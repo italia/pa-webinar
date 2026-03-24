@@ -1,0 +1,34 @@
+# ─────────────────────────────────────────────────────────────
+# eventi-dtd — Development / Staging overrides
+#
+# Usage:
+#   helm install eventi-dtd ./infra/helm/eventi-dtd \
+#     -f infra/helm/eventi-dtd/values.yaml \
+#     -f infra/helm/eventi-dtd/values-dev.yaml
+# ─────────────────────────────────────────────────────────────
+
+app:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+autoscaling:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: false
+
+postgresql:
+  enabled: true
+  primary:
+    persistence:
+      size: 5Gi
+      storageClass: ""
+
+jitsi:
+  enabled: true

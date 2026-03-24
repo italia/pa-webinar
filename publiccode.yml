@@ -1,0 +1,93 @@
+publiccodeYmlVersion: "0.4"
+name: eventi-dtd
+applicationSuite: eventi-dtd
+url: "https://github.com/italia/eventi-dtd"
+landingURL: "https://github.com/italia/eventi-dtd"
+softwareVersion: "0.1.0"
+releaseDate: "2026-03-24"
+developmentStatus: beta
+softwareType: standalone/web
+platforms:
+  - web
+
+categories:
+  - collaboration
+  - video-conferencing
+  - event-management
+
+usedBy:
+  - Dipartimento per la Trasformazione Digitale
+
+maintenance:
+  type: internal
+  contacts:
+    - name: Dipartimento per la Trasformazione Digitale
+      email: segreteria.trasformazionedigitale@governo.it
+
+legal:
+  license: EUPL-1.2
+  repoOwner: Dipartimento per la Trasformazione Digitale
+
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - it
+    - en
+
+it:
+  conforme:
+    lineeGuidaDesign: true
+    modelloInteroperabilita: false
+    misureMinimeSicurezza: true
+    gdpr: true
+  piattaforme:
+    spid: false
+    cie: false
+    anpr: false
+    pagopa: false
+
+description:
+  it:
+    genericName: Piattaforma eventi digitali
+    shortDescription: >
+      Piattaforma open-source per eventi pubblici digitali della PA, basata su Jitsi Meet e design system .italia.
+    longDescription: >
+      eventi-dtd è una piattaforma web per organizzare e gestire eventi pubblici digitali — webinar,
+      presentazioni, meeting pubblici — con fino a 300 partecipanti simultanei. Utilizza Jitsi Meet
+      come motore video/audio self-hosted e il design system .italia per l'interfaccia utente.
+
+      Funzionalità principali: video conferenza integrata, Q&A con upvote, registrazione partecipanti
+      GDPR-compliant, registrazione video, moderazione avanzata, inviti email con allegato iCal,
+      interfaccia bilingue IT/EN, design system .italia, cloud-native (Kubernetes).
+    features:
+      - Video conferenza con Jitsi Meet (fino a 300 partecipanti)
+      - Q&A con sistema di upvote
+      - Registrazione partecipanti GDPR-compliant
+      - Registrazione video con consenso esplicito
+      - Moderazione avanzata (mute, mani alzate, chat on/off)
+      - Email inviti con allegato iCal
+      - Interfaccia bilingue italiano/inglese
+      - Design system .italia (Bootstrap Italia)
+      - Cloud-native (Kubernetes, Helm, scale-to-zero)
+    screenshots:
+      - docs/screenshots/home.png
+      - docs/screenshots/event-detail.png
+      - docs/screenshots/live-room.png
+  en:
+    genericName: Digital events platform
+    shortDescription: >
+      Open-source platform for public digital events, built on Jitsi Meet and the Italian .italia design system.
+    longDescription: >
+      eventi-dtd is a web platform for organizing and managing public digital events — webinars,
+      presentations, public meetings — with up to 300 simultaneous participants. It uses Jitsi Meet
+      as a self-hosted video/audio engine and the .italia design system for the user interface.
+    features:
+      - Video conferencing with Jitsi Meet (up to 300 participants)
+      - Q&A with upvote system
+      - GDPR-compliant participant registration
+      - Video recording with explicit consent
+      - Advanced moderation (mute, hand raise, chat toggle)
+      - Email invitations with iCal attachment
+      - Bilingual interface (Italian/English)
+      - .italia design system (Bootstrap Italia)
+      - Cloud-native (Kubernetes, Helm, scale-to-zero)

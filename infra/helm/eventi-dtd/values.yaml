@@ -1,0 +1,380 @@
+# ─────────────────────────────────────────────────────────────
+# eventi-dtd — Helm Values
+#
+# Comprehensive configuration for the eventi-dtd platform.
+# Override with values-dev.yaml or values-prod.yaml per environment.
+# ─────────────────────────────────────────────────────────────
+
+# ── Application ──────────────────────────────────────────────
+
+app:
+  # Number of pod replicas (ignored when autoscaling.enabled=true)
+  replicaCount: 2
+
+  image:
+    # Container image registry/repository
+    repository: ghcr.io/italia/eventi-dtd
+    # Image tag — defaults to Chart.appVersion if empty
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  # Image pull secrets for private registries (e.g. Azure ACR)
+  imagePullSecrets: []
+  #   - name: acr-credentials
+
+  # Resource requests and limits
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+  # Node scheduling constraints
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  # ── Non-secret environment variables ──
+  # These are injected as a ConfigMap and mounted via envFrom.
+  # NEXT_PUBLIC_* vars are baked into the client bundle at build time,
+  # so they must match the build-time values.
+  env:
+    NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.eventi.dominio.gov.it"
+    NEXT_PUBLIC_APP_URL: "https://eventi.dominio.gov.it"
+    NEXT_PUBLIC_DEFAULT_LOCALE: "it"
+    DEFAULT_DATA_RETENTION_DAYS: "30"
+    DEFAULT_PRIVACY_POLICY_URL: "https://eventi.dominio.gov.it/it/privacy"
+
+  # ── Secrets ──
+  # Name of a pre-existing Kubernetes Secret containing sensitive variables.
+  # Required keys:
+  #   DATABASE_URL, JITSI_JWT_SECRET, JITSI_JWT_APP_ID, JITSI_JWT_ISSUER,
+  #   JITSI_JWT_AUDIENCE, APP_SECRET, ADMIN_API_KEY, PII_ENCRYPTION_KEY,
+  #   CRON_API_KEY, SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER,
+  #   SMTP_PASSWORD, SMTP_FROM, SMTP_FROM_NAME
+  # Optional keys:
+  #   AZURE_STORAGE_CONNECTION_STRING, AZURE_STORAGE_CONTAINER
+  existingSecret: "eventi-dtd-secrets"
+
+  # ── Security context ──
+
+  securityContext:
+    # Pod-level security context
+    pod:
+      runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 1001
+      fsGroup: 1001
+      seccompProfile:
+        type: RuntimeDefault
+
+    # Container-level security context
+    container:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1001
+      capabilities:
+        drop:
+          - ALL
+
+  # ── Writable volumes ──
+  # Required because readOnlyRootFilesystem is enabled.
+  # Next.js standalone needs /tmp and optionally .next/cache.
+  extraVolumes:
+    - name: tmp
+      emptyDir:
+        sizeLimit: 100Mi
+    - name: next-cache
+      emptyDir:
+        sizeLimit: 500Mi
+
+  extraVolumeMounts:
+    - name: tmp
+      mountPath: /tmp
+    - name: next-cache
+      mountPath: /app/.next/cache
+
+  # ── Health probes ──
+
+  probes:
+    # Liveness probe — restarts the container if it becomes unresponsive.
+    liveness:
+      httpGet:
+        path: /api/health
+        port: http
+      initialDelaySeconds: 15
+      periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+    # Readiness probe — removes the pod from Service endpoints when unhealthy.
+    readiness:
+      httpGet:
+        path: /api/health
+        port: http
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+    # Startup probe — gives the container time for initial startup.
+    # Prevents liveness probe from killing a slow-starting container.
+    startup:
+      httpGet:
+        path: /api/health
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      failureThreshold: 30
+
+  # Additional pod annotations (e.g. for Vault agent injector)
+  podAnnotations: {}
+
+  # Additional pod labels
+  podLabels: {}
+
+# ── Service ──────────────────────────────────────────────────
+
+service:
+  type: ClusterIP
+  port: 3000
+
+# ── ServiceAccount ───────────────────────────────────────────
+
+serviceAccount:
+  # Create a dedicated ServiceAccount for the app pods
+  create: true
+  # Annotations (e.g. for Azure Workload Identity)
+  annotations: {}
+  #   azure.workload.identity/client-id: "<managed-identity-client-id>"
+  # Override the ServiceAccount name (defaults to release fullname)
+  name: ""
+
+# ── Ingress ──────────────────────────────────────────────────
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/rate-limit: "10"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    # HSTS header for security
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+  hosts:
+    - host: eventi.dominio.gov.it
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: eventi-dtd-tls
+      hosts:
+        - eventi.dominio.gov.it
+
+# ── Horizontal Pod Autoscaler ────────────────────────────────
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  # Scale up when average CPU across all pods exceeds 70%
+  targetCPUUtilizationPercentage: 70
+  # Scale up when average memory exceeds 80%
+  targetMemoryUtilizationPercentage: 80
+  behavior:
+    scaleDown:
+      # Wait 5 minutes before scaling down to avoid flapping
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleUp:
+      # React to load spikes within 30 seconds
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+
+# ── Pod Disruption Budget ────────────────────────────────────
+
+podDisruptionBudget:
+  enabled: true
+  # At least 1 pod must remain available during voluntary disruptions
+  # (e.g. node drain, rolling update)
+  minAvailable: 1
+
+# ── CronJobs ─────────────────────────────────────────────────
+
+cronjobs:
+  # Email reminders for upcoming events (runs every 15 minutes)
+  reminders:
+    enabled: true
+    schedule: "*/15 * * * *"
+    image: curlimages/curl:8.11.1
+
+  # GDPR data cleanup — deletes PII past retention period (daily at 03:00)
+  cleanup:
+    enabled: true
+    schedule: "0 3 * * *"
+    image: curlimages/curl:8.11.1
+
+# ── Prometheus Metrics ───────────────────────────────────────
+
+metrics:
+  # Path where the app exposes Prometheus metrics
+  path: /api/metrics
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    scrapeTimeout: 10s
+    # Extra labels to match Prometheus Operator's serviceMonitorSelector
+    additionalLabels:
+      release: prometheus
+  # Optional: authenticate scrapes with a bearer token from a Secret
+  # bearerTokenSecret:
+  #   name: eventi-dtd-secrets
+  #   key: CRON_API_KEY
+
+# ── Jitsi Meet ───────────────────────────────────────────────
+
+jitsi:
+  # Set to false to use an external Jitsi instance.
+  # When true, the jitsi-meet subchart is deployed.
+  # Subchart values are under the top-level "jitsi-meet:" key below.
+  enabled: true
+
+  # ── External Jitsi configuration (when jitsi.enabled=false) ──
+  external:
+    # Jitsi domain as seen by the browser (e.g. jitsi.example.com)
+    domain: ""
+    jwtSecret: ""
+    jwtAppId: ""
+    jwtIssuer: ""
+    jwtAudience: ""
+
+# ── jitsi-meet subchart values ───────────────────────────────
+# These are passed directly to the jitsi-meet Helm subchart.
+# Only effective when jitsi.enabled=true.
+# Docs: https://github.com/jitsi-contrib/jitsi-helm
+
+jitsi-meet:
+  publicURL: "https://jitsi.eventi.dominio.gov.it"
+  enableAuth: true
+  enableGuests: false
+
+  prosody:
+    auth:
+      type: jwt
+      jwt:
+        appId: "eventi_dtd"
+        appSecret: ""  # Set via --set or Secret
+        acceptedIssuers: "eventi-dtd"
+        acceptedAudiences: "jitsi"
+
+  jvb:
+    replicaCount: 0  # Scale-to-zero — managed by KEDA or manual scaling
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "3"
+        memory: 4Gi
+    nodeSelector:
+      workload: jitsi-jvb
+    tolerations:
+      - key: workload
+        value: jitsi-jvb
+        effect: NoSchedule
+    useHostPort: true
+    useNodeIP: true
+    UDPPort: 10000
+
+  jibri:
+    enabled: true
+    replicaCount: 0
+    singleUseMode: true
+    nodeSelector:
+      workload: jitsi-jvb
+    tolerations:
+      - key: workload
+        value: jitsi-jvb
+        effect: NoSchedule
+
+  web:
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        # Restrict direct access — only IFrame API paths are allowed
+        nginx.ingress.kubernetes.io/server-snippet: |
+          location = / { return 403; }
+          location = /index.html { return 403; }
+      hosts:
+        - host: jitsi.eventi.dominio.gov.it
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: jitsi-tls
+          hosts:
+            - jitsi.eventi.dominio.gov.it
+
+# ── PostgreSQL ───────────────────────────────────────────────
+
+postgresql:
+  # Set to false to use Azure Database for PostgreSQL or another external DB
+  enabled: true
+
+  auth:
+    username: eventi
+    database: eventi_dtd
+    # Pre-existing Secret for PostgreSQL passwords
+    existingSecret: "eventi-dtd-secrets"
+    secretKeys:
+      adminPasswordKey: POSTGRES_ADMIN_PASSWORD
+      userPasswordKey: POSTGRES_PASSWORD
+
+  primary:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: managed-csi
+
+    securityContext:
+      enabled: true
+      fsGroup: 1001
+
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
+
+  # ── External PostgreSQL (when postgresql.enabled=false) ──
+  external:
+    host: ""
+    port: 5432
+    database: "eventi_dtd"
+    # Pre-existing Secret containing DATABASE_URL
+    existingSecret: ""
+    secretKey: "DATABASE_URL"

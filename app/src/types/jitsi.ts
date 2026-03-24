@@ -1,0 +1,102 @@
+/**
+ * Type declarations for Jitsi Meet IFrame API.
+ *
+ * Based on: https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-iframe/
+ * These types are NOT exhaustive — they cover the commands and events
+ * we actually use in eventi-dtd.
+ */
+
+export interface JitsiMeetExternalAPIOptions {
+  roomName: string;
+  width?: string | number;
+  height?: string | number;
+  parentNode?: HTMLElement;
+  configOverwrite?: Record<string, unknown>;
+  interfaceConfigOverwrite?: Record<string, unknown>;
+  jwt?: string;
+  lang?: string;
+  userInfo?: {
+    displayName?: string;
+    email?: string;
+  };
+  onload?: () => void;
+}
+
+export interface JitsiParticipant {
+  id: string;
+  displayName: string;
+  formattedDisplayName: string;
+  avatarURL?: string;
+  role: 'moderator' | 'participant';
+}
+
+export interface JitsiEventMap {
+  readyToClose: [];
+  videoConferenceJoined: [{ roomName: string; id: string; displayName: string }];
+  videoConferenceLeft: [{ roomName: string }];
+  participantJoined: [{ id: string; displayName: string }];
+  participantLeft: [{ id: string }];
+  participantRoleChanged: [{ id: string; role: string }];
+  audioMuteStatusChanged: [{ muted: boolean }];
+  videoMuteStatusChanged: [{ muted: boolean }];
+  raiseHandUpdated: [{ id: string; handRaised: number }];
+  recordingStatusChanged: [{ on: boolean; mode: string }];
+  dominantSpeakerChanged: [{ id: string }];
+  tileViewChanged: [{ enabled: boolean }];
+  filmstripDisplayChanged: [{ visible: boolean }];
+  participantsPaneToggled: [{ open: boolean }];
+}
+
+export type JitsiEventName = keyof JitsiEventMap;
+
+export interface JitsiMeetExternalAPI {
+  // Commands
+  executeCommand(command: 'muteEveryone'): void;
+  executeCommand(command: 'toggleAudio'): void;
+  executeCommand(command: 'toggleVideo'): void;
+  executeCommand(command: 'toggleTileView'): void;
+  executeCommand(command: 'toggleRaiseHand'): void;
+  executeCommand(command: 'toggleFilmStrip'): void;
+  executeCommand(command: 'toggleChat'): void;
+  executeCommand(command: 'toggleShareScreen'): void;
+  executeCommand(command: 'hangup'): void;
+  executeCommand(command: 'startRecording', options: { mode: 'file' | 'stream' }): void;
+  executeCommand(command: 'stopRecording', mode: 'file' | 'stream'): void;
+  executeCommand(command: 'kickParticipant', participantId: string): void;
+  executeCommand(command: 'setTileView', enabled: boolean): void;
+  executeCommand(command: 'setVideoQuality', quality: number): void;
+  executeCommand(command: 'subject', subject: string): void;
+  executeCommand(command: string, ...args: unknown[]): void;
+
+  // Event listeners
+  addListener<E extends JitsiEventName>(
+    event: E,
+    listener: (...args: JitsiEventMap[E]) => void
+  ): void;
+  removeListener<E extends JitsiEventName>(
+    event: E,
+    listener: (...args: JitsiEventMap[E]) => void
+  ): void;
+
+  // Queries
+  getParticipantsInfo(): JitsiParticipant[];
+  getNumberOfParticipants(): number;
+  isAudioMuted(): Promise<boolean>;
+  isVideoMuted(): Promise<boolean>;
+
+  // Lifecycle
+  dispose(): void;
+}
+
+/**
+ * Global type declaration for the JitsiMeetExternalAPI constructor.
+ * It's loaded via <script> from the Jitsi server.
+ */
+declare global {
+  interface Window {
+    JitsiMeetExternalAPI: new (
+      domain: string,
+      options: JitsiMeetExternalAPIOptions
+    ) => JitsiMeetExternalAPI;
+  }
+}
