@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Dropdown,
@@ -35,7 +35,6 @@ export default function AddToCalendar({
 }: AddToCalendarProps) {
   const t = useTranslations('events.detail.calendar');
   const [open, setOpen] = useState(false);
-  const toggleRef = useRef<HTMLButtonElement>(null);
 
   const baseUrl =
     typeof window !== 'undefined'
@@ -57,7 +56,6 @@ export default function AddToCalendar({
       <DropdownToggle
         color="outline-primary"
         className="w-100 d-flex align-items-center justify-content-center"
-        innerRef={toggleRef}
         caret
       >
         <Icon icon="it-calendar" size="sm" className="me-2" />
