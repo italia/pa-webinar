@@ -1,0 +1,92 @@
+# Kubernetes CronJobs for eventi-dtd scheduled tasks.
+# Both reference CRON_API_KEY from the eventi-dtd-secrets Secret.
+#
+# Apply: kubectl apply -f infra/aks/cronjobs.yaml -n eventi-dtd
+
+---
+# 1. Pre-event reminder emails — every 15 minutes
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: eventi-dtd-reminders
+  labels:
+    app.kubernetes.io/name: eventi-dtd
+    app.kubernetes.io/component: cron-reminders
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 120
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: eventi-dtd
+            app.kubernetes.io/component: cron-reminders
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: curl
+              image: curlimages/curl:latest
+              command:
+                - sh
+                - -c
+                - |
+                  curl -sf \
+                    -H "x-api-key: ${CRON_API_KEY}" \
+                    "${APP_URL}/api/cron/reminders"
+              env:
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: eventi-dtd-secrets
+                      key: CRON_API_KEY
+                - name: APP_URL
+                  value: "http://eventi-dtd-web.eventi-dtd.svc.cluster.local:3000"
+
+---
+# 2. GDPR data cleanup — daily at 03:00 UTC
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: eventi-dtd-cleanup
+  labels:
+    app.kubernetes.io/name: eventi-dtd
+    app.kubernetes.io/component: cron-cleanup
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 300
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: eventi-dtd
+            app.kubernetes.io/component: cron-cleanup
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: curl
+              image: curlimages/curl:latest
+              command:
+                - sh
+                - -c
+                - |
+                  curl -sf \
+                    -H "x-api-key: ${CRON_API_KEY}" \
+                    "${APP_URL}/api/cron/cleanup"
+              env:
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: eventi-dtd-secrets
+                      key: CRON_API_KEY
+                - name: APP_URL
+                  value: "http://eventi-dtd-web.eventi-dtd.svc.cluster.local:3000"

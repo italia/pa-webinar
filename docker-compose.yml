@@ -1,0 +1,197 @@
+# ─────────────────────────────────────────────────────────────
+# eventi-dtd — Docker Compose (full local stack)
+#
+# Usage:
+#   docker compose up --build -d          # Start everything
+#   docker compose --profile setup run db-migrate  # Seed DB
+#   docker compose logs -f app            # Watch app logs
+#   docker compose down -v                # Stop + remove volumes
+# ─────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Next.js Application ──────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://eventi:eventi_local_dev@postgres:5432/eventi_dtd
+      - NEXT_PUBLIC_JITSI_DOMAIN=localhost:8443
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - NEXT_PUBLIC_DEFAULT_LOCALE=it
+      - JITSI_JWT_SECRET=s3cr3t_dev_only
+      - JITSI_JWT_APP_ID=eventi_dtd
+      - JITSI_JWT_ISSUER=eventi-dtd
+      - JITSI_JWT_AUDIENCE=jitsi
+      - APP_SECRET=change_me_in_production
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+      - SMTP_SECURE=false
+      - SMTP_FROM=eventi@dominio.gov.it
+      - SMTP_FROM_NAME=Eventi DTD
+      - PII_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      - DEFAULT_PRIVACY_POLICY_URL=http://localhost:3000/it/privacy
+      - CRON_API_KEY=dev_cron_key_change_in_production
+      - ADMIN_API_KEY=dev_admin_key_2026
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # ── Database migration + seed (one-shot) ─────────────────
+  db-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    working_dir: /workspace/app
+    command: >
+      sh -c "npx prisma db push --skip-generate && npx tsx prisma/seed.ts"
+    environment:
+      - DATABASE_URL=postgresql://eventi:eventi_local_dev@postgres:5432/eventi_dtd
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["setup"]
+
+  # ── PostgreSQL ───────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: eventi_dtd
+      POSTGRES_USER: eventi
+      POSTGRES_PASSWORD: eventi_local_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventi -d eventi_dtd"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Jitsi Meet Stack ─────────────────────────────────────
+  # NOTE: In production, Jitsi Web should NOT be directly accessible.
+  # Use Kubernetes Ingress rules to restrict access to IFrame API paths only.
+  # See docs/ARCHITECTURE.md for the recommended Ingress configuration.
+
+  jitsi-web:
+    image: jitsi/web:stable
+    restart: unless-stopped
+    ports:
+      - "8443:443"
+    environment:
+      - ENABLE_AUTH=1
+      - AUTH_TYPE=jwt
+      - JWT_APP_ID=eventi_dtd
+      - JWT_APP_SECRET=${JITSI_JWT_SECRET:-s3cr3t_dev_only}
+      - JWT_ACCEPTED_ISSUERS=eventi-dtd
+      - JWT_ACCEPTED_AUDIENCES=jitsi
+      - ENABLE_GUESTS=0
+      - PUBLIC_URL=https://localhost:8443
+      - TZ=Europe/Rome
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_BOSH_URL_BASE=http://prosody:5280
+      - JVB_TCP_HARVESTER_DISABLED=true
+    volumes:
+      - jitsi_web_config:/config
+      - jitsi_web_crontabs:/var/spool/cron/crontabs
+      - jitsi_transcripts:/usr/share/jitsi-meet/transcripts
+    depends_on:
+      - prosody
+
+  prosody:
+    image: jitsi/prosody:stable
+    restart: unless-stopped
+    environment:
+      - ENABLE_AUTH=1
+      - AUTH_TYPE=jwt
+      - JWT_APP_ID=eventi_dtd
+      - JWT_APP_SECRET=${JITSI_JWT_SECRET:-s3cr3t_dev_only}
+      - JWT_ACCEPTED_ISSUERS=eventi-dtd
+      - JWT_ACCEPTED_AUDIENCES=jitsi
+      - ENABLE_GUESTS=0
+      - TZ=Europe/Rome
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_GUEST_DOMAIN=guest.meet.jitsi
+      - XMPP_MUC_DOMAIN=muc.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - XMPP_RECORDER_DOMAIN=recorder.meet.jitsi
+      - JICOFO_AUTH_PASSWORD=jicofo_pass
+      - JVB_AUTH_PASSWORD=jvb_pass
+      - JIBRI_XMPP_PASSWORD=jibri_pass
+      - JIBRI_RECORDER_PASSWORD=jibri_recorder_pass
+    volumes:
+      - jitsi_prosody_config:/config
+      - jitsi_prosody_plugins:/prosody-plugins-custom
+
+  jicofo:
+    image: jitsi/jicofo:stable
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Rome
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - XMPP_MUC_DOMAIN=muc.meet.jitsi
+      - XMPP_SERVER=prosody
+      - JICOFO_AUTH_PASSWORD=jicofo_pass
+      - AUTH_TYPE=jwt
+      - ENABLE_AUTH=1
+    volumes:
+      - jitsi_jicofo_config:/config
+    depends_on:
+      - prosody
+
+  jvb:
+    image: jitsi/jvb:stable
+    restart: unless-stopped
+    ports:
+      - "10000:10000/udp"
+    environment:
+      - TZ=Europe/Rome
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - XMPP_SERVER=prosody
+      - JVB_AUTH_PASSWORD=jvb_pass
+      - JVB_PORT=10000
+      - JVB_STUN_SERVERS=stun.l.google.com:19302
+      - DOCKER_HOST_ADDRESS=${DOCKER_HOST_ADDRESS:-host.docker.internal}
+    volumes:
+      - jitsi_jvb_config:/config
+    depends_on:
+      - prosody
+
+  # ── Mailpit (local email testing) ────────────────────────
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+volumes:
+  postgres_data:
+  jitsi_web_config:
+  jitsi_web_crontabs:
+  jitsi_transcripts:
+  jitsi_prosody_config:
+  jitsi_prosody_plugins:
+  jitsi_jicofo_config:
+  jitsi_jvb_config:

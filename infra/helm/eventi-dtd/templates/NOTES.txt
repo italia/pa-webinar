@@ -1,0 +1,57 @@
+╔══════════════════════════════════════════════════════════════╗
+║            eventi-dtd è stato installato!                    ║
+╚══════════════════════════════════════════════════════════════╝
+
+─── Portale ──────────────────────────────────────────────────
+{{- if .Values.ingress.enabled }}
+  URL:   https://{{ (index .Values.ingress.hosts 0).host }}
+{{- else }}
+  kubectl port-forward svc/{{ include "eventi-dtd.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+  URL:   http://localhost:{{ .Values.service.port }}
+{{- end }}
+
+─── Area amministrazione ─────────────────────────────────────
+{{- if .Values.ingress.enabled }}
+  URL:   https://{{ (index .Values.ingress.hosts 0).host }}/it/admin/login
+{{- else }}
+  URL:   http://localhost:{{ .Values.service.port }}/it/admin/login
+{{- end }}
+  Usa la chiave di accesso configurata in ADMIN_API_KEY
+  nel Secret "{{ .Values.app.existingSecret }}".
+
+─── Metriche ─────────────────────────────────────────────────
+{{- if .Values.metrics.serviceMonitor.enabled }}
+  ServiceMonitor creato — le metriche saranno raccolte da Prometheus.
+  Endpoint: {{ .Values.metrics.path | default "/api/metrics" }}
+{{- else }}
+  ServiceMonitor non abilitato. Per abilitare:
+    helm upgrade {{ .Release.Name }} ... --set metrics.serviceMonitor.enabled=true
+{{- end }}
+
+─── Database ─────────────────────────────────────────────────
+{{- if .Values.postgresql.enabled }}
+  PostgreSQL installato come subchart nel namespace {{ .Release.Namespace }}.
+  Database: {{ .Values.postgresql.auth.database }}
+  Utente:   {{ .Values.postgresql.auth.username }}
+{{- else }}
+  Connessione al database esterno.
+  Verifica che DATABASE_URL sia configurato nel Secret "{{ .Values.app.existingSecret }}".
+{{- end }}
+
+─── Jitsi Meet ───────────────────────────────────────────────
+{{- if .Values.jitsi.enabled }}
+  Jitsi Meet installato come subchart.
+  Ricorda di creare il node pool jvb dedicato e scalare i JVB pods
+  prima degli eventi. Vedi docs/ARCHITECTURE.md.
+{{- else }}
+  Connessione a Jitsi esterno: {{ .Values.jitsi.external.domain }}
+  Verifica che JITSI_JWT_SECRET sia configurato nel Secret "{{ .Values.app.existingSecret }}".
+{{- end }}
+
+─── Prossimi passi ───────────────────────────────────────────
+  1. Crea il Secret "{{ .Values.app.existingSecret }}" se non esiste
+  2. Esegui le migrazioni del database (prisma db push)
+  3. Accedi al pannello admin e crea il primo evento
+  4. Configura i backup del database
+
+  Documentazione completa: docs/ARCHITECTURE.md, docs/CONFIGURATION.md

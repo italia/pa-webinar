@@ -1,0 +1,57 @@
+# Dependencies (installed fresh in container)
+node_modules
+app/node_modules
+
+# Build output (built fresh in container)
+app/.next
+.next
+
+# Git
+.git
+.github
+.gitignore
+
+# Environment files (NEVER bake secrets into image)
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# IDE
+.vscode
+.idea
+.cursor
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker (avoid recursive context)
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Documentation (not needed in image)
+docs/
+*.md
+LICENSE
+CLAUDE.md
+.cursorrules
+
+# Infrastructure (not needed in image)
+infra/
+
+# Tests
+coverage/
+test-results/
+playwright-report/
+app/e2e/
+
+# Misc
+*.tar.gz
+*.log
+*.tgz
