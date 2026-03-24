@@ -1,0 +1,19 @@
+# ─────────────────────────────────────────────────────────────
+# eventi-dtd — Docker Compose dev override (hot-reload)
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+# ─────────────────────────────────────────────────────────────
+
+services:
+  app:
+    build:
+      target: deps
+    working_dir: /workspace/app
+    command: npx next dev --hostname 0.0.0.0
+    volumes:
+      - ./app/src:/workspace/app/src
+      - ./app/public:/workspace/app/public
+      - ./app/prisma:/workspace/app/prisma
+    environment:
+      - NODE_ENV=development

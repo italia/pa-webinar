@@ -1,0 +1,48 @@
+# ─────────────────────────────────────────────────────────────
+# eventi-dtd — Production overrides
+#
+# Usage:
+#   helm install eventi-dtd ./infra/helm/eventi-dtd \
+#     -f infra/helm/eventi-dtd/values.yaml \
+#     -f infra/helm/eventi-dtd/values-prod.yaml \
+#     --set app.existingSecret=eventi-dtd-secrets
+# ─────────────────────────────────────────────────────────────
+
+app:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 1Gi
+
+  nodeSelector:
+    workload: general
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 8
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Use Azure Database for PostgreSQL — no subchart
+postgresql:
+  enabled: false
+  external:
+    host: "eventi-db.postgres.database.azure.com"
+    existingSecret: "eventi-dtd-secrets"
+    secretKey: "DATABASE_URL"
+
+jitsi:
+  enabled: true
+
+jitsi-meet:
+  jvb:
+    replicaCount: 0
+    nodeSelector:
+      workload: jitsi-jvb

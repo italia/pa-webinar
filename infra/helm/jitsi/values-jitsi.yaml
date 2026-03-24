@@ -1,0 +1,140 @@
+# Jitsi Meet Helm Values — AKS Production
+# Chart: https://github.com/jitsi-contrib/jitsi-helm
+#
+# helm repo add jitsi https://jitsi-contrib.github.io/jitsi-helm/
+# helm install jitsi jitsi/jitsi-meet -f values-jitsi.yaml -n eventi-dtd
+
+publicURL: "https://jitsi.eventi.dominio.gov.it"
+
+# ── Authentication ────────────────────────────────────
+enableAuth: true
+enableGuests: false
+
+prosody:
+  auth:
+    type: jwt
+    jwt:
+      appId: "eventi_dtd"
+      appSecret: ""           # Set via --set or sealed secret
+      acceptedIssuers: "eventi-dtd"
+      acceptedAudiences: "jitsi"
+
+  extraEnvs:
+    - name: TZ
+      value: "Europe/Rome"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ── Jicofo ────────────────────────────────────────────
+jicofo:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ── JVB (Video Bridge) ───────────────────────────────
+jvb:
+  replicaCount: 0             # Scale-to-zero default, scaled up per-event
+
+  resources:
+    requests:
+      cpu: "1"
+      memory: 2Gi
+    limits:
+      cpu: "3"
+      memory: 4Gi
+
+  # Run on dedicated node pool
+  nodeSelector:
+    workload: jitsi-jvb
+  tolerations:
+    - key: workload
+      value: jitsi-jvb
+      effect: NoSchedule
+
+  # Expose JVB UDP port via hostPort
+  useHostPort: true
+  useNodeIP: true
+  UDPPort: 10000
+
+  # Metrics
+  metrics:
+    enabled: true
+    image:
+      repository: docker.io/systemli/prometheus-jitsi-meet-exporter
+      tag: 1.2.3
+    serviceMonitor:
+      enabled: true
+      selector:
+        release: prometheus
+
+  service:
+    enabled: false            # Using hostPort instead
+
+# ── Web ──────────────────────────────────────────────
+web:
+  # We don't expose Jitsi's web UI directly to users;
+  # it's only used for the IFrame API JS and BOSH endpoint
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: jitsi.eventi.dominio.gov.it
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: jitsi-tls
+        hosts:
+          - jitsi.eventi.dominio.gov.it
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# ── Jibri (Recording) ────────────────────────────────
+jibri:
+  enabled: true
+  replicaCount: 0             # Scaled up when recording is requested
+  singleUseMode: true         # One recording per pod instance
+
+  recording: true
+  livestreaming: false
+
+  nodeSelector:
+    workload: jitsi-jvb       # Same pool as JVB
+  tolerations:
+    - key: workload
+      value: jitsi-jvb
+      effect: NoSchedule
+
+  resources:
+    requests:
+      cpu: "1"
+      memory: 2Gi
+    limits:
+      cpu: "2"
+      memory: 4Gi
+
+  shm:
+    enabled: true
+
+  persistence:
+    enabled: true
+    size: 32Gi
+    storageClassName: managed-csi

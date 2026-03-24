@@ -1,0 +1,30 @@
+{
+  "name": "eventi-dtd",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Piattaforma open-source per eventi pubblici digitali del DTD",
+  "license": "EUPL-1.2",
+  "workspaces": ["app"],
+  "scripts": {
+    "dev": "npm run dev --workspace=app",
+    "build": "npm run build --workspace=app",
+    "start": "npm run start --workspace=app",
+    "lint": "npm run lint --workspace=app",
+    "test": "npm run test --workspace=app",
+    "test:e2e": "npm run test:e2e --workspace=app",
+    "db:push": "npm run db:push --workspace=app",
+    "db:migrate": "npm run db:migrate --workspace=app",
+    "db:studio": "npm run db:studio --workspace=app",
+    "format": "prettier --write .",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "overrides": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
