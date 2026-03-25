@@ -2,14 +2,12 @@
 
 import { useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { Button, Alert, Input, FormGroup, Label } from 'design-react-kit';
 
 export default function AdminLoginPage() {
   const t = useTranslations('admin');
   const router = useRouter();
-  const params = useParams();
-  const locale = params.locale as string;
 
   const [key, setKey] = useState('');
   const [error, setError] = useState(false);
@@ -28,7 +26,7 @@ export default function AdminLoginPage() {
       });
 
       if (res.ok) {
-        router.push(`/${locale}/admin`);
+        router.push('/admin');
       } else {
         setError(true);
       }

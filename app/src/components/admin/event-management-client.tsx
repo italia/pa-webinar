@@ -157,7 +157,7 @@ export default function EventManagementClient({
 
   const publicUrl = `${baseUrl}/${locale}/eventi/${event.slug}`;
   const moderatorUrl = `${baseUrl}/${locale}/admin/eventi/${event.id}?token=${event.moderatorToken}`;
-  const liveModeratorUrl = `/${locale}/eventi/${event.slug}/live?token=${event.moderatorToken}`;
+  const liveModeratorUrl = `/eventi/${event.slug}/live?token=${event.moderatorToken}`;
 
   const togglePublish = useCallback(async () => {
     const newStatus = status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
@@ -250,6 +250,12 @@ export default function EventManagementClient({
               {t('startEvent')}
             </Button>
           )}
+          <Link href={`/admin/eventi/${event.id}/modifica?token=${event.moderatorToken}`}>
+            <Button color="secondary" outline tag="span">
+              <Icon icon="it-pencil" size="sm" className="me-1" />
+              {t('editEvent')}
+            </Button>
+          </Link>
           <Button
             color={status === 'PUBLISHED' ? 'warning' : 'primary'}
             onClick={togglePublish}

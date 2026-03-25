@@ -7,6 +7,7 @@ import {
   extractModeratorToken,
   verifyModeratorToken,
 } from '@/lib/auth/moderator';
+import { sendDateChangeNotifications } from '@/lib/email/notification';
 
 export const dynamic = 'force-dynamic';
 
@@ -81,6 +82,11 @@ export async function GET(request: Request, context: RouteContext) {
       jitsiRoomName: event.jitsiRoomName,
       dataRetentionDays: event.dataRetentionDays,
       privacyPolicyUrl: event.privacyPolicyUrl,
+      speakersIt: event.speakersIt,
+      speakersEn: event.speakersEn,
+      organizerName: event.organizerName,
+      imageUrl: event.imageUrl,
+      waitingRoomAudioUrl: event.waitingRoomAudioUrl,
       createdAt: event.createdAt.toISOString(),
       registrations: event.registrations,
     });
@@ -153,6 +159,10 @@ export async function PUT(request: Request, context: RouteContext) {
 
   const data = parsed.data;
 
+  const dateChanged =
+    (data.startsAt !== undefined && data.startsAt !== event.startsAt.toISOString()) ||
+    (data.endsAt !== undefined && data.endsAt !== event.endsAt.toISOString());
+
   const updated = await prisma.event.update({
     where: { id: eventId },
     data: {
@@ -191,11 +201,21 @@ export async function PUT(request: Request, context: RouteContext) {
       ...(data.moderatorEmail !== undefined && {
         moderatorEmail: data.moderatorEmail,
       }),
+      ...(data.speakersIt !== undefined && { speakersIt: data.speakersIt }),
+      ...(data.speakersEn !== undefined && { speakersEn: data.speakersEn }),
+      ...(data.organizerName !== undefined && { organizerName: data.organizerName }),
+      ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
+      ...(data.waitingRoomAudioUrl !== undefined && { waitingRoomAudioUrl: data.waitingRoomAudioUrl }),
       ...(data.status !== undefined && { status: data.status }),
     },
   });
 
-  return NextResponse.json(updated);
+  if (dateChanged && event.status === 'PUBLISHED') {
+    const locale = resolveLocale(request) as 'it' | 'en';
+    sendDateChangeNotifications({ eventId, locale });
+  }
+
+  return NextResponse.json({ ...updated, dateChanged });
 }
 
 // ── DELETE /api/events/[id] — Delete event (moderator only) ──
