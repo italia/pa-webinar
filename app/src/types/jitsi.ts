@@ -66,6 +66,12 @@ export interface JitsiMeetExternalAPI {
   executeCommand(command: 'setTileView', enabled: boolean): void;
   executeCommand(command: 'setVideoQuality', quality: number): void;
   executeCommand(command: 'subject', subject: string): void;
+  executeCommand(command: 'enableAudioModeration'): void;
+  executeCommand(command: 'disableAudioModeration'): void;
+  executeCommand(command: 'enableVideoModeration'): void;
+  executeCommand(command: 'disableVideoModeration'): void;
+  executeCommand(command: 'approveAudio', participantId: string): void;
+  executeCommand(command: 'approveVideo', participantId: string): void;
   executeCommand(command: string, ...args: unknown[]): void;
 
   // Event listeners

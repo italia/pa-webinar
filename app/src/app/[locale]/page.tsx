@@ -6,7 +6,7 @@ import EventListClient from '@/components/events/event-list-client';
 
 export default async function HomePage() {
   const t = await getTranslations('home');
-  const locale = await getLocale();
+  const _locale = await getLocale();
 
   const events = await prisma.event.findMany({
     where: { status: { in: ['PUBLISHED', 'LIVE'] } },

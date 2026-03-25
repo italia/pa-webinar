@@ -99,6 +99,25 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       event.maxParticipants - event._count.registrations,
   };
 
+  // Fetch answered/highlighted Q&A for ended events
+  let answeredQuestions: { id: string; text: string; authorName: string; upvotes: number; status: string }[] = [];
+  if (event.status === 'ENDED' && event.qaEnabled) {
+    const questions = await prisma.question.findMany({
+      where: {
+        eventId: event.id,
+        status: { in: ['ANSWERED', 'HIGHLIGHTED'] },
+      },
+      orderBy: { upvoteCount: 'desc' },
+    });
+    answeredQuestions = questions.map((q) => ({
+      id: q.id,
+      text: q.text,
+      authorName: q.authorName,
+      upvotes: q.upvoteCount,
+      status: q.status,
+    }));
+  }
+
   const serialised = {
     id: event.id,
     slug: event.slug,
@@ -128,7 +147,11 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <EventDetailClient event={serialised} locale={locale} />
+      <EventDetailClient
+        event={serialised}
+        locale={locale}
+        answeredQuestions={answeredQuestions}
+      />
     </>
   );
 }

@@ -42,7 +42,7 @@ export default function QAPanel({
       </div>
 
       <div
-        className={`border-start bg-white d-flex flex-column ${showOnMobile ? '' : 'd-none d-lg-flex'}`}
+        className={`qa-sidebar d-flex flex-column ${showOnMobile ? '' : 'd-none d-lg-flex'}`}
         style={{ width: '100%', maxWidth: '360px', overflowY: 'auto' }}
       >
         <div className="p-3 border-bottom">
@@ -50,6 +50,9 @@ export default function QAPanel({
             <Icon icon="it-comment" className="me-2" />
             {t('title')}
           </h3>
+          <p className="text-muted mb-0 mt-1" style={{ fontSize: '0.78rem' }}>
+            {t('qaPersistenceNote')}
+          </p>
         </div>
 
         <div className="p-3 flex-grow-1" style={{ overflowY: 'auto' }}>

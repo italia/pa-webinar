@@ -14,6 +14,15 @@ import {
 
 import { Link } from '@/i18n/navigation';
 import AddToCalendar from '@/components/events/add-to-calendar';
+import PostEventQA from '@/components/events/post-event-qa';
+
+interface AnsweredQuestion {
+  id: string;
+  text: string;
+  authorName: string;
+  upvotes: number;
+  status: string;
+}
 
 interface EventData {
   id: string;
@@ -41,6 +50,7 @@ interface EventData {
 interface EventDetailClientProps {
   event: EventData;
   locale: string;
+  answeredQuestions?: AnsweredQuestion[];
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -52,6 +62,7 @@ const STATUS_COLOR: Record<string, string> = {
 export default function EventDetailClient({
   event,
   locale,
+  answeredQuestions = [],
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const format = useFormatter();
@@ -249,6 +260,16 @@ export default function EventDetailClient({
           >
             {description}
           </div>
+
+          {isEnded && event.qaEnabled && answeredQuestions.length > 0 && (
+            <div className="mt-4">
+              <h2 className="h4 fw-semibold mb-3" style={{ color: '#17324D' }}>
+                <Icon icon="it-comment" className="me-2" />
+                {t('detail.qaPostEvent')}
+              </h2>
+              <PostEventQA questions={answeredQuestions} />
+            </div>
+          )}
         </Col>
 
         <Col lg={4}>

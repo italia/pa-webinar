@@ -74,6 +74,9 @@ export async function GET(request: Request, context: RouteContext) {
       qaEnabled: event.qaEnabled,
       chatEnabled: event.chatEnabled,
       recordingEnabled: event.recordingEnabled,
+      participantsCanUnmute: event.participantsCanUnmute,
+      participantsCanStartVideo: event.participantsCanStartVideo,
+      participantsCanShareScreen: event.participantsCanShareScreen,
       status: event.status,
       recordingUrl: event.recordingUrl,
       moderatorToken: event.moderatorToken,
@@ -106,6 +109,9 @@ export async function GET(request: Request, context: RouteContext) {
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
     recordingEnabled: event.recordingEnabled,
+    participantsCanUnmute: event.participantsCanUnmute,
+    participantsCanStartVideo: event.participantsCanStartVideo,
+    participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
     recordingUrl: event.recordingUrl,
   });
@@ -188,6 +194,15 @@ export async function PUT(request: Request, context: RouteContext) {
       }),
       ...(data.recordingEnabled !== undefined && {
         recordingEnabled: data.recordingEnabled,
+      }),
+      ...(data.participantsCanUnmute !== undefined && {
+        participantsCanUnmute: data.participantsCanUnmute,
+      }),
+      ...(data.participantsCanStartVideo !== undefined && {
+        participantsCanStartVideo: data.participantsCanStartVideo,
+      }),
+      ...(data.participantsCanShareScreen !== undefined && {
+        participantsCanShareScreen: data.participantsCanShareScreen,
       }),
       ...(data.dataRetentionDays !== undefined && {
         dataRetentionDays: data.dataRetentionDays,

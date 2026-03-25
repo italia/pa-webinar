@@ -1,19 +1,21 @@
 # Waiting Room Audio
 
-Place a royalty-free ambient/lofi audio loop here as `waiting-room-default.mp3`.
+Default waiting room music: `waiting-room-default.mp3`
 
-Requirements:
-- Format: MP3, 128kbps or lower
-- Duration: 30–120 seconds (will loop automatically)
-- Style: calm ambient/lofi suitable for a professional public event lobby
-- License: CC0, CC-BY, or similar royalty-free license
-- No vocals
+**Track**: "Amore al Mare (Love at the Sea)" — Romantic Italian Melody  
+**Author**: Grand Project  
+**License**: Royalty-free (Pixabay license)  
+**Source**: [Pixabay](https://pixabay.com/)
 
-Recommended sources:
-- https://freemusicarchive.org/ (filter by CC0)
-- https://pixabay.com/music/ (Pixabay License)
-- https://incompetech.com/ (Kevin MacLeod, CC-BY)
+## Requirements
 
-The waiting room component falls back to this file when no per-event
-`waitingRoomAudioUrl` is configured. If this file is absent, the music
-button is simply hidden.
+- Format: MP3
+- Duration: any (looped playback)
+- Volume: played at 30% in the waiting room
+- Content: instrumental only, no vocals
+
+## Replacing the default audio
+
+Replace `waiting-room-default.mp3` with your own file. The player supports any browser-compatible audio format (MP3, OGG, WAV).
+
+Alternatively, set a per-event audio URL in the admin event creation form (`waitingRoomAudioUrl` field).

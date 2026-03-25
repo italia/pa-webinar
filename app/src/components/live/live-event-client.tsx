@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
   Alert,
@@ -18,6 +18,9 @@ import RecordingConsent, {
 } from '@/components/jitsi/recording-consent';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
 import QAPanel from '@/components/qa/qa-panel';
+import PreJoinScreen from '@/components/live/pre-join-screen';
+import GuestJoinForm from '@/components/live/guest-join-form';
+import AudioPlayer from '@/components/live/audio-player';
 
 interface EventInfo {
   id: string;
@@ -30,19 +33,25 @@ interface EventInfo {
   qaEnabled: boolean;
   chatEnabled: boolean;
   waitingRoomAudioUrl: string | null;
+  participantsCanUnmute: boolean;
+  participantsCanStartVideo: boolean;
+  participantsCanShareScreen: boolean;
 }
 
 interface LiveEventClientProps {
   event: EventInfo;
   token: string;
   isModerator: boolean;
+  isGuest?: boolean;
   displayName: string;
   locale: string;
 }
 
 type LivePhase =
   | 'waiting'
+  | 'guest_join'
   | 'consent_pending'
+  | 'pre_join'
   | 'fetching_jwt'
   | 'ready'
   | 'ended'
@@ -61,7 +70,8 @@ export default function LiveEventClient({
   event,
   token,
   isModerator,
-  displayName: _displayName,
+  isGuest = false,
+  displayName: initialDisplayName,
   locale,
 }: LiveEventClientProps) {
   const t = useTranslations('live');
@@ -75,51 +85,53 @@ export default function LiveEventClient({
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState('');
   const [jitsiApi, setJitsiApi] = useState<JitsiMeetExternalAPI | null>(null);
+  const [chosenName, setChosenName] = useState(initialDisplayName);
 
   const startsAtMs = new Date(event.startsAt).getTime();
   const [countdown, setCountdown] = useState('');
   const [eventStatus, setEventStatus] = useState(event.status);
-  const [musicPlaying, setMusicPlaying] = useState(false);
   const [startingEvent, setStartingEvent] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Determine initial phase based on event status and role
+  // Determine initial phase
   useEffect(() => {
     if (eventStatus === 'ENDED') {
       setPhase('ended');
       return;
     }
 
-    if (eventStatus === 'LIVE') {
-      if (isModerator) {
-        setPhase('fetching_jwt');
-      } else if (event.recordingEnabled) {
-        setPhase('consent_pending');
+    if (isGuest) {
+      if (eventStatus === 'LIVE') {
+        setPhase('guest_join');
       } else {
-        setPhase('fetching_jwt');
+        setPhase('waiting');
       }
       return;
     }
 
-    // PUBLISHED or DRAFT — show waiting room for everyone
+    if (eventStatus === 'LIVE') {
+      if (isModerator) {
+        setPhase('pre_join');
+      } else if (event.recordingEnabled) {
+        setPhase('consent_pending');
+      } else {
+        setPhase('pre_join');
+      }
+      return;
+    }
+
     setPhase('waiting');
-  }, [eventStatus, event.recordingEnabled, isModerator]);
+  }, [eventStatus, event.recordingEnabled, isModerator, isGuest]);
 
   // Countdown timer
   useEffect(() => {
     if (phase !== 'waiting') return;
-
     function updateCountdown() {
       const diff = startsAtMs - Date.now();
-      if (diff <= 0) {
-        setCountdown('');
-        return;
-      }
+      if (diff <= 0) { setCountdown(''); return; }
       const days = Math.floor(diff / 86400000);
       const hours = Math.floor((diff % 86400000) / 3600000);
       const minutes = Math.floor((diff % 3600000) / 60000);
       const seconds = Math.floor((diff % 60000) / 1000);
-
       const parts: string[] = [];
       if (days > 0) parts.push(`${days}g`);
       if (hours > 0) parts.push(`${hours}h`);
@@ -127,16 +139,14 @@ export default function LiveEventClient({
       parts.push(`${String(seconds).padStart(2, '0')}s`);
       setCountdown(parts.join(' '));
     }
-
     updateCountdown();
     const timer = setInterval(updateCountdown, 1000);
     return () => clearInterval(timer);
   }, [phase, startsAtMs]);
 
-  // Poll event status in waiting room (3s interval)
+  // Poll event status in waiting room
   useEffect(() => {
     if (phase !== 'waiting') return;
-
     const pollInterval = setInterval(async () => {
       try {
         const res = await fetch(`/api/events/${event.slug}`);
@@ -145,21 +155,24 @@ export default function LiveEventClient({
         if (data.status && data.status !== eventStatus) {
           setEventStatus(data.status);
         }
-      } catch {
-        /* retry */
-      }
+      } catch { /* retry */ }
     }, 3000);
-
     return () => clearInterval(pollInterval);
   }, [phase, event.slug, eventStatus]);
 
+  // Fetch JWT
   const fetchJwt = useCallback(async () => {
     setError('');
-
     try {
-      const body = isModerator
-        ? { moderatorToken: token }
-        : { accessToken: token };
+      const body: Record<string, string> = {};
+      if (isModerator) {
+        body.moderatorToken = token;
+      } else {
+        body.accessToken = token;
+      }
+      if (chosenName && chosenName !== initialDisplayName) {
+        body.displayNameOverride = chosenName;
+      }
 
       const res = await fetch(`/api/events/${event.slug}/jitsi/token`, {
         method: 'POST',
@@ -181,43 +194,46 @@ export default function LiveEventClient({
       setError(t('connectionError'));
       setPhase('error');
     }
-  }, [event.slug, isModerator, token, t]);
+  }, [event.slug, isModerator, token, chosenName, initialDisplayName, t]);
 
   useEffect(() => {
-    if (phase === 'fetching_jwt') {
-      fetchJwt();
-    }
+    if (phase === 'fetching_jwt') { fetchJwt(); }
   }, [phase, fetchJwt]);
 
   const handleConsentAccept = useCallback(() => {
-    setPhase('fetching_jwt');
+    setPhase('pre_join');
   }, []);
 
   const handleConsentDecline = useCallback(() => {
     router.push(`/eventi/${event.slug}`);
   }, [router, event.slug]);
 
-  const handleJitsiReady = useCallback(() => {
-    // Jitsi connected
+  const handlePreJoin = useCallback((name: string) => {
+    setChosenName(name);
+    setPhase('fetching_jwt');
   }, []);
 
-  const handleJitsiLeft = useCallback(() => {
-    setPhase('ended');
+  const handleGuestJoined = useCallback((creds: JitsiCredentials) => {
+    setCredentials(creds);
+    setChosenName(creds.displayName);
+    setPhase('ready');
   }, []);
 
-  const handleParticipantCountChanged = useCallback((count: number) => {
-    setParticipantCount(count);
-  }, []);
+  const handleJitsiReady = useCallback(() => {}, []);
+  const handleJitsiLeft = useCallback(() => { setPhase('ended'); }, []);
+  const handleParticipantCountChanged = useCallback((count: number) => { setParticipantCount(count); }, []);
+  const handleRecordingStatusChanged = useCallback((recording: boolean) => { setIsRecording(recording); }, []);
+  const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => { setJitsiApi(api); }, []);
 
-  const handleRecordingStatusChanged = useCallback((recording: boolean) => {
-    setIsRecording(recording);
-  }, []);
+  const handleLeaveRoom = useCallback(() => {
+    if (jitsiApi) {
+      jitsiApi.executeCommand('hangup');
+    } else {
+      setPhase('ended');
+    }
+  }, [jitsiApi]);
 
-  const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => {
-    setJitsiApi(api);
-  }, []);
-
-  // Moderator: start event (PATCH to LIVE)
+  // Moderator: start event
   const handleStartEvent = useCallback(async () => {
     setStartingEvent(true);
     try {
@@ -232,38 +248,18 @@ export default function LiveEventClient({
     }
   }, [event.id, token]);
 
-  // ── Audio ──
-  const audioSrc = event.waitingRoomAudioUrl || '/audio/waiting-room-default.mp3';
+  // ── Guest join form (no token, LIVE event) ──
+  if (phase === 'guest_join') {
+    return (
+      <GuestJoinForm
+        eventTitle={event.title}
+        eventSlug={event.slug}
+        onJoined={handleGuestJoined}
+      />
+    );
+  }
 
-  const toggleMusic = useCallback(() => {
-    if (!audioRef.current) {
-      const audio = new Audio(audioSrc);
-      audio.loop = true;
-      audio.volume = 0.3;
-      audioRef.current = audio;
-    }
-
-    if (musicPlaying) {
-      audioRef.current.pause();
-      setMusicPlaying(false);
-    } else {
-      audioRef.current.play().then(() => {
-        setMusicPlaying(true);
-      }).catch(() => {
-        setMusicPlaying(false);
-      });
-    }
-  }, [musicPlaying, audioSrc]);
-
-  useEffect(() => {
-    if (phase !== 'waiting' && audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-      setMusicPlaying(false);
-    }
-  }, [phase]);
-
-  // ── Waiting room (moderators AND participants) ──
+  // ── Waiting room ──
   if (phase === 'waiting') {
     return (
       <div className="container py-5">
@@ -275,13 +271,10 @@ export default function LiveEventClient({
             <p className="text-muted mb-4">
               {t('eventStartsAt', {
                 date: format.dateTime(new Date(startsAtMs), {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
+                  day: 'numeric', month: 'long', year: 'numeric',
                 }),
                 time: format.dateTime(new Date(startsAtMs), {
-                  hour: '2-digit',
-                  minute: '2-digit',
+                  hour: '2-digit', minute: '2-digit',
                 }),
               })}
             </p>
@@ -291,60 +284,29 @@ export default function LiveEventClient({
                 className="bg-primary text-white rounded-3 p-4 mb-4 d-inline-block"
                 style={{ minWidth: '280px' }}
               >
-                <div className="small text-uppercase mb-1 opacity-75">
-                  {t('countdown')}
-                </div>
-                <div className="display-6 fw-bold font-monospace">
-                  {countdown}
-                </div>
+                <div className="small text-uppercase mb-1 opacity-75">{t('countdown')}</div>
+                <div className="display-6 fw-bold font-monospace">{countdown}</div>
               </div>
             )}
 
-            {/* Moderator: start event button */}
             {isModerator && (
               <div className="mb-4">
                 <Button
-                  color="success"
-                  size="lg"
-                  className="px-5"
-                  onClick={handleStartEvent}
-                  disabled={startingEvent}
+                  color="success" size="lg" className="px-5"
+                  onClick={handleStartEvent} disabled={startingEvent}
                 >
                   {startingEvent ? (
-                    <>
-                      <Spinner active size="sm" className="me-2" />
-                      {t('startingEvent')}
-                    </>
+                    <><Spinner active small className="me-2" />{t('startingEvent')}</>
                   ) : (
-                    <>
-                      <Icon icon="it-video" size="sm" color="white" className="me-2" />
-                      {t('startEventButton')}
-                    </>
+                    <><Icon icon="it-video" size="sm" color="white" className="me-2" />{t('startEventButton')}</>
                   )}
                 </Button>
-                {isModerator && (
-                  <Badge color="info" pill className="ms-3 px-3 py-2">
-                    {t('moderatorBadge')}
-                  </Badge>
-                )}
+                <Badge color="info" pill className="ms-3 px-3 py-2">{t('moderatorBadge')}</Badge>
               </div>
             )}
 
-            {/* Music toggle */}
-            <div className="mb-4">
-              <Button
-                color={musicPlaying ? 'primary' : 'secondary'}
-                outline={!musicPlaying}
-                size="sm"
-                onClick={toggleMusic}
-                className="d-inline-flex align-items-center gap-2"
-                title={musicPlaying ? t('disableMusic') : t('enableMusic')}
-              >
-                <span style={{ fontSize: '1.1rem' }}>
-                  {musicPlaying ? '🔊' : '🔇'}
-                </span>
-                {musicPlaying ? t('disableMusic') : t('enableMusic')}
-              </Button>
+            <div className="mb-4 d-flex justify-content-center">
+              <AudioPlayer audioUrl={event.waitingRoomAudioUrl} />
             </div>
 
             <Alert color="info" className="text-start">
@@ -354,9 +316,7 @@ export default function LiveEventClient({
 
             <div className="mt-4">
               <Link href={`/eventi/${event.slug}`}>
-                <Button color="primary" outline tag="span">
-                  {tc('back')}
-                </Button>
+                <Button color="primary" outline tag="span">{tc('back')}</Button>
               </Link>
             </div>
           </div>
@@ -374,15 +334,11 @@ export default function LiveEventClient({
         <p className="mb-4">{t('eventEndedMessage')}</p>
         {isModerator ? (
           <Link href={`/admin/eventi/${event.id}?token=${token}`}>
-            <Button color="primary" outline tag="span">
-              {tc('back')}
-            </Button>
+            <Button color="primary" outline tag="span">{tc('back')}</Button>
           </Link>
         ) : (
           <Link href={`/eventi/${event.slug}`}>
-            <Button color="primary" outline tag="span">
-              {t('backToEvent')}
-            </Button>
+            <Button color="primary" outline tag="span">{t('backToEvent')}</Button>
           </Link>
         )}
       </div>
@@ -398,34 +354,33 @@ export default function LiveEventClient({
           {error || t('connectionError')}
         </Alert>
         <div className="text-center mt-3">
-          <Button color="primary" onClick={() => setPhase('fetching_jwt')} className="me-3">
-            {tc('retry')}
-          </Button>
+          <Button color="primary" onClick={() => setPhase('fetching_jwt')} className="me-3">{tc('retry')}</Button>
           <Link href={`/eventi/${event.slug}`}>
-            <Button color="secondary" outline tag="span">
-              {t('backToEvent')}
-            </Button>
+            <Button color="secondary" outline tag="span">{t('backToEvent')}</Button>
           </Link>
         </div>
       </div>
     );
   }
 
-  // ── Recording consent (participants only — moderators skip) ──
+  // ── Recording consent ──
   if (phase === 'consent_pending') {
     return (
       <>
-        <LiveTopBar
-          title={event.title}
-          participantCount={0}
-          isRecording={false}
-          isModerator={isModerator}
-        />
-        <RecordingConsent
-          onAccept={handleConsentAccept}
-          onDecline={handleConsentDecline}
-        />
+        <LiveTopBar title={event.title} participantCount={0} isRecording={false} isModerator={isModerator} />
+        <RecordingConsent onAccept={handleConsentAccept} onDecline={handleConsentDecline} />
       </>
+    );
+  }
+
+  // ── Pre-join screen ──
+  if (phase === 'pre_join') {
+    return (
+      <PreJoinScreen
+        eventTitle={event.title}
+        defaultName={chosenName || initialDisplayName}
+        onJoin={handlePreJoin}
+      />
     );
   }
 
@@ -439,19 +394,22 @@ export default function LiveEventClient({
     );
   }
 
-  // ── Ready: show Jitsi room ──
+  // ── Ready: Jitsi room ──
+  const isActualModerator = credentials.role === 'moderator';
+
   return (
-    <div className="d-flex flex-column" style={{ height: 'calc(100vh - 80px)' }}>
+    <div className="d-flex flex-column live-page-bg" style={{ height: 'calc(100vh - 80px)' }}>
       <RecordingBanner visible={isRecording} />
 
       <LiveTopBar
         title={event.title}
         participantCount={participantCount}
         isRecording={isRecording}
-        isModerator={isModerator}
+        isModerator={isActualModerator}
+        onLeaveRoom={handleLeaveRoom}
       />
 
-      {isModerator && (
+      {isActualModerator && (
         <ModeratorControls
           api={jitsiApi}
           eventId={event.id}
@@ -468,7 +426,10 @@ export default function LiveEventClient({
             jwt={credentials.jwt}
             displayName={credentials.displayName}
             locale={locale}
-            role={credentials.role === 'moderator' ? 'moderator' : 'participant'}
+            role={isActualModerator ? 'moderator' : 'participant'}
+            participantsCanUnmute={event.participantsCanUnmute}
+            participantsCanStartVideo={event.participantsCanStartVideo}
+            participantsCanShareScreen={event.participantsCanShareScreen}
             onReady={handleJitsiReady}
             onLeft={handleJitsiLeft}
             onParticipantCountChanged={handleParticipantCountChanged}
@@ -481,7 +442,7 @@ export default function LiveEventClient({
           <QAPanel
             eventSlug={event.slug}
             token={token}
-            isModerator={isModerator}
+            isModerator={isActualModerator}
           />
         )}
       </div>
@@ -496,39 +457,43 @@ interface LiveTopBarProps {
   participantCount: number;
   isRecording: boolean;
   isModerator: boolean;
+  onLeaveRoom?: () => void;
 }
 
-function LiveTopBar({
-  title,
-  participantCount,
-  isRecording,
-  isModerator,
-}: LiveTopBarProps) {
+function LiveTopBar({ title, participantCount, isRecording, isModerator, onLeaveRoom }: LiveTopBarProps) {
   const t = useTranslations('live');
 
   return (
-    <div className="bg-primary text-white px-3 py-2 d-flex align-items-center justify-content-between">
+    <div className="bg-primary text-white px-3 py-2 d-flex align-items-center justify-content-between live-top-bar">
       <div className="d-flex align-items-center">
         <h1 className="h6 mb-0 me-3 text-white">{title}</h1>
         {isModerator && (
-          <Badge color="light" pill className="text-primary px-2 py-1 me-2">
-            {t('moderatorBadge')}
-          </Badge>
+          <Badge color="light" pill className="text-primary px-2 py-1 me-2">{t('moderatorBadge')}</Badge>
         )}
       </div>
-
       <div className="d-flex align-items-center gap-3">
         {isRecording && (
           <Badge color="danger" pill className="px-2 py-1">
-            <span className="me-1">●</span>
-            {t('recordingActive')}
+            <span className="me-1">●</span>{t('recordingActive')}
           </Badge>
         )}
-
         <span className="small">
           <Icon icon="it-user" size="sm" color="white" className="me-1" />
           {t('moderator.participantCount', { count: participantCount })}
         </span>
+        {onLeaveRoom && (
+          <Button
+            color="danger"
+            outline
+            size="xs"
+            className="leave-room-btn"
+            onClick={onLeaveRoom}
+            aria-label={t('leaveRoom')}
+          >
+            <Icon icon="it-external-link" size="xs" color="white" className="me-1" />
+            {t('leaveRoom')}
+          </Button>
+        )}
       </div>
     </div>
   );

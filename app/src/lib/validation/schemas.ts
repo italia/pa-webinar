@@ -14,6 +14,9 @@ export const createEventSchema = z.object({
   qaEnabled: z.boolean().default(true),
   chatEnabled: z.boolean().default(false),
   recordingEnabled: z.boolean().default(false),
+  participantsCanUnmute: z.boolean().default(true),
+  participantsCanStartVideo: z.boolean().default(true),
+  participantsCanShareScreen: z.boolean().default(true),
   dataRetentionDays: z.number().int().min(1).max(365).default(30),
   privacyPolicyUrl: z.string().url().optional(),
   moderatorName: z.string().min(2).max(100).optional(),
@@ -73,9 +76,11 @@ export type UpdateQuestionStatusInput = z.infer<typeof updateQuestionStatusSchem
 export const jitsiTokenRequestSchema = z.object({
   accessToken: z.string().min(1).optional(),
   moderatorToken: z.string().uuid().optional(),
+  guestName: z.string().min(2).max(100).optional(),
+  displayNameOverride: z.string().min(2).max(100).optional(),
 }).refine(
-  (data) => data.accessToken ?? data.moderatorToken,
-  { message: 'Either accessToken or moderatorToken is required' }
+  (data) => data.accessToken ?? data.moderatorToken ?? data.guestName,
+  { message: 'Either accessToken, moderatorToken, or guestName is required' }
 );
 
 export type JitsiTokenRequest = z.infer<typeof jitsiTokenRequestSchema>;
