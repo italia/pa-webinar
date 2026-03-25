@@ -114,6 +114,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     status: event.status,
     recordingUrl: event.recordingUrl,
     qaEnabled: event.qaEnabled,
+    chatEnabled: event.chatEnabled,
     privacyPolicyUrl: event.privacyPolicyUrl,
     speakersIt: event.speakersIt,
     speakersEn: event.speakersEn,

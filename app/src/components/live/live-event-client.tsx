@@ -10,7 +10,7 @@ import {
   Spinner,
 } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import RecordingConsent, {
@@ -41,7 +41,7 @@ interface LiveEventClientProps {
 }
 
 type LivePhase =
-  | 'not_started'
+  | 'waiting'
   | 'consent_pending'
   | 'fetching_jwt'
   | 'ready'
@@ -67,8 +67,9 @@ export default function LiveEventClient({
   const t = useTranslations('live');
   const tc = useTranslations('common');
   const format = useFormatter();
+  const router = useRouter();
 
-  const [phase, setPhase] = useState<LivePhase>('not_started');
+  const [phase, setPhase] = useState<LivePhase>('waiting');
   const [credentials, setCredentials] = useState<JitsiCredentials | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
@@ -79,31 +80,34 @@ export default function LiveEventClient({
   const [countdown, setCountdown] = useState('');
   const [eventStatus, setEventStatus] = useState(event.status);
   const [musicPlaying, setMusicPlaying] = useState(false);
+  const [startingEvent, setStartingEvent] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Determine initial phase based on event status and role
   useEffect(() => {
     if (eventStatus === 'ENDED') {
       setPhase('ended');
       return;
     }
 
-    const now = Date.now();
-
-    if (now < startsAtMs && eventStatus === 'PUBLISHED' && !isModerator) {
-      setPhase('not_started');
+    if (eventStatus === 'LIVE') {
+      if (isModerator) {
+        setPhase('fetching_jwt');
+      } else if (event.recordingEnabled) {
+        setPhase('consent_pending');
+      } else {
+        setPhase('fetching_jwt');
+      }
       return;
     }
 
-    if (event.recordingEnabled) {
-      setPhase('consent_pending');
-    } else {
-      setPhase('fetching_jwt');
-    }
-  }, [eventStatus, event.recordingEnabled, startsAtMs, isModerator]);
+    // PUBLISHED or DRAFT — show waiting room for everyone
+    setPhase('waiting');
+  }, [eventStatus, event.recordingEnabled, isModerator]);
 
-  // Countdown timer for waiting room
+  // Countdown timer
   useEffect(() => {
-    if (phase !== 'not_started') return;
+    if (phase !== 'waiting') return;
 
     function updateCountdown() {
       const diff = startsAtMs - Date.now();
@@ -129,9 +133,9 @@ export default function LiveEventClient({
     return () => clearInterval(timer);
   }, [phase, startsAtMs]);
 
-  // Poll event status while in waiting room
+  // Poll event status in waiting room (3s interval)
   useEffect(() => {
-    if (phase !== 'not_started') return;
+    if (phase !== 'waiting') return;
 
     const pollInterval = setInterval(async () => {
       try {
@@ -142,15 +146,14 @@ export default function LiveEventClient({
           setEventStatus(data.status);
         }
       } catch {
-        // Silently retry on next interval
+        /* retry */
       }
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(pollInterval);
   }, [phase, event.slug, eventStatus]);
 
   const fetchJwt = useCallback(async () => {
-    setPhase('fetching_jwt');
     setError('');
 
     try {
@@ -191,12 +194,11 @@ export default function LiveEventClient({
   }, []);
 
   const handleConsentDecline = useCallback(() => {
-    // Will redirect via Link, but set phase for safety
-    setPhase('not_started');
-  }, []);
+    router.push(`/eventi/${event.slug}`);
+  }, [router, event.slug]);
 
   const handleJitsiReady = useCallback(() => {
-    // Jitsi connected successfully
+    // Jitsi connected
   }, []);
 
   const handleJitsiLeft = useCallback(() => {
@@ -215,7 +217,22 @@ export default function LiveEventClient({
     setJitsiApi(api);
   }, []);
 
-  // ── Waiting room audio toggle ──
+  // Moderator: start event (PATCH to LIVE)
+  const handleStartEvent = useCallback(async () => {
+    setStartingEvent(true);
+    try {
+      await fetch(`/api/events/${event.id}?token=${token}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'LIVE' }),
+      });
+      setEventStatus('LIVE');
+    } catch {
+      setStartingEvent(false);
+    }
+  }, [event.id, token]);
+
+  // ── Audio ──
   const audioSrc = event.waitingRoomAudioUrl || '/audio/waiting-room-default.mp3';
 
   const toggleMusic = useCallback(() => {
@@ -238,17 +255,16 @@ export default function LiveEventClient({
     }
   }, [musicPlaying, audioSrc]);
 
-  // Cleanup audio on phase change
   useEffect(() => {
-    if (phase !== 'not_started' && audioRef.current) {
+    if (phase !== 'waiting' && audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
       setMusicPlaying(false);
     }
   }, [phase]);
 
-  // ── Waiting room ──
-  if (phase === 'not_started') {
+  // ── Waiting room (moderators AND participants) ──
+  if (phase === 'waiting') {
     return (
       <div className="container py-5">
         <div className="row justify-content-center">
@@ -284,7 +300,37 @@ export default function LiveEventClient({
               </div>
             )}
 
-            {/* Music toggle button */}
+            {/* Moderator: start event button */}
+            {isModerator && (
+              <div className="mb-4">
+                <Button
+                  color="success"
+                  size="lg"
+                  className="px-5"
+                  onClick={handleStartEvent}
+                  disabled={startingEvent}
+                >
+                  {startingEvent ? (
+                    <>
+                      <Spinner active size="sm" className="me-2" />
+                      {t('startingEvent')}
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="it-video" size="sm" color="white" className="me-2" />
+                      {t('startEventButton')}
+                    </>
+                  )}
+                </Button>
+                {isModerator && (
+                  <Badge color="info" pill className="ms-3 px-3 py-2">
+                    {t('moderatorBadge')}
+                  </Badge>
+                )}
+              </div>
+            )}
+
+            {/* Music toggle */}
             <div className="mb-4">
               <Button
                 color={musicPlaying ? 'primary' : 'secondary'}
@@ -326,11 +372,19 @@ export default function LiveEventClient({
         <Icon icon="it-check-circle" size="xl" className="text-success mb-3" />
         <h1 className="h3 mb-3">{t('eventEnded')}</h1>
         <p className="mb-4">{t('eventEndedMessage')}</p>
-        <Link href={`/eventi/${event.slug}`}>
-          <Button color="primary" outline tag="span">
-            {t('backToEvent')}
-          </Button>
-        </Link>
+        {isModerator ? (
+          <Link href={`/admin/eventi/${event.id}?token=${token}`}>
+            <Button color="primary" outline tag="span">
+              {tc('back')}
+            </Button>
+          </Link>
+        ) : (
+          <Link href={`/eventi/${event.slug}`}>
+            <Button color="primary" outline tag="span">
+              {t('backToEvent')}
+            </Button>
+          </Link>
+        )}
       </div>
     );
   }
@@ -357,7 +411,7 @@ export default function LiveEventClient({
     );
   }
 
-  // ── Recording consent overlay ──
+  // ── Recording consent (participants only — moderators skip) ──
   if (phase === 'consent_pending') {
     return (
       <>
@@ -407,13 +461,14 @@ export default function LiveEventClient({
       )}
 
       <div className="d-flex flex-column flex-lg-row flex-grow-1" style={{ minHeight: 0 }}>
-        <div className="flex-grow-1" style={{ minHeight: '300px' }}>
+        <div className="flex-grow-1 position-relative" style={{ minHeight: '300px' }}>
           <JitsiRoom
             domain={JITSI_DOMAIN}
             roomName={credentials.roomName}
             jwt={credentials.jwt}
             displayName={credentials.displayName}
             locale={locale}
+            role={credentials.role === 'moderator' ? 'moderator' : 'participant'}
             onReady={handleJitsiReady}
             onLeft={handleJitsiLeft}
             onParticipantCountChanged={handleParticipantCountChanged}
@@ -434,7 +489,7 @@ export default function LiveEventClient({
   );
 }
 
-// ── Top bar sub-component ──
+// ── Top bar ──
 
 interface LiveTopBarProps {
   title: string;

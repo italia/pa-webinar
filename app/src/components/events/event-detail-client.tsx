@@ -30,6 +30,7 @@ interface EventData {
   status: string;
   recordingUrl: string | null;
   qaEnabled: boolean;
+  chatEnabled: boolean;
   privacyPolicyUrl: string | null;
   speakersIt: string | null;
   speakersEn: string | null;
@@ -75,7 +76,7 @@ export default function EventDetailClient({
 
   const spotsLeft = event.maxParticipants - event.registrationCount;
   const isFull = spotsLeft <= 0;
-  const canRegister = event.status === 'PUBLISHED' && !isFull;
+  const canRegister = (event.status === 'PUBLISHED' || event.status === 'LIVE') && !isFull;
   const isEnded = event.status === 'ENDED';
   const isLive = event.status === 'LIVE';
   const accentColor = STATUS_COLOR[event.status] ?? STATUS_COLOR.PUBLISHED;
@@ -320,9 +321,16 @@ export default function EventDetailClient({
                         tag="span"
                       >
                         <Icon icon="it-user" className="me-2" />
-                        {t('detail.register')}
+                        {isLive ? t('detail.registerAndJoin') : t('detail.register')}
                       </Button>
                     </Link>
+                  )}
+
+                  {event.chatEnabled && (
+                    <p className="text-muted mt-3 mb-0" style={{ fontSize: '0.82rem' }}>
+                      <Icon icon="it-info-circle" size="xs" className="me-1" />
+                      {t('detail.chatNotSaved')}
+                    </p>
                   )}
 
                   <AddToCalendar

@@ -12,7 +12,7 @@ const intlMiddleware = createMiddleware({
 
 const ADMIN_PATH_RE = /^\/(?:it|en)\/admin(?:\/|$)/;
 const ADMIN_LOGIN_RE = /^\/(?:it|en)\/admin\/login(?:\/|$)/;
-const ADMIN_EVENT_RE = /^\/(?:it|en)\/admin\/eventi\/[^/]+$/;
+const ADMIN_EVENT_RE = /^\/(?:it|en)\/admin\/eventi\/[^/]+(?:\/[^/]+)?$/;
 
 async function isValidAdminSession(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get('admin_session')?.value;

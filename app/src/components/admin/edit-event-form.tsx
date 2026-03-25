@@ -17,10 +17,38 @@ import {
 } from 'design-react-kit';
 
 import { useRouter } from '@/i18n/navigation';
-import { createEventSchema } from '@/lib/validation/schemas';
+import { updateEventSchema } from '@/lib/validation/schemas';
 
 interface FieldErrors {
   [key: string]: string | undefined;
+}
+
+interface EventData {
+  id: string;
+  titleIt: string;
+  titleEn: string | null;
+  descriptionIt: string;
+  descriptionEn: string | null;
+  startsAt: string;
+  endsAt: string;
+  maxParticipants: number;
+  qaEnabled: boolean;
+  chatEnabled: boolean;
+  recordingEnabled: boolean;
+  dataRetentionDays: number;
+  privacyPolicyUrl: string | null;
+  moderatorName: string | null;
+  moderatorEmail: string | null;
+  moderatorToken: string;
+  speakersIt: string | null;
+  speakersEn: string | null;
+  organizerName: string | null;
+  imageUrl: string | null;
+  waitingRoomAudioUrl: string | null;
+}
+
+interface EditEventFormProps {
+  event: EventData;
 }
 
 const CARD_STYLE = {
@@ -28,44 +56,43 @@ const CARD_STYLE = {
   border: '1px solid #e8e8e8',
 };
 
-function toDatetimeLocal(d: Date): string {
+function toDatetimeLocal(iso: string): string {
+  const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export default function CreateEventForm() {
+export default function EditEventForm({ event }: EditEventFormProps) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const router = useRouter();
 
-  const defaultStart = new Date(Date.now() + 24 * 3600_000);
-  const defaultEnd = new Date(defaultStart.getTime() + 2 * 3600_000);
-
   const [form, setForm] = useState({
-    titleIt: '',
-    titleEn: '',
-    descriptionIt: '',
-    descriptionEn: '',
-    startsAt: toDatetimeLocal(defaultStart),
-    endsAt: toDatetimeLocal(defaultEnd),
-    maxParticipants: 300,
-    qaEnabled: true,
-    chatEnabled: false,
-    recordingEnabled: false,
-    dataRetentionDays: 30,
-    privacyPolicyUrl: '',
-    moderatorName: '',
-    moderatorEmail: '',
-    speakersIt: '',
-    speakersEn: '',
-    organizerName: 'Dipartimento per la Trasformazione Digitale',
-    imageUrl: '',
-    waitingRoomAudioUrl: '',
+    titleIt: event.titleIt,
+    titleEn: event.titleEn ?? '',
+    descriptionIt: event.descriptionIt,
+    descriptionEn: event.descriptionEn ?? '',
+    startsAt: toDatetimeLocal(event.startsAt),
+    endsAt: toDatetimeLocal(event.endsAt),
+    maxParticipants: event.maxParticipants,
+    qaEnabled: event.qaEnabled,
+    chatEnabled: event.chatEnabled,
+    recordingEnabled: event.recordingEnabled,
+    dataRetentionDays: event.dataRetentionDays,
+    privacyPolicyUrl: event.privacyPolicyUrl ?? '',
+    moderatorName: event.moderatorName ?? '',
+    moderatorEmail: event.moderatorEmail ?? '',
+    speakersIt: event.speakersIt ?? '',
+    speakersEn: event.speakersEn ?? '',
+    organizerName: event.organizerName ?? '',
+    imageUrl: event.imageUrl ?? '',
+    waitingRoomAudioUrl: event.waitingRoomAudioUrl ?? '',
   });
 
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const setField = useCallback(
     <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => {
@@ -79,6 +106,7 @@ export default function CreateEventForm() {
     async (e: FormEvent) => {
       e.preventDefault();
       setServerError('');
+      setSuccess('');
 
       const payload = {
         titleIt: form.titleIt,
@@ -102,7 +130,7 @@ export default function CreateEventForm() {
         waitingRoomAudioUrl: form.waitingRoomAudioUrl || undefined,
       };
 
-      const result = createEventSchema.safeParse(payload);
+      const result = updateEventSchema.safeParse(payload);
       if (!result.success) {
         const fieldErrors: FieldErrors = {};
         for (const issue of result.error.issues) {
@@ -117,8 +145,8 @@ export default function CreateEventForm() {
 
       setSubmitting(true);
       try {
-        const res = await fetch('/api/events', {
-          method: 'POST',
+        const res = await fetch(`/api/events/${event.id}?token=${event.moderatorToken}`, {
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
@@ -129,17 +157,23 @@ export default function CreateEventForm() {
           return;
         }
 
-        const created = await res.json();
-        router.push(
-          `/admin/eventi/${created.id}?token=${created.moderatorToken}`,
-        );
+        const data = await res.json();
+        if (data.dateChanged) {
+          setSuccess(`${t('eventUpdated')} ${t('dateChangedNotification')}`);
+        } else {
+          setSuccess(t('eventUpdated'));
+        }
+
+        setTimeout(() => {
+          router.push(`/admin/eventi/${event.id}?token=${event.moderatorToken}`);
+        }, 1500);
       } catch {
         setServerError(tc('error'));
       } finally {
         setSubmitting(false);
       }
     },
-    [form, tc, router],
+    [form, tc, t, router, event.id, event.moderatorToken],
   );
 
   const inputProps = (key: keyof typeof form, label: string) => ({
@@ -156,8 +190,12 @@ export default function CreateEventForm() {
           {serverError}
         </Alert>
       )}
+      {success && (
+        <Alert color="success" className="mb-4">
+          {success}
+        </Alert>
+      )}
 
-      {/* ── Content section ── */}
       <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
         <CardBody className="p-4">
           <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
@@ -220,7 +258,6 @@ export default function CreateEventForm() {
         </CardBody>
       </Card>
 
-      {/* ── Schedule section ── */}
       <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
         <CardBody className="p-4">
           <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
@@ -296,7 +333,6 @@ export default function CreateEventForm() {
         </CardBody>
       </Card>
 
-      {/* ── Settings section ── */}
       <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
         <CardBody className="p-4">
           <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
@@ -306,54 +342,30 @@ export default function CreateEventForm() {
           <div className="py-3">
             <div className="d-flex justify-content-between align-items-start">
               <div className="me-3">
-                <div className="fw-semibold" style={{ color: '#17324D' }}>
-                  {t('form.qaEnabled')}
-                </div>
-                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-                  {t('toggleQaDesc')}
-                </div>
+                <div className="fw-semibold" style={{ color: '#17324D' }}>{t('form.qaEnabled')}</div>
+                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>{t('toggleQaDesc')}</div>
               </div>
-              <Toggle
-                label=""
-                checked={form.qaEnabled}
-                onChange={() => setField('qaEnabled', !form.qaEnabled)}
-              />
+              <Toggle label="" checked={form.qaEnabled} onChange={() => setField('qaEnabled', !form.qaEnabled)} />
             </div>
           </div>
 
           <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
             <div className="d-flex justify-content-between align-items-start">
               <div className="me-3">
-                <div className="fw-semibold" style={{ color: '#17324D' }}>
-                  {t('form.chatEnabled')}
-                </div>
-                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-                  {t('toggleChatDesc')}
-                </div>
+                <div className="fw-semibold" style={{ color: '#17324D' }}>{t('form.chatEnabled')}</div>
+                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>{t('toggleChatDesc')}</div>
               </div>
-              <Toggle
-                label=""
-                checked={form.chatEnabled}
-                onChange={() => setField('chatEnabled', !form.chatEnabled)}
-              />
+              <Toggle label="" checked={form.chatEnabled} onChange={() => setField('chatEnabled', !form.chatEnabled)} />
             </div>
           </div>
 
           <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
             <div className="d-flex justify-content-between align-items-start">
               <div className="me-3">
-                <div className="fw-semibold" style={{ color: '#17324D' }}>
-                  {t('form.recordingEnabled')}
-                </div>
-                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-                  {t('toggleRecordingDesc')}
-                </div>
+                <div className="fw-semibold" style={{ color: '#17324D' }}>{t('form.recordingEnabled')}</div>
+                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>{t('toggleRecordingDesc')}</div>
               </div>
-              <Toggle
-                label=""
-                checked={form.recordingEnabled}
-                onChange={() => setField('recordingEnabled', !form.recordingEnabled)}
-              />
+              <Toggle label="" checked={form.recordingEnabled} onChange={() => setField('recordingEnabled', !form.recordingEnabled)} />
             </div>
           </div>
 
@@ -384,7 +396,6 @@ export default function CreateEventForm() {
         </CardBody>
       </Card>
 
-      {/* ── Speakers & Organizer section ── */}
       <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
         <CardBody className="p-4">
           <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
@@ -445,7 +456,6 @@ export default function CreateEventForm() {
         </CardBody>
       </Card>
 
-      {/* ── Moderator section ── */}
       <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
         <CardBody className="p-4">
           <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
@@ -480,7 +490,6 @@ export default function CreateEventForm() {
         </CardBody>
       </Card>
 
-      {/* ── Submit ── */}
       <div className="d-flex gap-3 mb-5">
         <Button
           color="primary"
@@ -489,7 +498,7 @@ export default function CreateEventForm() {
           size="lg"
           className="px-5"
         >
-          {submitting ? t('form.creating') : t('form.submit')}
+          {submitting ? t('form.saving') : t('form.submitEdit')}
         </Button>
         <Button
           color="secondary"

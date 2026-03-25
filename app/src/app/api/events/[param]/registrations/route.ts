@@ -36,7 +36,7 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
-  if (event.status !== 'PUBLISHED') {
+  if (event.status !== 'PUBLISHED' && event.status !== 'LIVE') {
     return NextResponse.json(
       { error: 'Event is not open for registration' },
       { status: 409 },

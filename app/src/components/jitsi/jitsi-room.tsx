@@ -8,6 +8,8 @@ import type { JitsiMeetExternalAPI as JitsiAPI } from '@/types/jitsi';
 import {
   jitsiConfigOverwrite,
   jitsiInterfaceConfigOverwrite,
+  baseToolbarButtons,
+  moderatorToolbarButtons,
 } from '@/lib/jitsi/config';
 
 interface JitsiRoomProps {
@@ -16,6 +18,7 @@ interface JitsiRoomProps {
   jwt: string;
   displayName: string;
   locale: string;
+  role: 'moderator' | 'participant';
   onReady?: () => void;
   onLeft?: () => void;
   onParticipantCountChanged?: (count: number) => void;
@@ -34,6 +37,7 @@ export default function JitsiRoom({
   jwt,
   displayName,
   locale,
+  role,
   onReady,
   onLeft,
   onParticipantCountChanged,
@@ -63,6 +67,10 @@ export default function JitsiRoom({
     if (typeof window === 'undefined') return;
     disposedRef.current = false;
 
+    const toolbarButtons = role === 'moderator'
+      ? [...moderatorToolbarButtons]
+      : [...baseToolbarButtons];
+
     function initJitsi() {
       if (disposedRef.current || initializingRef.current || apiRef.current) return;
       if (!containerRef.current || !window.JitsiMeetExternalAPI) return;
@@ -77,8 +85,14 @@ export default function JitsiRoom({
           width: '100%',
           height: '100%',
           lang: locale,
-          configOverwrite: { ...jitsiConfigOverwrite },
-          interfaceConfigOverwrite: { ...jitsiInterfaceConfigOverwrite },
+          configOverwrite: {
+            ...jitsiConfigOverwrite,
+            toolbarButtons,
+          },
+          interfaceConfigOverwrite: {
+            ...jitsiInterfaceConfigOverwrite,
+            TOOLBAR_BUTTONS: toolbarButtons,
+          },
           userInfo: { displayName },
         });
 
@@ -138,19 +152,25 @@ export default function JitsiRoom({
         apiRef.current = null;
       }
     };
-    // Only run once on mount — callback refs keep values fresh
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, locale]);
+  }, [domain, roomName, jwt, displayName, locale, role]);
 
   return (
     <div
-      className="position-relative"
-      style={{ width: '100%', height: 'calc(100vh - 160px)', minHeight: '400px' }}
+      className="jitsi-container position-relative"
+      style={{
+        width: '100%',
+        height: '100%',
+        minHeight: '400px',
+        background: '#000',
+        borderRadius: 8,
+        overflow: 'hidden',
+      }}
     >
       {loadState === 'loading' && (
         <div className="position-absolute top-50 start-50 translate-middle text-center">
           <Spinner active double />
-          <p className="mt-3 text-muted">{t('connecting')}</p>
+          <p className="mt-3 text-white-50">{t('connecting')}</p>
         </div>
       )}
 
