@@ -6,6 +6,12 @@
  * features (recording, end event) and the Q&A panel.
  */
 
+/**
+ * Participant toolbar — NO 'hangup' to avoid "end meeting for all".
+ * We provide our own "Esci dalla sala" / "Leave room" button that
+ * calls api.executeCommand('hangup') without exposing the
+ * "Termina la riunione per tutti" option.
+ */
 export const baseToolbarButtons = [
   'microphone',
   'camera',
@@ -17,11 +23,11 @@ export const baseToolbarButtons = [
   'settings',
   'raisehand',
   'chat',
-  'hangup',
 ];
 
 export const moderatorToolbarButtons = [
   ...baseToolbarButtons,
+  'hangup',
   'mute-everyone',
   'security',
   'participants-pane',
@@ -32,8 +38,11 @@ export const moderatorToolbarButtons = [
  * Toolbar buttons are merged at instantiation time based on role.
  */
 export const jitsiConfigOverwrite = {
+  // Start muted but users CAN unmute
   startWithAudioMuted: true,
   startWithVideoMuted: true,
+  startSilent: false,
+  disableInitialGUM: false,
 
   prejoinConfig: { enabled: false },
   disableDeepLinking: true,
@@ -41,14 +50,25 @@ export const jitsiConfigOverwrite = {
   hideConferenceTimer: false,
   disableProfile: true,
 
-  // Chat is now enabled (native Jitsi chat alongside our Q&A)
   disableChat: false,
+
+  remoteVideoMenu: {
+    disabled: false,
+    disableKick: true,
+    disableGrantModerator: true,
+    disablePrivateChat: false,
+  },
+
+  conferenceInfo: {
+    alwaysVisible: [],
+    autoHide: [],
+  },
 
   enableWelcomePage: false,
   enableClosePage: false,
   disableInviteFunctions: true,
 
-  // Placeholder — overridden per role at instantiation
+  // Overridden per role at instantiation
   toolbarButtons: baseToolbarButtons as string[],
 
   notifications: [] as string[],
@@ -66,9 +86,13 @@ export const jitsiConfigOverwrite = {
   disableThirdPartyRequests: true,
   brandingRoomAlias: null,
 
-  // Nuclear watermark removal (newer Jitsi versions)
+  // Nuclear watermark removal
   defaultLogoUrl: '',
   'watermark.enabled': false,
+
+  // Branding
+  brandingDataUrl: null,
+  dynamicBrandingUrl: null,
 } as const;
 
 /**

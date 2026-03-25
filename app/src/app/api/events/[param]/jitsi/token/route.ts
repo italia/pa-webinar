@@ -2,15 +2,19 @@ import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/db';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
-import { generateJitsiJwt } from '@/lib/auth/jwt';
+import {
+  generateJitsiJwt,
+  moderatorJitsiId,
+  participantJitsiId,
+  guestJitsiId,
+} from '@/lib/auth/jwt';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 interface RouteContext {
   params: Promise<{ param: string }>;
 }
-
-// ── POST /api/events/[slug]/jitsi/token ──────────────────────
 
 export async function POST(request: Request, context: RouteContext) {
   const { param: slug } = await context.params;
@@ -30,7 +34,7 @@ export async function POST(request: Request, context: RouteContext) {
     );
   }
 
-  const { accessToken, moderatorToken } = parsed.data;
+  const { accessToken, moderatorToken, guestName, displayNameOverride } = parsed.data;
 
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) {
@@ -50,17 +54,19 @@ export async function POST(request: Request, context: RouteContext) {
       return NextResponse.json({ error: 'Invalid moderator token' }, { status: 403 });
     }
 
+    const name = displayNameOverride || event.moderatorName || 'Moderatore';
+
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
-      displayName: event.moderatorName ?? 'Moderatore',
-      email: event.moderatorEmail ?? `mod@${event.slug}`,
+      displayName: name,
+      uniqueId: moderatorJitsiId(event.id),
       isModerator: true,
     });
 
     return NextResponse.json({
       jwt,
       roomName: event.jitsiRoomName,
-      displayName: event.moderatorName ?? 'Moderatore',
+      displayName: name,
       role: 'moderator',
     });
   }
@@ -82,18 +88,54 @@ export async function POST(request: Request, context: RouteContext) {
       });
     }
 
+    const name = displayNameOverride || registration.displayName;
+
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
-      displayName: registration.displayName,
-      email: registration.emailHash,
+      displayName: name,
+      uniqueId: participantJitsiId(registration.id),
       isModerator: false,
     });
 
     return NextResponse.json({
       jwt,
       roomName: event.jitsiRoomName,
-      displayName: registration.displayName,
+      displayName: name,
       role: 'participant',
+    });
+  }
+
+  // ── Guest flow (no registration, LIVE events only) ──
+  if (guestName) {
+    if (event.status !== 'LIVE') {
+      return NextResponse.json(
+        { error: 'Guest access is only available during live events' },
+        { status: 409 },
+      );
+    }
+
+    const ip = getClientIp(request);
+    const rl = rateLimit(`guest-jwt:${ip}`, { limit: 5, windowMs: 60_000 });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
+      );
+    }
+
+    const jwt = await generateJitsiJwt({
+      roomName: event.jitsiRoomName,
+      displayName: guestName,
+      uniqueId: guestJitsiId(),
+      isModerator: false,
+      expiresInSeconds: 2 * 60 * 60,
+    });
+
+    return NextResponse.json({
+      jwt,
+      roomName: event.jitsiRoomName,
+      displayName: guestName,
+      role: 'guest',
     });
   }
 

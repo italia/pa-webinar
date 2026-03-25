@@ -19,6 +19,9 @@ interface JitsiRoomProps {
   displayName: string;
   locale: string;
   role: 'moderator' | 'participant';
+  participantsCanUnmute?: boolean;
+  participantsCanStartVideo?: boolean;
+  participantsCanShareScreen?: boolean;
   onReady?: () => void;
   onLeft?: () => void;
   onParticipantCountChanged?: (count: number) => void;
@@ -38,6 +41,9 @@ export default function JitsiRoom({
   displayName,
   locale,
   role,
+  participantsCanUnmute = true,
+  participantsCanStartVideo = true,
+  participantsCanShareScreen = true,
   onReady,
   onLeft,
   onParticipantCountChanged,
@@ -67,9 +73,27 @@ export default function JitsiRoom({
     if (typeof window === 'undefined') return;
     disposedRef.current = false;
 
-    const toolbarButtons = role === 'moderator'
+    let toolbarButtons = role === 'moderator'
       ? [...moderatorToolbarButtons]
       : [...baseToolbarButtons];
+
+    const extraConfig: Record<string, unknown> = {};
+
+    if (role === 'participant') {
+      if (!participantsCanUnmute) {
+        extraConfig.startWithAudioMuted = true;
+        extraConfig.disableAudioDenied = true;
+        toolbarButtons = toolbarButtons.filter(b => b !== 'microphone');
+      }
+      if (!participantsCanStartVideo) {
+        extraConfig.startWithVideoMuted = true;
+        extraConfig.disableVideoDenied = true;
+        toolbarButtons = toolbarButtons.filter(b => b !== 'camera');
+      }
+      if (!participantsCanShareScreen) {
+        toolbarButtons = toolbarButtons.filter(b => b !== 'desktop');
+      }
+    }
 
     function initJitsi() {
       if (disposedRef.current || initializingRef.current || apiRef.current) return;
@@ -87,6 +111,7 @@ export default function JitsiRoom({
           lang: locale,
           configOverwrite: {
             ...jitsiConfigOverwrite,
+            ...extraConfig,
             toolbarButtons,
           },
           interfaceConfigOverwrite: {
@@ -98,6 +123,29 @@ export default function JitsiRoom({
 
         apiRef.current = api;
         onApiReadyRef.current?.(api);
+
+        // Ensure the iframe has the correct permissions for camera/mic/screen
+        const iframeEl = containerRef.current?.querySelector('iframe');
+        if (iframeEl) {
+          iframeEl.setAttribute(
+            'allow',
+            'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock',
+          );
+        } else {
+          const observer = new MutationObserver((_mutations, obs) => {
+            const frame = containerRef.current?.querySelector('iframe');
+            if (frame) {
+              frame.setAttribute(
+                'allow',
+                'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock',
+              );
+              obs.disconnect();
+            }
+          });
+          if (containerRef.current) {
+            observer.observe(containerRef.current, { childList: true, subtree: true });
+          }
+        }
 
         api.addListener('videoConferenceJoined', () => {
           setLoadState('ready');
@@ -152,21 +200,10 @@ export default function JitsiRoom({
         apiRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, locale, role]);
+  }, [domain, roomName, jwt, displayName, locale, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen]);
 
   return (
-    <div
-      className="jitsi-container position-relative"
-      style={{
-        width: '100%',
-        height: '100%',
-        minHeight: '400px',
-        background: '#000',
-        borderRadius: 8,
-        overflow: 'hidden',
-      }}
-    >
+    <div className="jitsi-wrapper position-relative">
       {loadState === 'loading' && (
         <div className="position-absolute top-50 start-50 translate-middle text-center">
           <Spinner active double />

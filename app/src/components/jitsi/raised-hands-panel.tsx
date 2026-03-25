@@ -64,15 +64,25 @@ export default function RaisedHandsPanel({ api, onCountChange }: RaisedHandsPane
   }, [api, syncHands]);
 
   useEffect(() => {
-    const interval = setInterval(() => setTick((t) => t + 1), 10_000);
+    const interval = setInterval(() => setTick((n) => n + 1), 10_000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleGiveFloor = useCallback(
+  const handleApproveAll = useCallback(
     (id: string) => {
-      void id;
+      if (!api) return;
+      api.executeCommand('approveAudio', id);
+      api.executeCommand('approveVideo', id);
     },
-    [],
+    [api],
+  );
+
+  const handleApproveAudioOnly = useCallback(
+    (id: string) => {
+      if (!api) return;
+      api.executeCommand('approveAudio', id);
+    },
+    [api],
   );
 
   if (hands.length === 0) {
@@ -110,14 +120,26 @@ export default function RaisedHandsPanel({ api, onCountChange }: RaisedHandsPane
                 ({timeStr})
               </span>
               <Button
-                color="light"
+                color="success"
                 size="xs"
                 className="px-1 py-0 ms-1"
-                onClick={() => handleGiveFloor(h.id)}
-                aria-label={t('giveFloor')}
+                onClick={() => handleApproveAll(h.id)}
+                aria-label={t('approveAll')}
+                title={t('approveAll')}
                 style={{ lineHeight: 1 }}
               >
                 <Icon icon="it-microphone" size="xs" />
+              </Button>
+              <Button
+                color="light"
+                size="xs"
+                className="px-1 py-0"
+                onClick={() => handleApproveAudioOnly(h.id)}
+                aria-label={t('audioOnly')}
+                title={t('audioOnly')}
+                style={{ lineHeight: 1, fontSize: '0.65rem' }}
+              >
+                <Icon icon="it-hearing" size="xs" />
               </Button>
             </div>
           );

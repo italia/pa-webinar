@@ -44,6 +44,9 @@ interface EventData {
   qaEnabled: boolean;
   chatEnabled: boolean;
   recordingEnabled: boolean;
+  participantsCanUnmute: boolean;
+  participantsCanStartVideo: boolean;
+  participantsCanShareScreen: boolean;
   status: string;
   recordingUrl: string | null;
   moderatorToken: string;
@@ -109,18 +112,26 @@ export default function EventManagementClient({
   const [chatEnabled, setChatEnabled] = useState(event.chatEnabled);
   const [qaEnabled, setQaEnabled] = useState(event.qaEnabled);
   const [recordingEnabled, setRecordingEnabled] = useState(event.recordingEnabled);
+  const [participantsCanUnmute, setParticipantsCanUnmute] = useState(event.participantsCanUnmute);
+  const [participantsCanStartVideo, setParticipantsCanStartVideo] = useState(event.participantsCanStartVideo);
+  const [participantsCanShareScreen, setParticipantsCanShareScreen] = useState(event.participantsCanShareScreen);
   const [updating, setUpdating] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [savedField, setSavedField] = useState<string | null>(null);
 
+  type ToggleField = 'chatEnabled' | 'qaEnabled' | 'recordingEnabled' | 'participantsCanUnmute' | 'participantsCanStartVideo' | 'participantsCanShareScreen';
+
   const toggleSetting = useCallback(
-    async (field: 'chatEnabled' | 'qaEnabled' | 'recordingEnabled') => {
-      const setters = {
+    async (field: ToggleField) => {
+      const setters: Record<ToggleField, (v: boolean) => void> = {
         chatEnabled: setChatEnabled,
         qaEnabled: setQaEnabled,
         recordingEnabled: setRecordingEnabled,
+        participantsCanUnmute: setParticipantsCanUnmute,
+        participantsCanStartVideo: setParticipantsCanStartVideo,
+        participantsCanShareScreen: setParticipantsCanShareScreen,
       };
-      const current = { chatEnabled, qaEnabled, recordingEnabled }[field];
+      const current = { chatEnabled, qaEnabled, recordingEnabled, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen }[field];
       const next = !current;
 
       setters[field](next);
@@ -145,7 +156,7 @@ export default function EventManagementClient({
         setters[field](current);
       }
     },
-    [chatEnabled, qaEnabled, recordingEnabled, event.id, event.moderatorToken],
+    [chatEnabled, qaEnabled, recordingEnabled, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, event.id, event.moderatorToken],
   );
 
   const title = locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
@@ -408,8 +419,48 @@ export default function EventManagementClient({
                 saved={savedField === 'recordingEnabled'}
                 savedLabel={t('settingsSaved')}
                 hasBorder
-                isLast
               />
+            </CardBody>
+          </Card>
+
+          {/* ── AV Permissions Card ── */}
+          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+            <CardBody className="p-4">
+              <SectionTitle>{t('form.sectionPermissions')}</SectionTitle>
+              <ToggleRow
+                label={t('form.participantsCanUnmute')}
+                description={participantsCanUnmute ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
+                checked={participantsCanUnmute}
+                onChange={() => toggleSetting('participantsCanUnmute')}
+                disabled={updating}
+                saved={savedField === 'participantsCanUnmute'}
+                savedLabel={t('settingsSaved')}
+              />
+              <ToggleRow
+                label={t('form.participantsCanStartVideo')}
+                description={participantsCanStartVideo ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
+                checked={participantsCanStartVideo}
+                onChange={() => toggleSetting('participantsCanStartVideo')}
+                disabled={updating}
+                saved={savedField === 'participantsCanStartVideo'}
+                savedLabel={t('settingsSaved')}
+                hasBorder
+              />
+              <ToggleRow
+                label={t('form.participantsCanShareScreen')}
+                description={participantsCanShareScreen ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
+                checked={participantsCanShareScreen}
+                onChange={() => toggleSetting('participantsCanShareScreen')}
+                disabled={updating}
+                saved={savedField === 'participantsCanShareScreen'}
+                savedLabel={t('settingsSaved')}
+                hasBorder
+              />
+              <div className="mt-2">
+                <small className="form-text text-muted">
+                  {t('form.permissionsNote')}
+                </small>
+              </div>
             </CardBody>
           </Card>
 
@@ -428,7 +479,7 @@ export default function EventManagementClient({
                     color="primary"
                     outline
                     size="sm"
-                    onClick={() => console.log('CSV export placeholder')}
+                    onClick={() => { /* TODO: CSV export */ }}
                   >
                     {t('exportCsv')}
                   </Button>

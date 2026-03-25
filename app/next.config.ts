@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
 
   // Security headers
   async headers() {
+    const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN ?? 'localhost:8443';
+
     return [
       {
         source: '/:path*',
@@ -26,21 +28,21 @@ const nextConfig: NextConfig = {
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          {
+            key: 'Permissions-Policy',
+            value: `camera=(self "https://${jitsiDomain}"), microphone=(self "https://${jitsiDomain}"), display-capture=(self "https://${jitsiDomain}"), geolocation=()`,
+          },
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // Allow Jitsi iframe
-              `frame-src 'self' https://${process.env.NEXT_PUBLIC_JITSI_DOMAIN}`,
-              // Allow Jitsi external_api.js
-              `script-src 'self' 'unsafe-eval' 'unsafe-inline' https://${process.env.NEXT_PUBLIC_JITSI_DOMAIN}`,
+              `frame-src 'self' https://${jitsiDomain}`,
+              `script-src 'self' 'unsafe-eval' 'unsafe-inline' https://${jitsiDomain}`,
               "style-src 'self' 'unsafe-inline'",
-              // Self-hosted fonts only
               "font-src 'self'",
               "img-src 'self' data: blob:",
-              // WebRTC connections
-              "connect-src 'self' wss://*.meet.jitsi https://*.meet.jitsi",
+              `connect-src 'self' https://${jitsiDomain} wss://${jitsiDomain} wss://*.meet.jitsi https://*.meet.jitsi`,
+              "media-src 'self' blob:",
             ].join('; '),
           },
           {

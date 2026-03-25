@@ -20,7 +20,7 @@ export default async function RegistrationPage({
     include: { _count: { select: { registrations: true } } },
   });
 
-  if (!event || event.status !== 'PUBLISHED') {
+  if (!event || !['PUBLISHED', 'LIVE'].includes(event.status)) {
     notFound();
   }
 
