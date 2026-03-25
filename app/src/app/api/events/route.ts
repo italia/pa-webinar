@@ -85,6 +85,7 @@ export async function POST(request: Request) {
       speakersEn: data.speakersEn,
       organizerName: data.organizerName,
       imageUrl: data.imageUrl,
+      waitingRoomAudioUrl: data.waitingRoomAudioUrl,
     },
   });
 

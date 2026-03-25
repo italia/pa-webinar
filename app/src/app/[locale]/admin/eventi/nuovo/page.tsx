@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
 import CreateEventForm from '@/components/admin/create-event-form';
@@ -8,7 +9,7 @@ export default async function CreateEventPage() {
   return (
     <div className="container py-5">
       <div className="mb-2">
-        <a
+        <Link
           href="/it/admin"
           className="text-decoration-none d-inline-flex align-items-center text-primary"
           style={{ fontSize: '0.9rem' }}
@@ -17,7 +18,7 @@ export default async function CreateEventPage() {
             <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
           </svg>
           {t('title')}
-        </a>
+        </Link>
       </div>
 
       <h1 className="fw-bold mb-3" style={{ color: '#17324D' }}>

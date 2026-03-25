@@ -45,6 +45,7 @@ model Event {
   speakersEn    String?  @map("speakers_en")
   organizerName String?  @map("organizer_name")
   imageUrl      String?  @map("image_url")
+  waitingRoomAudioUrl String? @map("waiting_room_audio_url")
   
   // Status
   status      EventStatus @default(DRAFT)

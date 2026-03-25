@@ -133,6 +133,9 @@
     "eventStartsAt": "The event will start on {date} at {time}",
     "countdown": "Time remaining",
     "waitingRoomHint": "This page will update automatically when the moderator starts the event. No need to reload.",
+    "enableMusic": "Enable music",
+    "disableMusic": "Disable music",
+    "jibriUnavailable": "Recording unavailable — Jibri not configured",
     "eventEnded": "Event ended",
     "eventEndedMessage": "The event has ended. Thank you for participating.",
     "backToEvent": "Back to event",
@@ -252,6 +255,8 @@
       "speakersEn": "Speakers (English)",
       "organizerName": "Organizer",
       "imageUrl": "Cover image URL",
+      "waitingRoomAudioUrl": "Waiting room audio URL (optional)",
+      "waitingRoomAudioUrlHint": "Enter the URL of an MP3 file for waiting room music. Leave empty to use the default audio.",
       "submit": "Create event",
       "creating": "Creating...",
       "sectionContent": "Content",
@@ -283,6 +288,53 @@
     "dateLabel": "Date",
     "timeLabel": "Time",
     "durationLabel": "Duration"
+  },
+  "home": {
+    "hero": {
+      "title": "Public digital events",
+      "subtitle": "Platform for webinars, presentations and public meetings by the Department for Digital Transformation",
+      "browseEvents": "Browse events",
+      "organizeEvent": "Organise an event"
+    },
+    "features": {
+      "title": "The platform for PA events",
+      "video": {
+        "title": "Video conferencing",
+        "desc": "Join public events with up to 300 participants. No software to install."
+      },
+      "qa": {
+        "title": "Questions & Answers",
+        "desc": "Ask questions during the event and upvote the most important ones. The moderator answers live."
+      },
+      "privacy": {
+        "title": "Privacy & Security",
+        "desc": "GDPR-compliant data protection. Self-hosted infrastructure in Italy."
+      }
+    },
+    "upcoming": {
+      "title": "Upcoming events",
+      "viewAll": "View all events",
+      "noEvents": "No upcoming events. Check back soon!"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step1": {
+        "title": "Register",
+        "desc": "Sign up for free to the event"
+      },
+      "step2": {
+        "title": "Get your link",
+        "desc": "An email with your personal access link"
+      },
+      "step3": {
+        "title": "Join",
+        "desc": "Enter the event from your browser, no installation needed"
+      },
+      "step4": {
+        "title": "Interact",
+        "desc": "Ask questions, vote, join the discussion"
+      }
+    }
   },
   "footer": {
     "departmentName": "Department for Digital Transformation",

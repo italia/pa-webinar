@@ -53,6 +53,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     recordingEnabled: event.recordingEnabled,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
+    waitingRoomAudioUrl: event.waitingRoomAudioUrl,
   };
 
   return (

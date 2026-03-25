@@ -22,6 +22,7 @@ export const createEventSchema = z.object({
   speakersEn: z.string().max(1000).optional(),
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),
+  waitingRoomAudioUrl: z.string().url().optional(),
 });
 
 export const updateEventSchema = createEventSchema.partial().extend({
