@@ -31,6 +31,11 @@ model Event {
   chatEnabled     Boolean @default(false) @map("chat_enabled")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
   
+  // AV moderation settings
+  participantsCanUnmute      Boolean @default(true)  @map("participants_can_unmute")
+  participantsCanStartVideo  Boolean @default(true)  @map("participants_can_start_video")
+  participantsCanShareScreen Boolean @default(true)  @map("participants_can_share_screen")
+  
   // Moderator access
   moderatorToken  String  @unique @map("moderator_token") // UUID for magic link
   moderatorName   String? @map("moderator_name")

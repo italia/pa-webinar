@@ -8,7 +8,7 @@
  * Both flows generate a Jitsi JWT for the actual video conference.
  */
 
-import { createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 
 import { SignJWT } from 'jose';
 
@@ -25,18 +25,21 @@ const JITSI_JWT_AUDIENCE = process.env.JITSI_JWT_AUDIENCE ?? 'jitsi';
 interface JitsiTokenPayload {
   roomName: string;
   displayName: string;
-  email: string;
+  /** Globally unique identifier for this Jitsi session. */
+  uniqueId: string;
   isModerator: boolean;
   expiresInSeconds?: number;
 }
 
 /**
  * Generate a Jitsi JWT for authenticating a user to a specific room.
+ *
+ * `uniqueId` MUST be different for every session/user so Jitsi treats
+ * each connection as a distinct participant.
  */
 export async function generateJitsiJwt(
   payload: JitsiTokenPayload
 ): Promise<string> {
-  const emailHash = hashEmail(payload.email);
   const features: JitsiJwtFeatures = payload.isModerator
     ? moderatorFeatures
     : participantFeatures;
@@ -45,11 +48,14 @@ export async function generateJitsiJwt(
     context: {
       user: {
         name: payload.displayName,
-        id: emailHash,
-        moderator: payload.isModerator,
+        id: payload.uniqueId,
+        affiliation: payload.isModerator ? 'owner' : 'member',
+        moderator: payload.isModerator ? 'true' : 'false',
       },
       features,
     },
+    moderator: payload.isModerator,
+    affiliation: payload.isModerator ? 'owner' : 'member',
     room: payload.roomName,
   })
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
@@ -58,11 +64,36 @@ export async function generateJitsiJwt(
     .setAudience(JITSI_JWT_AUDIENCE)
     .setIssuedAt()
     .setExpirationTime(
-      `${payload.expiresInSeconds ?? 4 * 60 * 60}s` // Default 4 hours
+      `${payload.expiresInSeconds ?? 4 * 60 * 60}s`
     )
     .sign(JITSI_JWT_SECRET);
 
   return jwt;
+}
+
+/**
+ * Generate a unique Jitsi participant ID for a moderator session.
+ * Each call produces a different ID so multiple moderator tabs are
+ * treated as separate participants.
+ */
+export function moderatorJitsiId(eventId: string): string {
+  return `mod-${eventId}-${randomUUID().slice(0, 8)}`;
+}
+
+/**
+ * Generate a unique Jitsi participant ID for a registered participant.
+ * Uses the registration ID (already unique per event) plus a short
+ * random suffix so re-joining creates a fresh participant slot.
+ */
+export function participantJitsiId(registrationId: string): string {
+  return `reg-${registrationId}-${randomUUID().slice(0, 8)}`;
+}
+
+/**
+ * Generate a unique Jitsi participant ID for a guest.
+ */
+export function guestJitsiId(): string {
+  return `guest-${randomUUID()}`;
 }
 
 /**

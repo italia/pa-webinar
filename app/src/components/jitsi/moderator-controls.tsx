@@ -50,6 +50,8 @@ export default function ModeratorControls({
   const [handsOpen, setHandsOpen] = useState(false);
   const [handsCount, setHandsCount] = useState(0);
   const [recToast, setRecToast] = useState('');
+  const [audioModerationActive, setAudioModerationActive] = useState(false);
+  const [videoModerationActive, setVideoModerationActive] = useState(false);
 
   const [recSeconds, setRecSeconds] = useState(0);
   const recTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -101,6 +103,26 @@ export default function ModeratorControls({
     api?.executeCommand('toggleChat');
     setChatActive((o) => !o);
   }, [api]);
+
+  const handleToggleAudioModeration = useCallback(() => {
+    if (!api) return;
+    if (audioModerationActive) {
+      api.executeCommand('disableAudioModeration');
+    } else {
+      api.executeCommand('enableAudioModeration');
+    }
+    setAudioModerationActive((o) => !o);
+  }, [api, audioModerationActive]);
+
+  const handleToggleVideoModeration = useCallback(() => {
+    if (!api) return;
+    if (videoModerationActive) {
+      api.executeCommand('disableVideoModeration');
+    } else {
+      api.executeCommand('enableVideoModeration');
+    }
+    setVideoModerationActive((o) => !o);
+  }, [api, videoModerationActive]);
 
   const handleEndEvent = useCallback(async () => {
     setEnding(true);
@@ -157,6 +179,34 @@ export default function ModeratorControls({
           >
             <Icon icon="it-comment" size="sm" />
             {t('toggleChat')}
+          </Button>
+
+          {/* Audio moderation */}
+          <Button
+            color={audioModerationActive ? 'warning' : 'light'}
+            outline={!audioModerationActive}
+            size="sm"
+            className={BTN_BASE}
+            onClick={handleToggleAudioModeration}
+            disabled={!api}
+            style={{ fontSize: '0.82rem' }}
+          >
+            <Icon icon="it-hearing" size="sm" />
+            {t('audioModeration')}
+          </Button>
+
+          {/* Video moderation */}
+          <Button
+            color={videoModerationActive ? 'warning' : 'light'}
+            outline={!videoModerationActive}
+            size="sm"
+            className={BTN_BASE}
+            onClick={handleToggleVideoModeration}
+            disabled={!api}
+            style={{ fontSize: '0.82rem' }}
+          >
+            <Icon icon="it-video" size="sm" />
+            {t('videoModeration')}
           </Button>
 
           {/* Raised hands */}

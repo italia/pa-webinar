@@ -121,7 +121,11 @@ services:
       - JWT_APP_SECRET=${JITSI_JWT_SECRET:-s3cr3t_dev_only}
       - JWT_ACCEPTED_ISSUERS=eventi-dtd
       - JWT_ACCEPTED_AUDIENCES=jitsi
+      - JWT_ALLOW_EMPTY=0
+      - JWT_TOKEN_AUTH_MODULE=token_verification
       - ENABLE_GUESTS=0
+      - GLOBAL_MODULES=token_verification
+      - XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom
       - TZ=Europe/Rome
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi
@@ -135,7 +139,7 @@ services:
       - JIBRI_RECORDER_PASSWORD=jibri_recorder_pass
     volumes:
       - jitsi_prosody_config:/config
-      - jitsi_prosody_plugins:/prosody-plugins-custom
+      - ./infra/jitsi/prosody-plugins:/prosody-plugins-custom:ro
 
   jicofo:
     image: jitsi/jicofo:stable
@@ -150,6 +154,11 @@ services:
       - JICOFO_AUTH_PASSWORD=jicofo_pass
       - AUTH_TYPE=jwt
       - ENABLE_AUTH=1
+      - ENABLE_AUTO_OWNER=false
+      - JICOFO_ENABLE_AUTO_OWNER=false
+      - JICOFO_AUTHENTICATION_TYPE=jwt
+      - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=20
+      - JICOFO_AUTH_LIFETIME=24 hours
     volumes:
       - jitsi_jicofo_config:/config
     depends_on:
@@ -192,6 +201,5 @@ volumes:
   jitsi_web_crontabs:
   jitsi_transcripts:
   jitsi_prosody_config:
-  jitsi_prosody_plugins:
   jitsi_jicofo_config:
   jitsi_jvb_config:

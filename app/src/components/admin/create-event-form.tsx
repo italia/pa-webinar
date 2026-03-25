@@ -52,6 +52,9 @@ export default function CreateEventForm() {
     qaEnabled: true,
     chatEnabled: false,
     recordingEnabled: false,
+    participantsCanUnmute: true,
+    participantsCanStartVideo: true,
+    participantsCanShareScreen: true,
     dataRetentionDays: 30,
     privacyPolicyUrl: '',
     moderatorName: '',
@@ -91,6 +94,9 @@ export default function CreateEventForm() {
         qaEnabled: form.qaEnabled,
         chatEnabled: form.chatEnabled,
         recordingEnabled: form.recordingEnabled,
+        participantsCanUnmute: form.participantsCanUnmute,
+        participantsCanStartVideo: form.participantsCanStartVideo,
+        participantsCanShareScreen: form.participantsCanShareScreen,
         dataRetentionDays: form.dataRetentionDays,
         privacyPolicyUrl: form.privacyPolicyUrl || undefined,
         moderatorName: form.moderatorName || undefined,
@@ -381,6 +387,75 @@ export default function CreateEventForm() {
               {t('form.waitingRoomAudioUrlHint')}
             </small>
           </FormGroup>
+        </CardBody>
+      </Card>
+
+      {/* ── Participant permissions section ── */}
+      <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+        <CardBody className="p-4">
+          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            {t('form.sectionPermissions')}
+          </h5>
+
+          <div className="py-3">
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="me-3">
+                <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  {t('form.participantsCanUnmute')}
+                </div>
+                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                  {form.participantsCanUnmute ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
+                </div>
+              </div>
+              <Toggle
+                label=""
+                checked={form.participantsCanUnmute}
+                onChange={() => setField('participantsCanUnmute', !form.participantsCanUnmute)}
+              />
+            </div>
+          </div>
+
+          <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="me-3">
+                <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  {t('form.participantsCanStartVideo')}
+                </div>
+                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                  {form.participantsCanStartVideo ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
+                </div>
+              </div>
+              <Toggle
+                label=""
+                checked={form.participantsCanStartVideo}
+                onChange={() => setField('participantsCanStartVideo', !form.participantsCanStartVideo)}
+              />
+            </div>
+          </div>
+
+          <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="me-3">
+                <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  {t('form.participantsCanShareScreen')}
+                </div>
+                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                  {form.participantsCanShareScreen ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
+                </div>
+              </div>
+              <Toggle
+                label=""
+                checked={form.participantsCanShareScreen}
+                onChange={() => setField('participantsCanShareScreen', !form.participantsCanShareScreen)}
+              />
+            </div>
+          </div>
+
+          <div className="mt-2">
+            <small className="form-text text-muted">
+              {t('form.permissionsNote')}
+            </small>
+          </div>
         </CardBody>
       </Card>
 
