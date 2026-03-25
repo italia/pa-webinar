@@ -1,76 +1,78 @@
 /**
  * Jitsi IFrame API configuration.
  *
- * We hide most of Jitsi's native UI and replace it with our own
- * controls built with design-react-kit. Communication happens via
- * JitsiMeetExternalAPI commands and event listeners.
+ * We show Jitsi's native toolbar for essential controls (mic, camera,
+ * screen share, etc.) while keeping our custom wrapper for moderator
+ * features (recording, end event) and the Q&A panel.
  */
 
+export const baseToolbarButtons = [
+  'microphone',
+  'camera',
+  'select-background',
+  'desktop',
+  'fullscreen',
+  'filmstrip',
+  'tileview',
+  'settings',
+  'raisehand',
+  'chat',
+  'hangup',
+];
+
+export const moderatorToolbarButtons = [
+  ...baseToolbarButtons,
+  'mute-everyone',
+  'security',
+  'participants-pane',
+];
+
 /**
- * Config overrides — hides Jitsi native UI elements.
- * Passed as `configOverwrite` to JitsiMeetExternalAPI.
+ * Config overrides passed as `configOverwrite`.
+ * Toolbar buttons are merged at instantiation time based on role.
  */
 export const jitsiConfigOverwrite = {
-  // Audio/video defaults
   startWithAudioMuted: true,
   startWithVideoMuted: true,
 
-  // Disable Jitsi's own prejoin — we handle it in the portal
   prejoinConfig: { enabled: false },
-
-  // Disable deep linking to mobile app
   disableDeepLinking: true,
-
-  // Hide conference subject and timer from Jitsi's UI
   hideConferenceSubject: true,
   hideConferenceTimer: false,
-
-  // Disable user profile editing in Jitsi
   disableProfile: true,
 
-  // Chat is managed by our Q&A system
-  disableChat: true,
+  // Chat is now enabled (native Jitsi chat alongside our Q&A)
+  disableChat: false,
 
-  // No Jitsi welcome or close pages
   enableWelcomePage: false,
   enableClosePage: false,
-
-  // Disable invite — registration is handled by our portal
   disableInviteFunctions: true,
 
-  // Hide ALL toolbar buttons — we provide our own controls
-  toolbarButtons: [] as string[],
+  // Placeholder — overridden per role at instantiation
+  toolbarButtons: baseToolbarButtons as string[],
 
-  // Disable notifications — we handle our own
   notifications: [] as string[],
-
-  // Disable reactions (emoji)
   disableReactions: true,
 
-  // Breakout rooms disabled for now
   breakoutRooms: {
     hideAddRoomButton: true,
     hideAutoAssignButton: true,
     hideJoinRoomButton: true,
   },
 
-  // Disable P2P to force server-side routing (important for recording)
   p2p: { enabled: false },
-
-  // Disable file sharing
   enableFileSharing: false,
-
-  // Disable lobby (we handle access via JWT)
   enableLobbyChat: false,
-
-  // Remove third-party requests and branding
   disableThirdPartyRequests: true,
   brandingRoomAlias: null,
+
+  // Nuclear watermark removal (newer Jitsi versions)
+  defaultLogoUrl: '',
+  'watermark.enabled': false,
 } as const;
 
 /**
- * Interface config overrides — hides Jitsi branding and chrome.
- * Passed as `interfaceConfigOverwrite` to JitsiMeetExternalAPI.
+ * Interface config overrides passed as `interfaceConfigOverwrite`.
  */
 export const jitsiInterfaceConfigOverwrite = {
   SHOW_JITSI_WATERMARK: false,
@@ -81,46 +83,27 @@ export const jitsiInterfaceConfigOverwrite = {
   DEFAULT_LOGO_URL: '',
   DEFAULT_WELCOME_PAGE_LOGO_URL: '',
   SHOW_POWERED_BY: false,
+  PROVIDER_NAME: 'DTD',
+  APP_NAME: 'Eventi DTD',
+  NATIVE_APP_NAME: 'Eventi DTD',
 
-  // Empty toolbar (we provide our own)
-  TOOLBAR_BUTTONS: [] as string[],
+  TOOLBAR_BUTTONS: baseToolbarButtons as string[],
+  TOOLBAR_ALWAYS_VISIBLE: false,
+  INITIAL_TOOLBAR_TIMEOUT: 5000,
+  TOOLBAR_TIMEOUT: 4000,
 
-  // Hide invite header
   HIDE_INVITE_MORE_HEADER: true,
-
-  // Disable join/leave notifications (noisy with many participants)
   DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-
-  // No mobile app promo
   MOBILE_APP_PROMO: false,
-
-  // No Chrome extension banner
   SHOW_CHROME_EXTENSION_BANNER: false,
-
-  // Disable dominant speaker indicator (clutters UI)
   DISABLE_DOMINANT_SPEAKER_INDICATOR: false,
-
-  // Video quality label
   DISABLE_VIDEO_BACKGROUND: false,
-
-  // Film strip (thumbnails) — we keep this as Jitsi manages it well
   FILM_STRIP_MAX_HEIGHT: 120,
   VERTICAL_FILMSTRIP: true,
 } as const;
 
 /**
- * Moderator-specific config additions.
- * Merged with base config when the user is a moderator.
- */
-export const jitsiModeratorConfigOverwrite = {
-  // Moderators can use these toolbar buttons
-  // (still empty — we use executeCommand from our own buttons)
-  toolbarButtons: [] as string[],
-} as const;
-
-/**
  * Participant feature flags set via JWT context.
- * Controls what Jitsi allows per-user.
  */
 export interface JitsiJwtFeatures {
   recording: boolean;
@@ -132,7 +115,7 @@ export interface JitsiJwtFeatures {
 export const participantFeatures: JitsiJwtFeatures = {
   recording: false,
   livestreaming: false,
-  'screen-sharing': false,
+  'screen-sharing': true,
   'outbound-call': false,
 };
 
