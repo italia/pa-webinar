@@ -1,25 +1,13 @@
 'use client';
 
-import { Suspense } from 'react';
 import { useLocale } from 'next-intl';
-import { usePathname, useSearchParams } from 'next/navigation';
 
+import { Link, usePathname } from '@/i18n/navigation';
 import { locales, type Locale } from '@/i18n/config';
 
-function LanguageSwitcherInner() {
+export default function LanguageSwitcher() {
   const currentLocale = useLocale() as Locale;
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  function buildUrl(targetLocale: Locale): string {
-    const segments = pathname.split('/');
-    if (locales.includes(segments[1] as Locale)) {
-      segments[1] = targetLocale;
-    }
-    const newPath = segments.join('/');
-    const qs = searchParams.toString();
-    return qs ? `${newPath}?${qs}` : newPath;
-  }
 
   return (
     <ul className="d-flex list-unstyled mb-0 align-items-center">
@@ -43,34 +31,18 @@ function LanguageSwitcherInner() {
               {loc}
             </span>
           ) : (
-            <a
-              href={buildUrl(loc)}
+            <Link
+              href={pathname}
+              locale={loc}
               className="text-white text-uppercase text-decoration-none"
               style={{ fontSize: '0.85rem', letterSpacing: '0.02em', opacity: 0.65 }}
               lang={loc}
             >
               {loc}
-            </a>
+            </Link>
           )}
         </li>
       ))}
     </ul>
-  );
-}
-
-export default function LanguageSwitcher() {
-  return (
-    <Suspense
-      fallback={
-        <span
-          className="text-white text-uppercase"
-          style={{ fontSize: '0.85rem' }}
-        >
-          …
-        </span>
-      }
-    >
-      <LanguageSwitcherInner />
-    </Suspense>
   );
 }

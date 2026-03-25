@@ -60,6 +60,7 @@ export default function CreateEventForm() {
     speakersEn: '',
     organizerName: 'Dipartimento per la Trasformazione Digitale',
     imageUrl: '',
+    waitingRoomAudioUrl: '',
   });
 
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -98,6 +99,7 @@ export default function CreateEventForm() {
         speakersEn: form.speakersEn || undefined,
         organizerName: form.organizerName || undefined,
         imageUrl: form.imageUrl || undefined,
+        waitingRoomAudioUrl: form.waitingRoomAudioUrl || undefined,
       };
 
       const result = createEventSchema.safeParse(payload);
@@ -352,7 +354,7 @@ export default function CreateEventForm() {
             </div>
           </div>
 
-          <FormGroup className="mt-3 mb-0">
+          <FormGroup className="mt-3 mb-3">
             <Input
               {...inputProps('privacyPolicyUrl', t('form.privacyPolicyUrl'))}
               type="url"
@@ -361,6 +363,20 @@ export default function CreateEventForm() {
                 setField('privacyPolicyUrl', e.target.value)
               }
             />
+          </FormGroup>
+
+          <FormGroup className="mb-0">
+            <Input
+              {...inputProps('waitingRoomAudioUrl', t('form.waitingRoomAudioUrl'))}
+              type="url"
+              value={form.waitingRoomAudioUrl}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setField('waitingRoomAudioUrl', e.target.value)
+              }
+            />
+            <small className="form-text text-muted">
+              {t('form.waitingRoomAudioUrlHint')}
+            </small>
           </FormGroup>
         </CardBody>
       </Card>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
@@ -47,7 +48,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           <p className="text-secondary mb-0">{t('subtitle')}</p>
         </div>
         <div className="d-flex gap-2 align-items-center flex-shrink-0">
-          <a
+          <Link
             href="/it/admin/eventi/nuovo"
             className="btn btn-primary d-inline-flex align-items-center gap-2"
           >
@@ -55,7 +56,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               <path d="M8 2a1 1 0 0 1 1 1v4h4a1 1 0 1 1 0 2H9v4a1 1 0 1 1-2 0V9H3a1 1 0 0 1 0-2h4V3a1 1 0 0 1 1-1z" />
             </svg>
             {t('createEvent')}
-          </a>
+          </Link>
           {showLogout && <AdminLogoutButton />}
         </div>
       </div>
@@ -79,12 +80,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             </svg>
           </div>
           <p className="lead text-muted mb-3">{t('noEvents')}</p>
-          <a
+          <Link
             href="/it/admin/eventi/nuovo"
             className="btn btn-primary btn-lg"
           >
             {t('createEvent')}
-          </a>
+          </Link>
         </div>
       ) : (
         <AdminDashboardClient events={events} token={token} />

@@ -25,24 +25,32 @@ interface ModeratorControlsProps {
   recordingEnabled: boolean;
 }
 
+const BAR_STYLE: React.CSSProperties = {
+  background: '#1a1a2e',
+  borderBottom: '1px solid rgba(255,255,255,0.1)',
+};
+
+const BTN_BASE = 'py-2 px-3 d-inline-flex align-items-center gap-1 fw-semibold';
+
 export default function ModeratorControls({
   api,
   eventId,
   moderatorToken,
-  recordingEnabled,
 }: ModeratorControlsProps) {
   const t = useTranslations('live.moderator');
+  const tl = useTranslations('live');
   const tc = useTranslations('common');
   const router = useRouter();
 
   const { participantCount, isRecording } = useJitsiEvents(api);
 
-  const [chatOpen, setChatOpen] = useState(false);
+  const [chatActive, setChatActive] = useState(false);
   const [endModalOpen, setEndModalOpen] = useState(false);
   const [ending, setEnding] = useState(false);
-  const [showHands, setShowHands] = useState(false);
+  const [handsOpen, setHandsOpen] = useState(false);
+  const [handsCount, setHandsCount] = useState(0);
+  const [recToast, setRecToast] = useState('');
 
-  // Recording elapsed timer
   const [recSeconds, setRecSeconds] = useState(0);
   const recTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -72,32 +80,38 @@ export default function ModeratorControls({
   }, [api]);
 
   const handleToggleRecording = useCallback(() => {
-    if (!api) return;
-    if (isRecording) {
-      api.executeCommand('stopRecording', 'file');
-    } else {
-      api.executeCommand('startRecording', { mode: 'file' });
+    if (!api) {
+      setRecToast(tl('jibriUnavailable'));
+      setTimeout(() => setRecToast(''), 3000);
+      return;
     }
-  }, [api, isRecording]);
+    try {
+      if (isRecording) {
+        api.executeCommand('stopRecording', 'file');
+      } else {
+        api.executeCommand('startRecording', { mode: 'file' });
+      }
+    } catch {
+      setRecToast(tl('jibriUnavailable'));
+      setTimeout(() => setRecToast(''), 3000);
+    }
+  }, [api, isRecording, tl]);
 
   const handleToggleChat = useCallback(() => {
     api?.executeCommand('toggleChat');
-    setChatOpen((o) => !o);
+    setChatActive((o) => !o);
   }, [api]);
 
   const handleEndEvent = useCallback(async () => {
     setEnding(true);
     try {
       api?.executeCommand('hangup');
-
       await fetch(`/api/events/${eventId}?token=${moderatorToken}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'ENDED' }),
       });
-
       setEndModalOpen(false);
-
       setTimeout(() => {
         router.push(`/admin/eventi/${eventId}?token=${moderatorToken}`);
       }, 2000);
@@ -106,88 +120,150 @@ export default function ModeratorControls({
     }
   }, [api, eventId, moderatorToken, router]);
 
+  const onHandsCountChange = useCallback((count: number) => {
+    setHandsCount(count);
+  }, []);
+
   return (
     <>
-      <div className="bg-dark text-white px-3 py-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div
+        className="text-white px-3 py-2 d-flex align-items-center justify-content-between flex-wrap gap-2"
+        style={BAR_STYLE}
+      >
         <div className="d-flex align-items-center gap-2 flex-wrap">
+          {/* Mute All */}
           <Button
             color="light"
             outline
             size="sm"
+            className={BTN_BASE}
             onClick={handleMuteAll}
             disabled={!api}
+            style={{ fontSize: '0.82rem' }}
           >
-            <Icon icon="it-hearing" size="sm" className="me-1" />
+            <Icon icon="it-hearing" size="sm" />
             {t('muteAll')}
           </Button>
 
-          {recordingEnabled && (
-            <Button
-              color={isRecording ? 'danger' : 'light'}
-              outline={!isRecording}
-              size="sm"
-              onClick={handleToggleRecording}
-              disabled={!api}
-            >
-              <Icon icon="it-video" size="sm" className="me-1" />
-              {isRecording ? t('stopRecording') : t('startRecording')}
-              {isRecording && (
-                <Badge color="light" pill className="ms-2 text-danger px-2">
-                  {formatTime(recSeconds)}
-                </Badge>
-              )}
-            </Button>
-          )}
-
+          {/* Chat toggle */}
           <Button
-            color={chatOpen ? 'info' : 'light'}
-            outline={!chatOpen}
+            color={chatActive ? 'info' : 'light'}
+            outline={!chatActive}
             size="sm"
+            className={BTN_BASE}
             onClick={handleToggleChat}
             disabled={!api}
+            style={{ fontSize: '0.82rem' }}
           >
-            <Icon icon="it-comment" size="sm" className="me-1" />
+            <Icon icon="it-comment" size="sm" />
             {t('toggleChat')}
           </Button>
 
+          {/* Raised hands */}
           <Button
             color="light"
             outline
             size="sm"
-            onClick={() => setShowHands(!showHands)}
+            className={`${BTN_BASE} position-relative`}
+            onClick={() => setHandsOpen(!handsOpen)}
             disabled={!api}
+            style={{ fontSize: '0.82rem' }}
           >
-            <Icon icon="it-hand" size="sm" className="me-1" />
+            <span style={{ fontSize: '1rem' }}>✋</span>
             {t('raisedHands')}
+            {handsCount > 0 && (
+              <Badge
+                color="warning"
+                pill
+                className="ms-1"
+                style={{ fontSize: '0.7rem' }}
+              >
+                {handsCount}
+              </Badge>
+            )}
           </Button>
 
+          {/* Recording — always visible */}
+          <Button
+            color={isRecording ? 'danger' : 'light'}
+            outline={!isRecording}
+            size="sm"
+            className={BTN_BASE}
+            onClick={handleToggleRecording}
+            disabled={!api}
+            style={{ fontSize: '0.82rem' }}
+          >
+            {isRecording ? (
+              <>
+                <span
+                  className="d-inline-block rounded-circle"
+                  style={{
+                    width: 8,
+                    height: 8,
+                    backgroundColor: '#fff',
+                    animation: 'pulse-dot 1.5s ease-in-out infinite',
+                  }}
+                />
+                {t('stopRecording')}
+                <Badge
+                  color="light"
+                  pill
+                  className="ms-1 text-danger"
+                  style={{ fontSize: '0.72rem' }}
+                >
+                  {formatTime(recSeconds)}
+                </Badge>
+              </>
+            ) : (
+              <>
+                <Icon icon="it-video" size="sm" />
+                {t('startRecording')}
+              </>
+            )}
+          </Button>
+
+          {/* End event */}
           <Button
             color="danger"
             size="sm"
+            className={BTN_BASE}
             onClick={() => setEndModalOpen(true)}
+            style={{ fontSize: '0.82rem' }}
           >
-            <Icon icon="it-close-circle" size="sm" className="me-1" />
+            <Icon icon="it-close-circle" size="sm" color="white" />
             {t('endEvent')}
           </Button>
         </div>
 
-        <div className="d-flex align-items-center gap-2">
-          <Badge color="light" pill className="text-dark px-2 py-1">
-            <Icon icon="it-user" size="xs" className="me-1" />
-            {t('participantCount', { count: participantCount })}
-          </Badge>
-        </div>
+        {/* Participant count */}
+        <Badge
+          color=""
+          pill
+          className="px-3 py-1"
+          style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#fff', fontSize: '0.82rem' }}
+        >
+          <Icon icon="it-user" size="xs" className="me-1" />
+          {t('participantCount', { count: participantCount })}
+        </Badge>
       </div>
 
-      {showHands && (
-        <RaisedHandsPanel api={api} />
+      {/* Jibri toast */}
+      {recToast && (
+        <div
+          className="bg-warning text-dark px-3 py-2 small text-center fw-semibold"
+          role="alert"
+        >
+          {recToast}
+        </div>
       )}
 
-      <Modal
-        isOpen={endModalOpen}
-        toggle={() => setEndModalOpen(false)}
-        centered
-      >
+      {/* Raised hands panel — collapsed by default */}
+      {handsOpen && (
+        <RaisedHandsPanel api={api} onCountChange={onHandsCountChange} />
+      )}
+
+      {/* End event confirmation modal */}
+      <Modal isOpen={endModalOpen} toggle={() => setEndModalOpen(false)} centered>
         <ModalHeader toggle={() => setEndModalOpen(false)}>
           {t('endEvent')}
         </ModalHeader>

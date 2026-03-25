@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
   Alert,
@@ -29,6 +29,7 @@ interface EventInfo {
   recordingEnabled: boolean;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  waitingRoomAudioUrl: string | null;
 }
 
 interface LiveEventClientProps {
@@ -77,6 +78,8 @@ export default function LiveEventClient({
   const startsAtMs = new Date(event.startsAt).getTime();
   const [countdown, setCountdown] = useState('');
   const [eventStatus, setEventStatus] = useState(event.status);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (eventStatus === 'ENDED') {
@@ -212,6 +215,38 @@ export default function LiveEventClient({
     setJitsiApi(api);
   }, []);
 
+  // ── Waiting room audio toggle ──
+  const audioSrc = event.waitingRoomAudioUrl || '/audio/waiting-room-default.mp3';
+
+  const toggleMusic = useCallback(() => {
+    if (!audioRef.current) {
+      const audio = new Audio(audioSrc);
+      audio.loop = true;
+      audio.volume = 0.3;
+      audioRef.current = audio;
+    }
+
+    if (musicPlaying) {
+      audioRef.current.pause();
+      setMusicPlaying(false);
+    } else {
+      audioRef.current.play().then(() => {
+        setMusicPlaying(true);
+      }).catch(() => {
+        setMusicPlaying(false);
+      });
+    }
+  }, [musicPlaying, audioSrc]);
+
+  // Cleanup audio on phase change
+  useEffect(() => {
+    if (phase !== 'not_started' && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setMusicPlaying(false);
+    }
+  }, [phase]);
+
   // ── Waiting room ──
   if (phase === 'not_started') {
     return (
@@ -249,7 +284,24 @@ export default function LiveEventClient({
               </div>
             )}
 
-            <Alert color="info" className="text-start mt-4">
+            {/* Music toggle button */}
+            <div className="mb-4">
+              <Button
+                color={musicPlaying ? 'primary' : 'secondary'}
+                outline={!musicPlaying}
+                size="sm"
+                onClick={toggleMusic}
+                className="d-inline-flex align-items-center gap-2"
+                title={musicPlaying ? t('disableMusic') : t('enableMusic')}
+              >
+                <span style={{ fontSize: '1.1rem' }}>
+                  {musicPlaying ? '🔊' : '🔇'}
+                </span>
+                {musicPlaying ? t('disableMusic') : t('enableMusic')}
+              </Button>
+            </div>
+
+            <Alert color="info" className="text-start">
               <Icon icon="it-info-circle" className="me-2" />
               {t('waitingRoomHint')}
             </Alert>
