@@ -64,7 +64,8 @@ RUN find .next/standalone -name '.env*' -type f -delete && \
 # ── Stage 3: Production runner ───────────────────────────────
 FROM node:20-alpine AS runner
 
-RUN apk add --no-cache tini
+RUN apk upgrade --no-cache && apk add --no-cache tini && \
+    npm cache clean --force && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 WORKDIR /app
 
