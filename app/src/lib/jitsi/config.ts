@@ -62,6 +62,10 @@ export const jitsiConfigOverwrite = {
 
   // Disable lobby (we handle access via JWT)
   enableLobbyChat: false,
+
+  // Remove third-party requests and branding
+  disableThirdPartyRequests: true,
+  brandingRoomAlias: null,
 } as const;
 
 /**
@@ -72,6 +76,11 @@ export const jitsiInterfaceConfigOverwrite = {
   SHOW_JITSI_WATERMARK: false,
   SHOW_WATERMARK_FOR_GUESTS: false,
   SHOW_BRAND_WATERMARK: false,
+  BRAND_WATERMARK_LINK: '',
+  JITSI_WATERMARK_LINK: '',
+  DEFAULT_LOGO_URL: '',
+  DEFAULT_WELCOME_PAGE_LOGO_URL: '',
+  SHOW_POWERED_BY: false,
 
   // Empty toolbar (we provide our own)
   TOOLBAR_BUTTONS: [] as string[],

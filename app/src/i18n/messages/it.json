@@ -133,6 +133,9 @@
     "eventStartsAt": "L'evento inizierà il {date} alle {time}",
     "countdown": "Tempo rimanente",
     "waitingRoomHint": "Questa pagina si aggiornerà automaticamente quando il moderatore avvierà l'evento. Non è necessario ricaricare.",
+    "enableMusic": "Attiva musica",
+    "disableMusic": "Disattiva musica",
+    "jibriUnavailable": "Registrazione non disponibile — Jibri non configurato",
     "eventEnded": "Evento concluso",
     "eventEndedMessage": "L'evento è terminato. Grazie per aver partecipato.",
     "backToEvent": "Torna all'evento",
@@ -252,6 +255,8 @@
       "speakersEn": "Relatori (inglese)",
       "organizerName": "Organizzatore",
       "imageUrl": "URL immagine di copertina",
+      "waitingRoomAudioUrl": "URL audio sala d'attesa (opzionale)",
+      "waitingRoomAudioUrlHint": "Inserisci l'URL di un file MP3 per la musica nella sala d'attesa. Lascia vuoto per usare l'audio predefinito.",
       "submit": "Crea evento",
       "creating": "Creazione in corso...",
       "sectionContent": "Contenuti",
@@ -283,6 +288,53 @@
     "dateLabel": "Data",
     "timeLabel": "Ora",
     "durationLabel": "Durata"
+  },
+  "home": {
+    "hero": {
+      "title": "Eventi pubblici digitali",
+      "subtitle": "Piattaforma per webinar, presentazioni e incontri pubblici del Dipartimento per la Trasformazione Digitale",
+      "browseEvents": "Scopri gli eventi",
+      "organizeEvent": "Organizza un evento"
+    },
+    "features": {
+      "title": "La piattaforma per gli eventi della PA",
+      "video": {
+        "title": "Video conferenza",
+        "desc": "Partecipa a eventi pubblici con fino a 300 partecipanti. Nessun software da installare."
+      },
+      "qa": {
+        "title": "Domande e risposte",
+        "desc": "Fai domande durante l'evento e vota le più importanti. Il moderatore risponde in diretta."
+      },
+      "privacy": {
+        "title": "Privacy e sicurezza",
+        "desc": "Dati protetti e conformi al GDPR. Infrastruttura self-hosted in Italia."
+      }
+    },
+    "upcoming": {
+      "title": "Prossimi eventi",
+      "viewAll": "Vedi tutti gli eventi",
+      "noEvents": "Nessun evento in programma. Torna presto!"
+    },
+    "howItWorks": {
+      "title": "Come funziona",
+      "step1": {
+        "title": "Registrati",
+        "desc": "Iscriviti gratuitamente all'evento"
+      },
+      "step2": {
+        "title": "Ricevi il link",
+        "desc": "Un'email con il link personale per accedere"
+      },
+      "step3": {
+        "title": "Partecipa",
+        "desc": "Entra nell'evento dal browser, senza installazioni"
+      },
+      "step4": {
+        "title": "Interagisci",
+        "desc": "Fai domande, vota, partecipa alla discussione"
+      }
+    }
   },
   "footer": {
     "departmentName": "Dipartimento per la Trasformazione Digitale",

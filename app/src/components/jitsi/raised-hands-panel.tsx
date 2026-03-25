@@ -14,9 +14,10 @@ interface RaisedHand {
 
 interface RaisedHandsPanelProps {
   api: JitsiMeetExternalAPI | null;
+  onCountChange?: (count: number) => void;
 }
 
-export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
+export default function RaisedHandsPanel({ api, onCountChange }: RaisedHandsPanelProps) {
   const t = useTranslations('live.moderator');
   const [hands, setHands] = useState<RaisedHand[]>([]);
   const handsRef = useRef<Map<string, RaisedHand>>(new Map());
@@ -27,7 +28,8 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
       (a, b) => a.raisedAt - b.raisedAt,
     );
     setHands(arr);
-  }, []);
+    onCountChange?.(arr.length);
+  }, [onCountChange]);
 
   useEffect(() => {
     if (!api) return;
@@ -61,31 +63,34 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
     };
   }, [api, syncHands]);
 
-  // Tick every 10s to update "time since raised"
   useEffect(() => {
     const interval = setInterval(() => setTick((t) => t + 1), 10_000);
     return () => clearInterval(interval);
   }, []);
 
   const handleGiveFloor = useCallback(
-    (id: string, name: string) => {
-      // Unmuting a specific participant requires deeper Jitsi API work; for now this is a placeholder
+    (id: string) => {
       void id;
-      void name;
     },
     [],
   );
 
   if (hands.length === 0) {
     return (
-      <div className="bg-dark bg-opacity-75 text-white px-3 py-2 small text-center">
+      <div
+        className="text-white px-3 py-2 small text-center"
+        style={{ background: 'rgba(26,26,46,0.85)' }}
+      >
         {t('noRaisedHands')}
       </div>
     );
   }
 
   return (
-    <div className="bg-dark bg-opacity-75 text-white px-3 py-2">
+    <div
+      className="text-white px-3 py-2"
+      style={{ background: 'rgba(26,26,46,0.85)' }}
+    >
       <div className="d-flex flex-wrap gap-2 align-items-center">
         {hands.map((h) => {
           const elapsed = Math.floor((Date.now() - h.raisedAt) / 1000);
@@ -96,17 +101,21 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
           return (
             <div
               key={h.id}
-              className="d-flex align-items-center gap-1 bg-warning bg-opacity-25 rounded px-2 py-1"
+              className="d-flex align-items-center gap-1 rounded px-2 py-1"
+              style={{ backgroundColor: 'rgba(255,193,7,0.2)' }}
             >
-              <Icon icon="it-hand" size="xs" />
+              <span style={{ fontSize: '0.9rem' }}>✋</span>
               <span className="small fw-semibold">{h.displayName}</span>
-              <span className="text-muted small">({timeStr})</span>
+              <span className="small" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                ({timeStr})
+              </span>
               <Button
                 color="light"
                 size="xs"
                 className="px-1 py-0 ms-1"
-                onClick={() => handleGiveFloor(h.id, h.displayName)}
+                onClick={() => handleGiveFloor(h.id)}
                 aria-label={t('giveFloor')}
+                style={{ lineHeight: 1 }}
               >
                 <Icon icon="it-microphone" size="xs" />
               </Button>
