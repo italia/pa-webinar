@@ -81,3 +81,29 @@ Non vengono utilizzati script di analytics (Google Analytics, Mixpanel, ecc.) n�
 I partecipanti possono esercitare i diritti previsti dal GDPR (accesso, rettifica, cancellazione, portabilità) contattando l'organizzatore dell'evento o il Dipartimento per la Trasformazione Digitale.
 
 La cancellazione automatica dei dati al termine del periodo di conservazione garantisce il principio di minimizzazione dei dati.
+
+## Evoluzione v0.2.0 — Campi aggiuntivi registrazione (pianificato)
+
+### Nuovi dati raccolti
+
+| Dato | Obbligatorietà | Base giuridica | Note |
+|------|---------------|----------------|------|
+| Ente di appartenenza | Configurabile per evento | Consenso | Testo libero |
+| Ruolo nell'ente | Configurabile per evento | Consenso | Testo libero |
+| Tipologia ente | Configurabile per evento | Consenso | Select predefinita |
+
+Questi campi seguono la stessa retention dell'evento e vengono eliminati dal cron GDPR.
+
+### Consensi granulari (pianificato)
+
+1. **Trattamento dati per partecipazione** — obbligatorio
+2. **Registrazione video** — richiesto se l'evento è registrato
+3. **Comunicazioni post-evento** — opzionale ("Vuoi ricevere informazioni su eventi futuri?")
+
+### Audit log GDPR (pianificato)
+
+Log immutabile delle operazioni di cancellazione dati:
+- Timestamp operazione
+- ID evento
+- Conteggio record eliminati (registrazioni, domande, voti poll)
+- Nessun PII nel log
