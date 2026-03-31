@@ -17,7 +17,8 @@
     "db:studio": "npm run db:studio --workspace=app",
     "format": "prettier --write .",
     "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down"
+    "docker:down": "docker compose down",
+    "license:report": "node scripts/generate-license-report.mjs"
   },
   "overrides": {
     "react": "^19.0.0",

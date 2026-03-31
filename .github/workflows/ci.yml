@@ -70,9 +70,16 @@ jobs:
           node-version: "20"
           cache: "npm"
       - run: npm ci
-      - name: Check licenses
+      - name: Check forbidden licenses
         run: |
           npx license-checker --production --failOn "GPL-2.0;GPL-3.0;AGPL-3.0;AGPL-3.0-only;SSPL-1.0" --excludePrivatePackages
+      - name: Verify license-report.json is up to date
+        run: |
+          npm run license:report
+          git diff --exit-code license-report.json || {
+            echo "::error::license-report.json is out of date. Run 'npm run license:report' and commit the result."
+            exit 1
+          }
 
   docker:
     name: Docker Build & Scan
