@@ -56,7 +56,7 @@ export default function PAFooter() {
                 <ul className="footer-list link-list clearfix">
                   <li>
                     <a
-                      href="https://github.com/nicola-2022/eventi-dtd"
+                      href="https://github.com/italia/eventi-dtd"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="list-item"
