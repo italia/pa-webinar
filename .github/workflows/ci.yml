@@ -60,6 +60,20 @@ jobs:
           severity: "CRITICAL,HIGH"
           exit-code: "1"
 
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Check licenses
+        run: |
+          npx license-checker --production --failOn "GPL-2.0;GPL-3.0;AGPL-3.0;AGPL-3.0-only;SSPL-1.0" --excludePrivatePackages
+
   docker:
     name: Docker Build & Scan
     runs-on: ubuntu-latest
