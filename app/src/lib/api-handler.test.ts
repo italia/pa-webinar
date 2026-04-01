@@ -5,7 +5,7 @@ import { NotFoundError, AppError } from './errors';
 
 function makeNextRequest(
   url: string,
-  init?: RequestInit,
+  init?: ConstructorParameters<typeof NextRequest>[1],
 ): NextRequest {
   return new NextRequest(new URL(url, 'http://localhost'), init);
 }
