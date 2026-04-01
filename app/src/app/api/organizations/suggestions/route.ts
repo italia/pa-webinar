@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -10,12 +9,12 @@ export const dynamic = 'force-dynamic';
  * Returns distinct organization names matching the query prefix.
  * Used for autocomplete in the registration form.
  */
-export async function GET(request: Request) {
+export const GET = withErrorHandling(async (request) => {
   const url = new URL(request.url);
   const q = url.searchParams.get('q')?.trim();
 
   if (!q || q.length < 2) {
-    return NextResponse.json({ suggestions: [] });
+    return Response.json({ suggestions: [] });
   }
 
   const results = await prisma.registration.findMany({
@@ -32,5 +31,5 @@ export async function GET(request: Request) {
     .map((r) => r.organization)
     .filter((name): name is string => name !== null);
 
-  return NextResponse.json({ suggestions });
-}
+  return Response.json({ suggestions });
+});

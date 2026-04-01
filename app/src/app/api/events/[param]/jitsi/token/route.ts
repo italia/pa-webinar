@@ -1,5 +1,12 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import {
+  NotFoundError,
+  ForbiddenError,
+  ConflictError,
+  RateLimitError,
+  ValidationError,
+  AppError,
+} from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
 import { constantTimeEqual } from '@/lib/auth/moderator';
@@ -13,46 +20,28 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ param: string }>;
-}
-
-export async function POST(request: Request, context: RouteContext) {
+export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
-
+  const body = await parseJsonBody(request);
   const parsed = jitsiTokenRequestSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
-      { status: 422 },
-    );
+    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
   const { accessToken, moderatorToken, guestName, displayNameOverride } = parsed.data;
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  }
+  if (!event) throw new NotFoundError('Event');
 
   if (!['PUBLISHED', 'LIVE'].includes(event.status)) {
-    return NextResponse.json(
-      { error: 'Event is not active' },
-      { status: 409 },
-    );
+    throw new ConflictError('Event is not active');
   }
 
   // ── Moderator flow ──
   if (moderatorToken) {
     if (!constantTimeEqual(event.moderatorToken, moderatorToken)) {
-      return NextResponse.json({ error: 'Invalid moderator token' }, { status: 403 });
+      throw new ForbiddenError('Invalid moderator token');
     }
 
     const name = displayNameOverride || event.moderatorName || 'Moderatore';
@@ -64,7 +53,7 @@ export async function POST(request: Request, context: RouteContext) {
       isModerator: true,
     });
 
-    return NextResponse.json({
+    return Response.json({
       jwt,
       roomName: event.jitsiRoomName,
       displayName: name,
@@ -79,7 +68,7 @@ export async function POST(request: Request, context: RouteContext) {
     });
 
     if (!registration || registration.eventId !== event.id) {
-      return NextResponse.json({ error: 'Invalid access token' }, { status: 403 });
+      throw new ForbiddenError('Invalid access token');
     }
 
     if (!registration.joinedAt) {
@@ -89,7 +78,6 @@ export async function POST(request: Request, context: RouteContext) {
       });
     }
 
-    // Participants use their registered display name (no override to prevent impersonation)
     const name = registration.displayName;
 
     const jwt = await generateJitsiJwt({
@@ -99,7 +87,7 @@ export async function POST(request: Request, context: RouteContext) {
       isModerator: false,
     });
 
-    return NextResponse.json({
+    return Response.json({
       jwt,
       roomName: event.jitsiRoomName,
       displayName: name,
@@ -110,19 +98,13 @@ export async function POST(request: Request, context: RouteContext) {
   // ── Guest flow (no registration, LIVE events only) ──
   if (guestName) {
     if (event.status !== 'LIVE') {
-      return NextResponse.json(
-        { error: 'Guest access is only available during live events' },
-        { status: 409 },
-      );
+      throw new ConflictError('Guest access is only available during live events');
     }
 
     const ip = getClientIp(request);
     const rl = rateLimit(`guest-jwt:${ip}`, { limit: 5, windowMs: 60_000 });
     if (!rl.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
-      );
+      throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
     }
 
     const jwt = await generateJitsiJwt({
@@ -133,7 +115,7 @@ export async function POST(request: Request, context: RouteContext) {
       expiresInSeconds: 2 * 60 * 60,
     });
 
-    return NextResponse.json({
+    return Response.json({
       jwt,
       roomName: event.jitsiRoomName,
       displayName: guestName,
@@ -141,5 +123,5 @@ export async function POST(request: Request, context: RouteContext) {
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
-  return NextResponse.json({ error: 'No token provided' }, { status: 400 });
-}
+  throw new AppError('No token provided', 400, 'BAD_REQUEST');
+});

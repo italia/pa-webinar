@@ -1,19 +1,21 @@
 import { type PollStatus } from '@prisma/client';
-import { NextResponse } from 'next/server';
 
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  ValidationError,
+} from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { createPollSchema } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ param: string }>;
-}
-
 // ── GET /api/events/[slug]/polls ─────────────────────────
 
-export async function GET(request: Request, context: RouteContext) {
+export const GET = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const authHeader = request.headers.get('authorization');
@@ -21,18 +23,13 @@ export async function GET(request: Request, context: RouteContext) {
     ? authHeader.slice(7).trim()
     : new URL(request.url).searchParams.get('token');
 
-  if (!token) {
-    return NextResponse.json({ error: 'Token required' }, { status: 401 });
-  }
+  if (!token) throw new UnauthorizedError('Token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  }
+  if (!event) throw new NotFoundError('Event');
 
   const isModerator = constantTimeEqual(event.moderatorToken, token);
 
-  // Participants/guests can only see OPEN and PUBLISHED polls
   const where = isModerator
     ? { eventId: event.id }
     : { eventId: event.id, status: { in: ['OPEN', 'PUBLISHED'] as PollStatus[] } };
@@ -46,7 +43,6 @@ export async function GET(request: Request, context: RouteContext) {
     orderBy: { createdAt: 'desc' },
   });
 
-  // Determine if the user has voted on each poll
   let registrationId: string | null = null;
   if (!isModerator) {
     const reg = await prisma.registration.findUnique({
@@ -60,12 +56,10 @@ export async function GET(request: Request, context: RouteContext) {
     const options = poll.options as string[];
     const totalVotes = poll._count.votes;
 
-    // Count votes per option
     const optionCounts = options.map((_, idx) =>
       poll.votes.filter((v) => v.optionIndex === idx).length,
     );
 
-    // Check if user has voted
     const hasVoted = registrationId
       ? poll.votes.some((v) => v.registrationId === registrationId)
       : false;
@@ -74,7 +68,6 @@ export async function GET(request: Request, context: RouteContext) {
       ? poll.votes.find((v) => v.registrationId === registrationId)?.optionIndex ?? null
       : null;
 
-    // Show results to moderators always, to participants only when PUBLISHED or CLOSED
     const showResults = isModerator || poll.status !== 'OPEN';
 
     return {
@@ -91,37 +84,26 @@ export async function GET(request: Request, context: RouteContext) {
     };
   });
 
-  return NextResponse.json({ polls: result });
-}
+  return Response.json({ polls: result });
+});
 
 // ── POST /api/events/[slug]/polls ────────────────────────
 
-export async function POST(request: Request, context: RouteContext) {
+export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const token = extractModeratorToken(request);
-  if (!token) {
-    return NextResponse.json({ error: 'Moderator token required' }, { status: 401 });
-  }
+  if (!token) throw new UnauthorizedError('Moderator token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event || !constantTimeEqual(event.moderatorToken, token)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    throw new ForbiddenError('Unauthorized');
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-  }
-
+  const body = await parseJsonBody(request);
   const parsed = createPollSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
-      { status: 422 },
-    );
+    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
   const poll = await prisma.poll.create({
@@ -132,7 +114,7 @@ export async function POST(request: Request, context: RouteContext) {
     },
   });
 
-  return NextResponse.json(
+  return Response.json(
     {
       id: poll.id,
       question: poll.question,
@@ -147,4 +129,4 @@ export async function POST(request: Request, context: RouteContext) {
     },
     { status: 201 },
   );
-}
+});
