@@ -1,0 +1,69 @@
+# KEDA ScaledObject for Jitsi Video Bridge
+#
+# Alternative to the built-in CronJob scaler (jvbScaler).
+# Use this if you have KEDA installed in your cluster for more responsive scaling.
+#
+# Install KEDA:
+#   helm repo add kedacore https://kedacore.github.io/charts
+#   helm install keda kedacore/keda -n keda-system --create-namespace
+#
+# Apply:
+#   kubectl apply -f examples/keda-jvb-scaler.yaml
+#
+# When using KEDA, disable the CronJob scaler: jvbScaler.enabled=false
+#
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: jvb-scaler
+  namespace: videocall  # Change to match your namespace
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: videocall-jitsi-meet-jvb  # Adjust to match actual JVB deployment name
+
+  # Scale to 0 when no events
+  minReplicaCount: 0
+  maxReplicaCount: 4
+
+  # Check every 30 seconds
+  pollingInterval: 30
+
+  # Wait 10 minutes before scaling down (avoid flapping)
+  cooldownPeriod: 600
+
+  triggers:
+    - type: postgresql
+      metadata:
+        connectionFromEnv: DATABASE_URL
+
+        # Query: count events that are LIVE or starting within 30 minutes.
+        # Returns the number of JVB replicas needed.
+        query: >
+          SELECT COALESCE(
+            GREATEST(
+              (SELECT COUNT(*) FROM events
+               WHERE status = 'LIVE'),
+              (SELECT COUNT(*) FROM events
+               WHERE status = 'PUBLISHED'
+               AND starts_at <= NOW() + INTERVAL '30 minutes'
+               AND ends_at >= NOW())
+            ),
+            0
+          )
+        targetQueryValue: "1"
+        activationTargetQueryValue: "0.5"
+      authenticationRef:
+        name: videocall-db-auth
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: videocall-db-auth
+  namespace: videocall  # Change to match your namespace
+spec:
+  secretTargetRef:
+    - parameter: connection
+      name: videocall-secrets  # Change to match your secret name
+      key: DATABASE_URL

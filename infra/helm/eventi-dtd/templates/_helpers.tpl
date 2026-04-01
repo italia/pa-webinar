@@ -90,3 +90,11 @@ Points to the in-cluster Service.
 {{- define "eventi-dtd.internalUrl" -}}
 {{- printf "http://%s:%v" (include "eventi-dtd.fullname" .) .Values.service.port -}}
 {{- end }}
+
+{{/*
+Secret name — resolves the name of the Kubernetes Secret used by all resources.
+Uses secrets.existingSecretName (new) with fallback to app.existingSecret (legacy).
+*/}}
+{{- define "eventi-dtd.secretName" -}}
+{{- .Values.secrets.existingSecretName | default .Values.app.existingSecret | default "videocall-secrets" -}}
+{{- end }}

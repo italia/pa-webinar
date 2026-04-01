@@ -1,9 +1,19 @@
-# ─────────────────────────────────────────────────────────────
-# eventi-dtd — Helm Values
+# ============================================================================
+# eventi-dtd Helm Chart — Configurazione base
+# ============================================================================
 #
-# Comprehensive configuration for the eventi-dtd platform.
-# Override with values-dev.yaml or values-prod.yaml per environment.
-# ─────────────────────────────────────────────────────────────
+# Questo file contiene i valori predefiniti. Per il deployment, sovrapponi
+# con uno dei file di esempio:
+#
+#   Semplice:  helm install videocall . -f examples/values-simple.yaml
+#   Standard:  helm install videocall . -f examples/values-standard.yaml
+#   Completa:  helm install videocall . -f examples/values-full.yaml
+#
+# Personalizza i valori specifici del tuo ambiente in un file separato.
+# NON modificare questo file — crea un override.
+#
+# Documentazione: docs/DEPLOYMENT.md, docs/CONFIGURATION.md
+# ============================================================================
 
 # ── Application ──────────────────────────────────────────────
 
@@ -29,9 +39,9 @@ app:
       tag: ""  # Defaults to Chart.appVersion + "-migrate" suffix
       pullPolicy: IfNotPresent
 
-  # Image pull secrets for private registries (e.g. Azure ACR)
+  # Image pull secrets for private registries (e.g. ACR, ECR, GCR)
   imagePullSecrets: []
-  #   - name: acr-credentials
+  #   - name: registry-credentials
 
   # Resource requests and limits
   resources:
@@ -42,7 +52,12 @@ app:
       cpu: "1"
       memory: 512Mi
 
-  # Node scheduling constraints
+  # Node scheduling constraints (cloud-agnostic — set per environment)
+  # Examples:
+  #   AKS:  { agentpool: applications }
+  #   GKE:  { cloud.google.com/gke-nodepool: applications }
+  #   EKS:  { eks.amazonaws.com/nodegroup: applications }
+  #   k3s:  {}
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -52,22 +67,11 @@ app:
   # NEXT_PUBLIC_* vars are baked into the client bundle at build time,
   # so they must match the build-time values.
   env:
-    NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.eventi.dominio.gov.it"
-    NEXT_PUBLIC_APP_URL: "https://eventi.dominio.gov.it"
+    NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.videocall.example.com"
+    NEXT_PUBLIC_APP_URL: "https://videocall.example.com"
     NEXT_PUBLIC_DEFAULT_LOCALE: "it"
     DEFAULT_DATA_RETENTION_DAYS: "30"
-    DEFAULT_PRIVACY_POLICY_URL: "https://eventi.dominio.gov.it/it/privacy"
-
-  # ── Secrets ──
-  # Name of a pre-existing Kubernetes Secret containing sensitive variables.
-  # Required keys:
-  #   DATABASE_URL, JITSI_JWT_SECRET, JITSI_JWT_APP_ID, JITSI_JWT_ISSUER,
-  #   JITSI_JWT_AUDIENCE, APP_SECRET, ADMIN_API_KEY, PII_ENCRYPTION_KEY,
-  #   CRON_API_KEY, SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER,
-  #   SMTP_PASSWORD, SMTP_FROM, SMTP_FROM_NAME
-  # Optional keys:
-  #   AZURE_STORAGE_CONNECTION_STRING, AZURE_STORAGE_CONTAINER
-  existingSecret: "eventi-dtd-secrets"
+    DEFAULT_PRIVACY_POLICY_URL: "https://videocall.example.com/it/privacy"
 
   # ── Security context ──
 
@@ -147,6 +151,70 @@ app:
   # Additional pod labels
   podLabels: {}
 
+# ── Secrets ─────────────────────────────────────────────────
+#
+# Three modes for managing secrets:
+#   "existing"  — reference a pre-created Kubernetes Secret (default)
+#   "external"  — use External Secrets Operator (Azure Key Vault, AWS SM, GCP SM)
+#   "generate"  — chart creates Secret from values (dev/test ONLY)
+
+secrets:
+  mode: "existing"
+
+  # Name of the Kubernetes Secret (used by all modes as the target name)
+  existingSecretName: "videocall-secrets"
+
+  # ── External Secrets Operator config (mode: "external") ──
+  external:
+    # Provider: "azure-key-vault", "aws-secrets-manager", "gcp-secret-manager"
+    provider: "azure-key-vault"
+    refreshInterval: "1h"
+
+    azureKeyVault:
+      vaultUrl: ""
+      tenantId: ""
+      # Maps Kubernetes secret keys → Key Vault secret names
+      secretMappings:
+        DATABASE_URL: "eventi-dtd-database-url"
+        JITSI_JWT_SECRET: "eventi-dtd-jitsi-jwt-secret"
+        APP_SECRET: "eventi-dtd-app-secret"
+        ADMIN_API_KEY: "eventi-dtd-admin-api-key"
+        PII_ENCRYPTION_KEY: "eventi-dtd-pii-encryption-key"
+        CRON_API_KEY: "eventi-dtd-cron-api-key"
+        SMTP_HOST: "eventi-dtd-smtp-host"
+        SMTP_PORT: "eventi-dtd-smtp-port"
+        SMTP_USER: "eventi-dtd-smtp-user"
+        SMTP_PASSWORD: "eventi-dtd-smtp-password"
+
+    awsSecretsManager:
+      region: ""
+      # Maps Kubernetes secret keys → AWS Secrets Manager secret names
+      secretMappings: {}
+
+    gcpSecretManager:
+      projectID: ""
+      # Maps Kubernetes secret keys → GCP Secret Manager secret names
+      secretMappings: {}
+
+  # ── Generated secrets (mode: "generate", dev/test ONLY) ──
+  generate:
+    DATABASE_URL: ""
+    JITSI_JWT_SECRET: ""
+    JITSI_JWT_APP_ID: "eventi_dtd"
+    JITSI_JWT_ISSUER: "eventi-dtd"
+    JITSI_JWT_AUDIENCE: "jitsi"
+    APP_SECRET: ""
+    ADMIN_API_KEY: ""
+    PII_ENCRYPTION_KEY: ""
+    CRON_API_KEY: ""
+    SMTP_HOST: ""
+    SMTP_PORT: "587"
+    SMTP_SECURE: "false"
+    SMTP_USER: ""
+    SMTP_PASSWORD: ""
+    SMTP_FROM: ""
+    SMTP_FROM_NAME: ""
+
 # ── Service ──────────────────────────────────────────────────
 
 service:
@@ -158,9 +226,11 @@ service:
 serviceAccount:
   # Create a dedicated ServiceAccount for the app pods
   create: true
-  # Annotations (e.g. for Azure Workload Identity)
+  # Annotations (e.g. for Azure Workload Identity, GKE Workload Identity, IRSA)
   annotations: {}
   #   azure.workload.identity/client-id: "<managed-identity-client-id>"
+  #   iam.gke.io/gcp-service-account: "<gsa-name>@<project>.iam.gserviceaccount.com"
+  #   eks.amazonaws.com/role-arn: "arn:aws:iam::<account>:role/<role>"
   # Override the ServiceAccount name (defaults to release fullname)
   name: ""
 
@@ -178,14 +248,14 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
   hosts:
-    - host: eventi.dominio.gov.it
+    - host: videocall.example.com
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: eventi-dtd-tls
+    - secretName: videocall-tls
       hosts:
-        - eventi.dominio.gov.it
+        - videocall.example.com
 
 # ── Horizontal Pod Autoscaler ────────────────────────────────
 
@@ -236,21 +306,33 @@ cronjobs:
     schedule: "0 3 * * *"
     image: curlimages/curl:8.11.1
 
+# ── JVB Auto-Scaler ─────────────────────────────────────────
+# CronJob that scales JVB replicas based on upcoming/active events.
+# Only used with jitsi.mode=full. No external dependencies (no KEDA).
+# Calls the internal /api/internal/jvb-desired-replicas endpoint.
+
+jvbScaler:
+  enabled: false
+  schedule: "*/5 * * * *"
+  image: bitnami/kubectl:1.29
+  # Name of the JVB Deployment to scale — adjust to match your release name
+  jvbDeploymentName: "videocall-jitsi-meet-jvb"
+
 # ── Prometheus Metrics ───────────────────────────────────────
 
 metrics:
   # Path where the app exposes Prometheus metrics
   path: /api/metrics
   serviceMonitor:
-    enabled: true
+    enabled: false
     interval: 15s
     scrapeTimeout: 10s
     # Extra labels to match Prometheus Operator's serviceMonitorSelector
-    additionalLabels:
-      release: prometheus
+    additionalLabels: {}
+    #   release: prometheus
   # Optional: authenticate scrapes with a bearer token from a Secret
   # bearerTokenSecret:
-  #   name: eventi-dtd-secrets
+  #   name: videocall-secrets
   #   key: CRON_API_KEY
 
 # ── Jitsi Meet ───────────────────────────────────────────────
@@ -258,8 +340,13 @@ metrics:
 jitsi:
   # Set to false to use an external Jitsi instance.
   # When true, the jitsi-meet subchart is deployed.
-  # Subchart values are under the top-level "jitsi-meet:" key below.
   enabled: true
+
+  # Deployment mode:
+  #   "simple"   — JVB runs on any node, no scale-to-zero, no Jibri
+  #   "standard" — JVB on any node, Jibri enabled, no scale-to-zero
+  #   "full"     — JVB on dedicated nodes with taints, scale-to-zero ready, Jibri on dedicated nodes
+  mode: "simple"
 
   # ── External Jitsi configuration (when jitsi.enabled=false) ──
   external:
@@ -276,7 +363,7 @@ jitsi:
 # Docs: https://github.com/jitsi-contrib/jitsi-helm
 
 jitsi-meet:
-  publicURL: "https://jitsi.eventi.dominio.gov.it"
+  publicURL: "https://jitsi.videocall.example.com"
   enableAuth: true
   enableGuests: false
 
@@ -290,7 +377,7 @@ jitsi-meet:
         acceptedAudiences: "jitsi"
 
   jvb:
-    replicaCount: 0  # Scale-to-zero — managed by KEDA or manual scaling
+    replicaCount: 1
     resources:
       requests:
         cpu: "1"
@@ -298,26 +385,18 @@ jitsi-meet:
       limits:
         cpu: "3"
         memory: 4Gi
-    nodeSelector:
-      workload: jitsi-jvb
-    tolerations:
-      - key: workload
-        value: jitsi-jvb
-        effect: NoSchedule
+    nodeSelector: {}
+    tolerations: []
     useHostPort: true
     useNodeIP: true
     UDPPort: 10000
 
   jibri:
-    enabled: true
+    enabled: false
     replicaCount: 0
     singleUseMode: true
-    nodeSelector:
-      workload: jitsi-jvb
-    tolerations:
-      - key: workload
-        value: jitsi-jvb
-        effect: NoSchedule
+    nodeSelector: {}
+    tolerations: []
 
   web:
     ingress:
@@ -330,26 +409,26 @@ jitsi-meet:
           location = / { return 403; }
           location = /index.html { return 403; }
       hosts:
-        - host: jitsi.eventi.dominio.gov.it
+        - host: jitsi.videocall.example.com
           paths:
             - path: /
               pathType: Prefix
       tls:
         - secretName: jitsi-tls
           hosts:
-            - jitsi.eventi.dominio.gov.it
+            - jitsi.videocall.example.com
 
 # ── PostgreSQL ───────────────────────────────────────────────
 
 postgresql:
-  # Set to false to use Azure Database for PostgreSQL or another external DB
+  # Set to false to use an external database (Azure DB, RDS, Cloud SQL, etc.)
   enabled: true
 
   auth:
     username: eventi
     database: eventi_dtd
     # Pre-existing Secret for PostgreSQL passwords
-    existingSecret: "eventi-dtd-secrets"
+    existingSecret: "videocall-secrets"
     secretKeys:
       adminPasswordKey: POSTGRES_ADMIN_PASSWORD
       userPasswordKey: POSTGRES_PASSWORD
@@ -365,7 +444,7 @@ postgresql:
     persistence:
       enabled: true
       size: 10Gi
-      storageClass: managed-csi
+      storageClass: ""  # Use cluster default
 
     securityContext:
       enabled: true
@@ -389,3 +468,7 @@ postgresql:
     # Pre-existing Secret containing DATABASE_URL
     existingSecret: ""
     secretKey: "DATABASE_URL"
+
+# ── Name overrides ──────────────────────────────────────────
+nameOverride: ""
+fullnameOverride: ""
