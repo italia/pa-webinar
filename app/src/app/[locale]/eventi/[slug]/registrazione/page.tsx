@@ -48,6 +48,8 @@ export default async function RegistrationPage({
             <RegistrationFormClient
               eventSlug={slug}
               privacyPolicyUrl={privacyUrl}
+              privacyPolicyText={event.privacyPolicyText ?? undefined}
+              recordingEnabled={event.recordingEnabled}
               profiling={{
                 requireOrganization: event.requireOrganization,
                 requireOrganizationRole: event.requireOrganizationRole,

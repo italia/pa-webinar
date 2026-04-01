@@ -22,6 +22,7 @@ const eventBaseSchema = z.object({
   requireOrganizationType: z.boolean().default(false),
   dataRetentionDays: z.number().int().min(1).max(365).default(30),
   privacyPolicyUrl: z.string().url().optional(),
+  privacyPolicyText: z.string().max(10000).optional(),
   moderatorName: z.string().min(2).max(100).optional(),
   moderatorEmail: z.string().email().optional(),
   speakersIt: z.string().max(1000).optional(),
@@ -76,6 +77,8 @@ export const createRegistrationSchema = z.object({
     .literal(true, {
       errorMap: () => ({ message: 'registration.errors.consentRequired' }),
     }),
+  consentRecording: z.boolean().optional(),
+  consentFutureCommunications: z.boolean().default(false),
 });
 
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>;

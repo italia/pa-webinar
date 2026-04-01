@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
       participantsCanShareScreen: data.participantsCanShareScreen,
       dataRetentionDays: data.dataRetentionDays,
       privacyPolicyUrl: data.privacyPolicyUrl,
+      privacyPolicyText: data.privacyPolicyText,
       moderatorName: data.moderatorName,
       moderatorEmail: data.moderatorEmail,
       speakersIt: data.speakersIt,
