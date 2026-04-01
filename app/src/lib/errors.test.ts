@@ -173,22 +173,20 @@ describe('errorResponse', () => {
   });
 
   it('does not expose details in production', async () => {
-    const origEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     const err = new AppError('fail', 400, 'FAIL', { secret: 'data' });
     const res = errorResponse(err);
     const body = await res.json();
     expect(body.details).toBeUndefined();
-    process.env.NODE_ENV = origEnv;
+    vi.unstubAllEnvs();
   });
 
   it('exposes details in development', async () => {
-    const origEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    vi.stubEnv('NODE_ENV', 'development');
     const err = new AppError('fail', 400, 'FAIL', { field: 'email' });
     const res = errorResponse(err);
     const body = await res.json();
     expect(body.details).toEqual({ field: 'email' });
-    process.env.NODE_ENV = origEnv;
+    vi.unstubAllEnvs();
   });
 });
