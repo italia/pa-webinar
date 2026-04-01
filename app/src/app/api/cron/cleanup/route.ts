@@ -103,7 +103,7 @@ export async function GET(request: Request) {
           });
         }
 
-        return {
+        const counts = {
           upvotes: upvotesDeleted.count,
           questions: questionsDeleted.count,
           pollVotes: pollVotesDeleted.count,
@@ -113,6 +113,18 @@ export async function GET(request: Request) {
           reminders: remindersDeleted.count,
           registrations: registrationsDeleted.count,
         };
+
+        // GDPR audit log — no PII, only counts
+        await tx.gdprAuditLog.create({
+          data: {
+            eventId: evt.id,
+            action: 'DATA_DELETED',
+            recordCount: counts.registrations,
+            details: JSON.stringify(counts),
+          },
+        });
+
+        return counts;
       });
 
       // GDPR: recording blobs should be deleted when retention expires.

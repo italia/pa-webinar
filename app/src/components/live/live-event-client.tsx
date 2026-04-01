@@ -20,6 +20,7 @@ import ModeratorControls from '@/components/jitsi/moderator-controls';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
 import MaterialPanel from '@/components/materials/material-panel';
+import ParticipantPanel from '@/components/participants/participant-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
 import GuestJoinForm from '@/components/live/guest-join-form';
 import AudioPlayer from '@/components/live/audio-player';
@@ -376,7 +377,7 @@ export default function LiveEventClient({
   if (phase === 'consent_pending') {
     return (
       <>
-        <LiveTopBar title={event.title} participantCount={0} isRecording={false} isModerator={isModerator} />
+        <LiveTopBar title={event.title} participantCount={0} isRecording={false} role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')} />
         <RecordingConsent onAccept={handleConsentAccept} onDecline={handleConsentDecline} />
       </>
     );
@@ -414,7 +415,7 @@ export default function LiveEventClient({
         title={event.title}
         participantCount={participantCount}
         isRecording={isRecording}
-        isModerator={isActualModerator}
+        role={isActualModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
         onLeaveRoom={handleLeaveRoom}
       />
 
@@ -447,14 +448,13 @@ export default function LiveEventClient({
           />
         </div>
 
-        {(event.qaEnabled || true) && (
-          <LiveSidebar
-            eventSlug={event.slug}
-            token={token}
-            isModerator={isActualModerator}
-            qaEnabled={event.qaEnabled}
-          />
-        )}
+        <LiveSidebar
+          eventSlug={event.slug}
+          token={token}
+          isModerator={isActualModerator}
+          qaEnabled={event.qaEnabled}
+          jitsiApi={jitsiApi}
+        />
       </div>
     </div>
   );
@@ -462,40 +462,64 @@ export default function LiveEventClient({
 
 // ── Sidebar with tabs ──
 
+type SidebarTab = 'qa' | 'polls' | 'materials' | 'participants';
+
 interface LiveSidebarProps {
   eventSlug: string;
   token: string;
   isModerator: boolean;
   qaEnabled: boolean;
+  jitsiApi: JitsiMeetExternalAPI | null;
 }
 
-function LiveSidebar({ eventSlug, token, isModerator, qaEnabled }: LiveSidebarProps) {
+function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, jitsiApi }: LiveSidebarProps) {
   const t = useTranslations('live');
-  const [activeTab, setActiveTab] = useState<'qa' | 'polls' | 'materials'>(qaEnabled ? 'qa' : 'polls');
+  const [activeTab, setActiveTab] = useState<SidebarTab>(qaEnabled ? 'qa' : 'polls');
+  const [participantCount, setParticipantCount] = useState(0);
 
-  const tabClass = (tab: string) =>
-    `btn btn-sm flex-fill rounded-0 border-0 py-2 ${
-      activeTab === tab ? 'fw-semibold text-primary border-bottom border-primary border-2' : 'text-muted'
-    }`;
+  const tabs: { key: SidebarTab; label: string; icon: string; badge?: number; show: boolean }[] = [
+    { key: 'qa', label: t('sidebarTabQa'), icon: 'it-comment', show: qaEnabled },
+    { key: 'polls', label: t('sidebarTabPolls'), icon: 'it-chart-line', show: true },
+    { key: 'materials', label: t('sidebarTabMaterials'), icon: 'it-clip', show: true },
+    { key: 'participants', label: t('sidebarTabParticipants'), icon: 'it-user', badge: participantCount, show: true },
+  ];
+
+  const visibleTabs = tabs.filter((tab) => tab.show);
 
   return (
-    <div className="d-flex flex-column" style={{ width: '100%', maxWidth: '360px' }}>
-      {/* Tab buttons */}
-      <div className="d-flex border-bottom" style={{ background: '#f8f9fa' }}>
-        {qaEnabled && (
-          <button type="button" className={tabClass('qa')} onClick={() => setActiveTab('qa')}>
-            {t('sidebarTabQa')}
+    <div className="d-flex flex-column live-sidebar" style={{ width: '100%', maxWidth: '360px' }}>
+      {/* Tab header — matches top bar blue */}
+      <div className="d-flex live-sidebar-header" style={{ overflowX: 'auto' }}>
+        {visibleTabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            className={`btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-1 live-sidebar-tab${
+              activeTab === tab.key ? ' live-sidebar-tab--active' : ''
+            }`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            <Icon icon={tab.icon} size="xs" color="white" />
+            <span className="d-none d-md-inline">{tab.label}</span>
+            {tab.badge !== undefined && tab.badge > 0 && (
+              <Badge
+                color=""
+                pill
+                style={{
+                  fontSize: '0.6rem',
+                  padding: '1px 5px',
+                  backgroundColor: 'rgba(255,255,255,0.25)',
+                  color: '#fff',
+                }}
+              >
+                {tab.badge}
+              </Badge>
+            )}
           </button>
-        )}
-        <button type="button" className={tabClass('polls')} onClick={() => setActiveTab('polls')}>
-          {t('sidebarTabPolls')}
-        </button>
-        <button type="button" className={tabClass('materials')} onClick={() => setActiveTab('materials')}>
-          {t('sidebarTabMaterials')}
-        </button>
+        ))}
       </div>
 
-      {/* Tab content */}
+      {/* Tab content — scrollable, height matches Jitsi container */}
       <div className="flex-grow-1" style={{ minHeight: 0, overflowY: 'auto' }}>
         {activeTab === 'qa' && qaEnabled && (
           <QAPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
@@ -506,6 +530,13 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled }: LiveSidebarPr
         {activeTab === 'materials' && (
           <MaterialPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
         )}
+        {activeTab === 'participants' && (
+          <ParticipantPanel
+            api={jitsiApi}
+            isModerator={isModerator}
+            onCountChange={setParticipantCount}
+          />
+        )}
       </div>
     </div>
   );
@@ -513,24 +544,43 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled }: LiveSidebarPr
 
 // ── Top bar ──
 
+type UserRole = 'moderator' | 'participant' | 'guest';
+
+// Unified top bar (primary blue) with role-specific badge colors
+const ROLE_BADGE_COLORS: Record<UserRole, { badge: string; badgeFg: string }> = {
+  moderator: { badge: '#E8F0FE', badgeFg: '#0066CC' },
+  participant: { badge: '#D4EDDA', badgeFg: '#155724' },
+  guest: { badge: '#E9ECEF', badgeFg: '#5A768A' },
+};
+
 interface LiveTopBarProps {
   title: string;
   participantCount: number;
   isRecording: boolean;
-  isModerator: boolean;
+  role: UserRole;
   onLeaveRoom?: () => void;
 }
 
-function LiveTopBar({ title, participantCount, isRecording, isModerator, onLeaveRoom }: LiveTopBarProps) {
+function LiveTopBar({ title, participantCount, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
   const t = useTranslations('live');
+  const tr = useTranslations('live.role');
+  const badgeColors = ROLE_BADGE_COLORS[role];
 
   return (
-    <div className="bg-primary text-white px-3 py-2 d-flex align-items-center justify-content-between live-top-bar">
+    <div
+      className="text-white px-3 py-2 d-flex align-items-center justify-content-between live-top-bar"
+      style={{ backgroundColor: '#0066CC' }}
+    >
       <div className="d-flex align-items-center">
         <h1 className="h6 mb-0 me-3 text-white">{title}</h1>
-        {isModerator && (
-          <Badge color="light" pill className="text-primary px-2 py-1 me-2">{t('moderatorBadge')}</Badge>
-        )}
+        <Badge
+          color=""
+          pill
+          className="px-2 py-1 me-2"
+          style={{ backgroundColor: badgeColors.badge, color: badgeColors.badgeFg, fontSize: '0.72rem' }}
+        >
+          {tr(role)}
+        </Badge>
       </div>
       <div className="d-flex align-items-center gap-3">
         {isRecording && (

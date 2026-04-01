@@ -51,6 +51,10 @@ export default async function EventManagePage({
         include: { _count: { select: { sentRecords: true } } },
         orderBy: { offsetMinutes: 'desc' },
       },
+      gdprAuditLogs: {
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+      },
       _count: { select: { registrations: true } },
     },
   });
@@ -87,6 +91,7 @@ export default async function EventManagePage({
     jitsiRoomName: event.jitsiRoomName,
     dataRetentionDays: event.dataRetentionDays,
     privacyPolicyUrl: event.privacyPolicyUrl,
+    privacyPolicyText: event.privacyPolicyText,
     createdAt: event.createdAt.toISOString(),
     requireOrganization: event.requireOrganization,
     requireOrganizationRole: event.requireOrganizationRole,
@@ -114,6 +119,13 @@ export default async function EventManagePage({
       label: r.label,
       sentCount: r._count.sentRecords,
       createdAt: r.createdAt.toISOString(),
+    })),
+    gdprAuditLogs: event.gdprAuditLogs.map((l) => ({
+      id: l.id,
+      action: l.action,
+      recordCount: l.recordCount,
+      details: l.details,
+      createdAt: l.createdAt.toISOString(),
     })),
   };
 

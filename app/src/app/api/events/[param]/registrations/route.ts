@@ -65,7 +65,18 @@ export async function POST(request: Request, context: RouteContext) {
     );
   }
 
-  const { displayName, email, consentGiven, organization, organizationRole, organizationType } = parsed.data;
+  const {
+    displayName, email, consentGiven, organization, organizationRole, organizationType,
+    consentRecording, consentFutureCommunications,
+  } = parsed.data;
+
+  // If recording is enabled, consentRecording must be true
+  if (event.recordingEnabled && consentRecording !== true) {
+    return NextResponse.json(
+      { error: 'Validation failed', issues: [{ path: ['consentRecording'], message: 'registration.errors.recordingConsentRequired' }] },
+      { status: 422 },
+    );
+  }
 
   const emailHash = hashEmail(email);
   const encryptedEmail = encryptPII(email);
@@ -90,7 +101,7 @@ export async function POST(request: Request, context: RouteContext) {
         throw new Error('ALREADY_REGISTERED');
       }
 
-      return tx.registration.create({
+      const reg = await tx.registration.create({
         data: {
           eventId: event.id,
           displayName,
@@ -101,9 +112,27 @@ export async function POST(request: Request, context: RouteContext) {
           organizationType: organizationType || null,
           consentGiven,
           consentTimestamp: new Date(),
+          consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
+          consentFutureCommunications: consentFutureCommunications ?? false,
           accessToken,
         },
       });
+
+      // GDPR audit: record consent
+      await tx.gdprAuditLog.create({
+        data: {
+          eventId: event.id,
+          action: 'CONSENT_RECORDED',
+          recordCount: 1,
+          details: JSON.stringify({
+            consentGiven: true,
+            consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
+            consentFutureCommunications: consentFutureCommunications ?? false,
+          }),
+        },
+      });
+
+      return reg;
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : '';

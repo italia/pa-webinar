@@ -5,6 +5,9 @@ import { useTranslations } from 'next-intl';
 import {
   Button,
   Alert,
+  Callout,
+  CalloutTitle,
+  CalloutText,
   Input,
   TextArea,
   Toggle,
@@ -14,6 +17,7 @@ import {
   CardBody,
   Col,
   Row,
+  Icon,
 } from 'design-react-kit';
 
 import { useRouter } from '@/i18n/navigation';
@@ -60,6 +64,8 @@ export default function CreateEventForm() {
     requireOrganizationType: false,
     dataRetentionDays: 30,
     privacyPolicyUrl: '',
+    privacyPolicyText: '',
+    privacyPolicyMode: 'url' as 'url' | 'text',
     moderatorName: '',
     moderatorEmail: '',
     speakersIt: '',
@@ -104,7 +110,8 @@ export default function CreateEventForm() {
         requireOrganizationRole: form.requireOrganizationRole,
         requireOrganizationType: form.requireOrganizationType,
         dataRetentionDays: form.dataRetentionDays,
-        privacyPolicyUrl: form.privacyPolicyUrl || undefined,
+        privacyPolicyUrl: form.privacyPolicyMode === 'url' ? (form.privacyPolicyUrl || undefined) : undefined,
+        privacyPolicyText: form.privacyPolicyMode === 'text' ? (form.privacyPolicyText || undefined) : undefined,
         moderatorName: form.moderatorName || undefined,
         moderatorEmail: form.moderatorEmail || undefined,
         speakersIt: form.speakersIt || undefined,
@@ -305,6 +312,28 @@ export default function CreateEventForm() {
               </FormGroup>
             </Col>
           </Row>
+
+          {/* ── Retention preview callout ── */}
+          <Callout color="note">
+            <CalloutTitle>
+              <Icon icon="it-info-circle" aria-hidden />
+              {t('form.retentionPreviewTitle')}
+            </CalloutTitle>
+            <CalloutText>
+              <p className="mb-1">
+                {t('form.retentionPreviewIntro', { days: form.dataRetentionDays })}
+              </p>
+              <ul className="mb-0" style={{ fontSize: '0.85rem' }}>
+                <li>{t('form.retentionPreviewParticipants')}</li>
+                <li>{t('form.retentionPreviewQa')}</li>
+                <li>{t('form.retentionPreviewPolls')}</li>
+                <li>{t('form.retentionPreviewRecordings')}</li>
+              </ul>
+              <p className="mb-0 mt-1 text-muted" style={{ fontSize: '0.85rem' }}>
+                {t('form.retentionPreviewKept')}
+              </p>
+            </CalloutText>
+          </Callout>
         </CardBody>
       </Card>
 
@@ -369,16 +398,58 @@ export default function CreateEventForm() {
             </div>
           </div>
 
-          <FormGroup className="mt-3 mb-3">
-            <Input
-              {...inputProps('privacyPolicyUrl', t('form.privacyPolicyUrl'))}
-              type="url"
-              value={form.privacyPolicyUrl}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setField('privacyPolicyUrl', e.target.value)
-              }
-            />
-          </FormGroup>
+          {/* ── Privacy policy mode toggle ── */}
+          <div className="mt-3 mb-3">
+            <Label className="fw-semibold mb-2 d-block" style={{ color: '#17324D' }}>
+              {t('form.privacyPolicyMode')}
+            </Label>
+            <div className="d-flex gap-2 mb-2">
+              <Button
+                color={form.privacyPolicyMode === 'url' ? 'primary' : 'outline-primary'}
+                size="sm"
+                onClick={() => setField('privacyPolicyMode', 'url')}
+                type="button"
+              >
+                <Icon icon="it-link" size="xs" className="me-1" />
+                {t('form.privacyPolicyModeUrl')}
+              </Button>
+              <Button
+                color={form.privacyPolicyMode === 'text' ? 'primary' : 'outline-primary'}
+                size="sm"
+                onClick={() => setField('privacyPolicyMode', 'text')}
+                type="button"
+              >
+                <Icon icon="it-file" size="xs" className="me-1" />
+                {t('form.privacyPolicyModeText')}
+              </Button>
+            </div>
+            {form.privacyPolicyMode === 'url' ? (
+              <FormGroup className="mb-0">
+                <Input
+                  {...inputProps('privacyPolicyUrl', t('form.privacyPolicyUrl'))}
+                  type="url"
+                  value={form.privacyPolicyUrl}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setField('privacyPolicyUrl', e.target.value)
+                  }
+                />
+              </FormGroup>
+            ) : (
+              <FormGroup className="mb-0">
+                <TextArea
+                  {...inputProps('privacyPolicyText', t('form.privacyPolicyText'))}
+                  value={form.privacyPolicyText}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setField('privacyPolicyText', e.target.value)
+                  }
+                  rows={6}
+                />
+                <small className="form-text text-muted">
+                  {t('form.privacyPolicyTextHint')}
+                </small>
+              </FormGroup>
+            )}
+          </div>
 
           <FormGroup className="mb-0">
             <Input

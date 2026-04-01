@@ -82,7 +82,7 @@ I partecipanti possono esercitare i diritti previsti dal GDPR (accesso, rettific
 
 La cancellazione automatica dei dati al termine del periodo di conservazione garantisce il principio di minimizzazione dei dati.
 
-## Evoluzione v0.2.0 — Campi aggiuntivi registrazione (pianificato)
+## v0.2.0 — Campi aggiuntivi registrazione
 
 ### Nuovi dati raccolti
 
@@ -94,16 +94,56 @@ La cancellazione automatica dei dati al termine del periodo di conservazione gar
 
 Questi campi seguono la stessa retention dell'evento e vengono eliminati dal cron GDPR.
 
-### Consensi granulari (pianificato)
+### Consensi granulari
 
-1. **Trattamento dati per partecipazione** — obbligatorio
-2. **Registrazione video** — richiesto se l'evento è registrato
-3. **Comunicazioni post-evento** — opzionale ("Vuoi ricevere informazioni su eventi futuri?")
+Tre consensi distinti nel modulo di registrazione:
 
-### Audit log GDPR (pianificato)
+1. **Trattamento dati per partecipazione** (`consentGiven`) — obbligatorio, senza questo non è possibile registrarsi.
+2. **Registrazione audio/video** (`consentRecording`) — obbligatorio solo se l'evento ha `recordingEnabled = true`. Il campo è `null` se la registrazione non è abilitata.
+3. **Comunicazioni future** (`consentFutureCommunications`) — opzionale, default `false`. "Desidero ricevere informazioni su eventi futuri organizzati dal DTD."
 
-Log immutabile delle operazioni di cancellazione dati:
-- Timestamp operazione
-- ID evento
-- Conteggio record eliminati (registrazioni, domande, voti poll)
-- Nessun PII nel log
+Nessun consenso è pre-selezionato.
+
+### Informativa privacy per evento
+
+Ogni evento supporta due modalità di informativa privacy:
+- **URL esterno** (`privacyPolicyUrl`): link a un documento esterno.
+- **Testo personalizzato** (`privacyPolicyText`): testo inline mostrato in una sezione espandibile nel modulo di registrazione.
+
+Se nessuna delle due è configurata, viene usato l'URL da `DEFAULT_PRIVACY_POLICY_URL` (variabile d'ambiente).
+
+### Audit log GDPR
+
+Modello `GdprAuditLog` — log immutabile delle operazioni GDPR senza PII:
+
+| Campo | Tipo | Note |
+|-------|------|------|
+| `eventId` | UUID | Riferimento all'evento |
+| `action` | String | `DATA_DELETED`, `CONSENT_RECORDED`, `DATA_EXPORTED` |
+| `recordCount` | Int | Numero di record coinvolti |
+| `details` | JSON | Dettagli operazione (no PII) |
+| `createdAt` | DateTime | Timestamp immutabile |
+
+Azioni registrate:
+- **`CONSENT_RECORDED`**: scritto alla registrazione di ogni partecipante, include i flag di consenso (non i dati personali).
+- **`DATA_DELETED`**: scritto dal cron di pulizia, include i conteggi delle entità eliminate (registrazioni, domande, sondaggi, materiali).
+- **`DATA_EXPORTED`**: scritto quando un utente richiede i propri dati via `/api/gdpr/export`, include solo un prefisso dell'hash email.
+
+### Diritto di accesso (Art. 15)
+
+Endpoint: `GET /api/gdpr/export?email=xxx`
+
+- L'email viene hashata e confrontata con `emailHash` nelle registrazioni.
+- Restituisce: registrazioni, eventi, domande Q&A, voti ai sondaggi.
+- Non restituisce dati di altri partecipanti.
+- Rate limit: 3 richieste per ora per IP.
+- Pagina utente: `/[locale]/privacy/i-miei-dati`
+
+### Anteprima conservazione dati
+
+Nel form di creazione evento, sotto il campo `dataRetentionDays`, un callout informativo mostra esattamente cosa verrà eliminato automaticamente:
+- Dati dei partecipanti (nome, email, ente)
+- Domande Q&A e voti
+- Risultati dei sondaggi
+- Registrazioni video
+- Le statistiche aggregate vengono mantenute.
