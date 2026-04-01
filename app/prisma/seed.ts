@@ -12,6 +12,11 @@ async function main() {
   console.log('Seeding database...');
 
   // Clean existing data
+  await prisma.reminderSent.deleteMany();
+  await prisma.eventReminder.deleteMany();
+  await prisma.pollVote.deleteMany();
+  await prisma.poll.deleteMany();
+  await prisma.eventMaterial.deleteMany();
   await prisma.questionUpvote.deleteMany();
   await prisma.question.deleteMany();
   await prisma.registration.deleteMany();
@@ -108,6 +113,42 @@ async function main() {
       recordingUrl: 'https://example.com/recordings/design-system-workshop.mp4',
       dataRetentionDays: 90,
     },
+  });
+
+  // Add default reminders to events
+  for (const evt of [event1, event2, event3]) {
+    await prisma.eventReminder.createMany({
+      data: [
+        { eventId: evt.id, offsetMinutes: 1440, label: '1 giorno prima' },
+        { eventId: evt.id, offsetMinutes: 60, label: '1 ora prima' },
+      ],
+    });
+  }
+
+  // Add sample materials to the ended event
+  await prisma.eventMaterial.createMany({
+    data: [
+      {
+        eventId: event3.id,
+        title: 'Slide del workshop — Design System .italia',
+        url: 'https://docs.google.com/presentation/d/example-1',
+        description: 'Slide della presentazione principale del workshop.',
+        addedBy: 'Luca Verdi',
+      },
+      {
+        eventId: event3.id,
+        title: 'Documentazione Bootstrap Italia',
+        url: 'https://italia.github.io/bootstrap-italia/',
+        description: 'Riferimento ufficiale per il design system .italia.',
+        addedBy: 'Luca Verdi',
+      },
+      {
+        eventId: event3.id,
+        title: 'Repository Design React Kit',
+        url: 'https://github.com/italia/design-react-kit',
+        addedBy: 'Francesca Russo',
+      },
+    ],
   });
 
   // Log moderator links for testing

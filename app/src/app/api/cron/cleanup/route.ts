@@ -80,6 +80,18 @@ export async function GET(request: Request) {
           where: { eventId: evt.id },
         });
 
+        const materialsDeleted = await tx.eventMaterial.deleteMany({
+          where: { eventId: evt.id },
+        });
+
+        const reminderSentDeleted = await tx.reminderSent.deleteMany({
+          where: { reminder: { eventId: evt.id } },
+        });
+
+        const remindersDeleted = await tx.eventReminder.deleteMany({
+          where: { eventId: evt.id },
+        });
+
         const registrationsDeleted = await tx.registration.deleteMany({
           where: { eventId: evt.id },
         });
@@ -96,6 +108,9 @@ export async function GET(request: Request) {
           questions: questionsDeleted.count,
           pollVotes: pollVotesDeleted.count,
           polls: pollsDeleted.count,
+          materials: materialsDeleted.count,
+          remindersSent: reminderSentDeleted.count,
+          reminders: remindersDeleted.count,
           registrations: registrationsDeleted.count,
         };
       });
@@ -111,7 +126,7 @@ export async function GET(request: Request) {
 
       console.error(
         `[cron/cleanup] Cleaned event ${evt.id} (${evt.slug}): ` +
-          `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes, ${result.polls} polls, ${result.pollVotes} poll votes deleted`,
+          `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes, ${result.polls} polls, ${result.pollVotes} poll votes, ${result.materials} materials deleted`,
       );
 
       totalRegistrationsDeleted += result.registrations;

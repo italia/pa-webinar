@@ -44,6 +44,13 @@ export default async function EventManagePage({
         },
         orderBy: { createdAt: 'desc' },
       },
+      materials: {
+        orderBy: { createdAt: 'desc' },
+      },
+      reminders: {
+        include: { _count: { select: { sentRecords: true } } },
+        orderBy: { offsetMinutes: 'desc' },
+      },
       _count: { select: { registrations: true } },
     },
   });
@@ -91,6 +98,21 @@ export default async function EventManagePage({
       organizationRole: r.organizationRole,
       organizationType: r.organizationType,
       joinedAt: r.joinedAt?.toISOString() ?? null,
+      createdAt: r.createdAt.toISOString(),
+    })),
+    materials: event.materials.map((m) => ({
+      id: m.id,
+      title: m.title,
+      url: m.url,
+      description: m.description,
+      addedBy: m.addedBy,
+      createdAt: m.createdAt.toISOString(),
+    })),
+    reminders: event.reminders.map((r) => ({
+      id: r.id,
+      offsetMinutes: r.offsetMinutes,
+      label: r.label,
+      sentCount: r._count.sentRecords,
       createdAt: r.createdAt.toISOString(),
     })),
   };
