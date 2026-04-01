@@ -31,7 +31,6 @@ describe('metrics registry', () => {
   });
 
   it('counter increments', () => {
-    const before = (questionsTotal as unknown as { hashMap: Map<string, { value: number }> }).hashMap;
     questionsTotal.inc();
     // Verify it doesn't throw — actual value assertion is fragile with prom-client internals
     expect(() => questionsTotal.inc()).not.toThrow();
