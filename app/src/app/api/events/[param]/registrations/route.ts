@@ -60,40 +60,64 @@ export async function POST(request: Request, context: RouteContext) {
   const parsed = createRegistrationSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues },
+      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
       { status: 422 },
     );
   }
 
-  const { displayName, email } = parsed.data;
+  const { displayName, email, consentGiven } = parsed.data;
 
   const emailHash = hashEmail(email);
-
-  const existing = await prisma.registration.findUnique({
-    where: { eventId_emailHash: { eventId: event.id, emailHash } },
-  });
-
-  if (existing) {
-    return NextResponse.json(
-      { error: 'already_registered', message: 'Already registered for this event' },
-      { status: 409 },
-    );
-  }
-
   const encryptedEmail = encryptPII(email);
   const accessToken = nanoid(24);
 
-  const registration = await prisma.registration.create({
-    data: {
-      eventId: event.id,
-      displayName,
-      email: encryptedEmail,
-      emailHash,
-      consentGiven: true,
-      consentTimestamp: new Date(),
-      accessToken,
-    },
-  });
+  let registration;
+  try {
+    registration = await prisma.$transaction(async (tx) => {
+      // Re-check capacity inside transaction to prevent overbooking
+      const currentCount = await tx.registration.count({
+        where: { eventId: event.id },
+      });
+      if (currentCount >= event.maxParticipants) {
+        throw new Error('EVENT_FULL');
+      }
+
+      // Check for duplicates inside transaction
+      const existing = await tx.registration.findUnique({
+        where: { eventId_emailHash: { eventId: event.id, emailHash } },
+      });
+      if (existing) {
+        throw new Error('ALREADY_REGISTERED');
+      }
+
+      return tx.registration.create({
+        data: {
+          eventId: event.id,
+          displayName,
+          email: encryptedEmail,
+          emailHash,
+          consentGiven,
+          consentTimestamp: new Date(),
+          accessToken,
+        },
+      });
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : '';
+    if (message === 'EVENT_FULL') {
+      return NextResponse.json(
+        { error: 'event_full', message: 'Event is fully booked' },
+        { status: 409 },
+      );
+    }
+    if (message === 'ALREADY_REGISTERED') {
+      return NextResponse.json(
+        { error: 'already_registered', message: 'Already registered for this event' },
+        { status: 409 },
+      );
+    }
+    throw err;
+  }
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
@@ -118,6 +142,6 @@ export async function POST(request: Request, context: RouteContext) {
       accessToken,
       joinUrl,
     },
-    { status: 201 },
+    { status: 201, headers: { 'Cache-Control': 'no-store' } },
   );
 }

@@ -1,4 +1,16 @@
+import { timingSafeEqual } from 'crypto';
+
 import { prisma } from '@/lib/db';
+
+export function constantTimeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) {
+    timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return timingSafeEqual(bufA, bufB);
+}
 
 /**
  * Extract the moderator token from the request.
@@ -28,7 +40,7 @@ export async function verifyModeratorToken(
     where: { id: eventId },
   });
 
-  if (!event || event.moderatorToken !== token) {
+  if (!event || !constantTimeEqual(event.moderatorToken, token)) {
     return null;
   }
 

@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self'",
               `frame-src 'self' https://${jitsiDomain}`,
-              `script-src 'self' 'unsafe-eval' 'unsafe-inline' https://${jitsiDomain}`,
+              `script-src 'self' 'unsafe-inline' https://${jitsiDomain}`,
               "style-src 'self' 'unsafe-inline'",
               "font-src 'self'",
               "img-src 'self' data: blob:",

@@ -8,16 +8,20 @@
  * Both flows generate a Jitsi JWT for the actual video conference.
  */
 
-import { createHash, randomUUID } from 'crypto';
+import { randomUUID } from 'crypto';
 
 import { SignJWT } from 'jose';
 
 import type { JitsiJwtFeatures } from '@/lib/jitsi/config';
 import { moderatorFeatures, participantFeatures } from '@/lib/jitsi/config';
 
-const JITSI_JWT_SECRET = new TextEncoder().encode(
-  process.env.JITSI_JWT_SECRET ?? ''
-);
+function getJitsiJwtSecret(): Uint8Array {
+  const secret = process.env.JITSI_JWT_SECRET;
+  if (!secret) {
+    throw new Error('JITSI_JWT_SECRET environment variable is required');
+  }
+  return new TextEncoder().encode(secret);
+}
 const JITSI_JWT_APP_ID = process.env.JITSI_JWT_APP_ID ?? 'eventi_dtd';
 const JITSI_JWT_ISSUER = process.env.JITSI_JWT_ISSUER ?? 'eventi-dtd';
 const JITSI_JWT_AUDIENCE = process.env.JITSI_JWT_AUDIENCE ?? 'jitsi';
@@ -66,7 +70,7 @@ export async function generateJitsiJwt(
     .setExpirationTime(
       `${payload.expiresInSeconds ?? 4 * 60 * 60}s`
     )
-    .sign(JITSI_JWT_SECRET);
+    .sign(getJitsiJwtSecret());
 
   return jwt;
 }
@@ -96,14 +100,8 @@ export function guestJitsiId(): string {
   return `guest-${randomUUID()}`;
 }
 
-/**
- * Hash an email for use in Jitsi JWT (avoids exposing PII).
- */
-export function hashEmail(email: string): string {
-  return createHash('sha256')
-    .update(email.toLowerCase().trim())
-    .digest('hex');
-}
+// Re-export hashEmail from the canonical location for convenience
+export { hashEmail } from '@/lib/crypto/pii';
 
 /**
  * Generate a secure random token for moderator magic links.

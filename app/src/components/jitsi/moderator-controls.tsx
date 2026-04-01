@@ -36,6 +36,7 @@ export default function ModeratorControls({
   api,
   eventId,
   moderatorToken,
+  recordingEnabled,
 }: ModeratorControlsProps) {
   const t = useTranslations('live.moderator');
   const tl = useTranslations('live');
@@ -55,6 +56,14 @@ export default function ModeratorControls({
 
   const [recSeconds, setRecSeconds] = useState(0);
   const recTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const endNavigationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup navigation timer on unmount
+  useEffect(() => {
+    return () => {
+      if (endNavigationTimerRef.current) clearTimeout(endNavigationTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (isRecording) {
@@ -128,13 +137,16 @@ export default function ModeratorControls({
     setEnding(true);
     try {
       api?.executeCommand('hangup');
-      await fetch(`/api/events/${eventId}?token=${moderatorToken}`, {
+      await fetch(`/api/events/${eventId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${moderatorToken}`,
+        },
         body: JSON.stringify({ status: 'ENDED' }),
       });
       setEndModalOpen(false);
-      setTimeout(() => {
+      endNavigationTimerRef.current = setTimeout(() => {
         router.push(`/admin/eventi/${eventId}?token=${moderatorToken}`);
       }, 2000);
     } catch {
@@ -233,44 +245,46 @@ export default function ModeratorControls({
             )}
           </Button>
 
-          {/* Recording — always visible */}
-          <Button
-            color={isRecording ? 'danger' : 'light'}
-            outline={!isRecording}
-            size="sm"
-            className={BTN_BASE}
-            onClick={handleToggleRecording}
-            disabled={!api}
-            style={{ fontSize: '0.82rem' }}
-          >
-            {isRecording ? (
-              <>
-                <span
-                  className="d-inline-block rounded-circle"
-                  style={{
-                    width: 8,
-                    height: 8,
-                    backgroundColor: '#fff',
-                    animation: 'pulse-dot 1.5s ease-in-out infinite',
-                  }}
-                />
-                {t('stopRecording')}
-                <Badge
-                  color="light"
-                  pill
-                  className="ms-1 text-danger"
-                  style={{ fontSize: '0.72rem' }}
-                >
-                  {formatTime(recSeconds)}
-                </Badge>
-              </>
-            ) : (
-              <>
-                <Icon icon="it-video" size="sm" />
-                {t('startRecording')}
-              </>
-            )}
-          </Button>
+          {/* Recording — only visible when recording is enabled for the event */}
+          {recordingEnabled && (
+            <Button
+              color={isRecording ? 'danger' : 'light'}
+              outline={!isRecording}
+              size="sm"
+              className={BTN_BASE}
+              onClick={handleToggleRecording}
+              disabled={!api}
+              style={{ fontSize: '0.82rem' }}
+            >
+              {isRecording ? (
+                <>
+                  <span
+                    className="d-inline-block rounded-circle"
+                    style={{
+                      width: 8,
+                      height: 8,
+                      backgroundColor: '#fff',
+                      animation: 'pulse-dot 1.5s ease-in-out infinite',
+                    }}
+                  />
+                  {t('stopRecording')}
+                  <Badge
+                    color="light"
+                    pill
+                    className="ms-1 text-danger"
+                    style={{ fontSize: '0.72rem' }}
+                  >
+                    {formatTime(recSeconds)}
+                  </Badge>
+                </>
+              ) : (
+                <>
+                  <Icon icon="it-video" size="sm" />
+                  {t('startRecording')}
+                </>
+              )}
+            </Button>
+          )}
 
           {/* End event */}
           <Button

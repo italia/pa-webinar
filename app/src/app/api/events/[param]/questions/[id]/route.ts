@@ -3,6 +3,7 @@ import type { QuestionStatus } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
 import { updateQuestionStatusSchema } from '@/lib/validation/schemas';
+import { constantTimeEqual } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,10 @@ interface RouteContext {
 export async function PATCH(request: Request, context: RouteContext) {
   const { param: slug, id } = await context.params;
   const url = new URL(request.url);
-  const token = url.searchParams.get('token');
+  const authHeader = request.headers.get('authorization');
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : url.searchParams.get('token');
 
   if (!token) {
     return NextResponse.json({ error: 'Token required' }, { status: 401 });
@@ -26,7 +30,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
-  if (event.moderatorToken !== token) {
+  if (!constantTimeEqual(event.moderatorToken, token)) {
     return NextResponse.json({ error: 'Moderator access required' }, { status: 403 });
   }
 
@@ -40,7 +44,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   const parsed = updateQuestionStatusSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues },
+      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
       { status: 422 },
     );
   }
@@ -54,13 +58,12 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const newStatus = parsed.data.status as QuestionStatus;
-  const data: Record<string, unknown> = { status: newStatus };
-
-  if (newStatus === 'HIGHLIGHTED') {
-    data.highlightedAt = new Date();
-  } else if (newStatus === 'ANSWERED') {
-    data.answeredAt = new Date();
-  }
+  const data: Record<string, unknown> = {
+    status: newStatus,
+    // Clear stale timestamps when changing status
+    highlightedAt: newStatus === 'HIGHLIGHTED' ? new Date() : null,
+    answeredAt: newStatus === 'ANSWERED' ? new Date() : null,
+  };
 
   const updated = await prisma.question.update({
     where: { id },

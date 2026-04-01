@@ -5,6 +5,15 @@
 
 type Locale = 'it' | 'en';
 
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 interface EmailTemplateInput {
   locale: Locale;
   eventTitle: string;
@@ -87,9 +96,9 @@ const copy: Record<Locale, LocaleCopy> = {
   },
 };
 
-function layout(heading: string, body: string, footerText: string): string {
+function layout(heading: string, body: string, footerText: string, locale: Locale = 'it'): string {
   return `<!DOCTYPE html>
-<html lang="it">
+<html lang="${locale}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f5f6f7;font-family:'Titillium Web',Helvetica,Arial,sans-serif;">
 <table role="presentation" width="100%" style="background:#f5f6f7;padding:24px 0;">
@@ -130,19 +139,19 @@ function detailsTable(
   return `<table role="presentation" style="width:100%;border-collapse:collapse;margin:16px 0;">
 <tr>
   <td style="padding:8px 12px;font-weight:600;color:#17324d;width:100px;">${c.eventLabel}</td>
-  <td style="padding:8px 12px;">${input.eventTitle}</td>
+  <td style="padding:8px 12px;">${escapeHtml(input.eventTitle)}</td>
 </tr>
 <tr style="background:#f5f6f7;">
   <td style="padding:8px 12px;font-weight:600;color:#17324d;">${c.dateLabel}</td>
-  <td style="padding:8px 12px;">${input.eventDate}</td>
+  <td style="padding:8px 12px;">${escapeHtml(input.eventDate)}</td>
 </tr>
 <tr>
   <td style="padding:8px 12px;font-weight:600;color:#17324d;">${c.timeLabel}</td>
-  <td style="padding:8px 12px;">${input.eventTime}</td>
+  <td style="padding:8px 12px;">${escapeHtml(input.eventTime)}</td>
 </tr>
 <tr style="background:#f5f6f7;">
   <td style="padding:8px 12px;font-weight:600;color:#17324d;">${c.durationLabel}</td>
-  <td style="padding:8px 12px;">${input.eventDuration}</td>
+  <td style="padding:8px 12px;">${escapeHtml(input.eventDuration)}</td>
 </tr>
 </table>`;
 }
@@ -197,7 +206,7 @@ ${calendarHtml}
 </p>
 <p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
 
-  return layout(c.confirmationHeading, body, `${c.footer}<br>${c.unsubscribe}`);
+  return layout(c.confirmationHeading, body, `${c.footer}<br>${c.unsubscribe}`, input.locale);
 }
 
 export function confirmationText(input: EmailTemplateInput): string {
@@ -243,7 +252,7 @@ ${ctaButton(c.joinLabel, input.joinUrl)}
 ${calendarHtml}
 <p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
 
-  return layout(c.reminderHeading, body, `${c.footer}<br>${c.unsubscribe}`);
+  return layout(c.reminderHeading, body, `${c.footer}<br>${c.unsubscribe}`, input.locale);
 }
 
 export function reminderText(input: EmailTemplateInput): string {

@@ -6,6 +6,7 @@ import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import {
   extractModeratorToken,
   verifyModeratorToken,
+  constantTimeEqual,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
 
@@ -56,7 +57,7 @@ export async function GET(request: Request, context: RouteContext) {
   const { title, description } = localiseEvent(event, locale);
 
   // Moderator mode: verify token and return full data
-  if (token && event.moderatorToken === token) {
+  if (token && constantTimeEqual(event.moderatorToken, token)) {
     return NextResponse.json({
       id: event.id,
       slug: event.slug,
@@ -95,7 +96,14 @@ export async function GET(request: Request, context: RouteContext) {
     });
   }
 
-  // Public mode
+  // Public mode — hide DRAFT and ARCHIVED events
+  if (event.status === 'DRAFT' || event.status === 'ARCHIVED') {
+    return NextResponse.json(
+      { error: 'Event not found' },
+      { status: 404 },
+    );
+  }
+
   return NextResponse.json({
     id: event.id,
     slug: event.slug,
@@ -158,7 +166,7 @@ export async function PUT(request: Request, context: RouteContext) {
   const parsed = updateEventSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues },
+      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
       { status: 422 },
     );
   }
@@ -166,8 +174,8 @@ export async function PUT(request: Request, context: RouteContext) {
   const data = parsed.data;
 
   const dateChanged =
-    (data.startsAt !== undefined && data.startsAt !== event.startsAt.toISOString()) ||
-    (data.endsAt !== undefined && data.endsAt !== event.endsAt.toISOString());
+    (data.startsAt !== undefined && new Date(data.startsAt).getTime() !== event.startsAt.getTime()) ||
+    (data.endsAt !== undefined && new Date(data.endsAt).getTime() !== event.endsAt.getTime());
 
   const updated = await prisma.event.update({
     where: { id: eventId },

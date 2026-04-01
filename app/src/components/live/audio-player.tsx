@@ -21,6 +21,7 @@ export default function AudioPlayer({ audioUrl }: AudioPlayerProps) {
     audio.loop = true;
     audio.volume = 0;
     audioRef.current = audio;
+    setPlaying(false);
 
     return () => {
       audio.pause();

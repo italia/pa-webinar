@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/db';
+import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,15 +14,18 @@ interface RouteContext {
 export async function POST(request: Request, context: RouteContext) {
   const { param: slug, id: questionId } = await context.params;
 
-  let body: Record<string, unknown> = {};
+  let accessToken: string | undefined;
   try {
-    body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
+    if (body && typeof body === 'object' && typeof body.accessToken === 'string') {
+      accessToken = body.accessToken;
+    }
   } catch {
     // body is optional, token can be in query
   }
 
   const token =
-    (body.accessToken as string | undefined) ??
+    accessToken ??
     new URL(request.url).searchParams.get('token');
 
   if (!token) {
@@ -39,6 +43,11 @@ export async function POST(request: Request, context: RouteContext) {
   });
   if (!registration || registration.eventId !== event.id) {
     return NextResponse.json({ error: 'Invalid access token' }, { status: 403 });
+  }
+
+  const rl = rateLimit(`upvote:${registration.id}`, { limit: 10, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return NextResponse.json({ error: 'rate_limit' }, { status: 429 });
   }
 
   const question = await prisma.question.findUnique({

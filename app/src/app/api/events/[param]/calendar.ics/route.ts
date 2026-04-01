@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/db';
 import { generateEventICal } from '@/lib/ical/generate';
+import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +10,7 @@ interface RouteContext {
   params: Promise<{ param: string }>;
 }
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
   const { param: slug } = await context.params;
 
   const event = await prisma.event.findUnique({ where: { slug } });
@@ -18,12 +19,14 @@ export async function GET(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
+  const locale = resolveLocale(request);
+  const { title, description } = localiseEvent(event, locale);
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-  const eventUrl = `${baseUrl}/it/eventi/${slug}`;
+  const eventUrl = `${baseUrl}/${locale}/eventi/${slug}`;
 
   const ics = generateEventICal({
-    title: event.titleIt,
-    description: event.descriptionIt,
+    title,
+    description,
     startsAt: event.startsAt,
     endsAt: event.endsAt,
     timezone: event.timezone,

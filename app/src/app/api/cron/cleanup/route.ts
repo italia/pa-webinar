@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/db';
+import { constantTimeEqual } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,18 +26,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: Request) {
   const apiKey = process.env.CRON_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: 'CRON_API_KEY not configured' },
-      { status: 500 },
-    );
-  }
+  const providedKey = request.headers.get('x-api-key') ?? '';
 
-  const url = new URL(request.url);
-  const providedKey =
-    url.searchParams.get('key') ?? request.headers.get('x-api-key');
-
-  if (providedKey !== apiKey) {
+  if (!apiKey || !constantTimeEqual(providedKey, apiKey)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -97,8 +89,14 @@ export async function GET(request: Request) {
         };
       });
 
-      // TODO: if evt.recordingUrl && process.env.AZURE_STORAGE_CONNECTION_STRING,
-      // delete the recording blob from Azure Blob Storage here.
+      // GDPR: recording blobs should be deleted when retention expires.
+      if (evt.recordingUrl) {
+        console.warn(
+          `[cron/cleanup] Event ${evt.id} has a recording at ${evt.recordingUrl} ` +
+            `that should be deleted from Azure Blob Storage. ` +
+            `Implement Azure SDK deletion when AZURE_STORAGE_CONNECTION_STRING is available.`,
+        );
+      }
 
       console.error(
         `[cron/cleanup] Cleaned event ${evt.id} (${evt.slug}): ` +

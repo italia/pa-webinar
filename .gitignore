@@ -12,9 +12,9 @@ build/
 dist/
 
 # Environment
-.env
-.env.local
-.env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
 
 # Database
 app/prisma/migrations/**/migration_lock.toml

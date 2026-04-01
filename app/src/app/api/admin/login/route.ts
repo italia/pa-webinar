@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
 
+import { constantTimeEqual } from '@/lib/auth/moderator';
+
 export async function POST(request: NextRequest) {
   let body: { key?: string };
   try {
@@ -10,11 +12,16 @@ export async function POST(request: NextRequest) {
   }
 
   const adminKey = process.env.ADMIN_API_KEY;
-  if (!adminKey || body.key !== adminKey) {
+  if (!adminKey || !constantTimeEqual(body.key ?? '', adminKey)) {
     return NextResponse.json({ error: 'invalid_key' }, { status: 401 });
   }
 
-  const secret = new TextEncoder().encode(process.env.APP_SECRET);
+  const appSecret = process.env.APP_SECRET;
+  if (!appSecret) {
+    return NextResponse.json({ error: 'server_misconfigured' }, { status: 500 });
+  }
+
+  const secret = new TextEncoder().encode(appSecret);
   const token = await new SignJWT({ role: 'admin' })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()

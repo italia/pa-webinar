@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/db';
+import { constantTimeEqual } from '@/lib/auth/moderator';
 import {
   register,
   activeEventsGauge,
@@ -11,15 +12,12 @@ import {
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
   const cronKey = process.env.CRON_API_KEY;
-  if (cronKey && authHeader !== `Bearer ${cronKey}`) {
-    const isLocalhost =
-      request.headers.get('host')?.startsWith('localhost') ||
-      request.headers.get('host')?.startsWith('127.0.0.1');
-    if (!isLocalhost) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
+  const authHeader = request.headers.get('authorization');
+  const providedKey = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : '';
+
+  if (!cronKey || !constantTimeEqual(providedKey, cronKey)) {
+    return new NextResponse('Unauthorized', { status: 401 });
   }
 
   try {
