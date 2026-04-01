@@ -43,7 +43,7 @@ spec:
                 - name: CRON_API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.app.existingSecret }}
+                      name: {{ include "eventi-dtd.secretName" . }}
                       key: CRON_API_KEY
               securityContext:
                 allowPrivilegeEscalation: false

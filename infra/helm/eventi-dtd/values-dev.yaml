@@ -2,9 +2,8 @@
 # eventi-dtd — Development / Staging overrides
 #
 # Usage:
-#   helm install eventi-dtd ./infra/helm/eventi-dtd \
-#     -f infra/helm/eventi-dtd/values.yaml \
-#     -f infra/helm/eventi-dtd/values-dev.yaml
+#   helm install videocall ./infra/helm/eventi-dtd \
+#     -f values.yaml -f values-dev.yaml -n videocall-test
 # ─────────────────────────────────────────────────────────────
 
 app:

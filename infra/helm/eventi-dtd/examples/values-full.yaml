@@ -1,0 +1,157 @@
+# ============================================================================
+# Modalità completa — multi-pool, scale-to-zero, monitoraggio
+# ============================================================================
+#
+# Per DTD e grandi PA con cluster Kubernetes dedicati.
+# Funziona su AKS, GKE, EKS, o qualsiasi cluster con node pool dedicati.
+#
+# Deploy:
+#   kubectl create namespace videocall
+#   kubectl create secret generic videocall-secrets -n videocall --from-literal=...
+#   helm upgrade --install videocall ./infra/helm/eventi-dtd \
+#     -f examples/values-full.yaml -n videocall
+#
+# Cosa include:
+#   - 2+ repliche dell'app con HPA (2-8)
+#   - Database esterno
+#   - Jitsi con JVB su nodi dedicati, scale-to-zero
+#   - Jibri per recording su nodi dedicati
+#   - CronJob scaler per JVB (no KEDA richiesto)
+#   - ServiceMonitor per Prometheus
+#   - PodDisruptionBudget
+#
+# Prerequisiti:
+#   - Node pool general-purpose per l'app (es. "applications")
+#   - Node pool dedicato per JVB/Jibri con taint workload=jitsi-jvb:NoSchedule
+#   - Prometheus Operator (opzionale, per ServiceMonitor)
+#
+# Ideale per: grandi PA, 300+ partecipanti, eventi frequenti
+# ============================================================================
+
+app:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 1Gi
+
+  # Deploy on general-purpose pool — customize label per cloud provider:
+  #   AKS:  { agentpool: applications }
+  #   GKE:  { cloud.google.com/gke-nodepool: applications }
+  #   EKS:  { eks.amazonaws.com/nodegroup: applications }
+  #   k3s:  {}
+  nodeSelector:
+    agentpool: applications
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 70
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Secrets — pre-created or via External Secrets Operator
+secrets:
+  mode: "existing"
+  existingSecretName: "videocall-secrets"
+  # Uncomment for External Secrets Operator:
+  # mode: "external"
+  # external:
+  #   provider: "azure-key-vault"
+  #   azureKeyVault:
+  #     vaultUrl: "https://my-vault.vault.azure.net"
+  #     tenantId: "00000000-0000-0000-0000-000000000000"
+
+# External database
+postgresql:
+  enabled: false
+  external:
+    existingSecret: "videocall-secrets"
+    secretKey: "DATABASE_URL"
+
+# Jitsi — full mode with dedicated nodes and scale-to-zero
+jitsi:
+  enabled: true
+  mode: full
+
+jitsi-meet:
+  jvb:
+    replicaCount: 0  # Scale-to-zero, managed by jvbScaler CronJob
+    nodeSelector:
+      workload: jitsi-jvb
+    tolerations:
+      - key: workload
+        value: jitsi-jvb
+        effect: NoSchedule
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "3"
+        memory: 4Gi
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        selector:
+          release: prometheus
+
+  jibri:
+    enabled: true
+    replicaCount: 0  # Scaled up only when recording
+    singleUseMode: true
+    nodeSelector:
+      workload: jitsi-jvb
+    tolerations:
+      - key: workload
+        value: jitsi-jvb
+        effect: NoSchedule
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
+
+# JVB auto-scaler CronJob (no KEDA required)
+jvbScaler:
+  enabled: true
+  schedule: "*/5 * * * *"
+  image: bitnami/kubectl:1.29
+  jvbDeploymentName: "videocall-jitsi-meet-jvb"
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/rate-limit: "20"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: videocall.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: videocall-tls
+      hosts:
+        - videocall.example.com
+
+# Prometheus monitoring
+metrics:
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    additionalLabels:
+      release: prometheus

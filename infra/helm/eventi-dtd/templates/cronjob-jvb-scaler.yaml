@@ -1,0 +1,106 @@
+{{- if and .Values.jitsi.enabled (eq (default "simple" .Values.jitsi.mode) "full") .Values.jvbScaler.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-jvb-scaler
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: jvb-scaler
+spec:
+  schedule: {{ .Values.jvbScaler.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 60
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            {{- include "eventi-dtd.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: jvb-scaler
+        spec:
+          serviceAccountName: {{ include "eventi-dtd.fullname" . }}-scaler
+          automountServiceAccountToken: true
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: scaler
+              image: {{ .Values.jvbScaler.image | default "bitnami/kubectl:1.29" }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Query the app API for desired JVB replicas
+                  DESIRED=$(wget -qO- "{{ include "eventi-dtd.internalUrl" . }}/api/internal/jvb-desired-replicas" 2>/dev/null || echo "0")
+                  CURRENT=$(kubectl get deployment {{ .Values.jvbScaler.jvbDeploymentName }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
+
+                  if [ "$DESIRED" != "$CURRENT" ]; then
+                    echo "Scaling JVB from $CURRENT to $DESIRED replicas"
+                    kubectl scale deployment {{ .Values.jvbScaler.jvbDeploymentName }} \
+                      -n {{ .Release.Namespace }} --replicas="$DESIRED"
+                  else
+                    echo "JVB already at $DESIRED replicas"
+                  fi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 1001
+                capabilities:
+                  drop:
+                    - ALL
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 50m
+                  memory: 32Mi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-scaler
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: jvb-scaler
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-scaler
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: jvb-scaler
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-scaler
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: jvb-scaler
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "eventi-dtd.fullname" . }}-scaler
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "eventi-dtd.fullname" . }}-scaler
+    namespace: {{ .Release.Namespace }}
+{{- end }}
