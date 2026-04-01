@@ -56,9 +56,7 @@ RUN find .next/standalone -name '.env*' -type f -delete && \
     cd .next/standalone && \
     rm -rf node_modules/typescript \
            node_modules/sass \
-           node_modules/caniuse-lite \
-           node_modules/@img/sharp-linux-x64 \
-           node_modules/@img/sharp-libvips-linux-x64
+           node_modules/caniuse-lite
 
 
 # ── Stage 3: Production runner ───────────────────────────────

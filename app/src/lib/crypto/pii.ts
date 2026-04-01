@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;
@@ -57,10 +57,19 @@ export function decryptPII(ciphertext: string): string {
 }
 
 /**
- * SHA-256 hash of an email (lowercased, trimmed) for deduplication.
+ * HMAC-SHA-256 hash of an email (lowercased, trimmed) for deduplication.
+ * Uses APP_SECRET as HMAC key to prevent rainbow table attacks.
+ * Falls back to plain SHA-256 only if APP_SECRET is not set (dev mode).
  */
 export function hashEmail(email: string): string {
+  const normalized = email.toLowerCase().trim();
+  const secret = process.env.APP_SECRET;
+  if (secret) {
+    return createHmac('sha256', secret)
+      .update(normalized)
+      .digest('hex');
+  }
   return createHash('sha256')
-    .update(email.toLowerCase().trim())
+    .update(normalized)
     .digest('hex');
 }

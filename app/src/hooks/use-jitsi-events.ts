@@ -23,12 +23,19 @@ export function useJitsiEvents(api: JitsiMeetExternalAPI | null): JitsiEventsSta
 
   const cleanupRef = useRef<(() => void) | null>(null);
 
+  const apiRef = useRef(api);
+  useEffect(() => { apiRef.current = api; }, [api]);
+
   const onParticipantJoined = useCallback(() => {
-    setParticipantCount((c) => c + 1);
+    if (apiRef.current) {
+      setParticipantCount(apiRef.current.getNumberOfParticipants());
+    }
   }, []);
 
   const onParticipantLeft = useCallback(() => {
-    setParticipantCount((c) => Math.max(0, c - 1));
+    if (apiRef.current) {
+      setParticipantCount(apiRef.current.getNumberOfParticipants());
+    }
   }, []);
 
   const onRecordingStatusChanged = useCallback(

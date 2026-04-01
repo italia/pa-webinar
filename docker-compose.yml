@@ -22,7 +22,7 @@ services:
       - NEXT_PUBLIC_JITSI_DOMAIN=localhost:8443
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
       - NEXT_PUBLIC_DEFAULT_LOCALE=it
-      - JITSI_JWT_SECRET=s3cr3t_dev_only
+      - JITSI_JWT_SECRET=${JITSI_JWT_SECRET:-s3cr3t_dev_only}
       - JITSI_JWT_APP_ID=eventi_dtd
       - JITSI_JWT_ISSUER=eventi-dtd
       - JITSI_JWT_AUDIENCE=jitsi
@@ -158,7 +158,7 @@ services:
       - JICOFO_ENABLE_AUTO_OWNER=false
       - JICOFO_AUTHENTICATION_TYPE=jwt
       - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=20
-      - JICOFO_AUTH_LIFETIME=24 hours
+      - JICOFO_AUTH_LIFETIME=86400
     volumes:
       - jitsi_jicofo_config:/config
     depends_on:

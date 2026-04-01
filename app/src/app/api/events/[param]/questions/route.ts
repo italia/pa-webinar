@@ -4,6 +4,7 @@ import type { QuestionStatus } from '@prisma/client';
 import { prisma } from '@/lib/db';
 import { createQuestionSchema } from '@/lib/validation/schemas';
 import { rateLimit } from '@/lib/rate-limit';
+import { constantTimeEqual } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,11 @@ const PARTICIPANT_VISIBLE: QuestionStatus[] = ['PENDING', 'HIGHLIGHTED', 'ANSWER
 export async function GET(request: Request, context: RouteContext) {
   const { param: slug } = await context.params;
   const url = new URL(request.url);
-  const token = url.searchParams.get('token');
+  // Accept token from Authorization header (preferred) or query param (fallback)
+  const authHeader = request.headers.get('authorization');
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : url.searchParams.get('token');
 
   if (!token) {
     return NextResponse.json({ error: 'Token required' }, { status: 401 });
@@ -29,7 +34,7 @@ export async function GET(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
-  const isModerator = event.moderatorToken === token;
+  const isModerator = constantTimeEqual(event.moderatorToken, token);
   let registrationId: string | null = null;
 
   if (!isModerator) {
@@ -46,10 +51,18 @@ export async function GET(request: Request, context: RouteContext) {
   const statusFilter = url.searchParams.get('status') as QuestionStatus | null;
 
   const where: Record<string, unknown> = { eventId: event.id };
-  if (statusFilter) {
-    where.status = statusFilter;
-  } else if (!isModerator) {
-    where.status = { in: PARTICIPANT_VISIBLE };
+  if (isModerator) {
+    // Moderators can filter by any status
+    if (statusFilter) {
+      where.status = statusFilter;
+    }
+  } else {
+    // Participants can only see PARTICIPANT_VISIBLE statuses
+    if (statusFilter && PARTICIPANT_VISIBLE.includes(statusFilter)) {
+      where.status = statusFilter;
+    } else {
+      where.status = { in: PARTICIPANT_VISIBLE };
+    }
   }
 
   const questions = await prisma.question.findMany({
@@ -99,9 +112,10 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { accessToken, ...rest } = body as Record<string, unknown>;
+  const bodyObj = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+  const { accessToken, ...rest } = bodyObj;
   const token =
-    (accessToken as string) ??
+    (typeof accessToken === 'string' ? accessToken : undefined) ??
     new URL(request.url).searchParams.get('token');
 
   if (!token) {
@@ -124,7 +138,7 @@ export async function POST(request: Request, context: RouteContext) {
   const parsed = createQuestionSchema.safeParse(rest);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues },
+      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
       { status: 422 },
     );
   }

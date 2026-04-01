@@ -237,11 +237,18 @@ export default function LiveEventClient({
   const handleStartEvent = useCallback(async () => {
     setStartingEvent(true);
     try {
-      await fetch(`/api/events/${event.id}?token=${token}`, {
+      const res = await fetch(`/api/events/${event.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ status: 'LIVE' }),
       });
+      if (!res.ok) {
+        setStartingEvent(false);
+        return;
+      }
       setEventStatus('LIVE');
     } catch {
       setStartingEvent(false);

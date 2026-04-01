@@ -34,6 +34,7 @@ export default function QuestionForm({
   }, []);
 
   const startCooldown = useCallback(() => {
+    if (cooldownRef.current) clearInterval(cooldownRef.current);
     setCooldown(COOLDOWN_SECONDS);
     cooldownRef.current = setInterval(() => {
       setCooldown((prev) => {

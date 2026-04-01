@@ -200,7 +200,10 @@ export default function JitsiRoom({
         apiRef.current = null;
       }
     };
-  }, [domain, roomName, jwt, displayName, locale, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen]);
+  // NOTE: locale is intentionally excluded from deps to prevent iframe
+  // recreation (and user disconnection) when the user switches language.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen]);
 
   return (
     <div className="jitsi-wrapper position-relative">
