@@ -50,7 +50,8 @@
 
 ─── Prossimi passi ───────────────────────────────────────────
   1. Crea il Secret "{{ .Values.app.existingSecret }}" se non esiste
-  2. Esegui le migrazioni del database (prisma db push)
+  2. Le migrazioni del database vengono eseguite automaticamente
+     dall'initContainer db-migrate ad ogni deploy
   3. Accedi al pannello admin e crea il primo evento
   4. Configura i backup del database
 

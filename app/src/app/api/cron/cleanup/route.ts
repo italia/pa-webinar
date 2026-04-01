@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling } from '@/lib/api-handler';
+import { UnauthorizedError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 
@@ -11,25 +11,15 @@ export const dynamic = 'force-dynamic';
  * GDPR data cleanup: deletes participant PII, questions, and upvotes
  * for events whose retention period has expired.
  *
- * Logic:
- *   1. Find events where status is ENDED or ARCHIVED
- *      AND endsAt + dataRetentionDays < NOW()
- *   2. For each event, in a transaction:
- *      a. Delete all question_upvotes for the event's questions
- *      b. Delete all questions for the event
- *      c. Delete all registrations (removes all PII)
- *      d. Set status to ARCHIVED
- *   3. Return a JSON summary
- *
  * Protected by CRON_API_KEY.
  * In production, called daily at 03:00 UTC via a Kubernetes CronJob.
  */
-export async function GET(request: Request) {
+export const GET = withErrorHandling(async (request) => {
   const apiKey = process.env.CRON_API_KEY;
   const providedKey = request.headers.get('x-api-key') ?? '';
 
   if (!apiKey || !constantTimeEqual(providedKey, apiKey)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    throw new UnauthorizedError();
   }
 
   const now = new Date();
@@ -127,7 +117,6 @@ export async function GET(request: Request) {
         return counts;
       });
 
-      // GDPR: recording blobs should be deleted when retention expires.
       if (evt.recordingUrl) {
         console.warn(
           `[cron/cleanup] Event ${evt.id} has a recording at ${evt.recordingUrl} ` +
@@ -153,11 +142,11 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({
+  return Response.json({
     ok: true,
     eventsProcessed,
     registrationsDeleted: totalRegistrationsDeleted,
     questionsDeleted: totalQuestionsDeleted,
     pollsDeleted: totalPollsDeleted,
   });
-}
+});

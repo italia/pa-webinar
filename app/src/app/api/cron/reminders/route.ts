@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling } from '@/lib/api-handler';
+import { UnauthorizedError } from '@/lib/errors';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
@@ -33,17 +33,16 @@ type Locale = 'it' | 'en';
  * Protected by CRON_API_KEY.
  * In production, called by a Kubernetes CronJob every 5 minutes.
  */
-export async function GET(request: Request) {
+export const GET = withErrorHandling(async (request) => {
   const apiKey = process.env.CRON_API_KEY;
   const providedKey = request.headers.get('x-api-key') ?? '';
 
   if (!apiKey || !constantTimeEqual(providedKey, apiKey)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    throw new UnauthorizedError();
   }
 
   const now = new Date();
 
-  // Find all reminders for PUBLISHED/LIVE events where the trigger time has passed
   const reminders = await prisma.eventReminder.findMany({
     where: {
       event: {
@@ -55,10 +54,9 @@ export async function GET(request: Request) {
     },
   });
 
-  // Filter: only reminders whose trigger time (startsAt - offsetMinutes) has passed
   const dueReminders = reminders.filter((r) => {
     const triggerAt = new Date(r.event.startsAt.getTime() - r.offsetMinutes * 60_000);
-    return triggerAt <= now && r.event.startsAt > now; // don't send for past events
+    return triggerAt <= now && r.event.startsAt > now;
   });
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
@@ -69,7 +67,6 @@ export async function GET(request: Request) {
   for (const reminder of dueReminders) {
     const event = reminder.event;
 
-    // Find registrations that haven't been sent this particular reminder
     const registrations = await prisma.registration.findMany({
       where: {
         eventId: event.id,
@@ -163,10 +160,10 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json({
+  return Response.json({
     ok: true,
     remindersProcessed,
     emailsSent,
     emailsFailed,
   });
-}
+});

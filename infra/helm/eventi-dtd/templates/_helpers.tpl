@@ -71,6 +71,19 @@ Defaults tag to Chart.appVersion if not set.
 {{- end }}
 
 {{/*
+Migration container image reference: "repository:tag-migrate"
+Uses the builder-stage image that includes npm/prisma CLI.
+Defaults tag to Chart.appVersion + "-migrate" if not set.
+*/}}
+{{- define "eventi-dtd.migrationImage" -}}
+{{- $tag := .Values.app.migration.image.tag -}}
+{{- if not $tag -}}
+{{- $tag = printf "%s-migrate" (default .Chart.AppVersion .Values.app.image.tag) -}}
+{{- end -}}
+{{- printf "%s:%s" .Values.app.migration.image.repository $tag -}}
+{{- end }}
+
+{{/*
 App URL for CronJob curl commands.
 Points to the in-cluster Service.
 */}}

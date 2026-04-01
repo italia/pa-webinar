@@ -1,41 +1,33 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import {
+  NotFoundError,
+  ForbiddenError,
+  ConflictError,
+  RateLimitError,
+  ValidationError,
+  AppError,
+} from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { pollVoteSchema } from '@/lib/validation/schemas';
 import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ param: string; id: string }>;
-}
-
 // ── POST /api/events/[slug]/polls/[id]/vote ──
 
-export async function POST(request: Request, context: RouteContext) {
+export const POST = withErrorHandling(async (request, context) => {
   const { param: slug, id: pollId } = await context.params;
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-  }
-
+  const body = await parseJsonBody(request);
   const parsed = pollVoteSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
-      { status: 422 },
-    );
+    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
   const { optionIndex, accessToken, guestId } = parsed.data;
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  }
+  if (!event) throw new NotFoundError('Event');
 
   const poll = await prisma.poll.findUnique({
     where: { id: pollId },
@@ -43,16 +35,16 @@ export async function POST(request: Request, context: RouteContext) {
   });
 
   if (!poll || poll.eventId !== event.id) {
-    return NextResponse.json({ error: 'Poll not found' }, { status: 404 });
+    throw new NotFoundError('Poll');
   }
 
   if (poll.status !== 'OPEN') {
-    return NextResponse.json({ error: 'Poll is closed' }, { status: 409 });
+    throw new ConflictError('Poll is closed');
   }
 
   const options = poll.options as string[];
   if (optionIndex >= options.length) {
-    return NextResponse.json({ error: 'Invalid option index' }, { status: 400 });
+    throw new AppError('Invalid option index', 400, 'BAD_REQUEST');
   }
 
   let registrationId: string | null = null;
@@ -63,29 +55,22 @@ export async function POST(request: Request, context: RouteContext) {
       select: { id: true, eventId: true },
     });
     if (!reg || reg.eventId !== event.id) {
-      return NextResponse.json({ error: 'Invalid access token' }, { status: 403 });
+      throw new ForbiddenError('Invalid access token');
     }
     registrationId = reg.id;
 
     const rl = rateLimit(`poll-vote:${reg.id}`, { limit: 10, windowMs: 60_000 });
-    if (!rl.allowed) {
-      return NextResponse.json({ error: 'rate_limit' }, { status: 429 });
-    }
+    if (!rl.allowed) throw new RateLimitError();
 
-    // Check for existing vote
     const existing = await prisma.pollVote.findUnique({
       where: { pollId_registrationId: { pollId, registrationId: reg.id } },
     });
-    if (existing) {
-      return NextResponse.json({ error: 'Already voted' }, { status: 409 });
-    }
+    if (existing) throw new ConflictError('Already voted');
   } else if (guestId) {
     const existing = await prisma.pollVote.findUnique({
       where: { pollId_guestId: { pollId, guestId } },
     });
-    if (existing) {
-      return NextResponse.json({ error: 'Already voted' }, { status: 409 });
-    }
+    if (existing) throw new ConflictError('Already voted');
   }
 
   await prisma.pollVote.create({
@@ -97,5 +82,5 @@ export async function POST(request: Request, context: RouteContext) {
     },
   });
 
-  return NextResponse.json({ ok: true, optionIndex }, { status: 201 });
-}
+  return Response.json({ ok: true, optionIndex }, { status: 201 });
+});

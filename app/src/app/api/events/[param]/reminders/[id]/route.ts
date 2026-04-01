@@ -1,37 +1,29 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling } from '@/lib/api-handler';
+import { NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ param: string; id: string }>;
-}
-
 // ── DELETE /api/events/[slug]/reminders/[id] ─────────────
-// Moderator only
 
-export async function DELETE(request: Request, context: RouteContext) {
+export const DELETE = withErrorHandling(async (request, context) => {
   const { param: slug, id } = await context.params;
 
   const token = extractModeratorToken(request);
-  if (!token) {
-    return NextResponse.json({ error: 'Moderator token required' }, { status: 401 });
-  }
+  if (!token) throw new UnauthorizedError('Moderator token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event || !constantTimeEqual(event.moderatorToken, token)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    throw new ForbiddenError('Unauthorized');
   }
 
   const reminder = await prisma.eventReminder.findUnique({ where: { id } });
   if (!reminder || reminder.eventId !== event.id) {
-    return NextResponse.json({ error: 'Reminder not found' }, { status: 404 });
+    throw new NotFoundError('Reminder');
   }
 
-  // Delete sent records first (cascade should handle it, but be explicit)
   await prisma.eventReminder.delete({ where: { id } });
 
-  return NextResponse.json({ ok: true });
-}
+  return Response.json({ ok: true });
+});

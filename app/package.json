@@ -11,7 +11,11 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:create": "prisma migrate dev --create-only",
+    "db:migrate:reset": "prisma migrate reset",
+    "db:migrate:status": "prisma migrate status",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate"

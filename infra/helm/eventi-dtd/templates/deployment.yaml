@@ -44,6 +44,19 @@ spec:
           labelSelector:
             matchLabels:
               {{- include "eventi-dtd.selectorLabels" . | nindent 14 }}
+      initContainers:
+        - name: db-migrate
+          image: {{ include "eventi-dtd.migrationImage" . }}
+          imagePullPolicy: {{ .Values.app.migration.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.app.securityContext.container | nindent 12 }}
+          command: ["npx", "prisma", "migrate", "deploy"]
+          workingDir: /workspace/app
+          envFrom:
+            - configMapRef:
+                name: {{ include "eventi-dtd.fullname" . }}
+            - secretRef:
+                name: {{ .Values.app.existingSecret }}
       containers:
         - name: {{ .Chart.Name }}
           image: {{ include "eventi-dtd.image" . }}

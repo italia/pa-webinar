@@ -1,5 +1,11 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  ValidationError,
+  AppError,
+} from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
@@ -15,15 +21,9 @@ export const dynamic = 'force-dynamic';
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-interface RouteContext {
-  params: Promise<{ param: string }>;
-}
-
 // ── GET /api/events/[slug|id] — Event detail ────────────────
-// With ?token=moderatorToken: returns full moderator view with registrations.
-// Without token: returns public data only.
 
-export async function GET(request: Request, context: RouteContext) {
+export const GET = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
   const locale = resolveLocale(request);
   const token = extractModeratorToken(request);
@@ -47,18 +47,13 @@ export async function GET(request: Request, context: RouteContext) {
     },
   });
 
-  if (!event) {
-    return NextResponse.json(
-      { error: 'Event not found' },
-      { status: 404 },
-    );
-  }
+  if (!event) throw new NotFoundError('Event');
 
   const { title, description } = localiseEvent(event, locale);
 
   // Moderator mode: verify token and return full data
   if (token && constantTimeEqual(event.moderatorToken, token)) {
-    return NextResponse.json({
+    return Response.json({
       id: event.id,
       slug: event.slug,
       title,
@@ -98,13 +93,10 @@ export async function GET(request: Request, context: RouteContext) {
 
   // Public mode — hide DRAFT and ARCHIVED events
   if (event.status === 'DRAFT' || event.status === 'ARCHIVED') {
-    return NextResponse.json(
-      { error: 'Event not found' },
-      { status: 404 },
-    );
+    throw new NotFoundError('Event');
   }
 
-  return NextResponse.json({
+  return Response.json({
     id: event.id,
     slug: event.slug,
     title,
@@ -123,52 +115,27 @@ export async function GET(request: Request, context: RouteContext) {
     status: event.status,
     recordingUrl: event.recordingUrl,
   });
-}
+});
 
 // ── PUT /api/events/[id] — Update event (moderator only) ────
 
-export async function PUT(request: Request, context: RouteContext) {
+export const PUT = withErrorHandling(async (request, context) => {
   const { param: eventId } = await context.params;
 
   if (!UUID_RE.test(eventId)) {
-    return NextResponse.json(
-      { error: 'Event ID must be a UUID' },
-      { status: 400 },
-    );
+    throw new AppError('Event ID must be a UUID', 400, 'BAD_REQUEST');
   }
 
   const token = extractModeratorToken(request);
-  if (!token) {
-    return NextResponse.json(
-      { error: 'Moderator token required' },
-      { status: 401 },
-    );
-  }
+  if (!token) throw new UnauthorizedError('Moderator token required');
 
   const event = await verifyModeratorToken(eventId, token);
-  if (!event) {
-    return NextResponse.json(
-      { error: 'Invalid moderator token or event not found' },
-      { status: 403 },
-    );
-  }
+  if (!event) throw new ForbiddenError('Invalid moderator token or event not found');
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: 'Invalid JSON body' },
-      { status: 400 },
-    );
-  }
-
+  const body = await parseJsonBody(request);
   const parsed = updateEventSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
-      { status: 422 },
-    );
+    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
   const data = parsed.data;
@@ -238,41 +205,25 @@ export async function PUT(request: Request, context: RouteContext) {
     sendDateChangeNotifications({ eventId, locale });
   }
 
-  return NextResponse.json({ ...updated, dateChanged });
-}
+  return Response.json({ ...updated, dateChanged });
+});
 
 // ── DELETE /api/events/[id] — Delete event (moderator only) ──
 
-export async function DELETE(request: Request, context: RouteContext) {
+export const DELETE = withErrorHandling(async (request, context) => {
   const { param: eventId } = await context.params;
 
   if (!UUID_RE.test(eventId)) {
-    return NextResponse.json(
-      { error: 'Event ID must be a UUID' },
-      { status: 400 },
-    );
+    throw new AppError('Event ID must be a UUID', 400, 'BAD_REQUEST');
   }
 
   const token = extractModeratorToken(request);
-  if (!token) {
-    return NextResponse.json(
-      { error: 'Moderator token required' },
-      { status: 401 },
-    );
-  }
+  if (!token) throw new UnauthorizedError('Moderator token required');
 
   const event = await verifyModeratorToken(eventId, token);
-  if (!event) {
-    return NextResponse.json(
-      { error: 'Invalid moderator token or event not found' },
-      { status: 403 },
-    );
-  }
+  if (!event) throw new ForbiddenError('Invalid moderator token or event not found');
 
   await prisma.event.delete({ where: { id: eventId } });
 
-  return NextResponse.json(
-    { deleted: true, id: eventId },
-    { status: 200 },
-  );
-}
+  return Response.json({ deleted: true, id: eventId });
+});

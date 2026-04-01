@@ -1,6 +1,13 @@
-import { NextResponse } from 'next/server';
 import type { QuestionStatus } from '@prisma/client';
 
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  RateLimitError,
+  ValidationError,
+} from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { createQuestionSchema } from '@/lib/validation/schemas';
 import { rateLimit } from '@/lib/rate-limit';
@@ -8,31 +15,22 @@ import { constantTimeEqual } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ param: string }>;
-}
-
 const PARTICIPANT_VISIBLE: QuestionStatus[] = ['PENDING', 'HIGHLIGHTED', 'ANSWERED'];
 
 // ── GET /api/events/[slug]/questions ─────────────────────────
 
-export async function GET(request: Request, context: RouteContext) {
+export const GET = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
   const url = new URL(request.url);
-  // Accept token from Authorization header (preferred) or query param (fallback)
   const authHeader = request.headers.get('authorization');
   const token = authHeader?.startsWith('Bearer ')
     ? authHeader.slice(7).trim()
     : url.searchParams.get('token');
 
-  if (!token) {
-    return NextResponse.json({ error: 'Token required' }, { status: 401 });
-  }
+  if (!token) throw new UnauthorizedError('Token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  }
+  if (!event) throw new NotFoundError('Event');
 
   const isModerator = constantTimeEqual(event.moderatorToken, token);
   let registrationId: string | null = null;
@@ -43,7 +41,7 @@ export async function GET(request: Request, context: RouteContext) {
       select: { id: true, eventId: true },
     });
     if (!reg || reg.eventId !== event.id) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 403 });
+      throw new ForbiddenError('Invalid token');
     }
     registrationId = reg.id;
   }
@@ -52,12 +50,10 @@ export async function GET(request: Request, context: RouteContext) {
 
   const where: Record<string, unknown> = { eventId: event.id };
   if (isModerator) {
-    // Moderators can filter by any status
     if (statusFilter) {
       where.status = statusFilter;
     }
   } else {
-    // Participants can only see PARTICIPANT_VISIBLE statuses
     if (statusFilter && PARTICIPANT_VISIBLE.includes(statusFilter)) {
       where.status = statusFilter;
     } else {
@@ -94,23 +90,18 @@ export async function GET(request: Request, context: RouteContext) {
   const highlighted = result.filter((q) => q.status === 'HIGHLIGHTED');
   const rest = result.filter((q) => q.status !== 'HIGHLIGHTED');
 
-  return NextResponse.json({
+  return Response.json({
     questions: [...highlighted, ...rest],
     totalCount: result.length,
   });
-}
+});
 
 // ── POST /api/events/[slug]/questions ────────────────────────
 
-export async function POST(request: Request, context: RouteContext) {
+export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+  const body = await parseJsonBody(request);
 
   const bodyObj = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
   const { accessToken, ...rest } = bodyObj;
@@ -118,37 +109,27 @@ export async function POST(request: Request, context: RouteContext) {
     (typeof accessToken === 'string' ? accessToken : undefined) ??
     new URL(request.url).searchParams.get('token');
 
-  if (!token) {
-    return NextResponse.json({ error: 'Access token required' }, { status: 401 });
-  }
+  if (!token) throw new UnauthorizedError('Access token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event || !event.qaEnabled) {
-    return NextResponse.json({ error: 'Event not found or Q&A disabled' }, { status: 404 });
-  }
+  if (!event || !event.qaEnabled) throw new NotFoundError('Event');
 
   const registration = await prisma.registration.findUnique({
     where: { accessToken: token as string },
     select: { id: true, eventId: true, displayName: true },
   });
   if (!registration || registration.eventId !== event.id) {
-    return NextResponse.json({ error: 'Invalid access token' }, { status: 403 });
+    throw new ForbiddenError('Invalid access token');
   }
 
   const parsed = createQuestionSchema.safeParse(rest);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
-      { status: 422 },
-    );
+    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
   const rl = rateLimit(`qa:${registration.id}`, { limit: 1, windowMs: 30_000 });
   if (!rl.allowed) {
-    return NextResponse.json(
-      { error: 'rate_limit', message: 'Wait before submitting another question' },
-      { status: 429 },
-    );
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
   const question = await prisma.question.create({
@@ -160,7 +141,7 @@ export async function POST(request: Request, context: RouteContext) {
     },
   });
 
-  return NextResponse.json(
+  return Response.json(
     {
       id: question.id,
       authorName: question.authorName,
@@ -174,4 +155,4 @@ export async function POST(request: Request, context: RouteContext) {
     },
     { status: 201 },
   );
-}
+});
