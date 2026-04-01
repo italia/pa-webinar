@@ -7,29 +7,13 @@ import { prisma } from '@/lib/db';
 import { decryptPII } from '@/lib/crypto/pii';
 import { generateEventICal } from '@/lib/ical/generate';
 import { sendEmail } from '@/lib/email/send';
+import { formatDate, formatTime } from '@/lib/utils/date-format';
 
 type Locale = 'it' | 'en';
 
 interface DateChangeNotificationInput {
   eventId: string;
   locale: Locale;
-}
-
-function formatDate(date: Date, locale: Locale): string {
-  return date.toLocaleDateString(locale === 'it' ? 'it-IT' : 'en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-
-function formatTime(date: Date, locale: Locale): string {
-  return date.toLocaleTimeString(locale === 'it' ? 'it-IT' : 'en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Rome',
-  });
 }
 
 const COPY = {

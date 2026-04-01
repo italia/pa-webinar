@@ -138,7 +138,6 @@
     "waitingRoomHint": "Questa pagina si aggiornerà automaticamente quando il moderatore avvierà l'evento. Non è necessario ricaricare.",
     "startEventButton": "Avvia evento",
     "startingEvent": "Avvio in corso...",
-    "enterRoom": "Entra nella sala",
     "chatNotSaved": "I messaggi della chat non vengono salvati dopo la fine dell'evento.",
     "registerAndJoin": "Registrati e partecipa",
     "registerNow": "In corso — Registrati ora!",
@@ -202,7 +201,7 @@
     },
     "moderator": {
       "highlight": "Evidenzia",
-      "markAnswered": "Rispondida",
+      "markAnswered": "Risposta data",
       "dismiss": "Scarta",
       "resetToPending": "Ripristina"
     },

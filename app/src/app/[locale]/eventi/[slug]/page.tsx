@@ -145,7 +145,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
       <EventDetailClient
         event={serialised}

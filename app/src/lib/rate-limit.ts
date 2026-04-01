@@ -10,6 +10,7 @@ interface RateLimitEntry {
 }
 
 const store = new Map<string, RateLimitEntry>();
+const MAX_STORE_SIZE = 50_000;
 
 const CLEANUP_INTERVAL_MS = 60_000;
 let lastCleanup = Date.now();
@@ -21,6 +22,15 @@ function cleanup() {
   for (const [key, entry] of store) {
     if (entry.resetAt <= now) {
       store.delete(key);
+    }
+  }
+  // Evict oldest entries if store exceeds max size
+  if (store.size > MAX_STORE_SIZE) {
+    const excess = store.size - MAX_STORE_SIZE;
+    const iter = store.keys();
+    for (let i = 0; i < excess; i++) {
+      const key = iter.next().value;
+      if (key) store.delete(key);
     }
   }
 }

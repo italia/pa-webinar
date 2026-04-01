@@ -13,6 +13,7 @@ const intlMiddleware = createMiddleware({
 const ADMIN_PATH_RE = /^\/(?:it|en)\/admin(?:\/|$)/;
 const ADMIN_LOGIN_RE = /^\/(?:it|en)\/admin\/login(?:\/|$)/;
 const ADMIN_EVENT_RE = /^\/(?:it|en)\/admin\/eventi\/[^/]+(?:\/[^/]+)?$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 async function isValidAdminSession(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get('admin_session')?.value;
@@ -38,8 +39,14 @@ export default async function middleware(request: NextRequest) {
     return response;
   }
 
-  if (ADMIN_EVENT_RE.test(pathname) && request.nextUrl.searchParams.has('token')) {
-    return response;
+  // Moderator magic links: allow access to event-specific admin pages
+  // if a valid UUID token is provided. The actual token is verified
+  // server-side by the page/API, not here — we only gate on format.
+  if (ADMIN_EVENT_RE.test(pathname)) {
+    const tokenParam = request.nextUrl.searchParams.get('token');
+    if (tokenParam && UUID_RE.test(tokenParam)) {
+      return response;
+    }
   }
 
   const valid = await isValidAdminSession(request);

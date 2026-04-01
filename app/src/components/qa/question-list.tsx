@@ -34,17 +34,27 @@ interface QuestionListProps {
 
 type FilterTab = 'ALL' | 'PENDING' | 'HIGHLIGHTED' | 'ANSWERED' | 'DISMISSED';
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
-
 export default function QuestionList({
   eventSlug,
   token,
   isModerator,
 }: QuestionListProps) {
   const t = useTranslations('qa');
-  const apiUrl = `/api/events/${eventSlug}/questions?token=${token}`;
+  const apiUrl = `/api/events/${eventSlug}/questions`;
 
-  const { data, mutate } = useSWR<QuestionsResponse>(apiUrl, fetcher, {
+  // Send token via header instead of query param to avoid leaking in logs
+  const fetcherWithAuth = useCallback(
+    async (url: string) => {
+      const r = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    },
+    [token],
+  );
+
+  const { data, mutate } = useSWR<QuestionsResponse>(apiUrl, fetcherWithAuth, {
     refreshInterval: 3000,
   });
 
@@ -87,10 +97,13 @@ export default function QuestionList({
   const handleStatusChange = useCallback(
     async (questionId: string, status: string) => {
       await fetch(
-        `/api/events/${eventSlug}/questions/${questionId}?token=${token}`,
+        `/api/events/${eventSlug}/questions/${questionId}`,
         {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
           body: JSON.stringify({ status }),
         },
       );

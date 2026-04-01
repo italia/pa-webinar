@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/db';
+import { constantTimeEqual } from '@/lib/auth/moderator';
 import { decryptPII } from '@/lib/crypto/pii';
 import { generateEventICal } from '@/lib/ical/generate';
 import {
@@ -15,36 +16,11 @@ import {
   reminderHtml,
   reminderText,
 } from '@/lib/email/templates';
+import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
 
 export const dynamic = 'force-dynamic';
 
 type Locale = 'it' | 'en';
-
-function formatDuration(startsAt: Date, endsAt: Date): string {
-  const diffMs = endsAt.getTime() - startsAt.getTime();
-  const hours = Math.floor(diffMs / 3_600_000);
-  const minutes = Math.floor((diffMs % 3_600_000) / 60_000);
-  if (hours > 0 && minutes > 0) return `${hours}h ${minutes}min`;
-  if (hours > 0) return `${hours}h`;
-  return `${minutes}min`;
-}
-
-function formatDate(date: Date, locale: Locale): string {
-  return date.toLocaleDateString(locale === 'it' ? 'it-IT' : 'en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-
-function formatTime(date: Date, locale: Locale): string {
-  return date.toLocaleTimeString(locale === 'it' ? 'it-IT' : 'en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Rome',
-  });
-}
 
 /**
  * GET /api/cron/reminders
@@ -57,19 +33,9 @@ function formatTime(date: Date, locale: Locale): string {
  */
 export async function GET(request: Request) {
   const apiKey = process.env.CRON_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: 'CRON_API_KEY not configured' },
-      { status: 500 },
-    );
-  }
+  const providedKey = request.headers.get('x-api-key') ?? '';
 
-  const url = new URL(request.url);
-  const providedKey =
-    url.searchParams.get('key') ??
-    request.headers.get('x-api-key');
-
-  if (providedKey !== apiKey) {
+  if (!apiKey || !constantTimeEqual(providedKey, apiKey)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -93,6 +59,9 @@ export async function GET(request: Request) {
   let failed = 0;
 
   for (const event of events) {
+    // NOTE: Registration does not store user locale preference.
+    // Default to Italian as primary locale per ADR-008.
+    // Future improvement: store locale at registration time.
     const locale: Locale = 'it';
     const title = event.titleIt;
     const description = event.descriptionIt;

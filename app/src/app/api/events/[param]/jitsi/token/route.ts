@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/db';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
+import { constantTimeEqual } from '@/lib/auth/moderator';
 import {
   generateJitsiJwt,
   moderatorJitsiId,
@@ -29,7 +30,7 @@ export async function POST(request: Request, context: RouteContext) {
   const parsed = jitsiTokenRequestSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues },
+      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
       { status: 422 },
     );
   }
@@ -50,7 +51,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   // ── Moderator flow ──
   if (moderatorToken) {
-    if (event.moderatorToken !== moderatorToken) {
+    if (!constantTimeEqual(event.moderatorToken, moderatorToken)) {
       return NextResponse.json({ error: 'Invalid moderator token' }, { status: 403 });
     }
 
@@ -68,7 +69,7 @@ export async function POST(request: Request, context: RouteContext) {
       roomName: event.jitsiRoomName,
       displayName: name,
       role: 'moderator',
-    });
+    }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
   // ── Participant flow ──
@@ -88,7 +89,8 @@ export async function POST(request: Request, context: RouteContext) {
       });
     }
 
-    const name = displayNameOverride || registration.displayName;
+    // Participants use their registered display name (no override to prevent impersonation)
+    const name = registration.displayName;
 
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
@@ -102,7 +104,7 @@ export async function POST(request: Request, context: RouteContext) {
       roomName: event.jitsiRoomName,
       displayName: name,
       role: 'participant',
-    });
+    }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
   // ── Guest flow (no registration, LIVE events only) ──
@@ -136,7 +138,7 @@ export async function POST(request: Request, context: RouteContext) {
       roomName: event.jitsiRoomName,
       displayName: guestName,
       role: 'guest',
-    });
+    }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
   return NextResponse.json({ error: 'No token provided' }, { status: 400 });

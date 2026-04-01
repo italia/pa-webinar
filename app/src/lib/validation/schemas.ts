@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // ── Event Schemas ────────────────────────────────────
 
-export const createEventSchema = z.object({
+const eventBaseSchema = z.object({
   titleIt: z.string().min(3).max(200),
   titleEn: z.string().max(200).optional(),
   descriptionIt: z.string().min(10).max(5000),
@@ -14,9 +14,9 @@ export const createEventSchema = z.object({
   qaEnabled: z.boolean().default(true),
   chatEnabled: z.boolean().default(false),
   recordingEnabled: z.boolean().default(false),
-  participantsCanUnmute: z.boolean().default(true),
-  participantsCanStartVideo: z.boolean().default(true),
-  participantsCanShareScreen: z.boolean().default(true),
+  participantsCanUnmute: z.boolean().default(false),
+  participantsCanStartVideo: z.boolean().default(false),
+  participantsCanShareScreen: z.boolean().default(false),
   dataRetentionDays: z.number().int().min(1).max(365).default(30),
   privacyPolicyUrl: z.string().url().optional(),
   moderatorName: z.string().min(2).max(100).optional(),
@@ -28,11 +28,25 @@ export const createEventSchema = z.object({
   waitingRoomAudioUrl: z.string().url().optional(),
 });
 
-export const updateEventSchema = createEventSchema.partial().extend({
+export const createEventSchema = eventBaseSchema.refine(
+  (data) => new Date(data.endsAt) > new Date(data.startsAt),
+  { message: 'endsAt must be after startsAt', path: ['endsAt'] },
+);
+
+export const updateEventSchema = eventBaseSchema.partial().extend({
   status: z
     .enum(['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED', 'ARCHIVED'])
     .optional(),
-});
+}).refine(
+  (data) => {
+    // Only validate date ordering when both dates are present in the update
+    if (data.startsAt && data.endsAt) {
+      return new Date(data.endsAt) > new Date(data.startsAt);
+    }
+    return true;
+  },
+  { message: 'endsAt must be after startsAt', path: ['endsAt'] },
+);
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
@@ -80,7 +94,13 @@ export const jitsiTokenRequestSchema = z.object({
   displayNameOverride: z.string().min(2).max(100).optional(),
 }).refine(
   (data) => data.accessToken ?? data.moderatorToken ?? data.guestName,
-  { message: 'Either accessToken, moderatorToken, or guestName is required' }
+  { message: 'Either accessToken, moderatorToken, or guestName is required' },
+).refine(
+  (data) => {
+    const provided = [data.accessToken, data.moderatorToken, data.guestName].filter(Boolean);
+    return provided.length === 1;
+  },
+  { message: 'Exactly one of accessToken, moderatorToken, or guestName must be provided' },
 );
 
 export type JitsiTokenRequest = z.infer<typeof jitsiTokenRequestSchema>;

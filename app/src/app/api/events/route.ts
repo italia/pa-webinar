@@ -1,13 +1,16 @@
 import { randomUUID } from 'crypto';
 
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import type { EventStatus } from '@prisma/client';
+import { cookies } from 'next/headers';
 
 import { prisma } from '@/lib/db';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
+import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +18,14 @@ const PUBLIC_STATUSES: EventStatus[] = ['PUBLISHED', 'LIVE', 'ENDED'];
 
 // ── POST /api/events — Create event ──────────────────────────
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // Require admin authentication to create events
+  const cookieStore = await cookies();
+  const isAdmin = await isAdminAuthenticated(cookieStore);
+  if (!isAdmin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const ip = getClientIp(request);
   const rl = rateLimit(`create-event:${ip}`, {
     limit: 5,
@@ -50,7 +60,7 @@ export async function POST(request: Request) {
   const parsed = createEventSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues },
+      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
       { status: 422 },
     );
   }
@@ -93,13 +103,14 @@ export async function POST(request: Request) {
   });
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const locale = resolveLocale(request);
 
   return NextResponse.json(
     {
       ...event,
       links: {
-        publicPage: `${baseUrl}/it/eventi/${event.slug}`,
-        moderatorLink: `${baseUrl}/it/admin/eventi/${event.id}?token=${event.moderatorToken}`,
+        publicPage: `${baseUrl}/${locale}/eventi/${event.slug}`,
+        moderatorLink: `${baseUrl}/${locale}/admin/eventi/${event.id}?token=${event.moderatorToken}`,
       },
     },
     {
