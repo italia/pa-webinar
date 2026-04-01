@@ -18,6 +18,7 @@ import RecordingConsent, {
 } from '@/components/jitsi/recording-consent';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
 import QAPanel from '@/components/qa/qa-panel';
+import PollPanel from '@/components/polls/poll-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
 import GuestJoinForm from '@/components/live/guest-join-form';
 import AudioPlayer from '@/components/live/audio-player';
@@ -445,12 +446,65 @@ export default function LiveEventClient({
           />
         </div>
 
-        {event.qaEnabled && (
-          <QAPanel
+        {(event.qaEnabled || true) && (
+          <LiveSidebar
             eventSlug={event.slug}
             token={token}
             isModerator={isActualModerator}
+            qaEnabled={event.qaEnabled}
           />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Sidebar with tabs ──
+
+interface LiveSidebarProps {
+  eventSlug: string;
+  token: string;
+  isModerator: boolean;
+  qaEnabled: boolean;
+}
+
+function LiveSidebar({ eventSlug, token, isModerator, qaEnabled }: LiveSidebarProps) {
+  const t = useTranslations('live');
+  const [activeTab, setActiveTab] = useState<'qa' | 'polls'>(qaEnabled ? 'qa' : 'polls');
+
+  return (
+    <div className="d-flex flex-column" style={{ width: '100%', maxWidth: '360px' }}>
+      {/* Tab buttons */}
+      <div className="d-flex border-bottom" style={{ background: '#f8f9fa' }}>
+        {qaEnabled && (
+          <button
+            type="button"
+            className={`btn btn-sm flex-fill rounded-0 border-0 py-2 ${
+              activeTab === 'qa' ? 'fw-semibold text-primary border-bottom border-primary border-2' : 'text-muted'
+            }`}
+            onClick={() => setActiveTab('qa')}
+          >
+            {t('sidebarTabQa')}
+          </button>
+        )}
+        <button
+          type="button"
+          className={`btn btn-sm flex-fill rounded-0 border-0 py-2 ${
+            activeTab === 'polls' ? 'fw-semibold text-primary border-bottom border-primary border-2' : 'text-muted'
+          }`}
+          onClick={() => setActiveTab('polls')}
+        >
+          {t('sidebarTabPolls')}
+        </button>
+      </div>
+
+      {/* Tab content */}
+      <div className="flex-grow-1" style={{ minHeight: 0, overflowY: 'auto' }}>
+        {activeTab === 'qa' && qaEnabled && (
+          <QAPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+        )}
+        {activeTab === 'polls' && (
+          <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
         )}
       </div>
     </div>

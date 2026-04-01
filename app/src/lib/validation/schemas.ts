@@ -17,6 +17,9 @@ const eventBaseSchema = z.object({
   participantsCanUnmute: z.boolean().default(false),
   participantsCanStartVideo: z.boolean().default(false),
   participantsCanShareScreen: z.boolean().default(false),
+  requireOrganization: z.boolean().default(false),
+  requireOrganizationRole: z.boolean().default(false),
+  requireOrganizationType: z.boolean().default(false),
   dataRetentionDays: z.number().int().min(1).max(365).default(30),
   privacyPolicyUrl: z.string().url().optional(),
   moderatorName: z.string().min(2).max(100).optional(),
@@ -53,6 +56,11 @@ export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 
 // ── Registration Schemas ─────────────────────────────
 
+export const ORGANIZATION_TYPES = [
+  'MINISTRY', 'AGENCY', 'REGION', 'PROVINCE', 'MUNICIPALITY',
+  'ASL', 'UNIVERSITY', 'PUBLIC_ENTITY', 'IN_HOUSE', 'OTHER',
+] as const;
+
 export const createRegistrationSchema = z.object({
   displayName: z
     .string()
@@ -61,6 +69,9 @@ export const createRegistrationSchema = z.object({
   email: z
     .string()
     .email('registration.errors.emailInvalid'),
+  organization: z.string().max(200).optional(),
+  organizationRole: z.string().max(200).optional(),
+  organizationType: z.enum(ORGANIZATION_TYPES).optional(),
   consentGiven: z
     .literal(true, {
       errorMap: () => ({ message: 'registration.errors.consentRequired' }),
@@ -104,3 +115,26 @@ export const jitsiTokenRequestSchema = z.object({
 );
 
 export type JitsiTokenRequest = z.infer<typeof jitsiTokenRequestSchema>;
+
+// ── Poll Schemas ────────────────────────────────────────
+
+export const createPollSchema = z.object({
+  question: z.string().min(3).max(300),
+  options: z.array(z.string().min(1).max(200)).min(2).max(6),
+});
+
+export const updatePollStatusSchema = z.object({
+  status: z.enum(['OPEN', 'CLOSED', 'PUBLISHED']),
+});
+
+export const pollVoteSchema = z.object({
+  optionIndex: z.number().int().min(0),
+  accessToken: z.string().min(1).optional(),
+  guestId: z.string().min(1).optional(),
+}).refine(
+  (data) => data.accessToken || data.guestId,
+  { message: 'Either accessToken or guestId is required' },
+);
+
+export type CreatePollInput = z.infer<typeof createPollSchema>;
+export type PollVoteInput = z.infer<typeof pollVoteSchema>;

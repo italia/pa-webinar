@@ -55,6 +55,9 @@ export default function CreateEventForm() {
     participantsCanUnmute: false,
     participantsCanStartVideo: false,
     participantsCanShareScreen: false,
+    requireOrganization: false,
+    requireOrganizationRole: false,
+    requireOrganizationType: false,
     dataRetentionDays: 30,
     privacyPolicyUrl: '',
     moderatorName: '',
@@ -97,6 +100,9 @@ export default function CreateEventForm() {
         participantsCanUnmute: form.participantsCanUnmute,
         participantsCanStartVideo: form.participantsCanStartVideo,
         participantsCanShareScreen: form.participantsCanShareScreen,
+        requireOrganization: form.requireOrganization,
+        requireOrganizationRole: form.requireOrganizationRole,
+        requireOrganizationType: form.requireOrganizationType,
         dataRetentionDays: form.dataRetentionDays,
         privacyPolicyUrl: form.privacyPolicyUrl || undefined,
         moderatorName: form.moderatorName || undefined,
@@ -455,6 +461,69 @@ export default function CreateEventForm() {
             <small className="form-text text-muted">
               {t('form.permissionsNote')}
             </small>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* ── Registration profiling section ── */}
+      <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+        <CardBody className="p-4">
+          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            {t('form.sectionRegistrationFields')}
+          </h5>
+
+          <div className="py-3">
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="me-3">
+                <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  {t('form.requireOrganization')}
+                </div>
+                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                  {t('form.requireOrganizationDesc')}
+                </div>
+              </div>
+              <Toggle
+                label=""
+                checked={form.requireOrganization}
+                onChange={() => setField('requireOrganization', !form.requireOrganization)}
+              />
+            </div>
+          </div>
+
+          <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="me-3">
+                <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  {t('form.requireOrganizationRole')}
+                </div>
+                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                  {t('form.requireOrganizationRoleDesc')}
+                </div>
+              </div>
+              <Toggle
+                label=""
+                checked={form.requireOrganizationRole}
+                onChange={() => setField('requireOrganizationRole', !form.requireOrganizationRole)}
+              />
+            </div>
+          </div>
+
+          <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="me-3">
+                <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  {t('form.requireOrganizationType')}
+                </div>
+                <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                  {t('form.requireOrganizationTypeDesc')}
+                </div>
+              </div>
+              <Toggle
+                label=""
+                checked={form.requireOrganizationType}
+                onChange={() => setField('requireOrganizationType', !form.requireOrganizationType)}
+              />
+            </div>
           </div>
         </CardBody>
       </Card>
