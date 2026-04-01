@@ -57,8 +57,11 @@ describe('encryptPII + decryptPII', () => {
 
   it('decryption with tampered ciphertext throws', () => {
     const encrypted = encryptPII('secret@example.com');
-    // Flip a character in the base64
-    const tampered = encrypted.slice(0, 10) + 'X' + encrypted.slice(11);
+    // Corrupt the auth tag region by flipping bits in the raw buffer
+    const buf = Buffer.from(encrypted, 'base64');
+    // Auth tag starts at byte 12 (after IV)
+    buf[14] = buf[14]! ^ 0xff;
+    const tampered = buf.toString('base64');
     expect(() => decryptPII(tampered)).toThrow();
   });
 

@@ -17,7 +17,7 @@ dist/
 **/.env.*.local
 
 # Database
-app/prisma/migrations/**/migration_lock.toml
+# Note: migration_lock.toml MUST be committed (required by prisma migrate diff)
 
 # IDE
 .vscode/
