@@ -23,6 +23,8 @@ interface ProfilingConfig {
 interface RegistrationFormClientProps {
   eventSlug: string;
   privacyPolicyUrl: string;
+  privacyPolicyText?: string;
+  recordingEnabled?: boolean;
   profiling?: ProfilingConfig;
 }
 
@@ -31,9 +33,12 @@ type FieldErrors = Partial<Record<string, string>>;
 export default function RegistrationFormClient({
   eventSlug,
   privacyPolicyUrl,
+  privacyPolicyText,
+  recordingEnabled,
   profiling,
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
+  const tg = useTranslations('gdpr');
   const tc = useTranslations('common');
 
   const [displayName, setDisplayName] = useState('');
@@ -42,6 +47,9 @@ export default function RegistrationFormClient({
   const [organizationRole, setOrganizationRole] = useState('');
   const [organizationType, setOrganizationType] = useState('');
   const [consentGiven, setConsentGiven] = useState(false);
+  const [consentRecording, setConsentRecording] = useState(false);
+  const [consentFutureCommunications, setConsentFutureCommunications] = useState(false);
+  const [privacyExpanded, setPrivacyExpanded] = useState(false);
 
   const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -81,37 +89,42 @@ export default function RegistrationFormClient({
       displayName,
       email,
       consentGiven,
+      consentFutureCommunications,
     };
+    if (recordingEnabled) payload.consentRecording = consentRecording;
     if (showOrg) payload.organization = organization || undefined;
     if (showRole) payload.organizationRole = organizationRole || undefined;
     if (showType && organizationType) payload.organizationType = organizationType;
 
     const result = createRegistrationSchema.safeParse(payload);
 
-    if (result.success) {
-      // Extra validation: if profiling fields are required by event, ensure they're filled
-      const fieldErrors: FieldErrors = {};
-      if (showOrg && !organization.trim()) {
-        fieldErrors.organization = 'registration.errors.organizationRequired';
+    const fieldErrors: FieldErrors = {};
+
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const field = String(issue.path[0]);
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
+        }
       }
-      if (Object.keys(fieldErrors).length > 0) {
-        setErrors(fieldErrors);
-        return false;
-      }
-      setErrors({});
-      return true;
     }
 
-    const fieldErrors: FieldErrors = {};
-    for (const issue of result.error.issues) {
-      const field = String(issue.path[0]);
-      if (!fieldErrors[field]) {
-        fieldErrors[field] = issue.message;
-      }
+    // Extra validation: if profiling fields are required by event, ensure they're filled
+    if (showOrg && !organization.trim()) {
+      fieldErrors.organization = 'registration.errors.organizationRequired';
     }
-    setErrors(fieldErrors);
-    return false;
-  }, [displayName, email, consentGiven, organization, organizationRole, organizationType, showOrg, showRole, showType]);
+    // Recording consent is mandatory when recording is enabled
+    if (recordingEnabled && !consentRecording) {
+      fieldErrors.consentRecording = 'registration.errors.recordingConsentRequired';
+    }
+
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  }, [displayName, email, consentGiven, consentRecording, consentFutureCommunications, organization, organizationRole, organizationType, showOrg, showRole, showType, recordingEnabled]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -122,7 +135,11 @@ export default function RegistrationFormClient({
 
       setSubmitting(true);
       try {
-        const body: Record<string, unknown> = { displayName, email, consentGiven };
+        const body: Record<string, unknown> = {
+          displayName, email, consentGiven,
+          consentFutureCommunications,
+        };
+        if (recordingEnabled) body.consentRecording = consentRecording;
         if (showOrg && organization) body.organization = organization;
         if (showRole && organizationRole) body.organizationRole = organizationRole;
         if (showType && organizationType) body.organizationType = organizationType;
@@ -157,7 +174,7 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType],
+    [displayName, email, consentGiven, consentRecording, consentFutureCommunications, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled],
   );
 
   if (success) {
@@ -275,7 +292,42 @@ export default function RegistrationFormClient({
         </FormGroup>
       )}
 
-      <FormGroup check className="mb-4">
+      {/* ── Privacy policy (inline text or link) ── */}
+      {privacyPolicyText ? (
+        <div className="mb-4">
+          <button
+            type="button"
+            className="btn btn-link p-0 text-decoration-none fw-semibold"
+            onClick={() => setPrivacyExpanded(!privacyExpanded)}
+            style={{ fontSize: '0.9rem' }}
+          >
+            <Icon icon={privacyExpanded ? 'it-collapse' : 'it-expand'} size="sm" className="me-1" />
+            {t('gdprLink')}
+          </button>
+          {privacyExpanded && (
+            <div
+              className="border rounded p-3 mt-2 bg-white"
+              style={{ fontSize: '0.85rem', maxHeight: 300, overflowY: 'auto', whiteSpace: 'pre-wrap' }}
+            >
+              {privacyPolicyText}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="mb-3">
+          <a
+            href={privacyPolicyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: '0.9rem' }}
+          >
+            {t('gdprLink')}
+          </a>
+        </div>
+      )}
+
+      {/* ── Consent 1: Data processing (mandatory) ── */}
+      <FormGroup check className="mb-3">
         <Input
           type="checkbox"
           id="consentGiven"
@@ -285,21 +337,51 @@ export default function RegistrationFormClient({
           }
         />
         <Label for="consentGiven" check>
-          {t('gdprConsent')}{' '}
-          {(showOrg || showRole || showType) && t('gdprConsentProfiling')}{' '}
-          <a
-            href={privacyPolicyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t('gdprLink')}
-          </a>
+          {t('gdprConsent')}
+          {(showOrg || showRole || showType) && (' ' + t('gdprConsentProfiling'))}
         </Label>
         {errors.consentGiven && (
           <div className="text-danger small mt-1">
             {t('errors.consentRequired')}
           </div>
         )}
+      </FormGroup>
+
+      {/* ── Consent 2: Recording (shown only if event has recording) ── */}
+      {recordingEnabled && (
+        <FormGroup check className="mb-3">
+          <Input
+            type="checkbox"
+            id="consentRecording"
+            checked={consentRecording}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setConsentRecording(e.target.checked)
+            }
+          />
+          <Label for="consentRecording" check>
+            {tg('consent.recording')}
+          </Label>
+          {errors.consentRecording && (
+            <div className="text-danger small mt-1">
+              {tg('consent.recordingRequired')}
+            </div>
+          )}
+        </FormGroup>
+      )}
+
+      {/* ── Consent 3: Future communications (optional) ── */}
+      <FormGroup check className="mb-4">
+        <Input
+          type="checkbox"
+          id="consentFutureCommunications"
+          checked={consentFutureCommunications}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setConsentFutureCommunications(e.target.checked)
+          }
+        />
+        <Label for="consentFutureCommunications" check>
+          {tg('consent.futureCommunications')}
+        </Label>
       </FormGroup>
 
       <Button

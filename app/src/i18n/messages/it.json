@@ -138,6 +138,7 @@
       "emailInvalid": "Inserisci un'email valida",
       "organizationRequired": "Inserisci il tuo ente di appartenenza",
       "consentRequired": "Il consenso al trattamento dati è obbligatorio",
+      "recordingConsentRequired": "Il consenso alla registrazione è obbligatorio per questo evento",
       "eventFull": "L'evento ha raggiunto il numero massimo di partecipanti",
       "generic": "Errore durante la registrazione. Riprova."
     }
@@ -178,6 +179,18 @@
     "sidebarTabQa": "Q&A",
     "sidebarTabPolls": "Sondaggi",
     "sidebarTabMaterials": "Materiali",
+    "sidebarTabParticipants": "Partecipanti",
+    "role": {
+      "moderator": "Moderatore",
+      "participant": "Partecipante",
+      "guest": "Ospite"
+    },
+    "participants": {
+      "title": "Partecipanti",
+      "noParticipants": "Nessun partecipante",
+      "kick": "Espelli",
+      "kickConfirm": "Sei sicuro di voler espellere questo partecipante?"
+    },
     "moderator": {
       "muteAll": "Silenzia tutti",
       "unmuteAll": "Riattiva audio",
@@ -399,7 +412,19 @@
       "participantsCanShareScreen": "I partecipanti possono condividere lo schermo",
       "permissionsOnDesc": "I partecipanti possono attivare autonomamente",
       "permissionsOffDesc": "Solo i moderatori possono attivare. I partecipanti devono alzare la mano.",
-      "permissionsNote": "Le modifiche ai permessi si applicano ai nuovi partecipanti."
+      "permissionsNote": "Le modifiche ai permessi si applicano ai nuovi partecipanti.",
+      "privacyPolicyMode": "Informativa privacy",
+      "privacyPolicyModeUrl": "URL esterno",
+      "privacyPolicyModeText": "Testo personalizzato",
+      "privacyPolicyText": "Testo informativa privacy",
+      "privacyPolicyTextHint": "Scrivi il testo dell'informativa privacy. Verrà mostrato inline nel modulo di registrazione.",
+      "retentionPreviewTitle": "Cosa viene eliminato automaticamente",
+      "retentionPreviewIntro": "Dopo {days} giorni dalla fine dell'evento verranno eliminati automaticamente:",
+      "retentionPreviewParticipants": "Dati dei partecipanti (nome, email, ente)",
+      "retentionPreviewQa": "Domande Q&A e voti",
+      "retentionPreviewPolls": "Risultati dei sondaggi",
+      "retentionPreviewRecordings": "Registrazioni video",
+      "retentionPreviewKept": "Le statistiche aggregate e i metadati dell'evento vengono mantenuti."
     },
     "links": {
       "title": "Link dell'evento",
@@ -408,6 +433,18 @@
       "moderatorLinkHint": "Condividi questo link solo con i moderatori. Chiunque lo abbia può gestire l'evento.",
       "copyLink": "Copia link",
       "copied": "Copiato!"
+    },
+    "gdprAuditLog": {
+      "title": "Registro GDPR",
+      "date": "Data",
+      "action": "Azione",
+      "recordCount": "Record",
+      "details": "Dettagli",
+      "actions": {
+        "DATA_DELETED": "Dati eliminati",
+        "CONSENT_RECORDED": "Consenso registrato",
+        "DATA_EXPORTED": "Dati esportati"
+      }
     }
   },
   "email": {
@@ -470,6 +507,36 @@
         "title": "Interagisci",
         "desc": "Fai domande, vota, partecipa alla discussione"
       }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Acconsento alla registrazione audio/video dell'evento",
+      "recordingRequired": "Il consenso alla registrazione è obbligatorio per partecipare a questo evento",
+      "futureCommunications": "Desidero ricevere informazioni su eventi futuri organizzati dal DTD"
+    },
+    "export": {
+      "title": "I miei dati",
+      "subtitle": "Richiedi una copia dei dati personali associati al tuo indirizzo email, come previsto dall'Art. 15 del GDPR.",
+      "emailLabel": "Il tuo indirizzo email",
+      "emailPlaceholder": "Inserisci l'email usata per la registrazione",
+      "emailInvalid": "Inserisci un indirizzo email valido",
+      "submit": "Richiedi i miei dati",
+      "loading": "Ricerca in corso...",
+      "noData": "Nessun dato trovato per questo indirizzo email.",
+      "error": "Si è verificato un errore. Riprova più tardi.",
+      "rateLimited": "Troppe richieste. Riprova tra un'ora.",
+      "results": "I tuoi dati",
+      "resultsDescription": "Trovati dati relativi a {count} eventi.",
+      "registrationData": "Dati di registrazione",
+      "fieldName": "Nome",
+      "fieldEmail": "Email",
+      "fieldOrganization": "Ente",
+      "fieldRegisteredAt": "Data registrazione",
+      "fieldConsent": "Consenso",
+      "questionsTitle": "Domande Q&A",
+      "pollVotesTitle": "Voti sondaggi",
+      "optionLabel": "Opzione"
     }
   },
   "footer": {

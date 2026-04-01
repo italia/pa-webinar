@@ -92,10 +92,20 @@ interface EventData {
   jitsiRoomName: string;
   dataRetentionDays: number;
   privacyPolicyUrl: string | null;
+  privacyPolicyText: string | null;
   createdAt: string;
   registrations: Registration[];
   materials: MaterialData[];
   reminders: ReminderData[];
+  gdprAuditLogs: GdprAuditLogData[];
+}
+
+interface GdprAuditLogData {
+  id: string;
+  action: string;
+  recordCount: number;
+  details: string | null;
+  createdAt: string;
 }
 
 interface EventManagementClientProps {
@@ -1032,6 +1042,53 @@ export default function EventManagementClient({
           </Card>
         </Col>
       </Row>
+
+      {/* ── GDPR Audit Log (collapsible) ── */}
+      {event.gdprAuditLogs.length > 0 && (
+        <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+          <CardBody className="p-4">
+            <details>
+              <summary className="fw-semibold mb-3" style={{ color: '#17324D', cursor: 'pointer' }}>
+                {t('gdprAuditLog.title')} ({event.gdprAuditLogs.length})
+              </summary>
+              <Table responsive hover className="mt-3" style={{ fontSize: '0.85rem' }}>
+                <thead>
+                  <tr>
+                    <th>{t('gdprAuditLog.date')}</th>
+                    <th>{t('gdprAuditLog.action')}</th>
+                    <th>{t('gdprAuditLog.recordCount')}</th>
+                    <th>{t('gdprAuditLog.details')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {event.gdprAuditLogs.map((log) => (
+                    <tr key={log.id}>
+                      <td>{format.dateTime(new Date(log.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
+                      <td>
+                        <Badge
+                          color=""
+                          pill
+                          style={{
+                            fontSize: '0.72rem',
+                            backgroundColor: log.action === 'DATA_DELETED' ? '#FFF3CD' : log.action === 'DATA_EXPORTED' ? '#D1ECF1' : '#D4EDDA',
+                            color: log.action === 'DATA_DELETED' ? '#856404' : log.action === 'DATA_EXPORTED' ? '#0C5460' : '#155724',
+                          }}
+                        >
+                          {t(`gdprAuditLog.actions.${log.action}`)}
+                        </Badge>
+                      </td>
+                      <td>{log.recordCount}</td>
+                      <td style={{ maxWidth: 200 }} className="text-truncate">
+                        {log.details ? JSON.stringify(JSON.parse(log.details)) : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </details>
+          </CardBody>
+        </Card>
+      )}
     </>
   );
 }

@@ -138,6 +138,7 @@
       "emailInvalid": "Please enter a valid email",
       "organizationRequired": "Please enter your organization",
       "consentRequired": "Consent to data processing is required",
+      "recordingConsentRequired": "Recording consent is required for this event",
       "eventFull": "The event has reached the maximum number of participants",
       "generic": "Registration error. Please try again."
     }
@@ -178,6 +179,18 @@
     "sidebarTabQa": "Q&A",
     "sidebarTabPolls": "Polls",
     "sidebarTabMaterials": "Materials",
+    "sidebarTabParticipants": "Participants",
+    "role": {
+      "moderator": "Moderator",
+      "participant": "Participant",
+      "guest": "Guest"
+    },
+    "participants": {
+      "title": "Participants",
+      "noParticipants": "No participants",
+      "kick": "Kick",
+      "kickConfirm": "Are you sure you want to kick this participant?"
+    },
     "moderator": {
       "muteAll": "Mute all",
       "unmuteAll": "Unmute all",
@@ -329,7 +342,19 @@
       "participantsCanShareScreen": "Participants can share screen",
       "permissionsOnDesc": "Participants can activate on their own",
       "permissionsOffDesc": "Only moderators can activate. Participants must raise their hand.",
-      "permissionsNote": "Permission changes apply to new participants."
+      "permissionsNote": "Permission changes apply to new participants.",
+      "privacyPolicyMode": "Privacy policy",
+      "privacyPolicyModeUrl": "External URL",
+      "privacyPolicyModeText": "Custom text",
+      "privacyPolicyText": "Privacy policy text",
+      "privacyPolicyTextHint": "Write the privacy policy text. It will be shown inline in the registration form.",
+      "retentionPreviewTitle": "What gets automatically deleted",
+      "retentionPreviewIntro": "After {days} days from the end of the event, the following will be automatically deleted:",
+      "retentionPreviewParticipants": "Participant data (name, email, organization)",
+      "retentionPreviewQa": "Q&A questions and votes",
+      "retentionPreviewPolls": "Poll results",
+      "retentionPreviewRecordings": "Video recordings",
+      "retentionPreviewKept": "Aggregate statistics and event metadata are retained."
     },
     "links": {
       "title": "Event links",
@@ -338,6 +363,18 @@
       "moderatorLinkHint": "Share this link only with moderators. Anyone with this link can manage the event.",
       "copyLink": "Copy link",
       "copied": "Copied!"
+    },
+    "gdprAuditLog": {
+      "title": "GDPR Audit Log",
+      "date": "Date",
+      "action": "Action",
+      "recordCount": "Records",
+      "details": "Details",
+      "actions": {
+        "DATA_DELETED": "Data deleted",
+        "CONSENT_RECORDED": "Consent recorded",
+        "DATA_EXPORTED": "Data exported"
+      }
     }
   },
   "email": {
@@ -470,6 +507,36 @@
       "1hour": "1 hour before",
       "30min": "30 minutes before",
       "15min": "15 minutes before"
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "I consent to the audio/video recording of this event",
+      "recordingRequired": "Recording consent is required to participate in this event",
+      "futureCommunications": "I would like to receive information about future events organized by DTD"
+    },
+    "export": {
+      "title": "My data",
+      "subtitle": "Request a copy of personal data associated with your email address, as provided by GDPR Art. 15.",
+      "emailLabel": "Your email address",
+      "emailPlaceholder": "Enter the email used for registration",
+      "emailInvalid": "Please enter a valid email address",
+      "submit": "Request my data",
+      "loading": "Searching...",
+      "noData": "No data found for this email address.",
+      "error": "An error occurred. Please try again later.",
+      "rateLimited": "Too many requests. Please try again in one hour.",
+      "results": "Your data",
+      "resultsDescription": "Found data related to {count} events.",
+      "registrationData": "Registration data",
+      "fieldName": "Name",
+      "fieldEmail": "Email",
+      "fieldOrganization": "Organization",
+      "fieldRegisteredAt": "Registration date",
+      "fieldConsent": "Consent",
+      "questionsTitle": "Q&A Questions",
+      "pollVotesTitle": "Poll votes",
+      "optionLabel": "Option"
     }
   },
   "footer": {

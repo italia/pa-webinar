@@ -12,6 +12,7 @@ async function main() {
   console.log('Seeding database...');
 
   // Clean existing data
+  await prisma.gdprAuditLog.deleteMany();
   await prisma.reminderSent.deleteMany();
   await prisma.eventReminder.deleteMany();
   await prisma.pollVote.deleteMany();

@@ -91,10 +91,15 @@ export const jitsiConfigOverwrite = {
   defaultLogoUrl: '',
   'watermark.enabled': false,
 
-  // Branding
+  // Branding — dynamicBrandingUrl works in production when Jitsi is served
+  // from the same domain via Ingress (same-origin). In local dev the fetch
+  // may fail silently due to cross-origin, which is fine.
   brandingDataUrl: null,
-  dynamicBrandingUrl: null,
-} as const;
+  dynamicBrandingUrl:
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/jitsi-branding.json`
+      : '/jitsi-branding.json',
+};
 
 /**
  * Interface config overrides passed as `interfaceConfigOverwrite`.
