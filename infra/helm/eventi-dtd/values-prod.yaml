@@ -1,11 +1,12 @@
 # ─────────────────────────────────────────────────────────────
-# eventi-dtd — Production overrides
+# eventi-dtd — Generic production overrides
+#
+# For a specific cluster config, use values-production.yaml or
+# create your own override file based on examples/values-full.yaml.
 #
 # Usage:
-#   helm install eventi-dtd ./infra/helm/eventi-dtd \
-#     -f infra/helm/eventi-dtd/values.yaml \
-#     -f infra/helm/eventi-dtd/values-prod.yaml \
-#     --set app.existingSecret=eventi-dtd-secrets
+#   helm install videocall ./infra/helm/eventi-dtd \
+#     -f values.yaml -f values-prod.yaml -n videocall
 # ─────────────────────────────────────────────────────────────
 
 app:
@@ -18,9 +19,6 @@ app:
       cpu: "2"
       memory: 1Gi
 
-  nodeSelector:
-    workload: general
-
 autoscaling:
   enabled: true
   minReplicas: 2
@@ -30,12 +28,11 @@ podDisruptionBudget:
   enabled: true
   minAvailable: 1
 
-# Use Azure Database for PostgreSQL — no subchart
+# Use external database — no subchart
 postgresql:
   enabled: false
   external:
-    host: "eventi-db.postgres.database.azure.com"
-    existingSecret: "eventi-dtd-secrets"
+    existingSecret: "videocall-secrets"
     secretKey: "DATABASE_URL"
 
 jitsi:
@@ -44,5 +41,3 @@ jitsi:
 jitsi-meet:
   jvb:
     replicaCount: 0
-    nodeSelector:
-      workload: jitsi-jvb

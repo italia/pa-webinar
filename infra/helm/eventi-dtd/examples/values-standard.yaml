@@ -1,0 +1,86 @@
+# ============================================================================
+# Modalità standard — DB esterno, risorse dedicate, recording
+# ============================================================================
+#
+# Deploy:
+#   kubectl create namespace videocall
+#   kubectl create secret generic videocall-secrets -n videocall --from-literal=...
+#   helm upgrade --install videocall ./infra/helm/eventi-dtd \
+#     -f examples/values-standard.yaml -n videocall
+#
+# Cosa include:
+#   - 2 repliche dell'app con HPA (2-4)
+#   - Database esterno (Azure DB, RDS, Cloud SQL, ecc.)
+#   - Jitsi con 1 JVB + Jibri per recording
+#   - PodDisruptionBudget
+#   - Nessun requisito di node pool dedicati
+#
+# Ideale per: PA di medie dimensioni, fino a 200 partecipanti per evento
+# ============================================================================
+
+app:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 70
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Secrets — pre-created by the user
+secrets:
+  mode: "existing"
+  existingSecretName: "videocall-secrets"
+
+# External database
+postgresql:
+  enabled: false
+  external:
+    existingSecret: "videocall-secrets"
+    secretKey: "DATABASE_URL"
+
+# Jitsi — standard mode
+jitsi:
+  enabled: true
+  mode: standard
+
+jitsi-meet:
+  jvb:
+    replicaCount: 1
+    nodeSelector: {}
+    tolerations: []
+  jibri:
+    enabled: true
+    replicaCount: 1
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: videocall.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: videocall-tls
+      hosts:
+        - videocall.example.com
+
+metrics:
+  serviceMonitor:
+    enabled: false
