@@ -1,0 +1,490 @@
+import { describe, it, expect } from 'vitest';
+import {
+  createEventSchema,
+  updateEventSchema,
+  createRegistrationSchema,
+  createQuestionSchema,
+  updateQuestionStatusSchema,
+  jitsiTokenRequestSchema,
+  createMaterialSchema,
+  createReminderSchema,
+  createPollSchema,
+  updatePollStatusSchema,
+  pollVoteSchema,
+  VALID_OFFSETS,
+} from './schemas';
+
+// ── Helpers ─────────────────────────────────────────────────
+
+const futureDate = (hoursFromNow: number) =>
+  new Date(Date.now() + hoursFromNow * 3600_000).toISOString();
+
+const validEvent = () => ({
+  titleIt: 'PA Digitale 2026',
+  descriptionIt: 'Un evento sulla digitalizzazione della PA italiana.',
+  startsAt: futureDate(24),
+  endsAt: futureDate(26),
+});
+
+// ── createEventSchema ───────────────────────────────────────
+
+describe('createEventSchema', () => {
+  it('accepts valid minimal input', () => {
+    const result = createEventSchema.safeParse(validEvent());
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts valid full input', () => {
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      titleEn: 'PA Digital 2026',
+      descriptionEn: 'An event about Italian PA digitalization.',
+      timezone: 'Europe/Rome',
+      maxParticipants: 100,
+      qaEnabled: false,
+      chatEnabled: true,
+      recordingEnabled: true,
+      moderatorName: 'Mario Rossi',
+      moderatorEmail: 'mario@example.com',
+      speakersIt: 'Mario Rossi, Luigi Verdi',
+      organizerName: 'DTD',
+      privacyPolicyUrl: 'https://example.com/privacy',
+      privacyPolicyText: 'Testo privacy',
+      imageUrl: 'https://example.com/img.png',
+      dataRetentionDays: 60,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects missing titleIt', () => {
+    const { titleIt: _, ...rest } = validEvent();
+    const result = createEventSchema.safeParse(rest);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects missing descriptionIt', () => {
+    const { descriptionIt: _, ...rest } = validEvent();
+    const result = createEventSchema.safeParse(rest);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects titleIt shorter than 3 chars', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), titleIt: 'AB' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects descriptionIt shorter than 10 chars', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), descriptionIt: 'Short' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects end before start', () => {
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      startsAt: futureDate(26),
+      endsAt: futureDate(24),
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((i) => i.path.includes('endsAt'))).toBe(true);
+    }
+  });
+
+  it('rejects equal start and end', () => {
+    const same = futureDate(24);
+    const result = createEventSchema.safeParse({
+      ...validEvent(),
+      startsAt: same,
+      endsAt: same,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects maxParticipants of 0', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), maxParticipants: 0 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects maxParticipants of 1', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), maxParticipants: 1 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects maxParticipants over 500', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), maxParticipants: 501 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects negative maxParticipants', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), maxParticipants: -5 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects invalid datetime format for startsAt', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), startsAt: 'not-a-date' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects invalid privacyPolicyUrl', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), privacyPolicyUrl: 'not-a-url' });
+    expect(result.success).toBe(false);
+  });
+
+  it('defaults maxParticipants to 300', () => {
+    const result = createEventSchema.safeParse(validEvent());
+    if (result.success) {
+      expect(result.data.maxParticipants).toBe(300);
+    }
+  });
+
+  it('defaults qaEnabled to true', () => {
+    const result = createEventSchema.safeParse(validEvent());
+    if (result.success) {
+      expect(result.data.qaEnabled).toBe(true);
+    }
+  });
+
+  it('defaults dataRetentionDays to 30', () => {
+    const result = createEventSchema.safeParse(validEvent());
+    if (result.success) {
+      expect(result.data.dataRetentionDays).toBe(30);
+    }
+  });
+
+  it('rejects dataRetentionDays over 365', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), dataRetentionDays: 366 });
+    expect(result.success).toBe(false);
+  });
+});
+
+// ── updateEventSchema ───────────────────────────────────────
+
+describe('updateEventSchema', () => {
+  it('accepts empty partial update', () => {
+    const result = updateEventSchema.safeParse({});
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts partial update with just title', () => {
+    const result = updateEventSchema.safeParse({ titleIt: 'Nuovo Titolo' });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts valid status values', () => {
+    for (const status of ['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED', 'ARCHIVED']) {
+      const result = updateEventSchema.safeParse({ status });
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it('rejects invalid status', () => {
+    const result = updateEventSchema.safeParse({ status: 'INVALID' });
+    expect(result.success).toBe(false);
+  });
+
+  it('validates date ordering when both dates present', () => {
+    const result = updateEventSchema.safeParse({
+      startsAt: futureDate(26),
+      endsAt: futureDate(24),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('allows single date without ordering check', () => {
+    const result = updateEventSchema.safeParse({ startsAt: futureDate(24) });
+    expect(result.success).toBe(true);
+  });
+});
+
+// ── createRegistrationSchema ────────────────────────────────
+
+describe('createRegistrationSchema', () => {
+  const validReg = () => ({
+    displayName: 'Mario Rossi',
+    email: 'mario@example.com',
+    consentGiven: true as const,
+  });
+
+  it('accepts valid input', () => {
+    const result = createRegistrationSchema.safeParse(validReg());
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts with optional fields', () => {
+    const result = createRegistrationSchema.safeParse({
+      ...validReg(),
+      organization: 'AGID',
+      organizationRole: 'Developer',
+      organizationType: 'AGENCY',
+      consentRecording: true,
+      consentFutureCommunications: true,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects missing displayName', () => {
+    const { displayName: _, ...rest } = validReg();
+    const result = createRegistrationSchema.safeParse(rest);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects short displayName', () => {
+    const result = createRegistrationSchema.safeParse({ ...validReg(), displayName: 'A' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects invalid email', () => {
+    const result = createRegistrationSchema.safeParse({ ...validReg(), email: 'not-email' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects consentGiven = false', () => {
+    const result = createRegistrationSchema.safeParse({ ...validReg(), consentGiven: false });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects invalid organizationType', () => {
+    const result = createRegistrationSchema.safeParse({ ...validReg(), organizationType: 'INVALID' });
+    expect(result.success).toBe(false);
+  });
+
+  it('defaults consentFutureCommunications to false', () => {
+    const result = createRegistrationSchema.safeParse(validReg());
+    if (result.success) {
+      expect(result.data.consentFutureCommunications).toBe(false);
+    }
+  });
+});
+
+// ── createQuestionSchema ────────────────────────────────────
+
+describe('createQuestionSchema', () => {
+  it('accepts valid text', () => {
+    const result = createQuestionSchema.safeParse({ text: 'Come funziona il PNRR?' });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects empty text', () => {
+    const result = createQuestionSchema.safeParse({ text: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects text under 3 chars', () => {
+    const result = createQuestionSchema.safeParse({ text: 'Hi' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects text over 500 chars', () => {
+    const result = createQuestionSchema.safeParse({ text: 'A'.repeat(501) });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts text at exactly 500 chars', () => {
+    const result = createQuestionSchema.safeParse({ text: 'A'.repeat(500) });
+    expect(result.success).toBe(true);
+  });
+});
+
+// ── updateQuestionStatusSchema ──────────────────────────────
+
+describe('updateQuestionStatusSchema', () => {
+  it.each(['PENDING', 'HIGHLIGHTED', 'ANSWERED', 'DISMISSED'])(
+    'accepts status "%s"',
+    (status) => {
+      const result = updateQuestionStatusSchema.safeParse({ status });
+      expect(result.success).toBe(true);
+    },
+  );
+
+  it('rejects invalid status', () => {
+    const result = updateQuestionStatusSchema.safeParse({ status: 'OPEN' });
+    expect(result.success).toBe(false);
+  });
+});
+
+// ── jitsiTokenRequestSchema ─────────────────────────────────
+
+describe('jitsiTokenRequestSchema', () => {
+  it('accepts with accessToken only', () => {
+    const result = jitsiTokenRequestSchema.safeParse({ accessToken: 'abc123' });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts with moderatorToken only', () => {
+    const result = jitsiTokenRequestSchema.safeParse({
+      moderatorToken: '123e4567-e89b-12d3-a456-426614174000',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts with guestName only', () => {
+    const result = jitsiTokenRequestSchema.safeParse({ guestName: 'Ospite Pubblico' });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects with no token at all', () => {
+    const result = jitsiTokenRequestSchema.safeParse({});
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects with both accessToken and moderatorToken', () => {
+    const result = jitsiTokenRequestSchema.safeParse({
+      accessToken: 'abc123',
+      moderatorToken: '123e4567-e89b-12d3-a456-426614174000',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects moderatorToken that is not UUID', () => {
+    const result = jitsiTokenRequestSchema.safeParse({ moderatorToken: 'not-a-uuid' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects guestName shorter than 2 chars', () => {
+    const result = jitsiTokenRequestSchema.safeParse({ guestName: 'A' });
+    expect(result.success).toBe(false);
+  });
+});
+
+// ── createPollSchema ────────────────────────────────────────
+
+describe('createPollSchema', () => {
+  it('accepts valid poll', () => {
+    const result = createPollSchema.safeParse({
+      question: 'Qual è la piattaforma preferita?',
+      options: ['SPID', 'CIE', 'Entrambe'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects empty question', () => {
+    const result = createPollSchema.safeParse({ question: '', options: ['A', 'B'] });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects too few options (1)', () => {
+    const result = createPollSchema.safeParse({ question: 'Test poll?', options: ['A'] });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects too many options (7)', () => {
+    const result = createPollSchema.safeParse({
+      question: 'Test poll?',
+      options: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts 6 options (max)', () => {
+    const result = createPollSchema.safeParse({
+      question: 'Test poll?',
+      options: ['A', 'B', 'C', 'D', 'E', 'F'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects empty option string', () => {
+    const result = createPollSchema.safeParse({ question: 'Test poll?', options: ['A', ''] });
+    expect(result.success).toBe(false);
+  });
+});
+
+// ── updatePollStatusSchema ──────────────────────────────────
+
+describe('updatePollStatusSchema', () => {
+  it.each(['OPEN', 'CLOSED', 'PUBLISHED'])('accepts status "%s"', (status) => {
+    const result = updatePollStatusSchema.safeParse({ status });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects invalid status', () => {
+    const result = updatePollStatusSchema.safeParse({ status: 'DRAFT' });
+    expect(result.success).toBe(false);
+  });
+});
+
+// ── pollVoteSchema ──────────────────────────────────────────
+
+describe('pollVoteSchema', () => {
+  it('accepts with accessToken', () => {
+    const result = pollVoteSchema.safeParse({ optionIndex: 0, accessToken: 'abc' });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts with guestId', () => {
+    const result = pollVoteSchema.safeParse({ optionIndex: 1, guestId: 'guest-123' });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects without accessToken or guestId', () => {
+    const result = pollVoteSchema.safeParse({ optionIndex: 0 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects negative optionIndex', () => {
+    const result = pollVoteSchema.safeParse({ optionIndex: -1, accessToken: 'abc' });
+    expect(result.success).toBe(false);
+  });
+});
+
+// ── createMaterialSchema ────────────────────────────────────
+
+describe('createMaterialSchema', () => {
+  it('accepts valid input', () => {
+    const result = createMaterialSchema.safeParse({
+      title: 'Slide Presentation',
+      url: 'https://example.com/slides.pdf',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts with description', () => {
+    const result = createMaterialSchema.safeParse({
+      title: 'Slide',
+      url: 'https://example.com/slides.pdf',
+      description: 'Le slide della presentazione',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects missing title', () => {
+    const result = createMaterialSchema.safeParse({ url: 'https://example.com/slides.pdf' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects invalid URL', () => {
+    const result = createMaterialSchema.safeParse({ title: 'Slide', url: 'not-a-url' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects empty title', () => {
+    const result = createMaterialSchema.safeParse({ title: '', url: 'https://example.com' });
+    expect(result.success).toBe(false);
+  });
+});
+
+// ── createReminderSchema ────────────────────────────────────
+
+describe('createReminderSchema', () => {
+  it('accepts valid preset offset (60 = 1 hour)', () => {
+    const result = createReminderSchema.safeParse({ offsetMinutes: 60 });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts all valid offsets', () => {
+    for (const offset of VALID_OFFSETS) {
+      const result = createReminderSchema.safeParse({ offsetMinutes: offset });
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it('rejects invalid offset', () => {
+    const result = createReminderSchema.safeParse({ offsetMinutes: 42 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects non-integer offset', () => {
+    const result = createReminderSchema.safeParse({ offsetMinutes: 60.5 });
+    expect(result.success).toBe(false);
+  });
+});
