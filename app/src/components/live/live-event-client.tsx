@@ -19,6 +19,7 @@ import RecordingConsent, {
 import ModeratorControls from '@/components/jitsi/moderator-controls';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
+import MaterialPanel from '@/components/materials/material-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
 import GuestJoinForm from '@/components/live/guest-join-form';
 import AudioPlayer from '@/components/live/audio-player';
@@ -470,31 +471,27 @@ interface LiveSidebarProps {
 
 function LiveSidebar({ eventSlug, token, isModerator, qaEnabled }: LiveSidebarProps) {
   const t = useTranslations('live');
-  const [activeTab, setActiveTab] = useState<'qa' | 'polls'>(qaEnabled ? 'qa' : 'polls');
+  const [activeTab, setActiveTab] = useState<'qa' | 'polls' | 'materials'>(qaEnabled ? 'qa' : 'polls');
+
+  const tabClass = (tab: string) =>
+    `btn btn-sm flex-fill rounded-0 border-0 py-2 ${
+      activeTab === tab ? 'fw-semibold text-primary border-bottom border-primary border-2' : 'text-muted'
+    }`;
 
   return (
     <div className="d-flex flex-column" style={{ width: '100%', maxWidth: '360px' }}>
       {/* Tab buttons */}
       <div className="d-flex border-bottom" style={{ background: '#f8f9fa' }}>
         {qaEnabled && (
-          <button
-            type="button"
-            className={`btn btn-sm flex-fill rounded-0 border-0 py-2 ${
-              activeTab === 'qa' ? 'fw-semibold text-primary border-bottom border-primary border-2' : 'text-muted'
-            }`}
-            onClick={() => setActiveTab('qa')}
-          >
+          <button type="button" className={tabClass('qa')} onClick={() => setActiveTab('qa')}>
             {t('sidebarTabQa')}
           </button>
         )}
-        <button
-          type="button"
-          className={`btn btn-sm flex-fill rounded-0 border-0 py-2 ${
-            activeTab === 'polls' ? 'fw-semibold text-primary border-bottom border-primary border-2' : 'text-muted'
-          }`}
-          onClick={() => setActiveTab('polls')}
-        >
+        <button type="button" className={tabClass('polls')} onClick={() => setActiveTab('polls')}>
           {t('sidebarTabPolls')}
+        </button>
+        <button type="button" className={tabClass('materials')} onClick={() => setActiveTab('materials')}>
+          {t('sidebarTabMaterials')}
         </button>
       </div>
 
@@ -505,6 +502,9 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled }: LiveSidebarPr
         )}
         {activeTab === 'polls' && (
           <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+        )}
+        {activeTab === 'materials' && (
+          <MaterialPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
         )}
       </div>
     </div>

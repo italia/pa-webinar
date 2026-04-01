@@ -99,6 +99,23 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       event.maxParticipants - event._count.registrations,
   };
 
+  // Fetch materials for ended events
+  let eventMaterials: { id: string; title: string; url: string; description: string | null; addedBy: string; createdAt: string }[] = [];
+  if (event.status === 'ENDED') {
+    const materials = await prisma.eventMaterial.findMany({
+      where: { eventId: event.id },
+      orderBy: { createdAt: 'desc' },
+    });
+    eventMaterials = materials.map((m) => ({
+      id: m.id,
+      title: m.title,
+      url: m.url,
+      description: m.description,
+      addedBy: m.addedBy,
+      createdAt: m.createdAt.toISOString(),
+    }));
+  }
+
   // Fetch answered/highlighted Q&A for ended events
   let answeredQuestions: { id: string; text: string; authorName: string; upvotes: number; status: string }[] = [];
   if (event.status === 'ENDED' && event.qaEnabled) {
@@ -151,6 +168,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         event={serialised}
         locale={locale}
         answeredQuestions={answeredQuestions}
+        materials={eventMaterials}
       />
     </>
   );

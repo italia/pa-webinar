@@ -47,10 +47,20 @@ interface EventData {
   imageUrl: string | null;
 }
 
+interface MaterialData {
+  id: string;
+  title: string;
+  url: string;
+  description: string | null;
+  addedBy: string;
+  createdAt: string;
+}
+
 interface EventDetailClientProps {
   event: EventData;
   locale: string;
   answeredQuestions?: AnsweredQuestion[];
+  materials?: MaterialData[];
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -63,8 +73,10 @@ export default function EventDetailClient({
   event,
   locale,
   answeredQuestions = [],
+  materials = [],
 }: EventDetailClientProps) {
   const t = useTranslations('events');
+  const tm = useTranslations('materials');
   const format = useFormatter();
 
   const title =
@@ -268,6 +280,40 @@ export default function EventDetailClient({
                 {t('detail.qaPostEvent')}
               </h2>
               <PostEventQA questions={answeredQuestions} />
+            </div>
+          )}
+
+          {isEnded && materials.length > 0 && (
+            <div className="mt-4">
+              <h2 className="h4 fw-semibold mb-3" style={{ color: '#17324D' }}>
+                <Icon icon="it-files" className="me-2" />
+                {tm('postEventTitle')}
+              </h2>
+              <div className="d-flex flex-column gap-2">
+                {materials.map((m) => (
+                  <Card key={m.id} className="shadow-sm border-0" style={{ borderRadius: '0.5rem' }}>
+                    <CardBody className="p-3">
+                      <a
+                        href={m.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="fw-semibold text-primary text-decoration-none d-inline-flex align-items-center gap-1"
+                      >
+                        <Icon icon="it-external-link" size="sm" />
+                        {m.title}
+                      </a>
+                      {m.description && (
+                        <p className="text-muted mb-1 mt-1" style={{ fontSize: '0.9rem' }}>
+                          {m.description}
+                        </p>
+                      )}
+                      <div className="text-muted" style={{ fontSize: '0.8rem' }}>
+                        {tm('addedBy', { name: m.addedBy })}
+                      </div>
+                    </CardBody>
+                  </Card>
+                ))}
+              </div>
             </div>
           )}
         </Col>

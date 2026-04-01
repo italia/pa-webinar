@@ -22,6 +22,7 @@ interface EmailTemplateInput {
   eventDuration: string;
   joinUrl: string;
   eventPageUrl: string;
+  offsetMinutes?: number;
   calendarLinks?: {
     google: string;
     outlook: string;
@@ -32,16 +33,16 @@ interface EmailTemplateInput {
 
 interface LocaleCopy {
   confirmationSubject: (title: string) => string;
-  reminderSubject: (title: string) => string;
+  reminderSubject: (title: string, offsetMinutes: number) => string;
   confirmationHeading: string;
   reminderHeading: string;
+  reminderNote: (offsetMinutes: number) => string;
   eventLabel: string;
   dateLabel: string;
   timeLabel: string;
   durationLabel: string;
   joinLabel: string;
   keepNote: string;
-  reminderNote: string;
   viewEvent: string;
   addToCalendar: string;
   downloadIcs: string;
@@ -52,9 +53,26 @@ interface LocaleCopy {
 const copy: Record<Locale, LocaleCopy> = {
   it: {
     confirmationSubject: (title) => `Conferma registrazione: ${title}`,
-    reminderSubject: (title) => `Promemoria: ${title} inizia tra 1 ora`,
+    reminderSubject: (title, offsetMinutes) => {
+      if (offsetMinutes >= 1440) return `Promemoria: ${title} inizia domani`;
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Promemoria: ${title} inizia tra ${hours} or${hours === 1 ? 'a' : 'e'}`;
+      }
+      return `Promemoria: ${title} inizia tra ${offsetMinutes} minuti`;
+    },
     confirmationHeading: 'Registrazione confermata',
     reminderHeading: 'Promemoria evento',
+    reminderNote: (offsetMinutes) => {
+      if (offsetMinutes >= 1440) {
+        return 'L\u2019evento a cui sei registrato inizia domani. Usa il link qui sotto per accedere.';
+      }
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `L\u2019evento a cui sei registrato inizia tra ${hours} or${hours === 1 ? 'a' : 'e'}. Usa il link qui sotto per accedere.`;
+      }
+      return `L\u2019evento a cui sei registrato inizia tra ${offsetMinutes} minuti. Usa il link qui sotto per accedere.`;
+    },
     eventLabel: 'Evento',
     dateLabel: 'Data',
     timeLabel: 'Ora',
@@ -62,8 +80,6 @@ const copy: Record<Locale, LocaleCopy> = {
     joinLabel: 'Accedi all\u2019evento',
     keepNote:
       'Conserva questa email, contiene il tuo link personale per accedere all\u2019evento.',
-    reminderNote:
-      'L\u2019evento a cui sei registrato inizia tra meno di un\u2019ora. Usa il link qui sotto per accedere.',
     viewEvent: 'Visualizza la pagina dell\u2019evento',
     addToCalendar: 'Aggiungi al tuo calendario:',
     downloadIcs: 'Scarica .ics',
@@ -74,9 +90,26 @@ const copy: Record<Locale, LocaleCopy> = {
   },
   en: {
     confirmationSubject: (title) => `Registration confirmed: ${title}`,
-    reminderSubject: (title) => `Reminder: ${title} starts in 1 hour`,
+    reminderSubject: (title, offsetMinutes) => {
+      if (offsetMinutes >= 1440) return `Reminder: ${title} starts tomorrow`;
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Reminder: ${title} starts in ${hours} hour${hours === 1 ? '' : 's'}`;
+      }
+      return `Reminder: ${title} starts in ${offsetMinutes} minutes`;
+    },
     confirmationHeading: 'Registration confirmed',
     reminderHeading: 'Event reminder',
+    reminderNote: (offsetMinutes) => {
+      if (offsetMinutes >= 1440) {
+        return 'The event you registered for starts tomorrow. Use the link below to join.';
+      }
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `The event you registered for starts in ${hours} hour${hours === 1 ? '' : 's'}. Use the link below to join.`;
+      }
+      return `The event you registered for starts in ${offsetMinutes} minutes. Use the link below to join.`;
+    },
     eventLabel: 'Event',
     dateLabel: 'Date',
     timeLabel: 'Time',
@@ -84,8 +117,6 @@ const copy: Record<Locale, LocaleCopy> = {
     joinLabel: 'Join the event',
     keepNote:
       'Keep this email \u2014 it contains your personal link to access the event.',
-    reminderNote:
-      'The event you registered for starts in less than one hour. Use the link below to join.',
     viewEvent: 'View event page',
     addToCalendar: 'Add to your calendar:',
     downloadIcs: 'Download .ics',
@@ -188,8 +219,8 @@ export function confirmationSubject(
   return copy[locale].confirmationSubject(eventTitle);
 }
 
-export function reminderSubject(locale: Locale, eventTitle: string): string {
-  return copy[locale].reminderSubject(eventTitle);
+export function reminderSubject(locale: Locale, eventTitle: string, offsetMinutes = 60): string {
+  return copy[locale].reminderSubject(eventTitle, offsetMinutes);
 }
 
 export function confirmationHtml(input: EmailTemplateInput): string {
@@ -242,11 +273,12 @@ export function confirmationText(input: EmailTemplateInput): string {
 
 export function reminderHtml(input: EmailTemplateInput): string {
   const c = copy[input.locale];
+  const offset = input.offsetMinutes ?? 60;
   const calendarHtml = input.calendarLinks
     ? calendarLinksSection(c, input.calendarLinks)
     : '';
   const body = `
-<p style="margin:0 0 16px;">${c.reminderNote}</p>
+<p style="margin:0 0 16px;">${c.reminderNote(offset)}</p>
 ${detailsTable(c, input)}
 ${ctaButton(c.joinLabel, input.joinUrl)}
 ${calendarHtml}
@@ -257,6 +289,7 @@ ${calendarHtml}
 
 export function reminderText(input: EmailTemplateInput): string {
   const c = copy[input.locale];
+  const offset = input.offsetMinutes ?? 60;
   const calendarBlock = input.calendarLinks
     ? [
         '',
@@ -270,7 +303,7 @@ export function reminderText(input: EmailTemplateInput): string {
   return [
     c.reminderHeading,
     '',
-    c.reminderNote,
+    c.reminderNote(offset),
     '',
     `${c.eventLabel}: ${input.eventTitle}`,
     `${c.dateLabel}: ${input.eventDate}`,
