@@ -113,10 +113,30 @@
     "successMessage": "You will receive a confirmation email with the link to access the event.",
     "alreadyRegistered": "You are already registered for this event",
     "backToEvent": "Back to event",
+    "organization": "Organization",
+    "organizationPlaceholder": "e.g. AGID, Ministry of Economy, City of Rome",
+    "organizationRole": "Role in organization",
+    "organizationRolePlaceholder": "e.g. Digital Transformation Manager, Developer",
+    "organizationType": "Organization type",
+    "organizationTypePlaceholder": "Select type...",
+    "organizationTypes": {
+      "MINISTRY": "Ministry",
+      "AGENCY": "Agency",
+      "REGION": "Region",
+      "PROVINCE": "Province",
+      "MUNICIPALITY": "Municipality",
+      "ASL": "ASL (Local Health Authority)",
+      "UNIVERSITY": "University",
+      "PUBLIC_ENTITY": "Public entity",
+      "IN_HOUSE": "In-house company",
+      "OTHER": "Other"
+    },
+    "gdprConsentProfiling": "Organization data will be processed for statistical purposes.",
     "errors": {
       "nameRequired": "Please enter your name",
       "emailRequired": "Please enter your email",
       "emailInvalid": "Please enter a valid email",
+      "organizationRequired": "Please enter your organization",
       "consentRequired": "Consent to data processing is required",
       "eventFull": "The event has reached the maximum number of participants",
       "generic": "Registration error. Please try again."
@@ -155,6 +175,8 @@
     "moderatorBadge": "Moderator",
     "qaSidebarPlaceholder": "The Q&A panel will be available when the event starts.",
     "invalidToken": "Invalid link. Please check the link you received by email.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Polls",
     "moderator": {
       "muteAll": "Mute all",
       "unmuteAll": "Unmute all",
@@ -236,6 +258,8 @@
     "registrationCount": "{count} registrations",
     "noRegistrations": "No participants registered yet. Share the event link!",
     "exportCsv": "Export CSV",
+    "organization": "Organization",
+    "organizationType": "Type",
     "registrationDate": "Registration date",
     "joined": "Joined",
     "notJoined": "Not joined",
@@ -291,6 +315,13 @@
       "sectionSettings": "Settings",
       "sectionSpeakers": "Speakers and organizer",
       "sectionModerator": "Moderator",
+      "sectionRegistrationFields": "Registration fields",
+      "requireOrganization": "Require organization",
+      "requireOrganizationDesc": "Participants must indicate their organization",
+      "requireOrganizationRole": "Require role in organization",
+      "requireOrganizationRoleDesc": "Participants can indicate their role",
+      "requireOrganizationType": "Require organization type",
+      "requireOrganizationTypeDesc": "Participants select their organization type",
       "sectionPermissions": "Participant permissions",
       "participantsCanUnmute": "Participants can unmute",
       "participantsCanStartVideo": "Participants can start video",
@@ -368,6 +399,35 @@
         "title": "Interact",
         "desc": "Ask questions, vote, join the discussion"
       }
+    }
+  },
+  "polls": {
+    "title": "Polls",
+    "showPanel": "Show polls",
+    "hidePanel": "Hide polls",
+    "createPoll": "Create poll",
+    "noPolls": "No polls yet. The moderator will create them during the event.",
+    "questionPlaceholder": "Write the poll question...",
+    "optionPlaceholder": "Option {number}",
+    "addOption": "Add option",
+    "removeOption": "Remove option",
+    "create": "Create",
+    "creating": "Creating...",
+    "cancelCreate": "Cancel",
+    "closePoll": "Close voting",
+    "publishResults": "Publish results",
+    "reopenPoll": "Reopen",
+    "totalVotes": "{count} votes",
+    "voted": "You voted",
+    "status": {
+      "OPEN": "Open",
+      "CLOSED": "Closed",
+      "PUBLISHED": "Results"
+    },
+    "errors": {
+      "questionRequired": "Write the poll question",
+      "minOptions": "At least 2 options are required",
+      "generic": "Error creating the poll"
     }
   },
   "footer": {

@@ -113,10 +113,30 @@
     "successMessage": "Riceverai un'email di conferma con il link per accedere all'evento.",
     "alreadyRegistered": "Sei già registrato a questo evento",
     "backToEvent": "Torna all'evento",
+    "organization": "Ente di appartenenza",
+    "organizationPlaceholder": "es. AGID, Ministero dell'Economia, Comune di Roma",
+    "organizationRole": "Ruolo nell'ente",
+    "organizationRolePlaceholder": "es. Responsabile Transizione Digitale, Sviluppatore",
+    "organizationType": "Tipologia ente",
+    "organizationTypePlaceholder": "Seleziona tipologia...",
+    "organizationTypes": {
+      "MINISTRY": "Ministero",
+      "AGENCY": "Agenzia",
+      "REGION": "Regione",
+      "PROVINCE": "Provincia",
+      "MUNICIPALITY": "Comune",
+      "ASL": "ASL",
+      "UNIVERSITY": "Università",
+      "PUBLIC_ENTITY": "Ente pubblico non economico",
+      "IN_HOUSE": "Società in-house",
+      "OTHER": "Altro"
+    },
+    "gdprConsentProfiling": "I dati relativi all'ente di appartenenza saranno trattati ai fini statistici.",
     "errors": {
       "nameRequired": "Inserisci il tuo nome",
       "emailRequired": "Inserisci la tua email",
       "emailInvalid": "Inserisci un'email valida",
+      "organizationRequired": "Inserisci il tuo ente di appartenenza",
       "consentRequired": "Il consenso al trattamento dati è obbligatorio",
       "eventFull": "L'evento ha raggiunto il numero massimo di partecipanti",
       "generic": "Errore durante la registrazione. Riprova."
@@ -155,6 +175,8 @@
     "moderatorBadge": "Moderatore",
     "qaSidebarPlaceholder": "Il pannello Q&A sarà disponibile quando l'evento inizia.",
     "invalidToken": "Link non valido. Verifica il link ricevuto via email.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Sondaggi",
     "moderator": {
       "muteAll": "Silenzia tutti",
       "unmuteAll": "Riattiva audio",
@@ -212,6 +234,35 @@
       "generic": "Errore nell'invio della domanda"
     }
   },
+  "polls": {
+    "title": "Sondaggi",
+    "showPanel": "Mostra sondaggi",
+    "hidePanel": "Nascondi sondaggi",
+    "createPoll": "Crea sondaggio",
+    "noPolls": "Nessun sondaggio. Il moderatore ne creerà durante l'evento.",
+    "questionPlaceholder": "Scrivi la domanda del sondaggio...",
+    "optionPlaceholder": "Opzione {number}",
+    "addOption": "Aggiungi opzione",
+    "removeOption": "Rimuovi opzione",
+    "create": "Crea",
+    "creating": "Creazione...",
+    "cancelCreate": "Annulla",
+    "closePoll": "Chiudi voto",
+    "publishResults": "Pubblica risultati",
+    "reopenPoll": "Riapri",
+    "totalVotes": "{count} voti",
+    "voted": "Hai votato",
+    "status": {
+      "OPEN": "Aperto",
+      "CLOSED": "Chiuso",
+      "PUBLISHED": "Risultati"
+    },
+    "errors": {
+      "questionRequired": "Scrivi la domanda del sondaggio",
+      "minOptions": "Servono almeno 2 opzioni",
+      "generic": "Errore nella creazione del sondaggio"
+    }
+  },
   "admin": {
     "login": {
       "title": "Accesso amministratore",
@@ -236,6 +287,8 @@
     "registrationCount": "{count} registrazioni",
     "noRegistrations": "Nessun partecipante registrato. Condividi il link dell'evento!",
     "exportCsv": "Esporta CSV",
+    "organization": "Ente",
+    "organizationType": "Tipologia",
     "registrationDate": "Data registrazione",
     "joined": "Entrato",
     "notJoined": "Non entrato",
@@ -291,6 +344,13 @@
       "sectionSettings": "Impostazioni",
       "sectionSpeakers": "Relatori e organizzatore",
       "sectionModerator": "Moderatore",
+      "sectionRegistrationFields": "Campi registrazione",
+      "requireOrganization": "Richiedi ente di appartenenza",
+      "requireOrganizationDesc": "I partecipanti devono indicare il proprio ente",
+      "requireOrganizationRole": "Richiedi ruolo nell'ente",
+      "requireOrganizationRoleDesc": "I partecipanti possono indicare il loro ruolo",
+      "requireOrganizationType": "Richiedi tipologia ente",
+      "requireOrganizationTypeDesc": "I partecipanti selezionano la tipologia del proprio ente",
       "sectionPermissions": "Permessi partecipanti",
       "participantsCanUnmute": "I partecipanti possono attivare il microfono",
       "participantsCanStartVideo": "I partecipanti possono attivare la webcam",

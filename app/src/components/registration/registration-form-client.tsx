@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, type FormEvent } from 'react';
+import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Button,
@@ -12,53 +12,106 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
-import { createRegistrationSchema } from '@/lib/validation/schemas';
+import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
+
+interface ProfilingConfig {
+  requireOrganization: boolean;
+  requireOrganizationRole: boolean;
+  requireOrganizationType: boolean;
+}
 
 interface RegistrationFormClientProps {
   eventSlug: string;
   privacyPolicyUrl: string;
+  profiling?: ProfilingConfig;
 }
 
-type FieldErrors = Partial<Record<'displayName' | 'email' | 'consentGiven', string>>;
+type FieldErrors = Partial<Record<string, string>>;
 
 export default function RegistrationFormClient({
   eventSlug,
   privacyPolicyUrl,
+  profiling,
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
   const tc = useTranslations('common');
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [organizationRole, setOrganizationRole] = useState('');
+  const [organizationType, setOrganizationType] = useState('');
   const [consentGiven, setConsentGiven] = useState(false);
+
+  const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [errors, setErrors] = useState<FieldErrors>({});
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const showOrg = profiling?.requireOrganization ?? false;
+  const showRole = profiling?.requireOrganizationRole ?? false;
+  const showType = profiling?.requireOrganizationType ?? false;
+
+  // Autocomplete organization name
+  useEffect(() => {
+    if (!showOrg || organization.length < 2) {
+      setOrgSuggestions([]);
+      return;
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/organizations/suggestions?q=${encodeURIComponent(organization)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setOrgSuggestions(data.suggestions ?? []);
+        }
+      } catch { /* ignore */ }
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [organization, showOrg]);
+
   const validate = useCallback(() => {
-    const result = createRegistrationSchema.safeParse({
+    const payload: Record<string, unknown> = {
       displayName,
       email,
       consentGiven,
-    });
+    };
+    if (showOrg) payload.organization = organization || undefined;
+    if (showRole) payload.organizationRole = organizationRole || undefined;
+    if (showType && organizationType) payload.organizationType = organizationType;
+
+    const result = createRegistrationSchema.safeParse(payload);
 
     if (result.success) {
+      // Extra validation: if profiling fields are required by event, ensure they're filled
+      const fieldErrors: FieldErrors = {};
+      if (showOrg && !organization.trim()) {
+        fieldErrors.organization = 'registration.errors.organizationRequired';
+      }
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
+        return false;
+      }
       setErrors({});
       return true;
     }
 
     const fieldErrors: FieldErrors = {};
     for (const issue of result.error.issues) {
-      const field = issue.path[0] as keyof FieldErrors;
+      const field = String(issue.path[0]);
       if (!fieldErrors[field]) {
         fieldErrors[field] = issue.message;
       }
     }
     setErrors(fieldErrors);
     return false;
-  }, [displayName, email, consentGiven]);
+  }, [displayName, email, consentGiven, organization, organizationRole, organizationType, showOrg, showRole, showType]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -69,10 +122,15 @@ export default function RegistrationFormClient({
 
       setSubmitting(true);
       try {
+        const body: Record<string, unknown> = { displayName, email, consentGiven };
+        if (showOrg && organization) body.organization = organization;
+        if (showRole && organizationRole) body.organizationRole = organizationRole;
+        if (showType && organizationType) body.organizationType = organizationType;
+
         const res = await fetch(`/api/events/${eventSlug}/registrations`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ displayName, email, consentGiven }),
+          body: JSON.stringify(body),
         });
 
         if (res.status === 409) {
@@ -99,7 +157,7 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, eventSlug, validate, t],
+    [displayName, email, consentGiven, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType],
   );
 
   if (success) {
@@ -155,6 +213,68 @@ export default function RegistrationFormClient({
         />
       </FormGroup>
 
+      {showOrg && (
+        <FormGroup className="mb-4">
+          <Label htmlFor="organization">{t('organization')}</Label>
+          <input
+            type="text"
+            id="organization"
+            className={`form-control${errors.organization ? ' is-invalid' : ''}`}
+            placeholder={t('organizationPlaceholder')}
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
+            list="org-suggestions"
+            autoComplete="organization"
+          />
+          {orgSuggestions.length > 0 && (
+            <datalist id="org-suggestions">
+              {orgSuggestions.map((s) => (
+                <option key={s} value={s} />
+              ))}
+            </datalist>
+          )}
+          {errors.organization && (
+            <div className="invalid-feedback d-block">
+              {t('errors.organizationRequired')}
+            </div>
+          )}
+        </FormGroup>
+      )}
+
+      {showRole && (
+        <FormGroup className="mb-4">
+          <Input
+            type="text"
+            id="organizationRole"
+            label={t('organizationRole')}
+            placeholder={t('organizationRolePlaceholder')}
+            value={organizationRole}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setOrganizationRole(e.target.value)
+            }
+          />
+        </FormGroup>
+      )}
+
+      {showType && (
+        <FormGroup className="mb-4">
+          <Label htmlFor="organizationType">{t('organizationType')}</Label>
+          <select
+            id="organizationType"
+            className="form-select"
+            value={organizationType}
+            onChange={(e) => setOrganizationType(e.target.value)}
+          >
+            <option value="">{t('organizationTypePlaceholder')}</option>
+            {ORGANIZATION_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {t(`organizationTypes.${type}`)}
+              </option>
+            ))}
+          </select>
+        </FormGroup>
+      )}
+
       <FormGroup check className="mb-4">
         <Input
           type="checkbox"
@@ -166,6 +286,7 @@ export default function RegistrationFormClient({
         />
         <Label for="consentGiven" check>
           {t('gdprConsent')}{' '}
+          {(showOrg || showRole || showType) && t('gdprConsentProfiling')}{' '}
           <a
             href={privacyPolicyUrl}
             target="_blank"

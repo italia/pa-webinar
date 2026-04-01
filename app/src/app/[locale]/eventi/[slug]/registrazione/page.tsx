@@ -48,6 +48,11 @@ export default async function RegistrationPage({
             <RegistrationFormClient
               eventSlug={slug}
               privacyPolicyUrl={privacyUrl}
+              profiling={{
+                requireOrganization: event.requireOrganization,
+                requireOrganizationRole: event.requireOrganizationRole,
+                requireOrganizationType: event.requireOrganizationType,
+              }}
             />
           )}
         </div>

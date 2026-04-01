@@ -45,7 +45,7 @@ export async function GET(request: Request) {
       dataRetentionDays: true,
       status: true,
       recordingUrl: true,
-      _count: { select: { registrations: true, questions: true } },
+      _count: { select: { registrations: true, questions: true, polls: true } },
     },
   });
 
@@ -58,6 +58,7 @@ export async function GET(request: Request) {
 
   let totalRegistrationsDeleted = 0;
   let totalQuestionsDeleted = 0;
+  let totalPollsDeleted = 0;
   let eventsProcessed = 0;
 
   for (const evt of toClean) {
@@ -68,6 +69,14 @@ export async function GET(request: Request) {
         });
 
         const questionsDeleted = await tx.question.deleteMany({
+          where: { eventId: evt.id },
+        });
+
+        const pollVotesDeleted = await tx.pollVote.deleteMany({
+          where: { poll: { eventId: evt.id } },
+        });
+
+        const pollsDeleted = await tx.poll.deleteMany({
           where: { eventId: evt.id },
         });
 
@@ -85,6 +94,8 @@ export async function GET(request: Request) {
         return {
           upvotes: upvotesDeleted.count,
           questions: questionsDeleted.count,
+          pollVotes: pollVotesDeleted.count,
+          polls: pollsDeleted.count,
           registrations: registrationsDeleted.count,
         };
       });
@@ -100,11 +111,12 @@ export async function GET(request: Request) {
 
       console.error(
         `[cron/cleanup] Cleaned event ${evt.id} (${evt.slug}): ` +
-          `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes deleted`,
+          `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes, ${result.polls} polls, ${result.pollVotes} poll votes deleted`,
       );
 
       totalRegistrationsDeleted += result.registrations;
       totalQuestionsDeleted += result.questions;
+      totalPollsDeleted += result.polls;
       eventsProcessed++;
     } catch (err) {
       console.error(
@@ -119,5 +131,6 @@ export async function GET(request: Request) {
     eventsProcessed,
     registrationsDeleted: totalRegistrationsDeleted,
     questionsDeleted: totalQuestionsDeleted,
+    pollsDeleted: totalPollsDeleted,
   });
 }

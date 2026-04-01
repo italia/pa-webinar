@@ -22,9 +22,25 @@ import StatusBadge from './status-badge';
 import CopyButton from './copy-button';
 import DeleteEventModal from './delete-event-modal';
 
+const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
+  MINISTRY: { it: 'Ministero', en: 'Ministry' },
+  AGENCY: { it: 'Agenzia', en: 'Agency' },
+  REGION: { it: 'Regione', en: 'Region' },
+  PROVINCE: { it: 'Provincia', en: 'Province' },
+  MUNICIPALITY: { it: 'Comune', en: 'Municipality' },
+  ASL: { it: 'ASL', en: 'ASL' },
+  UNIVERSITY: { it: 'Università', en: 'University' },
+  PUBLIC_ENTITY: { it: 'Ente pubblico', en: 'Public entity' },
+  IN_HOUSE: { it: 'Società in-house', en: 'In-house company' },
+  OTHER: { it: 'Altro', en: 'Other' },
+};
+
 interface Registration {
   id: string;
   displayName: string;
+  organization: string | null;
+  organizationRole: string | null;
+  organizationType: string | null;
   joinedAt: string | null;
   createdAt: string;
 }
@@ -49,6 +65,9 @@ interface EventData {
   participantsCanShareScreen: boolean;
   status: string;
   recordingUrl: string | null;
+  requireOrganization: boolean;
+  requireOrganizationRole: boolean;
+  requireOrganizationType: boolean;
   moderatorToken: string;
   moderatorName: string | null;
   moderatorEmail: string | null;
@@ -218,6 +237,28 @@ export default function EventManagementClient({
   const handleDeleted = useCallback(() => {
     router.push('/admin');
   }, [router]);
+
+  const exportCsv = useCallback(() => {
+    const headers = ['Nome', 'Ente', 'Ruolo', 'Tipologia ente', 'Data registrazione', 'Entrato'];
+    const rows = event.registrations.map((reg) => [
+      reg.displayName,
+      reg.organization ?? '',
+      reg.organizationRole ?? '',
+      reg.organizationType ? (ORG_TYPE_LABELS[reg.organizationType]?.[locale as 'it' | 'en'] ?? reg.organizationType) : '',
+      new Date(reg.createdAt).toISOString(),
+      reg.joinedAt ? 'Si' : 'No',
+    ]);
+    const csv = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `registrazioni-${event.slug}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [event.registrations, event.slug, locale]);
 
   const occupancyPct = Math.min(
     100,
@@ -479,12 +520,36 @@ export default function EventManagementClient({
                     color="primary"
                     outline
                     size="sm"
-                    onClick={() => { /* TODO: CSV export */ }}
+                    onClick={exportCsv}
                   >
                     {t('exportCsv')}
                   </Button>
                 )}
               </div>
+
+              {/* Organization type stats */}
+              {event.registrations.some((r) => r.organizationType) && (
+                <div className="mb-3 d-flex flex-wrap gap-2">
+                  {Object.entries(
+                    event.registrations.reduce<Record<string, number>>((acc, r) => {
+                      if (r.organizationType) {
+                        acc[r.organizationType] = (acc[r.organizationType] || 0) + 1;
+                      }
+                      return acc;
+                    }, {}),
+                  )
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([type, count]) => {
+                      const pct = Math.round((count / event.registrations.length) * 100);
+                      const label = ORG_TYPE_LABELS[type]?.[locale as 'it' | 'en'] ?? type;
+                      return (
+                        <Badge key={type} color="" pill className="px-2 py-1" style={{ backgroundColor: '#E9ECEF', color: '#17324D', fontSize: '0.78rem' }}>
+                          {label}: {pct}% ({count})
+                        </Badge>
+                      );
+                    })}
+                </div>
+              )}
 
               {event.registrations.length === 0 ? (
                 <div className="text-center py-4">
@@ -507,6 +572,8 @@ export default function EventManagementClient({
                       <tr>
                         <th scope="col" style={{ width: 40 }}>#</th>
                         <th scope="col">{te('detail.participants')}</th>
+                        {event.requireOrganization && <th scope="col">{t('organization')}</th>}
+                        {event.requireOrganizationType && <th scope="col">{t('organizationType')}</th>}
                         <th scope="col">{t('registrationDate')}</th>
                         <th scope="col">{t('joined')}</th>
                       </tr>
@@ -516,6 +583,16 @@ export default function EventManagementClient({
                         <tr key={reg.id}>
                           <td className="text-muted">{i + 1}</td>
                           <td className="fw-semibold">{reg.displayName}</td>
+                          {event.requireOrganization && (
+                            <td className="text-secondary">{reg.organization ?? '—'}</td>
+                          )}
+                          {event.requireOrganizationType && (
+                            <td className="text-secondary">
+                              {reg.organizationType
+                                ? (ORG_TYPE_LABELS[reg.organizationType]?.[locale as 'it' | 'en'] ?? reg.organizationType)
+                                : '—'}
+                            </td>
+                          )}
                           <td className="text-secondary">
                             {format.dateTime(new Date(reg.createdAt), {
                               day: 'numeric',

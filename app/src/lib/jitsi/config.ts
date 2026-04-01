@@ -23,6 +23,7 @@ export const baseToolbarButtons = [
   'settings',
   'raisehand',
   'chat',
+  'reactions',
 ];
 
 export const moderatorToolbarButtons = [
@@ -72,7 +73,7 @@ export const jitsiConfigOverwrite = {
   toolbarButtons: baseToolbarButtons as string[],
 
   notifications: [] as string[],
-  disableReactions: true,
+  disableReactions: false,
 
   breakoutRooms: {
     hideAddRoomButton: true,

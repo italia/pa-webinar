@@ -65,7 +65,7 @@ export async function POST(request: Request, context: RouteContext) {
     );
   }
 
-  const { displayName, email, consentGiven } = parsed.data;
+  const { displayName, email, consentGiven, organization, organizationRole, organizationType } = parsed.data;
 
   const emailHash = hashEmail(email);
   const encryptedEmail = encryptPII(email);
@@ -96,6 +96,9 @@ export async function POST(request: Request, context: RouteContext) {
           displayName,
           email: encryptedEmail,
           emailHash,
+          organization: organization || null,
+          organizationRole: organizationRole || null,
+          organizationType: organizationType || null,
           consentGiven,
           consentTimestamp: new Date(),
           accessToken,
