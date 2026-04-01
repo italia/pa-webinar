@@ -177,6 +177,7 @@
     "invalidToken": "Link non valido. Verifica il link ricevuto via email.",
     "sidebarTabQa": "Q&A",
     "sidebarTabPolls": "Sondaggi",
+    "sidebarTabMaterials": "Materiali",
     "moderator": {
       "muteAll": "Silenzia tutti",
       "unmuteAll": "Riattiva audio",
@@ -261,6 +262,47 @@
       "questionRequired": "Scrivi la domanda del sondaggio",
       "minOptions": "Servono almeno 2 opzioni",
       "generic": "Errore nella creazione del sondaggio"
+    }
+  },
+  "materials": {
+    "title": "Materiali",
+    "postEventTitle": "Materiali dell'evento",
+    "addMaterial": "Aggiungi materiale",
+    "titleLabel": "Titolo",
+    "urlLabel": "URL del link",
+    "descriptionLabel": "Descrizione (facoltativa)",
+    "addedBy": "Aggiunto da {name}",
+    "noMaterials": "Nessun materiale condiviso.",
+    "confirmDelete": "Sei sicuro di voler eliminare questo materiale?",
+    "materialAdded": "Materiale aggiunto",
+    "materialDeleted": "Materiale eliminato",
+    "deleteMaterial": "Elimina materiale",
+    "add": "Aggiungi",
+    "adding": "Aggiunta...",
+    "cancel": "Annulla",
+    "errors": {
+      "urlInvalid": "Inserisci un URL valido",
+      "generic": "Errore nell'aggiunta del materiale"
+    }
+  },
+  "reminders": {
+    "title": "Notifiche",
+    "addReminder": "Aggiungi notifica",
+    "removeReminder": "Rimuovi",
+    "maxReminders": "Massimo 5 notifiche per evento.",
+    "selectPreset": "Seleziona quando...",
+    "sentStatus": "{count} inviate",
+    "notSent": "Non inviata",
+    "presets": {
+      "7days": "7 giorni prima",
+      "3days": "3 giorni prima",
+      "1day": "1 giorno prima",
+      "12hours": "12 ore prima",
+      "6hours": "6 ore prima",
+      "3hours": "3 ore prima",
+      "1hour": "1 ora prima",
+      "30min": "30 minuti prima",
+      "15min": "15 minuti prima"
     }
   },
   "admin": {

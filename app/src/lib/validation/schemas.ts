@@ -138,3 +138,36 @@ export const pollVoteSchema = z.object({
 
 export type CreatePollInput = z.infer<typeof createPollSchema>;
 export type PollVoteInput = z.infer<typeof pollVoteSchema>;
+
+// ── Material Schemas ───────────────────────────────────
+
+export const createMaterialSchema = z.object({
+  title: z.string().min(1).max(300),
+  url: z.string().url(),
+  description: z.string().max(500).optional(),
+});
+
+export type CreateMaterialInput = z.infer<typeof createMaterialSchema>;
+
+// ── Reminder Schemas ───────────────────────────────────
+
+export const REMINDER_PRESETS = [
+  { offsetMinutes: 10080, labelIt: '7 giorni prima', labelEn: '7 days before' },
+  { offsetMinutes: 4320, labelIt: '3 giorni prima', labelEn: '3 days before' },
+  { offsetMinutes: 1440, labelIt: '1 giorno prima', labelEn: '1 day before' },
+  { offsetMinutes: 720, labelIt: '12 ore prima', labelEn: '12 hours before' },
+  { offsetMinutes: 360, labelIt: '6 ore prima', labelEn: '6 hours before' },
+  { offsetMinutes: 180, labelIt: '3 ore prima', labelEn: '3 hours before' },
+  { offsetMinutes: 60, labelIt: '1 ora prima', labelEn: '1 hour before' },
+  { offsetMinutes: 30, labelIt: '30 minuti prima', labelEn: '30 minutes before' },
+  { offsetMinutes: 15, labelIt: '15 minuti prima', labelEn: '15 minutes before' },
+] as const;
+
+export const VALID_OFFSETS: number[] = REMINDER_PRESETS.map((p) => p.offsetMinutes);
+
+export const createReminderSchema = z.object({
+  offsetMinutes: z.number().int().refine(
+    (v) => VALID_OFFSETS.includes(v),
+    { message: 'Invalid offset' },
+  ),
+});

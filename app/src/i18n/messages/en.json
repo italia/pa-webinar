@@ -177,6 +177,7 @@
     "invalidToken": "Invalid link. Please check the link you received by email.",
     "sidebarTabQa": "Q&A",
     "sidebarTabPolls": "Polls",
+    "sidebarTabMaterials": "Materials",
     "moderator": {
       "muteAll": "Mute all",
       "unmuteAll": "Unmute all",
@@ -428,6 +429,47 @@
       "questionRequired": "Write the poll question",
       "minOptions": "At least 2 options are required",
       "generic": "Error creating the poll"
+    }
+  },
+  "materials": {
+    "title": "Materials",
+    "postEventTitle": "Event materials",
+    "addMaterial": "Add material",
+    "titleLabel": "Title",
+    "urlLabel": "Link URL",
+    "descriptionLabel": "Description (optional)",
+    "addedBy": "Added by {name}",
+    "noMaterials": "No materials shared.",
+    "confirmDelete": "Are you sure you want to delete this material?",
+    "materialAdded": "Material added",
+    "materialDeleted": "Material deleted",
+    "deleteMaterial": "Delete material",
+    "add": "Add",
+    "adding": "Adding...",
+    "cancel": "Cancel",
+    "errors": {
+      "urlInvalid": "Please enter a valid URL",
+      "generic": "Error adding material"
+    }
+  },
+  "reminders": {
+    "title": "Notifications",
+    "addReminder": "Add reminder",
+    "removeReminder": "Remove",
+    "maxReminders": "Maximum 5 reminders per event.",
+    "selectPreset": "Select when...",
+    "sentStatus": "{count} sent",
+    "notSent": "Not sent",
+    "presets": {
+      "7days": "7 days before",
+      "3days": "3 days before",
+      "1day": "1 day before",
+      "12hours": "12 hours before",
+      "6hours": "6 hours before",
+      "3hours": "3 hours before",
+      "1hour": "1 hour before",
+      "30min": "30 minutes before",
+      "15min": "15 minutes before"
     }
   },
   "footer": {

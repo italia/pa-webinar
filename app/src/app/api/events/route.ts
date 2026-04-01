@@ -99,6 +99,13 @@ export async function POST(request: NextRequest) {
       organizerName: data.organizerName,
       imageUrl: data.imageUrl,
       waitingRoomAudioUrl: data.waitingRoomAudioUrl,
+      // Default reminders: 1 day and 1 hour before
+      reminders: {
+        create: [
+          { offsetMinutes: 1440, label: '1 giorno prima' },
+          { offsetMinutes: 60, label: '1 ora prima' },
+        ],
+      },
     },
   });
 

@@ -17,6 +17,7 @@ import {
 
 import { useRouter } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
+import { REMINDER_PRESETS } from '@/lib/validation/schemas';
 
 import StatusBadge from './status-badge';
 import CopyButton from './copy-button';
@@ -34,6 +35,23 @@ const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   IN_HOUSE: { it: 'Società in-house', en: 'In-house company' },
   OTHER: { it: 'Altro', en: 'Other' },
 };
+
+interface ReminderData {
+  id: string;
+  offsetMinutes: number;
+  label: string;
+  sentCount: number;
+  createdAt: string;
+}
+
+interface MaterialData {
+  id: string;
+  title: string;
+  url: string;
+  description: string | null;
+  addedBy: string;
+  createdAt: string;
+}
 
 interface Registration {
   id: string;
@@ -76,6 +94,8 @@ interface EventData {
   privacyPolicyUrl: string | null;
   createdAt: string;
   registrations: Registration[];
+  materials: MaterialData[];
+  reminders: ReminderData[];
 }
 
 interface EventManagementClientProps {
@@ -259,6 +279,118 @@ export default function EventManagementClient({
     a.click();
     URL.revokeObjectURL(url);
   }, [event.registrations, event.slug, locale]);
+
+  // ── Materials management ──
+  const tm = useTranslations('materials');
+  const [materials, setMaterials] = useState<MaterialData[]>(event.materials);
+  const [showMaterialForm, setShowMaterialForm] = useState(false);
+  const [matTitle, setMatTitle] = useState('');
+  const [matUrl, setMatUrl] = useState('');
+  const [matDesc, setMatDesc] = useState('');
+  const [matSubmitting, setMatSubmitting] = useState(false);
+  const [matError, setMatError] = useState('');
+
+  const handleAddMaterial = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setMatError('');
+
+      if (matTitle.trim().length < 1) return;
+      try { new URL(matUrl.trim()); } catch {
+        setMatError(tm('errors.urlInvalid'));
+        return;
+      }
+
+      setMatSubmitting(true);
+      try {
+        const res = await fetch(`/api/events/${event.slug}/materials`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${event.moderatorToken}`,
+          },
+          body: JSON.stringify({
+            title: matTitle.trim(),
+            url: matUrl.trim(),
+            description: matDesc.trim() || undefined,
+          }),
+        });
+        if (res.ok) {
+          const newMat: MaterialData = await res.json();
+          setMaterials((prev) => [newMat, ...prev]);
+          setMatTitle('');
+          setMatUrl('');
+          setMatDesc('');
+          setShowMaterialForm(false);
+        } else {
+          setMatError(tm('errors.generic'));
+        }
+      } catch {
+        setMatError(tm('errors.generic'));
+      } finally {
+        setMatSubmitting(false);
+      }
+    },
+    [matTitle, matUrl, matDesc, event.slug, event.moderatorToken, tm],
+  );
+
+  const handleDeleteMaterial = useCallback(
+    async (id: string) => {
+      if (!confirm(tm('confirmDelete'))) return;
+      try {
+        const res = await fetch(`/api/events/${event.slug}/materials/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${event.moderatorToken}` },
+        });
+        if (res.ok) {
+          setMaterials((prev) => prev.filter((m) => m.id !== id));
+        }
+      } catch { /* retry next time */ }
+    },
+    [event.slug, event.moderatorToken, tm],
+  );
+
+  // ── Reminders management ──
+  const tr = useTranslations('reminders');
+  const [reminders, setReminders] = useState<ReminderData[]>(event.reminders);
+  const [selectedOffset, setSelectedOffset] = useState('');
+
+  const availablePresets = REMINDER_PRESETS.filter(
+    (p) => !reminders.some((r) => r.offsetMinutes === p.offsetMinutes),
+  );
+
+  const handleAddReminder = useCallback(async () => {
+    const offset = Number(selectedOffset);
+    if (!offset) return;
+
+    try {
+      const res = await fetch(`/api/events/${event.slug}/reminders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${event.moderatorToken}`,
+        },
+        body: JSON.stringify({ offsetMinutes: offset }),
+      });
+      if (res.ok) {
+        const newReminder: ReminderData = await res.json();
+        setReminders((prev) => [...prev, newReminder].sort((a, b) => b.offsetMinutes - a.offsetMinutes));
+        setSelectedOffset('');
+      }
+    } catch { /* retry */ }
+  }, [selectedOffset, event.slug, event.moderatorToken]);
+
+  const handleDeleteReminder = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(`/api/events/${event.slug}/reminders/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${event.moderatorToken}` },
+      });
+      if (res.ok) {
+        setReminders((prev) => prev.filter((r) => r.id !== id));
+      }
+    } catch { /* retry */ }
+  }, [event.slug, event.moderatorToken]);
 
   const occupancyPct = Math.min(
     100,
@@ -464,6 +596,82 @@ export default function EventManagementClient({
             </CardBody>
           </Card>
 
+          {/* ── Reminders Card ── */}
+          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+            <CardBody className="p-4">
+              <SectionTitle>{tr('title')}</SectionTitle>
+
+              {reminders.length > 0 && (
+                <div className="d-flex flex-column gap-2 mb-3">
+                  {reminders.map((r) => (
+                    <div
+                      key={r.id}
+                      className="d-flex justify-content-between align-items-center border rounded px-3 py-2"
+                    >
+                      <div>
+                        <span className="fw-semibold" style={{ fontSize: '0.9rem' }}>
+                          {r.label}
+                        </span>
+                        {r.sentCount > 0 && (
+                          <Badge color="success" pill className="ms-2" style={{ fontSize: '0.72rem' }}>
+                            {tr('sentStatus', { count: r.sentCount })}
+                          </Badge>
+                        )}
+                        {r.sentCount === 0 && (
+                          <Badge color="" pill className="ms-2" style={{ fontSize: '0.72rem', backgroundColor: '#E9ECEF', color: '#5A768A' }}>
+                            {tr('notSent')}
+                          </Badge>
+                        )}
+                      </div>
+                      <Button
+                        color="danger"
+                        outline
+                        size="xs"
+                        className="flex-shrink-0"
+                        onClick={() => handleDeleteReminder(r.id)}
+                      >
+                        <Icon icon="it-close" size="xs" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {reminders.length < 5 && availablePresets.length > 0 && (
+                <div className="d-flex gap-2 align-items-end">
+                  <select
+                    className="form-select form-select-sm"
+                    value={selectedOffset}
+                    onChange={(e) => setSelectedOffset(e.target.value)}
+                    style={{ maxWidth: 240 }}
+                  >
+                    <option value="">{tr('selectPreset')}</option>
+                    {availablePresets.map((p) => (
+                      <option key={p.offsetMinutes} value={p.offsetMinutes}>
+                        {locale === 'en' ? p.labelEn : p.labelIt}
+                      </option>
+                    ))}
+                  </select>
+                  <Button
+                    color="primary"
+                    outline
+                    size="sm"
+                    onClick={handleAddReminder}
+                    disabled={!selectedOffset}
+                  >
+                    + {tr('addReminder')}
+                  </Button>
+                </div>
+              )}
+
+              {reminders.length >= 5 && (
+                <div className="text-muted" style={{ fontSize: '0.85rem' }}>
+                  {tr('maxReminders')}
+                </div>
+              )}
+            </CardBody>
+          </Card>
+
           {/* ── AV Permissions Card ── */}
           <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
             <CardBody className="p-4">
@@ -502,6 +710,121 @@ export default function EventManagementClient({
                   {t('form.permissionsNote')}
                 </small>
               </div>
+            </CardBody>
+          </Card>
+
+          {/* ── Materials Card ── */}
+          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+            <CardBody className="p-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div className="d-flex align-items-center gap-2">
+                  <SectionTitle>{tm('title')}</SectionTitle>
+                  <Badge color="primary" pill className="mb-3" style={{ fontSize: '0.78rem' }}>
+                    {materials.length}
+                  </Badge>
+                </div>
+                {!showMaterialForm && (
+                  <Button color="primary" outline size="sm" onClick={() => setShowMaterialForm(true)}>
+                    + {tm('addMaterial')}
+                  </Button>
+                )}
+              </div>
+
+              {showMaterialForm && (
+                <form onSubmit={handleAddMaterial} className="border rounded p-3 mb-3">
+                  <div className="mb-2">
+                    <input
+                      type="text"
+                      className="form-control form-control-sm"
+                      placeholder={tm('titleLabel')}
+                      value={matTitle}
+                      onChange={(e) => setMatTitle(e.target.value)}
+                      maxLength={300}
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <input
+                      type="url"
+                      className="form-control form-control-sm"
+                      placeholder={tm('urlLabel')}
+                      value={matUrl}
+                      onChange={(e) => setMatUrl(e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <input
+                      type="text"
+                      className="form-control form-control-sm"
+                      placeholder={tm('descriptionLabel')}
+                      value={matDesc}
+                      onChange={(e) => setMatDesc(e.target.value)}
+                      maxLength={500}
+                    />
+                  </div>
+                  {matError && <div className="text-danger small mb-2">{matError}</div>}
+                  <div className="d-flex gap-2">
+                    <Button color="primary" size="sm" type="submit" disabled={matSubmitting}>
+                      {matSubmitting ? tm('adding') : tm('add')}
+                    </Button>
+                    <Button
+                      color="secondary"
+                      outline
+                      size="sm"
+                      type="button"
+                      onClick={() => { setShowMaterialForm(false); setMatError(''); }}
+                    >
+                      {tm('cancel')}
+                    </Button>
+                  </div>
+                </form>
+              )}
+
+              {materials.length === 0 ? (
+                <div className="text-center py-3">
+                  <p className="text-muted mb-0">{tm('noMaterials')}</p>
+                </div>
+              ) : (
+                <div className="d-flex flex-column gap-2">
+                  {materials.map((m) => (
+                    <div key={m.id} className="d-flex justify-content-between align-items-start border rounded p-3">
+                      <div style={{ minWidth: 0 }}>
+                        <a
+                          href={m.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="fw-semibold text-primary text-decoration-none d-inline-flex align-items-center gap-1"
+                        >
+                          <Icon icon="it-external-link" size="sm" />
+                          {m.title}
+                        </a>
+                        {m.description && (
+                          <div className="text-muted" style={{ fontSize: '0.85rem' }}>
+                            {m.description}
+                          </div>
+                        )}
+                        <div className="text-muted" style={{ fontSize: '0.78rem' }}>
+                          {tm('addedBy', { name: m.addedBy })} ·{' '}
+                          {format.dateTime(new Date(m.createdAt), {
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </div>
+                      </div>
+                      <Button
+                        color="danger"
+                        outline
+                        size="xs"
+                        className="flex-shrink-0 ms-2"
+                        onClick={() => handleDeleteMaterial(m.id)}
+                      >
+                        <Icon icon="it-close" size="xs" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardBody>
           </Card>
 

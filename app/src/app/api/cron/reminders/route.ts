@@ -1,21 +1,21 @@
 import { NextResponse } from 'next/server';
 
-import { prisma } from '@/lib/db';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { decryptPII } from '@/lib/crypto/pii';
-import { generateEventICal } from '@/lib/ical/generate';
-import {
-  generateGoogleCalendarUrl,
-  generateOutlookCalendarUrl,
-  generateYahooCalendarUrl,
-  generateIcsDownloadUrl,
-} from '@/lib/ical/calendar-links';
+import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email/send';
 import {
   reminderSubject,
   reminderHtml,
   reminderText,
 } from '@/lib/email/templates';
+import {
+  generateGoogleCalendarUrl,
+  generateOutlookCalendarUrl,
+  generateYahooCalendarUrl,
+  generateIcsDownloadUrl,
+} from '@/lib/ical/calendar-links';
+import { generateEventICal } from '@/lib/ical/generate';
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
 
 export const dynamic = 'force-dynamic';
@@ -25,11 +25,13 @@ type Locale = 'it' | 'en';
 /**
  * GET /api/cron/reminders
  *
- * Finds events starting within 60 minutes that have registrations
- * without reminderSentAt, and sends reminder emails.
- * Protected by CRON_API_KEY.
+ * Configurable reminder system. For each EventReminder:
+ *   - Check if event.startsAt - offsetMinutes <= NOW()
+ *   - Find registrations that don't have a ReminderSent entry for this reminder
+ *   - Send reminder email, create ReminderSent record
  *
- * In production, called by a Kubernetes CronJob every 15 minutes.
+ * Protected by CRON_API_KEY.
+ * In production, called by a Kubernetes CronJob every 5 minutes.
  */
 export async function GET(request: Request) {
   const apiKey = process.env.CRON_API_KEY;
@@ -40,36 +42,53 @@ export async function GET(request: Request) {
   }
 
   const now = new Date();
-  const sixtyMinutesFromNow = new Date(now.getTime() + 60 * 60_000);
 
-  const events = await prisma.event.findMany({
+  // Find all reminders for PUBLISHED/LIVE events where the trigger time has passed
+  const reminders = await prisma.eventReminder.findMany({
     where: {
-      status: { in: ['PUBLISHED', 'LIVE'] },
-      startsAt: { gt: now, lte: sixtyMinutesFromNow },
+      event: {
+        status: { in: ['PUBLISHED', 'LIVE'] },
+      },
     },
     include: {
-      registrations: {
-        where: { reminderSentAt: null },
-      },
+      event: true,
     },
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-  let sent = 0;
-  let failed = 0;
+  // Filter: only reminders whose trigger time (startsAt - offsetMinutes) has passed
+  const dueReminders = reminders.filter((r) => {
+    const triggerAt = new Date(r.event.startsAt.getTime() - r.offsetMinutes * 60_000);
+    return triggerAt <= now && r.event.startsAt > now; // don't send for past events
+  });
 
-  for (const event of events) {
-    // NOTE: Registration does not store user locale preference.
-    // Default to Italian as primary locale per ADR-008.
-    // Future improvement: store locale at registration time.
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  let remindersProcessed = 0;
+  let emailsSent = 0;
+  let emailsFailed = 0;
+
+  for (const reminder of dueReminders) {
+    const event = reminder.event;
+
+    // Find registrations that haven't been sent this particular reminder
+    const registrations = await prisma.registration.findMany({
+      where: {
+        eventId: event.id,
+        remindersSent: {
+          none: { reminderId: reminder.id },
+        },
+      },
+    });
+
+    if (registrations.length === 0) continue;
+    remindersProcessed++;
+
     const locale: Locale = 'it';
     const title = event.titleIt;
     const description = event.descriptionIt;
 
-    for (const reg of event.registrations) {
+    for (const reg of registrations) {
       try {
         const recipientEmail = decryptPII(reg.email);
-
         const joinUrl = `${baseUrl}/${locale}/eventi/${event.slug}/live?token=${reg.accessToken}`;
         const eventPageUrl = `${baseUrl}/${locale}/eventi/${event.slug}`;
 
@@ -89,6 +108,7 @@ export async function GET(request: Request) {
           eventDuration: formatDuration(event.startsAt, event.endsAt),
           joinUrl,
           eventPageUrl,
+          offsetMinutes: reminder.offsetMinutes,
           calendarLinks: {
             google: generateGoogleCalendarUrl(calendarInput),
             outlook: generateOutlookCalendarUrl(calendarInput),
@@ -113,7 +133,7 @@ export async function GET(request: Request) {
 
         await sendEmail({
           to: recipientEmail,
-          subject: reminderSubject(locale, title),
+          subject: reminderSubject(locale, title, reminder.offsetMinutes),
           html: reminderHtml(templateInput),
           text: reminderText(templateInput),
           attachments: [
@@ -125,26 +145,28 @@ export async function GET(request: Request) {
           ],
         });
 
-        await prisma.registration.update({
-          where: { id: reg.id },
-          data: { reminderSentAt: new Date() },
+        await prisma.reminderSent.create({
+          data: {
+            reminderId: reminder.id,
+            registrationId: reg.id,
+          },
         });
 
-        sent++;
+        emailsSent++;
       } catch (err) {
         console.error(
-          `[cron/reminders] Failed to send reminder to registration ${reg.id}:`,
+          `[cron/reminders] Failed to send reminder ${reminder.id} to registration ${reg.id}:`,
           err,
         );
-        failed++;
+        emailsFailed++;
       }
     }
   }
 
   return NextResponse.json({
     ok: true,
-    eventsProcessed: events.length,
-    remindersSent: sent,
-    remindersFailed: failed,
+    remindersProcessed,
+    emailsSent,
+    emailsFailed,
   });
 }
