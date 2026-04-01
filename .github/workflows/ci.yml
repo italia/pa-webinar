@@ -81,6 +81,43 @@ jobs:
             exit 1
           }
 
+  migration-check:
+    name: Migration Integrity
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: eventi_dtd_test
+          POSTGRES_USER: eventi
+          POSTGRES_PASSWORD: test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Apply migrations
+        run: npx prisma migrate deploy --schema=app/prisma/schema.prisma
+        env:
+          DATABASE_URL: postgresql://eventi:test@localhost:5432/eventi_dtd_test
+      - name: Verify schema is in sync with migrations
+        run: |
+          npx prisma migrate diff \
+            --from-migrations app/prisma/migrations \
+            --to-schema-datamodel app/prisma/schema.prisma \
+            --shadow-database-url postgresql://eventi:test@localhost:5432/eventi_dtd_test \
+            --exit-code
+        env:
+          DATABASE_URL: postgresql://eventi:test@localhost:5432/eventi_dtd_test
+
   docker:
     name: Docker Build & Scan
     runs-on: ubuntu-latest

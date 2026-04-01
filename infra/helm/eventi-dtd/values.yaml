@@ -18,6 +18,17 @@ app:
     tag: ""
     pullPolicy: IfNotPresent
 
+  # ── Database migration image ──
+  # The production runner image does not include npm/prisma CLI.
+  # Migrations run in an initContainer using the builder-stage image,
+  # which includes npx and prisma. Build with:
+  #   docker build --target builder -t <repo>:<tag>-migrate .
+  migration:
+    image:
+      repository: ghcr.io/italia/eventi-dtd
+      tag: ""  # Defaults to Chart.appVersion + "-migrate" suffix
+      pullPolicy: IfNotPresent
+
   # Image pull secrets for private registries (e.g. Azure ACR)
   imagePullSecrets: []
   #   - name: acr-credentials

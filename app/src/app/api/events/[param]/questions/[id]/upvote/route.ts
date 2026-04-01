@@ -1,17 +1,18 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling } from '@/lib/api-handler';
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  RateLimitError,
+} from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ param: string; id: string }>;
-}
-
 // ── POST /api/events/[slug]/questions/[id]/upvote — toggle ──
 
-export async function POST(request: Request, context: RouteContext) {
+export const POST = withErrorHandling(async (request, context) => {
   const { param: slug, id: questionId } = await context.params;
 
   let accessToken: string | undefined;
@@ -28,34 +29,28 @@ export async function POST(request: Request, context: RouteContext) {
     accessToken ??
     new URL(request.url).searchParams.get('token');
 
-  if (!token) {
-    return NextResponse.json({ error: 'Access token required' }, { status: 401 });
-  }
+  if (!token) throw new UnauthorizedError('Access token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  }
+  if (!event) throw new NotFoundError('Event');
 
   const registration = await prisma.registration.findUnique({
     where: { accessToken: token },
     select: { id: true, eventId: true },
   });
   if (!registration || registration.eventId !== event.id) {
-    return NextResponse.json({ error: 'Invalid access token' }, { status: 403 });
+    throw new ForbiddenError('Invalid access token');
   }
 
   const rl = rateLimit(`upvote:${registration.id}`, { limit: 10, windowMs: 60_000 });
-  if (!rl.allowed) {
-    return NextResponse.json({ error: 'rate_limit' }, { status: 429 });
-  }
+  if (!rl.allowed) throw new RateLimitError();
 
   const question = await prisma.question.findUnique({
     where: { id: questionId },
     select: { id: true, eventId: true },
   });
   if (!question || question.eventId !== event.id) {
-    return NextResponse.json({ error: 'Question not found' }, { status: 404 });
+    throw new NotFoundError('Question');
   }
 
   const existing = await prisma.questionUpvote.findUnique({
@@ -76,7 +71,7 @@ export async function POST(request: Request, context: RouteContext) {
       }),
     ]);
 
-    return NextResponse.json({
+    return Response.json({
       upvoted: false,
       upvoteCount: Math.max(0, updated.upvoteCount),
     });
@@ -92,8 +87,8 @@ export async function POST(request: Request, context: RouteContext) {
     }),
   ]);
 
-  return NextResponse.json({
+  return Response.json({
     upvoted: true,
     upvoteCount: updated.upvoteCount,
   });
-}
+});

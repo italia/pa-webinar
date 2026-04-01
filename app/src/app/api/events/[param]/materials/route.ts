@@ -1,19 +1,19 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  ValidationError,
+} from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { createMaterialSchema } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ param: string }>;
-}
-
 // ── GET /api/events/[slug]/materials ─────────────────────
-// Public: no auth needed
 
-export async function GET(_request: Request, context: RouteContext) {
+export const GET = withErrorHandling(async (_request, context) => {
   const { param: slug } = await context.params;
 
   const event = await prisma.event.findUnique({
@@ -22,7 +22,7 @@ export async function GET(_request: Request, context: RouteContext) {
   });
 
   if (!event || !['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    throw new NotFoundError('Event');
   }
 
   const materials = await prisma.eventMaterial.findMany({
@@ -30,7 +30,7 @@ export async function GET(_request: Request, context: RouteContext) {
     orderBy: { createdAt: 'desc' },
   });
 
-  return NextResponse.json({
+  return Response.json({
     materials: materials.map((m) => ({
       id: m.id,
       type: m.type,
@@ -41,37 +41,25 @@ export async function GET(_request: Request, context: RouteContext) {
       createdAt: m.createdAt.toISOString(),
     })),
   });
-}
+});
 
 // ── POST /api/events/[slug]/materials ────────────────────
-// Moderator only
 
-export async function POST(request: Request, context: RouteContext) {
+export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const token = extractModeratorToken(request);
-  if (!token) {
-    return NextResponse.json({ error: 'Moderator token required' }, { status: 401 });
-  }
+  if (!token) throw new UnauthorizedError('Moderator token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event || !constantTimeEqual(event.moderatorToken, token)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    throw new ForbiddenError('Unauthorized');
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-  }
-
+  const body = await parseJsonBody(request);
   const parsed = createMaterialSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
-      { status: 422 },
-    );
+    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
   const material = await prisma.eventMaterial.create({
@@ -84,7 +72,7 @@ export async function POST(request: Request, context: RouteContext) {
     },
   });
 
-  return NextResponse.json(
+  return Response.json(
     {
       id: material.id,
       type: material.type,
@@ -96,4 +84,4 @@ export async function POST(request: Request, context: RouteContext) {
     },
     { status: 201 },
   );
-}
+});

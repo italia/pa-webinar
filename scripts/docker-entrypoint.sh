@@ -31,7 +31,15 @@ while [ "$i" -lt 30 ]; do
 done
 
 if [ "$i" -eq 30 ]; then
-  echo "WARNING: database not reachable after 60s, starting anyway"
+  echo "ERROR: database not reachable after 60s. Aborting startup."
+  exit 1
 fi
+
+# Note: Database migrations are NOT run here. The production runner image
+# does not include npm/npx (stripped for security and image size).
+# Migrations must be applied before starting the app:
+#   - Kubernetes: via the db-migrate initContainer (see Helm chart)
+#   - Docker Compose: via the db-migrate service (profile: setup)
+#   - Manual: npx prisma migrate deploy (from the builder image)
 
 exec "$@"

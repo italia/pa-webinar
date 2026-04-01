@@ -1,10 +1,10 @@
 import { randomUUID } from 'crypto';
 
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 import type { EventStatus } from '@prisma/client';
 import { cookies } from 'next/headers';
 
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import { UnauthorizedError, RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -18,13 +18,10 @@ const PUBLIC_STATUSES: EventStatus[] = ['PUBLISHED', 'LIVE', 'ENDED'];
 
 // ── POST /api/events — Create event ──────────────────────────
 
-export async function POST(request: NextRequest) {
-  // Require admin authentication to create events
+export const POST = withErrorHandling(async (request) => {
   const cookieStore = await cookies();
   const isAdmin = await isAdminAuthenticated(cookieStore);
-  if (!isAdmin) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!isAdmin) throw new UnauthorizedError();
 
   const ip = getClientIp(request);
   const rl = rateLimit(`create-event:${ip}`, {
@@ -33,36 +30,13 @@ export async function POST(request: NextRequest) {
   });
 
   if (!rl.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests. Try again later.' },
-      {
-        status: 429,
-        headers: {
-          'Retry-After': String(
-            Math.ceil((rl.resetAt - Date.now()) / 1000),
-          ),
-          'X-RateLimit-Remaining': '0',
-        },
-      },
-    );
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: 'Invalid JSON body' },
-      { status: 400 },
-    );
-  }
-
+  const body = await parseJsonBody(request);
   const parsed = createEventSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
-      { status: 422 },
-    );
+    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
   const data = parsed.data;
@@ -113,7 +87,7 @@ export async function POST(request: NextRequest) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
   const locale = resolveLocale(request);
 
-  return NextResponse.json(
+  return Response.json(
     {
       ...event,
       links: {
@@ -121,16 +95,13 @@ export async function POST(request: NextRequest) {
         moderatorLink: `${baseUrl}/${locale}/admin/eventi/${event.id}?token=${event.moderatorToken}`,
       },
     },
-    {
-      status: 201,
-      headers: { 'X-RateLimit-Remaining': String(rl.remaining) },
-    },
+    { status: 201 },
   );
-}
+});
 
 // ── GET /api/events — List events ────────────────────────────
 
-export async function GET(request: Request) {
+export const GET = withErrorHandling(async (request) => {
   const url = new URL(request.url);
   const statusFilter = url.searchParams.get('status');
   const moderatorToken = url.searchParams.get('moderatorToken');
@@ -167,7 +138,7 @@ export async function GET(request: Request) {
       };
     });
 
-    return NextResponse.json(result);
+    return Response.json(result);
   }
 
   // Public mode: only PUBLISHED, LIVE, ENDED
@@ -206,5 +177,5 @@ export async function GET(request: Request) {
     };
   });
 
-  return NextResponse.json(result);
-}
+  return Response.json(result);
+});

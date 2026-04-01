@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling } from '@/lib/api-handler';
+import { RateLimitError, AppError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { hashEmail, decryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -13,21 +13,18 @@ export const dynamic = 'force-dynamic';
  * Returns all data associated with an email address.
  * Rate limited: 3 requests per hour per IP.
  */
-export async function GET(request: Request) {
+export const GET = withErrorHandling(async (request) => {
   const ip = getClientIp(request);
   const rl = rateLimit(`gdpr-export:${ip}`, { limit: 3, windowMs: 3_600_000 });
   if (!rl.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests. Try again in one hour.' },
-      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
-    );
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
   const url = new URL(request.url);
   const email = url.searchParams.get('email')?.trim();
 
   if (!email || !email.includes('@')) {
-    return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
+    throw new AppError('Valid email required', 400, 'BAD_REQUEST');
   }
 
   const emailHash = hashEmail(email);
@@ -71,7 +68,7 @@ export async function GET(request: Request) {
   });
 
   if (registrations.length === 0) {
-    return NextResponse.json({ data: [] }, { status: 200 });
+    return Response.json({ data: [] });
   }
 
   // Write audit log for each event
@@ -129,5 +126,5 @@ export async function GET(request: Request) {
     };
   });
 
-  return NextResponse.json({ data: result }, { status: 200 });
-}
+  return Response.json({ data: result });
+});

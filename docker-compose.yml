@@ -3,7 +3,7 @@
 #
 # Usage:
 #   docker compose up --build -d          # Start everything
-#   docker compose --profile setup run db-migrate  # Seed DB
+#   docker compose --profile setup run --rm db-migrate  # Migrate + seed
 #   docker compose logs -f app            # Watch app logs
 #   docker compose down -v                # Stop + remove volumes
 # ─────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ services:
       target: builder
     working_dir: /workspace/app
     command: >
-      sh -c "npx prisma db push --skip-generate && npx tsx prisma/seed.ts"
+      sh -c "npx prisma migrate deploy && npx tsx prisma/seed.ts"
     environment:
       - DATABASE_URL=postgresql://eventi:eventi_local_dev@postgres:5432/eventi_dtd
     depends_on:

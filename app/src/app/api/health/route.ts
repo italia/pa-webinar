@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-
+import { withErrorHandling } from '@/lib/api-handler';
+import { AppError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -8,26 +8,16 @@ export const dynamic = 'force-dynamic';
  * Health check endpoint for Kubernetes liveness/readiness probes.
  * GET /api/health
  */
-export async function GET() {
+export const GET = withErrorHandling(async () => {
   try {
-    // Check database connectivity
     await prisma.$queryRaw`SELECT 1`;
-
-    return NextResponse.json(
-      {
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        version: process.env.npm_package_version ?? '0.1.0',
-      },
-      { status: 200 }
-    );
   } catch {
-    return NextResponse.json(
-      {
-        status: 'error',
-        timestamp: new Date().toISOString(),
-      },
-      { status: 503 }
-    );
+    throw new AppError('Database unreachable', 503, 'SERVICE_UNAVAILABLE');
   }
-}
+
+  return Response.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    version: process.env.npm_package_version ?? '0.1.0',
+  });
+});

@@ -67,6 +67,7 @@ eventi-dtd/
 │   │   │   └── config.ts
 │   │   └── types/                # Interfacce TypeScript
 │   ├── prisma/
+│   │   ├── migrations/           # File SQL di migrazione (versionati)
 │   │   └── schema.prisma         # Schema database
 │   ├── public/
 │   │   └── fonts/                # Font self-hosted (Titillium Web, Roboto Mono, Lora)
@@ -146,8 +147,8 @@ npm install
 # 3. Genera il client Prisma
 npm run db:generate --workspace=app
 
-# 4. Applica lo schema al database
-npm run db:push --workspace=app
+# 4. Applica le migrazioni al database
+npm run db:migrate:dev --workspace=app
 
 # 5. Seed dati di esempio
 npm run db:seed --workspace=app
@@ -160,17 +161,53 @@ Assicurati che le variabili d'ambiente per la connessione al database e a Jitsi 
 
 ## Database
 
-Il database è gestito tramite Prisma 6. Tutti i comandi vanno eseguiti specificando il workspace:
+Il database è gestito tramite Prisma 6 con **migrazioni formali**. Tutti i comandi vanno eseguiti specificando il workspace.
+
+### Workflow migrazioni
+
+```bash
+# Applica tutte le migrazioni pendenti (produzione e CI)
+npm run db:migrate --workspace=app
+
+# Crea una nuova migrazione durante lo sviluppo
+npm run db:migrate:dev --workspace=app
+
+# Crea il file SQL senza applicarlo (per revisione manuale)
+npm run db:migrate:create --workspace=app
+
+# Verifica lo stato delle migrazioni
+npm run db:migrate:status --workspace=app
+
+# Reset completo del database (ATTENZIONE: distruttivo!)
+npm run db:migrate:reset --workspace=app
+```
+
+### Workflow tipico per modifiche allo schema
+
+1. Modifica `app/prisma/schema.prisma`
+2. Genera la migrazione: `npm run db:migrate:dev --workspace=app`
+3. Rivedi il file SQL generato in `app/prisma/migrations/`
+4. Committa sia lo schema che la migrazione
+
+### Ambienti
+
+| Ambiente | Comando | Note |
+|---|---|---|
+| Sviluppo locale | `npm run db:migrate:dev` | Crea e applica migrazioni, genera il client |
+| Docker Compose | `docker compose --profile setup run --rm db-migrate` | Esegue `prisma migrate deploy` + seed |
+| Kubernetes | Automatico via initContainer `db-migrate` | Esegue `prisma migrate deploy` prima dell'avvio app |
+| CI | `prisma migrate deploy` + `prisma migrate diff --exit-code` | Verifica integrità migrazioni |
+
+> **Importante:** `db:push` bypassa le migrazioni ed è **distruttivo** su database con dati. Non usarlo su staging o produzione. Usare sempre `db:migrate` o `db:migrate:dev`.
+
+### Altri comandi
 
 ```bash
 # Genera il client Prisma (dopo modifiche a schema.prisma)
 npm run db:generate --workspace=app
 
-# Push dello schema sul database (sviluppo, senza migration file)
+# Push rapido dello schema (solo prototipazione, nessun file migration)
 npm run db:push --workspace=app
-
-# Crea una migration (per cambi da committare)
-npm run db:migrate --workspace=app
 
 # Apri Prisma Studio (interfaccia web per esplorare i dati)
 npm run db:studio --workspace=app
@@ -178,8 +215,6 @@ npm run db:studio --workspace=app
 # Seed dati di esempio
 npm run db:seed --workspace=app
 ```
-
-**Attenzione:** `db:push` è pensato per lo sviluppo locale. Per ambienti di staging/produzione, usare sempre `db:migrate` che genera file di migration versionati.
 
 ## Test
 
@@ -232,9 +267,10 @@ La pipeline GitHub Actions (`.github/workflows/ci.yml`) esegue i seguenti step a
 
 1. **Lint** — ESLint + TypeScript type check
 2. **Unit test** — Vitest con coverage minima
-3. **Security scan** — Audit dipendenze npm (`npm audit`)
-4. **Docker build** — Build dell'immagine multi-stage di produzione
-5. **Image scan** — Scansione vulnerabilità dell'immagine Docker (Trivy)
+3. **Migration check** — Applica le migrazioni su un DB vuoto e verifica che lo schema Prisma sia sincronizzato con i file di migrazione
+4. **Security scan** — Audit dipendenze npm (`npm audit`)
+5. **Docker build** — Build dell'immagine multi-stage di produzione
+6. **Image scan** — Scansione vulnerabilità dell'immagine Docker (Trivy)
 
 La pipeline blocca il merge se uno qualsiasi degli step fallisce.
 
@@ -291,7 +327,11 @@ docker compose logs postgres
 docker compose exec postgres pg_isready
 ```
 
-Se il database è stato resettato (`docker compose down -v`), riesegui migration e seed.
+Se il database è stato resettato (`docker compose down -v`), riesegui le migrazioni:
+
+```bash
+docker compose --profile setup run --rm db-migrate
+```
 
 ### Test email non ricevute
 

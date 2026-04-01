@@ -1,22 +1,20 @@
 import { NextResponse } from 'next/server';
 
+import { withErrorHandling } from '@/lib/api-handler';
+import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { generateEventICal } from '@/lib/ical/generate';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ param: string }>;
-}
-
-export async function GET(request: Request, context: RouteContext) {
+export const GET = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const event = await prisma.event.findUnique({ where: { slug } });
 
   if (!event || event.status === 'DRAFT') {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    throw new NotFoundError('Event');
   }
 
   const locale = resolveLocale(request);
@@ -46,4 +44,4 @@ export async function GET(request: Request, context: RouteContext) {
       'Cache-Control': 'public, max-age=3600',
     },
   });
-}
+});

@@ -1,6 +1,12 @@
-import { NextResponse } from 'next/server';
 import { nanoid } from 'nanoid';
 
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import {
+  NotFoundError,
+  ConflictError,
+  RateLimitError,
+  ValidationError,
+} from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { createRegistrationSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -9,22 +15,15 @@ import { sendConfirmationEmail } from '@/lib/email/confirmation';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteContext {
-  params: Promise<{ param: string }>;
-}
-
 // ── POST /api/events/[slug]/registrations ────────────────────
 
-export async function POST(request: Request, context: RouteContext) {
+export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const ip = getClientIp(request);
   const rl = rateLimit(`register:${ip}`, { limit: 10, windowMs: 60_000 });
   if (!rl.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests. Try again later.' },
-      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
-    );
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
   const event = await prisma.event.findUnique({
@@ -32,37 +31,20 @@ export async function POST(request: Request, context: RouteContext) {
     include: { _count: { select: { registrations: true } } },
   });
 
-  if (!event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  }
+  if (!event) throw new NotFoundError('Event');
 
   if (event.status !== 'PUBLISHED' && event.status !== 'LIVE') {
-    return NextResponse.json(
-      { error: 'Event is not open for registration' },
-      { status: 409 },
-    );
+    throw new ConflictError('Event is not open for registration');
   }
 
   if (event._count.registrations >= event.maxParticipants) {
-    return NextResponse.json(
-      { error: 'event_full', message: 'Event is fully booked' },
-      { status: 409 },
-    );
+    throw new ConflictError('Event is fully booked');
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
-
+  const body = await parseJsonBody(request);
   const parsed = createRegistrationSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation failed', issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })) },
-      { status: 422 },
-    );
+    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
   const {
@@ -72,84 +54,63 @@ export async function POST(request: Request, context: RouteContext) {
 
   // If recording is enabled, consentRecording must be true
   if (event.recordingEnabled && consentRecording !== true) {
-    return NextResponse.json(
-      { error: 'Validation failed', issues: [{ path: ['consentRecording'], message: 'registration.errors.recordingConsentRequired' }] },
-      { status: 422 },
-    );
+    throw new ValidationError('Validation failed', [{ path: ['consentRecording'], message: 'registration.errors.recordingConsentRequired' }]);
   }
 
   const emailHash = hashEmail(email);
   const encryptedEmail = encryptPII(email);
   const accessToken = nanoid(24);
 
-  let registration;
-  try {
-    registration = await prisma.$transaction(async (tx) => {
-      // Re-check capacity inside transaction to prevent overbooking
-      const currentCount = await tx.registration.count({
-        where: { eventId: event.id },
-      });
-      if (currentCount >= event.maxParticipants) {
-        throw new Error('EVENT_FULL');
-      }
+  const registration = await prisma.$transaction(async (tx) => {
+    // Re-check capacity inside transaction to prevent overbooking
+    const currentCount = await tx.registration.count({
+      where: { eventId: event.id },
+    });
+    if (currentCount >= event.maxParticipants) {
+      throw new ConflictError('Event is fully booked');
+    }
 
-      // Check for duplicates inside transaction
-      const existing = await tx.registration.findUnique({
-        where: { eventId_emailHash: { eventId: event.id, emailHash } },
-      });
-      if (existing) {
-        throw new Error('ALREADY_REGISTERED');
-      }
+    // Check for duplicates inside transaction
+    const existing = await tx.registration.findUnique({
+      where: { eventId_emailHash: { eventId: event.id, emailHash } },
+    });
+    if (existing) {
+      throw new ConflictError('Already registered for this event');
+    }
 
-      const reg = await tx.registration.create({
-        data: {
-          eventId: event.id,
-          displayName,
-          email: encryptedEmail,
-          emailHash,
-          organization: organization || null,
-          organizationRole: organizationRole || null,
-          organizationType: organizationType || null,
-          consentGiven,
-          consentTimestamp: new Date(),
+    const reg = await tx.registration.create({
+      data: {
+        eventId: event.id,
+        displayName,
+        email: encryptedEmail,
+        emailHash,
+        organization: organization || null,
+        organizationRole: organizationRole || null,
+        organizationType: organizationType || null,
+        consentGiven,
+        consentTimestamp: new Date(),
+        consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
+        consentFutureCommunications: consentFutureCommunications ?? false,
+        accessToken,
+      },
+    });
+
+    // GDPR audit: record consent
+    await tx.gdprAuditLog.create({
+      data: {
+        eventId: event.id,
+        action: 'CONSENT_RECORDED',
+        recordCount: 1,
+        details: JSON.stringify({
+          consentGiven: true,
           consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
           consentFutureCommunications: consentFutureCommunications ?? false,
-          accessToken,
-        },
-      });
-
-      // GDPR audit: record consent
-      await tx.gdprAuditLog.create({
-        data: {
-          eventId: event.id,
-          action: 'CONSENT_RECORDED',
-          recordCount: 1,
-          details: JSON.stringify({
-            consentGiven: true,
-            consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
-            consentFutureCommunications: consentFutureCommunications ?? false,
-          }),
-        },
-      });
-
-      return reg;
+        }),
+      },
     });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : '';
-    if (message === 'EVENT_FULL') {
-      return NextResponse.json(
-        { error: 'event_full', message: 'Event is fully booked' },
-        { status: 409 },
-      );
-    }
-    if (message === 'ALREADY_REGISTERED') {
-      return NextResponse.json(
-        { error: 'already_registered', message: 'Already registered for this event' },
-        { status: 409 },
-      );
-    }
-    throw err;
-  }
+
+    return reg;
+  });
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
@@ -166,7 +127,7 @@ export async function POST(request: Request, context: RouteContext) {
     eventPageUrl,
   });
 
-  return NextResponse.json(
+  return Response.json(
     {
       id: registration.id,
       displayName: registration.displayName,
@@ -176,4 +137,4 @@ export async function POST(request: Request, context: RouteContext) {
     },
     { status: 201, headers: { 'Cache-Control': 'no-store' } },
   );
-}
+});

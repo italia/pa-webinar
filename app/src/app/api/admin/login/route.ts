@@ -1,24 +1,21 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { SignJWT } from 'jose';
 
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import { UnauthorizedError, AppError } from '@/lib/errors';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 
-export async function POST(request: NextRequest) {
-  let body: { key?: string };
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'invalid_body' }, { status: 400 });
-  }
+export const POST = withErrorHandling(async (request: NextRequest) => {
+  const body = await parseJsonBody(request) as { key?: string };
 
   const adminKey = process.env.ADMIN_API_KEY;
   if (!adminKey || !constantTimeEqual(body.key ?? '', adminKey)) {
-    return NextResponse.json({ error: 'invalid_key' }, { status: 401 });
+    throw new UnauthorizedError('invalid_key');
   }
 
   const appSecret = process.env.APP_SECRET;
   if (!appSecret) {
-    return NextResponse.json({ error: 'server_misconfigured' }, { status: 500 });
+    throw new AppError('server_misconfigured', 500, 'INTERNAL_ERROR');
   }
 
   const secret = new TextEncoder().encode(appSecret);
@@ -38,4 +35,4 @@ export async function POST(request: NextRequest) {
   });
 
   return response;
-}
+});
