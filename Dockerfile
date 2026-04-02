@@ -41,6 +41,19 @@ WORKDIR /workspace
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# NEXT_PUBLIC_* are inlined by webpack at build time. These defaults produce a
+# generic image; the app reads actual values at runtime via lib/env.ts (bracket
+# notation bypasses DefinePlugin). Client components receive values as props
+# from Server Components. Override at build time with --build-arg if needed.
+ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
+ARG NEXT_PUBLIC_JITSI_DOMAIN=localhost:8443
+ARG NEXT_PUBLIC_WATERMARK_URL=/images/dtd-watermark.svg
+ARG NEXT_PUBLIC_DEFAULT_LOCALE=it
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_JITSI_DOMAIN=$NEXT_PUBLIC_JITSI_DOMAIN
+ENV NEXT_PUBLIC_WATERMARK_URL=$NEXT_PUBLIC_WATERMARK_URL
+ENV NEXT_PUBLIC_DEFAULT_LOCALE=$NEXT_PUBLIC_DEFAULT_LOCALE
+
 # Copy installed deps from stage 1
 COPY --from=deps /workspace/node_modules ./node_modules
 COPY --from=deps /workspace/package.json ./

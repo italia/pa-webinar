@@ -4,6 +4,7 @@ import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import EventDetailClient from '@/components/events/event-detail-client';
+import { getPublicEnv } from '@/lib/env';
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -24,7 +25,7 @@ export async function generateMetadata({
       ? event.descriptionEn
       : event.descriptionIt;
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const pageUrl = `${baseUrl}/${locale}/eventi/${slug}`;
 
   return {
@@ -71,7 +72,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     locale === 'en' && event.descriptionEn
       ? event.descriptionEn
       : event.descriptionIt;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
 
   const jsonLd = {
     '@context': 'https://schema.org',

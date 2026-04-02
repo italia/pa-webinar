@@ -22,6 +22,7 @@ interface JitsiRoomProps {
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
+  watermarkUrl?: string;
   onReady?: () => void;
   onLeft?: () => void;
   onParticipantCountChanged?: (count: number) => void;
@@ -31,8 +32,7 @@ interface JitsiRoomProps {
 
 type LoadState = 'loading' | 'ready' | 'error';
 
-const WATERMARK_URL =
-  process.env.NEXT_PUBLIC_WATERMARK_URL || '/images/dtd-watermark.svg';
+const DEFAULT_WATERMARK_URL = '/images/dtd-watermark.svg';
 
 export default function JitsiRoom({
   domain,
@@ -44,6 +44,7 @@ export default function JitsiRoom({
   participantsCanUnmute = true,
   participantsCanStartVideo = true,
   participantsCanShareScreen = true,
+  watermarkUrl = DEFAULT_WATERMARK_URL,
   onReady,
   onLeft,
   onParticipantCountChanged,
@@ -235,7 +236,7 @@ export default function JitsiRoom({
 
       {loadState === 'ready' && (
         <img
-          src={WATERMARK_URL}
+          src={watermarkUrl}
           alt=""
           aria-hidden="true"
           style={{

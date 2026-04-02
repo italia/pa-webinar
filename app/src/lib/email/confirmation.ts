@@ -19,6 +19,7 @@ import {
   confirmationText,
 } from '@/lib/email/templates';
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
+import { getPublicEnv } from '@/lib/env';
 
 type Locale = 'it' | 'en';
 
@@ -52,8 +53,7 @@ export function sendConfirmationEmail(input: ConfirmationEmailInput): void {
           ? event.descriptionEn
           : event.descriptionIt;
 
-      const baseUrl =
-        process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+      const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
       const calendarInput = {
         title,
         description,

@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { getPublicEnv } from '@/lib/env';
 import LiveEventClient from '@/components/live/live-event-client';
 
 interface LivePageProps {
@@ -48,6 +49,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           isGuest={true}
           displayName=""
           locale={locale}
+          jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
+          watermarkUrl={getPublicEnv('NEXT_PUBLIC_WATERMARK_URL')}
         />
       );
     }
@@ -97,6 +100,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           : participantInfo?.displayName ?? 'Partecipante'
       }
       locale={locale}
+      jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
+      watermarkUrl={getPublicEnv('NEXT_PUBLIC_WATERMARK_URL')}
     />
   );
 }

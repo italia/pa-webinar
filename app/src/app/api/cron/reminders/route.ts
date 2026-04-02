@@ -17,6 +17,7 @@ import {
 } from '@/lib/ical/calendar-links';
 import { generateEventICal } from '@/lib/ical/generate';
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
+import { getPublicEnv } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,7 +60,7 @@ export const GET = withErrorHandling(async (request) => {
     return triggerAt <= now && r.event.startsAt > now;
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   let remindersProcessed = 0;
   let emailsSent = 0;
   let emailsFailed = 0;

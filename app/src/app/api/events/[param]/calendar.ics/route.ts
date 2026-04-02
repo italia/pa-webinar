@@ -5,6 +5,7 @@ import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { generateEventICal } from '@/lib/ical/generate';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
+import { getPublicEnv } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ export const GET = withErrorHandling(async (request, context) => {
 
   const locale = resolveLocale(request);
   const { title, description } = localiseEvent(event, locale);
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const eventUrl = `${baseUrl}/${locale}/eventi/${slug}`;
 
   const ics = generateEventICal({

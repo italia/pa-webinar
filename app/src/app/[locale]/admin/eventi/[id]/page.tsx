@@ -3,6 +3,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import EventManagementClient from '@/components/admin/event-management-client';
+import { getPublicEnv } from '@/lib/env';
 
 interface EventManagePageProps {
   params: Promise<{ id: string }>;
@@ -63,7 +64,7 @@ export default async function EventManagePage({
     notFound();
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
 
   const serialized = {
     id: event.id,

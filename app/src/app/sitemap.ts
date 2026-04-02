@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next';
 
 import { prisma } from '@/lib/db';
+import { getPublicEnv } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
 
   const staticPages: MetadataRoute.Sitemap = [
     {
