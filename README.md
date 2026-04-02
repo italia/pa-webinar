@@ -1,8 +1,10 @@
 # eventi-dtd
 
 [![CI](https://github.com/italia/eventi-dtd/actions/workflows/ci.yml/badge.svg)](https://github.com/italia/eventi-dtd/actions/workflows/ci.yml)
-[![License: EUPL-1.2](https://img.shields.io/badge/license-EUPL--1.2-blue.svg)](LICENSE)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/italia/eventi-dtd/badge)](https://scorecard.dev/viewer/?uri=github.com/italia/eventi-dtd)
+[![License: EUPL-1.2](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
 [![publiccode.yml](https://img.shields.io/badge/publiccode-available-brightgreen.svg)](publiccode.yml)
+[![Tests](https://img.shields.io/badge/tests-205%20passing-brightgreen.svg)](#test)
 
 Piattaforma open-source per eventi pubblici digitali della Pubblica Amministrazione italiana, basata su [Jitsi Meet](https://jitsi.org/) e il [design system .italia](https://designers.italia.it/).
 
@@ -98,6 +100,20 @@ Questo software è conforme alle [Linee guida per il riuso](https://docs.italia.
 ## GDPR
 
 Consulta [docs/GDPR.md](docs/GDPR.md) per i dettagli sulla conformità GDPR.
+
+## Qualità e sicurezza
+
+| Indicatore | Stato |
+|---|---|
+| CI/CD | [![CI](https://github.com/italia/eventi-dtd/actions/workflows/ci.yml/badge.svg)](https://github.com/italia/eventi-dtd/actions/workflows/ci.yml) |
+| Security | [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/italia/eventi-dtd/badge)](https://scorecard.dev/viewer/?uri=github.com/italia/eventi-dtd) |
+| Licenza | [![EUPL-1.2](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) |
+| Test | 205 test unitari |
+| Dipendenze | Audit EUPL-compatibile, SBOM per release |
+| Container | Non-root, read-only, seccomp |
+| GDPR | Encryption PII, consenso granulare, retention automatica |
+
+Per dettagli sugli standard di qualità adottati, consulta [docs/CONTRIBUTING-QUALITY.md](docs/CONTRIBUTING-QUALITY.md).
 
 ## Licenza / License
 
