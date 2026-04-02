@@ -4,7 +4,7 @@
 # ─────────────────────────────────────────────────────────────
 
 # ── Stage 1: Dependencies ────────────────────────────────────
-FROM node:20-alpine AS deps
+FROM node:25-alpine AS deps
 
 LABEL maintainer="Dipartimento per la Trasformazione Digitale <innovazione@governo.it>"
 LABEL org.opencontainers.image.title="eventi-dtd"
@@ -32,7 +32,7 @@ RUN cd app && npx prisma generate
 
 
 # ── Stage 2: Builder ─────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 
 RUN apk add --no-cache libc6-compat
 
@@ -60,7 +60,7 @@ RUN find .next/standalone -name '.env*' -type f -delete && \
 
 
 # ── Stage 3: Production runner ───────────────────────────────
-FROM node:20-alpine AS runner
+FROM node:25-alpine AS runner
 
 RUN apk upgrade --no-cache && apk add --no-cache tini && \
     npm cache clean --force && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
