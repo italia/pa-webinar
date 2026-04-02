@@ -45,7 +45,7 @@ for (const [key, entry] of Object.entries(parsed)) {
   if (entry.publisher) out.publisher = entry.publisher;
   if (entry.email) out.email = entry.email;
   if (entry.url) out.url = entry.url;
-  if (entry.licenseFile) out.licenseFile = entry.licenseFile;
+  // Omit licenseFile — node_modules paths vary with hoisting across environments
 
   cleaned[key] = out;
 }
