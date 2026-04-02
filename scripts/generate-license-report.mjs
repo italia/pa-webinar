@@ -25,8 +25,16 @@ const raw = execSync(
 
 const parsed = JSON.parse(raw);
 
+// Platform-specific native binary patterns — these vary across OS/arch and
+// have the same license as the parent package. Exclude them so the report is
+// reproducible regardless of where it was generated.
+const platformSpecificRe =
+  /[/-](linux|darwin|win32|freebsd|android)-(x64|arm64|arm|ia32|x64-gnu|x64-musl|x64-glibc|arm64-gnu|arm64-musl|arm64-glibc|universal)@/;
+
 const cleaned = {};
 for (const [key, entry] of Object.entries(parsed)) {
+  if (platformSpecificRe.test(key)) continue;
+
   const out = { licenses: entry.licenses };
 
   if (entry.repository) out.repository = entry.repository;
