@@ -16,8 +16,6 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
 
       - name: Run Scorecard
         uses: ossf/scorecard-action@v2.4.0
