@@ -103,11 +103,6 @@
     "publisher": "toyobayashi",
     "licenseFile": "node_modules/@emnapi/wasi-threads/LICENSE"
   },
-  "@esbuild/linux-x64@0.27.4": {
-    "licenses": "MIT",
-    "repository": "https://github.com/evanw/esbuild",
-    "licenseFile": "node_modules/@esbuild/linux-x64/README.md"
-  },
   "@eslint-community/eslint-utils@4.9.1": {
     "licenses": "MIT",
     "repository": "https://github.com/eslint-community/eslint-utils",
@@ -232,20 +227,6 @@
     "repository": "https://github.com/lovell/colour",
     "licenseFile": "node_modules/@img/colour/LICENSE.md"
   },
-  "@img/sharp-libvips-linux-x64@1.2.4": {
-    "licenses": "LGPL-3.0-or-later",
-    "repository": "https://github.com/lovell/sharp-libvips",
-    "publisher": "Lovell Fuller",
-    "email": "npm@lovell.info",
-    "licenseFile": "node_modules/@img/sharp-libvips-linux-x64/README.md"
-  },
-  "@img/sharp-linux-x64@0.34.5": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/lovell/sharp",
-    "publisher": "Lovell Fuller",
-    "email": "npm@lovell.info",
-    "licenseFile": "node_modules/@img/sharp-linux-x64/LICENSE"
-  },
   "@jridgewell/sourcemap-codec@1.5.5": {
     "licenses": "MIT",
     "repository": "https://github.com/jridgewell/sourcemaps",
@@ -264,11 +245,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/vercel/next.js",
     "licenseFile": "node_modules/@next/eslint-plugin-next/README.md"
-  },
-  "@next/swc-linux-x64-gnu@15.5.14": {
-    "licenses": "MIT",
-    "repository": "https://github.com/vercel/next.js",
-    "licenseFile": "node_modules/@next/swc-linux-x64-gnu/README.md"
   },
   "@nodelib/fs.scandir@2.1.5": {
     "licenses": "MIT",
@@ -301,11 +277,6 @@
     "repository": "https://github.com/oxc-project/oxc",
     "publisher": "Boshen and oxc contributors",
     "licenseFile": "node_modules/@oxc-project/types/LICENSE"
-  },
-  "@parcel/watcher-linux-x64-glibc@2.5.6": {
-    "licenses": "MIT",
-    "repository": "https://github.com/parcel-bundler/watcher",
-    "licenseFile": "node_modules/@parcel/watcher-linux-x64-glibc/LICENSE"
   },
   "@parcel/watcher@2.5.6": {
     "licenses": "MIT",
@@ -400,11 +371,6 @@
     "email": "monastic.panic@gmail.com",
     "licenseFile": "node_modules/@restart/ui/LICENSE"
   },
-  "@rolldown/binding-linux-x64-gnu@1.0.0-rc.12": {
-    "licenses": "MIT",
-    "repository": "https://github.com/rolldown/rolldown",
-    "licenseFile": "node_modules/@rolldown/binding-linux-x64-gnu/README.md"
-  },
   "@rolldown/pluginutils@1.0.0-rc.12": {
     "licenses": "MIT",
     "repository": "https://github.com/rolldown/rolldown",
@@ -414,12 +380,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/rolldown/rolldown",
     "licenseFile": "node_modules/@rolldown/pluginutils/LICENSE"
-  },
-  "@rollup/rollup-linux-x64-gnu@4.60.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/rollup/rollup",
-    "publisher": "Lukas Taegert-Atkinson",
-    "licenseFile": "node_modules/@rollup/rollup-linux-x64-gnu/README.md"
   },
   "@rtsao/scc@1.1.0": {
     "licenses": "MIT",
@@ -454,13 +414,6 @@
     "repository": "https://github.com/standard-schema/standard-schema",
     "publisher": "Colin McDonnell",
     "licenseFile": "node_modules/@standard-schema/spec/LICENSE"
-  },
-  "@swc/core-linux-x64-gnu@1.15.21": {
-    "licenses": "Apache-2.0 AND MIT",
-    "repository": "https://github.com/swc-project/swc",
-    "publisher": "강동윤",
-    "email": "kdy1997.dev@gmail.com",
-    "licenseFile": "node_modules/@swc/core-linux-x64-gnu/README.md"
   },
   "@swc/core@1.15.21": {
     "licenses": "Apache-2.0",
@@ -648,14 +601,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint",
     "licenseFile": "node_modules/@typescript-eslint/visitor-keys/LICENSE"
-  },
-  "@unrs/resolver-binding-linux-x64-gnu@1.11.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/unrs/unrs-resolver",
-    "publisher": "JounQin",
-    "email": "admin@1stg.me",
-    "url": "https://www.1stG.me",
-    "licenseFile": "node_modules/@unrs/resolver-binding-linux-x64-gnu/README.md"
   },
   "@videojs/http-streaming@3.17.4": {
     "licenses": "Apache-2.0",
@@ -2192,11 +2137,6 @@
     "email": "z@georgezahariev.com",
     "licenseFile": "node_modules/levn/LICENSE"
   },
-  "lightningcss-linux-x64-gnu@1.32.0": {
-    "licenses": "MPL-2.0",
-    "repository": "https://github.com/parcel-bundler/lightningcss",
-    "licenseFile": "node_modules/lightningcss-linux-x64-gnu/LICENSE"
-  },
   "lightningcss@1.32.0": {
     "licenses": "MPL-2.0",
     "repository": "https://github.com/parcel-bundler/lightningcss",
@@ -2642,7 +2582,7 @@
     "repository": "https://github.com/postcss/postcss",
     "publisher": "Andrey Sitnik",
     "email": "andrey@sitnik.ru",
-    "licenseFile": "node_modules/vite-node/node_modules/postcss/LICENSE"
+    "licenseFile": "node_modules/vite/node_modules/postcss/LICENSE"
   },
   "prelude-ls@1.2.1": {
     "licenses": "MIT",
