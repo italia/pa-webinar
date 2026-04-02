@@ -5,6 +5,12 @@ on:
   schedule:
     - cron: '0 6 * * 1'  # Weekly on Monday at 06:00 UTC
 
+# NOTE: If the Scorecard step fails with "Resource not accessible by integration",
+# the organization needs to either:
+#   1. Create a PAT with repo scope and store it as SCORECARD_TOKEN secret, or
+#   2. Go to Organization Settings → Actions → General → Workflow permissions
+#      and enable "Read repository contents and packages permissions"
+
 permissions: read-all
 
 jobs:
@@ -20,13 +26,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Scorecard
+        id: scorecard
         uses: ossf/scorecard-action@v2.4.0
+        continue-on-error: true
         with:
           results_file: results.sarif
           results_format: sarif
+          repo_token: ${{ secrets.SCORECARD_TOKEN || secrets.GITHUB_TOKEN }}
           publish_results: true
 
       - name: Upload to GitHub Security tab
+        if: steps.scorecard.outcome == 'success'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
