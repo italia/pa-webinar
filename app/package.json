@@ -42,7 +42,7 @@
     "@playwright/test": "^1.49.0",
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^16.0.0",
-    "@types/node": "^22.0.0",
+    "@types/node": "^25.5.0",
     "@types/nodemailer": "^6.4.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
