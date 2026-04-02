@@ -12,6 +12,7 @@ import { createRegistrationSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
+import { getPublicEnv } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,7 +113,7 @@ export const POST = withErrorHandling(async (request, context) => {
     return reg;
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
 
   const acceptLang = request.headers.get('Accept-Language') ?? '';
   const locale: 'it' | 'en' = acceptLang.toLowerCase().startsWith('en') ? 'en' : 'it';

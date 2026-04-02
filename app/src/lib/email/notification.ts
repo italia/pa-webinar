@@ -8,6 +8,7 @@ import { decryptPII } from '@/lib/crypto/pii';
 import { generateEventICal } from '@/lib/ical/generate';
 import { sendEmail } from '@/lib/email/send';
 import { formatDate, formatTime } from '@/lib/utils/date-format';
+import { getPublicEnv } from '@/lib/env';
 
 type Locale = 'it' | 'en';
 
@@ -91,7 +92,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
       const date = formatDate(event.startsAt, input.locale);
       const time = formatTime(event.startsAt, input.locale);
 
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+      const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
       const eventPageUrl = `${baseUrl}/${input.locale}/eventi/${event.slug}`;
 
       const icsContent = generateEventICal({

@@ -11,6 +11,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { getPublicEnv } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,7 +85,7 @@ export const POST = withErrorHandling(async (request) => {
     },
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const locale = resolveLocale(request);
 
   return Response.json(

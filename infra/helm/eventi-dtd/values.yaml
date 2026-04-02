@@ -64,8 +64,9 @@ app:
 
   # ── Non-secret environment variables ──
   # These are injected as a ConfigMap and mounted via envFrom.
-  # NEXT_PUBLIC_* vars are baked into the client bundle at build time,
-  # so they must match the build-time values.
+  # NEXT_PUBLIC_* vars are read at runtime via lib/env.ts (server-side)
+  # and passed as props to client components. A single pre-built image
+  # works across environments — no rebuild needed per FQDN.
   env:
     NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.videocall.example.com"
     NEXT_PUBLIC_APP_URL: "https://videocall.example.com"

@@ -48,6 +48,8 @@ interface LiveEventClientProps {
   isGuest?: boolean;
   displayName: string;
   locale: string;
+  jitsiDomain: string;
+  watermarkUrl?: string;
 }
 
 type LivePhase =
@@ -67,8 +69,6 @@ interface JitsiCredentials {
   role: string;
 }
 
-const JITSI_DOMAIN = process.env.NEXT_PUBLIC_JITSI_DOMAIN ?? 'localhost:8443';
-
 export default function LiveEventClient({
   event,
   token,
@@ -76,6 +76,8 @@ export default function LiveEventClient({
   isGuest = false,
   displayName: initialDisplayName,
   locale,
+  jitsiDomain,
+  watermarkUrl,
 }: LiveEventClientProps) {
   const t = useTranslations('live');
   const tc = useTranslations('common');
@@ -431,7 +433,7 @@ export default function LiveEventClient({
       <div className="d-flex flex-column flex-lg-row flex-grow-1" style={{ minHeight: 0 }}>
         <div className="flex-grow-1 position-relative" style={{ minHeight: '300px' }}>
           <JitsiRoom
-            domain={JITSI_DOMAIN}
+            domain={jitsiDomain}
             roomName={credentials.roomName}
             jwt={credentials.jwt}
             displayName={credentials.displayName}
@@ -440,6 +442,7 @@ export default function LiveEventClient({
             participantsCanUnmute={event.participantsCanUnmute}
             participantsCanStartVideo={event.participantsCanStartVideo}
             participantsCanShareScreen={event.participantsCanShareScreen}
+            watermarkUrl={watermarkUrl}
             onReady={handleJitsiReady}
             onLeft={handleJitsiLeft}
             onParticipantCountChanged={handleParticipantCountChanged}
