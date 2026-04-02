@@ -1,0 +1,52 @@
+{{/*
+Custom Jitsi Web Ingress — replaces the subchart's ingress to control path
+matching. Uses ImplementationSpecific pathType with regex (/.+) so that
+the Jitsi landing page (/) is NOT exposed, while all IFrame API paths
+(/external_api.js, /libs/, /<room-name>, /http-bind, etc.) are served.
+
+Enable this by setting jitsi.webIngress.enabled=true and disabling
+the subchart's own ingress (jitsi-meet.web.ingress.enabled=false).
+*/}}
+{{- if and .Values.jitsi.enabled .Values.jitsi.webIngress.enabled }}
+{{- $svcName := printf "%s-jitsi-meet-web" .Release.Name }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-jitsi-web
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    {{- with .Values.jitsi.webIngress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- with .Values.jitsi.webIngress.ingressClassName }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.jitsi.webIngress.tls }}
+  tls:
+    {{- range . }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.jitsi.webIngress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ .port | default 80 }}
+          {{- end }}
+    {{- end }}
+{{- end }}

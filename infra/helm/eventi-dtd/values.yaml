@@ -350,6 +350,26 @@ jitsi:
   #   "full"     — JVB on dedicated nodes with taints, scale-to-zero ready, Jibri on dedicated nodes
   mode: "simple"
 
+  # ── Jitsi Web Ingress (managed by parent chart) ──
+  # Replaces the subchart's built-in ingress to use regex path matching.
+  # Only paths matching /.+ are served — the Jitsi landing page (/) is
+  # excluded, so the domain only works when embedded via IFrame API.
+  # When enabled, set jitsi-meet.web.ingress.enabled=false.
+  webIngress:
+    enabled: false
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: jitsi.videocall.example.com
+        paths:
+          - path: "/.+"
+            port: 80
+    tls:
+      - secretName: jitsi-tls
+        hosts:
+          - jitsi.videocall.example.com
+
   # ── External Jitsi configuration (when jitsi.enabled=false) ──
   external:
     # Jitsi domain as seen by the browser (e.g. jitsi.example.com)
