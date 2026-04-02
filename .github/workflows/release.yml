@@ -62,7 +62,7 @@ jobs:
       - name: Generate Docker SBOM (SPDX)
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
           format: spdx-json
           output-file: sbom.spdx.json
 
@@ -90,9 +90,10 @@ jobs:
 
       - name: Package chart
         run: |
+          VERSION="${GITHUB_REF_NAME#v}"
           helm package infra/helm/eventi-dtd \
-            --version ${{ github.ref_name }} \
-            --app-version ${{ github.ref_name }}
+            --version "$VERSION" \
+            --app-version "$VERSION"
 
       - name: Upload chart to release
         uses: softprops/action-gh-release@v2
