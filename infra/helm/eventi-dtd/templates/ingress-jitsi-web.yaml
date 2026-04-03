@@ -1,22 +1,24 @@
 {{/*
-Custom Jitsi Web Ingress — replaces the subchart's ingress to control path
-matching. Uses ImplementationSpecific pathType with regex (/.+) so that
-the Jitsi landing page (/) is NOT exposed, while all IFrame API paths
-(/external_api.js, /libs/, /<room-name>, /http-bind, etc.) are served.
+Redirect Jitsi root (/) to the portal URL.
 
-Enable this by setting jitsi.webIngress.enabled=true and disabling
-the subchart's own ingress (jitsi-meet.web.ingress.enabled=false).
+The subchart's ingress serves all Jitsi content with Prefix /.
+This Ingress matches only Exact / — which in nginx has higher priority
+than prefix matching — and returns a 301 redirect to the portal.
+
+Requires: jitsi.webIngress.redirectUrl set to the portal URL.
+The subchart's own ingress (jitsi-meet.web.ingress.enabled=true) must
+remain enabled to serve IFrame API, room pages, and static assets.
 */}}
-{{- if and .Values.jitsi.enabled .Values.jitsi.webIngress.enabled }}
+{{- if and .Values.jitsi.enabled .Values.jitsi.webIngress.redirectUrl }}
 {{- $svcName := printf "%s-jitsi-meet-web" .Release.Name }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "eventi-dtd.fullname" . }}-jitsi-web
+  name: {{ include "eventi-dtd.fullname" . }}-jitsi-redirect
   labels:
     {{- include "eventi-dtd.labels" . | nindent 4 }}
   annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/permanent-redirect: {{ .Values.jitsi.webIngress.redirectUrl | quote }}
     {{- with .Values.jitsi.webIngress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -39,14 +41,12 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            pathType: ImplementationSpecific
+          - path: /
+            pathType: Exact
             backend:
               service:
                 name: {{ $svcName }}
                 port:
-                  number: {{ .port | default 80 }}
-          {{- end }}
+                  number: 80
     {{- end }}
 {{- end }}

@@ -3,12 +3,44 @@ import createMiddleware from 'next-intl/middleware';
 import { jwtVerify } from 'jose';
 
 import { locales, defaultLocale } from '@/i18n/config';
+import { getPublicEnv } from '@/lib/env';
 
 const intlMiddleware = createMiddleware({
   locales,
   defaultLocale,
   localePrefix: 'always',
 });
+
+function applySecurityHeaders(response: NextResponse): NextResponse {
+  const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN');
+
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set(
+    'Permissions-Policy',
+    `camera=(self "https://${jitsiDomain}"), microphone=(self "https://${jitsiDomain}"), display-capture=(self "https://${jitsiDomain}"), geolocation=()`,
+  );
+  response.headers.set(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      `frame-src 'self' https://${jitsiDomain}`,
+      `script-src 'self' 'unsafe-inline' https://${jitsiDomain}`,
+      "style-src 'self' 'unsafe-inline'",
+      "font-src 'self'",
+      "img-src 'self' data: blob:",
+      `connect-src 'self' https://${jitsiDomain} wss://${jitsiDomain}`,
+      "media-src 'self' blob:",
+    ].join('; '),
+  );
+  response.headers.set(
+    'Strict-Transport-Security',
+    'max-age=63072000; includeSubDomains; preload',
+  );
+
+  return response;
+}
 
 const ADMIN_PATH_RE = /^\/(?:it|en)\/admin(?:\/|$)/;
 const ADMIN_LOGIN_RE = /^\/(?:it|en)\/admin\/login(?:\/|$)/;
@@ -36,7 +68,7 @@ export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!ADMIN_PATH_RE.test(pathname) || ADMIN_LOGIN_RE.test(pathname)) {
-    return response;
+    return applySecurityHeaders(response);
   }
 
   // Moderator magic links: allow access to event-specific admin pages
@@ -45,7 +77,7 @@ export default async function middleware(request: NextRequest) {
   if (ADMIN_EVENT_RE.test(pathname)) {
     const tokenParam = request.nextUrl.searchParams.get('token');
     if (tokenParam && UUID_RE.test(tokenParam)) {
-      return response;
+      return applySecurityHeaders(response);
     }
   }
 
@@ -56,7 +88,7 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  return response;
+  return applySecurityHeaders(response);
 }
 
 export const config = {
