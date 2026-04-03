@@ -69,7 +69,7 @@ jobs:
       - name: Generate npm SBOM (CycloneDX)
         run: |
           npm ci
-          cd app && npx @cyclonedx/cyclonedx-npm --output-file ../npm-sbom.json
+          npx @cyclonedx/cyclonedx-npm --workspace app --output-file npm-sbom.json
 
       - name: Upload SBOMs to release
         uses: softprops/action-gh-release@v2
