@@ -539,6 +539,70 @@
       "optionLabel": "Opzione"
     }
   },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Informativa privacy",
+      "title": "Informativa privacy",
+      "intro": "Questa pagina riassume il trattamento dei dati personali connesso all'uso della piattaforma Eventi DTD e alla partecipazione agli eventi pubblici ospitati.",
+      "sections": {
+        "controller": {
+          "title": "Titolare del trattamento",
+          "body": "Il trattamento dei dati personali avviene nell'ambito delle attivita istituzionali del Dipartimento per la Trasformazione Digitale, per consentire la gestione tecnica e organizzativa degli eventi pubblici online."
+        },
+        "data": {
+          "title": "Dati trattati e finalita",
+          "body": "La piattaforma tratta i dati strettamente necessari alla registrazione e partecipazione agli eventi, come nome, email e gli eventuali campi facoltativi configurati dall'organizzatore. I dati sono usati per inviare il link personale di accesso, gestire la partecipazione all'evento, eventuali promemoria e gli adempimenti collegati alla sicurezza del servizio."
+        },
+        "retention": {
+          "title": "Conservazione dei dati e diritti",
+          "body": "I dati vengono conservati per il periodo configurato per ciascun evento e poi eliminati automaticamente, salvo obblighi normativi diversi. In qualunque momento e possibile esercitare i diritti previsti dal GDPR, inclusi accesso, rettifica e cancellazione, attraverso i canali istituzionali del Dipartimento."
+        }
+      },
+      "note": {
+        "title": "Richiesta dei propri dati",
+        "body": "Se hai partecipato a un evento e vuoi verificare quali dati personali risultano associati al tuo indirizzo email, puoi usare la funzionalita dedicata disponibile sulla piattaforma.",
+        "linkLabel": "Richiedi i miei dati"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Dichiarazione di accessibilita",
+      "title": "Dichiarazione di accessibilita",
+      "intro": "Il Dipartimento per la Trasformazione Digitale si impegna a rendere questa piattaforma accessibile, in linea con i requisiti previsti dalla normativa vigente per i servizi digitali della Pubblica Amministrazione.",
+      "sections": {
+        "commitment": {
+          "title": "Impegno all'accessibilita",
+          "body": "La piattaforma e progettata con componenti coerenti con il design system .italia e con particolare attenzione alla navigazione da tastiera, alla semantica dei contenuti e alla leggibilita delle interfacce nelle principali dimensioni di schermo."
+        },
+        "status": {
+          "title": "Stato di conformita",
+          "body": "Sono in corso attivita continue di verifica e miglioramento dell'accessibilita applicativa. Eventuali limiti residui vengono corretti progressivamente nell'ambito dell'evoluzione del servizio e della manutenzione ordinaria."
+        },
+        "feedback": {
+          "title": "Segnalazioni e contatti",
+          "body": "Per segnalare difficolta di accesso ai contenuti o problemi di fruizione del servizio, e possibile utilizzare i canali di contatto istituzionali del Dipartimento, indicando la pagina interessata e una descrizione del problema riscontrato."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Note legali",
+      "title": "Note legali",
+      "intro": "L'accesso e l'utilizzo della piattaforma Eventi DTD avvengono nel rispetto delle presenti note, che descrivono le condizioni generali di utilizzo e le principali informazioni sul servizio.",
+      "sections": {
+        "ownership": {
+          "title": "Titolarita del servizio",
+          "body": "La piattaforma e promossa dal Dipartimento per la Trasformazione Digitale ed e resa disponibile per l'organizzazione e la fruizione di eventi pubblici online di interesse istituzionale."
+        },
+        "usage": {
+          "title": "Modalita di utilizzo",
+          "body": "Gli utenti sono tenuti a utilizzare il servizio in modo corretto, senza compromettere la sicurezza della piattaforma, la disponibilita delle funzionalita o il regolare svolgimento degli eventi. Eventuali abusi o usi impropri possono comportare limitazioni di accesso al servizio."
+        },
+        "liability": {
+          "title": "Limitazioni di responsabilita",
+          "body": "Pur adottando misure tecniche e organizzative adeguate, il Dipartimento non garantisce l'assenza assoluta di interruzioni o malfunzionamenti dovuti a cause non prevedibili, manutenzioni o fattori esterni. Restano ferme le responsabilita previste dalla legge."
+        }
+      }
+    }
+  },
   "footer": {
     "departmentName": "Dipartimento per la Trasformazione Digitale",
     "presidencyName": "Presidenza del Consiglio dei Ministri",
