@@ -1,6 +1,5 @@
 import { withErrorHandling } from '@/lib/api-handler';
-import { UnauthorizedError } from '@/lib/errors';
-import { constantTimeEqual } from '@/lib/auth/moderator';
+import { assertCronApiKey } from '@/lib/auth/cron';
 import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email/send';
@@ -35,12 +34,7 @@ type Locale = 'it' | 'en';
  * In production, called by a Kubernetes CronJob every 5 minutes.
  */
 export const GET = withErrorHandling(async (request) => {
-  const apiKey = process.env.CRON_API_KEY;
-  const providedKey = request.headers.get('x-api-key') ?? '';
-
-  if (!apiKey || !constantTimeEqual(providedKey, apiKey)) {
-    throw new UnauthorizedError();
-  }
+  assertCronApiKey(request);
 
   const now = new Date();
 
