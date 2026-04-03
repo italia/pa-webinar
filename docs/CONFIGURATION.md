@@ -221,9 +221,10 @@ JVB usa STUN per la connettivita NAT e deve raggiungere `stun.l.google.com:19302
 | `NEXT_PUBLIC_APP_URL` | Yes | Public base URL (e.g. `https://videocall.example.com`) |
 | `NEXT_PUBLIC_JITSI_DOMAIN` | Yes | Jitsi Meet server domain (e.g. `jitsi.videocall.example.com`) |
 | `JITSI_JWT_SECRET` | Yes | Shared secret for Jitsi JWT authentication |
-| `JITSI_JWT_APP_ID` | Yes | App ID for Jitsi JWT (default: `eventi_dtd`) |
+| `JITSI_JWT_APP_ID` | Yes | App identifier used in JWT metadata / `jti` (default: `eventi_dtd`) |
 | `JITSI_JWT_ISSUER` | Yes | JWT issuer (default: `eventi-dtd`) |
 | `JITSI_JWT_AUDIENCE` | Yes | JWT audience (default: `jitsi`) |
+| `JITSI_JWT_SUBJECT` | No | Jitsi tenant/domain for the `sub` claim. Defaults to `NEXT_PUBLIC_JITSI_DOMAIN` |
 | `SMTP_HOST` | Yes | SMTP server host |
 | `SMTP_PORT` | Yes | SMTP server port (default: 587) |
 | `SMTP_SECURE` | No | Enable TLS (default: `true`) |

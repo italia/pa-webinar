@@ -13,15 +13,14 @@ import {
 } from './jwt';
 
 const JWT_SECRET = 'test-secret-for-jwt-tests';
-// These must match the defaults in jwt.ts since top-level constants are
-// captured at import time (before beforeAll runs).
-const JWT_APP_ID = 'eventi_dtd';
 const JWT_ISSUER = 'eventi-dtd';
 const JWT_AUDIENCE = 'jitsi';
+const JWT_SUBJECT = 'jitsi.test.local';
 
 beforeAll(() => {
   process.env.JITSI_JWT_SECRET = JWT_SECRET;
   process.env.APP_SECRET = 'test-app-secret';
+  process.env.NEXT_PUBLIC_JITSI_DOMAIN = JWT_SUBJECT;
 });
 
 async function decodeJwt(token: string) {
@@ -51,7 +50,7 @@ describe('generateJitsiJwt', () => {
     expect(payload.room).toBe('evt-test-room');
     expect(payload.moderator).toBe(true);
     expect(payload.affiliation).toBe('owner');
-    expect(payload.sub).toBe(JWT_APP_ID);
+    expect(payload.sub).toBe(JWT_SUBJECT);
 
     const ctx = payload.context as { user: Record<string, string> };
     expect(ctx.user.name).toBe('Moderatore');
@@ -104,6 +103,22 @@ describe('generateJitsiJwt', () => {
 
     const payload = await decodeJwt(jwt);
     expect(payload.exp! - payload.iat!).toBe(7200);
+  });
+
+  it('allows overriding the JWT subject explicitly', async () => {
+    process.env.JITSI_JWT_SUBJECT = 'meet.jitsi';
+
+    const jwt = await generateJitsiJwt({
+      roomName: 'room',
+      displayName: 'Guest',
+      uniqueId: 'guest-1',
+      isModerator: false,
+    });
+
+    const payload = await decodeJwt(jwt);
+    expect(payload.sub).toBe('meet.jitsi');
+
+    delete process.env.JITSI_JWT_SUBJECT;
   });
 
   it('includes features in context', async () => {
