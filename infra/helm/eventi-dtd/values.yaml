@@ -350,21 +350,16 @@ jitsi:
   #   "full"     — JVB on dedicated nodes with taints, scale-to-zero ready, Jibri on dedicated nodes
   mode: "simple"
 
-  # ── Jitsi Web Ingress (managed by parent chart) ──
-  # Replaces the subchart's built-in ingress to use regex path matching.
-  # Only paths matching /.+ are served — the Jitsi landing page (/) is
-  # excluded, so the domain only works when embedded via IFrame API.
-  # When enabled, set jitsi-meet.web.ingress.enabled=false.
+  # ── Jitsi root redirect ──
+  # Creates an Exact / ingress that redirects to the portal URL (301).
+  # The subchart's Prefix / ingress still serves all other paths.
+  # Nginx gives Exact match higher priority than Prefix.
   webIngress:
-    enabled: false
+    redirectUrl: ""  # e.g. "https://videocall.example.com"
     ingressClassName: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
+    annotations: {}
     hosts:
       - host: jitsi.videocall.example.com
-        paths:
-          - path: "/.+"
-            port: 80
     tls:
       - secretName: jitsi-tls
         hosts:
