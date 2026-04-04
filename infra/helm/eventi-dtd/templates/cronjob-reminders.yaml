@@ -29,6 +29,14 @@ spec:
             runAsGroup: 101
             seccompProfile:
               type: RuntimeDefault
+          {{- if .Values.app.nodeSelector }}
+          nodeSelector:
+            {{- toYaml .Values.app.nodeSelector | nindent 12 }}
+          {{- end }}
+          {{- if .Values.app.tolerations }}
+          tolerations:
+            {{- toYaml .Values.app.tolerations | nindent 12 }}
+          {{- end }}
           containers:
             - name: reminders
               image: {{ .Values.cronjobs.reminders.image }}
