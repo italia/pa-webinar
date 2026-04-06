@@ -1,22 +1,26 @@
 /**
  * Internal API for JVB auto-scaling.
  *
- * Returns the desired number of JVB replicas as plain text.
- * Called by the jvb-scaler CronJob every 5 minutes (cluster-internal only).
+ * Returns the desired number of JVB replicas as JSON.
+ * Called by the jvb-scaler CronJob every 2 minutes (cluster-internal only).
  *
- * Logic:
- *   0 events live or starting within 30 min → 0 replicas
- *   1+ events → 1 replica per event, capped at JVB_MAX_REPLICAS (default 4)
+ * Scale formula:
+ *   0 events → 0 replicas (scale to zero, save costs)
+ *   1-2 events → 1 replica (single JVB handles ~200 users)
+ *   3+ events → 1 replica per 2 events, capped at JVB_MAX_REPLICAS
  */
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 
-const JVB_MAX_REPLICAS = parseInt(process.env.JVB_MAX_REPLICAS || '4', 10);
+export const dynamic = 'force-dynamic';
+
+const PRE_SCALE_MINUTES = parseInt(process.env.JVB_PRE_SCALE_MINUTES || '30', 10);
+const MAX_REPLICAS = parseInt(process.env.JVB_MAX_REPLICAS || '4', 10);
 
 export const GET = withErrorHandling(async () => {
   const now = new Date();
-  const thirtyMinFromNow = new Date(now.getTime() + 30 * 60 * 1000);
+  const preScaleWindow = new Date(now.getTime() + PRE_SCALE_MINUTES * 60 * 1000);
 
   const activeOrUpcoming = await prisma.event.count({
     where: {
@@ -24,16 +28,26 @@ export const GET = withErrorHandling(async () => {
         { status: 'LIVE' },
         {
           status: 'PUBLISHED',
-          startsAt: { lte: thirtyMinFromNow },
+          startsAt: { lte: preScaleWindow },
           endsAt: { gte: now },
         },
       ],
     },
   });
 
-  const desired = Math.min(activeOrUpcoming, JVB_MAX_REPLICAS);
+  let desired = 0;
+  if (activeOrUpcoming > 0) {
+    desired = Math.min(
+      Math.max(1, Math.ceil(activeOrUpcoming / 2)),
+      MAX_REPLICAS,
+    );
+  }
 
-  return new Response(String(desired), {
-    headers: { 'Content-Type': 'text/plain' },
+  return Response.json({
+    desired,
+    activeEvents: activeOrUpcoming,
+    preScaleMinutes: PRE_SCALE_MINUTES,
+    maxReplicas: MAX_REPLICAS,
+    checkedAt: now.toISOString(),
   });
 });

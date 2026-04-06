@@ -178,5 +178,9 @@ export const GET = withErrorHandling(async (request) => {
     };
   });
 
-  return Response.json(result);
+  return Response.json(result, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+    },
+  });
 });
