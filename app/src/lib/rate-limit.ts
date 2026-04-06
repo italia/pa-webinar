@@ -1,7 +1,11 @@
 /**
  * Simple in-memory rate limiter for API routes.
- * Not suitable for multi-instance deployments — use Redis-based
- * rate limiting in production behind multiple replicas.
+ *
+ * Not suitable for multi-instance deployments — each pod has its own
+ * state. In production, ingress-level rate limiting (NGINX annotations)
+ * handles global per-IP limits. This in-memory limiter still protects
+ * per-user/per-action limits (e.g. Q&A submission cooldowns) where
+ * approximate enforcement per pod is acceptable.
  */
 
 interface RateLimitEntry {

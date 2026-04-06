@@ -603,6 +603,44 @@
       }
     }
   },
+  "status": {
+    "title": "Stato del sistema",
+    "subtitle": "Panoramica in tempo reale dello stato dei servizi della piattaforma.",
+    "allOperational": "Tutti i sistemi operativi",
+    "degraded": "Prestazioni ridotte",
+    "outage": "Interruzione del servizio",
+    "componentLabel": "Componente",
+    "statusLabel": "Stato",
+    "operational": "Operativo",
+    "degradedLabel": "Rallentato",
+    "standby": "In standby",
+    "loading": "Caricamento...",
+    "fetchError": "Impossibile recuperare lo stato del sistema",
+    "components": {
+      "app": "Portale web",
+      "database": "Database",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Registrazione video",
+      "smtp": "Email (SMTP)"
+    },
+    "jvbCapacity": "Capacità video bridge",
+    "jvbStandby": "In standby — si attiva automaticamente quando serve",
+    "jvbScaling": "Attivazione in corso...",
+    "nodesActive": "nodi attivi",
+    "participantsAvailable": "partecipanti disponibili",
+    "upcomingEvents": "Prossimi eventi",
+    "noUpcomingEvents": "Nessun evento in programma",
+    "jvbActivatesIn": "JVB si attiva tra {minutes} min",
+    "liveNow": "In corso",
+    "activeEvents": "Eventi attivi",
+    "registrationsToday": "Registrazioni oggi",
+    "jvbNodes": "Nodi JVB",
+    "overallStatus": "Stato generale",
+    "lastChecked": "Ultimo controllo",
+    "responseTime": "Tempo di risposta",
+    "systemStatus": "Stato del sistema"
+  },
   "footer": {
     "departmentName": "Dipartimento per la Trasformazione Digitale",
     "presidencyName": "Presidenza del Consiglio dei Ministri",
@@ -611,6 +649,7 @@
     "openSource": "Software open source",
     "contacts": "Contatti",
     "legalNotes": "Note legali",
-    "governmentSite": "Governo Italiano"
+    "governmentSite": "Governo Italiano",
+    "systemStatus": "Stato del sistema"
   }
 }

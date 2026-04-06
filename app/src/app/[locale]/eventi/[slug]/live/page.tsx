@@ -5,6 +5,8 @@ import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import LiveEventClient from '@/components/live/live-event-client';
 
+export const dynamic = 'force-dynamic';
+
 interface LivePageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ token?: string }>;

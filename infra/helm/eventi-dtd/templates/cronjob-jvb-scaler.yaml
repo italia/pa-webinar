@@ -45,16 +45,57 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  # Query the app API for desired JVB replicas
-                  DESIRED=$(wget -qO- "{{ include "eventi-dtd.internalUrl" . }}/api/internal/jvb-desired-replicas" 2>/dev/null || echo "0")
-                  CURRENT=$(kubectl get deployment {{ .Values.jvbScaler.jvbDeploymentName }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
+                  TS=$(date -u '+%Y-%m-%d %H:%M:%S')
+                  log() { echo "[$TS] JVB Scaler: $1"; }
+
+                  log "Checking..."
+
+                  {{- if .Values.jvbScaler.jvbDeploymentName }}
+                  JVB_DEPLOY="{{ .Values.jvbScaler.jvbDeploymentName }}"
+                  {{- else }}
+                  # Auto-detect JVB deployment by label
+                  JVB_DEPLOY=$(kubectl get deployments -n {{ .Release.Namespace }} \
+                    -l "app.kubernetes.io/component=jvb" \
+                    -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+
+                  if [ -z "$JVB_DEPLOY" ]; then
+                    # Fallback: find by name pattern
+                    JVB_DEPLOY=$(kubectl get deployments -n {{ .Release.Namespace }} \
+                      -o name 2>/dev/null | grep -i jvb | head -1 | sed 's|deployment.apps/||')
+                  fi
+                  {{- end }}
+
+                  if [ -z "$JVB_DEPLOY" ]; then
+                    log "ERROR: Cannot find JVB deployment"
+                    exit 1
+                  fi
+
+                  log "Found deployment $JVB_DEPLOY"
+
+                  APP_URL="{{ include "eventi-dtd.internalUrl" . }}"
+                  RESPONSE=$(wget -qO- "${APP_URL}/api/internal/jvb-desired-replicas" 2>/dev/null)
+
+                  if [ -z "$RESPONSE" ]; then
+                    log "ERROR: Empty response from API — defaulting to 0"
+                    DESIRED=0
+                  else
+                    log "API response: $RESPONSE"
+                    # Parse desired from JSON response
+                    DESIRED=$(echo "$RESPONSE" | grep -o '"desired":[0-9]*' | grep -o '[0-9]*' || echo "0")
+                  fi
+
+                  CURRENT=$(kubectl get deployment "$JVB_DEPLOY" -n {{ .Release.Namespace }} \
+                    -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
+
+                  log "Current replicas: $CURRENT, Desired: $DESIRED"
 
                   if [ "$DESIRED" != "$CURRENT" ]; then
-                    echo "Scaling JVB from $CURRENT to $DESIRED replicas"
-                    kubectl scale deployment {{ .Values.jvbScaler.jvbDeploymentName }} \
+                    log "Scaling JVB from $CURRENT to $DESIRED"
+                    kubectl scale deployment "$JVB_DEPLOY" \
                       -n {{ .Release.Namespace }} --replicas="$DESIRED"
+                    log "Scale command completed (exit $?)"
                   else
-                    echo "JVB already at $DESIRED replicas"
+                    log "No change needed"
                   fi
               securityContext:
                 allowPrivilegeEscalation: false
@@ -91,7 +132,7 @@ metadata:
 rules:
   - apiGroups: ["apps"]
     resources: ["deployments"]
-    verbs: ["get"]
+    verbs: ["get", "list"]
   - apiGroups: ["apps"]
     resources: ["deployments/scale"]
     verbs: ["get", "patch"]

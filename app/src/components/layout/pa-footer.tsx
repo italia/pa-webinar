@@ -84,6 +84,9 @@ export default function PAFooter() {
             <li className="list-inline-item">
               <Link href="/note-legali">{t('footer.legalNotes')}</Link>
             </li>
+            <li className="list-inline-item">
+              <Link href="/status">{t('footer.systemStatus')}</Link>
+            </li>
           </ul>
         </div>
       </div>

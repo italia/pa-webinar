@@ -114,6 +114,10 @@ export const GET = withErrorHandling(async (request, context) => {
     participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
     recordingUrl: event.recordingUrl,
+  }, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+    },
   });
 });
 

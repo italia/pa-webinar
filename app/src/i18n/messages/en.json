@@ -603,6 +603,44 @@
       }
     }
   },
+  "status": {
+    "title": "System status",
+    "subtitle": "Real-time overview of platform service status.",
+    "allOperational": "All systems operational",
+    "degraded": "Degraded performance",
+    "outage": "Service outage",
+    "componentLabel": "Component",
+    "statusLabel": "Status",
+    "operational": "Operational",
+    "degradedLabel": "Degraded",
+    "standby": "Standby",
+    "loading": "Loading...",
+    "fetchError": "Unable to fetch system status",
+    "components": {
+      "app": "Web portal",
+      "database": "Database",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Video recording",
+      "smtp": "Email (SMTP)"
+    },
+    "jvbCapacity": "Video bridge capacity",
+    "jvbStandby": "Standby — activates automatically when needed",
+    "jvbScaling": "Scaling up...",
+    "nodesActive": "nodes active",
+    "participantsAvailable": "participants available",
+    "upcomingEvents": "Upcoming events",
+    "noUpcomingEvents": "No upcoming events",
+    "jvbActivatesIn": "JVB activates in {minutes} min",
+    "liveNow": "Live now",
+    "activeEvents": "Active events",
+    "registrationsToday": "Registrations today",
+    "jvbNodes": "JVB nodes",
+    "overallStatus": "Overall status",
+    "lastChecked": "Last checked",
+    "responseTime": "Response time",
+    "systemStatus": "System status"
+  },
   "footer": {
     "departmentName": "Department for Digital Transformation",
     "presidencyName": "Presidency of the Council of Ministers",
@@ -611,6 +649,7 @@
     "openSource": "Open source software",
     "contacts": "Contacts",
     "legalNotes": "Legal notes",
-    "governmentSite": "Italian Government"
+    "governmentSite": "Italian Government",
+    "systemStatus": "System status"
   }
 }

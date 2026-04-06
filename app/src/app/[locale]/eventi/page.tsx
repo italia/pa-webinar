@@ -4,6 +4,8 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import EventListClient from '@/components/events/event-list-client';
 
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('events');
   return { title: t('title') };
