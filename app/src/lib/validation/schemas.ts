@@ -174,3 +174,57 @@ export const createReminderSchema = z.object({
     { message: 'Invalid offset' },
   ),
 });
+
+// ── Feedback Schemas ────────────────────────────────────
+
+export const createFeedbackSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().max(500).optional(),
+  accessToken: z.string().min(1).optional(),
+  guestId: z.string().min(1).optional(),
+}).refine(
+  (data) => data.accessToken || data.guestId,
+  { message: 'Either accessToken or guestId is required' },
+);
+
+export type CreateFeedbackInput = z.infer<typeof createFeedbackSchema>;
+
+// ── Word Cloud Schemas ──────────────────────────────────
+
+export const createWordCloudRoundSchema = z.object({
+  prompt: z.string().min(3).max(200),
+  duration: z.number().int().min(30).max(300).default(120),
+});
+
+export const submitWordCloudSchema = z.object({
+  word: z.string().min(1).max(30),
+  accessToken: z.string().min(1).optional(),
+  guestId: z.string().min(1).optional(),
+}).refine(
+  (data) => data.accessToken || data.guestId,
+  { message: 'Either accessToken or guestId is required' },
+);
+
+export type CreateWordCloudRoundInput = z.infer<typeof createWordCloudRoundSchema>;
+export type SubmitWordCloudInput = z.infer<typeof submitWordCloudSchema>;
+
+// ── Timer Schemas ───────────────────────────────────────
+
+export const timerActionSchema = z.object({
+  action: z.enum(['start', 'pause', 'reset']),
+  duration: z.number().int().min(10).max(7200).optional(),
+  visible: z.boolean().optional(),
+});
+
+export type TimerActionInput = z.infer<typeof timerActionSchema>;
+
+// ── Reaction Schemas ────────────────────────────────────
+
+const VALID_EMOJIS = ['👏', '❤️', '😂', '🎉', '👍', '😮'] as const;
+
+export const sendReactionSchema = z.object({
+  emoji: z.enum(VALID_EMOJIS),
+});
+
+export { VALID_EMOJIS };
+export type SendReactionInput = z.infer<typeof sendReactionSchema>;

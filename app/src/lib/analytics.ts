@@ -9,6 +9,8 @@ export interface AnalyticsOverview {
   averageParticipantsPerEvent: number;
   averageConversionRate: number;
   averageDurationMinutes: number;
+  averageFeedbackRating: number;
+  totalFeedback: number;
 }
 
 export interface AnalyticsTimeline {
@@ -42,7 +44,7 @@ export async function getOverview(days?: number): Promise<AnalyticsOverview> {
   const dateFilter = days ? { gte: daysAgoDate(days) } : undefined;
   const eventWhere = dateFilter ? { startsAt: dateFilter } : {};
 
-  const [events, registrations, participants, questions, pollVotes] =
+  const [events, registrations, participants, questions, pollVotes, feedbackAgg] =
     await Promise.all([
       prisma.event.count({ where: eventWhere }),
       prisma.registration.count({
@@ -64,6 +66,13 @@ export async function getOverview(days?: number): Promise<AnalyticsOverview> {
       prisma.pollVote.count({
         where: dateFilter
           ? { poll: { event: { startsAt: dateFilter } } }
+          : {},
+      }),
+      prisma.eventFeedback.aggregate({
+        _avg: { rating: true },
+        _count: true,
+        where: dateFilter
+          ? { event: { startsAt: dateFilter } }
           : {},
       }),
     ]);
@@ -99,6 +108,8 @@ export async function getOverview(days?: number): Promise<AnalyticsOverview> {
     averageParticipantsPerEvent: avgParticipants,
     averageConversionRate: avgConversion,
     averageDurationMinutes: avgDuration,
+    averageFeedbackRating: Math.round((feedbackAgg._avg.rating ?? 0) * 10) / 10,
+    totalFeedback: feedbackAgg._count,
   };
 }
 

@@ -24,6 +24,9 @@ import ParticipantPanel from '@/components/participants/participant-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
 import GuestJoinForm from '@/components/live/guest-join-form';
 import AudioPlayer from '@/components/live/audio-player';
+import EventFeedback from '@/components/live/event-feedback';
+import PresentationTimer from '@/components/live/presentation-timer';
+import ReactionBar from '@/components/live/reaction-bar';
 
 interface EventInfo {
   id: string;
@@ -105,6 +108,8 @@ export default function LiveEventClient({
   const [countdown, setCountdown] = useState('');
   const [eventStatus, setEventStatus] = useState(event.status);
   const [startingEvent, setStartingEvent] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [guestId] = useState(() => isGuest ? `guest_${Math.random().toString(36).slice(2, 10)}` : '');
 
   // Determine initial phase
   useEffect(() => {
@@ -233,8 +238,34 @@ export default function LiveEventClient({
     setPhase('ready');
   }, []);
 
+  // Poll event status during ready phase to detect ENDED
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/events/${event.slug}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.status === 'ENDED' && eventStatus !== 'ENDED') {
+          setEventStatus('ENDED');
+          if (!isModerator) {
+            setShowFeedback(true);
+          }
+        }
+      } catch { /* retry */ }
+    }, 5000);
+    return () => clearInterval(pollInterval);
+  }, [phase, event.slug, eventStatus, isModerator]);
+
+  const handleFeedbackClose = useCallback(() => {
+    setShowFeedback(false);
+    setPhase('ended');
+  }, []);
+
   const handleJitsiReady = useCallback(() => {}, []);
-  const handleJitsiLeft = useCallback(() => { setPhase('ended'); }, []);
+  const handleJitsiLeft = useCallback(() => {
+    if (!showFeedback) setPhase('ended');
+  }, [showFeedback]);
   const handleParticipantCountChanged = useCallback((count: number) => { setParticipantCount(count); }, []);
   const handleRecordingStatusChanged = useCallback((recording: boolean) => { setIsRecording(recording); }, []);
   const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => { setJitsiApi(api); }, []);
@@ -456,25 +487,34 @@ export default function LiveEventClient({
         />
       )}
 
+      <PresentationTimer
+        eventSlug={event.slug}
+        token={token}
+        isModerator={isActualModerator}
+      />
+
       <div className="d-flex flex-column flex-lg-row flex-grow-1" style={{ minHeight: 0 }}>
-        <div className="flex-grow-1 position-relative" style={{ minHeight: '300px' }}>
-          <JitsiRoom
-            domain={jitsiDomain}
-            roomName={credentials.roomName}
-            jwt={credentials.jwt}
-            displayName={credentials.displayName}
-            locale={locale}
-            role={isActualModerator ? 'moderator' : 'participant'}
-            participantsCanUnmute={event.participantsCanUnmute}
-            participantsCanStartVideo={event.participantsCanStartVideo}
-            participantsCanShareScreen={event.participantsCanShareScreen}
-            watermark={watermark}
-            onReady={handleJitsiReady}
-            onLeft={handleJitsiLeft}
-            onParticipantCountChanged={handleParticipantCountChanged}
-            onRecordingStatusChanged={handleRecordingStatusChanged}
-            onApiReady={handleApiReady}
-          />
+        <div className="d-flex flex-column flex-grow-1" style={{ minHeight: '300px' }}>
+          <div className="flex-grow-1 position-relative">
+            <JitsiRoom
+              domain={jitsiDomain}
+              roomName={credentials.roomName}
+              jwt={credentials.jwt}
+              displayName={credentials.displayName}
+              locale={locale}
+              role={isActualModerator ? 'moderator' : 'participant'}
+              participantsCanUnmute={event.participantsCanUnmute}
+              participantsCanStartVideo={event.participantsCanStartVideo}
+              participantsCanShareScreen={event.participantsCanShareScreen}
+              watermark={watermark}
+              onReady={handleJitsiReady}
+              onLeft={handleJitsiLeft}
+              onParticipantCountChanged={handleParticipantCountChanged}
+              onRecordingStatusChanged={handleRecordingStatusChanged}
+              onApiReady={handleApiReady}
+            />
+          </div>
+          <ReactionBar eventSlug={event.slug} />
         </div>
 
         <LiveSidebar
@@ -485,6 +525,15 @@ export default function LiveEventClient({
           jitsiApi={jitsiApi}
         />
       </div>
+
+      {showFeedback && (
+        <EventFeedback
+          eventSlug={event.slug}
+          accessToken={!isGuest && !isModerator ? token : undefined}
+          guestId={isGuest ? guestId : undefined}
+          onClose={handleFeedbackClose}
+        />
+      )}
     </div>
   );
 }
