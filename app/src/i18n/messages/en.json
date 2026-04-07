@@ -853,6 +853,54 @@
     "responseTime": "Response time",
     "systemStatus": "System status"
   },
+  "feedback": {
+    "title": "How would you rate this event?",
+    "ratingLabel": "Select a rating from 1 to 5 stars",
+    "comment": "Comment",
+    "commentPlaceholder": "Any suggestions? (optional)",
+    "submit": "Submit feedback",
+    "submitting": "Submitting...",
+    "skip": "Skip",
+    "thankYou": "Thank you for your feedback!",
+    "averageRating": "Average rating",
+    "ratingCount": "{count} ratings",
+    "noFeedback": "No feedback received"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Start",
+    "prompt": "Topic",
+    "promptPlaceholder": "e.g. What do you expect from this event?",
+    "duration": "Duration",
+    "submit": "Submit",
+    "submitPlaceholder": "Type a word (max 30 chars)",
+    "close": "Close word cloud",
+    "cancel": "Cancel",
+    "noActiveRound": "No word cloud active at the moment.",
+    "noWords": "Waiting for the first words...",
+    "wordsSubmitted": "{count} words submitted",
+    "timeRemaining": "Time remaining"
+  },
+  "timer": {
+    "title": "Timer",
+    "start": "Start",
+    "pause": "Pause",
+    "reset": "Reset",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Custom"
+    },
+    "showToAll": "Show to all",
+    "timeUp": "Time's up!"
+  },
+  "reactions": {
+    "title": "Reactions",
+    "sendReaction": "Send reaction",
+    "reactionSent": "Reaction sent!"
+  },
   "footer": {
     "departmentName": "Department for Digital Transformation",
     "presidencyName": "Presidency of the Council of Ministers",

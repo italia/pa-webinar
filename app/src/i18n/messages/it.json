@@ -853,6 +853,54 @@
     "responseTime": "Tempo di risposta",
     "systemStatus": "Stato del sistema"
   },
+  "feedback": {
+    "title": "Come valuti questo evento?",
+    "ratingLabel": "Seleziona un voto da 1 a 5 stelle",
+    "comment": "Commento",
+    "commentPlaceholder": "Hai suggerimenti? (facoltativo)",
+    "submit": "Invia feedback",
+    "submitting": "Invio...",
+    "skip": "Salta",
+    "thankYou": "Grazie per il tuo feedback!",
+    "averageRating": "Valutazione media",
+    "ratingCount": "{count} valutazioni",
+    "noFeedback": "Nessun feedback ricevuto"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Avvia",
+    "prompt": "Tema",
+    "promptPlaceholder": "es. Cosa ti aspetti da questo evento?",
+    "duration": "Durata",
+    "submit": "Invia",
+    "submitPlaceholder": "Scrivi una parola (max 30 car.)",
+    "close": "Chiudi word cloud",
+    "cancel": "Annulla",
+    "noActiveRound": "Nessun word cloud attivo al momento.",
+    "noWords": "In attesa delle prime parole...",
+    "wordsSubmitted": "{count} parole inviate",
+    "timeRemaining": "Tempo rimanente"
+  },
+  "timer": {
+    "title": "Timer",
+    "start": "Avvia",
+    "pause": "Pausa",
+    "reset": "Azzera",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Personalizzato"
+    },
+    "showToAll": "Mostra a tutti",
+    "timeUp": "Tempo scaduto!"
+  },
+  "reactions": {
+    "title": "Reazioni",
+    "sendReaction": "Invia reazione",
+    "reactionSent": "Reazione inviata!"
+  },
   "footer": {
     "departmentName": "Dipartimento per la Trasformazione Digitale",
     "presidencyName": "Presidenza del Consiglio dei Ministri",

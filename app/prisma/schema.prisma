@@ -70,12 +70,14 @@ model Event {
   updatedAt   DateTime @updatedAt @map("updated_at")
   
   // Relations
-  registrations Registration[]
-  questions     Question[]
-  polls         Poll[]
-  materials     EventMaterial[]
-  reminders     EventReminder[]
-  gdprAuditLogs GdprAuditLog[]
+  registrations   Registration[]
+  questions       Question[]
+  polls           Poll[]
+  materials       EventMaterial[]
+  reminders       EventReminder[]
+  gdprAuditLogs   GdprAuditLog[]
+  feedback        EventFeedback[]
+  wordCloudRounds WordCloudRound[]
 
   @@map("events")
 }
@@ -141,6 +143,7 @@ model Registration {
   upvotes       QuestionUpvote[]
   pollVotes     PollVote[]
   remindersSent ReminderSent[]
+  feedback      EventFeedback[]
 
   @@unique([eventId, emailHash])
   @@map("registrations")
@@ -368,4 +371,59 @@ enum HomePageMode {
   LANDING
   EVENTS_LIST
   CUSTOM
+}
+
+// ─── Event Feedback ─────────────────────────────────
+
+model EventFeedback {
+  id              String   @id @default(uuid()) @db.Uuid
+  eventId         String   @map("event_id") @db.Uuid
+  registrationId  String?  @map("registration_id") @db.Uuid
+  guestId         String?  @map("guest_id")
+  rating          Int      // 1-5
+  comment         String?  @db.VarChar(500)
+
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  event           Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration    Registration? @relation(fields: [registrationId], references: [id], onDelete: SetNull)
+
+  @@unique([eventId, registrationId])
+  @@unique([eventId, guestId])
+  @@index([eventId])
+  @@map("event_feedback")
+}
+
+// ─── Word Cloud ─────────────────────────────────────
+
+model WordCloudRound {
+  id          String   @id @default(uuid()) @db.Uuid
+  eventId     String   @map("event_id") @db.Uuid
+  prompt      String   @db.VarChar(200)
+  status      String   @default("OPEN") // OPEN, CLOSED
+  duration    Int      @default(120)
+  createdAt   DateTime @default(now()) @map("created_at")
+  closedAt    DateTime? @map("closed_at")
+
+  // Relations
+  event       Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  submissions WordCloudSubmission[]
+
+  @@index([eventId, status])
+  @@map("word_cloud_rounds")
+}
+
+model WordCloudSubmission {
+  id              String   @id @default(uuid()) @db.Uuid
+  roundId         String   @map("round_id") @db.Uuid
+  registrationId  String?  @map("registration_id") @db.Uuid
+  guestId         String?  @map("guest_id")
+  word            String   @db.VarChar(30)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  round           WordCloudRound @relation(fields: [roundId], references: [id], onDelete: Cascade)
+
+  @@map("word_cloud_submissions")
 }

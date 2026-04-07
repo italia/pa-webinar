@@ -171,10 +171,15 @@ describe('updateEventSchema', () => {
   });
 
   it('accepts valid status values', () => {
-    for (const status of ['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED', 'ARCHIVED']) {
+    for (const status of ['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED']) {
       const result = updateEventSchema.safeParse({ status });
       expect(result.success).toBe(true);
     }
+  });
+
+  it('rejects ARCHIVED status (internal only)', () => {
+    const result = updateEventSchema.safeParse({ status: 'ARCHIVED' });
+    expect(result.success).toBe(false);
   });
 
   it('rejects invalid status', () => {

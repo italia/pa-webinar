@@ -64,6 +64,18 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        const feedbackDeleted = await tx.eventFeedback.deleteMany({
+          where: { eventId: evt.id },
+        });
+
+        const wcSubmissionsDeleted = await tx.wordCloudSubmission.deleteMany({
+          where: { round: { eventId: evt.id } },
+        });
+
+        const wcRoundsDeleted = await tx.wordCloudRound.deleteMany({
+          where: { eventId: evt.id },
+        });
+
         const materialsDeleted = await tx.eventMaterial.deleteMany({
           where: { eventId: evt.id },
         });
@@ -92,6 +104,9 @@ export const GET = withErrorHandling(async (request) => {
           questions: questionsDeleted.count,
           pollVotes: pollVotesDeleted.count,
           polls: pollsDeleted.count,
+          feedback: feedbackDeleted.count,
+          wordCloudSubmissions: wcSubmissionsDeleted.count,
+          wordCloudRounds: wcRoundsDeleted.count,
           materials: materialsDeleted.count,
           remindersSent: reminderSentDeleted.count,
           reminders: remindersDeleted.count,
