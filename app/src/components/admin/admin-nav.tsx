@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: '/admin', icon: 'it-calendar', labelKey: 'events' },
   { href: '/admin/statistiche', icon: 'it-chart-line', labelKey: 'analytics' },
   { href: '/admin/impostazioni', icon: 'it-settings', labelKey: 'settings' },
+  { href: '/admin/infrastruttura', icon: 'it-server', labelKey: 'infrastructure' },
 ] as const;
 
 export default function AdminNav() {

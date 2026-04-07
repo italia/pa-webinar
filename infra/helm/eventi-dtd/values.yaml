@@ -433,6 +433,50 @@ jitsi-meet:
           hosts:
             - jitsi.videocall.example.com
 
+# ── Recording Pipeline ────────────────────────────────────────
+# Configuration for Jibri recording storage and finalize script.
+# Only effective when jitsi-meet.jibri.enabled=true.
+
+recording:
+  storage:
+    # local | azure-blob | s3 | gcs | minio
+    type: "local"
+
+    # Azure Blob Storage (AKS recommended)
+    azure:
+      connectionString: ""  # From secret
+      containerName: "recordings"
+
+    # AWS S3
+    s3:
+      bucket: ""
+      region: ""
+      accessKeyId: ""     # From secret
+      secretAccessKey: "" # From secret
+
+    # Google Cloud Storage
+    gcs:
+      bucket: ""
+      credentials: ""    # From secret (service account JSON)
+
+    # MinIO (self-hosted S3-compatible)
+    minio:
+      endpoint: ""
+      bucket: ""
+      accessKey: ""      # From secret
+      secretKey: ""      # From secret
+
+  # Jibri local PVC for in-progress recording
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClassName: ""  # Use cluster default
+
+  # GDPR retention — cleanup cron deletes recordings after this period
+  retentionDays: 90
+  # Safety limit for maximum recording duration
+  maxDurationMinutes: 240
+
 # ── PostgreSQL ───────────────────────────────────────────────
 
 postgresql:

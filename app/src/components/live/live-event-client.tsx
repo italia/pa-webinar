@@ -41,6 +41,13 @@ interface EventInfo {
   participantsCanShareScreen: boolean;
 }
 
+interface WatermarkSettings {
+  url?: string;
+  enabled?: boolean;
+  opacity?: number;
+  position?: string;
+}
+
 interface LiveEventClientProps {
   event: EventInfo;
   token: string;
@@ -49,7 +56,8 @@ interface LiveEventClientProps {
   displayName: string;
   locale: string;
   jitsiDomain: string;
-  watermarkUrl?: string;
+  watermark?: WatermarkSettings;
+  jibriAvailable?: boolean;
 }
 
 type LivePhase =
@@ -77,7 +85,8 @@ export default function LiveEventClient({
   displayName: initialDisplayName,
   locale,
   jitsiDomain,
-  watermarkUrl,
+  watermark,
+  jibriAvailable = true,
 }: LiveEventClientProps) {
   const t = useTranslations('live');
   const tc = useTranslations('common');
@@ -443,6 +452,7 @@ export default function LiveEventClient({
           eventId={event.id}
           moderatorToken={token}
           recordingEnabled={event.recordingEnabled}
+          jibriAvailable={jibriAvailable}
         />
       )}
 
@@ -458,7 +468,7 @@ export default function LiveEventClient({
             participantsCanUnmute={event.participantsCanUnmute}
             participantsCanStartVideo={event.participantsCanStartVideo}
             participantsCanShareScreen={event.participantsCanShareScreen}
-            watermarkUrl={watermarkUrl}
+            watermark={watermark}
             onReady={handleJitsiReady}
             onLeft={handleJitsiLeft}
             onParticipantCountChanged={handleParticipantCountChanged}

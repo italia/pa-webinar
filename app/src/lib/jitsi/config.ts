@@ -90,14 +90,13 @@ export const jitsiConfigOverwrite = {
   // Nuclear watermark removal
   'watermark.enabled': false,
 
-  // Branding — dynamicBrandingUrl works in production when Jitsi is served
-  // from the same domain via Ingress (same-origin). In local dev the fetch
-  // may fail silently due to cross-origin, which is fine.
+  // Dynamic branding — served by /api/jitsi-branding.json (settings-driven).
+  // Works cross-origin in production via Ingress; may fail silently in local dev.
   brandingDataUrl: null,
   dynamicBrandingUrl:
     typeof window !== 'undefined'
-      ? `${window.location.origin}/jitsi-branding.json`
-      : '/jitsi-branding.json',
+      ? `${window.location.origin}/api/jitsi-branding.json`
+      : '/api/jitsi-branding.json',
 };
 
 /**

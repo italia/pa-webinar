@@ -170,6 +170,7 @@
     "guestJoinButton": "Entra come ospite",
     "guestRedirectToRegister": "L'evento non è ancora iniziato. Registrati per ricevere il link di accesso.",
     "jibriUnavailable": "Registrazione non disponibile — Jibri non configurato",
+    "jibriNotConfigured": "Registrazione non configurata nell'infrastruttura",
     "eventEnded": "Evento concluso",
     "eventEndedMessage": "L'evento è terminato. Grazie per aver partecipato.",
     "backToEvent": "Torna all'evento",
@@ -323,7 +324,17 @@
       "events": "Gestione eventi",
       "analytics": "Statistiche",
       "settings": "Impostazioni sito",
+      "infrastructure": "Infrastruttura",
       "ariaLabel": "Navigazione amministrazione"
+    },
+    "recording": {
+      "title": "Registrazione video",
+      "play": "Riproduci",
+      "download": "Scarica",
+      "delete": "Elimina registrazione",
+      "deleteConfirm": "Sei sicuro di voler eliminare la registrazione? Questa azione è irreversibile.",
+      "notConfigured": "La registrazione video non è disponibile. Jibri non è configurato nell'infrastruttura.",
+      "inProgress": "Registrazione in corso..."
     },
     "login": {
       "title": "Accesso amministratore",
@@ -481,6 +492,21 @@
         "faviconUrl": "URL favicon",
         "primaryColor": "Colore primario"
       },
+      "watermark": {
+        "title": "Personalizzazione video",
+        "enabled": "Watermark attivo",
+        "url": "URL watermark",
+        "urlHelp": "URL di un'immagine SVG o PNG trasparente. Lascia vuoto per usare il logo dell'organizzazione.",
+        "opacity": "Opacità",
+        "position": "Posizione",
+        "previewLabel": "Anteprima area video",
+        "positions": {
+          "bottomLeft": "Basso a sinistra",
+          "bottomRight": "Basso a destra",
+          "topLeft": "Alto a sinistra",
+          "topRight": "Alto a destra"
+        }
+      },
       "seo": {
         "title": "Titolo SEO",
         "titleHelp": "Titolo mostrato nei risultati di ricerca e nella scheda del browser",
@@ -576,6 +602,61 @@
         "totalPollVotes": "Voti sondaggi totali",
         "avgParticipantsPerEvent": "Partecipanti medi per evento"
       }
+    },
+    "infrastructure": {
+      "title": "Infrastruttura",
+      "subtitle": "Stato dei componenti e della configurazione dell'ambiente",
+      "deploymentMode": "Modalità deploy",
+      "version": "Versione",
+      "environment": "Ambiente",
+      "modes": {
+        "simple": "Semplice (Docker Compose)",
+        "standard": "Standard (Kubernetes)",
+        "full": "Completa (Kubernetes con scale-to-zero)",
+        "unknown": "Sconosciuta"
+      },
+      "database": {
+        "title": "Database",
+        "internal": "In-cluster (PostgreSQL)",
+        "external": "Esterno",
+        "connected": "Connesso",
+        "disconnected": "Non raggiungibile"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Raggiungibile",
+        "unreachable": "Non raggiungibile",
+        "notConfigured": "Non configurato"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero attivo",
+        "replicas": "{current}/{max} nodi",
+        "preScale": "Pre-scale: {minutes} min",
+        "fixedMode": "Modalità fissa",
+        "scalerEnabled": "Scaler abilitato"
+      },
+      "jibri": {
+        "title": "Registrazione (Jibri)",
+        "available": "Disponibile",
+        "notConfigured": "Non configurato",
+        "storageType": "Storage",
+        "configureHint": "La registrazione video richiede Jibri. Configura lo storage per abilitarla.",
+        "docsLink": "Documentazione"
+      },
+      "email": {
+        "title": "Email",
+        "configured": "Configurato",
+        "notConfigured": "Non configurato"
+      },
+      "features": {
+        "title": "Funzionalità",
+        "statusPage": "Pagina di stato",
+        "guestAccess": "Accesso ospiti",
+        "metrics": "Endpoint metriche"
+      },
+      "note": "Le modifiche infrastrutturali si effettuano tramite Helm values e la pipeline CI/CD.",
+      "deployDocs": "Documentazione deploy"
     }
   },
   "email": {
