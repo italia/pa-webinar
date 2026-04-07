@@ -22,9 +22,26 @@ function getJitsiJwtSecret(): Uint8Array {
   }
   return new TextEncoder().encode(secret);
 }
-const JITSI_JWT_APP_ID = process.env.JITSI_JWT_APP_ID ?? 'eventi_dtd';
-const JITSI_JWT_ISSUER = process.env.JITSI_JWT_ISSUER ?? 'eventi-dtd';
-const JITSI_JWT_AUDIENCE = process.env.JITSI_JWT_AUDIENCE ?? 'jitsi';
+
+function getJitsiJwtAppId(): string {
+  return process.env.JITSI_JWT_APP_ID ?? 'eventi_dtd';
+}
+
+function getJitsiJwtIssuer(): string {
+  return process.env.JITSI_JWT_ISSUER ?? 'eventi-dtd';
+}
+
+function getJitsiJwtAudience(): string {
+  return process.env.JITSI_JWT_AUDIENCE ?? 'jitsi';
+}
+
+function getJitsiJwtSubject(): string {
+  return (
+    process.env.JITSI_JWT_SUBJECT ??
+    process.env.NEXT_PUBLIC_JITSI_DOMAIN ??
+    'localhost:8443'
+  );
+}
 
 interface JitsiTokenPayload {
   roomName: string;
@@ -47,6 +64,10 @@ export async function generateJitsiJwt(
   const features: JitsiJwtFeatures = payload.isModerator
     ? moderatorFeatures
     : participantFeatures;
+  const jitsiJwtAppId = getJitsiJwtAppId();
+  const jitsiJwtIssuer = getJitsiJwtIssuer();
+  const jitsiJwtAudience = getJitsiJwtAudience();
+  const jitsiJwtSubject = getJitsiJwtSubject();
 
   const jwt = await new SignJWT({
     context: {
@@ -63,9 +84,10 @@ export async function generateJitsiJwt(
     room: payload.roomName,
   })
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
-    .setSubject(JITSI_JWT_APP_ID)
-    .setIssuer(JITSI_JWT_ISSUER)
-    .setAudience(JITSI_JWT_AUDIENCE)
+    .setSubject(jitsiJwtSubject)
+    .setIssuer(jitsiJwtIssuer)
+    .setAudience(jitsiJwtAudience)
+    .setJti(`${jitsiJwtAppId}:${payload.uniqueId}`)
     .setIssuedAt()
     .setExpirationTime(
       `${payload.expiresInSeconds ?? 4 * 60 * 60}s`

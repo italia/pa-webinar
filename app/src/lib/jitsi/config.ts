@@ -88,7 +88,6 @@ export const jitsiConfigOverwrite = {
   brandingRoomAlias: null,
 
   // Nuclear watermark removal
-  defaultLogoUrl: '',
   'watermark.enabled': false,
 
   // Branding — dynamicBrandingUrl works in production when Jitsi is served
@@ -110,8 +109,6 @@ export const jitsiInterfaceConfigOverwrite = {
   SHOW_BRAND_WATERMARK: false,
   BRAND_WATERMARK_LINK: '',
   JITSI_WATERMARK_LINK: '',
-  DEFAULT_LOGO_URL: '',
-  DEFAULT_WELCOME_PAGE_LOGO_URL: '',
   SHOW_POWERED_BY: false,
   PROVIDER_NAME: 'DTD',
   APP_NAME: 'Eventi DTD',

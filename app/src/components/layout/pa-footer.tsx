@@ -147,6 +147,11 @@ export default function PAFooter() {
                 </li>
               </>
             )}
+            {settings.statusPageEnabled && (
+              <li className="list-inline-item">
+                <Link href="/status">{t('footer.systemStatus')}</Link>
+              </li>
+            )}
           </ul>
         </div>
       </div>

@@ -1,7 +1,6 @@
 import { withErrorHandling } from '@/lib/api-handler';
-import { UnauthorizedError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
-import { constantTimeEqual } from '@/lib/auth/moderator';
+import { assertCronApiKey } from '@/lib/auth/cron';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,12 +14,7 @@ export const dynamic = 'force-dynamic';
  * In production, called daily at 03:00 UTC via a Kubernetes CronJob.
  */
 export const GET = withErrorHandling(async (request) => {
-  const apiKey = process.env.CRON_API_KEY;
-  const providedKey = request.headers.get('x-api-key') ?? '';
-
-  if (!apiKey || !constantTimeEqual(providedKey, apiKey)) {
-    throw new UnauthorizedError();
-  }
+  assertCronApiKey(request);
 
   const now = new Date();
 

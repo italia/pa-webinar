@@ -612,7 +612,7 @@ Il JWT inviato a Jitsi per autenticare l'accesso alla room:
 | `context.user.email` | Hash SHA-256 dell'email — Jitsi non riceve mai l'email in chiaro |
 | `room` | UUID della room Jitsi, corrisponde a `jitsiRoomName` nel DB |
 | `iss` | Issuer, configurato in `JITSI_JWT_ISSUER` |
-| `sub` | Subject, configurato in `JITSI_JWT_APP_ID` |
+| `sub` | Dominio/tenant Jitsi, configurato in `JITSI_JWT_SUBJECT` o derivato da `NEXT_PUBLIC_JITSI_DOMAIN` |
 | `aud` | Audience, configurato in `JITSI_JWT_AUDIENCE` |
 | `moderator` | `true` per moderatori, `false` per partecipanti |
 | `exp` | Scadenza UNIX timestamp, durata breve (es. 4 ore) |
