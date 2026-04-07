@@ -249,6 +249,12 @@
     }
   },
   "admin": {
+    "nav": {
+      "events": "Event management",
+      "analytics": "Analytics",
+      "settings": "Site settings",
+      "ariaLabel": "Admin navigation"
+    },
     "login": {
       "title": "Administrator access",
       "keyLabel": "Access key",
@@ -374,6 +380,131 @@
         "DATA_DELETED": "Data deleted",
         "CONSENT_RECORDED": "Consent recorded",
         "DATA_EXPORTED": "Data exported"
+      }
+    },
+    "settings": {
+      "title": "Site settings",
+      "subtitle": "Configure the platform appearance and behavior for PA reuse",
+      "saving": "Saving...",
+      "saved": "Settings saved successfully",
+      "tabs": {
+        "branding": "Branding",
+        "seo": "SEO",
+        "homepage": "Home page",
+        "pages": "Pages",
+        "footer": "Footer",
+        "features": "Features"
+      },
+      "branding": {
+        "siteName": "Application name",
+        "siteNameHelp": "Shown in the header, browser title and emails",
+        "siteDescription": "Application description",
+        "organizationName": "Organization name",
+        "organizationNameHelp": "e.g. Department for Digital Transformation",
+        "organizationNameShort": "Organization short name",
+        "organizationUrl": "Organization URL",
+        "parentOrganization": "Parent organization",
+        "parentOrganizationHelp": "e.g. Presidency of the Council of Ministers",
+        "parentOrganizationUrl": "Parent organization URL",
+        "logoUrl": "Custom logo URL",
+        "logoUrlHelp": "Leave empty to use the default PA icon",
+        "faviconUrl": "Favicon URL",
+        "primaryColor": "Primary color"
+      },
+      "seo": {
+        "title": "SEO title",
+        "titleHelp": "Title shown in search results and the browser tab",
+        "description": "SEO description",
+        "descriptionHelp": "Description for search engines and social sharing",
+        "image": "Open Graph image",
+        "imageHelp": "Default image for social sharing (1200x630 recommended)"
+      },
+      "homepage": {
+        "modeLabel": "Home page mode",
+        "modes": {
+          "LANDING": {
+            "title": "Landing page",
+            "description": "Hero, features, upcoming events and how it works"
+          },
+          "EVENTS_LIST": {
+            "title": "Events list",
+            "description": "Show the event list directly"
+          },
+          "CUSTOM": {
+            "title": "Custom",
+            "description": "Custom HTML content + event list"
+          }
+        },
+        "customHtmlLabel": "Custom HTML content",
+        "customHtmlHelp": "HTML shown in the main section of the home page"
+      },
+      "pages": {
+        "privacyTitle": "Privacy policy",
+        "privacyIt": "Content (Italian)",
+        "privacyEn": "Content (English)",
+        "accessibilityTitle": "Accessibility statement",
+        "accessibilityIt": "Content (Italian)",
+        "accessibilityEn": "Content (English)",
+        "preview": "Preview"
+      },
+      "footer": {
+        "linksTitle": "Footer links",
+        "addLink": "Add link",
+        "noLinks": "No links configured. Default links will be used.",
+        "linkTitle": "Title",
+        "linkSection": "Section",
+        "sectionLegal": "Legal",
+        "sectionMain": "Main",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "removeLink": "Remove link"
+      },
+      "features": {
+        "statusPageEnabled": "Status page enabled",
+        "statusPageEnabledHelp": "Show the service status page",
+        "guestAccessEnabled": "Guest access enabled",
+        "guestAccessEnabledHelp": "Allow guest access to live events",
+        "publicRegistrationEnabled": "Public registration enabled",
+        "publicRegistrationEnabledHelp": "Anyone can create events (if disabled, only admins can)",
+        "githubUrl": "GitHub repository URL",
+        "supportEmail": "Support email"
+      }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "Platform metrics overview",
+      "timeline": "Timeline",
+      "topEvents": "Top events",
+      "noData": "No data available for this period.",
+      "period": {
+        "7d": "7 days",
+        "30d": "30 days",
+        "90d": "90 days",
+        "all": "All time"
+      },
+      "metrics": {
+        "totalEvents": "Total events",
+        "totalRegistrations": "Registrations",
+        "totalParticipants": "Participants",
+        "conversionRate": "Avg conversion rate",
+        "peakParticipants": "Peak participants"
+      },
+      "table": {
+        "event": "Event",
+        "date": "Date",
+        "registrations": "Registrations",
+        "participants": "Participants",
+        "peak": "Peak",
+        "questions": "Q&A",
+        "conversion": "Conversion",
+        "noEvents": "No events found."
+      },
+      "quickStats": {
+        "title": "Quick stats",
+        "avgDuration": "Average event duration",
+        "avgQuestionsPerEvent": "Q&A questions per event",
+        "totalPollVotes": "Total poll votes",
+        "avgParticipantsPerEvent": "Avg participants per event"
       }
     }
   },
@@ -548,5 +679,11 @@
     "contacts": "Contacts",
     "legalNotes": "Legal notes",
     "governmentSite": "Italian Government"
+  },
+  "pages": {
+    "privacyTitle": "Privacy policy",
+    "privacyNotConfigured": "Privacy policy not yet configured.",
+    "accessibilityTitle": "Accessibility statement",
+    "accessibilityNotConfigured": "Accessibility statement not yet configured."
   }
 }

@@ -11,6 +11,7 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { useSettings } from '@/lib/settings-context';
 
 import LanguageSwitcher from './language-switcher';
 
@@ -20,14 +21,27 @@ interface PAHeaderProps {
 
 export default function PAHeader({ isAdmin }: PAHeaderProps) {
   const t = useTranslations();
+  const settings = useSettings();
+
+  const slimTitle =
+    settings.parentOrganization || t('header.slimTitle');
+  const slimSubtitle =
+    settings.organizationNameShort || settings.organizationName || t('header.slimSubtitle');
+  const parentUrl = settings.parentOrganizationUrl || 'https://www.governo.it';
+  const appName = settings.siteName || t('common.appName');
 
   return (
     <Headers>
       <SlimHeader
-        slimTitle={t('header.slimTitle')}
-        slimSubtitle={t('header.slimSubtitle')}
+        slimTitle={slimTitle}
+        slimSubtitle={slimSubtitle}
+        parentUrl={parentUrl}
       />
-      <CenterHeader appName={t('common.appName')} isAdmin={isAdmin} />
+      <CenterHeader
+        appName={appName}
+        isAdmin={isAdmin}
+        logoUrl={settings.logoUrl}
+      />
     </Headers>
   );
 }
@@ -35,16 +49,18 @@ export default function PAHeader({ isAdmin }: PAHeaderProps) {
 function SlimHeader({
   slimTitle,
   slimSubtitle,
+  parentUrl,
 }: {
   slimTitle: string;
   slimSubtitle: string;
+  parentUrl: string;
 }) {
   return (
     <Header type="slim" theme="dark">
       <HeaderContent>
         <HeaderBrand
           tag="a"
-          href="https://www.governo.it"
+          href={parentUrl}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -62,18 +78,28 @@ function SlimHeader({
 function CenterHeader({
   appName,
   isAdmin,
+  logoUrl,
 }: {
   appName: string;
   isAdmin?: boolean;
+  logoUrl?: string | null;
 }) {
   const t = useTranslations('nav');
 
   return (
     <Header type="center" theme="dark" small>
       <HeaderContent>
-        <HeaderBrand iconName="it-pa" iconAlt={appName} tag={Link} href="/">
-          <h2>{appName}</h2>
-        </HeaderBrand>
+        {logoUrl ? (
+          <HeaderBrand tag={Link} href="/">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoUrl} alt={appName} style={{ height: 40, marginRight: 8 }} />
+            <h2>{appName}</h2>
+          </HeaderBrand>
+        ) : (
+          <HeaderBrand iconName="it-pa" iconAlt={appName} tag={Link} href="/">
+            <h2>{appName}</h2>
+          </HeaderBrand>
+        )}
         <HeaderRightZone>
           {isAdmin && (
             <Link

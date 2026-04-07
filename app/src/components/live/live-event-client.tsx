@@ -230,6 +230,22 @@ export default function LiveEventClient({
   const handleRecordingStatusChanged = useCallback((recording: boolean) => { setIsRecording(recording); }, []);
   const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => { setJitsiApi(api); }, []);
 
+  // Peak participant tracking (moderator only)
+  useEffect(() => {
+    if (!jitsiApi || !isModerator) return;
+    const interval = setInterval(() => {
+      const count = jitsiApi.getNumberOfParticipants?.();
+      if (typeof count === 'number' && count > 0) {
+        fetch(`/api/events/${event.slug}/analytics/peak`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ count, moderatorToken: token }),
+        }).catch(() => {});
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [jitsiApi, isModerator, event.slug, token]);
+
   const handleLeaveRoom = useCallback(() => {
     if (jitsiApi) {
       jitsiApi.executeCommand('hangup');

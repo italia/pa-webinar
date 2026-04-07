@@ -319,6 +319,12 @@
     }
   },
   "admin": {
+    "nav": {
+      "events": "Gestione eventi",
+      "analytics": "Statistiche",
+      "settings": "Impostazioni sito",
+      "ariaLabel": "Navigazione amministrazione"
+    },
     "login": {
       "title": "Accesso amministratore",
       "keyLabel": "Chiave di accesso",
@@ -445,6 +451,131 @@
         "CONSENT_RECORDED": "Consenso registrato",
         "DATA_EXPORTED": "Dati esportati"
       }
+    },
+    "settings": {
+      "title": "Impostazioni sito",
+      "subtitle": "Configura l'aspetto e il comportamento della piattaforma per il riuso PA",
+      "saving": "Salvataggio...",
+      "saved": "Impostazioni salvate con successo",
+      "tabs": {
+        "branding": "Branding",
+        "seo": "SEO",
+        "homepage": "Home page",
+        "pages": "Pagine",
+        "footer": "Footer",
+        "features": "Funzionalità"
+      },
+      "branding": {
+        "siteName": "Nome applicazione",
+        "siteNameHelp": "Mostrato nell'header, nel titolo del browser e nelle email",
+        "siteDescription": "Descrizione applicazione",
+        "organizationName": "Nome organizzazione",
+        "organizationNameHelp": "es. Dipartimento per la Trasformazione Digitale",
+        "organizationNameShort": "Sigla organizzazione",
+        "organizationUrl": "URL organizzazione",
+        "parentOrganization": "Organizzazione superiore",
+        "parentOrganizationHelp": "es. Presidenza del Consiglio dei Ministri",
+        "parentOrganizationUrl": "URL organizzazione superiore",
+        "logoUrl": "URL logo personalizzato",
+        "logoUrlHelp": "Lascia vuoto per usare l'icona PA predefinita",
+        "faviconUrl": "URL favicon",
+        "primaryColor": "Colore primario"
+      },
+      "seo": {
+        "title": "Titolo SEO",
+        "titleHelp": "Titolo mostrato nei risultati di ricerca e nella scheda del browser",
+        "description": "Descrizione SEO",
+        "descriptionHelp": "Descrizione per i motori di ricerca e le condivisioni social",
+        "image": "Immagine Open Graph",
+        "imageHelp": "Immagine predefinita per le condivisioni social (1200x630 consigliato)"
+      },
+      "homepage": {
+        "modeLabel": "Modalità home page",
+        "modes": {
+          "LANDING": {
+            "title": "Landing page",
+            "description": "Hero, funzionalità, eventi prossimi e come funziona"
+          },
+          "EVENTS_LIST": {
+            "title": "Lista eventi",
+            "description": "Mostra direttamente la lista degli eventi"
+          },
+          "CUSTOM": {
+            "title": "Personalizzata",
+            "description": "Contenuto HTML personalizzato + lista eventi"
+          }
+        },
+        "customHtmlLabel": "Contenuto HTML personalizzato",
+        "customHtmlHelp": "HTML mostrato nella sezione principale della home page"
+      },
+      "pages": {
+        "privacyTitle": "Informativa privacy",
+        "privacyIt": "Contenuto (italiano)",
+        "privacyEn": "Contenuto (inglese)",
+        "accessibilityTitle": "Dichiarazione di accessibilità",
+        "accessibilityIt": "Contenuto (italiano)",
+        "accessibilityEn": "Contenuto (inglese)",
+        "preview": "Anteprima"
+      },
+      "footer": {
+        "linksTitle": "Link footer",
+        "addLink": "Aggiungi link",
+        "noLinks": "Nessun link configurato. Verranno usati quelli predefiniti.",
+        "linkTitle": "Titolo",
+        "linkSection": "Sezione",
+        "sectionLegal": "Note legali",
+        "sectionMain": "Principale",
+        "moveUp": "Sposta su",
+        "moveDown": "Sposta giù",
+        "removeLink": "Rimuovi link"
+      },
+      "features": {
+        "statusPageEnabled": "Pagina stato attiva",
+        "statusPageEnabledHelp": "Mostra la pagina di stato del servizio",
+        "guestAccessEnabled": "Accesso ospiti attivo",
+        "guestAccessEnabledHelp": "Consenti l'accesso come ospite agli eventi in corso",
+        "publicRegistrationEnabled": "Registrazione pubblica attiva",
+        "publicRegistrationEnabledHelp": "Chiunque può creare eventi (se disattivato, solo gli amministratori)",
+        "githubUrl": "URL repository GitHub",
+        "supportEmail": "Email supporto"
+      }
+    },
+    "analytics": {
+      "title": "Statistiche",
+      "subtitle": "Panoramica delle metriche della piattaforma",
+      "timeline": "Andamento nel tempo",
+      "topEvents": "Migliori eventi",
+      "noData": "Nessun dato disponibile per questo periodo.",
+      "period": {
+        "7d": "7 giorni",
+        "30d": "30 giorni",
+        "90d": "90 giorni",
+        "all": "Tutto"
+      },
+      "metrics": {
+        "totalEvents": "Eventi totali",
+        "totalRegistrations": "Registrazioni",
+        "totalParticipants": "Partecipanti",
+        "conversionRate": "Tasso conversione medio",
+        "peakParticipants": "Picco partecipanti"
+      },
+      "table": {
+        "event": "Evento",
+        "date": "Data",
+        "registrations": "Registrazioni",
+        "participants": "Partecipanti",
+        "peak": "Picco",
+        "questions": "Q&A",
+        "conversion": "Conversione",
+        "noEvents": "Nessun evento trovato."
+      },
+      "quickStats": {
+        "title": "Statistiche rapide",
+        "avgDuration": "Durata media eventi",
+        "avgQuestionsPerEvent": "Domande Q&A per evento",
+        "totalPollVotes": "Voti sondaggi totali",
+        "avgParticipantsPerEvent": "Partecipanti medi per evento"
+      }
     }
   },
   "email": {
@@ -548,5 +679,11 @@
     "contacts": "Contatti",
     "legalNotes": "Note legali",
     "governmentSite": "Governo Italiano"
+  },
+  "pages": {
+    "privacyTitle": "Informativa sulla privacy",
+    "privacyNotConfigured": "Informativa privacy non ancora configurata.",
+    "accessibilityTitle": "Dichiarazione di accessibilità",
+    "accessibilityNotConfigured": "Dichiarazione di accessibilità non ancora configurata."
   }
 }
