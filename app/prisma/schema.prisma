@@ -62,6 +62,9 @@ model Event {
   status      EventStatus @default(DRAFT)
   recordingUrl String?    @map("recording_url")
   
+  // Analytics
+  peakParticipants  Int @default(0) @map("peak_participants")
+  
   // Timestamps
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -304,4 +307,59 @@ model GdprAuditLog {
 
   @@index([eventId])
   @@map("gdpr_audit_logs")
+}
+
+// ─── Site Settings ──────────────────────────────────────
+
+model SiteSetting {
+  id        String   @id @default("singleton")
+
+  // Branding
+  siteName             String  @default("Eventi PA") @map("site_name")
+  siteDescription      String  @default("Piattaforma per eventi pubblici digitali") @map("site_description") @db.Text
+  organizationName     String  @default("") @map("organization_name")
+  organizationNameShort String @default("") @map("organization_name_short")
+  organizationUrl      String  @default("") @map("organization_url")
+  parentOrganization   String  @default("") @map("parent_organization")
+  parentOrganizationUrl String @default("") @map("parent_organization_url")
+  logoUrl              String? @map("logo_url")
+  faviconUrl           String? @map("favicon_url")
+  primaryColor         String  @default("#0066CC") @map("primary_color")
+
+  // SEO
+  seoTitle             String  @default("Eventi PA") @map("seo_title")
+  seoDescription       String  @default("") @map("seo_description") @db.Text
+  seoImage             String? @map("seo_image")
+
+  // Home page
+  homePageMode         HomePageMode @default(LANDING) @map("home_page_mode")
+  customHomeHtml       String? @map("custom_home_html") @db.Text
+
+  // Footer
+  footerLinks          Json    @default("[]") @map("footer_links")
+
+  // Pages content (Markdown or HTML)
+  privacyPolicyIt      String? @map("privacy_policy_it") @db.Text
+  privacyPolicyEn      String? @map("privacy_policy_en") @db.Text
+  accessibilityIt      String? @map("accessibility_it") @db.Text
+  accessibilityEn      String? @map("accessibility_en") @db.Text
+
+  // Feature toggles
+  statusPageEnabled         Boolean @default(true) @map("status_page_enabled")
+  guestAccessEnabled        Boolean @default(true) @map("guest_access_enabled")
+  publicRegistrationEnabled Boolean @default(true) @map("public_registration_enabled")
+
+  // External links
+  githubUrl            String? @map("github_url")
+  supportEmail         String? @map("support_email")
+
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+enum HomePageMode {
+  LANDING
+  EVENTS_LIST
+  CUSTOM
 }

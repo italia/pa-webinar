@@ -29,6 +29,8 @@ interface EmailTemplateInput {
     yahoo: string;
     icsDownload: string;
   };
+  siteName?: string;
+  organizationFooter?: string;
 }
 
 interface LocaleCopy {
@@ -127,7 +129,7 @@ const copy: Record<Locale, LocaleCopy> = {
   },
 };
 
-function layout(heading: string, body: string, footerText: string, locale: Locale = 'it'): string {
+function layout(heading: string, body: string, footerText: string, locale: Locale = 'it', siteName = 'Eventi PA'): string {
   return `<!DOCTYPE html>
 <html lang="${locale}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -138,7 +140,7 @@ function layout(heading: string, body: string, footerText: string, locale: Local
 
 <!-- Header -->
 <tr><td style="background:#06c;padding:20px 24px;">
-  <span style="color:#fff;font-size:20px;font-weight:700;letter-spacing:0.5px;">Eventi DTD</span>
+  <span style="color:#fff;font-size:20px;font-weight:700;letter-spacing:0.5px;">${escapeHtml(siteName)}</span>
 </td></tr>
 
 <!-- Heading -->
@@ -228,6 +230,7 @@ export function confirmationHtml(input: EmailTemplateInput): string {
   const calendarHtml = input.calendarLinks
     ? calendarLinksSection(c, input.calendarLinks)
     : '';
+  const footerText = input.organizationFooter || c.footer;
   const body = `
 ${detailsTable(c, input)}
 ${ctaButton(c.joinLabel, input.joinUrl)}
@@ -237,11 +240,12 @@ ${calendarHtml}
 </p>
 <p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
 
-  return layout(c.confirmationHeading, body, `${c.footer}<br>${c.unsubscribe}`, input.locale);
+  return layout(c.confirmationHeading, body, `${footerText}<br>${c.unsubscribe}`, input.locale, input.siteName);
 }
 
 export function confirmationText(input: EmailTemplateInput): string {
   const c = copy[input.locale];
+  const footerText = input.organizationFooter || c.footer;
   const calendarBlock = input.calendarLinks
     ? [
         '',
@@ -267,7 +271,7 @@ export function confirmationText(input: EmailTemplateInput): string {
     '',
     `${c.viewEvent}: ${input.eventPageUrl}`,
     '',
-    c.footer,
+    footerText,
   ].join('\n');
 }
 
@@ -277,6 +281,7 @@ export function reminderHtml(input: EmailTemplateInput): string {
   const calendarHtml = input.calendarLinks
     ? calendarLinksSection(c, input.calendarLinks)
     : '';
+  const footerText = input.organizationFooter || c.footer;
   const body = `
 <p style="margin:0 0 16px;">${c.reminderNote(offset)}</p>
 ${detailsTable(c, input)}
@@ -284,12 +289,13 @@ ${ctaButton(c.joinLabel, input.joinUrl)}
 ${calendarHtml}
 <p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
 
-  return layout(c.reminderHeading, body, `${c.footer}<br>${c.unsubscribe}`, input.locale);
+  return layout(c.reminderHeading, body, `${footerText}<br>${c.unsubscribe}`, input.locale, input.siteName);
 }
 
 export function reminderText(input: EmailTemplateInput): string {
   const c = copy[input.locale];
   const offset = input.offsetMinutes ?? 60;
+  const footerText = input.organizationFooter || c.footer;
   const calendarBlock = input.calendarLinks
     ? [
         '',
@@ -315,6 +321,6 @@ export function reminderText(input: EmailTemplateInput): string {
     '',
     `${c.viewEvent}: ${input.eventPageUrl}`,
     '',
-    c.footer,
+    footerText,
   ].join('\n');
 }

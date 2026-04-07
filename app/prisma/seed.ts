@@ -23,6 +23,33 @@ async function main() {
   await prisma.registration.deleteMany();
   await prisma.event.deleteMany();
 
+  // Seed site settings
+  await prisma.siteSetting.upsert({
+    where: { id: 'singleton' },
+    update: {},
+    create: {
+      id: 'singleton',
+      siteName: 'Eventi PA',
+      siteDescription:
+        'Piattaforma per eventi pubblici digitali della Pubblica Amministrazione',
+      organizationName: 'Nome Ente',
+      organizationNameShort: 'Ente',
+      organizationUrl: 'https://www.example.gov.it',
+      parentOrganization: 'Organizzazione superiore',
+      parentOrganizationUrl: 'https://www.governo.it',
+      homePageMode: 'LANDING',
+      statusPageEnabled: true,
+      guestAccessEnabled: true,
+      publicRegistrationEnabled: true,
+      footerLinks: JSON.stringify([
+        { title: 'Privacy', url: '/privacy', section: 'legal' },
+        { title: 'Accessibilità', url: '/accessibilita', section: 'legal' },
+        { title: 'Note legali', url: '/note-legali', section: 'legal' },
+      ]),
+    },
+  });
+  console.log('Seeded site settings.');
+
   // Create sample events
   const now = new Date();
   const inOneHour = new Date(now.getTime() + 60 * 60 * 1000);

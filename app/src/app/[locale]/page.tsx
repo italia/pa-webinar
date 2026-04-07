@@ -1,21 +1,19 @@
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import EventListClient from '@/components/events/event-list-client';
 
-export default async function HomePage() {
-  const t = await getTranslations('home');
-  const _locale = await getLocale();
-
+async function loadUpcomingEvents() {
   const events = await prisma.event.findMany({
     where: { status: { in: ['PUBLISHED', 'LIVE'] } },
     include: { _count: { select: { registrations: true } } },
     orderBy: { startsAt: 'asc' },
-    take: 3,
+    take: 6,
   });
 
-  const upcoming = events.map((e) => ({
+  return events.map((e) => ({
     id: e.id,
     slug: e.slug,
     titleIt: e.titleIt,
@@ -34,6 +32,109 @@ export default async function HomePage() {
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,
   }));
+}
+
+export default async function HomePage() {
+  const _locale = await getLocale();
+  const settings = await getSettings();
+  const upcoming = await loadUpcomingEvents();
+
+  if (settings.homePageMode === 'EVENTS_LIST') {
+    return <EventsListHome upcoming={upcoming} />;
+  }
+
+  if (settings.homePageMode === 'CUSTOM' && settings.customHomeHtml) {
+    return (
+      <>
+        <div
+          className="container py-5"
+          dangerouslySetInnerHTML={{ __html: settings.customHomeHtml }}
+        />
+        <EventsSection upcoming={upcoming} />
+      </>
+    );
+  }
+
+  // Default: LANDING
+  return <LandingHome upcoming={upcoming} />;
+}
+
+async function EventsSection({
+  upcoming,
+}: {
+  upcoming: Awaited<ReturnType<typeof loadUpcomingEvents>>;
+}) {
+  const t = await getTranslations('home');
+
+  return (
+    <section className="py-5">
+      <div className="container">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="h3 fw-semibold mb-0">{t('upcoming.title')}</h2>
+          <Link
+            href="/eventi"
+            className="text-primary text-decoration-none fw-semibold"
+            style={{ fontSize: '0.95rem' }}
+          >
+            {t('upcoming.viewAll')} &rarr;
+          </Link>
+        </div>
+        {upcoming.length === 0 ? (
+          <div
+            className="p-5 rounded-3 text-center"
+            style={{ backgroundColor: '#F5F7FB' }}
+          >
+            <p className="text-secondary mb-0 lead">
+              {t('upcoming.noEvents')}
+            </p>
+          </div>
+        ) : (
+          <EventListClient events={upcoming} />
+        )}
+      </div>
+    </section>
+  );
+}
+
+async function EventsListHome({
+  upcoming,
+}: {
+  upcoming: Awaited<ReturnType<typeof loadUpcomingEvents>>;
+}) {
+  const t = await getTranslations('home');
+
+  return (
+    <section className="py-5">
+      <div className="container">
+        <h1 className="h2 fw-bold mb-4">{t('upcoming.title')}</h1>
+        {upcoming.length === 0 ? (
+          <div
+            className="p-5 rounded-3 text-center"
+            style={{ backgroundColor: '#F5F7FB' }}
+          >
+            <p className="text-secondary mb-0 lead">
+              {t('upcoming.noEvents')}
+            </p>
+          </div>
+        ) : (
+          <EventListClient events={upcoming} />
+        )}
+        <div className="text-center mt-4">
+          <Link href="/eventi" className="btn btn-primary btn-lg">
+            {t('upcoming.viewAll')}
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function LandingHome({
+  upcoming,
+}: {
+  upcoming: Awaited<ReturnType<typeof loadUpcomingEvents>>;
+}) {
+  const t = await getTranslations('home');
 
   const features = [
     {
@@ -54,10 +155,26 @@ export default async function HomePage() {
   ];
 
   const steps = [
-    { num: 1, title: t('howItWorks.step1.title'), desc: t('howItWorks.step1.desc') },
-    { num: 2, title: t('howItWorks.step2.title'), desc: t('howItWorks.step2.desc') },
-    { num: 3, title: t('howItWorks.step3.title'), desc: t('howItWorks.step3.desc') },
-    { num: 4, title: t('howItWorks.step4.title'), desc: t('howItWorks.step4.desc') },
+    {
+      num: 1,
+      title: t('howItWorks.step1.title'),
+      desc: t('howItWorks.step1.desc'),
+    },
+    {
+      num: 2,
+      title: t('howItWorks.step2.title'),
+      desc: t('howItWorks.step2.desc'),
+    },
+    {
+      num: 3,
+      title: t('howItWorks.step3.title'),
+      desc: t('howItWorks.step3.desc'),
+    },
+    {
+      num: 4,
+      title: t('howItWorks.step4.title'),
+      desc: t('howItWorks.step4.desc'),
+    },
   ];
 
   return (
@@ -66,7 +183,8 @@ export default async function HomePage() {
       <section
         className="text-white py-5"
         style={{
-          background: 'linear-gradient(135deg, #0066CC 0%, #004A99 50%, #003366 100%)',
+          background:
+            'linear-gradient(135deg, #0066CC 0%, #004A99 50%, #003366 100%)',
         }}
       >
         <div className="container py-4 py-lg-5">
@@ -106,7 +224,9 @@ export default async function HomePage() {
       {/* ── Features ── */}
       <section className="py-5" style={{ backgroundColor: '#F5F7FB' }}>
         <div className="container">
-          <h2 className="h3 fw-semibold text-center mb-5">{t('features.title')}</h2>
+          <h2 className="h3 fw-semibold text-center mb-5">
+            {t('features.title')}
+          </h2>
           <div className="row g-4">
             {features.map((f) => (
               <div key={f.title} className="col-md-4">
@@ -124,7 +244,10 @@ export default async function HomePage() {
                     {f.icon}
                   </div>
                   <h3 className="h5 fw-semibold mb-2">{f.title}</h3>
-                  <p className="text-secondary mb-0" style={{ fontSize: '0.95rem' }}>
+                  <p
+                    className="text-secondary mb-0"
+                    style={{ fontSize: '0.95rem' }}
+                  >
                     {f.desc}
                   </p>
                 </div>
@@ -135,31 +258,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Upcoming events ── */}
-      <section className="py-5">
-        <div className="container">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="h3 fw-semibold mb-0">{t('upcoming.title')}</h2>
-            <Link
-              href="/eventi"
-              className="text-primary text-decoration-none fw-semibold"
-              style={{ fontSize: '0.95rem' }}
-            >
-              {t('upcoming.viewAll')} →
-            </Link>
-          </div>
-
-          {upcoming.length === 0 ? (
-            <div
-              className="p-5 rounded-3 text-center"
-              style={{ backgroundColor: '#F5F7FB' }}
-            >
-              <p className="text-secondary mb-0 lead">{t('upcoming.noEvents')}</p>
-            </div>
-          ) : (
-            <EventListClient events={upcoming} />
-          )}
-        </div>
-      </section>
+      <EventsSection upcoming={upcoming} />
 
       {/* ── How it works ── */}
       <section className="py-5" style={{ backgroundColor: '#F5F7FB' }}>
