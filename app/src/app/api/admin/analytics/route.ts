@@ -1,8 +1,8 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { withErrorHandling } from '@/lib/api-handler';
+import { UnauthorizedError } from '@/lib/errors';
 import {
   getOverview,
   getTimeline,
@@ -25,13 +25,14 @@ function parseDays(period: string | null): number | undefined {
   }
 }
 
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling(async (request) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    throw new UnauthorizedError();
   }
 
-  const period = request.nextUrl.searchParams.get('period');
+  const url = new URL(request.url);
+  const period = url.searchParams.get('period');
   const days = parseDays(period);
 
   const [overview, timeline, topEvents, recentEvents] = await Promise.all([
@@ -41,10 +42,10 @@ export async function GET(request: NextRequest) {
     getEventAnalytics(10),
   ]);
 
-  return NextResponse.json({
+  return Response.json({
     overview,
     timeline,
     topEvents,
     recentEvents,
   });
-}
+});

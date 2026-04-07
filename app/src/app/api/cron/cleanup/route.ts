@@ -119,7 +119,7 @@ export const GET = withErrorHandling(async (request) => {
         );
       }
 
-      console.error(
+      console.log(
         `[cron/cleanup] Cleaned event ${evt.id} (${evt.slug}): ` +
           `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes, ${result.polls} polls, ${result.pollVotes} poll votes, ${result.materials} materials deleted`,
       );

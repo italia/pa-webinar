@@ -67,6 +67,9 @@ export const POST = withErrorHandling(async (request, context) => {
     });
     if (existing) throw new ConflictError('Already voted');
   } else if (guestId) {
+    const rl = rateLimit(`poll-vote-guest:${guestId}`, { limit: 10, windowMs: 60_000 });
+    if (!rl.allowed) throw new RateLimitError();
+
     const existing = await prisma.pollVote.findUnique({
       where: { pollId_guestId: { pollId, guestId } },
     });

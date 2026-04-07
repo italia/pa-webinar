@@ -57,13 +57,14 @@ export class RateLimitError extends AppError {
 
 export function errorResponse(error: unknown): Response {
   if (error instanceof AppError) {
+    const includeDetails =
+      error.code === 'VALIDATION_ERROR' ||
+      process.env.NODE_ENV === 'development';
     return Response.json(
       {
         error: error.message,
         code: error.code,
-        ...(error.details && process.env.NODE_ENV === 'development'
-          ? { details: error.details }
-          : {}),
+        ...(error.details && includeDetails ? { details: error.details } : {}),
       },
       { status: error.statusCode, headers: error.headers }
     );
