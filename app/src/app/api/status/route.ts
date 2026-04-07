@@ -51,7 +51,7 @@ async function checkJitsiWeb(): Promise<ComponentStatus> {
 
   const start = Date.now();
   try {
-    const protocol = jitsiDomain.includes('localhost') ? 'https' : 'https';
+    const protocol = jitsiDomain.includes('localhost') ? 'http' : 'https';
     const res = await fetch(`${protocol}://${jitsiDomain}/external_api.js`, {
       signal: AbortSignal.timeout(5000),
     });

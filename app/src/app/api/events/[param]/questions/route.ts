@@ -65,58 +65,75 @@ export const GET = withErrorHandling(async (request, context) => {
   // Short-lived cache for participant Q&A polling (2s TTL).
   // With 300 participants polling every 3s, this reduces DB queries
   // from ~100/s to ~1 every 2s per event.
+  // Cache stores question data WITHOUT per-user hasUpvoted; that's
+  // resolved per-request from a lightweight upvote lookup.
   const cacheKey = isModerator
     ? null
     : `qa:${event.id}:${statusFilter ?? 'all'}`;
 
+  interface CachedQuestion {
+    id: string;
+    authorName: string;
+    text: string;
+    status: string;
+    upvoteCount: number;
+    createdAt: string;
+    highlightedAt: string | null;
+    answeredAt: string | null;
+  }
+
   interface QaResponse {
-    questions: {
-      id: string;
-      authorName: string;
-      text: string;
-      status: string;
-      upvoteCount: number;
-      hasUpvoted: boolean;
-      createdAt: string;
-      highlightedAt: string | null;
-      answeredAt: string | null;
-    }[];
+    questions: (CachedQuestion & { hasUpvoted: boolean })[];
     totalCount: number;
   }
 
+  let cachedQuestions: CachedQuestion[] | null = null;
+
   if (cacheKey) {
-    const cached = getCached<QaResponse>(cacheKey);
-    if (cached) {
-      return Response.json(cached, {
-        headers: { 'Cache-Control': 'no-store' },
-      });
+    cachedQuestions = getCached<CachedQuestion[]>(cacheKey) ?? null;
+  }
+
+  if (!cachedQuestions) {
+    const questions = await prisma.question.findMany({
+      where,
+      orderBy: [
+        { status: 'asc' },
+        { upvoteCount: 'desc' },
+        { createdAt: 'desc' },
+      ],
+    });
+
+    cachedQuestions = questions.map((q) => ({
+      id: q.id,
+      authorName: q.authorName,
+      text: q.text,
+      status: q.status,
+      upvoteCount: q.upvoteCount,
+      createdAt: q.createdAt.toISOString(),
+      highlightedAt: q.highlightedAt?.toISOString() ?? null,
+      answeredAt: q.answeredAt?.toISOString() ?? null,
+    }));
+
+    if (cacheKey) {
+      setCache(cacheKey, cachedQuestions, 2000);
     }
   }
 
-  const questions = await prisma.question.findMany({
-    where,
-    include: {
-      upvotes: registrationId
-        ? { where: { registrationId }, select: { id: true } }
-        : false,
-    },
-    orderBy: [
-      { status: 'asc' },
-      { upvoteCount: 'desc' },
-      { createdAt: 'desc' },
-    ],
-  });
+  let userUpvotedIds: Set<string> = new Set();
+  if (registrationId && cachedQuestions.length > 0) {
+    const upvotes = await prisma.questionUpvote.findMany({
+      where: {
+        registrationId,
+        questionId: { in: cachedQuestions.map((q) => q.id) },
+      },
+      select: { questionId: true },
+    });
+    userUpvotedIds = new Set(upvotes.map((u) => u.questionId));
+  }
 
-  const result = questions.map((q) => ({
-    id: q.id,
-    authorName: q.authorName,
-    text: q.text,
-    status: q.status,
-    upvoteCount: q.upvoteCount,
-    hasUpvoted: Array.isArray(q.upvotes) ? q.upvotes.length > 0 : false,
-    createdAt: q.createdAt.toISOString(),
-    highlightedAt: q.highlightedAt?.toISOString() ?? null,
-    answeredAt: q.answeredAt?.toISOString() ?? null,
+  const result = cachedQuestions.map((q) => ({
+    ...q,
+    hasUpvoted: userUpvotedIds.has(q.id),
   }));
 
   const highlighted = result.filter((q) => q.status === 'HIGHLIGHTED');
@@ -126,10 +143,6 @@ export const GET = withErrorHandling(async (request, context) => {
     questions: [...highlighted, ...rest],
     totalCount: result.length,
   };
-
-  if (cacheKey) {
-    setCache(cacheKey, response, 2000);
-  }
 
   return Response.json(response, {
     headers: { 'Cache-Control': 'no-store' },

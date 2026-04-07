@@ -39,7 +39,7 @@ export const createEventSchema = eventBaseSchema.refine(
 
 export const updateEventSchema = eventBaseSchema.partial().extend({
   status: z
-    .enum(['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED', 'ARCHIVED'])
+    .enum(['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED'])
     .optional(),
 }).refine(
   (data) => {

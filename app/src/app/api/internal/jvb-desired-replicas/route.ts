@@ -11,6 +11,7 @@
  */
 
 import { withErrorHandling } from '@/lib/api-handler';
+import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -18,7 +19,8 @@ export const dynamic = 'force-dynamic';
 const PRE_SCALE_MINUTES = parseInt(process.env.JVB_PRE_SCALE_MINUTES || '30', 10);
 const MAX_REPLICAS = parseInt(process.env.JVB_MAX_REPLICAS || '4', 10);
 
-export const GET = withErrorHandling(async () => {
+export const GET = withErrorHandling(async (request) => {
+  assertCronApiKey(request);
   const now = new Date();
   const preScaleWindow = new Date(now.getTime() + PRE_SCALE_MINUTES * 60 * 1000);
 

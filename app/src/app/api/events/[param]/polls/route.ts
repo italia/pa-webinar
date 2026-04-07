@@ -34,15 +34,6 @@ export const GET = withErrorHandling(async (request, context) => {
     ? { eventId: event.id }
     : { eventId: event.id, status: { in: ['OPEN', 'PUBLISHED'] as PollStatus[] } };
 
-  const polls = await prisma.poll.findMany({
-    where,
-    include: {
-      _count: { select: { votes: true } },
-      votes: true,
-    },
-    orderBy: { createdAt: 'desc' },
-  });
-
   let registrationId: string | null = null;
   if (!isModerator) {
     const reg = await prisma.registration.findUnique({
@@ -51,6 +42,17 @@ export const GET = withErrorHandling(async (request, context) => {
     });
     registrationId = reg?.id ?? null;
   }
+
+  const polls = await prisma.poll.findMany({
+    where,
+    include: {
+      _count: { select: { votes: true } },
+      votes: {
+        select: { optionIndex: true, registrationId: true },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
 
   const result = polls.map((poll) => {
     const options = poll.options as string[];
