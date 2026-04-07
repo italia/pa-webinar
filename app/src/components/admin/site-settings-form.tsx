@@ -167,8 +167,27 @@ interface TabProps {
   ) => void;
 }
 
+const WATERMARK_POSITIONS = [
+  { value: 'bottom-left', labelKey: 'bottomLeft' },
+  { value: 'bottom-right', labelKey: 'bottomRight' },
+  { value: 'top-left', labelKey: 'topLeft' },
+  { value: 'top-right', labelKey: 'topRight' },
+] as const;
+
+const WM_POS_STYLES: Record<string, React.CSSProperties> = {
+  'bottom-left': { bottom: 8, left: 8 },
+  'bottom-right': { bottom: 8, right: 8 },
+  'top-left': { top: 8, left: 8 },
+  'top-right': { top: 8, right: 8 },
+};
+
 function BrandingTab({ settings, updateField }: TabProps) {
   const t = useTranslations('admin.settings.branding');
+  const tw = useTranslations('admin.settings.watermark');
+
+  const wmUrl =
+    settings.jitsiWatermarkUrl || settings.logoUrl || '/images/dtd-watermark.svg';
+
   return (
     <div>
       <Row>
@@ -332,6 +351,104 @@ function BrandingTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
+
+      {/* ── Video watermark ── */}
+      <hr className="my-4" />
+      <h6 className="fw-semibold mb-3">{tw('title')}</h6>
+
+      <div className="mb-3">
+        <Toggle
+          label={tw('enabled')}
+          checked={settings.jitsiWatermarkEnabled}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField('jitsiWatermarkEnabled', e.target.checked)
+          }
+        />
+      </div>
+
+      {settings.jitsiWatermarkEnabled && (
+        <>
+          <FormGroup>
+            <Label htmlFor="jitsiWatermarkUrl">{tw('url')}</Label>
+            <Input
+              id="jitsiWatermarkUrl"
+              type="url"
+              value={settings.jitsiWatermarkUrl ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('jitsiWatermarkUrl', e.target.value || null)
+              }
+            />
+            <small className="text-muted">{tw('urlHelp')}</small>
+          </FormGroup>
+
+          <Row>
+            <Col md={6}>
+              <FormGroup>
+                <Label htmlFor="jitsiWatermarkOpacity">
+                  {tw('opacity')} ({Math.round(settings.jitsiWatermarkOpacity * 100)}%)
+                </Label>
+                <input
+                  type="range"
+                  id="jitsiWatermarkOpacity"
+                  className="form-range"
+                  min={0.1}
+                  max={0.8}
+                  step={0.05}
+                  value={settings.jitsiWatermarkOpacity}
+                  onChange={(e) =>
+                    updateField('jitsiWatermarkOpacity', parseFloat(e.target.value))
+                  }
+                />
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup>
+                <Label htmlFor="jitsiWatermarkPosition">{tw('position')}</Label>
+                <Input
+                  type="select"
+                  id="jitsiWatermarkPosition"
+                  value={settings.jitsiWatermarkPosition}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    updateField('jitsiWatermarkPosition', e.target.value)
+                  }
+                >
+                  {WATERMARK_POSITIONS.map((pos) => (
+                    <option key={pos.value} value={pos.value}>
+                      {tw(`positions.${pos.labelKey}`)}
+                    </option>
+                  ))}
+                </Input>
+              </FormGroup>
+            </Col>
+          </Row>
+
+          {/* Preview */}
+          <div
+            className="rounded position-relative mt-2"
+            style={{
+              backgroundColor: '#1a1a2e',
+              height: 160,
+              overflow: 'hidden',
+            }}
+          >
+            <div className="position-absolute top-50 start-50 translate-middle text-white-50 small">
+              {tw('previewLabel')}
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={wmUrl}
+              alt=""
+              style={{
+                position: 'absolute',
+                ...WM_POS_STYLES[settings.jitsiWatermarkPosition] ?? WM_POS_STYLES['bottom-left'],
+                width: 60,
+                opacity: settings.jitsiWatermarkOpacity,
+                pointerEvents: 'none',
+              }}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

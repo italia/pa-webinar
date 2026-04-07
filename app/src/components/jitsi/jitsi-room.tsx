@@ -12,6 +12,13 @@ import {
   moderatorToolbarButtons,
 } from '@/lib/jitsi/config';
 
+interface WatermarkSettings {
+  url?: string;
+  enabled?: boolean;
+  opacity?: number;
+  position?: string;
+}
+
 interface JitsiRoomProps {
   domain: string;
   roomName: string;
@@ -22,7 +29,7 @@ interface JitsiRoomProps {
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
-  watermarkUrl?: string;
+  watermark?: WatermarkSettings;
   onReady?: () => void;
   onLeft?: () => void;
   onParticipantCountChanged?: (count: number) => void;
@@ -34,6 +41,13 @@ type LoadState = 'loading' | 'ready' | 'error';
 
 const DEFAULT_WATERMARK_URL = '/images/dtd-watermark.svg';
 
+const POSITION_STYLES: Record<string, React.CSSProperties> = {
+  'bottom-left': { bottom: 16, left: 16 },
+  'bottom-right': { bottom: 16, right: 16 },
+  'top-left': { top: 16, left: 16 },
+  'top-right': { top: 16, right: 16 },
+};
+
 export default function JitsiRoom({
   domain,
   roomName,
@@ -44,7 +58,7 @@ export default function JitsiRoom({
   participantsCanUnmute = true,
   participantsCanStartVideo = true,
   participantsCanShareScreen = true,
-  watermarkUrl = DEFAULT_WATERMARK_URL,
+  watermark,
   onReady,
   onLeft,
   onParticipantCountChanged,
@@ -234,19 +248,18 @@ export default function JitsiRoom({
         }}
       />
 
-      {loadState === 'ready' && (
+      {loadState === 'ready' && watermark?.enabled !== false && (
         <img
-          src={watermarkUrl}
+          src={watermark?.url || DEFAULT_WATERMARK_URL}
           alt=""
           aria-hidden="true"
           style={{
             position: 'absolute',
-            bottom: 16,
-            left: 16,
+            ...POSITION_STYLES[watermark?.position || 'bottom-left'],
             width: 80,
             pointerEvents: 'none',
             zIndex: 10,
-            opacity: 0.6,
+            opacity: watermark?.opacity ?? 0.4,
           }}
         />
       )}

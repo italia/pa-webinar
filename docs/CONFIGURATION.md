@@ -4,10 +4,14 @@
 
 ### Video watermark
 
-The DTD watermark is displayed in the bottom-left corner of the Jitsi video area. To customise it:
+The watermark overlaid on the Jitsi video area is configurable from the admin panel under **Impostazioni sito → Branding → Personalizzazione video**:
 
-- **Replace the static file**: swap `app/public/images/dtd-watermark.svg` with your own logo (SVG or PNG, ~120×40px recommended, white or light colour).
-- **Use an environment variable**: set `NEXT_PUBLIC_WATERMARK_URL` to an absolute URL or public path. When set, this overrides the static file.
+- **Toggle**: enable/disable the watermark
+- **URL**: custom SVG or PNG image (transparent, ~120×40px recommended). Falls back to the organization logo, then to `/images/dtd-watermark.svg`
+- **Opacity**: 10% to 80%
+- **Position**: bottom-left, bottom-right, top-left, top-right
+
+Settings are stored in the database (`SiteSetting` model) and applied dynamically — no restart needed.
 
 ### Waiting room music
 
@@ -28,19 +32,9 @@ The platform customizes Jitsi's appearance via several mechanisms:
 
 #### Dynamic branding JSON
 
-Edit `app/public/jitsi-branding.json` to set Jitsi's built-in branding:
+The Jitsi branding is served by a dynamic API route at `/api/jitsi-branding.json`. It reads from site settings to generate the branding configuration (background color, logo, invite domain). No static file to edit — configure via the admin panel.
 
-```json
-{
-  "backgroundColor": "#002855",
-  "backgroundImageUrl": "",
-  "logoClickUrl": "",
-  "logoImageUrl": "/images/dtd-watermark.svg",
-  "inviteDomain": "eventi.dominio.gov.it"
-}
-```
-
-The `dynamicBrandingUrl` in `lib/jitsi/config.ts` points to this file. In production (same-origin via Ingress), Jitsi can fetch it directly. In local dev with cross-origin Jitsi, the fetch may fail silently — this is expected.
+The `dynamicBrandingUrl` in `lib/jitsi/config.ts` points to this API. In production (same-origin via Ingress), Jitsi can fetch it directly. In local dev with cross-origin Jitsi, the fetch may fail silently — this is expected.
 
 #### Custom CSS injection (production only)
 
@@ -234,4 +228,5 @@ JVB usa STUN per la connettivita NAT e deve raggiungere `stun.l.google.com:19302
 | `SMTP_FROM_NAME` | No | Sender display name |
 | `DEFAULT_DATA_RETENTION_DAYS` | No | GDPR data retention (default: 30) |
 | `JVB_MAX_REPLICAS` | No | Max JVB replicas for auto-scaler (default: 4) |
-| `NEXT_PUBLIC_WATERMARK_URL` | No | Custom watermark image URL (overrides static file) |
+| `RECORDING_STORAGE_TYPE` | No | Recording storage: `azure-blob`, `s3`, `gcs`, `minio`, `local` |
+| `RECORDING_WEBHOOK_URL` | No | Webhook URL for Jibri finalize script notifications |

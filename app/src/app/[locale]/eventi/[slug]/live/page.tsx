@@ -3,6 +3,8 @@ import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { getSettings } from '@/lib/settings';
+import { isJibriAvailable } from '@/lib/infrastructure';
 import LiveEventClient from '@/components/live/live-event-client';
 
 export const dynamic = 'force-dynamic';
@@ -24,6 +26,16 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   if (!event) {
     notFound();
   }
+
+  const settings = await getSettings();
+  const jibriAvailable = await isJibriAvailable();
+
+  const watermark = {
+    url: settings.jitsiWatermarkUrl || settings.logoUrl || '/images/dtd-watermark.svg',
+    enabled: settings.jitsiWatermarkEnabled,
+    opacity: settings.jitsiWatermarkOpacity,
+    position: settings.jitsiWatermarkPosition,
+  };
 
   // No token: guest access or redirect
   if (!token) {
@@ -52,7 +64,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           displayName=""
           locale={locale}
           jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
-          watermarkUrl={getPublicEnv('NEXT_PUBLIC_WATERMARK_URL')}
+          watermark={watermark}
+          jibriAvailable={jibriAvailable}
         />
       );
     }
@@ -103,7 +116,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       }
       locale={locale}
       jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
-      watermarkUrl={getPublicEnv('NEXT_PUBLIC_WATERMARK_URL')}
+      watermark={watermark}
+      jibriAvailable={jibriAvailable}
     />
   );
 }

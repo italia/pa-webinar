@@ -23,6 +23,7 @@ interface ModeratorControlsProps {
   eventId: string;
   moderatorToken: string;
   recordingEnabled: boolean;
+  jibriAvailable?: boolean;
 }
 
 const BAR_STYLE: React.CSSProperties = {
@@ -37,6 +38,7 @@ export default function ModeratorControls({
   eventId,
   moderatorToken,
   recordingEnabled,
+  jibriAvailable = true,
 }: ModeratorControlsProps) {
   const t = useTranslations('live.moderator');
   const tl = useTranslations('live');
@@ -91,7 +93,7 @@ export default function ModeratorControls({
   }, [api]);
 
   const handleToggleRecording = useCallback(() => {
-    if (!api) {
+    if (!api || !jibriAvailable) {
       setRecToast(tl('jibriUnavailable'));
       setTimeout(() => setRecToast(''), 3000);
       return;
@@ -106,7 +108,7 @@ export default function ModeratorControls({
       setRecToast(tl('jibriUnavailable'));
       setTimeout(() => setRecToast(''), 3000);
     }
-  }, [api, isRecording, tl]);
+  }, [api, isRecording, tl, jibriAvailable]);
 
   const handleToggleChat = useCallback(() => {
     api?.executeCommand('toggleChat');
@@ -253,7 +255,8 @@ export default function ModeratorControls({
               size="sm"
               className={BTN_BASE}
               onClick={handleToggleRecording}
-              disabled={!api}
+              disabled={!api || !jibriAvailable}
+              title={!jibriAvailable ? tl('jibriNotConfigured') : undefined}
               style={{ fontSize: '0.82rem' }}
             >
               {isRecording ? (

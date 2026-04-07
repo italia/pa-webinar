@@ -170,6 +170,7 @@
     "guestJoinButton": "Join as guest",
     "guestRedirectToRegister": "The event has not started yet. Register to receive your access link.",
     "jibriUnavailable": "Recording unavailable — Jibri not configured",
+    "jibriNotConfigured": "Recording not configured in infrastructure",
     "eventEnded": "Event ended",
     "eventEndedMessage": "The event has ended. Thank you for participating.",
     "backToEvent": "Back to event",
@@ -253,7 +254,17 @@
       "events": "Event management",
       "analytics": "Analytics",
       "settings": "Site settings",
+      "infrastructure": "Infrastructure",
       "ariaLabel": "Admin navigation"
+    },
+    "recording": {
+      "title": "Video recording",
+      "play": "Play",
+      "download": "Download",
+      "delete": "Delete recording",
+      "deleteConfirm": "Are you sure you want to delete this recording? This action cannot be undone.",
+      "notConfigured": "Video recording is not available. Jibri is not configured in the infrastructure.",
+      "inProgress": "Recording in progress..."
     },
     "login": {
       "title": "Administrator access",
@@ -411,6 +422,21 @@
         "faviconUrl": "Favicon URL",
         "primaryColor": "Primary color"
       },
+      "watermark": {
+        "title": "Video customization",
+        "enabled": "Watermark enabled",
+        "url": "Watermark URL",
+        "urlHelp": "URL of a transparent SVG or PNG image. Leave empty to use the organization logo.",
+        "opacity": "Opacity",
+        "position": "Position",
+        "previewLabel": "Video area preview",
+        "positions": {
+          "bottomLeft": "Bottom left",
+          "bottomRight": "Bottom right",
+          "topLeft": "Top left",
+          "topRight": "Top right"
+        }
+      },
       "seo": {
         "title": "SEO title",
         "titleHelp": "Title shown in search results and the browser tab",
@@ -506,6 +532,61 @@
         "totalPollVotes": "Total poll votes",
         "avgParticipantsPerEvent": "Avg participants per event"
       }
+    },
+    "infrastructure": {
+      "title": "Infrastructure",
+      "subtitle": "Component status and environment configuration",
+      "deploymentMode": "Deployment mode",
+      "version": "Version",
+      "environment": "Environment",
+      "modes": {
+        "simple": "Simple (Docker Compose)",
+        "standard": "Standard (Kubernetes)",
+        "full": "Full (Kubernetes with scale-to-zero)",
+        "unknown": "Unknown"
+      },
+      "database": {
+        "title": "Database",
+        "internal": "In-cluster (PostgreSQL)",
+        "external": "External",
+        "connected": "Connected",
+        "disconnected": "Unreachable"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Reachable",
+        "unreachable": "Unreachable",
+        "notConfigured": "Not configured"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero active",
+        "replicas": "{current}/{max} nodes",
+        "preScale": "Pre-scale: {minutes} min",
+        "fixedMode": "Fixed mode",
+        "scalerEnabled": "Scaler enabled"
+      },
+      "jibri": {
+        "title": "Recording (Jibri)",
+        "available": "Available",
+        "notConfigured": "Not configured",
+        "storageType": "Storage",
+        "configureHint": "Video recording requires Jibri. Configure storage to enable it.",
+        "docsLink": "Documentation"
+      },
+      "email": {
+        "title": "Email",
+        "configured": "Configured",
+        "notConfigured": "Not configured"
+      },
+      "features": {
+        "title": "Features",
+        "statusPage": "Status page",
+        "guestAccess": "Guest access",
+        "metrics": "Metrics endpoint"
+      },
+      "note": "Infrastructure changes are made through Helm values and the CI/CD pipeline.",
+      "deployDocs": "Deployment documentation"
     }
   },
   "email": {

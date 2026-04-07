@@ -1,0 +1,11 @@
+{{- if and .Values.jitsi.enabled (index .Values "jitsi-meet" "jibri" "enabled") }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-jibri-finalize
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+data:
+  finalize.sh: |
+    {{ .Files.Get "files/jibri-finalize.sh" | nindent 4 }}
+{{- end }}

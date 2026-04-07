@@ -243,3 +243,69 @@ kubectl logs <pod> -n videocall -c db-migrate
 1. `kubectl get servicemonitor -n videocall`
 2. Verificare che il label `release: prometheus` corrisponda al selector
 3. `kubectl port-forward svc/videocall 3000:3000 -n videocall` poi `curl localhost:3000/api/metrics`
+
+## Configurazione registrazione video (Jibri)
+
+Jibri è il componente per la registrazione video degli eventi. È opzionale e richiede:
+
+1. **Storage object**: dove salvare le registrazioni
+2. **PVC**: storage locale temporaneo per la registrazione in corso
+3. **Risorse**: ~2 CPU, 4 GiB RAM per pod (usa /dev/shm)
+
+### Abilitare Jibri
+
+Nel values di produzione:
+
+```yaml
+jitsi:
+  jitsi-meet:
+    jibri:
+      enabled: true
+      replicaCount: 0  # Scale on demand
+      recording:
+        storage:
+          type: "azure-blob"  # o s3, gcs, minio
+          azure:
+            connectionString: ""  # Nel secret
+            containerName: "recordings"
+```
+
+### Provider di storage supportati
+
+| Provider | Tipo | Note |
+|----------|------|------|
+| Azure Blob Storage | `azure-blob` | Consigliato per AKS |
+| AWS S3 | `s3` | Consigliato per EKS |
+| Google Cloud Storage | `gcs` | Consigliato per GKE |
+| MinIO | `minio` | Self-hosted, S3-compatible |
+| Locale | `local` | Solo per test, recordings perse al restart |
+
+### Flusso recording
+
+1. Moderatore clicca "Avvia registrazione"
+2. Jitsi avvia Jibri (headless Chrome cattura audio/video)
+3. Al termine: Jibri salva `.mp4` → finalize script → upload su storage
+4. Webhook notifica il portale → recording URL salvata sull'evento
+5. Moderatore e partecipanti vedono il link nella pagina post-evento
+6. Dopo il periodo di retention GDPR, il cron job elimina la recording
+
+### Finalize script
+
+Lo script `infra/jitsi/jibri-finalize.sh` viene eseguito dopo ogni registrazione. In Kubernetes è montato come ConfigMap. Lo script:
+
+- Cerca il file MP4 nella directory di output di Jibri
+- Lo carica sullo storage configurato (Azure Blob, S3, GCS, MinIO)
+- Notifica il portale via webhook (`POST /api/webhooks/recording`)
+- Pulisce il file locale dopo l'upload (eccetto per storage `local`)
+
+### Variabili d'ambiente per recording
+
+| Variabile | Descrizione |
+|-----------|-------------|
+| `RECORDING_STORAGE_TYPE` | `azure-blob`, `s3`, `gcs`, `minio`, `local` |
+| `RECORDING_AZURE_CONNECTION_STRING` | Connection string Azure Blob |
+| `RECORDING_AZURE_CONTAINER` | Nome container Azure |
+| `RECORDING_S3_BUCKET` | Nome bucket S3 |
+| `RECORDING_S3_REGION` | Regione AWS |
+| `RECORDING_WEBHOOK_URL` | URL webhook per notificare il portale |
+| `CRON_API_KEY` | Chiave di autenticazione per il webhook |

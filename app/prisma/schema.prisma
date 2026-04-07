@@ -349,6 +349,12 @@ model SiteSetting {
   guestAccessEnabled        Boolean @default(true) @map("guest_access_enabled")
   publicRegistrationEnabled Boolean @default(true) @map("public_registration_enabled")
 
+  // Jitsi customization
+  jitsiWatermarkUrl      String?  @map("jitsi_watermark_url")
+  jitsiWatermarkEnabled  Boolean  @default(true) @map("jitsi_watermark_enabled")
+  jitsiWatermarkOpacity  Float    @default(0.4) @map("jitsi_watermark_opacity")
+  jitsiWatermarkPosition String   @default("bottom-left") @map("jitsi_watermark_position")
+
   // External links
   githubUrl            String? @map("github_url")
   supportEmail         String? @map("support_email")
