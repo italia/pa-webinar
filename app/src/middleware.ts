@@ -28,7 +28,7 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
       `frame-src 'self' https://${jitsiDomain}`,
       `script-src 'self' 'unsafe-inline' https://${jitsiDomain}`,
       "style-src 'self' 'unsafe-inline'",
-      "font-src 'self'",
+      "font-src 'self' data:",
       "img-src 'self' data: blob:",
       `connect-src 'self' https://${jitsiDomain} wss://${jitsiDomain}`,
       "media-src 'self' blob:",

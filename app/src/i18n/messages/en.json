@@ -670,6 +670,108 @@
       "optionLabel": "Option"
     }
   },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Privacy policy",
+      "title": "Privacy policy",
+      "intro": "This page summarises the processing of personal data related to the use of the DTD Events platform and participation in hosted public events.",
+      "sections": {
+        "controller": {
+          "title": "Data controller",
+          "body": "Personal data is processed within the institutional activities of the Department for Digital Transformation to support the technical and organisational management of public online events."
+        },
+        "data": {
+          "title": "Processed data and purposes",
+          "body": "The platform processes only the data strictly necessary for registration and participation in events, such as name, email address and any optional fields configured by the organiser. Data is used to send the personal access link, manage attendance, deliver reminders when applicable and support service security obligations."
+        },
+        "retention": {
+          "title": "Retention and rights",
+          "body": "Data is retained for the period configured for each event and then automatically deleted, unless different legal obligations apply. Data subjects may exercise their GDPR rights at any time, including access, rectification and erasure, through the Department's institutional channels."
+        }
+      },
+      "note": {
+        "title": "Request your data",
+        "body": "If you joined an event and want to verify which personal data is associated with your email address, you can use the dedicated feature available on the platform.",
+        "linkLabel": "Request my data"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Accessibility statement",
+      "title": "Accessibility statement",
+      "intro": "The Department for Digital Transformation is committed to making this platform accessible, in line with the applicable requirements for public sector digital services.",
+      "sections": {
+        "commitment": {
+          "title": "Accessibility commitment",
+          "body": "The platform is designed with components aligned with the .italia design system and with attention to keyboard navigation, semantic content structure and interface readability across the main screen sizes."
+        },
+        "status": {
+          "title": "Compliance status",
+          "body": "Accessibility checks and improvements are ongoing. Any residual issues are addressed progressively as part of the service evolution and regular maintenance activities."
+        },
+        "feedback": {
+          "title": "Feedback and contacts",
+          "body": "To report accessibility barriers or issues in using the service, users can contact the Department through its institutional channels, specifying the affected page and a brief description of the problem."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Legal notes",
+      "title": "Legal notes",
+      "intro": "Access to and use of the DTD Events platform is subject to these notes, which summarise the general terms of use and the main information about the service.",
+      "sections": {
+        "ownership": {
+          "title": "Service ownership",
+          "body": "The platform is promoted by the Department for Digital Transformation and made available for the organisation and participation in institutional public online events."
+        },
+        "usage": {
+          "title": "Use of the service",
+          "body": "Users must use the service correctly and must not compromise platform security, feature availability or the proper running of events. Abuse or improper use may lead to restrictions on access to the service."
+        },
+        "liability": {
+          "title": "Limitation of liability",
+          "body": "While appropriate technical and organisational measures are adopted, the Department cannot guarantee the complete absence of interruptions or malfunctions caused by unforeseen events, maintenance activities or external factors. Legal responsibilities remain governed by applicable law."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "System status",
+    "subtitle": "Real-time overview of platform service status.",
+    "allOperational": "All systems operational",
+    "degraded": "Degraded performance",
+    "outage": "Service outage",
+    "componentLabel": "Component",
+    "statusLabel": "Status",
+    "operational": "Operational",
+    "degradedLabel": "Degraded",
+    "standby": "Standby",
+    "loading": "Loading...",
+    "fetchError": "Unable to fetch system status",
+    "components": {
+      "app": "Web portal",
+      "database": "Database",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Video recording",
+      "smtp": "Email (SMTP)"
+    },
+    "jvbCapacity": "Video bridge capacity",
+    "jvbStandby": "Standby — activates automatically when needed",
+    "jvbScaling": "Scaling up...",
+    "nodesActive": "nodes active",
+    "participantsAvailable": "participants available",
+    "upcomingEvents": "Upcoming events",
+    "noUpcomingEvents": "No upcoming events",
+    "jvbActivatesIn": "JVB activates in {minutes} min",
+    "liveNow": "Live now",
+    "activeEvents": "Active events",
+    "registrationsToday": "Registrations today",
+    "jvbNodes": "JVB nodes",
+    "overallStatus": "Overall status",
+    "lastChecked": "Last checked",
+    "responseTime": "Response time",
+    "systemStatus": "System status"
+  },
   "footer": {
     "departmentName": "Department for Digital Transformation",
     "presidencyName": "Presidency of the Council of Ministers",
@@ -678,7 +780,8 @@
     "openSource": "Open source software",
     "contacts": "Contacts",
     "legalNotes": "Legal notes",
-    "governmentSite": "Italian Government"
+    "governmentSite": "Italian Government",
+    "systemStatus": "System status"
   },
   "pages": {
     "privacyTitle": "Privacy policy",

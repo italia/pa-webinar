@@ -2,7 +2,7 @@ apiVersion: v2
 name: eventi-dtd
 description: Piattaforma per eventi pubblici digitali della PA italiana
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "0.1.0"
 home: https://github.com/italia/eventi-dtd
 icon: https://italia.github.io/bootstrap-italia/docs/assets/img/favicons/favicon-32x32.png

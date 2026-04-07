@@ -36,6 +36,8 @@ services:
       - DEFAULT_PRIVACY_POLICY_URL=http://localhost:3000/it/privacy
       - CRON_API_KEY=dev_cron_key_change_in_production
       - ADMIN_API_KEY=dev_admin_key_2026
+      - JVB_PRE_SCALE_MINUTES=30
+      - JVB_MAX_REPLICAS=4
     depends_on:
       postgres:
         condition: service_healthy

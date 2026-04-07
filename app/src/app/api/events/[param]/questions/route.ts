@@ -12,6 +12,7 @@ import { prisma } from '@/lib/db';
 import { createQuestionSchema } from '@/lib/validation/schemas';
 import { rateLimit } from '@/lib/rate-limit';
 import { constantTimeEqual } from '@/lib/auth/moderator';
+import { getCached, setCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,6 +62,37 @@ export const GET = withErrorHandling(async (request, context) => {
     }
   }
 
+  // Short-lived cache for participant Q&A polling (2s TTL).
+  // With 300 participants polling every 3s, this reduces DB queries
+  // from ~100/s to ~1 every 2s per event.
+  const cacheKey = isModerator
+    ? null
+    : `qa:${event.id}:${statusFilter ?? 'all'}`;
+
+  interface QaResponse {
+    questions: {
+      id: string;
+      authorName: string;
+      text: string;
+      status: string;
+      upvoteCount: number;
+      hasUpvoted: boolean;
+      createdAt: string;
+      highlightedAt: string | null;
+      answeredAt: string | null;
+    }[];
+    totalCount: number;
+  }
+
+  if (cacheKey) {
+    const cached = getCached<QaResponse>(cacheKey);
+    if (cached) {
+      return Response.json(cached, {
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    }
+  }
+
   const questions = await prisma.question.findMany({
     where,
     include: {
@@ -90,9 +122,17 @@ export const GET = withErrorHandling(async (request, context) => {
   const highlighted = result.filter((q) => q.status === 'HIGHLIGHTED');
   const rest = result.filter((q) => q.status !== 'HIGHLIGHTED');
 
-  return Response.json({
+  const response: QaResponse = {
     questions: [...highlighted, ...rest],
     totalCount: result.length,
+  };
+
+  if (cacheKey) {
+    setCache(cacheKey, response, 2000);
+  }
+
+  return Response.json(response, {
+    headers: { 'Cache-Control': 'no-store' },
   });
 });
 

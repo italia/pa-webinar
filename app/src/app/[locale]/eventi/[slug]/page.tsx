@@ -6,6 +6,8 @@ import { prisma } from '@/lib/db';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
 
+export const revalidate = 30;
+
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
 }
