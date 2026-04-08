@@ -441,7 +441,8 @@
       "retentionPreviewQa": "Domande Q&A e voti",
       "retentionPreviewPolls": "Risultati dei sondaggi",
       "retentionPreviewRecordings": "Registrazioni video",
-      "retentionPreviewKept": "Le statistiche aggregate e i metadati dell'evento vengono mantenuti."
+      "retentionPreviewKept": "Le statistiche aggregate e i metadati dell'evento vengono mantenuti.",
+      "configPreview": "Anteprima configurazione"
     },
     "links": {
       "title": "Link dell'evento",
@@ -924,5 +925,39 @@
     "privacyNotConfigured": "Informativa privacy non ancora configurata.",
     "accessibilityTitle": "Dichiarazione di accessibilità",
     "accessibilityNotConfigured": "Dichiarazione di accessibilità non ancora configurata."
+  },
+  "video": {
+    "play": "Riproduci",
+    "pause": "Pausa",
+    "speed": "Velocità",
+    "fullscreen": "Schermo intero",
+    "pip": "Picture in Picture",
+    "volume": "Volume",
+    "mute": "Disattiva audio",
+    "unmute": "Attiva audio",
+    "download": "Scarica registrazione",
+    "speedLabel": "Velocità di riproduzione",
+    "progress": "Barra di avanzamento"
+  },
+  "diagram": {
+    "title": "Configurazione evento",
+    "topology": "Topologia",
+    "features": "Funzionalità attive",
+    "estimates": "Stima risorse",
+    "moderator": "Moderatore",
+    "participants": "Partecipanti",
+    "jvb": "Video Bridge",
+    "jibri": "Registrazione",
+    "bandwidth": {
+      "moderator": "Banda moderatore",
+      "participant": "Banda per partecipante",
+      "total": "Banda totale stimata"
+    },
+    "jvbCount": "JVB necessari",
+    "jvbRam": "RAM JVB stimata",
+    "storage": "Storage registrazione",
+    "duration": "Durata stimata",
+    "viewOnly": "Solo visione",
+    "preview": "Anteprima configurazione"
   }
 }

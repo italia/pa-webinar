@@ -93,6 +93,7 @@ export default async function EventManagePage({
     dataRetentionDays: event.dataRetentionDays,
     privacyPolicyUrl: event.privacyPolicyUrl,
     privacyPolicyText: event.privacyPolicyText,
+    speakersIt: event.speakersIt,
     createdAt: event.createdAt.toISOString(),
     requireOrganization: event.requireOrganization,
     requireOrganizationRole: event.requireOrganizationRole,

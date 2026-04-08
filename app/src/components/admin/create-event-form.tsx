@@ -22,6 +22,7 @@ import {
 
 import { useRouter } from '@/i18n/navigation';
 import { createEventSchema } from '@/lib/validation/schemas';
+import EventConfigDiagram from '@/components/admin/event-config-diagram';
 
 interface FieldErrors {
   [key: string]: string | undefined;
@@ -692,6 +693,34 @@ export default function CreateEventForm() {
               </FormGroup>
             </Col>
           </Row>
+        </CardBody>
+      </Card>
+
+      {/* ── Configuration Preview (collapsible) ── */}
+      <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+        <CardBody className="p-4">
+          <details>
+            <summary className="fw-semibold mb-3" style={{ color: '#17324D', cursor: 'pointer' }}>
+              {t('form.configPreview')}
+            </summary>
+            <div className="mt-3">
+              <EventConfigDiagram
+                event={{
+                  maxParticipants: form.maxParticipants,
+                  qaEnabled: form.qaEnabled,
+                  chatEnabled: form.chatEnabled,
+                  recordingEnabled: form.recordingEnabled,
+                  participantsCanUnmute: form.participantsCanUnmute,
+                  participantsCanStartVideo: form.participantsCanStartVideo,
+                  participantsCanShareScreen: form.participantsCanShareScreen,
+                  speakersIt: form.speakersIt || undefined,
+                  startsAt: form.startsAt ? new Date(form.startsAt).toISOString() : undefined,
+                  endsAt: form.endsAt ? new Date(form.endsAt).toISOString() : undefined,
+                }}
+                adminMode
+              />
+            </div>
+          </details>
         </CardBody>
       </Card>
 

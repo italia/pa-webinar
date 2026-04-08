@@ -22,6 +22,7 @@ import { REMINDER_PRESETS } from '@/lib/validation/schemas';
 import StatusBadge from './status-badge';
 import CopyButton from './copy-button';
 import DeleteEventModal from './delete-event-modal';
+import EventConfigDiagram from './event-config-diagram';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   MINISTRY: { it: 'Ministero', en: 'Ministry' },
@@ -93,6 +94,7 @@ interface EventData {
   dataRetentionDays: number;
   privacyPolicyUrl: string | null;
   privacyPolicyText: string | null;
+  speakersIt: string | null;
   createdAt: string;
   registrations: Registration[];
   materials: MaterialData[];
@@ -567,6 +569,29 @@ export default function EventManagementClient({
                   />
                 )}
               </dl>
+            </CardBody>
+          </Card>
+
+          {/* ── Configuration Diagram ── */}
+          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+            <CardBody className="p-4">
+              <SectionTitle>{te('manage.settingsSection')}</SectionTitle>
+              <EventConfigDiagram
+                event={{
+                  maxParticipants: event.maxParticipants,
+                  qaEnabled,
+                  chatEnabled,
+                  recordingEnabled,
+                  participantsCanUnmute,
+                  participantsCanStartVideo,
+                  participantsCanShareScreen,
+                  speakersIt: event.speakersIt ?? undefined,
+                  startsAt: event.startsAt,
+                  endsAt: event.endsAt,
+                }}
+                registrationCount={event.registrationCount}
+                adminMode
+              />
             </CardBody>
           </Card>
 

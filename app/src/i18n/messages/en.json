@@ -371,7 +371,8 @@
       "retentionPreviewQa": "Q&A questions and votes",
       "retentionPreviewPolls": "Poll results",
       "retentionPreviewRecordings": "Video recordings",
-      "retentionPreviewKept": "Aggregate statistics and event metadata are retained."
+      "retentionPreviewKept": "Aggregate statistics and event metadata are retained.",
+      "configPreview": "Configuration preview"
     },
     "links": {
       "title": "Event links",
@@ -924,5 +925,39 @@
     "privacyNotConfigured": "Privacy policy not yet configured.",
     "accessibilityTitle": "Accessibility statement",
     "accessibilityNotConfigured": "Accessibility statement not yet configured."
+  },
+  "video": {
+    "play": "Play",
+    "pause": "Pause",
+    "speed": "Speed",
+    "fullscreen": "Fullscreen",
+    "pip": "Picture in Picture",
+    "volume": "Volume",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "download": "Download recording",
+    "speedLabel": "Playback speed",
+    "progress": "Progress bar"
+  },
+  "diagram": {
+    "title": "Event configuration",
+    "topology": "Topology",
+    "features": "Active features",
+    "estimates": "Resource estimates",
+    "moderator": "Moderator",
+    "participants": "Participants",
+    "jvb": "Video Bridge",
+    "jibri": "Recording",
+    "bandwidth": {
+      "moderator": "Moderator bandwidth",
+      "participant": "Per-participant bandwidth",
+      "total": "Estimated total bandwidth"
+    },
+    "jvbCount": "Required JVBs",
+    "jvbRam": "Estimated JVB RAM",
+    "storage": "Recording storage",
+    "duration": "Estimated duration",
+    "viewOnly": "View only",
+    "preview": "Configuration preview"
   }
 }
