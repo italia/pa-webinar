@@ -26,12 +26,17 @@ interface SystemStatus {
     activeEvents: number;
     totalRegistrationsToday: number;
     jvbDesiredReplicas: number;
+    jvbRunningReplicas: number;
     jvbStatus: 'ready' | 'scaling' | 'standby';
+    jvbStressLevel: number | null;
+    jvbParticipants: number | null;
   };
   upcomingEvents: {
     title: string;
     startsAt: string;
     status: string;
+    maxParticipants: number;
+    videoEnabled: boolean;
   }[];
   lastChecked: string;
 }
@@ -131,13 +136,27 @@ export default function StatusDashboard() {
     return t(keyMap[status] ?? 'standby');
   };
 
-  const jvbMaxReplicas = parseInt(process.env.NEXT_PUBLIC_JVB_MAX_REPLICAS ?? '4', 10) || 4;
-  const jvbCapacityPct = Math.min(100, (data.metrics.jvbDesiredReplicas / jvbMaxReplicas) * 100);
-  const jvbCapacityColor = jvbCapacityPct > 70
-    ? '#CC334D'
-    : jvbCapacityPct > 0
-      ? '#008758'
-      : '#5A768A';
+  const jvbMaxReplicas = parseInt(process.env.NEXT_PUBLIC_JVB_MAX_REPLICAS ?? '6', 10) || 6;
+  const jvbRunning = data.metrics.jvbRunningReplicas;
+  const jvbDesired = data.metrics.jvbDesiredReplicas;
+  const jvbCapacityPct = Math.min(100, (Math.max(jvbRunning, jvbDesired) / jvbMaxReplicas) * 100);
+
+  const jvbCapacityColor = data.metrics.jvbStatus === 'scaling'
+    ? '#A66300'
+    : jvbCapacityPct > 70
+      ? '#CC334D'
+      : jvbCapacityPct > 0
+        ? '#008758'
+        : '#5A768A';
+
+  const stressLevel = data.metrics.jvbStressLevel;
+  const stressColor = stressLevel === null
+    ? '#5A768A'
+    : stressLevel > 0.7
+      ? '#CC334D'
+      : stressLevel > 0.5
+        ? '#A66300'
+        : '#008758';
 
   return (
     <>
@@ -221,34 +240,86 @@ export default function StatusDashboard() {
                 <Icon icon="it-video" size="sm" className="me-2" />
                 {t('jvbCapacity')}
               </h5>
-              {data.metrics.jvbDesiredReplicas === 0 ? (
-                <p className="text-muted mb-0">{t('jvbStandby')}</p>
+              {data.metrics.jvbStatus === 'standby' ? (
+                <div>
+                  <p className="text-muted mb-2">{t('jvbStandby')}</p>
+                  <p className="mb-0" style={{ fontSize: '0.82rem', color: '#5A768A' }}>
+                    {t('jvbStandbyDetail')}
+                  </p>
+                </div>
               ) : (
                 <>
                   <div className="progress mb-2" style={{ height: 12, borderRadius: 6 }}>
+                    {/* Running (solid) */}
                     <div
                       className="progress-bar"
                       role="progressbar"
                       style={{
-                        width: `${jvbCapacityPct}%`,
+                        width: `${(jvbRunning / jvbMaxReplicas) * 100}%`,
                         backgroundColor: jvbCapacityColor,
                         borderRadius: 6,
                       }}
-                      aria-valuenow={jvbCapacityPct}
+                      aria-valuenow={jvbRunning}
                       aria-valuemin={0}
-                      aria-valuemax={100}
+                      aria-valuemax={jvbMaxReplicas}
                     />
+                    {/* Desired but not yet running (striped) */}
+                    {jvbDesired > jvbRunning && (
+                      <div
+                        className="progress-bar progress-bar-striped progress-bar-animated"
+                        role="progressbar"
+                        style={{
+                          width: `${((jvbDesired - jvbRunning) / jvbMaxReplicas) * 100}%`,
+                          backgroundColor: '#A66300',
+                        }}
+                        aria-valuenow={jvbDesired - jvbRunning}
+                        aria-valuemin={0}
+                        aria-valuemax={jvbMaxReplicas}
+                      />
+                    )}
                   </div>
                   <p className="text-muted mb-0" style={{ fontSize: '0.88rem' }}>
-                    {data.metrics.jvbDesiredReplicas}/{jvbMaxReplicas} {t('nodesActive')}{' · '}
-                    ~{data.metrics.jvbDesiredReplicas * 100} {t('participantsAvailable')}
+                    {data.metrics.jvbStatus === 'scaling' ? (
+                      <>
+                        <strong style={{ color: '#A66300' }}>{t('jvbScaling')}</strong>
+                        {' · '}
+                        {jvbRunning}/{jvbDesired} {t('nodesReady')}
+                      </>
+                    ) : (
+                      <>
+                        {jvbRunning}/{jvbMaxReplicas} {t('nodesActive')}
+                      </>
+                    )}
                   </p>
+
+                  {/* Stress level indicator */}
+                  {stressLevel !== null && (
+                    <div className="mt-2">
+                      <div className="d-flex justify-content-between align-items-center mb-1">
+                        <span style={{ fontSize: '0.8rem', color: '#5A768A' }}>{t('jvbStress')}</span>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: stressColor }}>
+                          {Math.round(stressLevel * 100)}%
+                        </span>
+                      </div>
+                      <div className="progress" style={{ height: 6, borderRadius: 3 }}>
+                        <div
+                          className="progress-bar"
+                          style={{
+                            width: `${stressLevel * 100}%`,
+                            backgroundColor: stressColor,
+                            borderRadius: 3,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {data.metrics.jvbParticipants !== null && data.metrics.jvbParticipants > 0 && (
+                    <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: '#5A768A' }}>
+                      {data.metrics.jvbParticipants} {t('participantsConnected')}
+                    </p>
+                  )}
                 </>
-              )}
-              {data.metrics.jvbStatus === 'scaling' && (
-                <p className="text-warning mt-2 mb-0" style={{ fontSize: '0.85rem' }}>
-                  {t('jvbScaling')}
-                </p>
               )}
             </CardBody>
           </Card>
@@ -291,6 +362,10 @@ export default function StatusDashboard() {
                               hour: '2-digit',
                               minute: '2-digit',
                             })}
+                            {' · '}
+                            {event.maxParticipants} max
+                            {' · '}
+                            {event.videoEnabled ? t('videoInteractive') : t('videoWebinar')}
                           </span>
                         </div>
                         {isLive ? (
@@ -344,11 +419,23 @@ export default function StatusDashboard() {
         <Col xs={6} md={3} className="mb-3">
           <Card className="border-0 shadow-sm text-center">
             <CardBody className="py-3">
-              <div className="h3 mb-1 fw-bold" style={{ color: '#0066CC' }}>
-                {data.metrics.jvbDesiredReplicas}
+              <div
+                className="h3 mb-1 fw-bold"
+                style={{
+                  color: data.metrics.jvbStatus === 'scaling'
+                    ? '#A66300'
+                    : data.metrics.jvbRunningReplicas > 0
+                      ? '#008758'
+                      : '#5A768A',
+                }}
+              >
+                {data.metrics.jvbRunningReplicas}
               </div>
               <div className="text-muted" style={{ fontSize: '0.82rem' }}>
                 {t('jvbNodes')}
+                {data.metrics.jvbStatus === 'scaling' && (
+                  <span style={{ color: '#A66300' }}> ({t('scaling')})</span>
+                )}
               </div>
             </CardBody>
           </Card>
