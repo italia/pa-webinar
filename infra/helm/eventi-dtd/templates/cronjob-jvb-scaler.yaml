@@ -80,7 +80,7 @@ spec:
 
                     if [ -n "$JVB_POD" ]; then
                       STATS=$(kubectl exec -n {{ .Release.Namespace }} "$JVB_POD" \
-                        -- wget -qO- "http://127.0.0.1:8080/colibri/stats" 2>/dev/null || true)
+                        -- curl -sf "http://127.0.0.1:8080/colibri/stats" 2>/dev/null || true)
 
                       if [ -n "$STATS" ]; then
                         STRESS=$(echo "$STATS" | grep -o '"stress_level":[0-9.]*' | grep -o '[0-9.]*' || true)
@@ -98,8 +98,8 @@ spec:
 
                   # ── Phase 1: Predictive — query the app API ───────
                   APP_URL="{{ include "eventi-dtd.internalUrl" . }}"
-                  RESPONSE=$(wget -qO- \
-                    --header="x-api-key: $CRON_API_KEY" \
+                  RESPONSE=$(curl -sf \
+                    -H "x-api-key: $CRON_API_KEY" \
                     "${APP_URL}/api/internal/jvb-desired-replicas?_=1${STRESS_PARAM}" 2>/dev/null)
 
                   if [ -z "$RESPONSE" ]; then
