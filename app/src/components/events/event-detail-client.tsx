@@ -15,6 +15,8 @@ import {
 import { Link } from '@/i18n/navigation';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import PostEventQA from '@/components/events/post-event-qa';
+import VideoPlayer from '@/components/events/video-player';
+import EventConfigDiagram from '@/components/admin/event-config-diagram';
 
 interface AnsweredQuestion {
   id: string;
@@ -40,6 +42,10 @@ interface EventData {
   recordingUrl: string | null;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  recordingEnabled?: boolean;
+  participantsCanUnmute?: boolean;
+  participantsCanStartVideo?: boolean;
+  participantsCanShareScreen?: boolean;
   privacyPolicyUrl: string | null;
   speakersIt: string | null;
   speakersEn: string | null;
@@ -77,6 +83,7 @@ export default function EventDetailClient({
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tm = useTranslations('materials');
+  const tv = useTranslations('video');
   const format = useFormatter();
 
   const title =
@@ -263,6 +270,29 @@ export default function EventDetailClient({
       {/* ─── Content + Sidebar ─── */}
       <Row>
         <Col lg={8} className="mb-4 mb-lg-0">
+          {/* Video player for ended events with recording */}
+          {isEnded && event.recordingUrl && (
+            <div className="mb-4">
+              <VideoPlayer
+                src={`/api/events/${event.slug}/recording`}
+                title={title}
+                poster={event.imageUrl ?? undefined}
+              />
+              <div className="mt-2">
+                <a
+                  href={`/api/events/${event.slug}/recording`}
+                  download
+                  className="text-primary text-decoration-none d-inline-flex align-items-center gap-1"
+                  style={{ fontSize: '0.9rem' }}
+                >
+                  <Icon icon="it-download" size="sm" />
+                  {tv('download')}
+                </a>
+              </div>
+            </div>
+          )}
+          {/* // TODO v0.5.0: Live catch-up player with HLS */}
+
           <h2 className="h4 fw-semibold mb-3" style={{ color: '#17324D' }}>
             {t('detail.description')}
           </h2>
@@ -280,6 +310,28 @@ export default function EventDetailClient({
                 {t('detail.qaPostEvent')}
               </h2>
               <PostEventQA questions={answeredQuestions} />
+            </div>
+          )}
+
+          {/* Simplified feature diagram (public view) */}
+          {(event.qaEnabled !== undefined || event.chatEnabled !== undefined) && (
+            <div className="mt-4">
+              <EventConfigDiagram
+                event={{
+                  maxParticipants: event.maxParticipants,
+                  qaEnabled: event.qaEnabled,
+                  chatEnabled: event.chatEnabled,
+                  recordingEnabled: event.recordingEnabled ?? false,
+                  participantsCanUnmute: event.participantsCanUnmute ?? false,
+                  participantsCanStartVideo: event.participantsCanStartVideo ?? false,
+                  participantsCanShareScreen: event.participantsCanShareScreen ?? false,
+                  speakersIt: event.speakersIt,
+                  startsAt: event.startsAt,
+                  endsAt: event.endsAt,
+                }}
+                registrationCount={event.registrationCount}
+                adminMode={false}
+              />
             </div>
           )}
 
@@ -463,24 +515,12 @@ function PostEventSidebar({
       </div>
 
       {event.recordingUrl ? (
-        <>
-          <Alert color="success" className="mb-3 py-2 px-3">
-            <div className="d-flex align-items-center">
-              <Icon icon="it-video" className="me-2" />
-              <span className="fw-semibold">{t('detail.recording')}</span>
-            </div>
-          </Alert>
-          <a
-            href={event.recordingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button color="primary" size="lg" className="w-100 fw-semibold" tag="span">
-              <Icon icon="it-video" className="me-2" />
-              {t('detail.watchRecording')}
-            </Button>
-          </a>
-        </>
+        <Alert color="success" className="mb-3 py-2 px-3">
+          <div className="d-flex align-items-center">
+            <Icon icon="it-video" className="me-2" />
+            <span className="fw-semibold">{t('detail.recording')}</span>
+          </div>
+        </Alert>
       ) : (
         <p className="text-muted text-center mb-0">
           {t('detail.noRecording')}
