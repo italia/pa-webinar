@@ -1993,7 +1993,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/unjs/node-fetch-native"
   },
-  "nodemailer@7.0.13": {
+  "nodemailer@8.0.5": {
     "licenses": "MIT-0",
     "repository": "https://github.com/nodemailer/nodemailer",
     "publisher": "Andris Reinman"
