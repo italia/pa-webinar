@@ -12,15 +12,11 @@ export async function getSettings(): Promise<SiteSetting> {
     return cachedSettings;
   }
 
-  cachedSettings = await prisma.siteSetting.findUnique({
+  cachedSettings = await prisma.siteSetting.upsert({
     where: { id: 'singleton' },
+    create: { id: 'singleton' },
+    update: {},
   });
-
-  if (!cachedSettings) {
-    cachedSettings = await prisma.siteSetting.create({
-      data: { id: 'singleton' },
-    });
-  }
 
   cacheExpiry = Date.now() + CACHE_TTL_MS;
   return cachedSettings;
