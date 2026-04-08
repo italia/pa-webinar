@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
   Alert,
@@ -683,6 +683,11 @@ export default function EventManagementClient({
             }}
           />
 
+          {/* ── Feedback Results ── */}
+          {event.feedbackEnabled && status === 'ENDED' && (
+            <EventFeedbackAdmin slug={event.slug} token={event.moderatorToken} />
+          )}
+
           {/* ── Reminders Card ── */}
           <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
             <CardBody className="p-4">
@@ -1167,6 +1172,123 @@ export default function EventManagementClient({
         </Card>
       )}
     </>
+  );
+}
+
+interface FeedbackEntry {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+}
+
+interface FeedbackData {
+  averageRating: number;
+  totalCount: number;
+  distribution: number[];
+  feedback: FeedbackEntry[];
+}
+
+function EventFeedbackAdmin({
+  slug,
+  token,
+}: {
+  slug: string;
+  token: string;
+}) {
+  const t = useTranslations('admin.feedbackAdmin');
+  const [data, setData] = useState<FeedbackData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/events/${slug}/feedback?token=${token}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((json) => setData(json))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [slug, token]);
+
+  if (loading) return null;
+  if (!data || data.totalCount === 0) {
+    return (
+      <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+        <CardBody className="p-4">
+          <SectionTitle>{t('title')}</SectionTitle>
+          <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>{t('noFeedback')}</p>
+        </CardBody>
+      </Card>
+    );
+  }
+
+  const maxCount = Math.max(...data.distribution, 1);
+
+  return (
+    <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
+      <CardBody className="p-4">
+        <div className="d-flex justify-content-between align-items-start mb-4">
+          <SectionTitle>{t('title')}</SectionTitle>
+          <div className="text-end">
+            <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#17324D', lineHeight: 1 }}>
+              {data.averageRating.toFixed(1)}
+              <span className="text-warning ms-1">★</span>
+            </div>
+            <div className="text-muted" style={{ fontSize: '0.82rem' }}>
+              {t('totalVotes', { count: data.totalCount })}
+            </div>
+          </div>
+        </div>
+
+        {/* Star distribution bars */}
+        <div className="mb-4">
+          {[5, 4, 3, 2, 1].map((star) => {
+            const count = data.distribution[star - 1] ?? 0;
+            const pct = Math.round((count / maxCount) * 100);
+            return (
+              <div key={star} className="d-flex align-items-center gap-2 mb-1" style={{ fontSize: '0.82rem' }}>
+                <span className="text-muted flex-shrink-0" style={{ width: 24, textAlign: 'right' }}>{star}★</span>
+                <div className="flex-grow-1 bg-light rounded" style={{ height: 8 }}>
+                  <div
+                    className="rounded"
+                    style={{
+                      width: `${pct}%`,
+                      height: '100%',
+                      backgroundColor: star >= 4 ? '#008758' : star === 3 ? '#A66300' : '#CC334D',
+                      minWidth: count > 0 ? 4 : 0,
+                    }}
+                  />
+                </div>
+                <span className="text-muted flex-shrink-0" style={{ width: 20 }}>{count}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Comments */}
+        {data.feedback.some((f) => f.comment) && (
+          <>
+            <div className="fw-semibold mb-2" style={{ fontSize: '0.88rem', color: '#17324D' }}>
+              {t('comments')}
+            </div>
+            <div className="d-flex flex-column gap-2">
+              {data.feedback
+                .filter((f) => f.comment)
+                .map((f) => (
+                  <div
+                    key={f.id}
+                    className="p-3 rounded"
+                    style={{ backgroundColor: '#F5F7FB', fontSize: '0.88rem' }}
+                  >
+                    <div className="d-flex justify-content-between align-items-center mb-1">
+                      <span className="text-warning">{'★'.repeat(f.rating)}{'☆'.repeat(5 - f.rating)}</span>
+                    </div>
+                    <p className="mb-0" style={{ color: '#17324D' }}>{f.comment}</p>
+                  </div>
+                ))}
+            </div>
+          </>
+        )}
+      </CardBody>
+    </Card>
   );
 }
 

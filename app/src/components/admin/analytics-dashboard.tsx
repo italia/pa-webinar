@@ -25,6 +25,8 @@ interface OverviewData {
   averageParticipantsPerEvent: number;
   averageConversionRate: number;
   averageDurationMinutes: number;
+  averageFeedbackRating: number;
+  totalFeedback: number;
 }
 
 interface TimelineEntry {
@@ -379,6 +381,10 @@ function QuickStats({ overview }: { overview: OverviewData }) {
       label: t('avgParticipantsPerEvent'),
       value: overview.averageParticipantsPerEvent.toString(),
     },
+    ...(overview.totalFeedback > 0 ? [{
+      label: t('avgFeedbackRating'),
+      value: `${overview.averageFeedbackRating}/5 (${overview.totalFeedback})`,
+    }] : []),
   ];
 
   return (
