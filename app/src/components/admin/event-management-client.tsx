@@ -23,6 +23,8 @@ import StatusBadge from './status-badge';
 import CopyButton from './copy-button';
 import DeleteEventModal from './delete-event-modal';
 import EventConfigDiagram from './event-config-diagram';
+import RecordingManagement from './recording-management';
+import PostEventConfig from './post-event-config';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   MINISTRY: { it: 'Ministero', en: 'Ministry' },
@@ -84,6 +86,21 @@ interface EventData {
   participantsCanShareScreen: boolean;
   status: string;
   recordingUrl: string | null;
+  tempRecordingUrl: string | null;
+  tempRecordingStartedAt: string | null;
+  recordingPublished: boolean;
+  recordingPublishedAt: string | null;
+  recordingFileSize: number | null;
+  recordingDuration: number | null;
+  recordingDeleteAfterDays: number | null;
+  postEventPublic: boolean;
+  postEventPublicUntil: string | null;
+  postEventShowQA: boolean;
+  postEventShowMaterials: boolean;
+  postEventShowPolls: boolean;
+  postEventShowFeedback: boolean;
+  feedbackEnabled: boolean;
+  recordingConsentText: string | null;
   requireOrganization: boolean;
   requireOrganizationRole: boolean;
   requireOrganizationType: boolean;
@@ -631,67 +648,40 @@ export default function EventManagementClient({
             </CardBody>
           </Card>
 
-          {/* ── Recording Card ── */}
-          {event.recordingUrl && (
-            <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-              <CardBody className="p-4">
-                <SectionTitle>{t('recording.title')}</SectionTitle>
-                <div className="d-flex align-items-center gap-3 flex-wrap">
-                  <a
-                    href={event.recordingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-primary btn-sm d-inline-flex align-items-center gap-1"
-                  >
-                    <Icon icon="it-video" size="sm" color="white" />
-                    {t('recording.play')}
-                  </a>
-                  <a
-                    href={event.recordingUrl}
-                    download
-                    className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1"
-                  >
-                    <Icon icon="it-download" size="sm" />
-                    {t('recording.download')}
-                  </a>
-                  <Button
-                    color="danger"
-                    outline
-                    size="sm"
-                    className="d-inline-flex align-items-center gap-1"
-                    onClick={async () => {
-                      if (!window.confirm(t('recording.deleteConfirm'))) return;
-                      await fetch(`/api/events/${event.id}`, {
-                        method: 'PUT',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          Authorization: `Bearer ${event.moderatorToken}`,
-                        },
-                        body: JSON.stringify({ recordingUrl: null }),
-                      });
-                      router.refresh();
-                    }}
-                  >
-                    <Icon icon="it-delete" size="sm" />
-                    {t('recording.delete')}
-                  </Button>
-                </div>
-                <div
-                  className="mt-2"
-                  style={{
-                    background: '#f5f7fb',
-                    padding: 8,
-                    borderRadius: 4,
-                    wordBreak: 'break-all',
-                    fontSize: 12,
-                    fontFamily: "'Roboto Mono', monospace",
-                  }}
-                >
-                  {event.recordingUrl}
-                </div>
-              </CardBody>
-            </Card>
-          )}
+          {/* ── Recording Management ── */}
+          <RecordingManagement
+            event={{
+              id: event.id,
+              slug: event.slug,
+              status,
+              recordingEnabled,
+              recordingUrl: event.recordingUrl,
+              tempRecordingUrl: event.tempRecordingUrl,
+              tempRecordingStartedAt: event.tempRecordingStartedAt,
+              recordingPublished: event.recordingPublished,
+              recordingPublishedAt: event.recordingPublishedAt,
+              recordingFileSize: event.recordingFileSize,
+              recordingDuration: event.recordingDuration,
+              recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+              moderatorToken: event.moderatorToken,
+            }}
+          />
+
+          {/* ── Post-event Configuration ── */}
+          <PostEventConfig
+            event={{
+              id: event.id,
+              moderatorToken: event.moderatorToken,
+              postEventPublic: event.postEventPublic,
+              postEventPublicUntil: event.postEventPublicUntil,
+              postEventShowQA: event.postEventShowQA,
+              postEventShowMaterials: event.postEventShowMaterials,
+              postEventShowPolls: event.postEventShowPolls,
+              postEventShowFeedback: event.postEventShowFeedback,
+              feedbackEnabled: event.feedbackEnabled,
+              dataRetentionDays: event.dataRetentionDays,
+            }}
+          />
 
           {/* ── Reminders Card ── */}
           <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>

@@ -1,21 +1,25 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError, ForbiddenError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import {
+  extractModeratorToken,
+  constantTimeEqual,
+} from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const GET = withErrorHandling(async (_request, context) => {
   const { param } = await context.params;
-
-  const UUID_RE =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const isUuid = UUID_RE.test(param);
 
   const event = await prisma.event.findFirst({
     where: isUuid
       ? { OR: [{ id: param }, { slug: param }] }
       : { slug: param },
-    select: { recordingUrl: true, status: true },
+    select: { recordingUrl: true, status: true, recordingPublished: true },
   });
 
   if (!event?.recordingUrl) throw new NotFoundError('Recording');
@@ -24,4 +28,66 @@ export const GET = withErrorHandling(async (_request, context) => {
   }
 
   return Response.redirect(event.recordingUrl, 302);
+});
+
+export const DELETE = withErrorHandling(async (request, context) => {
+  const { param } = await context.params;
+  const isUuid = UUID_RE.test(param);
+
+  const token = extractModeratorToken(request);
+  if (!token) throw new ForbiddenError('Moderator token required');
+
+  const event = await prisma.event.findFirst({
+    where: isUuid
+      ? { OR: [{ id: param }, { slug: param }] }
+      : { slug: param },
+    select: {
+      id: true,
+      moderatorToken: true,
+      recordingUrl: true,
+      tempRecordingUrl: true,
+    },
+  });
+
+  if (!event) throw new NotFoundError('Event');
+  if (!constantTimeEqual(event.moderatorToken, token)) {
+    throw new ForbiddenError('Invalid moderator token');
+  }
+
+  // TODO: Delete from Azure Blob Storage when SDK available
+  if (event.recordingUrl || event.tempRecordingUrl) {
+    console.warn(
+      `[recording/delete] Recording URLs cleared for event ${event.id}. ` +
+        `Storage deletion should be implemented with Azure SDK.`,
+    );
+  }
+
+  await prisma.$transaction([
+    prisma.event.update({
+      where: { id: event.id },
+      data: {
+        recordingUrl: null,
+        tempRecordingUrl: null,
+        tempRecordingStartedAt: null,
+        recordingPublished: false,
+        recordingPublishedAt: null,
+        recordingFileSize: null,
+        recordingDuration: null,
+        recordingDeleteAfterDays: null,
+      },
+    }),
+    prisma.gdprAuditLog.create({
+      data: {
+        eventId: event.id,
+        action: 'RECORDING_DELETED',
+        recordCount: 1,
+        details: JSON.stringify({
+          hadRecordingUrl: !!event.recordingUrl,
+          hadTempRecordingUrl: !!event.tempRecordingUrl,
+        }),
+      },
+    }),
+  ]);
+
+  return Response.json({ deleted: true });
 });

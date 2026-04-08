@@ -17,6 +17,7 @@ import AddToCalendar from '@/components/events/add-to-calendar';
 import PostEventQA from '@/components/events/post-event-qa';
 import VideoPlayer from '@/components/events/video-player';
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
+import PostEventTabs from '@/components/events/post-event-tabs';
 
 interface AnsweredQuestion {
   id: string;
@@ -51,6 +52,14 @@ interface EventData {
   speakersEn: string | null;
   organizerName: string | null;
   imageUrl: string | null;
+  peakParticipants?: number;
+  postEventPublic?: boolean;
+  postEventPublicUntil?: string | null;
+  postEventShowQA?: boolean;
+  postEventShowMaterials?: boolean;
+  postEventShowPolls?: boolean;
+  postEventShowFeedback?: boolean;
+  dataRetentionDays?: number;
 }
 
 interface MaterialData {
@@ -62,11 +71,27 @@ interface MaterialData {
   createdAt: string;
 }
 
+interface PollData {
+  id: string;
+  question: string;
+  options: string[];
+  voteCounts: number[];
+  totalVotes: number;
+}
+
+interface FeedbackSummary {
+  average: number | null;
+  count: number;
+  distribution: { rating: number; count: number }[];
+}
+
 interface EventDetailClientProps {
   event: EventData;
   locale: string;
   answeredQuestions?: AnsweredQuestion[];
   materials?: MaterialData[];
+  polls?: PollData[];
+  feedbackSummary?: FeedbackSummary | null;
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -80,10 +105,13 @@ export default function EventDetailClient({
   locale,
   answeredQuestions = [],
   materials = [],
+  polls = [],
+  feedbackSummary = null,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tm = useTranslations('materials');
   const tv = useTranslations('video');
+  const tp = useTranslations('postEvent');
   const format = useFormatter();
 
   const title =
@@ -303,18 +331,22 @@ export default function EventDetailClient({
             {description}
           </div>
 
-          {isEnded && event.qaEnabled && answeredQuestions.length > 0 && (
-            <div className="mt-4">
-              <h2 className="h4 fw-semibold mb-3" style={{ color: '#17324D' }}>
-                <Icon icon="it-comment" className="me-2" />
-                {t('detail.qaPostEvent')}
-              </h2>
-              <PostEventQA questions={answeredQuestions} />
-            </div>
+          {/* Post-event tabbed content */}
+          {isEnded && (
+            <PostEventTabs
+              questions={answeredQuestions}
+              materials={materials}
+              polls={polls}
+              feedback={feedbackSummary}
+              showQA={event.postEventShowQA !== false}
+              showMaterials={event.postEventShowMaterials !== false}
+              showPolls={event.postEventShowPolls !== false}
+              showFeedback={event.postEventShowFeedback !== false}
+            />
           )}
 
-          {/* Simplified feature diagram (public view) */}
-          {(event.qaEnabled !== undefined || event.chatEnabled !== undefined) && (
+          {/* Feature diagram (public view, non-ended) */}
+          {!isEnded && (event.qaEnabled !== undefined || event.chatEnabled !== undefined) && (
             <div className="mt-4">
               <EventConfigDiagram
                 event={{
@@ -334,40 +366,6 @@ export default function EventDetailClient({
               />
             </div>
           )}
-
-          {isEnded && materials.length > 0 && (
-            <div className="mt-4">
-              <h2 className="h4 fw-semibold mb-3" style={{ color: '#17324D' }}>
-                <Icon icon="it-files" className="me-2" />
-                {tm('postEventTitle')}
-              </h2>
-              <div className="d-flex flex-column gap-2">
-                {materials.map((m) => (
-                  <Card key={m.id} className="shadow-sm border-0" style={{ borderRadius: '0.5rem' }}>
-                    <CardBody className="p-3">
-                      <a
-                        href={m.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="fw-semibold text-primary text-decoration-none d-inline-flex align-items-center gap-1"
-                      >
-                        <Icon icon="it-external-link" size="sm" />
-                        {m.title}
-                      </a>
-                      {m.description && (
-                        <p className="text-muted mb-1 mt-1" style={{ fontSize: '0.9rem' }}>
-                          {m.description}
-                        </p>
-                      )}
-                      <div className="text-muted" style={{ fontSize: '0.8rem' }}>
-                        {tm('addedBy', { name: m.addedBy })}
-                      </div>
-                    </CardBody>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
         </Col>
 
         <Col lg={4}>
@@ -380,6 +378,7 @@ export default function EventDetailClient({
                 <PostEventSidebar
                   event={event}
                   registrationCount={event.registrationCount}
+                  feedbackSummary={feedbackSummary}
                 />
               ) : (
                 <>
@@ -494,11 +493,19 @@ function StatusPill({ status }: { status: string }) {
 function PostEventSidebar({
   event,
   registrationCount,
+  feedbackSummary,
 }: {
   event: EventData;
   registrationCount: number;
+  feedbackSummary?: FeedbackSummary | null;
 }) {
   const t = useTranslations('events');
+  const tp = useTranslations('postEvent');
+  const format = useFormatter();
+
+  const retentionExpiry = event.dataRetentionDays
+    ? new Date(new Date(event.endsAt).getTime() + event.dataRetentionDays * 86_400_000)
+    : null;
 
   return (
     <>
@@ -509,10 +516,24 @@ function PostEventSidebar({
         {t('detail.eventEnded')}
       </h3>
 
-      <div className="d-flex align-items-center text-muted mb-3">
+      <div className="d-flex align-items-center text-muted mb-2" style={{ fontSize: '0.88rem' }}>
         <Icon icon="it-user" size="sm" className="me-2" />
         <span>{t('detail.totalRegistrations', { count: registrationCount })}</span>
       </div>
+
+      {event.peakParticipants !== undefined && event.peakParticipants > 0 && (
+        <div className="d-flex align-items-center text-muted mb-2" style={{ fontSize: '0.88rem' }}>
+          <Icon icon="it-chart-line" size="sm" className="me-2" />
+          <span>{t('detail.peakParticipants', { count: event.peakParticipants })}</span>
+        </div>
+      )}
+
+      {feedbackSummary && feedbackSummary.count > 0 && feedbackSummary.average && (
+        <div className="d-flex align-items-center text-muted mb-2" style={{ fontSize: '0.88rem' }}>
+          <span className="me-2">⭐</span>
+          <span>{feedbackSummary.average.toFixed(1)}/5 ({feedbackSummary.count})</span>
+        </div>
+      )}
 
       {event.recordingUrl ? (
         <Alert color="success" className="mb-3 py-2 px-3">
@@ -522,9 +543,22 @@ function PostEventSidebar({
           </div>
         </Alert>
       ) : (
-        <p className="text-muted text-center mb-0">
+        <p className="text-muted text-center mb-3" style={{ fontSize: '0.85rem' }}>
           {t('detail.noRecording')}
         </p>
+      )}
+
+      {retentionExpiry && (
+        <Alert color="info" className="py-2 px-3 mb-0" style={{ fontSize: '0.8rem' }}>
+          <Icon icon="it-info-circle" size="xs" className="me-1" />
+          {tp('availableUntil', {
+            date: format.dateTime(retentionExpiry, {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            }),
+          })}
+        </Alert>
       )}
     </>
   );

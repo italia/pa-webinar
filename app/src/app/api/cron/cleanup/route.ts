@@ -18,6 +18,104 @@ export const GET = withErrorHandling(async (request) => {
 
   const now = new Date();
 
+  // ── Phase 1: Clean up expired temporary recordings (24h) ──
+  const tempRecordingEvents = await prisma.event.findMany({
+    where: {
+      tempRecordingUrl: { not: null },
+      recordingPublished: false,
+      tempRecordingStartedAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
+    },
+    select: { id: true, slug: true, tempRecordingUrl: true },
+  });
+
+  for (const evt of tempRecordingEvents) {
+    try {
+      // TODO: Delete from Azure Blob Storage when SDK available
+      if (evt.tempRecordingUrl) {
+        console.warn(
+          `[cron/cleanup] Temp recording for event ${evt.id} should be deleted from storage: ${evt.tempRecordingUrl}`,
+        );
+      }
+      await prisma.$transaction([
+        prisma.event.update({
+          where: { id: evt.id },
+          data: { tempRecordingUrl: null, tempRecordingStartedAt: null },
+        }),
+        prisma.gdprAuditLog.create({
+          data: {
+            eventId: evt.id,
+            action: 'TEMP_RECORDING_DELETED',
+            recordCount: 1,
+            details: JSON.stringify({ reason: '24h_expiry' }),
+          },
+        }),
+      ]);
+      console.log(`[cron/cleanup] Temp recording cleared for event ${evt.id} (${evt.slug})`);
+    } catch (err) {
+      console.error(`[cron/cleanup] Failed to clear temp recording for event ${evt.id}:`, err);
+    }
+  }
+
+  // ── Phase 2: Clean up published recordings past their retention ──
+  const recordingRetentionEvents = await prisma.event.findMany({
+    where: {
+      recordingUrl: { not: null },
+      recordingPublished: true,
+      recordingDeleteAfterDays: { not: null },
+      recordingPublishedAt: { not: null },
+    },
+    select: {
+      id: true,
+      slug: true,
+      recordingUrl: true,
+      recordingDeleteAfterDays: true,
+      recordingPublishedAt: true,
+    },
+  });
+
+  for (const evt of recordingRetentionEvents) {
+    if (!evt.recordingPublishedAt || !evt.recordingDeleteAfterDays) continue;
+    const expiresAt = new Date(
+      evt.recordingPublishedAt.getTime() + evt.recordingDeleteAfterDays * 86_400_000,
+    );
+    if (expiresAt >= now) continue;
+
+    try {
+      // TODO: Delete from Azure Blob Storage when SDK available
+      console.warn(
+        `[cron/cleanup] Published recording for event ${evt.id} expired, should be deleted from storage: ${evt.recordingUrl}`,
+      );
+      await prisma.$transaction([
+        prisma.event.update({
+          where: { id: evt.id },
+          data: {
+            recordingUrl: null,
+            recordingPublished: false,
+            recordingPublishedAt: null,
+            recordingFileSize: null,
+            recordingDuration: null,
+            recordingDeleteAfterDays: null,
+          },
+        }),
+        prisma.gdprAuditLog.create({
+          data: {
+            eventId: evt.id,
+            action: 'RECORDING_DELETED',
+            recordCount: 1,
+            details: JSON.stringify({
+              reason: 'retention_expired',
+              retentionDays: evt.recordingDeleteAfterDays,
+            }),
+          },
+        }),
+      ]);
+      console.log(`[cron/cleanup] Published recording cleared for event ${evt.id} (${evt.slug})`);
+    } catch (err) {
+      console.error(`[cron/cleanup] Failed to clear recording for event ${evt.id}:`, err);
+    }
+  }
+
+  // ── Phase 3: Full event data retention cleanup ──
   const expiredEvents = await prisma.event.findMany({
     where: {
       status: { in: ['ENDED', 'ARCHIVED'] },
@@ -29,6 +127,7 @@ export const GET = withErrorHandling(async (request) => {
       dataRetentionDays: true,
       status: true,
       recordingUrl: true,
+      tempRecordingUrl: true,
       _count: { select: { registrations: true, questions: true, polls: true } },
     },
   });
@@ -126,11 +225,10 @@ export const GET = withErrorHandling(async (request) => {
         return counts;
       });
 
-      if (evt.recordingUrl) {
+      if (evt.recordingUrl || evt.tempRecordingUrl) {
         console.warn(
-          `[cron/cleanup] Event ${evt.id} has a recording at ${evt.recordingUrl} ` +
-            `that should be deleted from Azure Blob Storage. ` +
-            `Implement Azure SDK deletion when AZURE_STORAGE_CONNECTION_STRING is available.`,
+          `[cron/cleanup] Event ${evt.id} has recordings that should be deleted from storage. ` +
+            `recordingUrl: ${evt.recordingUrl ?? 'none'}, tempRecordingUrl: ${evt.tempRecordingUrl ?? 'none'}`,
         );
       }
 
@@ -153,6 +251,14 @@ export const GET = withErrorHandling(async (request) => {
 
   return Response.json({
     ok: true,
+    tempRecordingsCleaned: tempRecordingEvents.length,
+    publishedRecordingsCleaned: recordingRetentionEvents.filter((evt) => {
+      if (!evt.recordingPublishedAt || !evt.recordingDeleteAfterDays) return false;
+      const expiresAt = new Date(
+        evt.recordingPublishedAt.getTime() + evt.recordingDeleteAfterDays * 86_400_000,
+      );
+      return expiresAt < now;
+    }).length,
     eventsProcessed,
     registrationsDeleted: totalRegistrationsDeleted,
     questionsDeleted: totalQuestionsDeleted,

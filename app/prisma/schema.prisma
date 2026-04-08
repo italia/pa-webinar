@@ -60,7 +60,30 @@ model Event {
   
   // Status
   status      EventStatus @default(DRAFT)
-  recordingUrl String?    @map("recording_url")
+  
+  // Temporary recording (catch-up, always active when LIVE if Jibri available)
+  tempRecordingUrl       String?   @map("temp_recording_url")
+  tempRecordingStartedAt DateTime? @map("temp_recording_started_at")
+  
+  // Published recording (moderator decision)
+  recordingUrl           String?   @map("recording_url")
+  recordingPublished     Boolean   @default(false) @map("recording_published")
+  recordingPublishedAt   DateTime? @map("recording_published_at")
+  recordingFileSize      BigInt?   @map("recording_file_size")
+  recordingDuration      Int?      @map("recording_duration")
+  recordingDeleteAfterDays Int?    @map("recording_delete_after_days")
+  
+  // Post-event configuration
+  postEventPublic        Boolean   @default(true)  @map("post_event_public")
+  postEventPublicUntil   DateTime? @map("post_event_public_until")
+  postEventShowQA        Boolean   @default(true)  @map("post_event_show_qa")
+  postEventShowMaterials Boolean   @default(true)  @map("post_event_show_materials")
+  postEventShowPolls     Boolean   @default(true)  @map("post_event_show_polls")
+  postEventShowFeedback  Boolean   @default(true)  @map("post_event_show_feedback")
+  feedbackEnabled        Boolean   @default(true)  @map("feedback_enabled")
+  
+  // GDPR recording consent
+  recordingConsentText   String?   @map("recording_consent_text") @db.Text
   
   // Analytics
   peakParticipants  Int @default(0) @map("peak_participants")

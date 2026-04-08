@@ -33,14 +33,43 @@ Il sistema Q&A (domande con upvote nel pannello laterale) è invece persistito i
 
 ## Registrazioni video
 
-Le registrazioni video vengono effettuate tramite Jibri (headless Chrome) e caricate su Azure Blob Storage. La registrazione è facoltativa e deve essere esplicitamente attivata dal moderatore.
+Le registrazioni video vengono effettuate tramite Jibri (headless Chrome) e caricate su Azure Blob Storage.
 
-Prima dell'avvio della registrazione:
-1. Il moderatore attiva la registrazione dalla barra dei controlli.
-2. Un banner visibile a tutti i partecipanti indica che la registrazione è in corso.
-3. I partecipanti che accedono all'evento con registrazione attiva vedono una schermata di consenso prima di entrare nella sala.
+### Flusso registrazione
 
-Le registrazioni seguono la politica di conservazione configurata per l'evento (`dataRetentionDays`). Dopo la scadenza, il cron di pulizia elimina automaticamente sia i file su Azure Blob Storage che i metadati nel database.
+1. **Registrazione temporanea**: quando un evento è LIVE e Jibri è disponibile,
+   la registrazione viene avviata automaticamente. Questa registrazione è
+   temporanea e viene eliminata dopo 24 ore se non pubblicata. Serve per
+   consentire ai ritardatari di guardare l'evento dall'inizio ("catch-up").
+
+2. **Pubblicazione**: il moderatore può decidere di pubblicare la registrazione
+   nella pagina dell'evento. In questo caso, il video è accessibile ai visitatori
+   della pagina evento.
+
+3. **Conservazione**: la registrazione pubblicata segue il periodo di retention
+   configurato per l'evento (default: 30 giorni) oppure un periodo specifico
+   configurato dal moderatore (`recordingDeleteAfterDays`).
+
+4. **Eliminazione**: alla scadenza del periodo di conservazione, il video viene
+   eliminato dallo storage e il link rimosso dalla pagina evento.
+
+### Consenso
+
+- I partecipanti sono informati della registrazione prima dell'ingresso nella sala
+  tramite una schermata di consenso full-screen.
+- Il consenso è informato (banner visibile) e implicito (entrare = acconsentire).
+- Se l'evento ha un testo di consenso personalizzato (`recordingConsentText`),
+  viene mostrato al posto del testo predefinito.
+- Se il moderatore abilita la pubblicazione, l'informativa al momento della
+  registrazione include questa possibilità.
+- I partecipanti possono richiedere la rimozione del video ai sensi dell'Art. 17 GDPR.
+
+### Dati tecnici
+
+- Le registrazioni sono archiviate su object storage (Azure Blob, S3, GCS, MinIO).
+- L'accesso avviene tramite URL temporanei (SAS token) con scadenza.
+- I video non sono indicizzati dai motori di ricerca (noindex, nofollow).
+- Il player video non scarica il file intero — streaming progressivo.
 
 ## Conservazione dei dati / Data Retention
 
