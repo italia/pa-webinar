@@ -23,10 +23,10 @@ import MaterialPanel from '@/components/materials/material-panel';
 import ParticipantPanel from '@/components/participants/participant-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
 import GuestJoinForm from '@/components/live/guest-join-form';
-import AudioPlayer from '@/components/live/audio-player';
 import EventFeedback from '@/components/live/event-feedback';
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
+import WaitingRoom from '@/components/live/waiting-room';
 
 interface EventInfo {
   id: string;
@@ -42,6 +42,10 @@ interface EventInfo {
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
+  speakersIt?: string | null;
+  organizerName?: string | null;
+  maxParticipants?: number;
+  tempRecordingUrl?: string | null;
 }
 
 interface WatermarkSettings {
@@ -330,66 +334,31 @@ export default function LiveEventClient({
   // ── Waiting room ──
   if (phase === 'waiting') {
     return (
-      <div className="container py-5">
-        <div className="row justify-content-center">
-          <div className="col-lg-8 col-xl-6 text-center">
-            <Icon icon="it-clock" size="xl" className="text-primary mb-3" />
-            <h1 className="h3 mb-3">{event.title}</h1>
-            <p className="lead mb-2">{t('eventNotStarted')}</p>
-            <p className="text-muted mb-4">
-              {t('eventStartsAt', {
-                date: format.dateTime(new Date(startsAtMs), {
-                  day: 'numeric', month: 'long', year: 'numeric',
-                }),
-                time: format.dateTime(new Date(startsAtMs), {
-                  hour: '2-digit', minute: '2-digit',
-                }),
-              })}
-            </p>
-
-            {countdown && (
-              <div
-                className="bg-primary text-white rounded-3 p-4 mb-4 d-inline-block"
-                style={{ minWidth: '280px' }}
-              >
-                <div className="small text-uppercase mb-1 opacity-75">{t('countdown')}</div>
-                <div className="display-6 fw-bold font-monospace">{countdown}</div>
-              </div>
-            )}
-
-            {isModerator && (
-              <div className="mb-4">
-                <Button
-                  color="success" size="lg" className="px-5"
-                  onClick={handleStartEvent} disabled={startingEvent}
-                >
-                  {startingEvent ? (
-                    <><Spinner active small className="me-2" />{t('startingEvent')}</>
-                  ) : (
-                    <><Icon icon="it-video" size="sm" color="white" className="me-2" />{t('startEventButton')}</>
-                  )}
-                </Button>
-                <Badge color="info" pill className="ms-3 px-3 py-2">{t('moderatorBadge')}</Badge>
-              </div>
-            )}
-
-            <div className="mb-4 d-flex justify-content-center">
-              <AudioPlayer audioUrl={event.waitingRoomAudioUrl} />
-            </div>
-
-            <Alert color="info" className="text-start">
-              <Icon icon="it-info-circle" className="me-2" />
-              {t('waitingRoomHint')}
-            </Alert>
-
-            <div className="mt-4">
-              <Link href={`/eventi/${event.slug}`}>
-                <Button color="primary" outline tag="span">{tc('back')}</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+      <WaitingRoom
+        event={{
+          title: event.title,
+          slug: event.slug,
+          startsAt: event.startsAt,
+          endsAt: event.endsAt,
+          status: eventStatus as 'PUBLISHED' | 'LIVE',
+          speakersIt: event.speakersIt,
+          organizerName: event.organizerName,
+          maxParticipants: event.maxParticipants ?? 300,
+          recordingEnabled: event.recordingEnabled,
+          tempRecordingUrl: event.tempRecordingUrl,
+          waitingRoomAudioUrl: event.waitingRoomAudioUrl,
+        }}
+        participantCount={participantCount}
+        role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
+        onEnterLive={() => {
+          if (event.recordingEnabled && !isModerator) {
+            setPhase('consent_pending');
+          } else {
+            setPhase('pre_join');
+          }
+        }}
+        onStartEvent={isModerator ? handleStartEvent : undefined}
+      />
     );
   }
 

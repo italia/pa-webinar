@@ -6,11 +6,13 @@ import { Button, Alert, Icon } from 'design-react-kit';
 interface RecordingConsentProps {
   onAccept: () => void;
   onDecline: () => void;
+  customConsentText?: string | null;
 }
 
 export default function RecordingConsent({
   onAccept,
   onDecline,
+  customConsentText,
 }: RecordingConsentProps) {
   const t = useTranslations('live');
 
@@ -29,7 +31,9 @@ export default function RecordingConsent({
           className="text-warning mb-3"
         />
         <h2 className="h4 mb-3">{t('recordingConsentTitle')}</h2>
-        <p className="mb-4">{t('recordingConsent')}</p>
+        <p className="mb-4" style={{ whiteSpace: 'pre-wrap' }}>
+          {customConsentText || t('recordingConsent')}
+        </p>
 
         <div className="d-flex justify-content-center gap-3">
           <Button color="primary" onClick={onAccept}>

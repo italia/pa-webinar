@@ -309,3 +309,38 @@ Lo script `infra/jitsi/jibri-finalize.sh` viene eseguito dopo ogni registrazione
 | `RECORDING_S3_REGION` | Regione AWS |
 | `RECORDING_WEBHOOK_URL` | URL webhook per notificare il portale |
 | `CRON_API_KEY` | Chiave di autenticazione per il webhook |
+
+## Storage per registrazioni video
+
+### Dimensionamento
+
+- Jibri registra a ~1.5 Mbps (720p H.264)
+- 1 ora di registrazione ≈ 675 MB
+- 2 ore ≈ 1.35 GB
+- Con 10 eventi/mese da 2 ore: ~13.5 GB/mese
+
+### Azure Blob Storage con CDN
+
+Per servire il video a 300 utenti simultanei:
+- Azure Blob supporta fino a 500 richieste/secondo per blob
+- Con range requests, il video viene servito in chunk
+- Per alta disponibilità: Azure CDN (Front Door) davanti al Blob
+- Costo: ~€0.02/GB trasferimento + ~€0.02/GB storage
+
+### Configurazione CDN (opzionale, consigliato per >100 utenti simultanei)
+
+Se si prevede che molti utenti guarderanno le registrazioni contemporaneamente:
+1. Creare un profilo Azure Front Door
+2. Aggiungere un endpoint con origin = Blob Storage container
+3. Configurare regole di caching (cache video per 24h)
+4. Usare l'URL CDN come recordingUrl
+
+Senza CDN, Azure Blob gestisce comunque 300 utenti ma con latenza maggiore.
+
+### Lifecycle recordings
+
+| Tipo | Durata | Pulizia |
+|------|--------|---------|
+| Temporanea (catch-up) | 24 ore se non pubblicata | Cron `/api/cron/cleanup` |
+| Pubblicata | Configurabile (7/30/90 giorni o fino a retention evento) | Cron `/api/cron/cleanup` |
+| Event retention | `dataRetentionDays` dopo `endsAt` | Cron `/api/cron/cleanup` |

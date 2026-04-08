@@ -30,6 +30,14 @@ const eventBaseSchema = z.object({
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),
   waitingRoomAudioUrl: z.string().url().optional(),
+  postEventPublic: z.boolean().default(true),
+  postEventPublicUntil: z.string().datetime().nullable().optional(),
+  postEventShowQA: z.boolean().default(true),
+  postEventShowMaterials: z.boolean().default(true),
+  postEventShowPolls: z.boolean().default(true),
+  postEventShowFeedback: z.boolean().default(true),
+  feedbackEnabled: z.boolean().default(true),
+  recordingConsentText: z.string().max(5000).optional(),
 });
 
 export const createEventSchema = eventBaseSchema.refine(
@@ -41,6 +49,12 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
   status: z
     .enum(['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED'])
     .optional(),
+  recordingPublished: z.boolean().optional(),
+  recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
+  recordingUrl: z.string().url().nullable().optional(),
+  tempRecordingUrl: z.string().url().nullable().optional(),
+  recordingFileSize: z.number().int().nullable().optional(),
+  recordingDuration: z.number().int().nullable().optional(),
 }).refine(
   (data) => {
     // Only validate date ordering when both dates are present in the update
