@@ -316,7 +316,7 @@ cronjobs:
 jvbScaler:
   enabled: false
   schedule: "*/2 * * * *"
-  image: bitnami/kubectl:1.29
+  image: bitnami/kubectl:latest
   # Name of the JVB Deployment to scale.
   # Leave empty to auto-detect by label (app.kubernetes.io/component=jvb)
   # or name pattern. Set explicitly if auto-detection fails.

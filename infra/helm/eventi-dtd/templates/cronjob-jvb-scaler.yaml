@@ -13,7 +13,7 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
-      activeDeadlineSeconds: 60
+      activeDeadlineSeconds: 120
       backoffLimit: 1
       template:
         metadata:
@@ -40,26 +40,21 @@ spec:
           {{- end }}
           containers:
             - name: scaler
-              image: {{ .Values.jvbScaler.image | default "bitnami/kubectl:1.29" }}
+              image: {{ .Values.jvbScaler.image | default "bitnami/kubectl:latest" }}
               command:
                 - /bin/sh
                 - -c
                 - |
-                  TS=$(date -u '+%Y-%m-%d %H:%M:%S')
-                  log() { echo "[$TS] JVB Scaler: $1"; }
+                  log() { echo "[$(date -u '+%Y-%m-%d %H:%M:%S')] JVB Scaler: $1"; }
 
-                  log "Checking..."
-
+                  # ── Find JVB deployment ────────────────────────────
                   {{- if .Values.jvbScaler.jvbDeploymentName }}
                   JVB_DEPLOY="{{ .Values.jvbScaler.jvbDeploymentName }}"
                   {{- else }}
-                  # Auto-detect JVB deployment by label
                   JVB_DEPLOY=$(kubectl get deployments -n {{ .Release.Namespace }} \
                     -l "app.kubernetes.io/component=jvb" \
                     -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
-
                   if [ -z "$JVB_DEPLOY" ]; then
-                    # Fallback: find by name pattern
                     JVB_DEPLOY=$(kubectl get deployments -n {{ .Release.Namespace }} \
                       -o name 2>/dev/null | grep -i jvb | head -1 | sed 's|deployment.apps/||')
                   fi
@@ -69,25 +64,58 @@ spec:
                     log "ERROR: Cannot find JVB deployment"
                     exit 1
                   fi
-
-                  log "Found deployment $JVB_DEPLOY"
-
-                  APP_URL="{{ include "eventi-dtd.internalUrl" . }}"
-                  RESPONSE=$(wget -qO- "${APP_URL}/api/internal/jvb-desired-replicas" 2>/dev/null)
-
-                  if [ -z "$RESPONSE" ]; then
-                    log "ERROR: Empty response from API — defaulting to 0"
-                    DESIRED=0
-                  else
-                    log "API response: $RESPONSE"
-                    # Parse desired from JSON response
-                    DESIRED=$(echo "$RESPONSE" | grep -o '"desired":[0-9]*' | grep -o '[0-9]*' || echo "0")
-                  fi
+                  log "Found deployment: $JVB_DEPLOY"
 
                   CURRENT=$(kubectl get deployment "$JVB_DEPLOY" -n {{ .Release.Namespace }} \
                     -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
 
-                  log "Current replicas: $CURRENT, Desired: $DESIRED"
+                  # ── Phase 2: Reactive — query JVB colibri stats ───
+                  STRESS=""
+                  STRESS_PARAM=""
+                  if [ "$CURRENT" -gt 0 ]; then
+                    # Find a running JVB pod to query stats
+                    JVB_POD=$(kubectl get pods -n {{ .Release.Namespace }} \
+                      -l "app.kubernetes.io/component=jvb" \
+                      -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+
+                    if [ -n "$JVB_POD" ]; then
+                      STATS=$(kubectl exec -n {{ .Release.Namespace }} "$JVB_POD" \
+                        -- wget -qO- "http://127.0.0.1:8080/colibri/stats" 2>/dev/null || true)
+
+                      if [ -n "$STATS" ]; then
+                        STRESS=$(echo "$STATS" | grep -o '"stress_level":[0-9.]*' | grep -o '[0-9.]*' || true)
+                        PARTICIPANTS=$(echo "$STATS" | grep -o '"participants":[0-9]*' | grep -o '[0-9]*' || true)
+                        CONFERENCES=$(echo "$STATS" | grep -o '"conferences":[0-9]*' | grep -o '[0-9]*' || true)
+                        VIDEO_CH=$(echo "$STATS" | grep -o '"video_channels":[0-9]*' | grep -o '[0-9]*' || true)
+                        log "JVB stats: stress=${STRESS:-?} participants=${PARTICIPANTS:-0} conferences=${CONFERENCES:-0} video_channels=${VIDEO_CH:-0}"
+                      fi
+                    fi
+
+                    if [ -n "$STRESS" ]; then
+                      STRESS_PARAM="&stress_level=$STRESS"
+                    fi
+                  fi
+
+                  # ── Phase 1: Predictive — query the app API ───────
+                  APP_URL="{{ include "eventi-dtd.internalUrl" . }}"
+                  RESPONSE=$(wget -qO- \
+                    --header="x-api-key: $CRON_API_KEY" \
+                    "${APP_URL}/api/internal/jvb-desired-replicas?_=1${STRESS_PARAM}" 2>/dev/null)
+
+                  if [ -z "$RESPONSE" ]; then
+                    log "ERROR: Empty response from API — keeping current replicas ($CURRENT)"
+                    exit 0
+                  fi
+
+                  log "API response: $RESPONSE"
+                  DESIRED=$(echo "$RESPONSE" | grep -o '"desired":[0-9]*' | grep -o '[0-9]*' || echo "")
+
+                  if [ -z "$DESIRED" ]; then
+                    log "ERROR: Cannot parse desired from response — keeping current ($CURRENT)"
+                    exit 0
+                  fi
+
+                  log "Current: $CURRENT, Desired: $DESIRED"
 
                   if [ "$DESIRED" != "$CURRENT" ]; then
                     log "Scaling JVB from $CURRENT to $DESIRED"
@@ -97,6 +125,12 @@ spec:
                   else
                     log "No change needed"
                   fi
+              env:
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "eventi-dtd.secretName" . }}
+                      key: CRON_API_KEY
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true
@@ -136,6 +170,12 @@ rules:
   - apiGroups: ["apps"]
     resources: ["deployments/scale"]
     verbs: ["get", "patch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
