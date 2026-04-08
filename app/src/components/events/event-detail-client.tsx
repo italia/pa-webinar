@@ -14,7 +14,6 @@ import {
 
 import { Link } from '@/i18n/navigation';
 import AddToCalendar from '@/components/events/add-to-calendar';
-import PostEventQA from '@/components/events/post-event-qa';
 import VideoPlayer from '@/components/events/video-player';
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
 import PostEventTabs from '@/components/events/post-event-tabs';
@@ -109,9 +108,7 @@ export default function EventDetailClient({
   feedbackSummary = null,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
-  const tm = useTranslations('materials');
   const tv = useTranslations('video');
-  const tp = useTranslations('postEvent');
   const format = useFormatter();
 
   const title =

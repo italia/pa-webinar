@@ -134,8 +134,8 @@ async function getJvbStatus(): Promise<{
 
     // Check actual JVB pod status via Kubernetes API (if running in-cluster)
     let running = 0;
-    let stressLevel: number | null = null;
-    let participants: number | null = null;
+    const stressLevel: number | null = null;
+    const participants: number | null = null;
 
     if (process.env.KUBERNETES_SERVICE_HOST) {
       try {

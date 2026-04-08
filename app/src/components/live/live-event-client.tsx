@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useTranslations, useFormatter } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import {
   Alert,
   Badge,
@@ -97,7 +97,6 @@ export default function LiveEventClient({
 }: LiveEventClientProps) {
   const t = useTranslations('live');
   const tc = useTranslations('common');
-  const format = useFormatter();
   const router = useRouter();
 
   const [phase, setPhase] = useState<LivePhase>('waiting');
@@ -108,10 +107,7 @@ export default function LiveEventClient({
   const [jitsiApi, setJitsiApi] = useState<JitsiMeetExternalAPI | null>(null);
   const [chosenName, setChosenName] = useState(initialDisplayName);
 
-  const startsAtMs = new Date(event.startsAt).getTime();
-  const [countdown, setCountdown] = useState('');
   const [eventStatus, setEventStatus] = useState(event.status);
-  const [startingEvent, setStartingEvent] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [guestId] = useState(() => isGuest ? `guest_${Math.random().toString(36).slice(2, 10)}` : '');
 
@@ -144,28 +140,6 @@ export default function LiveEventClient({
 
     setPhase('waiting');
   }, [eventStatus, event.recordingEnabled, isModerator, isGuest]);
-
-  // Countdown timer
-  useEffect(() => {
-    if (phase !== 'waiting') return;
-    function updateCountdown() {
-      const diff = startsAtMs - Date.now();
-      if (diff <= 0) { setCountdown(''); return; }
-      const days = Math.floor(diff / 86400000);
-      const hours = Math.floor((diff % 86400000) / 3600000);
-      const minutes = Math.floor((diff % 3600000) / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
-      const parts: string[] = [];
-      if (days > 0) parts.push(`${days}g`);
-      if (hours > 0) parts.push(`${hours}h`);
-      parts.push(`${String(minutes).padStart(2, '0')}m`);
-      parts.push(`${String(seconds).padStart(2, '0')}s`);
-      setCountdown(parts.join(' '));
-    }
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
-    return () => clearInterval(timer);
-  }, [phase, startsAtMs]);
 
   // Poll event status in waiting room
   useEffect(() => {
@@ -300,7 +274,6 @@ export default function LiveEventClient({
 
   // Moderator: start event
   const handleStartEvent = useCallback(async () => {
-    setStartingEvent(true);
     try {
       const res = await fetch(`/api/events/${event.id}`, {
         method: 'PUT',
@@ -310,13 +283,10 @@ export default function LiveEventClient({
         },
         body: JSON.stringify({ status: 'LIVE' }),
       });
-      if (!res.ok) {
-        setStartingEvent(false);
-        return;
-      }
+      if (!res.ok) return;
       setEventStatus('LIVE');
     } catch {
-      setStartingEvent(false);
+      // WaitingRoom handles its own loading state via onStartEvent callback
     }
   }, [event.id, token]);
 
