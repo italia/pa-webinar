@@ -383,6 +383,15 @@
       "copyLink": "Copy link",
       "copied": "Copied!"
     },
+    "feedbackAdmin": {
+      "title": "Feedback Results",
+      "averageRating": "Average rating",
+      "totalVotes": "{count, plural, one {# rating} other {# ratings}}",
+      "noFeedback": "No feedback received",
+      "comments": "Participant comments",
+      "noComments": "No comments",
+      "stars": "stars"
+    },
     "gdprAuditLog": {
       "title": "GDPR Audit Log",
       "date": "Date",
@@ -532,7 +541,9 @@
         "avgDuration": "Average event duration",
         "avgQuestionsPerEvent": "Q&A questions per event",
         "totalPollVotes": "Total poll votes",
-        "avgParticipantsPerEvent": "Avg participants per event"
+        "avgParticipantsPerEvent": "Avg participants per event",
+        "avgFeedbackRating": "Avg feedback rating",
+        "totalFeedback": "Feedback responses"
       }
     },
     "infrastructure": {

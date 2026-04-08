@@ -453,6 +453,15 @@
       "copyLink": "Copia link",
       "copied": "Copiato!"
     },
+    "feedbackAdmin": {
+      "title": "Risultati Feedback",
+      "averageRating": "Valutazione media",
+      "totalVotes": "{count, plural, one {# valutazione} other {# valutazioni}}",
+      "noFeedback": "Nessun feedback ricevuto",
+      "comments": "Commenti dei partecipanti",
+      "noComments": "Nessun commento",
+      "stars": "stelle"
+    },
     "gdprAuditLog": {
       "title": "Registro GDPR",
       "date": "Data",
@@ -602,7 +611,9 @@
         "avgDuration": "Durata media eventi",
         "avgQuestionsPerEvent": "Domande Q&A per evento",
         "totalPollVotes": "Voti sondaggi totali",
-        "avgParticipantsPerEvent": "Partecipanti medi per evento"
+        "avgParticipantsPerEvent": "Partecipanti medi per evento",
+        "avgFeedbackRating": "Valutazione media feedback",
+        "totalFeedback": "Risposte feedback"
       }
     },
     "infrastructure": {
