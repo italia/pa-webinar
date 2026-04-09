@@ -44,6 +44,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       </h1>
 
       <EditEventForm
+        eventTimezone={event.timezone}
         event={{
           id: event.id,
           titleIt: event.titleIt,

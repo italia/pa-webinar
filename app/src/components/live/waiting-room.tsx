@@ -28,12 +28,14 @@ interface WaitingRoomEvent {
   recordingEnabled: boolean;
   tempRecordingUrl?: string | null;
   waitingRoomAudioUrl?: string | null;
+  timezone?: string;
 }
 
 interface WaitingRoomProps {
   event: WaitingRoomEvent;
   participantCount: number;
   role: 'moderator' | 'participant' | 'guest';
+  jvbReady?: boolean | null;
   onEnterLive: () => void;
   onStartEvent?: () => void;
   onWatchRecording?: () => void;
@@ -47,6 +49,7 @@ export default function WaitingRoom({
   event,
   participantCount,
   role,
+  jvbReady,
   onEnterLive,
   onStartEvent,
 }: WaitingRoomProps) {
@@ -201,11 +204,12 @@ export default function WaitingRoom({
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',
+                      timeZone: event.timezone,
                     })}
                     {' · '}
-                    {format.dateTime(new Date(event.startsAt), { hour: '2-digit', minute: '2-digit' })}
+                    {format.dateTime(new Date(event.startsAt), { hour: '2-digit', minute: '2-digit', timeZone: event.timezone })}
                     {' – '}
-                    {format.dateTime(new Date(event.endsAt), { hour: '2-digit', minute: '2-digit' })}
+                    {format.dateTime(new Date(event.endsAt), { hour: '2-digit', minute: '2-digit', timeZone: event.timezone })}
                   </div>
 
                   {participantCount > 0 && (
@@ -254,16 +258,29 @@ export default function WaitingRoom({
               {/* ─── Scenario B: On time ─── */}
               {scenario === 'on_time' && (
                 <>
-                  <div
-                    className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
-                    style={{
-                      width: 64,
-                      height: 64,
-                      backgroundColor: '#D4EDDA',
-                    }}
-                  >
-                    <Icon icon="it-check-circle" size="lg" className="text-success" />
-                  </div>
+                  {jvbReady === false ? (
+                    <div
+                      className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                      style={{
+                        width: 64,
+                        height: 64,
+                        background: 'linear-gradient(135deg, #FF9800, #F57C00)',
+                      }}
+                    >
+                      <Spinner active small className="text-white" />
+                    </div>
+                  ) : (
+                    <div
+                      className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+                      style={{
+                        width: 64,
+                        height: 64,
+                        backgroundColor: '#D4EDDA',
+                      }}
+                    >
+                      <Icon icon="it-check-circle" size="lg" className="text-success" />
+                    </div>
+                  )}
 
                   <Badge color="success" className="mb-3 px-3 py-2" style={{ fontSize: '0.85rem' }}>
                     {t('eventLive')}
@@ -272,6 +289,19 @@ export default function WaitingRoom({
                   <h1 className="h4 fw-bold mb-3" style={{ color: '#17324D' }}>
                     {event.title}
                   </h1>
+
+                  {jvbReady === false && (
+                    <Alert color="warning" className="text-start mb-4" style={{ fontSize: '0.88rem' }}>
+                      <div className="d-flex align-items-start">
+                        <Spinner active small className="me-2 mt-1 flex-shrink-0" />
+                        <div>
+                          <strong>{t('jvbScaling')}</strong>
+                          <br />
+                          {t('jvbScalingDetail')}
+                        </div>
+                      </div>
+                    </Alert>
+                  )}
 
                   <div className="d-flex justify-content-center gap-3 text-muted mb-4" style={{ fontSize: '0.9rem' }}>
                     <span>
@@ -292,9 +322,10 @@ export default function WaitingRoom({
                     className="w-100 fw-semibold mb-4"
                     style={{ maxWidth: 360 }}
                     onClick={onEnterLive}
+                    disabled={jvbReady === false}
                   >
                     <Icon icon="it-video" size="sm" color="white" className="me-2" />
-                    {t('enterRoom')}
+                    {jvbReady === false ? t('jvbScaling') : t('enterRoom')}
                   </Button>
 
                   {event.recordingEnabled && (
@@ -334,6 +365,19 @@ export default function WaitingRoom({
                     {event.title}
                   </h1>
 
+                  {jvbReady === false && (
+                    <Alert color="warning" className="text-start mb-4" style={{ fontSize: '0.88rem' }}>
+                      <div className="d-flex align-items-start">
+                        <Spinner active small className="me-2 mt-1 flex-shrink-0" />
+                        <div>
+                          <strong>{t('jvbScaling')}</strong>
+                          <br />
+                          {t('jvbScalingDetail')}
+                        </div>
+                      </div>
+                    </Alert>
+                  )}
+
                   <div className="text-muted mb-4" style={{ fontSize: '0.9rem' }}>
                     <Icon icon="it-user" size="xs" className="me-1" />
                     {t('connectedParticipants', { count: participantCount })}
@@ -350,9 +394,10 @@ export default function WaitingRoom({
                         style={{
                           borderRadius: 12,
                           borderLeft: '4px solid #0066CC',
-                          cursor: 'pointer',
+                          cursor: jvbReady === false ? 'not-allowed' : 'pointer',
+                          opacity: jvbReady === false ? 0.6 : 1,
                         }}
-                        onClick={onEnterLive}
+                        onClick={jvbReady === false ? undefined : onEnterLive}
                       >
                         <CardBody className="p-3 text-start">
                           <div className="fw-semibold mb-1" style={{ color: '#17324D' }}>
@@ -360,10 +405,10 @@ export default function WaitingRoom({
                             {t('enterLive')}
                           </div>
                           <p className="text-muted mb-2" style={{ fontSize: '0.82rem' }}>
-                            {t('enterLiveDesc')}
+                            {jvbReady === false ? t('jvbScalingDetail') : t('enterLiveDesc')}
                           </p>
-                          <Button color="primary" size="sm" className="fw-semibold" tag="span">
-                            {t('enterNow')}
+                          <Button color="primary" size="sm" className="fw-semibold" tag="span" disabled={jvbReady === false}>
+                            {jvbReady === false ? (<><Spinner active small className="me-1" />{t('jvbScaling')}</>) : t('enterNow')}
                           </Button>
                         </CardBody>
                       </Card>

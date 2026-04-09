@@ -65,8 +65,8 @@ export function sendConfirmationEmail(input: ConfirmationEmailInput): void {
       const templateInput = {
         locale: input.locale,
         eventTitle: title,
-        eventDate: formatDate(event.startsAt, input.locale),
-        eventTime: formatTime(event.startsAt, input.locale),
+        eventDate: formatDate(event.startsAt, input.locale, event.timezone),
+        eventTime: formatTime(event.startsAt, input.locale, event.timezone),
         eventDuration: formatDuration(event.startsAt, event.endsAt),
         joinUrl: input.joinUrl,
         eventPageUrl: input.eventPageUrl,

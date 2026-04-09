@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
 
@@ -14,9 +15,10 @@ export default async function CreateEventPage({
   const t = await getTranslations('admin');
   const { template: templateId } = await searchParams;
 
-  const templates = await prisma.eventTemplate.findMany({
-    orderBy: { sortOrder: 'asc' },
-  });
+  const [templates, siteSettings] = await Promise.all([
+    prisma.eventTemplate.findMany({ orderBy: { sortOrder: 'asc' } }),
+    getSettings(),
+  ]);
 
   const selectedTemplate = templateId
     ? templates.find((tpl) => tpl.id === templateId) ?? null
@@ -83,6 +85,7 @@ export default async function CreateEventPage({
       <CreateEventWithTemplate
         templates={serializedTemplates}
         selectedTemplate={serializedSelected}
+        siteTimezone={siteSettings.defaultTimezone}
       />
     </div>
   );
