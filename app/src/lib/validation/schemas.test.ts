@@ -157,6 +157,42 @@ describe('createEventSchema', () => {
   });
 });
 
+// ── createEventSchema — timezone validation ─────────────────
+
+describe('createEventSchema timezone', () => {
+  it('accepts Europe/Rome', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), timezone: 'Europe/Rome' });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts America/New_York', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), timezone: 'America/New_York' });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts Asia/Tokyo', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), timezone: 'Asia/Tokyo' });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects Invalid/Zone', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), timezone: 'Invalid/Zone' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects empty string', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), timezone: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('defaults to Europe/Rome when omitted', () => {
+    const result = createEventSchema.safeParse(validEvent());
+    if (result.success) {
+      expect(result.data.timezone).toBe('Europe/Rome');
+    }
+  });
+});
+
 // ── updateEventSchema ───────────────────────────────────────
 
 describe('updateEventSchema', () => {
