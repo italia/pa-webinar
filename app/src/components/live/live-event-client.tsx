@@ -150,10 +150,6 @@ export default function LiveEventClient({
     }
 
     if (eventStatus === 'LIVE') {
-      if (!jvbReady) {
-        setPhase('waiting');
-        return;
-      }
       if (isModerator) {
         setPhase('pre_join');
       } else if (event.recordingEnabled) {
@@ -165,7 +161,7 @@ export default function LiveEventClient({
     }
 
     setPhase('waiting');
-  }, [eventStatus, event.recordingEnabled, isModerator, isGuest, jvbReady]);
+  }, [eventStatus, event.recordingEnabled, isModerator, isGuest]);
 
   // Poll event status in waiting room
   useEffect(() => {
