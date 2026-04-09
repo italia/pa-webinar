@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 
+import { getSettings } from '@/lib/settings';
 import LegalDocumentPage from '@/components/layout/legal-document-page';
 
 interface PrivacyPageProps {
@@ -20,6 +21,23 @@ export async function generateMetadata({
 
 export default async function PrivacyPage() {
   const t = await getTranslations('legal.privacy');
+  const locale = await getLocale();
+  const settings = await getSettings();
+
+  const dbContent =
+    locale === 'en' ? settings.privacyPolicyEn : settings.privacyPolicyIt;
+
+  if (dbContent) {
+    return (
+      <LegalDocumentPage
+        title={t('title')}
+        htmlContent={dbContent}
+        noteTitle={t('note.title')}
+        noteBody={t('note.body')}
+        noteLink={{ href: '/privacy/i-miei-dati', label: t('note.linkLabel') }}
+      />
+    );
+  }
 
   return (
     <LegalDocumentPage

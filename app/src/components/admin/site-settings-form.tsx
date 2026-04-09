@@ -14,11 +14,11 @@ import {
   Label,
   Row,
   Spinner,
-  Toggle,
 } from 'design-react-kit';
 import type { SiteSetting } from '@prisma/client';
+import ToggleSwitch from '@/components/ui/toggle-switch';
 
-type Tab = 'branding' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features';
+type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features';
 
 interface FooterLink {
   title: string;
@@ -76,6 +76,7 @@ export default function SiteSettingsForm({
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: 'branding', label: t('tabs.branding'), icon: 'it-designers-italia' },
+    { id: 'header', label: t('tabs.header'), icon: 'it-burger' },
     { id: 'seo', label: t('tabs.seo'), icon: 'it-search' },
     { id: 'homepage', label: t('tabs.homepage'), icon: 'it-presentation' },
     { id: 'pages', label: t('tabs.pages'), icon: 'it-files' },
@@ -86,11 +87,15 @@ export default function SiteSettingsForm({
   return (
     <div>
       {/* Tab navigation */}
-      <ul className="nav nav-tabs mb-4" role="tablist">
+      <ul
+        className="nav nav-tabs flex-nowrap mb-4"
+        role="tablist"
+        style={{ overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}
+      >
         {tabs.map((tab) => (
-          <li key={tab.id} className="nav-item" role="presentation">
+          <li key={tab.id} className="nav-item flex-shrink-0" role="presentation">
             <button
-              className={`nav-link d-inline-flex align-items-center gap-2 ${activeTab === tab.id ? 'active' : ''}`}
+              className={`nav-link d-inline-flex align-items-center gap-2 text-nowrap ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
               role="tab"
               aria-selected={activeTab === tab.id}
@@ -108,6 +113,9 @@ export default function SiteSettingsForm({
         <CardBody className="p-4">
           {activeTab === 'branding' && (
             <BrandingTab settings={settings} updateField={updateField} />
+          )}
+          {activeTab === 'header' && (
+            <HeaderTab settings={settings} updateField={updateField} />
           )}
           {activeTab === 'seo' && (
             <SeoTab settings={settings} updateField={updateField} />
@@ -357,7 +365,7 @@ function BrandingTab({ settings, updateField }: TabProps) {
       <h6 className="fw-semibold mb-3">{tw('title')}</h6>
 
       <div className="mb-3">
-        <Toggle
+        <ToggleSwitch
           label={tw('enabled')}
           checked={settings.jitsiWatermarkEnabled}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -404,11 +412,11 @@ function BrandingTab({ settings, updateField }: TabProps) {
             <Col md={6}>
               <FormGroup>
                 <Label htmlFor="jitsiWatermarkPosition">{tw('position')}</Label>
-                <Input
-                  type="select"
+                <select
+                  className="form-select"
                   id="jitsiWatermarkPosition"
                   value={settings.jitsiWatermarkPosition}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e) =>
                     updateField('jitsiWatermarkPosition', e.target.value)
                   }
                 >
@@ -417,7 +425,7 @@ function BrandingTab({ settings, updateField }: TabProps) {
                       {tw(`positions.${pos.labelKey}`)}
                     </option>
                   ))}
-                </Input>
+                </select>
               </FormGroup>
             </Col>
           </Row>
@@ -759,18 +767,17 @@ function FooterTab({ settings, updateField }: TabProps) {
                   <Label htmlFor={`link-section-${i}`} className="small">
                     {t('linkSection')}
                   </Label>
-                  <Input
-                    type="select"
+                  <select
+                    className="form-select form-select-sm"
                     id={`link-section-${i}`}
                     value={link.section}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e) =>
                       updateLink(i, 'section', e.target.value)
                     }
-                    bsSize="sm"
                   >
                     <option value="legal">{t('sectionLegal')}</option>
                     <option value="main">{t('sectionMain')}</option>
-                  </Input>
+                  </select>
                 </FormGroup>
               </Col>
               <Col md={2}>
@@ -815,12 +822,126 @@ function FooterTab({ settings, updateField }: TabProps) {
   );
 }
 
+function HeaderTab({ settings, updateField }: TabProps) {
+  const t = useTranslations('admin.settings.header');
+
+  return (
+    <div>
+      <h6 className="fw-semibold mb-3">{t('slimBarTitle')}</h6>
+      <p className="text-muted" style={{ fontSize: '0.85rem' }}>
+        {t('slimBarDescription')}
+      </p>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="hdr-parentOrg">{t('parentOrganization')}</Label>
+            <Input
+              id="hdr-parentOrg"
+              value={settings.parentOrganization}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('parentOrganization', e.target.value)
+              }
+            />
+            <small className="text-muted">{t('parentOrganizationHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="hdr-parentOrgUrl">{t('parentOrganizationUrl')}</Label>
+            <Input
+              id="hdr-parentOrgUrl"
+              type="url"
+              value={settings.parentOrganizationUrl}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('parentOrganizationUrl', e.target.value)
+              }
+            />
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <hr className="my-4" />
+
+      <h6 className="fw-semibold mb-3">{t('centerBarTitle')}</h6>
+      <p className="text-muted" style={{ fontSize: '0.85rem' }}>
+        {t('centerBarDescription')}
+      </p>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="hdr-siteName">{t('appName')}</Label>
+            <Input
+              id="hdr-siteName"
+              value={settings.siteName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('siteName', e.target.value)
+              }
+            />
+            <small className="text-muted">{t('appNameHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="hdr-orgShort">{t('organizationShort')}</Label>
+            <Input
+              id="hdr-orgShort"
+              value={settings.organizationNameShort}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('organizationNameShort', e.target.value)
+              }
+            />
+          </FormGroup>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="hdr-logo">{t('logoUrl')}</Label>
+            <Input
+              id="hdr-logo"
+              type="url"
+              value={settings.logoUrl ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('logoUrl', e.target.value || null)
+              }
+            />
+            <small className="text-muted">{t('logoUrlHelp')}</small>
+            {settings.logoUrl && (
+              <div className="mt-2 p-2 bg-light rounded">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={settings.logoUrl}
+                  alt="Logo preview"
+                  style={{ maxHeight: 48 }}
+                />
+              </div>
+            )}
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="hdr-orgUrl">{t('organizationUrl')}</Label>
+            <Input
+              id="hdr-orgUrl"
+              type="url"
+              value={settings.organizationUrl}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('organizationUrl', e.target.value)
+              }
+            />
+          </FormGroup>
+        </Col>
+      </Row>
+    </div>
+  );
+}
+
 function FeaturesTab({ settings, updateField }: TabProps) {
   const t = useTranslations('admin.settings.features');
   return (
     <div>
       <div className="mb-4">
-        <Toggle
+        <ToggleSwitch
           label={t('statusPageEnabled')}
           checked={settings.statusPageEnabled}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -832,7 +953,7 @@ function FeaturesTab({ settings, updateField }: TabProps) {
         </small>
       </div>
       <div className="mb-4">
-        <Toggle
+        <ToggleSwitch
           label={t('guestAccessEnabled')}
           checked={settings.guestAccessEnabled}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -844,7 +965,7 @@ function FeaturesTab({ settings, updateField }: TabProps) {
         </small>
       </div>
       <div className="mb-4">
-        <Toggle
+        <ToggleSwitch
           label={t('publicRegistrationEnabled')}
           checked={settings.publicRegistrationEnabled}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

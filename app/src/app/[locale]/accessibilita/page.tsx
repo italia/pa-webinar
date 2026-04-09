@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 
+import { getSettings } from '@/lib/settings';
 import LegalDocumentPage from '@/components/layout/legal-document-page';
 
 interface AccessibilityPageProps {
@@ -20,6 +21,20 @@ export async function generateMetadata({
 
 export default async function AccessibilityPage() {
   const t = await getTranslations('legal.accessibility');
+  const locale = await getLocale();
+  const settings = await getSettings();
+
+  const dbContent =
+    locale === 'en' ? settings.accessibilityEn : settings.accessibilityIt;
+
+  if (dbContent) {
+    return (
+      <LegalDocumentPage
+        title={t('title')}
+        htmlContent={dbContent}
+      />
+    );
+  }
 
   return (
     <LegalDocumentPage

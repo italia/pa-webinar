@@ -26,8 +26,9 @@ const updateSettingsSchema = z.object({
   homePageMode: z.enum(['LANDING', 'EVENTS_LIST', 'CUSTOM']).optional(),
   customHomeHtml: z.string().max(50000).nullish(),
   footerLinks: z.array(z.object({
-    label: z.string().max(100),
-    url: z.string().url(),
+    title: z.string().max(100),
+    url: z.string().max(500),
+    section: z.enum(['main', 'legal']).optional(),
   })).max(20).optional(),
   privacyPolicyIt: z.string().max(100000).nullish(),
   privacyPolicyEn: z.string().max(100000).nullish(),
@@ -42,6 +43,9 @@ const updateSettingsSchema = z.object({
   jitsiWatermarkPosition: z.enum(['top-left', 'top-right', 'bottom-left', 'bottom-right']).optional(),
   githubUrl: z.string().url().nullish(),
   supportEmail: z.string().email().nullish(),
+  availableLocales: z.array(z.string().min(2).max(5)).optional(),
+  localeNames: z.record(z.string().min(2).max(5), z.string().max(50)).optional(),
+  translationOverrides: z.record(z.string(), z.record(z.string(), z.string())).optional(),
 }).strict();
 
 export const GET = withErrorHandling(async () => {
@@ -88,7 +92,8 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
   }
 
   const body = await parseJsonBody(request);
-  const parsed = updateSettingsSchema.safeParse(body);
+  const { id: _id, updatedAt: _updatedAt, ...cleanBody } = body as Record<string, unknown>;
+  const parsed = updateSettingsSchema.safeParse(cleanBody);
   if (!parsed.success) {
     throw new ValidationError(
       'Validation failed',

@@ -7,10 +7,11 @@ import {
   Card,
   CardBody,
   Icon,
-  Toggle,
   FormGroup,
   Input,
 } from 'design-react-kit';
+
+import ToggleSwitch from '@/components/ui/toggle-switch';
 
 interface PostEventConfigProps {
   event: {
@@ -98,7 +99,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
         <div className="d-flex flex-column gap-3">
           <div className="d-flex justify-content-between align-items-center">
             <span style={{ fontSize: '0.9rem' }}>{t('pageVisible')}</span>
-            <Toggle
+            <ToggleSwitch
               label=""
               checked={pageVisible}
               onChange={() => handleToggle('postEventPublic', !pageVisible, setPageVisible)}
@@ -107,7 +108,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
 
           <div className="d-flex justify-content-between align-items-center">
             <span style={{ fontSize: '0.9rem' }}>{t('showQA')}</span>
-            <Toggle
+            <ToggleSwitch
               label=""
               checked={showQA}
               onChange={() => handleToggle('postEventShowQA', !showQA, setShowQA)}
@@ -116,7 +117,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
 
           <div className="d-flex justify-content-between align-items-center">
             <span style={{ fontSize: '0.9rem' }}>{t('showMaterials')}</span>
-            <Toggle
+            <ToggleSwitch
               label=""
               checked={showMaterials}
               onChange={() => handleToggle('postEventShowMaterials', !showMaterials, setShowMaterials)}
@@ -125,7 +126,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
 
           <div className="d-flex justify-content-between align-items-center">
             <span style={{ fontSize: '0.9rem' }}>{t('showPolls')}</span>
-            <Toggle
+            <ToggleSwitch
               label=""
               checked={showPolls}
               onChange={() => handleToggle('postEventShowPolls', !showPolls, setShowPolls)}
@@ -134,7 +135,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
 
           <div className="d-flex justify-content-between align-items-center">
             <span style={{ fontSize: '0.9rem' }}>{t('showFeedback')}</span>
-            <Toggle
+            <ToggleSwitch
               label=""
               checked={showFeedback}
               onChange={() => handleToggle('postEventShowFeedback', !showFeedback, setShowFeedback)}
@@ -143,7 +144,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
 
           <div className="d-flex justify-content-between align-items-center">
             <span style={{ fontSize: '0.9rem' }}>{t('feedbackEnabled')}</span>
-            <Toggle
+            <ToggleSwitch
               label=""
               checked={feedbackActive}
               onChange={() => handleToggle('feedbackEnabled', !feedbackActive, setFeedbackActive)}

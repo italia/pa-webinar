@@ -7,7 +7,6 @@ import {
   Alert,
   Input,
   TextArea,
-  Toggle,
   FormGroup,
   Label,
   Card,
@@ -16,6 +15,7 @@ import {
   Row,
 } from 'design-react-kit';
 
+import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter } from '@/i18n/navigation';
 import { updateEventSchema } from '@/lib/validation/schemas';
 
@@ -354,7 +354,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                 <div className="fw-semibold" style={{ color: '#17324D' }}>{t('form.qaEnabled')}</div>
                 <div className="text-secondary" style={{ fontSize: '0.85rem' }}>{t('toggleQaDesc')}</div>
               </div>
-              <Toggle label="" checked={form.qaEnabled} onChange={() => setField('qaEnabled', !form.qaEnabled)} />
+              <ToggleSwitch label="" checked={form.qaEnabled} onChange={() => setField('qaEnabled', !form.qaEnabled)} />
             </div>
           </div>
 
@@ -364,7 +364,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                 <div className="fw-semibold" style={{ color: '#17324D' }}>{t('form.chatEnabled')}</div>
                 <div className="text-secondary" style={{ fontSize: '0.85rem' }}>{t('toggleChatDesc')}</div>
               </div>
-              <Toggle label="" checked={form.chatEnabled} onChange={() => setField('chatEnabled', !form.chatEnabled)} />
+              <ToggleSwitch label="" checked={form.chatEnabled} onChange={() => setField('chatEnabled', !form.chatEnabled)} />
             </div>
           </div>
 
@@ -374,7 +374,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                 <div className="fw-semibold" style={{ color: '#17324D' }}>{t('form.recordingEnabled')}</div>
                 <div className="text-secondary" style={{ fontSize: '0.85rem' }}>{t('toggleRecordingDesc')}</div>
               </div>
-              <Toggle label="" checked={form.recordingEnabled} onChange={() => setField('recordingEnabled', !form.recordingEnabled)} />
+              <ToggleSwitch label="" checked={form.recordingEnabled} onChange={() => setField('recordingEnabled', !form.recordingEnabled)} />
             </div>
           </div>
 
@@ -422,7 +422,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                   {form.participantsCanUnmute ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
                 </div>
               </div>
-              <Toggle
+              <ToggleSwitch
                 label=""
                 checked={form.participantsCanUnmute}
                 onChange={() => setField('participantsCanUnmute', !form.participantsCanUnmute)}
@@ -440,7 +440,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                   {form.participantsCanStartVideo ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
                 </div>
               </div>
-              <Toggle
+              <ToggleSwitch
                 label=""
                 checked={form.participantsCanStartVideo}
                 onChange={() => setField('participantsCanStartVideo', !form.participantsCanStartVideo)}
@@ -458,7 +458,7 @@ export default function EditEventForm({ event }: EditEventFormProps) {
                   {form.participantsCanShareScreen ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
                 </div>
               </div>
-              <Toggle
+              <ToggleSwitch
                 label=""
                 checked={form.participantsCanShareScreen}
                 onChange={() => setField('participantsCanShareScreen', !form.participantsCanShareScreen)}

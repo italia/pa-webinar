@@ -9,12 +9,12 @@ import {
   CardBody,
   Icon,
   Table,
-  Toggle,
   Row,
   Col,
   Badge,
 } from 'design-react-kit';
 
+import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
 import { REMINDER_PRESETS } from '@/lib/validation/schemas';
@@ -1358,7 +1358,7 @@ function ToggleRow({
             {savedLabel}
           </span>
         )}
-        <Toggle
+        <ToggleSwitch
           label=""
           checked={checked}
           onChange={onChange}

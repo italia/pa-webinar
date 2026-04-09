@@ -22,6 +22,81 @@ async function main() {
   await prisma.question.deleteMany();
   await prisma.registration.deleteMany();
   await prisma.event.deleteMany();
+  // System templates are created by migration; only delete user-created ones during seed
+  await prisma.eventTemplate.deleteMany({ where: { isSystem: false } });
+
+  // Ensure system templates exist (idempotent — migration handles this, seed is a safety net)
+  const systemTemplates = [
+    {
+      name: 'Webinar',
+      description:
+        'Presentazione pubblica con molti partecipanti. Solo ascolto, Q&A attivo, nessuna webcam partecipanti.',
+      icon: 'it-presentation',
+      qaEnabled: true,
+      chatEnabled: false,
+      recordingEnabled: false,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+      maxParticipants: 300,
+      isSystem: true,
+      sortOrder: 0,
+    },
+    {
+      name: 'Community interattiva',
+      description:
+        'Evento partecipativo con chat, Q&A e possibilità per tutti di parlare e mostrare la webcam.',
+      icon: 'it-team-digitale',
+      qaEnabled: true,
+      chatEnabled: true,
+      recordingEnabled: false,
+      participantsCanUnmute: true,
+      participantsCanStartVideo: true,
+      participantsCanShareScreen: false,
+      maxParticipants: 50,
+      isSystem: true,
+      sortOrder: 1,
+    },
+    {
+      name: 'Videocall tra colleghi',
+      description:
+        'Riunione interna con pochi partecipanti. Tutti possono parlare, condividere schermo e usare la webcam.',
+      icon: 'it-video',
+      qaEnabled: false,
+      chatEnabled: true,
+      recordingEnabled: false,
+      participantsCanUnmute: true,
+      participantsCanStartVideo: true,
+      participantsCanShareScreen: true,
+      maxParticipants: 20,
+      isSystem: true,
+      sortOrder: 2,
+    },
+    {
+      name: 'Presentazione pubblica',
+      description:
+        'Evento pubblico con registrazione video e condivisione schermo del relatore. Q&A attivo.',
+      icon: 'it-camera',
+      qaEnabled: true,
+      chatEnabled: false,
+      recordingEnabled: true,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+      maxParticipants: 300,
+      isSystem: true,
+      sortOrder: 3,
+    },
+  ];
+  for (const tmpl of systemTemplates) {
+    const existing = await prisma.eventTemplate.findFirst({
+      where: { name: tmpl.name, isSystem: true },
+    });
+    if (!existing) {
+      await prisma.eventTemplate.create({ data: tmpl });
+    }
+  }
+  console.log('System event templates ensured.');
 
   // Seed site settings
   await prisma.siteSetting.upsert({
