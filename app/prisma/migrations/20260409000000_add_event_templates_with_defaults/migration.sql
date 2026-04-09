@@ -1,5 +1,5 @@
--- CreateTable (idempotent — skips if already exists via db push)
-CREATE TABLE IF NOT EXISTS "event_templates" (
+-- CreateTable
+CREATE TABLE "event_templates" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" TEXT NOT NULL,
     "description" TEXT,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "event_templates" (
     "is_system" BOOLEAN NOT NULL DEFAULT false,
     "sort_order" INTEGER NOT NULL DEFAULT 0,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "event_templates_pkey" PRIMARY KEY ("id")
 );

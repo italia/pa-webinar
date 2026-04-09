@@ -3,7 +3,6 @@ import { cookies } from 'next/headers';
 
 import { prisma } from '@/lib/db';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
-import { Link } from '@/i18n/navigation';
 import AdminLogoutButton from '@/components/admin/admin-logout-button';
 import AdminLandingClient from '@/components/admin/admin-landing-client';
 
