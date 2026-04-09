@@ -322,10 +322,9 @@ export default function WaitingRoom({
                     className="w-100 fw-semibold mb-4"
                     style={{ maxWidth: 360 }}
                     onClick={onEnterLive}
-                    disabled={jvbReady === false}
                   >
                     <Icon icon="it-video" size="sm" color="white" className="me-2" />
-                    {jvbReady === false ? t('jvbScaling') : t('enterRoom')}
+                    {t('enterRoom')}
                   </Button>
 
                   {event.recordingEnabled && (
@@ -394,10 +393,9 @@ export default function WaitingRoom({
                         style={{
                           borderRadius: 12,
                           borderLeft: '4px solid #0066CC',
-                          cursor: jvbReady === false ? 'not-allowed' : 'pointer',
-                          opacity: jvbReady === false ? 0.6 : 1,
+                          cursor: 'pointer',
                         }}
-                        onClick={jvbReady === false ? undefined : onEnterLive}
+                        onClick={onEnterLive}
                       >
                         <CardBody className="p-3 text-start">
                           <div className="fw-semibold mb-1" style={{ color: '#17324D' }}>
@@ -405,10 +403,10 @@ export default function WaitingRoom({
                             {t('enterLive')}
                           </div>
                           <p className="text-muted mb-2" style={{ fontSize: '0.82rem' }}>
-                            {jvbReady === false ? t('jvbScalingDetail') : t('enterLiveDesc')}
+                            {t('enterLiveDesc')}
                           </p>
-                          <Button color="primary" size="sm" className="fw-semibold" tag="span" disabled={jvbReady === false}>
-                            {jvbReady === false ? (<><Spinner active small className="me-1" />{t('jvbScaling')}</>) : t('enterNow')}
+                          <Button color="primary" size="sm" className="fw-semibold" tag="span">
+                            {t('enterNow')}
                           </Button>
                         </CardBody>
                       </Card>
