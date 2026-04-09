@@ -9,9 +9,9 @@ import {
   Card,
   CardBody,
   Icon,
-  Toggle,
 } from 'design-react-kit';
 
+import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter } from '@/i18n/navigation';
 
 interface RecordingManagementProps {
@@ -224,7 +224,7 @@ export default function RecordingManagement({
                     {t('publishDesc')}
                   </div>
                 </div>
-                <Toggle
+                <ToggleSwitch
                   label=""
                   checked={published}
                   onChange={handleTogglePublish}
@@ -236,7 +236,7 @@ export default function RecordingManagement({
             {/* Retention options */}
             <div className="border rounded p-3 mb-3">
               <div className="fw-semibold mb-2" style={{ color: '#17324D' }}>
-                {t('retention')}
+                {t('retentionLabel')}
               </div>
               <div className="d-flex flex-column gap-1">
                 {RETENTION_OPTIONS.map(({ value, labelKey }) => (

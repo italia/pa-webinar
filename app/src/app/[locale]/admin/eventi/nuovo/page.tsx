@@ -1,22 +1,64 @@
-import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
-import CreateEventForm from '@/components/admin/create-event-form';
+import { prisma } from '@/lib/db';
+import { Link } from '@/i18n/navigation';
+import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
 
-export default async function CreateEventPage() {
+interface CreateEventPageProps {
+  searchParams: Promise<{ template?: string }>;
+}
+
+export default async function CreateEventPage({
+  searchParams,
+}: CreateEventPageProps) {
   const t = await getTranslations('admin');
+  const { template: templateId } = await searchParams;
+
+  const templates = await prisma.eventTemplate.findMany({
+    orderBy: { sortOrder: 'asc' },
+  });
+
+  const selectedTemplate = templateId
+    ? templates.find((tpl) => tpl.id === templateId) ?? null
+    : null;
+
+  const serializedTemplates = templates.map((tpl) => ({
+    id: tpl.id,
+    name: tpl.name,
+    description: tpl.description,
+    icon: tpl.icon,
+    qaEnabled: tpl.qaEnabled,
+    chatEnabled: tpl.chatEnabled,
+    recordingEnabled: tpl.recordingEnabled,
+    participantsCanUnmute: tpl.participantsCanUnmute,
+    participantsCanStartVideo: tpl.participantsCanStartVideo,
+    participantsCanShareScreen: tpl.participantsCanShareScreen,
+    maxParticipants: tpl.maxParticipants,
+  }));
+
+  const serializedSelected = selectedTemplate
+    ? {
+        id: selectedTemplate.id,
+        name: selectedTemplate.name,
+        qaEnabled: selectedTemplate.qaEnabled,
+        chatEnabled: selectedTemplate.chatEnabled,
+        recordingEnabled: selectedTemplate.recordingEnabled,
+        participantsCanUnmute: selectedTemplate.participantsCanUnmute,
+        participantsCanStartVideo: selectedTemplate.participantsCanStartVideo,
+        participantsCanShareScreen: selectedTemplate.participantsCanShareScreen,
+        maxParticipants: selectedTemplate.maxParticipants,
+      }
+    : null;
 
   return (
     <div className="container py-5">
       <div className="mb-2">
         <Link
-          href="/it/admin"
+          href="/admin/eventi"
           className="text-decoration-none d-inline-flex align-items-center text-primary"
           style={{ fontSize: '0.9rem' }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="me-1">
-            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-1" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
           {t('title')}
         </Link>
       </div>
@@ -38,7 +80,10 @@ export default async function CreateEventPage() {
         </p>
       </div>
 
-      <CreateEventForm />
+      <CreateEventWithTemplate
+        templates={serializedTemplates}
+        selectedTemplate={serializedSelected}
+      />
     </div>
   );
 }

@@ -4,6 +4,8 @@ import { cookies } from 'next/headers';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import AdminNav from '@/components/admin/admin-nav';
 
+export const dynamic = 'force-dynamic';
+
 interface AdminLayoutProps {
   children: ReactNode;
 }

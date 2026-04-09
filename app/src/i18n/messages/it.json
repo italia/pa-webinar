@@ -24,7 +24,7 @@
     "events": "Eventi",
     "about": "Informazioni",
     "privacy": "Privacy",
-    "admin": "Gestione eventi",
+    "admin": "Amministrazione",
     "language": "Lingua",
     "switchLanguage": "Cambia lingua",
     "skipToContent": "Vai al contenuto",
@@ -323,10 +323,26 @@
   "admin": {
     "nav": {
       "events": "Gestione eventi",
+      "settings": "Impostazioni di sistema",
+      "eventsList": "Lista eventi",
+      "newEvent": "Nuovo evento",
+      "templates": "Template",
       "analytics": "Statistiche",
-      "settings": "Impostazioni sito",
       "infrastructure": "Infrastruttura",
-      "ariaLabel": "Navigazione amministrazione"
+      "settingsGeneral": "Generali",
+      "settingsLanguages": "Lingue",
+      "ariaLabel": "Navigazione amministrazione",
+      "subNavAriaLabel": "Navigazione sezione"
+    },
+    "landing": {
+      "title": "Pannello di amministrazione",
+      "subtitle": "Gestisci eventi e configura la piattaforma",
+      "eventsTitle": "Gestione eventi",
+      "eventsDescription": "Crea, modifica e gestisci eventi, template e statistiche.",
+      "settingsTitle": "Impostazioni di sistema",
+      "settingsDescription": "Configura branding, contenuti, lingue, funzionalità e infrastruttura.",
+      "liveNow": "{count, plural, one {# evento live} other {# eventi live}}",
+      "upcomingEvents": "{count, plural, one {# evento in programma} other {# eventi in programma}}"
     },
     "recording": {
       "title": "Registrazione video",
@@ -443,7 +459,8 @@
       "retentionPreviewPolls": "Risultati dei sondaggi",
       "retentionPreviewRecordings": "Registrazioni video",
       "retentionPreviewKept": "Le statistiche aggregate e i metadati dell'evento vengono mantenuti.",
-      "configPreview": "Anteprima configurazione"
+      "configPreview": "Anteprima configurazione",
+      "templateApplied": "Template applicato: {name}. Puoi modificare tutte le impostazioni."
     },
     "links": {
       "title": "Link dell'evento",
@@ -481,11 +498,27 @@
       "saved": "Impostazioni salvate con successo",
       "tabs": {
         "branding": "Branding",
+        "header": "Header",
         "seo": "SEO",
         "homepage": "Home page",
         "pages": "Pagine",
         "footer": "Footer",
         "features": "Funzionalità"
+      },
+      "header": {
+        "slimBarTitle": "Barra superiore (Slim Header)",
+        "slimBarDescription": "La barra sottile in alto alla pagina che identifica l'ente di appartenenza.",
+        "parentOrganization": "Ente superiore",
+        "parentOrganizationHelp": "Es. \"Presidenza del Consiglio dei Ministri\"",
+        "parentOrganizationUrl": "URL ente superiore",
+        "centerBarTitle": "Header centrale",
+        "centerBarDescription": "L'area principale dell'header con il nome dell'applicazione e il logo.",
+        "appName": "Nome applicazione",
+        "appNameHelp": "Mostrato nell'header e nel titolo del browser",
+        "organizationShort": "Nome breve ente",
+        "logoUrl": "URL logo",
+        "logoUrlHelp": "Lascia vuoto per usare l'icona PA predefinita",
+        "organizationUrl": "URL sito dell'ente"
       },
       "branding": {
         "siteName": "Nome applicazione",
@@ -615,6 +648,59 @@
         "avgFeedbackRating": "Valutazione media feedback",
         "totalFeedback": "Risposte feedback"
       }
+    },
+    "templates": {
+      "title": "Template eventi",
+      "subtitle": "Gestisci i template predefiniti per la creazione rapida di eventi",
+      "create": "Nuovo template",
+      "deleteConfirm": "Sei sicuro di voler eliminare questo template?",
+      "system": "Sistema",
+      "nameLabel": "Nome template",
+      "descriptionLabel": "Descrizione",
+      "maxParticipantsLabel": "Max partecipanti",
+      "featuresLabel": "Funzionalità",
+      "recordingLabel": "Registrazione",
+      "unmute": "Microfono partecipanti",
+      "video": "Video partecipanti",
+      "screen": "Condivisione schermo",
+      "pickerTitle": "Scegli un template",
+      "pickerSubtitle": "Seleziona un template per pre-configurare le impostazioni dell'evento, oppure salta per configurare tutto manualmente.",
+      "skipTemplate": "Configura manualmente"
+    },
+    "files": {
+      "title": "File e materiali",
+      "upload": "Carica file",
+      "selectFile": "Seleziona file",
+      "fileTitle": "Titolo",
+      "visibility": "Visibilità",
+      "visibilityAlways": "Sempre visibile",
+      "visibilityBefore": "Solo prima dell'evento",
+      "visibilityDuring": "Solo durante l'evento",
+      "visibilityAfter": "Solo dopo l'evento",
+      "uploading": "Caricamento...",
+      "uploadBtn": "Carica",
+      "deleteConfirm": "Sei sicuro di voler eliminare questo file?",
+      "noFiles": "Nessun file caricato. Usa il pulsante \"Carica file\" per aggiungere materiali."
+    },
+    "languages": {
+      "title": "Gestione lingue",
+      "subtitle": "Configura le lingue disponibili e personalizza le traduzioni",
+      "configuredLocales": "Lingue configurate",
+      "localesDescription": "Seleziona le lingue disponibili per l'interfaccia utente. L'italiano è obbligatorio come lingua predefinita.",
+      "addLocale": "Aggiungi lingua",
+      "localeCode": "Codice lingua",
+      "localeName": "Nome lingua",
+      "selectLocale": "Seleziona...",
+      "add": "Aggiungi",
+      "default": "Predefinita",
+      "editTranslations": "Modifica traduzioni",
+      "saved": "Configurazione lingue salvata",
+      "saveNote": "Le modifiche alle lingue disponibili richiedono un riavvio per essere effettive nelle URL.",
+      "translationOverrides": "Traduzioni personalizzate — {locale}",
+      "overridesDescription": "Sovrascrivi le traduzioni predefinite per questa lingua. Usa la notazione con punto (es. common.appName).",
+      "keyLabel": "Chiave traduzione",
+      "valueLabel": "Valore",
+      "addOverride": "Aggiungi"
     },
     "infrastructure": {
       "title": "Infrastruttura",
@@ -1004,12 +1090,14 @@
     "automatic": "automatica",
     "publish": "Pubblica registrazione",
     "publishDesc": "Rendi il video accessibile nella pagina dell'evento",
-    "retention": "Conservazione",
-    "retention.24h": "24 ore (temporanea)",
-    "retention.7d": "7 giorni",
-    "retention.30d": "30 giorni",
-    "retention.90d": "90 giorni",
-    "retention.forever": "Mai (fino a scadenza evento)",
+    "retentionLabel": "Conservazione",
+    "retention": {
+      "24h": "24 ore (temporanea)",
+      "7d": "7 giorni",
+      "30d": "30 giorni",
+      "90d": "90 giorni",
+      "forever": "Mai (fino a scadenza evento)"
+    },
     "retentionNote": "Il video seguirà comunque la retention GDPR dell'evento",
     "delete": "Elimina registrazione",
     "deleteConfirm": "Sei sicuro? Il video verrà eliminato definitivamente.",

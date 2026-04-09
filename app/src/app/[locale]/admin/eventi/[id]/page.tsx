@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
-import EventManagementClient from '@/components/admin/event-management-client';
 import { getPublicEnv } from '@/lib/env';
+import EventManagementClient from '@/components/admin/event-management-client';
 
 interface EventManagePageProps {
   params: Promise<{ id: string }>;

@@ -24,7 +24,7 @@
     "events": "Events",
     "about": "About",
     "privacy": "Privacy",
-    "admin": "Event management",
+    "admin": "Administration",
     "language": "Language",
     "switchLanguage": "Switch language",
     "skipToContent": "Skip to content",
@@ -253,10 +253,26 @@
   "admin": {
     "nav": {
       "events": "Event management",
+      "settings": "System settings",
+      "eventsList": "Event list",
+      "newEvent": "New event",
+      "templates": "Templates",
       "analytics": "Analytics",
-      "settings": "Site settings",
       "infrastructure": "Infrastructure",
-      "ariaLabel": "Admin navigation"
+      "settingsGeneral": "General",
+      "settingsLanguages": "Languages",
+      "ariaLabel": "Admin navigation",
+      "subNavAriaLabel": "Section navigation"
+    },
+    "landing": {
+      "title": "Admin panel",
+      "subtitle": "Manage events and configure the platform",
+      "eventsTitle": "Event management",
+      "eventsDescription": "Create, edit and manage events, templates and analytics.",
+      "settingsTitle": "System settings",
+      "settingsDescription": "Configure branding, content, languages, features and infrastructure.",
+      "liveNow": "{count, plural, one {# event live} other {# events live}}",
+      "upcomingEvents": "{count, plural, one {# upcoming event} other {# upcoming events}}"
     },
     "recording": {
       "title": "Video recording",
@@ -373,7 +389,8 @@
       "retentionPreviewPolls": "Poll results",
       "retentionPreviewRecordings": "Video recordings",
       "retentionPreviewKept": "Aggregate statistics and event metadata are retained.",
-      "configPreview": "Configuration preview"
+      "configPreview": "Configuration preview",
+      "templateApplied": "Template applied: {name}. You can modify all settings."
     },
     "links": {
       "title": "Event links",
@@ -411,11 +428,27 @@
       "saved": "Settings saved successfully",
       "tabs": {
         "branding": "Branding",
+        "header": "Header",
         "seo": "SEO",
         "homepage": "Home page",
         "pages": "Pages",
         "footer": "Footer",
         "features": "Features"
+      },
+      "header": {
+        "slimBarTitle": "Top bar (Slim Header)",
+        "slimBarDescription": "The thin bar at the top of the page identifying the parent organization.",
+        "parentOrganization": "Parent organization",
+        "parentOrganizationHelp": "E.g. \"Presidency of the Council of Ministers\"",
+        "parentOrganizationUrl": "Parent organization URL",
+        "centerBarTitle": "Center header",
+        "centerBarDescription": "The main header area with the application name and logo.",
+        "appName": "Application name",
+        "appNameHelp": "Shown in the header and browser title",
+        "organizationShort": "Short organization name",
+        "logoUrl": "Logo URL",
+        "logoUrlHelp": "Leave empty to use the default PA icon",
+        "organizationUrl": "Organization website URL"
       },
       "branding": {
         "siteName": "Application name",
@@ -545,6 +578,59 @@
         "avgFeedbackRating": "Avg feedback rating",
         "totalFeedback": "Feedback responses"
       }
+    },
+    "templates": {
+      "title": "Event templates",
+      "subtitle": "Manage preset templates for quick event creation",
+      "create": "New template",
+      "deleteConfirm": "Are you sure you want to delete this template?",
+      "system": "System",
+      "nameLabel": "Template name",
+      "descriptionLabel": "Description",
+      "maxParticipantsLabel": "Max participants",
+      "featuresLabel": "Features",
+      "recordingLabel": "Recording",
+      "unmute": "Participant microphone",
+      "video": "Participant video",
+      "screen": "Screen sharing",
+      "pickerTitle": "Choose a template",
+      "pickerSubtitle": "Select a template to pre-configure event settings, or skip to configure everything manually.",
+      "skipTemplate": "Configure manually"
+    },
+    "files": {
+      "title": "Files and materials",
+      "upload": "Upload file",
+      "selectFile": "Select file",
+      "fileTitle": "Title",
+      "visibility": "Visibility",
+      "visibilityAlways": "Always visible",
+      "visibilityBefore": "Before event only",
+      "visibilityDuring": "During event only",
+      "visibilityAfter": "After event only",
+      "uploading": "Uploading...",
+      "uploadBtn": "Upload",
+      "deleteConfirm": "Are you sure you want to delete this file?",
+      "noFiles": "No files uploaded. Use the \"Upload file\" button to add materials."
+    },
+    "languages": {
+      "title": "Language management",
+      "subtitle": "Configure available languages and customize translations",
+      "configuredLocales": "Configured languages",
+      "localesDescription": "Select the languages available for the user interface. Italian is required as the default language.",
+      "addLocale": "Add language",
+      "localeCode": "Language code",
+      "localeName": "Language name",
+      "selectLocale": "Select...",
+      "add": "Add",
+      "default": "Default",
+      "editTranslations": "Edit translations",
+      "saved": "Language configuration saved",
+      "saveNote": "Changes to available languages require a restart to take effect in URLs.",
+      "translationOverrides": "Custom translations — {locale}",
+      "overridesDescription": "Override default translations for this language. Use dot notation (e.g. common.appName).",
+      "keyLabel": "Translation key",
+      "valueLabel": "Value",
+      "addOverride": "Add"
     },
     "infrastructure": {
       "title": "Infrastructure",
@@ -1004,12 +1090,14 @@
     "automatic": "automatic",
     "publish": "Publish recording",
     "publishDesc": "Make the video accessible on the event page",
-    "retention": "Retention",
-    "retention.24h": "24 hours (temporary)",
-    "retention.7d": "7 days",
-    "retention.30d": "30 days",
-    "retention.90d": "90 days",
-    "retention.forever": "Never (until event expiry)",
+    "retentionLabel": "Retention",
+    "retention": {
+      "24h": "24 hours (temporary)",
+      "7d": "7 days",
+      "30d": "30 days",
+      "90d": "90 days",
+      "forever": "Never (until event expiry)"
+    },
     "retentionNote": "The video will still follow the event's GDPR retention",
     "delete": "Delete recording",
     "deleteConfirm": "Are you sure? The video will be permanently deleted.",

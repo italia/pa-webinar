@@ -21,6 +21,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.26.0",
     "@prisma/client": "^6.0.0",
     "@splidejs/splide": "^4.1.4",
     "bootstrap-italia": "^2.12.0",

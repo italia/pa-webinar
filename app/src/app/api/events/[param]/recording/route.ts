@@ -5,6 +5,11 @@ import {
   extractModeratorToken,
   constantTimeEqual,
 } from '@/lib/auth/moderator';
+import {
+  isAzureConfigured,
+  deleteBlob,
+  getRecordingBlobPath,
+} from '@/lib/azure/blob-storage';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,12 +59,9 @@ export const DELETE = withErrorHandling(async (request, context) => {
     throw new ForbiddenError('Invalid moderator token');
   }
 
-  // TODO: Delete from Azure Blob Storage when SDK available
-  if (event.recordingUrl || event.tempRecordingUrl) {
-    console.warn(
-      `[recording/delete] Recording URLs cleared for event ${event.id}. ` +
-        `Storage deletion should be implemented with Azure SDK.`,
-    );
+  if (isAzureConfigured() && (event.recordingUrl || event.tempRecordingUrl)) {
+    const blobPath = getRecordingBlobPath(event.id);
+    await deleteBlob(blobPath);
   }
 
   await prisma.$transaction([
