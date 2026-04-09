@@ -12,7 +12,6 @@ import { UnauthorizedError, ValidationError, NotFoundError } from '@/lib/errors'
 import {
   isAzureConfigured,
   generateUploadSasUrl,
-  generateDownloadSasUrl,
   deleteBlob,
   getBlobPath,
   ensureContainer,
