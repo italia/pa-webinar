@@ -262,6 +262,8 @@ export default function EventManagementClient({
     }
   }, [status, event.id, event.moderatorToken, t]);
 
+  const isEarlyStart = new Date(event.startsAt).getTime() > Date.now() + 30 * 60_000;
+
   const startEvent = useCallback(async () => {
     setUpdating(true);
     setFeedback('');
@@ -276,12 +278,15 @@ export default function EventManagementClient({
       });
       if (res.ok) {
         setStatus('LIVE');
-        setFeedback(t('startEventSuccess'));
+        const msg = isEarlyStart
+          ? `${t('startEventSuccess')} ${t('jvbWarmupWarning')}`
+          : t('startEventSuccess');
+        setFeedback(msg);
       }
     } finally {
       setUpdating(false);
     }
-  }, [event.id, event.moderatorToken, t]);
+  }, [event.id, event.moderatorToken, event.startsAt, isEarlyStart, t]);
 
   const handleDeleted = useCallback(() => {
     router.push('/admin');

@@ -89,8 +89,8 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
 
       const title = input.locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
       const description = input.locale === 'en' && event.descriptionEn ? event.descriptionEn : event.descriptionIt;
-      const date = formatDate(event.startsAt, input.locale);
-      const time = formatTime(event.startsAt, input.locale);
+      const date = formatDate(event.startsAt, input.locale, event.timezone);
+      const time = formatTime(event.startsAt, input.locale, event.timezone);
 
       const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
       const eventPageUrl = `${baseUrl}/${input.locale}/eventi/${event.slug}`;

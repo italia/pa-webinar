@@ -9,7 +9,10 @@ const eventBaseSchema = z.object({
   descriptionEn: z.string().max(5000).optional(),
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime(),
-  timezone: z.string().default('Europe/Rome'),
+  timezone: z.string().refine(
+    (tz) => { try { Intl.DateTimeFormat(undefined, { timeZone: tz }); return true; } catch { return false; } },
+    { message: 'Invalid IANA timezone' },
+  ).default('Europe/Rome'),
   maxParticipants: z.number().int().min(2).max(500).default(300),
   qaEnabled: z.boolean().default(true),
   chatEnabled: z.boolean().default(false),

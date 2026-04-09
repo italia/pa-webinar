@@ -46,6 +46,7 @@ interface EventInfo {
   organizerName?: string | null;
   maxParticipants?: number;
   tempRecordingUrl?: string | null;
+  timezone?: string;
 }
 
 interface WatermarkSettings {
@@ -110,6 +111,27 @@ export default function LiveEventClient({
   const [eventStatus, setEventStatus] = useState(event.status);
   const [showFeedback, setShowFeedback] = useState(false);
   const [guestId] = useState(() => isGuest ? `guest_${Math.random().toString(36).slice(2, 10)}` : '');
+  const [jvbReady, setJvbReady] = useState<boolean | null>(null);
+
+  // Poll JVB status when event is LIVE
+  useEffect(() => {
+    if (eventStatus !== 'LIVE') {
+      setJvbReady(null);
+      return;
+    }
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const res = await fetch('/api/status');
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        if (!cancelled) setJvbReady(data.metrics?.jvbStatus === 'ready');
+      } catch { /* retry on next tick */ }
+    };
+    poll();
+    const interval = setInterval(poll, 3000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [eventStatus]);
 
   // Determine initial phase
   useEffect(() => {
@@ -128,6 +150,10 @@ export default function LiveEventClient({
     }
 
     if (eventStatus === 'LIVE') {
+      if (!jvbReady) {
+        setPhase('waiting');
+        return;
+      }
       if (isModerator) {
         setPhase('pre_join');
       } else if (event.recordingEnabled) {
@@ -139,7 +165,7 @@ export default function LiveEventClient({
     }
 
     setPhase('waiting');
-  }, [eventStatus, event.recordingEnabled, isModerator, isGuest]);
+  }, [eventStatus, event.recordingEnabled, isModerator, isGuest, jvbReady]);
 
   // Poll event status in waiting room
   useEffect(() => {
@@ -317,9 +343,11 @@ export default function LiveEventClient({
           recordingEnabled: event.recordingEnabled,
           tempRecordingUrl: event.tempRecordingUrl,
           waitingRoomAudioUrl: event.waitingRoomAudioUrl,
+          timezone: event.timezone,
         }}
         participantCount={participantCount}
         role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
+        jvbReady={jvbReady}
         onEnterLive={() => {
           if (event.recordingEnabled && !isModerator) {
             setPhase('consent_pending');

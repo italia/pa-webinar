@@ -22,6 +22,7 @@ import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter } from '@/i18n/navigation';
 import { createEventSchema } from '@/lib/validation/schemas';
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
+import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
 
 interface FieldErrors {
   [key: string]: string | undefined;
@@ -41,11 +42,7 @@ interface TemplatePreset {
 
 interface CreateEventFormProps {
   template?: TemplatePreset;
-}
-
-function toDatetimeLocal(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  siteTimezone: string;
 }
 
 function CollapsibleSection({
@@ -115,7 +112,7 @@ function CollapsibleSection({
   );
 }
 
-export default function CreateEventForm({ template }: CreateEventFormProps) {
+export default function CreateEventForm({ template, siteTimezone }: CreateEventFormProps) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const router = useRouter();
@@ -128,8 +125,8 @@ export default function CreateEventForm({ template }: CreateEventFormProps) {
     titleEn: '',
     descriptionIt: '',
     descriptionEn: '',
-    startsAt: toDatetimeLocal(defaultStart),
-    endsAt: toDatetimeLocal(defaultEnd),
+    startsAt: toDatetimeLocalInTz(defaultStart, siteTimezone),
+    endsAt: toDatetimeLocalInTz(defaultEnd, siteTimezone),
     maxParticipants: template?.maxParticipants ?? 300,
     qaEnabled: template?.qaEnabled ?? true,
     chatEnabled: template?.chatEnabled ?? false,
@@ -175,8 +172,9 @@ export default function CreateEventForm({ template }: CreateEventFormProps) {
         titleEn: form.titleEn || undefined,
         descriptionIt: form.descriptionIt,
         descriptionEn: form.descriptionEn || undefined,
-        startsAt: new Date(form.startsAt).toISOString(),
-        endsAt: new Date(form.endsAt).toISOString(),
+        startsAt: fromDatetimeLocalInTz(form.startsAt, siteTimezone).toISOString(),
+        endsAt: fromDatetimeLocalInTz(form.endsAt, siteTimezone).toISOString(),
+        timezone: siteTimezone,
         maxParticipants: form.maxParticipants,
         qaEnabled: form.qaEnabled,
         chatEnabled: form.chatEnabled,

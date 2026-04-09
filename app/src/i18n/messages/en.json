@@ -316,6 +316,7 @@
     "unpublishSuccess": "Event unpublished",
     "startEvent": "Start event",
     "startEventSuccess": "Event started! Waiting participants will be redirected automatically.",
+    "jvbWarmupWarning": "Video servers are starting up (~2 minutes). Participants will see a notice in the waiting room.",
     "eventIsLive": "The event is live",
     "joinAsModeratorBtn": "Join as moderator",
     "openPublicPage": "Open public page",
@@ -464,7 +465,9 @@
         "logoUrl": "Custom logo URL",
         "logoUrlHelp": "Leave empty to use the default PA icon",
         "faviconUrl": "Favicon URL",
-        "primaryColor": "Primary color"
+        "primaryColor": "Primary color",
+        "defaultTimezone": "Default timezone",
+        "defaultTimezoneHelp": "Used for date display and new event creation."
       },
       "watermark": {
         "title": "Video customization",
@@ -1078,7 +1081,10 @@
     "autoRefreshHint": "The page will automatically refresh when the event starts.",
     "startEventButton": "Start event",
     "startingEvent": "Starting...",
-    "peopleWaiting": "{count, plural, =0 {} =1 {1 person waiting} other {{count} people waiting}}"
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 person waiting} other {{count} people waiting}}",
+    "jvbScaling": "Preparing room...",
+    "jvbScalingDetail": "Video servers are starting up. This takes about 2 minutes.",
+    "jvbReady": "Room ready!"
   },
   "recording": {
     "management": "Video recording",

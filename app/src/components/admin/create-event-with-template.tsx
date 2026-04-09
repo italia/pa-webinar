@@ -36,11 +36,13 @@ interface TemplatePreset {
 interface Props {
   templates: TemplateSummary[];
   selectedTemplate: TemplatePreset | null;
+  siteTimezone: string;
 }
 
 export default function CreateEventWithTemplate({
   templates,
   selectedTemplate,
+  siteTimezone,
 }: Props) {
   const t = useTranslations('admin.templates');
   const router = useRouter();
@@ -66,5 +68,5 @@ export default function CreateEventWithTemplate({
     );
   }
 
-  return <CreateEventForm template={selectedTemplate ?? undefined} />;
+  return <CreateEventForm template={selectedTemplate ?? undefined} siteTimezone={siteTimezone} />;
 }

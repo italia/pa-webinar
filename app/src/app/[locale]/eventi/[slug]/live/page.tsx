@@ -57,6 +57,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             participantsCanUnmute: event.participantsCanUnmute,
             participantsCanStartVideo: event.participantsCanStartVideo,
             participantsCanShareScreen: event.participantsCanShareScreen,
+            timezone: event.timezone,
           }}
           token=""
           isModerator={false}
@@ -105,6 +106,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         participantsCanUnmute: event.participantsCanUnmute,
         participantsCanStartVideo: event.participantsCanStartVideo,
         participantsCanShareScreen: event.participantsCanShareScreen,
+        timezone: event.timezone,
       }}
       token={token}
       isModerator={isModerator}

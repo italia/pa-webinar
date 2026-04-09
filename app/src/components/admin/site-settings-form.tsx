@@ -20,6 +20,17 @@ import ToggleSwitch from '@/components/ui/toggle-switch';
 
 type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features';
 
+const COMMON_TIMEZONES = [
+  'Europe/Rome', 'Europe/London', 'Europe/Paris', 'Europe/Berlin',
+  'Europe/Madrid', 'Europe/Amsterdam', 'Europe/Brussels', 'Europe/Zurich',
+  'Europe/Vienna', 'Europe/Athens', 'Europe/Bucharest', 'Europe/Helsinki',
+  'Europe/Lisbon', 'Europe/Warsaw', 'Europe/Prague', 'Europe/Stockholm',
+  'Europe/Oslo', 'Europe/Copenhagen', 'Europe/Dublin', 'Europe/Istanbul',
+  'America/New_York', 'America/Chicago', 'America/Los_Angeles',
+  'America/Sao_Paulo', 'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Dubai',
+  'Asia/Kolkata', 'Australia/Sydney', 'Pacific/Auckland', 'UTC',
+];
+
 interface FooterLink {
   title: string;
   url: string;
@@ -236,18 +247,40 @@ function BrandingTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
-      <FormGroup>
-        <Label htmlFor="siteDescription">{t('siteDescription')}</Label>
-        <Input
-          type="textarea"
-          id="siteDescription"
-          value={settings.siteDescription}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            updateField('siteDescription', e.target.value)
-          }
-          style={{ minHeight: 60 }}
-        />
-      </FormGroup>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="defaultTimezone">{t('defaultTimezone')}</Label>
+            <Input
+              type="select"
+              id="defaultTimezone"
+              value={settings.defaultTimezone}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('defaultTimezone', e.target.value)
+              }
+            >
+              {COMMON_TIMEZONES.map((tz) => (
+                <option key={tz} value={tz}>{tz.replace(/_/g, ' ')}</option>
+              ))}
+            </Input>
+            <small className="text-muted">{t('defaultTimezoneHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="siteDescription">{t('siteDescription')}</Label>
+            <Input
+              type="textarea"
+              id="siteDescription"
+              value={settings.siteDescription}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('siteDescription', e.target.value)
+              }
+              style={{ minHeight: 60 }}
+            />
+          </FormGroup>
+        </Col>
+      </Row>
       <Row>
         <Col md={6}>
           <FormGroup>

@@ -385,6 +385,9 @@ model SiteSetting {
   faviconUrl           String? @map("favicon_url")
   primaryColor         String  @default("#0066CC") @map("primary_color")
 
+  // Timezone
+  defaultTimezone      String  @default("Europe/Rome") @map("default_timezone")
+
   // SEO
   seoTitle             String  @default("Eventi PA") @map("seo_title")
   seoDescription       String  @default("") @map("seo_description") @db.Text

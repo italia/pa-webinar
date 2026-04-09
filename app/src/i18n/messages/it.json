@@ -386,6 +386,7 @@
     "unpublishSuccess": "Evento rimosso dalla pubblicazione",
     "startEvent": "Avvia evento",
     "startEventSuccess": "Evento avviato! I partecipanti in attesa verranno reindirizzati automaticamente.",
+    "jvbWarmupWarning": "I server video si stanno avviando (circa 2 minuti). I partecipanti vedranno un avviso nella sala d'attesa.",
     "eventIsLive": "L'evento è in corso",
     "joinAsModeratorBtn": "Entra come moderatore",
     "openPublicPage": "Apri pagina pubblica",
@@ -534,7 +535,9 @@
         "logoUrl": "URL logo personalizzato",
         "logoUrlHelp": "Lascia vuoto per usare l'icona PA predefinita",
         "faviconUrl": "URL favicon",
-        "primaryColor": "Colore primario"
+        "primaryColor": "Colore primario",
+        "defaultTimezone": "Fuso orario predefinito",
+        "defaultTimezoneHelp": "Usato per la visualizzazione delle date e la creazione di nuovi eventi."
       },
       "watermark": {
         "title": "Personalizzazione video",
@@ -1078,7 +1081,10 @@
     "autoRefreshHint": "La pagina si aggiornerà automaticamente quando l'evento inizierà.",
     "startEventButton": "Avvia evento",
     "startingEvent": "Avvio in corso...",
-    "peopleWaiting": "{count, plural, =0 {} =1 {1 persona in attesa} other {{count} persone in attesa}}"
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 persona in attesa} other {{count} persone in attesa}}",
+    "jvbScaling": "Sala in preparazione...",
+    "jvbScalingDetail": "I server video si stanno avviando. L'operazione richiede circa 2 minuti.",
+    "jvbReady": "Sala pronta!"
   },
   "recording": {
     "management": "Registrazione video",

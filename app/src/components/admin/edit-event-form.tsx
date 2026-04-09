@@ -18,6 +18,7 @@ import {
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter } from '@/i18n/navigation';
 import { updateEventSchema } from '@/lib/validation/schemas';
+import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
 
 interface FieldErrors {
   [key: string]: string | undefined;
@@ -52,6 +53,7 @@ interface EventData {
 
 interface EditEventFormProps {
   event: EventData;
+  eventTimezone: string;
 }
 
 const CARD_STYLE = {
@@ -59,13 +61,7 @@ const CARD_STYLE = {
   border: '1px solid #e8e8e8',
 };
 
-function toDatetimeLocal(iso: string): string {
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-export default function EditEventForm({ event }: EditEventFormProps) {
+export default function EditEventForm({ event, eventTimezone }: EditEventFormProps) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const router = useRouter();
@@ -75,8 +71,8 @@ export default function EditEventForm({ event }: EditEventFormProps) {
     titleEn: event.titleEn ?? '',
     descriptionIt: event.descriptionIt,
     descriptionEn: event.descriptionEn ?? '',
-    startsAt: toDatetimeLocal(event.startsAt),
-    endsAt: toDatetimeLocal(event.endsAt),
+    startsAt: toDatetimeLocalInTz(new Date(event.startsAt), eventTimezone),
+    endsAt: toDatetimeLocalInTz(new Date(event.endsAt), eventTimezone),
     maxParticipants: event.maxParticipants,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
@@ -119,8 +115,8 @@ export default function EditEventForm({ event }: EditEventFormProps) {
         titleEn: form.titleEn || undefined,
         descriptionIt: form.descriptionIt,
         descriptionEn: form.descriptionEn || undefined,
-        startsAt: new Date(form.startsAt).toISOString(),
-        endsAt: new Date(form.endsAt).toISOString(),
+        startsAt: fromDatetimeLocalInTz(form.startsAt, eventTimezone).toISOString(),
+        endsAt: fromDatetimeLocalInTz(form.endsAt, eventTimezone).toISOString(),
         maxParticipants: form.maxParticipants,
         qaEnabled: form.qaEnabled,
         chatEnabled: form.chatEnabled,

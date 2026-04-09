@@ -95,8 +95,8 @@ export const GET = withErrorHandling(async (request) => {
         const templateInput = {
           locale,
           eventTitle: title,
-          eventDate: formatDate(event.startsAt, locale),
-          eventTime: formatTime(event.startsAt, locale),
+          eventDate: formatDate(event.startsAt, locale, event.timezone),
+          eventTime: formatTime(event.startsAt, locale, event.timezone),
           eventDuration: formatDuration(event.startsAt, event.endsAt),
           joinUrl,
           eventPageUrl,
