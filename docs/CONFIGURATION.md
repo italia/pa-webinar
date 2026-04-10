@@ -192,16 +192,103 @@ Vedi `values.yaml` sezione `secrets` per la configurazione dettagliata.
 
 ## Rete Jitsi
 
-JVB richiede la porta **UDP 10000** aperta verso Internet sui nodi del pool dedicato:
+### Connettività media (ICE)
+
+Il flusso media WebRTC tra browser e JVB richiede la negoziazione ICE (Interactive Connectivity Establishment). Il percorso dipende dalla rete del client:
+
+| Scenario client | Percorso media | Latenza |
+|---|---|---|
+| Rete aperta (UDP 10000) | Browser → JVB diretto | Minima |
+| NAT simmetrico | Browser → TURN UDP 3478 → coturn → JVB | Bassa |
+| Firewall restrittivo (solo 443) | Browser → TURNS TCP 443 → coturn → JVB | Media |
+
+### Configurazione JVB
+
+In ambienti Kubernetes con overlay network, i pod hanno IP interni (es. `192.168.x.x`) non raggiungibili dall'esterno. Configurare:
+
+```yaml
+jitsi-meet:
+  jvb:
+    stunServers: "turn.tuodominio.com:3478"
+    extraEnvs:
+      JVB_ADVERTISE_PRIVATE_CANDIDATES: "false"
+```
+
+| Parametro | Effetto |
+|---|---|
+| `stunServers` | JVB usa questo server per scoprire il proprio IP pubblico |
+| `JVB_ADVERTISE_PRIVATE_CANDIDATES: "false"` | Non annuncia gli IP di pod ai client (irraggiungibili) |
+
+### Configurazione coturn (TURN/TURNS)
+
+coturn è il relay per client che non possono raggiungere il JVB direttamente. È incluso come subchart:
+
+```yaml
+jitsi-meet:
+  coturn:
+    enabled: true
+    service:
+      type: LoadBalancer
+    tls:
+      enabled: true
+      secretName: coturn-tls
+    allowedPeerIPs: "10.0.0.0-10.255.255.255,192.168.0.0-192.168.255.255"
+```
+
+Il certificato TLS è necessario per TURNS (TURN over TLS su porta 443). Senza certificato valido, i client dietro firewall restrittivi non potranno connettersi.
+
+Prosody annuncia automaticamente i servizi TURN ai client via XEP-0215:
+- `stun:turn.tuodominio.com:3478` (UDP)
+- `turn:turn.tuodominio.com:3478` (UDP + TCP)
+- `turns:turn.tuodominio.com:443` (TLS su TCP)
+
+### Configurazione client ICE (override)
+
+Se la discovery XEP-0215 non funziona (dipende dalla versione di Jitsi e dalla configurazione Prosody), è possibile forzare la configurazione lato client:
+
+```yaml
+jitsi-meet:
+  web:
+    custom:
+      configs:
+        _custom_config_js: |
+          config.p2p.stunServers = [
+            { urls: 'stun:turn.tuodominio.com:3478' }
+          ];
+          config.p2p.useStunTurn = true;
+          config.bridgeChannel = { preferSctp: false };
+          config.useTurnUdp = true;
+          config.p2p.iceTransportPolicy = 'all';
+```
+
+**Parametri importanti:**
+
+| Parametro | Valore | Motivo |
+|---|---|---|
+| `bridgeChannel.preferSctp` | `false` | Usa WebSocket per il bridge channel. SCTP può causare un deadlock ICE che fa crashare la call quando un utente esce |
+| `p2p.useStunTurn` | `true` | Usa i server STUN/TURN anche in modalità P2P (2 partecipanti) |
+| `useTurnUdp` | `true` | Abilita TURN UDP come fallback per la connessione al JVB |
+| `p2p.iceTransportPolicy` | `'all'` | Prova tutti i candidati ICE (host, srflx, relay) |
+
+### Porte firewall
+
+| Porta | Protocollo | Componente | Obbligatoria | Note |
+|---|---|---|---|---|
+| 443 | TCP | Ingress (NGINX) | Sì | HTTPS signaling + WebSocket |
+| 443 | TCP | coturn LB | Raccomandata | TURNS per client dietro firewall |
+| 3478 | UDP+TCP | coturn LB | Raccomandata | STUN/TURN standard |
+| 10000 | UDP | JVB LB/NodePort | Raccomandata | Media RTP diretto (migliore latenza) |
+
+> **Nota**: se **tutti** i partecipanti hanno solo la porta 443 aperta, la piattaforma funziona comunque tramite TURNS. La porta 10000 UDP migliora la latenza ma non è strettamente necessaria se coturn è configurato.
+
+### Requisiti firewall per cloud
 
 | Cloud | Configurazione |
 |---|---|
-| AKS | Network Security Group del node pool `jvb` |
-| GKE | Firewall rule per il node pool |
-| EKS | Security Group del node group |
-| On-premise | Regola firewall/iptables |
-
-JVB usa STUN per la connettivita NAT e deve raggiungere `stun.l.google.com:19302`.
+| AKS | NSG del node pool `jvb`: inbound UDP 10000. NSG del nodo coturn: inbound TCP 443, UDP 3478 |
+| GKE | Firewall rule per il node pool JVB e per il Service LoadBalancer coturn |
+| EKS | Security Group del node group JVB. Security Group del Service LoadBalancer coturn |
+| On-premise | Regola firewall/iptables per le porte sopra indicate |
 
 ## Environment variables
 
