@@ -16,6 +16,7 @@ import {
 } from 'design-react-kit';
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import LocaleTabBar from '@/components/ui/locale-tab-bar';
 import { useRouter } from '@/i18n/navigation';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
@@ -51,6 +52,8 @@ interface EventData {
 interface EditEventFormProps {
   event: EventData;
   eventTimezone: string;
+  enabledLocales?: string[];
+  defaultLocale?: string;
 }
 
 const CARD_STYLE = {
@@ -58,10 +61,16 @@ const CARD_STYLE = {
   border: '1px solid #e8e8e8',
 };
 
-export default function EditEventForm({ event, eventTimezone }: EditEventFormProps) {
+export default function EditEventForm({
+  event,
+  eventTimezone,
+  enabledLocales = ['it', 'en'],
+  defaultLocale: defaultLoc = 'it',
+}: EditEventFormProps) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const router = useRouter();
+  const [contentLocale, setContentLocale] = useState(defaultLoc);
 
   const [form, setForm] = useState({
     title: { it: event.title?.it ?? '', en: event.title?.en ?? '' },
@@ -227,60 +236,35 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
           <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
             {t('form.sectionContent')}
           </h5>
-          <Row className="mb-3">
-            <Col md={6}>
-              <FormGroup className="mb-3">
-                <Input
-                  {...localizedInputProps('title', 'it', t('form.titleIt'))}
-                  type="text"
-                  value={form.title.it}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setLocalizedField('title', 'it', e.target.value)
-                  }
-                  required
-                />
-              </FormGroup>
-            </Col>
-            <Col md={6}>
-              <FormGroup className="mb-3">
-                <Input
-                  {...localizedInputProps('title', 'en', t('form.titleEn'))}
-                  type="text"
-                  value={form.title.en}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setLocalizedField('title', 'en', e.target.value)
-                  }
-                />
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col md={6}>
-              <FormGroup className="mb-3">
-                <TextArea
-                  {...localizedInputProps('description', 'it', t('form.descriptionIt'))}
-                  value={form.description.it}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setLocalizedField('description', 'it', e.target.value)
-                  }
-                  rows={4}
-                  required
-                />
-              </FormGroup>
-            </Col>
-            <Col md={6}>
-              <FormGroup className="mb-3">
-                <TextArea
-                  {...localizedInputProps('description', 'en', t('form.descriptionEn'))}
-                  value={form.description.en}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setLocalizedField('description', 'en', e.target.value)
-                  }
-                  rows={4}
-                />
-              </FormGroup>
-            </Col>
-          </Row>
+          <LocaleTabBar
+            enabledLocales={enabledLocales}
+            defaultLocale={defaultLoc}
+            activeLocale={contentLocale}
+            onSelectLocale={setContentLocale}
+            filledLocales={Object.keys(form.title).filter((l) => form.title[l as keyof typeof form.title])}
+          />
+          <FormGroup className="mb-3">
+            <Input
+              {...localizedInputProps('title', contentLocale, t('form.titleLabel'))}
+              type="text"
+              value={(form.title as Record<string, string>)[contentLocale] ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setLocalizedField('title', contentLocale, e.target.value)
+              }
+              required={contentLocale === defaultLoc}
+            />
+          </FormGroup>
+          <FormGroup className="mb-3">
+            <TextArea
+              {...localizedInputProps('description', contentLocale, t('form.descriptionLabel'))}
+              value={(form.description as Record<string, string>)[contentLocale] ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setLocalizedField('description', contentLocale, e.target.value)
+              }
+              rows={4}
+              required={contentLocale === defaultLoc}
+            />
+          </FormGroup>
         </CardBody>
       </Card>
 
@@ -496,26 +480,21 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
           <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
             {t('form.sectionSpeakers')}
           </h5>
+          <LocaleTabBar
+            enabledLocales={enabledLocales}
+            defaultLocale={defaultLoc}
+            activeLocale={contentLocale}
+            onSelectLocale={setContentLocale}
+            filledLocales={Object.keys(form.speakersInfo).filter((l) => form.speakersInfo[l as keyof typeof form.speakersInfo])}
+          />
           <Row className="mb-3">
-            <Col md={6}>
+            <Col md={12}>
               <FormGroup className="mb-3">
                 <TextArea
-                  {...localizedInputProps('speakersInfo', 'it', t('form.speakersIt'))}
-                  value={form.speakersInfo.it}
+                  {...localizedInputProps('speakersInfo', contentLocale, t('form.speakersLabel'))}
+                  value={(form.speakersInfo as Record<string, string>)[contentLocale] ?? ''}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setLocalizedField('speakersInfo', 'it', e.target.value)
-                  }
-                  rows={2}
-                />
-              </FormGroup>
-            </Col>
-            <Col md={6}>
-              <FormGroup className="mb-3">
-                <TextArea
-                  {...localizedInputProps('speakersInfo', 'en', t('form.speakersEn'))}
-                  value={form.speakersInfo.en}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setLocalizedField('speakersInfo', 'en', e.target.value)
+                    setLocalizedField('speakersInfo', contentLocale, e.target.value)
                   }
                   rows={2}
                 />

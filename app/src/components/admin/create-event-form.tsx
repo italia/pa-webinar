@@ -115,13 +115,19 @@ function CollapsibleSection({
   );
 }
 
-export default function CreateEventForm({ template, siteTimezone }: CreateEventFormProps) {
+export default function CreateEventForm({
+  template,
+  siteTimezone,
+  enabledLocales = ['it', 'en'],
+  defaultLocale: defaultLoc = 'it',
+}: CreateEventFormProps) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
   const router = useRouter();
 
   const defaultStart = new Date(Date.now() + 24 * 3600_000);
   const defaultEnd = new Date(defaultStart.getTime() + 2 * 3600_000);
+  const [contentLocale, setContentLocale] = useState(defaultLoc);
 
   const [form, setForm] = useState({
     title: { it: '', en: '' },
@@ -306,60 +312,35 @@ export default function CreateEventForm({ template, siteTimezone }: CreateEventF
         icon="it-file"
         defaultOpen
       >
-        <Row className="mb-3">
-          <Col md={6}>
-            <FormGroup className="mb-3">
-              <Input
-                {...localizedInputProps('title', 'it', t('form.titleIt'))}
-                type="text"
-                value={form.title.it}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setLocalizedField('title', 'it', e.target.value)
-                }
-                required
-              />
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup className="mb-3">
-              <Input
-                {...localizedInputProps('title', 'en', t('form.titleEn'))}
-                type="text"
-                value={form.title.en}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setLocalizedField('title', 'en', e.target.value)
-                }
-              />
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={6}>
-            <FormGroup className="mb-3">
-              <TextArea
-                {...localizedInputProps('description', 'it', t('form.descriptionIt'))}
-                value={form.description.it}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setLocalizedField('description', 'it', e.target.value)
-                }
-                rows={4}
-                required
-              />
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup className="mb-3">
-              <TextArea
-                {...localizedInputProps('description', 'en', t('form.descriptionEn'))}
-                value={form.description.en}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setLocalizedField('description', 'en', e.target.value)
-                }
-                rows={4}
-              />
-            </FormGroup>
-          </Col>
-        </Row>
+        <LocaleTabBar
+          enabledLocales={enabledLocales}
+          defaultLocale={defaultLoc}
+          activeLocale={contentLocale}
+          onSelectLocale={setContentLocale}
+          filledLocales={Object.keys(form.title).filter((l) => form.title[l as keyof typeof form.title])}
+        />
+        <FormGroup className="mb-3">
+          <Input
+            {...localizedInputProps('title', contentLocale, t('form.titleLabel'))}
+            type="text"
+            value={(form.title as Record<string, string>)[contentLocale] ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setLocalizedField('title', contentLocale, e.target.value)
+            }
+            required={contentLocale === defaultLoc}
+          />
+        </FormGroup>
+        <FormGroup className="mb-3">
+          <TextArea
+            {...localizedInputProps('description', contentLocale, t('form.descriptionLabel'))}
+            value={(form.description as Record<string, string>)[contentLocale] ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setLocalizedField('description', contentLocale, e.target.value)
+            }
+            rows={4}
+            required={contentLocale === defaultLoc}
+          />
+        </FormGroup>
       </CollapsibleSection>
 
       {/* Section 2: Schedule */}
@@ -826,25 +807,20 @@ export default function CreateEventForm({ template, siteTimezone }: CreateEventF
         defaultOpen={false}
       >
         <Row className="mb-3">
-          <Col md={6}>
+          <Col md={12}>
+            <LocaleTabBar
+              enabledLocales={enabledLocales}
+              defaultLocale={defaultLoc}
+              activeLocale={contentLocale}
+              onSelectLocale={setContentLocale}
+              filledLocales={Object.keys(form.speakersInfo).filter((l) => form.speakersInfo[l as keyof typeof form.speakersInfo])}
+            />
             <FormGroup className="mb-3">
               <TextArea
-                {...localizedInputProps('speakersInfo', 'it', t('form.speakersIt'))}
-                value={form.speakersInfo.it}
+                {...localizedInputProps('speakersInfo', contentLocale, t('form.speakersLabel'))}
+                value={(form.speakersInfo as Record<string, string>)[contentLocale] ?? ''}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setLocalizedField('speakersInfo', 'it', e.target.value)
-                }
-                rows={2}
-              />
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup className="mb-3">
-              <TextArea
-                {...localizedInputProps('speakersInfo', 'en', t('form.speakersEn'))}
-                value={form.speakersInfo.en}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setLocalizedField('speakersInfo', 'en', e.target.value)
+                  setLocalizedField('speakersInfo', contentLocale, e.target.value)
                 }
                 rows={2}
               />
