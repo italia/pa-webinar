@@ -251,18 +251,16 @@ function BrandingTab({ settings, updateField }: TabProps) {
         <Col md={6}>
           <FormGroup>
             <Label htmlFor="defaultTimezone">{t('defaultTimezone')}</Label>
-            <Input
-              type="select"
+            <select
+              className="form-select"
               id="defaultTimezone"
               value={settings.defaultTimezone}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('defaultTimezone', e.target.value)
-              }
+              onChange={(e) => updateField('defaultTimezone', e.target.value)}
             >
               {COMMON_TIMEZONES.map((tz) => (
                 <option key={tz} value={tz}>{tz.replace(/_/g, ' ')}</option>
               ))}
-            </Input>
+            </select>
             <small className="text-muted">{t('defaultTimezoneHelp')}</small>
           </FormGroup>
         </Col>
