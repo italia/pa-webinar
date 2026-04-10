@@ -136,7 +136,7 @@ graph TD
 
 Jitsi è il motore video. Non viene modificato a livello di codice sorgente: tutta la personalizzazione avviene tramite configurazione e IFrame API.
 
-Lo stack Jitsi è composto da quattro (opzionalmente cinque) componenti:
+Lo stack Jitsi è composto da cinque (opzionalmente sei) componenti:
 
 ```mermaid
 graph LR
@@ -145,26 +145,33 @@ graph LR
         PROSODY["Prosody<br/>Server XMPP<br/>Autenticazione JWT"]
         JICOFO["Jicofo<br/>Focus component<br/>Gestione sessioni"]
         JVB["JVB<br/>Video Bridge<br/>Inoltro media SFU"]
+        COTURN["coturn<br/>TURN/STUN relay<br/>TURNS su TCP 443"]
         JIBRI["Jibri<br/>Recording<br/>Headless Chrome"]
     end
 
     CLIENT["Browser<br/>via IFrame"] -- "HTTPS/WSS" --> WEB
     WEB -- "XMPP" --> PROSODY
     PROSODY -- "Segnalazione" --> JICOFO
+    PROSODY -- "XEP-0215<br/>TURN discovery" --> COTURN
     JICOFO -- "Allocazione" --> JVB
     JICOFO -- "Avvio rec." --> JIBRI
     JVB -- "RTP/SRTP<br/>UDP 10000" --> CLIENT
+    CLIENT -- "TURNS TCP 443<br/>fallback firewall" --> COTURN
+    COTURN -- "UDP relay<br/>rete interna" --> JVB
 ```
 
 | Componente | Funzione |
 |---|---|
 | **jitsi-web** | Serve i file statici (JS, CSS) e la configurazione della room |
-| **Prosody** | Server XMPP, gestisce autenticazione JWT e presence |
+| **Prosody** | Server XMPP, gestisce autenticazione JWT, presence e discovery TURN (XEP-0215) |
 | **Jicofo** | Componente focus: crea le conferenze, assegna JVB |
 | **JVB** | Video Bridge (SFU): inoltra i flussi media tra i partecipanti |
+| **coturn** | Server TURN/STUN: relay per client dietro firewall restrittivi (TURNS su TCP 443) |
 | **Jibri** | Recording: cattura la sessione con headless Chrome, produce file video |
 
-La comunicazione media viaggia su UDP porta 10000 direttamente tra il browser e il JVB, bypassando il web server dopo la fase di segnalazione.
+La comunicazione media ha due percorsi possibili:
+- **Diretto** (UDP 10000): Browser → JVB. Migliore latenza, richiede porta UDP aperta sul client.
+- **Relay** (TURNS TCP 443): Browser → coturn → JVB. Per client dietro firewall che bloccano UDP. Il browser scopre il TURN server via XEP-0215 e lo usa come fallback automatico.
 
 ### Database
 
@@ -635,6 +642,7 @@ graph TD
             NEXTJS_POD["eventi-dtd<br/>Next.js standalone<br/>2-6 repliche HPA"]
             PROSODY_POD["Prosody"]
             JICOFO_POD["Jicofo"]
+            COTURN_POD["coturn<br/>TURN/STUN relay<br/>TURNS TCP 443"]
             PROM["Prometheus"]
             GRAF["Grafana"]
             LOKI["Loki"]
@@ -648,12 +656,14 @@ graph TD
     end
 
     DNS["DNS<br/>eventi.dominio.gov.it"] --> INGRESS
+    DNS_TURN["DNS<br/>turn.dominio.gov.it"] --> COTURN_POD
     INGRESS --> NEXTJS_POD
     INGRESS --> PROSODY_POD
     PROSODY_POD --> JICOFO_POD
     JICOFO_POD --> JVB_POD1
     JICOFO_POD --> JVB_POD2
     JICOFO_POD --> JVB_PODN
+    COTURN_POD -- "relay UDP" --> JVB_POD1
 
     DB_EXT[("Azure PostgreSQL<br/>Flexible Server")]
     BLOB_EXT["Azure Blob Storage"]
@@ -765,7 +775,7 @@ Lo stack di monitoraggio è quello già presente nel cluster DTD:
 ```mermaid
 graph LR
     subgraph "Sorgenti metriche"
-        APP["Next.js<br/>/api/health"]
+        APP["Next.js<br/>/api/health + /api/ready"]
         JVB_M["JVB<br/>Colibri stats"]
         PROSODY_M["Prosody<br/>mod_prometheus"]
         PG["PostgreSQL<br/>pg_stat"]
@@ -788,6 +798,16 @@ graph LR
     PROM --> GRAF
     LOKI --> GRAF
 ```
+
+**Health endpoint:**
+
+| Endpoint | Probe K8s | Verifica |
+|---|---|---|
+| `/api/health` | Liveness | DB raggiungibile (`SELECT 1`). Se fallisce, K8s riavvia il pod |
+| `/api/ready` | Readiness + Startup | Compatibilità schema DB via query ORM Prisma. Se fallisce, K8s rimuove il pod dal Service (niente 500 agli utenti) |
+| `/api/status` | — (dashboard) | Stato completo: DB, Jitsi, SMTP, JVB, metriche |
+
+La separazione liveness/readiness è importante: un pod con schema DB incompatibile (migration mancante) è un pod sano che non deve servire traffico. La readiness probe lo rileva, ma il pod non viene ucciso inutilmente.
 
 **Metriche chiave monitorate:**
 
