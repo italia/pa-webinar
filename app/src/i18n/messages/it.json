@@ -326,6 +326,7 @@
       "settings": "Impostazioni di sistema",
       "eventsList": "Lista eventi",
       "newEvent": "Nuovo evento",
+      "calendar": "Calendario",
       "templates": "Template",
       "analytics": "Statistiche",
       "infrastructure": "Infrastruttura",
@@ -609,6 +610,8 @@
         "guestAccessEnabledHelp": "Consenti l'accesso come ospite agli eventi in corso",
         "publicRegistrationEnabled": "Registrazione pubblica attiva",
         "publicRegistrationEnabledHelp": "Chiunque può creare eventi (se disattivato, solo gli amministratori)",
+        "calendarPublic": "Calendario pubblico",
+        "calendarPublicHelp": "Pubblica il calendario degli eventi. Visitatori possono vedere gli eventi programmati.",
         "githubUrl": "URL repository GitHub",
         "supportEmail": "Email supporto"
       }
@@ -669,6 +672,19 @@
       "pickerTitle": "Scegli un template",
       "pickerSubtitle": "Seleziona un template per pre-configurare le impostazioni dell'evento, oppure salta per configurare tutto manualmente.",
       "skipTemplate": "Configura manualmente"
+    },
+    "instantCall": {
+      "title": "Videocall istantanea",
+      "subtitle": "Crea una videocall al volo e condividi il link. Nessuna calendarizzazione.",
+      "nameLabel": "Nome della videocall",
+      "namePlaceholder": "es. Sync rapido, Demo progetto...",
+      "moderatorLabel": "Il tuo nome (facoltativo)",
+      "moderatorPlaceholder": "Verrà mostrato nella call",
+      "create": "Crea e entra",
+      "creating": "Creazione...",
+      "copyLink": "Copia link di invito",
+      "copied": "Copiato!",
+      "hint": "Tutti possono attivare microfono, webcam e condividere lo schermo. Solo tu puoi registrare e terminare la call."
     },
     "files": {
       "title": "File e materiali",
@@ -1009,6 +1025,29 @@
     "title": "Reazioni",
     "sendReaction": "Invia reazione",
     "reactionSent": "Reazione inviata!"
+  },
+  "calendar": {
+    "title": "Calendario eventi",
+    "subtitle": "Visualizza tutti gli eventi nel tempo",
+    "publicTitle": "Calendario eventi",
+    "publicSubtitle": "Scopri gli eventi in programma",
+    "today": "Oggi",
+    "prev": "Periodo precedente",
+    "next": "Periodo successivo",
+    "views": {
+      "day": "Giorno",
+      "week": "Settimana",
+      "month": "Mese",
+      "year": "Anno",
+      "list": "Lista"
+    },
+    "status": {
+      "DRAFT": "Bozza",
+      "PUBLISHED": "Pubblicato",
+      "LIVE": "In corso",
+      "ENDED": "Concluso",
+      "ARCHIVED": "Archiviato"
+    }
   },
   "footer": {
     "departmentName": "Dipartimento per la Trasformazione Digitale",

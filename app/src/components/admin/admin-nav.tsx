@@ -21,6 +21,7 @@ const MAIN_SECTIONS: NavItem[] = [
 const EVENTS_SUB_NAV: NavItem[] = [
   { href: '/admin/eventi', icon: 'it-list', labelKey: 'eventsList', exact: true },
   { href: '/admin/eventi/nuovo', icon: 'it-plus', labelKey: 'newEvent' },
+  { href: '/admin/calendario', icon: 'it-calendar', labelKey: 'calendar' },
   { href: '/admin/eventi/template', icon: 'it-copy', labelKey: 'templates' },
   { href: '/admin/eventi/statistiche', icon: 'it-chart-line', labelKey: 'analytics' },
 ];
@@ -35,7 +36,7 @@ export default function AdminNav() {
   const pathname = usePathname();
 
   const stripped = pathname.replace(/^\/(it|en)/, '');
-  const inEvents = stripped.startsWith('/admin/eventi');
+  const inEvents = stripped.startsWith('/admin/eventi') || stripped.startsWith('/admin/calendario');
   const inSettings = stripped.startsWith('/admin/impostazioni') || stripped.startsWith('/admin/infrastruttura');
 
   function isActive(item: NavItem): boolean {

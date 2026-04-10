@@ -25,6 +25,7 @@ async function loadEvents(token?: string) {
     startsAt: e.startsAt.toISOString(),
     endsAt: e.endsAt.toISOString(),
     status: e.status,
+    eventType: e.eventType,
     registrationCount: e._count.registrations,
     maxParticipants: e.maxParticipants,
     moderatorToken: e.moderatorToken,

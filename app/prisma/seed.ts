@@ -116,6 +116,7 @@ async function main() {
       statusPageEnabled: true,
       guestAccessEnabled: true,
       publicRegistrationEnabled: true,
+      calendarPublic: true,
       footerLinks: JSON.stringify([
         { title: 'Privacy', url: '/privacy', section: 'legal' },
         { title: 'Accessibilità', url: '/accessibilita', section: 'legal' },

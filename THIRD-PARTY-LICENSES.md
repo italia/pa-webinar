@@ -15,7 +15,7 @@ La licenza EUPL-1.2 è compatibile con le seguenti licenze (Art. 5 EUPL):
 
 | Licenza | Conteggio |
 |---------|-----------|
-| MIT | 450 |
+| MIT | 457 |
 | Apache-2.0 | 53 |
 | ISC | 13 |
 | BSD-2-Clause | 10 |
@@ -34,6 +34,13 @@ La licenza EUPL-1.2 è compatibile con le seguenti licenze (Art. 5 EUPL):
 
 | Pacchetto | Versione | Licenza | Compatibile EUPL | Repository |
 |-----------|----------|---------|-------------------|------------|
+| @fullcalendar/core | 6.1.20 | MIT | ✅ | https://github.com/fullcalendar/fullcalendar |
+| @fullcalendar/daygrid | 6.1.20 | MIT | ✅ | https://github.com/fullcalendar/fullcalendar |
+| @fullcalendar/interaction | 6.1.20 | MIT | ✅ | https://github.com/fullcalendar/fullcalendar |
+| @fullcalendar/list | 6.1.20 | MIT | ✅ | https://github.com/fullcalendar/fullcalendar |
+| @fullcalendar/multimonth | 6.1.20 | MIT | ✅ | https://github.com/fullcalendar/fullcalendar |
+| @fullcalendar/react | 6.1.20 | MIT | ✅ | https://github.com/fullcalendar/fullcalendar |
+| @fullcalendar/timegrid | 6.1.20 | MIT | ✅ | https://github.com/fullcalendar/fullcalendar |
 | @prisma/client | 6.19.2 | Apache-2.0 | ✅ | https://github.com/prisma/prisma |
 | @splidejs/splide | 4.1.4 | MIT | ✅ | https://github.com/Splidejs/splide |
 | bootstrap-italia | 2.18.0 | BSD-3-Clause | ✅ | https://github.com/italia/bootstrap-italia |

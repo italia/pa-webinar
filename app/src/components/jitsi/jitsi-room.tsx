@@ -29,6 +29,7 @@ interface JitsiRoomProps {
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
+  enableFileSharing?: boolean;
   watermark?: WatermarkSettings;
   onReady?: () => void;
   onLeft?: () => void;
@@ -58,6 +59,7 @@ export default function JitsiRoom({
   participantsCanUnmute = true,
   participantsCanStartVideo = true,
   participantsCanShareScreen = true,
+  enableFileSharing = false,
   watermark,
   onReady,
   onLeft,
@@ -128,6 +130,7 @@ export default function JitsiRoom({
             ...jitsiConfigOverwrite,
             ...extraConfig,
             toolbarButtons,
+            ...(enableFileSharing ? { enableFileSharing: true } : {}),
           },
           interfaceConfigOverwrite: {
             ...jitsiInterfaceConfigOverwrite,
@@ -218,7 +221,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing]);
 
   return (
     <div className="jitsi-wrapper position-relative">

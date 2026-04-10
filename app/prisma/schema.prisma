@@ -58,6 +58,9 @@ model Event {
   imageUrl      String?  @map("image_url")
   waitingRoomAudioUrl String? @map("waiting_room_audio_url")
   
+  // Event type
+  eventType   EventType   @default(SCHEDULED) @map("event_type")
+
   // Status
   status      EventStatus @default(DRAFT)
   
@@ -111,6 +114,11 @@ enum EventStatus {
   LIVE
   ENDED
   ARCHIVED
+}
+
+enum EventType {
+  SCHEDULED
+  INSTANT
 }
 
 enum OrganizationType {
@@ -410,6 +418,7 @@ model SiteSetting {
   statusPageEnabled         Boolean @default(true) @map("status_page_enabled")
   guestAccessEnabled        Boolean @default(true) @map("guest_access_enabled")
   publicRegistrationEnabled Boolean @default(true) @map("public_registration_enabled")
+  calendarPublic            Boolean @default(false) @map("calendar_public")
 
   // Jitsi customization
   jitsiWatermarkUrl      String?  @map("jitsi_watermark_url")

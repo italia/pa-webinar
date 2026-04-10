@@ -60,7 +60,6 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
   recordingDuration: z.number().int().nullable().optional(),
 }).refine(
   (data) => {
-    // Only validate date ordering when both dates are present in the update
     if (data.startsAt && data.endsAt) {
       return new Date(data.endsAt) > new Date(data.startsAt);
     }
@@ -71,6 +70,13 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
+
+// ── Instant Call Schema ──────────────────────────────
+
+export const createInstantCallSchema = z.object({
+  titleIt: z.string().min(2).max(200),
+  moderatorName: z.string().min(2).max(100).optional(),
+});
 
 // ── Registration Schemas ─────────────────────────────
 
