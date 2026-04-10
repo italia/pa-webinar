@@ -136,6 +136,8 @@ jobs:
         run: docker compose up -d --wait
         env:
           APP_BUILD_TARGET: production
+      - name: Run database migrations
+        run: docker compose --profile setup run --rm db-migrate
       - name: Wait for app to be ready
         run: |
           for i in $(seq 1 30); do
