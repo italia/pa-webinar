@@ -127,23 +127,27 @@ app:
       failureThreshold: 3
 
     # Readiness probe — removes the pod from Service endpoints when unhealthy.
+    # Uses /api/ready which validates DB schema compatibility via ORM queries,
+    # catching migration drift that /api/health (SELECT 1) would miss.
     readiness:
       httpGet:
-        path: /api/health
+        path: /api/ready
         port: http
       initialDelaySeconds: 5
       periodSeconds: 10
-      timeoutSeconds: 3
+      timeoutSeconds: 5
       failureThreshold: 3
 
     # Startup probe — gives the container time for initial startup.
     # Prevents liveness probe from killing a slow-starting container.
+    # Uses /api/ready to ensure schema is valid before marking as started.
     startup:
       httpGet:
-        path: /api/health
+        path: /api/ready
         port: http
       initialDelaySeconds: 10
       periodSeconds: 5
+      timeoutSeconds: 5
       failureThreshold: 30
 
   # Additional pod annotations (e.g. for Vault agent injector)
