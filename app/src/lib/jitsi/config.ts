@@ -151,3 +151,38 @@ export const moderatorFeatures: JitsiJwtFeatures = {
   'screen-sharing': true,
   'outbound-call': false,
 };
+
+/**
+ * Instant call: participants get full AV (mic, camera, screen share)
+ * but NOT recording — only the creator (moderator) can record.
+ */
+export const instantCallToolbarButtons = [
+  'microphone',
+  'camera',
+  'select-background',
+  'desktop',
+  'fullscreen',
+  'filmstrip',
+  'tileview',
+  'settings',
+  'raisehand',
+  'chat',
+  'reactions',
+  'participants-pane',
+  'shareaudio',
+];
+
+export const instantCallModeratorToolbarButtons = [
+  ...instantCallToolbarButtons,
+  'hangup',
+  'mute-everyone',
+  'security',
+];
+
+export const instantCallConfigOverwrite = {
+  ...jitsiConfigOverwrite,
+  enableFileSharing: true,
+  disableChat: false,
+  startWithAudioMuted: true,
+  startWithVideoMuted: true,
+};

@@ -256,6 +256,7 @@
       "settings": "System settings",
       "eventsList": "Event list",
       "newEvent": "New event",
+      "calendar": "Calendar",
       "templates": "Templates",
       "analytics": "Analytics",
       "infrastructure": "Infrastructure",
@@ -539,6 +540,8 @@
         "guestAccessEnabledHelp": "Allow guest access to live events",
         "publicRegistrationEnabled": "Public registration enabled",
         "publicRegistrationEnabledHelp": "Anyone can create events (if disabled, only admins can)",
+        "calendarPublic": "Public calendar",
+        "calendarPublicHelp": "Publish the event calendar. Visitors can see scheduled events.",
         "githubUrl": "GitHub repository URL",
         "supportEmail": "Support email"
       }
@@ -599,6 +602,19 @@
       "pickerTitle": "Choose a template",
       "pickerSubtitle": "Select a template to pre-configure event settings, or skip to configure everything manually.",
       "skipTemplate": "Configure manually"
+    },
+    "instantCall": {
+      "title": "Instant video call",
+      "subtitle": "Create a video call on the fly and share the link. No scheduling needed.",
+      "nameLabel": "Call name",
+      "namePlaceholder": "e.g. Quick sync, Project demo...",
+      "moderatorLabel": "Your name (optional)",
+      "moderatorPlaceholder": "Shown in the call",
+      "create": "Create and join",
+      "creating": "Creating...",
+      "copyLink": "Copy invite link",
+      "copied": "Copied!",
+      "hint": "Everyone can enable microphone, webcam and share screen. Only you can record and end the call."
     },
     "files": {
       "title": "Files and materials",
@@ -1009,6 +1025,29 @@
     "title": "Reactions",
     "sendReaction": "Send reaction",
     "reactionSent": "Reaction sent!"
+  },
+  "calendar": {
+    "title": "Event calendar",
+    "subtitle": "View all events over time",
+    "publicTitle": "Event calendar",
+    "publicSubtitle": "Discover upcoming events",
+    "today": "Today",
+    "prev": "Previous period",
+    "next": "Next period",
+    "views": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year",
+      "list": "List"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published",
+      "LIVE": "Live",
+      "ENDED": "Ended",
+      "ARCHIVED": "Archived"
+    }
   },
   "footer": {
     "departmentName": "Department for Digital Transformation",

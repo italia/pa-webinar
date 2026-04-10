@@ -35,6 +35,7 @@ interface EventInfo {
   startsAt: string;
   endsAt: string;
   status: string;
+  eventType?: string;
   recordingEnabled: boolean;
   qaEnabled: boolean;
   chatEnabled: boolean;
@@ -427,6 +428,7 @@ export default function LiveEventClient({
 
   // ── Ready: Jitsi room ──
   const isActualModerator = credentials.role === 'moderator';
+  const isInstantCall = event.eventType === 'INSTANT';
 
   return (
     <div className="d-flex flex-column live-page-bg" style={{ height: 'calc(100vh - 80px)' }}>
@@ -450,11 +452,13 @@ export default function LiveEventClient({
         />
       )}
 
-      <PresentationTimer
-        eventSlug={event.slug}
-        token={token}
-        isModerator={isActualModerator}
-      />
+      {!isInstantCall && (
+        <PresentationTimer
+          eventSlug={event.slug}
+          token={token}
+          isModerator={isActualModerator}
+        />
+      )}
 
       <div className="d-flex flex-column flex-lg-row flex-grow-1" style={{ minHeight: 0 }}>
         <div className="d-flex flex-column flex-grow-1" style={{ minHeight: '300px' }}>
@@ -469,6 +473,7 @@ export default function LiveEventClient({
               participantsCanUnmute={event.participantsCanUnmute}
               participantsCanStartVideo={event.participantsCanStartVideo}
               participantsCanShareScreen={event.participantsCanShareScreen}
+              enableFileSharing={isInstantCall}
               watermark={watermark}
               onReady={handleJitsiReady}
               onLeft={handleJitsiLeft}
@@ -477,16 +482,18 @@ export default function LiveEventClient({
               onApiReady={handleApiReady}
             />
           </div>
-          <ReactionBar eventSlug={event.slug} />
+          {!isInstantCall && <ReactionBar eventSlug={event.slug} />}
         </div>
 
-        <LiveSidebar
-          eventSlug={event.slug}
-          token={token}
-          isModerator={isActualModerator}
-          qaEnabled={event.qaEnabled}
-          jitsiApi={jitsiApi}
-        />
+        {!isInstantCall && (
+          <LiveSidebar
+            eventSlug={event.slug}
+            token={token}
+            isModerator={isActualModerator}
+            qaEnabled={event.qaEnabled}
+            jitsiApi={jitsiApi}
+          />
+        )}
       </div>
 
       {showFeedback && (

@@ -22,6 +22,7 @@ interface EventSummary {
   startsAt: string;
   endsAt: string;
   status: string;
+  eventType?: string;
   registrationCount: number;
   maxParticipants: number;
   moderatorToken: string;
@@ -58,6 +59,7 @@ export default function AdminDashboardClient({
         const endsAt = new Date(event.endsAt);
         const isLive = event.status === 'LIVE';
         const isEnded = event.status === 'ENDED';
+        const isInstant = event.eventType === 'INSTANT';
         const occupancyPct = Math.min(
           100,
           (event.registrationCount / event.maxParticipants) * 100,
@@ -79,6 +81,19 @@ export default function AdminDashboardClient({
               <CardBody className="p-4 d-flex flex-column">
                 <div className="d-flex align-items-center gap-2 mb-3">
                   <StatusBadge status={event.status} />
+                  {isInstant && (
+                    <Badge
+                      color=""
+                      className="px-2 py-1"
+                      style={{
+                        fontSize: '0.7rem',
+                        backgroundColor: 'rgba(0,135,88,0.1)',
+                        color: '#008758',
+                      }}
+                    >
+                      Instant
+                    </Badge>
+                  )}
                   {isLive && (
                     <Badge
                       color="success"

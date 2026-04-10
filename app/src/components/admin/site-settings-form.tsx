@@ -1009,6 +1009,18 @@ function FeaturesTab({ settings, updateField }: TabProps) {
           {t('publicRegistrationEnabledHelp')}
         </small>
       </div>
+      <div className="mb-4">
+        <ToggleSwitch
+          label={t('calendarPublic')}
+          checked={settings.calendarPublic ?? false}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField('calendarPublic', e.target.checked)
+          }
+        />
+        <small className="text-muted d-block mt-1">
+          {t('calendarPublicHelp')}
+        </small>
+      </div>
       <hr className="my-4" />
       <Row>
         <Col md={6}>

@@ -37,6 +37,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     position: settings.jitsiWatermarkPosition,
   };
 
+  const isInstant = event.eventType === 'INSTANT';
+
   // No token: guest access or redirect
   if (!token) {
     if (event.status === 'LIVE') {
@@ -50,7 +52,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             startsAt: event.startsAt.toISOString(),
             endsAt: event.endsAt.toISOString(),
             status: event.status,
-            recordingEnabled: event.recordingEnabled,
+            eventType: event.eventType,
+            recordingEnabled: isInstant ? false : event.recordingEnabled,
             qaEnabled: event.qaEnabled,
             chatEnabled: event.chatEnabled,
             waitingRoomAudioUrl: event.waitingRoomAudioUrl,
@@ -69,6 +72,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           jibriAvailable={jibriAvailable}
         />
       );
+    }
+    if (isInstant) {
+      notFound();
     }
     redirect(`/${locale}/eventi/${slug}/registrazione`);
   }
@@ -99,6 +105,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),
         status: event.status,
+        eventType: event.eventType,
         recordingEnabled: event.recordingEnabled,
         qaEnabled: event.qaEnabled,
         chatEnabled: event.chatEnabled,

@@ -37,6 +37,7 @@ const updateSettingsSchema = z.object({
   statusPageEnabled: z.boolean().optional(),
   guestAccessEnabled: z.boolean().optional(),
   publicRegistrationEnabled: z.boolean().optional(),
+  calendarPublic: z.boolean().optional(),
   jitsiWatermarkUrl: z.string().url().nullish(),
   jitsiWatermarkEnabled: z.boolean().optional(),
   jitsiWatermarkOpacity: z.number().min(0).max(1).optional(),

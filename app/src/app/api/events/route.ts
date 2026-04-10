@@ -134,6 +134,7 @@ export const GET = withErrorHandling(async (request) => {
         chatEnabled: event.chatEnabled,
         recordingEnabled: event.recordingEnabled,
         status: event.status,
+        eventType: event.eventType,
         recordingUrl: event.recordingUrl,
         moderatorToken: event.moderatorToken,
       };
@@ -174,6 +175,7 @@ export const GET = withErrorHandling(async (request) => {
       qaEnabled: event.qaEnabled,
       recordingEnabled: event.recordingEnabled,
       status: event.status,
+      eventType: event.eventType,
       recordingUrl: event.recordingUrl,
     };
   });

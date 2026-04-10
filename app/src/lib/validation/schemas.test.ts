@@ -11,6 +11,7 @@ import {
   createPollSchema,
   updatePollStatusSchema,
   pollVoteSchema,
+  createInstantCallSchema,
   VALID_OFFSETS,
 } from './schemas';
 
@@ -527,5 +528,70 @@ describe('createReminderSchema', () => {
   it('rejects non-integer offset', () => {
     const result = createReminderSchema.safeParse({ offsetMinutes: 60.5 });
     expect(result.success).toBe(false);
+  });
+});
+
+// ── createInstantCallSchema ─────────────────────────────────
+
+describe('createInstantCallSchema', () => {
+  it('accepts valid minimal input (title only)', () => {
+    const result = createInstantCallSchema.safeParse({ titleIt: 'Quick sync' });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts with moderatorName', () => {
+    const result = createInstantCallSchema.safeParse({
+      titleIt: 'Demo progetto',
+      moderatorName: 'Mario Rossi',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.moderatorName).toBe('Mario Rossi');
+    }
+  });
+
+  it('rejects missing titleIt', () => {
+    const result = createInstantCallSchema.safeParse({});
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects titleIt shorter than 2 chars', () => {
+    const result = createInstantCallSchema.safeParse({ titleIt: 'A' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects titleIt longer than 200 chars', () => {
+    const result = createInstantCallSchema.safeParse({ titleIt: 'X'.repeat(201) });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts titleIt at exactly 200 chars', () => {
+    const result = createInstantCallSchema.safeParse({ titleIt: 'X'.repeat(200) });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects moderatorName shorter than 2 chars', () => {
+    const result = createInstantCallSchema.safeParse({
+      titleIt: 'Valid title',
+      moderatorName: 'A',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('moderatorName is optional (undefined)', () => {
+    const result = createInstantCallSchema.safeParse({ titleIt: 'Valid title' });
+    if (result.success) {
+      expect(result.data.moderatorName).toBeUndefined();
+    }
+  });
+
+  it('does not require dates, descriptions, or other event fields', () => {
+    const result = createInstantCallSchema.safeParse({
+      titleIt: 'Instant call',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual({ titleIt: 'Instant call' });
+    }
   });
 });
