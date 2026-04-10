@@ -28,7 +28,7 @@ export default function CreateInstantCall() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          titleIt: title.trim(),
+          title: { it: title.trim() },
           moderatorName: moderatorName.trim() || undefined,
         }),
       });

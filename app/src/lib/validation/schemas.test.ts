@@ -21,8 +21,8 @@ const futureDate = (hoursFromNow: number) =>
   new Date(Date.now() + hoursFromNow * 3600_000).toISOString();
 
 const validEvent = () => ({
-  titleIt: 'PA Digitale 2026',
-  descriptionIt: 'Un evento sulla digitalizzazione della PA italiana.',
+  title: { it: 'PA Digitale 2026' },
+  description: { it: 'Un evento sulla digitalizzazione della PA italiana.' },
   startsAt: futureDate(24),
   endsAt: futureDate(26),
 });
@@ -38,8 +38,8 @@ describe('createEventSchema', () => {
   it('accepts valid full input', () => {
     const result = createEventSchema.safeParse({
       ...validEvent(),
-      titleEn: 'PA Digital 2026',
-      descriptionEn: 'An event about Italian PA digitalization.',
+      title: { it: 'PA Digitale 2026', en: 'PA Digital 2026' },
+      description: { it: 'Un evento sulla digitalizzazione della PA italiana.', en: 'An event about Italian PA digitalization.' },
       timezone: 'Europe/Rome',
       maxParticipants: 100,
       qaEnabled: false,
@@ -47,7 +47,7 @@ describe('createEventSchema', () => {
       recordingEnabled: true,
       moderatorName: 'Mario Rossi',
       moderatorEmail: 'mario@example.com',
-      speakersIt: 'Mario Rossi, Luigi Verdi',
+      speakersInfo: { it: 'Mario Rossi, Luigi Verdi' },
       organizerName: 'DTD',
       privacyPolicyUrl: 'https://example.com/privacy',
       privacyPolicyText: 'Testo privacy',
@@ -57,25 +57,35 @@ describe('createEventSchema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('rejects missing titleIt', () => {
-    const { titleIt: _, ...rest } = validEvent();
+  it('rejects missing title', () => {
+    const { title: _, ...rest } = validEvent();
     const result = createEventSchema.safeParse(rest);
     expect(result.success).toBe(false);
   });
 
-  it('rejects missing descriptionIt', () => {
-    const { descriptionIt: _, ...rest } = validEvent();
+  it('rejects missing description', () => {
+    const { description: _, ...rest } = validEvent();
     const result = createEventSchema.safeParse(rest);
     expect(result.success).toBe(false);
   });
 
-  it('rejects titleIt shorter than 3 chars', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), titleIt: 'AB' });
+  it('rejects title.it shorter than 3 chars', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), title: { it: 'AB' } });
     expect(result.success).toBe(false);
   });
 
-  it('rejects descriptionIt shorter than 10 chars', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), descriptionIt: 'Short' });
+  it('rejects description.it shorter than 10 chars', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), description: { it: 'Short' } });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects title without it locale', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), title: { en: 'English only' } });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects description without it locale', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), description: { en: 'English only description here.' } });
     expect(result.success).toBe(false);
   });
 
@@ -203,7 +213,7 @@ describe('updateEventSchema', () => {
   });
 
   it('accepts partial update with just title', () => {
-    const result = updateEventSchema.safeParse({ titleIt: 'Nuovo Titolo' });
+    const result = updateEventSchema.safeParse({ title: { it: 'Nuovo Titolo' } });
     expect(result.success).toBe(true);
   });
 
@@ -535,13 +545,13 @@ describe('createReminderSchema', () => {
 
 describe('createInstantCallSchema', () => {
   it('accepts valid minimal input (title only)', () => {
-    const result = createInstantCallSchema.safeParse({ titleIt: 'Quick sync' });
+    const result = createInstantCallSchema.safeParse({ title: { it: 'Quick sync' } });
     expect(result.success).toBe(true);
   });
 
   it('accepts with moderatorName', () => {
     const result = createInstantCallSchema.safeParse({
-      titleIt: 'Demo progetto',
+      title: { it: 'Demo progetto' },
       moderatorName: 'Mario Rossi',
     });
     expect(result.success).toBe(true);
@@ -550,36 +560,31 @@ describe('createInstantCallSchema', () => {
     }
   });
 
-  it('rejects missing titleIt', () => {
+  it('rejects missing title', () => {
     const result = createInstantCallSchema.safeParse({});
     expect(result.success).toBe(false);
   });
 
-  it('rejects titleIt shorter than 2 chars', () => {
-    const result = createInstantCallSchema.safeParse({ titleIt: 'A' });
+  it('rejects title.it shorter than 2 chars', () => {
+    const result = createInstantCallSchema.safeParse({ title: { it: 'A' } });
     expect(result.success).toBe(false);
   });
 
-  it('rejects titleIt longer than 200 chars', () => {
-    const result = createInstantCallSchema.safeParse({ titleIt: 'X'.repeat(201) });
+  it('rejects title without it locale', () => {
+    const result = createInstantCallSchema.safeParse({ title: { en: 'English only' } });
     expect(result.success).toBe(false);
-  });
-
-  it('accepts titleIt at exactly 200 chars', () => {
-    const result = createInstantCallSchema.safeParse({ titleIt: 'X'.repeat(200) });
-    expect(result.success).toBe(true);
   });
 
   it('rejects moderatorName shorter than 2 chars', () => {
     const result = createInstantCallSchema.safeParse({
-      titleIt: 'Valid title',
+      title: { it: 'Valid title' },
       moderatorName: 'A',
     });
     expect(result.success).toBe(false);
   });
 
   it('moderatorName is optional (undefined)', () => {
-    const result = createInstantCallSchema.safeParse({ titleIt: 'Valid title' });
+    const result = createInstantCallSchema.safeParse({ title: { it: 'Valid title' } });
     if (result.success) {
       expect(result.data.moderatorName).toBeUndefined();
     }
@@ -587,11 +592,11 @@ describe('createInstantCallSchema', () => {
 
   it('does not require dates, descriptions, or other event fields', () => {
     const result = createInstantCallSchema.safeParse({
-      titleIt: 'Instant call',
+      title: { it: 'Instant call' },
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data).toEqual({ titleIt: 'Instant call' });
+      expect(result.data).toEqual({ title: { it: 'Instant call' } });
     }
   });
 });

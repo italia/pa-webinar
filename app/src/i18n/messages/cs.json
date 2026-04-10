@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "Události DTD",
+    "appDescription": "Platforma pro veřejné digitální události Odboru pro digitální transformaci",
+    "loading": "Načítání...",
+    "error": "Došlo k chybě",
+    "errorMessage": "Něco se pokazilo. Zkuste to prosím znovu.",
+    "retry": "Zkusit znovu",
+    "save": "Uložit",
+    "cancel": "Zrušit",
+    "confirm": "Potvrdit",
+    "close": "Zavřít",
+    "back": "Zpět",
+    "next": "Další",
+    "send": "Odeslat",
+    "delete": "Smazat",
+    "edit": "Upravit",
+    "search": "Hledat",
+    "noResults": "Žádné výsledky",
+    "requiredField": "Povinné pole"
+  },
+  "nav": {
+    "home": "Domů",
+    "events": "Události",
+    "about": "Informace",
+    "privacy": "Ochrana osobních údajů",
+    "admin": "Administrace",
+    "language": "Jazyk",
+    "switchLanguage": "Změnit jazyk",
+    "skipToContent": "Přejít na obsah",
+    "skipToFooter": "Přejít na zápatí"
+  },
+  "header": {
+    "slimTitle": "Předsednictví Rady ministrů",
+    "slimSubtitle": "Odbor pro digitální transformaci",
+    "followUs": "Sledujte nás na"
+  },
+  "events": {
+    "title": "Události",
+    "upcoming": "Nadcházející události",
+    "past": "Minulé události",
+    "noUpcoming": "V tuto chvíli nejsou naplánovány žádné události. Navštivte nás znovu!",
+    "noPast": "Žádné minulé události",
+    "card": {
+      "publicEvent": "Veřejná událost",
+      "readMore": "Zjistit více",
+      "liveNow": "Právě probíhá",
+      "spotsAvailable": "{count} volných míst",
+      "fullyBooked": "Obsazeno",
+      "ended": "Ukončeno",
+      "occupiedSpots": "{registered}/{max} registrovaných"
+    },
+    "detail": {
+      "title": "Detail události",
+      "date": "Datum a čas",
+      "duration": "Délka trvání",
+      "durationHours": "{hours} h {minutes} min",
+      "timezone": "Časové pásmo",
+      "description": "Popis",
+      "participants": "Účastníci",
+      "maxParticipants": "{count} míst celkem",
+      "spotsLeft": "{count} zbývajících míst",
+      "occupiedSpots": "{registered} z {max} míst obsazeno",
+      "full": "Obsazeno",
+      "register": "Registrovat se na událost",
+      "registerAndJoin": "Registrovat se a připojit",
+      "registered": "Jste registrováni",
+      "enterEvent": "Vstoupit do události",
+      "eventEnded": "Událost skončila",
+      "eventHeldOn": "Tato událost se konala dne {date}",
+      "totalRegistrations": "{count} registrovaných účastníků",
+      "recording": "Záznam je k dispozici",
+      "noRecording": "Videozáznam není pro tuto událost k dispozici.",
+      "watchRecording": "Přehrát záznam",
+      "backToEvents": "Zpět na události",
+      "speakers": "Přednášející",
+      "organizer": "Organizátor",
+      "chatNotSaved": "Zprávy z chatu nejsou po skončení události uchovávány.",
+      "qaPostEvent": "Otázky a odpovědi z události",
+      "peakParticipants": "Špička: {count} účastníků",
+      "calendar": {
+        "addToCalendar": "Přidat do kalendáře",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": "Stáhnout soubor .ics"
+      }
+    },
+    "manage": {
+      "toggleChat": "Chat",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Záznam",
+      "settingsSection": "Nastavení události"
+    },
+    "status": {
+      "DRAFT": "Koncept",
+      "PUBLISHED": "Publikováno",
+      "LIVE": "Právě probíhá",
+      "ENDED": "Ukončeno",
+      "ARCHIVED": "Archivováno"
+    }
+  },
+  "registration": {
+    "title": "Registrace na událost",
+    "name": "Jméno a příjmení",
+    "namePlaceholder": "Vaše jméno bude zobrazeno v místnosti události",
+    "email": "E-mail",
+    "emailPlaceholder": "Obdržíte odkaz pro přístup k události",
+    "gdprConsent": "Souhlasím se zpracováním svých osobních údajů (jméno, e-mail) v souladu s nařízením EU 2016/679 (GDPR) za účelem účasti na této události.",
+    "gdprLink": "Přečtěte si úplné zásady ochrany osobních údajů",
+    "submit": "Potvrdit registraci",
+    "submitting": "Probíhá registrace...",
+    "success": "Registrace dokončena!",
+    "successMessage": "Obdržíte potvrzovací e-mail s odkazem pro přístup k události.",
+    "alreadyRegistered": "Na tuto událost jste již registrováni",
+    "backToEvent": "Zpět na událost",
+    "organization": "Organizace",
+    "organizationPlaceholder": "např. AGID, Ministerstvo hospodářství, Obec Praha",
+    "organizationRole": "Pozice v organizaci",
+    "organizationRolePlaceholder": "např. Manažer digitální transformace, Vývojář",
+    "organizationType": "Typ organizace",
+    "organizationTypePlaceholder": "Vyberte typ...",
+    "organizationTypes": {
+      "MINISTRY": "Ministerstvo",
+      "AGENCY": "Agentura",
+      "REGION": "Kraj",
+      "PROVINCE": "Okres",
+      "MUNICIPALITY": "Obec",
+      "ASL": "ASL (místní zdravotnická organizace)",
+      "UNIVERSITY": "Univerzita",
+      "PUBLIC_ENTITY": "Veřejný subjekt",
+      "IN_HOUSE": "In-house společnost",
+      "OTHER": "Jiné"
+    },
+    "gdprConsentProfiling": "Údaje o organizaci budou zpracovány pro statistické účely.",
+    "errors": {
+      "nameRequired": "Zadejte své jméno",
+      "emailRequired": "Zadejte svůj e-mail",
+      "emailInvalid": "Zadejte platný e-mail",
+      "organizationRequired": "Zadejte svou organizaci",
+      "consentRequired": "Souhlas se zpracováním údajů je povinný",
+      "recordingConsentRequired": "Souhlas s nahráváním je pro tuto událost povinný",
+      "eventFull": "Událost dosáhla maximálního počtu účastníků",
+      "generic": "Chyba při registraci. Zkuste to znovu."
+    }
+  },
+  "live": {
+    "title": "Místnost události",
+    "connecting": "Připojování...",
+    "connectionError": "Nelze se připojit k místnosti. Zkontrolujte připojení a zkuste to znovu.",
+    "recordingActive": "Probíhá nahrávání",
+    "recordingConsent": "Tato událost je nahrávána. Vstupem souhlasíte s audio/video záznamem.",
+    "recordingConsentTitle": "Souhlas s nahráváním",
+    "declineRecording": "Neúčastnit se",
+    "enterRoom": "Vstoupit do místnosti",
+    "leaveRoom": "Opustit místnost",
+    "eventNotStarted": "Událost ještě nezačala",
+    "eventStartsAt": "Událost začne {date} v {time}",
+    "countdown": "Zbývající čas",
+    "waitingRoomHint": "Tato stránka se automaticky aktualizuje, jakmile moderátor zahájí událost. Není třeba stránku znovu načítat.",
+    "startEventButton": "Zahájit událost",
+    "startingEvent": "Zahajování...",
+    "chatNotSaved": "Zprávy z chatu nejsou po skončení události uchovávány.",
+    "registerAndJoin": "Registrovat se a připojit",
+    "registerNow": "Právě probíhá — Registrujte se!",
+    "enableMusic": "Zapnout hudbu",
+    "disableMusic": "Vypnout hudbu",
+    "preJoinSubtitle": "Chystáte se vstoupit do místnosti události",
+    "preJoinNameLabel": "Vaše jméno",
+    "guestJoinSubtitle": "Připojte se jako host k probíhající události",
+    "guestJoinButton": "Připojit se jako host",
+    "guestRedirectToRegister": "Událost ještě nezačala. Zaregistrujte se pro získání přístupového odkazu.",
+    "jibriUnavailable": "Nahrávání nedostupné — Jibri není nakonfigurován",
+    "jibriNotConfigured": "Nahrávání není v infrastruktuře nakonfigurováno",
+    "eventEnded": "Událost skončila",
+    "eventEndedMessage": "Událost skončila. Děkujeme za účast.",
+    "backToEvent": "Zpět na událost",
+    "moderatorBadge": "Moderátor",
+    "qaSidebarPlaceholder": "Panel Q&A bude dostupný po zahájení události.",
+    "invalidToken": "Neplatný odkaz. Zkontrolujte odkaz, který jste obdrželi e-mailem.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Ankety",
+    "sidebarTabMaterials": "Materiály",
+    "sidebarTabParticipants": "Účastníci",
+    "role": {
+      "moderator": "Moderátor",
+      "participant": "Účastník",
+      "guest": "Host"
+    },
+    "participants": {
+      "title": "Účastníci",
+      "noParticipants": "Žádní účastníci",
+      "kick": "Vyloučit",
+      "kickConfirm": "Opravdu chcete vyloučit tohoto účastníka?"
+    },
+    "moderator": {
+      "muteAll": "Ztlumit všechny",
+      "unmuteAll": "Zapnout zvuk všem",
+      "startRecording": "Zahájit nahrávání",
+      "stopRecording": "Zastavit nahrávání",
+      "toggleChat": "Chat zap/vyp",
+      "endEvent": "Ukončit událost",
+      "endEventConfirm": "Opravdu chcete ukončit událost pro všechny účastníky?",
+      "participantCount": "{count} účastníků",
+      "raisedHands": "Zvednuté ruce",
+      "noRaisedHands": "Žádné zvednuté ruce",
+      "giveFloor": "Udělit slovo",
+      "approveAudio": "Udělit slovo (audio)",
+      "approveVideo": "Udělit slovo (video)",
+      "approveAll": "Udělit slovo",
+      "audioOnly": "Pouze audio",
+      "audioModeration": "Mikrofon účastníků",
+      "videoModeration": "Video účastníků",
+      "eventEndedSuccess": "Událost úspěšně ukončena. Přesměrování..."
+    }
+  },
+  "qa": {
+    "title": "Otázky a odpovědi",
+    "askQuestion": "Položit otázku",
+    "placeholder": "Napište svou otázku (max. 500 znaků)",
+    "submit": "Odeslat otázku",
+    "submitting": "Odesílání...",
+    "questionSent": "Otázka odeslána!",
+    "cooldownWait": "Počkejte {seconds} s...",
+    "upvote": "Hlasovat",
+    "upvoted": "Hlasováno",
+    "noQuestions": "Zatím žádné otázky. Buďte první!",
+    "qaPersistenceNote": "Otázky jsou uloženy a budou dostupné i po skončení události.",
+    "qaPostEvent": "Otázky a odpovědi z události",
+    "noAnsweredQuestions": "Žádné zodpovězené otázky k této události.",
+    "filterAll": "Všechny",
+    "showPanel": "Zobrazit Q&A",
+    "hidePanel": "Skrýt Q&A",
+    "status": {
+      "PENDING": "Čeká na vyřízení",
+      "HIGHLIGHTED": "Zvýrazněno",
+      "ANSWERED": "Zodpovězeno",
+      "DISMISSED": "Zamítnuto"
+    },
+    "moderator": {
+      "highlight": "Zvýraznit",
+      "markAnswered": "Zodpovězeno",
+      "dismiss": "Zamítnout",
+      "resetToPending": "Obnovit"
+    },
+    "errors": {
+      "textRequired": "Napište svou otázku",
+      "tooLong": "Otázka nesmí přesáhnout 500 znaků",
+      "rateLimit": "Počkejte prosím, než odešlete další otázku",
+      "generic": "Chyba při odesílání otázky"
+    }
+  },
+  "polls": {
+    "title": "Ankety",
+    "showPanel": "Zobrazit ankety",
+    "hidePanel": "Skrýt ankety",
+    "createPoll": "Vytvořit anketu",
+    "noPolls": "Žádné ankety. Moderátor je vytvoří během události.",
+    "questionPlaceholder": "Napište otázku ankety...",
+    "optionPlaceholder": "Možnost {number}",
+    "addOption": "Přidat možnost",
+    "removeOption": "Odebrat možnost",
+    "create": "Vytvořit",
+    "creating": "Vytváření...",
+    "cancelCreate": "Zrušit",
+    "closePoll": "Ukončit hlasování",
+    "publishResults": "Zveřejnit výsledky",
+    "reopenPoll": "Znovu otevřít",
+    "totalVotes": "{count} hlasů",
+    "voted": "Hlasovali jste",
+    "status": {
+      "OPEN": "Otevřeno",
+      "CLOSED": "Uzavřeno",
+      "PUBLISHED": "Výsledky"
+    },
+    "errors": {
+      "questionRequired": "Napište otázku ankety",
+      "minOptions": "Jsou vyžadovány alespoň 2 možnosti",
+      "generic": "Chyba při vytváření ankety"
+    }
+  },
+  "materials": {
+    "title": "Materiály",
+    "postEventTitle": "Materiály události",
+    "addMaterial": "Přidat materiál",
+    "titleLabel": "Název",
+    "urlLabel": "URL odkazu",
+    "descriptionLabel": "Popis (volitelný)",
+    "addedBy": "Přidal/a {name}",
+    "noMaterials": "Žádné sdílené materiály.",
+    "confirmDelete": "Opravdu chcete smazat tento materiál?",
+    "materialAdded": "Materiál přidán",
+    "materialDeleted": "Materiál smazán",
+    "deleteMaterial": "Smazat materiál",
+    "add": "Přidat",
+    "adding": "Přidávání...",
+    "cancel": "Zrušit",
+    "errors": {
+      "urlInvalid": "Zadejte platný URL",
+      "generic": "Chyba při přidávání materiálu"
+    }
+  },
+  "reminders": {
+    "title": "Upozornění",
+    "addReminder": "Přidat upozornění",
+    "removeReminder": "Odebrat",
+    "maxReminders": "Maximálně 5 upozornění na událost.",
+    "selectPreset": "Vyberte kdy...",
+    "sentStatus": "{count} odesláno",
+    "notSent": "Neodesláno",
+    "presets": {
+      "7days": "7 dní předem",
+      "3days": "3 dny předem",
+      "1day": "1 den předem",
+      "12hours": "12 hodin předem",
+      "6hours": "6 hodin předem",
+      "3hours": "3 hodiny předem",
+      "1hour": "1 hodinu předem",
+      "30min": "30 minut předem",
+      "15min": "15 minut předem"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Správa událostí",
+      "settings": "Nastavení systému",
+      "eventsList": "Seznam událostí",
+      "newEvent": "Nová událost",
+      "calendar": "Kalendář",
+      "templates": "Šablony",
+      "analytics": "Statistiky",
+      "infrastructure": "Infrastruktura",
+      "settingsGeneral": "Obecné",
+      "settingsLanguages": "Jazyky",
+      "ariaLabel": "Navigace administrace",
+      "subNavAriaLabel": "Navigace sekce"
+    },
+    "landing": {
+      "title": "Administrační panel",
+      "subtitle": "Spravujte události a konfigurujte platformu",
+      "eventsTitle": "Správa událostí",
+      "eventsDescription": "Vytvářejte, upravujte a spravujte události, šablony a statistiky.",
+      "settingsTitle": "Nastavení systému",
+      "settingsDescription": "Konfigurujte branding, obsah, jazyky, funkce a infrastrukturu.",
+      "liveNow": "{count, plural, one {# událost živě} few {# události živě} other {# událostí živě}}",
+      "upcomingEvents": "{count, plural, one {# nadcházející událost} few {# nadcházející události} other {# nadcházejících událostí}}"
+    },
+    "recording": {
+      "title": "Videozáznam",
+      "play": "Přehrát",
+      "download": "Stáhnout",
+      "delete": "Smazat záznam",
+      "deleteConfirm": "Opravdu chcete smazat tento záznam? Tuto akci nelze vrátit zpět.",
+      "notConfigured": "Videozáznam není k dispozici. Jibri není v infrastruktuře nakonfigurován.",
+      "inProgress": "Nahrávání probíhá..."
+    },
+    "login": {
+      "title": "Přístup administrátora",
+      "keyLabel": "Přístupový klíč",
+      "keyPlaceholder": "Zadejte přístupový klíč",
+      "submit": "Přihlásit se",
+      "invalidKey": "Neplatný přístupový klíč",
+      "logout": "Odhlásit se"
+    },
+    "title": "Správa událostí",
+    "subtitle": "Administrační panel",
+    "createEvent": "Vytvořit novou událost",
+    "editEvent": "Upravit událost",
+    "deleteEvent": "Smazat událost",
+    "deleteConfirm": "Opravdu chcete smazat tuto událost? Tuto akci nelze vrátit zpět.",
+    "publish": "Publikovat",
+    "unpublish": "Zrušit publikaci",
+    "noToken": "Pro správu událostí použijte odkaz moderátora, který jste obdrželi e-mailem.",
+    "noEvents": "Nebyly nalezeny žádné události. Vytvořte svou první událost.",
+    "eventDetails": "Detail události",
+    "registrations": "Registrace",
+    "registrationCount": "{count} registrací",
+    "noRegistrations": "Zatím žádní registrovaní účastníci. Sdílejte odkaz na událost!",
+    "exportCsv": "Exportovat CSV",
+    "organization": "Organizace",
+    "organizationType": "Typ",
+    "registrationDate": "Datum registrace",
+    "joined": "Připojil/a se",
+    "notJoined": "Nepřipojil/a se",
+    "deleteSuccess": "Událost smazána",
+    "publishSuccess": "Událost publikována",
+    "unpublishSuccess": "Publikace události zrušena",
+    "startEvent": "Zahájit událost",
+    "startEventSuccess": "Událost zahájena! Čekající účastníci budou automaticky přesměrováni.",
+    "jvbWarmupWarning": "Video servery se spouštějí (přibližně 2 minuty). Účastníci uvidí upozornění v čekárně.",
+    "eventIsLive": "Událost právě probíhá",
+    "joinAsModeratorBtn": "Připojit se jako moderátor",
+    "openPublicPage": "Otevřít veřejnou stránku",
+    "quickActions": "Rychlé akce",
+    "liveRoomLink": "Odkaz na místnost události",
+    "manage": "Spravovat",
+    "settingsSaved": "Uloženo",
+    "toggleChatDesc": "Povolit chat mezi účastníky",
+    "toggleQaDesc": "Povolit otázky s hlasováním",
+    "toggleRecordingDesc": "Nahrávat událost (vyžaduje Jibri)",
+    "eventUpdated": "Událost úspěšně aktualizována!",
+    "dateChangedNotification": "Datum bylo změněno. Registrovaní účastníci budou informováni e-mailem.",
+    "eventCreated": "Událost úspěšně vytvořena!",
+    "createEventCta": "Uspořádat událost",
+    "createEventExplanation": "Vytvořte svou událost a obdržíte odkaz pro její správu.",
+    "noAccountNeeded": "Nepotřebujete účet — odkaz moderátora je váš přístup ke správě události.",
+    "form": {
+      "titleIt": "Název (italsky)",
+      "titleEn": "Název (anglicky)",
+      "descriptionIt": "Popis (italsky)",
+      "descriptionEn": "Popis (anglicky)",
+      "startsAt": "Datum a čas zahájení",
+      "endsAt": "Datum a čas ukončení",
+      "maxParticipants": "Maximální počet účastníků",
+      "qaEnabled": "Povolit Q&A",
+      "chatEnabled": "Povolit chat",
+      "recordingEnabled": "Povolit videozáznam",
+      "dataRetentionDays": "Uchovávání dat (dny po události)",
+      "dataRetentionHint": "Po uplynutí tohoto období budou automaticky smazány registrace účastníků, otázky Q&A a případné videozáznamy.",
+      "privacyPolicyUrl": "URL zásad ochrany osobních údajů",
+      "moderatorName": "Jméno moderátora",
+      "moderatorEmail": "E-mail moderátora",
+      "speakersIt": "Přednášející (italsky)",
+      "speakersEn": "Přednášející (anglicky)",
+      "organizerName": "Organizátor",
+      "imageUrl": "URL titulního obrázku",
+      "waitingRoomAudioUrl": "URL audia v čekárně (volitelné)",
+      "waitingRoomAudioUrlHint": "Zadejte URL souboru MP3 pro hudbu v čekárně. Ponechte prázdné pro výchozí audio.",
+      "submit": "Vytvořit událost",
+      "submitEdit": "Uložit změny",
+      "saving": "Ukládání...",
+      "creating": "Vytváření...",
+      "sectionContent": "Obsah",
+      "sectionSchedule": "Plánování",
+      "sectionSettings": "Nastavení",
+      "sectionSpeakers": "Přednášející a organizátor",
+      "sectionModerator": "Moderátor",
+      "sectionRegistrationFields": "Registrační pole",
+      "requireOrganization": "Vyžadovat organizaci",
+      "requireOrganizationDesc": "Účastníci musí uvést svou organizaci",
+      "requireOrganizationRole": "Vyžadovat pozici v organizaci",
+      "requireOrganizationRoleDesc": "Účastníci mohou uvést svou pozici",
+      "requireOrganizationType": "Vyžadovat typ organizace",
+      "requireOrganizationTypeDesc": "Účastníci vyberou typ své organizace",
+      "sectionPermissions": "Oprávnění účastníků",
+      "participantsCanUnmute": "Účastníci mohou zapnout mikrofon",
+      "participantsCanStartVideo": "Účastníci mohou zapnout webkameru",
+      "participantsCanShareScreen": "Účastníci mohou sdílet obrazovku",
+      "permissionsOnDesc": "Účastníci mohou aktivovat samostatně",
+      "permissionsOffDesc": "Pouze moderátoři mohou aktivovat. Účastníci musí zvednou ruku.",
+      "permissionsNote": "Změny oprávnění se vztahují na nové účastníky.",
+      "privacyPolicyMode": "Zásady ochrany osobních údajů",
+      "privacyPolicyModeUrl": "Externí URL",
+      "privacyPolicyModeText": "Vlastní text",
+      "privacyPolicyText": "Text zásad ochrany osobních údajů",
+      "privacyPolicyTextHint": "Napište text zásad ochrany osobních údajů. Bude zobrazen přímo v registračním formuláři.",
+      "retentionPreviewTitle": "Co bude automaticky smazáno",
+      "retentionPreviewIntro": "Po {days} dnech od ukončení události bude automaticky smazáno:",
+      "retentionPreviewParticipants": "Údaje účastníků (jméno, e-mail, organizace)",
+      "retentionPreviewQa": "Otázky Q&A a hlasy",
+      "retentionPreviewPolls": "Výsledky anket",
+      "retentionPreviewRecordings": "Videozáznamy",
+      "retentionPreviewKept": "Souhrnné statistiky a metadata události jsou uchovány.",
+      "configPreview": "Náhled konfigurace",
+      "templateApplied": "Šablona použita: {name}. Můžete upravit všechna nastavení."
+    },
+    "links": {
+      "title": "Odkazy události",
+      "publicPage": "Veřejná stránka události",
+      "moderatorLink": "Odkaz moderátora",
+      "moderatorLinkHint": "Tento odkaz sdílejte pouze s moderátory. Kdokoli s tímto odkazem může událost spravovat.",
+      "copyLink": "Kopírovat odkaz",
+      "copied": "Zkopírováno!"
+    },
+    "feedbackAdmin": {
+      "title": "Výsledky zpětné vazby",
+      "averageRating": "Průměrné hodnocení",
+      "totalVotes": "{count, plural, one {# hodnocení} few {# hodnocení} other {# hodnocení}}",
+      "noFeedback": "Žádná zpětná vazba",
+      "comments": "Komentáře účastníků",
+      "noComments": "Žádné komentáře",
+      "stars": "hvězd"
+    },
+    "gdprAuditLog": {
+      "title": "Auditní protokol GDPR",
+      "date": "Datum",
+      "action": "Akce",
+      "recordCount": "Záznamy",
+      "details": "Podrobnosti",
+      "actions": {
+        "DATA_DELETED": "Data smazána",
+        "CONSENT_RECORDED": "Souhlas zaznamenán",
+        "DATA_EXPORTED": "Data exportována"
+      }
+    },
+    "settings": {
+      "title": "Nastavení webu",
+      "subtitle": "Konfigurujte vzhled a chování platformy pro opakované použití ve veřejné správě",
+      "saving": "Ukládání...",
+      "saved": "Nastavení úspěšně uloženo",
+      "tabs": {
+        "branding": "Branding",
+        "header": "Záhlaví",
+        "seo": "SEO",
+        "homepage": "Domovská stránka",
+        "pages": "Stránky",
+        "footer": "Zápatí",
+        "features": "Funkce"
+      },
+      "header": {
+        "slimBarTitle": "Horní lišta (Slim Header)",
+        "slimBarDescription": "Tenká lišta v horní části stránky identifikující nadřazenou organizaci.",
+        "parentOrganization": "Nadřazená organizace",
+        "parentOrganizationHelp": "Např. \"Předsednictví Rady ministrů\"",
+        "parentOrganizationUrl": "URL nadřazené organizace",
+        "centerBarTitle": "Centrální záhlaví",
+        "centerBarDescription": "Hlavní oblast záhlaví s názvem aplikace a logem.",
+        "appName": "Název aplikace",
+        "appNameHelp": "Zobrazeno v záhlaví a titulku prohlížeče",
+        "organizationShort": "Krátký název organizace",
+        "logoUrl": "URL loga",
+        "logoUrlHelp": "Ponechte prázdné pro výchozí ikonu veřejné správy",
+        "organizationUrl": "URL webu organizace"
+      },
+      "branding": {
+        "siteName": "Název aplikace",
+        "siteNameHelp": "Zobrazeno v záhlaví, titulku prohlížeče a e-mailech",
+        "siteDescription": "Popis aplikace",
+        "organizationName": "Název organizace",
+        "organizationNameHelp": "např. Odbor pro digitální transformaci",
+        "organizationNameShort": "Zkratka organizace",
+        "organizationUrl": "URL organizace",
+        "parentOrganization": "Nadřazená organizace",
+        "parentOrganizationHelp": "např. Předsednictví Rady ministrů",
+        "parentOrganizationUrl": "URL nadřazené organizace",
+        "logoUrl": "URL vlastního loga",
+        "logoUrlHelp": "Ponechte prázdné pro výchozí ikonu veřejné správy",
+        "faviconUrl": "URL favicon",
+        "primaryColor": "Primární barva",
+        "defaultTimezone": "Výchozí časové pásmo",
+        "defaultTimezoneHelp": "Používá se pro zobrazení dat a vytváření nových událostí."
+      },
+      "watermark": {
+        "title": "Přizpůsobení videa",
+        "enabled": "Vodoznak aktivní",
+        "url": "URL vodoznaku",
+        "urlHelp": "URL průhledného obrázku SVG nebo PNG. Ponechte prázdné pro použití loga organizace.",
+        "opacity": "Průhlednost",
+        "position": "Pozice",
+        "previewLabel": "Náhled video oblasti",
+        "positions": {
+          "bottomLeft": "Vlevo dole",
+          "bottomRight": "Vpravo dole",
+          "topLeft": "Vlevo nahoře",
+          "topRight": "Vpravo nahoře"
+        }
+      },
+      "seo": {
+        "title": "SEO titulek",
+        "titleHelp": "Titulek zobrazený ve výsledcích vyhledávání a na záložce prohlížeče",
+        "description": "SEO popis",
+        "descriptionHelp": "Popis pro vyhledávače a sdílení na sociálních sítích",
+        "image": "Obrázek Open Graph",
+        "imageHelp": "Výchozí obrázek pro sdílení na sociálních sítích (doporučeno 1200×630)"
+      },
+      "homepage": {
+        "modeLabel": "Režim domovské stránky",
+        "modes": {
+          "LANDING": {
+            "title": "Úvodní stránka",
+            "description": "Hero, funkce, nadcházející události a jak to funguje"
+          },
+          "EVENTS_LIST": {
+            "title": "Seznam událostí",
+            "description": "Zobrazí přímo seznam událostí"
+          },
+          "CUSTOM": {
+            "title": "Vlastní",
+            "description": "Vlastní HTML obsah + seznam událostí"
+          }
+        },
+        "customHtmlLabel": "Vlastní HTML obsah",
+        "customHtmlHelp": "HTML zobrazené v hlavní sekci domovské stránky"
+      },
+      "pages": {
+        "privacyTitle": "Zásady ochrany osobních údajů",
+        "privacyIt": "Obsah (italsky)",
+        "privacyEn": "Obsah (anglicky)",
+        "accessibilityTitle": "Prohlášení o přístupnosti",
+        "accessibilityIt": "Obsah (italsky)",
+        "accessibilityEn": "Obsah (anglicky)",
+        "preview": "Náhled"
+      },
+      "footer": {
+        "linksTitle": "Odkazy v zápatí",
+        "addLink": "Přidat odkaz",
+        "noLinks": "Žádné nakonfigurované odkazy. Budou použity výchozí.",
+        "linkTitle": "Název",
+        "linkSection": "Sekce",
+        "sectionLegal": "Právní informace",
+        "sectionMain": "Hlavní",
+        "moveUp": "Posunout nahoru",
+        "moveDown": "Posunout dolů",
+        "removeLink": "Odebrat odkaz"
+      },
+      "features": {
+        "statusPageEnabled": "Stavová stránka aktivní",
+        "statusPageEnabledHelp": "Zobrazit stavovou stránku služby",
+        "guestAccessEnabled": "Přístup hostů aktivní",
+        "guestAccessEnabledHelp": "Povolit přístup hostů k probíhajícím událostem",
+        "publicRegistrationEnabled": "Veřejná registrace aktivní",
+        "publicRegistrationEnabledHelp": "Kdokoli může vytvářet události (pokud je deaktivováno, mohou pouze administrátoři)",
+        "calendarPublic": "Veřejný kalendář",
+        "calendarPublicHelp": "Zveřejnit kalendář událostí. Návštěvníci mohou vidět naplánované události.",
+        "githubUrl": "URL repozitáře GitHub",
+        "supportEmail": "E-mail podpory"
+      }
+    },
+    "analytics": {
+      "title": "Statistiky",
+      "subtitle": "Přehled metrik platformy",
+      "timeline": "Časový vývoj",
+      "topEvents": "Nejlepší události",
+      "noData": "Pro toto období nejsou k dispozici žádná data.",
+      "period": {
+        "7d": "7 dní",
+        "30d": "30 dní",
+        "90d": "90 dní",
+        "all": "Celé období"
+      },
+      "metrics": {
+        "totalEvents": "Celkem událostí",
+        "totalRegistrations": "Registrace",
+        "totalParticipants": "Účastníci",
+        "conversionRate": "Průměrná míra konverze",
+        "peakParticipants": "Špičkový počet účastníků"
+      },
+      "table": {
+        "event": "Událost",
+        "date": "Datum",
+        "registrations": "Registrace",
+        "participants": "Účastníci",
+        "peak": "Špička",
+        "questions": "Q&A",
+        "conversion": "Konverze",
+        "noEvents": "Nebyly nalezeny žádné události."
+      },
+      "quickStats": {
+        "title": "Rychlé statistiky",
+        "avgDuration": "Průměrná délka událostí",
+        "avgQuestionsPerEvent": "Otázky Q&A na událost",
+        "totalPollVotes": "Celkem hlasů v anketách",
+        "avgParticipantsPerEvent": "Průměrný počet účastníků na událost",
+        "avgFeedbackRating": "Průměrné hodnocení zpětné vazby",
+        "totalFeedback": "Odpovědí zpětné vazby"
+      }
+    },
+    "templates": {
+      "title": "Šablony událostí",
+      "subtitle": "Spravujte přednastavené šablony pro rychlé vytváření událostí",
+      "create": "Nová šablona",
+      "deleteConfirm": "Opravdu chcete smazat tuto šablonu?",
+      "system": "Systémová",
+      "nameLabel": "Název šablony",
+      "descriptionLabel": "Popis",
+      "maxParticipantsLabel": "Max. účastníků",
+      "featuresLabel": "Funkce",
+      "recordingLabel": "Nahrávání",
+      "unmute": "Mikrofon účastníků",
+      "video": "Video účastníků",
+      "screen": "Sdílení obrazovky",
+      "pickerTitle": "Vyberte šablonu",
+      "pickerSubtitle": "Vyberte šablonu pro předkonfiguraci nastavení události, nebo přeskočte pro ruční konfiguraci.",
+      "skipTemplate": "Konfigurovat ručně"
+    },
+    "instantCall": {
+      "title": "Okamžitý videohovor",
+      "subtitle": "Vytvořte videohovor na počkání a sdílejte odkaz. Bez plánování.",
+      "nameLabel": "Název videohovoru",
+      "namePlaceholder": "např. Rychlá porada, Demo projektu...",
+      "moderatorLabel": "Vaše jméno (volitelné)",
+      "moderatorPlaceholder": "Bude zobrazeno v hovoru",
+      "create": "Vytvořit a připojit se",
+      "creating": "Vytváření...",
+      "copyLink": "Kopírovat odkaz pozvánky",
+      "copied": "Zkopírováno!",
+      "hint": "Všichni mohou zapnout mikrofon, webkameru a sdílet obrazovku. Pouze vy můžete nahrávat a ukončit hovor."
+    },
+    "files": {
+      "title": "Soubory a materiály",
+      "upload": "Nahrát soubor",
+      "selectFile": "Vybrat soubor",
+      "fileTitle": "Název",
+      "visibility": "Viditelnost",
+      "visibilityAlways": "Vždy viditelné",
+      "visibilityBefore": "Pouze před událostí",
+      "visibilityDuring": "Pouze během události",
+      "visibilityAfter": "Pouze po události",
+      "uploading": "Nahrávání...",
+      "uploadBtn": "Nahrát",
+      "deleteConfirm": "Opravdu chcete smazat tento soubor?",
+      "noFiles": "Žádné nahrané soubory. Použijte tlačítko \"Nahrát soubor\" pro přidání materiálů."
+    },
+    "languages": {
+      "title": "Správa jazyků",
+      "subtitle": "Konfigurujte dostupné jazyky a přizpůsobte překlady",
+      "configuredLocales": "Nakonfigurované jazyky",
+      "localesDescription": "Vyberte jazyky dostupné pro uživatelské rozhraní. Italština je povinná jako výchozí jazyk.",
+      "addLocale": "Přidat jazyk",
+      "localeCode": "Kód jazyka",
+      "localeName": "Název jazyka",
+      "selectLocale": "Vyberte...",
+      "add": "Přidat",
+      "default": "Výchozí",
+      "editTranslations": "Upravit překlady",
+      "saved": "Konfigurace jazyků uložena",
+      "saveNote": "Změny dostupných jazyků vyžadují restart, aby se projevily v URL adresách.",
+      "translationOverrides": "Vlastní překlady — {locale}",
+      "overridesDescription": "Přepište výchozí překlady pro tento jazyk. Použijte tečkovou notaci (např. common.appName).",
+      "keyLabel": "Klíč překladu",
+      "valueLabel": "Hodnota",
+      "addOverride": "Přidat"
+    },
+    "infrastructure": {
+      "title": "Infrastruktura",
+      "subtitle": "Stav komponent a konfigurace prostředí",
+      "deploymentMode": "Režim nasazení",
+      "version": "Verze",
+      "environment": "Prostředí",
+      "modes": {
+        "simple": "Jednoduchý (Docker Compose)",
+        "standard": "Standardní (Kubernetes)",
+        "full": "Plný (Kubernetes se scale-to-zero)",
+        "unknown": "Neznámý"
+      },
+      "database": {
+        "title": "Databáze",
+        "internal": "V clusteru (PostgreSQL)",
+        "external": "Externí",
+        "connected": "Připojeno",
+        "disconnected": "Nedostupné"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Dostupné",
+        "unreachable": "Nedostupné",
+        "notConfigured": "Nenakonfigurováno"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero aktivní",
+        "replicas": "{current}/{max} uzlů",
+        "preScale": "Pre-scale: {minutes} min",
+        "fixedMode": "Pevný režim",
+        "scalerEnabled": "Scaler povolen"
+      },
+      "jibri": {
+        "title": "Nahrávání (Jibri)",
+        "available": "Dostupné",
+        "notConfigured": "Nenakonfigurováno",
+        "storageType": "Úložiště",
+        "configureHint": "Videozáznam vyžaduje Jibri. Nakonfigurujte úložiště pro jeho povolení.",
+        "docsLink": "Dokumentace"
+      },
+      "email": {
+        "title": "E-mail",
+        "configured": "Nakonfigurováno",
+        "notConfigured": "Nenakonfigurováno"
+      },
+      "features": {
+        "title": "Funkce",
+        "statusPage": "Stavová stránka",
+        "guestAccess": "Přístup hostů",
+        "metrics": "Endpoint metrik"
+      },
+      "note": "Změny infrastruktury se provádějí prostřednictvím Helm values a CI/CD pipeline.",
+      "deployDocs": "Dokumentace nasazení"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Potvrzení registrace: {eventTitle}",
+    "confirmationHeading": "Registrace potvrzena",
+    "confirmationKeepNote": "Uschovejte si tento e-mail — obsahuje váš osobní odkaz pro přístup k události.",
+    "reminderSubject": "Připomenutí: {eventTitle} začíná za 1 hodinu",
+    "reminderHeading": "Připomenutí události",
+    "reminderNote": "Událost, na kterou jste se registrovali, začíná za méně než hodinu. Pro připojení použijte níže uvedený odkaz.",
+    "recordingSubject": "Záznam k dispozici: {eventTitle}",
+    "joinLabel": "Připojit se k události",
+    "viewEvent": "Zobrazit stránku události",
+    "eventLabel": "Událost",
+    "dateLabel": "Datum",
+    "timeLabel": "Čas",
+    "durationLabel": "Délka trvání"
+  },
+  "home": {
+    "hero": {
+      "title": "Veřejné digitální události",
+      "subtitle": "Platforma pro webináře, prezentace a veřejná setkání Odboru pro digitální transformaci",
+      "browseEvents": "Prohlédnout události",
+      "organizeEvent": "Uspořádat událost"
+    },
+    "features": {
+      "title": "Platforma pro události veřejné správy",
+      "video": {
+        "title": "Videokonference",
+        "desc": "Zúčastněte se veřejných událostí až s 300 účastníky. Bez nutnosti instalace softwaru."
+      },
+      "qa": {
+        "title": "Otázky a odpovědi",
+        "desc": "Pokládejte otázky během události a hlasujte o nejdůležitějších. Moderátor odpovídá živě."
+      },
+      "privacy": {
+        "title": "Ochrana soukromí a bezpečnost",
+        "desc": "Ochrana dat v souladu s GDPR. Vlastní infrastruktura v Itálii."
+      }
+    },
+    "upcoming": {
+      "title": "Nadcházející události",
+      "viewAll": "Zobrazit všechny události",
+      "noEvents": "Žádné nadcházející události. Navštivte nás znovu!"
+    },
+    "howItWorks": {
+      "title": "Jak to funguje",
+      "step1": {
+        "title": "Zaregistrujte se",
+        "desc": "Přihlaste se zdarma na událost"
+      },
+      "step2": {
+        "title": "Obdržíte odkaz",
+        "desc": "E-mail s vaším osobním přístupovým odkazem"
+      },
+      "step3": {
+        "title": "Připojte se",
+        "desc": "Vstupte do události z prohlížeče, bez instalace"
+      },
+      "step4": {
+        "title": "Komunikujte",
+        "desc": "Pokládejte otázky, hlasujte, účastněte se diskuse"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Souhlasím s audio/video záznamem této události",
+      "recordingRequired": "Pro účast na této události je nutný souhlas s nahráváním",
+      "futureCommunications": "Přeji si dostávat informace o budoucích událostech organizovaných DTD"
+    },
+    "export": {
+      "title": "Moje údaje",
+      "subtitle": "Požádejte o kopii osobních údajů spojených s vaší e-mailovou adresou podle čl. 15 GDPR.",
+      "emailLabel": "Vaše e-mailová adresa",
+      "emailPlaceholder": "Zadejte e-mail použitý při registraci",
+      "emailInvalid": "Zadejte platnou e-mailovou adresu",
+      "submit": "Požádat o moje údaje",
+      "loading": "Vyhledávání...",
+      "noData": "Pro tuto e-mailovou adresu nebyly nalezeny žádné údaje.",
+      "error": "Došlo k chybě. Zkuste to prosím později.",
+      "rateLimited": "Příliš mnoho požadavků. Zkuste to znovu za hodinu.",
+      "results": "Vaše údaje",
+      "resultsDescription": "Nalezeny údaje vztahující se k {count} událostem.",
+      "registrationData": "Registrační údaje",
+      "fieldName": "Jméno",
+      "fieldEmail": "E-mail",
+      "fieldOrganization": "Organizace",
+      "fieldRegisteredAt": "Datum registrace",
+      "fieldConsent": "Souhlas",
+      "questionsTitle": "Otázky Q&A",
+      "pollVotesTitle": "Hlasy v anketách",
+      "optionLabel": "Možnost"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Zásady ochrany osobních údajů",
+      "title": "Zásady ochrany osobních údajů",
+      "intro": "Tato stránka shrnuje zpracování osobních údajů v souvislosti s používáním platformy Eventi DTD a účastí na pořádaných veřejných událostech.",
+      "sections": {
+        "controller": {
+          "title": "Správce údajů",
+          "body": "Zpracování osobních údajů probíhá v rámci institucionálních činností Odboru pro digitální transformaci za účelem technického a organizačního zajištění veřejných online událostí."
+        },
+        "data": {
+          "title": "Zpracovávané údaje a účely",
+          "body": "Platforma zpracovává pouze údaje nezbytně nutné pro registraci a účast na událostech, jako je jméno, e-mailová adresa a případná volitelná pole konfigurovaná organizátorem. Údaje se používají k zaslání osobního přístupového odkazu, správě účasti, zasílání připomenutí a plnění povinností spojených se zabezpečením služby."
+        },
+        "retention": {
+          "title": "Uchovávání údajů a práva",
+          "body": "Údaje jsou uchovávány po dobu nakonfigurovanou pro každou událost a poté automaticky smazány, pokud zákonné povinnosti nestanoví jinak. Subjekty údajů mohou kdykoli uplatnit svá práva podle GDPR, včetně přístupu, opravy a výmazu, prostřednictvím institucionálních kanálů Odboru."
+        }
+      },
+      "note": {
+        "title": "Žádost o vaše údaje",
+        "body": "Pokud jste se zúčastnili události a chcete ověřit, které osobní údaje jsou spojeny s vaší e-mailovou adresou, můžete využít vyhrazenou funkci dostupnou na platformě.",
+        "linkLabel": "Požádat o moje údaje"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Prohlášení o přístupnosti",
+      "title": "Prohlášení o přístupnosti",
+      "intro": "Odbor pro digitální transformaci se zavazuje zajistit přístupnost této platformy v souladu s platnými požadavky na digitální služby veřejné správy.",
+      "sections": {
+        "commitment": {
+          "title": "Závazek přístupnosti",
+          "body": "Platforma je navržena s komponentami v souladu s designovým systémem .italia a s důrazem na navigaci z klávesnice, sémantickou strukturu obsahu a čitelnost rozhraní na hlavních velikostech obrazovky."
+        },
+        "status": {
+          "title": "Stav shody",
+          "body": "Probíhají průběžné kontroly a zlepšování přístupnosti. Případné zbývající nedostatky jsou postupně odstraňovány v rámci vývoje služby a běžné údržby."
+        },
+        "feedback": {
+          "title": "Zpětná vazba a kontakty",
+          "body": "Pro nahlášení problémů s přístupností nebo potíží při používání služby mohou uživatelé kontaktovat Odbor prostřednictvím jeho institucionálních kanálů s uvedením dotčené stránky a stručným popisem problému."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Právní upozornění",
+      "title": "Právní upozornění",
+      "intro": "Přístup k platformě Eventi DTD a její používání podléhá těmto upozorněním, která shrnují obecné podmínky používání a hlavní informace o službě.",
+      "sections": {
+        "ownership": {
+          "title": "Vlastnictví služby",
+          "body": "Platforma je provozována Odborem pro digitální transformaci a je poskytována pro organizaci a účast na veřejných online událostech institucionálního zájmu."
+        },
+        "usage": {
+          "title": "Podmínky používání",
+          "body": "Uživatelé jsou povinni používat službu řádně a nesmí ohrozit bezpečnost platformy, dostupnost funkcí ani řádný průběh událostí. Zneužití nebo nevhodné použití může vést k omezení přístupu ke službě."
+        },
+        "liability": {
+          "title": "Omezení odpovědnosti",
+          "body": "Přestože jsou přijata odpovídající technická a organizační opatření, Odbor nemůže zaručit úplnou absenci přerušení nebo poruch způsobených nepředvídatelnými událostmi, údržbou nebo vnějšími faktory. Zákonné odpovědnosti zůstávají nedotčeny."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Stav systému",
+    "subtitle": "Přehled stavu služeb platformy v reálném čase.",
+    "allOperational": "Všechny systémy v provozu",
+    "degraded": "Snížený výkon",
+    "outage": "Výpadek služby",
+    "componentLabel": "Komponenta",
+    "statusLabel": "Stav",
+    "operational": "V provozu",
+    "degradedLabel": "Zpomaleno",
+    "standby": "V pohotovosti",
+    "loading": "Načítání...",
+    "fetchError": "Nelze načíst stav systému",
+    "components": {
+      "app": "Webový portál",
+      "database": "Databáze",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Videozáznam",
+      "smtp": "E-mail (SMTP)"
+    },
+    "jvbCapacity": "Kapacita video bridge",
+    "jvbStandby": "V pohotovosti — aktivuje se automaticky v případě potřeby",
+    "jvbStandbyDetail": "Scale-to-zero aktivní — žádné naplánované události. Uzly JVB budou automaticky vytvořeny před zahájením události.",
+    "jvbScaling": "Spouštění...",
+    "nodesActive": "uzlů aktivních",
+    "nodesReady": "uzlů připravených",
+    "scaling": "škálování",
+    "jvbStress": "Zátěž JVB",
+    "participantsConnected": "připojených účastníků",
+    "videoInteractive": "interaktivní",
+    "videoWebinar": "webinář",
+    "participantsAvailable": "dostupných účastníků",
+    "upcomingEvents": "Nadcházející události",
+    "noUpcomingEvents": "Žádné naplánované události",
+    "jvbActivatesIn": "JVB se aktivuje za {minutes} min",
+    "liveNow": "Právě probíhá",
+    "activeEvents": "Aktivní události",
+    "registrationsToday": "Dnešní registrace",
+    "jvbNodes": "Uzly JVB",
+    "overallStatus": "Celkový stav",
+    "lastChecked": "Poslední kontrola",
+    "responseTime": "Doba odezvy",
+    "systemStatus": "Stav systému"
+  },
+  "feedback": {
+    "title": "Jak hodnotíte tuto událost?",
+    "ratingLabel": "Vyberte hodnocení od 1 do 5 hvězd",
+    "comment": "Komentář",
+    "commentPlaceholder": "Máte návrhy? (volitelné)",
+    "submit": "Odeslat zpětnou vazbu",
+    "submitting": "Odesílání...",
+    "skip": "Přeskočit",
+    "thankYou": "Děkujeme za vaši zpětnou vazbu!",
+    "averageRating": "Průměrné hodnocení",
+    "ratingCount": "{count} hodnocení",
+    "noFeedback": "Žádná zpětná vazba"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Spustit",
+    "prompt": "Téma",
+    "promptPlaceholder": "např. Co od této události očekáváte?",
+    "duration": "Délka trvání",
+    "submit": "Odeslat",
+    "submitPlaceholder": "Napište slovo (max. 30 znaků)",
+    "close": "Zavřít word cloud",
+    "cancel": "Zrušit",
+    "noActiveRound": "V tuto chvíli není aktivní žádný word cloud.",
+    "noWords": "Čekáme na první slova...",
+    "wordsSubmitted": "{count} odeslaných slov",
+    "timeRemaining": "Zbývající čas"
+  },
+  "timer": {
+    "title": "Časovač",
+    "start": "Spustit",
+    "pause": "Pozastavit",
+    "reset": "Vynulovat",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Vlastní"
+    },
+    "showToAll": "Zobrazit všem",
+    "timeUp": "Čas vypršel!"
+  },
+  "reactions": {
+    "title": "Reakce",
+    "sendReaction": "Odeslat reakci",
+    "reactionSent": "Reakce odeslána!"
+  },
+  "calendar": {
+    "title": "Kalendář událostí",
+    "subtitle": "Zobrazit všechny události v čase",
+    "publicTitle": "Kalendář událostí",
+    "publicSubtitle": "Prohlédněte si naplánované události",
+    "today": "Dnes",
+    "prev": "Předchozí období",
+    "next": "Další období",
+    "views": {
+      "day": "Den",
+      "week": "Týden",
+      "month": "Měsíc",
+      "year": "Rok",
+      "list": "Seznam"
+    },
+    "status": {
+      "DRAFT": "Koncept",
+      "PUBLISHED": "Publikováno",
+      "LIVE": "Právě probíhá",
+      "ENDED": "Ukončeno",
+      "ARCHIVED": "Archivováno"
+    }
+  },
+  "footer": {
+    "departmentName": "Odbor pro digitální transformaci",
+    "presidencyName": "Předsednictví Rady ministrů",
+    "privacy": "Zásady ochrany osobních údajů",
+    "accessibility": "Prohlášení o přístupnosti",
+    "openSource": "Open source software",
+    "contacts": "Kontakty",
+    "legalNotes": "Právní upozornění",
+    "governmentSite": "Italská vláda",
+    "systemStatus": "Stav systému"
+  },
+  "pages": {
+    "privacyTitle": "Zásady ochrany osobních údajů",
+    "privacyNotConfigured": "Zásady ochrany osobních údajů ještě nebyly nakonfigurovány.",
+    "accessibilityTitle": "Prohlášení o přístupnosti",
+    "accessibilityNotConfigured": "Prohlášení o přístupnosti ještě nebylo nakonfigurováno."
+  },
+  "video": {
+    "play": "Přehrát",
+    "pause": "Pozastavit",
+    "speed": "Rychlost",
+    "fullscreen": "Celá obrazovka",
+    "pip": "Picture in Picture",
+    "volume": "Hlasitost",
+    "mute": "Ztlumit",
+    "unmute": "Zapnout zvuk",
+    "download": "Stáhnout záznam",
+    "speedLabel": "Rychlost přehrávání",
+    "progress": "Ukazatel průběhu"
+  },
+  "diagram": {
+    "title": "Konfigurace události",
+    "topology": "Topologie",
+    "features": "Aktivní funkce",
+    "estimates": "Odhad zdrojů",
+    "moderator": "Moderátor",
+    "participants": "Účastníci",
+    "jvb": "Video Bridge",
+    "jibri": "Nahrávání",
+    "bandwidth": {
+      "moderator": "Šířka pásma moderátora",
+      "participant": "Šířka pásma na účastníka",
+      "total": "Odhadovaná celková šířka pásma"
+    },
+    "jvbCount": "Potřebné JVB",
+    "jvbRam": "Odhadovaná RAM JVB",
+    "storage": "Úložiště záznamu",
+    "duration": "Odhadovaná délka",
+    "viewOnly": "Pouze prohlížení",
+    "preview": "Náhled konfigurace"
+  },
+  "waiting": {
+    "startsIn": "Událost začne za",
+    "eventLive": "Událost právě probíhá!",
+    "connectedParticipants": "{count, plural, =0 {Žádní účastníci} =1 {1 připojený účastník} few {{count} připojení účastníci} other {{count} připojených účastníků}}",
+    "elapsedTime": "Probíhá {minutes} minut",
+    "youAreLate": "Událost začala před {minutes} minutami",
+    "chooseHowToJoin": "Zvolte způsob účasti:",
+    "enterLive": "Připojit se ŽIVĚ",
+    "enterLiveDesc": "Připojte se živě. K záznamu můžete přistoupit i po skončení události.",
+    "enterNow": "Připojit se nyní",
+    "watchFromStart": "Sledovat od začátku",
+    "watchFromStartDesc": "Sledujte záznam od začátku a přepněte na živý přenos, kdykoli budete chtít.",
+    "watchNow": "Sledovat",
+    "switchToLive": "Přepnout na živý přenos",
+    "enterRoom": "Vstoupit do místnosti",
+    "recordingNotice": "Tato událost je nahrávána.",
+    "recordingAvailableAfter": "Záznam bude k dispozici po skončení události.",
+    "autoRefreshHint": "Stránka se automaticky aktualizuje, jakmile událost začne.",
+    "startEventButton": "Zahájit událost",
+    "startingEvent": "Zahajování...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 osoba čeká} few {{count} osoby čekají} other {{count} osob čeká}}",
+    "jvbScaling": "Příprava místnosti...",
+    "jvbScalingDetail": "Video servery se spouštějí. Trvá to přibližně 2 minuty.",
+    "jvbReady": "Místnost je připravena!"
+  },
+  "recording": {
+    "management": "Videozáznam",
+    "inProgress": "Probíhá",
+    "available": "Záznam k dispozici",
+    "duration": "Délka trvání",
+    "fileSize": "Velikost souboru",
+    "startedAt": "Zahájeno",
+    "automatic": "automatický",
+    "publish": "Zveřejnit záznam",
+    "publishDesc": "Zpřístupnit video na stránce události",
+    "retentionLabel": "Uchovávání",
+    "retention": {
+      "24h": "24 hodin (dočasný)",
+      "7d": "7 dní",
+      "30d": "30 dní",
+      "90d": "90 dní",
+      "forever": "Nikdy (do vypršení události)"
+    },
+    "retentionNote": "Video bude i nadále podléhat GDPR retenci události",
+    "delete": "Smazat záznam",
+    "deleteConfirm": "Jste si jisti? Video bude trvale smazáno.",
+    "notConfigured": "Jibri není nakonfigurován. Videozáznam není k dispozici.",
+    "play": "Přehrát",
+    "download": "Stáhnout"
+  },
+  "postEvent": {
+    "config": "Konfigurace po události",
+    "pageVisible": "Stránka události viditelná po skončení",
+    "showQA": "Zobrazit otázky Q&A",
+    "showMaterials": "Zobrazit sdílené materiály",
+    "showPolls": "Zobrazit výsledky anket",
+    "showFeedback": "Zobrazit zpětnou vazbu",
+    "feedbackEnabled": "Dotazník zpětné vazby aktivní po skončení události",
+    "visibilityAlways": "Vždy viditelné",
+    "visibilityUntil": "Viditelné do:",
+    "dataRetentionNote": "Osobní údaje účastníků budou smazány podle retence události ({days} dní). Obsah události zůstane dostupný po dobu viditelnosti stránky.",
+    "availableUntil": "Tato událost a její obsah budou dostupné do {date}.",
+    "tabs": {
+      "qa": "Otázky a odpovědi",
+      "materials": "Materiály",
+      "polls": "Ankety",
+      "feedback": "Zpětná vazba"
+    }
+  }
+}

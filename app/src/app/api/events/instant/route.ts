@@ -42,7 +42,7 @@ export const POST = withErrorHandling(async (request) => {
   const now = new Date();
   const maxDuration = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-  const slug = await generateUniqueSlug(data.titleIt);
+  const slug = await generateUniqueSlug(data.title);
   const jitsiRoomName = `call-${randomUUID()}`;
   const moderatorToken = randomUUID();
 
@@ -52,8 +52,8 @@ export const POST = withErrorHandling(async (request) => {
       jitsiRoomName,
       moderatorToken,
       eventType: 'INSTANT',
-      titleIt: data.titleIt,
-      descriptionIt: 'Videocall istantanea',
+      title: data.title,
+      description: { it: 'Videocall istantanea' },
       startsAt: now,
       endsAt: maxDuration,
       maxParticipants: 50,

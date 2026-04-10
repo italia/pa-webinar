@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "Udalosti DTD",
+    "appDescription": "Platforma pre verejné digitálne udalosti Odboru pre digitálnu transformáciu",
+    "loading": "Načítanie...",
+    "error": "Vyskytla sa chyba",
+    "errorMessage": "Niečo sa pokazilo. Skúste to prosím znova.",
+    "retry": "Skúsiť znova",
+    "save": "Uložiť",
+    "cancel": "Zrušiť",
+    "confirm": "Potvrdiť",
+    "close": "Zavrieť",
+    "back": "Späť",
+    "next": "Ďalej",
+    "send": "Odoslať",
+    "delete": "Zmazať",
+    "edit": "Upraviť",
+    "search": "Hľadať",
+    "noResults": "Žiadne výsledky",
+    "requiredField": "Povinné pole"
+  },
+  "nav": {
+    "home": "Domov",
+    "events": "Udalosti",
+    "about": "Informácie",
+    "privacy": "Ochrana osobných údajov",
+    "admin": "Administrácia",
+    "language": "Jazyk",
+    "switchLanguage": "Zmeniť jazyk",
+    "skipToContent": "Prejsť na obsah",
+    "skipToFooter": "Prejsť na pätu stránky"
+  },
+  "header": {
+    "slimTitle": "Predsedníctvo Rady ministrov",
+    "slimSubtitle": "Odbor pre digitálnu transformáciu",
+    "followUs": "Sledujte nás na"
+  },
+  "events": {
+    "title": "Udalosti",
+    "upcoming": "Nadchádzajúce udalosti",
+    "past": "Minulé udalosti",
+    "noUpcoming": "V tejto chvíli nie sú naplánované žiadne udalosti. Navštívte nás znova!",
+    "noPast": "Žiadne minulé udalosti",
+    "card": {
+      "publicEvent": "Verejná udalosť",
+      "readMore": "Zistiť viac",
+      "liveNow": "Práve prebieha",
+      "spotsAvailable": "{count} voľných miest",
+      "fullyBooked": "Obsadené",
+      "ended": "Ukončené",
+      "occupiedSpots": "{registered}/{max} registrovaných"
+    },
+    "detail": {
+      "title": "Detail udalosti",
+      "date": "Dátum a čas",
+      "duration": "Trvanie",
+      "durationHours": "{hours} h {minutes} min",
+      "timezone": "Časové pásmo",
+      "description": "Popis",
+      "participants": "Účastníci",
+      "maxParticipants": "{count} miest celkom",
+      "spotsLeft": "{count} zostávajúcich miest",
+      "occupiedSpots": "{registered} z {max} miest obsadených",
+      "full": "Obsadené",
+      "register": "Registrovať sa na udalosť",
+      "registerAndJoin": "Registrovať sa a pripojiť",
+      "registered": "Ste registrovaní",
+      "enterEvent": "Vstúpiť do udalosti",
+      "eventEnded": "Udalosť skončila",
+      "eventHeldOn": "Táto udalosť sa konala dňa {date}",
+      "totalRegistrations": "{count} registrovaných účastníkov",
+      "recording": "Záznam je k dispozícii",
+      "noRecording": "Videozáznam nie je pre túto udalosť k dispozícii.",
+      "watchRecording": "Prehrať záznam",
+      "backToEvents": "Späť na udalosti",
+      "speakers": "Prednášajúci",
+      "organizer": "Organizátor",
+      "chatNotSaved": "Správy z chatu nie sú po skončení udalosti uchovávané.",
+      "qaPostEvent": "Otázky a odpovede z udalosti",
+      "peakParticipants": "Špička: {count} účastníkov",
+      "calendar": {
+        "addToCalendar": "Pridať do kalendára",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": "Stiahnuť súbor .ics"
+      }
+    },
+    "manage": {
+      "toggleChat": "Chat",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Záznam",
+      "settingsSection": "Nastavenia udalosti"
+    },
+    "status": {
+      "DRAFT": "Koncept",
+      "PUBLISHED": "Publikované",
+      "LIVE": "Práve prebieha",
+      "ENDED": "Ukončené",
+      "ARCHIVED": "Archivované"
+    }
+  },
+  "registration": {
+    "title": "Registrácia na udalosť",
+    "name": "Meno a priezvisko",
+    "namePlaceholder": "Vaše meno bude zobrazené v miestnosti udalosti",
+    "email": "E-mail",
+    "emailPlaceholder": "Dostanete odkaz na prístup k udalosti",
+    "gdprConsent": "Súhlasím so spracovaním mojich osobných údajov (meno, e-mail) v súlade s nariadením EÚ 2016/679 (GDPR) za účelom účasti na tejto udalosti.",
+    "gdprLink": "Prečítajte si úplné zásady ochrany osobných údajov",
+    "submit": "Potvrdiť registráciu",
+    "submitting": "Prebieha registrácia...",
+    "success": "Registrácia dokončená!",
+    "successMessage": "Dostanete potvrdzovací e-mail s odkazom na prístup k udalosti.",
+    "alreadyRegistered": "Na túto udalosť ste už registrovaní",
+    "backToEvent": "Späť na udalosť",
+    "organization": "Organizácia",
+    "organizationPlaceholder": "napr. AGID, Ministerstvo hospodárstva, Obec Bratislava",
+    "organizationRole": "Pozícia v organizácii",
+    "organizationRolePlaceholder": "napr. Manažér digitálnej transformácie, Vývojár",
+    "organizationType": "Typ organizácie",
+    "organizationTypePlaceholder": "Vyberte typ...",
+    "organizationTypes": {
+      "MINISTRY": "Ministerstvo",
+      "AGENCY": "Agentúra",
+      "REGION": "Kraj",
+      "PROVINCE": "Okres",
+      "MUNICIPALITY": "Obec",
+      "ASL": "ASL (miestna zdravotnícka organizácia)",
+      "UNIVERSITY": "Univerzita",
+      "PUBLIC_ENTITY": "Verejný subjekt",
+      "IN_HOUSE": "In-house spoločnosť",
+      "OTHER": "Iné"
+    },
+    "gdprConsentProfiling": "Údaje o organizácii budú spracované na štatistické účely.",
+    "errors": {
+      "nameRequired": "Zadajte svoje meno",
+      "emailRequired": "Zadajte svoj e-mail",
+      "emailInvalid": "Zadajte platný e-mail",
+      "organizationRequired": "Zadajte svoju organizáciu",
+      "consentRequired": "Súhlas so spracovaním údajov je povinný",
+      "recordingConsentRequired": "Súhlas s nahrávaním je pre túto udalosť povinný",
+      "eventFull": "Udalosť dosiahla maximálny počet účastníkov",
+      "generic": "Chyba pri registrácii. Skúste to znova."
+    }
+  },
+  "live": {
+    "title": "Miestnosť udalosti",
+    "connecting": "Pripájanie...",
+    "connectionError": "Nie je možné sa pripojiť k miestnosti. Skontrolujte pripojenie a skúste to znova.",
+    "recordingActive": "Prebieha nahrávanie",
+    "recordingConsent": "Táto udalosť je nahrávaná. Vstupom súhlasíte s audio/video záznamom.",
+    "recordingConsentTitle": "Súhlas s nahrávaním",
+    "declineRecording": "Nezúčastniť sa",
+    "enterRoom": "Vstúpiť do miestnosti",
+    "leaveRoom": "Opustiť miestnosť",
+    "eventNotStarted": "Udalosť ešte nezačala",
+    "eventStartsAt": "Udalosť začne {date} o {time}",
+    "countdown": "Zostávajúci čas",
+    "waitingRoomHint": "Táto stránka sa automaticky aktualizuje, keď moderátor začne udalosť. Nie je potrebné stránku opätovne načítať.",
+    "startEventButton": "Začať udalosť",
+    "startingEvent": "Začíname...",
+    "chatNotSaved": "Správy z chatu nie sú po skončení udalosti uchovávané.",
+    "registerAndJoin": "Registrovať sa a pripojiť",
+    "registerNow": "Práve prebieha — Registrujte sa!",
+    "enableMusic": "Zapnúť hudbu",
+    "disableMusic": "Vypnúť hudbu",
+    "preJoinSubtitle": "Chystáte sa vstúpiť do miestnosti udalosti",
+    "preJoinNameLabel": "Vaše meno",
+    "guestJoinSubtitle": "Pripojte sa ako hosť k prebiehajúcej udalosti",
+    "guestJoinButton": "Pripojiť sa ako hosť",
+    "guestRedirectToRegister": "Udalosť ešte nezačala. Zaregistrujte sa na získanie prístupového odkazu.",
+    "jibriUnavailable": "Nahrávanie nedostupné — Jibri nie je nakonfigurovaný",
+    "jibriNotConfigured": "Nahrávanie nie je v infraštruktúre nakonfigurované",
+    "eventEnded": "Udalosť skončila",
+    "eventEndedMessage": "Udalosť skončila. Ďakujeme za účasť.",
+    "backToEvent": "Späť na udalosť",
+    "moderatorBadge": "Moderátor",
+    "qaSidebarPlaceholder": "Panel Q&A bude dostupný po začatí udalosti.",
+    "invalidToken": "Neplatný odkaz. Skontrolujte odkaz, ktorý ste dostali e-mailom.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Ankety",
+    "sidebarTabMaterials": "Materiály",
+    "sidebarTabParticipants": "Účastníci",
+    "role": {
+      "moderator": "Moderátor",
+      "participant": "Účastník",
+      "guest": "Hosť"
+    },
+    "participants": {
+      "title": "Účastníci",
+      "noParticipants": "Žiadni účastníci",
+      "kick": "Vylúčiť",
+      "kickConfirm": "Naozaj chcete vylúčiť tohto účastníka?"
+    },
+    "moderator": {
+      "muteAll": "Stlmiť všetkých",
+      "unmuteAll": "Zapnúť zvuk všetkým",
+      "startRecording": "Začať nahrávanie",
+      "stopRecording": "Zastaviť nahrávanie",
+      "toggleChat": "Chat zap/vyp",
+      "endEvent": "Ukončiť udalosť",
+      "endEventConfirm": "Naozaj chcete ukončiť udalosť pre všetkých účastníkov?",
+      "participantCount": "{count} účastníkov",
+      "raisedHands": "Zdvihnuté ruky",
+      "noRaisedHands": "Žiadne zdvihnuté ruky",
+      "giveFloor": "Udeliť slovo",
+      "approveAudio": "Udeliť slovo (audio)",
+      "approveVideo": "Udeliť slovo (video)",
+      "approveAll": "Udeliť slovo",
+      "audioOnly": "Iba audio",
+      "audioModeration": "Mikrofón účastníkov",
+      "videoModeration": "Video účastníkov",
+      "eventEndedSuccess": "Udalosť úspešne ukončená. Presmerovanie..."
+    }
+  },
+  "qa": {
+    "title": "Otázky a odpovede",
+    "askQuestion": "Položiť otázku",
+    "placeholder": "Napíšte svoju otázku (max. 500 znakov)",
+    "submit": "Odoslať otázku",
+    "submitting": "Odosielanie...",
+    "questionSent": "Otázka odoslaná!",
+    "cooldownWait": "Počkajte {seconds} s...",
+    "upvote": "Hlasovať",
+    "upvoted": "Hlasované",
+    "noQuestions": "Zatiaľ žiadne otázky. Buďte prvý!",
+    "qaPersistenceNote": "Otázky sú uložené a budú dostupné aj po skončení udalosti.",
+    "qaPostEvent": "Otázky a odpovede z udalosti",
+    "noAnsweredQuestions": "Žiadne zodpovedané otázky k tejto udalosti.",
+    "filterAll": "Všetky",
+    "showPanel": "Zobraziť Q&A",
+    "hidePanel": "Skryť Q&A",
+    "status": {
+      "PENDING": "Čaká na vybavenie",
+      "HIGHLIGHTED": "Zvýraznené",
+      "ANSWERED": "Zodpovedané",
+      "DISMISSED": "Zamietnuté"
+    },
+    "moderator": {
+      "highlight": "Zvýrazniť",
+      "markAnswered": "Zodpovedané",
+      "dismiss": "Zamietnuť",
+      "resetToPending": "Obnoviť"
+    },
+    "errors": {
+      "textRequired": "Napíšte svoju otázku",
+      "tooLong": "Otázka nesmie presiahnuť 500 znakov",
+      "rateLimit": "Počkajte prosím, kým odošlete ďalšiu otázku",
+      "generic": "Chyba pri odosielaní otázky"
+    }
+  },
+  "polls": {
+    "title": "Ankety",
+    "showPanel": "Zobraziť ankety",
+    "hidePanel": "Skryť ankety",
+    "createPoll": "Vytvoriť anketu",
+    "noPolls": "Žiadne ankety. Moderátor ich vytvorí počas udalosti.",
+    "questionPlaceholder": "Napíšte otázku ankety...",
+    "optionPlaceholder": "Možnosť {number}",
+    "addOption": "Pridať možnosť",
+    "removeOption": "Odstrániť možnosť",
+    "create": "Vytvoriť",
+    "creating": "Vytváranie...",
+    "cancelCreate": "Zrušiť",
+    "closePoll": "Ukončiť hlasovanie",
+    "publishResults": "Zverejniť výsledky",
+    "reopenPoll": "Znova otvoriť",
+    "totalVotes": "{count} hlasov",
+    "voted": "Hlasovali ste",
+    "status": {
+      "OPEN": "Otvorené",
+      "CLOSED": "Uzavreté",
+      "PUBLISHED": "Výsledky"
+    },
+    "errors": {
+      "questionRequired": "Napíšte otázku ankety",
+      "minOptions": "Sú potrebné aspoň 2 možnosti",
+      "generic": "Chyba pri vytváraní ankety"
+    }
+  },
+  "materials": {
+    "title": "Materiály",
+    "postEventTitle": "Materiály udalosti",
+    "addMaterial": "Pridať materiál",
+    "titleLabel": "Názov",
+    "urlLabel": "URL odkazu",
+    "descriptionLabel": "Popis (voliteľný)",
+    "addedBy": "Pridal/a {name}",
+    "noMaterials": "Žiadne zdieľané materiály.",
+    "confirmDelete": "Naozaj chcete zmazať tento materiál?",
+    "materialAdded": "Materiál pridaný",
+    "materialDeleted": "Materiál zmazaný",
+    "deleteMaterial": "Zmazať materiál",
+    "add": "Pridať",
+    "adding": "Pridávanie...",
+    "cancel": "Zrušiť",
+    "errors": {
+      "urlInvalid": "Zadajte platný URL",
+      "generic": "Chyba pri pridávaní materiálu"
+    }
+  },
+  "reminders": {
+    "title": "Upozornenia",
+    "addReminder": "Pridať upozornenie",
+    "removeReminder": "Odstrániť",
+    "maxReminders": "Maximálne 5 upozornení na udalosť.",
+    "selectPreset": "Vyberte kedy...",
+    "sentStatus": "{count} odoslaných",
+    "notSent": "Neodoslané",
+    "presets": {
+      "7days": "7 dní vopred",
+      "3days": "3 dni vopred",
+      "1day": "1 deň vopred",
+      "12hours": "12 hodín vopred",
+      "6hours": "6 hodín vopred",
+      "3hours": "3 hodiny vopred",
+      "1hour": "1 hodinu vopred",
+      "30min": "30 minút vopred",
+      "15min": "15 minút vopred"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Správa udalostí",
+      "settings": "Nastavenia systému",
+      "eventsList": "Zoznam udalostí",
+      "newEvent": "Nová udalosť",
+      "calendar": "Kalendár",
+      "templates": "Šablóny",
+      "analytics": "Štatistiky",
+      "infrastructure": "Infraštruktúra",
+      "settingsGeneral": "Všeobecné",
+      "settingsLanguages": "Jazyky",
+      "ariaLabel": "Navigácia administrácie",
+      "subNavAriaLabel": "Navigácia sekcie"
+    },
+    "landing": {
+      "title": "Administračný panel",
+      "subtitle": "Spravujte udalosti a konfigurujte platformu",
+      "eventsTitle": "Správa udalostí",
+      "eventsDescription": "Vytvárajte, upravujte a spravujte udalosti, šablóny a štatistiky.",
+      "settingsTitle": "Nastavenia systému",
+      "settingsDescription": "Konfigurujte branding, obsah, jazyky, funkcie a infraštruktúru.",
+      "liveNow": "{count, plural, one {# udalosť naživo} few {# udalosti naživo} other {# udalostí naživo}}",
+      "upcomingEvents": "{count, plural, one {# nadchádzajúca udalosť} few {# nadchádzajúce udalosti} other {# nadchádzajúcich udalostí}}"
+    },
+    "recording": {
+      "title": "Videozáznam",
+      "play": "Prehrať",
+      "download": "Stiahnuť",
+      "delete": "Zmazať záznam",
+      "deleteConfirm": "Naozaj chcete zmazať tento záznam? Túto akciu nie je možné vrátiť späť.",
+      "notConfigured": "Videozáznam nie je dostupný. Jibri nie je v infraštruktúre nakonfigurovaný.",
+      "inProgress": "Nahrávanie prebieha..."
+    },
+    "login": {
+      "title": "Prístup administrátora",
+      "keyLabel": "Prístupový kľúč",
+      "keyPlaceholder": "Zadajte prístupový kľúč",
+      "submit": "Prihlásiť sa",
+      "invalidKey": "Neplatný prístupový kľúč",
+      "logout": "Odhlásiť sa"
+    },
+    "title": "Správa udalostí",
+    "subtitle": "Administračný panel",
+    "createEvent": "Vytvoriť novú udalosť",
+    "editEvent": "Upraviť udalosť",
+    "deleteEvent": "Zmazať udalosť",
+    "deleteConfirm": "Naozaj chcete zmazať túto udalosť? Túto akciu nie je možné vrátiť späť.",
+    "publish": "Publikovať",
+    "unpublish": "Zrušiť publikáciu",
+    "noToken": "Na správu udalostí použite odkaz moderátora, ktorý ste dostali e-mailom.",
+    "noEvents": "Nenašli sa žiadne udalosti. Vytvorte svoju prvú udalosť.",
+    "eventDetails": "Detail udalosti",
+    "registrations": "Registrácie",
+    "registrationCount": "{count} registrácií",
+    "noRegistrations": "Zatiaľ žiadni registrovaní účastníci. Zdieľajte odkaz na udalosť!",
+    "exportCsv": "Exportovať CSV",
+    "organization": "Organizácia",
+    "organizationType": "Typ",
+    "registrationDate": "Dátum registrácie",
+    "joined": "Pripojil/a sa",
+    "notJoined": "Nepripojil/a sa",
+    "deleteSuccess": "Udalosť zmazaná",
+    "publishSuccess": "Udalosť publikovaná",
+    "unpublishSuccess": "Publikácia udalosti zrušená",
+    "startEvent": "Začať udalosť",
+    "startEventSuccess": "Udalosť začala! Čakajúci účastníci budú automaticky presmerovaní.",
+    "jvbWarmupWarning": "Video servery sa spúšťajú (približne 2 minúty). Účastníci uvidia upozornenie v čakárni.",
+    "eventIsLive": "Udalosť práve prebieha",
+    "joinAsModeratorBtn": "Pripojiť sa ako moderátor",
+    "openPublicPage": "Otvoriť verejnú stránku",
+    "quickActions": "Rýchle akcie",
+    "liveRoomLink": "Odkaz na miestnosť udalosti",
+    "manage": "Spravovať",
+    "settingsSaved": "Uložené",
+    "toggleChatDesc": "Povoliť chat medzi účastníkmi",
+    "toggleQaDesc": "Povoliť otázky s hlasovaním",
+    "toggleRecordingDesc": "Nahrávať udalosť (vyžaduje Jibri)",
+    "eventUpdated": "Udalosť úspešne aktualizovaná!",
+    "dateChangedNotification": "Dátum bol zmenený. Registrovaní účastníci budú informovaní e-mailom.",
+    "eventCreated": "Udalosť úspešne vytvorená!",
+    "createEventCta": "Usporiadať udalosť",
+    "createEventExplanation": "Vytvorte svoju udalosť a dostanete odkaz na jej správu.",
+    "noAccountNeeded": "Nepotrebujete účet — odkaz moderátora je váš prístup na správu udalosti.",
+    "form": {
+      "titleIt": "Názov (taliansky)",
+      "titleEn": "Názov (anglicky)",
+      "descriptionIt": "Popis (taliansky)",
+      "descriptionEn": "Popis (anglicky)",
+      "startsAt": "Dátum a čas začiatku",
+      "endsAt": "Dátum a čas konca",
+      "maxParticipants": "Maximálny počet účastníkov",
+      "qaEnabled": "Povoliť Q&A",
+      "chatEnabled": "Povoliť chat",
+      "recordingEnabled": "Povoliť videozáznam",
+      "dataRetentionDays": "Uchovávanie údajov (dni po udalosti)",
+      "dataRetentionHint": "Po uplynutí tohto obdobia budú automaticky zmazané registrácie účastníkov, otázky Q&A a prípadné videozáznamy.",
+      "privacyPolicyUrl": "URL zásad ochrany osobných údajov",
+      "moderatorName": "Meno moderátora",
+      "moderatorEmail": "E-mail moderátora",
+      "speakersIt": "Prednášajúci (taliansky)",
+      "speakersEn": "Prednášajúci (anglicky)",
+      "organizerName": "Organizátor",
+      "imageUrl": "URL titulného obrázka",
+      "waitingRoomAudioUrl": "URL audia v čakárni (voliteľné)",
+      "waitingRoomAudioUrlHint": "Zadajte URL súboru MP3 pre hudbu v čakárni. Nechajte prázdne pre predvolené audio.",
+      "submit": "Vytvoriť udalosť",
+      "submitEdit": "Uložiť zmeny",
+      "saving": "Ukladanie...",
+      "creating": "Vytváranie...",
+      "sectionContent": "Obsah",
+      "sectionSchedule": "Plánovanie",
+      "sectionSettings": "Nastavenia",
+      "sectionSpeakers": "Prednášajúci a organizátor",
+      "sectionModerator": "Moderátor",
+      "sectionRegistrationFields": "Registračné polia",
+      "requireOrganization": "Vyžadovať organizáciu",
+      "requireOrganizationDesc": "Účastníci musia uviesť svoju organizáciu",
+      "requireOrganizationRole": "Vyžadovať pozíciu v organizácii",
+      "requireOrganizationRoleDesc": "Účastníci môžu uviesť svoju pozíciu",
+      "requireOrganizationType": "Vyžadovať typ organizácie",
+      "requireOrganizationTypeDesc": "Účastníci vyberú typ svojej organizácie",
+      "sectionPermissions": "Oprávnenia účastníkov",
+      "participantsCanUnmute": "Účastníci môžu zapnúť mikrofón",
+      "participantsCanStartVideo": "Účastníci môžu zapnúť webkameru",
+      "participantsCanShareScreen": "Účastníci môžu zdieľať obrazovku",
+      "permissionsOnDesc": "Účastníci môžu aktivovať samostatne",
+      "permissionsOffDesc": "Iba moderátori môžu aktivovať. Účastníci musia zdvihnúť ruku.",
+      "permissionsNote": "Zmeny oprávnení sa vzťahujú na nových účastníkov.",
+      "privacyPolicyMode": "Zásady ochrany osobných údajov",
+      "privacyPolicyModeUrl": "Externý URL",
+      "privacyPolicyModeText": "Vlastný text",
+      "privacyPolicyText": "Text zásad ochrany osobných údajov",
+      "privacyPolicyTextHint": "Napíšte text zásad ochrany osobných údajov. Bude zobrazený priamo v registračnom formulári.",
+      "retentionPreviewTitle": "Čo bude automaticky zmazané",
+      "retentionPreviewIntro": "Po {days} dňoch od ukončenia udalosti bude automaticky zmazané:",
+      "retentionPreviewParticipants": "Údaje účastníkov (meno, e-mail, organizácia)",
+      "retentionPreviewQa": "Otázky Q&A a hlasy",
+      "retentionPreviewPolls": "Výsledky ankiet",
+      "retentionPreviewRecordings": "Videozáznamy",
+      "retentionPreviewKept": "Súhrnné štatistiky a metadáta udalosti sú uchované.",
+      "configPreview": "Náhľad konfigurácie",
+      "templateApplied": "Šablóna použitá: {name}. Môžete upraviť všetky nastavenia."
+    },
+    "links": {
+      "title": "Odkazy udalosti",
+      "publicPage": "Verejná stránka udalosti",
+      "moderatorLink": "Odkaz moderátora",
+      "moderatorLinkHint": "Tento odkaz zdieľajte iba s moderátormi. Ktokoľvek s týmto odkazom môže udalosť spravovať.",
+      "copyLink": "Kopírovať odkaz",
+      "copied": "Skopírované!"
+    },
+    "feedbackAdmin": {
+      "title": "Výsledky spätnej väzby",
+      "averageRating": "Priemerné hodnotenie",
+      "totalVotes": "{count, plural, one {# hodnotenie} few {# hodnotenia} other {# hodnotení}}",
+      "noFeedback": "Žiadna spätná väzba",
+      "comments": "Komentáre účastníkov",
+      "noComments": "Žiadne komentáre",
+      "stars": "hviezd"
+    },
+    "gdprAuditLog": {
+      "title": "Auditný protokol GDPR",
+      "date": "Dátum",
+      "action": "Akcia",
+      "recordCount": "Záznamy",
+      "details": "Podrobnosti",
+      "actions": {
+        "DATA_DELETED": "Údaje zmazané",
+        "CONSENT_RECORDED": "Súhlas zaznamenaný",
+        "DATA_EXPORTED": "Údaje exportované"
+      }
+    },
+    "settings": {
+      "title": "Nastavenia webu",
+      "subtitle": "Konfigurujte vzhľad a správanie platformy pre opakované použitie vo verejnej správe",
+      "saving": "Ukladanie...",
+      "saved": "Nastavenia úspešne uložené",
+      "tabs": {
+        "branding": "Branding",
+        "header": "Hlavička",
+        "seo": "SEO",
+        "homepage": "Domovská stránka",
+        "pages": "Stránky",
+        "footer": "Päta stránky",
+        "features": "Funkcie"
+      },
+      "header": {
+        "slimBarTitle": "Horná lišta (Slim Header)",
+        "slimBarDescription": "Tenká lišta v hornej časti stránky identifikujúca nadradenú organizáciu.",
+        "parentOrganization": "Nadradená organizácia",
+        "parentOrganizationHelp": "Napr. \"Predsedníctvo Rady ministrov\"",
+        "parentOrganizationUrl": "URL nadradenej organizácie",
+        "centerBarTitle": "Centrálna hlavička",
+        "centerBarDescription": "Hlavná oblasť hlavičky s názvom aplikácie a logom.",
+        "appName": "Názov aplikácie",
+        "appNameHelp": "Zobrazený v hlavičke a názve prehliadača",
+        "organizationShort": "Krátky názov organizácie",
+        "logoUrl": "URL loga",
+        "logoUrlHelp": "Nechajte prázdne pre predvolenú ikonu verejnej správy",
+        "organizationUrl": "URL webu organizácie"
+      },
+      "branding": {
+        "siteName": "Názov aplikácie",
+        "siteNameHelp": "Zobrazený v hlavičke, názve prehliadača a e-mailoch",
+        "siteDescription": "Popis aplikácie",
+        "organizationName": "Názov organizácie",
+        "organizationNameHelp": "napr. Odbor pre digitálnu transformáciu",
+        "organizationNameShort": "Skratka organizácie",
+        "organizationUrl": "URL organizácie",
+        "parentOrganization": "Nadradená organizácia",
+        "parentOrganizationHelp": "napr. Predsedníctvo Rady ministrov",
+        "parentOrganizationUrl": "URL nadradenej organizácie",
+        "logoUrl": "URL vlastného loga",
+        "logoUrlHelp": "Nechajte prázdne pre predvolenú ikonu verejnej správy",
+        "faviconUrl": "URL favicon",
+        "primaryColor": "Primárna farba",
+        "defaultTimezone": "Predvolené časové pásmo",
+        "defaultTimezoneHelp": "Používa sa na zobrazenie dátumov a vytváranie nových udalostí."
+      },
+      "watermark": {
+        "title": "Prispôsobenie videa",
+        "enabled": "Vodoznak aktívny",
+        "url": "URL vodoznaku",
+        "urlHelp": "URL priehľadného obrázka SVG alebo PNG. Nechajte prázdne pre použitie loga organizácie.",
+        "opacity": "Priehľadnosť",
+        "position": "Pozícia",
+        "previewLabel": "Náhľad video oblasti",
+        "positions": {
+          "bottomLeft": "Vľavo dole",
+          "bottomRight": "Vpravo dole",
+          "topLeft": "Vľavo hore",
+          "topRight": "Vpravo hore"
+        }
+      },
+      "seo": {
+        "title": "SEO titulok",
+        "titleHelp": "Titulok zobrazený vo výsledkoch vyhľadávania a na karte prehliadača",
+        "description": "SEO popis",
+        "descriptionHelp": "Popis pre vyhľadávače a zdieľanie na sociálnych sieťach",
+        "image": "Obrázok Open Graph",
+        "imageHelp": "Predvolený obrázok pre zdieľanie na sociálnych sieťach (odporúčané 1200×630)"
+      },
+      "homepage": {
+        "modeLabel": "Režim domovskej stránky",
+        "modes": {
+          "LANDING": {
+            "title": "Úvodná stránka",
+            "description": "Hero, funkcie, nadchádzajúce udalosti a ako to funguje"
+          },
+          "EVENTS_LIST": {
+            "title": "Zoznam udalostí",
+            "description": "Zobrazí priamo zoznam udalostí"
+          },
+          "CUSTOM": {
+            "title": "Vlastné",
+            "description": "Vlastný HTML obsah + zoznam udalostí"
+          }
+        },
+        "customHtmlLabel": "Vlastný HTML obsah",
+        "customHtmlHelp": "HTML zobrazené v hlavnej sekcii domovskej stránky"
+      },
+      "pages": {
+        "privacyTitle": "Zásady ochrany osobných údajov",
+        "privacyIt": "Obsah (taliansky)",
+        "privacyEn": "Obsah (anglicky)",
+        "accessibilityTitle": "Vyhlásenie o prístupnosti",
+        "accessibilityIt": "Obsah (taliansky)",
+        "accessibilityEn": "Obsah (anglicky)",
+        "preview": "Náhľad"
+      },
+      "footer": {
+        "linksTitle": "Odkazy v päte stránky",
+        "addLink": "Pridať odkaz",
+        "noLinks": "Žiadne nakonfigurované odkazy. Budú použité predvolené.",
+        "linkTitle": "Názov",
+        "linkSection": "Sekcia",
+        "sectionLegal": "Právne informácie",
+        "sectionMain": "Hlavné",
+        "moveUp": "Posunúť hore",
+        "moveDown": "Posunúť dole",
+        "removeLink": "Odstrániť odkaz"
+      },
+      "features": {
+        "statusPageEnabled": "Stavová stránka aktívna",
+        "statusPageEnabledHelp": "Zobraziť stavovú stránku služby",
+        "guestAccessEnabled": "Prístup hostí aktívny",
+        "guestAccessEnabledHelp": "Povoliť prístup hostí k prebiehajúcim udalostiam",
+        "publicRegistrationEnabled": "Verejná registrácia aktívna",
+        "publicRegistrationEnabledHelp": "Ktokoľvek môže vytvárať udalosti (ak je deaktivované, môžu iba administrátori)",
+        "calendarPublic": "Verejný kalendár",
+        "calendarPublicHelp": "Zverejniť kalendár udalostí. Návštevníci môžu vidieť naplánované udalosti.",
+        "githubUrl": "URL repozitára GitHub",
+        "supportEmail": "E-mail podpory"
+      }
+    },
+    "analytics": {
+      "title": "Štatistiky",
+      "subtitle": "Prehľad metrík platformy",
+      "timeline": "Časový vývoj",
+      "topEvents": "Najlepšie udalosti",
+      "noData": "Pre toto obdobie nie sú k dispozícii žiadne údaje.",
+      "period": {
+        "7d": "7 dní",
+        "30d": "30 dní",
+        "90d": "90 dní",
+        "all": "Celé obdobie"
+      },
+      "metrics": {
+        "totalEvents": "Celkom udalostí",
+        "totalRegistrations": "Registrácie",
+        "totalParticipants": "Účastníci",
+        "conversionRate": "Priemerná miera konverzie",
+        "peakParticipants": "Špičkový počet účastníkov"
+      },
+      "table": {
+        "event": "Udalosť",
+        "date": "Dátum",
+        "registrations": "Registrácie",
+        "participants": "Účastníci",
+        "peak": "Špička",
+        "questions": "Q&A",
+        "conversion": "Konverzia",
+        "noEvents": "Nenašli sa žiadne udalosti."
+      },
+      "quickStats": {
+        "title": "Rýchle štatistiky",
+        "avgDuration": "Priemerné trvanie udalostí",
+        "avgQuestionsPerEvent": "Otázky Q&A na udalosť",
+        "totalPollVotes": "Celkom hlasov v anketách",
+        "avgParticipantsPerEvent": "Priemerný počet účastníkov na udalosť",
+        "avgFeedbackRating": "Priemerné hodnotenie spätnej väzby",
+        "totalFeedback": "Odpovedí spätnej väzby"
+      }
+    },
+    "templates": {
+      "title": "Šablóny udalostí",
+      "subtitle": "Spravujte prednastavené šablóny pre rýchle vytváranie udalostí",
+      "create": "Nová šablóna",
+      "deleteConfirm": "Naozaj chcete zmazať túto šablónu?",
+      "system": "Systémová",
+      "nameLabel": "Názov šablóny",
+      "descriptionLabel": "Popis",
+      "maxParticipantsLabel": "Max. účastníkov",
+      "featuresLabel": "Funkcie",
+      "recordingLabel": "Nahrávanie",
+      "unmute": "Mikrofón účastníkov",
+      "video": "Video účastníkov",
+      "screen": "Zdieľanie obrazovky",
+      "pickerTitle": "Vyberte šablónu",
+      "pickerSubtitle": "Vyberte šablónu pre predkonfiguráciu nastavení udalosti, alebo preskočte pre manuálnu konfiguráciu.",
+      "skipTemplate": "Konfigurovať manuálne"
+    },
+    "instantCall": {
+      "title": "Okamžitý videohovor",
+      "subtitle": "Vytvorte videohovor na počkanie a zdieľajte odkaz. Bez plánovania.",
+      "nameLabel": "Názov videohovoru",
+      "namePlaceholder": "napr. Rýchla porada, Demo projektu...",
+      "moderatorLabel": "Vaše meno (voliteľné)",
+      "moderatorPlaceholder": "Bude zobrazené v hovore",
+      "create": "Vytvoriť a pripojiť sa",
+      "creating": "Vytváranie...",
+      "copyLink": "Kopírovať odkaz pozvánky",
+      "copied": "Skopírované!",
+      "hint": "Všetci môžu zapnúť mikrofón, webkameru a zdieľať obrazovku. Iba vy môžete nahrávať a ukončiť hovor."
+    },
+    "files": {
+      "title": "Súbory a materiály",
+      "upload": "Nahrať súbor",
+      "selectFile": "Vybrať súbor",
+      "fileTitle": "Názov",
+      "visibility": "Viditeľnosť",
+      "visibilityAlways": "Vždy viditeľné",
+      "visibilityBefore": "Iba pred udalosťou",
+      "visibilityDuring": "Iba počas udalosti",
+      "visibilityAfter": "Iba po udalosti",
+      "uploading": "Nahrávanie...",
+      "uploadBtn": "Nahrať",
+      "deleteConfirm": "Naozaj chcete zmazať tento súbor?",
+      "noFiles": "Žiadne nahrané súbory. Použite tlačidlo \"Nahrať súbor\" pre pridanie materiálov."
+    },
+    "languages": {
+      "title": "Správa jazykov",
+      "subtitle": "Konfigurujte dostupné jazyky a prispôsobte preklady",
+      "configuredLocales": "Nakonfigurované jazyky",
+      "localesDescription": "Vyberte jazyky dostupné pre používateľské rozhranie. Taliančina je povinná ako predvolený jazyk.",
+      "addLocale": "Pridať jazyk",
+      "localeCode": "Kód jazyka",
+      "localeName": "Názov jazyka",
+      "selectLocale": "Vyberte...",
+      "add": "Pridať",
+      "default": "Predvolený",
+      "editTranslations": "Upraviť preklady",
+      "saved": "Konfigurácia jazykov uložená",
+      "saveNote": "Zmeny dostupných jazykov vyžadujú reštart, aby sa prejavili v URL adresách.",
+      "translationOverrides": "Vlastné preklady — {locale}",
+      "overridesDescription": "Prepíšte predvolené preklady pre tento jazyk. Použite bodkovú notáciu (napr. common.appName).",
+      "keyLabel": "Kľúč prekladu",
+      "valueLabel": "Hodnota",
+      "addOverride": "Pridať"
+    },
+    "infrastructure": {
+      "title": "Infraštruktúra",
+      "subtitle": "Stav komponentov a konfigurácia prostredia",
+      "deploymentMode": "Režim nasadenia",
+      "version": "Verzia",
+      "environment": "Prostredie",
+      "modes": {
+        "simple": "Jednoduchý (Docker Compose)",
+        "standard": "Štandardný (Kubernetes)",
+        "full": "Plný (Kubernetes so scale-to-zero)",
+        "unknown": "Neznámy"
+      },
+      "database": {
+        "title": "Databáza",
+        "internal": "V klastri (PostgreSQL)",
+        "external": "Externá",
+        "connected": "Pripojené",
+        "disconnected": "Nedostupné"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Dostupné",
+        "unreachable": "Nedostupné",
+        "notConfigured": "Nenakonfigurované"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero aktívne",
+        "replicas": "{current}/{max} uzlov",
+        "preScale": "Pre-scale: {minutes} min",
+        "fixedMode": "Pevný režim",
+        "scalerEnabled": "Scaler povolený"
+      },
+      "jibri": {
+        "title": "Nahrávanie (Jibri)",
+        "available": "Dostupné",
+        "notConfigured": "Nenakonfigurované",
+        "storageType": "Úložisko",
+        "configureHint": "Videozáznam vyžaduje Jibri. Nakonfigurujte úložisko pre jeho povolenie.",
+        "docsLink": "Dokumentácia"
+      },
+      "email": {
+        "title": "E-mail",
+        "configured": "Nakonfigurované",
+        "notConfigured": "Nenakonfigurované"
+      },
+      "features": {
+        "title": "Funkcie",
+        "statusPage": "Stavová stránka",
+        "guestAccess": "Prístup hostí",
+        "metrics": "Endpoint metrík"
+      },
+      "note": "Zmeny infraštruktúry sa vykonávajú prostredníctvom Helm values a CI/CD pipeline.",
+      "deployDocs": "Dokumentácia nasadenia"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Potvrdenie registrácie: {eventTitle}",
+    "confirmationHeading": "Registrácia potvrdená",
+    "confirmationKeepNote": "Uschovajte si tento e-mail — obsahuje váš osobný odkaz na prístup k udalosti.",
+    "reminderSubject": "Pripomienka: {eventTitle} začína o 1 hodinu",
+    "reminderHeading": "Pripomienka udalosti",
+    "reminderNote": "Udalosť, na ktorú ste sa registrovali, začína o menej ako hodinu. Na pripojenie použite odkaz nižšie.",
+    "recordingSubject": "Záznam k dispozícii: {eventTitle}",
+    "joinLabel": "Pripojiť sa k udalosti",
+    "viewEvent": "Zobraziť stránku udalosti",
+    "eventLabel": "Udalosť",
+    "dateLabel": "Dátum",
+    "timeLabel": "Čas",
+    "durationLabel": "Trvanie"
+  },
+  "home": {
+    "hero": {
+      "title": "Verejné digitálne udalosti",
+      "subtitle": "Platforma pre webináre, prezentácie a verejné stretnutia Odboru pre digitálnu transformáciu",
+      "browseEvents": "Prehliadať udalosti",
+      "organizeEvent": "Usporiadať udalosť"
+    },
+    "features": {
+      "title": "Platforma pre udalosti verejnej správy",
+      "video": {
+        "title": "Videokonferencia",
+        "desc": "Zúčastnite sa verejných udalostí až s 300 účastníkmi. Bez nutnosti inštalácie softvéru."
+      },
+      "qa": {
+        "title": "Otázky a odpovede",
+        "desc": "Klaďte otázky počas udalosti a hlasujte o najdôležitejších. Moderátor odpovedá naživo."
+      },
+      "privacy": {
+        "title": "Ochrana súkromia a bezpečnosť",
+        "desc": "Ochrana údajov v súlade s GDPR. Vlastná infraštruktúra v Taliansku."
+      }
+    },
+    "upcoming": {
+      "title": "Nadchádzajúce udalosti",
+      "viewAll": "Zobraziť všetky udalosti",
+      "noEvents": "Žiadne nadchádzajúce udalosti. Navštívte nás znova!"
+    },
+    "howItWorks": {
+      "title": "Ako to funguje",
+      "step1": {
+        "title": "Zaregistrujte sa",
+        "desc": "Prihláste sa zadarmo na udalosť"
+      },
+      "step2": {
+        "title": "Dostanete odkaz",
+        "desc": "E-mail s vaším osobným prístupovým odkazom"
+      },
+      "step3": {
+        "title": "Pripojte sa",
+        "desc": "Vstúpte do udalosti z prehliadača, bez inštalácie"
+      },
+      "step4": {
+        "title": "Komunikujte",
+        "desc": "Klaďte otázky, hlasujte, zapojte sa do diskusie"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Súhlasím s audio/video záznamom tejto udalosti",
+      "recordingRequired": "Pre účasť na tejto udalosti je potrebný súhlas s nahrávaním",
+      "futureCommunications": "Prajem si dostávať informácie o budúcich udalostiach organizovaných DTD"
+    },
+    "export": {
+      "title": "Moje údaje",
+      "subtitle": "Požiadajte o kópiu osobných údajov spojených s vašou e-mailovou adresou podľa čl. 15 GDPR.",
+      "emailLabel": "Vaša e-mailová adresa",
+      "emailPlaceholder": "Zadajte e-mail použitý pri registrácii",
+      "emailInvalid": "Zadajte platnú e-mailovú adresu",
+      "submit": "Požiadať o moje údaje",
+      "loading": "Vyhľadávanie...",
+      "noData": "Pre túto e-mailovú adresu neboli nájdené žiadne údaje.",
+      "error": "Vyskytla sa chyba. Skúste to prosím neskôr.",
+      "rateLimited": "Príliš veľa požiadaviek. Skúste to znova o hodinu.",
+      "results": "Vaše údaje",
+      "resultsDescription": "Nájdené údaje vzťahujúce sa k {count} udalostiam.",
+      "registrationData": "Registračné údaje",
+      "fieldName": "Meno",
+      "fieldEmail": "E-mail",
+      "fieldOrganization": "Organizácia",
+      "fieldRegisteredAt": "Dátum registrácie",
+      "fieldConsent": "Súhlas",
+      "questionsTitle": "Otázky Q&A",
+      "pollVotesTitle": "Hlasy v anketách",
+      "optionLabel": "Možnosť"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Zásady ochrany osobných údajov",
+      "title": "Zásady ochrany osobných údajov",
+      "intro": "Táto stránka sumarizuje spracovanie osobných údajov v súvislosti s používaním platformy Eventi DTD a účasťou na usporiadaných verejných udalostiach.",
+      "sections": {
+        "controller": {
+          "title": "Prevádzkovateľ údajov",
+          "body": "Spracovanie osobných údajov prebieha v rámci inštitucionálnych činností Odboru pre digitálnu transformáciu za účelom technického a organizačného zabezpečenia verejných online udalostí."
+        },
+        "data": {
+          "title": "Spracovávané údaje a účely",
+          "body": "Platforma spracováva iba údaje nevyhnutne potrebné na registráciu a účasť na udalostiach, ako je meno, e-mailová adresa a prípadné voliteľné polia konfigurované organizátorom. Údaje sa používajú na zaslanie osobného prístupového odkazu, správu účasti, zasielanie pripomienok a plnenie povinností spojených so zabezpečením služby."
+        },
+        "retention": {
+          "title": "Uchovávanie údajov a práva",
+          "body": "Údaje sú uchovávané po dobu nakonfigurovanú pre každú udalosť a potom automaticky zmazané, pokiaľ zákonné povinnosti nestanovia inak. Dotknuté osoby môžu kedykoľvek uplatniť svoje práva podľa GDPR, vrátane prístupu, opravy a vymazania, prostredníctvom inštitucionálnych kanálov Odboru."
+        }
+      },
+      "note": {
+        "title": "Žiadosť o vaše údaje",
+        "body": "Ak ste sa zúčastnili udalosti a chcete overiť, aké osobné údaje sú spojené s vašou e-mailovou adresou, môžete využiť vyhradenú funkciu dostupnú na platforme.",
+        "linkLabel": "Požiadať o moje údaje"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Vyhlásenie o prístupnosti",
+      "title": "Vyhlásenie o prístupnosti",
+      "intro": "Odbor pre digitálnu transformáciu sa zaväzuje zabezpečiť prístupnosť tejto platformy v súlade s platnými požiadavkami na digitálne služby verejnej správy.",
+      "sections": {
+        "commitment": {
+          "title": "Záväzok prístupnosti",
+          "body": "Platforma je navrhnutá s komponentmi v súlade s dizajnovým systémom .italia a s dôrazom na navigáciu z klávesnice, sémantickú štruktúru obsahu a čitateľnosť rozhrania na hlavných veľkostiach obrazovky."
+        },
+        "status": {
+          "title": "Stav zhody",
+          "body": "Prebiehajú priebežné kontroly a zlepšovanie prístupnosti. Prípadné zostávajúce nedostatky sú postupne odstraňované v rámci vývoja služby a bežnej údržby."
+        },
+        "feedback": {
+          "title": "Spätná väzba a kontakty",
+          "body": "Na nahlásenie problémov s prístupnosťou alebo ťažkostí pri používaní služby môžu používatelia kontaktovať Odbor prostredníctvom jeho inštitucionálnych kanálov s uvedením dotknutej stránky a stručným popisom problému."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Právne upozornenia",
+      "title": "Právne upozornenia",
+      "intro": "Prístup k platforme Eventi DTD a jej používanie podlieha týmto upozorneniam, ktoré sumarizujú všeobecné podmienky používania a hlavné informácie o službe.",
+      "sections": {
+        "ownership": {
+          "title": "Vlastníctvo služby",
+          "body": "Platforma je prevádzkovaná Odborom pre digitálnu transformáciu a je poskytovaná na organizáciu a účasť na verejných online udalostiach inštitucionálneho záujmu."
+        },
+        "usage": {
+          "title": "Podmienky používania",
+          "body": "Používatelia sú povinní používať službu riadne a nesmú ohroziť bezpečnosť platformy, dostupnosť funkcií ani riadny priebeh udalostí. Zneužitie alebo nevhodné použitie môže viesť k obmedzeniu prístupu k službe."
+        },
+        "liability": {
+          "title": "Obmedzenie zodpovednosti",
+          "body": "Napriek prijatiu primeraných technických a organizačných opatrení Odbor nemôže zaručiť úplnú absenciu prerušení alebo porúch spôsobených nepredvídateľnými udalosťami, údržbou alebo vonkajšími faktormi. Zákonné zodpovednosti zostávajú nedotknuté."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Stav systému",
+    "subtitle": "Prehľad stavu služieb platformy v reálnom čase.",
+    "allOperational": "Všetky systémy v prevádzke",
+    "degraded": "Znížený výkon",
+    "outage": "Výpadok služby",
+    "componentLabel": "Komponent",
+    "statusLabel": "Stav",
+    "operational": "V prevádzke",
+    "degradedLabel": "Spomalené",
+    "standby": "V pohotovosti",
+    "loading": "Načítanie...",
+    "fetchError": "Nie je možné načítať stav systému",
+    "components": {
+      "app": "Webový portál",
+      "database": "Databáza",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Videozáznam",
+      "smtp": "E-mail (SMTP)"
+    },
+    "jvbCapacity": "Kapacita video bridge",
+    "jvbStandby": "V pohotovosti — aktivuje sa automaticky v prípade potreby",
+    "jvbStandbyDetail": "Scale-to-zero aktívne — žiadne naplánované udalosti. Uzly JVB budú automaticky vytvorené pred začiatkom udalosti.",
+    "jvbScaling": "Spúšťanie...",
+    "nodesActive": "uzlov aktívnych",
+    "nodesReady": "uzlov pripravených",
+    "scaling": "škálovanie",
+    "jvbStress": "Záťaž JVB",
+    "participantsConnected": "pripojených účastníkov",
+    "videoInteractive": "interaktívne",
+    "videoWebinar": "webinár",
+    "participantsAvailable": "dostupných účastníkov",
+    "upcomingEvents": "Nadchádzajúce udalosti",
+    "noUpcomingEvents": "Žiadne naplánované udalosti",
+    "jvbActivatesIn": "JVB sa aktivuje o {minutes} min",
+    "liveNow": "Práve prebieha",
+    "activeEvents": "Aktívne udalosti",
+    "registrationsToday": "Dnešné registrácie",
+    "jvbNodes": "Uzly JVB",
+    "overallStatus": "Celkový stav",
+    "lastChecked": "Posledná kontrola",
+    "responseTime": "Doba odozvy",
+    "systemStatus": "Stav systému"
+  },
+  "feedback": {
+    "title": "Ako hodnotíte túto udalosť?",
+    "ratingLabel": "Vyberte hodnotenie od 1 do 5 hviezd",
+    "comment": "Komentár",
+    "commentPlaceholder": "Máte návrhy? (voliteľné)",
+    "submit": "Odoslať spätnú väzbu",
+    "submitting": "Odosielanie...",
+    "skip": "Preskočiť",
+    "thankYou": "Ďakujeme za vašu spätnú väzbu!",
+    "averageRating": "Priemerné hodnotenie",
+    "ratingCount": "{count} hodnotení",
+    "noFeedback": "Žiadna spätná väzba"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Spustiť",
+    "prompt": "Téma",
+    "promptPlaceholder": "napr. Čo od tejto udalosti očakávate?",
+    "duration": "Trvanie",
+    "submit": "Odoslať",
+    "submitPlaceholder": "Napíšte slovo (max. 30 znakov)",
+    "close": "Zavrieť word cloud",
+    "cancel": "Zrušiť",
+    "noActiveRound": "V tejto chvíli nie je aktívny žiadny word cloud.",
+    "noWords": "Čakáme na prvé slová...",
+    "wordsSubmitted": "{count} odoslaných slov",
+    "timeRemaining": "Zostávajúci čas"
+  },
+  "timer": {
+    "title": "Časovač",
+    "start": "Spustiť",
+    "pause": "Pozastaviť",
+    "reset": "Vynulovať",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Vlastné"
+    },
+    "showToAll": "Zobraziť všetkým",
+    "timeUp": "Čas vypršal!"
+  },
+  "reactions": {
+    "title": "Reakcie",
+    "sendReaction": "Odoslať reakciu",
+    "reactionSent": "Reakcia odoslaná!"
+  },
+  "calendar": {
+    "title": "Kalendár udalostí",
+    "subtitle": "Zobraziť všetky udalosti v čase",
+    "publicTitle": "Kalendár udalostí",
+    "publicSubtitle": "Objavte naplánované udalosti",
+    "today": "Dnes",
+    "prev": "Predchádzajúce obdobie",
+    "next": "Nasledujúce obdobie",
+    "views": {
+      "day": "Deň",
+      "week": "Týždeň",
+      "month": "Mesiac",
+      "year": "Rok",
+      "list": "Zoznam"
+    },
+    "status": {
+      "DRAFT": "Koncept",
+      "PUBLISHED": "Publikované",
+      "LIVE": "Práve prebieha",
+      "ENDED": "Ukončené",
+      "ARCHIVED": "Archivované"
+    }
+  },
+  "footer": {
+    "departmentName": "Odbor pre digitálnu transformáciu",
+    "presidencyName": "Predsedníctvo Rady ministrov",
+    "privacy": "Zásady ochrany osobných údajov",
+    "accessibility": "Vyhlásenie o prístupnosti",
+    "openSource": "Open source softvér",
+    "contacts": "Kontakty",
+    "legalNotes": "Právne upozornenia",
+    "governmentSite": "Talianska vláda",
+    "systemStatus": "Stav systému"
+  },
+  "pages": {
+    "privacyTitle": "Zásady ochrany osobných údajov",
+    "privacyNotConfigured": "Zásady ochrany osobných údajov ešte neboli nakonfigurované.",
+    "accessibilityTitle": "Vyhlásenie o prístupnosti",
+    "accessibilityNotConfigured": "Vyhlásenie o prístupnosti ešte nebolo nakonfigurované."
+  },
+  "video": {
+    "play": "Prehrať",
+    "pause": "Pozastaviť",
+    "speed": "Rýchlosť",
+    "fullscreen": "Celá obrazovka",
+    "pip": "Picture in Picture",
+    "volume": "Hlasitosť",
+    "mute": "Stlmiť",
+    "unmute": "Zapnúť zvuk",
+    "download": "Stiahnuť záznam",
+    "speedLabel": "Rýchlosť prehrávania",
+    "progress": "Ukazovateľ priebehu"
+  },
+  "diagram": {
+    "title": "Konfigurácia udalosti",
+    "topology": "Topológia",
+    "features": "Aktívne funkcie",
+    "estimates": "Odhad zdrojov",
+    "moderator": "Moderátor",
+    "participants": "Účastníci",
+    "jvb": "Video Bridge",
+    "jibri": "Nahrávanie",
+    "bandwidth": {
+      "moderator": "Šírka pásma moderátora",
+      "participant": "Šírka pásma na účastníka",
+      "total": "Odhadovaná celková šírka pásma"
+    },
+    "jvbCount": "Potrebné JVB",
+    "jvbRam": "Odhadovaná RAM JVB",
+    "storage": "Úložisko záznamu",
+    "duration": "Odhadované trvanie",
+    "viewOnly": "Iba prezeranie",
+    "preview": "Náhľad konfigurácie"
+  },
+  "waiting": {
+    "startsIn": "Udalosť začne o",
+    "eventLive": "Udalosť práve prebieha!",
+    "connectedParticipants": "{count, plural, =0 {Žiadni účastníci} =1 {1 pripojený účastník} few {{count} pripojení účastníci} other {{count} pripojených účastníkov}}",
+    "elapsedTime": "Prebieha {minutes} minút",
+    "youAreLate": "Udalosť začala pred {minutes} minútami",
+    "chooseHowToJoin": "Vyberte si spôsob účasti:",
+    "enterLive": "Pripojiť sa NAŽIVO",
+    "enterLiveDesc": "Pripojte sa naživo. K záznamu môžete pristúpiť aj po skončení udalosti.",
+    "enterNow": "Pripojiť sa teraz",
+    "watchFromStart": "Sledovať od začiatku",
+    "watchFromStartDesc": "Sledujte záznam od začiatku a prepnite na živý prenos, kedykoľvek budete chcieť.",
+    "watchNow": "Sledovať",
+    "switchToLive": "Prepnúť na živý prenos",
+    "enterRoom": "Vstúpiť do miestnosti",
+    "recordingNotice": "Táto udalosť je nahrávaná.",
+    "recordingAvailableAfter": "Záznam bude k dispozícii po skončení udalosti.",
+    "autoRefreshHint": "Stránka sa automaticky aktualizuje, keď udalosť začne.",
+    "startEventButton": "Začať udalosť",
+    "startingEvent": "Začíname...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 osoba čaká} few {{count} osoby čakajú} other {{count} osôb čaká}}",
+    "jvbScaling": "Príprava miestnosti...",
+    "jvbScalingDetail": "Video servery sa spúšťajú. Trvá to približne 2 minúty.",
+    "jvbReady": "Miestnosť je pripravená!"
+  },
+  "recording": {
+    "management": "Videozáznam",
+    "inProgress": "Prebieha",
+    "available": "Záznam k dispozícii",
+    "duration": "Trvanie",
+    "fileSize": "Veľkosť súboru",
+    "startedAt": "Začaté",
+    "automatic": "automatický",
+    "publish": "Zverejniť záznam",
+    "publishDesc": "Sprístupniť video na stránke udalosti",
+    "retentionLabel": "Uchovávanie",
+    "retention": {
+      "24h": "24 hodín (dočasný)",
+      "7d": "7 dní",
+      "30d": "30 dní",
+      "90d": "90 dní",
+      "forever": "Nikdy (do vypršania udalosti)"
+    },
+    "retentionNote": "Video bude naďalej podliehať GDPR retencii udalosti",
+    "delete": "Zmazať záznam",
+    "deleteConfirm": "Ste si istí? Video bude trvalo zmazané.",
+    "notConfigured": "Jibri nie je nakonfigurovaný. Videozáznam nie je dostupný.",
+    "play": "Prehrať",
+    "download": "Stiahnuť"
+  },
+  "postEvent": {
+    "config": "Konfigurácia po udalosti",
+    "pageVisible": "Stránka udalosti viditeľná po skončení",
+    "showQA": "Zobraziť otázky Q&A",
+    "showMaterials": "Zobraziť zdieľané materiály",
+    "showPolls": "Zobraziť výsledky ankiet",
+    "showFeedback": "Zobraziť spätnú väzbu",
+    "feedbackEnabled": "Dotazník spätnej väzby aktívny po skončení udalosti",
+    "visibilityAlways": "Vždy viditeľné",
+    "visibilityUntil": "Viditeľné do:",
+    "dataRetentionNote": "Osobné údaje účastníkov budú zmazané podľa retencie udalosti ({days} dní). Obsah udalosti zostane dostupný po dobu viditeľnosti stránky.",
+    "availableUntil": "Táto udalosť a jej obsah budú dostupné do {date}.",
+    "tabs": {
+      "qa": "Otázky a odpovede",
+      "materials": "Materiály",
+      "polls": "Ankety",
+      "feedback": "Spätná väzba"
+    }
+  }
+}

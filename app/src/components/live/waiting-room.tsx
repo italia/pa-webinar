@@ -22,7 +22,7 @@ interface WaitingRoomEvent {
   startsAt: string;
   endsAt: string;
   status: 'PUBLISHED' | 'LIVE';
-  speakersIt?: string | null;
+  speakers?: string | null;
   organizerName?: string | null;
   maxParticipants: number;
   recordingEnabled: boolean;
@@ -174,9 +174,9 @@ export default function WaitingRoom({
                     {event.title}
                   </h1>
 
-                  {(event.speakersIt || event.organizerName) && (
+                  {(event.speakers || event.organizerName) && (
                     <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-                      {[event.speakersIt, event.organizerName].filter(Boolean).join(' · ')}
+                      {[event.speakers, event.organizerName].filter(Boolean).join(' · ')}
                     </p>
                   )}
 

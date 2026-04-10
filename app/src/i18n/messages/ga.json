@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "Imeachtaí DTD",
+    "appDescription": "Ardán d'imeachtaí poiblí digiteacha na Roinne um Chlaochlú Digiteach",
+    "loading": "Ag lódáil...",
+    "error": "Tharla earráid",
+    "errorMessage": "Chuaigh rud éigin mícheart. Bain triail eile as, le bhur dtoil.",
+    "retry": "Bain triail eile as",
+    "save": "Sábháil",
+    "cancel": "Cealaigh",
+    "confirm": "Deimhnigh",
+    "close": "Dún",
+    "back": "Ar ais",
+    "next": "Ar aghaidh",
+    "send": "Seol",
+    "delete": "Scrios",
+    "edit": "Cuir in eagar",
+    "search": "Cuardaigh",
+    "noResults": "Gan torthaí",
+    "requiredField": "Réimse riachtanach"
+  },
+  "nav": {
+    "home": "Baile",
+    "events": "Imeachtaí",
+    "about": "Eolas",
+    "privacy": "Príobháideacht",
+    "admin": "Riarachán",
+    "language": "Teanga",
+    "switchLanguage": "Athraigh teanga",
+    "skipToContent": "Téigh go dtí an t-ábhar",
+    "skipToFooter": "Téigh go dtí an buntásc"
+  },
+  "header": {
+    "slimTitle": "Uachtaránacht Chomhairle na nAirí",
+    "slimSubtitle": "An Roinn um Chlaochlú Digiteach",
+    "followUs": "Lean sinn ar"
+  },
+  "events": {
+    "title": "Imeachtaí",
+    "upcoming": "Imeachtaí atá le teacht",
+    "past": "Imeachtaí roimhe seo",
+    "noUpcoming": "Níl aon imeacht beartaithe faoi láthair. Tar ar ais arís!",
+    "noPast": "Níl aon imeacht roimhe seo",
+    "card": {
+      "publicEvent": "Imeacht poiblí",
+      "readMore": "Tuilleadh eolais",
+      "liveNow": "Beo anois",
+      "spotsAvailable": "{count} áit ar fáil",
+      "fullyBooked": "Lán go hiomlán",
+      "ended": "Críochnaithe",
+      "occupiedSpots": "{registered}/{max} cláraithe"
+    },
+    "detail": {
+      "title": "Sonraí an imeachta",
+      "date": "Dáta agus am",
+      "duration": "Fad",
+      "durationHours": "{hours}u {minutes}nóim",
+      "timezone": "Crios ama",
+      "description": "Cur síos",
+      "participants": "Rannpháirtithe",
+      "maxParticipants": "{count} áit san iomlán",
+      "spotsLeft": "{count} áit fágtha",
+      "occupiedSpots": "{registered} as {max} áit in úsáid",
+      "full": "Lán go hiomlán",
+      "register": "Cláraigh don imeacht",
+      "registerAndJoin": "Cláraigh agus bí páirteach",
+      "registered": "Tá sibh cláraithe",
+      "enterEvent": "Téigh isteach san imeacht",
+      "eventEnded": "Imeacht críochnaithe",
+      "eventHeldOn": "Reáchtáladh an t-imeacht seo ar {date}",
+      "totalRegistrations": "{count} rannpháirtí cláraithe",
+      "recording": "Taifeadadh ar fáil",
+      "noRecording": "Níl taifeadadh físe ar fáil don imeacht seo.",
+      "watchRecording": "Féach ar an taifeadadh",
+      "backToEvents": "Ar ais go dtí na himeachtaí",
+      "speakers": "Cainteoirí",
+      "organizer": "Eagraí",
+      "chatNotSaved": "Ní shábháiltear teachtaireachtaí comhrá tar éis deireadh an imeachta.",
+      "qaPostEvent": "Ceisteanna agus freagraí ón imeacht",
+      "peakParticipants": "Buaicphointe: {count} rannpháirtí",
+      "calendar": {
+        "addToCalendar": "Cuir leis an bhféilire",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": "Íoslódáil comhad .ics"
+      }
+    },
+    "manage": {
+      "toggleChat": "Comhrá",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Taifeadadh",
+      "settingsSection": "Socruithe an imeachta"
+    },
+    "status": {
+      "DRAFT": "Dréacht",
+      "PUBLISHED": "Foilsithe",
+      "LIVE": "Beo",
+      "ENDED": "Críochnaithe",
+      "ARCHIVED": "Cartlannaithe"
+    }
+  },
+  "registration": {
+    "title": "Clárú don imeacht",
+    "name": "Ainm iomlán",
+    "namePlaceholder": "Taispeánfar bhur n-ainm i seomra an imeachta",
+    "email": "Ríomhphost",
+    "emailPlaceholder": "Gheobhaidh sibh an nasc chun rochtain a fháil ar an imeacht",
+    "gdprConsent": "Toilím le próiseáil mo shonraí pearsanta (ainm, ríomhphost) de réir Rialachán AE 2016/679 (GDPR) chun páirt a ghlacadh san imeacht seo.",
+    "gdprLink": "Léigh an beartas príobháideachta iomlán",
+    "submit": "Deimhnigh clárú",
+    "submitting": "Ag clárú...",
+    "success": "Clárú críochnaithe!",
+    "successMessage": "Gheobhaidh sibh ríomhphost deimhnithe leis an nasc chun rochtain a fháil ar an imeacht.",
+    "alreadyRegistered": "Tá sibh cláraithe cheana féin don imeacht seo",
+    "backToEvent": "Ar ais go dtí an t-imeacht",
+    "organization": "Eagraíocht",
+    "organizationPlaceholder": "m.sh. AGID, An Roinn Airgeadais, Bardas na Róimhe",
+    "organizationRole": "Ról san eagraíocht",
+    "organizationRolePlaceholder": "m.sh. Bainisteoir Claochlaithe Dhigitigh, Forbróir",
+    "organizationType": "Cineál eagraíochta",
+    "organizationTypePlaceholder": "Roghnaigh cineál...",
+    "organizationTypes": {
+      "MINISTRY": "Aireacht",
+      "AGENCY": "Gníomhaireacht",
+      "REGION": "Réigiún",
+      "PROVINCE": "Cúige",
+      "MUNICIPALITY": "Bardas",
+      "ASL": "ASL",
+      "UNIVERSITY": "Ollscoil",
+      "PUBLIC_ENTITY": "Eintiteas poiblí",
+      "IN_HOUSE": "Cuideachta inmheánach",
+      "OTHER": "Eile"
+    },
+    "gdprConsentProfiling": "Próiseálfar sonraí na heagraíochta chun críoch staidrimh.",
+    "errors": {
+      "nameRequired": "Cuir isteach bhur n-ainm, le bhur dtoil",
+      "emailRequired": "Cuir isteach bhur ríomhphost, le bhur dtoil",
+      "emailInvalid": "Cuir isteach ríomhphost bailí, le bhur dtoil",
+      "organizationRequired": "Cuir isteach bhur n-eagraíocht, le bhur dtoil",
+      "consentRequired": "Tá toiliú le próiseáil sonraí riachtanach",
+      "recordingConsentRequired": "Tá toiliú leis an taifeadadh riachtanach don imeacht seo",
+      "eventFull": "Tá uaslíon na rannpháirtithe sroichte ag an imeacht",
+      "generic": "Earráid le linn an chláraithe. Bain triail eile as, le bhur dtoil."
+    }
+  },
+  "live": {
+    "title": "Seomra an imeachta",
+    "connecting": "Ag nascadh...",
+    "connectionError": "Ní féidir nascadh leis an seomra. Seiceáil bhur nasc agus bain triail eile as.",
+    "recordingActive": "Taifeadadh ar siúl",
+    "recordingConsent": "Tá an t-imeacht seo á thaifeadadh. Trí theacht isteach, toilíonn sibh leis an taifeadadh fuaime/físe.",
+    "recordingConsentTitle": "Toiliú leis an taifeadadh",
+    "declineRecording": "Ná glac páirt",
+    "enterRoom": "Téigh isteach sa seomra",
+    "leaveRoom": "Fág an seomra",
+    "eventNotStarted": "Níor thosaigh an t-imeacht fós",
+    "eventStartsAt": "Tosóidh an t-imeacht ar {date} ag {time}",
+    "countdown": "Am fágtha",
+    "waitingRoomHint": "Nuashonróidh an leathanach seo go huathoibríoch nuair a thosóidh an modhnóir an t-imeacht. Ní gá athluchtú.",
+    "startEventButton": "Tosaigh an t-imeacht",
+    "startingEvent": "Ag tosú...",
+    "chatNotSaved": "Ní shábháiltear teachtaireachtaí comhrá tar éis deireadh an imeachta.",
+    "registerAndJoin": "Cláraigh agus bí páirteach",
+    "registerNow": "Beo — Cláraigh anois!",
+    "enableMusic": "Cuir ceol ar siúl",
+    "disableMusic": "Cas ceol as",
+    "preJoinSubtitle": "Tá sibh ar tí dul isteach i seomra an imeachta",
+    "preJoinNameLabel": "Bhur n-ainm",
+    "guestJoinSubtitle": "Téigh isteach san imeacht beo mar aoi",
+    "guestJoinButton": "Téigh isteach mar aoi",
+    "guestRedirectToRegister": "Níor thosaigh an t-imeacht fós. Cláraigh chun bhur nasc rochtana a fháil.",
+    "jibriUnavailable": "Taifeadadh gan a bheith ar fáil — Jibri gan chumrú",
+    "jibriNotConfigured": "Taifeadadh gan chumrú sa bhonneagar",
+    "eventEnded": "Imeacht críochnaithe",
+    "eventEndedMessage": "Tá an t-imeacht thart. Go raibh maith agaibh as páirt a ghlacadh.",
+    "backToEvent": "Ar ais go dtí an t-imeacht",
+    "moderatorBadge": "Modhnóir",
+    "qaSidebarPlaceholder": "Beidh an painéal Q&A ar fáil nuair a thosóidh an t-imeacht.",
+    "invalidToken": "Nasc neamhbhailí. Seiceáil an nasc a fuair sibh ar ríomhphost, le bhur dtoil.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Pobalbhreitheanna",
+    "sidebarTabMaterials": "Ábhair",
+    "sidebarTabParticipants": "Rannpháirtithe",
+    "role": {
+      "moderator": "Modhnóir",
+      "participant": "Rannpháirtí",
+      "guest": "Aoi"
+    },
+    "participants": {
+      "title": "Rannpháirtithe",
+      "noParticipants": "Gan rannpháirtithe",
+      "kick": "Díbir",
+      "kickConfirm": "An bhfuil sibh cinnte gur mian libh an rannpháirtí seo a dhíbirt?"
+    },
+    "moderator": {
+      "muteAll": "Balbhaigh gach duine",
+      "unmuteAll": "Díbhalbhaigh gach duine",
+      "startRecording": "Tosaigh taifeadadh",
+      "stopRecording": "Stop taifeadadh",
+      "toggleChat": "Comhrá air/as",
+      "endEvent": "Críochnaigh an t-imeacht",
+      "endEventConfirm": "An bhfuil sibh cinnte gur mian libh an t-imeacht a chríochnú do gach rannpháirtí?",
+      "participantCount": "{count} rannpháirtí",
+      "raisedHands": "Lámha ardaithe",
+      "noRaisedHands": "Gan lámh ardaithe",
+      "giveFloor": "Tabhair an focal",
+      "approveAudio": "Ceadaigh fuaim",
+      "approveVideo": "Ceadaigh físeán",
+      "approveAll": "Tabhair an focal",
+      "audioOnly": "Fuaim amháin",
+      "audioModeration": "Micreafón rannpháirtithe",
+      "videoModeration": "Físeán rannpháirtithe",
+      "eventEndedSuccess": "Imeacht críochnaithe go rathúil. Ag atreorú..."
+    }
+  },
+  "qa": {
+    "title": "Ceisteanna agus Freagraí",
+    "askQuestion": "Cuir ceist",
+    "placeholder": "Scríobh bhur gceist (uasmhéid 500 carachtar)",
+    "submit": "Seol ceist",
+    "submitting": "Ag seoladh...",
+    "questionSent": "Ceist seolta!",
+    "cooldownWait": "Fan {seconds}s...",
+    "upvote": "Vótáil suas",
+    "upvoted": "Vótáilte",
+    "noQuestions": "Gan ceist fós. Bígí ar an gcéad duine!",
+    "qaPersistenceNote": "Sábháiltear ceisteanna agus beidh siad ar fáil tar éis an imeachta.",
+    "qaPostEvent": "Ceisteanna agus freagraí ón imeacht",
+    "noAnsweredQuestions": "Gan ceist freagartha don imeacht seo.",
+    "filterAll": "Gach ceann",
+    "showPanel": "Taispeáin Q&A",
+    "hidePanel": "Folaigh Q&A",
+    "status": {
+      "PENDING": "Ar feitheamh",
+      "HIGHLIGHTED": "Aibhsithe",
+      "ANSWERED": "Freagartha",
+      "DISMISSED": "Diúltaithe"
+    },
+    "moderator": {
+      "highlight": "Aibhsigh",
+      "markAnswered": "Marcáil mar fhreagartha",
+      "dismiss": "Diúltaigh",
+      "resetToPending": "Athshocraigh"
+    },
+    "errors": {
+      "textRequired": "Scríobh bhur gceist, le bhur dtoil",
+      "tooLong": "Ní féidir leis an gceist 500 carachtar a shárú",
+      "rateLimit": "Fan sula seolann sibh ceist eile, le bhur dtoil",
+      "generic": "Earráid agus an cheist á seoladh"
+    }
+  },
+  "polls": {
+    "title": "Pobalbhreitheanna",
+    "showPanel": "Taispeáin pobalbhreitheanna",
+    "hidePanel": "Folaigh pobalbhreitheanna",
+    "createPoll": "Cruthaigh pobalbhreith",
+    "noPolls": "Gan pobalbhreith fós. Cruthóidh an modhnóir ceann le linn an imeachta.",
+    "questionPlaceholder": "Scríobh ceist na pobalbhreithe...",
+    "optionPlaceholder": "Rogha {number}",
+    "addOption": "Cuir rogha leis",
+    "removeOption": "Bain rogha",
+    "create": "Cruthaigh",
+    "creating": "Ag cruthú...",
+    "cancelCreate": "Cealaigh",
+    "closePoll": "Dún an vótáil",
+    "publishResults": "Foilsigh torthaí",
+    "reopenPoll": "Athoscail",
+    "totalVotes": "{count} vóta",
+    "voted": "Vótáil sibh",
+    "status": {
+      "OPEN": "Oscailte",
+      "CLOSED": "Dúnta",
+      "PUBLISHED": "Torthaí"
+    },
+    "errors": {
+      "questionRequired": "Scríobh ceist na pobalbhreithe",
+      "minOptions": "Tá 2 rogha ar a laghad ag teastáil",
+      "generic": "Earráid agus an phobalbhreith á cruthú"
+    }
+  },
+  "materials": {
+    "title": "Ábhair",
+    "postEventTitle": "Ábhair an imeachta",
+    "addMaterial": "Cuir ábhar leis",
+    "titleLabel": "Teideal",
+    "urlLabel": "URL an naisc",
+    "descriptionLabel": "Cur síos (roghnach)",
+    "addedBy": "Curtha leis ag {name}",
+    "noMaterials": "Gan ábhar roinnte.",
+    "confirmDelete": "An bhfuil sibh cinnte gur mian libh an t-ábhar seo a scriosadh?",
+    "materialAdded": "Ábhar curtha leis",
+    "materialDeleted": "Ábhar scriosta",
+    "deleteMaterial": "Scrios ábhar",
+    "add": "Cuir leis",
+    "adding": "Ag cur leis...",
+    "cancel": "Cealaigh",
+    "errors": {
+      "urlInvalid": "Cuir isteach URL bailí, le bhur dtoil",
+      "generic": "Earráid agus an t-ábhar á chur leis"
+    }
+  },
+  "reminders": {
+    "title": "Fógraí",
+    "addReminder": "Cuir meabhrúchán leis",
+    "removeReminder": "Bain",
+    "maxReminders": "Uasmhéid 5 mheabhrúchán in aghaidh an imeachta.",
+    "selectPreset": "Roghnaigh cathain...",
+    "sentStatus": "{count} seolta",
+    "notSent": "Gan seoladh",
+    "presets": {
+      "7days": "7 lá roimhe",
+      "3days": "3 lá roimhe",
+      "1day": "1 lá roimhe",
+      "12hours": "12 uair roimhe",
+      "6hours": "6 uair roimhe",
+      "3hours": "3 uair roimhe",
+      "1hour": "1 uair roimhe",
+      "30min": "30 nóiméad roimhe",
+      "15min": "15 nóiméad roimhe"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Bainistíocht imeachtaí",
+      "settings": "Socruithe córais",
+      "eventsList": "Liosta imeachtaí",
+      "newEvent": "Imeacht nua",
+      "calendar": "Féilire",
+      "templates": "Teimpléid",
+      "analytics": "Staitisticí",
+      "infrastructure": "Bonneagar",
+      "settingsGeneral": "Ginearálta",
+      "settingsLanguages": "Teangacha",
+      "ariaLabel": "Nascleanúint riaracháin",
+      "subNavAriaLabel": "Nascleanúint rannáin"
+    },
+    "landing": {
+      "title": "Painéal riaracháin",
+      "subtitle": "Bainistigh imeachtaí agus cumraigh an t-ardán",
+      "eventsTitle": "Bainistíocht imeachtaí",
+      "eventsDescription": "Cruthaigh, cuir in eagar agus bainistigh imeachtaí, teimpléid agus staitisticí.",
+      "settingsTitle": "Socruithe córais",
+      "settingsDescription": "Cumraigh brandáil, ábhar, teangacha, gnéithe agus bonneagar.",
+      "liveNow": "{count, plural, one {# imeacht beo} two {# imeacht beo} few {# imeacht beo} many {# n-imeacht beo} other {# imeacht beo}}",
+      "upcomingEvents": "{count, plural, one {# imeacht le teacht} two {# imeacht le teacht} few {# imeacht le teacht} many {# n-imeacht le teacht} other {# imeacht le teacht}}"
+    },
+    "recording": {
+      "title": "Taifeadadh físe",
+      "play": "Seinn",
+      "download": "Íoslódáil",
+      "delete": "Scrios taifeadadh",
+      "deleteConfirm": "An bhfuil sibh cinnte gur mian libh an taifeadadh seo a scriosadh? Ní féidir an gníomh seo a chealú.",
+      "notConfigured": "Níl taifeadadh físe ar fáil. Níl Jibri cumraithe sa bhonneagar.",
+      "inProgress": "Taifeadadh ar siúl..."
+    },
+    "login": {
+      "title": "Rochtain riarthóra",
+      "keyLabel": "Eochair rochtana",
+      "keyPlaceholder": "Cuir isteach an eochair rochtana",
+      "submit": "Logáil isteach",
+      "invalidKey": "Eochair rochtana neamhbhailí",
+      "logout": "Logáil amach"
+    },
+    "title": "Bainistíocht imeachtaí",
+    "subtitle": "Painéal riaracháin",
+    "createEvent": "Cruthaigh imeacht nua",
+    "editEvent": "Cuir imeacht in eagar",
+    "deleteEvent": "Scrios imeacht",
+    "deleteConfirm": "An bhfuil sibh cinnte gur mian libh an t-imeacht seo a scriosadh? Ní féidir an gníomh seo a chealú.",
+    "publish": "Foilsigh",
+    "unpublish": "Bain ón bhfoilsiú",
+    "noToken": "Chun imeachtaí a bhainistiú, úsáid an nasc modhnóra a fuair sibh ar ríomhphost.",
+    "noEvents": "Níor aimsíodh aon imeacht. Cruthaigh bhur gcéad imeacht.",
+    "eventDetails": "Sonraí an imeachta",
+    "registrations": "Clárúcháin",
+    "registrationCount": "{count} clárúchán",
+    "noRegistrations": "Níl aon rannpháirtí cláraithe fós. Roinnigh nasc an imeachta!",
+    "exportCsv": "Easpórtáil CSV",
+    "organization": "Eagraíocht",
+    "organizationType": "Cineál",
+    "registrationDate": "Dáta cláraithe",
+    "joined": "D'fhreastail",
+    "notJoined": "Níor fhreastail",
+    "deleteSuccess": "Imeacht scriosta",
+    "publishSuccess": "Imeacht foilsithe",
+    "unpublishSuccess": "Imeacht bainte ón bhfoilsiú",
+    "startEvent": "Tosaigh an t-imeacht",
+    "startEventSuccess": "Imeacht tosaithe! Atreorófar rannpháirtithe atá ag fanacht go huathoibríoch.",
+    "jvbWarmupWarning": "Tá na freastalaithe físe ag tosú (~2 nóiméad). Feicfidh na rannpháirtithe fógra sa seomra feithimh.",
+    "eventIsLive": "Tá an t-imeacht beo",
+    "joinAsModeratorBtn": "Téigh isteach mar mhodhnóir",
+    "openPublicPage": "Oscail an leathanach poiblí",
+    "quickActions": "Gníomhartha tapa",
+    "liveRoomLink": "Nasc sheomra an imeachta",
+    "manage": "Bainistigh",
+    "settingsSaved": "Sábháilte",
+    "toggleChatDesc": "Cumasaigh comhrá idir rannpháirtithe",
+    "toggleQaDesc": "Cumasaigh ceisteanna le vótáil",
+    "toggleRecordingDesc": "Taifead an t-imeacht (éilíonn Jibri)",
+    "eventUpdated": "Imeacht nuashonraithe go rathúil!",
+    "dateChangedNotification": "Athraíodh an dáta. Gheobhaidh na rannpháirtithe cláraithe fógra ar ríomhphost.",
+    "eventCreated": "Imeacht cruthaithe go rathúil!",
+    "createEventCta": "Eagraigh imeacht",
+    "createEventExplanation": "Cruthaigh bhur n-imeacht agus gheobhaidh sibh nasc chun é a bhainistiú.",
+    "noAccountNeeded": "Ní theastaíonn cuntas — is é an nasc modhnóra bhur rochtain chun an t-imeacht a bhainistiú.",
+    "form": {
+      "titleIt": "Teideal (Iodáilis)",
+      "titleEn": "Teideal (Béarla)",
+      "descriptionIt": "Cur síos (Iodáilis)",
+      "descriptionEn": "Cur síos (Béarla)",
+      "startsAt": "Dáta agus am tosaithe",
+      "endsAt": "Dáta agus am deiridh",
+      "maxParticipants": "Uaslíon rannpháirtithe",
+      "qaEnabled": "Cumasaigh Q&A",
+      "chatEnabled": "Cumasaigh comhrá",
+      "recordingEnabled": "Cumasaigh taifeadadh físe",
+      "dataRetentionDays": "Coinneáil sonraí (laethanta tar éis an imeachta)",
+      "dataRetentionHint": "Tar éis na tréimhse seo, scriosfar clárúcháin na rannpháirtithe, ceisteanna Q&A agus aon taifeadadh físe go huathoibríoch.",
+      "privacyPolicyUrl": "URL an bheartais phríobháideachta",
+      "moderatorName": "Ainm an mhodhnóra",
+      "moderatorEmail": "Ríomhphost an mhodhnóra",
+      "speakersIt": "Cainteoirí (Iodáilis)",
+      "speakersEn": "Cainteoirí (Béarla)",
+      "organizerName": "Eagraí",
+      "imageUrl": "URL an íomhá clúdaigh",
+      "waitingRoomAudioUrl": "URL fuaime an tseomra feithimh (roghnach)",
+      "waitingRoomAudioUrlHint": "Cuir isteach URL comhaid MP3 le haghaidh ceol sa seomra feithimh. Fágaigí folamh chun an fhuaim réamhshocraithe a úsáid.",
+      "submit": "Cruthaigh imeacht",
+      "submitEdit": "Sábháil athruithe",
+      "saving": "Ag sábháil...",
+      "creating": "Ag cruthú...",
+      "sectionContent": "Ábhar",
+      "sectionSchedule": "Sceideal",
+      "sectionSettings": "Socruithe",
+      "sectionSpeakers": "Cainteoirí agus eagraí",
+      "sectionModerator": "Modhnóir",
+      "sectionRegistrationFields": "Réimsí cláraithe",
+      "requireOrganization": "Éiligh eagraíocht",
+      "requireOrganizationDesc": "Caithfidh rannpháirtithe a n-eagraíocht a lua",
+      "requireOrganizationRole": "Éiligh ról san eagraíocht",
+      "requireOrganizationRoleDesc": "Is féidir le rannpháirtithe a ról a lua",
+      "requireOrganizationType": "Éiligh cineál eagraíochta",
+      "requireOrganizationTypeDesc": "Roghnaíonn rannpháirtithe cineál a n-eagraíochta",
+      "sectionPermissions": "Ceadanna rannpháirtithe",
+      "participantsCanUnmute": "Is féidir le rannpháirtithe an micreafón a ghníomhachtú",
+      "participantsCanStartVideo": "Is féidir le rannpháirtithe an ceamara gréasáin a ghníomhachtú",
+      "participantsCanShareScreen": "Is féidir le rannpháirtithe an scáileán a roinnt",
+      "permissionsOnDesc": "Is féidir le rannpháirtithe iad a ghníomhachtú go neamhspleách",
+      "permissionsOffDesc": "Ní féidir ach le modhnóirí iad a ghníomhachtú. Caithfidh rannpháirtithe a lámh a ardú.",
+      "permissionsNote": "Baineann athruithe ar cheadanna le rannpháirtithe nua.",
+      "privacyPolicyMode": "Beartas príobháideachta",
+      "privacyPolicyModeUrl": "URL seachtrach",
+      "privacyPolicyModeText": "Téacs saincheaptha",
+      "privacyPolicyText": "Téacs an bheartais phríobháideachta",
+      "privacyPolicyTextHint": "Scríobh téacs an bheartais phríobháideachta. Taispeánfar é go hinlíne san fhoirm chláraithe.",
+      "retentionPreviewTitle": "Cad a scriostar go huathoibríoch",
+      "retentionPreviewIntro": "Tar éis {days} lá ó dheireadh an imeachta, scriosfar go huathoibríoch:",
+      "retentionPreviewParticipants": "Sonraí na rannpháirtithe (ainm, ríomhphost, eagraíocht)",
+      "retentionPreviewQa": "Ceisteanna Q&A agus vótaí",
+      "retentionPreviewPolls": "Torthaí pobalbhreitheanna",
+      "retentionPreviewRecordings": "Taifeadtaí físe",
+      "retentionPreviewKept": "Coinnítear staitisticí comhiomlánaithe agus meiteashonraí an imeachta.",
+      "configPreview": "Réamhamharc cumraíochta",
+      "templateApplied": "Teimpléad curtha i bhfeidhm: {name}. Is féidir libh gach socrú a athrú."
+    },
+    "links": {
+      "title": "Naisc an imeachta",
+      "publicPage": "Leathanach poiblí an imeachta",
+      "moderatorLink": "Nasc modhnóra",
+      "moderatorLinkHint": "Roinnigh an nasc seo le modhnóirí amháin. Is féidir le duine ar bith a bhfuil an nasc seo aige an t-imeacht a bhainistiú.",
+      "copyLink": "Cóipeáil nasc",
+      "copied": "Cóipeáilte!"
+    },
+    "feedbackAdmin": {
+      "title": "Torthaí aiseolais",
+      "averageRating": "Meánrátáil",
+      "totalVotes": "{count, plural, one {# rátáil} two {# rátáil} few {# rátáil} many {# rátáil} other {# rátáil}}",
+      "noFeedback": "Ní bhfuarthas aon aiseolas",
+      "comments": "Nótaí tráchta na rannpháirtithe",
+      "noComments": "Gan nótaí tráchta",
+      "stars": "réaltaí"
+    },
+    "gdprAuditLog": {
+      "title": "Loga iniúchóireachta GDPR",
+      "date": "Dáta",
+      "action": "Gníomh",
+      "recordCount": "Taifid",
+      "details": "Sonraí",
+      "actions": {
+        "DATA_DELETED": "Sonraí scriosta",
+        "CONSENT_RECORDED": "Toiliú taifeadta",
+        "DATA_EXPORTED": "Sonraí easpórtáilte"
+      }
+    },
+    "settings": {
+      "title": "Socruithe an tsuímh",
+      "subtitle": "Cumraigh cuma agus iompar an ardáin le haghaidh athúsáide RA",
+      "saving": "Ag sábháil...",
+      "saved": "Socruithe sábháilte go rathúil",
+      "tabs": {
+        "branding": "Brandáil",
+        "header": "Ceanntásc",
+        "seo": "SEO",
+        "homepage": "Leathanach baile",
+        "pages": "Leathanaigh",
+        "footer": "Buntásc",
+        "features": "Gnéithe"
+      },
+      "header": {
+        "slimBarTitle": "Barra barr (Ceanntásc Caol)",
+        "slimBarDescription": "An barra caol ag barr an leathanaigh a aithníonn an mháthaireagraíocht.",
+        "parentOrganization": "Máthaireagraíocht",
+        "parentOrganizationHelp": "m.sh. \"Uachtaránacht Chomhairle na nAirí\"",
+        "parentOrganizationUrl": "URL na máthaireagraíochta",
+        "centerBarTitle": "Ceanntásc láir",
+        "centerBarDescription": "An príomhlimistéar ceanntáisc le hainm an fheidhmchláir agus an lógó.",
+        "appName": "Ainm an fheidhmchláir",
+        "appNameHelp": "Taispeántar sa cheanntásc agus i dteideal an bhrabhsálaí",
+        "organizationShort": "Giorrúchán na heagraíochta",
+        "logoUrl": "URL an lógó",
+        "logoUrlHelp": "Fágaigí folamh chun deilbhín réamhshocraithe RA a úsáid",
+        "organizationUrl": "URL shuíomh gréasáin na heagraíochta"
+      },
+      "branding": {
+        "siteName": "Ainm an fheidhmchláir",
+        "siteNameHelp": "Taispeántar sa cheanntásc, i dteideal an bhrabhsálaí agus i ríomhphoist",
+        "siteDescription": "Cur síos ar an bhfeidhmchlár",
+        "organizationName": "Ainm na heagraíochta",
+        "organizationNameHelp": "m.sh. An Roinn um Chlaochlú Digiteach",
+        "organizationNameShort": "Giorrúchán na heagraíochta",
+        "organizationUrl": "URL na heagraíochta",
+        "parentOrganization": "Máthaireagraíocht",
+        "parentOrganizationHelp": "m.sh. Uachtaránacht Chomhairle na nAirí",
+        "parentOrganizationUrl": "URL na máthaireagraíochta",
+        "logoUrl": "URL lógó saincheaptha",
+        "logoUrlHelp": "Fágaigí folamh chun deilbhín réamhshocraithe RA a úsáid",
+        "faviconUrl": "URL favicon",
+        "primaryColor": "Príomhdhath",
+        "defaultTimezone": "Crios ama réamhshocraithe",
+        "defaultTimezoneHelp": "Úsáidtear le haghaidh taispeáint dátaí agus cruthú imeachtaí nua."
+      },
+      "watermark": {
+        "title": "Saincheapadh físe",
+        "enabled": "Comhartha uisce gníomhach",
+        "url": "URL an chomhartha uisce",
+        "urlHelp": "URL d'íomhá thrédhearcach SVG nó PNG. Fágaigí folamh chun lógó na heagraíochta a úsáid.",
+        "opacity": "Teimhneacht",
+        "position": "Suíomh",
+        "previewLabel": "Réamhamharc ar an limistéar físe",
+        "positions": {
+          "bottomLeft": "Bun ar chlé",
+          "bottomRight": "Bun ar dheis",
+          "topLeft": "Barr ar chlé",
+          "topRight": "Barr ar dheis"
+        }
+      },
+      "seo": {
+        "title": "Teideal SEO",
+        "titleHelp": "Teideal a thaispeántar i dtorthaí cuardaigh agus i gcluaisín an bhrabhsálaí",
+        "description": "Cur síos SEO",
+        "descriptionHelp": "Cur síos d'innill chuardaigh agus do roinnt sóisialta",
+        "image": "Íomhá Open Graph",
+        "imageHelp": "Íomhá réamhshocraithe do roinnt sóisialta (1200x630 molta)"
+      },
+      "homepage": {
+        "modeLabel": "Mód an leathanaigh bhaile",
+        "modes": {
+          "LANDING": {
+            "title": "Leathanach tuirlingthe",
+            "description": "Laoch, gnéithe, imeachtaí atá le teacht agus conas a oibríonn sé"
+          },
+          "EVENTS_LIST": {
+            "title": "Liosta imeachtaí",
+            "description": "Taispeáin liosta na n-imeachtaí go díreach"
+          },
+          "CUSTOM": {
+            "title": "Saincheaptha",
+            "description": "Ábhar HTML saincheaptha + liosta imeachtaí"
+          }
+        },
+        "customHtmlLabel": "Ábhar HTML saincheaptha",
+        "customHtmlHelp": "HTML a thaispeántar sa phríomhrannán den leathanach baile"
+      },
+      "pages": {
+        "privacyTitle": "Beartas príobháideachta",
+        "privacyIt": "Ábhar (Iodáilis)",
+        "privacyEn": "Ábhar (Béarla)",
+        "accessibilityTitle": "Ráiteas inrochtaineachta",
+        "accessibilityIt": "Ábhar (Iodáilis)",
+        "accessibilityEn": "Ábhar (Béarla)",
+        "preview": "Réamhamharc"
+      },
+      "footer": {
+        "linksTitle": "Naisc buntáisc",
+        "addLink": "Cuir nasc leis",
+        "noLinks": "Gan naisc cumraithe. Úsáidfear na cinn réamhshocraithe.",
+        "linkTitle": "Teideal",
+        "linkSection": "Rannán",
+        "sectionLegal": "Dlíthiúil",
+        "sectionMain": "Príomha",
+        "moveUp": "Bog suas",
+        "moveDown": "Bog síos",
+        "removeLink": "Bain nasc"
+      },
+      "features": {
+        "statusPageEnabled": "Leathanach stádais gníomhach",
+        "statusPageEnabledHelp": "Taispeáin leathanach stádas na seirbhíse",
+        "guestAccessEnabled": "Rochtain aonna gníomhach",
+        "guestAccessEnabledHelp": "Ceadaigh rochtain aonna ar imeachtaí beo",
+        "publicRegistrationEnabled": "Clárú poiblí gníomhach",
+        "publicRegistrationEnabledHelp": "Is féidir le duine ar bith imeachtaí a chruthú (má tá sé díchumasaithe, riarthóirí amháin)",
+        "calendarPublic": "Féilire poiblí",
+        "calendarPublicHelp": "Foilsigh féilire na n-imeachtaí. Is féidir le cuairteoirí imeachtaí beartaithe a fheiceáil.",
+        "githubUrl": "URL stór GitHub",
+        "supportEmail": "Ríomhphost tacaíochta"
+      }
+    },
+    "analytics": {
+      "title": "Staitisticí",
+      "subtitle": "Forbhreathnú ar mhéadracht an ardáin",
+      "timeline": "Amlíne",
+      "topEvents": "Na himeachtaí is fearr",
+      "noData": "Gan sonraí ar fáil don tréimhse seo.",
+      "period": {
+        "7d": "7 lá",
+        "30d": "30 lá",
+        "90d": "90 lá",
+        "all": "An t-iomlán"
+      },
+      "metrics": {
+        "totalEvents": "Imeachtaí iomlána",
+        "totalRegistrations": "Clárúcháin",
+        "totalParticipants": "Rannpháirtithe",
+        "conversionRate": "Meánráta tiontaithe",
+        "peakParticipants": "Buaicphointe rannpháirtithe"
+      },
+      "table": {
+        "event": "Imeacht",
+        "date": "Dáta",
+        "registrations": "Clárúcháin",
+        "participants": "Rannpháirtithe",
+        "peak": "Buaicphointe",
+        "questions": "Q&A",
+        "conversion": "Tiontú",
+        "noEvents": "Níor aimsíodh aon imeacht."
+      },
+      "quickStats": {
+        "title": "Staitisticí tapa",
+        "avgDuration": "Meánfhad na n-imeachtaí",
+        "avgQuestionsPerEvent": "Ceisteanna Q&A in aghaidh an imeachta",
+        "totalPollVotes": "Iomlán vótaí pobalbhreitheanna",
+        "avgParticipantsPerEvent": "Meán rannpháirtithe in aghaidh an imeachta",
+        "avgFeedbackRating": "Meánrátáil aiseolais",
+        "totalFeedback": "Freagraí aiseolais"
+      }
+    },
+    "templates": {
+      "title": "Teimpléid imeachtaí",
+      "subtitle": "Bainistigh teimpléid réamhshocraithe chun imeachtaí a chruthú go tapa",
+      "create": "Teimpléad nua",
+      "deleteConfirm": "An bhfuil sibh cinnte gur mian libh an teimpléad seo a scriosadh?",
+      "system": "Córas",
+      "nameLabel": "Ainm an teimpléid",
+      "descriptionLabel": "Cur síos",
+      "maxParticipantsLabel": "Uaslíon rannpháirtithe",
+      "featuresLabel": "Gnéithe",
+      "recordingLabel": "Taifeadadh",
+      "unmute": "Micreafón rannpháirtithe",
+      "video": "Físeán rannpháirtithe",
+      "screen": "Roinnt scáileáin",
+      "pickerTitle": "Roghnaigh teimpléad",
+      "pickerSubtitle": "Roghnaigh teimpléad chun socruithe an imeachta a réamhchumrú, nó scipeáil chun gach rud a chumrú de láimh.",
+      "skipTemplate": "Cumraigh de láimh"
+    },
+    "instantCall": {
+      "title": "Glao físe láithreach",
+      "subtitle": "Cruthaigh glao físe ar an toirt agus roinnigh an nasc. Ní theastaíonn sceidealú.",
+      "nameLabel": "Ainm an ghlao",
+      "namePlaceholder": "m.sh. Sionc tapa, Taispeántas tionscadail...",
+      "moderatorLabel": "Bhur n-ainm (roghnach)",
+      "moderatorPlaceholder": "Taispeánfar sa ghlao",
+      "create": "Cruthaigh agus téigh isteach",
+      "creating": "Ag cruthú...",
+      "copyLink": "Cóipeáil nasc cuiridh",
+      "copied": "Cóipeáilte!",
+      "hint": "Is féidir le gach duine micreafón, ceamara gréasáin a ghníomhachtú agus an scáileán a roinnt. Ní féidir ach libhse taifeadadh agus an glao a chríochnú."
+    },
+    "files": {
+      "title": "Comhaid agus ábhair",
+      "upload": "Uaslódáil comhad",
+      "selectFile": "Roghnaigh comhad",
+      "fileTitle": "Teideal",
+      "visibility": "Infheictheacht",
+      "visibilityAlways": "Infheicthe i gcónaí",
+      "visibilityBefore": "Roimh an imeacht amháin",
+      "visibilityDuring": "Le linn an imeachta amháin",
+      "visibilityAfter": "Tar éis an imeachta amháin",
+      "uploading": "Ag uaslódáil...",
+      "uploadBtn": "Uaslódáil",
+      "deleteConfirm": "An bhfuil sibh cinnte gur mian libh an comhad seo a scriosadh?",
+      "noFiles": "Gan comhad uaslódáilte. Úsáid an cnaipe \"Uaslódáil comhad\" chun ábhair a chur leis."
+    },
+    "languages": {
+      "title": "Bainistíocht teangacha",
+      "subtitle": "Cumraigh na teangacha atá ar fáil agus saincheap aistriúcháin",
+      "configuredLocales": "Teangacha cumraithe",
+      "localesDescription": "Roghnaigh na teangacha atá ar fáil don chomhéadan úsáideora. Tá an Iodáilis riachtanach mar theanga réamhshocraithe.",
+      "addLocale": "Cuir teanga leis",
+      "localeCode": "Cód teanga",
+      "localeName": "Ainm na teanga",
+      "selectLocale": "Roghnaigh...",
+      "add": "Cuir leis",
+      "default": "Réamhshocraithe",
+      "editTranslations": "Cuir aistriúcháin in eagar",
+      "saved": "Cumraíocht teangacha sábháilte",
+      "saveNote": "Éilíonn athruithe ar theangacha atá ar fáil atosú chun éifeacht a bheith acu in URLanna.",
+      "translationOverrides": "Aistriúcháin shaincheaptha — {locale}",
+      "overridesDescription": "Sáraigh na haistriúcháin réamhshocraithe don teanga seo. Úsáid nodaireacht poncanna (m.sh. common.appName).",
+      "keyLabel": "Eochair aistriúcháin",
+      "valueLabel": "Luach",
+      "addOverride": "Cuir leis"
+    },
+    "infrastructure": {
+      "title": "Bonneagar",
+      "subtitle": "Stádas na gcomhpháirteanna agus cumraíocht an chomhshaoil",
+      "deploymentMode": "Mód imlonnaithe",
+      "version": "Leagan",
+      "environment": "Comhshaol",
+      "modes": {
+        "simple": "Simplí (Docker Compose)",
+        "standard": "Caighdeánach (Kubernetes)",
+        "full": "Iomlán (Kubernetes le scála-go-nialas)",
+        "unknown": "Anaithnid"
+      },
+      "database": {
+        "title": "Bunachar sonraí",
+        "internal": "Sa bhraisle (PostgreSQL)",
+        "external": "Seachtrach",
+        "connected": "Nasctha",
+        "disconnected": "Dorochtana"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Inrochtana",
+        "unreachable": "Dorochtana",
+        "notConfigured": "Gan chumrú"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scála-go-nialas gníomhach",
+        "replicas": "{current}/{max} nód",
+        "preScale": "Réamhscálú: {minutes} nóim",
+        "fixedMode": "Mód seasta",
+        "scalerEnabled": "Scálóir cumasaithe"
+      },
+      "jibri": {
+        "title": "Taifeadadh (Jibri)",
+        "available": "Ar fáil",
+        "notConfigured": "Gan chumrú",
+        "storageType": "Stóras",
+        "configureHint": "Éilíonn taifeadadh físe Jibri. Cumraigh stóras chun é a chumasú.",
+        "docsLink": "Doiciméadú"
+      },
+      "email": {
+        "title": "Ríomhphost",
+        "configured": "Cumraithe",
+        "notConfigured": "Gan chumrú"
+      },
+      "features": {
+        "title": "Gnéithe",
+        "statusPage": "Leathanach stádais",
+        "guestAccess": "Rochtain aonna",
+        "metrics": "Críochphointe méadrachta"
+      },
+      "note": "Déantar athruithe ar an mbonneagar trí luachanna Helm agus an píblíne CI/CD.",
+      "deployDocs": "Doiciméadú imlonnaithe"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Clárú deimhnithe: {eventTitle}",
+    "confirmationHeading": "Clárú deimhnithe",
+    "confirmationKeepNote": "Coinnigh an ríomhphost seo — tá bhur nasc pearsanta chun rochtain a fháil ar an imeacht ann.",
+    "reminderSubject": "Meabhrúchán: tosóidh {eventTitle} i gceann uaire",
+    "reminderHeading": "Meabhrúchán imeachta",
+    "reminderNote": "Tosóidh an t-imeacht ar chláraigh sibh dó i gceann níos lú ná uair an chloig. Úsáid an nasc thíos chun páirt a ghlacadh.",
+    "recordingSubject": "Taifeadadh ar fáil: {eventTitle}",
+    "joinLabel": "Téigh isteach san imeacht",
+    "viewEvent": "Féach ar leathanach an imeachta",
+    "eventLabel": "Imeacht",
+    "dateLabel": "Dáta",
+    "timeLabel": "Am",
+    "durationLabel": "Fad"
+  },
+  "home": {
+    "hero": {
+      "title": "Imeachtaí poiblí digiteacha",
+      "subtitle": "Ardán le haghaidh seimineáir ghréasáin, cur i láthair agus cruinnithe poiblí na Roinne um Chlaochlú Digiteach",
+      "browseEvents": "Brabhsáil imeachtaí",
+      "organizeEvent": "Eagraigh imeacht"
+    },
+    "features": {
+      "title": "An t-ardán d'imeachtaí RA",
+      "video": {
+        "title": "Físchomhdháil",
+        "desc": "Glac páirt in imeachtaí poiblí le suas le 300 rannpháirtí. Ní theastaíonn aon bhogearraí a shuiteáil."
+      },
+      "qa": {
+        "title": "Ceisteanna agus Freagraí",
+        "desc": "Cuir ceisteanna le linn an imeachta agus vótáil do na cinn is tábhachtaí. Freagraíonn an modhnóir beo."
+      },
+      "privacy": {
+        "title": "Príobháideacht agus Slándáil",
+        "desc": "Sonraí cosanta agus comhlíontach le GDPR. Bonneagar féin-óstáilte san Iodáil."
+      }
+    },
+    "upcoming": {
+      "title": "Imeachtaí atá le teacht",
+      "viewAll": "Féach ar na himeachtaí go léir",
+      "noEvents": "Níl aon imeacht beartaithe. Tar ar ais go luath!"
+    },
+    "howItWorks": {
+      "title": "Conas a oibríonn sé",
+      "step1": {
+        "title": "Cláraigh",
+        "desc": "Cláraigh saor in aisce don imeacht"
+      },
+      "step2": {
+        "title": "Faigh bhur nasc",
+        "desc": "Ríomhphost le bhur nasc rochtana pearsanta"
+      },
+      "step3": {
+        "title": "Bí páirteach",
+        "desc": "Téigh isteach san imeacht ó bhur mbrabhsálaí, gan aon suiteáil"
+      },
+      "step4": {
+        "title": "Idirghníomhaigh",
+        "desc": "Cuir ceisteanna, vótáil, glac páirt sa díospóireacht"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Toilím le taifeadadh fuaime/físe an imeachta seo",
+      "recordingRequired": "Tá toiliú leis an taifeadadh riachtanach chun páirt a ghlacadh san imeacht seo",
+      "futureCommunications": "Ba mhaith liom eolas a fháil faoi imeachtaí amach anseo arna n-eagrú ag DTD"
+    },
+    "export": {
+      "title": "Mo chuid sonraí",
+      "subtitle": "Iarr cóip de na sonraí pearsanta a bhaineann le bhur seoladh ríomhphoist, mar a fhoráiltear in Airteagal 15 de GDPR.",
+      "emailLabel": "Bhur seoladh ríomhphoist",
+      "emailPlaceholder": "Cuir isteach an ríomhphost a úsáideadh le haghaidh cláraithe",
+      "emailInvalid": "Cuir isteach seoladh ríomhphoist bailí, le bhur dtoil",
+      "submit": "Iarr mo chuid sonraí",
+      "loading": "Ag cuardach...",
+      "noData": "Níor aimsíodh aon sonraí don seoladh ríomhphoist seo.",
+      "error": "Tharla earráid. Bain triail eile as ar ball, le bhur dtoil.",
+      "rateLimited": "An iomarca iarratas. Bain triail eile as i gceann uaire.",
+      "results": "Bhur gcuid sonraí",
+      "resultsDescription": "Aimsíodh sonraí a bhaineann le {count} imeacht.",
+      "registrationData": "Sonraí cláraithe",
+      "fieldName": "Ainm",
+      "fieldEmail": "Ríomhphost",
+      "fieldOrganization": "Eagraíocht",
+      "fieldRegisteredAt": "Dáta cláraithe",
+      "fieldConsent": "Toiliú",
+      "questionsTitle": "Ceisteanna Q&A",
+      "pollVotesTitle": "Vótaí pobalbhreitheanna",
+      "optionLabel": "Rogha"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Beartas príobháideachta",
+      "title": "Beartas príobháideachta",
+      "intro": "Déanann an leathanach seo achoimre ar phróiseáil sonraí pearsanta a bhaineann le húsáid ardáin Eventi DTD agus le rannpháirtíocht in imeachtaí poiblí óstáilte.",
+      "sections": {
+        "controller": {
+          "title": "Rialaitheoir sonraí",
+          "body": "Próiseáiltear sonraí pearsanta laistigh de ghníomhaíochtaí institiúideacha na Roinne um Chlaochlú Digiteach chun tacú le bainistíocht theicniúil agus eagraíochtúil imeachtaí poiblí ar líne."
+        },
+        "data": {
+          "title": "Sonraí próiseáilte agus cuspóirí",
+          "body": "Ní phróiseálann an t-ardán ach na sonraí atá go docht riachtanach le haghaidh cláraithe agus rannpháirtíochta in imeachtaí, mar shampla ainm, seoladh ríomhphoist agus aon réimsí roghnacha arna gcumrú ag an eagraí. Úsáidtear sonraí chun an nasc rochtana pearsanta a sheoladh, freastal a bhainistiú, meabhrúcháin a sheachadadh nuair is infheidhme, agus tacú le hoibleagáidí slándála na seirbhíse."
+        },
+        "retention": {
+          "title": "Coinneáil agus cearta",
+          "body": "Coinnítear sonraí ar feadh na tréimhse atá cumraithe do gach imeacht agus scriostar go huathoibríoch iad ina dhiaidh sin, mura bhfuil oibleagáidí dlíthiúla éagsúla i bhfeidhm. Is féidir le hábhair sonraí a gcearta GDPR a fheidhmiú am ar bith, lena n-áirítear rochtain, ceartú agus léirscriosadh, trí bhealaí institiúideacha na Roinne."
+        }
+      },
+      "note": {
+        "title": "Iarr bhur gcuid sonraí",
+        "body": "Más rud é gur ghlac sibh páirt in imeacht agus gur mian libh a fhíorú cé na sonraí pearsanta atá bainteach le bhur seoladh ríomhphoist, is féidir libh an ghné thiomnaithe atá ar fáil ar an ardán a úsáid.",
+        "linkLabel": "Iarr mo chuid sonraí"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Ráiteas inrochtaineachta",
+      "title": "Ráiteas inrochtaineachta",
+      "intro": "Tá an Roinn um Chlaochlú Digiteach tiomanta an t-ardán seo a dhéanamh inrochtana, i gcomhréir leis na ceanglais infheidhme do sheirbhísí digiteacha na hearnála poiblí.",
+      "sections": {
+        "commitment": {
+          "title": "Tiomantas don inrochtaineacht",
+          "body": "Tá an t-ardán deartha le comhpháirteanna atá ailínithe le córas deartha .italia agus le haird ar nascleanúint méarchláir, struchtúr séimeantach ábhair agus inléiteacht an chomhéadain ar na príomhmhéideanna scáileáin."
+        },
+        "status": {
+          "title": "Stádas comhlíontachta",
+          "body": "Tá seiceálacha agus feabhsúcháin inrochtaineachta ar siúl go leanúnach. Réitítear aon saincheisteanna iarmharacha de réir a chéile mar chuid d'fhorbairt na seirbhíse agus de ghníomhaíochtaí cothabhála rialta."
+        },
+        "feedback": {
+          "title": "Aiseolas agus teagmhálacha",
+          "body": "Chun bacainní inrochtaineachta nó deacrachtaí le húsáid na seirbhíse a thuairisciú, is féidir le húsáideoirí teagmháil a dhéanamh leis an Roinn trína bealaí institiúideacha, ag sonrú an leathanaigh lena mbaineann agus cur síos gairid ar an bhfadhb."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Nótaí dlíthiúla",
+      "title": "Nótaí dlíthiúla",
+      "intro": "Tá rochtain ar ardán Eventi DTD agus a úsáid faoi réir na nótaí seo, a dhéanann achoimre ar na téarmaí ginearálta úsáide agus ar an bpríomheolas faoin tseirbhís.",
+      "sections": {
+        "ownership": {
+          "title": "Úinéireacht na seirbhíse",
+          "body": "Cuireann an Roinn um Chlaochlú Digiteach an t-ardán chun cinn agus cuirtear ar fáil é le haghaidh eagrú agus rannpháirtíochta in imeachtaí poiblí institiúideacha ar líne."
+        },
+        "usage": {
+          "title": "Úsáid na seirbhíse",
+          "body": "Ní mór d'úsáideoirí an tseirbhís a úsáid i gceart gan slándáil an ardáin, infhaighteacht gnéithe nó rith ceart imeachtaí a chur i mbaol. D'fhéadfadh srianta rochtana ar an tseirbhís a bheith mar thoradh ar mhí-úsáid."
+        },
+        "liability": {
+          "title": "Teorannú dliteanais",
+          "body": "Cé go nglactar bearta teicniúla agus eagraíochtúla cuí, ní féidir leis an Roinn asláithreacht iomlán bristeacha nó mífheidhmithe a ráthú de dheasca teagmhas gan choinne, gníomhaíochtaí cothabhála nó fachtóirí seachtracha. Tá freagrachtaí dlíthiúla fós faoi rialú ag an dlí infheidhme."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Stádas an chórais",
+    "subtitle": "Forbhreathnú fíor-ama ar stádas seirbhísí an ardáin.",
+    "allOperational": "Gach córas ag feidhmiú",
+    "degraded": "Feidhmíocht laghdaithe",
+    "outage": "Bristeach seirbhíse",
+    "componentLabel": "Comhpháirt",
+    "statusLabel": "Stádas",
+    "operational": "Ag feidhmiú",
+    "degradedLabel": "Laghdaithe",
+    "standby": "Ar fuireachas",
+    "loading": "Ag lódáil...",
+    "fetchError": "Ní féidir stádas an chórais a fháil",
+    "components": {
+      "app": "Tairseach gréasáin",
+      "database": "Bunachar sonraí",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Taifeadadh físe",
+      "smtp": "Ríomhphost (SMTP)"
+    },
+    "jvbCapacity": "Acmhainn an droichid físe",
+    "jvbStandby": "Ar fuireachas — gníomhachtaítear go huathoibríoch nuair is gá",
+    "jvbStandbyDetail": "Scála-go-nialas gníomhach — gan imeacht beartaithe. Cruthófar nóid JVB go huathoibríoch roimh thús imeachta.",
+    "jvbScaling": "Ag scálú suas...",
+    "nodesActive": "nóid ghníomhacha",
+    "nodesReady": "nóid réidh",
+    "scaling": "ag scálú",
+    "jvbStress": "Ualach JVB",
+    "participantsConnected": "rannpháirtithe nasctha",
+    "videoInteractive": "idirghníomhach",
+    "videoWebinar": "seimineár gréasáin",
+    "participantsAvailable": "rannpháirtithe ar fáil",
+    "upcomingEvents": "Imeachtaí atá le teacht",
+    "noUpcomingEvents": "Gan imeacht beartaithe",
+    "jvbActivatesIn": "Gníomhachtaítear JVB i gceann {minutes} nóim",
+    "liveNow": "Beo anois",
+    "activeEvents": "Imeachtaí gníomhacha",
+    "registrationsToday": "Clárúcháin inniu",
+    "jvbNodes": "Nóid JVB",
+    "overallStatus": "Stádas ginearálta",
+    "lastChecked": "Seiceáilte go deireanach",
+    "responseTime": "Am freagartha",
+    "systemStatus": "Stádas an chórais"
+  },
+  "feedback": {
+    "title": "Conas a mheasann sibh an t-imeacht seo?",
+    "ratingLabel": "Roghnaigh rátáil ó 1 go 5 réalta",
+    "comment": "Nóta tráchta",
+    "commentPlaceholder": "Aon mholtaí? (roghnach)",
+    "submit": "Seol aiseolas",
+    "submitting": "Ag seoladh...",
+    "skip": "Scipeáil",
+    "thankYou": "Go raibh maith agaibh as bhur n-aiseolas!",
+    "averageRating": "Meánrátáil",
+    "ratingCount": "{count} rátáil",
+    "noFeedback": "Ní bhfuarthas aon aiseolas"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Tosaigh",
+    "prompt": "Topaic",
+    "promptPlaceholder": "m.sh. Cad a bhfuil sibh ag súil leis ón imeacht seo?",
+    "duration": "Fad",
+    "submit": "Seol",
+    "submitPlaceholder": "Clóscríobh focal (uasmhéid 30 car.)",
+    "close": "Dún an word cloud",
+    "cancel": "Cealaigh",
+    "noActiveRound": "Gan word cloud gníomhach faoi láthair.",
+    "noWords": "Ag fanacht leis na chéad fhocail...",
+    "wordsSubmitted": "{count} focal seolta",
+    "timeRemaining": "Am fágtha"
+  },
+  "timer": {
+    "title": "Amadóir",
+    "start": "Tosaigh",
+    "pause": "Cuir ar sos",
+    "reset": "Athshocraigh",
+    "presets": {
+      "5min": "5 nóim",
+      "10min": "10 nóim",
+      "15min": "15 nóim",
+      "30min": "30 nóim",
+      "custom": "Saincheaptha"
+    },
+    "showToAll": "Taispeáin do gach duine",
+    "timeUp": "Am istigh!"
+  },
+  "reactions": {
+    "title": "Imoibriúcháin",
+    "sendReaction": "Seol imoibriúchán",
+    "reactionSent": "Imoibriúchán seolta!"
+  },
+  "calendar": {
+    "title": "Féilire imeachtaí",
+    "subtitle": "Féach ar na himeachtaí go léir le himeacht aimsire",
+    "publicTitle": "Féilire imeachtaí",
+    "publicSubtitle": "Aimsigh imeachtaí atá le teacht",
+    "today": "Inniu",
+    "prev": "Tréimhse roimhe",
+    "next": "An chéad tréimhse eile",
+    "views": {
+      "day": "Lá",
+      "week": "Seachtain",
+      "month": "Mí",
+      "year": "Bliain",
+      "list": "Liosta"
+    },
+    "status": {
+      "DRAFT": "Dréacht",
+      "PUBLISHED": "Foilsithe",
+      "LIVE": "Beo",
+      "ENDED": "Críochnaithe",
+      "ARCHIVED": "Cartlannaithe"
+    }
+  },
+  "footer": {
+    "departmentName": "An Roinn um Chlaochlú Digiteach",
+    "presidencyName": "Uachtaránacht Chomhairle na nAirí",
+    "privacy": "Beartas príobháideachta",
+    "accessibility": "Ráiteas inrochtaineachta",
+    "openSource": "Bogearraí foinse oscailte",
+    "contacts": "Teagmhálacha",
+    "legalNotes": "Nótaí dlíthiúla",
+    "governmentSite": "Rialtas na hIodáile",
+    "systemStatus": "Stádas an chórais"
+  },
+  "pages": {
+    "privacyTitle": "Beartas príobháideachta",
+    "privacyNotConfigured": "Beartas príobháideachta gan chumrú fós.",
+    "accessibilityTitle": "Ráiteas inrochtaineachta",
+    "accessibilityNotConfigured": "Ráiteas inrochtaineachta gan chumrú fós."
+  },
+  "video": {
+    "play": "Seinn",
+    "pause": "Cuir ar sos",
+    "speed": "Luas",
+    "fullscreen": "Lánscáileán",
+    "pip": "Picture in Picture",
+    "volume": "Airde fuaime",
+    "mute": "Balbhaigh",
+    "unmute": "Díbhalbhaigh",
+    "download": "Íoslódáil taifeadadh",
+    "speedLabel": "Luas athsheanma",
+    "progress": "Barra dul chun cinn"
+  },
+  "diagram": {
+    "title": "Cumraíocht an imeachta",
+    "topology": "Topeolaíocht",
+    "features": "Gnéithe gníomhacha",
+    "estimates": "Meastacháin acmhainní",
+    "moderator": "Modhnóir",
+    "participants": "Rannpháirtithe",
+    "jvb": "Video Bridge",
+    "jibri": "Taifeadadh",
+    "bandwidth": {
+      "moderator": "Bandaleithead modhnóra",
+      "participant": "Bandaleithead in aghaidh an rannpháirtí",
+      "total": "Bandaleithead iomlán measta"
+    },
+    "jvbCount": "JVB riachtanacha",
+    "jvbRam": "RAM JVB measta",
+    "storage": "Stóras taifeadta",
+    "duration": "Fad measta",
+    "viewOnly": "Amharc amháin",
+    "preview": "Réamhamharc cumraíochta"
+  },
+  "waiting": {
+    "startsIn": "Tosóidh an t-imeacht i gceann",
+    "eventLive": "Tá an t-imeacht beo!",
+    "connectedParticipants": "{count, plural, =0 {Gan rannpháirtí} =1 {1 rannpháirtí nasctha} one {# rannpháirtí nasctha} two {# rannpháirtí nasctha} few {# rannpháirtí nasctha} many {# rannpháirtí nasctha} other {{count} rannpháirtí nasctha}}",
+    "elapsedTime": "Ar siúl le {minutes} nóiméad",
+    "youAreLate": "Thosaigh an t-imeacht {minutes} nóiméad ó shin",
+    "chooseHowToJoin": "Roghnaigh conas páirt a ghlacadh:",
+    "enterLive": "Téigh isteach BEO",
+    "enterLiveDesc": "Bí páirteach beo. Is féidir libh an taifeadadh a rochtain i gcónaí tar éis an imeachta.",
+    "enterNow": "Téigh isteach anois",
+    "watchFromStart": "Féach ón tús",
+    "watchFromStartDesc": "Féach ar an taifeadadh ón tús agus téigh beo nuair is mian libh.",
+    "watchNow": "Féach",
+    "switchToLive": "Athraigh go beo",
+    "enterRoom": "Téigh isteach sa seomra",
+    "recordingNotice": "Tá an t-imeacht seo á thaifeadadh.",
+    "recordingAvailableAfter": "Beidh an taifeadadh ar fáil tar éis an imeachta.",
+    "autoRefreshHint": "Nuashonróidh an leathanach go huathoibríoch nuair a thosóidh an t-imeacht.",
+    "startEventButton": "Tosaigh an t-imeacht",
+    "startingEvent": "Ag tosú...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 duine ag fanacht} one {# duine ag fanacht} two {# dhuine ag fanacht} few {# dhuine ag fanacht} many {# nduine ag fanacht} other {{count} duine ag fanacht}}",
+    "jvbScaling": "Seomra á ullmhú...",
+    "jvbScalingDetail": "Tá na freastalaithe físe ag tosú. Tógann sé seo thart ar 2 nóiméad.",
+    "jvbReady": "Seomra réidh!"
+  },
+  "recording": {
+    "management": "Taifeadadh físe",
+    "inProgress": "Ar siúl",
+    "available": "Taifeadadh ar fáil",
+    "duration": "Fad",
+    "fileSize": "Méid comhaid",
+    "startedAt": "Tosaithe ag",
+    "automatic": "uathoibríoch",
+    "publish": "Foilsigh taifeadadh",
+    "publishDesc": "Déan an físeán inrochtana ar leathanach an imeachta",
+    "retentionLabel": "Coinneáil",
+    "retention": {
+      "24h": "24 uair (sealadach)",
+      "7d": "7 lá",
+      "30d": "30 lá",
+      "90d": "90 lá",
+      "forever": "Choíche (go dtí dul in éag an imeachta)"
+    },
+    "retentionNote": "Leanfaidh an físeán coinneáil GDPR an imeachta fós",
+    "delete": "Scrios taifeadadh",
+    "deleteConfirm": "An bhfuil sibh cinnte? Scriosfar an físeán go buan.",
+    "notConfigured": "Níl Jibri cumraithe. Níl taifeadadh físe ar fáil.",
+    "play": "Seinn",
+    "download": "Íoslódáil"
+  },
+  "postEvent": {
+    "config": "Cumraíocht iar-imeachta",
+    "pageVisible": "Leathanach an imeachta infheicthe tar éis deiridh",
+    "showQA": "Taispeáin ceisteanna Q&A",
+    "showMaterials": "Taispeáin ábhair roinnte",
+    "showPolls": "Taispeáin torthaí pobalbhreitheanna",
+    "showFeedback": "Taispeáin aiseolas",
+    "feedbackEnabled": "Suirbhé aiseolais gníomhach ag deireadh an imeachta",
+    "visibilityAlways": "Infheicthe i gcónaí",
+    "visibilityUntil": "Infheicthe go dtí:",
+    "dataRetentionNote": "Scriosfar sonraí pearsanta na rannpháirtithe de réir choinneáil an imeachta ({days} lá). Fanfaidh ábhar an imeachta ar fáil fad is atá an leathanach infheicthe.",
+    "availableUntil": "Beidh an t-imeacht seo agus a ábhar ar fáil go dtí {date}.",
+    "tabs": {
+      "qa": "Ceisteanna agus Freagraí",
+      "materials": "Ábhair",
+      "polls": "Pobalbhreitheanna",
+      "feedback": "Aiseolas"
+    }
+  }
+}

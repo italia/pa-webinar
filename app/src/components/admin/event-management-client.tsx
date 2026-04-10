@@ -19,6 +19,8 @@ import { useRouter } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
 import { REMINDER_PRESETS } from '@/lib/validation/schemas';
 
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+
 import StatusBadge from './status-badge';
 import CopyButton from './copy-button';
 import DeleteEventModal from './delete-event-modal';
@@ -69,10 +71,8 @@ interface Registration {
 interface EventData {
   id: string;
   slug: string;
-  titleIt: string;
-  titleEn: string | null;
-  descriptionIt: string;
-  descriptionEn: string | null;
+  title: Record<string, string>;
+  description: Record<string, string>;
   startsAt: string;
   endsAt: string;
   timezone: string;
@@ -111,7 +111,7 @@ interface EventData {
   dataRetentionDays: number;
   privacyPolicyUrl: string | null;
   privacyPolicyText: string | null;
-  speakersIt: string | null;
+  speakersInfo: Record<string, string> | null;
   createdAt: string;
   registrations: Registration[];
   materials: MaterialData[];
@@ -227,7 +227,7 @@ export default function EventManagementClient({
     [chatEnabled, qaEnabled, recordingEnabled, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, event.id, event.moderatorToken],
   );
 
-  const title = locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
+  const title = getLocalized(event.title, locale);
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
   const durationMs = endsAt.getTime() - startsAt.getTime();
@@ -578,14 +578,12 @@ export default function EventManagementClient({
                     }
                   />
                 )}
-                {event.descriptionIt && (
+                {getLocalized(event.description, locale) && (
                   <DetailRow
                     label={te('detail.description')}
                     value={
                       <span className="text-secondary" style={{ whiteSpace: 'pre-wrap' }}>
-                        {locale === 'en' && event.descriptionEn
-                          ? event.descriptionEn
-                          : event.descriptionIt}
+                        {getLocalized(event.description, locale)}
                       </span>
                     }
                   />
@@ -607,7 +605,7 @@ export default function EventManagementClient({
                   participantsCanUnmute,
                   participantsCanStartVideo,
                   participantsCanShareScreen,
-                  speakersIt: event.speakersIt ?? undefined,
+                  speakers: getLocalized(event.speakersInfo as LocalizedField, locale) || undefined,
                   startsAt: event.startsAt,
                   endsAt: event.endsAt,
                 }}

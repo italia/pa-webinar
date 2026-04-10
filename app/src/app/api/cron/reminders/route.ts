@@ -16,6 +16,7 @@ import {
 } from '@/lib/ical/calendar-links';
 import { generateEventICal } from '@/lib/ical/generate';
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
@@ -75,8 +76,8 @@ export const GET = withErrorHandling(async (request) => {
     remindersProcessed++;
 
     const locale: Locale = 'it';
-    const title = event.titleIt;
-    const description = event.descriptionIt;
+    const title = getLocalized(event.title as LocalizedField, locale);
+    const description = getLocalized(event.description as LocalizedField, locale);
 
     for (const reg of registrations) {
       try {

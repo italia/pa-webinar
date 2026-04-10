@@ -12,7 +12,7 @@ interface EventConfigDiagramProps {
     participantsCanUnmute: boolean;
     participantsCanStartVideo: boolean;
     participantsCanShareScreen: boolean;
-    speakersIt?: string | null;
+    speakers?: string | null;
     startsAt?: string;
     endsAt?: string;
   };
@@ -80,8 +80,8 @@ export default function EventConfigDiagram({
     participantsCanShareScreen: event.participantsCanShareScreen,
   });
 
-  const speakerCount = event.speakersIt
-    ? event.speakersIt.split(',').filter(Boolean).length
+  const speakerCount = event.speakers
+    ? event.speakers.split(',').filter(Boolean).length
     : 0;
 
   const participantLabel =

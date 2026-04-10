@@ -57,11 +57,9 @@ export const GET = withErrorHandling(async (request, context) => {
       id: event.id,
       slug: event.slug,
       title,
-      titleIt: event.titleIt,
-      titleEn: event.titleEn,
+      titleAll: event.title,
       description,
-      descriptionIt: event.descriptionIt,
-      descriptionEn: event.descriptionEn,
+      descriptionAll: event.description,
       startsAt: event.startsAt.toISOString(),
       endsAt: event.endsAt.toISOString(),
       timezone: event.timezone,
@@ -96,8 +94,7 @@ export const GET = withErrorHandling(async (request, context) => {
       jitsiRoomName: event.jitsiRoomName,
       dataRetentionDays: event.dataRetentionDays,
       privacyPolicyUrl: event.privacyPolicyUrl,
-      speakersIt: event.speakersIt,
-      speakersEn: event.speakersEn,
+      speakersInfo: event.speakersInfo,
       organizerName: event.organizerName,
       imageUrl: event.imageUrl,
       waitingRoomAudioUrl: event.waitingRoomAudioUrl,
@@ -173,14 +170,8 @@ export const PUT = withErrorHandling(async (request, context) => {
   const updated = await prisma.event.update({
     where: { id: eventId },
     data: {
-      ...(data.titleIt !== undefined && { titleIt: data.titleIt }),
-      ...(data.titleEn !== undefined && { titleEn: data.titleEn }),
-      ...(data.descriptionIt !== undefined && {
-        descriptionIt: data.descriptionIt,
-      }),
-      ...(data.descriptionEn !== undefined && {
-        descriptionEn: data.descriptionEn,
-      }),
+      ...(data.title !== undefined && { title: data.title }),
+      ...(data.description !== undefined && { description: data.description }),
       ...(data.startsAt !== undefined && {
         startsAt: new Date(data.startsAt),
       }),
@@ -217,8 +208,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.moderatorEmail !== undefined && {
         moderatorEmail: data.moderatorEmail,
       }),
-      ...(data.speakersIt !== undefined && { speakersIt: data.speakersIt }),
-      ...(data.speakersEn !== undefined && { speakersEn: data.speakersEn }),
+      ...(data.speakersInfo !== undefined && { speakersInfo: data.speakersInfo }),
       ...(data.organizerName !== undefined && { organizerName: data.organizerName }),
       ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
       ...(data.waitingRoomAudioUrl !== undefined && { waitingRoomAudioUrl: data.waitingRoomAudioUrl }),

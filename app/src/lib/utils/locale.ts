@@ -1,5 +1,3 @@
-import type { Event } from '@prisma/client';
-
 import { defaultLocale, locales, type Locale } from '@/i18n/config';
 
 /**
@@ -28,22 +26,46 @@ export function resolveLocale(request: Request): Locale {
   return defaultLocale;
 }
 
+export type LocalizedField = Record<string, string> | null | undefined;
+
 /**
- * Pick the localised title/description for an event.
- * Falls back to Italian if the requested locale translation is missing.
+ * Retrieve a localized string from a multilingual JSON field.
+ * Falls back to the given fallback locale (default: 'it'),
+ * then to the first available value.
+ */
+export function getLocalized(
+  field: LocalizedField,
+  locale: string,
+  fallbackLocale: string = 'it',
+): string {
+  if (!field || typeof field !== 'object') return '';
+  const obj = field as Record<string, string>;
+  return obj[locale] ?? obj[fallbackLocale] ?? Object.values(obj)[0] ?? '';
+}
+
+/**
+ * Set a value in a multilingual JSON field, returning a new object.
+ */
+export function setLocalized(
+  field: LocalizedField,
+  locale: string,
+  value: string,
+): Record<string, string> {
+  const obj = (field && typeof field === 'object') ? { ...field } : {};
+  obj[locale] = value;
+  return obj;
+}
+
+/**
+ * Pick the localized title/description for an event.
+ * Works with the new JSON-based multilingual fields.
  */
 export function localiseEvent(
-  event: Event,
+  event: { title: unknown; description: unknown },
   locale: Locale,
 ): { title: string; description: string } {
-  if (locale === 'en') {
-    return {
-      title: event.titleEn ?? event.titleIt,
-      description: event.descriptionEn ?? event.descriptionIt,
-    };
-  }
   return {
-    title: event.titleIt,
-    description: event.descriptionIt,
+    title: getLocalized(event.title as LocalizedField, locale),
+    description: getLocalized(event.description as LocalizedField, locale),
   };
 }

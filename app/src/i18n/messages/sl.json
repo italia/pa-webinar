@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "Dogodki DTD",
+    "appDescription": "Platforma za javne digitalne dogodke Oddelka za digitalno preobrazbo",
+    "loading": "Nalaganje...",
+    "error": "Prišlo je do napake",
+    "errorMessage": "Nekaj je šlo narobe. Prosimo, poskusite znova.",
+    "retry": "Poskusite znova",
+    "save": "Shrani",
+    "cancel": "Prekliči",
+    "confirm": "Potrdi",
+    "close": "Zapri",
+    "back": "Nazaj",
+    "next": "Naprej",
+    "send": "Pošlji",
+    "delete": "Izbriši",
+    "edit": "Uredi",
+    "search": "Išči",
+    "noResults": "Ni rezultatov",
+    "requiredField": "Obvezno polje"
+  },
+  "nav": {
+    "home": "Domov",
+    "events": "Dogodki",
+    "about": "Informacije",
+    "privacy": "Zasebnost",
+    "admin": "Administracija",
+    "language": "Jezik",
+    "switchLanguage": "Zamenjaj jezik",
+    "skipToContent": "Preskoči na vsebino",
+    "skipToFooter": "Preskoči na nogo"
+  },
+  "header": {
+    "slimTitle": "Predsedstvo Sveta ministrov",
+    "slimSubtitle": "Oddelek za digitalno preobrazbo",
+    "followUs": "Sledite nam na"
+  },
+  "events": {
+    "title": "Dogodki",
+    "upcoming": "Prihajajoči dogodki",
+    "past": "Pretekli dogodki",
+    "noUpcoming": "Trenutno ni načrtovanih dogodkov. Preverite ponovno kmalu!",
+    "noPast": "Ni preteklih dogodkov",
+    "card": {
+      "publicEvent": "Javni dogodek",
+      "readMore": "Več informacij",
+      "liveNow": "V živo",
+      "spotsAvailable": "{count} prostih mest",
+      "fullyBooked": "Ni prostih mest",
+      "ended": "Zaključeno",
+      "occupiedSpots": "{registered}/{max} prijavljenih"
+    },
+    "detail": {
+      "title": "Podrobnosti dogodka",
+      "date": "Datum in ura",
+      "duration": "Trajanje",
+      "durationHours": "{hours}h {minutes}min",
+      "timezone": "Časovni pas",
+      "description": "Opis",
+      "participants": "Udeleženci",
+      "maxParticipants": "{count} skupno mest",
+      "spotsLeft": "{count} preostalih mest",
+      "occupiedSpots": "{registered} od {max} mest zasedenih",
+      "full": "Ni prostih mest",
+      "register": "Prijavite se na dogodek",
+      "registerAndJoin": "Prijavite se in sodelujte",
+      "registered": "Ste prijavljeni",
+      "enterEvent": "Vstopite v dogodek",
+      "eventEnded": "Dogodek je zaključen",
+      "eventHeldOn": "Ta dogodek je potekal {date}",
+      "totalRegistrations": "{count} prijavljenih udeležencev",
+      "recording": "Posnetek na voljo",
+      "noRecording": "Video posnetek za ta dogodek ni na voljo.",
+      "watchRecording": "Oglejte si posnetek",
+      "backToEvents": "Nazaj na dogodke",
+      "speakers": "Govorci",
+      "organizer": "Organizator",
+      "chatNotSaved": "Sporočila iz klepeta niso shranjena po koncu dogodka.",
+      "qaPostEvent": "Vprašanja in odgovori z dogodka",
+      "peakParticipants": "Vrh: {count} udeležencev",
+      "calendar": {
+        "addToCalendar": "Dodaj v koledar",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": "Prenesi datoteko .ics"
+      }
+    },
+    "manage": {
+      "toggleChat": "Klepet",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Snemanje",
+      "settingsSection": "Nastavitve dogodka"
+    },
+    "status": {
+      "DRAFT": "Osnutek",
+      "PUBLISHED": "Objavljeno",
+      "LIVE": "V živo",
+      "ENDED": "Zaključeno",
+      "ARCHIVED": "Arhivirano"
+    }
+  },
+  "registration": {
+    "title": "Prijava na dogodek",
+    "name": "Ime in priimek",
+    "namePlaceholder": "Ime bo prikazano v dvorani dogodka",
+    "email": "E-pošta",
+    "emailPlaceholder": "Prejeli boste povezavo za dostop do dogodka",
+    "gdprConsent": "Soglašam z obdelavo mojih osebnih podatkov (ime, e-pošta) v skladu z Uredbo EU 2016/679 (GDPR) za udeležbo na tem dogodku.",
+    "gdprLink": "Preberite celotno politiko zasebnosti",
+    "submit": "Potrdite prijavo",
+    "submitting": "Prijava poteka...",
+    "success": "Prijava zaključena!",
+    "successMessage": "Prejeli boste potrditveno e-pošto s povezavo za dostop do dogodka.",
+    "alreadyRegistered": "Že ste prijavljeni na ta dogodek",
+    "backToEvent": "Nazaj na dogodek",
+    "organization": "Organizacija",
+    "organizationPlaceholder": "npr. AGID, Ministrstvo za gospodarstvo, Mestna občina Rim",
+    "organizationRole": "Vloga v organizaciji",
+    "organizationRolePlaceholder": "npr. Vodja digitalne preobrazbe, Razvijalec",
+    "organizationType": "Vrsta organizacije",
+    "organizationTypePlaceholder": "Izberite vrsto...",
+    "organizationTypes": {
+      "MINISTRY": "Ministrstvo",
+      "AGENCY": "Agencija",
+      "REGION": "Regija",
+      "PROVINCE": "Pokrajina",
+      "MUNICIPALITY": "Občina",
+      "ASL": "ASL",
+      "UNIVERSITY": "Univerza",
+      "PUBLIC_ENTITY": "Javni subjekt",
+      "IN_HOUSE": "In-house družba",
+      "OTHER": "Drugo"
+    },
+    "gdprConsentProfiling": "Podatki o organizaciji bodo obdelani za statistične namene.",
+    "errors": {
+      "nameRequired": "Vnesite svoje ime",
+      "emailRequired": "Vnesite svojo e-pošto",
+      "emailInvalid": "Vnesite veljaven e-poštni naslov",
+      "organizationRequired": "Vnesite svojo organizacijo",
+      "consentRequired": "Soglasje z obdelavo podatkov je obvezno",
+      "recordingConsentRequired": "Soglasje s snemanjem je obvezno za ta dogodek",
+      "eventFull": "Dogodek je dosegel največje število udeležencev",
+      "generic": "Napaka pri prijavi. Prosimo, poskusite znova."
+    }
+  },
+  "live": {
+    "title": "Dvorana dogodka",
+    "connecting": "Povezovanje...",
+    "connectionError": "Povezava z dvorano ni mogoča. Preverite povezavo in poskusite znova.",
+    "recordingActive": "Snemanje poteka",
+    "recordingConsent": "Ta dogodek se snema. Z vstopom soglašate z avdio/video snemanjem.",
+    "recordingConsentTitle": "Soglasje s snemanjem",
+    "declineRecording": "Ne želim sodelovati",
+    "enterRoom": "Vstopite v dvorano",
+    "leaveRoom": "Zapustite dvorano",
+    "eventNotStarted": "Dogodek se še ni začel",
+    "eventStartsAt": "Dogodek se bo začel {date} ob {time}",
+    "countdown": "Preostali čas",
+    "waitingRoomHint": "Ta stran se bo samodejno posodobila, ko bo moderator zagnal dogodek. Ni treba znova nalagati.",
+    "startEventButton": "Zaženi dogodek",
+    "startingEvent": "Zagon...",
+    "chatNotSaved": "Sporočila iz klepeta niso shranjena po koncu dogodka.",
+    "registerAndJoin": "Prijavite se in sodelujte",
+    "registerNow": "V živo — Prijavite se zdaj!",
+    "enableMusic": "Vklopi glasbo",
+    "disableMusic": "Izklopi glasbo",
+    "preJoinSubtitle": "Vstopili boste v dvorano dogodka",
+    "preJoinNameLabel": "Vaše ime",
+    "guestJoinSubtitle": "Pridružite se dogodku v živo kot gost",
+    "guestJoinButton": "Vstopi kot gost",
+    "guestRedirectToRegister": "Dogodek se še ni začel. Prijavite se, da prejmete povezavo za dostop.",
+    "jibriUnavailable": "Snemanje ni na voljo — Jibri ni konfiguriran",
+    "jibriNotConfigured": "Snemanje ni konfigurirano v infrastrukturi",
+    "eventEnded": "Dogodek je zaključen",
+    "eventEndedMessage": "Dogodek se je zaključil. Hvala za udeležbo.",
+    "backToEvent": "Nazaj na dogodek",
+    "moderatorBadge": "Moderator",
+    "qaSidebarPlaceholder": "Plošča Q&A bo na voljo, ko se dogodek začne.",
+    "invalidToken": "Neveljavna povezava. Preverite povezavo, ki ste jo prejeli po e-pošti.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Ankete",
+    "sidebarTabMaterials": "Gradiva",
+    "sidebarTabParticipants": "Udeleženci",
+    "role": {
+      "moderator": "Moderator",
+      "participant": "Udeleženec",
+      "guest": "Gost"
+    },
+    "participants": {
+      "title": "Udeleženci",
+      "noParticipants": "Ni udeležencev",
+      "kick": "Odstrani",
+      "kickConfirm": "Ali ste prepričani, da želite odstraniti tega udeleženca?"
+    },
+    "moderator": {
+      "muteAll": "Utišaj vse",
+      "unmuteAll": "Vklopi zvok vsem",
+      "startRecording": "Začni snemanje",
+      "stopRecording": "Ustavi snemanje",
+      "toggleChat": "Klepet vkl./izkl.",
+      "endEvent": "Zaključi dogodek",
+      "endEventConfirm": "Ali ste prepričani, da želite zaključiti dogodek za vse udeležence?",
+      "participantCount": "{count} udeležencev",
+      "raisedHands": "Dvignjene roke",
+      "noRaisedHands": "Ni dvignjenih rok",
+      "giveFloor": "Daj besedo",
+      "approveAudio": "Daj besedo (zvok)",
+      "approveVideo": "Daj besedo (video)",
+      "approveAll": "Daj besedo",
+      "audioOnly": "Samo zvok",
+      "audioModeration": "Mikrofon udeležencev",
+      "videoModeration": "Video udeležencev",
+      "eventEndedSuccess": "Dogodek uspešno zaključen. Preusmerjanje..."
+    }
+  },
+  "qa": {
+    "title": "Vprašanja in odgovori",
+    "askQuestion": "Zastavite vprašanje",
+    "placeholder": "Napišite svoje vprašanje (najv. 500 znakov)",
+    "submit": "Pošljite vprašanje",
+    "submitting": "Pošiljanje...",
+    "questionSent": "Vprašanje je bilo poslano!",
+    "cooldownWait": "Počakajte {seconds}s...",
+    "upvote": "Glasuj",
+    "upvoted": "Glasovano",
+    "noQuestions": "Še ni vprašanj. Bodite prvi!",
+    "qaPersistenceNote": "Vprašanja so shranjena in bodo na voljo po dogodku.",
+    "qaPostEvent": "Vprašanja in odgovori z dogodka",
+    "noAnsweredQuestions": "Za ta dogodek ni vprašanj z odgovori.",
+    "filterAll": "Vsa",
+    "showPanel": "Prikaži Q&A",
+    "hidePanel": "Skrij Q&A",
+    "status": {
+      "PENDING": "V čakanju",
+      "HIGHLIGHTED": "Izpostavljeno",
+      "ANSWERED": "Odgovorjeno",
+      "DISMISSED": "Zavrnjeno"
+    },
+    "moderator": {
+      "highlight": "Izpostavi",
+      "markAnswered": "Odgovorjeno",
+      "dismiss": "Zavrni",
+      "resetToPending": "Ponastavi"
+    },
+    "errors": {
+      "textRequired": "Napišite svoje vprašanje",
+      "tooLong": "Vprašanje ne sme presegati 500 znakov",
+      "rateLimit": "Počakajte, preden pošljete novo vprašanje",
+      "generic": "Napaka pri pošiljanju vprašanja"
+    }
+  },
+  "polls": {
+    "title": "Ankete",
+    "showPanel": "Prikaži ankete",
+    "hidePanel": "Skrij ankete",
+    "createPoll": "Ustvari anketo",
+    "noPolls": "Ni anket. Moderator jih bo ustvaril med dogodkom.",
+    "questionPlaceholder": "Napišite vprašanje ankete...",
+    "optionPlaceholder": "Možnost {number}",
+    "addOption": "Dodaj možnost",
+    "removeOption": "Odstrani možnost",
+    "create": "Ustvari",
+    "creating": "Ustvarjanje...",
+    "cancelCreate": "Prekliči",
+    "closePoll": "Zapri glasovanje",
+    "publishResults": "Objavi rezultate",
+    "reopenPoll": "Ponovno odpri",
+    "totalVotes": "{count} glasov",
+    "voted": "Glasovali ste",
+    "status": {
+      "OPEN": "Odprto",
+      "CLOSED": "Zaprto",
+      "PUBLISHED": "Rezultati"
+    },
+    "errors": {
+      "questionRequired": "Napišite vprašanje ankete",
+      "minOptions": "Potrebni sta vsaj 2 možnosti",
+      "generic": "Napaka pri ustvarjanju ankete"
+    }
+  },
+  "materials": {
+    "title": "Gradiva",
+    "postEventTitle": "Gradiva dogodka",
+    "addMaterial": "Dodaj gradivo",
+    "titleLabel": "Naslov",
+    "urlLabel": "URL povezave",
+    "descriptionLabel": "Opis (neobvezno)",
+    "addedBy": "Dodal/a {name}",
+    "noMaterials": "Ni deljenih gradiv.",
+    "confirmDelete": "Ali ste prepričani, da želite izbrisati to gradivo?",
+    "materialAdded": "Gradivo dodano",
+    "materialDeleted": "Gradivo izbrisano",
+    "deleteMaterial": "Izbriši gradivo",
+    "add": "Dodaj",
+    "adding": "Dodajanje...",
+    "cancel": "Prekliči",
+    "errors": {
+      "urlInvalid": "Vnesite veljaven URL",
+      "generic": "Napaka pri dodajanju gradiva"
+    }
+  },
+  "reminders": {
+    "title": "Obvestila",
+    "addReminder": "Dodaj obvestilo",
+    "removeReminder": "Odstrani",
+    "maxReminders": "Največ 5 obvestil na dogodek.",
+    "selectPreset": "Izberite kdaj...",
+    "sentStatus": "{count} poslanih",
+    "notSent": "Ni poslano",
+    "presets": {
+      "7days": "7 dni pred",
+      "3days": "3 dni pred",
+      "1day": "1 dan pred",
+      "12hours": "12 ur pred",
+      "6hours": "6 ur pred",
+      "3hours": "3 ure pred",
+      "1hour": "1 uro pred",
+      "30min": "30 minut pred",
+      "15min": "15 minut pred"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Upravljanje dogodkov",
+      "settings": "Sistemske nastavitve",
+      "eventsList": "Seznam dogodkov",
+      "newEvent": "Nov dogodek",
+      "calendar": "Koledar",
+      "templates": "Predloge",
+      "analytics": "Statistike",
+      "infrastructure": "Infrastruktura",
+      "settingsGeneral": "Splošno",
+      "settingsLanguages": "Jeziki",
+      "ariaLabel": "Navigacija administracije",
+      "subNavAriaLabel": "Navigacija razdelka"
+    },
+    "landing": {
+      "title": "Administracijska plošča",
+      "subtitle": "Upravljajte dogodke in konfigurirajte platformo",
+      "eventsTitle": "Upravljanje dogodkov",
+      "eventsDescription": "Ustvarjajte, urejajte in upravljajte dogodke, predloge in statistike.",
+      "settingsTitle": "Sistemske nastavitve",
+      "settingsDescription": "Konfigurirajte blagovno znamko, vsebino, jezike, funkcionalnosti in infrastrukturo.",
+      "liveNow": "{count, plural, one {# dogodek v živo} two {# dogodka v živo} few {# dogodki v živo} other {# dogodkov v živo}}",
+      "upcomingEvents": "{count, plural, one {# prihajajoči dogodek} two {# prihajajoča dogodka} few {# prihajajoči dogodki} other {# prihajajočih dogodkov}}"
+    },
+    "recording": {
+      "title": "Video posnetek",
+      "play": "Predvajaj",
+      "download": "Prenesi",
+      "delete": "Izbriši posnetek",
+      "deleteConfirm": "Ali ste prepričani, da želite izbrisati posnetek? To dejanje je nepreklicno.",
+      "notConfigured": "Video snemanje ni na voljo. Jibri ni konfiguriran v infrastrukturi.",
+      "inProgress": "Snemanje poteka..."
+    },
+    "login": {
+      "title": "Administratorski dostop",
+      "keyLabel": "Dostopni ključ",
+      "keyPlaceholder": "Vnesite dostopni ključ",
+      "submit": "Prijavite se",
+      "invalidKey": "Neveljaven dostopni ključ",
+      "logout": "Odjavite se"
+    },
+    "title": "Upravljanje dogodkov",
+    "subtitle": "Administracijska plošča",
+    "createEvent": "Ustvari nov dogodek",
+    "editEvent": "Uredi dogodek",
+    "deleteEvent": "Izbriši dogodek",
+    "deleteConfirm": "Ali ste prepričani, da želite izbrisati ta dogodek? To dejanje je nepreklicno.",
+    "publish": "Objavi",
+    "unpublish": "Umakni iz objave",
+    "noToken": "Za upravljanje dogodkov uporabite moderatorsko povezavo, prejeto po e-pošti.",
+    "noEvents": "Ni najdenih dogodkov. Ustvarite svoj prvi dogodek.",
+    "eventDetails": "Podrobnosti dogodka",
+    "registrations": "Prijave",
+    "registrationCount": "{count} prijav",
+    "noRegistrations": "Ni prijavljenih udeležencev. Delite povezavo do dogodka!",
+    "exportCsv": "Izvozi CSV",
+    "organization": "Organizacija",
+    "organizationType": "Vrsta",
+    "registrationDate": "Datum prijave",
+    "joined": "Udeležen/a",
+    "notJoined": "Ni se udeležil/a",
+    "deleteSuccess": "Dogodek izbrisan",
+    "publishSuccess": "Dogodek objavljen",
+    "unpublishSuccess": "Dogodek umaknjen iz objave",
+    "startEvent": "Zaženi dogodek",
+    "startEventSuccess": "Dogodek zagnan! Udeleženci v čakalnici bodo samodejno preusmerjeni.",
+    "jvbWarmupWarning": "Video strežniki se zaganjajo (približno 2 minuti). Udeleženci bodo videli obvestilo v čakalnici.",
+    "eventIsLive": "Dogodek je v živo",
+    "joinAsModeratorBtn": "Vstopi kot moderator",
+    "openPublicPage": "Odpri javno stran",
+    "quickActions": "Hitra dejanja",
+    "liveRoomLink": "Povezava do dvorane dogodka",
+    "manage": "Upravljaj",
+    "settingsSaved": "Shranjeno",
+    "toggleChatDesc": "Omogoči klepet med udeleženci",
+    "toggleQaDesc": "Omogoči vprašanja z glasovanjem",
+    "toggleRecordingDesc": "Snemaj dogodek (zahteva Jibri)",
+    "eventUpdated": "Dogodek uspešno posodobljen!",
+    "dateChangedNotification": "Datum je bil spremenjen. Prijavljeni udeleženci bodo obveščeni po e-pošti.",
+    "eventCreated": "Dogodek uspešno ustvarjen!",
+    "createEventCta": "Organizirajte dogodek",
+    "createEventExplanation": "Ustvarite svoj dogodek in prejeli boste povezavo za upravljanje.",
+    "noAccountNeeded": "Račun ni potreben — moderatorska povezava je vaš dostop za upravljanje dogodka.",
+    "form": {
+      "titleIt": "Naslov (italijansko)",
+      "titleEn": "Naslov (angleško)",
+      "descriptionIt": "Opis (italijansko)",
+      "descriptionEn": "Opis (angleško)",
+      "startsAt": "Datum in čas začetka",
+      "endsAt": "Datum in čas konca",
+      "maxParticipants": "Največje število udeležencev",
+      "qaEnabled": "Omogoči Q&A",
+      "chatEnabled": "Omogoči klepet",
+      "recordingEnabled": "Omogoči video snemanje",
+      "dataRetentionDays": "Hramba podatkov (dni po dogodku)",
+      "dataRetentionHint": "Po tem obdobju bodo prijave udeležencev, vprašanja Q&A in morebitni video posnetki samodejno izbrisani.",
+      "privacyPolicyUrl": "URL politike zasebnosti",
+      "moderatorName": "Ime moderatorja",
+      "moderatorEmail": "E-pošta moderatorja",
+      "speakersIt": "Govorci (italijansko)",
+      "speakersEn": "Govorci (angleško)",
+      "organizerName": "Organizator",
+      "imageUrl": "URL naslovne slike",
+      "waitingRoomAudioUrl": "URL zvočne datoteke za čakalnico (neobvezno)",
+      "waitingRoomAudioUrlHint": "Vnesite URL datoteke MP3 za glasbo v čakalnici. Pustite prazno za privzeti zvok.",
+      "submit": "Ustvari dogodek",
+      "submitEdit": "Shrani spremembe",
+      "saving": "Shranjevanje...",
+      "creating": "Ustvarjanje...",
+      "sectionContent": "Vsebina",
+      "sectionSchedule": "Razpored",
+      "sectionSettings": "Nastavitve",
+      "sectionSpeakers": "Govorci in organizator",
+      "sectionModerator": "Moderator",
+      "sectionRegistrationFields": "Polja prijave",
+      "requireOrganization": "Zahtevaj organizacijo",
+      "requireOrganizationDesc": "Udeleženci morajo navesti svojo organizacijo",
+      "requireOrganizationRole": "Zahtevaj vlogo v organizaciji",
+      "requireOrganizationRoleDesc": "Udeleženci lahko navedejo svojo vlogo",
+      "requireOrganizationType": "Zahtevaj vrsto organizacije",
+      "requireOrganizationTypeDesc": "Udeleženci izberejo vrsto svoje organizacije",
+      "sectionPermissions": "Dovoljenja udeležencev",
+      "participantsCanUnmute": "Udeleženci lahko vklopijo mikrofon",
+      "participantsCanStartVideo": "Udeleženci lahko vklopijo kamero",
+      "participantsCanShareScreen": "Udeleženci lahko delijo zaslon",
+      "permissionsOnDesc": "Udeleženci lahko samostojno aktivirajo",
+      "permissionsOffDesc": "Samo moderatorji lahko aktivirajo. Udeleženci morajo dvigniti roko.",
+      "permissionsNote": "Spremembe dovoljenj veljajo za nove udeležence.",
+      "privacyPolicyMode": "Politika zasebnosti",
+      "privacyPolicyModeUrl": "Zunanji URL",
+      "privacyPolicyModeText": "Prilagojeno besedilo",
+      "privacyPolicyText": "Besedilo politike zasebnosti",
+      "privacyPolicyTextHint": "Napišite besedilo politike zasebnosti. Prikazano bo neposredno v prijavnem obrazcu.",
+      "retentionPreviewTitle": "Kaj se samodejno izbriše",
+      "retentionPreviewIntro": "Po {days} dneh od konca dogodka se samodejno izbrišejo:",
+      "retentionPreviewParticipants": "Podatki udeležencev (ime, e-pošta, organizacija)",
+      "retentionPreviewQa": "Vprašanja Q&A in glasovi",
+      "retentionPreviewPolls": "Rezultati anket",
+      "retentionPreviewRecordings": "Video posnetki",
+      "retentionPreviewKept": "Agregirane statistike in metapodatki dogodka se ohranijo.",
+      "configPreview": "Predogled konfiguracije",
+      "templateApplied": "Predloga uporabljena: {name}. Vse nastavitve lahko spremenite."
+    },
+    "links": {
+      "title": "Povezave dogodka",
+      "publicPage": "Javna stran dogodka",
+      "moderatorLink": "Moderatorska povezava",
+      "moderatorLinkHint": "To povezavo delite samo z moderatorji. Kdor koli jo ima, lahko upravlja dogodek.",
+      "copyLink": "Kopiraj povezavo",
+      "copied": "Kopirano!"
+    },
+    "feedbackAdmin": {
+      "title": "Rezultati povratnih informacij",
+      "averageRating": "Povprečna ocena",
+      "totalVotes": "{count, plural, one {# ocena} two {# oceni} few {# ocene} other {# ocen}}",
+      "noFeedback": "Ni prejetih povratnih informacij",
+      "comments": "Komentarji udeležencev",
+      "noComments": "Ni komentarjev",
+      "stars": "zvezdic"
+    },
+    "gdprAuditLog": {
+      "title": "Dnevnik GDPR",
+      "date": "Datum",
+      "action": "Dejanje",
+      "recordCount": "Zapisi",
+      "details": "Podrobnosti",
+      "actions": {
+        "DATA_DELETED": "Podatki izbrisani",
+        "CONSENT_RECORDED": "Soglasje zabeleženo",
+        "DATA_EXPORTED": "Podatki izvoženi"
+      }
+    },
+    "settings": {
+      "title": "Nastavitve spletišča",
+      "subtitle": "Konfigurirajte videz in obnašanje platforme za ponovno uporabo v javni upravi",
+      "saving": "Shranjevanje...",
+      "saved": "Nastavitve uspešno shranjene",
+      "tabs": {
+        "branding": "Branding",
+        "header": "Glava",
+        "seo": "SEO",
+        "homepage": "Domača stran",
+        "pages": "Strani",
+        "footer": "Noga",
+        "features": "Funkcionalnosti"
+      },
+      "header": {
+        "slimBarTitle": "Zgornja vrstica (Slim Header)",
+        "slimBarDescription": "Tanka vrstica na vrhu strani, ki identificira nadrejeno ustanovo.",
+        "parentOrganization": "Nadrejena ustanova",
+        "parentOrganizationHelp": "Npr. \"Predsedstvo Sveta ministrov\"",
+        "parentOrganizationUrl": "URL nadrejene ustanove",
+        "centerBarTitle": "Osrednja glava",
+        "centerBarDescription": "Glavno območje glave z imenom aplikacije in logotipom.",
+        "appName": "Ime aplikacije",
+        "appNameHelp": "Prikazano v glavi in naslovu brskalnika",
+        "organizationShort": "Kratko ime ustanove",
+        "logoUrl": "URL logotipa",
+        "logoUrlHelp": "Pustite prazno za privzeto ikono javne uprave",
+        "organizationUrl": "URL spletne strani ustanove"
+      },
+      "branding": {
+        "siteName": "Ime aplikacije",
+        "siteNameHelp": "Prikazano v glavi, naslovu brskalnika in e-pošti",
+        "siteDescription": "Opis aplikacije",
+        "organizationName": "Ime organizacije",
+        "organizationNameHelp": "npr. Oddelek za digitalno preobrazbo",
+        "organizationNameShort": "Kratica organizacije",
+        "organizationUrl": "URL organizacije",
+        "parentOrganization": "Nadrejena organizacija",
+        "parentOrganizationHelp": "npr. Predsedstvo Sveta ministrov",
+        "parentOrganizationUrl": "URL nadrejene organizacije",
+        "logoUrl": "URL prilagojenega logotipa",
+        "logoUrlHelp": "Pustite prazno za privzeto ikono javne uprave",
+        "faviconUrl": "URL favicona",
+        "primaryColor": "Primarna barva",
+        "defaultTimezone": "Privzeti časovni pas",
+        "defaultTimezoneHelp": "Uporablja se za prikaz datumov in ustvarjanje novih dogodkov."
+      },
+      "watermark": {
+        "title": "Prilagoditev videa",
+        "enabled": "Vodni žig aktiven",
+        "url": "URL vodnega žiga",
+        "urlHelp": "URL prosojne slike SVG ali PNG. Pustite prazno za logotip organizacije.",
+        "opacity": "Prosojnost",
+        "position": "Položaj",
+        "previewLabel": "Predogled video območja",
+        "positions": {
+          "bottomLeft": "Spodaj levo",
+          "bottomRight": "Spodaj desno",
+          "topLeft": "Zgoraj levo",
+          "topRight": "Zgoraj desno"
+        }
+      },
+      "seo": {
+        "title": "SEO naslov",
+        "titleHelp": "Naslov, prikazan v rezultatih iskanja in zavihku brskalnika",
+        "description": "SEO opis",
+        "descriptionHelp": "Opis za iskalnike in deljenje na družbenih omrežjih",
+        "image": "Open Graph slika",
+        "imageHelp": "Privzeta slika za deljenje na družbenih omrežjih (priporočeno 1200x630)"
+      },
+      "homepage": {
+        "modeLabel": "Način domače strani",
+        "modes": {
+          "LANDING": {
+            "title": "Predstavitvena stran",
+            "description": "Hero, funkcionalnosti, prihajajoči dogodki in kako deluje"
+          },
+          "EVENTS_LIST": {
+            "title": "Seznam dogodkov",
+            "description": "Neposredno prikaži seznam dogodkov"
+          },
+          "CUSTOM": {
+            "title": "Prilagojeno",
+            "description": "Prilagojena HTML vsebina + seznam dogodkov"
+          }
+        },
+        "customHtmlLabel": "Prilagojena HTML vsebina",
+        "customHtmlHelp": "HTML, prikazan v glavnem razdelku domače strani"
+      },
+      "pages": {
+        "privacyTitle": "Politika zasebnosti",
+        "privacyIt": "Vsebina (italijansko)",
+        "privacyEn": "Vsebina (angleško)",
+        "accessibilityTitle": "Izjava o dostopnosti",
+        "accessibilityIt": "Vsebina (italijansko)",
+        "accessibilityEn": "Vsebina (angleško)",
+        "preview": "Predogled"
+      },
+      "footer": {
+        "linksTitle": "Povezave v nogi",
+        "addLink": "Dodaj povezavo",
+        "noLinks": "Ni konfiguriranih povezav. Uporabljene bodo privzete.",
+        "linkTitle": "Naslov",
+        "linkSection": "Razdelek",
+        "sectionLegal": "Pravna obvestila",
+        "sectionMain": "Glavni",
+        "moveUp": "Premakni gor",
+        "moveDown": "Premakni dol",
+        "removeLink": "Odstrani povezavo"
+      },
+      "features": {
+        "statusPageEnabled": "Stran stanja aktivna",
+        "statusPageEnabledHelp": "Prikaži stran stanja storitve",
+        "guestAccessEnabled": "Dostop gostom aktiven",
+        "guestAccessEnabledHelp": "Dovoli dostop gostom na dogodke v živo",
+        "publicRegistrationEnabled": "Javna registracija aktivna",
+        "publicRegistrationEnabledHelp": "Kdor koli lahko ustvari dogodke (če je onemogočeno, samo administratorji)",
+        "calendarPublic": "Javni koledar",
+        "calendarPublicHelp": "Objavi koledar dogodkov. Obiskovalci lahko vidijo načrtovane dogodke.",
+        "githubUrl": "URL repozitorija GitHub",
+        "supportEmail": "E-pošta za podporo"
+      }
+    },
+    "analytics": {
+      "title": "Statistike",
+      "subtitle": "Pregled metrik platforme",
+      "timeline": "Časovni potek",
+      "topEvents": "Najboljši dogodki",
+      "noData": "Za to obdobje ni podatkov.",
+      "period": {
+        "7d": "7 dni",
+        "30d": "30 dni",
+        "90d": "90 dni",
+        "all": "Vse"
+      },
+      "metrics": {
+        "totalEvents": "Skupno dogodkov",
+        "totalRegistrations": "Prijave",
+        "totalParticipants": "Udeleženci",
+        "conversionRate": "Povprečna stopnja konverzije",
+        "peakParticipants": "Vrh udeležencev"
+      },
+      "table": {
+        "event": "Dogodek",
+        "date": "Datum",
+        "registrations": "Prijave",
+        "participants": "Udeleženci",
+        "peak": "Vrh",
+        "questions": "Q&A",
+        "conversion": "Konverzija",
+        "noEvents": "Ni najdenih dogodkov."
+      },
+      "quickStats": {
+        "title": "Hitre statistike",
+        "avgDuration": "Povprečno trajanje dogodkov",
+        "avgQuestionsPerEvent": "Q&A vprašanj na dogodek",
+        "totalPollVotes": "Skupno glasov v anketah",
+        "avgParticipantsPerEvent": "Povprečno udeležencev na dogodek",
+        "avgFeedbackRating": "Povprečna ocena povratnih informacij",
+        "totalFeedback": "Odgovori povratnih informacij"
+      }
+    },
+    "templates": {
+      "title": "Predloge dogodkov",
+      "subtitle": "Upravljajte vnaprej določene predloge za hitro ustvarjanje dogodkov",
+      "create": "Nova predloga",
+      "deleteConfirm": "Ali ste prepričani, da želite izbrisati to predlogo?",
+      "system": "Sistem",
+      "nameLabel": "Ime predloge",
+      "descriptionLabel": "Opis",
+      "maxParticipantsLabel": "Najv. udeležencev",
+      "featuresLabel": "Funkcionalnosti",
+      "recordingLabel": "Snemanje",
+      "unmute": "Mikrofon udeležencev",
+      "video": "Video udeležencev",
+      "screen": "Deljenje zaslona",
+      "pickerTitle": "Izberite predlogo",
+      "pickerSubtitle": "Izberite predlogo za predkonfiguracijo nastavitev dogodka ali preskočite za ročno konfiguracijo.",
+      "skipTemplate": "Konfiguriraj ročno"
+    },
+    "instantCall": {
+      "title": "Takojšnji video klic",
+      "subtitle": "Ustvarite video klic sproti in delite povezavo. Brez načrtovanja.",
+      "nameLabel": "Ime klica",
+      "namePlaceholder": "npr. Hitra uskladitev, Demo projekta...",
+      "moderatorLabel": "Vaše ime (neobvezno)",
+      "moderatorPlaceholder": "Prikazano bo v klicu",
+      "create": "Ustvari in vstopi",
+      "creating": "Ustvarjanje...",
+      "copyLink": "Kopiraj povezavo za povabilo",
+      "copied": "Kopirano!",
+      "hint": "Vsi lahko vklopijo mikrofon, kamero in delijo zaslon. Samo vi lahko snemate in zaključite klic."
+    },
+    "files": {
+      "title": "Datoteke in gradiva",
+      "upload": "Naloži datoteko",
+      "selectFile": "Izberi datoteko",
+      "fileTitle": "Naslov",
+      "visibility": "Vidnost",
+      "visibilityAlways": "Vedno vidno",
+      "visibilityBefore": "Samo pred dogodkom",
+      "visibilityDuring": "Samo med dogodkom",
+      "visibilityAfter": "Samo po dogodku",
+      "uploading": "Nalaganje...",
+      "uploadBtn": "Naloži",
+      "deleteConfirm": "Ali ste prepričani, da želite izbrisati to datoteko?",
+      "noFiles": "Ni naloženih datotek. Uporabite gumb \"Naloži datoteko\" za dodajanje gradiv."
+    },
+    "languages": {
+      "title": "Upravljanje jezikov",
+      "subtitle": "Konfigurirajte razpoložljive jezike in prilagodite prevode",
+      "configuredLocales": "Konfigurirani jeziki",
+      "localesDescription": "Izberite jezike, ki so na voljo za uporabniški vmesnik. Italijanščina je obvezna kot privzeti jezik.",
+      "addLocale": "Dodaj jezik",
+      "localeCode": "Koda jezika",
+      "localeName": "Ime jezika",
+      "selectLocale": "Izberite...",
+      "add": "Dodaj",
+      "default": "Privzeti",
+      "editTranslations": "Uredi prevode",
+      "saved": "Konfiguracija jezikov shranjena",
+      "saveNote": "Spremembe razpoložljivih jezikov zahtevajo ponovni zagon, da začnejo veljati v URL-jih.",
+      "translationOverrides": "Prilagojeni prevodi — {locale}",
+      "overridesDescription": "Prepišite privzete prevode za ta jezik. Uporabite pikčasto notacijo (npr. common.appName).",
+      "keyLabel": "Ključ prevoda",
+      "valueLabel": "Vrednost",
+      "addOverride": "Dodaj"
+    },
+    "infrastructure": {
+      "title": "Infrastruktura",
+      "subtitle": "Stanje komponent in konfiguracija okolja",
+      "deploymentMode": "Način namestitve",
+      "version": "Različica",
+      "environment": "Okolje",
+      "modes": {
+        "simple": "Preprosto (Docker Compose)",
+        "standard": "Standardno (Kubernetes)",
+        "full": "Popolno (Kubernetes s scale-to-zero)",
+        "unknown": "Neznano"
+      },
+      "database": {
+        "title": "Podatkovna baza",
+        "internal": "V gruči (PostgreSQL)",
+        "external": "Zunanja",
+        "connected": "Povezano",
+        "disconnected": "Nedosegljivo"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Dosegljivo",
+        "unreachable": "Nedosegljivo",
+        "notConfigured": "Ni konfigurirano"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero aktiven",
+        "replicas": "{current}/{max} vozlišč",
+        "preScale": "Pre-scale: {minutes} min",
+        "fixedMode": "Fiksni način",
+        "scalerEnabled": "Scaler omogočen"
+      },
+      "jibri": {
+        "title": "Snemanje (Jibri)",
+        "available": "Na voljo",
+        "notConfigured": "Ni konfigurirano",
+        "storageType": "Shramba",
+        "configureHint": "Video snemanje zahteva Jibri. Konfigurirajte shrambo za omogočanje.",
+        "docsLink": "Dokumentacija"
+      },
+      "email": {
+        "title": "E-pošta",
+        "configured": "Konfigurirano",
+        "notConfigured": "Ni konfigurirano"
+      },
+      "features": {
+        "title": "Funkcionalnosti",
+        "statusPage": "Stran stanja",
+        "guestAccess": "Dostop gostom",
+        "metrics": "Končna točka metrik"
+      },
+      "note": "Infrastrukturne spremembe se izvajajo prek Helm vrednosti in CI/CD cevovoda.",
+      "deployDocs": "Dokumentacija namestitve"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Potrditev prijave: {eventTitle}",
+    "confirmationHeading": "Prijava potrjena",
+    "confirmationKeepNote": "Shranite to e-pošto, saj vsebuje vašo osebno povezavo za dostop do dogodka.",
+    "reminderSubject": "Opomnik: {eventTitle} se začne čez 1 uro",
+    "reminderHeading": "Opomnik za dogodek",
+    "reminderNote": "Dogodek, na katerega ste prijavljeni, se začne čez manj kot eno uro. Za dostop uporabite spodnjo povezavo.",
+    "recordingSubject": "Posnetek na voljo: {eventTitle}",
+    "joinLabel": "Dostopite do dogodka",
+    "viewEvent": "Oglejte si stran dogodka",
+    "eventLabel": "Dogodek",
+    "dateLabel": "Datum",
+    "timeLabel": "Ura",
+    "durationLabel": "Trajanje"
+  },
+  "home": {
+    "hero": {
+      "title": "Javni digitalni dogodki",
+      "subtitle": "Platforma za spletne seminarje, predstavitve in javna srečanja Oddelka za digitalno preobrazbo",
+      "browseEvents": "Odkrijte dogodke",
+      "organizeEvent": "Organizirajte dogodek"
+    },
+    "features": {
+      "title": "Platforma za dogodke javne uprave",
+      "video": {
+        "title": "Videokonferenca",
+        "desc": "Udeležite se javnih dogodkov z do 300 udeleženci. Brez nameščanja programske opreme."
+      },
+      "qa": {
+        "title": "Vprašanja in odgovori",
+        "desc": "Zastavite vprašanja med dogodkom in glasujte za najpomembnejša. Moderator odgovarja v živo."
+      },
+      "privacy": {
+        "title": "Zasebnost in varnost",
+        "desc": "Podatki zaščiteni in skladni z GDPR. Lastna infrastruktura v Italiji."
+      }
+    },
+    "upcoming": {
+      "title": "Prihajajoči dogodki",
+      "viewAll": "Oglejte si vse dogodke",
+      "noEvents": "Ni načrtovanih dogodkov. Preverite kmalu!"
+    },
+    "howItWorks": {
+      "title": "Kako deluje",
+      "step1": {
+        "title": "Prijavite se",
+        "desc": "Brezplačna prijava na dogodek"
+      },
+      "step2": {
+        "title": "Prejmite povezavo",
+        "desc": "E-pošta z osebno povezavo za dostop"
+      },
+      "step3": {
+        "title": "Sodelujte",
+        "desc": "Vstopite v dogodek iz brskalnika, brez namestitev"
+      },
+      "step4": {
+        "title": "Komunicirajte",
+        "desc": "Zastavite vprašanja, glasujte, sodelujte v razpravi"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Soglašam z avdio/video snemanjem dogodka",
+      "recordingRequired": "Soglasje s snemanjem je obvezno za udeležbo na tem dogodku",
+      "futureCommunications": "Želim prejemati informacije o prihodnjih dogodkih, ki jih organizira DTD"
+    },
+    "export": {
+      "title": "Moji podatki",
+      "subtitle": "Zahtevajte kopijo osebnih podatkov, povezanih z vašim e-poštnim naslovom, v skladu s čl. 15 GDPR.",
+      "emailLabel": "Vaš e-poštni naslov",
+      "emailPlaceholder": "Vnesite e-pošto, uporabljeno pri prijavi",
+      "emailInvalid": "Vnesite veljaven e-poštni naslov",
+      "submit": "Zahtevaj moje podatke",
+      "loading": "Iskanje...",
+      "noData": "Za ta e-poštni naslov ni najdenih podatkov.",
+      "error": "Prišlo je do napake. Prosimo, poskusite znova pozneje.",
+      "rateLimited": "Preveč zahtevkov. Prosimo, poskusite znova čez eno uro.",
+      "results": "Vaši podatki",
+      "resultsDescription": "Najdeni podatki, povezani z {count} dogodki.",
+      "registrationData": "Podatki o prijavi",
+      "fieldName": "Ime",
+      "fieldEmail": "E-pošta",
+      "fieldOrganization": "Organizacija",
+      "fieldRegisteredAt": "Datum prijave",
+      "fieldConsent": "Soglasje",
+      "questionsTitle": "Vprašanja Q&A",
+      "pollVotesTitle": "Glasovi v anketah",
+      "optionLabel": "Možnost"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Politika zasebnosti",
+      "title": "Politika zasebnosti",
+      "intro": "Ta stran povzema obdelavo osebnih podatkov, povezano z uporabo platforme Eventi DTD in udeležbo na gostečih javnih dogodkih.",
+      "sections": {
+        "controller": {
+          "title": "Upravljavec podatkov",
+          "body": "Obdelava osebnih podatkov poteka v okviru institucionalnih dejavnosti Oddelka za digitalno preobrazbo za omogočanje tehničnega in organizacijskega upravljanja javnih spletnih dogodkov."
+        },
+        "data": {
+          "title": "Obdelani podatki in nameni",
+          "body": "Platforma obdeluje le podatke, nujno potrebne za prijavo in udeležbo na dogodkih, kot so ime, e-pošta in morebitna neobvezna polja, ki jih konfigurira organizator. Podatki se uporabljajo za pošiljanje osebne povezave za dostop, upravljanje udeležbe, morebitne opomnike in izpolnjevanje varnostnih obveznosti storitve."
+        },
+        "retention": {
+          "title": "Hramba podatkov in pravice",
+          "body": "Podatki se hranijo za obdobje, konfigurirano za vsak dogodek, nato pa se samodejno izbrišejo, razen če veljajo drugačne zakonske obveznosti. Kadarkoli je mogoče uveljavljati pravice, predvidene z GDPR, vključno z dostopom, popravkom in izbrisom, prek institucionalnih kanalov Oddelka."
+        }
+      },
+      "note": {
+        "title": "Zahtevajte svoje podatke",
+        "body": "Če ste se udeležili dogodka in želite preveriti, kateri osebni podatki so povezani z vašim e-poštnim naslovom, lahko uporabite namensko funkcionalnost, ki je na voljo na platformi.",
+        "linkLabel": "Zahtevaj moje podatke"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Izjava o dostopnosti",
+      "title": "Izjava o dostopnosti",
+      "intro": "Oddelek za digitalno preobrazbo si prizadeva to platformo narediti dostopno v skladu z zahtevami veljavne zakonodaje za digitalne storitve javne uprave.",
+      "sections": {
+        "commitment": {
+          "title": "Zaveza k dostopnosti",
+          "body": "Platforma je zasnovana s komponentami, usklajenimi z oblikovnim sistemom .italia, in s posebno pozornostjo do navigacije s tipkovnico, semantične strukture vsebine in berljivosti vmesnikov na glavnih velikostih zaslona."
+        },
+        "status": {
+          "title": "Stanje skladnosti",
+          "body": "Stalno potekajo preverjanja in izboljšave dostopnosti aplikacije. Morebitne preostale težave se postopoma odpravljajo v okviru razvoja storitve in rednega vzdrževanja."
+        },
+        "feedback": {
+          "title": "Prijave in kontakti",
+          "body": "Za prijavo težav pri dostopu do vsebine ali težav pri uporabi storitve lahko uporabite institucionalne kontaktne kanale Oddelka z navedbo prizadete strani in opisom naletene težave."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Pravna obvestila",
+      "title": "Pravna obvestila",
+      "intro": "Dostop do platforme Eventi DTD in njena uporaba potekata v skladu s temi obvestili, ki opisujejo splošne pogoje uporabe in glavne informacije o storitvi.",
+      "sections": {
+        "ownership": {
+          "title": "Lastništvo storitve",
+          "body": "Platformo spodbuja Oddelek za digitalno preobrazbo in je na voljo za organizacijo in izvedbo institucionalnih javnih spletnih dogodkov."
+        },
+        "usage": {
+          "title": "Način uporabe",
+          "body": "Uporabniki morajo storitev uporabljati pravilno, brez ogrožanja varnosti platforme, razpoložljivosti funkcionalnosti ali rednega poteka dogodkov. Zlorabe ali neprimerna uporaba lahko povzročijo omejitev dostopa do storitve."
+        },
+        "liability": {
+          "title": "Omejitev odgovornosti",
+          "body": "Kljub sprejetju ustreznih tehničnih in organizacijskih ukrepov Oddelek ne zagotavlja popolne odsotnosti prekinitev ali okvar, ki jih povzročijo nepredvideni dogodki, vzdrževalna dela ali zunanji dejavniki. Zakonske odgovornosti ureja veljavna zakonodaja."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Stanje sistema",
+    "subtitle": "Pregled stanja storitev platforme v realnem času.",
+    "allOperational": "Vsi sistemi so operativni",
+    "degraded": "Zmanjšana zmogljivost",
+    "outage": "Prekinitev storitve",
+    "componentLabel": "Komponenta",
+    "statusLabel": "Stanje",
+    "operational": "Operativno",
+    "degradedLabel": "Upočasnjeno",
+    "standby": "V pripravljenosti",
+    "loading": "Nalaganje...",
+    "fetchError": "Stanja sistema ni mogoče pridobiti",
+    "components": {
+      "app": "Spletni portal",
+      "database": "Podatkovna baza",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Video snemanje",
+      "smtp": "E-pošta (SMTP)"
+    },
+    "jvbCapacity": "Zmogljivost video mostu",
+    "jvbStandby": "V pripravljenosti — se samodejno aktivira po potrebi",
+    "jvbStandbyDetail": "Scale-to-zero aktiven — ni načrtovanih dogodkov. Vozlišča JVB bodo samodejno ustvarjena pred začetkom dogodka.",
+    "jvbScaling": "Aktiviranje...",
+    "nodesActive": "aktivnih vozlišč",
+    "nodesReady": "vozlišč pripravljenih",
+    "scaling": "skaliranje",
+    "jvbStress": "Obremenitev JVB",
+    "participantsConnected": "udeležencev povezanih",
+    "videoInteractive": "interaktivno",
+    "videoWebinar": "spletni seminar",
+    "participantsAvailable": "udeležencev na voljo",
+    "upcomingEvents": "Prihajajoči dogodki",
+    "noUpcomingEvents": "Ni načrtovanih dogodkov",
+    "jvbActivatesIn": "JVB se aktivira čez {minutes} min",
+    "liveNow": "V živo",
+    "activeEvents": "Aktivni dogodki",
+    "registrationsToday": "Prijave danes",
+    "jvbNodes": "Vozlišča JVB",
+    "overallStatus": "Splošno stanje",
+    "lastChecked": "Zadnje preverjanje",
+    "responseTime": "Odzivni čas",
+    "systemStatus": "Stanje sistema"
+  },
+  "feedback": {
+    "title": "Kako ocenjujete ta dogodek?",
+    "ratingLabel": "Izberite oceno od 1 do 5 zvezdic",
+    "comment": "Komentar",
+    "commentPlaceholder": "Imate predloge? (neobvezno)",
+    "submit": "Pošljite povratno informacijo",
+    "submitting": "Pošiljanje...",
+    "skip": "Preskoči",
+    "thankYou": "Hvala za vaše povratne informacije!",
+    "averageRating": "Povprečna ocena",
+    "ratingCount": "{count} ocen",
+    "noFeedback": "Ni prejetih povratnih informacij"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Zaženi",
+    "prompt": "Tema",
+    "promptPlaceholder": "npr. Kaj pričakujete od tega dogodka?",
+    "duration": "Trajanje",
+    "submit": "Pošlji",
+    "submitPlaceholder": "Vnesite besedo (najv. 30 znakov)",
+    "close": "Zapri word cloud",
+    "cancel": "Prekliči",
+    "noActiveRound": "Trenutno ni aktivnega word clouda.",
+    "noWords": "Čakamo na prve besede...",
+    "wordsSubmitted": "{count} besed poslanih",
+    "timeRemaining": "Preostali čas"
+  },
+  "timer": {
+    "title": "Časovnik",
+    "start": "Zaženi",
+    "pause": "Premor",
+    "reset": "Ponastavi",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Prilagojeno"
+    },
+    "showToAll": "Prikaži vsem",
+    "timeUp": "Čas je potekel!"
+  },
+  "reactions": {
+    "title": "Reakcije",
+    "sendReaction": "Pošlji reakcijo",
+    "reactionSent": "Reakcija poslana!"
+  },
+  "calendar": {
+    "title": "Koledar dogodkov",
+    "subtitle": "Oglejte si vse dogodke skozi čas",
+    "publicTitle": "Koledar dogodkov",
+    "publicSubtitle": "Odkrijte načrtovane dogodke",
+    "today": "Danes",
+    "prev": "Prejšnje obdobje",
+    "next": "Naslednje obdobje",
+    "views": {
+      "day": "Dan",
+      "week": "Teden",
+      "month": "Mesec",
+      "year": "Leto",
+      "list": "Seznam"
+    },
+    "status": {
+      "DRAFT": "Osnutek",
+      "PUBLISHED": "Objavljeno",
+      "LIVE": "V živo",
+      "ENDED": "Zaključeno",
+      "ARCHIVED": "Arhivirano"
+    }
+  },
+  "footer": {
+    "departmentName": "Oddelek za digitalno preobrazbo",
+    "presidencyName": "Predsedstvo Sveta ministrov",
+    "privacy": "Politika zasebnosti",
+    "accessibility": "Izjava o dostopnosti",
+    "openSource": "Odprtokodna programska oprema",
+    "contacts": "Kontakti",
+    "legalNotes": "Pravna obvestila",
+    "governmentSite": "Italijanska vlada",
+    "systemStatus": "Stanje sistema"
+  },
+  "pages": {
+    "privacyTitle": "Politika zasebnosti",
+    "privacyNotConfigured": "Politika zasebnosti še ni konfigurirana.",
+    "accessibilityTitle": "Izjava o dostopnosti",
+    "accessibilityNotConfigured": "Izjava o dostopnosti še ni konfigurirana."
+  },
+  "video": {
+    "play": "Predvajaj",
+    "pause": "Premor",
+    "speed": "Hitrost",
+    "fullscreen": "Celoten zaslon",
+    "pip": "Picture in Picture",
+    "volume": "Glasnost",
+    "mute": "Izklopi zvok",
+    "unmute": "Vklopi zvok",
+    "download": "Prenesi posnetek",
+    "speedLabel": "Hitrost predvajanja",
+    "progress": "Vrstica napredka"
+  },
+  "diagram": {
+    "title": "Konfiguracija dogodka",
+    "topology": "Topologija",
+    "features": "Aktivne funkcionalnosti",
+    "estimates": "Ocena virov",
+    "moderator": "Moderator",
+    "participants": "Udeleženci",
+    "jvb": "Video Bridge",
+    "jibri": "Snemanje",
+    "bandwidth": {
+      "moderator": "Pasovna širina moderatorja",
+      "participant": "Pasovna širina na udeleženca",
+      "total": "Ocenjena skupna pasovna širina"
+    },
+    "jvbCount": "Potrebni JVB-ji",
+    "jvbRam": "Ocenjen RAM JVB",
+    "storage": "Shramba posnetkov",
+    "duration": "Ocenjeno trajanje",
+    "viewOnly": "Samo ogled",
+    "preview": "Predogled konfiguracije"
+  },
+  "waiting": {
+    "startsIn": "Dogodek se začne čez",
+    "eventLive": "Dogodek je v živo!",
+    "connectedParticipants": "{count, plural, =0 {Ni udeležencev} =1 {1 udeleženec povezan} other {{count} udeležencev povezanih}}",
+    "elapsedTime": "V teku že {minutes} minut",
+    "youAreLate": "Dogodek se je začel pred {minutes} minutami",
+    "chooseHowToJoin": "Izberite, kako želite sodelovati:",
+    "enterLive": "Vstopite V ŽIVO",
+    "enterLiveDesc": "Sodelujte v živo. Do posnetka lahko vedno dostopate po dogodku.",
+    "enterNow": "Vstopite zdaj",
+    "watchFromStart": "Glejte od začetka",
+    "watchFromStartDesc": "Oglejte si posnetek od začetka in se kadarkoli pridružite prenosu v živo.",
+    "watchNow": "Glejte",
+    "switchToLive": "Preklopi na živo",
+    "enterRoom": "Vstopite v dvorano",
+    "recordingNotice": "Ta dogodek se snema.",
+    "recordingAvailableAfter": "Posnetek bo na voljo po dogodku.",
+    "autoRefreshHint": "Stran se bo samodejno osvežila, ko se bo dogodek začel.",
+    "startEventButton": "Zaženi dogodek",
+    "startingEvent": "Zagon...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 oseba čaka} other {{count} oseb čaka}}",
+    "jvbScaling": "Priprava dvorane...",
+    "jvbScalingDetail": "Video strežniki se zaganjajo. Postopek traja približno 2 minuti.",
+    "jvbReady": "Dvorana je pripravljena!"
+  },
+  "recording": {
+    "management": "Video posnetek",
+    "inProgress": "V teku",
+    "available": "Posnetek na voljo",
+    "duration": "Trajanje",
+    "fileSize": "Velikost",
+    "startedAt": "Začeto",
+    "automatic": "samodejno",
+    "publish": "Objavi posnetek",
+    "publishDesc": "Naredite video dostopen na strani dogodka",
+    "retentionLabel": "Hramba",
+    "retention": {
+      "24h": "24 ur (začasno)",
+      "7d": "7 dni",
+      "30d": "30 dni",
+      "90d": "90 dni",
+      "forever": "Nikoli (do poteka dogodka)"
+    },
+    "retentionNote": "Video bo v vsakem primeru upošteval GDPR hrambo dogodka",
+    "delete": "Izbriši posnetek",
+    "deleteConfirm": "Ali ste prepričani? Video bo trajno izbrisan.",
+    "notConfigured": "Jibri ni konfiguriran v infrastrukturi. Video snemanje ni na voljo.",
+    "play": "Predvajaj",
+    "download": "Prenesi"
+  },
+  "postEvent": {
+    "config": "Konfiguracija po dogodku",
+    "pageVisible": "Stran dogodka vidna po zaključku",
+    "showQA": "Prikaži vprašanja Q&A",
+    "showMaterials": "Prikaži deljena gradiva",
+    "showPolls": "Prikaži rezultate anket",
+    "showFeedback": "Prikaži povratne informacije",
+    "feedbackEnabled": "Anketa o povratnih informacijah aktivna ob koncu dogodka",
+    "visibilityAlways": "Vedno vidno",
+    "visibilityUntil": "Vidno do:",
+    "dataRetentionNote": "Osebni podatki udeležencev bodo izbrisani v skladu s hrambo dogodka ({days} dni). Vsebina dogodka bo ostala na voljo, dokler je stran vidna.",
+    "availableUntil": "Ta dogodek in njegova vsebina bodo na voljo do {date}.",
+    "tabs": {
+      "qa": "Vprašanja in odgovori",
+      "materials": "Gradiva",
+      "polls": "Ankete",
+      "feedback": "Povratne informacije"
+    }
+  }
+}

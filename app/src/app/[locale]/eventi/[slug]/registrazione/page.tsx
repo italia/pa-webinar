@@ -3,6 +3,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import RegistrationFormClient from '@/components/registration/registration-form-client';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 interface RegistrationPageProps {
   params: Promise<{ slug: string }>;
@@ -25,8 +26,7 @@ export default async function RegistrationPage({
   }
 
   const spotsLeft = event.maxParticipants - event._count.registrations;
-  const title =
-    locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
+  const title = getLocalized(event.title as LocalizedField, locale);
 
   const privacyUrl =
     event.privacyPolicyUrl ??

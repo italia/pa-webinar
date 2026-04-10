@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "DTD Események",
+    "appDescription": "A Digitális Átalakulási Főosztály nyilvános digitális eseményplatformja",
+    "loading": "Betöltés...",
+    "error": "Hiba történt",
+    "errorMessage": "Valami hiba történt. Kérjük, próbálja újra.",
+    "retry": "Újrapróbálás",
+    "save": "Mentés",
+    "cancel": "Mégse",
+    "confirm": "Megerősítés",
+    "close": "Bezárás",
+    "back": "Vissza",
+    "next": "Tovább",
+    "send": "Küldés",
+    "delete": "Törlés",
+    "edit": "Szerkesztés",
+    "search": "Keresés",
+    "noResults": "Nincs találat",
+    "requiredField": "Kötelező mező"
+  },
+  "nav": {
+    "home": "Kezdőlap",
+    "events": "Események",
+    "about": "Információk",
+    "privacy": "Adatvédelem",
+    "admin": "Adminisztráció",
+    "language": "Nyelv",
+    "switchLanguage": "Nyelv váltása",
+    "skipToContent": "Ugrás a tartalomra",
+    "skipToFooter": "Ugrás a láblécre"
+  },
+  "header": {
+    "slimTitle": "A Minisztertanács Elnöksége",
+    "slimSubtitle": "Digitális Átalakulási Főosztály",
+    "followUs": "Kövessen minket"
+  },
+  "events": {
+    "title": "Események",
+    "upcoming": "Közelgő események",
+    "past": "Korábbi események",
+    "noUpcoming": "Jelenleg nincs tervezett esemény. Látogasson vissza később!",
+    "noPast": "Nincsenek korábbi események",
+    "card": {
+      "publicEvent": "Nyilvános esemény",
+      "readMore": "Részletek",
+      "liveNow": "Éppen zajlik",
+      "spotsAvailable": "{count} szabad hely",
+      "fullyBooked": "Betelt",
+      "ended": "Befejezve",
+      "occupiedSpots": "{registered}/{max} regisztrált"
+    },
+    "detail": {
+      "title": "Esemény részletei",
+      "date": "Dátum és időpont",
+      "duration": "Időtartam",
+      "durationHours": "{hours} ó {minutes} perc",
+      "timezone": "Időzóna",
+      "description": "Leírás",
+      "participants": "Résztvevők",
+      "maxParticipants": "{count} hely összesen",
+      "spotsLeft": "{count} szabad hely",
+      "occupiedSpots": "{registered}/{max} hely foglalt",
+      "full": "Betelt",
+      "register": "Regisztráció az eseményre",
+      "registerAndJoin": "Regisztráció és csatlakozás",
+      "registered": "Ön regisztrált",
+      "enterEvent": "Belépés az eseményre",
+      "eventEnded": "Az esemény véget ért",
+      "eventHeldOn": "Ez az esemény {date} napon zajlott",
+      "totalRegistrations": "{count} regisztrált résztvevő",
+      "recording": "Felvétel elérhető",
+      "noRecording": "Ehhez az eseményhez nem érhető el videofelvétel.",
+      "watchRecording": "Felvétel megtekintése",
+      "backToEvents": "Vissza az eseményekhez",
+      "speakers": "Előadók",
+      "organizer": "Szervező",
+      "chatNotSaved": "A csevegés üzenetei az esemény végén nem kerülnek mentésre.",
+      "qaPostEvent": "Kérdések és válaszok az eseményről",
+      "peakParticipants": "Csúcs: {count} résztvevő",
+      "calendar": {
+        "addToCalendar": "Hozzáadás a naptárhoz",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": ".ics fájl letöltése"
+      }
+    },
+    "manage": {
+      "toggleChat": "Csevegés",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Felvétel",
+      "settingsSection": "Esemény beállítások"
+    },
+    "status": {
+      "DRAFT": "Vázlat",
+      "PUBLISHED": "Közzétéve",
+      "LIVE": "Éppen zajlik",
+      "ENDED": "Befejezve",
+      "ARCHIVED": "Archiválva"
+    }
+  },
+  "registration": {
+    "title": "Regisztráció az eseményre",
+    "name": "Teljes név",
+    "namePlaceholder": "Az Ön neve megjelenik az esemény szobájában",
+    "email": "E-mail",
+    "emailPlaceholder": "Erre a címre kapja meg a hozzáférési linket",
+    "gdprConsent": "Hozzájárulok személyes adataim (név, e-mail) kezeléséhez az EU 2016/679 rendelet (GDPR) alapján az eseményen való részvétel céljából.",
+    "gdprLink": "Olvassa el a teljes adatvédelmi tájékoztatót",
+    "submit": "Regisztráció megerősítése",
+    "submitting": "Regisztráció folyamatban...",
+    "success": "Regisztráció sikeres!",
+    "successMessage": "Visszaigazoló e-mailt kap az eseményhez való hozzáférési linkkel.",
+    "alreadyRegistered": "Ön már regisztrált erre az eseményre",
+    "backToEvent": "Vissza az eseményhez",
+    "organization": "Szervezet",
+    "organizationPlaceholder": "pl. AGID, Gazdasági Minisztérium, Budapest Főváros",
+    "organizationRole": "Beosztás a szervezetben",
+    "organizationRolePlaceholder": "pl. Digitális Átalakulási Vezető, Fejlesztő",
+    "organizationType": "Szervezet típusa",
+    "organizationTypePlaceholder": "Válasszon típust...",
+    "organizationTypes": {
+      "MINISTRY": "Minisztérium",
+      "AGENCY": "Ügynökség",
+      "REGION": "Régió",
+      "PROVINCE": "Megye",
+      "MUNICIPALITY": "Önkormányzat",
+      "ASL": "ASL (helyi egészségügyi hatóság)",
+      "UNIVERSITY": "Egyetem",
+      "PUBLIC_ENTITY": "Közintézmény",
+      "IN_HOUSE": "In-house társaság",
+      "OTHER": "Egyéb"
+    },
+    "gdprConsentProfiling": "A szervezeti adatokat statisztikai célokra kezeljük.",
+    "errors": {
+      "nameRequired": "Adja meg a nevét",
+      "emailRequired": "Adja meg az e-mail címét",
+      "emailInvalid": "Adjon meg érvényes e-mail címet",
+      "organizationRequired": "Adja meg a szervezetét",
+      "consentRequired": "Az adatkezeléshez való hozzájárulás kötelező",
+      "recordingConsentRequired": "A felvételhez való hozzájárulás ehhez az eseményhez kötelező",
+      "eventFull": "Az esemény elérte a maximális résztvevőszámot",
+      "generic": "Hiba a regisztráció során. Próbálja újra."
+    }
+  },
+  "live": {
+    "title": "Esemény szobája",
+    "connecting": "Csatlakozás...",
+    "connectionError": "Nem sikerült csatlakozni a szobához. Ellenőrizze a kapcsolatot, és próbálja újra.",
+    "recordingActive": "Felvétel folyamatban",
+    "recordingConsent": "Ez az esemény rögzítésre kerül. A belépéssel hozzájárul az audió/videó felvételhez.",
+    "recordingConsentTitle": "Hozzájárulás a felvételhez",
+    "declineRecording": "Nem veszek részt",
+    "enterRoom": "Belépés a szobába",
+    "leaveRoom": "Kilépés a szobából",
+    "eventNotStarted": "Az esemény még nem kezdődött el",
+    "eventStartsAt": "Az esemény {date} napon {time}-kor kezdődik",
+    "countdown": "Hátralévő idő",
+    "waitingRoomHint": "Ez az oldal automatikusan frissül, amikor a moderátor elindítja az eseményt. Nem szükséges az oldalt újratölteni.",
+    "startEventButton": "Esemény indítása",
+    "startingEvent": "Indítás...",
+    "chatNotSaved": "A csevegés üzenetei az esemény végén nem kerülnek mentésre.",
+    "registerAndJoin": "Regisztráció és csatlakozás",
+    "registerNow": "Éppen zajlik — Regisztráljon most!",
+    "enableMusic": "Zene bekapcsolása",
+    "disableMusic": "Zene kikapcsolása",
+    "preJoinSubtitle": "Ön belép az esemény szobájába",
+    "preJoinNameLabel": "Az Ön neve",
+    "guestJoinSubtitle": "Csatlakozzon vendégként a folyamatban lévő eseményhez",
+    "guestJoinButton": "Belépés vendégként",
+    "guestRedirectToRegister": "Az esemény még nem kezdődött el. Regisztráljon a hozzáférési link megkapásához.",
+    "jibriUnavailable": "Felvétel nem elérhető — Jibri nincs konfigurálva",
+    "jibriNotConfigured": "Felvétel nincs konfigurálva az infrastruktúrában",
+    "eventEnded": "Az esemény véget ért",
+    "eventEndedMessage": "Az esemény véget ért. Köszönjük a részvételt.",
+    "backToEvent": "Vissza az eseményhez",
+    "moderatorBadge": "Moderátor",
+    "qaSidebarPlaceholder": "A Q&A panel az esemény indulása után lesz elérhető.",
+    "invalidToken": "Érvénytelen link. Ellenőrizze az e-mailben kapott linket.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Szavazások",
+    "sidebarTabMaterials": "Anyagok",
+    "sidebarTabParticipants": "Résztvevők",
+    "role": {
+      "moderator": "Moderátor",
+      "participant": "Résztvevő",
+      "guest": "Vendég"
+    },
+    "participants": {
+      "title": "Résztvevők",
+      "noParticipants": "Nincsenek résztvevők",
+      "kick": "Eltávolítás",
+      "kickConfirm": "Biztosan el szeretné távolítani ezt a résztvevőt?"
+    },
+    "moderator": {
+      "muteAll": "Mindenki némítása",
+      "unmuteAll": "Hang visszakapcsolása mindenkinek",
+      "startRecording": "Felvétel indítása",
+      "stopRecording": "Felvétel leállítása",
+      "toggleChat": "Csevegés be/ki",
+      "endEvent": "Esemény befejezése",
+      "endEventConfirm": "Biztosan be szeretné fejezni az eseményt minden résztvevő számára?",
+      "participantCount": "{count} résztvevő",
+      "raisedHands": "Kézfeltartások",
+      "noRaisedHands": "Nincs kézfeltartás",
+      "giveFloor": "Szó megadása",
+      "approveAudio": "Szó megadása (audió)",
+      "approveVideo": "Szó megadása (videó)",
+      "approveAll": "Szó megadása",
+      "audioOnly": "Csak audió",
+      "audioModeration": "Résztvevők mikrofonja",
+      "videoModeration": "Résztvevők videója",
+      "eventEndedSuccess": "Esemény sikeresen befejezve. Átirányítás..."
+    }
+  },
+  "qa": {
+    "title": "Kérdések és válaszok",
+    "askQuestion": "Kérdés feltevése",
+    "placeholder": "Írja be kérdését (max. 500 karakter)",
+    "submit": "Kérdés elküldése",
+    "submitting": "Küldés...",
+    "questionSent": "Kérdés elküldve!",
+    "cooldownWait": "Várjon {seconds} mp-et...",
+    "upvote": "Szavazás",
+    "upvoted": "Megszavazva",
+    "noQuestions": "Még nincsenek kérdések. Legyen Ön az első!",
+    "qaPersistenceNote": "A kérdések mentésre kerülnek, és az esemény után is elérhetők lesznek.",
+    "qaPostEvent": "Kérdések és válaszok az eseményről",
+    "noAnsweredQuestions": "Ehhez az eseményhez nincsenek megválaszolt kérdések.",
+    "filterAll": "Összes",
+    "showPanel": "Q&A megjelenítése",
+    "hidePanel": "Q&A elrejtése",
+    "status": {
+      "PENDING": "Várakozó",
+      "HIGHLIGHTED": "Kiemelt",
+      "ANSWERED": "Megválaszolva",
+      "DISMISSED": "Elutasítva"
+    },
+    "moderator": {
+      "highlight": "Kiemelés",
+      "markAnswered": "Megválaszolva",
+      "dismiss": "Elutasítás",
+      "resetToPending": "Visszaállítás"
+    },
+    "errors": {
+      "textRequired": "Írja be kérdését",
+      "tooLong": "A kérdés nem haladhatja meg az 500 karaktert",
+      "rateLimit": "Kérjük, várjon a következő kérdés elküldése előtt",
+      "generic": "Hiba a kérdés elküldésekor"
+    }
+  },
+  "polls": {
+    "title": "Szavazások",
+    "showPanel": "Szavazások megjelenítése",
+    "hidePanel": "Szavazások elrejtése",
+    "createPoll": "Szavazás létrehozása",
+    "noPolls": "Nincsenek szavazások. A moderátor az esemény során hozza létre őket.",
+    "questionPlaceholder": "Írja be a szavazás kérdését...",
+    "optionPlaceholder": "{number}. lehetőség",
+    "addOption": "Lehetőség hozzáadása",
+    "removeOption": "Lehetőség eltávolítása",
+    "create": "Létrehozás",
+    "creating": "Létrehozás...",
+    "cancelCreate": "Mégse",
+    "closePoll": "Szavazás lezárása",
+    "publishResults": "Eredmények közzététele",
+    "reopenPoll": "Újranyitás",
+    "totalVotes": "{count} szavazat",
+    "voted": "Ön szavazott",
+    "status": {
+      "OPEN": "Nyitott",
+      "CLOSED": "Lezárt",
+      "PUBLISHED": "Eredmények"
+    },
+    "errors": {
+      "questionRequired": "Írja be a szavazás kérdését",
+      "minOptions": "Legalább 2 lehetőség szükséges",
+      "generic": "Hiba a szavazás létrehozásakor"
+    }
+  },
+  "materials": {
+    "title": "Anyagok",
+    "postEventTitle": "Esemény anyagai",
+    "addMaterial": "Anyag hozzáadása",
+    "titleLabel": "Cím",
+    "urlLabel": "Link URL",
+    "descriptionLabel": "Leírás (opcionális)",
+    "addedBy": "Hozzáadta: {name}",
+    "noMaterials": "Nincsenek megosztott anyagok.",
+    "confirmDelete": "Biztosan törölni szeretné ezt az anyagot?",
+    "materialAdded": "Anyag hozzáadva",
+    "materialDeleted": "Anyag törölve",
+    "deleteMaterial": "Anyag törlése",
+    "add": "Hozzáadás",
+    "adding": "Hozzáadás...",
+    "cancel": "Mégse",
+    "errors": {
+      "urlInvalid": "Adjon meg érvényes URL-t",
+      "generic": "Hiba az anyag hozzáadásakor"
+    }
+  },
+  "reminders": {
+    "title": "Értesítések",
+    "addReminder": "Értesítés hozzáadása",
+    "removeReminder": "Eltávolítás",
+    "maxReminders": "Eseményenként legfeljebb 5 értesítés.",
+    "selectPreset": "Válasszon időpontot...",
+    "sentStatus": "{count} elküldve",
+    "notSent": "Nem küldve",
+    "presets": {
+      "7days": "7 nappal korábban",
+      "3days": "3 nappal korábban",
+      "1day": "1 nappal korábban",
+      "12hours": "12 órával korábban",
+      "6hours": "6 órával korábban",
+      "3hours": "3 órával korábban",
+      "1hour": "1 órával korábban",
+      "30min": "30 perccel korábban",
+      "15min": "15 perccel korábban"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Események kezelése",
+      "settings": "Rendszerbeállítások",
+      "eventsList": "Eseménylista",
+      "newEvent": "Új esemény",
+      "calendar": "Naptár",
+      "templates": "Sablonok",
+      "analytics": "Statisztikák",
+      "infrastructure": "Infrastruktúra",
+      "settingsGeneral": "Általános",
+      "settingsLanguages": "Nyelvek",
+      "ariaLabel": "Adminisztrációs navigáció",
+      "subNavAriaLabel": "Szekció navigáció"
+    },
+    "landing": {
+      "title": "Adminisztrációs panel",
+      "subtitle": "Események kezelése és a platform konfigurálása",
+      "eventsTitle": "Események kezelése",
+      "eventsDescription": "Események, sablonok és statisztikák létrehozása, szerkesztése és kezelése.",
+      "settingsTitle": "Rendszerbeállítások",
+      "settingsDescription": "Arculat, tartalom, nyelvek, funkciók és infrastruktúra konfigurálása.",
+      "liveNow": "{count, plural, one {# élő esemény} other {# élő esemény}}",
+      "upcomingEvents": "{count, plural, one {# közelgő esemény} other {# közelgő esemény}}"
+    },
+    "recording": {
+      "title": "Videofelvétel",
+      "play": "Lejátszás",
+      "download": "Letöltés",
+      "delete": "Felvétel törlése",
+      "deleteConfirm": "Biztosan törölni szeretné ezt a felvételt? Ez a művelet nem vonható vissza.",
+      "notConfigured": "A videofelvétel nem elérhető. Jibri nincs konfigurálva az infrastruktúrában.",
+      "inProgress": "Felvétel folyamatban..."
+    },
+    "login": {
+      "title": "Adminisztrátori hozzáférés",
+      "keyLabel": "Hozzáférési kulcs",
+      "keyPlaceholder": "Adja meg a hozzáférési kulcsot",
+      "submit": "Bejelentkezés",
+      "invalidKey": "Érvénytelen hozzáférési kulcs",
+      "logout": "Kijelentkezés"
+    },
+    "title": "Események kezelése",
+    "subtitle": "Adminisztrációs panel",
+    "createEvent": "Új esemény létrehozása",
+    "editEvent": "Esemény szerkesztése",
+    "deleteEvent": "Esemény törlése",
+    "deleteConfirm": "Biztosan törölni szeretné ezt az eseményt? Ez a művelet nem vonható vissza.",
+    "publish": "Közzététel",
+    "unpublish": "Közzététel visszavonása",
+    "noToken": "Az események kezeléséhez használja az e-mailben kapott moderátor linket.",
+    "noEvents": "Nem találhatók események. Hozza létre az első eseményét.",
+    "eventDetails": "Esemény részletei",
+    "registrations": "Regisztrációk",
+    "registrationCount": "{count} regisztráció",
+    "noRegistrations": "Még nincsenek regisztrált résztvevők. Ossza meg az esemény linkjét!",
+    "exportCsv": "CSV exportálás",
+    "organization": "Szervezet",
+    "organizationType": "Típus",
+    "registrationDate": "Regisztráció dátuma",
+    "joined": "Csatlakozott",
+    "notJoined": "Nem csatlakozott",
+    "deleteSuccess": "Esemény törölve",
+    "publishSuccess": "Esemény közzétéve",
+    "unpublishSuccess": "Esemény közzététele visszavonva",
+    "startEvent": "Esemény indítása",
+    "startEventSuccess": "Esemény elindítva! A várakozó résztvevők automatikusan átirányításra kerülnek.",
+    "jvbWarmupWarning": "A videoszerverek indulóban vannak (kb. 2 perc). A résztvevők értesítést látnak a váróteremben.",
+    "eventIsLive": "Az esemény zajlik",
+    "joinAsModeratorBtn": "Belépés moderátorként",
+    "openPublicPage": "Nyilvános oldal megnyitása",
+    "quickActions": "Gyors műveletek",
+    "liveRoomLink": "Esemény szobájának linkje",
+    "manage": "Kezelés",
+    "settingsSaved": "Mentve",
+    "toggleChatDesc": "Csevegés engedélyezése a résztvevők között",
+    "toggleQaDesc": "Kérdések szavazással engedélyezése",
+    "toggleRecordingDesc": "Esemény rögzítése (Jibri szükséges)",
+    "eventUpdated": "Esemény sikeresen frissítve!",
+    "dateChangedNotification": "A dátum módosult. A regisztrált résztvevők e-mail értesítést kapnak.",
+    "eventCreated": "Esemény sikeresen létrehozva!",
+    "createEventCta": "Esemény szervezése",
+    "createEventExplanation": "Hozza létre az eseményét, és kap egy linket a kezeléséhez.",
+    "noAccountNeeded": "Nincs szükség fiókra — a moderátor link az Ön hozzáférése az esemény kezeléséhez.",
+    "form": {
+      "titleIt": "Cím (olaszul)",
+      "titleEn": "Cím (angolul)",
+      "descriptionIt": "Leírás (olaszul)",
+      "descriptionEn": "Leírás (angolul)",
+      "startsAt": "Kezdés dátuma és időpontja",
+      "endsAt": "Befejezés dátuma és időpontja",
+      "maxParticipants": "Résztvevők maximális száma",
+      "qaEnabled": "Q&A engedélyezése",
+      "chatEnabled": "Csevegés engedélyezése",
+      "recordingEnabled": "Videofelvétel engedélyezése",
+      "dataRetentionDays": "Adatmegőrzés (napok az esemény után)",
+      "dataRetentionHint": "Ezen időszak elteltével a résztvevők regisztrációi, a Q&A kérdések és az esetleges videofelvételek automatikusan törlésre kerülnek.",
+      "privacyPolicyUrl": "Adatvédelmi tájékoztató URL",
+      "moderatorName": "Moderátor neve",
+      "moderatorEmail": "Moderátor e-mail címe",
+      "speakersIt": "Előadók (olaszul)",
+      "speakersEn": "Előadók (angolul)",
+      "organizerName": "Szervező",
+      "imageUrl": "Borítókép URL",
+      "waitingRoomAudioUrl": "Váróterem audió URL (opcionális)",
+      "waitingRoomAudioUrlHint": "Adja meg egy MP3 fájl URL-jét a váróterem zenéjéhez. Hagyja üresen az alapértelmezett audió használatához.",
+      "submit": "Esemény létrehozása",
+      "submitEdit": "Módosítások mentése",
+      "saving": "Mentés...",
+      "creating": "Létrehozás...",
+      "sectionContent": "Tartalom",
+      "sectionSchedule": "Ütemezés",
+      "sectionSettings": "Beállítások",
+      "sectionSpeakers": "Előadók és szervező",
+      "sectionModerator": "Moderátor",
+      "sectionRegistrationFields": "Regisztrációs mezők",
+      "requireOrganization": "Szervezet megadásának követelése",
+      "requireOrganizationDesc": "A résztvevőknek meg kell adniuk szervezetüket",
+      "requireOrganizationRole": "Beosztás megadásának követelése",
+      "requireOrganizationRoleDesc": "A résztvevők megadhatják beosztásukat",
+      "requireOrganizationType": "Szervezet típusának követelése",
+      "requireOrganizationTypeDesc": "A résztvevők kiválasztják szervezetük típusát",
+      "sectionPermissions": "Résztvevői jogosultságok",
+      "participantsCanUnmute": "A résztvevők bekapcsolhatják a mikrofont",
+      "participantsCanStartVideo": "A résztvevők bekapcsolhatják a webkamerát",
+      "participantsCanShareScreen": "A résztvevők megoszthatják képernyőjüket",
+      "permissionsOnDesc": "A résztvevők önállóan aktiválhatják",
+      "permissionsOffDesc": "Csak a moderátorok aktiválhatják. A résztvevőknek kezet kell emelniük.",
+      "permissionsNote": "A jogosultsági módosítások az új résztvevőkre vonatkoznak.",
+      "privacyPolicyMode": "Adatvédelmi tájékoztató",
+      "privacyPolicyModeUrl": "Külső URL",
+      "privacyPolicyModeText": "Egyéni szöveg",
+      "privacyPolicyText": "Adatvédelmi tájékoztató szövege",
+      "privacyPolicyTextHint": "Írja meg az adatvédelmi tájékoztató szövegét. A regisztrációs űrlapban jelenik meg.",
+      "retentionPreviewTitle": "Automatikusan törlésre kerülő adatok",
+      "retentionPreviewIntro": "Az esemény befejezését követő {days} nap elteltével automatikusan törlésre kerül:",
+      "retentionPreviewParticipants": "Résztvevők adatai (név, e-mail, szervezet)",
+      "retentionPreviewQa": "Q&A kérdések és szavazatok",
+      "retentionPreviewPolls": "Szavazási eredmények",
+      "retentionPreviewRecordings": "Videofelvételek",
+      "retentionPreviewKept": "Az összesített statisztikák és az esemény metaadatai megmaradnak.",
+      "configPreview": "Konfiguráció előnézete",
+      "templateApplied": "Sablon alkalmazva: {name}. Minden beállítás módosítható."
+    },
+    "links": {
+      "title": "Esemény linkjei",
+      "publicPage": "Esemény nyilvános oldala",
+      "moderatorLink": "Moderátor link",
+      "moderatorLinkHint": "Ezt a linket csak moderátorokkal ossza meg. Bárki, aki rendelkezik ezzel a linkkel, kezelheti az eseményt.",
+      "copyLink": "Link másolása",
+      "copied": "Másolva!"
+    },
+    "feedbackAdmin": {
+      "title": "Visszajelzés eredményei",
+      "averageRating": "Átlagos értékelés",
+      "totalVotes": "{count, plural, one {# értékelés} other {# értékelés}}",
+      "noFeedback": "Nem érkezett visszajelzés",
+      "comments": "Résztvevők megjegyzései",
+      "noComments": "Nincsenek megjegyzések",
+      "stars": "csillag"
+    },
+    "gdprAuditLog": {
+      "title": "GDPR auditnapló",
+      "date": "Dátum",
+      "action": "Művelet",
+      "recordCount": "Rekordok",
+      "details": "Részletek",
+      "actions": {
+        "DATA_DELETED": "Adatok törölve",
+        "CONSENT_RECORDED": "Hozzájárulás rögzítve",
+        "DATA_EXPORTED": "Adatok exportálva"
+      }
+    },
+    "settings": {
+      "title": "Webhely beállításai",
+      "subtitle": "A platform megjelenésének és viselkedésének konfigurálása közigazgatási újrahasznosításhoz",
+      "saving": "Mentés...",
+      "saved": "Beállítások sikeresen mentve",
+      "tabs": {
+        "branding": "Arculat",
+        "header": "Fejléc",
+        "seo": "SEO",
+        "homepage": "Kezdőlap",
+        "pages": "Oldalak",
+        "footer": "Lábléc",
+        "features": "Funkciók"
+      },
+      "header": {
+        "slimBarTitle": "Felső sáv (Slim Header)",
+        "slimBarDescription": "A vékony sáv az oldal tetején, amely a fölérendelt szervezetet azonosítja.",
+        "parentOrganization": "Fölérendelt szervezet",
+        "parentOrganizationHelp": "Pl. \"A Minisztertanács Elnöksége\"",
+        "parentOrganizationUrl": "Fölérendelt szervezet URL",
+        "centerBarTitle": "Központi fejléc",
+        "centerBarDescription": "A fejléc fő területe az alkalmazás nevével és logójával.",
+        "appName": "Alkalmazás neve",
+        "appNameHelp": "A fejlécben és a böngésző címsorában jelenik meg",
+        "organizationShort": "Szervezet rövid neve",
+        "logoUrl": "Logó URL",
+        "logoUrlHelp": "Hagyja üresen az alapértelmezett közigazgatási ikon használatához",
+        "organizationUrl": "Szervezet webhelye URL"
+      },
+      "branding": {
+        "siteName": "Alkalmazás neve",
+        "siteNameHelp": "A fejlécben, a böngésző címsorában és az e-mailekben jelenik meg",
+        "siteDescription": "Alkalmazás leírása",
+        "organizationName": "Szervezet neve",
+        "organizationNameHelp": "pl. Digitális Átalakulási Főosztály",
+        "organizationNameShort": "Szervezet rövidítése",
+        "organizationUrl": "Szervezet URL",
+        "parentOrganization": "Fölérendelt szervezet",
+        "parentOrganizationHelp": "pl. A Minisztertanács Elnöksége",
+        "parentOrganizationUrl": "Fölérendelt szervezet URL",
+        "logoUrl": "Egyéni logó URL",
+        "logoUrlHelp": "Hagyja üresen az alapértelmezett közigazgatási ikon használatához",
+        "faviconUrl": "Favicon URL",
+        "primaryColor": "Elsődleges szín",
+        "defaultTimezone": "Alapértelmezett időzóna",
+        "defaultTimezoneHelp": "A dátumok megjelenítéséhez és új események létrehozásához használt."
+      },
+      "watermark": {
+        "title": "Videó testreszabás",
+        "enabled": "Vízjel aktív",
+        "url": "Vízjel URL",
+        "urlHelp": "Átlátszó SVG vagy PNG kép URL-je. Hagyja üresen a szervezet logójának használatához.",
+        "opacity": "Átlátszóság",
+        "position": "Pozíció",
+        "previewLabel": "Videóterület előnézete",
+        "positions": {
+          "bottomLeft": "Bal alsó",
+          "bottomRight": "Jobb alsó",
+          "topLeft": "Bal felső",
+          "topRight": "Jobb felső"
+        }
+      },
+      "seo": {
+        "title": "SEO cím",
+        "titleHelp": "A keresési találatokban és a böngésző fülén megjelenő cím",
+        "description": "SEO leírás",
+        "descriptionHelp": "Leírás a keresőmotorok és a közösségi megosztás számára",
+        "image": "Open Graph kép",
+        "imageHelp": "Alapértelmezett kép a közösségi megosztáshoz (ajánlott: 1200×630)"
+      },
+      "homepage": {
+        "modeLabel": "Kezdőlap mód",
+        "modes": {
+          "LANDING": {
+            "title": "Nyitóoldal",
+            "description": "Hero, funkciók, közelgő események és hogyan működik"
+          },
+          "EVENTS_LIST": {
+            "title": "Eseménylista",
+            "description": "Közvetlenül az eseménylista megjelenítése"
+          },
+          "CUSTOM": {
+            "title": "Egyéni",
+            "description": "Egyéni HTML tartalom + eseménylista"
+          }
+        },
+        "customHtmlLabel": "Egyéni HTML tartalom",
+        "customHtmlHelp": "A kezdőlap fő szakaszában megjelenő HTML"
+      },
+      "pages": {
+        "privacyTitle": "Adatvédelmi tájékoztató",
+        "privacyIt": "Tartalom (olaszul)",
+        "privacyEn": "Tartalom (angolul)",
+        "accessibilityTitle": "Akadálymentességi nyilatkozat",
+        "accessibilityIt": "Tartalom (olaszul)",
+        "accessibilityEn": "Tartalom (angolul)",
+        "preview": "Előnézet"
+      },
+      "footer": {
+        "linksTitle": "Lábléc linkjei",
+        "addLink": "Link hozzáadása",
+        "noLinks": "Nincsenek konfigurált linkek. Az alapértelmezettek lesznek használva.",
+        "linkTitle": "Cím",
+        "linkSection": "Szekció",
+        "sectionLegal": "Jogi információk",
+        "sectionMain": "Fő",
+        "moveUp": "Felfelé mozgatás",
+        "moveDown": "Lefelé mozgatás",
+        "removeLink": "Link eltávolítása"
+      },
+      "features": {
+        "statusPageEnabled": "Állapotoldal aktív",
+        "statusPageEnabledHelp": "A szolgáltatás állapotoldalának megjelenítése",
+        "guestAccessEnabled": "Vendég hozzáférés aktív",
+        "guestAccessEnabledHelp": "Vendégként való hozzáférés engedélyezése a folyamatban lévő eseményekhez",
+        "publicRegistrationEnabled": "Nyilvános regisztráció aktív",
+        "publicRegistrationEnabledHelp": "Bárki létrehozhat eseményeket (ha kikapcsolva, csak adminisztrátorok)",
+        "calendarPublic": "Nyilvános naptár",
+        "calendarPublicHelp": "Az eseménynaptár közzététele. A látogatók megtekinthetik a tervezett eseményeket.",
+        "githubUrl": "GitHub repozitórium URL",
+        "supportEmail": "Támogatási e-mail"
+      }
+    },
+    "analytics": {
+      "title": "Statisztikák",
+      "subtitle": "A platform metrikáinak áttekintése",
+      "timeline": "Időbeli alakulás",
+      "topEvents": "Legjobb események",
+      "noData": "Ehhez az időszakhoz nem állnak rendelkezésre adatok.",
+      "period": {
+        "7d": "7 nap",
+        "30d": "30 nap",
+        "90d": "90 nap",
+        "all": "Teljes időszak"
+      },
+      "metrics": {
+        "totalEvents": "Összes esemény",
+        "totalRegistrations": "Regisztrációk",
+        "totalParticipants": "Résztvevők",
+        "conversionRate": "Átlagos konverziós arány",
+        "peakParticipants": "Csúcs résztvevőszám"
+      },
+      "table": {
+        "event": "Esemény",
+        "date": "Dátum",
+        "registrations": "Regisztrációk",
+        "participants": "Résztvevők",
+        "peak": "Csúcs",
+        "questions": "Q&A",
+        "conversion": "Konverzió",
+        "noEvents": "Nem találhatók események."
+      },
+      "quickStats": {
+        "title": "Gyors statisztikák",
+        "avgDuration": "Átlagos eseményhossz",
+        "avgQuestionsPerEvent": "Q&A kérdések eseményenként",
+        "totalPollVotes": "Összes szavazati szám",
+        "avgParticipantsPerEvent": "Átlagos résztvevőszám eseményenként",
+        "avgFeedbackRating": "Átlagos visszajelzési értékelés",
+        "totalFeedback": "Visszajelzési válaszok"
+      }
+    },
+    "templates": {
+      "title": "Eseménysablonok",
+      "subtitle": "Előre beállított sablonok kezelése események gyors létrehozásához",
+      "create": "Új sablon",
+      "deleteConfirm": "Biztosan törölni szeretné ezt a sablont?",
+      "system": "Rendszer",
+      "nameLabel": "Sablon neve",
+      "descriptionLabel": "Leírás",
+      "maxParticipantsLabel": "Max. résztvevők",
+      "featuresLabel": "Funkciók",
+      "recordingLabel": "Felvétel",
+      "unmute": "Résztvevők mikrofonja",
+      "video": "Résztvevők videója",
+      "screen": "Képernyőmegosztás",
+      "pickerTitle": "Sablon kiválasztása",
+      "pickerSubtitle": "Válasszon sablont az eseménybeállítások előkonfigurálásához, vagy hagyja ki a kézi konfiguráláshoz.",
+      "skipTemplate": "Kézi konfigurálás"
+    },
+    "instantCall": {
+      "title": "Azonnali videohívás",
+      "subtitle": "Hozzon létre azonnali videohívást, és ossza meg a linket. Ütemezés nem szükséges.",
+      "nameLabel": "Hívás neve",
+      "namePlaceholder": "pl. Gyors egyeztetés, Projekt bemutató...",
+      "moderatorLabel": "Az Ön neve (opcionális)",
+      "moderatorPlaceholder": "Megjelenik a hívásban",
+      "create": "Létrehozás és csatlakozás",
+      "creating": "Létrehozás...",
+      "copyLink": "Meghívó link másolása",
+      "copied": "Másolva!",
+      "hint": "Mindenki bekapcsolhatja a mikrofont, webkamerát és megoszthatja képernyőjét. Csak Ön rögzíthet és fejezhet be hívást."
+    },
+    "files": {
+      "title": "Fájlok és anyagok",
+      "upload": "Fájl feltöltése",
+      "selectFile": "Fájl kiválasztása",
+      "fileTitle": "Cím",
+      "visibility": "Láthatóság",
+      "visibilityAlways": "Mindig látható",
+      "visibilityBefore": "Csak az esemény előtt",
+      "visibilityDuring": "Csak az esemény alatt",
+      "visibilityAfter": "Csak az esemény után",
+      "uploading": "Feltöltés...",
+      "uploadBtn": "Feltöltés",
+      "deleteConfirm": "Biztosan törölni szeretné ezt a fájlt?",
+      "noFiles": "Nincsenek feltöltött fájlok. Használja a \"Fájl feltöltése\" gombot anyagok hozzáadásához."
+    },
+    "languages": {
+      "title": "Nyelvkezelés",
+      "subtitle": "Az elérhető nyelvek konfigurálása és a fordítások testreszabása",
+      "configuredLocales": "Konfigurált nyelvek",
+      "localesDescription": "Válassza ki a felhasználói felületen elérhető nyelveket. Az olasz kötelező alapértelmezett nyelvként.",
+      "addLocale": "Nyelv hozzáadása",
+      "localeCode": "Nyelvi kód",
+      "localeName": "Nyelv neve",
+      "selectLocale": "Válasszon...",
+      "add": "Hozzáadás",
+      "default": "Alapértelmezett",
+      "editTranslations": "Fordítások szerkesztése",
+      "saved": "Nyelvi konfiguráció mentve",
+      "saveNote": "Az elérhető nyelvek módosításai újraindítást igényelnek az URL-ekben való érvényesüléshez.",
+      "translationOverrides": "Egyéni fordítások — {locale}",
+      "overridesDescription": "Írja felül az alapértelmezett fordításokat ehhez a nyelvhez. Használjon pont jelölést (pl. common.appName).",
+      "keyLabel": "Fordítási kulcs",
+      "valueLabel": "Érték",
+      "addOverride": "Hozzáadás"
+    },
+    "infrastructure": {
+      "title": "Infrastruktúra",
+      "subtitle": "Komponensek állapota és környezeti konfiguráció",
+      "deploymentMode": "Telepítési mód",
+      "version": "Verzió",
+      "environment": "Környezet",
+      "modes": {
+        "simple": "Egyszerű (Docker Compose)",
+        "standard": "Standard (Kubernetes)",
+        "full": "Teljes (Kubernetes scale-to-zero-val)",
+        "unknown": "Ismeretlen"
+      },
+      "database": {
+        "title": "Adatbázis",
+        "internal": "Klaszteren belüli (PostgreSQL)",
+        "external": "Külső",
+        "connected": "Csatlakoztatva",
+        "disconnected": "Nem elérhető"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Elérhető",
+        "unreachable": "Nem elérhető",
+        "notConfigured": "Nincs konfigurálva"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero aktív",
+        "replicas": "{current}/{max} csomópont",
+        "preScale": "Pre-scale: {minutes} perc",
+        "fixedMode": "Fix mód",
+        "scalerEnabled": "Scaler engedélyezve"
+      },
+      "jibri": {
+        "title": "Felvétel (Jibri)",
+        "available": "Elérhető",
+        "notConfigured": "Nincs konfigurálva",
+        "storageType": "Tárhely",
+        "configureHint": "A videofelvétel Jibri-t igényel. Konfigurálja a tárhelyet az engedélyezéséhez.",
+        "docsLink": "Dokumentáció"
+      },
+      "email": {
+        "title": "E-mail",
+        "configured": "Konfigurálva",
+        "notConfigured": "Nincs konfigurálva"
+      },
+      "features": {
+        "title": "Funkciók",
+        "statusPage": "Állapotoldal",
+        "guestAccess": "Vendég hozzáférés",
+        "metrics": "Metrika végpont"
+      },
+      "note": "Az infrastruktúra módosításai a Helm values és a CI/CD pipeline segítségével történnek.",
+      "deployDocs": "Telepítési dokumentáció"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Regisztráció megerősítve: {eventTitle}",
+    "confirmationHeading": "Regisztráció megerősítve",
+    "confirmationKeepNote": "Őrizze meg ezt az e-mailt — tartalmazza az eseményhez való személyes hozzáférési linkjét.",
+    "reminderSubject": "Emlékeztető: {eventTitle} 1 órán belül kezdődik",
+    "reminderHeading": "Esemény emlékeztető",
+    "reminderNote": "Az esemény, amelyre regisztrált, kevesebb mint egy óra múlva kezdődik. Használja az alábbi linket a csatlakozáshoz.",
+    "recordingSubject": "Felvétel elérhető: {eventTitle}",
+    "joinLabel": "Csatlakozás az eseményhez",
+    "viewEvent": "Esemény oldalának megtekintése",
+    "eventLabel": "Esemény",
+    "dateLabel": "Dátum",
+    "timeLabel": "Időpont",
+    "durationLabel": "Időtartam"
+  },
+  "home": {
+    "hero": {
+      "title": "Nyilvános digitális események",
+      "subtitle": "A Digitális Átalakulási Főosztály webináriumainak, prezentációinak és nyilvános találkozóinak platformja",
+      "browseEvents": "Események böngészése",
+      "organizeEvent": "Esemény szervezése"
+    },
+    "features": {
+      "title": "A közigazgatási események platformja",
+      "video": {
+        "title": "Videokonferencia",
+        "desc": "Vegyen részt nyilvános eseményeken akár 300 résztvevővel. Nincs szükség szoftvertelepítésre."
+      },
+      "qa": {
+        "title": "Kérdések és válaszok",
+        "desc": "Tegyen fel kérdéseket az esemény során, és szavazzon a legfontosabbakra. A moderátor élőben válaszol."
+      },
+      "privacy": {
+        "title": "Adatvédelem és biztonság",
+        "desc": "GDPR-kompatibilis adatvédelem. Saját infrastruktúra Olaszországban."
+      }
+    },
+    "upcoming": {
+      "title": "Közelgő események",
+      "viewAll": "Összes esemény megtekintése",
+      "noEvents": "Nincsenek közelgő események. Látogasson vissza hamarosan!"
+    },
+    "howItWorks": {
+      "title": "Hogyan működik",
+      "step1": {
+        "title": "Regisztráljon",
+        "desc": "Iratkozzon fel ingyenesen az eseményre"
+      },
+      "step2": {
+        "title": "Kapja meg a linket",
+        "desc": "E-mail a személyes hozzáférési linkkel"
+      },
+      "step3": {
+        "title": "Csatlakozzon",
+        "desc": "Lépjen be az eseményre a böngészőből, telepítés nélkül"
+      },
+      "step4": {
+        "title": "Interakcióba léphet",
+        "desc": "Tegyen fel kérdéseket, szavazzon, vegyen részt a vitában"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Hozzájárulok az esemény audió/videó felvételéhez",
+      "recordingRequired": "A felvételhez való hozzájárulás szükséges az eseményen való részvételhez",
+      "futureCommunications": "Szeretnék tájékoztatást kapni a DTD által szervezett jövőbeli eseményekről"
+    },
+    "export": {
+      "title": "Az én adataim",
+      "subtitle": "Kérjen másolatot az e-mail címéhez társított személyes adatokról a GDPR 15. cikkének megfelelően.",
+      "emailLabel": "Az Ön e-mail címe",
+      "emailPlaceholder": "Adja meg a regisztrációkor használt e-mail címet",
+      "emailInvalid": "Adjon meg érvényes e-mail címet",
+      "submit": "Adataim igénylése",
+      "loading": "Keresés...",
+      "noData": "Ehhez az e-mail címhez nem találhatók adatok.",
+      "error": "Hiba történt. Kérjük, próbálja újra később.",
+      "rateLimited": "Túl sok kérés. Próbálja újra egy óra múlva.",
+      "results": "Az Ön adatai",
+      "resultsDescription": "{count} eseményhez kapcsolódó adatok találhatók.",
+      "registrationData": "Regisztrációs adatok",
+      "fieldName": "Név",
+      "fieldEmail": "E-mail",
+      "fieldOrganization": "Szervezet",
+      "fieldRegisteredAt": "Regisztráció dátuma",
+      "fieldConsent": "Hozzájárulás",
+      "questionsTitle": "Q&A kérdések",
+      "pollVotesTitle": "Szavazási szavazatok",
+      "optionLabel": "Lehetőség"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Adatvédelmi tájékoztató",
+      "title": "Adatvédelmi tájékoztató",
+      "intro": "Ez az oldal összefoglalja az Eventi DTD platform használatával és a szervezett nyilvános eseményeken való részvétellel kapcsolatos személyes adatkezelést.",
+      "sections": {
+        "controller": {
+          "title": "Adatkezelő",
+          "body": "A személyes adatok kezelése a Digitális Átalakulási Főosztály intézményi tevékenységei keretében történik a nyilvános online események technikai és szervezési kezelésének támogatása érdekében."
+        },
+        "data": {
+          "title": "Kezelt adatok és célok",
+          "body": "A platform kizárólag az eseményekre való regisztrációhoz és részvételhez feltétlenül szükséges adatokat kezeli, mint például név, e-mail cím és a szervező által konfigurált esetleges opcionális mezők. Az adatokat a személyes hozzáférési link küldésére, a részvétel kezelésére, emlékeztetők kiküldésére és a szolgáltatás biztonságával kapcsolatos kötelezettségek teljesítésére használjuk."
+        },
+        "retention": {
+          "title": "Adatmegőrzés és jogok",
+          "body": "Az adatokat az egyes eseményekhez konfigurált ideig őrizzük, majd automatikusan töröljük, hacsak jogszabályi kötelezettségek másként nem rendelkeznek. Az érintettek bármikor gyakorolhatják GDPR szerinti jogaikat, beleértve a hozzáférést, helyesbítést és törlést, a Főosztály intézményi csatornáin keresztül."
+        }
+      },
+      "note": {
+        "title": "Adatigénylés",
+        "body": "Ha részt vett egy eseményen, és szeretné ellenőrizni, hogy milyen személyes adatok kapcsolódnak az e-mail címéhez, használhatja a platformon elérhető erre szolgáló funkciót.",
+        "linkLabel": "Adataim igénylése"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Akadálymentességi nyilatkozat",
+      "title": "Akadálymentességi nyilatkozat",
+      "intro": "A Digitális Átalakulási Főosztály elkötelezett amellett, hogy ezt a platformot akadálymentessé tegye, összhangban a közszféra digitális szolgáltatásaira vonatkozó hatályos követelményekkel.",
+      "sections": {
+        "commitment": {
+          "title": "Akadálymentességi kötelezettségvállalás",
+          "body": "A platform a .italia designrendszerrel összhangban lévő komponensekkel készült, különös figyelmet fordítva a billentyűzetes navigációra, a tartalom szemantikus szerkezetére és a felület olvashatóságára a fő képernyőméreteken."
+        },
+        "status": {
+          "title": "Megfelelőségi állapot",
+          "body": "Az akadálymentességi ellenőrzések és fejlesztések folyamatosan zajlanak. Az esetleges fennmaradó hiányosságokat a szolgáltatás fejlesztése és a rendszeres karbantartási tevékenységek keretében fokozatosan pótoljuk."
+        },
+        "feedback": {
+          "title": "Visszajelzés és kapcsolat",
+          "body": "Az akadálymentességi akadályok vagy a szolgáltatás használatával kapcsolatos problémák jelzéséhez a felhasználók a Főosztály intézményi csatornáin keresztül fordulhatnak hozzánk, megjelölve az érintett oldalt és a probléma rövid leírását."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Jogi közlemények",
+      "title": "Jogi közlemények",
+      "intro": "Az Eventi DTD platformhoz való hozzáférés és annak használata ezen közleményeknek megfelelően történik, amelyek összefoglalják az általános használati feltételeket és a szolgáltatással kapcsolatos főbb információkat.",
+      "sections": {
+        "ownership": {
+          "title": "A szolgáltatás tulajdonosa",
+          "body": "A platformot a Digitális Átalakulási Főosztály üzemelteti, és intézményi érdekű nyilvános online események szervezésére és lebonyolítására szolgál."
+        },
+        "usage": {
+          "title": "A szolgáltatás használata",
+          "body": "A felhasználók kötelesek a szolgáltatást megfelelően használni, és nem veszélyeztethetik a platform biztonságát, a funkciók elérhetőségét vagy az események szabályos lebonyolítását. Visszaélés vagy nem rendeltetésszerű használat a szolgáltatáshoz való hozzáférés korlátozásához vezethet."
+        },
+        "liability": {
+          "title": "Felelősségkorlátozás",
+          "body": "Megfelelő technikai és szervezési intézkedések ellenére a Főosztály nem garantálhatja az előre nem látható események, karbantartási tevékenységek vagy külső tényezők okozta fennakadások vagy üzemzavarok teljes hiányát. A jogszabályi felelősségek a vonatkozó törvények szerint érvényesek."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Rendszer állapota",
+    "subtitle": "A platform szolgáltatásainak állapotáról szóló valós idejű áttekintés.",
+    "allOperational": "Minden rendszer működik",
+    "degraded": "Csökkent teljesítmény",
+    "outage": "Szolgáltatáskiesés",
+    "componentLabel": "Komponens",
+    "statusLabel": "Állapot",
+    "operational": "Működik",
+    "degradedLabel": "Lassított",
+    "standby": "Készenlét",
+    "loading": "Betöltés...",
+    "fetchError": "A rendszer állapota nem kérhető le",
+    "components": {
+      "app": "Webportál",
+      "database": "Adatbázis",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Videofelvétel",
+      "smtp": "E-mail (SMTP)"
+    },
+    "jvbCapacity": "Video bridge kapacitás",
+    "jvbStandby": "Készenlétben — szükség esetén automatikusan aktiválódik",
+    "jvbStandbyDetail": "Scale-to-zero aktív — nincsenek tervezett események. A JVB csomópontok automatikusan létrejönnek az események megkezdése előtt.",
+    "jvbScaling": "Indítás...",
+    "nodesActive": "aktív csomópont",
+    "nodesReady": "kész csomópont",
+    "scaling": "skálázás",
+    "jvbStress": "JVB terhelés",
+    "participantsConnected": "csatlakozott résztvevő",
+    "videoInteractive": "interaktív",
+    "videoWebinar": "webinárium",
+    "participantsAvailable": "elérhető résztvevő",
+    "upcomingEvents": "Közelgő események",
+    "noUpcomingEvents": "Nincsenek tervezett események",
+    "jvbActivatesIn": "JVB aktiválódik {minutes} perc múlva",
+    "liveNow": "Éppen zajlik",
+    "activeEvents": "Aktív események",
+    "registrationsToday": "Mai regisztrációk",
+    "jvbNodes": "JVB csomópontok",
+    "overallStatus": "Összesített állapot",
+    "lastChecked": "Utolsó ellenőrzés",
+    "responseTime": "Válaszidő",
+    "systemStatus": "Rendszer állapota"
+  },
+  "feedback": {
+    "title": "Hogyan értékeli ezt az eseményt?",
+    "ratingLabel": "Válasszon értékelést 1-től 5 csillagig",
+    "comment": "Megjegyzés",
+    "commentPlaceholder": "Van javaslata? (opcionális)",
+    "submit": "Visszajelzés küldése",
+    "submitting": "Küldés...",
+    "skip": "Kihagyás",
+    "thankYou": "Köszönjük a visszajelzését!",
+    "averageRating": "Átlagos értékelés",
+    "ratingCount": "{count} értékelés",
+    "noFeedback": "Nem érkezett visszajelzés"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Indítás",
+    "prompt": "Téma",
+    "promptPlaceholder": "pl. Mit vár ettől az eseménytől?",
+    "duration": "Időtartam",
+    "submit": "Küldés",
+    "submitPlaceholder": "Írjon be egy szót (max. 30 karakter)",
+    "close": "Word cloud bezárása",
+    "cancel": "Mégse",
+    "noActiveRound": "Jelenleg nincs aktív word cloud.",
+    "noWords": "Várunk az első szavakra...",
+    "wordsSubmitted": "{count} beküldött szó",
+    "timeRemaining": "Hátralévő idő"
+  },
+  "timer": {
+    "title": "Időzítő",
+    "start": "Indítás",
+    "pause": "Szünet",
+    "reset": "Visszaállítás",
+    "presets": {
+      "5min": "5 perc",
+      "10min": "10 perc",
+      "15min": "15 perc",
+      "30min": "30 perc",
+      "custom": "Egyéni"
+    },
+    "showToAll": "Megjelenítés mindenkinek",
+    "timeUp": "Lejárt az idő!"
+  },
+  "reactions": {
+    "title": "Reakciók",
+    "sendReaction": "Reakció küldése",
+    "reactionSent": "Reakció elküldve!"
+  },
+  "calendar": {
+    "title": "Eseménynaptár",
+    "subtitle": "Összes esemény megjelenítése időrendben",
+    "publicTitle": "Eseménynaptár",
+    "publicSubtitle": "Fedezze fel a tervezett eseményeket",
+    "today": "Ma",
+    "prev": "Előző időszak",
+    "next": "Következő időszak",
+    "views": {
+      "day": "Nap",
+      "week": "Hét",
+      "month": "Hónap",
+      "year": "Év",
+      "list": "Lista"
+    },
+    "status": {
+      "DRAFT": "Vázlat",
+      "PUBLISHED": "Közzétéve",
+      "LIVE": "Éppen zajlik",
+      "ENDED": "Befejezve",
+      "ARCHIVED": "Archiválva"
+    }
+  },
+  "footer": {
+    "departmentName": "Digitális Átalakulási Főosztály",
+    "presidencyName": "A Minisztertanács Elnöksége",
+    "privacy": "Adatvédelmi tájékoztató",
+    "accessibility": "Akadálymentességi nyilatkozat",
+    "openSource": "Nyílt forráskódú szoftver",
+    "contacts": "Kapcsolat",
+    "legalNotes": "Jogi közlemények",
+    "governmentSite": "Olasz Kormány",
+    "systemStatus": "Rendszer állapota"
+  },
+  "pages": {
+    "privacyTitle": "Adatvédelmi tájékoztató",
+    "privacyNotConfigured": "Az adatvédelmi tájékoztató még nincs konfigurálva.",
+    "accessibilityTitle": "Akadálymentességi nyilatkozat",
+    "accessibilityNotConfigured": "Az akadálymentességi nyilatkozat még nincs konfigurálva."
+  },
+  "video": {
+    "play": "Lejátszás",
+    "pause": "Szünet",
+    "speed": "Sebesség",
+    "fullscreen": "Teljes képernyő",
+    "pip": "Picture in Picture",
+    "volume": "Hangerő",
+    "mute": "Némítás",
+    "unmute": "Hang bekapcsolása",
+    "download": "Felvétel letöltése",
+    "speedLabel": "Lejátszási sebesség",
+    "progress": "Folyamatjelző"
+  },
+  "diagram": {
+    "title": "Esemény konfiguráció",
+    "topology": "Topológia",
+    "features": "Aktív funkciók",
+    "estimates": "Erőforrás-becslés",
+    "moderator": "Moderátor",
+    "participants": "Résztvevők",
+    "jvb": "Video Bridge",
+    "jibri": "Felvétel",
+    "bandwidth": {
+      "moderator": "Moderátor sávszélessége",
+      "participant": "Résztvevőnkénti sávszélesség",
+      "total": "Becsült teljes sávszélesség"
+    },
+    "jvbCount": "Szükséges JVB-k",
+    "jvbRam": "Becsült JVB RAM",
+    "storage": "Felvétel tárhely",
+    "duration": "Becsült időtartam",
+    "viewOnly": "Csak megtekintés",
+    "preview": "Konfiguráció előnézete"
+  },
+  "waiting": {
+    "startsIn": "Az esemény kezdéséig hátralévő idő",
+    "eventLive": "Az esemény zajlik!",
+    "connectedParticipants": "{count, plural, =0 {Nincs résztvevő} =1 {1 csatlakozott résztvevő} other {{count} csatlakozott résztvevő}}",
+    "elapsedTime": "{minutes} perce zajlik",
+    "youAreLate": "Az esemény {minutes} perce elkezdődött",
+    "chooseHowToJoin": "Válassza ki a csatlakozás módját:",
+    "enterLive": "Csatlakozás ÉLŐ-ben",
+    "enterLiveDesc": "Csatlakozzon élőben. A felvételt az esemény után is megtekintheti.",
+    "enterNow": "Csatlakozás most",
+    "watchFromStart": "Megtekintés az elejétől",
+    "watchFromStartDesc": "Tekintse meg a felvételt az elejétől, és csatlakozzon az élő közvetítéshez, amikor csak szeretné.",
+    "watchNow": "Megtekintés",
+    "switchToLive": "Váltás élő közvetítésre",
+    "enterRoom": "Belépés a szobába",
+    "recordingNotice": "Ez az esemény rögzítésre kerül.",
+    "recordingAvailableAfter": "A felvétel az esemény után lesz elérhető.",
+    "autoRefreshHint": "Az oldal automatikusan frissül, amikor az esemény elkezdődik.",
+    "startEventButton": "Esemény indítása",
+    "startingEvent": "Indítás...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 várakozó személy} other {{count} várakozó személy}}",
+    "jvbScaling": "Szoba előkészítése...",
+    "jvbScalingDetail": "A videoszerverek indulóban vannak. Ez körülbelül 2 percet vesz igénybe.",
+    "jvbReady": "A szoba kész!"
+  },
+  "recording": {
+    "management": "Videofelvétel",
+    "inProgress": "Folyamatban",
+    "available": "Felvétel elérhető",
+    "duration": "Időtartam",
+    "fileSize": "Fájlméret",
+    "startedAt": "Elindítva",
+    "automatic": "automatikus",
+    "publish": "Felvétel közzététele",
+    "publishDesc": "A videó elérhetővé tétele az esemény oldalán",
+    "retentionLabel": "Megőrzés",
+    "retention": {
+      "24h": "24 óra (ideiglenes)",
+      "7d": "7 nap",
+      "30d": "30 nap",
+      "90d": "90 nap",
+      "forever": "Soha (az esemény lejártáig)"
+    },
+    "retentionNote": "A videóra továbbra is az esemény GDPR megőrzési szabálya vonatkozik",
+    "delete": "Felvétel törlése",
+    "deleteConfirm": "Biztos benne? A videó véglegesen törlésre kerül.",
+    "notConfigured": "Jibri nincs konfigurálva. A videofelvétel nem elérhető.",
+    "play": "Lejátszás",
+    "download": "Letöltés"
+  },
+  "postEvent": {
+    "config": "Esemény utáni konfiguráció",
+    "pageVisible": "Esemény oldala látható a befejezés után",
+    "showQA": "Q&A kérdések megjelenítése",
+    "showMaterials": "Megosztott anyagok megjelenítése",
+    "showPolls": "Szavazási eredmények megjelenítése",
+    "showFeedback": "Visszajelzések megjelenítése",
+    "feedbackEnabled": "Visszajelzési kérdőív aktív az esemény végén",
+    "visibilityAlways": "Mindig látható",
+    "visibilityUntil": "Látható eddig:",
+    "dataRetentionNote": "A résztvevők személyes adatai az esemény megőrzési szabálya szerint kerülnek törlésre ({days} nap). Az esemény tartalma az oldal láthatóságáig elérhető marad.",
+    "availableUntil": "Ez az esemény és tartalmai {date}-ig lesznek elérhetők.",
+    "tabs": {
+      "qa": "Kérdések és válaszok",
+      "materials": "Anyagok",
+      "polls": "Szavazások",
+      "feedback": "Visszajelzés"
+    }
+  }
+}

@@ -36,8 +36,7 @@ export const GET = withErrorHandling(async (request) => {
         select: {
           id: true,
           slug: true,
-          titleIt: true,
-          titleEn: true,
+          title: true,
           startsAt: true,
           endsAt: true,
           status: true,
@@ -107,8 +106,7 @@ export const GET = withErrorHandling(async (request) => {
         joinedAt: r.joinedAt?.toISOString() ?? null,
       },
       event: {
-        titleIt: r.event.titleIt,
-        titleEn: r.event.titleEn,
+        title: r.event.title,
         startsAt: r.event.startsAt.toISOString(),
         endsAt: r.event.endsAt.toISOString(),
         status: r.event.status,

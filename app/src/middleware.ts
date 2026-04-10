@@ -2,8 +2,16 @@ import { type NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { jwtVerify } from 'jose';
 
-import { locales, defaultLocale } from '@/i18n/config';
+import { locales, defaultLocale, type Locale } from '@/i18n/config';
 import { getPublicEnv } from '@/lib/env';
+
+const LOCALE_SEGMENT = locales.join('|');
+
+const ADMIN_PATH_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin(?:/|$)`);
+const ADMIN_LOGIN_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/login(?:/|$)`);
+const ADMIN_EVENT_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/eventi/[^/]+(?:/[^/]+)?$`);
+const LOCALE_PREFIX_RE = new RegExp(`^/(${LOCALE_SEGMENT})(?:/|$)`);
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const intlMiddleware = createMiddleware({
   locales,
@@ -42,10 +50,35 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
-const ADMIN_PATH_RE = /^\/(?:it|en)\/admin(?:\/|$)/;
-const ADMIN_LOGIN_RE = /^\/(?:it|en)\/admin\/login(?:\/|$)/;
-const ADMIN_EVENT_RE = /^\/(?:it|en)\/admin\/eventi\/[^/]+(?:\/[^/]+)?$/;
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function getEnabledLocales(request: NextRequest): Locale[] {
+  const cookie = request.cookies.get('enabled_locales')?.value;
+  if (cookie) {
+    try {
+      const parsed = JSON.parse(cookie) as string[];
+      const valid = parsed.filter((l): l is Locale =>
+        locales.includes(l as Locale),
+      );
+      if (valid.length > 0) return valid;
+    } catch { /* ignore malformed cookie */ }
+  }
+  return [...locales];
+}
+
+function getRuntimeDefaultLocale(request: NextRequest): Locale {
+  const cookie = request.cookies.get('default_locale')?.value;
+  if (cookie && locales.includes(cookie as Locale)) {
+    return cookie as Locale;
+  }
+  return defaultLocale;
+}
+
+function extractLocaleFromPath(pathname: string): Locale | null {
+  const match = LOCALE_PREFIX_RE.exec(pathname);
+  if (match && match[1]) {
+    return match[1] as Locale;
+  }
+  return null;
+}
 
 async function isValidAdminSession(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get('admin_session')?.value;
@@ -64,16 +97,24 @@ async function isValidAdminSession(request: NextRequest): Promise<boolean> {
 }
 
 export default async function middleware(request: NextRequest) {
-  const response = intlMiddleware(request);
   const { pathname } = request.nextUrl;
+
+  const requestedLocale = extractLocaleFromPath(pathname);
+  if (requestedLocale) {
+    const enabled = getEnabledLocales(request);
+    if (!enabled.includes(requestedLocale)) {
+      const rtDefault = getRuntimeDefaultLocale(request);
+      const rest = pathname.replace(LOCALE_PREFIX_RE, `/${rtDefault}/`);
+      return NextResponse.redirect(new URL(rest, request.url));
+    }
+  }
+
+  const response = intlMiddleware(request);
 
   if (!ADMIN_PATH_RE.test(pathname) || ADMIN_LOGIN_RE.test(pathname)) {
     return applySecurityHeaders(response);
   }
 
-  // Moderator magic links: allow access to event-specific admin pages
-  // if a valid UUID token is provided. The actual token is verified
-  // server-side by the page/API, not here — we only gate on format.
   if (ADMIN_EVENT_RE.test(pathname)) {
     const tokenParam = request.nextUrl.searchParams.get('token');
     if (tokenParam && UUID_RE.test(tokenParam)) {
@@ -83,7 +124,8 @@ export default async function middleware(request: NextRequest) {
 
   const valid = await isValidAdminSession(request);
   if (!valid) {
-    const locale = pathname.startsWith('/en') ? 'en' : 'it';
+    const pathLocale = extractLocaleFromPath(pathname);
+    const locale = pathLocale ?? getRuntimeDefaultLocale(request);
     const loginUrl = new URL(`/${locale}/admin/login`, request.url);
     return NextResponse.redirect(loginUrl);
   }

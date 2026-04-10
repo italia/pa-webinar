@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "DTD Evenemang",
+    "appDescription": "Plattform för offentliga digitala evenemang från Avdelningen för digital omvandling",
+    "loading": "Laddar...",
+    "error": "Ett fel uppstod",
+    "errorMessage": "Något gick fel. Försök igen.",
+    "retry": "Försök igen",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "confirm": "Bekräfta",
+    "close": "Stäng",
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "send": "Skicka",
+    "delete": "Radera",
+    "edit": "Redigera",
+    "search": "Sök",
+    "noResults": "Inga resultat",
+    "requiredField": "Obligatoriskt fält"
+  },
+  "nav": {
+    "home": "Hem",
+    "events": "Evenemang",
+    "about": "Om oss",
+    "privacy": "Integritetspolicy",
+    "admin": "Administration",
+    "language": "Språk",
+    "switchLanguage": "Byt språk",
+    "skipToContent": "Gå till innehåll",
+    "skipToFooter": "Gå till sidfot"
+  },
+  "header": {
+    "slimTitle": "Ministerrådets kansli",
+    "slimSubtitle": "Avdelningen för digital omvandling",
+    "followUs": "Följ oss på"
+  },
+  "events": {
+    "title": "Evenemang",
+    "upcoming": "Kommande evenemang",
+    "past": "Tidigare evenemang",
+    "noUpcoming": "Inga kommande evenemang för tillfället. Kom tillbaka snart!",
+    "noPast": "Inga tidigare evenemang",
+    "card": {
+      "publicEvent": "Offentligt evenemang",
+      "readMore": "Läs mer",
+      "liveNow": "Pågår nu",
+      "spotsAvailable": "{count} platser lediga",
+      "fullyBooked": "Fullbokat",
+      "ended": "Avslutat",
+      "occupiedSpots": "{registered}/{max} anmälda"
+    },
+    "detail": {
+      "title": "Evenemangsdetaljer",
+      "date": "Datum och tid",
+      "duration": "Längd",
+      "durationHours": "{hours}h {minutes}min",
+      "timezone": "Tidszon",
+      "description": "Beskrivning",
+      "participants": "Deltagare",
+      "maxParticipants": "{count} platser totalt",
+      "spotsLeft": "{count} platser kvar",
+      "occupiedSpots": "{registered} av {max} platser upptagna",
+      "full": "Fullbokat",
+      "register": "Anmäl dig till evenemanget",
+      "registerAndJoin": "Anmäl dig och delta",
+      "registered": "Du är anmäld",
+      "enterEvent": "Gå till evenemanget",
+      "eventEnded": "Evenemanget avslutat",
+      "eventHeldOn": "Detta evenemang ägde rum den {date}",
+      "totalRegistrations": "{count} anmälda deltagare",
+      "recording": "Inspelning tillgänglig",
+      "noRecording": "Videoinspelning är inte tillgänglig för detta evenemang.",
+      "watchRecording": "Se inspelningen",
+      "backToEvents": "Tillbaka till evenemang",
+      "speakers": "Talare",
+      "organizer": "Arrangör",
+      "chatNotSaved": "Chattmeddelanden sparas inte efter evenemangets slut.",
+      "qaPostEvent": "Q&A från evenemanget",
+      "peakParticipants": "Toppantal: {count} deltagare",
+      "calendar": {
+        "addToCalendar": "Lägg till i kalender",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": "Ladda ned .ics-fil"
+      }
+    },
+    "manage": {
+      "toggleChat": "Chatt",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Inspelning",
+      "settingsSection": "Evenemangsinställningar"
+    },
+    "status": {
+      "DRAFT": "Utkast",
+      "PUBLISHED": "Publicerat",
+      "LIVE": "Pågår",
+      "ENDED": "Avslutat",
+      "ARCHIVED": "Arkiverat"
+    }
+  },
+  "registration": {
+    "title": "Anmälan till evenemang",
+    "name": "Fullständigt namn",
+    "namePlaceholder": "Ditt namn visas i evenemangsrummet",
+    "email": "E-post",
+    "emailPlaceholder": "Du får en länk för att delta i evenemanget",
+    "gdprConsent": "Jag samtycker till behandlingen av mina personuppgifter (namn, e-post) i enlighet med EU-förordning 2016/679 (GDPR) för deltagande i detta evenemang.",
+    "gdprLink": "Läs den fullständiga integritetspolicyn",
+    "submit": "Bekräfta anmälan",
+    "submitting": "Anmäler...",
+    "success": "Anmälan genomförd!",
+    "successMessage": "Du kommer att få ett bekräftelsemeddelande med länken till evenemanget.",
+    "alreadyRegistered": "Du är redan anmäld till detta evenemang",
+    "backToEvent": "Tillbaka till evenemanget",
+    "organization": "Organisation",
+    "organizationPlaceholder": "t.ex. AGID, Ekonomiministeriet, Roms kommun",
+    "organizationRole": "Roll i organisationen",
+    "organizationRolePlaceholder": "t.ex. Ansvarig för digital omvandling, Utvecklare",
+    "organizationType": "Organisationstyp",
+    "organizationTypePlaceholder": "Välj typ...",
+    "organizationTypes": {
+      "MINISTRY": "Ministerium",
+      "AGENCY": "Myndighet",
+      "REGION": "Region",
+      "PROVINCE": "Provins",
+      "MUNICIPALITY": "Kommun",
+      "ASL": "ASL (Lokal hälsomyndighet)",
+      "UNIVERSITY": "Universitet",
+      "PUBLIC_ENTITY": "Offentlig organisation",
+      "IN_HOUSE": "In-house bolag",
+      "OTHER": "Övrigt"
+    },
+    "gdprConsentProfiling": "Organisationsuppgifter behandlas för statistiska ändamål.",
+    "errors": {
+      "nameRequired": "Ange ditt namn",
+      "emailRequired": "Ange din e-postadress",
+      "emailInvalid": "Ange en giltig e-postadress",
+      "organizationRequired": "Ange din organisation",
+      "consentRequired": "Samtycke till databehandling krävs",
+      "recordingConsentRequired": "Samtycke till inspelning krävs för detta evenemang",
+      "eventFull": "Evenemanget har nått maximalt antal deltagare",
+      "generic": "Fel vid anmälan. Försök igen."
+    }
+  },
+  "live": {
+    "title": "Evenemangsrum",
+    "connecting": "Ansluter...",
+    "connectionError": "Det gick inte att ansluta till rummet. Kontrollera anslutningen och försök igen.",
+    "recordingActive": "Inspelning pågår",
+    "recordingConsent": "Detta evenemang spelas in. Genom att delta samtycker du till ljud-/videoinspelning.",
+    "recordingConsentTitle": "Samtycke till inspelning",
+    "declineRecording": "Delta inte",
+    "enterRoom": "Gå in i rummet",
+    "leaveRoom": "Lämna rummet",
+    "eventNotStarted": "Evenemanget har inte börjat ännu",
+    "eventStartsAt": "Evenemanget börjar den {date} kl. {time}",
+    "countdown": "Tid kvar",
+    "waitingRoomHint": "Sidan uppdateras automatiskt när moderatorn startar evenemanget. Ingen omladdning behövs.",
+    "startEventButton": "Starta evenemang",
+    "startingEvent": "Startar...",
+    "chatNotSaved": "Chattmeddelanden sparas inte efter evenemangets slut.",
+    "registerAndJoin": "Anmäl dig och delta",
+    "registerNow": "Pågår nu — Anmäl dig nu!",
+    "enableMusic": "Aktivera musik",
+    "disableMusic": "Inaktivera musik",
+    "preJoinSubtitle": "Du är på väg in i evenemangsrummet",
+    "preJoinNameLabel": "Ditt namn",
+    "guestJoinSubtitle": "Delta som gäst i det pågående evenemanget",
+    "guestJoinButton": "Delta som gäst",
+    "guestRedirectToRegister": "Evenemanget har inte börjat ännu. Anmäl dig för att få din åtkomstlänk.",
+    "jibriUnavailable": "Inspelning ej tillgänglig — Jibri ej konfigurerat",
+    "jibriNotConfigured": "Inspelning ej konfigurerad i infrastrukturen",
+    "eventEnded": "Evenemanget avslutat",
+    "eventEndedMessage": "Evenemanget är slut. Tack för ditt deltagande.",
+    "backToEvent": "Tillbaka till evenemanget",
+    "moderatorBadge": "Moderator",
+    "qaSidebarPlaceholder": "Q&A-panelen blir tillgänglig när evenemanget startar.",
+    "invalidToken": "Ogiltig länk. Kontrollera länken du fick via e-post.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Omröstningar",
+    "sidebarTabMaterials": "Material",
+    "sidebarTabParticipants": "Deltagare",
+    "role": {
+      "moderator": "Moderator",
+      "participant": "Deltagare",
+      "guest": "Gäst"
+    },
+    "participants": {
+      "title": "Deltagare",
+      "noParticipants": "Inga deltagare",
+      "kick": "Ta bort",
+      "kickConfirm": "Är du säker på att du vill ta bort denna deltagare?"
+    },
+    "moderator": {
+      "muteAll": "Tysta alla",
+      "unmuteAll": "Slå på ljud för alla",
+      "startRecording": "Starta inspelning",
+      "stopRecording": "Stoppa inspelning",
+      "toggleChat": "Chatt på/av",
+      "endEvent": "Avsluta evenemang",
+      "endEventConfirm": "Är du säker på att du vill avsluta evenemanget för alla deltagare?",
+      "participantCount": "{count} deltagare",
+      "raisedHands": "Handuppräckning",
+      "noRaisedHands": "Ingen handuppräckning",
+      "giveFloor": "Ge ordet",
+      "approveAudio": "Godkänn ljud",
+      "approveVideo": "Godkänn video",
+      "approveAll": "Ge ordet",
+      "audioOnly": "Enbart ljud",
+      "audioModeration": "Deltagarens mikrofon",
+      "videoModeration": "Deltagarens video",
+      "eventEndedSuccess": "Evenemanget avslutat. Omdirigerar..."
+    }
+  },
+  "qa": {
+    "title": "Frågor och svar",
+    "askQuestion": "Ställ en fråga",
+    "placeholder": "Skriv din fråga (max 500 tecken)",
+    "submit": "Skicka fråga",
+    "submitting": "Skickar...",
+    "questionSent": "Fråga skickad!",
+    "cooldownWait": "Vänta {seconds}s...",
+    "upvote": "Rösta upp",
+    "upvoted": "Röstad",
+    "noQuestions": "Inga frågor ännu. Var den första!",
+    "qaPersistenceNote": "Frågor sparas och kommer att vara tillgängliga efter evenemanget.",
+    "qaPostEvent": "Q&A från evenemanget",
+    "noAnsweredQuestions": "Inga besvarade frågor för detta evenemang.",
+    "filterAll": "Alla",
+    "showPanel": "Visa Q&A",
+    "hidePanel": "Dölj Q&A",
+    "status": {
+      "PENDING": "Väntande",
+      "HIGHLIGHTED": "Markerad",
+      "ANSWERED": "Besvarad",
+      "DISMISSED": "Avvisad"
+    },
+    "moderator": {
+      "highlight": "Markera",
+      "markAnswered": "Markera som besvarad",
+      "dismiss": "Avvisa",
+      "resetToPending": "Återställ"
+    },
+    "errors": {
+      "textRequired": "Skriv din fråga",
+      "tooLong": "Frågan får inte överstiga 500 tecken",
+      "rateLimit": "Vänta innan du skickar en ny fråga",
+      "generic": "Fel vid sändning av fråga"
+    }
+  },
+  "polls": {
+    "title": "Omröstningar",
+    "showPanel": "Visa omröstningar",
+    "hidePanel": "Dölj omröstningar",
+    "createPoll": "Skapa omröstning",
+    "noPolls": "Inga omröstningar ännu. Moderatorn skapar dem under evenemanget.",
+    "questionPlaceholder": "Skriv omröstningsfrågan...",
+    "optionPlaceholder": "Alternativ {number}",
+    "addOption": "Lägg till alternativ",
+    "removeOption": "Ta bort alternativ",
+    "create": "Skapa",
+    "creating": "Skapar...",
+    "cancelCreate": "Avbryt",
+    "closePoll": "Stäng omröstning",
+    "publishResults": "Publicera resultat",
+    "reopenPoll": "Öppna igen",
+    "totalVotes": "{count} röster",
+    "voted": "Du har röstat",
+    "status": {
+      "OPEN": "Öppen",
+      "CLOSED": "Stängd",
+      "PUBLISHED": "Resultat"
+    },
+    "errors": {
+      "questionRequired": "Skriv omröstningsfrågan",
+      "minOptions": "Minst 2 alternativ krävs",
+      "generic": "Fel vid skapande av omröstning"
+    }
+  },
+  "materials": {
+    "title": "Material",
+    "postEventTitle": "Evenemangsmaterial",
+    "addMaterial": "Lägg till material",
+    "titleLabel": "Titel",
+    "urlLabel": "Länk-URL",
+    "descriptionLabel": "Beskrivning (valfritt)",
+    "addedBy": "Tillagt av {name}",
+    "noMaterials": "Inget material delat.",
+    "confirmDelete": "Är du säker på att du vill radera detta material?",
+    "materialAdded": "Material tillagt",
+    "materialDeleted": "Material raderat",
+    "deleteMaterial": "Radera material",
+    "add": "Lägg till",
+    "adding": "Lägger till...",
+    "cancel": "Avbryt",
+    "errors": {
+      "urlInvalid": "Ange en giltig URL",
+      "generic": "Fel vid tillägg av material"
+    }
+  },
+  "reminders": {
+    "title": "Påminnelser",
+    "addReminder": "Lägg till påminnelse",
+    "removeReminder": "Ta bort",
+    "maxReminders": "Max 5 påminnelser per evenemang.",
+    "selectPreset": "Välj när...",
+    "sentStatus": "{count} skickade",
+    "notSent": "Ej skickad",
+    "presets": {
+      "7days": "7 dagar innan",
+      "3days": "3 dagar innan",
+      "1day": "1 dag innan",
+      "12hours": "12 timmar innan",
+      "6hours": "6 timmar innan",
+      "3hours": "3 timmar innan",
+      "1hour": "1 timme innan",
+      "30min": "30 minuter innan",
+      "15min": "15 minuter innan"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Evenemangshantering",
+      "settings": "Systeminställningar",
+      "eventsList": "Evenemangslista",
+      "newEvent": "Nytt evenemang",
+      "calendar": "Kalender",
+      "templates": "Mallar",
+      "analytics": "Statistik",
+      "infrastructure": "Infrastruktur",
+      "settingsGeneral": "Allmänt",
+      "settingsLanguages": "Språk",
+      "ariaLabel": "Administrationsnavigering",
+      "subNavAriaLabel": "Sektionsnavigering"
+    },
+    "landing": {
+      "title": "Administrationspanel",
+      "subtitle": "Hantera evenemang och konfigurera plattformen",
+      "eventsTitle": "Evenemangshantering",
+      "eventsDescription": "Skapa, redigera och hantera evenemang, mallar och statistik.",
+      "settingsTitle": "Systeminställningar",
+      "settingsDescription": "Konfigurera varumärkesprofil, innehåll, språk, funktioner och infrastruktur.",
+      "liveNow": "{count, plural, one {# evenemang pågår} other {# evenemang pågår}}",
+      "upcomingEvents": "{count, plural, one {# kommande evenemang} other {# kommande evenemang}}"
+    },
+    "recording": {
+      "title": "Videoinspelning",
+      "play": "Spela upp",
+      "download": "Ladda ned",
+      "delete": "Radera inspelning",
+      "deleteConfirm": "Är du säker på att du vill radera denna inspelning? Åtgärden kan inte ångras.",
+      "notConfigured": "Videoinspelning är inte tillgänglig. Jibri är inte konfigurerat i infrastrukturen.",
+      "inProgress": "Inspelning pågår..."
+    },
+    "login": {
+      "title": "Administratörsåtkomst",
+      "keyLabel": "Åtkomstnyckel",
+      "keyPlaceholder": "Ange åtkomstnyckeln",
+      "submit": "Logga in",
+      "invalidKey": "Ogiltig åtkomstnyckel",
+      "logout": "Logga ut"
+    },
+    "title": "Evenemangshantering",
+    "subtitle": "Administrationspanel",
+    "createEvent": "Skapa nytt evenemang",
+    "editEvent": "Redigera evenemang",
+    "deleteEvent": "Radera evenemang",
+    "deleteConfirm": "Är du säker på att du vill radera detta evenemang? Åtgärden kan inte ångras.",
+    "publish": "Publicera",
+    "unpublish": "Avpublicera",
+    "noToken": "Använd moderatorlänken du fick via e-post för att hantera evenemang.",
+    "noEvents": "Inga evenemang hittades. Skapa ditt första evenemang.",
+    "eventDetails": "Evenemangsdetaljer",
+    "registrations": "Anmälningar",
+    "registrationCount": "{count} anmälningar",
+    "noRegistrations": "Inga deltagare anmälda ännu. Dela evenemangslänken!",
+    "exportCsv": "Exportera CSV",
+    "organization": "Organisation",
+    "organizationType": "Typ",
+    "registrationDate": "Anmälningsdatum",
+    "joined": "Deltog",
+    "notJoined": "Deltog inte",
+    "deleteSuccess": "Evenemang raderat",
+    "publishSuccess": "Evenemang publicerat",
+    "unpublishSuccess": "Evenemang avpublicerat",
+    "startEvent": "Starta evenemang",
+    "startEventSuccess": "Evenemanget startat! Väntande deltagare omdirigeras automatiskt.",
+    "jvbWarmupWarning": "Videoservrarna startar upp (ca 2 minuter). Deltagare ser ett meddelande i väntrummet.",
+    "eventIsLive": "Evenemanget pågår",
+    "joinAsModeratorBtn": "Delta som moderator",
+    "openPublicPage": "Öppna offentlig sida",
+    "quickActions": "Snabbåtgärder",
+    "liveRoomLink": "Länk till evenemangsrummet",
+    "manage": "Hantera",
+    "settingsSaved": "Sparat",
+    "toggleChatDesc": "Aktivera chatt mellan deltagare",
+    "toggleQaDesc": "Aktivera frågor med uppröstning",
+    "toggleRecordingDesc": "Spela in evenemanget (kräver Jibri)",
+    "eventUpdated": "Evenemanget uppdaterat!",
+    "dateChangedNotification": "Datumet har ändrats. Anmälda deltagare meddelas via e-post.",
+    "eventCreated": "Evenemanget skapat!",
+    "createEventCta": "Arrangera ett evenemang",
+    "createEventExplanation": "Skapa ditt evenemang och du får en länk för att hantera det.",
+    "noAccountNeeded": "Inget konto behövs — moderatorlänken är din åtkomst för att hantera evenemanget.",
+    "form": {
+      "titleIt": "Titel (italienska)",
+      "titleEn": "Titel (engelska)",
+      "descriptionIt": "Beskrivning (italienska)",
+      "descriptionEn": "Beskrivning (engelska)",
+      "startsAt": "Startdatum och -tid",
+      "endsAt": "Slutdatum och -tid",
+      "maxParticipants": "Maximalt antal deltagare",
+      "qaEnabled": "Aktivera Q&A",
+      "chatEnabled": "Aktivera chatt",
+      "recordingEnabled": "Aktivera videoinspelning",
+      "dataRetentionDays": "Datalagring (dagar efter evenemang)",
+      "dataRetentionHint": "Efter denna period raderas anmälningar, Q&A-frågor och eventuella videoinspelningar automatiskt.",
+      "privacyPolicyUrl": "URL till integritetspolicy",
+      "moderatorName": "Moderatorns namn",
+      "moderatorEmail": "Moderatorns e-post",
+      "speakersIt": "Talare (italienska)",
+      "speakersEn": "Talare (engelska)",
+      "organizerName": "Arrangör",
+      "imageUrl": "URL till omslagsbild",
+      "waitingRoomAudioUrl": "URL till väntrumets ljud (valfritt)",
+      "waitingRoomAudioUrlHint": "Ange URL till en MP3-fil för musik i väntrummet. Lämna tomt för att använda standardljudet.",
+      "submit": "Skapa evenemang",
+      "submitEdit": "Spara ändringar",
+      "saving": "Sparar...",
+      "creating": "Skapar...",
+      "sectionContent": "Innehåll",
+      "sectionSchedule": "Schema",
+      "sectionSettings": "Inställningar",
+      "sectionSpeakers": "Talare och arrangör",
+      "sectionModerator": "Moderator",
+      "sectionRegistrationFields": "Anmälningsfält",
+      "requireOrganization": "Kräv organisation",
+      "requireOrganizationDesc": "Deltagare måste ange sin organisation",
+      "requireOrganizationRole": "Kräv roll i organisation",
+      "requireOrganizationRoleDesc": "Deltagare kan ange sin roll",
+      "requireOrganizationType": "Kräv organisationstyp",
+      "requireOrganizationTypeDesc": "Deltagare väljer sin organisationstyp",
+      "sectionPermissions": "Deltagarbehörigheter",
+      "participantsCanUnmute": "Deltagare kan slå på mikrofonen",
+      "participantsCanStartVideo": "Deltagare kan starta video",
+      "participantsCanShareScreen": "Deltagare kan dela skärm",
+      "permissionsOnDesc": "Deltagare kan aktivera själva",
+      "permissionsOffDesc": "Enbart moderatorer kan aktivera. Deltagare måste räcka upp handen.",
+      "permissionsNote": "Behörighetsändringar gäller för nya deltagare.",
+      "privacyPolicyMode": "Integritetspolicy",
+      "privacyPolicyModeUrl": "Extern URL",
+      "privacyPolicyModeText": "Anpassad text",
+      "privacyPolicyText": "Text för integritetspolicy",
+      "privacyPolicyTextHint": "Skriv texten för integritetspolicyn. Den visas direkt i anmälningsformuläret.",
+      "retentionPreviewTitle": "Vad som raderas automatiskt",
+      "retentionPreviewIntro": "Efter {days} dagar från evenemangets slut raderas följande automatiskt:",
+      "retentionPreviewParticipants": "Deltagaruppgifter (namn, e-post, organisation)",
+      "retentionPreviewQa": "Q&A-frågor och röster",
+      "retentionPreviewPolls": "Omröstningsresultat",
+      "retentionPreviewRecordings": "Videoinspelningar",
+      "retentionPreviewKept": "Aggregerad statistik och evenemangsmetadata bevaras.",
+      "configPreview": "Förhandsgranskning av konfiguration",
+      "templateApplied": "Mall tillämpad: {name}. Du kan ändra alla inställningar."
+    },
+    "links": {
+      "title": "Evenemangslänkar",
+      "publicPage": "Offentlig evenemangssida",
+      "moderatorLink": "Moderatorlänk",
+      "moderatorLinkHint": "Dela enbart denna länk med moderatorer. Alla med denna länk kan hantera evenemanget.",
+      "copyLink": "Kopiera länk",
+      "copied": "Kopierat!"
+    },
+    "feedbackAdmin": {
+      "title": "Feedbackresultat",
+      "averageRating": "Genomsnittligt betyg",
+      "totalVotes": "{count, plural, one {# omdöme} other {# omdömen}}",
+      "noFeedback": "Ingen feedback mottagen",
+      "comments": "Deltagarkommentarer",
+      "noComments": "Inga kommentarer",
+      "stars": "stjärnor"
+    },
+    "gdprAuditLog": {
+      "title": "GDPR-revisionslogg",
+      "date": "Datum",
+      "action": "Åtgärd",
+      "recordCount": "Poster",
+      "details": "Detaljer",
+      "actions": {
+        "DATA_DELETED": "Data raderad",
+        "CONSENT_RECORDED": "Samtycke registrerat",
+        "DATA_EXPORTED": "Data exporterad"
+      }
+    },
+    "settings": {
+      "title": "Webbplatsinställningar",
+      "subtitle": "Konfigurera plattformens utseende och beteende för återanvändning inom offentlig förvaltning",
+      "saving": "Sparar...",
+      "saved": "Inställningar sparade",
+      "tabs": {
+        "branding": "Varumärkesprofil",
+        "header": "Sidhuvud",
+        "seo": "SEO",
+        "homepage": "Startsida",
+        "pages": "Sidor",
+        "footer": "Sidfot",
+        "features": "Funktioner"
+      },
+      "header": {
+        "slimBarTitle": "Topplisten (Slim Header)",
+        "slimBarDescription": "Det tunna fältet längst upp på sidan som identifierar den överordnade organisationen.",
+        "parentOrganization": "Överordnad organisation",
+        "parentOrganizationHelp": "T.ex. \"Ministerrådets kansli\"",
+        "parentOrganizationUrl": "URL för överordnad organisation",
+        "centerBarTitle": "Centralt sidhuvud",
+        "centerBarDescription": "Huvudområdet i sidhuvudet med applikationsnamn och logotyp.",
+        "appName": "Applikationsnamn",
+        "appNameHelp": "Visas i sidhuvudet och webbläsartiteln",
+        "organizationShort": "Kort organisationsnamn",
+        "logoUrl": "Logotyp-URL",
+        "logoUrlHelp": "Lämna tomt för att använda standardikonen",
+        "organizationUrl": "URL till organisationens webbplats"
+      },
+      "branding": {
+        "siteName": "Applikationsnamn",
+        "siteNameHelp": "Visas i sidhuvudet, webbläsartiteln och e-postmeddelanden",
+        "siteDescription": "Applikationsbeskrivning",
+        "organizationName": "Organisationsnamn",
+        "organizationNameHelp": "t.ex. Avdelningen för digital omvandling",
+        "organizationNameShort": "Organisationsförkortning",
+        "organizationUrl": "Organisations-URL",
+        "parentOrganization": "Överordnad organisation",
+        "parentOrganizationHelp": "t.ex. Ministerrådets kansli",
+        "parentOrganizationUrl": "URL för överordnad organisation",
+        "logoUrl": "Anpassad logotyp-URL",
+        "logoUrlHelp": "Lämna tomt för att använda standardikonen",
+        "faviconUrl": "Favicon-URL",
+        "primaryColor": "Primärfärg",
+        "defaultTimezone": "Standardtidszon",
+        "defaultTimezoneHelp": "Används för datumvisning och skapande av nya evenemang."
+      },
+      "watermark": {
+        "title": "Videoanpassning",
+        "enabled": "Vattenstämpel aktiverad",
+        "url": "Vattenstämpel-URL",
+        "urlHelp": "URL till en transparent SVG- eller PNG-bild. Lämna tomt för att använda organisationens logotyp.",
+        "opacity": "Genomskinlighet",
+        "position": "Position",
+        "previewLabel": "Förhandsgranskning av videoområde",
+        "positions": {
+          "bottomLeft": "Nedre vänster",
+          "bottomRight": "Nedre höger",
+          "topLeft": "Övre vänster",
+          "topRight": "Övre höger"
+        }
+      },
+      "seo": {
+        "title": "SEO-titel",
+        "titleHelp": "Titel som visas i sökresultat och webbläsarfliken",
+        "description": "SEO-beskrivning",
+        "descriptionHelp": "Beskrivning för sökmotorer och delning på sociala medier",
+        "image": "Open Graph-bild",
+        "imageHelp": "Standardbild för delning på sociala medier (1200x630 rekommenderat)"
+      },
+      "homepage": {
+        "modeLabel": "Startsideläge",
+        "modes": {
+          "LANDING": {
+            "title": "Landningssida",
+            "description": "Hero, funktioner, kommande evenemang och hur det fungerar"
+          },
+          "EVENTS_LIST": {
+            "title": "Evenemangslista",
+            "description": "Visa evenemangslistan direkt"
+          },
+          "CUSTOM": {
+            "title": "Anpassad",
+            "description": "Anpassat HTML-innehåll + evenemangslista"
+          }
+        },
+        "customHtmlLabel": "Anpassat HTML-innehåll",
+        "customHtmlHelp": "HTML som visas i startsidans huvudsektion"
+      },
+      "pages": {
+        "privacyTitle": "Integritetspolicy",
+        "privacyIt": "Innehåll (italienska)",
+        "privacyEn": "Innehåll (engelska)",
+        "accessibilityTitle": "Tillgänglighetsförklaring",
+        "accessibilityIt": "Innehåll (italienska)",
+        "accessibilityEn": "Innehåll (engelska)",
+        "preview": "Förhandsgranskning"
+      },
+      "footer": {
+        "linksTitle": "Sidfotslänkar",
+        "addLink": "Lägg till länk",
+        "noLinks": "Inga länkar konfigurerade. Standardlänkar kommer att användas.",
+        "linkTitle": "Titel",
+        "linkSection": "Sektion",
+        "sectionLegal": "Juridiskt",
+        "sectionMain": "Huvudsektion",
+        "moveUp": "Flytta upp",
+        "moveDown": "Flytta ned",
+        "removeLink": "Ta bort länk"
+      },
+      "features": {
+        "statusPageEnabled": "Statussida aktiverad",
+        "statusPageEnabledHelp": "Visa tjänstens statussida",
+        "guestAccessEnabled": "Gäståtkomst aktiverad",
+        "guestAccessEnabledHelp": "Tillåt gäståtkomst till pågående evenemang",
+        "publicRegistrationEnabled": "Offentlig registrering aktiverad",
+        "publicRegistrationEnabledHelp": "Alla kan skapa evenemang (om inaktiverat, enbart administratörer)",
+        "calendarPublic": "Offentlig kalender",
+        "calendarPublicHelp": "Publicera evenemangskalendern. Besökare kan se schemalagda evenemang.",
+        "githubUrl": "URL till GitHub-förråd",
+        "supportEmail": "Support-e-post"
+      }
+    },
+    "analytics": {
+      "title": "Statistik",
+      "subtitle": "Översikt av plattformens mätvärden",
+      "timeline": "Utveckling över tid",
+      "topEvents": "Bästa evenemang",
+      "noData": "Inga data tillgängliga för denna period.",
+      "period": {
+        "7d": "7 dagar",
+        "30d": "30 dagar",
+        "90d": "90 dagar",
+        "all": "Allt"
+      },
+      "metrics": {
+        "totalEvents": "Totalt antal evenemang",
+        "totalRegistrations": "Anmälningar",
+        "totalParticipants": "Deltagare",
+        "conversionRate": "Genomsnittlig konverteringsgrad",
+        "peakParticipants": "Toppantal deltagare"
+      },
+      "table": {
+        "event": "Evenemang",
+        "date": "Datum",
+        "registrations": "Anmälningar",
+        "participants": "Deltagare",
+        "peak": "Topp",
+        "questions": "Q&A",
+        "conversion": "Konvertering",
+        "noEvents": "Inga evenemang hittades."
+      },
+      "quickStats": {
+        "title": "Snabbstatistik",
+        "avgDuration": "Genomsnittlig evenemangslängd",
+        "avgQuestionsPerEvent": "Q&A-frågor per evenemang",
+        "totalPollVotes": "Totalt antal omröstningsröster",
+        "avgParticipantsPerEvent": "Genomsnitt deltagare per evenemang",
+        "avgFeedbackRating": "Genomsnittligt feedbackbetyg",
+        "totalFeedback": "Feedbacksvar"
+      }
+    },
+    "templates": {
+      "title": "Evenemangsmallar",
+      "subtitle": "Hantera förinställda mallar för snabbt skapande av evenemang",
+      "create": "Ny mall",
+      "deleteConfirm": "Är du säker på att du vill radera denna mall?",
+      "system": "System",
+      "nameLabel": "Mallnamn",
+      "descriptionLabel": "Beskrivning",
+      "maxParticipantsLabel": "Max deltagare",
+      "featuresLabel": "Funktioner",
+      "recordingLabel": "Inspelning",
+      "unmute": "Deltagarens mikrofon",
+      "video": "Deltagarens video",
+      "screen": "Skärmdelning",
+      "pickerTitle": "Välj en mall",
+      "pickerSubtitle": "Välj en mall för att förkonfigurera evenemangsinställningarna, eller hoppa över för att konfigurera allt manuellt.",
+      "skipTemplate": "Konfigurera manuellt"
+    },
+    "instantCall": {
+      "title": "Omedelbart videosamtal",
+      "subtitle": "Skapa ett videosamtal direkt och dela länken. Ingen schemaläggning behövs.",
+      "nameLabel": "Samtalsnamn",
+      "namePlaceholder": "t.ex. Snabbsynk, Projektdemo...",
+      "moderatorLabel": "Ditt namn (valfritt)",
+      "moderatorPlaceholder": "Visas i samtalet",
+      "create": "Skapa och delta",
+      "creating": "Skapar...",
+      "copyLink": "Kopiera inbjudningslänk",
+      "copied": "Kopierat!",
+      "hint": "Alla kan aktivera mikrofon, webbkamera och dela skärm. Enbart du kan spela in och avsluta samtalet."
+    },
+    "files": {
+      "title": "Filer och material",
+      "upload": "Ladda upp fil",
+      "selectFile": "Välj fil",
+      "fileTitle": "Titel",
+      "visibility": "Synlighet",
+      "visibilityAlways": "Alltid synlig",
+      "visibilityBefore": "Enbart före evenemanget",
+      "visibilityDuring": "Enbart under evenemanget",
+      "visibilityAfter": "Enbart efter evenemanget",
+      "uploading": "Laddar upp...",
+      "uploadBtn": "Ladda upp",
+      "deleteConfirm": "Är du säker på att du vill radera denna fil?",
+      "noFiles": "Inga filer uppladdade. Använd knappen \"Ladda upp fil\" för att lägga till material."
+    },
+    "languages": {
+      "title": "Språkhantering",
+      "subtitle": "Konfigurera tillgängliga språk och anpassa översättningar",
+      "configuredLocales": "Konfigurerade språk",
+      "localesDescription": "Välj vilka språk som ska vara tillgängliga i användargränssnittet. Italienska krävs som standardspråk.",
+      "addLocale": "Lägg till språk",
+      "localeCode": "Språkkod",
+      "localeName": "Språknamn",
+      "selectLocale": "Välj...",
+      "add": "Lägg till",
+      "default": "Standard",
+      "editTranslations": "Redigera översättningar",
+      "saved": "Språkkonfiguration sparad",
+      "saveNote": "Ändringar av tillgängliga språk kräver omstart för att träda i kraft i URL:er.",
+      "translationOverrides": "Anpassade översättningar — {locale}",
+      "overridesDescription": "Åsidosätt standardöversättningar för detta språk. Använd punktnotation (t.ex. common.appName).",
+      "keyLabel": "Översättningsnyckel",
+      "valueLabel": "Värde",
+      "addOverride": "Lägg till"
+    },
+    "infrastructure": {
+      "title": "Infrastruktur",
+      "subtitle": "Komponentstatus och miljökonfiguration",
+      "deploymentMode": "Driftläge",
+      "version": "Version",
+      "environment": "Miljö",
+      "modes": {
+        "simple": "Enkel (Docker Compose)",
+        "standard": "Standard (Kubernetes)",
+        "full": "Fullständig (Kubernetes med scale-to-zero)",
+        "unknown": "Okänd"
+      },
+      "database": {
+        "title": "Databas",
+        "internal": "I kluster (PostgreSQL)",
+        "external": "Extern",
+        "connected": "Ansluten",
+        "disconnected": "Ej nåbar"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Nåbar",
+        "unreachable": "Ej nåbar",
+        "notConfigured": "Ej konfigurerad"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero aktiv",
+        "replicas": "{current}/{max} noder",
+        "preScale": "Pre-scale: {minutes} min",
+        "fixedMode": "Fast läge",
+        "scalerEnabled": "Scaler aktiverad"
+      },
+      "jibri": {
+        "title": "Inspelning (Jibri)",
+        "available": "Tillgänglig",
+        "notConfigured": "Ej konfigurerad",
+        "storageType": "Lagring",
+        "configureHint": "Videoinspelning kräver Jibri. Konfigurera lagring för att aktivera det.",
+        "docsLink": "Dokumentation"
+      },
+      "email": {
+        "title": "E-post",
+        "configured": "Konfigurerad",
+        "notConfigured": "Ej konfigurerad"
+      },
+      "features": {
+        "title": "Funktioner",
+        "statusPage": "Statussida",
+        "guestAccess": "Gäståtkomst",
+        "metrics": "Mätpunktsendpunkt"
+      },
+      "note": "Infrastrukturändringar görs via Helm values och CI/CD-pipelinen.",
+      "deployDocs": "Driftsdokumentation"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Anmälan bekräftad: {eventTitle}",
+    "confirmationHeading": "Anmälan bekräftad",
+    "confirmationKeepNote": "Spara detta meddelande — det innehåller din personliga länk för att delta i evenemanget.",
+    "reminderSubject": "Påminnelse: {eventTitle} börjar om 1 timme",
+    "reminderHeading": "Evenemangspåminnelse",
+    "reminderNote": "Evenemanget du anmält dig till börjar om mindre än en timme. Använd länken nedan för att delta.",
+    "recordingSubject": "Inspelning tillgänglig: {eventTitle}",
+    "joinLabel": "Delta i evenemanget",
+    "viewEvent": "Visa evenemangssidan",
+    "eventLabel": "Evenemang",
+    "dateLabel": "Datum",
+    "timeLabel": "Tid",
+    "durationLabel": "Längd"
+  },
+  "home": {
+    "hero": {
+      "title": "Offentliga digitala evenemang",
+      "subtitle": "Plattform för webbinarier, presentationer och offentliga möten från Avdelningen för digital omvandling",
+      "browseEvents": "Utforska evenemang",
+      "organizeEvent": "Arrangera ett evenemang"
+    },
+    "features": {
+      "title": "Plattformen för offentliga evenemang",
+      "video": {
+        "title": "Videokonferens",
+        "desc": "Delta i offentliga evenemang med upp till 300 deltagare. Ingen programvara behöver installeras."
+      },
+      "qa": {
+        "title": "Frågor och svar",
+        "desc": "Ställ frågor under evenemanget och rösta upp de viktigaste. Moderatorn svarar live."
+      },
+      "privacy": {
+        "title": "Integritet och säkerhet",
+        "desc": "GDPR-kompatibelt dataskydd. Självhostad infrastruktur i Italien."
+      }
+    },
+    "upcoming": {
+      "title": "Kommande evenemang",
+      "viewAll": "Visa alla evenemang",
+      "noEvents": "Inga kommande evenemang. Kom tillbaka snart!"
+    },
+    "howItWorks": {
+      "title": "Så fungerar det",
+      "step1": {
+        "title": "Anmäl dig",
+        "desc": "Anmäl dig kostnadsfritt till evenemanget"
+      },
+      "step2": {
+        "title": "Få din länk",
+        "desc": "Ett e-postmeddelande med din personliga åtkomstlänk"
+      },
+      "step3": {
+        "title": "Delta",
+        "desc": "Delta i evenemanget direkt från webbläsaren, ingen installation behövs"
+      },
+      "step4": {
+        "title": "Interagera",
+        "desc": "Ställ frågor, rösta och delta i diskussionen"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Jag samtycker till ljud-/videoinspelning av detta evenemang",
+      "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
+      "futureCommunications": "Jag vill ta emot information om framtida evenemang arrangerade av DTD"
+    },
+    "export": {
+      "title": "Mina uppgifter",
+      "subtitle": "Begär en kopia av personuppgifter kopplade till din e-postadress i enlighet med GDPR art. 15.",
+      "emailLabel": "Din e-postadress",
+      "emailPlaceholder": "Ange den e-post du använde vid anmälan",
+      "emailInvalid": "Ange en giltig e-postadress",
+      "submit": "Begär mina uppgifter",
+      "loading": "Söker...",
+      "noData": "Inga uppgifter hittades för denna e-postadress.",
+      "error": "Ett fel uppstod. Försök igen senare.",
+      "rateLimited": "För många förfrågningar. Försök igen om en timme.",
+      "results": "Dina uppgifter",
+      "resultsDescription": "Uppgifter hittades för {count} evenemang.",
+      "registrationData": "Anmälningsuppgifter",
+      "fieldName": "Namn",
+      "fieldEmail": "E-post",
+      "fieldOrganization": "Organisation",
+      "fieldRegisteredAt": "Anmälningsdatum",
+      "fieldConsent": "Samtycke",
+      "questionsTitle": "Q&A-frågor",
+      "pollVotesTitle": "Omröstningsröster",
+      "optionLabel": "Alternativ"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Integritetspolicy",
+      "title": "Integritetspolicy",
+      "intro": "Denna sida sammanfattar behandlingen av personuppgifter i samband med användningen av plattformen Eventi DTD och deltagande i offentliga evenemang.",
+      "sections": {
+        "controller": {
+          "title": "Personuppgiftsansvarig",
+          "body": "Personuppgifter behandlas inom ramen för Avdelningen för digital omvandlings institutionella verksamhet för att stödja den tekniska och organisatoriska hanteringen av offentliga onlineevenemang."
+        },
+        "data": {
+          "title": "Behandlade uppgifter och ändamål",
+          "body": "Plattformen behandlar enbart de uppgifter som är strikt nödvändiga för anmälan och deltagande i evenemang, såsom namn, e-postadress och eventuella valfria fält som konfigurerats av arrangören. Uppgifterna används för att skicka den personliga åtkomstlänken, hantera deltagande, leverera påminnelser samt uppfylla tjänstens säkerhetskrav."
+        },
+        "retention": {
+          "title": "Lagring och rättigheter",
+          "body": "Uppgifter lagras under den period som konfigurerats för varje evenemang och raderas därefter automatiskt, om inte annan lagstiftning kräver annat. Registrerade kan när som helst utöva sina GDPR-rättigheter, inklusive tillgång, rättelse och radering, via avdelningens institutionella kanaler."
+        }
+      },
+      "note": {
+        "title": "Begär dina uppgifter",
+        "body": "Om du deltagit i ett evenemang och vill kontrollera vilka personuppgifter som är kopplade till din e-postadress kan du använda den dedikerade funktionen på plattformen.",
+        "linkLabel": "Begär mina uppgifter"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Tillgänglighetsförklaring",
+      "title": "Tillgänglighetsförklaring",
+      "intro": "Avdelningen för digital omvandling åtar sig att göra denna plattform tillgänglig i enlighet med gällande krav för digitala tjänster inom offentlig sektor.",
+      "sections": {
+        "commitment": {
+          "title": "Åtagande om tillgänglighet",
+          "body": "Plattformen är utformad med komponenter som följer designsystemet .italia, med särskild hänsyn till tangentbordsnavigering, semantisk innehållsstruktur och gränssnittsläsbarhet i de vanligaste skärmstorlekarna."
+        },
+        "status": {
+          "title": "Efterlevnadsstatus",
+          "body": "Tillgänglighetskontroller och förbättringar pågår löpande. Eventuella kvarvarande problem åtgärdas successivt som en del av tjänstens utveckling och regelbundna underhåll."
+        },
+        "feedback": {
+          "title": "Feedback och kontakt",
+          "body": "För att rapportera tillgänglighetshinder eller problem med att använda tjänsten kan användare kontakta avdelningen via dess institutionella kanaler med angivelse av berörd sida och en kort beskrivning av problemet."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Juridiska anmärkningar",
+      "title": "Juridiska anmärkningar",
+      "intro": "Åtkomst till och användning av plattformen Eventi DTD omfattas av dessa anmärkningar, som sammanfattar de allmänna användarvillkoren och huvudsaklig information om tjänsten.",
+      "sections": {
+        "ownership": {
+          "title": "Tjänsteägande",
+          "body": "Plattformen drivs av Avdelningen för digital omvandling och tillhandahålls för anordnande av och deltagande i institutionella offentliga onlineevenemang."
+        },
+        "usage": {
+          "title": "Användning av tjänsten",
+          "body": "Användare ska använda tjänsten korrekt och får inte äventyra plattformens säkerhet, funktionalitet eller det ordnade genomförandet av evenemang. Missbruk kan leda till begränsad åtkomst till tjänsten."
+        },
+        "liability": {
+          "title": "Ansvarsbegränsning",
+          "body": "Trots att lämpliga tekniska och organisatoriska åtgärder vidtas kan avdelningen inte garantera fullständig frånvaro av avbrott eller störningar orsakade av oförutsedda händelser, underhåll eller externa faktorer. Rättsligt ansvar regleras av tillämplig lag."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Systemstatus",
+    "subtitle": "Realtidsöversikt av plattformens tjänstestatus.",
+    "allOperational": "Alla system i drift",
+    "degraded": "Nedsatt prestanda",
+    "outage": "Tjänstavbrott",
+    "componentLabel": "Komponent",
+    "statusLabel": "Status",
+    "operational": "I drift",
+    "degradedLabel": "Nedsatt",
+    "standby": "Standby",
+    "loading": "Laddar...",
+    "fetchError": "Kunde inte hämta systemstatus",
+    "components": {
+      "app": "Webbportal",
+      "database": "Databas",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Videoinspelning",
+      "smtp": "E-post (SMTP)"
+    },
+    "jvbCapacity": "Video Bridge-kapacitet",
+    "jvbStandby": "Standby — aktiveras automatiskt vid behov",
+    "jvbStandbyDetail": "Scale-to-zero aktiv — inga kommande evenemang. JVB-noder skapas automatiskt innan ett evenemang börjar.",
+    "jvbScaling": "Skalar upp...",
+    "nodesActive": "noder aktiva",
+    "nodesReady": "noder redo",
+    "scaling": "skalar",
+    "jvbStress": "JVB-belastning",
+    "participantsConnected": "deltagare anslutna",
+    "videoInteractive": "interaktiv",
+    "videoWebinar": "webbinarium",
+    "participantsAvailable": "deltagare tillgängliga",
+    "upcomingEvents": "Kommande evenemang",
+    "noUpcomingEvents": "Inga kommande evenemang",
+    "jvbActivatesIn": "JVB aktiveras om {minutes} min",
+    "liveNow": "Pågår nu",
+    "activeEvents": "Aktiva evenemang",
+    "registrationsToday": "Anmälningar idag",
+    "jvbNodes": "JVB-noder",
+    "overallStatus": "Övergripande status",
+    "lastChecked": "Senast kontrollerad",
+    "responseTime": "Svarstid",
+    "systemStatus": "Systemstatus"
+  },
+  "feedback": {
+    "title": "Hur bedömer du detta evenemang?",
+    "ratingLabel": "Välj ett betyg från 1 till 5 stjärnor",
+    "comment": "Kommentar",
+    "commentPlaceholder": "Har du förslag? (valfritt)",
+    "submit": "Skicka feedback",
+    "submitting": "Skickar...",
+    "skip": "Hoppa över",
+    "thankYou": "Tack för din feedback!",
+    "averageRating": "Genomsnittligt betyg",
+    "ratingCount": "{count} omdömen",
+    "noFeedback": "Ingen feedback mottagen"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Starta",
+    "prompt": "Ämne",
+    "promptPlaceholder": "t.ex. Vad förväntar du dig av detta evenemang?",
+    "duration": "Längd",
+    "submit": "Skicka",
+    "submitPlaceholder": "Skriv ett ord (max 30 tecken)",
+    "close": "Stäng word cloud",
+    "cancel": "Avbryt",
+    "noActiveRound": "Ingen aktiv word cloud just nu.",
+    "noWords": "Väntar på de första orden...",
+    "wordsSubmitted": "{count} ord inskickade",
+    "timeRemaining": "Tid kvar"
+  },
+  "timer": {
+    "title": "Timer",
+    "start": "Starta",
+    "pause": "Paus",
+    "reset": "Återställ",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Anpassad"
+    },
+    "showToAll": "Visa för alla",
+    "timeUp": "Tiden är ute!"
+  },
+  "reactions": {
+    "title": "Reaktioner",
+    "sendReaction": "Skicka reaktion",
+    "reactionSent": "Reaktion skickad!"
+  },
+  "calendar": {
+    "title": "Evenemangskalender",
+    "subtitle": "Visa alla evenemang över tid",
+    "publicTitle": "Evenemangskalender",
+    "publicSubtitle": "Upptäck kommande evenemang",
+    "today": "Idag",
+    "prev": "Föregående period",
+    "next": "Nästa period",
+    "views": {
+      "day": "Dag",
+      "week": "Vecka",
+      "month": "Månad",
+      "year": "År",
+      "list": "Lista"
+    },
+    "status": {
+      "DRAFT": "Utkast",
+      "PUBLISHED": "Publicerat",
+      "LIVE": "Pågår",
+      "ENDED": "Avslutat",
+      "ARCHIVED": "Arkiverat"
+    }
+  },
+  "footer": {
+    "departmentName": "Avdelningen för digital omvandling",
+    "presidencyName": "Ministerrådets kansli",
+    "privacy": "Integritetspolicy",
+    "accessibility": "Tillgänglighetsförklaring",
+    "openSource": "Öppen källkod",
+    "contacts": "Kontakt",
+    "legalNotes": "Juridiska anmärkningar",
+    "governmentSite": "Italienska regeringen",
+    "systemStatus": "Systemstatus"
+  },
+  "pages": {
+    "privacyTitle": "Integritetspolicy",
+    "privacyNotConfigured": "Integritetspolicy har ännu inte konfigurerats.",
+    "accessibilityTitle": "Tillgänglighetsförklaring",
+    "accessibilityNotConfigured": "Tillgänglighetsförklaring har ännu inte konfigurerats."
+  },
+  "video": {
+    "play": "Spela upp",
+    "pause": "Paus",
+    "speed": "Hastighet",
+    "fullscreen": "Helskärm",
+    "pip": "Picture in Picture",
+    "volume": "Volym",
+    "mute": "Stäng av ljud",
+    "unmute": "Slå på ljud",
+    "download": "Ladda ned inspelning",
+    "speedLabel": "Uppspelningshastighet",
+    "progress": "Förloppsindikator"
+  },
+  "diagram": {
+    "title": "Evenemangskonfiguration",
+    "topology": "Topologi",
+    "features": "Aktiva funktioner",
+    "estimates": "Resursuppskattning",
+    "moderator": "Moderator",
+    "participants": "Deltagare",
+    "jvb": "Video Bridge",
+    "jibri": "Inspelning",
+    "bandwidth": {
+      "moderator": "Moderatorns bandbredd",
+      "participant": "Bandbredd per deltagare",
+      "total": "Uppskattad total bandbredd"
+    },
+    "jvbCount": "Nödvändiga JVB:er",
+    "jvbRam": "Uppskattat JVB-RAM",
+    "storage": "Inspelningslagring",
+    "duration": "Uppskattad längd",
+    "viewOnly": "Enbart visning",
+    "preview": "Förhandsgranskning av konfiguration"
+  },
+  "waiting": {
+    "startsIn": "Evenemanget börjar om",
+    "eventLive": "Evenemanget pågår!",
+    "connectedParticipants": "{count, plural, =0 {Inga deltagare} =1 {1 deltagare ansluten} other {{count} deltagare anslutna}}",
+    "elapsedTime": "Pågår sedan {minutes} minuter",
+    "youAreLate": "Evenemanget startade för {minutes} minuter sedan",
+    "chooseHowToJoin": "Välj hur du vill delta:",
+    "enterLive": "Gå med LIVE",
+    "enterLiveDesc": "Delta live. Du kan alltid se inspelningen efter evenemanget.",
+    "enterNow": "Gå med nu",
+    "watchFromStart": "Se från början",
+    "watchFromStartDesc": "Se inspelningen från början och anslut live när du vill.",
+    "watchNow": "Se",
+    "switchToLive": "Byt till live",
+    "enterRoom": "Gå in i rummet",
+    "recordingNotice": "Detta evenemang spelas in.",
+    "recordingAvailableAfter": "Inspelningen blir tillgänglig efter evenemanget.",
+    "autoRefreshHint": "Sidan uppdateras automatiskt när evenemanget startar.",
+    "startEventButton": "Starta evenemang",
+    "startingEvent": "Startar...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 person väntar} other {{count} personer väntar}}",
+    "jvbScaling": "Förbereder rummet...",
+    "jvbScalingDetail": "Videoservrarna startar upp. Det tar ungefär 2 minuter.",
+    "jvbReady": "Rummet är redo!"
+  },
+  "recording": {
+    "management": "Videoinspelning",
+    "inProgress": "Pågår",
+    "available": "Inspelning tillgänglig",
+    "duration": "Längd",
+    "fileSize": "Filstorlek",
+    "startedAt": "Startad",
+    "automatic": "automatisk",
+    "publish": "Publicera inspelning",
+    "publishDesc": "Gör videon tillgänglig på evenemangssidan",
+    "retentionLabel": "Lagring",
+    "retention": {
+      "24h": "24 timmar (tillfällig)",
+      "7d": "7 dagar",
+      "30d": "30 dagar",
+      "90d": "90 dagar",
+      "forever": "Aldrig (tills evenemanget löper ut)"
+    },
+    "retentionNote": "Videon följer fortfarande evenemangets GDPR-lagringspolicy",
+    "delete": "Radera inspelning",
+    "deleteConfirm": "Är du säker? Videon raderas permanent.",
+    "notConfigured": "Jibri är inte konfigurerat. Videoinspelning är inte tillgänglig.",
+    "play": "Spela upp",
+    "download": "Ladda ned"
+  },
+  "postEvent": {
+    "config": "Konfiguration efter evenemang",
+    "pageVisible": "Evenemangssida synlig efter avslut",
+    "showQA": "Visa Q&A-frågor",
+    "showMaterials": "Visa delat material",
+    "showPolls": "Visa omröstningsresultat",
+    "showFeedback": "Visa feedback",
+    "feedbackEnabled": "Feedbackundersökning aktiv vid evenemangets slut",
+    "visibilityAlways": "Alltid synlig",
+    "visibilityUntil": "Synlig till:",
+    "dataRetentionNote": "Deltagarnas personuppgifter raderas enligt evenemangets lagringspolicy ({days} dagar). Evenemangets innehåll förblir tillgängligt så länge sidan är synlig.",
+    "availableUntil": "Detta evenemang och dess innehåll kommer att vara tillgängligt till {date}.",
+    "tabs": {
+      "qa": "Frågor och svar",
+      "materials": "Material",
+      "polls": "Omröstningar",
+      "feedback": "Feedback"
+    }
+  }
+}

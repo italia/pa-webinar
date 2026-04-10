@@ -11,13 +11,13 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { getLocalized } from '@/lib/utils/locale';
 
 import StatusBadge from './status-badge';
 
 interface EventSummary {
   id: string;
-  titleIt: string;
-  titleEn: string | null;
+  title: Record<string, string>;
   slug: string;
   startsAt: string;
   endsAt: string;
@@ -53,8 +53,7 @@ export default function AdminDashboardClient({
   return (
     <Row>
       {events.map((event) => {
-        const title =
-          locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
+        const title = getLocalized(event.title, locale);
         const startsAt = new Date(event.startsAt);
         const endsAt = new Date(event.endsAt);
         const isLive = event.status === 'LIVE';

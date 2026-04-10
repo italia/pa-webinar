@@ -42,7 +42,7 @@ export const POST = withErrorHandling(async (request) => {
 
   const data = parsed.data;
 
-  const slug = await generateUniqueSlug(data.titleIt);
+  const slug = await generateUniqueSlug(data.title);
   const jitsiRoomName = `evt-${randomUUID()}`;
   const moderatorToken = randomUUID();
 
@@ -51,10 +51,8 @@ export const POST = withErrorHandling(async (request) => {
       slug,
       jitsiRoomName,
       moderatorToken,
-      titleIt: data.titleIt,
-      titleEn: data.titleEn,
-      descriptionIt: data.descriptionIt,
-      descriptionEn: data.descriptionEn,
+      title: data.title,
+      description: data.description,
       startsAt: new Date(data.startsAt),
       endsAt: new Date(data.endsAt),
       timezone: data.timezone,
@@ -70,8 +68,7 @@ export const POST = withErrorHandling(async (request) => {
       privacyPolicyText: data.privacyPolicyText,
       moderatorName: data.moderatorName,
       moderatorEmail: data.moderatorEmail,
-      speakersIt: data.speakersIt,
-      speakersEn: data.speakersEn,
+      speakersInfo: data.speakersInfo,
       organizerName: data.organizerName,
       imageUrl: data.imageUrl,
       waitingRoomAudioUrl: data.waitingRoomAudioUrl,
@@ -122,8 +119,6 @@ export const GET = withErrorHandling(async (request) => {
         id: event.id,
         slug: event.slug,
         title,
-        titleIt: event.titleIt,
-        titleEn: event.titleEn,
         description,
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),

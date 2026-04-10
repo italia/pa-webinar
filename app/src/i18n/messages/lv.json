@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "DTD Pasākumi",
+    "appDescription": "Digitālo publisko pasākumu platforma, ko izstrādājis Digitālās transformācijas departaments",
+    "loading": "Ielādē...",
+    "error": "Radās kļūda",
+    "errorMessage": "Kaut kas nogāja greizi. Lūdzu, mēģiniet vēlreiz.",
+    "retry": "Mēģināt vēlreiz",
+    "save": "Saglabāt",
+    "cancel": "Atcelt",
+    "confirm": "Apstiprināt",
+    "close": "Aizvērt",
+    "back": "Atpakaļ",
+    "next": "Tālāk",
+    "send": "Nosūtīt",
+    "delete": "Dzēst",
+    "edit": "Rediģēt",
+    "search": "Meklēt",
+    "noResults": "Nav rezultātu",
+    "requiredField": "Obligāts lauks"
+  },
+  "nav": {
+    "home": "Sākums",
+    "events": "Pasākumi",
+    "about": "Informācija",
+    "privacy": "Privātums",
+    "admin": "Administrēšana",
+    "language": "Valoda",
+    "switchLanguage": "Mainīt valodu",
+    "skipToContent": "Pāriet uz saturu",
+    "skipToFooter": "Pāriet uz kājeni"
+  },
+  "header": {
+    "slimTitle": "Ministru padomes prezidentūra",
+    "slimSubtitle": "Digitālās transformācijas departaments",
+    "followUs": "Sekojiet mums"
+  },
+  "events": {
+    "title": "Pasākumi",
+    "upcoming": "Gaidāmie pasākumi",
+    "past": "Iepriekšējie pasākumi",
+    "noUpcoming": "Šobrīd nav plānotu pasākumu. Apmeklējiet vēlāk!",
+    "noPast": "Nav iepriekšējo pasākumu",
+    "card": {
+      "publicEvent": "Publisks pasākums",
+      "readMore": "Uzzināt vairāk",
+      "liveNow": "Notiek tagad",
+      "spotsAvailable": "{count} brīvas vietas",
+      "fullyBooked": "Visas vietas aizņemtas",
+      "ended": "Beidzies",
+      "occupiedSpots": "{registered}/{max} reģistrēto"
+    },
+    "detail": {
+      "title": "Pasākuma informācija",
+      "date": "Datums un laiks",
+      "duration": "Ilgums",
+      "durationHours": "{hours} h {minutes} min",
+      "timezone": "Laika josla",
+      "description": "Apraksts",
+      "participants": "Dalībnieki",
+      "maxParticipants": "{count} vietas kopā",
+      "spotsLeft": "Atlikušas {count} vietas",
+      "occupiedSpots": "Aizņemtas {registered} no {max} vietām",
+      "full": "Visas vietas aizņemtas",
+      "register": "Reģistrēties pasākumam",
+      "registerAndJoin": "Reģistrēties un pievienoties",
+      "registered": "Jūs esat reģistrēts",
+      "enterEvent": "Ienākt pasākumā",
+      "eventEnded": "Pasākums beidzies",
+      "eventHeldOn": "Šis pasākums notika {date}",
+      "totalRegistrations": "{count} reģistrēto dalībnieku",
+      "recording": "Ieraksts pieejams",
+      "noRecording": "Šim pasākumam video ieraksts nav pieejams.",
+      "watchRecording": "Skatīt ierakstu",
+      "backToEvents": "Atpakaļ pie pasākumiem",
+      "speakers": "Referenti",
+      "organizer": "Organizators",
+      "chatNotSaved": "Tērzēšanas ziņojumi netiek saglabāti pēc pasākuma beigām.",
+      "qaPostEvent": "Jautājumi un atbildes no pasākuma",
+      "peakParticipants": "Maksimums: {count} dalībnieki",
+      "calendar": {
+        "addToCalendar": "Pievienot kalendāram",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": "Lejupielādēt .ics failu"
+      }
+    },
+    "manage": {
+      "toggleChat": "Tērzēšana",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Ierakstīšana",
+      "settingsSection": "Pasākuma iestatījumi"
+    },
+    "status": {
+      "DRAFT": "Melnraksts",
+      "PUBLISHED": "Publicēts",
+      "LIVE": "Notiek",
+      "ENDED": "Beidzies",
+      "ARCHIVED": "Arhivēts"
+    }
+  },
+  "registration": {
+    "title": "Reģistrācija pasākumam",
+    "name": "Vārds un uzvārds",
+    "namePlaceholder": "Jūsu vārds tiks parādīts pasākuma telpā",
+    "email": "E-pasts",
+    "emailPlaceholder": "Jūs saņemsiet piekļuves saiti pasākumam",
+    "gdprConsent": "Piekrītu savu personas datu (vārds, e-pasts) apstrādei saskaņā ar ES Regulu 2016/679 (GDPR) dalībai šajā pasākumā.",
+    "gdprLink": "Lasīt pilnu privātuma politiku",
+    "submit": "Apstiprināt reģistrāciju",
+    "submitting": "Reģistrēšana...",
+    "success": "Reģistrācija pabeigta!",
+    "successMessage": "Jūs saņemsiet apstiprinājuma e-pastu ar saiti piekļuvei pasākumam.",
+    "alreadyRegistered": "Jūs jau esat reģistrēts šim pasākumam",
+    "backToEvent": "Atpakaļ pie pasākuma",
+    "organization": "Organizācija",
+    "organizationPlaceholder": "piem. AGID, Ekonomikas ministrija, Romas pašvaldība",
+    "organizationRole": "Loma organizācijā",
+    "organizationRolePlaceholder": "piem. Digitālās transformācijas vadītājs, Izstrādātājs",
+    "organizationType": "Organizācijas veids",
+    "organizationTypePlaceholder": "Izvēlieties veidu...",
+    "organizationTypes": {
+      "MINISTRY": "Ministrija",
+      "AGENCY": "Aģentūra",
+      "REGION": "Reģions",
+      "PROVINCE": "Province",
+      "MUNICIPALITY": "Pašvaldība",
+      "ASL": "ASL (Vietējā veselības iestāde)",
+      "UNIVERSITY": "Universitāte",
+      "PUBLIC_ENTITY": "Publiska iestāde",
+      "IN_HOUSE": "Iekšējais uzņēmums",
+      "OTHER": "Cits"
+    },
+    "gdprConsentProfiling": "Organizācijas dati tiks apstrādāti statistiskiem mērķiem.",
+    "errors": {
+      "nameRequired": "Lūdzu, ievadiet savu vārdu",
+      "emailRequired": "Lūdzu, ievadiet savu e-pastu",
+      "emailInvalid": "Lūdzu, ievadiet derīgu e-pasta adresi",
+      "organizationRequired": "Lūdzu, ievadiet savu organizāciju",
+      "consentRequired": "Piekrišana datu apstrādei ir obligāta",
+      "recordingConsentRequired": "Šim pasākumam nepieciešama piekrišana ierakstīšanai",
+      "eventFull": "Pasākums ir sasniedzis maksimālo dalībnieku skaitu",
+      "generic": "Reģistrācijas kļūda. Lūdzu, mēģiniet vēlreiz."
+    }
+  },
+  "live": {
+    "title": "Pasākuma telpa",
+    "connecting": "Savienošanās...",
+    "connectionError": "Nevar izveidot savienojumu ar telpu. Pārbaudiet savienojumu un mēģiniet vēlreiz.",
+    "recordingActive": "Notiek ierakstīšana",
+    "recordingConsent": "Šis pasākums tiek ierakstīts. Ieejot jūs piekrītat audio/video ierakstīšanai.",
+    "recordingConsentTitle": "Piekrišana ierakstīšanai",
+    "declineRecording": "Nepiedalīties",
+    "enterRoom": "Ienākt telpā",
+    "leaveRoom": "Pamest telpu",
+    "eventNotStarted": "Pasākums vēl nav sācies",
+    "eventStartsAt": "Pasākums sāksies {date} plkst. {time}",
+    "countdown": "Atlikušais laiks",
+    "waitingRoomHint": "Šī lapa atjaunināsies automātiski, kad moderators sāks pasākumu. Nav nepieciešams pārlādēt.",
+    "startEventButton": "Sākt pasākumu",
+    "startingEvent": "Sākšana...",
+    "chatNotSaved": "Tērzēšanas ziņojumi netiek saglabāti pēc pasākuma beigām.",
+    "registerAndJoin": "Reģistrēties un pievienoties",
+    "registerNow": "Notiek tagad — Reģistrējieties!",
+    "enableMusic": "Ieslēgt mūziku",
+    "disableMusic": "Izslēgt mūziku",
+    "preJoinSubtitle": "Jūs gatavojaties ienākt pasākuma telpā",
+    "preJoinNameLabel": "Jūsu vārds",
+    "guestJoinSubtitle": "Pievienojieties notiekošajam pasākumam kā viesis",
+    "guestJoinButton": "Pievienoties kā viesis",
+    "guestRedirectToRegister": "Pasākums vēl nav sācies. Reģistrējieties, lai saņemtu piekļuves saiti.",
+    "jibriUnavailable": "Ierakstīšana nav pieejama — Jibri nav konfigurēts",
+    "jibriNotConfigured": "Ierakstīšana nav konfigurēta infrastruktūrā",
+    "eventEnded": "Pasākums beidzies",
+    "eventEndedMessage": "Pasākums ir beidzies. Paldies par dalību.",
+    "backToEvent": "Atpakaļ pie pasākuma",
+    "moderatorBadge": "Moderators",
+    "qaSidebarPlaceholder": "Q&A panelis būs pieejams, kad pasākums sāksies.",
+    "invalidToken": "Nederīga saite. Lūdzu, pārbaudiet saiti, ko saņēmāt e-pastā.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Aptaujas",
+    "sidebarTabMaterials": "Materiāli",
+    "sidebarTabParticipants": "Dalībnieki",
+    "role": {
+      "moderator": "Moderators",
+      "participant": "Dalībnieks",
+      "guest": "Viesis"
+    },
+    "participants": {
+      "title": "Dalībnieki",
+      "noParticipants": "Nav dalībnieku",
+      "kick": "Izslēgt",
+      "kickConfirm": "Vai tiešām vēlaties izslēgt šo dalībnieku?"
+    },
+    "moderator": {
+      "muteAll": "Izslēgt skaņu visiem",
+      "unmuteAll": "Ieslēgt skaņu visiem",
+      "startRecording": "Sākt ierakstīšanu",
+      "stopRecording": "Apturēt ierakstīšanu",
+      "toggleChat": "Tērzēšana ieslēgt/izslēgt",
+      "endEvent": "Beigt pasākumu",
+      "endEventConfirm": "Vai tiešām vēlaties beigt pasākumu visiem dalībniekiem?",
+      "participantCount": "{count} dalībnieki",
+      "raisedHands": "Paceltas rokas",
+      "noRaisedHands": "Nav paceltu roku",
+      "giveFloor": "Dot vārdu",
+      "approveAudio": "Dot vārdu (audio)",
+      "approveVideo": "Dot vārdu (video)",
+      "approveAll": "Dot vārdu",
+      "audioOnly": "Tikai audio",
+      "audioModeration": "Dalībnieku mikrofons",
+      "videoModeration": "Dalībnieku video",
+      "eventEndedSuccess": "Pasākums veiksmīgi beigts. Novirzīšana..."
+    }
+  },
+  "qa": {
+    "title": "Jautājumi un atbildes",
+    "askQuestion": "Uzdot jautājumu",
+    "placeholder": "Uzrakstiet savu jautājumu (maks. 500 rakstzīmes)",
+    "submit": "Iesniegt jautājumu",
+    "submitting": "Nosūtīšana...",
+    "questionSent": "Jautājums iesniegts!",
+    "cooldownWait": "Uzgaidiet {seconds} s...",
+    "upvote": "Balsot",
+    "upvoted": "Nobalsots",
+    "noQuestions": "Vēl nav jautājumu. Esiet pirmais!",
+    "qaPersistenceNote": "Jautājumi tiek saglabāti un būs pieejami pēc pasākuma.",
+    "qaPostEvent": "Jautājumi un atbildes no pasākuma",
+    "noAnsweredQuestions": "Šajā pasākumā nav atbildētu jautājumu.",
+    "filterAll": "Visi",
+    "showPanel": "Rādīt Q&A",
+    "hidePanel": "Slēpt Q&A",
+    "status": {
+      "PENDING": "Gaida",
+      "HIGHLIGHTED": "Izcelts",
+      "ANSWERED": "Atbildēts",
+      "DISMISSED": "Noraidīts"
+    },
+    "moderator": {
+      "highlight": "Izcelt",
+      "markAnswered": "Atzīmēt kā atbildētu",
+      "dismiss": "Noraidīt",
+      "resetToPending": "Atjaunot"
+    },
+    "errors": {
+      "textRequired": "Uzrakstiet savu jautājumu",
+      "tooLong": "Jautājums nedrīkst pārsniegt 500 rakstzīmes",
+      "rateLimit": "Lūdzu, uzgaidiet pirms nākamā jautājuma iesniegšanas",
+      "generic": "Kļūda, iesniedzot jautājumu"
+    }
+  },
+  "polls": {
+    "title": "Aptaujas",
+    "showPanel": "Rādīt aptaujas",
+    "hidePanel": "Slēpt aptaujas",
+    "createPoll": "Izveidot aptauju",
+    "noPolls": "Nav aptauju. Moderators tās izveidos pasākuma laikā.",
+    "questionPlaceholder": "Uzrakstiet aptaujas jautājumu...",
+    "optionPlaceholder": "Variants {number}",
+    "addOption": "Pievienot variantu",
+    "removeOption": "Noņemt variantu",
+    "create": "Izveidot",
+    "creating": "Izveido...",
+    "cancelCreate": "Atcelt",
+    "closePoll": "Slēgt balsošanu",
+    "publishResults": "Publicēt rezultātus",
+    "reopenPoll": "Atvērt no jauna",
+    "totalVotes": "{count} balsis",
+    "voted": "Jūs balsojāt",
+    "status": {
+      "OPEN": "Atvērta",
+      "CLOSED": "Slēgta",
+      "PUBLISHED": "Rezultāti"
+    },
+    "errors": {
+      "questionRequired": "Uzrakstiet aptaujas jautājumu",
+      "minOptions": "Nepieciešami vismaz 2 varianti",
+      "generic": "Kļūda, veidojot aptauju"
+    }
+  },
+  "materials": {
+    "title": "Materiāli",
+    "postEventTitle": "Pasākuma materiāli",
+    "addMaterial": "Pievienot materiālu",
+    "titleLabel": "Nosaukums",
+    "urlLabel": "Saites URL",
+    "descriptionLabel": "Apraksts (neobligāts)",
+    "addedBy": "Pievienoja {name}",
+    "noMaterials": "Nav kopīgotu materiālu.",
+    "confirmDelete": "Vai tiešām vēlaties dzēst šo materiālu?",
+    "materialAdded": "Materiāls pievienots",
+    "materialDeleted": "Materiāls dzēsts",
+    "deleteMaterial": "Dzēst materiālu",
+    "add": "Pievienot",
+    "adding": "Pievieno...",
+    "cancel": "Atcelt",
+    "errors": {
+      "urlInvalid": "Lūdzu, ievadiet derīgu URL",
+      "generic": "Kļūda, pievienojot materiālu"
+    }
+  },
+  "reminders": {
+    "title": "Paziņojumi",
+    "addReminder": "Pievienot atgādinājumu",
+    "removeReminder": "Noņemt",
+    "maxReminders": "Maksimāli 5 atgādinājumi pasākumam.",
+    "selectPreset": "Izvēlieties laiku...",
+    "sentStatus": "{count} nosūtīti",
+    "notSent": "Nav nosūtīts",
+    "presets": {
+      "7days": "7 dienas iepriekš",
+      "3days": "3 dienas iepriekš",
+      "1day": "1 dienu iepriekš",
+      "12hours": "12 stundas iepriekš",
+      "6hours": "6 stundas iepriekš",
+      "3hours": "3 stundas iepriekš",
+      "1hour": "1 stundu iepriekš",
+      "30min": "30 minūtes iepriekš",
+      "15min": "15 minūtes iepriekš"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Pasākumu pārvaldība",
+      "settings": "Sistēmas iestatījumi",
+      "eventsList": "Pasākumu saraksts",
+      "newEvent": "Jauns pasākums",
+      "calendar": "Kalendārs",
+      "templates": "Veidnes",
+      "analytics": "Statistika",
+      "infrastructure": "Infrastruktūra",
+      "settingsGeneral": "Vispārīgi",
+      "settingsLanguages": "Valodas",
+      "ariaLabel": "Administrēšanas navigācija",
+      "subNavAriaLabel": "Sadaļas navigācija"
+    },
+    "landing": {
+      "title": "Administrēšanas panelis",
+      "subtitle": "Pārvaldiet pasākumus un konfigurējiet platformu",
+      "eventsTitle": "Pasākumu pārvaldība",
+      "eventsDescription": "Izveidojiet, rediģējiet un pārvaldiet pasākumus, veidnes un statistiku.",
+      "settingsTitle": "Sistēmas iestatījumi",
+      "settingsDescription": "Konfigurējiet zīmolu, saturu, valodas, funkcijas un infrastruktūru.",
+      "liveNow": "{count, plural, zero {# tiešraides pasākumu} one {# tiešraides pasākums} other {# tiešraides pasākumi}}",
+      "upcomingEvents": "{count, plural, zero {# gaidāmo pasākumu} one {# gaidāms pasākums} other {# gaidāmi pasākumi}}"
+    },
+    "recording": {
+      "title": "Video ieraksts",
+      "play": "Atskaņot",
+      "download": "Lejupielādēt",
+      "delete": "Dzēst ierakstu",
+      "deleteConfirm": "Vai tiešām vēlaties dzēst šo ierakstu? Šo darbību nevar atsaukt.",
+      "notConfigured": "Video ierakstīšana nav pieejama. Jibri nav konfigurēts infrastruktūrā.",
+      "inProgress": "Ierakstīšana notiek..."
+    },
+    "login": {
+      "title": "Administratora piekļuve",
+      "keyLabel": "Piekļuves atslēga",
+      "keyPlaceholder": "Ievadiet piekļuves atslēgu",
+      "submit": "Pieteikties",
+      "invalidKey": "Nederīga piekļuves atslēga",
+      "logout": "Izrakstīties"
+    },
+    "title": "Pasākumu pārvaldība",
+    "subtitle": "Administrēšanas panelis",
+    "createEvent": "Izveidot jaunu pasākumu",
+    "editEvent": "Rediģēt pasākumu",
+    "deleteEvent": "Dzēst pasākumu",
+    "deleteConfirm": "Vai tiešām vēlaties dzēst šo pasākumu? Šo darbību nevar atsaukt.",
+    "publish": "Publicēt",
+    "unpublish": "Atsaukt publicēšanu",
+    "noToken": "Lai pārvaldītu pasākumus, izmantojiet moderatora saiti, ko saņēmāt e-pastā.",
+    "noEvents": "Nav atrastu pasākumu. Izveidojiet savu pirmo pasākumu.",
+    "eventDetails": "Pasākuma informācija",
+    "registrations": "Reģistrācijas",
+    "registrationCount": "{count} reģistrācijas",
+    "noRegistrations": "Vēl nav reģistrētu dalībnieku. Kopīgojiet pasākuma saiti!",
+    "exportCsv": "Eksportēt CSV",
+    "organization": "Organizācija",
+    "organizationType": "Veids",
+    "registrationDate": "Reģistrācijas datums",
+    "joined": "Pievienojās",
+    "notJoined": "Nepievienojās",
+    "deleteSuccess": "Pasākums dzēsts",
+    "publishSuccess": "Pasākums publicēts",
+    "unpublishSuccess": "Pasākuma publicēšana atsaukta",
+    "startEvent": "Sākt pasākumu",
+    "startEventSuccess": "Pasākums sākts! Gaidošie dalībnieki tiks automātiski novirzīti.",
+    "jvbWarmupWarning": "Video serveri tiek startēti (aptuveni 2 minūtes). Dalībnieki redzēs paziņojumu gaidīšanas telpā.",
+    "eventIsLive": "Pasākums notiek",
+    "joinAsModeratorBtn": "Pievienoties kā moderators",
+    "openPublicPage": "Atvērt publisko lapu",
+    "quickActions": "Ātrās darbības",
+    "liveRoomLink": "Pasākuma telpas saite",
+    "manage": "Pārvaldīt",
+    "settingsSaved": "Saglabāts",
+    "toggleChatDesc": "Iespējot tērzēšanu starp dalībniekiem",
+    "toggleQaDesc": "Iespējot jautājumus ar balsošanu",
+    "toggleRecordingDesc": "Ierakstīt pasākumu (nepieciešams Jibri)",
+    "eventUpdated": "Pasākums veiksmīgi atjaunināts!",
+    "dateChangedNotification": "Datums tika mainīts. Reģistrētie dalībnieki tiks informēti e-pastā.",
+    "eventCreated": "Pasākums veiksmīgi izveidots!",
+    "createEventCta": "Organizēt pasākumu",
+    "createEventExplanation": "Izveidojiet savu pasākumu un saņemsiet saiti tā pārvaldībai.",
+    "noAccountNeeded": "Konts nav nepieciešams — moderatora saite ir jūsu piekļuve pasākuma pārvaldībai.",
+    "form": {
+      "titleIt": "Nosaukums (itāliešu val.)",
+      "titleEn": "Nosaukums (angļu val.)",
+      "descriptionIt": "Apraksts (itāliešu val.)",
+      "descriptionEn": "Apraksts (angļu val.)",
+      "startsAt": "Sākuma datums un laiks",
+      "endsAt": "Beigu datums un laiks",
+      "maxParticipants": "Maksimālais dalībnieku skaits",
+      "qaEnabled": "Iespējot Q&A",
+      "chatEnabled": "Iespējot tērzēšanu",
+      "recordingEnabled": "Iespējot video ierakstīšanu",
+      "dataRetentionDays": "Datu saglabāšana (dienas pēc pasākuma)",
+      "dataRetentionHint": "Pēc šī perioda dalībnieku reģistrācijas, Q&A jautājumi un video ieraksti tiks automātiski dzēsti.",
+      "privacyPolicyUrl": "Privātuma politikas URL",
+      "moderatorName": "Moderatora vārds",
+      "moderatorEmail": "Moderatora e-pasts",
+      "speakersIt": "Referenti (itāliešu val.)",
+      "speakersEn": "Referenti (angļu val.)",
+      "organizerName": "Organizators",
+      "imageUrl": "Vāka attēla URL",
+      "waitingRoomAudioUrl": "Gaidīšanas telpas audio URL (neobligāts)",
+      "waitingRoomAudioUrlHint": "Ievadiet MP3 faila URL gaidīšanas telpas mūzikai. Atstājiet tukšu, lai izmantotu noklusējuma audio.",
+      "submit": "Izveidot pasākumu",
+      "submitEdit": "Saglabāt izmaiņas",
+      "saving": "Saglabāšana...",
+      "creating": "Izveido...",
+      "sectionContent": "Saturs",
+      "sectionSchedule": "Grafiks",
+      "sectionSettings": "Iestatījumi",
+      "sectionSpeakers": "Referenti un organizators",
+      "sectionModerator": "Moderators",
+      "sectionRegistrationFields": "Reģistrācijas lauki",
+      "requireOrganization": "Pieprasīt organizāciju",
+      "requireOrganizationDesc": "Dalībniekiem jānorāda sava organizācija",
+      "requireOrganizationRole": "Pieprasīt lomu organizācijā",
+      "requireOrganizationRoleDesc": "Dalībnieki var norādīt savu lomu",
+      "requireOrganizationType": "Pieprasīt organizācijas veidu",
+      "requireOrganizationTypeDesc": "Dalībnieki izvēlas savas organizācijas veidu",
+      "sectionPermissions": "Dalībnieku atļaujas",
+      "participantsCanUnmute": "Dalībnieki var ieslēgt mikrofonu",
+      "participantsCanStartVideo": "Dalībnieki var ieslēgt kameru",
+      "participantsCanShareScreen": "Dalībnieki var kopīgot ekrānu",
+      "permissionsOnDesc": "Dalībnieki var aktivizēt patstāvīgi",
+      "permissionsOffDesc": "Tikai moderatori var aktivizēt. Dalībniekiem jāpaceļ roka.",
+      "permissionsNote": "Atļauju izmaiņas attiecas uz jauniem dalībniekiem.",
+      "privacyPolicyMode": "Privātuma politika",
+      "privacyPolicyModeUrl": "Ārējais URL",
+      "privacyPolicyModeText": "Pielāgots teksts",
+      "privacyPolicyText": "Privātuma politikas teksts",
+      "privacyPolicyTextHint": "Uzrakstiet privātuma politikas tekstu. Tas tiks parādīts reģistrācijas formā.",
+      "retentionPreviewTitle": "Kas tiek automātiski dzēsts",
+      "retentionPreviewIntro": "Pēc {days} dienām no pasākuma beigām tiks automātiski dzēsts:",
+      "retentionPreviewParticipants": "Dalībnieku dati (vārds, e-pasts, organizācija)",
+      "retentionPreviewQa": "Q&A jautājumi un balsis",
+      "retentionPreviewPolls": "Aptauju rezultāti",
+      "retentionPreviewRecordings": "Video ieraksti",
+      "retentionPreviewKept": "Apkopotā statistika un pasākuma metadati tiek saglabāti.",
+      "configPreview": "Konfigurācijas priekšskatījums",
+      "templateApplied": "Veidne piemērota: {name}. Jūs varat mainīt visus iestatījumus."
+    },
+    "links": {
+      "title": "Pasākuma saites",
+      "publicPage": "Publiskā pasākuma lapa",
+      "moderatorLink": "Moderatora saite",
+      "moderatorLinkHint": "Kopīgojiet šo saiti tikai ar moderatoriem. Ikviens ar šo saiti var pārvaldīt pasākumu.",
+      "copyLink": "Kopēt saiti",
+      "copied": "Nokopēts!"
+    },
+    "feedbackAdmin": {
+      "title": "Atsauksmju rezultāti",
+      "averageRating": "Vidējais vērtējums",
+      "totalVotes": "{count, plural, zero {# vērtējumu} one {# vērtējums} other {# vērtējumi}}",
+      "noFeedback": "Nav saņemtu atsauksmju",
+      "comments": "Dalībnieku komentāri",
+      "noComments": "Nav komentāru",
+      "stars": "zvaigznes"
+    },
+    "gdprAuditLog": {
+      "title": "GDPR audita žurnāls",
+      "date": "Datums",
+      "action": "Darbība",
+      "recordCount": "Ieraksti",
+      "details": "Detaļas",
+      "actions": {
+        "DATA_DELETED": "Dati dzēsti",
+        "CONSENT_RECORDED": "Piekrišana reģistrēta",
+        "DATA_EXPORTED": "Dati eksportēti"
+      }
+    },
+    "settings": {
+      "title": "Vietnes iestatījumi",
+      "subtitle": "Konfigurējiet platformas izskatu un uzvedību VA atkārtotai izmantošanai",
+      "saving": "Saglabāšana...",
+      "saved": "Iestatījumi veiksmīgi saglabāti",
+      "tabs": {
+        "branding": "Zīmols",
+        "header": "Galvene",
+        "seo": "SEO",
+        "homepage": "Sākumlapa",
+        "pages": "Lapas",
+        "footer": "Kājene",
+        "features": "Funkcijas"
+      },
+      "header": {
+        "slimBarTitle": "Augšējā josla (Slim Header)",
+        "slimBarDescription": "Plānā josla lapas augšdaļā, kas norāda mātesorganizāciju.",
+        "parentOrganization": "Mātesorganizācija",
+        "parentOrganizationHelp": "Piem. \"Ministru padomes prezidentūra\"",
+        "parentOrganizationUrl": "Mātesorganizācijas URL",
+        "centerBarTitle": "Centrālā galvene",
+        "centerBarDescription": "Galvenais galvenes apgabals ar lietotnes nosaukumu un logotipu.",
+        "appName": "Lietotnes nosaukums",
+        "appNameHelp": "Tiek rādīts galvenē un pārlūka nosaukumā",
+        "organizationShort": "Organizācijas saīsinājums",
+        "logoUrl": "Logotipa URL",
+        "logoUrlHelp": "Atstājiet tukšu, lai izmantotu noklusējuma VA ikonu",
+        "organizationUrl": "Organizācijas vietnes URL"
+      },
+      "branding": {
+        "siteName": "Lietotnes nosaukums",
+        "siteNameHelp": "Tiek rādīts galvenē, pārlūka nosaukumā un e-pastos",
+        "siteDescription": "Lietotnes apraksts",
+        "organizationName": "Organizācijas nosaukums",
+        "organizationNameHelp": "piem. Digitālās transformācijas departaments",
+        "organizationNameShort": "Organizācijas saīsinājums",
+        "organizationUrl": "Organizācijas URL",
+        "parentOrganization": "Mātesorganizācija",
+        "parentOrganizationHelp": "piem. Ministru padomes prezidentūra",
+        "parentOrganizationUrl": "Mātesorganizācijas URL",
+        "logoUrl": "Pielāgota logotipa URL",
+        "logoUrlHelp": "Atstājiet tukšu, lai izmantotu noklusējuma VA ikonu",
+        "faviconUrl": "Favicon URL",
+        "primaryColor": "Primārā krāsa",
+        "defaultTimezone": "Noklusējuma laika josla",
+        "defaultTimezoneHelp": "Izmanto datumu attēlošanai un jaunu pasākumu izveidei."
+      },
+      "watermark": {
+        "title": "Video pielāgošana",
+        "enabled": "Ūdenszīme iespējota",
+        "url": "Ūdenszīmes URL",
+        "urlHelp": "Caurspīdīga SVG vai PNG attēla URL. Atstājiet tukšu, lai izmantotu organizācijas logotipu.",
+        "opacity": "Necaurspīdīgums",
+        "position": "Pozīcija",
+        "previewLabel": "Video apgabala priekšskatījums",
+        "positions": {
+          "bottomLeft": "Apakšā pa kreisi",
+          "bottomRight": "Apakšā pa labi",
+          "topLeft": "Augšā pa kreisi",
+          "topRight": "Augšā pa labi"
+        }
+      },
+      "seo": {
+        "title": "SEO nosaukums",
+        "titleHelp": "Nosaukums, kas tiek rādīts meklēšanas rezultātos un pārlūka cilnē",
+        "description": "SEO apraksts",
+        "descriptionHelp": "Apraksts meklētājprogrammām un sociālo tīklu kopīgošanai",
+        "image": "Open Graph attēls",
+        "imageHelp": "Noklusējuma attēls sociālo tīklu kopīgošanai (ieteicams 1200x630)"
+      },
+      "homepage": {
+        "modeLabel": "Sākumlapas režīms",
+        "modes": {
+          "LANDING": {
+            "title": "Galvenā lapa",
+            "description": "Galvenais bloks, funkcijas, gaidāmie pasākumi un kā tas darbojas"
+          },
+          "EVENTS_LIST": {
+            "title": "Pasākumu saraksts",
+            "description": "Tieši rādīt pasākumu sarakstu"
+          },
+          "CUSTOM": {
+            "title": "Pielāgots",
+            "description": "Pielāgots HTML saturs + pasākumu saraksts"
+          }
+        },
+        "customHtmlLabel": "Pielāgots HTML saturs",
+        "customHtmlHelp": "HTML, kas tiek rādīts sākumlapas galvenajā sadaļā"
+      },
+      "pages": {
+        "privacyTitle": "Privātuma politika",
+        "privacyIt": "Saturs (itāliešu val.)",
+        "privacyEn": "Saturs (angļu val.)",
+        "accessibilityTitle": "Pieejamības paziņojums",
+        "accessibilityIt": "Saturs (itāliešu val.)",
+        "accessibilityEn": "Saturs (angļu val.)",
+        "preview": "Priekšskatījums"
+      },
+      "footer": {
+        "linksTitle": "Kājenes saites",
+        "addLink": "Pievienot saiti",
+        "noLinks": "Nav konfigurētu saišu. Tiks izmantotas noklusējuma saites.",
+        "linkTitle": "Nosaukums",
+        "linkSection": "Sadaļa",
+        "sectionLegal": "Juridiskā informācija",
+        "sectionMain": "Galvenā",
+        "moveUp": "Pārvietot augšup",
+        "moveDown": "Pārvietot lejup",
+        "removeLink": "Noņemt saiti"
+      },
+      "features": {
+        "statusPageEnabled": "Statusa lapa iespējota",
+        "statusPageEnabledHelp": "Rādīt pakalpojuma statusa lapu",
+        "guestAccessEnabled": "Viesu piekļuve iespējota",
+        "guestAccessEnabledHelp": "Atļaut viesu piekļuvi notiekošiem pasākumiem",
+        "publicRegistrationEnabled": "Publiskā reģistrācija iespējota",
+        "publicRegistrationEnabledHelp": "Ikviens var veidot pasākumus (ja izslēgts, tikai administratori)",
+        "calendarPublic": "Publiskais kalendārs",
+        "calendarPublicHelp": "Publicēt pasākumu kalendāru. Apmeklētāji var redzēt plānotos pasākumus.",
+        "githubUrl": "GitHub repozitorija URL",
+        "supportEmail": "Atbalsta e-pasts"
+      }
+    },
+    "analytics": {
+      "title": "Statistika",
+      "subtitle": "Platformas metriku pārskats",
+      "timeline": "Laika grafiks",
+      "topEvents": "Labākie pasākumi",
+      "noData": "Šim periodam nav pieejamu datu.",
+      "period": {
+        "7d": "7 dienas",
+        "30d": "30 dienas",
+        "90d": "90 dienas",
+        "all": "Viss"
+      },
+      "metrics": {
+        "totalEvents": "Pasākumi kopā",
+        "totalRegistrations": "Reģistrācijas",
+        "totalParticipants": "Dalībnieki",
+        "conversionRate": "Vidējais konversijas rādītājs",
+        "peakParticipants": "Dalībnieku maksimums"
+      },
+      "table": {
+        "event": "Pasākums",
+        "date": "Datums",
+        "registrations": "Reģistrācijas",
+        "participants": "Dalībnieki",
+        "peak": "Maksimums",
+        "questions": "Q&A",
+        "conversion": "Konversija",
+        "noEvents": "Nav atrastu pasākumu."
+      },
+      "quickStats": {
+        "title": "Ātrā statistika",
+        "avgDuration": "Vidējais pasākumu ilgums",
+        "avgQuestionsPerEvent": "Q&A jautājumi pasākumā",
+        "totalPollVotes": "Aptauju balsis kopā",
+        "avgParticipantsPerEvent": "Vidēji dalībnieki pasākumā",
+        "avgFeedbackRating": "Vidējais atsauksmju vērtējums",
+        "totalFeedback": "Atsauksmju atbildes"
+      }
+    },
+    "templates": {
+      "title": "Pasākumu veidnes",
+      "subtitle": "Pārvaldiet iepriekš iestatītas veidnes ātrai pasākumu izveidei",
+      "create": "Jauna veidne",
+      "deleteConfirm": "Vai tiešām vēlaties dzēst šo veidni?",
+      "system": "Sistēma",
+      "nameLabel": "Veidnes nosaukums",
+      "descriptionLabel": "Apraksts",
+      "maxParticipantsLabel": "Maks. dalībnieki",
+      "featuresLabel": "Funkcijas",
+      "recordingLabel": "Ierakstīšana",
+      "unmute": "Dalībnieku mikrofons",
+      "video": "Dalībnieku video",
+      "screen": "Ekrāna kopīgošana",
+      "pickerTitle": "Izvēlieties veidni",
+      "pickerSubtitle": "Izvēlieties veidni, lai iepriekš konfigurētu pasākuma iestatījumus, vai izlaidiet, lai visu konfigurētu manuāli.",
+      "skipTemplate": "Konfigurēt manuāli"
+    },
+    "instantCall": {
+      "title": "Tūlītējs video zvans",
+      "subtitle": "Izveidojiet video zvanu tūlīt un kopīgojiet saiti. Nav nepieciešama plānošana.",
+      "nameLabel": "Zvana nosaukums",
+      "namePlaceholder": "piem. Ātrā sanāksme, Projekta demo...",
+      "moderatorLabel": "Jūsu vārds (neobligāts)",
+      "moderatorPlaceholder": "Tiks parādīts zvanā",
+      "create": "Izveidot un pievienoties",
+      "creating": "Izveido...",
+      "copyLink": "Kopēt ielūguma saiti",
+      "copied": "Nokopēts!",
+      "hint": "Visi var ieslēgt mikrofonu, kameru un kopīgot ekrānu. Tikai jūs varat ierakstīt un beigt zvanu."
+    },
+    "files": {
+      "title": "Faili un materiāli",
+      "upload": "Augšupielādēt failu",
+      "selectFile": "Izvēlēties failu",
+      "fileTitle": "Nosaukums",
+      "visibility": "Redzamība",
+      "visibilityAlways": "Vienmēr redzams",
+      "visibilityBefore": "Tikai pirms pasākuma",
+      "visibilityDuring": "Tikai pasākuma laikā",
+      "visibilityAfter": "Tikai pēc pasākuma",
+      "uploading": "Augšupielādē...",
+      "uploadBtn": "Augšupielādēt",
+      "deleteConfirm": "Vai tiešām vēlaties dzēst šo failu?",
+      "noFiles": "Nav augšupielādētu failu. Izmantojiet pogu \"Augšupielādēt failu\", lai pievienotu materiālus."
+    },
+    "languages": {
+      "title": "Valodu pārvaldība",
+      "subtitle": "Konfigurējiet pieejamās valodas un pielāgojiet tulkojumus",
+      "configuredLocales": "Konfigurētās valodas",
+      "localesDescription": "Izvēlieties valodas, kas pieejamas lietotāja saskarnē. Itāliešu valoda ir obligāta kā noklusējuma valoda.",
+      "addLocale": "Pievienot valodu",
+      "localeCode": "Valodas kods",
+      "localeName": "Valodas nosaukums",
+      "selectLocale": "Izvēlieties...",
+      "add": "Pievienot",
+      "default": "Noklusējuma",
+      "editTranslations": "Rediģēt tulkojumus",
+      "saved": "Valodu konfigurācija saglabāta",
+      "saveNote": "Pieejamo valodu izmaiņām nepieciešams restarts, lai tās stātos spēkā URL adresēs.",
+      "translationOverrides": "Pielāgoti tulkojumi — {locale}",
+      "overridesDescription": "Pārrakstiet noklusējuma tulkojumus šai valodai. Izmantojiet punktu apzīmējumu (piem. common.appName).",
+      "keyLabel": "Tulkojuma atslēga",
+      "valueLabel": "Vērtība",
+      "addOverride": "Pievienot"
+    },
+    "infrastructure": {
+      "title": "Infrastruktūra",
+      "subtitle": "Komponentu statuss un vides konfigurācija",
+      "deploymentMode": "Izvietošanas režīms",
+      "version": "Versija",
+      "environment": "Vide",
+      "modes": {
+        "simple": "Vienkārša (Docker Compose)",
+        "standard": "Standarta (Kubernetes)",
+        "full": "Pilna (Kubernetes ar scale-to-zero)",
+        "unknown": "Nezināma"
+      },
+      "database": {
+        "title": "Datubāze",
+        "internal": "Klasterī (PostgreSQL)",
+        "external": "Ārējā",
+        "connected": "Savienots",
+        "disconnected": "Nesasniedzama"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Sasniedzams",
+        "unreachable": "Nesasniedzams",
+        "notConfigured": "Nav konfigurēts"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero aktīvs",
+        "replicas": "{current}/{max} mezgli",
+        "preScale": "Priekšmērogošana: {minutes} min",
+        "fixedMode": "Fiksēts režīms",
+        "scalerEnabled": "Mērogotājs iespējots"
+      },
+      "jibri": {
+        "title": "Ierakstīšana (Jibri)",
+        "available": "Pieejams",
+        "notConfigured": "Nav konfigurēts",
+        "storageType": "Glabātuve",
+        "configureHint": "Video ierakstīšanai nepieciešams Jibri. Konfigurējiet glabātuvi, lai to iespējotu.",
+        "docsLink": "Dokumentācija"
+      },
+      "email": {
+        "title": "E-pasts",
+        "configured": "Konfigurēts",
+        "notConfigured": "Nav konfigurēts"
+      },
+      "features": {
+        "title": "Funkcijas",
+        "statusPage": "Statusa lapa",
+        "guestAccess": "Viesu piekļuve",
+        "metrics": "Metriku galapunkts"
+      },
+      "note": "Infrastruktūras izmaiņas tiek veiktas, izmantojot Helm konfigurāciju un CI/CD cauruļvadu.",
+      "deployDocs": "Izvietošanas dokumentācija"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Reģistrācija apstiprināta: {eventTitle}",
+    "confirmationHeading": "Reģistrācija apstiprināta",
+    "confirmationKeepNote": "Saglabājiet šo e-pastu — tajā ir jūsu personīgā saite piekļuvei pasākumam.",
+    "reminderSubject": "Atgādinājums: {eventTitle} sākas pēc 1 stundas",
+    "reminderHeading": "Pasākuma atgādinājums",
+    "reminderNote": "Pasākums, kuram reģistrējāties, sākas mazāk nekā pēc stundas. Izmantojiet zemāk esošo saiti, lai pievienotos.",
+    "recordingSubject": "Ieraksts pieejams: {eventTitle}",
+    "joinLabel": "Pievienoties pasākumam",
+    "viewEvent": "Skatīt pasākuma lapu",
+    "eventLabel": "Pasākums",
+    "dateLabel": "Datums",
+    "timeLabel": "Laiks",
+    "durationLabel": "Ilgums"
+  },
+  "home": {
+    "hero": {
+      "title": "Publiskie digitālie pasākumi",
+      "subtitle": "Tīmekļsemināru, prezentāciju un publisko sanāksmju platforma, ko izstrādājis Digitālās transformācijas departaments",
+      "browseEvents": "Pārlūkot pasākumus",
+      "organizeEvent": "Organizēt pasākumu"
+    },
+    "features": {
+      "title": "Valsts pārvaldes pasākumu platforma",
+      "video": {
+        "title": "Video konferences",
+        "desc": "Piedalieties publiskos pasākumos ar līdz 300 dalībniekiem. Nav jāinstalē nekāda programmatūra."
+      },
+      "qa": {
+        "title": "Jautājumi un atbildes",
+        "desc": "Uzdodiet jautājumus pasākuma laikā un balsojiet par svarīgākajiem. Moderators atbild tiešraidē."
+      },
+      "privacy": {
+        "title": "Privātums un drošība",
+        "desc": "Dati aizsargāti un atbilst GDPR prasībām. Pašizvietota infrastruktūra Itālijā."
+      }
+    },
+    "upcoming": {
+      "title": "Gaidāmie pasākumi",
+      "viewAll": "Skatīt visus pasākumus",
+      "noEvents": "Nav gaidāmu pasākumu. Apmeklējiet drīz!"
+    },
+    "howItWorks": {
+      "title": "Kā tas darbojas",
+      "step1": {
+        "title": "Reģistrējieties",
+        "desc": "Piereģistrējieties pasākumam bez maksas"
+      },
+      "step2": {
+        "title": "Saņemiet saiti",
+        "desc": "E-pasts ar jūsu personīgo piekļuves saiti"
+      },
+      "step3": {
+        "title": "Piedalieties",
+        "desc": "Ienāciet pasākumā no pārlūka, bez instalēšanas"
+      },
+      "step4": {
+        "title": "Mijiedarbojieties",
+        "desc": "Uzdodiet jautājumus, balsojiet, piedalieties diskusijā"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Piekrītu šī pasākuma audio/video ierakstīšanai",
+      "recordingRequired": "Lai piedalītos šajā pasākumā, ir nepieciešama piekrišana ierakstīšanai",
+      "futureCommunications": "Vēlos saņemt informāciju par nākotnes pasākumiem, ko organizē DTD"
+    },
+    "export": {
+      "title": "Mani dati",
+      "subtitle": "Pieprasiet ar jūsu e-pasta adresi saistīto personas datu kopiju saskaņā ar GDPR 15. pantu.",
+      "emailLabel": "Jūsu e-pasta adrese",
+      "emailPlaceholder": "Ievadiet e-pastu, ko izmantojāt reģistrācijai",
+      "emailInvalid": "Lūdzu, ievadiet derīgu e-pasta adresi",
+      "submit": "Pieprasīt manus datus",
+      "loading": "Meklēšana...",
+      "noData": "Šai e-pasta adresei nav atrastu datu.",
+      "error": "Radās kļūda. Lūdzu, mēģiniet vēlāk.",
+      "rateLimited": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc stundas.",
+      "results": "Jūsu dati",
+      "resultsDescription": "Atrasti dati, kas saistīti ar {count} pasākumiem.",
+      "registrationData": "Reģistrācijas dati",
+      "fieldName": "Vārds",
+      "fieldEmail": "E-pasts",
+      "fieldOrganization": "Organizācija",
+      "fieldRegisteredAt": "Reģistrācijas datums",
+      "fieldConsent": "Piekrišana",
+      "questionsTitle": "Q&A jautājumi",
+      "pollVotesTitle": "Aptauju balsis",
+      "optionLabel": "Variants"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Privātuma politika",
+      "title": "Privātuma politika",
+      "intro": "Šajā lapā ir apkopota informācija par personas datu apstrādi saistībā ar platformas Eventi DTD izmantošanu un dalību publiskos pasākumos.",
+      "sections": {
+        "controller": {
+          "title": "Datu pārzinis",
+          "body": "Personas dati tiek apstrādāti Digitālās transformācijas departamenta institucionālās darbības ietvaros, lai nodrošinātu publisko tiešsaistes pasākumu tehnisko un organizatorisko pārvaldību."
+        },
+        "data": {
+          "title": "Apstrādātie dati un mērķi",
+          "body": "Platforma apstrādā tikai datus, kas ir stingri nepieciešami reģistrācijai un dalībai pasākumos, piemēram, vārdu, e-pasta adresi un organizatora konfigurētos neobligātos laukus. Dati tiek izmantoti personīgās piekļuves saites nosūtīšanai, apmeklējuma pārvaldībai, atgādinājumiem un pakalpojuma drošības prasību izpildei."
+        },
+        "retention": {
+          "title": "Datu saglabāšana un tiesības",
+          "body": "Dati tiek glabāti katram pasākumam konfigurēto periodu un pēc tam automātiski dzēsti, ja vien nepastāv citi juridiskie pienākumi. Datu subjekti var jebkurā laikā izmantot savas GDPR tiesības, tostarp piekļuvi, labošanu un dzēšanu, izmantojot departamenta institucionālos kanālus."
+        }
+      },
+      "note": {
+        "title": "Pieprasīt savus datus",
+        "body": "Ja piedalījāties pasākumā un vēlaties pārbaudīt, kādi personas dati ir saistīti ar jūsu e-pasta adresi, varat izmantot platformā pieejamo speciālo funkciju.",
+        "linkLabel": "Pieprasīt manus datus"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Pieejamības paziņojums",
+      "title": "Pieejamības paziņojums",
+      "intro": "Digitālās transformācijas departaments apņemas padarīt šo platformu pieejamu saskaņā ar spēkā esošajām prasībām publiskā sektora digitālajiem pakalpojumiem.",
+      "sections": {
+        "commitment": {
+          "title": "Apņemšanās nodrošināt pieejamību",
+          "body": "Platforma ir izstrādāta ar komponentiem, kas saskaņoti ar .italia dizaina sistēmu, īpašu uzmanību pievēršot tastatūras navigācijai, satura semantiskajai struktūrai un saskarnes lasāmībai galvenajiem ekrānu izmēriem."
+        },
+        "status": {
+          "title": "Atbilstības statuss",
+          "body": "Pieejamības pārbaudes un uzlabojumi notiek pastāvīgi. Jebkādas atlikušās problēmas tiek risinātas pakāpeniski kā daļa no pakalpojuma attīstības un regulārās uzturēšanas."
+        },
+        "feedback": {
+          "title": "Atsauksmes un kontakti",
+          "body": "Lai ziņotu par pieejamības šķēršļiem vai pakalpojuma lietošanas problēmām, lietotāji var sazināties ar departamentu, izmantojot tā institucionālos kanālus, norādot skarto lapu un īsu problēmas aprakstu."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Juridiskās piezīmes",
+      "title": "Juridiskās piezīmes",
+      "intro": "Piekļuve platformai Eventi DTD un tās izmantošana ir pakļauta šīm piezīmēm, kurās apkopoti vispārējie lietošanas noteikumi un galvenā informācija par pakalpojumu.",
+      "sections": {
+        "ownership": {
+          "title": "Pakalpojuma īpašumtiesības",
+          "body": "Platformu veicina Digitālās transformācijas departaments, un tā ir pieejama institucionālo publisko tiešsaistes pasākumu organizēšanai un dalībai tajos."
+        },
+        "usage": {
+          "title": "Pakalpojuma izmantošana",
+          "body": "Lietotājiem jāizmanto pakalpojums pareizi, nekaitējot platformas drošībai, funkciju pieejamībai vai pasākumu normālai norisei. Ļaunprātīga vai nepareiza izmantošana var radīt piekļuves ierobežojumus pakalpojumam."
+        },
+        "liability": {
+          "title": "Atbildības ierobežojumi",
+          "body": "Lai gan tiek piemēroti atbilstoši tehniskie un organizatoriskie pasākumi, departaments nevar garantēt pilnīgu pārtraukumu vai darbības traucējumu neesamību neparedzamu apstākļu, uzturēšanas darbu vai ārējo faktoru dēļ. Juridiskā atbildība ir noteikta piemērojamos tiesību aktos."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Sistēmas statuss",
+    "subtitle": "Reāllaika pārskats par platformas pakalpojumu statusu.",
+    "allOperational": "Visas sistēmas darbojas",
+    "degraded": "Samazināta veiktspēja",
+    "outage": "Pakalpojuma pārtraukums",
+    "componentLabel": "Komponents",
+    "statusLabel": "Statuss",
+    "operational": "Darbojas",
+    "degradedLabel": "Palēnināts",
+    "standby": "Gaidstāve",
+    "loading": "Ielādē...",
+    "fetchError": "Nevar iegūt sistēmas statusu",
+    "components": {
+      "app": "Tīmekļa portāls",
+      "database": "Datubāze",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Video ierakstīšana",
+      "smtp": "E-pasts (SMTP)"
+    },
+    "jvbCapacity": "Video bridge kapacitāte",
+    "jvbStandby": "Gaidstāve — aktivizējas automātiski, kad nepieciešams",
+    "jvbStandbyDetail": "Scale-to-zero aktīvs — nav gaidāmu pasākumu. JVB mezgli tiks izveidoti automātiski pirms pasākuma sākuma.",
+    "jvbScaling": "Startēšana...",
+    "nodesActive": "aktīvi mezgli",
+    "nodesReady": "gatavi mezgli",
+    "scaling": "mērogošana",
+    "jvbStress": "JVB slodze",
+    "participantsConnected": "pievienotie dalībnieki",
+    "videoInteractive": "interaktīvs",
+    "videoWebinar": "tīmekļseminārs",
+    "participantsAvailable": "pieejamie dalībnieki",
+    "upcomingEvents": "Gaidāmie pasākumi",
+    "noUpcomingEvents": "Nav gaidāmu pasākumu",
+    "jvbActivatesIn": "JVB aktivizējas pēc {minutes} min",
+    "liveNow": "Notiek tagad",
+    "activeEvents": "Aktīvie pasākumi",
+    "registrationsToday": "Šodienas reģistrācijas",
+    "jvbNodes": "JVB mezgli",
+    "overallStatus": "Kopējais statuss",
+    "lastChecked": "Pēdējā pārbaude",
+    "responseTime": "Atbildes laiks",
+    "systemStatus": "Sistēmas statuss"
+  },
+  "feedback": {
+    "title": "Kā jūs vērtējat šo pasākumu?",
+    "ratingLabel": "Izvēlieties vērtējumu no 1 līdz 5 zvaigznēm",
+    "comment": "Komentārs",
+    "commentPlaceholder": "Vai jums ir ierosinājumi? (neobligāts)",
+    "submit": "Iesniegt atsauksmi",
+    "submitting": "Nosūtīšana...",
+    "skip": "Izlaist",
+    "thankYou": "Paldies par jūsu atsauksmi!",
+    "averageRating": "Vidējais vērtējums",
+    "ratingCount": "{count} vērtējumi",
+    "noFeedback": "Nav saņemtu atsauksmju"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Sākt",
+    "prompt": "Tēma",
+    "promptPlaceholder": "piem. Ko jūs sagaidāt no šī pasākuma?",
+    "duration": "Ilgums",
+    "submit": "Iesniegt",
+    "submitPlaceholder": "Ierakstiet vārdu (maks. 30 rakstz.)",
+    "close": "Aizvērt \"Word Cloud\"",
+    "cancel": "Atcelt",
+    "noActiveRound": "Šobrīd nav aktīva \"Word Cloud\".",
+    "noWords": "Gaidām pirmos vārdus...",
+    "wordsSubmitted": "{count} vārdi iesniegti",
+    "timeRemaining": "Atlikušais laiks"
+  },
+  "timer": {
+    "title": "Taimeris",
+    "start": "Sākt",
+    "pause": "Pauze",
+    "reset": "Atiestatīt",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Pielāgots"
+    },
+    "showToAll": "Rādīt visiem",
+    "timeUp": "Laiks beidzies!"
+  },
+  "reactions": {
+    "title": "Reakcijas",
+    "sendReaction": "Nosūtīt reakciju",
+    "reactionSent": "Reakcija nosūtīta!"
+  },
+  "calendar": {
+    "title": "Pasākumu kalendārs",
+    "subtitle": "Skatiet visus pasākumus laika gaitā",
+    "publicTitle": "Pasākumu kalendārs",
+    "publicSubtitle": "Atklājiet gaidāmos pasākumus",
+    "today": "Šodien",
+    "prev": "Iepriekšējais periods",
+    "next": "Nākamais periods",
+    "views": {
+      "day": "Diena",
+      "week": "Nedēļa",
+      "month": "Mēnesis",
+      "year": "Gads",
+      "list": "Saraksts"
+    },
+    "status": {
+      "DRAFT": "Melnraksts",
+      "PUBLISHED": "Publicēts",
+      "LIVE": "Notiek",
+      "ENDED": "Beidzies",
+      "ARCHIVED": "Arhivēts"
+    }
+  },
+  "footer": {
+    "departmentName": "Digitālās transformācijas departaments",
+    "presidencyName": "Ministru padomes prezidentūra",
+    "privacy": "Privātuma politika",
+    "accessibility": "Pieejamības paziņojums",
+    "openSource": "Atvērtā pirmkoda programmatūra",
+    "contacts": "Kontakti",
+    "legalNotes": "Juridiskās piezīmes",
+    "governmentSite": "Itālijas valdība",
+    "systemStatus": "Sistēmas statuss"
+  },
+  "pages": {
+    "privacyTitle": "Privātuma politika",
+    "privacyNotConfigured": "Privātuma politika vēl nav konfigurēta.",
+    "accessibilityTitle": "Pieejamības paziņojums",
+    "accessibilityNotConfigured": "Pieejamības paziņojums vēl nav konfigurēts."
+  },
+  "video": {
+    "play": "Atskaņot",
+    "pause": "Pauze",
+    "speed": "Ātrums",
+    "fullscreen": "Pilnekrāns",
+    "pip": "Picture in Picture",
+    "volume": "Skaļums",
+    "mute": "Izslēgt skaņu",
+    "unmute": "Ieslēgt skaņu",
+    "download": "Lejupielādēt ierakstu",
+    "speedLabel": "Atskaņošanas ātrums",
+    "progress": "Progresa josla"
+  },
+  "diagram": {
+    "title": "Pasākuma konfigurācija",
+    "topology": "Topoloģija",
+    "features": "Aktīvās funkcijas",
+    "estimates": "Resursu novērtējums",
+    "moderator": "Moderators",
+    "participants": "Dalībnieki",
+    "jvb": "Video Bridge",
+    "jibri": "Ierakstīšana",
+    "bandwidth": {
+      "moderator": "Moderatora joslas platums",
+      "participant": "Dalībnieka joslas platums",
+      "total": "Novērtētais kopējais joslas platums"
+    },
+    "jvbCount": "Nepieciešamo JVB skaits",
+    "jvbRam": "Novērtētā JVB RAM",
+    "storage": "Ierakstu glabātuve",
+    "duration": "Novērtētais ilgums",
+    "viewOnly": "Tikai skatīšana",
+    "preview": "Konfigurācijas priekšskatījums"
+  },
+  "waiting": {
+    "startsIn": "Pasākums sāksies pēc",
+    "eventLive": "Pasākums notiek!",
+    "connectedParticipants": "{count, plural, =0 {Nav dalībnieku} =1 {1 pievienojies dalībnieks} zero {# pievienojušos dalībnieku} one {# pievienojies dalībnieks} other {# pievienojušies dalībnieki}}",
+    "elapsedTime": "Notiek jau {minutes} minūtes",
+    "youAreLate": "Pasākums sākās pirms {minutes} minūtēm",
+    "chooseHowToJoin": "Izvēlieties, kā piedalīties:",
+    "enterLive": "Pievienoties TIEŠRAIDEI",
+    "enterLiveDesc": "Piedalieties tiešraidē. Ierakstam varat piekļūt pēc pasākuma.",
+    "enterNow": "Pievienoties tagad",
+    "watchFromStart": "Skatīt no sākuma",
+    "watchFromStartDesc": "Skatiet ierakstu no sākuma un pievienojieties tiešraidei jebkurā brīdī.",
+    "watchNow": "Skatīt",
+    "switchToLive": "Pārslēgties uz tiešraidi",
+    "enterRoom": "Ienākt telpā",
+    "recordingNotice": "Šis pasākums tiek ierakstīts.",
+    "recordingAvailableAfter": "Ieraksts būs pieejams pēc pasākuma.",
+    "autoRefreshHint": "Lapa automātiski atjaunināsies, kad pasākums sāksies.",
+    "startEventButton": "Sākt pasākumu",
+    "startingEvent": "Sākšana...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 gaidošais} zero {# gaidošo} one {# gaidošais} other {# gaidošie}}",
+    "jvbScaling": "Telpa tiek gatavota...",
+    "jvbScalingDetail": "Video serveri tiek startēti. Tas aizņem aptuveni 2 minūtes.",
+    "jvbReady": "Telpa gatava!"
+  },
+  "recording": {
+    "management": "Video ieraksts",
+    "inProgress": "Notiek",
+    "available": "Ieraksts pieejams",
+    "duration": "Ilgums",
+    "fileSize": "Faila izmērs",
+    "startedAt": "Sākts",
+    "automatic": "automātisks",
+    "publish": "Publicēt ierakstu",
+    "publishDesc": "Padarīt video pieejamu pasākuma lapā",
+    "retentionLabel": "Saglabāšana",
+    "retention": {
+      "24h": "24 stundas (pagaidu)",
+      "7d": "7 dienas",
+      "30d": "30 dienas",
+      "90d": "90 dienas",
+      "forever": "Nekad (līdz pasākuma termiņa beigām)"
+    },
+    "retentionNote": "Video jebkurā gadījumā ievēros pasākuma GDPR saglabāšanas politiku",
+    "delete": "Dzēst ierakstu",
+    "deleteConfirm": "Vai esat pārliecināts? Video tiks neatgriezeniski dzēsts.",
+    "notConfigured": "Jibri nav konfigurēts infrastruktūrā. Video ierakstīšana nav pieejama.",
+    "play": "Atskaņot",
+    "download": "Lejupielādēt"
+  },
+  "postEvent": {
+    "config": "Pēcpasākuma konfigurācija",
+    "pageVisible": "Pasākuma lapa redzama pēc beigām",
+    "showQA": "Rādīt Q&A jautājumus",
+    "showMaterials": "Rādīt kopīgotos materiālus",
+    "showPolls": "Rādīt aptauju rezultātus",
+    "showFeedback": "Rādīt atsauksmes",
+    "feedbackEnabled": "Atsauksmju aptauja aktīva pasākuma beigās",
+    "visibilityAlways": "Vienmēr redzams",
+    "visibilityUntil": "Redzams līdz:",
+    "dataRetentionNote": "Dalībnieku personas dati tiks dzēsti saskaņā ar pasākuma saglabāšanas politiku ({days} dienas). Pasākuma saturs būs pieejams, kamēr lapa ir redzama.",
+    "availableUntil": "Šis pasākums un tā saturs būs pieejams līdz {date}.",
+    "tabs": {
+      "qa": "Jautājumi un atbildes",
+      "materials": "Materiāli",
+      "polls": "Aptaujas",
+      "feedback": "Atsauksmes"
+    }
+  }
+}

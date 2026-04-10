@@ -1,4 +1,5 @@
 import { prisma } from './db';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export interface AnalyticsOverview {
   totalEvents: number;
@@ -191,7 +192,7 @@ export async function getEventAnalytics(
 
     return {
       eventId: e.id,
-      title: e.titleIt,
+      title: getLocalized(e.title as LocalizedField, 'it'),
       date: e.startsAt.toISOString(),
       registrations: totalRegs,
       participants,

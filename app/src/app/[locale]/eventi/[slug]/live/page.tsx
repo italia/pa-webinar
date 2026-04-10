@@ -6,6 +6,7 @@ import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { isJibriAvailable } from '@/lib/infrastructure';
 import LiveEventClient from '@/components/live/live-event-client';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +43,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // No token: guest access or redirect
   if (!token) {
     if (event.status === 'LIVE') {
-      const title = locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
+      const title = getLocalized(event.title as LocalizedField, locale);
       return (
         <LiveEventClient
           event={{
@@ -94,7 +95,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     participantInfo = { displayName: registration.displayName };
   }
 
-  const title = locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
+  const title = getLocalized(event.title as LocalizedField, locale);
 
   return (
     <LiveEventClient

@@ -16,10 +16,8 @@ async function loadUpcomingEvents() {
   return events.map((e) => ({
     id: e.id,
     slug: e.slug,
-    titleIt: e.titleIt,
-    titleEn: e.titleEn,
-    descriptionIt: e.descriptionIt,
-    descriptionEn: e.descriptionEn,
+    title: e.title as Record<string, string>,
+    description: e.description as Record<string, string> | null,
     startsAt: e.startsAt.toISOString(),
     endsAt: e.endsAt.toISOString(),
     timezone: e.timezone,
@@ -27,8 +25,7 @@ async function loadUpcomingEvents() {
     registrationCount: e._count.registrations,
     status: e.status,
     recordingUrl: e.recordingUrl,
-    speakersIt: e.speakersIt,
-    speakersEn: e.speakersEn,
+    speakersInfo: e.speakersInfo as Record<string, string> | null,
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,
   }));

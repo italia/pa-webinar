@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 
+import type { Prisma } from '@prisma/client';
+
 import { prisma } from '@/lib/db';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -30,10 +32,9 @@ const updateSettingsSchema = z.object({
     url: z.string().max(500),
     section: z.enum(['main', 'legal']).optional(),
   })).max(20).optional(),
-  privacyPolicyIt: z.string().max(100000).nullish(),
-  privacyPolicyEn: z.string().max(100000).nullish(),
-  accessibilityIt: z.string().max(100000).nullish(),
-  accessibilityEn: z.string().max(100000).nullish(),
+  privacyPolicy: z.record(z.string(), z.string().max(100000)).optional(),
+  accessibility: z.record(z.string(), z.string().max(100000)).optional(),
+  defaultLocale: z.string().min(2).max(5).optional(),
   statusPageEnabled: z.boolean().optional(),
   guestAccessEnabled: z.boolean().optional(),
   publicRegistrationEnabled: z.boolean().optional(),
@@ -102,9 +103,10 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
     );
   }
 
+  // Zod Record<string,string> is structurally InputJsonValue but TS can't prove it
   const updated = await prisma.siteSetting.update({
     where: { id: 'singleton' },
-    data: parsed.data,
+    data: parsed.data as Prisma.SiteSettingUpdateInput,
   });
 
   invalidateSettingsCache();

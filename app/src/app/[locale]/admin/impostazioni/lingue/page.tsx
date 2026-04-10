@@ -17,6 +17,7 @@ export default async function LanguagesPage() {
   const settings = await getSettings();
 
   const config = {
+    defaultLocale: settings.defaultLocale ?? 'it',
     availableLocales: (settings.availableLocales ?? ['it', 'en']) as string[],
     localeNames: (settings.localeNames ?? {
       it: 'Italiano',

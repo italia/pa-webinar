@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "DTD Üritused",
+    "appDescription": "Digitaalsete avalike ürituste platvorm, mille on loonud Digitaalse Ümberkujundamise Osakond",
+    "loading": "Laadimine...",
+    "error": "Ilmnes viga",
+    "errorMessage": "Midagi läks valesti. Palun proovige uuesti.",
+    "retry": "Proovi uuesti",
+    "save": "Salvesta",
+    "cancel": "Tühista",
+    "confirm": "Kinnita",
+    "close": "Sulge",
+    "back": "Tagasi",
+    "next": "Edasi",
+    "send": "Saada",
+    "delete": "Kustuta",
+    "edit": "Muuda",
+    "search": "Otsi",
+    "noResults": "Tulemusi ei leitud",
+    "requiredField": "Kohustuslik väli"
+  },
+  "nav": {
+    "home": "Avaleht",
+    "events": "Üritused",
+    "about": "Teave",
+    "privacy": "Privaatsus",
+    "admin": "Haldus",
+    "language": "Keel",
+    "switchLanguage": "Vaheta keelt",
+    "skipToContent": "Liigu sisuni",
+    "skipToFooter": "Liigu jalusesse"
+  },
+  "header": {
+    "slimTitle": "Ministrite Nõukogu Kantselei",
+    "slimSubtitle": "Digitaalse Ümberkujundamise Osakond",
+    "followUs": "Jälgige meid"
+  },
+  "events": {
+    "title": "Üritused",
+    "upcoming": "Eelseisvad üritused",
+    "past": "Möödunud üritused",
+    "noUpcoming": "Hetkel pole planeeritud üritusi. Tulge hiljem tagasi!",
+    "noPast": "Möödunud üritusi pole",
+    "card": {
+      "publicEvent": "Avalik üritus",
+      "readMore": "Loe lähemalt",
+      "liveNow": "Toimub praegu",
+      "spotsAvailable": "{count} vaba kohta",
+      "fullyBooked": "Kõik kohad täidetud",
+      "ended": "Lõppenud",
+      "occupiedSpots": "{registered}/{max} registreerunud"
+    },
+    "detail": {
+      "title": "Ürituse üksikasjad",
+      "date": "Kuupäev ja kellaaeg",
+      "duration": "Kestus",
+      "durationHours": "{hours} t {minutes} min",
+      "timezone": "Ajavöönd",
+      "description": "Kirjeldus",
+      "participants": "Osalejad",
+      "maxParticipants": "{count} kohta kokku",
+      "spotsLeft": "{count} kohta jäänud",
+      "occupiedSpots": "{registered} kohta {max}-st on hõivatud",
+      "full": "Kõik kohad täidetud",
+      "register": "Registreeru üritusele",
+      "registerAndJoin": "Registreeru ja osale",
+      "registered": "Olete registreeritud",
+      "enterEvent": "Sisene üritusele",
+      "eventEnded": "Üritus on lõppenud",
+      "eventHeldOn": "See üritus toimus {date}",
+      "totalRegistrations": "{count} registreerunud osalejat",
+      "recording": "Salvestis on saadaval",
+      "noRecording": "Selle ürituse videosalvestis pole saadaval.",
+      "watchRecording": "Vaata salvestist",
+      "backToEvents": "Tagasi ürituste juurde",
+      "speakers": "Esinejad",
+      "organizer": "Korraldaja",
+      "chatNotSaved": "Vestlussõnumeid ei salvestata pärast ürituse lõppu.",
+      "qaPostEvent": "Ürituse küsimused ja vastused",
+      "peakParticipants": "Tipp: {count} osalejat",
+      "calendar": {
+        "addToCalendar": "Lisa kalendrisse",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": "Laadi alla .ics fail"
+      }
+    },
+    "manage": {
+      "toggleChat": "Vestlus",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Salvestamine",
+      "settingsSection": "Ürituse seaded"
+    },
+    "status": {
+      "DRAFT": "Mustand",
+      "PUBLISHED": "Avaldatud",
+      "LIVE": "Toimub",
+      "ENDED": "Lõppenud",
+      "ARCHIVED": "Arhiveeritud"
+    }
+  },
+  "registration": {
+    "title": "Üritusele registreerumine",
+    "name": "Ees- ja perekonnanimi",
+    "namePlaceholder": "Teie nime kuvatakse ürituse ruumis",
+    "email": "E-post",
+    "emailPlaceholder": "Saate üritusele ligipääsu lingi",
+    "gdprConsent": "Nõustun oma isikuandmete (nimi, e-post) töötlemisega vastavalt ELi määrusele 2016/679 (GDPR) selles üritusel osalemiseks.",
+    "gdprLink": "Lugege täielikku privaatsuspoliitikat",
+    "submit": "Kinnita registreerumine",
+    "submitting": "Registreerimine...",
+    "success": "Registreerumine lõpetatud!",
+    "successMessage": "Saate kinnitusmeili koos lingiga üritusele ligipääsuks.",
+    "alreadyRegistered": "Olete juba sellele üritusele registreeritud",
+    "backToEvent": "Tagasi ürituse juurde",
+    "organization": "Organisatsioon",
+    "organizationPlaceholder": "nt AGID, Majandusministeerium, Rooma linnavalitsus",
+    "organizationRole": "Roll organisatsioonis",
+    "organizationRolePlaceholder": "nt Digiülemineku juht, Arendaja",
+    "organizationType": "Organisatsiooni tüüp",
+    "organizationTypePlaceholder": "Valige tüüp...",
+    "organizationTypes": {
+      "MINISTRY": "Ministeerium",
+      "AGENCY": "Agentuur",
+      "REGION": "Piirkond",
+      "PROVINCE": "Provints",
+      "MUNICIPALITY": "Omavalitsus",
+      "ASL": "ASL (Kohalik tervishoiuasutus)",
+      "UNIVERSITY": "Ülikool",
+      "PUBLIC_ENTITY": "Avalik-õiguslik asutus",
+      "IN_HOUSE": "Sihtasutus",
+      "OTHER": "Muu"
+    },
+    "gdprConsentProfiling": "Organisatsiooni andmeid töödeldakse statistilistel eesmärkidel.",
+    "errors": {
+      "nameRequired": "Palun sisestage oma nimi",
+      "emailRequired": "Palun sisestage oma e-posti aadress",
+      "emailInvalid": "Palun sisestage kehtiv e-posti aadress",
+      "organizationRequired": "Palun sisestage oma organisatsioon",
+      "consentRequired": "Nõusolek andmetöötluseks on kohustuslik",
+      "recordingConsentRequired": "Selle ürituse jaoks on salvestamise nõusolek kohustuslik",
+      "eventFull": "Üritus on saavutanud osalejate maksimaalse arvu",
+      "generic": "Registreerumisel ilmnes viga. Palun proovige uuesti."
+    }
+  },
+  "live": {
+    "title": "Ürituse ruum",
+    "connecting": "Ühendamine...",
+    "connectionError": "Ruumiga ei saa ühendust. Kontrollige ühendust ja proovige uuesti.",
+    "recordingActive": "Salvestamine käib",
+    "recordingConsent": "Seda üritust salvestatakse. Sisenedes nõustute heli-/videosalvestamisega.",
+    "recordingConsentTitle": "Salvestamise nõusolek",
+    "declineRecording": "Ei osale",
+    "enterRoom": "Sisene ruumi",
+    "leaveRoom": "Lahku ruumist",
+    "eventNotStarted": "Üritus ei ole veel alanud",
+    "eventStartsAt": "Üritus algab {date} kell {time}",
+    "countdown": "Jäänud aega",
+    "waitingRoomHint": "See leht uueneb automaatselt, kui moderaator ürituse käivitab. Lehte pole vaja uuesti laadida.",
+    "startEventButton": "Käivita üritus",
+    "startingEvent": "Käivitamine...",
+    "chatNotSaved": "Vestlussõnumeid ei salvestata pärast ürituse lõppu.",
+    "registerAndJoin": "Registreeru ja osale",
+    "registerNow": "Toimub praegu — Registreeruge!",
+    "enableMusic": "Lülita muusika sisse",
+    "disableMusic": "Lülita muusika välja",
+    "preJoinSubtitle": "Olete sisenemas ürituse ruumi",
+    "preJoinNameLabel": "Teie nimi",
+    "guestJoinSubtitle": "Liituge toimuva üritusega külalisena",
+    "guestJoinButton": "Sisene külalisena",
+    "guestRedirectToRegister": "Üritus ei ole veel alanud. Registreeruge, et saada ligipääsu link.",
+    "jibriUnavailable": "Salvestamine pole saadaval — Jibri pole seadistatud",
+    "jibriNotConfigured": "Salvestamine pole infrastruktuuris seadistatud",
+    "eventEnded": "Üritus on lõppenud",
+    "eventEndedMessage": "Üritus on lõppenud. Täname osalemise eest.",
+    "backToEvent": "Tagasi ürituse juurde",
+    "moderatorBadge": "Moderaator",
+    "qaSidebarPlaceholder": "Q&A paneel on saadaval, kui üritus algab.",
+    "invalidToken": "Vigane link. Palun kontrollige e-postiga saadud linki.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Küsitlused",
+    "sidebarTabMaterials": "Materjalid",
+    "sidebarTabParticipants": "Osalejad",
+    "role": {
+      "moderator": "Moderaator",
+      "participant": "Osaleja",
+      "guest": "Külaline"
+    },
+    "participants": {
+      "title": "Osalejad",
+      "noParticipants": "Osalejaid pole",
+      "kick": "Eemalda",
+      "kickConfirm": "Kas olete kindel, et soovite selle osaleja eemaldada?"
+    },
+    "moderator": {
+      "muteAll": "Vaigista kõik",
+      "unmuteAll": "Tühista kõigi vaigistus",
+      "startRecording": "Alusta salvestamist",
+      "stopRecording": "Peata salvestamine",
+      "toggleChat": "Vestlus sisse/välja",
+      "endEvent": "Lõpeta üritus",
+      "endEventConfirm": "Kas olete kindel, et soovite ürituse kõigi osalejate jaoks lõpetada?",
+      "participantCount": "{count} osalejat",
+      "raisedHands": "Tõstetud käed",
+      "noRaisedHands": "Tõstetud käsi pole",
+      "giveFloor": "Anna sõna",
+      "approveAudio": "Anna sõna (heli)",
+      "approveVideo": "Anna sõna (video)",
+      "approveAll": "Anna sõna",
+      "audioOnly": "Ainult heli",
+      "audioModeration": "Osalejate mikrofon",
+      "videoModeration": "Osalejate video",
+      "eventEndedSuccess": "Üritus on edukalt lõpetatud. Suunamine..."
+    }
+  },
+  "qa": {
+    "title": "Küsimused ja vastused",
+    "askQuestion": "Esita küsimus",
+    "placeholder": "Kirjutage oma küsimus (max 500 tähemärki)",
+    "submit": "Saada küsimus",
+    "submitting": "Saatmine...",
+    "questionSent": "Küsimus esitatud!",
+    "cooldownWait": "Oodake {seconds} s...",
+    "upvote": "Hääleta",
+    "upvoted": "Hääletatud",
+    "noQuestions": "Küsimusi veel pole. Olge esimene!",
+    "qaPersistenceNote": "Küsimused salvestatakse ja on saadaval pärast üritust.",
+    "qaPostEvent": "Ürituse küsimused ja vastused",
+    "noAnsweredQuestions": "Selle ürituse kohta vastatud küsimusi pole.",
+    "filterAll": "Kõik",
+    "showPanel": "Näita Q&A",
+    "hidePanel": "Peida Q&A",
+    "status": {
+      "PENDING": "Ootel",
+      "HIGHLIGHTED": "Esiletõstetud",
+      "ANSWERED": "Vastatud",
+      "DISMISSED": "Tagasi lükatud"
+    },
+    "moderator": {
+      "highlight": "Tõsta esile",
+      "markAnswered": "Märgi vastatuks",
+      "dismiss": "Lükka tagasi",
+      "resetToPending": "Taasta"
+    },
+    "errors": {
+      "textRequired": "Kirjutage oma küsimus",
+      "tooLong": "Küsimus ei tohi ületada 500 tähemärki",
+      "rateLimit": "Palun oodake enne järgmise küsimuse esitamist",
+      "generic": "Viga küsimuse esitamisel"
+    }
+  },
+  "polls": {
+    "title": "Küsitlused",
+    "showPanel": "Näita küsitlused",
+    "hidePanel": "Peida küsitlused",
+    "createPoll": "Loo küsitlus",
+    "noPolls": "Küsitlusi pole. Moderaator loob need ürituse ajal.",
+    "questionPlaceholder": "Kirjutage küsitluse küsimus...",
+    "optionPlaceholder": "Variant {number}",
+    "addOption": "Lisa variant",
+    "removeOption": "Eemalda variant",
+    "create": "Loo",
+    "creating": "Loomine...",
+    "cancelCreate": "Tühista",
+    "closePoll": "Sulge hääletus",
+    "publishResults": "Avalda tulemused",
+    "reopenPoll": "Ava uuesti",
+    "totalVotes": "{count} häält",
+    "voted": "Olete hääletanud",
+    "status": {
+      "OPEN": "Avatud",
+      "CLOSED": "Suletud",
+      "PUBLISHED": "Tulemused"
+    },
+    "errors": {
+      "questionRequired": "Kirjutage küsitluse küsimus",
+      "minOptions": "Vaja on vähemalt 2 varianti",
+      "generic": "Viga küsitluse loomisel"
+    }
+  },
+  "materials": {
+    "title": "Materjalid",
+    "postEventTitle": "Ürituse materjalid",
+    "addMaterial": "Lisa materjal",
+    "titleLabel": "Pealkiri",
+    "urlLabel": "Lingi URL",
+    "descriptionLabel": "Kirjeldus (valikuline)",
+    "addedBy": "Lisas {name}",
+    "noMaterials": "Materjale pole jagatud.",
+    "confirmDelete": "Kas olete kindel, et soovite selle materjali kustutada?",
+    "materialAdded": "Materjal lisatud",
+    "materialDeleted": "Materjal kustutatud",
+    "deleteMaterial": "Kustuta materjal",
+    "add": "Lisa",
+    "adding": "Lisamine...",
+    "cancel": "Tühista",
+    "errors": {
+      "urlInvalid": "Palun sisestage kehtiv URL",
+      "generic": "Viga materjali lisamisel"
+    }
+  },
+  "reminders": {
+    "title": "Teavitused",
+    "addReminder": "Lisa meeldetuletus",
+    "removeReminder": "Eemalda",
+    "maxReminders": "Maksimaalselt 5 meeldetuletust ürituse kohta.",
+    "selectPreset": "Valige aeg...",
+    "sentStatus": "{count} saadetud",
+    "notSent": "Saatmata",
+    "presets": {
+      "7days": "7 päeva enne",
+      "3days": "3 päeva enne",
+      "1day": "1 päev enne",
+      "12hours": "12 tundi enne",
+      "6hours": "6 tundi enne",
+      "3hours": "3 tundi enne",
+      "1hour": "1 tund enne",
+      "30min": "30 minutit enne",
+      "15min": "15 minutit enne"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Ürituste haldus",
+      "settings": "Süsteemi seaded",
+      "eventsList": "Ürituste nimekiri",
+      "newEvent": "Uus üritus",
+      "calendar": "Kalender",
+      "templates": "Mallid",
+      "analytics": "Statistika",
+      "infrastructure": "Infrastruktuur",
+      "settingsGeneral": "Üldised",
+      "settingsLanguages": "Keeled",
+      "ariaLabel": "Halduse navigatsioon",
+      "subNavAriaLabel": "Jaotise navigatsioon"
+    },
+    "landing": {
+      "title": "Halduspaneel",
+      "subtitle": "Hallake üritusi ja seadistage platvormi",
+      "eventsTitle": "Ürituste haldus",
+      "eventsDescription": "Looge, muutke ja hallake üritusi, malle ja statistikat.",
+      "settingsTitle": "Süsteemi seaded",
+      "settingsDescription": "Seadistage brändi, sisu, keeli, funktsioone ja infrastruktuuri.",
+      "liveNow": "{count, plural, one {# otseüritus} other {# otseüritust}}",
+      "upcomingEvents": "{count, plural, one {# eelseisev üritus} other {# eelseisvat üritust}}"
+    },
+    "recording": {
+      "title": "Videosalvestis",
+      "play": "Esita",
+      "download": "Laadi alla",
+      "delete": "Kustuta salvestis",
+      "deleteConfirm": "Kas olete kindel, et soovite selle salvestise kustutada? Seda toimingut ei saa tagasi võtta.",
+      "notConfigured": "Videosalvestamine pole saadaval. Jibri pole infrastruktuuris seadistatud.",
+      "inProgress": "Salvestamine käib..."
+    },
+    "login": {
+      "title": "Administraatori ligipääs",
+      "keyLabel": "Pääsuvõti",
+      "keyPlaceholder": "Sisestage pääsuvõti",
+      "submit": "Logi sisse",
+      "invalidKey": "Vigane pääsuvõti",
+      "logout": "Logi välja"
+    },
+    "title": "Ürituste haldus",
+    "subtitle": "Halduspaneel",
+    "createEvent": "Loo uus üritus",
+    "editEvent": "Muuda üritust",
+    "deleteEvent": "Kustuta üritus",
+    "deleteConfirm": "Kas olete kindel, et soovite selle ürituse kustutada? Seda toimingut ei saa tagasi võtta.",
+    "publish": "Avalda",
+    "unpublish": "Tühista avaldamine",
+    "noToken": "Ürituste haldamiseks kasutage e-postiga saadud moderaatori linki.",
+    "noEvents": "Üritusi ei leitud. Looge oma esimene üritus.",
+    "eventDetails": "Ürituse üksikasjad",
+    "registrations": "Registreerimised",
+    "registrationCount": "{count} registreerimist",
+    "noRegistrations": "Veel pole registreeritud osalejaid. Jagage ürituse linki!",
+    "exportCsv": "Ekspordi CSV",
+    "organization": "Organisatsioon",
+    "organizationType": "Tüüp",
+    "registrationDate": "Registreerimise kuupäev",
+    "joined": "Liitunud",
+    "notJoined": "Ei liitunud",
+    "deleteSuccess": "Üritus kustutatud",
+    "publishSuccess": "Üritus avaldatud",
+    "unpublishSuccess": "Ürituse avaldamine tühistatud",
+    "startEvent": "Käivita üritus",
+    "startEventSuccess": "Üritus käivitatud! Ootavad osalejad suunatakse automaatselt.",
+    "jvbWarmupWarning": "Videoservereid käivitatakse (umbes 2 minutit). Osalejad näevad teadet ootesaalis.",
+    "eventIsLive": "Üritus toimub",
+    "joinAsModeratorBtn": "Sisene moderaatorina",
+    "openPublicPage": "Ava avalik leht",
+    "quickActions": "Kiirtoimingud",
+    "liveRoomLink": "Ürituse ruumi link",
+    "manage": "Halda",
+    "settingsSaved": "Salvestatud",
+    "toggleChatDesc": "Luba vestlus osalejate vahel",
+    "toggleQaDesc": "Luba küsimused hääletamisega",
+    "toggleRecordingDesc": "Salvesta üritus (nõuab Jibri)",
+    "eventUpdated": "Üritus edukalt uuendatud!",
+    "dateChangedNotification": "Kuupäev on muudetud. Registreerunud osalejaid teavitatakse e-postiga.",
+    "eventCreated": "Üritus edukalt loodud!",
+    "createEventCta": "Korralda üritus",
+    "createEventExplanation": "Looge oma üritus ja saate lingi selle haldamiseks.",
+    "noAccountNeeded": "Kontot pole vaja — moderaatori link on teie ligipääs ürituse haldamiseks.",
+    "form": {
+      "titleIt": "Pealkiri (itaalia k.)",
+      "titleEn": "Pealkiri (inglise k.)",
+      "descriptionIt": "Kirjeldus (itaalia k.)",
+      "descriptionEn": "Kirjeldus (inglise k.)",
+      "startsAt": "Alguskuupäev ja -kellaaeg",
+      "endsAt": "Lõpukuupäev ja -kellaaeg",
+      "maxParticipants": "Osalejate maksimaalne arv",
+      "qaEnabled": "Luba Q&A",
+      "chatEnabled": "Luba vestlus",
+      "recordingEnabled": "Luba videosalvestamine",
+      "dataRetentionDays": "Andmete säilitamine (päevad pärast üritust)",
+      "dataRetentionHint": "Pärast seda perioodi kustutatakse osalejate registreerimised, Q&A küsimused ja videosalvestised automaatselt.",
+      "privacyPolicyUrl": "Privaatsuspoliitika URL",
+      "moderatorName": "Moderaatori nimi",
+      "moderatorEmail": "Moderaatori e-post",
+      "speakersIt": "Esinejad (itaalia k.)",
+      "speakersEn": "Esinejad (inglise k.)",
+      "organizerName": "Korraldaja",
+      "imageUrl": "Kaanepildi URL",
+      "waitingRoomAudioUrl": "Ootesaali heli URL (valikuline)",
+      "waitingRoomAudioUrlHint": "Sisestage ootesaali muusika MP3-faili URL. Jätke tühjaks vaikimisi heli kasutamiseks.",
+      "submit": "Loo üritus",
+      "submitEdit": "Salvesta muudatused",
+      "saving": "Salvestamine...",
+      "creating": "Loomine...",
+      "sectionContent": "Sisu",
+      "sectionSchedule": "Ajakava",
+      "sectionSettings": "Seaded",
+      "sectionSpeakers": "Esinejad ja korraldaja",
+      "sectionModerator": "Moderaator",
+      "sectionRegistrationFields": "Registreerimisväljad",
+      "requireOrganization": "Nõua organisatsiooni",
+      "requireOrganizationDesc": "Osalejad peavad märkima oma organisatsiooni",
+      "requireOrganizationRole": "Nõua rolli organisatsioonis",
+      "requireOrganizationRoleDesc": "Osalejad saavad märkida oma rolli",
+      "requireOrganizationType": "Nõua organisatsiooni tüüpi",
+      "requireOrganizationTypeDesc": "Osalejad valivad oma organisatsiooni tüübi",
+      "sectionPermissions": "Osalejate õigused",
+      "participantsCanUnmute": "Osalejad saavad mikrofoni sisse lülitada",
+      "participantsCanStartVideo": "Osalejad saavad veebikaamera sisse lülitada",
+      "participantsCanShareScreen": "Osalejad saavad ekraani jagada",
+      "permissionsOnDesc": "Osalejad saavad iseseisvalt aktiveerida",
+      "permissionsOffDesc": "Ainult moderaatorid saavad aktiveerida. Osalejad peavad käe tõstma.",
+      "permissionsNote": "Õiguste muudatused kehtivad uutele osalejatele.",
+      "privacyPolicyMode": "Privaatsuspoliitika",
+      "privacyPolicyModeUrl": "Väline URL",
+      "privacyPolicyModeText": "Kohandatud tekst",
+      "privacyPolicyText": "Privaatsuspoliitika tekst",
+      "privacyPolicyTextHint": "Kirjutage privaatsuspoliitika tekst. See kuvatakse registreerimisvormi sees.",
+      "retentionPreviewTitle": "Mis kustutatakse automaatselt",
+      "retentionPreviewIntro": "{days} päeva pärast ürituse lõppu kustutatakse automaatselt:",
+      "retentionPreviewParticipants": "Osalejate andmed (nimi, e-post, organisatsioon)",
+      "retentionPreviewQa": "Q&A küsimused ja hääled",
+      "retentionPreviewPolls": "Küsitluste tulemused",
+      "retentionPreviewRecordings": "Videosalvestised",
+      "retentionPreviewKept": "Koondstatistika ja ürituse metaandmed säilitatakse.",
+      "configPreview": "Seadistuse eelvaade",
+      "templateApplied": "Mall rakendatud: {name}. Saate kõiki seadeid muuta."
+    },
+    "links": {
+      "title": "Ürituse lingid",
+      "publicPage": "Ürituse avalik leht",
+      "moderatorLink": "Moderaatori link",
+      "moderatorLinkHint": "Jagage seda linki ainult moderaatoritega. Igaüks, kellel on see link, saab üritust hallata.",
+      "copyLink": "Kopeeri link",
+      "copied": "Kopeeritud!"
+    },
+    "feedbackAdmin": {
+      "title": "Tagasiside tulemused",
+      "averageRating": "Keskmine hinne",
+      "totalVotes": "{count, plural, one {# hinnang} other {# hinnangut}}",
+      "noFeedback": "Tagasisidet pole saadud",
+      "comments": "Osalejate kommentaarid",
+      "noComments": "Kommentaare pole",
+      "stars": "tärni"
+    },
+    "gdprAuditLog": {
+      "title": "GDPR auditilogi",
+      "date": "Kuupäev",
+      "action": "Toiming",
+      "recordCount": "Kirjed",
+      "details": "Üksikasjad",
+      "actions": {
+        "DATA_DELETED": "Andmed kustutatud",
+        "CONSENT_RECORDED": "Nõusolek registreeritud",
+        "DATA_EXPORTED": "Andmed eksporditud"
+      }
+    },
+    "settings": {
+      "title": "Saidi seaded",
+      "subtitle": "Seadistage platvormi välimus ja käitumine AH taaskasutuseks",
+      "saving": "Salvestamine...",
+      "saved": "Seaded edukalt salvestatud",
+      "tabs": {
+        "branding": "Bränd",
+        "header": "Päis",
+        "seo": "SEO",
+        "homepage": "Avaleht",
+        "pages": "Lehed",
+        "footer": "Jalus",
+        "features": "Funktsioonid"
+      },
+      "header": {
+        "slimBarTitle": "Ülemine riba (Slim Header)",
+        "slimBarDescription": "Õhuke riba lehe ülaosas, mis näitab emaorganisatsiooni.",
+        "parentOrganization": "Emaorganisatsioon",
+        "parentOrganizationHelp": "Nt \"Ministrite Nõukogu Kantselei\"",
+        "parentOrganizationUrl": "Emaorganisatsiooni URL",
+        "centerBarTitle": "Keskne päis",
+        "centerBarDescription": "Peamine päise ala rakenduse nime ja logoga.",
+        "appName": "Rakenduse nimi",
+        "appNameHelp": "Kuvatakse päises ja brauseri pealkirjas",
+        "organizationShort": "Organisatsiooni lühendnimi",
+        "logoUrl": "Logo URL",
+        "logoUrlHelp": "Jätke tühjaks vaikimisi AH ikooni kasutamiseks",
+        "organizationUrl": "Organisatsiooni veebisaidi URL"
+      },
+      "branding": {
+        "siteName": "Rakenduse nimi",
+        "siteNameHelp": "Kuvatakse päises, brauseri pealkirjas ja e-kirjades",
+        "siteDescription": "Rakenduse kirjeldus",
+        "organizationName": "Organisatsiooni nimi",
+        "organizationNameHelp": "nt Digitaalse Ümberkujundamise Osakond",
+        "organizationNameShort": "Organisatsiooni lühend",
+        "organizationUrl": "Organisatsiooni URL",
+        "parentOrganization": "Emaorganisatsioon",
+        "parentOrganizationHelp": "nt Ministrite Nõukogu Kantselei",
+        "parentOrganizationUrl": "Emaorganisatsiooni URL",
+        "logoUrl": "Kohandatud logo URL",
+        "logoUrlHelp": "Jätke tühjaks vaikimisi AH ikooni kasutamiseks",
+        "faviconUrl": "Favicon URL",
+        "primaryColor": "Põhivärv",
+        "defaultTimezone": "Vaikimisi ajavöönd",
+        "defaultTimezoneHelp": "Kasutatakse kuupäevade kuvamiseks ja uute ürituste loomiseks."
+      },
+      "watermark": {
+        "title": "Video kohandamine",
+        "enabled": "Vesimärk lubatud",
+        "url": "Vesimärgi URL",
+        "urlHelp": "Läbipaistva SVG või PNG pildi URL. Jätke tühjaks organisatsiooni logo kasutamiseks.",
+        "opacity": "Läbipaistmatus",
+        "position": "Asukoht",
+        "previewLabel": "Videoala eelvaade",
+        "positions": {
+          "bottomLeft": "All vasakul",
+          "bottomRight": "All paremal",
+          "topLeft": "Ülal vasakul",
+          "topRight": "Ülal paremal"
+        }
+      },
+      "seo": {
+        "title": "SEO pealkiri",
+        "titleHelp": "Pealkiri, mida kuvatakse otsingutulemustes ja brauseri vahekaardil",
+        "description": "SEO kirjeldus",
+        "descriptionHelp": "Kirjeldus otsingumootoritele ja sotsiaalmeedia jagamiseks",
+        "image": "Open Graph pilt",
+        "imageHelp": "Vaikimisi pilt sotsiaalmeedia jagamiseks (soovitatav 1200x630)"
+      },
+      "homepage": {
+        "modeLabel": "Avalehe režiim",
+        "modes": {
+          "LANDING": {
+            "title": "Maandumisleht",
+            "description": "Peablokk, funktsioonid, eelseisvad üritused ja kuidas see toimib"
+          },
+          "EVENTS_LIST": {
+            "title": "Ürituste nimekiri",
+            "description": "Kuva ürituste nimekiri otse"
+          },
+          "CUSTOM": {
+            "title": "Kohandatud",
+            "description": "Kohandatud HTML-sisu + ürituste nimekiri"
+          }
+        },
+        "customHtmlLabel": "Kohandatud HTML-sisu",
+        "customHtmlHelp": "HTML, mida kuvatakse avalehe põhiosas"
+      },
+      "pages": {
+        "privacyTitle": "Privaatsuspoliitika",
+        "privacyIt": "Sisu (itaalia k.)",
+        "privacyEn": "Sisu (inglise k.)",
+        "accessibilityTitle": "Ligipääsetavuse avaldus",
+        "accessibilityIt": "Sisu (itaalia k.)",
+        "accessibilityEn": "Sisu (inglise k.)",
+        "preview": "Eelvaade"
+      },
+      "footer": {
+        "linksTitle": "Jaluse lingid",
+        "addLink": "Lisa link",
+        "noLinks": "Linke pole seadistatud. Kasutatakse vaikelinke.",
+        "linkTitle": "Pealkiri",
+        "linkSection": "Jaotis",
+        "sectionLegal": "Õigusteave",
+        "sectionMain": "Peamine",
+        "moveUp": "Liiguta üles",
+        "moveDown": "Liiguta alla",
+        "removeLink": "Eemalda link"
+      },
+      "features": {
+        "statusPageEnabled": "Olekuleht lubatud",
+        "statusPageEnabledHelp": "Kuva teenuse olekuleht",
+        "guestAccessEnabled": "Külaliste ligipääs lubatud",
+        "guestAccessEnabledHelp": "Luba külaliste ligipääs toimuvatele üritustele",
+        "publicRegistrationEnabled": "Avalik registreerumine lubatud",
+        "publicRegistrationEnabledHelp": "Igaüks saab üritusi luua (kui keelatud, ainult administraatorid)",
+        "calendarPublic": "Avalik kalender",
+        "calendarPublicHelp": "Avalda ürituste kalender. Külastajad saavad näha planeeritud üritusi.",
+        "githubUrl": "GitHub hoidla URL",
+        "supportEmail": "Toe e-post"
+      }
+    },
+    "analytics": {
+      "title": "Statistika",
+      "subtitle": "Platvormi mõõdikute ülevaade",
+      "timeline": "Ajakäik",
+      "topEvents": "Parimad üritused",
+      "noData": "Selle perioodi kohta andmed puuduvad.",
+      "period": {
+        "7d": "7 päeva",
+        "30d": "30 päeva",
+        "90d": "90 päeva",
+        "all": "Kõik"
+      },
+      "metrics": {
+        "totalEvents": "Üritusi kokku",
+        "totalRegistrations": "Registreerimised",
+        "totalParticipants": "Osalejad",
+        "conversionRate": "Keskmine konversioonimäär",
+        "peakParticipants": "Osalejate tipp"
+      },
+      "table": {
+        "event": "Üritus",
+        "date": "Kuupäev",
+        "registrations": "Registreerimised",
+        "participants": "Osalejad",
+        "peak": "Tipp",
+        "questions": "Q&A",
+        "conversion": "Konversioon",
+        "noEvents": "Üritusi ei leitud."
+      },
+      "quickStats": {
+        "title": "Kiirstatistika",
+        "avgDuration": "Ürituste keskmine kestus",
+        "avgQuestionsPerEvent": "Q&A küsimusi ürituse kohta",
+        "totalPollVotes": "Küsitluste hääli kokku",
+        "avgParticipantsPerEvent": "Osalejaid ürituse kohta keskmiselt",
+        "avgFeedbackRating": "Tagasiside keskmine hinne",
+        "totalFeedback": "Tagasiside vastuseid"
+      }
+    },
+    "templates": {
+      "title": "Ürituste mallid",
+      "subtitle": "Hallake eelseadistatud malle ürituste kiireks loomiseks",
+      "create": "Uus mall",
+      "deleteConfirm": "Kas olete kindel, et soovite selle malli kustutada?",
+      "system": "Süsteem",
+      "nameLabel": "Malli nimi",
+      "descriptionLabel": "Kirjeldus",
+      "maxParticipantsLabel": "Max osalejaid",
+      "featuresLabel": "Funktsioonid",
+      "recordingLabel": "Salvestamine",
+      "unmute": "Osalejate mikrofon",
+      "video": "Osalejate video",
+      "screen": "Ekraanijagamine",
+      "pickerTitle": "Valige mall",
+      "pickerSubtitle": "Valige mall ürituse seadete eelseadistamiseks või jätke vahele, et kõik käsitsi seadistada.",
+      "skipTemplate": "Seadista käsitsi"
+    },
+    "instantCall": {
+      "title": "Kiire videokõne",
+      "subtitle": "Looge videokõne koheselt ja jagage linki. Planeerimist pole vaja.",
+      "nameLabel": "Kõne nimi",
+      "namePlaceholder": "nt Kiire kohtumine, Projekti demo...",
+      "moderatorLabel": "Teie nimi (valikuline)",
+      "moderatorPlaceholder": "Kuvatakse kõnes",
+      "create": "Loo ja liitu",
+      "creating": "Loomine...",
+      "copyLink": "Kopeeri kutse link",
+      "copied": "Kopeeritud!",
+      "hint": "Kõik saavad mikrofoni, veebikaamera sisse lülitada ja ekraani jagada. Ainult teie saate salvestada ja kõne lõpetada."
+    },
+    "files": {
+      "title": "Failid ja materjalid",
+      "upload": "Laadi fail üles",
+      "selectFile": "Vali fail",
+      "fileTitle": "Pealkiri",
+      "visibility": "Nähtavus",
+      "visibilityAlways": "Alati nähtav",
+      "visibilityBefore": "Ainult enne üritust",
+      "visibilityDuring": "Ainult ürituse ajal",
+      "visibilityAfter": "Ainult pärast üritust",
+      "uploading": "Üleslaadimine...",
+      "uploadBtn": "Laadi üles",
+      "deleteConfirm": "Kas olete kindel, et soovite selle faili kustutada?",
+      "noFiles": "Faile pole üles laaditud. Kasutage nuppu \"Laadi fail üles\", et materjale lisada."
+    },
+    "languages": {
+      "title": "Keelte haldus",
+      "subtitle": "Seadistage saadaolevad keeled ja kohandage tõlkeid",
+      "configuredLocales": "Seadistatud keeled",
+      "localesDescription": "Valige kasutajaliideses saadaolevad keeled. Itaalia keel on kohustuslik vaikekeelena.",
+      "addLocale": "Lisa keel",
+      "localeCode": "Keelekood",
+      "localeName": "Keele nimi",
+      "selectLocale": "Valige...",
+      "add": "Lisa",
+      "default": "Vaikimisi",
+      "editTranslations": "Muuda tõlkeid",
+      "saved": "Keelte seadistus salvestatud",
+      "saveNote": "Saadaolevate keelte muudatuste jõustumiseks URL-aadressides on vajalik taaskäivitus.",
+      "translationOverrides": "Kohandatud tõlked — {locale}",
+      "overridesDescription": "Kirjutage selle keele vaiketõlked üle. Kasutage punktmärgendit (nt common.appName).",
+      "keyLabel": "Tõlkevõti",
+      "valueLabel": "Väärtus",
+      "addOverride": "Lisa"
+    },
+    "infrastructure": {
+      "title": "Infrastruktuur",
+      "subtitle": "Komponentide olek ja keskkonna seadistus",
+      "deploymentMode": "Juurutusrežiim",
+      "version": "Versioon",
+      "environment": "Keskkond",
+      "modes": {
+        "simple": "Lihtne (Docker Compose)",
+        "standard": "Standard (Kubernetes)",
+        "full": "Täielik (Kubernetes koos scale-to-zero)",
+        "unknown": "Tundmatu"
+      },
+      "database": {
+        "title": "Andmebaas",
+        "internal": "Klastris (PostgreSQL)",
+        "external": "Väline",
+        "connected": "Ühendatud",
+        "disconnected": "Kättesaamatu"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Kättesaadav",
+        "unreachable": "Kättesaamatu",
+        "notConfigured": "Seadistamata"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero aktiivne",
+        "replicas": "{current}/{max} sõlme",
+        "preScale": "Eelskaala: {minutes} min",
+        "fixedMode": "Fikseeritud režiim",
+        "scalerEnabled": "Skaleerija lubatud"
+      },
+      "jibri": {
+        "title": "Salvestamine (Jibri)",
+        "available": "Saadaval",
+        "notConfigured": "Seadistamata",
+        "storageType": "Salvestusruum",
+        "configureHint": "Videosalvestamine vajab Jibri. Seadistage salvestusruum selle lubamiseks.",
+        "docsLink": "Dokumentatsioon"
+      },
+      "email": {
+        "title": "E-post",
+        "configured": "Seadistatud",
+        "notConfigured": "Seadistamata"
+      },
+      "features": {
+        "title": "Funktsioonid",
+        "statusPage": "Olekuleht",
+        "guestAccess": "Külaliste ligipääs",
+        "metrics": "Mõõdikute lõpp-punkt"
+      },
+      "note": "Infrastruktuuri muudatused tehakse Helmi konfiguratsiooni ja CI/CD torustiku kaudu.",
+      "deployDocs": "Juurutusdokumentatsioon"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Registreerumine kinnitatud: {eventTitle}",
+    "confirmationHeading": "Registreerumine kinnitatud",
+    "confirmationKeepNote": "Hoidke see e-kiri alles — see sisaldab teie isiklikku linki üritusele ligipääsuks.",
+    "reminderSubject": "Meeldetuletus: {eventTitle} algab 1 tunni pärast",
+    "reminderHeading": "Ürituse meeldetuletus",
+    "reminderNote": "Üritus, millele registreerusite, algab vähem kui tunni pärast. Kasutage allolevat linki liitumiseks.",
+    "recordingSubject": "Salvestis saadaval: {eventTitle}",
+    "joinLabel": "Liitu üritusega",
+    "viewEvent": "Vaata ürituse lehte",
+    "eventLabel": "Üritus",
+    "dateLabel": "Kuupäev",
+    "timeLabel": "Kellaaeg",
+    "durationLabel": "Kestus"
+  },
+  "home": {
+    "hero": {
+      "title": "Avalikud digitaalsed üritused",
+      "subtitle": "Veebiseminaride, esitluste ja avalike kohtumiste platvorm, mille on loonud Digitaalse Ümberkujundamise Osakond",
+      "browseEvents": "Sirvi üritusi",
+      "organizeEvent": "Korralda üritus"
+    },
+    "features": {
+      "title": "Avaliku halduse ürituste platvorm",
+      "video": {
+        "title": "Videokonverentsid",
+        "desc": "Osalege avalikel üritustel kuni 300 osalejaga. Tarkvara pole vaja paigaldada."
+      },
+      "qa": {
+        "title": "Küsimused ja vastused",
+        "desc": "Esitage küsimusi ürituse ajal ja hääletage olulisemate poolt. Moderaator vastab otseülekandes."
+      },
+      "privacy": {
+        "title": "Privaatsus ja turvalisus",
+        "desc": "Andmed on kaitstud ja vastavad GDPR nõuetele. Isehallatav infrastruktuur Itaalias."
+      }
+    },
+    "upcoming": {
+      "title": "Eelseisvad üritused",
+      "viewAll": "Vaata kõiki üritusi",
+      "noEvents": "Eelseisvaid üritusi pole. Tulge peagi tagasi!"
+    },
+    "howItWorks": {
+      "title": "Kuidas see toimib",
+      "step1": {
+        "title": "Registreeruge",
+        "desc": "Registreeruge üritusele tasuta"
+      },
+      "step2": {
+        "title": "Saate lingi",
+        "desc": "E-kiri teie isikliku ligipääsu lingiga"
+      },
+      "step3": {
+        "title": "Osalege",
+        "desc": "Sisenege üritusele brauserist, paigaldamist pole vaja"
+      },
+      "step4": {
+        "title": "Suhelge",
+        "desc": "Esitage küsimusi, hääletage, osalege arutelus"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Nõustun selle ürituse heli-/videosalvestamisega",
+      "recordingRequired": "Selles üritusel osalemiseks on nõutav salvestamise nõusolek",
+      "futureCommunications": "Soovin saada teavet DTD tulevaste ürituste kohta"
+    },
+    "export": {
+      "title": "Minu andmed",
+      "subtitle": "Taotlege oma e-posti aadressiga seotud isikuandmete koopiat vastavalt GDPR artiklile 15.",
+      "emailLabel": "Teie e-posti aadress",
+      "emailPlaceholder": "Sisestage registreerumisel kasutatud e-posti aadress",
+      "emailInvalid": "Palun sisestage kehtiv e-posti aadress",
+      "submit": "Taotle oma andmeid",
+      "loading": "Otsimine...",
+      "noData": "Selle e-posti aadressi kohta andmeid ei leitud.",
+      "error": "Ilmnes viga. Palun proovige hiljem uuesti.",
+      "rateLimited": "Liiga palju päringuid. Palun proovige uuesti tunni pärast.",
+      "results": "Teie andmed",
+      "resultsDescription": "Leiti andmeid {count} ürituse kohta.",
+      "registrationData": "Registreerimisandmed",
+      "fieldName": "Nimi",
+      "fieldEmail": "E-post",
+      "fieldOrganization": "Organisatsioon",
+      "fieldRegisteredAt": "Registreerimise kuupäev",
+      "fieldConsent": "Nõusolek",
+      "questionsTitle": "Q&A küsimused",
+      "pollVotesTitle": "Küsitluste hääled",
+      "optionLabel": "Variant"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Privaatsuspoliitika",
+      "title": "Privaatsuspoliitika",
+      "intro": "See leht võtab kokku isikuandmete töötlemise seoses platvormi Eventi DTD kasutamisega ja avalikel üritustel osalemisega.",
+      "sections": {
+        "controller": {
+          "title": "Vastutav töötleja",
+          "body": "Isikuandmeid töödeldakse Digitaalse Ümberkujundamise Osakonna institutsioonilise tegevuse raames, et toetada avalike veebiürituste tehnilist ja organisatsioonilist korraldamist."
+        },
+        "data": {
+          "title": "Töödeldavad andmed ja eesmärgid",
+          "body": "Platvorm töötleb ainult andmeid, mis on rangelt vajalikud üritustele registreerimiseks ja neil osalemiseks, nagu nimi, e-posti aadress ja korraldaja seadistatud valikulised väljad. Andmeid kasutatakse isikliku ligipääsu lingi saatmiseks, osaluse haldamiseks, meeldetuletuste edastamiseks ja teenuse turvanõuete täitmiseks."
+        },
+        "retention": {
+          "title": "Andmete säilitamine ja õigused",
+          "body": "Andmeid säilitatakse iga ürituse jaoks seadistatud perioodi jooksul ja seejärel kustutatakse automaatselt, välja arvatud juhul, kui kehtivad muud õiguslikud kohustused. Andmesubjektid saavad igal ajal kasutada oma GDPR-i õigusi, sealhulgas juurdepääsu, parandamise ja kustutamise õigust, osakonna institutsiooniliste kanalite kaudu."
+        }
+      },
+      "note": {
+        "title": "Taotlege oma andmeid",
+        "body": "Kui osalesite üritusel ja soovite kontrollida, millised isikuandmed on seotud teie e-posti aadressiga, saate kasutada platvormil saadaolevat spetsiaalset funktsiooni.",
+        "linkLabel": "Taotle oma andmeid"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Ligipääsetavuse avaldus",
+      "title": "Ligipääsetavuse avaldus",
+      "intro": "Digitaalse Ümberkujundamise Osakond on pühendunud selle platvormi ligipääsetavaks muutmisele vastavalt avaliku sektori digiteenuste kehtivatele nõuetele.",
+      "sections": {
+        "commitment": {
+          "title": "Ligipääsetavuse kohustus",
+          "body": "Platvorm on loodud komponentidega, mis on kooskõlas .italia disainisüsteemiga, pöörates erilist tähelepanu klaviatuurinavigatsioonile, sisu semantilisele struktuurile ja liidese loetavusele peamiste ekraanisuuruste puhul."
+        },
+        "status": {
+          "title": "Vastavuse olek",
+          "body": "Ligipääsetavuse kontrolle ja parandusi tehakse pidevalt. Kõik järelejäänud probleemid lahendatakse järk-järgult teenuse arendamise ja korralise hoolduse käigus."
+        },
+        "feedback": {
+          "title": "Tagasiside ja kontaktid",
+          "body": "Ligipääsetavuse takistustest või teenuse kasutamise probleemidest teatamiseks saavad kasutajad pöörduda osakonna poole selle institutsiooniliste kanalite kaudu, märkides mõjutatud lehe ja probleemi lühikirjelduse."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Õigusteave",
+      "title": "Õigusteave",
+      "intro": "Platvormi Eventi DTD kasutamine toimub vastavalt käesolevale õigusteabele, milles on kokku võetud üldised kasutustingimused ja peamine teave teenuse kohta.",
+      "sections": {
+        "ownership": {
+          "title": "Teenuse omandiõigus",
+          "body": "Platvormi edendab Digitaalse Ümberkujundamise Osakond ning see on kättesaadav institutsioonilise tähtsusega avalike veebiürituste korraldamiseks ja nendel osalemiseks."
+        },
+        "usage": {
+          "title": "Teenuse kasutamine",
+          "body": "Kasutajad peavad teenust kasutama nõuetekohaselt, kahjustamata platvormi turvalisust, funktsioonide kättesaadavust ega ürituste sujuvat toimumist. Kuritarvitamine või ebaõige kasutamine võib kaasa tuua teenusele juurdepääsu piiranguid."
+        },
+        "liability": {
+          "title": "Vastutuse piirangud",
+          "body": "Ehkki rakendatakse asjakohaseid tehnilisi ja organisatsioonilisi meetmeid, ei saa osakond garanteerida katkestuste või tõrgete täielikku puudumist ettenägematute asjaolude, hooldustööde või väliste tegurite tõttu. Seadusest tulenevad vastutused kehtivad vastavalt kohaldatavale õigusele."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Süsteemi olek",
+    "subtitle": "Platvormi teenuste oleku reaalajas ülevaade.",
+    "allOperational": "Kõik süsteemid toimivad",
+    "degraded": "Vähenenud jõudlus",
+    "outage": "Teenuse katkestus",
+    "componentLabel": "Komponent",
+    "statusLabel": "Olek",
+    "operational": "Töötab",
+    "degradedLabel": "Aeglustunud",
+    "standby": "Ooterežiim",
+    "loading": "Laadimine...",
+    "fetchError": "Süsteemi olekut ei saa laadida",
+    "components": {
+      "app": "Veebiportaal",
+      "database": "Andmebaas",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Videosalvestamine",
+      "smtp": "E-post (SMTP)"
+    },
+    "jvbCapacity": "Video bridge'i mahtuvus",
+    "jvbStandby": "Ooterežiim — aktiveerub automaatselt vajaduse korral",
+    "jvbStandbyDetail": "Scale-to-zero aktiivne — eelseisvaid üritusi pole. JVB sõlmed luuakse automaatselt enne ürituse algust.",
+    "jvbScaling": "Käivitamine...",
+    "nodesActive": "aktiivsed sõlmed",
+    "nodesReady": "valmis sõlmed",
+    "scaling": "skaleerimine",
+    "jvbStress": "JVB koormus",
+    "participantsConnected": "ühendatud osalejad",
+    "videoInteractive": "interaktiivne",
+    "videoWebinar": "veebiseminar",
+    "participantsAvailable": "saadaolevad osalejad",
+    "upcomingEvents": "Eelseisvad üritused",
+    "noUpcomingEvents": "Eelseisvaid üritusi pole",
+    "jvbActivatesIn": "JVB aktiveerub {minutes} min pärast",
+    "liveNow": "Toimub praegu",
+    "activeEvents": "Aktiivsed üritused",
+    "registrationsToday": "Tänased registreerimised",
+    "jvbNodes": "JVB sõlmed",
+    "overallStatus": "Üldine olek",
+    "lastChecked": "Viimati kontrollitud",
+    "responseTime": "Vastamisaeg",
+    "systemStatus": "Süsteemi olek"
+  },
+  "feedback": {
+    "title": "Kuidas hindate seda üritust?",
+    "ratingLabel": "Valige hinnang 1 kuni 5 tärni",
+    "comment": "Kommentaar",
+    "commentPlaceholder": "Kas teil on soovitusi? (valikuline)",
+    "submit": "Saada tagasiside",
+    "submitting": "Saatmine...",
+    "skip": "Jäta vahele",
+    "thankYou": "Täname teie tagasiside eest!",
+    "averageRating": "Keskmine hinne",
+    "ratingCount": "{count} hinnangut",
+    "noFeedback": "Tagasisidet pole saadud"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Alusta",
+    "prompt": "Teema",
+    "promptPlaceholder": "nt Mida te sellelt ürituselt ootate?",
+    "duration": "Kestus",
+    "submit": "Saada",
+    "submitPlaceholder": "Sisestage sõna (max 30 tähemärki)",
+    "close": "Sulge Word Cloud",
+    "cancel": "Tühista",
+    "noActiveRound": "Hetkel pole aktiivset Word Cloud'i.",
+    "noWords": "Ootame esimesi sõnu...",
+    "wordsSubmitted": "{count} sõna saadetud",
+    "timeRemaining": "Jäänud aega"
+  },
+  "timer": {
+    "title": "Taimer",
+    "start": "Alusta",
+    "pause": "Paus",
+    "reset": "Lähtesta",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Kohandatud"
+    },
+    "showToAll": "Näita kõigile",
+    "timeUp": "Aeg on läbi!"
+  },
+  "reactions": {
+    "title": "Reaktsioonid",
+    "sendReaction": "Saada reaktsioon",
+    "reactionSent": "Reaktsioon saadetud!"
+  },
+  "calendar": {
+    "title": "Ürituste kalender",
+    "subtitle": "Vaadake kõiki üritusi ajas",
+    "publicTitle": "Ürituste kalender",
+    "publicSubtitle": "Avastage eelseisvad üritused",
+    "today": "Täna",
+    "prev": "Eelmine periood",
+    "next": "Järgmine periood",
+    "views": {
+      "day": "Päev",
+      "week": "Nädal",
+      "month": "Kuu",
+      "year": "Aasta",
+      "list": "Nimekiri"
+    },
+    "status": {
+      "DRAFT": "Mustand",
+      "PUBLISHED": "Avaldatud",
+      "LIVE": "Toimub",
+      "ENDED": "Lõppenud",
+      "ARCHIVED": "Arhiveeritud"
+    }
+  },
+  "footer": {
+    "departmentName": "Digitaalse Ümberkujundamise Osakond",
+    "presidencyName": "Ministrite Nõukogu Kantselei",
+    "privacy": "Privaatsuspoliitika",
+    "accessibility": "Ligipääsetavuse avaldus",
+    "openSource": "Avatud lähtekoodiga tarkvara",
+    "contacts": "Kontaktid",
+    "legalNotes": "Õigusteave",
+    "governmentSite": "Itaalia valitsus",
+    "systemStatus": "Süsteemi olek"
+  },
+  "pages": {
+    "privacyTitle": "Privaatsuspoliitika",
+    "privacyNotConfigured": "Privaatsuspoliitika pole veel seadistatud.",
+    "accessibilityTitle": "Ligipääsetavuse avaldus",
+    "accessibilityNotConfigured": "Ligipääsetavuse avaldus pole veel seadistatud."
+  },
+  "video": {
+    "play": "Esita",
+    "pause": "Paus",
+    "speed": "Kiirus",
+    "fullscreen": "Täisekraan",
+    "pip": "Picture in Picture",
+    "volume": "Helitugevus",
+    "mute": "Vaigista",
+    "unmute": "Taasta heli",
+    "download": "Laadi salvestis alla",
+    "speedLabel": "Esituskiirus",
+    "progress": "Edenemisriba"
+  },
+  "diagram": {
+    "title": "Ürituse seadistus",
+    "topology": "Topoloogia",
+    "features": "Aktiivsed funktsioonid",
+    "estimates": "Ressursside hinnang",
+    "moderator": "Moderaator",
+    "participants": "Osalejad",
+    "jvb": "Video Bridge",
+    "jibri": "Salvestamine",
+    "bandwidth": {
+      "moderator": "Moderaatori ribalaiuse",
+      "participant": "Osaleja ribalaiuse",
+      "total": "Hinnanguline kogu ribalaiuse"
+    },
+    "jvbCount": "Vajalike JVB-de arv",
+    "jvbRam": "Hinnanguline JVB RAM",
+    "storage": "Salvestiste salvestusruum",
+    "duration": "Hinnanguline kestus",
+    "viewOnly": "Ainult vaatamine",
+    "preview": "Seadistuse eelvaade"
+  },
+  "waiting": {
+    "startsIn": "Üritus algab",
+    "eventLive": "Üritus toimub!",
+    "connectedParticipants": "{count, plural, =0 {Osalejaid pole} =1 {1 ühendatud osaleja} one {# ühendatud osaleja} other {# ühendatud osalejat}}",
+    "elapsedTime": "Toimub juba {minutes} minutit",
+    "youAreLate": "Üritus algas {minutes} minutit tagasi",
+    "chooseHowToJoin": "Valige, kuidas osaleda:",
+    "enterLive": "Liitu OTSE",
+    "enterLiveDesc": "Osalege otseülekandes. Salvestisele saate alati pärast üritust ligi.",
+    "enterNow": "Liitu nüüd",
+    "watchFromStart": "Vaata algusest",
+    "watchFromStartDesc": "Vaadake salvestist algusest ja liituge otseülekandega, kui soovite.",
+    "watchNow": "Vaata",
+    "switchToLive": "Lülitu otseülekandele",
+    "enterRoom": "Sisene ruumi",
+    "recordingNotice": "Seda üritust salvestatakse.",
+    "recordingAvailableAfter": "Salvestis on saadaval pärast üritust.",
+    "autoRefreshHint": "Leht uueneb automaatselt, kui üritus algab.",
+    "startEventButton": "Käivita üritus",
+    "startingEvent": "Käivitamine...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 ootaja} one {# ootaja} other {# ootajat}}",
+    "jvbScaling": "Ruumi valmistatakse ette...",
+    "jvbScalingDetail": "Videoservereid käivitatakse. See võtab aega umbes 2 minutit.",
+    "jvbReady": "Ruum on valmis!"
+  },
+  "recording": {
+    "management": "Videosalvestis",
+    "inProgress": "Käib",
+    "available": "Salvestis saadaval",
+    "duration": "Kestus",
+    "fileSize": "Faili suurus",
+    "startedAt": "Alustatud",
+    "automatic": "automaatne",
+    "publish": "Avalda salvestis",
+    "publishDesc": "Muutke video ürituse lehel kättesaadavaks",
+    "retentionLabel": "Säilitamine",
+    "retention": {
+      "24h": "24 tundi (ajutine)",
+      "7d": "7 päeva",
+      "30d": "30 päeva",
+      "90d": "90 päeva",
+      "forever": "Mitte kunagi (kuni ürituse aegumiseni)"
+    },
+    "retentionNote": "Video järgib igal juhul ürituse GDPR säilitamispoliitikat",
+    "delete": "Kustuta salvestis",
+    "deleteConfirm": "Kas olete kindel? Video kustutatakse jäädavalt.",
+    "notConfigured": "Jibri pole infrastruktuuris seadistatud. Videosalvestamine pole saadaval.",
+    "play": "Esita",
+    "download": "Laadi alla"
+  },
+  "postEvent": {
+    "config": "Üritusejärgne seadistus",
+    "pageVisible": "Ürituse leht nähtav pärast lõppu",
+    "showQA": "Näita Q&A küsimusi",
+    "showMaterials": "Näita jagatud materjale",
+    "showPolls": "Näita küsitluste tulemusi",
+    "showFeedback": "Näita tagasisidet",
+    "feedbackEnabled": "Tagasisideküsitlus aktiivne ürituse lõpus",
+    "visibilityAlways": "Alati nähtav",
+    "visibilityUntil": "Nähtav kuni:",
+    "dataRetentionNote": "Osalejate isikuandmed kustutatakse vastavalt ürituse säilitamispoliitikale ({days} päeva). Ürituse sisu jääb kättesaadavaks, kuni leht on nähtav.",
+    "availableUntil": "See üritus ja selle sisu on saadaval kuni {date}.",
+    "tabs": {
+      "qa": "Küsimused ja vastused",
+      "materials": "Materjalid",
+      "polls": "Küsitlused",
+      "feedback": "Tagasiside"
+    }
+  }
+}

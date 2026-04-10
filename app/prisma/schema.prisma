@@ -12,10 +12,8 @@ datasource db {
 model Event {
   id          String   @id @default(uuid()) @db.Uuid
   slug        String   @unique
-  titleIt     String   @map("title_it")
-  titleEn     String?  @map("title_en")
-  descriptionIt String @map("description_it") @db.Text
-  descriptionEn String? @map("description_en") @db.Text
+  title       Json     @default("{}") @db.JsonB
+  description Json     @default("{}") @db.JsonB
   
   startsAt    DateTime @map("starts_at")
   endsAt      DateTime @map("ends_at")
@@ -52,8 +50,7 @@ model Event {
   privacyPolicyText  String? @map("privacy_policy_text") @db.Text
   
   // Additional info
-  speakersIt    String?  @map("speakers_it")
-  speakersEn    String?  @map("speakers_en")
+  speakersInfo  Json     @default("{}") @map("speakers_info") @db.JsonB
   organizerName String?  @map("organizer_name")
   imageUrl      String?  @map("image_url")
   waitingRoomAudioUrl String? @map("waiting_room_audio_url")
@@ -408,11 +405,9 @@ model SiteSetting {
   // Footer
   footerLinks          Json    @default("[]") @map("footer_links")
 
-  // Pages content (Markdown or HTML)
-  privacyPolicyIt      String? @map("privacy_policy_it") @db.Text
-  privacyPolicyEn      String? @map("privacy_policy_en") @db.Text
-  accessibilityIt      String? @map("accessibility_it") @db.Text
-  accessibilityEn      String? @map("accessibility_en") @db.Text
+  // Pages content (Markdown or HTML) — multilingual JSON
+  privacyPolicy        Json    @default("{}") @map("privacy_policy") @db.JsonB
+  accessibility        Json    @default("{}") @map("accessibility") @db.JsonB
 
   // Feature toggles
   statusPageEnabled         Boolean @default(true) @map("status_page_enabled")
@@ -431,6 +426,7 @@ model SiteSetting {
   supportEmail         String? @map("support_email")
 
   // i18n / locale management
+  defaultLocale          String @default("it") @map("default_locale")
   availableLocales       Json @default("[\"it\",\"en\"]") @map("available_locales")
   localeNames            Json @default("{\"it\":\"Italiano\",\"en\":\"English\"}") @map("locale_names")
   translationOverrides   Json @default("{}") @map("translation_overrides")
