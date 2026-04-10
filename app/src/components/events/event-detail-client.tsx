@@ -13,6 +13,7 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer from '@/components/events/video-player';
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
@@ -29,10 +30,8 @@ interface AnsweredQuestion {
 interface EventData {
   id: string;
   slug: string;
-  titleIt: string;
-  titleEn: string | null;
-  descriptionIt: string;
-  descriptionEn: string | null;
+  title: Record<string, string>;
+  description: Record<string, string>;
   startsAt: string;
   endsAt: string;
   timezone: string;
@@ -47,8 +46,7 @@ interface EventData {
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
   privacyPolicyUrl: string | null;
-  speakersIt: string | null;
-  speakersEn: string | null;
+  speakersInfo: Record<string, string> | null;
   organizerName: string | null;
   imageUrl: string | null;
   peakParticipants?: number;
@@ -111,12 +109,8 @@ export default function EventDetailClient({
   const tv = useTranslations('video');
   const format = useFormatter();
 
-  const title =
-    locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
-  const description =
-    locale === 'en' && event.descriptionEn
-      ? event.descriptionEn
-      : event.descriptionIt;
+  const title = getLocalized(event.title, locale);
+  const description = getLocalized(event.description, locale);
 
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
@@ -124,10 +118,7 @@ export default function EventDetailClient({
   const durationHours = Math.floor(durationMs / 3_600_000);
   const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
 
-  const speakers =
-    locale === 'en' && event.speakersEn
-      ? event.speakersEn
-      : (event.speakersIt ?? '');
+  const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
   const spotsLeft = event.maxParticipants - event.registrationCount;
   const isFull = spotsLeft <= 0;
@@ -354,7 +345,7 @@ export default function EventDetailClient({
                   participantsCanUnmute: event.participantsCanUnmute ?? false,
                   participantsCanStartVideo: event.participantsCanStartVideo ?? false,
                   participantsCanShareScreen: event.participantsCanShareScreen ?? false,
-                  speakersIt: event.speakersIt,
+                  speakers: getLocalized(event.speakersInfo as LocalizedField, locale),
                   startsAt: event.startsAt,
                   endsAt: event.endsAt,
                 }}

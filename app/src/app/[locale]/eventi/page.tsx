@@ -75,18 +75,15 @@ export default async function EventiPage() {
 interface EventWithCount {
   id: string;
   slug: string;
-  titleIt: string;
-  titleEn: string | null;
-  descriptionIt: string;
-  descriptionEn: string | null;
+  title: unknown;
+  description: unknown;
   startsAt: Date;
   endsAt: Date;
   timezone: string;
   maxParticipants: number;
   status: string;
   recordingUrl: string | null;
-  speakersIt: string | null;
-  speakersEn: string | null;
+  speakersInfo: unknown;
   organizerName: string | null;
   imageUrl: string | null;
   _count: { registrations: number };
@@ -96,10 +93,8 @@ function serialise(e: EventWithCount, _locale: string) {
   return {
     id: e.id,
     slug: e.slug,
-    titleIt: e.titleIt,
-    titleEn: e.titleEn,
-    descriptionIt: e.descriptionIt,
-    descriptionEn: e.descriptionEn,
+    title: e.title as Record<string, string>,
+    description: e.description as Record<string, string> | null,
     startsAt: e.startsAt.toISOString(),
     endsAt: e.endsAt.toISOString(),
     timezone: e.timezone,
@@ -107,8 +102,7 @@ function serialise(e: EventWithCount, _locale: string) {
     registrationCount: e._count.registrations,
     status: e.status,
     recordingUrl: e.recordingUrl,
-    speakersIt: e.speakersIt,
-    speakersEn: e.speakersEn,
+    speakersInfo: e.speakersInfo as Record<string, string> | null,
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,
   };

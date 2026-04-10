@@ -3,6 +3,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { getSettings } from '@/lib/settings';
 import LegalDocumentPage from '@/components/layout/legal-document-page';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 interface AccessibilityPageProps {
   params: Promise<{ locale: string }>;
@@ -24,8 +25,7 @@ export default async function AccessibilityPage() {
   const locale = await getLocale();
   const settings = await getSettings();
 
-  const dbContent =
-    locale === 'en' ? settings.accessibilityEn : settings.accessibilityIt;
+  const dbContent = getLocalized(settings.accessibility as LocalizedField, locale);
 
   if (dbContent) {
     return (

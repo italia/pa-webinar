@@ -138,12 +138,11 @@ async function main() {
   const event1 = await prisma.event.create({
     data: {
       slug: 'pa-digitale-2026-aggiornamenti',
-      titleIt: 'PA Digitale 2026 — Aggiornamenti e prossimi passi',
-      titleEn: 'PA Digitale 2026 — Updates and next steps',
-      descriptionIt:
-        'Webinar pubblico sugli aggiornamenti del piano PA Digitale 2026. Verranno presentati i risultati raggiunti e i prossimi obiettivi.',
-      descriptionEn:
-        'Public webinar on PA Digitale 2026 plan updates. Results achieved and upcoming goals will be presented.',
+      title: { it: 'PA Digitale 2026 — Aggiornamenti e prossimi passi', en: 'PA Digitale 2026 — Updates and next steps' },
+      description: {
+        it: 'Webinar pubblico sugli aggiornamenti del piano PA Digitale 2026. Verranno presentati i risultati raggiunti e i prossimi obiettivi.',
+        en: 'Public webinar on PA Digitale 2026 plan updates. Results achieved and upcoming goals will be presented.',
+      },
       startsAt: tomorrow,
       endsAt: tomorrowPlusTwo,
       maxParticipants: 300,
@@ -157,8 +156,7 @@ async function main() {
       moderatorToken: randomUUID(),
       moderatorName: 'Mario Rossi',
       moderatorEmail: 'mario.rossi@innovazione.gov.it',
-      speakersIt: 'Mario Rossi, Laura Bianchi, Giuseppe Verdi',
-      speakersEn: 'Mario Rossi, Laura Bianchi, Giuseppe Verdi',
+      speakersInfo: { it: 'Mario Rossi, Laura Bianchi, Giuseppe Verdi', en: 'Mario Rossi, Laura Bianchi, Giuseppe Verdi' },
       organizerName: 'Dipartimento per la Trasformazione Digitale',
       status: 'PUBLISHED',
       dataRetentionDays: 30,
@@ -168,12 +166,11 @@ async function main() {
   const event2 = await prisma.event.create({
     data: {
       slug: 'cloud-italia-strategia',
-      titleIt: 'Cloud Italia — Strategia e migrazione',
-      titleEn: 'Cloud Italia — Strategy and migration',
-      descriptionIt:
-        'Presentazione della strategia Cloud Italia e dei percorsi di migrazione per le PA. Sessione di Q&A con il team tecnico.',
-      descriptionEn:
-        'Presentation of Cloud Italia strategy and migration paths for public administrations. Q&A session with the technical team.',
+      title: { it: 'Cloud Italia — Strategia e migrazione', en: 'Cloud Italia — Strategy and migration' },
+      description: {
+        it: 'Presentazione della strategia Cloud Italia e dei percorsi di migrazione per le PA. Sessione di Q&A con il team tecnico.',
+        en: 'Presentation of Cloud Italia strategy and migration paths for public administrations. Q&A session with the technical team.',
+      },
       startsAt: inOneHour,
       endsAt: inTwoHours,
       maxParticipants: 200,
@@ -184,8 +181,7 @@ async function main() {
       moderatorToken: randomUUID(),
       moderatorName: 'Anna Bianchi',
       moderatorEmail: 'anna.bianchi@innovazione.gov.it',
-      speakersIt: 'Anna Bianchi, Marco Neri',
-      speakersEn: 'Anna Bianchi, Marco Neri',
+      speakersInfo: { it: 'Anna Bianchi, Marco Neri', en: 'Anna Bianchi, Marco Neri' },
       organizerName: 'Dipartimento per la Trasformazione Digitale',
       status: 'PUBLISHED',
       dataRetentionDays: 60,
@@ -195,12 +191,11 @@ async function main() {
   const event3 = await prisma.event.create({
     data: {
       slug: 'design-system-italia-workshop',
-      titleIt: 'Workshop: Design System .italia per sviluppatori',
-      titleEn: 'Workshop: .italia Design System for developers',
-      descriptionIt:
-        'Workshop pratico sull\'utilizzo del design system .italia e di Bootstrap Italia per lo sviluppo di servizi digitali della PA.',
-      descriptionEn:
-        'Hands-on workshop on using the .italia design system and Bootstrap Italia for developing PA digital services.',
+      title: { it: 'Workshop: Design System .italia per sviluppatori', en: 'Workshop: .italia Design System for developers' },
+      description: {
+        it: 'Workshop pratico sull\'utilizzo del design system .italia e di Bootstrap Italia per lo sviluppo di servizi digitali della PA.',
+        en: 'Hands-on workshop on using the .italia design system and Bootstrap Italia for developing PA digital services.',
+      },
       startsAt: lastWeek,
       endsAt: lastWeekPlusTwo,
       maxParticipants: 100,
@@ -210,8 +205,7 @@ async function main() {
       recordingEnabled: true,
       moderatorToken: randomUUID(),
       moderatorName: 'Luca Verdi',
-      speakersIt: 'Luca Verdi, Francesca Russo, Alessandro Conti',
-      speakersEn: 'Luca Verdi, Francesca Russo, Alessandro Conti',
+      speakersInfo: { it: 'Luca Verdi, Francesca Russo, Alessandro Conti', en: 'Luca Verdi, Francesca Russo, Alessandro Conti' },
       organizerName: 'Dipartimento per la Trasformazione Digitale',
       status: 'ENDED',
       recordingUrl: 'https://example.com/recordings/design-system-workshop.mp4',

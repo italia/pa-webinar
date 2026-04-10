@@ -2,7 +2,7 @@ import type { EventStatus } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
-import { resolveLocale } from '@/lib/utils/locale';
+import { resolveLocale, getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getSettings } from '@/lib/settings';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { cookies } from 'next/headers';
@@ -45,8 +45,7 @@ export const GET = withErrorHandling(async (request) => {
     select: {
       id: true,
       slug: true,
-      titleIt: true,
-      titleEn: true,
+      title: true,
       startsAt: true,
       endsAt: true,
       status: true,
@@ -57,8 +56,7 @@ export const GET = withErrorHandling(async (request) => {
   });
 
   const result = events.map((event) => {
-    const title =
-      locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
+    const title = getLocalized(event.title as LocalizedField, locale);
     return {
       id: event.id,
       slug: event.slug,

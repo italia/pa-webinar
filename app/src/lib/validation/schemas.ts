@@ -2,11 +2,17 @@ import { z } from 'zod';
 
 // ── Event Schemas ────────────────────────────────────
 
+const localizedStringField = z.record(z.string(), z.string());
+
 const eventBaseSchema = z.object({
-  titleIt: z.string().min(3).max(200),
-  titleEn: z.string().max(200).optional(),
-  descriptionIt: z.string().min(10).max(5000),
-  descriptionEn: z.string().max(5000).optional(),
+  title: localizedStringField.refine(
+    (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
+    { message: 'title.it is required and must be at least 3 characters' },
+  ),
+  description: localizedStringField.refine(
+    (obj) => typeof obj.it === 'string' && obj.it.length >= 10,
+    { message: 'description.it is required and must be at least 10 characters' },
+  ),
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime(),
   timezone: z.string().refine(
@@ -28,8 +34,7 @@ const eventBaseSchema = z.object({
   privacyPolicyText: z.string().max(10000).optional(),
   moderatorName: z.string().min(2).max(100).optional(),
   moderatorEmail: z.string().email().optional(),
-  speakersIt: z.string().max(1000).optional(),
-  speakersEn: z.string().max(1000).optional(),
+  speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),
   waitingRoomAudioUrl: z.string().url().optional(),
@@ -74,7 +79,10 @@ export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 // ── Instant Call Schema ──────────────────────────────
 
 export const createInstantCallSchema = z.object({
-  titleIt: z.string().min(2).max(200),
+  title: localizedStringField.refine(
+    (obj) => typeof obj.it === 'string' && obj.it.length >= 2,
+    { message: 'title.it is required and must be at least 2 characters' },
+  ),
   moderatorName: z.string().min(2).max(100).optional(),
 });
 

@@ -1,6 +1,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
 
@@ -253,7 +254,7 @@ export const GET = withErrorHandling(async () => {
       orderBy: { startsAt: 'asc' },
       take: 5,
       select: {
-        titleIt: true,
+        title: true,
         startsAt: true,
         status: true,
         maxParticipants: true,
@@ -275,7 +276,7 @@ export const GET = withErrorHandling(async () => {
       jvbParticipants: jvb.participants,
     },
     upcomingEvents: upcomingEvents.map((e) => ({
-      title: e.titleIt,
+      title: getLocalized(e.title as LocalizedField, 'it'),
       startsAt: e.startsAt.toISOString(),
       status: e.status,
       maxParticipants: e.maxParticipants,

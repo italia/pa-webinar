@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, type FormEvent } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Button,
   Alert,
@@ -12,9 +12,10 @@ import {
   Icon,
 } from 'design-react-kit';
 
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+
 interface ExportEventData {
-  titleIt: string;
-  titleEn: string | null;
+  title: Record<string, string>;
   startsAt: string;
   endsAt: string;
   status: string;
@@ -55,6 +56,7 @@ interface ExportEntry {
 
 export default function MyDataPage() {
   const t = useTranslations('gdpr.export');
+  const locale = useLocale();
 
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -154,12 +156,7 @@ export default function MyDataPage() {
                 >
                   <CardBody className="p-4">
                     <h3 className="h5 mb-3">
-                      {entry.event.titleIt}
-                      {entry.event.titleEn && (
-                        <span className="text-muted fw-normal ms-2" style={{ fontSize: '0.85rem' }}>
-                          ({entry.event.titleEn})
-                        </span>
-                      )}
+                      {getLocalized(entry.event.title as LocalizedField, locale)}
                     </h3>
 
                     {/* Registration data */}

@@ -14,14 +14,13 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 interface EventItem {
   id: string;
   slug: string;
-  titleIt: string;
-  titleEn: string | null;
-  descriptionIt: string | null;
-  descriptionEn: string | null;
+  title: Record<string, string>;
+  description: Record<string, string> | null;
   startsAt: string;
   endsAt: string;
   timezone: string;
@@ -29,8 +28,7 @@ interface EventItem {
   registrationCount: number;
   status: string;
   recordingUrl: string | null;
-  speakersIt?: string | null;
-  speakersEn?: string | null;
+  speakersInfo?: Record<string, string> | null;
   organizerName?: string | null;
   imageUrl?: string | null;
 }
@@ -51,16 +49,9 @@ export default function EventListClient({
   return (
     <Row className="g-4">
       {events.map((event) => {
-        const title =
-          locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
-        const desc =
-          locale === 'en' && event.descriptionEn
-            ? event.descriptionEn
-            : (event.descriptionIt ?? '');
-        const speakers =
-          locale === 'en' && event.speakersEn
-            ? event.speakersEn
-            : (event.speakersIt ?? '');
+        const title = getLocalized(event.title, locale);
+        const desc = getLocalized(event.description as LocalizedField, locale);
+        const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
         const spotsLeft = event.maxParticipants - event.registrationCount;
         const isFull = spotsLeft <= 0;
         const isLive = event.status === 'LIVE';

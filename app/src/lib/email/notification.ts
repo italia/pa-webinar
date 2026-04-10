@@ -9,6 +9,7 @@ import { generateEventICal } from '@/lib/ical/generate';
 import { sendEmail } from '@/lib/email/send';
 import { formatDate, formatTime } from '@/lib/utils/date-format';
 import { getPublicEnv } from '@/lib/env';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 type Locale = 'it' | 'en';
 
@@ -87,8 +88,8 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
 
       if (!event || event.registrations.length === 0) return;
 
-      const title = input.locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
-      const description = input.locale === 'en' && event.descriptionEn ? event.descriptionEn : event.descriptionIt;
+      const title = getLocalized(event.title as LocalizedField, input.locale);
+      const description = getLocalized(event.description as LocalizedField, input.locale);
       const date = formatDate(event.startsAt, input.locale, event.timezone);
       const time = formatTime(event.startsAt, input.locale, event.timezone);
 

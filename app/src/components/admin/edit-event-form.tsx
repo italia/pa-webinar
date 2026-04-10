@@ -26,10 +26,8 @@ interface FieldErrors {
 
 interface EventData {
   id: string;
-  titleIt: string;
-  titleEn: string | null;
-  descriptionIt: string;
-  descriptionEn: string | null;
+  title: Record<string, string>;
+  description: Record<string, string>;
   startsAt: string;
   endsAt: string;
   maxParticipants: number;
@@ -44,8 +42,7 @@ interface EventData {
   moderatorName: string | null;
   moderatorEmail: string | null;
   moderatorToken: string;
-  speakersIt: string | null;
-  speakersEn: string | null;
+  speakersInfo: Record<string, string> | null;
   organizerName: string | null;
   imageUrl: string | null;
   waitingRoomAudioUrl: string | null;
@@ -67,10 +64,8 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
   const router = useRouter();
 
   const [form, setForm] = useState({
-    titleIt: event.titleIt,
-    titleEn: event.titleEn ?? '',
-    descriptionIt: event.descriptionIt,
-    descriptionEn: event.descriptionEn ?? '',
+    title: { it: event.title?.it ?? '', en: event.title?.en ?? '' },
+    description: { it: event.description?.it ?? '', en: event.description?.en ?? '' },
     startsAt: toDatetimeLocalInTz(new Date(event.startsAt), eventTimezone),
     endsAt: toDatetimeLocalInTz(new Date(event.endsAt), eventTimezone),
     maxParticipants: event.maxParticipants,
@@ -84,8 +79,7 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
     privacyPolicyUrl: event.privacyPolicyUrl ?? '',
     moderatorName: event.moderatorName ?? '',
     moderatorEmail: event.moderatorEmail ?? '',
-    speakersIt: event.speakersIt ?? '',
-    speakersEn: event.speakersEn ?? '',
+    speakersInfo: { it: event.speakersInfo?.it ?? '', en: event.speakersInfo?.en ?? '' },
     organizerName: event.organizerName ?? '',
     imageUrl: event.imageUrl ?? '',
     waitingRoomAudioUrl: event.waitingRoomAudioUrl ?? '',
@@ -104,17 +98,35 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
     [],
   );
 
+  type LocalizedFormField = 'title' | 'description' | 'speakersInfo';
+  const setLocalizedField = useCallback(
+    (field: LocalizedFormField, locale: string, value: string) => {
+      setForm((prev) => ({
+        ...prev,
+        [field]: { ...prev[field], [locale]: value },
+      }));
+      setErrors((prev) => ({ ...prev, [`${field}.${locale}`]: undefined, [field]: undefined }));
+    },
+    [],
+  );
+
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
       setServerError('');
       setSuccess('');
 
+      const titleObj: Record<string, string> = { it: form.title.it };
+      if (form.title.en) titleObj.en = form.title.en;
+      const descObj: Record<string, string> = { it: form.description.it };
+      if (form.description.en) descObj.en = form.description.en;
+      const speakersObj: Record<string, string> = {};
+      if (form.speakersInfo.it) speakersObj.it = form.speakersInfo.it;
+      if (form.speakersInfo.en) speakersObj.en = form.speakersInfo.en;
+
       const payload = {
-        titleIt: form.titleIt,
-        titleEn: form.titleEn || undefined,
-        descriptionIt: form.descriptionIt,
-        descriptionEn: form.descriptionEn || undefined,
+        title: titleObj,
+        description: descObj,
         startsAt: fromDatetimeLocalInTz(form.startsAt, eventTimezone).toISOString(),
         endsAt: fromDatetimeLocalInTz(form.endsAt, eventTimezone).toISOString(),
         maxParticipants: form.maxParticipants,
@@ -128,8 +140,7 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
         privacyPolicyUrl: form.privacyPolicyUrl || undefined,
         moderatorName: form.moderatorName || undefined,
         moderatorEmail: form.moderatorEmail || undefined,
-        speakersIt: form.speakersIt || undefined,
-        speakersEn: form.speakersEn || undefined,
+        speakersInfo: Object.keys(speakersObj).length > 0 ? speakersObj : undefined,
         organizerName: form.organizerName || undefined,
         imageUrl: form.imageUrl || undefined,
         waitingRoomAudioUrl: form.waitingRoomAudioUrl || undefined,
@@ -139,7 +150,7 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
       if (!result.success) {
         const fieldErrors: FieldErrors = {};
         for (const issue of result.error.issues) {
-          const key = issue.path[0];
+          const key = issue.path.join('.');
           if (key && !fieldErrors[key]) {
             fieldErrors[key] = issue.message;
           }
@@ -188,6 +199,16 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
     ...(errors[key] ? { valid: false, infoText: errors[key] } : {}),
   });
 
+  const localizedInputProps = (field: string, locale: string, label: string) => {
+    const errorKey = `${field}.${locale}`;
+    return {
+      id: errorKey,
+      label,
+      validationText: errors[errorKey],
+      ...(errors[errorKey] ? { valid: false, infoText: errors[errorKey] } : {}),
+    };
+  };
+
   return (
     <form onSubmit={handleSubmit} noValidate>
       {serverError && (
@@ -210,11 +231,11 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
             <Col md={6}>
               <FormGroup className="mb-3">
                 <Input
-                  {...inputProps('titleIt', t('form.titleIt'))}
+                  {...localizedInputProps('title', 'it', t('form.titleIt'))}
                   type="text"
-                  value={form.titleIt}
+                  value={form.title.it}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setField('titleIt', e.target.value)
+                    setLocalizedField('title', 'it', e.target.value)
                   }
                   required
                 />
@@ -223,11 +244,11 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
             <Col md={6}>
               <FormGroup className="mb-3">
                 <Input
-                  {...inputProps('titleEn', t('form.titleEn'))}
+                  {...localizedInputProps('title', 'en', t('form.titleEn'))}
                   type="text"
-                  value={form.titleEn}
+                  value={form.title.en}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setField('titleEn', e.target.value)
+                    setLocalizedField('title', 'en', e.target.value)
                   }
                 />
               </FormGroup>
@@ -237,10 +258,10 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
             <Col md={6}>
               <FormGroup className="mb-3">
                 <TextArea
-                  {...inputProps('descriptionIt', t('form.descriptionIt'))}
-                  value={form.descriptionIt}
+                  {...localizedInputProps('description', 'it', t('form.descriptionIt'))}
+                  value={form.description.it}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setField('descriptionIt', e.target.value)
+                    setLocalizedField('description', 'it', e.target.value)
                   }
                   rows={4}
                   required
@@ -250,10 +271,10 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
             <Col md={6}>
               <FormGroup className="mb-3">
                 <TextArea
-                  {...inputProps('descriptionEn', t('form.descriptionEn'))}
-                  value={form.descriptionEn}
+                  {...localizedInputProps('description', 'en', t('form.descriptionEn'))}
+                  value={form.description.en}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setField('descriptionEn', e.target.value)
+                    setLocalizedField('description', 'en', e.target.value)
                   }
                   rows={4}
                 />
@@ -479,10 +500,10 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
             <Col md={6}>
               <FormGroup className="mb-3">
                 <TextArea
-                  {...inputProps('speakersIt', t('form.speakersIt'))}
-                  value={form.speakersIt}
+                  {...localizedInputProps('speakersInfo', 'it', t('form.speakersIt'))}
+                  value={form.speakersInfo.it}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setField('speakersIt', e.target.value)
+                    setLocalizedField('speakersInfo', 'it', e.target.value)
                   }
                   rows={2}
                 />
@@ -491,10 +512,10 @@ export default function EditEventForm({ event, eventTimezone }: EditEventFormPro
             <Col md={6}>
               <FormGroup className="mb-3">
                 <TextArea
-                  {...inputProps('speakersEn', t('form.speakersEn'))}
-                  value={form.speakersEn}
+                  {...localizedInputProps('speakersInfo', 'en', t('form.speakersEn'))}
+                  value={form.speakersInfo.en}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setField('speakersEn', e.target.value)
+                    setLocalizedField('speakersInfo', 'en', e.target.value)
                   }
                   rows={2}
                 />

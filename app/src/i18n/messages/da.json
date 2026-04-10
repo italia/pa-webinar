@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "DTD Begivenheder",
+    "appDescription": "Platform for offentlige digitale begivenheder fra Afdelingen for Digital Omstilling",
+    "loading": "Indlæser...",
+    "error": "Der opstod en fejl",
+    "errorMessage": "Noget gik galt. Prøv venligst igen.",
+    "retry": "Prøv igen",
+    "save": "Gem",
+    "cancel": "Annuller",
+    "confirm": "Bekræft",
+    "close": "Luk",
+    "back": "Tilbage",
+    "next": "Næste",
+    "send": "Send",
+    "delete": "Slet",
+    "edit": "Rediger",
+    "search": "Søg",
+    "noResults": "Ingen resultater",
+    "requiredField": "Obligatorisk felt"
+  },
+  "nav": {
+    "home": "Hjem",
+    "events": "Begivenheder",
+    "about": "Om os",
+    "privacy": "Privatlivspolitik",
+    "admin": "Administration",
+    "language": "Sprog",
+    "switchLanguage": "Skift sprog",
+    "skipToContent": "Gå til indhold",
+    "skipToFooter": "Gå til sidefod"
+  },
+  "header": {
+    "slimTitle": "Præsidiet for Ministerrådet",
+    "slimSubtitle": "Afdelingen for Digital Omstilling",
+    "followUs": "Følg os på"
+  },
+  "events": {
+    "title": "Begivenheder",
+    "upcoming": "Kommende begivenheder",
+    "past": "Tidligere begivenheder",
+    "noUpcoming": "Ingen kommende begivenheder i øjeblikket. Kig forbi igen snart!",
+    "noPast": "Ingen tidligere begivenheder",
+    "card": {
+      "publicEvent": "Offentlig begivenhed",
+      "readMore": "Læs mere",
+      "liveNow": "Live nu",
+      "spotsAvailable": "{count} pladser ledige",
+      "fullyBooked": "Fuldt booket",
+      "ended": "Afsluttet",
+      "occupiedSpots": "{registered}/{max} tilmeldte"
+    },
+    "detail": {
+      "title": "Begivenhedsdetaljer",
+      "date": "Dato og klokkeslæt",
+      "duration": "Varighed",
+      "durationHours": "{hours}t {minutes}min",
+      "timezone": "Tidszone",
+      "description": "Beskrivelse",
+      "participants": "Deltagere",
+      "maxParticipants": "{count} pladser i alt",
+      "spotsLeft": "{count} pladser tilbage",
+      "occupiedSpots": "{registered} af {max} pladser optaget",
+      "full": "Fuldt booket",
+      "register": "Tilmeld dig begivenheden",
+      "registerAndJoin": "Tilmeld dig og deltag",
+      "registered": "Du er tilmeldt",
+      "enterEvent": "Gå til begivenheden",
+      "eventEnded": "Begivenheden er afsluttet",
+      "eventHeldOn": "Denne begivenhed fandt sted den {date}",
+      "totalRegistrations": "{count} tilmeldte deltagere",
+      "recording": "Optagelse tilgængelig",
+      "noRecording": "Videooptagelse er ikke tilgængelig for denne begivenhed.",
+      "watchRecording": "Se optagelsen",
+      "backToEvents": "Tilbage til begivenheder",
+      "speakers": "Talere",
+      "organizer": "Arrangør",
+      "chatNotSaved": "Chatbeskeder gemmes ikke efter begivenhedens afslutning.",
+      "qaPostEvent": "Q&A fra begivenheden",
+      "peakParticipants": "Højeste antal: {count} deltagere",
+      "calendar": {
+        "addToCalendar": "Tilføj til kalender",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": "Download .ics-fil"
+      }
+    },
+    "manage": {
+      "toggleChat": "Chat",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Optagelse",
+      "settingsSection": "Begivenhedsindstillinger"
+    },
+    "status": {
+      "DRAFT": "Kladde",
+      "PUBLISHED": "Publiceret",
+      "LIVE": "Live",
+      "ENDED": "Afsluttet",
+      "ARCHIVED": "Arkiveret"
+    }
+  },
+  "registration": {
+    "title": "Tilmelding til begivenhed",
+    "name": "Fulde navn",
+    "namePlaceholder": "Dit navn vises i begivenhedsrummet",
+    "email": "E-mail",
+    "emailPlaceholder": "Du modtager adgangslinket til begivenheden",
+    "gdprConsent": "Jeg giver samtykke til behandling af mine personoplysninger (navn, e-mail) i henhold til EU-forordning 2016/679 (GDPR) med henblik på deltagelse i denne begivenhed.",
+    "gdprLink": "Læs den fulde privatlivspolitik",
+    "submit": "Bekræft tilmelding",
+    "submitting": "Tilmelder...",
+    "success": "Tilmelding gennemført!",
+    "successMessage": "Du modtager en bekræftelsesmail med linket til begivenheden.",
+    "alreadyRegistered": "Du er allerede tilmeldt denne begivenhed",
+    "backToEvent": "Tilbage til begivenheden",
+    "organization": "Organisation",
+    "organizationPlaceholder": "f.eks. AGID, Økonomiministeriet, Roms Kommune",
+    "organizationRole": "Rolle i organisationen",
+    "organizationRolePlaceholder": "f.eks. Ansvarlig for Digital Omstilling, Udvikler",
+    "organizationType": "Organisationstype",
+    "organizationTypePlaceholder": "Vælg type...",
+    "organizationTypes": {
+      "MINISTRY": "Ministerium",
+      "AGENCY": "Agentur",
+      "REGION": "Region",
+      "PROVINCE": "Provins",
+      "MUNICIPALITY": "Kommune",
+      "ASL": "ASL (Lokal sundhedsmyndighed)",
+      "UNIVERSITY": "Universitet",
+      "PUBLIC_ENTITY": "Offentlig virksomhed",
+      "IN_HOUSE": "In-house selskab",
+      "OTHER": "Andet"
+    },
+    "gdprConsentProfiling": "Organisationsdata behandles til statistiske formål.",
+    "errors": {
+      "nameRequired": "Indtast venligst dit navn",
+      "emailRequired": "Indtast venligst din e-mail",
+      "emailInvalid": "Indtast venligst en gyldig e-mail",
+      "organizationRequired": "Indtast venligst din organisation",
+      "consentRequired": "Samtykke til databehandling er påkrævet",
+      "recordingConsentRequired": "Samtykke til optagelse er påkrævet for denne begivenhed",
+      "eventFull": "Begivenheden har nået det maksimale antal deltagere",
+      "generic": "Fejl ved tilmelding. Prøv venligst igen."
+    }
+  },
+  "live": {
+    "title": "Begivenhedsrum",
+    "connecting": "Forbinder...",
+    "connectionError": "Kunne ikke oprette forbindelse til rummet. Kontroller forbindelsen, og prøv igen.",
+    "recordingActive": "Optagelse i gang",
+    "recordingConsent": "Denne begivenhed optages. Ved at deltage giver du samtykke til lyd-/videooptagelse.",
+    "recordingConsentTitle": "Samtykke til optagelse",
+    "declineRecording": "Deltag ikke",
+    "enterRoom": "Gå ind i rummet",
+    "leaveRoom": "Forlad rummet",
+    "eventNotStarted": "Begivenheden er endnu ikke startet",
+    "eventStartsAt": "Begivenheden starter den {date} kl. {time}",
+    "countdown": "Tid tilbage",
+    "waitingRoomHint": "Denne side opdateres automatisk, når moderatoren starter begivenheden. Det er ikke nødvendigt at genindlæse.",
+    "startEventButton": "Start begivenhed",
+    "startingEvent": "Starter...",
+    "chatNotSaved": "Chatbeskeder gemmes ikke efter begivenhedens afslutning.",
+    "registerAndJoin": "Tilmeld dig og deltag",
+    "registerNow": "Live nu — Tilmeld dig nu!",
+    "enableMusic": "Aktivér musik",
+    "disableMusic": "Deaktivér musik",
+    "preJoinSubtitle": "Du er ved at gå ind i begivenhedsrummet",
+    "preJoinNameLabel": "Dit navn",
+    "guestJoinSubtitle": "Deltag som gæst i den igangværende begivenhed",
+    "guestJoinButton": "Deltag som gæst",
+    "guestRedirectToRegister": "Begivenheden er endnu ikke startet. Tilmeld dig for at modtage dit adgangslink.",
+    "jibriUnavailable": "Optagelse ikke tilgængelig — Jibri ikke konfigureret",
+    "jibriNotConfigured": "Optagelse ikke konfigureret i infrastrukturen",
+    "eventEnded": "Begivenheden er afsluttet",
+    "eventEndedMessage": "Begivenheden er slut. Tak for din deltagelse.",
+    "backToEvent": "Tilbage til begivenheden",
+    "moderatorBadge": "Moderator",
+    "qaSidebarPlaceholder": "Q&A-panelet bliver tilgængeligt, når begivenheden starter.",
+    "invalidToken": "Ugyldigt link. Kontroller venligst linket, du modtog via e-mail.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Afstemninger",
+    "sidebarTabMaterials": "Materialer",
+    "sidebarTabParticipants": "Deltagere",
+    "role": {
+      "moderator": "Moderator",
+      "participant": "Deltager",
+      "guest": "Gæst"
+    },
+    "participants": {
+      "title": "Deltagere",
+      "noParticipants": "Ingen deltagere",
+      "kick": "Fjern",
+      "kickConfirm": "Er du sikker på, at du vil fjerne denne deltager?"
+    },
+    "moderator": {
+      "muteAll": "Slå alle fra",
+      "unmuteAll": "Slå alle til",
+      "startRecording": "Start optagelse",
+      "stopRecording": "Stop optagelse",
+      "toggleChat": "Chat til/fra",
+      "endEvent": "Afslut begivenhed",
+      "endEventConfirm": "Er du sikker på, at du vil afslutte begivenheden for alle deltagere?",
+      "participantCount": "{count} deltagere",
+      "raisedHands": "Håndsoprækning",
+      "noRaisedHands": "Ingen håndsoprækning",
+      "giveFloor": "Giv ordet",
+      "approveAudio": "Godkend lyd",
+      "approveVideo": "Godkend video",
+      "approveAll": "Giv ordet",
+      "audioOnly": "Kun lyd",
+      "audioModeration": "Deltagermikrofon",
+      "videoModeration": "Deltagervideo",
+      "eventEndedSuccess": "Begivenheden er afsluttet. Omdirigerer..."
+    }
+  },
+  "qa": {
+    "title": "Spørgsmål og svar",
+    "askQuestion": "Stil et spørgsmål",
+    "placeholder": "Skriv dit spørgsmål (maks. 500 tegn)",
+    "submit": "Send spørgsmål",
+    "submitting": "Sender...",
+    "questionSent": "Spørgsmål sendt!",
+    "cooldownWait": "Vent {seconds}s...",
+    "upvote": "Stem op",
+    "upvoted": "Stemt",
+    "noQuestions": "Ingen spørgsmål endnu. Vær den første!",
+    "qaPersistenceNote": "Spørgsmål gemmes og vil være tilgængelige efter begivenheden.",
+    "qaPostEvent": "Q&A fra begivenheden",
+    "noAnsweredQuestions": "Ingen besvarede spørgsmål for denne begivenhed.",
+    "filterAll": "Alle",
+    "showPanel": "Vis Q&A",
+    "hidePanel": "Skjul Q&A",
+    "status": {
+      "PENDING": "Afventer",
+      "HIGHLIGHTED": "Fremhævet",
+      "ANSWERED": "Besvaret",
+      "DISMISSED": "Afvist"
+    },
+    "moderator": {
+      "highlight": "Fremhæv",
+      "markAnswered": "Markér som besvaret",
+      "dismiss": "Afvis",
+      "resetToPending": "Nulstil"
+    },
+    "errors": {
+      "textRequired": "Skriv venligst dit spørgsmål",
+      "tooLong": "Spørgsmålet må ikke overstige 500 tegn",
+      "rateLimit": "Vent venligst, før du sender endnu et spørgsmål",
+      "generic": "Fejl ved afsendelse af spørgsmål"
+    }
+  },
+  "polls": {
+    "title": "Afstemninger",
+    "showPanel": "Vis afstemninger",
+    "hidePanel": "Skjul afstemninger",
+    "createPoll": "Opret afstemning",
+    "noPolls": "Ingen afstemninger endnu. Moderatoren opretter dem under begivenheden.",
+    "questionPlaceholder": "Skriv afstemningsspørgsmålet...",
+    "optionPlaceholder": "Valgmulighed {number}",
+    "addOption": "Tilføj valgmulighed",
+    "removeOption": "Fjern valgmulighed",
+    "create": "Opret",
+    "creating": "Opretter...",
+    "cancelCreate": "Annuller",
+    "closePoll": "Luk afstemning",
+    "publishResults": "Publicér resultater",
+    "reopenPoll": "Genåbn",
+    "totalVotes": "{count} stemmer",
+    "voted": "Du har stemt",
+    "status": {
+      "OPEN": "Åben",
+      "CLOSED": "Lukket",
+      "PUBLISHED": "Resultater"
+    },
+    "errors": {
+      "questionRequired": "Skriv afstemningsspørgsmålet",
+      "minOptions": "Mindst 2 valgmuligheder er påkrævet",
+      "generic": "Fejl ved oprettelse af afstemning"
+    }
+  },
+  "materials": {
+    "title": "Materialer",
+    "postEventTitle": "Begivenhedsmaterialer",
+    "addMaterial": "Tilføj materiale",
+    "titleLabel": "Titel",
+    "urlLabel": "Link-URL",
+    "descriptionLabel": "Beskrivelse (valgfrit)",
+    "addedBy": "Tilføjet af {name}",
+    "noMaterials": "Ingen materialer delt.",
+    "confirmDelete": "Er du sikker på, at du vil slette dette materiale?",
+    "materialAdded": "Materiale tilføjet",
+    "materialDeleted": "Materiale slettet",
+    "deleteMaterial": "Slet materiale",
+    "add": "Tilføj",
+    "adding": "Tilføjer...",
+    "cancel": "Annuller",
+    "errors": {
+      "urlInvalid": "Indtast venligst en gyldig URL",
+      "generic": "Fejl ved tilføjelse af materiale"
+    }
+  },
+  "reminders": {
+    "title": "Påmindelser",
+    "addReminder": "Tilføj påmindelse",
+    "removeReminder": "Fjern",
+    "maxReminders": "Maks. 5 påmindelser pr. begivenhed.",
+    "selectPreset": "Vælg hvornår...",
+    "sentStatus": "{count} sendt",
+    "notSent": "Ikke sendt",
+    "presets": {
+      "7days": "7 dage før",
+      "3days": "3 dage før",
+      "1day": "1 dag før",
+      "12hours": "12 timer før",
+      "6hours": "6 timer før",
+      "3hours": "3 timer før",
+      "1hour": "1 time før",
+      "30min": "30 minutter før",
+      "15min": "15 minutter før"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Begivenhedsstyring",
+      "settings": "Systemindstillinger",
+      "eventsList": "Begivenhedsliste",
+      "newEvent": "Ny begivenhed",
+      "calendar": "Kalender",
+      "templates": "Skabeloner",
+      "analytics": "Statistik",
+      "infrastructure": "Infrastruktur",
+      "settingsGeneral": "Generelt",
+      "settingsLanguages": "Sprog",
+      "ariaLabel": "Administrationsnavigation",
+      "subNavAriaLabel": "Sektionsnavigation"
+    },
+    "landing": {
+      "title": "Administrationspanel",
+      "subtitle": "Administrer begivenheder og konfigurer platformen",
+      "eventsTitle": "Begivenhedsstyring",
+      "eventsDescription": "Opret, rediger og administrer begivenheder, skabeloner og statistik.",
+      "settingsTitle": "Systemindstillinger",
+      "settingsDescription": "Konfigurer branding, indhold, sprog, funktioner og infrastruktur.",
+      "liveNow": "{count, plural, one {# begivenhed live} other {# begivenheder live}}",
+      "upcomingEvents": "{count, plural, one {# kommende begivenhed} other {# kommende begivenheder}}"
+    },
+    "recording": {
+      "title": "Videooptagelse",
+      "play": "Afspil",
+      "download": "Download",
+      "delete": "Slet optagelse",
+      "deleteConfirm": "Er du sikker på, at du vil slette denne optagelse? Handlingen kan ikke fortrydes.",
+      "notConfigured": "Videooptagelse er ikke tilgængelig. Jibri er ikke konfigureret i infrastrukturen.",
+      "inProgress": "Optagelse i gang..."
+    },
+    "login": {
+      "title": "Administratoradgang",
+      "keyLabel": "Adgangsnøgle",
+      "keyPlaceholder": "Indtast adgangsnøglen",
+      "submit": "Log ind",
+      "invalidKey": "Ugyldig adgangsnøgle",
+      "logout": "Log ud"
+    },
+    "title": "Begivenhedsstyring",
+    "subtitle": "Administrationspanel",
+    "createEvent": "Opret ny begivenhed",
+    "editEvent": "Rediger begivenhed",
+    "deleteEvent": "Slet begivenhed",
+    "deleteConfirm": "Er du sikker på, at du vil slette denne begivenhed? Handlingen kan ikke fortrydes.",
+    "publish": "Publicér",
+    "unpublish": "Afpublicér",
+    "noToken": "For at administrere begivenheder brug moderatorlinket, du modtog via e-mail.",
+    "noEvents": "Ingen begivenheder fundet. Opret din første begivenhed.",
+    "eventDetails": "Begivenhedsdetaljer",
+    "registrations": "Tilmeldinger",
+    "registrationCount": "{count} tilmeldinger",
+    "noRegistrations": "Ingen tilmeldte deltagere endnu. Del begivenhedslinket!",
+    "exportCsv": "Eksporter CSV",
+    "organization": "Organisation",
+    "organizationType": "Type",
+    "registrationDate": "Tilmeldingsdato",
+    "joined": "Deltog",
+    "notJoined": "Deltog ikke",
+    "deleteSuccess": "Begivenhed slettet",
+    "publishSuccess": "Begivenhed publiceret",
+    "unpublishSuccess": "Begivenhed afpubliceret",
+    "startEvent": "Start begivenhed",
+    "startEventSuccess": "Begivenhed startet! Ventende deltagere omdirigeres automatisk.",
+    "jvbWarmupWarning": "Videoserverne starter op (ca. 2 minutter). Deltagere ser en besked i venteværelset.",
+    "eventIsLive": "Begivenheden er i gang",
+    "joinAsModeratorBtn": "Deltag som moderator",
+    "openPublicPage": "Åbn offentlig side",
+    "quickActions": "Hurtige handlinger",
+    "liveRoomLink": "Link til begivenhedsrum",
+    "manage": "Administrer",
+    "settingsSaved": "Gemt",
+    "toggleChatDesc": "Aktivér chat mellem deltagere",
+    "toggleQaDesc": "Aktivér spørgsmål med stemmeafgivning",
+    "toggleRecordingDesc": "Optag begivenheden (kræver Jibri)",
+    "eventUpdated": "Begivenhed opdateret!",
+    "dateChangedNotification": "Datoen er ændret. Tilmeldte deltagere vil blive underrettet via e-mail.",
+    "eventCreated": "Begivenhed oprettet!",
+    "createEventCta": "Arrangér en begivenhed",
+    "createEventExplanation": "Opret din begivenhed, og du modtager et link til at administrere den.",
+    "noAccountNeeded": "Ingen konto nødvendig — moderatorlinket er din adgang til at administrere begivenheden.",
+    "form": {
+      "titleIt": "Titel (italiensk)",
+      "titleEn": "Titel (engelsk)",
+      "descriptionIt": "Beskrivelse (italiensk)",
+      "descriptionEn": "Beskrivelse (engelsk)",
+      "startsAt": "Startdato og -tid",
+      "endsAt": "Slutdato og -tid",
+      "maxParticipants": "Maks. antal deltagere",
+      "qaEnabled": "Aktivér Q&A",
+      "chatEnabled": "Aktivér chat",
+      "recordingEnabled": "Aktivér videooptagelse",
+      "dataRetentionDays": "Dataopbevaring (dage efter begivenhed)",
+      "dataRetentionHint": "Efter denne periode slettes tilmeldinger, Q&A-spørgsmål og eventuelle videooptagelser automatisk.",
+      "privacyPolicyUrl": "URL til privatlivspolitik",
+      "moderatorName": "Moderatornavn",
+      "moderatorEmail": "Moderator-e-mail",
+      "speakersIt": "Talere (italiensk)",
+      "speakersEn": "Talere (engelsk)",
+      "organizerName": "Arrangør",
+      "imageUrl": "URL til coverbillede",
+      "waitingRoomAudioUrl": "URL til venteværelseslyd (valgfrit)",
+      "waitingRoomAudioUrlHint": "Indtast URL til en MP3-fil til musik i venteværelset. Lad feltet stå tomt for at bruge standardlyden.",
+      "submit": "Opret begivenhed",
+      "submitEdit": "Gem ændringer",
+      "saving": "Gemmer...",
+      "creating": "Opretter...",
+      "sectionContent": "Indhold",
+      "sectionSchedule": "Planlægning",
+      "sectionSettings": "Indstillinger",
+      "sectionSpeakers": "Talere og arrangør",
+      "sectionModerator": "Moderator",
+      "sectionRegistrationFields": "Tilmeldingsfelter",
+      "requireOrganization": "Kræv organisation",
+      "requireOrganizationDesc": "Deltagere skal angive deres organisation",
+      "requireOrganizationRole": "Kræv rolle i organisation",
+      "requireOrganizationRoleDesc": "Deltagere kan angive deres rolle",
+      "requireOrganizationType": "Kræv organisationstype",
+      "requireOrganizationTypeDesc": "Deltagere vælger deres organisationstype",
+      "sectionPermissions": "Deltagertilladelser",
+      "participantsCanUnmute": "Deltagere kan slå mikrofon til",
+      "participantsCanStartVideo": "Deltagere kan starte video",
+      "participantsCanShareScreen": "Deltagere kan dele skærm",
+      "permissionsOnDesc": "Deltagere kan aktivere selv",
+      "permissionsOffDesc": "Kun moderatorer kan aktivere. Deltagere skal række hånden op.",
+      "permissionsNote": "Ændringer af tilladelser gælder for nye deltagere.",
+      "privacyPolicyMode": "Privatlivspolitik",
+      "privacyPolicyModeUrl": "Ekstern URL",
+      "privacyPolicyModeText": "Brugerdefineret tekst",
+      "privacyPolicyText": "Tekst til privatlivspolitik",
+      "privacyPolicyTextHint": "Skriv teksten til privatlivspolitikken. Den vises direkte i tilmeldingsformularen.",
+      "retentionPreviewTitle": "Hvad slettes automatisk",
+      "retentionPreviewIntro": "Efter {days} dage fra begivenhedens afslutning slettes følgende automatisk:",
+      "retentionPreviewParticipants": "Deltagerdata (navn, e-mail, organisation)",
+      "retentionPreviewQa": "Q&A-spørgsmål og stemmer",
+      "retentionPreviewPolls": "Afstemningsresultater",
+      "retentionPreviewRecordings": "Videooptagelser",
+      "retentionPreviewKept": "Aggregerede statistikker og begivenhedsmetadata bevares.",
+      "configPreview": "Forhåndsvisning af konfiguration",
+      "templateApplied": "Skabelon anvendt: {name}. Du kan ændre alle indstillinger."
+    },
+    "links": {
+      "title": "Begivenhedslinks",
+      "publicPage": "Offentlig begivenhedsside",
+      "moderatorLink": "Moderatorlink",
+      "moderatorLinkHint": "Del kun dette link med moderatorer. Enhver med dette link kan administrere begivenheden.",
+      "copyLink": "Kopiér link",
+      "copied": "Kopieret!"
+    },
+    "feedbackAdmin": {
+      "title": "Feedbackresultater",
+      "averageRating": "Gennemsnitlig vurdering",
+      "totalVotes": "{count, plural, one {# vurdering} other {# vurderinger}}",
+      "noFeedback": "Ingen feedback modtaget",
+      "comments": "Deltagerkommentarer",
+      "noComments": "Ingen kommentarer",
+      "stars": "stjerner"
+    },
+    "gdprAuditLog": {
+      "title": "GDPR-revisionslog",
+      "date": "Dato",
+      "action": "Handling",
+      "recordCount": "Poster",
+      "details": "Detaljer",
+      "actions": {
+        "DATA_DELETED": "Data slettet",
+        "CONSENT_RECORDED": "Samtykke registreret",
+        "DATA_EXPORTED": "Data eksporteret"
+      }
+    },
+    "settings": {
+      "title": "Sideindstillinger",
+      "subtitle": "Konfigurer platformens udseende og adfærd til genbrug i den offentlige administration",
+      "saving": "Gemmer...",
+      "saved": "Indstillinger gemt",
+      "tabs": {
+        "branding": "Branding",
+        "header": "Header",
+        "seo": "SEO",
+        "homepage": "Startside",
+        "pages": "Sider",
+        "footer": "Sidefod",
+        "features": "Funktioner"
+      },
+      "header": {
+        "slimBarTitle": "Topbjælke (Slim Header)",
+        "slimBarDescription": "Den tynde bjælke øverst på siden, der identificerer den overordnede organisation.",
+        "parentOrganization": "Overordnet organisation",
+        "parentOrganizationHelp": "F.eks. \"Præsidiet for Ministerrådet\"",
+        "parentOrganizationUrl": "URL for overordnet organisation",
+        "centerBarTitle": "Central header",
+        "centerBarDescription": "Det primære headerområde med applikationsnavn og logo.",
+        "appName": "Applikationsnavn",
+        "appNameHelp": "Vises i headeren og browsertitlen",
+        "organizationShort": "Forkortet organisationsnavn",
+        "logoUrl": "Logo-URL",
+        "logoUrlHelp": "Lad feltet stå tomt for at bruge standardikonet",
+        "organizationUrl": "URL til organisationens websted"
+      },
+      "branding": {
+        "siteName": "Applikationsnavn",
+        "siteNameHelp": "Vises i headeren, browsertitlen og e-mails",
+        "siteDescription": "Applikationsbeskrivelse",
+        "organizationName": "Organisationsnavn",
+        "organizationNameHelp": "f.eks. Afdelingen for Digital Omstilling",
+        "organizationNameShort": "Organisationsforkortelse",
+        "organizationUrl": "Organisations-URL",
+        "parentOrganization": "Overordnet organisation",
+        "parentOrganizationHelp": "f.eks. Præsidiet for Ministerrådet",
+        "parentOrganizationUrl": "URL for overordnet organisation",
+        "logoUrl": "Brugerdefineret logo-URL",
+        "logoUrlHelp": "Lad feltet stå tomt for at bruge standardikonet",
+        "faviconUrl": "Favicon-URL",
+        "primaryColor": "Primærfarve",
+        "defaultTimezone": "Standardtidszone",
+        "defaultTimezoneHelp": "Bruges til datovisning og oprettelse af nye begivenheder."
+      },
+      "watermark": {
+        "title": "Videotilpasning",
+        "enabled": "Vandmærke aktiveret",
+        "url": "Vandmærke-URL",
+        "urlHelp": "URL til et transparent SVG- eller PNG-billede. Lad feltet stå tomt for at bruge organisationens logo.",
+        "opacity": "Gennemsigtighed",
+        "position": "Placering",
+        "previewLabel": "Forhåndsvisning af videoområde",
+        "positions": {
+          "bottomLeft": "Nederst til venstre",
+          "bottomRight": "Nederst til højre",
+          "topLeft": "Øverst til venstre",
+          "topRight": "Øverst til højre"
+        }
+      },
+      "seo": {
+        "title": "SEO-titel",
+        "titleHelp": "Titel vist i søgeresultater og browserfanen",
+        "description": "SEO-beskrivelse",
+        "descriptionHelp": "Beskrivelse til søgemaskiner og deling på sociale medier",
+        "image": "Open Graph-billede",
+        "imageHelp": "Standardbillede til deling på sociale medier (1200x630 anbefalet)"
+      },
+      "homepage": {
+        "modeLabel": "Startsidetype",
+        "modes": {
+          "LANDING": {
+            "title": "Landingsside",
+            "description": "Hero, funktioner, kommende begivenheder og hvordan det fungerer"
+          },
+          "EVENTS_LIST": {
+            "title": "Begivenhedsliste",
+            "description": "Vis begivenhedslisten direkte"
+          },
+          "CUSTOM": {
+            "title": "Brugerdefineret",
+            "description": "Brugerdefineret HTML-indhold + begivenhedsliste"
+          }
+        },
+        "customHtmlLabel": "Brugerdefineret HTML-indhold",
+        "customHtmlHelp": "HTML vist i hoveddelen af startsiden"
+      },
+      "pages": {
+        "privacyTitle": "Privatlivspolitik",
+        "privacyIt": "Indhold (italiensk)",
+        "privacyEn": "Indhold (engelsk)",
+        "accessibilityTitle": "Tilgængelighedserklæring",
+        "accessibilityIt": "Indhold (italiensk)",
+        "accessibilityEn": "Indhold (engelsk)",
+        "preview": "Forhåndsvisning"
+      },
+      "footer": {
+        "linksTitle": "Sidefodlinks",
+        "addLink": "Tilføj link",
+        "noLinks": "Ingen links konfigureret. Standardlinks vil blive brugt.",
+        "linkTitle": "Titel",
+        "linkSection": "Sektion",
+        "sectionLegal": "Juridisk",
+        "sectionMain": "Primær",
+        "moveUp": "Flyt op",
+        "moveDown": "Flyt ned",
+        "removeLink": "Fjern link"
+      },
+      "features": {
+        "statusPageEnabled": "Statusside aktiveret",
+        "statusPageEnabledHelp": "Vis tjenestens statusside",
+        "guestAccessEnabled": "Gæsteadgang aktiveret",
+        "guestAccessEnabledHelp": "Tillad gæsteadgang til igangværende begivenheder",
+        "publicRegistrationEnabled": "Offentlig registrering aktiveret",
+        "publicRegistrationEnabledHelp": "Alle kan oprette begivenheder (hvis deaktiveret, kun administratorer)",
+        "calendarPublic": "Offentlig kalender",
+        "calendarPublicHelp": "Offentliggør begivenhedskalenderen. Besøgende kan se planlagte begivenheder.",
+        "githubUrl": "URL til GitHub-repository",
+        "supportEmail": "Support-e-mail"
+      }
+    },
+    "analytics": {
+      "title": "Statistik",
+      "subtitle": "Overblik over platformens metrikker",
+      "timeline": "Udvikling over tid",
+      "topEvents": "Bedste begivenheder",
+      "noData": "Ingen data tilgængelig for denne periode.",
+      "period": {
+        "7d": "7 dage",
+        "30d": "30 dage",
+        "90d": "90 dage",
+        "all": "Alt"
+      },
+      "metrics": {
+        "totalEvents": "Begivenheder i alt",
+        "totalRegistrations": "Tilmeldinger",
+        "totalParticipants": "Deltagere",
+        "conversionRate": "Gns. konverteringsrate",
+        "peakParticipants": "Højeste antal deltagere"
+      },
+      "table": {
+        "event": "Begivenhed",
+        "date": "Dato",
+        "registrations": "Tilmeldinger",
+        "participants": "Deltagere",
+        "peak": "Højeste",
+        "questions": "Q&A",
+        "conversion": "Konvertering",
+        "noEvents": "Ingen begivenheder fundet."
+      },
+      "quickStats": {
+        "title": "Hurtig statistik",
+        "avgDuration": "Gennemsnitlig begivenhedsvarighed",
+        "avgQuestionsPerEvent": "Q&A-spørgsmål pr. begivenhed",
+        "totalPollVotes": "Afstemningsstemmer i alt",
+        "avgParticipantsPerEvent": "Gns. deltagere pr. begivenhed",
+        "avgFeedbackRating": "Gns. feedbackvurdering",
+        "totalFeedback": "Feedbackbesvarelser"
+      }
+    },
+    "templates": {
+      "title": "Begivenhedsskabeloner",
+      "subtitle": "Administrer forudindstillede skabeloner til hurtig oprettelse af begivenheder",
+      "create": "Ny skabelon",
+      "deleteConfirm": "Er du sikker på, at du vil slette denne skabelon?",
+      "system": "System",
+      "nameLabel": "Skabelonnavn",
+      "descriptionLabel": "Beskrivelse",
+      "maxParticipantsLabel": "Maks. deltagere",
+      "featuresLabel": "Funktioner",
+      "recordingLabel": "Optagelse",
+      "unmute": "Deltagermikrofon",
+      "video": "Deltagervideo",
+      "screen": "Skærmdeling",
+      "pickerTitle": "Vælg en skabelon",
+      "pickerSubtitle": "Vælg en skabelon for at forkonfigurere begivenhedsindstillingerne, eller spring over for at konfigurere alt manuelt.",
+      "skipTemplate": "Konfigurer manuelt"
+    },
+    "instantCall": {
+      "title": "Øjeblikkeligt videoopkald",
+      "subtitle": "Opret et videoopkald med det samme, og del linket. Ingen planlægning nødvendig.",
+      "nameLabel": "Opkaldsnavn",
+      "namePlaceholder": "f.eks. Hurtig synk, Projektdemo...",
+      "moderatorLabel": "Dit navn (valgfrit)",
+      "moderatorPlaceholder": "Vises i opkaldet",
+      "create": "Opret og deltag",
+      "creating": "Opretter...",
+      "copyLink": "Kopiér invitationslink",
+      "copied": "Kopieret!",
+      "hint": "Alle kan aktivere mikrofon, webcam og dele skærm. Kun du kan optage og afslutte opkaldet."
+    },
+    "files": {
+      "title": "Filer og materialer",
+      "upload": "Upload fil",
+      "selectFile": "Vælg fil",
+      "fileTitle": "Titel",
+      "visibility": "Synlighed",
+      "visibilityAlways": "Altid synlig",
+      "visibilityBefore": "Kun før begivenheden",
+      "visibilityDuring": "Kun under begivenheden",
+      "visibilityAfter": "Kun efter begivenheden",
+      "uploading": "Uploader...",
+      "uploadBtn": "Upload",
+      "deleteConfirm": "Er du sikker på, at du vil slette denne fil?",
+      "noFiles": "Ingen filer uploadet. Brug knappen \"Upload fil\" for at tilføje materialer."
+    },
+    "languages": {
+      "title": "Sprogstyring",
+      "subtitle": "Konfigurer tilgængelige sprog, og tilpas oversættelser",
+      "configuredLocales": "Konfigurerede sprog",
+      "localesDescription": "Vælg de tilgængelige sprog for brugergrænsefladen. Italiensk er påkrævet som standardsprog.",
+      "addLocale": "Tilføj sprog",
+      "localeCode": "Sprogkode",
+      "localeName": "Sprognavn",
+      "selectLocale": "Vælg...",
+      "add": "Tilføj",
+      "default": "Standard",
+      "editTranslations": "Rediger oversættelser",
+      "saved": "Sprogkonfiguration gemt",
+      "saveNote": "Ændringer af tilgængelige sprog kræver en genstart for at træde i kraft i URL'er.",
+      "translationOverrides": "Brugerdefinerede oversættelser — {locale}",
+      "overridesDescription": "Tilsidesæt standardoversættelser for dette sprog. Brug punktnotation (f.eks. common.appName).",
+      "keyLabel": "Oversættelsesnøgle",
+      "valueLabel": "Værdi",
+      "addOverride": "Tilføj"
+    },
+    "infrastructure": {
+      "title": "Infrastruktur",
+      "subtitle": "Komponentstatus og miljøkonfiguration",
+      "deploymentMode": "Implementeringsmetode",
+      "version": "Version",
+      "environment": "Miljø",
+      "modes": {
+        "simple": "Simpel (Docker Compose)",
+        "standard": "Standard (Kubernetes)",
+        "full": "Fuld (Kubernetes med scale-to-zero)",
+        "unknown": "Ukendt"
+      },
+      "database": {
+        "title": "Database",
+        "internal": "I klyngen (PostgreSQL)",
+        "external": "Ekstern",
+        "connected": "Forbundet",
+        "disconnected": "Ikke tilgængelig"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Tilgængelig",
+        "unreachable": "Ikke tilgængelig",
+        "notConfigured": "Ikke konfigureret"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero aktiv",
+        "replicas": "{current}/{max} noder",
+        "preScale": "Pre-scale: {minutes} min",
+        "fixedMode": "Fast tilstand",
+        "scalerEnabled": "Scaler aktiveret"
+      },
+      "jibri": {
+        "title": "Optagelse (Jibri)",
+        "available": "Tilgængelig",
+        "notConfigured": "Ikke konfigureret",
+        "storageType": "Lagring",
+        "configureHint": "Videooptagelse kræver Jibri. Konfigurer lagring for at aktivere det.",
+        "docsLink": "Dokumentation"
+      },
+      "email": {
+        "title": "E-mail",
+        "configured": "Konfigureret",
+        "notConfigured": "Ikke konfigureret"
+      },
+      "features": {
+        "title": "Funktioner",
+        "statusPage": "Statusside",
+        "guestAccess": "Gæsteadgang",
+        "metrics": "Metrikendepunkt"
+      },
+      "note": "Infrastrukturændringer foretages via Helm values og CI/CD-pipelinen.",
+      "deployDocs": "Implementeringsdokumentation"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Tilmelding bekræftet: {eventTitle}",
+    "confirmationHeading": "Tilmelding bekræftet",
+    "confirmationKeepNote": "Gem denne e-mail — den indeholder dit personlige link til at deltage i begivenheden.",
+    "reminderSubject": "Påmindelse: {eventTitle} starter om 1 time",
+    "reminderHeading": "Begivenhedspåmindelse",
+    "reminderNote": "Den begivenhed, du er tilmeldt, starter om mindre end en time. Brug linket nedenfor for at deltage.",
+    "recordingSubject": "Optagelse tilgængelig: {eventTitle}",
+    "joinLabel": "Deltag i begivenheden",
+    "viewEvent": "Se begivenhedssiden",
+    "eventLabel": "Begivenhed",
+    "dateLabel": "Dato",
+    "timeLabel": "Klokkeslæt",
+    "durationLabel": "Varighed"
+  },
+  "home": {
+    "hero": {
+      "title": "Offentlige digitale begivenheder",
+      "subtitle": "Platform for webinarer, præsentationer og offentlige møder fra Afdelingen for Digital Omstilling",
+      "browseEvents": "Se begivenheder",
+      "organizeEvent": "Arrangér en begivenhed"
+    },
+    "features": {
+      "title": "Platformen for offentlige begivenheder",
+      "video": {
+        "title": "Videokonference",
+        "desc": "Deltag i offentlige begivenheder med op til 300 deltagere. Ingen software skal installeres."
+      },
+      "qa": {
+        "title": "Spørgsmål og svar",
+        "desc": "Stil spørgsmål under begivenheden, og stem på de vigtigste. Moderatoren svarer live."
+      },
+      "privacy": {
+        "title": "Privatlivsbeskyttelse og sikkerhed",
+        "desc": "GDPR-kompatibel databeskyttelse. Selvhostet infrastruktur i Italien."
+      }
+    },
+    "upcoming": {
+      "title": "Kommende begivenheder",
+      "viewAll": "Se alle begivenheder",
+      "noEvents": "Ingen kommende begivenheder. Kig forbi igen snart!"
+    },
+    "howItWorks": {
+      "title": "Sådan fungerer det",
+      "step1": {
+        "title": "Tilmeld dig",
+        "desc": "Tilmeld dig gratis til begivenheden"
+      },
+      "step2": {
+        "title": "Modtag dit link",
+        "desc": "En e-mail med dit personlige adgangslink"
+      },
+      "step3": {
+        "title": "Deltag",
+        "desc": "Deltag i begivenheden direkte fra browseren, ingen installation nødvendig"
+      },
+      "step4": {
+        "title": "Interagér",
+        "desc": "Stil spørgsmål, stem og deltag i diskussionen"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Jeg giver samtykke til lyd-/videooptagelse af denne begivenhed",
+      "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
+      "futureCommunications": "Jeg ønsker at modtage information om fremtidige begivenheder arrangeret af DTD"
+    },
+    "export": {
+      "title": "Mine data",
+      "subtitle": "Anmod om en kopi af personoplysninger tilknyttet din e-mailadresse i henhold til GDPR art. 15.",
+      "emailLabel": "Din e-mailadresse",
+      "emailPlaceholder": "Indtast den e-mail, du brugte ved tilmelding",
+      "emailInvalid": "Indtast venligst en gyldig e-mailadresse",
+      "submit": "Anmod om mine data",
+      "loading": "Søger...",
+      "noData": "Ingen data fundet for denne e-mailadresse.",
+      "error": "Der opstod en fejl. Prøv venligst igen senere.",
+      "rateLimited": "For mange anmodninger. Prøv igen om en time.",
+      "results": "Dine data",
+      "resultsDescription": "Data fundet for {count} begivenheder.",
+      "registrationData": "Tilmeldingsdata",
+      "fieldName": "Navn",
+      "fieldEmail": "E-mail",
+      "fieldOrganization": "Organisation",
+      "fieldRegisteredAt": "Tilmeldingsdato",
+      "fieldConsent": "Samtykke",
+      "questionsTitle": "Q&A-spørgsmål",
+      "pollVotesTitle": "Afstemningsstemmer",
+      "optionLabel": "Valgmulighed"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Privatlivspolitik",
+      "title": "Privatlivspolitik",
+      "intro": "Denne side opsummerer behandlingen af personoplysninger i forbindelse med brug af platformen Eventi DTD og deltagelse i offentlige begivenheder.",
+      "sections": {
+        "controller": {
+          "title": "Dataansvarlig",
+          "body": "Personoplysninger behandles inden for rammerne af de institutionelle aktiviteter i Afdelingen for Digital Omstilling med henblik på at understøtte den tekniske og organisatoriske styring af offentlige onlinebegivenheder."
+        },
+        "data": {
+          "title": "Behandlede data og formål",
+          "body": "Platformen behandler udelukkende de data, der er strengt nødvendige for tilmelding og deltagelse i begivenheder, såsom navn, e-mailadresse og eventuelle valgfrie felter konfigureret af arrangøren. Data bruges til at sende det personlige adgangslink, administrere deltagelse, levere påmindelser og understøtte tjenestens sikkerhedsforpligtelser."
+        },
+        "retention": {
+          "title": "Opbevaring og rettigheder",
+          "body": "Data opbevares i den konfigurerede periode for hver begivenhed og slettes derefter automatisk, medmindre anden lovgivning kræver det. Registrerede kan til enhver tid udøve deres GDPR-rettigheder, herunder adgang, berigtigelse og sletning, via afdelingens institutionelle kanaler."
+        }
+      },
+      "note": {
+        "title": "Anmod om dine data",
+        "body": "Hvis du har deltaget i en begivenhed og ønsker at kontrollere, hvilke personoplysninger der er tilknyttet din e-mailadresse, kan du bruge den dedikerede funktion på platformen.",
+        "linkLabel": "Anmod om mine data"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Tilgængelighedserklæring",
+      "title": "Tilgængelighedserklæring",
+      "intro": "Afdelingen for Digital Omstilling forpligter sig til at gøre denne platform tilgængelig i overensstemmelse med gældende krav til digitale tjenester i den offentlige sektor.",
+      "sections": {
+        "commitment": {
+          "title": "Tilgængelighedsforpligtelse",
+          "body": "Platformen er designet med komponenter, der er kompatible med designsystemet .italia, med særlig opmærksomhed på tastaturnavigation, semantisk indholdsstruktur og grænsefladelæsbarhed på de vigtigste skærmstørrelser."
+        },
+        "status": {
+          "title": "Overholdelsesstatus",
+          "body": "Tilgængelighedskontrol og -forbedringer pågår løbende. Eventuelle resterende problemer løses progressivt som led i tjenestens udvikling og løbende vedligeholdelse."
+        },
+        "feedback": {
+          "title": "Feedback og kontakt",
+          "body": "For at rapportere tilgængelighedsbarrierer eller problemer med brug af tjenesten kan brugere kontakte afdelingen via dens institutionelle kanaler med angivelse af den berørte side og en kort beskrivelse af problemet."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Juridiske bemærkninger",
+      "title": "Juridiske bemærkninger",
+      "intro": "Adgang til og brug af platformen Eventi DTD er underlagt disse bemærkninger, som opsummerer de generelle brugsvilkår og de vigtigste oplysninger om tjenesten.",
+      "sections": {
+        "ownership": {
+          "title": "Tjenesteejerskab",
+          "body": "Platformen promoveres af Afdelingen for Digital Omstilling og stilles til rådighed for afholdelse af og deltagelse i institutionelle offentlige onlinebegivenheder."
+        },
+        "usage": {
+          "title": "Brug af tjenesten",
+          "body": "Brugere skal anvende tjenesten korrekt og må ikke kompromittere platformens sikkerhed, funktionalitet eller den korrekte afvikling af begivenheder. Misbrug kan medføre begrænsninger i adgangen til tjenesten."
+        },
+        "liability": {
+          "title": "Ansvarsbegrænsning",
+          "body": "Selvom der træffes passende tekniske og organisatoriske foranstaltninger, kan afdelingen ikke garantere fuldstændig fravær af afbrydelser eller fejl forårsaget af uforudsete hændelser, vedligeholdelse eller eksterne faktorer. Det juridiske ansvar reguleres af gældende lov."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Systemstatus",
+    "subtitle": "Realtidsoverblik over platformens tjenestestatus.",
+    "allOperational": "Alle systemer operationelle",
+    "degraded": "Nedsat ydeevne",
+    "outage": "Tjenesteafbrydelse",
+    "componentLabel": "Komponent",
+    "statusLabel": "Status",
+    "operational": "Operationel",
+    "degradedLabel": "Nedsat",
+    "standby": "Standby",
+    "loading": "Indlæser...",
+    "fetchError": "Kunne ikke hente systemstatus",
+    "components": {
+      "app": "Webportal",
+      "database": "Database",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Videooptagelse",
+      "smtp": "E-mail (SMTP)"
+    },
+    "jvbCapacity": "Video Bridge-kapacitet",
+    "jvbStandby": "Standby — aktiveres automatisk ved behov",
+    "jvbStandbyDetail": "Scale-to-zero aktiv — ingen kommende begivenheder. JVB-noder oprettes automatisk, inden en begivenhed starter.",
+    "jvbScaling": "Skalerer op...",
+    "nodesActive": "noder aktive",
+    "nodesReady": "noder klar",
+    "scaling": "skalerer",
+    "jvbStress": "JVB-belastning",
+    "participantsConnected": "deltagere forbundet",
+    "videoInteractive": "interaktiv",
+    "videoWebinar": "webinar",
+    "participantsAvailable": "deltagere tilgængelige",
+    "upcomingEvents": "Kommende begivenheder",
+    "noUpcomingEvents": "Ingen kommende begivenheder",
+    "jvbActivatesIn": "JVB aktiveres om {minutes} min",
+    "liveNow": "Live nu",
+    "activeEvents": "Aktive begivenheder",
+    "registrationsToday": "Tilmeldinger i dag",
+    "jvbNodes": "JVB-noder",
+    "overallStatus": "Samlet status",
+    "lastChecked": "Sidst kontrolleret",
+    "responseTime": "Svartid",
+    "systemStatus": "Systemstatus"
+  },
+  "feedback": {
+    "title": "Hvordan vurderer du denne begivenhed?",
+    "ratingLabel": "Vælg en vurdering fra 1 til 5 stjerner",
+    "comment": "Kommentar",
+    "commentPlaceholder": "Har du forslag? (valgfrit)",
+    "submit": "Send feedback",
+    "submitting": "Sender...",
+    "skip": "Spring over",
+    "thankYou": "Tak for din feedback!",
+    "averageRating": "Gennemsnitlig vurdering",
+    "ratingCount": "{count} vurderinger",
+    "noFeedback": "Ingen feedback modtaget"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Start",
+    "prompt": "Emne",
+    "promptPlaceholder": "f.eks. Hvad forventer du af denne begivenhed?",
+    "duration": "Varighed",
+    "submit": "Send",
+    "submitPlaceholder": "Skriv et ord (maks. 30 tegn)",
+    "close": "Luk word cloud",
+    "cancel": "Annuller",
+    "noActiveRound": "Ingen aktiv word cloud i øjeblikket.",
+    "noWords": "Venter på de første ord...",
+    "wordsSubmitted": "{count} ord indsendt",
+    "timeRemaining": "Tid tilbage"
+  },
+  "timer": {
+    "title": "Timer",
+    "start": "Start",
+    "pause": "Pause",
+    "reset": "Nulstil",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Brugerdefineret"
+    },
+    "showToAll": "Vis for alle",
+    "timeUp": "Tiden er udløbet!"
+  },
+  "reactions": {
+    "title": "Reaktioner",
+    "sendReaction": "Send reaktion",
+    "reactionSent": "Reaktion sendt!"
+  },
+  "calendar": {
+    "title": "Begivenhedskalender",
+    "subtitle": "Se alle begivenheder over tid",
+    "publicTitle": "Begivenhedskalender",
+    "publicSubtitle": "Opdag kommende begivenheder",
+    "today": "I dag",
+    "prev": "Forrige periode",
+    "next": "Næste periode",
+    "views": {
+      "day": "Dag",
+      "week": "Uge",
+      "month": "Måned",
+      "year": "År",
+      "list": "Liste"
+    },
+    "status": {
+      "DRAFT": "Kladde",
+      "PUBLISHED": "Publiceret",
+      "LIVE": "Live",
+      "ENDED": "Afsluttet",
+      "ARCHIVED": "Arkiveret"
+    }
+  },
+  "footer": {
+    "departmentName": "Afdelingen for Digital Omstilling",
+    "presidencyName": "Præsidiet for Ministerrådet",
+    "privacy": "Privatlivspolitik",
+    "accessibility": "Tilgængelighedserklæring",
+    "openSource": "Open source-software",
+    "contacts": "Kontakt",
+    "legalNotes": "Juridiske bemærkninger",
+    "governmentSite": "Den Italienske Regering",
+    "systemStatus": "Systemstatus"
+  },
+  "pages": {
+    "privacyTitle": "Privatlivspolitik",
+    "privacyNotConfigured": "Privatlivspolitik er endnu ikke konfigureret.",
+    "accessibilityTitle": "Tilgængelighedserklæring",
+    "accessibilityNotConfigured": "Tilgængelighedserklæring er endnu ikke konfigureret."
+  },
+  "video": {
+    "play": "Afspil",
+    "pause": "Pause",
+    "speed": "Hastighed",
+    "fullscreen": "Fuld skærm",
+    "pip": "Picture in Picture",
+    "volume": "Lydstyrke",
+    "mute": "Slå lyd fra",
+    "unmute": "Slå lyd til",
+    "download": "Download optagelse",
+    "speedLabel": "Afspilningshastighed",
+    "progress": "Statusbjælke"
+  },
+  "diagram": {
+    "title": "Begivenhedskonfiguration",
+    "topology": "Topologi",
+    "features": "Aktive funktioner",
+    "estimates": "Ressourceestimat",
+    "moderator": "Moderator",
+    "participants": "Deltagere",
+    "jvb": "Video Bridge",
+    "jibri": "Optagelse",
+    "bandwidth": {
+      "moderator": "Moderatorbåndbredde",
+      "participant": "Båndbredde pr. deltager",
+      "total": "Estimeret total båndbredde"
+    },
+    "jvbCount": "Nødvendige JVB'er",
+    "jvbRam": "Estimeret JVB-RAM",
+    "storage": "Optagelseslagring",
+    "duration": "Estimeret varighed",
+    "viewOnly": "Kun visning",
+    "preview": "Forhåndsvisning af konfiguration"
+  },
+  "waiting": {
+    "startsIn": "Begivenheden starter om",
+    "eventLive": "Begivenheden er i gang!",
+    "connectedParticipants": "{count, plural, =0 {Ingen deltagere} =1 {1 deltager forbundet} other {{count} deltagere forbundet}}",
+    "elapsedTime": "I gang i {minutes} minutter",
+    "youAreLate": "Begivenheden startede for {minutes} minutter siden",
+    "chooseHowToJoin": "Vælg, hvordan du vil deltage:",
+    "enterLive": "Deltag LIVE",
+    "enterLiveDesc": "Deltag live. Du kan altid se optagelsen efter begivenheden.",
+    "enterNow": "Deltag nu",
+    "watchFromStart": "Se fra starten",
+    "watchFromStartDesc": "Se optagelsen fra starten, og tilslut live, når du vil.",
+    "watchNow": "Se",
+    "switchToLive": "Skift til live",
+    "enterRoom": "Gå ind i rummet",
+    "recordingNotice": "Denne begivenhed optages.",
+    "recordingAvailableAfter": "Optagelsen vil være tilgængelig efter begivenheden.",
+    "autoRefreshHint": "Siden opdateres automatisk, når begivenheden starter.",
+    "startEventButton": "Start begivenhed",
+    "startingEvent": "Starter...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 person venter} other {{count} personer venter}}",
+    "jvbScaling": "Forbereder rummet...",
+    "jvbScalingDetail": "Videoserverne starter op. Det tager ca. 2 minutter.",
+    "jvbReady": "Rummet er klar!"
+  },
+  "recording": {
+    "management": "Videooptagelse",
+    "inProgress": "I gang",
+    "available": "Optagelse tilgængelig",
+    "duration": "Varighed",
+    "fileSize": "Filstørrelse",
+    "startedAt": "Startet",
+    "automatic": "automatisk",
+    "publish": "Publicér optagelse",
+    "publishDesc": "Gør videoen tilgængelig på begivenhedssiden",
+    "retentionLabel": "Opbevaring",
+    "retention": {
+      "24h": "24 timer (midlertidig)",
+      "7d": "7 dage",
+      "30d": "30 dage",
+      "90d": "90 dage",
+      "forever": "Aldrig (indtil begivenhed udløber)"
+    },
+    "retentionNote": "Videoen følger stadig begivenhedens GDPR-opbevaringspolitik",
+    "delete": "Slet optagelse",
+    "deleteConfirm": "Er du sikker? Videoen slettes permanent.",
+    "notConfigured": "Jibri er ikke konfigureret. Videooptagelse er ikke tilgængelig.",
+    "play": "Afspil",
+    "download": "Download"
+  },
+  "postEvent": {
+    "config": "Konfiguration efter begivenhed",
+    "pageVisible": "Begivenhedsside synlig efter afslutning",
+    "showQA": "Vis Q&A-spørgsmål",
+    "showMaterials": "Vis delte materialer",
+    "showPolls": "Vis afstemningsresultater",
+    "showFeedback": "Vis feedback",
+    "feedbackEnabled": "Feedbackundersøgelse aktiv efter begivenhed",
+    "visibilityAlways": "Altid synlig",
+    "visibilityUntil": "Synlig indtil:",
+    "dataRetentionNote": "Deltagernes personoplysninger slettes i henhold til begivenhedens opbevaringspolitik ({days} dage). Begivenhedsindholdet forbliver tilgængeligt, så længe siden er synlig.",
+    "availableUntil": "Denne begivenhed og dens indhold vil være tilgængelige indtil {date}.",
+    "tabs": {
+      "qa": "Spørgsmål og svar",
+      "materials": "Materialer",
+      "polls": "Afstemninger",
+      "feedback": "Feedback"
+    }
+  }
+}

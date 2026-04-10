@@ -1,51 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import type { Event } from '@prisma/client';
-import { resolveLocale, localiseEvent } from './locale';
+import { resolveLocale, localiseEvent, getLocalized, setLocalized } from './locale';
 
 function makeRequest(url: string, headers?: Record<string, string>): Request {
   return new Request(url, { headers });
-}
-
-// Minimal mock Event for localiseEvent
-function mockEvent(overrides?: Partial<Event>): Event {
-  return {
-    id: 'test-id',
-    slug: 'test-event',
-    titleIt: 'Titolo Italiano',
-    titleEn: 'English Title',
-    descriptionIt: 'Descrizione italiana',
-    descriptionEn: 'English description',
-    startsAt: new Date(),
-    endsAt: new Date(),
-    timezone: 'Europe/Rome',
-    maxParticipants: 100,
-    qaEnabled: true,
-    chatEnabled: false,
-    recordingEnabled: false,
-    participantsCanUnmute: false,
-    participantsCanStartVideo: false,
-    participantsCanShareScreen: false,
-    requireOrganization: false,
-    requireOrganizationRole: false,
-    requireOrganizationType: false,
-    dataRetentionDays: 30,
-    privacyPolicyUrl: null,
-    privacyPolicyText: null,
-    moderatorName: null,
-    moderatorEmail: null,
-    moderatorToken: 'mod-token',
-    jitsiRoomName: 'room-1',
-    speakersIt: null,
-    speakersEn: null,
-    organizerName: null,
-    imageUrl: null,
-    waitingRoomAudioUrl: null,
-    recordingUrl: null,
-    status: 'PUBLISHED',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    ...overrides,
-  } as Event;
 }
 
 // ── resolveLocale ───────────────────────────────────────────
@@ -80,11 +37,25 @@ describe('resolveLocale', () => {
     expect(result).toBe('it');
   });
 
-  it('ignores unsupported locales in Accept-Language', () => {
+  it('returns fr from Accept-Language: fr-FR', () => {
     const result = resolveLocale(
       makeRequest('http://localhost', { 'accept-language': 'fr-FR,de;q=0.5' }),
     );
-    expect(result).toBe('it'); // default
+    expect(result).toBe('fr');
+  });
+
+  it('returns de from Accept-Language: de-DE', () => {
+    const result = resolveLocale(
+      makeRequest('http://localhost', { 'accept-language': 'de-DE' }),
+    );
+    expect(result).toBe('de');
+  });
+
+  it('ignores unsupported locales in Accept-Language', () => {
+    const result = resolveLocale(
+      makeRequest('http://localhost', { 'accept-language': 'zh-CN,ja;q=0.5' }),
+    );
+    expect(result).toBe('it');
   });
 
   it('query param takes priority over Accept-Language', () => {
@@ -95,33 +66,99 @@ describe('resolveLocale', () => {
   });
 });
 
+// ── getLocalized ────────────────────────────────────────────
+
+describe('getLocalized', () => {
+  it('returns the value for the requested locale', () => {
+    expect(getLocalized({ it: 'Ciao', en: 'Hello' }, 'en')).toBe('Hello');
+  });
+
+  it('falls back to it when requested locale missing', () => {
+    expect(getLocalized({ it: 'Ciao' }, 'fr')).toBe('Ciao');
+  });
+
+  it('falls back to first value when fallback also missing', () => {
+    expect(getLocalized({ de: 'Hallo' }, 'fr', 'en')).toBe('Hallo');
+  });
+
+  it('returns empty string for null field', () => {
+    expect(getLocalized(null, 'it')).toBe('');
+  });
+
+  it('returns empty string for undefined field', () => {
+    expect(getLocalized(undefined, 'it')).toBe('');
+  });
+
+  it('returns empty string for empty object', () => {
+    expect(getLocalized({}, 'it')).toBe('');
+  });
+});
+
+// ── setLocalized ────────────────────────────────────────────
+
+describe('setLocalized', () => {
+  it('sets a new value on existing field', () => {
+    const result = setLocalized({ it: 'Ciao' }, 'en', 'Hello');
+    expect(result).toEqual({ it: 'Ciao', en: 'Hello' });
+  });
+
+  it('creates field from null', () => {
+    const result = setLocalized(null, 'it', 'Ciao');
+    expect(result).toEqual({ it: 'Ciao' });
+  });
+
+  it('overwrites existing locale value', () => {
+    const result = setLocalized({ it: 'Vecchio' }, 'it', 'Nuovo');
+    expect(result).toEqual({ it: 'Nuovo' });
+  });
+
+  it('does not mutate original object', () => {
+    const original = { it: 'Ciao' };
+    setLocalized(original, 'en', 'Hello');
+    expect(original).toEqual({ it: 'Ciao' });
+  });
+});
+
 // ── localiseEvent ───────────────────────────────────────────
 
 describe('localiseEvent', () => {
   it('returns Italian title/description for it locale', () => {
-    const event = mockEvent();
+    const event = {
+      title: { it: 'Titolo Italiano', en: 'English Title' },
+      description: { it: 'Descrizione italiana', en: 'English description' },
+    };
     const { title, description } = localiseEvent(event, 'it');
     expect(title).toBe('Titolo Italiano');
     expect(description).toBe('Descrizione italiana');
   });
 
   it('returns English title/description for en locale', () => {
-    const event = mockEvent();
+    const event = {
+      title: { it: 'Titolo Italiano', en: 'English Title' },
+      description: { it: 'Descrizione italiana', en: 'English description' },
+    };
     const { title, description } = localiseEvent(event, 'en');
     expect(title).toBe('English Title');
     expect(description).toBe('English description');
   });
 
-  it('falls back to Italian when English fields are null', () => {
-    const event = mockEvent({ titleEn: null, descriptionEn: null });
+  it('falls back to Italian when English fields are missing', () => {
+    const event = {
+      title: { it: 'Titolo Italiano' },
+      description: { it: 'Descrizione italiana' },
+    };
     const { title, description } = localiseEvent(event, 'en');
     expect(title).toBe('Titolo Italiano');
     expect(description).toBe('Descrizione italiana');
   });
 
-  it('returns Italian fields even when English is available for it locale', () => {
-    const event = mockEvent();
-    const { title } = localiseEvent(event, 'it');
-    expect(title).toBe('Titolo Italiano');
+  it('returns French when available', () => {
+    const event = {
+      title: { it: 'Titolo', fr: 'Titre' },
+      description: { it: 'Desc', fr: 'Description' },
+    };
+    const { title, description } = localiseEvent(event, 'fr');
+    expect(title).toBe('Titre');
+    expect(description).toBe('Description');
   });
 });

@@ -19,8 +19,7 @@ async function loadEvents(token?: string) {
 
   return events.map((e) => ({
     id: e.id,
-    titleIt: e.titleIt,
-    titleEn: e.titleEn,
+    title: e.title as Record<string, string>,
     slug: e.slug,
     startsAt: e.startsAt.toISOString(),
     endsAt: e.endsAt.toISOString(),

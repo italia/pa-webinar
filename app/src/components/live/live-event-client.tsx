@@ -43,7 +43,7 @@ interface EventInfo {
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
-  speakersIt?: string | null;
+  speakers?: string | null;
   organizerName?: string | null;
   maxParticipants?: number;
   tempRecordingUrl?: string | null;
@@ -334,7 +334,7 @@ export default function LiveEventClient({
           startsAt: event.startsAt,
           endsAt: event.endsAt,
           status: eventStatus as 'PUBLISHED' | 'LIVE',
-          speakersIt: event.speakersIt,
+          speakers: event.speakers,
           organizerName: event.organizerName,
           maxParticipants: event.maxParticipants ?? 300,
           recordingEnabled: event.recordingEnabled,

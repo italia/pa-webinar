@@ -596,6 +596,20 @@ function PagesTab({ settings, updateField }: TabProps) {
   const t = useTranslations('admin.settings.pages');
   const [previewKey, setPreviewKey] = useState<string | null>(null);
 
+  const privacyPolicy = (settings.privacyPolicy ?? {}) as Record<string, string>;
+  const accessibility = (settings.accessibility ?? {}) as Record<string, string>;
+
+  const updateJsonLocale = (
+    field: 'privacyPolicy' | 'accessibility',
+    current: Record<string, string>,
+    locale: string,
+    value: string,
+  ) => {
+    const updated = { ...current, [locale]: value };
+    if (!value) delete updated[locale];
+    updateField(field, (Object.keys(updated).length > 0 ? updated : null) as SiteSetting[typeof field]);
+  };
+
   return (
     <div>
       <h6 className="fw-semibold mb-3">{t('privacyTitle')}</h6>
@@ -606,9 +620,9 @@ function PagesTab({ settings, updateField }: TabProps) {
             <Input
               type="textarea"
               id="privacyIt"
-              value={settings.privacyPolicyIt ?? ''}
+              value={privacyPolicy.it ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('privacyPolicyIt', e.target.value || null)
+                updateJsonLocale('privacyPolicy', privacyPolicy, 'it', e.target.value)
               }
               style={{ fontFamily: 'monospace', fontSize: '0.85rem', minHeight: 200 }}
             />
@@ -622,11 +636,11 @@ function PagesTab({ settings, updateField }: TabProps) {
             >
               {t('preview')}
             </Button>
-            {previewKey === 'privacyIt' && settings.privacyPolicyIt && (
+            {previewKey === 'privacyIt' && privacyPolicy.it && (
               <div
                 className="mt-2 p-3 border rounded bg-white"
                 dangerouslySetInnerHTML={{
-                  __html: settings.privacyPolicyIt,
+                  __html: privacyPolicy.it,
                 }}
               />
             )}
@@ -638,9 +652,9 @@ function PagesTab({ settings, updateField }: TabProps) {
             <Input
               type="textarea"
               id="privacyEn"
-              value={settings.privacyPolicyEn ?? ''}
+              value={privacyPolicy.en ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('privacyPolicyEn', e.target.value || null)
+                updateJsonLocale('privacyPolicy', privacyPolicy, 'en', e.target.value)
               }
               style={{ fontFamily: 'monospace', fontSize: '0.85rem', minHeight: 200 }}
             />
@@ -654,11 +668,11 @@ function PagesTab({ settings, updateField }: TabProps) {
             >
               {t('preview')}
             </Button>
-            {previewKey === 'privacyEn' && settings.privacyPolicyEn && (
+            {previewKey === 'privacyEn' && privacyPolicy.en && (
               <div
                 className="mt-2 p-3 border rounded bg-white"
                 dangerouslySetInnerHTML={{
-                  __html: settings.privacyPolicyEn,
+                  __html: privacyPolicy.en,
                 }}
               />
             )}
@@ -676,9 +690,9 @@ function PagesTab({ settings, updateField }: TabProps) {
             <Input
               type="textarea"
               id="accessibilityIt"
-              value={settings.accessibilityIt ?? ''}
+              value={accessibility.it ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('accessibilityIt', e.target.value || null)
+                updateJsonLocale('accessibility', accessibility, 'it', e.target.value)
               }
               style={{ fontFamily: 'monospace', fontSize: '0.85rem', minHeight: 200 }}
             />
@@ -690,9 +704,9 @@ function PagesTab({ settings, updateField }: TabProps) {
             <Input
               type="textarea"
               id="accessibilityEn"
-              value={settings.accessibilityEn ?? ''}
+              value={accessibility.en ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('accessibilityEn', e.target.value || null)
+                updateJsonLocale('accessibility', accessibility, 'en', e.target.value)
               }
               style={{ fontFamily: 'monospace', fontSize: '0.85rem', minHeight: 200 }}
             />

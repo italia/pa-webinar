@@ -47,10 +47,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         eventTimezone={event.timezone}
         event={{
           id: event.id,
-          titleIt: event.titleIt,
-          titleEn: event.titleEn,
-          descriptionIt: event.descriptionIt,
-          descriptionEn: event.descriptionEn,
+          title: event.title as Record<string, string>,
+          description: event.description as Record<string, string>,
           startsAt: event.startsAt.toISOString(),
           endsAt: event.endsAt.toISOString(),
           maxParticipants: event.maxParticipants,
@@ -65,8 +63,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           moderatorName: event.moderatorName,
           moderatorEmail: event.moderatorEmail,
           moderatorToken: event.moderatorToken,
-          speakersIt: event.speakersIt,
-          speakersEn: event.speakersEn,
+          speakersInfo: event.speakersInfo as Record<string, string> | null,
           organizerName: event.organizerName,
           imageUrl: event.imageUrl,
           waitingRoomAudioUrl: event.waitingRoomAudioUrl,

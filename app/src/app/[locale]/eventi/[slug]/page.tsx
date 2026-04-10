@@ -5,6 +5,7 @@ import { getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const revalidate = 30;
 
@@ -21,11 +22,8 @@ export async function generateMetadata({
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) return { title: 'Not found' };
 
-  const title = locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
-  const description =
-    locale === 'en' && event.descriptionEn
-      ? event.descriptionEn
-      : event.descriptionIt;
+  const title = getLocalized(event.title as LocalizedField, locale);
+  const description = getLocalized(event.description as LocalizedField, locale);
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const pageUrl = `${baseUrl}/${locale}/eventi/${slug}`;
@@ -69,11 +67,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     notFound();
   }
 
-  const title = locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
-  const description =
-    locale === 'en' && event.descriptionEn
-      ? event.descriptionEn
-      : event.descriptionIt;
+  const title = getLocalized(event.title as LocalizedField, locale);
+  const description = getLocalized(event.description as LocalizedField, locale);
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
 
   const jsonLd = {
@@ -194,10 +189,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   const serialised = {
     id: event.id,
     slug: event.slug,
-    titleIt: event.titleIt,
-    titleEn: event.titleEn,
-    descriptionIt: event.descriptionIt,
-    descriptionEn: event.descriptionEn,
+    title: event.title as Record<string, string>,
+    description: event.description as Record<string, string>,
     startsAt: event.startsAt.toISOString(),
     endsAt: event.endsAt.toISOString(),
     timezone: event.timezone,
@@ -212,8 +205,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
     privacyPolicyUrl: event.privacyPolicyUrl,
-    speakersIt: event.speakersIt,
-    speakersEn: event.speakersEn,
+    speakersInfo: event.speakersInfo as Record<string, string> | null,
     organizerName: event.organizerName,
     imageUrl: event.imageUrl,
     peakParticipants: event.peakParticipants,

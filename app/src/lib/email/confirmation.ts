@@ -20,6 +20,7 @@ import {
 } from '@/lib/email/templates';
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
 import { getPublicEnv } from '@/lib/env';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 type Locale = 'it' | 'en';
 
@@ -46,12 +47,8 @@ export function sendConfirmationEmail(input: ConfirmationEmailInput): void {
 
       const event = registration.event;
       const recipientEmail = decryptPII(registration.email);
-      const title =
-        input.locale === 'en' && event.titleEn ? event.titleEn : event.titleIt;
-      const description =
-        input.locale === 'en' && event.descriptionEn
-          ? event.descriptionEn
-          : event.descriptionIt;
+      const title = getLocalized(event.title as LocalizedField, input.locale);
+      const description = getLocalized(event.description as LocalizedField, input.locale);
 
       const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
       const calendarInput = {

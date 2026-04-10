@@ -1,0 +1,1172 @@
+{
+  "common": {
+    "appName": "Evenimente DTD",
+    "appDescription": "Platformă pentru evenimente publice digitale a Departamentului pentru Transformarea Digitală",
+    "loading": "Se încarcă...",
+    "error": "A apărut o eroare",
+    "errorMessage": "Ceva nu a funcționat corect. Vă rugăm să reîncercați.",
+    "retry": "Reîncercați",
+    "save": "Salvați",
+    "cancel": "Anulați",
+    "confirm": "Confirmați",
+    "close": "Închideți",
+    "back": "Înapoi",
+    "next": "Înainte",
+    "send": "Trimiteți",
+    "delete": "Ștergeți",
+    "edit": "Editați",
+    "search": "Căutați",
+    "noResults": "Niciun rezultat",
+    "requiredField": "Câmp obligatoriu"
+  },
+  "nav": {
+    "home": "Acasă",
+    "events": "Evenimente",
+    "about": "Informații",
+    "privacy": "Confidențialitate",
+    "admin": "Administrare",
+    "language": "Limbă",
+    "switchLanguage": "Schimbați limba",
+    "skipToContent": "Salt la conținut",
+    "skipToFooter": "Salt la subsol"
+  },
+  "header": {
+    "slimTitle": "Președinția Consiliului de Miniștri",
+    "slimSubtitle": "Departamentul pentru Transformarea Digitală",
+    "followUs": "Urmăriți-ne pe"
+  },
+  "events": {
+    "title": "Evenimente",
+    "upcoming": "Evenimente viitoare",
+    "past": "Evenimente anterioare",
+    "noUpcoming": "Niciun eveniment programat momentan. Reveniți în curând!",
+    "noPast": "Niciun eveniment anterior",
+    "card": {
+      "publicEvent": "Eveniment public",
+      "readMore": "Aflați mai multe",
+      "liveNow": "În desfășurare",
+      "spotsAvailable": "{count} locuri disponibile",
+      "fullyBooked": "Locuri epuizate",
+      "ended": "Încheiat",
+      "occupiedSpots": "{registered}/{max} înscriși"
+    },
+    "detail": {
+      "title": "Detalii eveniment",
+      "date": "Data și ora",
+      "duration": "Durată",
+      "durationHours": "{hours}h {minutes}min",
+      "timezone": "Fus orar",
+      "description": "Descriere",
+      "participants": "Participanți",
+      "maxParticipants": "{count} locuri totale",
+      "spotsLeft": "{count} locuri rămase",
+      "occupiedSpots": "{registered} din {max} locuri ocupate",
+      "full": "Locuri epuizate",
+      "register": "Înregistrați-vă la eveniment",
+      "registerAndJoin": "Înregistrați-vă și participați",
+      "registered": "Sunteți înregistrat",
+      "enterEvent": "Intrați în eveniment",
+      "eventEnded": "Eveniment încheiat",
+      "eventHeldOn": "Acest eveniment a avut loc pe {date}",
+      "totalRegistrations": "{count} participanți înregistrați",
+      "recording": "Înregistrare disponibilă",
+      "noRecording": "Înregistrarea video nu este disponibilă pentru acest eveniment.",
+      "watchRecording": "Vizionați înregistrarea",
+      "backToEvents": "Înapoi la evenimente",
+      "speakers": "Vorbitori",
+      "organizer": "Organizator",
+      "chatNotSaved": "Mesajele din chat nu sunt salvate după încheierea evenimentului.",
+      "qaPostEvent": "Întrebări și răspunsuri de la eveniment",
+      "peakParticipants": "Vârf: {count} participanți",
+      "calendar": {
+        "addToCalendar": "Adăugați în calendar",
+        "google": "Google Calendar",
+        "outlook": "Outlook / Office 365",
+        "yahoo": "Yahoo Calendar",
+        "downloadIcs": "Descărcați fișierul .ics"
+      }
+    },
+    "manage": {
+      "toggleChat": "Chat",
+      "toggleQa": "Q&A",
+      "toggleRecording": "Înregistrare",
+      "settingsSection": "Setări eveniment"
+    },
+    "status": {
+      "DRAFT": "Ciornă",
+      "PUBLISHED": "Publicat",
+      "LIVE": "În desfășurare",
+      "ENDED": "Încheiat",
+      "ARCHIVED": "Arhivat"
+    }
+  },
+  "registration": {
+    "title": "Înregistrare la eveniment",
+    "name": "Nume complet",
+    "namePlaceholder": "Numele va fi afișat în sala evenimentului",
+    "email": "Email",
+    "emailPlaceholder": "Veți primi linkul de acces la eveniment",
+    "gdprConsent": "Consimt la prelucrarea datelor mele personale (nume, email) în conformitate cu Regulamentul UE 2016/679 (GDPR) pentru participarea la acest eveniment.",
+    "gdprLink": "Citiți politica de confidențialitate completă",
+    "submit": "Confirmați înregistrarea",
+    "submitting": "Înregistrare în curs...",
+    "success": "Înregistrare finalizată!",
+    "successMessage": "Veți primi un email de confirmare cu linkul de acces la eveniment.",
+    "alreadyRegistered": "Sunteți deja înregistrat la acest eveniment",
+    "backToEvent": "Înapoi la eveniment",
+    "organization": "Instituția de apartenență",
+    "organizationPlaceholder": "de ex. AGID, Ministerul Economiei, Primăria Romei",
+    "organizationRole": "Funcția în instituție",
+    "organizationRolePlaceholder": "de ex. Responsabil Transformare Digitală, Dezvoltator",
+    "organizationType": "Tipul instituției",
+    "organizationTypePlaceholder": "Selectați tipul...",
+    "organizationTypes": {
+      "MINISTRY": "Minister",
+      "AGENCY": "Agenție",
+      "REGION": "Regiune",
+      "PROVINCE": "Provincie",
+      "MUNICIPALITY": "Primărie",
+      "ASL": "ASL",
+      "UNIVERSITY": "Universitate",
+      "PUBLIC_ENTITY": "Entitate publică",
+      "IN_HOUSE": "Societate in-house",
+      "OTHER": "Altul"
+    },
+    "gdprConsentProfiling": "Datele referitoare la instituția de apartenență vor fi prelucrate în scopuri statistice.",
+    "errors": {
+      "nameRequired": "Introduceți numele dumneavoastră",
+      "emailRequired": "Introduceți emailul dumneavoastră",
+      "emailInvalid": "Introduceți o adresă de email validă",
+      "organizationRequired": "Introduceți instituția de apartenență",
+      "consentRequired": "Consimțământul pentru prelucrarea datelor este obligatoriu",
+      "recordingConsentRequired": "Consimțământul pentru înregistrare este obligatoriu pentru acest eveniment",
+      "eventFull": "Evenimentul a atins numărul maxim de participanți",
+      "generic": "Eroare la înregistrare. Vă rugăm să reîncercați."
+    }
+  },
+  "live": {
+    "title": "Sala evenimentului",
+    "connecting": "Se conectează...",
+    "connectionError": "Conectarea la sală nu a reușit. Verificați conexiunea și reîncercați.",
+    "recordingActive": "Înregistrare în curs",
+    "recordingConsent": "Acest eveniment este înregistrat. Prin intrare, consimțiți la înregistrarea audio/video.",
+    "recordingConsentTitle": "Consimțământ pentru înregistrare",
+    "declineRecording": "Nu particip",
+    "enterRoom": "Intrați în sală",
+    "leaveRoom": "Ieșiți din sală",
+    "eventNotStarted": "Evenimentul nu a început încă",
+    "eventStartsAt": "Evenimentul va începe pe {date} la ora {time}",
+    "countdown": "Timp rămas",
+    "waitingRoomHint": "Această pagină se va actualiza automat când moderatorul va porni evenimentul. Nu este necesar să reîncărcați.",
+    "startEventButton": "Porniți evenimentul",
+    "startingEvent": "Se pornește...",
+    "chatNotSaved": "Mesajele din chat nu sunt salvate după încheierea evenimentului.",
+    "registerAndJoin": "Înregistrați-vă și participați",
+    "registerNow": "În desfășurare — Înregistrați-vă acum!",
+    "enableMusic": "Activați muzica",
+    "disableMusic": "Dezactivați muzica",
+    "preJoinSubtitle": "Sunteți pe punctul de a intra în sala evenimentului",
+    "preJoinNameLabel": "Numele dumneavoastră",
+    "guestJoinSubtitle": "Intrați ca invitat la evenimentul în desfășurare",
+    "guestJoinButton": "Intrați ca invitat",
+    "guestRedirectToRegister": "Evenimentul nu a început încă. Înregistrați-vă pentru a primi linkul de acces.",
+    "jibriUnavailable": "Înregistrare indisponibilă — Jibri nu este configurat",
+    "jibriNotConfigured": "Înregistrarea nu este configurată în infrastructură",
+    "eventEnded": "Eveniment încheiat",
+    "eventEndedMessage": "Evenimentul s-a încheiat. Vă mulțumim pentru participare.",
+    "backToEvent": "Înapoi la eveniment",
+    "moderatorBadge": "Moderator",
+    "qaSidebarPlaceholder": "Panoul Q&A va fi disponibil după începerea evenimentului.",
+    "invalidToken": "Link invalid. Verificați linkul primit prin email.",
+    "sidebarTabQa": "Q&A",
+    "sidebarTabPolls": "Sondaje",
+    "sidebarTabMaterials": "Materiale",
+    "sidebarTabParticipants": "Participanți",
+    "role": {
+      "moderator": "Moderator",
+      "participant": "Participant",
+      "guest": "Invitat"
+    },
+    "participants": {
+      "title": "Participanți",
+      "noParticipants": "Niciun participant",
+      "kick": "Eliminați",
+      "kickConfirm": "Sigur doriți să eliminați acest participant?"
+    },
+    "moderator": {
+      "muteAll": "Dezactivați sunetul tuturor",
+      "unmuteAll": "Reactivați sunetul",
+      "startRecording": "Porniți înregistrarea",
+      "stopRecording": "Opriți înregistrarea",
+      "toggleChat": "Chat on/off",
+      "endEvent": "Încheiați evenimentul",
+      "endEventConfirm": "Sigur doriți să încheiați evenimentul pentru toți participanții?",
+      "participantCount": "{count} participanți",
+      "raisedHands": "Mâini ridicate",
+      "noRaisedHands": "Nicio mână ridicată",
+      "giveFloor": "Acordați cuvântul",
+      "approveAudio": "Acordați cuvântul (audio)",
+      "approveVideo": "Acordați cuvântul (video)",
+      "approveAll": "Acordați cuvântul",
+      "audioOnly": "Doar audio",
+      "audioModeration": "Microfon participanți",
+      "videoModeration": "Video participanți",
+      "eventEndedSuccess": "Evenimentul s-a încheiat cu succes. Redirecționare..."
+    }
+  },
+  "qa": {
+    "title": "Întrebări și Răspunsuri",
+    "askQuestion": "Puneți o întrebare",
+    "placeholder": "Scrieți întrebarea dumneavoastră (max. 500 caractere)",
+    "submit": "Trimiteți întrebarea",
+    "submitting": "Se trimite...",
+    "questionSent": "Întrebarea a fost trimisă!",
+    "cooldownWait": "Așteptați {seconds}s...",
+    "upvote": "Votați",
+    "upvoted": "Votat",
+    "noQuestions": "Nicio întrebare încă. Fiți primul!",
+    "qaPersistenceNote": "Întrebările sunt salvate și vor fi disponibile după eveniment.",
+    "qaPostEvent": "Întrebări și răspunsuri de la eveniment",
+    "noAnsweredQuestions": "Nicio întrebare cu răspuns pentru acest eveniment.",
+    "filterAll": "Toate",
+    "showPanel": "Afișați Q&A",
+    "hidePanel": "Ascundeți Q&A",
+    "status": {
+      "PENDING": "În așteptare",
+      "HIGHLIGHTED": "Evidențiat",
+      "ANSWERED": "Răspuns dat",
+      "DISMISSED": "Respins"
+    },
+    "moderator": {
+      "highlight": "Evidențiați",
+      "markAnswered": "Răspuns dat",
+      "dismiss": "Respingeți",
+      "resetToPending": "Resetați"
+    },
+    "errors": {
+      "textRequired": "Scrieți întrebarea dumneavoastră",
+      "tooLong": "Întrebarea nu poate depăși 500 de caractere",
+      "rateLimit": "Așteptați înainte de a trimite altă întrebare",
+      "generic": "Eroare la trimiterea întrebării"
+    }
+  },
+  "polls": {
+    "title": "Sondaje",
+    "showPanel": "Afișați sondajele",
+    "hidePanel": "Ascundeți sondajele",
+    "createPoll": "Creați un sondaj",
+    "noPolls": "Niciun sondaj. Moderatorul va crea sondaje în timpul evenimentului.",
+    "questionPlaceholder": "Scrieți întrebarea sondajului...",
+    "optionPlaceholder": "Opțiunea {number}",
+    "addOption": "Adăugați opțiune",
+    "removeOption": "Eliminați opțiune",
+    "create": "Creați",
+    "creating": "Se creează...",
+    "cancelCreate": "Anulați",
+    "closePoll": "Închideți votul",
+    "publishResults": "Publicați rezultatele",
+    "reopenPoll": "Redeschideți",
+    "totalVotes": "{count} voturi",
+    "voted": "Ați votat",
+    "status": {
+      "OPEN": "Deschis",
+      "CLOSED": "Închis",
+      "PUBLISHED": "Rezultate"
+    },
+    "errors": {
+      "questionRequired": "Scrieți întrebarea sondajului",
+      "minOptions": "Sunt necesare cel puțin 2 opțiuni",
+      "generic": "Eroare la crearea sondajului"
+    }
+  },
+  "materials": {
+    "title": "Materiale",
+    "postEventTitle": "Materialele evenimentului",
+    "addMaterial": "Adăugați material",
+    "titleLabel": "Titlu",
+    "urlLabel": "URL link",
+    "descriptionLabel": "Descriere (opțional)",
+    "addedBy": "Adăugat de {name}",
+    "noMaterials": "Niciun material distribuit.",
+    "confirmDelete": "Sigur doriți să ștergeți acest material?",
+    "materialAdded": "Material adăugat",
+    "materialDeleted": "Material șters",
+    "deleteMaterial": "Ștergeți materialul",
+    "add": "Adăugați",
+    "adding": "Se adaugă...",
+    "cancel": "Anulați",
+    "errors": {
+      "urlInvalid": "Introduceți un URL valid",
+      "generic": "Eroare la adăugarea materialului"
+    }
+  },
+  "reminders": {
+    "title": "Notificări",
+    "addReminder": "Adăugați notificare",
+    "removeReminder": "Eliminați",
+    "maxReminders": "Maxim 5 notificări per eveniment.",
+    "selectPreset": "Selectați când...",
+    "sentStatus": "{count} trimise",
+    "notSent": "Netrimisă",
+    "presets": {
+      "7days": "Cu 7 zile înainte",
+      "3days": "Cu 3 zile înainte",
+      "1day": "Cu 1 zi înainte",
+      "12hours": "Cu 12 ore înainte",
+      "6hours": "Cu 6 ore înainte",
+      "3hours": "Cu 3 ore înainte",
+      "1hour": "Cu 1 oră înainte",
+      "30min": "Cu 30 de minute înainte",
+      "15min": "Cu 15 minute înainte"
+    }
+  },
+  "admin": {
+    "nav": {
+      "events": "Gestionare evenimente",
+      "settings": "Setări de sistem",
+      "eventsList": "Listă evenimente",
+      "newEvent": "Eveniment nou",
+      "calendar": "Calendar",
+      "templates": "Șabloane",
+      "analytics": "Statistici",
+      "infrastructure": "Infrastructură",
+      "settingsGeneral": "Generale",
+      "settingsLanguages": "Limbi",
+      "ariaLabel": "Navigare administrare",
+      "subNavAriaLabel": "Navigare secțiune"
+    },
+    "landing": {
+      "title": "Panou de administrare",
+      "subtitle": "Gestionați evenimentele și configurați platforma",
+      "eventsTitle": "Gestionare evenimente",
+      "eventsDescription": "Creați, editați și gestionați evenimente, șabloane și statistici.",
+      "settingsTitle": "Setări de sistem",
+      "settingsDescription": "Configurați brandingul, conținutul, limbile, funcționalitățile și infrastructura.",
+      "liveNow": "{count, plural, one {# eveniment live} few {# evenimente live} other {# evenimente live}}",
+      "upcomingEvents": "{count, plural, one {# eveniment programat} few {# evenimente programate} other {# evenimente programate}}"
+    },
+    "recording": {
+      "title": "Înregistrare video",
+      "play": "Redați",
+      "download": "Descărcați",
+      "delete": "Ștergeți înregistrarea",
+      "deleteConfirm": "Sigur doriți să ștergeți înregistrarea? Această acțiune este ireversibilă.",
+      "notConfigured": "Înregistrarea video nu este disponibilă. Jibri nu este configurat în infrastructură.",
+      "inProgress": "Înregistrare în curs..."
+    },
+    "login": {
+      "title": "Acces administrator",
+      "keyLabel": "Cheie de acces",
+      "keyPlaceholder": "Introduceți cheia de acces",
+      "submit": "Autentificați-vă",
+      "invalidKey": "Cheie de acces invalidă",
+      "logout": "Deconectați-vă"
+    },
+    "title": "Gestionare evenimente",
+    "subtitle": "Panou de administrare",
+    "createEvent": "Creați un eveniment nou",
+    "editEvent": "Editați evenimentul",
+    "deleteEvent": "Ștergeți evenimentul",
+    "deleteConfirm": "Sigur doriți să ștergeți acest eveniment? Această acțiune este ireversibilă.",
+    "publish": "Publicați",
+    "unpublish": "Anulați publicarea",
+    "noToken": "Pentru a gestiona evenimentele, utilizați linkul de moderator primit prin email.",
+    "noEvents": "Niciun eveniment găsit. Creați primul dumneavoastră eveniment.",
+    "eventDetails": "Detalii eveniment",
+    "registrations": "Înregistrări",
+    "registrationCount": "{count} înregistrări",
+    "noRegistrations": "Niciun participant înregistrat. Distribuiți linkul evenimentului!",
+    "exportCsv": "Exportați CSV",
+    "organization": "Instituție",
+    "organizationType": "Tipologie",
+    "registrationDate": "Data înregistrării",
+    "joined": "A participat",
+    "notJoined": "Nu a participat",
+    "deleteSuccess": "Eveniment șters",
+    "publishSuccess": "Eveniment publicat",
+    "unpublishSuccess": "Publicare anulată",
+    "startEvent": "Porniți evenimentul",
+    "startEventSuccess": "Eveniment pornit! Participanții în așteptare vor fi redirecționați automat.",
+    "jvbWarmupWarning": "Serverele video se pornesc (aproximativ 2 minute). Participanții vor vedea o notificare în sala de așteptare.",
+    "eventIsLive": "Evenimentul este în desfășurare",
+    "joinAsModeratorBtn": "Intrați ca moderator",
+    "openPublicPage": "Deschideți pagina publică",
+    "quickActions": "Acțiuni rapide",
+    "liveRoomLink": "Link sală eveniment",
+    "manage": "Gestionați",
+    "settingsSaved": "Salvat",
+    "toggleChatDesc": "Activați chatul între participanți",
+    "toggleQaDesc": "Activați întrebările cu vot",
+    "toggleRecordingDesc": "Înregistrați evenimentul (necesită Jibri)",
+    "eventUpdated": "Eveniment actualizat cu succes!",
+    "dateChangedNotification": "Data a fost modificată. Participanții înregistrați vor primi o notificare prin email.",
+    "eventCreated": "Eveniment creat cu succes!",
+    "createEventCta": "Organizați un eveniment",
+    "createEventExplanation": "Creați evenimentul și veți primi un link pentru a-l gestiona.",
+    "noAccountNeeded": "Nu este necesar un cont — linkul de moderator este accesul dumneavoastră pentru gestionarea evenimentului.",
+    "form": {
+      "titleIt": "Titlu (italiană)",
+      "titleEn": "Titlu (engleză)",
+      "descriptionIt": "Descriere (italiană)",
+      "descriptionEn": "Descriere (engleză)",
+      "startsAt": "Data și ora de început",
+      "endsAt": "Data și ora de sfârșit",
+      "maxParticipants": "Numărul maxim de participanți",
+      "qaEnabled": "Activați Q&A",
+      "chatEnabled": "Activați chatul",
+      "recordingEnabled": "Activați înregistrarea video",
+      "dataRetentionDays": "Păstrarea datelor (zile după eveniment)",
+      "dataRetentionHint": "După această perioadă, înregistrările participanților, întrebările Q&A și eventualele înregistrări video vor fi șterse automat.",
+      "privacyPolicyUrl": "URL politica de confidențialitate",
+      "moderatorName": "Numele moderatorului",
+      "moderatorEmail": "Emailul moderatorului",
+      "speakersIt": "Vorbitori (italiană)",
+      "speakersEn": "Vorbitori (engleză)",
+      "organizerName": "Organizator",
+      "imageUrl": "URL imagine de copertă",
+      "waitingRoomAudioUrl": "URL audio sală de așteptare (opțional)",
+      "waitingRoomAudioUrlHint": "Introduceți URL-ul unui fișier MP3 pentru muzica din sala de așteptare. Lăsați gol pentru audio-ul implicit.",
+      "submit": "Creați evenimentul",
+      "submitEdit": "Salvați modificările",
+      "saving": "Se salvează...",
+      "creating": "Se creează...",
+      "sectionContent": "Conținut",
+      "sectionSchedule": "Programare",
+      "sectionSettings": "Setări",
+      "sectionSpeakers": "Vorbitori și organizator",
+      "sectionModerator": "Moderator",
+      "sectionRegistrationFields": "Câmpuri de înregistrare",
+      "requireOrganization": "Solicitați instituția de apartenență",
+      "requireOrganizationDesc": "Participanții trebuie să indice instituția lor",
+      "requireOrganizationRole": "Solicitați funcția în instituție",
+      "requireOrganizationRoleDesc": "Participanții pot indica funcția lor",
+      "requireOrganizationType": "Solicitați tipul instituției",
+      "requireOrganizationTypeDesc": "Participanții selectează tipul instituției lor",
+      "sectionPermissions": "Permisiuni participanți",
+      "participantsCanUnmute": "Participanții pot activa microfonul",
+      "participantsCanStartVideo": "Participanții pot activa camera",
+      "participantsCanShareScreen": "Participanții pot partaja ecranul",
+      "permissionsOnDesc": "Participanții pot activa în mod autonom",
+      "permissionsOffDesc": "Doar moderatorii pot activa. Participanții trebuie să ridice mâna.",
+      "permissionsNote": "Modificările permisiunilor se aplică noilor participanți.",
+      "privacyPolicyMode": "Politica de confidențialitate",
+      "privacyPolicyModeUrl": "URL extern",
+      "privacyPolicyModeText": "Text personalizat",
+      "privacyPolicyText": "Textul politicii de confidențialitate",
+      "privacyPolicyTextHint": "Scrieți textul politicii de confidențialitate. Va fi afișat inline în formularul de înregistrare.",
+      "retentionPreviewTitle": "Ce se șterge automat",
+      "retentionPreviewIntro": "După {days} zile de la încheierea evenimentului, se vor șterge automat:",
+      "retentionPreviewParticipants": "Datele participanților (nume, email, instituție)",
+      "retentionPreviewQa": "Întrebările Q&A și voturile",
+      "retentionPreviewPolls": "Rezultatele sondajelor",
+      "retentionPreviewRecordings": "Înregistrările video",
+      "retentionPreviewKept": "Statisticile agregate și metadatele evenimentului sunt păstrate.",
+      "configPreview": "Previzualizare configurație",
+      "templateApplied": "Șablon aplicat: {name}. Puteți modifica toate setările."
+    },
+    "links": {
+      "title": "Linkurile evenimentului",
+      "publicPage": "Pagina publică a evenimentului",
+      "moderatorLink": "Link moderator",
+      "moderatorLinkHint": "Distribuiți acest link doar moderatorilor. Oricine îl deține poate gestiona evenimentul.",
+      "copyLink": "Copiați linkul",
+      "copied": "Copiat!"
+    },
+    "feedbackAdmin": {
+      "title": "Rezultate feedback",
+      "averageRating": "Evaluare medie",
+      "totalVotes": "{count, plural, one {# evaluare} few {# evaluări} other {# evaluări}}",
+      "noFeedback": "Niciun feedback primit",
+      "comments": "Comentariile participanților",
+      "noComments": "Niciun comentariu",
+      "stars": "stele"
+    },
+    "gdprAuditLog": {
+      "title": "Registru GDPR",
+      "date": "Data",
+      "action": "Acțiune",
+      "recordCount": "Înregistrări",
+      "details": "Detalii",
+      "actions": {
+        "DATA_DELETED": "Date șterse",
+        "CONSENT_RECORDED": "Consimțământ înregistrat",
+        "DATA_EXPORTED": "Date exportate"
+      }
+    },
+    "settings": {
+      "title": "Setări site",
+      "subtitle": "Configurați aspectul și comportamentul platformei pentru reutilizarea în AP",
+      "saving": "Se salvează...",
+      "saved": "Setări salvate cu succes",
+      "tabs": {
+        "branding": "Branding",
+        "header": "Antet",
+        "seo": "SEO",
+        "homepage": "Pagina principală",
+        "pages": "Pagini",
+        "footer": "Subsol",
+        "features": "Funcționalități"
+      },
+      "header": {
+        "slimBarTitle": "Bară superioară (Slim Header)",
+        "slimBarDescription": "Bara subțire din partea de sus a paginii care identifică instituția superioară.",
+        "parentOrganization": "Instituția superioară",
+        "parentOrganizationHelp": "De ex. \"Președinția Consiliului de Miniștri\"",
+        "parentOrganizationUrl": "URL instituție superioară",
+        "centerBarTitle": "Antet central",
+        "centerBarDescription": "Zona principală a antetului cu numele aplicației și logo-ul.",
+        "appName": "Numele aplicației",
+        "appNameHelp": "Afișat în antet și în titlul browserului",
+        "organizationShort": "Numele scurt al instituției",
+        "logoUrl": "URL logo",
+        "logoUrlHelp": "Lăsați gol pentru a utiliza pictograma AP implicită",
+        "organizationUrl": "URL site-ul instituției"
+      },
+      "branding": {
+        "siteName": "Numele aplicației",
+        "siteNameHelp": "Afișat în antet, în titlul browserului și în emailuri",
+        "siteDescription": "Descrierea aplicației",
+        "organizationName": "Numele organizației",
+        "organizationNameHelp": "de ex. Departamentul pentru Transformarea Digitală",
+        "organizationNameShort": "Sigla organizației",
+        "organizationUrl": "URL organizație",
+        "parentOrganization": "Organizația superioară",
+        "parentOrganizationHelp": "de ex. Președinția Consiliului de Miniștri",
+        "parentOrganizationUrl": "URL organizație superioară",
+        "logoUrl": "URL logo personalizat",
+        "logoUrlHelp": "Lăsați gol pentru a utiliza pictograma AP implicită",
+        "faviconUrl": "URL favicon",
+        "primaryColor": "Culoare primară",
+        "defaultTimezone": "Fus orar implicit",
+        "defaultTimezoneHelp": "Utilizat pentru afișarea datelor și crearea evenimentelor noi."
+      },
+      "watermark": {
+        "title": "Personalizare video",
+        "enabled": "Watermark activ",
+        "url": "URL watermark",
+        "urlHelp": "URL-ul unei imagini SVG sau PNG transparente. Lăsați gol pentru a utiliza logo-ul organizației.",
+        "opacity": "Opacitate",
+        "position": "Poziție",
+        "previewLabel": "Previzualizare zonă video",
+        "positions": {
+          "bottomLeft": "Stânga jos",
+          "bottomRight": "Dreapta jos",
+          "topLeft": "Stânga sus",
+          "topRight": "Dreapta sus"
+        }
+      },
+      "seo": {
+        "title": "Titlu SEO",
+        "titleHelp": "Titlul afișat în rezultatele căutării și în fila browserului",
+        "description": "Descriere SEO",
+        "descriptionHelp": "Descriere pentru motoarele de căutare și distribuirea pe rețele sociale",
+        "image": "Imagine Open Graph",
+        "imageHelp": "Imagine implicită pentru distribuirea pe rețele sociale (1200x630 recomandat)"
+      },
+      "homepage": {
+        "modeLabel": "Modul paginii principale",
+        "modes": {
+          "LANDING": {
+            "title": "Pagină de prezentare",
+            "description": "Hero, funcționalități, evenimente viitoare și cum funcționează"
+          },
+          "EVENTS_LIST": {
+            "title": "Lista evenimentelor",
+            "description": "Afișează direct lista evenimentelor"
+          },
+          "CUSTOM": {
+            "title": "Personalizat",
+            "description": "Conținut HTML personalizat + lista evenimentelor"
+          }
+        },
+        "customHtmlLabel": "Conținut HTML personalizat",
+        "customHtmlHelp": "HTML afișat în secțiunea principală a paginii de start"
+      },
+      "pages": {
+        "privacyTitle": "Politica de confidențialitate",
+        "privacyIt": "Conținut (italiană)",
+        "privacyEn": "Conținut (engleză)",
+        "accessibilityTitle": "Declarația de accesibilitate",
+        "accessibilityIt": "Conținut (italiană)",
+        "accessibilityEn": "Conținut (engleză)",
+        "preview": "Previzualizare"
+      },
+      "footer": {
+        "linksTitle": "Linkuri subsol",
+        "addLink": "Adăugați link",
+        "noLinks": "Niciun link configurat. Se vor utiliza linkurile implicite.",
+        "linkTitle": "Titlu",
+        "linkSection": "Secțiune",
+        "sectionLegal": "Note legale",
+        "sectionMain": "Principal",
+        "moveUp": "Mutați în sus",
+        "moveDown": "Mutați în jos",
+        "removeLink": "Eliminați linkul"
+      },
+      "features": {
+        "statusPageEnabled": "Pagina de stare activă",
+        "statusPageEnabledHelp": "Afișați pagina de stare a serviciului",
+        "guestAccessEnabled": "Acces invitați activ",
+        "guestAccessEnabledHelp": "Permiteți accesul ca invitat la evenimentele în desfășurare",
+        "publicRegistrationEnabled": "Înregistrare publică activă",
+        "publicRegistrationEnabledHelp": "Oricine poate crea evenimente (dacă este dezactivat, doar administratorii)",
+        "calendarPublic": "Calendar public",
+        "calendarPublicHelp": "Publicați calendarul evenimentelor. Vizitatorii pot vedea evenimentele programate.",
+        "githubUrl": "URL depozit GitHub",
+        "supportEmail": "Email suport"
+      }
+    },
+    "analytics": {
+      "title": "Statistici",
+      "subtitle": "Prezentare generală a metricilor platformei",
+      "timeline": "Evoluție în timp",
+      "topEvents": "Cele mai bune evenimente",
+      "noData": "Nicio dată disponibilă pentru această perioadă.",
+      "period": {
+        "7d": "7 zile",
+        "30d": "30 zile",
+        "90d": "90 zile",
+        "all": "Total"
+      },
+      "metrics": {
+        "totalEvents": "Total evenimente",
+        "totalRegistrations": "Înregistrări",
+        "totalParticipants": "Participanți",
+        "conversionRate": "Rata medie de conversie",
+        "peakParticipants": "Vârf participanți"
+      },
+      "table": {
+        "event": "Eveniment",
+        "date": "Data",
+        "registrations": "Înregistrări",
+        "participants": "Participanți",
+        "peak": "Vârf",
+        "questions": "Q&A",
+        "conversion": "Conversie",
+        "noEvents": "Niciun eveniment găsit."
+      },
+      "quickStats": {
+        "title": "Statistici rapide",
+        "avgDuration": "Durata medie a evenimentelor",
+        "avgQuestionsPerEvent": "Întrebări Q&A per eveniment",
+        "totalPollVotes": "Total voturi sondaje",
+        "avgParticipantsPerEvent": "Participanți medii per eveniment",
+        "avgFeedbackRating": "Evaluarea medie feedback",
+        "totalFeedback": "Răspunsuri feedback"
+      }
+    },
+    "templates": {
+      "title": "Șabloane evenimente",
+      "subtitle": "Gestionați șabloanele predefinite pentru crearea rapidă de evenimente",
+      "create": "Șablon nou",
+      "deleteConfirm": "Sigur doriți să ștergeți acest șablon?",
+      "system": "Sistem",
+      "nameLabel": "Numele șablonului",
+      "descriptionLabel": "Descriere",
+      "maxParticipantsLabel": "Max participanți",
+      "featuresLabel": "Funcționalități",
+      "recordingLabel": "Înregistrare",
+      "unmute": "Microfon participanți",
+      "video": "Video participanți",
+      "screen": "Partajare ecran",
+      "pickerTitle": "Alegeți un șablon",
+      "pickerSubtitle": "Selectați un șablon pentru a pre-configura setările evenimentului sau omiteți pentru a configura totul manual.",
+      "skipTemplate": "Configurați manual"
+    },
+    "instantCall": {
+      "title": "Apel video instant",
+      "subtitle": "Creați un apel video rapid și distribuiți linkul. Fără programare.",
+      "nameLabel": "Numele apelului",
+      "namePlaceholder": "de ex. Sincronizare rapidă, Demo proiect...",
+      "moderatorLabel": "Numele dumneavoastră (opțional)",
+      "moderatorPlaceholder": "Va fi afișat în apel",
+      "create": "Creați și intrați",
+      "creating": "Se creează...",
+      "copyLink": "Copiați linkul de invitație",
+      "copied": "Copiat!",
+      "hint": "Toți pot activa microfonul, camera și partaja ecranul. Doar dumneavoastră puteți înregistra și încheia apelul."
+    },
+    "files": {
+      "title": "Fișiere și materiale",
+      "upload": "Încărcați fișier",
+      "selectFile": "Selectați fișierul",
+      "fileTitle": "Titlu",
+      "visibility": "Vizibilitate",
+      "visibilityAlways": "Întotdeauna vizibil",
+      "visibilityBefore": "Doar înainte de eveniment",
+      "visibilityDuring": "Doar în timpul evenimentului",
+      "visibilityAfter": "Doar după eveniment",
+      "uploading": "Se încarcă...",
+      "uploadBtn": "Încărcați",
+      "deleteConfirm": "Sigur doriți să ștergeți acest fișier?",
+      "noFiles": "Niciun fișier încărcat. Utilizați butonul \"Încărcați fișier\" pentru a adăuga materiale."
+    },
+    "languages": {
+      "title": "Gestionare limbi",
+      "subtitle": "Configurați limbile disponibile și personalizați traducerile",
+      "configuredLocales": "Limbi configurate",
+      "localesDescription": "Selectați limbile disponibile pentru interfața utilizatorului. Italiana este obligatorie ca limbă implicită.",
+      "addLocale": "Adăugați limbă",
+      "localeCode": "Cod limbă",
+      "localeName": "Numele limbii",
+      "selectLocale": "Selectați...",
+      "add": "Adăugați",
+      "default": "Implicită",
+      "editTranslations": "Editați traducerile",
+      "saved": "Configurarea limbilor a fost salvată",
+      "saveNote": "Modificările limbilor disponibile necesită o repornire pentru a intra în vigoare în URL-uri.",
+      "translationOverrides": "Traduceri personalizate — {locale}",
+      "overridesDescription": "Suprascrieți traducerile implicite pentru această limbă. Utilizați notația cu punct (de ex. common.appName).",
+      "keyLabel": "Cheie traducere",
+      "valueLabel": "Valoare",
+      "addOverride": "Adăugați"
+    },
+    "infrastructure": {
+      "title": "Infrastructură",
+      "subtitle": "Starea componentelor și configurarea mediului",
+      "deploymentMode": "Modul de implementare",
+      "version": "Versiune",
+      "environment": "Mediu",
+      "modes": {
+        "simple": "Simplu (Docker Compose)",
+        "standard": "Standard (Kubernetes)",
+        "full": "Complet (Kubernetes cu scale-to-zero)",
+        "unknown": "Necunoscut"
+      },
+      "database": {
+        "title": "Bază de date",
+        "internal": "În cluster (PostgreSQL)",
+        "external": "Extern",
+        "connected": "Conectat",
+        "disconnected": "Indisponibil"
+      },
+      "jitsi": {
+        "title": "Jitsi Meet",
+        "reachable": "Accesibil",
+        "unreachable": "Inaccesibil",
+        "notConfigured": "Neconfigurat"
+      },
+      "jvb": {
+        "title": "Video Bridge (JVB)",
+        "scaleToZero": "Scale-to-zero activ",
+        "replicas": "{current}/{max} noduri",
+        "preScale": "Pre-scale: {minutes} min",
+        "fixedMode": "Mod fix",
+        "scalerEnabled": "Scaler activat"
+      },
+      "jibri": {
+        "title": "Înregistrare (Jibri)",
+        "available": "Disponibil",
+        "notConfigured": "Neconfigurat",
+        "storageType": "Stocare",
+        "configureHint": "Înregistrarea video necesită Jibri. Configurați stocarea pentru a o activa.",
+        "docsLink": "Documentație"
+      },
+      "email": {
+        "title": "Email",
+        "configured": "Configurat",
+        "notConfigured": "Neconfigurat"
+      },
+      "features": {
+        "title": "Funcționalități",
+        "statusPage": "Pagina de stare",
+        "guestAccess": "Acces invitați",
+        "metrics": "Endpoint metrici"
+      },
+      "note": "Modificările de infrastructură se efectuează prin Helm values și pipeline-ul CI/CD.",
+      "deployDocs": "Documentație implementare"
+    }
+  },
+  "email": {
+    "confirmationSubject": "Confirmare înregistrare: {eventTitle}",
+    "confirmationHeading": "Înregistrare confirmată",
+    "confirmationKeepNote": "Păstrați acest email, conține linkul dumneavoastră personal de acces la eveniment.",
+    "reminderSubject": "Memento: {eventTitle} începe într-o oră",
+    "reminderHeading": "Memento eveniment",
+    "reminderNote": "Evenimentul la care v-ați înregistrat începe în mai puțin de o oră. Utilizați linkul de mai jos pentru a accesa.",
+    "recordingSubject": "Înregistrare disponibilă: {eventTitle}",
+    "joinLabel": "Accesați evenimentul",
+    "viewEvent": "Vizualizați pagina evenimentului",
+    "eventLabel": "Eveniment",
+    "dateLabel": "Data",
+    "timeLabel": "Ora",
+    "durationLabel": "Durată"
+  },
+  "home": {
+    "hero": {
+      "title": "Evenimente publice digitale",
+      "subtitle": "Platformă pentru webinarii, prezentări și întâlniri publice a Departamentului pentru Transformarea Digitală",
+      "browseEvents": "Descoperiți evenimentele",
+      "organizeEvent": "Organizați un eveniment"
+    },
+    "features": {
+      "title": "Platforma pentru evenimentele administrației publice",
+      "video": {
+        "title": "Videoconferință",
+        "desc": "Participați la evenimente publice cu până la 300 de participanți. Fără software de instalat."
+      },
+      "qa": {
+        "title": "Întrebări și răspunsuri",
+        "desc": "Puneți întrebări în timpul evenimentului și votați-le pe cele mai importante. Moderatorul răspunde în direct."
+      },
+      "privacy": {
+        "title": "Confidențialitate și securitate",
+        "desc": "Date protejate și conforme cu GDPR. Infrastructură self-hosted în Italia."
+      }
+    },
+    "upcoming": {
+      "title": "Evenimente viitoare",
+      "viewAll": "Vedeți toate evenimentele",
+      "noEvents": "Niciun eveniment programat. Reveniți în curând!"
+    },
+    "howItWorks": {
+      "title": "Cum funcționează",
+      "step1": {
+        "title": "Înregistrați-vă",
+        "desc": "Înscrieți-vă gratuit la eveniment"
+      },
+      "step2": {
+        "title": "Primiți linkul",
+        "desc": "Un email cu linkul personal de acces"
+      },
+      "step3": {
+        "title": "Participați",
+        "desc": "Intrați la eveniment din browser, fără instalări"
+      },
+      "step4": {
+        "title": "Interacționați",
+        "desc": "Puneți întrebări, votați, participați la discuție"
+      }
+    }
+  },
+  "gdpr": {
+    "consent": {
+      "recording": "Consimt la înregistrarea audio/video a evenimentului",
+      "recordingRequired": "Consimțământul pentru înregistrare este obligatoriu pentru a participa la acest eveniment",
+      "futureCommunications": "Doresc să primesc informații despre evenimentele viitoare organizate de DTD"
+    },
+    "export": {
+      "title": "Datele mele",
+      "subtitle": "Solicitați o copie a datelor personale asociate adresei dumneavoastră de email, în conformitate cu Art. 15 din GDPR.",
+      "emailLabel": "Adresa dumneavoastră de email",
+      "emailPlaceholder": "Introduceți emailul utilizat la înregistrare",
+      "emailInvalid": "Introduceți o adresă de email validă",
+      "submit": "Solicitați datele mele",
+      "loading": "Se caută...",
+      "noData": "Nicio dată găsită pentru această adresă de email.",
+      "error": "A apărut o eroare. Vă rugăm să reîncercați mai târziu.",
+      "rateLimited": "Prea multe solicitări. Vă rugăm să reîncercați peste o oră.",
+      "results": "Datele dumneavoastră",
+      "resultsDescription": "S-au găsit date referitoare la {count} evenimente.",
+      "registrationData": "Date de înregistrare",
+      "fieldName": "Nume",
+      "fieldEmail": "Email",
+      "fieldOrganization": "Instituție",
+      "fieldRegisteredAt": "Data înregistrării",
+      "fieldConsent": "Consimțământ",
+      "questionsTitle": "Întrebări Q&A",
+      "pollVotesTitle": "Voturi sondaje",
+      "optionLabel": "Opțiune"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Politica de confidențialitate",
+      "title": "Politica de confidențialitate",
+      "intro": "Această pagină rezumă prelucrarea datelor personale legată de utilizarea platformei Eventi DTD și de participarea la evenimentele publice găzduite.",
+      "sections": {
+        "controller": {
+          "title": "Operatorul de date",
+          "body": "Prelucrarea datelor personale se desfășoară în cadrul activităților instituționale ale Departamentului pentru Transformarea Digitală, pentru a permite gestionarea tehnică și organizatorică a evenimentelor publice online."
+        },
+        "data": {
+          "title": "Date prelucrate și scopuri",
+          "body": "Platforma prelucrează datele strict necesare pentru înregistrarea și participarea la evenimente, cum ar fi numele, emailul și eventualele câmpuri opționale configurate de organizator. Datele sunt utilizate pentru a trimite linkul personal de acces, a gestiona participarea la eveniment, eventualele mementouri și obligațiile legate de securitatea serviciului."
+        },
+        "retention": {
+          "title": "Păstrarea datelor și drepturi",
+          "body": "Datele sunt păstrate pe perioada configurată pentru fiecare eveniment și apoi șterse automat, cu excepția unor obligații legale diferite. În orice moment pot fi exercitate drepturile prevăzute de GDPR, inclusiv accesul, rectificarea și ștergerea, prin canalele instituționale ale Departamentului."
+        }
+      },
+      "note": {
+        "title": "Solicitarea propriilor date",
+        "body": "Dacă ați participat la un eveniment și doriți să verificați ce date personale sunt asociate adresei dumneavoastră de email, puteți utiliza funcționalitatea dedicată disponibilă pe platformă.",
+        "linkLabel": "Solicitați datele mele"
+      }
+    },
+    "accessibility": {
+      "metaTitle": "Declarația de accesibilitate",
+      "title": "Declarația de accesibilitate",
+      "intro": "Departamentul pentru Transformarea Digitală se angajează să facă această platformă accesibilă, în conformitate cu cerințele prevăzute de legislația în vigoare pentru serviciile digitale ale administrației publice.",
+      "sections": {
+        "commitment": {
+          "title": "Angajamentul pentru accesibilitate",
+          "body": "Platforma este proiectată cu componente aliniate la sistemul de design .italia și cu o atenție deosebită acordată navigării de la tastatură, semanticii conținutului și lizibilității interfețelor pe principalele dimensiuni de ecran."
+        },
+        "status": {
+          "title": "Starea conformității",
+          "body": "Sunt în curs activități continue de verificare și îmbunătățire a accesibilității aplicației. Eventualele probleme reziduale sunt corectate progresiv în cadrul evoluției serviciului și al mentenanței ordinare."
+        },
+        "feedback": {
+          "title": "Semnalări și contacte",
+          "body": "Pentru a semnala dificultăți de acces la conținut sau probleme de utilizare a serviciului, puteți utiliza canalele de contact instituționale ale Departamentului, indicând pagina afectată și o descriere a problemei întâmpinate."
+        }
+      }
+    },
+    "legalNotes": {
+      "metaTitle": "Note legale",
+      "title": "Note legale",
+      "intro": "Accesul și utilizarea platformei Eventi DTD se efectuează cu respectarea prezentelor note, care descriu condițiile generale de utilizare și principalele informații despre serviciu.",
+      "sections": {
+        "ownership": {
+          "title": "Titularul serviciului",
+          "body": "Platforma este promovată de Departamentul pentru Transformarea Digitală și este pusă la dispoziție pentru organizarea și desfășurarea evenimentelor publice online de interes instituțional."
+        },
+        "usage": {
+          "title": "Modalități de utilizare",
+          "body": "Utilizatorii sunt obligați să utilizeze serviciul în mod corect, fără a compromite securitatea platformei, disponibilitatea funcționalităților sau desfășurarea regulată a evenimentelor. Eventualele abuzuri sau utilizări necorespunzătoare pot duce la restricționarea accesului la serviciu."
+        },
+        "liability": {
+          "title": "Limitări de responsabilitate",
+          "body": "Deși se adoptă măsuri tehnice și organizatorice adecvate, Departamentul nu garantează absența absolută a întreruperilor sau defecțiunilor cauzate de evenimente neprevăzute, activități de mentenanță sau factori externi. Responsabilitățile legale rămân cele prevăzute de legislația aplicabilă."
+        }
+      }
+    }
+  },
+  "status": {
+    "title": "Starea sistemului",
+    "subtitle": "Prezentare în timp real a stării serviciilor platformei.",
+    "allOperational": "Toate sistemele sunt operaționale",
+    "degraded": "Performanță redusă",
+    "outage": "Întrerupere de serviciu",
+    "componentLabel": "Componentă",
+    "statusLabel": "Stare",
+    "operational": "Operațional",
+    "degradedLabel": "Încetinit",
+    "standby": "În standby",
+    "loading": "Se încarcă...",
+    "fetchError": "Nu s-a putut obține starea sistemului",
+    "components": {
+      "app": "Portal web",
+      "database": "Bază de date",
+      "jitsi": "Jitsi Meet",
+      "jvb": "Video Bridge (JVB)",
+      "jibri": "Înregistrare video",
+      "smtp": "Email (SMTP)"
+    },
+    "jvbCapacity": "Capacitatea video bridge",
+    "jvbStandby": "În standby — se activează automat când este necesar",
+    "jvbStandbyDetail": "Scale-to-zero activ — niciun eveniment programat. Nodurile JVB vor fi create automat înainte de începerea unui eveniment.",
+    "jvbScaling": "Activare în curs...",
+    "nodesActive": "noduri active",
+    "nodesReady": "noduri pregătite",
+    "scaling": "scalare",
+    "jvbStress": "Încărcare JVB",
+    "participantsConnected": "participanți conectați",
+    "videoInteractive": "interactiv",
+    "videoWebinar": "webinar",
+    "participantsAvailable": "participanți disponibili",
+    "upcomingEvents": "Evenimente viitoare",
+    "noUpcomingEvents": "Niciun eveniment programat",
+    "jvbActivatesIn": "JVB se activează în {minutes} min",
+    "liveNow": "În desfășurare",
+    "activeEvents": "Evenimente active",
+    "registrationsToday": "Înregistrări astăzi",
+    "jvbNodes": "Noduri JVB",
+    "overallStatus": "Stare generală",
+    "lastChecked": "Ultima verificare",
+    "responseTime": "Timp de răspuns",
+    "systemStatus": "Starea sistemului"
+  },
+  "feedback": {
+    "title": "Cum evaluați acest eveniment?",
+    "ratingLabel": "Selectați o evaluare de la 1 la 5 stele",
+    "comment": "Comentariu",
+    "commentPlaceholder": "Aveți sugestii? (opțional)",
+    "submit": "Trimiteți feedback",
+    "submitting": "Se trimite...",
+    "skip": "Omiteți",
+    "thankYou": "Vă mulțumim pentru feedback!",
+    "averageRating": "Evaluare medie",
+    "ratingCount": "{count} evaluări",
+    "noFeedback": "Niciun feedback primit"
+  },
+  "wordcloud": {
+    "title": "Word Cloud",
+    "startRound": "Porniți",
+    "prompt": "Temă",
+    "promptPlaceholder": "de ex. Ce așteptări aveți de la acest eveniment?",
+    "duration": "Durată",
+    "submit": "Trimiteți",
+    "submitPlaceholder": "Scrieți un cuvânt (max. 30 car.)",
+    "close": "Închideți word cloud",
+    "cancel": "Anulați",
+    "noActiveRound": "Niciun word cloud activ momentan.",
+    "noWords": "Se așteaptă primele cuvinte...",
+    "wordsSubmitted": "{count} cuvinte trimise",
+    "timeRemaining": "Timp rămas"
+  },
+  "timer": {
+    "title": "Cronometru",
+    "start": "Porniți",
+    "pause": "Pauză",
+    "reset": "Resetați",
+    "presets": {
+      "5min": "5 min",
+      "10min": "10 min",
+      "15min": "15 min",
+      "30min": "30 min",
+      "custom": "Personalizat"
+    },
+    "showToAll": "Afișați tuturor",
+    "timeUp": "Timpul a expirat!"
+  },
+  "reactions": {
+    "title": "Reacții",
+    "sendReaction": "Trimiteți reacție",
+    "reactionSent": "Reacție trimisă!"
+  },
+  "calendar": {
+    "title": "Calendarul evenimentelor",
+    "subtitle": "Vizualizați toate evenimentele în timp",
+    "publicTitle": "Calendarul evenimentelor",
+    "publicSubtitle": "Descoperiți evenimentele programate",
+    "today": "Astăzi",
+    "prev": "Perioada anterioară",
+    "next": "Perioada următoare",
+    "views": {
+      "day": "Zi",
+      "week": "Săptămână",
+      "month": "Lună",
+      "year": "An",
+      "list": "Listă"
+    },
+    "status": {
+      "DRAFT": "Ciornă",
+      "PUBLISHED": "Publicat",
+      "LIVE": "În desfășurare",
+      "ENDED": "Încheiat",
+      "ARCHIVED": "Arhivat"
+    }
+  },
+  "footer": {
+    "departmentName": "Departamentul pentru Transformarea Digitală",
+    "presidencyName": "Președinția Consiliului de Miniștri",
+    "privacy": "Politica de confidențialitate",
+    "accessibility": "Declarația de accesibilitate",
+    "openSource": "Software open source",
+    "contacts": "Contacte",
+    "legalNotes": "Note legale",
+    "governmentSite": "Guvernul Italian",
+    "systemStatus": "Starea sistemului"
+  },
+  "pages": {
+    "privacyTitle": "Politica de confidențialitate",
+    "privacyNotConfigured": "Politica de confidențialitate nu este încă configurată.",
+    "accessibilityTitle": "Declarația de accesibilitate",
+    "accessibilityNotConfigured": "Declarația de accesibilitate nu este încă configurată."
+  },
+  "video": {
+    "play": "Redați",
+    "pause": "Pauză",
+    "speed": "Viteză",
+    "fullscreen": "Ecran complet",
+    "pip": "Picture in Picture",
+    "volume": "Volum",
+    "mute": "Dezactivați sunetul",
+    "unmute": "Activați sunetul",
+    "download": "Descărcați înregistrarea",
+    "speedLabel": "Viteza de redare",
+    "progress": "Bară de progres"
+  },
+  "diagram": {
+    "title": "Configurare eveniment",
+    "topology": "Topologie",
+    "features": "Funcționalități active",
+    "estimates": "Estimare resurse",
+    "moderator": "Moderator",
+    "participants": "Participanți",
+    "jvb": "Video Bridge",
+    "jibri": "Înregistrare",
+    "bandwidth": {
+      "moderator": "Lățime de bandă moderator",
+      "participant": "Lățime de bandă per participant",
+      "total": "Lățime de bandă totală estimată"
+    },
+    "jvbCount": "JVB necesare",
+    "jvbRam": "RAM JVB estimat",
+    "storage": "Stocare înregistrare",
+    "duration": "Durată estimată",
+    "viewOnly": "Doar vizualizare",
+    "preview": "Previzualizare configurație"
+  },
+  "waiting": {
+    "startsIn": "Evenimentul va începe în",
+    "eventLive": "Evenimentul este în desfășurare!",
+    "connectedParticipants": "{count, plural, =0 {Niciun participant} =1 {1 participant conectat} other {{count} participanți conectați}}",
+    "elapsedTime": "În desfășurare de {minutes} minute",
+    "youAreLate": "Evenimentul a început acum {minutes} minute",
+    "chooseHowToJoin": "Alegeți cum doriți să participați:",
+    "enterLive": "Intrați LIVE",
+    "enterLiveDesc": "Participați în direct. Puteți accesa oricând înregistrarea după eveniment.",
+    "enterNow": "Intrați acum",
+    "watchFromStart": "Vizionați de la început",
+    "watchFromStartDesc": "Vizionați înregistrarea de la început și treceți la transmisiunea directă oricând doriți.",
+    "watchNow": "Vizionați",
+    "switchToLive": "Treceți la direct",
+    "enterRoom": "Intrați în sală",
+    "recordingNotice": "Acest eveniment este înregistrat.",
+    "recordingAvailableAfter": "Înregistrarea va fi disponibilă după eveniment.",
+    "autoRefreshHint": "Pagina se va actualiza automat când evenimentul va începe.",
+    "startEventButton": "Porniți evenimentul",
+    "startingEvent": "Se pornește...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 persoană în așteptare} other {{count} persoane în așteptare}}",
+    "jvbScaling": "Pregătire sală...",
+    "jvbScalingDetail": "Serverele video se pornesc. Operațiunea durează aproximativ 2 minute.",
+    "jvbReady": "Sală pregătită!"
+  },
+  "recording": {
+    "management": "Înregistrare video",
+    "inProgress": "În curs",
+    "available": "Înregistrare disponibilă",
+    "duration": "Durată",
+    "fileSize": "Dimensiune",
+    "startedAt": "Pornită",
+    "automatic": "automată",
+    "publish": "Publicați înregistrarea",
+    "publishDesc": "Faceți videoclipul accesibil pe pagina evenimentului",
+    "retentionLabel": "Păstrare",
+    "retention": {
+      "24h": "24 ore (temporar)",
+      "7d": "7 zile",
+      "30d": "30 zile",
+      "90d": "90 zile",
+      "forever": "Niciodată (până la expirarea evenimentului)"
+    },
+    "retentionNote": "Videoclipul va respecta oricum retenția GDPR a evenimentului",
+    "delete": "Ștergeți înregistrarea",
+    "deleteConfirm": "Sigur doriți? Videoclipul va fi șters definitiv.",
+    "notConfigured": "Jibri nu este configurat în infrastructură. Înregistrarea video nu este disponibilă.",
+    "play": "Redați",
+    "download": "Descărcați"
+  },
+  "postEvent": {
+    "config": "Configurare post-eveniment",
+    "pageVisible": "Pagina evenimentului vizibilă după încheiere",
+    "showQA": "Afișați întrebările Q&A",
+    "showMaterials": "Afișați materialele distribuite",
+    "showPolls": "Afișați rezultatele sondajelor",
+    "showFeedback": "Afișați feedbackul",
+    "feedbackEnabled": "Chestionar feedback activ la sfârșitul evenimentului",
+    "visibilityAlways": "Întotdeauna vizibil",
+    "visibilityUntil": "Vizibil până la:",
+    "dataRetentionNote": "Datele personale ale participanților vor fi șterse conform retenției evenimentului ({days} zile). Conținutul evenimentului va rămâne disponibil cât timp pagina este vizibilă.",
+    "availableUntil": "Acest eveniment și conținutul asociat vor fi disponibile până la {date}.",
+    "tabs": {
+      "qa": "Întrebări și Răspunsuri",
+      "materials": "Materiale",
+      "polls": "Sondaje",
+      "feedback": "Feedback"
+    }
+  }
+}

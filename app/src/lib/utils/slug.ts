@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 /**
  * Convert a string to a URL-safe kebab-case slug.
@@ -18,8 +19,8 @@ function toKebab(input: string): string {
  * Generate a unique slug from the Italian title.
  * Appends a numeric suffix if the base slug already exists.
  */
-export async function generateUniqueSlug(titleIt: string): Promise<string> {
-  const base = toKebab(titleIt);
+export async function generateUniqueSlug(title: LocalizedField): Promise<string> {
+  const base = toKebab(getLocalized(title, 'it'));
 
   const existing = await prisma.event.findUnique({ where: { slug: base } });
   if (!existing) return base;

@@ -6,8 +6,8 @@ import type { Event, EventStatus, Registration } from '@prisma/client';
 export interface PublicEvent {
   id: string;
   slug: string;
-  title: string; // resolved from titleIt/titleEn based on locale
-  description: string; // resolved from descriptionIt/descriptionEn based on locale
+  title: string; // resolved from Json title field based on locale
+  description: string; // resolved from Json description field based on locale
   startsAt: string;
   endsAt: string;
   timezone: string;
