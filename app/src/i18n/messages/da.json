@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Q&A-panelet bliver tilgængeligt, når begivenheden starter.",
     "invalidToken": "Ugyldigt link. Kontroller venligst linket, du modtog via e-mail.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Afstemninger",
     "sidebarTabMaterials": "Materialer",
     "sidebarTabParticipants": "Deltagere",
+    "chat": {
+      "placeholder": "Skriv en besked...",
+      "send": "Send",
+      "noMessages": "Ingen beskeder endnu"
+    },
     "role": {
       "moderator": "Moderator",
       "participant": "Deltager",

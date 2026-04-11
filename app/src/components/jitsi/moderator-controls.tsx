@@ -27,8 +27,8 @@ interface ModeratorControlsProps {
 }
 
 const BAR_STYLE: React.CSSProperties = {
-  background: '#1a1a2e',
-  borderBottom: '1px solid rgba(255,255,255,0.1)',
+  background: '#0F1B2D',
+  borderBottom: '1px solid rgba(0, 102, 204, 0.4)',
 };
 
 const BTN_BASE = 'py-2 px-3 d-inline-flex align-items-center gap-1 fw-semibold';
@@ -47,7 +47,6 @@ export default function ModeratorControls({
 
   const { participantCount, isRecording } = useJitsiEvents(api);
 
-  const [chatActive, setChatActive] = useState(false);
   const [endModalOpen, setEndModalOpen] = useState(false);
   const [ending, setEnding] = useState(false);
   const [handsOpen, setHandsOpen] = useState(false);
@@ -109,11 +108,6 @@ export default function ModeratorControls({
       setTimeout(() => setRecToast(''), 3000);
     }
   }, [api, isRecording, tl, jibriAvailable]);
-
-  const handleToggleChat = useCallback(() => {
-    api?.executeCommand('toggleChat');
-    setChatActive((o) => !o);
-  }, [api]);
 
   const handleToggleAudioModeration = useCallback(() => {
     if (!api) return;
@@ -179,20 +173,6 @@ export default function ModeratorControls({
           >
             <Icon icon="it-hearing" size="sm" />
             {t('muteAll')}
-          </Button>
-
-          {/* Chat toggle */}
-          <Button
-            color={chatActive ? 'info' : 'light'}
-            outline={!chatActive}
-            size="sm"
-            className={BTN_BASE}
-            onClick={handleToggleChat}
-            disabled={!api}
-            style={{ fontSize: '0.82rem' }}
-          >
-            <Icon icon="it-comment" size="sm" />
-            {t('toggleChat')}
           </Button>
 
           {/* Audio moderation */}

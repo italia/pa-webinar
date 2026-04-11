@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Ο πίνακας Q&A θα είναι διαθέσιμος όταν ξεκινήσει η εκδήλωση.",
     "invalidToken": "Μη έγκυρος σύνδεσμος. Ελέγξτε τον σύνδεσμο που λάβατε μέσω email.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Δημοσκοπήσεις",
     "sidebarTabMaterials": "Υλικό",
     "sidebarTabParticipants": "Συμμετέχοντες",
+    "chat": {
+      "placeholder": "Γράψτε ένα μήνυμα...",
+      "send": "Αποστολή",
+      "noMessages": "Κανένα μήνυμα"
+    },
     "role": {
       "moderator": "Συντονιστής",
       "participant": "Συμμετέχων",

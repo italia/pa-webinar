@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Het Q&A-paneel wordt beschikbaar wanneer het evenement begint.",
     "invalidToken": "Ongeldige link. Controleer de link die u per e-mail hebt ontvangen.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Peilingen",
     "sidebarTabMaterials": "Materialen",
     "sidebarTabParticipants": "Deelnemers",
+    "chat": {
+      "placeholder": "Schrijf een bericht...",
+      "send": "Verstuur",
+      "noMessages": "Nog geen berichten"
+    },
     "role": {
       "moderator": "Moderator",
       "participant": "Deelnemer",

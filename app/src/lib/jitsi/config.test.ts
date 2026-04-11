@@ -9,6 +9,7 @@ import {
   instantCallToolbarButtons,
   instantCallModeratorToolbarButtons,
   instantCallConfigOverwrite,
+  dtdJitsiTheme,
 } from './config';
 
 describe('Jitsi config exports', () => {
@@ -26,6 +27,14 @@ describe('Jitsi config exports', () => {
     }
   });
 
+  it('baseToolbarButtons excludes chat (handled by custom ChatPanel)', () => {
+    expect(baseToolbarButtons).not.toContain('chat');
+  });
+
+  it('baseToolbarButtons excludes reactions (handled by custom ReactionBar)', () => {
+    expect(baseToolbarButtons).not.toContain('reactions');
+  });
+
   it('participant features have recording disabled', () => {
     expect(participantFeatures.recording).toBe(false);
   });
@@ -37,6 +46,26 @@ describe('Jitsi config exports', () => {
   it('both feature sets have screen-sharing enabled', () => {
     expect(participantFeatures['screen-sharing']).toBe(true);
     expect(moderatorFeatures['screen-sharing']).toBe(true);
+  });
+});
+
+describe('DTD Jitsi theme', () => {
+  it('defines a palette with DTD primary blue', () => {
+    expect(dtdJitsiTheme.palette.action01).toBe('#0066CC');
+  });
+
+  it('uses DTD dark navy for backgrounds', () => {
+    expect(dtdJitsiTheme.palette.uiBackground).toBe('#001428');
+    expect(dtdJitsiTheme.palette.ui01).toBe('#0F1B2D');
+  });
+
+  it('uses Bootstrap Italia success and warning colors', () => {
+    expect(dtdJitsiTheme.palette.success01).toBe('#008758');
+    expect(dtdJitsiTheme.palette.warning01).toBe('#A66300');
+  });
+
+  it('has white as primary text color', () => {
+    expect(dtdJitsiTheme.palette.text01).toBe('#FFFFFF');
   });
 });
 
@@ -59,6 +88,15 @@ describe('Jitsi config overwrite', () => {
 
   it('disables P2P', () => {
     expect(jitsiConfigOverwrite.p2p.enabled).toBe(false);
+  });
+
+  it('disables native reactions (handled by custom overlay)', () => {
+    expect(jitsiConfigOverwrite.disableReactions).toBe(true);
+  });
+
+  it('includes customTheme with DTD palette', () => {
+    expect(jitsiConfigOverwrite.customTheme).toBe(dtdJitsiTheme);
+    expect(jitsiConfigOverwrite.customTheme.palette.action01).toBe('#0066CC');
   });
 });
 
@@ -94,6 +132,11 @@ describe('Instant call config', () => {
     expect(instantCallToolbarButtons).toContain('participants-pane');
   });
 
+  it('instantCallToolbarButtons excludes chat and reactions', () => {
+    expect(instantCallToolbarButtons).not.toContain('chat');
+    expect(instantCallToolbarButtons).not.toContain('reactions');
+  });
+
   it('instantCallToolbarButtons does not include hangup', () => {
     expect(instantCallToolbarButtons).not.toContain('hangup');
   });
@@ -122,7 +165,7 @@ describe('Instant call config', () => {
     expect(instantCallConfigOverwrite.startWithVideoMuted).toBe(true);
   });
 
-  it('instant call config has chat enabled', () => {
+  it('instant call config has chat enabled in Jitsi backend (for API events)', () => {
     expect(instantCallConfigOverwrite.disableChat).toBe(false);
   });
 });

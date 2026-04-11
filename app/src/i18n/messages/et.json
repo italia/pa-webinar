@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Q&A paneel on saadaval, kui üritus algab.",
     "invalidToken": "Vigane link. Palun kontrollige e-postiga saadud linki.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Küsitlused",
     "sidebarTabMaterials": "Materjalid",
     "sidebarTabParticipants": "Osalejad",
+    "chat": {
+      "placeholder": "Kirjutage sõnum...",
+      "send": "Saada",
+      "noMessages": "Sõnumeid pole"
+    },
     "role": {
       "moderator": "Moderaator",
       "participant": "Osaleja",

@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Le panneau Q&A sera disponible lorsque l'événement débutera.",
     "invalidToken": "Lien non valide. Veuillez vérifier le lien reçu par e-mail.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondages",
     "sidebarTabMaterials": "Documents",
     "sidebarTabParticipants": "Participants",
+    "chat": {
+      "placeholder": "Écrivez un message...",
+      "send": "Envoyer",
+      "noMessages": "Aucun message"
+    },
     "role": {
       "moderator": "Modérateur",
       "participant": "Participant",

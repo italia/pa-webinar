@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "A Q&A panel az esemény indulása után lesz elérhető.",
     "invalidToken": "Érvénytelen link. Ellenőrizze az e-mailben kapott linket.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Szavazások",
     "sidebarTabMaterials": "Anyagok",
     "sidebarTabParticipants": "Résztvevők",
+    "chat": {
+      "placeholder": "Írjon üzenetet...",
+      "send": "Küldés",
+      "noMessages": "Nincsenek üzenetek"
+    },
     "role": {
       "moderator": "Moderátor",
       "participant": "Résztvevő",

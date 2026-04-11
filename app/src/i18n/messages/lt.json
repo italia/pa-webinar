@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Q&A skydelis bus prieinamas, kai renginys prasidės.",
     "invalidToken": "Negaliojanti nuoroda. Patikrinkite nuorodą, gautą el. paštu.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Apklausos",
     "sidebarTabMaterials": "Medžiaga",
     "sidebarTabParticipants": "Dalyviai",
+    "chat": {
+      "placeholder": "Rašykite žinutę...",
+      "send": "Siųsti",
+      "noMessages": "Nėra žinučių"
+    },
     "role": {
       "moderator": "Moderatorius",
       "participant": "Dalyvis",

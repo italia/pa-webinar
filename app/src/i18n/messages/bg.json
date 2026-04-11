@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Панелът Q&A ще бъде наличен, когато събитието започне.",
     "invalidToken": "Невалиден линк. Моля, проверете линка, получен по email.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Анкети",
     "sidebarTabMaterials": "Материали",
     "sidebarTabParticipants": "Участници",
+    "chat": {
+      "placeholder": "Напишете съобщение...",
+      "send": "Изпрати",
+      "noMessages": "Няма съобщения"
+    },
     "role": {
       "moderator": "Модератор",
       "participant": "Участник",
