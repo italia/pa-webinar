@@ -171,6 +171,7 @@ jobs:
           tags: eventi-dtd:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          no-cache-filters: runner
           load: true
       - name: Run Trivy on Docker image
         uses: aquasecurity/trivy-action@master
