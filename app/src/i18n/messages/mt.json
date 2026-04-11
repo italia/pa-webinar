@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Il-pannell Q&A se jkun disponibbli meta jibda l-avveniment.",
     "invalidToken": "Link mhux validu. Jekk jogħġbok ivverifika l-link li rċivejt bl-email.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Stħarriġ",
     "sidebarTabMaterials": "Materjali",
     "sidebarTabParticipants": "Parteċipanti",
+    "chat": {
+      "placeholder": "Ikteb messaġġ...",
+      "send": "Ibgħat",
+      "noMessages": "L-ebda messaġġ"
+    },
     "role": {
       "moderator": "Moderatur",
       "participant": "Parteċipant",

@@ -30,6 +30,14 @@ export interface JitsiParticipant {
   role: 'moderator' | 'participant';
 }
 
+export interface JitsiChatMessage {
+  from: string;
+  nick: string;
+  message: string;
+  privateMessage: boolean;
+  stamp: string;
+}
+
 export interface JitsiEventMap {
   readyToClose: [];
   videoConferenceJoined: [{ roomName: string; id: string; displayName: string }];
@@ -45,6 +53,8 @@ export interface JitsiEventMap {
   tileViewChanged: [{ enabled: boolean }];
   filmstripDisplayChanged: [{ visible: boolean }];
   participantsPaneToggled: [{ open: boolean }];
+  incomingMessage: [JitsiChatMessage];
+  outgoingMessage: [JitsiChatMessage];
 }
 
 export type JitsiEventName = keyof JitsiEventMap;
@@ -58,6 +68,7 @@ export interface JitsiMeetExternalAPI {
   executeCommand(command: 'toggleRaiseHand'): void;
   executeCommand(command: 'toggleFilmStrip'): void;
   executeCommand(command: 'toggleChat'): void;
+  executeCommand(command: 'sendChatMessage', message: string, to?: string, ignorePrivacy?: boolean): void;
   executeCommand(command: 'toggleShareScreen'): void;
   executeCommand(command: 'hangup'): void;
   executeCommand(command: 'startRecording', options: { mode: 'file' | 'stream' }): void;

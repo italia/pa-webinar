@@ -26,6 +26,7 @@ import GuestJoinForm from '@/components/live/guest-join-form';
 import EventFeedback from '@/components/live/event-feedback';
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
+import ChatPanel from '@/components/live/chat-panel';
 import WaitingRoom from '@/components/live/waiting-room';
 
 interface EventInfo {
@@ -481,8 +482,8 @@ export default function LiveEventClient({
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
             />
+            {!isInstantCall && <ReactionBar eventSlug={event.slug} />}
           </div>
-          {!isInstantCall && <ReactionBar eventSlug={event.slug} />}
         </div>
 
         {!isInstantCall && (
@@ -491,7 +492,9 @@ export default function LiveEventClient({
             token={token}
             isModerator={isActualModerator}
             qaEnabled={event.qaEnabled}
+            chatEnabled={event.chatEnabled}
             jitsiApi={jitsiApi}
+            displayName={credentials.displayName}
           />
         )}
       </div>
@@ -510,23 +513,27 @@ export default function LiveEventClient({
 
 // ── Sidebar with tabs ──
 
-type SidebarTab = 'qa' | 'polls' | 'materials' | 'participants';
+type SidebarTab = 'qa' | 'chat' | 'polls' | 'materials' | 'participants';
 
 interface LiveSidebarProps {
   eventSlug: string;
   token: string;
   isModerator: boolean;
   qaEnabled: boolean;
+  chatEnabled: boolean;
   jitsiApi: JitsiMeetExternalAPI | null;
+  displayName: string;
 }
 
-function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, jitsiApi }: LiveSidebarProps) {
+function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, jitsiApi, displayName }: LiveSidebarProps) {
   const t = useTranslations('live');
-  const [activeTab, setActiveTab] = useState<SidebarTab>(qaEnabled ? 'qa' : 'polls');
+  const showChat = chatEnabled !== false;
+  const [activeTab, setActiveTab] = useState<SidebarTab>(qaEnabled ? 'qa' : (showChat ? 'chat' : 'polls'));
   const [participantCount, setParticipantCount] = useState(0);
 
   const tabs: { key: SidebarTab; label: string; icon: string; badge?: number; show: boolean }[] = [
     { key: 'qa', label: t('sidebarTabQa'), icon: 'it-comment', show: qaEnabled },
+    { key: 'chat', label: t('sidebarTabChat'), icon: 'it-mail', show: showChat },
     { key: 'polls', label: t('sidebarTabPolls'), icon: 'it-chart-line', show: true },
     { key: 'materials', label: t('sidebarTabMaterials'), icon: 'it-clip', show: true },
     { key: 'participants', label: t('sidebarTabParticipants'), icon: 'it-user', badge: participantCount, show: true },
@@ -536,7 +543,6 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, jitsiApi }: Liv
 
   return (
     <div className="d-flex flex-column live-sidebar" style={{ width: '100%', maxWidth: '360px' }}>
-      {/* Tab header — matches top bar blue */}
       <div className="d-flex live-sidebar-header" style={{ overflowX: 'auto' }}>
         {visibleTabs.map((tab) => (
           <button
@@ -567,10 +573,12 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, jitsiApi }: Liv
         ))}
       </div>
 
-      {/* Tab content — scrollable, height matches Jitsi container */}
-      <div className="flex-grow-1" style={{ minHeight: 0, overflowY: 'auto' }}>
+      <div className="flex-grow-1 d-flex flex-column" style={{ minHeight: 0, overflowY: 'auto' }}>
         {activeTab === 'qa' && qaEnabled && (
           <QAPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+        )}
+        {activeTab === 'chat' && showChat && (
+          <ChatPanel api={jitsiApi} displayName={displayName} />
         )}
         {activeTab === 'polls' && (
           <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
@@ -617,7 +625,10 @@ function LiveTopBar({ title, participantCount, isRecording, role, onLeaveRoom }:
   return (
     <div
       className="text-white px-3 py-2 d-flex align-items-center justify-content-between live-top-bar"
-      style={{ backgroundColor: '#0066CC' }}
+      style={{
+        background: 'linear-gradient(90deg, #004D99 0%, #0066CC 100%)',
+        boxShadow: '0 2px 8px rgba(0, 40, 85, 0.3)',
+      }}
     >
       <div className="d-flex align-items-center">
         <h1 className="h6 mb-0 me-3 text-white">{title}</h1>

@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Q&A-panelen blir tillgänglig när evenemanget startar.",
     "invalidToken": "Ogiltig länk. Kontrollera länken du fick via e-post.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Omröstningar",
     "sidebarTabMaterials": "Material",
     "sidebarTabParticipants": "Deltagare",
+    "chat": {
+      "placeholder": "Skriv ett meddelande...",
+      "send": "Skicka",
+      "noMessages": "Inga meddelanden ännu"
+    },
     "role": {
       "moderator": "Moderator",
       "participant": "Deltagare",

@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Q&A panelis būs pieejams, kad pasākums sāksies.",
     "invalidToken": "Nederīga saite. Lūdzu, pārbaudiet saiti, ko saņēmāt e-pastā.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Aptaujas",
     "sidebarTabMaterials": "Materiāli",
     "sidebarTabParticipants": "Dalībnieki",
+    "chat": {
+      "placeholder": "Rakstiet ziņojumu...",
+      "send": "Sūtīt",
+      "noMessages": "Nav ziņojumu"
+    },
     "role": {
       "moderator": "Moderators",
       "participant": "Dalībnieks",

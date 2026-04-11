@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Ploča Q&A bit će dostupna kada događaj počne.",
     "invalidToken": "Nevaljana poveznica. Provjerite poveznicu primljenu emailom.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Ankete",
     "sidebarTabMaterials": "Materijali",
     "sidebarTabParticipants": "Sudionici",
+    "chat": {
+      "placeholder": "Napišite poruku...",
+      "send": "Pošalji",
+      "noMessages": "Nema poruka"
+    },
     "role": {
       "moderator": "Moderator",
       "participant": "Sudionik",

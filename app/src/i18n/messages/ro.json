@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Panoul Q&A va fi disponibil după începerea evenimentului.",
     "invalidToken": "Link invalid. Verificați linkul primit prin email.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondaje",
     "sidebarTabMaterials": "Materiale",
     "sidebarTabParticipants": "Participanți",
+    "chat": {
+      "placeholder": "Scrieți un mesaj...",
+      "send": "Trimite",
+      "noMessages": "Niciun mesaj încă"
+    },
     "role": {
       "moderator": "Moderator",
       "participant": "Participant",

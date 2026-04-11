@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Beidh an painéal Q&A ar fáil nuair a thosóidh an t-imeacht.",
     "invalidToken": "Nasc neamhbhailí. Seiceáil an nasc a fuair sibh ar ríomhphost, le bhur dtoil.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Pobalbhreitheanna",
     "sidebarTabMaterials": "Ábhair",
     "sidebarTabParticipants": "Rannpháirtithe",
+    "chat": {
+      "placeholder": "Scríobh teachtaireacht...",
+      "send": "Seol",
+      "noMessages": "Gan teachtaireachtaí"
+    },
     "role": {
       "moderator": "Modhnóir",
       "participant": "Rannpháirtí",

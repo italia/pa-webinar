@@ -5,7 +5,7 @@ export async function GET() {
 
   return Response.json(
     {
-      backgroundColor: settings.primaryColor || '#002855',
+      backgroundColor: settings.primaryColor || '#001428',
       backgroundImageUrl: '',
       logoClickUrl: settings.organizationUrl || '',
       logoImageUrl:

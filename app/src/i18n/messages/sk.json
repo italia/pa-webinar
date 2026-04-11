@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Panel Q&A bude dostupný po začatí udalosti.",
     "invalidToken": "Neplatný odkaz. Skontrolujte odkaz, ktorý ste dostali e-mailom.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Ankety",
     "sidebarTabMaterials": "Materiály",
     "sidebarTabParticipants": "Účastníci",
+    "chat": {
+      "placeholder": "Napíšte správu...",
+      "send": "Odoslať",
+      "noMessages": "Zatiaľ žiadne správy"
+    },
     "role": {
       "moderator": "Moderátor",
       "participant": "Účastník",

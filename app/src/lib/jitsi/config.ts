@@ -4,13 +4,74 @@
  * We show Jitsi's native toolbar for essential controls (mic, camera,
  * screen share, etc.) while keeping our custom wrapper for moderator
  * features (recording, end event) and the Q&A panel.
+ *
+ * Chat and reactions are handled by custom components in the app sidebar
+ * and as a floating overlay, so they are excluded from the Jitsi toolbar.
  */
+
+/**
+ * DTD / Bootstrap Italia aligned palette for Jitsi's customTheme.
+ * Token reference: https://github.com/jitsi/jitsi-meet/blob/master/resources/custom-theme/custom-theme.json
+ */
+export const dtdJitsiTheme = {
+  palette: {
+    uiBackground: '#001428',
+    ui01: '#0F1B2D',
+    ui02: '#17324D',
+    ui03: '#2E4A62',
+    ui04: '#3D5A80',
+    ui05: '#5A768A',
+    action01: '#0066CC',
+    action01Hover: '#004D99',
+    action01Active: '#003D7A',
+    action02: '#17324D',
+    action02Hover: '#2E4A62',
+    action02Active: '#0F1B2D',
+    action03: 'transparent',
+    action03Hover: '#2E4A62',
+    action03Active: '#17324D',
+    actionDanger: '#D9364F',
+    actionDangerHover: '#E04757',
+    actionDangerActive: '#A21B29',
+    disabled01: '#1A3A5C',
+    bottomSheet: '#0F1B2D',
+    text01: '#FFFFFF',
+    text02: '#C9D4DE',
+    text03: '#8899AA',
+    text04: '#AAB8C8',
+    textError: '#E04757',
+    icon01: '#FFFFFF',
+    icon02: '#C9D4DE',
+    icon03: '#8899AA',
+    iconError: '#E04757',
+    field01: '#0F1B2D',
+    link01: '#4D9AFF',
+    link01Hover: '#80B8FF',
+    link01Active: '#0066CC',
+    success01: '#008758',
+    success02: '#008758',
+    warning01: '#A66300',
+    warning02: '#A66300',
+    support01: '#FF9B42',
+    support02: '#F96E57',
+    support03: '#DF486F',
+    support04: '#B23683',
+    support05: '#73348C',
+    support06: '#6A50D3',
+    support07: '#0066CC',
+    support08: '#00A8B3',
+    support09: '#008758',
+  },
+};
 
 /**
  * Participant toolbar — NO 'hangup' to avoid "end meeting for all".
  * We provide our own "Esci dalla sala" / "Leave room" button that
  * calls api.executeCommand('hangup') without exposing the
  * "Termina la riunione per tutti" option.
+ *
+ * 'chat' excluded: we use a custom ChatPanel in the sidebar.
+ * 'reactions' excluded: we use a custom ReactionBar overlay.
  */
 export const baseToolbarButtons = [
   'microphone',
@@ -22,8 +83,6 @@ export const baseToolbarButtons = [
   'tileview',
   'settings',
   'raisehand',
-  'chat',
-  'reactions',
 ];
 
 export const moderatorToolbarButtons = [
@@ -73,7 +132,9 @@ export const jitsiConfigOverwrite = {
   toolbarButtons: baseToolbarButtons as string[],
 
   notifications: [] as string[],
-  disableReactions: false,
+  disableReactions: true,
+
+  customTheme: dtdJitsiTheme,
 
   breakoutRooms: {
     hideAddRoomButton: true,
@@ -166,8 +227,6 @@ export const instantCallToolbarButtons = [
   'tileview',
   'settings',
   'raisehand',
-  'chat',
-  'reactions',
   'participants-pane',
   'shareaudio',
 ];

@@ -179,9 +179,15 @@
     "qaSidebarPlaceholder": "Q&A-paneeli tulee saataville tapahtuman alkaessa.",
     "invalidToken": "Virheellinen linkki. Tarkista sähköpostissa saamasi linkki.",
     "sidebarTabQa": "Q&A",
+    "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Kyselyt",
     "sidebarTabMaterials": "Materiaalit",
     "sidebarTabParticipants": "Osallistujat",
+    "chat": {
+      "placeholder": "Kirjoita viesti...",
+      "send": "Lähetä",
+      "noMessages": "Ei viestejä"
+    },
     "role": {
       "moderator": "Moderaattori",
       "participant": "Osallistuja",
