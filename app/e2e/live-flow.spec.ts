@@ -24,8 +24,8 @@ async function createEvent(request: APIRequestContext, cookie: string) {
   const res = await request.post(`${BASE}/api/events`, {
     headers: { Cookie: cookie },
     data: {
-      titleIt: `E2E Smoke ${uid}`,
-      descriptionIt: 'Evento creato automaticamente dal test E2E Playwright.',
+      title: { it: `E2E Smoke ${uid}` },
+      description: { it: 'Evento creato automaticamente dal test E2E Playwright.' },
       startsAt,
       endsAt,
     },
