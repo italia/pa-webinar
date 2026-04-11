@@ -136,17 +136,17 @@
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@emnapi/core@1.9.1": {
+  "@emnapi/core@1.9.2": {
     "licenses": "MIT",
     "repository": "https://github.com/toyobayashi/emnapi",
     "publisher": "toyobayashi"
   },
-  "@emnapi/runtime@1.9.1": {
+  "@emnapi/runtime@1.9.2": {
     "licenses": "MIT",
     "repository": "https://github.com/toyobayashi/emnapi",
     "publisher": "toyobayashi"
   },
-  "@emnapi/wasi-threads@1.2.0": {
+  "@emnapi/wasi-threads@1.2.1": {
     "licenses": "MIT",
     "repository": "https://github.com/toyobayashi/emnapi",
     "publisher": "toyobayashi"
@@ -306,7 +306,7 @@
     "publisher": "Justin Ridgewell",
     "email": "justin@ridgewell.name"
   },
-  "@next/env@15.5.14": {
+  "@next/env@15.5.15": {
     "licenses": "MIT",
     "repository": "https://github.com/vercel/next.js",
     "publisher": "Next.js Team",
@@ -337,7 +337,7 @@
     "repository": "https://github.com/open-telemetry/opentelemetry-js",
     "publisher": "OpenTelemetry Authors"
   },
-  "@oxc-project/types@0.122.0": {
+  "@oxc-project/types@0.124.0": {
     "licenses": "MIT",
     "repository": "https://github.com/oxc-project/oxc",
     "publisher": "Boshen and oxc contributors"
@@ -421,7 +421,7 @@
     "publisher": "Jason Quense",
     "email": "monastic.panic@gmail.com"
   },
-  "@rolldown/pluginutils@1.0.0-rc.12": {
+  "@rolldown/pluginutils@1.0.0-rc.15": {
     "licenses": "MIT",
     "repository": "https://github.com/rolldown/rolldown"
   },
@@ -1625,7 +1625,7 @@
     "publisher": "Sebastian Pekarek",
     "email": "mail@sebbo.net"
   },
-  "icu-minify@4.9.0": {
+  "icu-minify@4.9.1": {
     "licenses": "MIT",
     "repository": "https://github.com/amannn/next-intl",
     "publisher": "Jan Amann",
@@ -2119,19 +2119,19 @@
     "licenses": "MIT",
     "repository": "https://github.com/jshttp/negotiator"
   },
-  "next-intl-swc-plugin-extractor@4.9.0": {
+  "next-intl-swc-plugin-extractor@4.9.1": {
     "licenses": "MIT",
     "repository": "https://github.com/amannn/next-intl",
     "publisher": "강동윤",
     "email": "kdy1997.dev@gmail.com"
   },
-  "next-intl@4.9.0": {
+  "next-intl@4.9.1": {
     "licenses": "MIT",
     "repository": "https://github.com/amannn/next-intl",
     "publisher": "Jan Amann",
     "email": "jan@amann.work"
   },
-  "next@15.5.14": {
+  "next@15.5.15": {
     "licenses": "MIT",
     "repository": "https://github.com/vercel/next.js"
   },
@@ -2554,7 +2554,7 @@
     "publisher": "Matteo Collina",
     "email": "hello@matteocollina.com"
   },
-  "rolldown@1.0.0-rc.12": {
+  "rolldown@1.0.0-rc.15": {
     "licenses": "MIT",
     "repository": "https://github.com/rolldown/rolldown"
   },
@@ -2977,7 +2977,7 @@
     "publisher": "Gary Court",
     "email": "gary.court@gmail.com"
   },
-  "use-intl@4.9.0": {
+  "use-intl@4.9.1": {
     "licenses": "MIT",
     "repository": "https://github.com/amannn/next-intl",
     "publisher": "Jan Amann",
@@ -3024,12 +3024,12 @@
     "publisher": "Anthony Fu",
     "email": "anthonyfu117@hotmail.com"
   },
-  "vite@7.3.1": {
+  "vite@7.3.2": {
     "licenses": "MIT",
     "repository": "https://github.com/vitejs/vite",
     "publisher": "Evan You"
   },
-  "vite@8.0.3": {
+  "vite@8.0.8": {
     "licenses": "MIT",
     "repository": "https://github.com/vitejs/vite",
     "publisher": "Evan You"
