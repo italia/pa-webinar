@@ -215,6 +215,7 @@
       "unmuteAll": "Unmute all",
       "startRecording": "Start recording",
       "stopRecording": "Stop recording",
+      "recPreparing": "Preparing…",
       "toggleChat": "Toggle chat",
       "endEvent": "End event",
       "endEventConfirm": "Are you sure you want to end the event for all participants?",
