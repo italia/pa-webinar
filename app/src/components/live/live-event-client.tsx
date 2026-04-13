@@ -118,11 +118,13 @@ export default function LiveEventClient({
   const [showFeedback, setShowFeedback] = useState(false);
   const [guestId] = useState(() => isGuest ? `guest_${Math.random().toString(36).slice(2, 10)}` : '');
   const [jvbReady, setJvbReady] = useState<boolean | null>(null);
+  const [jibriReady, setJibriReady] = useState<boolean | null>(null);
 
-  // Poll JVB status when event is LIVE
+  // Poll infrastructure status (JVB + Jibri) when event is LIVE
   useEffect(() => {
     if (eventStatus !== 'LIVE') {
       setJvbReady(null);
+      setJibriReady(null);
       return;
     }
     let cancelled = false;
@@ -131,7 +133,10 @@ export default function LiveEventClient({
         const res = await fetch('/api/status');
         if (!res.ok || cancelled) return;
         const data = await res.json();
-        if (!cancelled) setJvbReady(data.metrics?.jvbStatus === 'ready');
+        if (!cancelled) {
+          setJvbReady(data.metrics?.jvbStatus === 'ready');
+          setJibriReady(data.metrics?.jibriStatus === 'ready');
+        }
       } catch { /* retry on next tick */ }
     };
     poll();
@@ -272,11 +277,19 @@ export default function LiveEventClient({
   const recPromptShownRef = useRef(false);
 
   const handleJitsiReady = useCallback(() => {
-    if (isModerator && event.recordingEnabled && !recPromptShownRef.current) {
+    if (isModerator && event.recordingEnabled && jibriReady && !recPromptShownRef.current) {
       recPromptShownRef.current = true;
       setShowRecPrompt(true);
     }
-  }, [isModerator, event.recordingEnabled]);
+  }, [isModerator, event.recordingEnabled, jibriReady]);
+
+  // Show recording prompt when Jibri becomes ready after room is already open
+  useEffect(() => {
+    if (jibriReady && jitsiApi && isModerator && event.recordingEnabled && !recPromptShownRef.current) {
+      recPromptShownRef.current = true;
+      setShowRecPrompt(true);
+    }
+  }, [jibriReady, jitsiApi, isModerator, event.recordingEnabled]);
   const handleJitsiLeft = useCallback(() => {
     if (!showFeedback) setPhase('ended');
   }, [showFeedback]);
@@ -450,6 +463,7 @@ export default function LiveEventClient({
   // ── Ready: Jitsi room ──
   const isActualModerator = credentials.role === 'moderator';
   const isInstantCall = event.eventType === 'INSTANT';
+  const showJvbOverlay = jvbReady !== true;
 
   return (
     <div className="d-flex flex-column live-page-bg" style={{ height: 'calc(100vh - 80px)' }}>
@@ -463,19 +477,19 @@ export default function LiveEventClient({
         onLeaveRoom={handleLeaveRoom}
       />
 
-      {isActualModerator && (
+      {isActualModerator && !showJvbOverlay && (
         <ModeratorControls
           api={jitsiApi}
           eventId={event.id}
           moderatorToken={token}
           recordingEnabled={event.recordingEnabled}
-          jibriAvailable={jibriAvailable}
+          jibriAvailable={jibriReady === true}
           participantsCanUnmute={event.participantsCanUnmute}
           participantsCanStartVideo={event.participantsCanStartVideo}
         />
       )}
 
-      {!isInstantCall && (
+      {!isInstantCall && !showJvbOverlay && (
         <PresentationTimer
           eventSlug={event.slug}
           token={token}
@@ -486,6 +500,18 @@ export default function LiveEventClient({
       <div className="d-flex flex-column flex-lg-row flex-grow-1" style={{ minHeight: 0 }}>
         <div className="d-flex flex-column flex-grow-1" style={{ minHeight: '300px' }}>
           <div className="flex-grow-1 position-relative">
+            {showJvbOverlay && (
+              <div
+                className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
+                style={{ zIndex: 10, background: 'rgba(15, 27, 45, 0.95)' }}
+              >
+                <Spinner active double className="mb-3" />
+                <h2 className="h5 text-white fw-semibold mb-2">{t('roomPreparing')}</h2>
+                <p className="text-white-50 mb-0" style={{ maxWidth: 400, textAlign: 'center' }}>
+                  {t('roomPreparingDetail')}
+                </p>
+              </div>
+            )}
             <JitsiRoom
               domain={jitsiDomain}
               roomName={credentials.roomName}

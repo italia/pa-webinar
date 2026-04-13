@@ -10,6 +10,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Spinner,
 } from 'design-react-kit';
 
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
@@ -265,48 +266,61 @@ export default function ModeratorControls({
 
           {/* Recording */}
           {recordingEnabled && (
-            <Button
-              color={isRecording ? 'danger' : 'secondary'}
-              size="sm"
-              className={BTN_BASE}
-              onClick={handleToggleRecording}
-              disabled={!api || !jibriAvailable || recCooldown}
-              title={!jibriAvailable ? tl('jibriNotConfigured') : undefined}
-              style={isRecording ? BTN_DANGER : BTN_DEFAULT}
-            >
-              {recCooldown ? (
-                <>
-                  <Icon icon="it-refresh" size="sm" color="white" />
-                  {t('recPreparing')}
-                </>
-              ) : isRecording ? (
-                <>
-                  <span
-                    className="d-inline-block rounded-circle"
-                    style={{
-                      width: 8,
-                      height: 8,
-                      backgroundColor: '#fff',
-                      animation: 'pulse-dot 1.5s ease-in-out infinite',
-                    }}
-                  />
-                  {t('stopRecording')}
-                  <Badge
-                    color=""
-                    pill
-                    className="ms-1"
-                    style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.2)', color: '#fff' }}
-                  >
-                    {formatTime(recSeconds)}
-                  </Badge>
-                </>
-              ) : (
-                <>
-                  <Icon icon="it-video" size="sm" color="white" />
-                  {t('startRecording')}
-                </>
-              )}
-            </Button>
+            jibriAvailable ? (
+              <Button
+                color={isRecording ? 'danger' : 'secondary'}
+                size="sm"
+                className={BTN_BASE}
+                onClick={handleToggleRecording}
+                disabled={!api || recCooldown}
+                style={isRecording ? BTN_DANGER : BTN_DEFAULT}
+              >
+                {recCooldown ? (
+                  <>
+                    <Icon icon="it-refresh" size="sm" color="white" />
+                    {t('recPreparing')}
+                  </>
+                ) : isRecording ? (
+                  <>
+                    <span
+                      className="d-inline-block rounded-circle"
+                      style={{
+                        width: 8,
+                        height: 8,
+                        backgroundColor: '#fff',
+                        animation: 'pulse-dot 1.5s ease-in-out infinite',
+                      }}
+                    />
+                    {t('stopRecording')}
+                    <Badge
+                      color=""
+                      pill
+                      className="ms-1"
+                      style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.2)', color: '#fff' }}
+                    >
+                      {formatTime(recSeconds)}
+                    </Badge>
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="it-video" size="sm" color="white" />
+                    {t('startRecording')}
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                color="secondary"
+                size="sm"
+                className={BTN_BASE}
+                disabled
+                style={{ ...BTN_DEFAULT, opacity: 0.6 }}
+                title={tl('jibriScalingTooltip')}
+              >
+                <Spinner active small className="me-1" style={{ width: 14, height: 14 }} />
+                {tl('jibriScaling')}
+              </Button>
+            )
           )}
 
           {/* End event */}
