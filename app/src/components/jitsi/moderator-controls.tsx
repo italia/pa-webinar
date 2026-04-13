@@ -24,6 +24,8 @@ interface ModeratorControlsProps {
   moderatorToken: string;
   recordingEnabled: boolean;
   jibriAvailable?: boolean;
+  participantsCanUnmute?: boolean;
+  participantsCanStartVideo?: boolean;
 }
 
 const BAR_STYLE: React.CSSProperties = {
@@ -55,6 +57,8 @@ export default function ModeratorControls({
   moderatorToken,
   recordingEnabled,
   jibriAvailable = true,
+  participantsCanUnmute = false,
+  participantsCanStartVideo = false,
 }: ModeratorControlsProps) {
   const t = useTranslations('live.moderator');
   const tl = useTranslations('live');
@@ -206,31 +210,35 @@ export default function ModeratorControls({
         style={BAR_STYLE}
       >
         <div className="d-flex align-items-center gap-2 flex-wrap">
-          {/* Audio moderation toggle */}
-          <Button
-            color={audioModerationActive ? 'warning' : 'secondary'}
-            size="sm"
-            className={BTN_BASE}
-            onClick={handleToggleAudioModeration}
-            disabled={!api}
-            style={audioModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
-          >
-            <Icon icon="it-hearing" size="sm" color="white" />
-            {audioModerationActive ? t('micDisabled') : t('audioModeration')}
-          </Button>
+          {/* Audio moderation — only when participants have mic access */}
+          {participantsCanUnmute && (
+            <Button
+              color={audioModerationActive ? 'warning' : 'secondary'}
+              size="sm"
+              className={BTN_BASE}
+              onClick={handleToggleAudioModeration}
+              disabled={!api}
+              style={audioModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
+            >
+              <Icon icon="it-hearing" size="sm" color="white" />
+              {audioModerationActive ? t('micDisabled') : t('audioModeration')}
+            </Button>
+          )}
 
-          {/* Video moderation toggle */}
-          <Button
-            color={videoModerationActive ? 'warning' : 'secondary'}
-            size="sm"
-            className={BTN_BASE}
-            onClick={handleToggleVideoModeration}
-            disabled={!api}
-            style={videoModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
-          >
-            <Icon icon="it-video" size="sm" color="white" />
-            {videoModerationActive ? t('videoDisabled') : t('videoModeration')}
-          </Button>
+          {/* Video moderation — only when participants have camera access */}
+          {participantsCanStartVideo && (
+            <Button
+              color={videoModerationActive ? 'warning' : 'secondary'}
+              size="sm"
+              className={BTN_BASE}
+              onClick={handleToggleVideoModeration}
+              disabled={!api}
+              style={videoModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
+            >
+              <Icon icon="it-video" size="sm" color="white" />
+              {videoModerationActive ? t('videoDisabled') : t('videoModeration')}
+            </Button>
+          )}
 
           {/* Raised hands */}
           <Button

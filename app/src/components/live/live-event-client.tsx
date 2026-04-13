@@ -470,6 +470,8 @@ export default function LiveEventClient({
           moderatorToken={token}
           recordingEnabled={event.recordingEnabled}
           jibriAvailable={jibriAvailable}
+          participantsCanUnmute={event.participantsCanUnmute}
+          participantsCanStartVideo={event.participantsCanStartVideo}
         />
       )}
 
