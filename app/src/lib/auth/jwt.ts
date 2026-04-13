@@ -43,6 +43,10 @@ function getJitsiJwtSubject(): string {
   );
 }
 
+function getAppUrl(): string {
+  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+}
+
 interface JitsiTokenPayload {
   roomName: string;
   displayName: string;
@@ -69,11 +73,14 @@ export async function generateJitsiJwt(
   const jitsiJwtAudience = getJitsiJwtAudience();
   const jitsiJwtSubject = getJitsiJwtSubject();
 
+  const avatarUrl = `${getAppUrl()}/api/avatar?name=${encodeURIComponent(payload.displayName)}&size=200`;
+
   const jwt = await new SignJWT({
     context: {
       user: {
         name: payload.displayName,
         id: payload.uniqueId,
+        avatar: avatarUrl,
         affiliation: payload.isModerator ? 'owner' : 'member',
         moderator: payload.isModerator ? 'true' : 'false',
       },
