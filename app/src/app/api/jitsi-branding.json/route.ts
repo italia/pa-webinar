@@ -1,4 +1,5 @@
 import { getSettings } from '@/lib/settings';
+import { getPublicEnv } from '@/lib/env';
 
 const CORS_HEADERS = {
   'Cache-Control': 'public, s-maxage=300',
@@ -42,9 +43,7 @@ export async function GET() {
         settings.logoUrl ||
         '/images/dtd-watermark.svg',
       avatarBackgrounds: BI_AVATAR_BACKGROUNDS,
-      inviteDomain: new URL(
-        process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-      ).hostname,
+      inviteDomain: new URL(getPublicEnv('NEXT_PUBLIC_APP_URL')).hostname,
     },
     { headers: CORS_HEADERS },
   );
