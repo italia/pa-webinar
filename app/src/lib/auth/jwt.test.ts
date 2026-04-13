@@ -121,6 +121,24 @@ describe('generateJitsiJwt', () => {
     delete process.env.JITSI_JWT_SUBJECT;
   });
 
+  it('includes avatar URL pointing to our API', async () => {
+    process.env.NEXT_PUBLIC_APP_URL = 'https://videocall-test.innovazione.gov.it';
+
+    const jwt = await generateJitsiJwt({
+      roomName: 'room',
+      displayName: 'Raff',
+      uniqueId: 'test-avatar',
+      isModerator: false,
+    });
+
+    const payload = await decodeJwt(jwt);
+    const ctx = payload.context as { user: Record<string, string> };
+    expect(ctx.user.avatar).toContain('/api/avatar');
+    expect(ctx.user.avatar).toContain('name=Raff');
+
+    delete process.env.NEXT_PUBLIC_APP_URL;
+  });
+
   it('includes features in context', async () => {
     const jwt = await generateJitsiJwt({
       roomName: 'room',
