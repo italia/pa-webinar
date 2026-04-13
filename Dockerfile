@@ -62,6 +62,12 @@ COPY --from=deps /workspace/package.json ./
 COPY app/ ./app/
 
 WORKDIR /workspace/app
+
+# Copy Bootstrap Italia SVG sprite to public — needed by design-react-kit <Icon>
+# Deps are hoisted to workspace root (/workspace/node_modules)
+RUN mkdir -p public/svg && \
+    cp /workspace/node_modules/bootstrap-italia/dist/svg/sprites.svg public/svg/sprites.svg
+
 RUN npm run build
 
 # Clean standalone output: remove .env files and build-only traced packages

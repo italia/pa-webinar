@@ -161,6 +161,58 @@ export default function ModeratorControls({
     api.executeCommand('toggleModeration', !videoModerationActive, 'video');
   }, [api, videoModerationActive]);
 
+  const recRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const recAttemptsRef = useRef(0);
+  const MAX_REC_RETRIES = 3;
+  const REC_RETRY_DELAY_MS = 3000;
+
+  useEffect(() => {
+    return () => {
+      if (recRetryRef.current) clearTimeout(recRetryRef.current);
+    };
+  }, []);
+
+  const attemptStartRecording = useCallback(() => {
+    if (!api) return;
+    try {
+      api.executeCommand('startRecording', { mode: 'file' });
+    } catch {
+      // Jibri not yet in MUC — schedule retry with backoff
+      if (recAttemptsRef.current < MAX_REC_RETRIES) {
+        recAttemptsRef.current += 1;
+        const delay = REC_RETRY_DELAY_MS * recAttemptsRef.current;
+        recRetryRef.current = setTimeout(attemptStartRecording, delay);
+      } else {
+        recAttemptsRef.current = 0;
+        setRecToast(tl('jibriUnavailable'));
+        setTimeout(() => setRecToast(''), 4000);
+      }
+    }
+  }, [api, tl]);
+
+  // Listen for recording errors (service-unavailable) and auto-retry
+  useEffect(() => {
+    if (!api) return;
+    const onRecordingLinkUpdate = (evt: { error?: string; on?: boolean }) => {
+      if (evt.error && recAttemptsRef.current < MAX_REC_RETRIES) {
+        recAttemptsRef.current += 1;
+        const delay = REC_RETRY_DELAY_MS * recAttemptsRef.current;
+        if (recRetryRef.current) clearTimeout(recRetryRef.current);
+        recRetryRef.current = setTimeout(attemptStartRecording, delay);
+      } else if (evt.error) {
+        recAttemptsRef.current = 0;
+        setRecToast(tl('jibriUnavailable'));
+        setTimeout(() => setRecToast(''), 4000);
+      } else if (evt.on !== undefined) {
+        recAttemptsRef.current = 0;
+      }
+    };
+    api.addListener('recordingStatusChanged', onRecordingLinkUpdate);
+    return () => {
+      api.removeListener('recordingStatusChanged', onRecordingLinkUpdate);
+    };
+  }, [api, attemptStartRecording, tl]);
+
   const handleToggleRecording = useCallback(() => {
     if (!api || !jibriAvailable || recCooldown) {
       if (!recCooldown) {
@@ -169,25 +221,20 @@ export default function ModeratorControls({
       }
       return;
     }
-    try {
-      if (isRecording) {
-        api.executeCommand('stopRecording', 'file');
-        setRecCooldown(true);
-        setTimeout(() => setRecCooldown(false), 8000);
-      } else {
-        api.executeCommand('startRecording', { mode: 'file' });
-      }
-    } catch {
-      setRecToast(tl('jibriUnavailable'));
-      setTimeout(() => setRecToast(''), 3000);
+    if (isRecording) {
+      api.executeCommand('stopRecording', 'file');
+      setRecCooldown(true);
+      setTimeout(() => setRecCooldown(false), 8000);
+    } else {
+      recAttemptsRef.current = 0;
+      attemptStartRecording();
     }
-  }, [api, isRecording, tl, jibriAvailable, recCooldown]);
+  }, [api, isRecording, tl, jibriAvailable, recCooldown, attemptStartRecording]);
 
   const handleEndEvent = useCallback(async () => {
     setEnding(true);
     try {
-      api?.executeCommand('hangup');
-      await fetch(`/api/events/${eventId}`, {
+      const res = await fetch(`/api/events/${eventId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -195,14 +242,23 @@ export default function ModeratorControls({
         },
         body: JSON.stringify({ status: 'ENDED' }),
       });
+      if (!res.ok) {
+        setEnding(false);
+        setRecToast(tl('endEventError'));
+        setTimeout(() => setRecToast(''), 4000);
+        return;
+      }
+      api?.executeCommand('hangup');
       setEndModalOpen(false);
       endNavigationTimerRef.current = setTimeout(() => {
         router.push(`/admin/eventi/${eventId}?token=${moderatorToken}`);
       }, 2000);
     } catch {
       setEnding(false);
+      setRecToast(tl('endEventError'));
+      setTimeout(() => setRecToast(''), 4000);
     }
-  }, [api, eventId, moderatorToken, router]);
+  }, [api, eventId, moderatorToken, router, tl]);
 
   return (
     <>

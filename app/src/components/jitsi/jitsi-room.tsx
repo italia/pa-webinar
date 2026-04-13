@@ -86,6 +86,8 @@ export default function JitsiRoom({
   useEffect(() => { onRecordingStatusChangedRef.current = onRecordingStatusChanged; }, [onRecordingStatusChanged]);
   useEffect(() => { onApiReadyRef.current = onApiReady; }, [onApiReady]);
 
+  const observerRef = useRef<MutationObserver | null>(null);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     disposedRef.current = false;
@@ -111,6 +113,8 @@ export default function JitsiRoom({
         toolbarButtons = toolbarButtons.filter(b => b !== 'desktop');
       }
     }
+
+    const IFRAME_ALLOW = 'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock';
 
     function initJitsi() {
       if (disposedRef.current || initializingRef.current || apiRef.current) return;
@@ -142,54 +146,57 @@ export default function JitsiRoom({
         apiRef.current = api;
         onApiReadyRef.current?.(api);
 
-        // Ensure the iframe has the correct permissions for camera/mic/screen
         const iframeEl = containerRef.current?.querySelector('iframe');
         if (iframeEl) {
-          iframeEl.setAttribute(
-            'allow',
-            'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock',
-          );
+          iframeEl.setAttribute('allow', IFRAME_ALLOW);
         } else {
           const observer = new MutationObserver((_mutations, obs) => {
             const frame = containerRef.current?.querySelector('iframe');
             if (frame) {
-              frame.setAttribute(
-                'allow',
-                'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock',
-              );
+              frame.setAttribute('allow', IFRAME_ALLOW);
               obs.disconnect();
+              observerRef.current = null;
             }
           });
+          observerRef.current = observer;
           if (containerRef.current) {
             observer.observe(containerRef.current, { childList: true, subtree: true });
           }
         }
 
         api.addListener('videoConferenceJoined', () => {
+          if (disposedRef.current) return;
           setLoadState('ready');
           onReadyRef.current?.();
         });
 
         api.addListener('videoConferenceLeft', () => {
+          if (disposedRef.current) return;
           onLeftRef.current?.();
         });
 
         api.addListener('participantJoined', () => {
+          if (disposedRef.current) return;
           onParticipantCountChangedRef.current?.(api.getNumberOfParticipants());
         });
 
         api.addListener('participantLeft', () => {
+          if (disposedRef.current) return;
           onParticipantCountChangedRef.current?.(api.getNumberOfParticipants());
         });
 
         api.addListener('recordingStatusChanged', (evt: { on: boolean }) => {
+          if (disposedRef.current) return;
           onRecordingStatusChangedRef.current?.(evt.on);
         });
       } catch {
-        setLoadState('error');
+        if (!disposedRef.current) setLoadState('error');
         initializingRef.current = false;
       }
     }
+
+    let scriptLoadHandler: (() => void) | null = null;
+    let attachedScript: HTMLScriptElement | null = null;
 
     if (window.JitsiMeetExternalAPI) {
       initJitsi();
@@ -199,13 +206,15 @@ export default function JitsiRoom({
       ) as HTMLScriptElement | null;
 
       if (existingScript) {
-        existingScript.addEventListener('load', initJitsi);
+        scriptLoadHandler = initJitsi;
+        attachedScript = existingScript;
+        existingScript.addEventListener('load', scriptLoadHandler);
       } else {
         const script = document.createElement('script');
         script.src = `https://${domain}/external_api.js`;
         script.async = true;
         script.onload = initJitsi;
-        script.onerror = () => setLoadState('error');
+        script.onerror = () => { if (!disposedRef.current) setLoadState('error'); };
         document.head.appendChild(script);
       }
     }
@@ -213,6 +222,11 @@ export default function JitsiRoom({
     return () => {
       disposedRef.current = true;
       initializingRef.current = false;
+      observerRef.current?.disconnect();
+      observerRef.current = null;
+      if (attachedScript && scriptLoadHandler) {
+        attachedScript.removeEventListener('load', scriptLoadHandler);
+      }
       if (apiRef.current) {
         apiRef.current.dispose();
         apiRef.current = null;

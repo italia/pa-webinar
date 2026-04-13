@@ -16,6 +16,19 @@ interface RaisedHandsPanelProps {
   api: JitsiMeetExternalAPI | null;
 }
 
+/**
+ * Resolves the display name for a participant, retrying once after a
+ * short delay if the initial lookup returns empty (race with MUC presence).
+ */
+function resolveDisplayName(
+  api: JitsiMeetExternalAPI,
+  participantId: string,
+): string {
+  const info = api.getParticipantsInfo();
+  const p = info.find((pp) => pp.id === participantId);
+  return p?.displayName || p?.formattedDisplayName || '';
+}
+
 export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
   const t = useTranslations('live.moderator');
   const [hands, setHands] = useState<RaisedHand[]>([]);
@@ -32,19 +45,37 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
   useEffect(() => {
     if (!api) return;
 
+    const retryTimers = new Set<ReturnType<typeof setTimeout>>();
+
     const onRaiseHand = (evt: { id: string; handRaised: number }) => {
       if (evt.handRaised > 0) {
-        const participants = api.getParticipantsInfo();
-        const p = participants.find((pp) => pp.id === evt.id);
+        const name = resolveDisplayName(api, evt.id);
         handsRef.current.set(evt.id, {
           id: evt.id,
-          displayName: p?.displayName ?? evt.id,
+          displayName: name,
           raisedAt: Date.now(),
         });
+        syncHands();
+
+        // If name was empty, retry after MUC presence propagates
+        if (!name) {
+          const timer = setTimeout(() => {
+            retryTimers.delete(timer);
+            const entry = handsRef.current.get(evt.id);
+            if (entry && !entry.displayName) {
+              const retried = resolveDisplayName(api, evt.id);
+              if (retried) {
+                handsRef.current.set(evt.id, { ...entry, displayName: retried });
+                syncHands();
+              }
+            }
+          }, 500);
+          retryTimers.add(timer);
+        }
       } else {
         handsRef.current.delete(evt.id);
+        syncHands();
       }
-      syncHands();
     };
 
     const onParticipantLeft = (evt: { id: string }) => {
@@ -52,12 +83,25 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
       syncHands();
     };
 
+    // Update display names when they change (handles late JWT propagation)
+    const onDisplayNameChange = (evt: { id: string; displayname: string }) => {
+      const entry = handsRef.current.get(evt.id);
+      if (entry && evt.displayname) {
+        handsRef.current.set(evt.id, { ...entry, displayName: evt.displayname });
+        syncHands();
+      }
+    };
+
     api.addListener('raiseHandUpdated', onRaiseHand);
     api.addListener('participantLeft', onParticipantLeft);
+    api.addListener('displayNameChange', onDisplayNameChange);
 
     return () => {
+      retryTimers.forEach(clearTimeout);
+      retryTimers.clear();
       api.removeListener('raiseHandUpdated', onRaiseHand);
       api.removeListener('participantLeft', onParticipantLeft);
+      api.removeListener('displayNameChange', onDisplayNameChange);
     };
   }, [api, syncHands]);
 
@@ -114,7 +158,9 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
               style={{ backgroundColor: 'rgba(255,193,7,0.2)' }}
             >
               <span style={{ fontSize: '0.9rem' }}>&#9995;</span>
-              <span className="small fw-semibold">{h.displayName}</span>
+              <span className="small fw-semibold">
+                {h.displayName || t('participantFallback')}
+              </span>
               <span className="small" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 ({timeStr})
               </span>

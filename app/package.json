@@ -18,7 +18,8 @@
     "db:migrate:status": "prisma migrate status",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate"
+    "copy-sprites": "mkdir -p public/svg && cp $(node -e \"console.log(require.resolve('bootstrap-italia/dist/svg/sprites.svg'))\") public/svg/sprites.svg",
+    "postinstall": "prisma generate && npm run copy-sprites"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.26.0",

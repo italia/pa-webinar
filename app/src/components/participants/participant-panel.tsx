@@ -36,16 +36,19 @@ export default function ParticipantPanel({
     return () => clearInterval(interval);
   }, [refresh]);
 
-  // Also refresh on join/leave events
+  // Also refresh on join/leave/name-change events
   useEffect(() => {
     if (!api) return;
     const onJoin = () => refresh();
     const onLeft = () => refresh();
+    const onNameChange = () => refresh();
     api.addListener('participantJoined', onJoin);
     api.addListener('participantLeft', onLeft);
+    api.addListener('displayNameChange', onNameChange);
     return () => {
       api.removeListener('participantJoined', onJoin);
       api.removeListener('participantLeft', onLeft);
+      api.removeListener('displayNameChange', onNameChange);
     };
   }, [api, refresh]);
 
@@ -134,7 +137,7 @@ export default function ParticipantPanel({
                 <div className="d-flex align-items-center gap-2" style={{ minWidth: 0 }}>
                   <Icon icon="it-user" size="xs" className="text-muted flex-shrink-0" />
                   <span className="text-truncate fw-semibold" style={{ maxWidth: 140 }}>
-                    {p.displayName}
+                    {p.displayName || p.formattedDisplayName || t('anonymous')}
                   </span>
                   {roleBadge(p.role)}
                 </div>

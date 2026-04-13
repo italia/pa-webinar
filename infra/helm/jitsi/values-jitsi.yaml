@@ -33,6 +33,9 @@ prosody:
 
 # ── Jicofo ────────────────────────────────────────────
 jicofo:
+  extraEnvs:
+    JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT: "30"
+    JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT: "0"
   resources:
     requests:
       cpu: 100m
