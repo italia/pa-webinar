@@ -72,6 +72,7 @@ export default function ModeratorControls({
   const [videoModerationActive, setVideoModerationActive] = useState(false);
 
   const [recSeconds, setRecSeconds] = useState(0);
+  const [recCooldown, setRecCooldown] = useState(false);
   const recTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const endNavigationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -162,14 +163,18 @@ export default function ModeratorControls({
   }, [api, videoModerationActive]);
 
   const handleToggleRecording = useCallback(() => {
-    if (!api || !jibriAvailable) {
-      setRecToast(tl('jibriUnavailable'));
-      setTimeout(() => setRecToast(''), 3000);
+    if (!api || !jibriAvailable || recCooldown) {
+      if (!recCooldown) {
+        setRecToast(tl('jibriUnavailable'));
+        setTimeout(() => setRecToast(''), 3000);
+      }
       return;
     }
     try {
       if (isRecording) {
         api.executeCommand('stopRecording', 'file');
+        setRecCooldown(true);
+        setTimeout(() => setRecCooldown(false), 8000);
       } else {
         api.executeCommand('startRecording', { mode: 'file' });
       }
@@ -177,7 +182,7 @@ export default function ModeratorControls({
       setRecToast(tl('jibriUnavailable'));
       setTimeout(() => setRecToast(''), 3000);
     }
-  }, [api, isRecording, tl, jibriAvailable]);
+  }, [api, isRecording, tl, jibriAvailable, recCooldown]);
 
   const handleEndEvent = useCallback(async () => {
     setEnding(true);
@@ -263,11 +268,16 @@ export default function ModeratorControls({
               size="sm"
               className={BTN_BASE}
               onClick={handleToggleRecording}
-              disabled={!api || !jibriAvailable}
+              disabled={!api || !jibriAvailable || recCooldown}
               title={!jibriAvailable ? tl('jibriNotConfigured') : undefined}
               style={isRecording ? BTN_DANGER : BTN_DEFAULT}
             >
-              {isRecording ? (
+              {recCooldown ? (
+                <>
+                  <Icon icon="it-refresh" size="sm" color="white" />
+                  {t('recPreparing')}
+                </>
+              ) : isRecording ? (
                 <>
                   <span
                     className="d-inline-block rounded-circle"

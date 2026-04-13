@@ -215,6 +215,7 @@
       "unmuteAll": "Riattiva audio",
       "startRecording": "Avvia registrazione",
       "stopRecording": "Ferma registrazione",
+      "recPreparing": "Preparazione…",
       "toggleChat": "Chat on/off",
       "endEvent": "Termina evento",
       "endEventConfirm": "Sei sicuro di voler terminare l'evento per tutti i partecipanti?",
