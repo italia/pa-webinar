@@ -27,21 +27,21 @@ interface ModeratorControlsProps {
 }
 
 const BAR_STYLE: React.CSSProperties = {
-  background: '#0F1B2D',
-  borderBottom: '1px solid rgba(0, 102, 204, 0.4)',
+  background: '#17324D',
+  borderBottom: '2px solid #0066CC',
 };
 
-const BTN_BASE = 'py-2 px-3 d-inline-flex align-items-center gap-1 fw-semibold border-0';
+const BTN_BASE = 'py-2 px-3 d-inline-flex align-items-center gap-1 fw-semibold border-0 rounded-1';
 
 const BTN_DEFAULT: React.CSSProperties = {
   fontSize: '0.82rem',
-  background: 'rgba(255,255,255,0.12)',
-  color: '#fff',
+  background: '#243B55',
+  color: '#C9D4DE',
 };
 
 const BTN_ACTIVE_WARN: React.CSSProperties = {
   fontSize: '0.82rem',
-  background: '#A66300',
+  background: '#0066CC',
   color: '#fff',
 };
 
