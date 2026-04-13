@@ -51,6 +51,7 @@ export interface JitsiEventMap {
   recordingStatusChanged: [{ on: boolean; mode: string }];
   audioModerationChanged: [{ enabled: boolean }];
   videoModerationChanged: [{ enabled: boolean }];
+  moderationStatusChanged: [{ enabled: boolean; mediaType: string }];
   dominantSpeakerChanged: [{ id: string }];
   tileViewChanged: [{ enabled: boolean }];
   filmstripDisplayChanged: [{ visible: boolean }];
