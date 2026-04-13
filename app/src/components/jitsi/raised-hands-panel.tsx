@@ -70,7 +70,7 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
   const handleApproveAll = useCallback(
     (id: string) => {
       if (!api) return;
-      api.executeCommand('approveAudio', id);
+      api.executeCommand('askToUnmute', id);
       api.executeCommand('approveVideo', id);
     },
     [api],
@@ -79,7 +79,7 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
   const handleApproveAudioOnly = useCallback(
     (id: string) => {
       if (!api) return;
-      api.executeCommand('approveAudio', id);
+      api.executeCommand('askToUnmute', id);
     },
     [api],
   );
