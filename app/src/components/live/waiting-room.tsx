@@ -37,7 +37,7 @@ interface WaitingRoomProps {
   role: 'moderator' | 'participant' | 'guest';
   jvbReady?: boolean | null;
   onEnterLive: () => void;
-  onStartEvent?: () => void;
+  onStartEvent?: () => Promise<void>;
   onWatchRecording?: () => void;
 }
 
@@ -105,11 +105,18 @@ export default function WaitingRoom({
     return () => clearInterval(timer);
   }, [isLive, startsAtMs, event.tempRecordingUrl]);
 
+  const [startError, setStartError] = useState('');
   const handleStartEvent = useCallback(async () => {
     if (!onStartEvent) return;
     setStartingEvent(true);
-    onStartEvent();
-  }, [onStartEvent]);
+    setStartError('');
+    try {
+      await onStartEvent();
+    } catch {
+      setStartError(t('startEventError'));
+      setStartingEvent(false);
+    }
+  }, [onStartEvent, t]);
 
   if (watchingCatchUp && event.tempRecordingUrl) {
     return (
@@ -230,6 +237,11 @@ export default function WaitingRoom({
 
                   {role === 'moderator' && onStartEvent && (
                     <div className="mb-3">
+                      {startError && (
+                        <Alert color="danger" className="mb-2" style={{ fontSize: '0.85rem' }}>
+                          {startError}
+                        </Alert>
+                      )}
                       <Button
                         color="success"
                         size="lg"

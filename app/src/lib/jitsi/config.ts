@@ -93,7 +93,9 @@ export const jitsiConfigOverwrite = {
   p2p: { enabled: false },
   enableFileSharing: false,
   enableLobbyChat: false,
-  disableThirdPartyRequests: true,
+  // Gravatar disabled separately — we proxy via /api/avatar.
+  // disableThirdPartyRequests blocked JWT avatar data URIs in some Jitsi builds.
+  gravatar: { disabled: true },
   brandingRoomAlias: null,
 };
 

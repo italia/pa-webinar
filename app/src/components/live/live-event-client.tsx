@@ -297,11 +297,28 @@ export default function LiveEventClient({
   const handleRecordingStatusChanged = useCallback((recording: boolean) => { setIsRecording(recording); }, []);
   const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => { setJitsiApi(api); }, []);
 
+  const recPromptRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (recPromptRetryRef.current) clearTimeout(recPromptRetryRef.current); };
+  }, []);
+
   const handleRecPromptStart = useCallback(() => {
-    if (jitsiApi) {
-      try { jitsiApi.executeCommand('startRecording', { mode: 'file' }); } catch { /* handled by toast */ }
-    }
     setShowRecPrompt(false);
+    if (!jitsiApi) return;
+
+    let attempts = 0;
+    const tryStart = () => {
+      try {
+        jitsiApi.executeCommand('startRecording', { mode: 'file' });
+      } catch {
+        if (attempts < 3) {
+          attempts += 1;
+          recPromptRetryRef.current = setTimeout(tryStart, 3000 * attempts);
+        }
+      }
+    };
+    tryStart();
   }, [jitsiApi]);
   const handleRecPromptLater = useCallback(() => { setShowRecPrompt(false); }, []);
 
@@ -329,22 +346,19 @@ export default function LiveEventClient({
     }
   }, [jitsiApi]);
 
-  // Moderator: start event
   const handleStartEvent = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/events/${event.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: 'LIVE' }),
-      });
-      if (!res.ok) return;
-      setEventStatus('LIVE');
-    } catch {
-      // WaitingRoom handles its own loading state via onStartEvent callback
+    const res = await fetch(`/api/events/${event.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status: 'LIVE' }),
+    });
+    if (!res.ok) {
+      throw new Error('Failed to start event');
     }
+    setEventStatus('LIVE');
   }, [event.id, token]);
 
   // ── Guest join form (no token, LIVE event) ──

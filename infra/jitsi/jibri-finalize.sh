@@ -84,15 +84,25 @@ echo "Recording uploaded: $RECORDING_URL"
 if [ -n "$RECORDING_WEBHOOK_URL" ] && [ "${RECORDING_URL}" != "file://"* ]; then
   ROOM_NAME=$(basename "$RECORDING_DIR" | sed 's/_[0-9]*-[0-9]*-[0-9]*.*$//')
 
+  # Use jq if available, otherwise python — avoids broken JSON from special chars in URLs
+  if command -v jq >/dev/null 2>&1; then
+    PAYLOAD=$(jq -n --arg room "$ROOM_NAME" --arg url "$RECORDING_URL" --arg file "$FILENAME" \
+      '{roomName: $room, recordingUrl: $url, filename: $file}')
+  elif command -v python3 >/dev/null 2>&1; then
+    PAYLOAD=$(python3 -c "import json,sys;print(json.dumps({'roomName':sys.argv[1],'recordingUrl':sys.argv[2],'filename':sys.argv[3]}))" "$ROOM_NAME" "$RECORDING_URL" "$FILENAME")
+  else
+    # Minimal escaping for backslash and double-quote
+    ESC_ROOM=$(printf '%s' "$ROOM_NAME" | sed 's/\\/\\\\/g;s/"/\\"/g')
+    ESC_URL=$(printf '%s' "$RECORDING_URL" | sed 's/\\/\\\\/g;s/"/\\"/g')
+    ESC_FILE=$(printf '%s' "$FILENAME" | sed 's/\\/\\\\/g;s/"/\\"/g')
+    PAYLOAD="{\"roomName\":\"$ESC_ROOM\",\"recordingUrl\":\"$ESC_URL\",\"filename\":\"$ESC_FILE\"}"
+  fi
+
   echo "Notifying portal: $RECORDING_WEBHOOK_URL"
   curl -s -X POST "$RECORDING_WEBHOOK_URL" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${CRON_API_KEY}" \
-    -d "{
-      \"roomName\": \"$ROOM_NAME\",
-      \"recordingUrl\": \"$RECORDING_URL\",
-      \"filename\": \"$FILENAME\"
-    }" || echo "WARNING: Failed to notify portal"
+    -d "$PAYLOAD" || echo "WARNING: Failed to notify portal"
 fi
 
 # Cleanup local file after successful upload (except for local storage)

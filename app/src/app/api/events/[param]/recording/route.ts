@@ -31,6 +31,9 @@ export const GET = withErrorHandling(async (_request, context) => {
   if (event.status !== 'ENDED' && event.status !== 'ARCHIVED') {
     throw new ForbiddenError('Recording not yet available');
   }
+  if (!event.recordingPublished) {
+    throw new ForbiddenError('Recording not published');
+  }
 
   return Response.redirect(event.recordingUrl, 302);
 });

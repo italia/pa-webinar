@@ -63,7 +63,7 @@ export default function ChatPanel({ api, displayName }: ChatPanelProps) {
       if (evt.privateMessage) return;
       const msg: ChatMessage = {
         id: `in-${++idCounter.current}`,
-        sender: evt.nick || evt.from,
+        sender: evt.nick || evt.from || '?',
         text: evt.message,
         timestamp: new Date(evt.stamp || Date.now()),
         isOwn: false,

@@ -12,6 +12,9 @@ app/out/
 build/
 dist/
 
+# Generated sprites (copied from bootstrap-italia during postinstall)
+app/public/svg/
+
 # Environment
 **/.env
 **/.env.local

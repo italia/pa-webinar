@@ -139,6 +139,8 @@ jitsi-meet:
     env:
       JICOFO_ENABLE_AUTO_OWNER: "false"
       JICOFO_AUTHENTICATION_TYPE: "jwt"
+      JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT: "30"
+      JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT: "0"
 
   jvb:
     replicaCount: 0

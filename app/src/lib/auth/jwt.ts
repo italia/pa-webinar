@@ -43,17 +43,7 @@ function getJitsiJwtSubject(): string {
   );
 }
 
-import { createHash } from 'crypto';
-
-import { getPublicEnv } from '@/lib/env';
-
-function getAppUrl(): string {
-  return getPublicEnv('NEXT_PUBLIC_APP_URL');
-}
-
-function gravatarMd5(email: string): string {
-  return createHash('md5').update(email.toLowerCase().trim()).digest('hex');
-}
+import { generateAvatarDataUri } from '@/lib/avatar';
 
 interface JitsiTokenPayload {
   roomName: string;
@@ -62,7 +52,7 @@ interface JitsiTokenPayload {
   uniqueId: string;
   isModerator: boolean;
   expiresInSeconds?: number;
-  /** If provided, enables Gravatar lookup in the avatar proxy. */
+  /** Kept for forward compatibility but not used for avatar URLs. */
   email?: string;
 }
 
@@ -83,12 +73,8 @@ export async function generateJitsiJwt(
   const jitsiJwtAudience = getJitsiJwtAudience();
   const jitsiJwtSubject = getJitsiJwtSubject();
 
-  const avatarParams = new URLSearchParams({
-    name: payload.displayName,
-    size: '200',
-    ...(payload.email ? { gh: gravatarMd5(payload.email) } : {}),
-  });
-  const avatarUrl = `${getAppUrl()}/api/avatar?${avatarParams.toString()}`;
+  // Inline SVG data URI bypasses Jitsi web CSP restrictions
+  const avatarUrl = generateAvatarDataUri(payload.displayName);
 
   const jwt = await new SignJWT({
     context: {
