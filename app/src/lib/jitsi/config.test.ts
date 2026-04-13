@@ -9,7 +9,6 @@ import {
   instantCallToolbarButtons,
   instantCallModeratorToolbarButtons,
   instantCallConfigOverwrite,
-  dtdJitsiTheme,
 } from './config';
 
 describe('Jitsi config exports', () => {
@@ -49,26 +48,6 @@ describe('Jitsi config exports', () => {
   });
 });
 
-describe('DTD Jitsi theme', () => {
-  it('defines a palette with DTD primary blue', () => {
-    expect(dtdJitsiTheme.palette.action01).toBe('#0066CC');
-  });
-
-  it('uses DTD dark navy for backgrounds', () => {
-    expect(dtdJitsiTheme.palette.uiBackground).toBe('#0F1B2D');
-    expect(dtdJitsiTheme.palette.ui01).toBe('#17324D');
-  });
-
-  it('uses Bootstrap Italia success and warning colors', () => {
-    expect(dtdJitsiTheme.palette.success01).toBe('#008758');
-    expect(dtdJitsiTheme.palette.warning01).toBe('#A66300');
-  });
-
-  it('has white as primary text color', () => {
-    expect(dtdJitsiTheme.palette.text01).toBe('#FFFFFF');
-  });
-});
-
 describe('Jitsi config overwrite', () => {
   it('disables file sharing by default', () => {
     expect(jitsiConfigOverwrite.enableFileSharing).toBe(false);
@@ -94,9 +73,12 @@ describe('Jitsi config overwrite', () => {
     expect(jitsiConfigOverwrite.disableReactions).toBe(true);
   });
 
-  it('includes customTheme with DTD palette', () => {
-    expect(jitsiConfigOverwrite.customTheme).toBe(dtdJitsiTheme);
-    expect(jitsiConfigOverwrite.customTheme.palette.action01).toBe('#0066CC');
+  it('does NOT include customTheme (server-side only)', () => {
+    expect('customTheme' in jitsiConfigOverwrite).toBe(false);
+  });
+
+  it('does NOT include dynamicBrandingUrl (server-side only)', () => {
+    expect('dynamicBrandingUrl' in jitsiConfigOverwrite).toBe(false);
   });
 });
 

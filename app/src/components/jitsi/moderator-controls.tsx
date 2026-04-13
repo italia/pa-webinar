@@ -31,7 +31,23 @@ const BAR_STYLE: React.CSSProperties = {
   borderBottom: '1px solid rgba(0, 102, 204, 0.4)',
 };
 
-const BTN_BASE = 'py-2 px-3 d-inline-flex align-items-center gap-1 fw-semibold';
+const BTN_BASE = 'py-2 px-3 d-inline-flex align-items-center gap-1 fw-semibold border-0';
+
+const BTN_DEFAULT: React.CSSProperties = {
+  fontSize: '0.82rem',
+  background: 'rgba(255,255,255,0.12)',
+  color: '#fff',
+};
+
+const BTN_ACTIVE_WARN: React.CSSProperties = {
+  fontSize: '0.82rem',
+  background: '#A66300',
+  color: '#fff',
+};
+
+const BTN_DANGER: React.CSSProperties = {
+  fontSize: '0.82rem',
+};
 
 export default function ModeratorControls({
   api,
@@ -191,43 +207,40 @@ export default function ModeratorControls({
         style={BAR_STYLE}
       >
         <div className="d-flex align-items-center gap-2 flex-wrap">
-          {/* Audio moderation toggle (replaces old "Silenzia tutti" + "Mic partecipanti") */}
+          {/* Audio moderation toggle */}
           <Button
-            color={audioModerationActive ? 'warning' : 'light'}
-            outline={!audioModerationActive}
+            color={audioModerationActive ? 'warning' : 'secondary'}
             size="sm"
             className={BTN_BASE}
             onClick={handleToggleAudioModeration}
             disabled={!api}
-            style={{ fontSize: '0.82rem' }}
+            style={audioModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
           >
-            <Icon icon="it-hearing" size="sm" />
+            <Icon icon="it-hearing" size="sm" color="white" />
             {audioModerationActive ? t('micDisabled') : t('audioModeration')}
           </Button>
 
           {/* Video moderation toggle */}
           <Button
-            color={videoModerationActive ? 'warning' : 'light'}
-            outline={!videoModerationActive}
+            color={videoModerationActive ? 'warning' : 'secondary'}
             size="sm"
             className={BTN_BASE}
             onClick={handleToggleVideoModeration}
             disabled={!api}
-            style={{ fontSize: '0.82rem' }}
+            style={videoModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
           >
-            <Icon icon="it-video" size="sm" />
+            <Icon icon="it-video" size="sm" color="white" />
             {videoModerationActive ? t('videoDisabled') : t('videoModeration')}
           </Button>
 
           {/* Raised hands */}
           <Button
-            color={handsCount > 0 ? 'warning' : 'light'}
-            outline={handsCount === 0}
+            color={handsCount > 0 ? 'warning' : 'secondary'}
             size="sm"
             className={`${BTN_BASE} position-relative`}
             onClick={() => setHandsOpen(!handsOpen)}
             disabled={!api}
-            style={{ fontSize: '0.82rem' }}
+            style={handsCount > 0 ? BTN_ACTIVE_WARN : BTN_DEFAULT}
           >
             <span style={{ fontSize: '1rem' }}>&#9995;</span>
             {t('raisedHands')}
@@ -246,14 +259,13 @@ export default function ModeratorControls({
           {/* Recording */}
           {recordingEnabled && (
             <Button
-              color={isRecording ? 'danger' : 'light'}
-              outline={!isRecording}
+              color={isRecording ? 'danger' : 'secondary'}
               size="sm"
               className={BTN_BASE}
               onClick={handleToggleRecording}
               disabled={!api || !jibriAvailable}
               title={!jibriAvailable ? tl('jibriNotConfigured') : undefined}
-              style={{ fontSize: '0.82rem' }}
+              style={isRecording ? BTN_DANGER : BTN_DEFAULT}
             >
               {isRecording ? (
                 <>
@@ -268,17 +280,17 @@ export default function ModeratorControls({
                   />
                   {t('stopRecording')}
                   <Badge
-                    color="light"
+                    color=""
                     pill
-                    className="ms-1 text-danger"
-                    style={{ fontSize: '0.72rem' }}
+                    className="ms-1"
+                    style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.2)', color: '#fff' }}
                   >
                     {formatTime(recSeconds)}
                   </Badge>
                 </>
               ) : (
                 <>
-                  <Icon icon="it-video" size="sm" />
+                  <Icon icon="it-video" size="sm" color="white" />
                   {t('startRecording')}
                 </>
               )}
@@ -291,7 +303,7 @@ export default function ModeratorControls({
             size="sm"
             className={BTN_BASE}
             onClick={() => setEndModalOpen(true)}
-            style={{ fontSize: '0.82rem' }}
+            style={BTN_DANGER}
           >
             <Icon icon="it-close-circle" size="sm" color="white" />
             {t('endEvent')}
