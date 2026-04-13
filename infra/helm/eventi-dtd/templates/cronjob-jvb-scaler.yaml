@@ -125,6 +125,37 @@ spec:
                   else
                     log "No change needed"
                   fi
+
+                  # ── Jibri auto-scaling ──────────────────────────────
+                  JIBRI_DESIRED=$(echo "$RESPONSE" | grep -o '"jibriDesired":[0-9]*' | grep -o '[0-9]*' || echo "")
+                  if [ -n "$JIBRI_DESIRED" ]; then
+                    JIBRI_DEPLOY=$(kubectl get deployments -n {{ .Release.Namespace }} \
+                      -l "app.kubernetes.io/component=jibri" \
+                      -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+
+                    if [ -z "$JIBRI_DEPLOY" ]; then
+                      JIBRI_DEPLOY=$(kubectl get statefulsets -n {{ .Release.Namespace }} \
+                        -l "app.kubernetes.io/component=jibri" \
+                        -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+                      JIBRI_KIND="statefulset"
+                    else
+                      JIBRI_KIND="deployment"
+                    fi
+
+                    if [ -n "$JIBRI_DEPLOY" ]; then
+                      JIBRI_CURRENT=$(kubectl get "$JIBRI_KIND" "$JIBRI_DEPLOY" \
+                        -n {{ .Release.Namespace }} -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
+                      if [ "$JIBRI_DESIRED" != "$JIBRI_CURRENT" ]; then
+                        log "Scaling Jibri ($JIBRI_KIND/$JIBRI_DEPLOY) from $JIBRI_CURRENT to $JIBRI_DESIRED"
+                        kubectl scale "$JIBRI_KIND" "$JIBRI_DEPLOY" \
+                          -n {{ .Release.Namespace }} --replicas="$JIBRI_DESIRED"
+                      else
+                        log "Jibri: no change ($JIBRI_CURRENT replicas)"
+                      fi
+                    else
+                      log "Jibri: deployment/statefulset not found — skipping"
+                    fi
+                  fi
               env:
                 - name: CRON_API_KEY
                   valueFrom:
@@ -165,10 +196,10 @@ metadata:
     app.kubernetes.io/component: jvb-scaler
 rules:
   - apiGroups: ["apps"]
-    resources: ["deployments"]
+    resources: ["deployments", "statefulsets"]
     verbs: ["get", "list"]
   - apiGroups: ["apps"]
-    resources: ["deployments/scale"]
+    resources: ["deployments/scale", "statefulsets/scale"]
     verbs: ["get", "patch"]
   - apiGroups: [""]
     resources: ["pods"]

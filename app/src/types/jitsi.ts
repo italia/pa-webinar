@@ -49,6 +49,8 @@ export interface JitsiEventMap {
   videoMuteStatusChanged: [{ muted: boolean }];
   raiseHandUpdated: [{ id: string; handRaised: number }];
   recordingStatusChanged: [{ on: boolean; mode: string }];
+  audioModerationChanged: [{ enabled: boolean }];
+  videoModerationChanged: [{ enabled: boolean }];
   dominantSpeakerChanged: [{ id: string }];
   tileViewChanged: [{ enabled: boolean }];
   filmstripDisplayChanged: [{ visible: boolean }];
@@ -101,8 +103,38 @@ export interface JitsiMeetExternalAPI {
   isAudioMuted(): Promise<boolean>;
   isVideoMuted(): Promise<boolean>;
 
+  // Statistics
+  getConnectionQuality(): Promise<JitsiConnectionStats>;
+
   // Lifecycle
   dispose(): void;
+}
+
+export interface JitsiConnectionStats {
+  bandwidth?: {
+    download?: number;
+    upload?: number;
+  };
+  bitrate?: {
+    download?: number;
+    upload?: number;
+    audio?: { download?: number; upload?: number };
+    video?: { download?: number; upload?: number };
+  };
+  packetLoss?: {
+    download?: number;
+    upload?: number;
+    total?: number;
+  };
+  resolution?: Record<string, { height?: number; width?: number }>;
+  framerate?: Record<string, number>;
+  codec?: Record<string, { audio?: string; video?: string }>;
+  connectionQuality?: number;
+  jvbRTT?: number;
+  serverRegion?: string;
+  bridgeCount?: number;
+  e2eRTT?: number;
+  transport?: Array<{ type?: string; localCandidateType?: string; remoteCandidateType?: string; p2p?: boolean }>;
 }
 
 /**

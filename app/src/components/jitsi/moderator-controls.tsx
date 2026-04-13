@@ -59,12 +59,50 @@ export default function ModeratorControls({
   const recTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const endNavigationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Cleanup navigation timer on unmount
   useEffect(() => {
     return () => {
       if (endNavigationTimerRef.current) clearTimeout(endNavigationTimerRef.current);
     };
   }, []);
+
+  // Sync AV moderation state with Jitsi events
+  useEffect(() => {
+    if (!api) return;
+    const onAudioMod = (evt: { enabled: boolean }) => setAudioModerationActive(evt.enabled);
+    const onVideoMod = (evt: { enabled: boolean }) => setVideoModerationActive(evt.enabled);
+    api.addListener('audioModerationChanged', onAudioMod);
+    api.addListener('videoModerationChanged', onVideoMod);
+    return () => {
+      api.removeListener('audioModerationChanged', onAudioMod);
+      api.removeListener('videoModerationChanged', onVideoMod);
+    };
+  }, [api]);
+
+  // Track raised hands even when panel is closed
+  useEffect(() => {
+    if (!api) return;
+    const raisedIds = new Set<string>();
+
+    const onRaiseHand = (evt: { id: string; handRaised: number }) => {
+      if (evt.handRaised > 0) {
+        raisedIds.add(evt.id);
+      } else {
+        raisedIds.delete(evt.id);
+      }
+      setHandsCount(raisedIds.size);
+    };
+    const onLeft = (evt: { id: string }) => {
+      raisedIds.delete(evt.id);
+      setHandsCount(raisedIds.size);
+    };
+
+    api.addListener('raiseHandUpdated', onRaiseHand);
+    api.addListener('participantLeft', onLeft);
+    return () => {
+      api.removeListener('raiseHandUpdated', onRaiseHand);
+      api.removeListener('participantLeft', onLeft);
+    };
+  }, [api]);
 
   useEffect(() => {
     if (isRecording) {
@@ -87,9 +125,25 @@ export default function ModeratorControls({
     return `${m}:${s}`;
   };
 
-  const handleMuteAll = useCallback(() => {
-    api?.executeCommand('muteEveryone');
-  }, [api]);
+  // Mic toggle: mute everyone + enable audio moderation, or disable moderation
+  const handleToggleAudioModeration = useCallback(() => {
+    if (!api) return;
+    if (audioModerationActive) {
+      api.executeCommand('disableAudioModeration');
+    } else {
+      api.executeCommand('muteEveryone');
+      api.executeCommand('enableAudioModeration');
+    }
+  }, [api, audioModerationActive]);
+
+  const handleToggleVideoModeration = useCallback(() => {
+    if (!api) return;
+    if (videoModerationActive) {
+      api.executeCommand('disableVideoModeration');
+    } else {
+      api.executeCommand('enableVideoModeration');
+    }
+  }, [api, videoModerationActive]);
 
   const handleToggleRecording = useCallback(() => {
     if (!api || !jibriAvailable) {
@@ -108,26 +162,6 @@ export default function ModeratorControls({
       setTimeout(() => setRecToast(''), 3000);
     }
   }, [api, isRecording, tl, jibriAvailable]);
-
-  const handleToggleAudioModeration = useCallback(() => {
-    if (!api) return;
-    if (audioModerationActive) {
-      api.executeCommand('disableAudioModeration');
-    } else {
-      api.executeCommand('enableAudioModeration');
-    }
-    setAudioModerationActive((o) => !o);
-  }, [api, audioModerationActive]);
-
-  const handleToggleVideoModeration = useCallback(() => {
-    if (!api) return;
-    if (videoModerationActive) {
-      api.executeCommand('disableVideoModeration');
-    } else {
-      api.executeCommand('enableVideoModeration');
-    }
-    setVideoModerationActive((o) => !o);
-  }, [api, videoModerationActive]);
 
   const handleEndEvent = useCallback(async () => {
     setEnding(true);
@@ -150,32 +184,14 @@ export default function ModeratorControls({
     }
   }, [api, eventId, moderatorToken, router]);
 
-  const onHandsCountChange = useCallback((count: number) => {
-    setHandsCount(count);
-  }, []);
-
   return (
     <>
       <div
-        className="text-white px-3 py-2 d-flex align-items-center justify-content-between flex-wrap gap-2"
+        className="text-white px-3 py-2 d-flex align-items-center justify-content-between flex-wrap gap-2 moderator-bar"
         style={BAR_STYLE}
       >
         <div className="d-flex align-items-center gap-2 flex-wrap">
-          {/* Mute All */}
-          <Button
-            color="light"
-            outline
-            size="sm"
-            className={BTN_BASE}
-            onClick={handleMuteAll}
-            disabled={!api}
-            style={{ fontSize: '0.82rem' }}
-          >
-            <Icon icon="it-hearing" size="sm" />
-            {t('muteAll')}
-          </Button>
-
-          {/* Audio moderation */}
+          {/* Audio moderation toggle (replaces old "Silenzia tutti" + "Mic partecipanti") */}
           <Button
             color={audioModerationActive ? 'warning' : 'light'}
             outline={!audioModerationActive}
@@ -186,10 +202,10 @@ export default function ModeratorControls({
             style={{ fontSize: '0.82rem' }}
           >
             <Icon icon="it-hearing" size="sm" />
-            {t('audioModeration')}
+            {audioModerationActive ? t('micDisabled') : t('audioModeration')}
           </Button>
 
-          {/* Video moderation */}
+          {/* Video moderation toggle */}
           <Button
             color={videoModerationActive ? 'warning' : 'light'}
             outline={!videoModerationActive}
@@ -200,24 +216,24 @@ export default function ModeratorControls({
             style={{ fontSize: '0.82rem' }}
           >
             <Icon icon="it-video" size="sm" />
-            {t('videoModeration')}
+            {videoModerationActive ? t('videoDisabled') : t('videoModeration')}
           </Button>
 
           {/* Raised hands */}
           <Button
-            color="light"
-            outline
+            color={handsCount > 0 ? 'warning' : 'light'}
+            outline={handsCount === 0}
             size="sm"
             className={`${BTN_BASE} position-relative`}
             onClick={() => setHandsOpen(!handsOpen)}
             disabled={!api}
             style={{ fontSize: '0.82rem' }}
           >
-            <span style={{ fontSize: '1rem' }}>✋</span>
+            <span style={{ fontSize: '1rem' }}>&#9995;</span>
             {t('raisedHands')}
             {handsCount > 0 && (
               <Badge
-                color="warning"
+                color="danger"
                 pill
                 className="ms-1"
                 style={{ fontSize: '0.7rem' }}
@@ -227,7 +243,7 @@ export default function ModeratorControls({
             )}
           </Button>
 
-          {/* Recording — only visible when recording is enabled for the event */}
+          {/* Recording */}
           {recordingEnabled && (
             <Button
               color={isRecording ? 'danger' : 'light'}
@@ -304,9 +320,9 @@ export default function ModeratorControls({
         </div>
       )}
 
-      {/* Raised hands panel — collapsed by default */}
+      {/* Raised hands panel */}
       {handsOpen && (
-        <RaisedHandsPanel api={api} onCountChange={onHandsCountChange} />
+        <RaisedHandsPanel api={api} />
       )}
 
       {/* End event confirmation modal */}

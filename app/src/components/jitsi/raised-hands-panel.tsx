@@ -14,10 +14,9 @@ interface RaisedHand {
 
 interface RaisedHandsPanelProps {
   api: JitsiMeetExternalAPI | null;
-  onCountChange?: (count: number) => void;
 }
 
-export default function RaisedHandsPanel({ api, onCountChange }: RaisedHandsPanelProps) {
+export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
   const t = useTranslations('live.moderator');
   const [hands, setHands] = useState<RaisedHand[]>([]);
   const handsRef = useRef<Map<string, RaisedHand>>(new Map());
@@ -28,8 +27,7 @@ export default function RaisedHandsPanel({ api, onCountChange }: RaisedHandsPane
       (a, b) => a.raisedAt - b.raisedAt,
     );
     setHands(arr);
-    onCountChange?.(arr.length);
-  }, [onCountChange]);
+  }, []);
 
   useEffect(() => {
     if (!api) return;
@@ -63,6 +61,7 @@ export default function RaisedHandsPanel({ api, onCountChange }: RaisedHandsPane
     };
   }, [api, syncHands]);
 
+  // Refresh elapsed-time display periodically
   useEffect(() => {
     const interval = setInterval(() => setTick((n) => n + 1), 10_000);
     return () => clearInterval(interval);
@@ -114,7 +113,7 @@ export default function RaisedHandsPanel({ api, onCountChange }: RaisedHandsPane
               className="d-flex align-items-center gap-1 rounded px-2 py-1"
               style={{ backgroundColor: 'rgba(255,193,7,0.2)' }}
             >
-              <span style={{ fontSize: '0.9rem' }}>✋</span>
+              <span style={{ fontSize: '0.9rem' }}>&#9995;</span>
               <span className="small fw-semibold">{h.displayName}</span>
               <span className="small" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 ({timeStr})

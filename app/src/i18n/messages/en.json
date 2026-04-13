@@ -172,6 +172,10 @@
     "guestRedirectToRegister": "The event has not started yet. Register to receive your access link.",
     "jibriUnavailable": "Recording unavailable — Jibri not configured",
     "jibriNotConfigured": "Recording not configured in infrastructure",
+    "recordingPromptTitle": "Start recording?",
+    "recordingPromptBody": "Recording is enabled for this event. Would you like to start it now?",
+    "recordingPromptStart": "Start now",
+    "recordingPromptLater": "Later",
     "eventEnded": "Event ended",
     "eventEndedMessage": "The event has ended. Thank you for participating.",
     "backToEvent": "Back to event",
@@ -197,7 +201,14 @@
       "title": "Participants",
       "noParticipants": "No participants",
       "kick": "Kick",
-      "kickConfirm": "Are you sure you want to kick this participant?"
+      "kickConfirm": "Are you sure you want to kick this participant?",
+      "connectionQuality": "Connection",
+      "quality": {
+        "good": "Good",
+        "medium": "Medium",
+        "poor": "Poor",
+        "unknown": "N/A"
+      }
     },
     "moderator": {
       "muteAll": "Mute all",
@@ -216,7 +227,9 @@
       "approveAll": "Give the floor",
       "audioOnly": "Audio only",
       "audioModeration": "Participant mic",
+      "micDisabled": "Mic disabled",
       "videoModeration": "Participant video",
+      "videoDisabled": "Video disabled",
       "eventEndedSuccess": "Event ended successfully. Redirecting..."
     }
   },
@@ -325,6 +338,7 @@
     "startEventSuccess": "Event started! Waiting participants will be redirected automatically.",
     "jvbWarmupWarning": "Video servers are starting up (~2 minutes). Participants will see a notice in the waiting room.",
     "eventIsLive": "The event is live",
+    "liveParticipants": "{count} in room / {max} max",
     "joinAsModeratorBtn": "Join as moderator",
     "openPublicPage": "Open public page",
     "quickActions": "Quick actions",

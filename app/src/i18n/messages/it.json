@@ -172,6 +172,10 @@
     "guestRedirectToRegister": "L'evento non è ancora iniziato. Registrati per ricevere il link di accesso.",
     "jibriUnavailable": "Registrazione non disponibile — Jibri non configurato",
     "jibriNotConfigured": "Registrazione non configurata nell'infrastruttura",
+    "recordingPromptTitle": "Avviare la registrazione?",
+    "recordingPromptBody": "La registrazione è abilitata per questo evento. Vuoi avviarla ora?",
+    "recordingPromptStart": "Avvia ora",
+    "recordingPromptLater": "Dopo",
     "eventEnded": "Evento concluso",
     "eventEndedMessage": "L'evento è terminato. Grazie per aver partecipato.",
     "backToEvent": "Torna all'evento",
@@ -197,7 +201,14 @@
       "title": "Partecipanti",
       "noParticipants": "Nessun partecipante",
       "kick": "Espelli",
-      "kickConfirm": "Sei sicuro di voler espellere questo partecipante?"
+      "kickConfirm": "Sei sicuro di voler espellere questo partecipante?",
+      "connectionQuality": "Connessione",
+      "quality": {
+        "good": "Buona",
+        "medium": "Media",
+        "poor": "Scarsa",
+        "unknown": "N/D"
+      }
     },
     "moderator": {
       "muteAll": "Silenzia tutti",
@@ -216,7 +227,9 @@
       "approveAll": "Dai la parola",
       "audioOnly": "Solo audio",
       "audioModeration": "Mic partecipanti",
+      "micDisabled": "Mic disattivato",
       "videoModeration": "Video partecipanti",
+      "videoDisabled": "Video disattivato",
       "eventEndedSuccess": "Evento terminato con successo. Reindirizzamento..."
     }
   },
@@ -395,6 +408,7 @@
     "startEventSuccess": "Evento avviato! I partecipanti in attesa verranno reindirizzati automaticamente.",
     "jvbWarmupWarning": "I server video si stanno avviando (circa 2 minuti). I partecipanti vedranno un avviso nella sala d'attesa.",
     "eventIsLive": "L'evento è in corso",
+    "liveParticipants": "{count} in stanza / {max} max",
     "joinAsModeratorBtn": "Entra come moderatore",
     "openPublicPage": "Apri pagina pubblica",
     "quickActions": "Azioni rapide",

@@ -15,8 +15,8 @@
  */
 export const dtdJitsiTheme = {
   palette: {
-    uiBackground: '#001428',
-    ui01: '#0F1B2D',
+    uiBackground: '#0F1B2D',
+    ui01: '#17324D',
     ui02: '#17324D',
     ui03: '#2E4A62',
     ui04: '#3D5A80',
