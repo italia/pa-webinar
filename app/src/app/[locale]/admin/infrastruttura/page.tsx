@@ -5,6 +5,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { getInfrastructureInfo } from '@/lib/infrastructure';
 import InfrastructurePanel from '@/components/admin/infrastructure-panel';
+import InfrastructureMap from '@/components/status/infrastructure-map';
 
 export default async function InfrastructurePage() {
   const locale = await getLocale();
@@ -15,12 +16,22 @@ export default async function InfrastructurePage() {
   }
 
   const t = await getTranslations('admin.infrastructure');
+  const tMap = await getTranslations('infraMap');
   const info = await getInfrastructureInfo();
 
   return (
     <div className="container py-5">
       <h1 className="mb-2">{t('title')}</h1>
       <p className="text-secondary mb-4">{t('subtitle')}</p>
+
+      <section className="mb-5">
+        <h2 className="h4 fw-semibold mb-3">{tMap('title')}</h2>
+        <p className="text-muted mb-3" style={{ fontSize: '0.88rem' }}>
+          {tMap('subtitle')}
+        </p>
+        <InfrastructureMap />
+      </section>
+
       <InfrastructurePanel info={info} />
     </div>
   );
