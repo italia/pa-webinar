@@ -23,6 +23,8 @@ interface SystemStatus {
     jvbStatus: 'ready' | 'scaling' | 'standby';
     jvbStressLevel: number | null;
     jvbParticipants: number | null;
+    jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable';
+    jibriRunningReplicas: number;
   };
   upcomingEvents: {
     title: string;
@@ -204,6 +206,72 @@ async function getJvbStatus(): Promise<{
   }
 }
 
+async function getJibriStatus(): Promise<{
+  component: ComponentStatus;
+  running: number;
+  jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable';
+}> {
+  const storageType = process.env.RECORDING_STORAGE_TYPE;
+  const storageConfigured = !!storageType && storageType !== 'local';
+
+  if (!storageConfigured) {
+    return {
+      component: { name: 'jibri', status: 'standby', details: 'Not configured' },
+      running: 0,
+      jibriStatus: 'unavailable',
+    };
+  }
+
+  let running = 0;
+
+  if (process.env.KUBERNETES_SERVICE_HOST) {
+    try {
+      const token = await readFileIfExists('/var/run/secrets/kubernetes.io/serviceaccount/token');
+      const namespace = await readFileIfExists('/var/run/secrets/kubernetes.io/serviceaccount/namespace');
+      if (token && namespace) {
+        const apiBase = `https://${process.env.KUBERNETES_SERVICE_HOST}:${process.env.KUBERNETES_SERVICE_PORT}`;
+        const res = await fetch(
+          `${apiBase}/apis/apps/v1/namespaces/${namespace}/deployments?labelSelector=app.kubernetes.io/component=jibri`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: AbortSignal.timeout(3000),
+            // @ts-expect-error -- Node fetch option
+            rejectUnauthorized: false,
+          },
+        );
+        if (res.ok) {
+          const data = await res.json() as { items: { status?: { readyReplicas?: number }; spec?: { replicas?: number } }[] };
+          for (const item of data.items ?? []) {
+            running += item.status?.readyReplicas ?? 0;
+          }
+        }
+      }
+    } catch {
+      // Not critical — fall through
+    }
+  } else {
+    // Outside K8s (dev), assume Jibri is available if storage is configured
+    return {
+      component: { name: 'jibri', status: 'operational' },
+      running: 1,
+      jibriStatus: 'ready',
+    };
+  }
+
+  const jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable' =
+    running > 0 ? 'ready' : 'scaling';
+
+  return {
+    component: {
+      name: 'jibri',
+      status: running > 0 ? 'operational' : 'degraded',
+      details: running > 0 ? `${running} instance(s) ready` : 'No instances running — scaling up',
+    },
+    running,
+    jibriStatus,
+  };
+}
+
 async function readFileIfExists(path: string): Promise<string | null> {
   try {
     const { readFile } = await import('node:fs/promises');
@@ -223,11 +291,8 @@ export const GET = withErrorHandling(async () => {
 
   const app: ComponentStatus = { name: 'app', status: 'operational' };
 
-  const jibri: ComponentStatus = {
-    name: 'jibri',
-    status: process.env.JIBRI_ENABLED === 'true' ? 'operational' : 'standby',
-    details: process.env.JIBRI_ENABLED === 'true' ? undefined : 'Not enabled',
-  };
+  const jibriResult = await getJibriStatus();
+  const jibri = jibriResult.component;
 
   const components = [app, db, jitsi, jvb.component, jibri, smtp];
 
@@ -274,6 +339,8 @@ export const GET = withErrorHandling(async () => {
       jvbStatus: jvb.jvbStatus,
       jvbStressLevel: jvb.stressLevel,
       jvbParticipants: jvb.participants,
+      jibriStatus: jibriResult.jibriStatus,
+      jibriRunningReplicas: jibriResult.running,
     },
     upcomingEvents: upcomingEvents.map((e) => ({
       title: getLocalized(e.title as LocalizedField, 'it'),
