@@ -82,16 +82,15 @@ export default function ModeratorControls({
     };
   }, []);
 
-  // Sync AV moderation state with Jitsi events
   useEffect(() => {
     if (!api) return;
-    const onAudioMod = (evt: { enabled: boolean }) => setAudioModerationActive(evt.enabled);
-    const onVideoMod = (evt: { enabled: boolean }) => setVideoModerationActive(evt.enabled);
-    api.addListener('audioModerationChanged', onAudioMod);
-    api.addListener('videoModerationChanged', onVideoMod);
+    const onModerationChanged = (evt: { enabled: boolean; mediaType: string }) => {
+      if (evt.mediaType === 'audio') setAudioModerationActive(evt.enabled);
+      if (evt.mediaType === 'video') setVideoModerationActive(evt.enabled);
+    };
+    api.addListener('moderationStatusChanged', onModerationChanged);
     return () => {
-      api.removeListener('audioModerationChanged', onAudioMod);
-      api.removeListener('videoModerationChanged', onVideoMod);
+      api.removeListener('moderationStatusChanged', onModerationChanged);
     };
   }, [api]);
 
@@ -142,24 +141,19 @@ export default function ModeratorControls({
     return `${m}:${s}`;
   };
 
-  // Mic toggle: mute everyone + enable audio moderation, or disable moderation
   const handleToggleAudioModeration = useCallback(() => {
     if (!api) return;
     if (audioModerationActive) {
-      api.executeCommand('disableAudioModeration');
+      api.executeCommand('toggleModeration', false, 'audio');
     } else {
       api.executeCommand('muteEveryone');
-      api.executeCommand('enableAudioModeration');
+      api.executeCommand('toggleModeration', true, 'audio');
     }
   }, [api, audioModerationActive]);
 
   const handleToggleVideoModeration = useCallback(() => {
     if (!api) return;
-    if (videoModerationActive) {
-      api.executeCommand('disableVideoModeration');
-    } else {
-      api.executeCommand('enableVideoModeration');
-    }
+    api.executeCommand('toggleModeration', !videoModerationActive, 'video');
   }, [api, videoModerationActive]);
 
   const handleToggleRecording = useCallback(() => {
