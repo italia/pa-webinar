@@ -45,8 +45,10 @@ function getJitsiJwtSubject(): string {
 
 import { createHash } from 'crypto';
 
+import { getPublicEnv } from '@/lib/env';
+
 function getAppUrl(): string {
-  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  return getPublicEnv('NEXT_PUBLIC_APP_URL');
 }
 
 function gravatarMd5(email: string): string {
