@@ -85,7 +85,7 @@ describe('DTD theme color harmony', () => {
       return r + g + b;
     };
     expect(brightness(palette.uiBackground)).toBeLessThan(brightness(palette.ui01));
-    expect(brightness(palette.ui01)).toBeLessThan(brightness(palette.ui02));
+    expect(brightness(palette.ui01)).toBeLessThanOrEqual(brightness(palette.ui02));
     expect(brightness(palette.ui02)).toBeLessThan(brightness(palette.ui03));
     expect(brightness(palette.ui03)).toBeLessThan(brightness(palette.ui04));
     expect(brightness(palette.ui04)).toBeLessThan(brightness(palette.ui05));

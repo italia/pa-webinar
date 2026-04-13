@@ -55,8 +55,8 @@ describe('DTD Jitsi theme', () => {
   });
 
   it('uses DTD dark navy for backgrounds', () => {
-    expect(dtdJitsiTheme.palette.uiBackground).toBe('#001428');
-    expect(dtdJitsiTheme.palette.ui01).toBe('#0F1B2D');
+    expect(dtdJitsiTheme.palette.uiBackground).toBe('#0F1B2D');
+    expect(dtdJitsiTheme.palette.ui01).toBe('#17324D');
   });
 
   it('uses Bootstrap Italia success and warning colors', () => {
