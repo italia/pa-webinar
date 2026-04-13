@@ -79,6 +79,12 @@ spec:
               value: "0.0.0.0"
             - name: NODE_ENV
               value: "production"
+            {{- if .Values.jitsi.enabled }}
+            - name: JVB_HEALTH_URL
+              value: {{ .Values.jitsi.jvbHealthUrl | default (printf "http://%s-jitsi-meet-jvb:8080" .Release.Name) | quote }}
+            - name: JIBRI_HEALTH_URL
+              value: {{ .Values.jitsi.jibriHealthUrl | default (printf "http://%s-jitsi-meet-jibri:2222" .Release.Name) | quote }}
+            {{- end }}
           {{- with .Values.app.probes.startup }}
           startupProbe:
             {{- toYaml . | nindent 12 }}
