@@ -16,6 +16,7 @@ import {
   participantJitsiId,
   guestJitsiId,
 } from '@/lib/auth/jwt';
+import { decryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -79,12 +80,19 @@ export const POST = withErrorHandling(async (request, context) => {
     }
 
     const name = registration.displayName;
+    let email: string | undefined;
+    try {
+      email = decryptPII(registration.email);
+    } catch {
+      // PII decryption failure — skip Gravatar, use SVG fallback
+    }
 
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: name,
       uniqueId: participantJitsiId(registration.id),
       isModerator: false,
+      email,
     });
 
     return Response.json({
