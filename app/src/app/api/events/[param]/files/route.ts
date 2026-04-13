@@ -33,8 +33,14 @@ export const GET = withErrorHandling(
   ) => {
     const { param } = await context.params;
 
+    const UUID_RE =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const where = UUID_RE.test(param)
+      ? { OR: [{ id: param }, { slug: param }] }
+      : { slug: param };
+
     const event = await prisma.event.findFirst({
-      where: { OR: [{ id: param }, { slug: param }] },
+      where,
       select: { id: true },
     });
 

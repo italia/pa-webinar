@@ -1,59 +1,65 @@
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
+import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
+import { AppError } from '@/lib/errors';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ param: string }> },
-) {
-  const { param: slugOrId } = await params;
+export const dynamic = 'force-dynamic';
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function eventWhereClause(param: string) {
+  return UUID_RE.test(param)
+    ? { OR: [{ id: param }, { slug: param }] }
+    : { slug: param };
+}
+
+export const GET = withErrorHandling(async (request, context) => {
+  const { param } = await context.params;
   const token = request.nextUrl.searchParams.get('token');
   if (!token) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
   }
 
   const event = await prisma.event.findFirst({
     where: {
-      OR: [{ slug: slugOrId }, { id: slugOrId }],
+      ...eventWhereClause(param),
       moderatorToken: token,
     },
     select: { peakParticipants: true, status: true },
   });
 
   if (!event) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    throw new AppError('Event not found', 404, 'NOT_FOUND');
   }
 
   return NextResponse.json({
     peakParticipants: event.peakParticipants,
     isLive: event.status === 'LIVE',
   });
-}
+});
 
 const peakSchema = z.object({
   count: z.number().int().min(0),
   moderatorToken: z.string().min(1),
 });
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ param: string }> },
-) {
-  const { param: slugOrId } = await params;
+export const POST = withErrorHandling(async (request, context) => {
+  const { param } = await context.params;
 
   const body = await request.json();
   const parsed = peakSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    throw new AppError('Invalid payload', 400, 'INVALID_BODY');
   }
 
   const { count, moderatorToken } = parsed.data;
 
   const event = await prisma.event.findFirst({
     where: {
-      OR: [{ slug: slugOrId }, { id: slugOrId }],
+      ...eventWhereClause(param),
       moderatorToken,
       status: 'LIVE',
     },
@@ -61,7 +67,7 @@ export async function POST(
   });
 
   if (!event) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    throw new AppError('Event not found or not live', 404, 'NOT_FOUND');
   }
 
   if (count > event.peakParticipants) {
@@ -72,4 +78,4 @@ export async function POST(
   }
 
   return NextResponse.json({ ok: true });
-}
+});

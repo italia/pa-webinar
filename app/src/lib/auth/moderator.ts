@@ -28,17 +28,23 @@ export function extractModeratorToken(request: Request): string | null {
   return url.searchParams.get('token');
 }
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * Verify a moderator token belongs to the given event and return the event.
+ * Accepts either a UUID id or a slug for the event lookup.
  * Returns null if the token is invalid or doesn't match.
  */
 export async function verifyModeratorToken(
-  eventId: string,
+  eventIdOrSlug: string,
   token: string,
 ) {
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
-  });
+  const where = UUID_RE.test(eventIdOrSlug)
+    ? { id: eventIdOrSlug }
+    : { slug: eventIdOrSlug };
+
+  const event = await prisma.event.findUnique({ where });
 
   if (!event || !constantTimeEqual(event.moderatorToken, token)) {
     return null;
