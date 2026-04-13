@@ -100,7 +100,7 @@ export default function LiveEventClient({
   locale,
   jitsiDomain,
   watermark,
-  jibriAvailable = true,
+  jibriAvailable: _jibriAvailable = true,
 }: LiveEventClientProps) {
   const t = useTranslations('live');
   const tc = useTranslations('common');

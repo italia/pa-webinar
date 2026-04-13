@@ -135,35 +135,30 @@ async function getJvbStatus(): Promise<{
     desired = Math.min(desired, maxReplicas);
     if (events.length > 0 && desired === 0) desired = 1;
 
-    // Check actual JVB pod status via Kubernetes API (if running in-cluster)
     let running = 0;
-    const stressLevel: number | null = null;
-    const participants: number | null = null;
+    let stressLevel: number | null = null;
+    let participants: number | null = null;
 
-    if (process.env.KUBERNETES_SERVICE_HOST) {
+    const jvbHealthUrl = process.env.JVB_HEALTH_URL;
+    if (jvbHealthUrl) {
       try {
-        const token = await readFileIfExists('/var/run/secrets/kubernetes.io/serviceaccount/token');
-        const namespace = await readFileIfExists('/var/run/secrets/kubernetes.io/serviceaccount/namespace');
-        if (token && namespace) {
-          const apiBase = `https://${process.env.KUBERNETES_SERVICE_HOST}:${process.env.KUBERNETES_SERVICE_PORT}`;
-          const res = await fetch(
-            `${apiBase}/apis/apps/v1/namespaces/${namespace}/deployments?labelSelector=app.kubernetes.io/component=jvb`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-              signal: AbortSignal.timeout(3000),
-              // @ts-expect-error -- Node fetch option
-              rejectUnauthorized: false,
-            },
-          );
-          if (res.ok) {
-            const data = await res.json() as { items: { status?: { readyReplicas?: number } }[] };
-            for (const item of data.items ?? []) {
-              running += item.status?.readyReplicas ?? 0;
-            }
+        const res = await fetch(`${jvbHealthUrl}/colibri/stats`, {
+          signal: AbortSignal.timeout(3000),
+        });
+        if (res.ok) {
+          const stats = await res.json() as {
+            healthy?: boolean;
+            stress_level?: number;
+            participants?: number;
+          };
+          if (stats.healthy !== false) {
+            running = 1;
+            stressLevel = stats.stress_level ?? null;
+            participants = stats.participants ?? null;
           }
         }
       } catch {
-        // Not critical — fall through to estimation
+        // JVB not reachable — running stays 0
       }
     }
 
@@ -223,34 +218,27 @@ async function getJibriStatus(): Promise<{
   }
 
   let running = 0;
+  let busyStatus: string | null = null;
 
-  if (process.env.KUBERNETES_SERVICE_HOST) {
+  const jibriHealthUrl = process.env.JIBRI_HEALTH_URL;
+  if (jibriHealthUrl) {
     try {
-      const token = await readFileIfExists('/var/run/secrets/kubernetes.io/serviceaccount/token');
-      const namespace = await readFileIfExists('/var/run/secrets/kubernetes.io/serviceaccount/namespace');
-      if (token && namespace) {
-        const apiBase = `https://${process.env.KUBERNETES_SERVICE_HOST}:${process.env.KUBERNETES_SERVICE_PORT}`;
-        const res = await fetch(
-          `${apiBase}/apis/apps/v1/namespaces/${namespace}/deployments?labelSelector=app.kubernetes.io/component=jibri`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            signal: AbortSignal.timeout(3000),
-            // @ts-expect-error -- Node fetch option
-            rejectUnauthorized: false,
-          },
-        );
-        if (res.ok) {
-          const data = await res.json() as { items: { status?: { readyReplicas?: number }; spec?: { replicas?: number } }[] };
-          for (const item of data.items ?? []) {
-            running += item.status?.readyReplicas ?? 0;
-          }
+      const res = await fetch(`${jibriHealthUrl}/jibri/api/v1.0/health`, {
+        signal: AbortSignal.timeout(3000),
+      });
+      if (res.ok) {
+        const data = await res.json() as {
+          status?: { busyStatus?: string; health?: { healthStatus?: string } };
+        };
+        if (data.status?.health?.healthStatus === 'HEALTHY') {
+          running = 1;
+          busyStatus = data.status.busyStatus ?? null;
         }
       }
     } catch {
-      // Not critical — fall through
+      // Jibri not reachable — running stays 0
     }
-  } else {
-    // Outside K8s (dev), assume Jibri is available if storage is configured
+  } else if (!process.env.KUBERNETES_SERVICE_HOST) {
     return {
       component: { name: 'jibri', status: 'operational' },
       running: 1,
@@ -265,20 +253,13 @@ async function getJibriStatus(): Promise<{
     component: {
       name: 'jibri',
       status: running > 0 ? 'operational' : 'degraded',
-      details: running > 0 ? `${running} instance(s) ready` : 'No instances running — scaling up',
+      details: running > 0
+        ? `${running} instance(s) ready${busyStatus ? ` (${busyStatus})` : ''}`
+        : 'No instances running — scaling up',
     },
     running,
     jibriStatus,
   };
-}
-
-async function readFileIfExists(path: string): Promise<string | null> {
-  try {
-    const { readFile } = await import('node:fs/promises');
-    return (await readFile(path, 'utf-8')).trim();
-  } catch {
-    return null;
-  }
 }
 
 export const GET = withErrorHandling(async () => {
