@@ -99,8 +99,25 @@ export const GET = withErrorHandling(async (request) => {
     MAX_REPLICAS,
   );
 
+  // Jibri: need 1 replica when any LIVE event has recordingEnabled
+  const liveWithRecording = await prisma.event.count({
+    where: {
+      OR: [
+        { status: 'LIVE', recordingEnabled: true },
+        {
+          status: 'PUBLISHED',
+          recordingEnabled: true,
+          startsAt: { lte: preScaleWindow },
+          endsAt: { gte: now },
+        },
+      ],
+    },
+  });
+  const jibriDesired = liveWithRecording > 0 ? 1 : 0;
+
   return Response.json({
     desired,
+    jibriDesired,
     predictiveDesired,
     reactiveAdjustment,
     stressLevel,

@@ -1,12 +1,16 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Alert,
   Badge,
   Button,
   Icon,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   Spinner,
 } from 'design-react-kit';
 
@@ -264,13 +268,29 @@ export default function LiveEventClient({
     setPhase('ended');
   }, []);
 
-  const handleJitsiReady = useCallback(() => {}, []);
+  const [showRecPrompt, setShowRecPrompt] = useState(false);
+  const recPromptShownRef = useRef(false);
+
+  const handleJitsiReady = useCallback(() => {
+    if (isModerator && event.recordingEnabled && !recPromptShownRef.current) {
+      recPromptShownRef.current = true;
+      setShowRecPrompt(true);
+    }
+  }, [isModerator, event.recordingEnabled]);
   const handleJitsiLeft = useCallback(() => {
     if (!showFeedback) setPhase('ended');
   }, [showFeedback]);
   const handleParticipantCountChanged = useCallback((count: number) => { setParticipantCount(count); }, []);
   const handleRecordingStatusChanged = useCallback((recording: boolean) => { setIsRecording(recording); }, []);
   const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => { setJitsiApi(api); }, []);
+
+  const handleRecPromptStart = useCallback(() => {
+    if (jitsiApi) {
+      try { jitsiApi.executeCommand('startRecording', { mode: 'file' }); } catch { /* handled by toast */ }
+    }
+    setShowRecPrompt(false);
+  }, [jitsiApi]);
+  const handleRecPromptLater = useCallback(() => { setShowRecPrompt(false); }, []);
 
   // Peak participant tracking (moderator only)
   useEffect(() => {
@@ -486,17 +506,16 @@ export default function LiveEventClient({
           </div>
         </div>
 
-        {!isInstantCall && (
-          <LiveSidebar
-            eventSlug={event.slug}
-            token={token}
-            isModerator={isActualModerator}
-            qaEnabled={event.qaEnabled}
-            chatEnabled={event.chatEnabled}
-            jitsiApi={jitsiApi}
-            displayName={credentials.displayName}
-          />
-        )}
+        <LiveSidebar
+          eventSlug={event.slug}
+          token={token}
+          isModerator={isActualModerator}
+          qaEnabled={event.qaEnabled}
+          chatEnabled={event.chatEnabled}
+          jitsiApi={jitsiApi}
+          displayName={credentials.displayName}
+          isInstantCall={isInstantCall}
+        />
       </div>
 
       {showFeedback && (
@@ -507,6 +526,24 @@ export default function LiveEventClient({
           onClose={handleFeedbackClose}
         />
       )}
+
+      {/* Recording pre-activation prompt for moderator */}
+      <Modal isOpen={showRecPrompt} toggle={handleRecPromptLater} centered>
+        <ModalHeader toggle={handleRecPromptLater}>
+          {t('recordingPromptTitle')}
+        </ModalHeader>
+        <ModalBody>
+          <p>{t('recordingPromptBody')}</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" outline onClick={handleRecPromptLater}>
+            {t('recordingPromptLater')}
+          </Button>
+          <Button color="primary" onClick={handleRecPromptStart}>
+            {t('recordingPromptStart')}
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 }
@@ -523,19 +560,22 @@ interface LiveSidebarProps {
   chatEnabled: boolean;
   jitsiApi: JitsiMeetExternalAPI | null;
   displayName: string;
+  isInstantCall?: boolean;
 }
 
-function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, jitsiApi, displayName }: LiveSidebarProps) {
+function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, jitsiApi, displayName, isInstantCall = false }: LiveSidebarProps) {
   const t = useTranslations('live');
   const showChat = chatEnabled !== false;
-  const [activeTab, setActiveTab] = useState<SidebarTab>(qaEnabled ? 'qa' : (showChat ? 'chat' : 'polls'));
+  const [activeTab, setActiveTab] = useState<SidebarTab>(
+    isInstantCall ? 'participants' : (qaEnabled ? 'qa' : (showChat ? 'chat' : 'polls'))
+  );
   const [participantCount, setParticipantCount] = useState(0);
 
   const tabs: { key: SidebarTab; label: string; icon: string; badge?: number; show: boolean }[] = [
-    { key: 'qa', label: t('sidebarTabQa'), icon: 'it-comment', show: qaEnabled },
-    { key: 'chat', label: t('sidebarTabChat'), icon: 'it-mail', show: showChat },
-    { key: 'polls', label: t('sidebarTabPolls'), icon: 'it-chart-line', show: true },
-    { key: 'materials', label: t('sidebarTabMaterials'), icon: 'it-clip', show: true },
+    { key: 'qa', label: t('sidebarTabQa'), icon: 'it-comment', show: !isInstantCall && qaEnabled },
+    { key: 'chat', label: t('sidebarTabChat'), icon: 'it-mail', show: !isInstantCall && showChat },
+    { key: 'polls', label: t('sidebarTabPolls'), icon: 'it-chart-line', show: !isInstantCall },
+    { key: 'materials', label: t('sidebarTabMaterials'), icon: 'it-clip', show: !isInstantCall },
     { key: 'participants', label: t('sidebarTabParticipants'), icon: 'it-user', badge: participantCount, show: true },
   ];
 

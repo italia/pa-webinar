@@ -4,6 +4,34 @@ import { z } from 'zod';
 
 import { prisma } from '@/lib/db';
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ param: string }> },
+) {
+  const { param: slugOrId } = await params;
+  const token = request.nextUrl.searchParams.get('token');
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const event = await prisma.event.findFirst({
+    where: {
+      OR: [{ slug: slugOrId }, { id: slugOrId }],
+      moderatorToken: token,
+    },
+    select: { peakParticipants: true, status: true },
+  });
+
+  if (!event) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
+  return NextResponse.json({
+    peakParticipants: event.peakParticipants,
+    isLive: event.status === 'LIVE',
+  });
+}
+
 const peakSchema = z.object({
   count: z.number().int().min(0),
   moderatorToken: z.string().min(1),

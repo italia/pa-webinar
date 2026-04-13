@@ -426,6 +426,30 @@ export default function EventManagementClient({
     } catch { /* retry */ }
   }, [event.slug, event.moderatorToken]);
 
+  // Poll live participant count when event is LIVE
+  const [liveCount, setLiveCount] = useState<number | null>(null);
+  useEffect(() => {
+    if (status !== 'LIVE') {
+      setLiveCount(null);
+      return;
+    }
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const res = await fetch(
+          `/api/events/${event.slug}/analytics/peak?token=${event.moderatorToken}`,
+        );
+        if (res.ok && !cancelled) {
+          const data = await res.json();
+          setLiveCount(data.peakParticipants ?? null);
+        }
+      } catch { /* ignore */ }
+    };
+    poll();
+    const interval = setInterval(poll, 15_000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [status, event.slug, event.moderatorToken]);
+
   const occupancyPct = Math.min(
     100,
     (event.registrationCount / event.maxParticipants) * 100,
@@ -498,9 +522,22 @@ export default function EventManagementClient({
       {status === 'LIVE' && (
         <Alert color="info" className="mb-4 mt-3">
           <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <span className="d-flex align-items-center">
-              <Icon icon="it-video" className="me-2" />
-              <strong>{t('eventIsLive')}</strong>
+            <span className="d-flex align-items-center gap-3">
+              <span className="d-flex align-items-center">
+                <Icon icon="it-video" className="me-2" />
+                <strong>{t('eventIsLive')}</strong>
+              </span>
+              {liveCount !== null && (
+                <Badge
+                  color=""
+                  pill
+                  className="px-2 py-1"
+                  style={{ backgroundColor: 'rgba(0,102,204,0.12)', color: '#0066CC', fontSize: '0.82rem' }}
+                >
+                  <Icon icon="it-user" size="xs" className="me-1" />
+                  {t('liveParticipants', { count: liveCount, max: event.maxParticipants })}
+                </Badge>
+              )}
             </span>
             <Link href={liveModeratorUrl}>
               <Button color="primary" size="sm" tag="span">

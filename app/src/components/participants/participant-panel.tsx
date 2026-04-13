@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Badge, Icon } from 'design-react-kit';
 
 import type { JitsiMeetExternalAPI, JitsiParticipant } from '@/types/jitsi';
+import { useJitsiStats, qualityLabel, qualityColor } from '@/hooks/use-jitsi-stats';
 
 interface ParticipantPanelProps {
   api: JitsiMeetExternalAPI | null;
@@ -20,6 +21,7 @@ export default function ParticipantPanel({
   const t = useTranslations('live.participants');
   const tr = useTranslations('live.role');
   const [participants, setParticipants] = useState<JitsiParticipant[]>([]);
+  const stats = useJitsiStats(api);
 
   const refresh = useCallback(() => {
     if (!api) return;
@@ -81,6 +83,34 @@ export default function ParticipantPanel({
           {participants.length}
         </Badge>
       </div>
+
+      {/* Connection quality indicator */}
+      {isModerator && stats.connectionQuality !== null && (
+        <div
+          className="d-flex align-items-center gap-2 rounded px-2 py-1 mb-2"
+          style={{ backgroundColor: '#f0f4f8', fontSize: '0.78rem' }}
+        >
+          <span
+            className="d-inline-block rounded-circle"
+            style={{
+              width: 8,
+              height: 8,
+              backgroundColor: qualityColor(stats.connectionQuality),
+            }}
+          />
+          <span className="fw-semibold">{t('connectionQuality')}</span>
+          <span style={{ color: qualityColor(stats.connectionQuality) }}>
+            {t(`quality.${qualityLabel(stats.connectionQuality)}`)}
+          </span>
+          {stats.downloadBitrate !== null && (
+            <span className="text-muted ms-auto">
+              ↓{Math.round(stats.downloadBitrate)}
+              {stats.uploadBitrate !== null && <>  ↑{Math.round(stats.uploadBitrate)}</>}
+              {' kbps'}
+            </span>
+          )}
+        </div>
+      )}
 
       {participants.length === 0 ? (
         <div className="text-center text-muted py-3" style={{ fontSize: '0.85rem' }}>
