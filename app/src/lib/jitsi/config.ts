@@ -7,62 +7,12 @@
  *
  * Chat and reactions are handled by custom components in the app sidebar
  * and as a floating overlay, so they are excluded from the Jitsi toolbar.
+ *
+ * NOTE: Theme (customTheme), watermark, and branding settings are applied
+ * server-side via Jitsi's _custom_config_js and _custom_interface_config_js
+ * in the Helm values — NOT here. The IFrame API ignores customTheme and
+ * dynamicBrandingUrl when passed via configOverwrite.
  */
-
-/**
- * DTD / Bootstrap Italia aligned palette for Jitsi's customTheme.
- * Token reference: https://github.com/jitsi/jitsi-meet/blob/master/resources/custom-theme/custom-theme.json
- */
-export const dtdJitsiTheme = {
-  palette: {
-    uiBackground: '#0F1B2D',
-    ui01: '#17324D',
-    ui02: '#17324D',
-    ui03: '#2E4A62',
-    ui04: '#3D5A80',
-    ui05: '#5A768A',
-    action01: '#0066CC',
-    action01Hover: '#004D99',
-    action01Active: '#003D7A',
-    action02: '#17324D',
-    action02Hover: '#2E4A62',
-    action02Active: '#0F1B2D',
-    action03: 'transparent',
-    action03Hover: '#2E4A62',
-    action03Active: '#17324D',
-    actionDanger: '#D9364F',
-    actionDangerHover: '#E04757',
-    actionDangerActive: '#A21B29',
-    disabled01: '#1A3A5C',
-    bottomSheet: '#0F1B2D',
-    text01: '#FFFFFF',
-    text02: '#C9D4DE',
-    text03: '#8899AA',
-    text04: '#AAB8C8',
-    textError: '#E04757',
-    icon01: '#FFFFFF',
-    icon02: '#C9D4DE',
-    icon03: '#8899AA',
-    iconError: '#E04757',
-    field01: '#0F1B2D',
-    link01: '#4D9AFF',
-    link01Hover: '#80B8FF',
-    link01Active: '#0066CC',
-    success01: '#008758',
-    success02: '#008758',
-    warning01: '#A66300',
-    warning02: '#A66300',
-    support01: '#FF9B42',
-    support02: '#F96E57',
-    support03: '#DF486F',
-    support04: '#B23683',
-    support05: '#73348C',
-    support06: '#6A50D3',
-    support07: '#0066CC',
-    support08: '#00A8B3',
-    support09: '#008758',
-  },
-};
 
 /**
  * Participant toolbar — NO 'hangup' to avoid "end meeting for all".
@@ -134,8 +84,6 @@ export const jitsiConfigOverwrite = {
   notifications: [] as string[],
   disableReactions: true,
 
-  customTheme: dtdJitsiTheme,
-
   breakoutRooms: {
     hideAddRoomButton: true,
     hideAutoAssignButton: true,
@@ -147,17 +95,6 @@ export const jitsiConfigOverwrite = {
   enableLobbyChat: false,
   disableThirdPartyRequests: true,
   brandingRoomAlias: null,
-
-  // Nuclear watermark removal
-  'watermark.enabled': false,
-
-  // Dynamic branding — served by /api/jitsi-branding.json (settings-driven).
-  // Works cross-origin in production via Ingress; may fail silently in local dev.
-  brandingDataUrl: null,
-  dynamicBrandingUrl:
-    typeof window !== 'undefined'
-      ? `${window.location.origin}/api/jitsi-branding.json`
-      : '/api/jitsi-branding.json',
 };
 
 /**
