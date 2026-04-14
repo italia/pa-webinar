@@ -13,6 +13,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -118,8 +119,8 @@ export const POST = withErrorHandling(async (request, context) => {
   const acceptLang = request.headers.get('Accept-Language') ?? '';
   const locale: 'it' | 'en' = acceptLang.toLowerCase().startsWith('en') ? 'en' : 'it';
 
-  const joinUrl = `${baseUrl}/${locale}/events/${slug}/live?token=${accessToken}`;
-  const eventPageUrl = `${baseUrl}/${locale}/events/${slug}`;
+  const joinUrl = localizedUrl(baseUrl, `/events/${slug}/live?token=${accessToken}`, locale);
+  const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
 
   sendConfirmationEmail({
     registrationId: registration.id,

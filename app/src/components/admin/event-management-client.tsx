@@ -235,7 +235,7 @@ export default function EventManagementClient({
   const durationHours = Math.floor(durationMs / 3_600_000);
   const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
 
-  const publicUrl = `${baseUrl}/${locale}/events/${event.slug}`;
+  const publicUrl = `${baseUrl}/${locale}/${locale === 'it' ? 'eventi' : 'events'}/${event.slug}`;
   const moderatorUrl = `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`;
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
 

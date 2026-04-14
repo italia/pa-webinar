@@ -10,6 +10,7 @@ import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
+import { localizedUrl } from '@/lib/utils/localized-url';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { getPublicEnv } from '@/lib/env';
 
@@ -89,7 +90,7 @@ export const POST = withErrorHandling(async (request) => {
     {
       ...event,
       links: {
-        publicPage: `${baseUrl}/${locale}/events/${event.slug}`,
+        publicPage: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
         moderatorLink: `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`,
       },
     },
