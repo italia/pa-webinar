@@ -49,13 +49,19 @@ RUN git clone --depth=1 https://github.com/jitsi/jitsi-meet-torture.git /torture
 WORKDIR /torture
 RUN mvn -q -B dependency:go-offline || true
 
-# Fix upstream Malleus bug #1: la costante INPUT_VIDEO_FILE punta a
-# "resources/FourPeople_1280x720_30.y4m" ma il file effettivamente presente
-# nel repo è "fakeVideoStream.y4m". Senza questo symlink, Chrome riceve
-# --use-file-for-fake-video-capture=<file inesistente>, getUserMedia fallisce
-# silenziosamente e i bot sender non pubblicano alcun track video.
-RUN ln -sf fakeVideoStream.y4m /torture/resources/FourPeople_1280x720_30.y4m \
- && ls -la /torture/resources/
+# Fix upstream Malleus bug #1: la costante INPUT_VIDEO_FILE hardcoded a
+# "resources/FourPeople_1280x720_30.y4m" ma il file presente nel repo è
+# "fakeVideoStream.y4m" a 320x180@5fps. Jitsi Meet richiede ~1280x720@30,
+# altrimenti getUserMedia fallisce con "Constraint could not be satisfied".
+# Usiamo ffmpeg per transcodificare il y4m bundled a 1280x720@30 e salvarlo
+# come FourPeople_1280x720_30.y4m (lo stesso path hardcoded da Malleus).
+RUN apt-get update -qq \
+ && apt-get install -y --no-install-recommends -qq ffmpeg \
+ && ffmpeg -nostdin -loglevel error -i /torture/resources/fakeVideoStream.y4m \
+      -vf "scale=1280:720:flags=lanczos" -r 30 -pix_fmt yuv420p \
+      /torture/resources/FourPeople_1280x720_30.y4m \
+ && head -c 80 /torture/resources/FourPeople_1280x720_30.y4m | head -1 \
+ && ls -la /torture/resources/FourPeople_1280x720_30.y4m
 
 # Fix upstream Malleus bug #2: rimuove l'append di
 # "config.prejoinConfig.enabled=false" dalla URL di join. Il codice di
