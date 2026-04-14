@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
   Badge,
@@ -11,16 +11,9 @@ import {
   Col,
 } from 'design-react-kit';
 
-interface ComponentStatus {
-  name: string;
-  status: 'operational' | 'degraded' | 'outage' | 'standby' | 'unknown';
-  responseTime?: number;
-  details?: string;
-}
-
 interface SystemStatus {
   overall: 'operational' | 'degraded' | 'outage';
-  components: ComponentStatus[];
+  components: unknown[];
   metrics: {
     activeEvents: number;
     totalRegistrationsToday: number;
@@ -40,15 +33,6 @@ interface SystemStatus {
   lastChecked: string;
 }
 
-const STATUS_COLOR: Record<string, string> = {
-  operational: '#008758',
-  degraded: '#A66300',
-  outage: '#CC334D',
-  standby: '#5A768A',
-  unknown: '#5A768A',
-};
-
-const MAX_HISTORY = 10;
 const POLL_INTERVAL_MS = 30_000;
 
 export default function StatusDashboard() {
@@ -56,7 +40,6 @@ export default function StatusDashboard() {
   const format = useFormatter();
   const [data, setData] = useState<SystemStatus | null>(null);
   const [error, setError] = useState(false);
-  const historyRef = useRef<Map<string, number[]>>(new Map());
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -65,18 +48,8 @@ export default function StatusDashboard() {
         signal: AbortSignal.timeout(10_000),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json: SystemStatus = await res.json();
-      setData(json);
+      setData(await res.json());
       setError(false);
-
-      for (const comp of json.components) {
-        if (comp.responseTime !== undefined) {
-          const history = historyRef.current.get(comp.name) ?? [];
-          history.push(comp.responseTime);
-          if (history.length > MAX_HISTORY) history.shift();
-          historyRef.current.set(comp.name, history);
-        }
-      }
     } catch {
       setError(true);
     }
@@ -106,31 +79,6 @@ export default function StatusDashboard() {
 
   if (!data) return null;
 
-  const componentKey = (name: string): string => {
-    const keyMap: Record<string, string> = {
-      app: 'components.app',
-      database: 'components.database',
-      jitsi: 'components.jitsi',
-      prosody: 'components.prosody',
-      jicofo: 'components.jicofo',
-      jvb: 'components.jvb',
-      jibri: 'components.jibri',
-      smtp: 'components.smtp',
-    };
-    return keyMap[name] ?? name;
-  };
-
-  const statusLabel = (status: string): string => {
-    const keyMap: Record<string, string> = {
-      operational: 'operational',
-      degraded: 'degradedLabel',
-      outage: 'outage',
-      standby: 'standby',
-      unknown: 'standby',
-    };
-    return t(keyMap[status] ?? 'standby');
-  };
-
   const jvbMaxReplicas = parseInt(process.env.NEXT_PUBLIC_JVB_MAX_REPLICAS ?? '6', 10) || 6;
   const jvbRunning = data.metrics.jvbRunningReplicas;
   const jvbDesired = data.metrics.jvbDesiredReplicas;
@@ -152,68 +100,6 @@ export default function StatusDashboard() {
 
   return (
     <>
-      {/* Component table */}
-      <Card className="mb-4 border-0 shadow-sm">
-        <CardBody className="p-0">
-          <div className="table-responsive">
-            <table className="table table-hover mb-0">
-              <thead>
-                <tr>
-                  <th className="border-0 ps-4" style={{ width: '40%' }}>{t('componentLabel')}</th>
-                  <th className="border-0" style={{ width: '30%' }}>{t('statusLabel')}</th>
-                  <th className="border-0 text-end pe-4" style={{ width: '30%' }}>{t('responseTime')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.components.map((comp) => (
-                  <tr key={comp.name}>
-                    <td className="ps-4 align-middle">
-                      <span className="d-flex align-items-center gap-2">
-                        <span
-                          className="rounded-circle d-inline-block flex-shrink-0"
-                          style={{
-                            width: 10,
-                            height: 10,
-                            backgroundColor: STATUS_COLOR[comp.status] ?? '#5A768A',
-                          }}
-                        />
-                        {t(componentKey(comp.name))}
-                      </span>
-                    </td>
-                    <td className="align-middle">
-                      <Badge
-                        style={{
-                          backgroundColor: STATUS_COLOR[comp.status] ?? '#5A768A',
-                          fontSize: '0.78rem',
-                        }}
-                      >
-                        {statusLabel(comp.status)}
-                      </Badge>
-                    </td>
-                    <td className="text-end pe-4 align-middle">
-                      {comp.responseTime !== undefined ? (
-                        <span className="d-flex align-items-center justify-content-end gap-2">
-                          <ResponseHistory
-                            history={historyRef.current.get(comp.name) ?? []}
-                          />
-                          <span className="text-muted" style={{ fontSize: '0.85rem' }}>
-                            {comp.responseTime}ms
-                          </span>
-                        </span>
-                      ) : (
-                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>
-                          {comp.details ?? '—'}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardBody>
-      </Card>
-
       <Row className="mb-4">
         {/* JVB Capacity */}
         <Col md={6} className="mb-4 mb-md-0">
@@ -382,38 +268,5 @@ export default function StatusDashboard() {
         )}
       </p>
     </>
-  );
-}
-
-function ResponseHistory({ history }: { history: number[] }) {
-  if (history.length < 2) return null;
-
-  const max = Math.max(...history, 1);
-  const dotSize = 4;
-  const gap = 3;
-  const height = 16;
-
-  return (
-    <svg
-      width={history.length * (dotSize + gap)}
-      height={height}
-      aria-hidden="true"
-    >
-      {history.map((ms, i) => {
-        const normalised = Math.min(ms / max, 1);
-        const y = height - dotSize / 2 - normalised * (height - dotSize);
-        const color = ms > 1000 ? '#CC334D' : ms > 500 ? '#A66300' : '#008758';
-        return (
-          <circle
-            key={i}
-            cx={i * (dotSize + gap) + dotSize / 2}
-            cy={y}
-            r={dotSize / 2}
-            fill={color}
-            opacity={0.7}
-          />
-        );
-      })}
-    </svg>
   );
 }
