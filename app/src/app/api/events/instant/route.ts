@@ -11,6 +11,7 @@ import { generateUniqueSlug } from '@/lib/utils/slug';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { getPublicEnv } from '@/lib/env';
 import { resolveLocale } from '@/lib/utils/locale';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,8 +80,8 @@ export const POST = withErrorHandling(async (request) => {
       jitsiRoomName: event.jitsiRoomName,
       moderatorToken: event.moderatorToken,
       links: {
-        liveRoom: `${baseUrl}/${locale}/events/${event.slug}/live?token=${event.moderatorToken}`,
-        shareLink: `${baseUrl}/${locale}/events/${event.slug}/live`,
+        liveRoom: localizedUrl(baseUrl, `/events/${event.slug}/live?token=${event.moderatorToken}`, locale),
+        shareLink: localizedUrl(baseUrl, `/events/${event.slug}/live`, locale),
       },
     },
     { status: 201 },

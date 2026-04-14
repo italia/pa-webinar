@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
+import { localizedUrl } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const revalidate = 30;
@@ -28,7 +29,7 @@ export async function generateMetadata({
   const description = getLocalized(event.description as LocalizedField, locale);
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
-  const pageUrl = `${baseUrl}/${locale}/events/${slug}`;
+  const pageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
 
   return {
     title,
@@ -88,7 +89,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         : 'https://schema.org/EventScheduled',
     location: {
       '@type': 'VirtualLocation',
-      url: `${baseUrl}/${locale}/eventi/${event.slug}`,
+      url: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
     },
     organizer: {
       '@type': 'Organization',

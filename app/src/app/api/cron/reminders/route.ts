@@ -19,6 +19,7 @@ import { generateEventICal } from '@/lib/ical/generate';
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,8 +85,8 @@ export const GET = withErrorHandling(async (request) => {
     for (const reg of registrations) {
       try {
         const recipientEmail = decryptPII(reg.email);
-        const joinUrl = `${baseUrl}/${locale}/events/${event.slug}/live?token=${reg.accessToken}`;
-        const eventPageUrl = `${baseUrl}/${locale}/events/${event.slug}`;
+        const joinUrl = localizedUrl(baseUrl, `/events/${event.slug}/live?token=${reg.accessToken}`, locale);
+        const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
 
         const calendarInput = {
           title,

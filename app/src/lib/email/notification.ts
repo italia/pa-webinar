@@ -9,6 +9,7 @@ import { generateEventICal } from '@/lib/ical/generate';
 import { sendEmail } from '@/lib/email/send';
 import { formatDate, formatTime } from '@/lib/utils/date-format';
 import { getPublicEnv } from '@/lib/env';
+import { localizedUrl } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 type Locale = 'it' | 'en';
@@ -94,7 +95,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
       const time = formatTime(event.startsAt, input.locale, event.timezone);
 
       const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
-      const eventPageUrl = `${baseUrl}/${input.locale}/events/${event.slug}`;
+      const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, input.locale);
 
       const icsContent = generateEventICal({
         title,

@@ -7,6 +7,7 @@ import { generateEventICal } from '@/lib/ical/generate';
 import { getSettings } from '@/lib/settings';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,7 @@ export const GET = withErrorHandling(async (request, context) => {
   const locale = resolveLocale(request);
   const { title, description } = localiseEvent(event, locale);
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
-  const eventUrl = `${baseUrl}/${locale}/events/${slug}`;
+  const eventUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
 
   const settings = await getSettings();
 
