@@ -335,6 +335,7 @@
       "calendar": "Koledar",
       "templates": "Predloge",
       "analytics": "Statistike",
+      "instantCalls": "Instant calls",
       "infrastructure": "Infrastruktura",
       "monitoring": "Monitoring",
       "settingsGeneral": "Splošno",
@@ -782,6 +783,28 @@
       },
       "note": "Infrastrukturne spremembe se izvajajo prek Helm vrednosti in CI/CD cevovoda.",
       "deployDocs": "Dokumentacija namestitve"
+    },
+    "instantCalls": {
+      "title": "Instant calls",
+      "subtitle": "List of instant videocalls",
+      "total": "total",
+      "noCalls": "No instant calls yet.",
+      "participants": "participants",
+      "sessions": "sessions"
+    },
+    "sessions": {
+      "title": "Call sessions",
+      "loading": "Loading sessions...",
+      "participants": "participants",
+      "participantList": "Participants",
+      "name": "Name",
+      "joined": "Joined",
+      "left": "Left",
+      "telemetry": "Telemetry",
+      "play": "Play",
+      "hidePlayer": "Hide player",
+      "download": "Download",
+      "deleteConfirm": "Delete this session and its recording?"
     },
     "monitoring": {
       "title": "Monitoring",

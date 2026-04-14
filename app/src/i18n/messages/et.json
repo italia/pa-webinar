@@ -335,6 +335,7 @@
       "calendar": "Kalender",
       "templates": "Mallid",
       "analytics": "Statistika",
+      "instantCalls": "Instant calls",
       "infrastructure": "Infrastruktuur",
       "monitoring": "Monitoring",
       "settingsGeneral": "Üldised",
@@ -782,6 +783,28 @@
       },
       "note": "Infrastruktuuri muudatused tehakse Helmi konfiguratsiooni ja CI/CD torustiku kaudu.",
       "deployDocs": "Juurutusdokumentatsioon"
+    },
+    "instantCalls": {
+      "title": "Instant calls",
+      "subtitle": "List of instant videocalls",
+      "total": "total",
+      "noCalls": "No instant calls yet.",
+      "participants": "participants",
+      "sessions": "sessions"
+    },
+    "sessions": {
+      "title": "Call sessions",
+      "loading": "Loading sessions...",
+      "participants": "participants",
+      "participantList": "Participants",
+      "name": "Name",
+      "joined": "Joined",
+      "left": "Left",
+      "telemetry": "Telemetry",
+      "play": "Play",
+      "hidePlayer": "Hide player",
+      "download": "Download",
+      "deleteConfirm": "Delete this session and its recording?"
     },
     "monitoring": {
       "title": "Monitoring",

@@ -335,6 +335,7 @@
       "calendar": "Naptár",
       "templates": "Sablonok",
       "analytics": "Statisztikák",
+      "instantCalls": "Instant calls",
       "infrastructure": "Infrastruktúra",
       "monitoring": "Monitoring",
       "settingsGeneral": "Általános",
@@ -782,6 +783,28 @@
       },
       "note": "Az infrastruktúra módosításai a Helm values és a CI/CD pipeline segítségével történnek.",
       "deployDocs": "Telepítési dokumentáció"
+    },
+    "instantCalls": {
+      "title": "Instant calls",
+      "subtitle": "List of instant videocalls",
+      "total": "total",
+      "noCalls": "No instant calls yet.",
+      "participants": "participants",
+      "sessions": "sessions"
+    },
+    "sessions": {
+      "title": "Call sessions",
+      "loading": "Loading sessions...",
+      "participants": "participants",
+      "participantList": "Participants",
+      "name": "Name",
+      "joined": "Joined",
+      "left": "Left",
+      "telemetry": "Telemetry",
+      "play": "Play",
+      "hidePlayer": "Hide player",
+      "download": "Download",
+      "deleteConfirm": "Delete this session and its recording?"
     },
     "monitoring": {
       "title": "Monitoring",

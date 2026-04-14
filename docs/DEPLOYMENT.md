@@ -4,11 +4,13 @@
 
 Il chart Helm supporta tre modalita, adatte a diverse dimensioni di PA e infrastrutture.
 
-| Modalita | Database | JVB | Recording | Node pool dedicato | Ideale per |
-|---|---|---|---|---|---|
-| **Semplice** | Nel cluster | 1 fisso | No | No | Demo, test, piccole PA |
-| **Standard** | Esterno | 1+ fisso | Si | No | PA medie, fino a 200 partecipanti |
-| **Completa** | Esterno | Scale-to-zero | Si | Si | Grandi PA, 300+ partecipanti |
+| Modalita | Database | JVB | Recording | Node pool dedicato | Capacita indicativa (*) | Ideale per |
+|---|---|---|---|---|---|---|
+| **Semplice** | Nel cluster | 1 fisso | No | No | ~50 partecipanti/evento, 1 evento alla volta | Demo, test, piccole PA |
+| **Standard** | Esterno | 1+ fisso | Si | No | ~200 partecipanti/evento, 1-2 eventi concorrenti | PA medie |
+| **Completa** | Esterno | Scale-to-zero | Si | Si | ~300 partecipanti/evento, N eventi concorrenti (N = numero JVB scalato dinamicamente) | Grandi PA, eventi multipli |
+
+(*) Valori indicativi su hardware tipico (4 vCPU, 8 GB per JVB). La capacità per singolo evento è limitata da un bridge JVB, perché Jicofo assegna una conferenza a un solo bridge. Per superare ~300 partecipanti in un singolo evento è necessario abilitare il bridge cascading (Octo) — non attivo di default. La capacità totale della piattaforma, invece, scala orizzontalmente aggiungendo pod JVB: più eventi concorrenti = più bridge. Per validare i numeri sulla propria infrastruttura vedere [`LOAD-TESTING.md`](LOAD-TESTING.md).
 
 ## Prerequisiti comuni
 

@@ -21,6 +21,7 @@ const MAIN_SECTIONS: NavItem[] = [
 const EVENTS_SUB_NAV: NavItem[] = [
   { href: '/admin/events', icon: 'it-list', labelKey: 'eventsList', exact: true },
   { href: '/admin/events/new', icon: 'it-plus', labelKey: 'newEvent' },
+  { href: '/admin/events/calls', icon: 'it-video', labelKey: 'instantCalls' },
   { href: '/admin/calendar', icon: 'it-calendar', labelKey: 'calendar' },
   { href: '/admin/events/template', icon: 'it-copy', labelKey: 'templates' },
   { href: '/admin/events/statistics', icon: 'it-chart-line', labelKey: 'analytics' },

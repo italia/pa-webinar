@@ -357,6 +357,7 @@
       "calendar": "Calendario",
       "templates": "Template",
       "analytics": "Statistiche",
+      "instantCalls": "Chiamate rapide",
       "infrastructure": "Infrastruttura",
       "monitoring": "Monitoraggio",
       "settingsGeneral": "Generali",
@@ -816,6 +817,28 @@
       },
       "note": "Le modifiche infrastrutturali si effettuano tramite Helm values e la pipeline CI/CD.",
       "deployDocs": "Documentazione deploy"
+    },
+    "instantCalls": {
+      "title": "Chiamate rapide",
+      "subtitle": "Elenco delle videochiamate istantanee",
+      "total": "totali",
+      "noCalls": "Nessuna chiamata rapida effettuata.",
+      "participants": "partecipanti",
+      "sessions": "sessioni"
+    },
+    "sessions": {
+      "title": "Sessioni di chiamata",
+      "loading": "Caricamento sessioni...",
+      "participants": "partecipanti",
+      "participantList": "Partecipanti",
+      "name": "Nome",
+      "joined": "Entrata",
+      "left": "Uscita",
+      "telemetry": "Telemetria",
+      "play": "Riproduci",
+      "hidePlayer": "Nascondi player",
+      "download": "Scarica",
+      "deleteConfirm": "Eliminare questa sessione e la registrazione associata?"
     },
     "monitoring": {
       "title": "Monitoraggio",

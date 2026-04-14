@@ -1,0 +1,80 @@
+# Run jitsi-meet-torture as a Kubernetes Job inside the same namespace
+# as the eventi-dtd / jitsi deployment. Bypasses the public ingress and
+# hits the Jitsi web Service via ClusterIP DNS.
+#
+# Usage:
+#   1. Edit NAMESPACE, RELEASE and PARTICIPANTS below.
+#   2. Mint a JWT with scripts/load-test/mint-jwt.mjs and create a secret:
+#        kubectl -n <ns> create secret generic torture-jwt \
+#          --from-literal=jwt="$(node mint-jwt.mjs --room load-test --name Bot)"
+#   3. kubectl -n <ns> apply -f k8s-job.yaml
+#   4. kubectl -n <ns> logs -f job/torture
+#   5. kubectl -n <ns> delete job torture
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: torture
+  labels:
+    app.kubernetes.io/name: jitsi-meet-torture
+    app.kubernetes.io/component: load-test
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jitsi-meet-torture
+        app.kubernetes.io/component: load-test
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: torture
+          # Official Maven image bundles JDK + Maven. jitsi-meet-torture
+          # is cloned at startup; for air-gapped clusters build a custom
+          # image with the repo and headless Chrome pre-installed.
+          image: maven:3.9-eclipse-temurin-17
+          env:
+            # Internal Service name of the Jitsi web pod. The exact name
+            # comes from the subchart release (commonly <release>-jitsi-meet-web).
+            - name: JITSI_URL
+              value: "http://RELEASE-NAME-jitsi-meet-web.NAMESPACE.svc.cluster.local"
+            - name: JITSI_ROOM
+              value: "load-test-room"
+            - name: PARTICIPANTS
+              value: "100"
+            - name: SENDERS
+              value: "4"
+            - name: DURATION
+              value: "600"
+            - name: JITSI_JWT
+              valueFrom:
+                secretKeyRef:
+                  name: torture-jwt
+                  key: jwt
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+              apt-get update && apt-get install -y --no-install-recommends \
+                git chromium-driver chromium
+              git clone --depth=1 https://github.com/jitsi/jitsi-meet-torture.git /torture
+              cd /torture
+              mvn test \
+                -Djitsi-meet.instance.url="$JITSI_URL" \
+                -Djitsi-meet.tests.toRun=MalleusJitsificus \
+                -Dmalleus.conferences=1 \
+                -Dmalleus.participants="$PARTICIPANTS" \
+                -Dmalleus.senders="$SENDERS" \
+                -Dmalleus.audioSenders="$SENDERS" \
+                -Dmalleus.duration="${DURATION}000" \
+                -Dmalleus.room="$JITSI_ROOM" \
+                -Dorg.jitsi.malleus.jwt="$JITSI_JWT" \
+                -Dchrome.binary.path=/usr/bin/chromium \
+                -Dchrome.disable.nosanbox=true
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+            limits:
+              cpu: "4"
+              memory: "8Gi"

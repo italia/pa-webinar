@@ -712,7 +712,29 @@ graph LR
 | JVB | Cluster Autoscaler | 0 | 4 | Pod pending su node pool `jvb` |
 | PostgreSQL | Verticale | - | - | Azure Flexible Server auto-tuning |
 
-Ogni JVB gestisce circa 75-100 partecipanti simultanei a seconda delle impostazioni di qualità video. Con 4 nodi JVB il sistema supporta fino a ~400 partecipanti in una singola conferenza o distribuiti su più eventi contemporanei.
+#### Capacità e limiti: due metriche distinte
+
+Nel valutare la capacità della piattaforma vanno tenute separate **due metriche** che hanno caratteristiche di scaling molto diverse:
+
+| Metrica | Valore indicativo | Scaling | Limitato da |
+|---|---|---|---|
+| **Partecipanti per singolo evento** | ~200-300 (fino a ~500 con JVB generosamente dimensionato) | Verticale (JVB sizing) oppure orizzontale con **bridge cascading / Octo** | Un singolo JVB, perché Jicofo di default assegna una conferenza a un unico bridge |
+| **Partecipanti totali concorrenti (cross-event)** | Limite dato dalle risorse del cluster | **Orizzontale**: ogni nuovo evento può essere assegnato a un JVB diverso (`min=0, max=4` nel chart di default, configurabile) | Segnalazione Prosody/Jicofo (migliaia di sessioni), banda di uplink del cluster |
+
+In pratica:
+- **Per alzare il tetto di un singolo evento** oltre ~300 partecipanti servono più CPU/RAM sul JVB, oppure l'abilitazione del **bridge cascading** (Octo), che distribuisce una stessa conferenza su più JVB. Cascading non è attivo di default in questo chart e richiede configurazione aggiuntiva su Jicofo e sui canali inter-bridge.
+- **Per supportare più eventi contemporanei** è sufficiente aggiungere pod JVB: Jicofo bilancia automaticamente le nuove conferenze sui bridge disponibili. Con il default `max=4` il cluster autoscaler porta fino a 4 pod JVB su un node pool dedicato, sufficienti per ~4 eventi da ~300 partecipanti ciascuno in parallelo.
+
+#### Bottleneck effettivi, in ordine di probabilità
+
+1. **Jibri = 1 registrazione concorrente per pod.** Per N registrazioni parallele servono N Jibri. Questo è il primo limite che si incontra in scenari multi-evento con registrazione.
+2. **Singolo meeting > ~500 partecipanti**: richiede cascading/Octo, non presente.
+3. **Prosody XMPP**: comincia a soffrire intorno a qualche migliaio di sessioni concorrenti.
+4. **Banda e egress cloud**: spesso il vero tetto economico prima di quello tecnico.
+
+#### Validazione con carico reale
+
+I numeri sopra sono riferimenti basati sulle metriche pubblicate dal progetto Jitsi e su hardware tipico (4 vCPU, 8 GB per JVB, 1 Gbps). Prima di pubblicare SLA o sizing per la propria infrastruttura è necessario un **test di carico reale** con [jitsi-meet-torture](https://github.com/jitsi/jitsi-meet-torture) sul proprio deployment. Il repository include script e istruzioni pronti all'uso in [`docs/LOAD-TESTING.md`](LOAD-TESTING.md) e [`scripts/load-test/`](../scripts/load-test/).
 
 ### Restrizione accesso Jitsi
 

@@ -468,6 +468,17 @@ jitsi-meet:
 # ── Recording Pipeline ────────────────────────────────────────
 # Configuration for Jibri recording storage and finalize script.
 # Only effective when jitsi-meet.jibri.enabled=true.
+#
+# The finalize script (infra/jitsi/jibri-finalize.sh) is mounted as a ConfigMap
+# in the Jibri pod. It:
+#   1. Extracts duration/size via ffprobe
+#   2. Re-muxes with faststart (no re-encode) for streaming
+#   3. Tags MP4 metadata (title, organizer, participants) from the portal
+#   4. Uploads to configured object storage
+#   5. Notifies the portal webhook with enriched payload (creates CallSession)
+#
+# Required env vars for finalize (set automatically from secrets/configmap):
+#   RECORDING_STORAGE_TYPE, RECORDING_WEBHOOK_URL, CRON_API_KEY, APP_INTERNAL_URL
 
 recording:
   storage:

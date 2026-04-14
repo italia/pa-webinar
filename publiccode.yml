@@ -92,16 +92,22 @@ description:
       Piattaforma open-source per eventi pubblici digitali della PA, basata su Jitsi Meet e design system .italia.
     longDescription: >
       eventi-dtd è una piattaforma web per organizzare e gestire eventi pubblici digitali — webinar,
-      presentazioni, meeting pubblici — con fino a 300 partecipanti simultanei. Utilizza Jitsi Meet
-      come motore video/audio self-hosted e il design system .italia per l'interfaccia utente.
+      presentazioni, meeting pubblici. Utilizza Jitsi Meet come motore video/audio self-hosted e il
+      design system .italia per l'interfaccia utente.
 
-      Funzionalità principali: video conferenza integrata, Q&A con upvote, registrazione partecipanti
-      GDPR-compliant, registrazione video, moderazione avanzata, inviti email con allegato iCal,
-      interfaccia multilingue (24 lingue UE), design system .italia, cloud-native (Kubernetes).
+      Architettura scalabile orizzontalmente su Kubernetes: capacità per singolo evento di ~300 partecipanti
+      con un bridge JVB standard (estendibile tramite bridge cascading); capacità totale della piattaforma
+      limitata solo dalle risorse del cluster, con auto-scaling dei bridge JVB e scale-to-zero quando
+      inattivo.
+
+      Funzionalità principali: video conferenza integrata, Q&A con upvote, sondaggi, word cloud e
+      reazioni live, registrazione partecipanti GDPR-compliant, registrazione video, moderazione
+      avanzata, inviti email con allegato iCal, interfaccia multilingue (24 lingue UE), design system
+      .italia, API REST documentate in OpenAPI 3, cloud-native (Kubernetes, Helm).
     documentation: "https://github.com/italia/eventi-dtd/tree/main/docs"
     apiDocumentation: "https://github.com/italia/eventi-dtd/blob/main/api/openapi.json"
     features:
-      - Video conferenza con Jitsi Meet (fino a 300 partecipanti)
+      - Video conferenza con Jitsi Meet, scalabile orizzontalmente su Kubernetes
       - Q&A con sistema di upvote
       - Sondaggi, word cloud e reazioni live
       - Registrazione partecipanti GDPR-compliant
@@ -122,12 +128,16 @@ description:
       Open-source platform for public digital events, built on Jitsi Meet and the Italian .italia design system.
     longDescription: >
       eventi-dtd is a web platform for organizing and managing public digital events — webinars,
-      presentations, public meetings — with up to 300 simultaneous participants. It uses Jitsi Meet
-      as a self-hosted video/audio engine and the .italia design system for the user interface.
+      presentations, public meetings. It uses Jitsi Meet as a self-hosted video/audio engine and the
+      .italia design system for the user interface.
+
+      Horizontally scalable architecture on Kubernetes: per-event capacity ~300 participants on a
+      standard JVB bridge (extendable via bridge cascading); total platform capacity bounded only by
+      cluster resources, with auto-scaling JVB bridges and scale-to-zero when idle.
     documentation: "https://github.com/italia/eventi-dtd/tree/main/docs"
     apiDocumentation: "https://github.com/italia/eventi-dtd/blob/main/api/openapi.json"
     features:
-      - Video conferencing with Jitsi Meet (up to 300 participants)
+      - Video conferencing with Jitsi Meet, horizontally scalable on Kubernetes
       - Q&A with upvote system
       - Live polls, word cloud and reactions
       - GDPR-compliant participant registration

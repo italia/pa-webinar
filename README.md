@@ -12,11 +12,13 @@ Piattaforma open-source per eventi pubblici digitali della Pubblica Amministrazi
 
 ## Cos'è / What is this
 
-**eventi-dtd** è una piattaforma web per organizzare eventi pubblici digitali — webinar, presentazioni, meeting pubblici — con fino a 300 partecipanti simultanei. Sviluppata dal [Dipartimento per la Trasformazione Digitale](https://innovazione.gov.it/).
+**eventi-dtd** è una piattaforma web per organizzare eventi pubblici digitali — webinar, presentazioni, meeting pubblici. Sviluppata dal [Dipartimento per la Trasformazione Digitale](https://innovazione.gov.it/).
+
+Architettura scalabile orizzontalmente su Kubernetes: capacità per singolo evento ~300 partecipanti con un bridge JVB standard (estendibile tramite bridge cascading); capacità totale della piattaforma limitata solo dalle risorse del cluster, con auto-scaling dei bridge JVB (scale-to-zero quando inattivo). Per numeri misurati sulla propria infrastruttura vedere [`docs/LOAD-TESTING.md`](docs/LOAD-TESTING.md).
 
 Funzionalità principali:
 
-- 🎥 Video conferenza con Jitsi Meet (fino a 300 partecipanti)
+- 🎥 Video conferenza con Jitsi Meet (scalabile orizzontalmente su Kubernetes)
 - ❓ Q&A con sistema di upvote
 - 📝 Registrazione partecipanti GDPR-compliant
 - 🔴 Registrazione video con consenso esplicito
