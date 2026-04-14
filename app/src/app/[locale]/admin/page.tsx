@@ -17,7 +17,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
   if (token) {
     const { redirect } = await import('next/navigation');
-    redirect(`/admin/eventi?token=${token}`);
+    redirect(`/admin/events?token=${token}`);
   }
 
   const [upcomingCount, liveCount] = await Promise.all([

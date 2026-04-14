@@ -79,8 +79,8 @@ export const POST = withErrorHandling(async (request) => {
       jitsiRoomName: event.jitsiRoomName,
       moderatorToken: event.moderatorToken,
       links: {
-        liveRoom: `${baseUrl}/${locale}/eventi/${event.slug}/live?token=${event.moderatorToken}`,
-        shareLink: `${baseUrl}/${locale}/eventi/${event.slug}/live`,
+        liveRoom: `${baseUrl}/${locale}/events/${event.slug}/live?token=${event.moderatorToken}`,
+        shareLink: `${baseUrl}/${locale}/events/${event.slug}/live`,
       },
     },
     { status: 201 },

@@ -258,7 +258,7 @@ export default function WaitingRoom({
                     </div>
                   )}
 
-                  <Link href={`/eventi/${event.slug}`}>
+                  <Link href={`/events/${event.slug}`}>
                     <Button color="primary" outline tag="span" size="sm">
                       <Icon icon="it-arrow-left" size="xs" className="me-1" />
                       {tc('back')}

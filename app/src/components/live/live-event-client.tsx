@@ -235,7 +235,7 @@ export default function LiveEventClient({
   }, []);
 
   const handleConsentDecline = useCallback(() => {
-    router.push(`/eventi/${event.slug}`);
+    router.push(`/events/${event.slug}`);
   }, [router, event.slug]);
 
   const handlePreJoin = useCallback((name: string) => {
@@ -413,11 +413,11 @@ export default function LiveEventClient({
         <h1 className="h3 mb-3">{t('eventEnded')}</h1>
         <p className="mb-4">{t('eventEndedMessage')}</p>
         {isModerator ? (
-          <Link href={`/admin/eventi/${event.id}?token=${token}`}>
+          <Link href={`/admin/events/${event.id}?token=${token}`}>
             <Button color="primary" outline tag="span">{tc('back')}</Button>
           </Link>
         ) : (
-          <Link href={`/eventi/${event.slug}`}>
+          <Link href={`/events/${event.slug}`}>
             <Button color="primary" outline tag="span">{t('backToEvent')}</Button>
           </Link>
         )}
@@ -435,7 +435,7 @@ export default function LiveEventClient({
         </Alert>
         <div className="text-center mt-3">
           <Button color="primary" onClick={() => setPhase('fetching_jwt')} className="me-3">{tc('retry')}</Button>
-          <Link href={`/eventi/${event.slug}`}>
+          <Link href={`/events/${event.slug}`}>
             <Button color="secondary" outline tag="span">{t('backToEvent')}</Button>
           </Link>
         </div>

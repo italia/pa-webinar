@@ -50,7 +50,7 @@ export default async function EventsListPage({
         </div>
         <div className="d-flex gap-2 align-items-center flex-shrink-0">
           <Link
-            href="/admin/eventi/nuovo"
+            href="/admin/events/new"
             className="btn btn-primary d-inline-flex align-items-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -77,7 +77,7 @@ export default async function EventsListPage({
           </div>
           <p className="lead text-muted mb-3">{t('noEvents')}</p>
           <Link
-            href="/admin/eventi/nuovo"
+            href="/admin/events/new"
             className="btn btn-primary btn-lg"
           >
             {t('createEvent')}

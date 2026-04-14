@@ -104,7 +104,7 @@ export default function EventListClient({
 
                 <CardTitle tag="h3" className="h5 fw-semibold mb-2">
                   <Link
-                    href={`/eventi/${event.slug}`}
+                    href={`/events/${event.slug}`}
                     className="text-decoration-none"
                     style={{ color: '#17324D' }}
                   >
@@ -182,7 +182,7 @@ export default function EventListClient({
                   )}
                   <CardReadMore
                     tag={Link}
-                    href={`/eventi/${event.slug}`}
+                    href={`/events/${event.slug}`}
                     text={t('card.readMore')}
                     iconName="it-arrow-right"
                   />

@@ -19,7 +19,7 @@ export default function AdminLandingClient({
   return (
     <div className="row g-4">
       <div className="col-12 col-md-6">
-        <Link href="/admin/eventi" className="text-decoration-none">
+        <Link href="/admin/events" className="text-decoration-none">
           <Card
             className="h-100 border shadow-sm"
             style={{ borderRadius: 12, transition: 'box-shadow 0.2s' }}
@@ -80,7 +80,7 @@ export default function AdminLandingClient({
       </div>
 
       <div className="col-12 col-md-6">
-        <Link href="/admin/impostazioni" className="text-decoration-none">
+        <Link href="/admin/settings" className="text-decoration-none">
           <Card
             className="h-100 border shadow-sm"
             style={{ borderRadius: 12, transition: 'box-shadow 0.2s' }}

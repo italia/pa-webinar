@@ -19,8 +19,8 @@ export default function PAFooter() {
     settings.organizationName || t('footer.departmentName');
   const parentOrg =
     settings.parentOrganization || t('footer.presidencyName');
-  const orgUrl = settings.organizationUrl || 'https://innovazione.gov.it';
-  const githubUrl = settings.githubUrl || 'https://github.com/italia/eventi-dtd';
+  const orgUrl = settings.organizationUrl || '#';
+  const githubUrl = settings.githubUrl || '';
 
   let footerLinks: FooterLink[] = [];
   try {
@@ -58,7 +58,7 @@ export default function PAFooter() {
               <div className="col-lg-4 col-md-4 pb-2">
                 <h4>
                   <Link
-                    href="/eventi"
+                    href="/events"
                     className="text-white text-decoration-none"
                   >
                     {t('nav.events')}
@@ -68,16 +68,18 @@ export default function PAFooter() {
               <div className="col-lg-4 col-md-4 pb-2">
                 <h4>{t('footer.contacts')}</h4>
                 <ul className="footer-list link-list clearfix">
-                  <li>
-                    <a
-                      href={orgUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="list-item"
-                    >
-                      {new URL(orgUrl).hostname.replace(/^www\./, '')}
-                    </a>
-                  </li>
+                  {orgUrl !== '#' && (
+                    <li>
+                      <a
+                        href={orgUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="list-item"
+                      >
+                        {new URL(orgUrl).hostname.replace(/^www\./, '')}
+                      </a>
+                    </li>
+                  )}
                   {settings.supportEmail && (
                     <li>
                       <a
@@ -138,12 +140,12 @@ export default function PAFooter() {
                   <Link href="/privacy">{t('footer.privacy')}</Link>
                 </li>
                 <li className="list-inline-item">
-                  <Link href="/accessibilita">
+                  <Link href="/accessibility">
                     {t('footer.accessibility')}
                   </Link>
                 </li>
                 <li className="list-inline-item">
-                  <Link href="/note-legali">{t('footer.legalNotes')}</Link>
+                  <Link href="/legal-notice">{t('footer.legalNotes')}</Link>
                 </li>
               </>
             )}

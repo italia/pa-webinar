@@ -26,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: {
         languages: {
           it: `${baseUrl}/it/eventi`,
-          en: `${baseUrl}/en/eventi`,
+          en: `${baseUrl}/en/events`,
         },
       },
     },
@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     alternates: {
       languages: {
         it: `${baseUrl}/it/eventi/${event.slug}`,
-        en: `${baseUrl}/en/eventi/${event.slug}`,
+        en: `${baseUrl}/en/events/${event.slug}`,
       },
     },
   }));

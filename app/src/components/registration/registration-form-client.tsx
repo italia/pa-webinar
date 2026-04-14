@@ -183,7 +183,7 @@ export default function RegistrationFormClient({
         <Icon icon="it-check-circle" size="xl" className="text-success mb-3" />
         <h2 className="h3 mb-3">{t('success')}</h2>
         <p className="mb-4">{t('successMessage')}</p>
-        <Link href={`/eventi/${eventSlug}`}>
+        <Link href={`/events/${eventSlug}`}>
           <Button color="primary" outline tag="span">
             {t('backToEvent')}
           </Button>
@@ -393,7 +393,7 @@ export default function RegistrationFormClient({
         {submitting ? t('submitting') : t('submit')}
       </Button>
 
-      <Link href={`/eventi/${eventSlug}`}>
+      <Link href={`/events/${eventSlug}`}>
         <Button color="secondary" outline tag="span">
           {tc('cancel')}
         </Button>

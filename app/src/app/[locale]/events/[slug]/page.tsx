@@ -5,6 +5,7 @@ import { getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
+import { getSettings } from '@/lib/settings';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const revalidate = 30;
@@ -18,6 +19,7 @@ export async function generateMetadata({
 }: EventDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
   const locale = await getLocale();
+  const settings = await (await import('@/lib/settings')).getSettings();
 
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) return { title: 'Not found' };
@@ -26,7 +28,7 @@ export async function generateMetadata({
   const description = getLocalized(event.description as LocalizedField, locale);
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
-  const pageUrl = `${baseUrl}/${locale}/eventi/${slug}`;
+  const pageUrl = `${baseUrl}/${locale}/events/${slug}`;
 
   return {
     title,
@@ -37,7 +39,7 @@ export async function generateMetadata({
       url: pageUrl,
       type: 'website',
       locale: locale === 'en' ? 'en_GB' : 'it_IT',
-      siteName: 'Eventi DTD',
+      siteName: settings.siteName || 'Eventi PA',
     },
     twitter: {
       card: 'summary',
@@ -48,7 +50,7 @@ export async function generateMetadata({
       canonical: pageUrl,
       languages: {
         it: `${baseUrl}/it/eventi/${slug}`,
-        en: `${baseUrl}/en/eventi/${slug}`,
+        en: `${baseUrl}/en/events/${slug}`,
       },
     },
   };
@@ -57,6 +59,7 @@ export async function generateMetadata({
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
   const { slug } = await params;
   const locale = await getLocale();
+  const settings = await getSettings();
 
   const event = await prisma.event.findUnique({
     where: { slug },
@@ -89,8 +92,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     },
     organizer: {
       '@type': 'Organization',
-      name: 'Dipartimento per la Trasformazione Digitale',
-      url: 'https://innovazione.gov.it',
+      name: settings.organizationName || 'Eventi PA',
+      url: settings.organizationUrl || '',
     },
     maximumAttendeeCapacity: event.maxParticipants,
     remainingAttendeeCapacity:

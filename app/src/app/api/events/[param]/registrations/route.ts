@@ -118,8 +118,8 @@ export const POST = withErrorHandling(async (request, context) => {
   const acceptLang = request.headers.get('Accept-Language') ?? '';
   const locale: 'it' | 'en' = acceptLang.toLowerCase().startsWith('en') ? 'en' : 'it';
 
-  const joinUrl = `${baseUrl}/${locale}/eventi/${slug}/live?token=${accessToken}`;
-  const eventPageUrl = `${baseUrl}/${locale}/eventi/${slug}`;
+  const joinUrl = `${baseUrl}/${locale}/events/${slug}/live?token=${accessToken}`;
+  const eventPageUrl = `${baseUrl}/${locale}/events/${slug}`;
 
   sendConfirmationEmail({
     registrationId: registration.id,

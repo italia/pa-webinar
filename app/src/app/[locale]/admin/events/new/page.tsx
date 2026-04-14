@@ -56,7 +56,7 @@ export default async function CreateEventPage({
     <div className="container py-5">
       <div className="mb-2">
         <Link
-          href="/admin/eventi"
+          href="/admin/events"
           className="text-decoration-none d-inline-flex align-items-center text-primary"
           style={{ fontSize: '0.9rem' }}
         >

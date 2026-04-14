@@ -3,6 +3,7 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email/send';
+import { getSettings } from '@/lib/settings';
 import {
   reminderSubject,
   reminderHtml,
@@ -56,6 +57,7 @@ export const GET = withErrorHandling(async (request) => {
   });
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
+  const settings = await getSettings();
   let remindersProcessed = 0;
   let emailsSent = 0;
   let emailsFailed = 0;
@@ -82,8 +84,8 @@ export const GET = withErrorHandling(async (request) => {
     for (const reg of registrations) {
       try {
         const recipientEmail = decryptPII(reg.email);
-        const joinUrl = `${baseUrl}/${locale}/eventi/${event.slug}/live?token=${reg.accessToken}`;
-        const eventPageUrl = `${baseUrl}/${locale}/eventi/${event.slug}`;
+        const joinUrl = `${baseUrl}/${locale}/events/${event.slug}/live?token=${reg.accessToken}`;
+        const eventPageUrl = `${baseUrl}/${locale}/events/${event.slug}`;
 
         const calendarInput = {
           title,
@@ -117,7 +119,7 @@ export const GET = withErrorHandling(async (request) => {
           endsAt: event.endsAt,
           timezone: event.timezone,
           url: eventPageUrl,
-          organizerName: event.moderatorName ?? 'Eventi DTD',
+          organizerName: event.moderatorName ?? (settings.siteName || 'Eventi PA'),
           organizerEmail:
             event.moderatorEmail ??
             process.env.SMTP_FROM ??

@@ -41,7 +41,7 @@ export async function GET() {
       logoImageUrl:
         settings.jitsiWatermarkUrl ||
         settings.logoUrl ||
-        '/images/dtd-watermark.svg',
+        '/images/default-watermark.svg',
       avatarBackgrounds: BI_AVATAR_BACKGROUNDS,
       inviteDomain: new URL(getPublicEnv('NEXT_PUBLIC_APP_URL')).hostname,
     },

@@ -22,6 +22,12 @@
     "email": "diego.perini@gmail.com",
     "url": "http://www.iport.it/"
   },
+  "@asteasolutions/zod-to-openapi@8.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/asteasolutions/zod-to-openapi",
+    "publisher": "Astea Solutions",
+    "email": "info@asteasolutions.com"
+  },
   "@azure/abort-controller@2.1.2": {
     "licenses": "MIT",
     "repository": "https://github.com/Azure/azure-sdk-for-js",
@@ -136,17 +142,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/csstools/postcss-plugins"
   },
-  "@emnapi/core@1.9.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/toyobayashi/emnapi",
-    "publisher": "toyobayashi"
-  },
   "@emnapi/runtime@1.9.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/toyobayashi/emnapi",
-    "publisher": "toyobayashi"
-  },
-  "@emnapi/wasi-threads@1.2.1": {
     "licenses": "MIT",
     "repository": "https://github.com/toyobayashi/emnapi",
     "publisher": "toyobayashi"
@@ -476,12 +472,6 @@
     "publisher": "강동윤",
     "email": "kdy1997.dev@gmail.com"
   },
-  "@swc/helpers@0.5.20": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/swc-project/swc",
-    "publisher": "강동윤",
-    "email": "kdy1997.dev@gmail.com"
-  },
   "@swc/types@0.1.26": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/swc-project/swc",
@@ -508,11 +498,6 @@
     "publisher": "Kent C. Dodds",
     "email": "me@kentcdodds.com",
     "url": "https://kentcdodds.com"
-  },
-  "@tybys/wasm-util@0.10.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/toyobayashi/wasm-util",
-    "publisher": "toyobayashi"
   },
   "@types/aria-query@5.0.4": {
     "licenses": "MIT",
@@ -2211,6 +2196,11 @@
     "licenses": "MIT",
     "repository": "https://github.com/unjs/ohash"
   },
+  "openapi3-ts@4.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/metadevpro/openapi3-ts",
+    "publisher": "Pedro J. Molina / Metadev"
+  },
   "optionator@0.9.4": {
     "licenses": "MIT",
     "repository": "https://github.com/gkz/optionator",
@@ -3131,6 +3121,12 @@
     "repository": "https://github.com/lddubeau/xmlchars",
     "publisher": "Louis-Dominique Dubeau",
     "email": "ldd@lddubeau.com"
+  },
+  "yaml@2.8.3": {
+    "licenses": "ISC",
+    "repository": "https://github.com/eemeli/yaml",
+    "publisher": "Eemeli Aro",
+    "email": "eemeli@gmail.com"
   },
   "yocto-queue@0.1.0": {
     "licenses": "MIT",

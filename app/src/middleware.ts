@@ -3,21 +3,18 @@ import createMiddleware from 'next-intl/middleware';
 import { jwtVerify } from 'jose';
 
 import { locales, defaultLocale, type Locale } from '@/i18n/config';
+import { routing } from '@/i18n/routing';
 import { getPublicEnv } from '@/lib/env';
 
 const LOCALE_SEGMENT = locales.join('|');
 
 const ADMIN_PATH_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin(?:/|$)`);
 const ADMIN_LOGIN_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/login(?:/|$)`);
-const ADMIN_EVENT_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/eventi/[^/]+(?:/[^/]+)?$`);
+const ADMIN_EVENT_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/(?:events|eventi)/[^/]+(?:/[^/]+)?$`);
 const LOCALE_PREFIX_RE = new RegExp(`^/(${LOCALE_SEGMENT})(?:/|$)`);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale,
-  localePrefix: 'always',
-});
+const intlMiddleware = createMiddleware(routing);
 
 function applySecurityHeaders(response: NextResponse): NextResponse {
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN');

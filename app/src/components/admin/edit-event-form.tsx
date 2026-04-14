@@ -190,7 +190,7 @@ export default function EditEventForm({
         }
 
         setTimeout(() => {
-          router.push(`/admin/eventi/${event.id}?token=${event.moderatorToken}`);
+          router.push(`/admin/events/${event.id}?token=${event.moderatorToken}`);
         }, 1500);
       } catch {
         setServerError(tc('error'));

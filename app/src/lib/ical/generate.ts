@@ -23,7 +23,7 @@ export function generateEventICal(input: EventICalInput): string {
   const calendar = ical({
     name: input.title,
     method: ICalCalendarMethod.REQUEST,
-    prodId: { company: 'DTD', product: 'eventi-dtd' },
+    prodId: { company: 'Eventi PA', product: 'eventi-pa' },
     timezone: input.timezone,
   });
 

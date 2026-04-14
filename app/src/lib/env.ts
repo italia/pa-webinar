@@ -15,7 +15,7 @@
 const ENV_DEFAULTS: Record<string, string> = {
   NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
   NEXT_PUBLIC_JITSI_DOMAIN: 'localhost:8443',
-  NEXT_PUBLIC_WATERMARK_URL: '/images/dtd-watermark.svg',
+  NEXT_PUBLIC_WATERMARK_URL: '/images/default-watermark.svg',
   NEXT_PUBLIC_DEFAULT_LOCALE: 'it',
 };
 

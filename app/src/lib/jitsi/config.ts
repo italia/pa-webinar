@@ -109,9 +109,9 @@ export const jitsiInterfaceConfigOverwrite = {
   BRAND_WATERMARK_LINK: '',
   JITSI_WATERMARK_LINK: '',
   SHOW_POWERED_BY: false,
-  PROVIDER_NAME: 'DTD',
-  APP_NAME: 'Eventi DTD',
-  NATIVE_APP_NAME: 'Eventi DTD',
+  PROVIDER_NAME: '',
+  APP_NAME: 'Eventi PA',
+  NATIVE_APP_NAME: 'Eventi PA',
 
   TOOLBAR_BUTTONS: baseToolbarButtons as string[],
   TOOLBAR_ALWAYS_VISIBLE: false,

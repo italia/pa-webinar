@@ -13,31 +13,70 @@ platforms:
 categories:
   - collaboration
   - video-conferencing
-  - event-management
+  - communications
 
 usedBy:
   - Dipartimento per la Trasformazione Digitale
+
+roadmap: "https://github.com/italia/eventi-dtd/blob/main/docs/ROADMAP.md"
+
+dependsOn:
+  open:
+    - name: Jitsi Meet
+      versionMin: "2.0"
+      optional: false
+    - name: PostgreSQL
+      versionMin: "15"
+      optional: false
+    - name: Node.js
+      versionMin: "20"
+      optional: false
 
 maintenance:
   type: internal
   contacts:
     - name: Dipartimento per la Trasformazione Digitale
       email: segreteria.trasformazionedigitale@governo.it
+      affiliation: Presidenza del Consiglio dei Ministri
 
 legal:
   license: EUPL-1.2
+  mainCopyrightOwner: Dipartimento per la Trasformazione Digitale
   repoOwner: Dipartimento per la Trasformazione Digitale
 
 localisation:
   localisationReady: true
   availableLanguages:
-    - it
+    - bg
+    - cs
+    - da
+    - de
+    - el
     - en
+    - es
+    - et
+    - fi
+    - fr
+    - ga
+    - hr
+    - hu
+    - it
+    - lt
+    - lv
+    - mt
+    - nl
+    - pl
+    - pt
+    - ro
+    - sk
+    - sl
+    - sv
 
 it:
+  countryExtensionVersion: "0.2"
   conforme:
     lineeGuidaDesign: true
-    modelloInteroperabilita: false
+    modelloInteroperabilita: true
     misureMinimeSicurezza: true
     gdpr: true
   piattaforme:
@@ -58,16 +97,20 @@ description:
 
       Funzionalità principali: video conferenza integrata, Q&A con upvote, registrazione partecipanti
       GDPR-compliant, registrazione video, moderazione avanzata, inviti email con allegato iCal,
-      interfaccia bilingue IT/EN, design system .italia, cloud-native (Kubernetes).
+      interfaccia multilingue (24 lingue UE), design system .italia, cloud-native (Kubernetes).
+    documentation: "https://github.com/italia/eventi-dtd/tree/main/docs"
+    apiDocumentation: "https://github.com/italia/eventi-dtd/blob/main/api/openapi.json"
     features:
       - Video conferenza con Jitsi Meet (fino a 300 partecipanti)
       - Q&A con sistema di upvote
+      - Sondaggi, word cloud e reazioni live
       - Registrazione partecipanti GDPR-compliant
       - Registrazione video con consenso esplicito
       - Moderazione avanzata (mute, mani alzate, chat on/off)
       - Email inviti con allegato iCal
-      - Interfaccia bilingue italiano/inglese
+      - Interfaccia multilingue (24 lingue UE)
       - Design system .italia (Bootstrap Italia)
+      - API REST documentate in OpenAPI 3
       - Cloud-native (Kubernetes, Helm, scale-to-zero)
     screenshots:
       - docs/screenshots/home.png
@@ -81,13 +124,17 @@ description:
       eventi-dtd is a web platform for organizing and managing public digital events — webinars,
       presentations, public meetings — with up to 300 simultaneous participants. It uses Jitsi Meet
       as a self-hosted video/audio engine and the .italia design system for the user interface.
+    documentation: "https://github.com/italia/eventi-dtd/tree/main/docs"
+    apiDocumentation: "https://github.com/italia/eventi-dtd/blob/main/api/openapi.json"
     features:
       - Video conferencing with Jitsi Meet (up to 300 participants)
       - Q&A with upvote system
+      - Live polls, word cloud and reactions
       - GDPR-compliant participant registration
       - Video recording with explicit consent
       - Advanced moderation (mute, hand raise, chat toggle)
       - Email invitations with iCal attachment
-      - Bilingual interface (Italian/English)
+      - Multilingual interface (24 EU languages)
       - .italia design system (Bootstrap Italia)
+      - REST APIs documented in OpenAPI 3
       - Cloud-native (Kubernetes, Helm, scale-to-zero)

@@ -40,7 +40,7 @@ interface JitsiRoomProps {
 
 type LoadState = 'loading' | 'ready' | 'error';
 
-const DEFAULT_WATERMARK_URL = '/images/dtd-watermark.svg';
+const DEFAULT_WATERMARK_URL = '/images/default-watermark.svg';
 
 const POSITION_STYLES: Record<string, React.CSSProperties> = {
   'bottom-left': { bottom: 16, left: 16 },
