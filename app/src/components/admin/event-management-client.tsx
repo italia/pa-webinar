@@ -26,6 +26,7 @@ import CopyButton from './copy-button';
 import DeleteEventModal from './delete-event-modal';
 import EventConfigDiagram from './event-config-diagram';
 import RecordingManagement from './recording-management';
+import CallSessionsPanel from './call-sessions-panel';
 import PostEventConfig from './post-event-config';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
@@ -705,6 +706,13 @@ export default function EventManagementClient({
               recordingDeleteAfterDays: event.recordingDeleteAfterDays,
               moderatorToken: event.moderatorToken,
             }}
+          />
+
+          {/* ── Call Sessions ── */}
+          <CallSessionsPanel
+            eventId={event.id}
+            eventSlug={event.slug}
+            moderatorToken={event.moderatorToken}
           />
 
           {/* ── Post-event Configuration ── */}

@@ -287,6 +287,7 @@
       "calendar": "Calendar",
       "templates": "Templates",
       "analytics": "Analytics",
+      "instantCalls": "Instant calls",
       "infrastructure": "Infrastructure",
       "monitoring": "Monitoring",
       "settingsGeneral": "General",
@@ -746,6 +747,28 @@
       },
       "note": "Infrastructure changes are made through Helm values and the CI/CD pipeline.",
       "deployDocs": "Deployment documentation"
+    },
+    "instantCalls": {
+      "title": "Instant calls",
+      "subtitle": "List of instant videocalls",
+      "total": "total",
+      "noCalls": "No instant calls yet.",
+      "participants": "participants",
+      "sessions": "sessions"
+    },
+    "sessions": {
+      "title": "Call sessions",
+      "loading": "Loading sessions...",
+      "participants": "participants",
+      "participantList": "Participants",
+      "name": "Name",
+      "joined": "Joined",
+      "left": "Left",
+      "telemetry": "Telemetry",
+      "play": "Play",
+      "hidePlayer": "Hide player",
+      "download": "Download",
+      "deleteConfirm": "Delete this session and its recording?"
     },
     "monitoring": {
       "title": "Monitoring",

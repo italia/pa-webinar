@@ -17,6 +17,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const body = (await parseJsonBody(request)) as Record<string, unknown>;
   const roomName = body.roomName as string | undefined;
   const recordingUrl = body.recordingUrl as string | undefined;
+  const filename = (body.filename as string) || null;
+  const duration = typeof body.duration === 'number' ? body.duration : null;
+  const fileSize = typeof body.fileSize === 'number' ? body.fileSize : null;
+  const participants = Array.isArray(body.participants) ? body.participants : [];
 
   if (!roomName || !recordingUrl) {
     throw new ValidationError('roomName and recordingUrl are required');
@@ -24,20 +28,49 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   const event = await prisma.event.findUnique({
     where: { jitsiRoomName: roomName },
+    select: {
+      id: true,
+      slug: true,
+      startsAt: true,
+      peakParticipants: true,
+    },
   });
 
   if (!event) {
     throw new NotFoundError('Event');
   }
 
-  await prisma.event.update({
-    where: { id: event.id },
-    data: { recordingUrl },
-  });
+  const [updatedEvent, callSession] = await prisma.$transaction([
+    prisma.event.update({
+      where: { id: event.id },
+      data: {
+        recordingUrl,
+        recordingDuration: duration,
+        recordingFileSize: fileSize ? BigInt(fileSize) : null,
+      },
+    }),
+    prisma.callSession.create({
+      data: {
+        eventId: event.id,
+        jitsiRoomName: roomName,
+        startedAt: event.startsAt,
+        endedAt: new Date(),
+        duration,
+        peakParticipants: event.peakParticipants,
+        participants: participants as object[],
+        recordingUrl,
+        recordingFileSize: fileSize ? BigInt(fileSize) : null,
+        recordingDuration: duration,
+        recordingFilename: filename,
+        telemetry: {},
+      },
+    }),
+  ]);
 
   return Response.json({
     success: true,
-    eventId: event.id,
+    eventId: updatedEvent.id,
     slug: event.slug,
+    sessionId: callSession.id,
   });
 });

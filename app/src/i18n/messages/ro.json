@@ -335,6 +335,7 @@
       "calendar": "Calendar",
       "templates": "Șabloane",
       "analytics": "Statistici",
+      "instantCalls": "Instant calls",
       "infrastructure": "Infrastructură",
       "monitoring": "Monitoring",
       "settingsGeneral": "Generale",
@@ -782,6 +783,28 @@
       },
       "note": "Modificările de infrastructură se efectuează prin Helm values și pipeline-ul CI/CD.",
       "deployDocs": "Documentație implementare"
+    },
+    "instantCalls": {
+      "title": "Instant calls",
+      "subtitle": "List of instant videocalls",
+      "total": "total",
+      "noCalls": "No instant calls yet.",
+      "participants": "participants",
+      "sessions": "sessions"
+    },
+    "sessions": {
+      "title": "Call sessions",
+      "loading": "Loading sessions...",
+      "participants": "participants",
+      "participantList": "Participants",
+      "name": "Name",
+      "joined": "Joined",
+      "left": "Left",
+      "telemetry": "Telemetry",
+      "play": "Play",
+      "hidePlayer": "Hide player",
+      "download": "Download",
+      "deleteConfirm": "Delete this session and its recording?"
     },
     "monitoring": {
       "title": "Monitoring",
