@@ -1,9 +1,9 @@
 dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
-  version: 18.5.14
+  version: 18.5.17
 - name: jitsi-meet
   repository: https://jitsi-contrib.github.io/jitsi-helm/
   version: 2.13.1
-digest: sha256:38ca1768bb9af8147b0cea6695d54a5713471c0119011977ab82abef513d2856
-generated: "2026-03-24T23:44:45.539281452+01:00"
+digest: sha256:2858e6c49b48bf589073fa3a794e9d75868e896cfa4a42c72d05847cb043a1f2
+generated: "2026-04-14T16:21:29.348835268+02:00"

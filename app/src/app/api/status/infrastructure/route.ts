@@ -472,7 +472,7 @@ export const GET = withErrorHandling(async () => {
     });
   } else {
     nodePools.push({
-      name: 'default',
+      name: 'main',
       nodeCount: 1,
       minNodes: 1,
       maxNodes: 1,

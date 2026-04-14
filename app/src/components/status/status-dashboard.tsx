@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
-  Alert,
   Badge,
   Card,
   CardBody,
@@ -47,12 +46,6 @@ const STATUS_COLOR: Record<string, string> = {
   outage: '#CC334D',
   standby: '#5A768A',
   unknown: '#5A768A',
-};
-
-const OVERALL_ALERT: Record<string, 'success' | 'warning' | 'danger'> = {
-  operational: 'success',
-  degraded: 'warning',
-  outage: 'danger',
 };
 
 const MAX_HISTORY = 10;
@@ -107,7 +100,7 @@ export default function StatusDashboard() {
 
   if (error && !data) {
     return (
-      <Alert color="danger">{t('fetchError')}</Alert>
+      <div className="alert alert-danger">{t('fetchError')}</div>
     );
   }
 
@@ -118,6 +111,8 @@ export default function StatusDashboard() {
       app: 'components.app',
       database: 'components.database',
       jitsi: 'components.jitsi',
+      prosody: 'components.prosody',
+      jicofo: 'components.jicofo',
       jvb: 'components.jvb',
       jibri: 'components.jibri',
       smtp: 'components.smtp',
@@ -139,15 +134,12 @@ export default function StatusDashboard() {
   const jvbMaxReplicas = parseInt(process.env.NEXT_PUBLIC_JVB_MAX_REPLICAS ?? '6', 10) || 6;
   const jvbRunning = data.metrics.jvbRunningReplicas;
   const jvbDesired = data.metrics.jvbDesiredReplicas;
-  const jvbCapacityPct = Math.min(100, (Math.max(jvbRunning, jvbDesired) / jvbMaxReplicas) * 100);
 
   const jvbCapacityColor = data.metrics.jvbStatus === 'scaling'
     ? '#A66300'
-    : jvbCapacityPct > 70
-      ? '#CC334D'
-      : jvbCapacityPct > 0
-        ? '#008758'
-        : '#5A768A';
+    : jvbRunning > 0
+      ? '#008758'
+      : '#5A768A';
 
   const stressLevel = data.metrics.jvbStressLevel;
   const stressColor = stressLevel === null
@@ -160,16 +152,7 @@ export default function StatusDashboard() {
 
   return (
     <>
-      {/* Overall status banner */}
-      <Alert color={OVERALL_ALERT[data.overall] ?? 'info'} className="mb-4">
-        <strong>
-          {data.overall === 'operational' && t('allOperational')}
-          {data.overall === 'degraded' && t('degraded')}
-          {data.overall === 'outage' && t('outage')}
-        </strong>
-      </Alert>
-
-      {/* Component list */}
+      {/* Component table */}
       <Card className="mb-4 border-0 shadow-sm">
         <CardBody className="p-0">
           <div className="table-responsive">
@@ -235,7 +218,7 @@ export default function StatusDashboard() {
         {/* JVB Capacity */}
         <Col md={6} className="mb-4 mb-md-0">
           <Card className="h-100 border-0 shadow-sm">
-            <CardBody>
+            <CardBody className="p-4">
               <h5 className="fw-semibold mb-3">
                 <Icon icon="it-video" size="sm" className="me-2" />
                 {t('jvbCapacity')}
@@ -250,7 +233,6 @@ export default function StatusDashboard() {
               ) : (
                 <>
                   <div className="progress mb-2" style={{ height: 12, borderRadius: 6 }}>
-                    {/* Running (solid) */}
                     <div
                       className="progress-bar"
                       role="progressbar"
@@ -263,7 +245,6 @@ export default function StatusDashboard() {
                       aria-valuemin={0}
                       aria-valuemax={jvbMaxReplicas}
                     />
-                    {/* Desired but not yet running (striped) */}
                     {jvbDesired > jvbRunning && (
                       <div
                         className="progress-bar progress-bar-striped progress-bar-animated"
@@ -292,9 +273,8 @@ export default function StatusDashboard() {
                     )}
                   </p>
 
-                  {/* Stress level indicator */}
                   {stressLevel !== null && (
-                    <div className="mt-2">
+                    <div className="mt-3">
                       <div className="d-flex justify-content-between align-items-center mb-1">
                         <span style={{ fontSize: '0.8rem', color: '#5A768A' }}>{t('jvbStress')}</span>
                         <span style={{ fontSize: '0.8rem', fontWeight: 600, color: stressColor }}>
@@ -328,7 +308,7 @@ export default function StatusDashboard() {
         {/* Upcoming events */}
         <Col md={6}>
           <Card className="h-100 border-0 shadow-sm">
-            <CardBody>
+            <CardBody className="p-4">
               <h5 className="fw-semibold mb-3">
                 <Icon icon="it-calendar" size="sm" className="me-2" />
                 {t('upcomingEvents')}
@@ -385,73 +365,6 @@ export default function StatusDashboard() {
                   })}
                 </ul>
               )}
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Metrics summary */}
-      <Row className="mb-4">
-        <Col xs={6} md={3} className="mb-3">
-          <Card className="border-0 shadow-sm text-center">
-            <CardBody className="py-3">
-              <div className="h3 mb-1 fw-bold" style={{ color: '#0066CC' }}>
-                {data.metrics.activeEvents}
-              </div>
-              <div className="text-muted" style={{ fontSize: '0.82rem' }}>
-                {t('activeEvents')}
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-        <Col xs={6} md={3} className="mb-3">
-          <Card className="border-0 shadow-sm text-center">
-            <CardBody className="py-3">
-              <div className="h3 mb-1 fw-bold" style={{ color: '#0066CC' }}>
-                {data.metrics.totalRegistrationsToday}
-              </div>
-              <div className="text-muted" style={{ fontSize: '0.82rem' }}>
-                {t('registrationsToday')}
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-        <Col xs={6} md={3} className="mb-3">
-          <Card className="border-0 shadow-sm text-center">
-            <CardBody className="py-3">
-              <div
-                className="h3 mb-1 fw-bold"
-                style={{
-                  color: data.metrics.jvbStatus === 'scaling'
-                    ? '#A66300'
-                    : data.metrics.jvbRunningReplicas > 0
-                      ? '#008758'
-                      : '#5A768A',
-                }}
-              >
-                {data.metrics.jvbRunningReplicas}
-              </div>
-              <div className="text-muted" style={{ fontSize: '0.82rem' }}>
-                {t('jvbNodes')}
-                {data.metrics.jvbStatus === 'scaling' && (
-                  <span style={{ color: '#A66300' }}> ({t('scaling')})</span>
-                )}
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-        <Col xs={6} md={3} className="mb-3">
-          <Card className="border-0 shadow-sm text-center">
-            <CardBody className="py-3">
-              <div
-                className="h3 mb-1 fw-bold"
-                style={{ color: STATUS_COLOR[data.overall] }}
-              >
-                {statusLabel(data.overall)}
-              </div>
-              <div className="text-muted" style={{ fontSize: '0.82rem' }}>
-                {t('overallStatus')}
-              </div>
             </CardBody>
           </Card>
         </Col>

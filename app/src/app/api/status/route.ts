@@ -275,7 +275,18 @@ export const GET = withErrorHandling(async () => {
   const jibriResult = await getJibriStatus();
   const jibri = jibriResult.component;
 
-  const components = [app, db, jitsi, jvb.component, jibri, smtp];
+  const prosody: ComponentStatus = {
+    name: 'prosody',
+    status: jitsi.status === 'operational' ? 'operational' : jitsi.status === 'outage' ? 'outage' : jitsi.status,
+    details: jitsi.status === 'operational' ? 'Healthy' : 'Depends on Jitsi Web',
+  };
+  const jicofo: ComponentStatus = {
+    name: 'jicofo',
+    status: jitsi.status === 'operational' ? 'operational' : jitsi.status === 'outage' ? 'outage' : jitsi.status,
+    details: jitsi.status === 'operational' ? 'Healthy' : 'Depends on Jitsi Web',
+  };
+
+  const components = [app, db, jitsi, prosody, jicofo, jvb.component, jibri, smtp];
 
   const hasOutage = components.some((c) => c.status === 'outage');
   const hasDegraded = components.some((c) => c.status === 'degraded');
