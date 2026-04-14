@@ -135,7 +135,7 @@ export default function EventDetailClient({
     <div className="container py-5">
       <div className="mb-4">
         <Link
-          href="/eventi"
+          href="/events"
           className="text-decoration-none d-inline-flex align-items-center text-primary"
         >
           <Icon icon="it-arrow-left" size="sm" className="me-1" />
@@ -419,7 +419,7 @@ export default function EventDetailClient({
                   )}
 
                   {canRegister && (
-                    <Link href={`/eventi/${event.slug}/registrazione`}>
+                    <Link href={`/events/${event.slug}/registration`}>
                       <Button
                         color="primary"
                         size="lg"

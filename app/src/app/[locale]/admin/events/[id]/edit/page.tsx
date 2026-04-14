@@ -31,7 +31,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     <div className="container py-4">
       <div className="mb-2">
         <Link
-          href={`/admin/eventi/${id}?token=${token}`}
+          href={`/admin/events/${id}?token=${token}`}
           className="text-decoration-none d-inline-flex align-items-center text-primary"
           style={{ fontSize: '0.9rem' }}
         >

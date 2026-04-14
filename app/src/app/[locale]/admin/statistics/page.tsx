@@ -3,5 +3,5 @@ import { getLocale } from 'next-intl/server';
 
 export default async function AnalyticsRedirect() {
   const locale = await getLocale();
-  redirect(`/${locale}/admin/eventi/statistiche`);
+  redirect(`/${locale}/admin/events/statistics`);
 }

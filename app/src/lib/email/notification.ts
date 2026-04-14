@@ -26,7 +26,7 @@ const COPY = {
     newDate: 'Nuova data',
     newTime: 'Nuovo orario',
     linkNote: 'Il tuo link personale per partecipare resta invariato.',
-    footer: 'Questa email è stata inviata automaticamente da Eventi DTD.',
+    footer: 'Questa email è stata inviata automaticamente da Eventi PA.',
   },
   en: {
     subject: (title: string) => `Update: ${title} — New date`,
@@ -35,7 +35,7 @@ const COPY = {
     newDate: 'New date',
     newTime: 'New time',
     linkNote: 'Your personal join link remains unchanged.',
-    footer: 'This email was sent automatically by Eventi DTD.',
+    footer: 'This email was sent automatically by Eventi PA.',
   },
 } as const;
 
@@ -94,7 +94,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
       const time = formatTime(event.startsAt, input.locale, event.timezone);
 
       const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
-      const eventPageUrl = `${baseUrl}/${input.locale}/eventi/${event.slug}`;
+      const eventPageUrl = `${baseUrl}/${input.locale}/events/${event.slug}`;
 
       const icsContent = generateEventICal({
         title,
@@ -103,7 +103,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
         endsAt: event.endsAt,
         timezone: event.timezone,
         url: eventPageUrl,
-        organizerName: event.moderatorName ?? 'Eventi DTD',
+        organizerName: event.moderatorName ?? 'Eventi PA',
         organizerEmail: event.moderatorEmail ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
       });
 

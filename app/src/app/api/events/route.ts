@@ -89,8 +89,8 @@ export const POST = withErrorHandling(async (request) => {
     {
       ...event,
       links: {
-        publicPage: `${baseUrl}/${locale}/eventi/${event.slug}`,
-        moderatorLink: `${baseUrl}/${locale}/admin/eventi/${event.id}?token=${event.moderatorToken}`,
+        publicPage: `${baseUrl}/${locale}/events/${event.slug}`,
+        moderatorLink: `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`,
       },
     },
     { status: 201 },

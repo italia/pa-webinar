@@ -76,9 +76,9 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
     const evt = info.event;
     const slug = evt.extendedProps.slug as string;
     if (mode === 'admin') {
-      router.push(`/admin/eventi/${evt.id}?token=`);
+      router.push(`/admin/events/${evt.id}?token=`);
     } else {
-      router.push(`/eventi/${slug}`);
+      router.push(`/events/${slug}`);
     }
   }, [mode, router]);
 

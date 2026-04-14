@@ -4,6 +4,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { generateEventICal } from '@/lib/ical/generate';
+import { getSettings } from '@/lib/settings';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
 
@@ -21,7 +22,9 @@ export const GET = withErrorHandling(async (request, context) => {
   const locale = resolveLocale(request);
   const { title, description } = localiseEvent(event, locale);
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
-  const eventUrl = `${baseUrl}/${locale}/eventi/${slug}`;
+  const eventUrl = `${baseUrl}/${locale}/events/${slug}`;
+
+  const settings = await getSettings();
 
   const ics = generateEventICal({
     title,
@@ -30,7 +33,7 @@ export const GET = withErrorHandling(async (request, context) => {
     endsAt: event.endsAt,
     timezone: event.timezone,
     url: eventUrl,
-    organizerName: event.moderatorName ?? 'Eventi DTD',
+    organizerName: event.moderatorName ?? (settings.siteName || 'Eventi PA'),
     organizerEmail:
       event.moderatorEmail ??
       process.env.SMTP_FROM ??

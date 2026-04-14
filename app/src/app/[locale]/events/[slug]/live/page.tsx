@@ -32,7 +32,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   const jibriAvailable = await isJibriAvailable();
 
   const watermark = {
-    url: settings.jitsiWatermarkUrl || settings.logoUrl || '/images/dtd-watermark.svg',
+    url: settings.jitsiWatermarkUrl || settings.logoUrl || '/images/default-watermark.svg',
     enabled: settings.jitsiWatermarkEnabled,
     opacity: settings.jitsiWatermarkOpacity,
     position: settings.jitsiWatermarkPosition,
@@ -77,7 +77,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     if (isInstant) {
       notFound();
     }
-    redirect(`/${locale}/eventi/${slug}/registrazione`);
+    redirect(`/${locale}/events/${slug}/registration`);
   }
 
   const isModerator = event.moderatorToken === token;

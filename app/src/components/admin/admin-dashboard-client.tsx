@@ -65,7 +65,7 @@ export default function AdminDashboardClient({
         );
         const borderColor =
           STATUS_BORDER[event.status] ?? STATUS_BORDER.DRAFT;
-        const manageUrl = `/admin/eventi/${event.id}?token=${token ?? event.moderatorToken}`;
+        const manageUrl = `/admin/events/${event.id}?token=${token ?? event.moderatorToken}`;
 
         return (
           <Col key={event.id} sm={12} md={6} lg={4} className="mb-4">

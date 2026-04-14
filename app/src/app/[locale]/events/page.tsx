@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { getSettings } from '@/lib/settings';
 import EventListClient from '@/components/events/event-list-client';
 
 export const revalidate = 60;
@@ -14,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function EventiPage() {
   const t = await getTranslations('events');
   const locale = await getLocale();
+  const settings = await getSettings();
 
   const events = await prisma.event.findMany({
     where: { status: { in: ['PUBLISHED', 'LIVE', 'ENDED'] } },
@@ -33,9 +35,7 @@ export default async function EventiPage() {
     <div className="container py-5">
       <h1 className="mb-2">{t('title')}</h1>
       <p className="lead text-muted mb-5" style={{ maxWidth: '680px' }}>
-        {locale === 'en'
-          ? 'Public events organised by the Department for Digital Transformation.'
-          : 'Eventi pubblici organizzati dal Dipartimento per la Trasformazione Digitale.'}
+        {settings.siteDescription}
       </p>
 
       <section className="mb-5">

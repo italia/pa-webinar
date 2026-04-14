@@ -85,8 +85,7 @@ const copy: Record<Locale, LocaleCopy> = {
     viewEvent: 'Visualizza la pagina dell\u2019evento',
     addToCalendar: 'Aggiungi al tuo calendario:',
     downloadIcs: 'Scarica .ics',
-    footer:
-      'Dipartimento per la Trasformazione Digitale \u2014 Presidenza del Consiglio dei Ministri',
+    footer: '',
     unsubscribe:
       'Ricevi questa email perch\u00e9 ti sei registrato all\u2019evento. Nessuna azione ulteriore \u00e8 necessaria per disiscriverti.',
   },
@@ -122,8 +121,7 @@ const copy: Record<Locale, LocaleCopy> = {
     viewEvent: 'View event page',
     addToCalendar: 'Add to your calendar:',
     downloadIcs: 'Download .ics',
-    footer:
-      'Department for Digital Transformation \u2014 Presidency of the Council of Ministers',
+    footer: '',
     unsubscribe:
       'You are receiving this email because you registered for the event. No further action is needed to unsubscribe.',
   },

@@ -234,9 +234,9 @@ export default function EventManagementClient({
   const durationHours = Math.floor(durationMs / 3_600_000);
   const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
 
-  const publicUrl = `${baseUrl}/${locale}/eventi/${event.slug}`;
-  const moderatorUrl = `${baseUrl}/${locale}/admin/eventi/${event.id}?token=${event.moderatorToken}`;
-  const liveModeratorUrl = `/eventi/${event.slug}/live?token=${event.moderatorToken}`;
+  const publicUrl = `${baseUrl}/${locale}/events/${event.slug}`;
+  const moderatorUrl = `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`;
+  const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
 
   const togglePublish = useCallback(async () => {
     const newStatus = status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
@@ -492,7 +492,7 @@ export default function EventManagementClient({
               {t('startEvent')}
             </Button>
           )}
-          <Link href={`/admin/eventi/${event.id}/modifica?token=${event.moderatorToken}`}>
+          <Link href={`/admin/events/${event.id}/edit?token=${event.moderatorToken}`}>
             <Button color="secondary" outline tag="span">
               <Icon icon="it-pencil" size="sm" className="me-1" />
               {t('editEvent')}

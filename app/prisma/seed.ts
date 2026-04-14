@@ -119,8 +119,8 @@ async function main() {
       calendarPublic: true,
       footerLinks: JSON.stringify([
         { title: 'Privacy', url: '/privacy', section: 'legal' },
-        { title: 'Accessibilità', url: '/accessibilita', section: 'legal' },
-        { title: 'Note legali', url: '/note-legali', section: 'legal' },
+        { title: 'Accessibilità', url: '/accessibility', section: 'legal' },
+        { title: 'Note legali', url: '/legal-notice', section: 'legal' },
       ]),
     },
   });

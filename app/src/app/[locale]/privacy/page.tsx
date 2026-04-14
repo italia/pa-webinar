@@ -34,7 +34,7 @@ export default async function PrivacyPage() {
         htmlContent={dbContent}
         noteTitle={t('note.title')}
         noteBody={t('note.body')}
-        noteLink={{ href: '/privacy/i-miei-dati', label: t('note.linkLabel') }}
+        noteLink={{ href: '/privacy/my-data', label: t('note.linkLabel') }}
       />
     );
   }
@@ -59,7 +59,7 @@ export default async function PrivacyPage() {
       ]}
       noteTitle={t('note.title')}
       noteBody={t('note.body')}
-      noteLink={{ href: '/privacy/i-miei-dati', label: t('note.linkLabel') }}
+      noteLink={{ href: '/privacy/my-data', label: t('note.linkLabel') }}
     />
   );
 }

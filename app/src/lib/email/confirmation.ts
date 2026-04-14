@@ -29,6 +29,8 @@ interface ConfirmationEmailInput {
   locale: Locale;
   joinUrl: string;
   eventPageUrl: string;
+  siteName?: string;
+  organizationFooter?: string;
 }
 
 /**
@@ -73,6 +75,8 @@ export function sendConfirmationEmail(input: ConfirmationEmailInput): void {
           yahoo: generateYahooCalendarUrl(calendarInput),
           icsDownload: generateIcsDownloadUrl(event.slug, baseUrl),
         },
+        siteName: input.siteName,
+        organizationFooter: input.organizationFooter,
       };
 
       const icsContent = generateEventICal({
@@ -82,7 +86,7 @@ export function sendConfirmationEmail(input: ConfirmationEmailInput): void {
         endsAt: event.endsAt,
         timezone: event.timezone,
         url: input.eventPageUrl,
-        organizerName: event.moderatorName ?? 'Eventi DTD',
+        organizerName: event.moderatorName ?? 'Eventi PA',
         organizerEmail: event.moderatorEmail ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
       });
 

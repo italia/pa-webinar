@@ -14,22 +14,22 @@ interface NavItem {
 }
 
 const MAIN_SECTIONS: NavItem[] = [
-  { href: '/admin/eventi', icon: 'it-calendar', labelKey: 'events' },
-  { href: '/admin/impostazioni', icon: 'it-settings', labelKey: 'settings' },
+  { href: '/admin/events', icon: 'it-calendar', labelKey: 'events' },
+  { href: '/admin/settings', icon: 'it-settings', labelKey: 'settings' },
 ];
 
 const EVENTS_SUB_NAV: NavItem[] = [
-  { href: '/admin/eventi', icon: 'it-list', labelKey: 'eventsList', exact: true },
-  { href: '/admin/eventi/nuovo', icon: 'it-plus', labelKey: 'newEvent' },
-  { href: '/admin/calendario', icon: 'it-calendar', labelKey: 'calendar' },
-  { href: '/admin/eventi/template', icon: 'it-copy', labelKey: 'templates' },
-  { href: '/admin/eventi/statistiche', icon: 'it-chart-line', labelKey: 'analytics' },
+  { href: '/admin/events', icon: 'it-list', labelKey: 'eventsList', exact: true },
+  { href: '/admin/events/new', icon: 'it-plus', labelKey: 'newEvent' },
+  { href: '/admin/calendar', icon: 'it-calendar', labelKey: 'calendar' },
+  { href: '/admin/events/template', icon: 'it-copy', labelKey: 'templates' },
+  { href: '/admin/events/statistics', icon: 'it-chart-line', labelKey: 'analytics' },
 ];
 
 const SETTINGS_SUB_NAV: NavItem[] = [
-  { href: '/admin/impostazioni', icon: 'it-settings', labelKey: 'settingsGeneral', exact: true },
-  { href: '/admin/impostazioni/lingue', icon: 'it-hearing', labelKey: 'settingsLanguages' },
-  { href: '/admin/infrastruttura', icon: 'it-server', labelKey: 'infrastructure' },
+  { href: '/admin/settings', icon: 'it-settings', labelKey: 'settingsGeneral', exact: true },
+  { href: '/admin/settings/languages', icon: 'it-hearing', labelKey: 'settingsLanguages' },
+  { href: '/admin/infrastructure', icon: 'it-server', labelKey: 'infrastructure' },
   { href: '/admin/monitoring', icon: 'it-chart-line', labelKey: 'monitoring' },
 ];
 
@@ -37,14 +37,14 @@ export default function AdminNav() {
   const t = useTranslations('admin.nav');
   const pathname = usePathname();
 
-  const stripped = pathname.replace(/^\/(it|en)/, '');
-  const inEvents = stripped.startsWith('/admin/eventi') || stripped.startsWith('/admin/calendario');
-  const inSettings = stripped.startsWith('/admin/impostazioni') || stripped.startsWith('/admin/infrastruttura') || stripped.startsWith('/admin/monitoring');
+  const stripped = pathname.replace(/^\/[a-z]{2}/, '');
+  const inEvents = stripped.startsWith('/admin/events') || stripped.startsWith('/admin/calendar');
+  const inSettings = stripped.startsWith('/admin/settings') || stripped.startsWith('/admin/infrastructure') || stripped.startsWith('/admin/monitoring');
 
   function isActive(item: NavItem): boolean {
     if (item.exact) return stripped === item.href;
-    if (item.href === '/admin/eventi' && !item.exact) return inEvents;
-    if (item.href === '/admin/impostazioni') return inSettings;
+    if (item.href === '/admin/events' && !item.exact) return inEvents;
+    if (item.href === '/admin/settings') return inSettings;
     return stripped.startsWith(item.href);
   }
 

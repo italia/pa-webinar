@@ -251,7 +251,7 @@ export default function ModeratorControls({
       api?.executeCommand('hangup');
       setEndModalOpen(false);
       endNavigationTimerRef.current = setTimeout(() => {
-        router.push(`/admin/eventi/${eventId}?token=${moderatorToken}`);
+        router.push(`/admin/events/${eventId}?token=${moderatorToken}`);
       }, 2000);
     } catch {
       setEnding(false);

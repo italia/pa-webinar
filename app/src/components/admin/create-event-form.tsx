@@ -151,7 +151,7 @@ export default function CreateEventForm({
     moderatorName: '',
     moderatorEmail: '',
     speakersInfo: { it: '', en: '' },
-    organizerName: 'Dipartimento per la Trasformazione Digitale',
+    organizerName: '',
     imageUrl: '',
     waitingRoomAudioUrl: '',
   });
@@ -255,7 +255,7 @@ export default function CreateEventForm({
 
         const created = await res.json();
         router.push(
-          `/admin/eventi/${created.id}?token=${created.moderatorToken}`,
+          `/admin/events/${created.id}?token=${created.moderatorToken}`,
         );
       } catch {
         setServerError(tc('error'));

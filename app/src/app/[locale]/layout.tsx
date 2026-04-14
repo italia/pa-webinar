@@ -13,6 +13,12 @@ import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { getSettings } from '@/lib/settings';
 import { SettingsProvider } from '@/lib/settings-context';
 
+function hexToRgb(hex: string): string {
+  const h = hex.replace('#', '');
+  const n = parseInt(h, 16);
+  return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+}
+
 interface LocaleLayoutProps {
   children: ReactNode;
   params: Promise<{ locale: string }>;
@@ -49,6 +55,9 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body className="d-flex flex-column min-vh-100">
+        {settings.primaryColor && settings.primaryColor !== '#0066CC' && (
+          <style dangerouslySetInnerHTML={{ __html: `:root { --bs-primary: ${settings.primaryColor}; --bs-primary-rgb: ${hexToRgb(settings.primaryColor)}; }` }} />
+        )}
         <NextIntlClientProvider messages={messages}>
           <SettingsProvider settings={settings}>
             <Skiplink />

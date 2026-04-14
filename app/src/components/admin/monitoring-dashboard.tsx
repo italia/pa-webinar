@@ -11,6 +11,7 @@ import {
 } from 'design-react-kit';
 
 const REFRESH_MS = 30_000;
+const APP_LABEL = 'eventi-dtd';
 
 interface PromResult {
   available: boolean;
@@ -144,7 +145,7 @@ export default function MonitoringDashboard() {
   const [memorySeries, setMemorySeries] = useState<Array<[number, string]>>([]);
 
   const fetchMetrics = useCallback(async () => {
-    const checkRes = await promQuery('up{app="eventi-dtd"}');
+    const checkRes = await promQuery(`up{app="${APP_LABEL}"}`);
     if (!checkRes.available) {
       setAvailable(false);
       return;
@@ -167,20 +168,20 @@ export default function MonitoringDashboard() {
       cpuRangeRes,
       memRangeRes,
     ] = await Promise.all([
-      promQuery('eventi_active_events{app="eventi-dtd"}'),
-      promQuery('eventi_jvb_participants{app="eventi-dtd"}'),
-      promQuery('eventi_registrations_total{app="eventi-dtd"}'),
-      promQuery('avg_over_time(up{app="eventi-dtd"}[24h]) * 100'),
-      promQuery('histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{app="eventi-dtd"}[5m]))'),
-      promQuery('histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{app="eventi-dtd"}[5m]))'),
-      promQuery('rate(http_requests_total{app="eventi-dtd",status_code=~"5.."}[5m]) / rate(http_requests_total{app="eventi-dtd"}[5m]) * 100'),
-      promQuery('eventi_jvb_stress_level{app="eventi-dtd"}'),
-      promRangeQuery('eventi_jvb_participants{app="eventi-dtd"}', 24, '300'),
-      promRangeQuery('histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{app="eventi-dtd"}[5m]))', 6, '60'),
-      promRangeQuery('rate(http_requests_total{app="eventi-dtd"}[5m])', 6, '60'),
-      promRangeQuery('eventi_jvb_stress_level{app="eventi-dtd"}', 24, '300'),
-      promRangeQuery('rate(process_cpu_seconds_total{app="eventi-dtd"}[5m])', 6, '60'),
-      promRangeQuery('process_resident_memory_bytes{app="eventi-dtd"}', 6, '300'),
+      promQuery(`eventi_active_events{app="${APP_LABEL}"}`),
+      promQuery(`eventi_jvb_participants{app="${APP_LABEL}"}`),
+      promQuery(`eventi_registrations_total{app="${APP_LABEL}"}`),
+      promQuery(`avg_over_time(up{app="${APP_LABEL}"}[24h]) * 100`),
+      promQuery(`histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{app="${APP_LABEL}"}[5m]))`),
+      promQuery(`histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{app="${APP_LABEL}"}[5m]))`),
+      promQuery(`rate(http_requests_total{app="${APP_LABEL}",status_code=~"5.."}[5m]) / rate(http_requests_total{app="${APP_LABEL}"}[5m]) * 100`),
+      promQuery(`eventi_jvb_stress_level{app="${APP_LABEL}"}`),
+      promRangeQuery(`eventi_jvb_participants{app="${APP_LABEL}"}`, 24, '300'),
+      promRangeQuery(`histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{app="${APP_LABEL}"}[5m]))`, 6, '60'),
+      promRangeQuery(`rate(http_requests_total{app="${APP_LABEL}"}[5m])`, 6, '60'),
+      promRangeQuery(`eventi_jvb_stress_level{app="${APP_LABEL}"}`, 24, '300'),
+      promRangeQuery(`rate(process_cpu_seconds_total{app="${APP_LABEL}"}[5m])`, 6, '60'),
+      promRangeQuery(`process_resident_memory_bytes{app="${APP_LABEL}"}`, 6, '300'),
     ]);
 
     const fv = (res: PromResult, decimals = 0): string => {

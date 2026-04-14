@@ -7,6 +7,7 @@ import {
   queryPrometheus,
   queryPrometheusRange,
 } from '@/lib/prometheus';
+import { METRICS_APP_LABEL } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
 
@@ -235,7 +236,7 @@ async function fetchPrometheusData(namespace: string): Promise<PrometheusData> {
   try {
     const [uptimeRes, latencyRes, participantsRes] = await Promise.all([
       queryPrometheus(`avg_over_time(up{namespace="${namespace}",job=~".*eventi.*"}[24h]) * 100`).catch(() => null),
-      queryPrometheus(`histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{namespace="${namespace}",app="eventi-dtd"}[5m]))`).catch(() => null),
+      queryPrometheus(`histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{namespace="${namespace}",app="${METRICS_APP_LABEL}"}[5m]))`).catch(() => null),
       queryPrometheusRange(
         `eventi_jvb_participants{namespace="${namespace}"}`,
         String(Math.floor(Date.now() / 1000) - 4 * 3600),

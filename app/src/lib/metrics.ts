@@ -2,7 +2,10 @@ import client from 'prom-client';
 
 const register = new client.Registry();
 
-register.setDefaultLabels({ app: 'eventi-dtd' });
+const METRICS_APP_LABEL = process.env['METRICS_APP_LABEL'] || 'eventi-dtd';
+register.setDefaultLabels({ app: METRICS_APP_LABEL });
+
+export { METRICS_APP_LABEL };
 
 client.collectDefaultMetrics({ register });
 

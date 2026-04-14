@@ -69,7 +69,7 @@ async function EventsSection({
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="h3 fw-semibold mb-0">{t('upcoming.title')}</h2>
           <Link
-            href="/eventi"
+            href="/events"
             className="text-primary text-decoration-none fw-semibold"
             style={{ fontSize: '0.95rem' }}
           >
@@ -117,7 +117,7 @@ async function EventsListHome({
           <EventListClient events={upcoming} />
         )}
         <div className="text-center mt-4">
-          <Link href="/eventi" className="btn btn-primary btn-lg">
+          <Link href="/events" className="btn btn-primary btn-lg">
             {t('upcoming.viewAll')}
           </Link>
         </div>
@@ -201,7 +201,7 @@ async function LandingHome({
               </p>
               <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
                 <Link
-                  href="/eventi"
+                  href="/events"
                   className="btn btn-light btn-lg px-4 fw-semibold text-primary"
                 >
                   {t('hero.browseEvents')}

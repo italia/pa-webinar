@@ -42,7 +42,7 @@ export default function CreateInstantCall() {
 
       const data = await res.json();
       setShareLink(data.links.shareLink);
-      router.push(`/eventi/${data.slug}/live?token=${data.moderatorToken}`);
+      router.push(`/events/${data.slug}/live?token=${data.moderatorToken}`);
     } catch {
       setError(tc('error'));
       setLoading(false);

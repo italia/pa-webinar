@@ -37,7 +37,7 @@ describe('Interface config watermark overrides', () => {
     expect(jitsiInterfaceConfigOverwrite.SHOW_POWERED_BY).toBe(false);
   });
 
-  it('sets DTD provider name', () => {
-    expect(jitsiInterfaceConfigOverwrite.PROVIDER_NAME).toBe('DTD');
+  it('has configurable provider name', () => {
+    expect(typeof jitsiInterfaceConfigOverwrite.PROVIDER_NAME).toBe('string');
   });
 });

@@ -309,7 +309,7 @@ function EventsTable({ events }: { events: EventAnalytics[] }) {
             <tr key={event.eventId}>
               <td>
                 <Link
-                  href={`/admin/eventi/${event.eventId}`}
+                  href={`/admin/events/${event.eventId}`}
                   className="text-decoration-none fw-semibold"
                   style={{ color: '#0066CC' }}
                 >

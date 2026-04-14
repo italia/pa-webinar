@@ -123,7 +123,7 @@ export default function CreateEventWithTemplate({
         <TemplatePicker
           templates={templates}
           onSelect={(tpl) => {
-            router.push(`/admin/eventi/nuovo?template=${tpl.id}`);
+            router.push(`/admin/events/new?template=${tpl.id}`);
           }}
           onSkip={() => setSkipped(true)}
         />

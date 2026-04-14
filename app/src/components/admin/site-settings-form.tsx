@@ -205,7 +205,7 @@ function BrandingTab({ settings, updateField }: TabProps) {
   const tw = useTranslations('admin.settings.watermark');
 
   const wmUrl =
-    settings.jitsiWatermarkUrl || settings.logoUrl || '/images/dtd-watermark.svg';
+    settings.jitsiWatermarkUrl || settings.logoUrl || '/images/default-watermark.svg';
 
   return (
     <div>
