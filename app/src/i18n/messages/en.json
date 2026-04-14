@@ -1030,25 +1030,124 @@
     "bandwidthOut": "Bandwidth out",
     "recordings": "Recordings",
     "registrationsToday": "Registrations today",
-    "replicas": "Replicas",
-    "cpu": "CPU request",
-    "memory": "Memory request",
-    "ports": "Ports",
-    "stressLevel": "Stress level",
-    "busyStatus": "Busy status",
+    "replicas": "Active instances",
+    "cpu": "Allocated CPU",
+    "memory": "Allocated memory",
+    "ports": "Network ports",
+    "stressLevel": "Workload",
+    "busyStatus": "Activity status",
     "type": "Type",
+    "technicalName": "Technical name",
+    "latency": "Latency",
+    "uptime": "Uptime",
+    "heapUsed": "Heap memory",
+    "eventLoopLag": "Responsiveness",
+    "cpuUsage": "CPU usage",
+    "memoryUsed": "Memory used",
+    "rtt": "Network round-trip time",
+    "jitter": "Latency variation",
+    "packetLoss": "Packet loss",
+    "largestConference": "Largest conference",
+    "sendingAudio": "Sending audio",
+    "sendingVideo": "Sending video",
+    "iceSuccess": "Successful connections",
+    "totalConferences": "Total conferences",
     "lastUpdated": "Last updated",
-    "zonePublic": "Public",
-    "zoneCluster": "Kubernetes Cluster",
-    "zoneMedia": "Media",
+    "zonePublic": "Public access",
+    "zoneCluster": "Platform services",
+    "zoneMedia": "Video room",
     "zoneRecording": "Recording",
-    "zoneStorage": "Storage",
+    "zoneStorage": "Archive",
+    "connData": "data",
+    "connNotifications": "notifications",
+    "connSignaling": "signaling",
+    "connMedia": "video stream",
+    "connRecording": "recording",
+    "connUpload": "upload",
+    "services": {
+      "app": "Web portal",
+      "database": "Database",
+      "jitsiWeb": "Video conference room",
+      "prosody": "Internal messaging",
+      "jicofo": "Conference coordinator",
+      "jvb": "Video bridge",
+      "jibri": "Video recording",
+      "smtp": "Email service"
+    },
+    "descriptions": {
+      "app": "The website where you access events",
+      "database": "Where events and registrations are stored",
+      "jitsiWeb": "The video conference interface",
+      "prosody": "Handles communication between video services",
+      "jicofo": "Coordinates who participates in each conference",
+      "jvb": "Transmits audio and video to participants",
+      "jibri": "Records video sessions of events",
+      "smtp": "Sends confirmation emails and reminders"
+    },
+    "verdicts": {
+      "app": {
+        "healthy": "The web portal is working correctly and responding to requests."
+      },
+      "database": {
+        "healthy": "The database is responding correctly.",
+        "degraded": "The database is responding, but slower than usual. Operations may take longer.",
+        "down": "The database is not responding. The platform cannot function properly."
+      },
+      "jitsiWeb": {
+        "healthy": "The video conference room is reachable and ready for events.",
+        "down": "The video conference room is not reachable. It is not possible to start or join events.",
+        "standby": "The video conference room is not configured."
+      },
+      "prosody": {
+        "healthy": "Internal messaging between video services is working correctly.",
+        "down": "Internal messaging is not reachable. Video services cannot communicate with each other.",
+        "standby": "The messaging service is not configured."
+      },
+      "jicofo": {
+        "healthy": "The conference coordinator is active and managing sessions.",
+        "down": "The conference coordinator is not reachable. It is not possible to create new conferences.",
+        "standby": "The conference coordinator is not configured."
+      },
+      "jvb": {
+        "healthy": "The video bridge is active and transmitting audio/video to participants.",
+        "scaling": "The video bridge is preparing for an upcoming event. Servers are being created automatically.",
+        "standby": "The video bridge is on standby. It will activate automatically before a scheduled event starts."
+      },
+      "jibri": {
+        "healthy": "The recording service is ready and available.",
+        "busy": "The recording service is active and recording a session in progress.",
+        "down": "The recording service is not reachable. Events cannot be recorded.",
+        "standby": "Video recording is not configured. Events will not be recorded."
+      },
+      "smtp": {
+        "healthy": "The email service is configured and ready to send notifications.",
+        "standby": "The email service is not configured. Confirmation emails and reminders will not be sent."
+      }
+    },
+    "impacts": {
+      "database": "The platform cannot load events, manage registrations, or save data.",
+      "jitsiWeb": "Participants cannot access the video conference room.",
+      "prosody": "Video services cannot communicate. Conferences will not work.",
+      "jicofo": "It is not possible to create or manage new video conferences.",
+      "jvbScaling": "The video bridge is activating. The event will be able to start shortly.",
+      "jibri": "Events cannot be recorded. Participants can still join and participate.",
+      "smtp": "Registration confirmation emails and reminders will not be sent."
+    },
+    "overallVerdicts": {
+      "operational": "All services are working correctly. The platform is fully operational.",
+      "degraded": "Some services are experiencing slowdowns. The platform is operational but performance may be reduced.",
+      "outage": "One or more services are unavailable. Some platform features may not work."
+    },
+    "verdictSection": "Service status summary",
+    "verdictSectionSubtitle": "Details on services that require attention",
+    "impactLabel": "Impact",
+    "noIssues": "No issues detected",
     "statuses": {
       "healthy": "Operational",
       "degraded": "Degraded",
       "down": "Down",
       "standby": "Standby",
-      "scaling": "Scaling"
+      "scaling": "Preparing"
     }
   },
   "feedback": {

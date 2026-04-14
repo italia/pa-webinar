@@ -1030,25 +1030,124 @@
     "bandwidthOut": "Banda in uscita",
     "recordings": "Registrazioni",
     "registrationsToday": "Registrazioni oggi",
-    "replicas": "Repliche",
-    "cpu": "CPU richiesta",
-    "memory": "Memoria richiesta",
-    "ports": "Porte",
-    "stressLevel": "Livello di stress",
+    "replicas": "Istanze attive",
+    "cpu": "CPU allocata",
+    "memory": "Memoria allocata",
+    "ports": "Porte di rete",
+    "stressLevel": "Carico di lavoro",
     "busyStatus": "Stato attività",
     "type": "Tipo",
+    "technicalName": "Nome tecnico",
+    "latency": "Latenza",
+    "uptime": "Attivo da",
+    "heapUsed": "Memoria heap",
+    "eventLoopLag": "Reattività",
+    "cpuUsage": "Utilizzo CPU",
+    "memoryUsed": "Memoria utilizzata",
+    "rtt": "Tempo di risposta rete",
+    "jitter": "Variazione latenza",
+    "packetLoss": "Perdita pacchetti",
+    "largestConference": "Conferenza più grande",
+    "sendingAudio": "Invio audio",
+    "sendingVideo": "Invio video",
+    "iceSuccess": "Connessioni riuscite",
+    "totalConferences": "Conferenze totali",
     "lastUpdated": "Ultimo aggiornamento",
-    "zonePublic": "Pubblico",
-    "zoneCluster": "Cluster Kubernetes",
-    "zoneMedia": "Media",
+    "zonePublic": "Accesso pubblico",
+    "zoneCluster": "Servizi piattaforma",
+    "zoneMedia": "Sala video",
     "zoneRecording": "Registrazione",
-    "zoneStorage": "Storage",
+    "zoneStorage": "Archivio",
+    "connData": "dati",
+    "connNotifications": "notifiche",
+    "connSignaling": "segnalazione",
+    "connMedia": "flusso video",
+    "connRecording": "registrazione",
+    "connUpload": "caricamento",
+    "services": {
+      "app": "Portale web",
+      "database": "Database",
+      "jitsiWeb": "Sala videoconferenza",
+      "prosody": "Messaggistica interna",
+      "jicofo": "Coordinatore conferenze",
+      "jvb": "Ponte video",
+      "jibri": "Registrazione video",
+      "smtp": "Servizio email"
+    },
+    "descriptions": {
+      "app": "Il sito web dove si accede agli eventi",
+      "database": "Dove vengono salvati eventi e registrazioni",
+      "jitsiWeb": "L'interfaccia per le videoconferenze",
+      "prosody": "Gestisce la comunicazione tra i servizi video",
+      "jicofo": "Coordina chi partecipa a ogni conferenza",
+      "jvb": "Trasmette audio e video ai partecipanti",
+      "jibri": "Registra le sessioni video degli eventi",
+      "smtp": "Invia email di conferma e promemoria"
+    },
+    "verdicts": {
+      "app": {
+        "healthy": "Il portale web funziona correttamente e risponde alle richieste."
+      },
+      "database": {
+        "healthy": "Il database risponde correttamente.",
+        "degraded": "Il database risponde, ma con tempi più lunghi del normale. Le operazioni potrebbero risultare più lente.",
+        "down": "Il database non risponde. La piattaforma non è in grado di funzionare correttamente."
+      },
+      "jitsiWeb": {
+        "healthy": "La sala videoconferenza è raggiungibile e pronta per gli eventi.",
+        "down": "La sala videoconferenza non è raggiungibile. Non è possibile avviare o partecipare agli eventi.",
+        "standby": "La sala videoconferenza non è configurata."
+      },
+      "prosody": {
+        "healthy": "La messaggistica interna tra i servizi video funziona correttamente.",
+        "down": "La messaggistica interna non è raggiungibile. I servizi video non possono comunicare tra loro.",
+        "standby": "Il servizio di messaggistica non è configurato."
+      },
+      "jicofo": {
+        "healthy": "Il coordinatore conferenze è attivo e gestisce le sessioni.",
+        "down": "Il coordinatore conferenze non è raggiungibile. Non è possibile creare nuove conferenze.",
+        "standby": "Il coordinatore conferenze non è configurato."
+      },
+      "jvb": {
+        "healthy": "Il ponte video è attivo e trasmette audio/video ai partecipanti.",
+        "scaling": "Il ponte video si sta preparando per un evento imminente. I server vengono creati automaticamente.",
+        "standby": "Il ponte video è in attesa. Si attiverà automaticamente prima dell'inizio di un evento programmato."
+      },
+      "jibri": {
+        "healthy": "Il servizio di registrazione è pronto e disponibile.",
+        "busy": "Il servizio di registrazione è attivo e sta registrando una sessione in corso.",
+        "down": "Il servizio di registrazione non è raggiungibile. Non è possibile registrare gli eventi.",
+        "standby": "La registrazione video non è configurata. Gli eventi non verranno registrati."
+      },
+      "smtp": {
+        "healthy": "Il servizio email è configurato e pronto a inviare notifiche.",
+        "standby": "Il servizio email non è configurato. Le email di conferma e i promemoria non verranno inviati."
+      }
+    },
+    "impacts": {
+      "database": "La piattaforma non può caricare eventi, gestire registrazioni o salvare dati.",
+      "jitsiWeb": "I partecipanti non possono accedere alla sala videoconferenza.",
+      "prosody": "I servizi video non possono comunicare. Le conferenze non funzionano.",
+      "jicofo": "Non è possibile creare o gestire nuove conferenze video.",
+      "jvbScaling": "Il ponte video si sta attivando. L'evento potrà iniziare a breve.",
+      "jibri": "Non è possibile registrare gli eventi. I partecipanti possono comunque partecipare.",
+      "smtp": "Le email di conferma registrazione e i promemoria non verranno inviati."
+    },
+    "overallVerdicts": {
+      "operational": "Tutti i servizi funzionano correttamente. La piattaforma è pienamente operativa.",
+      "degraded": "Alcuni servizi presentano rallentamenti. La piattaforma è operativa ma le prestazioni potrebbero essere ridotte.",
+      "outage": "Uno o più servizi non sono disponibili. Alcune funzionalità della piattaforma potrebbero non funzionare."
+    },
+    "verdictSection": "Riepilogo stato servizi",
+    "verdictSectionSubtitle": "Dettaglio dei servizi che richiedono attenzione",
+    "impactLabel": "Conseguenza",
+    "noIssues": "Nessun problema rilevato",
     "statuses": {
       "healthy": "Operativo",
       "degraded": "Rallentato",
       "down": "Non disponibile",
       "standby": "In standby",
-      "scaling": "In scala"
+      "scaling": "In preparazione"
     }
   },
   "feedback": {

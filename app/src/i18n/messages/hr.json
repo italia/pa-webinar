@@ -996,25 +996,122 @@
     "bandwidthOut": "Odlazna propusnost",
     "recordings": "Snimke",
     "registrationsToday": "Registracije danas",
-    "replicas": "Replike",
-    "cpu": "CPU zahtjev",
-    "memory": "Zahtjev za memoriju",
-    "ports": "Portovi",
-    "stressLevel": "Razina opterećenja",
+    "replicas": "Aktivne instance",
+    "cpu": "Dodijeljeni CPU",
+    "memory": "Dodijeljena memorija",
+    "ports": "Mrežni portovi",
+    "stressLevel": "Opterećenje",
     "busyStatus": "Status aktivnosti",
     "type": "Tip",
+    "technicalName": "Tehnički naziv",
+    "latency": "Latencija",
+    "uptime": "Vrijeme rada",
+    "heapUsed": "Heap memorija",
+    "eventLoopLag": "Odzivnost",
+    "cpuUsage": "Korištenje CPU-a",
+    "memoryUsed": "Korištena memorija",
+    "rtt": "Mrežno kružno vrijeme",
+    "jitter": "Varijacija latencije",
+    "packetLoss": "Gubitak paketa",
+    "largestConference": "Najveća konferencija",
+    "sendingAudio": "Slanje zvuka",
+    "sendingVideo": "Slanje videa",
+    "iceSuccess": "Uspješne veze",
+    "totalConferences": "Ukupno konferencija",
     "lastUpdated": "Zadnje ažuriranje",
-    "zonePublic": "Javno",
-    "zoneCluster": "Kubernetes klaster",
-    "zoneMedia": "Mediji",
+    "zonePublic": "Javni pristup",
+    "zoneCluster": "Usluge platforme",
+    "zoneMedia": "Video soba",
     "zoneRecording": "Snimanje",
-    "zoneStorage": "Pohrana",
+    "zoneStorage": "Arhiva",
+    "connData": "podaci",
+    "connNotifications": "obavijesti",
+    "connSignaling": "signalizacija",
+    "connMedia": "video prijenos",
+    "connRecording": "snimanje",
+    "connUpload": "prijenos",
+    "services": {
+      "app": "Web portal",
+      "database": "Baza podataka",
+      "jitsiWeb": "Video konferencijska soba",
+      "prosody": "Interno slanje poruka",
+      "jicofo": "Koordinator konferencija",
+      "jvb": "Video most",
+      "jibri": "Video snimanje",
+      "smtp": "Usluga e-pošte"
+    },
+    "descriptions": {
+      "app": "Web stranica na kojoj pristupate događajima",
+      "database": "Mjesto gdje se pohranjuju događaji i registracije",
+      "jitsiWeb": "Sučelje za video konferencije",
+      "prosody": "Upravlja komunikacijom između video usluga",
+      "jicofo": "Koordinira tko sudjeluje u svakoj konferenciji",
+      "jvb": "Prenosi zvuk i video sudionicima",
+      "jibri": "Snima video sesije događaja",
+      "smtp": "Šalje potvrdne e-poruke i podsjetnike"
+    },
+    "verdicts": {
+      "app": { "healthy": "Web portal radi ispravno i odgovara na zahtjeve." },
+      "database": {
+        "healthy": "Baza podataka odgovara ispravno.",
+        "degraded": "Baza podataka odgovara, ali sporije nego uobičajeno. Operacije mogu trajati duže.",
+        "down": "Baza podataka ne odgovara. Platforma ne može ispravno funkcionirati."
+      },
+      "jitsiWeb": {
+        "healthy": "Video konferencijska soba je dostupna i spremna za događaje.",
+        "down": "Video konferencijska soba nije dostupna. Nije moguće pokrenuti ili se pridružiti događajima.",
+        "standby": "Video konferencijska soba nije konfigurirana."
+      },
+      "prosody": {
+        "healthy": "Interno slanje poruka između video usluga radi ispravno.",
+        "down": "Interno slanje poruka nije dostupno. Video usluge ne mogu međusobno komunicirati.",
+        "standby": "Usluga slanja poruka nije konfigurirana."
+      },
+      "jicofo": {
+        "healthy": "Koordinator konferencija je aktivan i upravlja sesijama.",
+        "down": "Koordinator konferencija nije dostupan. Nije moguće kreirati nove konferencije.",
+        "standby": "Koordinator konferencija nije konfiguriran."
+      },
+      "jvb": {
+        "healthy": "Video most je aktivan i prenosi zvuk/video sudionicima.",
+        "scaling": "Video most se priprema za nadolazeći događaj. Serveri se automatski stvaraju.",
+        "standby": "Video most je u pripravnosti. Automatski će se aktivirati prije početka zakazanog događaja."
+      },
+      "jibri": {
+        "healthy": "Usluga snimanja je spremna i dostupna.",
+        "busy": "Usluga snimanja je aktivna i snima sesiju u tijeku.",
+        "down": "Usluga snimanja nije dostupna. Događaji se ne mogu snimati.",
+        "standby": "Video snimanje nije konfigurirano. Događaji se neće snimati."
+      },
+      "smtp": {
+        "healthy": "Usluga e-pošte je konfigurirana i spremna za slanje obavijesti.",
+        "standby": "Usluga e-pošte nije konfigurirana. Potvrdne e-poruke i podsjetnici neće biti poslani."
+      }
+    },
+    "impacts": {
+      "database": "Platforma ne može učitati događaje, upravljati registracijama ili spremati podatke.",
+      "jitsiWeb": "Sudionici ne mogu pristupiti video konferencijskoj sobi.",
+      "prosody": "Video usluge ne mogu komunicirati. Konferencije neće raditi.",
+      "jicofo": "Nije moguće kreirati ili upravljati novim video konferencijama.",
+      "jvbScaling": "Video most se aktivira. Događaj će uskoro moći započeti.",
+      "jibri": "Događaji se ne mogu snimati. Sudionici se i dalje mogu pridružiti i sudjelovati.",
+      "smtp": "Potvrdne e-poruke i podsjetnici za registraciju neće biti poslani."
+    },
+    "overallVerdicts": {
+      "operational": "Sve usluge rade ispravno. Platforma je potpuno operativna.",
+      "degraded": "Neke usluge imaju usporenja. Platforma je operativna, ali performanse mogu biti smanjene.",
+      "outage": "Jedna ili više usluga nije dostupno. Neke funkcije platforme možda neće raditi."
+    },
+    "verdictSection": "Sažetak stanja usluga",
+    "verdictSectionSubtitle": "Pojedinosti o uslugama koje zahtijevaju pažnju",
+    "impactLabel": "Utjecaj",
+    "noIssues": "Nisu otkriveni problemi",
     "statuses": {
       "healthy": "Operativan",
       "degraded": "Usporen",
       "down": "Nedostupan",
       "standby": "U pripravnosti",
-      "scaling": "Skaliranje"
+      "scaling": "Priprema"
     }
   },
   "feedback": {

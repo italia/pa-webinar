@@ -996,25 +996,122 @@
     "bandwidthOut": "Odchádzajúca šírka pásma",
     "recordings": "Nahrávky",
     "registrationsToday": "Registrácie dnes",
-    "replicas": "Repliky",
-    "cpu": "Požiadavka CPU",
-    "memory": "Požiadavka pamäte",
-    "ports": "Porty",
-    "stressLevel": "Úroveň záťaže",
+    "replicas": "Aktívne inštancie",
+    "cpu": "Pridelené CPU",
+    "memory": "Pridelená pamäť",
+    "ports": "Sieťové porty",
+    "stressLevel": "Záťaž",
     "busyStatus": "Stav aktivity",
     "type": "Typ",
+    "technicalName": "Technický názov",
+    "latency": "Latencia",
+    "uptime": "Doba prevádzky",
+    "heapUsed": "Pamäť haldy",
+    "eventLoopLag": "Odozva",
+    "cpuUsage": "Využitie CPU",
+    "memoryUsed": "Využitá pamäť",
+    "rtt": "Doba odozvy siete",
+    "jitter": "Kolísanie latencie",
+    "packetLoss": "Strata paketov",
+    "largestConference": "Najväčšia konferencia",
+    "sendingAudio": "Odosielanie zvuku",
+    "sendingVideo": "Odosielanie videa",
+    "iceSuccess": "Úspešné spojenia",
+    "totalConferences": "Celkový počet konferencií",
     "lastUpdated": "Posledná aktualizácia",
-    "zonePublic": "Verejný",
-    "zoneCluster": "Kubernetes klaster",
-    "zoneMedia": "Médiá",
+    "zonePublic": "Verejný prístup",
+    "zoneCluster": "Služby platformy",
+    "zoneMedia": "Videomiestnosť",
     "zoneRecording": "Nahrávanie",
-    "zoneStorage": "Úložisko",
+    "zoneStorage": "Archív",
+    "connData": "dáta",
+    "connNotifications": "oznámenia",
+    "connSignaling": "signalizácia",
+    "connMedia": "video stream",
+    "connRecording": "nahrávanie",
+    "connUpload": "nahrávanie súborov",
+    "services": {
+      "app": "Webový portál",
+      "database": "Databáza",
+      "jitsiWeb": "Videokonferenčná miestnosť",
+      "prosody": "Interná komunikácia",
+      "jicofo": "Koordinátor konferencií",
+      "jvb": "Video bridge",
+      "jibri": "Videozáznam",
+      "smtp": "E-mailová služba"
+    },
+    "descriptions": {
+      "app": "Webová stránka, kde pristupujete k udalostiam",
+      "database": "Úložisko udalostí a registrácií",
+      "jitsiWeb": "Rozhranie videokonferencie",
+      "prosody": "Zabezpečuje komunikáciu medzi video službami",
+      "jicofo": "Koordinuje účastníkov v jednotlivých konferenciách",
+      "jvb": "Prenáša zvuk a video účastníkom",
+      "jibri": "Nahráva video relácie udalostí",
+      "smtp": "Odosiela potvrdzujúce e-maily a upozornenia"
+    },
+    "verdicts": {
+      "app": { "healthy": "Webový portál funguje správne a odpovedá na požiadavky." },
+      "database": {
+        "healthy": "Databáza odpovedá správne.",
+        "degraded": "Databáza odpovedá, ale pomalšie ako zvyčajne. Operácie môžu trvať dlhšie.",
+        "down": "Databáza neodpovedá. Platforma nemôže správne fungovať."
+      },
+      "jitsiWeb": {
+        "healthy": "Videokonferenčná miestnosť je dostupná a pripravená na udalosti.",
+        "down": "Videokonferenčná miestnosť nie je dostupná. Nie je možné začať ani sa pripojiť k udalostiam.",
+        "standby": "Videokonferenčná miestnosť nie je nakonfigurovaná."
+      },
+      "prosody": {
+        "healthy": "Interná komunikácia medzi video službami funguje správne.",
+        "down": "Interná komunikácia nie je dostupná. Video služby spolu nemôžu komunikovať.",
+        "standby": "Komunikačná služba nie je nakonfigurovaná."
+      },
+      "jicofo": {
+        "healthy": "Koordinátor konferencií je aktívny a spravuje relácie.",
+        "down": "Koordinátor konferencií nie je dostupný. Nie je možné vytvárať nové konferencie.",
+        "standby": "Koordinátor konferencií nie je nakonfigurovaný."
+      },
+      "jvb": {
+        "healthy": "Video bridge je aktívny a prenáša zvuk/video účastníkom.",
+        "scaling": "Video bridge sa pripravuje na nadchádzajúcu udalosť. Servery sa vytvárajú automaticky.",
+        "standby": "Video bridge je v pohotovostnom režime. Automaticky sa aktivuje pred začiatkom naplánovanej udalosti."
+      },
+      "jibri": {
+        "healthy": "Služba nahrávania je pripravená a dostupná.",
+        "busy": "Služba nahrávania je aktívna a nahráva prebiehajúcu reláciu.",
+        "down": "Služba nahrávania nie je dostupná. Udalosti nie je možné nahrávať.",
+        "standby": "Videozáznam nie je nakonfigurovaný. Udalosti nebudú nahrávané."
+      },
+      "smtp": {
+        "healthy": "E-mailová služba je nakonfigurovaná a pripravená odosielať oznámenia.",
+        "standby": "E-mailová služba nie je nakonfigurovaná. Potvrdzujúce e-maily a upozornenia nebudú odosielané."
+      }
+    },
+    "impacts": {
+      "database": "Platforma nemôže načítať udalosti, spravovať registrácie ani ukladať údaje.",
+      "jitsiWeb": "Účastníci nemôžu pristúpiť k videokonferenčnej miestnosti.",
+      "prosody": "Video služby spolu nemôžu komunikovať. Konferencie nebudú fungovať.",
+      "jicofo": "Nie je možné vytvárať ani spravovať nové videokonferencie.",
+      "jvbScaling": "Video bridge sa aktivuje. Udalosť bude môcť čoskoro začať.",
+      "jibri": "Udalosti nie je možné nahrávať. Účastníci sa stále môžu pripojiť a zúčastniť.",
+      "smtp": "Potvrdzujúce e-maily registrácií a upozornenia nebudú odosielané."
+    },
+    "overallVerdicts": {
+      "operational": "Všetky služby fungujú správne. Platforma je plne funkčná.",
+      "degraded": "Niektoré služby zaznamenávajú spomalenie. Platforma je funkčná, ale výkon môže byť znížený.",
+      "outage": "Jedna alebo viacero služieb je nedostupných. Niektoré funkcie platformy nemusia fungovať."
+    },
+    "verdictSection": "Zhrnutie stavu služieb",
+    "verdictSectionSubtitle": "Podrobnosti o službách vyžadujúcich pozornosť",
+    "impactLabel": "Dopad",
+    "noIssues": "Neboli zistené žiadne problémy",
     "statuses": {
       "healthy": "Funkčný",
       "degraded": "Spomalený",
       "down": "Nedostupný",
       "standby": "V pohotovosti",
-      "scaling": "Škálovanie"
+      "scaling": "Príprava"
     }
   },
   "feedback": {

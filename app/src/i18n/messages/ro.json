@@ -996,25 +996,122 @@
     "bandwidthOut": "Lățime de bandă ieșire",
     "recordings": "Înregistrări",
     "registrationsToday": "Înregistrări astăzi",
-    "replicas": "Replici",
-    "cpu": "Cerere CPU",
-    "memory": "Cerere memorie",
-    "ports": "Porturi",
+    "replicas": "Instanțe active",
+    "cpu": "CPU alocat",
+    "memory": "Memorie alocată",
+    "ports": "Porturi de rețea",
     "stressLevel": "Nivel de încărcare",
     "busyStatus": "Stare activitate",
     "type": "Tip",
+    "technicalName": "Nume tehnic",
+    "latency": "Latență",
+    "uptime": "Timp de funcționare",
+    "heapUsed": "Memorie heap",
+    "eventLoopLag": "Reactivitate",
+    "cpuUsage": "Utilizare CPU",
+    "memoryUsed": "Memorie utilizată",
+    "rtt": "Timp de răspuns rețea",
+    "jitter": "Variația latenței",
+    "packetLoss": "Pierdere de pachete",
+    "largestConference": "Cea mai mare conferință",
+    "sendingAudio": "Trimite audio",
+    "sendingVideo": "Trimite video",
+    "iceSuccess": "Conexiuni reușite",
+    "totalConferences": "Total conferințe",
     "lastUpdated": "Ultima actualizare",
-    "zonePublic": "Public",
-    "zoneCluster": "Cluster Kubernetes",
-    "zoneMedia": "Media",
+    "zonePublic": "Acces public",
+    "zoneCluster": "Servicii platformă",
+    "zoneMedia": "Sală video",
     "zoneRecording": "Înregistrare",
-    "zoneStorage": "Stocare",
+    "zoneStorage": "Arhivă",
+    "connData": "date",
+    "connNotifications": "notificări",
+    "connSignaling": "semnalizare",
+    "connMedia": "flux video",
+    "connRecording": "înregistrare",
+    "connUpload": "încărcare",
+    "services": {
+      "app": "Portal web",
+      "database": "Bază de date",
+      "jitsiWeb": "Sală de videoconferință",
+      "prosody": "Mesagerie internă",
+      "jicofo": "Coordonator conferințe",
+      "jvb": "Punte video",
+      "jibri": "Înregistrare video",
+      "smtp": "Serviciu email"
+    },
+    "descriptions": {
+      "app": "Site-ul web de unde accesați evenimentele",
+      "database": "Unde sunt stocate evenimentele și înregistrările",
+      "jitsiWeb": "Interfața sălii de videoconferință",
+      "prosody": "Gestionează comunicarea între serviciile video",
+      "jicofo": "Coordonează participanții la fiecare conferință",
+      "jvb": "Transmite audio și video către participanți",
+      "jibri": "Înregistrează sesiunile video ale evenimentelor",
+      "smtp": "Trimite emailuri de confirmare și mementouri"
+    },
+    "verdicts": {
+      "app": { "healthy": "Portalul web funcționează corect și răspunde la solicitări." },
+      "database": {
+        "healthy": "Baza de date răspunde corect.",
+        "degraded": "Baza de date răspunde, dar mai lent decât de obicei. Operațiunile pot dura mai mult.",
+        "down": "Baza de date nu răspunde. Platforma nu poate funcționa corect."
+      },
+      "jitsiWeb": {
+        "healthy": "Sala de videoconferință este accesibilă și pregătită pentru evenimente.",
+        "down": "Sala de videoconferință nu este accesibilă. Nu este posibil să porniți sau să vă alăturați evenimentelor.",
+        "standby": "Sala de videoconferință nu este configurată."
+      },
+      "prosody": {
+        "healthy": "Mesageria internă între serviciile video funcționează corect.",
+        "down": "Mesageria internă nu este accesibilă. Serviciile video nu pot comunica între ele.",
+        "standby": "Serviciul de mesagerie nu este configurat."
+      },
+      "jicofo": {
+        "healthy": "Coordonatorul de conferințe este activ și gestionează sesiunile.",
+        "down": "Coordonatorul de conferințe nu este accesibil. Nu este posibil să creați conferințe noi.",
+        "standby": "Coordonatorul de conferințe nu este configurat."
+      },
+      "jvb": {
+        "healthy": "Puntea video este activă și transmite audio/video către participanți.",
+        "scaling": "Puntea video se pregătește pentru un eveniment viitor. Serverele sunt create automat.",
+        "standby": "Puntea video este în așteptare. Se va activa automat înainte de începerea unui eveniment programat."
+      },
+      "jibri": {
+        "healthy": "Serviciul de înregistrare este pregătit și disponibil.",
+        "busy": "Serviciul de înregistrare este activ și înregistrează o sesiune în curs.",
+        "down": "Serviciul de înregistrare nu este accesibil. Evenimentele nu pot fi înregistrate.",
+        "standby": "Înregistrarea video nu este configurată. Evenimentele nu vor fi înregistrate."
+      },
+      "smtp": {
+        "healthy": "Serviciul de email este configurat și pregătit să trimită notificări.",
+        "standby": "Serviciul de email nu este configurat. Emailurile de confirmare și mementourile nu vor fi trimise."
+      }
+    },
+    "impacts": {
+      "database": "Platforma nu poate încărca evenimente, gestiona înregistrări sau salva date.",
+      "jitsiWeb": "Participanții nu pot accesa sala de videoconferință.",
+      "prosody": "Serviciile video nu pot comunica. Conferințele nu vor funcționa.",
+      "jicofo": "Nu este posibil să creați sau să gestionați conferințe video noi.",
+      "jvbScaling": "Puntea video se activează. Evenimentul va putea începe în curând.",
+      "jibri": "Evenimentele nu pot fi înregistrate. Participanții se pot alătura și participa în continuare.",
+      "smtp": "Emailurile de confirmare a înregistrării și mementourile nu vor fi trimise."
+    },
+    "overallVerdicts": {
+      "operational": "Toate serviciile funcționează corect. Platforma este complet operațională.",
+      "degraded": "Unele servicii se confruntă cu încetiniri. Platforma este operațională, dar performanța poate fi redusă.",
+      "outage": "Unul sau mai multe servicii sunt indisponibile. Unele funcționalități ale platformei pot să nu funcționeze."
+    },
+    "verdictSection": "Rezumatul stării serviciilor",
+    "verdictSectionSubtitle": "Detalii despre serviciile care necesită atenție",
+    "impactLabel": "Impact",
+    "noIssues": "Nicio problemă detectată",
     "statuses": {
       "healthy": "Operațional",
       "degraded": "Degradat",
       "down": "Indisponibil",
       "standby": "În așteptare",
-      "scaling": "Scalare"
+      "scaling": "Pregătire"
     }
   },
   "feedback": {

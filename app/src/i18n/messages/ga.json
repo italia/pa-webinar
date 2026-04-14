@@ -996,25 +996,122 @@
     "bandwidthOut": "Bandaleithead amach",
     "recordings": "Taifeadtaí",
     "registrationsToday": "Clárúcháin inniu",
-    "replicas": "Macasamhlacha",
-    "cpu": "Iarratas CPU",
-    "memory": "Iarratas cuimhne",
-    "ports": "Poirt",
-    "stressLevel": "Leibhéal struis",
+    "replicas": "Ásc ghníomhacha",
+    "cpu": "CPU leithdháilte",
+    "memory": "Cuimhne leithdháilte",
+    "ports": "Poirt líonra",
+    "stressLevel": "Ualach oibre",
     "busyStatus": "Stádas gníomhaíochta",
     "type": "Cineál",
+    "technicalName": "Ainm teicniúil",
+    "latency": "Moill",
+    "uptime": "Am ar líne",
+    "heapUsed": "Cuimhne charn",
+    "eventLoopLag": "Freagrúlacht",
+    "cpuUsage": "Úsáid CPU",
+    "memoryUsed": "Cuimhne in úsáid",
+    "rtt": "Am fillte líonra",
+    "jitter": "Athrú moille",
+    "packetLoss": "Caillteanas paicéad",
+    "largestConference": "An chomhdháil is mó",
+    "sendingAudio": "Fuaim á seoladh",
+    "sendingVideo": "Físeán á sheoladh",
+    "iceSuccess": "Naisc rathúla",
+    "totalConferences": "Comhdhálacha iomlána",
     "lastUpdated": "Nuashonraithe go deireanach",
-    "zonePublic": "Poiblí",
-    "zoneCluster": "Braisle Kubernetes",
-    "zoneMedia": "Meáin",
+    "zonePublic": "Rochtain phoiblí",
+    "zoneCluster": "Seirbhísí ardáin",
+    "zoneMedia": "Seomra físeáin",
     "zoneRecording": "Taifeadadh",
-    "zoneStorage": "Stóráil",
+    "zoneStorage": "Cartlann",
+    "connData": "sonraí",
+    "connNotifications": "fógraí",
+    "connSignaling": "comharthaíocht",
+    "connMedia": "sruth físeáin",
+    "connRecording": "taifeadadh",
+    "connUpload": "uaslódáil",
+    "services": {
+      "app": "Tairseach gréasáin",
+      "database": "Bunachar sonraí",
+      "jitsiWeb": "Seomra físchomhdhála",
+      "prosody": "Teachtaireachtaí inmheánacha",
+      "jicofo": "Comhordaitheoir comhdhála",
+      "jvb": "Droichead físeáin",
+      "jibri": "Taifeadadh físeáin",
+      "smtp": "Seirbhís ríomhphoist"
+    },
+    "descriptions": {
+      "app": "An suíomh gréasáin ina n-aimsíonn sibh imeachtaí",
+      "database": "An áit a stóráiltear imeachtaí agus clárúcháin",
+      "jitsiWeb": "Comhéadan na físchomhdhála",
+      "prosody": "Láimhseálann cumarsáid idir seirbhísí físeáin",
+      "jicofo": "Comhordaíonn cé a ghlacann páirt i ngach comhdháil",
+      "jvb": "Tarchuireann fuaim agus físeán chuig rannpháirtithe",
+      "jibri": "Taifeadann seisiúin físe d'imeachtaí",
+      "smtp": "Seolann ríomhphoist deimhnithe agus meabhrúcháin"
+    },
+    "verdicts": {
+      "app": { "healthy": "Tá an tairseach gréasáin ag obair i gceart agus ag freagairt d'iarratais." },
+      "database": {
+        "healthy": "Tá an bunachar sonraí ag freagairt i gceart.",
+        "degraded": "Tá an bunachar sonraí ag freagairt, ach níos moille ná mar is gnách. D'fhéadfadh oibríochtaí níos mó ama a thógáil.",
+        "down": "Níl an bunachar sonraí ag freagairt. Ní féidir leis an ardán feidhmiú i gceart."
+      },
+      "jitsiWeb": {
+        "healthy": "Tá an seomra físchomhdhála inrochtana agus réidh d'imeachtaí.",
+        "down": "Níl an seomra físchomhdhála inrochtana. Ní féidir imeachtaí a thosú ná dul isteach iontu.",
+        "standby": "Níl an seomra físchomhdhála cumraithe."
+      },
+      "prosody": {
+        "healthy": "Tá teachtaireachtaí inmheánacha idir seirbhísí físeáin ag obair i gceart.",
+        "down": "Níl na teachtaireachtaí inmheánacha inrochtana. Ní féidir le seirbhísí físeáin cumarsáid a dhéanamh le chéile.",
+        "standby": "Níl an tseirbhís teachtaireachtaí cumraithe."
+      },
+      "jicofo": {
+        "healthy": "Tá an comhordaitheoir comhdhála gníomhach agus ag bainistiú seisiún.",
+        "down": "Níl an comhordaitheoir comhdhála inrochtana. Ní féidir comhdhálacha nua a chruthú.",
+        "standby": "Níl an comhordaitheoir comhdhála cumraithe."
+      },
+      "jvb": {
+        "healthy": "Tá an droichead físeáin gníomhach agus ag tarchur fuaime/físeáin chuig rannpháirtithe.",
+        "scaling": "Tá an droichead físeáin ag ullmhú d'imeacht atá le teacht. Tá freastalaithe á gcruthú go huathoibríoch.",
+        "standby": "Tá an droichead físeáin ar fuireachas. Gníomhachtófar go huathoibríoch é roimh thús imeachta sceidealaithe."
+      },
+      "jibri": {
+        "healthy": "Tá an tseirbhís taifeadta réidh agus ar fáil.",
+        "busy": "Tá an tseirbhís taifeadta gníomhach agus ag taifeadadh seisiúin atá ar siúl.",
+        "down": "Níl an tseirbhís taifeadta inrochtana. Ní féidir imeachtaí a thaifeadadh.",
+        "standby": "Níl taifeadadh físe cumraithe. Ní thaifeadfar imeachtaí."
+      },
+      "smtp": {
+        "healthy": "Tá an tseirbhís ríomhphoist cumraithe agus réidh le fógraí a sheoladh.",
+        "standby": "Níl an tseirbhís ríomhphoist cumraithe. Ní sheolfar ríomhphoist deimhnithe ná meabhrúcháin."
+      }
+    },
+    "impacts": {
+      "database": "Ní féidir leis an ardán imeachtaí a lódáil, clárúcháin a bhainistiú, ná sonraí a shábháil.",
+      "jitsiWeb": "Ní féidir le rannpháirtithe rochtain a fháil ar an seomra físchomhdhála.",
+      "prosody": "Ní féidir le seirbhísí físeáin cumarsáid a dhéanamh. Ní oibreoidh comhdhálacha.",
+      "jicofo": "Ní féidir físchomhdhálacha nua a chruthú ná a bhainistiú.",
+      "jvbScaling": "Tá an droichead físeáin á ghníomhachtú. Beidh an t-imeacht in ann tosú go luath.",
+      "jibri": "Ní féidir imeachtaí a thaifeadadh. Is féidir le rannpháirtithe páirt a ghlacadh fós.",
+      "smtp": "Ní sheolfar ríomhphoist deimhnithe clárúcháin ná meabhrúcháin."
+    },
+    "overallVerdicts": {
+      "operational": "Tá gach seirbhís ag obair i gceart. Tá an t-ardán ag feidhmiú go hiomlán.",
+      "degraded": "Tá moilliú ag tarlú i roinnt seirbhísí. Tá an t-ardán ag feidhmiú ach d'fhéadfadh an fheidhmíocht a bheith laghdaithe.",
+      "outage": "Tá seirbhís amháin nó níos mó gan fáil. D'fhéadfadh gnéithe áirithe den ardán gan obair."
+    },
+    "verdictSection": "Achoimre ar stádas na seirbhísí",
+    "verdictSectionSubtitle": "Sonraí faoi sheirbhísí a dteastaíonn aird uathu",
+    "impactLabel": "Tionchar",
+    "noIssues": "Níor aimsíodh aon fhadhb",
     "statuses": {
       "healthy": "Oibríochtúil",
       "degraded": "Laghdaithe",
       "down": "Gan fáil",
       "standby": "Ar fuireachas",
-      "scaling": "Scálú"
+      "scaling": "Ag ullmhú"
     }
   },
   "feedback": {

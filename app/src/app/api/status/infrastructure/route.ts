@@ -1,13 +1,20 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { getAppProcessMetrics } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
+
+type ServiceStatus = 'healthy' | 'degraded' | 'down' | 'standby' | 'scaling';
 
 interface ServiceNode {
   id: string;
   name: string;
-  status: 'healthy' | 'degraded' | 'down' | 'standby' | 'scaling';
+  technicalName: string;
+  description: string;
+  status: ServiceStatus;
+  verdict: string;
+  impact: string | null;
   replicas: { running: number; desired: number; max: number };
   resources: {
     cpuRequest: string;
@@ -43,6 +50,26 @@ interface NodePoolInfo {
   instanceType: string;
 }
 
+interface JvbExtendedStats {
+  largestConference: number | null;
+  rttAggregateMs: number | null;
+  jitterAggregateMs: number | null;
+  lossRateDownload: number | null;
+  lossRateUpload: number | null;
+  endpointsSendingAudio: number | null;
+  endpointsSendingVideo: number | null;
+  totalConferencesCreated: number | null;
+  iceSuccessRate: number | null;
+}
+
+interface AppProcessMetrics {
+  cpuUsagePercent: number | null;
+  memoryUsedMB: number | null;
+  heapUsedMB: number | null;
+  eventLoopLagMs: number | null;
+  uptimeHours: number | null;
+}
+
 export interface InfraMapData {
   cluster: {
     mode: 'simple' | 'standard' | 'full' | 'unknown';
@@ -65,6 +92,9 @@ export interface InfraMapData {
     registrationsToday: number;
     upcomingCount: number;
   };
+  jvbExtended: JvbExtendedStats;
+  appMetrics: AppProcessMetrics;
+  overallVerdict: string;
   lastUpdated: string;
 }
 
@@ -89,7 +119,7 @@ async function probeService(
   }
 }
 
-async function getJvbStats(): Promise<{
+interface JvbFullStats {
   healthy: boolean;
   stressLevel: number | null;
   participants: number | null;
@@ -97,26 +127,69 @@ async function getJvbStats(): Promise<{
   videochannels: number | null;
   bitRateDown: number | null;
   bitRateUp: number | null;
-}> {
+  largestConference: number | null;
+  rttAggregateMs: number | null;
+  jitterAggregateMs: number | null;
+  lossRateDownload: number | null;
+  lossRateUpload: number | null;
+  endpointsSendingAudio: number | null;
+  endpointsSendingVideo: number | null;
+  totalConferencesCreated: number | null;
+  iceSucceeded: number | null;
+  iceFailed: number | null;
+}
+
+const EMPTY_JVB: JvbFullStats = {
+  healthy: false,
+  stressLevel: null,
+  participants: null,
+  conferences: null,
+  videochannels: null,
+  bitRateDown: null,
+  bitRateUp: null,
+  largestConference: null,
+  rttAggregateMs: null,
+  jitterAggregateMs: null,
+  lossRateDownload: null,
+  lossRateUpload: null,
+  endpointsSendingAudio: null,
+  endpointsSendingVideo: null,
+  totalConferencesCreated: null,
+  iceSucceeded: null,
+  iceFailed: null,
+};
+
+async function getJvbStats(): Promise<JvbFullStats> {
   const url = process.env.JVB_HEALTH_URL;
-  if (!url) return { healthy: false, stressLevel: null, participants: null, conferences: null, videochannels: null, bitRateDown: null, bitRateUp: null };
+  if (!url) return { ...EMPTY_JVB };
 
   try {
     const res = await fetch(`${url}/colibri/stats`, { signal: AbortSignal.timeout(3000) });
-    if (!res.ok) return { healthy: false, stressLevel: null, participants: null, conferences: null, videochannels: null, bitRateDown: null, bitRateUp: null };
+    if (!res.ok) return { ...EMPTY_JVB };
 
-    const stats = await res.json() as Record<string, unknown>;
+    const s = await res.json() as Record<string, unknown>;
+    const num = (k: string) => typeof s[k] === 'number' ? s[k] as number : null;
     return {
-      healthy: stats.healthy !== false,
-      stressLevel: typeof stats.stress_level === 'number' ? stats.stress_level : null,
-      participants: typeof stats.participants === 'number' ? stats.participants : null,
-      conferences: typeof stats.conferences === 'number' ? stats.conferences : null,
-      videochannels: typeof stats.videochannels === 'number' ? stats.videochannels : null,
-      bitRateDown: typeof stats.bit_rate_download === 'number' ? stats.bit_rate_download : null,
-      bitRateUp: typeof stats.bit_rate_upload === 'number' ? stats.bit_rate_upload : null,
+      healthy: s.healthy !== false,
+      stressLevel: num('stress_level'),
+      participants: num('participants'),
+      conferences: num('conferences'),
+      videochannels: num('videochannels'),
+      bitRateDown: num('bit_rate_download'),
+      bitRateUp: num('bit_rate_upload'),
+      largestConference: num('largest_conference'),
+      rttAggregateMs: num('rtt_aggregate'),
+      jitterAggregateMs: num('jitter_aggregate'),
+      lossRateDownload: num('loss_rate_download'),
+      lossRateUpload: num('loss_rate_upload'),
+      endpointsSendingAudio: num('endpoints_sending_audio'),
+      endpointsSendingVideo: num('endpoints_sending_video'),
+      totalConferencesCreated: num('total_conferences_created'),
+      iceSucceeded: num('total_ice_succeeded'),
+      iceFailed: num('total_ice_failed'),
     };
   } catch {
-    return { healthy: false, stressLevel: null, participants: null, conferences: null, videochannels: null, bitRateDown: null, bitRateUp: null };
+    return { ...EMPTY_JVB };
   }
 }
 
@@ -143,6 +216,13 @@ async function getJibriInfo(): Promise<{
   }
 }
 
+function computeIceSuccessRate(succeeded: number | null, failed: number | null): number | null {
+  if (succeeded === null || failed === null) return null;
+  const total = succeeded + failed;
+  if (total === 0) return null;
+  return Math.round((succeeded / total) * 10000) / 100;
+}
+
 export const GET = withErrorHandling(async () => {
   const mode = inferDeploymentMode();
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN') || '';
@@ -160,6 +240,7 @@ export const GET = withErrorHandling(async () => {
     todayRegCount,
     upcomingCount,
     recordingCount,
+    appMetricsRaw,
   ] = await Promise.all([
     Promise.resolve(null),
     jitsiDomain ? probeService(`${jitsiDomain.includes('localhost') ? 'http' : 'https'}://${jitsiDomain}/external_api.js`, 5000) : Promise.resolve({ ok: false, responseMs: 0 }),
@@ -169,11 +250,15 @@ export const GET = withErrorHandling(async () => {
     prisma.registration.count({ where: { createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } } }),
     prisma.event.count({ where: { status: { in: ['PUBLISHED', 'LIVE'] }, endsAt: { gte: new Date() } } }),
     prisma.event.count({ where: { recordingUrl: { not: null } } }),
+    getAppProcessMetrics(),
   ]);
 
   let dbOk = false;
+  let dbLatencyMs = 0;
   try {
+    const dbStart = Date.now();
     await prisma.$queryRaw`SELECT 1`;
+    dbLatencyMs = Date.now() - dbStart;
     dbOk = true;
   } catch { /* noop */ }
 
@@ -186,7 +271,7 @@ export const GET = withErrorHandling(async () => {
         { status: 'PUBLISHED', startsAt: { lte: preScaleWindow }, endsAt: { gte: now } },
       ],
     },
-    select: { maxParticipants: true, participantsCanStartVideo: true },
+    select: { maxParticipants: true, participantsCanStartVideo: true, startsAt: true },
   });
 
   let jvbDesired = 0;
@@ -202,37 +287,63 @@ export const GET = withErrorHandling(async () => {
   if (soonEvents.length > 0 && jvbDesired === 0) jvbDesired = 1;
 
   const jvbRunning = jvbStats.healthy ? 1 : 0;
-  const jvbStatus: ServiceNode['status'] =
+  const jvbStatus: ServiceStatus =
     jvbDesired === 0 ? 'standby'
       : jvbRunning >= jvbDesired ? 'healthy'
         : 'scaling';
 
+  const nextEventMin = soonEvents
+    .filter(e => e.startsAt > now)
+    .map(e => Math.round((e.startsAt.getTime() - now.getTime()) / 60_000))
+    .sort((a, b) => a - b)[0] ?? null;
+
   let appHost = '';
   try { appHost = new URL(appDomain).hostname; } catch { /* */ }
+
+  const dbStatus: ServiceStatus = dbOk ? (dbLatencyMs > 1000 ? 'degraded' : 'healthy') : 'down';
+  const jitsiWebStatus: ServiceStatus = jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby';
+  const jibriStatus: ServiceStatus = jibriInfo.healthy ? 'healthy' : storageType !== 'not-configured' ? 'down' : 'standby';
+  const smtpStatus: ServiceStatus = process.env.SMTP_HOST ? 'healthy' : 'standby';
 
   const services: ServiceNode[] = [
     {
       id: 'app',
-      name: 'App (Next.js)',
+      name: 'infraMap.services.app',
+      technicalName: 'Next.js 15 / Node.js',
+      description: 'infraMap.descriptions.app',
       status: 'healthy',
+      verdict: 'infraMap.verdicts.app.healthy',
+      impact: null,
       replicas: { running: parseInt(process.env.APP_REPLICAS || '1', 10), desired: parseInt(process.env.APP_REPLICAS || '1', 10), max: parseInt(process.env.APP_MAX_REPLICAS || '4', 10) },
-      resources: { cpuRequest: '250m', memRequest: '512Mi', cpuUsage: null, memUsage: null },
+      resources: { cpuRequest: '250m', memRequest: '512Mi', cpuUsage: appMetricsRaw.cpuUsagePercent, memUsage: appMetricsRaw.memoryUsedMB },
       ports: [{ name: 'http', port: 3000, protocol: 'TCP' }],
-      metadata: { framework: 'Next.js 15', runtime: 'Node.js' },
+      metadata: { framework: 'Next.js 15', runtime: 'Node.js', uptimeHours: appMetricsRaw.uptimeHours, heapUsedMB: appMetricsRaw.heapUsedMB, eventLoopLagMs: appMetricsRaw.eventLoopLagMs },
     },
     {
       id: 'database',
-      name: 'PostgreSQL',
-      status: dbOk ? 'healthy' : 'down',
+      name: 'infraMap.services.database',
+      technicalName: 'PostgreSQL 16',
+      description: 'infraMap.descriptions.database',
+      status: dbStatus,
+      verdict: dbOk
+        ? (dbLatencyMs > 1000 ? 'infraMap.verdicts.database.degraded' : 'infraMap.verdicts.database.healthy')
+        : 'infraMap.verdicts.database.down',
+      impact: dbOk ? null : 'infraMap.impacts.database',
       replicas: { running: dbOk ? 1 : 0, desired: 1, max: 1 },
       resources: { cpuRequest: '500m', memRequest: '1Gi', cpuUsage: null, memUsage: null },
       ports: [{ name: 'postgresql', port: 5432, protocol: 'TCP' }],
-      metadata: { version: '16', type: mode === 'simple' ? 'in-cluster' : 'external' },
+      metadata: { version: '16', type: mode === 'simple' ? 'in-cluster' : 'external', latencyMs: dbLatencyMs },
     },
     {
       id: 'jitsi-web',
-      name: 'Jitsi Web',
-      status: jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby',
+      name: 'infraMap.services.jitsiWeb',
+      technicalName: 'Jitsi Meet Web',
+      description: 'infraMap.descriptions.jitsiWeb',
+      status: jitsiWebStatus,
+      verdict: jitsiProbe.ok
+        ? 'infraMap.verdicts.jitsiWeb.healthy'
+        : jitsiDomain ? 'infraMap.verdicts.jitsiWeb.down' : 'infraMap.verdicts.jitsiWeb.standby',
+      impact: jitsiWebStatus === 'down' ? 'infraMap.impacts.jitsiWeb' : null,
       replicas: { running: jitsiProbe.ok ? 1 : 0, desired: 1, max: 1 },
       resources: { cpuRequest: '100m', memRequest: '256Mi', cpuUsage: null, memUsage: null },
       ports: [{ name: 'https', port: 443, protocol: 'TCP' }],
@@ -240,8 +351,14 @@ export const GET = withErrorHandling(async () => {
     },
     {
       id: 'prosody',
-      name: 'Prosody (XMPP)',
-      status: jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby',
+      name: 'infraMap.services.prosody',
+      technicalName: 'Prosody (XMPP)',
+      description: 'infraMap.descriptions.prosody',
+      status: jitsiWebStatus,
+      verdict: jitsiProbe.ok
+        ? 'infraMap.verdicts.prosody.healthy'
+        : jitsiDomain ? 'infraMap.verdicts.prosody.down' : 'infraMap.verdicts.prosody.standby',
+      impact: jitsiWebStatus === 'down' ? 'infraMap.impacts.prosody' : null,
       replicas: { running: jitsiProbe.ok ? 1 : 0, desired: 1, max: 1 },
       resources: { cpuRequest: '100m', memRequest: '256Mi', cpuUsage: null, memUsage: null },
       ports: [
@@ -253,8 +370,14 @@ export const GET = withErrorHandling(async () => {
     },
     {
       id: 'jicofo',
-      name: 'Jicofo (Focus)',
-      status: jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby',
+      name: 'infraMap.services.jicofo',
+      technicalName: 'Jicofo (Focus Component)',
+      description: 'infraMap.descriptions.jicofo',
+      status: jitsiWebStatus,
+      verdict: jitsiProbe.ok
+        ? 'infraMap.verdicts.jicofo.healthy'
+        : jitsiDomain ? 'infraMap.verdicts.jicofo.down' : 'infraMap.verdicts.jicofo.standby',
+      impact: jitsiWebStatus === 'down' ? 'infraMap.impacts.jicofo' : null,
       replicas: { running: jitsiProbe.ok ? 1 : 0, desired: 1, max: 1 },
       resources: { cpuRequest: '100m', memRequest: '256Mi', cpuUsage: null, memUsage: null },
       ports: [{ name: 'http', port: 8888, protocol: 'TCP' }],
@@ -262,8 +385,18 @@ export const GET = withErrorHandling(async () => {
     },
     {
       id: 'jvb',
-      name: 'Video Bridge (JVB)',
+      name: 'infraMap.services.jvb',
+      technicalName: 'Jitsi Videobridge (JVB)',
+      description: 'infraMap.descriptions.jvb',
       status: jvbStatus,
+      verdict: jvbDesired === 0
+        ? 'infraMap.verdicts.jvb.standby'
+        : jvbRunning >= jvbDesired
+          ? 'infraMap.verdicts.jvb.healthy'
+          : 'infraMap.verdicts.jvb.scaling',
+      impact: jvbStatus === 'scaling' && nextEventMin !== null
+        ? 'infraMap.impacts.jvbScaling'
+        : null,
       replicas: { running: jvbRunning, desired: jvbDesired, max: maxJvb },
       resources: { cpuRequest: '1', memRequest: '2Gi', cpuUsage: null, memUsage: null },
       ports: [
@@ -275,12 +408,19 @@ export const GET = withErrorHandling(async () => {
         participants: jvbStats.participants,
         conferences: jvbStats.conferences,
         videochannels: jvbStats.videochannels,
+        nextEventMin,
       },
     },
     {
       id: 'jibri',
-      name: 'Jibri (Recording)',
-      status: jibriInfo.healthy ? 'healthy' : storageType !== 'not-configured' ? 'down' : 'standby',
+      name: 'infraMap.services.jibri',
+      technicalName: 'Jibri (Jitsi Broadcasting Infrastructure)',
+      description: 'infraMap.descriptions.jibri',
+      status: jibriStatus,
+      verdict: jibriInfo.healthy
+        ? (jibriInfo.busy ? 'infraMap.verdicts.jibri.busy' : 'infraMap.verdicts.jibri.healthy')
+        : storageType !== 'not-configured' ? 'infraMap.verdicts.jibri.down' : 'infraMap.verdicts.jibri.standby',
+      impact: jibriStatus === 'down' ? 'infraMap.impacts.jibri' : null,
       replicas: { running: jibriInfo.healthy ? 1 : 0, desired: storageType !== 'not-configured' ? 1 : 0, max: 2 },
       resources: { cpuRequest: '2', memRequest: '4Gi', cpuUsage: null, memUsage: null },
       ports: [{ name: 'api', port: 2222, protocol: 'TCP' }],
@@ -288,8 +428,14 @@ export const GET = withErrorHandling(async () => {
     },
     {
       id: 'smtp',
-      name: 'SMTP (Email)',
-      status: process.env.SMTP_HOST ? 'healthy' : 'standby',
+      name: 'infraMap.services.smtp',
+      technicalName: `SMTP (${inferEmailProvider(process.env.SMTP_HOST || '')})`,
+      description: 'infraMap.descriptions.smtp',
+      status: smtpStatus,
+      verdict: process.env.SMTP_HOST
+        ? 'infraMap.verdicts.smtp.healthy'
+        : 'infraMap.verdicts.smtp.standby',
+      impact: smtpStatus === 'standby' ? 'infraMap.impacts.smtp' : null,
       replicas: { running: process.env.SMTP_HOST ? 1 : 0, desired: 1, max: 1 },
       resources: { cpuRequest: '—', memRequest: '—', cpuUsage: null, memUsage: null },
       ports: [{ name: 'smtp', port: parseInt(process.env.SMTP_PORT || '587', 10), protocol: 'TCP' }],
@@ -338,6 +484,14 @@ export const GET = withErrorHandling(async () => {
   const bitRateDownMbps = jvbStats.bitRateDown !== null ? jvbStats.bitRateDown / 1024 : null;
   const bitRateUpMbps = jvbStats.bitRateUp !== null ? jvbStats.bitRateUp / 1024 : null;
 
+  const hasDownService = services.some(s => s.status === 'down');
+  const hasDegradedService = services.some(s => s.status === 'degraded');
+  const overallVerdict = hasDownService
+    ? 'infraMap.overallVerdicts.outage'
+    : hasDegradedService
+      ? 'infraMap.overallVerdicts.degraded'
+      : 'infraMap.overallVerdicts.operational';
+
   const data: InfraMapData = {
     cluster: {
       mode,
@@ -364,6 +518,19 @@ export const GET = withErrorHandling(async () => {
       registrationsToday: todayRegCount,
       upcomingCount,
     },
+    jvbExtended: {
+      largestConference: jvbStats.largestConference,
+      rttAggregateMs: jvbStats.rttAggregateMs,
+      jitterAggregateMs: jvbStats.jitterAggregateMs,
+      lossRateDownload: jvbStats.lossRateDownload,
+      lossRateUpload: jvbStats.lossRateUpload,
+      endpointsSendingAudio: jvbStats.endpointsSendingAudio,
+      endpointsSendingVideo: jvbStats.endpointsSendingVideo,
+      totalConferencesCreated: jvbStats.totalConferencesCreated,
+      iceSuccessRate: computeIceSuccessRate(jvbStats.iceSucceeded, jvbStats.iceFailed),
+    },
+    appMetrics: appMetricsRaw,
+    overallVerdict,
     lastUpdated: new Date().toISOString(),
   };
 

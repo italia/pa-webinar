@@ -996,25 +996,122 @@
     "bandwidthOut": "Lähtevä kaistanleveys",
     "recordings": "Tallenteet",
     "registrationsToday": "Rekisteröinnit tänään",
-    "replicas": "Replikat",
-    "cpu": "CPU-pyyntö",
-    "memory": "Muistipyyntö",
-    "ports": "Portit",
-    "stressLevel": "Kuormitustaso",
+    "replicas": "Aktiiviset instanssit",
+    "cpu": "Varattu CPU",
+    "memory": "Varattu muisti",
+    "ports": "Verkkoportit",
+    "stressLevel": "Työkuorma",
     "busyStatus": "Toimintatila",
     "type": "Tyyppi",
+    "technicalName": "Tekninen nimi",
+    "latency": "Viive",
+    "uptime": "Käyttöaika",
+    "heapUsed": "Heap-muisti",
+    "eventLoopLag": "Vastekyky",
+    "cpuUsage": "CPU-käyttö",
+    "memoryUsed": "Käytetty muisti",
+    "rtt": "Verkon edestakainen viive",
+    "jitter": "Viiveen vaihtelu",
+    "packetLoss": "Pakettihäviö",
+    "largestConference": "Suurin konferenssi",
+    "sendingAudio": "Lähettää ääntä",
+    "sendingVideo": "Lähettää videota",
+    "iceSuccess": "Onnistuneet yhteydet",
+    "totalConferences": "Konferenssit yhteensä",
     "lastUpdated": "Viimeksi päivitetty",
-    "zonePublic": "Julkinen",
-    "zoneCluster": "Kubernetes-klusteri",
-    "zoneMedia": "Media",
+    "zonePublic": "Julkinen pääsy",
+    "zoneCluster": "Alustapalvelut",
+    "zoneMedia": "Videohuone",
     "zoneRecording": "Tallennus",
-    "zoneStorage": "Tallennus",
+    "zoneStorage": "Arkisto",
+    "connData": "data",
+    "connNotifications": "ilmoitukset",
+    "connSignaling": "signalointi",
+    "connMedia": "videovirta",
+    "connRecording": "tallennus",
+    "connUpload": "lähetys",
+    "services": {
+      "app": "Verkkoportaali",
+      "database": "Tietokanta",
+      "jitsiWeb": "Videoneuvotteluhuone",
+      "prosody": "Sisäinen viestintä",
+      "jicofo": "Konferenssikoordinaattori",
+      "jvb": "Videosilta",
+      "jibri": "Videotallennus",
+      "smtp": "Sähköpostipalvelu"
+    },
+    "descriptions": {
+      "app": "Verkkosivusto, jolla pääset tapahtumiin",
+      "database": "Tapahtumien ja ilmoittautumisten tallennuspaikka",
+      "jitsiWeb": "Videoneuvottelun käyttöliittymä",
+      "prosody": "Hoitaa videopalveluiden välisen viestinnän",
+      "jicofo": "Koordinoi, kuka osallistuu kuhunkin konferenssiin",
+      "jvb": "Välittää ääntä ja videota osallistujille",
+      "jibri": "Tallentaa tapahtumien videoistunnot",
+      "smtp": "Lähettää vahvistusviestit ja muistutukset"
+    },
+    "verdicts": {
+      "app": { "healthy": "Verkkoportaali toimii oikein ja vastaa pyyntöihin." },
+      "database": {
+        "healthy": "Tietokanta vastaa oikein.",
+        "degraded": "Tietokanta vastaa, mutta tavallista hitaammin. Toiminnot voivat kestää pidempään.",
+        "down": "Tietokanta ei vastaa. Alusta ei voi toimia kunnolla."
+      },
+      "jitsiWeb": {
+        "healthy": "Videoneuvotteluhuone on tavoitettavissa ja valmis tapahtumiin.",
+        "down": "Videoneuvotteluhuone ei ole tavoitettavissa. Tapahtumia ei voi käynnistää eikä niihin voi liittyä.",
+        "standby": "Videoneuvotteluhuonetta ei ole määritetty."
+      },
+      "prosody": {
+        "healthy": "Sisäinen viestintä videopalveluiden välillä toimii oikein.",
+        "down": "Sisäinen viestintä ei ole tavoitettavissa. Videopalvelut eivät voi kommunikoida keskenään.",
+        "standby": "Viestintäpalvelua ei ole määritetty."
+      },
+      "jicofo": {
+        "healthy": "Konferenssikoordinaattori on aktiivinen ja hallitsee istuntoja.",
+        "down": "Konferenssikoordinaattori ei ole tavoitettavissa. Uusia konferensseja ei voi luoda.",
+        "standby": "Konferenssikoordinaattoria ei ole määritetty."
+      },
+      "jvb": {
+        "healthy": "Videosilta on aktiivinen ja välittää ääntä/videota osallistujille.",
+        "scaling": "Videosilta valmistautuu tulevaan tapahtumaan. Palvelimia luodaan automaattisesti.",
+        "standby": "Videosilta on valmiustilassa. Se aktivoituu automaattisesti ennen ajoitetun tapahtuman alkua."
+      },
+      "jibri": {
+        "healthy": "Tallennuspalvelu on valmis ja käytettävissä.",
+        "busy": "Tallennuspalvelu on aktiivinen ja tallentaa käynnissä olevaa istuntoa.",
+        "down": "Tallennuspalvelu ei ole tavoitettavissa. Tapahtumia ei voi tallentaa.",
+        "standby": "Videotallennusta ei ole määritetty. Tapahtumia ei tallenneta."
+      },
+      "smtp": {
+        "healthy": "Sähköpostipalvelu on määritetty ja valmis lähettämään ilmoituksia.",
+        "standby": "Sähköpostipalvelua ei ole määritetty. Vahvistusviestejä ja muistutuksia ei lähetetä."
+      }
+    },
+    "impacts": {
+      "database": "Alusta ei voi ladata tapahtumia, hallita ilmoittautumisia eikä tallentaa tietoja.",
+      "jitsiWeb": "Osallistujat eivät pääse videoneuvotteluhuoneeseen.",
+      "prosody": "Videopalvelut eivät voi kommunikoida. Konferenssit eivät toimi.",
+      "jicofo": "Uusia videoneuvotteluita ei voi luoda eikä hallita.",
+      "jvbScaling": "Videosilta aktivoituu. Tapahtuma voidaan aloittaa pian.",
+      "jibri": "Tapahtumia ei voi tallentaa. Osallistujat voivat silti liittyä ja osallistua.",
+      "smtp": "Vahvistusviestejä ja muistutuksia ei lähetetä."
+    },
+    "overallVerdicts": {
+      "operational": "Kaikki palvelut toimivat oikein. Alusta on täysin toiminnassa.",
+      "degraded": "Joissakin palveluissa on hidastumisia. Alusta toimii, mutta suorituskyky voi olla heikentynyt.",
+      "outage": "Yksi tai useampi palvelu ei ole käytettävissä. Jotkin alustan ominaisuudet eivät ehkä toimi."
+    },
+    "verdictSection": "Yhteenveto palveluiden tilasta",
+    "verdictSectionSubtitle": "Tiedot huomiota vaativista palveluista",
+    "impactLabel": "Vaikutus",
+    "noIssues": "Ongelmia ei havaittu",
     "statuses": {
       "healthy": "Toiminnassa",
       "degraded": "Hidastunut",
       "down": "Ei saatavilla",
       "standby": "Valmiustilassa",
-      "scaling": "Skaalaus"
+      "scaling": "Valmistellaan"
     }
   },
   "feedback": {

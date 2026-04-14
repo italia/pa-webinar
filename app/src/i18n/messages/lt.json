@@ -996,25 +996,122 @@
     "bandwidthOut": "Išeinantis pralaidumas",
     "recordings": "Įrašai",
     "registrationsToday": "Registracijos šiandien",
-    "replicas": "Replikos",
-    "cpu": "CPU užklausa",
-    "memory": "Atminties užklausa",
-    "ports": "Prievadai",
-    "stressLevel": "Apkrovos lygis",
+    "replicas": "Aktyvios instancijos",
+    "cpu": "Priskirtas CPU",
+    "memory": "Priskirta atmintis",
+    "ports": "Tinklo prievadai",
+    "stressLevel": "Darbo krūvis",
     "busyStatus": "Veiklos būsena",
     "type": "Tipas",
+    "technicalName": "Techninis pavadinimas",
+    "latency": "Vėlinimas",
+    "uptime": "Veikimo laikas",
+    "heapUsed": "Krūvos atmintis",
+    "eventLoopLag": "Atsako greitis",
+    "cpuUsage": "CPU naudojimas",
+    "memoryUsed": "Naudojama atmintis",
+    "rtt": "Tinklo kelionės pirmyn ir atgal laikas",
+    "jitter": "Vėlinimo variacija",
+    "packetLoss": "Paketų praradimas",
+    "largestConference": "Didžiausia konferencija",
+    "sendingAudio": "Garso siuntimas",
+    "sendingVideo": "Vaizdo siuntimas",
+    "iceSuccess": "Sėkmingi ryšiai",
+    "totalConferences": "Iš viso konferencijų",
     "lastUpdated": "Paskutinis atnaujinimas",
-    "zonePublic": "Viešas",
-    "zoneCluster": "Kubernetes klasteris",
-    "zoneMedia": "Medija",
+    "zonePublic": "Viešoji prieiga",
+    "zoneCluster": "Platformos paslaugos",
+    "zoneMedia": "Vaizdo kambarys",
     "zoneRecording": "Įrašymas",
-    "zoneStorage": "Saugykla",
+    "zoneStorage": "Archyvas",
+    "connData": "duomenys",
+    "connNotifications": "pranešimai",
+    "connSignaling": "signalizacija",
+    "connMedia": "vaizdo srautas",
+    "connRecording": "įrašymas",
+    "connUpload": "įkėlimas",
+    "services": {
+      "app": "Žiniatinklio portalas",
+      "database": "Duomenų bazė",
+      "jitsiWeb": "Vaizdo konferencijų kambarys",
+      "prosody": "Vidiniai pranešimai",
+      "jicofo": "Konferencijų koordinatorius",
+      "jvb": "Vaizdo tiltas",
+      "jibri": "Vaizdo įrašymas",
+      "smtp": "El. pašto paslauga"
+    },
+    "descriptions": {
+      "app": "Svetainė, kurioje pasiekiate renginius",
+      "database": "Kur saugomi renginiai ir registracijos",
+      "jitsiWeb": "Vaizdo konferencijų sąsaja",
+      "prosody": "Valdo vaizdo paslaugų tarpusavio ryšį",
+      "jicofo": "Koordinuoja, kas dalyvauja kiekvienoje konferencijoje",
+      "jvb": "Perduoda garsą ir vaizdą dalyviams",
+      "jibri": "Įrašo renginių vaizdo sesijas",
+      "smtp": "Siunčia patvirtinimo el. laiškus ir priminimus"
+    },
+    "verdicts": {
+      "app": { "healthy": "Žiniatinklio portalas veikia teisingai ir atsako į užklausas." },
+      "database": {
+        "healthy": "Duomenų bazė atsako teisingai.",
+        "degraded": "Duomenų bazė atsako, bet lėčiau nei įprastai. Operacijos gali užtrukti ilgiau.",
+        "down": "Duomenų bazė neatsako. Platforma negali tinkamai veikti."
+      },
+      "jitsiWeb": {
+        "healthy": "Vaizdo konferencijų kambarys pasiekiamas ir paruoštas renginiams.",
+        "down": "Vaizdo konferencijų kambarys nepasiekiamas. Negalima pradėti ar prisijungti prie renginių.",
+        "standby": "Vaizdo konferencijų kambarys nesukonfigūruotas."
+      },
+      "prosody": {
+        "healthy": "Vidiniai pranešimai tarp vaizdo paslaugų veikia teisingai.",
+        "down": "Vidiniai pranešimai nepasiekiami. Vaizdo paslaugos negali tarpusavyje bendrauti.",
+        "standby": "Pranešimų paslauga nesukonfigūruota."
+      },
+      "jicofo": {
+        "healthy": "Konferencijų koordinatorius aktyvus ir valdo sesijas.",
+        "down": "Konferencijų koordinatorius nepasiekiamas. Negalima kurti naujų konferencijų.",
+        "standby": "Konferencijų koordinatorius nesukonfigūruotas."
+      },
+      "jvb": {
+        "healthy": "Vaizdo tiltas aktyvus ir perduoda garsą/vaizdą dalyviams.",
+        "scaling": "Vaizdo tiltas ruošiasi artėjančiam renginiui. Serveriai kuriami automatiškai.",
+        "standby": "Vaizdo tiltas budėjimo režime. Automatiškai aktyvuosis prieš suplanuoto renginio pradžią."
+      },
+      "jibri": {
+        "healthy": "Įrašymo paslauga paruošta ir prieinama.",
+        "busy": "Įrašymo paslauga aktyvi ir įrašo vykstančią sesiją.",
+        "down": "Įrašymo paslauga nepasiekiama. Renginių negalima įrašyti.",
+        "standby": "Vaizdo įrašymas nesukonfigūruotas. Renginiai nebus įrašomi."
+      },
+      "smtp": {
+        "healthy": "El. pašto paslauga sukonfigūruota ir paruošta siųsti pranešimus.",
+        "standby": "El. pašto paslauga nesukonfigūruota. Patvirtinimo el. laiškai ir priminimai nebus siunčiami."
+      }
+    },
+    "impacts": {
+      "database": "Platforma negali įkelti renginių, valdyti registracijų ar išsaugoti duomenų.",
+      "jitsiWeb": "Dalyviai negali pasiekti vaizdo konferencijų kambario.",
+      "prosody": "Vaizdo paslaugos negali bendrauti. Konferencijos neveiks.",
+      "jicofo": "Negalima kurti ar valdyti naujų vaizdo konferencijų.",
+      "jvbScaling": "Vaizdo tiltas aktyvuojasi. Renginys galės prasidėti netrukus.",
+      "jibri": "Renginių negalima įrašyti. Dalyviai vis tiek gali prisijungti ir dalyvauti.",
+      "smtp": "Registracijos patvirtinimo el. laiškai ir priminimai nebus siunčiami."
+    },
+    "overallVerdicts": {
+      "operational": "Visos paslaugos veikia teisingai. Platforma visiškai veikia.",
+      "degraded": "Kai kurios paslaugos patiria sulėtėjimų. Platforma veikia, bet našumas gali būti sumažėjęs.",
+      "outage": "Viena ar daugiau paslaugų nepasiekiamos. Kai kurios platformos funkcijos gali neveikti."
+    },
+    "verdictSection": "Paslaugų būsenos santrauka",
+    "verdictSectionSubtitle": "Informacija apie paslaugas, kurioms reikia dėmesio",
+    "impactLabel": "Poveikis",
+    "noIssues": "Problemų nerasta",
     "statuses": {
       "healthy": "Veikia",
       "degraded": "Sulėtėjęs",
       "down": "Nepasiekiamas",
       "standby": "Budėjimo režimas",
-      "scaling": "Mastelio keitimas"
+      "scaling": "Ruošiamasi"
     }
   },
   "feedback": {

@@ -996,25 +996,122 @@
     "bandwidthOut": "Väljaminev ribalaius",
     "recordings": "Salvestused",
     "registrationsToday": "Registreerimised täna",
-    "replicas": "Koopiad",
-    "cpu": "CPU päring",
-    "memory": "Mälu päring",
-    "ports": "Pordid",
-    "stressLevel": "Koormuse tase",
+    "replicas": "Aktiivsed instantsid",
+    "cpu": "Eraldatud CPU",
+    "memory": "Eraldatud mälu",
+    "ports": "Võrgupordid",
+    "stressLevel": "Töökoormus",
     "busyStatus": "Tegevuse olek",
     "type": "Tüüp",
+    "technicalName": "Tehniline nimi",
+    "latency": "Latentsus",
+    "uptime": "Tööaeg",
+    "heapUsed": "Kuhjamälu",
+    "eventLoopLag": "Reageerimisvõime",
+    "cpuUsage": "CPU kasutus",
+    "memoryUsed": "Kasutatud mälu",
+    "rtt": "Võrgu edasi-tagasi aeg",
+    "jitter": "Latentsuse kõikumine",
+    "packetLoss": "Pakettide kadu",
+    "largestConference": "Suurim konverents",
+    "sendingAudio": "Heli saatmine",
+    "sendingVideo": "Video saatmine",
+    "iceSuccess": "Edukad ühendused",
+    "totalConferences": "Konverentse kokku",
     "lastUpdated": "Viimati uuendatud",
-    "zonePublic": "Avalik",
-    "zoneCluster": "Kubernetese klaster",
-    "zoneMedia": "Meedia",
+    "zonePublic": "Avalik juurdepääs",
+    "zoneCluster": "Platvormiteenused",
+    "zoneMedia": "Videoruum",
     "zoneRecording": "Salvestamine",
-    "zoneStorage": "Salvestusruum",
+    "zoneStorage": "Arhiiv",
+    "connData": "andmed",
+    "connNotifications": "teavitused",
+    "connSignaling": "signaaliedastus",
+    "connMedia": "videovoog",
+    "connRecording": "salvestamine",
+    "connUpload": "üleslaadimine",
+    "services": {
+      "app": "Veebiportaal",
+      "database": "Andmebaas",
+      "jitsiWeb": "Videokonverentsi ruum",
+      "prosody": "Sisemine sõnumivahetus",
+      "jicofo": "Konverentside koordinaator",
+      "jvb": "Videosild",
+      "jibri": "Videosalvestus",
+      "smtp": "E-posti teenus"
+    },
+    "descriptions": {
+      "app": "Veebileht, kust pääsete sündmustele ligi",
+      "database": "Koht, kus sündmused ja registreerimised on salvestatud",
+      "jitsiWeb": "Videokonverentsi liides",
+      "prosody": "Haldab videoteenuste vahelist suhtlust",
+      "jicofo": "Koordineerib, kes osaleb igas konverentsis",
+      "jvb": "Edastab heli ja videot osalejatele",
+      "jibri": "Salvestab sündmuste videoseansse",
+      "smtp": "Saadab kinnitusmeile ja meeldetuletusi"
+    },
+    "verdicts": {
+      "app": { "healthy": "Veebiportaal töötab korrektselt ja vastab päringutele." },
+      "database": {
+        "healthy": "Andmebaas vastab korrektselt.",
+        "degraded": "Andmebaas vastab, kuid aeglasemalt kui tavaliselt. Toimingud võivad kauem aega võtta.",
+        "down": "Andmebaas ei vasta. Platvorm ei saa korrektselt toimida."
+      },
+      "jitsiWeb": {
+        "healthy": "Videokonverentsi ruum on kättesaadav ja sündmusteks valmis.",
+        "down": "Videokonverentsi ruum ei ole kättesaadav. Sündmusi ei saa alustada ega nendega liituda.",
+        "standby": "Videokonverentsi ruum ei ole seadistatud."
+      },
+      "prosody": {
+        "healthy": "Sisemine sõnumivahetus videoteenuste vahel töötab korrektselt.",
+        "down": "Sisemine sõnumivahetus ei ole kättesaadav. Videoteenused ei saa omavahel suhelda.",
+        "standby": "Sõnumivahetusteenus ei ole seadistatud."
+      },
+      "jicofo": {
+        "healthy": "Konverentside koordinaator on aktiivne ja haldab seansse.",
+        "down": "Konverentside koordinaator ei ole kättesaadav. Uusi konverentse ei saa luua.",
+        "standby": "Konverentside koordinaator ei ole seadistatud."
+      },
+      "jvb": {
+        "healthy": "Videosild on aktiivne ja edastab heli/videot osalejatele.",
+        "scaling": "Videosild valmistub eelseisvaks sündmuseks. Servereid luuakse automaatselt.",
+        "standby": "Videosild on ooterežiimis. See aktiveerub automaatselt enne planeeritud sündmuse algust."
+      },
+      "jibri": {
+        "healthy": "Salvestusteenus on valmis ja saadaval.",
+        "busy": "Salvestusteenus on aktiivne ja salvestab käimasolevat seanssi.",
+        "down": "Salvestusteenus ei ole kättesaadav. Sündmusi ei saa salvestada.",
+        "standby": "Videosalvestus ei ole seadistatud. Sündmusi ei salvestata."
+      },
+      "smtp": {
+        "healthy": "E-posti teenus on seadistatud ja valmis teavituste saatmiseks.",
+        "standby": "E-posti teenus ei ole seadistatud. Kinnitusmeile ja meeldetuletusi ei saadeta."
+      }
+    },
+    "impacts": {
+      "database": "Platvorm ei saa laadida sündmusi, hallata registreerimisi ega andmeid salvestada.",
+      "jitsiWeb": "Osalejad ei pääse videokonverentsi ruumile ligi.",
+      "prosody": "Videoteenused ei saa suhelda. Konverentsid ei tööta.",
+      "jicofo": "Uusi videokonverentse ei saa luua ega hallata.",
+      "jvbScaling": "Videosild aktiveerub. Sündmus saab peagi alata.",
+      "jibri": "Sündmusi ei saa salvestada. Osalejad saavad endiselt liituda ja osaleda.",
+      "smtp": "Registreerimise kinnitusmeile ja meeldetuletusi ei saadeta."
+    },
+    "overallVerdicts": {
+      "operational": "Kõik teenused töötavad korrektselt. Platvorm on täielikult töökorras.",
+      "degraded": "Mõned teenused on aeglustunud. Platvorm töötab, kuid jõudlus võib olla vähenenud.",
+      "outage": "Üks või mitu teenust ei ole saadaval. Mõned platvormi funktsioonid ei pruugi töötada."
+    },
+    "verdictSection": "Teenuste oleku kokkuvõte",
+    "verdictSectionSubtitle": "Üksikasjad tähelepanu vajavate teenuste kohta",
+    "impactLabel": "Mõju",
+    "noIssues": "Probleeme ei tuvastatud",
     "statuses": {
       "healthy": "Töökorras",
       "degraded": "Aeglustatud",
       "down": "Pole saadaval",
       "standby": "Ooterežiimis",
-      "scaling": "Skaleerimine"
+      "scaling": "Ettevalmistus"
     }
   },
   "feedback": {

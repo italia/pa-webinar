@@ -996,25 +996,122 @@
     "bandwidthOut": "Utgående bandbredd",
     "recordings": "Inspelningar",
     "registrationsToday": "Registreringar idag",
-    "replicas": "Repliker",
-    "cpu": "CPU-begäran",
-    "memory": "Minnesbegäran",
-    "ports": "Portar",
-    "stressLevel": "Belastningsnivå",
+    "replicas": "Aktiva instanser",
+    "cpu": "Tilldelad CPU",
+    "memory": "Tilldelat minne",
+    "ports": "Nätverksportar",
+    "stressLevel": "Arbetsbelastning",
     "busyStatus": "Aktivitetsstatus",
     "type": "Typ",
+    "technicalName": "Tekniskt namn",
+    "latency": "Latens",
+    "uptime": "Drifttid",
+    "heapUsed": "Heap-minne",
+    "eventLoopLag": "Responsivitet",
+    "cpuUsage": "CPU-användning",
+    "memoryUsed": "Använt minne",
+    "rtt": "Nätverkets rundturstid",
+    "jitter": "Latensvariation",
+    "packetLoss": "Paketförlust",
+    "largestConference": "Största konferens",
+    "sendingAudio": "Sänder ljud",
+    "sendingVideo": "Sänder video",
+    "iceSuccess": "Lyckade anslutningar",
+    "totalConferences": "Totalt antal konferenser",
     "lastUpdated": "Senast uppdaterad",
-    "zonePublic": "Publik",
-    "zoneCluster": "Kubernetes-kluster",
-    "zoneMedia": "Media",
+    "zonePublic": "Publik åtkomst",
+    "zoneCluster": "Plattformstjänster",
+    "zoneMedia": "Videorum",
     "zoneRecording": "Inspelning",
-    "zoneStorage": "Lagring",
+    "zoneStorage": "Arkiv",
+    "connData": "data",
+    "connNotifications": "aviseringar",
+    "connSignaling": "signalering",
+    "connMedia": "videoström",
+    "connRecording": "inspelning",
+    "connUpload": "uppladdning",
+    "services": {
+      "app": "Webbportal",
+      "database": "Databas",
+      "jitsiWeb": "Videokonferensrum",
+      "prosody": "Intern meddelandehantering",
+      "jicofo": "Konferenskoordinator",
+      "jvb": "Videobrygga",
+      "jibri": "Videoinspelning",
+      "smtp": "E-posttjänst"
+    },
+    "descriptions": {
+      "app": "Webbplatsen där du kommer åt evenemang",
+      "database": "Där evenemang och anmälningar lagras",
+      "jitsiWeb": "Videokonferensgränssnittet",
+      "prosody": "Hanterar kommunikation mellan videotjänster",
+      "jicofo": "Koordinerar vem som deltar i varje konferens",
+      "jvb": "Överför ljud och video till deltagare",
+      "jibri": "Spelar in videosessioner av evenemang",
+      "smtp": "Skickar bekräftelsemeddelanden och påminnelser"
+    },
+    "verdicts": {
+      "app": { "healthy": "Webbportalen fungerar korrekt och svarar på förfrågningar." },
+      "database": {
+        "healthy": "Databasen svarar korrekt.",
+        "degraded": "Databasen svarar, men långsammare än vanligt. Operationer kan ta längre tid.",
+        "down": "Databasen svarar inte. Plattformen kan inte fungera korrekt."
+      },
+      "jitsiWeb": {
+        "healthy": "Videokonferensrummet är nåbart och redo för evenemang.",
+        "down": "Videokonferensrummet är inte nåbart. Det går inte att starta eller ansluta till evenemang.",
+        "standby": "Videokonferensrummet är inte konfigurerat."
+      },
+      "prosody": {
+        "healthy": "Intern meddelandehantering mellan videotjänster fungerar korrekt.",
+        "down": "Intern meddelandehantering är inte nåbar. Videotjänster kan inte kommunicera med varandra.",
+        "standby": "Meddelandetjänsten är inte konfigurerad."
+      },
+      "jicofo": {
+        "healthy": "Konferenskoordinatorn är aktiv och hanterar sessioner.",
+        "down": "Konferenskoordinatorn är inte nåbar. Det går inte att skapa nya konferenser.",
+        "standby": "Konferenskoordinatorn är inte konfigurerad."
+      },
+      "jvb": {
+        "healthy": "Videobryggan är aktiv och överför ljud/video till deltagare.",
+        "scaling": "Videobryggan förbereder sig för ett kommande evenemang. Servrar skapas automatiskt.",
+        "standby": "Videobryggan är i standby. Den aktiveras automatiskt innan ett schemalagt evenemang börjar."
+      },
+      "jibri": {
+        "healthy": "Inspelningstjänsten är redo och tillgänglig.",
+        "busy": "Inspelningstjänsten är aktiv och spelar in en pågående session.",
+        "down": "Inspelningstjänsten är inte nåbar. Evenemang kan inte spelas in.",
+        "standby": "Videoinspelning är inte konfigurerad. Evenemang kommer inte att spelas in."
+      },
+      "smtp": {
+        "healthy": "E-posttjänsten är konfigurerad och redo att skicka aviseringar.",
+        "standby": "E-posttjänsten är inte konfigurerad. Bekräftelsemeddelanden och påminnelser kommer inte att skickas."
+      }
+    },
+    "impacts": {
+      "database": "Plattformen kan inte ladda evenemang, hantera anmälningar eller spara data.",
+      "jitsiWeb": "Deltagare kan inte komma åt videokonferensrummet.",
+      "prosody": "Videotjänster kan inte kommunicera. Konferenser fungerar inte.",
+      "jicofo": "Det går inte att skapa eller hantera nya videokonferenser.",
+      "jvbScaling": "Videobryggan aktiveras. Evenemanget kommer att kunna startas inom kort.",
+      "jibri": "Evenemang kan inte spelas in. Deltagare kan fortfarande ansluta och delta.",
+      "smtp": "Bekräftelsemeddelanden och påminnelser skickas inte."
+    },
+    "overallVerdicts": {
+      "operational": "Alla tjänster fungerar korrekt. Plattformen är fullt operativ.",
+      "degraded": "Vissa tjänster upplever fördröjningar. Plattformen är operativ men prestandan kan vara nedsatt.",
+      "outage": "En eller flera tjänster är otillgängliga. Vissa plattformsfunktioner kanske inte fungerar."
+    },
+    "verdictSection": "Sammanfattning av tjänsternas status",
+    "verdictSectionSubtitle": "Detaljer om tjänster som kräver uppmärksamhet",
+    "impactLabel": "Påverkan",
+    "noIssues": "Inga problem upptäckta",
     "statuses": {
       "healthy": "Driftsklar",
       "degraded": "Försämrad",
       "down": "Otillgänglig",
       "standby": "Standby",
-      "scaling": "Skalning"
+      "scaling": "Förbereder"
     }
   },
   "feedback": {
