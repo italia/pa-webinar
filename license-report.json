@@ -93,18 +93,6 @@
     "repository": "https://github.com/Azure/azure-sdk-for-js",
     "publisher": "Microsoft Corporation"
   },
-  "@babel/code-frame@7.29.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/babel/babel",
-    "publisher": "The Babel Team",
-    "url": "https://babel.dev/team"
-  },
-  "@babel/helper-validator-identifier@7.28.5": {
-    "licenses": "MIT",
-    "repository": "https://github.com/babel/babel",
-    "publisher": "The Babel Team",
-    "url": "https://babel.dev/team"
-  },
   "@babel/runtime@7.29.2": {
     "licenses": "MIT",
     "repository": "https://github.com/babel/babel",
@@ -333,11 +321,6 @@
     "repository": "https://github.com/open-telemetry/opentelemetry-js",
     "publisher": "OpenTelemetry Authors"
   },
-  "@oxc-project/types@0.124.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/oxc-project/oxc",
-    "publisher": "Boshen and oxc contributors"
-  },
   "@parcel/watcher@2.5.6": {
     "licenses": "MIT",
     "repository": "https://github.com/parcel-bundler/watcher"
@@ -417,10 +400,6 @@
     "publisher": "Jason Quense",
     "email": "monastic.panic@gmail.com"
   },
-  "@rolldown/pluginutils@1.0.0-rc.15": {
-    "licenses": "MIT",
-    "repository": "https://github.com/rolldown/rolldown"
-  },
   "@rolldown/pluginutils@1.0.0-rc.7": {
     "licenses": "MIT",
     "repository": "https://github.com/rolldown/rolldown"
@@ -478,13 +457,6 @@
     "publisher": "강동윤",
     "email": "kdy1997.dev@gmail.com"
   },
-  "@testing-library/dom@10.4.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/testing-library/dom-testing-library",
-    "publisher": "Kent C. Dodds",
-    "email": "me@kentcdodds.com",
-    "url": "https://kentcdodds.com"
-  },
   "@testing-library/jest-dom@6.9.1": {
     "licenses": "MIT",
     "repository": "https://github.com/testing-library/jest-dom",
@@ -498,10 +470,6 @@
     "publisher": "Kent C. Dodds",
     "email": "me@kentcdodds.com",
     "url": "https://kentcdodds.com"
-  },
-  "@types/aria-query@5.0.4": {
-    "licenses": "MIT",
-    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
   "@types/bootstrap@5.2.10": {
     "licenses": "MIT",
@@ -693,26 +661,12 @@
     "publisher": "Julian Garnier",
     "email": "hello@julian.gr"
   },
-  "ansi-regex@5.0.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/chalk/ansi-regex",
-    "publisher": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "sindresorhus.com"
-  },
   "ansi-styles@4.3.0": {
     "licenses": "MIT",
     "repository": "https://github.com/chalk/ansi-styles",
     "publisher": "Sindre Sorhus",
     "email": "sindresorhus@gmail.com",
     "url": "sindresorhus.com"
-  },
-  "ansi-styles@5.2.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/chalk/ansi-styles",
-    "publisher": "Sindre Sorhus",
-    "email": "sindresorhus@gmail.com",
-    "url": "https://sindresorhus.com"
   },
   "argparse@2.0.1": {
     "licenses": "Python-2.0",
@@ -1117,10 +1071,6 @@
   "doctrine@2.1.0": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/eslint/doctrine"
-  },
-  "dom-accessibility-api@0.5.16": {
-    "licenses": "MIT",
-    "repository": "https://github.com/eps1lon/dom-accessibility-api"
   },
   "dom-accessibility-api@0.6.3": {
     "licenses": "MIT",
@@ -1950,10 +1900,6 @@
     "publisher": "George Zahariev",
     "email": "z@georgezahariev.com"
   },
-  "lightningcss@1.32.0": {
-    "licenses": "MPL-2.0",
-    "repository": "https://github.com/parcel-bundler/lightningcss"
-  },
   "locate-path@6.0.0": {
     "licenses": "MIT",
     "repository": "https://github.com/sindresorhus/locate-path",
@@ -1984,12 +1930,6 @@
     "repository": "https://github.com/isaacs/node-lru-cache",
     "publisher": "Isaac Z. Schlueter",
     "email": "i@izs.me"
-  },
-  "lz-string@1.5.0": {
-    "licenses": "MIT",
-    "repository": "https://github.com/pieroxy/lz-string",
-    "publisher": "pieroxy",
-    "email": "pieroxy@pieroxy.net"
   },
   "m3u8-parser@7.2.0": {
     "licenses": "Apache-2.0",
@@ -2345,12 +2285,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/preactjs/preact"
   },
-  "preact@8.5.3": {
-    "licenses": "MIT",
-    "repository": "https://github.com/developit/preact",
-    "publisher": "Jason Miller",
-    "email": "jason@developit.ca"
-  },
   "prelude-ls@1.2.1": {
     "licenses": "MIT",
     "repository": "https://github.com/gkz/prelude-ls",
@@ -2361,12 +2295,6 @@
     "licenses": "MIT",
     "repository": "https://github.com/prettier/prettier",
     "publisher": "James Long"
-  },
-  "pretty-format@27.5.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/facebook/jest",
-    "publisher": "James Kyle",
-    "email": "me@thejameskyle.com"
   },
   "prisma@6.19.3": {
     "licenses": "Apache-2.0",
@@ -2441,10 +2369,6 @@
     "publisher": "Chris Bolin"
   },
   "react-is@16.13.1": {
-    "licenses": "MIT",
-    "repository": "https://github.com/facebook/react"
-  },
-  "react-is@17.0.2": {
     "licenses": "MIT",
     "repository": "https://github.com/facebook/react"
   },
@@ -2543,10 +2467,6 @@
     "repository": "https://github.com/mcollina/reusify",
     "publisher": "Matteo Collina",
     "email": "hello@matteocollina.com"
-  },
-  "rolldown@1.0.0-rc.15": {
-    "licenses": "MIT",
-    "repository": "https://github.com/rolldown/rolldown"
   },
   "rollup@4.60.1": {
     "licenses": "MIT",
@@ -3015,11 +2935,6 @@
     "email": "anthonyfu117@hotmail.com"
   },
   "vite@7.3.2": {
-    "licenses": "MIT",
-    "repository": "https://github.com/vitejs/vite",
-    "publisher": "Evan You"
-  },
-  "vite@8.0.8": {
     "licenses": "MIT",
     "repository": "https://github.com/vitejs/vite",
     "publisher": "Evan You"
