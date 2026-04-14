@@ -1,10 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
 import { Icon } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 
 interface NavItem {
   href: string;
@@ -39,19 +38,41 @@ export default function AdminNav() {
   const pathname = usePathname();
 
   const stripped = pathname.replace(/^\/[a-z]{2}/, '');
-  const inEvents = stripped.startsWith('/admin/events') || stripped.startsWith('/admin/calendar');
-  const inSettings = stripped.startsWith('/admin/settings') || stripped.startsWith('/admin/infrastructure') || stripped.startsWith('/admin/monitoring');
+  const inEvents = stripped.startsWith('/admin/events') || stripped.startsWith('/admin/eventi')
+    || stripped.startsWith('/admin/calendar') || stripped.startsWith('/admin/calendario');
+  const inSettings = stripped.startsWith('/admin/settings') || stripped.startsWith('/admin/impostazioni')
+    || stripped.startsWith('/admin/infrastructure') || stripped.startsWith('/admin/infrastruttura')
+    || stripped.startsWith('/admin/monitoring');
+
+  const PATH_ALIASES: Record<string, string[]> = {
+    '/admin/events': ['/admin/events', '/admin/eventi'],
+    '/admin/events/new': ['/admin/events/new', '/admin/eventi/nuovo'],
+    '/admin/events/calls': ['/admin/events/calls'],
+    '/admin/events/template': ['/admin/events/template'],
+    '/admin/events/statistics': ['/admin/events/statistics', '/admin/eventi/statistiche'],
+    '/admin/calendar': ['/admin/calendar', '/admin/calendario'],
+    '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
+    '/admin/settings/languages': ['/admin/settings/languages', '/admin/impostazioni/lingue'],
+    '/admin/infrastructure': ['/admin/infrastructure', '/admin/infrastruttura'],
+    '/admin/monitoring': ['/admin/monitoring'],
+  };
+
+  function matchesPath(href: string, exact?: boolean): boolean {
+    const aliases = PATH_ALIASES[href] || [href];
+    if (exact) return aliases.some((a) => stripped === a);
+    return aliases.some((a) => stripped.startsWith(a));
+  }
 
   function isActive(item: NavItem): boolean {
-    if (item.exact) return stripped === item.href;
+    if (item.exact) return matchesPath(item.href, true);
     if (item.href === '/admin/events' && !item.exact) return inEvents;
     if (item.href === '/admin/settings') return inSettings;
-    return stripped.startsWith(item.href);
+    return matchesPath(item.href);
   }
 
   function isSubActive(item: NavItem): boolean {
-    if (item.exact) return stripped === item.href;
-    return stripped.startsWith(item.href);
+    if (item.exact) return matchesPath(item.href, true);
+    return matchesPath(item.href);
   }
 
   const subNav = inEvents ? EVENTS_SUB_NAV : inSettings ? SETTINGS_SUB_NAV : null;
