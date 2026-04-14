@@ -996,25 +996,122 @@
     "bandwidthOut": "Bandwidth ħiereġ",
     "recordings": "Reġistrazzjonijiet",
     "registrationsToday": "Reġistrazzjonijiet illum",
-    "replicas": "Repliki",
-    "cpu": "Talba CPU",
-    "memory": "Talba tal-memorja",
-    "ports": "Portijiet",
-    "stressLevel": "Livell tat-tagħbija",
+    "replicas": "Istanzi attivi",
+    "cpu": "CPU allokat",
+    "memory": "Memorja allokata",
+    "ports": "Portijiet tan-netwerk",
+    "stressLevel": "Tagħbija tax-xogħol",
     "busyStatus": "Status tal-attività",
     "type": "Tip",
+    "technicalName": "Isem tekniku",
+    "latency": "Latenza",
+    "uptime": "Uptime",
+    "heapUsed": "Memorja heap",
+    "eventLoopLag": "Responsività",
+    "cpuUsage": "Użu tal-CPU",
+    "memoryUsed": "Memorja użata",
+    "rtt": "Round-trip time tan-netwerk",
+    "jitter": "Varjazzjoni fil-latenza",
+    "packetLoss": "Telf ta' pakketti",
+    "largestConference": "L-akbar konferenza",
+    "sendingAudio": "Qed jibgħat l-awdjo",
+    "sendingVideo": "Qed jibgħat il-vidjo",
+    "iceSuccess": "Konnessjonijiet b'suċċess",
+    "totalConferences": "Konferenzi totali",
     "lastUpdated": "Aħħar aġġornament",
-    "zonePublic": "Pubbliku",
-    "zoneCluster": "Cluster Kubernetes",
-    "zoneMedia": "Midja",
+    "zonePublic": "Aċċess pubbliku",
+    "zoneCluster": "Servizzi tal-pjattaforma",
+    "zoneMedia": "Sala tal-vidjo",
     "zoneRecording": "Reġistrazzjoni",
-    "zoneStorage": "Ħażna",
+    "zoneStorage": "Arkivju",
+    "connData": "dejta",
+    "connNotifications": "notifiki",
+    "connSignaling": "sinjalar",
+    "connMedia": "stream tal-vidjo",
+    "connRecording": "reġistrazzjoni",
+    "connUpload": "upload",
+    "services": {
+      "app": "Portal web",
+      "database": "Database",
+      "jitsiWeb": "Sala tal-vidjokonferenza",
+      "prosody": "Messaġġistika interna",
+      "jicofo": "Koordinatur tal-konferenzi",
+      "jvb": "Pont tal-vidjo",
+      "jibri": "Reġistrazzjoni tal-vidjo",
+      "smtp": "Servizz tal-email"
+    },
+    "descriptions": {
+      "app": "Is-sit fejn taċċessa l-avvenimenti",
+      "database": "Fejn jinħażnu l-avvenimenti u r-reġistrazzjonijiet",
+      "jitsiWeb": "L-interfaċċja tal-vidjokonferenza",
+      "prosody": "Jimmaniġġja l-komunikazzjoni bejn is-servizzi tal-vidjo",
+      "jicofo": "Jikkoordina min jipparteċipa f'kull konferenza",
+      "jvb": "Jittrażmetti l-awdjo u l-vidjo lill-parteċipanti",
+      "jibri": "Jirreġistra s-sessjonijiet tal-vidjo tal-avvenimenti",
+      "smtp": "Jibgħat emails ta' konferma u tfakkiriet"
+    },
+    "verdicts": {
+      "app": { "healthy": "Il-portal web qed jaħdem korrettament u qed iwieġeb għat-talbiet." },
+      "database": {
+        "healthy": "Id-database qed twieġeb korrettament.",
+        "degraded": "Id-database qed twieġeb, iżda aktar bil-mod minn tas-soltu. L-operazzjonijiet jistgħu jieħdu aktar ħin.",
+        "down": "Id-database mhijiex qed twieġeb. Il-pjattaforma ma tistax taħdem sew."
+      },
+      "jitsiWeb": {
+        "healthy": "Is-sala tal-vidjokonferenza hija aċċessibbli u lesta għall-avvenimenti.",
+        "down": "Is-sala tal-vidjokonferenza mhijiex aċċessibbli. Mhuwiex possibbli tibda jew tidħol fl-avvenimenti.",
+        "standby": "Is-sala tal-vidjokonferenza mhijiex ikkonfigurata."
+      },
+      "prosody": {
+        "healthy": "Il-messaġġistika interna bejn is-servizzi tal-vidjo qed taħdem korrettament.",
+        "down": "Il-messaġġistika interna mhijiex aċċessibbli. Is-servizzi tal-vidjo ma jistgħux jikkomunikaw ma' xulxin.",
+        "standby": "Is-servizz tal-messaġġistika mhuwiex ikkonfigurat."
+      },
+      "jicofo": {
+        "healthy": "Il-koordinatur tal-konferenzi huwa attiv u qed jimmaniġġja s-sessjonijiet.",
+        "down": "Il-koordinatur tal-konferenzi mhuwiex aċċessibbli. Mhuwiex possibbli toħloq konferenzi ġodda.",
+        "standby": "Il-koordinatur tal-konferenzi mhuwiex ikkonfigurat."
+      },
+      "jvb": {
+        "healthy": "Il-pont tal-vidjo huwa attiv u qed jittrażmetti l-awdjo/vidjo lill-parteċipanti.",
+        "scaling": "Il-pont tal-vidjo qed jipprepara għal avveniment li ġej. Is-servers qed jinħolqu awtomatikament.",
+        "standby": "Il-pont tal-vidjo huwa standby. Se jiġi attivat awtomatikament qabel ma jibda avveniment skedat."
+      },
+      "jibri": {
+        "healthy": "Is-servizz tar-reġistrazzjoni huwa lest u disponibbli.",
+        "busy": "Is-servizz tar-reġistrazzjoni huwa attiv u qed jirreġistra sessjoni għaddejja.",
+        "down": "Is-servizz tar-reġistrazzjoni mhuwiex aċċessibbli. L-avvenimenti ma jistgħux jiġu rreġistrati.",
+        "standby": "Ir-reġistrazzjoni tal-vidjo mhijiex ikkonfigurata. L-avvenimenti mhux se jiġu rreġistrati."
+      },
+      "smtp": {
+        "healthy": "Is-servizz tal-email huwa kkonfigurat u lest biex jibgħat in-notifiki.",
+        "standby": "Is-servizz tal-email mhuwiex ikkonfigurat. L-emails ta' konferma u t-tfakkiriet mhux se jintbagħtu."
+      }
+    },
+    "impacts": {
+      "database": "Il-pjattaforma ma tistax tgħabbi l-avvenimenti, timmaniġġja r-reġistrazzjonijiet, jew tissejvja d-dejta.",
+      "jitsiWeb": "Il-parteċipanti ma jistgħux jaċċessaw is-sala tal-vidjokonferenza.",
+      "prosody": "Is-servizzi tal-vidjo ma jistgħux jikkomunikaw. Il-konferenzi mhux se jaħdmu.",
+      "jicofo": "Mhuwiex possibbli toħloq jew timmaniġġja vidjokonferenzi ġodda.",
+      "jvbScaling": "Il-pont tal-vidjo qed jiġi attivat. L-avveniment se jkun jista' jibda dalwaqt.",
+      "jibri": "L-avvenimenti ma jistgħux jiġu rreġistrati. Il-parteċipanti jistgħu xorta jipparteċipaw.",
+      "smtp": "L-emails ta' konferma tar-reġistrazzjoni u t-tfakkiriet mhux se jintbagħtu."
+    },
+    "overallVerdicts": {
+      "operational": "Is-servizzi kollha qed jaħdmu korrettament. Il-pjattaforma hija kompletament operattiva.",
+      "degraded": "Xi servizzi qed jesperjenzaw dewmien. Il-pjattaforma hija operattiva iżda l-prestazzjoni tista' tkun imnaqqsa.",
+      "outage": "Servizz wieħed jew aktar mhumiex disponibbli. Xi funzjonalitajiet tal-pjattaforma jistgħu ma jaħdmux."
+    },
+    "verdictSection": "Sommarju tal-istatus tas-servizzi",
+    "verdictSectionSubtitle": "Dettalji dwar is-servizzi li jeħtieġu attenzjoni",
+    "impactLabel": "Impatt",
+    "noIssues": "L-ebda problemi identifikati",
     "statuses": {
       "healthy": "Operattiv",
       "degraded": "Imnaqqas",
       "down": "Mhux disponibbli",
       "standby": "Standby",
-      "scaling": "Skalar"
+      "scaling": "Qed jipprepara"
     }
   },
   "feedback": {

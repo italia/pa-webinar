@@ -996,25 +996,124 @@
     "bandwidthOut": "Przepustowość wychodząca",
     "recordings": "Nagrania",
     "registrationsToday": "Rejestracje dzisiaj",
-    "replicas": "Repliki",
-    "cpu": "Żądanie CPU",
-    "memory": "Żądanie pamięci",
-    "ports": "Porty",
-    "stressLevel": "Poziom obciążenia",
+    "replicas": "Aktywne instancje",
+    "cpu": "Przydzielone CPU",
+    "memory": "Przydzielona pamięć",
+    "ports": "Porty sieciowe",
+    "stressLevel": "Obciążenie",
     "busyStatus": "Status aktywności",
     "type": "Typ",
+    "technicalName": "Nazwa techniczna",
+    "latency": "Opóźnienie",
+    "uptime": "Czas działania",
+    "heapUsed": "Pamięć sterty",
+    "eventLoopLag": "Responsywność",
+    "cpuUsage": "Użycie CPU",
+    "memoryUsed": "Użyta pamięć",
+    "rtt": "Czas podróży w obie strony",
+    "jitter": "Zmienność opóźnienia",
+    "packetLoss": "Utrata pakietów",
+    "largestConference": "Największa konferencja",
+    "sendingAudio": "Wysyłanie audio",
+    "sendingVideo": "Wysyłanie wideo",
+    "iceSuccess": "Udane połączenia",
+    "totalConferences": "Łączna liczba konferencji",
     "lastUpdated": "Ostatnia aktualizacja",
-    "zonePublic": "Publiczny",
-    "zoneCluster": "Klaster Kubernetes",
-    "zoneMedia": "Media",
+    "zonePublic": "Dostęp publiczny",
+    "zoneCluster": "Usługi platformy",
+    "zoneMedia": "Sala wideo",
     "zoneRecording": "Nagrywanie",
-    "zoneStorage": "Magazyn",
+    "zoneStorage": "Archiwum",
+    "connData": "dane",
+    "connNotifications": "powiadomienia",
+    "connSignaling": "sygnalizacja",
+    "connMedia": "strumień wideo",
+    "connRecording": "nagrywanie",
+    "connUpload": "przesyłanie",
+    "services": {
+      "app": "Portal internetowy",
+      "database": "Baza danych",
+      "jitsiWeb": "Sala wideokonferencyjna",
+      "prosody": "Wewnętrzna komunikacja",
+      "jicofo": "Koordynator konferencji",
+      "jvb": "Most wideo",
+      "jibri": "Nagrywanie wideo",
+      "smtp": "Usługa e-mail"
+    },
+    "descriptions": {
+      "app": "Strona internetowa, na której uzyskujesz dostęp do wydarzeń",
+      "database": "Miejsce przechowywania wydarzeń i rejestracji",
+      "jitsiWeb": "Interfejs wideokonferencji",
+      "prosody": "Zarządza komunikacją między usługami wideo",
+      "jicofo": "Koordynuje uczestnictwo w poszczególnych konferencjach",
+      "jvb": "Przesyła audio i wideo do uczestników",
+      "jibri": "Nagrywa sesje wideo wydarzeń",
+      "smtp": "Wysyła e-maile z potwierdzeniami i przypomnienia"
+    },
+    "verdicts": {
+      "app": {
+        "healthy": "Portal internetowy działa prawidłowo i odpowiada na żądania."
+      },
+      "database": {
+        "healthy": "Baza danych odpowiada prawidłowo.",
+        "degraded": "Baza danych odpowiada, ale wolniej niż zwykle. Operacje mogą trwać dłużej.",
+        "down": "Baza danych nie odpowiada. Platforma nie może działać prawidłowo."
+      },
+      "jitsiWeb": {
+        "healthy": "Sala wideokonferencyjna jest dostępna i gotowa na wydarzenia.",
+        "down": "Sala wideokonferencyjna jest niedostępna. Nie można rozpoczynać ani dołączać do wydarzeń.",
+        "standby": "Sala wideokonferencyjna nie jest skonfigurowana."
+      },
+      "prosody": {
+        "healthy": "Wewnętrzna komunikacja między usługami wideo działa prawidłowo.",
+        "down": "Wewnętrzna komunikacja jest niedostępna. Usługi wideo nie mogą się ze sobą komunikować.",
+        "standby": "Usługa komunikacji nie jest skonfigurowana."
+      },
+      "jicofo": {
+        "healthy": "Koordynator konferencji jest aktywny i zarządza sesjami.",
+        "down": "Koordynator konferencji jest niedostępny. Nie można tworzyć nowych konferencji.",
+        "standby": "Koordynator konferencji nie jest skonfigurowany."
+      },
+      "jvb": {
+        "healthy": "Most wideo jest aktywny i przesyła audio/wideo do uczestników.",
+        "scaling": "Most wideo przygotowuje się do nadchodzącego wydarzenia. Serwery są tworzone automatycznie.",
+        "standby": "Most wideo jest w trybie gotowości. Aktywuje się automatycznie przed rozpoczęciem zaplanowanego wydarzenia."
+      },
+      "jibri": {
+        "healthy": "Usługa nagrywania jest gotowa i dostępna.",
+        "busy": "Usługa nagrywania jest aktywna i nagrywa trwającą sesję.",
+        "down": "Usługa nagrywania jest niedostępna. Nie można nagrywać wydarzeń.",
+        "standby": "Nagrywanie wideo nie jest skonfigurowane. Wydarzenia nie będą nagrywane."
+      },
+      "smtp": {
+        "healthy": "Usługa e-mail jest skonfigurowana i gotowa do wysyłania powiadomień.",
+        "standby": "Usługa e-mail nie jest skonfigurowana. E-maile z potwierdzeniami i przypomnienia nie będą wysyłane."
+      }
+    },
+    "impacts": {
+      "database": "Platforma nie może ładować wydarzeń, zarządzać rejestracjami ani zapisywać danych.",
+      "jitsiWeb": "Uczestnicy nie mogą uzyskać dostępu do sali wideokonferencyjnej.",
+      "prosody": "Usługi wideo nie mogą się komunikować. Konferencje nie będą działać.",
+      "jicofo": "Nie można tworzyć ani zarządzać nowymi wideokonferencjami.",
+      "jvbScaling": "Most wideo się aktywuje. Wydarzenie będzie mogło rozpocząć się wkrótce.",
+      "jibri": "Nie można nagrywać wydarzeń. Uczestnicy mogą nadal dołączać i uczestniczyć.",
+      "smtp": "E-maile z potwierdzeniami rejestracji i przypomnienia nie będą wysyłane."
+    },
+    "overallVerdicts": {
+      "operational": "Wszystkie usługi działają prawidłowo. Platforma jest w pełni operacyjna.",
+      "degraded": "Niektóre usługi doświadczają spowolnień. Platforma jest operacyjna, ale wydajność może być obniżona.",
+      "outage": "Jedna lub więcej usług jest niedostępnych. Niektóre funkcje platformy mogą nie działać."
+    },
+    "verdictSection": "Podsumowanie stanu usług",
+    "verdictSectionSubtitle": "Szczegóły dotyczące usług wymagających uwagi",
+    "impactLabel": "Wpływ",
+    "noIssues": "Nie wykryto problemów",
     "statuses": {
       "healthy": "Sprawny",
       "degraded": "Spowolniony",
       "down": "Niedostępny",
       "standby": "W gotowości",
-      "scaling": "Skalowanie"
+      "scaling": "Przygotowywanie"
     }
   },
   "feedback": {

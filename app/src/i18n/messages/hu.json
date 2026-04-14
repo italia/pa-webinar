@@ -996,25 +996,122 @@
     "bandwidthOut": "Kimenő sávszélesség",
     "recordings": "Felvételek",
     "registrationsToday": "Mai regisztrációk",
-    "replicas": "Replikák",
-    "cpu": "CPU igény",
-    "memory": "Memória igény",
-    "ports": "Portok",
-    "stressLevel": "Terhelési szint",
+    "replicas": "Aktív példányok",
+    "cpu": "Lefoglalt CPU",
+    "memory": "Lefoglalt memória",
+    "ports": "Hálózati portok",
+    "stressLevel": "Terhelés",
     "busyStatus": "Tevékenységi állapot",
     "type": "Típus",
+    "technicalName": "Technikai név",
+    "latency": "Késleltetés",
+    "uptime": "Üzemidő",
+    "heapUsed": "Halommemória",
+    "eventLoopLag": "Válaszképesség",
+    "cpuUsage": "CPU-használat",
+    "memoryUsed": "Felhasznált memória",
+    "rtt": "Hálózati oda-vissza idő",
+    "jitter": "Késleltetés-ingadozás",
+    "packetLoss": "Csomagvesztés",
+    "largestConference": "Legnagyobb konferencia",
+    "sendingAudio": "Hangküldés",
+    "sendingVideo": "Videóküldés",
+    "iceSuccess": "Sikeres kapcsolatok",
+    "totalConferences": "Összes konferencia",
     "lastUpdated": "Utolsó frissítés",
-    "zonePublic": "Nyilvános",
-    "zoneCluster": "Kubernetes klaszter",
-    "zoneMedia": "Média",
+    "zonePublic": "Nyilvános hozzáférés",
+    "zoneCluster": "Platform szolgáltatások",
+    "zoneMedia": "Videószoba",
     "zoneRecording": "Felvétel",
-    "zoneStorage": "Tárolás",
+    "zoneStorage": "Archívum",
+    "connData": "adatok",
+    "connNotifications": "értesítések",
+    "connSignaling": "jelzés",
+    "connMedia": "videó stream",
+    "connRecording": "felvétel",
+    "connUpload": "feltöltés",
+    "services": {
+      "app": "Webportál",
+      "database": "Adatbázis",
+      "jitsiWeb": "Videokonferencia-szoba",
+      "prosody": "Belső üzenetkezelés",
+      "jicofo": "Konferencia-koordinátor",
+      "jvb": "Videóhíd",
+      "jibri": "Videófelvétel",
+      "smtp": "E-mail szolgáltatás"
+    },
+    "descriptions": {
+      "app": "A weboldal, ahol az eseményekhez hozzáfér",
+      "database": "Az események és regisztrációk tárolóhelye",
+      "jitsiWeb": "A videokonferencia felülete",
+      "prosody": "A videószolgáltatások közötti kommunikációt kezeli",
+      "jicofo": "Koordinálja, ki vesz részt az egyes konferenciákon",
+      "jvb": "Hangot és videót továbbít a résztvevőknek",
+      "jibri": "Az események videófelvételeit készíti",
+      "smtp": "Visszaigazoló e-maileket és emlékeztetőket küld"
+    },
+    "verdicts": {
+      "app": { "healthy": "A webportál megfelelően működik és válaszol a kérésekre." },
+      "database": {
+        "healthy": "Az adatbázis megfelelően válaszol.",
+        "degraded": "Az adatbázis válaszol, de a szokásosnál lassabban. A műveletek tovább tarthatnak.",
+        "down": "Az adatbázis nem válaszol. A platform nem tud megfelelően működni."
+      },
+      "jitsiWeb": {
+        "healthy": "A videokonferencia-szoba elérhető és készen áll az eseményekre.",
+        "down": "A videokonferencia-szoba nem elérhető. Nem lehet eseményeket indítani vagy csatlakozni hozzájuk.",
+        "standby": "A videokonferencia-szoba nincs konfigurálva."
+      },
+      "prosody": {
+        "healthy": "A videószolgáltatások közötti belső üzenetkezelés megfelelően működik.",
+        "down": "A belső üzenetkezelés nem elérhető. A videószolgáltatások nem tudnak egymással kommunikálni.",
+        "standby": "Az üzenetkezelő szolgáltatás nincs konfigurálva."
+      },
+      "jicofo": {
+        "healthy": "A konferencia-koordinátor aktív és kezeli a munkameneteket.",
+        "down": "A konferencia-koordinátor nem elérhető. Nem lehet új konferenciákat létrehozni.",
+        "standby": "A konferencia-koordinátor nincs konfigurálva."
+      },
+      "jvb": {
+        "healthy": "A videóhíd aktív, és hangot/videót továbbít a résztvevőknek.",
+        "scaling": "A videóhíd előkészül egy közelgő eseményre. A szerverek automatikusan létrejönnek.",
+        "standby": "A videóhíd készenléti módban van. Automatikusan aktiválódik egy tervezett esemény kezdete előtt."
+      },
+      "jibri": {
+        "healthy": "A felvételi szolgáltatás készen áll és elérhető.",
+        "busy": "A felvételi szolgáltatás aktív, és egy folyamatban lévő munkamenetet rögzít.",
+        "down": "A felvételi szolgáltatás nem elérhető. Az eseményeket nem lehet rögzíteni.",
+        "standby": "A videófelvétel nincs konfigurálva. Az események nem kerülnek rögzítésre."
+      },
+      "smtp": {
+        "healthy": "Az e-mail szolgáltatás konfigurálva van és készen áll az értesítések küldésére.",
+        "standby": "Az e-mail szolgáltatás nincs konfigurálva. A visszaigazoló e-mailek és emlékeztetők nem kerülnek elküldésre."
+      }
+    },
+    "impacts": {
+      "database": "A platform nem tudja betölteni az eseményeket, kezelni a regisztrációkat, vagy menteni az adatokat.",
+      "jitsiWeb": "A résztvevők nem férhetnek hozzá a videokonferencia-szobához.",
+      "prosody": "A videószolgáltatások nem tudnak kommunikálni. A konferenciák nem fognak működni.",
+      "jicofo": "Nem lehet új videokonferenciákat létrehozni vagy kezelni.",
+      "jvbScaling": "A videóhíd aktiválódik. Az esemény hamarosan elindítható lesz.",
+      "jibri": "Az eseményeket nem lehet rögzíteni. A résztvevők továbbra is csatlakozhatnak és részt vehetnek.",
+      "smtp": "A regisztrációs visszaigazoló e-mailek és emlékeztetők nem kerülnek elküldésre."
+    },
+    "overallVerdicts": {
+      "operational": "Minden szolgáltatás megfelelően működik. A platform teljesen üzemképes.",
+      "degraded": "Egyes szolgáltatások lassulást tapasztalnak. A platform működik, de a teljesítmény csökkent lehet.",
+      "outage": "Egy vagy több szolgáltatás nem elérhető. A platform egyes funkciói nem működhetnek."
+    },
+    "verdictSection": "Szolgáltatások állapotának összegzése",
+    "verdictSectionSubtitle": "Figyelmet igénylő szolgáltatások részletei",
+    "impactLabel": "Hatás",
+    "noIssues": "Nem észleltünk problémát",
     "statuses": {
       "healthy": "Működik",
       "degraded": "Lassult",
       "down": "Nem elérhető",
       "standby": "Készenlétben",
-      "scaling": "Skálázás"
+      "scaling": "Előkészítés"
     }
   },
   "feedback": {

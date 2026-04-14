@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge } from 'design-react-kit';
+import { Alert, Badge } from 'design-react-kit';
 
 import type { InfraMapData } from '@/app/api/status/infrastructure/route';
 
@@ -40,49 +40,61 @@ const SERVICE_ICONS: Record<string, string> = {
 
 interface Pos { x: number; y: number }
 
-const NODE_W = 120;
-const NODE_H = 68;
+const NODE_W = 160;
+const NODE_H = 80;
 
 const LAYOUT: Record<string, Pos> = {
-  app:         { x: 200, y: 200 },
-  'jitsi-web': { x: 480, y: 130 },
-  prosody:     { x: 480, y: 270 },
-  jicofo:      { x: 640, y: 200 },
-  jvb:         { x: 800, y: 180 },
-  jibri:       { x: 800, y: 330 },
-  database:    { x: 200, y: 370 },
-  smtp:        { x: 370, y: 400 },
+  app:         { x: 220, y: 210 },
+  'jitsi-web': { x: 500, y: 140 },
+  prosody:     { x: 500, y: 290 },
+  jicofo:      { x: 680, y: 215 },
+  jvb:         { x: 860, y: 190 },
+  jibri:       { x: 860, y: 350 },
+  database:    { x: 220, y: 390 },
+  smtp:        { x: 390, y: 420 },
 };
 
 const FIXED_POS: Record<string, Pos> = {
-  'endpoint-app':   { x: 50, y: 170 },
-  'endpoint-jitsi': { x: 50, y: 260 },
-  'endpoint-media': { x: 960, y: 130 },
-  storage:          { x: 960, y: 330 },
+  'endpoint-app':   { x: 55, y: 180 },
+  'endpoint-jitsi': { x: 55, y: 275 },
+  'endpoint-media': { x: 1060, y: 140 },
+  storage:          { x: 1060, y: 350 },
 };
 
-const CONNECTIONS: { from: string; to: string; label?: string; dashed?: boolean }[] = [
-  { from: 'endpoint-app', to: 'app', label: 'HTTPS :443' },
-  { from: 'endpoint-jitsi', to: 'jitsi-web', label: 'HTTPS :443' },
-  { from: 'app', to: 'database', label: 'TCP :5432' },
-  { from: 'app', to: 'smtp', label: 'SMTP', dashed: true },
-  { from: 'jitsi-web', to: 'prosody', label: 'BOSH :5280' },
-  { from: 'prosody', to: 'jicofo', label: 'XMPP' },
-  { from: 'prosody', to: 'jvb', label: 'XMPP' },
-  { from: 'prosody', to: 'jibri', label: 'XMPP', dashed: true },
-  { from: 'jicofo', to: 'jvb', label: 'Colibri :8080' },
-  { from: 'endpoint-media', to: 'jvb', label: 'UDP :10000' },
-  { from: 'jibri', to: 'storage', label: 'Upload', dashed: true },
+type ConnDef = { from: string; to: string; labelKey: string; dashed?: boolean };
+
+const CONNECTIONS: ConnDef[] = [
+  { from: 'endpoint-app', to: 'app', labelKey: 'connData' },
+  { from: 'endpoint-jitsi', to: 'jitsi-web', labelKey: 'connData' },
+  { from: 'app', to: 'database', labelKey: 'connData' },
+  { from: 'app', to: 'smtp', labelKey: 'connNotifications', dashed: true },
+  { from: 'jitsi-web', to: 'prosody', labelKey: 'connSignaling' },
+  { from: 'prosody', to: 'jicofo', labelKey: 'connSignaling' },
+  { from: 'prosody', to: 'jvb', labelKey: 'connSignaling' },
+  { from: 'prosody', to: 'jibri', labelKey: 'connRecording', dashed: true },
+  { from: 'jicofo', to: 'jvb', labelKey: 'connMedia' },
+  { from: 'endpoint-media', to: 'jvb', labelKey: 'connMedia' },
+  { from: 'jibri', to: 'storage', labelKey: 'connUpload', dashed: true },
 ];
 
 function pos(id: string): Pos {
-  return FIXED_POS[id] ?? LAYOUT[id] ?? { x: 400, y: 300 };
+  return FIXED_POS[id] ?? LAYOUT[id] ?? { x: 500, y: 300 };
 }
 
 function formatMbps(mbps: number | null): string {
   if (mbps === null) return '—';
   if (mbps < 1) return `${(mbps * 1024).toFixed(0)} Kbps`;
   return `${mbps.toFixed(1)} Mbps`;
+}
+
+function resolveI18nKey(t: ReturnType<typeof useTranslations<'infraMap'>>, key: string): string {
+  const prefix = 'infraMap.';
+  const lookupKey = key.startsWith(prefix) ? key.slice(prefix.length) : key;
+  try {
+    return t(lookupKey as Parameters<typeof t>[0]);
+  } catch {
+    return key;
+  }
 }
 
 function SvgIcon({ path, x, y, size, fill, opacity = 1 }: {
@@ -139,8 +151,8 @@ export default function InfrastructureMap() {
     [data, selected],
   );
 
-  const W = 1040;
-  const H = 480;
+  const W = 1150;
+  const H = 500;
 
   if (!data && !error) {
     return (
@@ -166,8 +178,17 @@ export default function InfrastructureMap() {
     );
   };
 
+  const issueServices = data?.services.filter(s =>
+    s.status === 'down' || s.status === 'degraded' || s.status === 'standby' || s.status === 'scaling',
+  ) ?? [];
+
   return (
     <div className="infra-map">
+      {/* Overall status banner */}
+      {data && (
+        <OverallBanner verdict={data.overallVerdict} t={t} />
+      )}
+
       {/* Stats bar */}
       {data && (
         <div className="infra-map__stats-bar">
@@ -196,20 +217,20 @@ export default function InfrastructureMap() {
           </defs>
 
           {/* Zone backgrounds */}
-          <rect x="10" y="75" width="130" height="240" rx="12" fill="#F0F4F8" opacity="0.5" />
+          <rect x="10" y="75" width="130" height="250" rx="12" fill="#F0F4F8" opacity="0.5" />
           <text x="75" y="93" textAnchor="middle" className="infra-map__zone-label">{t('zonePublic')}</text>
 
-          <rect x="150" y="75" width="530" height="370" rx="12" fill="#F8FAFE" opacity="0.4" />
-          <text x="415" y="93" textAnchor="middle" className="infra-map__zone-label">{t('zoneCluster')}</text>
+          <rect x="150" y="75" width="580" height="390" rx="12" fill="#F8FAFE" opacity="0.4" />
+          <text x="440" y="93" textAnchor="middle" className="infra-map__zone-label">{t('zoneCluster')}</text>
 
-          <rect x="720" y="75" width="160" height="180" rx="12" fill="#F2FFF5" opacity="0.4" />
-          <text x="800" y="93" textAnchor="middle" className="infra-map__zone-label">{t('zoneMedia')}</text>
+          <rect x="770" y="75" width="200" height="190" rx="12" fill="#F2FFF5" opacity="0.4" />
+          <text x="870" y="93" textAnchor="middle" className="infra-map__zone-label">{t('zoneMedia')}</text>
 
-          <rect x="720" y="275" width="160" height="120" rx="12" fill="#FFF8F0" opacity="0.4" />
-          <text x="800" y="293" textAnchor="middle" className="infra-map__zone-label">{t('zoneRecording')}</text>
+          <rect x="770" y="285" width="200" height="140" rx="12" fill="#FFF8F0" opacity="0.4" />
+          <text x="870" y="303" textAnchor="middle" className="infra-map__zone-label">{t('zoneRecording')}</text>
 
-          <rect x="900" y="275" width="130" height="120" rx="12" fill="#F5F0FF" opacity="0.4" />
-          <text x="965" y="293" textAnchor="middle" className="infra-map__zone-label">{t('zoneStorage')}</text>
+          <rect x="990" y="285" width="150" height="140" rx="12" fill="#F5F0FF" opacity="0.4" />
+          <text x="1065" y="303" textAnchor="middle" className="infra-map__zone-label">{t('zoneStorage')}</text>
 
           {/* Connection lines */}
           {data && CONNECTIONS.map((c) => {
@@ -233,14 +254,14 @@ export default function InfrastructureMap() {
 
                 {hasTraffic && (
                   <>
-                    <circle r="3" fill={c.label?.includes('UDP') ? '#008758' : '#0066CC'} opacity="0.8">
+                    <circle r="3" fill={c.labelKey === 'connMedia' ? '#008758' : '#0066CC'} opacity="0.8">
                       <animateMotion
                         dur={`${getAnimDur(key)}s`}
                         repeatCount="indefinite"
                         path={`M${f.x},${f.y} L${t2.x},${t2.y}`}
                       />
                     </circle>
-                    <circle r="2" fill={c.label?.includes('UDP') ? '#008758' : '#0066CC'} opacity="0.5">
+                    <circle r="2" fill={c.labelKey === 'connMedia' ? '#008758' : '#0066CC'} opacity="0.5">
                       <animateMotion
                         dur={`${getAnimDur(key) + 0.7}s`}
                         repeatCount="indefinite"
@@ -251,25 +272,32 @@ export default function InfrastructureMap() {
                   </>
                 )}
 
-                {c.label && hi && (
+                {hi && (
                   <>
-                    <rect
-                      x={(f.x + t2.x) / 2 - c.label.length * 3.2}
-                      y={(f.y + t2.y) / 2 - 18}
-                      width={c.label.length * 6.4}
-                      height="14"
-                      rx="3"
-                      fill="#fff"
-                      opacity="0.9"
-                    />
-                    <text
-                      x={(f.x + t2.x) / 2}
-                      y={(f.y + t2.y) / 2 - 8}
-                      textAnchor="middle"
-                      className="infra-map__conn-label"
-                    >
-                      {c.label}
-                    </text>
+                    {(() => {
+                      const label = t(c.labelKey as Parameters<typeof t>[0]);
+                      return (
+                        <>
+                          <rect
+                            x={(f.x + t2.x) / 2 - label.length * 3.2}
+                            y={(f.y + t2.y) / 2 - 18}
+                            width={label.length * 6.4}
+                            height="14"
+                            rx="3"
+                            fill="#fff"
+                            opacity="0.9"
+                          />
+                          <text
+                            x={(f.x + t2.x) / 2}
+                            y={(f.y + t2.y) / 2 - 8}
+                            textAnchor="middle"
+                            className="infra-map__conn-label"
+                          >
+                            {label}
+                          </text>
+                        </>
+                      );
+                    })()}
                   </>
                 )}
               </g>
@@ -278,7 +306,7 @@ export default function InfrastructureMap() {
 
           {/* Public endpoints */}
           {data?.endpoints.filter(e => e.service !== 'jvb').map((ep, i) => {
-            const p = { x: 50, y: 170 + i * 90 };
+            const p = { x: 55, y: 180 + i * 95 };
             const epId = `endpoint-${ep.service === 'app' ? 'app' : 'jitsi'}`;
             return (
               <g
@@ -290,7 +318,7 @@ export default function InfrastructureMap() {
                 <rect x={p.x - 40} y={p.y - 22} width="80" height="44" rx="22" fill="#E3F2FD" stroke={isHighlighted(epId) ? '#0066CC' : '#90CAF9'} strokeWidth={isHighlighted(epId) ? 2 : 1} />
                 <SvgIcon path={SERVICE_ICONS.globe!} x={p.x - 10} y={p.y - 10} size={20} fill="#0066CC" />
                 <text x={p.x} y={p.y + 34} textAnchor="middle" className="infra-map__endpoint-label">
-                  :{ep.port} {ep.protocol}
+                  {ep.protocol}
                 </text>
               </g>
             );
@@ -309,7 +337,7 @@ export default function InfrastructureMap() {
                 <rect x={mp.x - 40} y={mp.y - 22} width="80" height="44" rx="22" fill="#E8F5E9" stroke={isHighlighted('endpoint-media') ? '#008758' : '#A5D6A7'} strokeWidth={isHighlighted('endpoint-media') ? 2 : 1} />
                 <SvgIcon path={SERVICE_ICONS.globe!} x={mp.x - 10} y={mp.y - 10} size={20} fill="#008758" />
                 <text x={mp.x} y={mp.y + 34} textAnchor="middle" className="infra-map__endpoint-label">
-                  UDP :{ep.port}
+                  {ep.protocol}
                 </text>
               </g>
             );
@@ -320,13 +348,13 @@ export default function InfrastructureMap() {
             const sp = FIXED_POS.storage!;
             return (
               <g>
-                <rect x={sp.x - 50} y={sp.y - 28} width="100" height="56" rx="10" fill="#F3E5F5" stroke="#9C27B0" strokeWidth="1.2" filter="url(#infraShadow)" />
+                <rect x={sp.x - 55} y={sp.y - 30} width="110" height="60" rx="10" fill="#F3E5F5" stroke="#9C27B0" strokeWidth="1.2" filter="url(#infraShadow)" />
                 <SvgIcon path={SERVICE_ICONS.storage!} x={sp.x - 10} y={sp.y - 18} size={18} fill="#7B1FA2" />
-                <text x={sp.x} y={sp.y + 4} textAnchor="middle" className="infra-map__node-label-sm">
-                  {data.storage.type === 'not-configured' ? 'N/A' : data.storage.type}
+                <text x={sp.x} y={sp.y + 6} textAnchor="middle" className="infra-map__node-label-sm">
+                  {t('zoneStorage')}
                 </text>
-                <text x={sp.x} y={sp.y + 17} textAnchor="middle" className="infra-map__node-sublabel">
-                  {data.storage.recordings.count} rec
+                <text x={sp.x} y={sp.y + 20} textAnchor="middle" className="infra-map__node-sublabel">
+                  {data.storage.recordings.count} rec · {data.storage.type === 'not-configured' ? 'N/A' : data.storage.type}
                 </text>
               </g>
             );
@@ -342,6 +370,8 @@ export default function InfrastructureMap() {
             const iconPath = SERVICE_ICONS[svc.id] ?? SERVICE_ICONS.app ?? '';
             const halfW = NODE_W / 2;
             const halfH = NODE_H / 2;
+            const svcName = resolveI18nKey(t, svc.name);
+            const svcDesc = resolveI18nKey(t, svc.description);
 
             return (
               <g
@@ -352,19 +382,17 @@ export default function InfrastructureMap() {
                 style={{ cursor: 'pointer' }}
                 role="button"
                 tabIndex={0}
-                aria-label={`${svc.name}: ${svc.status}`}
+                aria-label={`${svcName}: ${t(`statuses.${svc.status}` as Parameters<typeof t>[0])}`}
               >
-                {/* Pulse ring for active healthy services */}
                 {svc.status === 'healthy' && data.traffic.totalParticipants > 0 && (
-                  <circle cx={p.x} cy={p.y} r="42" fill="none" stroke={sc} strokeWidth="1.5" opacity="0">
-                    <animate attributeName="r" values="35;52;35" dur="2.5s" repeatCount="indefinite" />
+                  <circle cx={p.x} cy={p.y} r="50" fill="none" stroke={sc} strokeWidth="1.5" opacity="0">
+                    <animate attributeName="r" values="42;58;42" dur="2.5s" repeatCount="indefinite" />
                     <animate attributeName="opacity" values="0.5;0;0.5" dur="2.5s" repeatCount="indefinite" />
                   </circle>
                 )}
 
-                {/* Scaling dashed ring */}
                 {svc.status === 'scaling' && (
-                  <circle cx={p.x} cy={p.y} r="42" fill="none" stroke="#0066CC" strokeWidth="2" strokeDasharray="8 5" opacity="0.6">
+                  <circle cx={p.x} cy={p.y} r="50" fill="none" stroke="#0066CC" strokeWidth="2" strokeDasharray="8 5" opacity="0.6">
                     <animateTransform
                       attributeName="transform"
                       type="rotate"
@@ -376,41 +404,47 @@ export default function InfrastructureMap() {
                   </circle>
                 )}
 
-                {/* Card background */}
                 <rect
                   x={p.x - halfW} y={p.y - halfH}
                   width={NODE_W} height={NODE_H}
-                  rx="12"
+                  rx="14"
                   fill={bg}
                   stroke={sc}
                   strokeWidth={hi ? 2.5 : 1.2}
                   filter="url(#infraShadow)"
                 />
 
-                {/* Status dot (animated blink when healthy + traffic) */}
-                <circle cx={p.x - halfW + 14} cy={p.y - halfH + 14} r="4" fill={sc}>
+                {/* Status dot */}
+                <circle cx={p.x - halfW + 16} cy={p.y - halfH + 16} r="5" fill={sc}>
                   {svc.status === 'healthy' && data.traffic.totalParticipants > 0 && (
                     <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
                   )}
                 </circle>
 
                 {/* Service icon */}
-                <SvgIcon path={iconPath} x={p.x - halfW + 6} y={p.y - 6} size={16} fill={sc} opacity={0.6} />
+                <SvgIcon path={iconPath} x={p.x - halfW + 8} y={p.y - 6} size={16} fill={sc} opacity={0.6} />
 
-                {/* Name */}
-                <text x={p.x - halfW + 28} y={p.y - 4} className="infra-map__node-label">
-                  {svc.name.length > 16 ? svc.name.substring(0, 15) + '…' : svc.name}
+                {/* Name - full, no truncation */}
+                <text x={p.x - halfW + 30} y={p.y - 8} className="infra-map__node-label">
+                  {svcName}
                 </text>
 
-                {/* Replicas text */}
-                <text x={p.x - halfW + 28} y={p.y + 10} className="infra-map__node-sublabel">
-                  {svc.replicas.running}/{svc.replicas.max} replicas
-                </text>
+                {/* Description tooltip on hover */}
+                {hi && (
+                  <text x={p.x - halfW + 30} y={p.y + 6} className="infra-map__node-sublabel" style={{ fontSize: '8px' }}>
+                    {svcDesc.length > 40 ? svcDesc.substring(0, 39) + '…' : svcDesc}
+                  </text>
+                )}
+                {!hi && (
+                  <text x={p.x - halfW + 30} y={p.y + 6} className="infra-map__node-sublabel">
+                    {t(`statuses.${svc.status}` as Parameters<typeof t>[0])}
+                  </text>
+                )}
 
                 {/* Replica bars */}
-                {Array.from({ length: Math.min(svc.replicas.max, 8) }).map((_, i) => {
-                  const bx = p.x - halfW + 8 + i * 13;
-                  const by = p.y + halfH - 10;
+                {Array.from({ length: Math.min(svc.replicas.max, 10) }).map((_, i) => {
+                  const bx = p.x - halfW + 10 + i * 14;
+                  const by = p.y + halfH - 12;
                   const isRunning = i < svc.replicas.running;
                   const isDesired = i < svc.replicas.desired;
                   const barFill = isRunning ? sc : isDesired ? '#FFB74D' : '#E0E0E0';
@@ -435,7 +469,7 @@ export default function InfrastructureMap() {
 
           {/* Node pools (bottom) */}
           {data?.nodePools.map((pool, i) => {
-            const px = 220 + i * 260;
+            const px = 250 + i * 280;
             const py = H - 28;
             const pc = pool.status === 'active' ? '#008758'
               : pool.status === 'scaling' ? '#A66300'
@@ -444,9 +478,9 @@ export default function InfrastructureMap() {
 
             return (
               <g key={pool.name}>
-                <rect x={px - 85} y={py - 16} width="170" height="32" rx="6" fill="#FAFAFA" stroke={pc} strokeWidth="1" />
-                <SvgIcon path={SERVICE_ICONS.server!} x={px - 78} y={py - 8} size={16} fill={pc} />
-                <text x={px - 55} y={py + 4} className="infra-map__pool-label">{pool.name}</text>
+                <rect x={px - 90} y={py - 16} width="180" height="32" rx="6" fill="#FAFAFA" stroke={pc} strokeWidth="1" />
+                <SvgIcon path={SERVICE_ICONS.server!} x={px - 82} y={py - 8} size={16} fill={pc} />
+                <text x={px - 58} y={py + 4} className="infra-map__pool-label">{pool.name}</text>
                 <text x={px + 20} y={py + 4} className="infra-map__pool-count" fill={pc}>
                   {pool.nodeCount}/{pool.maxNodes}
                 </text>
@@ -466,8 +500,8 @@ export default function InfrastructureMap() {
           {/* Mode badge */}
           {data && (
             <g>
-              <rect x={W - 148} y="8" width="138" height="24" rx="12" fill="#E3F2FD" />
-              <text x={W - 79} y="24" textAnchor="middle" className="infra-map__mode-badge">
+              <rect x={W - 158} y="8" width="148" height="24" rx="12" fill="#E3F2FD" />
+              <text x={W - 84} y="24" textAnchor="middle" className="infra-map__mode-badge">
                 {data.cluster.mode.toUpperCase()} · {data.cluster.environment}
               </text>
             </g>
@@ -485,6 +519,30 @@ export default function InfrastructureMap() {
         />
       )}
 
+      {/* Verdict cards for non-healthy services */}
+      {data && issueServices.length > 0 && (
+        <div className="infra-map__verdicts">
+          <h6 className="infra-map__verdicts-title">{t('verdictSection')}</h6>
+          <p className="infra-map__verdicts-subtitle">{t('verdictSectionSubtitle')}</p>
+          <div className="infra-map__verdicts-grid">
+            {issueServices.map((svc) => (
+              <VerdictCard key={svc.id} service={svc} t={t} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {data && issueServices.length === 0 && (
+        <div className="infra-map__verdicts infra-map__verdicts--ok">
+          <div className="d-flex align-items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#008758" />
+            </svg>
+            <span className="fw-semibold" style={{ color: '#008758' }}>{t('noIssues')}</span>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       {data && (
         <div className="infra-map__footer">
@@ -492,7 +550,7 @@ export default function InfrastructureMap() {
             {Object.entries(STATUS_COLORS).map(([status, color]) => (
               <span key={status} className="infra-map__legend-item">
                 <span className="infra-map__legend-dot" style={{ backgroundColor: color }} />
-                {t(`statuses.${status}`)}
+                {t(`statuses.${status}` as Parameters<typeof t>[0])}
               </span>
             ))}
           </div>
@@ -503,6 +561,66 @@ export default function InfrastructureMap() {
       )}
 
       {error && <div className="infra-map__error">{t('fetchError')}</div>}
+    </div>
+  );
+}
+
+function OverallBanner({ verdict, t }: {
+  verdict: string;
+  t: ReturnType<typeof useTranslations<'infraMap'>>;
+}) {
+  const text = resolveI18nKey(t, verdict);
+  const isOk = verdict.includes('operational');
+  const isDegraded = verdict.includes('degraded');
+  const color = isOk ? 'success' : isDegraded ? 'warning' : 'danger';
+
+  return (
+    <Alert color={color} className="infra-map__banner mb-0 rounded-0 border-start-0 border-end-0 border-top-0">
+      <div className="d-flex align-items-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+          {isOk ? (
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor" />
+          ) : isDegraded ? (
+            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor" />
+          ) : (
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor" />
+          )}
+        </svg>
+        <span style={{ fontSize: '0.88rem' }}>{text}</span>
+      </div>
+    </Alert>
+  );
+}
+
+function VerdictCard({ service, t }: {
+  service: InfraMapData['services'][0];
+  t: ReturnType<typeof useTranslations<'infraMap'>>;
+}) {
+  const sc = STATUS_COLORS[service.status] ?? '#5A768A';
+  const svcName = resolveI18nKey(t, service.name);
+  const verdictText = resolveI18nKey(t, service.verdict);
+  const impactText = service.impact ? resolveI18nKey(t, service.impact) : null;
+  const iconPath = SERVICE_ICONS[service.id] ?? SERVICE_ICONS.app ?? '';
+
+  return (
+    <div className="infra-map__verdict-card" style={{ borderLeftColor: sc }}>
+      <div className="d-flex align-items-center gap-2 mb-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path d={iconPath} fill={sc} />
+        </svg>
+        <span className="fw-semibold" style={{ color: '#17324D', fontSize: '0.88rem' }}>{svcName}</span>
+        <Badge style={{ backgroundColor: sc, fontSize: '0.68rem', marginLeft: 'auto' }}>
+          {t(`statuses.${service.status}` as Parameters<typeof t>[0])}
+        </Badge>
+      </div>
+      <p className="mb-1" style={{ fontSize: '0.82rem', color: '#455A64', lineHeight: 1.4 }}>
+        {verdictText}
+      </p>
+      {impactText && (
+        <p className="mb-0" style={{ fontSize: '0.78rem', color: '#CC334D', lineHeight: 1.3 }}>
+          <strong>{t('impactLabel')}:</strong> {impactText}
+        </p>
+      )}
     </div>
   );
 }
@@ -528,6 +646,8 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
   onClose: () => void;
 }) {
   const sc = STATUS_COLORS[service.status] ?? '#5A768A';
+  const svcName = resolveI18nKey(t, service.name);
+  const verdictText = resolveI18nKey(t, service.verdict);
 
   return (
     <div className="infra-map__detail" onClick={(e) => e.stopPropagation()}>
@@ -535,24 +655,58 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
         <div>
           <h6 className="mb-0 fw-semibold d-flex align-items-center gap-2">
             <span className="rounded-circle d-inline-block" style={{ width: 10, height: 10, backgroundColor: sc }} />
-            {service.name}
+            {svcName}
           </h6>
-          <Badge style={{ backgroundColor: sc, fontSize: '0.72rem', marginTop: 4 }}>
-            {t(`statuses.${service.status}`)}
-          </Badge>
+          <div className="d-flex align-items-center gap-2 mt-1">
+            <Badge style={{ backgroundColor: sc, fontSize: '0.68rem' }}>
+              {t(`statuses.${service.status}` as Parameters<typeof t>[0])}
+            </Badge>
+            <span style={{ fontSize: '0.7rem', color: '#78909C' }}>{service.technicalName}</span>
+          </div>
         </div>
-        <button className="btn btn-sm btn-link text-muted p-0" onClick={onClose} aria-label="Close">✕</button>
+        <button className="btn btn-sm btn-link text-muted p-0" onClick={onClose} aria-label="Close">&#10005;</button>
       </div>
 
       <div className="infra-map__detail-body">
+        {/* Verdict */}
+        <p style={{ fontSize: '0.8rem', color: '#455A64', lineHeight: 1.4, marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid #f0f0f0' }}>
+          {verdictText}
+        </p>
+
         <DRow label={t('replicas')} value={`${service.replicas.running} / ${service.replicas.desired} (max ${service.replicas.max})`} />
-        <DRow label={t('cpu')} value={service.resources.cpuRequest} />
-        <DRow label={t('memory')} value={service.resources.memRequest} />
+
+        {/* Human-readable resource display */}
+        {service.resources.cpuRequest !== '—' && (
+          <DRow label={t('cpu')} value={formatCpu(service.resources.cpuRequest)} />
+        )}
+        {service.resources.memRequest !== '—' && (
+          <DRow label={t('memory')} value={formatMem(service.resources.memRequest)} />
+        )}
 
         {service.ports.length > 0 && (
           <DRow label={t('ports')} value={service.ports.map((p) => `${p.port}/${p.protocol}`).join(', ')} />
         )}
 
+        {/* App-specific metrics */}
+        {service.id === 'app' && data.appMetrics && (
+          <>
+            {data.appMetrics.cpuUsagePercent != null && <DRow label={t('cpuUsage')} value={`${data.appMetrics.cpuUsagePercent}%`} />}
+            {data.appMetrics.memoryUsedMB != null && <DRow label={t('memoryUsed')} value={`${data.appMetrics.memoryUsedMB} MB`} />}
+            {data.appMetrics.heapUsedMB != null && <DRow label={t('heapUsed')} value={`${data.appMetrics.heapUsedMB} MB`} />}
+            {data.appMetrics.eventLoopLagMs != null && <DRow label={t('eventLoopLag')} value={`${data.appMetrics.eventLoopLagMs} ms`} />}
+            {data.appMetrics.uptimeHours != null && <DRow label={t('uptime')} value={`${data.appMetrics.uptimeHours} h`} />}
+          </>
+        )}
+
+        {/* Database-specific metrics */}
+        {service.id === 'database' && (
+          <>
+            {service.metadata.type != null && <DRow label={t('type')} value={String(service.metadata.type)} />}
+            {service.metadata.latencyMs != null && <DRow label={t('latency')} value={`${service.metadata.latencyMs} ms`} />}
+          </>
+        )}
+
+        {/* JVB-specific metrics */}
         {service.id === 'jvb' && (
           <>
             {service.metadata.stressLevel !== null && service.metadata.stressLevel !== undefined && (
@@ -572,21 +726,23 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
             {service.metadata.conferences != null && <DRow label={t('conferences')} value={String(service.metadata.conferences)} />}
             {data.traffic.bandwidthInMbps != null && <DRow label={t('bandwidthIn')} value={formatMbps(data.traffic.bandwidthInMbps)} />}
             {data.traffic.bandwidthOutMbps != null && <DRow label={t('bandwidthOut')} value={formatMbps(data.traffic.bandwidthOutMbps)} />}
+
+            {/* Extended JVB metrics */}
+            {data.jvbExtended.largestConference != null && <DRow label={t('largestConference')} value={String(data.jvbExtended.largestConference)} />}
+            {data.jvbExtended.rttAggregateMs != null && <DRow label={t('rtt')} value={`${Math.round(data.jvbExtended.rttAggregateMs)} ms`} />}
+            {data.jvbExtended.jitterAggregateMs != null && <DRow label={t('jitter')} value={`${Math.round(data.jvbExtended.jitterAggregateMs)} ms`} />}
+            {data.jvbExtended.lossRateDownload != null && <DRow label={t('packetLoss')} value={`${(data.jvbExtended.lossRateDownload * 100).toFixed(1)}%`} />}
+            {data.jvbExtended.endpointsSendingAudio != null && <DRow label={t('sendingAudio')} value={String(data.jvbExtended.endpointsSendingAudio)} />}
+            {data.jvbExtended.endpointsSendingVideo != null && <DRow label={t('sendingVideo')} value={String(data.jvbExtended.endpointsSendingVideo)} />}
+            {data.jvbExtended.iceSuccessRate != null && <DRow label={t('iceSuccess')} value={`${data.jvbExtended.iceSuccessRate}%`} />}
+            {data.jvbExtended.totalConferencesCreated != null && <DRow label={t('totalConferences')} value={String(data.jvbExtended.totalConferencesCreated)} />}
           </>
         )}
 
+        {/* Jibri-specific metrics */}
         {service.id === 'jibri' && service.metadata.busyStatus != null && (
           <DRow label={t('busyStatus')} value={String(service.metadata.busyStatus)} />
         )}
-
-        {service.id === 'database' && service.metadata.type != null && (
-          <DRow label={t('type')} value={String(service.metadata.type)} />
-        )}
-
-        {Object.entries(service.metadata)
-          .filter(([k]) => !['stressLevel', 'participants', 'conferences', 'videochannels', 'busy', 'busyStatus', 'type'].includes(k))
-          .filter(([, v]) => v != null)
-          .map(([k, v]) => <DRow key={k} label={k} value={String(v)} />)}
       </div>
     </div>
   );
@@ -599,4 +755,18 @@ function DRow({ label, value }: { label: string; value: string }) {
       <span className="infra-map__detail-value">{value}</span>
     </div>
   );
+}
+
+function formatCpu(raw: string): string {
+  if (raw.endsWith('m')) {
+    const millis = parseInt(raw, 10);
+    return millis >= 1000 ? `${(millis / 1000).toFixed(1)} CPU` : `${millis / 1000} CPU`;
+  }
+  return `${raw} CPU`;
+}
+
+function formatMem(raw: string): string {
+  if (raw.endsWith('Mi')) return `${parseInt(raw, 10)} MB`;
+  if (raw.endsWith('Gi')) return `${parseFloat(raw)} GB`;
+  return raw;
 }

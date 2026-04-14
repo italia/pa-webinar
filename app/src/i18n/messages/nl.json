@@ -996,25 +996,124 @@
     "bandwidthOut": "Uitgaande bandbreedte",
     "recordings": "Opnames",
     "registrationsToday": "Registraties vandaag",
-    "replicas": "Replica's",
-    "cpu": "CPU-aanvraag",
-    "memory": "Geheugen-aanvraag",
-    "ports": "Poorten",
-    "stressLevel": "Belastingsniveau",
+    "replicas": "Actieve instanties",
+    "cpu": "Toegewezen CPU",
+    "memory": "Toegewezen geheugen",
+    "ports": "Netwerkpoorten",
+    "stressLevel": "Werklast",
     "busyStatus": "Activiteitsstatus",
     "type": "Type",
+    "technicalName": "Technische naam",
+    "latency": "Latentie",
+    "uptime": "Uptime",
+    "heapUsed": "Heap-geheugen",
+    "eventLoopLag": "Responsiviteit",
+    "cpuUsage": "CPU-gebruik",
+    "memoryUsed": "Geheugengebruik",
+    "rtt": "Netwerkrondreis",
+    "jitter": "Latentievariatie",
+    "packetLoss": "Pakketverlies",
+    "largestConference": "Grootste conferentie",
+    "sendingAudio": "Audio verzenden",
+    "sendingVideo": "Video verzenden",
+    "iceSuccess": "Geslaagde verbindingen",
+    "totalConferences": "Totaal conferenties",
     "lastUpdated": "Laatst bijgewerkt",
-    "zonePublic": "Publiek",
-    "zoneCluster": "Kubernetes-cluster",
-    "zoneMedia": "Media",
+    "zonePublic": "Publieke toegang",
+    "zoneCluster": "Platformdiensten",
+    "zoneMedia": "Videokamer",
     "zoneRecording": "Opname",
-    "zoneStorage": "Opslag",
+    "zoneStorage": "Archief",
+    "connData": "gegevens",
+    "connNotifications": "meldingen",
+    "connSignaling": "signalering",
+    "connMedia": "videostream",
+    "connRecording": "opname",
+    "connUpload": "upload",
+    "services": {
+      "app": "Webportaal",
+      "database": "Database",
+      "jitsiWeb": "Videoconferentiekamer",
+      "prosody": "Interne berichtgeving",
+      "jicofo": "Conferentiecoördinator",
+      "jvb": "Videobridge",
+      "jibri": "Video-opname",
+      "smtp": "E-maildienst"
+    },
+    "descriptions": {
+      "app": "De website waar u toegang krijgt tot evenementen",
+      "database": "Waar evenementen en inschrijvingen worden opgeslagen",
+      "jitsiWeb": "De videoconferentie-interface",
+      "prosody": "Beheert de communicatie tussen videodiensten",
+      "jicofo": "Coördineert wie deelneemt aan elke conferentie",
+      "jvb": "Verzendt audio en video naar deelnemers",
+      "jibri": "Neemt videosessies van evenementen op",
+      "smtp": "Verstuurt bevestigingsmails en herinneringen"
+    },
+    "verdicts": {
+      "app": {
+        "healthy": "Het webportaal werkt correct en reageert op verzoeken."
+      },
+      "database": {
+        "healthy": "De database reageert correct.",
+        "degraded": "De database reageert, maar langzamer dan gebruikelijk. Bewerkingen kunnen langer duren.",
+        "down": "De database reageert niet. Het platform kan niet goed functioneren."
+      },
+      "jitsiWeb": {
+        "healthy": "De videoconferentiekamer is bereikbaar en klaar voor evenementen.",
+        "down": "De videoconferentiekamer is niet bereikbaar. Het is niet mogelijk om evenementen te starten of bij te wonen.",
+        "standby": "De videoconferentiekamer is niet geconfigureerd."
+      },
+      "prosody": {
+        "healthy": "Interne berichtgeving tussen videodiensten werkt correct.",
+        "down": "Interne berichtgeving is niet bereikbaar. Videodiensten kunnen niet met elkaar communiceren.",
+        "standby": "De berichtendienst is niet geconfigureerd."
+      },
+      "jicofo": {
+        "healthy": "De conferentiecoördinator is actief en beheert sessies.",
+        "down": "De conferentiecoördinator is niet bereikbaar. Het is niet mogelijk om nieuwe conferenties aan te maken.",
+        "standby": "De conferentiecoördinator is niet geconfigureerd."
+      },
+      "jvb": {
+        "healthy": "De videobridge is actief en verzendt audio/video naar deelnemers.",
+        "scaling": "De videobridge bereidt zich voor op een aankomend evenement. Servers worden automatisch aangemaakt.",
+        "standby": "De videobridge is in stand-by. Deze wordt automatisch geactiveerd vóór de start van een gepland evenement."
+      },
+      "jibri": {
+        "healthy": "De opnamedienst is gereed en beschikbaar.",
+        "busy": "De opnamedienst is actief en neemt een lopende sessie op.",
+        "down": "De opnamedienst is niet bereikbaar. Evenementen kunnen niet worden opgenomen.",
+        "standby": "Video-opname is niet geconfigureerd. Evenementen worden niet opgenomen."
+      },
+      "smtp": {
+        "healthy": "De e-maildienst is geconfigureerd en klaar om meldingen te versturen.",
+        "standby": "De e-maildienst is niet geconfigureerd. Bevestigingsmails en herinneringen worden niet verstuurd."
+      }
+    },
+    "impacts": {
+      "database": "Het platform kan geen evenementen laden, inschrijvingen beheren of gegevens opslaan.",
+      "jitsiWeb": "Deelnemers hebben geen toegang tot de videoconferentiekamer.",
+      "prosody": "Videodiensten kunnen niet communiceren. Conferenties zullen niet werken.",
+      "jicofo": "Het is niet mogelijk om nieuwe videoconferenties aan te maken of te beheren.",
+      "jvbScaling": "De videobridge wordt geactiveerd. Het evenement kan binnenkort starten.",
+      "jibri": "Evenementen kunnen niet worden opgenomen. Deelnemers kunnen nog steeds deelnemen.",
+      "smtp": "Bevestigingsmails en herinneringen voor inschrijvingen worden niet verstuurd."
+    },
+    "overallVerdicts": {
+      "operational": "Alle diensten werken correct. Het platform is volledig operationeel.",
+      "degraded": "Sommige diensten ondervinden vertragingen. Het platform is operationeel, maar de prestaties kunnen verminderd zijn.",
+      "outage": "Een of meer diensten zijn niet beschikbaar. Sommige platformfuncties werken mogelijk niet."
+    },
+    "verdictSection": "Samenvatting servicestatus",
+    "verdictSectionSubtitle": "Details over diensten die aandacht vereisen",
+    "impactLabel": "Impact",
+    "noIssues": "Geen problemen gedetecteerd",
     "statuses": {
       "healthy": "Operationeel",
       "degraded": "Vertraagd",
       "down": "Niet beschikbaar",
       "standby": "Stand-by",
-      "scaling": "Schalen"
+      "scaling": "Voorbereiden"
     }
   },
   "feedback": {

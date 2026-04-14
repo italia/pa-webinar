@@ -995,26 +995,125 @@
     "bandwidthIn": "Ancho de banda entrante",
     "bandwidthOut": "Ancho de banda saliente",
     "recordings": "Grabaciones",
-    "registrationsToday": "Registros hoy",
-    "replicas": "Réplicas",
-    "cpu": "Solicitud de CPU",
-    "memory": "Solicitud de memoria",
-    "ports": "Puertos",
-    "stressLevel": "Nivel de carga",
+    "registrationsToday": "Inscripciones hoy",
+    "replicas": "Instancias activas",
+    "cpu": "CPU asignada",
+    "memory": "Memoria asignada",
+    "ports": "Puertos de red",
+    "stressLevel": "Carga de trabajo",
     "busyStatus": "Estado de actividad",
     "type": "Tipo",
+    "technicalName": "Nombre técnico",
+    "latency": "Latencia",
+    "uptime": "Disponibilidad",
+    "heapUsed": "Memoria heap",
+    "eventLoopLag": "Capacidad de respuesta",
+    "cpuUsage": "Uso de CPU",
+    "memoryUsed": "Memoria utilizada",
+    "rtt": "Tiempo de ida y vuelta de red",
+    "jitter": "Variación de latencia",
+    "packetLoss": "Pérdida de paquetes",
+    "largestConference": "Mayor conferencia",
+    "sendingAudio": "Enviando audio",
+    "sendingVideo": "Enviando vídeo",
+    "iceSuccess": "Conexiones exitosas",
+    "totalConferences": "Total de conferencias",
     "lastUpdated": "Última actualización",
-    "zonePublic": "Público",
-    "zoneCluster": "Clúster Kubernetes",
-    "zoneMedia": "Medios",
+    "zonePublic": "Acceso público",
+    "zoneCluster": "Servicios de la plataforma",
+    "zoneMedia": "Sala de vídeo",
     "zoneRecording": "Grabación",
-    "zoneStorage": "Almacenamiento",
+    "zoneStorage": "Archivo",
+    "connData": "datos",
+    "connNotifications": "notificaciones",
+    "connSignaling": "señalización",
+    "connMedia": "flujo de vídeo",
+    "connRecording": "grabación",
+    "connUpload": "subida",
+    "services": {
+      "app": "Portal web",
+      "database": "Base de datos",
+      "jitsiWeb": "Sala de videoconferencia",
+      "prosody": "Mensajería interna",
+      "jicofo": "Coordinador de conferencias",
+      "jvb": "Puente de vídeo",
+      "jibri": "Grabación de vídeo",
+      "smtp": "Servicio de correo electrónico"
+    },
+    "descriptions": {
+      "app": "El sitio web donde se accede a los eventos",
+      "database": "Donde se almacenan los eventos y las inscripciones",
+      "jitsiWeb": "La interfaz de videoconferencia",
+      "prosody": "Gestiona la comunicación entre los servicios de vídeo",
+      "jicofo": "Coordina quién participa en cada conferencia",
+      "jvb": "Transmite audio y vídeo a los participantes",
+      "jibri": "Graba las sesiones de vídeo de los eventos",
+      "smtp": "Envía los correos de confirmación y los recordatorios"
+    },
+    "verdicts": {
+      "app": {
+        "healthy": "El portal web funciona correctamente y responde a las solicitudes."
+      },
+      "database": {
+        "healthy": "La base de datos responde correctamente.",
+        "degraded": "La base de datos responde, pero más lento de lo habitual. Las operaciones pueden tardar más.",
+        "down": "La base de datos no responde. La plataforma no puede funcionar correctamente."
+      },
+      "jitsiWeb": {
+        "healthy": "La sala de videoconferencia es accesible y está lista para los eventos.",
+        "down": "La sala de videoconferencia no es accesible. No es posible iniciar ni unirse a eventos.",
+        "standby": "La sala de videoconferencia no está configurada."
+      },
+      "prosody": {
+        "healthy": "La mensajería interna entre los servicios de vídeo funciona correctamente.",
+        "down": "La mensajería interna no es accesible. Los servicios de vídeo no pueden comunicarse entre sí.",
+        "standby": "El servicio de mensajería no está configurado."
+      },
+      "jicofo": {
+        "healthy": "El coordinador de conferencias está activo y gestionando sesiones.",
+        "down": "El coordinador de conferencias no es accesible. No es posible crear nuevas conferencias.",
+        "standby": "El coordinador de conferencias no está configurado."
+      },
+      "jvb": {
+        "healthy": "El puente de vídeo está activo y transmitiendo audio/vídeo a los participantes.",
+        "scaling": "El puente de vídeo se está preparando para un evento próximo. Los servidores se están creando automáticamente.",
+        "standby": "El puente de vídeo está en espera. Se activará automáticamente antes del inicio de un evento programado."
+      },
+      "jibri": {
+        "healthy": "El servicio de grabación está listo y disponible.",
+        "busy": "El servicio de grabación está activo y grabando una sesión en curso.",
+        "down": "El servicio de grabación no es accesible. Los eventos no pueden ser grabados.",
+        "standby": "La grabación de vídeo no está configurada. Los eventos no serán grabados."
+      },
+      "smtp": {
+        "healthy": "El servicio de correo electrónico está configurado y listo para enviar notificaciones.",
+        "standby": "El servicio de correo electrónico no está configurado. Los correos de confirmación y los recordatorios no se enviarán."
+      }
+    },
+    "impacts": {
+      "database": "La plataforma no puede cargar eventos, gestionar inscripciones ni guardar datos.",
+      "jitsiWeb": "Los participantes no pueden acceder a la sala de videoconferencia.",
+      "prosody": "Los servicios de vídeo no pueden comunicarse. Las conferencias no funcionarán.",
+      "jicofo": "No es posible crear ni gestionar nuevas videoconferencias.",
+      "jvbScaling": "El puente de vídeo se está activando. El evento podrá comenzar en breve.",
+      "jibri": "Los eventos no pueden ser grabados. Los participantes pueden seguir uniéndose y participando.",
+      "smtp": "Los correos de confirmación de inscripción y los recordatorios no se enviarán."
+    },
+    "overallVerdicts": {
+      "operational": "Todos los servicios funcionan correctamente. La plataforma está plenamente operativa.",
+      "degraded": "Algunos servicios presentan ralentizaciones. La plataforma está operativa pero el rendimiento puede verse reducido.",
+      "outage": "Uno o más servicios no están disponibles. Algunas funcionalidades de la plataforma pueden no funcionar."
+    },
+    "verdictSection": "Resumen del estado de los servicios",
+    "verdictSectionSubtitle": "Detalles sobre servicios que requieren atención",
+    "impactLabel": "Impacto",
+    "noIssues": "No se detectaron problemas",
     "statuses": {
       "healthy": "Operativo",
       "degraded": "Degradado",
       "down": "No disponible",
       "standby": "En espera",
-      "scaling": "Escalando"
+      "scaling": "En preparación"
     }
   },
   "feedback": {

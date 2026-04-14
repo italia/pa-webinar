@@ -996,25 +996,122 @@
     "bandwidthOut": "Udgående båndbredde",
     "recordings": "Optagelser",
     "registrationsToday": "Registreringer i dag",
-    "replicas": "Replikaer",
-    "cpu": "CPU-anmodning",
-    "memory": "Hukommelsesanmodning",
-    "ports": "Porte",
-    "stressLevel": "Belastningsniveau",
+    "replicas": "Aktive instanser",
+    "cpu": "Tildelt CPU",
+    "memory": "Tildelt hukommelse",
+    "ports": "Netværksporte",
+    "stressLevel": "Arbejdsbelastning",
     "busyStatus": "Aktivitetsstatus",
     "type": "Type",
+    "technicalName": "Teknisk navn",
+    "latency": "Latens",
+    "uptime": "Oppetid",
+    "heapUsed": "Heap-hukommelse",
+    "eventLoopLag": "Responsivitet",
+    "cpuUsage": "CPU-forbrug",
+    "memoryUsed": "Brugt hukommelse",
+    "rtt": "Netværkets rundturstid",
+    "jitter": "Latensvariation",
+    "packetLoss": "Pakketab",
+    "largestConference": "Største konference",
+    "sendingAudio": "Sender lyd",
+    "sendingVideo": "Sender video",
+    "iceSuccess": "Succesfulde forbindelser",
+    "totalConferences": "Konferencer i alt",
     "lastUpdated": "Sidst opdateret",
-    "zonePublic": "Offentlig",
-    "zoneCluster": "Kubernetes-klynge",
-    "zoneMedia": "Medier",
+    "zonePublic": "Offentlig adgang",
+    "zoneCluster": "Platformstjenester",
+    "zoneMedia": "Videorum",
     "zoneRecording": "Optagelse",
-    "zoneStorage": "Lagring",
+    "zoneStorage": "Arkiv",
+    "connData": "data",
+    "connNotifications": "notifikationer",
+    "connSignaling": "signalering",
+    "connMedia": "videostrøm",
+    "connRecording": "optagelse",
+    "connUpload": "upload",
+    "services": {
+      "app": "Webportal",
+      "database": "Database",
+      "jitsiWeb": "Videokonferencerum",
+      "prosody": "Intern beskedhåndtering",
+      "jicofo": "Konferencekoordinator",
+      "jvb": "Videobro",
+      "jibri": "Videooptagelse",
+      "smtp": "E-mailtjeneste"
+    },
+    "descriptions": {
+      "app": "Hjemmesiden, hvor du tilgår begivenheder",
+      "database": "Hvor begivenheder og tilmeldinger opbevares",
+      "jitsiWeb": "Videokonferencegrænsefladen",
+      "prosody": "Håndterer kommunikation mellem videotjenester",
+      "jicofo": "Koordinerer hvem der deltager i hver konference",
+      "jvb": "Overfører lyd og video til deltagere",
+      "jibri": "Optager videosessioner af begivenheder",
+      "smtp": "Sender bekræftelsesmails og påmindelser"
+    },
+    "verdicts": {
+      "app": { "healthy": "Webportalen fungerer korrekt og svarer på forespørgsler." },
+      "database": {
+        "healthy": "Databasen svarer korrekt.",
+        "degraded": "Databasen svarer, men langsommere end normalt. Operationer kan tage længere tid.",
+        "down": "Databasen svarer ikke. Platformen kan ikke fungere korrekt."
+      },
+      "jitsiWeb": {
+        "healthy": "Videokonferencerummet er tilgængeligt og klar til begivenheder.",
+        "down": "Videokonferencerummet er ikke tilgængeligt. Det er ikke muligt at starte eller deltage i begivenheder.",
+        "standby": "Videokonferencerummet er ikke konfigureret."
+      },
+      "prosody": {
+        "healthy": "Intern beskedhåndtering mellem videotjenester fungerer korrekt.",
+        "down": "Intern beskedhåndtering er ikke tilgængelig. Videotjenester kan ikke kommunikere med hinanden.",
+        "standby": "Beskedtjenesten er ikke konfigureret."
+      },
+      "jicofo": {
+        "healthy": "Konferencekoordinatoren er aktiv og styrer sessioner.",
+        "down": "Konferencekoordinatoren er ikke tilgængelig. Det er ikke muligt at oprette nye konferencer.",
+        "standby": "Konferencekoordinatoren er ikke konfigureret."
+      },
+      "jvb": {
+        "healthy": "Videobroen er aktiv og overfører lyd/video til deltagere.",
+        "scaling": "Videobroen forbereder sig til en kommende begivenhed. Servere oprettes automatisk.",
+        "standby": "Videobroen er på standby. Den aktiveres automatisk, inden en planlagt begivenhed starter."
+      },
+      "jibri": {
+        "healthy": "Optagelsestjenesten er klar og tilgængelig.",
+        "busy": "Optagelsestjenesten er aktiv og optager en igangværende session.",
+        "down": "Optagelsestjenesten er ikke tilgængelig. Begivenheder kan ikke optages.",
+        "standby": "Videooptagelse er ikke konfigureret. Begivenheder vil ikke blive optaget."
+      },
+      "smtp": {
+        "healthy": "E-mailtjenesten er konfigureret og klar til at sende notifikationer.",
+        "standby": "E-mailtjenesten er ikke konfigureret. Bekræftelsesmails og påmindelser vil ikke blive sendt."
+      }
+    },
+    "impacts": {
+      "database": "Platformen kan ikke indlæse begivenheder, administrere tilmeldinger eller gemme data.",
+      "jitsiWeb": "Deltagere kan ikke tilgå videokonferencerummet.",
+      "prosody": "Videotjenester kan ikke kommunikere. Konferencer vil ikke fungere.",
+      "jicofo": "Det er ikke muligt at oprette eller administrere nye videokonferencer.",
+      "jvbScaling": "Videobroen aktiveres. Begivenheden vil kunne starte om kort tid.",
+      "jibri": "Begivenheder kan ikke optages. Deltagere kan stadig deltage.",
+      "smtp": "Bekræftelsesmails og påmindelser vil ikke blive sendt."
+    },
+    "overallVerdicts": {
+      "operational": "Alle tjenester fungerer korrekt. Platformen er fuldt operationel.",
+      "degraded": "Nogle tjenester oplever forsinkelser. Platformen er operationel, men ydeevnen kan være nedsat.",
+      "outage": "En eller flere tjenester er utilgængelige. Nogle platformfunktioner fungerer muligvis ikke."
+    },
+    "verdictSection": "Oversigt over tjenesternes status",
+    "verdictSectionSubtitle": "Detaljer om tjenester, der kræver opmærksomhed",
+    "impactLabel": "Påvirkning",
+    "noIssues": "Ingen problemer registreret",
     "statuses": {
       "healthy": "Operationel",
       "degraded": "Forringet",
       "down": "Nede",
       "standby": "Standby",
-      "scaling": "Skalering"
+      "scaling": "Forbereder"
     }
   },
   "feedback": {

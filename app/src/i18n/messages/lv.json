@@ -996,25 +996,122 @@
     "bandwidthOut": "Izejošais joslas platums",
     "recordings": "Ieraksti",
     "registrationsToday": "Reģistrācijas šodien",
-    "replicas": "Replikas",
-    "cpu": "CPU pieprasījums",
-    "memory": "Atmiņas pieprasījums",
-    "ports": "Porti",
-    "stressLevel": "Slodzes līmenis",
+    "replicas": "Aktīvās instances",
+    "cpu": "Piešķirtais CPU",
+    "memory": "Piešķirtā atmiņa",
+    "ports": "Tīkla porti",
+    "stressLevel": "Darba slodze",
     "busyStatus": "Aktivitātes statuss",
     "type": "Tips",
+    "technicalName": "Tehniskais nosaukums",
+    "latency": "Latentums",
+    "uptime": "Darbības laiks",
+    "heapUsed": "Kaudzes atmiņa",
+    "eventLoopLag": "Atsaucība",
+    "cpuUsage": "CPU izmantojums",
+    "memoryUsed": "Izmantotā atmiņa",
+    "rtt": "Tīkla turp-atpakaļ laiks",
+    "jitter": "Latentuma svārstības",
+    "packetLoss": "Pakešu zudums",
+    "largestConference": "Lielākā konference",
+    "sendingAudio": "Audio nosūtīšana",
+    "sendingVideo": "Video nosūtīšana",
+    "iceSuccess": "Veiksmīgi savienojumi",
+    "totalConferences": "Konferences kopā",
     "lastUpdated": "Pēdējā atjaunināšana",
-    "zonePublic": "Publisks",
-    "zoneCluster": "Kubernetes klasteris",
-    "zoneMedia": "Mediji",
+    "zonePublic": "Publiskā piekļuve",
+    "zoneCluster": "Platformas pakalpojumi",
+    "zoneMedia": "Video telpa",
     "zoneRecording": "Ierakstīšana",
-    "zoneStorage": "Krātuve",
+    "zoneStorage": "Arhīvs",
+    "connData": "dati",
+    "connNotifications": "paziņojumi",
+    "connSignaling": "signalizācija",
+    "connMedia": "video straume",
+    "connRecording": "ierakstīšana",
+    "connUpload": "augšupielāde",
+    "services": {
+      "app": "Tīmekļa portāls",
+      "database": "Datubāze",
+      "jitsiWeb": "Videokonferenču telpa",
+      "prosody": "Iekšējā ziņapmaiņa",
+      "jicofo": "Konferenču koordinators",
+      "jvb": "Video tilts",
+      "jibri": "Video ierakstīšana",
+      "smtp": "E-pasta pakalpojums"
+    },
+    "descriptions": {
+      "app": "Tīmekļa vietne, kurā piekļūstat pasākumiem",
+      "database": "Vieta, kur tiek glabāti pasākumi un reģistrācijas",
+      "jitsiWeb": "Videokonferenču saskarne",
+      "prosody": "Pārvalda saziņu starp video pakalpojumiem",
+      "jicofo": "Koordinē, kas piedalās katrā konferencē",
+      "jvb": "Pārraida audio un video dalībniekiem",
+      "jibri": "Ieraksta pasākumu video sesijas",
+      "smtp": "Nosūta apstiprinājuma e-pastus un atgādinājumus"
+    },
+    "verdicts": {
+      "app": { "healthy": "Tīmekļa portāls darbojas pareizi un atbild uz pieprasījumiem." },
+      "database": {
+        "healthy": "Datubāze atbild pareizi.",
+        "degraded": "Datubāze atbild, bet lēnāk nekā parasti. Darbības var aizņemt ilgāku laiku.",
+        "down": "Datubāze neatbild. Platforma nevar pareizi darboties."
+      },
+      "jitsiWeb": {
+        "healthy": "Videokonferenču telpa ir sasniedzama un gatava pasākumiem.",
+        "down": "Videokonferenču telpa nav sasniedzama. Nav iespējams sākt vai pievienoties pasākumiem.",
+        "standby": "Videokonferenču telpa nav konfigurēta."
+      },
+      "prosody": {
+        "healthy": "Iekšējā ziņapmaiņa starp video pakalpojumiem darbojas pareizi.",
+        "down": "Iekšējā ziņapmaiņa nav sasniedzama. Video pakalpojumi nevar savstarpēji sazināties.",
+        "standby": "Ziņapmaiņas pakalpojums nav konfigurēts."
+      },
+      "jicofo": {
+        "healthy": "Konferenču koordinators ir aktīvs un pārvalda sesijas.",
+        "down": "Konferenču koordinators nav sasniedzams. Nav iespējams izveidot jaunas konferences.",
+        "standby": "Konferenču koordinators nav konfigurēts."
+      },
+      "jvb": {
+        "healthy": "Video tilts ir aktīvs un pārraida audio/video dalībniekiem.",
+        "scaling": "Video tilts gatavojas gaidāmajam pasākumam. Serveri tiek veidoti automātiski.",
+        "standby": "Video tilts ir gaidstāvē. Tas automātiski aktivizēsies pirms plānotā pasākuma sākuma."
+      },
+      "jibri": {
+        "healthy": "Ierakstīšanas pakalpojums ir gatavs un pieejams.",
+        "busy": "Ierakstīšanas pakalpojums ir aktīvs un ieraksta notiekošu sesiju.",
+        "down": "Ierakstīšanas pakalpojums nav sasniedzams. Pasākumus nevar ierakstīt.",
+        "standby": "Video ierakstīšana nav konfigurēta. Pasākumi netiks ierakstīti."
+      },
+      "smtp": {
+        "healthy": "E-pasta pakalpojums ir konfigurēts un gatavs nosūtīt paziņojumus.",
+        "standby": "E-pasta pakalpojums nav konfigurēts. Apstiprinājuma e-pasti un atgādinājumi netiks nosūtīti."
+      }
+    },
+    "impacts": {
+      "database": "Platforma nevar ielādēt pasākumus, pārvaldīt reģistrācijas vai saglabāt datus.",
+      "jitsiWeb": "Dalībnieki nevar piekļūt videokonferenču telpai.",
+      "prosody": "Video pakalpojumi nevar sazināties. Konferences nedarbosies.",
+      "jicofo": "Nav iespējams izveidot vai pārvaldīt jaunas videokonferences.",
+      "jvbScaling": "Video tilts aktivizējas. Pasākums drīz varēs sākties.",
+      "jibri": "Pasākumus nevar ierakstīt. Dalībnieki joprojām var pievienoties un piedalīties.",
+      "smtp": "Reģistrācijas apstiprinājuma e-pasti un atgādinājumi netiks nosūtīti."
+    },
+    "overallVerdicts": {
+      "operational": "Visi pakalpojumi darbojas pareizi. Platforma ir pilnībā funkcionāla.",
+      "degraded": "Daži pakalpojumi piedzīvo palēninājumus. Platforma darbojas, bet veiktspēja var būt samazināta.",
+      "outage": "Viens vai vairāki pakalpojumi nav pieejami. Dažas platformas funkcijas var nedarboties."
+    },
+    "verdictSection": "Pakalpojumu statusa kopsavilkums",
+    "verdictSectionSubtitle": "Detaļas par pakalpojumiem, kuriem nepieciešama uzmanība",
+    "impactLabel": "Ietekme",
+    "noIssues": "Problēmas nav konstatētas",
     "statuses": {
       "healthy": "Darbojas",
       "degraded": "Palēnināts",
       "down": "Nav pieejams",
       "standby": "Gaidstāvē",
-      "scaling": "Mērogošana"
+      "scaling": "Sagatavošana"
     }
   },
   "feedback": {

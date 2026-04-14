@@ -54,3 +54,56 @@ export const jitsiTokensIssued = new client.Counter({
 });
 
 export { register };
+
+export async function getAppProcessMetrics(): Promise<{
+  cpuUsagePercent: number | null;
+  memoryUsedMB: number | null;
+  heapUsedMB: number | null;
+  eventLoopLagMs: number | null;
+  uptimeHours: number | null;
+}> {
+  try {
+    const metrics = await register.getMetricsAsJSON();
+
+    const findGaugeValue = (name: string, labels?: Record<string, string>): number | null => {
+      const metric = metrics.find(m => m.name === name);
+      if (!metric || !('values' in metric)) return null;
+      const values = (metric as { values: { value: number; labels: Record<string, string> }[] }).values;
+      if (labels) {
+        const entry = values.find(v =>
+          Object.entries(labels).every(([k, val]) => v.labels[k] === val),
+        );
+        return entry?.value ?? null;
+      }
+      return values[0]?.value ?? null;
+    };
+
+    const cpuSeconds = findGaugeValue('process_cpu_seconds_total');
+    const startTime = findGaugeValue('process_start_time_seconds');
+    const nowSec = Date.now() / 1000;
+    let cpuPercent: number | null = null;
+    if (cpuSeconds !== null && startTime !== null) {
+      const elapsed = nowSec - startTime;
+      cpuPercent = elapsed > 0 ? Math.round((cpuSeconds / elapsed) * 10000) / 100 : null;
+    }
+
+    const rssBytes = findGaugeValue('process_resident_memory_bytes');
+    const heapBytes = findGaugeValue('nodejs_heap_size_used_bytes');
+    const elLag = findGaugeValue('nodejs_eventloop_lag_seconds');
+
+    let uptimeHours: number | null = null;
+    if (startTime !== null) {
+      uptimeHours = Math.round(((nowSec - startTime) / 3600) * 10) / 10;
+    }
+
+    return {
+      cpuUsagePercent: cpuPercent,
+      memoryUsedMB: rssBytes !== null ? Math.round(rssBytes / 1048576) : null,
+      heapUsedMB: heapBytes !== null ? Math.round(heapBytes / 1048576) : null,
+      eventLoopLagMs: elLag !== null ? Math.round(elLag * 1000 * 100) / 100 : null,
+      uptimeHours,
+    };
+  } catch {
+    return { cpuUsagePercent: null, memoryUsedMB: null, heapUsedMB: null, eventLoopLagMs: null, uptimeHours: null };
+  }
+}
