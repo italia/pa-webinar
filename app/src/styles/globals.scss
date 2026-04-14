@@ -985,6 +985,13 @@
       }
     }
   }
+
+  &__sparklines {
+    padding: 16px 20px;
+    background: #FAFBFC;
+    border-top: 1px solid #E8ECF0;
+    border-radius: 0 0 16px 16px;
+  }
 }
 
 @keyframes infraSlideUp {

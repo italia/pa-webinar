@@ -29,6 +29,8 @@ const EVENTS_SUB_NAV: NavItem[] = [
 const SETTINGS_SUB_NAV: NavItem[] = [
   { href: '/admin/impostazioni', icon: 'it-settings', labelKey: 'settingsGeneral', exact: true },
   { href: '/admin/impostazioni/lingue', icon: 'it-hearing', labelKey: 'settingsLanguages' },
+  { href: '/admin/infrastruttura', icon: 'it-server', labelKey: 'infrastructure' },
+  { href: '/admin/monitoring', icon: 'it-chart-line', labelKey: 'monitoring' },
 ];
 
 export default function AdminNav() {
@@ -37,7 +39,7 @@ export default function AdminNav() {
 
   const stripped = pathname.replace(/^\/(it|en)/, '');
   const inEvents = stripped.startsWith('/admin/eventi') || stripped.startsWith('/admin/calendario');
-  const inSettings = stripped.startsWith('/admin/impostazioni') || stripped.startsWith('/admin/infrastruttura');
+  const inSettings = stripped.startsWith('/admin/impostazioni') || stripped.startsWith('/admin/infrastruttura') || stripped.startsWith('/admin/monitoring');
 
   function isActive(item: NavItem): boolean {
     if (item.exact) return stripped === item.href;

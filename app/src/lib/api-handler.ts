@@ -1,5 +1,6 @@
 import { type NextRequest } from 'next/server';
 import { AppError, errorResponse } from './errors';
+import { httpRequestDuration, httpRequestsTotal } from './metrics';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RouteContext = { params: Promise<any> };
@@ -7,6 +8,12 @@ type RouteHandler = (
   request: NextRequest,
   context: RouteContext
 ) => Promise<Response>;
+
+function normalizeRoute(pathname: string): string {
+  return pathname
+    .replace(/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '/:id')
+    .replace(/\/\d+/g, '/:id');
+}
 
 export function withErrorHandling(handler: RouteHandler): RouteHandler {
   return async (request, context) => {
@@ -19,6 +26,15 @@ export function withErrorHandling(handler: RouteHandler): RouteHandler {
     }
     const duration = Date.now() - start;
     const url = new URL(request.url);
+    const route = normalizeRoute(url.pathname);
+    const statusCode = String(response.status);
+
+    httpRequestDuration.observe(
+      { method: request.method, route, status_code: statusCode },
+      duration / 1000,
+    );
+    httpRequestsTotal.inc({ method: request.method, route, status_code: statusCode });
+
     console.log(
       JSON.stringify({
         level:

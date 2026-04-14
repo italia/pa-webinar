@@ -500,3 +500,77 @@ Senza CDN, Azure Blob gestisce comunque 300 utenti ma con latenza maggiore.
 | Temporanea (catch-up) | 24 ore se non pubblicata | Cron `/api/cron/cleanup` |
 | Pubblicata | Configurabile (7/30/90 giorni o fino a retention evento) | Cron `/api/cron/cleanup` |
 | Event retention | `dataRetentionDays` dopo `endsAt` | Cron `/api/cron/cleanup` |
+
+---
+
+## Monitoring & Observability
+
+### Prometheus Integration
+
+L'app espone metriche Prometheus tramite `prom-client` all'endpoint `/api/metrics` (protetto da Bearer token `CRON_API_KEY`).
+
+#### Metriche esposte
+
+| Metrica | Tipo | Descrizione |
+|---------|------|-------------|
+| `http_request_duration_seconds` | Histogram | Latenza HTTP per route/metodo/status |
+| `http_requests_total` | Counter | Contatore richieste HTTP |
+| `eventi_active_events` | Gauge | Eventi attualmente LIVE |
+| `eventi_registrations_total` | Gauge | Registrazioni totali |
+| `eventi_events_total` | Gauge | Eventi per status |
+| `eventi_jvb_participants` | Gauge | Partecipanti JVB correnti |
+| `eventi_jvb_conferences` | Gauge | Conferenze JVB attive |
+| `eventi_jvb_stress_level` | Gauge | Livello di stress JVB (0.0-1.0) |
+| `eventi_jvb_scaling_events_total` | Counter | Eventi di scaling JVB (up/down) |
+| `eventi_event_participants_total` | Histogram | Partecipanti per evento a fine sessione |
+| `eventi_event_duration_seconds` | Histogram | Durata eventi |
+| `eventi_questions_total` | Counter | Domande Q&A inviate |
+| `eventi_jitsi_tokens_issued_total` | Counter | JWT Jitsi emessi (per ruolo) |
+
+#### Abilitare ServiceMonitor
+
+```yaml
+# values.yaml override
+metrics:
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: kube-prometheus-stack  # match your Prometheus Operator selector
+```
+
+#### Abilitare PrometheusRule (alerting)
+
+```yaml
+metrics:
+  prometheusRule:
+    enabled: true
+    additionalLabels:
+      release: kube-prometheus-stack
+```
+
+Alert inclusi: `EventiDtdDown`, `EventiDtdHighLatency`, `EventiDtdHighErrorRate`, `EventiDtdDatabaseDown`, `JvbHighStress`, `JvbScalingStuck`, `JibriUnavailable`, `HighEventLoopLag`.
+
+#### Abilitare Grafana Dashboard (auto-import via sidecar)
+
+```yaml
+metrics:
+  grafanaDashboard:
+    enabled: true
+    folder: "eventi-dtd"
+```
+
+La dashboard viene caricata automaticamente se il sidecar Grafana è configurato per leggere ConfigMap con label `grafana_dashboard: "1"`.
+
+Per l'import manuale: il file JSON è in `infra/grafana/eventi-dtd-dashboard.json`.
+
+#### Prometheus URL per monitoring avanzato
+
+Per abilitare la dashboard di monitoraggio nell'admin panel e i dati avanzati nella pagina di stato pubblica:
+
+```yaml
+app:
+  env:
+    PROMETHEUS_URL: "http://kube-prometheus-stack-prometheus.monitoring:9090"
+```
+
+Se `PROMETHEUS_URL` non è configurato, la pagina di stato funziona comunque con i soli probe HTTP (degradazione graceful).

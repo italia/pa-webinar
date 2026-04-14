@@ -846,3 +846,41 @@ Riepilogo delle misure di sicurezza implementate:
 | **Font e asset** | Self-hosted | Nessun CDN esterno, nessun tracking |
 | **Cookie** | Solo funzionali | Nessun cookie di marketing o analytics |
 | **Log** | No PII nei log | Retention log 30 giorni, nessun logging IP applicativo |
+
+---
+
+## Monitoring & Observability
+
+### Stack di monitoraggio
+
+Il progetto supporta un'integrazione completa con lo stack Prometheus/Grafana/Alertmanager.
+
+### Livelli di integrazione
+
+| Livello | Requisiti | Funzionalità |
+|---------|-----------|--------------|
+| **Base** | Nessuno | Status page con probe HTTP, JVB Colibri stats |
+| **Metriche** | `ServiceMonitor` abilitato | Prometheus scraping, Grafana dashboard |
+| **Alerting** | `PrometheusRule` abilitato | 8 regole di alert pre-configurate |
+| **Monitoring UI** | `PROMETHEUS_URL` configurato | Dashboard admin con grafici real-time, sparkline nella status page |
+| **Grafana** | `grafanaDashboard` abilitato | Dashboard importata automaticamente via sidecar |
+
+### Metriche applicative
+
+L'app espone 14 metriche custom tramite `prom-client`:
+- **HTTP**: `http_request_duration_seconds` (histogram), `http_requests_total` (counter)
+- **Eventi**: `eventi_active_events`, `eventi_events_total`, `eventi_registrations_total`, `eventi_questions_total`, `eventi_jitsi_tokens_issued_total`
+- **JVB**: `eventi_jvb_participants`, `eventi_jvb_conferences`, `eventi_jvb_stress_level`, `eventi_jvb_scaling_events_total`
+- **Lifecycle**: `eventi_event_participants_total` (histogram), `eventi_event_duration_seconds` (histogram)
+
+### PromQL Proxy
+
+L'app espone un endpoint interno `POST /api/admin/metrics/query` (protetto da autenticazione admin) che funge da proxy verso Prometheus. Questo permette alla dashboard admin di mostrare grafici storici senza esporre Prometheus al browser. La status page pubblica accede a query predefinite tramite `GET /api/status/metrics`.
+
+### Alerting
+
+8 regole PrometheusRule pre-configurate: `EventiDtdDown`, `EventiDtdHighLatency`, `EventiDtdHighErrorRate`, `EventiDtdDatabaseDown`, `JvbHighStress`, `JvbScalingStuck`, `JibriUnavailable`, `HighEventLoopLag`.
+
+### Grafana Dashboard
+
+Dashboard JSON importabile in `infra/grafana/eventi-dtd-dashboard.json` con 5 sezioni: Overview, Application Performance, JVB/Jitsi, Infrastructure, Events Lifecycle. Auto-importabile via Helm ConfigMap con sidecar Grafana.
