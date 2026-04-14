@@ -46,6 +46,7 @@ cd /torture
 
 echo "==> target=$JITSI_URL room=$JITSI_ROOM participants=$PARTICIPANTS senders=$SENDERS duration=${DURATION}s use_load_test=$USE_LOAD_TEST"
 
+export MAVEN_OPTS="${MAVEN_OPTS:--Xss512k -Xmx6g -XX:+UseG1GC -Dwebdriver.http.factory=netty}"
 xvfb-run -a --server-args="-screen 0 1280x720x24" \
 mvn -q test \
   -Djitsi-meet.instance.url="$JITSI_URL" \
