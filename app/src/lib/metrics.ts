@@ -53,6 +53,45 @@ export const jitsiTokensIssued = new client.Counter({
   registers: [register],
 });
 
+export const jvbParticipantsGauge = new client.Gauge({
+  name: 'eventi_jvb_participants',
+  help: 'Current number of JVB participants',
+  registers: [register],
+});
+
+export const jvbConferencesGauge = new client.Gauge({
+  name: 'eventi_jvb_conferences',
+  help: 'Current number of active JVB conferences',
+  registers: [register],
+});
+
+export const jvbStressLevelGauge = new client.Gauge({
+  name: 'eventi_jvb_stress_level',
+  help: 'Current JVB stress level (0.0 - 1.0)',
+  registers: [register],
+});
+
+export const jvbScalingEventsTotal = new client.Counter({
+  name: 'eventi_jvb_scaling_events_total',
+  help: 'Total JVB scaling events',
+  labelNames: ['direction'] as const,
+  registers: [register],
+});
+
+export const eventParticipantsHistogram = new client.Histogram({
+  name: 'eventi_event_participants_total',
+  help: 'Number of participants per event at end',
+  buckets: [5, 10, 25, 50, 100, 150, 200, 300],
+  registers: [register],
+});
+
+export const eventDurationHistogram = new client.Histogram({
+  name: 'eventi_event_duration_seconds',
+  help: 'Duration of events in seconds',
+  buckets: [300, 900, 1800, 3600, 5400, 7200, 10800],
+  registers: [register],
+});
+
 export { register };
 
 export async function getAppProcessMetrics(): Promise<{

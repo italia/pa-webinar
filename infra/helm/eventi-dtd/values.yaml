@@ -73,6 +73,11 @@ app:
     NEXT_PUBLIC_DEFAULT_LOCALE: "it"
     DEFAULT_DATA_RETENTION_DAYS: "30"
     DEFAULT_PRIVACY_POLICY_URL: "https://videocall.example.com/it/privacy"
+    # Prometheus URL for PromQL queries from the app (admin monitoring, status page).
+    # Set to the internal Prometheus service URL, e.g.:
+    #   http://kube-prometheus-stack-prometheus.monitoring:9090
+    # Leave empty to disable Prometheus integration (probe-only status page).
+    PROMETHEUS_URL: ""
 
   # ── Security context ──
 
@@ -344,6 +349,27 @@ metrics:
   # bearerTokenSecret:
   #   name: videocall-secrets
   #   key: CRON_API_KEY
+
+  # ── PrometheusRule (alerting) ──
+  # Requires Prometheus Operator. Creates alert rules for app health,
+  # latency, error rate, JVB stress, and event loop lag.
+  prometheusRule:
+    enabled: false
+    # Extra labels to match Prometheus Operator's ruleSelector
+    additionalLabels: {}
+    #   release: prometheus
+    # Custom additional rules (appended to built-in rules)
+    rules: []
+
+  # ── Grafana Dashboard ──
+  # Creates a ConfigMap with the eventi-dtd Grafana dashboard JSON.
+  # The Grafana sidecar auto-discovers ConfigMaps with grafana_dashboard: "1".
+  grafanaDashboard:
+    enabled: false
+    # Grafana folder to place the dashboard in
+    folder: ""
+    # Extra labels for the ConfigMap
+    additionalLabels: {}
 
 # ── Jitsi Meet ───────────────────────────────────────────────
 

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Alert, Badge, Collapse } from 'design-react-kit';
 
 import type { InfraMapData } from '@/app/api/status/infrastructure/route';
+import PrometheusSparkline, { UptimeBadge, ResponseTimeBadge } from './prometheus-chart';
 
 const POLL_MS = 15_000;
 
@@ -195,21 +196,15 @@ export default function InfrastructureMap() {
     s.status === 'down' || s.status === 'degraded',
   ) ?? [];
 
-  const poolLabelKey = (name: string): string => {
-    const map: Record<string, string> = {
-      system: 'poolSystem',
-      jvb: 'poolJvb',
-      main: 'poolMain',
-      local: 'poolLocal',
-    };
-    return map[name] ?? name;
-  };
-
   return (
     <div className="infra-map">
       {/* Overall status banner */}
       {data && (
-        <OverallBanner verdict={data.overallVerdict} t={t} />
+        <OverallBanner
+          verdict={data.overallVerdict}
+          prometheus={data.prometheus}
+          t={t}
+        />
       )}
 
       {/* Stats bar */}
@@ -445,11 +440,13 @@ export default function InfrastructureMap() {
                   </text>
                 )}
 
-                {Array.from({ length: Math.min(svc.replicas.max, 10) }).map((_, i) => {
+                {svc.replicas.max !== null && svc.replicas.max > 0 && Array.from({ length: Math.min(svc.replicas.max, 10) }).map((_, i) => {
                   const bx = p.x - halfW + 10 + i * 14;
                   const by = p.y + halfH - 12;
-                  const isRunning = i < svc.replicas.running;
-                  const isDesired = i < svc.replicas.desired;
+                  const running = svc.replicas.running ?? 0;
+                  const desired = svc.replicas.desired ?? 0;
+                  const isRunning = i < running;
+                  const isDesired = i < desired;
                   const barFill = isRunning ? sc : isDesired ? '#FFB74D' : '#E0E0E0';
 
                   return (
@@ -466,37 +463,6 @@ export default function InfrastructureMap() {
                     </rect>
                   );
                 })}
-              </g>
-            );
-          })}
-
-          {/* Node pools (bottom) */}
-          {data?.nodePools.map((pool, i) => {
-            const px = 250 + i * 280;
-            const py = H - 28;
-            const pc = pool.status === 'active' ? '#008758'
-              : pool.status === 'scaling' ? '#A66300'
-                : pool.status === 'scaled-to-zero' ? '#5A768A'
-                  : '#CFD8DC';
-            const label = t(poolLabelKey(pool.name) as Parameters<typeof t>[0]);
-
-            return (
-              <g key={pool.name}>
-                <rect x={px - 100} y={py - 16} width="200" height="32" rx="6" fill="#FAFAFA" stroke={pc} strokeWidth="1" />
-                <SvgIcon path={SERVICE_ICONS.server!} x={px - 90} y={py - 8} size={16} fill={pc} />
-                <text x={px - 66} y={py + 4} className="infra-map__pool-label">{label}</text>
-                <text x={px + 30} y={py + 4} className="infra-map__pool-count" fill={pc}>
-                  {pool.nodeCount}/{pool.maxNodes}
-                </text>
-                {pool.status === 'scaled-to-zero' && (
-                  <text x={px + 65} y={py + 4} fill="#5A768A" className="infra-map__pool-tag">idle</text>
-                )}
-                {pool.status === 'scaling' && (
-                  <text x={px + 65} y={py + 4} fill="#A66300" className="infra-map__pool-tag">
-                    scaling
-                    <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite" />
-                  </text>
-                )}
               </g>
             );
           })}
@@ -557,8 +523,6 @@ export default function InfrastructureMap() {
                     <th className="border-0 ps-3">{t('tableComponent')}</th>
                     <th className="border-0">{t('tableStatus')}</th>
                     <th className="border-0">{t('tableReplicas')}</th>
-                    <th className="border-0">{t('tableCpu')}</th>
-                    <th className="border-0">{t('tableMemory')}</th>
                     <th className="border-0 pe-3">{t('tableVerdict')}</th>
                   </tr>
                 </thead>
@@ -567,6 +531,12 @@ export default function InfrastructureMap() {
                     const sc = STATUS_COLORS[svc.status] ?? '#5A768A';
                     const svcName = resolveI18nKey(t, svc.name);
                     const verdictText = resolveI18nKey(t, svc.verdict);
+                    const running = svc.replicas.running;
+                    const desired = svc.replicas.desired;
+                    const replicaStr = running !== null
+                      ? (desired !== null ? `${running}/${desired}` : String(running))
+                      : '—';
+
                     return (
                       <tr key={svc.id}>
                         <td className="ps-3 align-middle">
@@ -585,16 +555,10 @@ export default function InfrastructureMap() {
                           </Badge>
                         </td>
                         <td className="align-middle" style={{ fontSize: '0.82rem', fontVariantNumeric: 'tabular-nums' }}>
-                          {svc.replicas.running}/{svc.replicas.desired}
+                          {replicaStr}
                         </td>
-                        <td className="align-middle" style={{ fontSize: '0.82rem' }}>
-                          {svc.resources.cpuRequest !== '—' ? formatCpu(svc.resources.cpuRequest) : '—'}
-                        </td>
-                        <td className="align-middle" style={{ fontSize: '0.82rem' }}>
-                          {svc.resources.memRequest !== '—' ? formatMem(svc.resources.memRequest) : '—'}
-                        </td>
-                        <td className="pe-3 align-middle" style={{ fontSize: '0.78rem', color: '#455A64', maxWidth: '220px' }}>
-                          {verdictText.length > 60 ? verdictText.substring(0, 59) + '…' : verdictText}
+                        <td className="pe-3 align-middle" style={{ fontSize: '0.78rem', color: '#455A64', maxWidth: '280px' }}>
+                          {verdictText.length > 80 ? verdictText.substring(0, 79) + '…' : verdictText}
                         </td>
                       </tr>
                     );
@@ -603,6 +567,26 @@ export default function InfrastructureMap() {
               </table>
             </div>
           </Collapse>
+        </div>
+      )}
+
+      {/* Prometheus sparkline charts */}
+      {data?.prometheus.available && (
+        <div className="infra-map__sparklines">
+          <div className="d-flex flex-wrap gap-4 align-items-end">
+            <div>
+              <div className="text-muted mb-1" style={{ fontSize: '0.72rem' }}>{t('participants')} (4h)</div>
+              <PrometheusSparkline metric="participants" hours={4} width={220} height={44} color="#008758" unit="" />
+            </div>
+            <div>
+              <div className="text-muted mb-1" style={{ fontSize: '0.72rem' }}>{t('conferences')} (4h)</div>
+              <PrometheusSparkline metric="conferences" hours={4} width={220} height={44} color="#0066CC" unit="" />
+            </div>
+            <div>
+              <div className="text-muted mb-1" style={{ fontSize: '0.72rem' }}>P95 {t('latency')} (1h)</div>
+              <PrometheusSparkline metric="responseTime" hours={1} width={220} height={44} color="#A66300" unit="s" />
+            </div>
+          </div>
         </div>
       )}
 
@@ -628,8 +612,9 @@ export default function InfrastructureMap() {
   );
 }
 
-function OverallBanner({ verdict, t }: {
+function OverallBanner({ verdict, prometheus, t }: {
   verdict: string;
+  prometheus: InfraMapData['prometheus'];
   t: ReturnType<typeof useTranslations<'infraMap'>>;
 }) {
   const text = resolveI18nKey(t, verdict);
@@ -639,7 +624,15 @@ function OverallBanner({ verdict, t }: {
 
   return (
     <Alert color={color} className="infra-map__banner mb-0 rounded-0 border-start-0 border-end-0 border-top-0">
-      <span style={{ fontSize: '0.88rem' }}>{text}</span>
+      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <span style={{ fontSize: '0.88rem' }}>{text}</span>
+        {prometheus.available && (
+          <div className="d-flex align-items-center gap-2">
+            <UptimeBadge uptime24h={prometheus.uptime24h} />
+            <ResponseTimeBadge responseTimeMs={prometheus.responseTimeP95} />
+          </div>
+        )}
+      </div>
     </Alert>
   );
 }
@@ -724,13 +717,13 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
           {verdictText}
         </p>
 
-        <DRow label={t('replicas')} value={`${service.replicas.running} / ${service.replicas.desired} (max ${service.replicas.max})`} />
-
-        {service.resources.cpuRequest !== '—' && (
-          <DRow label={t('cpu')} value={formatCpu(service.resources.cpuRequest)} />
-        )}
-        {service.resources.memRequest !== '—' && (
-          <DRow label={t('memory')} value={formatMem(service.resources.memRequest)} />
+        {service.replicas.running !== null && (
+          <DRow
+            label={t('replicas')}
+            value={service.replicas.desired !== null
+              ? `${service.replicas.running} / ${service.replicas.desired}${service.replicas.max !== null ? ` (max ${service.replicas.max})` : ''}`
+              : String(service.replicas.running)}
+          />
         )}
 
         {service.ports.length > 0 && (
@@ -801,16 +794,3 @@ function DRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function formatCpu(raw: string): string {
-  if (raw.endsWith('m')) {
-    const millis = parseInt(raw, 10);
-    return millis >= 1000 ? `${(millis / 1000).toFixed(1)} CPU` : `${millis / 1000} CPU`;
-  }
-  return `${raw} CPU`;
-}
-
-function formatMem(raw: string): string {
-  if (raw.endsWith('Mi')) return `${parseInt(raw, 10)} MB`;
-  if (raw.endsWith('Gi')) return `${parseFloat(raw)} GB`;
-  return raw;
-}

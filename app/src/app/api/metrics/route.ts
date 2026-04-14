@@ -9,9 +9,25 @@ import {
   activeEventsGauge,
   totalRegistrationsGauge,
   totalEventsGauge,
+  jvbParticipantsGauge,
+  jvbConferencesGauge,
+  jvbStressLevelGauge,
 } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
+
+async function refreshJvbGauges(): Promise<void> {
+  const url = process.env.JVB_HEALTH_URL;
+  if (!url) return;
+  try {
+    const res = await fetch(`${url}/colibri/stats`, { signal: AbortSignal.timeout(3000) });
+    if (!res.ok) return;
+    const s = await res.json() as Record<string, unknown>;
+    if (typeof s.participants === 'number') jvbParticipantsGauge.set(s.participants);
+    if (typeof s.conferences === 'number') jvbConferencesGauge.set(s.conferences);
+    if (typeof s.stress_level === 'number') jvbStressLevelGauge.set(s.stress_level);
+  } catch { /* JVB not reachable — gauges keep last known value */ }
+}
 
 export const GET = withErrorHandling(async (request) => {
   const cronKey = process.env.CRON_API_KEY;
@@ -29,6 +45,7 @@ export const GET = withErrorHandling(async (request) => {
       by: ['status'],
       _count: { id: true },
     }),
+    refreshJvbGauges(),
   ]);
 
   activeEventsGauge.set(liveCount);

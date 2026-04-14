@@ -2,6 +2,11 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { getAppProcessMetrics } from '@/lib/metrics';
+import {
+  isPrometheusConfigured,
+  queryPrometheus,
+  queryPrometheusRange,
+} from '@/lib/prometheus';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,13 +20,7 @@ interface ServiceNode {
   status: ServiceStatus;
   verdict: string;
   impact: string | null;
-  replicas: { running: number; desired: number; max: number };
-  resources: {
-    cpuRequest: string;
-    memRequest: string;
-    cpuUsage: number | null;
-    memUsage: number | null;
-  };
+  replicas: { running: number | null; desired: number | null; max: number | null };
   ports: { name: string; port: number; protocol: string }[];
   metadata: Record<string, string | number | boolean | null>;
 }
@@ -39,15 +38,6 @@ interface StorageInfo {
   type: string;
   configured: boolean;
   recordings: { count: number; totalSizeBytes: number | null };
-}
-
-interface NodePoolInfo {
-  name: string;
-  nodeCount: number;
-  minNodes: number;
-  maxNodes: number;
-  status: 'active' | 'idle' | 'scaling' | 'scaled-to-zero';
-  instanceType: string;
 }
 
 interface JvbExtendedStats {
@@ -70,6 +60,14 @@ interface AppProcessMetrics {
   uptimeHours: number | null;
 }
 
+interface PrometheusData {
+  available: boolean;
+  uptime24h: number | null;
+  responseTimeP95: number | null;
+  replicaCounts: Record<string, { running: number; desired: number }>;
+  participantHistory: Array<[number, string]>;
+}
+
 export interface InfraMapData {
   cluster: {
     mode: 'simple' | 'standard' | 'full' | 'unknown';
@@ -79,7 +77,6 @@ export interface InfraMapData {
   };
   endpoints: Endpoint[];
   services: ServiceNode[];
-  nodePools: NodePoolInfo[];
   storage: StorageInfo;
   traffic: {
     totalParticipants: number;
@@ -94,6 +91,7 @@ export interface InfraMapData {
   };
   jvbExtended: JvbExtendedStats;
   appMetrics: AppProcessMetrics;
+  prometheus: PrometheusData;
   overallVerdict: string;
   lastUpdated: string;
 }
@@ -223,6 +221,67 @@ function computeIceSuccessRate(succeeded: number | null, failed: number | null):
   return Math.round((succeeded / total) * 10000) / 100;
 }
 
+async function fetchPrometheusData(namespace: string): Promise<PrometheusData> {
+  const empty: PrometheusData = {
+    available: false,
+    uptime24h: null,
+    responseTimeP95: null,
+    replicaCounts: {},
+    participantHistory: [],
+  };
+
+  if (!isPrometheusConfigured()) return empty;
+
+  try {
+    const [uptimeRes, latencyRes, participantsRes] = await Promise.all([
+      queryPrometheus(`avg_over_time(up{namespace="${namespace}",job=~".*eventi.*"}[24h]) * 100`).catch(() => null),
+      queryPrometheus(`histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{namespace="${namespace}",app="eventi-dtd"}[5m]))`).catch(() => null),
+      queryPrometheusRange(
+        `eventi_jvb_participants{namespace="${namespace}"}`,
+        String(Math.floor(Date.now() / 1000) - 4 * 3600),
+        String(Math.floor(Date.now() / 1000)),
+        '60',
+      ).catch(() => null),
+    ]);
+
+    let uptime24h: number | null = null;
+    if (uptimeRes?.data?.result?.[0]) {
+      uptime24h = Math.round(parseFloat(uptimeRes.data.result[0].value[1]) * 100) / 100;
+    }
+
+    let responseTimeP95: number | null = null;
+    if (latencyRes?.data?.result?.[0]) {
+      responseTimeP95 = Math.round(parseFloat(latencyRes.data.result[0].value[1]) * 1000);
+    }
+
+    let participantHistory: Array<[number, string]> = [];
+    if (participantsRes?.data?.result?.[0]?.values) {
+      participantHistory = participantsRes.data.result[0].values;
+    }
+
+    return {
+      available: true,
+      uptime24h,
+      responseTimeP95,
+      replicaCounts: {},
+      participantHistory,
+    };
+  } catch {
+    return empty;
+  }
+}
+
+function inferEmailProvider(host: string): string {
+  if (!host) return 'none';
+  const h = host.toLowerCase();
+  if (h.includes('mailgun')) return 'Mailgun';
+  if (h.includes('sendgrid')) return 'SendGrid';
+  if (h.includes('communication.azure')) return 'Azure ACS';
+  if (h.includes('ses.')) return 'Amazon SES';
+  if (h.includes('mailpit') || h.includes('localhost')) return 'Mailpit';
+  return 'SMTP';
+}
+
 export const GET = withErrorHandling(async () => {
   const mode = inferDeploymentMode();
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN') || '';
@@ -230,9 +289,9 @@ export const GET = withErrorHandling(async () => {
   const maxJvb = parseInt(process.env.JVB_MAX_REPLICAS || '6', 10);
   const preScaleMinutes = parseInt(process.env.JVB_PRE_SCALE_MINUTES || '30', 10);
   const storageType = process.env.RECORDING_STORAGE_TYPE || 'not-configured';
+  const namespace = process.env.POD_NAMESPACE || 'default';
 
   const [
-    ,
     jitsiProbe,
     jvbStats,
     jibriInfo,
@@ -241,8 +300,8 @@ export const GET = withErrorHandling(async () => {
     upcomingCount,
     recordingCount,
     appMetricsRaw,
+    prometheusData,
   ] = await Promise.all([
-    Promise.resolve(null),
     jitsiDomain ? probeService(`${jitsiDomain.includes('localhost') ? 'http' : 'https'}://${jitsiDomain}/external_api.js`, 5000) : Promise.resolve({ ok: false, responseMs: 0 }),
     getJvbStats(),
     getJibriInfo(),
@@ -251,6 +310,7 @@ export const GET = withErrorHandling(async () => {
     prisma.event.count({ where: { status: { in: ['PUBLISHED', 'LIVE'] }, endsAt: { gte: new Date() } } }),
     prisma.event.count({ where: { recordingUrl: { not: null } } }),
     getAppProcessMetrics(),
+    fetchPrometheusData(namespace),
   ]);
 
   let dbOk = false;
@@ -309,30 +369,28 @@ export const GET = withErrorHandling(async () => {
     {
       id: 'app',
       name: 'infraMap.services.app',
-      technicalName: 'Next.js 15 / Node.js',
+      technicalName: `Next.js / Node.js ${process.version}`,
       description: 'infraMap.descriptions.app',
       status: 'healthy',
       verdict: 'infraMap.verdicts.app.healthy',
       impact: null,
-      replicas: { running: parseInt(process.env.APP_REPLICAS || '1', 10), desired: parseInt(process.env.APP_REPLICAS || '1', 10), max: parseInt(process.env.APP_MAX_REPLICAS || '4', 10) },
-      resources: { cpuRequest: '250m', memRequest: '512Mi', cpuUsage: appMetricsRaw.cpuUsagePercent, memUsage: appMetricsRaw.memoryUsedMB },
+      replicas: { running: 1, desired: null, max: null },
       ports: [{ name: 'http', port: 3000, protocol: 'TCP' }],
-      metadata: { framework: 'Next.js 15', runtime: 'Node.js', uptimeHours: appMetricsRaw.uptimeHours, heapUsedMB: appMetricsRaw.heapUsedMB, eventLoopLagMs: appMetricsRaw.eventLoopLagMs },
+      metadata: { runtime: `Node.js ${process.version}`, uptimeHours: appMetricsRaw.uptimeHours, heapUsedMB: appMetricsRaw.heapUsedMB, eventLoopLagMs: appMetricsRaw.eventLoopLagMs },
     },
     {
       id: 'database',
       name: 'infraMap.services.database',
-      technicalName: 'PostgreSQL 16',
+      technicalName: 'PostgreSQL',
       description: 'infraMap.descriptions.database',
       status: dbStatus,
       verdict: dbOk
         ? (dbLatencyMs > 1000 ? 'infraMap.verdicts.database.degraded' : 'infraMap.verdicts.database.healthy')
         : 'infraMap.verdicts.database.down',
       impact: dbOk ? null : 'infraMap.impacts.database',
-      replicas: { running: dbOk ? 1 : 0, desired: 1, max: 1 },
-      resources: { cpuRequest: '500m', memRequest: '1Gi', cpuUsage: null, memUsage: null },
+      replicas: { running: dbOk ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'postgresql', port: 5432, protocol: 'TCP' }],
-      metadata: { version: '16', type: mode === 'simple' ? 'in-cluster' : 'external', latencyMs: dbLatencyMs },
+      metadata: { type: mode === 'simple' ? 'in-cluster' : 'external', latencyMs: dbLatencyMs },
     },
     {
       id: 'jitsi-web',
@@ -344,8 +402,7 @@ export const GET = withErrorHandling(async () => {
         ? 'infraMap.verdicts.jitsiWeb.healthy'
         : jitsiDomain ? 'infraMap.verdicts.jitsiWeb.down' : 'infraMap.verdicts.jitsiWeb.standby',
       impact: jitsiWebStatus === 'down' ? 'infraMap.impacts.jitsiWeb' : null,
-      replicas: { running: jitsiProbe.ok ? 1 : 0, desired: 1, max: 1 },
-      resources: { cpuRequest: '100m', memRequest: '256Mi', cpuUsage: null, memUsage: null },
+      replicas: { running: jitsiProbe.ok ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'https', port: 443, protocol: 'TCP' }],
       metadata: { domain: jitsiDomain, responseMs: jitsiProbe.responseMs },
     },
@@ -359,8 +416,7 @@ export const GET = withErrorHandling(async () => {
         ? 'infraMap.verdicts.prosody.healthy'
         : jitsiDomain ? 'infraMap.verdicts.prosody.down' : 'infraMap.verdicts.prosody.standby',
       impact: jitsiWebStatus === 'down' ? 'infraMap.impacts.prosody' : null,
-      replicas: { running: jitsiProbe.ok ? 1 : 0, desired: 1, max: 1 },
-      resources: { cpuRequest: '100m', memRequest: '256Mi', cpuUsage: null, memUsage: null },
+      replicas: { running: jitsiProbe.ok ? 1 : 0, desired: null, max: null },
       ports: [
         { name: 'xmpp-c2s', port: 5222, protocol: 'TCP' },
         { name: 'xmpp-s2s', port: 5269, protocol: 'TCP' },
@@ -378,8 +434,7 @@ export const GET = withErrorHandling(async () => {
         ? 'infraMap.verdicts.jicofo.healthy'
         : jitsiDomain ? 'infraMap.verdicts.jicofo.down' : 'infraMap.verdicts.jicofo.standby',
       impact: jitsiWebStatus === 'down' ? 'infraMap.impacts.jicofo' : null,
-      replicas: { running: jitsiProbe.ok ? 1 : 0, desired: 1, max: 1 },
-      resources: { cpuRequest: '100m', memRequest: '256Mi', cpuUsage: null, memUsage: null },
+      replicas: { running: jitsiProbe.ok ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'http', port: 8888, protocol: 'TCP' }],
       metadata: {},
     },
@@ -398,7 +453,6 @@ export const GET = withErrorHandling(async () => {
         ? 'infraMap.impacts.jvbScaling'
         : null,
       replicas: { running: jvbRunning, desired: jvbDesired, max: maxJvb },
-      resources: { cpuRequest: '1', memRequest: '2Gi', cpuUsage: null, memUsage: null },
       ports: [
         { name: 'media', port: 10000, protocol: 'UDP' },
         { name: 'colibri', port: 8080, protocol: 'TCP' },
@@ -421,8 +475,7 @@ export const GET = withErrorHandling(async () => {
         ? (jibriInfo.busy ? 'infraMap.verdicts.jibri.busy' : 'infraMap.verdicts.jibri.healthy')
         : storageType !== 'not-configured' ? 'infraMap.verdicts.jibri.down' : 'infraMap.verdicts.jibri.standby',
       impact: jibriStatus === 'down' ? 'infraMap.impacts.jibri' : null,
-      replicas: { running: jibriInfo.healthy ? 1 : 0, desired: storageType !== 'not-configured' ? 1 : 0, max: 2 },
-      resources: { cpuRequest: '2', memRequest: '4Gi', cpuUsage: null, memUsage: null },
+      replicas: { running: jibriInfo.healthy ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'api', port: 2222, protocol: 'TCP' }],
       metadata: { busy: jibriInfo.busy, busyStatus: jibriInfo.busyStatus },
     },
@@ -436,8 +489,7 @@ export const GET = withErrorHandling(async () => {
         ? 'infraMap.verdicts.smtp.healthy'
         : 'infraMap.verdicts.smtp.standby',
       impact: smtpStatus === 'standby' ? 'infraMap.impacts.smtp' : null,
-      replicas: { running: process.env.SMTP_HOST ? 1 : 0, desired: 1, max: 1 },
-      resources: { cpuRequest: '—', memRequest: '—', cpuUsage: null, memUsage: null },
+      replicas: { running: process.env.SMTP_HOST ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'smtp', port: parseInt(process.env.SMTP_PORT || '587', 10), protocol: 'TCP' }],
       metadata: { provider: inferEmailProvider(process.env.SMTP_HOST || ''), external: true },
     },
@@ -450,35 +502,6 @@ export const GET = withErrorHandling(async () => {
   if (jitsiDomain) {
     endpoints.push({ host: jitsiDomain, port: 443, protocol: 'HTTPS', tls: true, service: 'jitsi-web', trafficRps: null });
     endpoints.push({ host: jitsiDomain, port: 10000, protocol: 'UDP', tls: false, service: 'jvb', trafficRps: null });
-  }
-
-  const nodePools: NodePoolInfo[] = [];
-  if (mode === 'full') {
-    nodePools.push({
-      name: 'system',
-      nodeCount: 1,
-      minNodes: 1,
-      maxNodes: 3,
-      status: 'active',
-      instanceType: process.env.SYSTEM_NODE_TYPE || 'Standard_D4s_v3',
-    });
-    nodePools.push({
-      name: 'jvb',
-      nodeCount: jvbRunning > 0 ? 1 : 0,
-      minNodes: 0,
-      maxNodes: parseInt(process.env.JVB_MAX_NODES || '4', 10),
-      status: jvbDesired === 0 ? 'scaled-to-zero' : jvbRunning < jvbDesired ? 'scaling' : 'active',
-      instanceType: process.env.JVB_NODE_TYPE || 'Standard_F4s_v2',
-    });
-  } else {
-    nodePools.push({
-      name: 'main',
-      nodeCount: 1,
-      minNodes: 1,
-      maxNodes: 1,
-      status: 'active',
-      instanceType: mode === 'simple' ? 'docker-compose' : 'Standard_D4s_v3',
-    });
   }
 
   const bitRateDownMbps = jvbStats.bitRateDown !== null ? jvbStats.bitRateDown / 1024 : null;
@@ -497,11 +520,10 @@ export const GET = withErrorHandling(async () => {
       mode,
       version: process.env.npm_package_version || process.env.APP_VERSION || '0.0.0',
       environment: process.env.NODE_ENV || 'development',
-      namespace: process.env.POD_NAMESPACE || 'default',
+      namespace,
     },
     endpoints,
     services,
-    nodePools,
     storage: {
       type: storageType,
       configured: storageType !== 'not-configured' && storageType !== 'local',
@@ -530,20 +552,10 @@ export const GET = withErrorHandling(async () => {
       iceSuccessRate: computeIceSuccessRate(jvbStats.iceSucceeded, jvbStats.iceFailed),
     },
     appMetrics: appMetricsRaw,
+    prometheus: prometheusData,
     overallVerdict,
     lastUpdated: new Date().toISOString(),
   };
 
   return Response.json(data, { headers: { 'Cache-Control': 'no-store' } });
 });
-
-function inferEmailProvider(host: string): string {
-  if (!host) return 'none';
-  const h = host.toLowerCase();
-  if (h.includes('mailgun')) return 'Mailgun';
-  if (h.includes('sendgrid')) return 'SendGrid';
-  if (h.includes('communication.azure')) return 'Azure ACS';
-  if (h.includes('ses.')) return 'Amazon SES';
-  if (h.includes('mailpit') || h.includes('localhost')) return 'Mailpit';
-  return 'SMTP';
-}
