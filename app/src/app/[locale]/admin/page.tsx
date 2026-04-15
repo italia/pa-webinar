@@ -31,6 +31,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     instantCallsLast30d,
     registrationsTotal,
     registrationsToday,
+    recordingsTotal,
   ] = await Promise.all([
     prisma.event.count({
       where: { status: 'PUBLISHED', startsAt: { gt: now } },
@@ -41,6 +42,17 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     }),
     prisma.registration.count(),
     prisma.registration.count({ where: { createdAt: { gte: todayStart } } }),
+    // Count both per-event published recordings and per-session artifacts
+    // from CallSession. We deliberately don't de-duplicate since the
+    // "library" view merges the two sources and a single count "reflecting
+    // what the admin will see" is what the card needs.
+    (async () => {
+      const [a, b] = await Promise.all([
+        prisma.event.count({ where: { recordingUrl: { not: null } } }),
+        prisma.callSession.count({ where: { recordingUrl: { not: null } } }),
+      ]);
+      return a + b;
+    })(),
   ]);
 
   return (
@@ -65,6 +77,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         instantCallsLast30d={instantCallsLast30d}
         registrationsTotal={registrationsTotal}
         registrationsToday={registrationsToday}
+        recordingsTotal={recordingsTotal}
       />
     </div>
   );

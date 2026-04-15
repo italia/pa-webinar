@@ -24,15 +24,22 @@ export const routing = defineRouting({
     '/admin/login': '/admin/login',
     '/admin/events': { it: '/admin/eventi', en: '/admin/events' },
     '/admin/events/new': { it: '/admin/eventi/nuovo', en: '/admin/events/new' },
+    // Explicit declaration so next-intl doesn't route /admin/events/calls
+    // through the /admin/events/[id] wildcard and end up serving the wrong
+    // segment under /admin/eventi/calls in Italian.
+    '/admin/events/calls': { it: '/admin/eventi/chiamate-rapide', en: '/admin/events/calls' },
     '/admin/events/template': '/admin/events/template',
     '/admin/events/statistics': { it: '/admin/eventi/statistiche', en: '/admin/events/statistics' },
     '/admin/events/[id]': { it: '/admin/eventi/[id]', en: '/admin/events/[id]' },
     '/admin/events/[id]/edit': { it: '/admin/eventi/[id]/modifica', en: '/admin/events/[id]/edit' },
+    '/admin/registrations': { it: '/admin/iscrizioni', en: '/admin/registrations' },
+    '/admin/recordings': { it: '/admin/registrazioni-video', en: '/admin/recordings' },
+    '/admin/moderators': { it: '/admin/moderatori', en: '/admin/moderators' },
+    '/admin/gdpr-audit': { it: '/admin/gdpr-audit', en: '/admin/gdpr-audit' },
     '/admin/settings': { it: '/admin/impostazioni', en: '/admin/settings' },
     '/admin/settings/languages': { it: '/admin/impostazioni/lingue', en: '/admin/settings/languages' },
     '/admin/calendar': { it: '/admin/calendario', en: '/admin/calendar' },
     '/admin/infrastructure': { it: '/admin/infrastruttura', en: '/admin/infrastructure' },
     '/admin/monitoring': '/admin/monitoring',
-    '/admin/statistics': { it: '/admin/statistiche', en: '/admin/statistics' },
   },
 });
