@@ -447,10 +447,16 @@ model SiteSetting {
   // JVB scale-to-zero tuning
   // Minuti di conferenza vuota prima di marcare un evento LIVE come IDLE
   // e scalare il JVB a 0. Default: 45. Range consigliato: 15-120.
-  jvbInactiveGraceMinutes Int @default(45) @map("jvb_inactive_grace_minutes")
+  jvbInactiveGraceMinutes  Int @default(45) @map("jvb_inactive_grace_minutes")
   // Minuti di lookahead per il pre-scaling di eventi PUBLISHED → PROVISIONING.
   // Il nodo viene avviato N minuti prima di startsAt. Default: 10.
-  jvbPreScaleMinutes      Int @default(10) @map("jvb_pre_scale_minutes")
+  jvbPreScaleMinutes       Int @default(10) @map("jvb_pre_scale_minutes")
+  // Soglie di stress che attivano il reactive scale-up oltre al predictive.
+  // Sopra la warn, aggiunge 1 replica; sopra la critical, 2. Entrambe
+  // sono espresse come percentuale 0-100 per comodità dell'admin UI.
+  // Default 50/70 = scale-up se lo stress supera rispettivamente 50% e 70%.
+  jvbStressWarnPercent     Int @default(50) @map("jvb_stress_warn_percent")
+  jvbStressCriticalPercent Int @default(70) @map("jvb_stress_critical_percent")
 
   updatedAt DateTime @updatedAt @map("updated_at")
 

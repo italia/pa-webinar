@@ -33,24 +33,15 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { jvbsForEvent, jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
-const MAX_REPLICAS = parseInt(process.env.JVB_MAX_REPLICAS || '6', 10);
+const MAX_REPLICAS = jvbMaxReplicasFromEnv();
 
-/** How many JVB instances a single event needs, based on its configuration. */
-function jvbsForEvent(maxParticipants: number, videoEnabled: boolean): number {
-  if (videoEnabled) {
-    // Interactive all-senders: ~50 participants per F16s_v2 JVB (empirical)
-    if (maxParticipants <= 50) return 1;
-    if (maxParticipants <= 100) return 2;
-    return Math.min(Math.ceil(maxParticipants / 50), MAX_REPLICAS);
-  }
-  // Webinar (few senders, many passive viewers): ~300 parts per F16s_v2 JVB
-  if (maxParticipants <= 300) return 1;
-  if (maxParticipants <= 600) return 2;
-  return Math.min(Math.ceil(maxParticipants / 300), MAX_REPLICAS);
+function clampPct(v: number): number {
+  return Math.max(0, Math.min(100, v));
 }
 
 type JvbStats = {
@@ -94,6 +85,10 @@ export const GET = withErrorHandling(async (request) => {
   const preScaleMin =
     settings.jvbPreScaleMinutes ??
     parseInt(process.env.JVB_PRE_SCALE_MINUTES || '10', 10);
+  // Reactive scale-up thresholds, 0-100 percent. Stored as integer in DB
+  // for the admin form; compared against the 0..1 fraction from JVB stats.
+  const stressWarn = clampPct(settings.jvbStressWarnPercent ?? 50) / 100;
+  const stressCritical = clampPct(settings.jvbStressCriticalPercent ?? 70) / 100;
 
   const now = new Date();
   const preScaleWindow = new Date(now.getTime() + preScaleMin * 60_000);
@@ -218,10 +213,12 @@ export const GET = withErrorHandling(async (request) => {
     };
   });
 
-  // Reactive: if measured stress is high, add headroom.
+  // Reactive: if measured stress is high, add headroom. Thresholds come
+  // from SiteSetting so an admin can make the scaler more or less eager
+  // without a redeploy.
   let reactiveAdjustment = 0;
-  if (effectiveStress > 0.7) reactiveAdjustment = 2;
-  else if (effectiveStress > 0.5) reactiveAdjustment = 1;
+  if (effectiveStress > stressCritical) reactiveAdjustment = 2;
+  else if (effectiveStress > stressWarn) reactiveAdjustment = 1;
 
   const desired = Math.min(
     Math.max(predictiveDesired + reactiveAdjustment, billableEvents.length > 0 ? 1 : 0),
@@ -245,6 +242,8 @@ export const GET = withErrorHandling(async (request) => {
     transitions,
     inactiveGraceMinutes: inactiveGraceMin,
     preScaleMinutes: preScaleMin,
+    stressWarnPercent: Math.round(stressWarn * 100),
+    stressCriticalPercent: Math.round(stressCritical * 100),
     maxReplicas: MAX_REPLICAS,
     checkedAt: now.toISOString(),
   });

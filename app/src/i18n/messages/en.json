@@ -585,7 +585,11 @@
         "jvbInactiveGraceMinutes": "Inactivity minutes before shutdown",
         "jvbInactiveGraceMinutesHelp": "How long the conference must stay empty before the video node is scaled down. Recommended 45 minutes. Range 5-240.",
         "jvbPreScaleMinutes": "Pre-scale lead time (minutes)",
-        "jvbPreScaleMinutesHelp": "How many minutes before startsAt to boot the video node for a scheduled event. Recommended 10 minutes."
+        "jvbPreScaleMinutesHelp": "How many minutes before startsAt to boot the video node for a scheduled event. Recommended 10 minutes.",
+        "jvbStressWarnPercent": "Stress warning threshold (%)",
+        "jvbStressWarnPercentHelp": "Above this threshold the scaler adds 1 extra JVB replica even if predictive sizing doesn't require it. Default 50.",
+        "jvbStressCriticalPercent": "Stress critical threshold (%)",
+        "jvbStressCriticalPercentHelp": "Above this threshold the scaler adds 2 extra JVB replicas. Default 70. Must be higher than warn."
       }
     },
     "analytics": {
@@ -1068,6 +1072,9 @@
     "noUpcomingEvents": "No upcoming events",
     "jvbActivatesIn": "JVB activates in {minutes} min",
     "liveNow": "Live now",
+    "provisioning": "Provisioning",
+    "idle": "Paused",
+    "jvbOctoActive": "Octo active: {bridges} bridges, {relayMbps} Mbps inter-bridge relay",
     "activeEvents": "Active events",
     "registrationsToday": "Sign-ups today",
     "jvbNodes": "JVB nodes",
@@ -1110,6 +1117,10 @@
     "sendingVideo": "Sending video",
     "iceSuccess": "Successful connections",
     "totalConferences": "Total conferences",
+    "octoConferences": "Octo conferences (multi-bridge)",
+    "octoEndpoints": "Endpoints via relay",
+    "octoSend": "Inter-bridge relay out",
+    "octoReceive": "Inter-bridge relay in",
     "lastUpdated": "Last updated",
     "zonePublic": "Public access",
     "zoneCluster": "Platform services",

@@ -16,12 +16,18 @@ interface SystemStatus {
   components: unknown[];
   metrics: {
     activeEvents: number;
+    idleEvents: number;
+    provisioningEvents: number;
     totalRegistrationsToday: number;
     jvbDesiredReplicas: number;
     jvbRunningReplicas: number;
     jvbStatus: 'ready' | 'scaling' | 'standby';
     jvbStressLevel: number | null;
     jvbParticipants: number | null;
+    jvbOctoEnabled: boolean;
+    jvbOctoConferences: number | null;
+    jvbOctoEndpoints: number | null;
+    jvbOctoSendBitrateBps: number | null;
   };
   upcomingEvents: {
     title: string;
@@ -185,6 +191,16 @@ export default function StatusDashboard() {
                       {data.metrics.jvbParticipants} {t('participantsConnected')}
                     </p>
                   )}
+
+                  {data.metrics.jvbOctoEnabled && (
+                    <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: '#0066CC' }}>
+                      <Icon icon="it-link" size="xs" className="me-1" />
+                      {t('jvbOctoActive', {
+                        bridges: (data.metrics.jvbOctoConferences ?? 0) + 1,
+                        relayMbps: Math.round((data.metrics.jvbOctoSendBitrateBps ?? 0) / 1000),
+                      })}
+                    </p>
+                  )}
                 </>
               )}
             </CardBody>
@@ -205,11 +221,32 @@ export default function StatusDashboard() {
                 <ul className="list-unstyled mb-0">
                   {data.upcomingEvents.map((event, i) => {
                     const startsAt = new Date(event.startsAt);
-                    const isLive = event.status === 'LIVE';
                     const minutesUntil = Math.max(
                       0,
                       Math.round((startsAt.getTime() - Date.now()) / 60_000),
                     );
+
+                    // Badge/label driven by lifecycle state. IDLE and
+                    // PROVISIONING are new states introduced with
+                    // scale-to-zero; they need distinct visual treatment
+                    // so a user landing on /status can tell why a room is
+                    // "up but not running".
+                    const badge = (() => {
+                      switch (event.status) {
+                        case 'LIVE':
+                          return <Badge color="success" className="ms-2 flex-shrink-0">{t('liveNow')}</Badge>;
+                        case 'PROVISIONING':
+                          return <Badge color="warning" className="ms-2 flex-shrink-0">{t('provisioning')}</Badge>;
+                        case 'IDLE':
+                          return <Badge color="secondary" className="ms-2 flex-shrink-0">{t('idle')}</Badge>;
+                        default:
+                          return minutesUntil <= 30 ? (
+                            <span className="text-warning flex-shrink-0" style={{ fontSize: '0.8rem' }}>
+                              {t('jvbActivatesIn', { minutes: minutesUntil })}
+                            </span>
+                          ) : null;
+                      }
+                    })();
 
                     return (
                       <li
@@ -234,18 +271,7 @@ export default function StatusDashboard() {
                             {event.videoEnabled ? t('videoInteractive') : t('videoWebinar')}
                           </span>
                         </div>
-                        {isLive ? (
-                          <Badge color="success" className="ms-2 flex-shrink-0">
-                            {t('liveNow')}
-                          </Badge>
-                        ) : minutesUntil <= 30 ? (
-                          <span
-                            className="text-warning flex-shrink-0"
-                            style={{ fontSize: '0.8rem' }}
-                          >
-                            {t('jvbActivatesIn', { minutes: minutesUntil })}
-                          </span>
-                        ) : null}
+                        {badge}
                       </li>
                     );
                   })}

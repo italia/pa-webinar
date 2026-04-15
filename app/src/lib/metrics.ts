@@ -74,6 +74,33 @@ export const jvbStressLevelGauge = new client.Gauge({
   registers: [register],
 });
 
+// Octo (cascaded bridges). When a conference is spread across multiple
+// JVB pods these gauges reflect the inter-bridge relay traffic. Value 0
+// with octo disabled is indistinguishable from octo-enabled-but-idle.
+export const jvbOctoConferencesGauge = new client.Gauge({
+  name: 'eventi_jvb_octo_conferences',
+  help: 'Number of conferences this JVB is participating in via Octo relay',
+  registers: [register],
+});
+
+export const jvbOctoEndpointsGauge = new client.Gauge({
+  name: 'eventi_jvb_octo_endpoints',
+  help: 'Number of remote endpoints this JVB is forwarding from peer bridges',
+  registers: [register],
+});
+
+export const jvbOctoSendBitrateGauge = new client.Gauge({
+  name: 'eventi_jvb_octo_send_bitrate_bps',
+  help: 'Outbound bitrate of Octo relay traffic (bytes per second)',
+  registers: [register],
+});
+
+export const jvbOctoReceiveBitrateGauge = new client.Gauge({
+  name: 'eventi_jvb_octo_receive_bitrate_bps',
+  help: 'Inbound bitrate of Octo relay traffic (bytes per second)',
+  registers: [register],
+});
+
 export const jvbScalingEventsTotal = new client.Counter({
   name: 'eventi_jvb_scaling_events_total',
   help: 'Total JVB scaling events',
