@@ -17,7 +17,8 @@
     "edit": "Editja",
     "search": "Fittex",
     "noResults": "L-ebda riżultat",
-    "requiredField": "Qasam obbligatorju"
+    "requiredField": "Qasam obbligatorju",
+    "errorGeneric": "An error occurred. Please try again."
   },
   "nav": {
     "home": "Paġna Ewlenija",
@@ -790,7 +791,20 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      }
     },
     "sessions": {
       "title": "Call sessions",
@@ -1103,7 +1117,9 @@
       "smtp": "Jibgħat emails ta' konferma u tfakkiriet"
     },
     "verdicts": {
-      "app": { "healthy": "Il-portal web qed jaħdem korrettament u qed iwieġeb għat-talbiet." },
+      "app": {
+        "healthy": "Il-portal web qed jaħdem korrettament u qed iwieġeb għat-talbiet."
+      },
       "database": {
         "healthy": "Id-database qed twieġeb korrettament.",
         "degraded": "Id-database qed twieġeb, iżda aktar bil-mod minn tas-soltu. L-operazzjonijiet jistgħu jieħdu aktar ħin.",

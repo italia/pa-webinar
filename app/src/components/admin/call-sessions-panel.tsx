@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import {
-  Alert,
   Badge,
   Button,
   Card,
@@ -68,7 +67,7 @@ function formatSize(bytes: number | null): string {
 }
 
 export default function CallSessionsPanel({
-  eventId,
+  eventId: _eventId,
   eventSlug,
   moderatorToken,
 }: CallSessionsPanelProps) {

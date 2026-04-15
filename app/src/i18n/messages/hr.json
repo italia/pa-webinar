@@ -17,7 +17,8 @@
     "edit": "Uredi",
     "search": "Pretraži",
     "noResults": "Nema rezultata",
-    "requiredField": "Obvezno polje"
+    "requiredField": "Obvezno polje",
+    "errorGeneric": "An error occurred. Please try again."
   },
   "nav": {
     "home": "Početna",
@@ -790,7 +791,20 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      }
     },
     "sessions": {
       "title": "Call sessions",
@@ -1103,7 +1117,9 @@
       "smtp": "Šalje potvrdne e-poruke i podsjetnike"
     },
     "verdicts": {
-      "app": { "healthy": "Web portal radi ispravno i odgovara na zahtjeve." },
+      "app": {
+        "healthy": "Web portal radi ispravno i odgovara na zahtjeve."
+      },
       "database": {
         "healthy": "Baza podataka odgovara ispravno.",
         "degraded": "Baza podataka odgovara, ali sporije nego uobičajeno. Operacije mogu trajati duže.",

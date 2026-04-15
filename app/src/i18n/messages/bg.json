@@ -17,7 +17,8 @@
     "edit": "Редактиране",
     "search": "Търсене",
     "noResults": "Няма резултати",
-    "requiredField": "Задължително поле"
+    "requiredField": "Задължително поле",
+    "errorGeneric": "An error occurred. Please try again."
   },
   "nav": {
     "home": "Начало",
@@ -790,7 +791,20 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      }
     },
     "sessions": {
       "title": "Call sessions",
@@ -1103,7 +1117,9 @@
       "smtp": "Изпраща имейли за потвърждение и напомняния"
     },
     "verdicts": {
-      "app": { "healthy": "Уеб порталът работи правилно и отговаря на заявки." },
+      "app": {
+        "healthy": "Уеб порталът работи правилно и отговаря на заявки."
+      },
       "database": {
         "healthy": "Базата данни отговаря правилно.",
         "degraded": "Базата данни отговаря, но по-бавно от обичайното. Операциите може да отнемат повече време.",

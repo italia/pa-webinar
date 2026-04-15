@@ -17,7 +17,8 @@
     "edit": "Modifica",
     "search": "Cerca",
     "noResults": "Nessun risultato",
-    "requiredField": "Campo obbligatorio"
+    "requiredField": "Campo obbligatorio",
+    "errorGeneric": "Si è verificato un errore. Riprova."
   },
   "nav": {
     "home": "Home",
@@ -985,7 +986,20 @@
       "total": "totali",
       "noCalls": "Nessuna chiamata rapida effettuata.",
       "participants": "partecipanti",
-      "sessions": "sessioni"
+      "sessions": "sessioni",
+      "createNew": "Nuova chiamata",
+      "createAndJoin": "Crea ed entra",
+      "selected": "selezionate",
+      "selectAll": "Seleziona tutte",
+      "deselectAll": "Deseleziona tutte",
+      "selectRow": "Seleziona riga",
+      "deleteSelected": "Elimina selezionate",
+      "deleteConfirm": "Stai per eliminare {count} chiamate rapide e tutti i dati associati (sessioni, registrazioni). Operazione irreversibile.",
+      "titleTooShort": "Il titolo deve contenere almeno 2 caratteri.",
+      "form": {
+        "titleLabel": "Titolo della chiamata",
+        "moderatorLabel": "Nome del moderatore (opzionale)"
+      }
     },
     "sessions": {
       "title": "Sessioni di chiamata",

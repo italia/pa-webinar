@@ -17,7 +17,8 @@
     "edit": "Redigera",
     "search": "Sök",
     "noResults": "Inga resultat",
-    "requiredField": "Obligatoriskt fält"
+    "requiredField": "Obligatoriskt fält",
+    "errorGeneric": "An error occurred. Please try again."
   },
   "nav": {
     "home": "Hem",
@@ -790,7 +791,20 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      }
     },
     "sessions": {
       "title": "Call sessions",
@@ -1103,7 +1117,9 @@
       "smtp": "Skickar bekräftelsemeddelanden och påminnelser"
     },
     "verdicts": {
-      "app": { "healthy": "Webbportalen fungerar korrekt och svarar på förfrågningar." },
+      "app": {
+        "healthy": "Webbportalen fungerar korrekt och svarar på förfrågningar."
+      },
       "database": {
         "healthy": "Databasen svarar korrekt.",
         "degraded": "Databasen svarar, men långsammare än vanligt. Operationer kan ta längre tid.",

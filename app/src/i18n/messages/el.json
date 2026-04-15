@@ -17,7 +17,8 @@
     "edit": "Επεξεργασία",
     "search": "Αναζήτηση",
     "noResults": "Κανένα αποτέλεσμα",
-    "requiredField": "Υποχρεωτικό πεδίο"
+    "requiredField": "Υποχρεωτικό πεδίο",
+    "errorGeneric": "An error occurred. Please try again."
   },
   "nav": {
     "home": "Αρχική",
@@ -790,7 +791,20 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      }
     },
     "sessions": {
       "title": "Call sessions",
@@ -1103,7 +1117,9 @@
       "smtp": "Αποστέλλει email επιβεβαίωσης και υπενθυμίσεις"
     },
     "verdicts": {
-      "app": { "healthy": "Η διαδικτυακή πύλη λειτουργεί σωστά και ανταποκρίνεται σε αιτήματα." },
+      "app": {
+        "healthy": "Η διαδικτυακή πύλη λειτουργεί σωστά και ανταποκρίνεται σε αιτήματα."
+      },
       "database": {
         "healthy": "Η βάση δεδομένων ανταποκρίνεται σωστά.",
         "degraded": "Η βάση δεδομένων ανταποκρίνεται, αλλά πιο αργά από το συνηθισμένο. Οι λειτουργίες μπορεί να διαρκέσουν περισσότερο.",
