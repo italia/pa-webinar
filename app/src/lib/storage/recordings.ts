@@ -40,6 +40,56 @@ function extractBlobName(recordingUrl: string): string | null {
 }
 
 /**
+ * Generate a write-SAS URL for a new recording blob. Used by the
+ * Jibri finalize script to PUT the mp4 without holding an account
+ * key. Returns `{ uploadUrl, recordingUrl }`: the uploadUrl carries
+ * the SAS token and is consumed by `curl -X PUT`; recordingUrl is
+ * the bare blob URL the portal stores in the DB.
+ *
+ * Returns null when storage is not configured (dev mode) or the
+ * connection string is missing required fields.
+ */
+export async function generateRecordingUploadUrl(
+  filename: string,
+  expiresInMinutes: number,
+): Promise<{ uploadUrl: string; recordingUrl: string } | null> {
+  if (STORAGE_TYPE !== 'azure-blob') return null;
+  if (!AZURE_CONNECTION_STRING) return null;
+
+  const accountName = extractFromConnectionString('AccountName');
+  const accountKey = extractFromConnectionString('AccountKey');
+  if (!accountName || !accountKey) return null;
+
+  const client = getBlobServiceClient();
+  const containerClient = client.getContainerClient(AZURE_CONTAINER);
+  const blobClient = containerClient.getBlobClient(filename);
+
+  const credential = new StorageSharedKeyCredential(accountName, accountKey);
+  const startsOn = new Date();
+  const expiresOn = new Date(startsOn.getTime() + expiresInMinutes * 60_000);
+
+  // 'cw' = create + write. The blob does not yet exist at this point,
+  // so 'w' alone isn't enough on new PutBlob calls under the SAS v2+
+  // protocol — 'c' is required to create a new blob.
+  const sas = generateBlobSASQueryParameters(
+    {
+      containerName: AZURE_CONTAINER,
+      blobName: filename,
+      permissions: BlobSASPermissions.parse('cw'),
+      startsOn,
+      expiresOn,
+      protocol: SASProtocol.Https,
+    },
+    credential,
+  ).toString();
+
+  return {
+    uploadUrl: `${blobClient.url}?${sas}`,
+    recordingUrl: blobClient.url,
+  };
+}
+
+/**
  * Generate a SAS URL for a recording with read-only access and expiry.
  * Returns null if storage is not azure-blob or URL cannot be parsed.
  */
