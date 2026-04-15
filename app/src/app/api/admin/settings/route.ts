@@ -52,6 +52,8 @@ const updateSettingsSchema = z.object({
   jvbPreScaleMinutes: z.number().int().min(1).max(60).optional(),
   jvbStressWarnPercent: z.number().int().min(0).max(100).optional(),
   jvbStressCriticalPercent: z.number().int().min(0).max(100).optional(),
+  jvbProvisioningTimeoutMinutes: z.number().int().min(1).max(120).optional(),
+  statusPollIntervalSeconds: z.number().int().min(5).max(600).optional(),
 }).strict();
 
 export const GET = withErrorHandling(async () => {

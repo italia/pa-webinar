@@ -2,6 +2,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
+import { getSettings } from '@/lib/settings';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,7 @@ interface SystemStatus {
     jvbStatus: 'ready' | 'scaling' | 'standby';
     jvbStressLevel: number | null;
     jvbParticipants: number | null;
+    jvbStale: boolean;
     // Octo (multi-bridge cascading). Populated from /colibri/stats of
     // whichever JVB pod the service LB routes us to — aggregate across
     // bridges requires per-pod queries which we don't do here.
@@ -35,6 +37,7 @@ interface SystemStatus {
     jvbOctoSendBitrateBps: number | null;
     jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable';
     jibriRunningReplicas: number;
+    jibriStale: boolean;
   };
   upcomingEvents: {
     title: string;
@@ -43,6 +46,10 @@ interface SystemStatus {
     maxParticipants: number;
     videoEnabled: boolean;
   }[];
+  config: {
+    provisioningTimeoutMinutes: number;
+    pollIntervalSeconds: number;
+  };
   lastChecked: string;
 }
 
@@ -106,14 +113,19 @@ interface JvbStatusResult {
   octoConferences: number | null;
   octoEndpoints: number | null;
   octoSendBitrateBps: number | null;
+  /** True when ≥1 billable event has been waiting for JVB longer than the configured timeout. */
+  stale: boolean;
 }
 
-async function getJvbStatus(): Promise<JvbStatusResult> {
+async function getJvbStatus(
+  preScaleMinutes: number,
+  provisioningTimeoutMinutes: number,
+): Promise<JvbStatusResult> {
   try {
     const now = new Date();
-    const preScaleMinutes = parseInt(process.env.JVB_PRE_SCALE_MINUTES || '10', 10);
     const maxReplicas = jvbMaxReplicasFromEnv();
     const preScaleWindow = new Date(now.getTime() + preScaleMinutes * 60 * 1000);
+    const staleCutoff = new Date(now.getTime() - provisioningTimeoutMinutes * 60 * 1000);
 
     // LIVE + PROVISIONING: already billing JVB capacity.
     // PUBLISHED within the pre-scale window: scaler will promote them to
@@ -131,6 +143,11 @@ async function getJvbStatus(): Promise<JvbStatusResult> {
         ],
       },
       select: {
+        id: true,
+        slug: true,
+        status: true,
+        startsAt: true,
+        provisioningStartedAt: true,
         maxParticipants: true,
         participantsCanStartVideo: true,
       },
@@ -142,6 +159,16 @@ async function getJvbStatus(): Promise<JvbStatusResult> {
     }
     desired = Math.min(desired, maxReplicas);
     if (events.length > 0 && desired === 0) desired = 1;
+
+    // Stale-provisioning alert: an event should have JVB ready within
+    // provisioningTimeoutMinutes from when it became billable. If not, the
+    // cluster autoscaler is stuck OR the JVB is failing to boot — surface
+    // this on the status page instead of letting JVB remain in "scaling".
+    // Reference timestamp: provisioningStartedAt if set, otherwise startsAt.
+    const staleEvents = events.filter((e) => {
+      const since = e.provisioningStartedAt ?? e.startsAt;
+      return since <= staleCutoff;
+    });
 
     let running = 0;
     let stressLevel: number | null = null;
@@ -180,6 +207,8 @@ async function getJvbStatus(): Promise<JvbStatusResult> {
       }
     }
 
+    const isStale = staleEvents.length > 0 && running < desired;
+
     let jvbStatus: 'ready' | 'scaling' | 'standby' = 'standby';
     if (desired === 0) {
       jvbStatus = 'standby';
@@ -191,14 +220,29 @@ async function getJvbStatus(): Promise<JvbStatusResult> {
 
     const statusText = desired === 0
       ? 'Scale-to-zero — no events'
-      : jvbStatus === 'scaling'
-        ? `Scaling: ${running}/${desired} replicas ready`
-        : `${running}/${maxReplicas} replicas ready`;
+      : isStale
+        ? `Stale: ${staleEvents.length} event(s) waiting JVB for >${provisioningTimeoutMinutes} min`
+        : jvbStatus === 'scaling'
+          ? `Scaling: ${running}/${desired} replicas ready`
+          : `${running}/${maxReplicas} replicas ready`;
+
+    // Status priority:
+    //   standby  → no events need JVB (normal for scale-to-zero)
+    //   degraded → stale (events waiting but bridge not ready)
+    //   operational → running matches desired
+    //   degraded → scaling in flight (not stale yet)
+    const componentStatus: ComponentStatus['status'] = desired === 0
+      ? 'standby'
+      : isStale
+        ? 'degraded'
+        : jvbStatus === 'ready'
+          ? 'operational'
+          : 'degraded';
 
     return {
       component: {
         name: 'jvb',
-        status: desired === 0 ? 'standby' : (jvbStatus === 'ready' ? 'operational' : 'degraded'),
+        status: componentStatus,
         details: statusText,
       },
       desired,
@@ -210,6 +254,7 @@ async function getJvbStatus(): Promise<JvbStatusResult> {
       octoConferences,
       octoEndpoints,
       octoSendBitrateBps,
+      stale: isStale,
     };
   } catch {
     return {
@@ -223,11 +268,12 @@ async function getJvbStatus(): Promise<JvbStatusResult> {
       octoConferences: null,
       octoEndpoints: null,
       octoSendBitrateBps: null,
+      stale: false,
     };
   }
 }
 
-async function getJibriStatus(recordingNeeded: boolean): Promise<{
+async function getJibriStatus(recordingNeeded: boolean, recordingStale: boolean): Promise<{
   component: ComponentStatus;
   running: number;
   jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable';
@@ -290,13 +336,20 @@ async function getJibriStatus(recordingNeeded: boolean): Promise<{
   const jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable' =
     running > 0 ? 'ready' : 'scaling';
 
+  // If the event requesting recording has been waiting past the
+  // provisioning timeout, flag Jibri as degraded with a stale-specific
+  // message instead of the generic "scaling up".
+  const details = running > 0
+    ? `${running} instance(s) ready${busyStatus ? ` (${busyStatus})` : ''}`
+    : recordingStale
+      ? 'Stale: event with recording waiting Jibri past timeout'
+      : 'No instances running — scaling up';
+
   return {
     component: {
       name: 'jibri',
       status: running > 0 ? 'operational' : 'degraded',
-      details: running > 0
-        ? `${running} instance(s) ready${busyStatus ? ` (${busyStatus})` : ''}`
-        : 'No instances running — scaling up',
+      details,
     },
     running,
     jibriStatus,
@@ -304,21 +357,34 @@ async function getJibriStatus(recordingNeeded: boolean): Promise<{
 }
 
 export const GET = withErrorHandling(async () => {
-  // Check whether any currently-billable event wants recording. Drives
-  // Jibri's "expected to be up" signal.
-  const recordingNeeded = (await prisma.event.count({
+  const settings = await getSettings();
+  const preScaleMinutes = settings.jvbPreScaleMinutes ?? 10;
+  const provisioningTimeoutMinutes = settings.jvbProvisioningTimeoutMinutes ?? 15;
+  const pollIntervalSeconds = settings.statusPollIntervalSeconds ?? 30;
+
+  // Pull recording-enabled events in LIVE/PROVISIONING once; drive both the
+  // "Jibri is expected to be up" signal and the stale-provisioning check.
+  const now = new Date();
+  const staleCutoff = new Date(now.getTime() - provisioningTimeoutMinutes * 60 * 1000);
+  const recordingEvents = await prisma.event.findMany({
     where: {
       status: { in: [...JVB_BILLABLE_STATUSES] },
       recordingEnabled: true,
     },
-  })) > 0;
+    select: { id: true, startsAt: true, provisioningStartedAt: true },
+  });
+  const recordingNeeded = recordingEvents.length > 0;
+  const recordingStale = recordingEvents.some((e) => {
+    const since = e.provisioningStartedAt ?? e.startsAt;
+    return since <= staleCutoff;
+  });
 
   const [db, jitsi, smtp, jvb, jibriResult] = await Promise.all([
     checkDatabase(),
     checkJitsiWeb(),
     checkSmtp(),
-    getJvbStatus(),
-    getJibriStatus(recordingNeeded),
+    getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes),
+    getJibriStatus(recordingNeeded, recordingStale),
   ]);
 
   const app: ComponentStatus = { name: 'app', status: 'operational' };
@@ -345,7 +411,6 @@ export const GET = withErrorHandling(async () => {
       ? 'degraded'
       : 'operational';
 
-  const now = new Date();
   const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
 
@@ -386,12 +451,14 @@ export const GET = withErrorHandling(async () => {
       jvbStatus: jvb.jvbStatus,
       jvbStressLevel: jvb.stressLevel,
       jvbParticipants: jvb.participants,
+      jvbStale: jvb.stale,
       jvbOctoEnabled: jvb.octoEnabled,
       jvbOctoConferences: jvb.octoConferences,
       jvbOctoEndpoints: jvb.octoEndpoints,
       jvbOctoSendBitrateBps: jvb.octoSendBitrateBps,
       jibriStatus: jibriResult.jibriStatus,
       jibriRunningReplicas: jibriResult.running,
+      jibriStale: recordingStale && jibriResult.running === 0,
     },
     upcomingEvents: upcomingEvents.map((e) => ({
       title: getLocalized(e.title as LocalizedField, 'it'),
@@ -400,6 +467,10 @@ export const GET = withErrorHandling(async () => {
       maxParticipants: e.maxParticipants,
       videoEnabled: e.participantsCanStartVideo,
     })),
+    config: {
+      provisioningTimeoutMinutes,
+      pollIntervalSeconds,
+    },
     lastChecked: now.toISOString(),
   };
 

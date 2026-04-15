@@ -1158,6 +1158,52 @@ function FeaturesTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="jvbProvisioningTimeoutMinutes">
+              {t('jvbProvisioningTimeoutMinutes')}
+            </Label>
+            <Input
+              id="jvbProvisioningTimeoutMinutes"
+              type="number"
+              min={1}
+              max={120}
+              step={1}
+              value={settings.jvbProvisioningTimeoutMinutes}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('jvbProvisioningTimeoutMinutes', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('jvbProvisioningTimeoutMinutesHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="statusPollIntervalSeconds">
+              {t('statusPollIntervalSeconds')}
+            </Label>
+            <Input
+              id="statusPollIntervalSeconds"
+              type="number"
+              min={5}
+              max={600}
+              step={5}
+              value={settings.statusPollIntervalSeconds}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('statusPollIntervalSeconds', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('statusPollIntervalSecondsHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+      </Row>
     </div>
   );
 }
