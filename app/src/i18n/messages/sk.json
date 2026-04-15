@@ -17,7 +17,8 @@
     "edit": "Upraviť",
     "search": "Hľadať",
     "noResults": "Žiadne výsledky",
-    "requiredField": "Povinné pole"
+    "requiredField": "Povinné pole",
+    "errorGeneric": "An error occurred. Please try again."
   },
   "nav": {
     "home": "Domov",
@@ -790,7 +791,20 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      }
     },
     "sessions": {
       "title": "Call sessions",
@@ -1103,7 +1117,9 @@
       "smtp": "Odosiela potvrdzujúce e-maily a upozornenia"
     },
     "verdicts": {
-      "app": { "healthy": "Webový portál funguje správne a odpovedá na požiadavky." },
+      "app": {
+        "healthy": "Webový portál funguje správne a odpovedá na požiadavky."
+      },
       "database": {
         "healthy": "Databáza odpovedá správne.",
         "degraded": "Databáza odpovedá, ale pomalšie ako zvyčajne. Operácie môžu trvať dlhšie.",

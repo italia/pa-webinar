@@ -17,7 +17,8 @@
     "edit": "Muokkaa",
     "search": "Haku",
     "noResults": "Ei tuloksia",
-    "requiredField": "Pakollinen kenttä"
+    "requiredField": "Pakollinen kenttä",
+    "errorGeneric": "An error occurred. Please try again."
   },
   "nav": {
     "home": "Etusivu",
@@ -790,7 +791,20 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      }
     },
     "sessions": {
       "title": "Call sessions",
@@ -1103,7 +1117,9 @@
       "smtp": "Lähettää vahvistusviestit ja muistutukset"
     },
     "verdicts": {
-      "app": { "healthy": "Verkkoportaali toimii oikein ja vastaa pyyntöihin." },
+      "app": {
+        "healthy": "Verkkoportaali toimii oikein ja vastaa pyyntöihin."
+      },
       "database": {
         "healthy": "Tietokanta vastaa oikein.",
         "degraded": "Tietokanta vastaa, mutta tavallista hitaammin. Toiminnot voivat kestää pidempään.",

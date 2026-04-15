@@ -17,7 +17,8 @@
     "edit": "Cuir in eagar",
     "search": "Cuardaigh",
     "noResults": "Gan torthaí",
-    "requiredField": "Réimse riachtanach"
+    "requiredField": "Réimse riachtanach",
+    "errorGeneric": "An error occurred. Please try again."
   },
   "nav": {
     "home": "Baile",
@@ -790,7 +791,20 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      }
     },
     "sessions": {
       "title": "Call sessions",
@@ -1103,7 +1117,9 @@
       "smtp": "Seolann ríomhphoist deimhnithe agus meabhrúcháin"
     },
     "verdicts": {
-      "app": { "healthy": "Tá an tairseach gréasáin ag obair i gceart agus ag freagairt d'iarratais." },
+      "app": {
+        "healthy": "Tá an tairseach gréasáin ag obair i gceart agus ag freagairt d'iarratais."
+      },
       "database": {
         "healthy": "Tá an bunachar sonraí ag freagairt i gceart.",
         "degraded": "Tá an bunachar sonraí ag freagairt, ach níos moille ná mar is gnách. D'fhéadfadh oibríochtaí níos mó ama a thógáil.",

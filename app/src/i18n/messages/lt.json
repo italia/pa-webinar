@@ -17,7 +17,8 @@
     "edit": "Redaguoti",
     "search": "Ieškoti",
     "noResults": "Rezultatų nerasta",
-    "requiredField": "Privalomas laukas"
+    "requiredField": "Privalomas laukas",
+    "errorGeneric": "An error occurred. Please try again."
   },
   "nav": {
     "home": "Pradžia",
@@ -790,7 +791,20 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      }
     },
     "sessions": {
       "title": "Call sessions",
@@ -1103,7 +1117,9 @@
       "smtp": "Siunčia patvirtinimo el. laiškus ir priminimus"
     },
     "verdicts": {
-      "app": { "healthy": "Žiniatinklio portalas veikia teisingai ir atsako į užklausas." },
+      "app": {
+        "healthy": "Žiniatinklio portalas veikia teisingai ir atsako į užklausas."
+      },
       "database": {
         "healthy": "Duomenų bazė atsako teisingai.",
         "degraded": "Duomenų bazė atsako, bet lėčiau nei įprastai. Operacijos gali užtrukti ilgiau.",
