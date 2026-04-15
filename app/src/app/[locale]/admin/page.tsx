@@ -20,11 +20,27 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     redirect(`/admin/events?token=${token}`);
   }
 
-  const [upcomingCount, liveCount] = await Promise.all([
+  const now = new Date();
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+  const last30d = new Date(now.getTime() - 30 * 86400_000);
+
+  const [
+    upcomingCount,
+    liveCount,
+    instantCallsLast30d,
+    registrationsTotal,
+    registrationsToday,
+  ] = await Promise.all([
     prisma.event.count({
-      where: { status: 'PUBLISHED', startsAt: { gt: new Date() } },
+      where: { status: 'PUBLISHED', startsAt: { gt: now } },
     }),
     prisma.event.count({ where: { status: 'LIVE' } }),
+    prisma.event.count({
+      where: { eventType: 'INSTANT', createdAt: { gte: last30d } },
+    }),
+    prisma.registration.count(),
+    prisma.registration.count({ where: { createdAt: { gte: todayStart } } }),
   ]);
 
   return (
@@ -46,6 +62,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       <AdminLandingClient
         upcomingCount={upcomingCount}
         liveCount={liveCount}
+        instantCallsLast30d={instantCallsLast30d}
+        registrationsTotal={registrationsTotal}
+        registrationsToday={registrationsToday}
       />
     </div>
   );

@@ -14,6 +14,8 @@ interface NavItem {
 
 const MAIN_SECTIONS: NavItem[] = [
   { href: '/admin/events', icon: 'it-calendar', labelKey: 'events' },
+  { href: '/admin/registrations', icon: 'it-user', labelKey: 'registrations' },
+  { href: '/admin/monitoring', icon: 'it-presentation', labelKey: 'monitoring' },
   { href: '/admin/settings', icon: 'it-settings', labelKey: 'settings' },
 ];
 
@@ -26,11 +28,15 @@ const EVENTS_SUB_NAV: NavItem[] = [
   { href: '/admin/events/statistics', icon: 'it-chart-line', labelKey: 'analytics' },
 ];
 
+// Monitoring groups together all the observability surfaces.
+const MONITORING_SUB_NAV: NavItem[] = [
+  { href: '/admin/monitoring', icon: 'it-presentation', labelKey: 'monitoringDashboard', exact: true },
+  { href: '/admin/infrastructure', icon: 'it-server', labelKey: 'infrastructure' },
+];
+
 const SETTINGS_SUB_NAV: NavItem[] = [
   { href: '/admin/settings', icon: 'it-settings', labelKey: 'settingsGeneral', exact: true },
   { href: '/admin/settings/languages', icon: 'it-hearing', labelKey: 'settingsLanguages' },
-  { href: '/admin/infrastructure', icon: 'it-server', labelKey: 'infrastructure' },
-  { href: '/admin/monitoring', icon: 'it-chart-line', labelKey: 'monitoring' },
 ];
 
 export default function AdminNav() {
@@ -40,9 +46,16 @@ export default function AdminNav() {
   const stripped = pathname.replace(/^\/[a-z]{2}/, '');
   const inEvents = stripped.startsWith('/admin/events') || stripped.startsWith('/admin/eventi')
     || stripped.startsWith('/admin/calendar') || stripped.startsWith('/admin/calendario');
-  const inSettings = stripped.startsWith('/admin/settings') || stripped.startsWith('/admin/impostazioni')
-    || stripped.startsWith('/admin/infrastructure') || stripped.startsWith('/admin/infrastruttura')
-    || stripped.startsWith('/admin/monitoring');
+  // Monitoring area groups /admin/monitoring and /admin/infrastructure.
+  // These used to live under Settings but they are operational views,
+  // not configuration — so they get their own top-level section.
+  const inMonitoring = stripped.startsWith('/admin/monitoring')
+    || stripped.startsWith('/admin/infrastructure')
+    || stripped.startsWith('/admin/infrastruttura');
+  const inSettings = (stripped.startsWith('/admin/settings') || stripped.startsWith('/admin/impostazioni'))
+    && !inMonitoring;
+  const inRegistrations = stripped.startsWith('/admin/registrations')
+    || stripped.startsWith('/admin/iscrizioni');
 
   const PATH_ALIASES: Record<string, string[]> = {
     '/admin/events': ['/admin/events', '/admin/eventi'],
@@ -51,6 +64,7 @@ export default function AdminNav() {
     '/admin/events/template': ['/admin/events/template'],
     '/admin/events/statistics': ['/admin/events/statistics', '/admin/eventi/statistiche'],
     '/admin/calendar': ['/admin/calendar', '/admin/calendario'],
+    '/admin/registrations': ['/admin/registrations', '/admin/iscrizioni'],
     '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
     '/admin/settings/languages': ['/admin/settings/languages', '/admin/impostazioni/lingue'],
     '/admin/infrastructure': ['/admin/infrastructure', '/admin/infrastruttura'],
@@ -66,7 +80,9 @@ export default function AdminNav() {
   function isActive(item: NavItem): boolean {
     if (item.exact) return matchesPath(item.href, true);
     if (item.href === '/admin/events' && !item.exact) return inEvents;
+    if (item.href === '/admin/monitoring') return inMonitoring;
     if (item.href === '/admin/settings') return inSettings;
+    if (item.href === '/admin/registrations') return inRegistrations;
     return matchesPath(item.href);
   }
 
@@ -75,7 +91,13 @@ export default function AdminNav() {
     return matchesPath(item.href);
   }
 
-  const subNav = inEvents ? EVENTS_SUB_NAV : inSettings ? SETTINGS_SUB_NAV : null;
+  const subNav = inEvents
+    ? EVENTS_SUB_NAV
+    : inMonitoring
+      ? MONITORING_SUB_NAV
+      : inSettings
+        ? SETTINGS_SUB_NAV
+        : null;
 
   return (
     <div>
