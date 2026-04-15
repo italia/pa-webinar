@@ -390,7 +390,10 @@
         "decisionIgnore": "Kept",
         "decisionDeleteNow": "To delete",
         "nextSweep": "Next run"
-      }
+      },
+      "play": "Play",
+      "closePlayer": "Close player",
+      "playerUnsupported": "Your browser does not support video playback."
     },
     "gdprAudit": {
       "title": "GDPR audit",

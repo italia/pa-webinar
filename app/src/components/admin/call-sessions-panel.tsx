@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import {
   Badge,
   Button,
@@ -72,6 +72,7 @@ export default function CallSessionsPanel({
   moderatorToken,
 }: CallSessionsPanelProps) {
   const t = useTranslations('admin.sessions');
+  const fmt = useFormatter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -138,7 +139,13 @@ export default function CallSessionsPanel({
                   <div className="d-flex align-items-center gap-3">
                     <div>
                       <div className="fw-semibold" style={{ fontSize: '0.9rem' }}>
-                        {new Date(session.startedAt).toLocaleString()}
+                        {fmt.dateTime(new Date(session.startedAt), {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
                       </div>
                       <div className="d-flex gap-2 text-muted" style={{ fontSize: '0.78rem' }}>
                         <span>{formatDuration(session.duration)}</span>
@@ -215,8 +222,8 @@ export default function CallSessionsPanel({
                               {participantList.map((p, i) => (
                                 <tr key={i}>
                                   <td>{p.name}</td>
-                                  <td>{p.joinedAt ? new Date(p.joinedAt).toLocaleTimeString() : '—'}</td>
-                                  <td>{p.leftAt ? new Date(p.leftAt).toLocaleTimeString() : '—'}</td>
+                                  <td>{p.joinedAt ? fmt.dateTime(new Date(p.joinedAt), { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—'}</td>
+                                  <td>{p.leftAt ? fmt.dateTime(new Date(p.leftAt), { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—'}</td>
                                 </tr>
                               ))}
                             </tbody>

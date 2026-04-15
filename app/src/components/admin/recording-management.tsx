@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import {
   Alert,
   Badge,
@@ -60,6 +60,7 @@ export default function RecordingManagement({
   jibriAvailable = true,
 }: RecordingManagementProps) {
   const t = useTranslations('recording');
+  const fmt = useFormatter();
   const router = useRouter();
 
   const [published, setPublished] = useState(event.recordingPublished);
@@ -170,7 +171,7 @@ export default function RecordingManagement({
                   {t('duration')}: <span className="font-monospace">{liveElapsed}</span>
                 </div>
                 <div className="text-muted" style={{ fontSize: '0.82rem' }}>
-                  {t('startedAt')}: {new Date(event.tempRecordingStartedAt).toLocaleTimeString()} ({t('automatic')})
+                  {t('startedAt')}: {fmt.dateTime(new Date(event.tempRecordingStartedAt), { hour: '2-digit', minute: '2-digit', second: '2-digit' })} ({t('automatic')})
                 </div>
               </div>
             </div>
