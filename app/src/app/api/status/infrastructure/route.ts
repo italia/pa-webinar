@@ -9,6 +9,7 @@ import {
   queryPrometheusRange,
 } from '@/lib/prometheus';
 import { METRICS_APP_LABEL } from '@/lib/metrics';
+import { getSettings } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -369,8 +370,11 @@ export const GET = withErrorHandling(async () => {
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN') || '';
   const appDomain = getPublicEnv('NEXT_PUBLIC_APP_URL') || '';
   const maxJvb = jvbMaxReplicasFromEnv();
-  const preScaleMinutes = parseInt(process.env.JVB_PRE_SCALE_MINUTES || '10', 10);
+  const settings = await getSettings();
+  const preScaleMinutes = settings.jvbPreScaleMinutes ?? 10;
+  const provisioningTimeoutMinutes = settings.jvbProvisioningTimeoutMinutes ?? 15;
   const storageType = process.env.RECORDING_STORAGE_TYPE || 'not-configured';
+  const storageConfigured = storageType !== 'not-configured' && storageType !== 'local';
   const namespace = process.env.POD_NAMESPACE || 'default';
 
   const [
@@ -406,9 +410,12 @@ export const GET = withErrorHandling(async () => {
 
   const now = new Date();
   const preScaleWindow = new Date(now.getTime() + preScaleMinutes * 60 * 1000);
+  const staleCutoff = new Date(now.getTime() - provisioningTimeoutMinutes * 60 * 1000);
   // Same filter as /api/internal/jvb-desired-replicas: count LIVE,
   // PROVISIONING and PUBLISHED-within-pre-scale. IDLE is excluded so the
   // infrastructure view reflects current billable capacity, not historical.
+  // We also pull provisioningStartedAt + recordingEnabled to compute the
+  // stale-provisioning flag (same rule as /api/status).
   const soonEvents = await prisma.event.findMany({
     where: {
       OR: [
@@ -416,7 +423,15 @@ export const GET = withErrorHandling(async () => {
         { status: 'PUBLISHED', startsAt: { lte: preScaleWindow }, endsAt: { gte: now } },
       ],
     },
-    select: { maxParticipants: true, participantsCanStartVideo: true, startsAt: true },
+    select: {
+      id: true,
+      status: true,
+      startsAt: true,
+      provisioningStartedAt: true,
+      maxParticipants: true,
+      participantsCanStartVideo: true,
+      recordingEnabled: true,
+    },
   });
 
   let jvbDesired = 0;
@@ -427,10 +442,34 @@ export const GET = withErrorHandling(async () => {
   if (soonEvents.length > 0 && jvbDesired === 0) jvbDesired = 1;
 
   const jvbRunning = jvbStats.healthy ? 1 : 0;
+
+  // Stale-provisioning: an event with JVB_BILLABLE_STATUSES is waiting for a
+  // bridge longer than the configured timeout. Reference timestamp is
+  // provisioningStartedAt when set (populated by the scaler on PUBLISHED→
+  // PROVISIONING transition) else startsAt (fallback for already-LIVE
+  // events that skipped the provisioning phase).
+  const billableEvents = soonEvents.filter((e) =>
+    (JVB_BILLABLE_STATUSES as readonly string[]).includes(e.status),
+  );
+  const jvbStale = jvbRunning < jvbDesired && billableEvents.some((e) => {
+    const since = e.provisioningStartedAt ?? e.startsAt;
+    return since <= staleCutoff;
+  });
+
+  // Jibri is "needed" only when a billable event has recording enabled.
+  // Without a billable+recording event, Jibri can legitimately be at 0.
+  const recordingEvents = billableEvents.filter((e) => e.recordingEnabled);
+  const recordingNeeded = recordingEvents.length > 0;
+  const jibriStale = recordingNeeded && !jibriInfo.healthy && recordingEvents.some((e) => {
+    const since = e.provisioningStartedAt ?? e.startsAt;
+    return since <= staleCutoff;
+  });
+
   const jvbStatus: ServiceStatus =
     jvbDesired === 0 ? 'standby'
-      : jvbRunning >= jvbDesired ? 'healthy'
-        : 'scaling';
+      : jvbStale ? 'degraded'
+        : jvbRunning >= jvbDesired ? 'healthy'
+          : 'scaling';
 
   const nextEventMin = soonEvents
     .filter(e => e.startsAt > now)
@@ -442,7 +481,21 @@ export const GET = withErrorHandling(async () => {
 
   const dbStatus: ServiceStatus = dbOk ? (dbLatencyMs > 1000 ? 'degraded' : 'healthy') : 'down';
   const jitsiWebStatus: ServiceStatus = jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby';
-  const jibriStatus: ServiceStatus = jibriInfo.healthy ? 'healthy' : storageType !== 'not-configured' ? 'down' : 'standby';
+  // Jibri status reflects scale-to-zero semantics, mirroring /api/status:
+  //   - unconfigured (no storage backend) → standby with unconfigured verdict
+  //   - healthy pod reachable              → healthy / busy
+  //   - no pod but nothing needs recording → standby (scale-to-zero normal)
+  //   - no pod but a billable+recording event waits past timeout → degraded (stale)
+  //   - no pod but something needs recording, not yet stale → scaling
+  const jibriStatus: ServiceStatus = !storageConfigured
+    ? 'standby'
+    : jibriInfo.healthy
+      ? 'healthy'
+      : jibriStale
+        ? 'degraded'
+        : recordingNeeded
+          ? 'scaling'
+          : 'standby';
   const smtpStatus: ServiceStatus = process.env.SMTP_HOST ? 'healthy' : 'standby';
 
   const services: ServiceNode[] = [
@@ -524,14 +577,18 @@ export const GET = withErrorHandling(async () => {
       technicalName: 'Jitsi Videobridge (JVB)',
       description: 'infraMap.descriptions.jvb',
       status: jvbStatus,
-      verdict: jvbDesired === 0
-        ? 'infraMap.verdicts.jvb.standby'
-        : jvbRunning >= jvbDesired
-          ? 'infraMap.verdicts.jvb.healthy'
-          : 'infraMap.verdicts.jvb.scaling',
-      impact: jvbStatus === 'scaling' && nextEventMin !== null
-        ? 'infraMap.impacts.jvbScaling'
-        : null,
+      verdict: jvbStale
+        ? 'infraMap.verdicts.jvb.stale'
+        : jvbDesired === 0
+          ? 'infraMap.verdicts.jvb.standby'
+          : jvbRunning >= jvbDesired
+            ? 'infraMap.verdicts.jvb.healthy'
+            : 'infraMap.verdicts.jvb.scaling',
+      impact: jvbStale
+        ? 'infraMap.impacts.jvbStale'
+        : jvbStatus === 'scaling' && nextEventMin !== null
+          ? 'infraMap.impacts.jvbScaling'
+          : null,
       replicas: { running: jvbRunning, desired: jvbDesired, max: maxJvb },
       ports: [
         { name: 'media', port: 10000, protocol: 'UDP' },
@@ -551,13 +608,28 @@ export const GET = withErrorHandling(async () => {
       technicalName: 'Jibri (Jitsi Broadcasting Infrastructure)',
       description: 'infraMap.descriptions.jibri',
       status: jibriStatus,
-      verdict: jibriInfo.healthy
-        ? (jibriInfo.busy ? 'infraMap.verdicts.jibri.busy' : 'infraMap.verdicts.jibri.healthy')
-        : storageType !== 'not-configured' ? 'infraMap.verdicts.jibri.down' : 'infraMap.verdicts.jibri.standby',
-      impact: jibriStatus === 'down' ? 'infraMap.impacts.jibri' : null,
+      // Verdict mirrors the status: unconfigured → unconfigured, healthy →
+      // healthy/busy, stale → stale, needed-but-scaling → (fall back to
+      // 'standby' which already explains scale-to-zero), normal idle →
+      // standby. The only "down" case is when storage IS configured AND
+      // a billable+recording event has been waiting past the timeout —
+      // which is the 'stale' verdict.
+      verdict: !storageConfigured
+        ? 'infraMap.verdicts.jibri.unconfigured'
+        : jibriInfo.healthy
+          ? (jibriInfo.busy ? 'infraMap.verdicts.jibri.busy' : 'infraMap.verdicts.jibri.healthy')
+          : jibriStale
+            ? 'infraMap.verdicts.jibri.stale'
+            : 'infraMap.verdicts.jibri.standby',
+      impact: jibriStale ? 'infraMap.impacts.jibriStale' : null,
       replicas: { running: jibriInfo.healthy ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'api', port: 2222, protocol: 'TCP' }],
-      metadata: { busy: jibriInfo.busy, busyStatus: jibriInfo.busyStatus },
+      metadata: {
+        busy: jibriInfo.busy,
+        busyStatus: jibriInfo.busyStatus,
+        storageConfigured,
+        recordingNeeded,
+      },
     },
     {
       id: 'smtp',
