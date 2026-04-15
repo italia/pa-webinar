@@ -579,7 +579,13 @@
         "calendarPublic": "Public calendar",
         "calendarPublicHelp": "Publish the event calendar. Visitors can see scheduled events.",
         "githubUrl": "GitHub repository URL",
-        "supportEmail": "Support email"
+        "supportEmail": "Support email",
+        "jvbScalingTitle": "Video bridge scaling (JVB)",
+        "jvbScalingHelp": "Control how long to wait before shutting down an idle video node, and how early to start it for a scheduled event.",
+        "jvbInactiveGraceMinutes": "Inactivity minutes before shutdown",
+        "jvbInactiveGraceMinutesHelp": "How long the conference must stay empty before the video node is scaled down. Recommended 45 minutes. Range 5-240.",
+        "jvbPreScaleMinutes": "Pre-scale lead time (minutes)",
+        "jvbPreScaleMinutesHelp": "How many minutes before startsAt to boot the video node for a scheduled event. Recommended 10 minutes."
       }
     },
     "analytics": {
@@ -1406,5 +1412,17 @@
       "polls": "Polls",
       "feedback": "Feedback"
     }
+  },
+  "provisioning": {
+    "loading": "Loading",
+    "titleFromIdle": "Reactivating room",
+    "titleColdStart": "Preparing room",
+    "descriptionFromIdle": "The room had been paused due to inactivity to save energy. We're restarting it now — this usually takes 2-3 minutes.",
+    "descriptionColdStart": "We're setting up the virtual room for this event. It takes about 2-3 minutes: you'll be redirected automatically when everything is ready.",
+    "progressLabel": "{seconds} s",
+    "retry": "Reload",
+    "tempError": "Retrying to reach the server, no action needed.",
+    "ended": "The event has ended.",
+    "scaleToZeroNote": "To reduce environmental impact, video nodes are powered off when nobody is in a call. They restart automatically on the first join."
   }
 }

@@ -48,6 +48,8 @@ const updateSettingsSchema = z.object({
   availableLocales: z.array(z.string().min(2).max(5)).optional(),
   localeNames: z.record(z.string().min(2).max(5), z.string().max(50)).optional(),
   translationOverrides: z.record(z.string(), z.record(z.string(), z.string())).optional(),
+  jvbInactiveGraceMinutes: z.number().int().min(5).max(240).optional(),
+  jvbPreScaleMinutes: z.number().int().min(1).max(60).optional(),
 }).strict();
 
 export const GET = withErrorHandling(async () => {

@@ -10,88 +10,98 @@ datasource db {
 // ─── Events ──────────────────────────────────────────────────
 
 model Event {
-  id          String   @id @default(uuid()) @db.Uuid
-  slug        String   @unique
-  title       Json     @default("{}") @db.JsonB
-  description Json     @default("{}") @db.JsonB
-  
-  startsAt    DateTime @map("starts_at")
-  endsAt      DateTime @map("ends_at")
-  timezone    String   @default("Europe/Rome")
-  
-  maxParticipants Int  @default(300) @map("max_participants")
-  
+  id          String @id @default(uuid()) @db.Uuid
+  slug        String @unique
+  title       Json   @default("{}") @db.JsonB
+  description Json   @default("{}") @db.JsonB
+
+  startsAt DateTime @map("starts_at")
+  endsAt   DateTime @map("ends_at")
+  timezone String   @default("Europe/Rome")
+
+  maxParticipants Int @default(300) @map("max_participants")
+
   // Jitsi room configuration
   jitsiRoomName String @unique @map("jitsi_room_name") // UUID-based
-  
+
   // Feature toggles
-  qaEnabled       Boolean @default(true)  @map("qa_enabled")
-  chatEnabled     Boolean @default(false) @map("chat_enabled")
+  qaEnabled        Boolean @default(true) @map("qa_enabled")
+  chatEnabled      Boolean @default(false) @map("chat_enabled")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
-  
+
   // AV moderation settings
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")
-  
+
   // Registration profiling toggles
   requireOrganization     Boolean @default(false) @map("require_organization")
   requireOrganizationRole Boolean @default(false) @map("require_organization_role")
   requireOrganizationType Boolean @default(false) @map("require_organization_type")
 
   // Moderator access
-  moderatorToken  String  @unique @map("moderator_token") // UUID for magic link
-  moderatorName   String? @map("moderator_name")
-  moderatorEmail  String? @map("moderator_email")
-  
+  moderatorToken String  @unique @map("moderator_token") // UUID for magic link
+  moderatorName  String? @map("moderator_name")
+  moderatorEmail String? @map("moderator_email")
+
   // GDPR
-  dataRetentionDays  Int @default(30) @map("data_retention_days")
-  privacyPolicyUrl   String? @map("privacy_policy_url")
-  privacyPolicyText  String? @map("privacy_policy_text") @db.Text
-  
+  dataRetentionDays Int     @default(30) @map("data_retention_days")
+  privacyPolicyUrl  String? @map("privacy_policy_url")
+  privacyPolicyText String? @map("privacy_policy_text") @db.Text
+
   // Additional info
-  speakersInfo  Json     @default("{}") @map("speakers_info") @db.JsonB
-  organizerName String?  @map("organizer_name")
-  imageUrl      String?  @map("image_url")
+  speakersInfo        Json    @default("{}") @map("speakers_info") @db.JsonB
+  organizerName       String? @map("organizer_name")
+  imageUrl            String? @map("image_url")
   waitingRoomAudioUrl String? @map("waiting_room_audio_url")
-  
+
   // Event type
-  eventType   EventType   @default(SCHEDULED) @map("event_type")
+  eventType EventType @default(SCHEDULED) @map("event_type")
 
   // Status
-  status      EventStatus @default(DRAFT)
-  
+  status EventStatus @default(DRAFT)
+
+  // Scale-to-zero tracking: quando il JVB era effettivamente in uso l'ultima
+  // volta (≥1 endpoint sul bridge per la room dell'evento). Popolato dallo
+  // scaler ogni ciclo. Usato per IDLE → scale-down dopo INACTIVE_GRACE_MIN.
+  lastActiveAt DateTime? @map("last_active_at")
+
+  // Inizio transizione PROVISIONING (primo utente che apre la pagina di un
+  // evento IDLE, o pre-scaling automatico prima di startsAt). Usato per
+  // mostrare "sala in allestimento" e per il timeout di provisioning.
+  provisioningStartedAt DateTime? @map("provisioning_started_at")
+
   // Temporary recording (catch-up, always active when LIVE if Jibri available)
   tempRecordingUrl       String?   @map("temp_recording_url")
   tempRecordingStartedAt DateTime? @map("temp_recording_started_at")
-  
+
   // Published recording (moderator decision)
-  recordingUrl           String?   @map("recording_url")
-  recordingPublished     Boolean   @default(false) @map("recording_published")
-  recordingPublishedAt   DateTime? @map("recording_published_at")
-  recordingFileSize      BigInt?   @map("recording_file_size")
-  recordingDuration      Int?      @map("recording_duration")
-  recordingDeleteAfterDays Int?    @map("recording_delete_after_days")
-  
+  recordingUrl             String?   @map("recording_url")
+  recordingPublished       Boolean   @default(false) @map("recording_published")
+  recordingPublishedAt     DateTime? @map("recording_published_at")
+  recordingFileSize        BigInt?   @map("recording_file_size")
+  recordingDuration        Int?      @map("recording_duration")
+  recordingDeleteAfterDays Int?      @map("recording_delete_after_days")
+
   // Post-event configuration
-  postEventPublic        Boolean   @default(true)  @map("post_event_public")
+  postEventPublic        Boolean   @default(true) @map("post_event_public")
   postEventPublicUntil   DateTime? @map("post_event_public_until")
-  postEventShowQA        Boolean   @default(true)  @map("post_event_show_qa")
-  postEventShowMaterials Boolean   @default(true)  @map("post_event_show_materials")
-  postEventShowPolls     Boolean   @default(true)  @map("post_event_show_polls")
-  postEventShowFeedback  Boolean   @default(true)  @map("post_event_show_feedback")
-  feedbackEnabled        Boolean   @default(true)  @map("feedback_enabled")
-  
+  postEventShowQA        Boolean   @default(true) @map("post_event_show_qa")
+  postEventShowMaterials Boolean   @default(true) @map("post_event_show_materials")
+  postEventShowPolls     Boolean   @default(true) @map("post_event_show_polls")
+  postEventShowFeedback  Boolean   @default(true) @map("post_event_show_feedback")
+  feedbackEnabled        Boolean   @default(true) @map("feedback_enabled")
+
   // GDPR recording consent
-  recordingConsentText   String?   @map("recording_consent_text") @db.Text
-  
+  recordingConsentText String? @map("recording_consent_text") @db.Text
+
   // Analytics
-  peakParticipants  Int @default(0) @map("peak_participants")
-  
+  peakParticipants Int @default(0) @map("peak_participants")
+
   // Timestamps
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   // Relations
   registrations   Registration[]
   questions       Question[]
@@ -109,7 +119,9 @@ model Event {
 enum EventStatus {
   DRAFT
   PUBLISHED
-  LIVE
+  PROVISIONING // JVB/nodo in allestimento: mostra "sala in allestimento"
+  LIVE // JVB su + ≥1 partecipante connesso negli ultimi 2 min
+  IDLE // LIVE senza partecipanti da ≥ INACTIVE_GRACE_MIN → JVB scalato a 0
   ENDED
   ARCHIVED
 }
@@ -135,39 +147,39 @@ enum OrganizationType {
 // ─── Registrations ───────────────────────────────────────────
 
 model Registration {
-  id          String   @id @default(uuid()) @db.Uuid
-  eventId     String   @map("event_id") @db.Uuid
-  
-  displayName String  @map("display_name")
-  email       String  // encrypted at application level
-  emailHash   String  @map("email_hash") // SHA-256 for dedup & Jitsi JWT
-  
+  id      String @id @default(uuid()) @db.Uuid
+  eventId String @map("event_id") @db.Uuid
+
+  displayName String @map("display_name")
+  email       String // encrypted at application level
+  emailHash   String @map("email_hash") // SHA-256 for dedup & Jitsi JWT
+
   // Profiling (configurable per event)
-  organization     String?            @map("organization")
-  organizationRole String?            @map("organization_role")
-  organizationType OrganizationType?  @map("organization_type")
+  organization     String?           @map("organization")
+  organizationRole String?           @map("organization_role")
+  organizationType OrganizationType? @map("organization_type")
 
   // GDPR consent
   consentGiven                Boolean  @map("consent_given")
-  consentTimestamp             DateTime @map("consent_timestamp")
-  consentRecording             Boolean? @map("consent_recording") // null if event has no recording
-  consentFutureCommunications  Boolean  @default(false) @map("consent_future_communications")
-  
+  consentTimestamp            DateTime @map("consent_timestamp")
+  consentRecording            Boolean? @map("consent_recording") // null if event has no recording
+  consentFutureCommunications Boolean  @default(false) @map("consent_future_communications")
+
   // Access token (for personal join link)
   accessToken String @unique @map("access_token") // nanoid
-  
+
   // Status
-  joinedAt    DateTime? @map("joined_at")
-  leftAt      DateTime? @map("left_at")
-  
+  joinedAt DateTime? @map("joined_at")
+  leftAt   DateTime? @map("left_at")
+
   // Email tracking
   confirmationSentAt DateTime? @map("confirmation_sent_at")
 
   // Timestamps
-  createdAt   DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  event         Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event         Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
   questions     Question[]
   upvotes       QuestionUpvote[]
   pollVotes     PollVote[]
@@ -181,25 +193,25 @@ model Registration {
 // ─── Q&A ─────────────────────────────────────────────────────
 
 model Question {
-  id              String   @id @default(uuid()) @db.Uuid
-  eventId         String   @map("event_id") @db.Uuid
-  registrationId  String   @map("registration_id") @db.Uuid
-  
-  authorName      String   @map("author_name")
-  text            String   @db.VarChar(500)
-  
-  status          QuestionStatus @default(PENDING)
-  upvoteCount     Int      @default(0) @map("upvote_count") // denormalized
-  
-  createdAt       DateTime @default(now()) @map("created_at")
-  highlightedAt   DateTime? @map("highlighted_at")
-  answeredAt      DateTime? @map("answered_at")
-  
+  id             String @id @default(uuid()) @db.Uuid
+  eventId        String @map("event_id") @db.Uuid
+  registrationId String @map("registration_id") @db.Uuid
+
+  authorName String @map("author_name")
+  text       String @db.VarChar(500)
+
+  status      QuestionStatus @default(PENDING)
+  upvoteCount Int            @default(0) @map("upvote_count") // denormalized
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  highlightedAt DateTime? @map("highlighted_at")
+  answeredAt    DateTime? @map("answered_at")
+
   // Relations
-  event           Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  registration    Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
-  upvotes         QuestionUpvote[]
-  
+  event        Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration Registration     @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  upvotes      QuestionUpvote[]
+
   @@index([eventId, status, upvoteCount(sort: Desc)])
   @@map("questions")
 }
@@ -212,16 +224,16 @@ enum QuestionStatus {
 }
 
 model QuestionUpvote {
-  id              String   @id @default(uuid()) @db.Uuid
-  questionId      String   @map("question_id") @db.Uuid
-  registrationId  String   @map("registration_id") @db.Uuid
-  
-  createdAt       DateTime @default(now()) @map("created_at")
-  
+  id             String @id @default(uuid()) @db.Uuid
+  questionId     String @map("question_id") @db.Uuid
+  registrationId String @map("registration_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+
   // Relations
-  question        Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  registration    Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
-  
+  question     Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
   @@unique([questionId, registrationId])
   @@map("question_upvotes")
 }
@@ -229,18 +241,18 @@ model QuestionUpvote {
 // ─── Polls ───────────────────────────────────────────────────
 
 model Poll {
-  id        String     @id @default(uuid()) @db.Uuid
-  eventId   String     @map("event_id") @db.Uuid
-  question  String     @db.VarChar(300)
-  options   Json       // string[] of option texts
-  status    PollStatus @default(OPEN)
+  id       String     @id @default(uuid()) @db.Uuid
+  eventId  String     @map("event_id") @db.Uuid
+  question String     @db.VarChar(300)
+  options  Json // string[] of option texts
+  status   PollStatus @default(OPEN)
 
-  createdAt DateTime   @default(now()) @map("created_at")
-  closedAt  DateTime?  @map("closed_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  closedAt  DateTime? @map("closed_at")
 
   // Relations
-  event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  votes     PollVote[]
+  event Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  votes PollVote[]
 
   @@index([eventId, status])
   @@map("polls")
@@ -253,17 +265,17 @@ enum PollStatus {
 }
 
 model PollVote {
-  id              String   @id @default(uuid()) @db.Uuid
-  pollId          String   @map("poll_id") @db.Uuid
-  registrationId  String?  @map("registration_id") @db.Uuid
-  guestId         String?  @map("guest_id")
-  optionIndex     Int      @map("option_index")
+  id             String  @id @default(uuid()) @db.Uuid
+  pollId         String  @map("poll_id") @db.Uuid
+  registrationId String? @map("registration_id") @db.Uuid
+  guestId        String? @map("guest_id")
+  optionIndex    Int     @map("option_index")
 
-  createdAt       DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  poll            Poll @relation(fields: [pollId], references: [id], onDelete: Cascade)
-  registration    Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  poll         Poll          @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
 
   @@unique([pollId, registrationId])
   @@unique([pollId, guestId])
@@ -273,27 +285,27 @@ model PollVote {
 // ─── Event Materials ────────────────────────────────────
 
 model EventMaterial {
-  id          String   @id @default(uuid()) @db.Uuid
-  eventId     String   @map("event_id") @db.Uuid
-  type        String   @default("LINK") // LINK or FILE
-  title       String   @db.VarChar(300)
+  id          String  @id @default(uuid()) @db.Uuid
+  eventId     String  @map("event_id") @db.Uuid
+  type        String  @default("LINK") // LINK or FILE
+  title       String  @db.VarChar(300)
   url         String
-  description String?  @db.VarChar(500)
-  addedBy     String   @map("added_by")
+  description String? @db.VarChar(500)
+  addedBy     String  @map("added_by")
 
   // File-specific fields (type=FILE)
-  fileName    String?  @map("file_name")
-  fileSize    BigInt?  @map("file_size")
-  mimeType    String?  @map("mime_type")
-  blobPath    String?  @map("blob_path")
+  fileName String? @map("file_name")
+  fileSize BigInt? @map("file_size")
+  mimeType String? @map("mime_type")
+  blobPath String? @map("blob_path")
 
   // Visibility control
-  visibility  String   @default("ALWAYS") @map("visibility") // ALWAYS, BEFORE, DURING, AFTER
+  visibility String @default("ALWAYS") @map("visibility") // ALWAYS, BEFORE, DURING, AFTER
 
-  createdAt   DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
   @@map("event_materials")
@@ -302,31 +314,31 @@ model EventMaterial {
 // ─── Event Reminders ────────────────────────────────────
 
 model EventReminder {
-  id             String   @id @default(uuid()) @db.Uuid
-  eventId        String   @map("event_id") @db.Uuid
-  offsetMinutes  Int      @map("offset_minutes") // e.g. 1440=1day, 60=1hour, 15=15min
-  label          String   @db.VarChar(100) // e.g. "1 giorno prima"
+  id            String @id @default(uuid()) @db.Uuid
+  eventId       String @map("event_id") @db.Uuid
+  offsetMinutes Int    @map("offset_minutes") // e.g. 1440=1day, 60=1hour, 15=15min
+  label         String @db.VarChar(100) // e.g. "1 giorno prima"
 
-  createdAt      DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  event          Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  sentRecords    ReminderSent[]
+  event       Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sentRecords ReminderSent[]
 
   @@index([eventId])
   @@map("event_reminders")
 }
 
 model ReminderSent {
-  id              String   @id @default(uuid()) @db.Uuid
-  reminderId      String   @map("reminder_id") @db.Uuid
-  registrationId  String   @map("registration_id") @db.Uuid
+  id             String @id @default(uuid()) @db.Uuid
+  reminderId     String @map("reminder_id") @db.Uuid
+  registrationId String @map("registration_id") @db.Uuid
 
-  sentAt          DateTime @default(now()) @map("sent_at")
+  sentAt DateTime @default(now()) @map("sent_at")
 
   // Relations
-  reminder        EventReminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
-  registration    Registration  @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  reminder     EventReminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+  registration Registration  @relation(fields: [registrationId], references: [id], onDelete: Cascade)
 
   @@unique([reminderId, registrationId])
   @@map("reminder_sent")
@@ -335,16 +347,16 @@ model ReminderSent {
 // ─── GDPR Audit Log ────────────────────────────────────
 
 model GdprAuditLog {
-  id          String   @id @default(uuid()) @db.Uuid
-  eventId     String   @map("event_id") @db.Uuid
-  action      String   // DATA_DELETED, CONSENT_RECORDED, DATA_EXPORTED
-  recordCount Int      @map("record_count")
-  details     String?  @db.Text // JSON, no PII
+  id          String  @id @default(uuid()) @db.Uuid
+  eventId     String  @map("event_id") @db.Uuid
+  action      String // DATA_DELETED, CONSENT_RECORDED, DATA_EXPORTED
+  recordCount Int     @map("record_count")
+  details     String? @db.Text // JSON, no PII
 
-  createdAt   DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
   @@map("gdpr_audit_logs")
@@ -358,18 +370,18 @@ model EventTemplate {
   description String? @db.Text
   icon        String  @default("it-video")
 
-  qaEnabled                  Boolean @default(true)  @map("qa_enabled")
+  qaEnabled                  Boolean @default(true) @map("qa_enabled")
   chatEnabled                Boolean @default(false) @map("chat_enabled")
   recordingEnabled           Boolean @default(false) @map("recording_enabled")
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")
-  maxParticipants            Int     @default(300)   @map("max_participants")
+  maxParticipants            Int     @default(300) @map("max_participants")
 
   isSystem  Boolean  @default(false) @map("is_system")
-  sortOrder Int      @default(0)     @map("sort_order")
+  sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt      @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("event_templates")
 }
@@ -377,38 +389,38 @@ model EventTemplate {
 // ─── Site Settings ──────────────────────────────────────
 
 model SiteSetting {
-  id        String   @id @default("singleton")
+  id String @id @default("singleton")
 
   // Branding
-  siteName             String  @default("Eventi PA") @map("site_name")
-  siteDescription      String  @default("Piattaforma per eventi pubblici digitali") @map("site_description") @db.Text
-  organizationName     String  @default("") @map("organization_name")
-  organizationNameShort String @default("") @map("organization_name_short")
-  organizationUrl      String  @default("") @map("organization_url")
-  parentOrganization   String  @default("") @map("parent_organization")
-  parentOrganizationUrl String @default("") @map("parent_organization_url")
-  logoUrl              String? @map("logo_url")
-  faviconUrl           String? @map("favicon_url")
-  primaryColor         String  @default("#0066CC") @map("primary_color")
+  siteName              String  @default("Eventi PA") @map("site_name")
+  siteDescription       String  @default("Piattaforma per eventi pubblici digitali") @map("site_description") @db.Text
+  organizationName      String  @default("") @map("organization_name")
+  organizationNameShort String  @default("") @map("organization_name_short")
+  organizationUrl       String  @default("") @map("organization_url")
+  parentOrganization    String  @default("") @map("parent_organization")
+  parentOrganizationUrl String  @default("") @map("parent_organization_url")
+  logoUrl               String? @map("logo_url")
+  faviconUrl            String? @map("favicon_url")
+  primaryColor          String  @default("#0066CC") @map("primary_color")
 
   // Timezone
-  defaultTimezone      String  @default("Europe/Rome") @map("default_timezone")
+  defaultTimezone String @default("Europe/Rome") @map("default_timezone")
 
   // SEO
-  seoTitle             String  @default("Eventi PA") @map("seo_title")
-  seoDescription       String  @default("") @map("seo_description") @db.Text
-  seoImage             String? @map("seo_image")
+  seoTitle       String  @default("Eventi PA") @map("seo_title")
+  seoDescription String  @default("") @map("seo_description") @db.Text
+  seoImage       String? @map("seo_image")
 
   // Home page
-  homePageMode         HomePageMode @default(LANDING) @map("home_page_mode")
-  customHomeHtml       String? @map("custom_home_html") @db.Text
+  homePageMode   HomePageMode @default(LANDING) @map("home_page_mode")
+  customHomeHtml String?      @map("custom_home_html") @db.Text
 
   // Footer
-  footerLinks          Json    @default("[]") @map("footer_links")
+  footerLinks Json @default("[]") @map("footer_links")
 
   // Pages content (Markdown or HTML) — multilingual JSON
-  privacyPolicy        Json    @default("{}") @map("privacy_policy") @db.JsonB
-  accessibility        Json    @default("{}") @map("accessibility") @db.JsonB
+  privacyPolicy Json @default("{}") @map("privacy_policy") @db.JsonB
+  accessibility Json @default("{}") @map("accessibility") @db.JsonB
 
   // Feature toggles
   statusPageEnabled         Boolean @default(true) @map("status_page_enabled")
@@ -417,22 +429,30 @@ model SiteSetting {
   calendarPublic            Boolean @default(false) @map("calendar_public")
 
   // Jitsi customization
-  jitsiWatermarkUrl      String?  @map("jitsi_watermark_url")
-  jitsiWatermarkEnabled  Boolean  @default(true) @map("jitsi_watermark_enabled")
-  jitsiWatermarkOpacity  Float    @default(0.4) @map("jitsi_watermark_opacity")
-  jitsiWatermarkPosition String   @default("bottom-left") @map("jitsi_watermark_position")
+  jitsiWatermarkUrl      String? @map("jitsi_watermark_url")
+  jitsiWatermarkEnabled  Boolean @default(true) @map("jitsi_watermark_enabled")
+  jitsiWatermarkOpacity  Float   @default(0.4) @map("jitsi_watermark_opacity")
+  jitsiWatermarkPosition String  @default("bottom-left") @map("jitsi_watermark_position")
 
   // External links
-  githubUrl            String? @map("github_url")
-  supportEmail         String? @map("support_email")
+  githubUrl    String? @map("github_url")
+  supportEmail String? @map("support_email")
 
   // i18n / locale management
-  defaultLocale          String @default("it") @map("default_locale")
-  availableLocales       Json @default("[\"it\",\"en\"]") @map("available_locales")
-  localeNames            Json @default("{\"it\":\"Italiano\",\"en\":\"English\"}") @map("locale_names")
-  translationOverrides   Json @default("{}") @map("translation_overrides")
+  defaultLocale        String @default("it") @map("default_locale")
+  availableLocales     Json   @default("[\"it\",\"en\"]") @map("available_locales")
+  localeNames          Json   @default("{\"it\":\"Italiano\",\"en\":\"English\"}") @map("locale_names")
+  translationOverrides Json   @default("{}") @map("translation_overrides")
 
-  updatedAt            DateTime @updatedAt @map("updated_at")
+  // JVB scale-to-zero tuning
+  // Minuti di conferenza vuota prima di marcare un evento LIVE come IDLE
+  // e scalare il JVB a 0. Default: 45. Range consigliato: 15-120.
+  jvbInactiveGraceMinutes Int @default(45) @map("jvb_inactive_grace_minutes")
+  // Minuti di lookahead per il pre-scaling di eventi PUBLISHED → PROVISIONING.
+  // Il nodo viene avviato N minuti prima di startsAt. Default: 10.
+  jvbPreScaleMinutes      Int @default(10) @map("jvb_pre_scale_minutes")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("site_settings")
 }
@@ -446,18 +466,18 @@ enum HomePageMode {
 // ─── Event Feedback ─────────────────────────────────
 
 model EventFeedback {
-  id              String   @id @default(uuid()) @db.Uuid
-  eventId         String   @map("event_id") @db.Uuid
-  registrationId  String?  @map("registration_id") @db.Uuid
-  guestId         String?  @map("guest_id")
-  rating          Int      // 1-5
-  comment         String?  @db.VarChar(500)
+  id             String  @id @default(uuid()) @db.Uuid
+  eventId        String  @map("event_id") @db.Uuid
+  registrationId String? @map("registration_id") @db.Uuid
+  guestId        String? @map("guest_id")
+  rating         Int // 1-5
+  comment        String? @db.VarChar(500)
 
-  createdAt       DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  event           Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  registration    Registration? @relation(fields: [registrationId], references: [id], onDelete: SetNull)
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: SetNull)
 
   @@unique([eventId, registrationId])
   @@unique([eventId, guestId])
@@ -468,16 +488,16 @@ model EventFeedback {
 // ─── Word Cloud ─────────────────────────────────────
 
 model WordCloudRound {
-  id          String   @id @default(uuid()) @db.Uuid
-  eventId     String   @map("event_id") @db.Uuid
-  prompt      String   @db.VarChar(200)
-  status      String   @default("OPEN") // OPEN, CLOSED
-  duration    Int      @default(120)
-  createdAt   DateTime @default(now()) @map("created_at")
-  closedAt    DateTime? @map("closed_at")
+  id        String    @id @default(uuid()) @db.Uuid
+  eventId   String    @map("event_id") @db.Uuid
+  prompt    String    @db.VarChar(200)
+  status    String    @default("OPEN") // OPEN, CLOSED
+  duration  Int       @default(120)
+  createdAt DateTime  @default(now()) @map("created_at")
+  closedAt  DateTime? @map("closed_at")
 
   // Relations
-  event       Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event       Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
   submissions WordCloudSubmission[]
 
   @@index([eventId, status])
@@ -485,15 +505,15 @@ model WordCloudRound {
 }
 
 model WordCloudSubmission {
-  id              String   @id @default(uuid()) @db.Uuid
-  roundId         String   @map("round_id") @db.Uuid
-  registrationId  String?  @map("registration_id") @db.Uuid
-  guestId         String?  @map("guest_id")
-  word            String   @db.VarChar(30)
-  createdAt       DateTime @default(now()) @map("created_at")
+  id             String   @id @default(uuid()) @db.Uuid
+  roundId        String   @map("round_id") @db.Uuid
+  registrationId String?  @map("registration_id") @db.Uuid
+  guestId        String?  @map("guest_id")
+  word           String   @db.VarChar(30)
+  createdAt      DateTime @default(now()) @map("created_at")
 
   // Relations
-  round           WordCloudRound @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  round WordCloudRound @relation(fields: [roundId], references: [id], onDelete: Cascade)
 
   @@map("word_cloud_submissions")
 }
@@ -501,27 +521,27 @@ model WordCloudSubmission {
 // ─── Call Sessions ──────────────────────────────────
 
 model CallSession {
-  id              String   @id @default(uuid()) @db.Uuid
-  eventId         String   @map("event_id") @db.Uuid
-  jitsiRoomName   String   @map("jitsi_room_name")
+  id            String @id @default(uuid()) @db.Uuid
+  eventId       String @map("event_id") @db.Uuid
+  jitsiRoomName String @map("jitsi_room_name")
 
-  startedAt       DateTime @map("started_at")
-  endedAt         DateTime? @map("ended_at")
-  duration        Int?
+  startedAt DateTime  @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+  duration  Int?
 
-  peakParticipants Int     @default(0) @map("peak_participants")
-  participants    Json     @default("[]") @db.JsonB
+  peakParticipants Int  @default(0) @map("peak_participants")
+  participants     Json @default("[]") @db.JsonB
 
-  recordingUrl      String?  @map("recording_url")
-  recordingFileSize BigInt?  @map("recording_file_size")
-  recordingDuration Int?     @map("recording_duration")
-  recordingFilename String?  @map("recording_filename")
+  recordingUrl      String? @map("recording_url")
+  recordingFileSize BigInt? @map("recording_file_size")
+  recordingDuration Int?    @map("recording_duration")
+  recordingFilename String? @map("recording_filename")
 
-  telemetry       Json     @default("{}") @db.JsonB
+  telemetry Json @default("{}") @db.JsonB
 
-  createdAt       DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
   @@map("call_sessions")

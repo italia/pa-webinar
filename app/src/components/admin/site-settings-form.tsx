@@ -1062,6 +1062,56 @@ function FeaturesTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
+
+      <hr className="my-4" />
+      <h3 className="h5 mb-3">{t('jvbScalingTitle')}</h3>
+      <p className="text-muted small mb-3">{t('jvbScalingHelp')}</p>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="jvbInactiveGraceMinutes">
+              {t('jvbInactiveGraceMinutes')}
+            </Label>
+            <Input
+              id="jvbInactiveGraceMinutes"
+              type="number"
+              min={5}
+              max={240}
+              step={5}
+              value={settings.jvbInactiveGraceMinutes}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('jvbInactiveGraceMinutes', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('jvbInactiveGraceMinutesHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="jvbPreScaleMinutes">
+              {t('jvbPreScaleMinutes')}
+            </Label>
+            <Input
+              id="jvbPreScaleMinutes"
+              type="number"
+              min={1}
+              max={60}
+              step={1}
+              value={settings.jvbPreScaleMinutes}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('jvbPreScaleMinutes', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('jvbPreScaleMinutesHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+      </Row>
     </div>
   );
 }

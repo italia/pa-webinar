@@ -649,7 +649,13 @@
         "calendarPublic": "Calendario pubblico",
         "calendarPublicHelp": "Pubblica il calendario degli eventi. Visitatori possono vedere gli eventi programmati.",
         "githubUrl": "URL repository GitHub",
-        "supportEmail": "Email supporto"
+        "supportEmail": "Email supporto",
+        "jvbScalingTitle": "Scaling ponte video (JVB)",
+        "jvbScalingHelp": "Regola quanto tempo aspettare prima di spegnere un nodo video inattivo e quanto prima avviarlo rispetto all'inizio di un evento programmato.",
+        "jvbInactiveGraceMinutes": "Minuti di inattività prima dello spegnimento",
+        "jvbInactiveGraceMinutesHelp": "Dopo quanto tempo di conferenza vuota il nodo video viene messo in pausa. Consigliato 45 minuti. Range 5-240.",
+        "jvbPreScaleMinutes": "Minuti di anticipo per avvio programmato",
+        "jvbPreScaleMinutesHelp": "Quanto prima di startsAt avviare il nodo video per un evento programmato. Consigliato 10 minuti."
       }
     },
     "analytics": {
@@ -1406,5 +1412,17 @@
       "polls": "Sondaggi",
       "feedback": "Feedback"
     }
+  },
+  "provisioning": {
+    "loading": "Caricamento",
+    "titleFromIdle": "Sala in riattivazione",
+    "titleColdStart": "Sala in allestimento",
+    "descriptionFromIdle": "La sala era stata messa in pausa per inattività per contenere i consumi energetici. La stiamo riavviando: ci vogliono circa 2-3 minuti.",
+    "descriptionColdStart": "Stiamo preparando la sala virtuale per questo evento. L'operazione richiede circa 2-3 minuti: verrai reindirizzato automaticamente non appena tutto sarà pronto.",
+    "progressLabel": "{seconds} s",
+    "retry": "Ricarica",
+    "tempError": "Stiamo riprovando a contattare il server, nessuna azione necessaria.",
+    "ended": "L'evento è terminato.",
+    "scaleToZeroNote": "Per ridurre l'impatto ambientale, i nodi video vengono spenti quando nessuno è in chiamata. Il riavvio è automatico al primo ingresso."
   }
 }
