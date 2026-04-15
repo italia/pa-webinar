@@ -870,6 +870,16 @@
       "last6h": "last 6 hours",
       "last24h": "last 24 hours",
       "reqPerSec": "requests/sec"
+    },
+    "bulk": {
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select event",
+      "selected": "selected",
+      "archive": "Archive",
+      "delete": "Delete",
+      "deleteConfirm": "You are about to permanently delete {count} events and all associated data (registrations, sessions, recordings, Q&A, polls). This action cannot be undone.",
+      "archiveConfirm": "You are about to archive {count} events. Archived events are hidden from the public listing but their data is preserved."
     }
   },
   "email": {
