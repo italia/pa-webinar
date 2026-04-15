@@ -1098,6 +1098,16 @@
       "provisioningNow": "in allestimento",
       "idleNow": "IDLE (in pausa)",
       "scaleToZeroHelp": "IDLE è lo stato normale per un evento senza traffico da più del grace period. Alla prossima visita di un utente torna a PROVISIONING e poi LIVE."
+    },
+    "bulk": {
+      "selectAll": "Seleziona tutti",
+      "deselectAll": "Deseleziona tutti",
+      "selectRow": "Seleziona evento",
+      "selected": "selezionati",
+      "archive": "Archivia",
+      "delete": "Elimina",
+      "deleteConfirm": "Stai per eliminare definitivamente {count} eventi con tutti i dati associati (iscrizioni, sessioni, registrazioni, Q&A, sondaggi). Operazione irreversibile.",
+      "archiveConfirm": "Stai per archiviare {count} eventi. Gli eventi archiviati non sono più visibili nella lista pubblica ma i dati vengono conservati."
     }
   },
   "email": {
