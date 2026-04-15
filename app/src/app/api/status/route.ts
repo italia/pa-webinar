@@ -227,7 +227,7 @@ async function getJvbStatus(): Promise<JvbStatusResult> {
   }
 }
 
-async function getJibriStatus(): Promise<{
+async function getJibriStatus(recordingNeeded: boolean): Promise<{
   component: ComponentStatus;
   running: number;
   jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable';
@@ -272,6 +272,21 @@ async function getJibriStatus(): Promise<{
     };
   }
 
+  // If no live/provisioning event asks for recording, Jibri is allowed to
+  // be scaled to zero. Report "standby" instead of "degraded" so the page's
+  // overall status stays green while the cluster is idle.
+  if (running === 0 && !recordingNeeded) {
+    return {
+      component: {
+        name: 'jibri',
+        status: 'standby',
+        details: 'Scale-to-zero — no recording required',
+      },
+      running: 0,
+      jibriStatus: 'standby',
+    };
+  }
+
   const jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable' =
     running > 0 ? 'ready' : 'scaling';
 
@@ -289,16 +304,24 @@ async function getJibriStatus(): Promise<{
 }
 
 export const GET = withErrorHandling(async () => {
-  const [db, jitsi, smtp, jvb] = await Promise.all([
+  // Check whether any currently-billable event wants recording. Drives
+  // Jibri's "expected to be up" signal.
+  const recordingNeeded = (await prisma.event.count({
+    where: {
+      status: { in: [...JVB_BILLABLE_STATUSES] },
+      recordingEnabled: true,
+    },
+  })) > 0;
+
+  const [db, jitsi, smtp, jvb, jibriResult] = await Promise.all([
     checkDatabase(),
     checkJitsiWeb(),
     checkSmtp(),
     getJvbStatus(),
+    getJibriStatus(recordingNeeded),
   ]);
 
   const app: ComponentStatus = { name: 'app', status: 'operational' };
-
-  const jibriResult = await getJibriStatus();
   const jibri = jibriResult.component;
 
   const prosody: ComponentStatus = {
