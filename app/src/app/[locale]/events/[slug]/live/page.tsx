@@ -6,6 +6,7 @@ import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { isJibriAvailable } from '@/lib/infrastructure';
 import LiveEventClient from '@/components/live/live-event-client';
+import ProvisioningScreen from '@/components/live/provisioning-screen';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,22 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   if (!event) {
     notFound();
+  }
+
+  // Intercept IDLE / PROVISIONING before doing any Jitsi setup: the bridge
+  // isn't ready, handing out a JWT or embedding Jitsi now would dump the
+  // user onto a cold pod. ProvisioningScreen calls /wake and polls until
+  // the scaler brings the bridge up, then reloads this page.
+  if (event.status === 'IDLE' || event.status === 'PROVISIONING') {
+    const title = getLocalized(event.title as LocalizedField, locale);
+    return (
+      <ProvisioningScreen
+        slug={event.slug}
+        title={title}
+        initialStatus={event.status}
+        camefromIdle={event.status === 'IDLE'}
+      />
+    );
   }
 
   const settings = await getSettings();
