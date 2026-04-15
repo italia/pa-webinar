@@ -18,7 +18,9 @@
     "search": "Cerca",
     "noResults": "Nessun risultato",
     "requiredField": "Campo obbligatorio",
-    "errorGeneric": "Si è verificato un errore. Riprova."
+    "errorGeneric": "Si è verificato un errore. Riprova.",
+    "selectAll": "Seleziona tutti",
+    "deselectAll": "Deseleziona tutti"
   },
   "nav": {
     "home": "Home",
@@ -431,7 +433,34 @@
       },
       "download": "Scarica",
       "noFile": "Senza file",
-      "noResults": "Nessuna registrazione per i filtri correnti."
+      "noResults": "Nessuna registrazione per i filtri correnti.",
+      "tabs": {
+        "library": "Libreria",
+        "orphans": "Orfane"
+      },
+      "orphans": {
+        "noneFound": "Nessuna registrazione orfana. Il bucket è allineato al database.",
+        "graceDays": "Gli orfani vengono eliminati automaticamente dopo {days} giorni.",
+        "refresh": "Aggiorna",
+        "intro": "Queste registrazioni esistono nel bucket di storage ma non sono collegate a nessun evento o sessione nel database. Verranno eliminate automaticamente dopo {days} giorni dalla loro scoperta. Puoi marcarle come \"Mantieni\" per preservarle, \"Elimina subito\" per rimuoverle alla prossima esecuzione del cron, oppure lasciarle in sospeso fino al timeout.",
+        "statTotal": "Totale",
+        "statPending": "In sospeso",
+        "statIgnore": "Mantenute",
+        "statDeleteNow": "Da eliminare",
+        "selected": "selezionate",
+        "markIgnore": "Mantieni",
+        "markDelete": "Elimina subito",
+        "markPending": "Revoca decisione",
+        "colBlobName": "Nome blob",
+        "colSize": "Dimensione",
+        "colDiscovered": "Scoperto il",
+        "colDecision": "Decisione",
+        "colDeletesAt": "Eliminazione prevista",
+        "decisionPending": "In sospeso",
+        "decisionIgnore": "Mantenuta",
+        "decisionDeleteNow": "Da eliminare",
+        "nextSweep": "Prossima esecuzione"
+      }
     },
     "gdprAudit": {
       "title": "Audit GDPR",

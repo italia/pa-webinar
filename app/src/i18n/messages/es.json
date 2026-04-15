@@ -18,7 +18,9 @@
     "search": "Buscar",
     "noResults": "Sin resultados",
     "requiredField": "Campo obligatorio",
-    "errorGeneric": "An error occurred. Please try again."
+    "errorGeneric": "An error occurred. Please try again.",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all"
   },
   "nav": {
     "home": "Inicio",
@@ -880,6 +882,35 @@
       "delete": "Delete",
       "deleteConfirm": "You are about to permanently delete {count} events and all associated data (registrations, sessions, recordings, Q&A, polls). This action cannot be undone.",
       "archiveConfirm": "You are about to archive {count} events. Archived events are hidden from the public listing but their data is preserved."
+    },
+    "recordingsLibrary": {
+      "tabs": {
+        "library": "Library",
+        "orphans": "Orphans"
+      },
+      "orphans": {
+        "noneFound": "No orphan recordings. The bucket is in sync with the database.",
+        "graceDays": "Orphans are automatically deleted after {days} days.",
+        "refresh": "Refresh",
+        "intro": "These recordings exist in the storage bucket but are not linked to any event or session in the database. They will be automatically deleted {days} days after discovery. You can mark them as \"Keep\" to preserve them, \"Delete now\" to remove on the next cron run, or leave them pending until the timeout.",
+        "statTotal": "Total",
+        "statPending": "Pending",
+        "statIgnore": "Kept",
+        "statDeleteNow": "To delete",
+        "selected": "selected",
+        "markIgnore": "Keep",
+        "markDelete": "Delete now",
+        "markPending": "Revert decision",
+        "colBlobName": "Blob name",
+        "colSize": "Size",
+        "colDiscovered": "Discovered on",
+        "colDecision": "Decision",
+        "colDeletesAt": "Scheduled deletion",
+        "decisionPending": "Pending",
+        "decisionIgnore": "Kept",
+        "decisionDeleteNow": "To delete",
+        "nextSweep": "Next run"
+      }
     }
   },
   "email": {

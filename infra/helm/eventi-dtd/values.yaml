@@ -319,6 +319,16 @@ cronjobs:
     schedule: "0 3 * * *"
     image: curlimages/curl:8.11.1
 
+  # Orphan recording reconciliation — scans the recording bucket,
+  # upserts orphan_recordings rows for blobs not linked to any event or
+  # session, and sweeps entries whose grace period has expired.
+  # Runs every 6h by default; keep this disabled in dev where the
+  # bucket isn't configured.
+  recordingsReconcile:
+    enabled: true
+    schedule: "17 */6 * * *"
+    image: curlimages/curl:8.11.1
+
 # ── JVB Auto-Scaler ─────────────────────────────────────────
 # CronJob that scales JVB replicas based on upcoming/active events.
 # Only used with jitsi.mode=full. No external dependencies (no KEDA).

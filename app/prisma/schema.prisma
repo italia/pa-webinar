@@ -468,9 +468,47 @@ model SiteSetting {
   // 30s — compromesso fra freschezza dei dati e carico sull'app.
   statusPollIntervalSeconds Int @default(30) @map("status_poll_interval_seconds")
 
+  // Giorni di grace prima che un orfano (blob nello storage non linkato a
+  // nessun Event/CallSession) venga cancellato automaticamente dal cron di
+  // reconciliation. Default: 30. Durante la grace l'admin può decidere di
+  // marcare l'orfano come "ignore" (mantenere) o "delete-now" (eliminare
+  // subito). Impostare a 0 per disabilitare l'auto-cleanup.
+  orphanRecordingGraceDays Int @default(30) @map("orphan_recording_grace_days")
+
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("site_settings")
+}
+
+// ─── Orphan Recordings ──────────────────────────────
+//
+// Recordings live in object storage and are linked to Event/CallSession
+// rows only when Jibri's finalize webhook succeeds. If the webhook fails
+// (misconfigured room name, network error, expired event, etc.) the blob
+// becomes an orphan: it exists in the bucket but nothing references it.
+//
+// A periodic reconciliation job scans the bucket, upserts unknown blobs
+// here, and refreshes `lastSeenAt` on every run. A second job sweeps
+// orphans with decision=pending past the configured grace period and
+// deletes them from the bucket (and from this table).
+//
+// decision transitions:
+//   pending    — discovered, awaiting admin review
+//   ignore     — operator chose to keep; never auto-deleted
+//   delete-now — operator chose to delete immediately on next sweep
+model OrphanRecording {
+  id           String   @id @default(uuid()) @db.Uuid
+  blobName     String   @unique @map("blob_name")
+  sizeBytes    BigInt?  @map("size_bytes")
+  lastModified DateTime? @map("last_modified")
+  discoveredAt DateTime @default(now()) @map("discovered_at")
+  lastSeenAt   DateTime @default(now()) @map("last_seen_at")
+  decision     String   @default("pending") // pending | ignore | delete-now
+  note         String?  @db.Text
+
+  @@index([decision])
+  @@index([discoveredAt])
+  @@map("orphan_recordings")
 }
 
 enum HomePageMode {
