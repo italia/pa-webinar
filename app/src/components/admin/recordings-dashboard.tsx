@@ -8,7 +8,7 @@
  * file the platform has ever produced.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Button, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
 
@@ -117,6 +117,12 @@ export default function RecordingsDashboard({
   const [orphanLoading, setOrphanLoading] = useState(false);
   const [orphanSelected, setOrphanSelected] = useState<Set<string>>(new Set());
   const [orphanSubmitting, setOrphanSubmitting] = useState(false);
+
+  // Track which row currently has the inline HTML5 player expanded.
+  // Only one row can be open at a time: opening a new one auto-closes
+  // the previous player so we don't end up streaming two recordings
+  // from the same tab.
+  const [playingId, setPlayingId] = useState<string | null>(null);
 
   const [range, setRange] = useState<Range>('90d');
   const [eventId, setEventId] = useState('');
@@ -389,38 +395,73 @@ export default function RecordingsDashboard({
                   </tr>
                 </thead>
                 <tbody>
-                  {visibleRows.map((r) => (
-                    <tr key={r.id}>
-                      <td className="text-muted" style={{ fontSize: '0.75rem' }}>
-                        {fmt.dateTime(new Date(r.startedAt), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </td>
-                      <td>
-                        <Link href={`/admin/events/${r.eventId}`} className="text-decoration-none">
-                          {r.eventTitle}
-                        </Link>
-                        {r.eventType === 'INSTANT' && (
-                          <Badge color="secondary" className="ms-1" style={{ fontSize: '0.65rem' }}>⚡</Badge>
+                  {visibleRows.map((r) => {
+                    const isPlaying = playingId === r.id;
+                    return (
+                      <React.Fragment key={r.id}>
+                        <tr>
+                          <td className="text-muted" style={{ fontSize: '0.75rem' }}>
+                            {fmt.dateTime(new Date(r.startedAt), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </td>
+                          <td>
+                            <Link href={`/admin/events/${r.eventId}`} className="text-decoration-none">
+                              {r.eventTitle}
+                            </Link>
+                            {r.eventType === 'INSTANT' && (
+                              <Badge color="secondary" className="ms-1" style={{ fontSize: '0.65rem' }}>⚡</Badge>
+                            )}
+                          </td>
+                          <td>
+                            <Badge color={r.source === 'session' ? 'primary' : 'info'} style={{ fontSize: '0.68rem' }}>
+                              {t(`sources.${r.source}` as 'sources.session' | 'sources.event')}
+                            </Badge>
+                          </td>
+                          <td className="text-end">{fmtDuration(r.durationSeconds)}</td>
+                          <td className="text-end">{fmtSize(r.recordingFileSize)}</td>
+                          <td className="text-end">{r.peakParticipants}</td>
+                          <td>
+                            {r.recordingUrl ? (
+                              <div className="d-flex gap-1">
+                                <button
+                                  type="button"
+                                  className={`btn btn-sm ${isPlaying ? 'btn-primary' : 'btn-outline-primary'}`}
+                                  onClick={() => setPlayingId(isPlaying ? null : r.id)}
+                                  title={isPlaying ? t('closePlayer') : t('play')}
+                                >
+                                  <Icon icon={isPlaying ? 'it-close' : 'it-video'} size="xs" color={isPlaying ? 'white' : undefined} />
+                                </button>
+                                <a
+                                  href={r.recordingUrl}
+                                  download={r.recordingFilename ?? undefined}
+                                  className="btn btn-sm btn-outline-primary"
+                                  title={t('download')}
+                                >
+                                  <Icon icon="it-download" size="xs" />
+                                </a>
+                              </div>
+                            ) : (
+                              <span className="text-muted" style={{ fontSize: '0.78rem' }}>{t('noFile')}</span>
+                            )}
+                          </td>
+                        </tr>
+                        {isPlaying && r.recordingUrl && (
+                          <tr>
+                            <td colSpan={7} style={{ background: '#F8FAFE', padding: '1rem' }}>
+                              <video
+                                key={r.recordingUrl}
+                                controls
+                                preload="metadata"
+                                style={{ width: '100%', maxWidth: 900, display: 'block', margin: '0 auto', borderRadius: 8 }}
+                                src={r.recordingUrl}
+                              >
+                                {t('playerUnsupported')}
+                              </video>
+                            </td>
+                          </tr>
                         )}
-                      </td>
-                      <td>
-                        <Badge color={r.source === 'session' ? 'primary' : 'info'} style={{ fontSize: '0.68rem' }}>
-                          {t(`sources.${r.source}` as 'sources.session' | 'sources.event')}
-                        </Badge>
-                      </td>
-                      <td className="text-end">{fmtDuration(r.durationSeconds)}</td>
-                      <td className="text-end">{fmtSize(r.recordingFileSize)}</td>
-                      <td className="text-end">{r.peakParticipants}</td>
-                      <td>
-                        {r.recordingUrl ? (
-                          <a href={r.recordingUrl} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-outline-primary">
-                            <Icon icon="it-download" size="xs" className="me-1" /> {t('download')}
-                          </a>
-                        ) : (
-                          <span className="text-muted" style={{ fontSize: '0.78rem' }}>{t('noFile')}</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                      </React.Fragment>
+                    );
+                  })}
                   {visibleRows.length === 0 && !loading && (
                     <tr>
                       <td colSpan={7} className="text-center text-muted py-4">

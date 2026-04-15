@@ -460,7 +460,10 @@
         "decisionIgnore": "Mantenuta",
         "decisionDeleteNow": "Da eliminare",
         "nextSweep": "Prossima esecuzione"
-      }
+      },
+      "play": "Riproduci",
+      "closePlayer": "Chiudi player",
+      "playerUnsupported": "Il tuo browser non supporta la riproduzione video."
     },
     "gdprAudit": {
       "title": "Audit GDPR",

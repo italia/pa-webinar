@@ -20,7 +20,14 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError } from '@/lib/errors';
+import { generateRecordingSasUrl } from '@/lib/storage/recordings';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+
+// SAS expiry for inline playback + download links. Long enough that a
+// 300 MB file finishes downloading on a slow connection without the
+// token expiring mid-transfer, short enough that a stale page load
+// doesn't leak long-lived credentials.
+const SAS_EXPIRY_MINUTES = 60;
 
 export const dynamic = 'force-dynamic';
 
@@ -129,10 +136,25 @@ export const GET = withErrorHandling(async (request) => {
       : Promise.resolve([]),
   ]);
 
-  const rows: RecordingRow[] = [
-    ...sessions.map<RecordingRow>((s) => ({
+  // Sign each blob URL with a short-lived read-SAS so the admin can
+  // play/download directly from the browser. The storage account has
+  // public access disabled, so the bare URL would 403 with
+  // `PublicAccessNotPermitted`. Signing per-row (instead of a single
+  // endpoint that redirects) lets the browser's video element fetch
+  // ranges for scrubbing.
+  async function signOrNull(url: string | null): Promise<string | null> {
+    if (!url) return null;
+    try {
+      return await generateRecordingSasUrl(url, SAS_EXPIRY_MINUTES);
+    } catch {
+      return url;
+    }
+  }
+
+  const rawRows = [
+    ...sessions.map((s) => ({
       id: `session:${s.id}`,
-      source: 'session',
+      source: 'session' as const,
       eventId: s.eventId,
       eventTitle: getLocalized(s.event.title as LocalizedField, 'it'),
       eventSlug: s.event.slug,
@@ -146,9 +168,9 @@ export const GET = withErrorHandling(async (request) => {
       recordingFileSize: s.recordingFileSize?.toString() ?? null,
       createdAt: s.createdAt.toISOString(),
     })),
-    ...events.map<RecordingRow>((e) => ({
+    ...events.map((e) => ({
       id: `event:${e.id}`,
-      source: 'event',
+      source: 'event' as const,
       eventId: e.id,
       eventTitle: getLocalized(e.title as LocalizedField, 'it'),
       eventSlug: e.slug,
@@ -163,6 +185,13 @@ export const GET = withErrorHandling(async (request) => {
       createdAt: (e.recordingPublishedAt ?? e.createdAt).toISOString(),
     })),
   ];
+
+  const rows: RecordingRow[] = await Promise.all(
+    rawRows.map(async (r) => ({
+      ...r,
+      recordingUrl: await signOrNull(r.recordingUrl),
+    })),
+  );
 
   rows.sort((a, b) => b.startedAt.localeCompare(a.startedAt));
 

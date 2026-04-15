@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import {
   Badge,
   Button,
@@ -140,7 +140,7 @@ function StatusBadge({
 }
 
 export default function InstantCallsList({
-  locale,
+  locale: _locale,
   idleGraceMinutes,
 }: {
   locale: string;
@@ -148,6 +148,7 @@ export default function InstantCallsList({
 }) {
   const t = useTranslations('admin.instantCalls');
   const tc = useTranslations('common');
+  const fmt = useFormatter();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -525,7 +526,7 @@ export default function InstantCallsList({
                             )}
                             <span>
                               <Icon icon="it-calendar" size="xs" className="me-1" />
-                              {new Date(call.createdAt).toLocaleDateString(locale, {
+                              {fmt.dateTime(new Date(call.createdAt), {
                                 day: 'numeric',
                                 month: 'short',
                                 year: 'numeric',
