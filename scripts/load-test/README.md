@@ -145,15 +145,30 @@ I nostri risultati sono stati raccolti su:
 
 ### Cluster (AKS `developers-italia-prod`)
 
-| Componente | Node pool | Instance type | CPU allocatable | Mem allocatable | Spot? | Usato come |
-|---|---|---|---|---|---|---|
-| **JVB** | `jvb` | `Standard_D4as_v5` | 3860m | 12 Gi | **no** | Media plane SFU |
-| **Prosody / Jicofo / Web** | `test` | `Standard_D2as_v5` (spot) | 1900m | 5.8 Gi | sì | Signaling, auth, statici |
-| **App + load-test pod** | `applications` | `Standard_D8as_v5` | 7820m | 27 Gi | no | Runtime applicativo |
+**Storico v1 — dismesso 2026-04-15**:
 
-Risorse specifiche pod JVB (dal chart values): `requests: 500m/1Gi`, `limits: 3 CPU/2 Gi`.
-Questo è **il tetto effettivo del media plane** del deploy test — test oltre
-questa soglia satureranno JVB prima di saturare il generatore.
+| Componente | Node pool | Instance type | CPU | Mem | Spot? |
+|---|---|---|---|---|---|
+| JVB | `jvb` | `Standard_D4as_v5` | 4 | 16 Gi | no |
+
+Chart values v1: `requests 500m/1Gi, limits 3 CPU/2 Gi`. JVB OOM osservato
+a 60-80 participants webinar (vedi scenario A storico).
+
+**v2 — attuale**:
+
+| Componente | Node pool | Instance type | CPU | Mem | Spot? | Usato come |
+|---|---|---|---|---|---|---|
+| **JVB** | `jvb` | `Standard_F16s_v2` | 16 | 32 Gi | **no** | Media plane SFU, 1 pod = 1 nodo |
+| **Jibri** | `jibri` | `Standard_F4s_v2` | 4 | 8 Gi | **no** | Recording (anti-affinity con JVB) |
+| **Prosody / Jicofo / Web** | `test` | `Standard_D2as_v5` (spot) | 2 | 8 Gi | sì | Signaling, auth, statici |
+| **App + load-test pod** | `applications` | `Standard_D8as_v5` | 8 | 32 Gi | no | Runtime applicativo |
+
+Chart values v2 (da `k8s-configuration/helm/videocall/test/values.yaml`):
+- JVB `requests: cpu=14 memory=24Gi, limits: cpu=15 memory=28Gi`
+- `VIDEOBRIDGE_OPTS=-Xms4g -Xmx16g -XX:MaxDirectMemorySize=8g -XX:+UseG1GC -XX:MaxGCPauseMillis=40`
+- `octo.enabled: true`
+- Entrambi `jvb` e `jibri` hanno `temporary_name_for_rotation` lato Terraform
+  per permettere cambi futuri di vm_size senza recreate manuale.
 
 ### Workstation locale (sviluppo)
 
@@ -266,7 +281,7 @@ limit, 2 Gi). Per supportare 150 sender concorrenti servono:
 - Upscaling vincolato del pod JVB (più CPU), oppure
 - Deployment dedicato "videocall" vs "webinar" con sizing differente
 
-## Sommario dei risultati
+## Sommario dei risultati v1 (D4as_v5, 3 CPU / 2 Gi)
 
 | Scenario | Part | Send | Stress JVB | Up JVB | Down JVB | Verdetto |
 |---|---|---|---|---|---|---|
@@ -274,7 +289,7 @@ limit, 2 Gi). Per supportare 150 sender concorrenti servono:
 | **Webinar medio** | 60 | 6 | 0.47 | 19 Mbps | 860 kbps | ✅ OK, ~50% risorse JVB |
 | **Videocall mini** | 30 | 30 | **0.83** | **42 Mbps** | 2.1 Mbps | ⚠️ **JVB al limite** (saturazione) |
 
-### Conclusioni operative
+### Conclusioni operative v1
 
 1. **Pattern webinar (pochi sender, molti receiver) scala molto meglio del
    pattern videocall (tutti sender).** Con 1 solo JVB (3 CPU / 2 Gi) si
@@ -296,6 +311,241 @@ limit, 2 Gi). Per supportare 150 sender concorrenti servono:
    videocall di gruppo ≥30 part con tutti video servono risorse maggiori:
    bumpare limit a 6-8 CPU, oppure abilitare cluster autoscaler per JVB
    multipli + Octo.
+
+---
+
+## Scenari v2 — F16s_v2 + scale-to-zero + Octo (2026-04-15)
+
+Il 15/04/2026 il nodepool JVB è stato portato a **Standard_F16s_v2** (16
+vCPU / 32 GiB, compute-optimized) e il pod JVB occupa l'intero nodo:
+
+- `requests: cpu=14 memory=24Gi`
+- `limits:   cpu=15 memory=28Gi`
+- `VIDEOBRIDGE_OPTS=-Xms4g -Xmx16g -XX:MaxDirectMemorySize=8g -XX:+UseG1GC -XX:MaxGCPauseMillis=40`
+
+Jibri è stato spostato su un nodepool dedicato `Standard_F4s_v2` con taint
+`workload=jitsi-jibri:NoSchedule` e Octo è stato abilitato nel subchart
+`jitsi-meet` per consentire a Jicofo di distribuire una singola conferenza
+su più bridge. Strategia di default `RegionBasedBridgeSelectionStrategy`
+(riempie un bridge alla volta, spilla al successivo oltre lo stress target).
+
+### Topologia operativa
+
+```mermaid
+flowchart LR
+    U1[Utenti pubblici]-->|HTTPS|ING[NGINX Ingress]
+    ING-->|/|APP[eventi-dtd<br/>Next.js]
+    ING-->|/event/*|JWEB[Jitsi Web]
+    APP-->|Prisma|DB[(Azure Postgres<br/>videocall_test)]
+    APP-->|REST /colibri/stats|JVB1
+    JWEB-->|XMPP BOSH|PROS[Prosody]
+    PROS-->|MUC|JIC[Jicofo]
+    JIC-->|bridge select|JVB1
+    JIC-->|bridge select|JVB2
+
+    subgraph JVBPOOL["jvb nodepool · F16s_v2 · scale 0-6"]
+      JVB1[JVB pod 1<br/>16 CPU · 28 Gi]
+      JVB2[JVB pod 2<br/>16 CPU · 28 Gi]
+      JVB1<-->|Octo UDP 4096|JVB2
+    end
+
+    subgraph JIBRIPOOL["jibri nodepool · F4s_v2 · scale 0-2"]
+      JIBRI[Jibri pod<br/>4 CPU · 6 Gi]
+    end
+
+    JIBRI-->|record RTP|JVB1
+    JIBRI-->|finalize upload|BLOB[(Azure Blob<br/>recordings)]
+
+    CRON[jvb-scaler CronJob<br/>*/2 min]
+    CRON-->|GET desired-replicas|APP
+    CRON-->|kubectl scale|JVB1
+    CRON-->|kubectl scale|JIBRI
+
+    U2[Partecipante/Moderatore]-->|WebRTC UDP 10000|JVB1
+    U2-->|WebRTC UDP 10000|JVB2
+```
+
+### Ciclo di vita eventi con scale-to-zero
+
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT
+    DRAFT --> PUBLISHED : admin pubblica
+    PUBLISHED --> PROVISIONING : scheduled pre-scale (T-preScaleMin)
+    PUBLISHED --> PROVISIONING : POST /events/[slug]/wake
+    PROVISIONING --> LIVE : JVB Ready + startsAt ≤ now
+    LIVE --> LIVE : traffico attivo, lastActiveAt refresh
+    LIVE --> IDLE : 0 parts per ≥ graceMinutes (def 45)
+    IDLE --> PROVISIONING : POST /wake riaccende il nodo
+    LIVE --> ENDED : endsAt superato
+    IDLE --> ENDED : endsAt superato
+    PROVISIONING --> ENDED : endsAt superato
+    ENDED --> [*]
+```
+
+L'intero flusso `IDLE → PROVISIONING → LIVE → JVB ready` è stato osservato
+su cluster in **~3 minuti** di cold start (CA spinup del nodo F16 + JVB
+boot + Jicofo bridge registration).
+
+### Scenario C — Webinar 150 su singolo F16 (180s)
+
+Stesso pattern di Scenario 2 (poche sender, molti receiver) ma su JVB
+full-node F16 invece che 3 CPU / 2 Gi. 5 container × 30 bot locali → tetto
+di generatore ~78-80 browser.
+
+| Metrica | Valore peak (campioni stabili) |
+|---|---|
+| `participants` | **78** (limite locale, non JVB) |
+| `endpoints_sending_video` | 6-7 |
+| `bit_rate_upload` (JVB outbound) | **54.5 Mbps** max |
+| `stress_level` | **0.183** (18.3%) max |
+| `threads` JVB | 273 |
+| JVB CPU usage | **1.14 / 15 core** (7%) |
+| JVB memory usage | **1.1 / 16 GiB heap** (7%) |
+| OOM / errori | 0 |
+
+**Confronto con v1 (Scenario 2)**: stesso workload (93 part / 7 sender)
+passava da **60.7% stress su 4 CPU** → **~18% proiettato su 15 CPU**.
+Rapporto quasi perfettamente lineare (60.7 × 4/15 = 16.2% vs 18.3%
+misurato), conferma che il collo di bottiglia era solo CPU.
+
+**Proiezione lineare**: stress cresce ~0.22% per partecipante webinar con
+~7 sender. Estrapolando:
+- **150 parts ≈ 35% stress** — abbondante margine
+- **300 parts ≈ 70% stress** — sotto la soglia reactive (tipicamente 80%),
+  supportato da 1 singolo F16
+- **500 parts ≈ 115% stress** — serve Octo (2 bridge, Jicofo spilla metà
+  dei partecipanti sul secondo)
+
+### Scenario D — Videocall all-sender su singolo F16 (180s)
+
+Ogni bot attiva mic + webcam. Avviati 2 container × 25 bot, tetto locale
+~25 sender contemporanei attivi (la workstation locale diventa il collo).
+
+| Metrica | Valore peak |
+|---|---|
+| `participants` | 47 |
+| `endpoints_sending_video` | **25** (di 50 richiesti) |
+| `bit_rate_upload` (JVB outbound) | **23.4 Mbps** |
+| `stress_level` | **0.095** (9.5%) |
+| JVB CPU usage | **1.05 / 15 core** (7%) |
+| OOM / errori | 0 |
+
+**Confronto con v1 (Scenario 3)**: 30 all-sender su 3 CPU facevano **83%**
+stress (limite critico). 25 all-sender su 15 CPU fanno 9.5%. Scaling
+lineare: 30 × 3/15 × 15/25 → stress proiettato 9% ↔ misurato 9.5%, allineato.
+
+**Proiezione lineare per all-sender**:
+- **50 parts ≈ 20% stress** — abbondante margine
+- **100 parts ≈ 40% stress** — ancora su 1 solo bridge
+- **150 parts ≈ 60% stress** — ancora fattibile singolo JVB, ma rischio
+  picchi quando qualcuno condivide schermo → **meglio 2 bridge**
+- **200 parts** richiede **≥3 bridge + Octo** per margine di sicurezza
+
+### Scenario E — Octo 2 bridge (60 parts, 180s)
+
+Validazione della cascata Octo con `SplitBridgeSelectionStrategy` forzata
+(produzione usa `RegionBased` che spilla solo sotto stress). 2 container ×
+30 bot, stessa room, 2 JVB pod su 2 F16 distinti.
+
+| Bridge | parts locali | octo_endpoints | octo_send_bitrate | stress |
+|---|---|---|---|---|
+| JVB1 (pod 76gm8) | ~30 | 30 | 85-100 Mbps | 3-4% |
+| JVB2 (pod jh8dl) | ~30 | 30 | 85-100 Mbps | 3-4% |
+
+- Totale unique parts nella room: **60**
+- **octo_conferences: 1** su entrambi i bridge → conferenza unica
+- Ogni bridge ha 30 partecipanti locali + 30 remoti via relay
+- **Traffico inter-bridge ~90 Mbps per verso** per soli 6 sender totali —
+  è il costo dell'Octo: ogni sender viene replicato una volta verso il
+  peer bridge, e il peer lo fanout ai propri receiver
+
+**Implicazione banda**: Octo **raddoppia** la banda aggregata JVB→JVB
+rispetto a un singolo bridge con gli stessi sender, perché ogni layer di
+simulcast deve attraversare il relay. Per 50 all-sender su 2 bridge
+proiettiamo ~150-200 Mbps di traffico inter-bridge — entro l'accelerated
+networking degli F16 (~12.5 Gbps), ma va monitorato.
+
+### Scenario F — Scale-down end-to-end (validazione logica)
+
+Non un test di performance, ma una validazione dell'automazione:
+1. `SiteSetting.jvbInactiveGraceMinutes = 1` (override per velocizzare)
+2. Evento `prova` marcato `LIVE` con `lastActiveAt = -10 min`
+3. Riattivato `jvb-scaler` CronJob
+4. **Osservato nel log scaler (ciclo successivo, ~2 min dopo)**:
+   ```
+   [10:58:42] JVB Scaler: API response: {"desired":0,...,"liveToIdle":1,
+              "inactiveGraceMinutes":1,"preScaleMinutes":1}
+   [10:58:42] JVB Scaler: Current: 1, Desired: 0
+   [10:58:42] JVB Scaler: Scaling JVB from 1 to 0
+   ```
+5. Evento in DB transizionato a `IDLE`, pod JVB terminato, nodo F16
+   rimosso dal CA nei 10 min successivi
+
+Conferma che: (a) la grace viene letta dal `SiteSetting` (override admin
+applicato in <1 ciclo), (b) la transizione `LIVE → IDLE` è atomica con
+lo scale-down, (c) il nuovo endpoint distingue correttamente i billable
+events dagli IDLE.
+
+## Capacity plan operativo (post v2)
+
+**Per singolo JVB su F16s_v2 (target stress 70% max con margine reactive):**
+
+```mermaid
+quadrantChart
+    title Capacità per deploy · asse X = numero parts, asse Y = % sender
+    x-axis "pochi partecipanti" --> "molti partecipanti"
+    y-axis "webinar (pochi sender)" --> "videocall (tutti sender)"
+    quadrant-1 "Octo obbligatorio"
+    quadrant-2 "Singolo bridge (videocall piccolo)"
+    quadrant-3 "Singolo bridge (webinar piccolo)"
+    quadrant-4 "Octo consigliato (webinar grande)"
+    "webinar 50": [0.08, 0.1]
+    "webinar 150": [0.22, 0.1]
+    "webinar 300": [0.45, 0.1]
+    "webinar 500": [0.82, 0.05]
+    "videocall 25": [0.08, 0.85]
+    "videocall 50": [0.22, 0.95]
+    "videocall 100": [0.52, 0.95]
+    "videocall 150": [0.78, 0.95]
+```
+
+| Scenario target | Bridge necessari | Octo? | Stima stress per bridge |
+|---|---|---|---|
+| Webinar ≤150 part | 1 F16 | no | ~18% |
+| Webinar ≤300 part | 1 F16 | no | ~40% |
+| Webinar 300-500 part | 2 F16 | **sì** (RegionBased) | ~35% per bridge |
+| Videocall all-sender ≤30 | 1 F16 | no | ~12% |
+| Videocall all-sender ≤50 | 1 F16 | no | ~20% |
+| Videocall all-sender 50-100 | 2 F16 | **sì** | ~25% per bridge |
+| Videocall all-sender 100-150 | 3 F16 | **sì** | ~30% per bridge |
+
+**Limiti di validazione**: tutti i numeri ≤80 partecipanti/bridge sono
+misurati direttamente. Tutto quello oltre (150 webinar, 50 all-sender
+reali, 300 webinar, 500 webinar, >50 videocall) è **proiezione lineare**
+dalle misure dirette, non test end-to-end. La linearità CPU è confermata
+per pattern omogenei, ma i seguenti fattori possono far degradare prima:
+
+- **GC pause** del JVM con heap 16g: sopra ~200 endpoint/bridge il G1
+  può introdurre pause visibili. Monitorare `jvm_gc_pause_seconds`.
+- **UDP buffer overflow**: con 150+ endpoint concorrenti a 720p la coda
+  di pacchetti può saturare. Richiede sysctl lato nodo (`net.core.rmem_max`).
+- **Inter-bridge bandwidth Octo**: per 100+ sender la somma dei relay
+  può eccedere il singolo link. Verificare con `octo_send_bitrate` peak.
+
+**Raccomandazione**: prima di un evento da >150 parts tutti-sender fare
+un **test di conferma** con bot reali alla scala target (richiede 2-3
+workstation di generazione o Selenium Grid in cluster).
+
+## Stato corrente del deploy test (2026-04-15)
+
+- Nodepool `jvb`: F16s_v2 · min=0 max=6 · scale-to-zero
+- Nodepool `jibri`: F4s_v2 · min=0 max=2 · scale-to-zero
+- JVB replicaCount default: `0` (portato a 1+ dallo scaler)
+- Octo: abilitato, strategia `RegionBasedBridgeSelectionStrategy`
+- Grace di scale-down: `SiteSetting.jvbInactiveGraceMinutes = 45` (configurabile)
+- Pre-scale: `SiteSetting.jvbPreScaleMinutes = 10` (configurabile)
+- Soglie reactive: warn 50% / critical 70% (configurabili)
 
 ## Note sulla misurazione della banda
 
