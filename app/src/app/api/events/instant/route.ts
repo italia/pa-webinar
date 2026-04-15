@@ -66,6 +66,10 @@ export const POST = withErrorHandling(async (request) => {
       participantsCanShareScreen: true,
       moderatorName: data.moderatorName,
       status: 'LIVE',
+      // Seed lastActiveAt so the LIVE→IDLE scaler's grace-cutoff OR-clause
+      // can match this event. Without it, lastActiveAt stays null and the
+      // call lingers LIVE until the 24h endsAt upper bound kicks in.
+      lastActiveAt: now,
       dataRetentionDays: 7,
     },
   });

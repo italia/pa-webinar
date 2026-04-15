@@ -999,7 +999,32 @@
       "form": {
         "titleLabel": "Titolo della chiamata",
         "moderatorLabel": "Nome del moderatore (opzionale)"
-      }
+      },
+      "hero": {
+        "title": "Avvia una nuova videocall",
+        "subtitle": "Crea una stanza Jitsi istantanea, ricevi il link moderatore e inizia in pochi secondi."
+      },
+      "filters": {
+        "search": "Cerca",
+        "searchPlaceholder": "Titolo o moderatore…",
+        "from": "Dal",
+        "to": "Al",
+        "status": "Stato",
+        "statusAll": "Tutti",
+        "recording": "Registrazione",
+        "recAny": "Tutte",
+        "recYes": "Con registrazione",
+        "recNo": "Senza registrazione",
+        "reset": "Azzera filtri"
+      },
+      "status": {
+        "live": "Live",
+        "idle": "In pausa",
+        "ended": "Terminata",
+        "archived": "Archiviata",
+        "idleTooltip": "In pausa da {idle} min — auto-chiusura prevista dopo {grace} min di inattività"
+      },
+      "noResults": "Nessuna chiamata corrisponde ai filtri."
     },
     "sessions": {
       "title": "Sessioni di chiamata",

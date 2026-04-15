@@ -929,7 +929,32 @@
       "form": {
         "titleLabel": "Call title",
         "moderatorLabel": "Moderator name (optional)"
-      }
+      },
+      "hero": {
+        "title": "Start a new videocall",
+        "subtitle": "Spin up an instant Jitsi room, get the moderator link, and join in seconds."
+      },
+      "filters": {
+        "search": "Search",
+        "searchPlaceholder": "Title or moderator…",
+        "from": "From",
+        "to": "To",
+        "status": "Status",
+        "statusAll": "All",
+        "recording": "Recording",
+        "recAny": "All",
+        "recYes": "With recording",
+        "recNo": "Without recording",
+        "reset": "Reset filters"
+      },
+      "status": {
+        "live": "Live",
+        "idle": "Idle",
+        "ended": "Ended",
+        "archived": "Archived",
+        "idleTooltip": "Idle for {idle} min — auto-close after {grace} min of inactivity"
+      },
+      "noResults": "No calls match the filters."
     },
     "sessions": {
       "title": "Call sessions",
