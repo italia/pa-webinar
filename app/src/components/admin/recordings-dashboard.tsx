@@ -8,11 +8,30 @@
  * file the platform has ever produced.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Badge, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
+import { Badge, Button, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+
+interface OrphanRow {
+  id: string;
+  blobName: string;
+  sizeBytes: string | null;
+  lastModified: string | null;
+  discoveredAt: string;
+  lastSeenAt: string;
+  decision: string;
+  note: string | null;
+  deletesAt: string | null;
+}
+
+interface OrphanResponse {
+  rows: OrphanRow[];
+  total: number;
+  totalBytes: string;
+  graceDays: number;
+}
 
 interface EventOption {
   id: string;
@@ -80,6 +99,8 @@ function fmtDuration(seconds: number | null): string {
   return `${Math.round(seconds)}s`;
 }
 
+type Tab = 'library' | 'orphans';
+
 export default function RecordingsDashboard({
   events,
   locale,
@@ -88,7 +109,14 @@ export default function RecordingsDashboard({
   locale: string;
 }) {
   const t = useTranslations('admin.recordingsLibrary');
+  const tc = useTranslations('common');
   const fmt = useFormatter();
+
+  const [tab, setTab] = useState<Tab>('library');
+  const [orphanData, setOrphanData] = useState<OrphanResponse | null>(null);
+  const [orphanLoading, setOrphanLoading] = useState(false);
+  const [orphanSelected, setOrphanSelected] = useState<Set<string>>(new Set());
+  const [orphanSubmitting, setOrphanSubmitting] = useState(false);
 
   const [range, setRange] = useState<Range>('90d');
   const [eventId, setEventId] = useState('');
@@ -123,6 +151,58 @@ export default function RecordingsDashboard({
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const fetchOrphans = useCallback(async () => {
+    setOrphanLoading(true);
+    try {
+      const res = await fetch('/api/admin/recordings/orphans', { cache: 'no-store' });
+      if (res.ok) setOrphanData((await res.json()) as OrphanResponse);
+    } finally {
+      setOrphanLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tab === 'orphans') fetchOrphans();
+  }, [tab, fetchOrphans]);
+
+  const toggleOrphan = useCallback((id: string) => {
+    setOrphanSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const orphanBulkDecision = useCallback(
+    async (decision: 'ignore' | 'delete-now' | 'pending') => {
+      if (orphanSelected.size === 0) return;
+      setOrphanSubmitting(true);
+      try {
+        const res = await fetch('/api/admin/recordings/orphans', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ids: Array.from(orphanSelected),
+            decision,
+          }),
+        });
+        if (res.ok) {
+          setOrphanSelected(new Set());
+          fetchOrphans();
+        }
+      } finally {
+        setOrphanSubmitting(false);
+      }
+    },
+    [orphanSelected, fetchOrphans],
+  );
+
+  const orphanCountPending = useMemo(
+    () => orphanData?.rows.filter((r) => r.decision === 'pending').length ?? 0,
+    [orphanData],
+  );
+
   const exportCsv = () => {
     window.location.href = `/api/admin/recordings?${buildQuery(true)}`;
   };
@@ -138,6 +218,64 @@ export default function RecordingsDashboard({
 
   return (
     <div>
+      <ul className="nav nav-tabs mb-4">
+        <li className="nav-item">
+          <button
+            type="button"
+            className={`nav-link ${tab === 'library' ? 'active' : ''}`}
+            onClick={() => setTab('library')}
+          >
+            <Icon icon="it-video" size="sm" className="me-1" />
+            {t('tabs.library')}
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            type="button"
+            className={`nav-link ${tab === 'orphans' ? 'active' : ''}`}
+            onClick={() => setTab('orphans')}
+          >
+            <Icon icon="it-warning-circle" size="sm" className="me-1" />
+            {t('tabs.orphans')}
+            {orphanCountPending > 0 && (
+              <Badge color="warning" className="ms-2" style={{ fontSize: '0.65rem' }}>
+                {orphanCountPending}
+              </Badge>
+            )}
+          </button>
+        </li>
+      </ul>
+
+      {tab === 'orphans' ? (
+        <OrphansView
+          data={orphanData}
+          loading={orphanLoading}
+          selected={orphanSelected}
+          submitting={orphanSubmitting}
+          onToggle={toggleOrphan}
+          onSelectAll={() => {
+            if (!orphanData) return;
+            setOrphanSelected((prev) =>
+              prev.size === orphanData.rows.length
+                ? new Set()
+                : new Set(orphanData.rows.map((r) => r.id)),
+            );
+          }}
+          onBulk={orphanBulkDecision}
+          onRefresh={fetchOrphans}
+          t={t}
+          tc={tc}
+          fmt={fmt}
+        />
+      ) : (
+        <LibraryView />
+      )}
+    </div>
+  );
+
+  function LibraryView() {
+    return (
+      <div>
       {/* Filters */}
       <Card className="border-0 shadow-sm mb-4">
         <CardBody className="p-3">
@@ -299,6 +437,265 @@ export default function RecordingsDashboard({
           </CardBody>
         </Card>
       )}
+    </div>
+    );
+  }
+}
+
+function fmtOrphanSize(bytesStr: string | null): string {
+  if (!bytesStr) return '—';
+  const n = Number(bytesStr);
+  if (n >= 1_073_741_824) return `${(n / 1_073_741_824).toFixed(2)} GB`;
+  if (n >= 1_048_576) return `${(n / 1_048_576).toFixed(0)} MB`;
+  if (n >= 1024) return `${(n / 1024).toFixed(0)} KB`;
+  return `${n} B`;
+}
+
+interface OrphansViewProps {
+  data: OrphanResponse | null;
+  loading: boolean;
+  selected: Set<string>;
+  submitting: boolean;
+  onToggle: (id: string) => void;
+  onSelectAll: () => void;
+  onBulk: (decision: 'ignore' | 'delete-now' | 'pending') => void;
+  onRefresh: () => void;
+  t: ReturnType<typeof useTranslations>;
+  tc: ReturnType<typeof useTranslations>;
+  fmt: ReturnType<typeof useFormatter>;
+}
+
+function OrphansView({
+  data,
+  loading,
+  selected,
+  submitting,
+  onToggle,
+  onSelectAll,
+  onBulk,
+  onRefresh,
+  t,
+  tc,
+  fmt,
+}: OrphansViewProps) {
+  if (loading && !data) {
+    return <div className="text-muted">{tc('loading')}</div>;
+  }
+  if (!data || data.rows.length === 0) {
+    return (
+      <Card className="border-0 shadow-sm">
+        <CardBody className="p-5 text-center">
+          <Icon icon="it-check-circle" size="xl" className="text-success mb-3" />
+          <p className="text-muted mb-1">{t('orphans.noneFound')}</p>
+          <small className="text-muted">
+            {t('orphans.graceDays', { days: data?.graceDays ?? 30 })}
+          </small>
+          <div className="mt-3">
+            <Button color="secondary" outline size="xs" onClick={onRefresh}>
+              <Icon icon="it-refresh" size="xs" className="me-1" />
+              {t('orphans.refresh')}
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
+    );
+  }
+
+  const allSelected = selected.size === data.rows.length;
+  const hasSelection = selected.size > 0;
+  const countPending = data.rows.filter((r) => r.decision === 'pending').length;
+  const countIgnore = data.rows.filter((r) => r.decision === 'ignore').length;
+  const countDeleteNow = data.rows.filter((r) => r.decision === 'delete-now').length;
+
+  return (
+    <div>
+      <div className="row g-3 mb-3">
+        <div className="col-md-3">
+          <Card className="border-0 shadow-sm h-100">
+            <CardBody className="p-3">
+              <div className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase' }}>
+                {t('orphans.statTotal')}
+              </div>
+              <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#17324D' }}>
+                {data.total}
+              </div>
+              <small className="text-muted">{fmtOrphanSize(data.totalBytes)}</small>
+            </CardBody>
+          </Card>
+        </div>
+        <div className="col-md-3">
+          <Card className="border-0 shadow-sm h-100">
+            <CardBody className="p-3">
+              <div className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase' }}>
+                {t('orphans.statPending')}
+              </div>
+              <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#A66300' }}>
+                {countPending}
+              </div>
+            </CardBody>
+          </Card>
+        </div>
+        <div className="col-md-3">
+          <Card className="border-0 shadow-sm h-100">
+            <CardBody className="p-3">
+              <div className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase' }}>
+                {t('orphans.statIgnore')}
+              </div>
+              <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#5A768A' }}>
+                {countIgnore}
+              </div>
+            </CardBody>
+          </Card>
+        </div>
+        <div className="col-md-3">
+          <Card className="border-0 shadow-sm h-100">
+            <CardBody className="p-3">
+              <div className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase' }}>
+                {t('orphans.statDeleteNow')}
+              </div>
+              <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#CC0000' }}>
+                {countDeleteNow}
+              </div>
+            </CardBody>
+          </Card>
+        </div>
+      </div>
+
+      <div className="alert alert-info d-flex align-items-start gap-2 mb-3">
+        <Icon icon="it-info-circle" size="sm" className="mt-1 flex-shrink-0" />
+        <div style={{ fontSize: '0.85rem' }}>
+          {t('orphans.intro', { days: data.graceDays })}
+        </div>
+      </div>
+
+      <div className="d-flex flex-wrap gap-2 mb-3">
+        <Button color="primary" outline size="xs" onClick={onSelectAll}>
+          <Icon
+            icon={allSelected ? 'it-check-circle' : 'it-check'}
+            size="xs"
+            className="me-1"
+          />
+          {allSelected ? tc('deselectAll') : tc('selectAll')}
+        </Button>
+        {hasSelection && (
+          <>
+            <span className="text-muted small ms-1">
+              {selected.size} {t('orphans.selected')}
+            </span>
+            <Button
+              color="secondary"
+              outline
+              size="xs"
+              disabled={submitting}
+              onClick={() => onBulk('ignore')}
+            >
+              <Icon icon="it-lock" size="xs" className="me-1" />
+              {t('orphans.markIgnore')}
+            </Button>
+            <Button
+              color="danger"
+              outline
+              size="xs"
+              disabled={submitting}
+              onClick={() => onBulk('delete-now')}
+            >
+              <Icon icon="it-delete" size="xs" className="me-1" />
+              {t('orphans.markDelete')}
+            </Button>
+            <Button
+              color="warning"
+              outline
+              size="xs"
+              disabled={submitting}
+              onClick={() => onBulk('pending')}
+            >
+              <Icon icon="it-refresh" size="xs" className="me-1" />
+              {t('orphans.markPending')}
+            </Button>
+          </>
+        )}
+        <div className="ms-auto">
+          <Button color="secondary" outline size="xs" onClick={onRefresh}>
+            <Icon icon="it-refresh" size="xs" className="me-1" />
+            {t('orphans.refresh')}
+          </Button>
+        </div>
+      </div>
+
+      <Card className="border-0 shadow-sm">
+        <CardBody className="p-0">
+          <div className="table-responsive">
+            <table className="table table-hover mb-0" style={{ fontSize: '0.85rem' }}>
+              <thead style={{ background: '#F8FAFE' }}>
+                <tr>
+                  <th style={{ width: 32 }} />
+                  <th>{t('orphans.colBlobName')}</th>
+                  <th className="text-end">{t('orphans.colSize')}</th>
+                  <th>{t('orphans.colDiscovered')}</th>
+                  <th>{t('orphans.colDecision')}</th>
+                  <th>{t('orphans.colDeletesAt')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.rows.map((r) => {
+                  const isSelected = selected.has(r.id);
+                  const decisionBadge =
+                    r.decision === 'pending' ? (
+                      <Badge color="warning" style={{ fontSize: '0.68rem' }}>
+                        {t('orphans.decisionPending')}
+                      </Badge>
+                    ) : r.decision === 'ignore' ? (
+                      <Badge color="secondary" style={{ fontSize: '0.68rem' }}>
+                        {t('orphans.decisionIgnore')}
+                      </Badge>
+                    ) : (
+                      <Badge color="danger" style={{ fontSize: '0.68rem' }}>
+                        {t('orphans.decisionDeleteNow')}
+                      </Badge>
+                    );
+                  const deletesAtLabel =
+                    r.deletesAt === null
+                      ? '—'
+                      : r.deletesAt === 'next-sweep'
+                        ? t('orphans.nextSweep')
+                        : fmt.dateTime(new Date(r.deletesAt), {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          });
+                  return (
+                    <tr key={r.id} style={{ background: isSelected ? '#EFF6FF' : undefined }}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          checked={isSelected}
+                          onChange={() => onToggle(r.id)}
+                        />
+                      </td>
+                      <td>
+                        <code style={{ fontSize: '0.78rem', color: '#17324D' }}>{r.blobName}</code>
+                      </td>
+                      <td className="text-end">{fmtOrphanSize(r.sizeBytes)}</td>
+                      <td className="text-muted" style={{ fontSize: '0.78rem' }}>
+                        {fmt.dateTime(new Date(r.discoveredAt), {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </td>
+                      <td>{decisionBadge}</td>
+                      <td className="text-muted" style={{ fontSize: '0.78rem' }}>
+                        {deletesAtLabel}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }

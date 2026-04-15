@@ -38,6 +38,10 @@ interface SystemStatus {
     jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable';
     jibriRunningReplicas: number;
     jibriStale: boolean;
+    // Orphan recordings awaiting operator decision or auto-cleanup.
+    // A non-zero pending count is surfaced as a status-page warning so
+    // the operator knows the reconcile cron is producing data.
+    orphanRecordingsPending: number;
   };
   upcomingEvents: {
     title: string;
@@ -379,12 +383,13 @@ export const GET = withErrorHandling(async () => {
     return since <= staleCutoff;
   });
 
-  const [db, jitsi, smtp, jvb, jibriResult] = await Promise.all([
+  const [db, jitsi, smtp, jvb, jibriResult, orphanRecordingsPendingCount] = await Promise.all([
     checkDatabase(),
     checkJitsiWeb(),
     checkSmtp(),
     getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes),
     getJibriStatus(recordingNeeded, recordingStale),
+    prisma.orphanRecording.count({ where: { decision: 'pending' } }).catch(() => 0),
   ]);
 
   const app: ComponentStatus = { name: 'app', status: 'operational' };
@@ -459,6 +464,7 @@ export const GET = withErrorHandling(async () => {
       jibriStatus: jibriResult.jibriStatus,
       jibriRunningReplicas: jibriResult.running,
       jibriStale: recordingStale && jibriResult.running === 0,
+      orphanRecordingsPending: orphanRecordingsPendingCount,
     },
     upcomingEvents: upcomingEvents.map((e) => ({
       title: getLocalized(e.title as LocalizedField, 'it'),
