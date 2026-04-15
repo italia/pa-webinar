@@ -50,6 +50,8 @@ const updateSettingsSchema = z.object({
   translationOverrides: z.record(z.string(), z.record(z.string(), z.string())).optional(),
   jvbInactiveGraceMinutes: z.number().int().min(5).max(240).optional(),
   jvbPreScaleMinutes: z.number().int().min(1).max(60).optional(),
+  jvbStressWarnPercent: z.number().int().min(0).max(100).optional(),
+  jvbStressCriticalPercent: z.number().int().min(0).max(100).optional(),
 }).strict();
 
 export const GET = withErrorHandling(async () => {

@@ -1112,6 +1112,52 @@ function FeaturesTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="jvbStressWarnPercent">
+              {t('jvbStressWarnPercent')}
+            </Label>
+            <Input
+              id="jvbStressWarnPercent"
+              type="number"
+              min={0}
+              max={100}
+              step={5}
+              value={settings.jvbStressWarnPercent}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('jvbStressWarnPercent', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('jvbStressWarnPercentHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="jvbStressCriticalPercent">
+              {t('jvbStressCriticalPercent')}
+            </Label>
+            <Input
+              id="jvbStressCriticalPercent"
+              type="number"
+              min={0}
+              max={100}
+              step={5}
+              value={settings.jvbStressCriticalPercent}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('jvbStressCriticalPercent', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('jvbStressCriticalPercentHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+      </Row>
     </div>
   );
 }

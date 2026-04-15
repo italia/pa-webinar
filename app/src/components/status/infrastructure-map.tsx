@@ -774,6 +774,18 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
             {data.jvbExtended.endpointsSendingVideo != null && <DRow label={t('sendingVideo')} value={String(data.jvbExtended.endpointsSendingVideo)} />}
             {data.jvbExtended.iceSuccessRate != null && <DRow label={t('iceSuccess')} value={`${data.jvbExtended.iceSuccessRate}%`} />}
             {data.jvbExtended.totalConferencesCreated != null && <DRow label={t('totalConferences')} value={String(data.jvbExtended.totalConferencesCreated)} />}
+            {(data.jvbExtended.octoConferences ?? 0) > 0 && (
+              <>
+                <DRow label={t('octoConferences')} value={String(data.jvbExtended.octoConferences)} />
+                {data.jvbExtended.octoEndpoints != null && <DRow label={t('octoEndpoints')} value={String(data.jvbExtended.octoEndpoints)} />}
+                {data.jvbExtended.octoSendBitrateBps != null && (
+                  <DRow label={t('octoSend')} value={formatMbps(data.jvbExtended.octoSendBitrateBps / 1_000_000)} />
+                )}
+                {data.jvbExtended.octoReceiveBitrateBps != null && (
+                  <DRow label={t('octoReceive')} value={formatMbps(data.jvbExtended.octoReceiveBitrateBps / 1_000_000)} />
+                )}
+              </>
+            )}
           </>
         )}
 

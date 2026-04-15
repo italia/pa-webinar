@@ -1,6 +1,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
@@ -17,12 +18,21 @@ interface SystemStatus {
   components: ComponentStatus[];
   metrics: {
     activeEvents: number;
+    idleEvents: number;
+    provisioningEvents: number;
     totalRegistrationsToday: number;
     jvbDesiredReplicas: number;
     jvbRunningReplicas: number;
     jvbStatus: 'ready' | 'scaling' | 'standby';
     jvbStressLevel: number | null;
     jvbParticipants: number | null;
+    // Octo (multi-bridge cascading). Populated from /colibri/stats of
+    // whichever JVB pod the service LB routes us to — aggregate across
+    // bridges requires per-pod queries which we don't do here.
+    jvbOctoEnabled: boolean;
+    jvbOctoConferences: number | null;
+    jvbOctoEndpoints: number | null;
+    jvbOctoSendBitrateBps: number | null;
     jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable';
     jibriRunningReplicas: number;
   };
@@ -85,36 +95,34 @@ async function checkSmtp(): Promise<ComponentStatus> {
   return { name: 'smtp', status: 'operational', details: 'Configured' };
 }
 
-/** How many JVB instances a single event needs. */
-function jvbsForEvent(maxParticipants: number, videoEnabled: boolean): number {
-  const maxReplicas = parseInt(process.env.JVB_MAX_REPLICAS || '6', 10);
-  if (videoEnabled) {
-    if (maxParticipants <= 150) return 1;
-    if (maxParticipants <= 350) return 2;
-    return Math.min(Math.ceil(maxParticipants / 150), maxReplicas);
-  }
-  if (maxParticipants <= 500) return 1;
-  return Math.min(Math.ceil(maxParticipants / 500), maxReplicas);
-}
-
-async function getJvbStatus(): Promise<{
+interface JvbStatusResult {
   component: ComponentStatus;
   desired: number;
   running: number;
   jvbStatus: 'ready' | 'scaling' | 'standby';
   stressLevel: number | null;
   participants: number | null;
-}> {
+  octoEnabled: boolean;
+  octoConferences: number | null;
+  octoEndpoints: number | null;
+  octoSendBitrateBps: number | null;
+}
+
+async function getJvbStatus(): Promise<JvbStatusResult> {
   try {
     const now = new Date();
-    const preScaleMinutes = parseInt(process.env.JVB_PRE_SCALE_MINUTES || '30', 10);
-    const maxReplicas = parseInt(process.env.JVB_MAX_REPLICAS || '6', 10);
+    const preScaleMinutes = parseInt(process.env.JVB_PRE_SCALE_MINUTES || '10', 10);
+    const maxReplicas = jvbMaxReplicasFromEnv();
     const preScaleWindow = new Date(now.getTime() + preScaleMinutes * 60 * 1000);
 
+    // LIVE + PROVISIONING: already billing JVB capacity.
+    // PUBLISHED within the pre-scale window: scaler will promote them to
+    // PROVISIONING shortly, so we count them too to avoid a visible dip.
+    // IDLE is deliberately excluded (that's the whole point of scale-to-zero).
     const events = await prisma.event.findMany({
       where: {
         OR: [
-          { status: 'LIVE' },
+          { status: { in: [...JVB_BILLABLE_STATUSES] } },
           {
             status: 'PUBLISHED',
             startsAt: { lte: preScaleWindow },
@@ -130,7 +138,7 @@ async function getJvbStatus(): Promise<{
 
     let desired = 0;
     for (const event of events) {
-      desired += jvbsForEvent(event.maxParticipants, event.participantsCanStartVideo);
+      desired += jvbsForEvent(event.maxParticipants, event.participantsCanStartVideo, maxReplicas);
     }
     desired = Math.min(desired, maxReplicas);
     if (events.length > 0 && desired === 0) desired = 1;
@@ -138,6 +146,10 @@ async function getJvbStatus(): Promise<{
     let running = 0;
     let stressLevel: number | null = null;
     let participants: number | null = null;
+    let octoEnabled = false;
+    let octoConferences: number | null = null;
+    let octoEndpoints: number | null = null;
+    let octoSendBitrateBps: number | null = null;
 
     const jvbHealthUrl = process.env.JVB_HEALTH_URL;
     if (jvbHealthUrl) {
@@ -146,15 +158,21 @@ async function getJvbStatus(): Promise<{
           signal: AbortSignal.timeout(3000),
         });
         if (res.ok) {
-          const stats = await res.json() as {
-            healthy?: boolean;
-            stress_level?: number;
-            participants?: number;
-          };
+          const stats = await res.json() as Record<string, unknown>;
           if (stats.healthy !== false) {
             running = 1;
-            stressLevel = stats.stress_level ?? null;
-            participants = stats.participants ?? null;
+            stressLevel = typeof stats.stress_level === 'number' ? stats.stress_level : null;
+            participants = typeof stats.participants === 'number' ? stats.participants : null;
+            // Octo is considered "enabled" for this reporting purpose when
+            // the bridge has relay traffic OR is serving an octo conference.
+            // /colibri/stats always exposes these fields; a zero value with
+            // octo disabled is indistinguishable from octo-enabled-but-idle,
+            // so we key on the presence of non-zero relay fields at report
+            // time instead of a separate config probe.
+            octoConferences = typeof stats.octo_conferences === 'number' ? stats.octo_conferences : null;
+            octoEndpoints = typeof stats.octo_endpoints === 'number' ? stats.octo_endpoints : null;
+            octoSendBitrateBps = typeof stats.octo_send_bitrate === 'number' ? stats.octo_send_bitrate : null;
+            octoEnabled = (octoConferences ?? 0) > 0 || (octoSendBitrateBps ?? 0) > 0;
           }
         }
       } catch {
@@ -188,6 +206,10 @@ async function getJvbStatus(): Promise<{
       jvbStatus,
       stressLevel,
       participants,
+      octoEnabled,
+      octoConferences,
+      octoEndpoints,
+      octoSendBitrateBps,
     };
   } catch {
     return {
@@ -197,6 +219,10 @@ async function getJvbStatus(): Promise<{
       jvbStatus: 'standby',
       stressLevel: null,
       participants: null,
+      octoEnabled: false,
+      octoConferences: null,
+      octoEndpoints: null,
+      octoSendBitrateBps: null,
     };
   }
 }
@@ -300,12 +326,16 @@ export const GET = withErrorHandling(async () => {
   const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
 
-  const [activeEvents, totalRegsToday, upcomingEvents] = await Promise.all([
+  const [activeEvents, idleEvents, provisioningEvents, totalRegsToday, upcomingEvents] = await Promise.all([
     prisma.event.count({ where: { status: 'LIVE' } }),
+    prisma.event.count({ where: { status: 'IDLE', endsAt: { gt: now } } }),
+    prisma.event.count({ where: { status: 'PROVISIONING' } }),
     prisma.registration.count({ where: { createdAt: { gte: todayStart } } }),
     prisma.event.findMany({
       where: {
-        status: { in: ['PUBLISHED', 'LIVE'] },
+        // Include PROVISIONING and IDLE so the public page reflects the
+        // actual lifecycle state of upcoming/recently-active events.
+        status: { in: ['PUBLISHED', 'PROVISIONING', 'LIVE', 'IDLE'] },
         endsAt: { gte: now },
       },
       orderBy: { startsAt: 'asc' },
@@ -325,12 +355,18 @@ export const GET = withErrorHandling(async () => {
     components,
     metrics: {
       activeEvents,
+      idleEvents,
+      provisioningEvents,
       totalRegistrationsToday: totalRegsToday,
       jvbDesiredReplicas: jvb.desired,
       jvbRunningReplicas: jvb.running,
       jvbStatus: jvb.jvbStatus,
       jvbStressLevel: jvb.stressLevel,
       jvbParticipants: jvb.participants,
+      jvbOctoEnabled: jvb.octoEnabled,
+      jvbOctoConferences: jvb.octoConferences,
+      jvbOctoEndpoints: jvb.octoEndpoints,
+      jvbOctoSendBitrateBps: jvb.octoSendBitrateBps,
       jibriStatus: jibriResult.jibriStatus,
       jibriRunningReplicas: jibriResult.running,
     },

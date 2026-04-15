@@ -1,6 +1,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
 import { getAppProcessMetrics } from '@/lib/metrics';
 import {
   isPrometheusConfigured,
@@ -51,6 +52,13 @@ interface JvbExtendedStats {
   endpointsSendingVideo: number | null;
   totalConferencesCreated: number | null;
   iceSuccessRate: number | null;
+  // Octo (multi-bridge cascading). Non-zero values indicate the conference
+  // is spread across multiple JVB pods and media is being relayed between
+  // them. Reported from the single JVB pod the service LB routes us to.
+  octoConferences: number | null;
+  octoEndpoints: number | null;
+  octoSendBitrateBps: number | null;
+  octoReceiveBitrateBps: number | null;
 }
 
 interface AppProcessMetrics {
@@ -136,6 +144,10 @@ interface JvbFullStats {
   totalConferencesCreated: number | null;
   iceSucceeded: number | null;
   iceFailed: number | null;
+  octoConferences: number | null;
+  octoEndpoints: number | null;
+  octoSendBitrateBps: number | null;
+  octoReceiveBitrateBps: number | null;
 }
 
 const EMPTY_JVB: JvbFullStats = {
@@ -156,6 +168,10 @@ const EMPTY_JVB: JvbFullStats = {
   totalConferencesCreated: null,
   iceSucceeded: null,
   iceFailed: null,
+  octoConferences: null,
+  octoEndpoints: null,
+  octoSendBitrateBps: null,
+  octoReceiveBitrateBps: null,
 };
 
 async function getJvbStats(): Promise<JvbFullStats> {
@@ -186,6 +202,10 @@ async function getJvbStats(): Promise<JvbFullStats> {
       totalConferencesCreated: num('total_conferences_created'),
       iceSucceeded: num('total_ice_succeeded'),
       iceFailed: num('total_ice_failed'),
+      octoConferences: num('octo_conferences'),
+      octoEndpoints: num('octo_endpoints'),
+      octoSendBitrateBps: num('octo_send_bitrate'),
+      octoReceiveBitrateBps: num('octo_receive_bitrate'),
     };
   } catch {
     return { ...EMPTY_JVB };
@@ -287,8 +307,8 @@ export const GET = withErrorHandling(async () => {
   const mode = inferDeploymentMode();
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN') || '';
   const appDomain = getPublicEnv('NEXT_PUBLIC_APP_URL') || '';
-  const maxJvb = parseInt(process.env.JVB_MAX_REPLICAS || '6', 10);
-  const preScaleMinutes = parseInt(process.env.JVB_PRE_SCALE_MINUTES || '30', 10);
+  const maxJvb = jvbMaxReplicasFromEnv();
+  const preScaleMinutes = parseInt(process.env.JVB_PRE_SCALE_MINUTES || '10', 10);
   const storageType = process.env.RECORDING_STORAGE_TYPE || 'not-configured';
   const namespace = process.env.POD_NAMESPACE || 'default';
 
@@ -308,7 +328,7 @@ export const GET = withErrorHandling(async () => {
     getJibriInfo(),
     prisma.event.count({ where: { status: 'LIVE' } }),
     prisma.registration.count({ where: { createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } } }),
-    prisma.event.count({ where: { status: { in: ['PUBLISHED', 'LIVE'] }, endsAt: { gte: new Date() } } }),
+    prisma.event.count({ where: { status: { in: ['PUBLISHED', 'PROVISIONING', 'LIVE', 'IDLE'] }, endsAt: { gte: new Date() } } }),
     prisma.event.count({ where: { recordingUrl: { not: null } } }),
     getAppProcessMetrics(),
     fetchPrometheusData(namespace),
@@ -325,10 +345,13 @@ export const GET = withErrorHandling(async () => {
 
   const now = new Date();
   const preScaleWindow = new Date(now.getTime() + preScaleMinutes * 60 * 1000);
+  // Same filter as /api/internal/jvb-desired-replicas: count LIVE,
+  // PROVISIONING and PUBLISHED-within-pre-scale. IDLE is excluded so the
+  // infrastructure view reflects current billable capacity, not historical.
   const soonEvents = await prisma.event.findMany({
     where: {
       OR: [
-        { status: 'LIVE' },
+        { status: { in: [...JVB_BILLABLE_STATUSES] } },
         { status: 'PUBLISHED', startsAt: { lte: preScaleWindow }, endsAt: { gte: now } },
       ],
     },
@@ -337,12 +360,7 @@ export const GET = withErrorHandling(async () => {
 
   let jvbDesired = 0;
   for (const ev of soonEvents) {
-    const videoEnabled = ev.participantsCanStartVideo;
-    if (videoEnabled) {
-      jvbDesired += ev.maxParticipants <= 150 ? 1 : ev.maxParticipants <= 350 ? 2 : Math.ceil(ev.maxParticipants / 150);
-    } else {
-      jvbDesired += ev.maxParticipants <= 500 ? 1 : Math.ceil(ev.maxParticipants / 500);
-    }
+    jvbDesired += jvbsForEvent(ev.maxParticipants, ev.participantsCanStartVideo, maxJvb);
   }
   jvbDesired = Math.min(jvbDesired, maxJvb);
   if (soonEvents.length > 0 && jvbDesired === 0) jvbDesired = 1;
@@ -551,6 +569,10 @@ export const GET = withErrorHandling(async () => {
       endpointsSendingVideo: jvbStats.endpointsSendingVideo,
       totalConferencesCreated: jvbStats.totalConferencesCreated,
       iceSuccessRate: computeIceSuccessRate(jvbStats.iceSucceeded, jvbStats.iceFailed),
+      octoConferences: jvbStats.octoConferences,
+      octoEndpoints: jvbStats.octoEndpoints,
+      octoSendBitrateBps: jvbStats.octoSendBitrateBps,
+      octoReceiveBitrateBps: jvbStats.octoReceiveBitrateBps,
     },
     appMetrics: appMetricsRaw,
     prometheus: prometheusData,

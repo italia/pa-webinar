@@ -12,6 +12,10 @@ import {
   jvbParticipantsGauge,
   jvbConferencesGauge,
   jvbStressLevelGauge,
+  jvbOctoConferencesGauge,
+  jvbOctoEndpointsGauge,
+  jvbOctoSendBitrateGauge,
+  jvbOctoReceiveBitrateGauge,
 } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +30,10 @@ async function refreshJvbGauges(): Promise<void> {
     if (typeof s.participants === 'number') jvbParticipantsGauge.set(s.participants);
     if (typeof s.conferences === 'number') jvbConferencesGauge.set(s.conferences);
     if (typeof s.stress_level === 'number') jvbStressLevelGauge.set(s.stress_level);
+    if (typeof s.octo_conferences === 'number') jvbOctoConferencesGauge.set(s.octo_conferences);
+    if (typeof s.octo_endpoints === 'number') jvbOctoEndpointsGauge.set(s.octo_endpoints);
+    if (typeof s.octo_send_bitrate === 'number') jvbOctoSendBitrateGauge.set(s.octo_send_bitrate);
+    if (typeof s.octo_receive_bitrate === 'number') jvbOctoReceiveBitrateGauge.set(s.octo_receive_bitrate);
   } catch { /* JVB not reachable — gauges keep last known value */ }
 }
 
