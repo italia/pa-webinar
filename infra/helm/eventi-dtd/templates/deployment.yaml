@@ -79,6 +79,17 @@ spec:
               value: "0.0.0.0"
             - name: NODE_ENV
               value: "production"
+            # Needed by /api/status/infrastructure to scope Prometheus queries
+            # to the release namespace. Without this, queries default to
+            # namespace="default" and every series returns empty.
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             {{- if .Values.jitsi.enabled }}
             - name: JVB_HEALTH_URL
               value: {{ .Values.jitsi.jvbHealthUrl | default (printf "http://%s-jitsi-meet-jvb:8080" .Release.Name) | quote }}

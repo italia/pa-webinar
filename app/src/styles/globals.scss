@@ -796,18 +796,23 @@
     filter: url(#infraShadow) brightness(0.97);
   }
 
+  // Detail panel is rendered INSIDE .infra-map__canvas, so its absolute
+  // positioning resolves within the SVG container — it stays visible on
+  // top of the diagram regardless of how much the verdict cards below
+  // expand the parent .infra-map height.
   &__detail {
     position: absolute;
-    bottom: 60px;
-    right: 20px;
-    width: 300px;
+    top: 16px;
+    right: 16px;
+    width: 320px;
+    max-width: calc(100% - 32px);
     background: #fff;
     border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
     border: 1px solid #E8ECF0;
     overflow: hidden;
     animation: infraSlideUp 0.2s ease-out;
-    z-index: 10;
+    z-index: 20;
   }
 
   &__detail-header {
@@ -884,14 +889,69 @@
     text-align: center;
   }
 
+  // Custom banner replacing design-react-kit <Alert>, which injects a
+  // ::before icon at left:16px that would overlap the banner text given
+  // our compact 10px padding. Colour handled via data-state attribute.
   &__banner {
     font-size: 0.88rem;
-    padding: 10px 20px !important;
-    margin-bottom: 0 !important;
-    border-radius: 0 !important;
-    border-left: 0 !important;
-    border-right: 0 !important;
-    border-top: 0 !important;
+    padding: 10px 20px;
+    border-bottom: 1px solid transparent;
+
+    &[data-state="operational"] {
+      background: #e8f5e9;
+      color: #1b5e20;
+      border-bottom-color: #c8e6c9;
+    }
+    &[data-state="degraded"] {
+      background: #fff8e1;
+      color: #6d4c00;
+      border-bottom-color: #ffe0a3;
+    }
+    &[data-state="outage"] {
+      background: #ffebee;
+      color: #b71c1c;
+      border-bottom-color: #ffcdd2;
+    }
+  }
+
+  // Row of Prometheus-sourced metric chips shown under the banner.
+  &__metrics-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 20px;
+    background: #F8FAFE;
+    border-bottom: 1px solid #E8ECF0;
+  }
+
+  &__metric-chip {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 10px;
+    background: #fff;
+    border: 1px solid #E8ECF0;
+    border-radius: 8px;
+    min-width: 110px;
+
+    &[data-tone="warn"] {
+      border-color: #ffb300;
+      background: #fff8e1;
+    }
+  }
+
+  &__metric-label {
+    font-size: 0.68rem;
+    color: #5A768A;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__metric-value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #17324D;
+    font-variant-numeric: tabular-nums;
   }
 
   &__verdicts {

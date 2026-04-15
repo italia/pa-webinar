@@ -659,7 +659,11 @@
         "jvbStressWarnPercent": "Soglia stress warning (%)",
         "jvbStressWarnPercentHelp": "Sopra questa soglia lo scaler aggiunge 1 replica JVB anche se il predictive non la richiede. Default 50.",
         "jvbStressCriticalPercent": "Soglia stress critical (%)",
-        "jvbStressCriticalPercentHelp": "Sopra questa soglia lo scaler aggiunge 2 repliche JVB. Default 70. Deve essere maggiore della warn."
+        "jvbStressCriticalPercentHelp": "Sopra questa soglia lo scaler aggiunge 2 repliche JVB. Default 70. Deve essere maggiore della warn.",
+        "jvbProvisioningTimeoutMinutes": "Timeout provisioning (minuti)",
+        "jvbProvisioningTimeoutMinutesHelp": "Dopo quanti minuti da startsAt un evento con JVB non ancora pronto viene segnalato come 'degraded' sulla status page. Default 15. Copre cold-start del nodo (~3-5 min) + margine di sicurezza.",
+        "statusPollIntervalSeconds": "Intervallo polling status page (secondi)",
+        "statusPollIntervalSecondsHelp": "Ogni quanti secondi la pagina /status aggiorna i dati lato browser. Default 30. Valori più bassi = dati più freschi ma più carico sull'app."
       }
     },
     "analytics": {
@@ -1075,6 +1079,9 @@
     "provisioning": "In allestimento",
     "idle": "In pausa",
     "jvbOctoActive": "Octo attivo: {bridges} bridge, {relayMbps} Mbps di relay fra bridge",
+    "staleWarningTitle": "Attenzione: componenti video non pronti",
+    "staleJvbDetail": "C'è almeno un evento attivo da più del tempo configurato e il video bridge non è ancora disponibile. Controlla il cluster autoscaler o i log dei pod JVB.",
+    "staleJibriDetail": "C'è almeno un evento con registrazione abilitata in attesa da più del tempo configurato e Jibri non è ancora disponibile.",
     "activeEvents": "Eventi attivi",
     "registrationsToday": "Iscrizioni oggi",
     "jvbNodes": "Nodi JVB",
@@ -1231,6 +1238,16 @@
       "down": "Non disponibile",
       "standby": "In standby",
       "scaling": "In preparazione"
+    },
+    "metrics": {
+      "uptime24h": "Uptime 24h",
+      "uptime7d": "Uptime 7gg",
+      "latencyP50": "Latenza P50",
+      "latencyP95": "Latenza P95",
+      "latencyP99": "Latenza P99",
+      "errorRate": "Errori 5xx",
+      "requestRate": "Richieste/s",
+      "podUptime": "Pod uptime"
     }
   },
   "feedback": {

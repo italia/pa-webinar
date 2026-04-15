@@ -24,10 +24,12 @@ interface SystemStatus {
     jvbStatus: 'ready' | 'scaling' | 'standby';
     jvbStressLevel: number | null;
     jvbParticipants: number | null;
+    jvbStale: boolean;
     jvbOctoEnabled: boolean;
     jvbOctoConferences: number | null;
     jvbOctoEndpoints: number | null;
     jvbOctoSendBitrateBps: number | null;
+    jibriStale: boolean;
   };
   upcomingEvents: {
     title: string;
@@ -36,10 +38,14 @@ interface SystemStatus {
     maxParticipants: number;
     videoEnabled: boolean;
   }[];
+  config: {
+    provisioningTimeoutMinutes: number;
+    pollIntervalSeconds: number;
+  };
   lastChecked: string;
 }
 
-const POLL_INTERVAL_MS = 30_000;
+const DEFAULT_POLL_INTERVAL_MS = 30_000;
 
 export default function StatusDashboard() {
   const t = useTranslations('status');
@@ -61,11 +67,17 @@ export default function StatusDashboard() {
     }
   }, []);
 
+  // Poll interval comes from SiteSetting (admin-configurable, default 30s).
+  // Until the first fetch lands we fall back to the compile-time default.
+  const pollIntervalMs = (data?.config?.pollIntervalSeconds ?? 0) > 0
+    ? (data!.config.pollIntervalSeconds * 1000)
+    : DEFAULT_POLL_INTERVAL_MS;
+
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, POLL_INTERVAL_MS);
+    const interval = setInterval(fetchStatus, pollIntervalMs);
     return () => clearInterval(interval);
-  }, [fetchStatus]);
+  }, [fetchStatus, pollIntervalMs]);
 
   if (!data && !error) {
     return (
@@ -104,8 +116,25 @@ export default function StatusDashboard() {
         ? '#A66300'
         : '#008758';
 
+  const anyStale = data.metrics.jvbStale || data.metrics.jibriStale;
+
   return (
     <>
+      {anyStale && (
+        <div
+          className="alert alert-warning mb-4 border-0"
+          role="alert"
+          style={{ background: '#fff8e1', color: '#6d4c00' }}
+        >
+          <Icon icon="it-warning-circle" size="sm" className="me-2" color="warning" />
+          <strong>{t('staleWarningTitle')}</strong>
+          <div className="mt-1" style={{ fontSize: '0.88rem' }}>
+            {data.metrics.jvbStale && t('staleJvbDetail')}
+            {data.metrics.jvbStale && data.metrics.jibriStale && ' '}
+            {data.metrics.jibriStale && t('staleJibriDetail')}
+          </div>
+        </div>
+      )}
       <Row className="mb-4">
         {/* JVB Capacity */}
         <Col md={6} className="mb-4 mb-md-0">

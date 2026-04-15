@@ -72,7 +72,17 @@ interface AppProcessMetrics {
 interface PrometheusData {
   available: boolean;
   uptime24h: number | null;
+  uptime7d: number | null;
+  // Latency percentiles over the last 5 minutes (ms).
+  responseTimeP50: number | null;
   responseTimeP95: number | null;
+  responseTimeP99: number | null;
+  // 5xx error rate as a fraction of total requests over 5m.
+  errorRate5m: number | null;
+  // Total request rate in req/s over 5m.
+  requestRate5m: number | null;
+  // How long the oldest ready pod has been running (seconds).
+  podUptimeSeconds: number | null;
   replicaCounts: Record<string, { running: number; desired: number }>;
   participantHistory: Array<[number, string]>;
 }
@@ -246,34 +256,73 @@ async function fetchPrometheusData(namespace: string): Promise<PrometheusData> {
   const empty: PrometheusData = {
     available: false,
     uptime24h: null,
+    uptime7d: null,
+    responseTimeP50: null,
     responseTimeP95: null,
+    responseTimeP99: null,
+    errorRate5m: null,
+    requestRate5m: null,
+    podUptimeSeconds: null,
     replicaCounts: {},
     participantHistory: [],
   };
 
   if (!isPrometheusConfigured()) return empty;
 
+  // Helper: aggregate multi-series results to a single scalar. Prometheus
+  // returns one series per {pod,instance,method,route,status_code}, so we
+  // sum (for counters) or average (for gauges/quantiles) across them.
+  const firstScalar = (result: Array<{ value: [number, string] }> | undefined): number | null => {
+    const first = result?.[0];
+    if (!first) return null;
+    const v = parseFloat(first.value[1]);
+    return Number.isNaN(v) ? null : v;
+  };
+
+  const NS = namespace;
+  const APP = METRICS_APP_LABEL;
+  // Uptime uses up{}. Quantiles go through `sum by (le)` so we collapse
+  // all pods/routes before running the histogram_quantile — gives a single
+  // meaningful number instead of one per label combination.
+  const durationBucket = `http_request_duration_seconds_bucket{namespace="${NS}",app="${APP}"}`;
+  const requestsTotal = `http_requests_total{namespace="${NS}",app="${APP}"}`;
+
   try {
-    const [uptimeRes, latencyRes, participantsRes] = await Promise.all([
-      queryPrometheus(`avg_over_time(up{namespace="${namespace}",job=~".*eventi.*"}[24h]) * 100`).catch(() => null),
-      queryPrometheus(`histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{namespace="${namespace}",app="${METRICS_APP_LABEL}"}[5m]))`).catch(() => null),
+    const [
+      uptime24hRes,
+      uptime7dRes,
+      p50Res,
+      p95Res,
+      p99Res,
+      errorRateRes,
+      requestRateRes,
+      podUptimeRes,
+      participantsRes,
+    ] = await Promise.all([
+      queryPrometheus(`avg(avg_over_time(up{namespace="${NS}",job=~".*eventi.*"}[24h])) * 100`).catch(() => null),
+      queryPrometheus(`avg(avg_over_time(up{namespace="${NS}",job=~".*eventi.*"}[7d])) * 100`).catch(() => null),
+      queryPrometheus(`histogram_quantile(0.50, sum by (le) (rate(${durationBucket}[5m])))`).catch(() => null),
+      queryPrometheus(`histogram_quantile(0.95, sum by (le) (rate(${durationBucket}[5m])))`).catch(() => null),
+      queryPrometheus(`histogram_quantile(0.99, sum by (le) (rate(${durationBucket}[5m])))`).catch(() => null),
+      queryPrometheus(`sum(rate(${requestsTotal.replace('}', ',status_code=~"5.."}')}[5m])) / clamp_min(sum(rate(${requestsTotal}[5m])), 0.001)`).catch(() => null),
+      queryPrometheus(`sum(rate(${requestsTotal}[5m]))`).catch(() => null),
+      queryPrometheus(`max(time() - process_start_time_seconds{namespace="${NS}",app="${APP}"})`).catch(() => null),
       queryPrometheusRange(
-        `eventi_jvb_participants{namespace="${namespace}"}`,
+        `eventi_jvb_participants{namespace="${NS}"}`,
         String(Math.floor(Date.now() / 1000) - 4 * 3600),
         String(Math.floor(Date.now() / 1000)),
         '60',
       ).catch(() => null),
     ]);
 
-    let uptime24h: number | null = null;
-    if (uptimeRes?.data?.result?.[0]) {
-      uptime24h = Math.round(parseFloat(uptimeRes.data.result[0].value[1]) * 100) / 100;
-    }
-
-    let responseTimeP95: number | null = null;
-    if (latencyRes?.data?.result?.[0]) {
-      responseTimeP95 = Math.round(parseFloat(latencyRes.data.result[0].value[1]) * 1000);
-    }
+    const scalarMs = (res: typeof uptime24hRes): number | null => {
+      const v = firstScalar(res?.data?.result);
+      return v === null ? null : Math.round(v * 1000);
+    };
+    const scalarPct = (res: typeof uptime24hRes): number | null => {
+      const v = firstScalar(res?.data?.result);
+      return v === null ? null : Math.round(v * 100) / 100;
+    };
 
     let participantHistory: Array<[number, string]> = [];
     if (participantsRes?.data?.result?.[0]?.values) {
@@ -282,8 +331,20 @@ async function fetchPrometheusData(namespace: string): Promise<PrometheusData> {
 
     return {
       available: true,
-      uptime24h,
-      responseTimeP95,
+      uptime24h: scalarPct(uptime24hRes),
+      uptime7d: scalarPct(uptime7dRes),
+      responseTimeP50: scalarMs(p50Res),
+      responseTimeP95: scalarMs(p95Res),
+      responseTimeP99: scalarMs(p99Res),
+      errorRate5m: firstScalar(errorRateRes?.data?.result),
+      requestRate5m: (() => {
+        const v = firstScalar(requestRateRes?.data?.result);
+        return v === null ? null : Math.round(v * 100) / 100;
+      })(),
+      podUptimeSeconds: (() => {
+        const v = firstScalar(podUptimeRes?.data?.result);
+        return v === null ? null : Math.round(v);
+      })(),
       replicaCounts: {},
       participantHistory,
     };

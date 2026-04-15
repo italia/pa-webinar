@@ -458,6 +458,16 @@ model SiteSetting {
   jvbStressWarnPercent     Int @default(50) @map("jvb_stress_warn_percent")
   jvbStressCriticalPercent Int @default(70) @map("jvb_stress_critical_percent")
 
+  // Timeout oltre il quale un evento LIVE/PROVISIONING senza JVB pronto
+  // viene segnalato come "degraded" sulla status page (invece che come
+  // "standby normale"). Default 15 min, copre cold-start del nodo F16
+  // (~3-5 min) + boot JVB (~1 min) + margine di sicurezza.
+  jvbProvisioningTimeoutMinutes Int @default(15) @map("jvb_provisioning_timeout_minutes")
+
+  // Intervallo di polling della status page lato browser (secondi). Default
+  // 30s — compromesso fra freschezza dei dati e carico sull'app.
+  statusPollIntervalSeconds Int @default(30) @map("status_poll_interval_seconds")
+
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("site_settings")

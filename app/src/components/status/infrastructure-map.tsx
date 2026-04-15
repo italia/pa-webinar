@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Alert, Badge, Collapse } from 'design-react-kit';
+import { Badge, Collapse } from 'design-react-kit';
 
 import type { InfraMapData } from '@/app/api/status/infrastructure/route';
 import PrometheusSparkline, { UptimeBadge, ResponseTimeBadge } from './prometheus-chart';
@@ -192,8 +192,14 @@ export default function InfrastructureMap() {
     );
   };
 
+  // Services worth showing as a verdict card:
+  //   - down/degraded  → actionable problem, always rendered
+  //   - standby        → normal scale-to-zero state; render it too, but
+  //                      with a non-alarming colour, so the user sees a
+  //                      line explaining why JVB/Jibri are "grey" instead
+  //                      of assuming something is broken.
   const issueServices = data?.services.filter(s =>
-    s.status === 'down' || s.status === 'degraded',
+    s.status === 'down' || s.status === 'degraded' || s.status === 'standby',
   ) ?? [];
 
   return (
@@ -219,7 +225,10 @@ export default function InfrastructureMap() {
         </div>
       )}
 
-      {/* SVG Canvas */}
+      {/* SVG Canvas — detail panel is rendered INSIDE this div so its
+          absolute positioning is scoped to the canvas area and stays
+          visible above the diagram even if verdict cards expand the
+          outer container. */}
       <div className="infra-map__canvas" onClick={() => setSelected(null)}>
         <svg viewBox={`0 0 ${W} ${H}`} className="infra-map__svg" role="img" aria-label={t('ariaLabel')}>
           <defs>
@@ -477,17 +486,19 @@ export default function InfrastructureMap() {
             </g>
           )}
         </svg>
-      </div>
 
-      {/* Detail panel */}
-      {selectedSvc && data && (
-        <ServiceDetailPanel
-          service={selectedSvc}
-          data={data}
-          t={t}
-          onClose={() => setSelected(null)}
-        />
-      )}
+        {/* Detail panel rendered inside the canvas so its absolute
+            positioning anchors to the SVG area, not to the whole map
+            container (which grows when verdict cards expand). */}
+        {selectedSvc && data && (
+          <ServiceDetailPanel
+            service={selectedSvc}
+            data={data}
+            t={t}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </div>
 
       {/* Verdict cards for services with issues */}
       {data && issueServices.length > 0 && (
@@ -618,22 +629,78 @@ function OverallBanner({ verdict, prometheus, t }: {
   t: ReturnType<typeof useTranslations<'infraMap'>>;
 }) {
   const text = resolveI18nKey(t, verdict);
-  const isOk = verdict.includes('operational');
-  const isDegraded = verdict.includes('degraded');
-  const color = isOk ? 'success' : isDegraded ? 'warning' : 'danger';
+  // Map the verdict to a visual state. We use a plain div instead of the
+  // design-react-kit <Alert>: Alert injects a ::before icon at left:16px
+  // which overlapped the text with our compact padding.
+  const state: 'operational' | 'degraded' | 'outage' = verdict.includes('operational')
+    ? 'operational'
+    : verdict.includes('degraded')
+      ? 'degraded'
+      : 'outage';
 
   return (
-    <Alert color={color} className="infra-map__banner mb-0 rounded-0 border-start-0 border-end-0 border-top-0">
-      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-        <span style={{ fontSize: '0.88rem' }}>{text}</span>
-        {prometheus.available && (
-          <div className="d-flex align-items-center gap-2">
-            <UptimeBadge uptime24h={prometheus.uptime24h} />
-            <ResponseTimeBadge responseTimeMs={prometheus.responseTimeP95} />
-          </div>
-        )}
+    <>
+      <div className="infra-map__banner" data-state={state} role="status">
+        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <span>{text}</span>
+          {prometheus.available && (
+            <div className="d-flex align-items-center gap-2">
+              <UptimeBadge uptime24h={prometheus.uptime24h} />
+              <ResponseTimeBadge responseTimeMs={prometheus.responseTimeP95} />
+            </div>
+          )}
+        </div>
       </div>
-    </Alert>
+      {prometheus.available && (
+        <div className="infra-map__metrics-row" role="list">
+          <MetricChip label={t('metrics.uptime24h')} value={fmtPct(prometheus.uptime24h)} />
+          <MetricChip label={t('metrics.uptime7d')} value={fmtPct(prometheus.uptime7d)} />
+          <MetricChip label={t('metrics.latencyP50')} value={fmtMs(prometheus.responseTimeP50)} />
+          <MetricChip label={t('metrics.latencyP95')} value={fmtMs(prometheus.responseTimeP95)} />
+          <MetricChip label={t('metrics.latencyP99')} value={fmtMs(prometheus.responseTimeP99)} />
+          <MetricChip
+            label={t('metrics.errorRate')}
+            value={prometheus.errorRate5m === null ? '—' : `${(prometheus.errorRate5m * 100).toFixed(2)}%`}
+            tone={prometheus.errorRate5m !== null && prometheus.errorRate5m > 0.01 ? 'warn' : 'ok'}
+          />
+          <MetricChip
+            label={t('metrics.requestRate')}
+            value={prometheus.requestRate5m === null ? '—' : `${prometheus.requestRate5m.toFixed(1)} req/s`}
+          />
+          <MetricChip
+            label={t('metrics.podUptime')}
+            value={fmtUptime(prometheus.podUptimeSeconds)}
+          />
+        </div>
+      )}
+    </>
+  );
+}
+
+function fmtPct(v: number | null): string {
+  if (v === null || Number.isNaN(v)) return '—';
+  return `${v.toFixed(2)}%`;
+}
+
+function fmtMs(v: number | null): string {
+  if (v === null || Number.isNaN(v)) return '—';
+  return `${v} ms`;
+}
+
+function fmtUptime(seconds: number | null): string {
+  if (seconds === null || Number.isNaN(seconds)) return '—';
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
+  if (seconds < 86400) return `${Math.round(seconds / 3600)}h`;
+  return `${Math.round(seconds / 86400)}d`;
+}
+
+function MetricChip({ label, value, tone }: { label: string; value: string; tone?: 'ok' | 'warn' }) {
+  return (
+    <div className="infra-map__metric-chip" data-tone={tone ?? 'ok'} role="listitem">
+      <span className="infra-map__metric-label">{label}</span>
+      <span className="infra-map__metric-value">{value}</span>
+    </div>
   );
 }
 
