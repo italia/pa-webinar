@@ -15,6 +15,7 @@ interface NavItem {
 const MAIN_SECTIONS: NavItem[] = [
   { href: '/admin/events', icon: 'it-calendar', labelKey: 'events' },
   { href: '/admin/registrations', icon: 'it-user', labelKey: 'registrations' },
+  { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordings' },
   { href: '/admin/monitoring', icon: 'it-presentation', labelKey: 'monitoring' },
   { href: '/admin/settings', icon: 'it-settings', labelKey: 'settings' },
 ];
@@ -26,6 +27,18 @@ const EVENTS_SUB_NAV: NavItem[] = [
   { href: '/admin/calendar', icon: 'it-calendar', labelKey: 'calendar' },
   { href: '/admin/events/template', icon: 'it-copy', labelKey: 'templates' },
   { href: '/admin/events/statistics', icon: 'it-chart-line', labelKey: 'analytics' },
+];
+
+// Registrations area groups cross-event attendee management.
+const REGISTRATIONS_SUB_NAV: NavItem[] = [
+  { href: '/admin/registrations', icon: 'it-user', labelKey: 'registrationsList', exact: true },
+  { href: '/admin/moderators', icon: 'it-key', labelKey: 'moderators' },
+  { href: '/admin/gdpr-audit', icon: 'it-files', labelKey: 'gdprAudit' },
+];
+
+// Recordings / instant calls / live sessions — everything video-output.
+const RECORDINGS_SUB_NAV: NavItem[] = [
+  { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordingsList', exact: true },
 ];
 
 // Monitoring groups together all the observability surfaces.
@@ -54,17 +67,27 @@ export default function AdminNav() {
     || stripped.startsWith('/admin/infrastruttura');
   const inSettings = (stripped.startsWith('/admin/settings') || stripped.startsWith('/admin/impostazioni'))
     && !inMonitoring;
+  // Registrations area: attendee sign-ups, moderators, GDPR audit —
+  // everything that has to do with the *people* on the platform.
   const inRegistrations = stripped.startsWith('/admin/registrations')
-    || stripped.startsWith('/admin/iscrizioni');
+    || stripped.startsWith('/admin/iscrizioni')
+    || stripped.startsWith('/admin/moderators')
+    || stripped.startsWith('/admin/moderatori')
+    || stripped.startsWith('/admin/gdpr-audit');
+  const inRecordings = stripped.startsWith('/admin/recordings')
+    || stripped.startsWith('/admin/registrazioni-video');
 
   const PATH_ALIASES: Record<string, string[]> = {
     '/admin/events': ['/admin/events', '/admin/eventi'],
     '/admin/events/new': ['/admin/events/new', '/admin/eventi/nuovo'],
-    '/admin/events/calls': ['/admin/events/calls'],
+    '/admin/events/calls': ['/admin/events/calls', '/admin/eventi/chiamate-rapide'],
     '/admin/events/template': ['/admin/events/template'],
     '/admin/events/statistics': ['/admin/events/statistics', '/admin/eventi/statistiche'],
     '/admin/calendar': ['/admin/calendar', '/admin/calendario'],
     '/admin/registrations': ['/admin/registrations', '/admin/iscrizioni'],
+    '/admin/recordings': ['/admin/recordings', '/admin/registrazioni-video'],
+    '/admin/moderators': ['/admin/moderators', '/admin/moderatori'],
+    '/admin/gdpr-audit': ['/admin/gdpr-audit'],
     '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
     '/admin/settings/languages': ['/admin/settings/languages', '/admin/impostazioni/lingue'],
     '/admin/infrastructure': ['/admin/infrastructure', '/admin/infrastruttura'],
@@ -83,6 +106,7 @@ export default function AdminNav() {
     if (item.href === '/admin/monitoring') return inMonitoring;
     if (item.href === '/admin/settings') return inSettings;
     if (item.href === '/admin/registrations') return inRegistrations;
+    if (item.href === '/admin/recordings') return inRecordings;
     return matchesPath(item.href);
   }
 
@@ -93,11 +117,15 @@ export default function AdminNav() {
 
   const subNav = inEvents
     ? EVENTS_SUB_NAV
-    : inMonitoring
-      ? MONITORING_SUB_NAV
-      : inSettings
-        ? SETTINGS_SUB_NAV
-        : null;
+    : inRegistrations
+      ? REGISTRATIONS_SUB_NAV
+      : inRecordings
+        ? RECORDINGS_SUB_NAV
+        : inMonitoring
+          ? MONITORING_SUB_NAV
+          : inSettings
+            ? SETTINGS_SUB_NAV
+            : null;
 
   return (
     <div>

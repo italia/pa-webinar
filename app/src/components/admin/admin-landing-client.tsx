@@ -11,6 +11,7 @@ interface AdminLandingClientProps {
   instantCallsLast30d: number;
   registrationsTotal: number;
   registrationsToday: number;
+  recordingsTotal: number;
 }
 
 /**
@@ -77,6 +78,7 @@ export default function AdminLandingClient({
   instantCallsLast30d,
   registrationsTotal,
   registrationsToday,
+  recordingsTotal,
 }: AdminLandingClientProps) {
   const t = useTranslations('admin.landing');
 
@@ -148,6 +150,19 @@ export default function AdminLandingClient({
 
       <div className="col-12 col-md-6 col-lg-4">
         <AdminCard
+          href="/admin/recordings"
+          icon="it-video"
+          title={t('recordingsTitle')}
+          description={t('recordingsDescription')}
+        >
+          <span className="text-muted" style={{ fontSize: '0.82rem' }}>
+            {t('recordingsStat', { count: recordingsTotal })}
+          </span>
+        </AdminCard>
+      </div>
+
+      <div className="col-12 col-md-6 col-lg-4">
+        <AdminCard
           href="/admin/events/statistics"
           icon="it-chart-line"
           title={t('analyticsTitle')}
@@ -161,6 +176,15 @@ export default function AdminLandingClient({
           icon="it-presentation"
           title={t('monitoringTitle')}
           description={t('monitoringDescription')}
+        />
+      </div>
+
+      <div className="col-12 col-md-6 col-lg-4">
+        <AdminCard
+          href="/admin/events/template"
+          icon="it-copy"
+          title={t('templatesTitle')}
+          description={t('templatesDescription')}
         />
       </div>
 
