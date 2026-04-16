@@ -12,6 +12,8 @@ interface EventManagePageProps {
   searchParams: Promise<{ token?: string }>;
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export default async function EventManagePage({
   params,
   searchParams,
@@ -35,6 +37,14 @@ export default async function EventManagePage({
         </div>
       </div>
     );
+  }
+
+  // Guard against non-UUID slugs hitting this dynamic route: Next.js picks
+  // the [id] segment for any path that doesn't match a sibling static route
+  // (e.g. /admin/events/<typo>). Hitting Prisma with a non-UUID throws
+  // P2023 Inconsistent column data instead of a clean 404.
+  if (!UUID_RE.test(id)) {
+    notFound();
   }
 
   const event = await prisma.event.findUnique({
