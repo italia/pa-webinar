@@ -393,7 +393,12 @@
       },
       "play": "Play",
       "closePlayer": "Close player",
-      "playerUnsupported": "Your browser does not support video playback."
+      "playerUnsupported": "Your browser does not support video playback.",
+      "detailStart": "Start",
+      "detailEnd": "End",
+      "detailModerator": "Moderator",
+      "detailRoom": "Jitsi room",
+      "detailFilename": "File name"
     },
     "gdprAudit": {
       "title": "GDPR audit",
