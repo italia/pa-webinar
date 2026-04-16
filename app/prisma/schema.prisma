@@ -98,6 +98,12 @@ model Event {
   recordingDuration        Int?      @map("recording_duration")
   recordingDeleteAfterDays Int?      @map("recording_delete_after_days")
 
+  // Optional YouTube URL for legacy / mirrored recordings. When set, the
+  // public video library prefers the embed over the self-hosted blob —
+  // useful for events that were originally streamed or published on
+  // YouTube before we owned the platform.
+  youtubeUrl String? @map("youtube_url")
+
   // Post-event configuration
   postEventPublic        Boolean   @default(true) @map("post_event_public")
   postEventPublicUntil   DateTime? @map("post_event_public_until")

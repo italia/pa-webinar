@@ -26,6 +26,7 @@
   "nav": {
     "home": "Home",
     "events": "Events",
+    "videoLibrary": "Video library",
     "about": "About",
     "privacy": "Privacy",
     "admin": "Administration",
@@ -149,6 +150,17 @@
       "eventFull": "The event has reached the maximum number of participants",
       "generic": "Registration error. Please try again."
     }
+  },
+  "videoLibrary": {
+    "title": "Video library",
+    "subtitle": "Replay recordings from past public events. Each card opens the event page with its video and materials.",
+    "searchPlaceholder": "Search by title or description…",
+    "results": "{count, plural, =0 {No videos available} =1 {1 video} other {# videos}}",
+    "empty": "No published recordings for the current filters.",
+    "loading": "Loading…",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}"
   },
   "live": {
     "title": "Event room",

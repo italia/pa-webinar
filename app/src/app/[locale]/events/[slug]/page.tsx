@@ -202,6 +202,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     registrationCount: event._count.registrations,
     status: event.status,
     recordingUrl: event.recordingPublished ? event.recordingUrl : null,
+    youtubeUrl: event.youtubeUrl,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
     recordingEnabled: event.recordingEnabled,
