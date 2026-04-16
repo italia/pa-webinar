@@ -31,7 +31,7 @@ function getAppSecret(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-export function joinGrantCookieName(eventId: string): string {
+function joinGrantCookieName(eventId: string): string {
   return `join_granted_${eventId}`;
 }
 
