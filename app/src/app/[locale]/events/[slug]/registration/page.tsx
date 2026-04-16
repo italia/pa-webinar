@@ -18,7 +18,10 @@ export default async function RegistrationPage({
 
   const event = await prisma.event.findUnique({
     where: { slug },
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      _count: { select: { registrations: true } },
+      gdprTemplate: { select: { body: true } },
+    },
   });
 
   if (!event || !['PUBLISHED', 'LIVE'].includes(event.status)) {
@@ -32,6 +35,17 @@ export default async function RegistrationPage({
     event.privacyPolicyUrl ??
     process.env.DEFAULT_PRIVACY_POLICY_URL ??
     '/privacy';
+
+  // Privacy text resolution order: ad-hoc text wins (an event can always
+  // override with bespoke wording), then the linked GDPR template's body
+  // for the current locale (falling back to IT), and finally nothing — in
+  // which case the registration form falls back to the privacyUrl link.
+  const templateBody = event.gdprTemplate?.body as Record<string, string> | undefined;
+  const privacyText =
+    event.privacyPolicyText
+    ?? templateBody?.[locale]
+    ?? templateBody?.it
+    ?? undefined;
 
   return (
     <div className="container py-5">
@@ -48,7 +62,7 @@ export default async function RegistrationPage({
             <RegistrationFormClient
               eventSlug={slug}
               privacyPolicyUrl={privacyUrl}
-              privacyPolicyText={event.privacyPolicyText ?? undefined}
+              privacyPolicyText={privacyText}
               recordingEnabled={event.recordingEnabled}
               profiling={{
                 requireOrganization: event.requireOrganization,
