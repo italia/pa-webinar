@@ -332,7 +332,7 @@
       "eventEdit": "Edit event",
       "publications": "Publications",
       "publicationsList": "All publications",
-      "publicationsImportYoutube": "Import from YouTube",
+      "publicationsNew": "New publication",
       "ariaLabel": "Admin navigation",
       "subNavAriaLabel": "Section navigation"
     },
@@ -364,8 +364,8 @@
     },
     "publications": {
       "title": "Publications",
-      "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, YouTube legacy imports, and sessions waiting to be promoted.",
-      "importYoutube": "Import from YouTube",
+      "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, uploaded archive recordings, and sessions waiting to be promoted.",
+      "newPublication": "New publication",
       "searchPlaceholder": "Search by title or description…",
       "listedAny": "All (listed and unlisted)",
       "listedYes": "Only in library",
@@ -376,7 +376,7 @@
         "all": "All",
         "scheduled": "Events",
         "instant": "Instant calls",
-        "legacy": "Legacy YouTube",
+        "legacy": "Uploaded archive",
         "pending": "To promote"
       },
       "source": {
@@ -398,37 +398,39 @@
         "list": "List in library",
         "unlist": "Remove from library"
       },
-      "importYoutubePage": {
-        "title": "Import a YouTube video",
-        "subtitle": "Paste the URL of an existing YouTube video. Title, author and thumbnail are pre-filled from the public oEmbed API.",
-        "urlLabel": "YouTube URL",
-        "urlPlaceholder": "https://www.youtube.com/watch?v=…",
-        "urlHint": "youtu.be short links also accepted. The video must be public or unlisted.",
-        "fetchPreview": "Analyze",
-        "previewTitle": "Video preview",
-        "videoId": "Video ID",
-        "metadataTitle": "Publication metadata",
+      "uploadPage": {
+        "title": "New publication",
+        "subtitle": "Upload an existing video file (MP4, WebM or MOV) to the platform storage and enrich it with editorial metadata.",
+        "step1Title": "1. Upload the video file",
+        "startUpload": "Upload",
+        "signing": "Preparing…",
+        "uploading": "Uploading {progress}%",
+        "uploaded": "Upload complete",
+        "uploadHint": "Supported formats: MP4, WebM, MOV, M4V. Max size 5 GB. Upload is direct to object storage (Azure Blob) — nothing passes through our servers.",
+        "step2Title": "2. Publication metadata",
         "titleIt": "Title (Italian)",
-        "titleEn": "Title (English)",
+        "titleEn": "Title (English, optional)",
         "description": "Description",
         "startsAt": "Original event date",
         "organizer": "Organizer",
         "speakers": "Speakers",
         "speakersPlaceholder": "Comma-separated",
+        "coverUrl": "Cover URL (16:9, optional)",
+        "coverPlaceholder": "https://...",
+        "coverHint": "Banner used on the library card. If empty we fall back to the event image or a gradient.",
+        "youtubeUrl": "Reference YouTube URL (optional)",
+        "youtubeHint": "Shown as an external link on the event page, never embedded.",
         "libraryListed": "Publish in the video library now",
-        "save": "Import and create publication",
-        "thumb": {
-          "maxres": "Max resolution",
-          "high": "High",
-          "standard": "Standard",
-          "hint": "Pick the cover to use as library banner."
-        },
+        "save": "Create publication",
         "errors": {
-          "previewFirst": "Analyze the URL first so we can pull its metadata.",
-          "previewFailed": "Couldn't analyze the URL. Make sure it points to a valid YouTube video.",
+          "fileTooLarge": "File exceeds the 5 GB limit.",
+          "unsupportedType": "Unsupported format. Upload MP4, WebM, MOV or M4V.",
+          "signFailed": "Couldn't get an upload URL. Check the storage configuration.",
+          "uploadFailed": "Upload failed. Check your connection and retry.",
+          "uploadFirst": "Upload the file first.",
           "titleRequired": "The Italian title is required (at least 3 characters).",
           "dateRequired": "The original date is required.",
-          "saveFailed": "Save failed. Please retry."
+          "saveFailed": "Saving the metadata failed."
         }
       }
     },

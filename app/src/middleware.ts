@@ -54,6 +54,14 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN');
   const mediaHosts = recordingMediaHosts();
   const mediaSrc = ["'self'", 'blob:', ...mediaHosts].join(' ');
+  // connect-src needs the same storage hosts so the admin upload form
+  // can PUT directly to the SAS URL (browser-side Azure SDK / fetch).
+  const connectSrc = [
+    "'self'",
+    `https://${jitsiDomain}`,
+    `wss://${jitsiDomain}`,
+    ...mediaHosts,
+  ].join(' ');
 
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
@@ -74,7 +82,7 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       "img-src 'self' data: blob: https://i.ytimg.com",
-      `connect-src 'self' https://${jitsiDomain} wss://${jitsiDomain}`,
+      `connect-src ${connectSrc}`,
       `media-src ${mediaSrc}`,
     ].join('; '),
   );

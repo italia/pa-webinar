@@ -112,10 +112,16 @@ export type UpdateGdprTemplateInput = z.infer<typeof updateGdprTemplateSchema>;
 
 // ── Legacy Event Import Schema ───────────────────────
 //
-// Legacy events (eventType=LEGACY) cover video archives imported from
-// external sources: YouTube uploads, mirrored livestreams, etc. They
-// skip Jitsi provisioning and registrations; all we persist is enough
-// metadata to render the detail page and the library card.
+// Legacy events (eventType=LEGACY) cover video archives the PA already
+// owns (typically MsTeams recordings re-uploaded onto our Azure Blob
+// via the admin UI). They skip Jitsi provisioning and registrations;
+// all we persist is enough metadata to render the detail page and the
+// library card.
+//
+// The mandatory field is `recordingUrl`: the blob URL returned by the
+// SAS-signed upload endpoint. `youtubeUrl` stays optional as an
+// external-reference link to the original YouTube upload (surfaced as
+// a "Watch on YouTube" link, never embedded).
 export const createLegacyEventSchema = z.object({
   title: localizedStringField.refine(
     (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
@@ -124,13 +130,18 @@ export const createLegacyEventSchema = z.object({
   description: localizedStringField.optional().default({ it: '' }),
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime(),
+  recordingUrl: z.string().url(),
+  recordingFileSize: z.number().int().positive().optional(),
+  recordingDuration: z.number().int().positive().optional(),
   youtubeUrl: z
     .string()
     .url()
     .refine(
       (u) => /(?:youtube\.com|youtu\.be)/i.test(u),
       { message: 'URL must point to youtube.com or youtu.be' },
-    ),
+    )
+    .nullable()
+    .optional(),
   coverImageUrl: z.string().url().optional(),
   speakersInfo: localizedStringField.optional(),
   organizerName: z.string().max(200).optional(),
