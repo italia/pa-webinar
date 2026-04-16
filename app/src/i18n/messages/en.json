@@ -93,7 +93,9 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Recording",
-      "settingsSection": "Event settings"
+      "settingsSection": "Event settings",
+      "sessionsAndRecordings": "Sessions and video recordings",
+      "postEventSection": "Post-event and feedback"
     },
     "status": {
       "DRAFT": "Draft",
@@ -616,8 +618,12 @@
     "links": {
       "title": "Event links",
       "publicPage": "Public event page",
+      "publicPageHint": "Share this URL to collect new registrations.",
+      "guestJoin": "Direct invite (no registration)",
+      "guestJoinHint": "Quick link to invite a last-minute attendee: they join as a guest while the event is live, without filling in the registration form.",
       "moderatorLink": "Moderator link",
       "moderatorLinkHint": "Share this link only with moderators. Anyone with this link can manage the event.",
+      "liveRoomHint": "Direct link to enter the live room as moderator.",
       "copyLink": "Copy link",
       "copied": "Copied!"
     },
@@ -632,6 +638,7 @@
     },
     "gdprAuditLog": {
       "title": "GDPR Audit Log",
+      "subtitle": "Privacy actions tracked for this event: consent, export, deletions.",
       "date": "Date",
       "action": "Action",
       "recordCount": "Records",
@@ -1629,14 +1636,23 @@
     "estimates": "Resource estimates",
     "moderator": "Moderator",
     "participants": "Participants",
+    "bridge": "Video Bridge",
     "jvb": "Video Bridge",
     "jibri": "Recording",
-    "bandwidth": {
-      "moderator": "Moderator bandwidth",
-      "participant": "Per-participant bandwidth",
-      "total": "Estimated total bandwidth"
+    "occupancy": "Occupancy",
+    "sizedForRegistrations": "Sized on {count} current registrations",
+    "sizedForCapacity": "Sized on max capacity of {count}",
+    "chips": {
+      "mic": "Microphone",
+      "video": "Webcam",
+      "screen": "Screen share"
     },
-    "jvbCount": "Required JVBs",
+    "bandwidth": {
+      "moderator": "Moderator bandwidth ↑",
+      "participant": "Per-participant bandwidth ↓",
+      "total": "Total bandwidth"
+    },
+    "jvbCount": "Infrastructure",
     "jvbRam": "Estimated JVB RAM",
     "storage": "Recording storage",
     "duration": "Estimated duration",

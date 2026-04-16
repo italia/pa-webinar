@@ -1,5 +1,13 @@
 interface EventConfig {
   maxParticipants: number;
+  /**
+   * Registered participants at the time the estimate is computed. When
+   * provided, estimates are sized on this value rather than on
+   * `maxParticipants`, so the moderator sees the *current* demand rather
+   * than the worst-case capacity. Falls back to `maxParticipants` when
+   * omitted or zero.
+   */
+  registeredParticipants?: number;
   startsAt?: string;
   endsAt?: string;
   recordingEnabled: boolean;
@@ -9,6 +17,10 @@ interface EventConfig {
 }
 
 export interface EventEstimates {
+  /** Number of participants the estimate was sized for. */
+  sizedFor: number;
+  /** True when the estimate is sized on `registeredParticipants`. */
+  basedOnRegistrations: boolean;
   moderatorBandwidth: string;
   participantBandwidth: string;
   totalBandwidth: string;
@@ -19,7 +31,12 @@ export interface EventEstimates {
 }
 
 export function calculateEstimates(event: EventConfig): EventEstimates {
-  const participants = event.maxParticipants;
+  const basedOnRegistrations =
+    event.registeredParticipants !== undefined &&
+    event.registeredParticipants > 0;
+  const participants = basedOnRegistrations
+    ? (event.registeredParticipants as number)
+    : event.maxParticipants;
 
   let moderatorUp = 0.05;
   let participantDown = 0.05;
@@ -61,6 +78,8 @@ export function calculateEstimates(event: EventConfig): EventEstimates {
     : '0';
 
   return {
+    sizedFor: participants,
+    basedOnRegistrations,
     moderatorBandwidth: `~${moderatorUp.toFixed(1)} Mbps ↑`,
     participantBandwidth: `~${participantDown.toFixed(1)} Mbps ↓`,
     totalBandwidth:

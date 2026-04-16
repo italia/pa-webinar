@@ -717,7 +717,7 @@ export default function CreateEventForm({
       <CollapsibleSection
         id="profiling"
         title={t('form.sectionRegistrationFields')}
-        icon="it-clipboard"
+        icon="it-list"
         defaultOpen={false}
       >
         <div className="py-3">
