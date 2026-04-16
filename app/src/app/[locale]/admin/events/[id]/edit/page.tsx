@@ -60,6 +60,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           participantsCanShareScreen: event.participantsCanShareScreen,
           dataRetentionDays: event.dataRetentionDays,
           privacyPolicyUrl: event.privacyPolicyUrl,
+          gdprTemplateId: event.gdprTemplateId,
           moderatorName: event.moderatorName,
           moderatorEmail: event.moderatorEmail,
           moderatorToken: event.moderatorToken,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, type FormEvent } from 'react';
+import { useState, useCallback, useEffect, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Button,
@@ -40,6 +40,7 @@ interface EventData {
   participantsCanShareScreen: boolean;
   dataRetentionDays: number;
   privacyPolicyUrl: string | null;
+  gdprTemplateId?: string | null;
   moderatorName: string | null;
   moderatorEmail: string | null;
   moderatorToken: string;
@@ -86,6 +87,7 @@ export default function EditEventForm({
     participantsCanShareScreen: event.participantsCanShareScreen,
     dataRetentionDays: event.dataRetentionDays,
     privacyPolicyUrl: event.privacyPolicyUrl ?? '',
+    gdprTemplateId: event.gdprTemplateId ?? '',
     moderatorName: event.moderatorName ?? '',
     moderatorEmail: event.moderatorEmail ?? '',
     speakersInfo: { it: event.speakersInfo?.it ?? '', en: event.speakersInfo?.en ?? '' },
@@ -98,6 +100,18 @@ export default function EditEventForm({
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const [gdprTemplates, setGdprTemplates] = useState<
+    { id: string; name: string; isDefault: boolean }[]
+  >([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/admin/gdpr-templates', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : { rows: [] }))
+      .then((data) => { if (!cancelled) setGdprTemplates(data.rows ?? []); })
+      .catch(() => { /* templates optional */ });
+    return () => { cancelled = true; };
+  }, []);
 
   const setField = useCallback(
     <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => {
@@ -147,6 +161,7 @@ export default function EditEventForm({
         participantsCanShareScreen: form.participantsCanShareScreen,
         dataRetentionDays: form.dataRetentionDays,
         privacyPolicyUrl: form.privacyPolicyUrl || undefined,
+        gdprTemplateId: form.gdprTemplateId || null,
         moderatorName: form.moderatorName || undefined,
         moderatorEmail: form.moderatorEmail || undefined,
         speakersInfo: Object.keys(speakersObj).length > 0 ? speakersObj : undefined,
@@ -378,6 +393,28 @@ export default function EditEventForm({
               <ToggleSwitch label="" checked={form.recordingEnabled} onChange={() => setField('recordingEnabled', !form.recordingEnabled)} />
             </div>
           </div>
+
+          {gdprTemplates.length > 0 && (
+            <FormGroup className="mt-3 mb-3">
+              <Label htmlFor="gdprTemplateId">{t('form.privacyPolicyModeTemplate')}</Label>
+              <select
+                id="gdprTemplateId"
+                className="form-select"
+                value={form.gdprTemplateId}
+                onChange={(e) => setField('gdprTemplateId', e.target.value)}
+              >
+                <option value="">{t('form.privacyPolicyTemplateNone')}</option>
+                {gdprTemplates.map((tpl) => (
+                  <option key={tpl.id} value={tpl.id}>
+                    {tpl.name}{tpl.isDefault ? ' ★' : ''}
+                  </option>
+                ))}
+              </select>
+              <small className="form-text text-muted">
+                {t('form.privacyPolicyTemplateHint')}
+              </small>
+            </FormGroup>
+          )}
 
           <FormGroup className="mt-3 mb-3">
             <Input
