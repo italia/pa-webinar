@@ -128,7 +128,18 @@ export default function RecordingManagement({
   }, [event.slug, event.moderatorToken, t, router]);
 
   if (!event.recordingEnabled && !hasRecording) {
-    return null;
+    return (
+      <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
+        <CardBody className="p-4">
+          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            {t('management')}
+          </h5>
+          <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+            {t('disabledHint')}
+          </div>
+        </CardBody>
+      </Card>
+    );
   }
 
   if (!jibriAvailable && !hasRecording) {

@@ -1161,6 +1161,7 @@
     },
     "sessions": {
       "title": "Call sessions",
+      "empty": "No sessions recorded yet. Live sessions are listed here automatically as soon as the moderator joins the room.",
       "loading": "Loading sessions...",
       "participants": "participants",
       "participantList": "Participants",
@@ -1865,6 +1866,7 @@
     "delete": "Delete recording",
     "deleteConfirm": "Are you sure? The video will be permanently deleted.",
     "notConfigured": "Jibri is not configured. Video recording is not available.",
+    "disabledHint": "Video recording is not enabled for this event. To enable it open the Settings section above and toggle \"Recording\" on.",
     "play": "Play",
     "download": "Download"
   },
