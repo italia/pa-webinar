@@ -702,6 +702,12 @@
       "title": "Site settings",
       "subtitle": "Configure the platform appearance and behavior for PA reuse",
       "saving": "Saving...",
+      "sections": {
+        "languagesTitle": "Language management",
+        "languagesDescription": "Enable or disable the EU languages exposed to users, pick the default locale and customise translation strings.",
+        "gdprTemplatesTitle": "GDPR templates",
+        "gdprTemplatesDescription": "Create reusable privacy notices that can be linked to any event, and pick the default one for new events."
+      },
       "saved": "Settings saved successfully",
       "tabs": {
         "branding": "Branding",

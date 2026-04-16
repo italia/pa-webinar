@@ -773,6 +773,12 @@
       "subtitle": "Configura l'aspetto e il comportamento della piattaforma per il riuso PA",
       "saving": "Salvataggio...",
       "saved": "Impostazioni salvate con successo",
+      "sections": {
+        "languagesTitle": "Gestione lingue",
+        "languagesDescription": "Attiva/disattiva le lingue dell'UE esposte nell'interfaccia, scegli la lingua predefinita e personalizza le traduzioni.",
+        "gdprTemplatesTitle": "Template GDPR",
+        "gdprTemplatesDescription": "Crea informative privacy riutilizzabili tra eventi e scegli quella predefinita per i nuovi eventi."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Header",
