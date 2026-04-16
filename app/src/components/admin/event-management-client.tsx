@@ -798,7 +798,6 @@ export default function EventManagementClient({
             id="sessions"
             title={te('manage.sessionsAndRecordings')}
             icon="it-video"
-            bare
           >
             <RecordingManagement
               event={{
@@ -828,8 +827,7 @@ export default function EventManagementClient({
           <CollapsibleSection
             id="post-event"
             title={te('manage.postEventSection')}
-            icon="it-calendar-check"
-            bare
+            icon="it-calendar"
           >
             <PostEventConfig
               event={{
