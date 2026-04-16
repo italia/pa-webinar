@@ -306,6 +306,9 @@
       "settingsGeneral": "General",
       "settingsLanguages": "Languages",
       "settingsGdprTemplates": "GDPR templates",
+      "admin": "Administration",
+      "eventDetail": "Event detail",
+      "eventEdit": "Edit event",
       "ariaLabel": "Admin navigation",
       "subNavAriaLabel": "Section navigation"
     },
