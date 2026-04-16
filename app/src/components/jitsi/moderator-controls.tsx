@@ -27,6 +27,9 @@ interface ModeratorControlsProps {
   jibriAvailable?: boolean;
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
+  /** Local moderator's display name, forwarded to the raised-hands panel
+   *  so it can resolve the current user's own raise-hand event. */
+  localDisplayName?: string;
 }
 
 const BAR_STYLE: React.CSSProperties = {
@@ -60,6 +63,7 @@ export default function ModeratorControls({
   jibriAvailable = true,
   participantsCanUnmute = false,
   participantsCanStartVideo = false,
+  localDisplayName = '',
 }: ModeratorControlsProps) {
   const t = useTranslations('live.moderator');
   const tl = useTranslations('live');
@@ -416,7 +420,7 @@ export default function ModeratorControls({
 
       {/* Raised hands panel */}
       {handsOpen && (
-        <RaisedHandsPanel api={api} />
+        <RaisedHandsPanel api={api} localDisplayName={localDisplayName} />
       )}
 
       {/* End event confirmation modal */}

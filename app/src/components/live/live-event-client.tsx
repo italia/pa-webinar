@@ -500,6 +500,7 @@ export default function LiveEventClient({
           jibriAvailable={jibriReady === true}
           participantsCanUnmute={event.participantsCanUnmute}
           participantsCanStartVideo={event.participantsCanStartVideo}
+          localDisplayName={credentials?.displayName ?? chosenName ?? ''}
         />
       )}
 

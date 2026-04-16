@@ -138,7 +138,11 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       isGuest={false}
       displayName={
         isModerator
-          ? event.moderatorName ?? 'Moderatore'
+          // Leave blank on moderator magic-link so multiple co-moderators
+          // each type their own name. The configured moderatorName is a
+          // fallback only (used by Jitsi if the user skips the prejoin
+          // form), not a pre-filled default in the display-name input.
+          ? ''
           : participantInfo?.displayName ?? 'Partecipante'
       }
       locale={locale}
