@@ -10,8 +10,14 @@ import {
   deleteBlob,
   getRecordingBlobPath,
 } from '@/lib/azure/blob-storage';
+import { generateRecordingSasUrl } from '@/lib/storage/recordings';
 
 export const dynamic = 'force-dynamic';
+
+// Short-lived read-SAS so the browser can keep a long download / seek
+// session open on a single-hour recording (≤1 GB MsTeams export at
+// 720p fits with room to spare).
+const PLAYBACK_SAS_EXPIRY_MINUTES = 120;
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -35,7 +41,17 @@ export const GET = withErrorHandling(async (_request, context) => {
     throw new ForbiddenError('Recording not published');
   }
 
-  return Response.redirect(event.recordingUrl, 302);
+  // 302 to a signed blob URL so the browser streams directly from
+  // Azure (range requests, no bandwidth through our pod) while the
+  // private-container permission is still enforced by SAS. Falling
+  // back to the bare URL only if signing fails (dev / non-azure
+  // storage): better than a dead redirect.
+  const signed = await generateRecordingSasUrl(
+    event.recordingUrl,
+    PLAYBACK_SAS_EXPIRY_MINUTES,
+  ).catch(() => null);
+
+  return Response.redirect(signed ?? event.recordingUrl, 302);
 });
 
 export const DELETE = withErrorHandling(async (request, context) => {
