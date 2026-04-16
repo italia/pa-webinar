@@ -796,7 +796,7 @@ export default function EventManagementClient({
           {/* ── Sessions & recordings ── */}
           <CollapsibleSection
             id="sessions"
-            title={t('manage.sessionsAndRecordings')}
+            title={te('manage.sessionsAndRecordings')}
             icon="it-video"
             bare
           >
@@ -827,7 +827,7 @@ export default function EventManagementClient({
           {/* ── Post-event & Feedback ── */}
           <CollapsibleSection
             id="post-event"
-            title={t('manage.postEventSection')}
+            title={te('manage.postEventSection')}
             icon="it-calendar-check"
             bare
           >
