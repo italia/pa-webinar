@@ -128,9 +128,9 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
             </li>
           ))}
         </ul>
-        <Link href="/admin/publications/import-youtube">
+        <Link href="/admin/publications/new">
           <Button color="primary" size="sm" tag="span">
-            + {t('importYoutube')}
+            + {t('newPublication')}
           </Button>
         </Link>
       </div>

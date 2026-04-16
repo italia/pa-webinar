@@ -34,7 +34,7 @@ const ROUTE_TREE: { match: RegExp; labelKey: string; href: string }[] = [
   { match: /^\/admin\/gdpr-audit$/, labelKey: 'gdprAudit', href: '/admin/gdpr-audit' },
   { match: /^\/admin\/recordings$/, labelKey: 'recordings', href: '/admin/recordings' },
   { match: /^\/admin\/publications$/, labelKey: 'publications', href: '/admin/publications' },
-  { match: /^\/admin\/publications\/import-youtube$/, labelKey: 'publicationsImportYoutube', href: '/admin/publications/import-youtube' },
+  { match: /^\/admin\/publications\/new$/, labelKey: 'publicationsNew', href: '/admin/publications/new' },
   { match: /^\/admin\/monitoring$/, labelKey: 'monitoring', href: '/admin/monitoring' },
   { match: /^\/admin\/infrastructure$/, labelKey: 'infrastructure', href: '/admin/infrastructure' },
   { match: /^\/admin\/settings$/, labelKey: 'settings', href: '/admin/settings' },

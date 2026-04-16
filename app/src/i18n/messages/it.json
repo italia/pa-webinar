@@ -402,7 +402,7 @@
       "eventEdit": "Modifica evento",
       "publications": "Pubblicazioni",
       "publicationsList": "Tutte le pubblicazioni",
-      "publicationsImportYoutube": "Importa da YouTube",
+      "publicationsNew": "Nuova pubblicazione",
       "ariaLabel": "Navigazione amministrazione",
       "subNavAriaLabel": "Navigazione sezione"
     },
@@ -434,8 +434,8 @@
     },
     "publications": {
       "title": "Pubblicazioni",
-      "subtitle": "Hub editoriale unico per tutti i video pubblicati: eventi schedulati, call istantanee, legacy YouTube e sessioni in attesa di promozione.",
-      "importYoutube": "Importa da YouTube",
+      "subtitle": "Hub editoriale unico per tutti i video pubblicati: eventi schedulati, call istantanee, archivi storici caricati e sessioni in attesa di promozione.",
+      "newPublication": "Nuova pubblicazione",
       "searchPlaceholder": "Cerca per titolo o descrizione…",
       "listedAny": "Tutti (libreria e non)",
       "listedYes": "Solo pubblicati in libreria",
@@ -446,7 +446,7 @@
         "all": "Tutte",
         "scheduled": "Eventi",
         "instant": "Chiamate rapide",
-        "legacy": "Legacy YouTube",
+        "legacy": "Archivi caricati",
         "pending": "Da promuovere"
       },
       "source": {
@@ -468,37 +468,39 @@
         "list": "Pubblica in libreria",
         "unlist": "Rimuovi dalla libreria"
       },
-      "importYoutubePage": {
-        "title": "Importa video da YouTube",
-        "subtitle": "Incolla l'URL di un video YouTube esistente. Titolo, autore e anteprima vengono pre-compilati dall'API pubblica oEmbed.",
-        "urlLabel": "URL YouTube",
-        "urlPlaceholder": "https://www.youtube.com/watch?v=…",
-        "urlHint": "Accettati anche i link brevi youtu.be. Serve un video pubblico o non listato.",
-        "fetchPreview": "Analizza",
-        "previewTitle": "Anteprima video",
-        "videoId": "ID video",
-        "metadataTitle": "Metadati pubblicazione",
+      "uploadPage": {
+        "title": "Nuova pubblicazione",
+        "subtitle": "Carica un video esistente (MP4, WebM o MOV) nello storage della piattaforma e arricchiscilo con i metadati editoriali.",
+        "step1Title": "1. Carica il file video",
+        "startUpload": "Carica",
+        "signing": "Preparazione...",
+        "uploading": "Caricamento {progress}%",
+        "uploaded": "Caricamento completato",
+        "uploadHint": "Formati supportati: MP4, WebM, MOV, M4V. Dimensione massima 5 GB. Il caricamento avviene direttamente sullo storage (Azure Blob), niente passa dai nostri server.",
+        "step2Title": "2. Metadati pubblicazione",
         "titleIt": "Titolo (italiano)",
-        "titleEn": "Titolo (inglese)",
+        "titleEn": "Titolo (inglese, facoltativo)",
         "description": "Descrizione",
         "startsAt": "Data originale dell'evento",
         "organizer": "Organizzatore",
         "speakers": "Relatori",
         "speakersPlaceholder": "Separati da virgola",
+        "coverUrl": "URL copertina (16:9, facoltativo)",
+        "coverPlaceholder": "https://...",
+        "coverHint": "Banner usato nella card libreria. Se vuoto usa il logo dell'evento o un gradiente.",
+        "youtubeUrl": "Link YouTube di riferimento (facoltativo)",
+        "youtubeHint": "Mostrato come link esterno sulla pagina evento, non incorporato.",
         "libraryListed": "Pubblica subito in libreria video",
-        "save": "Importa e crea pubblicazione",
-        "thumb": {
-          "maxres": "Max risoluzione",
-          "high": "Alta",
-          "standard": "Standard",
-          "hint": "Scegli la copertina da usare come banner in libreria."
-        },
+        "save": "Crea pubblicazione",
         "errors": {
-          "previewFirst": "Analizza prima l'URL per recuperare i metadati.",
-          "previewFailed": "Impossibile analizzare l'URL. Verifica che sia un video YouTube valido.",
+          "fileTooLarge": "Il file supera il limite di 5 GB.",
+          "unsupportedType": "Formato non supportato. Carica un MP4, WebM, MOV o M4V.",
+          "signFailed": "Impossibile ottenere l'URL di upload. Verifica lo storage.",
+          "uploadFailed": "Caricamento fallito. Controlla la connessione e riprova.",
+          "uploadFirst": "Carica prima il file.",
           "titleRequired": "Il titolo in italiano è obbligatorio (almeno 3 caratteri).",
           "dateRequired": "La data originale è obbligatoria.",
-          "saveFailed": "Salvataggio non riuscito. Riprova."
+          "saveFailed": "Salvataggio metadati non riuscito."
         }
       }
     },

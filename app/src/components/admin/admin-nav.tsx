@@ -45,7 +45,7 @@ const RECORDINGS_SUB_NAV: NavItem[] = [
 // Publications area: unified library editing.
 const PUBLICATIONS_SUB_NAV: NavItem[] = [
   { href: '/admin/publications', icon: 'it-files', labelKey: 'publicationsList', exact: true },
-  { href: '/admin/publications/import-youtube', icon: 'it-plus', labelKey: 'publicationsImportYoutube' },
+  { href: '/admin/publications/new', icon: 'it-plus', labelKey: 'publicationsNew' },
 ];
 
 // Monitoring groups together all the observability surfaces.
@@ -96,7 +96,7 @@ export default function AdminNav() {
     '/admin/registrations': ['/admin/registrations', '/admin/iscrizioni'],
     '/admin/recordings': ['/admin/recordings', '/admin/registrazioni-video'],
     '/admin/publications': ['/admin/publications'],
-    '/admin/publications/import-youtube': ['/admin/publications/import-youtube'],
+    '/admin/publications/new': ['/admin/publications/new'],
     '/admin/moderators': ['/admin/moderators', '/admin/moderatori'],
     '/admin/gdpr-audit': ['/admin/gdpr-audit'],
     '/admin/settings': ['/admin/settings', '/admin/impostazioni'],

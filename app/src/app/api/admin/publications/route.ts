@@ -16,15 +16,18 @@
  * without returning the bulky per-row prisma payload.
  */
 
+import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
 import type { EventType } from '@prisma/client';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { prisma } from '@/lib/db';
-import { UnauthorizedError } from '@/lib/errors';
+import { UnauthorizedError, ValidationError } from '@/lib/errors';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveLocale } from '@/lib/utils/locale';
+import { createLegacyEventSchema } from '@/lib/validation/schemas';
+import { generateUniqueSlug } from '@/lib/utils/slug';
 
 export const dynamic = 'force-dynamic';
 
@@ -160,4 +163,67 @@ export const GET = withErrorHandling(async (request) => {
     },
     { headers: { 'Cache-Control': 'no-store' } },
   );
+});
+
+/**
+ * Create a LEGACY publication. The client has already uploaded the
+ * video to blob storage via the SAS URL issued by /upload-url, so all
+ * we do here is persist the metadata row and point at the blob URL.
+ */
+export const POST = withErrorHandling(async (request) => {
+  const isAdmin = await isAdminAuthenticated(await cookies());
+  if (!isAdmin) throw new UnauthorizedError();
+
+  const body = await parseJsonBody(request);
+  const parsed = createLegacyEventSchema.safeParse(body);
+  if (!parsed.success) {
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+    );
+  }
+  const data = parsed.data;
+
+  const titleIt = data.title.it ?? '';
+  const slug = await generateUniqueSlug({ it: titleIt });
+
+  const event = await prisma.event.create({
+    data: {
+      slug,
+      // LEGACY has no live Jitsi room — the unique placeholder is kept
+      // so downstream joins / queries that assume jitsiRoomName is set
+      // don't trip.
+      jitsiRoomName: `legacy-${randomUUID()}`,
+      moderatorToken: randomUUID(),
+      eventType: 'LEGACY',
+      status: 'ENDED',
+      title: data.title,
+      description: data.description ?? { it: '' },
+      startsAt: new Date(data.startsAt),
+      endsAt: new Date(data.endsAt),
+      timezone: 'Europe/Rome',
+      maxParticipants: 0,
+      qaEnabled: false,
+      chatEnabled: false,
+      recordingEnabled: true,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+      dataRetentionDays: 3650,
+      speakersInfo: data.speakersInfo ?? {},
+      organizerName: data.organizerName ?? null,
+      recordingUrl: data.recordingUrl,
+      recordingPublished: true,
+      recordingPublishedAt: new Date(),
+      recordingFileSize: data.recordingFileSize ? BigInt(data.recordingFileSize) : null,
+      recordingDuration: data.recordingDuration ?? null,
+      youtubeUrl: data.youtubeUrl ?? null,
+      coverImageUrl: data.coverImageUrl ?? null,
+      libraryListed: data.libraryListed ?? true,
+      postEventPublic: true,
+      feedbackEnabled: false,
+    },
+  });
+
+  return Response.json(event, { status: 201 });
 });
