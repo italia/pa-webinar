@@ -277,6 +277,13 @@ export default function EventManagementClient({
         if (res.ok) {
           setSavedField(field);
           setTimeout(() => setSavedField(null), 2000);
+          // RecordingManagement is a sibling that reads
+          // `event.recordingEnabled` off the server-rendered snapshot,
+          // not our local state — refresh the RSC tree so it picks up
+          // the new flag without requiring the operator to reload.
+          if (field === 'recordingEnabled') {
+            router.refresh();
+          }
         } else {
           setters[field](current);
         }
@@ -284,7 +291,7 @@ export default function EventManagementClient({
         setters[field](current);
       }
     },
-    [chatEnabled, qaEnabled, recordingEnabled, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, event.id, event.moderatorToken],
+    [chatEnabled, qaEnabled, recordingEnabled, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, event.id, event.moderatorToken, router],
   );
 
   const title = getLocalized(event.title, locale);
