@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { Link } from '@/i18n/navigation';
 import RegistrationFormClient from '@/components/registration/registration-form-client';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -51,6 +52,16 @@ export default async function RegistrationPage({
     <div className="container py-5">
       <div className="row justify-content-center">
         <div className="col-lg-7">
+          <div className="mb-3">
+            <Link
+              href={`/events/${slug}`}
+              className="text-decoration-none d-inline-flex align-items-center text-primary"
+              style={{ fontSize: '0.9rem' }}
+            >
+              <span aria-hidden="true" className="me-1">←</span>
+              {t('backToEvent')}
+            </Link>
+          </div>
           <h1 className="mb-2">{t('title')}</h1>
           <p className="lead text-muted mb-4">{title}</p>
 
