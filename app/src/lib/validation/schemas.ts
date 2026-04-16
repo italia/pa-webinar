@@ -32,6 +32,7 @@ const eventBaseSchema = z.object({
   dataRetentionDays: z.number().int().min(1).max(365).default(30),
   privacyPolicyUrl: z.string().url().optional(),
   privacyPolicyText: z.string().max(10000).optional(),
+  gdprTemplateId: z.string().uuid().nullable().optional(),
   moderatorName: z.string().min(2).max(100).optional(),
   moderatorEmail: z.string().email().optional(),
   speakersInfo: localizedStringField.optional(),
@@ -75,6 +76,25 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
+
+// ── GDPR Template Schemas ────────────────────────────
+
+export const gdprTemplateBodySchema = localizedStringField.refine(
+  (obj) => Object.values(obj).some((v) => typeof v === 'string' && v.trim().length >= 20),
+  { message: 'At least one locale must contain ≥20 characters' },
+);
+
+export const createGdprTemplateSchema = z.object({
+  name: z.string().min(2).max(120),
+  description: z.string().max(500).nullable().optional(),
+  body: gdprTemplateBodySchema,
+  isDefault: z.boolean().optional().default(false),
+});
+
+export const updateGdprTemplateSchema = createGdprTemplateSchema.partial();
+
+export type CreateGdprTemplateInput = z.infer<typeof createGdprTemplateSchema>;
+export type UpdateGdprTemplateInput = z.infer<typeof updateGdprTemplateSchema>;
 
 // ── Instant Call Schema ──────────────────────────────
 

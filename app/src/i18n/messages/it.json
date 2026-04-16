@@ -7,6 +7,7 @@
     "errorMessage": "Qualcosa è andato storto. Per favore riprova.",
     "retry": "Riprova",
     "save": "Salva",
+    "saving": "Salvataggio...",
     "cancel": "Annulla",
     "confirm": "Conferma",
     "close": "Chiudi",
@@ -374,6 +375,7 @@
       "recordingsList": "Registrazioni video",
       "settingsGeneral": "Generali",
       "settingsLanguages": "Lingue",
+      "settingsGdprTemplates": "Template GDPR",
       "ariaLabel": "Navigazione amministrazione",
       "subNavAriaLabel": "Navigazione sezione"
     },
@@ -942,6 +944,31 @@
       "uploadBtn": "Carica",
       "deleteConfirm": "Sei sicuro di voler eliminare questo file?",
       "noFiles": "Nessun file caricato. Usa il pulsante \"Carica file\" per aggiungere materiali."
+    },
+    "gdprTemplates": {
+      "title": "Template GDPR",
+      "subtitle": "Crea e gestisci informative privacy riutilizzabili tra eventi. Un template marcato come predefinito è pre-selezionato sui nuovi eventi.",
+      "newTemplate": "Nuovo template",
+      "emptyState": "Nessun template ancora creato. Crea il primo per riutilizzare lo stesso testo privacy su più eventi.",
+      "defaultBadge": "Predefinito",
+      "usedByEvents": "{count, plural, =0 {Nessun evento collegato} =1 {1 evento collegato} other {# eventi collegati}}",
+      "confirmDelete": "Eliminare il template \"{name}\"? {count, plural, =0 {} =1 {1 evento perderà il riferimento.} other {# eventi perderanno il riferimento.}}",
+      "form": {
+        "newTitle": "Nuovo template GDPR",
+        "editTitle": "Modifica template GDPR",
+        "name": "Nome interno",
+        "namePlaceholder": "es. Informativa standard DTD",
+        "description": "Descrizione (facoltativa)",
+        "descriptionPlaceholder": "Note brevi per riconoscere il template",
+        "bodyIt": "Testo informativa (italiano)",
+        "bodyEn": "Testo informativa (inglese)",
+        "bodyPlaceholder": "Incolla qui il testo dell'informativa privacy per questa lingua…",
+        "isDefault": "Usa come predefinito per i nuovi eventi",
+        "isDefaultHint": "Il template predefinito è pre-selezionato sul form di creazione evento. Solo un template alla volta può essere predefinito."
+      },
+      "errors": {
+        "saveFailed": "Salvataggio non riuscito. Verifica i dati e riprova."
+      }
     },
     "languages": {
       "title": "Gestione lingue",

@@ -12,6 +12,7 @@ import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { getPublicEnv } from '@/lib/env';
 import { resolveLocale } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import { calculateEstimates } from '@/lib/estimates';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,6 +48,16 @@ export const POST = withErrorHandling(async (request) => {
   const jitsiRoomName = `call-${randomUUID()}`;
   const moderatorToken = randomUUID();
 
+  const capacityEstimate = calculateEstimates({
+    maxParticipants: 50,
+    startsAt: now.toISOString(),
+    endsAt: maxDuration.toISOString(),
+    recordingEnabled: true,
+    participantsCanUnmute: true,
+    participantsCanStartVideo: true,
+    participantsCanShareScreen: true,
+  });
+
   const event = await prisma.event.create({
     data: {
       slug,
@@ -71,6 +82,10 @@ export const POST = withErrorHandling(async (request) => {
       // call lingers LIVE until the 24h endsAt upper bound kicks in.
       lastActiveAt: now,
       dataRetentionDays: 7,
+      capacityEstimateJson: {
+        ...capacityEstimate,
+        computedAt: now.toISOString(),
+      },
     },
   });
 

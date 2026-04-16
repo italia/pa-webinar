@@ -145,7 +145,6 @@ export default function EventDetailClient({
 
       {isEnded && (
         <Alert color="info" className="mb-4">
-          <Icon icon="it-info-circle" className="me-2" />
           {t('detail.eventHeldOn', {
             date: format.dateTime(startsAt, {
               weekday: 'long',
@@ -524,12 +523,20 @@ function PostEventSidebar({
       )}
 
       {event.recordingUrl ? (
-        <Alert color="success" className="mb-3 py-2 px-3">
-          <div className="d-flex align-items-center">
-            <Icon icon="it-video" className="me-2" />
-            <span className="fw-semibold">{t('detail.recording')}</span>
-          </div>
-        </Alert>
+        <div
+          className="mb-3 d-flex align-items-center gap-2"
+          style={{
+            fontSize: '0.88rem',
+            padding: '8px 12px',
+            borderLeft: '3px solid #008758',
+            background: '#E6F4EA',
+            borderRadius: '0 4px 4px 0',
+            color: '#155724',
+          }}
+        >
+          <Icon icon="it-video" size="sm" />
+          <span className="fw-semibold">{t('detail.recording')}</span>
+        </div>
       ) : (
         <p className="text-muted text-center mb-3" style={{ fontSize: '0.85rem' }}>
           {t('detail.noRecording')}
@@ -537,8 +544,17 @@ function PostEventSidebar({
       )}
 
       {retentionExpiry && (
-        <Alert color="info" className="py-2 px-3 mb-0" style={{ fontSize: '0.8rem' }}>
-          <Icon icon="it-info-circle" size="xs" className="me-1" />
+        <div
+          className="mb-0"
+          style={{
+            fontSize: '0.78rem',
+            padding: '8px 12px',
+            borderLeft: '3px solid #5c9ec8',
+            background: '#E8F0FE',
+            borderRadius: '0 4px 4px 0',
+            color: '#17324D',
+          }}
+        >
           {tp('availableUntil', {
             date: format.dateTime(retentionExpiry, {
               day: 'numeric',
@@ -546,7 +562,7 @@ function PostEventSidebar({
               year: 'numeric',
             }),
           })}
-        </Alert>
+        </div>
       )}
     </>
   );
