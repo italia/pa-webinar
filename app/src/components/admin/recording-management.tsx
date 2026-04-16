@@ -139,7 +139,6 @@ export default function RecordingManagement({
             {t('management')}
           </h5>
           <Alert color="warning" className="mb-0">
-            <Icon icon="it-warning-circle" className="me-2" />
             {t('notConfigured')}
           </Alert>
         </CardBody>
