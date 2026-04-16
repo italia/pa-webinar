@@ -45,6 +45,8 @@ const eventBaseSchema = z.object({
     )
     .nullable()
     .optional(),
+  libraryListed: z.boolean().optional(),
+  coverImageUrl: z.string().url().nullable().optional(),
   moderatorName: z.string().min(2).max(100).optional(),
   moderatorEmail: z.string().email().optional(),
   speakersInfo: localizedStringField.optional(),
@@ -107,6 +109,34 @@ export const updateGdprTemplateSchema = createGdprTemplateSchema.partial();
 
 export type CreateGdprTemplateInput = z.infer<typeof createGdprTemplateSchema>;
 export type UpdateGdprTemplateInput = z.infer<typeof updateGdprTemplateSchema>;
+
+// ── Legacy Event Import Schema ───────────────────────
+//
+// Legacy events (eventType=LEGACY) cover video archives imported from
+// external sources: YouTube uploads, mirrored livestreams, etc. They
+// skip Jitsi provisioning and registrations; all we persist is enough
+// metadata to render the detail page and the library card.
+export const createLegacyEventSchema = z.object({
+  title: localizedStringField.refine(
+    (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
+    { message: 'title.it is required and must be at least 3 characters' },
+  ),
+  description: localizedStringField.optional().default({ it: '' }),
+  startsAt: z.string().datetime(),
+  endsAt: z.string().datetime(),
+  youtubeUrl: z
+    .string()
+    .url()
+    .refine(
+      (u) => /(?:youtube\.com|youtu\.be)/i.test(u),
+      { message: 'URL must point to youtube.com or youtu.be' },
+    ),
+  coverImageUrl: z.string().url().optional(),
+  speakersInfo: localizedStringField.optional(),
+  organizerName: z.string().max(200).optional(),
+  libraryListed: z.boolean().optional().default(true),
+});
+export type CreateLegacyEventInput = z.infer<typeof createLegacyEventSchema>;
 
 // ── Instant Call Schema ──────────────────────────────
 

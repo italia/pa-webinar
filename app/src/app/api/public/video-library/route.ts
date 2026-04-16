@@ -37,7 +37,11 @@ export const GET = withErrorHandling(async (request) => {
 
   const where: Prisma.EventWhereInput = {
     status: 'ENDED',
-    postEventPublic: true,
+    // `libraryListed` is the explicit "show in public library" switch.
+    // Separate from `postEventPublic` so an admin can keep an event's
+    // detail page public for registered attendees while hiding it from
+    // the library index (common for internal instant calls).
+    libraryListed: true,
     OR: [
       { AND: [{ recordingPublished: true }, { recordingUrl: { not: null } }] },
       { youtubeUrl: { not: null } },
@@ -61,6 +65,7 @@ export const GET = withErrorHandling(async (request) => {
         recordingPublishedAt: true,
         youtubeUrl: true,
         imageUrl: true,
+        coverImageUrl: true,
       },
     }),
     prisma.event.count({ where }),
@@ -86,7 +91,9 @@ export const GET = withErrorHandling(async (request) => {
         endsAt: r.endsAt.toISOString(),
         durationSeconds: r.recordingDuration,
         publishedAt: r.recordingPublishedAt?.toISOString() ?? null,
-        imageUrl: r.imageUrl,
+        // Prefer the curated cover banner; fall back to the generic
+        // imageUrl; the client handles the final fallback gradient.
+        imageUrl: r.coverImageUrl ?? r.imageUrl,
         hasYoutube: Boolean(r.youtubeUrl),
       })),
       page,

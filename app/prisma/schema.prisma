@@ -104,6 +104,19 @@ model Event {
   // YouTube before we owned the platform.
   youtubeUrl String? @map("youtube_url")
 
+  // Whether the event is listed on the public /video-library hub.
+  // Independent from `post_event_public` (which controls the detail
+  // page's post-event view): an admin can keep a call's detail page
+  // accessible to registered participants without exposing it to every
+  // library visitor. Default false; INSTANT calls stay off by default
+  // because they're usually internal / throw-away sessions.
+  libraryListed Boolean @default(false) @map("library_listed")
+
+  // 16:9 cover banner for the library card — higher-quality / more
+  // curated than `image_url` (which may be a generic event graphic).
+  // Optional: falls back to `image_url`, then to a generated gradient.
+  coverImageUrl String? @map("cover_image_url")
+
   // Post-event configuration
   postEventPublic        Boolean   @default(true) @map("post_event_public")
   postEventPublicUntil   DateTime? @map("post_event_public_until")
@@ -221,6 +234,10 @@ enum EventStatus {
 enum EventType {
   SCHEDULED
   INSTANT
+  // Historical event imported from an external source (e.g. YouTube):
+  // no Jitsi room, no registrations, no live flow — just metadata and
+  // a `youtubeUrl` that the library / detail page can embed.
+  LEGACY
 }
 
 enum OrganizationType {
