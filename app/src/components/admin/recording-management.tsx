@@ -13,6 +13,7 @@ import {
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter } from '@/i18n/navigation';
+import RecordingUploadWidget from './recording-upload-widget';
 
 interface RecordingManagementProps {
   event: {
@@ -134,9 +135,10 @@ export default function RecordingManagement({
           <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
             {t('management')}
           </h5>
-          <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+          <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
             {t('disabledHint')}
           </div>
+          <RecordingUploadWidget eventId={event.id} />
         </CardBody>
       </Card>
     );
@@ -303,6 +305,14 @@ export default function RecordingManagement({
               </Button>
             </div>
           </>
+        )}
+
+        {/* Replace the existing recording with a different MP4 —
+            useful after editing the Jibri output offline or swapping
+            for a MsTeams export. Hidden while a live recording is
+            running to avoid racing against Jibri's own upload. */}
+        {!isLive && (
+          <RecordingUploadWidget eventId={event.id} compact />
         )}
       </CardBody>
     </Card>

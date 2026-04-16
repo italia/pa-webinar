@@ -741,6 +741,23 @@
       "noComments": "No comments",
       "stars": "stars"
     },
+    "recordingUpload": {
+      "title": "Upload an existing recording",
+      "subtitle": "Already have a video file of the event (for example a MsTeams recording)? Upload it here — it becomes the official recording on the public page.",
+      "fileLabel": "Video file",
+      "upload": "Upload and attach",
+      "signing": "Preparing…",
+      "uploading": "Uploading {progress}%",
+      "attaching": "Attaching to event…",
+      "hint": "Formats: MP4, WebM, MOV, M4V. Max 5 GB. Upload goes straight to Azure Blob storage.",
+      "errors": {
+        "fileTooLarge": "File exceeds the 5 GB limit.",
+        "unsupportedType": "Unsupported format. Upload MP4, WebM, MOV or M4V.",
+        "signFailed": "Couldn't get the upload URL.",
+        "uploadFailed": "Upload failed. Please retry.",
+        "attachFailed": "Video uploaded but not attached to the event. Retry the last step."
+      }
+    },
     "coModerators": {
       "title": "Co-moderators",
       "intro": "Add extra moderators with individual magic-links.",

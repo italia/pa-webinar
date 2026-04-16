@@ -34,6 +34,15 @@ const updatePublicationSchema = z.object({
     })
     .nullable()
     .optional(),
+  // Attach an already-uploaded blob to the event as its primary
+  // recording. The admin reaches this after the direct-to-Azure upload
+  // has completed, so the URL is guaranteed to point at an existing
+  // blob in our container. Setting recordingUrl implies publishing
+  // unless the caller explicitly passes recordingPublished: false.
+  recordingUrl: z.string().url().nullable().optional(),
+  recordingPublished: z.boolean().optional(),
+  recordingFileSize: z.number().int().positive().nullable().optional(),
+  recordingDuration: z.number().int().positive().nullable().optional(),
 });
 
 export const PATCH = withErrorHandling(async (request, context) => {
@@ -54,6 +63,15 @@ export const PATCH = withErrorHandling(async (request, context) => {
     );
   }
 
+  // Attaching a recording URL means we also flip the published switch
+  // on by default — uploading a file from the admin panel is an
+  // explicit intent to publish. The caller can still opt out by
+  // passing recordingPublished: false alongside recordingUrl.
+  const setsRecording = parsed.data.recordingUrl !== undefined;
+  const publishWith =
+    parsed.data.recordingPublished ??
+    (setsRecording && parsed.data.recordingUrl !== null ? true : undefined);
+
   const updated = await prisma.event.update({
     where: { id },
     data: {
@@ -69,6 +87,26 @@ export const PATCH = withErrorHandling(async (request, context) => {
       ...(parsed.data.youtubeUrl !== undefined && {
         youtubeUrl: parsed.data.youtubeUrl,
       }),
+      ...(setsRecording && {
+        recordingUrl: parsed.data.recordingUrl,
+        // Enable the flag even on retroactive uploads (Jibri was off
+        // during the event) so the detail page surfaces the player.
+        recordingEnabled: true,
+        ...(parsed.data.recordingUrl === null && { recordingPublished: false }),
+      }),
+      ...(publishWith !== undefined && {
+        recordingPublished: publishWith,
+        ...(publishWith && { recordingPublishedAt: new Date() }),
+      }),
+      ...(parsed.data.recordingFileSize !== undefined && {
+        recordingFileSize:
+          parsed.data.recordingFileSize === null
+            ? null
+            : BigInt(parsed.data.recordingFileSize),
+      }),
+      ...(parsed.data.recordingDuration !== undefined && {
+        recordingDuration: parsed.data.recordingDuration,
+      }),
     },
   });
 
@@ -78,5 +116,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
     postEventPublic: updated.postEventPublic,
     coverImageUrl: updated.coverImageUrl,
     youtubeUrl: updated.youtubeUrl,
+    recordingUrl: updated.recordingUrl,
+    recordingPublished: updated.recordingPublished,
   });
 });
