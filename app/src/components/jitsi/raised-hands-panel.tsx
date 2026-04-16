@@ -14,25 +14,41 @@ interface RaisedHand {
 
 interface RaisedHandsPanelProps {
   api: JitsiMeetExternalAPI | null;
+  /**
+   * Display name of the local participant (from our pre-join flow / JWT).
+   * Jitsi's `getParticipantsInfo()` returns **remote** participants only,
+   * so when the local moderator raises their own hand the lookup by ID
+   * comes back empty and the UI falls back to "Partecipante". Passing
+   * the name down lets us short-circuit the lookup for the local ID.
+   */
+  localDisplayName?: string;
 }
 
 /**
  * Resolves the display name for a participant, retrying once after a
  * short delay if the initial lookup returns empty (race with MUC presence).
+ * `localId` + `localName` handle the local-participant case where Jitsi's
+ * getParticipantsInfo() returns nothing (it only lists remotes).
  */
 function resolveDisplayName(
   api: JitsiMeetExternalAPI,
   participantId: string,
+  localId: string | null,
+  localName: string,
 ): string {
+  if (localId && participantId === localId && localName) {
+    return localName;
+  }
   const info = api.getParticipantsInfo();
   const p = info.find((pp) => pp.id === participantId);
   return p?.displayName || p?.formattedDisplayName || '';
 }
 
-export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
+export default function RaisedHandsPanel({ api, localDisplayName = '' }: RaisedHandsPanelProps) {
   const t = useTranslations('live.moderator');
   const [hands, setHands] = useState<RaisedHand[]>([]);
   const handsRef = useRef<Map<string, RaisedHand>>(new Map());
+  const localIdRef = useRef<string | null>(null);
   const [, setTick] = useState(0);
 
   const syncHands = useCallback(() => {
@@ -47,9 +63,16 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
 
     const retryTimers = new Set<ReturnType<typeof setTimeout>>();
 
+    // Capture the local participant id as soon as Jitsi joins the
+    // conference — needed to map a local "raiseHandUpdated" event back
+    // to the name we already know (getParticipantsInfo excludes self).
+    const onConferenceJoined = (evt: { id: string }) => {
+      localIdRef.current = evt.id;
+    };
+
     const onRaiseHand = (evt: { id: string; handRaised: number }) => {
       if (evt.handRaised > 0) {
-        const name = resolveDisplayName(api, evt.id);
+        const name = resolveDisplayName(api, evt.id, localIdRef.current, localDisplayName);
         handsRef.current.set(evt.id, {
           id: evt.id,
           displayName: name,
@@ -63,7 +86,7 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
             retryTimers.delete(timer);
             const entry = handsRef.current.get(evt.id);
             if (entry && !entry.displayName) {
-              const retried = resolveDisplayName(api, evt.id);
+              const retried = resolveDisplayName(api, evt.id, localIdRef.current, localDisplayName);
               if (retried) {
                 handsRef.current.set(evt.id, { ...entry, displayName: retried });
                 syncHands();
@@ -92,6 +115,7 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
       }
     };
 
+    api.addListener('videoConferenceJoined', onConferenceJoined);
     api.addListener('raiseHandUpdated', onRaiseHand);
     api.addListener('participantLeft', onParticipantLeft);
     api.addListener('displayNameChange', onDisplayNameChange);
@@ -99,11 +123,12 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
     return () => {
       retryTimers.forEach(clearTimeout);
       retryTimers.clear();
+      api.removeListener('videoConferenceJoined', onConferenceJoined);
       api.removeListener('raiseHandUpdated', onRaiseHand);
       api.removeListener('participantLeft', onParticipantLeft);
       api.removeListener('displayNameChange', onDisplayNameChange);
     };
-  }, [api, syncHands]);
+  }, [api, syncHands, localDisplayName]);
 
   // Refresh elapsed-time display periodically
   useEffect(() => {
@@ -145,7 +170,7 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
       style={{ background: 'rgba(26,26,46,0.85)' }}
     >
       <div className="d-flex flex-wrap gap-2 align-items-center">
-        {hands.map((h) => {
+        {hands.map((h, idx) => {
           const elapsed = Math.floor((Date.now() - h.raisedAt) / 1000);
           const mins = Math.floor(elapsed / 60);
           const secs = elapsed % 60;
@@ -157,6 +182,19 @@ export default function RaisedHandsPanel({ api }: RaisedHandsPanelProps) {
               className="d-flex align-items-center gap-1 rounded px-2 py-1"
               style={{ backgroundColor: 'rgba(255,193,7,0.2)' }}
             >
+              <span
+                className="badge rounded-pill"
+                style={{
+                  fontSize: '0.65rem',
+                  backgroundColor: idx === 0 ? '#0066CC' : 'rgba(255,255,255,0.2)',
+                  color: '#fff',
+                  minWidth: 18,
+                }}
+                aria-label={`posizione ${idx + 1}`}
+                title={`Posizione ${idx + 1} in coda`}
+              >
+                #{idx + 1}
+              </span>
               <span style={{ fontSize: '0.9rem' }}>&#9995;</span>
               <span className="small fw-semibold">
                 {h.displayName || t('participantFallback')}
