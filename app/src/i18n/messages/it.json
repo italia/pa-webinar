@@ -736,6 +736,25 @@
       "noComments": "Nessun commento",
       "stars": "stelle"
     },
+    "coModerators": {
+      "title": "Co-moderatori",
+      "intro": "Aggiungi altri moderatori con magic-link individuali.",
+      "introHint": "Ciascun co-moderatore ha un suo nome visibile in sala e un token revocabile indipendentemente dal link principale.",
+      "add": "Aggiungi co-moderatore",
+      "name": "Nome visibile in sala",
+      "email": "Email (facoltativa)",
+      "emailPlaceholder": "per inviargli il link",
+      "copyLink": "Copia link",
+      "copied": "Copiato!",
+      "revoke": "Revoca",
+      "revoked": "Revocato",
+      "confirmRevoke": "Revocare l'accesso a questo co-moderatore? Il link smetterà di funzionare immediatamente.",
+      "empty": "Nessun co-moderatore aggiunto. Il link moderatore principale resta l'unico accesso da moderatore.",
+      "activeCount": "{count, plural, =0 {Nessun co-moderatore attivo} =1 {1 co-moderatore attivo} other {# co-moderatori attivi}}",
+      "errors": {
+        "addFailed": "Impossibile aggiungere il co-moderatore. Riprova."
+      }
+    },
     "gdprAuditLog": {
       "title": "Registro GDPR",
       "subtitle": "Azioni di privacy tracciate per questo evento: consensi, export, cancellazioni.",
