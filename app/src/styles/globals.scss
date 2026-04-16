@@ -4,6 +4,23 @@
 // Bootstrap Italia — the .italia design system CSS framework
 @import 'bootstrap-italia/src/scss/bootstrap-italia';
 
+// ── Bootstrap Italia overrides ───────────────────────────────────────────
+//
+// Bootstrap Italia's `.alert` renders the contextual icon (warning / info /
+// danger / ...) as a background-image positioned at `left: 20px` with a
+// reserved `padding-left: 4em`. When we apply spacing utilities like
+// `px-2` / `px-3` to tighten the banner, Bootstrap's `.px-*` wins over the
+// component rule and collapses the left padding to ~1rem — which puts the
+// icon on top of the text. The compound selector below raises the
+// specificity above `.px-*` so the reserved space is preserved regardless
+// of the utility classes the caller adds.
+.alert[class*="alert-"] {
+  padding-left: 4em;
+}
+.alert-dismissible[class*="alert-"] {
+  padding-right: 4em;
+}
+
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
@@ -616,44 +633,121 @@
 // ── Event config diagram ──
 
 .event-config-diagram {
-  background: #f8f9fa;
+  background: #fff;
   border-radius: 12px;
-  padding: 24px;
+  padding: 16px 20px;
   border: 1px solid #e8e8e8;
 }
 
-.feature-badge {
+.diagram-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.feature-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 0.85rem;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: #F6F8FA;
+  color: #5A768A;
+  border: 1px solid #E8ECF0;
 
-  &--active {
-    background: #e8f5e9;
-    color: #2e7d32;
-    border: 1px solid #c8e6c9;
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #C9D4DE;
+    flex-shrink: 0;
   }
 
-  &--inactive {
-    background: #f5f5f5;
-    color: #9e9e9e;
-    border: 1px solid #e0e0e0;
+  &--on {
+    background: #E6F4EA;
+    color: #1B5E20;
+    border-color: #BFE2C8;
+
+    .feature-chip__dot {
+      background: #2E7D32;
+    }
+  }
+
+  &--off {
+    opacity: 0.55;
     text-decoration: line-through;
   }
 }
 
-.estimate-card {
-  background: #fff;
+.diagram-metrics {
+  background: #F8FAFE;
   border-radius: 8px;
-  padding: 12px 16px;
-  border-left: 3px solid;
+  padding: 12px 14px;
 
-  &--primary { border-color: var(--bs-primary, #0066CC); }
-  &--info { border-color: var(--bs-info, #5c9ec8); }
-  &--warning { border-color: var(--bs-warning, #a66300); }
-  &--success { border-color: var(--bs-success, #008758); }
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #17324D;
+  }
+
+  &__basis {
+    font-size: 0.72rem;
+    color: #5A768A;
+  }
+
+  &__bar {
+    height: 4px;
+    background: #E8ECF0;
+    border-radius: 2px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  &__bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0066CC, #4A90E2);
+    transition: width 0.3s ease;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+  }
+}
+
+.metric-cell {
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 10px;
+  border-left: 2px solid #0066CC;
+
+  &__label {
+    font-size: 0.68rem;
+    color: #5A768A;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+
+  &__value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #17324D;
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+  }
 }
 
 // ── Infrastructure Weathermap ──

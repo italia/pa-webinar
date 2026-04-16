@@ -28,6 +28,7 @@ import EventConfigDiagram from './event-config-diagram';
 import RecordingManagement from './recording-management';
 import CallSessionsPanel from './call-sessions-panel';
 import PostEventConfig from './post-event-config';
+import CollapsibleSection from './collapsible-section';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   MINISTRY: { it: 'Ministero', en: 'Ministry' },
@@ -167,6 +168,63 @@ function UrlBox({ url }: { url: string }) {
   );
 }
 
+/**
+ * Single row inside the Links card. We intentionally *don't* use
+ * design-react-kit's <Alert> for the hint line: the inline left-border
+ * style keeps the icon/text alignment predictable even at compact sizes,
+ * where Alert's absolute-positioned pseudo-icon tends to collide with
+ * short content.
+ */
+function LinkBlock({
+  label,
+  hint,
+  url,
+  tone,
+  topBorder,
+}: {
+  label: string;
+  hint?: string;
+  url: string;
+  tone?: 'warning' | 'info';
+  topBorder?: boolean;
+}) {
+  const toneColor =
+    tone === 'warning' ? '#a66300' : tone === 'info' ? '#0066CC' : '#5A768A';
+  const toneBg =
+    tone === 'warning' ? '#fff8e1' : tone === 'info' ? '#e8f0fe' : undefined;
+
+  return (
+    <div
+      className={`mb-4 ${topBorder ? 'pt-4' : ''}`}
+      style={topBorder ? { borderTop: '1px solid #e8e8e8' } : undefined}
+    >
+      <label
+        className="fw-semibold d-block mb-1 text-secondary"
+        style={{ fontSize: '0.85rem' }}
+      >
+        {label}
+      </label>
+      {hint && (
+        <div
+          className="mb-2"
+          style={{
+            fontSize: '0.78rem',
+            padding: '8px 12px',
+            borderLeft: tone ? `3px solid ${toneColor}` : '3px solid #dee2e6',
+            background: toneBg ?? '#f8f9fa',
+            color: '#17324D',
+            borderRadius: '0 4px 4px 0',
+          }}
+        >
+          {hint}
+        </div>
+      )}
+      <UrlBox url={url} />
+      <CopyButton text={url} />
+    </div>
+  );
+}
+
 export default function EventManagementClient({
   event,
   baseUrl,
@@ -238,6 +296,10 @@ export default function EventManagementClient({
   const publicUrl = `${baseUrl}/${locale}/${locale === 'it' ? 'eventi' : 'events'}/${event.slug}`;
   const moderatorUrl = `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`;
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
+  // Guest join URL: opens the live page as an anonymous viewer once the
+  // event is LIVE. Used by the moderator to hand a quick link to a late
+  // participant who never registered through the public form.
+  const guestJoinUrl = `${baseUrl}/${locale}/events/${event.slug}/live`;
 
   const togglePublish = useCallback(async () => {
     const newStatus = status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
@@ -552,10 +614,13 @@ export default function EventManagementClient({
       <Row className="mt-4">
         {/* ═══ Left Column ═══ */}
         <Col lg={8}>
-          {/* ── Event Details Card ── */}
-          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-            <CardBody className="p-4">
-              <SectionTitle>{t('eventDetails')}</SectionTitle>
+          {/* ── Summary (open by default) ── */}
+          <CollapsibleSection
+            id="summary"
+            title={t('eventDetails')}
+            icon="it-info-circle"
+            defaultOpen
+          >
               <dl className="mb-0">
                 <DetailRow
                   label={te('detail.date')}
@@ -627,13 +692,14 @@ export default function EventManagementClient({
                   />
                 )}
               </dl>
-            </CardBody>
-          </Card>
+          </CollapsibleSection>
 
           {/* ── Configuration Diagram ── */}
-          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-            <CardBody className="p-4">
-              <SectionTitle>{te('manage.settingsSection')}</SectionTitle>
+          <CollapsibleSection
+            id="diagram"
+            title={te('manage.settingsSection')}
+            icon="it-pa"
+          >
               <EventConfigDiagram
                 event={{
                   maxParticipants: event.maxParticipants,
@@ -650,13 +716,14 @@ export default function EventManagementClient({
                 registrationCount={event.registrationCount}
                 adminMode
               />
-            </CardBody>
-          </Card>
+          </CollapsibleSection>
 
-          {/* ── Settings Card ── */}
-          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-            <CardBody className="p-4">
-              <SectionTitle>{te('manage.settingsSection')}</SectionTitle>
+          {/* ── Settings & permissions ── */}
+          <CollapsibleSection
+            id="settings"
+            title={t('form.sectionSettings')}
+            icon="it-settings"
+          >
               <ToggleRow
                 label={te('manage.toggleChat')}
                 description={t('toggleChatDesc')}
@@ -686,61 +753,110 @@ export default function EventManagementClient({
                 savedLabel={t('settingsSaved')}
                 hasBorder
               />
-            </CardBody>
-          </Card>
+              <hr className="my-3" />
+              <h6 className="fw-semibold mb-3" style={{ color: '#17324D', fontSize: '0.9rem' }}>
+                {t('form.sectionPermissions')}
+              </h6>
+              <ToggleRow
+                label={t('form.participantsCanUnmute')}
+                description={participantsCanUnmute ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
+                checked={participantsCanUnmute}
+                onChange={() => toggleSetting('participantsCanUnmute')}
+                disabled={updating}
+                saved={savedField === 'participantsCanUnmute'}
+                savedLabel={t('settingsSaved')}
+              />
+              <ToggleRow
+                label={t('form.participantsCanStartVideo')}
+                description={participantsCanStartVideo ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
+                checked={participantsCanStartVideo}
+                onChange={() => toggleSetting('participantsCanStartVideo')}
+                disabled={updating}
+                saved={savedField === 'participantsCanStartVideo'}
+                savedLabel={t('settingsSaved')}
+                hasBorder
+              />
+              <ToggleRow
+                label={t('form.participantsCanShareScreen')}
+                description={participantsCanShareScreen ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
+                checked={participantsCanShareScreen}
+                onChange={() => toggleSetting('participantsCanShareScreen')}
+                disabled={updating}
+                saved={savedField === 'participantsCanShareScreen'}
+                savedLabel={t('settingsSaved')}
+                hasBorder
+              />
+              <div className="mt-2">
+                <small className="form-text text-muted">
+                  {t('form.permissionsNote')}
+                </small>
+              </div>
+          </CollapsibleSection>
 
-          {/* ── Recording Management ── */}
-          <RecordingManagement
-            event={{
-              id: event.id,
-              slug: event.slug,
-              status,
-              recordingEnabled,
-              recordingUrl: event.recordingUrl,
-              tempRecordingUrl: event.tempRecordingUrl,
-              tempRecordingStartedAt: event.tempRecordingStartedAt,
-              recordingPublished: event.recordingPublished,
-              recordingPublishedAt: event.recordingPublishedAt,
-              recordingFileSize: event.recordingFileSize,
-              recordingDuration: event.recordingDuration,
-              recordingDeleteAfterDays: event.recordingDeleteAfterDays,
-              moderatorToken: event.moderatorToken,
-            }}
-          />
+          {/* ── Sessions & recordings ── */}
+          <CollapsibleSection
+            id="sessions"
+            title={t('manage.sessionsAndRecordings')}
+            icon="it-video"
+            bare
+          >
+            <RecordingManagement
+              event={{
+                id: event.id,
+                slug: event.slug,
+                status,
+                recordingEnabled,
+                recordingUrl: event.recordingUrl,
+                tempRecordingUrl: event.tempRecordingUrl,
+                tempRecordingStartedAt: event.tempRecordingStartedAt,
+                recordingPublished: event.recordingPublished,
+                recordingPublishedAt: event.recordingPublishedAt,
+                recordingFileSize: event.recordingFileSize,
+                recordingDuration: event.recordingDuration,
+                recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+                moderatorToken: event.moderatorToken,
+              }}
+            />
+            <CallSessionsPanel
+              eventId={event.id}
+              eventSlug={event.slug}
+              moderatorToken={event.moderatorToken}
+            />
+          </CollapsibleSection>
 
-          {/* ── Call Sessions ── */}
-          <CallSessionsPanel
-            eventId={event.id}
-            eventSlug={event.slug}
-            moderatorToken={event.moderatorToken}
-          />
+          {/* ── Post-event & Feedback ── */}
+          <CollapsibleSection
+            id="post-event"
+            title={t('manage.postEventSection')}
+            icon="it-calendar-check"
+            bare
+          >
+            <PostEventConfig
+              event={{
+                id: event.id,
+                moderatorToken: event.moderatorToken,
+                postEventPublic: event.postEventPublic,
+                postEventPublicUntil: event.postEventPublicUntil,
+                postEventShowQA: event.postEventShowQA,
+                postEventShowMaterials: event.postEventShowMaterials,
+                postEventShowPolls: event.postEventShowPolls,
+                postEventShowFeedback: event.postEventShowFeedback,
+                feedbackEnabled: event.feedbackEnabled,
+                dataRetentionDays: event.dataRetentionDays,
+              }}
+            />
+            {event.feedbackEnabled && status === 'ENDED' && (
+              <EventFeedbackAdmin slug={event.slug} token={event.moderatorToken} />
+            )}
+          </CollapsibleSection>
 
-          {/* ── Post-event Configuration ── */}
-          <PostEventConfig
-            event={{
-              id: event.id,
-              moderatorToken: event.moderatorToken,
-              postEventPublic: event.postEventPublic,
-              postEventPublicUntil: event.postEventPublicUntil,
-              postEventShowQA: event.postEventShowQA,
-              postEventShowMaterials: event.postEventShowMaterials,
-              postEventShowPolls: event.postEventShowPolls,
-              postEventShowFeedback: event.postEventShowFeedback,
-              feedbackEnabled: event.feedbackEnabled,
-              dataRetentionDays: event.dataRetentionDays,
-            }}
-          />
-
-          {/* ── Feedback Results ── */}
-          {event.feedbackEnabled && status === 'ENDED' && (
-            <EventFeedbackAdmin slug={event.slug} token={event.moderatorToken} />
-          )}
-
-          {/* ── Reminders Card ── */}
-          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-            <CardBody className="p-4">
-              <SectionTitle>{tr('title')}</SectionTitle>
-
+          {/* ── Reminders ── */}
+          <CollapsibleSection
+            id="reminders"
+            title={tr('title')}
+            icon="it-calendar"
+            badge={reminders.length || undefined}
+          >
               {reminders.length > 0 && (
                 <div className="d-flex flex-column gap-2 mb-3">
                   {reminders.map((r) => (
@@ -809,60 +925,16 @@ export default function EventManagementClient({
                   {tr('maxReminders')}
                 </div>
               )}
-            </CardBody>
-          </Card>
+          </CollapsibleSection>
 
-          {/* ── AV Permissions Card ── */}
-          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-            <CardBody className="p-4">
-              <SectionTitle>{t('form.sectionPermissions')}</SectionTitle>
-              <ToggleRow
-                label={t('form.participantsCanUnmute')}
-                description={participantsCanUnmute ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
-                checked={participantsCanUnmute}
-                onChange={() => toggleSetting('participantsCanUnmute')}
-                disabled={updating}
-                saved={savedField === 'participantsCanUnmute'}
-                savedLabel={t('settingsSaved')}
-              />
-              <ToggleRow
-                label={t('form.participantsCanStartVideo')}
-                description={participantsCanStartVideo ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
-                checked={participantsCanStartVideo}
-                onChange={() => toggleSetting('participantsCanStartVideo')}
-                disabled={updating}
-                saved={savedField === 'participantsCanStartVideo'}
-                savedLabel={t('settingsSaved')}
-                hasBorder
-              />
-              <ToggleRow
-                label={t('form.participantsCanShareScreen')}
-                description={participantsCanShareScreen ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
-                checked={participantsCanShareScreen}
-                onChange={() => toggleSetting('participantsCanShareScreen')}
-                disabled={updating}
-                saved={savedField === 'participantsCanShareScreen'}
-                savedLabel={t('settingsSaved')}
-                hasBorder
-              />
-              <div className="mt-2">
-                <small className="form-text text-muted">
-                  {t('form.permissionsNote')}
-                </small>
-              </div>
-            </CardBody>
-          </Card>
-
-          {/* ── Materials Card ── */}
-          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-            <CardBody className="p-4">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <div className="d-flex align-items-center gap-2">
-                  <SectionTitle>{tm('title')}</SectionTitle>
-                  <Badge color="primary" pill className="mb-3" style={{ fontSize: '0.78rem' }}>
-                    {materials.length}
-                  </Badge>
-                </div>
+          {/* ── Materials ── */}
+          <CollapsibleSection
+            id="materials"
+            title={tm('title')}
+            icon="it-files"
+            badge={materials.length || undefined}
+          >
+              <div className="d-flex justify-content-end align-items-center mb-3">
                 {!showMaterialForm && (
                   <Button color="primary" outline size="sm" onClick={() => setShowMaterialForm(true)}>
                     + {tm('addMaterial')}
@@ -965,19 +1037,16 @@ export default function EventManagementClient({
                   ))}
                 </div>
               )}
-            </CardBody>
-          </Card>
+          </CollapsibleSection>
 
-          {/* ── Registrations Card ── */}
-          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-            <CardBody className="p-4">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <div className="d-flex align-items-center gap-2">
-                  <SectionTitle>{t('registrationsSection')}</SectionTitle>
-                  <Badge color="primary" pill className="mb-3" style={{ fontSize: '0.78rem' }}>
-                    {event.registrationCount}
-                  </Badge>
-                </div>
+          {/* ── Registrations ── */}
+          <CollapsibleSection
+            id="registrations"
+            title={t('registrationsSection')}
+            icon="it-user"
+            badge={event.registrationCount || undefined}
+          >
+              <div className="d-flex justify-content-end align-items-center mb-3">
                 {event.registrations.length > 0 && (
                   <Button
                     color="primary"
@@ -1082,8 +1151,53 @@ export default function EventManagementClient({
                   </Table>
                 </div>
               )}
-            </CardBody>
-          </Card>
+          </CollapsibleSection>
+
+          {/* ── Privacy & GDPR ── */}
+          {event.gdprAuditLogs.length > 0 && (
+            <CollapsibleSection
+              id="privacy"
+              title={t('gdprAuditLog.title')}
+              icon="it-lock"
+              badge={event.gdprAuditLogs.length || undefined}
+              subtitle={t('gdprAuditLog.subtitle')}
+            >
+              <Table responsive hover className="mt-1" style={{ fontSize: '0.85rem' }}>
+                <thead>
+                  <tr>
+                    <th>{t('gdprAuditLog.date')}</th>
+                    <th>{t('gdprAuditLog.action')}</th>
+                    <th>{t('gdprAuditLog.recordCount')}</th>
+                    <th>{t('gdprAuditLog.details')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {event.gdprAuditLogs.map((log) => (
+                    <tr key={log.id}>
+                      <td>{format.dateTime(new Date(log.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
+                      <td>
+                        <Badge
+                          color=""
+                          pill
+                          style={{
+                            fontSize: '0.72rem',
+                            backgroundColor: log.action === 'DATA_DELETED' ? '#FFF3CD' : log.action === 'DATA_EXPORTED' ? '#D1ECF1' : '#D4EDDA',
+                            color: log.action === 'DATA_DELETED' ? '#856404' : log.action === 'DATA_EXPORTED' ? '#0C5460' : '#155724',
+                          }}
+                        >
+                          {t(`gdprAuditLog.actions.${log.action}`)}
+                        </Badge>
+                      </td>
+                      <td>{log.recordCount}</td>
+                      <td style={{ maxWidth: 200 }} className="text-truncate">
+                        {log.details ? JSON.stringify(JSON.parse(log.details)) : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </CollapsibleSection>
+          )}
         </Col>
 
         {/* ═══ Right Column ═══ */}
@@ -1093,36 +1207,37 @@ export default function EventManagementClient({
             <CardBody className="p-4">
               <SectionTitle>{t('links.title')}</SectionTitle>
 
-              <div className="mb-4">
-                <label className="fw-semibold d-block mb-1 text-secondary" style={{ fontSize: '0.85rem' }}>
-                  {t('links.publicPage')}
-                </label>
-                <UrlBox url={publicUrl} />
-                <CopyButton text={publicUrl} />
-              </div>
-
-              <div
-                className="mb-4 pt-4"
-                style={{ borderTop: '1px solid #e8e8e8' }}
-              >
-                <label className="fw-semibold d-block mb-1 text-secondary" style={{ fontSize: '0.85rem' }}>
-                  {t('links.moderatorLink')}
-                </label>
-                <Alert color="warning" className="py-2 px-3 mb-2">
-                  <small>{t('links.moderatorLinkHint')}</small>
-                </Alert>
-                <UrlBox url={moderatorUrl} />
-                <CopyButton text={moderatorUrl} />
-              </div>
+              <LinkBlock
+                label={t('links.publicPage')}
+                hint={t('links.publicPageHint')}
+                url={publicUrl}
+              />
 
               {(status === 'PUBLISHED' || status === 'LIVE') && (
-                <div className="pt-4" style={{ borderTop: '1px solid #e8e8e8' }}>
-                  <label className="fw-semibold d-block mb-1 text-secondary" style={{ fontSize: '0.85rem' }}>
-                    {t('liveRoomLink')}
-                  </label>
-                  <UrlBox url={`${baseUrl}${liveModeratorUrl}`} />
-                  <CopyButton text={`${baseUrl}${liveModeratorUrl}`} />
-                </div>
+                <LinkBlock
+                  label={t('links.guestJoin')}
+                  hint={t('links.guestJoinHint')}
+                  tone="info"
+                  url={guestJoinUrl}
+                  topBorder
+                />
+              )}
+
+              <LinkBlock
+                label={t('links.moderatorLink')}
+                hint={t('links.moderatorLinkHint')}
+                tone="warning"
+                url={moderatorUrl}
+                topBorder
+              />
+
+              {(status === 'PUBLISHED' || status === 'LIVE') && (
+                <LinkBlock
+                  label={t('liveRoomLink')}
+                  hint={t('links.liveRoomHint')}
+                  url={`${baseUrl}${liveModeratorUrl}`}
+                  topBorder
+                />
               )}
             </CardBody>
           </Card>
@@ -1172,53 +1287,6 @@ export default function EventManagementClient({
           </Card>
         </Col>
       </Row>
-
-      {/* ── GDPR Audit Log (collapsible) ── */}
-      {event.gdprAuditLogs.length > 0 && (
-        <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-          <CardBody className="p-4">
-            <details>
-              <summary className="fw-semibold mb-3" style={{ color: '#17324D', cursor: 'pointer' }}>
-                {t('gdprAuditLog.title')} ({event.gdprAuditLogs.length})
-              </summary>
-              <Table responsive hover className="mt-3" style={{ fontSize: '0.85rem' }}>
-                <thead>
-                  <tr>
-                    <th>{t('gdprAuditLog.date')}</th>
-                    <th>{t('gdprAuditLog.action')}</th>
-                    <th>{t('gdprAuditLog.recordCount')}</th>
-                    <th>{t('gdprAuditLog.details')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {event.gdprAuditLogs.map((log) => (
-                    <tr key={log.id}>
-                      <td>{format.dateTime(new Date(log.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
-                      <td>
-                        <Badge
-                          color=""
-                          pill
-                          style={{
-                            fontSize: '0.72rem',
-                            backgroundColor: log.action === 'DATA_DELETED' ? '#FFF3CD' : log.action === 'DATA_EXPORTED' ? '#D1ECF1' : '#D4EDDA',
-                            color: log.action === 'DATA_DELETED' ? '#856404' : log.action === 'DATA_EXPORTED' ? '#0C5460' : '#155724',
-                          }}
-                        >
-                          {t(`gdprAuditLog.actions.${log.action}`)}
-                        </Badge>
-                      </td>
-                      <td>{log.recordCount}</td>
-                      <td style={{ maxWidth: 200 }} className="text-truncate">
-                        {log.details ? JSON.stringify(JSON.parse(log.details)) : '—'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </details>
-          </CardBody>
-        </Card>
-      )}
     </>
   );
 }

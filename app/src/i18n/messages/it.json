@@ -93,7 +93,9 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Registrazione",
-      "settingsSection": "Impostazioni evento"
+      "settingsSection": "Impostazioni evento",
+      "sessionsAndRecordings": "Sessioni e registrazioni video",
+      "postEventSection": "Post-evento e feedback"
     },
     "status": {
       "DRAFT": "Bozza",
@@ -686,8 +688,12 @@
     "links": {
       "title": "Link dell'evento",
       "publicPage": "Pagina pubblica evento",
+      "publicPageHint": "La pagina da condividere per raccogliere nuove iscrizioni.",
+      "guestJoin": "Invito diretto (senza registrazione)",
+      "guestJoinHint": "Link rapido per invitare un partecipante all'ultimo momento: accede come ospite quando l'evento è dal vivo, senza compilare il form di registrazione.",
       "moderatorLink": "Link moderatore",
       "moderatorLinkHint": "Condividi questo link solo con i moderatori. Chiunque lo abbia può gestire l'evento.",
+      "liveRoomHint": "Link per entrare direttamente nella stanza come moderatore.",
       "copyLink": "Copia link",
       "copied": "Copiato!"
     },
@@ -702,6 +708,7 @@
     },
     "gdprAuditLog": {
       "title": "Registro GDPR",
+      "subtitle": "Azioni di privacy tracciate per questo evento: consensi, export, cancellazioni.",
       "date": "Data",
       "action": "Azione",
       "recordCount": "Record",
@@ -1629,14 +1636,23 @@
     "estimates": "Stima risorse",
     "moderator": "Moderatore",
     "participants": "Partecipanti",
+    "bridge": "Video Bridge",
     "jvb": "Video Bridge",
     "jibri": "Registrazione",
-    "bandwidth": {
-      "moderator": "Banda moderatore",
-      "participant": "Banda per partecipante",
-      "total": "Banda totale stimata"
+    "occupancy": "Occupazione",
+    "sizedForRegistrations": "Basato su {count} iscritti attuali",
+    "sizedForCapacity": "Basato su capacità massima di {count}",
+    "chips": {
+      "mic": "Microfono",
+      "video": "Webcam",
+      "screen": "Screen share"
     },
-    "jvbCount": "JVB necessari",
+    "bandwidth": {
+      "moderator": "Banda moderatore ↑",
+      "participant": "Banda partecipante ↓",
+      "total": "Banda totale"
+    },
+    "jvbCount": "Infrastruttura",
     "jvbRam": "RAM JVB stimata",
     "storage": "Storage registrazione",
     "duration": "Durata stimata",
