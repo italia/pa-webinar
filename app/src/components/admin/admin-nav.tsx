@@ -50,6 +50,7 @@ const MONITORING_SUB_NAV: NavItem[] = [
 const SETTINGS_SUB_NAV: NavItem[] = [
   { href: '/admin/settings', icon: 'it-settings', labelKey: 'settingsGeneral', exact: true },
   { href: '/admin/settings/languages', icon: 'it-hearing', labelKey: 'settingsLanguages' },
+  { href: '/admin/settings/gdpr-templates', icon: 'it-lock', labelKey: 'settingsGdprTemplates' },
 ];
 
 export default function AdminNav() {
@@ -90,6 +91,7 @@ export default function AdminNav() {
     '/admin/gdpr-audit': ['/admin/gdpr-audit'],
     '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
     '/admin/settings/languages': ['/admin/settings/languages', '/admin/impostazioni/lingue'],
+    '/admin/settings/gdpr-templates': ['/admin/settings/gdpr-templates'],
     '/admin/infrastructure': ['/admin/infrastructure', '/admin/infrastruttura'],
     '/admin/monitoring': ['/admin/monitoring'],
   };

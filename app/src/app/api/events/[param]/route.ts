@@ -15,6 +15,7 @@ import {
   constantTimeEqual,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
+import { calculateEstimates } from '@/lib/estimates';
 
 export const dynamic = 'force-dynamic';
 
@@ -167,6 +168,39 @@ export const PUT = withErrorHandling(async (request, context) => {
     (data.startsAt !== undefined && new Date(data.startsAt).getTime() !== event.startsAt.getTime()) ||
     (data.endsAt !== undefined && new Date(data.endsAt).getTime() !== event.endsAt.getTime());
 
+  // Recompute the capacity estimate snapshot when any input that feeds
+  // into it changed. Skipped if none of these fields were touched — we
+  // don't want an idempotent update (e.g. toggling only `status`) to
+  // rewrite the pre-event estimate that autoscalers already read.
+  const capacityInputsTouched =
+    data.maxParticipants !== undefined ||
+    data.startsAt !== undefined ||
+    data.endsAt !== undefined ||
+    data.recordingEnabled !== undefined ||
+    data.participantsCanUnmute !== undefined ||
+    data.participantsCanStartVideo !== undefined ||
+    data.participantsCanShareScreen !== undefined;
+
+  const nextCapacityEstimate = capacityInputsTouched
+    ? {
+        ...calculateEstimates({
+          maxParticipants: data.maxParticipants ?? event.maxParticipants,
+          startsAt:
+            data.startsAt ?? event.startsAt.toISOString(),
+          endsAt: data.endsAt ?? event.endsAt.toISOString(),
+          recordingEnabled:
+            data.recordingEnabled ?? event.recordingEnabled,
+          participantsCanUnmute:
+            data.participantsCanUnmute ?? event.participantsCanUnmute,
+          participantsCanStartVideo:
+            data.participantsCanStartVideo ?? event.participantsCanStartVideo,
+          participantsCanShareScreen:
+            data.participantsCanShareScreen ?? event.participantsCanShareScreen,
+        }),
+        computedAt: new Date().toISOString(),
+      }
+    : undefined;
+
   const updated = await prisma.event.update({
     where: { id: eventId },
     data: {
@@ -230,6 +264,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.recordingFileSize !== undefined && { recordingFileSize: data.recordingFileSize }),
       ...(data.recordingDuration !== undefined && { recordingDuration: data.recordingDuration }),
       ...(data.status !== undefined && { status: data.status }),
+      ...(nextCapacityEstimate !== undefined && {
+        capacityEstimateJson: nextCapacityEstimate,
+      }),
     },
   });
 

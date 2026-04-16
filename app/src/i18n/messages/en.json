@@ -7,6 +7,7 @@
     "errorMessage": "Something went wrong. Please try again.",
     "retry": "Retry",
     "save": "Save",
+    "saving": "Saving...",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "close": "Close",
@@ -304,6 +305,7 @@
       "recordingsList": "Video recordings",
       "settingsGeneral": "General",
       "settingsLanguages": "Languages",
+      "settingsGdprTemplates": "GDPR templates",
       "ariaLabel": "Admin navigation",
       "subNavAriaLabel": "Section navigation"
     },
@@ -872,6 +874,31 @@
       "uploadBtn": "Upload",
       "deleteConfirm": "Are you sure you want to delete this file?",
       "noFiles": "No files uploaded. Use the \"Upload file\" button to add materials."
+    },
+    "gdprTemplates": {
+      "title": "GDPR templates",
+      "subtitle": "Create and manage reusable privacy notices shared across events. A template marked as default is pre-selected on new events.",
+      "newTemplate": "New template",
+      "emptyState": "No templates yet. Create one to reuse the same privacy text across multiple events.",
+      "defaultBadge": "Default",
+      "usedByEvents": "{count, plural, =0 {No events linked} =1 {1 event linked} other {# events linked}}",
+      "confirmDelete": "Delete template \"{name}\"? {count, plural, =0 {} =1 {1 event will lose its reference.} other {# events will lose their reference.}}",
+      "form": {
+        "newTitle": "New GDPR template",
+        "editTitle": "Edit GDPR template",
+        "name": "Internal name",
+        "namePlaceholder": "e.g. DTD standard privacy notice",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Short notes to recognise the template",
+        "bodyIt": "Privacy text (Italian)",
+        "bodyEn": "Privacy text (English)",
+        "bodyPlaceholder": "Paste the privacy notice text for this locale…",
+        "isDefault": "Use as default for new events",
+        "isDefaultHint": "The default template is pre-selected on the new event form. Only one template can be the default at a time."
+      },
+      "errors": {
+        "saveFailed": "Save failed. Check the fields and retry."
+      }
     },
     "languages": {
       "title": "Language management",
