@@ -330,6 +330,9 @@
       "admin": "Administration",
       "eventDetail": "Event detail",
       "eventEdit": "Edit event",
+      "publications": "Publications",
+      "publicationsList": "All publications",
+      "publicationsImportYoutube": "Import from YouTube",
       "ariaLabel": "Admin navigation",
       "subNavAriaLabel": "Section navigation"
     },
@@ -358,6 +361,76 @@
       "settingsDescription": "Configure branding, content, languages, privacy and platform behaviour.",
       "liveNow": "{count, plural, one {# event live} other {# events live}}",
       "upcomingEvents": "{count, plural, one {# upcoming event} other {# upcoming events}}"
+    },
+    "publications": {
+      "title": "Publications",
+      "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, YouTube legacy imports, and sessions waiting to be promoted.",
+      "importYoutube": "Import from YouTube",
+      "searchPlaceholder": "Search by title or description…",
+      "listedAny": "All (listed and unlisted)",
+      "listedYes": "Only in library",
+      "listedNo": "Only not in library",
+      "empty": "No publications match the current filters.",
+      "untitled": "(untitled)",
+      "tabs": {
+        "all": "All",
+        "scheduled": "Events",
+        "instant": "Instant calls",
+        "legacy": "Legacy YouTube",
+        "pending": "To promote"
+      },
+      "source": {
+        "scheduled": "Event",
+        "instant": "Instant",
+        "legacy": "Legacy"
+      },
+      "badges": {
+        "listed": "In library",
+        "unlisted": "Not in library",
+        "pending": "{count, plural, =1 {1 recording to promote} other {# recordings to promote}}"
+      },
+      "meta": {
+        "registrations": "{count, plural, =0 {No registrations} =1 {1 registered} other {# registered}}"
+      },
+      "actions": {
+        "edit": "Edit event",
+        "preview": "Public preview",
+        "list": "List in library",
+        "unlist": "Remove from library"
+      },
+      "importYoutubePage": {
+        "title": "Import a YouTube video",
+        "subtitle": "Paste the URL of an existing YouTube video. Title, author and thumbnail are pre-filled from the public oEmbed API.",
+        "urlLabel": "YouTube URL",
+        "urlPlaceholder": "https://www.youtube.com/watch?v=…",
+        "urlHint": "youtu.be short links also accepted. The video must be public or unlisted.",
+        "fetchPreview": "Analyze",
+        "previewTitle": "Video preview",
+        "videoId": "Video ID",
+        "metadataTitle": "Publication metadata",
+        "titleIt": "Title (Italian)",
+        "titleEn": "Title (English)",
+        "description": "Description",
+        "startsAt": "Original event date",
+        "organizer": "Organizer",
+        "speakers": "Speakers",
+        "speakersPlaceholder": "Comma-separated",
+        "libraryListed": "Publish in the video library now",
+        "save": "Import and create publication",
+        "thumb": {
+          "maxres": "Max resolution",
+          "high": "High",
+          "standard": "Standard",
+          "hint": "Pick the cover to use as library banner."
+        },
+        "errors": {
+          "previewFirst": "Analyze the URL first so we can pull its metadata.",
+          "previewFailed": "Couldn't analyze the URL. Make sure it points to a valid YouTube video.",
+          "titleRequired": "The Italian title is required (at least 3 characters).",
+          "dateRequired": "The original date is required.",
+          "saveFailed": "Save failed. Please retry."
+        }
+      }
     },
     "recordingsLibrary": {
       "title": "Video recordings",

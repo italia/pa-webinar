@@ -15,6 +15,7 @@ interface NavItem {
 const MAIN_SECTIONS: NavItem[] = [
   { href: '/admin/events', icon: 'it-calendar', labelKey: 'events' },
   { href: '/admin/registrations', icon: 'it-user', labelKey: 'registrations' },
+  { href: '/admin/publications', icon: 'it-files', labelKey: 'publications' },
   { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordings' },
   { href: '/admin/monitoring', icon: 'it-presentation', labelKey: 'monitoring' },
   { href: '/admin/settings', icon: 'it-settings', labelKey: 'settings' },
@@ -39,6 +40,12 @@ const REGISTRATIONS_SUB_NAV: NavItem[] = [
 // Recordings / instant calls / live sessions — everything video-output.
 const RECORDINGS_SUB_NAV: NavItem[] = [
   { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordingsList', exact: true },
+];
+
+// Publications area: unified library editing.
+const PUBLICATIONS_SUB_NAV: NavItem[] = [
+  { href: '/admin/publications', icon: 'it-files', labelKey: 'publicationsList', exact: true },
+  { href: '/admin/publications/import-youtube', icon: 'it-plus', labelKey: 'publicationsImportYoutube' },
 ];
 
 // Monitoring groups together all the observability surfaces.
@@ -77,6 +84,7 @@ export default function AdminNav() {
     || stripped.startsWith('/admin/gdpr-audit');
   const inRecordings = stripped.startsWith('/admin/recordings')
     || stripped.startsWith('/admin/registrazioni-video');
+  const inPublications = stripped.startsWith('/admin/publications');
 
   const PATH_ALIASES: Record<string, string[]> = {
     '/admin/events': ['/admin/events', '/admin/eventi'],
@@ -87,6 +95,8 @@ export default function AdminNav() {
     '/admin/calendar': ['/admin/calendar', '/admin/calendario'],
     '/admin/registrations': ['/admin/registrations', '/admin/iscrizioni'],
     '/admin/recordings': ['/admin/recordings', '/admin/registrazioni-video'],
+    '/admin/publications': ['/admin/publications'],
+    '/admin/publications/import-youtube': ['/admin/publications/import-youtube'],
     '/admin/moderators': ['/admin/moderators', '/admin/moderatori'],
     '/admin/gdpr-audit': ['/admin/gdpr-audit'],
     '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
@@ -109,6 +119,7 @@ export default function AdminNav() {
     if (item.href === '/admin/settings') return inSettings;
     if (item.href === '/admin/registrations') return inRegistrations;
     if (item.href === '/admin/recordings') return inRecordings;
+    if (item.href === '/admin/publications') return inPublications;
     return matchesPath(item.href);
   }
 
@@ -123,11 +134,13 @@ export default function AdminNav() {
       ? REGISTRATIONS_SUB_NAV
       : inRecordings
         ? RECORDINGS_SUB_NAV
-        : inMonitoring
-          ? MONITORING_SUB_NAV
-          : inSettings
-            ? SETTINGS_SUB_NAV
-            : null;
+        : inPublications
+          ? PUBLICATIONS_SUB_NAV
+          : inMonitoring
+            ? MONITORING_SUB_NAV
+            : inSettings
+              ? SETTINGS_SUB_NAV
+              : null;
 
   return (
     <div>

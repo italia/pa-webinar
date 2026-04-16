@@ -400,6 +400,9 @@
       "admin": "Amministrazione",
       "eventDetail": "Dettaglio evento",
       "eventEdit": "Modifica evento",
+      "publications": "Pubblicazioni",
+      "publicationsList": "Tutte le pubblicazioni",
+      "publicationsImportYoutube": "Importa da YouTube",
       "ariaLabel": "Navigazione amministrazione",
       "subNavAriaLabel": "Navigazione sezione"
     },
@@ -428,6 +431,76 @@
       "settingsDescription": "Configura branding, contenuti, lingue, privacy e comportamento della piattaforma.",
       "liveNow": "{count, plural, one {# evento live} other {# eventi live}}",
       "upcomingEvents": "{count, plural, one {# evento in programma} other {# eventi in programma}}"
+    },
+    "publications": {
+      "title": "Pubblicazioni",
+      "subtitle": "Hub editoriale unico per tutti i video pubblicati: eventi schedulati, call istantanee, legacy YouTube e sessioni in attesa di promozione.",
+      "importYoutube": "Importa da YouTube",
+      "searchPlaceholder": "Cerca per titolo o descrizione…",
+      "listedAny": "Tutti (libreria e non)",
+      "listedYes": "Solo pubblicati in libreria",
+      "listedNo": "Solo non in libreria",
+      "empty": "Nessuna pubblicazione per i filtri correnti.",
+      "untitled": "(senza titolo)",
+      "tabs": {
+        "all": "Tutte",
+        "scheduled": "Eventi",
+        "instant": "Chiamate rapide",
+        "legacy": "Legacy YouTube",
+        "pending": "Da promuovere"
+      },
+      "source": {
+        "scheduled": "Evento",
+        "instant": "Rapida",
+        "legacy": "Legacy"
+      },
+      "badges": {
+        "listed": "In libreria",
+        "unlisted": "Non in libreria",
+        "pending": "{count, plural, =1 {1 registrazione da promuovere} other {# registrazioni da promuovere}}"
+      },
+      "meta": {
+        "registrations": "{count, plural, =0 {Nessuna iscrizione} =1 {1 iscritto} other {# iscritti}}"
+      },
+      "actions": {
+        "edit": "Modifica evento",
+        "preview": "Anteprima pubblica",
+        "list": "Pubblica in libreria",
+        "unlist": "Rimuovi dalla libreria"
+      },
+      "importYoutubePage": {
+        "title": "Importa video da YouTube",
+        "subtitle": "Incolla l'URL di un video YouTube esistente. Titolo, autore e anteprima vengono pre-compilati dall'API pubblica oEmbed.",
+        "urlLabel": "URL YouTube",
+        "urlPlaceholder": "https://www.youtube.com/watch?v=…",
+        "urlHint": "Accettati anche i link brevi youtu.be. Serve un video pubblico o non listato.",
+        "fetchPreview": "Analizza",
+        "previewTitle": "Anteprima video",
+        "videoId": "ID video",
+        "metadataTitle": "Metadati pubblicazione",
+        "titleIt": "Titolo (italiano)",
+        "titleEn": "Titolo (inglese)",
+        "description": "Descrizione",
+        "startsAt": "Data originale dell'evento",
+        "organizer": "Organizzatore",
+        "speakers": "Relatori",
+        "speakersPlaceholder": "Separati da virgola",
+        "libraryListed": "Pubblica subito in libreria video",
+        "save": "Importa e crea pubblicazione",
+        "thumb": {
+          "maxres": "Max risoluzione",
+          "high": "Alta",
+          "standard": "Standard",
+          "hint": "Scegli la copertina da usare come banner in libreria."
+        },
+        "errors": {
+          "previewFirst": "Analizza prima l'URL per recuperare i metadati.",
+          "previewFailed": "Impossibile analizzare l'URL. Verifica che sia un video YouTube valido.",
+          "titleRequired": "Il titolo in italiano è obbligatorio (almeno 3 caratteri).",
+          "dateRequired": "La data originale è obbligatoria.",
+          "saveFailed": "Salvataggio non riuscito. Riprova."
+        }
+      }
     },
     "recordingsLibrary": {
       "title": "Registrazioni video",
