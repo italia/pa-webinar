@@ -34,7 +34,13 @@ const UUID_RE =
 /**
  * Verify a moderator token belongs to the given event and return the event.
  * Accepts either a UUID id or a slug for the event lookup.
- * Returns null if the token is invalid or doesn't match.
+ *
+ * Two accepted tokens:
+ *   - `Event.moderatorToken` (primary owner magic link, always valid)
+ *   - `EventModerator.token` (co-moderator magic link; must not be
+ *     revoked and must reference the same event)
+ *
+ * Returns null if no match.
  */
 export async function verifyModeratorToken(
   eventIdOrSlug: string,
@@ -45,10 +51,47 @@ export async function verifyModeratorToken(
     : { slug: eventIdOrSlug };
 
   const event = await prisma.event.findUnique({ where });
+  if (!event) return null;
 
-  if (!event || !constantTimeEqual(event.moderatorToken, token)) {
-    return null;
+  if (constantTimeEqual(event.moderatorToken, token)) {
+    return event;
   }
 
-  return event;
+  // Co-moderator path: lookup by token, then cross-check that it points
+  // at the same event and hasn't been revoked.
+  const coMod = await prisma.eventModerator.findUnique({ where: { token } });
+  if (coMod && coMod.eventId === event.id && coMod.revokedAt === null) {
+    return event;
+  }
+
+  return null;
+}
+
+/**
+ * Resolve a moderator token to its human-readable display name.
+ * Returns the Event's primary moderator name for the primary token,
+ * the co-moderator's own name for a secondary token, or null when no
+ * match (caller decides fallback — usually the pre-join input).
+ */
+export async function resolveModeratorName(
+  eventIdOrSlug: string,
+  token: string,
+): Promise<string | null> {
+  const where = UUID_RE.test(eventIdOrSlug)
+    ? { id: eventIdOrSlug }
+    : { slug: eventIdOrSlug };
+
+  const event = await prisma.event.findUnique({ where });
+  if (!event) return null;
+
+  if (constantTimeEqual(event.moderatorToken, token)) {
+    return event.moderatorName ?? null;
+  }
+
+  const coMod = await prisma.eventModerator.findUnique({ where: { token } });
+  if (coMod && coMod.eventId === event.id && coMod.revokedAt === null) {
+    return coMod.name;
+  }
+
+  return null;
 }

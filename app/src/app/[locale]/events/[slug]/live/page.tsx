@@ -118,7 +118,17 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     redirect(`/${locale}/events/${slug}/registration`);
   }
 
-  const isModerator = event.moderatorToken === token;
+  const isPrimaryModerator = event.moderatorToken === token;
+
+  // Co-moderator path: token matches an EventModerator row for this
+  // event (and isn't revoked). Resolved in a single query so we get the
+  // co-moderator's own display name to propagate to the pre-join flow.
+  const coMod = isPrimaryModerator
+    ? null
+    : await prisma.eventModerator.findUnique({ where: { token } });
+  const isCoModerator =
+    !!coMod && coMod.eventId === event.id && coMod.revokedAt === null;
+  const isModerator = isPrimaryModerator || isCoModerator;
 
   let participantInfo: { displayName: string } | null = null;
   if (!isModerator) {
@@ -158,13 +168,16 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       isModerator={isModerator}
       isGuest={false}
       displayName={
-        isModerator
-          // Leave blank on moderator magic-link so multiple co-moderators
-          // each type their own name. The configured moderatorName is a
-          // fallback only (used by Jitsi if the user skips the prejoin
-          // form), not a pre-filled default in the display-name input.
-          ? ''
-          : participantInfo?.displayName ?? 'Partecipante'
+        isCoModerator && coMod
+          // Named co-moderator via EventModerator row — greet them by
+          // name in the pre-join input (still editable).
+          ? coMod.name
+          : isModerator
+            // Primary moderator magic-link (shared): keep the input
+            // empty so anyone opening the link types their own name
+            // rather than inheriting the configured moderatorName.
+            ? ''
+            : participantInfo?.displayName ?? 'Partecipante'
       }
       locale={locale}
       jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}

@@ -131,17 +131,51 @@ model Event {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  registrations   Registration[]
-  questions       Question[]
-  polls           Poll[]
-  materials       EventMaterial[]
-  reminders       EventReminder[]
-  gdprAuditLogs   GdprAuditLog[]
-  feedback        EventFeedback[]
-  wordCloudRounds WordCloudRound[]
-  callSessions    CallSession[]
+  registrations    Registration[]
+  questions        Question[]
+  polls            Poll[]
+  materials        EventMaterial[]
+  reminders        EventReminder[]
+  gdprAuditLogs    GdprAuditLog[]
+  feedback         EventFeedback[]
+  wordCloudRounds  WordCloudRound[]
+  callSessions     CallSession[]
+  additionalMods   EventModerator[]
 
   @@map("events")
+}
+
+// ─── Additional moderators ───────────────────────────────────
+//
+// Beyond the primary `Event.moderatorToken` (which acts as the
+// "owner" magic link), events can have any number of named
+// co-moderators with their own individual magic-link tokens. Each
+// row carries a display name and optional email so:
+//
+//   - The pre-join screen can greet the co-moderator by name without
+//     leaking the primary moderator's name (fixes the shared-link
+//     issue where everyone showed up as the original moderator).
+//   - Revoking access to a single co-moderator doesn't invalidate the
+//     other moderators' links.
+//   - An audit trail at /admin/events/[id] shows who has access.
+model EventModerator {
+  id    String @id @default(uuid()) @db.Uuid
+  eventId String @map("event_id") @db.Uuid
+
+  name  String
+  email String?
+
+  // Per-moderator magic link token. Still UUID so `randomUUID()` from
+  // crypto can generate it safely.
+  token String @unique
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@map("event_moderators")
 }
 
 // ─── GDPR Templates ─────────────────────────────────────────
