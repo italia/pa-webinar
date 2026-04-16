@@ -9,7 +9,7 @@ on:
 jobs:
   lint:
     name: Lint & Typecheck
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-eventi-dtd
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,7 +22,7 @@ jobs:
 
   test:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-eventi-dtd
     services:
       postgres:
         image: postgres:16-alpine
@@ -49,7 +49,7 @@ jobs:
 
   security:
     name: Security Scan
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-eventi-dtd
     steps:
       - uses: actions/checkout@v4
       - name: Run Trivy vulnerability scanner
@@ -62,7 +62,7 @@ jobs:
 
   license-check:
     name: License Compliance
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-eventi-dtd
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -83,7 +83,7 @@ jobs:
 
   migration-check:
     name: Migration Integrity
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-eventi-dtd
     services:
       postgres:
         image: postgres:16-alpine
@@ -120,7 +120,7 @@ jobs:
 
   e2e:
     name: E2E Smoke Tests
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-eventi-dtd
     needs: [lint, test]
     steps:
       - uses: actions/checkout@v4
@@ -159,7 +159,7 @@ jobs:
 
   docker:
     name: Docker Build & Scan
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-eventi-dtd
     needs: [lint, test]
     steps:
       - uses: actions/checkout@v4
