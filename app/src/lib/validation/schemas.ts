@@ -36,6 +36,15 @@ const eventBaseSchema = z.object({
   /** Cleartext join password. Server hashes and stores in `join_password_hash`.
    *  Empty string clears the password (sets the column back to NULL). */
   joinPassword: z.string().max(200).optional(),
+  youtubeUrl: z
+    .string()
+    .url()
+    .refine(
+      (u) => /(?:youtube\.com|youtu\.be)/i.test(u),
+      { message: 'URL must point to youtube.com or youtu.be' },
+    )
+    .nullable()
+    .optional(),
   moderatorName: z.string().min(2).max(100).optional(),
   moderatorEmail: z.string().email().optional(),
   speakersInfo: localizedStringField.optional(),

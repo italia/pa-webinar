@@ -272,6 +272,7 @@ export const PUT = withErrorHandling(async (request, context) => {
         joinPasswordHash:
           data.joinPassword.length > 0 ? hashJoinPassword(data.joinPassword) : null,
       }),
+      ...(data.youtubeUrl !== undefined && { youtubeUrl: data.youtubeUrl }),
     },
   });
 

@@ -66,11 +66,14 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      `frame-src 'self' https://${jitsiDomain}`,
+      // Also allow YouTube for the public video-library embed (legacy
+      // events host their recordings on youtube.com before we owned
+      // Jibri infra). img-src mirrors this so YT preview thumbs load.
+      `frame-src 'self' https://${jitsiDomain} https://www.youtube.com https://www.youtube-nocookie.com`,
       `script-src 'self' 'unsafe-inline' https://${jitsiDomain}`,
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
-      "img-src 'self' data: blob:",
+      "img-src 'self' data: blob: https://i.ytimg.com",
       `connect-src 'self' https://${jitsiDomain} wss://${jitsiDomain}`,
       `media-src ${mediaSrc}`,
     ].join('; '),
