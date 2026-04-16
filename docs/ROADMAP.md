@@ -284,9 +284,16 @@ Note raccolte durante la prima demo live con stakeholder interni. Alcune
 voci sono bug da sistemare rapidamente (hotfix v0.2.x), altre sono
 miglioramenti UX e feature nuove che vanno pianificate.
 
+**Stato** (aggiornato 2026-04-16 pomeriggio):
+
+- ✅ Strato 1 (hotfix) + Strato 2 (UX refinement) consolidati e
+  rilasciati su `dev` / `videocall-test`. Vedi log commit da
+  `2c9e60e` (mani alzate + display name) a `ba1ce1a` (UI co-mod).
+- 🧠 Strato 3 (trascrizione + AI) resta da progettare — vedi sotto.
+
 ### Hotfix (candidate v0.2.x)
 
-- **Mani alzate — lista non affidabile**
+- ✅ **Mani alzate — lista non affidabile**
   Cliccando "Mani alzate" non sempre compare chi ha alzato la mano;
   quando io stesso alzo la mano mi vedo come "Partecipante" e non col
   mio nome vero. Aggiungere ordinamento FIFO (prima l'ha alzata → prima
@@ -297,7 +304,7 @@ miglioramenti UX e feature nuove che vanno pianificate.
   **Effort**: S (0.5–1 giorno). Fix lato `raised-hands-panel` +
   cross-check con `participants` list.
 
-- **Moderatore aggiuntivo non riesce a muteare tutti**
+- ✅ **Moderatore aggiuntivo non riesce a muteare tutti**
   Una collega entrata con il link moderatore (stesso token) non
   riusciva a silenziare gli altri. Il pulsante "Mute all" probabilmente
   è rilegato al primo moderatore che entra (session-based) anziché al
@@ -305,7 +312,7 @@ miglioramenti UX e feature nuove che vanno pianificate.
   `moderator-controls` in presenza di più moderatori.
   **Effort**: S (mezza giornata di indagine + fix).
 
-- **Magic-link moderatore con nome preconfigurato**
+- ✅ **Magic-link moderatore con nome preconfigurato**
   Condividendo il link moderatore al collega, lui trovava il mio nome
   già impostato nella sala d'attesa. Va separato: il display-name in
   pre-join deve essere vuoto di default per chiunque apra il link, non
@@ -315,21 +322,21 @@ miglioramenti UX e feature nuove che vanno pianificate.
 
 ### UX refinement (v0.3.x)
 
-- **Navigazione e breadcrumb**
+- ✅ **Navigazione e breadcrumb**
   In più pagine (admin + public) mancano pulsanti "Indietro" o il link
   alla sezione di origine. Passata sistematica: ogni pagina admin deve
   avere breadcrumb coerente e un modo di tornare al parent logico.
   **Effort**: M (2–3 giorni sparsi). Aggiungere un componente
   `AdminBreadcrumb` guidato dalla route e usarlo ovunque.
 
-- **Password opzionale per call (soprattutto instant)**
+- ✅ **Password opzionale per call (soprattutto instant)**
   Campo `password` opzionale sull'evento; se settato, il join page
   chiede la password prima di emettere il JWT Jitsi. Per le instant
   call la password va proposta nella UI di creazione ("call privata?").
   Lato Jitsi: `config.roomPassword` o custom gating nel Prosody.
   **Effort**: M (1–2 giorni).
 
-- **Gestione magic-link multi-moderatore**
+- ✅ **Gestione magic-link multi-moderatore**
   Oggi esiste un solo `moderatorToken` per evento — chiunque lo riceve
   diventa moderatore anonimo. Serve un modello `EventModerator` con
   magic-link personali (nome + email + token individuale) così che:
@@ -339,7 +346,7 @@ miglioramenti UX e feature nuove che vanno pianificate.
   **Effort**: M/L (2–4 giorni). Nuovo model + UI admin + migration
   del token singolo a "primary moderator" per eventi esistenti.
 
-- **Libreria video pubblica**
+- ✅ **Libreria video pubblica**
   Nuova sezione `/video-library` pubblica dove sfogliare tutti i video
   degli eventi passati (pubblicati) con filtri per data / argomento /
   tipo evento. Include:
