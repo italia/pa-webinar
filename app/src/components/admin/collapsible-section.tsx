@@ -1,33 +1,49 @@
 'use client';
 
 import { useState } from 'react';
-import { Icon, Badge } from 'design-react-kit';
+import { Badge } from 'design-react-kit';
 
 interface CollapsibleSectionProps {
   id: string;
   title: string;
-  icon: string;
+  /**
+   * Icon hint for the header. Kept in the props for backwards compatibility
+   * with existing call sites but ignored — design-react-kit's <Icon> loads
+   * its SVG asynchronously and populates a module-level cache, which makes
+   * the server and client disagree on the rendered markup once any other
+   * page has pre-warmed the cache (React hydration error #418). The header
+   * is already clear without the thematic icon; the chevron below signals
+   * collapsibility.
+   */
+  icon?: string;
   defaultOpen?: boolean;
   badge?: string | number;
   subtitle?: string;
-  /**
-   * `bare` drops the outer border/background so we can wrap sub-components
-   * that already render their own Card, without producing nested frames.
-   * The expanded content then flows directly inside the parent container.
-   */
   bare?: boolean;
   children: React.ReactNode;
 }
 
-/**
- * Accordion row used on admin event screens (create + manage) to keep the
- * surface calm: only the opened section reveals its controls. The header
- * is a full-width button so it's touch-friendly on mobile.
- */
+// Hard-coded inline SVGs for the expand/collapse chevron: rendered
+// identically on SSR and hydration, so no iconsCache warm-up path can
+// drift between server and client.
+function ChevronDown() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A768A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+function ChevronUp() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A768A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="18 15 12 9 6 15" />
+    </svg>
+  );
+}
+
 export default function CollapsibleSection({
   id,
   title,
-  icon,
   defaultOpen = false,
   badge,
   subtitle,
@@ -59,7 +75,6 @@ export default function CollapsibleSection({
         aria-controls={`section-${id}`}
       >
         <div className="d-flex align-items-center gap-2 text-start flex-grow-1" style={{ minWidth: 0 }}>
-          <Icon icon={icon} size="sm" color="primary" />
           <div style={{ minWidth: 0 }}>
             <h5
               className="fw-semibold mb-0"
@@ -82,12 +97,9 @@ export default function CollapsibleSection({
             )}
           </div>
         </div>
-        <Icon
-          icon={open ? 'it-collapse' : 'it-expand'}
-          size="sm"
-          color="secondary"
-          className="flex-shrink-0 ms-2"
-        />
+        <span className="flex-shrink-0 ms-2 d-inline-flex">
+          {open ? <ChevronUp /> : <ChevronDown />}
+        </span>
       </button>
       {open && (
         <div id={`section-${id}`} className={contentPadding}>
