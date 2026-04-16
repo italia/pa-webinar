@@ -29,6 +29,7 @@ import RecordingManagement from './recording-management';
 import CallSessionsPanel from './call-sessions-panel';
 import PostEventConfig from './post-event-config';
 import CollapsibleSection from './collapsible-section';
+import EventModeratorsPanel from './event-moderators-panel';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   MINISTRY: { it: 'Ministero', en: 'Ministry' },
@@ -846,6 +847,21 @@ export default function EventManagementClient({
             {event.feedbackEnabled && status === 'ENDED' && (
               <EventFeedbackAdmin slug={event.slug} token={event.moderatorToken} />
             )}
+          </CollapsibleSection>
+
+          {/* ── Co-moderators ── */}
+          <CollapsibleSection
+            id="co-moderators"
+            title={t('coModerators.title')}
+            icon="it-user"
+          >
+            <EventModeratorsPanel
+              eventId={event.id}
+              eventSlug={event.slug}
+              moderatorToken={event.moderatorToken}
+              baseUrl={baseUrl}
+              locale={locale}
+            />
           </CollapsibleSection>
 
           {/* ── Reminders ── */}

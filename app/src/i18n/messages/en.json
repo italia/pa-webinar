@@ -666,6 +666,25 @@
       "noComments": "No comments",
       "stars": "stars"
     },
+    "coModerators": {
+      "title": "Co-moderators",
+      "intro": "Add extra moderators with individual magic-links.",
+      "introHint": "Each co-moderator has their own display name in the room and a token that can be revoked without invalidating the primary moderator link.",
+      "add": "Add co-moderator",
+      "name": "Name visible in room",
+      "email": "Email (optional)",
+      "emailPlaceholder": "to send them the link",
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "revoke": "Revoke",
+      "revoked": "Revoked",
+      "confirmRevoke": "Revoke this co-moderator's access? The link will stop working immediately.",
+      "empty": "No co-moderators added. The primary moderator link is the only moderator access.",
+      "activeCount": "{count, plural, =0 {No active co-moderators} =1 {1 active co-moderator} other {# active co-moderators}}",
+      "errors": {
+        "addFailed": "Couldn't add the co-moderator. Please retry."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR Audit Log",
       "subtitle": "Privacy actions tracked for this event: consent, export, deletions.",
