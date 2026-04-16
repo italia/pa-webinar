@@ -14,6 +14,7 @@ import { localizedUrl } from '@/lib/utils/localized-url';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { getPublicEnv } from '@/lib/env';
 import { calculateEstimates } from '@/lib/estimates';
+import { hashJoinPassword } from '@/lib/auth/password';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,6 +93,10 @@ export const POST = withErrorHandling(async (request) => {
         ...capacityEstimate,
         computedAt: new Date().toISOString(),
       },
+      joinPasswordHash:
+        data.joinPassword && data.joinPassword.length > 0
+          ? hashJoinPassword(data.joinPassword)
+          : null,
       // Default reminders: 1 day and 1 hour before
       reminders: {
         create: [

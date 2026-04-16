@@ -152,6 +152,15 @@
   },
   "live": {
     "title": "Event room",
+    "password": {
+      "title": "Join password",
+      "label": "Enter the password",
+      "submit": "Join",
+      "submitting": "Verifying...",
+      "wrong": "Wrong password. Try again.",
+      "rateLimited": "Too many attempts. Wait a minute and try again.",
+      "generic": "Verification error. Try again."
+    },
     "connecting": "Connecting...",
     "connectionError": "Unable to connect to the room. Check your connection and try again.",
     "recordingActive": "Recording in progress",
@@ -861,6 +870,10 @@
       "namePlaceholder": "e.g. Quick sync, Project demo...",
       "moderatorLabel": "Your name (optional)",
       "moderatorPlaceholder": "Shown in the call",
+      "passwordLabel": "Join password (optional)",
+      "passwordPlaceholder": "Leave empty for public call",
+      "passwordHint": "If set, guests must type this password to join. Minimum 4 characters. Moderators don't need it.",
+      "passwordTooShort": "Password must be at least 4 characters.",
       "create": "Create and join",
       "creating": "Creating...",
       "copyLink": "Copy invite link",

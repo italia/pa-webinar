@@ -44,6 +44,13 @@ model Event {
   moderatorName  String? @map("moderator_name")
   moderatorEmail String? @map("moderator_email")
 
+  // Optional join password. When set, guests visiting /live without a
+  // valid accessToken or matching password are redirected to a password
+  // prompt before a Jitsi JWT is issued. Stored as a bcrypt hash — never
+  // surfaced via any API response — and bypassed for admin / moderator
+  // sessions (they already authenticated via magic link or JWT).
+  joinPasswordHash String? @map("join_password_hash")
+
   // GDPR
   dataRetentionDays Int     @default(30) @map("data_retention_days")
   privacyPolicyUrl  String? @map("privacy_policy_url")
