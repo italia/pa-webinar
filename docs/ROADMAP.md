@@ -278,7 +278,121 @@ Test automatizzati per i flussi critici:
 - Calendario: download .ics, link Google/Outlook
 - Responsive: test su mobile viewport
 
-## v0.3.0 — Pianificato
+## Feedback post-demo (2026-04-16)
+
+Note raccolte durante la prima demo live con stakeholder interni. Alcune
+voci sono bug da sistemare rapidamente (hotfix v0.2.x), altre sono
+miglioramenti UX e feature nuove che vanno pianificate.
+
+### Hotfix (candidate v0.2.x)
+
+- **Mani alzate — lista non affidabile**
+  Cliccando "Mani alzate" non sempre compare chi ha alzato la mano;
+  quando io stesso alzo la mano mi vedo come "Partecipante" e non col
+  mio nome vero. Aggiungere ordinamento FIFO (prima l'ha alzata → prima
+  in lista) con timestamp visibile, e risolvere la mappatura
+  `jitsi-participant-id → registration.displayName` che evidentemente
+  non sta incrociando le registrazioni in tutti i casi (guest vs
+  registrati, nomi da prejoin).
+  **Effort**: S (0.5–1 giorno). Fix lato `raised-hands-panel` +
+  cross-check con `participants` list.
+
+- **Moderatore aggiuntivo non riesce a muteare tutti**
+  Una collega entrata con il link moderatore (stesso token) non
+  riusciva a silenziare gli altri. Il pulsante "Mute all" probabilmente
+  è rilegato al primo moderatore che entra (session-based) anziché al
+  ruolo. Verificare JWT + permessi Jitsi (affiliation=owner) e bottone
+  `moderator-controls` in presenza di più moderatori.
+  **Effort**: S (mezza giornata di indagine + fix).
+
+- **Magic-link moderatore con nome preconfigurato**
+  Condividendo il link moderatore al collega, lui trovava il mio nome
+  già impostato nella sala d'attesa. Va separato: il display-name in
+  pre-join deve essere vuoto di default per chiunque apra il link, non
+  pre-populato con `event.moderatorName`. Oppure usare
+  `moderatorName` solo come fallback se l'utente non scrive nulla.
+  **Effort**: S (poche ore).
+
+### UX refinement (v0.3.x)
+
+- **Navigazione e breadcrumb**
+  In più pagine (admin + public) mancano pulsanti "Indietro" o il link
+  alla sezione di origine. Passata sistematica: ogni pagina admin deve
+  avere breadcrumb coerente e un modo di tornare al parent logico.
+  **Effort**: M (2–3 giorni sparsi). Aggiungere un componente
+  `AdminBreadcrumb` guidato dalla route e usarlo ovunque.
+
+- **Password opzionale per call (soprattutto instant)**
+  Campo `password` opzionale sull'evento; se settato, il join page
+  chiede la password prima di emettere il JWT Jitsi. Per le instant
+  call la password va proposta nella UI di creazione ("call privata?").
+  Lato Jitsi: `config.roomPassword` o custom gating nel Prosody.
+  **Effort**: M (1–2 giorni).
+
+- **Gestione magic-link multi-moderatore**
+  Oggi esiste un solo `moderatorToken` per evento — chiunque lo riceve
+  diventa moderatore anonimo. Serve un modello `EventModerator` con
+  magic-link personali (nome + email + token individuale) così che:
+  - Ogni moderatore si presenta con il proprio nome
+  - Si possono revocare singoli accessi senza invalidare tutti
+  - Il pannello gestione mostra chi ha accesso come co-moderatore
+  **Effort**: M/L (2–4 giorni). Nuovo model + UI admin + migration
+  del token singolo a "primary moderator" per eventi esistenti.
+
+- **Libreria video pubblica**
+  Nuova sezione `/video-library` pubblica dove sfogliare tutti i video
+  degli eventi passati (pubblicati) con filtri per data / argomento /
+  tipo evento. Include:
+  - Import YouTube: permettere al moderatore di collegare un URL
+    YouTube come "video dell'evento" (embed iframe + link). Utile
+    per retrocompatibilità con registrazioni legacy.
+  - Nuove registrazioni Jibri vengono pubblicate qui automaticamente
+    quando il moderatore marca il record come `recordingPublished`.
+  **Effort**: M (2–3 giorni). Nuovo route + componente lista + campo
+  `youtubeUrl` opzionale su Event / Recording.
+
+### Trascrizione, sottotitoli, sintesi AI (v0.4.0)
+
+Questo è il blocco più ambizioso e richiede una discussione
+architetturale dedicata prima di iniziare.
+
+- **Sottotitoli live nel player (accessibilità)**
+  Ogni utente può attivare sottotitoli durante la call. Lato Jitsi
+  esiste Jigasi + Vosk (open source) o integrazione Whisper. Il flusso
+  live captions passa via XMPP e viene renderizzato dal frontend.
+  **Effort**: L (1 settimana). Deploy Jigasi su cluster + abilitare
+  `transcribingEnabled` + UI toggle per participant + rendering
+  captions nell'iframe Jitsi.
+
+- **Editor trascrizione post-evento**
+  Nella pagina registrazione video del post-evento, un editor testo
+  con timeline: ogni intervento mostra speaker + timestamp
+  (es. "Raffaele: ciao a tutti — 00:10:24"). Il moderatore può
+  correggere il testo, riassegnare lo speaker, esportare SRT/VTT/TXT.
+  Player video sincronizzato: click sulla frase → jump al minuto.
+  **Effort**: L/XL (2 settimane). Storage trascrizione per event +
+  editor UI (timeline + waveform) + WebVTT export.
+
+- **Sintesi AI della call (obbligo legale: trascrizione originale)**
+  Per ogni evento registrato e trascritto, generare con LLM:
+  - Trascrizione "raw" → **mantenuta sempre** (obbligo normativo)
+  - Trascrizione editata (correzioni moderatore) → salvata come
+    versione separata
+  - Sintesi per speaker ("intervento di Raffaele: ...")
+  - Sintesi globale / abstract / argomenti trattati
+  - Questionario precompilato (N domande a risposta chiusa/aperta
+    estratte dai temi emersi) che il moderatore rivede prima di
+    inviarlo ai partecipanti per feedback
+  **Effort**: XL (2–4 settimane). Scelta LLM (Claude API vs
+  self-hosted), prompt engineering, privacy impact assessment
+  (dati conversazione verso provider esterno), UI editor + review +
+  invio questionario. **Richiede** prima la trascrizione post-evento.
+
+- **Ricerca full-text sulle trascrizioni**
+  Una volta che le trascrizioni sono persistite, esporre ricerca
+  per parola chiave su tutti gli eventi (PostgreSQL `tsvector` basta
+  per i volumi previsti).
+  **Effort**: M (1 settimana).
 
 - [ ] Ruolo **Relatore** (speaker) — mic/video/share senza poteri admin
 - [ ] **Live streaming** per audience > 300 (RTMP → player HLS)
