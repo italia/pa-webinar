@@ -16,6 +16,7 @@ import {
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
 import { calculateEstimates } from '@/lib/estimates';
+import { hashJoinPassword } from '@/lib/auth/password';
 
 export const dynamic = 'force-dynamic';
 
@@ -266,6 +267,10 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.status !== undefined && { status: data.status }),
       ...(nextCapacityEstimate !== undefined && {
         capacityEstimateJson: nextCapacityEstimate,
+      }),
+      ...(data.joinPassword !== undefined && {
+        joinPasswordHash:
+          data.joinPassword.length > 0 ? hashJoinPassword(data.joinPassword) : null,
       }),
     },
   });

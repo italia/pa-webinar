@@ -33,6 +33,9 @@ const eventBaseSchema = z.object({
   privacyPolicyUrl: z.string().url().optional(),
   privacyPolicyText: z.string().max(10000).optional(),
   gdprTemplateId: z.string().uuid().nullable().optional(),
+  /** Cleartext join password. Server hashes and stores in `join_password_hash`.
+   *  Empty string clears the password (sets the column back to NULL). */
+  joinPassword: z.string().max(200).optional(),
   moderatorName: z.string().min(2).max(100).optional(),
   moderatorEmail: z.string().email().optional(),
   speakersInfo: localizedStringField.optional(),
@@ -104,6 +107,7 @@ export const createInstantCallSchema = z.object({
     { message: 'title.it is required and must be at least 2 characters' },
   ),
   moderatorName: z.string().min(2).max(100).optional(),
+  joinPassword: z.string().min(4).max(200).optional(),
 });
 
 // ── Registration Schemas ─────────────────────────────

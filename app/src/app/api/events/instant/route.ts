@@ -13,6 +13,7 @@ import { getPublicEnv } from '@/lib/env';
 import { resolveLocale } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { calculateEstimates } from '@/lib/estimates';
+import { hashJoinPassword } from '@/lib/auth/password';
 
 export const dynamic = 'force-dynamic';
 
@@ -86,6 +87,10 @@ export const POST = withErrorHandling(async (request) => {
         ...capacityEstimate,
         computedAt: now.toISOString(),
       },
+      joinPasswordHash:
+        data.joinPassword && data.joinPassword.length > 0
+          ? hashJoinPassword(data.joinPassword)
+          : null,
     },
   });
 

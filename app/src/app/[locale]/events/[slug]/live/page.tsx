@@ -1,5 +1,7 @@
+import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
+import { jwtVerify } from 'jose';
 
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
@@ -8,6 +10,21 @@ import { isJibriAvailable } from '@/lib/infrastructure';
 import LiveEventClient from '@/components/live/live-event-client';
 import ProvisioningScreen from '@/components/live/provisioning-screen';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+
+async function hasJoinGrant(eventId: string): Promise<boolean> {
+  const appSecret = process.env.APP_SECRET;
+  if (!appSecret) return false;
+  const cookieStore = await cookies();
+  const cookie = cookieStore.get(`join_granted_${eventId}`)?.value;
+  if (!cookie) return false;
+  try {
+    const secret = new TextEncoder().encode(appSecret);
+    const { payload } = await jwtVerify(cookie, secret);
+    return payload.eventId === eventId;
+  } catch {
+    return false;
+  }
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -57,8 +74,12 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   const isInstant = event.eventType === 'INSTANT';
 
-  // No token: guest access or redirect
+  // No token: guest access or redirect. Password-protected events
+  // require a cleared join-grant cookie before we issue the guest JWT.
   if (!token) {
+    if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
+      redirect(`/${locale}/events/${slug}/password`);
+    }
     if (event.status === 'LIVE') {
       const title = getLocalized(event.title as LocalizedField, locale);
       return (

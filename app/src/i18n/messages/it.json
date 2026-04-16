@@ -152,6 +152,15 @@
   },
   "live": {
     "title": "Sala evento",
+    "password": {
+      "title": "Password di accesso",
+      "label": "Inserisci la password",
+      "submit": "Entra",
+      "submitting": "Verifica...",
+      "wrong": "Password errata. Riprova.",
+      "rateLimited": "Troppi tentativi. Attendi un minuto e riprova.",
+      "generic": "Errore di verifica. Riprova."
+    },
     "connecting": "Connessione in corso...",
     "connectionError": "Impossibile connettersi alla sala. Verifica la connessione e riprova.",
     "recordingActive": "Registrazione in corso",
@@ -931,6 +940,10 @@
       "namePlaceholder": "es. Sync rapido, Demo progetto...",
       "moderatorLabel": "Il tuo nome (facoltativo)",
       "moderatorPlaceholder": "Verrà mostrato nella call",
+      "passwordLabel": "Password di accesso (facoltativa)",
+      "passwordPlaceholder": "Lascia vuoto per call pubblica",
+      "passwordHint": "Se impostata, gli ospiti devono digitare questa password per entrare. Minimo 4 caratteri. I moderatori non ne hanno bisogno.",
+      "passwordTooShort": "La password deve avere almeno 4 caratteri.",
       "create": "Crea e entra",
       "creating": "Creazione...",
       "copyLink": "Copia link di invito",
