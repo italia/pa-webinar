@@ -463,7 +463,12 @@
       },
       "play": "Riproduci",
       "closePlayer": "Chiudi player",
-      "playerUnsupported": "Il tuo browser non supporta la riproduzione video."
+      "playerUnsupported": "Il tuo browser non supporta la riproduzione video.",
+      "detailStart": "Inizio",
+      "detailEnd": "Fine",
+      "detailModerator": "Moderatore",
+      "detailRoom": "Stanza Jitsi",
+      "detailFilename": "Nome file"
     },
     "gdprAudit": {
       "title": "Audit GDPR",

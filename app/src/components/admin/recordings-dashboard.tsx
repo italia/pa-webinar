@@ -50,11 +50,15 @@ interface RecordingRow {
   eventType: string;
   eventStartsAt: string;
   startedAt: string;
+  endedAt: string | null;
   durationSeconds: number | null;
   peakParticipants: number;
   recordingUrl: string | null;
   recordingFilename: string | null;
   recordingFileSize: string | null;
+  jitsiRoomName: string | null;
+  moderatorName: string | null;
+  moderatorEmail: string | null;
 }
 
 interface ApiResponse {
@@ -447,15 +451,56 @@ export default function RecordingsDashboard({
                         {isPlaying && r.recordingUrl && (
                           <tr>
                             <td colSpan={7} style={{ background: '#F8FAFE', padding: '1rem' }}>
-                              <video
-                                key={r.recordingUrl}
-                                controls
-                                preload="metadata"
-                                style={{ width: '100%', maxWidth: 900, display: 'block', margin: '0 auto', borderRadius: 8 }}
-                                src={r.recordingUrl}
-                              >
-                                {t('playerUnsupported')}
-                              </video>
+                              <div style={{ maxWidth: 900, margin: '0 auto' }}>
+                                <dl className="row g-2 mb-3" style={{ fontSize: '0.78rem' }}>
+                                  <dt className="col-sm-3 text-muted">{t('detailStart')}</dt>
+                                  <dd className="col-sm-9 mb-0">
+                                    {fmt.dateTime(new Date(r.startedAt), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                  </dd>
+                                  {r.endedAt && (
+                                    <>
+                                      <dt className="col-sm-3 text-muted">{t('detailEnd')}</dt>
+                                      <dd className="col-sm-9 mb-0">
+                                        {fmt.dateTime(new Date(r.endedAt), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                      </dd>
+                                    </>
+                                  )}
+                                  {r.moderatorName && (
+                                    <>
+                                      <dt className="col-sm-3 text-muted">{t('detailModerator')}</dt>
+                                      <dd className="col-sm-9 mb-0">
+                                        {r.moderatorName}
+                                        {r.moderatorEmail && <span className="text-muted"> &lt;{r.moderatorEmail}&gt;</span>}
+                                      </dd>
+                                    </>
+                                  )}
+                                  {r.jitsiRoomName && (
+                                    <>
+                                      <dt className="col-sm-3 text-muted">{t('detailRoom')}</dt>
+                                      <dd className="col-sm-9 mb-0">
+                                        <code style={{ fontSize: '0.75rem' }}>{r.jitsiRoomName}</code>
+                                      </dd>
+                                    </>
+                                  )}
+                                  {r.recordingFilename && (
+                                    <>
+                                      <dt className="col-sm-3 text-muted">{t('detailFilename')}</dt>
+                                      <dd className="col-sm-9 mb-0">
+                                        <code style={{ fontSize: '0.75rem' }}>{r.recordingFilename}</code>
+                                      </dd>
+                                    </>
+                                  )}
+                                </dl>
+                                <video
+                                  key={r.recordingUrl}
+                                  controls
+                                  preload="metadata"
+                                  style={{ width: '100%', display: 'block', borderRadius: 8 }}
+                                  src={r.recordingUrl}
+                                >
+                                  {t('playerUnsupported')}
+                                </video>
+                              </div>
                             </td>
                           </tr>
                         )}
