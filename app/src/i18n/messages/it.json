@@ -223,7 +223,10 @@
     "chat": {
       "placeholder": "Scrivi un messaggio...",
       "send": "Invia",
-      "noMessages": "Nessun messaggio"
+      "noMessages": "Nessun messaggio",
+      "empty": "Nessun messaggio ancora. Scrivi per primo!",
+      "inputLabel": "Messaggio chat",
+      "moderatorBadge": "Moderatore"
     },
     "role": {
       "moderator": "Moderatore",
