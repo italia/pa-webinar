@@ -346,6 +346,26 @@ miglioramenti UX e feature nuove che vanno pianificate.
   **Effort**: M/L (2–4 giorni). Nuovo model + UI admin + migration
   del token singolo a "primary moderator" per eventi esistenti.
 
+- ✅ **Chat in-app real-time (Redis + SSE)**
+  Sostituito la chat Jitsi XMPP con una propria: messaggi persistiti su
+  Postgres (`chat_messages`), fan-out cross-pod via Redis pub/sub, canale
+  SSE per i client. Vantaggi: late-joiner, archivio post-evento, audit
+  trail, rate-limit server-side, funziona anche con Jitsi esterno.
+  Deploy: subchart Bitnami `redis` (`architecture: standalone`, immagine
+  `:latest` per aggirare Legacy Catalog Bitnami), `REDIS_PASSWORD` via
+  Secret. In-cluster e managed entrambi supportati. Exporter Prometheus
+  attivo, sezione "Chat in-app & Redis" nell'admin monitoring.
+  **Effort**: M (spedito v0.3.43).
+
+- ⏳ **High-availability Redis / migrazione Valkey**
+  Standalone è OK per eventi saltuari, ma su spot VM un'eviction
+  congela il fan-out chat per 30-60s. Migrazione pianificata a Valkey
+  (fork BSD-3, Linux Foundation) con `architecture: replication`
+  (1 primary + 2 replica + 3 sentinel). Giustificato solo se si
+  aggiungono feature che usano Redis come path critico
+  (rate-limit distribuito, cache session). Cost: ~3× risorse.
+  **Effort**: S (<1 giorno, switch subchart + test failover).
+
 - ✅ **Libreria video pubblica**
   Nuova sezione `/video-library` pubblica dove sfogliare tutti i video
   degli eventi passati (pubblicati) con filtri per data / argomento /

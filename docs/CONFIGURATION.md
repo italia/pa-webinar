@@ -180,11 +180,12 @@ Imposta `postgresql.enabled: false` e fornisci `DATABASE_URL` nel Secret:
 
 ## Redis (chat pub/sub)
 
-Richiesto **solo** per il fan-out chat cross-pod. Con una singola replica
-del pod app il codice funziona anche senza Redis (fallback a `null` in
-`lib/redis.ts`): tutti i client SSE sullo stesso pod ricevono i messaggi
-dalla Postgres insert locale, ma due pod diversi non si scambiano
-messaggi in tempo reale.
+Required per il fan-out chat cross-pod. Lo stato canonico dei messaggi
+vive in Postgres (tabella `chat_messages`), ma senza Redis due pod app
+non si scambiano messaggi in tempo reale: gli utenti su pod diversi
+vedono solo i messaggi del proprio pod fino al refresh. `/api/status`
+riporta Redis come **`outage`** (non "idle") quando manca o il ping
+fallisce — la chat real-time è una dipendenza richiesta, non opzionale.
 
 ### Redis nel cluster (modalità semplice)
 
@@ -206,6 +207,19 @@ redis:
   master:
     persistence:
       enabled: false   # pub/sub è ephemeral; canonical state in Postgres
+
+  # Esposizione Prometheus via redis-exporter sidecar. Il chart Bitnami
+  # pinna anche il tag dell'exporter nel Legacy Catalog, quindi va
+  # sovrascritto a :latest come il primary.
+  metrics:
+    enabled: true
+    image:
+      tag: latest
+      pullPolicy: Always
+    serviceMonitor:
+      enabled: true
+      namespace: videocall-test   # il namespace dove esce il ServiceMonitor
+      interval: 30s
 ```
 
 ### Redis esterno (managed)
@@ -221,6 +235,33 @@ Imposta `redis.enabled: false` e fornisci `REDIS_URL` nel Secret:
 
 > Usa lo schema `rediss://` (con doppia `s`) per TLS — obbligatorio su
 > Azure Cache che accetta solo connessioni cifrate.
+
+### High availability (pianificato)
+
+Il default è standalone (1 pod, no persistence, ~80Mi RAM idle). Su nodi
+spot un'eviction = 30-60s di fan-out gap — i messaggi restano in Postgres
+ma non propagano in tempo reale durante il reschedule. Per SLA stretti la
+roadmap prevede switch a **Valkey** (fork BSD-3 di Redis, Linux Foundation)
+con `architecture: replication`: 1 primary + 2 replica + 3 sentinel, ~3×
+risorse. Giustificato quando si aggiungono feature critiche come
+distributed rate-limiting; per PA con eventi saltuari il fallback
+Postgres + reschedule automatico è sufficiente.
+
+### Metriche esposte
+
+Con `redis.metrics.enabled: true` il subchart installa un sidecar
+`redis-exporter` e (se `serviceMonitor.enabled: true`) un ServiceMonitor
+per Prometheus Operator. Metriche rilevanti:
+
+- `redis_connected_clients` — connessioni TCP (pub + subscriber)
+- `redis_memory_used_bytes` — uso memoria
+- `redis_commands_processed_total` — rate ops/sec
+- `redis_pubsub_channels` — canali pub/sub attivi (≈ eventi con chat live)
+
+Le metriche app-level (`eventi_chat_messages_total`,
+`eventi_chat_sse_connections`) sono esposte da `/api/metrics` (prom-client).
+L'admin dashboard `/admin/monitoring` aggrega entrambe le sorgenti nella
+sezione "Chat in-app & Redis" (richiede `PROMETHEUS_URL` configurato).
 
 ## Secrets management
 
