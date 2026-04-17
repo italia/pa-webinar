@@ -73,6 +73,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           organizerName: event.organizerName,
           imageUrl: event.imageUrl,
           waitingRoomAudioUrl: event.waitingRoomAudioUrl,
+          expectedSenderRatioPct: event.expectedSenderRatioPct,
+          gracePeriodMinutes: event.gracePeriodMinutes,
         }}
       />
     </div>
