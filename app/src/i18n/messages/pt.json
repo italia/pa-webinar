@@ -17,7 +17,10 @@
     "edit": "Editar",
     "search": "Pesquisar",
     "noResults": "Sem resultados",
-    "requiredField": "Campo obrigatório"
+    "requiredField": "Campo obrigatório",
+    "errorGeneric": "An error occurred. Please try again.",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all"
   },
   "nav": {
     "home": "Início",
@@ -790,7 +793,45 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      },
+      "hero": {
+        "title": "Start a new videocall",
+        "subtitle": "Spin up an instant Jitsi room, get the moderator link, and join in seconds."
+      },
+      "filters": {
+        "search": "Search",
+        "searchPlaceholder": "Title or moderator…",
+        "from": "From",
+        "to": "To",
+        "status": "Status",
+        "statusAll": "All",
+        "recording": "Recording",
+        "recAny": "All",
+        "recYes": "With recording",
+        "recNo": "Without recording",
+        "reset": "Reset filters"
+      },
+      "status": {
+        "live": "Live",
+        "idle": "Idle",
+        "ended": "Ended",
+        "archived": "Archived",
+        "idleTooltip": "Idle for {idle} min — auto-close after {grace} min of inactivity"
+      },
+      "noResults": "No calls match the filters."
     },
     "sessions": {
       "title": "Call sessions",
@@ -831,6 +872,48 @@
       "last6h": "last 6 hours",
       "last24h": "last 24 hours",
       "reqPerSec": "requests/sec"
+    },
+    "bulk": {
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select event",
+      "selected": "selected",
+      "archive": "Archive",
+      "delete": "Delete",
+      "deleteConfirm": "You are about to permanently delete {count} events and all associated data (registrations, sessions, recordings, Q&A, polls). This action cannot be undone.",
+      "archiveConfirm": "You are about to archive {count} events. Archived events are hidden from the public listing but their data is preserved."
+    },
+    "recordingsLibrary": {
+      "tabs": {
+        "library": "Library",
+        "orphans": "Orphans"
+      },
+      "orphans": {
+        "noneFound": "No orphan recordings. The bucket is in sync with the database.",
+        "graceDays": "Orphans are automatically deleted after {days} days.",
+        "refresh": "Refresh",
+        "intro": "These recordings exist in the storage bucket but are not linked to any event or session in the database. They will be automatically deleted {days} days after discovery. You can mark them as \"Keep\" to preserve them, \"Delete now\" to remove on the next cron run, or leave them pending until the timeout.",
+        "statTotal": "Total",
+        "statPending": "Pending",
+        "statIgnore": "Kept",
+        "statDeleteNow": "To delete",
+        "selected": "selected",
+        "markIgnore": "Keep",
+        "markDelete": "Delete now",
+        "markPending": "Revert decision",
+        "colBlobName": "Blob name",
+        "colSize": "Size",
+        "colDiscovered": "Discovered on",
+        "colDecision": "Decision",
+        "colDeletesAt": "Scheduled deletion",
+        "decisionPending": "Pending",
+        "decisionIgnore": "Kept",
+        "decisionDeleteNow": "To delete",
+        "nextSweep": "Next run"
+      },
+      "play": "Play",
+      "closePlayer": "Close player",
+      "playerUnsupported": "Your browser does not support video playback."
     }
   },
   "email": {

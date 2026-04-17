@@ -7,6 +7,7 @@
     "errorMessage": "Something went wrong. Please try again.",
     "retry": "Retry",
     "save": "Save",
+    "saving": "Saving...",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "close": "Close",
@@ -17,11 +18,15 @@
     "edit": "Edit",
     "search": "Search",
     "noResults": "No results",
-    "requiredField": "Required field"
+    "requiredField": "Required field",
+    "errorGeneric": "An error occurred. Please try again.",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all"
   },
   "nav": {
     "home": "Home",
     "events": "Events",
+    "videoLibrary": "Video library",
     "about": "About",
     "privacy": "Privacy",
     "admin": "Administration",
@@ -90,7 +95,9 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Recording",
-      "settingsSection": "Event settings"
+      "settingsSection": "Event settings",
+      "sessionsAndRecordings": "Sessions and video recordings",
+      "postEventSection": "Post-event and feedback"
     },
     "status": {
       "DRAFT": "Draft",
@@ -144,8 +151,28 @@
       "generic": "Registration error. Please try again."
     }
   },
+  "videoLibrary": {
+    "title": "Video library",
+    "subtitle": "Replay recordings from past public events. Each card opens the event page with its video and materials.",
+    "searchPlaceholder": "Search by title or description…",
+    "results": "{count, plural, =0 {No videos available} =1 {1 video} other {# videos}}",
+    "empty": "No published recordings for the current filters.",
+    "loading": "Loading…",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}"
+  },
   "live": {
     "title": "Event room",
+    "password": {
+      "title": "Join password",
+      "label": "Enter the password",
+      "submit": "Join",
+      "submitting": "Verifying...",
+      "wrong": "Wrong password. Try again.",
+      "rateLimited": "Too many attempts. Wait a minute and try again.",
+      "generic": "Verification error. Try again."
+    },
     "connecting": "Connecting...",
     "connectionError": "Unable to connect to the room. Check your connection and try again.",
     "recordingActive": "Recording in progress",
@@ -196,7 +223,10 @@
     "chat": {
       "placeholder": "Type a message...",
       "send": "Send",
-      "noMessages": "No messages yet"
+      "noMessages": "No messages yet",
+      "empty": "No messages yet. Be the first!",
+      "inputLabel": "Chat message",
+      "moderatorBadge": "Moderator"
     },
     "role": {
       "moderator": "Moderator",
@@ -299,6 +329,13 @@
       "recordingsList": "Video recordings",
       "settingsGeneral": "General",
       "settingsLanguages": "Languages",
+      "settingsGdprTemplates": "GDPR templates",
+      "admin": "Administration",
+      "eventDetail": "Event detail",
+      "eventEdit": "Edit event",
+      "publications": "Publications",
+      "publicationsList": "All publications",
+      "publicationsNew": "New publication",
       "ariaLabel": "Admin navigation",
       "subNavAriaLabel": "Section navigation"
     },
@@ -327,6 +364,78 @@
       "settingsDescription": "Configure branding, content, languages, privacy and platform behaviour.",
       "liveNow": "{count, plural, one {# event live} other {# events live}}",
       "upcomingEvents": "{count, plural, one {# upcoming event} other {# upcoming events}}"
+    },
+    "publications": {
+      "title": "Publications",
+      "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, uploaded archive recordings, and sessions waiting to be promoted.",
+      "newPublication": "New publication",
+      "searchPlaceholder": "Search by title or description…",
+      "listedAny": "All (listed and unlisted)",
+      "listedYes": "Only in library",
+      "listedNo": "Only not in library",
+      "empty": "No publications match the current filters.",
+      "untitled": "(untitled)",
+      "tabs": {
+        "all": "All",
+        "scheduled": "Events",
+        "instant": "Instant calls",
+        "legacy": "Uploaded archive",
+        "pending": "To promote"
+      },
+      "source": {
+        "scheduled": "Event",
+        "instant": "Instant",
+        "legacy": "Legacy"
+      },
+      "badges": {
+        "listed": "In library",
+        "unlisted": "Not in library",
+        "pending": "{count, plural, =1 {1 recording to promote} other {# recordings to promote}}"
+      },
+      "meta": {
+        "registrations": "{count, plural, =0 {No registrations} =1 {1 registered} other {# registered}}"
+      },
+      "actions": {
+        "edit": "Edit event",
+        "preview": "Public preview",
+        "list": "List in library",
+        "unlist": "Remove from library"
+      },
+      "uploadPage": {
+        "title": "New publication",
+        "subtitle": "Upload an existing video file (MP4, WebM or MOV) to the platform storage and enrich it with editorial metadata.",
+        "step1Title": "1. Upload the video file",
+        "startUpload": "Upload",
+        "signing": "Preparing…",
+        "uploading": "Uploading {progress}%",
+        "uploaded": "Upload complete",
+        "uploadHint": "Supported formats: MP4, WebM, MOV, M4V. Max size 5 GB. Upload is direct to object storage (Azure Blob) — nothing passes through our servers.",
+        "step2Title": "2. Publication metadata",
+        "titleIt": "Title (Italian)",
+        "titleEn": "Title (English, optional)",
+        "description": "Description",
+        "startsAt": "Original event date",
+        "organizer": "Organizer",
+        "speakers": "Speakers",
+        "speakersPlaceholder": "Comma-separated",
+        "coverUrl": "Cover URL (16:9, optional)",
+        "coverPlaceholder": "https://...",
+        "coverHint": "Banner used on the library card. If empty we fall back to the event image or a gradient.",
+        "youtubeUrl": "Reference YouTube URL (optional)",
+        "youtubeHint": "Shown as an external link on the event page, never embedded.",
+        "libraryListed": "Publish in the video library now",
+        "save": "Create publication",
+        "errors": {
+          "fileTooLarge": "File exceeds the 5 GB limit.",
+          "unsupportedType": "Unsupported format. Upload MP4, WebM, MOV or M4V.",
+          "signFailed": "Couldn't get an upload URL. Check the storage configuration.",
+          "uploadFailed": "Upload failed. Check your connection and retry.",
+          "uploadFirst": "Upload the file first.",
+          "titleRequired": "The Italian title is required (at least 3 characters).",
+          "dateRequired": "The original date is required.",
+          "saveFailed": "Saving the metadata failed."
+        }
+      }
     },
     "recordingsLibrary": {
       "title": "Video recordings",
@@ -360,7 +469,42 @@
       },
       "download": "Download",
       "noFile": "No file",
-      "noResults": "No recordings for the current filters."
+      "noResults": "No recordings for the current filters.",
+      "tabs": {
+        "library": "Library",
+        "orphans": "Orphans"
+      },
+      "orphans": {
+        "noneFound": "No orphan recordings. The bucket is in sync with the database.",
+        "graceDays": "Orphans are automatically deleted after {days} days.",
+        "refresh": "Refresh",
+        "intro": "These recordings exist in the storage bucket but are not linked to any event or session in the database. They will be automatically deleted {days} days after discovery. You can mark them as \"Keep\" to preserve them, \"Delete now\" to remove on the next cron run, or leave them pending until the timeout.",
+        "statTotal": "Total",
+        "statPending": "Pending",
+        "statIgnore": "Kept",
+        "statDeleteNow": "To delete",
+        "selected": "selected",
+        "markIgnore": "Keep",
+        "markDelete": "Delete now",
+        "markPending": "Revert decision",
+        "colBlobName": "Blob name",
+        "colSize": "Size",
+        "colDiscovered": "Discovered on",
+        "colDecision": "Decision",
+        "colDeletesAt": "Scheduled deletion",
+        "decisionPending": "Pending",
+        "decisionIgnore": "Kept",
+        "decisionDeleteNow": "To delete",
+        "nextSweep": "Next run"
+      },
+      "play": "Play",
+      "closePlayer": "Close player",
+      "playerUnsupported": "Your browser does not support video playback.",
+      "detailStart": "Start",
+      "detailEnd": "End",
+      "detailModerator": "Moderator",
+      "detailRoom": "Jitsi room",
+      "detailFilename": "File name"
     },
     "gdprAudit": {
       "title": "GDPR audit",
@@ -563,6 +707,10 @@
       "privacyPolicyMode": "Privacy policy",
       "privacyPolicyModeUrl": "External URL",
       "privacyPolicyModeText": "Custom text",
+      "privacyPolicyModeTemplate": "Shared template",
+      "privacyPolicyTemplateNone": "— Select a template —",
+      "privacyPolicyTemplateEmpty": "This template has no text yet. Edit it from Settings › GDPR templates.",
+      "privacyPolicyTemplateHint": "Templates are managed under Settings › GDPR templates. ★ marks the default.",
       "privacyPolicyText": "Privacy policy text",
       "privacyPolicyTextHint": "Write the privacy policy text. It will be shown inline in the registration form.",
       "retentionPreviewTitle": "What gets automatically deleted",
@@ -578,8 +726,12 @@
     "links": {
       "title": "Event links",
       "publicPage": "Public event page",
+      "publicPageHint": "Share this URL to collect new registrations.",
+      "guestJoin": "Direct invite (no registration)",
+      "guestJoinHint": "Quick link to invite a last-minute attendee: they join as a guest while the event is live, without filling in the registration form.",
       "moderatorLink": "Moderator link",
       "moderatorLinkHint": "Share this link only with moderators. Anyone with this link can manage the event.",
+      "liveRoomHint": "Direct link to enter the live room as moderator.",
       "copyLink": "Copy link",
       "copied": "Copied!"
     },
@@ -592,8 +744,45 @@
       "noComments": "No comments",
       "stars": "stars"
     },
+    "recordingUpload": {
+      "title": "Upload an existing recording",
+      "subtitle": "Already have a video file of the event (for example a MsTeams recording)? Upload it here — it becomes the official recording on the public page.",
+      "fileLabel": "Video file",
+      "upload": "Upload and attach",
+      "signing": "Preparing…",
+      "uploading": "Uploading {progress}%",
+      "attaching": "Attaching to event…",
+      "hint": "Formats: MP4, WebM, MOV, M4V. Max 5 GB. Upload goes straight to Azure Blob storage.",
+      "errors": {
+        "fileTooLarge": "File exceeds the 5 GB limit.",
+        "unsupportedType": "Unsupported format. Upload MP4, WebM, MOV or M4V.",
+        "signFailed": "Couldn't get the upload URL.",
+        "uploadFailed": "Upload failed. Please retry.",
+        "attachFailed": "Video uploaded but not attached to the event. Retry the last step."
+      }
+    },
+    "coModerators": {
+      "title": "Co-moderators",
+      "intro": "Add extra moderators with individual magic-links.",
+      "introHint": "Each co-moderator has their own display name in the room and a token that can be revoked without invalidating the primary moderator link.",
+      "add": "Add co-moderator",
+      "name": "Name visible in room",
+      "email": "Email (optional)",
+      "emailPlaceholder": "to send them the link",
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "revoke": "Revoke",
+      "revoked": "Revoked",
+      "confirmRevoke": "Revoke this co-moderator's access? The link will stop working immediately.",
+      "empty": "No co-moderators added. The primary moderator link is the only moderator access.",
+      "activeCount": "{count, plural, =0 {No active co-moderators} =1 {1 active co-moderator} other {# active co-moderators}}",
+      "errors": {
+        "addFailed": "Couldn't add the co-moderator. Please retry."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR Audit Log",
+      "subtitle": "Privacy actions tracked for this event: consent, export, deletions.",
       "date": "Date",
       "action": "Action",
       "recordCount": "Records",
@@ -608,6 +797,12 @@
       "title": "Site settings",
       "subtitle": "Configure the platform appearance and behavior for PA reuse",
       "saving": "Saving...",
+      "sections": {
+        "languagesTitle": "Language management",
+        "languagesDescription": "Enable or disable the EU languages exposed to users, pick the default locale and customise translation strings.",
+        "gdprTemplatesTitle": "GDPR templates",
+        "gdprTemplatesDescription": "Create reusable privacy notices that can be linked to any event, and pick the default one for new events."
+      },
       "saved": "Settings saved successfully",
       "tabs": {
         "branding": "Branding",
@@ -807,6 +1002,10 @@
       "namePlaceholder": "e.g. Quick sync, Project demo...",
       "moderatorLabel": "Your name (optional)",
       "moderatorPlaceholder": "Shown in the call",
+      "passwordLabel": "Join password (optional)",
+      "passwordPlaceholder": "Leave empty for public call",
+      "passwordHint": "If set, guests must type this password to join. Minimum 4 characters. Moderators don't need it.",
+      "passwordTooShort": "Password must be at least 4 characters.",
       "create": "Create and join",
       "creating": "Creating...",
       "copyLink": "Copy invite link",
@@ -827,6 +1026,31 @@
       "uploadBtn": "Upload",
       "deleteConfirm": "Are you sure you want to delete this file?",
       "noFiles": "No files uploaded. Use the \"Upload file\" button to add materials."
+    },
+    "gdprTemplates": {
+      "title": "GDPR templates",
+      "subtitle": "Create and manage reusable privacy notices shared across events. A template marked as default is pre-selected on new events.",
+      "newTemplate": "New template",
+      "emptyState": "No templates yet. Create one to reuse the same privacy text across multiple events.",
+      "defaultBadge": "Default",
+      "usedByEvents": "{count, plural, =0 {No events linked} =1 {1 event linked} other {# events linked}}",
+      "confirmDelete": "Delete template \"{name}\"? {count, plural, =0 {} =1 {1 event will lose its reference.} other {# events will lose their reference.}}",
+      "form": {
+        "newTitle": "New GDPR template",
+        "editTitle": "Edit GDPR template",
+        "name": "Internal name",
+        "namePlaceholder": "e.g. DTD standard privacy notice",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Short notes to recognise the template",
+        "bodyIt": "Privacy text (Italian)",
+        "bodyEn": "Privacy text (English)",
+        "bodyPlaceholder": "Paste the privacy notice text for this locale…",
+        "isDefault": "Use as default for new events",
+        "isDefaultHint": "The default template is pre-selected on the new event form. Only one template can be the default at a time."
+      },
+      "errors": {
+        "saveFailed": "Save failed. Check the fields and retry."
+      }
     },
     "languages": {
       "title": "Language management",
@@ -915,10 +1139,49 @@
       "total": "total",
       "noCalls": "No instant calls yet.",
       "participants": "participants",
-      "sessions": "sessions"
+      "sessions": "sessions",
+      "createNew": "New call",
+      "createAndJoin": "Create and join",
+      "selected": "selected",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select row",
+      "deleteSelected": "Delete selected",
+      "deleteConfirm": "You are about to delete {count} instant calls and all associated data (sessions, recordings). This action cannot be undone.",
+      "titleTooShort": "Title must be at least 2 characters long.",
+      "form": {
+        "titleLabel": "Call title",
+        "moderatorLabel": "Moderator name (optional)"
+      },
+      "hero": {
+        "title": "Start a new videocall",
+        "subtitle": "Spin up an instant Jitsi room, get the moderator link, and join in seconds."
+      },
+      "filters": {
+        "search": "Search",
+        "searchPlaceholder": "Title or moderator…",
+        "from": "From",
+        "to": "To",
+        "status": "Status",
+        "statusAll": "All",
+        "recording": "Recording",
+        "recAny": "All",
+        "recYes": "With recording",
+        "recNo": "Without recording",
+        "reset": "Reset filters"
+      },
+      "status": {
+        "live": "Live",
+        "idle": "Idle",
+        "ended": "Ended",
+        "archived": "Archived",
+        "idleTooltip": "Idle for {idle} min — auto-close after {grace} min of inactivity"
+      },
+      "noResults": "No calls match the filters."
     },
     "sessions": {
       "title": "Call sessions",
+      "empty": "No sessions recorded yet. Live sessions are listed here automatically as soon as the moderator joins the room.",
       "loading": "Loading sessions...",
       "participants": "participants",
       "participantList": "Participants",
@@ -989,6 +1252,16 @@
       "provisioningNow": "provisioning",
       "idleNow": "IDLE (paused)",
       "scaleToZeroHelp": "IDLE is the normal state for an event with no traffic past the grace period. On the next user visit it transitions to PROVISIONING and then LIVE."
+    },
+    "bulk": {
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectRow": "Select event",
+      "selected": "selected",
+      "archive": "Archive",
+      "delete": "Delete",
+      "deleteConfirm": "You are about to permanently delete {count} events and all associated data (registrations, sessions, recordings, Q&A, polls). This action cannot be undone.",
+      "archiveConfirm": "You are about to archive {count} events. Archived events are hidden from the public listing but their data is preserved."
     }
   },
   "email": {
@@ -1320,9 +1593,11 @@
     "connMedia": "video stream",
     "connRecording": "recording",
     "connUpload": "upload",
+    "connPubSub": "chat pub/sub",
     "services": {
       "app": "Web portal",
       "database": "Database",
+      "redis": "Real-time chat",
       "jitsiWeb": "Video conference room",
       "prosody": "Internal messaging",
       "jicofo": "Conference coordinator",
@@ -1333,6 +1608,7 @@
     "descriptions": {
       "app": "The website where you access events",
       "database": "Where events and registrations are stored",
+      "redis": "Real-time chat message exchange between servers",
       "jitsiWeb": "The video conference interface",
       "prosody": "Handles communication between video services",
       "jicofo": "Coordinates who participates in each conference",
@@ -1348,6 +1624,12 @@
         "healthy": "The database is responding correctly.",
         "degraded": "The database is responding, but slower than usual. Operations may take longer.",
         "down": "The database is not responding. The platform cannot function properly."
+      },
+      "redis": {
+        "healthy": "Real-time chat service is responding correctly.",
+        "degraded": "Real-time chat service is slow: messages may reach other servers with delay.",
+        "down": "Real-time chat service is unreachable. With multiple servers, messages may not fan out: the system keeps working in single-server mode.",
+        "standby": "Real-time chat service is not configured (single-server mode)."
       },
       "jitsiWeb": {
         "healthy": "The video conference room is reachable and ready for events.",
@@ -1543,14 +1825,23 @@
     "estimates": "Resource estimates",
     "moderator": "Moderator",
     "participants": "Participants",
+    "bridge": "Video Bridge",
     "jvb": "Video Bridge",
     "jibri": "Recording",
-    "bandwidth": {
-      "moderator": "Moderator bandwidth",
-      "participant": "Per-participant bandwidth",
-      "total": "Estimated total bandwidth"
+    "occupancy": "Occupancy",
+    "sizedForRegistrations": "Sized on {count} current registrations",
+    "sizedForCapacity": "Sized on max capacity of {count}",
+    "chips": {
+      "mic": "Microphone",
+      "video": "Webcam",
+      "screen": "Screen share"
     },
-    "jvbCount": "Required JVBs",
+    "bandwidth": {
+      "moderator": "Moderator bandwidth ↑",
+      "participant": "Per-participant bandwidth ↓",
+      "total": "Total bandwidth"
+    },
+    "jvbCount": "Infrastructure",
     "jvbRam": "Estimated JVB RAM",
     "storage": "Recording storage",
     "duration": "Estimated duration",
@@ -1604,6 +1895,7 @@
     "delete": "Delete recording",
     "deleteConfirm": "Are you sure? The video will be permanently deleted.",
     "notConfigured": "Jibri is not configured. Video recording is not available.",
+    "disabledHint": "Video recording is not enabled for this event. To enable it open the Settings section above and toggle \"Recording\" on.",
     "play": "Play",
     "download": "Download"
   },

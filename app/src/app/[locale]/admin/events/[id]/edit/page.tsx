@@ -10,12 +10,17 @@ interface PageProps {
   searchParams: Promise<{ token?: string }>;
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export default async function EditEventPage({ params, searchParams }: PageProps) {
   const { id, locale } = await params;
   const { token } = await searchParams;
   const t = await getTranslations({ locale, namespace: 'admin' });
 
   if (!token) {
+    notFound();
+  }
+  if (!UUID_RE.test(id)) {
     notFound();
   }
 
@@ -60,6 +65,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           participantsCanShareScreen: event.participantsCanShareScreen,
           dataRetentionDays: event.dataRetentionDays,
           privacyPolicyUrl: event.privacyPolicyUrl,
+          gdprTemplateId: event.gdprTemplateId,
           moderatorName: event.moderatorName,
           moderatorEmail: event.moderatorEmail,
           moderatorToken: event.moderatorToken,

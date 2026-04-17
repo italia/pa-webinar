@@ -20,7 +20,14 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError } from '@/lib/errors';
+import { generateRecordingSasUrl } from '@/lib/storage/recordings';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+
+// SAS expiry for inline playback + download links. Long enough that a
+// 300 MB file finishes downloading on a slow connection without the
+// token expiring mid-transfer, short enough that a stale page load
+// doesn't leak long-lived credentials.
+const SAS_EXPIRY_MINUTES = 60;
 
 export const dynamic = 'force-dynamic';
 
@@ -38,11 +45,15 @@ interface RecordingRow {
   eventType: string;
   eventStartsAt: string;
   startedAt: string;
+  endedAt: string | null;
   durationSeconds: number | null;
   peakParticipants: number;
   recordingUrl: string | null;
   recordingFilename: string | null;
   recordingFileSize: string | null; // BigInt → string
+  jitsiRoomName: string | null;
+  moderatorName: string | null;
+  moderatorEmail: string | null;
   createdAt: string;
 }
 
@@ -102,7 +113,14 @@ export const GET = withErrorHandling(async (request) => {
       skip: format === 'csv' ? 0 : offset,
       include: {
         event: {
-          select: { slug: true, title: true, startsAt: true, eventType: true },
+          select: {
+            slug: true,
+            title: true,
+            startsAt: true,
+            eventType: true,
+            moderatorName: true,
+            moderatorEmail: true,
+          },
         },
       },
     }),
@@ -118,51 +136,85 @@ export const GET = withErrorHandling(async (request) => {
             title: true,
             eventType: true,
             startsAt: true,
+            endsAt: true,
             createdAt: true,
             recordingPublishedAt: true,
             recordingUrl: true,
             recordingDuration: true,
             recordingFileSize: true,
             peakParticipants: true,
+            jitsiRoomName: true,
+            moderatorName: true,
+            moderatorEmail: true,
           },
         })
       : Promise.resolve([]),
   ]);
 
-  const rows: RecordingRow[] = [
-    ...sessions.map<RecordingRow>((s) => ({
+  // Sign each blob URL with a short-lived read-SAS so the admin can
+  // play/download directly from the browser. The storage account has
+  // public access disabled, so the bare URL would 403 with
+  // `PublicAccessNotPermitted`. Signing per-row (instead of a single
+  // endpoint that redirects) lets the browser's video element fetch
+  // ranges for scrubbing.
+  async function signOrNull(url: string | null): Promise<string | null> {
+    if (!url) return null;
+    try {
+      return await generateRecordingSasUrl(url, SAS_EXPIRY_MINUTES);
+    } catch {
+      return url;
+    }
+  }
+
+  const rawRows = [
+    ...sessions.map((s) => ({
       id: `session:${s.id}`,
-      source: 'session',
+      source: 'session' as const,
       eventId: s.eventId,
       eventTitle: getLocalized(s.event.title as LocalizedField, 'it'),
       eventSlug: s.event.slug,
       eventType: s.event.eventType,
       eventStartsAt: s.event.startsAt.toISOString(),
       startedAt: s.startedAt.toISOString(),
+      endedAt: s.endedAt?.toISOString() ?? null,
       durationSeconds: s.duration,
       peakParticipants: s.peakParticipants,
       recordingUrl: s.recordingUrl,
       recordingFilename: s.recordingFilename,
       recordingFileSize: s.recordingFileSize?.toString() ?? null,
+      jitsiRoomName: s.jitsiRoomName,
+      moderatorName: s.event.moderatorName,
+      moderatorEmail: s.event.moderatorEmail,
       createdAt: s.createdAt.toISOString(),
     })),
-    ...events.map<RecordingRow>((e) => ({
+    ...events.map((e) => ({
       id: `event:${e.id}`,
-      source: 'event',
+      source: 'event' as const,
       eventId: e.id,
       eventTitle: getLocalized(e.title as LocalizedField, 'it'),
       eventSlug: e.slug,
       eventType: e.eventType,
       eventStartsAt: e.startsAt.toISOString(),
       startedAt: (e.recordingPublishedAt ?? e.createdAt).toISOString(),
+      endedAt: e.endsAt.toISOString(),
       durationSeconds: e.recordingDuration,
       peakParticipants: e.peakParticipants,
       recordingUrl: e.recordingUrl,
       recordingFilename: null,
       recordingFileSize: e.recordingFileSize?.toString() ?? null,
+      jitsiRoomName: e.jitsiRoomName,
+      moderatorName: e.moderatorName,
+      moderatorEmail: e.moderatorEmail,
       createdAt: (e.recordingPublishedAt ?? e.createdAt).toISOString(),
     })),
   ];
+
+  const rows: RecordingRow[] = await Promise.all(
+    rawRows.map(async (r) => ({
+      ...r,
+      recordingUrl: await signOrNull(r.recordingUrl),
+    })),
+  );
 
   rows.sort((a, b) => b.startedAt.localeCompare(a.startedAt));
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, type FormEvent } from 'react';
+import { useState, useCallback, useEffect, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Button,
@@ -147,7 +147,8 @@ export default function CreateEventForm({
     dataRetentionDays: 30,
     privacyPolicyUrl: '',
     privacyPolicyText: '',
-    privacyPolicyMode: 'url' as 'url' | 'text',
+    privacyPolicyMode: 'url' as 'url' | 'text' | 'template',
+    gdprTemplateId: '',
     moderatorName: '',
     moderatorEmail: '',
     speakersInfo: { it: '', en: '' },
@@ -159,6 +160,31 @@ export default function CreateEventForm({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState('');
+
+  // GDPR templates: reusable privacy notices managed under
+  // /admin/settings/gdpr-templates. We fetch once on mount and auto-select
+  // the default template so an admin who has configured the DTD standard
+  // notice doesn't have to touch the privacy section on every new event.
+  const [gdprTemplates, setGdprTemplates] = useState<
+    { id: string; name: string; body: Record<string, string>; isDefault: boolean }[]
+  >([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/admin/gdpr-templates', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : { rows: [] }))
+      .then((data) => {
+        if (cancelled) return;
+        setGdprTemplates(data.rows ?? []);
+        const preset = (data.rows ?? []).find((r: { isDefault: boolean }) => r.isDefault);
+        if (preset) {
+          setForm((prev) => prev.gdprTemplateId || prev.privacyPolicyText
+            ? prev
+            : { ...prev, gdprTemplateId: preset.id, privacyPolicyMode: 'template' });
+        }
+      })
+      .catch(() => { /* templates are optional; fall back to url/text */ });
+    return () => { cancelled = true; };
+  }, []);
 
   const setField = useCallback(
     <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => {
@@ -217,6 +243,10 @@ export default function CreateEventForm({
         privacyPolicyText:
           form.privacyPolicyMode === 'text'
             ? form.privacyPolicyText || undefined
+            : undefined,
+        gdprTemplateId:
+          form.privacyPolicyMode === 'template' && form.gdprTemplateId
+            ? form.gdprTemplateId
             : undefined,
         moderatorName: form.moderatorName || undefined,
         moderatorEmail: form.moderatorEmail || undefined,
@@ -534,7 +564,18 @@ export default function CreateEventForm({
           >
             {t('form.privacyPolicyMode')}
           </Label>
-          <div className="d-flex gap-2 mb-2">
+          <div className="d-flex gap-2 mb-2 flex-wrap">
+            {gdprTemplates.length > 0 && (
+              <Button
+                color={form.privacyPolicyMode === 'template' ? 'primary' : 'outline-primary'}
+                size="sm"
+                onClick={() => setField('privacyPolicyMode', 'template')}
+                type="button"
+              >
+                <Icon icon="it-lock" size="xs" className="me-1" />
+                {t('form.privacyPolicyModeTemplate')}
+              </Button>
+            )}
             <Button
               color={
                 form.privacyPolicyMode === 'url'
@@ -562,7 +603,36 @@ export default function CreateEventForm({
               {t('form.privacyPolicyModeText')}
             </Button>
           </div>
-          {form.privacyPolicyMode === 'url' ? (
+          {form.privacyPolicyMode === 'template' ? (
+            <FormGroup className="mb-0">
+              <select
+                className="form-select"
+                value={form.gdprTemplateId}
+                onChange={(e) => setField('gdprTemplateId', e.target.value)}
+              >
+                <option value="">{t('form.privacyPolicyTemplateNone')}</option>
+                {gdprTemplates.map((tpl) => (
+                  <option key={tpl.id} value={tpl.id}>
+                    {tpl.name}{tpl.isDefault ? ' ★' : ''}
+                  </option>
+                ))}
+              </select>
+              {form.gdprTemplateId && (
+                <div
+                  className="border rounded p-3 mt-2 bg-white"
+                  style={{ fontSize: '0.82rem', maxHeight: 180, overflowY: 'auto', whiteSpace: 'pre-wrap', color: '#17324D' }}
+                >
+                  {(() => {
+                    const tpl = gdprTemplates.find((x) => x.id === form.gdprTemplateId);
+                    return tpl?.body?.it ?? tpl?.body?.en ?? t('form.privacyPolicyTemplateEmpty');
+                  })()}
+                </div>
+              )}
+              <small className="form-text text-muted">
+                {t('form.privacyPolicyTemplateHint')}
+              </small>
+            </FormGroup>
+          ) : form.privacyPolicyMode === 'url' ? (
             <FormGroup className="mb-0">
               <Input
                 {...inputProps(
@@ -717,7 +787,7 @@ export default function CreateEventForm({
       <CollapsibleSection
         id="profiling"
         title={t('form.sectionRegistrationFields')}
-        icon="it-clipboard"
+        icon="it-list"
         defaultOpen={false}
       >
         <div className="py-3">

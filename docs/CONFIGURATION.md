@@ -178,6 +178,50 @@ Imposta `postgresql.enabled: false` e fornisci `DATABASE_URL` nel Secret:
 | Google Cloud SQL | `postgresql://user:pass@private-ip:5432/eventi_dtd?sslmode=require` |
 | Self-hosted | `postgresql://user:pass@host:5432/eventi_dtd` |
 
+## Redis (chat pub/sub)
+
+Richiesto **solo** per il fan-out chat cross-pod. Con una singola replica
+del pod app il codice funziona anche senza Redis (fallback a `null` in
+`lib/redis.ts`): tutti i client SSE sullo stesso pod ricevono i messaggi
+dalla Postgres insert locale, ma due pod diversi non si scambiano
+messaggi in tempo reale.
+
+### Redis nel cluster (modalità semplice)
+
+Il chart include il subchart Bitnami di Redis con `redis.enabled: true`
+di default. L'image è fissata a `latest` per evitare la rimozione del
+tag pinnato nel Legacy Catalog Bitnami (policy dal 2025-08-28). Redis
+usa autenticazione: metti la password nel Secret come `REDIS_PASSWORD`.
+
+```yaml
+redis:
+  enabled: true
+  architecture: standalone
+  image:
+    tag: latest
+  auth:
+    enabled: true
+    existingSecret: "videocall-secrets"
+    existingSecretPasswordKey: "REDIS_PASSWORD"
+  master:
+    persistence:
+      enabled: false   # pub/sub è ephemeral; canonical state in Postgres
+```
+
+### Redis esterno (managed)
+
+Imposta `redis.enabled: false` e fornisci `REDIS_URL` nel Secret:
+
+| Provider | Formato |
+|---|---|
+| Azure Cache for Redis | `rediss://:accessKey@cache-name.redis.cache.windows.net:6380/0` |
+| Amazon ElastiCache | `redis://user:pass@cluster.region.cache.amazonaws.com:6379/0` |
+| Google Memorystore | `redis://:pass@private-ip:6379/0` |
+| Self-hosted | `redis://:pass@host:6379/0` |
+
+> Usa lo schema `rediss://` (con doppia `s`) per TLS — obbligatorio su
+> Azure Cache che accetta solo connessioni cifrate.
+
 ## Secrets management
 
 Tre modalita disponibili (configurabili in `secrets.mode`):
@@ -295,6 +339,8 @@ jitsi-meet:
 | Variable | Required | Description |
 |---|---|---|
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `REDIS_URL` | No | Redis connection string (`redis://` / `rediss://`). Required only for multi-pod chat fan-out. With the in-cluster `redis` subchart the chart derives it at render time from `REDIS_PASSWORD`. |
+| `REDIS_PASSWORD` | Cond. | Required when the `redis` subchart is enabled or when `REDIS_URL` is not set explicitly. |
 | `APP_SECRET` | Yes | Secret for signing JWTs (admin sessions, Jitsi tokens) |
 | `ADMIN_API_KEY` | Yes | Key for admin login |
 | `PII_ENCRYPTION_KEY` | Yes | AES-256 key for PII encryption (64 hex chars) |

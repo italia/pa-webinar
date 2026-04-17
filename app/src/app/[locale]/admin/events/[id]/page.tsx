@@ -1,6 +1,8 @@
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
+import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import EventManagementClient from '@/components/admin/event-management-client';
@@ -9,6 +11,8 @@ interface EventManagePageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ token?: string }>;
 }
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function EventManagePage({
   params,
@@ -19,7 +23,12 @@ export default async function EventManagePage({
   const t = await getTranslations('admin');
   const locale = await getLocale();
 
-  if (!token) {
+  // Admins navigating from the admin UI (e.g. the recordings library) reach
+  // this page without a moderator token. Authenticate via the admin_session
+  // cookie instead and fall through to load the event.
+  const adminAuthenticated = token ? false : await isAdminAuthenticated(await cookies());
+
+  if (!token && !adminAuthenticated) {
     return (
       <div className="container py-5">
         <h1 className="mb-4">{t('title')}</h1>
@@ -28,6 +37,14 @@ export default async function EventManagePage({
         </div>
       </div>
     );
+  }
+
+  // Guard against non-UUID slugs hitting this dynamic route: Next.js picks
+  // the [id] segment for any path that doesn't match a sibling static route
+  // (e.g. /admin/events/<typo>). Hitting Prisma with a non-UUID throws
+  // P2023 Inconsistent column data instead of a clean 404.
+  if (!UUID_RE.test(id)) {
+    notFound();
   }
 
   const event = await prisma.event.findUnique({
@@ -60,7 +77,10 @@ export default async function EventManagePage({
     },
   });
 
-  if (!event || event.moderatorToken !== token) {
+  if (!event) {
+    notFound();
+  }
+  if (!adminAuthenticated && event.moderatorToken !== token) {
     notFound();
   }
 

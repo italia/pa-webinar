@@ -32,6 +32,21 @@ const eventBaseSchema = z.object({
   dataRetentionDays: z.number().int().min(1).max(365).default(30),
   privacyPolicyUrl: z.string().url().optional(),
   privacyPolicyText: z.string().max(10000).optional(),
+  gdprTemplateId: z.string().uuid().nullable().optional(),
+  /** Cleartext join password. Server hashes and stores in `join_password_hash`.
+   *  Empty string clears the password (sets the column back to NULL). */
+  joinPassword: z.string().max(200).optional(),
+  youtubeUrl: z
+    .string()
+    .url()
+    .refine(
+      (u) => /(?:youtube\.com|youtu\.be)/i.test(u),
+      { message: 'URL must point to youtube.com or youtu.be' },
+    )
+    .nullable()
+    .optional(),
+  libraryListed: z.boolean().optional(),
+  coverImageUrl: z.string().url().nullable().optional(),
   moderatorName: z.string().min(2).max(100).optional(),
   moderatorEmail: z.string().email().optional(),
   speakersInfo: localizedStringField.optional(),
@@ -76,6 +91,64 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 
+// ── GDPR Template Schemas ────────────────────────────
+
+export const gdprTemplateBodySchema = localizedStringField.refine(
+  (obj) => Object.values(obj).some((v) => typeof v === 'string' && v.trim().length >= 20),
+  { message: 'At least one locale must contain ≥20 characters' },
+);
+
+export const createGdprTemplateSchema = z.object({
+  name: z.string().min(2).max(120),
+  description: z.string().max(500).nullable().optional(),
+  body: gdprTemplateBodySchema,
+  isDefault: z.boolean().optional().default(false),
+});
+
+export const updateGdprTemplateSchema = createGdprTemplateSchema.partial();
+
+export type CreateGdprTemplateInput = z.infer<typeof createGdprTemplateSchema>;
+export type UpdateGdprTemplateInput = z.infer<typeof updateGdprTemplateSchema>;
+
+// ── Legacy Event Import Schema ───────────────────────
+//
+// Legacy events (eventType=LEGACY) cover video archives the PA already
+// owns (typically MsTeams recordings re-uploaded onto our Azure Blob
+// via the admin UI). They skip Jitsi provisioning and registrations;
+// all we persist is enough metadata to render the detail page and the
+// library card.
+//
+// The mandatory field is `recordingUrl`: the blob URL returned by the
+// SAS-signed upload endpoint. `youtubeUrl` stays optional as an
+// external-reference link to the original YouTube upload (surfaced as
+// a "Watch on YouTube" link, never embedded).
+export const createLegacyEventSchema = z.object({
+  title: localizedStringField.refine(
+    (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
+    { message: 'title.it is required and must be at least 3 characters' },
+  ),
+  description: localizedStringField.optional().default({ it: '' }),
+  startsAt: z.string().datetime(),
+  endsAt: z.string().datetime(),
+  recordingUrl: z.string().url(),
+  recordingFileSize: z.number().int().positive().optional(),
+  recordingDuration: z.number().int().positive().optional(),
+  youtubeUrl: z
+    .string()
+    .url()
+    .refine(
+      (u) => /(?:youtube\.com|youtu\.be)/i.test(u),
+      { message: 'URL must point to youtube.com or youtu.be' },
+    )
+    .nullable()
+    .optional(),
+  coverImageUrl: z.string().url().optional(),
+  speakersInfo: localizedStringField.optional(),
+  organizerName: z.string().max(200).optional(),
+  libraryListed: z.boolean().optional().default(true),
+});
+export type CreateLegacyEventInput = z.infer<typeof createLegacyEventSchema>;
+
 // ── Instant Call Schema ──────────────────────────────
 
 export const createInstantCallSchema = z.object({
@@ -84,6 +157,7 @@ export const createInstantCallSchema = z.object({
     { message: 'title.it is required and must be at least 2 characters' },
   ),
   moderatorName: z.string().min(2).max(100).optional(),
+  joinPassword: z.string().min(4).max(200).optional(),
 });
 
 // ── Registration Schemas ─────────────────────────────

@@ -13,6 +13,7 @@ export default function CreateInstantCall() {
 
   const [title, setTitle] = useState('');
   const [moderatorName, setModeratorName] = useState('');
+  const [joinPassword, setJoinPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [shareLink, setShareLink] = useState('');
@@ -20,6 +21,10 @@ export default function CreateInstantCall() {
 
   const handleCreate = async () => {
     if (!title.trim()) return;
+    if (joinPassword && joinPassword.length < 4) {
+      setError(t('passwordTooShort'));
+      return;
+    }
     setLoading(true);
     setError('');
 
@@ -30,6 +35,7 @@ export default function CreateInstantCall() {
         body: JSON.stringify({
           title: { it: title.trim() },
           moderatorName: moderatorName.trim() || undefined,
+          joinPassword: joinPassword.trim() || undefined,
         }),
       });
 
@@ -120,6 +126,23 @@ export default function CreateInstantCall() {
           disabled={loading}
           maxLength={100}
         />
+      </FormGroup>
+
+      <FormGroup className="mb-3">
+        <Label htmlFor="instant-password" className="fw-semibold" style={{ fontSize: '0.85rem' }}>
+          {t('passwordLabel')}
+        </Label>
+        <Input
+          id="instant-password"
+          type="password"
+          value={joinPassword}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setJoinPassword(e.target.value)}
+          placeholder={t('passwordPlaceholder')}
+          disabled={loading}
+          maxLength={200}
+          autoComplete="new-password"
+        />
+        <small className="form-text text-muted">{t('passwordHint')}</small>
       </FormGroup>
 
       <div className="d-flex align-items-center gap-2">

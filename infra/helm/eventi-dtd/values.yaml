@@ -186,6 +186,7 @@ secrets:
       # Maps Kubernetes secret keys → Key Vault secret names
       secretMappings:
         DATABASE_URL: "eventi-dtd-database-url"
+        REDIS_URL: "eventi-dtd-redis-url"
         JITSI_JWT_SECRET: "eventi-dtd-jitsi-jwt-secret"
         APP_SECRET: "eventi-dtd-app-secret"
         ADMIN_API_KEY: "eventi-dtd-admin-api-key"
@@ -209,6 +210,14 @@ secrets:
   # ── Generated secrets (mode: "generate", dev/test ONLY) ──
   generate:
     DATABASE_URL: ""
+    # Leave empty when using the in-cluster `redis` subchart: the
+    # templates inject an svc-based default at render time. Set
+    # explicitly when pointing at an external / managed Redis.
+    REDIS_URL: ""
+    # Random password used by both the redis subchart (auth.enabled)
+    # and the app (as part of the derived REDIS_URL). Regenerate per
+    # deploy with: openssl rand -base64 32
+    REDIS_PASSWORD: ""
     JITSI_JWT_SECRET: ""
     JITSI_JWT_APP_ID: "eventi_dtd"
     JITSI_JWT_ISSUER: "eventi-dtd"
@@ -317,6 +326,16 @@ cronjobs:
   cleanup:
     enabled: true
     schedule: "0 3 * * *"
+    image: curlimages/curl:8.11.1
+
+  # Orphan recording reconciliation — scans the recording bucket,
+  # upserts orphan_recordings rows for blobs not linked to any event or
+  # session, and sweeps entries whose grace period has expired.
+  # Runs every 6h by default; keep this disabled in dev where the
+  # bucket isn't configured.
+  recordingsReconcile:
+    enabled: true
+    schedule: "17 */6 * * *"
     image: curlimages/curl:8.11.1
 
 # ── JVB Auto-Scaler ─────────────────────────────────────────
@@ -570,6 +589,57 @@ postgresql:
     # Pre-existing Secret containing DATABASE_URL
     existingSecret: ""
     secretKey: "DATABASE_URL"
+
+# ── Redis ────────────────────────────────────────────────────
+#
+# Redis powers real-time chat fan-out (pub/sub) across app pods.
+# Disable and point the REDIS_URL secret at a managed Redis (Azure
+# Cache, ElastiCache, MemoryStore, …) for production deployments.
+redis:
+  enabled: true
+
+  architecture: standalone  # single node is enough for pub/sub + rate-limit
+
+  # As of 2025-08-28 Bitnami moved most pinned image tags to their
+  # "Legacy Catalog"; the chart's default tag may disappear from the
+  # public registry. We deliberately track `latest` because we only
+  # rely on PUBLISH/SUBSCRIBE/GET/SET — those are stable across major
+  # Redis versions. Override in values-<env>.yaml if your org pins a
+  # specific digest.
+  image:
+    tag: "latest"
+    pullPolicy: Always
+
+  auth:
+    enabled: true
+    # Pre-existing Secret containing REDIS_PASSWORD. Required: Redis
+    # refuses to start without a password when auth is enabled.
+    existingSecret: "videocall-secrets"
+    existingSecretPasswordKey: "REDIS_PASSWORD"
+
+  master:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    persistence:
+      # pub/sub is ephemeral; we don't need AOF/RDB durability. Turn
+      # it on if you plan to reuse the same Redis for other stateful
+      # features (distributed rate-limit counters, cache).
+      enabled: false
+
+  commonConfiguration: |
+    # No persistence: pub/sub is fire-and-forget and canonical chat
+    # state lives in Postgres.
+    save ""
+    appendonly no
+    # Pub/sub buffers: allow bigger spikes during a live event (300
+    # subscribers × a few messages/sec peak) without Redis killing
+    # slow consumers. Defaults are 32mb hard / 8mb soft for pubsub.
+    client-output-buffer-limit pubsub 64mb 16mb 60
 
 # ── Name overrides ──────────────────────────────────────────
 nameOverride: ""

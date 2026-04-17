@@ -162,12 +162,12 @@ export default function SiteSettingsForm({
           {saving ? t('saving') : tc('save')}
         </Button>
         {saved && (
-          <Alert color="success" className="mb-0 py-2 px-3">
+          <Alert color="success" className="mb-0">
             {t('saved')}
           </Alert>
         )}
         {error && (
-          <Alert color="danger" className="mb-0 py-2 px-3">
+          <Alert color="danger" className="mb-0">
             {error}
           </Alert>
         )}

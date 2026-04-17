@@ -1,7 +1,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { ForbiddenError, NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
-import { extractModeratorToken, constantTimeEqual } from '@/lib/auth/moderator';
+import { extractModeratorToken } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 

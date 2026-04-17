@@ -189,8 +189,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
           </div>
         </div>
 
-        <Alert color="info" className="py-2 px-3 mb-0" style={{ fontSize: '0.82rem' }}>
-          <Icon icon="it-info-circle" size="xs" className="me-1" />
+        <Alert color="info" className="mb-0" style={{ fontSize: '0.82rem' }}>
           {t('dataRetentionNote', { days: event.dataRetentionDays })}
         </Alert>
       </CardBody>

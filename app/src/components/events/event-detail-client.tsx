@@ -39,6 +39,7 @@ interface EventData {
   registrationCount: number;
   status: string;
   recordingUrl: string | null;
+  youtubeUrl?: string | null;
   qaEnabled: boolean;
   chatEnabled: boolean;
   recordingEnabled?: boolean;
@@ -145,7 +146,6 @@ export default function EventDetailClient({
 
       {isEnded && (
         <Alert color="info" className="mb-4">
-          <Icon icon="it-info-circle" className="me-2" />
           {t('detail.eventHeldOn', {
             date: format.dateTime(startsAt, {
               weekday: 'long',
@@ -286,8 +286,16 @@ export default function EventDetailClient({
       {/* ─── Content + Sidebar ─── */}
       <Row>
         <Col lg={8} className="mb-4 mb-lg-0">
-          {/* Video player for ended events with recording */}
-          {isEnded && event.recordingUrl && (
+          {/* Video player for ended events with a recording. YouTube
+              embed wins when set (legacy uploads / mirrored streams);
+              otherwise the self-hosted MP4 is served via our signed
+              /api/events/[slug]/recording route. */}
+          {isEnded && event.youtubeUrl && (
+            <div className="mb-4">
+              <YouTubeEmbed url={event.youtubeUrl} title={title} />
+            </div>
+          )}
+          {isEnded && !event.youtubeUrl && event.recordingUrl && (
             <div className="mb-4">
               <VideoPlayer
                 src={`/api/events/${event.slug}/recording`}
@@ -524,12 +532,20 @@ function PostEventSidebar({
       )}
 
       {event.recordingUrl ? (
-        <Alert color="success" className="mb-3 py-2 px-3">
-          <div className="d-flex align-items-center">
-            <Icon icon="it-video" className="me-2" />
-            <span className="fw-semibold">{t('detail.recording')}</span>
-          </div>
-        </Alert>
+        <div
+          className="mb-3 d-flex align-items-center gap-2"
+          style={{
+            fontSize: '0.88rem',
+            padding: '8px 12px',
+            borderLeft: '3px solid #008758',
+            background: '#E6F4EA',
+            borderRadius: '0 4px 4px 0',
+            color: '#155724',
+          }}
+        >
+          <Icon icon="it-video" size="sm" />
+          <span className="fw-semibold">{t('detail.recording')}</span>
+        </div>
       ) : (
         <p className="text-muted text-center mb-3" style={{ fontSize: '0.85rem' }}>
           {t('detail.noRecording')}
@@ -537,8 +553,17 @@ function PostEventSidebar({
       )}
 
       {retentionExpiry && (
-        <Alert color="info" className="py-2 px-3 mb-0" style={{ fontSize: '0.8rem' }}>
-          <Icon icon="it-info-circle" size="xs" className="me-1" />
+        <div
+          className="mb-0"
+          style={{
+            fontSize: '0.78rem',
+            padding: '8px 12px',
+            borderLeft: '3px solid #5c9ec8',
+            background: '#E8F0FE',
+            borderRadius: '0 4px 4px 0',
+            color: '#17324D',
+          }}
+        >
           {tp('availableUntil', {
             date: format.dateTime(retentionExpiry, {
               day: 'numeric',
@@ -546,8 +571,57 @@ function PostEventSidebar({
               year: 'numeric',
             }),
           })}
-        </Alert>
+        </div>
       )}
     </>
+  );
+}
+
+/**
+ * Normalize a YouTube watch/shortlink URL to an embed URL.
+ * Accepts:
+ *   - https://www.youtube.com/watch?v=VIDEO_ID
+ *   - https://youtu.be/VIDEO_ID
+ *   - https://www.youtube.com/embed/VIDEO_ID (already normalized)
+ * Returns null for anything we can't confidently map to a video id.
+ */
+function toYouTubeEmbed(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('youtu.be')) {
+      const id = u.pathname.replace(/^\//, '').split('/')[0];
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+    if (u.hostname.includes('youtube.com')) {
+      if (u.pathname.startsWith('/embed/')) return url;
+      const id = u.searchParams.get('v');
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+  } catch { /* fall through */ }
+  return null;
+}
+
+function YouTubeEmbed({ url, title }: { url: string; title: string }) {
+  const embed = toYouTubeEmbed(url);
+  if (!embed) {
+    // Fallback to a plain link if the URL didn't parse as a YouTube
+    // video — better than rendering nothing silently.
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        {url}
+      </a>
+    );
+  }
+  return (
+    <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: 8, background: '#000' }}>
+      <iframe
+        src={embed}
+        title={title}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        loading="lazy"
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+      />
+    </div>
   );
 }
