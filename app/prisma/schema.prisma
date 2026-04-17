@@ -44,10 +44,25 @@ model Event {
   moderatorName  String? @map("moderator_name")
   moderatorEmail String? @map("moderator_email")
 
+  // Optional join password. When set, guests visiting /live without a
+  // valid accessToken or matching password are redirected to a password
+  // prompt before a Jitsi JWT is issued. Stored as a bcrypt hash — never
+  // surfaced via any API response — and bypassed for admin / moderator
+  // sessions (they already authenticated via magic link or JWT).
+  joinPasswordHash String? @map("join_password_hash")
+
   // GDPR
   dataRetentionDays Int     @default(30) @map("data_retention_days")
   privacyPolicyUrl  String? @map("privacy_policy_url")
   privacyPolicyText String? @map("privacy_policy_text") @db.Text
+
+  // Optional link to a shared GDPR template. When set, the event inherits
+  // the template's multilingual body; privacyPolicyText can still override
+  // per-event when a custom privacy notice is needed (the template is
+  // primarily a default for admins who don't want to paste the same text
+  // on every new event).
+  gdprTemplateId String?       @map("gdpr_template_id") @db.Uuid
+  gdprTemplate   GdprTemplate? @relation(fields: [gdprTemplateId], references: [id], onDelete: SetNull)
 
   // Additional info
   speakersInfo        Json    @default("{}") @map("speakers_info") @db.JsonB
@@ -83,6 +98,25 @@ model Event {
   recordingDuration        Int?      @map("recording_duration")
   recordingDeleteAfterDays Int?      @map("recording_delete_after_days")
 
+  // Optional YouTube URL for legacy / mirrored recordings. When set, the
+  // public video library prefers the embed over the self-hosted blob —
+  // useful for events that were originally streamed or published on
+  // YouTube before we owned the platform.
+  youtubeUrl String? @map("youtube_url")
+
+  // Whether the event is listed on the public /video-library hub.
+  // Independent from `post_event_public` (which controls the detail
+  // page's post-event view): an admin can keep a call's detail page
+  // accessible to registered participants without exposing it to every
+  // library visitor. Default false; INSTANT calls stay off by default
+  // because they're usually internal / throw-away sessions.
+  libraryListed Boolean @default(false) @map("library_listed")
+
+  // 16:9 cover banner for the library card — higher-quality / more
+  // curated than `image_url` (which may be a generic event graphic).
+  // Optional: falls back to `image_url`, then to a generated gradient.
+  coverImageUrl String? @map("cover_image_url")
+
   // Post-event configuration
   postEventPublic        Boolean   @default(true) @map("post_event_public")
   postEventPublicUntil   DateTime? @map("post_event_public_until")
@@ -98,22 +132,141 @@ model Event {
   // Analytics
   peakParticipants Int @default(0) @map("peak_participants")
 
+  // Capacity estimate snapshot captured at create/update time (moderator
+  // bandwidth, participant bandwidth, JVB count, storage, ...). Persisted
+  // so we can later diff against real Prometheus metrics and tune the
+  // estimate formula over time, and so Helm/autoscaler flows can pre-warm
+  // the right number of JVB replicas for upcoming events.
+  capacityEstimateJson Json? @map("capacity_estimate_json") @db.JsonB
+
   // Timestamps
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  registrations   Registration[]
-  questions       Question[]
-  polls           Poll[]
-  materials       EventMaterial[]
-  reminders       EventReminder[]
-  gdprAuditLogs   GdprAuditLog[]
-  feedback        EventFeedback[]
-  wordCloudRounds WordCloudRound[]
-  callSessions    CallSession[]
+  registrations    Registration[]
+  questions        Question[]
+  polls            Poll[]
+  materials        EventMaterial[]
+  reminders        EventReminder[]
+  gdprAuditLogs    GdprAuditLog[]
+  feedback         EventFeedback[]
+  wordCloudRounds  WordCloudRound[]
+  callSessions     CallSession[]
+  additionalMods   EventModerator[]
+  chatMessages     ChatMessage[]
 
   @@map("events")
+}
+
+// ─── Additional moderators ───────────────────────────────────
+//
+// Beyond the primary `Event.moderatorToken` (which acts as the
+// "owner" magic link), events can have any number of named
+// co-moderators with their own individual magic-link tokens. Each
+// row carries a display name and optional email so:
+//
+//   - The pre-join screen can greet the co-moderator by name without
+//     leaking the primary moderator's name (fixes the shared-link
+//     issue where everyone showed up as the original moderator).
+//   - Revoking access to a single co-moderator doesn't invalidate the
+//     other moderators' links.
+//   - An audit trail at /admin/events/[id] shows who has access.
+model EventModerator {
+  id    String @id @default(uuid()) @db.Uuid
+  eventId String @map("event_id") @db.Uuid
+
+  name  String
+  email String?
+
+  // Per-moderator magic link token. Still UUID so `randomUUID()` from
+  // crypto can generate it safely.
+  token String @unique
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@map("event_moderators")
+}
+
+// ─── Chat messages ──────────────────────────────────────────
+//
+// In-app real-time chat for live events. Unlike the previous iteration
+// (which used Jitsi XMPP as transport and was ephemeral), these rows
+// persist so we can:
+//   - rehydrate late joiners with /chat/history?since=…
+//   - surface the transcript in the post-event page alongside Q&A
+//   - feed the chat corpus into AI summary workflows (roadmap)
+//   - export for GDPR / compliance requests
+//
+// Real-time fan-out is handled via Redis pub/sub (POST inserts a row
+// and PUBLISHes on `chat:<eventId>`; SSE subscribers on any pod
+// re-emit to their connected clients).
+model ChatMessage {
+  id        String  @id @default(uuid()) @db.Uuid
+  eventId   String  @map("event_id") @db.Uuid
+
+  // Who sent it. We intentionally denormalize the sender's display
+  // name — participant display names are mutable in Jitsi pre-join,
+  // and for post-event history we want the name as it appeared in
+  // the room, not the current one.
+  senderName String @map("sender_name")
+  // Matches the participant's JWT uniqueId (mod-xxx / reg-xxx /
+  // guest-xxx), so we can cluster messages by author for AI summary
+  // even after display-name changes.
+  senderId   String @map("sender_id")
+  // true when the caller authenticated via the moderator magic link.
+  // Used by the UI to style moderator messages differently and by
+  // moderation actions to prevent partecipanti from deleting others.
+  isModerator Boolean @default(false) @map("is_moderator")
+
+  text String @db.Text
+
+  // Soft-delete flag: moderator/admin can hide a message without
+  // losing the audit trail. Hidden messages are excluded from
+  // /history but kept in the archive for compliance.
+  hiddenAt  DateTime? @map("hidden_at")
+  hiddenBy  String?   @map("hidden_by")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, createdAt])
+  @@map("chat_messages")
+}
+
+// ─── GDPR Templates ─────────────────────────────────────────
+//
+// Reusable privacy notices shared across events. A template stores the
+// privacy text in every enabled locale (JSON: {it: "...", en: "..."}).
+// Events can either reference a template (inheriting the text) or keep
+// their ad-hoc `privacyPolicyText`. The admin UI lets operators create,
+// edit and select templates, so the same GDPR clauses don't need to be
+// pasted into every new event form.
+model GdprTemplate {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @unique
+  description String? @db.Text
+  // Localized body: { it: "...", en: "..." }; every enabled locale is
+  // optional — missing locales fall back to the default site locale on
+  // the event page.
+  body        Json    @default("{}") @db.JsonB
+
+  // True for the template the admin wants to pre-select on new events.
+  // Only one template can be default at a time (enforced by a unique
+  // partial index in the migration SQL).
+  isDefault Boolean @default(false) @map("is_default")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  events Event[]
+
+  @@map("gdpr_templates")
 }
 
 enum EventStatus {
@@ -129,6 +282,10 @@ enum EventStatus {
 enum EventType {
   SCHEDULED
   INSTANT
+  // Historical event imported from an external source (e.g. YouTube):
+  // no Jitsi room, no registrations, no live flow — just metadata and
+  // a `youtubeUrl` that the library / detail page can embed.
+  LEGACY
 }
 
 enum OrganizationType {
@@ -468,9 +625,47 @@ model SiteSetting {
   // 30s — compromesso fra freschezza dei dati e carico sull'app.
   statusPollIntervalSeconds Int @default(30) @map("status_poll_interval_seconds")
 
+  // Giorni di grace prima che un orfano (blob nello storage non linkato a
+  // nessun Event/CallSession) venga cancellato automaticamente dal cron di
+  // reconciliation. Default: 30. Durante la grace l'admin può decidere di
+  // marcare l'orfano come "ignore" (mantenere) o "delete-now" (eliminare
+  // subito). Impostare a 0 per disabilitare l'auto-cleanup.
+  orphanRecordingGraceDays Int @default(30) @map("orphan_recording_grace_days")
+
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("site_settings")
+}
+
+// ─── Orphan Recordings ──────────────────────────────
+//
+// Recordings live in object storage and are linked to Event/CallSession
+// rows only when Jibri's finalize webhook succeeds. If the webhook fails
+// (misconfigured room name, network error, expired event, etc.) the blob
+// becomes an orphan: it exists in the bucket but nothing references it.
+//
+// A periodic reconciliation job scans the bucket, upserts unknown blobs
+// here, and refreshes `lastSeenAt` on every run. A second job sweeps
+// orphans with decision=pending past the configured grace period and
+// deletes them from the bucket (and from this table).
+//
+// decision transitions:
+//   pending    — discovered, awaiting admin review
+//   ignore     — operator chose to keep; never auto-deleted
+//   delete-now — operator chose to delete immediately on next sweep
+model OrphanRecording {
+  id           String   @id @default(uuid()) @db.Uuid
+  blobName     String   @unique @map("blob_name")
+  sizeBytes    BigInt?  @map("size_bytes")
+  lastModified DateTime? @map("last_modified")
+  discoveredAt DateTime @default(now()) @map("discovered_at")
+  lastSeenAt   DateTime @default(now()) @map("last_seen_at")
+  decision     String   @default("pending") // pending | ignore | delete-now
+  note         String?  @db.Text
+
+  @@index([decision])
+  @@index([discoveredAt])
+  @@map("orphan_recordings")
 }
 
 enum HomePageMode {

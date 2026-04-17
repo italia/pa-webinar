@@ -16,8 +16,52 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 const intlMiddleware = createMiddleware(routing);
 
+/**
+ * Hosts allowed by CSP `media-src` so the inline <video> player can stream
+ * recordings directly from the configured object store. We resolve them at
+ * request time from the recording-storage env vars — the platform supports
+ * Azure Blob, S3, GCS and MinIO, each with a different hostname shape.
+ *
+ * RECORDING_MEDIA_CSP_HOSTS (space-separated) overrides/extends the set
+ * for operators who terminate storage behind a custom domain or CDN.
+ */
+function recordingMediaHosts(): string[] {
+  const hosts = new Set<string>();
+
+  const storageType = process.env.RECORDING_STORAGE_TYPE;
+  if (storageType === 'azure-blob') {
+    const conn = process.env.RECORDING_AZURE_CONNECTION_STRING ?? '';
+    const account = conn.match(/AccountName=([^;]+)/)?.[1];
+    if (account) hosts.add(`https://${account}.blob.core.windows.net`);
+  } else if (storageType === 's3') {
+    const endpoint = process.env.RECORDING_S3_ENDPOINT;
+    if (endpoint) {
+      try { hosts.add(new URL(endpoint).origin); } catch { /* ignore */ }
+    } else {
+      hosts.add('https://*.amazonaws.com');
+    }
+  } else if (storageType === 'gcs') {
+    hosts.add('https://storage.googleapis.com');
+  }
+
+  const extra = process.env.RECORDING_MEDIA_CSP_HOSTS;
+  if (extra) for (const h of extra.split(/\s+/).filter(Boolean)) hosts.add(h);
+
+  return [...hosts];
+}
+
 function applySecurityHeaders(response: NextResponse): NextResponse {
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN');
+  const mediaHosts = recordingMediaHosts();
+  const mediaSrc = ["'self'", 'blob:', ...mediaHosts].join(' ');
+  // connect-src needs the same storage hosts so the admin upload form
+  // can PUT directly to the SAS URL (browser-side Azure SDK / fetch).
+  const connectSrc = [
+    "'self'",
+    `https://${jitsiDomain}`,
+    `wss://${jitsiDomain}`,
+    ...mediaHosts,
+  ].join(' ');
 
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
@@ -30,13 +74,16 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      `frame-src 'self' https://${jitsiDomain}`,
+      // Also allow YouTube for the public video-library embed (legacy
+      // events host their recordings on youtube.com before we owned
+      // Jibri infra). img-src mirrors this so YT preview thumbs load.
+      `frame-src 'self' https://${jitsiDomain} https://www.youtube.com https://www.youtube-nocookie.com`,
       `script-src 'self' 'unsafe-inline' https://${jitsiDomain}`,
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
-      "img-src 'self' data: blob:",
-      `connect-src 'self' https://${jitsiDomain} wss://${jitsiDomain}`,
-      "media-src 'self' blob:",
+      "img-src 'self' data: blob: https://i.ytimg.com",
+      `connect-src ${connectSrc}`,
+      `media-src ${mediaSrc}`,
     ].join('; '),
   );
   response.headers.set(

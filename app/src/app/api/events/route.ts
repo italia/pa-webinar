@@ -13,6 +13,8 @@ import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { getPublicEnv } from '@/lib/env';
+import { calculateEstimates } from '@/lib/estimates';
+import { hashJoinPassword } from '@/lib/auth/password';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,6 +49,20 @@ export const POST = withErrorHandling(async (request) => {
   const jitsiRoomName = `evt-${randomUUID()}`;
   const moderatorToken = randomUUID();
 
+  // Capture the capacity estimate snapshot at creation time. We store it
+  // with the event so provisioning workflows (JVB pre-scaling, Jibri
+  // availability) can read the expected load without recomputing, and
+  // so post-event analytics can diff it against real Prometheus data.
+  const capacityEstimate = calculateEstimates({
+    maxParticipants: data.maxParticipants,
+    startsAt: data.startsAt,
+    endsAt: data.endsAt,
+    recordingEnabled: data.recordingEnabled,
+    participantsCanUnmute: data.participantsCanUnmute,
+    participantsCanStartVideo: data.participantsCanStartVideo,
+    participantsCanShareScreen: data.participantsCanShareScreen,
+  });
+
   const event = await prisma.event.create({
     data: {
       slug,
@@ -73,6 +89,14 @@ export const POST = withErrorHandling(async (request) => {
       organizerName: data.organizerName,
       imageUrl: data.imageUrl,
       waitingRoomAudioUrl: data.waitingRoomAudioUrl,
+      capacityEstimateJson: {
+        ...capacityEstimate,
+        computedAt: new Date().toISOString(),
+      },
+      joinPasswordHash:
+        data.joinPassword && data.joinPassword.length > 0
+          ? hashJoinPassword(data.joinPassword)
+          : null,
       // Default reminders: 1 day and 1 hour before
       reminders: {
         create: [

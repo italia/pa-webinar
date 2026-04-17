@@ -408,6 +408,31 @@ export const GET = withErrorHandling(async () => {
     dbOk = true;
   } catch { /* noop */ }
 
+  // Redis ping for the infrastructure map. Kept side-by-side with the
+  // database probe so both data-plane components share the same
+  // failure surface. `redisConfigured = false` means the operator
+  // is running single-pod (REDIS_URL unset) — we render the node
+  // in 'standby' rather than 'down'.
+  let redisConfigured = false;
+  let redisOk = false;
+  let redisLatencyMs = 0;
+  try {
+    const { getRedis } = await import('@/lib/redis');
+    const redis = getRedis();
+    if (redis) {
+      redisConfigured = true;
+      const redisStart = Date.now();
+      const pong = await Promise.race([
+        redis.ping(),
+        new Promise<never>((_, rej) =>
+          setTimeout(() => rej(new Error('redis timeout')), 2000),
+        ),
+      ]);
+      redisLatencyMs = Date.now() - redisStart;
+      redisOk = pong === 'PONG';
+    }
+  } catch { /* redisOk stays false */ }
+
   const now = new Date();
   const preScaleWindow = new Date(now.getTime() + preScaleMinutes * 60 * 1000);
   const staleCutoff = new Date(now.getTime() - provisioningTimeoutMinutes * 60 * 1000);
@@ -480,6 +505,11 @@ export const GET = withErrorHandling(async () => {
   try { appHost = new URL(appDomain).hostname; } catch { /* */ }
 
   const dbStatus: ServiceStatus = dbOk ? (dbLatencyMs > 1000 ? 'degraded' : 'healthy') : 'down';
+  const redisStatus: ServiceStatus = !redisConfigured
+    ? 'standby'
+    : redisOk
+      ? (redisLatencyMs > 500 ? 'degraded' : 'healthy')
+      : 'down';
   const jitsiWebStatus: ServiceStatus = jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby';
   // Jibri status reflects scale-to-zero semantics, mirroring /api/status:
   //   - unconfigured (no storage backend) → standby with unconfigured verdict
@@ -524,6 +554,22 @@ export const GET = withErrorHandling(async () => {
       replicas: { running: dbOk ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'postgresql', port: 5432, protocol: 'TCP' }],
       metadata: { type: mode === 'simple' ? 'in-cluster' : 'external', latencyMs: dbLatencyMs },
+    },
+    {
+      id: 'redis',
+      name: 'infraMap.services.redis',
+      technicalName: 'Redis (pub/sub)',
+      description: 'infraMap.descriptions.redis',
+      status: redisStatus,
+      verdict: !redisConfigured
+        ? 'infraMap.verdicts.redis.standby'
+        : redisOk
+          ? (redisLatencyMs > 500 ? 'infraMap.verdicts.redis.degraded' : 'infraMap.verdicts.redis.healthy')
+          : 'infraMap.verdicts.redis.down',
+      impact: null,
+      replicas: { running: redisOk ? 1 : 0, desired: null, max: null },
+      ports: [{ name: 'redis', port: 6379, protocol: 'TCP' }],
+      metadata: { configured: redisConfigured, latencyMs: redisLatencyMs },
     },
     {
       id: 'jitsi-web',

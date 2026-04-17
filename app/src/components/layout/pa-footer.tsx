@@ -64,6 +64,13 @@ export default function PAFooter() {
                     {t('nav.events')}
                   </Link>
                 </h4>
+                <ul className="footer-list link-list clearfix">
+                  <li>
+                    <Link href="/video-library" className="list-item text-white">
+                      {t('nav.videoLibrary')}
+                    </Link>
+                  </li>
+                </ul>
               </div>
               <div className="col-lg-4 col-md-4 pb-2">
                 <h4>{t('footer.contacts')}</h4>

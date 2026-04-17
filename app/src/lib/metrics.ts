@@ -49,6 +49,28 @@ export const questionsTotal = new client.Counter({
   registers: [register],
 });
 
+// ── Chat ─────────────────────────────────────────────────────
+//
+// The in-app chat (Postgres + Redis pub/sub + SSE) has two metrics
+// worth watching on a live event: the rate of submitted messages
+// and the number of SSE subscribers currently connected to this
+// pod. The latter is what drives the pod's keepalive + fan-out
+// cost — monitoring the gauge makes horizontal scaling decisions
+// easy ("300 SSE per pod → add a replica").
+export const chatMessagesTotal = new client.Counter({
+  name: 'eventi_chat_messages_total',
+  help: 'Total chat messages persisted (after auth + rate-limit)',
+  labelNames: ['event_id'] as const,
+  registers: [register],
+});
+
+export const chatSseConnectionsGauge = new client.Gauge({
+  name: 'eventi_chat_sse_connections',
+  help: 'Active chat SSE connections handled by this pod',
+  labelNames: ['event_id'] as const,
+  registers: [register],
+});
+
 export const jitsiTokensIssued = new client.Counter({
   name: 'eventi_jitsi_tokens_issued_total',
   help: 'Total Jitsi JWT tokens issued',

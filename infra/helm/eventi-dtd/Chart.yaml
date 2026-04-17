@@ -24,6 +24,14 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
 
+  # Redis — pub/sub for real-time chat fan-out across app pods.
+  # Disable and point REDIS_URL at an external/managed Redis for
+  # production cloud deployments.
+  - name: redis
+    version: "~20.13.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+
   # Jitsi Meet — disable if using external Jitsi instance
   - name: jitsi-meet
     version: "~2.13.0"

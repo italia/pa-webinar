@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import AdminNav from '@/components/admin/admin-nav';
+import AdminBreadcrumb from '@/components/admin/admin-breadcrumb';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +17,12 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <>
-      {isAdmin && <AdminNav />}
+      {isAdmin && (
+        <>
+          <AdminNav />
+          <AdminBreadcrumb />
+        </>
+      )}
       {children}
     </>
   );

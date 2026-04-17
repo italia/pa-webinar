@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import {
   Alert,
   Badge,
@@ -13,6 +13,7 @@ import {
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter } from '@/i18n/navigation';
+import RecordingUploadWidget from './recording-upload-widget';
 
 interface RecordingManagementProps {
   event: {
@@ -60,6 +61,7 @@ export default function RecordingManagement({
   jibriAvailable = true,
 }: RecordingManagementProps) {
   const t = useTranslations('recording');
+  const fmt = useFormatter();
   const router = useRouter();
 
   const [published, setPublished] = useState(event.recordingPublished);
@@ -127,7 +129,19 @@ export default function RecordingManagement({
   }, [event.slug, event.moderatorToken, t, router]);
 
   if (!event.recordingEnabled && !hasRecording) {
-    return null;
+    return (
+      <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
+        <CardBody className="p-4">
+          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            {t('management')}
+          </h5>
+          <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+            {t('disabledHint')}
+          </div>
+          <RecordingUploadWidget eventId={event.id} />
+        </CardBody>
+      </Card>
+    );
   }
 
   if (!jibriAvailable && !hasRecording) {
@@ -138,7 +152,6 @@ export default function RecordingManagement({
             {t('management')}
           </h5>
           <Alert color="warning" className="mb-0">
-            <Icon icon="it-warning-circle" className="me-2" />
             {t('notConfigured')}
           </Alert>
         </CardBody>
@@ -170,7 +183,7 @@ export default function RecordingManagement({
                   {t('duration')}: <span className="font-monospace">{liveElapsed}</span>
                 </div>
                 <div className="text-muted" style={{ fontSize: '0.82rem' }}>
-                  {t('startedAt')}: {new Date(event.tempRecordingStartedAt).toLocaleTimeString()} ({t('automatic')})
+                  {t('startedAt')}: {fmt.dateTime(new Date(event.tempRecordingStartedAt), { hour: '2-digit', minute: '2-digit', second: '2-digit' })} ({t('automatic')})
                 </div>
               </div>
             </div>
@@ -292,6 +305,14 @@ export default function RecordingManagement({
               </Button>
             </div>
           </>
+        )}
+
+        {/* Replace the existing recording with a different MP4 —
+            useful after editing the Jibri output offline or swapping
+            for a MsTeams export. Hidden while a live recording is
+            running to avoid racing against Jibri's own upload. */}
+        {!isLive && (
+          <RecordingUploadWidget eventId={event.id} compact />
         )}
       </CardBody>
     </Card>

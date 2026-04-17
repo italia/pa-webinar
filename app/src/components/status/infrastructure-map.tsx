@@ -34,6 +34,9 @@ const SERVICE_ICONS: Record<string, string> = {
   jvb: 'M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 17H5V7h9v10z',
   jibri: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z',
   smtp: 'M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z',
+  // Lightning bolt — matches the "pub/sub real-time" mental model
+  // and doesn't collide visually with the database cylinder icon.
+  redis: 'M13 10V3L4 14h7v7l9-11h-7z',
   storage: 'M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z',
   globe: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z',
   server: 'M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zm0-10H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1z',
@@ -52,6 +55,10 @@ const LAYOUT: Record<string, Pos> = {
   jicofo:      { x: 570, y: 310 },
   jvb:         { x: 830, y: 290 },
   smtp:        { x: 120, y: 430 },
+  // Slot between smtp and jibri so the "chat pub/sub" edge from
+  // app→redis stays visually separate from the data column that
+  // terminates at database.
+  redis:       { x: 320, y: 430 },
   jibri:       { x: 680, y: 430 },
 };
 
@@ -80,6 +87,7 @@ const CONNECTIONS: ConnDef[] = [
   { from: 'endpoint-app', to: 'app', labelKey: 'connData' },
   { from: 'endpoint-jitsi', to: 'jitsi-web', labelKey: 'connData' },
   { from: 'app', to: 'database', labelKey: 'connData' },
+  { from: 'app', to: 'redis', labelKey: 'connPubSub', dashed: true },
   { from: 'app', to: 'smtp', labelKey: 'connNotifications', dashed: true },
   { from: 'jitsi-web', to: 'prosody', labelKey: 'connSignaling' },
   { from: 'prosody', to: 'jicofo', labelKey: 'connSignaling' },
