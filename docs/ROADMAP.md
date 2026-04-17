@@ -346,6 +346,16 @@ miglioramenti UX e feature nuove che vanno pianificate.
   **Effort**: M/L (2–4 giorni). Nuovo model + UI admin + migration
   del token singolo a "primary moderator" per eventi esistenti.
 
+- ✅ **Storage provider agnostico (S3/MinIO/GCS/PSN + Azure)**
+  Astrazione `lib/storage/` con interfaccia `StorageProvider` + due
+  adapter (`azure-provider.ts`, `s3-provider.ts`). Factory legge env
+  e sceglie provider per dominio (`files` + `recordings`). S3 adapter
+  copre AWS S3, MinIO (`forcePathStyle`), Cloudflare R2, GCS (HMAC
+  interop), Wasabi, PSN on-prem. Tutte le route esistenti e il modulo
+  `lib/storage/recordings.ts` passano ora attraverso l'interfaccia —
+  zero modifiche al test che resta su Azure Blob.
+  **Effort**: M (spedito v0.3.44). Task #25.
+
 - ✅ **Chat in-app real-time (Redis + SSE)**
   Sostituito la chat Jitsi XMPP con una propria: messaggi persistiti su
   Postgres (`chat_messages`), fan-out cross-pod via Redis pub/sub, canale

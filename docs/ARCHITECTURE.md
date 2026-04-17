@@ -34,7 +34,7 @@ graph TD
     end
 
     SMTP["Server SMTP"]
-    BLOB["Azure Blob Storage<br/>Registrazioni video"]
+    BLOB["Storage provider<br/>Azure Blob / S3 / MinIO / GCS / PSN"]
 
     UI -- "HTTPS" --> NEXTJS
     IFRAME -- "WSS / HTTPS" --> PROSODY
@@ -713,7 +713,7 @@ graph TD
     COTURN_POD -- "relay UDP" --> JVB_POD1
 
     DB_EXT[("Azure PostgreSQL<br/>Flexible Server")]
-    BLOB_EXT["Azure Blob Storage"]
+    BLOB_EXT["Object storage<br/>Azure Blob | S3 | MinIO | GCS | PSN"]
     SMTP_EXT["Azure Communication Services"]
 
     NEXTJS_POD --> DB_EXT
@@ -892,7 +892,7 @@ La separazione liveness/readiness è importante: un pod con schema DB incompatib
 | Errori 5xx | Ingress access log | > 5/min |
 | Connessioni DB attive | pg_stat_activity | > 80% pool |
 | Rate registrazioni | Application log | > 100/min (possibile abuso) |
-| Spazio disco recording | Azure Blob metrics | > 80% quota |
+| Spazio disco recording | Provider storage (Azure Blob / S3 / MinIO metrics) | > 80% quota |
 | SSE chat per pod | `eventi_chat_sse_connections` | > 300 (scala app) |
 | Memoria Redis | `redis_memory_used_bytes` | > 80% del limit del pod |
 | Redis raggiungibile | `/api/status` probe | `outage` → chat fan-out broken |

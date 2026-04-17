@@ -79,6 +79,37 @@ app:
     # Leave empty to disable Prometheus integration (probe-only status page).
     PROMETHEUS_URL: ""
 
+    # ── Storage provider ──
+    #
+    # Two independent storage domains, each backed by any S3-compatible
+    # service (AWS S3, MinIO, Cloudflare R2, Wasabi, GCS via HMAC, PSN)
+    # or Azure Blob Storage. Auto-detected from whichever *_BUCKET or
+    # CONNECTION_STRING is set, or force via STORAGE_FILES_PROVIDER /
+    # RECORDING_STORAGE_TYPE.
+    #
+    # (Non-sensitive hints live here; credentials go in the Secret.)
+    #
+    # Files domain — event materials (PDFs, slides, images)
+    #   AZURE_STORAGE_CONTAINER_NAME: "eventi-files"
+    #   STORAGE_FILES_PROVIDER: "s3"          # azure | s3
+    #   STORAGE_FILES_S3_ENDPOINT: ""         # e.g. https://minio.example.com (leave blank for AWS)
+    #   STORAGE_FILES_S3_REGION: "eu-south-1"
+    #   STORAGE_FILES_S3_BUCKET: "eventi-files"
+    #   STORAGE_FILES_S3_FORCE_PATH_STYLE: "true"  # required for MinIO
+    #
+    # Recordings domain — Jibri MP4 + manual publications
+    #   RECORDING_STORAGE_TYPE: "azure-blob"  # azure-blob | s3 | gcs | minio
+    #   RECORDING_AZURE_CONTAINER: "recordings"
+    #   RECORDING_S3_ENDPOINT: ""
+    #   RECORDING_S3_REGION: "eu-south-1"
+    #   RECORDING_S3_BUCKET: "recordings"
+    #   RECORDING_S3_FORCE_PATH_STYLE: "true"
+    #
+    # CSP override when serving media from a non-standard host (e.g. R2,
+    # custom MinIO with HTTP): set RECORDING_MEDIA_CSP_HOSTS to a
+    # space-separated list of origins allowed in `media-src`.
+    #   RECORDING_MEDIA_CSP_HOSTS: "https://cdn.example.com"
+
   # ── Security context ──
 
   securityContext:
