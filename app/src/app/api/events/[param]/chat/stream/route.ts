@@ -25,8 +25,9 @@ import { subscribeChat, type ChatEnvelope } from '@/lib/chat/pubsub';
 
 export const dynamic = 'force-dynamic';
 // Opt out of Vercel's default 10s stream budget; we want this open
-// for the length of the call.
-export const maxDuration = 60 * 60; // 1 hour
+// for the length of the call. Next.js requires a literal integer
+// here (no arithmetic), so 3600 = 1 hour.
+export const maxDuration = 3600;
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
