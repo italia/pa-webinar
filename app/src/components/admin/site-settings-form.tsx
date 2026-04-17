@@ -18,7 +18,7 @@ import {
 import type { SiteSetting } from '@prisma/client';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 
-type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features';
+type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features' | 'scaling';
 
 const COMMON_TIMEZONES = [
   'Europe/Rome', 'Europe/London', 'Europe/Paris', 'Europe/Berlin',
@@ -93,6 +93,7 @@ export default function SiteSettingsForm({
     { id: 'pages', label: t('tabs.pages'), icon: 'it-files' },
     { id: 'footer', label: t('tabs.footer'), icon: 'it-link' },
     { id: 'features', label: t('tabs.features'), icon: 'it-tool' },
+    { id: 'scaling', label: t('tabs.scaling'), icon: 'it-chart-line' },
   ];
 
   return (
@@ -142,6 +143,9 @@ export default function SiteSettingsForm({
           )}
           {activeTab === 'features' && (
             <FeaturesTab settings={settings} updateField={updateField} />
+          )}
+          {activeTab === 'scaling' && (
+            <ScalingTab settings={settings} updateField={updateField} />
           )}
         </CardBody>
       </Card>
@@ -1201,6 +1205,206 @@ function FeaturesTab({ settings, updateField }: TabProps) {
             <small className="text-muted d-block mt-1">
               {t('statusPollIntervalSecondsHelp')}
             </small>
+          </FormGroup>
+        </Col>
+      </Row>
+    </div>
+  );
+}
+
+// ─── Scaling tab ────────────────────────────────────────────
+//
+// Per-cluster JVB/Jibri sizing knobs. Defaults are calibrated for
+// Azure F16s_v2 (16 vCPU / 32 GiB) which is what the DTD test and
+// prod environments use. Any PA reusing the platform tweaks these
+// here instead of forking the scaler code.
+
+function ScalingTab({ settings, updateField }: TabProps) {
+  const t = useTranslations('admin.settings.scaling');
+
+  // Forecast preview: given the current settings, how many JVBs would
+  // we need for a 100-person event with the default sender ratio? Gives
+  // the admin a quick sanity check before saving.
+  const previewParticipants = 100;
+  const ratio = (settings.defaultSenderRatioPct ?? 30) / 100;
+  const senders = Math.ceil(previewParticipants * ratio);
+  const receivers = previewParticipants - senders;
+  const coresNeeded =
+    senders / Math.max(0.1, settings.jvbSendersPerCore ?? 3.125) +
+    receivers / Math.max(0.1, settings.jvbReceiversPerCore ?? 18.75);
+  const jvbsNeeded = Math.max(
+    1,
+    Math.min(
+      Math.ceil(coresNeeded / Math.max(1, settings.jvbCpuCoresPerPod ?? 16)),
+      settings.jvbMaxReplicas ?? 6,
+    ),
+  );
+
+  return (
+    <div>
+      <Alert color="info" className="mb-4">
+        <Icon icon="it-info-circle" className="me-2" />
+        {t('intro')}
+      </Alert>
+
+      <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+        {t('jvbSection')}
+      </h5>
+      <Row>
+        <Col md={4}>
+          <FormGroup>
+            <Label htmlFor="jvbCpuCoresPerPod">{t('jvbCpuCoresPerPod')}</Label>
+            <Input
+              id="jvbCpuCoresPerPod"
+              type="number"
+              min={1}
+              max={128}
+              value={settings.jvbCpuCoresPerPod ?? 16}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('jvbCpuCoresPerPod', Number(e.target.value) || 16)
+              }
+            />
+            <small className="text-muted d-block mt-1">{t('jvbCpuCoresPerPodHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={4}>
+          <FormGroup>
+            <Label htmlFor="jvbReceiversPerCore">{t('jvbReceiversPerCore')}</Label>
+            <Input
+              id="jvbReceiversPerCore"
+              type="number"
+              step="0.01"
+              min={0.1}
+              max={100}
+              value={settings.jvbReceiversPerCore ?? 18.75}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField(
+                  'jvbReceiversPerCore',
+                  Number(e.target.value) || 18.75,
+                )
+              }
+            />
+            <small className="text-muted d-block mt-1">{t('jvbReceiversPerCoreHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={4}>
+          <FormGroup>
+            <Label htmlFor="jvbSendersPerCore">{t('jvbSendersPerCore')}</Label>
+            <Input
+              id="jvbSendersPerCore"
+              type="number"
+              step="0.01"
+              min={0.1}
+              max={100}
+              value={settings.jvbSendersPerCore ?? 3.125}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField(
+                  'jvbSendersPerCore',
+                  Number(e.target.value) || 3.125,
+                )
+              }
+            />
+            <small className="text-muted d-block mt-1">{t('jvbSendersPerCoreHelp')}</small>
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <Row>
+        <Col md={4}>
+          <FormGroup>
+            <Label htmlFor="jvbMaxReplicas">{t('jvbMaxReplicas')}</Label>
+            <Input
+              id="jvbMaxReplicas"
+              type="number"
+              min={1}
+              max={50}
+              value={settings.jvbMaxReplicas ?? 6}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('jvbMaxReplicas', Number(e.target.value) || 6)
+              }
+            />
+            <small className="text-muted d-block mt-1">{t('jvbMaxReplicasHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={4}>
+          <FormGroup>
+            <Label htmlFor="jibriCpuCoresPerPod">{t('jibriCpuCoresPerPod')}</Label>
+            <Input
+              id="jibriCpuCoresPerPod"
+              type="number"
+              min={1}
+              max={32}
+              value={settings.jibriCpuCoresPerPod ?? 4}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('jibriCpuCoresPerPod', Number(e.target.value) || 4)
+              }
+            />
+            <small className="text-muted d-block mt-1">{t('jibriCpuCoresPerPodHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={4}>
+          <FormGroup>
+            <Label htmlFor="defaultSenderRatioPct">{t('defaultSenderRatioPct')}</Label>
+            <div className="d-flex align-items-center gap-2">
+              <Input
+                id="defaultSenderRatioPct"
+                type="number"
+                min={0}
+                max={100}
+                value={settings.defaultSenderRatioPct ?? 30}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  updateField(
+                    'defaultSenderRatioPct',
+                    Math.max(0, Math.min(100, Number(e.target.value) || 0)),
+                  )
+                }
+              />
+              <span className="text-muted">%</span>
+            </div>
+            <small className="text-muted d-block mt-1">{t('defaultSenderRatioPctHelp')}</small>
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <Card className="border-0 shadow-sm mb-4" style={{ background: '#F5F7FB' }}>
+        <CardBody className="p-3">
+          <div className="fw-semibold mb-1" style={{ color: '#17324D', fontSize: '0.9rem' }}>
+            {t('previewTitle')}
+          </div>
+          <div className="text-muted" style={{ fontSize: '0.88rem' }}>
+            {t('previewBody', {
+              participants: previewParticipants,
+              ratio: settings.defaultSenderRatioPct ?? 30,
+              senders,
+              receivers,
+              cores: coresNeeded.toFixed(1),
+              jvbs: jvbsNeeded,
+            })}
+          </div>
+        </CardBody>
+      </Card>
+
+      <h5 className="fw-semibold mb-3 mt-4" style={{ color: '#17324D' }}>
+        {t('graceSection')}
+      </h5>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="eventGracePeriodMinutes">{t('eventGracePeriodMinutes')}</Label>
+            <Input
+              id="eventGracePeriodMinutes"
+              type="number"
+              min={-1}
+              max={240}
+              value={settings.eventGracePeriodMinutes ?? 15}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField(
+                  'eventGracePeriodMinutes',
+                  Number(e.target.value) || 0,
+                )
+              }
+            />
+            <small className="text-muted d-block mt-1">{t('eventGracePeriodMinutesHelp')}</small>
           </FormGroup>
         </Col>
       </Row>

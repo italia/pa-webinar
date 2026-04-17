@@ -156,6 +156,11 @@ export default function CreateEventForm({
     organizerName: '',
     imageUrl: '',
     waitingRoomAudioUrl: '',
+    // null = inherit site default, otherwise a percentage 0-100
+    expectedSenderRatioPct: null as number | null,
+    // null = inherit site default; 0 = hard stop at endsAt; -1 = never
+    // auto-close; N>0 = grace of N minutes
+    gracePeriodMinutes: null as number | null,
   });
 
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -255,6 +260,8 @@ export default function CreateEventForm({
         organizerName: form.organizerName || undefined,
         imageUrl: form.imageUrl || undefined,
         waitingRoomAudioUrl: form.waitingRoomAudioUrl || undefined,
+        expectedSenderRatioPct: form.expectedSenderRatioPct ?? undefined,
+        gracePeriodMinutes: form.gracePeriodMinutes ?? undefined,
       };
 
       const result = createEventSchema.safeParse(payload);
@@ -432,6 +439,70 @@ export default function CreateEventForm({
                 max={10000}
               />
               <small className="text-muted">{t('form.expectedParticipantsHint')}</small>
+            </FormGroup>
+          </Col>
+          <Col md={6}>
+            <FormGroup className="mb-3">
+              <Label htmlFor="expectedSenderRatioPct">
+                {t('form.expectedSenderRatio')}
+              </Label>
+              <div className="d-flex align-items-center gap-2">
+                <Input
+                  id="expectedSenderRatioPct"
+                  type="number"
+                  value={form.expectedSenderRatioPct ?? ''}
+                  placeholder={t('form.expectedSenderRatioInherit')}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const v = e.target.value;
+                    setField(
+                      'expectedSenderRatioPct',
+                      v === ''
+                        ? null
+                        : Math.max(0, Math.min(100, Number(v) || 0)),
+                    );
+                  }}
+                  min={0}
+                  max={100}
+                />
+                <span className="text-muted">%</span>
+              </div>
+              <small className="text-muted">
+                {t('form.expectedSenderRatioHint')}
+              </small>
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={6}>
+            <FormGroup className="mb-3">
+              <Label htmlFor="gracePeriodMinutes">{t('form.gracePeriod')}</Label>
+              <select
+                id="gracePeriodMinutes"
+                className="form-control"
+                value={
+                  form.gracePeriodMinutes === null
+                    ? 'inherit'
+                    : String(form.gracePeriodMinutes)
+                }
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setField(
+                    'gracePeriodMinutes',
+                    v === 'inherit' ? null : Number(v),
+                  );
+                }}
+              >
+                <option value="inherit">{t('form.gracePeriodInherit')}</option>
+                <option value="0">{t('form.gracePeriodHardStop')}</option>
+                <option value="5">{t('form.gracePeriodMinutesN', { n: 5 })}</option>
+                <option value="15">{t('form.gracePeriodMinutesN', { n: 15 })}</option>
+                <option value="30">{t('form.gracePeriodMinutesN', { n: 30 })}</option>
+                <option value="60">{t('form.gracePeriodMinutesN', { n: 60 })}</option>
+                <option value="-1">{t('form.gracePeriodNever')}</option>
+              </select>
+              <small className="text-muted d-block mt-1">
+                {t('form.gracePeriodHint')}
+              </small>
             </FormGroup>
           </Col>
           <Col md={6}>

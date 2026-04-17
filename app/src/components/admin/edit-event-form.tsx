@@ -49,6 +49,8 @@ interface EventData {
   organizerName: string | null;
   imageUrl: string | null;
   waitingRoomAudioUrl: string | null;
+  expectedSenderRatioPct: number | null;
+  gracePeriodMinutes: number | null;
 }
 
 interface EditEventFormProps {
@@ -95,6 +97,8 @@ export default function EditEventForm({
     organizerName: event.organizerName ?? '',
     imageUrl: event.imageUrl ?? '',
     waitingRoomAudioUrl: event.waitingRoomAudioUrl ?? '',
+    expectedSenderRatioPct: event.expectedSenderRatioPct,
+    gracePeriodMinutes: event.gracePeriodMinutes,
   });
 
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -168,6 +172,8 @@ export default function EditEventForm({
         speakersInfo: Object.keys(speakersObj).length > 0 ? speakersObj : undefined,
         organizerName: form.organizerName || undefined,
         imageUrl: form.imageUrl || undefined,
+        expectedSenderRatioPct: form.expectedSenderRatioPct,
+        gracePeriodMinutes: form.gracePeriodMinutes,
         waitingRoomAudioUrl: form.waitingRoomAudioUrl || undefined,
       };
 
@@ -337,6 +343,68 @@ export default function EditEventForm({
                   max={10000}
                 />
                 <small className="text-muted">{t('form.expectedParticipantsHint')}</small>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3">
+                <Label htmlFor="expectedSenderRatioPct">
+                  {t('form.expectedSenderRatio')}
+                </Label>
+                <div className="d-flex align-items-center gap-2">
+                  <Input
+                    id="expectedSenderRatioPct"
+                    type="number"
+                    value={form.expectedSenderRatioPct ?? ''}
+                    placeholder={t('form.expectedSenderRatioInherit')}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const v = e.target.value;
+                      setField(
+                        'expectedSenderRatioPct',
+                        v === ''
+                          ? null
+                          : Math.max(0, Math.min(100, Number(v) || 0)),
+                      );
+                    }}
+                    min={0}
+                    max={100}
+                  />
+                  <span className="text-muted">%</span>
+                </div>
+                <small className="text-muted">{t('form.expectedSenderRatioHint')}</small>
+              </FormGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>
+              <FormGroup className="mb-3">
+                <Label htmlFor="gracePeriodMinutes">{t('form.gracePeriod')}</Label>
+                <select
+                  id="gracePeriodMinutes"
+                  className="form-control"
+                  value={
+                    form.gracePeriodMinutes === null
+                      ? 'inherit'
+                      : String(form.gracePeriodMinutes)
+                  }
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setField(
+                      'gracePeriodMinutes',
+                      v === 'inherit' ? null : Number(v),
+                    );
+                  }}
+                >
+                  <option value="inherit">{t('form.gracePeriodInherit')}</option>
+                  <option value="0">{t('form.gracePeriodHardStop')}</option>
+                  <option value="5">{t('form.gracePeriodMinutesN', { n: 5 })}</option>
+                  <option value="15">{t('form.gracePeriodMinutesN', { n: 15 })}</option>
+                  <option value="30">{t('form.gracePeriodMinutesN', { n: 30 })}</option>
+                  <option value="60">{t('form.gracePeriodMinutesN', { n: 60 })}</option>
+                  <option value="-1">{t('form.gracePeriodNever')}</option>
+                </select>
+                <small className="text-muted d-block mt-1">
+                  {t('form.gracePeriodHint')}
+                </small>
               </FormGroup>
             </Col>
             <Col md={6}>
