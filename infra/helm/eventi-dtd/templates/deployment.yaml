@@ -96,6 +96,13 @@ spec:
             - name: JIBRI_HEALTH_URL
               value: {{ .Values.jitsi.jibriHealthUrl | default (printf "http://%s-jitsi-meet-jibri:2222" .Release.Name) | quote }}
             {{- end }}
+            {{- if .Values.redis.enabled }}
+            # Derived at render time from the in-cluster redis subchart.
+            # Overridden by REDIS_URL from the Secret/envFrom block above
+            # if the operator set it explicitly (external / managed Redis).
+            - name: REDIS_URL
+              value: "redis://default:$(REDIS_PASSWORD)@{{ .Release.Name }}-redis-master.{{ .Release.Namespace }}.svc.cluster.local:6379/0"
+            {{- end }}
           {{- with .Values.app.probes.startup }}
           startupProbe:
             {{- toYaml . | nindent 12 }}

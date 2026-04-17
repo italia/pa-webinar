@@ -661,7 +661,12 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
           <QAPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
         )}
         {activeTab === 'chat' && showChat && (
-          <ChatPanel api={jitsiApi} displayName={displayName} />
+          <ChatPanel
+            eventSlug={eventSlug}
+            token={token}
+            displayName={displayName}
+            isGuest={!token}
+          />
         )}
         {activeTab === 'polls' && (
           <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />

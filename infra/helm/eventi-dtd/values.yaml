@@ -186,6 +186,7 @@ secrets:
       # Maps Kubernetes secret keys → Key Vault secret names
       secretMappings:
         DATABASE_URL: "eventi-dtd-database-url"
+        REDIS_URL: "eventi-dtd-redis-url"
         JITSI_JWT_SECRET: "eventi-dtd-jitsi-jwt-secret"
         APP_SECRET: "eventi-dtd-app-secret"
         ADMIN_API_KEY: "eventi-dtd-admin-api-key"
@@ -209,6 +210,10 @@ secrets:
   # ── Generated secrets (mode: "generate", dev/test ONLY) ──
   generate:
     DATABASE_URL: ""
+    # Leave empty when using the in-cluster `redis` subchart: the
+    # templates inject an svc-based default at render time. Set
+    # explicitly when pointing at an external / managed Redis.
+    REDIS_URL: ""
     JITSI_JWT_SECRET: ""
     JITSI_JWT_APP_ID: "eventi_dtd"
     JITSI_JWT_ISSUER: "eventi-dtd"
@@ -580,6 +585,42 @@ postgresql:
     # Pre-existing Secret containing DATABASE_URL
     existingSecret: ""
     secretKey: "DATABASE_URL"
+
+# ── Redis ────────────────────────────────────────────────────
+#
+# Redis powers real-time chat fan-out (pub/sub) across app pods.
+# Disable and point the REDIS_URL secret at a managed Redis (Azure
+# Cache, ElastiCache, MemoryStore, …) for production deployments.
+redis:
+  enabled: true
+
+  architecture: standalone  # single node is enough for pub/sub + rate-limit
+
+  auth:
+    enabled: true
+    # Pre-existing Secret containing REDIS_PASSWORD
+    existingSecret: "videocall-secrets"
+    existingSecretPasswordKey: "REDIS_PASSWORD"
+
+  master:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    persistence:
+      # pub/sub is ephemeral; we don't need AOF/RDB durability. Turn
+      # it on if you plan to reuse the same Redis for other stateful
+      # features (distributed rate-limit counters, cache).
+      enabled: false
+
+  commonConfiguration: |
+    # No persistence: pub/sub is fire-and-forget and canonical chat
+    # state lives in Postgres.
+    save ""
+    appendonly no
 
 # ── Name overrides ──────────────────────────────────────────
 nameOverride: ""
