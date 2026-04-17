@@ -1,36 +1,69 @@
 /**
  * Single source of truth for "how many JVB replicas does an event need".
  *
- * Empirical sizing (validated 2026-04-15 on Standard_F16s_v2, 16 vCPU / 32 GiB):
- *   - Webinar (few senders, many passive viewers): ~300 parts per JVB
- *     measured at 78 parts / 18% stress (Test C), linear projection to
- *     300 parts ≈ 70% stress
- *   - Interactive all-senders (every participant sending video): ~50 parts
- *     per JVB, projected from 47 parts / 25 senders / 9.5% stress (Test D)
+ * Historically this file had magic numbers (300 parts/JVB webinar,
+ * 50 parts/JVB interactive) tied to Azure F16s_v2. The platform is
+ * now reused by other PAs that run on different hardware (EKS m5,
+ * GKE n2, on-prem), so the density constants live in SiteSetting and
+ * the calculation is a linear combination of sender vs receiver cost.
  *
- * Both APIs that compute desired JVB replicas (the internal scaler endpoint
- * and the public status dashboards) call this function so a sizing change
- * only needs to happen in one place.
+ * Formula:
+ *   effectiveRatio = videoEnabled ? expectedSenderRatioPct/100 : 0
+ *   senders   = ceil(maxParticipants * effectiveRatio)
+ *   receivers = maxParticipants - senders
+ *   cores     = senders / sendersPerCore + receivers / receiversPerCore
+ *   replicas  = clamp(1, maxReplicas, ceil(cores / cpuCoresPerPod))
+ *
+ * Default constants (tuned on F16s_v2, 16 vCPU / 32 GiB):
+ *   receiversPerCore = 18.75   # 300 passive viewers / 16 cores
+ *   sendersPerCore   = 3.125   # 50 all-senders / 16 cores
+ *   cpuCoresPerPod   = 16
+ *
+ * Validation runs (2026-04-15): webinar 78 parts @ 18% stress (Test C),
+ * all-sender 47 parts / 25 senders @ 9.5% stress (Test D). Linear
+ * extrapolation puts 300 webinar parts ≈ 70% stress, 50 all-senders ≈
+ * same — ample headroom for 80th-percentile spikes.
  */
 
 const DEFAULT_MAX_REPLICAS = 6;
 
-/** JVB replicas needed for a single event, based on expected load. */
+export interface JvbSizingConfig {
+  /** Effective CPU cores per JVB pod (not the node's). */
+  cpuCoresPerPod: number;
+  /** How many passive viewers (receive-only) fit on 1 core. */
+  receiversPerCore: number;
+  /** How many active senders (mic+webcam) fit on 1 core. */
+  sendersPerCore: number;
+  /** Ceiling on replica count (protects runaway scale-up). */
+  maxReplicas: number;
+}
+
+export const DEFAULT_JVB_CONFIG: JvbSizingConfig = {
+  cpuCoresPerPod: 16,
+  receiversPerCore: 18.75,
+  sendersPerCore: 3.125,
+  maxReplicas: DEFAULT_MAX_REPLICAS,
+};
+
+/** JVB replicas needed for a single event. */
 export function jvbsForEvent(
   maxParticipants: number,
+  expectedSenderRatioPct: number,
   videoEnabled: boolean,
-  maxReplicas: number = DEFAULT_MAX_REPLICAS,
+  config: JvbSizingConfig = DEFAULT_JVB_CONFIG,
 ): number {
-  if (videoEnabled) {
-    // Interactive all-senders: ~50 parts per F16s_v2 JVB.
-    if (maxParticipants <= 50) return 1;
-    if (maxParticipants <= 100) return 2;
-    return Math.min(Math.ceil(maxParticipants / 50), maxReplicas);
-  }
-  // Webinar (few senders, many passive viewers): ~300 parts per F16s_v2 JVB.
-  if (maxParticipants <= 300) return 1;
-  if (maxParticipants <= 600) return 2;
-  return Math.min(Math.ceil(maxParticipants / 300), maxReplicas);
+  // When video is disabled at the event level, nobody can send video —
+  // the ratio collapses to 0 regardless of what was configured.
+  const ratio = videoEnabled ? Math.max(0, Math.min(100, expectedSenderRatioPct)) / 100 : 0;
+  const senders = Math.ceil(maxParticipants * ratio);
+  const receivers = Math.max(0, maxParticipants - senders);
+
+  const senderCost = config.sendersPerCore > 0 ? senders / config.sendersPerCore : 0;
+  const receiverCost = config.receiversPerCore > 0 ? receivers / config.receiversPerCore : 0;
+  const cores = senderCost + receiverCost;
+  const replicas = Math.ceil(cores / Math.max(1, config.cpuCoresPerPod));
+
+  return Math.max(1, Math.min(replicas, Math.max(1, config.maxReplicas)));
 }
 
 export function jvbMaxReplicasFromEnv(): number {
