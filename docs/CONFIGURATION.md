@@ -263,6 +263,131 @@ Le metriche app-level (`eventi_chat_messages_total`,
 L'admin dashboard `/admin/monitoring` aggrega entrambe le sorgenti nella
 sezione "Chat in-app & Redis" (richiede `PROMETHEUS_URL` configurato).
 
+## Storage provider (file e registrazioni)
+
+Il portale gestisce due **domini di storage** indipendenti, configurabili
+separatamente:
+
+- **files** — materiali evento (PDF, slide, immagini caricate dal moderatore)
+- **recordings** — output Jibri + MP4 caricati manualmente
+
+Ogni dominio supporta 2 backend:
+
+- **Azure Blob Storage** — connection string con account key
+- **S3-compatibile** — AWS S3, MinIO, Cloudflare R2, Wasabi, Google Cloud
+  Storage (via HMAC interop), PSN, qualunque servizio S3 on-prem
+
+Il provider viene scelto per auto-detection dalle env var presenti, oppure
+forzato con `STORAGE_FILES_PROVIDER` / `RECORDING_STORAGE_TYPE`. Tutto
+passa attraverso l'astrazione `app/src/lib/storage/` — nessun altro modulo
+importa SDK vendor direttamente.
+
+### Azure Blob (default DTD)
+
+```yaml
+# ConfigMap
+AZURE_STORAGE_CONTAINER_NAME: "eventi-files"
+RECORDING_STORAGE_TYPE: "azure-blob"
+RECORDING_AZURE_CONTAINER: "recordings"
+
+# Secret
+AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net"
+RECORDING_AZURE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net"
+```
+
+SAS (Shared Access Signature) generati lato app con `StorageSharedKeyCredential`;
+upload con PUT diretto, download con redirect firmato a breve scadenza.
+
+### AWS S3
+
+```yaml
+# ConfigMap
+STORAGE_FILES_PROVIDER: "s3"
+STORAGE_FILES_S3_REGION: "eu-south-1"
+STORAGE_FILES_S3_BUCKET: "eventi-files"
+RECORDING_STORAGE_TYPE: "s3"
+RECORDING_S3_REGION: "eu-south-1"
+RECORDING_S3_BUCKET: "eventi-recordings"
+
+# Secret
+STORAGE_FILES_S3_ACCESS_KEY_ID: "AKIA..."
+STORAGE_FILES_S3_SECRET_ACCESS_KEY: "..."
+RECORDING_S3_ACCESS_KEY_ID: "AKIA..."
+RECORDING_S3_SECRET_ACCESS_KEY: "..."
+```
+
+Omettere `*_ENDPOINT` fa puntare al regional endpoint AWS. Per IAM role
+su EKS, ometti le credential e l'SDK usa il ServiceAccount IRSA.
+
+### MinIO / S3 on-prem
+
+```yaml
+STORAGE_FILES_PROVIDER: "s3"
+STORAGE_FILES_S3_ENDPOINT: "https://minio.example.com"
+STORAGE_FILES_S3_REGION: "us-east-1"     # MinIO accetta qualunque valore
+STORAGE_FILES_S3_BUCKET: "eventi-files"
+STORAGE_FILES_S3_FORCE_PATH_STYLE: "true"  # obbligatorio per MinIO
+```
+
+`forcePathStyle: true` è richiesto perché MinIO non usa DNS virtual-host
+e serve a costruire URL tipo `https://minio/bucket/key` invece di
+`https://bucket.minio/key`.
+
+### Google Cloud Storage (via S3 interop HMAC)
+
+```yaml
+STORAGE_FILES_PROVIDER: "s3"
+STORAGE_FILES_S3_ENDPOINT: "https://storage.googleapis.com"
+STORAGE_FILES_S3_REGION: "auto"
+STORAGE_FILES_S3_BUCKET: "eventi-files"
+STORAGE_FILES_S3_FORCE_PATH_STYLE: "true"
+```
+
+Credenziali HMAC da Cloud Console → Storage → Interoperability. L'SDK AWS
+autentica e GCS traduce le request. Nativo `@google-cloud/storage` non è
+necessario per gli use-case attuali (PUT/GET/DELETE/LIST + presigned URL).
+
+### Cloudflare R2
+
+```yaml
+STORAGE_FILES_PROVIDER: "s3"
+STORAGE_FILES_S3_ENDPOINT: "https://<account-id>.r2.cloudflarestorage.com"
+STORAGE_FILES_S3_REGION: "auto"
+STORAGE_FILES_S3_BUCKET: "eventi-files"
+```
+
+### PSN / cloud sovrani italiani
+
+La maggior parte espone un'API S3-compatibile — configura come MinIO
+sostituendo `STORAGE_FILES_S3_ENDPOINT` con il dominio PSN/CSIRT
+(`https://s3.psn.it` o simili) e verifica con il provider se serve
+`forcePathStyle`. Per registrazioni usa le stesse env con prefisso
+`RECORDING_S3_*`.
+
+### CSP e media-src
+
+Se il bucket ha un dominio custom non coperto automaticamente dal
+middleware (che già gestisce `*.blob.core.windows.net`, `*.amazonaws.com`,
+`storage.googleapis.com`), aggiungi:
+
+```yaml
+RECORDING_MEDIA_CSP_HOSTS: "https://cdn.example.com https://minio.example.com"
+```
+
+Il middleware ammette queste origini in `media-src` e `connect-src` così
+il player e il form di upload possano comunicare con il bucket.
+
+### Matrice di compatibilità
+
+| Provider | Upload PUT | Download GET | Delete | List | Note |
+|---|---|---|---|---|---|
+| Azure Blob | ✅ SAS | ✅ SAS | ✅ | ✅ | Default DTD |
+| AWS S3 | ✅ presigned | ✅ presigned | ✅ | ✅ | IRSA supportato |
+| MinIO | ✅ | ✅ | ✅ | ✅ | `forcePathStyle: true` |
+| Cloudflare R2 | ✅ | ✅ | ✅ | ✅ | region `auto` |
+| GCS (HMAC) | ✅ | ✅ | ✅ | ✅ | via S3 interop |
+| PSN S3 | ✅ | ✅ | ✅ | ✅ | testare per-provider |
+
 ## Secrets management
 
 Tre modalita disponibili (configurabili in `secrets.mode`):

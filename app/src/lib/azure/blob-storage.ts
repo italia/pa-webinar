@@ -1,60 +1,29 @@
-import {
-  BlobServiceClient,
-  StorageSharedKeyCredential,
-  generateBlobSASQueryParameters,
-  BlobSASPermissions,
-  type ContainerClient,
-} from '@azure/storage-blob';
+/**
+ * @deprecated Thin shim over `@/lib/storage` preserved to avoid
+ * touching a pile of call-sites in one go. New code should import
+ * from `@/lib/storage` directly. The symbol names here are kept
+ * for backwards compatibility with existing routes:
+ *
+ *   isAzureConfigured()      → replace with isFilesStorageConfigured()
+ *   generateUploadSasUrl     → provider.getUploadUrl()
+ *   generateDownloadSasUrl   → provider.getDownloadUrl()
+ *   deleteBlob               → provider.delete()
+ *   getBlobProperties        → provider.stat() (not yet in interface)
+ *   ensureContainer          → provider.ensure()
+ *
+ * Removing this file is tracked separately — see task #25.
+ */
 
-function getConnectionString(): string {
-  const conn = process.env.AZURE_STORAGE_CONNECTION_STRING;
-  if (!conn) {
-    throw new Error(
-      'AZURE_STORAGE_CONNECTION_STRING is not configured. File upload is unavailable.',
-    );
-  }
-  return conn;
-}
-
-function getContainerName(): string {
-  return process.env.AZURE_STORAGE_CONTAINER_NAME ?? 'eventi-files';
-}
-
-function getContainerClient(): ContainerClient {
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    getConnectionString(),
-  );
-  return blobServiceClient.getContainerClient(getContainerName());
-}
-
-function parseConnectionString(conn: string): {
-  accountName: string;
-  accountKey: string;
-} {
-  const parts = conn.split(';').reduce(
-    (acc, part) => {
-      const idx = part.indexOf('=');
-      if (idx > 0) {
-        acc[part.substring(0, idx)] = part.substring(idx + 1);
-      }
-      return acc;
-    },
-    {} as Record<string, string>,
-  );
-
-  return {
-    accountName: parts['AccountName'] ?? '',
-    accountKey: parts['AccountKey'] ?? '',
-  };
-}
+import { getFilesStorage } from '@/lib/storage';
 
 export function isAzureConfigured(): boolean {
-  return !!process.env.AZURE_STORAGE_CONNECTION_STRING;
+  return getFilesStorage() !== null;
 }
 
 export async function ensureContainer(): Promise<void> {
-  const containerClient = getContainerClient();
-  await containerClient.createIfNotExists({ access: undefined });
+  const provider = getFilesStorage();
+  if (!provider) throw new Error('Files storage is not configured');
+  await provider.ensure();
 }
 
 export function getBlobPath(eventId: string, fileName: string): string {
@@ -69,86 +38,50 @@ export async function generateUploadSasUrl(
   blobPath: string,
   expiresInMinutes = 30,
 ): Promise<string> {
-  const conn = getConnectionString();
-  const { accountName, accountKey } = parseConnectionString(conn);
-  const sharedKeyCredential = new StorageSharedKeyCredential(
-    accountName,
-    accountKey,
-  );
-
-  const containerName = getContainerName();
-  const expiresOn = new Date();
-  expiresOn.setMinutes(expiresOn.getMinutes() + expiresInMinutes);
-
-  const sasToken = generateBlobSASQueryParameters(
-    {
-      containerName,
-      blobName: blobPath,
-      permissions: BlobSASPermissions.parse('cw'),
-      expiresOn,
-    },
-    sharedKeyCredential,
-  ).toString();
-
-  const containerClient = getContainerClient();
-  const blobClient = containerClient.getBlockBlobClient(blobPath);
-  return `${blobClient.url}?${sasToken}`;
+  const provider = getFilesStorage();
+  if (!provider) throw new Error('Files storage is not configured');
+  const { uploadUrl } = await provider.getUploadUrl(blobPath, { expiresInMinutes });
+  return uploadUrl;
 }
 
 export async function generateDownloadSasUrl(
   blobPath: string,
   expiresInMinutes = 60,
 ): Promise<string> {
-  const conn = getConnectionString();
-  const { accountName, accountKey } = parseConnectionString(conn);
-  const sharedKeyCredential = new StorageSharedKeyCredential(
-    accountName,
-    accountKey,
-  );
-
-  const containerName = getContainerName();
-  const expiresOn = new Date();
-  expiresOn.setMinutes(expiresOn.getMinutes() + expiresInMinutes);
-
-  const sasToken = generateBlobSASQueryParameters(
-    {
-      containerName,
-      blobName: blobPath,
-      permissions: BlobSASPermissions.parse('r'),
-      expiresOn,
-    },
-    sharedKeyCredential,
-  ).toString();
-
-  const containerClient = getContainerClient();
-  const blobClient = containerClient.getBlockBlobClient(blobPath);
-  return `${blobClient.url}?${sasToken}`;
+  const provider = getFilesStorage();
+  if (!provider) throw new Error('Files storage is not configured');
+  return provider.getDownloadUrl(blobPath, { expiresInMinutes });
 }
 
 export async function deleteBlob(blobPath: string): Promise<boolean> {
+  const provider = getFilesStorage();
+  if (!provider) return false;
   try {
-    const containerClient = getContainerClient();
-    const blobClient = containerClient.getBlockBlobClient(blobPath);
-    await blobClient.deleteIfExists();
-    return true;
+    return await provider.delete(blobPath);
   } catch (error) {
     console.error('Failed to delete blob:', blobPath, error);
     return false;
   }
 }
 
+/**
+ * No equivalent in the provider interface yet — this function is called
+ * after upload to store the returned metadata. For now we keep the
+ * Azure-specific implementation by accessing the provider directly.
+ * TODO: add `stat(key)` to StorageProvider and remove this indirection.
+ */
 export async function getBlobProperties(
   blobPath: string,
 ): Promise<{ contentLength: number; contentType: string } | null> {
-  try {
-    const containerClient = getContainerClient();
-    const blobClient = containerClient.getBlockBlobClient(blobPath);
-    const props = await blobClient.getProperties();
-    return {
-      contentLength: props.contentLength ?? 0,
-      contentType: props.contentType ?? 'application/octet-stream',
-    };
-  } catch {
-    return null;
-  }
+  const provider = getFilesStorage();
+  if (!provider) return null;
+  // List with exact prefix is portable across Azure/S3 and avoids
+  // depending on a provider-specific stat() method for now.
+  const list = await provider.list(blobPath);
+  const hit = list.find((e) => e.key === blobPath);
+  if (!hit) return null;
+  return {
+    contentLength: hit.sizeBytes ?? 0,
+    contentType: 'application/octet-stream',
+  };
 }

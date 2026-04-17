@@ -1,180 +1,106 @@
-import {
-  BlobServiceClient,
-  StorageSharedKeyCredential,
-  generateBlobSASQueryParameters,
-  BlobSASPermissions,
-  SASProtocol,
-} from '@azure/storage-blob';
-
-const STORAGE_TYPE = process.env.RECORDING_STORAGE_TYPE || 'not-configured';
-const AZURE_CONNECTION_STRING = process.env.RECORDING_AZURE_CONNECTION_STRING || '';
-const AZURE_CONTAINER = process.env.RECORDING_AZURE_CONTAINER || 'recordings';
-
-let _blobServiceClient: BlobServiceClient | null = null;
-
-function getBlobServiceClient(): BlobServiceClient {
-  if (!_blobServiceClient) {
-    if (!AZURE_CONNECTION_STRING) {
-      throw new Error('RECORDING_AZURE_CONNECTION_STRING is not configured');
-    }
-    _blobServiceClient = BlobServiceClient.fromConnectionString(AZURE_CONNECTION_STRING);
-  }
-  return _blobServiceClient;
-}
-
 /**
- * Extract the blob name from a full Azure Blob Storage URL.
- * Handles URLs like: https://<account>.blob.core.windows.net/<container>/<blob>
- */
-function extractBlobName(recordingUrl: string): string | null {
-  try {
-    const url = new URL(recordingUrl);
-    // Path: /<container>/<blob-name>
-    const parts = url.pathname.split('/').filter(Boolean);
-    if (parts.length < 2) return null;
-    // Everything after the container name is the blob path
-    return parts.slice(1).join('/');
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Generate a write-SAS URL for a new recording blob. Used by the
- * Jibri finalize script to PUT the mp4 without holding an account
- * key. Returns `{ uploadUrl, recordingUrl }`: the uploadUrl carries
- * the SAS token and is consumed by `curl -X PUT`; recordingUrl is
- * the bare blob URL the portal stores in the DB.
+ * Recordings storage — thin adapter on top of the StorageProvider
+ * abstraction (`./index.ts`). Historically this module was Azure-only
+ * with `RECORDING_AZURE_*` env vars; it now works with any provider
+ * (Azure Blob, AWS S3, MinIO, GCS S3-compat, PSN, Cloudflare R2) and
+ * keeps the same public API so callers don't change.
  *
- * Returns null when storage is not configured (dev mode) or the
- * connection string is missing required fields.
+ * Domain convention: recordings live at `recordings/<filename>` inside
+ * whatever bucket/container the provider is pointed to.
+ */
+
+import { getRecordingsStorage, recordingsProviderLabel } from './index';
+
+const KEY_PREFIX = 'recordings/';
+
+function keyFromFilename(filename: string): string {
+  // Callers already pass filenames without a leading slash. A filename
+  // that already starts with `recordings/` is respected as-is — this
+  // happens when the caller got the filename from listRecordingBlobs().
+  return filename.startsWith(KEY_PREFIX) ? filename : `${KEY_PREFIX}${filename}`;
+}
+
+/**
+ * Generate a presigned upload URL for a new recording blob. Used by:
+ *   - Jibri finalize hook (via /api/internal/recording-upload-url)
+ *   - manual publication upload from the admin UI
+ *
+ * Returns null when no recordings provider is configured (dev mode)
+ * or when required credentials are missing.
  */
 export async function generateRecordingUploadUrl(
   filename: string,
   expiresInMinutes: number,
 ): Promise<{ uploadUrl: string; recordingUrl: string } | null> {
-  if (STORAGE_TYPE !== 'azure-blob') return null;
-  if (!AZURE_CONNECTION_STRING) return null;
+  const provider = getRecordingsStorage();
+  if (!provider) return null;
 
-  const accountName = extractFromConnectionString('AccountName');
-  const accountKey = extractFromConnectionString('AccountKey');
-  if (!accountName || !accountKey) return null;
-
-  const client = getBlobServiceClient();
-  const containerClient = client.getContainerClient(AZURE_CONTAINER);
-  const blobClient = containerClient.getBlobClient(filename);
-
-  const credential = new StorageSharedKeyCredential(accountName, accountKey);
-  const startsOn = new Date();
-  const expiresOn = new Date(startsOn.getTime() + expiresInMinutes * 60_000);
-
-  // 'cw' = create + write. The blob does not yet exist at this point,
-  // so 'w' alone isn't enough on new PutBlob calls under the SAS v2+
-  // protocol — 'c' is required to create a new blob.
-  const sas = generateBlobSASQueryParameters(
-    {
-      containerName: AZURE_CONTAINER,
-      blobName: filename,
-      permissions: BlobSASPermissions.parse('cw'),
-      startsOn,
-      expiresOn,
-      protocol: SASProtocol.Https,
-    },
-    credential,
-  ).toString();
-
-  return {
-    uploadUrl: `${blobClient.url}?${sas}`,
-    recordingUrl: blobClient.url,
-  };
+  const key = keyFromFilename(filename);
+  const { uploadUrl, publicUrl } = await provider.getUploadUrl(key, {
+    expiresInMinutes,
+    contentType: 'video/mp4',
+  });
+  return { uploadUrl, recordingUrl: publicUrl };
 }
 
 /**
- * Generate a SAS URL for a recording with read-only access and expiry.
- * Returns null if storage is not azure-blob or URL cannot be parsed.
+ * Return a short-lived signed GET URL for an existing recording, given
+ * the canonical URL we stored in the DB. Returns `recordingUrl` unchanged
+ * if no provider is configured (local/dev mode — URL is assumed usable
+ * as-is). Returns null if the URL can't be parsed against the configured
+ * provider (corrupt DB row, moved bucket, etc.).
  */
 export async function generateRecordingSasUrl(
   recordingUrl: string,
   expiresInMinutes: number,
 ): Promise<string | null> {
-  if (STORAGE_TYPE !== 'azure-blob') return recordingUrl;
+  const provider = getRecordingsStorage();
+  if (!provider) return recordingUrl;
 
-  const blobName = extractBlobName(recordingUrl);
-  if (!blobName) return null;
+  const key = provider.keyFromUrl(recordingUrl);
+  if (!key) return null;
 
-  const client = getBlobServiceClient();
-  const containerClient = client.getContainerClient(AZURE_CONTAINER);
-  const blobClient = containerClient.getBlobClient(blobName);
-
-  // Extract account name and key from connection string for SAS generation
-  const accountName = extractFromConnectionString('AccountName');
-  const accountKey = extractFromConnectionString('AccountKey');
-  if (!accountName || !accountKey) return null;
-
-  const credential = new StorageSharedKeyCredential(accountName, accountKey);
-  const startsOn = new Date();
-  const expiresOn = new Date(startsOn.getTime() + expiresInMinutes * 60_000);
-
-  const sas = generateBlobSASQueryParameters(
-    {
-      containerName: AZURE_CONTAINER,
-      blobName,
-      permissions: BlobSASPermissions.parse('r'),
-      startsOn,
-      expiresOn,
-      protocol: SASProtocol.Https,
-    },
-    credential,
-  ).toString();
-
-  return `${blobClient.url}?${sas}`;
+  return provider.getDownloadUrl(key, { expiresInMinutes });
 }
 
 /**
- * Delete a recording blob from Azure Blob Storage.
- * Returns true if deleted, false if not found or not azure-blob storage.
+ * Delete a recording object given its canonical URL. No-op (returns
+ * false with a warning) when the provider isn't configured or the URL
+ * doesn't parse.
  */
 export async function deleteRecordingBlob(recordingUrl: string): Promise<boolean> {
-  if (STORAGE_TYPE !== 'azure-blob') {
-    console.warn(`[storage] Cannot delete blob: storage type is ${STORAGE_TYPE}`);
+  const provider = getRecordingsStorage();
+  if (!provider) {
+    console.warn(`[storage] Cannot delete: provider not configured (${recordingsProviderLabel()})`);
     return false;
   }
 
-  const blobName = extractBlobName(recordingUrl);
-  if (!blobName) {
-    console.warn(`[storage] Cannot parse blob name from URL: ${recordingUrl}`);
+  const key = provider.keyFromUrl(recordingUrl);
+  if (!key) {
+    console.warn(`[storage] Cannot parse key from URL: ${recordingUrl}`);
     return false;
   }
 
-  const client = getBlobServiceClient();
-  const containerClient = client.getContainerClient(AZURE_CONTAINER);
-  const blobClient = containerClient.getBlobClient(blobName);
-
-  const response = await blobClient.deleteIfExists({ deleteSnapshots: 'include' });
-  if (response.succeeded) {
-    console.log(`[storage] Deleted blob: ${blobName}`);
+  const ok = await provider.delete(key);
+  if (ok) {
+    console.log(`[storage] Deleted recording: ${key}`);
   } else {
-    console.warn(`[storage] Blob not found (already deleted?): ${blobName}`);
+    console.warn(`[storage] Recording not found or delete failed: ${key}`);
   }
-  return response.succeeded;
+  return ok;
 }
 
-function extractFromConnectionString(key: string): string | null {
-  const match = AZURE_CONNECTION_STRING.match(new RegExp(`${key}=([^;]+)`));
-  return match?.[1] ?? null;
+/** True when a recordings provider is configured and wired. */
+export function isRecordingStorageConfigured(): boolean {
+  return getRecordingsStorage() !== null;
 }
 
 /**
- * True when recording storage is configured and can be introspected.
- * Used by the reconciliation cron to skip no-op runs in dev mode.
+ * Stable label for the UI/status ('azure-blob' | 's3' | 'not-configured').
+ * Kept backwards-compatible with the old string values.
  */
-export function isRecordingStorageConfigured(): boolean {
-  return STORAGE_TYPE === 'azure-blob' && AZURE_CONNECTION_STRING.length > 0;
-}
-
-/** Returns the configured storage type for UI / status purposes. */
 export function getRecordingStorageType(): string {
-  return STORAGE_TYPE;
+  return recordingsProviderLabel();
 }
 
 export interface RecordingBlobEntry {
@@ -185,40 +111,32 @@ export interface RecordingBlobEntry {
 }
 
 /**
- * Enumerate all blobs currently present in the recording container.
- * Used by the reconciliation cron to cross-reference against DB rows.
- * Returns an empty list when storage is not configured (dev mode).
+ * Enumerate all recordings currently present on the provider. Used by
+ * the reconciliation cron to cross-reference against DB rows. Returns
+ * an empty list when no provider is configured.
+ *
+ * `name` is the key *without* the `recordings/` prefix — this matches
+ * the historical Azure-only behaviour so callers stored in the DB as
+ * bare filenames keep working.
  */
 export async function listRecordingBlobs(): Promise<RecordingBlobEntry[]> {
-  if (!isRecordingStorageConfigured()) return [];
+  const provider = getRecordingsStorage();
+  if (!provider) return [];
 
-  const client = getBlobServiceClient();
-  const containerClient = client.getContainerClient(AZURE_CONTAINER);
-  const entries: RecordingBlobEntry[] = [];
-
-  for await (const item of containerClient.listBlobsFlat()) {
-    const blobClient = containerClient.getBlobClient(item.name);
-    entries.push({
-      name: item.name,
-      url: blobClient.url,
-      sizeBytes: item.properties.contentLength ?? null,
-      lastModified: item.properties.lastModified ?? null,
-    });
-  }
-
-  return entries;
+  const entries = await provider.list(KEY_PREFIX);
+  return entries.map((e) => ({
+    // strip the `recordings/` prefix to keep backwards compat with
+    // callers that only know filenames, not full keys
+    name: e.key.startsWith(KEY_PREFIX) ? e.key.slice(KEY_PREFIX.length) : e.key,
+    url: e.url,
+    sizeBytes: e.sizeBytes,
+    lastModified: e.lastModified,
+  }));
 }
 
-/**
- * Delete a blob by its raw name inside the recordings container.
- * Useful when we have the name from listRecordingBlobs() but not a URL.
- */
+/** Delete by bare blob name (without the `recordings/` prefix). */
 export async function deleteRecordingBlobByName(blobName: string): Promise<boolean> {
-  if (!isRecordingStorageConfigured()) return false;
-
-  const client = getBlobServiceClient();
-  const containerClient = client.getContainerClient(AZURE_CONTAINER);
-  const blobClient = containerClient.getBlobClient(blobName);
-  const response = await blobClient.deleteIfExists({ deleteSnapshots: 'include' });
-  return response.succeeded;
+  const provider = getRecordingsStorage();
+  if (!provider) return false;
+  return provider.delete(keyFromFilename(blobName));
 }
