@@ -205,6 +205,21 @@ Alternative valutate: ejabberd/XMPP (reinventare client web complicato), Matrix/
 
 **Trade-off**: serve scrivere ~200 righe di real-time noi (stream handler + subscriber lifecycle). Niente presence server-side out-of-the-box; per ora non serve — si fa con heartbeat HTTP se mai richiesta. A >5000 SSE simultanee per pod si aggiunge una replica (il fan-out Redis rende lo scale-out orizzontale gratis).
 
+**Availability e HA**: il deploy di default è Redis **standalone** (1 pod, 50m/128Mi richiesti, no persistence). Su spot VM un'eviction = ~30-60s di fan-out gap; i messaggi continuano a essere persistiti in Postgres, quindi non si perdono — la chat live semplicemente non propaga in tempo reale durante il reschedule. `/api/status` riporta `outage` finché Redis non torna (non `standby`/`idle`): chat real-time è trattata come dipendenza richiesta, non opzionale. Per SLA più stretti, la roadmap prevede migrazione a **Valkey** (fork BSD-3 di Redis, gestito da Linux Foundation) con `architecture: replication` — 3× risorse per failover sub-secondo, giustificato solo quando si aggiungono feature critiche come distributed rate-limiting.
+
+**Metriche esposte**:
+
+| Sorgente | Metrica | Uso |
+|---|---|---|
+| App (prom-client) | `eventi_chat_messages_total{event_id}` | Counter messaggi persistiti per evento |
+| App (prom-client) | `eventi_chat_sse_connections{event_id}` | Gauge subscriber attivi per pod/evento |
+| Redis-exporter sidecar | `redis_connected_clients` | Pub + subscriber TCP aperti |
+| Redis-exporter sidecar | `redis_memory_used_bytes` | Uso store (principalmente buffer pub/sub) |
+| Redis-exporter sidecar | `redis_commands_processed_total` | Rate PUBLISH/SUBSCRIBE |
+| Redis-exporter sidecar | `redis_pubsub_channels` | ≈ eventi LIVE con chat attiva |
+
+L'admin dashboard (`/admin/monitoring`) mostra questi valori in una sezione dedicata "Chat in-app & Redis" con KPI istantanei + trend charts (memoria Redis, connessioni SSE). Prerequisito: `PROMETHEUS_URL` puntato a un Prometheus con ServiceMonitor Bitnami attivo.
+
 ### Database
 
 Il database PostgreSQL contiene quattro entità principali con le relative relazioni:
@@ -829,27 +844,31 @@ Lo stack di monitoraggio è quello già presente nel cluster DTD:
 ```mermaid
 graph LR
     subgraph "Sorgenti metriche"
-        APP["Next.js<br/>/api/health + /api/ready"]
+        APP["Next.js<br/>/api/metrics (prom-client)"]
         JVB_M["JVB<br/>Colibri stats"]
         PROSODY_M["Prosody<br/>mod_prometheus"]
         PG["PostgreSQL<br/>pg_stat"]
+        REDIS_M["Redis<br/>redis-exporter sidecar"]
     end
 
     subgraph "Stack monitoraggio"
         PROM["Prometheus<br/>Scraping metriche"]
         LOKI["Loki<br/>Aggregazione log"]
         GRAF["Grafana<br/>Dashboard e alert"]
+        ADMIN["/admin/monitoring<br/>(legge Prometheus via PROMETHEUS_URL)"]
     end
 
     APP --> PROM
     JVB_M --> PROM
     PROSODY_M --> PROM
     PG --> PROM
+    REDIS_M --> PROM
 
     APP --> LOKI
     JVB_M --> LOKI
 
     PROM --> GRAF
+    PROM --> ADMIN
     LOKI --> GRAF
 ```
 
@@ -874,6 +893,9 @@ La separazione liveness/readiness è importante: un pod con schema DB incompatib
 | Connessioni DB attive | pg_stat_activity | > 80% pool |
 | Rate registrazioni | Application log | > 100/min (possibile abuso) |
 | Spazio disco recording | Azure Blob metrics | > 80% quota |
+| SSE chat per pod | `eventi_chat_sse_connections` | > 300 (scala app) |
+| Memoria Redis | `redis_memory_used_bytes` | > 80% del limit del pod |
+| Redis raggiungibile | `/api/status` probe | `outage` → chat fan-out broken |
 
 ---
 
