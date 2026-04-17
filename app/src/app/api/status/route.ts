@@ -107,11 +107,12 @@ async function checkSmtp(): Promise<ComponentStatus> {
 }
 
 /**
- * Redis health check. Required for real-time chat fan-out across
- * pods. When Redis is unreachable the app keeps working for
- * single-pod deployments (chat stays local to each pod), so we
- * report 'degraded' instead of 'outage' — matches the operational
- * impact rather than the technical state.
+ * Redis health check. Redis is a required dependency — it fans out
+ * chat messages across pods. A missing or unreachable Redis means
+ * users on different pods can't see each other's chat, which is an
+ * outage, not a degradation. Canonical chat state still lives in
+ * Postgres so messages aren't lost, but the real-time feature is
+ * broken and the operator needs to see that.
  */
 async function checkRedis(): Promise<ComponentStatus> {
   const { getRedis } = await import('@/lib/redis');
@@ -119,8 +120,8 @@ async function checkRedis(): Promise<ComponentStatus> {
   if (!redis) {
     return {
       name: 'redis',
-      status: 'unknown',
-      details: 'REDIS_URL not configured (single-pod mode)',
+      status: 'outage',
+      details: 'REDIS_URL not configured',
     };
   }
   const start = Date.now();
@@ -133,7 +134,7 @@ async function checkRedis(): Promise<ComponentStatus> {
     ]);
     const responseTime = Date.now() - start;
     if (pong !== 'PONG') {
-      return { name: 'redis', status: 'degraded', responseTime, details: String(pong) };
+      return { name: 'redis', status: 'outage', responseTime, details: String(pong) };
     }
     return {
       name: 'redis',
@@ -143,7 +144,7 @@ async function checkRedis(): Promise<ComponentStatus> {
   } catch (e) {
     return {
       name: 'redis',
-      status: 'degraded',
+      status: 'outage',
       responseTime: Date.now() - start,
       details: e instanceof Error ? e.message : 'ping failed',
     };
