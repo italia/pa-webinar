@@ -99,7 +99,7 @@ jobs:
       - name: Package chart
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          helm dependency build infra/helm/eventi-dtd
+          helm dependency update infra/helm/eventi-dtd
           helm package infra/helm/eventi-dtd \
             --version "$VERSION" \
             --app-version "$VERSION"
