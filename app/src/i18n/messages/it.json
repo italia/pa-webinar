@@ -23,6 +23,12 @@
     "selectAll": "Seleziona tutti",
     "deselectAll": "Deseleziona tutti"
   },
+  "markdown": {
+    "edit": "Scrivi",
+    "preview": "Anteprima",
+    "hint": "Supporta grassetto, corsivo, link, liste, immagini, tabelle.",
+    "syntaxHelp": "Markdown: **grassetto** · *corsivo* · [testo](url) · ![alt](img)"
+  },
   "nav": {
     "home": "Home",
     "events": "Eventi",
@@ -175,6 +181,7 @@
     },
     "connecting": "Connessione in corso...",
     "connectionError": "Impossibile connettersi alla sala. Verifica la connessione e riprova.",
+    "activeVsRegistered": "{active} attivi · {registered} registrati",
     "recordingActive": "Registrazione in corso",
     "recordingConsent": "Questo evento viene registrato. Entrando, acconsenti alla registrazione audio/video.",
     "recordingConsentTitle": "Consenso alla registrazione",
@@ -736,6 +743,8 @@
       "startsAt": "Data e ora inizio",
       "endsAt": "Data e ora fine",
       "maxParticipants": "Numero massimo partecipanti",
+      "expectedParticipants": "Partecipanti attesi (stima)",
+      "expectedParticipantsHint": "Solo una stima per il dimensionamento infrastruttura. Non è un tetto massimo: le registrazioni oltre questa soglia sono accettate, l'infra scala in automatico.",
       "qaEnabled": "Abilita Q&A",
       "chatEnabled": "Abilita chat",
       "recordingEnabled": "Abilita registrazione video",

@@ -51,6 +51,7 @@ interface EventInfo {
   speakers?: string | null;
   organizerName?: string | null;
   maxParticipants?: number;
+  registrationCount?: number;
   tempRecordingUrl?: string | null;
   timezone?: string;
 }
@@ -486,6 +487,7 @@ export default function LiveEventClient({
       <LiveTopBar
         title={event.title}
         participantCount={participantCount}
+        registrationCount={event.registrationCount}
         isRecording={isRecording}
         role={isActualModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
         onLeaveRoom={handleLeaveRoom}
@@ -700,12 +702,16 @@ const ROLE_BADGE_COLORS: Record<UserRole, { badge: string; badgeFg: string }> = 
 interface LiveTopBarProps {
   title: string;
   participantCount: number;
+  /** Total confirmed registrations (if known). Shown alongside the live
+   *  Jitsi count as "N attivi · M registrati". Omitted on public/guest
+   *  views where we don't leak the registration total. */
+  registrationCount?: number;
   isRecording: boolean;
   role: UserRole;
   onLeaveRoom?: () => void;
 }
 
-function LiveTopBar({ title, participantCount, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
+function LiveTopBar({ title, participantCount, registrationCount, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
   const badgeColors = ROLE_BADGE_COLORS[role];
@@ -737,7 +743,9 @@ function LiveTopBar({ title, participantCount, isRecording, role, onLeaveRoom }:
         )}
         <span className="small">
           <Icon icon="it-user" size="sm" color="white" className="me-1" />
-          {t('moderator.participantCount', { count: participantCount })}
+          {registrationCount !== undefined && registrationCount > 0
+            ? t('activeVsRegistered', { active: participantCount, registered: registrationCount })
+            : t('moderator.participantCount', { count: participantCount })}
         </span>
         {onLeaveRoom && (
           <Button

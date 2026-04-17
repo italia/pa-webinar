@@ -16,8 +16,8 @@ import { Link } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer from '@/components/events/video-player';
-import EventConfigDiagram from '@/components/admin/event-config-diagram';
 import PostEventTabs from '@/components/events/post-event-tabs';
+import { MarkdownRenderer } from '@/components/ui/markdown';
 
 interface AnsweredQuestion {
   id: string;
@@ -121,16 +121,10 @@ export default function EventDetailClient({
 
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
-  const spotsLeft = event.maxParticipants - event.registrationCount;
-  const isFull = spotsLeft <= 0;
-  const canRegister = (event.status === 'PUBLISHED' || event.status === 'LIVE') && !isFull;
+  const canRegister = event.status === 'PUBLISHED' || event.status === 'LIVE';
   const isEnded = event.status === 'ENDED';
   const isLive = event.status === 'LIVE';
   const accentColor = STATUS_COLOR[event.status] ?? STATUS_COLOR.PUBLISHED;
-  const occupancyPct = Math.min(
-    100,
-    (event.registrationCount / event.maxParticipants) * 100,
-  );
 
   return (
     <div className="container py-5">
@@ -320,12 +314,7 @@ export default function EventDetailClient({
           <h2 className="h4 fw-semibold mb-3" style={{ color: '#17324D' }}>
             {t('detail.description')}
           </h2>
-          <div
-            className="mb-4 text-secondary"
-            style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7, fontSize: '1.05rem' }}
-          >
-            {description}
-          </div>
+          <MarkdownRenderer content={description} className="mb-4" />
 
           {/* Post-event tabbed content */}
           {isEnded && (
@@ -341,27 +330,8 @@ export default function EventDetailClient({
             />
           )}
 
-          {/* Feature diagram (public view, non-ended) */}
-          {!isEnded && (event.qaEnabled !== undefined || event.chatEnabled !== undefined) && (
-            <div className="mt-4">
-              <EventConfigDiagram
-                event={{
-                  maxParticipants: event.maxParticipants,
-                  qaEnabled: event.qaEnabled,
-                  chatEnabled: event.chatEnabled,
-                  recordingEnabled: event.recordingEnabled ?? false,
-                  participantsCanUnmute: event.participantsCanUnmute ?? false,
-                  participantsCanStartVideo: event.participantsCanStartVideo ?? false,
-                  participantsCanShareScreen: event.participantsCanShareScreen ?? false,
-                  speakers: getLocalized(event.speakersInfo as LocalizedField, locale),
-                  startsAt: event.startsAt,
-                  endsAt: event.endsAt,
-                }}
-                registrationCount={event.registrationCount}
-                adminMode={false}
-              />
-            </div>
-          )}
+          {/* Feature diagram moved behind the admin UI — it's internal
+              infra/capacity info, not something public attendees need. */}
         </Col>
 
         <Col lg={4}>
@@ -387,44 +357,10 @@ export default function EventDetailClient({
 
                   <div className="mb-2 fw-semibold" style={{ fontSize: '1.5rem', color: '#17324D' }}>
                     {event.registrationCount}
-                    <span className="fw-normal text-muted" style={{ fontSize: '1rem' }}>
-                      {' / '}
-                      {event.maxParticipants}
-                    </span>
                   </div>
-
-                  <div className="text-muted small mb-3">
-                    {t('detail.occupiedSpots', {
-                      registered: event.registrationCount,
-                      max: event.maxParticipants,
-                    })}
+                  <div className="text-muted small mb-4">
+                    {t('detail.totalRegistrations', { count: event.registrationCount })}
                   </div>
-
-                  <div
-                    className="progress mb-4"
-                    style={{ height: '6px', borderRadius: '3px' }}
-                  >
-                    <div
-                      className="progress-bar"
-                      role="progressbar"
-                      style={{
-                        width: `${occupancyPct}%`,
-                        backgroundColor: isFull ? '#D9364E' : accentColor,
-                        borderRadius: '3px',
-                      }}
-                      aria-valuenow={event.registrationCount}
-                      aria-valuemin={0}
-                      aria-valuemax={event.maxParticipants}
-                    />
-                  </div>
-
-                  {isFull && (
-                    <div className="text-center mb-3">
-                      <Badge color="danger" className="px-3 py-2">
-                        {t('detail.full')}
-                      </Badge>
-                    </div>
-                  )}
 
                   {canRegister && (
                     <Link href={`/events/${event.slug}/registration`}>

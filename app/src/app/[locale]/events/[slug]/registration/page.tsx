@@ -29,7 +29,6 @@ export default async function RegistrationPage({
     notFound();
   }
 
-  const spotsLeft = event.maxParticipants - event._count.registrations;
   const title = getLocalized(event.title as LocalizedField, locale);
 
   const privacyUrl =
@@ -65,23 +64,17 @@ export default async function RegistrationPage({
           <h1 className="mb-2">{t('title')}</h1>
           <p className="lead text-muted mb-4">{title}</p>
 
-          {spotsLeft <= 0 ? (
-            <div className="alert alert-warning" role="alert">
-              {t('errors.eventFull')}
-            </div>
-          ) : (
-            <RegistrationFormClient
-              eventSlug={slug}
-              privacyPolicyUrl={privacyUrl}
-              privacyPolicyText={privacyText}
-              recordingEnabled={event.recordingEnabled}
-              profiling={{
-                requireOrganization: event.requireOrganization,
-                requireOrganizationRole: event.requireOrganizationRole,
-                requireOrganizationType: event.requireOrganizationType,
-              }}
-            />
-          )}
+          <RegistrationFormClient
+            eventSlug={slug}
+            privacyPolicyUrl={privacyUrl}
+            privacyPolicyText={privacyText}
+            recordingEnabled={event.recordingEnabled}
+            profiling={{
+              requireOrganization: event.requireOrganization,
+              requireOrganizationRole: event.requireOrganizationRole,
+              requireOrganizationType: event.requireOrganizationType,
+            }}
+          />
         </div>
       </div>
     </div>
