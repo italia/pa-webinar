@@ -12,7 +12,12 @@ export const routing = defineRouting({
     '/events': { it: '/eventi', en: '/events' },
     '/events/[slug]': { it: '/eventi/[slug]', en: '/events/[slug]' },
     '/events/[slug]/registration': { it: '/eventi/[slug]/registrazione', en: '/events/[slug]/registration' },
-    '/events/[slug]/live': '/events/[slug]/live',
+    // Must stay in sync with `lib/utils/localized-url.ts`, which
+    // rewrites `/events/…` → `/eventi/…` wholesale for IT. That helper
+    // builds the join link in the sign-up confirmation email, so the
+    // router has to match `/it/eventi/<slug>/live` — if this stays a
+    // bare string ('/events/[slug]/live') the email link 404s.
+    '/events/[slug]/live': { it: '/eventi/[slug]/live', en: '/events/[slug]/live' },
 
     '/calendar': { it: '/calendario', en: '/calendar' },
     '/accessibility': { it: '/accessibilita', en: '/accessibility' },
