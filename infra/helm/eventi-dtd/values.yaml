@@ -214,6 +214,10 @@ secrets:
     # templates inject an svc-based default at render time. Set
     # explicitly when pointing at an external / managed Redis.
     REDIS_URL: ""
+    # Random password used by both the redis subchart (auth.enabled)
+    # and the app (as part of the derived REDIS_URL). Regenerate per
+    # deploy with: openssl rand -base64 32
+    REDIS_PASSWORD: ""
     JITSI_JWT_SECRET: ""
     JITSI_JWT_APP_ID: "eventi_dtd"
     JITSI_JWT_ISSUER: "eventi-dtd"
@@ -596,9 +600,20 @@ redis:
 
   architecture: standalone  # single node is enough for pub/sub + rate-limit
 
+  # As of 2025-08-28 Bitnami moved most pinned image tags to their
+  # "Legacy Catalog"; the chart's default tag may disappear from the
+  # public registry. We deliberately track `latest` because we only
+  # rely on PUBLISH/SUBSCRIBE/GET/SET — those are stable across major
+  # Redis versions. Override in values-<env>.yaml if your org pins a
+  # specific digest.
+  image:
+    tag: "latest"
+    pullPolicy: Always
+
   auth:
     enabled: true
-    # Pre-existing Secret containing REDIS_PASSWORD
+    # Pre-existing Secret containing REDIS_PASSWORD. Required: Redis
+    # refuses to start without a password when auth is enabled.
     existingSecret: "videocall-secrets"
     existingSecretPasswordKey: "REDIS_PASSWORD"
 
@@ -621,6 +636,10 @@ redis:
     # state lives in Postgres.
     save ""
     appendonly no
+    # Pub/sub buffers: allow bigger spikes during a live event (300
+    # subscribers × a few messages/sec peak) without Redis killing
+    # slow consumers. Defaults are 32mb hard / 8mb soft for pubsub.
+    client-output-buffer-limit pubsub 64mb 16mb 60
 
 # ── Name overrides ──────────────────────────────────────────
 nameOverride: ""

@@ -22,6 +22,7 @@
 
 import { prisma } from '@/lib/db';
 import { subscribeChat, type ChatEnvelope } from '@/lib/chat/pubsub';
+import { chatSseConnectionsGauge } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
 // Opt out of Vercel's default 10s stream budget; we want this open
@@ -54,6 +55,9 @@ export async function GET(
   if (!event) {
     return new Response('Event not found', { status: 404 });
   }
+  // Capture id into a local const so TS narrowing survives across
+  // the inner closures (closed()/callbacks).
+  const eventId: string = event.id;
 
   const encoder = new TextEncoder();
   let cleanup: (() => void) | null = null;
@@ -78,7 +82,7 @@ export async function GET(
       // Emit an opener comment immediately so the client knows the
       // connection is established (EventSource transitions to OPEN
       // on the first byte).
-      controller.enqueue(encoder.encode(`: connected to chat:${event.id}\n\n`));
+      controller.enqueue(encoder.encode(`: connected to chat:${eventId}\n\n`));
 
       // Keepalive comment line every 25s — pure no-op for the
       // EventSource parser (lines starting with `:` are comments)
@@ -89,21 +93,27 @@ export async function GET(
         } catch { /* stream closed */ }
       }, KEEPALIVE_MS);
 
-      cleanup = await subscribeChat(event.id, send);
+      cleanup = await subscribeChat(eventId, send);
+      chatSseConnectionsGauge.inc({ event_id: eventId });
     },
     cancel() {
-      if (cleanup) cleanup();
-      if (keepalive) clearInterval(keepalive);
+      closed();
     },
   });
 
-  // Abort wiring: Next.js route handlers receive a request signal
-  // that fires when the client disconnects. Tie it to the stream
-  // controller's cancel() so subscriber cleanup runs deterministically.
-  request.signal.addEventListener('abort', () => {
+  // Single-shot close guard: both ReadableStream.cancel() (when we
+  // finish writing or Next.js aborts) and request.signal 'abort'
+  // (when the client TCP disconnects) can fire; we want cleanup to
+  // run exactly once so the gauge doesn't go negative.
+  let closedOnce = false;
+  function closed() {
+    if (closedOnce) return;
+    closedOnce = true;
     if (cleanup) cleanup();
     if (keepalive) clearInterval(keepalive);
-  });
+    chatSseConnectionsGauge.dec({ event_id: eventId });
+  }
+  request.signal.addEventListener('abort', closed);
 
   return new Response(stream, {
     headers: {

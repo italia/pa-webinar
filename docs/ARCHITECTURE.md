@@ -58,7 +58,8 @@ Il browser carica due contesti separati: il portale (React) e l'iframe Jitsi (We
 | CSS | Bootstrap Italia | 2.x | Stili, variabili CSS, griglia responsive |
 | Video | Jitsi Meet | stable | Motore WebRTC via IFrame API |
 | ORM | Prisma | 6.x | Accesso DB, migrazioni, type safety |
-| Database | PostgreSQL | 16 | Dati eventi, registrazioni, Q&A |
+| Database | PostgreSQL | 16 | Dati eventi, registrazioni, Q&A, chat |
+| Pub/Sub | Redis | 7+ | Real-time fan-out chat (cross-pod) |
 | i18n | next-intl | latest | Localizzazione IT/EN, App Router |
 | Email | Nodemailer | latest | Invio conferme e promemoria |
 | Auth | jose | latest | Generazione e verifica JWT |
@@ -172,6 +173,37 @@ graph LR
 La comunicazione media ha due percorsi possibili:
 - **Diretto** (UDP 10000): Browser → JVB. Migliore latenza, richiede porta UDP aperta sul client.
 - **Relay** (TURNS TCP 443): Browser → coturn → JVB. Per client dietro firewall che bloccano UDP. Il browser scopre il TURN server via XEP-0215 e lo usa come fallback automatico.
+
+### Chat in-app (Redis + SSE)
+
+La chat durante gli eventi è **nostra** (in-app), non Jitsi XMPP. I motivi:
+
+- **Persistenza**: i messaggi vivono in `chat_messages` (Postgres) invece che transitare su Prosody XMPP e scomparire a fine call. Utile per late-joiner, archivio post-evento, AI-summary.
+- **Controllo**: rate-limit e moderazione server-side, soft-delete con audit trail.
+- **Indipendenza**: niente contaminazione della configurazione Jitsi; la chat funziona anche quando Jitsi è embedded da istanza esterna.
+
+Stack a tre livelli:
+
+```
+Client A ──POST /chat──► Next.js API ──INSERT──► PostgreSQL
+                               │
+                               └──PUBLISH chat:evt123──► Redis pub/sub
+                                                              │
+                                   ┌──────────────────────────┤ SUBSCRIBE
+                                   ▼                          ▼
+                          Pod #1 SSE /stream         Pod #2 SSE /stream
+                                   │                          │
+                                   ▼                          ▼
+                              Client A, B                Client C, D
+```
+
+- **POST `/api/events/[param]/chat`** autentica il sender (moderator token / co-moderator / registration accessToken / guest-on-LIVE), persiste in Postgres, pubblica su Redis.
+- **GET `/api/events/[param]/chat/stream`** apre un'SSE che legge dal subscriber Redis e rilancia ogni messaggio al browser. `EventSource` auto-reconnect + `since=<timestamp>` per backfill garantiscono ordinamento consistente su reconnect.
+- **GET `/api/events/[param]/chat[?since=&limit=]`** per lo storico, usato al mount del panel e come backfill su reconnect.
+
+Alternative valutate: ejabberd/XMPP (reinventare client web complicato), Matrix/Synapse (overkill, infra extra), Socket.IO + Redis (bundle client pesante), Centrifugo (dep esterna extra, maintainer russo — concerns governance PA). SSE+Redis è la scelta "minimal dep, massima auditabilità" per una PA che fa riuso.
+
+**Trade-off**: serve scrivere ~200 righe di real-time noi (stream handler + subscriber lifecycle). Niente presence server-side out-of-the-box; per ora non serve — si fa con heartbeat HTTP se mai richiesta. A >5000 SSE simultanee per pod si aggiunge una replica (il fan-out Redis rende lo scale-out orizzontale gratis).
 
 ### Database
 
