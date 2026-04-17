@@ -1628,8 +1628,7 @@
       "redis": {
         "healthy": "Real-time chat service is responding correctly.",
         "degraded": "Real-time chat service is slow: messages may reach other servers with delay.",
-        "down": "Real-time chat service is unreachable. With multiple servers, messages may not fan out: the system keeps working in single-server mode.",
-        "standby": "Real-time chat service is not configured (single-server mode)."
+        "down": "Real-time chat service is unreachable. Live chat cannot fan out messages between servers — messages are still persisted to the database but users don't see each other in real time."
       },
       "jitsiWeb": {
         "healthy": "The video conference room is reachable and ready for events.",
@@ -1667,6 +1666,7 @@
     },
     "impacts": {
       "database": "The platform cannot load events, manage registrations, or save data.",
+      "redis": "Live chat messages don't fan out across servers. Users only see messages sent on their own pod.",
       "jitsiWeb": "Participants cannot access the video conference room.",
       "prosody": "Video services cannot communicate. Conferences will not work.",
       "jicofo": "It is not possible to create or manage new video conferences.",

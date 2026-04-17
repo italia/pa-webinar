@@ -1628,8 +1628,7 @@
       "redis": {
         "healthy": "Il servizio di chat real-time risponde correttamente.",
         "degraded": "Il servizio di chat risponde con lentezza: i messaggi potrebbero arrivare in ritardo tra i server.",
-        "down": "Il servizio di chat real-time non è raggiungibile. Con più server attivi, i messaggi potrebbero non essere distribuiti: il sistema continua a funzionare in modalità single-server.",
-        "standby": "Il servizio di chat real-time non è configurato (modalità single-server)."
+        "down": "Il servizio di chat real-time non è raggiungibile. La chat live non può distribuire i messaggi tra i server — i messaggi restano salvati in database ma non vengono visti in tempo reale da tutti gli utenti."
       },
       "jitsiWeb": {
         "healthy": "La sala videoconferenza è raggiungibile e pronta per gli eventi.",
@@ -1667,6 +1666,7 @@
     },
     "impacts": {
       "database": "La piattaforma non può caricare eventi, gestire registrazioni o salvare dati.",
+      "redis": "I messaggi della chat live non vengono distribuiti tra i server. Gli utenti vedono solo i messaggi inviati sul proprio pod.",
       "jitsiWeb": "I partecipanti non possono accedere alla sala videoconferenza.",
       "prosody": "I servizi video non possono comunicare. Le conferenze non funzionano.",
       "jicofo": "Non è possibile creare o gestire nuove conferenze video.",

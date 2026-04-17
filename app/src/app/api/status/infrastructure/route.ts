@@ -505,11 +505,12 @@ export const GET = withErrorHandling(async () => {
   try { appHost = new URL(appDomain).hostname; } catch { /* */ }
 
   const dbStatus: ServiceStatus = dbOk ? (dbLatencyMs > 1000 ? 'degraded' : 'healthy') : 'down';
-  const redisStatus: ServiceStatus = !redisConfigured
-    ? 'standby'
-    : redisOk
-      ? (redisLatencyMs > 500 ? 'degraded' : 'healthy')
-      : 'down';
+  // Redis is a required dependency for real-time chat fan-out.
+  // A missing or unreachable Redis is reported as `down`, not `standby`,
+  // because the chat fan-out feature is broken for the user.
+  const redisStatus: ServiceStatus = redisConfigured && redisOk
+    ? (redisLatencyMs > 500 ? 'degraded' : 'healthy')
+    : 'down';
   const jitsiWebStatus: ServiceStatus = jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby';
   // Jibri status reflects scale-to-zero semantics, mirroring /api/status:
   //   - unconfigured (no storage backend) → standby with unconfigured verdict
@@ -561,12 +562,10 @@ export const GET = withErrorHandling(async () => {
       technicalName: 'Redis (pub/sub)',
       description: 'infraMap.descriptions.redis',
       status: redisStatus,
-      verdict: !redisConfigured
-        ? 'infraMap.verdicts.redis.standby'
-        : redisOk
-          ? (redisLatencyMs > 500 ? 'infraMap.verdicts.redis.degraded' : 'infraMap.verdicts.redis.healthy')
-          : 'infraMap.verdicts.redis.down',
-      impact: null,
+      verdict: redisConfigured && redisOk
+        ? (redisLatencyMs > 500 ? 'infraMap.verdicts.redis.degraded' : 'infraMap.verdicts.redis.healthy')
+        : 'infraMap.verdicts.redis.down',
+      impact: redisConfigured && redisOk ? null : 'infraMap.impacts.redis',
       replicas: { running: redisOk ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'redis', port: 6379, protocol: 'TCP' }],
       metadata: { configured: redisConfigured, latencyMs: redisLatencyMs },
