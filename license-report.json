@@ -273,6 +273,13 @@
     "licenses": "MIT",
     "repository": "https://github.com/lovell/colour"
   },
+  "@ioredis/commands@1.5.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ioredis/commands",
+    "publisher": "Zihua Li",
+    "email": "i@zihua.li",
+    "url": "http://zihua.li"
+  },
   "@jridgewell/sourcemap-codec@1.5.5": {
     "licenses": "MIT",
     "repository": "https://github.com/jridgewell/sourcemaps",
@@ -886,6 +893,13 @@
     "email": "luke.edwards05@gmail.com",
     "url": "https://lukeed.com"
   },
+  "cluster-key-slot@1.1.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/Salakar/cluster-key-slot",
+    "publisher": "Mike Diarmid",
+    "email": "mike.diarmid@gmail.com",
+    "url": "http://github.com/Salakar/"
+  },
   "color-convert@2.0.1": {
     "licenses": "MIT",
     "repository": "https://github.com/Qix-/color-convert",
@@ -1024,6 +1038,13 @@
   "defu@6.1.7": {
     "licenses": "MIT",
     "repository": "https://github.com/unjs/defu"
+  },
+  "denque@2.1.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/invertase/denque",
+    "publisher": "Invertase",
+    "email": "oss@invertase.io",
+    "url": "http://github.com/invertase/"
   },
   "dequal@2.0.3": {
     "licenses": "MIT",
@@ -1604,6 +1625,13 @@
     "publisher": "Andres Suarez",
     "email": "zertosh@gmail.com"
   },
+  "ioredis@5.10.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/luin/ioredis",
+    "publisher": "Zihua Li",
+    "email": "i@zihua.li",
+    "url": "http://zihua.li"
+  },
   "is-array-buffer@3.0.5": {
     "licenses": "MIT",
     "repository": "https://github.com/inspect-js/is-array-buffer",
@@ -1889,6 +1917,20 @@
     "publisher": "Sindre Sorhus",
     "email": "sindresorhus@gmail.com",
     "url": "https://sindresorhus.com"
+  },
+  "lodash.defaults@4.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "url": "http://allyoucanleet.com/"
+  },
+  "lodash.isarguments@3.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "url": "http://allyoucanleet.com/"
   },
   "lodash.merge@4.6.2": {
     "licenses": "MIT",
@@ -2399,6 +2441,16 @@
     "email": "sindresorhus@gmail.com",
     "url": "sindresorhus.com"
   },
+  "redis-errors@1.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/NodeRedis/redis-errors",
+    "publisher": "Ruben Bridgewater"
+  },
+  "redis-parser@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/NodeRedis/node-redis-parser",
+    "publisher": "Ruben Bridgewater"
+  },
   "reflect.getprototypeof@1.0.10": {
     "licenses": "MIT",
     "repository": "https://github.com/es-shims/Reflect.getPrototypeOf",
@@ -2591,6 +2643,12 @@
     "repository": "https://github.com/shtylman/node-stackback",
     "publisher": "Roman Shtylman",
     "email": "shtylman@gmail.com"
+  },
+  "standard-as-callback@2.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/luin/asCallback",
+    "publisher": "luin",
+    "email": "i@zihua.li"
   },
   "std-env@3.10.0": {
     "licenses": "MIT",
