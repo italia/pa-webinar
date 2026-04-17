@@ -145,15 +145,41 @@ export const GET = withErrorHandling(async (request) => {
       counts.liveToIdle = r.count;
     }
 
-    // 3) Any non-terminal event past endsAt → ENDED.
-    const r3 = await tx.event.updateMany({
+    // 3) Past endsAt:
+    //    - PUBLISHED / PROVISIONING / IDLE past endsAt → ENDED (they
+    //      never really served anyone; nothing to grace).
+    //    - LIVE past endsAt respects the grace period: the event gets
+    //      a soft "overtime" window, then we flip to ENDED. Grace
+    //      of -1 means "never auto-close" — the inactivity cleanup in
+    //      step (2) will eventually catch it.
+    const r3a = await tx.event.updateMany({
       where: {
-        status: { in: ['PUBLISHED', 'PROVISIONING', 'LIVE', 'IDLE'] },
+        status: { in: ['PUBLISHED', 'PROVISIONING', 'IDLE'] },
         endsAt: { lt: now },
       },
       data: { status: 'ENDED' },
     });
-    counts.toEnded = r3.count;
+    counts.toEnded = r3a.count;
+
+    const liveOvertime = await tx.event.findMany({
+      where: { status: 'LIVE', endsAt: { lt: now } },
+      select: { id: true, endsAt: true, gracePeriodMinutes: true },
+    });
+    const siteGrace = settings.eventGracePeriodMinutes ?? 15;
+    const toEndIds: string[] = [];
+    for (const ev of liveOvertime) {
+      const grace = ev.gracePeriodMinutes ?? siteGrace;
+      if (grace < 0) continue; // caller opted out of auto-close
+      const closeAt = new Date(ev.endsAt.getTime() + grace * 60_000);
+      if (now >= closeAt) toEndIds.push(ev.id);
+    }
+    if (toEndIds.length > 0) {
+      const r3b = await tx.event.updateMany({
+        where: { id: { in: toEndIds } },
+        data: { status: 'ENDED' },
+      });
+      counts.toEnded += r3b.count;
+    }
 
     // 4) PUBLISHED → PROVISIONING when startsAt enters the pre-scale window,
     //    or when startsAt has already passed and nobody moved the state yet.
@@ -186,30 +212,50 @@ export const GET = withErrorHandling(async (request) => {
   });
 
   // ── Compute desired replicas from the updated state ──────────────
+  // LIVE events within endsAt+grace are still billable. Step (3) above
+  // has already flipped past-grace LIVE → ENDED, so whatever remains
+  // LIVE/PROVISIONING here actually needs bridge capacity.
   const billableEvents = await prisma.event.findMany({
-    where: {
-      status: { in: ['LIVE', 'PROVISIONING'] },
-      endsAt: { gt: now },
-    },
+    where: { status: { in: ['LIVE', 'PROVISIONING'] } },
     select: {
       id: true,
       maxParticipants: true,
+      expectedSenderRatioPct: true,
       participantsCanStartVideo: true,
       recordingEnabled: true,
       status: true,
+      endsAt: true,
+      gracePeriodMinutes: true,
     },
   });
 
+  const sizingConfig = {
+    cpuCoresPerPod: settings.jvbCpuCoresPerPod ?? 16,
+    receiversPerCore: settings.jvbReceiversPerCore ?? 18.75,
+    sendersPerCore: settings.jvbSendersPerCore ?? 3.125,
+    maxReplicas: settings.jvbMaxReplicas ?? MAX_REPLICAS,
+  };
+  const defaultSenderRatio = settings.defaultSenderRatioPct ?? 30;
+
   let predictiveDesired = 0;
   const breakdown = billableEvents.map((event) => {
-    const jvbs = jvbsForEvent(event.maxParticipants, event.participantsCanStartVideo);
+    const ratio = event.expectedSenderRatioPct ?? defaultSenderRatio;
+    const jvbs = jvbsForEvent(
+      event.maxParticipants,
+      ratio,
+      event.participantsCanStartVideo,
+      sizingConfig,
+    );
     predictiveDesired += jvbs;
+    const inOvertime = event.status === 'LIVE' && event.endsAt.getTime() < now.getTime();
     return {
       eventId: event.id,
       status: event.status,
       maxParticipants: event.maxParticipants,
+      senderRatio: ratio,
       videoEnabled: event.participantsCanStartVideo,
       jvbs,
+      inOvertime,
     };
   });
 

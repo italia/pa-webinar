@@ -202,15 +202,40 @@ export const PUT = withErrorHandling(async (request, context) => {
       }
     : undefined;
 
+  // Reviving an ENDED event: if the moderator pushes endsAt into the
+  // future we flip the status back to PUBLISHED or LIVE instead of
+  // leaving the row stuck in ENDED. Without this the call happens to
+  // be terminated permanently from a single timing mistake — which
+  // is what happened on the caffettino dry-run.
+  let revivedStatus: 'PUBLISHED' | 'LIVE' | undefined;
+  if (
+    event.status === 'ENDED' &&
+    data.endsAt !== undefined &&
+    new Date(data.endsAt) > new Date() &&
+    data.status === undefined // caller hasn't explicitly asked for a status
+  ) {
+    const effectiveStart = data.startsAt
+      ? new Date(data.startsAt)
+      : event.startsAt;
+    revivedStatus = effectiveStart <= new Date() ? 'LIVE' : 'PUBLISHED';
+  }
+
   const updated = await prisma.event.update({
     where: { id: eventId },
     data: {
+      ...(revivedStatus && { status: revivedStatus }),
       ...(data.title !== undefined && { title: data.title }),
       ...(data.description !== undefined && { description: data.description }),
       ...(data.startsAt !== undefined && {
         startsAt: new Date(data.startsAt),
       }),
       ...(data.endsAt !== undefined && { endsAt: new Date(data.endsAt) }),
+      ...(data.expectedSenderRatioPct !== undefined && {
+        expectedSenderRatioPct: data.expectedSenderRatioPct,
+      }),
+      ...(data.gracePeriodMinutes !== undefined && {
+        gracePeriodMinutes: data.gracePeriodMinutes,
+      }),
       ...(data.timezone !== undefined && { timezone: data.timezone }),
       ...(data.maxParticipants !== undefined && {
         maxParticipants: data.maxParticipants,

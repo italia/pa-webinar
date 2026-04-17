@@ -166,9 +166,17 @@ interface JvbStatusResult {
   stale: boolean;
 }
 
+interface JvbSizingInput {
+  cpuCoresPerPod: number;
+  receiversPerCore: number;
+  sendersPerCore: number;
+  defaultSenderRatioPct: number;
+}
+
 async function getJvbStatus(
   preScaleMinutes: number,
   provisioningTimeoutMinutes: number,
+  sizing: JvbSizingInput,
 ): Promise<JvbStatusResult> {
   try {
     const now = new Date();
@@ -198,13 +206,27 @@ async function getJvbStatus(
         startsAt: true,
         provisioningStartedAt: true,
         maxParticipants: true,
+        expectedSenderRatioPct: true,
         participantsCanStartVideo: true,
       },
     });
 
+    const sizingConfig = {
+      cpuCoresPerPod: sizing.cpuCoresPerPod,
+      receiversPerCore: sizing.receiversPerCore,
+      sendersPerCore: sizing.sendersPerCore,
+      maxReplicas,
+    };
+
     let desired = 0;
     for (const event of events) {
-      desired += jvbsForEvent(event.maxParticipants, event.participantsCanStartVideo, maxReplicas);
+      const ratio = event.expectedSenderRatioPct ?? sizing.defaultSenderRatioPct;
+      desired += jvbsForEvent(
+        event.maxParticipants,
+        ratio,
+        event.participantsCanStartVideo,
+        sizingConfig,
+      );
     }
     desired = Math.min(desired, maxReplicas);
     if (events.length > 0 && desired === 0) desired = 1;
@@ -433,7 +455,12 @@ export const GET = withErrorHandling(async () => {
     checkJitsiWeb(),
     checkSmtp(),
     checkRedis(),
-    getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes),
+    getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes, {
+      cpuCoresPerPod: settings.jvbCpuCoresPerPod ?? 16,
+      receiversPerCore: settings.jvbReceiversPerCore ?? 18.75,
+      sendersPerCore: settings.jvbSendersPerCore ?? 3.125,
+      defaultSenderRatioPct: settings.defaultSenderRatioPct ?? 30,
+    }),
     getJibriStatus(recordingNeeded, recordingStale),
     prisma.orphanRecording.count({ where: { decision: 'pending' } }).catch(() => 0),
   ]);

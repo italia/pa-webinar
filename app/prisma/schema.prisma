@@ -21,6 +21,19 @@ model Event {
 
   maxParticipants Int @default(300) @map("max_participants")
 
+  // Expected share of participants that will actually send media (mic
+  // or webcam). Drives JVB sizing — a webinar with 100 attendees and
+  // 20% senders is *very* different infra-load than 100 all-senders.
+  // Percentage (0-100). Null inherits SiteSetting.defaultSenderRatioPct.
+  expectedSenderRatioPct Int? @map("expected_sender_ratio_pct")
+
+  // Soft exit / grace period in minutes past endsAt before the scaler
+  // transitions LIVE → ENDED. Null inherits SiteSetting.eventGracePeriodMinutes.
+  //   0    → hard close at endsAt (legacy behaviour)
+  //   N>0  → show "event in overtime" banner, close at endsAt+N
+  //   -1   → never auto-close on endsAt; let the inactivity cleanup cron decide
+  gracePeriodMinutes Int? @map("grace_period_minutes")
+
   // Jitsi room configuration
   jitsiRoomName String @unique @map("jitsi_room_name") // UUID-based
 
@@ -631,6 +644,35 @@ model SiteSetting {
   // marcare l'orfano come "ignore" (mantenere) o "delete-now" (eliminare
   // subito). Impostare a 0 per disabilitare l'auto-cleanup.
   orphanRecordingGraceDays Int @default(30) @map("orphan_recording_grace_days")
+
+  // ── JVB sizing calculator (admin-tunable, per-cluster) ─────────
+  //
+  // Il software è a riuso: diverse PA eseguono su hardware diverso
+  // (F16s_v2, m5.xlarge, n2-standard-16, on-prem…). Lo scaler deve
+  // calcolare il numero di repliche JVB da questi parametri invece che
+  // da magic-number hard-coded.
+  //
+  // Default calibrati su Azure F16s_v2 (16 vCPU / 32 GiB) con pod
+  // requests=14 core. Per nodo più piccolo/grande l'admin aggiorna qui
+  // — non serve redeploy.
+  jvbCpuCoresPerPod    Int   @default(16)    @map("jvb_cpu_cores_per_pod")
+  jvbReceiversPerCore  Float @default(18.75) @map("jvb_receivers_per_core")
+  jvbSendersPerCore    Float @default(3.125) @map("jvb_senders_per_core")
+  jvbMaxReplicas       Int   @default(6)     @map("jvb_max_replicas")
+  jibriCpuCoresPerPod  Int   @default(4)     @map("jibri_cpu_cores_per_pod")
+
+  // Frazione di partecipanti attesa come "sender" (mic o webcam attivi)
+  // quando l'evento non ne specifica una. 30% è un buon default per
+  // webinar interattivi; i template possono overridare (es. 100% per
+  // call con tutti i partecipanti attivi, 10% per keynote).
+  defaultSenderRatioPct Int @default(30) @map("default_sender_ratio_pct")
+
+  // Soft exit: minuti di "overtime" concessi dopo endsAt prima di chiudere
+  // la call. Mostrato come banner non invasivo ai partecipanti.
+  //   0    → chiusura dura a endsAt (vecchio comportamento)
+  //   N>0  → grace di N min, poi cleanup chiude la call
+  //   -1   → non chiudere automaticamente, lascia al cleanup di inattività
+  eventGracePeriodMinutes Int @default(15) @map("event_grace_period_minutes")
 
   updatedAt DateTime @updatedAt @map("updated_at")
 

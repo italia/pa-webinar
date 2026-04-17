@@ -57,6 +57,10 @@ const eventBaseSchema = z.object({
   organizerName: z.string().max(200).optional(),
   imageUrl: z.string().url().optional(),
   waitingRoomAudioUrl: z.string().url().optional(),
+  // Percent 0-100, null → inherit SiteSetting.defaultSenderRatioPct.
+  expectedSenderRatioPct: z.number().int().min(0).max(100).nullable().optional(),
+  // Minutes of grace after endsAt. -1 never auto-closes, null inherits.
+  gracePeriodMinutes: z.number().int().min(-1).max(240).nullable().optional(),
   postEventPublic: z.boolean().default(true),
   postEventPublicUntil: z.string().datetime().nullable().optional(),
   postEventShowQA: z.boolean().default(true),

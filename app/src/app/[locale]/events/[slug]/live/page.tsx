@@ -102,6 +102,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             participantsCanShareScreen: event.participantsCanShareScreen,
             timezone: event.timezone,
             registrationCount: event._count.registrations,
+            effectiveGraceMinutes:
+              event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
           }}
           token=""
           isModerator={false}
@@ -165,6 +167,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         participantsCanStartVideo: event.participantsCanStartVideo,
         participantsCanShareScreen: event.participantsCanShareScreen,
         timezone: event.timezone,
+        registrationCount: event._count.registrations,
+        effectiveGraceMinutes:
+          event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
       }}
       token={token}
       isModerator={isModerator}

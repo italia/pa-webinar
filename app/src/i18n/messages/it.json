@@ -182,6 +182,11 @@
     "connecting": "Connessione in corso...",
     "connectionError": "Impossibile connettersi alla sala. Verifica la connessione e riprova.",
     "activeVsRegistered": "{active} attivi · {registered} registrati",
+    "overtime": {
+      "withCountdown": "L'orario di fine previsto è passato. L'evento si chiuderà automaticamente fra {minutes, plural, one {# minuto} other {# minuti}}.",
+      "closingNow": "L'orario di fine è stato raggiunto. L'evento sta per chiudersi.",
+      "indefinite": "L'orario di fine previsto è passato. L'evento resterà attivo finché ci sono partecipanti collegati."
+    },
     "recordingActive": "Registrazione in corso",
     "recordingConsent": "Questo evento viene registrato. Entrando, acconsenti alla registrazione audio/video.",
     "recordingConsentTitle": "Consenso alla registrazione",

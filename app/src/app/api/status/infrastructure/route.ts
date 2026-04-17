@@ -454,14 +454,24 @@ export const GET = withErrorHandling(async () => {
       startsAt: true,
       provisioningStartedAt: true,
       maxParticipants: true,
+      expectedSenderRatioPct: true,
       participantsCanStartVideo: true,
       recordingEnabled: true,
     },
   });
 
+  const sizing = {
+    cpuCoresPerPod: settings.jvbCpuCoresPerPod ?? 16,
+    receiversPerCore: settings.jvbReceiversPerCore ?? 18.75,
+    sendersPerCore: settings.jvbSendersPerCore ?? 3.125,
+    maxReplicas: maxJvb,
+  };
+  const defaultRatio = settings.defaultSenderRatioPct ?? 30;
+
   let jvbDesired = 0;
   for (const ev of soonEvents) {
-    jvbDesired += jvbsForEvent(ev.maxParticipants, ev.participantsCanStartVideo, maxJvb);
+    const ratio = ev.expectedSenderRatioPct ?? defaultRatio;
+    jvbDesired += jvbsForEvent(ev.maxParticipants, ratio, ev.participantsCanStartVideo, sizing);
   }
   jvbDesired = Math.min(jvbDesired, maxJvb);
   if (soonEvents.length > 0 && jvbDesired === 0) jvbDesired = 1;

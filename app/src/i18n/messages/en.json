@@ -182,6 +182,11 @@
     "connecting": "Connecting...",
     "connectionError": "Unable to connect to the room. Check your connection and try again.",
     "activeVsRegistered": "{active} active · {registered} registered",
+    "overtime": {
+      "withCountdown": "The scheduled end time has passed. The event will close automatically in {minutes, plural, one {# minute} other {# minutes}}.",
+      "closingNow": "End time reached. The event is about to close.",
+      "indefinite": "The scheduled end time has passed. The event will stay open while participants are connected."
+    },
     "recordingActive": "Recording in progress",
     "recordingConsent": "This event is being recorded. By entering, you consent to audio/video recording.",
     "recordingConsentTitle": "Recording consent",

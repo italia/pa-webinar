@@ -52,6 +52,10 @@ interface EventInfo {
   organizerName?: string | null;
   maxParticipants?: number;
   registrationCount?: number;
+  /** Soft-exit grace in minutes past endsAt. Null → site default. */
+  gracePeriodMinutes?: number | null;
+  /** Resolved grace value (settings default applied). Used for the overtime banner. */
+  effectiveGraceMinutes?: number;
   tempRecordingUrl?: string | null;
   timezone?: string;
 }
@@ -483,6 +487,7 @@ export default function LiveEventClient({
   return (
     <div className="d-flex flex-column live-page-bg" style={{ height: 'calc(100vh - 80px)' }}>
       <RecordingBanner visible={isRecording} />
+      <OvertimeBanner endsAt={event.endsAt} graceMinutes={event.effectiveGraceMinutes ?? 15} />
 
       <LiveTopBar
         title={event.title}
@@ -698,6 +703,60 @@ const ROLE_BADGE_COLORS: Record<UserRole, { badge: string; badgeFg: string }> = 
   participant: { badge: '#D4EDDA', badgeFg: '#155724' },
   guest: { badge: '#E9ECEF', badgeFg: '#5A768A' },
 };
+
+/**
+ * Non-intrusive banner shown when the event has gone past its scheduled
+ * endsAt but is within the grace window. Warns attendees the call will
+ * close automatically; polls the wall clock every 30s so the countdown
+ * is never more than half a minute stale.
+ */
+function OvertimeBanner({
+  endsAt,
+  graceMinutes,
+}: {
+  endsAt: string;
+  graceMinutes: number;
+}) {
+  const t = useTranslations('live');
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const endsAtMs = new Date(endsAt).getTime();
+  if (now < endsAtMs) return null;
+
+  // graceMinutes === -1 → never auto-close; graceMinutes === 0 → hard
+  // close (banner wouldn't be visible anyway since the scaler flips
+  // to ENDED instantly and the user gets redirected).
+  if (graceMinutes === 0) return null;
+
+  const closeAt = graceMinutes > 0
+    ? new Date(endsAtMs + graceMinutes * 60_000)
+    : null;
+  const minutesLeft = closeAt
+    ? Math.max(0, Math.ceil((closeAt.getTime() - now) / 60_000))
+    : null;
+
+  const message = closeAt && minutesLeft !== null
+    ? minutesLeft > 0
+      ? t('overtime.withCountdown', { minutes: minutesLeft })
+      : t('overtime.closingNow')
+    : t('overtime.indefinite');
+
+  return (
+    <div
+      className="px-3 py-2 d-flex align-items-center gap-2 text-white small"
+      style={{ background: '#A66300' }}
+      role="status"
+    >
+      <span aria-hidden="true">⏱</span>
+      {message}
+    </div>
+  );
+}
 
 interface LiveTopBarProps {
   title: string;
