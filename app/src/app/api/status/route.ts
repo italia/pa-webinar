@@ -106,6 +106,50 @@ async function checkSmtp(): Promise<ComponentStatus> {
   return { name: 'smtp', status: 'operational', details: 'Configured' };
 }
 
+/**
+ * Redis health check. Required for real-time chat fan-out across
+ * pods. When Redis is unreachable the app keeps working for
+ * single-pod deployments (chat stays local to each pod), so we
+ * report 'degraded' instead of 'outage' — matches the operational
+ * impact rather than the technical state.
+ */
+async function checkRedis(): Promise<ComponentStatus> {
+  const { getRedis } = await import('@/lib/redis');
+  const redis = getRedis();
+  if (!redis) {
+    return {
+      name: 'redis',
+      status: 'unknown',
+      details: 'REDIS_URL not configured (single-pod mode)',
+    };
+  }
+  const start = Date.now();
+  try {
+    const pong = await Promise.race([
+      redis.ping(),
+      new Promise<never>((_, rej) =>
+        setTimeout(() => rej(new Error('redis ping timeout')), 2000),
+      ),
+    ]);
+    const responseTime = Date.now() - start;
+    if (pong !== 'PONG') {
+      return { name: 'redis', status: 'degraded', responseTime, details: String(pong) };
+    }
+    return {
+      name: 'redis',
+      status: responseTime > 500 ? 'degraded' : 'operational',
+      responseTime,
+    };
+  } catch (e) {
+    return {
+      name: 'redis',
+      status: 'degraded',
+      responseTime: Date.now() - start,
+      details: e instanceof Error ? e.message : 'ping failed',
+    };
+  }
+}
+
 interface JvbStatusResult {
   component: ComponentStatus;
   desired: number;
@@ -383,10 +427,11 @@ export const GET = withErrorHandling(async () => {
     return since <= staleCutoff;
   });
 
-  const [db, jitsi, smtp, jvb, jibriResult, orphanRecordingsPendingCount] = await Promise.all([
+  const [db, jitsi, smtp, redisHealth, jvb, jibriResult, orphanRecordingsPendingCount] = await Promise.all([
     checkDatabase(),
     checkJitsiWeb(),
     checkSmtp(),
+    checkRedis(),
     getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes),
     getJibriStatus(recordingNeeded, recordingStale),
     prisma.orphanRecording.count({ where: { decision: 'pending' } }).catch(() => 0),
@@ -406,7 +451,7 @@ export const GET = withErrorHandling(async () => {
     details: jitsi.status === 'operational' ? 'Healthy' : 'Depends on Jitsi Web',
   };
 
-  const components = [app, db, jitsi, prosody, jicofo, jvb.component, jibri, smtp];
+  const components = [app, db, jitsi, prosody, jicofo, jvb.component, jibri, smtp, redisHealth];
 
   const hasOutage = components.some((c) => c.status === 'outage');
   const hasDegraded = components.some((c) => c.status === 'degraded');
