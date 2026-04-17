@@ -1593,9 +1593,11 @@
     "connMedia": "flusso video",
     "connRecording": "registrazione",
     "connUpload": "caricamento",
+    "connPubSub": "chat pub/sub",
     "services": {
       "app": "Portale web",
       "database": "Database",
+      "redis": "Chat real-time",
       "jitsiWeb": "Sala videoconferenza",
       "prosody": "Messaggistica interna",
       "jicofo": "Coordinatore conferenze",
@@ -1606,6 +1608,7 @@
     "descriptions": {
       "app": "Il sito web dove si accede agli eventi",
       "database": "Dove vengono salvati eventi e registrazioni",
+      "redis": "Scambio messaggi chat in tempo reale tra i server",
       "jitsiWeb": "L'interfaccia per le videoconferenze",
       "prosody": "Gestisce la comunicazione tra i servizi video",
       "jicofo": "Coordina chi partecipa a ogni conferenza",
@@ -1621,6 +1624,12 @@
         "healthy": "Il database risponde correttamente.",
         "degraded": "Il database risponde, ma con tempi più lunghi del normale. Le operazioni potrebbero risultare più lente.",
         "down": "Il database non risponde. La piattaforma non è in grado di funzionare correttamente."
+      },
+      "redis": {
+        "healthy": "Il servizio di chat real-time risponde correttamente.",
+        "degraded": "Il servizio di chat risponde con lentezza: i messaggi potrebbero arrivare in ritardo tra i server.",
+        "down": "Il servizio di chat real-time non è raggiungibile. Con più server attivi, i messaggi potrebbero non essere distribuiti: il sistema continua a funzionare in modalità single-server.",
+        "standby": "Il servizio di chat real-time non è configurato (modalità single-server)."
       },
       "jitsiWeb": {
         "healthy": "La sala videoconferenza è raggiungibile e pronta per gli eventi.",
