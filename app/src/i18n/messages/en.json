@@ -23,6 +23,12 @@
     "selectAll": "Select all",
     "deselectAll": "Deselect all"
   },
+  "markdown": {
+    "edit": "Write",
+    "preview": "Preview",
+    "hint": "Supports bold, italic, links, lists, images, tables.",
+    "syntaxHelp": "Markdown: **bold** · *italic* · [text](url) · ![alt](img)"
+  },
   "nav": {
     "home": "Home",
     "events": "Events",
@@ -175,6 +181,7 @@
     },
     "connecting": "Connecting...",
     "connectionError": "Unable to connect to the room. Check your connection and try again.",
+    "activeVsRegistered": "{active} active · {registered} registered",
     "recordingActive": "Recording in progress",
     "recordingConsent": "This event is being recorded. By entering, you consent to audio/video recording.",
     "recordingConsentTitle": "Recording consent",
@@ -666,6 +673,8 @@
       "startsAt": "Start date and time",
       "endsAt": "End date and time",
       "maxParticipants": "Maximum number of participants",
+      "expectedParticipants": "Expected participants (estimate)",
+      "expectedParticipantsHint": "Just an estimate for infrastructure sizing. This is not a hard cap: registrations beyond this number are accepted and the infra scales automatically.",
       "qaEnabled": "Enable Q&A",
       "chatEnabled": "Enable chat",
       "recordingEnabled": "Enable video recording",

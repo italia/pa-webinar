@@ -1094,6 +1094,10 @@
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
+  "@types/trusted-types@2.0.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
+  },
   "@types/warning@3.0.4": {
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
@@ -1675,6 +1679,13 @@
     "repository": "https://github.com/Raynos/dom-walk",
     "publisher": "Raynos",
     "email": "raynos2@gmail.com"
+  },
+  "dompurify@3.4.0": {
+    "licenses": "(MPL-2.0 OR Apache-2.0)",
+    "repository": "https://github.com/cure53/DOMPurify",
+    "publisher": "Dr.-Ing. Mario Heiderich, Cure53",
+    "email": "mario@cure53.de",
+    "url": "https://cure53.de/"
   },
   "dotenv@16.6.1": {
     "licenses": "BSD-2-Clause",
@@ -2406,6 +2417,10 @@
     "email": "i@izs.me",
     "url": "http://blog.izs.me/"
   },
+  "isomorphic-dompurify@3.9.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kkomelin/isomorphic-dompurify"
+  },
   "iterator.prototype@1.1.5": {
     "licenses": "MIT",
     "repository": "https://github.com/ljharb/Iterator.prototype",
@@ -2555,6 +2570,11 @@
     "licenses": "MIT",
     "repository": "https://github.com/Rich-Harris/magic-string",
     "publisher": "Rich Harris"
+  },
+  "marked@18.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/markedjs/marked",
+    "publisher": "Christopher Jeffrey"
   },
   "math-intrinsics@1.1.0": {
     "licenses": "MIT",

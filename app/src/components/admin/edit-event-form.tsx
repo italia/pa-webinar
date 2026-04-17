@@ -17,6 +17,7 @@ import {
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import LocaleTabBar from '@/components/ui/locale-tab-bar';
+import { MarkdownEditor } from '@/components/ui/markdown';
 import { useRouter } from '@/i18n/navigation';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
@@ -270,14 +271,14 @@ export default function EditEventForm({
             />
           </FormGroup>
           <FormGroup className="mb-3">
-            <TextArea
-              {...localizedInputProps('description', contentLocale, t('form.descriptionLabel'))}
+            <MarkdownEditor
+              id={`description.${contentLocale}`}
+              label={t('form.descriptionLabel')}
               value={(form.description as Record<string, string>)[contentLocale] ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setLocalizedField('description', contentLocale, e.target.value)
-              }
-              rows={4}
-              required={contentLocale === defaultLoc}
+              onChange={(v) => setLocalizedField('description', contentLocale, v)}
+              rows={8}
+              invalid={!!errors[`description.${contentLocale}`]}
+              errorText={errors[`description.${contentLocale}`]}
             />
           </FormGroup>
         </CardBody>
@@ -326,15 +327,16 @@ export default function EditEventForm({
             <Col md={6}>
               <FormGroup className="mb-3">
                 <Input
-                  {...inputProps('maxParticipants', t('form.maxParticipants'))}
+                  {...inputProps('maxParticipants', t('form.expectedParticipants'))}
                   type="number"
                   value={form.maxParticipants.toString()}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setField('maxParticipants', Number(e.target.value) || 0)
                   }
                   min={2}
-                  max={500}
+                  max={10000}
                 />
+                <small className="text-muted">{t('form.expectedParticipantsHint')}</small>
               </FormGroup>
             </Col>
             <Col md={6}>

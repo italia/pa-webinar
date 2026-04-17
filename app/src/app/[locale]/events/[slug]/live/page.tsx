@@ -40,6 +40,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   const event = await prisma.event.findUnique({
     where: { slug },
+    include: { _count: { select: { registrations: true } } },
   });
 
   if (!event) {
@@ -100,6 +101,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             participantsCanStartVideo: event.participantsCanStartVideo,
             participantsCanShareScreen: event.participantsCanShareScreen,
             timezone: event.timezone,
+            registrationCount: event._count.registrations,
           }}
           token=""
           isModerator={false}

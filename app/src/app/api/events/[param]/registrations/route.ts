@@ -39,9 +39,10 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ConflictError('Event is not open for registration');
   }
 
-  if (event._count.registrations >= event.maxParticipants) {
-    throw new ConflictError('Event is fully booked');
-  }
+  // maxParticipants is an expected-attendance estimate (used for
+  // capacity planning), not a hard cap. Registrations beyond it are
+  // accepted — the platform scales horizontally, refusing sign-ups
+  // would only damage participation.
 
   const body = await parseJsonBody(request);
   const parsed = createRegistrationSchema.safeParse(body);
@@ -64,14 +65,6 @@ export const POST = withErrorHandling(async (request, context) => {
   const accessToken = nanoid(24);
 
   const registration = await prisma.$transaction(async (tx) => {
-    // Re-check capacity inside transaction to prevent overbooking
-    const currentCount = await tx.registration.count({
-      where: { eventId: event.id },
-    });
-    if (currentCount >= event.maxParticipants) {
-      throw new ConflictError('Event is fully booked');
-    }
-
     // Check for duplicates inside transaction
     const existing = await tx.registration.findUnique({
       where: { eventId_emailHash: { eventId: event.id, emailHash } },

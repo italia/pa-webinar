@@ -19,7 +19,11 @@ const eventBaseSchema = z.object({
     (tz) => { try { Intl.DateTimeFormat(undefined, { timeZone: tz }); return true; } catch { return false; } },
     { message: 'Invalid IANA timezone' },
   ).default('Europe/Rome'),
-  maxParticipants: z.number().int().min(2).max(500).default(300),
+  // Now an estimate of expected attendees, not a hard cap. Registrations
+  // are not refused when this count is reached — the infra scales. The
+  // validation max is a sanity bound only (prevents a fat-finger typo
+  // triggering worst-case resource estimates).
+  maxParticipants: z.number().int().min(2).max(10000).default(300),
   qaEnabled: z.boolean().default(true),
   chatEnabled: z.boolean().default(false),
   recordingEnabled: z.boolean().default(false),
