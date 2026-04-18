@@ -1074,36 +1074,36 @@
       }
     },
     "security": {
-      "metaTitle": "Security and transparency",
-      "title": "Security and transparency",
-      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "metaTitle": "Sigurtà u trasparenza",
+      "title": "Sigurtà u trasparenza",
+      "intro": "Il-kodiċi sors ta' din il-pjattaforma huwa pubbliku u huwa suġġett għal kontrolli tas-sigurtà awtomatizzati. Din il-paġna tiġbor l-għodod ta' trasparenza disponibbli għal min juża s-servizz.",
       "sections": {
         "openSource": {
-          "title": "Open source software",
-          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+          "title": "Software open source",
+          "body": "Il-pjattaforma sħiħa tinħareġ bħala software liberu. Il-kodiċi sors jista' jiġi eżaminat, imniżżel u verifikat minn kulħadd, skont il-prinċipji ta' trasparenza tal-Amministrazzjoni Pubblika Taljana."
         },
         "sbom": {
-          "title": "SBOM (Software Bill of Materials)",
-          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+          "title": "SBOM (Lista tal-komponenti tas-software)",
+          "body": "Kull rilaxx ippubblikat fuq GitHub jinkludi SBOM f'format SPDX għall-immaġni tal-kontejner u SBOM f'format CycloneDX għad-dipendenzi npm tal-applikazzjoni. Il-fajls huma mehmużin direttament mar-rilaxx u jistgħu jintużaw għall-verifiki tas-sigurtà u tal-konformità."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+          "body": "Ir-repożitorju jiġi analizzat perjodikament minn OpenSSF Scorecard, li jevalwa awtomatikament għexieren ta' prattiki tas-sigurtà tal-proġett (protezzjoni tal-friegħi, workflows bi privileġġi minimi, commits iffirmati, ġestjoni tad-dipendenzi). Il-punteġġ attwali huwa pubbliku."
         },
         "scanning": {
-          "title": "Automated scanning",
-          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+          "title": "Skenjar awtomatiku",
+          "body": "Id-dipendenzi jiġu mmonitorjati b'mod kontinwu permezz ta' Dependabot u npm audit. Il-pipeline tar-rilaxx jipproduċi immaġini traċċabbli permezz tat-tikketta org.opencontainers.image.revision, li torbot kull immaġni mal-commit eżatt minn fejn ġiet mibnija."
         },
         "disclosure": {
-          "title": "Vulnerability disclosure",
-          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+          "title": "Rapportar ta' vulnerabbiltajiet",
+          "body": "Il-politika ta' żvelar responsabbli hija deskritta fil-fajl SECURITY.md tar-repożitorju. Il-problemi ta' sigurtà jistgħu jiġu rrapportati b'mod kunfidenzjali skont l-istruzzjonijiet ipprovduti hemmhekk."
         }
       },
       "links": {
-        "sourceCode": "Source code",
-        "scorecard": "OpenSSF Scorecard score",
-        "latestRelease": "Latest release (with SBOM)",
-        "securityPolicy": "Disclosure policy (SECURITY.md)"
+        "sourceCode": "Kodiċi sors",
+        "scorecard": "Punteġġ OpenSSF Scorecard",
+        "latestRelease": "L-aħħar rilaxx (b'SBOM)",
+        "securityPolicy": "Politika ta' żvelar (SECURITY.md)"
       }
     }
   },
@@ -1381,12 +1381,12 @@
     "legalNotes": "Noti legali",
     "governmentSite": "Gvern Taljan",
     "systemStatus": "Status tas-sistema",
-    "sbomLatest": "SBOM latest release",
-    "transparency": "Security and transparency",
-    "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "sbomLatest": "SBOM tal-aħħar rilaxx",
+    "transparency": "Sigurtà u trasparenza",
+    "sourceCode": "Kodiċi sors",
+    "buildInfoDev": "build ta' żvilupp",
+    "viewCommit": "Ara l-commit fuq GitHub",
+    "viewRelease": "Ara r-rilaxx fuq GitHub"
   },
   "pages": {
     "privacyTitle": "Avviż dwar il-privatezza",

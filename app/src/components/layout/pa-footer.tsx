@@ -187,7 +187,7 @@ export default function PAFooter() {
               </li>
             )}
             {(BUILD_VERSION || BUILD_SHA) && (
-              <li className="list-inline-item ms-md-auto opacity-75">
+              <li className="list-inline-item ms-md-auto text-white">
                 <BuildInfo githubUrl={githubUrl} t={t} />
               </li>
             )}
@@ -217,6 +217,15 @@ function BuildInfo({
       ? `v${BUILD_VERSION}`
       : t('footer.buildInfoDev');
 
+  const linkStyle = { color: 'inherit', textDecoration: 'underline' };
+  const codeStyle = {
+    color: 'inherit',
+    background: 'transparent',
+    fontFamily:
+      'ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", monospace',
+    fontSize: '0.85em',
+  };
+
   return (
     <span style={{ fontSize: '0.8rem' }}>
       {releaseUrl ? (
@@ -225,6 +234,7 @@ function BuildInfo({
           target="_blank"
           rel="noopener noreferrer"
           title={t('footer.viewRelease')}
+          style={linkStyle}
         >
           {versionLabel}
         </a>
@@ -240,11 +250,12 @@ function BuildInfo({
               target="_blank"
               rel="noopener noreferrer"
               title={t('footer.viewCommit')}
+              style={linkStyle}
             >
-              <code>{BUILD_SHA}</code>
+              <code style={codeStyle}>{BUILD_SHA}</code>
             </a>
           ) : (
-            <code>{BUILD_SHA}</code>
+            <code style={codeStyle}>{BUILD_SHA}</code>
           )}
         </>
       ) : null}

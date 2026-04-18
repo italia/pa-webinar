@@ -1074,36 +1074,36 @@
       }
     },
     "security": {
-      "metaTitle": "Security and transparency",
-      "title": "Security and transparency",
-      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "metaTitle": "Beveiliging en transparantie",
+      "title": "Beveiliging en transparantie",
+      "intro": "De broncode van dit platform is openbaar en wordt onderworpen aan geautomatiseerde beveiligingscontroles. Deze pagina vat de transparantie-instrumenten samen die beschikbaar zijn voor iedereen die de dienst gebruikt.",
       "sections": {
         "openSource": {
-          "title": "Open source software",
-          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+          "title": "Opensource-software",
+          "body": "Het hele platform wordt uitgebracht als vrije software. De broncode kan door iedereen worden ingezien, gedownload en geauditeerd, in lijn met de transparantieprincipes van de Italiaanse overheid."
         },
         "sbom": {
-          "title": "SBOM (Software Bill of Materials)",
-          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+          "title": "SBOM (softwarecomponentenlijst)",
+          "body": "Elke op GitHub gepubliceerde release bevat een SBOM in SPDX-formaat voor de containerafbeelding en een SBOM in CycloneDX-formaat voor de npm-afhankelijkheden van de applicatie. De bestanden worden direct aan de release gekoppeld en kunnen worden gebruikt voor beveiligings- en compliance-audits."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+          "body": "De repository wordt periodiek geanalyseerd door OpenSSF Scorecard, die automatisch tientallen beveiligingspraktijken van het project evalueert (branch-bescherming, workflows met minimale rechten, ondertekende commits, beheer van afhankelijkheden). De huidige score is openbaar."
         },
         "scanning": {
-          "title": "Automated scanning",
-          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+          "title": "Geautomatiseerde scans",
+          "body": "Afhankelijkheden worden continu gemonitord via Dependabot en npm audit. De release-pijplijn produceert traceerbare images via het label org.opencontainers.image.revision, dat elke image koppelt aan de exacte commit waaruit deze is gebouwd."
         },
         "disclosure": {
-          "title": "Vulnerability disclosure",
-          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+          "title": "Melden van kwetsbaarheden",
+          "body": "Het beleid voor verantwoord melden is beschreven in het bestand SECURITY.md in de repository. Beveiligingsproblemen kunnen vertrouwelijk worden gemeld volgens de daar gegeven instructies."
         }
       },
       "links": {
-        "sourceCode": "Source code",
-        "scorecard": "OpenSSF Scorecard score",
-        "latestRelease": "Latest release (with SBOM)",
-        "securityPolicy": "Disclosure policy (SECURITY.md)"
+        "sourceCode": "Broncode",
+        "scorecard": "OpenSSF Scorecard-score",
+        "latestRelease": "Laatste release (met SBOM)",
+        "securityPolicy": "Meldbeleid (SECURITY.md)"
       }
     }
   },
@@ -1381,12 +1381,12 @@
     "legalNotes": "Juridische kennisgeving",
     "governmentSite": "Italiaanse Overheid",
     "systemStatus": "Systeemstatus",
-    "sbomLatest": "SBOM latest release",
-    "transparency": "Security and transparency",
-    "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "sbomLatest": "SBOM van de laatste release",
+    "transparency": "Beveiliging en transparantie",
+    "sourceCode": "Broncode",
+    "buildInfoDev": "ontwikkelbuild",
+    "viewCommit": "Bekijk commit op GitHub",
+    "viewRelease": "Bekijk release op GitHub"
   },
   "pages": {
     "privacyTitle": "Privacybeleid",

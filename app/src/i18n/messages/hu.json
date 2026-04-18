@@ -1074,36 +1074,36 @@
       }
     },
     "security": {
-      "metaTitle": "Security and transparency",
-      "title": "Security and transparency",
-      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "metaTitle": "Biztonság és átláthatóság",
+      "title": "Biztonság és átláthatóság",
+      "intro": "A platform forráskódja nyilvános, és automatizált biztonsági ellenőrzéseknek van alávetve. Ez az oldal összefoglalja a szolgáltatást használók számára elérhető átláthatósági eszközöket.",
       "sections": {
         "openSource": {
-          "title": "Open source software",
-          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+          "title": "Nyílt forráskódú szoftver",
+          "body": "A teljes platform szabad szoftverként kerül kiadásra. A forráskódot bárki megvizsgálhatja, letöltheti és auditálhatja, az olasz közigazgatás átláthatósági elveivel összhangban."
         },
         "sbom": {
-          "title": "SBOM (Software Bill of Materials)",
-          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+          "title": "SBOM (Szoftveres komponens jegyzék)",
+          "body": "Minden GitHubon megjelentetett kiadás tartalmaz egy SPDX formátumú SBOM-ot a konténerképhez és egy CycloneDX formátumú SBOM-ot az alkalmazás npm függőségeihez. A fájlok közvetlenül a kiadáshoz csatolódnak, és biztonsági, valamint megfelelőségi auditokhoz használhatók."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+          "body": "A tárolót rendszeresen elemzi az OpenSSF Scorecard, amely automatikusan értékeli a projekt több tucat biztonsági gyakorlatát (ágvédelem, minimális jogosultságú munkafolyamatok, aláírt commitok, függőségkezelés). A jelenlegi pontszám nyilvános."
         },
         "scanning": {
-          "title": "Automated scanning",
-          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+          "title": "Automatikus ellenőrzések",
+          "body": "A függőségeket a Dependabot és az npm audit folyamatosan figyeli. A kiadási pipeline nyomon követhető képeket állít elő az org.opencontainers.image.revision címke segítségével, amely minden képet ahhoz a pontos committhez köt, amelyből épült."
         },
         "disclosure": {
-          "title": "Vulnerability disclosure",
-          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+          "title": "Sebezhetőségek bejelentése",
+          "body": "A felelős nyilvánosságra hozatali irányelv a tároló SECURITY.md fájljában van leírva. A biztonsági problémák az ott szereplő utasítások szerint bizalmasan bejelenthetők."
         }
       },
       "links": {
-        "sourceCode": "Source code",
-        "scorecard": "OpenSSF Scorecard score",
-        "latestRelease": "Latest release (with SBOM)",
-        "securityPolicy": "Disclosure policy (SECURITY.md)"
+        "sourceCode": "Forráskód",
+        "scorecard": "OpenSSF Scorecard pontszám",
+        "latestRelease": "Legutóbbi kiadás (SBOM-mal)",
+        "securityPolicy": "Nyilvánosságra hozatali irányelv (SECURITY.md)"
       }
     }
   },
@@ -1381,12 +1381,12 @@
     "legalNotes": "Jogi közlemények",
     "governmentSite": "Olasz Kormány",
     "systemStatus": "Rendszer állapota",
-    "sbomLatest": "SBOM latest release",
-    "transparency": "Security and transparency",
-    "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "sbomLatest": "Legutóbbi kiadás SBOM-ja",
+    "transparency": "Biztonság és átláthatóság",
+    "sourceCode": "Forráskód",
+    "buildInfoDev": "fejlesztői build",
+    "viewCommit": "Commit megtekintése a GitHubon",
+    "viewRelease": "Kiadás megtekintése a GitHubon"
   },
   "pages": {
     "privacyTitle": "Adatvédelmi tájékoztató",

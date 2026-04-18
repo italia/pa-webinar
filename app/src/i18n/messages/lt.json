@@ -1074,36 +1074,36 @@
       }
     },
     "security": {
-      "metaTitle": "Security and transparency",
-      "title": "Security and transparency",
-      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "metaTitle": "Saugumas ir skaidrumas",
+      "title": "Saugumas ir skaidrumas",
+      "intro": "Šios platformos šaltinio kodas yra viešas ir jam taikomi automatiniai saugumo patikrinimai. Šiame puslapyje apžvelgiamos paslaugos naudotojams prieinamos skaidrumo priemonės.",
       "sections": {
         "openSource": {
-          "title": "Open source software",
-          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+          "title": "Atvirojo kodo programinė įranga",
+          "body": "Visa platforma išleidžiama kaip laisva programinė įranga. Šaltinio kodą gali peržiūrėti, atsisiųsti ir audituoti bet kas, laikantis Italijos viešojo administravimo skaidrumo principų."
         },
         "sbom": {
-          "title": "SBOM (Software Bill of Materials)",
-          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+          "title": "SBOM (programinės įrangos komponentų sąrašas)",
+          "body": "Kiekvienas „GitHub“ paskelbtas leidimas apima SPDX formato SBOM konteinerio atvaizdui ir CycloneDX formato SBOM programos npm priklausomybėms. Failai pridedami tiesiogiai prie leidimo ir gali būti naudojami saugumo bei atitikties auditams."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+          "body": "Repozitoriją periodiškai analizuoja OpenSSF Scorecard, kuris automatiškai vertina daugybę projekto saugumo praktikų (šakų apsaugą, darbo eigas su minimaliomis teisėmis, pasirašytus commit'us, priklausomybių valdymą). Esamas balas yra viešas."
         },
         "scanning": {
-          "title": "Automated scanning",
-          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+          "title": "Automatiniai patikrinimai",
+          "body": "Priklausomybės nuolat stebimos naudojant „Dependabot“ ir npm audit. Leidimo konvejeris kuria atsekamus atvaizdus naudodamas etiketę org.opencontainers.image.revision, kuri kiekvieną atvaizdą susieja su tiksliu commit'u, iš kurio jis sukurtas."
         },
         "disclosure": {
-          "title": "Vulnerability disclosure",
-          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+          "title": "Pažeidžiamumų pranešimas",
+          "body": "Atsakingo atskleidimo politika aprašyta repozitorijos faile SECURITY.md. Saugumo problemas galima konfidencialiai pranešti vadovaujantis ten pateiktomis instrukcijomis."
         }
       },
       "links": {
-        "sourceCode": "Source code",
-        "scorecard": "OpenSSF Scorecard score",
-        "latestRelease": "Latest release (with SBOM)",
-        "securityPolicy": "Disclosure policy (SECURITY.md)"
+        "sourceCode": "Šaltinio kodas",
+        "scorecard": "OpenSSF Scorecard balas",
+        "latestRelease": "Naujausias leidimas (su SBOM)",
+        "securityPolicy": "Atskleidimo politika (SECURITY.md)"
       }
     }
   },
@@ -1381,12 +1381,12 @@
     "legalNotes": "Teisinės pastabos",
     "governmentSite": "Italijos Vyriausybė",
     "systemStatus": "Sistemos būsena",
-    "sbomLatest": "SBOM latest release",
-    "transparency": "Security and transparency",
-    "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "sbomLatest": "Naujausio leidimo SBOM",
+    "transparency": "Saugumas ir skaidrumas",
+    "sourceCode": "Šaltinio kodas",
+    "buildInfoDev": "kūrimo versija",
+    "viewCommit": "Peržiūrėti commit'ą „GitHub“",
+    "viewRelease": "Peržiūrėti leidimą „GitHub“"
   },
   "pages": {
     "privacyTitle": "Privatumo politika",

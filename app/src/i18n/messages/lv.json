@@ -1074,36 +1074,36 @@
       }
     },
     "security": {
-      "metaTitle": "Security and transparency",
-      "title": "Security and transparency",
-      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "metaTitle": "Drošība un pārredzamība",
+      "title": "Drošība un pārredzamība",
+      "intro": "Šīs platformas avota kods ir publisks, un tam tiek veiktas automatizētas drošības pārbaudes. Šī lapa apkopo pārredzamības rīkus, kas pieejami ikvienam pakalpojuma lietotājam.",
       "sections": {
         "openSource": {
-          "title": "Open source software",
-          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+          "title": "Atvērtā koda programmatūra",
+          "body": "Visa platforma tiek publicēta kā brīva programmatūra. Avota kodu var apskatīt, lejupielādēt un auditēt ikviens, saskaņā ar Itālijas Publiskās pārvaldes pārredzamības principiem."
         },
         "sbom": {
-          "title": "SBOM (Software Bill of Materials)",
-          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+          "title": "SBOM (programmatūras komponentu saraksts)",
+          "body": "Katrs GitHub publicētais laidiens ietver SPDX formāta SBOM konteinera attēlam un CycloneDX formāta SBOM lietojumprogrammas npm atkarībām. Faili ir pievienoti tieši laidienam un tos var izmantot drošības un atbilstības auditiem."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+          "body": "Repozitoriju periodiski analizē OpenSSF Scorecard, kas automātiski novērtē desmitiem projekta drošības prakšu (zaru aizsardzība, darbplūsmas ar minimālām tiesībām, parakstīti commiti, atkarību pārvaldība). Pašreizējais vērtējums ir publisks."
         },
         "scanning": {
-          "title": "Automated scanning",
-          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+          "title": "Automātiskās skenēšanas",
+          "body": "Atkarības nepārtraukti uzrauga, izmantojot Dependabot un npm audit. Laidiena konveijers veido izsekojamus attēlus, izmantojot etiķeti org.opencontainers.image.revision, kas katru attēlu sasaista ar precīzu commit, no kura tas izveidots."
         },
         "disclosure": {
-          "title": "Vulnerability disclosure",
-          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+          "title": "Ievainojamību ziņošana",
+          "body": "Atbildīgas izpaušanas politika ir aprakstīta repozitorija failā SECURITY.md. Drošības problēmas var konfidenciāli ziņot saskaņā ar tur sniegtajām instrukcijām."
         }
       },
       "links": {
-        "sourceCode": "Source code",
-        "scorecard": "OpenSSF Scorecard score",
-        "latestRelease": "Latest release (with SBOM)",
-        "securityPolicy": "Disclosure policy (SECURITY.md)"
+        "sourceCode": "Avota kods",
+        "scorecard": "OpenSSF Scorecard vērtējums",
+        "latestRelease": "Jaunākais laidiens (ar SBOM)",
+        "securityPolicy": "Izpaušanas politika (SECURITY.md)"
       }
     }
   },
@@ -1381,12 +1381,12 @@
     "legalNotes": "Juridiskās piezīmes",
     "governmentSite": "Itālijas valdība",
     "systemStatus": "Sistēmas statuss",
-    "sbomLatest": "SBOM latest release",
-    "transparency": "Security and transparency",
-    "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "sbomLatest": "Jaunākā laidiena SBOM",
+    "transparency": "Drošība un pārredzamība",
+    "sourceCode": "Avota kods",
+    "buildInfoDev": "izstrādes būvējums",
+    "viewCommit": "Skatīt commit GitHub",
+    "viewRelease": "Skatīt laidienu GitHub"
   },
   "pages": {
     "privacyTitle": "Privātuma politika",
