@@ -9,7 +9,6 @@ FROM node:20-alpine AS deps
 LABEL maintainer="Dipartimento per la Trasformazione Digitale <innovazione@governo.it>"
 LABEL org.opencontainers.image.title="eventi-dtd"
 LABEL org.opencontainers.image.description="Public digital event platform for the Italian DTD"
-LABEL org.opencontainers.image.version="0.1.0"
 LABEL org.opencontainers.image.source="https://github.com/italia/eventi-dtd"
 
 RUN apk add --no-cache libc6-compat

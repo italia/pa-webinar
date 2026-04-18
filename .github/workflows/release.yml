@@ -19,6 +19,10 @@ jobs:
       actions: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history + tags so the release-notes step can diff
+          # against the previous tag.
+          fetch-depth: 0
 
       - uses: docker/setup-buildx-action@v3
 
@@ -81,13 +85,79 @@ jobs:
           npm ci --legacy-peer-deps
           npx @cyclonedx/cyclonedx-npm --workspace app --output-file npm-sbom.json || true
 
+      - name: Generate release notes from git log
+        id: notes
+        run: |
+          CURR="${GITHUB_REF_NAME}"
+          PREV="$(git tag --sort=-version:refname | grep -v "^${CURR}$" | head -n1)"
+
+          if [ -z "$PREV" ]; then
+            RANGE="HEAD"
+            HEADING="## ${CURR}"
+          else
+            RANGE="${PREV}..HEAD"
+            HEADING="## ${CURR} — changes since ${PREV}"
+          fi
+
+          # Conventional-commit type → section heading.
+          # Anything that doesn't match a known type falls into "Other".
+          declare -A SECTIONS=(
+            [feat]="Features"
+            [fix]="Bug fixes"
+            [perf]="Performance"
+            [refactor]="Refactoring"
+            [docs]="Documentation"
+            [ci]="CI / build"
+            [chore]="Chores"
+            [test]="Tests"
+          )
+          ORDER=(feat fix perf refactor docs ci chore test)
+
+          : > release-notes.md
+          echo "$HEADING" >> release-notes.md
+          echo "" >> release-notes.md
+
+          for type in "${ORDER[@]}"; do
+            # Match "type(scope): ..." and "type: ..." at start of subject.
+            lines="$(git log "$RANGE" --no-merges \
+              --pretty=format:"%s|%h" \
+              --grep="^${type}(" --grep="^${type}:" || true)"
+            if [ -n "$lines" ]; then
+              echo "### ${SECTIONS[$type]}" >> release-notes.md
+              while IFS='|' read -r subj hash; do
+                [ -z "$subj" ] && continue
+                # Strip the "type(scope): " or "type: " prefix for readability.
+                clean="$(echo "$subj" | sed -E "s/^${type}(\([^)]+\))?: //")"
+                echo "- ${clean} (\`${hash}\`)" >> release-notes.md
+              done <<< "$lines"
+              echo "" >> release-notes.md
+            fi
+          done
+
+          # "Other": anything since PREV that didn't match the known types.
+          other="$(git log "$RANGE" --no-merges --pretty=format:"%s|%h" \
+            | grep -Ev "^(feat|fix|perf|refactor|docs|ci|chore|test)(\([^)]+\))?:" \
+            || true)"
+          if [ -n "$other" ]; then
+            echo "### Other" >> release-notes.md
+            while IFS='|' read -r subj hash; do
+              [ -z "$subj" ] && continue
+              echo "- ${subj} (\`${hash}\`)" >> release-notes.md
+            done <<< "$other"
+            echo "" >> release-notes.md
+          fi
+
+          if [ -n "$PREV" ]; then
+            echo "**Full diff**: https://github.com/${GITHUB_REPOSITORY}/compare/${PREV}...${CURR}" >> release-notes.md
+          fi
+
+          echo "=== Generated release notes ==="
+          cat release-notes.md
+
       - name: Upload SBOMs to release
         uses: softprops/action-gh-release@v2
         with:
-          # Auto-generate release notes from commits/PRs since previous tag.
-          # Commit discipline gives us a usable changelog for free; custom
-          # formatting (keep-a-changelog etc.) can be layered on later.
-          generate_release_notes: true
+          body_path: release-notes.md
           files: |
             sbom.spdx.json
             npm-sbom.json
