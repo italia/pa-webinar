@@ -363,6 +363,26 @@ export default function EventManagementClient({
     router.push('/admin');
   }, [router]);
 
+  const duplicateEvent = useCallback(async () => {
+    setUpdating(true);
+    setFeedback('');
+    try {
+      const res = await fetch(`/api/admin/events/${event.id}/duplicate`, {
+        method: 'POST',
+      });
+      if (!res.ok) {
+        setFeedback(t('duplicateError'));
+        return;
+      }
+      const body = (await res.json()) as { id: string; moderatorToken: string };
+      router.push(`/admin/events/${body.id}/edit?token=${body.moderatorToken}`);
+    } catch {
+      setFeedback(t('duplicateError'));
+    } finally {
+      setUpdating(false);
+    }
+  }, [event.id, router, t]);
+
   const exportCsv = useCallback(() => {
     const headers = ['Nome', 'Ente', 'Ruolo', 'Tipologia ente', 'Data registrazione', 'Entrato'];
     const rows = event.registrations.map((reg) => [
@@ -569,6 +589,15 @@ export default function EventManagementClient({
               {t('editEvent')}
             </Button>
           </Link>
+          <Button
+            color="secondary"
+            outline
+            onClick={duplicateEvent}
+            disabled={updating}
+          >
+            <Icon icon="it-copy" size="sm" className="me-1" />
+            {t('duplicateEvent')}
+          </Button>
           <Button
             color={status === 'PUBLISHED' ? 'warning' : 'primary'}
             onClick={togglePublish}

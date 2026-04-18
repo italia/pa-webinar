@@ -914,7 +914,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Dúbailte",
+    "duplicateError": "Theip ar an dúbailt. Bain triail eile as."
   },
   "email": {
     "confirmationSubject": "Clárú deimhnithe: {eventTitle}",

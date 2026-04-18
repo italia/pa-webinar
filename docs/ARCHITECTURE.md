@@ -2,7 +2,7 @@
 
 Documento tecnico di riferimento per sviluppatori, sistemisti e personale tecnico della PA.
 
-Ultimo aggiornamento: marzo 2026
+Ultimo aggiornamento: aprile 2026
 
 ---
 
@@ -340,6 +340,26 @@ sequenceDiagram
 ```
 
 Il magic link per il moderatore ha la forma: `https://eventi.dominio.gov.it/it/eventi/{slug}/live?moderator={moderatorToken}`
+
+#### Contenuti autorizzati — descrizioni markdown
+
+Dalla v0.3.44 la `description` dell'evento è **Markdown** anziché plain text. L'admin UI (`app/src/components/ui/markdown.tsx`) offre editor con preview live; il rendering passa per `marked` + `isomorphic-dompurify` con:
+
+- **Allowlist ristretto per tag**: `href` ammesso solo su `<a>`, `src` solo su `<img>`/`<figure>`. Tag non ammessi (script, style, iframe, form, svg, embed) vengono strippati.
+- **Rewrite anchor**: tutti i link aperti in nuova tab con `rel="noopener noreferrer"` (mitigazione reverse-tabnabbing).
+- **URL schemes bloccati**: `javascript:`, `data:` e `vbscript:` rimossi da DOMPurify via `ALLOWED_URI_REGEXP` default.
+
+La stessa stringa è riutilizzata server-side come `description` in iCal/SEO previa estrazione plain-text (niente tag HTML nei meta/calendar).
+
+#### Event templates
+
+Un `EventTemplate` (tabella singola, sola lettura UI) è un preset di feature flags e metadati. Le migration seedano tre template:
+
+1. **Base** — Q&A + chat, no recording (webinar leggero).
+2. **Avanzato** — + poll, word cloud, reactions (eventi interattivi).
+3. **Completo** (migration `20260418100000_seed_complete_template`) — tutti i feature flag attivi + `participantsCanShareScreen=true` per workshop/demo.
+
+Quando un admin crea un evento da template, i valori vengono pre-caricati nella form; può override manualmente prima di salvare.
 
 ### Registrazione partecipante
 
@@ -782,6 +802,51 @@ In pratica:
 #### Validazione con carico reale
 
 I numeri sopra sono riferimenti basati sulle metriche pubblicate dal progetto Jitsi e su hardware tipico (4 vCPU, 8 GB per JVB, 1 Gbps). Prima di pubblicare SLA o sizing per la propria infrastruttura è necessario un **test di carico reale** con [jitsi-meet-torture](https://github.com/jitsi/jitsi-meet-torture) sul proprio deployment. Il repository include script e istruzioni pronti all'uso in [`docs/LOAD-TESTING.md`](LOAD-TESTING.md) e [`scripts/load-test/`](../scripts/load-test/).
+
+#### Dimensionamento dinamico (SiteSetting sizing calculator)
+
+Fino alla v0.3.43 il numero di JVB per evento era derivato da una logica binaria basata su soglie hardcoded tarate su Azure `Standard_F16s_v2`. Questo legava il chart a un'assunzione di VM che non vale su altri cloud/VM families (AWS c6i, GCP n2, on-prem).
+
+Dalla v0.3.44 il calcolo vive in `app/src/lib/jvb-sizing.ts` come **formula lineare configurabile** alimentata da 7 colonne `SiteSetting` (modificabili a caldo dall'admin UI `/admin/settings` → tab "Dimensionamento infra"):
+
+```
+senders   = maxParticipants × (expectedSenderRatioPct / 100)   [se videoEnabled]
+receivers = maxParticipants − senders
+coresNeeded = senders / sendersPerCore + receivers / receiversPerCore
+replicas = clamp(1, maxReplicas, ceil(coresNeeded / cpuCoresPerPod))
+```
+
+| SiteSetting | Default (F16s_v2) | Ruolo |
+|---|---|---|
+| `jvbCpuCoresPerPod` | 16 | Core CPU per pod JVB |
+| `jvbReceiversPerCore` | 18.75 | Partecipanti passivi sostenibili per core |
+| `jvbSendersPerCore` | 3.125 | Partecipanti video-attivi sostenibili per core |
+| `jvbMaxReplicas` | 6 | Cap superiore scaler (protezione cost) |
+| `jibriCpuCoresPerPod` | 4 | Core per pod Jibri (F4s_v2) |
+| `defaultSenderRatioPct` | 30 | % sender attesa default |
+| `eventGracePeriodMinutes` | 15 | Grace period default post-endsAt |
+
+**Per-event override** (tab "Programmazione" in create/edit event):
+
+- `Event.expectedSenderRatioPct` — % sender per questo evento specifico (fallback sul default globale se `null`).
+- `Event.gracePeriodMinutes` — minuti di grace (`0` chiusura netta, `-1` evento mai auto-chiuso, `5-240` grace custom).
+
+Il cron scaler (`/api/internal/jvb-desired-replicas`, chiamato ogni 2 min) usa questa formula per calcolare `desiredReplicas` e applicarle via `kubectl scale` (job esterno) o tramite KEDA `ScaledObject` quando abilitato.
+
+#### Soft event exit (grace period)
+
+Scenario: un moderatore imposta `endsAt` alle 11:00 ma la sessione si protrae. Prima della v0.3.44 l'evento veniva marcato `ENDED` alle 11:00 netto e il JVB scaler riduceva i pod a 0, scollegando i partecipanti ancora in call.
+
+Dalla v0.3.44:
+1. Un evento `LIVE` con `endsAt` passato resta `LIVE` finché `now <= endsAt + gracePeriodMinutes`.
+2. Un banner "overtime" (arancione, non invasivo) appare ai partecipanti con countdown: `closingIn 3m`, `closingNow`, o `indefinite` se `gracePeriodMinutes = -1`.
+3. Superato il grace, l'evento passa `ENDED` e lo scaler libera le risorse.
+4. Se il moderatore estende `endsAt` via edit-event (anche da `ENDED`), l'evento viene **revived** — torna `PUBLISHED` o `LIVE` (in base a `startsAt`) — senza ricreare risorse.
+
+Implementazione:
+- `app/src/app/api/internal/jvb-desired-replicas/route.ts` — logica lifecycle + `inOvertime` flag esposto.
+- `app/src/components/live/live-event-client.tsx` → `OvertimeBanner` — polling wall-clock ogni 30s.
+- `app/src/app/api/events/[param]/route.ts` PUT — logica di revival.
 
 ### Restrizione accesso Jitsi
 

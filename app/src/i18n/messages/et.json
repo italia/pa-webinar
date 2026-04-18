@@ -914,7 +914,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplikaadi",
+    "duplicateError": "Duplikeerimine ebaõnnestus. Proovi uuesti."
   },
   "email": {
     "confirmationSubject": "Registreerumine kinnitatud: {eventTitle}",

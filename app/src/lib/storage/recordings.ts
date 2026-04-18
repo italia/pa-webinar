@@ -13,10 +13,24 @@ import { getRecordingsStorage, recordingsProviderLabel } from './index';
 
 const KEY_PREFIX = 'recordings/';
 
+// Object-storage keys are opaque strings — S3/Azure do not resolve `..`
+// like a filesystem would, so "path traversal" can't escape the bucket.
+// We still reject dotdot segments, leading slashes, NUL bytes and
+// control chars so that the stored key is always predictable and cannot
+// be used to spoof an adjacent key in UI listings (e.g. smuggling
+// `recordings/../publications/foo.mp4` into a dashboard).
 function keyFromFilename(filename: string): string {
-  // Callers already pass filenames without a leading slash. A filename
-  // that already starts with `recordings/` is respected as-is — this
-  // happens when the caller got the filename from listRecordingBlobs().
+  if (!filename || /[\0\r\n]/.test(filename)) {
+    throw new Error('Invalid filename: empty or contains control chars');
+  }
+  if (filename.startsWith('/')) {
+    throw new Error('Invalid filename: leading slash not allowed');
+  }
+  // Reject `..` as a standalone path segment (anywhere in the key).
+  const segments = filename.split('/');
+  if (segments.some((s) => s === '..' || s === '.')) {
+    throw new Error('Invalid filename: dotdot segments not allowed');
+  }
   return filename.startsWith(KEY_PREFIX) ? filename : `${KEY_PREFIX}${filename}`;
 }
 

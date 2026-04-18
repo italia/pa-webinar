@@ -914,7 +914,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Αντιγραφή",
+    "duplicateError": "Η αντιγραφή απέτυχε. Δοκιμάστε ξανά."
   },
   "email": {
     "confirmationSubject": "Επιβεβαίωση εγγραφής: {eventTitle}",

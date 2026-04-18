@@ -914,7 +914,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplicar",
+    "duplicateError": "La duplicación falló. Inténtalo de nuevo."
   },
   "email": {
     "confirmationSubject": "Confirmación de inscripción: {eventTitle}",
