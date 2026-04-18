@@ -33,6 +33,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { shouldEndLiveEvent } from '@/lib/events/lifecycle';
 import { jvbsForEvent, jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 
@@ -168,10 +169,14 @@ export const GET = withErrorHandling(async (request) => {
     const siteGrace = settings.eventGracePeriodMinutes ?? 15;
     const toEndIds: string[] = [];
     for (const ev of liveOvertime) {
-      const grace = ev.gracePeriodMinutes ?? siteGrace;
-      if (grace < 0) continue; // caller opted out of auto-close
-      const closeAt = new Date(ev.endsAt.getTime() + grace * 60_000);
-      if (now >= closeAt) toEndIds.push(ev.id);
+      if (shouldEndLiveEvent({
+        endsAt: ev.endsAt,
+        gracePeriodMinutes: ev.gracePeriodMinutes,
+        siteGraceMinutes: siteGrace,
+        now,
+      })) {
+        toEndIds.push(ev.id);
+      }
     }
     if (toEndIds.length > 0) {
       const r3b = await tx.event.updateMany({

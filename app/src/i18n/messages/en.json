@@ -629,6 +629,8 @@
     "subtitle": "Administration panel",
     "createEvent": "Create new event",
     "editEvent": "Edit event",
+    "duplicateEvent": "Duplicate",
+    "duplicateError": "Duplication failed. Please try again.",
     "deleteEvent": "Delete event",
     "deleteConfirm": "Are you sure you want to delete this event? This action cannot be undone.",
     "publish": "Publish",

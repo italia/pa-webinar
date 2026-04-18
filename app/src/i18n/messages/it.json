@@ -699,6 +699,8 @@
     "subtitle": "Pannello di amministrazione",
     "createEvent": "Crea nuovo evento",
     "editEvent": "Modifica evento",
+    "duplicateEvent": "Duplica",
+    "duplicateError": "Duplicazione non riuscita. Riprova.",
     "deleteEvent": "Elimina evento",
     "deleteConfirm": "Sei sicuro di voler eliminare questo evento? Questa azione è irreversibile.",
     "publish": "Pubblica",

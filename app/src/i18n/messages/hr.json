@@ -914,7 +914,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Dupliciraj",
+    "duplicateError": "Dupliciranje nije uspjelo. Pokušajte ponovno."
   },
   "email": {
     "confirmationSubject": "Potvrda prijave: {eventTitle}",

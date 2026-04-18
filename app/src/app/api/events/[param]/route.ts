@@ -7,6 +7,7 @@ import {
   AppError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { reviveStatus } from '@/lib/events/lifecycle';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import {
@@ -207,18 +208,14 @@ export const PUT = withErrorHandling(async (request, context) => {
   // leaving the row stuck in ENDED. Without this the call happens to
   // be terminated permanently from a single timing mistake — which
   // is what happened on the caffettino dry-run.
-  let revivedStatus: 'PUBLISHED' | 'LIVE' | undefined;
-  if (
-    event.status === 'ENDED' &&
-    data.endsAt !== undefined &&
-    new Date(data.endsAt) > new Date() &&
-    data.status === undefined // caller hasn't explicitly asked for a status
-  ) {
-    const effectiveStart = data.startsAt
-      ? new Date(data.startsAt)
-      : event.startsAt;
-    revivedStatus = effectiveStart <= new Date() ? 'LIVE' : 'PUBLISHED';
-  }
+  const revivedStatus = reviveStatus({
+    currentStatus: event.status,
+    currentStartsAt: event.startsAt,
+    newEndsAt: data.endsAt !== undefined ? new Date(data.endsAt) : undefined,
+    newStartsAt: data.startsAt !== undefined ? new Date(data.startsAt) : undefined,
+    statusExplicitlySet: data.status !== undefined,
+    now: new Date(),
+  });
 
   const updated = await prisma.event.update({
     where: { id: eventId },

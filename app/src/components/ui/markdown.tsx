@@ -35,16 +35,52 @@ const ALLOWED_TAGS = [
   'table', 'thead', 'tbody', 'tr', 'th', 'td',
 ];
 
+// Per-tag allowlist: keep sensitive attrs (`href`, `src`) scoped to the
+// tags that actually use them. DOMPurify's global `ALLOWED_ATTR` would
+// permit e.g. `<img href=javascript:...>` or `<p src=...>`, which are
+// not valid markdown output but could be injected via raw HTML in the
+// source and exploited by future renderer quirks. We strip those via a
+// post-sanitize hook.
 const ALLOWED_ATTRS = ['href', 'title', 'alt', 'src', 'target', 'rel', 'class'];
+const ATTR_BY_TAG: Record<string, Set<string>> = {
+  a: new Set(['href', 'title', 'target', 'rel', 'class']),
+  img: new Set(['src', 'alt', 'title', 'class']),
+  figure: new Set(['class']),
+  figcaption: new Set(['class']),
+};
+
+let hooksInstalled = false;
+function ensureHooks() {
+  if (hooksInstalled) return;
+  DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+    const tag = node.nodeName?.toLowerCase();
+    const scoped = tag ? ATTR_BY_TAG[tag] : undefined;
+    // Drop href/src on tags that shouldn't carry them (e.g. href on
+    // <img>, src on <p>). Other attrs pass through the global allowlist.
+    if ((data.attrName === 'href' || data.attrName === 'src') && (!scoped || !scoped.has(data.attrName))) {
+      data.keepAttr = false;
+    }
+  });
+  // All anchors in event descriptions go to user-supplied URLs, so
+  // force them to open in a new tab with `rel=noopener noreferrer` to
+  // prevent reverse-tabnabbing.
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.nodeName === 'A') {
+      const el = node as Element;
+      el.setAttribute('target', '_blank');
+      el.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+  hooksInstalled = true;
+}
 
 export function renderMarkdown(markdown: string): string {
   if (!markdown) return '';
+  ensureHooks();
   const raw = marked.parse(markdown, { async: false }) as string;
   return DOMPurify.sanitize(raw, {
     ALLOWED_TAGS,
     ALLOWED_ATTR: ALLOWED_ATTRS,
-    // Force external links to open in a new tab with rel=noopener.
-    ADD_ATTR: ['target'],
   });
 }
 

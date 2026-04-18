@@ -914,7 +914,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplikovat",
+    "duplicateError": "Duplikace se nezdařila. Zkuste to znovu."
   },
   "email": {
     "confirmationSubject": "Potvrzení registrace: {eventTitle}",

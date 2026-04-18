@@ -914,7 +914,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Monista",
+    "duplicateError": "Monistus epäonnistui. Yritä uudelleen."
   },
   "email": {
     "confirmationSubject": "Ilmoittautuminen vahvistettu: {eventTitle}",

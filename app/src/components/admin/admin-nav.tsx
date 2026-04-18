@@ -84,7 +84,8 @@ export default function AdminNav() {
     || stripped.startsWith('/admin/gdpr-audit');
   const inRecordings = stripped.startsWith('/admin/recordings')
     || stripped.startsWith('/admin/registrazioni-video');
-  const inPublications = stripped.startsWith('/admin/publications');
+  const inPublications = stripped.startsWith('/admin/publications')
+    || stripped.startsWith('/admin/pubblicazioni');
 
   const PATH_ALIASES: Record<string, string[]> = {
     '/admin/events': ['/admin/events', '/admin/eventi'],
@@ -95,13 +96,13 @@ export default function AdminNav() {
     '/admin/calendar': ['/admin/calendar', '/admin/calendario'],
     '/admin/registrations': ['/admin/registrations', '/admin/iscrizioni'],
     '/admin/recordings': ['/admin/recordings', '/admin/registrazioni-video'],
-    '/admin/publications': ['/admin/publications'],
-    '/admin/publications/new': ['/admin/publications/new'],
+    '/admin/publications': ['/admin/publications', '/admin/pubblicazioni'],
+    '/admin/publications/new': ['/admin/publications/new', '/admin/pubblicazioni/nuova'],
     '/admin/moderators': ['/admin/moderators', '/admin/moderatori'],
     '/admin/gdpr-audit': ['/admin/gdpr-audit'],
     '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
     '/admin/settings/languages': ['/admin/settings/languages', '/admin/impostazioni/lingue'],
-    '/admin/settings/gdpr-templates': ['/admin/settings/gdpr-templates'],
+    '/admin/settings/gdpr-templates': ['/admin/settings/gdpr-templates', '/admin/impostazioni/modelli-gdpr'],
     '/admin/infrastructure': ['/admin/infrastructure', '/admin/infrastruttura'],
     '/admin/monitoring': ['/admin/monitoring'],
   };

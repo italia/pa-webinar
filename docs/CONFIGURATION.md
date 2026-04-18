@@ -505,7 +505,7 @@ jitsi-meet:
 | Variable | Required | Description |
 |---|---|---|
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `REDIS_URL` | No | Redis connection string (`redis://` / `rediss://`). Required only for multi-pod chat fan-out. With the in-cluster `redis` subchart the chart derives it at render time from `REDIS_PASSWORD`. |
+| `REDIS_URL` | **Yes (chat)** | Redis connection string (`redis://` / `rediss://`). Required for chat fan-out — senza Redis `/api/status` riporta `outage` e la chat è disabilitata. Con il subchart `redis` in-cluster la chart lo deriva a render time da `REDIS_PASSWORD`. |
 | `REDIS_PASSWORD` | Cond. | Required when the `redis` subchart is enabled or when `REDIS_URL` is not set explicitly. |
 | `APP_SECRET` | Yes | Secret for signing JWTs (admin sessions, Jitsi tokens) |
 | `ADMIN_API_KEY` | Yes | Key for admin login |
@@ -529,3 +529,52 @@ jitsi-meet:
 | `JVB_MAX_REPLICAS` | No | Max JVB replicas for auto-scaler (default: 4) |
 | `RECORDING_STORAGE_TYPE` | No | Recording storage: `azure-blob`, `s3`, `gcs`, `minio`, `local` |
 | `RECORDING_WEBHOOK_URL` | No | Webhook URL for Jibri finalize script notifications |
+| **Files storage (materials uploaded by moderators)** |  |  |
+| `STORAGE_FILES_PROVIDER` | No | `azure-blob` or `s3`. Default: auto-detected from env vars present. |
+| `AZURE_STORAGE_CONTAINER_NAME` | Cond. | Container name per files quando provider = `azure-blob`. |
+| `AZURE_STORAGE_CONNECTION_STRING` | Cond. | Connection string completa (account + key) per Azure Blob files. |
+| `STORAGE_FILES_S3_REGION` | Cond. | Regione AWS/MinIO/etc quando provider = `s3`. |
+| `STORAGE_FILES_S3_BUCKET` | Cond. | Bucket per files. |
+| `STORAGE_FILES_S3_ENDPOINT` | No | Endpoint custom (MinIO, R2, GCS interop, PSN). Ometti per AWS nativo. |
+| `STORAGE_FILES_S3_FORCE_PATH_STYLE` | No | `true` per MinIO / S3 on-prem (path-style URLs). Default: `false`. |
+| `STORAGE_FILES_S3_ACCESS_KEY_ID` | Cond. | HMAC access key. Ometti su EKS con IRSA per usare il ServiceAccount. |
+| `STORAGE_FILES_S3_SECRET_ACCESS_KEY` | Cond. | HMAC secret key. |
+| **Recordings storage (Jibri output + admin uploads)** |  |  |
+| `RECORDING_AZURE_CONTAINER` | Cond. | Container name recordings quando `RECORDING_STORAGE_TYPE=azure-blob`. |
+| `RECORDING_AZURE_CONNECTION_STRING` | Cond. | Connection string Azure per recordings. |
+| `RECORDING_S3_REGION` | Cond. | Regione S3 quando `RECORDING_STORAGE_TYPE=s3`. |
+| `RECORDING_S3_BUCKET` | Cond. | Bucket recordings. |
+| `RECORDING_S3_ENDPOINT` | No | Endpoint S3 custom. |
+| `RECORDING_S3_FORCE_PATH_STYLE` | No | `true` per MinIO / on-prem. |
+| `RECORDING_S3_ACCESS_KEY_ID` | Cond. | HMAC access key recordings. |
+| `RECORDING_S3_SECRET_ACCESS_KEY` | Cond. | HMAC secret key recordings. |
+| `RECORDING_MEDIA_CSP_HOSTS` | No | Origini extra separate da spazi da ammettere in `media-src` / `connect-src` CSP (domini custom / CDN per il bucket). |
+
+### Dynamic runtime settings (SiteSetting DB row)
+
+Alcuni parametri non sono env var ma vivono nella tabella `SiteSetting`
+(singleton) e sono modificabili a caldo dall'admin UI in
+`/admin/settings`. Persistono nel DB e sono riletti a ogni request.
+
+**Infrastructure sizing** (tab "Dimensionamento infra"): serve a calibrare
+il calcolatore JVB per il nodo effettivamente in uso (Azure F-series,
+AWS c6i, GCP n2, on-prem). Il calcolatore stima i JVB pod necessari
+per un evento con formula lineare `ceil((receivers/receiversPerCore +
+senders/sendersPerCore) / cpuCoresPerPod)`.
+
+| Key | Default | Meaning |
+|---|---|---|
+| `jvbCpuCoresPerPod` | `16` | Core CPU per pod JVB. Default tarato su Azure `Standard_F16s_v2`. Per `F8s_v2` usa `8`. |
+| `jvbReceiversPerCore` | `18.75` | Partecipanti passivi (audio-only, no video upstream) sostenibili per core. Default Azure F-series. |
+| `jvbSendersPerCore` | `3.125` | Partecipanti attivi (video upstream) sostenibili per core. |
+| `jvbMaxReplicas` | `6` | Cap superiore al numero di JVB che il cron scaler può richiedere. Protezione da cost explosion. |
+| `jibriCpuCoresPerPod` | `4` | Core CPU per pod Jibri. Default Azure `Standard_F4s_v2`. |
+| `defaultSenderRatioPct` | `30` | % di partecipanti attesi come "sender" (video) quando un evento non specifica un override. |
+| `eventGracePeriodMinutes` | `15` | Minuti dopo `endsAt` in cui l'evento resta LIVE (banner "overtime"). `0` chiusura netta, `-1` mai. Override per-evento via `Event.gracePeriodMinutes`. |
+
+**Per-event overrides** (create/edit event, sezione "Programmazione"):
+
+| Event column | Values | Meaning |
+|---|---|---|
+| `expectedSenderRatioPct` | `null` \| `0-100` | Override % sender atteso. `null` = usa `defaultSenderRatioPct`. |
+| `gracePeriodMinutes` | `null` \| `-1` \| `0` \| `5-240` | Override minuti di grace. `null` = usa `eventGracePeriodMinutes`, `-1` = evento mai auto-chiuso (utile per eventi open-ended). |

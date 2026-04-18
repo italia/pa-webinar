@@ -914,7 +914,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplică",
+    "duplicateError": "Duplicarea a eșuat. Încercați din nou."
   },
   "email": {
     "confirmationSubject": "Confirmare înregistrare: {eventTitle}",
