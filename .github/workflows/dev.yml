@@ -72,6 +72,10 @@ jobs:
           # (scope=release) stays isolated and we don't cross-contaminate.
           cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev' }}
           cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev' }}
+          build-args: |
+            NEXT_PUBLIC_BUILD_VERSION=dev
+            NEXT_PUBLIC_BUILD_SHA=${{ steps.tags.outputs.sha_short }}
+            NEXT_PUBLIC_BUILD_CHANNEL=dev
           # Commit-SHA label helps tracing which commit is actually running
           # in the test cluster when the `:dev` tag is ambiguous.
           labels: |

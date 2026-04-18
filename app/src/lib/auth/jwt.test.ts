@@ -134,12 +134,11 @@ describe('generateJitsiJwt', () => {
 
     const payload = await decodeJwt(jwt);
     const ctx = payload.context as { user: Record<string, string> };
-    expect(ctx.user.avatar).toMatch(/^data:image\/svg\+xml;base64,/);
+    const avatar = ctx.user.avatar ?? '';
+    expect(avatar).toMatch(/^data:image\/svg\+xml;base64,/);
     // Initials come from displayName — decode and spot-check.
-    const base64 = ctx.user.avatar.split(',')[1];
-    const svg = Buffer.from(base64, 'utf-8').length > 0
-      ? Buffer.from(base64, 'base64').toString('utf-8')
-      : '';
+    const base64 = avatar.split(',')[1] ?? '';
+    const svg = Buffer.from(base64, 'base64').toString('utf-8');
     expect(svg).toContain('<svg');
     expect(svg).toContain('>R<'); // single-initial "R" for "Raff"
   });

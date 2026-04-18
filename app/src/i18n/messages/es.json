@@ -1072,6 +1072,39 @@
           "body": "Aun adoptando medidas técnicas y organizativas adecuadas, el Departamento no puede garantizar la ausencia total de interrupciones o fallos debidos a eventos imprevistos, tareas de mantenimiento o factores externos. Las responsabilidades legales se rigen por la legislación aplicable."
         }
       }
+    },
+    "security": {
+      "metaTitle": "Security and transparency",
+      "title": "Security and transparency",
+      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "sections": {
+        "openSource": {
+          "title": "Open source software",
+          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+        },
+        "sbom": {
+          "title": "SBOM (Software Bill of Materials)",
+          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+        },
+        "scanning": {
+          "title": "Automated scanning",
+          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+        },
+        "disclosure": {
+          "title": "Vulnerability disclosure",
+          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+        }
+      },
+      "links": {
+        "sourceCode": "Source code",
+        "scorecard": "OpenSSF Scorecard score",
+        "latestRelease": "Latest release (with SBOM)",
+        "securityPolicy": "Disclosure policy (SECURITY.md)"
+      }
     }
   },
   "status": {
@@ -1347,7 +1380,13 @@
     "contacts": "Contacto",
     "legalNotes": "Aviso legal",
     "governmentSite": "Gobierno Italiano",
-    "systemStatus": "Estado del sistema"
+    "systemStatus": "Estado del sistema",
+    "sbomLatest": "SBOM latest release",
+    "transparency": "Security and transparency",
+    "sourceCode": "Source code",
+    "buildInfoDev": "development build",
+    "viewCommit": "View commit on GitHub",
+    "viewRelease": "View release on GitHub"
   },
   "pages": {
     "privacyTitle": "Política de privacidad",

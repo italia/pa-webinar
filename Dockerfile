@@ -54,6 +54,16 @@ ENV NEXT_PUBLIC_JITSI_DOMAIN=$NEXT_PUBLIC_JITSI_DOMAIN
 ENV NEXT_PUBLIC_WATERMARK_URL=$NEXT_PUBLIC_WATERMARK_URL
 ENV NEXT_PUBLIC_DEFAULT_LOCALE=$NEXT_PUBLIC_DEFAULT_LOCALE
 
+# Build identity — inlined by webpack so the footer can render version + sha.
+# BUILD_CHANNEL is `dev` for rolling :dev builds and `release` for tagged v*
+# pushes; the footer uses it to pick between commit link and release link.
+ARG NEXT_PUBLIC_BUILD_VERSION=dev
+ARG NEXT_PUBLIC_BUILD_SHA=
+ARG NEXT_PUBLIC_BUILD_CHANNEL=dev
+ENV NEXT_PUBLIC_BUILD_VERSION=$NEXT_PUBLIC_BUILD_VERSION
+ENV NEXT_PUBLIC_BUILD_SHA=$NEXT_PUBLIC_BUILD_SHA
+ENV NEXT_PUBLIC_BUILD_CHANNEL=$NEXT_PUBLIC_BUILD_CHANNEL
+
 # Copy installed deps from stage 1
 COPY --from=deps /workspace/node_modules ./node_modules
 COPY --from=deps /workspace/package.json ./

@@ -1548,6 +1548,39 @@
           "body": "Pur adottando misure tecniche e organizzative adeguate, il Dipartimento non garantisce l'assenza assoluta di interruzioni o malfunzionamenti dovuti a cause non prevedibili, manutenzioni o fattori esterni. Restano ferme le responsabilita previste dalla legge."
         }
       }
+    },
+    "security": {
+      "metaTitle": "Sicurezza e trasparenza",
+      "title": "Sicurezza e trasparenza",
+      "intro": "Il codice sorgente di questa piattaforma e pubblico e sottoposto a controlli automatici di sicurezza. Questa pagina riassume gli strumenti di trasparenza disponibili per chi utilizza il servizio.",
+      "sections": {
+        "openSource": {
+          "title": "Software open source",
+          "body": "L'intera piattaforma e rilasciata come software libero. Il codice sorgente e consultabile, scaricabile e auditabile da chiunque, coerentemente con i principi di trasparenza della Pubblica Amministrazione italiana."
+        },
+        "sbom": {
+          "title": "SBOM (Software Bill of Materials)",
+          "body": "Ogni release pubblicata su GitHub include un SBOM in formato SPDX per l'immagine container e un SBOM CycloneDX per le dipendenze npm dell'applicazione. I file sono allegati direttamente alla release e possono essere utilizzati per audit di sicurezza e conformita."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Il repository e analizzato periodicamente da OpenSSF Scorecard, che valuta automaticamente decine di pratiche di sicurezza del progetto (protezione del branch, workflow con permessi minimi, firma dei commit, gestione delle dipendenze). Il punteggio aggiornato e pubblico."
+        },
+        "scanning": {
+          "title": "Scansioni automatiche",
+          "body": "Le dipendenze vengono monitorate in continuo tramite Dependabot e npm audit. La pipeline di release genera immagini firmate e tracciabili tramite la label org.opencontainers.image.revision, che lega ogni immagine al commit esatto da cui proviene."
+        },
+        "disclosure": {
+          "title": "Segnalazione di vulnerabilita",
+          "body": "La politica di disclosure responsabile delle vulnerabilita e descritta nel file SECURITY.md del repository. Eventuali problemi di sicurezza possono essere segnalati in modo confidenziale secondo le istruzioni riportate."
+        }
+      },
+      "links": {
+        "sourceCode": "Codice sorgente",
+        "scorecard": "Punteggio OpenSSF Scorecard",
+        "latestRelease": "Ultima release (con SBOM)",
+        "securityPolicy": "Policy di disclosure (SECURITY.md)"
+      }
     }
   },
   "status": {
@@ -1857,7 +1890,13 @@
     "contacts": "Contatti",
     "legalNotes": "Note legali",
     "governmentSite": "Governo Italiano",
-    "systemStatus": "Stato del sistema"
+    "systemStatus": "Stato del sistema",
+    "sbomLatest": "SBOM ultima release",
+    "transparency": "Sicurezza e trasparenza",
+    "sourceCode": "Codice sorgente",
+    "buildInfoDev": "build di sviluppo",
+    "viewCommit": "Vedi il commit su GitHub",
+    "viewRelease": "Vedi la release su GitHub"
   },
   "pages": {
     "privacyTitle": "Informativa sulla privacy",
