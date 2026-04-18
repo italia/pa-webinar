@@ -11,6 +11,14 @@ interface FooterLink {
   section: 'main' | 'legal';
 }
 
+// Build identity is baked in by webpack DefinePlugin from build args set in
+// dev.yml / release.yml. Dot notation is required for the inlining — bracket
+// notation reads runtime env, which is empty for NEXT_PUBLIC_* in a
+// standalone Next server.
+const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_VERSION ?? '';
+const BUILD_SHA = process.env.NEXT_PUBLIC_BUILD_SHA ?? '';
+const BUILD_CHANNEL = process.env.NEXT_PUBLIC_BUILD_CHANNEL ?? 'dev';
+
 export default function PAFooter() {
   const t = useTranslations();
   const settings = useSettings();
@@ -103,17 +111,34 @@ export default function PAFooter() {
                 <h4>{t('footer.openSource')}</h4>
                 <ul className="footer-list link-list clearfix">
                   {githubUrl && (
-                    <li>
-                      <a
-                        href={githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="list-item"
-                      >
-                        GitHub
-                      </a>
-                    </li>
+                    <>
+                      <li>
+                        <a
+                          href={githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="list-item"
+                        >
+                          {t('footer.sourceCode')}
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href={`${githubUrl}/releases/latest`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="list-item"
+                        >
+                          {t('footer.sbomLatest')}
+                        </a>
+                      </li>
+                    </>
                   )}
+                  <li>
+                    <Link href="/security" className="list-item text-white">
+                      {t('footer.transparency')}
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -161,9 +186,68 @@ export default function PAFooter() {
                 <Link href="/status">{t('footer.systemStatus')}</Link>
               </li>
             )}
+            {(BUILD_VERSION || BUILD_SHA) && (
+              <li className="list-inline-item ms-md-auto opacity-75">
+                <BuildInfo githubUrl={githubUrl} t={t} />
+              </li>
+            )}
           </ul>
         </div>
       </div>
     </footer>
+  );
+}
+
+function BuildInfo({
+  githubUrl,
+  t,
+}: {
+  githubUrl: string;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const hasRepo = githubUrl.startsWith('http');
+  const commitUrl = hasRepo && BUILD_SHA ? `${githubUrl}/commit/${BUILD_SHA}` : null;
+  const releaseUrl =
+    hasRepo && BUILD_CHANNEL === 'release' && BUILD_VERSION
+      ? `${githubUrl}/releases/tag/v${BUILD_VERSION}`
+      : null;
+
+  const versionLabel =
+    BUILD_CHANNEL === 'release' && BUILD_VERSION
+      ? `v${BUILD_VERSION}`
+      : t('footer.buildInfoDev');
+
+  return (
+    <span style={{ fontSize: '0.8rem' }}>
+      {releaseUrl ? (
+        <a
+          href={releaseUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={t('footer.viewRelease')}
+        >
+          {versionLabel}
+        </a>
+      ) : (
+        <span>{versionLabel}</span>
+      )}
+      {BUILD_SHA ? (
+        <>
+          {' · '}
+          {commitUrl ? (
+            <a
+              href={commitUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={t('footer.viewCommit')}
+            >
+              <code>{BUILD_SHA}</code>
+            </a>
+          ) : (
+            <code>{BUILD_SHA}</code>
+          )}
+        </>
+      ) : null}
+    </span>
   );
 }
