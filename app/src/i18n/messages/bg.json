@@ -1074,36 +1074,36 @@
       }
     },
     "security": {
-      "metaTitle": "Security and transparency",
-      "title": "Security and transparency",
-      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "metaTitle": "Сигурност и прозрачност",
+      "title": "Сигурност и прозрачност",
+      "intro": "Изходният код на тази платформа е публичен и подлежи на автоматизирани проверки за сигурност. Тази страница обобщава наличните инструменти за прозрачност за потребителите на услугата.",
       "sections": {
         "openSource": {
-          "title": "Open source software",
-          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+          "title": "Софтуер с отворен код",
+          "body": "Цялата платформа е публикувана като свободен софтуер. Изходният код може да бъде преглеждан, изтеглян и одитиран от всеки, в съответствие с принципите за прозрачност на италианската публична администрация."
         },
         "sbom": {
-          "title": "SBOM (Software Bill of Materials)",
-          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+          "title": "SBOM (Списък на софтуерните компоненти)",
+          "body": "Всяка версия, публикувана в GitHub, включва SBOM във формат SPDX за контейнерния образ и SBOM във формат CycloneDX за npm зависимостите на приложението. Файловете са приложени директно към версията и могат да се използват за одити на сигурността и съответствието."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+          "body": "Хранилището се анализира периодично от OpenSSF Scorecard, който автоматично оценява десетки практики за сигурност на проекта (защита на клоновете, работни процеси с минимални привилегии, подписани ангажименти, управление на зависимостите). Текущият резултат е публичен."
         },
         "scanning": {
-          "title": "Automated scanning",
-          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+          "title": "Автоматизирани проверки",
+          "body": "Зависимостите се наблюдават непрекъснато чрез Dependabot и npm audit. Пайплайнът за версии създава проследими образи чрез етикета org.opencontainers.image.revision, който свързва всеки образ с точния ангажимент, от който е построен."
         },
         "disclosure": {
-          "title": "Vulnerability disclosure",
-          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+          "title": "Докладване на уязвимости",
+          "body": "Политиката за отговорно разкриване е описана във файла SECURITY.md на хранилището. Проблеми със сигурността могат да бъдат докладвани поверително според указанията там."
         }
       },
       "links": {
-        "sourceCode": "Source code",
-        "scorecard": "OpenSSF Scorecard score",
-        "latestRelease": "Latest release (with SBOM)",
-        "securityPolicy": "Disclosure policy (SECURITY.md)"
+        "sourceCode": "Изходен код",
+        "scorecard": "Резултат от OpenSSF Scorecard",
+        "latestRelease": "Последна версия (със SBOM)",
+        "securityPolicy": "Политика за разкриване (SECURITY.md)"
       }
     }
   },
@@ -1381,12 +1381,12 @@
     "legalNotes": "Правни бележки",
     "governmentSite": "Италианско правителство",
     "systemStatus": "Състояние на системата",
-    "sbomLatest": "SBOM latest release",
-    "transparency": "Security and transparency",
-    "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "sbomLatest": "SBOM на последната версия",
+    "transparency": "Сигурност и прозрачност",
+    "sourceCode": "Изходен код",
+    "buildInfoDev": "разработческа компилация",
+    "viewCommit": "Преглед на ангажимента в GitHub",
+    "viewRelease": "Преглед на версията в GitHub"
   },
   "pages": {
     "privacyTitle": "Политика за поверителност",

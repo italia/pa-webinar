@@ -1074,36 +1074,36 @@
       }
     },
     "security": {
-      "metaTitle": "Security and transparency",
-      "title": "Security and transparency",
-      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "metaTitle": "Ασφάλεια και διαφάνεια",
+      "title": "Ασφάλεια και διαφάνεια",
+      "intro": "Ο πηγαίος κώδικας αυτής της πλατφόρμας είναι δημόσιος και υπόκειται σε αυτοματοποιημένους ελέγχους ασφαλείας. Αυτή η σελίδα συνοψίζει τα εργαλεία διαφάνειας που διατίθενται σε όσους χρησιμοποιούν την υπηρεσία.",
       "sections": {
         "openSource": {
-          "title": "Open source software",
-          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+          "title": "Λογισμικό ανοικτού κώδικα",
+          "body": "Ολόκληρη η πλατφόρμα κυκλοφορεί ως ελεύθερο λογισμικό. Ο πηγαίος κώδικας μπορεί να εξεταστεί, να ληφθεί και να ελεγχθεί από οποιονδήποτε, σύμφωνα με τις αρχές διαφάνειας της ιταλικής Δημόσιας Διοίκησης."
         },
         "sbom": {
-          "title": "SBOM (Software Bill of Materials)",
-          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+          "title": "SBOM (Καταλόγου Λογισμικού)",
+          "body": "Κάθε έκδοση που δημοσιεύεται στο GitHub περιλαμβάνει ένα SBOM σε μορφή SPDX για το container image και ένα SBOM σε μορφή CycloneDX για τις εξαρτήσεις npm της εφαρμογής. Τα αρχεία επισυνάπτονται απευθείας στην έκδοση και μπορούν να χρησιμοποιηθούν για ελέγχους ασφάλειας και συμμόρφωσης."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+          "body": "Το αποθετήριο αναλύεται περιοδικά από το OpenSSF Scorecard, το οποίο αξιολογεί αυτόματα δεκάδες πρακτικές ασφάλειας του έργου (προστασία κλάδων, workflows με ελάχιστα δικαιώματα, υπογεγραμμένα commits, διαχείριση εξαρτήσεων). Η τρέχουσα βαθμολογία είναι δημόσια."
         },
         "scanning": {
-          "title": "Automated scanning",
-          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+          "title": "Αυτοματοποιημένες σαρώσεις",
+          "body": "Οι εξαρτήσεις παρακολουθούνται συνεχώς μέσω Dependabot και npm audit. Η διαδικασία έκδοσης παράγει ιχνηλάσιμα images μέσω της ετικέτας org.opencontainers.image.revision, η οποία συνδέει κάθε image με το ακριβές commit από το οποίο δημιουργήθηκε."
         },
         "disclosure": {
-          "title": "Vulnerability disclosure",
-          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+          "title": "Αναφορά ευπαθειών",
+          "body": "Η πολιτική υπεύθυνης αποκάλυψης περιγράφεται στο αρχείο SECURITY.md του αποθετηρίου. Τα ζητήματα ασφάλειας μπορούν να αναφερθούν εμπιστευτικά σύμφωνα με τις οδηγίες εκεί."
         }
       },
       "links": {
-        "sourceCode": "Source code",
-        "scorecard": "OpenSSF Scorecard score",
-        "latestRelease": "Latest release (with SBOM)",
-        "securityPolicy": "Disclosure policy (SECURITY.md)"
+        "sourceCode": "Πηγαίος κώδικας",
+        "scorecard": "Βαθμολογία OpenSSF Scorecard",
+        "latestRelease": "Τελευταία έκδοση (με SBOM)",
+        "securityPolicy": "Πολιτική αποκάλυψης (SECURITY.md)"
       }
     }
   },
@@ -1381,12 +1381,12 @@
     "legalNotes": "Νομικές σημειώσεις",
     "governmentSite": "Ιταλική Κυβέρνηση",
     "systemStatus": "Κατάσταση συστήματος",
-    "sbomLatest": "SBOM latest release",
-    "transparency": "Security and transparency",
-    "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "sbomLatest": "SBOM τελευταίας έκδοσης",
+    "transparency": "Ασφάλεια και διαφάνεια",
+    "sourceCode": "Πηγαίος κώδικας",
+    "buildInfoDev": "έκδοση ανάπτυξης",
+    "viewCommit": "Προβολή commit στο GitHub",
+    "viewRelease": "Προβολή έκδοσης στο GitHub"
   },
   "pages": {
     "privacyTitle": "Πολιτική απορρήτου",

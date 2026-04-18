@@ -1074,36 +1074,36 @@
       }
     },
     "security": {
-      "metaTitle": "Security and transparency",
-      "title": "Security and transparency",
-      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "metaTitle": "Säkerhet och transparens",
+      "title": "Säkerhet och transparens",
+      "intro": "Källkoden för denna plattform är offentlig och genomgår automatiserade säkerhetskontroller. Denna sida sammanfattar de transparensverktyg som finns tillgängliga för alla som använder tjänsten.",
       "sections": {
         "openSource": {
-          "title": "Open source software",
-          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+          "title": "Öppen källkod",
+          "body": "Hela plattformen publiceras som fri programvara. Källkoden kan granskas, laddas ner och revideras av vem som helst, i linje med den italienska offentliga förvaltningens transparensprinciper."
         },
         "sbom": {
-          "title": "SBOM (Software Bill of Materials)",
-          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+          "title": "SBOM (förteckning över programvarukomponenter)",
+          "body": "Varje version som publiceras på GitHub innehåller en SBOM i SPDX-format för containerbilden och en SBOM i CycloneDX-format för applikationens npm-beroenden. Filerna bifogas direkt till versionen och kan användas för säkerhets- och efterlevnadsrevisioner."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+          "body": "Repositoriet analyseras regelbundet av OpenSSF Scorecard, som automatiskt utvärderar dussintals projektsäkerhetspraxis (branch-skydd, arbetsflöden med lägsta behörighet, signerade commits, hantering av beroenden). Den aktuella poängen är offentlig."
         },
         "scanning": {
-          "title": "Automated scanning",
-          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+          "title": "Automatiserade skanningar",
+          "body": "Beroenden övervakas kontinuerligt via Dependabot och npm audit. Release-pipelinen producerar spårbara bilder via etiketten org.opencontainers.image.revision, som kopplar varje bild till den exakta commit den byggdes från."
         },
         "disclosure": {
-          "title": "Vulnerability disclosure",
-          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+          "title": "Rapportering av sårbarheter",
+          "body": "Policyn för ansvarsfullt avslöjande beskrivs i filen SECURITY.md i repositoriet. Säkerhetsproblem kan rapporteras konfidentiellt enligt instruktionerna där."
         }
       },
       "links": {
-        "sourceCode": "Source code",
-        "scorecard": "OpenSSF Scorecard score",
-        "latestRelease": "Latest release (with SBOM)",
-        "securityPolicy": "Disclosure policy (SECURITY.md)"
+        "sourceCode": "Källkod",
+        "scorecard": "OpenSSF Scorecard-poäng",
+        "latestRelease": "Senaste versionen (med SBOM)",
+        "securityPolicy": "Avslöjandepolicy (SECURITY.md)"
       }
     }
   },
@@ -1381,12 +1381,12 @@
     "legalNotes": "Juridiska anmärkningar",
     "governmentSite": "Italienska regeringen",
     "systemStatus": "Systemstatus",
-    "sbomLatest": "SBOM latest release",
-    "transparency": "Security and transparency",
-    "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "sbomLatest": "SBOM för senaste versionen",
+    "transparency": "Säkerhet och transparens",
+    "sourceCode": "Källkod",
+    "buildInfoDev": "utvecklingsbygge",
+    "viewCommit": "Visa commit på GitHub",
+    "viewRelease": "Visa version på GitHub"
   },
   "pages": {
     "privacyTitle": "Integritetspolicy",

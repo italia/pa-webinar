@@ -1074,36 +1074,36 @@
       }
     },
     "security": {
-      "metaTitle": "Security and transparency",
-      "title": "Security and transparency",
-      "intro": "The source code of this platform is public and subject to automated security controls. This page summarises the transparency tools available to anyone using the service.",
+      "metaTitle": "Bezpečnost a transparentnost",
+      "title": "Bezpečnost a transparentnost",
+      "intro": "Zdrojový kód této platformy je veřejný a podléhá automatickým bezpečnostním kontrolám. Tato stránka shrnuje nástroje transparentnosti dostupné všem uživatelům služby.",
       "sections": {
         "openSource": {
-          "title": "Open source software",
-          "body": "The entire platform is released as free software. The source code can be inspected, downloaded and audited by anyone, in line with the transparency principles of the Italian Public Administration."
+          "title": "Software s otevřeným kódem",
+          "body": "Celá platforma je vydána jako svobodný software. Zdrojový kód může kdokoli prohlížet, stahovat a auditovat v souladu se zásadami transparentnosti italské veřejné správy."
         },
         "sbom": {
           "title": "SBOM (Software Bill of Materials)",
-          "body": "Every release published on GitHub includes an SPDX SBOM for the container image and a CycloneDX SBOM for the application npm dependencies. The files are attached directly to the release and can be used for security and compliance audits."
+          "body": "Každé vydání zveřejněné na GitHubu obsahuje SBOM ve formátu SPDX pro kontejnerový obraz a SBOM ve formátu CycloneDX pro npm závislosti aplikace. Soubory jsou přiloženy přímo k vydání a lze je použít pro bezpečnostní audity a audity shody."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "The repository is analysed periodically by OpenSSF Scorecard, which automatically evaluates dozens of project security practices (branch protection, least-privilege workflows, signed commits, dependency management). The current score is public."
+          "body": "Repozitář je pravidelně analyzován nástrojem OpenSSF Scorecard, který automaticky hodnotí desítky bezpečnostních praktik projektu (ochrana větví, workflow s minimálními oprávněními, podepsané commity, správa závislostí). Aktuální skóre je veřejné."
         },
         "scanning": {
-          "title": "Automated scanning",
-          "body": "Dependencies are continuously monitored via Dependabot and npm audit. The release pipeline produces traceable images through the org.opencontainers.image.revision label, binding each image to the exact commit it was built from."
+          "title": "Automatizované skenování",
+          "body": "Závislosti jsou průběžně monitorovány pomocí Dependabot a npm audit. Pipeline pro vydání produkuje sledovatelné obrazy prostřednictvím štítku org.opencontainers.image.revision, který spojuje každý obraz s přesným commitem, ze kterého byl sestaven."
         },
         "disclosure": {
-          "title": "Vulnerability disclosure",
-          "body": "The responsible disclosure policy is described in the SECURITY.md file of the repository. Security issues can be reported confidentially following the instructions provided there."
+          "title": "Hlášení zranitelností",
+          "body": "Zásady odpovědného zveřejňování jsou popsány v souboru SECURITY.md v repozitáři. Bezpečnostní problémy lze nahlásit důvěrně podle tamních pokynů."
         }
       },
       "links": {
-        "sourceCode": "Source code",
-        "scorecard": "OpenSSF Scorecard score",
-        "latestRelease": "Latest release (with SBOM)",
-        "securityPolicy": "Disclosure policy (SECURITY.md)"
+        "sourceCode": "Zdrojový kód",
+        "scorecard": "Skóre OpenSSF Scorecard",
+        "latestRelease": "Nejnovější vydání (se SBOM)",
+        "securityPolicy": "Zásady zveřejňování (SECURITY.md)"
       }
     }
   },
@@ -1381,12 +1381,12 @@
     "legalNotes": "Právní upozornění",
     "governmentSite": "Italská vláda",
     "systemStatus": "Stav systému",
-    "sbomLatest": "SBOM latest release",
-    "transparency": "Security and transparency",
-    "sourceCode": "Source code",
-    "buildInfoDev": "development build",
-    "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "sbomLatest": "SBOM nejnovějšího vydání",
+    "transparency": "Bezpečnost a transparentnost",
+    "sourceCode": "Zdrojový kód",
+    "buildInfoDev": "vývojový build",
+    "viewCommit": "Zobrazit commit na GitHubu",
+    "viewRelease": "Zobrazit vydání na GitHubu"
   },
   "pages": {
     "privacyTitle": "Zásady ochrany osobních údajů",
