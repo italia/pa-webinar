@@ -878,22 +878,27 @@
       }
     },
     "coModerators": {
-      "title": "Co-moderatori",
-      "intro": "Aggiungi altri moderatori con magic-link individuali.",
-      "introHint": "Ciascun co-moderatore ha un suo nome visibile in sala e un token revocabile indipendentemente dal link principale.",
-      "add": "Aggiungi co-moderatore",
+      "title": "Co-moderatori e relatori",
+      "intro": "Aggiungi co-moderatori e relatori con magic-link individuali.",
+      "introHint": "Ogni persona ha un nome visibile in sala e un token revocabile indipendentemente dal link principale. I relatori hanno microfono, video e condivisione schermo ma non possono moderare (kick, muta-tutti, registrazione).",
+      "add": "Aggiungi persona",
       "name": "Nome visibile in sala",
       "email": "Email (facoltativa)",
       "emailPlaceholder": "per inviargli il link",
+      "role": "Ruolo",
+      "roleModerator": "Moderatore",
+      "roleSpeaker": "Relatore",
+      "roleModeratorHint": "Piena moderazione: può registrare, disattivare audio a tutti, rimuovere partecipanti.",
+      "roleSpeakerHint": "Può parlare, mostrare video e condividere lo schermo. Non può moderare la sala.",
       "copyLink": "Copia link",
       "copied": "Copiato!",
       "revoke": "Revoca",
       "revoked": "Revocato",
-      "confirmRevoke": "Revocare l'accesso a questo co-moderatore? Il link smetterà di funzionare immediatamente.",
-      "empty": "Nessun co-moderatore aggiunto. Il link moderatore principale resta l'unico accesso da moderatore.",
-      "activeCount": "{count, plural, =0 {Nessun co-moderatore attivo} =1 {1 co-moderatore attivo} other {# co-moderatori attivi}}",
+      "confirmRevoke": "Revocare l'accesso a questa persona? Il link smetterà di funzionare immediatamente.",
+      "empty": "Nessun accesso aggiuntivo. Il link moderatore principale resta l'unico ingresso privilegiato.",
+      "activeCount": "{count, plural, =0 {Nessun accesso attivo} =1 {1 accesso attivo} other {# accessi attivi}}",
       "errors": {
-        "addFailed": "Impossibile aggiungere il co-moderatore. Riprova."
+        "addFailed": "Impossibile salvare. Riprova."
       }
     },
     "gdprAuditLog": {
@@ -918,7 +923,9 @@
         "languagesTitle": "Gestione lingue",
         "languagesDescription": "Attiva/disattiva le lingue dell'UE esposte nell'interfaccia, scegli la lingua predefinita e personalizza le traduzioni.",
         "gdprTemplatesTitle": "Template GDPR",
-        "gdprTemplatesDescription": "Crea informative privacy riutilizzabili tra eventi e scegli quella predefinita per i nuovi eventi."
+        "gdprTemplatesDescription": "Crea informative privacy riutilizzabili tra eventi e scegli quella predefinita per i nuovi eventi.",
+        "emailTemplatesTitle": "Template email",
+        "emailTemplatesDescription": "Personalizza oggetto, titoli e testi delle email di conferma e promemoria. Se lasciati vuoti si usano i testi predefiniti."
       },
       "tabs": {
         "branding": "Branding",
@@ -1188,6 +1195,45 @@
       },
       "errors": {
         "saveFailed": "Salvataggio non riuscito. Verifica i dati e riprova."
+      }
+    },
+    "emailTemplates": {
+      "title": "Template email",
+      "subtitle": "Personalizza oggetto, titoli e testi delle email transazionali. Campi lasciati vuoti usano i testi predefiniti integrati.",
+      "overridden": "Personalizzato",
+      "usingDefault": "Predefinito",
+      "saved": "Template salvato con successo.",
+      "resetDone": "Override rimosso: verrà usato il testo predefinito.",
+      "revert": "Annulla modifiche",
+      "resetToDefault": "Ripristina predefinito",
+      "confirmReset": "Rimuovere l'override? Verrà usato il testo predefinito integrato.",
+      "placeholdersTitle": "Placeholder disponibili",
+      "placeholdersHelp": "Inserisci questi segnaposto nei campi: verranno sostituiti al momento dell'invio con i dati reali dell'evento.",
+      "keys": {
+        "confirmation": "Conferma registrazione",
+        "reminder": "Promemoria evento"
+      },
+      "selectors": {
+        "key": "Tipo email",
+        "locale": "Lingua"
+      },
+      "fields": {
+        "subject": "Oggetto",
+        "subjectHint": "Oggetto dell'email. Supporta i placeholder.",
+        "heading": "Titolo principale",
+        "headingHint": "Titolo mostrato in cima al corpo dell'email.",
+        "bodyIntro": "Paragrafo introduttivo",
+        "bodyIntroHint": "Testo prima della tabella con i dettagli evento. Utile per un messaggio di benvenuto o un contesto extra.",
+        "ctaLabel": "Etichetta pulsante",
+        "ctaLabelHint": "Testo del pulsante che porta al link personale di accesso.",
+        "infoNote": "Nota informativa",
+        "infoNoteHint": "Box giallo di avviso sotto il pulsante. Lascialo vuoto per nasconderlo.",
+        "footerNote": "Nota a piè pagina",
+        "footerNoteHint": "Testo mostrato nel footer sotto l'eventuale firma dell'organizzazione."
+      },
+      "errors": {
+        "saveFailed": "Salvataggio non riuscito. Verifica i dati e riprova.",
+        "resetFailed": "Impossibile rimuovere l'override. Riprova."
       }
     },
     "languages": {

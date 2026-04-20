@@ -6,6 +6,8 @@ import {
   jitsiInterfaceConfigOverwrite,
   participantFeatures,
   moderatorFeatures,
+  speakerFeatures,
+  speakerToolbarButtons,
   instantCallToolbarButtons,
   instantCallModeratorToolbarButtons,
   instantCallConfigOverwrite,
@@ -45,6 +47,18 @@ describe('Jitsi config exports', () => {
   it('both feature sets have screen-sharing enabled', () => {
     expect(participantFeatures['screen-sharing']).toBe(true);
     expect(moderatorFeatures['screen-sharing']).toBe(true);
+  });
+
+  it('speaker features allow screen-sharing but not recording', () => {
+    expect(speakerFeatures['screen-sharing']).toBe(true);
+    expect(speakerFeatures.recording).toBe(false);
+    expect(speakerFeatures.livestreaming).toBe(false);
+  });
+
+  it('speaker toolbar excludes moderator-only buttons', () => {
+    expect(speakerToolbarButtons).not.toContain('hangup');
+    expect(speakerToolbarButtons).not.toContain('mute-everyone');
+    expect(speakerToolbarButtons).not.toContain('security');
   });
 });
 

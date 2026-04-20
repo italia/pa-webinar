@@ -14,10 +14,14 @@ import {
 } from '@/lib/ical/calendar-links';
 import { sendEmail } from '@/lib/email/send';
 import {
-  confirmationSubject,
   confirmationHtml,
   confirmationText,
+  baseConfirmationCopy,
 } from '@/lib/email/templates';
+import {
+  applyOverride,
+  loadEmailTemplateOverride,
+} from '@/lib/email/resolve-template';
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
 import { getPublicEnv } from '@/lib/env';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -90,11 +94,26 @@ export function sendConfirmationEmail(input: ConfirmationEmailInput): void {
         organizerEmail: event.moderatorEmail ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
       });
 
+      const override = await loadEmailTemplateOverride('confirmation', input.locale);
+      const resolved = applyOverride(
+        baseConfirmationCopy(templateInput),
+        override,
+        {
+          eventTitle: templateInput.eventTitle,
+          eventDate: templateInput.eventDate,
+          eventTime: templateInput.eventTime,
+          eventDuration: templateInput.eventDuration,
+          joinUrl: templateInput.joinUrl,
+          eventPageUrl: templateInput.eventPageUrl,
+          siteName: templateInput.siteName,
+        },
+      );
+
       await sendEmail({
         to: recipientEmail,
-        subject: confirmationSubject(input.locale, title),
-        html: confirmationHtml(templateInput),
-        text: confirmationText(templateInput),
+        subject: resolved.subject,
+        html: confirmationHtml(templateInput, resolved),
+        text: confirmationText(templateInput, resolved),
         attachments: [
           {
             filename: 'event.ics',

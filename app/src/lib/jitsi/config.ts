@@ -153,6 +153,26 @@ export const moderatorFeatures: JitsiJwtFeatures = {
 };
 
 /**
+ * Speaker ("relatore"): full AV rights like a moderator, but cannot
+ * record, kick or mute-everyone. Mapped to Jitsi's participant role
+ * (moderator:false) so Jitsi's internal permissions also deny mod-only
+ * actions — we don't rely on just hiding buttons.
+ */
+export const speakerFeatures: JitsiJwtFeatures = {
+  recording: false,
+  livestreaming: false,
+  'screen-sharing': true,
+  'outbound-call': false,
+};
+
+/**
+ * Speaker toolbar: same as base participant toolbar. No hangup/
+ * mute-everyone/security/participants-pane — those are moderator-only.
+ * Kept as a named export for clarity and to make i18n/tests explicit.
+ */
+export const speakerToolbarButtons = baseToolbarButtons;
+
+/**
  * Instant call: participants get full AV (mic, camera, screen share)
  * but NOT recording — only the creator (moderator) can record.
  */

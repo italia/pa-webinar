@@ -13,6 +13,8 @@
 
 import { randomUUID } from 'crypto';
 
+import { EventModeratorRole } from '@prisma/client';
+
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, UnauthorizedError, ValidationError } from '@/lib/errors';
@@ -27,6 +29,7 @@ const UUID_RE =
 const addModeratorSchema = z.object({
   name: z.string().min(2).max(100),
   email: z.string().email().optional(),
+  role: z.nativeEnum(EventModeratorRole).optional(),
 });
 
 async function requirePrimary(eventIdOrSlug: string, token: string) {
@@ -57,6 +60,7 @@ export const GET = withErrorHandling(async (request, context) => {
       id: true,
       name: true,
       email: true,
+      role: true,
       token: true,
       createdAt: true,
       revokedAt: true,
@@ -87,6 +91,7 @@ export const POST = withErrorHandling(async (request, context) => {
       eventId: event.id,
       name: parsed.data.name,
       email: parsed.data.email ?? null,
+      role: parsed.data.role ?? EventModeratorRole.MODERATOR,
       token: randomUUID(),
     },
   });
