@@ -492,6 +492,30 @@
       "noComments": "Nincsenek megjegyzések",
       "stars": "csillag"
     },
+    "coModerators": {
+      "title": "Társmoderátorok és előadók",
+      "intro": "Adj hozzá társmoderátorokat és előadókat egyéni varázslinkkel.",
+      "introHint": "Mindenkinek saját, a teremben látható neve és tokenje van, amely a fő linktől függetlenül visszavonható. Az előadók mikrofont, kamerát és képernyőmegosztást kapnak, de nem moderálhatnak (kidobás, mindenki némítása, felvétel).",
+      "add": "Személy hozzáadása",
+      "name": "A teremben látható név",
+      "email": "E-mail (nem kötelező)",
+      "emailPlaceholder": "a link elküldéséhez",
+      "role": "Szerep",
+      "roleModerator": "Moderátor",
+      "roleSpeaker": "Előadó",
+      "roleModeratorHint": "Teljes moderátori jogok: felvétel, mindenki némítása, résztvevők eltávolítása.",
+      "roleSpeakerHint": "Beszélhet, videót mutathat és képernyőt oszthat meg. Nem moderálhatja a termet.",
+      "copyLink": "Link másolása",
+      "copied": "Másolva!",
+      "revoke": "Visszavonás",
+      "revoked": "Visszavonva",
+      "confirmRevoke": "Visszavonja ennek a személynek a hozzáférését? A link azonnal megszűnik működni.",
+      "empty": "Nincs további hozzáférés. A fő moderátori link az egyetlen privilegizált belépési pont.",
+      "activeCount": "{count, plural, =0 {Nincs aktív hozzáférés} =1 {1 aktív hozzáférés} other {# aktív hozzáférés}}",
+      "errors": {
+        "addFailed": "Nem sikerült menteni. Próbáld újra."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR auditnapló",
       "date": "Dátum",
@@ -509,6 +533,14 @@
       "subtitle": "A platform megjelenésének és viselkedésének konfigurálása közigazgatási újrahasznosításhoz",
       "saving": "Mentés...",
       "saved": "Beállítások sikeresen mentve",
+      "sections": {
+        "languagesTitle": "Nyelvek kezelése",
+        "languagesDescription": "A felhasználók számára elérhető EU-s nyelvek engedélyezése vagy letiltása, az alapértelmezett nyelv kiválasztása és a fordítások testreszabása.",
+        "gdprTemplatesTitle": "GDPR sablonok",
+        "gdprTemplatesDescription": "Hozz létre bármely eseményhez kapcsolható, újrafelhasználható adatvédelmi tájékoztatókat, és válaszd ki az új eseményekhez használt alapértelmezettet.",
+        "emailTemplatesTitle": "E-mail sablonok",
+        "emailTemplatesDescription": "Szabd testre a visszaigazoló és emlékeztető e-mailek tárgyát, címsorát és szövegét. Üres mezők esetén a beépített alapértelmezett szövegek maradnak."
+      },
       "tabs": {
         "branding": "Arculat",
         "header": "Fejléc",
@@ -711,6 +743,45 @@
       "uploadBtn": "Feltöltés",
       "deleteConfirm": "Biztosan törölni szeretné ezt a fájlt?",
       "noFiles": "Nincsenek feltöltött fájlok. Használja a \"Fájl feltöltése\" gombot anyagok hozzáadásához."
+    },
+    "emailTemplates": {
+      "title": "E-mail sablonok",
+      "subtitle": "Szabd testre a tranzakciós e-mailek tárgyát, címsorait és szövegét. Az üresen hagyott mezőkben a beépített alapértelmezett szövegek érvényesek.",
+      "overridden": "Testreszabva",
+      "usingDefault": "Alapértelmezett",
+      "saved": "Sablon mentve.",
+      "resetDone": "Felülírás eltávolítva: az alapértelmezett szöveg kerül használatba.",
+      "revert": "Módosítások elvetése",
+      "resetToDefault": "Visszaállítás alapértelmezettre",
+      "confirmReset": "Eltávolítja a felülírást? A beépített alapértelmezett szöveg kerül használatba.",
+      "placeholdersTitle": "Elérhető helyőrzők",
+      "placeholdersHelp": "Szúrd be ezeket a jelzőket bármely mezőbe — küldéskor az esemény valódi adataira cserélődnek.",
+      "keys": {
+        "confirmation": "Regisztrációs visszaigazolás",
+        "reminder": "Esemény-emlékeztető"
+      },
+      "selectors": {
+        "key": "E-mail típus",
+        "locale": "Nyelv"
+      },
+      "fields": {
+        "subject": "Tárgy",
+        "subjectHint": "Az e-mail tárgya. Támogatja a helyőrzőket.",
+        "heading": "Főcím",
+        "headingHint": "Az e-mail törzsének tetején megjelenő címsor.",
+        "bodyIntro": "Bevezető bekezdés",
+        "bodyIntroHint": "Az esemény részleteit tartalmazó táblázat előtt megjelenő szöveg. Üdvözlő üzenethez vagy extra kontextushoz hasznos.",
+        "ctaLabel": "Gomb felirata",
+        "ctaLabelHint": "A személyes csatlakozási linkre vezető gomb felirata.",
+        "infoNote": "Információs megjegyzés",
+        "infoNoteHint": "Sárga figyelmeztető doboz a gomb alatt. Hagyd üresen az elrejtéséhez.",
+        "footerNote": "Láblécmegjegyzés",
+        "footerNoteHint": "A láblécben, az esetleges szervezeti aláírás alatt megjelenő szöveg."
+      },
+      "errors": {
+        "saveFailed": "A mentés nem sikerült. Ellenőrizd a mezőket és próbáld újra.",
+        "resetFailed": "Nem sikerült eltávolítani a felülírást. Próbáld újra."
+      }
     },
     "languages": {
       "title": "Nyelvkezelés",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Forráskód",
     "buildInfoDev": "fejlesztői build",
     "viewCommit": "Commit megtekintése a GitHubon",
-    "viewRelease": "Kiadás megtekintése a GitHubon"
+    "viewRelease": "Kiadás megtekintése a GitHubon",
+    "buildDatePrefix": "Összeállítva"
   },
   "pages": {
     "privacyTitle": "Adatvédelmi tájékoztató",

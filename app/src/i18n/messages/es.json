@@ -492,6 +492,30 @@
       "noComments": "Sin comentarios",
       "stars": "estrellas"
     },
+    "coModerators": {
+      "title": "Co-moderadores y ponentes",
+      "intro": "Añade co-moderadores y ponentes con magic-links individuales.",
+      "introHint": "Cada persona tiene un nombre visible en la sala y un token revocable de forma independiente al enlace principal. Los ponentes disponen de micrófono, vídeo y compartir pantalla, pero no pueden moderar (expulsar, silenciar a todos, grabar).",
+      "add": "Añadir persona",
+      "name": "Nombre visible en la sala",
+      "email": "Correo electrónico (opcional)",
+      "emailPlaceholder": "para enviarle el enlace",
+      "role": "Rol",
+      "roleModerator": "Moderador",
+      "roleSpeaker": "Ponente",
+      "roleModeratorHint": "Moderación completa: puede grabar, silenciar a todos y expulsar a participantes.",
+      "roleSpeakerHint": "Puede hablar, mostrar vídeo y compartir pantalla. No puede moderar la sala.",
+      "copyLink": "Copiar enlace",
+      "copied": "¡Copiado!",
+      "revoke": "Revocar",
+      "revoked": "Revocado",
+      "confirmRevoke": "¿Revocar el acceso de esta persona? El enlace dejará de funcionar de inmediato.",
+      "empty": "No se ha concedido acceso adicional. El enlace principal del moderador es la única entrada privilegiada.",
+      "activeCount": "{count, plural, =0 {Sin accesos activos} =1 {1 acceso activo} other {# accesos activos}}",
+      "errors": {
+        "addFailed": "No se ha podido guardar. Inténtalo de nuevo."
+      }
+    },
     "gdprAuditLog": {
       "title": "Registro GDPR",
       "date": "Fecha",
@@ -509,6 +533,14 @@
       "subtitle": "Configure la apariencia y el comportamiento de la plataforma para la reutilización PA",
       "saving": "Guardando...",
       "saved": "Configuración guardada con éxito",
+      "sections": {
+        "languagesTitle": "Gestión de idiomas",
+        "languagesDescription": "Activa o desactiva los idiomas de la UE mostrados en la interfaz, elige el idioma predeterminado y personaliza las traducciones.",
+        "gdprTemplatesTitle": "Plantillas RGPD",
+        "gdprTemplatesDescription": "Crea avisos de privacidad reutilizables entre eventos y elige la plantilla predeterminada para los nuevos eventos.",
+        "emailTemplatesTitle": "Plantillas de correo",
+        "emailTemplatesDescription": "Personaliza el asunto, los títulos y los textos de los correos de confirmación y recordatorio. Si se dejan vacíos, se usan los textos predeterminados."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Encabezado",
@@ -711,6 +743,45 @@
       "uploadBtn": "Subir",
       "deleteConfirm": "¿Está seguro de que desea eliminar este archivo?",
       "noFiles": "No hay archivos subidos. Utilice el botón «Subir archivo» para añadir materiales."
+    },
+    "emailTemplates": {
+      "title": "Plantillas de correo",
+      "subtitle": "Personaliza el asunto, los títulos y los textos de los correos transaccionales. Los campos vacíos usan los textos predeterminados integrados.",
+      "overridden": "Personalizado",
+      "usingDefault": "Predeterminado",
+      "saved": "Plantilla guardada con éxito.",
+      "resetDone": "Personalización eliminada: se usará el texto predeterminado.",
+      "revert": "Descartar cambios",
+      "resetToDefault": "Restablecer predeterminado",
+      "confirmReset": "¿Eliminar la personalización? Se usará el texto predeterminado integrado.",
+      "placeholdersTitle": "Marcadores disponibles",
+      "placeholdersHelp": "Inserta estos marcadores en los campos: se sustituirán al enviar por los datos reales del evento.",
+      "keys": {
+        "confirmation": "Confirmación de registro",
+        "reminder": "Recordatorio de evento"
+      },
+      "selectors": {
+        "key": "Tipo de correo",
+        "locale": "Idioma"
+      },
+      "fields": {
+        "subject": "Asunto",
+        "subjectHint": "Asunto del correo. Admite marcadores.",
+        "heading": "Título principal",
+        "headingHint": "Título mostrado en la parte superior del cuerpo del correo.",
+        "bodyIntro": "Párrafo introductorio",
+        "bodyIntroHint": "Texto antes de la tabla con los detalles del evento. Útil para un mensaje de bienvenida o contexto adicional.",
+        "ctaLabel": "Etiqueta del botón",
+        "ctaLabelHint": "Texto del botón que lleva al enlace personal de acceso.",
+        "infoNote": "Nota informativa",
+        "infoNoteHint": "Cuadro de aviso amarillo debajo del botón. Déjalo vacío para ocultarlo.",
+        "footerNote": "Nota al pie",
+        "footerNoteHint": "Texto mostrado en el pie debajo de la eventual firma de la organización."
+      },
+      "errors": {
+        "saveFailed": "Error al guardar. Revisa los datos e inténtalo de nuevo.",
+        "resetFailed": "No se ha podido eliminar la personalización. Inténtalo de nuevo."
+      }
     },
     "languages": {
       "title": "Gestión de idiomas",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Código fuente",
     "buildInfoDev": "compilación de desarrollo",
     "viewCommit": "Ver el commit en GitHub",
-    "viewRelease": "Ver la versión en GitHub"
+    "viewRelease": "Ver la versión en GitHub",
+    "buildDatePrefix": "Compilado el"
   },
   "pages": {
     "privacyTitle": "Política de privacidad",

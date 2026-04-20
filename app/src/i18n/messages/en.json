@@ -1963,7 +1963,8 @@
     "sourceCode": "Source code",
     "buildInfoDev": "development build",
     "viewCommit": "View commit on GitHub",
-    "viewRelease": "View release on GitHub"
+    "viewRelease": "View release on GitHub",
+    "buildDatePrefix": "Built on"
   },
   "pages": {
     "privacyTitle": "Privacy policy",

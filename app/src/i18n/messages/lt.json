@@ -492,6 +492,30 @@
       "noComments": "Komentarų nėra",
       "stars": "žvaigždutės"
     },
+    "coModerators": {
+      "title": "Antriniai moderatoriai ir pranešėjai",
+      "intro": "Pridėkite antrinius moderatorius ir pranešėjus su individualiomis magiškomis nuorodomis.",
+      "introHint": "Kiekvienas asmuo salėje turi matomą vardą ir savo žetoną, kurį galima atšaukti nepriklausomai nuo pagrindinės nuorodos. Pranešėjai gali naudoti mikrofoną, kamerą ir bendrinti ekraną, bet negali moderuoti (pašalinti, nutildyti visus, įrašyti).",
+      "add": "Pridėti asmenį",
+      "name": "Salėje matomas vardas",
+      "email": "El. paštas (neprivaloma)",
+      "emailPlaceholder": "norint išsiųsti nuorodą",
+      "role": "Vaidmuo",
+      "roleModerator": "Moderatorius",
+      "roleSpeaker": "Pranešėjas",
+      "roleModeratorHint": "Visiškas moderavimas: gali įrašyti, nutildyti visus, pašalinti dalyvius.",
+      "roleSpeakerHint": "Gali kalbėti, rodyti vaizdą ir bendrinti ekraną. Negali moderuoti salės.",
+      "copyLink": "Kopijuoti nuorodą",
+      "copied": "Nukopijuota!",
+      "revoke": "Atšaukti",
+      "revoked": "Atšaukta",
+      "confirmRevoke": "Atšaukti šio asmens prieigą? Nuoroda nustos veikti nedelsiant.",
+      "empty": "Papildomų prieigų nesuteikta. Pagrindinė moderatoriaus nuoroda lieka vienintelis privilegijuotas įėjimas.",
+      "activeCount": "{count, plural, =0 {Nėra aktyvių prieigų} =1 {1 aktyvi prieiga} other {# aktyvių prieigų}}",
+      "errors": {
+        "addFailed": "Nepavyko išsaugoti. Bandykite dar kartą."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR audito žurnalas",
       "date": "Data",
@@ -509,6 +533,14 @@
       "subtitle": "Konfigūruokite platformos išvaizdą ir elgseną pakartotiniam VA naudojimui",
       "saving": "Saugoma...",
       "saved": "Nustatymai sėkmingai išsaugoti",
+      "sections": {
+        "languagesTitle": "Kalbų valdymas",
+        "languagesDescription": "Įjunkite arba išjunkite ES kalbas, matomas sąsajoje, pasirinkite numatytąją kalbą ir tinkinkite vertimus.",
+        "gdprTemplatesTitle": "GDPR šablonai",
+        "gdprTemplatesDescription": "Kurkite daugkartinio naudojimo privatumo pranešimus, kuriuos galima susieti su bet kuriuo renginiu, ir pasirinkite numatytąjį naujiems renginiams.",
+        "emailTemplatesTitle": "El. laiškų šablonai",
+        "emailTemplatesDescription": "Tinkinkite patvirtinimo ir priminimo laiškų temą, antraštes ir tekstą. Palikite tuščią, kad būtų naudojami įtaisyti numatytieji tekstai."
+      },
       "tabs": {
         "branding": "Prekės ženklas",
         "header": "Antraštė",
@@ -711,6 +743,45 @@
       "uploadBtn": "Įkelti",
       "deleteConfirm": "Ar tikrai norite ištrinti šį failą?",
       "noFiles": "Failų neįkelta. Naudokite mygtuką \"Įkelti failą\", kad pridėtumėte medžiagos."
+    },
+    "emailTemplates": {
+      "title": "El. laiškų šablonai",
+      "subtitle": "Tinkinkite operacinių el. laiškų temą, antraštes ir tekstą. Palikus tuščius laukus naudojami įtaisyti numatytieji tekstai.",
+      "overridden": "Tinkinta",
+      "usingDefault": "Naudojamas numatytasis",
+      "saved": "Šablonas sėkmingai išsaugotas.",
+      "resetDone": "Tinkinimas pašalintas: bus naudojamas numatytasis tekstas.",
+      "revert": "Atsisakyti pakeitimų",
+      "resetToDefault": "Atstatyti numatytąjį",
+      "confirmReset": "Pašalinti tinkinimą? Bus naudojamas įtaisytas numatytasis tekstas.",
+      "placeholdersTitle": "Galimi rezervuoti žymekliai",
+      "placeholdersHelp": "Įterpkite šiuos žymeklius į bet kurį lauką — siuntimo metu jie bus pakeisti tikrais renginio duomenimis.",
+      "keys": {
+        "confirmation": "Registracijos patvirtinimas",
+        "reminder": "Renginio priminimas"
+      },
+      "selectors": {
+        "key": "Laiško tipas",
+        "locale": "Kalba"
+      },
+      "fields": {
+        "subject": "Tema",
+        "subjectHint": "Laiško tema. Palaiko žymeklius.",
+        "heading": "Pagrindinė antraštė",
+        "headingHint": "Antraštė, rodoma laiško teksto viršuje.",
+        "bodyIntro": "Įvadinė pastraipa",
+        "bodyIntroHint": "Tekstas prieš renginio informacijos lentelę. Tinka pasveikinimo žinutei ar papildomam kontekstui.",
+        "ctaLabel": "Mygtuko etiketė",
+        "ctaLabelHint": "Pagrindinio mygtuko tekstas, vedantis į asmeninį prisijungimo saitą.",
+        "infoNote": "Informacinė pastaba",
+        "infoNoteHint": "Geltonas įspėjimo langelis po mygtuku. Palikite tuščią, kad jis nebūtų rodomas.",
+        "footerNote": "Poraštės pastaba",
+        "footerNoteHint": "Tekstas, rodomas poraštėje po organizacijos parašo."
+      },
+      "errors": {
+        "saveFailed": "Nepavyko išsaugoti. Patikrinkite laukus ir bandykite dar kartą.",
+        "resetFailed": "Nepavyko pašalinti tinkinimo. Bandykite dar kartą."
+      }
     },
     "languages": {
       "title": "Kalbų valdymas",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Šaltinio kodas",
     "buildInfoDev": "kūrimo versija",
     "viewCommit": "Peržiūrėti commit'ą „GitHub“",
-    "viewRelease": "Peržiūrėti leidimą „GitHub“"
+    "viewRelease": "Peržiūrėti leidimą „GitHub“",
+    "buildDatePrefix": "Sukurta"
   },
   "pages": {
     "privacyTitle": "Privatumo politika",

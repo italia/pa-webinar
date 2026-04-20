@@ -492,6 +492,30 @@
       "noComments": "Žádné komentáře",
       "stars": "hvězd"
     },
+    "coModerators": {
+      "title": "Spolumoderátoři a řečníci",
+      "intro": "Přidejte spolumoderátory a řečníky s individuálními magickými odkazy.",
+      "introHint": "Každá osoba má vlastní jméno viditelné v místnosti a token, který lze zrušit nezávisle na hlavním odkazu. Řečníci mají mikrofon, kameru a sdílení obrazovky, ale nemohou moderovat (vyhodit, ztlumit všechny, nahrávat).",
+      "add": "Přidat osobu",
+      "name": "Jméno viditelné v místnosti",
+      "email": "E-mail (volitelný)",
+      "emailPlaceholder": "pro zaslání odkazu",
+      "role": "Role",
+      "roleModerator": "Moderátor",
+      "roleSpeaker": "Řečník",
+      "roleModeratorHint": "Plná moderace: může nahrávat, ztlumit všechny, odstraňovat účastníky.",
+      "roleSpeakerHint": "Může mluvit, zapnout video a sdílet obrazovku. Nemůže moderovat místnost.",
+      "copyLink": "Kopírovat odkaz",
+      "copied": "Zkopírováno!",
+      "revoke": "Zrušit",
+      "revoked": "Zrušeno",
+      "confirmRevoke": "Zrušit přístup této osobě? Odkaz okamžitě přestane fungovat.",
+      "empty": "Žádný další přístup nebyl udělen. Hlavní odkaz moderátora je jediným privilegovaným vstupem.",
+      "activeCount": "{count, plural, =0 {Žádné aktivní přístupy} =1 {1 aktivní přístup} other {# aktivních přístupů}}",
+      "errors": {
+        "addFailed": "Nelze uložit. Zkuste to prosím znovu."
+      }
+    },
     "gdprAuditLog": {
       "title": "Auditní protokol GDPR",
       "date": "Datum",
@@ -509,6 +533,14 @@
       "subtitle": "Konfigurujte vzhled a chování platformy pro opakované použití ve veřejné správě",
       "saving": "Ukládání...",
       "saved": "Nastavení úspěšně uloženo",
+      "sections": {
+        "languagesTitle": "Správa jazyků",
+        "languagesDescription": "Povolte nebo zakažte jazyky EU zobrazené v rozhraní, zvolte výchozí jazyk a upravte překlady.",
+        "gdprTemplatesTitle": "Šablony GDPR",
+        "gdprTemplatesDescription": "Vytvářejte opakovaně použitelná zásady ochrany osobních údajů sdílené mezi událostmi a zvolte výchozí šablonu pro nové události.",
+        "emailTemplatesTitle": "E-mailové šablony",
+        "emailTemplatesDescription": "Upravte předmět, nadpisy a texty potvrzovacích a upomínkových e-mailů. Pokud jsou prázdné, použijí se výchozí texty."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Záhlaví",
@@ -711,6 +743,45 @@
       "uploadBtn": "Nahrát",
       "deleteConfirm": "Opravdu chcete smazat tento soubor?",
       "noFiles": "Žádné nahrané soubory. Použijte tlačítko \"Nahrát soubor\" pro přidání materiálů."
+    },
+    "emailTemplates": {
+      "title": "E-mailové šablony",
+      "subtitle": "Upravte předmět, nadpisy a texty transakčních e-mailů. Prázdná pole používají vestavěné výchozí texty.",
+      "overridden": "Přizpůsobeno",
+      "usingDefault": "Výchozí",
+      "saved": "Šablona byla úspěšně uložena.",
+      "resetDone": "Přizpůsobení odstraněno: použije se výchozí text.",
+      "revert": "Zrušit změny",
+      "resetToDefault": "Obnovit výchozí",
+      "confirmReset": "Odstranit přizpůsobení? Použije se vestavěný výchozí text.",
+      "placeholdersTitle": "Dostupné zástupné znaky",
+      "placeholdersHelp": "Vložte tyto zástupné znaky do polí: při odeslání budou nahrazeny skutečnými údaji události.",
+      "keys": {
+        "confirmation": "Potvrzení registrace",
+        "reminder": "Upomínka události"
+      },
+      "selectors": {
+        "key": "Typ e-mailu",
+        "locale": "Jazyk"
+      },
+      "fields": {
+        "subject": "Předmět",
+        "subjectHint": "Předmět e-mailu. Podporuje zástupné znaky.",
+        "heading": "Hlavní nadpis",
+        "headingHint": "Nadpis zobrazený v horní části těla e-mailu.",
+        "bodyIntro": "Úvodní odstavec",
+        "bodyIntroHint": "Text před tabulkou s podrobnostmi události. Užitečný pro uvítací zprávu nebo další kontext.",
+        "ctaLabel": "Popisek tlačítka",
+        "ctaLabelHint": "Text tlačítka vedoucího k osobnímu odkazu pro připojení.",
+        "infoNote": "Informační poznámka",
+        "infoNoteHint": "Žluté varovné pole pod tlačítkem. Ponechte prázdné pro skrytí.",
+        "footerNote": "Poznámka v patičce",
+        "footerNoteHint": "Text zobrazený v patičce pod případným podpisem organizace."
+      },
+      "errors": {
+        "saveFailed": "Uložení se nezdařilo. Zkontrolujte údaje a zkuste to znovu.",
+        "resetFailed": "Přizpůsobení nelze odstranit. Zkuste to prosím znovu."
+      }
     },
     "languages": {
       "title": "Správa jazyků",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Zdrojový kód",
     "buildInfoDev": "vývojový build",
     "viewCommit": "Zobrazit commit na GitHubu",
-    "viewRelease": "Zobrazit vydání na GitHubu"
+    "viewRelease": "Zobrazit vydání na GitHubu",
+    "buildDatePrefix": "Sestaveno"
   },
   "pages": {
     "privacyTitle": "Zásady ochrany osobních údajů",

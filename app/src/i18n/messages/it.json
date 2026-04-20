@@ -1963,7 +1963,8 @@
     "sourceCode": "Codice sorgente",
     "buildInfoDev": "build di sviluppo",
     "viewCommit": "Vedi il commit su GitHub",
-    "viewRelease": "Vedi la release su GitHub"
+    "viewRelease": "Vedi la release su GitHub",
+    "buildDatePrefix": "Compilato il"
   },
   "pages": {
     "privacyTitle": "Informativa sulla privacy",

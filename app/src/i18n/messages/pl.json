@@ -492,6 +492,30 @@
       "noComments": "Brak komentarzy",
       "stars": "gwiazdek"
     },
+    "coModerators": {
+      "title": "Współmoderatorzy i prelegenci",
+      "intro": "Dodaj współmoderatorów i prelegentów za pomocą indywidualnych magic linków.",
+      "introHint": "Każda osoba ma nazwę widoczną w pokoju oraz token, który można cofnąć niezależnie od głównego linku. Prelegenci mają mikrofon, kamerę i udostępnianie ekranu, ale nie mogą moderować (usuwać, wyciszać wszystkich, nagrywać).",
+      "add": "Dodaj osobę",
+      "name": "Nazwa widoczna w pokoju",
+      "email": "E-mail (opcjonalny)",
+      "emailPlaceholder": "aby wysłać link",
+      "role": "Rola",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Prelegent",
+      "roleModeratorHint": "Pełna moderacja: może nagrywać, wyciszać wszystkich, usuwać uczestników.",
+      "roleSpeakerHint": "Może mówić, pokazywać obraz i udostępniać ekran. Nie może moderować pokoju.",
+      "copyLink": "Kopiuj link",
+      "copied": "Skopiowano!",
+      "revoke": "Cofnij",
+      "revoked": "Cofnięty",
+      "confirmRevoke": "Cofnąć dostęp tej osobie? Link natychmiast przestanie działać.",
+      "empty": "Brak dodatkowych dostępów. Główny link moderatora pozostaje jedynym uprzywilejowanym wejściem.",
+      "activeCount": "{count, plural, =0 {Brak aktywnych dostępów} =1 {1 aktywny dostęp} other {# aktywnych dostępów}}",
+      "errors": {
+        "addFailed": "Nie udało się zapisać. Spróbuj ponownie."
+      }
+    },
     "gdprAuditLog": {
       "title": "Rejestr GDPR",
       "date": "Data",
@@ -509,6 +533,14 @@
       "subtitle": "Konfiguracja wyglądu i zachowania platformy do ponownego wykorzystania przez administrację publiczną",
       "saving": "Zapisywanie...",
       "saved": "Ustawienia zapisane pomyślnie",
+      "sections": {
+        "languagesTitle": "Zarządzanie językami",
+        "languagesDescription": "Włącz lub wyłącz języki UE widoczne w interfejsie, wybierz język domyślny i dostosuj tłumaczenia.",
+        "gdprTemplatesTitle": "Szablony GDPR",
+        "gdprTemplatesDescription": "Twórz wielokrotnego użytku klauzule prywatności, które można powiązać z dowolnym wydarzeniem, i wybierz domyślny szablon dla nowych wydarzeń.",
+        "emailTemplatesTitle": "Szablony e-maili",
+        "emailTemplatesDescription": "Dostosuj temat, nagłówki i treść e-maili z potwierdzeniem i przypomnieniem. Pozostaw puste, aby użyć wbudowanych tekstów domyślnych."
+      },
       "tabs": {
         "branding": "Identyfikacja wizualna",
         "header": "Nagłówek",
@@ -711,6 +743,45 @@
       "uploadBtn": "Prześlij",
       "deleteConfirm": "Czy na pewno chcesz usunąć ten plik?",
       "noFiles": "Brak przesłanych plików. Użyj przycisku \"Prześlij plik\", aby dodać materiały."
+    },
+    "emailTemplates": {
+      "title": "Szablony e-maili",
+      "subtitle": "Dostosuj temat, nagłówki i treść e-maili transakcyjnych. Puste pola używają wbudowanych tekstów domyślnych.",
+      "overridden": "Dostosowane",
+      "usingDefault": "Używany domyślny",
+      "saved": "Szablon zapisany pomyślnie.",
+      "resetDone": "Dostosowanie usunięte: zostanie użyty tekst domyślny.",
+      "revert": "Odrzuć zmiany",
+      "resetToDefault": "Przywróć domyślny",
+      "confirmReset": "Usunąć dostosowanie? Zostanie użyty wbudowany tekst domyślny.",
+      "placeholdersTitle": "Dostępne placeholdery",
+      "placeholdersHelp": "Wstaw te tokeny w dowolnym polu — przy wysyłce zostaną zastąpione rzeczywistymi danymi wydarzenia.",
+      "keys": {
+        "confirmation": "Potwierdzenie rejestracji",
+        "reminder": "Przypomnienie o wydarzeniu"
+      },
+      "selectors": {
+        "key": "Typ e-maila",
+        "locale": "Język"
+      },
+      "fields": {
+        "subject": "Temat",
+        "subjectHint": "Temat wiadomości. Obsługuje placeholdery.",
+        "heading": "Nagłówek główny",
+        "headingHint": "Nagłówek wyświetlany na górze treści e-maila.",
+        "bodyIntro": "Akapit wprowadzający",
+        "bodyIntroHint": "Tekst przed tabelą z danymi wydarzenia. Przydatny do powitania lub dodatkowego kontekstu.",
+        "ctaLabel": "Etykieta przycisku",
+        "ctaLabelHint": "Etykieta głównego przycisku prowadzącego do osobistego linku dołączenia.",
+        "infoNote": "Informacja",
+        "infoNoteHint": "Żółte ostrzeżenie pod przyciskiem. Pozostaw puste, aby je ukryć.",
+        "footerNote": "Notka w stopce",
+        "footerNoteHint": "Tekst wyświetlany w stopce pod ewentualnym podpisem organizacji."
+      },
+      "errors": {
+        "saveFailed": "Zapis nie powiódł się. Sprawdź pola i spróbuj ponownie.",
+        "resetFailed": "Nie udało się usunąć dostosowania. Spróbuj ponownie."
+      }
     },
     "languages": {
       "title": "Zarządzanie językami",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Kod źródłowy",
     "buildInfoDev": "kompilacja deweloperska",
     "viewCommit": "Zobacz commit na GitHubie",
-    "viewRelease": "Zobacz wydanie na GitHubie"
+    "viewRelease": "Zobacz wydanie na GitHubie",
+    "buildDatePrefix": "Zbudowano"
   },
   "pages": {
     "privacyTitle": "Polityka prywatności",
