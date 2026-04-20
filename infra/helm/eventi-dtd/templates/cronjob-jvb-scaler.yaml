@@ -68,6 +68,11 @@ spec:
 
                   CURRENT=$(kubectl get deployment "$JVB_DEPLOY" -n {{ .Release.Namespace }} \
                     -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
+                  READY=$(kubectl get deployment "$JVB_DEPLOY" -n {{ .Release.Namespace }} \
+                    -o jsonpath='{.status.readyReplicas}' 2>/dev/null || echo "0")
+                  # readyReplicas is omitted (empty string) when 0; normalise.
+                  READY=${READY:-0}
+                  log "Deployment state: spec=$CURRENT ready=$READY"
 
                   # ── Phase 2: Reactive — query JVB colibri stats ───
                   STRESS=""
@@ -97,10 +102,14 @@ spec:
                   fi
 
                   # ── Phase 1: Predictive — query the app API ───────
+                  # Forward spec/ready replica counts so the API can persist
+                  # an authoritative snapshot to Redis. The public /api/status
+                  # reads that snapshot instead of guessing `running` from a
+                  # single /colibri/stats hit (which only tells us 1 pod is up).
                   APP_URL="{{ include "eventi-dtd.internalUrl" . }}"
                   RESPONSE=$(curl -sf \
                     -H "x-api-key: $CRON_API_KEY" \
-                    "${APP_URL}/api/internal/jvb-desired-replicas?_=1${STRESS_PARAM}" 2>/dev/null)
+                    "${APP_URL}/api/internal/jvb-desired-replicas?current=${CURRENT}&ready=${READY}${STRESS_PARAM}" 2>/dev/null)
 
                   if [ -z "$RESPONSE" ]; then
                     log "ERROR: Empty response from API — keeping current replicas ($CURRENT)"

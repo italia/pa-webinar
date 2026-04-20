@@ -755,6 +755,27 @@
       "expectedSenderRatio": "Ratio sender atteso",
       "expectedSenderRatioInherit": "Default sito",
       "expectedSenderRatioHint": "Percentuale di partecipanti che avranno mic o webcam attivi. Webinar classico 10-20%, tavola rotonda 50-100%. Lascia vuoto per ereditare il default del sito.",
+      "jvbPreview": {
+        "title": "Stima capacità JVB",
+        "pod": "pod JVB",
+        "pods": "pod JVB",
+        "senders": "Sender",
+        "receivers": "Receiver",
+        "effectiveRatio": "Ratio effettivo",
+        "inherited": "ereditato",
+        "presetLabel": "Preset",
+        "preset": {
+          "webinar": "Webinar",
+          "meeting": "Meeting",
+          "workshop": "Workshop",
+          "allHands": "Tutti sender"
+        },
+        "clearPreset": "Usa default sito",
+        "atCeiling": "limite max {max}",
+        "videoDisabled": "Video disabilitato: tutti i partecipanti contano come receiver.",
+        "warnInherited": "Con {participants} partecipanti e ratio ereditato ({defaultPct}%), la stima si basa sul default di sito. Per eventi grandi conviene impostare un valore esplicito (webinar 5-20%, meeting 30%, workshop 60%).",
+        "warnCeiling": "Stima al limite massimo configurato ({max} pod). Se i partecipanti reali o i sender superano la stima, potrebbero saturarsi i bridge. Valuta di aumentare il limite o ridurre maxParticipants."
+      },
       "gracePeriod": "Fine evento (soft exit)",
       "gracePeriodInherit": "Usa default sito",
       "gracePeriodHardStop": "Chiusura immediata a endsAt (0 min)",

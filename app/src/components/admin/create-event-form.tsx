@@ -24,7 +24,9 @@ import { MarkdownEditor } from '@/components/ui/markdown';
 import { useRouter } from '@/i18n/navigation';
 import { createEventSchema } from '@/lib/validation/schemas';
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
+import JvbCapacityPreview from '@/components/admin/jvb-capacity-preview';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 
 interface FieldErrors {
   [key: string]: string | undefined;
@@ -47,6 +49,8 @@ interface CreateEventFormProps {
   siteTimezone: string;
   enabledLocales?: string[];
   defaultLocale?: string;
+  defaultSenderRatioPct: number;
+  jvbSizingConfig: JvbSizingConfig;
 }
 
 function CollapsibleSection({
@@ -121,6 +125,8 @@ export default function CreateEventForm({
   siteTimezone,
   enabledLocales = ['it', 'en'],
   defaultLocale: defaultLoc = 'it',
+  defaultSenderRatioPct,
+  jvbSizingConfig,
 }: CreateEventFormProps) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
@@ -470,6 +476,20 @@ export default function CreateEventForm({
                 {t('form.expectedSenderRatioHint')}
               </small>
             </FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            <JvbCapacityPreview
+              maxParticipants={form.maxParticipants}
+              senderRatioPct={form.expectedSenderRatioPct}
+              onSenderRatioChange={(next) =>
+                setField('expectedSenderRatioPct', next)
+              }
+              videoEnabled={form.participantsCanStartVideo}
+              defaultSenderRatioPct={defaultSenderRatioPct}
+              sizingConfig={jvbSizingConfig}
+            />
           </Col>
         </Row>
         <Row>

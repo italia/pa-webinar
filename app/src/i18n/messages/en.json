@@ -685,6 +685,27 @@
       "expectedSenderRatio": "Expected sender ratio",
       "expectedSenderRatioInherit": "Site default",
       "expectedSenderRatioHint": "Percentage of attendees with mic or webcam on. Classic webinar 10-20%, panel 50-100%. Leave empty to inherit the site default.",
+      "jvbPreview": {
+        "title": "Estimated JVB capacity",
+        "pod": "JVB pod",
+        "pods": "JVB pods",
+        "senders": "Senders",
+        "receivers": "Receivers",
+        "effectiveRatio": "Effective ratio",
+        "inherited": "inherited",
+        "presetLabel": "Preset",
+        "preset": {
+          "webinar": "Webinar",
+          "meeting": "Meeting",
+          "workshop": "Workshop",
+          "allHands": "All senders"
+        },
+        "clearPreset": "Use site default",
+        "atCeiling": "max {max} cap",
+        "videoDisabled": "Video disabled: all attendees count as receivers.",
+        "warnInherited": "With {participants} attendees and the inherited ratio ({defaultPct}%), the estimate relies on the site default. Large events should set an explicit value (webinar 5-20%, meeting 30%, workshop 60%).",
+        "warnCeiling": "Estimate at the configured max ({max} pods). If real attendance or senders exceed the estimate, bridges may saturate. Consider raising the cap or lowering maxParticipants."
+      },
       "gracePeriod": "Event end (soft exit)",
       "gracePeriodInherit": "Use site default",
       "gracePeriodHardStop": "Hard close at endsAt (0 min)",
