@@ -18,9 +18,11 @@ import {
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import LocaleTabBar from '@/components/ui/locale-tab-bar';
 import { MarkdownEditor } from '@/components/ui/markdown';
+import JvbCapacityPreview from '@/components/admin/jvb-capacity-preview';
 import { useRouter } from '@/i18n/navigation';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 
 interface FieldErrors {
   [key: string]: string | undefined;
@@ -58,6 +60,8 @@ interface EditEventFormProps {
   eventTimezone: string;
   enabledLocales?: string[];
   defaultLocale?: string;
+  defaultSenderRatioPct: number;
+  jvbSizingConfig: JvbSizingConfig;
 }
 
 const CARD_STYLE = {
@@ -70,6 +74,8 @@ export default function EditEventForm({
   eventTimezone,
   enabledLocales = ['it', 'en'],
   defaultLocale: defaultLoc = 'it',
+  defaultSenderRatioPct,
+  jvbSizingConfig,
 }: EditEventFormProps) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
@@ -372,6 +378,20 @@ export default function EditEventForm({
                 </div>
                 <small className="text-muted">{t('form.expectedSenderRatioHint')}</small>
               </FormGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              <JvbCapacityPreview
+                maxParticipants={form.maxParticipants}
+                senderRatioPct={form.expectedSenderRatioPct}
+                onSenderRatioChange={(next) =>
+                  setField('expectedSenderRatioPct', next)
+                }
+                videoEnabled={form.participantsCanStartVideo}
+                defaultSenderRatioPct={defaultSenderRatioPct}
+                sizingConfig={jvbSizingConfig}
+              />
             </Col>
           </Row>
           <Row>

@@ -7,6 +7,7 @@ import { useRouter } from '@/i18n/navigation';
 import TemplatePicker from '@/components/admin/template-picker';
 import CreateEventForm from '@/components/admin/create-event-form';
 import CreateInstantCall from '@/components/admin/create-instant-call';
+import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 
 interface TemplateSummary {
   id: string;
@@ -38,12 +39,16 @@ interface Props {
   templates: TemplateSummary[];
   selectedTemplate: TemplatePreset | null;
   siteTimezone: string;
+  defaultSenderRatioPct: number;
+  jvbSizingConfig: JvbSizingConfig;
 }
 
 export default function CreateEventWithTemplate({
   templates,
   selectedTemplate,
   siteTimezone,
+  defaultSenderRatioPct,
+  jvbSizingConfig,
 }: Props) {
   const t = useTranslations('admin.templates');
   const ti = useTranslations('admin.instantCall');
@@ -131,5 +136,12 @@ export default function CreateEventWithTemplate({
     );
   }
 
-  return <CreateEventForm template={selectedTemplate ?? undefined} siteTimezone={siteTimezone} />;
+  return (
+    <CreateEventForm
+      template={selectedTemplate ?? undefined}
+      siteTimezone={siteTimezone}
+      defaultSenderRatioPct={defaultSenderRatioPct}
+      jvbSizingConfig={jvbSizingConfig}
+    />
+  );
 }

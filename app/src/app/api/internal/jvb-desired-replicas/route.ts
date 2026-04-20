@@ -34,7 +34,9 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import { shouldEndLiveEvent } from '@/lib/events/lifecycle';
+import { JVB_SNAPSHOT_KEY, JVB_SNAPSHOT_TTL_SECONDS } from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
+import { getRedis } from '@/lib/redis';
 import { getSettings } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
@@ -99,9 +101,19 @@ export const GET = withErrorHandling(async (request) => {
 
   // Phase 2 — stress from query string is a legacy caller signal; keep
   // it as a hint but prefer our own polling.
-  const stressParam = new URL(request.url).searchParams.get('stress_level');
+  const searchParams = new URL(request.url).searchParams;
+  const stressParam = searchParams.get('stress_level');
   const stressFromCaller = stressParam ? parseFloat(stressParam) : null;
   const effectiveStress = jvb.reachable ? jvb.stressLevel : stressFromCaller ?? 0;
+
+  // The scaler (CronJob) has K8s RBAC to read the deployment; it forwards
+  // `current` (spec.replicas) and `ready` (status.readyReplicas) so we can
+  // persist an authoritative snapshot for the public status page. Parse
+  // defensively: if the caller is an older scaler image, fall back to null.
+  const currentParam = searchParams.get('current');
+  const readyParam = searchParams.get('ready');
+  const currentReplicas = currentParam !== null ? parseInt(currentParam, 10) : null;
+  const readyReplicas = readyParam !== null ? parseInt(readyParam, 10) : null;
 
   // ── Lifecycle transitions (applied as an atomic batch) ───────────
   // Order matters: first refresh LIVE activity, then demote stale LIVE→IDLE,
@@ -127,23 +139,36 @@ export const GET = withErrorHandling(async (request) => {
     // 2) LIVE → IDLE when the conference has been empty for ≥ grace.
     //    Use lastActiveAt when set, else fall back to provisioningStartedAt
     //    (for events that went LIVE but never had anyone join).
-    const idleCandidates = await tx.event.findMany({
-      where: {
-        status: 'LIVE',
-        endsAt: { gt: now },
-        OR: [
-          { lastActiveAt: { lt: inactiveCutoff } },
-          { AND: [{ lastActiveAt: null }, { provisioningStartedAt: { lt: inactiveCutoff } }] },
-        ],
-      },
-      select: { id: true },
-    });
-    if (idleCandidates.length > 0) {
-      const r = await tx.event.updateMany({
-        where: { id: { in: idleCandidates.map((e) => e.id) } },
-        data: { status: 'IDLE' },
+    //
+    //    Safety guard: /colibri/stats is served by whichever JVB pod the
+    //    Service VIP routes to on this tick. With multiple replicas (a
+    //    second event scales the deployment out) the probe might land on
+    //    a freshly-spun-up empty pod while the real traffic lives on a
+    //    sibling — making `participants=0` meaningless for LIVE-ness.
+    //    When currentReplicas > 1 we therefore skip the entire demotion
+    //    step for this tick; operator-visible staleness still surfaces
+    //    via the provisioning-timeout path, and real idleness is caught
+    //    once the deployment scales back down to 1.
+    const skipIdleDemotion = (currentReplicas ?? 1) > 1;
+    if (!skipIdleDemotion) {
+      const idleCandidates = await tx.event.findMany({
+        where: {
+          status: 'LIVE',
+          endsAt: { gt: now },
+          OR: [
+            { lastActiveAt: { lt: inactiveCutoff } },
+            { AND: [{ lastActiveAt: null }, { provisioningStartedAt: { lt: inactiveCutoff } }] },
+          ],
+        },
+        select: { id: true },
       });
-      counts.liveToIdle = r.count;
+      if (idleCandidates.length > 0) {
+        const r = await tx.event.updateMany({
+          where: { id: { in: idleCandidates.map((e) => e.id) } },
+          data: { status: 'IDLE' },
+        });
+        counts.liveToIdle = r.count;
+      }
     }
 
     // 3) Past endsAt:
@@ -280,6 +305,53 @@ export const GET = withErrorHandling(async (request) => {
   const needsRecording = billableEvents.some((e) => e.recordingEnabled);
   const jibriDesired = needsRecording ? 1 : 0;
 
+  // Forensic log line: one structured summary per tick so we can
+  // reconstruct which events moved between states and why (replica
+  // churn during overlapping live events has been a source of
+  // hard-to-reproduce bugs).
+  const hasTransitions =
+    transitions.liveRefreshed > 0 ||
+    transitions.liveToIdle > 0 ||
+    transitions.toEnded > 0 ||
+    transitions.publishedToProvisioning > 0 ||
+    transitions.provisioningToLive > 0;
+  if (hasTransitions || billableEvents.length > 0) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `[jvb-scaler] tick ${now.toISOString()} ` +
+        `current=${currentReplicas ?? '?'} ready=${readyReplicas ?? '?'} ` +
+        `desired=${desired} billable=${billableEvents.length} ` +
+        `stress=${effectiveStress.toFixed(2)} jvbReachable=${jvb.reachable} ` +
+        `jvbParticipants=${jvb.participants} ` +
+        `transitions=${JSON.stringify(transitions)}`,
+    );
+  }
+
+  // Persist snapshot for /api/status. Only write when the caller provided
+  // the replica counts — otherwise we'd overwrite a valid snapshot with a
+  // partial one. Redis is optional in dev, so swallow errors silently.
+  if (currentReplicas !== null && readyReplicas !== null) {
+    const redis = getRedis();
+    if (redis) {
+      const snapshot = {
+        current: currentReplicas,
+        ready: readyReplicas,
+        desired,
+        checkedAt: now.toISOString(),
+      };
+      try {
+        await redis.set(
+          JVB_SNAPSHOT_KEY,
+          JSON.stringify(snapshot),
+          'EX',
+          JVB_SNAPSHOT_TTL_SECONDS,
+        );
+      } catch {
+        // Non-fatal: scaler still completes its primary job of scaling.
+      }
+    }
+  }
+
   return Response.json({
     desired,
     jibriDesired,
@@ -296,6 +368,8 @@ export const GET = withErrorHandling(async (request) => {
     stressWarnPercent: Math.round(stressWarn * 100),
     stressCriticalPercent: Math.round(stressCritical * 100),
     maxReplicas: MAX_REPLICAS,
+    currentReplicas,
+    readyReplicas,
     checkedAt: now.toISOString(),
   });
 });

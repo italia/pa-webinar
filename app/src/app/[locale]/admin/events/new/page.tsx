@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
@@ -86,6 +87,13 @@ export default async function CreateEventPage({
         templates={serializedTemplates}
         selectedTemplate={serializedSelected}
         siteTimezone={siteSettings.defaultTimezone}
+        defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
+        jvbSizingConfig={{
+          cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,
+          receiversPerCore: siteSettings.jvbReceiversPerCore ?? 18.75,
+          sendersPerCore: siteSettings.jvbSendersPerCore ?? 3.125,
+          maxReplicas: siteSettings.jvbMaxReplicas ?? jvbMaxReplicasFromEnv(),
+        }}
       />
     </div>
   );

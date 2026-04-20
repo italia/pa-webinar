@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
+import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import EditEventForm from '@/components/admin/edit-event-form';
 
@@ -24,9 +26,10 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     notFound();
   }
 
-  const event = await prisma.event.findUnique({
-    where: { id },
-  });
+  const [event, siteSettings] = await Promise.all([
+    prisma.event.findUnique({ where: { id } }),
+    getSettings(),
+  ]);
 
   if (!event || event.moderatorToken !== token) {
     notFound();
@@ -50,6 +53,13 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
 
       <EditEventForm
         eventTimezone={event.timezone}
+        defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
+        jvbSizingConfig={{
+          cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,
+          receiversPerCore: siteSettings.jvbReceiversPerCore ?? 18.75,
+          sendersPerCore: siteSettings.jvbSendersPerCore ?? 3.125,
+          maxReplicas: siteSettings.jvbMaxReplicas ?? jvbMaxReplicasFromEnv(),
+        }}
         event={{
           id: event.id,
           title: event.title as Record<string, string>,

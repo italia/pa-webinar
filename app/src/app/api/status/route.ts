@@ -1,7 +1,13 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import {
+  JVB_SNAPSHOT_KEY,
+  parseJvbSnapshot,
+  type JvbSnapshot,
+} from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
+import { getRedis } from '@/lib/redis';
 import { getSettings } from '@/lib/settings';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -173,6 +179,20 @@ interface JvbSizingInput {
   defaultSenderRatioPct: number;
 }
 
+async function readJvbSnapshot(): Promise<JvbSnapshot | null> {
+  const redis = getRedis();
+  if (!redis) return null;
+  try {
+    const raw = await Promise.race([
+      redis.get(JVB_SNAPSHOT_KEY),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
+    ]);
+    return parseJvbSnapshot(raw);
+  } catch {
+    return null;
+  }
+}
+
 async function getJvbStatus(
   preScaleMinutes: number,
   provisioningTimeoutMinutes: number,
@@ -249,6 +269,15 @@ async function getJvbStatus(
     let octoEndpoints: number | null = null;
     let octoSendBitrateBps: number | null = null;
 
+    // Authoritative replica count: the scaler CronJob has K8s RBAC to read
+    // the JVB deployment and writes a snapshot to Redis on every tick. The
+    // /colibri/stats path below only tells us "≥1 pod answered the VIP"
+    // which caps `running` at 1 regardless of the real deployment size.
+    const snapshot = await readJvbSnapshot();
+    if (snapshot) {
+      running = snapshot.ready;
+    }
+
     const jvbHealthUrl = process.env.JVB_HEALTH_URL;
     if (jvbHealthUrl) {
       try {
@@ -258,7 +287,10 @@ async function getJvbStatus(
         if (res.ok) {
           const stats = await res.json() as Record<string, unknown>;
           if (stats.healthy !== false) {
-            running = 1;
+            // Fallback when the Redis snapshot is missing (fresh pod, no
+            // scaler tick yet, or Redis down). We know at least one pod
+            // is answering; reporting 1 is better than 0.
+            if (!snapshot) running = 1;
             stressLevel = typeof stats.stress_level === 'number' ? stats.stress_level : null;
             participants = typeof stats.participants === 'number' ? stats.participants : null;
             // Octo is considered "enabled" for this reporting purpose when
@@ -274,7 +306,7 @@ async function getJvbStatus(
           }
         }
       } catch {
-        // JVB not reachable — running stays 0
+        // JVB not reachable — keep whatever `running` the snapshot gave us.
       }
     }
 
