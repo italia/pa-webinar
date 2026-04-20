@@ -492,6 +492,30 @@
       "noComments": "Niciun comentariu",
       "stars": "stele"
     },
+    "coModerators": {
+      "title": "Co-moderatori și vorbitori",
+      "intro": "Adăugați co-moderatori și vorbitori cu magic-link-uri individuale.",
+      "introHint": "Fiecare persoană are un nume afișat propriu în sală și un token care poate fi revocat independent de linkul principal. Vorbitorii au microfon, video și partajare de ecran, dar nu pot modera (excludere, dezactivare audio general, înregistrare).",
+      "add": "Adăugați persoană",
+      "name": "Nume afișat în sală",
+      "email": "Email (opțional)",
+      "emailPlaceholder": "pentru a-i trimite linkul",
+      "role": "Rol",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Vorbitor",
+      "roleModeratorHint": "Moderare completă: poate înregistra, dezactiva audio-ul tuturor, elimina participanți.",
+      "roleSpeakerHint": "Poate vorbi, afișa video și partaja ecranul. Nu poate modera sala.",
+      "copyLink": "Copiați linkul",
+      "copied": "Copiat!",
+      "revoke": "Revocați",
+      "revoked": "Revocat",
+      "confirmRevoke": "Revocați accesul acestei persoane? Linkul va înceta să funcționeze imediat.",
+      "empty": "Niciun acces suplimentar acordat. Linkul moderator principal rămâne singura intrare privilegiată.",
+      "activeCount": "{count, plural, =0 {Niciun acces activ} =1 {1 acces activ} other {# accesuri active}}",
+      "errors": {
+        "addFailed": "Nu s-a putut salva. Încercați din nou."
+      }
+    },
     "gdprAuditLog": {
       "title": "Registru GDPR",
       "date": "Data",
@@ -509,6 +533,14 @@
       "subtitle": "Configurați aspectul și comportamentul platformei pentru reutilizarea în AP",
       "saving": "Se salvează...",
       "saved": "Setări salvate cu succes",
+      "sections": {
+        "languagesTitle": "Gestionare limbi",
+        "languagesDescription": "Activați/dezactivați limbile UE expuse în interfață, alegeți limba implicită și personalizați traducerile.",
+        "gdprTemplatesTitle": "Șabloane GDPR",
+        "gdprTemplatesDescription": "Creați informări de confidențialitate reutilizabile între evenimente și alegeți-o pe cea implicită pentru evenimentele noi.",
+        "emailTemplatesTitle": "Șabloane de e-mail",
+        "emailTemplatesDescription": "Personalizați subiectul, titlurile și textele e-mailurilor de confirmare și memento. Dacă sunt lăsate goale, se folosesc textele predefinite."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Antet",
@@ -711,6 +743,45 @@
       "uploadBtn": "Încărcați",
       "deleteConfirm": "Sigur doriți să ștergeți acest fișier?",
       "noFiles": "Niciun fișier încărcat. Utilizați butonul \"Încărcați fișier\" pentru a adăuga materiale."
+    },
+    "emailTemplates": {
+      "title": "Șabloane de e-mail",
+      "subtitle": "Personalizați subiectul, titlurile și textele e-mailurilor tranzacționale. Câmpurile lăsate goale folosesc textele predefinite integrate.",
+      "overridden": "Personalizat",
+      "usingDefault": "Predefinit",
+      "saved": "Șablon salvat cu succes.",
+      "resetDone": "Suprascrierea a fost eliminată: se va folosi textul predefinit.",
+      "revert": "Anulați modificările",
+      "resetToDefault": "Restabiliți la predefinit",
+      "confirmReset": "Eliminați suprascrierea? Se va folosi textul predefinit integrat.",
+      "placeholdersTitle": "Substituenți disponibili",
+      "placeholdersHelp": "Inserați acești substituenți în câmpuri: vor fi înlocuiți la trimitere cu datele reale ale evenimentului.",
+      "keys": {
+        "confirmation": "Confirmare înregistrare",
+        "reminder": "Memento eveniment"
+      },
+      "selectors": {
+        "key": "Tip de e-mail",
+        "locale": "Limbă"
+      },
+      "fields": {
+        "subject": "Subiect",
+        "subjectHint": "Subiectul e-mailului. Acceptă substituenți.",
+        "heading": "Titlu principal",
+        "headingHint": "Titlul afișat în partea de sus a corpului e-mailului.",
+        "bodyIntro": "Paragraf introductiv",
+        "bodyIntroHint": "Text afișat înainte de tabelul cu detaliile evenimentului. Util pentru un mesaj de bun venit sau context suplimentar.",
+        "ctaLabel": "Eticheta butonului",
+        "ctaLabelHint": "Textul butonului care duce la linkul personal de acces.",
+        "infoNote": "Notă informativă",
+        "infoNoteHint": "Caseta galbenă de avertizare de sub buton. Lăsați-o goală pentru a o ascunde.",
+        "footerNote": "Notă de subsol",
+        "footerNoteHint": "Text afișat în subsol, sub eventuala semnătură a organizației."
+      },
+      "errors": {
+        "saveFailed": "Salvarea a eșuat. Verificați datele și încercați din nou.",
+        "resetFailed": "Nu s-a putut elimina suprascrierea. Încercați din nou."
+      }
     },
     "languages": {
       "title": "Gestionare limbi",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Codul sursă",
     "buildInfoDev": "versiune de dezvoltare",
     "viewCommit": "Vezi commit-ul pe GitHub",
-    "viewRelease": "Vezi versiunea pe GitHub"
+    "viewRelease": "Vezi versiunea pe GitHub",
+    "buildDatePrefix": "Compilat la"
   },
   "pages": {
     "privacyTitle": "Politica de confidențialitate",

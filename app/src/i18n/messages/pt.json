@@ -492,6 +492,30 @@
       "noComments": "Nenhum comentário",
       "stars": "estrelas"
     },
+    "coModerators": {
+      "title": "Comoderadores e oradores",
+      "intro": "Adicione comoderadores e oradores com magic-links individuais.",
+      "introHint": "Cada pessoa tem um nome visível na sala e um token que pode ser revogado independentemente do link principal. Os oradores têm microfone, câmara e partilha de ecrã, mas não podem moderar (expulsar, silenciar todos, gravar).",
+      "add": "Adicionar pessoa",
+      "name": "Nome visível na sala",
+      "email": "Email (opcional)",
+      "emailPlaceholder": "para enviar o link",
+      "role": "Papel",
+      "roleModerator": "Moderador",
+      "roleSpeaker": "Orador",
+      "roleModeratorHint": "Moderação completa: pode gravar, silenciar todos, remover participantes.",
+      "roleSpeakerHint": "Pode falar, mostrar vídeo e partilhar o ecrã. Não pode moderar a sala.",
+      "copyLink": "Copiar link",
+      "copied": "Copiado!",
+      "revoke": "Revogar",
+      "revoked": "Revogado",
+      "confirmRevoke": "Revogar o acesso desta pessoa? O link deixa de funcionar imediatamente.",
+      "empty": "Sem acessos adicionais. O link principal do moderador continua a ser a única entrada privilegiada.",
+      "activeCount": "{count, plural, =0 {Nenhum acesso ativo} =1 {1 acesso ativo} other {# acessos ativos}}",
+      "errors": {
+        "addFailed": "Não foi possível guardar. Tente novamente."
+      }
+    },
     "gdprAuditLog": {
       "title": "Registo GDPR",
       "date": "Data",
@@ -509,6 +533,14 @@
       "subtitle": "Configure o aspeto e o comportamento da plataforma para reutilização pela AP",
       "saving": "A guardar...",
       "saved": "Definições guardadas com sucesso",
+      "sections": {
+        "languagesTitle": "Gestão de idiomas",
+        "languagesDescription": "Ative ou desative os idiomas da UE apresentados na interface, escolha o idioma predefinido e personalize as traduções.",
+        "gdprTemplatesTitle": "Modelos GDPR",
+        "gdprTemplatesDescription": "Crie avisos de privacidade reutilizáveis que podem ser associados a qualquer evento e escolha o predefinido para novos eventos.",
+        "emailTemplatesTitle": "Modelos de email",
+        "emailTemplatesDescription": "Personalize o assunto, os títulos e o texto dos emails de confirmação e lembrete. Deixe vazio para utilizar os textos predefinidos integrados."
+      },
       "tabs": {
         "branding": "Marca",
         "header": "Cabeçalho",
@@ -711,6 +743,45 @@
       "uploadBtn": "Carregar",
       "deleteConfirm": "Tem a certeza de que pretende eliminar este ficheiro?",
       "noFiles": "Nenhum ficheiro carregado. Utilize o botão \"Carregar ficheiro\" para adicionar materiais."
+    },
+    "emailTemplates": {
+      "title": "Modelos de email",
+      "subtitle": "Personalize o assunto, os títulos e o texto dos emails transacionais. Campos vazios utilizam os textos predefinidos integrados.",
+      "overridden": "Personalizado",
+      "usingDefault": "A utilizar predefinido",
+      "saved": "Modelo guardado com sucesso.",
+      "resetDone": "Personalização removida: será utilizado o texto predefinido.",
+      "revert": "Anular alterações",
+      "resetToDefault": "Repor predefinido",
+      "confirmReset": "Remover a personalização? Será utilizado o texto predefinido integrado.",
+      "placeholdersTitle": "Marcadores disponíveis",
+      "placeholdersHelp": "Insira estes tokens em qualquer campo — no momento do envio serão substituídos pelos dados reais do evento.",
+      "keys": {
+        "confirmation": "Confirmação de registo",
+        "reminder": "Lembrete do evento"
+      },
+      "selectors": {
+        "key": "Tipo de email",
+        "locale": "Idioma"
+      },
+      "fields": {
+        "subject": "Assunto",
+        "subjectHint": "Assunto do email. Suporta marcadores.",
+        "heading": "Título principal",
+        "headingHint": "Título mostrado no topo do corpo do email.",
+        "bodyIntro": "Parágrafo introdutório",
+        "bodyIntroHint": "Texto antes da tabela com os detalhes do evento. Útil para uma mensagem de boas-vindas ou contexto adicional.",
+        "ctaLabel": "Texto do botão",
+        "ctaLabelHint": "Texto do botão principal que remete para o link pessoal de entrada.",
+        "infoNote": "Nota informativa",
+        "infoNoteHint": "Caixa de aviso amarela abaixo do botão. Deixe vazio para a ocultar.",
+        "footerNote": "Nota de rodapé",
+        "footerNoteHint": "Texto apresentado no rodapé, abaixo da eventual assinatura da organização."
+      },
+      "errors": {
+        "saveFailed": "Não foi possível guardar. Verifique os campos e tente novamente.",
+        "resetFailed": "Não foi possível remover a personalização. Tente novamente."
+      }
     },
     "languages": {
       "title": "Gestão de idiomas",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Código fonte",
     "buildInfoDev": "build de desenvolvimento",
     "viewCommit": "Ver o commit no GitHub",
-    "viewRelease": "Ver a versão no GitHub"
+    "viewRelease": "Ver a versão no GitHub",
+    "buildDatePrefix": "Compilado em"
   },
   "pages": {
     "privacyTitle": "Política de privacidade",

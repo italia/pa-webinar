@@ -492,6 +492,30 @@
       "noComments": "Aucun commentaire",
       "stars": "étoiles"
     },
+    "coModerators": {
+      "title": "Co-modérateurs et intervenants",
+      "intro": "Ajoutez des co-modérateurs et intervenants avec des liens magiques individuels.",
+      "introHint": "Chaque personne a son propre nom visible dans la salle et un jeton révocable indépendamment du lien principal. Les intervenants disposent du micro, de la caméra et du partage d'écran mais ne peuvent pas modérer (exclure, couper le son de tous, enregistrer).",
+      "add": "Ajouter une personne",
+      "name": "Nom visible dans la salle",
+      "email": "E-mail (facultatif)",
+      "emailPlaceholder": "pour lui envoyer le lien",
+      "role": "Rôle",
+      "roleModerator": "Modérateur",
+      "roleSpeaker": "Intervenant",
+      "roleModeratorHint": "Modération complète : peut enregistrer, couper le son de tous, retirer des participants.",
+      "roleSpeakerHint": "Peut parler, montrer sa vidéo et partager son écran. Ne peut pas modérer la salle.",
+      "copyLink": "Copier le lien",
+      "copied": "Copié !",
+      "revoke": "Révoquer",
+      "revoked": "Révoqué",
+      "confirmRevoke": "Révoquer l'accès de cette personne ? Le lien cessera de fonctionner immédiatement.",
+      "empty": "Aucun accès supplémentaire accordé. Le lien modérateur principal est la seule entrée privilégiée.",
+      "activeCount": "{count, plural, =0 {Aucun accès actif} =1 {1 accès actif} other {# accès actifs}}",
+      "errors": {
+        "addFailed": "Enregistrement impossible. Veuillez réessayer."
+      }
+    },
     "gdprAuditLog": {
       "title": "Journal GDPR",
       "date": "Date",
@@ -509,6 +533,14 @@
       "subtitle": "Configurez l'apparence et le comportement de la plateforme pour la réutilisation PA",
       "saving": "Enregistrement...",
       "saved": "Paramètres enregistrés avec succès",
+      "sections": {
+        "languagesTitle": "Gestion des langues",
+        "languagesDescription": "Activez ou désactivez les langues de l'UE proposées aux utilisateurs, choisissez la langue par défaut et personnalisez les traductions.",
+        "gdprTemplatesTitle": "Modèles GDPR",
+        "gdprTemplatesDescription": "Créez des informations de confidentialité réutilisables, liables à n'importe quel événement, et choisissez le modèle par défaut pour les nouveaux événements.",
+        "emailTemplatesTitle": "Modèles d'e-mail",
+        "emailTemplatesDescription": "Personnalisez l'objet, les titres et les textes des e-mails de confirmation et de rappel. Les champs vides conservent les textes intégrés par défaut."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "En-tête",
@@ -711,6 +743,45 @@
       "uploadBtn": "Charger",
       "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce fichier ?",
       "noFiles": "Aucun fichier chargé. Utilisez le bouton « Charger un fichier » pour ajouter des documents."
+    },
+    "emailTemplates": {
+      "title": "Modèles d'e-mail",
+      "subtitle": "Personnalisez l'objet, les titres et les textes des e-mails transactionnels. Les champs vides conservent les textes intégrés par défaut.",
+      "overridden": "Personnalisé",
+      "usingDefault": "Par défaut",
+      "saved": "Modèle enregistré.",
+      "resetDone": "Personnalisation supprimée : le texte par défaut sera utilisé.",
+      "revert": "Annuler les modifications",
+      "resetToDefault": "Rétablir la valeur par défaut",
+      "confirmReset": "Supprimer la personnalisation ? Le texte intégré par défaut sera utilisé.",
+      "placeholdersTitle": "Placeholders disponibles",
+      "placeholdersHelp": "Insérez ces jetons dans les champs : ils seront remplacés au moment de l'envoi par les vraies données de l'événement.",
+      "keys": {
+        "confirmation": "Confirmation d'inscription",
+        "reminder": "Rappel d'événement"
+      },
+      "selectors": {
+        "key": "Type d'e-mail",
+        "locale": "Langue"
+      },
+      "fields": {
+        "subject": "Objet",
+        "subjectHint": "Objet de l'e-mail. Prend en charge les placeholders.",
+        "heading": "Titre principal",
+        "headingHint": "Titre affiché en haut du corps de l'e-mail.",
+        "bodyIntro": "Paragraphe d'introduction",
+        "bodyIntroHint": "Texte affiché avant le tableau des détails de l'événement. Utile pour un message de bienvenue ou un contexte supplémentaire.",
+        "ctaLabel": "Libellé du bouton",
+        "ctaLabelHint": "Libellé du bouton menant au lien personnel de connexion.",
+        "infoNote": "Note d'information",
+        "infoNoteHint": "Encadré jaune d'avertissement sous le bouton. Laissez vide pour le masquer.",
+        "footerNote": "Note de pied de page",
+        "footerNoteHint": "Texte affiché dans le pied de page, sous la signature éventuelle de l'organisation."
+      },
+      "errors": {
+        "saveFailed": "Échec de l'enregistrement. Vérifiez les champs et réessayez.",
+        "resetFailed": "Impossible de supprimer la personnalisation. Veuillez réessayer."
+      }
     },
     "languages": {
       "title": "Gestion des langues",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Code source",
     "buildInfoDev": "build de développement",
     "viewCommit": "Voir le commit sur GitHub",
-    "viewRelease": "Voir la version sur GitHub"
+    "viewRelease": "Voir la version sur GitHub",
+    "buildDatePrefix": "Compilé le"
   },
   "pages": {
     "privacyTitle": "Politique de confidentialité",

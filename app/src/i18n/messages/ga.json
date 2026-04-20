@@ -492,6 +492,30 @@
       "noComments": "Gan nótaí tráchta",
       "stars": "réaltaí"
     },
+    "coModerators": {
+      "title": "Comhmhodhnóirí agus cainteoirí",
+      "intro": "Cuir comhmhodhnóirí agus cainteoirí leis trí naisc dhraíochta ar leith.",
+      "introHint": "Tá ainm ar leith ag gach duine sa seomra agus comhartha is féidir a chúlghairm go neamhspleách ón bpríomhnasc. Tá micreafón, ceamara agus comhroinnt scáileáin ag cainteoirí ach ní féidir leo modhnóireacht a dhéanamh (ciceáil amach, gach duine a chiúiniú, taifeadadh).",
+      "add": "Cuir duine leis",
+      "name": "Ainm infheicthe sa seomra",
+      "email": "Ríomhphost (roghnach)",
+      "emailPlaceholder": "chun an nasc a sheoladh chucu",
+      "role": "Ról",
+      "roleModerator": "Modhnóir",
+      "roleSpeaker": "Cainteoir",
+      "roleModeratorHint": "Lánmhodhnóireacht: is féidir taifeadadh, gach duine a chiúiniú agus rannpháirtithe a bhaint.",
+      "roleSpeakerHint": "Is féidir labhairt, físeán a thaispeáint agus scáileán a chomhroinnt. Ní féidir an seomra a mhodhnóireacht.",
+      "copyLink": "Cóipeáil nasc",
+      "copied": "Cóipeáilte!",
+      "revoke": "Cúlghair",
+      "revoked": "Cúlghairthe",
+      "confirmRevoke": "Rochtain an duine seo a chúlghairm? Stopfaidh an nasc ag obair láithreach.",
+      "empty": "Ní tugadh aon rochtain bhreise. Is é an príomhnasc modhnóra an t-aon slí isteach phribhléideach.",
+      "activeCount": "{count, plural, =0 {Gan rochtain ghníomhach} =1 {1 rochtain ghníomhach} other {# rochtain ghníomhacha}}",
+      "errors": {
+        "addFailed": "Níorbh fhéidir é a shábháil. Déan iarracht arís."
+      }
+    },
     "gdprAuditLog": {
       "title": "Loga iniúchóireachta GDPR",
       "date": "Dáta",
@@ -509,6 +533,14 @@
       "subtitle": "Cumraigh cuma agus iompar an ardáin le haghaidh athúsáide RA",
       "saving": "Ag sábháil...",
       "saved": "Socruithe sábháilte go rathúil",
+      "sections": {
+        "languagesTitle": "Bainistíocht teangacha",
+        "languagesDescription": "Cumasaigh nó díchumasaigh na teangacha AE atá ar fáil d'úsáideoirí, roghnaigh an teanga réamhshocraithe agus saincheap na haistriúcháin.",
+        "gdprTemplatesTitle": "Teimpléid GDPR",
+        "gdprTemplatesDescription": "Cruthaigh fógraí príobháideachta in-athúsáidte is féidir a nascadh le himeachtaí ar bith, agus roghnaigh an ceann réamhshocraithe do imeachtaí nua.",
+        "emailTemplatesTitle": "Teimpléid ríomhphoist",
+        "emailTemplatesDescription": "Saincheap ábhar, cinnteidil agus téacs na ríomhphost deimhnithe agus meabhrúcháin. Fág folamh chun na téacsanna réamhshocraithe a úsáid."
+      },
       "tabs": {
         "branding": "Brandáil",
         "header": "Ceanntásc",
@@ -711,6 +743,45 @@
       "uploadBtn": "Uaslódáil",
       "deleteConfirm": "An bhfuil sibh cinnte gur mian libh an comhad seo a scriosadh?",
       "noFiles": "Gan comhad uaslódáilte. Úsáid an cnaipe \"Uaslódáil comhad\" chun ábhair a chur leis."
+    },
+    "emailTemplates": {
+      "title": "Teimpléid ríomhphoist",
+      "subtitle": "Saincheap ábhar, cinnteidil agus téacs na ríomhphost idirbheartaíochta. Úsáidtear na téacsanna réamhshocraithe ionsuite i réimsí folmha.",
+      "overridden": "Saincheaptha",
+      "usingDefault": "Réamhshocraithe",
+      "saved": "Teimpléad sábháilte.",
+      "resetDone": "Sáruithe bainte: úsáidfear an téacs réamhshocraithe.",
+      "revert": "Cealaigh athruithe",
+      "resetToDefault": "Athshocraigh go réamhshocraithe",
+      "confirmReset": "An sárú a bhaint? Úsáidfear an téacs réamhshocraithe ionsuite.",
+      "placeholdersTitle": "Ionadchoinneálaithe ar fáil",
+      "placeholdersHelp": "Cuir isteach na comharthaí seo i réimse ar bith — cuirfear sonraí fíor an imeachta ina n-áit tráth an tseolta.",
+      "keys": {
+        "confirmation": "Deimhniú cláraithe",
+        "reminder": "Meabhrúchán imeachta"
+      },
+      "selectors": {
+        "key": "Cineál ríomhphoist",
+        "locale": "Teanga"
+      },
+      "fields": {
+        "subject": "Ábhar",
+        "subjectHint": "Ábhar an ríomhphoist. Tacaíonn sé le hionadchoinneálaithe.",
+        "heading": "Príomhcheannteideal",
+        "headingHint": "Ceannteideal a thaispeántar ag barr chorp an ríomhphoist.",
+        "bodyIntro": "Alt tosaigh",
+        "bodyIntroHint": "Téacs a thaispeántar roimh tábla sonraí an imeachta. Úsáideach do theachtaireacht fáilte nó comhthéacs breise.",
+        "ctaLabel": "Lipéad an chnaipe",
+        "ctaLabelHint": "Lipéad an phríomhchnaipe a nascann leis an URL pearsanta rannpháirtíochta.",
+        "infoNote": "Nóta eolais",
+        "infoNoteHint": "Bosca rabhaidh buí faoin gcnaipe. Fág folamh chun é a cheilt.",
+        "footerNote": "Nóta buntásc",
+        "footerNoteHint": "Téacs a thaispeántar sa bhuntásc faoi shíniú na heagraíochta, más ann dó."
+      },
+      "errors": {
+        "saveFailed": "Theip ar an sábháil. Seiceáil na réimsí agus bain triail eile as.",
+        "resetFailed": "Níorbh fhéidir an sárú a bhaint. Déan iarracht arís."
+      }
     },
     "languages": {
       "title": "Bainistíocht teangacha",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Cód foinse",
     "buildInfoDev": "tógáil forbartha",
     "viewCommit": "Féach ar an gcommit ar GitHub",
-    "viewRelease": "Féach ar an eisiúint ar GitHub"
+    "viewRelease": "Féach ar an eisiúint ar GitHub",
+    "buildDatePrefix": "Tógtha ar"
   },
   "pages": {
     "privacyTitle": "Beartas príobháideachta",

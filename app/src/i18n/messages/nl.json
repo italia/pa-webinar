@@ -492,6 +492,30 @@
       "noComments": "Geen opmerkingen",
       "stars": "sterren"
     },
+    "coModerators": {
+      "title": "Co-moderators en sprekers",
+      "intro": "Voeg co-moderators en sprekers toe met individuele magic links.",
+      "introHint": "Elke persoon heeft een zichtbare naam in de ruimte en een token dat onafhankelijk van de hoofdlink kan worden ingetrokken. Sprekers krijgen microfoon, camera en schermdeling, maar kunnen niet modereren (verwijderen, iedereen dempen, opnemen).",
+      "add": "Persoon toevoegen",
+      "name": "Zichtbare naam in de ruimte",
+      "email": "E-mail (optioneel)",
+      "emailPlaceholder": "om de link te versturen",
+      "role": "Rol",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Spreker",
+      "roleModeratorHint": "Volledige moderatie: kan opnemen, iedereen dempen, deelnemers verwijderen.",
+      "roleSpeakerHint": "Kan spreken, video tonen en het scherm delen. Kan de ruimte niet modereren.",
+      "copyLink": "Link kopiëren",
+      "copied": "Gekopieerd!",
+      "revoke": "Intrekken",
+      "revoked": "Ingetrokken",
+      "confirmRevoke": "Toegang van deze persoon intrekken? De link stopt onmiddellijk met werken.",
+      "empty": "Geen extra toegang verleend. De primaire moderatorlink blijft de enige bevoorrechte ingang.",
+      "activeCount": "{count, plural, =0 {Geen actieve toegang} =1 {1 actieve toegang} other {# actieve toegangen}}",
+      "errors": {
+        "addFailed": "Opslaan mislukt. Probeer het opnieuw."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR-auditlogboek",
       "date": "Datum",
@@ -509,6 +533,14 @@
       "subtitle": "Configureer het uiterlijk en gedrag van het platform voor hergebruik door overheden",
       "saving": "Opslaan...",
       "saved": "Instellingen succesvol opgeslagen",
+      "sections": {
+        "languagesTitle": "Taalbeheer",
+        "languagesDescription": "Activeer of deactiveer de EU-talen in de interface, kies de standaardtaal en pas vertalingen aan.",
+        "gdprTemplatesTitle": "GDPR-sjablonen",
+        "gdprTemplatesDescription": "Maak herbruikbare privacyverklaringen die aan elk evenement gekoppeld kunnen worden en kies de standaardverklaring voor nieuwe evenementen.",
+        "emailTemplatesTitle": "E-mailsjablonen",
+        "emailTemplatesDescription": "Pas onderwerp, koppen en teksten van de bevestigings- en herinneringsmails aan. Laat leeg om de ingebouwde standaardteksten te gebruiken."
+      },
       "tabs": {
         "branding": "Huisstijl",
         "header": "Header",
@@ -711,6 +743,45 @@
       "uploadBtn": "Uploaden",
       "deleteConfirm": "Weet u zeker dat u dit bestand wilt verwijderen?",
       "noFiles": "Geen bestanden geüpload. Gebruik de knop \"Bestand uploaden\" om materialen toe te voegen."
+    },
+    "emailTemplates": {
+      "title": "E-mailsjablonen",
+      "subtitle": "Pas onderwerp, koppen en teksten van transactionele e-mails aan. Lege velden gebruiken de ingebouwde standaardteksten.",
+      "overridden": "Aangepast",
+      "usingDefault": "Standaard wordt gebruikt",
+      "saved": "Sjabloon succesvol opgeslagen.",
+      "resetDone": "Aanpassing verwijderd: de standaardtekst wordt gebruikt.",
+      "revert": "Wijzigingen verwerpen",
+      "resetToDefault": "Terug naar standaard",
+      "confirmReset": "Aanpassing verwijderen? De ingebouwde standaardtekst wordt gebruikt.",
+      "placeholdersTitle": "Beschikbare placeholders",
+      "placeholdersHelp": "Plaats deze tokens in een veld — ze worden bij verzending vervangen door echte evenementgegevens.",
+      "keys": {
+        "confirmation": "Registratiebevestiging",
+        "reminder": "Evenementherinnering"
+      },
+      "selectors": {
+        "key": "Type e-mail",
+        "locale": "Taal"
+      },
+      "fields": {
+        "subject": "Onderwerp",
+        "subjectHint": "Onderwerp van de e-mail. Ondersteunt placeholders.",
+        "heading": "Hoofdkop",
+        "headingHint": "Kop die bovenaan de e-mail wordt getoond.",
+        "bodyIntro": "Inleidende alinea",
+        "bodyIntroHint": "Tekst vóór de tabel met evenementdetails. Handig voor een welkomstboodschap of extra context.",
+        "ctaLabel": "Knoplabel",
+        "ctaLabelHint": "Label van de primaire knop die naar de persoonlijke deelnamelink leidt.",
+        "infoNote": "Infomelding",
+        "infoNoteHint": "Gele waarschuwing onder de knop. Laat leeg om te verbergen.",
+        "footerNote": "Voettekst",
+        "footerNoteHint": "Tekst in de voettekst onder de eventuele handtekening van de organisatie."
+      },
+      "errors": {
+        "saveFailed": "Opslaan mislukt. Controleer de velden en probeer het opnieuw.",
+        "resetFailed": "Kon aanpassing niet verwijderen. Probeer het opnieuw."
+      }
     },
     "languages": {
       "title": "Taalbeheer",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Broncode",
     "buildInfoDev": "ontwikkelbuild",
     "viewCommit": "Bekijk commit op GitHub",
-    "viewRelease": "Bekijk release op GitHub"
+    "viewRelease": "Bekijk release op GitHub",
+    "buildDatePrefix": "Gebouwd op"
   },
   "pages": {
     "privacyTitle": "Privacybeleid",

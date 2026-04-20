@@ -492,6 +492,30 @@
       "noComments": "Kommentaare pole",
       "stars": "tärni"
     },
+    "coModerators": {
+      "title": "Kaasmoderaatorid ja esinejad",
+      "intro": "Lisa kaasmoderaatoreid ja esinejaid individuaalsete võlulinkidega.",
+      "introHint": "Igal inimesel on ruumis nähtav nimi ja tokkel, mida saab põhilingist sõltumatult kehtetuks tunnistada. Esinejatel on mikrofon, kaamera ja ekraani jagamine, kuid nad ei saa modereerida (eemaldada, kõiki vaigistada, salvestada).",
+      "add": "Lisa isik",
+      "name": "Ruumis nähtav nimi",
+      "email": "E-post (valikuline)",
+      "emailPlaceholder": "lingi saatmiseks",
+      "role": "Roll",
+      "roleModerator": "Moderaator",
+      "roleSpeaker": "Esineja",
+      "roleModeratorHint": "Täielik moderaator: saab salvestada, kõik vaigistada ja osalejaid eemaldada.",
+      "roleSpeakerHint": "Saab rääkida, videot näidata ja ekraani jagada. Ei saa ruumi modereerida.",
+      "copyLink": "Kopeeri link",
+      "copied": "Kopeeritud!",
+      "revoke": "Tühista",
+      "revoked": "Tühistatud",
+      "confirmRevoke": "Kas tühistada selle isiku juurdepääs? Link lakkab kohe töötamast.",
+      "empty": "Lisajuurdepääsu pole antud. Põhiline moderaatori link on ainus privilegeeritud sissepääs.",
+      "activeCount": "{count, plural, =0 {Aktiivseid juurdepääse pole} =1 {1 aktiivne juurdepääs} other {# aktiivset juurdepääsu}}",
+      "errors": {
+        "addFailed": "Salvestamine ebaõnnestus. Proovi uuesti."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR auditilogi",
       "date": "Kuupäev",
@@ -509,6 +533,14 @@
       "subtitle": "Seadistage platvormi välimus ja käitumine AH taaskasutuseks",
       "saving": "Salvestamine...",
       "saved": "Seaded edukalt salvestatud",
+      "sections": {
+        "languagesTitle": "Keelte haldus",
+        "languagesDescription": "Luba või keela kasutajale avatavad EL keeled, vali vaikekeel ja kohanda tõlkeid.",
+        "gdprTemplatesTitle": "GDPR mallid",
+        "gdprTemplatesDescription": "Loo korduvkasutatavad privaatsusteated, mida saab siduda iga üritusega, ja vali uute ürituste jaoks vaikevariant.",
+        "emailTemplatesTitle": "E-kirjade mallid",
+        "emailTemplatesDescription": "Kohanda kinnitus- ja meeldetuletuskirjade teemasid, pealkirju ja tekste. Tühjadele väljadele jäetakse sisseehitatud vaiketekstid."
+      },
       "tabs": {
         "branding": "Bränd",
         "header": "Päis",
@@ -711,6 +743,45 @@
       "uploadBtn": "Laadi üles",
       "deleteConfirm": "Kas olete kindel, et soovite selle faili kustutada?",
       "noFiles": "Faile pole üles laaditud. Kasutage nuppu \"Laadi fail üles\", et materjale lisada."
+    },
+    "emailTemplates": {
+      "title": "E-kirjade mallid",
+      "subtitle": "Kohanda transaktsiooniliste e-kirjade teemasid, pealkirju ja tekste. Tühjade väljadega kasutatakse sisseehitatud vaiketekste.",
+      "overridden": "Kohandatud",
+      "usingDefault": "Vaikeväärtus",
+      "saved": "Mall salvestatud.",
+      "resetDone": "Kohandus eemaldatud: kasutatakse vaiketeksti.",
+      "revert": "Tühista muudatused",
+      "resetToDefault": "Taasta vaikeväärtus",
+      "confirmReset": "Kas eemaldada kohandus? Kasutatakse sisseehitatud vaiketeksti.",
+      "placeholdersTitle": "Saadaolevad kohatäited",
+      "placeholdersHelp": "Sisesta need kohatäited väljadele: need asendatakse saatmise hetkel ürituse tegelike andmetega.",
+      "keys": {
+        "confirmation": "Registreerimise kinnitus",
+        "reminder": "Ürituse meeldetuletus"
+      },
+      "selectors": {
+        "key": "E-kirja tüüp",
+        "locale": "Keel"
+      },
+      "fields": {
+        "subject": "Teema",
+        "subjectHint": "E-kirja teema. Toetab kohatäiteid.",
+        "heading": "Põhipealkiri",
+        "headingHint": "E-kirja keha tipus kuvatav pealkiri.",
+        "bodyIntro": "Sissejuhatav lõik",
+        "bodyIntroHint": "Tekst enne ürituse üksikasjade tabelit. Sobib tervitussõnumi või lisainfo jaoks.",
+        "ctaLabel": "Nupu silt",
+        "ctaLabelHint": "Isikliku liitumislingi juurde viiva nupu tekst.",
+        "infoNote": "Infoteade",
+        "infoNoteHint": "Kollane hoiatuskast nupu all. Peitmiseks jäta tühjaks.",
+        "footerNote": "Jaluse märkus",
+        "footerNoteHint": "Jaluses organisatsiooni allkirja all kuvatav tekst."
+      },
+      "errors": {
+        "saveFailed": "Salvestamine ebaõnnestus. Kontrolli andmeid ja proovi uuesti.",
+        "resetFailed": "Kohanduse eemaldamine ebaõnnestus. Proovi uuesti."
+      }
     },
     "languages": {
       "title": "Keelte haldus",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Lähtekood",
     "buildInfoDev": "arendusversioon",
     "viewCommit": "Vaata committi GitHubis",
-    "viewRelease": "Vaata väljalaset GitHubis"
+    "viewRelease": "Vaata väljalaset GitHubis",
+    "buildDatePrefix": "Ehitatud"
   },
   "pages": {
     "privacyTitle": "Privaatsuspoliitika",

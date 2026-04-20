@@ -492,6 +492,30 @@
       "noComments": "Ni komentarjev",
       "stars": "zvezdic"
     },
+    "coModerators": {
+      "title": "Somoderatorji in govorci",
+      "intro": "Dodajte somoderatorje in govorce z individualnimi magic-link povezavami.",
+      "introHint": "Vsaka oseba ima svoje prikazno ime v sobi in žeton, ki ga je mogoče preklicati neodvisno od glavne povezave. Govorci imajo mikrofon, video in deljenje zaslona, vendar ne morejo moderirati (odstranitev, utišanje vseh, snemanje).",
+      "add": "Dodaj osebo",
+      "name": "Prikazno ime v sobi",
+      "email": "E-pošta (neobvezno)",
+      "emailPlaceholder": "za pošiljanje povezave",
+      "role": "Vloga",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Govorec",
+      "roleModeratorHint": "Polna moderacija: lahko snema, utiša vse, odstrani udeležence.",
+      "roleSpeakerHint": "Lahko govori, prikazuje video in deli zaslon. Ne more moderirati sobe.",
+      "copyLink": "Kopiraj povezavo",
+      "copied": "Kopirano!",
+      "revoke": "Prekliči",
+      "revoked": "Preklicano",
+      "confirmRevoke": "Prekličete dostop tej osebi? Povezava bo takoj prenehala delovati.",
+      "empty": "Ni podeljenih dodatnih dostopov. Glavna moderatorska povezava ostaja edini privilegirani vhod.",
+      "activeCount": "{count, plural, =0 {Brez aktivnih dostopov} =1 {1 aktiven dostop} other {# aktivnih dostopov}}",
+      "errors": {
+        "addFailed": "Shranjevanje ni uspelo. Poskusite znova."
+      }
+    },
     "gdprAuditLog": {
       "title": "Dnevnik GDPR",
       "date": "Datum",
@@ -509,6 +533,14 @@
       "subtitle": "Konfigurirajte videz in obnašanje platforme za ponovno uporabo v javni upravi",
       "saving": "Shranjevanje...",
       "saved": "Nastavitve uspešno shranjene",
+      "sections": {
+        "languagesTitle": "Upravljanje jezikov",
+        "languagesDescription": "Omogočite ali onemogočite jezike EU, prikazane v vmesniku, izberite privzeti jezik in prilagodite prevode.",
+        "gdprTemplatesTitle": "Predloge GDPR",
+        "gdprTemplatesDescription": "Ustvarite obvestila o zasebnosti, ki jih je mogoče ponovno uporabiti med dogodki, in izberite privzeto za nove dogodke.",
+        "emailTemplatesTitle": "Predloge e-pošte",
+        "emailTemplatesDescription": "Prilagodite zadevo, naslove in besedila e-poštnih sporočil za potrditev in opomnik. Če ostanejo prazna, bodo uporabljena privzeta besedila."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Glava",
@@ -711,6 +743,45 @@
       "uploadBtn": "Naloži",
       "deleteConfirm": "Ali ste prepričani, da želite izbrisati to datoteko?",
       "noFiles": "Ni naloženih datotek. Uporabite gumb \"Naloži datoteko\" za dodajanje gradiv."
+    },
+    "emailTemplates": {
+      "title": "Predloge e-pošte",
+      "subtitle": "Prilagodite zadevo, naslove in besedila transakcijskih e-poštnih sporočil. Prazna polja uporabljajo vgrajena privzeta besedila.",
+      "overridden": "Prilagojeno",
+      "usingDefault": "Privzeto",
+      "saved": "Predloga je uspešno shranjena.",
+      "resetDone": "Prepis je odstranjen: uporabljeno bo privzeto besedilo.",
+      "revert": "Prekliči spremembe",
+      "resetToDefault": "Ponastavi na privzeto",
+      "confirmReset": "Odstranite prepis? Uporabljeno bo vgrajeno privzeto besedilo.",
+      "placeholdersTitle": "Razpoložljivi nadomestni znaki",
+      "placeholdersHelp": "Vstavite te nadomestne znake v polja: ob pošiljanju bodo nadomeščeni z dejanskimi podatki o dogodku.",
+      "keys": {
+        "confirmation": "Potrditev registracije",
+        "reminder": "Opomnik dogodka"
+      },
+      "selectors": {
+        "key": "Vrsta e-pošte",
+        "locale": "Jezik"
+      },
+      "fields": {
+        "subject": "Zadeva",
+        "subjectHint": "Zadeva e-pošte. Podpira nadomestne znake.",
+        "heading": "Glavni naslov",
+        "headingHint": "Naslov, prikazan na vrhu telesa e-pošte.",
+        "bodyIntro": "Uvodni odstavek",
+        "bodyIntroHint": "Besedilo pred tabelo s podrobnostmi dogodka. Primerno za pozdravno sporočilo ali dodaten kontekst.",
+        "ctaLabel": "Oznaka gumba",
+        "ctaLabelHint": "Besedilo gumba, ki vodi do osebne povezave za pristop.",
+        "infoNote": "Informativna opomba",
+        "infoNoteHint": "Rumeno opozorilno polje pod gumbom. Če ostane prazno, bo skrito.",
+        "footerNote": "Opomba v nogi",
+        "footerNoteHint": "Besedilo, prikazano v nogi pod morebitnim podpisom organizacije."
+      },
+      "errors": {
+        "saveFailed": "Shranjevanje ni uspelo. Preverite podatke in poskusite znova.",
+        "resetFailed": "Odstranitev prepisa ni uspela. Poskusite znova."
+      }
     },
     "languages": {
       "title": "Upravljanje jezikov",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Izvorna koda",
     "buildInfoDev": "razvojna zgradba",
     "viewCommit": "Oglejte si commit na GitHubu",
-    "viewRelease": "Oglejte si izdajo na GitHubu"
+    "viewRelease": "Oglejte si izdajo na GitHubu",
+    "buildDatePrefix": "Zgrajeno"
   },
   "pages": {
     "privacyTitle": "Politika zasebnosti",

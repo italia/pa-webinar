@@ -492,6 +492,30 @@
       "noComments": "Nav komentāru",
       "stars": "zvaigznes"
     },
+    "coModerators": {
+      "title": "Līdzmoderatori un runātāji",
+      "intro": "Pievienojiet līdzmoderatorus un runātājus ar individuālām maģiskajām saitēm.",
+      "introHint": "Katrai personai zālē ir redzams vārds un žetons, ko var atsaukt neatkarīgi no galvenās saites. Runātājiem ir mikrofons, kamera un ekrāna koplietošana, bet viņi nevar moderēt (izmest, izslēgt skaņu visiem, ierakstīt).",
+      "add": "Pievienot personu",
+      "name": "Zālē redzamais vārds",
+      "email": "E-pasts (neobligāts)",
+      "emailPlaceholder": "lai nosūtītu saiti",
+      "role": "Loma",
+      "roleModerator": "Moderators",
+      "roleSpeaker": "Runātājs",
+      "roleModeratorHint": "Pilna moderācija: var ierakstīt, izslēgt skaņu visiem, noņemt dalībniekus.",
+      "roleSpeakerHint": "Var runāt, rādīt video un koplietot ekrānu. Nevar moderēt zāli.",
+      "copyLink": "Kopēt saiti",
+      "copied": "Nokopēts!",
+      "revoke": "Atsaukt",
+      "revoked": "Atsaukts",
+      "confirmRevoke": "Atsaukt šīs personas piekļuvi? Saite nekavējoties pārstās darboties.",
+      "empty": "Nav piešķirta papildu piekļuve. Galvenā moderatora saite paliek vienīgā privileģētā ieeja.",
+      "activeCount": "{count, plural, =0 {Nav aktīvu piekļuvju} =1 {1 aktīva piekļuve} other {# aktīvas piekļuves}}",
+      "errors": {
+        "addFailed": "Neizdevās saglabāt. Mēģiniet vēlreiz."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR audita žurnāls",
       "date": "Datums",
@@ -509,6 +533,14 @@
       "subtitle": "Konfigurējiet platformas izskatu un uzvedību VA atkārtotai izmantošanai",
       "saving": "Saglabāšana...",
       "saved": "Iestatījumi veiksmīgi saglabāti",
+      "sections": {
+        "languagesTitle": "Valodu pārvaldība",
+        "languagesDescription": "Ieslēdziet vai izslēdziet ES valodas, kas redzamas saskarnē, izvēlieties noklusējuma valodu un pielāgojiet tulkojumus.",
+        "gdprTemplatesTitle": "GDPR veidnes",
+        "gdprTemplatesDescription": "Izveidojiet atkārtoti lietojamus privātuma paziņojumus, ko var saistīt ar jebkuru pasākumu, un izvēlieties noklusējuma veidni jauniem pasākumiem.",
+        "emailTemplatesTitle": "E-pasta veidnes",
+        "emailTemplatesDescription": "Pielāgojiet apstiprinājuma un atgādinājuma e-pastu tēmu, virsrakstus un tekstu. Atstājiet tukšu, lai izmantotu iebūvētos noklusējuma tekstus."
+      },
       "tabs": {
         "branding": "Zīmols",
         "header": "Galvene",
@@ -711,6 +743,45 @@
       "uploadBtn": "Augšupielādēt",
       "deleteConfirm": "Vai tiešām vēlaties dzēst šo failu?",
       "noFiles": "Nav augšupielādētu failu. Izmantojiet pogu \"Augšupielādēt failu\", lai pievienotu materiālus."
+    },
+    "emailTemplates": {
+      "title": "E-pasta veidnes",
+      "subtitle": "Pielāgojiet transakciju e-pastu tēmu, virsrakstus un tekstu. Tukšos laukos tiek izmantoti iebūvētie noklusējuma teksti.",
+      "overridden": "Pielāgots",
+      "usingDefault": "Tiek lietots noklusējuma",
+      "saved": "Veidne veiksmīgi saglabāta.",
+      "resetDone": "Pielāgojums noņemts: tiks izmantots noklusējuma teksts.",
+      "revert": "Atcelt izmaiņas",
+      "resetToDefault": "Atjaunot noklusējuma",
+      "confirmReset": "Noņemt pielāgojumu? Tiks izmantots iebūvētais noklusējuma teksts.",
+      "placeholdersTitle": "Pieejamie vietturi",
+      "placeholdersHelp": "Ievietojiet šos marķierus jebkurā laukā — nosūtīšanas brīdī tie tiks aizstāti ar reāliem pasākuma datiem.",
+      "keys": {
+        "confirmation": "Reģistrācijas apstiprinājums",
+        "reminder": "Pasākuma atgādinājums"
+      },
+      "selectors": {
+        "key": "E-pasta veids",
+        "locale": "Valoda"
+      },
+      "fields": {
+        "subject": "Tēma",
+        "subjectHint": "E-pasta tēma. Atbalsta vietturus.",
+        "heading": "Galvenais virsraksts",
+        "headingHint": "Virsraksts, kas parādās e-pasta teksta augšā.",
+        "bodyIntro": "Ievada rindkopa",
+        "bodyIntroHint": "Teksts pirms pasākuma detaļu tabulas. Noder sveiciena ziņojumam vai papildu kontekstam.",
+        "ctaLabel": "Pogas uzraksts",
+        "ctaLabelHint": "Galvenās pogas uzraksts, kas saistīta ar personīgo pievienošanās saiti.",
+        "infoNote": "Informatīva piezīme",
+        "infoNoteHint": "Dzeltens brīdinājuma lodziņš zem pogas. Atstājiet tukšu, lai to paslēptu.",
+        "footerNote": "Kājenes piezīme",
+        "footerNoteHint": "Teksts, kas tiek parādīts kājenē zem organizācijas paraksta."
+      },
+      "errors": {
+        "saveFailed": "Saglabāšana neizdevās. Pārbaudiet laukus un mēģiniet vēlreiz.",
+        "resetFailed": "Nevarēja noņemt pielāgojumu. Mēģiniet vēlreiz."
+      }
     },
     "languages": {
       "title": "Valodu pārvaldība",
@@ -1386,7 +1457,8 @@
     "sourceCode": "Avota kods",
     "buildInfoDev": "izstrādes būvējums",
     "viewCommit": "Skatīt commit GitHub",
-    "viewRelease": "Skatīt laidienu GitHub"
+    "viewRelease": "Skatīt laidienu GitHub",
+    "buildDatePrefix": "Izveidots"
   },
   "pages": {
     "privacyTitle": "Privātuma politika",
