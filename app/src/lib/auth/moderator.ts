@@ -1,6 +1,10 @@
 import { timingSafeEqual } from 'crypto';
 
+import { EventModeratorRole } from '@prisma/client';
+
 import { prisma } from '@/lib/db';
+
+export type GrantRole = EventModeratorRole;
 
 export function constantTimeEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(a);
@@ -37,8 +41,12 @@ const UUID_RE =
  *
  * Two accepted tokens:
  *   - `Event.moderatorToken` (primary owner magic link, always valid)
- *   - `EventModerator.token` (co-moderator magic link; must not be
- *     revoked and must reference the same event)
+ *   - `EventModerator.token` with role=MODERATOR (co-moderator magic
+ *     link; must not be revoked and must reference the same event)
+ *
+ * SPEAKER-role grants are NOT accepted here — speakers don't have
+ * moderation authority and must not pass moderator-only endpoints.
+ * Use `verifyGrantToken` to resolve speaker tokens.
  *
  * Returns null if no match.
  */
@@ -57,11 +65,51 @@ export async function verifyModeratorToken(
     return event;
   }
 
-  // Co-moderator path: lookup by token, then cross-check that it points
-  // at the same event and hasn't been revoked.
   const coMod = await prisma.eventModerator.findUnique({ where: { token } });
-  if (coMod && coMod.eventId === event.id && coMod.revokedAt === null) {
+  if (
+    coMod &&
+    coMod.eventId === event.id &&
+    coMod.revokedAt === null &&
+    coMod.role === EventModeratorRole.MODERATOR
+  ) {
     return event;
+  }
+
+  return null;
+}
+
+/**
+ * Resolve any grant token (primary moderator, co-moderator, or speaker)
+ * for an event. Returns the event + the grant's role and display name.
+ *
+ * Used by the /live entry point where moderators AND speakers both
+ * arrive via magic link and need distinct Jitsi capabilities.
+ */
+export async function verifyGrantToken(
+  eventIdOrSlug: string,
+  token: string,
+): Promise<
+  | { event: Awaited<ReturnType<typeof prisma.event.findUnique>>; role: GrantRole; displayName: string | null }
+  | null
+> {
+  const where = UUID_RE.test(eventIdOrSlug)
+    ? { id: eventIdOrSlug }
+    : { slug: eventIdOrSlug };
+
+  const event = await prisma.event.findUnique({ where });
+  if (!event) return null;
+
+  if (constantTimeEqual(event.moderatorToken, token)) {
+    return {
+      event,
+      role: EventModeratorRole.MODERATOR,
+      displayName: event.moderatorName ?? null,
+    };
+  }
+
+  const grant = await prisma.eventModerator.findUnique({ where: { token } });
+  if (grant && grant.eventId === event.id && grant.revokedAt === null) {
+    return { event, role: grant.role, displayName: grant.name };
   }
 
   return null;
@@ -95,3 +143,5 @@ export async function resolveModeratorName(
 
   return null;
 }
+
+export { EventModeratorRole };

@@ -5,10 +5,14 @@ import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email/send';
 import { getSettings } from '@/lib/settings';
 import {
-  reminderSubject,
   reminderHtml,
   reminderText,
+  baseReminderCopy,
 } from '@/lib/email/templates';
+import {
+  applyOverride,
+  loadEmailTemplateOverride,
+} from '@/lib/email/resolve-template';
 import {
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
@@ -127,11 +131,27 @@ export const GET = withErrorHandling(async (request) => {
             'noreply@dominio.gov.it',
         });
 
+        const override = await loadEmailTemplateOverride('reminder', locale);
+        const resolved = applyOverride(
+          baseReminderCopy(templateInput),
+          override,
+          {
+            eventTitle: templateInput.eventTitle,
+            eventDate: templateInput.eventDate,
+            eventTime: templateInput.eventTime,
+            eventDuration: templateInput.eventDuration,
+            joinUrl: templateInput.joinUrl,
+            eventPageUrl: templateInput.eventPageUrl,
+            siteName: settings.siteName || 'Eventi PA',
+            offsetMinutes: reminder.offsetMinutes,
+          },
+        );
+
         await sendEmail({
           to: recipientEmail,
-          subject: reminderSubject(locale, title, reminder.offsetMinutes),
-          html: reminderHtml(templateInput),
-          text: reminderText(templateInput),
+          subject: resolved.subject,
+          html: reminderHtml(templateInput, resolved),
+          text: reminderText(templateInput, resolved),
           attachments: [
             {
               filename: 'event.ics',

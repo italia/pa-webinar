@@ -4,10 +4,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Badge, Button, Input, Label } from 'design-react-kit';
 
+type GrantRole = 'MODERATOR' | 'SPEAKER';
+
 interface ModeratorRow {
   id: string;
   name: string;
   email: string | null;
+  role: GrantRole;
   token: string;
   createdAt: string;
   revokedAt: string | null;
@@ -36,6 +39,7 @@ export default function EventModeratorsPanel({
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [role, setRole] = useState<GrantRole>('MODERATOR');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -76,6 +80,7 @@ export default function EventModeratorsPanel({
           body: JSON.stringify({
             name: name.trim(),
             email: email.trim() || undefined,
+            role,
           }),
         });
         if (!res.ok) {
@@ -84,13 +89,14 @@ export default function EventModeratorsPanel({
         }
         setName('');
         setEmail('');
+        setRole('MODERATOR');
         setShowForm(false);
         await fetchRows();
       } finally {
         setSubmitting(false);
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [name, email, eventId, moderatorToken, fetchRows, t],
+    }, [name, email, role, eventId, moderatorToken, fetchRows, t],
   );
 
   const handleRevoke = useCallback(
@@ -149,7 +155,7 @@ export default function EventModeratorsPanel({
               autoFocus
             />
           </div>
-          <div className="mb-3">
+          <div className="mb-2">
             <Label htmlFor="co-mod-email">{t('email')}</Label>
             <Input
               id="co-mod-email"
@@ -158,6 +164,21 @@ export default function EventModeratorsPanel({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               placeholder={t('emailPlaceholder')}
             />
+          </div>
+          <div className="mb-3">
+            <Label htmlFor="co-mod-role">{t('role')}</Label>
+            <select
+              id="co-mod-role"
+              className="form-select"
+              value={role}
+              onChange={(e) => setRole(e.target.value as GrantRole)}
+            >
+              <option value="MODERATOR">{t('roleModerator')}</option>
+              <option value="SPEAKER">{t('roleSpeaker')}</option>
+            </select>
+            <div className="text-muted mt-1" style={{ fontSize: '0.78rem' }}>
+              {role === 'SPEAKER' ? t('roleSpeakerHint') : t('roleModeratorHint')}
+            </div>
           </div>
           <div className="d-flex gap-2">
             <Button color="primary" size="sm" type="submit" disabled={submitting || name.trim().length < 2}>
@@ -198,6 +219,17 @@ export default function EventModeratorsPanel({
                     <span className="fw-semibold" style={{ color: '#17324D' }}>
                       {row.name}
                     </span>
+                    <Badge
+                      color=""
+                      pill
+                      style={{
+                        fontSize: '0.68rem',
+                        background: row.role === 'SPEAKER' ? '#FEF5E6' : '#E8F1FA',
+                        color: row.role === 'SPEAKER' ? '#A66300' : '#0759A9',
+                      }}
+                    >
+                      {row.role === 'SPEAKER' ? t('roleSpeaker') : t('roleModerator')}
+                    </Badge>
                     {revoked && (
                       <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: '#5A768A' }}>
                         {t('revoked')}

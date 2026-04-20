@@ -124,18 +124,20 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   const isPrimaryModerator = event.moderatorToken === token;
 
-  // Co-moderator path: token matches an EventModerator row for this
-  // event (and isn't revoked). Resolved in a single query so we get the
-  // co-moderator's own display name to propagate to the pre-join flow.
-  const coMod = isPrimaryModerator
+  // Magic-link path: token may be a co-moderator (role=MODERATOR) or
+  // a speaker (role=SPEAKER). Resolved once so we get the grant's own
+  // display name for the pre-join greeting and the role for JWT + UI.
+  const grant = isPrimaryModerator
     ? null
     : await prisma.eventModerator.findUnique({ where: { token } });
-  const isCoModerator =
-    !!coMod && coMod.eventId === event.id && coMod.revokedAt === null;
+  const isValidGrant =
+    !!grant && grant.eventId === event.id && grant.revokedAt === null;
+  const isCoModerator = isValidGrant && grant.role === 'MODERATOR';
+  const isSpeaker = isValidGrant && grant.role === 'SPEAKER';
   const isModerator = isPrimaryModerator || isCoModerator;
 
   let participantInfo: { displayName: string } | null = null;
-  if (!isModerator) {
+  if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
       select: { displayName: true, eventId: true },
@@ -173,13 +175,14 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       }}
       token={token}
       isModerator={isModerator}
+      isSpeaker={isSpeaker}
       isGuest={false}
       displayName={
-        isCoModerator && coMod
-          // Named co-moderator via EventModerator row — greet them by
-          // name in the pre-join input (still editable).
-          ? coMod.name
-          : isModerator
+        isValidGrant && grant
+          // Named co-moderator or speaker via EventModerator row —
+          // greet them by name in the pre-join input (still editable).
+          ? grant.name
+          : isPrimaryModerator
             // Primary moderator magic-link (shared): keep the input
             // empty so anyone opening the link types their own name
             // rather than inheriting the configured moderatorName.

@@ -71,6 +71,8 @@ interface LiveEventClientProps {
   event: EventInfo;
   token: string;
   isModerator: boolean;
+  /** Speaker ("relatore") magic-link grant. Full AV but no moderation. */
+  isSpeaker?: boolean;
   isGuest?: boolean;
   displayName: string;
   locale: string;
@@ -100,6 +102,7 @@ export default function LiveEventClient({
   event,
   token,
   isModerator,
+  isSpeaker = false,
   isGuest = false,
   displayName: initialDisplayName,
   locale,
@@ -200,7 +203,10 @@ export default function LiveEventClient({
     setError('');
     try {
       const body: Record<string, string> = {};
-      if (isModerator) {
+      // Both moderators and speakers arrive via magic link → they use
+      // the `moderatorToken` field (the JWT route's grant flow handles
+      // the role distinction and issues the right Jitsi features).
+      if (isModerator || isSpeaker) {
         body.moderatorToken = token;
       } else {
         body.accessToken = token;
@@ -229,7 +235,7 @@ export default function LiveEventClient({
       setError(t('connectionError'));
       setPhase('error');
     }
-  }, [event.slug, isModerator, token, chosenName, initialDisplayName, t]);
+  }, [event.slug, isModerator, isSpeaker, token, chosenName, initialDisplayName, t]);
 
   useEffect(() => {
     if (phase === 'fetching_jwt') { fetchJwt(); }
@@ -571,7 +577,7 @@ export default function LiveEventClient({
       {showFeedback && (
         <EventFeedback
           eventSlug={event.slug}
-          accessToken={!isGuest && !isModerator ? token : undefined}
+          accessToken={!isGuest && !isModerator && !isSpeaker ? token : undefined}
           guestId={isGuest ? guestId : undefined}
           onClose={handleFeedbackClose}
         />

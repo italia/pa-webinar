@@ -808,22 +808,27 @@
       }
     },
     "coModerators": {
-      "title": "Co-moderators",
-      "intro": "Add extra moderators with individual magic-links.",
-      "introHint": "Each co-moderator has their own display name in the room and a token that can be revoked without invalidating the primary moderator link.",
-      "add": "Add co-moderator",
+      "title": "Co-moderators and speakers",
+      "intro": "Add co-moderators and speakers with individual magic-links.",
+      "introHint": "Each person has their own display name in the room and a token that can be revoked independently. Speakers get mic, camera and screen share but can't moderate (kick, mute-all, recording).",
+      "add": "Add person",
       "name": "Name visible in room",
       "email": "Email (optional)",
       "emailPlaceholder": "to send them the link",
+      "role": "Role",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Speaker",
+      "roleModeratorHint": "Full moderation: record, mute everyone, remove participants.",
+      "roleSpeakerHint": "Can speak, show video and share screen. Cannot moderate the room.",
       "copyLink": "Copy link",
       "copied": "Copied!",
       "revoke": "Revoke",
       "revoked": "Revoked",
-      "confirmRevoke": "Revoke this co-moderator's access? The link will stop working immediately.",
-      "empty": "No co-moderators added. The primary moderator link is the only moderator access.",
-      "activeCount": "{count, plural, =0 {No active co-moderators} =1 {1 active co-moderator} other {# active co-moderators}}",
+      "confirmRevoke": "Revoke this person's access? The link will stop working immediately.",
+      "empty": "No extra access granted. The primary moderator link is the only privileged entry.",
+      "activeCount": "{count, plural, =0 {No active access} =1 {1 active access} other {# active accesses}}",
       "errors": {
-        "addFailed": "Couldn't add the co-moderator. Please retry."
+        "addFailed": "Couldn't save. Please retry."
       }
     },
     "gdprAuditLog": {
@@ -847,7 +852,9 @@
         "languagesTitle": "Language management",
         "languagesDescription": "Enable or disable the EU languages exposed to users, pick the default locale and customise translation strings.",
         "gdprTemplatesTitle": "GDPR templates",
-        "gdprTemplatesDescription": "Create reusable privacy notices that can be linked to any event, and pick the default one for new events."
+        "gdprTemplatesDescription": "Create reusable privacy notices that can be linked to any event, and pick the default one for new events.",
+        "emailTemplatesTitle": "Email templates",
+        "emailTemplatesDescription": "Customise subject, headings and copy for the confirmation and reminder emails. Leave empty to keep the built-in defaults."
       },
       "saved": "Settings saved successfully",
       "tabs": {
@@ -1118,6 +1125,45 @@
       },
       "errors": {
         "saveFailed": "Save failed. Check the fields and retry."
+      }
+    },
+    "emailTemplates": {
+      "title": "Email templates",
+      "subtitle": "Customise subject, headings and copy for transactional emails. Fields left empty use the built-in default copy.",
+      "overridden": "Customised",
+      "usingDefault": "Using default",
+      "saved": "Template saved.",
+      "resetDone": "Override removed: the default copy will be used.",
+      "revert": "Discard changes",
+      "resetToDefault": "Reset to default",
+      "confirmReset": "Remove the override? The built-in default copy will be used.",
+      "placeholdersTitle": "Available placeholders",
+      "placeholdersHelp": "Insert these tokens in any field — they will be replaced at send time with real event data.",
+      "keys": {
+        "confirmation": "Registration confirmation",
+        "reminder": "Event reminder"
+      },
+      "selectors": {
+        "key": "Email type",
+        "locale": "Language"
+      },
+      "fields": {
+        "subject": "Subject",
+        "subjectHint": "Email subject. Supports placeholders.",
+        "heading": "Main heading",
+        "headingHint": "Heading shown at the top of the email body.",
+        "bodyIntro": "Intro paragraph",
+        "bodyIntroHint": "Text shown before the event details table. Useful for a welcome message or extra context.",
+        "ctaLabel": "Button label",
+        "ctaLabelHint": "Label of the primary button linking to the personal join URL.",
+        "infoNote": "Info note",
+        "infoNoteHint": "Yellow warning box under the button. Leave empty to hide it.",
+        "footerNote": "Footer note",
+        "footerNoteHint": "Text shown in the footer below any organisation signature."
+      },
+      "errors": {
+        "saveFailed": "Save failed. Check the fields and retry.",
+        "resetFailed": "Could not remove override. Please retry."
       }
     },
     "languages": {
