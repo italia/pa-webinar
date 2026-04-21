@@ -60,9 +60,23 @@
 }
 
 // ── Live room ──
+//
+// Layout strategy:
+//   Desktop (≥lg): fixed viewport height, video + sidebar side-by-side.
+//   Mobile  (<lg): 100svh (small-viewport-height — iOS-safe, excludes URL
+//                  bar collapse), video and sidebar stacked, each getting a
+//                  predictable share of vertical space via `.live-main`
+//                  explicit height. Without this the jitsi-wrapper's 400px
+//                  min-height crowds the sidebar off a 667px iPhone screen.
 
 .live-page-bg {
   background: #0F1B2D;
+  height: calc(100vh - 80px);
+
+  @media (max-width: 991.98px) {
+    height: auto;
+    min-height: 100svh;
+  }
 }
 
 .live-top-bar {
@@ -76,6 +90,23 @@
   flex-shrink: 0;
 }
 
+// Main video flex-child. `min-width: 0` is the classic flexbox fix that
+// lets the Jitsi iframe shrink to fit instead of overflowing its parent;
+// on mobile we also cap its height so the sidebar gets room below.
+.live-main {
+  min-width: 0;
+  min-height: 0;
+
+  @media (min-width: 992px) {
+    min-height: 300px;
+  }
+
+  @media (max-width: 991.98px) {
+    flex: 0 0 auto;
+    height: 45vh;
+  }
+}
+
 .jitsi-wrapper {
   position: relative;
   width: 100%;
@@ -85,6 +116,10 @@
   border-radius: 0;
   overflow: hidden;
   border: none;
+
+  @media (max-width: 991.98px) {
+    min-height: 0;
+  }
 }
 
 // ── Sidebar ──
@@ -93,6 +128,12 @@
   border-left: 2px solid rgba(0, 102, 204, 0.4);
   background: #ffffff;
   box-shadow: -2px 0 12px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  min-width: 0;
+
+  @media (min-width: 992px) {
+    max-width: 360px;
+  }
 }
 
 .live-sidebar-header {
@@ -113,6 +154,14 @@
   background: transparent;
   color: rgba(255, 255, 255, 0.65);
   position: relative;
+
+  // Icon-only on phones (labels hidden via d-md-inline) needs a bigger
+  // touch target than a regular tab — aim for Apple's 44pt / Material's
+  // 48dp guideline.
+  @media (max-width: 767.98px) {
+    padding: 0.75rem 0.25rem;
+    min-height: 44px;
+  }
 
   &:hover {
     color: #fff;

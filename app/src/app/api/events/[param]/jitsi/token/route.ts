@@ -116,8 +116,14 @@ export const POST = withErrorHandling(async (request, context) => {
       throw new ConflictError('Guest access is only available during live events');
     }
 
+    // Default 120/min per IP to accommodate bursts of participants joining
+    // from a shared corporate NAT (common scenario: announcing the link
+    // during an MS Teams call where 100+ colleagues click simultaneously).
+    // Tunable per-deploy via GUEST_JWT_RATE_LIMIT_PER_MINUTE; the in-memory
+    // limiter is per-pod, so the effective ceiling is N_replicas × limit.
     const ip = getClientIp(request);
-    const rl = rateLimit(`guest-jwt:${ip}`, { limit: 5, windowMs: 60_000 });
+    const limit = parseInt(process.env.GUEST_JWT_RATE_LIMIT_PER_MINUTE || '120', 10);
+    const rl = rateLimit(`guest-jwt:${ip}`, { limit, windowMs: 60_000 });
     if (!rl.allowed) {
       throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
     }
