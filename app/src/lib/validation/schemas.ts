@@ -70,6 +70,20 @@ const eventBaseSchema = z.object({
   postEventShowFeedback: z.boolean().default(true),
   feedbackEnabled: z.boolean().default(true),
   recordingConsentText: z.string().max(5000).optional(),
+
+  // Recurrence (RFC 5545 RRULE). Null = one-off.
+  recurrenceRule: z.string().max(500).nullable().optional(),
+  recurrenceSeriesId: z.string().uuid().nullable().optional(),
+
+  // Per-feature role allowlist. See `lib/utils/permission-matrix.ts`.
+  // Accepting `any` here because Zod's record typings don't easily
+  // express the role-enum shape; the server coerces via `coerceMatrix`
+  // before persisting, which drops unknown keys.
+  permissionMatrix: z.record(z.string(), z.array(z.string())).nullable().optional(),
+
+  // Tag slugs (not UUIDs) so the admin can reference stable identifiers
+  // between templates and events.
+  tagSlugs: z.array(z.string().min(1).max(100)).max(30).optional(),
 });
 
 export const createEventSchema = eventBaseSchema.refine(
@@ -456,3 +470,24 @@ export const submitQuestionnaireResponseSchema = z.object({
 
 export type SubmitQuestionnaireResponseInput = z.infer<typeof submitQuestionnaireResponseSchema>;
 export type QuestionnaireAnswerInput = z.infer<typeof questionnaireAnswerInputSchema>;
+
+// ── Admin asset upload response ──────────────────────
+//
+// Shape returned by POST /api/admin/assets/upload-url. Kept as a
+// standalone schema so client-side callers (FileOrUrlInput and the
+// admin wizard forms) can import the TS type without duplicating the
+// response contract.
+export const assetUploadResponseSchema = z.object({
+  /** Canonical public URL of the uploaded object (no signature). */
+  url: z.string().url(),
+  /** Object-storage key under `assets/{type}/{yyyy}/{mm}/...`. */
+  key: z.string().min(1),
+  /** MIME type accepted and stored with the blob. */
+  mime: z.string().min(1),
+  /** Size in bytes, as observed server-side. */
+  size: z.number().int().nonnegative(),
+  /** Original filename (sanitized) — surfaced for display in the UI. */
+  filename: z.string().min(1),
+});
+
+export type AssetUploadResponse = z.infer<typeof assetUploadResponseSchema>;

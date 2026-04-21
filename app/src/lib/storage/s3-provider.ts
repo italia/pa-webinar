@@ -126,6 +126,22 @@ export class S3StorageProvider implements StorageProvider {
     }
   }
 
+  async put(
+    key: string,
+    body: Buffer | Uint8Array,
+    contentType: string,
+  ): Promise<{ publicUrl: string }> {
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+      }),
+    );
+    return { publicUrl: this.publicUrl(key) };
+  }
+
   async getUploadUrl(
     key: string,
     opts: UploadUrlOptions = {},

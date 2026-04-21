@@ -63,6 +63,19 @@ export interface StorageProvider {
   ): Promise<{ uploadUrl: string; publicUrl: string }>;
 
   /**
+   * Server-side upload — the app receives the bytes (e.g. from a
+   * multipart form) and writes them to the bucket/container directly.
+   * Preferred for small assets where routing through the app is fine
+   * (images, audio clips, documents). For large media use getUploadUrl
+   * so the client uploads directly without egress through the app.
+   */
+  put(
+    key: string,
+    body: Buffer | Uint8Array,
+    contentType: string,
+  ): Promise<{ publicUrl: string }>;
+
+  /**
    * Return a presigned URL that lets the holder download the blob via
    * GET for a limited time. For public/anonymous access switch the
    * container/bucket ACL instead — this API always signs.

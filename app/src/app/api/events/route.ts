@@ -15,6 +15,7 @@ import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { getPublicEnv } from '@/lib/env';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
+import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +46,26 @@ export const POST = withErrorHandling(async (request) => {
 
   const data = parsed.data;
 
+  // If the wizard supplied a permission matrix, keep the boolean toggles
+  // in sync so legacy code paths stay correct. Matrix wins when both are
+  // present.
+  const matrix = data.permissionMatrix ? coerceMatrix(data.permissionMatrix) : null;
+  const effectiveToggles = matrix
+    ? {
+        qaEnabled: togglesFromMatrix(matrix).qaEnabled,
+        chatEnabled: togglesFromMatrix(matrix).chatEnabled,
+        participantsCanUnmute: togglesFromMatrix(matrix).participantsCanUnmute,
+        participantsCanStartVideo: togglesFromMatrix(matrix).participantsCanStartVideo,
+        participantsCanShareScreen: togglesFromMatrix(matrix).participantsCanShareScreen,
+      }
+    : {
+        qaEnabled: data.qaEnabled,
+        chatEnabled: data.chatEnabled,
+        participantsCanUnmute: data.participantsCanUnmute,
+        participantsCanStartVideo: data.participantsCanStartVideo,
+        participantsCanShareScreen: data.participantsCanShareScreen,
+      };
+
   const slug = await generateUniqueSlug(data.title);
   const jitsiRoomName = `evt-${randomUUID()}`;
   const moderatorToken = randomUUID();
@@ -74,13 +95,16 @@ export const POST = withErrorHandling(async (request) => {
       endsAt: new Date(data.endsAt),
       timezone: data.timezone,
       maxParticipants: data.maxParticipants,
-      qaEnabled: data.qaEnabled,
-      chatEnabled: data.chatEnabled,
+      qaEnabled: effectiveToggles.qaEnabled,
+      chatEnabled: effectiveToggles.chatEnabled,
       recordingEnabled: data.recordingEnabled,
       autoStartRecording: data.autoStartRecording,
-      participantsCanUnmute: data.participantsCanUnmute,
-      participantsCanStartVideo: data.participantsCanStartVideo,
-      participantsCanShareScreen: data.participantsCanShareScreen,
+      participantsCanUnmute: effectiveToggles.participantsCanUnmute,
+      participantsCanStartVideo: effectiveToggles.participantsCanStartVideo,
+      participantsCanShareScreen: effectiveToggles.participantsCanShareScreen,
+      permissionMatrix: matrix ?? undefined,
+      recurrenceRule: data.recurrenceRule ?? null,
+      recurrenceSeriesId: data.recurrenceSeriesId ?? null,
       dataRetentionDays: data.dataRetentionDays,
       privacyPolicyUrl: data.privacyPolicyUrl,
       privacyPolicyText: data.privacyPolicyText,
@@ -107,6 +131,21 @@ export const POST = withErrorHandling(async (request) => {
       },
     },
   });
+
+  // Attach tags (if the wizard provided slugs). Silently drops unknown
+  // slugs — admins curate the tag list via /api/admin/tags separately.
+  if (data.tagSlugs && data.tagSlugs.length > 0) {
+    const tags = await prisma.tag.findMany({
+      where: { slug: { in: data.tagSlugs } },
+      select: { id: true },
+    });
+    if (tags.length > 0) {
+      await prisma.eventTagLink.createMany({
+        data: tags.map((t) => ({ eventId: event.id, tagId: t.id })),
+        skipDuplicates: true,
+      });
+    }
+  }
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const locale = resolveLocale(request);

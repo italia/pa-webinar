@@ -321,6 +321,146 @@
     }
   },
   "admin": {
+    "fileOrUrl": {
+      "tabUpload": "Upload file",
+      "tabUrl": "Paste URL",
+      "uploadLabel": "Choose a file from your device",
+      "urlLabel": "File URL",
+      "urlPlaceholder": "https://…",
+      "uploadButton": "Upload",
+      "uploading": "Uploading…",
+      "remove": "Remove",
+      "preview": "Preview",
+      "openFile": "Open file",
+      "invalidUrl": "Please enter a valid URL",
+      "errorSize": "File exceeds the maximum allowed size",
+      "errorMime": "Unsupported file type",
+      "errorGeneric": "Error while uploading the file",
+      "helpImage": "Supported formats: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
+      "helpAudio": "Supported formats: MP3, WAV, OGG, M4A, WebM — max 20 MB",
+      "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+    },
+    "wizard": {
+      "steps": {
+        "base": "Basics",
+        "permissions": "Permissions",
+        "invites": "People",
+        "content": "Content",
+        "review": "Review"
+      },
+      "saveDraft": "Save as draft",
+      "publish": "Publish event",
+      "step1": {
+        "heading": "Basic information",
+        "intro": "Title, description, cover image and schedule.",
+        "coverImage": "Cover image",
+        "coverImageHelp": "Shown on the public event page and invitation emails.",
+        "scheduleHeading": "Schedule",
+        "timezone": "Timezone",
+        "recurrenceHeading": "Recurrence",
+        "tagsHeading": "Tags",
+        "waitingRoomAudio": "Waiting-room audio (optional)",
+        "waitingRoomAudioHelp": "Played before the live call starts."
+      },
+      "step2": {
+        "heading": "Who can do what",
+        "intro": "Permission matrix: pick which roles can use each feature. Moderators can always do everything.",
+        "featureCol": "Feature",
+        "role": {
+          "GUEST": "Guest",
+          "SPEAKER": "Speaker",
+          "MODERATOR": "Moderator"
+        },
+        "feature": {
+          "qa": { "label": "Q&A", "desc": "Submit questions to the Q&A panel." },
+          "chat": { "label": "Chat", "desc": "Post messages in the group chat." },
+          "mic": { "label": "Microphone", "desc": "Unmute their own microphone." },
+          "video": { "label": "Video", "desc": "Turn on their own camera." },
+          "share": { "label": "Screen share", "desc": "Share their screen." },
+          "recording_control": { "label": "Recording control", "desc": "Start/stop the recording." }
+        },
+        "recordingHeading": "Recording"
+      },
+      "step3": {
+        "heading": "People and invites",
+        "intro": "Add organizers (shown on the page), speakers (receive a moderator link), and invited guests.",
+        "organizersHeading": "Organizers",
+        "organizersHelp": "Appear on the public event page.",
+        "organizerName": "Organizer name",
+        "organizerWebsite": "Website",
+        "speakersHeading": "Speakers",
+        "speakersHelp": "Receive a moderator link via email.",
+        "speakerName": "Name",
+        "speakerEmail": "Email",
+        "speakerRequired": "Name and email are required.",
+        "invitationsHeading": "Invitations",
+        "invitationsHelp": "Pre-registered attendees — each gets a personal join link.",
+        "invitationName": "Name (optional)",
+        "invitationEmail": "Email",
+        "invitationRole": "Role",
+        "role": {
+          "GUEST": "Guest",
+          "SPEAKER": "Speaker"
+        },
+        "add": "Add",
+        "remove": "Remove",
+        "invalidEmail": "Invalid email address.",
+        "duplicateEmail": "Email already added."
+      },
+      "step4": {
+        "heading": "Content and materials",
+        "intro": "Attach materials and link pre/post-event questionnaires.",
+        "materialsHeading": "Materials",
+        "materialsHelp": "Documents, slides, and links to share before, during or after the event.",
+        "materialTitle": "Title",
+        "materialUrl": "File or link",
+        "visibilityLabel": "Visibility",
+        "visibility": {
+          "ALWAYS": "Always",
+          "BEFORE": "Before the event",
+          "DURING": "During the event",
+          "AFTER": "After the event"
+        },
+        "addMaterial": "Add material",
+        "remove": "Remove",
+        "questionnairesHeading": "Questionnaires",
+        "questionnairesEmpty": "No questionnaires available. Create one from Settings → Questionnaires.",
+        "preQuestionnaire": "Pre-event questionnaire",
+        "postQuestionnaire": "Post-event questionnaire (feedback)",
+        "none": "— None —"
+      },
+      "step5": {
+        "heading": "Review and publish",
+        "intro": "Double-check and publish (or save as draft).",
+        "summary": {
+          "title": "Title",
+          "schedule": "Schedule",
+          "recurrence": "Recurrence",
+          "maxParticipants": "Expected participants",
+          "organizers": "Organizers",
+          "speakers": "Speakers",
+          "invitations": "Invitations",
+          "materials": "Materials",
+          "tags": "Tags",
+          "recording": "Recording",
+          "recordingAuto": "On — auto-start",
+          "recordingManual": "On — manual start",
+          "recordingOff": "Off"
+        },
+        "noRecurrence": "One-off event",
+        "gdprHeading": "Privacy and data retention",
+        "retentionDays": "Retention days",
+        "retentionHelp": "After this threshold, personal data is automatically deleted.",
+        "gdprTemplate": "Privacy template",
+        "gdprTemplateNone": "— Use custom text —",
+        "privacyText": "Privacy notice (text)",
+        "moderatorHeading": "Moderator contact",
+        "moderatorName": "Name",
+        "moderatorEmail": "Email",
+        "capacityHeading": "Estimated capacity",
+        "featuresHeading": "Configuration summary"
+      }
+    },
     "nav": {
       "events": "Events",
       "registrations": "Sign-ups",
@@ -1060,6 +1200,35 @@
         "totalFeedback": "Feedback responses"
       }
     },
+    "recurrence": {
+      "label": "Recurrence",
+      "helpText": "Make this event recurring. A series will be generated starting from the start date.",
+      "preset": {
+        "none": "None",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "weekdays": "Weekdays",
+        "monthly": "Monthly",
+        "custom": "Custom"
+      },
+      "weekdaysLabel": "Days of the week",
+      "weekdayShort": {
+        "0": "Mon",
+        "1": "Tue",
+        "2": "Wed",
+        "3": "Thu",
+        "4": "Fri",
+        "5": "Sat",
+        "6": "Sun"
+      },
+      "endLabel": "End of recurrence",
+      "endNever": "Never ends",
+      "endDate": "On date...",
+      "endCount": "After N occurrences",
+      "previewLabel": "Preview: next 5 occurrences",
+      "customRRuleLabel": "Custom RRULE",
+      "invalidRRule": "Invalid rule"
+    },
     "templates": {
       "title": "Event templates",
       "subtitle": "Manage preset templates for quick event creation",
@@ -1113,6 +1282,29 @@
       "uploadBtn": "Upload",
       "deleteConfirm": "Are you sure you want to delete this file?",
       "noFiles": "No files uploaded. Use the \"Upload file\" button to add materials."
+    },
+    "materials": {
+      "title": "Event materials",
+      "subtitle": "Attachments, links and resources shared before, during and after the event.",
+      "addButton": "Add material",
+      "empty": "No materials added yet.",
+      "deleteConfirm": "Delete this material permanently?",
+      "editButton": "Edit",
+      "cancelButton": "Cancel",
+      "saveButton": "Save",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description (optional)",
+      "visibilityLabel": "Visibility",
+      "visibilityAlways": "Always",
+      "visibilityBefore": "Before the event",
+      "visibilityDuring": "During the event",
+      "visibilityAfter": "After the event",
+      "typeLabel": "Type",
+      "fileUploaded": "File uploaded",
+      "typeFile": "File",
+      "typeLink": "Link",
+      "sizeLabel": "Size",
+      "errorGeneric": "Something went wrong. Please try again."
     },
     "gdprTemplates": {
       "title": "GDPR templates",
