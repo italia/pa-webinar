@@ -3,9 +3,10 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "serialNumber": "urn:uuid:5b0c41ec-1f2b-4a53-9b2e-1d2f3a4b5c6d",
-  "version": 1,
+  "version": 2,
+
   "metadata": {
-    "timestamp": "2026-04-21T08:00:00Z",
+    "timestamp": "2026-04-21T11:15:00Z",
     "lifecycles": [
       { "phase": "operations" }
     ],
@@ -15,19 +16,30 @@
           "type": "application",
           "group": "@cyclonedx",
           "name": "cdxgen",
-          "version": "10.x"
+          "version": "10.x",
+          "description": "Produrrà la parte DEV (dipendenze npm, container OCI) in modo automatizzato."
         },
         {
           "type": "application",
           "group": "anchore",
           "name": "syft",
-          "version": "1.x"
+          "version": "1.x",
+          "description": "Previsto per estrarre il manifest OS layer dai container."
+        },
+        {
+          "type": "application",
+          "name": "manual-ops-authoring",
+          "description": "La parte services/OPS di questo documento è curata manualmente — la sua automazione tramite Azure Resource Graph è in roadmap."
         }
       ]
     },
+    "manufacturer": {
+      "name": "Dipartimento per la Trasformazione Digitale — Presidenza del Consiglio dei Ministri",
+      "url": ["https://innovazione.gov.it"]
+    },
     "authors": [
       {
-        "name": "Dipartimento per la Trasformazione Digitale",
+        "name": "Trasparenza Piattaforma Eventi",
         "email": "trasparenza@innovazione.gov.it"
       }
     ],
@@ -36,122 +48,275 @@
       "type": "application",
       "name": "eventi-dtd",
       "version": "0.3.44",
-      "description": "Istanza eventi-dtd per il tenant videocall-test (ambiente di collaudo).",
+      "publisher": "Dipartimento per la Trasformazione Digitale",
+      "description": "Istanza eventi-dtd per il tenant videocall-test (ambiente di collaudo sul cluster AKS italynorth).",
+      "scope": "required",
       "licenses": [
-        { "license": { "id": "AGPL-3.0-only" } }
+        { "license": { "id": "AGPL-3.0-only", "url": "https://spdx.org/licenses/AGPL-3.0-only.html" } }
       ],
       "externalReferences": [
         { "type": "vcs", "url": "https://github.com/italia/eventi-dtd" },
-        { "type": "website", "url": "https://videocall-test.example.it" }
+        { "type": "website", "url": "https://videocall-test.innovazione.gov.it" },
+        { "type": "release-notes", "url": "https://github.com/italia/eventi-dtd/releases" },
+        { "type": "bom", "url": "https://videocall-test.innovazione.gov.it/examples/service-inventory.example.json" }
       ]
     },
     "properties": [
       { "name": "eventi-dtd:tenant", "value": "videocall-test" },
+      { "name": "eventi-dtd:environment", "value": "test" },
       { "name": "eventi-dtd:cloud-provider", "value": "Microsoft Azure" },
       { "name": "eventi-dtd:region", "value": "italynorth" },
-      { "name": "eventi-dtd:deployment-mode", "value": "standard" }
+      { "name": "eventi-dtd:kubernetes-version", "value": "v1.34.4" },
+      { "name": "eventi-dtd:deployment-mode", "value": "standard" },
+      { "name": "eventi-dtd:helm-chart", "value": "eventi-dtd-0.1.1" }
     ]
   },
 
   "components": [
     {
-      "bom-ref": "pkg:oci/eventi-dtd@sha256:placeholder",
+      "bom-ref": "pkg:oci/eventi-dtd",
       "type": "container",
+      "publisher": "Dipartimento per la Trasformazione Digitale",
+      "supplier": { "name": "GitHub Container Registry", "url": ["https://ghcr.io"] },
+      "manufacturer": { "name": "Italia DTD" },
       "name": "eventi-dtd",
       "version": "0.3.44",
-      "purl": "pkg:oci/italia/eventi-dtd@0.3.44?repository_url=ghcr.io",
-      "description": "Immagine OCI dell'applicazione Next.js, pubblicata su GHCR."
+      "purl": "pkg:oci/italia/eventi-dtd@sha256:185e0a4c1ac8daf974687dd1560dd403b1985b180cd337058524534ecfe52c23?repository_url=ghcr.io",
+      "description": "Immagine OCI dell'applicazione Next.js. Base: Debian 12 slim.",
+      "scope": "required",
+      "hashes": [
+        { "alg": "SHA-256", "content": "185e0a4c1ac8daf974687dd1560dd403b1985b180cd337058524534ecfe52c23" }
+      ],
+      "licenses": [{ "license": { "id": "AGPL-3.0-only" } }],
+      "externalReferences": [
+        { "type": "vcs", "url": "https://github.com/italia/eventi-dtd" },
+        { "type": "distribution", "url": "https://ghcr.io/italia/eventi-dtd" }
+      ]
     },
     {
       "bom-ref": "pkg:oci/jitsi-web",
       "type": "container",
+      "supplier": { "name": "Docker Hub", "url": ["https://hub.docker.com"] },
+      "manufacturer": { "name": "Jitsi Community / 8x8" },
       "name": "jitsi/web",
       "version": "stable-9258",
-      "purl": "pkg:oci/jitsi/web@stable-9258?repository_url=docker.io"
+      "purl": "pkg:oci/jitsi/web@sha256:a3f2b04691356fe989bd5b5a4ac0905e831226273fc6b814b0c9417319396b9e?repository_url=docker.io&tag=stable-9258",
+      "scope": "required",
+      "hashes": [
+        { "alg": "SHA-256", "content": "a3f2b04691356fe989bd5b5a4ac0905e831226273fc6b814b0c9417319396b9e" }
+      ],
+      "licenses": [{ "license": { "id": "Apache-2.0" } }],
+      "externalReferences": [
+        { "type": "vcs", "url": "https://github.com/jitsi/jitsi-meet" }
+      ]
     },
     {
       "bom-ref": "pkg:oci/jitsi-prosody",
       "type": "container",
+      "supplier": { "name": "Docker Hub" },
+      "manufacturer": { "name": "Jitsi Community / 8x8" },
       "name": "jitsi/prosody",
       "version": "stable-9258",
-      "purl": "pkg:oci/jitsi/prosody@stable-9258?repository_url=docker.io"
+      "purl": "pkg:oci/jitsi/prosody@sha256:7faab902ca4678080bad92efd607e1d6cfab78d728705add885bc706b92e446b?repository_url=docker.io",
+      "scope": "required",
+      "hashes": [
+        { "alg": "SHA-256", "content": "7faab902ca4678080bad92efd607e1d6cfab78d728705add885bc706b92e446b" }
+      ],
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
     },
     {
       "bom-ref": "pkg:oci/jitsi-jicofo",
       "type": "container",
+      "supplier": { "name": "Docker Hub" },
+      "manufacturer": { "name": "Jitsi Community / 8x8" },
       "name": "jitsi/jicofo",
       "version": "stable-9258",
-      "purl": "pkg:oci/jitsi/jicofo@stable-9258?repository_url=docker.io"
+      "purl": "pkg:oci/jitsi/jicofo@sha256:005724f3b065cf404a279e34a44c8d0b53106a5c4f2a280d6b3ef344503b9d01?repository_url=docker.io",
+      "scope": "required",
+      "hashes": [
+        { "alg": "SHA-256", "content": "005724f3b065cf404a279e34a44c8d0b53106a5c4f2a280d6b3ef344503b9d01" }
+      ],
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
     },
     {
       "bom-ref": "pkg:oci/jitsi-jvb",
       "type": "container",
+      "supplier": { "name": "Docker Hub" },
+      "manufacturer": { "name": "Jitsi Community / 8x8" },
       "name": "jitsi/jvb",
       "version": "stable-9258",
-      "purl": "pkg:oci/jitsi/jvb@stable-9258?repository_url=docker.io"
+      "purl": "pkg:oci/jitsi/jvb@stable-9258?repository_url=docker.io",
+      "scope": "required",
+      "licenses": [{ "license": { "id": "Apache-2.0" } }],
+      "description": "Video Bridge. Digest catturato dinamicamente dai pod JVB quando scalano da zero."
+    },
+    {
+      "bom-ref": "pkg:oci/coturn",
+      "type": "container",
+      "supplier": { "name": "Docker Hub" },
+      "manufacturer": { "name": "coturn project" },
+      "name": "coturn/coturn",
+      "purl": "pkg:oci/coturn/coturn@sha256:254a7e19f23366bc638af8e092c18ea52e0eefc9e44041f376e58b61b3b6d646?repository_url=docker.io",
+      "scope": "required",
+      "hashes": [
+        { "alg": "SHA-256", "content": "254a7e19f23366bc638af8e092c18ea52e0eefc9e44041f376e58b61b3b6d646" }
+      ],
+      "licenses": [{ "license": { "id": "BSD-3-Clause" } }]
+    },
+    {
+      "bom-ref": "pkg:oci/redis",
+      "type": "container",
+      "supplier": { "name": "Docker Hub" },
+      "manufacturer": { "name": "Bitnami (Broadcom)" },
+      "name": "bitnami/redis",
+      "version": "8.6.2",
+      "purl": "pkg:oci/bitnami/redis@sha256:f3d94ad232c4ace445696beef70e8ebd798fbe1a338b56698db3185fbd68c573?repository_url=docker.io",
+      "scope": "required",
+      "hashes": [
+        { "alg": "SHA-256", "content": "f3d94ad232c4ace445696beef70e8ebd798fbe1a338b56698db3185fbd68c573" }
+      ],
+      "licenses": [{ "license": { "id": "RSALv2", "name": "Redis Source Available License v2" } }]
+    },
+    {
+      "bom-ref": "pkg:oci/ingress-nginx-controller",
+      "type": "container",
+      "supplier": { "name": "registry.k8s.io" },
+      "manufacturer": { "name": "Kubernetes SIGs" },
+      "name": "ingress-nginx/controller",
+      "version": "v1.9.4",
+      "purl": "pkg:oci/ingress-nginx/controller@sha256:5b161f051d017e55d358435f295f5e9a297e66158f136321d9b04520ec6c48a3?repository_url=registry.k8s.io",
+      "scope": "required",
+      "hashes": [
+        { "alg": "SHA-256", "content": "5b161f051d017e55d358435f295f5e9a297e66158f136321d9b04520ec6c48a3" }
+      ],
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
+    },
+    {
+      "bom-ref": "pkg:oci/cert-manager",
+      "type": "container",
+      "supplier": { "name": "Quay.io" },
+      "manufacturer": { "name": "Jetstack / CNCF" },
+      "name": "jetstack/cert-manager-controller",
+      "version": "v1.13.3",
+      "purl": "pkg:oci/jetstack/cert-manager-controller@v1.13.3?repository_url=quay.io",
+      "scope": "required",
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
     },
     {
       "bom-ref": "pkg:deb/debian/debian@12",
       "type": "operating-system",
       "name": "debian",
       "version": "12-slim",
-      "description": "Base image layer dell'immagine Next.js."
+      "description": "Base image layer dell'applicazione Next.js."
     },
     {
       "bom-ref": "pkg:npm/next@15.5.15",
       "type": "framework",
+      "supplier": { "name": "npm, Inc." },
+      "publisher": "Vercel",
       "name": "next",
       "version": "15.5.15",
       "purl": "pkg:npm/next@15.5.15",
+      "scope": "required",
       "licenses": [{ "license": { "id": "MIT" } }]
     },
     {
       "bom-ref": "pkg:npm/react@19.0.0",
       "type": "library",
+      "supplier": { "name": "npm, Inc." },
+      "publisher": "Meta",
       "name": "react",
       "version": "19.0.0",
       "purl": "pkg:npm/react@19.0.0",
+      "scope": "required",
       "licenses": [{ "license": { "id": "MIT" } }]
     },
     {
       "bom-ref": "pkg:npm/next-intl@4.0.0",
       "type": "library",
+      "supplier": { "name": "npm, Inc." },
       "name": "next-intl",
       "version": "4.0.0",
       "purl": "pkg:npm/next-intl@4.0.0",
+      "scope": "required",
       "licenses": [{ "license": { "id": "MIT" } }]
     },
     {
       "bom-ref": "pkg:npm/@prisma/client@6.0.0",
       "type": "library",
+      "supplier": { "name": "npm, Inc." },
+      "publisher": "Prisma",
       "name": "@prisma/client",
       "version": "6.0.0",
       "purl": "pkg:npm/%40prisma/client@6.0.0",
+      "scope": "required",
       "licenses": [{ "license": { "id": "Apache-2.0" } }]
     },
     {
       "bom-ref": "pkg:npm/bootstrap-italia@2.12.0",
       "type": "library",
+      "supplier": { "name": "npm, Inc." },
+      "publisher": "Designers Italia",
       "name": "bootstrap-italia",
       "version": "2.12.0",
       "purl": "pkg:npm/bootstrap-italia@2.12.0",
+      "scope": "required",
       "licenses": [{ "license": { "id": "BSD-3-Clause" } }]
     },
     {
       "bom-ref": "pkg:npm/design-react-kit@5.1.0",
       "type": "library",
+      "supplier": { "name": "npm, Inc." },
+      "publisher": "Designers Italia",
       "name": "design-react-kit",
       "version": "5.1.0",
       "purl": "pkg:npm/design-react-kit@5.1.0",
+      "scope": "required",
       "licenses": [{ "license": { "id": "BSD-3-Clause" } }]
     },
     {
       "bom-ref": "pkg:npm/ioredis@5.10.1",
       "type": "library",
+      "supplier": { "name": "npm, Inc." },
       "name": "ioredis",
       "version": "5.10.1",
       "purl": "pkg:npm/ioredis@5.10.1",
+      "scope": "required",
       "licenses": [{ "license": { "id": "MIT" } }]
+    },
+
+    {
+      "bom-ref": "crypto:tls/letsencrypt",
+      "type": "cryptographic-asset",
+      "name": "Certificato TLS videocall-test.innovazione.gov.it",
+      "description": "X.509 rilasciato da Let's Encrypt via cert-manager (ACME HTTP-01). Chiavi RSA 2048 gestite in Secret Kubernetes videocall-test-tls.",
+      "properties": [
+        { "name": "crypto:algorithm", "value": "RSA-2048" },
+        { "name": "crypto:issuer", "value": "Let's Encrypt (ISRG)" },
+        { "name": "crypto:rotation", "value": "automatic, every 60 days via cert-manager" }
+      ]
+    },
+    {
+      "bom-ref": "crypto:jwt/jitsi-signing-key",
+      "type": "cryptographic-asset",
+      "name": "Chiave di firma JWT Jitsi",
+      "description": "Chiave simmetrica HS256 condivisa tra app Next.js e Prosody per autenticare i partecipanti verso Jitsi. Conservata nel Secret videocall-secrets (chiave JITSI_JWT_SECRET). Mai esposta al browser né al cittadino.",
+      "properties": [
+        { "name": "crypto:algorithm", "value": "HS256" },
+        { "name": "crypto:storage", "value": "Kubernetes Secret (videocall-secrets)" },
+        { "name": "crypto:rotation", "value": "manual, on operator request" }
+      ]
+    },
+    {
+      "bom-ref": "crypto:encryption/pii",
+      "type": "cryptographic-asset",
+      "name": "Chiave di cifratura PII a riposo",
+      "description": "AES-256-GCM applicata prima della scrittura su PostgreSQL per campi nominativi ed email degli iscritti. La chiave PII_ENCRYPTION_KEY è gestita nel Secret Kubernetes, il database non la vede.",
+      "properties": [
+        { "name": "crypto:algorithm", "value": "AES-256-GCM" },
+        { "name": "crypto:storage", "value": "Kubernetes Secret (videocall-secrets)" },
+        { "name": "crypto:purpose", "value": "application-layer encryption of PII at rest" }
+      ]
     }
   ],
 
@@ -159,13 +324,13 @@
     {
       "bom-ref": "svc:azure/aks/videocall-test",
       "provider": {
-        "name": "Microsoft Azure",
-        "url": ["https://azure.microsoft.com"]
+        "name": "Microsoft Corporation",
+        "url": ["https://azure.microsoft.com/it-it/products/kubernetes-service"]
       },
       "group": "Microsoft.ContainerService",
       "name": "Azure Kubernetes Service",
-      "version": "1.29",
-      "description": "Cluster AKS aks-test che ospita il namespace videocall-test.",
+      "version": "1.34.4",
+      "description": "Cluster AKS developers-italia-prod che ospita il namespace videocall-test. Nodepool di sistema + nodepool jitsi-jvb (scale-to-zero) + nodepool jitsi-jibri (scale-to-zero).",
       "endpoints": ["https://aks-test-dns.hcp.italynorth.azmk8s.io"],
       "authenticated": true,
       "x-trust-boundary": true,
@@ -173,102 +338,197 @@
         { "classification": "application", "flow": "bi-directional" }
       ],
       "externalReferences": [
-        { "type": "documentation", "url": "https://learn.microsoft.com/azure/aks/" }
+        { "type": "documentation", "url": "https://learn.microsoft.com/it-it/azure/aks/" },
+        { "type": "license", "url": "https://www.microsoft.com/licensing/docs/view/OST-Online-Services-Terms" }
       ],
       "properties": [
         { "name": "azure:resource-type", "value": "Microsoft.ContainerService/managedClusters" },
         { "name": "azure:region", "value": "italynorth" },
-        { "name": "eventi-dtd:node-pools", "value": "system,jvb-pool" }
+        { "name": "azure:sla", "value": "99.95% (con Uptime SLA)" },
+        { "name": "azure:certifications", "value": "ISO 27001, ISO 27017, ISO 27018, SOC 1/2/3, HIPAA, PCI DSS, AgID Circolare 2/2018 (cloud qualificato)" },
+        { "name": "eventi-dtd:node-pools", "value": "system, jitsi-jvb, jitsi-jibri" }
       ]
     },
     {
       "bom-ref": "svc:azure/postgres-flexible/videocall-test",
-      "provider": { "name": "Microsoft Azure" },
+      "provider": { "name": "Microsoft Corporation" },
       "group": "Microsoft.DBforPostgreSQL",
       "name": "Azure Database for PostgreSQL Flexible Server",
       "version": "16",
-      "description": "Database gestito con dati applicativi: eventi, iscrizioni, feedback, template email.",
+      "description": "Database gestito (server developersitalia-prod, database videocall_test). Contiene dati applicativi: eventi, iscrizioni, consensi GDPR, template email, feedback. I campi nominativi sono cifrati AES-256-GCM lato applicazione prima della scrittura.",
+      "endpoints": ["developersitalia-prod.postgres.database.azure.com:5432"],
       "authenticated": true,
       "x-trust-boundary": true,
       "data": [
-        { "classification": "personal-data", "flow": "bi-directional" },
-        { "classification": "application", "flow": "bi-directional" }
+        {
+          "classification": "personal-data",
+          "flow": "bi-directional",
+          "description": "Nominativi, email, consensi privacy degli iscritti. Base giuridica: consenso (art. 6.1.a GDPR)."
+        },
+        {
+          "classification": "application",
+          "flow": "bi-directional"
+        }
+      ],
+      "externalReferences": [
+        { "type": "documentation", "url": "https://learn.microsoft.com/azure/postgresql/flexible-server/" }
       ],
       "properties": [
         { "name": "azure:resource-type", "value": "Microsoft.DBforPostgreSQL/flexibleServers" },
-        { "name": "eventi-dtd:retention-days", "value": "35" },
-        { "name": "eventi-dtd:backup", "value": "geo-redundant" },
-        { "name": "eventi-dtd:pii", "value": "email-hash, nome, cognome, consensi GDPR" }
+        { "name": "azure:region", "value": "italynorth" },
+        { "name": "azure:tls-minimum", "value": "TLS 1.2" },
+        { "name": "azure:backup", "value": "geo-redundant, 7 giorni" },
+        { "name": "eventi-dtd:retention-days", "value": "30 (videocall-test)" },
+        { "name": "eventi-dtd:pii-encryption", "value": "application-layer AES-256-GCM (chiave in Kubernetes Secret, non visibile al servizio gestito)" }
       ]
     },
     {
-      "bom-ref": "svc:azure/blob/recordings-videocall-test",
-      "provider": { "name": "Microsoft Azure" },
+      "bom-ref": "svc:azure/blob/recordings",
+      "provider": { "name": "Microsoft Corporation" },
       "group": "Microsoft.Storage",
       "name": "Azure Blob Storage",
-      "description": "Bucket delle registrazioni Jibri e degli asset branding del tenant.",
+      "description": "Storage account developersitaliarec, container 'recordings'. Conserva le registrazioni video Jibri.",
+      "endpoints": ["https://developersitaliarec.blob.core.windows.net/"],
       "authenticated": true,
       "x-trust-boundary": true,
       "data": [
-        { "classification": "recording", "flow": "outbound" }
+        {
+          "classification": "recording",
+          "flow": "outbound",
+          "description": "File MP4 delle sessioni webinar con partecipanti visibili. Base giuridica: consenso esplicito del partecipante (informativa in fase di registrazione)."
+        }
+      ],
+      "externalReferences": [
+        { "type": "documentation", "url": "https://learn.microsoft.com/azure/storage/blobs/" }
       ],
       "properties": [
         { "name": "azure:resource-type", "value": "Microsoft.Storage/storageAccounts" },
-        { "name": "azure:replication", "value": "ZRS" },
-        { "name": "eventi-dtd:retention-days", "value": "90" }
+        { "name": "azure:replication", "value": "ZRS (zone-redundant italynorth)" },
+        { "name": "azure:encryption", "value": "Microsoft-managed keys (MSKM), AES-256" },
+        { "name": "eventi-dtd:retention-days", "value": "90" },
+        { "name": "eventi-dtd:access-pattern", "value": "SAS URL pre-signed per upload (Jibri) e download (cittadini autenticati)" }
+      ]
+    },
+    {
+      "bom-ref": "svc:mailgun/eu",
+      "provider": {
+        "name": "Mailgun Technologies, Inc. (Sinch Group)",
+        "url": ["https://www.mailgun.com/"]
+      },
+      "name": "Mailgun Email Service (regione EU)",
+      "description": "SMTP relay per email transazionali: conferme iscrizione, link moderatore, reminder. Regione EU per mantenere i dati nell'Unione Europea.",
+      "endpoints": ["smtp.eu.mailgun.org:587"],
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [
+        {
+          "classification": "personal-data",
+          "flow": "outbound",
+          "description": "Indirizzo email, nominativo, link di accesso personalizzato. Base giuridica: esecuzione del servizio richiesto (art. 6.1.b GDPR)."
+        }
+      ],
+      "externalReferences": [
+        { "type": "documentation", "url": "https://documentation.mailgun.com/" },
+        { "type": "license", "url": "https://www.mailgun.com/legal/dpa/" }
+      ],
+      "properties": [
+        { "name": "mailgun:region", "value": "EU (api.eu.mailgun.net)" },
+        { "name": "mailgun:dpa", "value": "https://www.mailgun.com/legal/dpa/" },
+        { "name": "eventi-dtd:sender-domain", "value": "videocall-test.innovazione.gov.it" },
+        { "name": "eventi-dtd:credentials-rotation", "value": "manuale, secret riutilizzato da plebiscitum-test" }
       ]
     },
     {
       "bom-ref": "svc:github/ghcr",
-      "provider": { "name": "GitHub, Inc.", "url": ["https://github.com"] },
+      "provider": { "name": "GitHub, Inc. (Microsoft)", "url": ["https://github.com"] },
       "name": "GitHub Container Registry",
-      "description": "Registry OCI da cui AKS pull-a le immagini dell'app.",
+      "description": "Registry OCI da cui AKS pull-a l'immagine eventi-dtd. Autenticazione tramite pull secret kubernetes ghcr-secret.",
       "endpoints": ["https://ghcr.io"],
-      "authenticated": false,
+      "authenticated": true,
       "x-trust-boundary": true,
       "data": [{ "classification": "image", "flow": "inbound" }]
+    },
+    {
+      "bom-ref": "svc:github/source-and-ci",
+      "provider": { "name": "GitHub, Inc. (Microsoft)" },
+      "name": "GitHub (source & CI/CD)",
+      "description": "Repository sorgente italia/eventi-dtd e pipeline GitHub Actions che produce le immagini :dev e :release e pubblica SBOM alla release. La catena di fornitura del software parte qui.",
+      "endpoints": ["https://github.com/italia/eventi-dtd"],
+      "authenticated": false,
+      "x-trust-boundary": true,
+      "data": [{ "classification": "source-code", "flow": "inbound" }],
+      "externalReferences": [
+        { "type": "build-system", "url": "https://github.com/italia/eventi-dtd/actions" }
+      ]
     },
     {
       "bom-ref": "svc:ingress-nginx",
       "provider": { "name": "Kubernetes SIGs" },
       "name": "ingress-nginx",
-      "version": "4.11.x",
-      "description": "Ingress controller self-hosted nel cluster AKS.",
-      "authenticated": false
+      "version": "v1.9.4",
+      "description": "Ingress controller self-hosted nel cluster. Termina TLS, route verso i servizi interni.",
+      "authenticated": false,
+      "x-trust-boundary": false
     },
     {
       "bom-ref": "svc:cert-manager",
-      "provider": { "name": "cert-manager.io" },
+      "provider": { "name": "cert-manager.io / Jetstack / CNCF" },
       "name": "cert-manager",
-      "version": "1.15.x",
-      "description": "Emissione certificati TLS via Let's Encrypt (ACME HTTP-01).",
-      "authenticated": false
+      "version": "v1.13.3",
+      "description": "Emissione e rinnovo automatico dei certificati TLS via Let's Encrypt (ACME HTTP-01).",
+      "authenticated": false,
+      "x-trust-boundary": false
     },
     {
       "bom-ref": "svc:letsencrypt",
-      "provider": { "name": "Let's Encrypt / ISRG", "url": ["https://letsencrypt.org"] },
-      "name": "ACME directory",
-      "description": "CA esterna per i certificati TLS.",
+      "provider": { "name": "Internet Security Research Group (ISRG)", "url": ["https://letsencrypt.org"] },
+      "name": "Let's Encrypt ACME CA",
+      "description": "Autorità di certificazione pubblica che firma i certificati TLS della piattaforma.",
       "endpoints": ["https://acme-v02.api.letsencrypt.org/directory"],
-      "x-trust-boundary": true
+      "authenticated": false,
+      "x-trust-boundary": true,
+      "externalReferences": [
+        { "type": "documentation", "url": "https://letsencrypt.org/repository/" }
+      ]
     },
     {
-      "bom-ref": "svc:smtp/mailpit-test",
-      "provider": { "name": "Mailpit (self-hosted)" },
-      "name": "SMTP relay",
-      "description": "In ambiente videocall-test le email sono catturate da Mailpit (nessuna consegna reale). In produzione: SMTP del provider PA.",
+      "bom-ref": "svc:redis-in-cluster",
+      "provider": { "name": "self-hosted (Bitnami subchart)" },
+      "name": "Redis (chat pub/sub)",
+      "version": "8.6.2",
+      "description": "Single-pod standalone in-cluster usato come bus di messaggistica real-time per la chat. Stato canonico su PostgreSQL; Redis è un relay effimero. Password gestita come Secret Kubernetes.",
       "authenticated": true,
       "x-trust-boundary": false,
-      "data": [{ "classification": "personal-data", "flow": "outbound" }]
+      "data": [
+        {
+          "classification": "chat-ephemeral",
+          "flow": "bi-directional",
+          "description": "Messaggi di chat trasportati per 1-10s prima della persistenza. Non sono dati personali in senso stretto ma possono contenerne."
+        }
+      ]
     },
     {
-      "bom-ref": "svc:turn/coturn",
-      "provider": { "name": "coturn (self-hosted)" },
-      "name": "TURN/STUN server",
-      "description": "Relay media per partecipanti dietro NAT simmetrici.",
+      "bom-ref": "svc:coturn",
+      "provider": { "name": "coturn project (self-hosted)" },
+      "name": "TURN/STUN relay",
+      "description": "Server STUN/TURN self-hosted su nodepool dedicato. Utilizzato dai partecipanti dietro NAT simmetrici per relay audio/video.",
+      "endpoints": ["turn:turn-test.innovazione.gov.it:3478", "turns:turn-test.innovazione.gov.it:443"],
       "authenticated": true,
       "x-trust-boundary": true,
-      "data": [{ "classification": "media", "flow": "bi-directional" }]
+      "data": [
+        { "classification": "media", "flow": "bi-directional", "description": "Stream A/V relayati quando P2P non è possibile. Non conservati." }
+      ]
+    },
+    {
+      "bom-ref": "svc:kube-prometheus-stack",
+      "provider": { "name": "Prometheus Community (self-hosted)" },
+      "name": "kube-prometheus-stack (Prometheus + Grafana)",
+      "description": "Telemetria di piattaforma: metriche applicative (/api/metrics), stato cluster, dashboard Grafana di monitoring. Dati aggregati, nessun PII.",
+      "authenticated": true,
+      "x-trust-boundary": false,
+      "data": [
+        { "classification": "telemetry", "flow": "inbound", "description": "Metriche aggregate (contatori, gauge, istogrammi). Nessun dato personale." }
+      ]
     }
   ],
 
@@ -276,24 +536,34 @@
     {
       "ref": "tenant:videocall-test",
       "dependsOn": [
-        "pkg:oci/eventi-dtd@sha256:placeholder",
+        "pkg:oci/eventi-dtd",
         "pkg:oci/jitsi-web",
         "pkg:oci/jitsi-prosody",
         "pkg:oci/jitsi-jicofo",
         "pkg:oci/jitsi-jvb",
+        "pkg:oci/coturn",
+        "pkg:oci/redis",
+        "pkg:oci/ingress-nginx-controller",
+        "pkg:oci/cert-manager",
+        "crypto:tls/letsencrypt",
+        "crypto:jwt/jitsi-signing-key",
+        "crypto:encryption/pii",
         "svc:azure/aks/videocall-test",
         "svc:azure/postgres-flexible/videocall-test",
-        "svc:azure/blob/recordings-videocall-test",
+        "svc:azure/blob/recordings",
+        "svc:mailgun/eu",
         "svc:github/ghcr",
+        "svc:github/source-and-ci",
         "svc:ingress-nginx",
         "svc:cert-manager",
         "svc:letsencrypt",
-        "svc:smtp/mailpit-test",
-        "svc:turn/coturn"
+        "svc:redis-in-cluster",
+        "svc:coturn",
+        "svc:kube-prometheus-stack"
       ]
     },
     {
-      "ref": "pkg:oci/eventi-dtd@sha256:placeholder",
+      "ref": "pkg:oci/eventi-dtd",
       "dependsOn": [
         "pkg:deb/debian/debian@12",
         "pkg:npm/next@15.5.15",
@@ -304,6 +574,198 @@
         "pkg:npm/design-react-kit@5.1.0",
         "pkg:npm/ioredis@5.10.1"
       ]
+    }
+  ],
+
+  "compositions": [
+    {
+      "bom-ref": "comp:dev-components-incomplete",
+      "aggregate": "incomplete_first_party_only",
+      "assemblies": ["pkg:oci/eventi-dtd"],
+      "description": "L'elenco npm visibile è quello delle dipendenze dirette più significative (7 pacchetti). L'immagine runtime risolve circa 800 pacchetti inclusi i transitive. Un SBOM completo sarà generato a ogni release da cdxgen + syft e pubblicato come allegato GitHub Release."
+    },
+    {
+      "bom-ref": "comp:ops-services-complete",
+      "aggregate": "complete",
+      "assemblies": [
+        "svc:azure/aks/videocall-test",
+        "svc:azure/postgres-flexible/videocall-test",
+        "svc:azure/blob/recordings",
+        "svc:mailgun/eu",
+        "svc:github/ghcr",
+        "svc:github/source-and-ci",
+        "svc:ingress-nginx",
+        "svc:cert-manager",
+        "svc:letsencrypt",
+        "svc:redis-in-cluster",
+        "svc:coturn",
+        "svc:kube-prometheus-stack"
+      ],
+      "description": "L'elenco dei servizi operativi è esaustivo alla data del documento per l'ambiente videocall-test. Eventuali sub-processors dei fornitori (es. sub-regioni Azure) non sono qui enumerati; riferirsi ai rispettivi DPA linkati in services[*].externalReferences."
+    },
+    {
+      "bom-ref": "comp:vulnerabilities-declared",
+      "aggregate": "complete",
+      "assemblies": ["tenant:videocall-test"],
+      "description": "Array vulnerabilities[] dichiarato esplicitamente vuoto: al momento della generazione nessuna CVE nota applicabile. Consultare vulnerabilities[] e scanner CI (Dependabot, npm audit) per l'evidenza operativa continua."
+    }
+  ],
+
+  "vulnerabilities": [],
+
+  "declarations": {
+    "targets": {
+      "components": [{ "ref": "tenant:videocall-test" }]
+    },
+    "assessors": [
+      {
+        "bom-ref": "assessor:dtd-internal",
+        "thirdParty": false,
+        "organization": {
+          "name": "Dipartimento per la Trasformazione Digitale",
+          "url": ["https://innovazione.gov.it"]
+        }
+      }
+    ],
+    "attestations": [
+      {
+        "summary": "Attestazioni di conformità del deploy videocall-test al 2026-04-21.",
+        "assessor": "assessor:dtd-internal",
+        "map": [
+          {
+            "requirement": "AgID — Linee Guida per lo Sviluppo del Software Sicuro",
+            "claims": ["claim:open-source", "claim:vulnerability-scanning", "claim:data-minimization"]
+          },
+          {
+            "requirement": "GDPR art. 32 — Misure di sicurezza",
+            "claims": ["claim:encryption-at-rest", "claim:encryption-in-transit", "claim:access-control"]
+          },
+          {
+            "requirement": "AgID Circolare 2/2018 — Qualificazione servizi cloud per PA",
+            "claims": ["claim:qualified-cloud-provider"]
+          }
+        ]
+      }
+    ],
+    "claims": [
+      {
+        "bom-ref": "claim:open-source",
+        "target": "tenant:videocall-test",
+        "predicate": "Il codice sorgente della piattaforma è pubblicato con licenza AGPL-3.0-only ed è auditabile da chiunque su github.com/italia/eventi-dtd.",
+        "evidence": ["evidence:repo"]
+      },
+      {
+        "bom-ref": "claim:vulnerability-scanning",
+        "target": "tenant:videocall-test",
+        "predicate": "Le dipendenze software sono monitorate in continuo da Dependabot (GitHub) e npm audit in pipeline. Ogni release pubblica un SBOM CycloneDX/SPDX.",
+        "evidence": ["evidence:dependabot", "evidence:release-sbom"]
+      },
+      {
+        "bom-ref": "claim:data-minimization",
+        "target": "tenant:videocall-test",
+        "predicate": "I dati personali raccolti in fase di iscrizione sono limitati a nome, cognome, email e consensi. Nessun dato biometrico, nessuna profilazione, nessuna condivisione con terzi oltre ai processor dichiarati in services[]."
+      },
+      {
+        "bom-ref": "claim:encryption-at-rest",
+        "target": "tenant:videocall-test",
+        "predicate": "I campi PII (nome, cognome, email) sono cifrati AES-256-GCM a livello applicativo prima della scrittura su PostgreSQL. Lo storage Azure Blob applica cifratura AES-256 con MSKM.",
+        "evidence": ["evidence:pii-encryption-config"]
+      },
+      {
+        "bom-ref": "claim:encryption-in-transit",
+        "target": "tenant:videocall-test",
+        "predicate": "Tutto il traffico esterno è protetto da TLS 1.2+ con certificati Let's Encrypt rinnovati automaticamente da cert-manager. Il traffico media Jitsi è SRTP end-to-hop."
+      },
+      {
+        "bom-ref": "claim:access-control",
+        "target": "tenant:videocall-test",
+        "predicate": "L'accesso amministrativo richiede ADMIN_API_KEY con rotazione a richiesta; sessioni admin come JWT in cookie HttpOnly. Link moderatore monouso per-evento. Nessun account persistente per moderatori."
+      },
+      {
+        "bom-ref": "claim:qualified-cloud-provider",
+        "target": "svc:azure/aks/videocall-test",
+        "predicate": "Il fornitore dei servizi cloud (Microsoft Azure) è qualificato ai sensi della Circolare AgID 2/2018 per l'erogazione di servizi alla Pubblica Amministrazione italiana.",
+        "externalReferences": [
+          { "type": "other", "url": "https://catalogocloud.agid.gov.it/" }
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "bom-ref": "evidence:repo",
+        "description": "Repository pubblico del codice sorgente.",
+        "data": [{ "contents": { "attachment": { "content": "https://github.com/italia/eventi-dtd", "contentType": "text/uri-list" } } }]
+      },
+      {
+        "bom-ref": "evidence:dependabot",
+        "description": "Dependabot attivo sul repository con alert pubblici di sicurezza."
+      },
+      {
+        "bom-ref": "evidence:release-sbom",
+        "description": "Ogni release pubblica SBOM SPDX e CycloneDX come asset allegati.",
+        "data": [{ "contents": { "attachment": { "content": "https://github.com/italia/eventi-dtd/releases/latest", "contentType": "text/uri-list" } } }]
+      },
+      {
+        "bom-ref": "evidence:pii-encryption-config",
+        "description": "Variabile PII_ENCRYPTION_KEY configurata nel Secret videocall-secrets. La logica di cifratura/decifratura risiede in app/src/lib (application-layer)."
+      }
+    ],
+    "affirmation": {
+      "statement": "Il Dipartimento per la Trasformazione Digitale attesta che le informazioni contenute in questo documento riflettono, al meglio delle conoscenze del team al 2026-04-21, la composizione software e operativa dell'istanza videocall-test della piattaforma eventi-dtd.",
+      "signatories": [
+        {
+          "name": "Team Piattaforma Eventi DTD",
+          "role": "Responsabile tecnico",
+          "organization": { "name": "Dipartimento per la Trasformazione Digitale" }
+        }
+      ]
+    }
+  },
+
+  "formulation": [
+    {
+      "bom-ref": "formulation:videocall-test-deploy",
+      "components": [
+        {
+          "bom-ref": "formulation:helm-chart",
+          "type": "application",
+          "name": "eventi-dtd Helm chart",
+          "version": "0.1.1",
+          "description": "Chart OSS pubblicato in infra/helm/eventi-dtd del repo italia/eventi-dtd."
+        },
+        {
+          "bom-ref": "formulation:values",
+          "type": "file",
+          "name": "helm/videocall/test/values.yaml",
+          "description": "Values specifici di questo tenant, versionati nel repo privato teamdigitale/k8s-configuration, branch master."
+        }
+      ],
+      "workflows": [
+        {
+          "bom-ref": "formulation:ci-dev-build",
+          "uid": "github-actions/dev.yml",
+          "name": "Build & Push Dev Image",
+          "description": "Pipeline GitHub Actions che costruisce l'immagine :dev ad ogni push sul branch dev e la pubblica su ghcr.io/italia/eventi-dtd:dev.",
+          "taskTypes": ["build", "release"]
+        },
+        {
+          "bom-ref": "formulation:helm-upgrade",
+          "uid": "manual",
+          "name": "helm upgrade + rollout restart",
+          "description": "Esecuzione manuale da workstation del team DTD contro il cluster developers-italia-prod, namespace videocall-test.",
+          "taskTypes": ["deploy"]
+        }
+      ]
+    }
+  ],
+
+  "annotations": [
+    {
+      "bom-ref": "annotation:pedagogical",
+      "subjects": ["tenant:videocall-test"],
+      "annotator": { "organization": { "name": "Dipartimento per la Trasformazione Digitale" } },
+      "timestamp": "2026-04-21T11:15:00Z",
+      "text": "Questo documento è un esempio di Service Inventory per un'istanza eventi-dtd, pensato per mostrare come CycloneDX 1.6 modella sia le dipendenze software (components[]) sia i servizi del provider (services[]) in un unico artefatto. Le sezioni declarations[], compositions[], vulnerabilities[] e formulation[] illustrano i livelli di trasparenza richiesti dalla normativa italiana ed europea per i servizi erogati alla Pubblica Amministrazione. Nella produzione reale la parte DEV sarà rigenerata automaticamente in CI, la parte OPS da un job che interroga Azure Resource Graph, e l'intero BOM sarà firmato con cosign e pubblicato come artefatto versionato."
     }
   ]
 }
