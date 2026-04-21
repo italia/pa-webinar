@@ -32,6 +32,7 @@ type BomComponent = {
   description?: string;
   purl?: string;
   licenses?: BomLicense[];
+  properties?: BomProperty[];
 };
 type BomService = {
   'bom-ref'?: string;
@@ -85,6 +86,37 @@ async function loadInventory(url: string): Promise<Bom | null> {
 
 function getProp(props: BomProperty[] | undefined, name: string): string | undefined {
   return props?.find((p) => p.name === name)?.value;
+}
+
+type StackLayerKey = 'access' | 'app' | 'data' | 'platform';
+type StackItem = { key: string; label: string };
+
+const STACK_LAYER_COLORS: Record<StackLayerKey, string> = {
+  access: '#0066CC',
+  app: '#004C99',
+  data: '#17324D',
+  platform: '#5A768A',
+};
+
+// Build the 4 stack layers from items that carry an eventi-dtd:layer property.
+// Display label falls back to the component/service name if no stack-label
+// override is set — so a tenant can surface items in the stack just by tagging
+// them, without editing this file.
+function buildStack(bom: Bom): Record<StackLayerKey, StackItem[]> {
+  const out: Record<StackLayerKey, StackItem[]> = {
+    access: [], app: [], data: [], platform: [],
+  };
+  const collect = (items: Array<BomComponent | BomService>) => {
+    for (const it of items) {
+      const layer = getProp(it.properties, 'eventi-dtd:layer') as StackLayerKey | undefined;
+      if (!layer || !(layer in out)) continue;
+      const label = getProp(it.properties, 'eventi-dtd:stack-label') ?? it.name;
+      out[layer].push({ key: it['bom-ref'] ?? label, label });
+    }
+  };
+  collect(bom.components ?? []);
+  collect(bom.services ?? []);
+  return out;
 }
 
 function renderLicense(licenses?: BomLicense[]): string {
@@ -282,79 +314,55 @@ export default async function ServiceInventoryPage() {
             </div>
           </section>
 
-          <section className="service-inventory__stack" aria-labelledby="si-stack-title">
-            <h2 id="si-stack-title" className="service-inventory__stack-title">
-              {t('stack.title')}
-            </h2>
-            <p className="service-inventory__stack-intro">{t('stack.intro')}</p>
-            <div className="service-inventory__stack-layers">
-              <div className="service-inventory__stack-layer" style={{ ['--layer-color' as string]: '#0066CC' }}>
-                <div>
-                  <span className="service-inventory__stack-layer-title">
-                    {t('stack.layers.access.title')}
-                  </span>
-                  <span className="service-inventory__stack-layer-sub">
-                    {t('stack.layers.access.sub')}
-                  </span>
+          {(() => {
+            const stack = buildStack(bom);
+            const layersInOrder: StackLayerKey[] = ['access', 'app', 'data', 'platform'];
+            const hasAny = layersInOrder.some((k) => stack[k].length > 0);
+            if (!hasAny) return null;
+            return (
+              <section className="service-inventory__stack" aria-labelledby="si-stack-title">
+                <h2 id="si-stack-title" className="service-inventory__stack-title">
+                  {t('stack.title')}
+                </h2>
+                <p className="service-inventory__stack-intro">{t('stack.intro')}</p>
+                <div className="service-inventory__stack-layers">
+                  {layersInOrder.map((layerKey) => {
+                    const items = stack[layerKey];
+                    if (items.length === 0) return null;
+                    return (
+                      <div
+                        key={layerKey}
+                        className="service-inventory__stack-layer"
+                        style={{ ['--layer-color' as string]: STACK_LAYER_COLORS[layerKey] }}
+                      >
+                        <div>
+                          <span className="service-inventory__stack-layer-title">
+                            {t(`stack.layers.${layerKey}.title`)}
+                          </span>
+                          <span className="service-inventory__stack-layer-sub">
+                            {t(`stack.layers.${layerKey}.sub`)}
+                          </span>
+                        </div>
+                        <div className="service-inventory__stack-items">
+                          {layerKey === 'access' && (
+                            <span className="service-inventory__stack-item">
+                              {t('stack.layers.access.endUsers')}
+                            </span>
+                          )}
+                          {items.map((it) => (
+                            <span key={it.key} className="service-inventory__stack-item">
+                              {it.label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="service-inventory__stack-items">
-                  <span className="service-inventory__stack-item">{t('stack.layers.access.endUsers')}</span>
-                  <span className="service-inventory__stack-item">Let&apos;s Encrypt (TLS)</span>
-                  <span className="service-inventory__stack-item">ingress-nginx</span>
-                  <span className="service-inventory__stack-item">cert-manager</span>
-                </div>
-              </div>
-              <div className="service-inventory__stack-layer" style={{ ['--layer-color' as string]: '#004C99' }}>
-                <div>
-                  <span className="service-inventory__stack-layer-title">
-                    {t('stack.layers.app.title')}
-                  </span>
-                  <span className="service-inventory__stack-layer-sub">
-                    {t('stack.layers.app.sub')}
-                  </span>
-                </div>
-                <div className="service-inventory__stack-items">
-                  <span className="service-inventory__stack-item">eventi-dtd (Next.js)</span>
-                  <span className="service-inventory__stack-item">Jitsi Meet (web · prosody · jicofo)</span>
-                  <span className="service-inventory__stack-item">Jitsi Videobridge (JVB)</span>
-                  <span className="service-inventory__stack-item">Jibri (recording)</span>
-                  <span className="service-inventory__stack-item">coturn</span>
-                </div>
-              </div>
-              <div className="service-inventory__stack-layer" style={{ ['--layer-color' as string]: '#17324D' }}>
-                <div>
-                  <span className="service-inventory__stack-layer-title">
-                    {t('stack.layers.data.title')}
-                  </span>
-                  <span className="service-inventory__stack-layer-sub">
-                    {t('stack.layers.data.sub')}
-                  </span>
-                </div>
-                <div className="service-inventory__stack-items">
-                  <span className="service-inventory__stack-item">Azure Database for PostgreSQL</span>
-                  <span className="service-inventory__stack-item">Redis</span>
-                  <span className="service-inventory__stack-item">Azure Blob Storage</span>
-                </div>
-              </div>
-              <div className="service-inventory__stack-layer" style={{ ['--layer-color' as string]: '#5A768A' }}>
-                <div>
-                  <span className="service-inventory__stack-layer-title">
-                    {t('stack.layers.platform.title')}
-                  </span>
-                  <span className="service-inventory__stack-layer-sub">
-                    {t('stack.layers.platform.sub')}
-                  </span>
-                </div>
-                <div className="service-inventory__stack-items">
-                  <span className="service-inventory__stack-item">AKS (italynorth)</span>
-                  <span className="service-inventory__stack-item">Mailgun EU (SMTP)</span>
-                  <span className="service-inventory__stack-item">GitHub · GHCR · Actions</span>
-                  <span className="service-inventory__stack-item">kube-prometheus-stack</span>
-                </div>
-              </div>
-            </div>
-            <p className="text-muted small mt-3 mb-0">{t('stack.note')}</p>
-          </section>
+                <p className="text-muted small mt-3 mb-0">{t('stack.note')}</p>
+              </section>
+            );
+          })()}
         </div>
       </div>
     </div>
