@@ -15,6 +15,7 @@ const templateSchema = z.object({
   qaEnabled: z.boolean().optional(),
   chatEnabled: z.boolean().optional(),
   recordingEnabled: z.boolean().optional(),
+  autoStartRecording: z.boolean().optional(),
   participantsCanUnmute: z.boolean().optional(),
   participantsCanStartVideo: z.boolean().optional(),
   participantsCanShareScreen: z.boolean().optional(),

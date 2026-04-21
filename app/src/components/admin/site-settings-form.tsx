@@ -1037,6 +1037,18 @@ function FeaturesTab({ settings, updateField }: TabProps) {
           {t('calendarPublicHelp')}
         </small>
       </div>
+      <div className="mb-4">
+        <ToggleSwitch
+          label={t('parseTitleKicker')}
+          checked={settings.parseTitleKicker ?? false}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField('parseTitleKicker', e.target.checked)
+          }
+        />
+        <small className="text-muted d-block mt-1">
+          {t('parseTitleKickerHelp')}
+        </small>
+      </div>
       <hr className="my-4" />
       <Row>
         <Col md={6}>

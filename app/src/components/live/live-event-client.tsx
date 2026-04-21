@@ -42,6 +42,7 @@ interface EventInfo {
   status: string;
   eventType?: string;
   recordingEnabled: boolean;
+  autoStartRecording?: boolean;
   qaEnabled: boolean;
   chatEnabled: boolean;
   waitingRoomAudioUrl: string | null;
@@ -286,42 +287,20 @@ export default function LiveEventClient({
 
   const [showRecPrompt, setShowRecPrompt] = useState(false);
   const recPromptShownRef = useRef(false);
-
-  const handleJitsiReady = useCallback(() => {
-    if (isModerator && event.recordingEnabled && jibriReady && !recPromptShownRef.current) {
-      recPromptShownRef.current = true;
-      setShowRecPrompt(true);
-    }
-  }, [isModerator, event.recordingEnabled, jibriReady]);
-
-  // Show recording prompt when Jibri becomes ready after room is already open
-  useEffect(() => {
-    if (jibriReady && jitsiApi && isModerator && event.recordingEnabled && !recPromptShownRef.current) {
-      recPromptShownRef.current = true;
-      setShowRecPrompt(true);
-    }
-  }, [jibriReady, jitsiApi, isModerator, event.recordingEnabled]);
-  const handleJitsiLeft = useCallback(() => {
-    if (!showFeedback) setPhase('ended');
-  }, [showFeedback]);
-  const handleParticipantCountChanged = useCallback((count: number) => { setParticipantCount(count); }, []);
-  const handleRecordingStatusChanged = useCallback((recording: boolean) => { setIsRecording(recording); }, []);
-  const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => { setJitsiApi(api); }, []);
-
   const recPromptRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => { if (recPromptRetryRef.current) clearTimeout(recPromptRetryRef.current); };
   }, []);
 
-  const handleRecPromptStart = useCallback(() => {
-    setShowRecPrompt(false);
-    if (!jitsiApi) return;
-
+  // Shared "fire startRecording on Jitsi, with retry" — used both by the
+  // moderator-confirmed prompt and by the autoStartRecording path which
+  // bypasses the prompt entirely.
+  const triggerRecording = useCallback((api: JitsiMeetExternalAPI) => {
     let attempts = 0;
     const tryStart = () => {
       try {
-        jitsiApi.executeCommand('startRecording', { mode: 'file' });
+        api.executeCommand('startRecording', { mode: 'file' });
       } catch {
         if (attempts < 3) {
           attempts += 1;
@@ -330,7 +309,43 @@ export default function LiveEventClient({
       }
     };
     tryStart();
-  }, [jitsiApi]);
+  }, []);
+
+  const autoOrPromptRecording = useCallback((api: JitsiMeetExternalAPI | null) => {
+    if (event.autoStartRecording && api) {
+      triggerRecording(api);
+    } else {
+      setShowRecPrompt(true);
+    }
+  }, [event.autoStartRecording, triggerRecording]);
+
+  const handleJitsiReady = useCallback(() => {
+    if (isModerator && event.recordingEnabled && jibriReady && !recPromptShownRef.current) {
+      recPromptShownRef.current = true;
+      autoOrPromptRecording(jitsiApi);
+    }
+  }, [isModerator, event.recordingEnabled, jibriReady, jitsiApi, autoOrPromptRecording]);
+
+  // Show recording prompt (or auto-trigger) when Jibri becomes ready after
+  // the room is already open.
+  useEffect(() => {
+    if (jibriReady && jitsiApi && isModerator && event.recordingEnabled && !recPromptShownRef.current) {
+      recPromptShownRef.current = true;
+      autoOrPromptRecording(jitsiApi);
+    }
+  }, [jibriReady, jitsiApi, isModerator, event.recordingEnabled, autoOrPromptRecording]);
+  const handleJitsiLeft = useCallback(() => {
+    if (!showFeedback) setPhase('ended');
+  }, [showFeedback]);
+  const handleParticipantCountChanged = useCallback((count: number) => { setParticipantCount(count); }, []);
+  const handleRecordingStatusChanged = useCallback((recording: boolean) => { setIsRecording(recording); }, []);
+  const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => { setJitsiApi(api); }, []);
+
+  const handleRecPromptStart = useCallback(() => {
+    setShowRecPrompt(false);
+    if (!jitsiApi) return;
+    triggerRecording(jitsiApi);
+  }, [jitsiApi, triggerRecording]);
   const handleRecPromptLater = useCallback(() => { setShowRecPrompt(false); }, []);
 
   // Peak participant tracking (moderator only)

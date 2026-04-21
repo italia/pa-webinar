@@ -38,6 +38,7 @@ interface EventData {
   qaEnabled: boolean;
   chatEnabled: boolean;
   recordingEnabled: boolean;
+  autoStartRecording: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
@@ -91,6 +92,7 @@ export default function EditEventForm({
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
     recordingEnabled: event.recordingEnabled,
+    autoStartRecording: event.autoStartRecording,
     participantsCanUnmute: event.participantsCanUnmute,
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
@@ -167,6 +169,7 @@ export default function EditEventForm({
         qaEnabled: form.qaEnabled,
         chatEnabled: form.chatEnabled,
         recordingEnabled: form.recordingEnabled,
+        autoStartRecording: form.autoStartRecording,
         participantsCanUnmute: form.participantsCanUnmute,
         participantsCanStartVideo: form.participantsCanStartVideo,
         participantsCanShareScreen: form.participantsCanShareScreen,
@@ -483,6 +486,18 @@ export default function EditEventForm({
               <ToggleSwitch label="" checked={form.recordingEnabled} onChange={() => setField('recordingEnabled', !form.recordingEnabled)} />
             </div>
           </div>
+
+          {form.recordingEnabled && (
+            <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+              <div className="d-flex justify-content-between align-items-start">
+                <div className="me-3">
+                  <div className="fw-semibold" style={{ color: '#17324D' }}>{t('form.autoStartRecording')}</div>
+                  <div className="text-secondary" style={{ fontSize: '0.85rem' }}>{t('form.autoStartRecordingDesc')}</div>
+                </div>
+                <ToggleSwitch label="" checked={form.autoStartRecording} onChange={() => setField('autoStartRecording', !form.autoStartRecording)} />
+              </div>
+            </div>
+          )}
 
           {gdprTemplates.length > 0 && (
             <FormGroup className="mt-3 mb-3">

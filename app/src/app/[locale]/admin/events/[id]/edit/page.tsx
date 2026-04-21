@@ -70,6 +70,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           qaEnabled: event.qaEnabled,
           chatEnabled: event.chatEnabled,
           recordingEnabled: event.recordingEnabled,
+          autoStartRecording: event.autoStartRecording,
           participantsCanUnmute: event.participantsCanUnmute,
           participantsCanStartVideo: event.participantsCanStartVideo,
           participantsCanShareScreen: event.participantsCanShareScreen,

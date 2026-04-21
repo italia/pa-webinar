@@ -77,6 +77,7 @@ export const POST = withErrorHandling(async (request) => {
       qaEnabled: data.qaEnabled,
       chatEnabled: data.chatEnabled,
       recordingEnabled: data.recordingEnabled,
+      autoStartRecording: data.autoStartRecording,
       participantsCanUnmute: data.participantsCanUnmute,
       participantsCanStartVideo: data.participantsCanStartVideo,
       participantsCanShareScreen: data.participantsCanShareScreen,
