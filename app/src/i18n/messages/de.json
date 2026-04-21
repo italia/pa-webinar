@@ -1178,42 +1178,66 @@
       }
     },
     "serviceInventory": {
-      "metaTitle": "Service inventory",
-      "title": "Provider service inventory",
-      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
-      "notPublishedTitle": "Inventory not yet published",
-      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
-      "fetchErrorTitle": "Could not load the inventory",
-      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metaTitle": "Dienste-Inventar",
+      "title": "Dienste-Inventar des Anbieters",
+      "intro": "Für diese Instanz listet das folgende Dokument sowohl die Software-Abhängigkeiten (DEV) als auch die betrieblichen Dienste (OPS) auf, aus denen die Plattform besteht. Es wird im Format CycloneDX 1.6 veröffentlicht, einem offenen OWASP-Standard, der Code-Bibliotheken und von Dritten verwaltete Dienste in einem einzigen Dokument beschreibt.",
+      "notPublishedTitle": "Inventar noch nicht veröffentlicht",
+      "notPublishedBody": "Der Betreiber dieser Instanz hat noch kein Dienste-Inventar veröffentlicht. Die Konfigurationsvariable SERVICE_INVENTORY_URL wurde für dieses Deployment nicht festgelegt.",
+      "fetchErrorTitle": "Inventar konnte nicht geladen werden",
+      "fetchErrorBody": "Die JSON-Datei des Inventars ist derzeit nicht erreichbar. Bitte versuchen Sie es später erneut oder wenden Sie sich an den Dienstverantwortlichen.",
       "metadata": {
-        "tenant": "Instance",
-        "provider": "Cloud provider",
+        "tenant": "Instanz",
+        "provider": "Cloud-Anbieter",
         "region": "Region",
-        "deploymentMode": "Deployment mode",
-        "generatedAt": "Generated at",
+        "deploymentMode": "Deployment-Modus",
+        "generatedAt": "Erstellt am",
         "format": "Format",
-        "download": "Download raw JSON"
+        "download": "Roh-JSON herunterladen"
       },
       "sections": {
-        "componentsTitle": "Software components (DEV)",
-        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
-        "servicesTitle": "Operational services (OPS)",
-        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
-        "dependenciesTitle": "Dependency chain"
+        "componentsTitle": "Software-Komponenten (DEV)",
+        "componentsIntro": "Bibliotheken, Container und Betriebssystem-Pakete, aus denen die Anwendung besteht. An die Code-Version gebunden; reproduzierbar für jeden mit Zugang zum Quellcode.",
+        "servicesTitle": "Betriebliche Dienste (OPS)",
+        "servicesIntro": "Von Drittanbietern verwaltete Dienste, von denen diese Instanz abhängt. Mandantenbezogene Information, die sich ändert, sobald der Betreiber die Konfiguration anpasst oder den Anbieter wechselt.",
+        "dependenciesTitle": "Abhängigkeitskette"
       },
       "columns": {
         "name": "Name",
-        "type": "Type",
+        "type": "Typ",
         "version": "Version",
-        "license": "License",
-        "provider": "Provider",
-        "dataFlow": "Data flow",
-        "description": "Description"
+        "license": "Lizenz",
+        "provider": "Anbieter",
+        "dataFlow": "Datenfluss",
+        "description": "Beschreibung"
       },
       "badges": {
-        "trustBoundary": "crosses trust boundary",
-        "personalData": "personal data",
-        "recording": "recorded content"
+        "trustBoundary": "überschreitet Vertrauensgrenze",
+        "personalData": "personenbezogene Daten",
+        "recording": "aufgezeichneter Inhalt"
+      },
+      "stack": {
+        "title": "Architektur im Überblick",
+        "intro": "Eine Übersicht über die vier Schichten der Plattform: vom Benutzerzugriff bis zur Laufzeitumgebung.",
+        "layers": {
+          "access": {
+            "title": "Zugriff",
+            "sub": "Web-Eintrittspunkt und TLS-Terminierung",
+            "endUsers": "Endnutzer (Browser)"
+          },
+          "app": {
+            "title": "Anwendung",
+            "sub": "Portal, Video, Echtzeit-Medien"
+          },
+          "data": {
+            "title": "Daten",
+            "sub": "Persistenz, Cache, Objektspeicher"
+          },
+          "platform": {
+            "title": "Plattform",
+            "sub": "Kubernetes-Laufzeit, SMTP, CI/CD, Observability"
+          }
+        },
+        "note": "Die vollständige Liste der Komponenten und Dienste mit Versionen, Hashes und technischen Eigenschaften finden Sie in den Abschnitten oben und in der herunterladbaren JSON-Datei."
       }
     }
   },
@@ -1498,7 +1522,7 @@
     "viewCommit": "Commit auf GitHub ansehen",
     "viewRelease": "Release auf GitHub ansehen",
     "buildDatePrefix": "Erstellt am",
-    "serviceInventory": "Service inventory"
+    "serviceInventory": "Dienste-Inventar"
   },
   "pages": {
     "privacyTitle": "Datenschutzerklärung",

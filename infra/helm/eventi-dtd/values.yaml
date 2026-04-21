@@ -92,8 +92,9 @@ app:
     #   - path starting with "/" served from the app's public/ directory
     #
     # Leave empty to render a "not yet published" placeholder. A sample
-    # document for structure reference is shipped at
-    # /examples/service-inventory.example.json.
+    # document (the videocall-test tenant) is shipped at
+    # /tenants/videocall-test/service-inventory.json — use it as a
+    # structure reference when building per-tenant artifacts.
     SERVICE_INVENTORY_URL: ""
 
     # ── Storage provider ──

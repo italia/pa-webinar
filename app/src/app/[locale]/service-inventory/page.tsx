@@ -260,15 +260,17 @@ export default async function ServiceInventoryPage() {
                       {s.description && <p className="mb-2">{s.description}</p>}
                       <div className="d-flex flex-wrap gap-2">
                         {s['x-trust-boundary'] && (
-                          <span className="badge bg-warning text-dark">
+                          <span className="service-inventory__chip service-inventory__chip--trust">
                             {t('badges.trustBoundary')}
                           </span>
                         )}
                         {hasPersonalData && (
-                          <span className="badge bg-danger">{t('badges.personalData')}</span>
+                          <span className="service-inventory__chip service-inventory__chip--personal-data">
+                            {t('badges.personalData')}
+                          </span>
                         )}
                         {hasRecording && (
-                          <span className="badge bg-info text-dark">
+                          <span className="service-inventory__chip service-inventory__chip--recording">
                             {t('badges.recording')}
                           </span>
                         )}
@@ -278,6 +280,80 @@ export default async function ServiceInventoryPage() {
                 );
               })}
             </div>
+          </section>
+
+          <section className="service-inventory__stack" aria-labelledby="si-stack-title">
+            <h2 id="si-stack-title" className="service-inventory__stack-title">
+              {t('stack.title')}
+            </h2>
+            <p className="service-inventory__stack-intro">{t('stack.intro')}</p>
+            <div className="service-inventory__stack-layers">
+              <div className="service-inventory__stack-layer" style={{ ['--layer-color' as string]: '#0066CC' }}>
+                <div>
+                  <span className="service-inventory__stack-layer-title">
+                    {t('stack.layers.access.title')}
+                  </span>
+                  <span className="service-inventory__stack-layer-sub">
+                    {t('stack.layers.access.sub')}
+                  </span>
+                </div>
+                <div className="service-inventory__stack-items">
+                  <span className="service-inventory__stack-item">{t('stack.layers.access.endUsers')}</span>
+                  <span className="service-inventory__stack-item">Let&apos;s Encrypt (TLS)</span>
+                  <span className="service-inventory__stack-item">ingress-nginx</span>
+                  <span className="service-inventory__stack-item">cert-manager</span>
+                </div>
+              </div>
+              <div className="service-inventory__stack-layer" style={{ ['--layer-color' as string]: '#004C99' }}>
+                <div>
+                  <span className="service-inventory__stack-layer-title">
+                    {t('stack.layers.app.title')}
+                  </span>
+                  <span className="service-inventory__stack-layer-sub">
+                    {t('stack.layers.app.sub')}
+                  </span>
+                </div>
+                <div className="service-inventory__stack-items">
+                  <span className="service-inventory__stack-item">eventi-dtd (Next.js)</span>
+                  <span className="service-inventory__stack-item">Jitsi Meet (web · prosody · jicofo)</span>
+                  <span className="service-inventory__stack-item">Jitsi Videobridge (JVB)</span>
+                  <span className="service-inventory__stack-item">Jibri (recording)</span>
+                  <span className="service-inventory__stack-item">coturn</span>
+                </div>
+              </div>
+              <div className="service-inventory__stack-layer" style={{ ['--layer-color' as string]: '#17324D' }}>
+                <div>
+                  <span className="service-inventory__stack-layer-title">
+                    {t('stack.layers.data.title')}
+                  </span>
+                  <span className="service-inventory__stack-layer-sub">
+                    {t('stack.layers.data.sub')}
+                  </span>
+                </div>
+                <div className="service-inventory__stack-items">
+                  <span className="service-inventory__stack-item">Azure Database for PostgreSQL</span>
+                  <span className="service-inventory__stack-item">Redis</span>
+                  <span className="service-inventory__stack-item">Azure Blob Storage</span>
+                </div>
+              </div>
+              <div className="service-inventory__stack-layer" style={{ ['--layer-color' as string]: '#5A768A' }}>
+                <div>
+                  <span className="service-inventory__stack-layer-title">
+                    {t('stack.layers.platform.title')}
+                  </span>
+                  <span className="service-inventory__stack-layer-sub">
+                    {t('stack.layers.platform.sub')}
+                  </span>
+                </div>
+                <div className="service-inventory__stack-items">
+                  <span className="service-inventory__stack-item">AKS (italynorth)</span>
+                  <span className="service-inventory__stack-item">Mailgun EU (SMTP)</span>
+                  <span className="service-inventory__stack-item">GitHub · GHCR · Actions</span>
+                  <span className="service-inventory__stack-item">kube-prometheus-stack</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-muted small mt-3 mb-0">{t('stack.note')}</p>
           </section>
         </div>
       </div>
