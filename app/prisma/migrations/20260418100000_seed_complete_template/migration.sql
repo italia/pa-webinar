@@ -10,13 +10,15 @@ INSERT INTO event_templates (
   name, description, icon,
   qa_enabled, chat_enabled, recording_enabled,
   participants_can_unmute, participants_can_start_video, participants_can_share_screen,
-  max_participants, is_system, sort_order
+  max_participants, is_system, sort_order,
+  created_at, updated_at
 ) VALUES (
   'Evento interattivo completo',
   'Tutte le funzioni live attive: Q&A, chat, registrazione, reazioni, mic e webcam partecipanti. Per webinar, panel, eventi con interazione intensa.',
   'it-star-full',
   true,  true,  true,
   true,  true,  false,        -- screen share resta fuori: solo il moderatore presenta
-  300,   true,  0
+  300,   true,  0,
+  NOW(),  NOW()
 )
 ON CONFLICT DO NOTHING;

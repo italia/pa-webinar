@@ -349,7 +349,11 @@
       "publicationsList": "All publications",
       "publicationsNew": "New publication",
       "ariaLabel": "Admin navigation",
-      "subNavAriaLabel": "Section navigation"
+      "subNavAriaLabel": "Section navigation",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Admin panel",
@@ -1527,7 +1531,9 @@
     "consent": {
       "recording": "I consent to the audio/video recording of this event",
       "recordingRequired": "Recording consent is required to participate in this event",
-      "futureCommunications": "I would like to receive information about future events organized by DTD"
+      "futureCommunications": "I would like to receive information about future events organized by DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "My data",
@@ -2160,5 +2166,24 @@
     "tempError": "Retrying to reach the server, no action needed.",
     "ended": "The event has ended.",
     "scaleToZeroNote": "To reduce environmental impact, video nodes are powered off when nobody is in a call. They restart automatically on the first join."
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
+    }
   }
 }

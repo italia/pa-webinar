@@ -344,7 +344,11 @@
       "settingsGeneral": "Ogólne",
       "settingsLanguages": "Języki",
       "ariaLabel": "Nawigacja administracyjna",
-      "subNavAriaLabel": "Nawigacja sekcji"
+      "subNavAriaLabel": "Nawigacja sekcji",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Panel administracyjny",
@@ -1055,7 +1059,9 @@
     "consent": {
       "recording": "Wyrażam zgodę na nagrywanie audio/wideo wydarzenia",
       "recordingRequired": "Zgoda na nagrywanie jest wymagana do uczestnictwa w tym wydarzeniu",
-      "futureCommunications": "Chcę otrzymywać informacje o przyszłych wydarzeniach organizowanych przez DTD"
+      "futureCommunications": "Chcę otrzymywać informacje o przyszłych wydarzeniach organizowanych przez DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Moje dane",
@@ -1631,6 +1637,25 @@
       "materials": "Materiały",
       "polls": "Ankiety",
       "feedback": "Opinie"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

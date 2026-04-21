@@ -15,6 +15,13 @@ function getTransporter(): Transporter {
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT ?? 587),
     secure: process.env.SMTP_SECURE === 'true',
+    // Pool reuses the same SMTP connection across sends — the handshake
+    // (TCP + TLS + LOGIN) happens once per pod, not once per email.
+    // Without this, sequential sends against an upstream provider can
+    // take 2-5s each on cold connections.
+    pool: true,
+    maxConnections: Number(process.env.SMTP_POOL_MAX_CONNECTIONS ?? 5),
+    maxMessages: Number(process.env.SMTP_POOL_MAX_MESSAGES ?? 100),
     auth:
       process.env.SMTP_USER && process.env.SMTP_PASSWORD
         ? {
