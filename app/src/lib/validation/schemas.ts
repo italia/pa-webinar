@@ -84,6 +84,11 @@ const eventBaseSchema = z.object({
   // Tag slugs (not UUIDs) so the admin can reference stable identifiers
   // between templates and events.
   tagSlugs: z.array(z.string().min(1).max(100)).max(30).optional(),
+
+  // Per-event override for the editorial "title with kicker" convention.
+  // Null (or omitted) inherits SiteSetting.parseTitleKicker; true/false
+  // force on/off for this event only.
+  parseTitleKicker: z.boolean().nullable().optional(),
 });
 
 export const createEventSchema = eventBaseSchema.refine(

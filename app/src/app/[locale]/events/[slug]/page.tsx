@@ -8,6 +8,7 @@ import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
 export const revalidate = 30;
 
@@ -232,7 +233,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       <EventDetailClient
         event={serialised}
         locale={locale}
-        parseTitleKicker={settings.parseTitleKicker}
+        parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}
         polls={pollsData}

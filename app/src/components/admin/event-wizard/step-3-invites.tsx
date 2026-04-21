@@ -1,29 +1,29 @@
 'use client';
 
-/**
- * Step 3 — People.
- *
- * Three independent lists, all optional:
- *   - Organizers:   who's billed / shown on the event page (display only).
- *   - Speakers:     get EventModerator rows with role=SPEAKER after save.
- *   - Invitations:  pre-register named invitees (guest or speaker).
- *
- * Wizard shell fans these out to the respective side-APIs after the main
- * event is created.
- */
-
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import RubricaPicker, {
+  type RubricaPickedPerson,
+} from '@/components/admin/rubrica-picker';
+
 export interface OrganizerEntry {
   name: string;
+  organization: string;
   logoUrl: string | null;
   websiteUrl: string | null;
+}
+
+export interface ModeratorEntry {
+  name: string;
+  email: string;
+  personId: string | null;
 }
 
 export interface SpeakerEntry {
   name: string;
   email: string;
+  personId: string | null;
 }
 
 export interface InvitationEntry {
@@ -35,6 +35,7 @@ export interface InvitationEntry {
 
 export interface Step3Value {
   organizers: OrganizerEntry[];
+  moderators: ModeratorEntry[];
   speakers: SpeakerEntry[];
   invitations: InvitationEntry[];
 }
@@ -65,6 +66,11 @@ export default function Step3Invites({ value, onChange }: Props) {
         onChange={(next) => onChange({ organizers: next })}
       />
 
+      <ModeratorsSection
+        value={value.moderators}
+        onChange={(next) => onChange({ moderators: next })}
+      />
+
       <SpeakersSection
         value={value.speakers}
         onChange={(next) => onChange({ speakers: next })}
@@ -88,21 +94,36 @@ function OrganizersSection({
   const t = useTranslations('admin.wizard.step3');
   const [draft, setDraft] = useState<OrganizerEntry>({
     name: '',
+    organization: '',
     logoUrl: null,
     websiteUrl: null,
   });
+  const [err, setErr] = useState<string | null>(null);
 
   const add = () => {
-    if (!draft.name.trim()) return;
+    if (!draft.name.trim() || !draft.organization.trim()) {
+      setErr(t('organizerRequired'));
+      return;
+    }
+    setErr(null);
     onChange([
       ...value,
       {
         name: draft.name.trim(),
+        organization: draft.organization.trim(),
         logoUrl: draft.logoUrl?.trim() || null,
         websiteUrl: draft.websiteUrl?.trim() || null,
       },
     ]);
-    setDraft({ name: '', logoUrl: null, websiteUrl: null });
+    setDraft({ name: '', organization: '', logoUrl: null, websiteUrl: null });
+  };
+
+  const onPick = (p: RubricaPickedPerson) => {
+    setDraft((d) => ({
+      ...d,
+      name: p.displayName || d.name,
+      organization: p.organization ?? d.organization,
+    }));
   };
 
   return (
@@ -123,8 +144,11 @@ function OrganizersSection({
             >
               <div>
                 <div className="fw-semibold">{o.name}</div>
+                <small className="text-muted">{o.organization}</small>
                 {o.websiteUrl && (
-                  <small className="text-muted">{o.websiteUrl}</small>
+                  <div>
+                    <small className="text-muted">{o.websiteUrl}</small>
+                  </div>
                 )}
               </div>
               <button
@@ -139,8 +163,13 @@ function OrganizersSection({
         </ul>
       )}
 
+      <div className="mb-2">
+        <RubricaPicker onSelect={onPick} placeholder={t('rubricaPick')} />
+        <small className="text-muted">{t('rubricaOrAdd')}</small>
+      </div>
+
       <div className="row g-2 align-items-end">
-        <div className="col-md-5">
+        <div className="col-md-4">
           <label className="form-label" htmlFor="org-name">
             {t('organizerName')}
           </label>
@@ -150,9 +179,25 @@ function OrganizersSection({
             className="form-control"
             value={draft.name}
             onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+            required
           />
         </div>
-        <div className="col-md-5">
+        <div className="col-md-3">
+          <label className="form-label" htmlFor="org-org">
+            {t('organizerOrganization')}
+          </label>
+          <input
+            id="org-org"
+            type="text"
+            className="form-control"
+            value={draft.organization}
+            onChange={(e) =>
+              setDraft({ ...draft, organization: e.target.value })
+            }
+            required
+          />
+        </div>
+        <div className="col-md-3">
           <label className="form-label" htmlFor="org-web">
             {t('organizerWebsite')}
           </label>
@@ -171,11 +216,142 @@ function OrganizersSection({
             type="button"
             className="btn btn-primary w-100"
             onClick={add}
-            disabled={!draft.name.trim()}
+            disabled={!draft.name.trim() || !draft.organization.trim()}
           >
             {t('add')}
           </button>
         </div>
+        {err && (
+          <div className="col-12">
+            <small className="text-danger">{err}</small>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ModeratorsSection({
+  value,
+  onChange,
+}: {
+  value: ModeratorEntry[];
+  onChange: (next: ModeratorEntry[]) => void;
+}) {
+  const t = useTranslations('admin.wizard.step3');
+  const [draft, setDraft] = useState<ModeratorEntry>({
+    name: '',
+    email: '',
+    personId: null,
+  });
+  const [err, setErr] = useState<string | null>(null);
+
+  const add = () => {
+    if (!draft.name.trim() || !draft.email.trim()) {
+      setErr(t('moderatorRequired'));
+      return;
+    }
+    if (!isEmail(draft.email.trim())) {
+      setErr(t('invalidEmail'));
+      return;
+    }
+    setErr(null);
+    onChange([
+      ...value,
+      {
+        name: draft.name.trim(),
+        email: draft.email.trim().toLowerCase(),
+        personId: draft.personId,
+      },
+    ]);
+    setDraft({ name: '', email: '', personId: null });
+  };
+
+  const onPick = (p: RubricaPickedPerson) => {
+    setDraft((d) => ({
+      ...d,
+      name: p.displayName || d.name,
+      email: p.email ?? d.email,
+      personId: p.id,
+    }));
+  };
+
+  return (
+    <section className="mb-4">
+      <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+        {t('moderatorsHeading')}
+      </h3>
+      <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
+        {t('moderatorsHelp')}
+      </p>
+
+      {value.length > 0 && (
+        <ul className="list-group mb-3">
+          {value.map((m, i) => (
+            <li
+              key={`${m.email}-${i}`}
+              className="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <div className="fw-semibold">{m.name}</div>
+                <small className="text-muted">{m.email}</small>
+              </div>
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-danger"
+                onClick={() => onChange(value.filter((_, j) => j !== i))}
+              >
+                {t('remove')}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mb-2">
+        <RubricaPicker onSelect={onPick} placeholder={t('rubricaPick')} />
+        <small className="text-muted">{t('rubricaOrAdd')}</small>
+      </div>
+
+      <div className="row g-2 align-items-end">
+        <div className="col-md-5">
+          <label className="form-label" htmlFor="mod-name">
+            {t('moderatorName')}
+          </label>
+          <input
+            id="mod-name"
+            type="text"
+            className="form-control"
+            value={draft.name}
+            onChange={(e) =>
+              setDraft({ ...draft, name: e.target.value, personId: null })
+            }
+          />
+        </div>
+        <div className="col-md-5">
+          <label className="form-label" htmlFor="mod-email">
+            {t('moderatorEmail')}
+          </label>
+          <input
+            id="mod-email"
+            type="email"
+            className="form-control"
+            value={draft.email}
+            onChange={(e) =>
+              setDraft({ ...draft, email: e.target.value, personId: null })
+            }
+          />
+        </div>
+        <div className="col-md-2">
+          <button type="button" className="btn btn-primary w-100" onClick={add}>
+            {t('add')}
+          </button>
+        </div>
+        {err && (
+          <div className="col-12">
+            <small className="text-danger">{err}</small>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -189,7 +365,11 @@ function SpeakersSection({
   onChange: (next: SpeakerEntry[]) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
-  const [draft, setDraft] = useState<SpeakerEntry>({ name: '', email: '' });
+  const [draft, setDraft] = useState<SpeakerEntry>({
+    name: '',
+    email: '',
+    personId: null,
+  });
   const [err, setErr] = useState<string | null>(null);
 
   const add = () => {
@@ -204,9 +384,22 @@ function SpeakersSection({
     setErr(null);
     onChange([
       ...value,
-      { name: draft.name.trim(), email: draft.email.trim().toLowerCase() },
+      {
+        name: draft.name.trim(),
+        email: draft.email.trim().toLowerCase(),
+        personId: draft.personId,
+      },
     ]);
-    setDraft({ name: '', email: '' });
+    setDraft({ name: '', email: '', personId: null });
+  };
+
+  const onPick = (p: RubricaPickedPerson) => {
+    setDraft((d) => ({
+      ...d,
+      name: p.displayName || d.name,
+      email: p.email ?? d.email,
+      personId: p.id,
+    }));
   };
 
   return (
@@ -241,6 +434,11 @@ function SpeakersSection({
         </ul>
       )}
 
+      <div className="mb-2">
+        <RubricaPicker onSelect={onPick} placeholder={t('rubricaPick')} />
+        <small className="text-muted">{t('rubricaOrAdd')}</small>
+      </div>
+
       <div className="row g-2 align-items-end">
         <div className="col-md-5">
           <label className="form-label" htmlFor="sp-name">
@@ -251,7 +449,9 @@ function SpeakersSection({
             type="text"
             className="form-control"
             value={draft.name}
-            onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+            onChange={(e) =>
+              setDraft({ ...draft, name: e.target.value, personId: null })
+            }
           />
         </div>
         <div className="col-md-5">
@@ -263,7 +463,9 @@ function SpeakersSection({
             type="email"
             className="form-control"
             value={draft.email}
-            onChange={(e) => setDraft({ ...draft, email: e.target.value })}
+            onChange={(e) =>
+              setDraft({ ...draft, email: e.target.value, personId: null })
+            }
           />
         </div>
         <div className="col-md-2">
@@ -314,10 +516,19 @@ function InvitationsSection({
         name: draft.name?.trim() || null,
         email,
         role: draft.role,
-        personId: null,
+        personId: draft.personId,
       },
     ]);
     setDraft({ name: '', email: '', role: 'GUEST', personId: null });
+  };
+
+  const onPick = (p: RubricaPickedPerson) => {
+    setDraft((d) => ({
+      ...d,
+      name: p.displayName || d.name || '',
+      email: p.email ?? d.email,
+      personId: p.id,
+    }));
   };
 
   return (
@@ -363,6 +574,11 @@ function InvitationsSection({
         </ul>
       )}
 
+      <div className="mb-2">
+        <RubricaPicker onSelect={onPick} placeholder={t('rubricaPick')} />
+        <small className="text-muted">{t('rubricaOrAdd')}</small>
+      </div>
+
       <div className="row g-2 align-items-end">
         <div className="col-md-4">
           <label className="form-label" htmlFor="inv-name">
@@ -373,7 +589,9 @@ function InvitationsSection({
             type="text"
             className="form-control"
             value={draft.name ?? ''}
-            onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+            onChange={(e) =>
+              setDraft({ ...draft, name: e.target.value, personId: null })
+            }
           />
         </div>
         <div className="col-md-4">
@@ -385,7 +603,9 @@ function InvitationsSection({
             type="email"
             className="form-control"
             value={draft.email}
-            onChange={(e) => setDraft({ ...draft, email: e.target.value })}
+            onChange={(e) =>
+              setDraft({ ...draft, email: e.target.value, personId: null })
+            }
             required
           />
         </div>

@@ -86,6 +86,7 @@ interface EventWithCount {
   speakersInfo: unknown;
   organizerName: string | null;
   imageUrl: string | null;
+  parseTitleKicker: boolean | null;
   _count: { registrations: number };
 }
 
@@ -105,5 +106,6 @@ function serialise(e: EventWithCount, _locale: string) {
     speakersInfo: e.speakersInfo as Record<string, string> | null,
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,
+    parseTitleKicker: e.parseTitleKicker,
   };
 }

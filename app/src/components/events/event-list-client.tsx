@@ -15,6 +15,7 @@ import {
 import { Link } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import EventTitle from '@/components/events/event-title';
+import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
 interface EventItem {
   id: string;
@@ -31,11 +32,14 @@ interface EventItem {
   speakersInfo?: Record<string, string> | null;
   organizerName?: string | null;
   imageUrl?: string | null;
+  /** Per-event override for the kicker parse. Null = inherit site default. */
+  parseTitleKicker?: boolean | null;
 }
 
 interface EventListClientProps {
   events: EventItem[];
   muted?: boolean;
+  /** Site-wide default for the kicker parse, used when an event has no override. */
   parseTitleKicker?: boolean;
 }
 
@@ -106,7 +110,7 @@ export default function EventListClient({
 
                 <EventTitle
                   title={title}
-                  kickerEnabled={parseTitleKicker}
+                  kickerEnabled={resolveKickerEnabled(event, parseTitleKicker)}
                   as="h3"
                   className="h5 fw-semibold mb-2"
                   style={{ color: '#17324D' }}

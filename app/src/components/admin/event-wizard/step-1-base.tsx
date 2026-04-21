@@ -38,6 +38,10 @@ export interface Step1Value {
   recurrencePreset: RecurrencePreset;
   recurrenceUntil: string | null;
   recurrenceCount: number | null;
+  /** Per-event override: true forces "kicker" rendering on, null inherits
+   *  the site default. The wizard only exposes the toggle when the site
+   *  default is off (otherwise the site setting already covers it). */
+  parseTitleKicker: boolean | null;
 }
 
 interface Props {
@@ -51,6 +55,9 @@ interface Props {
     color: string | null;
   }>;
   fieldErrors: Record<string, string>;
+  /** Site-wide default for parseTitleKicker. When true, the per-event
+   *  checkbox is hidden because the site setting already covers it. */
+  siteDefaultParseTitleKicker: boolean;
 }
 
 export default function Step1Base({
@@ -60,6 +67,7 @@ export default function Step1Base({
   defaultLocale,
   availableTags,
   fieldErrors,
+  siteDefaultParseTitleKicker,
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
   const tAdmin = useTranslations('admin');
@@ -164,6 +172,29 @@ export default function Step1Base({
               {fieldErrors[`title.${contentLocale}`]}
             </div>
           )}
+
+          {/* Per-event kicker override. Hidden when the site default is
+              already on — in that case every `|` title already renders
+              split, so the override is redundant. */}
+          {!siteDefaultParseTitleKicker && (
+            <div className="form-check mt-2">
+              <input
+                id="ev-parse-title-kicker"
+                type="checkbox"
+                className="form-check-input"
+                checked={value.parseTitleKicker === true}
+                onChange={(e) =>
+                  onChange({ parseTitleKicker: e.target.checked ? true : null })
+                }
+              />
+              <label className="form-check-label" htmlFor="ev-parse-title-kicker">
+                {t('parseTitleKickerLabel')}
+              </label>
+              <small className="form-text text-muted d-block">
+                {t('parseTitleKickerHelp')}
+              </small>
+            </div>
+          )}
         </div>
 
         <div className="mb-3">
@@ -204,11 +235,14 @@ export default function Step1Base({
             <input
               id="ev-starts"
               type="datetime-local"
-              className="form-control"
+              className={`form-control ${fieldErrors.startsAt ? 'is-invalid' : ''}`}
               value={value.startsAt}
               onChange={(e) => handleStartsAt(e.target.value)}
               required
             />
+            {fieldErrors.startsAt && (
+              <div className="invalid-feedback">{t('validation.startsAt')}</div>
+            )}
           </div>
           <div className="col-md-6">
             <label className="form-label" htmlFor="ev-ends">
@@ -217,11 +251,14 @@ export default function Step1Base({
             <input
               id="ev-ends"
               type="datetime-local"
-              className="form-control"
+              className={`form-control ${fieldErrors.endsAt ? 'is-invalid' : ''}`}
               value={value.endsAt}
               onChange={(e) => onChange({ endsAt: e.target.value })}
               required
             />
+            {fieldErrors.endsAt && (
+              <div className="invalid-feedback">{t('validation.endsAt')}</div>
+            )}
           </div>
           <div className="col-md-6">
             <label className="form-label" htmlFor="ev-tz">
@@ -244,17 +281,39 @@ export default function Step1Base({
             <label className="form-label" htmlFor="ev-max">
               {tAdmin('form.expectedParticipants')}
             </label>
-            <input
-              id="ev-max"
-              type="number"
-              min={2}
-              max={10000}
-              className="form-control"
-              value={value.maxParticipants}
-              onChange={(e) =>
-                onChange({ maxParticipants: Number(e.target.value) || 0 })
-              }
-            />
+            <div className="d-flex align-items-center gap-3">
+              <input
+                id="ev-max-range"
+                type="range"
+                min={2}
+                max={500}
+                step={1}
+                className="form-range flex-grow-1"
+                value={Math.min(500, Math.max(2, value.maxParticipants || 150))}
+                onChange={(e) =>
+                  onChange({ maxParticipants: Number(e.target.value) || 2 })
+                }
+                aria-label={tAdmin('form.expectedParticipants')}
+              />
+              <input
+                id="ev-max"
+                type="number"
+                min={2}
+                max={500}
+                className="form-control"
+                style={{ maxWidth: 96 }}
+                value={value.maxParticipants}
+                onChange={(e) => {
+                  const raw = Number(e.target.value);
+                  if (!Number.isFinite(raw)) return;
+                  const clamped = Math.min(500, Math.max(2, Math.floor(raw)));
+                  onChange({ maxParticipants: clamped });
+                }}
+              />
+            </div>
+            <small className="form-text text-muted">
+              {t('maxParticipantsHelp')}
+            </small>
           </div>
         </div>
       </section>

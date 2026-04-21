@@ -48,6 +48,7 @@ interface Props {
   jvbSizingConfig: JvbSizingConfig;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
+  siteDefaultParseTitleKicker: boolean;
 }
 
 export default function CreateEventWithTemplate({
@@ -61,6 +62,7 @@ export default function CreateEventWithTemplate({
   jvbSizingConfig,
   availableTags,
   gdprTemplates,
+  siteDefaultParseTitleKicker,
 }: Props) {
   const t = useTranslations('admin.templates');
   const ti = useTranslations('admin.instantCall');
@@ -159,6 +161,7 @@ export default function CreateEventWithTemplate({
       jvbSizingConfig={jvbSizingConfig}
       availableTags={availableTags}
       gdprTemplates={gdprTemplates}
+      siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
     />
   );
 }

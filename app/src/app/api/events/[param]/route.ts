@@ -302,6 +302,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.youtubeUrl !== undefined && { youtubeUrl: data.youtubeUrl }),
       ...(data.libraryListed !== undefined && { libraryListed: data.libraryListed }),
       ...(data.coverImageUrl !== undefined && { coverImageUrl: data.coverImageUrl }),
+      ...(data.parseTitleKicker !== undefined && {
+        parseTitleKicker: data.parseTitleKicker,
+      }),
     },
   });
 

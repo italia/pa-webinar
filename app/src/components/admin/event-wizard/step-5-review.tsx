@@ -14,6 +14,7 @@ import { useTranslations } from 'next-intl';
 
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
 import JvbCapacityPreview from '@/components/admin/jvb-capacity-preview';
+import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { describeRRule } from '@/lib/utils/recurrence';
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
@@ -177,8 +178,21 @@ export default function Step5Review({
                 value={form.privacyPolicyText ?? ''}
                 onChange={(e) => onChange({ privacyPolicyText: e.target.value })}
               />
+              <small className="form-text text-muted">
+                {t('privacyTextHelp')}
+              </small>
             </div>
           )}
+          <div className="col-12">
+            <FileOrUrlInput
+              id="rev-privacy-doc"
+              label={t('privacyDoc')}
+              assetType="document"
+              value={form.privacyPolicyUrl}
+              onChange={(next) => onChange({ privacyPolicyUrl: next })}
+              helpText={t('privacyDocHelp')}
+            />
+          </div>
         </div>
       </section>
 

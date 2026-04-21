@@ -21,7 +21,6 @@
 
 import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Input } from 'design-react-kit';
 
 import type { AssetUploadResponse } from '@/lib/validation/schemas';
 
@@ -306,42 +305,31 @@ export default function FileOrUrlInput({
           }}
           onDrop={onDrop}
         >
-          <div className="mb-2 text-muted small">{t('uploadLabel')}</div>
-          <div className="d-flex align-items-center gap-2 flex-wrap">
-            <input
-              id={fileInputId}
-              ref={fileInputRef}
-              type="file"
-              accept={effectiveAccept}
-              onChange={onFileInputChange}
-              disabled={disabled || uploading}
-              className="form-control form-control-sm"
-              style={{ maxWidth: 360 }}
-            />
-            <Button
-              type="button"
-              color="primary"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={disabled || uploading}
-            >
-              {uploading ? (
-                <>
-                  <span
-                    className="spinner-border spinner-border-sm me-2"
-                    role="status"
-                    aria-hidden="true"
-                  />
-                  {t('uploading')}
-                </>
-              ) : (
-                <>
-                  <InlineIcon name="upload" className="me-1" />
-                  {t('uploadButton')}
-                </>
-              )}
-            </Button>
-          </div>
+          <label
+            htmlFor={fileInputId}
+            className="form-label small text-muted mb-2 d-block"
+          >
+            {t('uploadLabel')}
+          </label>
+          <input
+            id={fileInputId}
+            ref={fileInputRef}
+            type="file"
+            accept={effectiveAccept}
+            onChange={onFileInputChange}
+            disabled={disabled || uploading}
+            className="form-control"
+          />
+          {uploading && (
+            <div className="d-flex align-items-center gap-2 mt-2 text-primary small">
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              />
+              {t('uploading')}
+            </div>
+          )}
           {defaultHelp && (
             <div className="form-text text-muted mt-2">{defaultHelp}</div>
           )}
@@ -358,27 +346,30 @@ export default function FileOrUrlInput({
       )}
 
       {mode === 'url' && (
-        <div>
-          <Input
+        <div className="border rounded p-3 bg-white">
+          <label
+            htmlFor={urlInputId}
+            className="form-label small text-muted mb-2 d-block"
+          >
+            {t('urlLabel')}
+          </label>
+          <input
             id={urlInputId}
             type="url"
-            label={t('urlLabel')}
+            className={`form-control${urlError ? ' is-invalid' : ''}`}
             placeholder={t('urlPlaceholder')}
             value={urlDraft}
             onChange={onUrlChange}
-            onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
-              commitUrl(e.target.value)
-            }
+            onBlur={(e) => commitUrl(e.target.value)}
             disabled={disabled}
-            valid={urlError ? false : undefined}
           />
           {urlError && (
-            <div className="text-danger small" role="alert" aria-live="polite">
+            <div className="text-danger small mt-2" role="alert" aria-live="polite">
               {urlError}
             </div>
           )}
           {defaultHelp && !urlError && (
-            <div className="form-text text-muted">{defaultHelp}</div>
+            <div className="form-text text-muted mt-2">{defaultHelp}</div>
           )}
         </div>
       )}
@@ -426,17 +417,15 @@ export default function FileOrUrlInput({
               </a>
             )}
           </div>
-          <Button
+          <button
             type="button"
-            color="danger"
-            outline
-            size="sm"
+            className="btn btn-outline-danger btn-sm"
             onClick={remove}
             disabled={disabled}
           >
             <InlineIcon name="delete" className="me-1" />
             {t('remove')}
-          </Button>
+          </button>
         </div>
       )}
     </div>

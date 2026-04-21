@@ -10,6 +10,7 @@ import { isJibriAvailable } from '@/lib/infrastructure';
 import LiveEventClient from '@/components/live/live-event-client';
 import ProvisioningScreen from '@/components/live/provisioning-screen';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
 async function hasJoinGrant(eventId: string): Promise<boolean> {
   const appSecret = process.env.APP_SECRET;
@@ -89,6 +90,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             id: event.id,
             slug: event.slug,
             title,
+            parseTitleKicker: resolveKickerEnabled(event, settings.parseTitleKicker),
             startsAt: event.startsAt.toISOString(),
             endsAt: event.endsAt.toISOString(),
             status: event.status,
@@ -158,6 +160,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         id: event.id,
         slug: event.slug,
         title,
+        parseTitleKicker: resolveKickerEnabled(event, settings.parseTitleKicker),
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),
         status: event.status,

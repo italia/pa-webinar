@@ -6,6 +6,7 @@ import { Link } from '@/i18n/navigation';
 import RegistrationFormClient from '@/components/registration/registration-form-client';
 import EventTitle from '@/components/events/event-title';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { getSettings } from '@/lib/settings';
 
 interface RegistrationPageProps {
@@ -67,7 +68,7 @@ export default async function RegistrationPage({
           <h1 className="mb-2">{t('title')}</h1>
           <EventTitle
             title={title}
-            kickerEnabled={settings.parseTitleKicker}
+            kickerEnabled={resolveKickerEnabled(event, settings.parseTitleKicker)}
             as="p"
             className="lead text-muted mb-4"
           />
