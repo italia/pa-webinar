@@ -1648,6 +1648,45 @@
         "latestRelease": "Ultima release (con SBOM)",
         "securityPolicy": "Policy di disclosure (SECURITY.md)"
       }
+    },
+    "serviceInventory": {
+      "metaTitle": "Inventario servizi",
+      "title": "Inventario servizi del provider",
+      "intro": "Questo documento elenca, per l'istanza corrente, le dipendenze software (DEV) e i servizi operativi (OPS) che compongono la piattaforma. Il formato utilizzato è CycloneDX 1.6, uno standard aperto OWASP che descrive in un unico documento sia le librerie di codice sia i servizi gestiti da fornitori terzi.",
+      "notPublishedTitle": "Inventario non ancora pubblicato",
+      "notPublishedBody": "Il gestore di questa istanza non ha ancora pubblicato un inventario dei servizi. La variabile di configurazione SERVICE_INVENTORY_URL non è stata impostata per questo deploy.",
+      "fetchErrorTitle": "Impossibile caricare l'inventario",
+      "fetchErrorBody": "Il file JSON dell'inventario non è al momento raggiungibile. Riprovare più tardi o contattare il referente del servizio.",
+      "metadata": {
+        "tenant": "Istanza",
+        "provider": "Fornitore cloud",
+        "region": "Regione",
+        "deploymentMode": "Modalità di deploy",
+        "generatedAt": "Generato il",
+        "format": "Formato",
+        "download": "Scarica JSON originale"
+      },
+      "sections": {
+        "componentsTitle": "Componenti software (DEV)",
+        "componentsIntro": "Librerie, container e pacchetti di sistema che formano l'applicazione. Informazione legata alla versione del codice, riproducibile da chiunque scarichi il sorgente.",
+        "servicesTitle": "Servizi operativi (OPS)",
+        "servicesIntro": "Servizi gestiti da terzi su cui questa istanza si appoggia. Informazione legata al tenant: cambia quando il gestore modifica la configurazione o il fornitore cloud.",
+        "dependenciesTitle": "Catena di dipendenze"
+      },
+      "columns": {
+        "name": "Nome",
+        "type": "Tipo",
+        "version": "Versione",
+        "license": "Licenza",
+        "provider": "Fornitore",
+        "dataFlow": "Flusso dati",
+        "description": "Descrizione"
+      },
+      "badges": {
+        "trustBoundary": "attraversa confine di fiducia",
+        "personalData": "dati personali",
+        "recording": "contenuti registrati"
+      }
     }
   },
   "status": {
@@ -1960,6 +1999,7 @@
     "systemStatus": "Stato del sistema",
     "sbomLatest": "SBOM ultima release",
     "transparency": "Sicurezza e trasparenza",
+    "serviceInventory": "Inventario servizi",
     "sourceCode": "Codice sorgente",
     "buildInfoDev": "build di sviluppo",
     "viewCommit": "Vedi il commit su GitHub",

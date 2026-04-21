@@ -79,6 +79,23 @@ app:
     # Leave empty to disable Prometheus integration (probe-only status page).
     PROMETHEUS_URL: ""
 
+    # ── Service inventory (CycloneDX 1.6) ──
+    #
+    # Public transparency artifact served at /service-inventory. Describes
+    # both software dependencies (DEV) and operational services (OPS) that
+    # make up THIS tenant's deployment. See docs/ARCHITECTURE.md or the
+    # OWASP CycloneDX spec for the format.
+    #
+    # Accepted forms:
+    #   - absolute https URL (e.g. Azure Blob public container) — fetched
+    #     with revalidate:3600
+    #   - path starting with "/" served from the app's public/ directory
+    #
+    # Leave empty to render a "not yet published" placeholder. A sample
+    # document for structure reference is shipped at
+    # /examples/service-inventory.example.json.
+    SERVICE_INVENTORY_URL: ""
+
     # ── Storage provider ──
     #
     # Two independent storage domains, each backed by any S3-compatible

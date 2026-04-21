@@ -1176,6 +1176,45 @@
         "latestRelease": "Najnovejša izdaja (z SBOM)",
         "securityPolicy": "Politika razkrivanja (SECURITY.md)"
       }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      }
     }
   },
   "status": {
@@ -1458,7 +1497,8 @@
     "buildInfoDev": "razvojna zgradba",
     "viewCommit": "Oglejte si commit na GitHubu",
     "viewRelease": "Oglejte si izdajo na GitHubu",
-    "buildDatePrefix": "Zgrajeno"
+    "buildDatePrefix": "Zgrajeno",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Politika zasebnosti",

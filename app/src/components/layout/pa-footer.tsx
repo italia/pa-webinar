@@ -72,6 +72,15 @@ function FooterIconTag() {
     </svg>
   );
 }
+function FooterIconInventory() {
+  return (
+    <svg width={FOOTER_ICON_SIZE} height={FOOTER_ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7h16v13H4z" />
+      <path d="M4 7l2-3h12l2 3" />
+      <path d="M9 11h6" />
+    </svg>
+  );
+}
 
 // Pick a matching icon for custom (admin-defined) legal links based on the
 // URL/title — best-effort, falls back to the generic link glyph.
@@ -94,12 +103,15 @@ function IconLabel({ icon, children }: { icon: React.ReactNode; children: React.
   );
 }
 
-// YYYY-MM-DD only — the ISO string is inlined at build time so server/client
-// render the same text and there is no Intl locale drift to reconcile.
+// "YYYY-MM-DD HH:MM UTC" — the ISO string is inlined at build time so
+// server/client render the same text and there is no Intl locale drift to
+// reconcile. Seconds are dropped; UTC suffix is explicit so readers don't
+// assume Europe/Rome.
 function formatBuildDate(iso: string): string {
   if (!iso) return '';
-  const idx = iso.indexOf('T');
-  return idx > 0 ? iso.slice(0, idx) : iso;
+  const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec(iso);
+  if (!match) return iso;
+  return `${match[1]} ${match[2]} UTC`;
 }
 
 export default function PAFooter() {
@@ -270,6 +282,11 @@ export default function PAFooter() {
                 </li>
               </>
             )}
+            <li className="list-inline-item">
+              <Link href="/service-inventory">
+                <IconLabel icon={<FooterIconInventory />}>{t('footer.serviceInventory')}</IconLabel>
+              </Link>
+            </li>
             {settings.statusPageEnabled && (
               <li className="list-inline-item">
                 <Link href="/status">
