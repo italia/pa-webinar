@@ -1,0 +1,309 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:5b0c41ec-1f2b-4a53-9b2e-1d2f3a4b5c6d",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-04-21T08:00:00Z",
+    "lifecycles": [
+      { "phase": "operations" }
+    ],
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "group": "@cyclonedx",
+          "name": "cdxgen",
+          "version": "10.x"
+        },
+        {
+          "type": "application",
+          "group": "anchore",
+          "name": "syft",
+          "version": "1.x"
+        }
+      ]
+    },
+    "authors": [
+      {
+        "name": "Dipartimento per la Trasformazione Digitale",
+        "email": "trasparenza@innovazione.gov.it"
+      }
+    ],
+    "component": {
+      "bom-ref": "tenant:videocall-test",
+      "type": "application",
+      "name": "eventi-dtd",
+      "version": "0.3.44",
+      "description": "Istanza eventi-dtd per il tenant videocall-test (ambiente di collaudo).",
+      "licenses": [
+        { "license": { "id": "AGPL-3.0-only" } }
+      ],
+      "externalReferences": [
+        { "type": "vcs", "url": "https://github.com/italia/eventi-dtd" },
+        { "type": "website", "url": "https://videocall-test.example.it" }
+      ]
+    },
+    "properties": [
+      { "name": "eventi-dtd:tenant", "value": "videocall-test" },
+      { "name": "eventi-dtd:cloud-provider", "value": "Microsoft Azure" },
+      { "name": "eventi-dtd:region", "value": "italynorth" },
+      { "name": "eventi-dtd:deployment-mode", "value": "standard" }
+    ]
+  },
+
+  "components": [
+    {
+      "bom-ref": "pkg:oci/eventi-dtd@sha256:placeholder",
+      "type": "container",
+      "name": "eventi-dtd",
+      "version": "0.3.44",
+      "purl": "pkg:oci/italia/eventi-dtd@0.3.44?repository_url=ghcr.io",
+      "description": "Immagine OCI dell'applicazione Next.js, pubblicata su GHCR."
+    },
+    {
+      "bom-ref": "pkg:oci/jitsi-web",
+      "type": "container",
+      "name": "jitsi/web",
+      "version": "stable-9258",
+      "purl": "pkg:oci/jitsi/web@stable-9258?repository_url=docker.io"
+    },
+    {
+      "bom-ref": "pkg:oci/jitsi-prosody",
+      "type": "container",
+      "name": "jitsi/prosody",
+      "version": "stable-9258",
+      "purl": "pkg:oci/jitsi/prosody@stable-9258?repository_url=docker.io"
+    },
+    {
+      "bom-ref": "pkg:oci/jitsi-jicofo",
+      "type": "container",
+      "name": "jitsi/jicofo",
+      "version": "stable-9258",
+      "purl": "pkg:oci/jitsi/jicofo@stable-9258?repository_url=docker.io"
+    },
+    {
+      "bom-ref": "pkg:oci/jitsi-jvb",
+      "type": "container",
+      "name": "jitsi/jvb",
+      "version": "stable-9258",
+      "purl": "pkg:oci/jitsi/jvb@stable-9258?repository_url=docker.io"
+    },
+    {
+      "bom-ref": "pkg:deb/debian/debian@12",
+      "type": "operating-system",
+      "name": "debian",
+      "version": "12-slim",
+      "description": "Base image layer dell'immagine Next.js."
+    },
+    {
+      "bom-ref": "pkg:npm/next@15.5.15",
+      "type": "framework",
+      "name": "next",
+      "version": "15.5.15",
+      "purl": "pkg:npm/next@15.5.15",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    },
+    {
+      "bom-ref": "pkg:npm/react@19.0.0",
+      "type": "library",
+      "name": "react",
+      "version": "19.0.0",
+      "purl": "pkg:npm/react@19.0.0",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    },
+    {
+      "bom-ref": "pkg:npm/next-intl@4.0.0",
+      "type": "library",
+      "name": "next-intl",
+      "version": "4.0.0",
+      "purl": "pkg:npm/next-intl@4.0.0",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    },
+    {
+      "bom-ref": "pkg:npm/@prisma/client@6.0.0",
+      "type": "library",
+      "name": "@prisma/client",
+      "version": "6.0.0",
+      "purl": "pkg:npm/%40prisma/client@6.0.0",
+      "licenses": [{ "license": { "id": "Apache-2.0" } }]
+    },
+    {
+      "bom-ref": "pkg:npm/bootstrap-italia@2.12.0",
+      "type": "library",
+      "name": "bootstrap-italia",
+      "version": "2.12.0",
+      "purl": "pkg:npm/bootstrap-italia@2.12.0",
+      "licenses": [{ "license": { "id": "BSD-3-Clause" } }]
+    },
+    {
+      "bom-ref": "pkg:npm/design-react-kit@5.1.0",
+      "type": "library",
+      "name": "design-react-kit",
+      "version": "5.1.0",
+      "purl": "pkg:npm/design-react-kit@5.1.0",
+      "licenses": [{ "license": { "id": "BSD-3-Clause" } }]
+    },
+    {
+      "bom-ref": "pkg:npm/ioredis@5.10.1",
+      "type": "library",
+      "name": "ioredis",
+      "version": "5.10.1",
+      "purl": "pkg:npm/ioredis@5.10.1",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    }
+  ],
+
+  "services": [
+    {
+      "bom-ref": "svc:azure/aks/videocall-test",
+      "provider": {
+        "name": "Microsoft Azure",
+        "url": ["https://azure.microsoft.com"]
+      },
+      "group": "Microsoft.ContainerService",
+      "name": "Azure Kubernetes Service",
+      "version": "1.29",
+      "description": "Cluster AKS aks-test che ospita il namespace videocall-test.",
+      "endpoints": ["https://aks-test-dns.hcp.italynorth.azmk8s.io"],
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [
+        { "classification": "application", "flow": "bi-directional" }
+      ],
+      "externalReferences": [
+        { "type": "documentation", "url": "https://learn.microsoft.com/azure/aks/" }
+      ],
+      "properties": [
+        { "name": "azure:resource-type", "value": "Microsoft.ContainerService/managedClusters" },
+        { "name": "azure:region", "value": "italynorth" },
+        { "name": "eventi-dtd:node-pools", "value": "system,jvb-pool" }
+      ]
+    },
+    {
+      "bom-ref": "svc:azure/postgres-flexible/videocall-test",
+      "provider": { "name": "Microsoft Azure" },
+      "group": "Microsoft.DBforPostgreSQL",
+      "name": "Azure Database for PostgreSQL Flexible Server",
+      "version": "16",
+      "description": "Database gestito con dati applicativi: eventi, iscrizioni, feedback, template email.",
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [
+        { "classification": "personal-data", "flow": "bi-directional" },
+        { "classification": "application", "flow": "bi-directional" }
+      ],
+      "properties": [
+        { "name": "azure:resource-type", "value": "Microsoft.DBforPostgreSQL/flexibleServers" },
+        { "name": "eventi-dtd:retention-days", "value": "35" },
+        { "name": "eventi-dtd:backup", "value": "geo-redundant" },
+        { "name": "eventi-dtd:pii", "value": "email-hash, nome, cognome, consensi GDPR" }
+      ]
+    },
+    {
+      "bom-ref": "svc:azure/blob/recordings-videocall-test",
+      "provider": { "name": "Microsoft Azure" },
+      "group": "Microsoft.Storage",
+      "name": "Azure Blob Storage",
+      "description": "Bucket delle registrazioni Jibri e degli asset branding del tenant.",
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [
+        { "classification": "recording", "flow": "outbound" }
+      ],
+      "properties": [
+        { "name": "azure:resource-type", "value": "Microsoft.Storage/storageAccounts" },
+        { "name": "azure:replication", "value": "ZRS" },
+        { "name": "eventi-dtd:retention-days", "value": "90" }
+      ]
+    },
+    {
+      "bom-ref": "svc:github/ghcr",
+      "provider": { "name": "GitHub, Inc.", "url": ["https://github.com"] },
+      "name": "GitHub Container Registry",
+      "description": "Registry OCI da cui AKS pull-a le immagini dell'app.",
+      "endpoints": ["https://ghcr.io"],
+      "authenticated": false,
+      "x-trust-boundary": true,
+      "data": [{ "classification": "image", "flow": "inbound" }]
+    },
+    {
+      "bom-ref": "svc:ingress-nginx",
+      "provider": { "name": "Kubernetes SIGs" },
+      "name": "ingress-nginx",
+      "version": "4.11.x",
+      "description": "Ingress controller self-hosted nel cluster AKS.",
+      "authenticated": false
+    },
+    {
+      "bom-ref": "svc:cert-manager",
+      "provider": { "name": "cert-manager.io" },
+      "name": "cert-manager",
+      "version": "1.15.x",
+      "description": "Emissione certificati TLS via Let's Encrypt (ACME HTTP-01).",
+      "authenticated": false
+    },
+    {
+      "bom-ref": "svc:letsencrypt",
+      "provider": { "name": "Let's Encrypt / ISRG", "url": ["https://letsencrypt.org"] },
+      "name": "ACME directory",
+      "description": "CA esterna per i certificati TLS.",
+      "endpoints": ["https://acme-v02.api.letsencrypt.org/directory"],
+      "x-trust-boundary": true
+    },
+    {
+      "bom-ref": "svc:smtp/mailpit-test",
+      "provider": { "name": "Mailpit (self-hosted)" },
+      "name": "SMTP relay",
+      "description": "In ambiente videocall-test le email sono catturate da Mailpit (nessuna consegna reale). In produzione: SMTP del provider PA.",
+      "authenticated": true,
+      "x-trust-boundary": false,
+      "data": [{ "classification": "personal-data", "flow": "outbound" }]
+    },
+    {
+      "bom-ref": "svc:turn/coturn",
+      "provider": { "name": "coturn (self-hosted)" },
+      "name": "TURN/STUN server",
+      "description": "Relay media per partecipanti dietro NAT simmetrici.",
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [{ "classification": "media", "flow": "bi-directional" }]
+    }
+  ],
+
+  "dependencies": [
+    {
+      "ref": "tenant:videocall-test",
+      "dependsOn": [
+        "pkg:oci/eventi-dtd@sha256:placeholder",
+        "pkg:oci/jitsi-web",
+        "pkg:oci/jitsi-prosody",
+        "pkg:oci/jitsi-jicofo",
+        "pkg:oci/jitsi-jvb",
+        "svc:azure/aks/videocall-test",
+        "svc:azure/postgres-flexible/videocall-test",
+        "svc:azure/blob/recordings-videocall-test",
+        "svc:github/ghcr",
+        "svc:ingress-nginx",
+        "svc:cert-manager",
+        "svc:letsencrypt",
+        "svc:smtp/mailpit-test",
+        "svc:turn/coturn"
+      ]
+    },
+    {
+      "ref": "pkg:oci/eventi-dtd@sha256:placeholder",
+      "dependsOn": [
+        "pkg:deb/debian/debian@12",
+        "pkg:npm/next@15.5.15",
+        "pkg:npm/react@19.0.0",
+        "pkg:npm/next-intl@4.0.0",
+        "pkg:npm/@prisma/client@6.0.0",
+        "pkg:npm/bootstrap-italia@2.12.0",
+        "pkg:npm/design-react-kit@5.1.0",
+        "pkg:npm/ioredis@5.10.1"
+      ]
+    }
+  ]
+}
