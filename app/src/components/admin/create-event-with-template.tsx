@@ -17,6 +17,7 @@ interface TemplateSummary {
   qaEnabled: boolean;
   chatEnabled: boolean;
   recordingEnabled: boolean;
+  autoStartRecording: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
@@ -29,6 +30,7 @@ interface TemplatePreset {
   qaEnabled: boolean;
   chatEnabled: boolean;
   recordingEnabled: boolean;
+  autoStartRecording: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;

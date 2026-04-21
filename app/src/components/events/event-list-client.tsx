@@ -4,7 +4,6 @@ import { useTranslations, useLocale, useFormatter } from 'next-intl';
 import {
   Card,
   CardBody,
-  CardTitle,
   CardText,
   CardReadMore,
   Badge,
@@ -15,6 +14,7 @@ import {
 
 import { Link } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import EventTitle from '@/components/events/event-title';
 
 interface EventItem {
   id: string;
@@ -36,11 +36,13 @@ interface EventItem {
 interface EventListClientProps {
   events: EventItem[];
   muted?: boolean;
+  parseTitleKicker?: boolean;
 }
 
 export default function EventListClient({
   events,
   muted = false,
+  parseTitleKicker = false,
 }: EventListClientProps) {
   const locale = useLocale();
   const format = useFormatter();
@@ -102,15 +104,22 @@ export default function EventListClient({
                   )}
                 </div>
 
-                <CardTitle tag="h3" className="h5 fw-semibold mb-2">
-                  <Link
-                    href={`/events/${event.slug}`}
-                    className="text-decoration-none"
-                    style={{ color: '#17324D' }}
-                  >
-                    {title}
-                  </Link>
-                </CardTitle>
+                <EventTitle
+                  title={title}
+                  kickerEnabled={parseTitleKicker}
+                  as="h3"
+                  className="h5 fw-semibold mb-2"
+                  style={{ color: '#17324D' }}
+                  wrapMain={(main) => (
+                    <Link
+                      href={`/events/${event.slug}`}
+                      className="text-decoration-none"
+                      style={{ color: '#17324D' }}
+                    >
+                      {main}
+                    </Link>
+                  )}
+                />
 
                 <div className="d-flex align-items-center text-secondary mb-2">
                   <Icon icon="it-calendar" size="sm" className="me-2 flex-shrink-0" />

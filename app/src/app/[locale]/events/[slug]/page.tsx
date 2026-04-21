@@ -232,6 +232,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       <EventDetailClient
         event={serialised}
         locale={locale}
+        parseTitleKicker={settings.parseTitleKicker}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}
         polls={pollsData}

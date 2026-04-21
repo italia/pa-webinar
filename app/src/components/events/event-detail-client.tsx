@@ -17,6 +17,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer from '@/components/events/video-player';
 import PostEventTabs from '@/components/events/post-event-tabs';
+import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 
 interface AnsweredQuestion {
@@ -86,6 +87,7 @@ interface FeedbackSummary {
 interface EventDetailClientProps {
   event: EventData;
   locale: string;
+  parseTitleKicker?: boolean;
   answeredQuestions?: AnsweredQuestion[];
   materials?: MaterialData[];
   polls?: PollData[];
@@ -101,6 +103,7 @@ const STATUS_COLOR: Record<string, string> = {
 export default function EventDetailClient({
   event,
   locale,
+  parseTitleKicker = false,
   answeredQuestions = [],
   materials = [],
   polls = [],
@@ -181,9 +184,13 @@ export default function EventDetailClient({
           )}
         </div>
 
-        <h1 className="mb-4" style={{ color: '#17324D', lineHeight: 1.3 }}>
-          {title}
-        </h1>
+        <EventTitle
+          title={title}
+          kickerEnabled={parseTitleKicker}
+          as="h1"
+          className="mb-4"
+          style={{ color: '#17324D', lineHeight: 1.3 }}
+        />
 
         <Row className="g-3 g-lg-4">
           <Col xs={12} md="auto">

@@ -4,7 +4,9 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { Link } from '@/i18n/navigation';
 import RegistrationFormClient from '@/components/registration/registration-form-client';
+import EventTitle from '@/components/events/event-title';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { getSettings } from '@/lib/settings';
 
 interface RegistrationPageProps {
   params: Promise<{ slug: string }>;
@@ -30,6 +32,7 @@ export default async function RegistrationPage({
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);
+  const settings = await getSettings();
 
   const privacyUrl =
     event.privacyPolicyUrl ??
@@ -62,7 +65,12 @@ export default async function RegistrationPage({
             </Link>
           </div>
           <h1 className="mb-2">{t('title')}</h1>
-          <p className="lead text-muted mb-4">{title}</p>
+          <EventTitle
+            title={title}
+            kickerEnabled={settings.parseTitleKicker}
+            as="p"
+            className="lead text-muted mb-4"
+          />
 
           <RegistrationFormClient
             eventSlug={slug}

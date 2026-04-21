@@ -42,6 +42,13 @@ model Event {
   chatEnabled      Boolean @default(false) @map("chat_enabled")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
 
+  // When recording is enabled, this skips the "start recording?" moderator
+  // prompt and starts the recording automatically as soon as the moderator
+  // joins and Jibri is ready. Useful for events that want to guarantee
+  // late-joiners have a player to catch up with. Ignored when
+  // recordingEnabled is false.
+  autoStartRecording Boolean @default(false) @map("auto_start_recording")
+
   // AV moderation settings
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
@@ -167,6 +174,7 @@ model Event {
   wordCloudRounds  WordCloudRound[]
   callSessions     CallSession[]
   additionalMods   EventModerator[]
+  organizers       EventOrganizer[]
   chatMessages     ChatMessage[]
   questionnaires   EventQuestionnaire[]
 
@@ -213,6 +221,35 @@ model EventModerator {
 
   @@index([eventId])
   @@map("event_moderators")
+}
+
+// ─── Event organizers ────────────────────────────────────────
+//
+// Institutions / departments that co-organize the event. Purely
+// display metadata — no access rights, no magic link, no email
+// communication. Shown publicly on the event page (names + logo +
+// optional link). Multiple organizers per event for sponsor lists
+// or cross-department collaborations.
+//
+// Separate from `EventModerator` (which grants room access with a
+// role) and from the legacy `Event.organizerName` single-string
+// column (which we keep as a fallback for older events).
+model EventOrganizer {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId     String   @map("event_id") @db.Uuid
+
+  name        String   @db.VarChar(200)
+  logoUrl     String?  @map("logo_url")
+  websiteUrl  String?  @map("website_url")
+
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, sortOrder])
+  @@map("event_organizers")
 }
 
 // ─── Email templates ────────────────────────────────────────
@@ -593,6 +630,7 @@ model EventTemplate {
   qaEnabled                  Boolean @default(true) @map("qa_enabled")
   chatEnabled                Boolean @default(false) @map("chat_enabled")
   recordingEnabled           Boolean @default(false) @map("recording_enabled")
+  autoStartRecording         Boolean @default(false) @map("auto_start_recording")
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")
@@ -647,6 +685,11 @@ model SiteSetting {
   guestAccessEnabled        Boolean @default(true) @map("guest_access_enabled")
   publicRegistrationEnabled Boolean @default(true) @map("public_registration_enabled")
   calendarPublic            Boolean @default(false) @map("calendar_public")
+
+  // Editorial convention: when true, an event title containing `|` is rendered
+  // with the part before the pipe as a small eyebrow/kicker label above the
+  // main title. Off by default so existing titles never change appearance.
+  parseTitleKicker Boolean @default(false) @map("parse_title_kicker")
 
   // Jitsi customization
   jitsiWatermarkUrl      String? @map("jitsi_watermark_url")

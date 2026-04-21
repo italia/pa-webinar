@@ -21,6 +21,63 @@
   padding-right: 4em;
 }
 
+// Form controls — Bootstrap Italia's floating-label scheme renders text fields
+// with no visible border and a transparent background, which disappears on any
+// white card surface. Admin forms live inside white cards, so we force a
+// legible baseline: explicit text color, neutral border, light-gray idle
+// background that contrasts against a white card, with a blue focus ring.
+// Scope to .admin-form-surface so we don't touch public-site form skins.
+.admin-form-surface {
+  .form-control,
+  .form-select,
+  input.form-control,
+  select.form-select,
+  textarea.form-control {
+    background-color: #fff;
+    border: 1px solid #C9D4DE;
+    color: #17324D;
+
+    &::placeholder {
+      color: #8899AA;
+      opacity: 1;
+    }
+
+    &:hover:not(:disabled):not(:focus) {
+      border-color: #90A4AE;
+    }
+
+    &:focus {
+      background-color: #fff;
+      border-color: #0066CC;
+      color: #17324D;
+      box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.15);
+    }
+
+    &:disabled,
+    &[readonly] {
+      background-color: #F5F7FB;
+      color: #5A768A;
+      border-color: #E8ECF0;
+    }
+  }
+
+  // Native <select> arrow is nearly invisible on white — inline a dark chevron.
+  select.form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%2317324D' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 14px 14px;
+    padding-right: 2.25rem;
+    appearance: none;
+  }
+
+  // Bootstrap Italia's floating-label pattern puts the label inside the input
+  // box as a "placeholder" until focus; on a white card it also blends in.
+  .form-group label {
+    color: #17324D;
+  }
+}
+
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
@@ -57,6 +114,24 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   }
+}
+
+// Editorial "kicker" / eyebrow above an event title. Opt-in via the
+// `parseTitleKicker` site setting — the renderer only emits .event-title-kicker
+// when the setting is on AND the title contains a `|` with text on both sides.
+.event-title-kicker {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5A768A;
+  margin-bottom: 0.25em;
+  line-height: 1.2;
+}
+
+.event-title-main {
+  display: block;
 }
 
 // ── Live room ──

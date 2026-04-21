@@ -71,6 +71,7 @@ export const GET = withErrorHandling(async (request, context) => {
       qaEnabled: event.qaEnabled,
       chatEnabled: event.chatEnabled,
       recordingEnabled: event.recordingEnabled,
+      autoStartRecording: event.autoStartRecording,
       participantsCanUnmute: event.participantsCanUnmute,
       participantsCanStartVideo: event.participantsCanStartVideo,
       participantsCanShareScreen: event.participantsCanShareScreen,
@@ -124,6 +125,7 @@ export const GET = withErrorHandling(async (request, context) => {
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
     recordingEnabled: event.recordingEnabled,
+    autoStartRecording: event.autoStartRecording,
     participantsCanUnmute: event.participantsCanUnmute,
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
@@ -243,6 +245,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       }),
       ...(data.recordingEnabled !== undefined && {
         recordingEnabled: data.recordingEnabled,
+      }),
+      ...(data.autoStartRecording !== undefined && {
+        autoStartRecording: data.autoStartRecording,
       }),
       ...(data.participantsCanUnmute !== undefined && {
         participantsCanUnmute: data.participantsCanUnmute,

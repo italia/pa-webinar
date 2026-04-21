@@ -45,6 +45,7 @@ describe('createEventSchema', () => {
       qaEnabled: false,
       chatEnabled: true,
       recordingEnabled: true,
+      autoStartRecording: true,
       moderatorName: 'Mario Rossi',
       moderatorEmail: 'mario@example.com',
       speakersInfo: { it: 'Mario Rossi, Luigi Verdi' },

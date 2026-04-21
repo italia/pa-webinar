@@ -53,7 +53,7 @@ export default async function EventiPage() {
             <p className="text-muted mb-0">{t('noUpcoming')}</p>
           </div>
         ) : (
-          <EventListClient events={upcoming} />
+          <EventListClient events={upcoming} parseTitleKicker={settings.parseTitleKicker} />
         )}
       </section>
 
@@ -65,7 +65,7 @@ export default async function EventiPage() {
           >
             {t('past')}
           </h2>
-          <EventListClient events={past} muted />
+          <EventListClient events={past} muted parseTitleKicker={settings.parseTitleKicker} />
         </section>
       )}
     </div>

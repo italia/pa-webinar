@@ -27,6 +27,7 @@ const eventBaseSchema = z.object({
   qaEnabled: z.boolean().default(true),
   chatEnabled: z.boolean().default(false),
   recordingEnabled: z.boolean().default(false),
+  autoStartRecording: z.boolean().default(false),
   participantsCanUnmute: z.boolean().default(false),
   participantsCanStartVideo: z.boolean().default(false),
   participantsCanShareScreen: z.boolean().default(false),
