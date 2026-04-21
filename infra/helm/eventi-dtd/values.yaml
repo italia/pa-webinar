@@ -95,6 +95,9 @@ app:
     # document (the videocall-test tenant) is shipped at
     # /tenants/videocall-test/service-inventory.json — use it as a
     # structure reference when building per-tenant artifacts.
+    # Generation runbook + Azure reference implementation:
+    #   docs/SERVICE-INVENTORY-GENERATION.md
+    #   infra/service-inventory/azure/
     SERVICE_INVENTORY_URL: ""
 
     # ── Storage provider ──
