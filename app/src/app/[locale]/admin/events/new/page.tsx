@@ -115,6 +115,7 @@ export default async function CreateEventPage({
           color: tg.color,
         }))}
         gdprTemplates={gdprTemplates}
+        siteDefaultParseTitleKicker={siteSettings.parseTitleKicker}
       />
     </div>
   );

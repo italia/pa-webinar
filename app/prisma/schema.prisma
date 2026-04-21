@@ -178,6 +178,13 @@ model Event {
   // the right number of JVB replicas for upcoming events.
   capacityEstimateJson Json? @map("capacity_estimate_json") @db.JsonB
 
+  // Per-event override for the editorial "title with kicker" convention.
+  // Null = inherit SiteSetting.parseTitleKicker. When set, overrides the
+  // site-wide default for this event only — lets the admin force the
+  // two-line kicker rendering on events whose title contains a `|` even
+  // when the site default is off (or vice versa).
+  parseTitleKicker Boolean? @map("parse_title_kicker")
+
   // Timestamps
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

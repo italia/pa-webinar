@@ -28,6 +28,7 @@ async function loadUpcomingEvents() {
     speakersInfo: e.speakersInfo as Record<string, string> | null,
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,
+    parseTitleKicker: e.parseTitleKicker,
   }));
 }
 

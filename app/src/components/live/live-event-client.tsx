@@ -32,11 +32,14 @@ import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
 import WaitingRoom from '@/components/live/waiting-room';
+import { splitTitleKicker } from '@/lib/utils/title-kicker';
 
 interface EventInfo {
   id: string;
   slug: string;
   title: string;
+  /** Resolved kicker flag (per-event override merged with site default). */
+  parseTitleKicker?: boolean;
   startsAt: string;
   endsAt: string;
   status: string;
@@ -473,7 +476,7 @@ export default function LiveEventClient({
   if (phase === 'consent_pending') {
     return (
       <>
-        <LiveTopBar title={event.title} participantCount={0} isRecording={false} role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')} />
+        <LiveTopBar title={event.title} parseTitleKicker={event.parseTitleKicker} participantCount={0} isRecording={false} role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')} />
         <RecordingConsent onAccept={handleConsentAccept} onDecline={handleConsentDecline} />
       </>
     );
@@ -512,6 +515,7 @@ export default function LiveEventClient({
 
       <LiveTopBar
         title={event.title}
+        parseTitleKicker={event.parseTitleKicker}
         participantCount={participantCount}
         registrationCount={event.registrationCount}
         isRecording={isRecording}
@@ -781,6 +785,10 @@ function OvertimeBanner({
 
 interface LiveTopBarProps {
   title: string;
+  /** When true, a `|` in the title renders the leading part as a small
+   *  kicker line above the main title. Resolved server-side from the
+   *  per-event override + site default. */
+  parseTitleKicker?: boolean;
   participantCount: number;
   /** Total confirmed registrations (if known). Shown alongside the live
    *  Jitsi count as "N attivi · M registrati". Omitted on public/guest
@@ -791,10 +799,11 @@ interface LiveTopBarProps {
   onLeaveRoom?: () => void;
 }
 
-function LiveTopBar({ title, participantCount, registrationCount, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
+function LiveTopBar({ title, parseTitleKicker = false, participantCount, registrationCount, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
   const badgeColors = ROLE_BADGE_COLORS[role];
+  const { kicker, main } = splitTitleKicker(title, parseTitleKicker);
 
   return (
     <div
@@ -805,7 +814,17 @@ function LiveTopBar({ title, participantCount, registrationCount, isRecording, r
       }}
     >
       <div className="d-flex align-items-center">
-        <h1 className="h6 mb-0 me-3 text-white">{title}</h1>
+        <h1 className="h6 mb-0 me-3 text-white">
+          {kicker && (
+            <span
+              className="event-title-kicker d-block"
+              style={{ fontSize: '0.65rem', lineHeight: 1.1, opacity: 0.85 }}
+            >
+              {kicker}
+            </span>
+          )}
+          <span className="event-title-main">{main}</span>
+        </h1>
         <Badge
           color=""
           pill

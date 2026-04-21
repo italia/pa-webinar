@@ -31,7 +31,11 @@ import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 import Step1Base, { type Step1Value } from './step-1-base';
 import Step2Permissions, { type Step2Value } from './step-2-permissions';
 import Step3Invites, { type Step3Value } from './step-3-invites';
-import Step4Content, { type Step4Value } from './step-4-content';
+import Step4Content, {
+  type Step4Value,
+  type QuestionnaireBlock,
+  type AdhocQuestionDraft,
+} from './step-4-content';
 import Step5Review from './step-5-review';
 
 export interface WizardTemplatePreset {
@@ -58,12 +62,16 @@ export interface WizardProps {
   jvbSizingConfig: JvbSizingConfig;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
+  /** Site-wide default for the title-kicker parse. Used to decide whether
+   *  to surface the per-event override in step 1 (hidden when already on). */
+  siteDefaultParseTitleKicker: boolean;
 }
 
 export interface Step5ReviewFields {
   dataRetentionDays: number;
   gdprTemplateId: string | null;
   privacyPolicyText: string;
+  privacyPolicyUrl: string | null;
   moderatorName: string;
   moderatorEmail: string;
 }
@@ -96,7 +104,7 @@ export default function EventWizard(props: WizardProps) {
       startsAt: toDatetimeLocalInTz(defaultStart, props.siteTimezone),
       endsAt: toDatetimeLocalInTz(defaultEnd, props.siteTimezone),
       timezone: props.siteTimezone,
-      maxParticipants: tpl?.maxParticipants ?? 300,
+      maxParticipants: tpl?.maxParticipants ?? 150,
       coverImageUrl: null,
       imageUrl: null,
       waitingRoomAudioUrl: null,
@@ -105,6 +113,7 @@ export default function EventWizard(props: WizardProps) {
       recurrencePreset: 'none' as const,
       recurrenceUntil: null,
       recurrenceCount: null,
+      parseTitleKicker: null,
 
       // Step 2
       permissionMatrix: matrix,
@@ -113,18 +122,20 @@ export default function EventWizard(props: WizardProps) {
 
       // Step 3
       organizers: [],
+      moderators: [],
       speakers: [],
       invitations: [],
 
       // Step 4
       materials: [],
-      preEventQuestionnaireId: null,
-      postEventQuestionnaireId: null,
+      preEventQuestionnaire: { templateIds: [], adhocQuestions: [] },
+      postEventQuestionnaire: { templateIds: [], adhocQuestions: [] },
 
       // Step 5 fields written here so review can surface them
       dataRetentionDays: props.defaultRetentionDays,
       gdprTemplateId: null,
       privacyPolicyText: '',
+      privacyPolicyUrl: null,
       moderatorName: '',
       moderatorEmail: '',
     } satisfies WizardForm;
@@ -143,15 +154,47 @@ export default function EventWizard(props: WizardProps) {
 
   const stepIndex = STEP_KEYS.indexOf(activeStep);
   const goPrev = () => stepIndex > 0 && setActiveStep(STEP_KEYS[stepIndex - 1]!);
-  const goNext = () => stepIndex < STEP_KEYS.length - 1 && setActiveStep(STEP_KEYS[stepIndex + 1]!);
+  const goNext = () => {
+    const errs = validateStep(activeStep, form, props.defaultLocale);
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs);
+      setSubmitError(t('validationFailed'));
+      return;
+    }
+    setFieldErrors({});
+    setSubmitError(null);
+    if (stepIndex < STEP_KEYS.length - 1) setActiveStep(STEP_KEYS[stepIndex + 1]!);
+  };
 
   /**
    * POST to /api/events with the assembled payload, then fan out to
    * side-APIs (organizers, invitations, tags — tags come along in the
    * main payload, the wizard keeps both sets in sync).
+   *
+   * `overrideRedirect`, if provided, replaces the default post-create
+   * redirect. A literal `"__questionnaires__"` is expanded to the
+   * event's per-event questionnaire editor once the id is known.
    */
   const handleSubmit = useCallback(
-    async (mode: 'draft' | 'publish') => {
+    async (mode: 'draft' | 'publish', overrideRedirect?: string) => {
+      // Validate every step before submitting (especially on publish).
+      const aggregated: Record<string, string> = {};
+      for (const key of STEP_KEYS) {
+        Object.assign(aggregated, validateStep(key, form, props.defaultLocale));
+      }
+      if (mode === 'publish') {
+        Object.assign(aggregated, validatePublish(form));
+      }
+      if (Object.keys(aggregated).length > 0) {
+        setFieldErrors(aggregated);
+        setSubmitError(t('validationFailed'));
+        // Jump to the first failing step.
+        const firstFailing = STEP_KEYS.find((k) =>
+          Object.keys(validateStep(k, form, props.defaultLocale)).length > 0,
+        );
+        if (firstFailing) setActiveStep(firstFailing);
+        return;
+      }
       setSubmitting(true);
       setSubmitError(null);
       setFieldErrors({});
@@ -176,6 +219,7 @@ export default function EventWizard(props: WizardProps) {
           waitingRoomAudioUrl: form.waitingRoomAudioUrl ?? undefined,
           tagSlugs: form.tagSlugs,
           recurrenceRule: form.recurrenceRule,
+          parseTitleKicker: form.parseTitleKicker,
 
           // Permissions (matrix + derived booleans)
           permissionMatrix: form.permissionMatrix,
@@ -191,6 +235,7 @@ export default function EventWizard(props: WizardProps) {
           dataRetentionDays: form.dataRetentionDays,
           gdprTemplateId: form.gdprTemplateId,
           privacyPolicyText: form.privacyPolicyText?.trim() || undefined,
+          privacyPolicyUrl: form.privacyPolicyUrl ?? undefined,
           moderatorName: form.moderatorName?.trim() || undefined,
           moderatorEmail: form.moderatorEmail?.trim() || undefined,
         };
@@ -253,7 +298,23 @@ export default function EventWizard(props: WizardProps) {
           });
         }
 
-        // 3) Speakers (additional EventModerator rows, SPEAKER role)
+        // 3) Moderators (EventModerator rows, MODERATOR role)
+        for (const mod of form.moderators) {
+          await fetch(`/api/events/${created.id}/moderators`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(moderatorToken ? { 'X-Moderator-Token': moderatorToken } : {}),
+            },
+            body: JSON.stringify({
+              name: mod.name,
+              email: mod.email,
+              role: 'MODERATOR',
+            }),
+          }).catch(() => {});
+        }
+
+        // 4) Speakers (additional EventModerator rows, SPEAKER role)
         for (const sp of form.speakers) {
           await fetch(`/api/events/${created.id}/moderators`, {
             method: 'POST',
@@ -278,7 +339,21 @@ export default function EventWizard(props: WizardProps) {
           }).catch(() => {});
         }
 
-        // 5) Promote from DRAFT → PUBLISHED if requested. The create
+        // 5) Questionnaires (pre/post)
+        await submitQuestionnaire(
+          created.id,
+          'PRE_REGISTRATION',
+          form.preEventQuestionnaire,
+          props.defaultLocale,
+        );
+        await submitQuestionnaire(
+          created.id,
+          'POST_EVENT',
+          form.postEventQuestionnaire,
+          props.defaultLocale,
+        );
+
+        // 6) Promote from DRAFT → PUBLISHED if requested. The create
         //    endpoint currently doesn't accept status; use PATCH on the
         //    detail route.
         if (mode === 'publish') {
@@ -292,14 +367,27 @@ export default function EventWizard(props: WizardProps) {
           }).catch(() => {});
         }
 
-        router.push(`/admin/events/${created.id}/edit?created=1`);
+        let destination = `/admin/events/${created.id}/edit?created=1`;
+        if (overrideRedirect === '__questionnaires__') {
+          destination = `/admin/events/${created.id}/questionnaires`;
+        } else if (overrideRedirect) {
+          destination = overrideRedirect;
+        }
+        router.push(destination);
       } catch (e) {
         setSubmitError(e instanceof Error ? e.message : 'Unknown error');
       } finally {
         setSubmitting(false);
       }
     },
-    [form, router],
+    [form, router, props.defaultLocale, t],
+  );
+
+  const saveDraftAndNavigate = useCallback(
+    async (destination: string) => {
+      await handleSubmit('draft', destination);
+    },
+    [handleSubmit],
   );
 
   return (
@@ -325,6 +413,7 @@ export default function EventWizard(props: WizardProps) {
             defaultLocale={props.defaultLocale}
             availableTags={props.availableTags}
             fieldErrors={fieldErrors}
+            siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
           />
         )}
         {activeStep === 'permissions' && (
@@ -343,6 +432,8 @@ export default function EventWizard(props: WizardProps) {
           <Step4Content
             value={form}
             onChange={updateForm}
+            onSaveDraftAndNavigate={saveDraftAndNavigate}
+            submitting={submitting}
           />
         )}
         {activeStep === 'review' && (
@@ -466,4 +557,120 @@ function StepNav({
       </ol>
     </nav>
   );
+}
+
+// ── Step validation ─────────────────────────────────────────────────────────
+// Client-side field checks that must pass before advancing. Keyed by
+// dot-path so Step components can surface per-field errors inline.
+
+function validateStep(
+  step: StepKey,
+  form: WizardForm,
+  defaultLocale: string,
+): Record<string, string> {
+  const errs: Record<string, string> = {};
+  if (step === 'base') {
+    const titleDef = (form.title[defaultLocale] ?? '').trim();
+    if (titleDef.length < 3) {
+      errs[`title.${defaultLocale}`] = 'required';
+    }
+    try {
+      const start = new Date(form.startsAt);
+      const end = new Date(form.endsAt);
+      if (Number.isNaN(start.getTime())) errs['startsAt'] = 'invalid';
+      if (Number.isNaN(end.getTime())) errs['endsAt'] = 'invalid';
+      if (!errs['startsAt'] && !errs['endsAt'] && end <= start) {
+        errs['endsAt'] = 'mustBeAfterStart';
+      }
+    } catch {
+      errs['startsAt'] = 'invalid';
+    }
+    if (
+      !Number.isFinite(form.maxParticipants) ||
+      form.maxParticipants < 2 ||
+      form.maxParticipants > 500
+    ) {
+      errs['maxParticipants'] = 'outOfRange';
+    }
+  }
+  return errs;
+}
+
+function validatePublish(form: WizardForm): Record<string, string> {
+  const errs: Record<string, string> = {};
+  const email = (form.moderatorEmail ?? '').trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errs['moderatorEmail'] = 'required';
+  }
+  const name = (form.moderatorName ?? '').trim();
+  if (name.length < 2) {
+    errs['moderatorName'] = 'required';
+  }
+  return errs;
+}
+
+// ── Questionnaire fan-out helpers ──────────────────────────────────────────
+
+type Placement = 'PRE_REGISTRATION' | 'POST_EVENT';
+
+const PLACEMENT_TITLES: Record<Placement, { it: string; en: string }> = {
+  PRE_REGISTRATION: { it: 'Pre-evento', en: 'Pre-event' },
+  POST_EVENT: { it: 'Post-evento', en: 'Post-event' },
+};
+
+function mapAdhocToApi(
+  draft: AdhocQuestionDraft,
+  index: number,
+  defaultLocale: string,
+) {
+  const prompt: Record<string, string> = { [defaultLocale]: draft.prompt.trim() };
+  const base: Record<string, unknown> = {
+    prompt,
+    type: draft.type,
+    required: draft.required,
+    sortOrder: index,
+  };
+  if (draft.type === 'SINGLE_CHOICE' || draft.type === 'MULTI_CHOICE') {
+    base.options = draft.options
+      .map((o) => o.trim())
+      .filter((o) => o.length > 0)
+      .map((o) => ({ [defaultLocale]: o }));
+  }
+  if (draft.type === 'LIKERT') {
+    if (draft.scaleMin != null) base.scaleMin = draft.scaleMin;
+    if (draft.scaleMax != null) base.scaleMax = draft.scaleMax;
+  }
+  return base;
+}
+
+async function submitQuestionnaire(
+  eventId: string,
+  placement: Placement,
+  block: QuestionnaireBlock,
+  defaultLocale: string,
+): Promise<void> {
+  if (block.templateIds.length === 0 && block.adhocQuestions.length === 0) {
+    return;
+  }
+  const body = {
+    placement,
+    title: PLACEMENT_TITLES[placement],
+    description: {},
+    required: false,
+    allowEdit: false,
+    templateIds: block.templateIds,
+    adhocItems: block.adhocQuestions.map((q, i) =>
+      mapAdhocToApi(q, i, defaultLocale),
+    ),
+  };
+  await fetch(
+    `/api/admin/events/${eventId}/questionnaires/${placement}`,
+    {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+  ).catch(() => {
+    /* best-effort; admin can fix from the questionnaires page */
+  });
 }
