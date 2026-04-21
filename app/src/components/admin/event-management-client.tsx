@@ -589,6 +589,12 @@ export default function EventManagementClient({
               {t('editEvent')}
             </Button>
           </Link>
+          <Link href={`/admin/events/${event.id}/materials`}>
+            <Button color="secondary" outline tag="span">
+              <Icon icon="it-files" size="sm" className="me-1" />
+              {tm('title')}
+            </Button>
+          </Link>
           <Button
             color="secondary"
             outline

@@ -86,6 +86,21 @@ export class AzureStorageProvider implements StorageProvider {
     await containerClient.createIfNotExists({ access: undefined });
   }
 
+  async put(
+    key: string,
+    body: Buffer | Uint8Array,
+    contentType: string,
+  ): Promise<{ publicUrl: string }> {
+    const blockBlob = this.client
+      .getContainerClient(this.bucket)
+      .getBlockBlobClient(key);
+    const buf = Buffer.isBuffer(body) ? body : Buffer.from(body);
+    await blockBlob.uploadData(buf, {
+      blobHTTPHeaders: { blobContentType: contentType },
+    });
+    return { publicUrl: this.publicUrl(key) };
+  }
+
   async getUploadUrl(
     key: string,
     opts: UploadUrlOptions = {},

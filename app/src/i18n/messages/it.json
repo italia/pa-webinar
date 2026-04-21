@@ -391,6 +391,164 @@
     }
   },
   "admin": {
+    "fileOrUrl": {
+      "tabUpload": "Carica file",
+      "tabUrl": "Incolla URL",
+      "uploadLabel": "Seleziona un file dal tuo dispositivo",
+      "urlLabel": "URL del file",
+      "urlPlaceholder": "https://…",
+      "uploadButton": "Carica",
+      "uploading": "Caricamento in corso…",
+      "remove": "Rimuovi",
+      "preview": "Anteprima",
+      "openFile": "Apri file",
+      "invalidUrl": "Inserisci un URL valido",
+      "errorSize": "Il file supera la dimensione massima consentita",
+      "errorMime": "Tipo di file non supportato",
+      "errorGeneric": "Errore durante il caricamento del file",
+      "helpImage": "Formati supportati: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
+      "helpAudio": "Formati supportati: MP3, WAV, OGG, M4A, WebM — max 20 MB",
+      "helpDocument": "Formati supportati: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+    },
+    "wizard": {
+      "steps": {
+        "base": "Base",
+        "permissions": "Permessi",
+        "invites": "Persone",
+        "content": "Contenuti",
+        "review": "Riepilogo"
+      },
+      "saveDraft": "Salva come bozza",
+      "publish": "Pubblica evento",
+      "step1": {
+        "heading": "Informazioni di base",
+        "intro": "Titolo, descrizione, immagine e calendario dell'evento.",
+        "coverImage": "Immagine di copertina",
+        "coverImageHelp": "Mostrata sul sito pubblico e nelle email di invito.",
+        "scheduleHeading": "Calendario",
+        "timezone": "Fuso orario",
+        "recurrenceHeading": "Ricorrenza",
+        "tagsHeading": "Categorie (tag)",
+        "waitingRoomAudio": "Audio sala d'attesa (facoltativo)",
+        "waitingRoomAudioHelp": "Riprodotto prima dell'inizio della videocall."
+      },
+      "step2": {
+        "heading": "Chi può fare cosa",
+        "intro": "Matrice dei permessi: scegli per ogni funzione chi può usarla. I moderatori possono sempre tutto.",
+        "featureCol": "Funzionalità",
+        "role": {
+          "GUEST": "Ospite",
+          "SPEAKER": "Relatore",
+          "MODERATOR": "Moderatore"
+        },
+        "feature": {
+          "qa": {
+            "label": "Q&A",
+            "desc": "Inviare domande al pannello Q&A."
+          },
+          "chat": {
+            "label": "Chat",
+            "desc": "Scrivere in chat di gruppo."
+          },
+          "mic": {
+            "label": "Microfono",
+            "desc": "Attivare il proprio microfono."
+          },
+          "video": {
+            "label": "Video",
+            "desc": "Attivare la propria webcam."
+          },
+          "share": {
+            "label": "Condivisione schermo",
+            "desc": "Condividere lo schermo con tutti."
+          },
+          "recording_control": {
+            "label": "Controllo registrazione",
+            "desc": "Avviare/fermare la registrazione."
+          }
+        },
+        "recordingHeading": "Registrazione"
+      },
+      "step3": {
+        "heading": "Persone e inviti",
+        "intro": "Aggiungi organizzatori (mostrati sulla pagina), relatori (ricevono un link da moderatore) e ospiti invitati.",
+        "organizersHeading": "Organizzatori",
+        "organizersHelp": "Compaiono nella pagina pubblica dell'evento.",
+        "organizerName": "Nome organizzatore",
+        "organizerWebsite": "Sito web",
+        "speakersHeading": "Relatori",
+        "speakersHelp": "Ricevono un link da moderatore via email.",
+        "speakerName": "Nome",
+        "speakerEmail": "Email",
+        "speakerRequired": "Nome ed email sono obbligatori.",
+        "invitationsHeading": "Inviti",
+        "invitationsHelp": "Persone pre-registrate — riceveranno un link personale per partecipare.",
+        "invitationName": "Nome (facoltativo)",
+        "invitationEmail": "Email",
+        "invitationRole": "Ruolo",
+        "role": {
+          "GUEST": "Ospite",
+          "SPEAKER": "Relatore"
+        },
+        "add": "Aggiungi",
+        "remove": "Rimuovi",
+        "invalidEmail": "Indirizzo email non valido.",
+        "duplicateEmail": "Indirizzo già presente."
+      },
+      "step4": {
+        "heading": "Contenuti e materiali",
+        "intro": "Allega materiali e collega i questionari pre/post evento.",
+        "materialsHeading": "Materiali",
+        "materialsHelp": "Documenti, slide, link utili da condividere prima, durante o dopo l'evento.",
+        "materialTitle": "Titolo",
+        "materialUrl": "File o link",
+        "visibilityLabel": "Visibilità",
+        "visibility": {
+          "ALWAYS": "Sempre",
+          "BEFORE": "Prima dell'evento",
+          "DURING": "Durante l'evento",
+          "AFTER": "Dopo l'evento"
+        },
+        "addMaterial": "Aggiungi materiale",
+        "remove": "Rimuovi",
+        "questionnairesHeading": "Questionari",
+        "questionnairesEmpty": "Nessun questionario disponibile. Crea un questionario da Impostazioni → Questionari.",
+        "preQuestionnaire": "Questionario pre-evento",
+        "postQuestionnaire": "Questionario post-evento (feedback)",
+        "none": "— Nessuno —"
+      },
+      "step5": {
+        "heading": "Riepilogo e pubblicazione",
+        "intro": "Verifica le informazioni e pubblica l'evento (oppure salva come bozza).",
+        "summary": {
+          "title": "Titolo",
+          "schedule": "Calendario",
+          "recurrence": "Ricorrenza",
+          "maxParticipants": "Partecipanti attesi",
+          "organizers": "Organizzatori",
+          "speakers": "Relatori",
+          "invitations": "Inviti",
+          "materials": "Materiali",
+          "tags": "Categorie",
+          "recording": "Registrazione",
+          "recordingAuto": "Attiva — avvio automatico",
+          "recordingManual": "Attiva — avvio manuale",
+          "recordingOff": "Non attiva"
+        },
+        "noRecurrence": "Evento singolo",
+        "gdprHeading": "Privacy e conservazione dati",
+        "retentionDays": "Giorni di conservazione",
+        "retentionHelp": "Oltre questa soglia i dati personali vengono cancellati automaticamente.",
+        "gdprTemplate": "Template informativa",
+        "gdprTemplateNone": "— Usa testo personalizzato —",
+        "privacyText": "Informativa privacy (testo)",
+        "moderatorHeading": "Contatto moderatore",
+        "moderatorName": "Nome",
+        "moderatorEmail": "Email",
+        "capacityHeading": "Capacità stimata",
+        "featuresHeading": "Configurazione sintetica"
+      }
+    },
     "nav": {
       "events": "Eventi",
       "registrations": "Iscrizioni",
@@ -1130,6 +1288,35 @@
         "totalFeedback": "Risposte feedback"
       }
     },
+    "recurrence": {
+      "label": "Ricorrenza",
+      "helpText": "Rendi l'evento ricorrente. Verrà creata una serie a partire dalla data di inizio.",
+      "preset": {
+        "none": "Nessuna",
+        "daily": "Ogni giorno",
+        "weekly": "Ogni settimana",
+        "weekdays": "Giorni feriali",
+        "monthly": "Ogni mese",
+        "custom": "Personalizzata"
+      },
+      "weekdaysLabel": "Giorni della settimana",
+      "weekdayShort": {
+        "0": "Lun",
+        "1": "Mar",
+        "2": "Mer",
+        "3": "Gio",
+        "4": "Ven",
+        "5": "Sab",
+        "6": "Dom"
+      },
+      "endLabel": "Fine ricorrenza",
+      "endNever": "Non termina",
+      "endDate": "Termina il...",
+      "endCount": "Dopo N ripetizioni",
+      "previewLabel": "Anteprima prossime 5 occorrenze",
+      "customRRuleLabel": "Regola RRULE personalizzata",
+      "invalidRRule": "Regola non valida"
+    },
     "templates": {
       "title": "Template eventi",
       "subtitle": "Gestisci i template predefiniti per la creazione rapida di eventi",
@@ -1183,6 +1370,29 @@
       "uploadBtn": "Carica",
       "deleteConfirm": "Sei sicuro di voler eliminare questo file?",
       "noFiles": "Nessun file caricato. Usa il pulsante \"Carica file\" per aggiungere materiali."
+    },
+    "materials": {
+      "title": "Materiali dell'evento",
+      "subtitle": "Allegati, link e risorse condivise prima, durante e dopo l'evento.",
+      "addButton": "Aggiungi materiale",
+      "empty": "Nessun materiale ancora aggiunto.",
+      "deleteConfirm": "Eliminare definitivamente questo materiale?",
+      "editButton": "Modifica",
+      "cancelButton": "Annulla",
+      "saveButton": "Salva",
+      "titleLabel": "Titolo",
+      "descriptionLabel": "Descrizione (facoltativa)",
+      "visibilityLabel": "Visibilità",
+      "visibilityAlways": "Sempre",
+      "visibilityBefore": "Prima dell'evento",
+      "visibilityDuring": "Durante l'evento",
+      "visibilityAfter": "Dopo l'evento",
+      "typeLabel": "Tipo",
+      "fileUploaded": "File caricato",
+      "typeFile": "File",
+      "typeLink": "Link",
+      "sizeLabel": "Dimensione",
+      "errorGeneric": "Si è verificato un errore. Riprova."
     },
     "gdprTemplates": {
       "title": "Template GDPR",

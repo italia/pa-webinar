@@ -1,0 +1,469 @@
+'use client';
+
+/**
+ * 5-step event creation wizard.
+ *
+ *   1. Base          — title, description, cover, dates, recurrence, tags,
+ *                       waiting-room audio
+ *   2. Permissions   — role×feature matrix + recording auto-start
+ *   3. Invites       — organizers (display only), speakers (access grant),
+ *                       guests (pre-registration)
+ *   4. Content       — materials + Q&A presets + questionnaires
+ *   5. Review        — GDPR/retention, load diagram, draft/publish
+ *
+ * The steps share a single form state (`WizardForm`) which, on submit,
+ * is POSTed to /api/events. After create, the step 3 invites/organizers
+ * are pushed to their respective side-APIs (event has an id at that point).
+ */
+
+import { useCallback, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
+
+import { useRouter } from '@/i18n/navigation';
+import {
+  defaultMatrix,
+  togglesFromMatrix,
+  type PermissionMatrix,
+} from '@/lib/utils/permission-matrix';
+import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import type { JvbSizingConfig } from '@/lib/jvb-sizing';
+
+import Step1Base, { type Step1Value } from './step-1-base';
+import Step2Permissions, { type Step2Value } from './step-2-permissions';
+import Step3Invites, { type Step3Value } from './step-3-invites';
+import Step4Content, { type Step4Value } from './step-4-content';
+import Step5Review from './step-5-review';
+
+export interface WizardTemplatePreset {
+  id: string;
+  name: string;
+  qaEnabled: boolean;
+  chatEnabled: boolean;
+  recordingEnabled: boolean;
+  autoStartRecording: boolean;
+  participantsCanUnmute: boolean;
+  participantsCanStartVideo: boolean;
+  participantsCanShareScreen: boolean;
+  maxParticipants: number;
+  permissionMatrix?: PermissionMatrix | null;
+}
+
+export interface WizardProps {
+  template?: WizardTemplatePreset | null;
+  siteTimezone: string;
+  enabledLocales: string[];
+  defaultLocale: string;
+  defaultSenderRatioPct: number;
+  defaultRetentionDays: number;
+  jvbSizingConfig: JvbSizingConfig;
+  availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
+  gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
+}
+
+export interface Step5ReviewFields {
+  dataRetentionDays: number;
+  gdprTemplateId: string | null;
+  privacyPolicyText: string;
+  moderatorName: string;
+  moderatorEmail: string;
+}
+
+export type WizardForm = Step1Value &
+  Step2Value &
+  Step3Value &
+  Step4Value &
+  Step5ReviewFields;
+
+const STEP_KEYS = ['base', 'permissions', 'invites', 'content', 'review'] as const;
+type StepKey = (typeof STEP_KEYS)[number];
+
+export default function EventWizard(props: WizardProps) {
+  const t = useTranslations('admin.wizard');
+  const tc = useTranslations('common');
+  const router = useRouter();
+
+  const defaultStart = new Date(Date.now() + 24 * 3600_000);
+  const defaultEnd = new Date(defaultStart.getTime() + 2 * 3600_000);
+
+  // Initial form state seeded from template (when given) + sensible defaults.
+  const initial: WizardForm = useMemo(() => {
+    const tpl = props.template;
+    const matrix: PermissionMatrix = tpl?.permissionMatrix ?? defaultMatrix();
+    return {
+      // Step 1
+      title: { it: '', en: '' },
+      description: { it: '', en: '' },
+      startsAt: toDatetimeLocalInTz(defaultStart, props.siteTimezone),
+      endsAt: toDatetimeLocalInTz(defaultEnd, props.siteTimezone),
+      timezone: props.siteTimezone,
+      maxParticipants: tpl?.maxParticipants ?? 300,
+      coverImageUrl: null,
+      imageUrl: null,
+      waitingRoomAudioUrl: null,
+      tagSlugs: [],
+      recurrenceRule: null,
+      recurrencePreset: 'none' as const,
+      recurrenceUntil: null,
+      recurrenceCount: null,
+
+      // Step 2
+      permissionMatrix: matrix,
+      recordingEnabled: tpl?.recordingEnabled ?? false,
+      autoStartRecording: tpl?.autoStartRecording ?? false,
+
+      // Step 3
+      organizers: [],
+      speakers: [],
+      invitations: [],
+
+      // Step 4
+      materials: [],
+      preEventQuestionnaireId: null,
+      postEventQuestionnaireId: null,
+
+      // Step 5 fields written here so review can surface them
+      dataRetentionDays: props.defaultRetentionDays,
+      gdprTemplateId: null,
+      privacyPolicyText: '',
+      moderatorName: '',
+      moderatorEmail: '',
+    } satisfies WizardForm;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.template]);
+
+  const [form, setForm] = useState<WizardForm>(initial);
+  const [activeStep, setActiveStep] = useState<StepKey>('base');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const updateForm = useCallback((patch: Partial<WizardForm>) => {
+    setForm((prev) => ({ ...prev, ...patch }));
+  }, []);
+
+  const stepIndex = STEP_KEYS.indexOf(activeStep);
+  const goPrev = () => stepIndex > 0 && setActiveStep(STEP_KEYS[stepIndex - 1]!);
+  const goNext = () => stepIndex < STEP_KEYS.length - 1 && setActiveStep(STEP_KEYS[stepIndex + 1]!);
+
+  /**
+   * POST to /api/events with the assembled payload, then fan out to
+   * side-APIs (organizers, invitations, tags — tags come along in the
+   * main payload, the wizard keeps both sets in sync).
+   */
+  const handleSubmit = useCallback(
+    async (mode: 'draft' | 'publish') => {
+      setSubmitting(true);
+      setSubmitError(null);
+      setFieldErrors({});
+      try {
+        // Derive boolean toggles from the matrix so legacy consumers stay
+        // correct. The API also re-derives them server-side as a defensive
+        // measure.
+        const toggles = togglesFromMatrix(form.permissionMatrix);
+
+        const startsAtUTC = fromDatetimeLocalInTz(form.startsAt, form.timezone).toISOString();
+        const endsAtUTC = fromDatetimeLocalInTz(form.endsAt, form.timezone).toISOString();
+
+        const payload: Record<string, unknown> = {
+          title: form.title,
+          description: form.description,
+          startsAt: startsAtUTC,
+          endsAt: endsAtUTC,
+          timezone: form.timezone,
+          maxParticipants: form.maxParticipants,
+          coverImageUrl: form.coverImageUrl,
+          imageUrl: form.imageUrl ?? undefined,
+          waitingRoomAudioUrl: form.waitingRoomAudioUrl ?? undefined,
+          tagSlugs: form.tagSlugs,
+          recurrenceRule: form.recurrenceRule,
+
+          // Permissions (matrix + derived booleans)
+          permissionMatrix: form.permissionMatrix,
+          qaEnabled: toggles.qaEnabled,
+          chatEnabled: toggles.chatEnabled,
+          participantsCanUnmute: toggles.participantsCanUnmute,
+          participantsCanStartVideo: toggles.participantsCanStartVideo,
+          participantsCanShareScreen: toggles.participantsCanShareScreen,
+          recordingEnabled: form.recordingEnabled,
+          autoStartRecording: form.recordingEnabled && form.autoStartRecording,
+
+          // Review step
+          dataRetentionDays: form.dataRetentionDays,
+          gdprTemplateId: form.gdprTemplateId,
+          privacyPolicyText: form.privacyPolicyText?.trim() || undefined,
+          moderatorName: form.moderatorName?.trim() || undefined,
+          moderatorEmail: form.moderatorEmail?.trim() || undefined,
+        };
+
+        const res = await fetch('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          if (err.details) {
+            const next: Record<string, string> = {};
+            for (const d of err.details) {
+              const key = Array.isArray(d.path) ? d.path.join('.') : String(d.path ?? 'form');
+              next[key] = d.message ?? 'Invalid';
+            }
+            setFieldErrors(next);
+          }
+          throw new Error(err.error ?? err.message ?? `HTTP ${res.status}`);
+        }
+        const created = (await res.json()) as { id: string; slug: string };
+
+        // Fan-out: side resources (organizers, invitations). Moderator
+        // token is needed for the organizers POST — we can grab it from
+        // the response.
+        const moderatorToken = (created as { moderatorToken?: string }).moderatorToken;
+
+        // 1) Organizers (primary-moderator auth)
+        for (const org of form.organizers) {
+          await fetch(`/api/events/${created.id}/organizers`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(moderatorToken ? { 'X-Moderator-Token': moderatorToken } : {}),
+            },
+            body: JSON.stringify({
+              name: org.name,
+              logoUrl: org.logoUrl,
+              websiteUrl: org.websiteUrl,
+            }),
+          }).catch(() => {
+            /* best-effort; admin can fix later */
+          });
+        }
+
+        // 2) Invitations (admin-session auth)
+        for (const inv of form.invitations) {
+          await fetch(`/api/admin/events/${created.id}/invitations`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: inv.email,
+              name: inv.name,
+              role: inv.role,
+              personId: inv.personId ?? undefined,
+            }),
+          }).catch(() => {
+            /* best-effort */
+          });
+        }
+
+        // 3) Speakers (additional EventModerator rows, SPEAKER role)
+        for (const sp of form.speakers) {
+          await fetch(`/api/events/${created.id}/moderators`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(moderatorToken ? { 'X-Moderator-Token': moderatorToken } : {}),
+            },
+            body: JSON.stringify({
+              name: sp.name,
+              email: sp.email,
+              role: 'SPEAKER',
+            }),
+          }).catch(() => {});
+        }
+
+        // 4) Materials
+        for (const m of form.materials) {
+          await fetch(`/api/admin/events/${created.id}/materials`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(m),
+          }).catch(() => {});
+        }
+
+        // 5) Promote from DRAFT → PUBLISHED if requested. The create
+        //    endpoint currently doesn't accept status; use PATCH on the
+        //    detail route.
+        if (mode === 'publish') {
+          await fetch(`/api/events/${created.id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(moderatorToken ? { 'X-Moderator-Token': moderatorToken } : {}),
+            },
+            body: JSON.stringify({ status: 'PUBLISHED' }),
+          }).catch(() => {});
+        }
+
+        router.push(`/admin/events/${created.id}/edit?created=1`);
+      } catch (e) {
+        setSubmitError(e instanceof Error ? e.message : 'Unknown error');
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [form, router],
+  );
+
+  return (
+    <div>
+      <StepNav
+        steps={STEP_KEYS.map((k) => ({ key: k, label: t(`steps.${k}`) }))}
+        activeStep={activeStep}
+        onJump={(k) => setActiveStep(k)}
+      />
+
+      {submitError && (
+        <div className="alert alert-danger mt-3" role="alert">
+          {submitError}
+        </div>
+      )}
+
+      <div className="mt-4">
+        {activeStep === 'base' && (
+          <Step1Base
+            value={form}
+            onChange={updateForm}
+            enabledLocales={props.enabledLocales}
+            defaultLocale={props.defaultLocale}
+            availableTags={props.availableTags}
+            fieldErrors={fieldErrors}
+          />
+        )}
+        {activeStep === 'permissions' && (
+          <Step2Permissions
+            value={form}
+            onChange={updateForm}
+          />
+        )}
+        {activeStep === 'invites' && (
+          <Step3Invites
+            value={form}
+            onChange={updateForm}
+          />
+        )}
+        {activeStep === 'content' && (
+          <Step4Content
+            value={form}
+            onChange={updateForm}
+          />
+        )}
+        {activeStep === 'review' && (
+          <Step5Review
+            form={form}
+            onChange={updateForm}
+            jvbSizingConfig={props.jvbSizingConfig}
+            defaultSenderRatioPct={props.defaultSenderRatioPct}
+            gdprTemplates={props.gdprTemplates}
+          />
+        )}
+      </div>
+
+      <div className="d-flex justify-content-between mt-4 pt-3" style={{ borderTop: '1px solid #e8e8e8' }}>
+        <button
+          type="button"
+          className="btn btn-outline-primary"
+          onClick={goPrev}
+          disabled={stepIndex === 0 || submitting}
+        >
+          ← {tc('back')}
+        </button>
+
+        {activeStep !== 'review' ? (
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={goNext}
+            disabled={submitting}
+          >
+            {tc('next')} →
+          </button>
+        ) : (
+          <div className="d-flex gap-2">
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={() => handleSubmit('draft')}
+              disabled={submitting}
+            >
+              {t('saveDraft')}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => handleSubmit('publish')}
+              disabled={submitting}
+            >
+              {submitting ? '...' : t('publish')}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Step navigation bar ─────────────────────────────────────────────────────
+//
+// Horizontal stepper with numbered circles and connecting lines. Each step
+// is a clickable button — admins can jump back to edit an earlier step
+// without losing later work (all steps share the same form state).
+
+function StepNav({
+  steps,
+  activeStep,
+  onJump,
+}: {
+  steps: Array<{ key: StepKey; label: string }>;
+  activeStep: StepKey;
+  onJump: (k: StepKey) => void;
+}) {
+  const activeIdx = steps.findIndex((s) => s.key === activeStep);
+  return (
+    <nav aria-label="Wizard steps" className="mb-3">
+      <ol className="d-flex align-items-center justify-content-between list-unstyled mb-0 flex-wrap gap-2">
+        {steps.map((s, i) => {
+          const isActive = i === activeIdx;
+          const isDone = i < activeIdx;
+          const bg = isActive ? '#0066CC' : isDone ? '#5C9EFF' : '#DEE5EC';
+          const color = isActive || isDone ? '#fff' : '#17324D';
+          return (
+            <li key={s.key} className="flex-grow-1">
+              <button
+                type="button"
+                onClick={() => onJump(s.key)}
+                className="d-flex align-items-center gap-2 w-100 border-0 bg-transparent p-2 rounded"
+                style={{
+                  cursor: 'pointer',
+                  borderBottom: isActive ? '3px solid #0066CC' : '3px solid transparent',
+                }}
+              >
+                <span
+                  className="d-inline-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    backgroundColor: bg,
+                    color,
+                    fontSize: '0.9rem',
+                  }}
+                  aria-hidden="true"
+                >
+                  {isDone ? '✓' : i + 1}
+                </span>
+                <span
+                  className={isActive ? 'fw-bold' : ''}
+                  style={{
+                    color: isActive ? '#0066CC' : '#17324D',
+                    fontSize: '0.9rem',
+                    textAlign: 'left',
+                  }}
+                >
+                  {s.label}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
