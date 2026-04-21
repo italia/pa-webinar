@@ -491,7 +491,7 @@ export default function LiveEventClient({
   const showJvbOverlay = jvbReady !== true;
 
   return (
-    <div className="d-flex flex-column live-page-bg" style={{ height: 'calc(100vh - 80px)' }}>
+    <div className="d-flex flex-column live-page-bg">
       <RecordingBanner visible={isRecording} />
       <OvertimeBanner endsAt={event.endsAt} graceMinutes={event.effectiveGraceMinutes ?? 15} />
 
@@ -525,8 +525,8 @@ export default function LiveEventClient({
         />
       )}
 
-      <div className="d-flex flex-column flex-lg-row flex-grow-1" style={{ minHeight: 0 }}>
-        <div className="d-flex flex-column flex-grow-1" style={{ minHeight: '300px' }}>
+      <div className="d-flex flex-column flex-lg-row flex-grow-1 live-body">
+        <div className="d-flex flex-column flex-grow-1 live-main">
           <div className="flex-grow-1 position-relative">
             {showJvbOverlay && (
               <div
@@ -638,7 +638,7 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
   const visibleTabs = tabs.filter((tab) => tab.show);
 
   return (
-    <div className="d-flex flex-column live-sidebar" style={{ width: '100%', maxWidth: '360px' }}>
+    <div className="d-flex flex-column live-sidebar">
       <div className="d-flex live-sidebar-header" style={{ overflowX: 'auto' }}>
         {visibleTabs.map((tab) => (
           <button

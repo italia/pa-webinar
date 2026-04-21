@@ -166,6 +166,11 @@ export const createInstantCallSchema = z.object({
   ),
   moderatorName: z.string().min(2).max(100).optional(),
   joinPassword: z.string().min(4).max(200).optional(),
+  // Capacity hint for the JVB auto-scaler. Optional — route applies a
+  // conservative default when omitted. Operators sizing a demo for a
+  // large audience should set this up-front so the scaler provisions
+  // enough replicas on the next tick instead of reactive catch-up.
+  maxParticipants: z.number().int().min(2).max(500).optional(),
 });
 
 // ── Registration Schemas ─────────────────────────────

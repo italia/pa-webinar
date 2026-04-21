@@ -49,8 +49,15 @@ export const POST = withErrorHandling(async (request) => {
   const jitsiRoomName = `call-${randomUUID()}`;
   const moderatorToken = randomUUID();
 
+  // Default matches the admin UI placeholder. Bigger calls (demos, 100+
+  // audiences) must pass `maxParticipants` explicitly so the JVB scaler's
+  // next tick sees the real capacity need — instant calls skip the
+  // PUBLISHED→PROVISIONING pre-scale window, so the *initial* desired
+  // replica count is whatever this value implies and nothing more.
+  const maxParticipants = data.maxParticipants ?? 50;
+
   const capacityEstimate = calculateEstimates({
-    maxParticipants: 50,
+    maxParticipants,
     startsAt: now.toISOString(),
     endsAt: maxDuration.toISOString(),
     recordingEnabled: true,
@@ -69,7 +76,7 @@ export const POST = withErrorHandling(async (request) => {
       description: { it: 'Videocall istantanea' },
       startsAt: now,
       endsAt: maxDuration,
-      maxParticipants: 50,
+      maxParticipants,
       qaEnabled: false,
       chatEnabled: true,
       recordingEnabled: true,
@@ -82,6 +89,11 @@ export const POST = withErrorHandling(async (request) => {
       // can match this event. Without it, lastActiveAt stays null and the
       // call lingers LIVE until the 24h endsAt upper bound kicks in.
       lastActiveAt: now,
+      // Align with the scheduled-event flow where the PUBLISHED→PROVISIONING
+      // transition stamps this field. For instant calls we skip that state
+      // but still set the timestamp — the provisioning-timeout UI path and
+      // the IDLE-demotion fallback both depend on it being non-null.
+      provisioningStartedAt: now,
       dataRetentionDays: 7,
       capacityEstimateJson: {
         ...capacityEstimate,
