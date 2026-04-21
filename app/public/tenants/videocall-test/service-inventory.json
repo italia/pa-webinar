@@ -58,7 +58,7 @@
         { "type": "vcs", "url": "https://github.com/italia/eventi-dtd" },
         { "type": "website", "url": "https://videocall-test.innovazione.gov.it" },
         { "type": "release-notes", "url": "https://github.com/italia/eventi-dtd/releases" },
-        { "type": "bom", "url": "https://videocall-test.innovazione.gov.it/examples/service-inventory.example.json" }
+        { "type": "bom", "url": "https://videocall-test.innovazione.gov.it/tenants/videocall-test/service-inventory.json" }
       ]
     },
     "properties": [
@@ -346,7 +346,11 @@
         { "name": "azure:region", "value": "italynorth" },
         { "name": "azure:sla", "value": "99.95% (con Uptime SLA)" },
         { "name": "azure:certifications", "value": "ISO 27001, ISO 27017, ISO 27018, SOC 1/2/3, HIPAA, PCI DSS, AgID Circolare 2/2018 (cloud qualificato)" },
-        { "name": "eventi-dtd:node-pools", "value": "system, jitsi-jvb, jitsi-jibri" }
+        { "name": "eventi-dtd:node-pools", "value": "system, jitsi-jvb, jitsi-jibri" },
+        { "name": "eventi-dtd:node-pool.app.provisioning-model", "value": "spot" },
+        { "name": "eventi-dtd:node-pool.app.availability-impact", "value": "interruptible — i nodi spot possono essere revocati da Azure con 30s di preavviso; accettabile in ambiente di collaudo, in produzione si useranno VM regular con SLA garantito." },
+        { "name": "eventi-dtd:node-pool.jitsi-jvb.provisioning-model", "value": "regular (scale-to-zero)" },
+        { "name": "eventi-dtd:node-pool.jitsi-jibri.provisioning-model", "value": "regular (scale-to-zero)" }
       ]
     },
     {

@@ -1686,6 +1686,30 @@
         "trustBoundary": "attraversa confine di fiducia",
         "personalData": "dati personali",
         "recording": "contenuti registrati"
+      },
+      "stack": {
+        "title": "Architettura in breve",
+        "intro": "Una vista sintetica dei quattro livelli che compongono la piattaforma: dall'accesso utente fino alla piattaforma di esecuzione.",
+        "layers": {
+          "access": {
+            "title": "Accesso",
+            "sub": "Ingresso web e terminazione TLS",
+            "endUsers": "Utenti finali (browser)"
+          },
+          "app": {
+            "title": "Applicazione",
+            "sub": "Portale, video, media real-time"
+          },
+          "data": {
+            "title": "Dati",
+            "sub": "Persistenza, cache, archiviazione"
+          },
+          "platform": {
+            "title": "Piattaforma",
+            "sub": "Runtime Kubernetes, SMTP, CI/CD, osservabilità"
+          }
+        },
+        "note": "L'elenco completo di componenti e servizi, con versioni, hash e proprietà tecniche, è disponibile nelle sezioni precedenti e nel JSON scaricabile."
       }
     }
   },

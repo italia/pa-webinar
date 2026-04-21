@@ -1221,3 +1221,115 @@
     th { background: #F5F7FB; font-weight: 600; text-align: left; }
   }
 }
+
+// ── Service inventory (/service-inventory) ──
+.service-inventory {
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: #F5F7FB;
+    color: #17324D;
+    white-space: nowrap;
+
+    &::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      flex: 0 0 auto;
+    }
+  }
+  &__chip--trust {
+    background: #FFF6E0;
+    border-color: #E6B800;
+    color: #7A5A00;
+  }
+  &__chip--personal-data {
+    background: #FBE7EB;
+    border-color: #D9364F;
+    color: #8B1D2C;
+  }
+  &__chip--recording {
+    background: #E7F0FA;
+    border-color: #0066CC;
+    color: #004C99;
+  }
+
+  &__stack {
+    margin-top: 2.5rem;
+    padding: 1.5rem;
+    background: #F8FAFC;
+    border: 1px solid #E8ECF0;
+    border-radius: 8px;
+  }
+  &__stack-title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #17324D;
+  }
+  &__stack-intro {
+    margin: 0 0 1.25rem 0;
+    color: #5A768A;
+    font-size: 0.9rem;
+  }
+  &__stack-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  &__stack-layer {
+    display: grid;
+    grid-template-columns: minmax(130px, 180px) 1fr;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border: 1px solid #E8ECF0;
+    border-left: 4px solid var(--layer-color, #0066CC);
+    border-radius: 6px;
+  }
+  &__stack-layer-title {
+    font-weight: 600;
+    color: #17324D;
+    font-size: 0.92rem;
+  }
+  &__stack-layer-sub {
+    display: block;
+    font-weight: 400;
+    color: #5A768A;
+    font-size: 0.78rem;
+    margin-top: 2px;
+  }
+  &__stack-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  &__stack-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.6rem;
+    background: #F5F7FB;
+    color: #17324D;
+    border: 1px solid #E8ECF0;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    &__stack-layer {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+  }
+}
