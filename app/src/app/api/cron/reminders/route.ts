@@ -2,7 +2,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { sendEmail } from '@/lib/email/send';
+import { enqueueEmail } from '@/lib/email/outbox';
 import { getSettings } from '@/lib/settings';
 import {
   reminderHtml,
@@ -147,7 +147,7 @@ export const GET = withErrorHandling(async (request) => {
           },
         );
 
-        await sendEmail({
+        await enqueueEmail({
           to: recipientEmail,
           subject: resolved.subject,
           html: reminderHtml(templateInput, resolved),
@@ -159,6 +159,12 @@ export const GET = withErrorHandling(async (request) => {
               contentType: 'text/calendar; charset=utf-8; method=REQUEST',
             },
           ],
+          metadata: {
+            kind: 'reminder',
+            reminderId: reminder.id,
+            registrationId: reg.id,
+            eventId: reminder.eventId,
+          },
         });
 
         await prisma.reminderSent.create({

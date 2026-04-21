@@ -13,6 +13,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
+import { upsertPersonOnRegistration } from '@/lib/persons';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
@@ -52,7 +53,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const {
     displayName, email, consentGiven, organization, organizationRole, organizationType,
-    consentRecording, consentFutureCommunications,
+    consentRecording, consentFutureCommunications, consentAddressBook,
   } = parsed.data;
 
   // If recording is enabled, consentRecording must be true
@@ -73,6 +74,15 @@ export const POST = withErrorHandling(async (request, context) => {
       throw new ConflictError('Already registered for this event');
     }
 
+    const personId = await upsertPersonOnRegistration(tx, {
+      emailHash,
+      displayName,
+      organization: organization || null,
+      organizationRole: organizationRole || null,
+      organizationType: organizationType || null,
+      optedIn: consentAddressBook === true,
+    });
+
     const reg = await tx.registration.create({
       data: {
         eventId: event.id,
@@ -87,6 +97,7 @@ export const POST = withErrorHandling(async (request, context) => {
         consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
         consentFutureCommunications: consentFutureCommunications ?? false,
         accessToken,
+        personId,
       },
     });
 
@@ -100,6 +111,7 @@ export const POST = withErrorHandling(async (request, context) => {
           consentGiven: true,
           consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
           consentFutureCommunications: consentFutureCommunications ?? false,
+          consentAddressBook: consentAddressBook === true,
         }),
       },
     });
@@ -115,7 +127,7 @@ export const POST = withErrorHandling(async (request, context) => {
   const joinUrl = localizedUrl(baseUrl, `/events/${slug}/live?token=${accessToken}`, locale);
   const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
 
-  sendConfirmationEmail({
+  await sendConfirmationEmail({
     registrationId: registration.id,
     locale,
     joinUrl,

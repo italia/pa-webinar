@@ -418,8 +418,12 @@
       "publications": "Pubblicazioni",
       "publicationsList": "Tutte le pubblicazioni",
       "publicationsNew": "Nuova pubblicazione",
+      "questionnaires": "Questionari",
+      "questionnairesLibrary": "Libreria template",
+      "questionnairesResponses": "Risposte e statistiche",
       "ariaLabel": "Navigazione amministrazione",
-      "subNavAriaLabel": "Navigazione sezione"
+      "subNavAriaLabel": "Navigazione sezione",
+      "rubrica": "Rubrica"
     },
     "landing": {
       "title": "Pannello di amministrazione",
@@ -1527,7 +1531,9 @@
     "consent": {
       "recording": "Acconsento alla registrazione audio/video dell'evento",
       "recordingRequired": "Il consenso alla registrazione è obbligatorio per partecipare a questo evento",
-      "futureCommunications": "Desidero ricevere informazioni su eventi futuri organizzati dal DTD"
+      "futureCommunications": "Desidero ricevere informazioni su eventi futuri organizzati dal DTD",
+      "addressBook": "Voglio essere inserito nella Rubrica DTD per essere invitato ad eventi simili",
+      "addressBookHelp": "Consenso separato (art. 6.1.a GDPR). Potrai revocarlo in qualsiasi momento dal link \"Rimuovi i miei dati dalla rubrica\" nelle email che riceverai. Il nome e l'organizzazione saranno ricavati dal profilo di registrazione."
     },
     "export": {
       "title": "I miei dati",
@@ -2160,5 +2166,24 @@
     "tempError": "Stiamo riprovando a contattare il server, nessuna azione necessaria.",
     "ended": "L'evento è terminato.",
     "scaleToZeroNote": "Per ridurre l'impatto ambientale, i nodi video vengono spenti quando nessuno è in chiamata. Il riavvio è automatico al primo ingresso."
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Rimozione dalla Rubrica DTD",
+      "intro": "Stai per revocare il consenso all'inserimento nella Rubrica DTD. Dopo la conferma, non sarai più contattato per essere invitato a eventi simili.",
+      "missingToken": "Il link non è valido o è incompleto. Controlla l'email originale.",
+      "invalidToken": "Il link è scaduto o non valido. Contatta il referente dell'evento per assistenza.",
+      "notFound": "Nessuna persona corrisponde al link. Potrebbe essere già stata rimossa.",
+      "loading": "Caricamento…",
+      "previewHeader": "Stai per rimuovere dalla rubrica:",
+      "warning": "L'operazione non cancella lo storico delle iscrizioni ai singoli eventi.",
+      "confirm": "Conferma la rimozione",
+      "submitting": "Rimozione in corso…",
+      "successTitle": "Rimozione completata",
+      "successBody": "I tuoi dati non sono più presenti nella Rubrica DTD.",
+      "errors": {
+        "generic": "Si è verificato un errore. Riprova più tardi."
+      }
+    }
   }
 }
