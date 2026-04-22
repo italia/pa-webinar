@@ -166,8 +166,12 @@
 }
 
 // Main video flex-child. `min-width: 0` is the classic flexbox fix that
-// lets the Jitsi iframe shrink to fit instead of overflowing its parent;
-// on mobile we also cap its height so the sidebar gets room below.
+// lets the Jitsi iframe shrink to fit instead of overflowing its parent.
+//
+// Mobile (<992px): the video fills the full viewport minus top bar and
+// the ~48px persistent tab strip at the bottom; the sidebar collapses
+// to a bottom-sheet drawer (see `.live-sidebar` mobile overrides below)
+// that overlays the video when a tab is tapped.
 .live-main {
   min-width: 0;
   min-height: 0;
@@ -177,8 +181,13 @@
   }
 
   @media (max-width: 991.98px) {
-    flex: 0 0 auto;
-    height: 45vh;
+    flex: 1 1 auto;
+    // Height: full viewport minus the top bar / moderator bar stack
+    // above (~120px is a safe envelope — top-bar 52px + potential
+    // moderator-bar/overtime/recording banners) and minus the 48px
+    // bottom tab strip that stays pinned via the fixed sidebar.
+    min-height: calc(100svh - 168px);
+    padding-bottom: 48px;
   }
 }
 
@@ -198,6 +207,13 @@
 }
 
 // ── Sidebar ──
+//
+// Desktop ≥992px: fixed right-hand column, flush against the video.
+// Mobile  <992px: the sidebar is rendered as a bottom-anchored sheet
+// that overlays the video. A persistent tab strip (the sidebar header)
+// stays pinned to the bottom of the viewport and acts as the launcher;
+// tapping a tab expands the drawer to ~80vh. The body of the drawer
+// slides up / down via `transform: translateY()`.
 
 .live-sidebar {
   border-left: 2px solid rgba(0, 102, 204, 0.4);
@@ -209,12 +225,82 @@
   @media (min-width: 992px) {
     max-width: 360px;
   }
+
+  @media (max-width: 991.98px) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    // When closed, only the 48px tab strip peeks above the bottom edge.
+    // When open, the whole sheet lifts to reveal the body.
+    height: 80vh;
+    max-height: 80vh;
+    border-left: none;
+    border-top: 2px solid rgba(0, 102, 204, 0.4);
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.25);
+    // Default closed: hide all but the tab strip. The strip is 48px,
+    // so push the whole sheet down by its own height minus 48px.
+    transform: translateY(calc(100% - 48px));
+    transition: transform 240ms ease-out;
+    z-index: 1050;
+  }
+
+  &--open {
+    @media (max-width: 991.98px) {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Dimmer behind the open drawer. Click = close.
+.live-sidebar-scrim {
+  display: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  @media (max-width: 991.98px) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1040;
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
+    pointer-events: none;
+    transition: background 240ms ease-out, opacity 240ms ease-out;
+  }
+
+  &--open {
+    @media (max-width: 991.98px) {
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+// Body under the tabs. On mobile we need it to scroll within the sheet.
+.live-sidebar-body {
+  @media (max-width: 991.98px) {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 .live-sidebar-header {
   background: linear-gradient(90deg, #004D99 0%, #0066CC 100%);
   padding: 0;
   flex-shrink: 0;
+
+  @media (max-width: 991.98px) {
+    // The header IS the always-visible tab strip on mobile — pin it to
+    // the top of the sheet so it stays visible whether the drawer is
+    // open or peeking from the bottom.
+    min-height: 48px;
+    align-items: stretch;
+  }
 }
 
 .live-sidebar-tab {

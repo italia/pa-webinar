@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   baseToolbarButtons,
   moderatorToolbarButtons,
+  mobileBaseToolbarButtons,
+  mobileModeratorToolbarButtons,
   jitsiConfigOverwrite,
   jitsiInterfaceConfigOverwrite,
   participantFeatures,
@@ -59,6 +61,27 @@ describe('Jitsi config exports', () => {
     expect(speakerToolbarButtons).not.toContain('hangup');
     expect(speakerToolbarButtons).not.toContain('mute-everyone');
     expect(speakerToolbarButtons).not.toContain('security');
+  });
+
+  it('mobileBaseToolbarButtons trims overwhelming controls', () => {
+    expect(mobileBaseToolbarButtons).toContain('microphone');
+    expect(mobileBaseToolbarButtons).toContain('camera');
+    expect(mobileBaseToolbarButtons).toContain('desktop');
+    expect(mobileBaseToolbarButtons).toContain('raisehand');
+    expect(mobileBaseToolbarButtons).toContain('settings');
+    expect(mobileBaseToolbarButtons).not.toContain('filmstrip');
+    expect(mobileBaseToolbarButtons).not.toContain('tileview');
+    expect(mobileBaseToolbarButtons).not.toContain('fullscreen');
+    expect(mobileBaseToolbarButtons).not.toContain('select-background');
+    expect(mobileBaseToolbarButtons).not.toContain('hangup');
+  });
+
+  it('mobileModeratorToolbarButtons extends mobile base with hangup and participants-pane', () => {
+    for (const btn of mobileBaseToolbarButtons) {
+      expect(mobileModeratorToolbarButtons).toContain(btn);
+    }
+    expect(mobileModeratorToolbarButtons).toContain('hangup');
+    expect(mobileModeratorToolbarButtons).toContain('participants-pane');
   });
 });
 

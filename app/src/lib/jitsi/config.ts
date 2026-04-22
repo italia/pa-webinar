@@ -44,6 +44,30 @@ export const moderatorToolbarButtons = [
 ];
 
 /**
+ * Trimmed participant toolbar for mobile (<768px). Drops tile/filmstrip/
+ * fullscreen/select-background — non-technical first-timers on a shared
+ * link get lost otherwise. Settings stays because it contains the
+ * device chooser which is the most-asked-for control on mobile.
+ */
+export const mobileBaseToolbarButtons = [
+  'microphone',
+  'camera',
+  'desktop',
+  'raisehand',
+  'settings',
+];
+
+/**
+ * Moderator mobile toolbar: same trim as participants plus hangup and
+ * the participants-pane button (needed to manage the room on small screens).
+ */
+export const mobileModeratorToolbarButtons = [
+  ...mobileBaseToolbarButtons,
+  'hangup',
+  'participants-pane',
+];
+
+/**
  * Config overrides passed as `configOverwrite`.
  * Toolbar buttons are merged at instantiation time based on role.
  */

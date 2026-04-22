@@ -26,7 +26,6 @@ import PollPanel from '@/components/polls/poll-panel';
 import MaterialPanel from '@/components/materials/material-panel';
 import ParticipantPanel from '@/components/participants/participant-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
-import GuestJoinForm from '@/components/live/guest-join-form';
 import EventFeedback from '@/components/live/event-feedback';
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
@@ -54,6 +53,9 @@ interface EventInfo {
   participantsCanShareScreen: boolean;
   speakers?: string | null;
   organizerName?: string | null;
+  moderatorName?: string | null;
+  imageUrl?: string | null;
+  coverImageUrl?: string | null;
   maxParticipants?: number;
   registrationCount?: number;
   /** Soft-exit grace in minutes past endsAt. Null → site default. */
@@ -61,6 +63,8 @@ interface EventInfo {
   /** Resolved grace value (settings default applied). Used for the overtime banner. */
   effectiveGraceMinutes?: number;
   tempRecordingUrl?: string | null;
+  recordingUrl?: string | null;
+  feedbackEnabled?: boolean;
   timezone?: string;
 }
 
@@ -87,7 +91,6 @@ interface LiveEventClientProps {
 
 type LivePhase =
   | 'waiting'
-  | 'guest_join'
   | 'consent_pending'
   | 'pre_join'
   | 'fetching_jwt'
@@ -156,35 +159,15 @@ export default function LiveEventClient({
     return () => { cancelled = true; clearInterval(interval); };
   }, [eventStatus]);
 
-  // Determine initial phase
+  // Determine initial phase. Everyone (guest, participant, moderator,
+  // speaker) lands on the unified waiting room first regardless of
+  // status (PUBLISHED / LIVE / ENDED) — the waiting room itself shows
+  // the right content (countdown / join CTA / recording + feedback).
+  // `phase='ended'` is now only reached mid-session when the Jitsi
+  // connection ends, for the legacy "evento concluso" thank-you screen.
   useEffect(() => {
-    if (eventStatus === 'ENDED') {
-      setPhase('ended');
-      return;
-    }
-
-    if (isGuest) {
-      if (eventStatus === 'LIVE') {
-        setPhase('guest_join');
-      } else {
-        setPhase('waiting');
-      }
-      return;
-    }
-
-    if (eventStatus === 'LIVE') {
-      if (isModerator) {
-        setPhase('pre_join');
-      } else if (event.recordingEnabled) {
-        setPhase('consent_pending');
-      } else {
-        setPhase('pre_join');
-      }
-      return;
-    }
-
-    setPhase('waiting');
-  }, [eventStatus, event.recordingEnabled, isModerator, isGuest]);
+    setPhase((prev) => (prev === 'ready' || prev === 'ended' ? prev : 'waiting'));
+  }, [eventStatus]);
 
   // Poll event status in waiting room
   useEffect(() => {
@@ -202,21 +185,32 @@ export default function LiveEventClient({
     return () => clearInterval(pollInterval);
   }, [phase, event.slug, eventStatus]);
 
-  // Fetch JWT
+  // Fetch JWT. Shape of the request depends on the caller:
+  //   - moderator / speaker magic-link:  moderatorToken=<token>
+  //   - registered participant:          accessToken=<token>
+  //   - anonymous guest (no token):      guestName=<name>
   const fetchJwt = useCallback(async () => {
     setError('');
     try {
       const body: Record<string, string> = {};
-      // Both moderators and speakers arrive via magic link → they use
-      // the `moderatorToken` field (the JWT route's grant flow handles
-      // the role distinction and issues the right Jitsi features).
-      if (isModerator || isSpeaker) {
+      if (isGuest || !token) {
+        // Anonymous guest on a public (or password-cleared) LIVE event.
+        // The typed name is required — we ensure it before transitioning
+        // into fetching_jwt from the waiting room.
+        body.guestName = chosenName.trim();
+      } else if (isModerator || isSpeaker) {
+        // Both moderators and speakers arrive via magic link → they use
+        // the `moderatorToken` field (the JWT route's grant flow handles
+        // the role distinction and issues the right Jitsi features).
         body.moderatorToken = token;
+        if (chosenName && chosenName !== initialDisplayName) {
+          body.displayNameOverride = chosenName;
+        }
       } else {
         body.accessToken = token;
-      }
-      if (chosenName && chosenName !== initialDisplayName) {
-        body.displayNameOverride = chosenName;
+        if (chosenName && chosenName !== initialDisplayName) {
+          body.displayNameOverride = chosenName;
+        }
       }
 
       const res = await fetch(`/api/events/${event.slug}/jitsi/token`, {
@@ -239,14 +233,18 @@ export default function LiveEventClient({
       setError(t('connectionError'));
       setPhase('error');
     }
-  }, [event.slug, isModerator, isSpeaker, token, chosenName, initialDisplayName, t]);
+  }, [event.slug, isModerator, isSpeaker, isGuest, token, chosenName, initialDisplayName, t]);
 
   useEffect(() => {
     if (phase === 'fetching_jwt') { fetchJwt(); }
   }, [phase, fetchJwt]);
 
   const handleConsentAccept = useCallback(() => {
-    setPhase('pre_join');
+    // Name already collected in the waiting room; skip the (legacy)
+    // pre-join name form and fetch the JWT directly. Keeping `pre_join`
+    // as a reachable phase for the device-check experience Task 2 will
+    // add — for now consent → JWT is the shortest path.
+    setPhase('fetching_jwt');
   }, []);
 
   const handleConsentDecline = useCallback(() => {
@@ -258,11 +256,23 @@ export default function LiveEventClient({
     setPhase('fetching_jwt');
   }, []);
 
-  const handleGuestJoined = useCallback((creds: JitsiCredentials) => {
-    setCredentials(creds);
-    setChosenName(creds.displayName);
-    setPhase('ready');
-  }, []);
+  // Unified entry from the waiting room. Dispatches through the
+  // consent → pre_join → fetching_jwt pipeline depending on role and
+  // whether recording consent is required for this event.
+  const handleEnterFromWaiting = useCallback((name: string) => {
+    setChosenName(name);
+    // Moderator + speaker magic-links skip the participant recording-
+    // consent modal (they're the ones driving recording). Guests and
+    // registered participants see it when recording is enabled.
+    if (event.recordingEnabled && !isModerator && !isSpeaker) {
+      setPhase('consent_pending');
+    } else {
+      // No device check step yet (Task 2 will add mic/camera preview to
+      // PreJoinScreen); for now we just short-circuit to the JWT fetch
+      // since the waiting room already collected the name.
+      setPhase('fetching_jwt');
+    }
+  }, [event.recordingEnabled, isModerator, isSpeaker]);
 
   // Poll event status during ready phase to detect ENDED
   useEffect(() => {
@@ -390,46 +400,39 @@ export default function LiveEventClient({
     setEventStatus('LIVE');
   }, [event.id, token]);
 
-  // ── Guest join form (no token, LIVE event) ──
-  if (phase === 'guest_join') {
-    return (
-      <GuestJoinForm
-        eventTitle={event.title}
-        eventSlug={event.slug}
-        onJoined={handleGuestJoined}
-      />
-    );
-  }
-
-  // ── Waiting room ──
+  // ── Waiting room (unified front door for every arrival) ──
   if (phase === 'waiting') {
     return (
       <WaitingRoom
         event={{
           title: event.title,
           slug: event.slug,
+          parseTitleKicker: event.parseTitleKicker,
           startsAt: event.startsAt,
           endsAt: event.endsAt,
-          status: eventStatus as 'PUBLISHED' | 'LIVE',
+          status: eventStatus as 'PUBLISHED' | 'LIVE' | 'ENDED',
           speakers: event.speakers,
           organizerName: event.organizerName,
+          moderatorName: event.moderatorName,
+          imageUrl: event.imageUrl,
+          coverImageUrl: event.coverImageUrl,
           maxParticipants: event.maxParticipants ?? 300,
           recordingEnabled: event.recordingEnabled,
           tempRecordingUrl: event.tempRecordingUrl,
+          recordingUrl: event.recordingUrl,
           waitingRoomAudioUrl: event.waitingRoomAudioUrl,
+          feedbackEnabled: event.feedbackEnabled,
+          chatEnabled: event.chatEnabled,
+          qaEnabled: event.qaEnabled,
           timezone: event.timezone,
         }}
         participantCount={participantCount}
         role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
         jvbReady={jvbReady}
-        onEnterLive={() => {
-          if (event.recordingEnabled && !isModerator) {
-            setPhase('consent_pending');
-          } else {
-            setPhase('pre_join');
-          }
-        }}
+        defaultName={chosenName || initialDisplayName}
+        onEnterLive={handleEnterFromWaiting}
         onStartEvent={isModerator ? handleStartEvent : undefined}
+        onLeaveFeedback={() => setShowFeedback(true)}
       />
     );
   }
@@ -518,10 +521,13 @@ export default function LiveEventClient({
         parseTitleKicker={event.parseTitleKicker}
         participantCount={participantCount}
         registrationCount={event.registrationCount}
+        maxParticipants={event.maxParticipants}
         isRecording={isRecording}
         role={isActualModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
         onLeaveRoom={handleLeaveRoom}
       />
+
+      <FirstEntryHintBanner />
 
       {isActualModerator && !showJvbOverlay && (
         <ModeratorControls
@@ -645,6 +651,9 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
     isInstantCall ? 'participants' : (qaEnabled ? 'qa' : (showChat ? 'chat' : 'polls'))
   );
   const [participantCount, setParticipantCount] = useState(0);
+  // Drawer-open state only matters on mobile (<992px); on desktop the
+  // .live-sidebar is always visible via CSS regardless of this flag.
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const tabs: { key: SidebarTab; label: string; icon: string; badge?: number; show: boolean }[] = [
     { key: 'qa', label: t('sidebarTabQa'), icon: 'it-comment', show: !isInstantCall && qaEnabled },
@@ -656,65 +665,93 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
 
   const visibleTabs = tabs.filter((tab) => tab.show);
 
-  return (
-    <div className="d-flex flex-column live-sidebar">
-      <div className="d-flex live-sidebar-header" style={{ overflowX: 'auto' }}>
-        {visibleTabs.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            className={`btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-1 live-sidebar-tab${
-              activeTab === tab.key ? ' live-sidebar-tab--active' : ''
-            }`}
-            onClick={() => setActiveTab(tab.key)}
-          >
-            <Icon icon={tab.icon} size="xs" color="white" />
-            <span className="d-none d-md-inline">{tab.label}</span>
-            {tab.badge !== undefined && tab.badge > 0 && (
-              <Badge
-                color=""
-                pill
-                style={{
-                  fontSize: '0.6rem',
-                  padding: '1px 5px',
-                  backgroundColor: 'rgba(255,255,255,0.25)',
-                  color: '#fff',
-                }}
-              >
-                {tab.badge}
-              </Badge>
-            )}
-          </button>
-        ))}
-      </div>
+  const handleTabClick = useCallback((key: SidebarTab) => {
+    // Mobile toggle semantics: tapping the already-active tab closes the
+    // drawer. Desktop CSS ignores drawerOpen, so this is a no-op there.
+    if (activeTab === key && drawerOpen) {
+      setDrawerOpen(false);
+      return;
+    }
+    setActiveTab(key);
+    setDrawerOpen(true);
+  }, [activeTab, drawerOpen]);
 
-      <div className="flex-grow-1 d-flex flex-column" style={{ minHeight: 0, overflowY: 'auto' }}>
-        {activeTab === 'qa' && qaEnabled && (
-          <QAPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
-        )}
-        {activeTab === 'chat' && showChat && (
-          <ChatPanel
-            eventSlug={eventSlug}
-            token={token}
-            displayName={displayName}
-            isGuest={!token}
-          />
-        )}
-        {activeTab === 'polls' && (
-          <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
-        )}
-        {activeTab === 'materials' && (
-          <MaterialPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
-        )}
-        {activeTab === 'participants' && (
-          <ParticipantPanel
-            api={jitsiApi}
-            isModerator={isModerator}
-            onCountChange={setParticipantCount}
-          />
-        )}
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
+
+  return (
+    <>
+      {/* Mobile scrim — only visible when drawer open on narrow screens.
+          Desktop never renders it (CSS). Tap = close. */}
+      <button
+        type="button"
+        className={`live-sidebar-scrim${drawerOpen ? ' live-sidebar-scrim--open' : ''}`}
+        onClick={closeDrawer}
+        aria-label={t('closeDrawer')}
+        tabIndex={drawerOpen ? 0 : -1}
+      />
+
+      <div className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}`}>
+        {/* Tab strip — doubles as the always-visible mobile launcher
+            when the drawer is collapsed. On desktop this is just the
+            regular sidebar header. */}
+        <div className="d-flex live-sidebar-header" style={{ overflowX: 'auto' }}>
+          {visibleTabs.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              className={`btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-1 live-sidebar-tab${
+                activeTab === tab.key ? ' live-sidebar-tab--active' : ''
+              }`}
+              onClick={() => handleTabClick(tab.key)}
+            >
+              <Icon icon={tab.icon} size="xs" color="white" />
+              <span className="d-none d-md-inline">{tab.label}</span>
+              {tab.badge !== undefined && tab.badge > 0 && (
+                <Badge
+                  color=""
+                  pill
+                  style={{
+                    fontSize: '0.6rem',
+                    padding: '1px 5px',
+                    backgroundColor: 'rgba(255,255,255,0.25)',
+                    color: '#fff',
+                  }}
+                >
+                  {tab.badge}
+                </Badge>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-grow-1 d-flex flex-column live-sidebar-body" style={{ minHeight: 0, overflowY: 'auto' }}>
+          {activeTab === 'qa' && qaEnabled && (
+            <QAPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+          )}
+          {activeTab === 'chat' && showChat && (
+            <ChatPanel
+              eventSlug={eventSlug}
+              token={token}
+              displayName={displayName}
+              isGuest={!token}
+            />
+          )}
+          {activeTab === 'polls' && (
+            <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+          )}
+          {activeTab === 'materials' && (
+            <MaterialPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+          )}
+          {activeTab === 'participants' && (
+            <ParticipantPanel
+              api={jitsiApi}
+              isModerator={isModerator}
+              onCountChange={setParticipantCount}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -794,12 +831,15 @@ interface LiveTopBarProps {
    *  Jitsi count as "N attivi · M registrati". Omitted on public/guest
    *  views where we don't leak the registration total. */
   registrationCount?: number;
+  /** Event capacity (maxParticipants). Used by the "live / capacity"
+   *  pill in the top bar and as fallback when no one has joined yet. */
+  maxParticipants?: number;
   isRecording: boolean;
   role: UserRole;
   onLeaveRoom?: () => void;
 }
 
-function LiveTopBar({ title, parseTitleKicker = false, participantCount, registrationCount, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
+function LiveTopBar({ title, parseTitleKicker = false, participantCount, registrationCount, maxParticipants, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
   const badgeColors = ROLE_BADGE_COLORS[role];
@@ -833,6 +873,23 @@ function LiveTopBar({ title, parseTitleKicker = false, participantCount, registr
         >
           {tr(role)}
         </Badge>
+        {/* "👥 87 / 150" pill. Fallback to "{max} posti disponibili"
+         *  before anyone has joined so the room never looks empty. */}
+        <Badge
+          color=""
+          pill
+          className="px-2 py-1"
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.18)',
+            color: '#fff',
+            fontSize: '0.72rem',
+          }}
+          aria-live="polite"
+        >
+          {participantCount === 0 && maxParticipants
+            ? t('topBarCount.capacityOnly', { max: maxParticipants })
+            : t('topBarCount.live', { count: participantCount, max: maxParticipants ?? 0 })}
+        </Badge>
       </div>
       <div className="d-flex align-items-center gap-3">
         {isRecording && (
@@ -840,12 +897,12 @@ function LiveTopBar({ title, parseTitleKicker = false, participantCount, registr
             <span className="me-1">●</span>{t('recordingActive')}
           </Badge>
         )}
-        <span className="small">
-          <Icon icon="it-user" size="sm" color="white" className="me-1" />
-          {registrationCount !== undefined && registrationCount > 0
-            ? t('activeVsRegistered', { active: participantCount, registered: registrationCount })
-            : t('moderator.participantCount', { count: participantCount })}
-        </span>
+        {registrationCount !== undefined && registrationCount > 0 && (
+          <span className="small d-none d-md-inline">
+            <Icon icon="it-user" size="sm" color="white" className="me-1" />
+            {t('activeVsRegistered', { active: participantCount, registered: registrationCount })}
+          </span>
+        )}
         {onLeaveRoom && (
           <Button
             color="danger"
@@ -859,6 +916,68 @@ function LiveTopBar({ title, parseTitleKicker = false, participantCount, registr
             {t('leaveRoom')}
           </Button>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ── First-entry hint banner ──
+//
+// One-time dismissible tips shown the first time a user reaches phase=ready.
+// Dismissal persists in localStorage so repeat joiners don't see it again.
+
+const HINT_DISMISSED_KEY = 'eventidtd.liveHint.dismissed';
+
+function FirstEntryHintBanner() {
+  const t = useTranslations('live.hintBanner');
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      if (window.localStorage.getItem(HINT_DISMISSED_KEY) !== '1') {
+        setVisible(true);
+      }
+    } catch {
+      // Private mode / blocked storage → show the banner once per session.
+      setVisible(true);
+    }
+  }, []);
+
+  const handleDismiss = useCallback(() => {
+    setVisible(false);
+    try {
+      window.localStorage.setItem(HINT_DISMISSED_KEY, '1');
+    } catch { /* ignore */ }
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div
+      className="px-3 py-2 d-flex flex-column flex-md-row align-items-md-center gap-2 gap-md-3 live-hint-banner"
+      style={{
+        background: '#E8F0FE',
+        color: '#003D80',
+        borderBottom: '1px solid #B6D4FE',
+        fontSize: '0.85rem',
+      }}
+      role="note"
+      aria-label="tips"
+    >
+      <span className="d-inline-flex align-items-center gap-2">
+        <span aria-hidden="true">🎤</span>{t('controls')}
+      </span>
+      <span className="d-inline-flex align-items-center gap-2">
+        <span aria-hidden="true">✋</span>{t('raiseHand')}
+      </span>
+      <span className="d-inline-flex align-items-center gap-2">
+        <span aria-hidden="true">💬</span>{t('sidebar')}
+      </span>
+      <div className="ms-md-auto">
+        <Button color="primary" size="xs" onClick={handleDismiss}>
+          {t('dismiss')}
+        </Button>
       </div>
     </div>
   );
