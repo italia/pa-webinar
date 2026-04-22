@@ -298,7 +298,8 @@
     "topBarCount": {
       "live": "👥 {count, plural, one {# person} other {# people}}"
     },
-    "sidebarTabChatUnread": "New unread messages"
+    "sidebarTabChatUnread": "New unread messages",
+    "floatingControlsLabel": "Event controls"
   },
   "qa": {
     "title": "Questions & Answers",

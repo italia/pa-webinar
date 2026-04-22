@@ -194,14 +194,16 @@
 
   // Mobile: .live-page-bg is now a strict 100svh flex column, so
   // .live-main just grows into the remaining space after the top bar
-  // and banners. The 48px bottom padding reserves room for the fixed
-  // sidebar tab strip that overlays the bottom of the viewport — the
-  // Jitsi toolbar is never hidden underneath it.
+  // and banners. The floating control bar overlays the video directly
+  // (via .live-floating-controls-slot) so no bottom padding is needed.
   @media (max-width: 991.98px) {
     flex: 1 1 0;
-    padding-bottom: 48px;
     overflow: hidden;
   }
+
+  // `position: relative` lets the floating-controls-slot be
+  // absolutely positioned within this container on all breakpoints.
+  position: relative;
 }
 
 .jitsi-wrapper {
@@ -223,134 +225,227 @@
   }
 }
 
-// ── Sidebar ──
+// ── Sidebar / floating controls (Meet-style) ──
 //
-// Desktop ≥992px: fixed right-hand column, flush against the video.
-// Mobile  <992px: the sidebar is rendered as a bottom-anchored sheet
-// that overlays the video. A persistent tab strip (the sidebar header)
-// stays pinned to the bottom of the viewport and acts as the launcher;
-// tapping a tab expands the drawer to ~80vh. The body of the drawer
-// slides up / down via `transform: translateY()`.
+// Video takes the full width of .live-body. A "floating control bar"
+// overlays the bottom-center of the video with big pill buttons for
+// Q&A / Chat / Polls / Materials / Participants. Tapping a button
+// opens a drawer:
+//   Desktop ≥992px → slides in from the right (420px wide, full height)
+//   Mobile  <992px → slides up from the bottom (80vh)
+// Both variants use the same scrim + transform: translate mechanism.
 
+.live-floating-controls-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none; // individual buttons re-enable pointer-events
+  z-index: 5;
+}
+
+.live-floating-controls {
+  pointer-events: auto;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  // Sit just above Jitsi's own bottom toolbar (~60px tall when shown,
+  // auto-hides after 4s). On mobile, raise a bit more to clear thumbs
+  // and the sidebar tab strip that no longer exists but iOS home bar
+  // could still overlap.
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  // Subtle backdrop so buttons pop over light Jitsi tiles without
+  // fighting dark ones. Rounded band, centered horizontally.
+  margin: 0 auto 14px;
+  width: fit-content;
+  background: rgba(15, 27, 45, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 28px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+
+  @media (max-width: 767.98px) {
+    gap: 0.3rem;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+    border-radius: 20px;
+  }
+}
+
+.live-floating-btn {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 68px;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &--active {
+    background: #0066CC;
+    color: #fff;
+  }
+
+  @media (max-width: 767.98px) {
+    min-width: 56px;
+    padding: 6px 8px;
+    font-size: 0.7rem;
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__label {
+    white-space: nowrap;
+  }
+
+  &__badge {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 10px;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  &__dot {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #D9364F;
+    box-shadow: 0 0 0 2px rgba(15, 27, 45, 0.9);
+  }
+}
+
+// Drawer. Always `position: fixed`; slides in from the right on desktop
+// and from the bottom on mobile. Closed state = translated off-screen
+// (no tab strip peek anymore — the floating bar is the launcher).
 .live-sidebar {
-  border-left: 2px solid rgba(0, 102, 204, 0.4);
   background: #ffffff;
-  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.08);
   width: 100%;
   min-width: 0;
+  position: fixed;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  transition: transform 240ms ease-out;
 
   @media (min-width: 992px) {
-    max-width: 360px;
+    top: 80px; // .live-page-bg margin allowance (header 80px above)
+    right: 0;
+    bottom: 0;
+    width: 420px;
+    max-width: 90vw;
+    border-left: 2px solid rgba(0, 102, 204, 0.4);
+    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.25);
+    transform: translateX(100%);
   }
 
   @media (max-width: 991.98px) {
-    position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    // When closed, only the 48px tab strip peeks above the bottom edge.
-    // When open, the whole sheet lifts to reveal the body.
-    height: 80vh;
-    max-height: 80vh;
-    border-left: none;
+    height: 82vh;
+    max-height: 82vh;
     border-top: 2px solid rgba(0, 102, 204, 0.4);
     border-top-left-radius: 14px;
     border-top-right-radius: 14px;
     box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.25);
-    // Default closed: hide all but the tab strip. The strip is 48px,
-    // so push the whole sheet down by its own height minus 48px.
-    transform: translateY(calc(100% - 48px));
-    transition: transform 240ms ease-out;
-    z-index: 1050;
+    transform: translateY(100%);
   }
 
   &--open {
+    @media (min-width: 992px) {
+      transform: translateX(0);
+    }
     @media (max-width: 991.98px) {
       transform: translateY(0);
     }
   }
 }
 
-// Dimmer behind the open drawer. Click = close.
+// Scrim visible on BOTH desktop and mobile whenever the drawer is open.
 .live-sidebar-scrim {
-  display: none;
+  display: block;
   padding: 0;
   border: none;
-  background: transparent;
-
-  @media (max-width: 991.98px) {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 1040;
-    background: rgba(0, 0, 0, 0);
-    opacity: 0;
-    pointer-events: none;
-    transition: background 240ms ease-out, opacity 240ms ease-out;
-  }
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  background: rgba(0, 0, 0, 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: background 240ms ease-out, opacity 240ms ease-out;
 
   &--open {
-    @media (max-width: 991.98px) {
-      background: rgba(0, 0, 0, 0.4);
-      opacity: 1;
-      pointer-events: auto;
-    }
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 
-// Body under the tabs. On mobile we need it to scroll within the sheet.
+// Drawer body scrolls internally — input rows stay pinned to the
+// bottom of the drawer viewport on both layouts.
 .live-sidebar-body {
-  @media (max-width: 991.98px) {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
+// Drawer header: active panel title + close button.
 .live-sidebar-header {
   background: linear-gradient(90deg, #004D99 0%, #0066CC 100%);
-  padding: 0;
+  padding: 0.75rem 1rem;
   flex-shrink: 0;
-
-  @media (max-width: 991.98px) {
-    // The header IS the always-visible tab strip on mobile — pin it to
-    // the top of the sheet so it stays visible whether the drawer is
-    // open or peeking from the bottom.
-    min-height: 48px;
-    align-items: stretch;
-  }
+  min-height: 52px;
 }
 
-.live-sidebar-tab {
-  border: none;
-  border-radius: 0;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  min-width: 0;
-  padding: 0.55rem 0.3rem;
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.65);
-  position: relative;
-
-  // Icon-only on phones (labels hidden via d-md-inline) needs a bigger
-  // touch target than a regular tab — aim for Apple's 44pt / Material's
-  // 48dp guideline.
-  @media (max-width: 767.98px) {
-    padding: 0.75rem 0.25rem;
-    min-height: 44px;
-  }
+.live-sidebar-close {
+  border: 0;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 
   &:hover {
+    background: rgba(255, 255, 255, 0.25);
     color: #fff;
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  &--active {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    font-weight: 600;
-    box-shadow: inset 0 -2px 0 #0066CC;
   }
 }
 
