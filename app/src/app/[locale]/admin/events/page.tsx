@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import AdminDashboardClient from '@/components/admin/admin-dashboard-client';
 import AdminLogoutButton from '@/components/admin/admin-logout-button';
@@ -13,7 +14,16 @@ async function loadEvents(token?: string) {
   const where = token ? { moderatorToken: token } : {};
   const events = await prisma.event.findMany({
     where,
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      _count: {
+        select: {
+          registrations: true,
+          additionalMods: true,
+          organizers: true,
+        },
+      },
+      tagLinks: { include: { tag: true } },
+    },
     orderBy: { startsAt: 'asc' },
   });
 
@@ -23,11 +33,34 @@ async function loadEvents(token?: string) {
     slug: e.slug,
     startsAt: e.startsAt.toISOString(),
     endsAt: e.endsAt.toISOString(),
+    createdAt: e.createdAt.toISOString(),
     status: e.status,
     eventType: e.eventType,
     registrationCount: e._count.registrations,
     maxParticipants: e.maxParticipants,
     moderatorToken: e.moderatorToken,
+    coverImageUrl: e.coverImageUrl,
+    imageUrl: e.imageUrl,
+    organizerName: e.organizerName,
+    parseTitleKicker: e.parseTitleKicker,
+    moderatorCount: e._count.additionalMods,
+    organizerCount: e._count.organizers,
+    tags: e.tagLinks.map((link) => ({
+      slug: link.tag.slug,
+      name: link.tag.name as Record<string, string>,
+      color: link.tag.color,
+    })),
+  }));
+}
+
+async function loadAvailableTags() {
+  const tags = await prisma.tag.findMany({
+    orderBy: [{ sortOrder: 'asc' }, { slug: 'asc' }],
+  });
+  return tags.map((t) => ({
+    slug: t.slug,
+    name: t.name as Record<string, string>,
+    color: t.color,
   }));
 }
 
@@ -36,7 +69,11 @@ export default async function EventsListPage({
 }: EventsListPageProps) {
   const { token } = await searchParams;
   const t = await getTranslations('admin');
-  const events = await loadEvents(token);
+  const [events, availableTags, settings] = await Promise.all([
+    loadEvents(token),
+    loadAvailableTags(),
+    getSettings(),
+  ]);
   const showLogout = !token;
 
   return (
@@ -84,7 +121,12 @@ export default async function EventsListPage({
           </Link>
         </div>
       ) : (
-        <AdminDashboardClient events={events} token={token} />
+        <AdminDashboardClient
+          events={events}
+          token={token}
+          availableTags={availableTags}
+          siteDefaultParseTitleKicker={settings.parseTitleKicker}
+        />
       )}
     </div>
   );

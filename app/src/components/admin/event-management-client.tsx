@@ -1,35 +1,154 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { useTranslations, useFormatter } from 'next-intl';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  Icon,
-  Table,
-  Row,
-  Col,
-  Badge,
-} from 'design-react-kit';
+/**
+ * Admin event detail page.
+ *
+ * Hero (title + status + tags + CTAs) on top; tabbed body on the left
+ * (Panoramica / Impostazioni / Persone / Contenuti / Registrazioni &
+ * Audit) — tab order mirrors the create-event wizard — and a sticky
+ * sidebar on the right with KPIs, reminders and the primary edit CTA.
+ *
+ * Feature-flag toggles are intentionally read-only here: editing lives
+ * in /admin/events/[id]/edit. Having two sources of truth caused
+ * confusion where the wizard and the detail page could disagree.
+ */
 
-import ToggleSwitch from '@/components/ui/toggle-switch';
-import { useRouter } from '@/i18n/navigation';
-import { Link } from '@/i18n/navigation';
-import { REMINDER_PRESETS } from '@/lib/validation/schemas';
+import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useFormatter, useTranslations } from 'next-intl';
 
+import { Link, useRouter } from '@/i18n/navigation';
+import EventTitle from '@/components/events/event-title';
+import { MarkdownRenderer } from '@/components/ui/markdown';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
-import StatusBadge from './status-badge';
-import CopyButton from './copy-button';
+import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
 import EventConfigDiagram from './event-config-diagram';
-import RecordingManagement from './recording-management';
-import CallSessionsPanel from './call-sessions-panel';
-import PostEventConfig from './post-event-config';
-import CollapsibleSection from './collapsible-section';
 import EventModeratorsPanel from './event-moderators-panel';
+import PostEventConfig from './post-event-config';
+import RecordingManagement from './recording-management';
+import StatusBadge from './status-badge';
+
+// ── Palette ──
+const C_PRIMARY = '#0066CC';
+const C_SUCCESS = '#008758';
+const C_INK = '#17324D';
+const C_MUTED = '#5A768A';
+const C_DANGER = '#CC334D';
+
+// ── Shared styles ──
+const CARD: CSSProperties = { borderRadius: 8, border: '1px solid #e8e8e8', background: '#fff' };
+const EYEBROW: CSSProperties = { fontSize: '0.72rem', letterSpacing: '0.04em', color: C_MUTED, fontWeight: 600, textTransform: 'uppercase' };
+const CAPTION: CSSProperties = { fontSize: '0.85rem', color: C_MUTED };
+const PILL_MUTED: CSSProperties = { background: '#E9ECEF', color: C_INK, fontSize: '0.78rem', fontWeight: 500 };
+
+// ── Inline SVGs (currentColor, 24×24 viewBox) ──
+// Using SVG instead of design-react-kit <Icon> avoids the hydration
+// mismatch the kit's dynamic icon loader triggers on SSR pages.
+type IconName =
+  | 'arrow-left' | 'link' | 'user-group' | 'video' | 'folder' | 'shield'
+  | 'pencil' | 'check' | 'x' | 'info' | 'external' | 'settings';
+
+const ICONS: Record<IconName, ReactNode> = {
+  'arrow-left': <path d="M19 12H5M12 19l-7-7 7-7" />,
+  link: <>
+    <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.41 4.59" />
+    <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.41-1.41" />
+  </>,
+  'user-group': <>
+    <circle cx="9" cy="8" r="3.5" /><path d="M2 20v-1a6 6 0 0 1 12 0v1" />
+    <circle cx="17" cy="9" r="2.5" /><path d="M16 14a5 5 0 0 1 6 4.9V20" />
+  </>,
+  video: <><rect x="2" y="6" width="14" height="12" rx="2" /><path d="M22 8l-6 4 6 4V8z" /></>,
+  folder: <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />,
+  shield: <path d="M12 2l9 4v6c0 5-4 9-9 10-5-1-9-5-9-10V6l9-4z" />,
+  pencil: <>
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+  </>,
+  check: <path d="M20 6L9 17l-5-5" />,
+  x: <path d="M18 6L6 18M6 6l12 12" />,
+  info: <><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></>,
+  external: <>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <path d="M15 3h6v6M10 14L21 3" />
+  </>,
+  settings: <>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9 2 2 0 1 1-2.8 2.8 1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2 2 2 0 1 1-2.8-2.8A1.7 1.7 0 0 0 4.6 14H3a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.6-2.9 2 2 0 1 1 2.8-2.8A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.9 1.1 2 2 0 1 1 2.8 2.8A1.7 1.7 0 0 0 20.9 10H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
+  </>,
+};
+
+function Svg({ name, size = 16 }: { name: IconName; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {ICONS[name]}
+    </svg>
+  );
+}
+
+// ── Types ──
+interface Registration {
+  id: string; displayName: string; organization: string | null;
+  organizationRole: string | null; organizationType: string | null;
+  joinedAt: string | null; createdAt: string;
+}
+interface MaterialData {
+  id: string; title: string; url: string;
+  description: string | null; addedBy: string; createdAt: string;
+}
+interface ReminderData {
+  id: string; offsetMinutes: number; label: string;
+  sentCount: number; createdAt: string;
+}
+interface GdprAuditLogData {
+  id: string; action: string; recordCount: number;
+  details: string | null; createdAt: string;
+}
+interface TagData { id: string; slug: string; name: Record<string, string>; color: string | null }
+interface OrganizerData { id: string; name: string; logoUrl: string | null; websiteUrl: string | null }
+interface EventModeratorData {
+  id: string; name: string; email: string | null;
+  role: 'MODERATOR' | 'SPEAKER'; revokedAt: string | null;
+}
+
+interface EventData {
+  id: string; slug: string;
+  title: Record<string, string>; description: Record<string, string>;
+  startsAt: string; endsAt: string; timezone: string;
+  maxParticipants: number; registrationCount: number;
+  qaEnabled: boolean; chatEnabled: boolean; recordingEnabled: boolean;
+  participantsCanUnmute: boolean; participantsCanStartVideo: boolean; participantsCanShareScreen: boolean;
+  status: string;
+  coverImageUrl: string | null; imageUrl: string | null;
+  parseTitleKicker: boolean | null;
+  expectedSenderRatioPct: number | null;
+  capacityEstimateJson: Record<string, unknown> | null;
+  recordingUrl: string | null; tempRecordingUrl: string | null; tempRecordingStartedAt: string | null;
+  recordingPublished: boolean; recordingPublishedAt: string | null;
+  recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
+  postEventPublic: boolean; postEventPublicUntil: string | null;
+  postEventShowQA: boolean; postEventShowMaterials: boolean;
+  postEventShowPolls: boolean; postEventShowFeedback: boolean;
+  feedbackEnabled: boolean; recordingConsentText: string | null;
+  requireOrganization: boolean; requireOrganizationRole: boolean; requireOrganizationType: boolean;
+  moderatorToken: string; moderatorName: string | null; moderatorEmail: string | null;
+  jitsiRoomName: string; dataRetentionDays: number;
+  privacyPolicyUrl: string | null; privacyPolicyText: string | null;
+  speakersInfo: Record<string, string> | null;
+  createdAt: string;
+  tags: TagData[]; organizers: OrganizerData[]; eventModerators: EventModeratorData[];
+  questionnaireCount: number;
+  registrations: Registration[]; materials: MaterialData[];
+  reminders: ReminderData[]; gdprAuditLogs: GdprAuditLogData[];
+}
+
+interface EventManagementClientProps {
+  event: EventData; baseUrl: string; locale: string; kickerEnabled: boolean;
+}
+
+type TabId = 'panoramica' | 'impostazioni' | 'persone' | 'contenuti' | 'audit';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   MINISTRY: { it: 'Ministero', en: 'Ministry' },
@@ -44,257 +163,33 @@ const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   OTHER: { it: 'Altro', en: 'Other' },
 };
 
-interface ReminderData {
-  id: string;
-  offsetMinutes: number;
-  label: string;
-  sentCount: number;
-  createdAt: string;
+function tagChipStyle(color: string | null): CSSProperties {
+  const base = color ?? C_PRIMARY;
+  return {
+    background: `${base}18`, color: base, border: `1px solid ${base}40`,
+    borderRadius: 999, fontSize: '0.75rem', fontWeight: 600,
+    padding: '2px 10px', lineHeight: 1.6, whiteSpace: 'nowrap',
+  };
 }
 
-interface MaterialData {
-  id: string;
-  title: string;
-  url: string;
-  description: string | null;
-  addedBy: string;
-  createdAt: string;
-}
-
-interface Registration {
-  id: string;
-  displayName: string;
-  organization: string | null;
-  organizationRole: string | null;
-  organizationType: string | null;
-  joinedAt: string | null;
-  createdAt: string;
-}
-
-interface EventData {
-  id: string;
-  slug: string;
-  title: Record<string, string>;
-  description: Record<string, string>;
-  startsAt: string;
-  endsAt: string;
-  timezone: string;
-  maxParticipants: number;
-  registrationCount: number;
-  qaEnabled: boolean;
-  chatEnabled: boolean;
-  recordingEnabled: boolean;
-  participantsCanUnmute: boolean;
-  participantsCanStartVideo: boolean;
-  participantsCanShareScreen: boolean;
-  status: string;
-  recordingUrl: string | null;
-  tempRecordingUrl: string | null;
-  tempRecordingStartedAt: string | null;
-  recordingPublished: boolean;
-  recordingPublishedAt: string | null;
-  recordingFileSize: number | null;
-  recordingDuration: number | null;
-  recordingDeleteAfterDays: number | null;
-  postEventPublic: boolean;
-  postEventPublicUntil: string | null;
-  postEventShowQA: boolean;
-  postEventShowMaterials: boolean;
-  postEventShowPolls: boolean;
-  postEventShowFeedback: boolean;
-  feedbackEnabled: boolean;
-  recordingConsentText: string | null;
-  requireOrganization: boolean;
-  requireOrganizationRole: boolean;
-  requireOrganizationType: boolean;
-  moderatorToken: string;
-  moderatorName: string | null;
-  moderatorEmail: string | null;
-  jitsiRoomName: string;
-  dataRetentionDays: number;
-  privacyPolicyUrl: string | null;
-  privacyPolicyText: string | null;
-  speakersInfo: Record<string, string> | null;
-  createdAt: string;
-  registrations: Registration[];
-  materials: MaterialData[];
-  reminders: ReminderData[];
-  gdprAuditLogs: GdprAuditLogData[];
-}
-
-interface GdprAuditLogData {
-  id: string;
-  action: string;
-  recordCount: number;
-  details: string | null;
-  createdAt: string;
-}
-
-interface EventManagementClientProps {
-  event: EventData;
-  baseUrl: string;
-  locale: string;
-}
-
-const CARD_STYLE = {
-  borderRadius: 8,
-  border: '1px solid #e8e8e8',
-};
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
-      {children}
-    </h5>
-  );
-}
-
-function UrlBox({ url }: { url: string }) {
-  return (
-    <div
-      className="mb-2"
-      style={{
-        background: '#f5f7fb',
-        padding: 12,
-        borderRadius: 4,
-        wordBreak: 'break-all',
-        fontSize: 13,
-        fontFamily: "'Roboto Mono', monospace",
-        color: '#17324D',
-        lineHeight: 1.5,
-      }}
-    >
-      {url}
-    </div>
-  );
-}
-
-/**
- * Single row inside the Links card. We intentionally *don't* use
- * design-react-kit's <Alert> for the hint line: the inline left-border
- * style keeps the icon/text alignment predictable even at compact sizes,
- * where Alert's absolute-positioned pseudo-icon tends to collide with
- * short content.
- */
-function LinkBlock({
-  label,
-  hint,
-  url,
-  tone,
-  topBorder,
-}: {
-  label: string;
-  hint?: string;
-  url: string;
-  tone?: 'warning' | 'info';
-  topBorder?: boolean;
-}) {
-  const toneColor =
-    tone === 'warning' ? '#a66300' : tone === 'info' ? '#0066CC' : '#5A768A';
-  const toneBg =
-    tone === 'warning' ? '#fff8e1' : tone === 'info' ? '#e8f0fe' : undefined;
-
-  return (
-    <div
-      className={`mb-4 ${topBorder ? 'pt-4' : ''}`}
-      style={topBorder ? { borderTop: '1px solid #e8e8e8' } : undefined}
-    >
-      <label
-        className="fw-semibold d-block mb-1 text-secondary"
-        style={{ fontSize: '0.85rem' }}
-      >
-        {label}
-      </label>
-      {hint && (
-        <div
-          className="mb-2"
-          style={{
-            fontSize: '0.78rem',
-            padding: '8px 12px',
-            borderLeft: tone ? `3px solid ${toneColor}` : '3px solid #dee2e6',
-            background: toneBg ?? '#f8f9fa',
-            color: '#17324D',
-            borderRadius: '0 4px 4px 0',
-          }}
-        >
-          {hint}
-        </div>
-      )}
-      <UrlBox url={url} />
-      <CopyButton text={url} />
-    </div>
-  );
-}
-
+// ── Main component ──
 export default function EventManagementClient({
-  event,
-  baseUrl,
-  locale,
+  event, baseUrl, locale, kickerEnabled,
 }: EventManagementClientProps) {
   const t = useTranslations('admin');
+  const td = useTranslations('admin.eventDetail');
   const te = useTranslations('events');
+  const tr = useTranslations('reminders');
   const format = useFormatter();
   const router = useRouter();
 
+  const [activeTab, setActiveTab] = useState<TabId>('panoramica');
   const [status, setStatus] = useState(event.status);
-  const [chatEnabled, setChatEnabled] = useState(event.chatEnabled);
-  const [qaEnabled, setQaEnabled] = useState(event.qaEnabled);
-  const [recordingEnabled, setRecordingEnabled] = useState(event.recordingEnabled);
-  const [participantsCanUnmute, setParticipantsCanUnmute] = useState(event.participantsCanUnmute);
-  const [participantsCanStartVideo, setParticipantsCanStartVideo] = useState(event.participantsCanStartVideo);
-  const [participantsCanShareScreen, setParticipantsCanShareScreen] = useState(event.participantsCanShareScreen);
   const [updating, setUpdating] = useState(false);
   const [feedback, setFeedback] = useState('');
-  const [savedField, setSavedField] = useState<string | null>(null);
-
-  type ToggleField = 'chatEnabled' | 'qaEnabled' | 'recordingEnabled' | 'participantsCanUnmute' | 'participantsCanStartVideo' | 'participantsCanShareScreen';
-
-  const toggleSetting = useCallback(
-    async (field: ToggleField) => {
-      const setters: Record<ToggleField, (v: boolean) => void> = {
-        chatEnabled: setChatEnabled,
-        qaEnabled: setQaEnabled,
-        recordingEnabled: setRecordingEnabled,
-        participantsCanUnmute: setParticipantsCanUnmute,
-        participantsCanStartVideo: setParticipantsCanStartVideo,
-        participantsCanShareScreen: setParticipantsCanShareScreen,
-      };
-      const current = { chatEnabled, qaEnabled, recordingEnabled, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen }[field];
-      const next = !current;
-
-      setters[field](next);
-      setSavedField(null);
-
-      try {
-        const res = await fetch(`/api/events/${event.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${event.moderatorToken}`,
-          },
-          body: JSON.stringify({ [field]: next }),
-        });
-        if (res.ok) {
-          setSavedField(field);
-          setTimeout(() => setSavedField(null), 2000);
-          // RecordingManagement is a sibling that reads
-          // `event.recordingEnabled` off the server-rendered snapshot,
-          // not our local state — refresh the RSC tree so it picks up
-          // the new flag without requiring the operator to reload.
-          if (field === 'recordingEnabled') {
-            router.refresh();
-          }
-        } else {
-          setters[field](current);
-        }
-      } catch {
-        setters[field](current);
-      }
-    },
-    [chatEnabled, qaEnabled, recordingEnabled, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, event.id, event.moderatorToken, router],
-  );
 
   const title = getLocalized(event.title, locale);
+  const description = getLocalized(event.description, locale);
   const startsAt = new Date(event.startsAt);
   const endsAt = new Date(event.endsAt);
   const durationMs = endsAt.getTime() - startsAt.getTime();
@@ -304,232 +199,78 @@ export default function EventManagementClient({
   const publicUrl = `${baseUrl}/${locale}/${locale === 'it' ? 'eventi' : 'events'}/${event.slug}`;
   const moderatorUrl = `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`;
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
-  // Guest join URL: opens the live page as an anonymous viewer once the
-  // event is LIVE. Used by the moderator to hand a quick link to a late
-  // participant who never registered through the public form.
-  const guestJoinUrl = `${baseUrl}/${locale}/events/${event.slug}/live`;
+  const editUrl = `/admin/events/${event.id}/edit?token=${event.moderatorToken}`;
+
+  const occupancyPct = Math.min(100, (event.registrationCount / Math.max(1, event.maxParticipants)) * 100);
+
+  // Capacity estimate sidebar surface. Everything else stays in the diagram.
+  const capacity = event.capacityEstimateJson ?? null;
+  const jvbCount = capacity && typeof capacity.jvbCount === 'number' ? capacity.jvbCount : null;
+  const jvbRam = capacity && typeof capacity.jvbRam === 'string' ? capacity.jvbRam : null;
 
   const togglePublish = useCallback(async () => {
     const newStatus = status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
-    setUpdating(true);
-    setFeedback('');
+    setUpdating(true); setFeedback('');
     try {
       const res = await fetch(`/api/events/${event.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${event.moderatorToken}`,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${event.moderatorToken}` },
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {
         setStatus(newStatus);
-        setFeedback(
-          newStatus === 'PUBLISHED' ? t('publishSuccess') : t('unpublishSuccess'),
-        );
+        setFeedback(newStatus === 'PUBLISHED' ? t('publishSuccess') : t('unpublishSuccess'));
       }
-    } finally {
-      setUpdating(false);
-    }
+    } finally { setUpdating(false); }
   }, [status, event.id, event.moderatorToken, t]);
 
-  const isEarlyStart = new Date(event.startsAt).getTime() > Date.now() + 30 * 60_000;
+  const isEarlyStart = startsAt.getTime() > Date.now() + 30 * 60_000;
 
   const startEvent = useCallback(async () => {
-    setUpdating(true);
-    setFeedback('');
+    setUpdating(true); setFeedback('');
     try {
       const res = await fetch(`/api/events/${event.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${event.moderatorToken}`,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${event.moderatorToken}` },
         body: JSON.stringify({ status: 'LIVE' }),
       });
       if (res.ok) {
         setStatus('LIVE');
-        const msg = isEarlyStart
-          ? `${t('startEventSuccess')} ${t('jvbWarmupWarning')}`
-          : t('startEventSuccess');
-        setFeedback(msg);
+        setFeedback(isEarlyStart ? `${t('startEventSuccess')} ${t('jvbWarmupWarning')}` : t('startEventSuccess'));
       }
-    } finally {
-      setUpdating(false);
-    }
-  }, [event.id, event.moderatorToken, event.startsAt, isEarlyStart, t]);
+    } finally { setUpdating(false); }
+  }, [event.id, event.moderatorToken, isEarlyStart, t]);
 
-  const handleDeleted = useCallback(() => {
-    router.push('/admin');
-  }, [router]);
-
-  const duplicateEvent = useCallback(async () => {
-    setUpdating(true);
-    setFeedback('');
-    try {
-      const res = await fetch(`/api/admin/events/${event.id}/duplicate`, {
-        method: 'POST',
-      });
-      if (!res.ok) {
-        setFeedback(t('duplicateError'));
-        return;
-      }
-      const body = (await res.json()) as { id: string; moderatorToken: string };
-      router.push(`/admin/events/${body.id}/edit?token=${body.moderatorToken}`);
-    } catch {
-      setFeedback(t('duplicateError'));
-    } finally {
-      setUpdating(false);
-    }
-  }, [event.id, router, t]);
+  const handleDeleted = useCallback(() => { router.push('/admin'); }, [router]);
 
   const exportCsv = useCallback(() => {
     const headers = ['Nome', 'Ente', 'Ruolo', 'Tipologia ente', 'Data registrazione', 'Entrato'];
-    const rows = event.registrations.map((reg) => [
-      reg.displayName,
-      reg.organization ?? '',
-      reg.organizationRole ?? '',
-      reg.organizationType ? (ORG_TYPE_LABELS[reg.organizationType]?.[locale as 'it' | 'en'] ?? reg.organizationType) : '',
-      new Date(reg.createdAt).toISOString(),
-      reg.joinedAt ? 'Si' : 'No',
+    const rows = event.registrations.map((r) => [
+      r.displayName,
+      r.organization ?? '',
+      r.organizationRole ?? '',
+      r.organizationType ? (ORG_TYPE_LABELS[r.organizationType]?.[locale as 'it' | 'en'] ?? r.organizationType) : '',
+      new Date(r.createdAt).toISOString(),
+      r.joinedAt ? 'Si' : 'No',
     ]);
     const csv = [headers, ...rows]
       .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
       .join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `registrazioni-${event.slug}.csv`;
-    a.click();
+    a.href = url; a.download = `registrazioni-${event.slug}.csv`; a.click();
     URL.revokeObjectURL(url);
   }, [event.registrations, event.slug, locale]);
 
-  // ── Materials management ──
-  const tm = useTranslations('materials');
-  const [materials, setMaterials] = useState<MaterialData[]>(event.materials);
-  const [showMaterialForm, setShowMaterialForm] = useState(false);
-  const [matTitle, setMatTitle] = useState('');
-  const [matUrl, setMatUrl] = useState('');
-  const [matDesc, setMatDesc] = useState('');
-  const [matSubmitting, setMatSubmitting] = useState(false);
-  const [matError, setMatError] = useState('');
-
-  const handleAddMaterial = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      setMatError('');
-
-      if (matTitle.trim().length < 1) return;
-      try { new URL(matUrl.trim()); } catch {
-        setMatError(tm('errors.urlInvalid'));
-        return;
-      }
-
-      setMatSubmitting(true);
-      try {
-        const res = await fetch(`/api/events/${event.slug}/materials`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${event.moderatorToken}`,
-          },
-          body: JSON.stringify({
-            title: matTitle.trim(),
-            url: matUrl.trim(),
-            description: matDesc.trim() || undefined,
-          }),
-        });
-        if (res.ok) {
-          const newMat: MaterialData = await res.json();
-          setMaterials((prev) => [newMat, ...prev]);
-          setMatTitle('');
-          setMatUrl('');
-          setMatDesc('');
-          setShowMaterialForm(false);
-        } else {
-          setMatError(tm('errors.generic'));
-        }
-      } catch {
-        setMatError(tm('errors.generic'));
-      } finally {
-        setMatSubmitting(false);
-      }
-    },
-    [matTitle, matUrl, matDesc, event.slug, event.moderatorToken, tm],
-  );
-
-  const handleDeleteMaterial = useCallback(
-    async (id: string) => {
-      if (!confirm(tm('confirmDelete'))) return;
-      try {
-        const res = await fetch(`/api/events/${event.slug}/materials/${id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${event.moderatorToken}` },
-        });
-        if (res.ok) {
-          setMaterials((prev) => prev.filter((m) => m.id !== id));
-        }
-      } catch { /* retry next time */ }
-    },
-    [event.slug, event.moderatorToken, tm],
-  );
-
-  // ── Reminders management ──
-  const tr = useTranslations('reminders');
-  const [reminders, setReminders] = useState<ReminderData[]>(event.reminders);
-  const [selectedOffset, setSelectedOffset] = useState('');
-
-  const availablePresets = REMINDER_PRESETS.filter(
-    (p) => !reminders.some((r) => r.offsetMinutes === p.offsetMinutes),
-  );
-
-  const handleAddReminder = useCallback(async () => {
-    const offset = Number(selectedOffset);
-    if (!offset) return;
-
-    try {
-      const res = await fetch(`/api/events/${event.slug}/reminders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${event.moderatorToken}`,
-        },
-        body: JSON.stringify({ offsetMinutes: offset }),
-      });
-      if (res.ok) {
-        const newReminder: ReminderData = await res.json();
-        setReminders((prev) => [...prev, newReminder].sort((a, b) => b.offsetMinutes - a.offsetMinutes));
-        setSelectedOffset('');
-      }
-    } catch { /* retry */ }
-  }, [selectedOffset, event.slug, event.moderatorToken]);
-
-  const handleDeleteReminder = useCallback(async (id: string) => {
-    try {
-      const res = await fetch(`/api/events/${event.slug}/reminders/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${event.moderatorToken}` },
-      });
-      if (res.ok) {
-        setReminders((prev) => prev.filter((r) => r.id !== id));
-      }
-    } catch { /* retry */ }
-  }, [event.slug, event.moderatorToken]);
-
-  // Poll live participant count when event is LIVE
+  // Live peak-count poll when LIVE.
   const [liveCount, setLiveCount] = useState<number | null>(null);
   useEffect(() => {
-    if (status !== 'LIVE') {
-      setLiveCount(null);
-      return;
-    }
+    if (status !== 'LIVE') { setLiveCount(null); return; }
     let cancelled = false;
     const poll = async () => {
       try {
-        const res = await fetch(
-          `/api/events/${event.slug}/analytics/peak?token=${event.moderatorToken}`,
-        );
+        const res = await fetch(`/api/events/${event.slug}/analytics/peak?token=${event.moderatorToken}`);
         if (res.ok && !cancelled) {
           const data = await res.json();
           setLiveCount(data.peakParticipants ?? null);
@@ -537,1006 +278,718 @@ export default function EventManagementClient({
       } catch { /* ignore */ }
     };
     poll();
-    const interval = setInterval(poll, 15_000);
-    return () => { cancelled = true; clearInterval(interval); };
+    const i = setInterval(poll, 15_000);
+    return () => { cancelled = true; clearInterval(i); };
   }, [status, event.slug, event.moderatorToken]);
 
-  const occupancyPct = Math.min(
-    100,
-    (event.registrationCount / event.maxParticipants) * 100,
-  );
+  const coverBg = event.coverImageUrl ?? event.imageUrl ?? null;
+  const firstLetter = (title || '?').trim().charAt(0).toUpperCase();
 
   return (
     <>
-      {/* ── Breadcrumb + Header ── */}
-      <div className="mb-2">
-        <Link
-          href="/admin"
-          className="text-decoration-none d-inline-flex align-items-center text-primary"
-          style={{ fontSize: '0.9rem' }}
-        >
-          <Icon icon="it-arrow-left" size="sm" className="me-1" />
+      {/* ── Breadcrumb ── */}
+      <div className="mb-3">
+        <Link href="/admin" className="text-decoration-none d-inline-flex align-items-center"
+              style={{ fontSize: '0.9rem', color: C_PRIMARY }}>
+          <span className="me-1"><Svg name="arrow-left" size={14} /></span>
           {t('title')}
         </Link>
       </div>
 
-      <div className="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-3">
-        <div className="flex-grow-1" style={{ minWidth: 0 }}>
-          <h1 className="fw-bold mb-2" style={{ color: '#17324D' }}>
-            {title}
-          </h1>
-          <div className="d-flex align-items-center gap-2 flex-wrap">
-            <StatusBadge status={status} />
-            <span className="text-muted" style={{ fontSize: '0.85rem' }}>
-              {format.dateTime(startsAt, {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </span>
+      {/* ═══ Hero ═══ */}
+      <div className="p-4 mb-4" style={CARD}>
+        <div className="d-flex flex-wrap gap-3 align-items-start">
+          {/* Cover thumbnail */}
+          <div className="flex-shrink-0 d-flex align-items-center justify-content-center"
+               aria-hidden={!!coverBg}
+               style={{
+                 width: 120, height: 80, borderRadius: 8, overflow: 'hidden',
+                 background: coverBg
+                   ? `url(${coverBg}) center/cover no-repeat`
+                   : `linear-gradient(135deg, ${C_PRIMARY} 0%, ${C_SUCCESS} 100%)`,
+                 color: '#fff', fontSize: '2rem', fontWeight: 700,
+               }}>
+            {!coverBg && firstLetter}
           </div>
-        </div>
-        <div className="d-flex gap-2 flex-wrap flex-shrink-0">
-          {status === 'PUBLISHED' && (
-            <Button color="success" onClick={startEvent} disabled={updating}>
-              <Icon icon="it-video" size="sm" color="white" className="me-1" />
-              {t('startEvent')}
-            </Button>
-          )}
-          <Link href={`/admin/events/${event.id}/edit?token=${event.moderatorToken}`}>
-            <Button color="secondary" outline tag="span">
-              <Icon icon="it-pencil" size="sm" className="me-1" />
-              {t('editEvent')}
-            </Button>
-          </Link>
-          <Link href={`/admin/events/${event.id}/materials`}>
-            <Button color="secondary" outline tag="span">
-              <Icon icon="it-files" size="sm" className="me-1" />
-              {tm('title')}
-            </Button>
-          </Link>
-          <Button
-            color="secondary"
-            outline
-            onClick={duplicateEvent}
-            disabled={updating}
-          >
-            <Icon icon="it-copy" size="sm" className="me-1" />
-            {t('duplicateEvent')}
-          </Button>
-          <Button
-            color={status === 'PUBLISHED' ? 'warning' : 'primary'}
-            onClick={togglePublish}
-            disabled={updating || status === 'LIVE' || status === 'ENDED'}
-          >
-            {status === 'PUBLISHED' ? t('unpublish') : t('publish')}
-          </Button>
-          <DeleteEventModal
-            eventId={event.id}
-            moderatorToken={event.moderatorToken}
-            onDeleted={handleDeleted}
-          />
+
+          {/* Middle */}
+          <div className="flex-grow-1" style={{ minWidth: 0 }}>
+            <EventTitle title={title} kickerEnabled={kickerEnabled} as="h1"
+                        className="fw-bold mb-2"
+                        style={{ color: C_INK, fontSize: '1.5rem', lineHeight: 1.2 }} />
+            <div className="d-flex align-items-center gap-2 flex-wrap mb-2">
+              <StatusBadge status={status} />
+              {event.tags.map((tag) => (
+                <span key={tag.id} style={tagChipStyle(tag.color)}>
+                  {getLocalized(tag.name, locale) || tag.slug}
+                </span>
+              ))}
+            </div>
+            <div className="d-flex align-items-center gap-3 flex-wrap" style={{ ...CAPTION, fontSize: '0.88rem' }}>
+              <span>
+                {format.dateTime(startsAt, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                {' · '}
+                {format.dateTime(startsAt, { hour: '2-digit', minute: '2-digit' })}
+                {' – '}
+                {format.dateTime(endsAt, { hour: '2-digit', minute: '2-digit' })}
+              </span>
+              <span>·</span>
+              <span>{te('detail.durationHours', { hours: durationHours, minutes: durationMinutes })}</span>
+              <span>·</span>
+              <span>{event.timezone}</span>
+            </div>
+            {event.organizers.length > 0 && (
+              <div className="mt-2 d-flex flex-wrap gap-2 align-items-center"
+                   style={{ ...CAPTION, fontSize: '0.82rem' }}>
+                <span className="fw-semibold">{td('organizers')}:</span>
+                {event.organizers.map((o, i) => (
+                  <span key={o.id}>
+                    {o.websiteUrl
+                      ? <a href={o.websiteUrl} target="_blank" rel="noopener noreferrer"
+                           style={{ color: C_PRIMARY, textDecoration: 'none' }}>{o.name}</a>
+                      : o.name}
+                    {i < event.organizers.length - 1 && ','}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right CTAs */}
+          <div className="d-flex flex-column gap-2 flex-shrink-0" style={{ minWidth: 220 }}>
+            <CopyBtn text={publicUrl} label={td('copyPublicUrl')} />
+            <CopyBtn text={moderatorUrl} label={td('copyModeratorUrl')} />
+            {(status === 'PUBLISHED' || status === 'LIVE') && (
+              <Link href={liveModeratorUrl}
+                    className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2"
+                    style={{ fontSize: '0.88rem' }}>
+                <Svg name="video" size={14} /> {td('enterAsModerator')}
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
       {feedback && (
-        <Alert color="success" className="mb-4 mt-3">
-          {feedback}
-        </Alert>
+        <div className="mb-3 p-3 rounded d-flex align-items-center gap-2"
+             style={{ background: '#e6f4ea', color: '#0c5a2a', border: '1px solid #c2e3cc' }}>
+          <Svg name="check" /> {feedback}
+        </div>
       )}
 
       {status === 'LIVE' && (
-        <Alert color="info" className="mb-4 mt-3">
-          <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <span className="d-flex align-items-center gap-3">
-              <span className="d-flex align-items-center">
-                <Icon icon="it-video" className="me-2" />
-                <strong>{t('eventIsLive')}</strong>
+        <div className="mb-3 p-3 rounded d-flex align-items-center justify-content-between gap-3 flex-wrap"
+             style={{ background: '#e8f0fe', color: C_INK, border: `1px solid ${C_PRIMARY}40` }}>
+          <div className="d-flex align-items-center gap-2">
+            <span style={{ color: C_PRIMARY }}><Svg name="video" /></span>
+            <strong>{t('eventIsLive')}</strong>
+            {liveCount !== null && (
+              <span className="px-2 py-1 rounded-pill"
+                    style={{ background: `${C_PRIMARY}18`, color: C_PRIMARY,
+                             fontSize: '0.78rem', fontWeight: 600 }}>
+                {t('liveParticipants', { count: liveCount, max: event.maxParticipants })}
               </span>
-              {liveCount !== null && (
-                <Badge
-                  color=""
-                  pill
-                  className="px-2 py-1"
-                  style={{ backgroundColor: 'rgba(0,102,204,0.12)', color: '#0066CC', fontSize: '0.82rem' }}
-                >
-                  <Icon icon="it-user" size="xs" className="me-1" />
-                  {t('liveParticipants', { count: liveCount, max: event.maxParticipants })}
-                </Badge>
-              )}
-            </span>
-            <Link href={liveModeratorUrl}>
-              <Button color="primary" size="sm" tag="span">
-                {t('joinAsModeratorBtn')}
-              </Button>
-            </Link>
+            )}
           </div>
-        </Alert>
+          <Link href={liveModeratorUrl} className="btn btn-primary btn-sm"
+                style={{ fontSize: '0.84rem' }}>
+            {t('joinAsModeratorBtn')}
+          </Link>
+        </div>
       )}
 
-      <Row className="mt-4">
-        {/* ═══ Left Column ═══ */}
-        <Col lg={8}>
-          {/* ── Summary (open by default) ── */}
-          <CollapsibleSection
-            id="summary"
-            title={t('eventDetails')}
-            icon="it-info-circle"
-            defaultOpen
-          >
-              <dl className="mb-0">
-                <DetailRow
-                  label={te('detail.date')}
-                  value={
-                    <>
-                      {format.dateTime(startsAt, {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                      {' · '}
-                      {format.dateTime(startsAt, { hour: '2-digit', minute: '2-digit' })}
-                      {' – '}
-                      {format.dateTime(endsAt, { hour: '2-digit', minute: '2-digit' })}
-                    </>
-                  }
-                />
-                <DetailRow
-                  label={te('detail.duration')}
-                  value={te('detail.durationHours', {
-                    hours: durationHours,
-                    minutes: durationMinutes,
-                  })}
-                />
-                <DetailRow
-                  label={te('detail.participants')}
-                  value={
-                    <div>
-                      <div className="d-flex align-items-center justify-content-between mb-1">
-                        <span className="fw-semibold">
-                          {event.registrationCount} / {event.maxParticipants}
-                        </span>
-                        <span className="text-muted" style={{ fontSize: '0.8rem' }}>
-                          {Math.round(occupancyPct)}%
-                        </span>
-                      </div>
-                      <div className="progress" style={{ height: 5, borderRadius: 3 }}>
-                        <div
-                          className="progress-bar bg-primary"
-                          role="progressbar"
-                          style={{ width: `${occupancyPct}%`, borderRadius: 3 }}
-                          aria-valuenow={event.registrationCount}
-                          aria-valuemin={0}
-                          aria-valuemax={event.maxParticipants}
-                        />
-                      </div>
-                    </div>
-                  }
-                />
-                {event.moderatorName && (
-                  <DetailRow
-                    label={t('form.moderatorName')}
-                    value={
-                      event.moderatorEmail
-                        ? `${event.moderatorName} (${event.moderatorEmail})`
-                        : event.moderatorName
-                    }
-                  />
-                )}
-                {getLocalized(event.description, locale) && (
-                  <DetailRow
-                    label={te('detail.description')}
-                    value={
-                      <span className="text-secondary" style={{ whiteSpace: 'pre-wrap' }}>
-                        {getLocalized(event.description, locale)}
-                      </span>
-                    }
-                  />
-                )}
-              </dl>
-          </CollapsibleSection>
-
-          {/* ── Configuration Diagram ── */}
-          <CollapsibleSection
-            id="diagram"
-            title={te('manage.settingsSection')}
-            icon="it-pa"
-          >
-              <EventConfigDiagram
-                event={{
-                  maxParticipants: event.maxParticipants,
-                  qaEnabled,
-                  chatEnabled,
-                  recordingEnabled,
-                  participantsCanUnmute,
-                  participantsCanStartVideo,
-                  participantsCanShareScreen,
-                  speakers: getLocalized(event.speakersInfo as LocalizedField, locale) || undefined,
-                  startsAt: event.startsAt,
-                  endsAt: event.endsAt,
-                }}
-                registrationCount={event.registrationCount}
-                adminMode
-              />
-          </CollapsibleSection>
-
-          {/* ── Settings & permissions ── */}
-          <CollapsibleSection
-            id="settings"
-            title={t('form.sectionSettings')}
-            icon="it-settings"
-          >
-              <ToggleRow
-                label={te('manage.toggleChat')}
-                description={t('toggleChatDesc')}
-                checked={chatEnabled}
-                onChange={() => toggleSetting('chatEnabled')}
-                disabled={updating}
-                saved={savedField === 'chatEnabled'}
-                savedLabel={t('settingsSaved')}
-              />
-              <ToggleRow
-                label={te('manage.toggleQa')}
-                description={t('toggleQaDesc')}
-                checked={qaEnabled}
-                onChange={() => toggleSetting('qaEnabled')}
-                disabled={updating}
-                saved={savedField === 'qaEnabled'}
-                savedLabel={t('settingsSaved')}
-                hasBorder
-              />
-              <ToggleRow
-                label={te('manage.toggleRecording')}
-                description={t('toggleRecordingDesc')}
-                checked={recordingEnabled}
-                onChange={() => toggleSetting('recordingEnabled')}
-                disabled={updating}
-                saved={savedField === 'recordingEnabled'}
-                savedLabel={t('settingsSaved')}
-                hasBorder
-              />
-              <hr className="my-3" />
-              <h6 className="fw-semibold mb-3" style={{ color: '#17324D', fontSize: '0.9rem' }}>
-                {t('form.sectionPermissions')}
-              </h6>
-              <ToggleRow
-                label={t('form.participantsCanUnmute')}
-                description={participantsCanUnmute ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
-                checked={participantsCanUnmute}
-                onChange={() => toggleSetting('participantsCanUnmute')}
-                disabled={updating}
-                saved={savedField === 'participantsCanUnmute'}
-                savedLabel={t('settingsSaved')}
-              />
-              <ToggleRow
-                label={t('form.participantsCanStartVideo')}
-                description={participantsCanStartVideo ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
-                checked={participantsCanStartVideo}
-                onChange={() => toggleSetting('participantsCanStartVideo')}
-                disabled={updating}
-                saved={savedField === 'participantsCanStartVideo'}
-                savedLabel={t('settingsSaved')}
-                hasBorder
-              />
-              <ToggleRow
-                label={t('form.participantsCanShareScreen')}
-                description={participantsCanShareScreen ? t('form.permissionsOnDesc') : t('form.permissionsOffDesc')}
-                checked={participantsCanShareScreen}
-                onChange={() => toggleSetting('participantsCanShareScreen')}
-                disabled={updating}
-                saved={savedField === 'participantsCanShareScreen'}
-                savedLabel={t('settingsSaved')}
-                hasBorder
-              />
-              <div className="mt-2">
-                <small className="form-text text-muted">
-                  {t('form.permissionsNote')}
-                </small>
-              </div>
-          </CollapsibleSection>
-
-          {/* ── Sessions & recordings ── */}
-          <CollapsibleSection
-            id="sessions"
-            title={te('manage.sessionsAndRecordings')}
-            icon="it-video"
-          >
-            <RecordingManagement
-              event={{
-                id: event.id,
-                slug: event.slug,
-                status,
-                recordingEnabled,
-                recordingUrl: event.recordingUrl,
-                tempRecordingUrl: event.tempRecordingUrl,
-                tempRecordingStartedAt: event.tempRecordingStartedAt,
-                recordingPublished: event.recordingPublished,
-                recordingPublishedAt: event.recordingPublishedAt,
-                recordingFileSize: event.recordingFileSize,
-                recordingDuration: event.recordingDuration,
-                recordingDeleteAfterDays: event.recordingDeleteAfterDays,
-                moderatorToken: event.moderatorToken,
-              }}
-            />
-            <CallSessionsPanel
-              eventId={event.id}
-              eventSlug={event.slug}
-              moderatorToken={event.moderatorToken}
-            />
-          </CollapsibleSection>
-
-          {/* ── Post-event & Feedback ── */}
-          <CollapsibleSection
-            id="post-event"
-            title={te('manage.postEventSection')}
-            icon="it-calendar"
-          >
-            <PostEventConfig
-              event={{
-                id: event.id,
-                moderatorToken: event.moderatorToken,
-                postEventPublic: event.postEventPublic,
-                postEventPublicUntil: event.postEventPublicUntil,
-                postEventShowQA: event.postEventShowQA,
-                postEventShowMaterials: event.postEventShowMaterials,
-                postEventShowPolls: event.postEventShowPolls,
-                postEventShowFeedback: event.postEventShowFeedback,
-                feedbackEnabled: event.feedbackEnabled,
-                dataRetentionDays: event.dataRetentionDays,
-              }}
-            />
-            {event.feedbackEnabled && status === 'ENDED' && (
-              <EventFeedbackAdmin slug={event.slug} token={event.moderatorToken} />
+      {/* ═══ Body ═══ */}
+      <div className="row g-4">
+        <div className="col-lg-8">
+          <TabNav active={activeTab} onChange={setActiveTab} t={td} />
+          <div className="p-4" style={CARD}>
+            {activeTab === 'panoramica' && (
+              <OverviewTab event={event} description={description} locale={locale} editUrl={editUrl} />
             )}
-          </CollapsibleSection>
+            {activeTab === 'impostazioni' && <SettingsTab event={event} editUrl={editUrl} />}
+            {activeTab === 'persone' && (
+              <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv} />
+            )}
+            {activeTab === 'contenuti' && <ContentTab event={event} />}
+            {activeTab === 'audit' && <AuditTab event={event} status={status} />}
+          </div>
+        </div>
 
-          {/* ── Co-moderators ── */}
-          <CollapsibleSection
-            id="co-moderators"
-            title={t('coModerators.title')}
-            icon="it-user"
-          >
-            <EventModeratorsPanel
-              eventId={event.id}
-              eventSlug={event.slug}
-              moderatorToken={event.moderatorToken}
-              baseUrl={baseUrl}
-              locale={locale}
-            />
-          </CollapsibleSection>
+        {/* ═══ Sidebar ═══ */}
+        <div className="col-lg-4">
+          <div style={{ position: 'sticky', top: 20 }}>
+            {/* KPI */}
+            <div className="p-4 mb-3" style={CARD}>
+              <div className="mb-1" style={EYEBROW}>{td('sidebar.registrations')}</div>
+              <div className="fw-bold mb-1" style={{ fontSize: '2rem', color: C_INK, lineHeight: 1 }}>
+                {event.registrationCount}
+              </div>
+              <div style={CAPTION}>
+                {td('sidebar.ofMax', { current: event.registrationCount, max: event.maxParticipants })}
+              </div>
+              <div className="progress mt-2" style={{ height: 6, borderRadius: 3 }}>
+                <div className="progress-bar" role="progressbar"
+                     aria-valuenow={event.registrationCount}
+                     aria-valuemin={0} aria-valuemax={event.maxParticipants}
+                     style={{ width: `${occupancyPct}%`, background: C_PRIMARY, borderRadius: 3 }} />
+              </div>
+              {(jvbCount !== null || jvbRam) && (
+                <div className="mt-3 pt-3 d-flex align-items-center gap-2"
+                     style={{ borderTop: '1px solid #f0f0f0', ...CAPTION, fontSize: '0.82rem' }}>
+                  <Svg name="info" size={14} />
+                  <span>
+                    {td('sidebar.capacityEstimate', { jvbs: jvbCount ?? 1, ram: jvbRam ?? '—' })}
+                  </span>
+                </div>
+              )}
+            </div>
 
-          {/* ── Reminders ── */}
-          <CollapsibleSection
-            id="reminders"
-            title={tr('title')}
-            icon="it-calendar"
-            badge={reminders.length || undefined}
-          >
-              {reminders.length > 0 && (
-                <div className="d-flex flex-column gap-2 mb-3">
-                  {reminders.map((r) => (
-                    <div
-                      key={r.id}
-                      className="d-flex justify-content-between align-items-center border rounded px-3 py-2"
-                    >
-                      <div>
-                        <span className="fw-semibold" style={{ fontSize: '0.9rem' }}>
-                          {r.label}
+            {/* Reminders */}
+            <div className="p-4 mb-3" style={CARD}>
+              <div className="mb-2" style={EYEBROW}>{tr('title')}</div>
+              {event.reminders.length === 0 ? (
+                <div style={CAPTION}>{td('sidebar.noReminders')}</div>
+              ) : (
+                <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
+                  {event.reminders.map((r) => {
+                    const sent = r.sentCount > 0;
+                    return (
+                      <li key={r.id} className="d-flex align-items-center gap-2"
+                          style={{ fontSize: '0.85rem', color: C_INK }}>
+                        <span aria-hidden="true"
+                              style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                                       background: sent ? C_SUCCESS : '#CED4DA' }} />
+                        <span className="flex-grow-1">{r.label}</span>
+                        <span style={{ color: C_MUTED, fontSize: '0.75rem' }}>
+                          {sent ? tr('sentStatus', { count: r.sentCount }) : tr('notSent')}
                         </span>
-                        {r.sentCount > 0 && (
-                          <Badge color="success" pill className="ms-2" style={{ fontSize: '0.72rem' }}>
-                            {tr('sentStatus', { count: r.sentCount })}
-                          </Badge>
-                        )}
-                        {r.sentCount === 0 && (
-                          <Badge color="" pill className="ms-2" style={{ fontSize: '0.72rem', backgroundColor: '#E9ECEF', color: '#5A768A' }}>
-                            {tr('notSent')}
-                          </Badge>
-                        )}
-                      </div>
-                      <Button
-                        color="danger"
-                        outline
-                        size="xs"
-                        className="flex-shrink-0"
-                        onClick={() => handleDeleteReminder(r.id)}
-                      >
-                        <Icon icon="it-close" size="xs" />
-                      </Button>
-                    </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+
+            {/* Tags recap */}
+            {event.tags.length > 0 && (
+              <div className="p-4 mb-3" style={CARD}>
+                <div className="mb-2" style={EYEBROW}>{td('sidebar.tags')}</div>
+                <div className="d-flex flex-wrap gap-2">
+                  {event.tags.map((tag) => (
+                    <span key={tag.id} style={tagChipStyle(tag.color)}>
+                      {getLocalized(tag.name, locale) || tag.slug}
+                    </span>
                   ))}
                 </div>
-              )}
-
-              {reminders.length < 5 && availablePresets.length > 0 && (
-                <div className="d-flex gap-2 align-items-end">
-                  <select
-                    className="form-select form-select-sm"
-                    value={selectedOffset}
-                    onChange={(e) => setSelectedOffset(e.target.value)}
-                    style={{ maxWidth: 240 }}
-                  >
-                    <option value="">{tr('selectPreset')}</option>
-                    {availablePresets.map((p) => (
-                      <option key={p.offsetMinutes} value={p.offsetMinutes}>
-                        {locale === 'en' ? p.labelEn : p.labelIt}
-                      </option>
-                    ))}
-                  </select>
-                  <Button
-                    color="primary"
-                    outline
-                    size="sm"
-                    onClick={handleAddReminder}
-                    disabled={!selectedOffset}
-                  >
-                    + {tr('addReminder')}
-                  </Button>
-                </div>
-              )}
-
-              {reminders.length >= 5 && (
-                <div className="text-muted" style={{ fontSize: '0.85rem' }}>
-                  {tr('maxReminders')}
-                </div>
-              )}
-          </CollapsibleSection>
-
-          {/* ── Materials ── */}
-          <CollapsibleSection
-            id="materials"
-            title={tm('title')}
-            icon="it-files"
-            badge={materials.length || undefined}
-          >
-              <div className="d-flex justify-content-end align-items-center mb-3">
-                {!showMaterialForm && (
-                  <Button color="primary" outline size="sm" onClick={() => setShowMaterialForm(true)}>
-                    + {tm('addMaterial')}
-                  </Button>
-                )}
               </div>
+            )}
 
-              {showMaterialForm && (
-                <form onSubmit={handleAddMaterial} className="border rounded p-3 mb-3">
-                  <div className="mb-2">
-                    <input
-                      type="text"
-                      className="form-control form-control-sm"
-                      placeholder={tm('titleLabel')}
-                      value={matTitle}
-                      onChange={(e) => setMatTitle(e.target.value)}
-                      maxLength={300}
-                    />
-                  </div>
-                  <div className="mb-2">
-                    <input
-                      type="url"
-                      className="form-control form-control-sm"
-                      placeholder={tm('urlLabel')}
-                      value={matUrl}
-                      onChange={(e) => setMatUrl(e.target.value)}
-                    />
-                  </div>
-                  <div className="mb-2">
-                    <input
-                      type="text"
-                      className="form-control form-control-sm"
-                      placeholder={tm('descriptionLabel')}
-                      value={matDesc}
-                      onChange={(e) => setMatDesc(e.target.value)}
-                      maxLength={500}
-                    />
-                  </div>
-                  {matError && <div className="text-danger small mb-2">{matError}</div>}
-                  <div className="d-flex gap-2">
-                    <Button color="primary" size="sm" type="submit" disabled={matSubmitting}>
-                      {matSubmitting ? tm('adding') : tm('add')}
-                    </Button>
-                    <Button
-                      color="secondary"
-                      outline
-                      size="sm"
-                      type="button"
-                      onClick={() => { setShowMaterialForm(false); setMatError(''); }}
-                    >
-                      {tm('cancel')}
-                    </Button>
-                  </div>
-                </form>
-              )}
-
-              {materials.length === 0 ? (
-                <div className="text-center py-3">
-                  <p className="text-muted mb-0">{tm('noMaterials')}</p>
-                </div>
-              ) : (
-                <div className="d-flex flex-column gap-2">
-                  {materials.map((m) => (
-                    <div key={m.id} className="d-flex justify-content-between align-items-start border rounded p-3">
-                      <div style={{ minWidth: 0 }}>
-                        <a
-                          href={m.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="fw-semibold text-primary text-decoration-none d-inline-flex align-items-center gap-1"
-                        >
-                          <Icon icon="it-external-link" size="sm" />
-                          {m.title}
-                        </a>
-                        {m.description && (
-                          <div className="text-muted" style={{ fontSize: '0.85rem' }}>
-                            {m.description}
-                          </div>
-                        )}
-                        <div className="text-muted" style={{ fontSize: '0.78rem' }}>
-                          {tm('addedBy', { name: m.addedBy })} ·{' '}
-                          {format.dateTime(new Date(m.createdAt), {
-                            day: 'numeric',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </div>
-                      </div>
-                      <Button
-                        color="danger"
-                        outline
-                        size="xs"
-                        className="flex-shrink-0 ms-2"
-                        onClick={() => handleDeleteMaterial(m.id)}
-                      >
-                        <Icon icon="it-close" size="xs" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-          </CollapsibleSection>
-
-          {/* ── Registrations ── */}
-          <CollapsibleSection
-            id="registrations"
-            title={t('registrationsSection')}
-            icon="it-user"
-            badge={event.registrationCount || undefined}
-          >
-              <div className="d-flex justify-content-end align-items-center mb-3">
-                {event.registrations.length > 0 && (
-                  <Button
-                    color="primary"
-                    outline
-                    size="sm"
-                    onClick={exportCsv}
-                  >
-                    {t('exportCsv')}
-                  </Button>
+            {/* Actions */}
+            <div className="p-4 mb-3" style={CARD}>
+              <div className="d-grid gap-2">
+                {status === 'PUBLISHED' && (
+                  <button type="button"
+                          className="btn btn-success d-flex align-items-center justify-content-center gap-2"
+                          onClick={startEvent} disabled={updating}>
+                    <Svg name="video" size={14} /> {t('startEvent')}
+                  </button>
                 )}
+                <Link href={editUrl}
+                      className="btn btn-primary d-flex align-items-center justify-content-center gap-2">
+                  <Svg name="pencil" size={14} /> {td('editEvent')}
+                </Link>
+                <button type="button"
+                        className={status === 'PUBLISHED' ? 'btn btn-outline-warning' : 'btn btn-outline-primary'}
+                        onClick={togglePublish}
+                        disabled={updating || status === 'LIVE' || status === 'ENDED'}>
+                  {status === 'PUBLISHED' ? t('unpublish') : t('publish')}
+                </button>
+                <a href={publicUrl} target="_blank" rel="noopener noreferrer"
+                   className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
+                  <Svg name="external" size={14} /> {t('openPublicPage')}
+                </a>
+                <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
+                                  onDeleted={handleDeleted} />
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
 
-              {/* Organization type stats */}
-              {event.registrations.some((r) => r.organizationType) && (
-                <div className="mb-3 d-flex flex-wrap gap-2">
-                  {Object.entries(
-                    event.registrations.reduce<Record<string, number>>((acc, r) => {
-                      if (r.organizationType) {
-                        acc[r.organizationType] = (acc[r.organizationType] || 0) + 1;
-                      }
-                      return acc;
-                    }, {}),
-                  )
-                    .sort((a, b) => b[1] - a[1])
-                    .map(([type, count]) => {
-                      const pct = Math.round((count / event.registrations.length) * 100);
-                      const label = ORG_TYPE_LABELS[type]?.[locale as 'it' | 'en'] ?? type;
-                      return (
-                        <Badge key={type} color="" pill className="px-2 py-1" style={{ backgroundColor: '#E9ECEF', color: '#17324D', fontSize: '0.78rem' }}>
-                          {label}: {pct}% ({count})
-                        </Badge>
-                      );
-                    })}
-                </div>
-              )}
-
-              {event.registrations.length === 0 ? (
-                <div className="text-center py-4">
-                  <div
-                    className="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+// ── TabNav ──
+function TabNav({ active, onChange, t }: {
+  active: TabId;
+  onChange: (tab: TabId) => void;
+  t: (key: string) => string;
+}) {
+  const tabs: { id: TabId; icon: IconName; key: string }[] = [
+    { id: 'panoramica', icon: 'info', key: 'tabs.overview' },
+    { id: 'impostazioni', icon: 'settings', key: 'tabs.settings' },
+    { id: 'persone', icon: 'user-group', key: 'tabs.people' },
+    { id: 'contenuti', icon: 'folder', key: 'tabs.content' },
+    { id: 'audit', icon: 'shield', key: 'tabs.audit' },
+  ];
+  return (
+    <ul className="nav nav-tabs mb-0" role="tablist" style={{ borderBottom: 'none' }}>
+      {tabs.map((tab) => {
+        const isActive = active === tab.id;
+        return (
+          <li key={tab.id} className="nav-item" role="presentation">
+            <button type="button" role="tab" aria-selected={isActive}
+                    className="nav-link d-inline-flex align-items-center gap-2"
+                    onClick={() => onChange(tab.id)}
                     style={{
-                      width: 48,
-                      height: 48,
-                      backgroundColor: 'rgba(0,102,204,0.08)',
-                    }}
-                  >
-                    <Icon icon="it-user" className="text-primary" />
-                  </div>
-                  <p className="text-muted mb-0">{t('noRegistrations')}</p>
-                </div>
-              ) : (
-                <div className="table-responsive">
-                  <Table hover>
-                    <thead>
-                      <tr>
-                        <th scope="col" style={{ width: 40 }}>#</th>
-                        <th scope="col">{te('detail.participants')}</th>
-                        {event.requireOrganization && <th scope="col">{t('organization')}</th>}
-                        {event.requireOrganizationType && <th scope="col">{t('organizationType')}</th>}
-                        <th scope="col">{t('registrationDate')}</th>
-                        <th scope="col">{t('joined')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {event.registrations.map((reg, i) => (
-                        <tr key={reg.id}>
-                          <td className="text-muted">{i + 1}</td>
-                          <td className="fw-semibold">{reg.displayName}</td>
-                          {event.requireOrganization && (
-                            <td className="text-secondary">{reg.organization ?? '—'}</td>
-                          )}
-                          {event.requireOrganizationType && (
-                            <td className="text-secondary">
-                              {reg.organizationType
-                                ? (ORG_TYPE_LABELS[reg.organizationType]?.[locale as 'it' | 'en'] ?? reg.organizationType)
-                                : '—'}
-                            </td>
-                          )}
-                          <td className="text-secondary">
-                            {format.dateTime(new Date(reg.createdAt), {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </td>
-                          <td>
-                            {reg.joinedAt ? (
-                              <Badge color="success" pill className="px-2 py-1" style={{ fontSize: '0.75rem' }}>
-                                {t('joined')}
-                              </Badge>
-                            ) : (
-                              <Badge color="" pill className="px-2 py-1" style={{ fontSize: '0.75rem', backgroundColor: '#E9ECEF', color: '#5A768A' }}>
-                                {t('notJoined')}
-                              </Badge>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </div>
-              )}
-          </CollapsibleSection>
+                      background: isActive ? '#fff' : 'transparent',
+                      color: isActive ? C_PRIMARY : C_MUTED,
+                      border: '1px solid #e8e8e8',
+                      borderBottom: isActive ? '1px solid #fff' : '1px solid #e8e8e8',
+                      borderTopLeftRadius: 6, borderTopRightRadius: 6,
+                      marginBottom: -1,
+                      fontWeight: isActive ? 600 : 500,
+                      fontSize: '0.88rem', padding: '10px 14px',
+                    }}>
+              <Svg name={tab.icon} size={14} /> {t(tab.key)}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
-          {/* ── Privacy & GDPR ── */}
-          {event.gdprAuditLogs.length > 0 && (
-            <CollapsibleSection
-              id="privacy"
-              title={t('gdprAuditLog.title')}
-              icon="it-lock"
-              badge={event.gdprAuditLogs.length || undefined}
-              subtitle={t('gdprAuditLog.subtitle')}
-            >
-              <Table responsive hover className="mt-1" style={{ fontSize: '0.85rem' }}>
-                <thead>
-                  <tr>
-                    <th>{t('gdprAuditLog.date')}</th>
-                    <th>{t('gdprAuditLog.action')}</th>
-                    <th>{t('gdprAuditLog.recordCount')}</th>
-                    <th>{t('gdprAuditLog.details')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {event.gdprAuditLogs.map((log) => (
+// ── Tabs ──
+function OverviewTab({ event, description, locale, editUrl }: {
+  event: EventData; description: string; locale: string; editUrl: string;
+}) {
+  const td = useTranslations('admin.eventDetail');
+  const te = useTranslations('events');
+  const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
+
+  const toggles: { label: string; value: boolean }[] = [
+    { label: te('manage.toggleChat'), value: event.chatEnabled },
+    { label: te('manage.toggleQa'), value: event.qaEnabled },
+    { label: te('manage.toggleRecording'), value: event.recordingEnabled },
+    { label: td('toggles.unmute'), value: event.participantsCanUnmute },
+    { label: td('toggles.video'), value: event.participantsCanStartVideo },
+    { label: td('toggles.screenShare'), value: event.participantsCanShareScreen },
+  ];
+
+  return (
+    <>
+      {description && (
+        <div className="mb-4">
+          <H>{te('detail.description')}</H>
+          <MarkdownRenderer content={description} />
+        </div>
+      )}
+
+      <div className="mb-4">
+        <H>{te('manage.settingsSection')}</H>
+        <EventConfigDiagram
+          event={{
+            maxParticipants: event.maxParticipants,
+            qaEnabled: event.qaEnabled, chatEnabled: event.chatEnabled,
+            recordingEnabled: event.recordingEnabled,
+            participantsCanUnmute: event.participantsCanUnmute,
+            participantsCanStartVideo: event.participantsCanStartVideo,
+            participantsCanShareScreen: event.participantsCanShareScreen,
+            speakers: speakers || undefined,
+            startsAt: event.startsAt, endsAt: event.endsAt,
+          }}
+          registrationCount={event.registrationCount} adminMode
+        />
+      </div>
+
+      <div>
+        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <H>{td('featureSummary')}</H>
+          <Link href={editUrl}
+                className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+            <Svg name="pencil" size={12} /> {td('editSettings')}
+          </Link>
+        </div>
+        <div className="d-grid gap-2" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          {toggles.map((toggle) => (
+            <div key={toggle.label}
+                 className="d-flex align-items-center gap-2 px-3 py-2"
+                 style={{ background: '#f8f9fa', borderRadius: 6, fontSize: '0.88rem', color: C_INK }}>
+              <span style={{ color: toggle.value ? C_SUCCESS : C_DANGER, flexShrink: 0 }}>
+                <Svg name={toggle.value ? 'check' : 'x'} size={14} />
+              </span>
+              <span>{toggle.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function SettingsTab({ event, editUrl }: { event: EventData; editUrl: string }) {
+  const td = useTranslations('admin.eventDetail');
+  const t = useTranslations('admin');
+
+  return (
+    <>
+      <div className="mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <H>{td('privacyGdpr')}</H>
+          <Link href={editUrl}
+                className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+            <Svg name="pencil" size={12} /> {td('editSettings')}
+          </Link>
+        </div>
+        <dl className="mb-0">
+          <KV label={td('fields.dataRetention')}
+              value={td('fields.dataRetentionValue', { days: event.dataRetentionDays })} />
+          {event.privacyPolicyUrl && (
+            <KV label={td('fields.privacyUrl')}
+                value={<a href={event.privacyPolicyUrl} target="_blank" rel="noopener noreferrer"
+                          style={{ color: C_PRIMARY }}>{event.privacyPolicyUrl}</a>} />
+          )}
+          {event.moderatorName && (
+            <KV label={t('form.moderatorName')}
+                value={event.moderatorEmail ? `${event.moderatorName} (${event.moderatorEmail})` : event.moderatorName} />
+          )}
+          {event.recordingConsentText && (
+            <KV label={td('fields.recordingConsent')}
+                value={<span style={{ whiteSpace: 'pre-wrap', color: C_INK }}>{event.recordingConsentText}</span>} />
+          )}
+        </dl>
+      </div>
+
+      <div>
+        <H>{td('postEventTitle')}</H>
+        <PostEventConfig
+          event={{
+            id: event.id, moderatorToken: event.moderatorToken,
+            postEventPublic: event.postEventPublic,
+            postEventPublicUntil: event.postEventPublicUntil,
+            postEventShowQA: event.postEventShowQA,
+            postEventShowMaterials: event.postEventShowMaterials,
+            postEventShowPolls: event.postEventShowPolls,
+            postEventShowFeedback: event.postEventShowFeedback,
+            feedbackEnabled: event.feedbackEnabled,
+            dataRetentionDays: event.dataRetentionDays,
+          }}
+        />
+      </div>
+    </>
+  );
+}
+
+function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
+  event: EventData; baseUrl: string; locale: string; onExportCsv: () => void;
+}) {
+  const t = useTranslations('admin');
+  const te = useTranslations('events');
+  const format = useFormatter();
+
+  // Aggregated org-type histogram for the intro chip row.
+  const orgTypeCounts = event.registrations.reduce<Record<string, number>>((acc, r) => {
+    if (r.organizationType) acc[r.organizationType] = (acc[r.organizationType] || 0) + 1;
+    return acc;
+  }, {});
+  const orgTypeEntries = Object.entries(orgTypeCounts).sort((a, b) => b[1] - a[1]);
+
+  return (
+    <>
+      <div className="mb-4">
+        <H>{t('coModerators.title')}</H>
+        <EventModeratorsPanel eventId={event.id} eventSlug={event.slug}
+                              moderatorToken={event.moderatorToken}
+                              baseUrl={baseUrl} locale={locale} />
+      </div>
+
+      <div>
+        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <H>
+            {t('registrationsSection')}
+            <span className="ms-2" style={{ color: C_MUTED, fontWeight: 400, fontSize: '0.88rem' }}>
+              ({event.registrationCount})
+            </span>
+          </H>
+          {event.registrations.length > 0 && (
+            <button type="button" className="btn btn-outline-primary btn-sm" onClick={onExportCsv}>
+              {t('exportCsv')}
+            </button>
+          )}
+        </div>
+
+        {orgTypeEntries.length > 0 && (
+          <div className="mb-3 d-flex flex-wrap gap-2">
+            {orgTypeEntries.map(([type, count]) => {
+              const pct = Math.round((count / event.registrations.length) * 100);
+              const label = ORG_TYPE_LABELS[type]?.[locale as 'it' | 'en'] ?? type;
+              return (
+                <span key={type} className="px-2 py-1 rounded-pill" style={PILL_MUTED}>
+                  {label}: {pct}% ({count})
+                </span>
+              );
+            })}
+          </div>
+        )}
+
+        {event.registrations.length === 0 ? (
+          <div className="text-center py-4" style={{ color: C_MUTED, fontSize: '0.9rem' }}>
+            {t('noRegistrations')}
+          </div>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th scope="col" style={{ width: 40 }}>#</th>
+                  <th scope="col">{te('detail.participants')}</th>
+                  {event.requireOrganization && <th scope="col">{t('organization')}</th>}
+                  {event.requireOrganizationType && <th scope="col">{t('organizationType')}</th>}
+                  <th scope="col">{t('registrationDate')}</th>
+                  <th scope="col">{t('joined')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {event.registrations.map((reg, i) => {
+                  const joined = !!reg.joinedAt;
+                  const typeLabel = reg.organizationType
+                    ? (ORG_TYPE_LABELS[reg.organizationType]?.[locale as 'it' | 'en'] ?? reg.organizationType)
+                    : '—';
+                  return (
+                    <tr key={reg.id}>
+                      <td style={{ color: C_MUTED }}>{i + 1}</td>
+                      <td className="fw-semibold">{reg.displayName}</td>
+                      {event.requireOrganization && (
+                        <td style={{ color: C_MUTED }}>{reg.organization ?? '—'}</td>
+                      )}
+                      {event.requireOrganizationType && (
+                        <td style={{ color: C_MUTED }}>{typeLabel}</td>
+                      )}
+                      <td style={{ color: C_MUTED }}>
+                        {format.dateTime(new Date(reg.createdAt), {
+                          day: 'numeric', month: 'short', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit',
+                        })}
+                      </td>
+                      <td>
+                        <span className="px-2 py-1 rounded-pill"
+                              style={{ fontSize: '0.75rem', fontWeight: 600,
+                                       background: joined ? `${C_SUCCESS}22` : '#E9ECEF',
+                                       color: joined ? C_SUCCESS : C_MUTED }}>
+                          {joined ? t('joined') : t('notJoined')}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function ContentTab({ event }: { event: EventData }) {
+  const tm = useTranslations('materials');
+  const td = useTranslations('admin.eventDetail');
+  const format = useFormatter();
+
+  return (
+    <>
+      <div className="mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <H>
+            {tm('title')}
+            <span className="ms-2" style={{ color: C_MUTED, fontWeight: 400, fontSize: '0.88rem' }}>
+              ({event.materials.length})
+            </span>
+          </H>
+          <Link href={`/admin/events/${event.id}/materials`}
+                className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+            <Svg name="pencil" size={12} /> {td('manageMaterials')}
+          </Link>
+        </div>
+        {event.materials.length === 0 ? (
+          <div className="text-center py-3" style={{ color: C_MUTED, fontSize: '0.9rem' }}>
+            {tm('noMaterials')}
+          </div>
+        ) : (
+          <div className="d-flex flex-column gap-2">
+            {event.materials.map((m) => (
+              <div key={m.id} className="d-flex justify-content-between align-items-start p-3"
+                   style={{ border: '1px solid #e8e8e8', borderRadius: 6 }}>
+                <div style={{ minWidth: 0 }}>
+                  <a href={m.url} target="_blank" rel="noopener noreferrer"
+                     className="fw-semibold text-decoration-none d-inline-flex align-items-center gap-1"
+                     style={{ color: C_PRIMARY }}>
+                    <Svg name="external" size={12} /> {m.title}
+                  </a>
+                  {m.description && (
+                    <div style={CAPTION}>{m.description}</div>
+                  )}
+                  <div style={{ ...CAPTION, fontSize: '0.78rem' }}>
+                    {tm('addedBy', { name: m.addedBy })} ·{' '}
+                    {format.dateTime(new Date(m.createdAt), {
+                      day: 'numeric', month: 'short',
+                      hour: '2-digit', minute: '2-digit',
+                    })}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+          <H>{td('questionnaires')}</H>
+          <Link href={`/admin/events/${event.id}/questionnaires`}
+                className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+            <Svg name="pencil" size={12} /> {td('manageQuestionnaires')}
+          </Link>
+        </div>
+        <div style={{ fontSize: '0.88rem', color: C_MUTED }}>
+          {td('questionnaireCount', { count: event.questionnaireCount })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function AuditTab({ event, status }: { event: EventData; status: string }) {
+  const td = useTranslations('admin.eventDetail');
+  const t = useTranslations('admin');
+  const format = useFormatter();
+
+  // Small helper for the action-badge color mapping.
+  const actionColor = (action: string) => {
+    if (action === 'DATA_DELETED') return { bg: '#FFF3CD', fg: '#856404' };
+    if (action === 'DATA_EXPORTED') return { bg: '#D1ECF1', fg: '#0C5460' };
+    return { bg: '#D4EDDA', fg: '#155724' };
+  };
+
+  return (
+    <>
+      <div className="mb-4">
+        <H>{td('recordingSection')}</H>
+        <RecordingManagement
+          event={{
+            id: event.id, slug: event.slug, status,
+            recordingEnabled: event.recordingEnabled,
+            recordingUrl: event.recordingUrl,
+            tempRecordingUrl: event.tempRecordingUrl,
+            tempRecordingStartedAt: event.tempRecordingStartedAt,
+            recordingPublished: event.recordingPublished,
+            recordingPublishedAt: event.recordingPublishedAt,
+            recordingFileSize: event.recordingFileSize,
+            recordingDuration: event.recordingDuration,
+            recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+            moderatorToken: event.moderatorToken,
+          }}
+        />
+      </div>
+
+      <div className="mb-4">
+        <H>{td('callSessions')}</H>
+        <CallSessionsPanel eventId={event.id} eventSlug={event.slug}
+                           moderatorToken={event.moderatorToken} />
+      </div>
+
+      {event.gdprAuditLogs.length > 0 && (
+        <div>
+          <H>{t('gdprAuditLog.title')}</H>
+          <div style={{ ...CAPTION, marginBottom: 8 }}>{t('gdprAuditLog.subtitle')}</div>
+          <div className="table-responsive">
+            <table className="table table-hover align-middle" style={{ fontSize: '0.85rem' }}>
+              <thead>
+                <tr>
+                  <th>{t('gdprAuditLog.date')}</th>
+                  <th>{t('gdprAuditLog.action')}</th>
+                  <th>{t('gdprAuditLog.recordCount')}</th>
+                  <th>{t('gdprAuditLog.details')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {event.gdprAuditLogs.map((log) => {
+                  const c = actionColor(log.action);
+                  return (
                     <tr key={log.id}>
                       <td>{format.dateTime(new Date(log.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
                       <td>
-                        <Badge
-                          color=""
-                          pill
-                          style={{
-                            fontSize: '0.72rem',
-                            backgroundColor: log.action === 'DATA_DELETED' ? '#FFF3CD' : log.action === 'DATA_EXPORTED' ? '#D1ECF1' : '#D4EDDA',
-                            color: log.action === 'DATA_DELETED' ? '#856404' : log.action === 'DATA_EXPORTED' ? '#0C5460' : '#155724',
-                          }}
-                        >
+                        <span className="px-2 py-1 rounded-pill"
+                              style={{ fontSize: '0.72rem', fontWeight: 600,
+                                       background: c.bg, color: c.fg }}>
                           {t(`gdprAuditLog.actions.${log.action}`)}
-                        </Badge>
+                        </span>
                       </td>
                       <td>{log.recordCount}</td>
                       <td style={{ maxWidth: 200 }} className="text-truncate">
                         {log.details ? JSON.stringify(JSON.parse(log.details)) : '—'}
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </CollapsibleSection>
-          )}
-        </Col>
-
-        {/* ═══ Right Column ═══ */}
-        <Col lg={4}>
-          {/* ── Links Card ── */}
-          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-            <CardBody className="p-4">
-              <SectionTitle>{t('links.title')}</SectionTitle>
-
-              <LinkBlock
-                label={t('links.publicPage')}
-                hint={t('links.publicPageHint')}
-                url={publicUrl}
-              />
-
-              {(status === 'PUBLISHED' || status === 'LIVE') && (
-                <LinkBlock
-                  label={t('links.guestJoin')}
-                  hint={t('links.guestJoinHint')}
-                  tone="info"
-                  url={guestJoinUrl}
-                  topBorder
-                />
-              )}
-
-              <LinkBlock
-                label={t('links.moderatorLink')}
-                hint={t('links.moderatorLinkHint')}
-                tone="warning"
-                url={moderatorUrl}
-                topBorder
-              />
-
-              {(status === 'PUBLISHED' || status === 'LIVE') && (
-                <LinkBlock
-                  label={t('liveRoomLink')}
-                  hint={t('links.liveRoomHint')}
-                  url={`${baseUrl}${liveModeratorUrl}`}
-                  topBorder
-                />
-              )}
-            </CardBody>
-          </Card>
-
-          {/* ── Quick Actions Card ── */}
-          <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-            <CardBody className="p-4">
-              <SectionTitle>{t('quickActions')}</SectionTitle>
-              <div className="d-grid gap-2">
-                <a
-                  href={publicUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
-                >
-                  <Icon icon="it-external-link" size="sm" />
-                  {t('openPublicPage')}
-                </a>
-
-                {(status === 'PUBLISHED' || status === 'LIVE') && (
-                  <Link href={liveModeratorUrl}>
-                    <Button
-                      color="primary"
-                      outline
-                      className="w-100 d-flex align-items-center justify-content-center gap-2"
-                      tag="span"
-                    >
-                      <Icon icon="it-video" size="sm" />
-                      {t('joinAsModeratorBtn')}
-                    </Button>
-                  </Link>
-                )}
-
-                {status === 'PUBLISHED' && (
-                  <Button
-                    color="success"
-                    className="d-flex align-items-center justify-content-center gap-2"
-                    onClick={startEvent}
-                    disabled={updating}
-                  >
-                    <Icon icon="it-video" size="sm" color="white" />
-                    {t('startEvent')}
-                  </Button>
-                )}
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </>
   );
 }
 
-interface FeedbackEntry {
-  id: string;
-  rating: number;
-  comment: string | null;
-  createdAt: string;
-}
-
-interface FeedbackData {
-  averageRating: number;
-  totalCount: number;
-  distribution: number[];
-  feedback: FeedbackEntry[];
-}
-
-function EventFeedbackAdmin({
-  slug,
-  token,
-}: {
-  slug: string;
-  token: string;
-}) {
-  const t = useTranslations('admin.feedbackAdmin');
-  const [data, setData] = useState<FeedbackData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch(`/api/events/${slug}/feedback?token=${token}`)
-      .then((r) => r.ok ? r.json() : null)
-      .then((json) => setData(json))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [slug, token]);
-
-  if (loading) return null;
-  if (!data || data.totalCount === 0) {
-    return (
-      <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-        <CardBody className="p-4">
-          <SectionTitle>{t('title')}</SectionTitle>
-          <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>{t('noFeedback')}</p>
-        </CardBody>
-      </Card>
-    );
-  }
-
-  const maxCount = Math.max(...data.distribution, 1);
-
+// ── Reusable bits ──
+function H({ children }: { children: ReactNode }) {
   return (
-    <Card className="shadow-sm border-0 mb-4" style={CARD_STYLE}>
-      <CardBody className="p-4">
-        <div className="d-flex justify-content-between align-items-start mb-4">
-          <SectionTitle>{t('title')}</SectionTitle>
-          <div className="text-end">
-            <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#17324D', lineHeight: 1 }}>
-              {data.averageRating.toFixed(1)}
-              <span className="text-warning ms-1">★</span>
-            </div>
-            <div className="text-muted" style={{ fontSize: '0.82rem' }}>
-              {t('totalVotes', { count: data.totalCount })}
-            </div>
-          </div>
-        </div>
-
-        {/* Star distribution bars */}
-        <div className="mb-4">
-          {[5, 4, 3, 2, 1].map((star) => {
-            const count = data.distribution[star - 1] ?? 0;
-            const pct = Math.round((count / maxCount) * 100);
-            return (
-              <div key={star} className="d-flex align-items-center gap-2 mb-1" style={{ fontSize: '0.82rem' }}>
-                <span className="text-muted flex-shrink-0" style={{ width: 24, textAlign: 'right' }}>{star}★</span>
-                <div className="flex-grow-1 bg-light rounded" style={{ height: 8 }}>
-                  <div
-                    className="rounded"
-                    style={{
-                      width: `${pct}%`,
-                      height: '100%',
-                      backgroundColor: star >= 4 ? '#008758' : star === 3 ? '#A66300' : '#CC334D',
-                      minWidth: count > 0 ? 4 : 0,
-                    }}
-                  />
-                </div>
-                <span className="text-muted flex-shrink-0" style={{ width: 20 }}>{count}</span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Comments */}
-        {data.feedback.some((f) => f.comment) && (
-          <>
-            <div className="fw-semibold mb-2" style={{ fontSize: '0.88rem', color: '#17324D' }}>
-              {t('comments')}
-            </div>
-            <div className="d-flex flex-column gap-2">
-              {data.feedback
-                .filter((f) => f.comment)
-                .map((f) => (
-                  <div
-                    key={f.id}
-                    className="p-3 rounded"
-                    style={{ backgroundColor: '#F5F7FB', fontSize: '0.88rem' }}
-                  >
-                    <div className="d-flex justify-content-between align-items-center mb-1">
-                      <span className="text-warning">{'★'.repeat(f.rating)}{'☆'.repeat(5 - f.rating)}</span>
-                    </div>
-                    <p className="mb-0" style={{ color: '#17324D' }}>{f.comment}</p>
-                  </div>
-                ))}
-            </div>
-          </>
-        )}
-      </CardBody>
-    </Card>
+    <h2 className="fw-semibold mb-3" style={{ color: C_INK, fontSize: '1rem' }}>
+      {children}
+    </h2>
   );
 }
 
-function DetailRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: React.ReactNode;
-}) {
+function KV({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div
-      className="py-3"
-      style={{ borderBottom: '1px solid #f0f0f0' }}
-    >
-      <dt
-        className="text-secondary text-uppercase mb-1"
-        style={{ fontSize: '0.75rem', letterSpacing: '0.04em', fontWeight: 600 }}
-      >
-        {label}
-      </dt>
-      <dd className="mb-0" style={{ color: '#17324D' }}>
-        {value}
-      </dd>
+    <div className="py-3" style={{ borderBottom: '1px solid #f0f0f0' }}>
+      <dt className="mb-1" style={EYEBROW}>{label}</dt>
+      <dd className="mb-0" style={{ color: C_INK, fontSize: '0.9rem' }}>{value}</dd>
     </div>
   );
 }
 
-function ToggleRow({
-  label,
-  description,
-  checked,
-  onChange,
-  disabled,
-  saved,
-  savedLabel,
-  hasBorder,
-  isLast,
-}: {
-  label: string;
-  description: string;
-  checked: boolean;
-  onChange: () => void;
-  disabled: boolean;
-  saved: boolean;
-  savedLabel: string;
-  hasBorder?: boolean;
-  isLast?: boolean;
-}) {
+// Minimal copy-to-clipboard button with a caller-supplied label.
+// We don't reuse the shared <CopyButton> because it hardcodes its
+// own label from `admin.links` — the hero needs two buttons side by
+// side with distinct labels ("public URL" vs "moderator URL").
+function CopyBtn({ text, label }: { text: string; label: string }) {
+  const tl = useTranslations('admin.links');
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [text]);
+
   return (
-    <div
-      className={`d-flex justify-content-between align-items-start py-3${isLast ? '' : ''}`}
-      style={hasBorder ? { borderTop: '1px solid #f0f0f0' } : undefined}
-    >
-      <div className="me-3">
-        <div className="fw-semibold" style={{ color: '#17324D' }}>
-          {label}
-        </div>
-        <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-          {description}
-        </div>
-      </div>
-      <div className="d-flex align-items-center gap-2 flex-shrink-0">
-        {saved && (
-          <span className="text-success" style={{ fontSize: '0.8rem' }}>
-            <Icon icon="it-check" size="sm" className="me-1" />
-            {savedLabel}
-          </span>
-        )}
-        <ToggleSwitch
-          label=""
-          checked={checked}
-          onChange={onChange}
-          disabled={disabled}
-        />
-      </div>
-    </div>
+    <button type="button" onClick={handleCopy}
+            aria-label={label}
+            className="btn btn-outline-primary btn-sm d-inline-flex align-items-center justify-content-center gap-2"
+            style={{ fontSize: '0.85rem' }}>
+      <Svg name={copied ? 'check' : 'link'} size={14} />
+      {copied ? tl('copied') : label}
+    </button>
   );
 }
