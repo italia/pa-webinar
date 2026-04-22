@@ -65,7 +65,10 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
   const event = await prisma.event.findUnique({
     where: { slug },
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      _count: { select: { registrations: true } },
+      tagLinks: { include: { tag: true } },
+    },
   });
 
   if (!event || !['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
@@ -238,6 +241,11 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         materials={eventMaterials}
         polls={pollsData}
         feedbackSummary={feedbackSummary}
+        tags={event.tagLinks.map((l) => ({
+          slug: l.tag.slug,
+          name: (l.tag.name ?? {}) as Record<string, string>,
+          color: l.tag.color,
+        }))}
       />
     </>
   );
