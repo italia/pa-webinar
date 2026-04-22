@@ -110,6 +110,17 @@ describe('Jitsi config overwrite', () => {
     expect(jitsiConfigOverwrite.disableReactions).toBe(true);
   });
 
+  it('disables kick by default (participants must not see the kick button)', () => {
+    // JitsiRoom flips this to false in configOverwrite when role === 'moderator'
+    // so the participants-pane "rimuovi utente" action fires. Participants keep
+    // the safe default so they never see a non-functional kick option.
+    expect(jitsiConfigOverwrite.remoteVideoMenu.disableKick).toBe(true);
+  });
+
+  it('disables grant-moderator via UI (grant is driven by JWT only)', () => {
+    expect(jitsiConfigOverwrite.remoteVideoMenu.disableGrantModerator).toBe(true);
+  });
+
   it('does NOT include customTheme (server-side only)', () => {
     expect('customTheme' in jitsiConfigOverwrite).toBe(false);
   });

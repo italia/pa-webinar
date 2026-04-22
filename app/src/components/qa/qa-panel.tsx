@@ -57,11 +57,43 @@ export default function QAPanel({
 
         <div className="p-3 flex-grow-1" style={{ overflowY: 'auto' }}>
           {!isModerator && (
-            <QuestionForm
-              eventSlug={eventSlug}
-              token={token}
-              onSubmitted={handleSubmitted}
-            />
+            <>
+              {/* First-time-user CTA. Kept visible even after the first
+                  question is sent so new arrivals still see the prompt. */}
+              <div
+                className="mb-3 p-3 rounded d-flex gap-2 align-items-start"
+                style={{
+                  backgroundColor: '#EAF4FF',
+                  border: '1px solid #CCE0F5',
+                }}
+                role="note"
+              >
+                <div aria-hidden="true" style={{ flexShrink: 0 }}>
+                  <Icon icon="it-comment" size="lg" color="primary" />
+                </div>
+                <div>
+                  <h6 className="mb-1">{t('ctaTitle')}</h6>
+                  <p className="mb-0 small text-secondary">
+                    {t('ctaBody')}
+                  </p>
+                </div>
+              </div>
+
+              <QuestionForm
+                eventSlug={eventSlug}
+                token={token}
+                onSubmitted={handleSubmitted}
+              />
+            </>
+          )}
+
+          {isModerator && (
+            <div
+              className="mb-3 p-2 rounded small text-muted"
+              style={{ backgroundColor: '#F5F5F5' }}
+            >
+              {t('moderatorHint')}
+            </div>
           )}
 
           <QuestionList

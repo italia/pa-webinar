@@ -297,7 +297,8 @@
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# persona} other {# persone}}"
-    }
+    },
+    "sidebarTabChatUnread": "Nuovi messaggi non letti"
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -333,7 +334,13 @@
       "tooLong": "La domanda non può superare i 500 caratteri",
       "rateLimit": "Attendi prima di inviare un'altra domanda",
       "generic": "Errore nell'invio della domanda"
-    }
+    },
+    "ctaTitle": "Fai la prima domanda",
+    "ctaBody": "Gli altri partecipanti potranno votare la tua domanda. I moderatori la vedranno e potranno dare risposta in voce o in scritto.",
+    "moderatorHint": "I partecipanti possono fare domande dal loro pannello. Le vedrai qui in tempo reale.",
+    "yourQuestionLabel": "La tua domanda",
+    "placeholderInviting": "Es: Puoi spiegare meglio…",
+    "submitPrimary": "Invia domanda"
   },
   "polls": {
     "title": "Sondaggi",
@@ -1848,7 +1855,8 @@
         "tags": "Tag",
         "postEventSummary": "{connected} connessi su {registered} registrazioni (stimate {estimated})",
         "estimatedAttendance": "Stimati: {estimated} partecipanti"
-      }
+      },
+      "copyGuestUrl": "Copia link per ospiti"
     }
   },
   "email": {
@@ -2512,7 +2520,11 @@
     "endedWatchRecording": "Guarda la registrazione",
     "endedLeaveFeedback": "Lascia un feedback",
     "moderatedBy": "Moderato da {name}",
-    "startEventError": "Errore nell'avvio dell'evento. Riprova."
+    "startEventError": "Errore nell'avvio dell'evento. Riprova.",
+    "emailLabel": "Email (facoltativa)",
+    "emailHelp": "Solo per eventuale follow-up post-evento",
+    "emailInvalid": "Inserisci un indirizzo email valido",
+    "chatLockedMessage": "Inserisci il tuo nome per partecipare alla chat dell'evento."
   },
   "recording": {
     "management": "Registrazione video",
@@ -2598,6 +2610,11 @@
     "permissionNeeded": "Autorizza mic e webcam per testarli. Potrai comunque entrare senza.",
     "noVideo": "Nessun video",
     "noAudio": "Microfono non disponibile",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "cameraToggleOn": "Fotocamera ON",
+    "cameraToggleOff": "Fotocamera OFF",
+    "micToggleOn": "Microfono ON",
+    "micToggleOff": "Microfono OFF",
+    "cameraOffPreview": "Fotocamera spenta"
   }
 }

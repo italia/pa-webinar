@@ -67,6 +67,13 @@ interface WaitingRoomEvent {
   timezone?: string;
 }
 
+export interface WaitingRoomJoinPrefs {
+  /** Whether the user wants their camera on when they land in Jitsi. */
+  cameraOn: boolean;
+  /** Whether the user wants their microphone on when they land in Jitsi. */
+  micOn: boolean;
+}
+
 interface WaitingRoomProps {
   event: WaitingRoomEvent;
   participantCount: number;
@@ -75,11 +82,17 @@ interface WaitingRoomProps {
   defaultName: string;
   /** Called when the user confirms "Entra ora" / "Guarda registrazione".
    *  The name the user typed is passed through so the parent can forward
-   *  it to the JWT fetch (displayNameOverride / guestName). */
-  onEnterLive: (chosenName: string) => void;
+   *  it to the JWT fetch (displayNameOverride / guestName). The pre-join
+   *  camera/mic preference (see DeviceCheck) travels alongside so the
+   *  shell can wire it into `startWithVideoMuted`/`startWithAudioMuted`. */
+  onEnterLive: (chosenName: string, prefs: WaitingRoomJoinPrefs) => void;
   onStartEvent?: () => Promise<void>;
   onLeaveFeedback?: () => void;
 }
+
+const PARTICIPANT_NAME_KEY = 'eventidtd.participant.name';
+const PARTICIPANT_EMAIL_KEY = 'eventidtd.participant.email';
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function WaitingRoom({
   event,
@@ -100,8 +113,33 @@ export default function WaitingRoom({
   const [watchingCatchUp, setWatchingCatchUp] = useState(false);
   const [pulseCountdown, setPulseCountdown] = useState(false);
   const [name, setName] = useState(defaultName);
+  const [email, setEmail] = useState('');
+  const [devicePrefs, setDevicePrefs] = useState<WaitingRoomJoinPrefs>({
+    cameraOn: true,
+    micOn: true,
+  });
   const [startError, setStartError] = useState('');
   const [nowMs, setNowMs] = useState(() => Date.now());
+
+  // Rehydrate name + email from localStorage on mount. Name is merged
+  // with the server-provided default (registration displayName / grant
+  // name) so anonymous guests get their last-typed name back while
+  // registered participants still see the accurate greeting.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const storedName = window.localStorage.getItem(PARTICIPANT_NAME_KEY);
+      if (storedName && !defaultName) {
+        setName(storedName);
+      }
+      const storedEmail = window.localStorage.getItem(PARTICIPANT_EMAIL_KEY);
+      if (storedEmail) {
+        setEmail(storedEmail);
+      }
+    } catch {
+      /* private mode / blocked storage → fall back to defaults */
+    }
+  }, [defaultName]);
 
   const startsAtMs = new Date(event.startsAt).getTime();
   const isLive = event.status === 'LIVE';
@@ -119,6 +157,9 @@ export default function WaitingRoom({
   const canEnterLive = isLive;
   const trimmedName = name.trim();
   const nameValid = trimmedName.length >= 2;
+  const trimmedEmail = email.trim();
+  const emailValid = trimmedEmail.length === 0 || EMAIL_RE.test(trimmedEmail);
+  const canEnter = nameValid && emailValid;
 
   // Countdown tick: only needed while PUBLISHED. Live / ended do not use it.
   useEffect(() => {
@@ -166,9 +207,28 @@ export default function WaitingRoom({
   }, [onStartEvent, t]);
 
   const handleEnterLive = useCallback(() => {
-    if (!nameValid) return;
-    onEnterLive(trimmedName);
-  }, [nameValid, onEnterLive, trimmedName]);
+    if (!canEnter) return;
+    // Persist the last-used identity so guests don't have to retype on
+    // reconnects / accidental reloads.
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(PARTICIPANT_NAME_KEY, trimmedName);
+        if (trimmedEmail) {
+          window.localStorage.setItem(PARTICIPANT_EMAIL_KEY, trimmedEmail);
+        } else {
+          window.localStorage.removeItem(PARTICIPANT_EMAIL_KEY);
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    onEnterLive(trimmedName, devicePrefs);
+  }, [canEnter, onEnterLive, trimmedName, trimmedEmail, devicePrefs]);
+
+  const handleDeviceStateChange = useCallback(
+    (s: WaitingRoomJoinPrefs) => setDevicePrefs(s),
+    [],
+  );
 
   // ── Catch-up recording player ─────────────────────────────────────
   if (watchingCatchUp && event.tempRecordingUrl) {
@@ -371,11 +431,38 @@ export default function WaitingRoom({
                 </FormGroup>
               )}
 
+              {/* Optional email — we don't use it server-side (the chat
+                  API doesn't take it) but capturing it here enables
+                  post-event follow-up (feedback, recording notifications)
+                  for guests who didn't go through the registration flow. */}
+              {!isEnded && (
+                <FormGroup className="mb-3">
+                  <Input
+                    id="waiting-email"
+                    label={t('emailLabel')}
+                    type="email"
+                    value={email}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                    maxLength={200}
+                    aria-invalid={!emailValid}
+                    autoComplete="email"
+                  />
+                  <small className="text-muted" style={{ fontSize: '0.8rem' }}>
+                    {t('emailHelp')}
+                  </small>
+                  {!emailValid && (
+                    <div className="small text-danger mt-1" style={{ fontSize: '0.8rem' }}>
+                      {t('emailInvalid')}
+                    </div>
+                  )}
+                </FormGroup>
+              )}
+
               {/* Device check — mic + camera preview before entering. Only
                   shown when the user is about to join live (not on ENDED). */}
               {!isEnded && (
                 <div className="mb-3">
-                  <DeviceCheck compact />
+                  <DeviceCheck compact onStateChange={handleDeviceStateChange} />
                 </div>
               )}
 
@@ -457,7 +544,7 @@ export default function WaitingRoom({
                       size="lg"
                       className="fw-semibold"
                       onClick={handleEnterLive}
-                      disabled={!nameValid}
+                      disabled={!canEnter}
                     >
                       <Icon icon="it-video" size="sm" color="white" className="me-2" />
                       {t('joinNowBtn')}
@@ -518,9 +605,17 @@ export default function WaitingRoom({
                 </Alert>
               )}
 
-              {/* Chat preview (LIVE only) */}
+              {/* Chat preview (LIVE only). Gated behind a valid name —
+                  without this, every anonymous arrival posted as
+                  "Ospite" and the chat degenerated into a crowd of
+                  nameless messages. Moderators/registered participants
+                  already have `nameValid` satisfied from the server-
+                  provided defaultName, so they never see the gate. */}
               {showChatPreview && (
-                <div className="waiting-chat-preview rounded-3 overflow-hidden mb-3" style={{ border: '1px solid #E2E8F0' }}>
+                <div
+                  className="waiting-chat-preview rounded-3 overflow-hidden mb-3"
+                  style={{ border: '1px solid #E2E8F0' }}
+                >
                   <div className="px-3 py-2" style={{ backgroundColor: '#F5F7FA' }}>
                     <div className="fw-semibold" style={{ color: '#17324D', fontSize: '0.85rem' }}>
                       <Icon icon="it-comment" size="xs" className="me-1" />
@@ -530,14 +625,24 @@ export default function WaitingRoom({
                       {t('chatPreviewHint')}
                     </div>
                   </div>
-                  <div style={{ height: 220, display: 'flex', flexDirection: 'column' }}>
-                    <ChatPanel
-                      eventSlug={event.slug}
-                      token=""
-                      displayName={trimmedName || defaultName || 'Ospite'}
-                      isGuest
-                    />
-                  </div>
+                  {nameValid ? (
+                    <div style={{ height: 220, display: 'flex', flexDirection: 'column' }}>
+                      <ChatPanel
+                        eventSlug={event.slug}
+                        token=""
+                        displayName={trimmedName}
+                        isGuest
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="d-flex flex-column align-items-center justify-content-center text-center p-4"
+                      style={{ height: 220, backgroundColor: '#F5F7FA', color: '#5A768A' }}
+                    >
+                      <Icon icon="it-lock" size="sm" className="mb-2" />
+                      <div style={{ fontSize: '0.85rem' }}>{t('chatLockedMessage')}</div>
+                    </div>
+                  )}
                 </div>
               )}
 

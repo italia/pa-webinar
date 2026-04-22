@@ -297,7 +297,8 @@
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# person} other {# people}}"
-    }
+    },
+    "sidebarTabChatUnread": "New unread messages"
   },
   "qa": {
     "title": "Questions & Answers",
@@ -333,7 +334,13 @@
       "tooLong": "Question cannot exceed 500 characters",
       "rateLimit": "Please wait before submitting another question",
       "generic": "Error submitting question"
-    }
+    },
+    "ctaTitle": "Ask the first question",
+    "ctaBody": "Other attendees can upvote your question. Moderators will see it and can answer live or in writing.",
+    "moderatorHint": "Attendees can submit questions from their own panel. They appear here in real time.",
+    "yourQuestionLabel": "Your question",
+    "placeholderInviting": "E.g. Could you explain…",
+    "submitPrimary": "Send question"
   },
   "admin": {
     "fileOrUrl": {
@@ -1778,7 +1785,8 @@
         "tags": "Tags",
         "postEventSummary": "{connected} joined of {registered} registrations (estimated {estimated})",
         "estimatedAttendance": "Estimated: {estimated} attendees"
-      }
+      },
+      "copyGuestUrl": "Copy guest link"
     }
   },
   "email": {
@@ -2512,7 +2520,11 @@
     "endedWatchRecording": "Watch the recording",
     "endedLeaveFeedback": "Leave feedback",
     "moderatedBy": "Moderated by {name}",
-    "startEventError": "Error starting the event. Please try again."
+    "startEventError": "Error starting the event. Please try again.",
+    "emailLabel": "Email (optional)",
+    "emailHelp": "Only for post-event follow-up",
+    "emailInvalid": "Please enter a valid email address",
+    "chatLockedMessage": "Enter your name to join the event chat."
   },
   "recording": {
     "management": "Video recording",
@@ -2598,6 +2610,11 @@
     "permissionNeeded": "Allow camera and microphone to test them. You can also join without.",
     "noVideo": "No video",
     "noAudio": "Microphone unavailable",
-    "retry": "Retry"
+    "retry": "Retry",
+    "cameraToggleOn": "Camera ON",
+    "cameraToggleOff": "Camera OFF",
+    "micToggleOn": "Microphone ON",
+    "micToggleOff": "Microphone OFF",
+    "cameraOffPreview": "Camera off"
   }
 }

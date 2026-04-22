@@ -6,17 +6,47 @@ import { Alert, Button } from 'design-react-kit';
 
 type PermissionState = 'idle' | 'requesting' | 'granted' | 'denied';
 
+const CAMERA_PREF_KEY = 'eventidtd.deviceCheck.cameraOn';
+const MIC_PREF_KEY = 'eventidtd.deviceCheck.micOn';
+
+function readBoolPref(key: string, fallback: boolean): boolean {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (raw === null) return fallback;
+    return raw === '1';
+  } catch {
+    return fallback;
+  }
+}
+
+function writeBoolPref(key: string, value: boolean): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(key, value ? '1' : '0');
+  } catch {
+    /* ignore */
+  }
+}
+
 interface DeviceCheckProps {
   /** Called whenever readiness changes. True once mic+camera permission
    *  is granted AND both a video and an audio device are selected. */
   onReady?: (ok: boolean) => void;
+  /** Called whenever the user toggles camera/mic in the pre-join UI.
+   *  Parent wires this into `startWithVideoMuted`/`startWithAudioMuted`
+   *  so the choice actually takes effect when the user joins Jitsi. */
+  onStateChange?: (s: { cameraOn: boolean; micOn: boolean }) => void;
   /** true = vertical stacked layout (for narrow containers / mobile).
    *  false = horizontal with a 240x135 preview on the left. */
   compact?: boolean;
 }
 
-export default function DeviceCheck({ onReady, compact = false }: DeviceCheckProps) {
+export default function DeviceCheck({ onReady, onStateChange, compact = false }: DeviceCheckProps) {
   const t = useTranslations('deviceCheck');
+
+  const [cameraOn, setCameraOn] = useState<boolean>(() => readBoolPref(CAMERA_PREF_KEY, true));
+  const [micOn, setMicOn] = useState<boolean>(() => readBoolPref(MIC_PREF_KEY, true));
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -155,6 +185,45 @@ export default function DeviceCheck({ onReady, compact = false }: DeviceCheckPro
     onReady?.(ok);
   }, [permissionState, selectedVideoId, selectedAudioId, onReady]);
 
+  // Propagate the camera/mic on-off choice so the caller can forward it
+  // as `startWithVideoMuted`/`startWithAudioMuted` when the user joins.
+  useEffect(() => {
+    onStateChange?.({ cameraOn, micOn });
+  }, [cameraOn, micOn, onStateChange]);
+
+  // Apply the camera toggle to the live preview by enabling/disabling
+  // the video track. Keeping the stream alive means flipping the switch
+  // is instant — no extra `getUserMedia` round-trip.
+  useEffect(() => {
+    const stream = streamRef.current;
+    if (!stream) return;
+    for (const track of stream.getVideoTracks()) {
+      track.enabled = cameraOn;
+    }
+  }, [cameraOn, permissionState, selectedVideoId]);
+
+  // Same for the mic: disabling the audio track keeps the VU meter flat
+  // without tearing the stream down.
+  useEffect(() => {
+    const stream = streamRef.current;
+    if (!stream) return;
+    for (const track of stream.getAudioTracks()) {
+      track.enabled = micOn;
+    }
+  }, [micOn, permissionState, selectedAudioId]);
+
+  const handleCameraToggle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const next = e.target.checked;
+    setCameraOn(next);
+    writeBoolPref(CAMERA_PREF_KEY, next);
+  }, []);
+
+  const handleMicToggle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const next = e.target.checked;
+    setMicOn(next);
+    writeBoolPref(MIC_PREF_KEY, next);
+  }, []);
+
   const handleVideoChange = useCallback(async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value;
     setSelectedVideoId(id);
@@ -185,7 +254,13 @@ export default function DeviceCheck({ onReady, compact = false }: DeviceCheckPro
         playsInline
         muted
         aria-label={t('preview')}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', background: '#000' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          background: '#000',
+          display: cameraOn ? 'block' : 'none',
+        }}
       />
       {permissionState !== 'granted' && (
         <div
@@ -195,6 +270,47 @@ export default function DeviceCheck({ onReady, compact = false }: DeviceCheckPro
           {t('noVideo')}
         </div>
       )}
+      {permissionState === 'granted' && !cameraOn && (
+        <div
+          className="position-absolute top-50 start-50 translate-middle text-white-50 small text-center px-2"
+          aria-live="polite"
+        >
+          {t('cameraOffPreview')}
+        </div>
+      )}
+    </div>
+  );
+
+  const toggles = (
+    <div className="d-flex flex-wrap gap-3 mb-3">
+      <div className="form-check form-switch mb-0">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="device-check-camera-toggle"
+          checked={cameraOn}
+          onChange={handleCameraToggle}
+          disabled={permissionState !== 'granted'}
+        />
+        <label className="form-check-label small" htmlFor="device-check-camera-toggle">
+          {cameraOn ? t('cameraToggleOn') : t('cameraToggleOff')}
+        </label>
+      </div>
+      <div className="form-check form-switch mb-0">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="device-check-mic-toggle"
+          checked={micOn}
+          onChange={handleMicToggle}
+          disabled={permissionState !== 'granted'}
+        />
+        <label className="form-check-label small" htmlFor="device-check-mic-toggle">
+          {micOn ? t('micToggleOn') : t('micToggleOff')}
+        </label>
+      </div>
     </div>
   );
 
@@ -282,6 +398,8 @@ export default function DeviceCheck({ onReady, compact = false }: DeviceCheckPro
           </div>
         </Alert>
       )}
+
+      {toggles}
 
       <div className={compact ? 'd-flex flex-column gap-2' : 'd-flex flex-column flex-md-row gap-3'}>
         {previewBox}
