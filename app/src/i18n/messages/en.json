@@ -340,6 +340,12 @@
       "helpAudio": "Supported formats: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
     },
+    "rubricaPicker": {
+      "loading": "Searching…",
+      "noResults": "No results",
+      "addSelected": "Add selected",
+      "selectedCount": "{count, plural, =0 {No people selected} one {1 person selected} other {# people selected}}"
+    },
     "wizard": {
       "steps": {
         "base": "Basics",
@@ -350,6 +356,7 @@
       },
       "saveDraft": "Save as draft",
       "publish": "Publish event",
+      "updateEvent": "Update event",
       "step1": {
         "heading": "Basic information",
         "intro": "Title, description, cover image and schedule.",
@@ -362,7 +369,16 @@
         "waitingRoomAudio": "Waiting-room audio (optional)",
         "waitingRoomAudioHelp": "Played before the live call starts.",
         "parseTitleKickerLabel": "Use kicker in title (| separator)",
-        "parseTitleKickerHelp": "When on, a title like 'CONFERENCE | Digital innovation' renders CONFERENCE as a small kicker line above the main title."
+        "parseTitleKickerHelp": "When on, a title like 'CONFERENCE | Digital innovation' renders CONFERENCE as a small kicker line above the main title.",
+        "maxParticipantsHelp": "Estimate the maximum number of participants. Drives video server capacity and waiting-room UI.",
+        "validation": {
+          "startsAt": "Invalid start date.",
+          "endsAt": "End date must be after start date."
+        },
+        "senderRatioLabel": "Estimated active share",
+        "senderRatioHelp": "How many participants you expect to have mic/camera active. Helps size the video server.",
+        "activeParticipantsEstimate": "≈ {count} active participants",
+        "senderRatioPreset": "{pct}%"
       },
       "step2": {
         "heading": "Who can do what",
@@ -374,12 +390,30 @@
           "MODERATOR": "Moderator"
         },
         "feature": {
-          "qa": { "label": "Q&A", "desc": "Submit questions to the Q&A panel." },
-          "chat": { "label": "Chat", "desc": "Post messages in the group chat." },
-          "mic": { "label": "Microphone", "desc": "Unmute their own microphone." },
-          "video": { "label": "Video", "desc": "Turn on their own camera." },
-          "share": { "label": "Screen share", "desc": "Share their screen." },
-          "recording_control": { "label": "Recording control", "desc": "Start/stop the recording." }
+          "qa": {
+            "label": "Q&A",
+            "desc": "Submit questions to the Q&A panel."
+          },
+          "chat": {
+            "label": "Chat",
+            "desc": "Post messages in the group chat."
+          },
+          "mic": {
+            "label": "Microphone",
+            "desc": "Unmute their own microphone."
+          },
+          "video": {
+            "label": "Video",
+            "desc": "Turn on their own camera."
+          },
+          "share": {
+            "label": "Screen share",
+            "desc": "Share their screen."
+          },
+          "recording_control": {
+            "label": "Recording control",
+            "desc": "Start/stop the recording."
+          }
         },
         "recordingHeading": "Recording"
       },
@@ -489,8 +523,12 @@
         "moderatorName": "Name",
         "moderatorEmail": "Email",
         "capacityHeading": "Estimated capacity",
-        "featuresHeading": "Configuration summary"
-      }
+        "featuresHeading": "Configuration summary",
+        "privacyDoc": "Privacy notice document (PDF or link)",
+        "privacyDocHelp": "Upload a PDF or paste the URL of an alternative privacy notice. Overrides the GDPR template when set.",
+        "privacyTextHelp": "Short text shown on the registration form; can complement or replace the GDPR template."
+      },
+      "validationFailed": "Please review the highlighted fields before continuing."
     },
     "nav": {
       "events": "Events",

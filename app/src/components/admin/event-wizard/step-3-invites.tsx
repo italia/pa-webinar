@@ -267,13 +267,21 @@ function ModeratorsSection({
     setDraft({ name: '', email: '', personId: null });
   };
 
-  const onPick = (p: RubricaPickedPerson) => {
-    setDraft((d) => ({
-      ...d,
-      name: p.displayName || d.name,
-      email: p.email ?? d.email,
-      personId: p.id,
-    }));
+  const onAddMany = (picks: RubricaPickedPerson[]) => {
+    const existing = new Set(value.map((m) => m.email));
+    const toAdd: ModeratorEntry[] = [];
+    for (const p of picks) {
+      const email = (p.email ?? '').trim().toLowerCase();
+      if (!email || !isEmail(email)) continue;
+      if (existing.has(email)) continue;
+      existing.add(email);
+      toAdd.push({
+        name: p.displayName || email,
+        email,
+        personId: p.id,
+      });
+    }
+    if (toAdd.length > 0) onChange([...value, ...toAdd]);
   };
 
   return (
@@ -309,7 +317,11 @@ function ModeratorsSection({
       )}
 
       <div className="mb-2">
-        <RubricaPicker onSelect={onPick} placeholder={t('rubricaPick')} />
+        <RubricaPicker
+          mode="multi"
+          onAddMany={onAddMany}
+          placeholder={t('rubricaPick')}
+        />
         <small className="text-muted">{t('rubricaOrAdd')}</small>
       </div>
 
@@ -393,13 +405,21 @@ function SpeakersSection({
     setDraft({ name: '', email: '', personId: null });
   };
 
-  const onPick = (p: RubricaPickedPerson) => {
-    setDraft((d) => ({
-      ...d,
-      name: p.displayName || d.name,
-      email: p.email ?? d.email,
-      personId: p.id,
-    }));
+  const onAddMany = (picks: RubricaPickedPerson[]) => {
+    const existing = new Set(value.map((s) => s.email));
+    const toAdd: SpeakerEntry[] = [];
+    for (const p of picks) {
+      const email = (p.email ?? '').trim().toLowerCase();
+      if (!email || !isEmail(email)) continue;
+      if (existing.has(email)) continue;
+      existing.add(email);
+      toAdd.push({
+        name: p.displayName || email,
+        email,
+        personId: p.id,
+      });
+    }
+    if (toAdd.length > 0) onChange([...value, ...toAdd]);
   };
 
   return (
@@ -435,7 +455,11 @@ function SpeakersSection({
       )}
 
       <div className="mb-2">
-        <RubricaPicker onSelect={onPick} placeholder={t('rubricaPick')} />
+        <RubricaPicker
+          mode="multi"
+          onAddMany={onAddMany}
+          placeholder={t('rubricaPick')}
+        />
         <small className="text-muted">{t('rubricaOrAdd')}</small>
       </div>
 
@@ -522,13 +546,22 @@ function InvitationsSection({
     setDraft({ name: '', email: '', role: 'GUEST', personId: null });
   };
 
-  const onPick = (p: RubricaPickedPerson) => {
-    setDraft((d) => ({
-      ...d,
-      name: p.displayName || d.name || '',
-      email: p.email ?? d.email,
-      personId: p.id,
-    }));
+  const onAddMany = (picks: RubricaPickedPerson[]) => {
+    const existing = new Set(value.map((v) => v.email));
+    const toAdd: InvitationEntry[] = [];
+    for (const p of picks) {
+      const email = (p.email ?? '').trim().toLowerCase();
+      if (!email || !isEmail(email)) continue;
+      if (existing.has(email)) continue;
+      existing.add(email);
+      toAdd.push({
+        name: p.displayName?.trim() || null,
+        email,
+        role: draft.role,
+        personId: p.id,
+      });
+    }
+    if (toAdd.length > 0) onChange([...value, ...toAdd]);
   };
 
   return (
@@ -575,7 +608,11 @@ function InvitationsSection({
       )}
 
       <div className="mb-2">
-        <RubricaPicker onSelect={onPick} placeholder={t('rubricaPick')} />
+        <RubricaPicker
+          mode="multi"
+          onAddMany={onAddMany}
+          placeholder={t('rubricaPick')}
+        />
         <small className="text-muted">{t('rubricaOrAdd')}</small>
       </div>
 

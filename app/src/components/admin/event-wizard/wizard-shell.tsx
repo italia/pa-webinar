@@ -21,7 +21,9 @@ import { useTranslations } from 'next-intl';
 
 import { useRouter } from '@/i18n/navigation';
 import {
+  coerceMatrix,
   defaultMatrix,
+  matrixFromToggles,
   togglesFromMatrix,
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
@@ -65,6 +67,89 @@ export interface WizardProps {
   /** Site-wide default for the title-kicker parse. Used to decide whether
    *  to surface the per-event override in step 1 (hidden when already on). */
   siteDefaultParseTitleKicker: boolean;
+  /** When `'edit'`, the wizard seeds state from `initialEvent`, PUTs to
+   *  /api/events/:id on submit, and redirects to the admin detail page.
+   *  When `'create'` (default), it POSTs to /api/events and falls into the
+   *  classic post-create redirect. */
+  mode?: 'create' | 'edit';
+  /** Required when `mode === 'edit'`. Fully-loaded event + related
+   *  entities so the wizard can diff on submit. */
+  initialEvent?: InitialEventShape;
+}
+
+/**
+ * Full edit-mode snapshot of the event and its related entities. This is
+ * what the server page collects and hands to the wizard so it can seed
+ * the form AND run diff-based fan-out on submit.
+ */
+export interface InitialEventShape {
+  id: string;
+  slug: string;
+  moderatorToken: string;
+  /** Raw event row (partial; only the fields the wizard needs). */
+  event: {
+    title: Record<string, string>;
+    description: Record<string, string>;
+    startsAt: string;
+    endsAt: string;
+    timezone: string;
+    maxParticipants: number;
+    coverImageUrl: string | null;
+    imageUrl: string | null;
+    waitingRoomAudioUrl: string | null;
+    tagSlugs: string[];
+    recurrenceRule: string | null;
+    parseTitleKicker: boolean | null;
+    expectedSenderRatioPct: number | null;
+    permissionMatrix: PermissionMatrix | null;
+    qaEnabled: boolean;
+    chatEnabled: boolean;
+    participantsCanUnmute: boolean;
+    participantsCanStartVideo: boolean;
+    participantsCanShareScreen: boolean;
+    recordingEnabled: boolean;
+    autoStartRecording: boolean;
+    dataRetentionDays: number;
+    gdprTemplateId: string | null;
+    privacyPolicyText: string | null;
+    privacyPolicyUrl: string | null;
+    moderatorName: string | null;
+    moderatorEmail: string | null;
+  };
+  /** Each organizer with its DB id so we can DELETE on removal. */
+  organizers: Array<{
+    id: string;
+    name: string;
+    organization: string;
+    logoUrl: string | null;
+    websiteUrl: string | null;
+  }>;
+  /** EventModerator rows (both MODERATOR and SPEAKER roles). Used to
+   *  populate both the moderators and speakers lists in step 3. */
+  eventModerators: Array<{
+    id: string;
+    name: string;
+    email: string | null;
+    role: 'MODERATOR' | 'SPEAKER';
+    personId: string | null;
+  }>;
+  invitations: Array<{
+    id: string;
+    name: string | null;
+    email: string;
+    role: 'GUEST' | 'SPEAKER';
+    personId: string | null;
+  }>;
+  materials: Array<{
+    id: string;
+    title: string;
+    url: string;
+    description: string | null;
+    type: 'file' | 'link';
+    visibility: 'BEFORE' | 'DURING' | 'AFTER' | 'ALWAYS';
+  }>;
+  preEventQuestionnaire: QuestionnaireBlock | null;
+  postEventQuestionnaire: QuestionnaireBlock | null;
 }
 
 export interface Step5ReviewFields {
@@ -90,11 +175,114 @@ export default function EventWizard(props: WizardProps) {
   const tc = useTranslations('common');
   const router = useRouter();
 
+  const mode: 'create' | 'edit' = props.mode ?? 'create';
+  const initialEvent = props.initialEvent;
+
   const defaultStart = new Date(Date.now() + 24 * 3600_000);
   const defaultEnd = new Date(defaultStart.getTime() + 2 * 3600_000);
 
-  // Initial form state seeded from template (when given) + sensible defaults.
+  // Initial form state seeded from template (when given) + sensible defaults,
+  // or — in edit mode — from `initialEvent`.
   const initial: WizardForm = useMemo(() => {
+    if (mode === 'edit' && initialEvent) {
+      const ev = initialEvent.event;
+      // Prefer the stored matrix; if absent (older events), project from
+      // the legacy booleans so step 2 reflects the effective state.
+      const matrix: PermissionMatrix =
+        (ev.permissionMatrix && coerceMatrix(ev.permissionMatrix)) ??
+        matrixFromToggles({
+          qaEnabled: ev.qaEnabled,
+          chatEnabled: ev.chatEnabled,
+          participantsCanUnmute: ev.participantsCanUnmute,
+          participantsCanStartVideo: ev.participantsCanStartVideo,
+          participantsCanShareScreen: ev.participantsCanShareScreen,
+        });
+
+      return {
+        // Step 1
+        title: { it: ev.title.it ?? '', en: ev.title.en ?? '', ...ev.title },
+        description: {
+          it: ev.description.it ?? '',
+          en: ev.description.en ?? '',
+          ...ev.description,
+        },
+        startsAt: toDatetimeLocalInTz(new Date(ev.startsAt), ev.timezone),
+        endsAt: toDatetimeLocalInTz(new Date(ev.endsAt), ev.timezone),
+        timezone: ev.timezone,
+        maxParticipants: ev.maxParticipants,
+        coverImageUrl: ev.coverImageUrl,
+        imageUrl: ev.imageUrl,
+        waitingRoomAudioUrl: ev.waitingRoomAudioUrl,
+        tagSlugs: ev.tagSlugs,
+        recurrenceRule: ev.recurrenceRule,
+        recurrencePreset: ev.recurrenceRule ? 'custom' : ('none' as const),
+        recurrenceUntil: null,
+        recurrenceCount: null,
+        parseTitleKicker: ev.parseTitleKicker,
+        expectedSenderRatioPct: ev.expectedSenderRatioPct,
+
+        // Step 2
+        permissionMatrix: matrix,
+        recordingEnabled: ev.recordingEnabled,
+        autoStartRecording: ev.autoStartRecording,
+
+        // Step 3 — seed lists from related entities.
+        organizers: initialEvent.organizers.map((o) => ({
+          name: o.name,
+          organization: o.organization,
+          logoUrl: o.logoUrl,
+          websiteUrl: o.websiteUrl,
+        })),
+        moderators: initialEvent.eventModerators
+          .filter((m) => m.role === 'MODERATOR')
+          .map((m) => ({
+            name: m.name,
+            email: m.email ?? '',
+            personId: m.personId,
+          })),
+        speakers: initialEvent.eventModerators
+          .filter((m) => m.role === 'SPEAKER')
+          .map((m) => ({
+            name: m.name,
+            email: m.email ?? '',
+            personId: m.personId,
+          })),
+        invitations: initialEvent.invitations.map((i) => ({
+          name: i.name,
+          email: i.email,
+          role: i.role,
+          personId: i.personId,
+        })),
+
+        // Step 4
+        materials: initialEvent.materials.map((m) => ({
+          title: m.title,
+          url: m.url,
+          description: m.description,
+          type: m.type,
+          visibility: m.visibility,
+        })),
+        preEventQuestionnaire:
+          initialEvent.preEventQuestionnaire ?? {
+            templateIds: [],
+            adhocQuestions: [],
+          },
+        postEventQuestionnaire:
+          initialEvent.postEventQuestionnaire ?? {
+            templateIds: [],
+            adhocQuestions: [],
+          },
+
+        // Step 5
+        dataRetentionDays: ev.dataRetentionDays,
+        gdprTemplateId: ev.gdprTemplateId,
+        privacyPolicyText: ev.privacyPolicyText ?? '',
+        privacyPolicyUrl: ev.privacyPolicyUrl,
+        moderatorName: ev.moderatorName ?? '',
+        moderatorEmail: ev.moderatorEmail ?? '',
+      } satisfies WizardForm;
+    }
+
     const tpl = props.template;
     const matrix: PermissionMatrix = tpl?.permissionMatrix ?? defaultMatrix();
     return {
@@ -114,6 +302,7 @@ export default function EventWizard(props: WizardProps) {
       recurrenceUntil: null,
       recurrenceCount: null,
       parseTitleKicker: null,
+      expectedSenderRatioPct: null,
 
       // Step 2
       permissionMatrix: matrix,
@@ -140,7 +329,7 @@ export default function EventWizard(props: WizardProps) {
       moderatorEmail: '',
     } satisfies WizardForm;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.template]);
+  }, [props.template, mode, initialEvent]);
 
   const [form, setForm] = useState<WizardForm>(initial);
   const [activeStep, setActiveStep] = useState<StepKey>('base');
@@ -176,13 +365,13 @@ export default function EventWizard(props: WizardProps) {
    * event's per-event questionnaire editor once the id is known.
    */
   const handleSubmit = useCallback(
-    async (mode: 'draft' | 'publish', overrideRedirect?: string) => {
+    async (submitMode: 'draft' | 'publish', overrideRedirect?: string) => {
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
       for (const key of STEP_KEYS) {
         Object.assign(aggregated, validateStep(key, form, props.defaultLocale));
       }
-      if (mode === 'publish') {
+      if (submitMode === 'publish') {
         Object.assign(aggregated, validatePublish(form));
       }
       if (Object.keys(aggregated).length > 0) {
@@ -220,6 +409,7 @@ export default function EventWizard(props: WizardProps) {
           tagSlugs: form.tagSlugs,
           recurrenceRule: form.recurrenceRule,
           parseTitleKicker: form.parseTitleKicker,
+          expectedSenderRatioPct: form.expectedSenderRatioPct,
 
           // Permissions (matrix + derived booleans)
           permissionMatrix: form.permissionMatrix,
@@ -239,6 +429,47 @@ export default function EventWizard(props: WizardProps) {
           moderatorName: form.moderatorName?.trim() || undefined,
           moderatorEmail: form.moderatorEmail?.trim() || undefined,
         };
+
+        // ── Edit mode: PUT the event, diff-based fan-out, then redirect
+        //    back to the event detail page. Everything below the `return`
+        //    is the "create" branch.
+        if (mode === 'edit' && initialEvent) {
+          const eventId = initialEvent.id;
+          const moderatorToken = initialEvent.moderatorToken;
+
+          const putRes = await fetch(
+            `/api/events/${eventId}?token=${encodeURIComponent(moderatorToken)}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Moderator-Token': moderatorToken,
+              },
+              body: JSON.stringify(payload),
+            },
+          );
+          if (!putRes.ok) {
+            const err = await putRes.json().catch(() => ({}));
+            if (err.details) {
+              const next: Record<string, string> = {};
+              for (const d of err.details) {
+                const key = Array.isArray(d.path)
+                  ? d.path.join('.')
+                  : String(d.path ?? 'form');
+                next[key] = d.message ?? 'Invalid';
+              }
+              setFieldErrors(next);
+            }
+            throw new Error(err.error ?? err.message ?? `HTTP ${putRes.status}`);
+          }
+
+          await fanoutEditDiff(eventId, moderatorToken, form, initialEvent, props.defaultLocale);
+
+          router.push(
+            `/admin/events/${eventId}?token=${encodeURIComponent(moderatorToken)}`,
+          );
+          return;
+        }
 
         const res = await fetch('/api/events', {
           method: 'POST',
@@ -356,7 +587,7 @@ export default function EventWizard(props: WizardProps) {
         // 6) Promote from DRAFT → PUBLISHED if requested. The create
         //    endpoint currently doesn't accept status; use PATCH on the
         //    detail route.
-        if (mode === 'publish') {
+        if (submitMode === 'publish') {
           await fetch(`/api/events/${created.id}`, {
             method: 'PATCH',
             headers: {
@@ -380,7 +611,7 @@ export default function EventWizard(props: WizardProps) {
         setSubmitting(false);
       }
     },
-    [form, router, props.defaultLocale, t],
+    [form, router, props.defaultLocale, t, mode, initialEvent],
   );
 
   const saveDraftAndNavigate = useCallback(
@@ -414,6 +645,7 @@ export default function EventWizard(props: WizardProps) {
             availableTags={props.availableTags}
             fieldErrors={fieldErrors}
             siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
+            defaultSenderRatioPct={props.defaultSenderRatioPct}
           />
         )}
         {activeStep === 'permissions' && (
@@ -465,6 +697,15 @@ export default function EventWizard(props: WizardProps) {
             disabled={submitting}
           >
             {tc('next')} →
+          </button>
+        ) : mode === 'edit' ? (
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => handleSubmit('draft')}
+            disabled={submitting}
+          >
+            {submitting ? '...' : t('updateEvent')}
           </button>
         ) : (
           <div className="d-flex gap-2">
@@ -673,4 +914,155 @@ async function submitQuestionnaire(
   ).catch(() => {
     /* best-effort; admin can fix from the questionnaires page */
   });
+}
+
+// ── Edit-mode fan-out: diff against the initial snapshot ────────────────────
+//
+// For each related collection (organizers / event moderators / invitations /
+// materials) we:
+//   – POST every row in `form` that is NOT in the initial snapshot (by a
+//     stable identity key), and
+//   – DELETE every initial row that is NOT in `form` by the same key.
+//
+// Identity keys:
+//   – organizers:        `${name}|${organization}`
+//   – moderators:        `${role}|${email}`
+//   – invitations:       `${email}` (invitations are event-scoped unique by email)
+//   – materials:         `${title}|${url}`
+//
+// Rows that exist on both sides are left untouched — the admin who only
+// wanted to rename/reorder would need a dedicated PATCH-each row flow,
+// which is out of scope for this refactor. Renaming effectively
+// "replaces" the row (delete + re-add) which is acceptable here.
+//
+// Questionnaires are handled differently: the upsert endpoint is PUT and
+// idempotently replaces templates + adhoc items, so we just call it.
+
+async function fanoutEditDiff(
+  eventId: string,
+  moderatorToken: string,
+  form: WizardForm,
+  initial: InitialEventShape,
+  defaultLocale: string,
+): Promise<void> {
+  // Organizers
+  const orgKey = (o: { name: string; organization: string }) =>
+    `${o.name}|${o.organization}`;
+  const initialOrgByKey = new Map(
+    initial.organizers.map((o) => [orgKey(o), o]),
+  );
+  const currentOrgKeys = new Set(form.organizers.map(orgKey));
+  for (const o of form.organizers) {
+    if (initialOrgByKey.has(orgKey(o))) continue;
+    await fetch(`/api/events/${eventId}/organizers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Moderator-Token': moderatorToken,
+      },
+      body: JSON.stringify({
+        name: o.name,
+        logoUrl: o.logoUrl,
+        websiteUrl: o.websiteUrl,
+      }),
+    }).catch(() => {});
+  }
+  for (const o of initial.organizers) {
+    if (currentOrgKeys.has(orgKey(o))) continue;
+    await fetch(`/api/events/${eventId}/organizers/${o.id}`, {
+      method: 'DELETE',
+      headers: { 'X-Moderator-Token': moderatorToken },
+    }).catch(() => {});
+  }
+
+  // EventModerators (MODERATOR + SPEAKER roles share one table)
+  const modKey = (
+    m: { email: string | null; role: 'MODERATOR' | 'SPEAKER' },
+  ) => `${m.role}|${(m.email ?? '').toLowerCase()}`;
+  const initialModByKey = new Map(
+    initial.eventModerators.map((m) => [modKey(m), m]),
+  );
+  const currentMods: Array<{ email: string; role: 'MODERATOR' | 'SPEAKER'; name: string }> = [
+    ...form.moderators.map((m) => ({ email: m.email, role: 'MODERATOR' as const, name: m.name })),
+    ...form.speakers.map((s) => ({ email: s.email, role: 'SPEAKER' as const, name: s.name })),
+  ];
+  const currentModKeys = new Set(currentMods.map(modKey));
+  for (const m of currentMods) {
+    if (initialModByKey.has(modKey(m))) continue;
+    await fetch(`/api/events/${eventId}/moderators`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Moderator-Token': moderatorToken,
+      },
+      body: JSON.stringify({ name: m.name, email: m.email, role: m.role }),
+    }).catch(() => {});
+  }
+  for (const m of initial.eventModerators) {
+    if (currentModKeys.has(modKey(m))) continue;
+    await fetch(`/api/events/${eventId}/moderators/${m.id}`, {
+      method: 'DELETE',
+      headers: { 'X-Moderator-Token': moderatorToken },
+    }).catch(() => {});
+  }
+
+  // Invitations (admin-session auth, no moderator token)
+  const invKey = (i: { email: string }) => i.email.toLowerCase();
+  const initialInvByKey = new Map(initial.invitations.map((i) => [invKey(i), i]));
+  const currentInvKeys = new Set(form.invitations.map(invKey));
+  for (const i of form.invitations) {
+    if (initialInvByKey.has(invKey(i))) continue;
+    await fetch(`/api/admin/events/${eventId}/invitations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: i.email,
+        name: i.name ?? undefined,
+        role: i.role,
+        personId: i.personId ?? undefined,
+      }),
+    }).catch(() => {});
+  }
+  for (const i of initial.invitations) {
+    if (currentInvKeys.has(invKey(i))) continue;
+    await fetch(`/api/admin/events/${eventId}/invitations/${i.id}`, {
+      method: 'DELETE',
+    }).catch(() => {});
+  }
+
+  // Materials
+  const matKey = (m: { title: string; url: string }) => `${m.title}|${m.url}`;
+  const initialMatByKey = new Map(initial.materials.map((m) => [matKey(m), m]));
+  const currentMatKeys = new Set(form.materials.map(matKey));
+  for (const m of form.materials) {
+    if (initialMatByKey.has(matKey(m))) continue;
+    await fetch(`/api/admin/events/${eventId}/materials`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(m),
+    }).catch(() => {});
+  }
+  for (const m of initial.materials) {
+    if (currentMatKeys.has(matKey(m))) continue;
+    await fetch(`/api/admin/events/${eventId}/materials/${m.id}`, {
+      method: 'DELETE',
+    }).catch(() => {});
+  }
+
+  // Questionnaires — PUT is idempotent (replaces templates + adhoc items).
+  // The server rejects with 409 if responses already exist; that failure is
+  // silently swallowed here, matching create-mode behaviour. TODO: surface
+  // this back to the admin (e.g. a toast) instead of just ignoring it.
+  await submitQuestionnaire(
+    eventId,
+    'PRE_REGISTRATION',
+    form.preEventQuestionnaire,
+    defaultLocale,
+  );
+  await submitQuestionnaire(
+    eventId,
+    'POST_EVENT',
+    form.postEventQuestionnaire,
+    defaultLocale,
+  );
 }

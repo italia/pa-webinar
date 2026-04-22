@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 export interface RubricaPickedPerson {
   id: string;
@@ -19,25 +20,48 @@ interface RubricaRow {
   emailHash?: string | null;
 }
 
-interface RubricaPickerProps {
+type SingleProps = {
+  mode?: 'single';
   onSelect: (person: RubricaPickedPerson) => void;
+  onAddMany?: never;
   placeholder?: string;
   disabled?: boolean;
-}
+};
+
+type MultiProps = {
+  mode: 'multi';
+  onAddMany: (persons: RubricaPickedPerson[]) => void;
+  onSelect?: never;
+  placeholder?: string;
+  disabled?: boolean;
+};
+
+type RubricaPickerProps = SingleProps | MultiProps;
 
 const DEBOUNCE_MS = 250;
 const RESULT_LIMIT = 8;
 
-export default function RubricaPicker({
-  onSelect,
-  placeholder,
-  disabled,
-}: RubricaPickerProps) {
+function rowToPerson(row: RubricaRow): RubricaPickedPerson {
+  const email =
+    typeof row.email === 'string' && row.email.length > 0 ? row.email : null;
+  return {
+    id: row.id,
+    displayName: row.displayName ?? '',
+    organization: row.organization ?? null,
+    email,
+  };
+}
+
+export default function RubricaPicker(props: RubricaPickerProps) {
+  const { placeholder, disabled } = props;
+  const mode: 'single' | 'multi' = props.mode ?? 'single';
+  const t = useTranslations('admin.rubricaPicker');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<RubricaRow[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [highlight, setHighlight] = useState(0);
+  const [selected, setSelected] = useState<RubricaPickedPerson[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const reqCounter = useRef(0);
@@ -47,7 +71,13 @@ export default function RubricaPicker({
     const mine = ++reqCounter.current;
     setLoading(true);
     try {
-      const qs = new URLSearchParams({ q, limit: String(RESULT_LIMIT) });
+      // Admin picker includes opted-out persons — the admin rubrica may
+      // contain entries that have not (yet) opted in to the address book.
+      const qs = new URLSearchParams({
+        q,
+        limit: String(RESULT_LIMIT),
+        includeOpted: 'out',
+      });
       const res = await fetch(`/api/admin/rubrica?${qs.toString()}`, {
         cache: 'no-store',
       });
@@ -57,7 +87,9 @@ export default function RubricaPicker({
       }
       const data = (await res.json()) as { rows: RubricaRow[] };
       if (mine === reqCounter.current) {
-        setResults(Array.isArray(data.rows) ? data.rows.slice(0, RESULT_LIMIT) : []);
+        setResults(
+          Array.isArray(data.rows) ? data.rows.slice(0, RESULT_LIMIT) : [],
+        );
         setHighlight(0);
       }
     } catch {
@@ -90,23 +122,44 @@ export default function RubricaPicker({
     return () => document.removeEventListener('mousedown', onDocClick);
   }, []);
 
-  const choose = useCallback(
+  const chooseSingle = useCallback(
     (row: RubricaRow) => {
-      const email =
-        typeof row.email === 'string' && row.email.length > 0 ? row.email : null;
-      onSelect({
-        id: row.id,
-        displayName: row.displayName ?? '',
-        organization: row.organization ?? null,
-        email,
-      });
+      if (mode !== 'single' || !props.onSelect) return;
+      props.onSelect(rowToPerson(row));
       setQuery('');
       setResults([]);
       setOpen(false);
       setHighlight(0);
     },
-    [onSelect],
+    // props.onSelect is stable per render; mode is a literal
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [mode, props.onSelect],
   );
+
+  const toggleSelected = useCallback((row: RubricaRow) => {
+    const person = rowToPerson(row);
+    setSelected((list) => {
+      if (list.some((p) => p.id === person.id)) {
+        return list.filter((p) => p.id !== person.id);
+      }
+      return [...list, person];
+    });
+  }, []);
+
+  const removeSelected = useCallback((id: string) => {
+    setSelected((list) => list.filter((p) => p.id !== id));
+  }, []);
+
+  const emitAddMany = useCallback(() => {
+    if (mode !== 'multi' || !props.onAddMany) return;
+    if (selected.length === 0) return;
+    props.onAddMany(selected);
+    setSelected([]);
+    setQuery('');
+    setResults([]);
+    setOpen(false);
+    setHighlight(0);
+  }, [mode, props.onAddMany, selected]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!open || results.length === 0) {
@@ -124,37 +177,87 @@ export default function RubricaPicker({
     } else if (e.key === 'Enter') {
       e.preventDefault();
       const pick = results[highlight];
-      if (pick) choose(pick);
+      if (!pick) return;
+      if (mode === 'multi') {
+        toggleSelected(pick);
+      } else {
+        chooseSingle(pick);
+      }
     } else if (e.key === 'Escape') {
       e.preventDefault();
       setOpen(false);
     }
   };
 
-  const showDropdown =
-    open && query.trim().length > 0 && (loading || results.length > 0);
+  // Keep the dropdown open as long as the user is focused with a non-empty
+  // query. Show explicit loading / empty states inside instead of flickering.
+  const showDropdown = open && query.trim().length > 0;
 
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
-      <input
-        ref={inputRef}
-        type="text"
-        className="form-control"
-        value={query}
-        placeholder={placeholder}
-        disabled={disabled}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          setOpen(true);
-        }}
-        onFocus={() => setOpen(true)}
-        onKeyDown={onKeyDown}
-        autoComplete="off"
-        role="combobox"
-        aria-expanded={showDropdown}
-        aria-autocomplete="list"
-        aria-controls={listboxId}
-      />
+      {mode === 'multi' && selected.length > 0 && (
+        <div className="d-flex flex-wrap gap-2 mb-2" aria-live="polite">
+          {selected.map((p) => (
+            <span
+              key={p.id}
+              className="badge bg-primary d-inline-flex align-items-center"
+              style={{ fontSize: '0.85rem', padding: '0.35em 0.6em' }}
+            >
+              <span className="me-2">
+                {p.displayName || p.email || p.id}
+              </span>
+              <button
+                type="button"
+                className="btn-close btn-close-white btn-sm"
+                aria-label="remove"
+                onClick={() => removeSelected(p.id)}
+                style={{ fontSize: '0.6rem' }}
+              />
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="d-flex gap-2">
+        <input
+          ref={inputRef}
+          type="text"
+          className="form-control"
+          value={query}
+          placeholder={placeholder}
+          disabled={disabled}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={onKeyDown}
+          autoComplete="off"
+          role="combobox"
+          aria-expanded={showDropdown}
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+        />
+        {mode === 'multi' && (
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={disabled || selected.length === 0}
+            onClick={emitAddMany}
+          >
+            {t('addSelected')}
+            {selected.length > 0 && (
+              <span className="ms-2 badge bg-light text-primary">
+                {selected.length}
+              </span>
+            )}
+          </button>
+        )}
+      </div>
+      {mode === 'multi' && selected.length > 0 && (
+        <small className="text-muted d-block mt-1">
+          {t('selectedCount', { count: selected.length })}
+        </small>
+      )}
       {showDropdown && (
         <ul
           id={listboxId}
@@ -177,11 +280,18 @@ export default function RubricaPicker({
                 className="spinner-border spinner-border-sm me-2"
                 aria-hidden="true"
               />
-              ...
+              {t('loading')}
+            </li>
+          )}
+          {!loading && results.length === 0 && (
+            <li className="list-group-item text-muted small">
+              {t('noResults')}
             </li>
           )}
           {results.map((row, i) => {
             const active = i === highlight;
+            const isSelected =
+              mode === 'multi' && selected.some((p) => p.id === row.id);
             return (
               <li
                 key={row.id}
@@ -193,18 +303,36 @@ export default function RubricaPicker({
                 style={{ cursor: 'pointer' }}
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  choose(row);
+                  if (mode === 'multi') {
+                    toggleSelected(row);
+                  } else {
+                    chooseSingle(row);
+                  }
                 }}
                 onMouseEnter={() => setHighlight(i)}
               >
-                <div className="fw-semibold">
-                  {row.displayName || '—'}
+                <div className="d-flex align-items-center">
+                  {mode === 'multi' && (
+                    <input
+                      type="checkbox"
+                      className="form-check-input me-2"
+                      checked={isSelected}
+                      readOnly
+                      tabIndex={-1}
+                      aria-hidden="true"
+                    />
+                  )}
+                  <div>
+                    <div className="fw-semibold">
+                      {row.displayName || '—'}
+                    </div>
+                    {row.organization && (
+                      <small className={active ? '' : 'text-muted'}>
+                        {row.organization}
+                      </small>
+                    )}
+                  </div>
                 </div>
-                {row.organization && (
-                  <small className={active ? '' : 'text-muted'}>
-                    {row.organization}
-                  </small>
-                )}
               </li>
             );
           })}
