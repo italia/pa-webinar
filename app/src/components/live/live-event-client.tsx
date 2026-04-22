@@ -873,23 +873,23 @@ function LiveTopBar({ title, parseTitleKicker = false, participantCount, registr
         >
           {tr(role)}
         </Badge>
-        {/* "👥 87 / 150" pill. Fallback to "{max} posti disponibili"
-         *  before anyone has joined so the room never looks empty. */}
-        <Badge
-          color=""
-          pill
-          className="px-2 py-1"
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.18)',
-            color: '#fff',
-            fontSize: '0.72rem',
-          }}
-          aria-live="polite"
-        >
-          {participantCount === 0 && maxParticipants
-            ? t('topBarCount.capacityOnly', { max: maxParticipants })
-            : t('topBarCount.live', { count: participantCount, max: maxParticipants ?? 0 })}
-        </Badge>
+        {/* "👥 87" — capacity display is intentionally omitted: the system
+         *  autoscales, so we only surface the live count. */}
+        {participantCount > 0 && (
+          <Badge
+            color=""
+            pill
+            className="px-2 py-1"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.18)',
+              color: '#fff',
+              fontSize: '0.72rem',
+            }}
+            aria-live="polite"
+          >
+            {t('topBarCount.live', { count: participantCount })}
+          </Badge>
+        )}
       </div>
       <div className="d-flex align-items-center gap-3">
         {isRecording && (

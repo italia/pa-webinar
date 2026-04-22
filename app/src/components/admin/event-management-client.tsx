@@ -117,7 +117,7 @@ interface EventData {
   id: string; slug: string;
   title: Record<string, string>; description: Record<string, string>;
   startsAt: string; endsAt: string; timezone: string;
-  maxParticipants: number; registrationCount: number;
+  maxParticipants: number; registrationCount: number; peakParticipants: number;
   qaEnabled: boolean; chatEnabled: boolean; recordingEnabled: boolean;
   participantsCanUnmute: boolean; participantsCanStartVideo: boolean; participantsCanShareScreen: boolean;
   status: string;
@@ -201,7 +201,6 @@ export default function EventManagementClient({
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
   const editUrl = `/admin/events/${event.id}/edit?token=${event.moderatorToken}`;
 
-  const occupancyPct = Math.min(100, (event.registrationCount / Math.max(1, event.maxParticipants)) * 100);
 
   // Capacity estimate sidebar surface. Everything else stays in the diagram.
   const capacity = event.capacityEstimateJson ?? null;
@@ -424,15 +423,19 @@ export default function EventManagementClient({
               <div className="fw-bold mb-1" style={{ fontSize: '2rem', color: C_INK, lineHeight: 1 }}>
                 {event.registrationCount}
               </div>
-              <div style={CAPTION}>
-                {td('sidebar.ofMax', { current: event.registrationCount, max: event.maxParticipants })}
-              </div>
-              <div className="progress mt-2" style={{ height: 6, borderRadius: 3 }}>
-                <div className="progress-bar" role="progressbar"
-                     aria-valuenow={event.registrationCount}
-                     aria-valuemin={0} aria-valuemax={event.maxParticipants}
-                     style={{ width: `${occupancyPct}%`, background: C_PRIMARY, borderRadius: 3 }} />
-              </div>
+              {status === 'ENDED' && event.peakParticipants > 0 ? (
+                <div style={CAPTION}>
+                  {td('sidebar.postEventSummary', {
+                    connected: event.peakParticipants,
+                    registered: event.registrationCount,
+                    estimated: event.maxParticipants,
+                  })}
+                </div>
+              ) : (
+                <div style={CAPTION}>
+                  {td('sidebar.estimatedAttendance', { estimated: event.maxParticipants })}
+                </div>
+              )}
               {(jvbCount !== null || jvbRam) && (
                 <div className="mt-3 pt-3 d-flex align-items-center gap-2"
                      style={{ borderTop: '1px solid #f0f0f0', ...CAPTION, fontSize: '0.82rem' }}>

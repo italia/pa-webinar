@@ -101,6 +101,7 @@ export default async function EventManagePage({
     endsAt: event.endsAt.toISOString(),
     timezone: event.timezone,
     maxParticipants: event.maxParticipants,
+    peakParticipants: event.peakParticipants,
     registrationCount: event._count.registrations,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,

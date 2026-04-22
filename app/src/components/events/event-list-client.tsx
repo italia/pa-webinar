@@ -82,8 +82,6 @@ export default function EventListClient({
         const title = getLocalized(event.title, locale);
         const desc = getLocalized(event.description as LocalizedField, locale);
         const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
-        const spotsLeft = event.maxParticipants - event.registrationCount;
-        const isFull = spotsLeft <= 0;
         const isLive = event.status === 'LIVE';
         const isEnded = event.status === 'ENDED';
 
@@ -249,20 +247,15 @@ export default function EventListClient({
                         <Icon icon="it-video" size="xs" className="me-1" />
                         {t('detail.recording')}
                       </Badge>
-                    ) : (
+                    ) : event.registrationCount > 0 ? (
                       <span className="text-muted small">
-                        {t('card.occupiedSpots', {
-                          registered: event.registrationCount,
-                          max: event.maxParticipants,
-                        })}
+                        {t('card.registeredCount', { count: event.registrationCount })}
                       </span>
-                    )
+                    ) : null
                   ) : (
-                    <Badge color={isFull ? 'danger' : 'secondary'} pill>
+                    <Badge color="secondary" pill>
                       <Icon icon="it-user" size="xs" className="me-1" />
-                      {isFull
-                        ? t('card.fullyBooked')
-                        : t('card.spotsAvailable', { count: spotsLeft })}
+                      {t('card.registeredCount', { count: event.registrationCount })}
                     </Badge>
                   )}
                   <CardReadMore

@@ -38,6 +38,7 @@ async function loadEvents(token?: string) {
     eventType: e.eventType,
     registrationCount: e._count.registrations,
     maxParticipants: e.maxParticipants,
+    peakParticipants: e.peakParticipants,
     moderatorToken: e.moderatorToken,
     coverImageUrl: e.coverImageUrl,
     imageUrl: e.imageUrl,
