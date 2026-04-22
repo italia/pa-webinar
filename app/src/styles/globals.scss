@@ -239,7 +239,10 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  // Anchored at the top-center: Jitsi's own toolbar lives at the
+  // bottom and auto-hides, so placing ours at the top keeps both
+  // always-visible and conflict-free.
+  top: 0;
   pointer-events: none; // individual buttons re-enable pointer-events
   z-index: 5;
 }
@@ -250,14 +253,8 @@
   gap: 0.5rem;
   justify-content: center;
   align-items: center;
-  // Sit just above Jitsi's own bottom toolbar (~60px tall when shown,
-  // auto-hides after 4s). On mobile, raise a bit more to clear thumbs
-  // and the sidebar tab strip that no longer exists but iOS home bar
-  // could still overlap.
-  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
-  // Subtle backdrop so buttons pop over light Jitsi tiles without
-  // fighting dark ones. Rounded band, centered horizontally.
-  margin: 0 auto 14px;
+  padding: 10px 12px;
+  margin: 12px auto 0;
   width: fit-content;
   background: rgba(15, 27, 45, 0.72);
   backdrop-filter: blur(10px);
@@ -267,8 +264,9 @@
 
   @media (max-width: 767.98px) {
     gap: 0.3rem;
-    padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+    padding: 8px 10px;
     border-radius: 20px;
+    margin-top: 8px;
   }
 }
 
@@ -449,9 +447,14 @@
   }
 }
 
-// Legacy alias
-.qa-sidebar {
-  @extend .live-sidebar;
+// Legacy aliases from before the Meet-style refactor. The QAPanel /
+// PollPanel / etc. render inside the drawer body now, so they must NOT
+// inherit the fixed-position + off-screen translate rules. Keep the
+// selectors as no-ops for any stray consumers, but don't @extend.
+.qa-sidebar,
+.poll-sidebar {
+  width: 100%;
+  height: 100%;
 }
 
 .leave-room-btn {

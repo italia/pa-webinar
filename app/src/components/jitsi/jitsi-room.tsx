@@ -124,8 +124,18 @@ export default function JitsiRoom({
       };
     }
 
+    // Honor the user's pre-join DeviceCheck choice. The base
+    // `jitsiConfigOverwrite` defaults both flags to `true` (start muted),
+    // so we must explicitly write the prop value — both true AND false —
+    // otherwise a user who turned the camera ON in the preview would
+    // still join muted.
+    extraConfig.startWithVideoMuted = startWithVideoMuted;
+    extraConfig.startWithAudioMuted = startWithAudioMuted;
+
     if (role === 'participant') {
       if (!participantsCanUnmute) {
+        // Policy override: participants without unmute permission are
+        // always forced muted. Can't be relaxed by the DeviceCheck.
         extraConfig.startWithAudioMuted = true;
         extraConfig.disableAudioDenied = true;
         toolbarButtons = toolbarButtons.filter(b => b !== 'microphone');
@@ -138,17 +148,6 @@ export default function JitsiRoom({
       if (!participantsCanShareScreen) {
         toolbarButtons = toolbarButtons.filter(b => b !== 'desktop');
       }
-    }
-
-    // Honor the user's pre-join DeviceCheck toggles. Never weaken a
-    // policy-forced mute (above), only strengthen: if the user chose to
-    // join with camera/mic off, mute them from the start even when the
-    // event allows unmuting.
-    if (startWithVideoMuted) {
-      extraConfig.startWithVideoMuted = true;
-    }
-    if (startWithAudioMuted) {
-      extraConfig.startWithAudioMuted = true;
     }
 
     const IFRAME_ALLOW = 'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock';

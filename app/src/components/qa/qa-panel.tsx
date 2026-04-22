@@ -19,7 +19,6 @@ export default function QAPanel({
   isModerator,
 }: QAPanelProps) {
   const t = useTranslations('qa');
-  const [showOnMobile, setShowOnMobile] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleSubmitted = useCallback(() => {
@@ -27,24 +26,10 @@ export default function QAPanel({
   }, []);
 
   return (
-    <>
-      <div className="d-lg-none p-2 border-top">
-        <Button
-          color="primary"
-          outline
-          size="sm"
-          className="w-100"
-          onClick={() => setShowOnMobile(!showOnMobile)}
-        >
-          <Icon icon="it-comment" size="sm" className="me-2" />
-          {showOnMobile ? t('hidePanel') : t('showPanel')}
-        </Button>
-      </div>
-
-      <div
-        className={`qa-sidebar d-flex flex-column ${showOnMobile ? '' : 'd-none d-lg-flex'}`}
-        style={{ width: '100%', maxWidth: '360px', overflowY: 'auto' }}
-      >
+    <div
+      className="d-flex flex-column flex-grow-1"
+      style={{ width: '100%', minHeight: 0 }}
+    >
         <div className="p-3 border-bottom">
           <h3 className="h5 mb-0 d-flex align-items-center">
             <Icon icon="it-comment" className="me-2" />
@@ -103,7 +88,6 @@ export default function QAPanel({
             isModerator={isModerator}
           />
         </div>
-      </div>
-    </>
+    </div>
   );
 }
