@@ -148,8 +148,11 @@
   background: #0F1B2D;
   height: calc(100vh - 80px);
 
+  // On mobile the page fills the viewport strictly — no scroll, no
+  // collapse. Using `svh` ensures the live area excludes the URL bar
+  // and on-screen keyboard so the iframe never ends up clipped.
   @media (max-width: 991.98px) {
-    height: auto;
+    height: 100svh;
     min-height: 100svh;
   }
 }
@@ -162,6 +165,15 @@
 .moderator-bar {
   margin-bottom: 0;
   border-radius: 0;
+  flex-shrink: 0;
+}
+
+// Ancillary flex-children stacked above the main video area. Without
+// `flex-shrink: 0` a tight `100svh` column on mobile would squeeze
+// these banners and eat into their legibility.
+.live-hint-banner,
+.live-recording-banner,
+.live-overtime-banner {
   flex-shrink: 0;
 }
 
@@ -180,14 +192,15 @@
     min-height: 300px;
   }
 
+  // Mobile: .live-page-bg is now a strict 100svh flex column, so
+  // .live-main just grows into the remaining space after the top bar
+  // and banners. The 48px bottom padding reserves room for the fixed
+  // sidebar tab strip that overlays the bottom of the viewport — the
+  // Jitsi toolbar is never hidden underneath it.
   @media (max-width: 991.98px) {
-    flex: 1 1 auto;
-    // Height: full viewport minus the top bar / moderator bar stack
-    // above (~120px is a safe envelope — top-bar 52px + potential
-    // moderator-bar/overtime/recording banners) and minus the 48px
-    // bottom tab strip that stays pinned via the fixed sidebar.
-    min-height: calc(100svh - 168px);
+    flex: 1 1 0;
     padding-bottom: 48px;
+    overflow: hidden;
   }
 }
 
@@ -201,8 +214,12 @@
   overflow: hidden;
   border: none;
 
+  // On mobile we drop the desktop's 400px floor so the wrapper always
+  // matches its flex-sized parent exactly. Without this the wrapper
+  // could overflow on short phones (e.g. iPhone SE landscape).
   @media (max-width: 991.98px) {
     min-height: 0;
+    height: 100%;
   }
 }
 

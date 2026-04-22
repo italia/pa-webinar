@@ -82,6 +82,7 @@ export const POST = withErrorHandling(async (request) => {
     participantsCanUnmute: data.participantsCanUnmute,
     participantsCanStartVideo: data.participantsCanStartVideo,
     participantsCanShareScreen: data.participantsCanShareScreen,
+    expectedSenderRatioPct: data.expectedSenderRatioPct ?? null,
   });
 
   const event = await prisma.event.create({

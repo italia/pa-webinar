@@ -1,3 +1,9 @@
+import {
+  DEFAULT_JVB_CONFIG,
+  jvbsForEvent,
+  type JvbSizingConfig,
+} from '@/lib/jvb-sizing';
+
 interface EventConfig {
   maxParticipants: number;
   /**
@@ -14,6 +20,15 @@ interface EventConfig {
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
+  /**
+   * Percentage of attendees expected to send mic/video. Null → fall back
+   * to a sensible default. Passed through to `jvbsForEvent` so the
+   * creation-time preview matches what the runtime scaler actually does.
+   */
+  expectedSenderRatioPct?: number | null;
+  /** JVB sizing constants (cpuCoresPerPod, sendersPerCore, receiversPerCore,
+   *  maxReplicas). Defaults to `DEFAULT_JVB_CONFIG`. */
+  jvbSizingConfig?: JvbSizingConfig;
 }
 
 export interface EventEstimates {
@@ -59,10 +74,24 @@ export function calculateEstimates(event: EventConfig): EventEstimates {
 
   const totalBandwidth = participantDown * participants + moderatorUp;
 
-  const isWebinarMode =
-    !event.participantsCanStartVideo && !event.participantsCanUnmute;
-  const participantsPerJvb = isWebinarMode ? 500 : 150;
-  const jvbCount = Math.max(1, Math.ceil(participants / participantsPerJvb));
+  // Use the same formula the runtime JVB scaler uses, so the creation-
+  // time preview ("≈N JVB") matches the number of replicas the cluster
+  // will actually provision. The scaler keys off maxParticipants ×
+  // sender-ratio, so a webinar with video disabled collapses to 0
+  // senders and receivers dominate.
+  const ratioForSizing =
+    event.expectedSenderRatioPct !== undefined &&
+    event.expectedSenderRatioPct !== null
+      ? event.expectedSenderRatioPct
+      : event.participantsCanStartVideo
+        ? 30
+        : 0;
+  const jvbCount = jvbsForEvent(
+    participants,
+    ratioForSizing,
+    event.participantsCanStartVideo,
+    event.jvbSizingConfig ?? DEFAULT_JVB_CONFIG,
+  );
 
   const jvbRamMB = (2048 + participants * 10) * jvbCount;
 
