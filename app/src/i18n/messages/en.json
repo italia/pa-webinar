@@ -286,6 +286,17 @@
       "videoModeration": "Participant video",
       "videoDisabled": "Video disabled",
       "eventEndedSuccess": "Event ended successfully. Redirecting..."
+    },
+    "closeDrawer": "Close",
+    "hintBanner": {
+      "controls": "Controls are at the bottom",
+      "raiseHand": "Raise your hand to speak",
+      "sidebar": "Q&A and chat in the side panel",
+      "dismiss": "Got it"
+    },
+    "topBarCount": {
+      "live": "👥 {count} / {max}",
+      "capacityOnly": "{max} seats available"
     }
   },
   "qa": {
@@ -2479,7 +2490,25 @@
     "peopleWaiting": "{count, plural, =0 {} =1 {1 person waiting} other {{count} people waiting}}",
     "jvbScaling": "Preparing room...",
     "jvbScalingDetail": "Video servers are starting up. This takes about 2 minutes.",
-    "jvbReady": "Room ready!"
+    "jvbReady": "Room ready!",
+    "nameLabel": "Your name",
+    "nameHelp": "Other participants will see this",
+    "joinNowBtn": "Enter now",
+    "openingAt": "Opens at {time}",
+    "netiquetteTitle": "How to take part",
+    "netiquetteBullet1": "Arrive a few minutes early to test your microphone and camera",
+    "netiquetteBullet2": "Turn camera and mic on only when speaking — raise your hand to request the floor",
+    "netiquetteBullet3": "Use chat for quick exchanges, Q&A for questions to the speakers",
+    "netiquetteBullet4": "Recording, when enabled, is controlled by moderators and marked with a red indicator",
+    "watchCatchup": "Watch from the start",
+    "watchCatchupDesc": "Watch the partial recording and catch up with the live stream when you want",
+    "chatPreviewTitle": "Event chat",
+    "chatPreviewHint": "Read what other participants are saying while you get ready",
+    "endedTitle": "Event ended",
+    "endedWatchRecording": "Watch the recording",
+    "endedLeaveFeedback": "Leave feedback",
+    "moderatedBy": "Moderated by {name}",
+    "startEventError": "Error starting the event. Please try again."
   },
   "recording": {
     "management": "Video recording",
@@ -2556,5 +2585,15 @@
         "generic": "Something went wrong. Please try again later."
       }
     }
+  },
+  "deviceCheck": {
+    "preview": "Video preview",
+    "micLevel": "Microphone level",
+    "cameraLabel": "Camera",
+    "micLabel": "Microphone",
+    "permissionNeeded": "Allow camera and microphone to test them. You can also join without.",
+    "noVideo": "No video",
+    "noAudio": "Microphone unavailable",
+    "retry": "Retry"
   }
 }

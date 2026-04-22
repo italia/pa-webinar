@@ -10,6 +10,8 @@ import {
   jitsiInterfaceConfigOverwrite,
   baseToolbarButtons,
   moderatorToolbarButtons,
+  mobileBaseToolbarButtons,
+  mobileModeratorToolbarButtons,
 } from '@/lib/jitsi/config';
 
 interface WatermarkSettings {
@@ -87,14 +89,19 @@ export default function JitsiRoom({
   useEffect(() => { onApiReadyRef.current = onApiReady; }, [onApiReady]);
 
   const observerRef = useRef<MutationObserver | null>(null);
+  // Mobile detection captured once at mount. We intentionally don't
+  // react to resize: flipping the toolbar mid-call would require
+  // reinitialising the iframe (disconnecting the user).
+  const isMobileRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     disposedRef.current = false;
+    isMobileRef.current = window.matchMedia('(max-width: 767.98px)').matches;
 
     let toolbarButtons = role === 'moderator'
-      ? [...moderatorToolbarButtons]
-      : [...baseToolbarButtons];
+      ? (isMobileRef.current ? [...mobileModeratorToolbarButtons] : [...moderatorToolbarButtons])
+      : (isMobileRef.current ? [...mobileBaseToolbarButtons] : [...baseToolbarButtons]);
 
     const extraConfig: Record<string, unknown> = {};
 
