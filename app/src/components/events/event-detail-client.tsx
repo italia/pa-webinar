@@ -84,6 +84,12 @@ interface FeedbackSummary {
   distribution: { rating: number; count: number }[];
 }
 
+interface TagChip {
+  slug: string;
+  name: Record<string, string>;
+  color: string | null;
+}
+
 interface EventDetailClientProps {
   event: EventData;
   locale: string;
@@ -92,6 +98,7 @@ interface EventDetailClientProps {
   materials?: MaterialData[];
   polls?: PollData[];
   feedbackSummary?: FeedbackSummary | null;
+  tags?: TagChip[];
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -108,6 +115,7 @@ export default function EventDetailClient({
   materials = [],
   polls = [],
   feedbackSummary = null,
+  tags = [],
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tv = useTranslations('video');
@@ -188,9 +196,37 @@ export default function EventDetailClient({
           title={title}
           kickerEnabled={parseTitleKicker}
           as="h1"
-          className="mb-4"
+          className="mb-3"
           style={{ color: '#17324D', lineHeight: 1.3 }}
         />
+
+        {tags.length > 0 && (
+          <div className="d-flex flex-wrap gap-2 mb-4">
+            {tags.map((tag) => {
+              const label =
+                tag.name[locale] ?? tag.name.it ?? tag.name.en ?? tag.slug;
+              const color = tag.color ?? '#5A768A';
+              return (
+                <Link
+                  key={tag.slug}
+                  href={`/events?tag=${tag.slug}`}
+                  className="text-decoration-none"
+                  style={{
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: 999,
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    backgroundColor: `${color}22`,
+                    color,
+                    border: `1px solid ${color}44`,
+                  }}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+        )}
 
         <Row className="g-3 g-lg-4">
           <Col xs={12} md="auto">
