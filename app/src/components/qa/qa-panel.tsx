@@ -11,12 +11,16 @@ interface QAPanelProps {
   eventSlug: string;
   token: string;
   isModerator: boolean;
+  /** Guest display name, forwarded to QuestionForm when token is empty
+   *  so anonymous attendees can post questions. */
+  guestName?: string;
 }
 
 export default function QAPanel({
   eventSlug,
   token,
   isModerator,
+  guestName,
 }: QAPanelProps) {
   const t = useTranslations('qa');
   const [refreshKey, setRefreshKey] = useState(0);
@@ -67,6 +71,7 @@ export default function QAPanel({
               <QuestionForm
                 eventSlug={eventSlug}
                 token={token}
+                guestName={guestName}
                 onSubmitted={handleSubmitted}
               />
             </>

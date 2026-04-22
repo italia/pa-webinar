@@ -10,12 +10,16 @@ const COOLDOWN_SECONDS = 30;
 interface QuestionFormProps {
   eventSlug: string;
   token: string;
+  /** Guest display name (from waiting-room). Used when `token` is empty
+   *  so anonymous attendees can still post questions. */
+  guestName?: string;
   onSubmitted: () => void;
 }
 
 export default function QuestionForm({
   eventSlug,
   token,
+  guestName,
   onSubmitted,
 }: QuestionFormProps) {
   const t = useTranslations('qa');
@@ -63,7 +67,10 @@ export default function QuestionForm({
         const res = await fetch(`/api/events/${eventSlug}/questions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: text.trim(), accessToken: token }),
+          body: JSON.stringify({
+            text: text.trim(),
+            ...(token ? { accessToken: token } : { guestName }),
+          }),
         });
 
         if (res.status === 429) {
@@ -88,7 +95,7 @@ export default function QuestionForm({
         setSubmitting(false);
       }
     },
-    [text, eventSlug, token, t, startCooldown, onSubmitted],
+    [text, eventSlug, token, guestName, t, startCooldown, onSubmitted],
   );
 
   const remaining = MAX_LENGTH - text.length;

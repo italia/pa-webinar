@@ -235,16 +235,27 @@
 //   Mobile  <992px → slides up from the bottom (80vh)
 // Both variants use the same scrim + transform: translate mechanism.
 
+// Desktop: floating pill at the top of the video.
+// Mobile: full-width bottom tab strip (the pre-Meet pattern users
+// preferred — one tap per tab, always visible, never covered by the
+// drawer).
 .live-floating-controls-slot {
   position: absolute;
   left: 0;
   right: 0;
-  // Anchored at the top-center: Jitsi's own toolbar lives at the
-  // bottom and auto-hides, so placing ours at the top keeps both
-  // always-visible and conflict-free.
   top: 0;
-  pointer-events: none; // individual buttons re-enable pointer-events
+  pointer-events: none;
   z-index: 5;
+
+  @media (max-width: 991.98px) {
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    z-index: 1060; // above the drawer (1050) so the strip stays visible
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    background: linear-gradient(90deg, #004D99 0%, #0066CC 100%);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+  }
 }
 
 .live-floating-controls {
@@ -262,11 +273,18 @@
   border-radius: 28px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 
-  @media (max-width: 767.98px) {
-    gap: 0.3rem;
-    padding: 8px 10px;
-    border-radius: 20px;
-    margin-top: 8px;
+  @media (max-width: 991.98px) {
+    // Reset to a flat full-width strip.
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    gap: 0;
+    min-height: 52px;
   }
 }
 
@@ -303,10 +321,26 @@
     color: #fff;
   }
 
-  @media (max-width: 767.98px) {
-    min-width: 56px;
-    padding: 6px 8px;
-    font-size: 0.7rem;
+  // Mobile: flat tab-bar cell. flex-fill is applied via Bootstrap class
+  // on the button element from React. Active state uses the same blue
+  // inset underline as the pre-Meet strip.
+  @media (max-width: 991.98px) {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 6px 4px;
+    border-radius: 0;
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.65);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    &--active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      box-shadow: inset 0 -2px 0 #0066CC;
+    }
   }
 
   &__icon {
@@ -374,14 +408,16 @@
   @media (max-width: 991.98px) {
     left: 0;
     right: 0;
-    bottom: 0;
-    height: 82vh;
-    max-height: 82vh;
+    // Leave the 52px bottom tab strip visible above the drawer, so
+    // users can switch tabs without closing the drawer.
+    bottom: 52px;
+    height: calc(82vh - 52px);
+    max-height: calc(82vh - 52px);
     border-top: 2px solid rgba(0, 102, 204, 0.4);
     border-top-left-radius: 14px;
     border-top-right-radius: 14px;
     box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.25);
-    transform: translateY(100%);
+    transform: translateY(calc(100% + 52px));
   }
 
   &--open {
@@ -444,6 +480,60 @@
   &:hover {
     background: rgba(255, 255, 255, 0.25);
     color: #fff;
+  }
+}
+
+// DeviceCheck toggle (custom, cross-browser). Bootstrap/Italia's own
+// form-switch styles interact badly with Firefox's default checkbox
+// rendering when stacked with `role="switch"` + our small text layout.
+// This is a minimal switch styled the same on every browser.
+.device-check-toggle {
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+  }
+
+  &__track {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    background: #CED4DA;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: left 0.15s ease;
+  }
+
+  &__input:checked + &__track {
+    background: #0066CC;
+  }
+
+  &__input:checked + &__track &__thumb {
+    left: 18px;
+  }
+
+  &__input:focus-visible + &__track {
+    outline: 2px solid #0066CC;
+    outline-offset: 2px;
   }
 }
 
