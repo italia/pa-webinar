@@ -34,7 +34,11 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import { shouldEndLiveEvent } from '@/lib/events/lifecycle';
-import { JVB_SNAPSHOT_KEY, JVB_SNAPSHOT_TTL_SECONDS } from '@/lib/jvb-snapshot';
+import {
+  JVB_SNAPSHOT_KEY,
+  JVB_SNAPSHOT_TTL_SECONDS,
+  type JvbSnapshot,
+} from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getRedis } from '@/lib/redis';
 import { getSettings } from '@/lib/settings';
@@ -97,23 +101,50 @@ export const GET = withErrorHandling(async (request) => {
   const preScaleWindow = new Date(now.getTime() + preScaleMin * 60_000);
   const inactiveCutoff = new Date(now.getTime() - inactiveGraceMin * 60_000);
 
-  const jvb = await fetchJvbStats();
-
-  // Phase 2 — stress from query string is a legacy caller signal; keep
-  // it as a hint but prefer our own polling.
   const searchParams = new URL(request.url).searchParams;
-  const stressParam = searchParams.get('stress_level');
-  const stressFromCaller = stressParam ? parseFloat(stressParam) : null;
-  const effectiveStress = jvb.reachable ? jvb.stressLevel : stressFromCaller ?? 0;
+  const numParam = (name: string): number | null => {
+    const v = searchParams.get(name);
+    if (v === null) return null;
+    const p = Number(v);
+    return Number.isFinite(p) ? p : null;
+  };
 
   // The scaler (CronJob) has K8s RBAC to read the deployment; it forwards
   // `current` (spec.replicas) and `ready` (status.readyReplicas) so we can
   // persist an authoritative snapshot for the public status page. Parse
   // defensively: if the caller is an older scaler image, fall back to null.
-  const currentParam = searchParams.get('current');
-  const readyParam = searchParams.get('ready');
-  const currentReplicas = currentParam !== null ? parseInt(currentParam, 10) : null;
-  const readyReplicas = readyParam !== null ? parseInt(readyParam, 10) : null;
+  const currentReplicas = numParam('current') !== null ? Math.trunc(numParam('current')!) : null;
+  const readyReplicas = numParam('ready') !== null ? Math.trunc(numParam('ready')!) : null;
+
+  // The scaler also aggregates `/colibri/stats` across ALL JVB pods (it has
+  // `pods/exec` RBAC). A single Service-LB fetch from this pod would only
+  // see one random bridge's slice of the traffic, which broke status-page
+  // numbers whenever `ready > 1`. `pollSuccesses > 0` is the signal that
+  // the scaler ran aggregation this tick; absent (older scaler image, or
+  // kubectl-exec failed for all pods) we fall back to a single fetch.
+  const pollSuccesses = numParam('pollSuccesses');
+  const pollFailures = numParam('pollFailures');
+  const scalerAggregated = pollSuccesses !== null && pollSuccesses > 0;
+
+  const stressFromCaller = numParam('stress_level');
+  const jvb = scalerAggregated
+    ? { participants: 0, conferences: 0, stressLevel: 0, reachable: false }
+    : await fetchJvbStats();
+
+  const participants = scalerAggregated
+    ? numParam('participants') ?? 0
+    : jvb.participants;
+  const conferences = scalerAggregated
+    ? numParam('conferences') ?? 0
+    : jvb.conferences;
+  const effectiveStress = scalerAggregated
+    ? numParam('stressLevel') ?? 0
+    : jvb.reachable
+      ? jvb.stressLevel
+      : stressFromCaller ?? 0;
+  // Aggregation succeeded ⇒ at least one pod answered ⇒ bridge is reachable.
+  // Without aggregation we can only use the single-pod probe's reachable flag.
+  const jvbReachable = scalerAggregated ? true : jvb.reachable;
 
   // ── Lifecycle transitions (applied as an atomic batch) ───────────
   // Order matters: first refresh LIVE activity, then demote stale LIVE→IDLE,
@@ -128,7 +159,7 @@ export const GET = withErrorHandling(async (request) => {
     };
 
     // 1) Refresh lastActiveAt for LIVE events when bridge has traffic.
-    if (jvb.reachable && jvb.participants > 0) {
+    if (jvbReachable && participants > 0) {
       const r = await tx.event.updateMany({
         where: { status: 'LIVE' },
         data: { lastActiveAt: now },
@@ -149,7 +180,11 @@ export const GET = withErrorHandling(async (request) => {
     //    step for this tick; operator-visible staleness still surfaces
     //    via the provisioning-timeout path, and real idleness is caught
     //    once the deployment scales back down to 1.
-    const skipIdleDemotion = (currentReplicas ?? 1) > 1;
+    //
+    //    When the scaler provided aggregated cross-pod stats this tick, the
+    //    `participants` count above is correct for every replica and the
+    //    guard can be dropped.
+    const skipIdleDemotion = !scalerAggregated && (currentReplicas ?? 1) > 1;
     if (!skipIdleDemotion) {
       const idleCandidates = await tx.event.findMany({
         where: {
@@ -226,7 +261,7 @@ export const GET = withErrorHandling(async (request) => {
     // 5) PROVISIONING → LIVE when the bridge is up AND the event has started.
     //    We wait on bridge reachability so the first joining user doesn't
     //    land on a still-cold JVB.
-    if (jvb.reachable) {
+    if (jvbReachable) {
       const r5 = await tx.event.updateMany({
         where: {
           status: 'PROVISIONING',
@@ -321,8 +356,10 @@ export const GET = withErrorHandling(async (request) => {
       `[jvb-scaler] tick ${now.toISOString()} ` +
         `current=${currentReplicas ?? '?'} ready=${readyReplicas ?? '?'} ` +
         `desired=${desired} billable=${billableEvents.length} ` +
-        `stress=${effectiveStress.toFixed(2)} jvbReachable=${jvb.reachable} ` +
-        `jvbParticipants=${jvb.participants} ` +
+        `stress=${effectiveStress.toFixed(2)} jvbReachable=${jvbReachable} ` +
+        `jvbParticipants=${participants} conferences=${conferences} ` +
+        `aggregated=${scalerAggregated} pollSuccesses=${pollSuccesses ?? 0} ` +
+        `pollFailures=${pollFailures ?? 0} ` +
         `transitions=${JSON.stringify(transitions)}`,
     );
   }
@@ -333,12 +370,41 @@ export const GET = withErrorHandling(async (request) => {
   if (currentReplicas !== null && readyReplicas !== null) {
     const redis = getRedis();
     if (redis) {
-      const snapshot = {
+      const snapshot: JvbSnapshot = {
         current: currentReplicas,
         ready: readyReplicas,
         desired,
         checkedAt: now.toISOString(),
       };
+      if (scalerAggregated) {
+        // Aggregated snapshot — authoritative traffic figures for the
+        // public status page. Fields are written only when the scaler
+        // provided them so a partial aggregation (e.g. some pods probed
+        // successfully, some failed) still stores meaningful sums.
+        snapshot.pollSuccesses = pollSuccesses ?? undefined;
+        snapshot.pollFailures = pollFailures ?? undefined;
+        snapshot.participants = participants;
+        snapshot.conferences = conferences;
+        snapshot.stressLevel = effectiveStress;
+        const largest = numParam('largestConference');
+        if (largest !== null) snapshot.largestConference = largest;
+        const audio = numParam('endpointsSendingAudio');
+        if (audio !== null) snapshot.endpointsSendingAudio = audio;
+        const video = numParam('endpointsSendingVideo');
+        if (video !== null) snapshot.endpointsSendingVideo = video;
+        const bitDown = numParam('bitRateDownKbps');
+        if (bitDown !== null) snapshot.bitRateDownKbps = bitDown;
+        const bitUp = numParam('bitRateUpKbps');
+        if (bitUp !== null) snapshot.bitRateUpKbps = bitUp;
+        const octoC = numParam('octoConferences');
+        if (octoC !== null) snapshot.octoConferences = octoC;
+        const octoE = numParam('octoEndpoints');
+        if (octoE !== null) snapshot.octoEndpoints = octoE;
+        const octoSend = numParam('octoSendBitrateBps');
+        if (octoSend !== null) snapshot.octoSendBitrateBps = octoSend;
+        const octoRecv = numParam('octoReceiveBitrateBps');
+        if (octoRecv !== null) snapshot.octoReceiveBitrateBps = octoRecv;
+      }
       try {
         await redis.set(
           JVB_SNAPSHOT_KEY,
@@ -358,8 +424,8 @@ export const GET = withErrorHandling(async (request) => {
     predictiveDesired,
     reactiveAdjustment,
     stressLevel: effectiveStress,
-    jvbReachable: jvb.reachable,
-    jvbParticipants: jvb.participants,
+    jvbReachable,
+    jvbParticipants: participants,
     activeEvents: billableEvents.length,
     breakdown,
     transitions,

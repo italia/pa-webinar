@@ -269,17 +269,32 @@ async function getJvbStatus(
     let octoEndpoints: number | null = null;
     let octoSendBitrateBps: number | null = null;
 
-    // Authoritative replica count: the scaler CronJob has K8s RBAC to read
-    // the JVB deployment and writes a snapshot to Redis on every tick. The
-    // /colibri/stats path below only tells us "≥1 pod answered the VIP"
-    // which caps `running` at 1 regardless of the real deployment size.
+    // Authoritative snapshot: the scaler CronJob has K8s RBAC to read the
+    // JVB deployment AND `pods/exec` to reach each pod's /colibri/stats.
+    // It aggregates per-pod stats and writes the result here. The direct
+    // /colibri/stats call below only tells us what ONE pod (whichever the
+    // Service VIP routes us to) reports — it caps running at 1 and zeroes
+    // participants/stress whenever traffic lives on a sibling pod.
     const snapshot = await readJvbSnapshot();
+    const snapshotHasTraffic = snapshot?.pollSuccesses !== undefined && snapshot.pollSuccesses > 0;
     if (snapshot) {
       running = snapshot.ready;
     }
+    if (snapshotHasTraffic) {
+      participants = snapshot!.participants ?? null;
+      stressLevel = snapshot!.stressLevel ?? null;
+      octoConferences = snapshot!.octoConferences ?? null;
+      octoEndpoints = snapshot!.octoEndpoints ?? null;
+      octoSendBitrateBps = snapshot!.octoSendBitrateBps ?? null;
+      octoEnabled = (octoConferences ?? 0) > 0 || (octoSendBitrateBps ?? 0) > 0;
+    }
 
+    // Fall back to a single /colibri/stats probe when the snapshot is missing
+    // aggregated traffic data (fresh pod, Redis cold, or older scaler image).
+    // With one JVB replica this is still correct; with many it's a lower
+    // bound for the bridge that happens to answer.
     const jvbHealthUrl = process.env.JVB_HEALTH_URL;
-    if (jvbHealthUrl) {
+    if (jvbHealthUrl && !snapshotHasTraffic) {
       try {
         const res = await fetch(`${jvbHealthUrl}/colibri/stats`, {
           signal: AbortSignal.timeout(3000),
@@ -287,18 +302,11 @@ async function getJvbStatus(
         if (res.ok) {
           const stats = await res.json() as Record<string, unknown>;
           if (stats.healthy !== false) {
-            // Fallback when the Redis snapshot is missing (fresh pod, no
-            // scaler tick yet, or Redis down). We know at least one pod
-            // is answering; reporting 1 is better than 0.
+            // Fallback when the Redis snapshot is missing entirely. We know
+            // at least one pod is answering; reporting 1 beats 0.
             if (!snapshot) running = 1;
             stressLevel = typeof stats.stress_level === 'number' ? stats.stress_level : null;
             participants = typeof stats.participants === 'number' ? stats.participants : null;
-            // Octo is considered "enabled" for this reporting purpose when
-            // the bridge has relay traffic OR is serving an octo conference.
-            // /colibri/stats always exposes these fields; a zero value with
-            // octo disabled is indistinguishable from octo-enabled-but-idle,
-            // so we key on the presence of non-zero relay fields at report
-            // time instead of a separate config probe.
             octoConferences = typeof stats.octo_conferences === 'number' ? stats.octo_conferences : null;
             octoEndpoints = typeof stats.octo_endpoints === 'number' ? stats.octo_endpoints : null;
             octoSendBitrateBps = typeof stats.octo_send_bitrate === 'number' ? stats.octo_send_bitrate : null;
