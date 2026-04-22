@@ -115,6 +115,7 @@ export const POST = withErrorHandling(async (request) => {
       imageUrl: data.imageUrl,
       waitingRoomAudioUrl: data.waitingRoomAudioUrl,
       parseTitleKicker: data.parseTitleKicker ?? null,
+      expectedSenderRatioPct: data.expectedSenderRatioPct ?? null,
       capacityEstimateJson: {
         ...capacityEstimate,
         computedAt: new Date().toISOString(),

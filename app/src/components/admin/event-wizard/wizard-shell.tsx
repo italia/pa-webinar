@@ -443,7 +443,7 @@ export default function EventWizard(props: WizardProps) {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
-                'X-Moderator-Token': moderatorToken,
+                Authorization: `Bearer ${moderatorToken}`,
               },
               body: JSON.stringify(payload),
             },
@@ -501,7 +501,7 @@ export default function EventWizard(props: WizardProps) {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              ...(moderatorToken ? { 'X-Moderator-Token': moderatorToken } : {}),
+              ...(moderatorToken ? { Authorization: `Bearer ${moderatorToken}` } : {}),
             },
             body: JSON.stringify({
               name: org.name,
@@ -535,7 +535,7 @@ export default function EventWizard(props: WizardProps) {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              ...(moderatorToken ? { 'X-Moderator-Token': moderatorToken } : {}),
+              ...(moderatorToken ? { Authorization: `Bearer ${moderatorToken}` } : {}),
             },
             body: JSON.stringify({
               name: mod.name,
@@ -551,7 +551,7 @@ export default function EventWizard(props: WizardProps) {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              ...(moderatorToken ? { 'X-Moderator-Token': moderatorToken } : {}),
+              ...(moderatorToken ? { Authorization: `Bearer ${moderatorToken}` } : {}),
             },
             body: JSON.stringify({
               name: sp.name,
@@ -585,14 +585,14 @@ export default function EventWizard(props: WizardProps) {
         );
 
         // 6) Promote from DRAFT → PUBLISHED if requested. The create
-        //    endpoint currently doesn't accept status; use PATCH on the
-        //    detail route.
+        //    endpoint currently doesn't accept status; use PUT on the
+        //    detail route (the route only exports PUT, not PATCH).
         if (submitMode === 'publish') {
           await fetch(`/api/events/${created.id}`, {
-            method: 'PATCH',
+            method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              ...(moderatorToken ? { 'X-Moderator-Token': moderatorToken } : {}),
+              ...(moderatorToken ? { Authorization: `Bearer ${moderatorToken}` } : {}),
             },
             body: JSON.stringify({ status: 'PUBLISHED' }),
           }).catch(() => {});
@@ -958,7 +958,7 @@ async function fanoutEditDiff(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Moderator-Token': moderatorToken,
+        Authorization: `Bearer ${moderatorToken}`,
       },
       body: JSON.stringify({
         name: o.name,
@@ -993,7 +993,7 @@ async function fanoutEditDiff(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Moderator-Token': moderatorToken,
+        Authorization: `Bearer ${moderatorToken}`,
       },
       body: JSON.stringify({ name: m.name, email: m.email, role: m.role }),
     }).catch(() => {});
