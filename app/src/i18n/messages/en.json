@@ -59,7 +59,8 @@
       "spotsAvailable": "{count} spots available",
       "fullyBooked": "Fully booked",
       "ended": "Ended",
-      "occupiedSpots": "{registered}/{max} registered"
+      "occupiedSpots": "{registered}/{max} registered",
+      "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}"
     },
     "detail": {
       "title": "Event details",
@@ -295,8 +296,7 @@
       "dismiss": "Got it"
     },
     "topBarCount": {
-      "live": "👥 {count} / {max}",
-      "capacityOnly": "{max} seats available"
+      "live": "👥 {count, plural, one {# person} other {# people}}"
     }
   },
   "qa": {
@@ -1696,7 +1696,9 @@
       "resultsCount": "{count, plural, =0 {No events} one {# event} other {# events}}",
       "durationMinutes": "{minutes} min",
       "durationHoursMinutes": "{hours}h {minutes}min",
-      "moderatorsSpeakers": "{mods} moderators · {speakers} speakers"
+      "moderatorsSpeakers": "{mods} moderators · {speakers} speakers",
+      "postEventSummary": "{connected} joined · {registered} registered",
+      "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}"
     },
     "tags": {
       "title": "Tag management",
@@ -1773,7 +1775,9 @@
         "ofMax": "{current} of {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "No reminders configured",
-        "tags": "Tags"
+        "tags": "Tags",
+        "postEventSummary": "{connected} joined of {registered} registrations (estimated {estimated})",
+        "estimatedAttendance": "Estimated: {estimated} attendees"
       }
     }
   },

@@ -35,6 +35,7 @@ interface EventSummary {
   eventType?: string;
   registrationCount: number;
   maxParticipants: number;
+  peakParticipants: number;
   moderatorToken: string;
   coverImageUrl: string | null;
   imageUrl: string | null;
@@ -466,12 +467,6 @@ export default function AdminDashboardClient({
             const isEnded = event.status === 'ENDED';
             const isInstant = event.eventType === 'INSTANT';
             const isSelected = selected.has(event.id);
-            const occupancyPct = Math.min(
-              100,
-              (event.registrationCount /
-                Math.max(1, event.maxParticipants)) *
-                100,
-            );
             const borderColor =
               STATUS_BORDER[event.status] ?? STATUS_BORDER.DRAFT;
             const manageUrl = `/admin/events/${event.id}?token=${token ?? event.moderatorToken}`;
@@ -707,38 +702,21 @@ export default function AdminDashboardClient({
                       </li>
                     </ul>
 
-                    {/* Progress */}
+                    {/* Footer: registrations count + manage link */}
                     <div className="mt-auto">
-                      <div className="d-flex align-items-center justify-content-between mb-1">
+                      <div className="d-flex align-items-center justify-content-between mb-2">
                         <span
-                          className="text-secondary"
-                          style={{ fontSize: '0.8rem' }}
+                          className="text-secondary d-inline-flex align-items-center gap-1"
+                          style={{ fontSize: '0.82rem' }}
                         >
-                          {event.registrationCount} / {event.maxParticipants}
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                          {isEnded && event.peakParticipants > 0
+                            ? tList('postEventSummary', {
+                                connected: event.peakParticipants,
+                                registered: event.registrationCount,
+                              })
+                            : tList('registeredCount', { count: event.registrationCount })}
                         </span>
-                        <span
-                          className="text-muted"
-                          style={{ fontSize: '0.75rem' }}
-                        >
-                          {Math.round(occupancyPct)}%
-                        </span>
-                      </div>
-                      <div
-                        className="progress mb-3"
-                        style={{ height: 4, borderRadius: 2 }}
-                      >
-                        <div
-                          className="progress-bar"
-                          role="progressbar"
-                          style={{
-                            width: `${occupancyPct}%`,
-                            backgroundColor: borderColor,
-                            borderRadius: 2,
-                          }}
-                          aria-valuenow={event.registrationCount}
-                          aria-valuemin={0}
-                          aria-valuemax={event.maxParticipants}
-                        />
                       </div>
 
                       <div
