@@ -559,9 +559,13 @@ model Registration {
 // ─── Q&A ─────────────────────────────────────────────────────
 
 model Question {
-  id             String @id @default(uuid()) @db.Uuid
-  eventId        String @map("event_id") @db.Uuid
-  registrationId String @map("registration_id") @db.Uuid
+  id             String  @id @default(uuid()) @db.Uuid
+  eventId        String  @map("event_id") @db.Uuid
+  // Nullable so guests (no Registration row) can also submit questions
+  // via the event live page. `authorName` stays authoritative: for
+  // registrations it's copied from Registration.displayName, for guests
+  // it's whatever the guest typed in the waiting room.
+  registrationId String? @map("registration_id") @db.Uuid
 
   authorName String @map("author_name")
   text       String @db.VarChar(500)
@@ -574,8 +578,8 @@ model Question {
   answeredAt    DateTime? @map("answered_at")
 
   // Relations
-  event        Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  registration Registration     @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  event        Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration Registration?     @relation(fields: [registrationId], references: [id], onDelete: Cascade)
   upvotes      QuestionUpvote[]
 
   @@index([eventId, status, upvoteCount(sort: Desc)])

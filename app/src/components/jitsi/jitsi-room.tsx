@@ -129,8 +129,20 @@ export default function JitsiRoom({
     // so we must explicitly write the prop value — both true AND false —
     // otherwise a user who turned the camera ON in the preview would
     // still join muted.
-    extraConfig.startWithVideoMuted = startWithVideoMuted;
-    extraConfig.startWithAudioMuted = startWithAudioMuted;
+    //
+    // EXCEPTION: on mobile browsers we always start muted, regardless of
+    // the pre-join choice. iOS Safari (and Chrome in-iframe contexts)
+    // require a fresh user gesture for each getUserMedia call, so
+    // auto-acquiring the camera on join fails and can crash the iframe.
+    // The user taps the Jitsi camera button after joining — that click
+    // counts as a gesture and works reliably.
+    if (isMobileRef.current) {
+      extraConfig.startWithVideoMuted = true;
+      extraConfig.startWithAudioMuted = true;
+    } else {
+      extraConfig.startWithVideoMuted = startWithVideoMuted;
+      extraConfig.startWithAudioMuted = startWithAudioMuted;
+    }
 
     if (role === 'participant') {
       if (!participantsCanUnmute) {

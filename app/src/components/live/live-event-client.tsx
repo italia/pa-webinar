@@ -857,7 +857,12 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
 
         <div className="flex-grow-1 d-flex flex-column live-sidebar-body" style={{ minHeight: 0, overflowY: 'auto' }}>
           {activeTab === 'qa' && qaEnabled && (
-            <QAPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+            <QAPanel
+              eventSlug={eventSlug}
+              token={token}
+              isModerator={isModerator}
+              guestName={!token ? displayName : undefined}
+            />
           )}
           {/* ChatPanel stays mounted while the event is live so it can
               keep its SSE open and count unreads while the user is on

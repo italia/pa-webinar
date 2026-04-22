@@ -281,36 +281,50 @@ export default function DeviceCheck({ onReady, onStateChange, compact = false }:
     </div>
   );
 
+  // The toggles drive two things: the live preview (only active when
+  // permission is granted) and the join preference forwarded to Jitsi.
+  // We deliberately keep them ENABLED even while the browser is
+  // prompting for permission — otherwise on Firefox / browsers with
+  // slow permission UIs the user sees the switches greyed out and
+  // thinks they are broken.
   const toggles = (
     <div className="d-flex flex-wrap gap-3 mb-3">
-      <div className="form-check form-switch mb-0">
+      <label
+        className="device-check-toggle d-inline-flex align-items-center gap-2"
+        htmlFor="device-check-camera-toggle"
+      >
         <input
-          className="form-check-input"
           type="checkbox"
-          role="switch"
+          className="device-check-toggle__input"
           id="device-check-camera-toggle"
           checked={cameraOn}
           onChange={handleCameraToggle}
-          disabled={permissionState !== 'granted'}
         />
-        <label className="form-check-label small" htmlFor="device-check-camera-toggle">
+        <span className="device-check-toggle__track" aria-hidden="true">
+          <span className="device-check-toggle__thumb" />
+        </span>
+        <span className="small fw-semibold">
           {cameraOn ? t('cameraToggleOn') : t('cameraToggleOff')}
-        </label>
-      </div>
-      <div className="form-check form-switch mb-0">
+        </span>
+      </label>
+      <label
+        className="device-check-toggle d-inline-flex align-items-center gap-2"
+        htmlFor="device-check-mic-toggle"
+      >
         <input
-          className="form-check-input"
           type="checkbox"
-          role="switch"
+          className="device-check-toggle__input"
           id="device-check-mic-toggle"
           checked={micOn}
           onChange={handleMicToggle}
-          disabled={permissionState !== 'granted'}
         />
-        <label className="form-check-label small" htmlFor="device-check-mic-toggle">
+        <span className="device-check-toggle__track" aria-hidden="true">
+          <span className="device-check-toggle__thumb" />
+        </span>
+        <span className="small fw-semibold">
           {micOn ? t('micToggleOn') : t('micToggleOff')}
-        </label>
-      </div>
+        </span>
+      </label>
     </div>
   );
 
