@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import {
   Alert,
@@ -595,6 +596,10 @@ export default function LiveEventClient({
               onApiReady={handleApiReady}
             />
             {!isInstantCall && <ReactionBar eventSlug={event.slug} />}
+            {/* Floating controls slot: the sidebar portals its bar here
+                so it sits on top of the Jitsi iframe (Meet-style) on
+                both desktop and mobile. */}
+            <div id="live-floating-controls-slot" className="live-floating-controls-slot" />
           </div>
         </div>
 
@@ -708,19 +713,57 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
     };
   }, [chatUnread]);
 
-  const tabs: { key: SidebarTab; label: string; icon: string; badge?: number; dot?: boolean; show: boolean }[] = [
-    { key: 'qa', label: t('sidebarTabQa'), icon: 'it-comment', show: !isInstantCall && qaEnabled },
-    { key: 'chat', label: t('sidebarTabChat'), icon: 'it-mail', dot: chatUnread > 0, show: !isInstantCall && showChat },
-    { key: 'polls', label: t('sidebarTabPolls'), icon: 'it-chart-line', show: !isInstantCall },
-    { key: 'materials', label: t('sidebarTabMaterials'), icon: 'it-clip', show: !isInstantCall },
-    { key: 'participants', label: t('sidebarTabParticipants'), icon: 'it-user', badge: participantCount, show: true },
+  // Meet-style floating controls live on top of the video; the drawer
+  // slides in from the right on desktop / from the bottom on mobile.
+  // The drawer is open when activeTab is set AND the user has clicked.
+  // Rather than having two "open" flags we reuse `drawerOpen` as the
+  // single source of truth and let the floating bar toggle it.
+  const tabs: Array<{
+    key: SidebarTab;
+    label: string;
+    svg: React.ReactNode;
+    badge?: number;
+    dot?: boolean;
+    show: boolean;
+  }> = [
+    {
+      key: 'qa',
+      label: t('sidebarTabQa'),
+      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>),
+      show: !isInstantCall && qaEnabled,
+    },
+    {
+      key: 'chat',
+      label: t('sidebarTabChat'),
+      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>),
+      dot: chatUnread > 0,
+      show: !isInstantCall && showChat,
+    },
+    {
+      key: 'polls',
+      label: t('sidebarTabPolls'),
+      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>),
+      show: !isInstantCall,
+    },
+    {
+      key: 'materials',
+      label: t('sidebarTabMaterials'),
+      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>),
+      show: !isInstantCall,
+    },
+    {
+      key: 'participants',
+      label: t('sidebarTabParticipants'),
+      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>),
+      badge: participantCount,
+      show: true,
+    },
   ];
 
   const visibleTabs = tabs.filter((tab) => tab.show);
 
   const handleTabClick = useCallback((key: SidebarTab) => {
-    // Mobile toggle semantics: tapping the already-active tab closes the
-    // drawer. Desktop CSS ignores drawerOpen, so this is a no-op there.
+    // Toggle semantics: clicking the active-and-open tab closes the drawer.
     if (activeTab === key && drawerOpen) {
       setDrawerOpen(false);
       return;
@@ -731,10 +774,63 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
+  // ESC closes the drawer (desktop users expect it, mobile scrim
+  // already handles the tap-outside pattern).
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeDrawer();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [drawerOpen, closeDrawer]);
+
+  // The floating controls portal target is mounted in LiveBody just
+  // after <JitsiRoom>. We wait a tick after mount to read it, since
+  // SSR returns null for document.getElementById.
+  const [slot, setSlot] = useState<Element | null>(null);
+  useEffect(() => {
+    setSlot(document.getElementById('live-floating-controls-slot'));
+  }, []);
+
+  const floatingBar = (
+    <div className="live-floating-controls" role="toolbar" aria-label={t('floatingControlsLabel')}>
+      {visibleTabs.map((tab) => {
+        const isActive = activeTab === tab.key && drawerOpen;
+        return (
+          <button
+            key={tab.key}
+            type="button"
+            className={`live-floating-btn${isActive ? ' live-floating-btn--active' : ''}`}
+            onClick={() => handleTabClick(tab.key)}
+            aria-pressed={isActive}
+          >
+            <span className="live-floating-btn__icon">{tab.svg}</span>
+            <span className="live-floating-btn__label">{tab.label}</span>
+            {tab.badge !== undefined && tab.badge > 0 && (
+              <span className="live-floating-btn__badge" aria-hidden="true">{tab.badge}</span>
+            )}
+            {tab.dot && (
+              <span
+                className="live-floating-btn__dot"
+                aria-label={t('sidebarTabChatUnread')}
+                title={t('sidebarTabChatUnread')}
+              />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+
   return (
     <>
-      {/* Mobile scrim — only visible when drawer open on narrow screens.
-          Desktop never renders it (CSS). Tap = close. */}
+      {/* Floating control bar — portaled into the video wrapper so it
+          overlays the Jitsi iframe and scales with the video. */}
+      {slot && createPortal(floatingBar, slot)}
+
+      {/* Scrim visible whenever the drawer is open (desktop + mobile).
+          Click = close. */}
       <button
         type="button"
         className={`live-sidebar-scrim${drawerOpen ? ' live-sidebar-scrim--open' : ''}`}
@@ -744,51 +840,19 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
       />
 
       <div className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}`}>
-        {/* Tab strip — doubles as the always-visible mobile launcher
-            when the drawer is collapsed. On desktop this is just the
-            regular sidebar header. */}
-        <div className="d-flex live-sidebar-header" style={{ overflowX: 'auto' }}>
-          {visibleTabs.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              className={`btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-1 live-sidebar-tab${
-                activeTab === tab.key ? ' live-sidebar-tab--active' : ''
-              }`}
-              onClick={() => handleTabClick(tab.key)}
-            >
-              <Icon icon={tab.icon} size="xs" color="white" />
-              <span className="d-none d-md-inline">{tab.label}</span>
-              {tab.badge !== undefined && tab.badge > 0 && (
-                <Badge
-                  color=""
-                  pill
-                  style={{
-                    fontSize: '0.6rem',
-                    padding: '1px 5px',
-                    backgroundColor: 'rgba(255,255,255,0.25)',
-                    color: '#fff',
-                  }}
-                >
-                  {tab.badge}
-                </Badge>
-              )}
-              {tab.dot && (
-                <span
-                  aria-label={t('sidebarTabChatUnread')}
-                  title={t('sidebarTabChatUnread')}
-                  style={{
-                    display: 'inline-block',
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    backgroundColor: '#D9364F',
-                    boxShadow: '0 0 0 1px rgba(255,255,255,0.6)',
-                  }}
-                />
-              )}
-            </button>
-          ))}
+        {/* Drawer header: active panel title + close button. */}
+        <div className="live-sidebar-header d-flex align-items-center justify-content-between">
+          <span className="fw-semibold" style={{ color: '#fff', fontSize: '0.95rem' }}>
+            {visibleTabs.find((t) => t.key === activeTab)?.label}
+          </span>
+          <button
+            type="button"
+            className="btn btn-sm live-sidebar-close"
+            onClick={closeDrawer}
+            aria-label={t('closeDrawer')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
 
         <div className="flex-grow-1 d-flex flex-column live-sidebar-body" style={{ minHeight: 0, overflowY: 'auto' }}>
