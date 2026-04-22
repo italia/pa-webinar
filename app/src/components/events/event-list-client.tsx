@@ -17,6 +17,12 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import EventTitle from '@/components/events/event-title';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
+interface EventTag {
+  slug: string;
+  name: Record<string, string>;
+  color: string | null;
+}
+
 interface EventItem {
   id: string;
   slug: string;
@@ -34,6 +40,7 @@ interface EventItem {
   imageUrl?: string | null;
   /** Per-event override for the kicker parse. Null = inherit site default. */
   parseTitleKicker?: boolean | null;
+  tags?: EventTag[];
 }
 
 interface EventListClientProps {
@@ -41,6 +48,23 @@ interface EventListClientProps {
   muted?: boolean;
   /** Site-wide default for the kicker parse, used when an event has no override. */
   parseTitleKicker?: boolean;
+}
+
+function hexWithAlpha(hex: string, alpha: number): string {
+  const clean = hex.replace('#', '');
+  const normalized =
+    clean.length === 3
+      ? clean
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : clean;
+  if (normalized.length !== 6) return hex;
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  if ([r, g, b].some((v) => Number.isNaN(v))) return hex;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 export default function EventListClient({
@@ -71,6 +95,10 @@ export default function EventListClient({
           : isEnded
             ? '#5A768A'
             : '#0066CC';
+
+        const eventTags = event.tags ?? [];
+        const visibleTags = eventTags.slice(0, 3);
+        const overflowCount = Math.max(0, eventTags.length - 3);
 
         return (
           <Col key={event.id} xs={12} md={6} lg={4}>
@@ -124,6 +152,50 @@ export default function EventListClient({
                     </Link>
                   )}
                 />
+
+                {visibleTags.length > 0 && (
+                  <div className="d-flex flex-wrap gap-1 mb-2">
+                    {visibleTags.map((tag) => {
+                      const displayName =
+                        tag.name[locale] ??
+                        tag.name.it ??
+                        tag.name.en ??
+                        tag.slug;
+                      const color = tag.color ?? '#0066CC';
+                      return (
+                        <Link
+                          key={tag.slug}
+                          href={{ pathname: '/events', query: { tag: tag.slug } }}
+                          className="badge text-decoration-none"
+                          style={{
+                            backgroundColor: hexWithAlpha(color, 0.15),
+                            color,
+                            fontWeight: 500,
+                            fontSize: '0.72rem',
+                            padding: '3px 8px',
+                            borderRadius: 12,
+                          }}
+                        >
+                          {displayName}
+                        </Link>
+                      );
+                    })}
+                    {overflowCount > 0 && (
+                      <span
+                        className="badge"
+                        style={{
+                          backgroundColor: '#F5F7FB',
+                          color: '#5A768A',
+                          fontSize: '0.72rem',
+                          padding: '3px 8px',
+                          borderRadius: 12,
+                        }}
+                      >
+                        +{overflowCount}
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 <div className="d-flex align-items-center text-secondary mb-2">
                   <Icon icon="it-calendar" size="sm" className="me-2 flex-shrink-0" />

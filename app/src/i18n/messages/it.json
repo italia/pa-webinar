@@ -111,6 +111,10 @@
       "LIVE": "In corso",
       "ENDED": "Concluso",
       "ARCHIVED": "Archiviato"
+    },
+    "list": {
+      "filterByTag": "Filtra per categoria",
+      "allTags": "Tutte"
     }
   },
   "registration": {
@@ -1140,7 +1144,9 @@
         "gdprTemplatesTitle": "Template GDPR",
         "gdprTemplatesDescription": "Crea informative privacy riutilizzabili tra eventi e scegli quella predefinita per i nuovi eventi.",
         "emailTemplatesTitle": "Template email",
-        "emailTemplatesDescription": "Personalizza oggetto, titoli e testi delle email di conferma e promemoria. Se lasciati vuoti si usano i testi predefiniti."
+        "emailTemplatesDescription": "Personalizza oggetto, titoli e testi delle email di conferma e promemoria. Se lasciati vuoti si usano i testi predefiniti.",
+        "tagsTitle": "Gestione tag",
+        "tagsDescription": "Crea e modifica i tag usati per filtrare gli eventi"
       },
       "tabs": {
         "branding": "Branding",
@@ -1732,6 +1738,102 @@
       "delete": "Elimina",
       "deleteConfirm": "Stai per eliminare definitivamente {count} eventi con tutti i dati associati (iscrizioni, sessioni, registrazioni, Q&A, sondaggi). Operazione irreversibile.",
       "archiveConfirm": "Stai per archiviare {count} eventi. Gli eventi archiviati non sono più visibili nella lista pubblica ma i dati vengono conservati."
+    },
+    "eventsList": {
+      "search": "Cerca",
+      "searchPlaceholder": "Titolo, slug o organizzatore…",
+      "status": "Stato",
+      "statusAll": "Tutti gli stati",
+      "tags": "Categorie",
+      "sort": "Ordina per",
+      "sortStartsAsc": "Data inizio ↑ (default)",
+      "sortStartsDesc": "Data inizio ↓",
+      "sortCreatedDesc": "Creazione ↓",
+      "sortTitleAsc": "Titolo A→Z",
+      "resetFilters": "Reset filtri",
+      "noResults": "Nessun evento corrisponde ai filtri.",
+      "resultsCount": "{count, plural, =0 {Nessun evento} one {# evento} other {# eventi}}",
+      "durationMinutes": "{minutes} min",
+      "durationHoursMinutes": "{hours}h {minutes}min",
+      "moderatorsSpeakers": "{mods} moderatori · {speakers} relatori"
+    },
+    "tags": {
+      "title": "Gestione tag",
+      "subtitle": "Crea, modifica ed elimina i tag usati per classificare e filtrare gli eventi pubblici.",
+      "backToSettings": "Impostazioni",
+      "addTag": "Nuovo tag",
+      "editTag": "Modifica tag",
+      "columnColor": "Colore",
+      "columnSlug": "Slug",
+      "columnName": "Nome",
+      "columnSortOrder": "Ordine",
+      "columnActions": "Azioni",
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "deleting": "Eliminazione…",
+      "deleteConfirm": "Eliminare il tag \"{name}\"? Verrà rimosso anche dagli eventi collegati.",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "cancel": "Annulla",
+      "slugLabel": "Slug",
+      "slugHelp": "Solo minuscole, cifre e trattini (es. webinar-aperto).",
+      "nameItLabel": "Nome (italiano)",
+      "nameItRequired": "Il nome in italiano è obbligatorio.",
+      "nameEnLabel": "Nome (inglese)",
+      "colorLabel": "Colore",
+      "colorInvalid": "Colore non valido: usa il formato #rrggbb.",
+      "sortOrderLabel": "Ordine",
+      "sortOrderHelp": "Valori più bassi appaiono prima. Default: 0.",
+      "empty": "Nessun tag definito. Crea il primo con il pulsante \"Nuovo tag\".",
+      "countLabel": "{count, plural, one {# tag} other {# tag}}",
+      "slugInUse": "Slug già in uso",
+      "notFound": "Tag non trovato",
+      "saved": "Tag salvato",
+      "deleted": "Tag eliminato",
+      "validationFailed": "Alcuni campi non sono validi.",
+      "genericError": "Si è verificato un errore. Riprova."
+    },
+    "eventDetail": {
+      "copyPublicUrl": "Copia link pubblico",
+      "copyModeratorUrl": "Copia link moderatore",
+      "enterAsModerator": "Entra live",
+      "editEvent": "Modifica evento",
+      "editSettings": "Modifica impostazioni",
+      "featureSummary": "Funzionalità attive",
+      "organizers": "Organizzatori",
+      "privacyGdpr": "Privacy & GDPR",
+      "postEventTitle": "Post-evento & feedback",
+      "recordingSection": "Registrazione",
+      "callSessions": "Sessioni & telemetria",
+      "questionnaires": "Questionari",
+      "questionnaireCount": "{count, plural, =0 {Nessun questionario associato} one {1 questionario associato} other {# questionari associati}}",
+      "manageMaterials": "Gestisci materiali",
+      "manageQuestionnaires": "Gestisci questionari",
+      "tabs": {
+        "overview": "Panoramica",
+        "settings": "Impostazioni",
+        "people": "Persone",
+        "content": "Contenuti",
+        "audit": "Registrazioni & Audit"
+      },
+      "toggles": {
+        "unmute": "Partecipanti possono parlare",
+        "video": "Partecipanti possono attivare video",
+        "screenShare": "Partecipanti possono condividere schermo"
+      },
+      "fields": {
+        "dataRetention": "Retention dati",
+        "dataRetentionValue": "{days, plural, one {# giorno} other {# giorni}}",
+        "privacyUrl": "Informativa privacy",
+        "recordingConsent": "Consenso registrazione"
+      },
+      "sidebar": {
+        "registrations": "Registrazioni",
+        "ofMax": "{current} su {max}",
+        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
+        "noReminders": "Nessun promemoria configurato",
+        "tags": "Tag"
+      }
     }
   },
   "email": {
