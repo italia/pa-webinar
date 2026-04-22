@@ -9,7 +9,10 @@
  * GET params:
  *   q?          — case-insensitive substring match on displayName or organization
  *   orgType?    — OrganizationType enum value
- *   includeOpted?  — 'out' to include opted-out persons (default: only opted-in)
+ *   includeOpted?  — 'out' to include opted-out persons (default: only opted-in).
+ *                   Admin-side pickers (e.g. event wizard rubrica picker) may
+ *                   pass this flag to surface persons that have not yet opted in
+ *                   to the cross-event address book.
  *   limit?      — default 200, max 1000
  *   offset?     — pagination offset
  */

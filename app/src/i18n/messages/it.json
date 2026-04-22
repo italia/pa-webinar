@@ -410,6 +410,12 @@
       "helpAudio": "Formati supportati: MP3, WAV, OGG, M4A, WebM — max 20 MB",
       "helpDocument": "Formati supportati: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
     },
+    "rubricaPicker": {
+      "loading": "Ricerca in corso…",
+      "noResults": "Nessun risultato",
+      "addSelected": "Aggiungi selezionati",
+      "selectedCount": "{count, plural, =0 {Nessuna persona selezionata} one {1 persona selezionata} other {# persone selezionate}}"
+    },
     "wizard": {
       "steps": {
         "base": "Base",
@@ -420,6 +426,7 @@
       },
       "saveDraft": "Salva come bozza",
       "publish": "Pubblica evento",
+      "updateEvent": "Aggiorna evento",
       "step1": {
         "heading": "Informazioni di base",
         "intro": "Titolo, descrizione, immagine e calendario dell'evento.",
@@ -432,7 +439,16 @@
         "waitingRoomAudio": "Audio sala d'attesa (facoltativo)",
         "waitingRoomAudioHelp": "Riprodotto prima dell'inizio della videocall.",
         "parseTitleKickerLabel": "Titolo con sopratitolo (separatore |)",
-        "parseTitleKickerHelp": "Quando attivo, un titolo come 'CONFERENZA | Innovazione digitale' mostrerà CONFERENZA come sopratitolo."
+        "parseTitleKickerHelp": "Quando attivo, un titolo come 'CONFERENZA | Innovazione digitale' mostrerà CONFERENZA come sopratitolo.",
+        "maxParticipantsHelp": "Stima il numero massimo di partecipanti. Determina la capacità del server video e la UI di sala d'attesa.",
+        "validation": {
+          "startsAt": "Data di inizio non valida.",
+          "endsAt": "La data di fine deve essere successiva alla data di inizio."
+        },
+        "senderRatioLabel": "Percentuale attiva stimata",
+        "senderRatioHelp": "Quanti partecipanti si aspettano di avere microfono/video attivo. Aiuta a dimensionare il server video.",
+        "activeParticipantsEstimate": "≈ {count} partecipanti attivi",
+        "senderRatioPreset": "{pct}%"
       },
       "step2": {
         "heading": "Chi può fare cosa",
@@ -577,8 +593,12 @@
         "moderatorName": "Nome",
         "moderatorEmail": "Email",
         "capacityHeading": "Capacità stimata",
-        "featuresHeading": "Configurazione sintetica"
-      }
+        "featuresHeading": "Configurazione sintetica",
+        "privacyDoc": "Documento informativa (PDF o link)",
+        "privacyDocHelp": "Carica un PDF o incolla l'URL di un'informativa sostitutiva. Sovrascrive il template GDPR se presente.",
+        "privacyTextHelp": "Testo sintetico mostrato nel form di registrazione; può integrare o sostituire il template GDPR."
+      },
+      "validationFailed": "Controlla i campi evidenziati prima di procedere."
     },
     "nav": {
       "events": "Eventi",

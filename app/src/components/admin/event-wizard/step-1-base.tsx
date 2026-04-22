@@ -38,10 +38,12 @@ export interface Step1Value {
   recurrencePreset: RecurrencePreset;
   recurrenceUntil: string | null;
   recurrenceCount: number | null;
-  /** Per-event override: true forces "kicker" rendering on, null inherits
-   *  the site default. The wizard only exposes the toggle when the site
-   *  default is off (otherwise the site setting already covers it). */
+  /** Per-event override: true/false forces the behaviour, null inherits
+   *  the site default. */
   parseTitleKicker: boolean | null;
+  /** Per-event estimate of how many participants will send audio/video.
+   *  Null inherits the site default. */
+  expectedSenderRatioPct: number | null;
 }
 
 interface Props {
@@ -55,10 +57,14 @@ interface Props {
     color: string | null;
   }>;
   fieldErrors: Record<string, string>;
-  /** Site-wide default for parseTitleKicker. When true, the per-event
-   *  checkbox is hidden because the site setting already covers it. */
+  /** Site-wide default for parseTitleKicker. Used as the visible default
+   *  when the per-event override is null. */
   siteDefaultParseTitleKicker: boolean;
+  /** Site-wide default sender-ratio %, used as fallback/initial estimate. */
+  defaultSenderRatioPct: number;
 }
+
+const SENDER_RATIO_PRESETS = [15, 25, 35, 50, 75] as const;
 
 export default function Step1Base({
   value,
@@ -68,6 +74,7 @@ export default function Step1Base({
   availableTags,
   fieldErrors,
   siteDefaultParseTitleKicker,
+  defaultSenderRatioPct,
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
   const tAdmin = useTranslations('admin');
@@ -173,28 +180,27 @@ export default function Step1Base({
             </div>
           )}
 
-          {/* Per-event kicker override. Hidden when the site default is
-              already on — in that case every `|` title already renders
-              split, so the override is redundant. */}
-          {!siteDefaultParseTitleKicker && (
-            <div className="form-check mt-2">
-              <input
-                id="ev-parse-title-kicker"
-                type="checkbox"
-                className="form-check-input"
-                checked={value.parseTitleKicker === true}
-                onChange={(e) =>
-                  onChange({ parseTitleKicker: e.target.checked ? true : null })
-                }
-              />
-              <label className="form-check-label" htmlFor="ev-parse-title-kicker">
-                {t('parseTitleKickerLabel')}
-              </label>
-              <small className="form-text text-muted d-block">
-                {t('parseTitleKickerHelp')}
-              </small>
-            </div>
-          )}
+          {/* Per-event kicker override — always shown so the admin can
+              toggle pipe-splitting on or off for this event. The initial
+              checked state mirrors the resolved value (override ??
+              site default); flipping it stores an explicit true/false. */}
+          <div className="form-check mt-2">
+            <input
+              id="ev-parse-title-kicker"
+              type="checkbox"
+              className="form-check-input"
+              checked={value.parseTitleKicker ?? siteDefaultParseTitleKicker}
+              onChange={(e) =>
+                onChange({ parseTitleKicker: e.target.checked })
+              }
+            />
+            <label className="form-check-label" htmlFor="ev-parse-title-kicker">
+              {t('parseTitleKickerLabel')}
+            </label>
+            <small className="form-text text-muted d-block">
+              {t('parseTitleKickerHelp')}
+            </small>
+          </div>
         </div>
 
         <div className="mb-3">
@@ -313,6 +319,57 @@ export default function Step1Base({
             </div>
             <small className="form-text text-muted">
               {t('maxParticipantsHelp')}
+            </small>
+          </div>
+          <div className="col-12">
+            <label className="form-label" htmlFor="ev-sender-ratio">
+              {t('senderRatioLabel')}
+            </label>
+            <div className="d-flex align-items-center flex-wrap gap-2">
+              {SENDER_RATIO_PRESETS.map((pct) => {
+                const effective = value.expectedSenderRatioPct ?? defaultSenderRatioPct;
+                const active = effective === pct;
+                return (
+                  <button
+                    key={pct}
+                    type="button"
+                    aria-pressed={active}
+                    className={`btn btn-sm ${active ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    onClick={() => onChange({ expectedSenderRatioPct: pct })}
+                  >
+                    {t('senderRatioPreset', { pct })}
+                  </button>
+                );
+              })}
+              <input
+                id="ev-sender-ratio"
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                className="form-control"
+                style={{ maxWidth: 96 }}
+                value={value.expectedSenderRatioPct ?? defaultSenderRatioPct}
+                onChange={(e) => {
+                  const raw = Number(e.target.value);
+                  if (!Number.isFinite(raw)) return;
+                  const clamped = Math.min(100, Math.max(0, Math.round(raw)));
+                  onChange({ expectedSenderRatioPct: clamped });
+                }}
+                aria-label={t('senderRatioLabel')}
+              />
+              <span className="text-muted" style={{ fontSize: '0.85rem' }}>
+                {t('activeParticipantsEstimate', {
+                  count: Math.round(
+                    (value.maxParticipants *
+                      (value.expectedSenderRatioPct ?? defaultSenderRatioPct)) /
+                      100,
+                  ),
+                })}
+              </span>
+            </div>
+            <small className="form-text text-muted">
+              {t('senderRatioHelp')}
             </small>
           </div>
         </div>

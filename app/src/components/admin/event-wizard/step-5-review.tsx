@@ -236,10 +236,10 @@ export default function Step5Review({
         </h3>
         <JvbCapacityPreview
           maxParticipants={form.maxParticipants}
-          senderRatioPct={null}
-          onSenderRatioChange={() => {
-            /* wizard surfaces the default only — fine-tuning lives on the edit page */
-          }}
+          senderRatioPct={form.expectedSenderRatioPct}
+          onSenderRatioChange={(next) =>
+            onChange({ expectedSenderRatioPct: next })
+          }
           videoEnabled={toggles.participantsCanStartVideo}
           defaultSenderRatioPct={defaultSenderRatioPct}
           sizingConfig={jvbSizingConfig}
