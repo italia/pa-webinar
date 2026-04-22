@@ -110,8 +110,14 @@ spec:
 
                     for JVB_POD in $JVB_PODS; do
                       [ -z "$JVB_POD" ] && continue
+                      # NOTE: don't pass --request-timeout to `kubectl exec` here.
+                      # With that flag kubectl silently discards the in-cluster
+                      # kubeconfig and tries localhost:8080 (observed: "dial tcp
+                      # [::1]:8080: connect: connection refused"), turning every
+                      # probe into pods_fail. The curl --max-time caps the inner
+                      # call; activeDeadlineSeconds on the CronJob caps the whole
+                      # tick at 120s, which is enough for ≤6 pod probes.
                       STATS=$(kubectl exec -n {{ .Release.Namespace }} "$JVB_POD" \
-                        --request-timeout=5s \
                         -- curl -sf --max-time 3 "http://127.0.0.1:8080/colibri/stats" 2>/dev/null || true)
 
                       if [ -z "$STATS" ]; then
@@ -133,9 +139,22 @@ spec:
                       OR=$(extract_num "$STATS" octo_receive_bitrate); OR=${OR:-0}
                       SL=$(extract_num "$STATS" stress_level); SL=${SL:-0}
 
-                      # stress is in [0,1] with 4+ decimals. Multiply by 1000 and
-                      # truncate to an integer so we can compare with POSIX `-gt`.
-                      SL_MILLI=$(awk "BEGIN{printf \"%d\", ($SL)*1000}" 2>/dev/null || echo 0)
+                      # Stress is documented to be in [0,1] but JVB has been
+                      # observed returning much larger values on freshly-started
+                      # or recently-cycled pods (e.g. 7-8 on an idle bridge),
+                      # which would amplify into spurious reactive scale-ups.
+                      # Two safeguards:
+                      #   1. Cap per-pod stress to 1.0.
+                      #   2. Ignore stress from pods with zero participants.
+                      #      Stress on an empty bridge is meaningless for
+                      #      reactive capacity decisions — the predictive
+                      #      signal already covers that event's provisioning.
+                      # Multiply by 1000 and truncate so POSIX `-gt` can compare.
+                      if [ "$P" -gt 0 ] 2>/dev/null; then
+                        SL_MILLI=$(awk "BEGIN{v=($SL); if(v>1)v=1; if(v<0)v=0; printf \"%d\", v*1000}" 2>/dev/null || echo 0)
+                      else
+                        SL_MILLI=0
+                      fi
 
                       SUM_PARTICIPANTS=$((SUM_PARTICIPANTS + P))
                       SUM_CONFERENCES=$((SUM_CONFERENCES + C))
