@@ -32,6 +32,12 @@ interface JitsiRoomProps {
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
   enableFileSharing?: boolean;
+  /** If true, the iframe initializes with the local video track muted.
+   *  Reflects the user's pre-join DeviceCheck toggle so the choice
+   *  actually takes effect when the user lands in the Jitsi room. */
+  startWithVideoMuted?: boolean;
+  /** If true, the iframe initializes with the local audio track muted. */
+  startWithAudioMuted?: boolean;
   watermark?: WatermarkSettings;
   onReady?: () => void;
   onLeft?: () => void;
@@ -62,6 +68,8 @@ export default function JitsiRoom({
   participantsCanStartVideo = true,
   participantsCanShareScreen = true,
   enableFileSharing = false,
+  startWithVideoMuted = false,
+  startWithAudioMuted = false,
   watermark,
   onReady,
   onLeft,
@@ -105,6 +113,17 @@ export default function JitsiRoom({
 
     const extraConfig: Record<string, unknown> = {};
 
+    // Moderators need the participants-pane "rimuovi utente" (kick) to
+    // actually fire — the global default has `disableKick: true` to hide
+    // the button from participants, so we flip it back on per-instance.
+    // `disableGrantModerator` stays true: grant is driven by JWT, not UI.
+    if (role === 'moderator') {
+      extraConfig.remoteVideoMenu = {
+        ...jitsiConfigOverwrite.remoteVideoMenu,
+        disableKick: false,
+      };
+    }
+
     if (role === 'participant') {
       if (!participantsCanUnmute) {
         extraConfig.startWithAudioMuted = true;
@@ -119,6 +138,17 @@ export default function JitsiRoom({
       if (!participantsCanShareScreen) {
         toolbarButtons = toolbarButtons.filter(b => b !== 'desktop');
       }
+    }
+
+    // Honor the user's pre-join DeviceCheck toggles. Never weaken a
+    // policy-forced mute (above), only strengthen: if the user chose to
+    // join with camera/mic off, mute them from the start even when the
+    // event allows unmuting.
+    if (startWithVideoMuted) {
+      extraConfig.startWithVideoMuted = true;
+    }
+    if (startWithAudioMuted) {
+      extraConfig.startWithAudioMuted = true;
     }
 
     const IFRAME_ALLOW = 'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock';
@@ -242,7 +272,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, startWithVideoMuted, startWithAudioMuted]);
 
   return (
     <div className="jitsi-wrapper position-relative">

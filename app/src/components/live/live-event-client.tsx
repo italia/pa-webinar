@@ -30,7 +30,7 @@ import EventFeedback from '@/components/live/event-feedback';
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
-import WaitingRoom from '@/components/live/waiting-room';
+import WaitingRoom, { type WaitingRoomJoinPrefs } from '@/components/live/waiting-room';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 
 interface EventInfo {
@@ -134,6 +134,13 @@ export default function LiveEventClient({
   const [guestId] = useState(() => isGuest ? `guest_${Math.random().toString(36).slice(2, 10)}` : '');
   const [jvbReady, setJvbReady] = useState<boolean | null>(null);
   const [jibriReady, setJibriReady] = useState<boolean | null>(null);
+  // Pre-join camera/mic choice captured by the waiting room's DeviceCheck.
+  // Forwarded to JitsiRoom as `startWithVideoMuted`/`startWithAudioMuted`
+  // so the user actually lands in the room with the state they picked.
+  const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
+    cameraOn: true,
+    micOn: true,
+  });
 
   // Poll infrastructure status (JVB + Jibri) when event is LIVE
   useEffect(() => {
@@ -259,17 +266,17 @@ export default function LiveEventClient({
   // Unified entry from the waiting room. Dispatches through the
   // consent → pre_join → fetching_jwt pipeline depending on role and
   // whether recording consent is required for this event.
-  const handleEnterFromWaiting = useCallback((name: string) => {
+  const handleEnterFromWaiting = useCallback((name: string, prefs: WaitingRoomJoinPrefs) => {
     setChosenName(name);
+    setJoinPrefs(prefs);
     // Moderator + speaker magic-links skip the participant recording-
     // consent modal (they're the ones driving recording). Guests and
     // registered participants see it when recording is enabled.
     if (event.recordingEnabled && !isModerator && !isSpeaker) {
       setPhase('consent_pending');
     } else {
-      // No device check step yet (Task 2 will add mic/camera preview to
-      // PreJoinScreen); for now we just short-circuit to the JWT fetch
-      // since the waiting room already collected the name.
+      // The waiting room has already collected the name + device
+      // preferences, so jump straight to the JWT fetch.
       setPhase('fetching_jwt');
     }
   }, [event.recordingEnabled, isModerator, isSpeaker]);
@@ -479,7 +486,7 @@ export default function LiveEventClient({
   if (phase === 'consent_pending') {
     return (
       <>
-        <LiveTopBar title={event.title} parseTitleKicker={event.parseTitleKicker} participantCount={0} isRecording={false} role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')} />
+        <LiveTopBar title={event.title} parseTitleKicker={event.parseTitleKicker} imageUrl={event.imageUrl} coverImageUrl={event.coverImageUrl} participantCount={0} isRecording={false} role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')} />
         <RecordingConsent onAccept={handleConsentAccept} onDecline={handleConsentDecline} />
       </>
     );
@@ -519,6 +526,8 @@ export default function LiveEventClient({
       <LiveTopBar
         title={event.title}
         parseTitleKicker={event.parseTitleKicker}
+        imageUrl={event.imageUrl}
+        coverImageUrl={event.coverImageUrl}
         participantCount={participantCount}
         registrationCount={event.registrationCount}
         maxParticipants={event.maxParticipants}
@@ -576,6 +585,8 @@ export default function LiveEventClient({
               participantsCanStartVideo={event.participantsCanStartVideo}
               participantsCanShareScreen={event.participantsCanShareScreen}
               enableFileSharing={isInstantCall}
+              startWithVideoMuted={!joinPrefs.cameraOn}
+              startWithAudioMuted={!joinPrefs.micOn}
               watermark={watermark}
               onReady={handleJitsiReady}
               onLeft={handleJitsiLeft}
@@ -654,10 +665,52 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
   // Drawer-open state only matters on mobile (<992px); on desktop the
   // .live-sidebar is always visible via CSS regardless of this flag.
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // Chat unread count — set by ChatPanel via onUnreadCountChange.
+  // A chat is "active" when the Chat tab is selected AND (on mobile)
+  // the drawer is open.
+  const [chatUnread, setChatUnread] = useState(0);
+  const isChatActive = activeTab === 'chat';
+  // Browser tab title flash: when unread increases while document is
+  // hidden, prefix the title with "● ". Restore on focus. We scope
+  // the effect to *this* sidebar instance so at most one listener is
+  // registered at a time.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const BULLET = '● ';
+    const originalTitle = document.title;
+    let flashed = false;
+    const setFlashed = (on: boolean) => {
+      if (on === flashed) return;
+      flashed = on;
+      if (on) {
+        if (!document.title.startsWith(BULLET)) {
+          document.title = BULLET + document.title;
+        }
+      } else if (document.title.startsWith(BULLET)) {
+        document.title = document.title.slice(BULLET.length);
+      }
+    };
 
-  const tabs: { key: SidebarTab; label: string; icon: string; badge?: number; show: boolean }[] = [
+    if (chatUnread > 0 && document.hidden) setFlashed(true);
+    if (chatUnread === 0) setFlashed(false);
+
+    const onVisibility = () => {
+      if (!document.hidden) setFlashed(false);
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      setFlashed(false);
+      // Best-effort restore in case a teardown happens mid-flash.
+      if (document.title.startsWith(BULLET)) {
+        document.title = originalTitle;
+      }
+    };
+  }, [chatUnread]);
+
+  const tabs: { key: SidebarTab; label: string; icon: string; badge?: number; dot?: boolean; show: boolean }[] = [
     { key: 'qa', label: t('sidebarTabQa'), icon: 'it-comment', show: !isInstantCall && qaEnabled },
-    { key: 'chat', label: t('sidebarTabChat'), icon: 'it-mail', show: !isInstantCall && showChat },
+    { key: 'chat', label: t('sidebarTabChat'), icon: 'it-mail', dot: chatUnread > 0, show: !isInstantCall && showChat },
     { key: 'polls', label: t('sidebarTabPolls'), icon: 'it-chart-line', show: !isInstantCall },
     { key: 'materials', label: t('sidebarTabMaterials'), icon: 'it-clip', show: !isInstantCall },
     { key: 'participants', label: t('sidebarTabParticipants'), icon: 'it-user', badge: participantCount, show: true },
@@ -720,6 +773,20 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
                   {tab.badge}
                 </Badge>
               )}
+              {tab.dot && (
+                <span
+                  aria-label={t('sidebarTabChatUnread')}
+                  title={t('sidebarTabChatUnread')}
+                  style={{
+                    display: 'inline-block',
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    backgroundColor: '#D9364F',
+                    boxShadow: '0 0 0 1px rgba(255,255,255,0.6)',
+                  }}
+                />
+              )}
             </button>
           ))}
         </div>
@@ -728,13 +795,26 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
           {activeTab === 'qa' && qaEnabled && (
             <QAPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
-          {activeTab === 'chat' && showChat && (
-            <ChatPanel
-              eventSlug={eventSlug}
-              token={token}
-              displayName={displayName}
-              isGuest={!token}
-            />
+          {/* ChatPanel stays mounted while the event is live so it can
+              keep its SSE open and count unreads while the user is on
+              another tab. We hide it visually instead of unmounting. */}
+          {showChat && (
+            <div
+              className="d-flex flex-column flex-grow-1"
+              style={{
+                minHeight: 0,
+                display: activeTab === 'chat' ? undefined : 'none',
+              }}
+            >
+              <ChatPanel
+                eventSlug={eventSlug}
+                token={token}
+                displayName={displayName}
+                isGuest={!token}
+                active={isChatActive}
+                onUnreadCountChange={setChatUnread}
+              />
+            </div>
           )}
           {activeTab === 'polls' && (
             <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
@@ -826,6 +906,12 @@ interface LiveTopBarProps {
    *  kicker line above the main title. Resolved server-side from the
    *  per-event override + site default. */
   parseTitleKicker?: boolean;
+  /** Primary event cover (Prisma `event.imageUrl`). Preferred source for
+   *  the small brand thumbnail rendered to the left of the title. */
+  imageUrl?: string | null;
+  /** Fallback cover (Prisma `event.coverImageUrl`). Used when `imageUrl`
+   *  is unset — legacy events carry their hero image here. */
+  coverImageUrl?: string | null;
   participantCount: number;
   /** Total confirmed registrations (if known). Shown alongside the live
    *  Jitsi count as "N attivi · M registrati". Omitted on public/guest
@@ -839,11 +925,13 @@ interface LiveTopBarProps {
   onLeaveRoom?: () => void;
 }
 
-function LiveTopBar({ title, parseTitleKicker = false, participantCount, registrationCount, maxParticipants, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
+function LiveTopBar({ title, parseTitleKicker = false, imageUrl, coverImageUrl, participantCount, registrationCount, maxParticipants, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
   const badgeColors = ROLE_BADGE_COLORS[role];
   const { kicker, main } = splitTitleKicker(title, parseTitleKicker);
+  const thumbUrl = imageUrl ?? coverImageUrl ?? null;
+  const monogram = (main.trim().charAt(0) || title.trim().charAt(0) || '?').toUpperCase();
 
   return (
     <div
@@ -854,6 +942,38 @@ function LiveTopBar({ title, parseTitleKicker = false, participantCount, registr
       }}
     >
       <div className="d-flex align-items-center">
+        {thumbUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={thumbUrl}
+            alt=""
+            aria-hidden="true"
+            className="me-2 flex-shrink-0"
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 6,
+              objectFit: 'cover',
+              border: '1px solid rgba(255,255,255,0.25)',
+            }}
+          />
+        ) : (
+          <span
+            aria-hidden="true"
+            className="me-2 flex-shrink-0 d-inline-flex align-items-center justify-content-center fw-bold"
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 6,
+              background: 'linear-gradient(135deg, #0066CC 0%, #004080 100%)',
+              color: '#fff',
+              fontSize: '0.8rem',
+              border: '1px solid rgba(255,255,255,0.25)',
+            }}
+          >
+            {monogram}
+          </span>
+        )}
         <h1 className="h6 mb-0 me-3 text-white">
           {kicker && (
             <span

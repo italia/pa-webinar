@@ -109,11 +109,18 @@ export default function QuestionForm({
       )}
 
       <div className="mb-2">
+        <label
+          htmlFor="qa-question-textarea"
+          className="form-label fw-semibold mb-1"
+        >
+          {t('yourQuestionLabel')}
+        </label>
         <textarea
+          id="qa-question-textarea"
           className="form-control"
-          rows={2}
+          rows={3}
           maxLength={MAX_LENGTH}
-          placeholder={t('placeholder')}
+          placeholder={t('placeholderInviting')}
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={submitting || cooldown > 0}
@@ -132,11 +139,27 @@ export default function QuestionForm({
 
       <Button
         color="primary"
-        size="sm"
         type="submit"
+        className="w-100 d-flex align-items-center justify-content-center gap-2"
         disabled={submitting || cooldown > 0 || text.trim().length < 3}
       >
-        {submitting ? t('submitting') : t('submit')}
+        {/* Inline SVG instead of <Icon> to avoid design-react-kit
+            hydration mismatches inside interactive forms. */}
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+        {submitting ? t('submitting') : t('submitPrimary')}
       </Button>
     </form>
   );

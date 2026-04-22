@@ -197,6 +197,7 @@ export default function EventManagementClient({
   const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
 
   const publicUrl = `${baseUrl}/${locale}/${locale === 'it' ? 'eventi' : 'events'}/${event.slug}`;
+  const guestLiveUrl = `${baseUrl}/${locale}/${locale === 'it' ? 'eventi' : 'events'}/${event.slug}/live`;
   const moderatorUrl = `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`;
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
   const editUrl = `/admin/events/${event.id}/edit?token=${event.moderatorToken}`;
@@ -357,6 +358,7 @@ export default function EventManagementClient({
           {/* Right CTAs */}
           <div className="d-flex flex-column gap-2 flex-shrink-0" style={{ minWidth: 220 }}>
             <CopyBtn text={publicUrl} label={td('copyPublicUrl')} />
+            <CopyBtn text={guestLiveUrl} label={td('copyGuestUrl')} />
             <CopyBtn text={moderatorUrl} label={td('copyModeratorUrl')} />
             {(status === 'PUBLISHED' || status === 'LIVE') && (
               <Link href={liveModeratorUrl}

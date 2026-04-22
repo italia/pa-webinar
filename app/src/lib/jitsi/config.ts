@@ -86,6 +86,13 @@ export const jitsiConfigOverwrite = {
 
   disableChat: false,
 
+  // NOTE: `disableKick: true` is the safe default — prevents participants
+  // from even attempting a kick (Jitsi would reject it server-side, but
+  // showing the button confuses users). JitsiRoom flips this to `false`
+  // at instantiation when `role === 'moderator'` so the participants-pane
+  // "rimuovi utente" action actually dispatches. `disableGrantModerator`
+  // stays `true` globally: only the primary moderator (via JWT) should
+  // grant, never via UI.
   remoteVideoMenu: {
     disabled: false,
     disableKick: true,
