@@ -277,12 +277,18 @@ spec:
                   drop:
                     - ALL
               resources:
+                # Memory bumped from 32Mi after observing OOMKills with
+                # CURRENT>=3 JVB pods: the scaler fans out `kubectl exec`
+                # to every pod to aggregate /colibri/stats, and each
+                # kubectl client + bash subshell easily pushes past the
+                # old 32Mi ceiling. 256Mi covers up to ~6 pods (== the
+                # default maxReplicas) with comfortable headroom.
                 requests:
                   cpu: 10m
-                  memory: 16Mi
+                  memory: 64Mi
                 limits:
-                  cpu: 50m
-                  memory: 32Mi
+                  cpu: 200m
+                  memory: 256Mi
 ---
 apiVersion: v1
 kind: ServiceAccount
