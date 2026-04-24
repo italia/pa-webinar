@@ -22,6 +22,7 @@ import RecordingConsent, {
   RecordingBanner,
 } from '@/components/jitsi/recording-consent';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
+import RaisedHandsPanel from '@/components/jitsi/raised-hands-panel';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
 import MaterialPanel from '@/components/materials/material-panel';
@@ -558,6 +559,26 @@ export default function LiveEventClient({
           token={token}
           isModerator={isActualModerator}
         />
+      )}
+
+      {/* Read-only raised-hands queue visible to ALL attendees so
+          everyone sees who's in line to speak and in what order. The
+          moderator still gets the full panel with "approve mic/video"
+          buttons inside ModeratorControls above — this one stays
+          compact and silent when no hand is up. */}
+      {!isInstantCall && !showJvbOverlay && !isActualModerator && jitsiApi && (
+        <RaisedHandsPanel
+          api={jitsiApi}
+          localDisplayName={credentials?.displayName ?? chosenName ?? ''}
+          readOnly
+        />
+      )}
+
+      {/* Screenshare banner — attention cue whenever someone in the
+          room starts sharing. Jitsi auto-pins the share but a visible
+          banner was requested because users missed the transition. */}
+      {!isInstantCall && !showJvbOverlay && jitsiApi && (
+        <ScreenshareBanner api={jitsiApi} />
       )}
 
       <div className="d-flex flex-column flex-lg-row flex-grow-1 live-body">
@@ -1168,6 +1189,82 @@ function FirstEntryHintBanner() {
           {t('dismiss')}
         </Button>
       </div>
+    </div>
+  );
+}
+
+// ── Screenshare banner ──
+//
+// Surfaces a slim highlighted strip at the top of the live area whenever
+// any remote participant starts sharing their screen. Jitsi's own UI
+// auto-pins the share and puts a small "is sharing" label on the tile,
+// but attendees on the caffettino demo reported missing the transition
+// ("la schermata non era evidenziata rispetto alle altre"). The banner
+// uses Jitsi's `screenSharingStatusChanged` event — fires for every
+// remote presenter with on/off, and also for the local user (which we
+// filter out since the local presenter already knows).
+
+function ScreenshareBanner({ api }: { api: JitsiMeetExternalAPI }) {
+  const t = useTranslations('live');
+  const [activeSharerId, setActiveSharerId] = useState<string | null>(null);
+  const [activeSharerName, setActiveSharerName] = useState<string>('');
+  const localIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const onJoined = (evt: { id: string }) => {
+      localIdRef.current = evt.id;
+    };
+    const onShareChanged = (evt: { id: string; on: boolean }) => {
+      if (!evt.on) {
+        if (activeSharerId === evt.id) {
+          setActiveSharerId(null);
+          setActiveSharerName('');
+        }
+        return;
+      }
+      if (evt.id === localIdRef.current) return; // don't ping the presenter
+      setActiveSharerId(evt.id);
+      const info = api.getParticipantsInfo().find((p) => p.id === evt.id);
+      setActiveSharerName(info?.displayName ?? info?.formattedDisplayName ?? '');
+    };
+    const onLeft = (evt: { id: string }) => {
+      if (activeSharerId === evt.id) {
+        setActiveSharerId(null);
+        setActiveSharerName('');
+      }
+    };
+
+    api.addListener('videoConferenceJoined', onJoined);
+    api.addListener('screenSharingStatusChanged', onShareChanged);
+    api.addListener('participantLeft', onLeft);
+    return () => {
+      api.removeListener('videoConferenceJoined', onJoined);
+      api.removeListener('screenSharingStatusChanged', onShareChanged);
+      api.removeListener('participantLeft', onLeft);
+    };
+  }, [api, activeSharerId]);
+
+  if (!activeSharerId) return null;
+
+  return (
+    <div
+      className="d-flex align-items-center gap-2 px-3 py-2"
+      style={{
+        background: 'linear-gradient(90deg, #F7A11A 0%, #D97706 100%)',
+        color: '#fff',
+        fontSize: '0.88rem',
+        fontWeight: 600,
+        flexShrink: 0,
+      }}
+      role="status"
+      aria-live="polite"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+      <span>{t('screenshareActive', { name: activeSharerName || t('screenshareFallbackName') })}</span>
     </div>
   );
 }

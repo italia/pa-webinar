@@ -49,10 +49,13 @@ export const moderatorToolbarButtons = [
  * link get lost otherwise. Settings stays because it contains the
  * device chooser which is the most-asked-for control on mobile.
  */
+// Mobile: no 'desktop' — iOS Safari + most Android browsers don't
+// support getDisplayMedia() inside an iframe, so the button would
+// surface a misleading error. Feedback on the Friday caffettino
+// confirmed this (several users on mobile couldn't share screen).
 export const mobileBaseToolbarButtons = [
   'microphone',
   'camera',
-  'desktop',
   'raisehand',
   'settings',
 ];
@@ -161,9 +164,12 @@ export const jitsiInterfaceConfigOverwrite = {
   NATIVE_APP_NAME: 'Eventi PA',
 
   TOOLBAR_BUTTONS: baseToolbarButtons as string[],
-  TOOLBAR_ALWAYS_VISIBLE: false,
-  INITIAL_TOOLBAR_TIMEOUT: 5000,
-  TOOLBAR_TIMEOUT: 4000,
+  // Keep the toolbar always visible. Auto-hide at 4s surprised users
+  // on the Friday caffettino — some saw it only as a half-peek when
+  // the pointer was near the bottom and couldn't find mic/cam.
+  TOOLBAR_ALWAYS_VISIBLE: true,
+  INITIAL_TOOLBAR_TIMEOUT: 20000,
+  TOOLBAR_TIMEOUT: 20000,
 
   HIDE_INVITE_MORE_HEADER: true,
   DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,

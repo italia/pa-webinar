@@ -394,6 +394,36 @@ export default function DeviceCheck({ onReady, onStateChange, compact = false }:
         {permissionState === 'granted' && !streamRef.current?.getAudioTracks()[0] && (
           <div className="small text-muted mt-1">{t('noAudio')}</div>
         )}
+        <div className="mt-2">
+          <Button
+            color="primary"
+            outline
+            size="xs"
+            onClick={() => {
+              // Short chime so the user can confirm their speakers /
+              // headphones actually play audio before joining. Several
+              // caffettino attendees "didn't hear" the call — probably
+              // because they never verified audio output beforehand.
+              try {
+                const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext!)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 880;
+                gain.gain.value = 0.001;
+                osc.connect(gain).connect(ctx.destination);
+                const t0 = ctx.currentTime;
+                gain.gain.exponentialRampToValueAtTime(0.15, t0 + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.6);
+                osc.start(t0);
+                osc.stop(t0 + 0.65);
+                osc.onended = () => ctx.close();
+              } catch { /* ignore — user can still join */ }
+            }}
+          >
+            {t('speakerTest')}
+          </Button>
+        </div>
       </div>
     </div>
   );
