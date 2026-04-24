@@ -1862,3 +1862,206 @@
     opacity: 0.55;
   }
 }
+
+// ── Garden interactive overlay (ADR-012 fase 2) ──
+// Avatar layer sits on top of GardenScene but below the waiting-room
+// card (which lives at z-index:1). HUD + joystick + picker float
+// above everything and receive pointer events selectively.
+
+.garden-avatars-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none; // avatars don't block clicks on the card above
+}
+
+.garden-hud {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  pointer-events: none; // only inner buttons take clicks
+
+  &__left, &__right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    pointer-events: auto;
+    background: rgba(23, 50, 77, 0.85);
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.35rem 0.6rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+
+  &__count {
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  &__hint {
+    font-size: 0.68rem;
+    opacity: 0.75;
+  }
+
+  &__toggle {
+    background: transparent;
+    color: #fff !important;
+    border-color: rgba(255,255,255,0.45);
+    font-size: 0.76rem;
+    font-weight: 600;
+
+    &:hover, &:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #fff;
+      color: #fff !important;
+    }
+  }
+}
+
+.garden-avatar-chip {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #F5F7FB;
+  border: 2px solid #fff;
+  padding: 2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:hover { border-color: #F7A11A; }
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 2px; }
+}
+
+// Mobile touch joystick.
+.garden-joystick {
+  position: fixed;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0));
+  right: 16px;
+  width: 110px;
+  height: 110px;
+  z-index: 3;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+
+  &__base {
+    position: absolute;
+    inset: 0;
+    background: rgba(23, 50, 77, 0.35);
+    border: 2px solid rgba(255, 255, 255, 0.55);
+    border-radius: 50%;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    background: #0066CC;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 60ms linear;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+  }
+}
+
+// Avatar picker modal.
+.garden-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1055;
+  background: rgba(15, 27, 45, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.garden-picker {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.25rem 1.25rem 1rem;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+
+  &__tile {
+    background: #F5F7FB;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 0.5rem 0.25rem 0.4rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+
+    &:hover {
+      background: #E6F0FA;
+      border-color: #C9D4DE;
+    }
+    &:focus-visible {
+      outline: 2px solid #0066CC;
+      outline-offset: 1px;
+    }
+    &--active {
+      background: #E6F0FA;
+      border-color: #0066CC;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.18);
+    }
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #17324D;
+  }
+}
+
+// Reduced motion: disable walk-cycle bob on avatars (we still move
+// them, but they don't bounce).
+@media (prefers-reduced-motion: reduce) {
+  .garden-avatars-layer * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

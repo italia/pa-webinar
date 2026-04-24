@@ -2620,5 +2620,15 @@
     "micToggleOff": "Microphone OFF",
     "cameraOffPreview": "Camera off",
     "speakerTest": "🔊 Test audio"
+  },
+  "garden": {
+    "enable": "Show the garden",
+    "classicView": "Classic view",
+    "changeAvatar": "Change avatar",
+    "peopleInGarden": "{count, plural, =0 {Nobody in the garden} one {1 person in the garden} other {# people in the garden}}",
+    "hintKeyboard": "Move with WASD or arrow keys",
+    "pickerTitle": "Choose your avatar",
+    "pickerHelp": "This character represents you in the waiting garden. You can change it any time.",
+    "close": "Close"
   }
 }

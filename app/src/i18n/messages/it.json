@@ -2620,5 +2620,15 @@
     "micToggleOff": "Microfono OFF",
     "cameraOffPreview": "Fotocamera spenta",
     "speakerTest": "🔊 Test audio"
+  },
+  "garden": {
+    "enable": "Mostra il giardino",
+    "classicView": "Vista classica",
+    "changeAvatar": "Cambia avatar",
+    "peopleInGarden": "{count, plural, =0 {Nessuno nel giardino} one {1 persona nel giardino} other {# persone nel giardino}}",
+    "hintKeyboard": "Muoviti con WASD o le frecce",
+    "pickerTitle": "Scegli il tuo avatar",
+    "pickerHelp": "Il personaggio rappresenta te nel giardino dell'attesa. Puoi cambiarlo quando vuoi.",
+    "close": "Chiudi"
   }
 }
