@@ -132,6 +132,10 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
         working-directory: app
+      # The ghcr.io/actions/actions-runner image used by ARC ships docker CLI
+      # but not the compose v2 plugin — install it on the fly so `docker compose`
+      # works on the self-hosted runner the same way it does on ubuntu-latest.
+      - uses: docker/setup-compose-action@v2
       - name: Start stack
         run: docker compose up -d --wait
         env:

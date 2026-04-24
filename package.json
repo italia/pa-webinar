@@ -23,9 +23,7 @@
   "overrides": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "mpd-parser": {
-      "@xmldom/xmldom": ">=0.8.12"
-    }
+    "@xmldom/xmldom": "^0.9.10"
   },
   "engines": {
     "node": ">=20.0.0",
