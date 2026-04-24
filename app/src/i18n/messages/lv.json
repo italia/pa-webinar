@@ -344,7 +344,11 @@
       "settingsGeneral": "Vispārīgi",
       "settingsLanguages": "Valodas",
       "ariaLabel": "Administrēšanas navigācija",
-      "subNavAriaLabel": "Sadaļas navigācija"
+      "subNavAriaLabel": "Sadaļas navigācija",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Administrēšanas panelis",
@@ -492,6 +496,30 @@
       "noComments": "Nav komentāru",
       "stars": "zvaigznes"
     },
+    "coModerators": {
+      "title": "Līdzmoderatori un runātāji",
+      "intro": "Pievienojiet līdzmoderatorus un runātājus ar individuālām maģiskajām saitēm.",
+      "introHint": "Katrai personai zālē ir redzams vārds un žetons, ko var atsaukt neatkarīgi no galvenās saites. Runātājiem ir mikrofons, kamera un ekrāna koplietošana, bet viņi nevar moderēt (izmest, izslēgt skaņu visiem, ierakstīt).",
+      "add": "Pievienot personu",
+      "name": "Zālē redzamais vārds",
+      "email": "E-pasts (neobligāts)",
+      "emailPlaceholder": "lai nosūtītu saiti",
+      "role": "Loma",
+      "roleModerator": "Moderators",
+      "roleSpeaker": "Runātājs",
+      "roleModeratorHint": "Pilna moderācija: var ierakstīt, izslēgt skaņu visiem, noņemt dalībniekus.",
+      "roleSpeakerHint": "Var runāt, rādīt video un koplietot ekrānu. Nevar moderēt zāli.",
+      "copyLink": "Kopēt saiti",
+      "copied": "Nokopēts!",
+      "revoke": "Atsaukt",
+      "revoked": "Atsaukts",
+      "confirmRevoke": "Atsaukt šīs personas piekļuvi? Saite nekavējoties pārstās darboties.",
+      "empty": "Nav piešķirta papildu piekļuve. Galvenā moderatora saite paliek vienīgā privileģētā ieeja.",
+      "activeCount": "{count, plural, =0 {Nav aktīvu piekļuvju} =1 {1 aktīva piekļuve} other {# aktīvas piekļuves}}",
+      "errors": {
+        "addFailed": "Neizdevās saglabāt. Mēģiniet vēlreiz."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR audita žurnāls",
       "date": "Datums",
@@ -509,6 +537,14 @@
       "subtitle": "Konfigurējiet platformas izskatu un uzvedību VA atkārtotai izmantošanai",
       "saving": "Saglabāšana...",
       "saved": "Iestatījumi veiksmīgi saglabāti",
+      "sections": {
+        "languagesTitle": "Valodu pārvaldība",
+        "languagesDescription": "Ieslēdziet vai izslēdziet ES valodas, kas redzamas saskarnē, izvēlieties noklusējuma valodu un pielāgojiet tulkojumus.",
+        "gdprTemplatesTitle": "GDPR veidnes",
+        "gdprTemplatesDescription": "Izveidojiet atkārtoti lietojamus privātuma paziņojumus, ko var saistīt ar jebkuru pasākumu, un izvēlieties noklusējuma veidni jauniem pasākumiem.",
+        "emailTemplatesTitle": "E-pasta veidnes",
+        "emailTemplatesDescription": "Pielāgojiet apstiprinājuma un atgādinājuma e-pastu tēmu, virsrakstus un tekstu. Atstājiet tukšu, lai izmantotu iebūvētos noklusējuma tekstus."
+      },
       "tabs": {
         "branding": "Zīmols",
         "header": "Galvene",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Vai tiešām vēlaties dzēst šo failu?",
       "noFiles": "Nav augšupielādētu failu. Izmantojiet pogu \"Augšupielādēt failu\", lai pievienotu materiālus."
     },
+    "emailTemplates": {
+      "title": "E-pasta veidnes",
+      "subtitle": "Pielāgojiet transakciju e-pastu tēmu, virsrakstus un tekstu. Tukšos laukos tiek izmantoti iebūvētie noklusējuma teksti.",
+      "overridden": "Pielāgots",
+      "usingDefault": "Tiek lietots noklusējuma",
+      "saved": "Veidne veiksmīgi saglabāta.",
+      "resetDone": "Pielāgojums noņemts: tiks izmantots noklusējuma teksts.",
+      "revert": "Atcelt izmaiņas",
+      "resetToDefault": "Atjaunot noklusējuma",
+      "confirmReset": "Noņemt pielāgojumu? Tiks izmantots iebūvētais noklusējuma teksts.",
+      "placeholdersTitle": "Pieejamie vietturi",
+      "placeholdersHelp": "Ievietojiet šos marķierus jebkurā laukā — nosūtīšanas brīdī tie tiks aizstāti ar reāliem pasākuma datiem.",
+      "keys": {
+        "confirmation": "Reģistrācijas apstiprinājums",
+        "reminder": "Pasākuma atgādinājums"
+      },
+      "selectors": {
+        "key": "E-pasta veids",
+        "locale": "Valoda"
+      },
+      "fields": {
+        "subject": "Tēma",
+        "subjectHint": "E-pasta tēma. Atbalsta vietturus.",
+        "heading": "Galvenais virsraksts",
+        "headingHint": "Virsraksts, kas parādās e-pasta teksta augšā.",
+        "bodyIntro": "Ievada rindkopa",
+        "bodyIntroHint": "Teksts pirms pasākuma detaļu tabulas. Noder sveiciena ziņojumam vai papildu kontekstam.",
+        "ctaLabel": "Pogas uzraksts",
+        "ctaLabelHint": "Galvenās pogas uzraksts, kas saistīta ar personīgo pievienošanās saiti.",
+        "infoNote": "Informatīva piezīme",
+        "infoNoteHint": "Dzeltens brīdinājuma lodziņš zem pogas. Atstājiet tukšu, lai to paslēptu.",
+        "footerNote": "Kājenes piezīme",
+        "footerNoteHint": "Teksts, kas tiek parādīts kājenē zem organizācijas paraksta."
+      },
+      "errors": {
+        "saveFailed": "Saglabāšana neizdevās. Pārbaudiet laukus un mēģiniet vēlreiz.",
+        "resetFailed": "Nevarēja noņemt pielāgojumu. Mēģiniet vēlreiz."
+      }
+    },
     "languages": {
       "title": "Valodu pārvaldība",
       "subtitle": "Konfigurējiet pieejamās valodas un pielāgojiet tulkojumus",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Dublēt",
+    "duplicateError": "Dublēšana neizdevās. Mēģiniet vēlreiz."
   },
   "email": {
     "confirmationSubject": "Reģistrācija apstiprināta: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Piekrītu šī pasākuma audio/video ierakstīšanai",
       "recordingRequired": "Lai piedalītos šajā pasākumā, ir nepieciešama piekrišana ierakstīšanai",
-      "futureCommunications": "Vēlos saņemt informāciju par nākotnes pasākumiem, ko organizē DTD"
+      "futureCommunications": "Vēlos saņemt informāciju par nākotnes pasākumiem, ko organizē DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Mani dati",
@@ -1069,6 +1148,102 @@
           "title": "Atbildības ierobežojumi",
           "body": "Lai gan tiek piemēroti atbilstoši tehniskie un organizatoriskie pasākumi, departaments nevar garantēt pilnīgu pārtraukumu vai darbības traucējumu neesamību neparedzamu apstākļu, uzturēšanas darbu vai ārējo faktoru dēļ. Juridiskā atbildība ir noteikta piemērojamos tiesību aktos."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Drošība un pārredzamība",
+      "title": "Drošība un pārredzamība",
+      "intro": "Šīs platformas avota kods ir publisks, un tam tiek veiktas automatizētas drošības pārbaudes. Šī lapa apkopo pārredzamības rīkus, kas pieejami ikvienam pakalpojuma lietotājam.",
+      "sections": {
+        "openSource": {
+          "title": "Atvērtā koda programmatūra",
+          "body": "Visa platforma tiek publicēta kā brīva programmatūra. Avota kodu var apskatīt, lejupielādēt un auditēt ikviens, saskaņā ar Itālijas Publiskās pārvaldes pārredzamības principiem."
+        },
+        "sbom": {
+          "title": "SBOM (programmatūras komponentu saraksts)",
+          "body": "Katrs GitHub publicētais laidiens ietver SPDX formāta SBOM konteinera attēlam un CycloneDX formāta SBOM lietojumprogrammas npm atkarībām. Faili ir pievienoti tieši laidienam un tos var izmantot drošības un atbilstības auditiem."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Repozitoriju periodiski analizē OpenSSF Scorecard, kas automātiski novērtē desmitiem projekta drošības prakšu (zaru aizsardzība, darbplūsmas ar minimālām tiesībām, parakstīti commiti, atkarību pārvaldība). Pašreizējais vērtējums ir publisks."
+        },
+        "scanning": {
+          "title": "Automātiskās skenēšanas",
+          "body": "Atkarības nepārtraukti uzrauga, izmantojot Dependabot un npm audit. Laidiena konveijers veido izsekojamus attēlus, izmantojot etiķeti org.opencontainers.image.revision, kas katru attēlu sasaista ar precīzu commit, no kura tas izveidots."
+        },
+        "disclosure": {
+          "title": "Ievainojamību ziņošana",
+          "body": "Atbildīgas izpaušanas politika ir aprakstīta repozitorija failā SECURITY.md. Drošības problēmas var konfidenciāli ziņot saskaņā ar tur sniegtajām instrukcijām."
+        }
+      },
+      "links": {
+        "sourceCode": "Avota kods",
+        "scorecard": "OpenSSF Scorecard vērtējums",
+        "latestRelease": "Jaunākais laidiens (ar SBOM)",
+        "securityPolicy": "Izpaušanas politika (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kontakti",
     "legalNotes": "Juridiskās piezīmes",
     "governmentSite": "Itālijas valdība",
-    "systemStatus": "Sistēmas statuss"
+    "systemStatus": "Sistēmas statuss",
+    "sbomLatest": "Jaunākā laidiena SBOM",
+    "transparency": "Drošība un pārredzamība",
+    "sourceCode": "Avota kods",
+    "buildInfoDev": "izstrādes būvējums",
+    "viewCommit": "Skatīt commit GitHub",
+    "viewRelease": "Skatīt laidienu GitHub",
+    "buildDatePrefix": "Izveidots",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Privātuma politika",
@@ -1454,6 +1637,25 @@
       "materials": "Materiāli",
       "polls": "Aptaujas",
       "feedback": "Atsauksmes"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

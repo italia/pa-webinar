@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
@@ -15,9 +16,14 @@ export default async function CreateEventPage({
   const t = await getTranslations('admin');
   const { template: templateId } = await searchParams;
 
-  const [templates, siteSettings] = await Promise.all([
+  const [templates, siteSettings, tags, gdprTemplates] = await Promise.all([
     prisma.eventTemplate.findMany({ orderBy: { sortOrder: 'asc' } }),
     getSettings(),
+    prisma.tag.findMany({ orderBy: [{ sortOrder: 'asc' }, { slug: 'asc' }] }),
+    prisma.gdprTemplate.findMany({
+      orderBy: [{ isDefault: 'desc' }, { name: 'asc' }],
+      select: { id: true, name: true, isDefault: true },
+    }),
   ]);
 
   const selectedTemplate = templateId
@@ -32,6 +38,7 @@ export default async function CreateEventPage({
     qaEnabled: tpl.qaEnabled,
     chatEnabled: tpl.chatEnabled,
     recordingEnabled: tpl.recordingEnabled,
+    autoStartRecording: tpl.autoStartRecording,
     participantsCanUnmute: tpl.participantsCanUnmute,
     participantsCanStartVideo: tpl.participantsCanStartVideo,
     participantsCanShareScreen: tpl.participantsCanShareScreen,
@@ -45,6 +52,7 @@ export default async function CreateEventPage({
         qaEnabled: selectedTemplate.qaEnabled,
         chatEnabled: selectedTemplate.chatEnabled,
         recordingEnabled: selectedTemplate.recordingEnabled,
+        autoStartRecording: selectedTemplate.autoStartRecording,
         participantsCanUnmute: selectedTemplate.participantsCanUnmute,
         participantsCanStartVideo: selectedTemplate.participantsCanStartVideo,
         participantsCanShareScreen: selectedTemplate.participantsCanShareScreen,
@@ -86,6 +94,28 @@ export default async function CreateEventPage({
         templates={serializedTemplates}
         selectedTemplate={serializedSelected}
         siteTimezone={siteSettings.defaultTimezone}
+        enabledLocales={
+          Array.isArray(siteSettings.availableLocales) &&
+          siteSettings.availableLocales.length > 0
+            ? (siteSettings.availableLocales as string[])
+            : ['it', 'en']
+        }
+        defaultLocale={siteSettings.defaultLocale ?? 'it'}
+        defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
+        defaultRetentionDays={30}
+        jvbSizingConfig={{
+          cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,
+          receiversPerCore: siteSettings.jvbReceiversPerCore ?? 18.75,
+          sendersPerCore: siteSettings.jvbSendersPerCore ?? 3.125,
+          maxReplicas: siteSettings.jvbMaxReplicas ?? jvbMaxReplicasFromEnv(),
+        }}
+        availableTags={tags.map((tg) => ({
+          slug: tg.slug,
+          name: (tg.name ?? {}) as Record<string, string>,
+          color: tg.color,
+        }))}
+        gdprTemplates={gdprTemplates}
+        siteDefaultParseTitleKicker={siteSettings.parseTitleKicker}
       />
     </div>
   );

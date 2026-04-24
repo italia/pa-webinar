@@ -176,3 +176,55 @@ Nel form di creazione evento, sotto il campo `dataRetentionDays`, un callout inf
 - Risultati dei sondaggi
 - Registrazioni video
 - Le statistiche aggregate vengono mantenute.
+
+## Rubrica / Identità Persona (v0.4.x)
+
+Oltre alla `Registration` per-evento, la piattaforma introduce il modello
+`Person` — un'identità **cross-evento** basata su `emailHash` che persiste
+oltre la retention del singolo evento. La base giuridica è distinta
+(consenso esplicito separato Art. 6.1.a) e il flusso è documentato in
+[ADR-011](adr/011-person-rubrica.md).
+
+### Principi
+
+- **Opt-in esplicito**: un record `Person` con `optedInToAddressBook = true`
+  esiste solo quando il partecipante (o l'admin, in scrittura diretta) ha
+  dato consenso separato alla conservazione in rubrica. La semplice
+  registrazione a un evento **non** alimenta la rubrica.
+- **Nessun dato sensibile**: solo `emailHash`, `displayName`, `organization`,
+  `organizationRole`, `organizationType`, più i timestamp `optedInAt` /
+  `optedOutAt` / `lastActiveAt`. Nessuna telemetria AV, nessun tracciamento
+  comportamentale.
+- **Retention per inattività**: cron `/api/cron/rubrica-retention` cancella
+  i `Person` inattivi oltre la soglia (default 24 mesi), slide su
+  `lastActiveAt`.
+
+### Opt-out (Art. 21)
+
+Il diritto di opposizione è esercitabile via link firmato nell'email di
+invito: il token non è un JWT ma un HMAC dedicato (vedi
+`app/src/lib/persons/opt-out-token.ts`) che espone `POST /api/rubrica/opt-out`.
+Al click:
+
+1. Il record `Person` viene marcato `optedOutAt = now()` e `optedInToAddressBook = false`.
+2. L'admin UI di `/admin/rubrica` non mostra più la persona nelle liste di invito.
+3. Il `emailHash` resta nel record per impedire re-opt-in silenzioso senza nuovo consenso.
+
+Gli admin possono esercitare l'opt-out per conto dell'interessato da
+`/admin/rubrica` (action "Rimuovi dalla rubrica"), azione loggata su
+`GdprAuditLog`.
+
+## Percorso guest (senza Registration)
+
+Alcune feature accettano contributi da utenti **non registrati** (guest)
+quando l'evento li consente:
+
+| Feature | PII salvate | Retention |
+|---|---|---|
+| Q&A domande | `Question.authorName` (display name scelto al momento, `registrationId` nullable) | Segue `dataRetentionDays` dell'evento |
+| Chat in-app | `ChatMessage.authorName`, nessuna email | Segue `dataRetentionDays` dell'evento |
+| Reactions / word cloud | Nessuna PII — solo contatori / parole | Segue `dataRetentionDays` dell'evento |
+
+Ai guest non viene chiesta l'email; il display name è sotto il controllo
+dell'utente e può essere lasciato vuoto (sostituito con un placeholder
+generico). Nessuna PII viene persistita senza un display name esplicito.

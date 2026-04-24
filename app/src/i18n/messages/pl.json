@@ -344,7 +344,11 @@
       "settingsGeneral": "Ogólne",
       "settingsLanguages": "Języki",
       "ariaLabel": "Nawigacja administracyjna",
-      "subNavAriaLabel": "Nawigacja sekcji"
+      "subNavAriaLabel": "Nawigacja sekcji",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Panel administracyjny",
@@ -492,6 +496,30 @@
       "noComments": "Brak komentarzy",
       "stars": "gwiazdek"
     },
+    "coModerators": {
+      "title": "Współmoderatorzy i prelegenci",
+      "intro": "Dodaj współmoderatorów i prelegentów za pomocą indywidualnych magic linków.",
+      "introHint": "Każda osoba ma nazwę widoczną w pokoju oraz token, który można cofnąć niezależnie od głównego linku. Prelegenci mają mikrofon, kamerę i udostępnianie ekranu, ale nie mogą moderować (usuwać, wyciszać wszystkich, nagrywać).",
+      "add": "Dodaj osobę",
+      "name": "Nazwa widoczna w pokoju",
+      "email": "E-mail (opcjonalny)",
+      "emailPlaceholder": "aby wysłać link",
+      "role": "Rola",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Prelegent",
+      "roleModeratorHint": "Pełna moderacja: może nagrywać, wyciszać wszystkich, usuwać uczestników.",
+      "roleSpeakerHint": "Może mówić, pokazywać obraz i udostępniać ekran. Nie może moderować pokoju.",
+      "copyLink": "Kopiuj link",
+      "copied": "Skopiowano!",
+      "revoke": "Cofnij",
+      "revoked": "Cofnięty",
+      "confirmRevoke": "Cofnąć dostęp tej osobie? Link natychmiast przestanie działać.",
+      "empty": "Brak dodatkowych dostępów. Główny link moderatora pozostaje jedynym uprzywilejowanym wejściem.",
+      "activeCount": "{count, plural, =0 {Brak aktywnych dostępów} =1 {1 aktywny dostęp} other {# aktywnych dostępów}}",
+      "errors": {
+        "addFailed": "Nie udało się zapisać. Spróbuj ponownie."
+      }
+    },
     "gdprAuditLog": {
       "title": "Rejestr GDPR",
       "date": "Data",
@@ -509,6 +537,14 @@
       "subtitle": "Konfiguracja wyglądu i zachowania platformy do ponownego wykorzystania przez administrację publiczną",
       "saving": "Zapisywanie...",
       "saved": "Ustawienia zapisane pomyślnie",
+      "sections": {
+        "languagesTitle": "Zarządzanie językami",
+        "languagesDescription": "Włącz lub wyłącz języki UE widoczne w interfejsie, wybierz język domyślny i dostosuj tłumaczenia.",
+        "gdprTemplatesTitle": "Szablony GDPR",
+        "gdprTemplatesDescription": "Twórz wielokrotnego użytku klauzule prywatności, które można powiązać z dowolnym wydarzeniem, i wybierz domyślny szablon dla nowych wydarzeń.",
+        "emailTemplatesTitle": "Szablony e-maili",
+        "emailTemplatesDescription": "Dostosuj temat, nagłówki i treść e-maili z potwierdzeniem i przypomnieniem. Pozostaw puste, aby użyć wbudowanych tekstów domyślnych."
+      },
       "tabs": {
         "branding": "Identyfikacja wizualna",
         "header": "Nagłówek",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Czy na pewno chcesz usunąć ten plik?",
       "noFiles": "Brak przesłanych plików. Użyj przycisku \"Prześlij plik\", aby dodać materiały."
     },
+    "emailTemplates": {
+      "title": "Szablony e-maili",
+      "subtitle": "Dostosuj temat, nagłówki i treść e-maili transakcyjnych. Puste pola używają wbudowanych tekstów domyślnych.",
+      "overridden": "Dostosowane",
+      "usingDefault": "Używany domyślny",
+      "saved": "Szablon zapisany pomyślnie.",
+      "resetDone": "Dostosowanie usunięte: zostanie użyty tekst domyślny.",
+      "revert": "Odrzuć zmiany",
+      "resetToDefault": "Przywróć domyślny",
+      "confirmReset": "Usunąć dostosowanie? Zostanie użyty wbudowany tekst domyślny.",
+      "placeholdersTitle": "Dostępne placeholdery",
+      "placeholdersHelp": "Wstaw te tokeny w dowolnym polu — przy wysyłce zostaną zastąpione rzeczywistymi danymi wydarzenia.",
+      "keys": {
+        "confirmation": "Potwierdzenie rejestracji",
+        "reminder": "Przypomnienie o wydarzeniu"
+      },
+      "selectors": {
+        "key": "Typ e-maila",
+        "locale": "Język"
+      },
+      "fields": {
+        "subject": "Temat",
+        "subjectHint": "Temat wiadomości. Obsługuje placeholdery.",
+        "heading": "Nagłówek główny",
+        "headingHint": "Nagłówek wyświetlany na górze treści e-maila.",
+        "bodyIntro": "Akapit wprowadzający",
+        "bodyIntroHint": "Tekst przed tabelą z danymi wydarzenia. Przydatny do powitania lub dodatkowego kontekstu.",
+        "ctaLabel": "Etykieta przycisku",
+        "ctaLabelHint": "Etykieta głównego przycisku prowadzącego do osobistego linku dołączenia.",
+        "infoNote": "Informacja",
+        "infoNoteHint": "Żółte ostrzeżenie pod przyciskiem. Pozostaw puste, aby je ukryć.",
+        "footerNote": "Notka w stopce",
+        "footerNoteHint": "Tekst wyświetlany w stopce pod ewentualnym podpisem organizacji."
+      },
+      "errors": {
+        "saveFailed": "Zapis nie powiódł się. Sprawdź pola i spróbuj ponownie.",
+        "resetFailed": "Nie udało się usunąć dostosowania. Spróbuj ponownie."
+      }
+    },
     "languages": {
       "title": "Zarządzanie językami",
       "subtitle": "Konfiguruj dostępne języki i dostosuj tłumaczenia",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplikuj",
+    "duplicateError": "Duplikowanie nie powiodło się. Spróbuj ponownie."
   },
   "email": {
     "confirmationSubject": "Potwierdzenie rejestracji: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Wyrażam zgodę na nagrywanie audio/wideo wydarzenia",
       "recordingRequired": "Zgoda na nagrywanie jest wymagana do uczestnictwa w tym wydarzeniu",
-      "futureCommunications": "Chcę otrzymywać informacje o przyszłych wydarzeniach organizowanych przez DTD"
+      "futureCommunications": "Chcę otrzymywać informacje o przyszłych wydarzeniach organizowanych przez DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Moje dane",
@@ -1069,6 +1148,102 @@
           "title": "Ograniczenie odpowiedzialności",
           "body": "Pomimo zastosowania odpowiednich środków technicznych i organizacyjnych, Departament nie gwarantuje całkowitego braku przerw lub awarii spowodowanych nieprzewidzianymi okolicznościami, pracami konserwacyjnymi lub czynnikami zewnętrznymi. Odpowiedzialność prawna pozostaje regulowana przez obowiązujące przepisy."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Bezpieczeństwo i przejrzystość",
+      "title": "Bezpieczeństwo i przejrzystość",
+      "intro": "Kod źródłowy tej platformy jest publiczny i podlega automatycznym kontrolom bezpieczeństwa. Ta strona podsumowuje narzędzia przejrzystości dostępne dla wszystkich korzystających z usługi.",
+      "sections": {
+        "openSource": {
+          "title": "Oprogramowanie open source",
+          "body": "Cała platforma jest publikowana jako wolne oprogramowanie. Kod źródłowy może być przeglądany, pobierany i audytowany przez każdego, zgodnie z zasadami przejrzystości włoskiej administracji publicznej."
+        },
+        "sbom": {
+          "title": "SBOM (lista komponentów oprogramowania)",
+          "body": "Każde wydanie publikowane na GitHubie zawiera SBOM w formacie SPDX dla obrazu kontenera oraz SBOM w formacie CycloneDX dla zależności npm aplikacji. Pliki są dołączane bezpośrednio do wydania i mogą być używane do audytów bezpieczeństwa i zgodności."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Repozytorium jest okresowo analizowane przez OpenSSF Scorecard, który automatycznie ocenia dziesiątki praktyk bezpieczeństwa projektu (ochrona gałęzi, przepływy pracy z minimalnymi uprawnieniami, podpisane commity, zarządzanie zależnościami). Aktualny wynik jest publiczny."
+        },
+        "scanning": {
+          "title": "Automatyczne skany",
+          "body": "Zależności są stale monitorowane za pomocą Dependabot i npm audit. Potok wydawniczy produkuje identyfikowalne obrazy za pomocą etykiety org.opencontainers.image.revision, która wiąże każdy obraz z dokładnym commitem, z którego został zbudowany."
+        },
+        "disclosure": {
+          "title": "Zgłaszanie podatności",
+          "body": "Polityka odpowiedzialnego ujawniania jest opisana w pliku SECURITY.md w repozytorium. Problemy bezpieczeństwa można zgłaszać poufnie zgodnie z instrukcjami tam podanymi."
+        }
+      },
+      "links": {
+        "sourceCode": "Kod źródłowy",
+        "scorecard": "Wynik OpenSSF Scorecard",
+        "latestRelease": "Najnowsze wydanie (z SBOM)",
+        "securityPolicy": "Polityka ujawniania (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kontakt",
     "legalNotes": "Noty prawne",
     "governmentSite": "Rząd Włoski",
-    "systemStatus": "Stan systemu"
+    "systemStatus": "Stan systemu",
+    "sbomLatest": "SBOM najnowszego wydania",
+    "transparency": "Bezpieczeństwo i przejrzystość",
+    "sourceCode": "Kod źródłowy",
+    "buildInfoDev": "kompilacja deweloperska",
+    "viewCommit": "Zobacz commit na GitHubie",
+    "viewRelease": "Zobacz wydanie na GitHubie",
+    "buildDatePrefix": "Zbudowano",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Polityka prywatności",
@@ -1454,6 +1637,25 @@
       "materials": "Materiały",
       "polls": "Ankiety",
       "feedback": "Opinie"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

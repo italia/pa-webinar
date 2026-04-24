@@ -6,7 +6,6 @@ import {
   Alert,
   Card,
   CardBody,
-  Icon,
   FormGroup,
   Input,
 } from 'design-react-kit';

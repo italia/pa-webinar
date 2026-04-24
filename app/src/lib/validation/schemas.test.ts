@@ -45,6 +45,7 @@ describe('createEventSchema', () => {
       qaEnabled: false,
       chatEnabled: true,
       recordingEnabled: true,
+      autoStartRecording: true,
       moderatorName: 'Mario Rossi',
       moderatorEmail: 'mario@example.com',
       speakersInfo: { it: 'Mario Rossi, Luigi Verdi' },
@@ -121,9 +122,18 @@ describe('createEventSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejects maxParticipants over 500', () => {
-    const result = createEventSchema.safeParse({ ...validEvent(), maxParticipants: 501 });
+  it('rejects maxParticipants over 10000', () => {
+    // The hard cap is 10_000 because the field is now an *estimate* of
+    // expected attendance (not a hard per-event capacity). The cap
+    // protects against typos; anything above that would indicate a
+    // form error or abuse.
+    const result = createEventSchema.safeParse({ ...validEvent(), maxParticipants: 10001 });
     expect(result.success).toBe(false);
+  });
+
+  it('accepts maxParticipants up to 10000', () => {
+    const result = createEventSchema.safeParse({ ...validEvent(), maxParticipants: 10000 });
+    expect(result.success).toBe(true);
   });
 
   it('rejects negative maxParticipants', () => {
@@ -165,6 +175,54 @@ describe('createEventSchema', () => {
   it('rejects dataRetentionDays over 365', () => {
     const result = createEventSchema.safeParse({ ...validEvent(), dataRetentionDays: 366 });
     expect(result.success).toBe(false);
+  });
+
+  // ── Per-event sizing + grace period overrides ─────────────
+  // Both fields are `.nullable().optional()` — null/omitted means
+  // "inherit the SiteSetting default". Keep allowed bounds tight so an
+  // admin can't set `gracePeriodMinutes: 99999` and blow the scaler.
+
+  it('accepts expectedSenderRatioPct at bounds (0 and 100)', () => {
+    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 0 }).success).toBe(true);
+    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 100 }).success).toBe(true);
+  });
+
+  it('accepts expectedSenderRatioPct: null (inherit default)', () => {
+    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: null }).success).toBe(true);
+  });
+
+  it('rejects expectedSenderRatioPct over 100', () => {
+    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 101 }).success).toBe(false);
+  });
+
+  it('rejects negative expectedSenderRatioPct', () => {
+    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: -1 }).success).toBe(false);
+  });
+
+  it('rejects non-integer expectedSenderRatioPct', () => {
+    expect(createEventSchema.safeParse({ ...validEvent(), expectedSenderRatioPct: 33.5 }).success).toBe(false);
+  });
+
+  it('accepts gracePeriodMinutes: -1 (never auto-close)', () => {
+    expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: -1 }).success).toBe(true);
+  });
+
+  it('accepts gracePeriodMinutes: 0, 5, 15, 30, 60', () => {
+    for (const v of [0, 5, 15, 30, 60]) {
+      expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: v }).success).toBe(true);
+    }
+  });
+
+  it('accepts gracePeriodMinutes at upper bound (240)', () => {
+    expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: 240 }).success).toBe(true);
+  });
+
+  it('rejects gracePeriodMinutes below -1', () => {
+    expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: -2 }).success).toBe(false);
+  });
+
+  it('rejects gracePeriodMinutes over 240', () => {
+    expect(createEventSchema.safeParse({ ...validEvent(), gracePeriodMinutes: 241 }).success).toBe(false);
   });
 });
 

@@ -344,7 +344,11 @@
       "settingsGeneral": "Általános",
       "settingsLanguages": "Nyelvek",
       "ariaLabel": "Adminisztrációs navigáció",
-      "subNavAriaLabel": "Szekció navigáció"
+      "subNavAriaLabel": "Szekció navigáció",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Adminisztrációs panel",
@@ -492,6 +496,30 @@
       "noComments": "Nincsenek megjegyzések",
       "stars": "csillag"
     },
+    "coModerators": {
+      "title": "Társmoderátorok és előadók",
+      "intro": "Adj hozzá társmoderátorokat és előadókat egyéni varázslinkkel.",
+      "introHint": "Mindenkinek saját, a teremben látható neve és tokenje van, amely a fő linktől függetlenül visszavonható. Az előadók mikrofont, kamerát és képernyőmegosztást kapnak, de nem moderálhatnak (kidobás, mindenki némítása, felvétel).",
+      "add": "Személy hozzáadása",
+      "name": "A teremben látható név",
+      "email": "E-mail (nem kötelező)",
+      "emailPlaceholder": "a link elküldéséhez",
+      "role": "Szerep",
+      "roleModerator": "Moderátor",
+      "roleSpeaker": "Előadó",
+      "roleModeratorHint": "Teljes moderátori jogok: felvétel, mindenki némítása, résztvevők eltávolítása.",
+      "roleSpeakerHint": "Beszélhet, videót mutathat és képernyőt oszthat meg. Nem moderálhatja a termet.",
+      "copyLink": "Link másolása",
+      "copied": "Másolva!",
+      "revoke": "Visszavonás",
+      "revoked": "Visszavonva",
+      "confirmRevoke": "Visszavonja ennek a személynek a hozzáférését? A link azonnal megszűnik működni.",
+      "empty": "Nincs további hozzáférés. A fő moderátori link az egyetlen privilegizált belépési pont.",
+      "activeCount": "{count, plural, =0 {Nincs aktív hozzáférés} =1 {1 aktív hozzáférés} other {# aktív hozzáférés}}",
+      "errors": {
+        "addFailed": "Nem sikerült menteni. Próbáld újra."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR auditnapló",
       "date": "Dátum",
@@ -509,6 +537,14 @@
       "subtitle": "A platform megjelenésének és viselkedésének konfigurálása közigazgatási újrahasznosításhoz",
       "saving": "Mentés...",
       "saved": "Beállítások sikeresen mentve",
+      "sections": {
+        "languagesTitle": "Nyelvek kezelése",
+        "languagesDescription": "A felhasználók számára elérhető EU-s nyelvek engedélyezése vagy letiltása, az alapértelmezett nyelv kiválasztása és a fordítások testreszabása.",
+        "gdprTemplatesTitle": "GDPR sablonok",
+        "gdprTemplatesDescription": "Hozz létre bármely eseményhez kapcsolható, újrafelhasználható adatvédelmi tájékoztatókat, és válaszd ki az új eseményekhez használt alapértelmezettet.",
+        "emailTemplatesTitle": "E-mail sablonok",
+        "emailTemplatesDescription": "Szabd testre a visszaigazoló és emlékeztető e-mailek tárgyát, címsorát és szövegét. Üres mezők esetén a beépített alapértelmezett szövegek maradnak."
+      },
       "tabs": {
         "branding": "Arculat",
         "header": "Fejléc",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Biztosan törölni szeretné ezt a fájlt?",
       "noFiles": "Nincsenek feltöltött fájlok. Használja a \"Fájl feltöltése\" gombot anyagok hozzáadásához."
     },
+    "emailTemplates": {
+      "title": "E-mail sablonok",
+      "subtitle": "Szabd testre a tranzakciós e-mailek tárgyát, címsorait és szövegét. Az üresen hagyott mezőkben a beépített alapértelmezett szövegek érvényesek.",
+      "overridden": "Testreszabva",
+      "usingDefault": "Alapértelmezett",
+      "saved": "Sablon mentve.",
+      "resetDone": "Felülírás eltávolítva: az alapértelmezett szöveg kerül használatba.",
+      "revert": "Módosítások elvetése",
+      "resetToDefault": "Visszaállítás alapértelmezettre",
+      "confirmReset": "Eltávolítja a felülírást? A beépített alapértelmezett szöveg kerül használatba.",
+      "placeholdersTitle": "Elérhető helyőrzők",
+      "placeholdersHelp": "Szúrd be ezeket a jelzőket bármely mezőbe — küldéskor az esemény valódi adataira cserélődnek.",
+      "keys": {
+        "confirmation": "Regisztrációs visszaigazolás",
+        "reminder": "Esemény-emlékeztető"
+      },
+      "selectors": {
+        "key": "E-mail típus",
+        "locale": "Nyelv"
+      },
+      "fields": {
+        "subject": "Tárgy",
+        "subjectHint": "Az e-mail tárgya. Támogatja a helyőrzőket.",
+        "heading": "Főcím",
+        "headingHint": "Az e-mail törzsének tetején megjelenő címsor.",
+        "bodyIntro": "Bevezető bekezdés",
+        "bodyIntroHint": "Az esemény részleteit tartalmazó táblázat előtt megjelenő szöveg. Üdvözlő üzenethez vagy extra kontextushoz hasznos.",
+        "ctaLabel": "Gomb felirata",
+        "ctaLabelHint": "A személyes csatlakozási linkre vezető gomb felirata.",
+        "infoNote": "Információs megjegyzés",
+        "infoNoteHint": "Sárga figyelmeztető doboz a gomb alatt. Hagyd üresen az elrejtéséhez.",
+        "footerNote": "Láblécmegjegyzés",
+        "footerNoteHint": "A láblécben, az esetleges szervezeti aláírás alatt megjelenő szöveg."
+      },
+      "errors": {
+        "saveFailed": "A mentés nem sikerült. Ellenőrizd a mezőket és próbáld újra.",
+        "resetFailed": "Nem sikerült eltávolítani a felülírást. Próbáld újra."
+      }
+    },
     "languages": {
       "title": "Nyelvkezelés",
       "subtitle": "Az elérhető nyelvek konfigurálása és a fordítások testreszabása",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplikálás",
+    "duplicateError": "A duplikálás sikertelen. Próbáld újra."
   },
   "email": {
     "confirmationSubject": "Regisztráció megerősítve: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Hozzájárulok az esemény audió/videó felvételéhez",
       "recordingRequired": "A felvételhez való hozzájárulás szükséges az eseményen való részvételhez",
-      "futureCommunications": "Szeretnék tájékoztatást kapni a DTD által szervezett jövőbeli eseményekről"
+      "futureCommunications": "Szeretnék tájékoztatást kapni a DTD által szervezett jövőbeli eseményekről",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Az én adataim",
@@ -1069,6 +1148,102 @@
           "title": "Felelősségkorlátozás",
           "body": "Megfelelő technikai és szervezési intézkedések ellenére a Főosztály nem garantálhatja az előre nem látható események, karbantartási tevékenységek vagy külső tényezők okozta fennakadások vagy üzemzavarok teljes hiányát. A jogszabályi felelősségek a vonatkozó törvények szerint érvényesek."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Biztonság és átláthatóság",
+      "title": "Biztonság és átláthatóság",
+      "intro": "A platform forráskódja nyilvános, és automatizált biztonsági ellenőrzéseknek van alávetve. Ez az oldal összefoglalja a szolgáltatást használók számára elérhető átláthatósági eszközöket.",
+      "sections": {
+        "openSource": {
+          "title": "Nyílt forráskódú szoftver",
+          "body": "A teljes platform szabad szoftverként kerül kiadásra. A forráskódot bárki megvizsgálhatja, letöltheti és auditálhatja, az olasz közigazgatás átláthatósági elveivel összhangban."
+        },
+        "sbom": {
+          "title": "SBOM (Szoftveres komponens jegyzék)",
+          "body": "Minden GitHubon megjelentetett kiadás tartalmaz egy SPDX formátumú SBOM-ot a konténerképhez és egy CycloneDX formátumú SBOM-ot az alkalmazás npm függőségeihez. A fájlok közvetlenül a kiadáshoz csatolódnak, és biztonsági, valamint megfelelőségi auditokhoz használhatók."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "A tárolót rendszeresen elemzi az OpenSSF Scorecard, amely automatikusan értékeli a projekt több tucat biztonsági gyakorlatát (ágvédelem, minimális jogosultságú munkafolyamatok, aláírt commitok, függőségkezelés). A jelenlegi pontszám nyilvános."
+        },
+        "scanning": {
+          "title": "Automatikus ellenőrzések",
+          "body": "A függőségeket a Dependabot és az npm audit folyamatosan figyeli. A kiadási pipeline nyomon követhető képeket állít elő az org.opencontainers.image.revision címke segítségével, amely minden képet ahhoz a pontos committhez köt, amelyből épült."
+        },
+        "disclosure": {
+          "title": "Sebezhetőségek bejelentése",
+          "body": "A felelős nyilvánosságra hozatali irányelv a tároló SECURITY.md fájljában van leírva. A biztonsági problémák az ott szereplő utasítások szerint bizalmasan bejelenthetők."
+        }
+      },
+      "links": {
+        "sourceCode": "Forráskód",
+        "scorecard": "OpenSSF Scorecard pontszám",
+        "latestRelease": "Legutóbbi kiadás (SBOM-mal)",
+        "securityPolicy": "Nyilvánosságra hozatali irányelv (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kapcsolat",
     "legalNotes": "Jogi közlemények",
     "governmentSite": "Olasz Kormány",
-    "systemStatus": "Rendszer állapota"
+    "systemStatus": "Rendszer állapota",
+    "sbomLatest": "Legutóbbi kiadás SBOM-ja",
+    "transparency": "Biztonság és átláthatóság",
+    "sourceCode": "Forráskód",
+    "buildInfoDev": "fejlesztői build",
+    "viewCommit": "Commit megtekintése a GitHubon",
+    "viewRelease": "Kiadás megtekintése a GitHubon",
+    "buildDatePrefix": "Összeállítva",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Adatvédelmi tájékoztató",
@@ -1454,6 +1637,25 @@
       "materials": "Anyagok",
       "polls": "Szavazások",
       "feedback": "Visszajelzés"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

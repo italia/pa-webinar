@@ -344,7 +344,11 @@
       "settingsGeneral": "Allmänt",
       "settingsLanguages": "Språk",
       "ariaLabel": "Administrationsnavigering",
-      "subNavAriaLabel": "Sektionsnavigering"
+      "subNavAriaLabel": "Sektionsnavigering",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Administrationspanel",
@@ -492,6 +496,30 @@
       "noComments": "Inga kommentarer",
       "stars": "stjärnor"
     },
+    "coModerators": {
+      "title": "Moderatorer och talare",
+      "intro": "Lägg till extra moderatorer och talare med individuella magiska länkar.",
+      "introHint": "Varje person har ett eget visningsnamn i rummet och en token som kan återkallas oberoende av huvudlänken. Talare får mikrofon, kamera och skärmdelning men kan inte moderera (kasta ut, tysta alla, spela in).",
+      "add": "Lägg till person",
+      "name": "Namn som visas i rummet",
+      "email": "E-post (valfritt)",
+      "emailPlaceholder": "för att skicka länken till dem",
+      "role": "Roll",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Talare",
+      "roleModeratorHint": "Full moderering: kan spela in, tysta alla, ta bort deltagare.",
+      "roleSpeakerHint": "Kan tala, visa video och dela skärm. Kan inte moderera rummet.",
+      "copyLink": "Kopiera länk",
+      "copied": "Kopierat!",
+      "revoke": "Återkalla",
+      "revoked": "Återkallad",
+      "confirmRevoke": "Återkalla denna persons åtkomst? Länken slutar fungera omedelbart.",
+      "empty": "Ingen extra åtkomst beviljad. Den primära moderatorslänken är den enda privilegierade ingången.",
+      "activeCount": "{count, plural, =0 {Ingen aktiv åtkomst} =1 {1 aktiv åtkomst} other {# aktiva åtkomster}}",
+      "errors": {
+        "addFailed": "Kunde inte spara. Försök igen."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR-revisionslogg",
       "date": "Datum",
@@ -509,6 +537,14 @@
       "subtitle": "Konfigurera plattformens utseende och beteende för återanvändning inom offentlig förvaltning",
       "saving": "Sparar...",
       "saved": "Inställningar sparade",
+      "sections": {
+        "languagesTitle": "Språkhantering",
+        "languagesDescription": "Aktivera eller inaktivera EU-språken som visas i gränssnittet, välj standardspråk och anpassa översättningar.",
+        "gdprTemplatesTitle": "GDPR-mallar",
+        "gdprTemplatesDescription": "Skapa återanvändbara integritetsmeddelanden som kan kopplas till evenemang och välj standardmallen för nya evenemang.",
+        "emailTemplatesTitle": "E-postmallar",
+        "emailTemplatesDescription": "Anpassa ämne, rubriker och text för bekräftelse- och påminnelsemeddelanden. Lämnas fälten tomma används de inbyggda standardtexterna."
+      },
       "tabs": {
         "branding": "Varumärkesprofil",
         "header": "Sidhuvud",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Är du säker på att du vill radera denna fil?",
       "noFiles": "Inga filer uppladdade. Använd knappen \"Ladda upp fil\" för att lägga till material."
     },
+    "emailTemplates": {
+      "title": "E-postmallar",
+      "subtitle": "Anpassa ämne, rubriker och text för transaktionsmeddelanden. Fält som lämnas tomma använder de inbyggda standardtexterna.",
+      "overridden": "Anpassad",
+      "usingDefault": "Standard",
+      "saved": "Mallen har sparats.",
+      "resetDone": "Åsidosättningen har tagits bort: standardtexten används.",
+      "revert": "Ångra ändringar",
+      "resetToDefault": "Återställ till standard",
+      "confirmReset": "Ta bort åsidosättningen? Den inbyggda standardtexten kommer att användas.",
+      "placeholdersTitle": "Tillgängliga platshållare",
+      "placeholdersHelp": "Infoga dessa platshållare i fälten: de ersätts vid sändning med evenemangets verkliga data.",
+      "keys": {
+        "confirmation": "Registreringsbekräftelse",
+        "reminder": "Evenemangspåminnelse"
+      },
+      "selectors": {
+        "key": "E-posttyp",
+        "locale": "Språk"
+      },
+      "fields": {
+        "subject": "Ämne",
+        "subjectHint": "E-postens ämne. Stöder platshållare.",
+        "heading": "Huvudrubrik",
+        "headingHint": "Rubriken som visas överst i e-postmeddelandets text.",
+        "bodyIntro": "Inledande stycke",
+        "bodyIntroHint": "Text som visas före tabellen med evenemangsdetaljer. Användbar för ett välkomstmeddelande eller extra sammanhang.",
+        "ctaLabel": "Knappetikett",
+        "ctaLabelHint": "Text på knappen som leder till den personliga anslutningslänken.",
+        "infoNote": "Informationsnotis",
+        "infoNoteHint": "Gul varningsruta under knappen. Lämna tom för att dölja den.",
+        "footerNote": "Sidfotsnotis",
+        "footerNoteHint": "Text som visas i sidfoten under eventuell organisationssignatur."
+      },
+      "errors": {
+        "saveFailed": "Det gick inte att spara. Kontrollera fälten och försök igen.",
+        "resetFailed": "Det gick inte att ta bort åsidosättningen. Försök igen."
+      }
+    },
     "languages": {
       "title": "Språkhantering",
       "subtitle": "Konfigurera tillgängliga språk och anpassa översättningar",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplicera",
+    "duplicateError": "Dupliceringen misslyckades. Försök igen."
   },
   "email": {
     "confirmationSubject": "Anmälan bekräftad: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Jag samtycker till ljud-/videoinspelning av detta evenemang",
       "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
-      "futureCommunications": "Jag vill ta emot information om framtida evenemang arrangerade av DTD"
+      "futureCommunications": "Jag vill ta emot information om framtida evenemang arrangerade av DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Mina uppgifter",
@@ -1069,6 +1148,102 @@
           "title": "Ansvarsbegränsning",
           "body": "Trots att lämpliga tekniska och organisatoriska åtgärder vidtas kan avdelningen inte garantera fullständig frånvaro av avbrott eller störningar orsakade av oförutsedda händelser, underhåll eller externa faktorer. Rättsligt ansvar regleras av tillämplig lag."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Säkerhet och transparens",
+      "title": "Säkerhet och transparens",
+      "intro": "Källkoden för denna plattform är offentlig och genomgår automatiserade säkerhetskontroller. Denna sida sammanfattar de transparensverktyg som finns tillgängliga för alla som använder tjänsten.",
+      "sections": {
+        "openSource": {
+          "title": "Öppen källkod",
+          "body": "Hela plattformen publiceras som fri programvara. Källkoden kan granskas, laddas ner och revideras av vem som helst, i linje med den italienska offentliga förvaltningens transparensprinciper."
+        },
+        "sbom": {
+          "title": "SBOM (förteckning över programvarukomponenter)",
+          "body": "Varje version som publiceras på GitHub innehåller en SBOM i SPDX-format för containerbilden och en SBOM i CycloneDX-format för applikationens npm-beroenden. Filerna bifogas direkt till versionen och kan användas för säkerhets- och efterlevnadsrevisioner."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Repositoriet analyseras regelbundet av OpenSSF Scorecard, som automatiskt utvärderar dussintals projektsäkerhetspraxis (branch-skydd, arbetsflöden med lägsta behörighet, signerade commits, hantering av beroenden). Den aktuella poängen är offentlig."
+        },
+        "scanning": {
+          "title": "Automatiserade skanningar",
+          "body": "Beroenden övervakas kontinuerligt via Dependabot och npm audit. Release-pipelinen producerar spårbara bilder via etiketten org.opencontainers.image.revision, som kopplar varje bild till den exakta commit den byggdes från."
+        },
+        "disclosure": {
+          "title": "Rapportering av sårbarheter",
+          "body": "Policyn för ansvarsfullt avslöjande beskrivs i filen SECURITY.md i repositoriet. Säkerhetsproblem kan rapporteras konfidentiellt enligt instruktionerna där."
+        }
+      },
+      "links": {
+        "sourceCode": "Källkod",
+        "scorecard": "OpenSSF Scorecard-poäng",
+        "latestRelease": "Senaste versionen (med SBOM)",
+        "securityPolicy": "Avslöjandepolicy (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kontakt",
     "legalNotes": "Juridiska anmärkningar",
     "governmentSite": "Italienska regeringen",
-    "systemStatus": "Systemstatus"
+    "systemStatus": "Systemstatus",
+    "sbomLatest": "SBOM för senaste versionen",
+    "transparency": "Säkerhet och transparens",
+    "sourceCode": "Källkod",
+    "buildInfoDev": "utvecklingsbygge",
+    "viewCommit": "Visa commit på GitHub",
+    "viewRelease": "Visa version på GitHub",
+    "buildDatePrefix": "Byggd den",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Integritetspolicy",
@@ -1454,6 +1637,25 @@
       "materials": "Material",
       "polls": "Omröstningar",
       "feedback": "Feedback"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

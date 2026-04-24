@@ -68,39 +68,145 @@ spec:
 
                   CURRENT=$(kubectl get deployment "$JVB_DEPLOY" -n {{ .Release.Namespace }} \
                     -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
+                  READY=$(kubectl get deployment "$JVB_DEPLOY" -n {{ .Release.Namespace }} \
+                    -o jsonpath='{.status.readyReplicas}' 2>/dev/null || echo "0")
+                  # readyReplicas is omitted (empty string) when 0; normalise.
+                  READY=${READY:-0}
+                  log "Deployment state: spec=$CURRENT ready=$READY"
 
-                  # ── Phase 2: Reactive — query JVB colibri stats ───
-                  STRESS=""
-                  STRESS_PARAM=""
+                  # ── Phase 2: Reactive — aggregate /colibri/stats across ALL JVB pods ──
+                  # A single hit to the JVB Service LB only reaches one pod, so with
+                  # CURRENT>1 the reported participants/bitrate/conferences reflect
+                  # that one pod's slice — the rest show zero. We instead list every
+                  # JVB pod and exec curl on each, summing numeric fields. The app
+                  # pod doesn't have the RBAC for this; the scaler does.
+                  POLL_OK=0
+                  POLL_FAIL=0
+                  SUM_PARTICIPANTS=0
+                  SUM_CONFERENCES=0
+                  SUM_BIT_DOWN=0
+                  SUM_BIT_UP=0
+                  SUM_AUDIO_SENDERS=0
+                  SUM_VIDEO_SENDERS=0
+                  SUM_OCTO_CONF=0
+                  SUM_OCTO_EP=0
+                  SUM_OCTO_SEND=0
+                  SUM_OCTO_RECV=0
+                  MAX_STRESS_MILLI=0        # stress_level * 1000 — POSIX sh has no floats
+                  MAX_LARGEST_CONF=0
+
+                  # Extract a numeric field from a JSON stats blob. Handles integers
+                  # (participants) and fractional values (stress_level). Prints empty
+                  # when missing. No `jq` — bitnami/kubectl ships minimal tooling.
+                  extract_num() {
+                    echo "$1" | grep -o "\"$2\":[0-9.]*" | head -1 | sed "s/^\"$2\"://" || true
+                  }
+
                   if [ "$CURRENT" -gt 0 ]; then
-                    # Find a running JVB pod to query stats
-                    JVB_POD=$(kubectl get pods -n {{ .Release.Namespace }} \
+                    JVB_PODS=$(kubectl get pods -n {{ .Release.Namespace }} \
                       -l "app.kubernetes.io/component=jvb" \
-                      -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+                      --field-selector=status.phase=Running \
+                      -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null)
 
-                    if [ -n "$JVB_POD" ]; then
+                    for JVB_POD in $JVB_PODS; do
+                      [ -z "$JVB_POD" ] && continue
+                      # NOTE: don't pass --request-timeout to `kubectl exec` here.
+                      # With that flag kubectl silently discards the in-cluster
+                      # kubeconfig and tries localhost:8080 (observed: "dial tcp
+                      # [::1]:8080: connect: connection refused"), turning every
+                      # probe into pods_fail. The curl --max-time caps the inner
+                      # call; activeDeadlineSeconds on the CronJob caps the whole
+                      # tick at 120s, which is enough for ≤6 pod probes.
                       STATS=$(kubectl exec -n {{ .Release.Namespace }} "$JVB_POD" \
-                        -- curl -sf "http://127.0.0.1:8080/colibri/stats" 2>/dev/null || true)
+                        -- curl -sf --max-time 3 "http://127.0.0.1:8080/colibri/stats" 2>/dev/null || true)
 
-                      if [ -n "$STATS" ]; then
-                        STRESS=$(echo "$STATS" | grep -o '"stress_level":[0-9.]*' | grep -o '[0-9.]*' || true)
-                        PARTICIPANTS=$(echo "$STATS" | grep -o '"participants":[0-9]*' | grep -o '[0-9]*' || true)
-                        CONFERENCES=$(echo "$STATS" | grep -o '"conferences":[0-9]*' | grep -o '[0-9]*' || true)
-                        VIDEO_CH=$(echo "$STATS" | grep -o '"video_channels":[0-9]*' | grep -o '[0-9]*' || true)
-                        log "JVB stats: stress=${STRESS:-?} participants=${PARTICIPANTS:-0} conferences=${CONFERENCES:-0} video_channels=${VIDEO_CH:-0}"
+                      if [ -z "$STATS" ]; then
+                        POLL_FAIL=$((POLL_FAIL + 1))
+                        continue
                       fi
-                    fi
+                      POLL_OK=$((POLL_OK + 1))
 
-                    if [ -n "$STRESS" ]; then
-                      STRESS_PARAM="&stress_level=$STRESS"
-                    fi
+                      P=$(extract_num "$STATS" participants); P=${P:-0}
+                      C=$(extract_num "$STATS" conferences); C=${C:-0}
+                      BD=$(extract_num "$STATS" bit_rate_download); BD=${BD:-0}
+                      BU=$(extract_num "$STATS" bit_rate_upload); BU=${BU:-0}
+                      AS=$(extract_num "$STATS" endpoints_sending_audio); AS=${AS:-0}
+                      VS=$(extract_num "$STATS" endpoints_sending_video); VS=${VS:-0}
+                      LC=$(extract_num "$STATS" largest_conference); LC=${LC:-0}
+                      OC=$(extract_num "$STATS" octo_conferences); OC=${OC:-0}
+                      OE=$(extract_num "$STATS" octo_endpoints); OE=${OE:-0}
+                      OS=$(extract_num "$STATS" octo_send_bitrate); OS=${OS:-0}
+                      OR=$(extract_num "$STATS" octo_receive_bitrate); OR=${OR:-0}
+                      SL=$(extract_num "$STATS" stress_level); SL=${SL:-0}
+
+                      # Stress is documented to be in [0,1] but JVB has been
+                      # observed returning much larger values on freshly-started
+                      # or recently-cycled pods (e.g. 7-8 on an idle bridge),
+                      # which would amplify into spurious reactive scale-ups.
+                      # Two safeguards:
+                      #   1. Cap per-pod stress to 1.0.
+                      #   2. Ignore stress from pods with zero participants.
+                      #      Stress on an empty bridge is meaningless for
+                      #      reactive capacity decisions — the predictive
+                      #      signal already covers that event's provisioning.
+                      # Multiply by 1000 and truncate so POSIX `-gt` can compare.
+                      if [ "$P" -gt 0 ] 2>/dev/null; then
+                        SL_MILLI=$(awk "BEGIN{v=($SL); if(v>1)v=1; if(v<0)v=0; printf \"%d\", v*1000}" 2>/dev/null || echo 0)
+                      else
+                        SL_MILLI=0
+                      fi
+
+                      SUM_PARTICIPANTS=$((SUM_PARTICIPANTS + P))
+                      SUM_CONFERENCES=$((SUM_CONFERENCES + C))
+                      SUM_BIT_DOWN=$((SUM_BIT_DOWN + BD))
+                      SUM_BIT_UP=$((SUM_BIT_UP + BU))
+                      SUM_AUDIO_SENDERS=$((SUM_AUDIO_SENDERS + AS))
+                      SUM_VIDEO_SENDERS=$((SUM_VIDEO_SENDERS + VS))
+                      SUM_OCTO_CONF=$((SUM_OCTO_CONF + OC))
+                      SUM_OCTO_EP=$((SUM_OCTO_EP + OE))
+                      SUM_OCTO_SEND=$((SUM_OCTO_SEND + OS))
+                      SUM_OCTO_RECV=$((SUM_OCTO_RECV + OR))
+                      [ "$LC" -gt "$MAX_LARGEST_CONF" ] 2>/dev/null && MAX_LARGEST_CONF=$LC
+                      [ "$SL_MILLI" -gt "$MAX_STRESS_MILLI" ] 2>/dev/null && MAX_STRESS_MILLI=$SL_MILLI
+                    done
+
+                    log "JVB aggregate: pods_ok=$POLL_OK pods_fail=$POLL_FAIL participants=$SUM_PARTICIPANTS conferences=$SUM_CONFERENCES bitDown=$SUM_BIT_DOWN bitUp=$SUM_BIT_UP largest=$MAX_LARGEST_CONF stressMilli=$MAX_STRESS_MILLI"
+                  fi
+
+                  # Build the aggregated query-string chunk only when at least one
+                  # pod responded. Without that signal the API falls back to its
+                  # own single-pod probe and the snapshot is marked non-aggregated.
+                  AGG_PARAMS=""
+                  STRESS_FLOAT=""
+                  if [ "$POLL_OK" -gt 0 ]; then
+                    STRESS_FLOAT=$(awk "BEGIN{printf \"%.6f\", $MAX_STRESS_MILLI/1000}" 2>/dev/null || echo 0)
+                    AGG_PARAMS="&pollSuccesses=${POLL_OK}&pollFailures=${POLL_FAIL}"
+                    AGG_PARAMS="${AGG_PARAMS}&participants=${SUM_PARTICIPANTS}"
+                    AGG_PARAMS="${AGG_PARAMS}&conferences=${SUM_CONFERENCES}"
+                    AGG_PARAMS="${AGG_PARAMS}&stressLevel=${STRESS_FLOAT}"
+                    AGG_PARAMS="${AGG_PARAMS}&bitRateDownKbps=${SUM_BIT_DOWN}"
+                    AGG_PARAMS="${AGG_PARAMS}&bitRateUpKbps=${SUM_BIT_UP}"
+                    AGG_PARAMS="${AGG_PARAMS}&endpointsSendingAudio=${SUM_AUDIO_SENDERS}"
+                    AGG_PARAMS="${AGG_PARAMS}&endpointsSendingVideo=${SUM_VIDEO_SENDERS}"
+                    AGG_PARAMS="${AGG_PARAMS}&largestConference=${MAX_LARGEST_CONF}"
+                    AGG_PARAMS="${AGG_PARAMS}&octoConferences=${SUM_OCTO_CONF}"
+                    AGG_PARAMS="${AGG_PARAMS}&octoEndpoints=${SUM_OCTO_EP}"
+                    AGG_PARAMS="${AGG_PARAMS}&octoSendBitrateBps=${SUM_OCTO_SEND}"
+                    AGG_PARAMS="${AGG_PARAMS}&octoReceiveBitrateBps=${SUM_OCTO_RECV}"
+                    # Legacy stress_level param kept for older route handlers that
+                    # still look for it; harmless with the new code path.
+                    AGG_PARAMS="${AGG_PARAMS}&stress_level=${STRESS_FLOAT}"
                   fi
 
                   # ── Phase 1: Predictive — query the app API ───────
+                  # Forward spec/ready replica counts + aggregated traffic so the
+                  # API persists an authoritative snapshot to Redis. The public
+                  # /api/status reads that snapshot instead of guessing from a
+                  # single /colibri/stats hit (which only ever sees 1 pod).
                   APP_URL="{{ include "eventi-dtd.internalUrl" . }}"
                   RESPONSE=$(curl -sf \
                     -H "x-api-key: $CRON_API_KEY" \
-                    "${APP_URL}/api/internal/jvb-desired-replicas?_=1${STRESS_PARAM}" 2>/dev/null)
+                    "${APP_URL}/api/internal/jvb-desired-replicas?current=${CURRENT}&ready=${READY}${AGG_PARAMS}" 2>/dev/null)
 
                   if [ -z "$RESPONSE" ]; then
                     log "ERROR: Empty response from API — keeping current replicas ($CURRENT)"
@@ -171,12 +277,18 @@ spec:
                   drop:
                     - ALL
               resources:
+                # Memory bumped from 32Mi after observing OOMKills with
+                # CURRENT>=3 JVB pods: the scaler fans out `kubectl exec`
+                # to every pod to aggregate /colibri/stats, and each
+                # kubectl client + bash subshell easily pushes past the
+                # old 32Mi ceiling. 256Mi covers up to ~6 pods (== the
+                # default maxReplicas) with comfortable headroom.
                 requests:
                   cpu: 10m
-                  memory: 16Mi
+                  memory: 64Mi
                 limits:
-                  cpu: 50m
-                  memory: 32Mi
+                  cpu: 200m
+                  memory: 256Mi
 ---
 apiVersion: v1
 kind: ServiceAccount

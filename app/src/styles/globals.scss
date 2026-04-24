@@ -21,6 +21,63 @@
   padding-right: 4em;
 }
 
+// Form controls — Bootstrap Italia's floating-label scheme renders text fields
+// with no visible border and a transparent background, which disappears on any
+// white card surface. Admin forms live inside white cards, so we force a
+// legible baseline: explicit text color, neutral border, light-gray idle
+// background that contrasts against a white card, with a blue focus ring.
+// Scope to .admin-form-surface so we don't touch public-site form skins.
+.admin-form-surface {
+  .form-control,
+  .form-select,
+  input.form-control,
+  select.form-select,
+  textarea.form-control {
+    background-color: #fff;
+    border: 1px solid #C9D4DE;
+    color: #17324D;
+
+    &::placeholder {
+      color: #8899AA;
+      opacity: 1;
+    }
+
+    &:hover:not(:disabled):not(:focus) {
+      border-color: #90A4AE;
+    }
+
+    &:focus {
+      background-color: #fff;
+      border-color: #0066CC;
+      color: #17324D;
+      box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.15);
+    }
+
+    &:disabled,
+    &[readonly] {
+      background-color: #F5F7FB;
+      color: #5A768A;
+      border-color: #E8ECF0;
+    }
+  }
+
+  // Native <select> arrow is nearly invisible on white — inline a dark chevron.
+  select.form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%2317324D' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 14px 14px;
+    padding-right: 2.25rem;
+    appearance: none;
+  }
+
+  // Bootstrap Italia's floating-label pattern puts the label inside the input
+  // box as a "placeholder" until focus; on a white card it also blends in.
+  .form-group label {
+    color: #17324D;
+  }
+}
+
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
@@ -59,10 +116,45 @@
   }
 }
 
+// Editorial "kicker" / eyebrow above an event title. Opt-in via the
+// `parseTitleKicker` site setting — the renderer only emits .event-title-kicker
+// when the setting is on AND the title contains a `|` with text on both sides.
+.event-title-kicker {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5A768A;
+  margin-bottom: 0.25em;
+  line-height: 1.2;
+}
+
+.event-title-main {
+  display: block;
+}
+
 // ── Live room ──
+//
+// Layout strategy:
+//   Desktop (≥lg): fixed viewport height, video + sidebar side-by-side.
+//   Mobile  (<lg): 100svh (small-viewport-height — iOS-safe, excludes URL
+//                  bar collapse), video and sidebar stacked, each getting a
+//                  predictable share of vertical space via `.live-main`
+//                  explicit height. Without this the jitsi-wrapper's 400px
+//                  min-height crowds the sidebar off a 667px iPhone screen.
 
 .live-page-bg {
   background: #0F1B2D;
+  height: calc(100vh - 80px);
+
+  // On mobile the page fills the viewport strictly — no scroll, no
+  // collapse. Using `svh` ensures the live area excludes the URL bar
+  // and on-screen keyboard so the iframe never ends up clipped.
+  @media (max-width: 991.98px) {
+    height: 100svh;
+    min-height: 100svh;
+  }
 }
 
 .live-top-bar {
@@ -76,6 +168,44 @@
   flex-shrink: 0;
 }
 
+// Ancillary flex-children stacked above the main video area. Without
+// `flex-shrink: 0` a tight `100svh` column on mobile would squeeze
+// these banners and eat into their legibility.
+.live-hint-banner,
+.live-recording-banner,
+.live-overtime-banner {
+  flex-shrink: 0;
+}
+
+// Main video flex-child. `min-width: 0` is the classic flexbox fix that
+// lets the Jitsi iframe shrink to fit instead of overflowing its parent.
+//
+// Mobile (<992px): the video fills the full viewport minus top bar and
+// the ~48px persistent tab strip at the bottom; the sidebar collapses
+// to a bottom-sheet drawer (see `.live-sidebar` mobile overrides below)
+// that overlays the video when a tab is tapped.
+.live-main {
+  min-width: 0;
+  min-height: 0;
+
+  @media (min-width: 992px) {
+    min-height: 300px;
+  }
+
+  // Mobile: .live-page-bg is now a strict 100svh flex column, so
+  // .live-main just grows into the remaining space after the top bar
+  // and banners. The floating control bar overlays the video directly
+  // (via .live-floating-controls-slot) so no bottom padding is needed.
+  @media (max-width: 991.98px) {
+    flex: 1 1 0;
+    overflow: hidden;
+  }
+
+  // `position: relative` lets the floating-controls-slot be
+  // absolutely positioned within this container on all breakpoints.
+  position: relative;
+}
+
 .jitsi-wrapper {
   position: relative;
   width: 100%;
@@ -85,51 +215,336 @@
   border-radius: 0;
   overflow: hidden;
   border: none;
+
+  // On mobile we drop the desktop's 400px floor so the wrapper always
+  // matches its flex-sized parent exactly. Without this the wrapper
+  // could overflow on short phones (e.g. iPhone SE landscape).
+  @media (max-width: 991.98px) {
+    min-height: 0;
+    height: 100%;
+  }
 }
 
-// ── Sidebar ──
+// ── Sidebar / floating controls (Meet-style) ──
+//
+// Video takes the full width of .live-body. A "floating control bar"
+// overlays the bottom-center of the video with big pill buttons for
+// Q&A / Chat / Polls / Materials / Participants. Tapping a button
+// opens a drawer:
+//   Desktop ≥992px → slides in from the right (420px wide, full height)
+//   Mobile  <992px → slides up from the bottom (80vh)
+// Both variants use the same scrim + transform: translate mechanism.
 
-.live-sidebar {
-  border-left: 2px solid rgba(0, 102, 204, 0.4);
-  background: #ffffff;
-  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.08);
+// Desktop: floating pill at the top of the video.
+// Mobile: full-width bottom tab strip (the pre-Meet pattern users
+// preferred — one tap per tab, always visible, never covered by the
+// drawer).
+.live-floating-controls-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 5;
+
+  @media (max-width: 991.98px) {
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    z-index: 1060; // above the drawer (1050) so the strip stays visible
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    background: linear-gradient(90deg, #004D99 0%, #0066CC 100%);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+  }
 }
 
-.live-sidebar-header {
-  background: linear-gradient(90deg, #004D99 0%, #0066CC 100%);
-  padding: 0;
-  flex-shrink: 0;
+.live-floating-controls {
+  pointer-events: auto;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 12px;
+  margin: 12px auto 0;
+  width: fit-content;
+  background: rgba(15, 27, 45, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 28px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+
+  @media (max-width: 991.98px) {
+    // Reset to a flat full-width strip.
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    gap: 0;
+    min-height: 52px;
+  }
 }
 
-.live-sidebar-tab {
-  border: none;
-  border-radius: 0;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  min-width: 0;
-  padding: 0.55rem 0.3rem;
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.65);
+.live-floating-btn {
   position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 68px;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
 
   &:hover {
+    background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &:active {
+    transform: scale(0.96);
   }
 
   &--active {
-    background: rgba(255, 255, 255, 0.15);
+    background: #0066CC;
     color: #fff;
-    font-weight: 600;
-    box-shadow: inset 0 -2px 0 #0066CC;
+  }
+
+  // Mobile: flat tab-bar cell. flex-fill is applied via Bootstrap class
+  // on the button element from React. Active state uses the same blue
+  // inset underline as the pre-Meet strip.
+  @media (max-width: 991.98px) {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 6px 4px;
+    border-radius: 0;
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.65);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    &--active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      box-shadow: inset 0 -2px 0 #0066CC;
+    }
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__label {
+    white-space: nowrap;
+  }
+
+  &__badge {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 10px;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  &__dot {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #D9364F;
+    box-shadow: 0 0 0 2px rgba(15, 27, 45, 0.9);
   }
 }
 
-// Legacy alias
-.qa-sidebar {
-  @extend .live-sidebar;
+// Drawer. Always `position: fixed`; slides in from the right on desktop
+// and from the bottom on mobile. Closed state = translated off-screen
+// (no tab strip peek anymore — the floating bar is the launcher).
+.live-sidebar {
+  background: #ffffff;
+  width: 100%;
+  min-width: 0;
+  position: fixed;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  transition: transform 240ms ease-out;
+
+  @media (min-width: 992px) {
+    top: 80px; // .live-page-bg margin allowance (header 80px above)
+    right: 0;
+    bottom: 0;
+    width: 420px;
+    max-width: 90vw;
+    border-left: 2px solid rgba(0, 102, 204, 0.4);
+    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.25);
+    transform: translateX(100%);
+  }
+
+  @media (max-width: 991.98px) {
+    left: 0;
+    right: 0;
+    // Leave the 52px bottom tab strip visible above the drawer, so
+    // users can switch tabs without closing the drawer.
+    bottom: 52px;
+    height: calc(82vh - 52px);
+    max-height: calc(82vh - 52px);
+    border-top: 2px solid rgba(0, 102, 204, 0.4);
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.25);
+    transform: translateY(calc(100% + 52px));
+  }
+
+  &--open {
+    @media (min-width: 992px) {
+      transform: translateX(0);
+    }
+    @media (max-width: 991.98px) {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Scrim visible on BOTH desktop and mobile whenever the drawer is open.
+.live-sidebar-scrim {
+  display: block;
+  padding: 0;
+  border: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  background: rgba(0, 0, 0, 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: background 240ms ease-out, opacity 240ms ease-out;
+
+  &--open {
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+// Drawer body scrolls internally — input rows stay pinned to the
+// bottom of the drawer viewport on both layouts.
+.live-sidebar-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// Drawer header: active panel title + close button.
+.live-sidebar-header {
+  background: linear-gradient(90deg, #004D99 0%, #0066CC 100%);
+  padding: 0.75rem 1rem;
+  flex-shrink: 0;
+  min-height: 52px;
+}
+
+.live-sidebar-close {
+  border: 0;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+  }
+}
+
+// DeviceCheck toggle (custom, cross-browser). Bootstrap/Italia's own
+// form-switch styles interact badly with Firefox's default checkbox
+// rendering when stacked with `role="switch"` + our small text layout.
+// This is a minimal switch styled the same on every browser.
+.device-check-toggle {
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+  }
+
+  &__track {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    background: #CED4DA;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: left 0.15s ease;
+  }
+
+  &__input:checked + &__track {
+    background: #0066CC;
+  }
+
+  &__input:checked + &__track &__thumb {
+    left: 18px;
+  }
+
+  &__input:focus-visible + &__track {
+    outline: 2px solid #0066CC;
+    outline-offset: 2px;
+  }
+}
+
+// Legacy aliases from before the Meet-style refactor. The QAPanel /
+// PollPanel / etc. render inside the drawer body now, so they must NOT
+// inherit the fixed-position + off-screen translate rules. Keep the
+// selectors as no-ops for any stray consumers, but don't @extend.
+.qa-sidebar,
+.poll-sidebar {
+  width: 100%;
+  height: 100%;
 }
 
 .leave-room-btn {
@@ -1151,4 +1566,502 @@
 @keyframes infraSlideUp {
   0% { opacity: 0; transform: translateY(12px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+
+// ── Markdown body (event descriptions) ──
+.markdown-body {
+  line-height: 1.7;
+  color: #17324D;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #17324D;
+    font-weight: 600;
+    margin-top: 1.2em;
+    margin-bottom: 0.5em;
+  }
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.4rem; }
+  h3 { font-size: 1.2rem; }
+
+  p { margin-bottom: 0.75rem; }
+
+  a {
+    color: #0066CC;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    &:hover { color: #004D99; }
+  }
+
+  ul, ol { margin-bottom: 0.75rem; padding-left: 1.5rem; }
+  li { margin-bottom: 0.25rem; }
+
+  blockquote {
+    border-left: 3px solid #0066CC;
+    padding: 0.5rem 1rem;
+    margin: 0.75rem 0;
+    background: #F5F7FB;
+    color: #5A768A;
+    border-radius: 0 4px 4px 0;
+  }
+
+  code {
+    background: #F0F4F8;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.88em;
+    font-family: 'Roboto Mono', monospace;
+  }
+  pre {
+    background: #17324D;
+    color: #E8F0FE;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    code { background: transparent; color: inherit; padding: 0; }
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 0.5rem 0;
+  }
+
+  hr { border: 0; border-top: 1px solid #E8ECF0; margin: 1.5rem 0; }
+
+  table {
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    th, td { border: 1px solid #E8ECF0; padding: 6px 10px; }
+    th { background: #F5F7FB; font-weight: 600; text-align: left; }
+  }
+}
+
+// ── Service inventory (/service-inventory) ──
+.service-inventory {
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: #F5F7FB;
+    color: #17324D;
+    white-space: nowrap;
+
+    &::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      flex: 0 0 auto;
+    }
+  }
+  &__chip--trust {
+    background: #FFF6E0;
+    border-color: #E6B800;
+    color: #7A5A00;
+  }
+  &__chip--personal-data {
+    background: #FBE7EB;
+    border-color: #D9364F;
+    color: #8B1D2C;
+  }
+  &__chip--recording {
+    background: #E7F0FA;
+    border-color: #0066CC;
+    color: #004C99;
+  }
+
+  &__stack {
+    margin-top: 2.5rem;
+    padding: 1.5rem;
+    background: #F8FAFC;
+    border: 1px solid #E8ECF0;
+    border-radius: 8px;
+  }
+  &__stack-title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #17324D;
+  }
+  &__stack-intro {
+    margin: 0 0 1.25rem 0;
+    color: #5A768A;
+    font-size: 0.9rem;
+  }
+  &__stack-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  &__stack-layer {
+    display: grid;
+    grid-template-columns: minmax(130px, 180px) 1fr;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border: 1px solid #E8ECF0;
+    border-left: 4px solid var(--layer-color, #0066CC);
+    border-radius: 6px;
+  }
+  &__stack-layer-title {
+    font-weight: 600;
+    color: #17324D;
+    font-size: 0.92rem;
+  }
+  &__stack-layer-sub {
+    display: block;
+    font-weight: 400;
+    color: #5A768A;
+    font-size: 0.78rem;
+    margin-top: 2px;
+  }
+  &__stack-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  &__stack-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.6rem;
+    background: #F5F7FB;
+    color: #17324D;
+    border: 1px solid #E8ECF0;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    &__stack-layer {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+  }
+}
+
+// ── Waiting-room garden scene (ADR-012, fase 0) ──
+// Decorative background displayed behind the waiting-room card. The
+// scene itself is in `<GardenScene>`; this sheet owns the layout +
+// keyframes. Everything respects `prefers-reduced-motion`: users who
+// opted out of motion in their OS see a still scene.
+
+.waiting-garden-bg {
+  position: relative;
+  min-height: 100%;
+  background: linear-gradient(180deg, #BCE0FF 0%, #FFE9CF 60%, #FFD8B8 100%);
+}
+
+.garden-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.garden-scene .garden-sun {
+  transform-origin: 1580px 220px;
+  animation: gardenSunPulse 6s ease-in-out infinite;
+}
+
+.garden-scene .garden-tree {
+  transform-origin: center bottom;
+  animation: gardenSway 5s ease-in-out infinite;
+}
+.garden-scene .garden-tree--2 { animation-delay: -1.3s; animation-duration: 6s; }
+.garden-scene .garden-tree--3 { animation-delay: -2.6s; animation-duration: 5.5s; }
+
+.garden-scene .garden-fountain-jet {
+  animation: gardenJet 1.6s ease-in-out infinite;
+  transform-origin: 0 0;
+}
+
+.garden-scene .garden-fountain-drops circle {
+  animation: gardenDrop 1.8s ease-in-out infinite;
+}
+.garden-scene .garden-fountain-drops circle:nth-child(2) { animation-delay: -0.4s; }
+.garden-scene .garden-fountain-drops circle:nth-child(3) { animation-delay: -0.8s; }
+.garden-scene .garden-fountain-drops circle:nth-child(4) { animation-delay: -1.2s; }
+
+.garden-scene .garden-steam path {
+  animation: gardenSteam 3s ease-in-out infinite;
+  transform-origin: bottom center;
+  opacity: 0;
+}
+.garden-scene .garden-steam path:nth-child(2) { animation-delay: -1s; }
+.garden-scene .garden-steam path:nth-child(3) { animation-delay: -2s; }
+
+.garden-scene .garden-music-notes > g {
+  animation: gardenNote 4s ease-out infinite;
+  transform-origin: center;
+  opacity: 0;
+}
+.garden-scene .garden-music-notes__2 { animation-delay: -1.3s; }
+.garden-scene .garden-music-notes__3 { animation-delay: -2.6s; }
+
+@keyframes gardenSunPulse {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.05); }
+}
+
+@keyframes gardenSway {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50%      { transform: rotate(1.2deg); }
+}
+
+@keyframes gardenJet {
+  0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.85; }
+  50%      { transform: translateY(-6px) scaleY(1.08); opacity: 1; }
+}
+
+@keyframes gardenDrop {
+  0%   { transform: translateY(-20px); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translateY(20px); opacity: 0; }
+}
+
+@keyframes gardenSteam {
+  0%   { transform: translateY(0); opacity: 0; }
+  20%  { opacity: 0.75; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+@keyframes gardenNote {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  10%  { opacity: 0.8; }
+  100% { transform: translate(20px, -80px); opacity: 0; }
+}
+
+// Reduced-motion: honor the OS/browser setting. Users sensitive to
+// motion get a still scene (no sway, no water spray, no steam).
+@media (prefers-reduced-motion: reduce) {
+  .garden-scene *,
+  .garden-scene *::before,
+  .garden-scene *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+// Mobile: scale down the visual weight so the scene never steals
+// focus from the waiting-room card above it.
+@media (max-width: 767.98px) {
+  .garden-scene {
+    opacity: 0.55;
+  }
+}
+
+// ── Garden interactive overlay (ADR-012 fase 2) ──
+// Avatar layer sits on top of GardenScene but below the waiting-room
+// card (which lives at z-index:1). HUD + joystick + picker float
+// above everything and receive pointer events selectively.
+
+.garden-avatars-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none; // avatars don't block clicks on the card above
+}
+
+.garden-hud {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  pointer-events: none; // only inner buttons take clicks
+
+  &__left, &__right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    pointer-events: auto;
+    background: rgba(23, 50, 77, 0.85);
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.35rem 0.6rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+
+  &__count {
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  &__hint {
+    font-size: 0.68rem;
+    opacity: 0.75;
+  }
+
+  &__toggle {
+    background: transparent;
+    color: #fff !important;
+    border-color: rgba(255,255,255,0.45);
+    font-size: 0.76rem;
+    font-weight: 600;
+
+    &:hover, &:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: #fff;
+      color: #fff !important;
+    }
+  }
+}
+
+.garden-avatar-chip {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #F5F7FB;
+  border: 2px solid #fff;
+  padding: 2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:hover { border-color: #F7A11A; }
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 2px; }
+}
+
+// Mobile touch joystick.
+.garden-joystick {
+  position: fixed;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0));
+  right: 16px;
+  width: 110px;
+  height: 110px;
+  z-index: 3;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+
+  &__base {
+    position: absolute;
+    inset: 0;
+    background: rgba(23, 50, 77, 0.35);
+    border: 2px solid rgba(255, 255, 255, 0.55);
+    border-radius: 50%;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    background: #0066CC;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 60ms linear;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+  }
+}
+
+// Avatar picker modal.
+.garden-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1055;
+  background: rgba(15, 27, 45, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.garden-picker {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.25rem 1.25rem 1rem;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+
+  &__tile {
+    background: #F5F7FB;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 0.5rem 0.25rem 0.4rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+
+    &:hover {
+      background: #E6F0FA;
+      border-color: #C9D4DE;
+    }
+    &:focus-visible {
+      outline: 2px solid #0066CC;
+      outline-offset: 1px;
+    }
+    &--active {
+      background: #E6F0FA;
+      border-color: #0066CC;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.18);
+    }
+  }
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #17324D;
+  }
+}
+
+// Reduced motion: disable walk-cycle bob on avatars (we still move
+// them, but they don't bounce).
+@media (prefers-reduced-motion: reduce) {
+  .garden-avatars-layer * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

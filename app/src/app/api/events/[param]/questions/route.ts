@@ -10,7 +10,7 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { createQuestionSchema } from '@/lib/validation/schemas';
-import { rateLimit } from '@/lib/rate-limit';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { getCached, setCache } from '@/lib/cache';
 
@@ -157,22 +157,35 @@ export const POST = withErrorHandling(async (request, context) => {
   const body = await parseJsonBody(request);
 
   const bodyObj = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
-  const { accessToken, ...rest } = bodyObj;
+  const { accessToken, guestName, ...rest } = bodyObj;
   const token =
     (typeof accessToken === 'string' ? accessToken : undefined) ??
     new URL(request.url).searchParams.get('token');
 
-  if (!token) throw new UnauthorizedError('Access token required');
-
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event || !event.qaEnabled) throw new NotFoundError('Event');
 
-  const registration = await prisma.registration.findUnique({
-    where: { accessToken: token as string },
-    select: { id: true, eventId: true, displayName: true },
-  });
-  if (!registration || registration.eventId !== event.id) {
-    throw new ForbiddenError('Invalid access token');
+  let registrationId: string | null = null;
+  let authorName = '';
+
+  if (token) {
+    const registration = await prisma.registration.findUnique({
+      where: { accessToken: token as string },
+      select: { id: true, eventId: true, displayName: true },
+    });
+    if (!registration || registration.eventId !== event.id) {
+      throw new ForbiddenError('Invalid access token');
+    }
+    registrationId = registration.id;
+    authorName = registration.displayName;
+  } else {
+    // Guest path: requires a non-empty display name, rate-limited by IP
+    // since there's no stable participant id to key on.
+    const name = typeof guestName === 'string' ? guestName.trim() : '';
+    if (name.length < 2) {
+      throw new UnauthorizedError('guestName required for anonymous Q&A');
+    }
+    authorName = name.slice(0, 80);
   }
 
   const parsed = createQuestionSchema.safeParse(rest);
@@ -180,7 +193,10 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
-  const rl = rateLimit(`qa:${registration.id}`, { limit: 1, windowMs: 30_000 });
+  const rlKey = registrationId
+    ? `qa:${registrationId}`
+    : `qa-guest:${getClientIp(request)}`;
+  const rl = rateLimit(rlKey, { limit: 1, windowMs: 30_000 });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
@@ -188,8 +204,8 @@ export const POST = withErrorHandling(async (request, context) => {
   const question = await prisma.question.create({
     data: {
       eventId: event.id,
-      registrationId: registration.id,
-      authorName: registration.displayName,
+      registrationId: registrationId ?? undefined,
+      authorName,
       text: parsed.data.text,
     },
   });

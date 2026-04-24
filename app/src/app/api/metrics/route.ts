@@ -4,6 +4,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { UnauthorizedError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { constantTimeEqual } from '@/lib/auth/moderator';
+import { readJvbSnapshot } from '@/lib/jvb-snapshot';
 import {
   register,
   activeEventsGauge,
@@ -20,7 +21,35 @@ import {
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Populate the JVB gauges from the authoritative cross-pod snapshot
+ * written to Redis by the scaler CronJob (`jvb:replicas:snapshot`, TTL
+ * 300 s). With N>1 pods a direct Service-VIP fetch of `/colibri/stats`
+ * only sees one pod's slice and reports zeros for the rest — Prometheus
+ * was scraping misleading values during the Friday caffettino (apparent
+ * 0 participants while the scaler correctly saw 63). Prefer the snapshot;
+ * fall back to a single probe only when the snapshot is missing or has
+ * no aggregated traffic data (fresh pod, scaler crashed, Redis cold).
+ */
 async function refreshJvbGauges(): Promise<void> {
+  const snapshot = await readJvbSnapshot();
+  const snapshotHasTraffic =
+    snapshot?.pollSuccesses !== undefined && snapshot.pollSuccesses > 0;
+
+  if (snapshotHasTraffic) {
+    if (snapshot!.participants !== undefined) jvbParticipantsGauge.set(snapshot!.participants);
+    if (snapshot!.conferences !== undefined) jvbConferencesGauge.set(snapshot!.conferences);
+    if (snapshot!.stressLevel !== undefined) jvbStressLevelGauge.set(snapshot!.stressLevel);
+    if (snapshot!.octoConferences !== undefined) jvbOctoConferencesGauge.set(snapshot!.octoConferences);
+    if (snapshot!.octoEndpoints !== undefined) jvbOctoEndpointsGauge.set(snapshot!.octoEndpoints);
+    if (snapshot!.octoSendBitrateBps !== undefined) jvbOctoSendBitrateGauge.set(snapshot!.octoSendBitrateBps);
+    if (snapshot!.octoReceiveBitrateBps !== undefined) jvbOctoReceiveBitrateGauge.set(snapshot!.octoReceiveBitrateBps);
+    return;
+  }
+
+  // Fallback: single-pod probe. Correct when replicas==1, a lower bound
+  // otherwise. Still worth emitting so the dashboard isn't completely
+  // blank when the scaler hasn't run (first deploy, Redis wipe, etc.).
   const url = process.env.JVB_HEALTH_URL;
   if (!url) return;
   try {

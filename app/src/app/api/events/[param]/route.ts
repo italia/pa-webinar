@@ -7,6 +7,7 @@ import {
   AppError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { reviveStatus } from '@/lib/events/lifecycle';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import {
@@ -70,6 +71,7 @@ export const GET = withErrorHandling(async (request, context) => {
       qaEnabled: event.qaEnabled,
       chatEnabled: event.chatEnabled,
       recordingEnabled: event.recordingEnabled,
+      autoStartRecording: event.autoStartRecording,
       participantsCanUnmute: event.participantsCanUnmute,
       participantsCanStartVideo: event.participantsCanStartVideo,
       participantsCanShareScreen: event.participantsCanShareScreen,
@@ -123,6 +125,7 @@ export const GET = withErrorHandling(async (request, context) => {
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
     recordingEnabled: event.recordingEnabled,
+    autoStartRecording: event.autoStartRecording,
     participantsCanUnmute: event.participantsCanUnmute,
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
@@ -202,15 +205,36 @@ export const PUT = withErrorHandling(async (request, context) => {
       }
     : undefined;
 
+  // Reviving an ENDED event: if the moderator pushes endsAt into the
+  // future we flip the status back to PUBLISHED or LIVE instead of
+  // leaving the row stuck in ENDED. Without this the call happens to
+  // be terminated permanently from a single timing mistake — which
+  // is what happened on the caffettino dry-run.
+  const revivedStatus = reviveStatus({
+    currentStatus: event.status,
+    currentStartsAt: event.startsAt,
+    newEndsAt: data.endsAt !== undefined ? new Date(data.endsAt) : undefined,
+    newStartsAt: data.startsAt !== undefined ? new Date(data.startsAt) : undefined,
+    statusExplicitlySet: data.status !== undefined,
+    now: new Date(),
+  });
+
   const updated = await prisma.event.update({
     where: { id: eventId },
     data: {
+      ...(revivedStatus && { status: revivedStatus }),
       ...(data.title !== undefined && { title: data.title }),
       ...(data.description !== undefined && { description: data.description }),
       ...(data.startsAt !== undefined && {
         startsAt: new Date(data.startsAt),
       }),
       ...(data.endsAt !== undefined && { endsAt: new Date(data.endsAt) }),
+      ...(data.expectedSenderRatioPct !== undefined && {
+        expectedSenderRatioPct: data.expectedSenderRatioPct,
+      }),
+      ...(data.gracePeriodMinutes !== undefined && {
+        gracePeriodMinutes: data.gracePeriodMinutes,
+      }),
       ...(data.timezone !== undefined && { timezone: data.timezone }),
       ...(data.maxParticipants !== undefined && {
         maxParticipants: data.maxParticipants,
@@ -221,6 +245,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       }),
       ...(data.recordingEnabled !== undefined && {
         recordingEnabled: data.recordingEnabled,
+      }),
+      ...(data.autoStartRecording !== undefined && {
+        autoStartRecording: data.autoStartRecording,
       }),
       ...(data.participantsCanUnmute !== undefined && {
         participantsCanUnmute: data.participantsCanUnmute,
@@ -275,6 +302,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.youtubeUrl !== undefined && { youtubeUrl: data.youtubeUrl }),
       ...(data.libraryListed !== undefined && { libraryListed: data.libraryListed }),
       ...(data.coverImageUrl !== undefined && { coverImageUrl: data.coverImageUrl }),
+      ...(data.parseTitleKicker !== undefined && {
+        parseTitleKicker: data.parseTitleKicker,
+      }),
     },
   });
 

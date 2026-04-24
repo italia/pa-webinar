@@ -10,6 +10,7 @@ import { isJibriAvailable } from '@/lib/infrastructure';
 import LiveEventClient from '@/components/live/live-event-client';
 import ProvisioningScreen from '@/components/live/provisioning-screen';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
 async function hasJoinGrant(eventId: string): Promise<boolean> {
   const appSecret = process.env.APP_SECRET;
@@ -40,6 +41,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   const event = await prisma.event.findUnique({
     where: { slug },
+    include: { _count: { select: { registrations: true } } },
   });
 
   if (!event) {
@@ -50,7 +52,20 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // isn't ready, handing out a JWT or embedding Jitsi now would dump the
   // user onto a cold pod. ProvisioningScreen calls /wake and polls until
   // the scaler brings the bridge up, then reloads this page.
-  if (event.status === 'IDLE' || event.status === 'PROVISIONING') {
+  //
+  // EXCEPTION: when an event is PROVISIONING but startsAt is still in
+  // the future (pre-scale window scenario), the bridge warm-up is a
+  // background concern — the user is here early and should see the
+  // waiting room with its countdown, netiquette, device check and
+  // chat preview, not a spinner. Let the waiting room render; it'll
+  // show "Apertura alle HH:MM" and auto-enable "Entra ora" the moment
+  // the scaler promotes PROVISIONING → LIVE at startsAt.
+  const now = new Date();
+  const startsAt = new Date(event.startsAt);
+  const bridgeColdStart =
+    event.status === 'IDLE' ||
+    (event.status === 'PROVISIONING' && startsAt <= now);
+  if (bridgeColdStart) {
     const title = getLocalized(event.title as LocalizedField, locale);
     return (
       <ProvisioningScreen
@@ -88,18 +103,31 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             id: event.id,
             slug: event.slug,
             title,
+            parseTitleKicker: resolveKickerEnabled(event, settings.parseTitleKicker),
             startsAt: event.startsAt.toISOString(),
             endsAt: event.endsAt.toISOString(),
             status: event.status,
             eventType: event.eventType,
             recordingEnabled: isInstant ? false : event.recordingEnabled,
+            autoStartRecording: isInstant ? false : event.autoStartRecording,
             qaEnabled: event.qaEnabled,
             chatEnabled: event.chatEnabled,
             waitingRoomAudioUrl: event.waitingRoomAudioUrl,
             participantsCanUnmute: event.participantsCanUnmute,
             participantsCanStartVideo: event.participantsCanStartVideo,
             participantsCanShareScreen: event.participantsCanShareScreen,
+            organizerName: event.organizerName,
+            moderatorName: event.moderatorName,
+            imageUrl: event.imageUrl,
+            coverImageUrl: event.coverImageUrl,
+            maxParticipants: event.maxParticipants,
+            recordingUrl: event.recordingUrl,
+            tempRecordingUrl: event.tempRecordingUrl,
+            feedbackEnabled: event.feedbackEnabled,
             timezone: event.timezone,
+            registrationCount: event._count.registrations,
+            effectiveGraceMinutes:
+              event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
           }}
           token=""
           isModerator={false}
@@ -120,18 +148,20 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   const isPrimaryModerator = event.moderatorToken === token;
 
-  // Co-moderator path: token matches an EventModerator row for this
-  // event (and isn't revoked). Resolved in a single query so we get the
-  // co-moderator's own display name to propagate to the pre-join flow.
-  const coMod = isPrimaryModerator
+  // Magic-link path: token may be a co-moderator (role=MODERATOR) or
+  // a speaker (role=SPEAKER). Resolved once so we get the grant's own
+  // display name for the pre-join greeting and the role for JWT + UI.
+  const grant = isPrimaryModerator
     ? null
     : await prisma.eventModerator.findUnique({ where: { token } });
-  const isCoModerator =
-    !!coMod && coMod.eventId === event.id && coMod.revokedAt === null;
+  const isValidGrant =
+    !!grant && grant.eventId === event.id && grant.revokedAt === null;
+  const isCoModerator = isValidGrant && grant.role === 'MODERATOR';
+  const isSpeaker = isValidGrant && grant.role === 'SPEAKER';
   const isModerator = isPrimaryModerator || isCoModerator;
 
   let participantInfo: { displayName: string } | null = null;
-  if (!isModerator) {
+  if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
       select: { displayName: true, eventId: true },
@@ -151,28 +181,42 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         id: event.id,
         slug: event.slug,
         title,
+        parseTitleKicker: resolveKickerEnabled(event, settings.parseTitleKicker),
         startsAt: event.startsAt.toISOString(),
         endsAt: event.endsAt.toISOString(),
         status: event.status,
         eventType: event.eventType,
         recordingEnabled: event.recordingEnabled,
+        autoStartRecording: event.autoStartRecording,
         qaEnabled: event.qaEnabled,
         chatEnabled: event.chatEnabled,
         waitingRoomAudioUrl: event.waitingRoomAudioUrl,
         participantsCanUnmute: event.participantsCanUnmute,
         participantsCanStartVideo: event.participantsCanStartVideo,
         participantsCanShareScreen: event.participantsCanShareScreen,
+        organizerName: event.organizerName,
+        moderatorName: event.moderatorName,
+        imageUrl: event.imageUrl,
+        coverImageUrl: event.coverImageUrl,
+        maxParticipants: event.maxParticipants,
+        recordingUrl: event.recordingUrl,
+        tempRecordingUrl: event.tempRecordingUrl,
+        feedbackEnabled: event.feedbackEnabled,
         timezone: event.timezone,
+        registrationCount: event._count.registrations,
+        effectiveGraceMinutes:
+          event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
       }}
       token={token}
       isModerator={isModerator}
+      isSpeaker={isSpeaker}
       isGuest={false}
       displayName={
-        isCoModerator && coMod
-          // Named co-moderator via EventModerator row — greet them by
-          // name in the pre-join input (still editable).
-          ? coMod.name
-          : isModerator
+        isValidGrant && grant
+          // Named co-moderator or speaker via EventModerator row —
+          // greet them by name in the pre-join input (still editable).
+          ? grant.name
+          : isPrimaryModerator
             // Primary moderator magic-link (shared): keep the input
             // empty so anyone opening the link types their own name
             // rather than inheriting the configured moderatorName.

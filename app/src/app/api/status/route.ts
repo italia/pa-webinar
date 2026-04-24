@@ -1,6 +1,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { readJvbSnapshot } from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -107,11 +108,12 @@ async function checkSmtp(): Promise<ComponentStatus> {
 }
 
 /**
- * Redis health check. Required for real-time chat fan-out across
- * pods. When Redis is unreachable the app keeps working for
- * single-pod deployments (chat stays local to each pod), so we
- * report 'degraded' instead of 'outage' — matches the operational
- * impact rather than the technical state.
+ * Redis health check. Redis is a required dependency — it fans out
+ * chat messages across pods. A missing or unreachable Redis means
+ * users on different pods can't see each other's chat, which is an
+ * outage, not a degradation. Canonical chat state still lives in
+ * Postgres so messages aren't lost, but the real-time feature is
+ * broken and the operator needs to see that.
  */
 async function checkRedis(): Promise<ComponentStatus> {
   const { getRedis } = await import('@/lib/redis');
@@ -119,8 +121,8 @@ async function checkRedis(): Promise<ComponentStatus> {
   if (!redis) {
     return {
       name: 'redis',
-      status: 'unknown',
-      details: 'REDIS_URL not configured (single-pod mode)',
+      status: 'outage',
+      details: 'REDIS_URL not configured',
     };
   }
   const start = Date.now();
@@ -133,7 +135,7 @@ async function checkRedis(): Promise<ComponentStatus> {
     ]);
     const responseTime = Date.now() - start;
     if (pong !== 'PONG') {
-      return { name: 'redis', status: 'degraded', responseTime, details: String(pong) };
+      return { name: 'redis', status: 'outage', responseTime, details: String(pong) };
     }
     return {
       name: 'redis',
@@ -143,7 +145,7 @@ async function checkRedis(): Promise<ComponentStatus> {
   } catch (e) {
     return {
       name: 'redis',
-      status: 'degraded',
+      status: 'outage',
       responseTime: Date.now() - start,
       details: e instanceof Error ? e.message : 'ping failed',
     };
@@ -165,9 +167,17 @@ interface JvbStatusResult {
   stale: boolean;
 }
 
+interface JvbSizingInput {
+  cpuCoresPerPod: number;
+  receiversPerCore: number;
+  sendersPerCore: number;
+  defaultSenderRatioPct: number;
+}
+
 async function getJvbStatus(
   preScaleMinutes: number,
   provisioningTimeoutMinutes: number,
+  sizing: JvbSizingInput,
 ): Promise<JvbStatusResult> {
   try {
     const now = new Date();
@@ -197,13 +207,27 @@ async function getJvbStatus(
         startsAt: true,
         provisioningStartedAt: true,
         maxParticipants: true,
+        expectedSenderRatioPct: true,
         participantsCanStartVideo: true,
       },
     });
 
+    const sizingConfig = {
+      cpuCoresPerPod: sizing.cpuCoresPerPod,
+      receiversPerCore: sizing.receiversPerCore,
+      sendersPerCore: sizing.sendersPerCore,
+      maxReplicas,
+    };
+
     let desired = 0;
     for (const event of events) {
-      desired += jvbsForEvent(event.maxParticipants, event.participantsCanStartVideo, maxReplicas);
+      const ratio = event.expectedSenderRatioPct ?? sizing.defaultSenderRatioPct;
+      desired += jvbsForEvent(
+        event.maxParticipants,
+        ratio,
+        event.participantsCanStartVideo,
+        sizingConfig,
+      );
     }
     desired = Math.min(desired, maxReplicas);
     if (events.length > 0 && desired === 0) desired = 1;
@@ -226,8 +250,32 @@ async function getJvbStatus(
     let octoEndpoints: number | null = null;
     let octoSendBitrateBps: number | null = null;
 
+    // Authoritative snapshot: the scaler CronJob has K8s RBAC to read the
+    // JVB deployment AND `pods/exec` to reach each pod's /colibri/stats.
+    // It aggregates per-pod stats and writes the result here. The direct
+    // /colibri/stats call below only tells us what ONE pod (whichever the
+    // Service VIP routes us to) reports — it caps running at 1 and zeroes
+    // participants/stress whenever traffic lives on a sibling pod.
+    const snapshot = await readJvbSnapshot();
+    const snapshotHasTraffic = snapshot?.pollSuccesses !== undefined && snapshot.pollSuccesses > 0;
+    if (snapshot) {
+      running = snapshot.ready;
+    }
+    if (snapshotHasTraffic) {
+      participants = snapshot!.participants ?? null;
+      stressLevel = snapshot!.stressLevel ?? null;
+      octoConferences = snapshot!.octoConferences ?? null;
+      octoEndpoints = snapshot!.octoEndpoints ?? null;
+      octoSendBitrateBps = snapshot!.octoSendBitrateBps ?? null;
+      octoEnabled = (octoConferences ?? 0) > 0 || (octoSendBitrateBps ?? 0) > 0;
+    }
+
+    // Fall back to a single /colibri/stats probe when the snapshot is missing
+    // aggregated traffic data (fresh pod, Redis cold, or older scaler image).
+    // With one JVB replica this is still correct; with many it's a lower
+    // bound for the bridge that happens to answer.
     const jvbHealthUrl = process.env.JVB_HEALTH_URL;
-    if (jvbHealthUrl) {
+    if (jvbHealthUrl && !snapshotHasTraffic) {
       try {
         const res = await fetch(`${jvbHealthUrl}/colibri/stats`, {
           signal: AbortSignal.timeout(3000),
@@ -235,15 +283,11 @@ async function getJvbStatus(
         if (res.ok) {
           const stats = await res.json() as Record<string, unknown>;
           if (stats.healthy !== false) {
-            running = 1;
+            // Fallback when the Redis snapshot is missing entirely. We know
+            // at least one pod is answering; reporting 1 beats 0.
+            if (!snapshot) running = 1;
             stressLevel = typeof stats.stress_level === 'number' ? stats.stress_level : null;
             participants = typeof stats.participants === 'number' ? stats.participants : null;
-            // Octo is considered "enabled" for this reporting purpose when
-            // the bridge has relay traffic OR is serving an octo conference.
-            // /colibri/stats always exposes these fields; a zero value with
-            // octo disabled is indistinguishable from octo-enabled-but-idle,
-            // so we key on the presence of non-zero relay fields at report
-            // time instead of a separate config probe.
             octoConferences = typeof stats.octo_conferences === 'number' ? stats.octo_conferences : null;
             octoEndpoints = typeof stats.octo_endpoints === 'number' ? stats.octo_endpoints : null;
             octoSendBitrateBps = typeof stats.octo_send_bitrate === 'number' ? stats.octo_send_bitrate : null;
@@ -251,7 +295,7 @@ async function getJvbStatus(
           }
         }
       } catch {
-        // JVB not reachable — running stays 0
+        // JVB not reachable — keep whatever `running` the snapshot gave us.
       }
     }
 
@@ -432,7 +476,12 @@ export const GET = withErrorHandling(async () => {
     checkJitsiWeb(),
     checkSmtp(),
     checkRedis(),
-    getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes),
+    getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes, {
+      cpuCoresPerPod: settings.jvbCpuCoresPerPod ?? 16,
+      receiversPerCore: settings.jvbReceiversPerCore ?? 18.75,
+      sendersPerCore: settings.jvbSendersPerCore ?? 3.125,
+      defaultSenderRatioPct: settings.defaultSenderRatioPct ?? 30,
+    }),
     getJibriStatus(recordingNeeded, recordingStale),
     prisma.orphanRecording.count({ where: { decision: 'pending' } }).catch(() => 0),
   ]);

@@ -344,7 +344,11 @@
       "settingsGeneral": "Ġenerali",
       "settingsLanguages": "Lingwi",
       "ariaLabel": "Navigazzjoni tal-amministrazzjoni",
-      "subNavAriaLabel": "Navigazzjoni tas-sezzjoni"
+      "subNavAriaLabel": "Navigazzjoni tas-sezzjoni",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Pannell tal-amministrazzjoni",
@@ -492,6 +496,30 @@
       "noComments": "L-ebda kummenti",
       "stars": "stilel"
     },
+    "coModerators": {
+      "title": "Ko-moderaturi u kelliema",
+      "intro": "Żid ko-moderaturi u kelliema b'magic-links individwali.",
+      "introHint": "Kull persuna għandha isem viżibbli fil-kamra u token li jista' jiġi revokat indipendentement mil-link prinċipali. Il-kelliema għandhom mikrofonu, kamera u qsim tal-iskrin iżda ma jistgħux jimmoderaw (keċċu, issilenzjaw lil kulħadd, reġistraw).",
+      "add": "Żid persuna",
+      "name": "Isem viżibbli fil-kamra",
+      "email": "Email (mhux obbligatorja)",
+      "emailPlaceholder": "biex tibgħatlu l-link",
+      "role": "Rwol",
+      "roleModerator": "Moderatur",
+      "roleSpeaker": "Kelliem",
+      "roleModeratorHint": "Moderazzjoni sħiħa: jista' jirreġistra, jissilenzja lil kulħadd, ineħħi parteċipanti.",
+      "roleSpeakerHint": "Jista' jitkellem, juri video u jaqsam l-iskrin. Ma jistax jimmodera l-kamra.",
+      "copyLink": "Ikkopja l-link",
+      "copied": "Ikkopjat!",
+      "revoke": "Irrevoka",
+      "revoked": "Revokat",
+      "confirmRevoke": "Tirrevoka l-aċċess ta' din il-persuna? Il-link se jieqaf jaħdem immedjatament.",
+      "empty": "L-ebda aċċess addizzjonali mogħti. Il-link prinċipali tal-moderatur jibqa' l-uniku daħla privileġġata.",
+      "activeCount": "{count, plural, =0 {L-ebda aċċess attiv} =1 {1 aċċess attiv} other {# aċċessi attivi}}",
+      "errors": {
+        "addFailed": "Ma setax jiġi ssejvjat. Erġa' pprova."
+      }
+    },
     "gdprAuditLog": {
       "title": "Reġistru tal-Awditu GDPR",
       "date": "Data",
@@ -509,6 +537,14 @@
       "subtitle": "Ikkonfigura d-dehra u l-imġiba tal-pjattaforma għar-riużu tal-PA",
       "saving": "Qed jiġi ssejvjat...",
       "saved": "Settings issejvjati b'suċċess",
+      "sections": {
+        "languagesTitle": "Ġestjoni tal-lingwi",
+        "languagesDescription": "Attiva jew iddiżattiva l-lingwi tal-UE esposti fl-interfaċċja, agħżel il-lingwa awtomatika u personalizza t-traduzzjonijiet.",
+        "gdprTemplatesTitle": "Mudelli GDPR",
+        "gdprTemplatesDescription": "Oħloq avviżi ta' privatezza li jistgħu jerġgħu jintużaw u jiġu llinkjati ma' kwalunkwe avveniment, u agħżel dak awtomatiku għal avvenimenti ġodda.",
+        "emailTemplatesTitle": "Mudelli tal-email",
+        "emailTemplatesDescription": "Personalizza s-suġġett, it-titli u t-testi tal-emails ta' konferma u tfakkira. Ħalli vojt biex tuża t-testi awtomatiċi integrati."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Header",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Żgur li trid tħassar dan il-fajl?",
       "noFiles": "L-ebda fajls imtella'. Uża l-buttuna \"Ittella' fajl\" biex iżżid materjali."
     },
+    "emailTemplates": {
+      "title": "Mudelli tal-email",
+      "subtitle": "Personalizza s-suġġett, it-titli u t-testi tal-emails tranżazzjonali. Oqsma mħollija vojta jużaw it-testi awtomatiċi integrati.",
+      "overridden": "Personalizzat",
+      "usingDefault": "Qed jintuża dak awtomatiku",
+      "saved": "Mudell issejvjat b'suċċess.",
+      "resetDone": "Il-personalizzazzjoni tneħħiet: se jintuża t-test awtomatiku.",
+      "revert": "Annulla l-bidliet",
+      "resetToDefault": "Erġa' għall-awtomatiku",
+      "confirmReset": "Tneħħi l-personalizzazzjoni? Se jintuża t-test awtomatiku integrat.",
+      "placeholdersTitle": "Placeholders disponibbli",
+      "placeholdersHelp": "Daħħal dawn it-tokens f'kull qasam — meta tintbagħat, jiġu sostitwiti bid-data vera tal-avveniment.",
+      "keys": {
+        "confirmation": "Konferma ta' reġistrazzjoni",
+        "reminder": "Tfakkira tal-avveniment"
+      },
+      "selectors": {
+        "key": "Tip ta' email",
+        "locale": "Lingwa"
+      },
+      "fields": {
+        "subject": "Suġġett",
+        "subjectHint": "Suġġett tal-email. Jappoġġja l-placeholders.",
+        "heading": "Titlu prinċipali",
+        "headingHint": "Titlu li jidher fuq nett tal-korp tal-email.",
+        "bodyIntro": "Paragrafu introduttorju",
+        "bodyIntroHint": "Test qabel it-tabella bid-dettalji tal-avveniment. Utli għal messaġġ ta' merħba jew kuntest żejjed.",
+        "ctaLabel": "Tikketta tal-buttuna",
+        "ctaLabelHint": "Tikketta tal-buttuna prinċipali li twassal għall-link personali.",
+        "infoNote": "Nota informattiva",
+        "infoNoteHint": "Kaxxa ta' twissija safra taħt il-buttuna. Ħalliha vojta biex taħbiha.",
+        "footerNote": "Nota tal-footer",
+        "footerNoteHint": "Test li jidher fil-footer taħt il-firma tal-organizzazzjoni."
+      },
+      "errors": {
+        "saveFailed": "L-issejvjar falla. Iċċekkja l-oqsma u erġa' pprova.",
+        "resetFailed": "Ma setax titneħħa l-personalizzazzjoni. Erġa' pprova."
+      }
+    },
     "languages": {
       "title": "Ġestjoni tal-lingwi",
       "subtitle": "Ikkonfigura l-lingwi disponibbli u personalizza t-traduzzjonijiet",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Ikkopja",
+    "duplicateError": "Id-duplikazzjoni falliet. Erġa' pprova."
   },
   "email": {
     "confirmationSubject": "Reġistrazzjoni kkonfermata: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Nagħti l-kunsens tiegħi għar-reġistrazzjoni tal-awdjo/vidjo ta' dan l-avveniment",
       "recordingRequired": "Il-kunsens għar-reġistrazzjoni huwa obbligatorju biex tipparteċipa f'dan l-avveniment",
-      "futureCommunications": "Nixtieq nirċievi informazzjoni dwar avvenimenti futuri organizzati mid-DTD"
+      "futureCommunications": "Nixtieq nirċievi informazzjoni dwar avvenimenti futuri organizzati mid-DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Id-dejta tiegħi",
@@ -1069,6 +1148,102 @@
           "title": "Limitazzjoni tar-responsabbiltà",
           "body": "Filwaqt li jiġu adottati miżuri tekniċi u organizzattivi xierqa, id-Dipartiment ma jistax jiggarantixxi n-nuqqas assolut ta' interruzzjonijiet jew malfunzjonamenti dovuti għal kawżi mhux prevedibbli, attivitajiet ta' manutenzjoni jew fatturi esterni. Ir-responsabbiltajiet legali jibqgħu regolati mil-liġi applikabbli."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Sigurtà u trasparenza",
+      "title": "Sigurtà u trasparenza",
+      "intro": "Il-kodiċi sors ta' din il-pjattaforma huwa pubbliku u huwa suġġett għal kontrolli tas-sigurtà awtomatizzati. Din il-paġna tiġbor l-għodod ta' trasparenza disponibbli għal min juża s-servizz.",
+      "sections": {
+        "openSource": {
+          "title": "Software open source",
+          "body": "Il-pjattaforma sħiħa tinħareġ bħala software liberu. Il-kodiċi sors jista' jiġi eżaminat, imniżżel u verifikat minn kulħadd, skont il-prinċipji ta' trasparenza tal-Amministrazzjoni Pubblika Taljana."
+        },
+        "sbom": {
+          "title": "SBOM (Lista tal-komponenti tas-software)",
+          "body": "Kull rilaxx ippubblikat fuq GitHub jinkludi SBOM f'format SPDX għall-immaġni tal-kontejner u SBOM f'format CycloneDX għad-dipendenzi npm tal-applikazzjoni. Il-fajls huma mehmużin direttament mar-rilaxx u jistgħu jintużaw għall-verifiki tas-sigurtà u tal-konformità."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Ir-repożitorju jiġi analizzat perjodikament minn OpenSSF Scorecard, li jevalwa awtomatikament għexieren ta' prattiki tas-sigurtà tal-proġett (protezzjoni tal-friegħi, workflows bi privileġġi minimi, commits iffirmati, ġestjoni tad-dipendenzi). Il-punteġġ attwali huwa pubbliku."
+        },
+        "scanning": {
+          "title": "Skenjar awtomatiku",
+          "body": "Id-dipendenzi jiġu mmonitorjati b'mod kontinwu permezz ta' Dependabot u npm audit. Il-pipeline tar-rilaxx jipproduċi immaġini traċċabbli permezz tat-tikketta org.opencontainers.image.revision, li torbot kull immaġni mal-commit eżatt minn fejn ġiet mibnija."
+        },
+        "disclosure": {
+          "title": "Rapportar ta' vulnerabbiltajiet",
+          "body": "Il-politika ta' żvelar responsabbli hija deskritta fil-fajl SECURITY.md tar-repożitorju. Il-problemi ta' sigurtà jistgħu jiġu rrapportati b'mod kunfidenzjali skont l-istruzzjonijiet ipprovduti hemmhekk."
+        }
+      },
+      "links": {
+        "sourceCode": "Kodiċi sors",
+        "scorecard": "Punteġġ OpenSSF Scorecard",
+        "latestRelease": "L-aħħar rilaxx (b'SBOM)",
+        "securityPolicy": "Politika ta' żvelar (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kuntatti",
     "legalNotes": "Noti legali",
     "governmentSite": "Gvern Taljan",
-    "systemStatus": "Status tas-sistema"
+    "systemStatus": "Status tas-sistema",
+    "sbomLatest": "SBOM tal-aħħar rilaxx",
+    "transparency": "Sigurtà u trasparenza",
+    "sourceCode": "Kodiċi sors",
+    "buildInfoDev": "build ta' żvilupp",
+    "viewCommit": "Ara l-commit fuq GitHub",
+    "viewRelease": "Ara r-rilaxx fuq GitHub",
+    "buildDatePrefix": "Mibni fi",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Avviż dwar il-privatezza",
@@ -1454,6 +1637,25 @@
       "materials": "Materjali",
       "polls": "Stħarriġ",
       "feedback": "Feedback"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

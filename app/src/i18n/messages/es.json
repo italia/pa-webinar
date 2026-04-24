@@ -344,7 +344,11 @@
       "settingsGeneral": "General",
       "settingsLanguages": "Idiomas",
       "ariaLabel": "Navegación de administración",
-      "subNavAriaLabel": "Navegación de sección"
+      "subNavAriaLabel": "Navegación de sección",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Panel de administración",
@@ -492,6 +496,30 @@
       "noComments": "Sin comentarios",
       "stars": "estrellas"
     },
+    "coModerators": {
+      "title": "Co-moderadores y ponentes",
+      "intro": "Añade co-moderadores y ponentes con magic-links individuales.",
+      "introHint": "Cada persona tiene un nombre visible en la sala y un token revocable de forma independiente al enlace principal. Los ponentes disponen de micrófono, vídeo y compartir pantalla, pero no pueden moderar (expulsar, silenciar a todos, grabar).",
+      "add": "Añadir persona",
+      "name": "Nombre visible en la sala",
+      "email": "Correo electrónico (opcional)",
+      "emailPlaceholder": "para enviarle el enlace",
+      "role": "Rol",
+      "roleModerator": "Moderador",
+      "roleSpeaker": "Ponente",
+      "roleModeratorHint": "Moderación completa: puede grabar, silenciar a todos y expulsar a participantes.",
+      "roleSpeakerHint": "Puede hablar, mostrar vídeo y compartir pantalla. No puede moderar la sala.",
+      "copyLink": "Copiar enlace",
+      "copied": "¡Copiado!",
+      "revoke": "Revocar",
+      "revoked": "Revocado",
+      "confirmRevoke": "¿Revocar el acceso de esta persona? El enlace dejará de funcionar de inmediato.",
+      "empty": "No se ha concedido acceso adicional. El enlace principal del moderador es la única entrada privilegiada.",
+      "activeCount": "{count, plural, =0 {Sin accesos activos} =1 {1 acceso activo} other {# accesos activos}}",
+      "errors": {
+        "addFailed": "No se ha podido guardar. Inténtalo de nuevo."
+      }
+    },
     "gdprAuditLog": {
       "title": "Registro GDPR",
       "date": "Fecha",
@@ -509,6 +537,14 @@
       "subtitle": "Configure la apariencia y el comportamiento de la plataforma para la reutilización PA",
       "saving": "Guardando...",
       "saved": "Configuración guardada con éxito",
+      "sections": {
+        "languagesTitle": "Gestión de idiomas",
+        "languagesDescription": "Activa o desactiva los idiomas de la UE mostrados en la interfaz, elige el idioma predeterminado y personaliza las traducciones.",
+        "gdprTemplatesTitle": "Plantillas RGPD",
+        "gdprTemplatesDescription": "Crea avisos de privacidad reutilizables entre eventos y elige la plantilla predeterminada para los nuevos eventos.",
+        "emailTemplatesTitle": "Plantillas de correo",
+        "emailTemplatesDescription": "Personaliza el asunto, los títulos y los textos de los correos de confirmación y recordatorio. Si se dejan vacíos, se usan los textos predeterminados."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Encabezado",
@@ -712,6 +748,45 @@
       "deleteConfirm": "¿Está seguro de que desea eliminar este archivo?",
       "noFiles": "No hay archivos subidos. Utilice el botón «Subir archivo» para añadir materiales."
     },
+    "emailTemplates": {
+      "title": "Plantillas de correo",
+      "subtitle": "Personaliza el asunto, los títulos y los textos de los correos transaccionales. Los campos vacíos usan los textos predeterminados integrados.",
+      "overridden": "Personalizado",
+      "usingDefault": "Predeterminado",
+      "saved": "Plantilla guardada con éxito.",
+      "resetDone": "Personalización eliminada: se usará el texto predeterminado.",
+      "revert": "Descartar cambios",
+      "resetToDefault": "Restablecer predeterminado",
+      "confirmReset": "¿Eliminar la personalización? Se usará el texto predeterminado integrado.",
+      "placeholdersTitle": "Marcadores disponibles",
+      "placeholdersHelp": "Inserta estos marcadores en los campos: se sustituirán al enviar por los datos reales del evento.",
+      "keys": {
+        "confirmation": "Confirmación de registro",
+        "reminder": "Recordatorio de evento"
+      },
+      "selectors": {
+        "key": "Tipo de correo",
+        "locale": "Idioma"
+      },
+      "fields": {
+        "subject": "Asunto",
+        "subjectHint": "Asunto del correo. Admite marcadores.",
+        "heading": "Título principal",
+        "headingHint": "Título mostrado en la parte superior del cuerpo del correo.",
+        "bodyIntro": "Párrafo introductorio",
+        "bodyIntroHint": "Texto antes de la tabla con los detalles del evento. Útil para un mensaje de bienvenida o contexto adicional.",
+        "ctaLabel": "Etiqueta del botón",
+        "ctaLabelHint": "Texto del botón que lleva al enlace personal de acceso.",
+        "infoNote": "Nota informativa",
+        "infoNoteHint": "Cuadro de aviso amarillo debajo del botón. Déjalo vacío para ocultarlo.",
+        "footerNote": "Nota al pie",
+        "footerNoteHint": "Texto mostrado en el pie debajo de la eventual firma de la organización."
+      },
+      "errors": {
+        "saveFailed": "Error al guardar. Revisa los datos e inténtalo de nuevo.",
+        "resetFailed": "No se ha podido eliminar la personalización. Inténtalo de nuevo."
+      }
+    },
     "languages": {
       "title": "Gestión de idiomas",
       "subtitle": "Configure los idiomas disponibles y personalice las traducciones",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplicar",
+    "duplicateError": "La duplicación falló. Inténtalo de nuevo."
   },
   "email": {
     "confirmationSubject": "Confirmación de inscripción: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Consiento la grabación de audio/vídeo de este evento",
       "recordingRequired": "El consentimiento para la grabación es obligatorio para participar en este evento",
-      "futureCommunications": "Deseo recibir información sobre futuros eventos organizados por el DTD"
+      "futureCommunications": "Deseo recibir información sobre futuros eventos organizados por el DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Mis datos",
@@ -1069,6 +1148,102 @@
           "title": "Limitación de responsabilidad",
           "body": "Aun adoptando medidas técnicas y organizativas adecuadas, el Departamento no puede garantizar la ausencia total de interrupciones o fallos debidos a eventos imprevistos, tareas de mantenimiento o factores externos. Las responsabilidades legales se rigen por la legislación aplicable."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Seguridad y transparencia",
+      "title": "Seguridad y transparencia",
+      "intro": "El código fuente de esta plataforma es público y está sometido a controles automáticos de seguridad. Esta página resume las herramientas de transparencia disponibles para quienes utilicen el servicio.",
+      "sections": {
+        "openSource": {
+          "title": "Software de código abierto",
+          "body": "Toda la plataforma se publica como software libre. Cualquier persona puede inspeccionar, descargar y auditar el código fuente, en línea con los principios de transparencia de la Administración Pública italiana."
+        },
+        "sbom": {
+          "title": "SBOM (Lista de materiales de software)",
+          "body": "Cada versión publicada en GitHub incluye un SBOM en formato SPDX para la imagen del contenedor y un SBOM en formato CycloneDX para las dependencias npm de la aplicación. Los archivos se adjuntan directamente a la versión y pueden utilizarse para auditorías de seguridad y cumplimiento."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "El repositorio es analizado periódicamente por OpenSSF Scorecard, que evalúa automáticamente decenas de prácticas de seguridad del proyecto (protección de ramas, flujos de trabajo con privilegios mínimos, commits firmados, gestión de dependencias). La puntuación actual es pública."
+        },
+        "scanning": {
+          "title": "Escaneos automáticos",
+          "body": "Las dependencias se supervisan de forma continua mediante Dependabot y npm audit. El pipeline de publicación produce imágenes trazables mediante la etiqueta org.opencontainers.image.revision, que asocia cada imagen al commit exacto del que se construyó."
+        },
+        "disclosure": {
+          "title": "Notificación de vulnerabilidades",
+          "body": "La política de divulgación responsable se describe en el archivo SECURITY.md del repositorio. Los problemas de seguridad pueden notificarse de forma confidencial siguiendo las instrucciones incluidas allí."
+        }
+      },
+      "links": {
+        "sourceCode": "Código fuente",
+        "scorecard": "Puntuación de OpenSSF Scorecard",
+        "latestRelease": "Última versión (con SBOM)",
+        "securityPolicy": "Política de divulgación (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Inventario de servicios",
+      "title": "Inventario de servicios del proveedor",
+      "intro": "Para esta instancia, el siguiente documento enumera tanto las dependencias de software (DEV) como los servicios operativos (OPS) que componen la plataforma. Se publica en formato CycloneDX 1.6, un estándar abierto de OWASP que describe en un único documento las bibliotecas de código y los servicios gestionados por terceros.",
+      "notPublishedTitle": "Inventario aún no publicado",
+      "notPublishedBody": "El operador de esta instancia aún no ha publicado un inventario de servicios. La variable de configuración SERVICE_INVENTORY_URL no se ha establecido para este despliegue.",
+      "fetchErrorTitle": "No se pudo cargar el inventario",
+      "fetchErrorBody": "El archivo JSON del inventario no está disponible en este momento. Inténtelo de nuevo más tarde o póngase en contacto con el responsable del servicio.",
+      "metadata": {
+        "tenant": "Instancia",
+        "provider": "Proveedor de nube",
+        "region": "Región",
+        "deploymentMode": "Modo de despliegue",
+        "generatedAt": "Generado el",
+        "format": "Formato",
+        "download": "Descargar JSON original"
+      },
+      "sections": {
+        "componentsTitle": "Componentes de software (DEV)",
+        "componentsIntro": "Bibliotecas, contenedores y paquetes del sistema que forman la aplicación. Ligado a la versión del código; reproducible por cualquiera con acceso al código fuente.",
+        "servicesTitle": "Servicios operativos (OPS)",
+        "servicesIntro": "Servicios gestionados por terceros de los que depende esta instancia. Información vinculada al tenant, que cambia cuando el operador modifica la configuración o cambia de proveedor.",
+        "dependenciesTitle": "Cadena de dependencias"
+      },
+      "columns": {
+        "name": "Nombre",
+        "type": "Tipo",
+        "version": "Versión",
+        "license": "Licencia",
+        "provider": "Proveedor",
+        "dataFlow": "Flujo de datos",
+        "description": "Descripción"
+      },
+      "badges": {
+        "trustBoundary": "cruza el límite de confianza",
+        "personalData": "datos personales",
+        "recording": "contenido grabado"
+      },
+      "stack": {
+        "title": "Arquitectura de un vistazo",
+        "intro": "Una vista sintética de las cuatro capas que componen la plataforma: desde el acceso del usuario hasta la plataforma de ejecución.",
+        "layers": {
+          "access": {
+            "title": "Acceso",
+            "sub": "Punto de entrada web y terminación TLS",
+            "endUsers": "Usuarios finales (navegador)"
+          },
+          "app": {
+            "title": "Aplicación",
+            "sub": "Portal, vídeo, medios en tiempo real"
+          },
+          "data": {
+            "title": "Datos",
+            "sub": "Persistencia, caché, almacenamiento de objetos"
+          },
+          "platform": {
+            "title": "Plataforma",
+            "sub": "Runtime de Kubernetes, SMTP, CI/CD, observabilidad"
+          }
+        },
+        "note": "La lista completa de componentes y servicios, con versiones, hashes y propiedades técnicas, está disponible en las secciones anteriores y en el JSON descargable."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Contacto",
     "legalNotes": "Aviso legal",
     "governmentSite": "Gobierno Italiano",
-    "systemStatus": "Estado del sistema"
+    "systemStatus": "Estado del sistema",
+    "sbomLatest": "SBOM de la última versión",
+    "transparency": "Seguridad y transparencia",
+    "sourceCode": "Código fuente",
+    "buildInfoDev": "compilación de desarrollo",
+    "viewCommit": "Ver el commit en GitHub",
+    "viewRelease": "Ver la versión en GitHub",
+    "buildDatePrefix": "Compilado el",
+    "serviceInventory": "Inventario de servicios"
   },
   "pages": {
     "privacyTitle": "Política de privacidad",
@@ -1454,6 +1637,25 @@
       "materials": "Materiales",
       "polls": "Encuestas",
       "feedback": "Valoraciones"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

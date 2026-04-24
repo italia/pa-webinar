@@ -344,7 +344,11 @@
       "settingsGeneral": "Üldised",
       "settingsLanguages": "Keeled",
       "ariaLabel": "Halduse navigatsioon",
-      "subNavAriaLabel": "Jaotise navigatsioon"
+      "subNavAriaLabel": "Jaotise navigatsioon",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Halduspaneel",
@@ -492,6 +496,30 @@
       "noComments": "Kommentaare pole",
       "stars": "tärni"
     },
+    "coModerators": {
+      "title": "Kaasmoderaatorid ja esinejad",
+      "intro": "Lisa kaasmoderaatoreid ja esinejaid individuaalsete võlulinkidega.",
+      "introHint": "Igal inimesel on ruumis nähtav nimi ja tokkel, mida saab põhilingist sõltumatult kehtetuks tunnistada. Esinejatel on mikrofon, kaamera ja ekraani jagamine, kuid nad ei saa modereerida (eemaldada, kõiki vaigistada, salvestada).",
+      "add": "Lisa isik",
+      "name": "Ruumis nähtav nimi",
+      "email": "E-post (valikuline)",
+      "emailPlaceholder": "lingi saatmiseks",
+      "role": "Roll",
+      "roleModerator": "Moderaator",
+      "roleSpeaker": "Esineja",
+      "roleModeratorHint": "Täielik moderaator: saab salvestada, kõik vaigistada ja osalejaid eemaldada.",
+      "roleSpeakerHint": "Saab rääkida, videot näidata ja ekraani jagada. Ei saa ruumi modereerida.",
+      "copyLink": "Kopeeri link",
+      "copied": "Kopeeritud!",
+      "revoke": "Tühista",
+      "revoked": "Tühistatud",
+      "confirmRevoke": "Kas tühistada selle isiku juurdepääs? Link lakkab kohe töötamast.",
+      "empty": "Lisajuurdepääsu pole antud. Põhiline moderaatori link on ainus privilegeeritud sissepääs.",
+      "activeCount": "{count, plural, =0 {Aktiivseid juurdepääse pole} =1 {1 aktiivne juurdepääs} other {# aktiivset juurdepääsu}}",
+      "errors": {
+        "addFailed": "Salvestamine ebaõnnestus. Proovi uuesti."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR auditilogi",
       "date": "Kuupäev",
@@ -509,6 +537,14 @@
       "subtitle": "Seadistage platvormi välimus ja käitumine AH taaskasutuseks",
       "saving": "Salvestamine...",
       "saved": "Seaded edukalt salvestatud",
+      "sections": {
+        "languagesTitle": "Keelte haldus",
+        "languagesDescription": "Luba või keela kasutajale avatavad EL keeled, vali vaikekeel ja kohanda tõlkeid.",
+        "gdprTemplatesTitle": "GDPR mallid",
+        "gdprTemplatesDescription": "Loo korduvkasutatavad privaatsusteated, mida saab siduda iga üritusega, ja vali uute ürituste jaoks vaikevariant.",
+        "emailTemplatesTitle": "E-kirjade mallid",
+        "emailTemplatesDescription": "Kohanda kinnitus- ja meeldetuletuskirjade teemasid, pealkirju ja tekste. Tühjadele väljadele jäetakse sisseehitatud vaiketekstid."
+      },
       "tabs": {
         "branding": "Bränd",
         "header": "Päis",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Kas olete kindel, et soovite selle faili kustutada?",
       "noFiles": "Faile pole üles laaditud. Kasutage nuppu \"Laadi fail üles\", et materjale lisada."
     },
+    "emailTemplates": {
+      "title": "E-kirjade mallid",
+      "subtitle": "Kohanda transaktsiooniliste e-kirjade teemasid, pealkirju ja tekste. Tühjade väljadega kasutatakse sisseehitatud vaiketekste.",
+      "overridden": "Kohandatud",
+      "usingDefault": "Vaikeväärtus",
+      "saved": "Mall salvestatud.",
+      "resetDone": "Kohandus eemaldatud: kasutatakse vaiketeksti.",
+      "revert": "Tühista muudatused",
+      "resetToDefault": "Taasta vaikeväärtus",
+      "confirmReset": "Kas eemaldada kohandus? Kasutatakse sisseehitatud vaiketeksti.",
+      "placeholdersTitle": "Saadaolevad kohatäited",
+      "placeholdersHelp": "Sisesta need kohatäited väljadele: need asendatakse saatmise hetkel ürituse tegelike andmetega.",
+      "keys": {
+        "confirmation": "Registreerimise kinnitus",
+        "reminder": "Ürituse meeldetuletus"
+      },
+      "selectors": {
+        "key": "E-kirja tüüp",
+        "locale": "Keel"
+      },
+      "fields": {
+        "subject": "Teema",
+        "subjectHint": "E-kirja teema. Toetab kohatäiteid.",
+        "heading": "Põhipealkiri",
+        "headingHint": "E-kirja keha tipus kuvatav pealkiri.",
+        "bodyIntro": "Sissejuhatav lõik",
+        "bodyIntroHint": "Tekst enne ürituse üksikasjade tabelit. Sobib tervitussõnumi või lisainfo jaoks.",
+        "ctaLabel": "Nupu silt",
+        "ctaLabelHint": "Isikliku liitumislingi juurde viiva nupu tekst.",
+        "infoNote": "Infoteade",
+        "infoNoteHint": "Kollane hoiatuskast nupu all. Peitmiseks jäta tühjaks.",
+        "footerNote": "Jaluse märkus",
+        "footerNoteHint": "Jaluses organisatsiooni allkirja all kuvatav tekst."
+      },
+      "errors": {
+        "saveFailed": "Salvestamine ebaõnnestus. Kontrolli andmeid ja proovi uuesti.",
+        "resetFailed": "Kohanduse eemaldamine ebaõnnestus. Proovi uuesti."
+      }
+    },
     "languages": {
       "title": "Keelte haldus",
       "subtitle": "Seadistage saadaolevad keeled ja kohandage tõlkeid",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplikaadi",
+    "duplicateError": "Duplikeerimine ebaõnnestus. Proovi uuesti."
   },
   "email": {
     "confirmationSubject": "Registreerumine kinnitatud: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Nõustun selle ürituse heli-/videosalvestamisega",
       "recordingRequired": "Selles üritusel osalemiseks on nõutav salvestamise nõusolek",
-      "futureCommunications": "Soovin saada teavet DTD tulevaste ürituste kohta"
+      "futureCommunications": "Soovin saada teavet DTD tulevaste ürituste kohta",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Minu andmed",
@@ -1069,6 +1148,102 @@
           "title": "Vastutuse piirangud",
           "body": "Ehkki rakendatakse asjakohaseid tehnilisi ja organisatsioonilisi meetmeid, ei saa osakond garanteerida katkestuste või tõrgete täielikku puudumist ettenägematute asjaolude, hooldustööde või väliste tegurite tõttu. Seadusest tulenevad vastutused kehtivad vastavalt kohaldatavale õigusele."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Turvalisus ja läbipaistvus",
+      "title": "Turvalisus ja läbipaistvus",
+      "intro": "Selle platvormi lähtekood on avalik ja läbib automaatsed turvakontrollid. Käesolev leht koondab teenuse kasutajatele kättesaadavad läbipaistvuse vahendid.",
+      "sections": {
+        "openSource": {
+          "title": "Avatud lähtekoodiga tarkvara",
+          "body": "Kogu platvorm on avaldatud vabavarana. Lähtekoodi saab igaüks uurida, alla laadida ja auditeerida kooskõlas Itaalia avaliku halduse läbipaistvuse põhimõtetega."
+        },
+        "sbom": {
+          "title": "SBOM (tarkvara komponendiloend)",
+          "body": "Iga GitHubis avaldatud väljalase sisaldab SPDX-vormingus SBOM-i konteineritõmmise kohta ja CycloneDX-vormingus SBOM-i rakenduse npm-sõltuvuste kohta. Failid on lisatud väljalaskele ning neid saab kasutada turvalisuse ja vastavuse auditiks."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Hoidlat analüüsib perioodiliselt OpenSSF Scorecard, mis hindab automaatselt kümneid projekti turvaliste tavade aspekte (harude kaitse, minimaalsete õigustega töövood, allkirjastatud committed, sõltuvuste haldus). Praegune skoor on avalik."
+        },
+        "scanning": {
+          "title": "Automaatsed skannimised",
+          "body": "Sõltuvusi jälgitakse pidevalt Dependaboti ja npm audit-i kaudu. Väljalaske pipeline toodab jälgitavaid tõmmiseid sildi org.opencontainers.image.revision abil, mis seob iga tõmmise täpse committiga, millest see ehitati."
+        },
+        "disclosure": {
+          "title": "Haavatavuste teatamine",
+          "body": "Vastutustundliku avalikustamise poliitikat kirjeldatakse hoidla failis SECURITY.md. Turvaküsimustest saab teatada konfidentsiaalselt seal toodud juhiste järgi."
+        }
+      },
+      "links": {
+        "sourceCode": "Lähtekood",
+        "scorecard": "OpenSSF Scorecard hinne",
+        "latestRelease": "Viimane väljalase (koos SBOM-iga)",
+        "securityPolicy": "Avalikustamise poliitika (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kontaktid",
     "legalNotes": "Õigusteave",
     "governmentSite": "Itaalia valitsus",
-    "systemStatus": "Süsteemi olek"
+    "systemStatus": "Süsteemi olek",
+    "sbomLatest": "Viimase väljalaske SBOM",
+    "transparency": "Turvalisus ja läbipaistvus",
+    "sourceCode": "Lähtekood",
+    "buildInfoDev": "arendusversioon",
+    "viewCommit": "Vaata committi GitHubis",
+    "viewRelease": "Vaata väljalaset GitHubis",
+    "buildDatePrefix": "Ehitatud",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Privaatsuspoliitika",
@@ -1454,6 +1637,25 @@
       "materials": "Materjalid",
       "polls": "Küsitlused",
       "feedback": "Tagasiside"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

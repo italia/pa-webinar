@@ -1,6 +1,6 @@
 {
   "name": "@eventi-dtd/app",
-  "version": "0.1.0",
+  "version": "0.3.44",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.5.0",
+    "@aws-sdk/client-s3": "^3.1031.0",
+    "@aws-sdk/s3-request-presigner": "^3.1031.0",
     "@azure/storage-blob": "^12.26.0",
     "@fullcalendar/core": "^6.1.20",
     "@fullcalendar/daygrid": "^6.1.20",
@@ -38,7 +40,9 @@
     "design-react-kit": "^5.1.0",
     "ical-generator": "^8.0.0",
     "ioredis": "^5.10.1",
+    "isomorphic-dompurify": "^3.9.0",
     "jose": "^6.0.0",
+    "marked": "^18.0.1",
     "nanoid": "^5.0.0",
     "next": "^15.5.15",
     "next-intl": "^4.0.0",
@@ -46,6 +50,7 @@
     "prom-client": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "rrule": "^2.8.1",
     "swr": "^2.3.0",
     "zod": "^3.24.0"
   },
@@ -59,7 +64,7 @@
     "@types/react-dom": "^19.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
-    "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-react": "^5.2.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.1.0",
     "eslint-config-prettier": "^10.1.8",

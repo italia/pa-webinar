@@ -23,6 +23,12 @@
     "selectAll": "Seleziona tutti",
     "deselectAll": "Deseleziona tutti"
   },
+  "markdown": {
+    "edit": "Scrivi",
+    "preview": "Anteprima",
+    "hint": "Supporta grassetto, corsivo, link, liste, immagini, tabelle.",
+    "syntaxHelp": "Markdown: **grassetto** · *corsivo* · [testo](url) · ![alt](img)"
+  },
   "nav": {
     "home": "Home",
     "events": "Eventi",
@@ -53,7 +59,8 @@
       "spotsAvailable": "{count} posti disponibili",
       "fullyBooked": "Posti esauriti",
       "ended": "Concluso",
-      "occupiedSpots": "{registered}/{max} iscritti"
+      "occupiedSpots": "{registered}/{max} iscritti",
+      "registeredCount": "{count, plural, =0 {Nessuna registrazione} one {1 registrazione} other {# registrazioni}}"
     },
     "detail": {
       "title": "Dettaglio evento",
@@ -105,6 +112,10 @@
       "LIVE": "In corso",
       "ENDED": "Concluso",
       "ARCHIVED": "Archiviato"
+    },
+    "list": {
+      "filterByTag": "Filtra per categoria",
+      "allTags": "Tutte"
     }
   },
   "registration": {
@@ -175,6 +186,12 @@
     },
     "connecting": "Connessione in corso...",
     "connectionError": "Impossibile connettersi alla sala. Verifica la connessione e riprova.",
+    "activeVsRegistered": "{active} attivi · {registered} registrati",
+    "overtime": {
+      "withCountdown": "L'orario di fine previsto è passato. L'evento si chiuderà automaticamente fra {minutes, plural, one {# minuto} other {# minuti}}.",
+      "closingNow": "L'orario di fine è stato raggiunto. L'evento sta per chiudersi.",
+      "indefinite": "L'orario di fine previsto è passato. L'evento resterà attivo finché ci sono partecipanti collegati."
+    },
     "recordingActive": "Registrazione in corso",
     "recordingConsent": "Questo evento viene registrato. Entrando, acconsenti alla registrazione audio/video.",
     "recordingConsentTitle": "Consenso alla registrazione",
@@ -270,7 +287,21 @@
       "videoModeration": "Video partecipanti",
       "videoDisabled": "Video disattivato",
       "eventEndedSuccess": "Evento terminato con successo. Reindirizzamento..."
-    }
+    },
+    "closeDrawer": "Chiudi",
+    "hintBanner": {
+      "controls": "Controlli in basso",
+      "raiseHand": "Alza la mano per parlare",
+      "sidebar": "Q&A e chat nella barra laterale",
+      "dismiss": "Ho capito"
+    },
+    "topBarCount": {
+      "live": "👥 {count, plural, one {# persona} other {# persone}}"
+    },
+    "sidebarTabChatUnread": "Nuovi messaggi non letti",
+    "floatingControlsLabel": "Controlli evento",
+    "screenshareActive": "🖥️ {name} sta condividendo lo schermo",
+    "screenshareFallbackName": "Un partecipante"
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -306,7 +337,13 @@
       "tooLong": "La domanda non può superare i 500 caratteri",
       "rateLimit": "Attendi prima di inviare un'altra domanda",
       "generic": "Errore nell'invio della domanda"
-    }
+    },
+    "ctaTitle": "Fai la prima domanda",
+    "ctaBody": "Gli altri partecipanti potranno votare la tua domanda. I moderatori la vedranno e potranno dare risposta in voce o in scritto.",
+    "moderatorHint": "I partecipanti possono fare domande dal loro pannello. Le vedrai qui in tempo reale.",
+    "yourQuestionLabel": "La tua domanda",
+    "placeholderInviting": "Es: Puoi spiegare meglio…",
+    "submitPrimary": "Invia domanda"
   },
   "polls": {
     "title": "Sondaggi",
@@ -379,6 +416,215 @@
     }
   },
   "admin": {
+    "fileOrUrl": {
+      "tabUpload": "Carica file",
+      "tabUrl": "Incolla URL",
+      "uploadLabel": "Seleziona un file dal tuo dispositivo",
+      "urlLabel": "URL del file",
+      "urlPlaceholder": "https://…",
+      "uploadButton": "Carica",
+      "uploading": "Caricamento in corso…",
+      "remove": "Rimuovi",
+      "preview": "Anteprima",
+      "openFile": "Apri file",
+      "invalidUrl": "Inserisci un URL valido",
+      "errorSize": "Il file supera la dimensione massima consentita",
+      "errorMime": "Tipo di file non supportato",
+      "errorGeneric": "Errore durante il caricamento del file",
+      "helpImage": "Formati supportati: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
+      "helpAudio": "Formati supportati: MP3, WAV, OGG, M4A, WebM — max 20 MB",
+      "helpDocument": "Formati supportati: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+    },
+    "rubricaPicker": {
+      "loading": "Ricerca in corso…",
+      "noResults": "Nessun risultato",
+      "addSelected": "Aggiungi selezionati",
+      "selectedCount": "{count, plural, =0 {Nessuna persona selezionata} one {1 persona selezionata} other {# persone selezionate}}"
+    },
+    "wizard": {
+      "steps": {
+        "base": "Base",
+        "permissions": "Permessi",
+        "invites": "Persone",
+        "content": "Contenuti",
+        "review": "Riepilogo"
+      },
+      "saveDraft": "Salva come bozza",
+      "publish": "Pubblica evento",
+      "updateEvent": "Aggiorna evento",
+      "step1": {
+        "heading": "Informazioni di base",
+        "intro": "Titolo, descrizione, immagine e calendario dell'evento.",
+        "coverImage": "Immagine di copertina",
+        "coverImageHelp": "Mostrata sul sito pubblico e nelle email di invito.",
+        "scheduleHeading": "Calendario",
+        "timezone": "Fuso orario",
+        "recurrenceHeading": "Ricorrenza",
+        "tagsHeading": "Categorie (tag)",
+        "waitingRoomAudio": "Audio sala d'attesa (facoltativo)",
+        "waitingRoomAudioHelp": "Riprodotto prima dell'inizio della videocall.",
+        "parseTitleKickerLabel": "Titolo con sopratitolo (separatore |)",
+        "parseTitleKickerHelp": "Quando attivo, un titolo come 'CONFERENZA | Innovazione digitale' mostrerà CONFERENZA come sopratitolo.",
+        "maxParticipantsHelp": "Stima il numero massimo di partecipanti. Determina la capacità del server video e la UI di sala d'attesa.",
+        "validation": {
+          "startsAt": "Data di inizio non valida.",
+          "endsAt": "La data di fine deve essere successiva alla data di inizio."
+        },
+        "senderRatioLabel": "Percentuale attiva stimata",
+        "senderRatioHelp": "Quanti partecipanti si aspettano di avere microfono/video attivo. Aiuta a dimensionare il server video.",
+        "activeParticipantsEstimate": "≈ {count} partecipanti attivi",
+        "senderRatioPreset": "{pct}%"
+      },
+      "step2": {
+        "heading": "Chi può fare cosa",
+        "intro": "Matrice dei permessi: scegli per ogni funzione chi può usarla. I moderatori possono sempre tutto.",
+        "featureCol": "Funzionalità",
+        "role": {
+          "GUEST": "Ospite",
+          "SPEAKER": "Relatore",
+          "MODERATOR": "Moderatore"
+        },
+        "feature": {
+          "qa": {
+            "label": "Q&A",
+            "desc": "Inviare domande al pannello Q&A."
+          },
+          "chat": {
+            "label": "Chat",
+            "desc": "Scrivere in chat di gruppo."
+          },
+          "mic": {
+            "label": "Microfono",
+            "desc": "Attivare il proprio microfono."
+          },
+          "video": {
+            "label": "Video",
+            "desc": "Attivare la propria webcam."
+          },
+          "share": {
+            "label": "Condivisione schermo",
+            "desc": "Condividere lo schermo con tutti."
+          },
+          "recording_control": {
+            "label": "Controllo registrazione",
+            "desc": "Avviare/fermare la registrazione."
+          }
+        },
+        "recordingHeading": "Registrazione"
+      },
+      "step3": {
+        "heading": "Persone e inviti",
+        "intro": "Aggiungi organizzatori (mostrati sulla pagina), moderatori, relatori e ospiti invitati.",
+        "organizersHeading": "Organizzatori",
+        "organizersHelp": "Compaiono nella pagina pubblica dell'evento.",
+        "organizerName": "Referente",
+        "organizerOrganization": "Organizzazione",
+        "organizerWebsite": "Sito web",
+        "organizerRequired": "Referente e organizzazione sono obbligatori.",
+        "moderatorsHeading": "Moderatori",
+        "moderatorsHelp": "I moderatori possono gestire la sessione e controllare i permessi durante l'evento.",
+        "moderatorName": "Nome",
+        "moderatorEmail": "Email",
+        "moderatorRequired": "Nome ed email sono obbligatori.",
+        "speakersHeading": "Relatori",
+        "speakersHelp": "Ricevono un link da moderatore via email.",
+        "speakerName": "Nome",
+        "speakerEmail": "Email",
+        "speakerRequired": "Nome ed email sono obbligatori.",
+        "invitationsHeading": "Inviti",
+        "invitationsHelp": "Persone pre-registrate — riceveranno un link personale per partecipare.",
+        "invitationName": "Nome (facoltativo)",
+        "invitationEmail": "Email",
+        "invitationRole": "Ruolo",
+        "role": {
+          "GUEST": "Ospite",
+          "SPEAKER": "Relatore"
+        },
+        "add": "Aggiungi",
+        "remove": "Rimuovi",
+        "invalidEmail": "Indirizzo email non valido.",
+        "duplicateEmail": "Indirizzo già presente.",
+        "rubricaPick": "Cerca dalla rubrica…",
+        "rubricaOrAdd": "oppure aggiungi manualmente"
+      },
+      "step4": {
+        "heading": "Contenuti e materiali",
+        "intro": "Allega materiali e collega i questionari pre/post evento.",
+        "materialsHeading": "Materiali",
+        "materialsHelp": "Documenti, slide, link utili da condividere prima, durante o dopo l'evento.",
+        "materialTitle": "Titolo",
+        "materialUrl": "File o link",
+        "visibilityLabel": "Visibilità",
+        "visibility": {
+          "ALWAYS": "Sempre",
+          "BEFORE": "Prima dell'evento",
+          "DURING": "Durante l'evento",
+          "AFTER": "Dopo l'evento"
+        },
+        "addMaterial": "Aggiungi materiale",
+        "remove": "Rimuovi",
+        "questionnairesHeading": "Questionari",
+        "questionnairesIntro": "Combina template riutilizzabili con domande specifiche per questo evento.",
+        "questionnairesEmpty": "Nessun questionario disponibile. Crea un questionario da Impostazioni → Questionari.",
+        "preHeading": "Questionario di pre-registrazione",
+        "postHeading": "Questionario post-evento",
+        "templatesLabel": "Template riutilizzabili",
+        "templatesEmpty": "Nessun template creato. Vai a Impostazioni → Questionari.",
+        "adhocLabel": "Domande specifiche per questo evento",
+        "addQuestion": "+ Aggiungi domanda",
+        "questionPrompt": "Testo della domanda",
+        "questionType": "Tipo",
+        "questionTypeSingle": "Scelta singola",
+        "questionTypeMulti": "Scelta multipla",
+        "questionTypeYesNo": "Sì/No",
+        "questionTypeLikert": "Scala Likert",
+        "questionTypeOpen": "Risposta aperta",
+        "addOption": "+ Aggiungi opzione",
+        "option": "Opzione",
+        "scaleMin": "Minimo",
+        "scaleMax": "Massimo",
+        "required": "Obbligatoria",
+        "saveDraftAndGoQuestionnaires": "Salva bozza e vai a gestione questionari",
+        "preQuestionnaire": "Questionario pre-evento",
+        "postQuestionnaire": "Questionario post-evento (feedback)",
+        "none": "— Nessuno —"
+      },
+      "step5": {
+        "heading": "Riepilogo e pubblicazione",
+        "intro": "Verifica le informazioni e pubblica l'evento (oppure salva come bozza).",
+        "summary": {
+          "title": "Titolo",
+          "schedule": "Calendario",
+          "recurrence": "Ricorrenza",
+          "maxParticipants": "Partecipanti attesi",
+          "organizers": "Organizzatori",
+          "speakers": "Relatori",
+          "invitations": "Inviti",
+          "materials": "Materiali",
+          "tags": "Categorie",
+          "recording": "Registrazione",
+          "recordingAuto": "Attiva — avvio automatico",
+          "recordingManual": "Attiva — avvio manuale",
+          "recordingOff": "Non attiva"
+        },
+        "noRecurrence": "Evento singolo",
+        "gdprHeading": "Privacy e conservazione dati",
+        "retentionDays": "Giorni di conservazione",
+        "retentionHelp": "Oltre questa soglia i dati personali vengono cancellati automaticamente.",
+        "gdprTemplate": "Template informativa",
+        "gdprTemplateNone": "— Usa testo personalizzato —",
+        "privacyText": "Informativa privacy (testo)",
+        "moderatorHeading": "Contatto moderatore",
+        "moderatorName": "Nome",
+        "moderatorEmail": "Email",
+        "capacityHeading": "Capacità stimata",
+        "featuresHeading": "Configurazione sintetica",
+        "privacyDoc": "Documento informativa (PDF o link)",
+        "privacyDocHelp": "Carica un PDF o incolla l'URL di un'informativa sostitutiva. Sovrascrive il template GDPR se presente.",
+        "privacyTextHelp": "Testo sintetico mostrato nel form di registrazione; può integrare o sostituire il template GDPR."
+      },
+      "validationFailed": "Controlla i campi evidenziati prima di procedere."
+    },
     "nav": {
       "events": "Eventi",
       "registrations": "Iscrizioni",
@@ -406,8 +652,12 @@
       "publications": "Pubblicazioni",
       "publicationsList": "Tutte le pubblicazioni",
       "publicationsNew": "Nuova pubblicazione",
+      "questionnaires": "Questionari",
+      "questionnairesLibrary": "Libreria template",
+      "questionnairesResponses": "Risposte e statistiche",
       "ariaLabel": "Navigazione amministrazione",
-      "subNavAriaLabel": "Navigazione sezione"
+      "subNavAriaLabel": "Navigazione sezione",
+      "rubrica": "Rubrica"
     },
     "landing": {
       "title": "Pannello di amministrazione",
@@ -687,6 +937,8 @@
     "subtitle": "Pannello di amministrazione",
     "createEvent": "Crea nuovo evento",
     "editEvent": "Modifica evento",
+    "duplicateEvent": "Duplica",
+    "duplicateError": "Duplicazione non riuscita. Riprova.",
     "deleteEvent": "Elimina evento",
     "deleteConfirm": "Sei sicuro di voler eliminare questo evento? Questa azione è irreversibile.",
     "publish": "Pubblica",
@@ -736,9 +988,43 @@
       "startsAt": "Data e ora inizio",
       "endsAt": "Data e ora fine",
       "maxParticipants": "Numero massimo partecipanti",
+      "expectedParticipants": "Partecipanti attesi (stima)",
+      "expectedParticipantsHint": "Solo una stima per il dimensionamento infrastruttura. Non è un tetto massimo: le registrazioni oltre questa soglia sono accettate, l'infra scala in automatico.",
+      "expectedSenderRatio": "Ratio sender atteso",
+      "expectedSenderRatioInherit": "Default sito",
+      "expectedSenderRatioHint": "Percentuale di partecipanti che avranno mic o webcam attivi. Webinar classico 10-20%, tavola rotonda 50-100%. Lascia vuoto per ereditare il default del sito.",
+      "jvbPreview": {
+        "title": "Stima capacità JVB",
+        "pod": "pod JVB",
+        "pods": "pod JVB",
+        "senders": "Sender",
+        "receivers": "Receiver",
+        "effectiveRatio": "Ratio effettivo",
+        "inherited": "ereditato",
+        "presetLabel": "Preset",
+        "preset": {
+          "webinar": "Webinar",
+          "meeting": "Meeting",
+          "workshop": "Workshop",
+          "allHands": "Tutti sender"
+        },
+        "clearPreset": "Usa default sito",
+        "atCeiling": "limite max {max}",
+        "videoDisabled": "Video disabilitato: tutti i partecipanti contano come receiver.",
+        "warnInherited": "Con {participants} partecipanti e ratio ereditato ({defaultPct}%), la stima si basa sul default di sito. Per eventi grandi conviene impostare un valore esplicito (webinar 5-20%, meeting 30%, workshop 60%).",
+        "warnCeiling": "Stima al limite massimo configurato ({max} pod). Se i partecipanti reali o i sender superano la stima, potrebbero saturarsi i bridge. Valuta di aumentare il limite o ridurre maxParticipants."
+      },
+      "gracePeriod": "Fine evento (soft exit)",
+      "gracePeriodInherit": "Usa default sito",
+      "gracePeriodHardStop": "Chiusura immediata a endsAt (0 min)",
+      "gracePeriodMinutesN": "{n} minuti di grazia",
+      "gracePeriodNever": "Non auto-chiudere (lascia al cleanup)",
+      "gracePeriodHint": "Quanti minuti dopo l'orario di fine continuare prima di chiudere la call. Mostrato come banner non invasivo ai partecipanti durante l'overtime.",
       "qaEnabled": "Abilita Q&A",
       "chatEnabled": "Abilita chat",
       "recordingEnabled": "Abilita registrazione video",
+      "autoStartRecording": "Avvia la registrazione automaticamente",
+      "autoStartRecordingDesc": "Al momento dell'inizio dell'evento la registrazione parte da sola (senza chiedere conferma al moderatore). Così eventuali ritardatari trovano già il player disponibile.",
       "dataRetentionDays": "Conservazione dati (giorni dopo l'evento)",
       "dataRetentionHint": "Dopo questo periodo, le registrazioni dei partecipanti, le domande Q&A e le eventuali registrazioni video verranno eliminate automaticamente.",
       "privacyPolicyUrl": "URL informativa privacy",
@@ -832,22 +1118,27 @@
       }
     },
     "coModerators": {
-      "title": "Co-moderatori",
-      "intro": "Aggiungi altri moderatori con magic-link individuali.",
-      "introHint": "Ciascun co-moderatore ha un suo nome visibile in sala e un token revocabile indipendentemente dal link principale.",
-      "add": "Aggiungi co-moderatore",
+      "title": "Co-moderatori e relatori",
+      "intro": "Aggiungi co-moderatori e relatori con magic-link individuali.",
+      "introHint": "Ogni persona ha un nome visibile in sala e un token revocabile indipendentemente dal link principale. I relatori hanno microfono, video e condivisione schermo ma non possono moderare (kick, muta-tutti, registrazione).",
+      "add": "Aggiungi persona",
       "name": "Nome visibile in sala",
       "email": "Email (facoltativa)",
       "emailPlaceholder": "per inviargli il link",
+      "role": "Ruolo",
+      "roleModerator": "Moderatore",
+      "roleSpeaker": "Relatore",
+      "roleModeratorHint": "Piena moderazione: può registrare, disattivare audio a tutti, rimuovere partecipanti.",
+      "roleSpeakerHint": "Può parlare, mostrare video e condividere lo schermo. Non può moderare la sala.",
       "copyLink": "Copia link",
       "copied": "Copiato!",
       "revoke": "Revoca",
       "revoked": "Revocato",
-      "confirmRevoke": "Revocare l'accesso a questo co-moderatore? Il link smetterà di funzionare immediatamente.",
-      "empty": "Nessun co-moderatore aggiunto. Il link moderatore principale resta l'unico accesso da moderatore.",
-      "activeCount": "{count, plural, =0 {Nessun co-moderatore attivo} =1 {1 co-moderatore attivo} other {# co-moderatori attivi}}",
+      "confirmRevoke": "Revocare l'accesso a questa persona? Il link smetterà di funzionare immediatamente.",
+      "empty": "Nessun accesso aggiuntivo. Il link moderatore principale resta l'unico ingresso privilegiato.",
+      "activeCount": "{count, plural, =0 {Nessun accesso attivo} =1 {1 accesso attivo} other {# accessi attivi}}",
       "errors": {
-        "addFailed": "Impossibile aggiungere il co-moderatore. Riprova."
+        "addFailed": "Impossibile salvare. Riprova."
       }
     },
     "gdprAuditLog": {
@@ -872,7 +1163,11 @@
         "languagesTitle": "Gestione lingue",
         "languagesDescription": "Attiva/disattiva le lingue dell'UE esposte nell'interfaccia, scegli la lingua predefinita e personalizza le traduzioni.",
         "gdprTemplatesTitle": "Template GDPR",
-        "gdprTemplatesDescription": "Crea informative privacy riutilizzabili tra eventi e scegli quella predefinita per i nuovi eventi."
+        "gdprTemplatesDescription": "Crea informative privacy riutilizzabili tra eventi e scegli quella predefinita per i nuovi eventi.",
+        "emailTemplatesTitle": "Template email",
+        "emailTemplatesDescription": "Personalizza oggetto, titoli e testi delle email di conferma e promemoria. Se lasciati vuoti si usano i testi predefiniti.",
+        "tagsTitle": "Gestione tag",
+        "tagsDescription": "Crea e modifica i tag usati per filtrare gli eventi"
       },
       "tabs": {
         "branding": "Branding",
@@ -881,7 +1176,29 @@
         "homepage": "Home page",
         "pages": "Pagine",
         "footer": "Footer",
-        "features": "Funzionalità"
+        "features": "Funzionalità",
+        "scaling": "Dimensionamento infra"
+      },
+      "scaling": {
+        "intro": "Parametri che descrivono la capacità del cluster dove gira la piattaforma. I valori di default sono tarati per Azure F16s_v2 (16 vCPU / 32 GiB) per JVB e F4s_v2 (4 vCPU / 8 GiB) per Jibri. Se usi hardware diverso, aggiorna qui — lo scaler ricalcola subito.",
+        "jvbSection": "Capacità ponte video (JVB)",
+        "jvbCpuCoresPerPod": "vCPU per pod JVB",
+        "jvbCpuCoresPerPodHelp": "Numero di core CPU richiesti dal container JVB (resources.requests.cpu). Azure F16s_v2 = 16.",
+        "jvbReceiversPerCore": "Partecipanti passivi per core",
+        "jvbReceiversPerCoreHelp": "Quanti spettatori receive-only fit in 1 vCPU. Calibrato a 18.75 (300 webinar ÷ 16 core) su F16s_v2.",
+        "jvbSendersPerCore": "Partecipanti attivi per core",
+        "jvbSendersPerCoreHelp": "Quanti sender (mic+webcam) fit in 1 vCPU. Calibrato a 3.125 (50 all-sender ÷ 16 core) su F16s_v2.",
+        "jvbMaxReplicas": "Max repliche JVB",
+        "jvbMaxReplicasHelp": "Tetto hard per evitare scale-up runaway. Default 6.",
+        "jibriCpuCoresPerPod": "vCPU per pod Jibri",
+        "jibriCpuCoresPerPodHelp": "Core richiesti dal container Jibri (ffmpeg + Chrome headless). Azure F4s_v2 = 4.",
+        "defaultSenderRatioPct": "Ratio sender di default",
+        "defaultSenderRatioPctHelp": "Percentuale di partecipanti attesi come sender (mic+webcam) quando l'evento non la specifica. Webinar 10-30%, tavola rotonda 50-100%.",
+        "previewTitle": "Anteprima calcolo",
+        "previewBody": "Evento con {participants} partecipanti stimati al {ratio}% di sender → {senders} sender + {receivers} passivi → {cores} core stimati → {jvbs} JVB.",
+        "graceSection": "Soft exit (fine evento)",
+        "eventGracePeriodMinutes": "Minuti di grazia dopo endsAt (default)",
+        "eventGracePeriodMinutesHelp": "Tempo extra concesso dopo l'orario di fine previsto prima di chiudere la call. 0 = chiusura dura, -1 = non auto-chiudere (lascia al cleanup di inattività), 15 = banner e chiusura dopo 15 min. Ogni evento può overridare."
       },
       "header": {
         "slimBarTitle": "Barra superiore (Slim Header)",
@@ -990,6 +1307,8 @@
         "publicRegistrationEnabledHelp": "Chiunque può creare eventi (se disattivato, solo gli amministratori)",
         "calendarPublic": "Calendario pubblico",
         "calendarPublicHelp": "Pubblica il calendario degli eventi. Visitatori possono vedere gli eventi programmati.",
+        "parseTitleKicker": "Titoli con kicker editoriale",
+        "parseTitleKickerHelp": "Se il titolo di un evento contiene il carattere \"|\", la parte prima viene mostrata come piccola etichetta in maiuscoletto sopra il titolo principale. Esempio: \"Caffettino | Prova OSS\" → etichetta \"CAFFETTINO\" + titolo \"Prova OSS\".",
         "githubUrl": "URL repository GitHub",
         "supportEmail": "Email supporto",
         "jvbScalingTitle": "Scaling ponte video (JVB)",
@@ -1047,6 +1366,35 @@
         "totalFeedback": "Risposte feedback"
       }
     },
+    "recurrence": {
+      "label": "Ricorrenza",
+      "helpText": "Rendi l'evento ricorrente. Verrà creata una serie a partire dalla data di inizio.",
+      "preset": {
+        "none": "Nessuna",
+        "daily": "Ogni giorno",
+        "weekly": "Ogni settimana",
+        "weekdays": "Giorni feriali",
+        "monthly": "Ogni mese",
+        "custom": "Personalizzata"
+      },
+      "weekdaysLabel": "Giorni della settimana",
+      "weekdayShort": {
+        "0": "Lun",
+        "1": "Mar",
+        "2": "Mer",
+        "3": "Gio",
+        "4": "Ven",
+        "5": "Sab",
+        "6": "Dom"
+      },
+      "endLabel": "Fine ricorrenza",
+      "endNever": "Non termina",
+      "endDate": "Termina il...",
+      "endCount": "Dopo N ripetizioni",
+      "previewLabel": "Anteprima prossime 5 occorrenze",
+      "customRRuleLabel": "Regola RRULE personalizzata",
+      "invalidRRule": "Regola non valida"
+    },
     "templates": {
       "title": "Template eventi",
       "subtitle": "Gestisci i template predefiniti per la creazione rapida di eventi",
@@ -1076,6 +1424,10 @@
       "passwordPlaceholder": "Lascia vuoto per call pubblica",
       "passwordHint": "Se impostata, gli ospiti devono digitare questa password per entrare. Minimo 4 caratteri. I moderatori non ne hanno bisogno.",
       "passwordTooShort": "La password deve avere almeno 4 caratteri.",
+      "maxParticipantsLabel": "Numero massimo di partecipanti (facoltativo)",
+      "maxParticipantsPlaceholder": "Predefinito: 50",
+      "maxParticipantsHint": "Alza il valore se prevedi un pubblico numeroso: lo scaler usa questo numero per decidere quante repliche JVB allocare. Le chiamate istantanee non hanno pre-scaling, quindi per oltre ~50 partecipanti preferisci un evento schedulato con almeno 15 min di anticipo.",
+      "maxParticipantsInvalid": "Il numero deve essere compreso tra 2 e 500.",
       "create": "Crea e entra",
       "creating": "Creazione...",
       "copyLink": "Copia link di invito",
@@ -1096,6 +1448,29 @@
       "uploadBtn": "Carica",
       "deleteConfirm": "Sei sicuro di voler eliminare questo file?",
       "noFiles": "Nessun file caricato. Usa il pulsante \"Carica file\" per aggiungere materiali."
+    },
+    "materials": {
+      "title": "Materiali dell'evento",
+      "subtitle": "Allegati, link e risorse condivise prima, durante e dopo l'evento.",
+      "addButton": "Aggiungi materiale",
+      "empty": "Nessun materiale ancora aggiunto.",
+      "deleteConfirm": "Eliminare definitivamente questo materiale?",
+      "editButton": "Modifica",
+      "cancelButton": "Annulla",
+      "saveButton": "Salva",
+      "titleLabel": "Titolo",
+      "descriptionLabel": "Descrizione (facoltativa)",
+      "visibilityLabel": "Visibilità",
+      "visibilityAlways": "Sempre",
+      "visibilityBefore": "Prima dell'evento",
+      "visibilityDuring": "Durante l'evento",
+      "visibilityAfter": "Dopo l'evento",
+      "typeLabel": "Tipo",
+      "fileUploaded": "File caricato",
+      "typeFile": "File",
+      "typeLink": "Link",
+      "sizeLabel": "Dimensione",
+      "errorGeneric": "Si è verificato un errore. Riprova."
     },
     "gdprTemplates": {
       "title": "Template GDPR",
@@ -1120,6 +1495,45 @@
       },
       "errors": {
         "saveFailed": "Salvataggio non riuscito. Verifica i dati e riprova."
+      }
+    },
+    "emailTemplates": {
+      "title": "Template email",
+      "subtitle": "Personalizza oggetto, titoli e testi delle email transazionali. Campi lasciati vuoti usano i testi predefiniti integrati.",
+      "overridden": "Personalizzato",
+      "usingDefault": "Predefinito",
+      "saved": "Template salvato con successo.",
+      "resetDone": "Override rimosso: verrà usato il testo predefinito.",
+      "revert": "Annulla modifiche",
+      "resetToDefault": "Ripristina predefinito",
+      "confirmReset": "Rimuovere l'override? Verrà usato il testo predefinito integrato.",
+      "placeholdersTitle": "Placeholder disponibili",
+      "placeholdersHelp": "Inserisci questi segnaposto nei campi: verranno sostituiti al momento dell'invio con i dati reali dell'evento.",
+      "keys": {
+        "confirmation": "Conferma registrazione",
+        "reminder": "Promemoria evento"
+      },
+      "selectors": {
+        "key": "Tipo email",
+        "locale": "Lingua"
+      },
+      "fields": {
+        "subject": "Oggetto",
+        "subjectHint": "Oggetto dell'email. Supporta i placeholder.",
+        "heading": "Titolo principale",
+        "headingHint": "Titolo mostrato in cima al corpo dell'email.",
+        "bodyIntro": "Paragrafo introduttivo",
+        "bodyIntroHint": "Testo prima della tabella con i dettagli evento. Utile per un messaggio di benvenuto o un contesto extra.",
+        "ctaLabel": "Etichetta pulsante",
+        "ctaLabelHint": "Testo del pulsante che porta al link personale di accesso.",
+        "infoNote": "Nota informativa",
+        "infoNoteHint": "Box giallo di avviso sotto il pulsante. Lascialo vuoto per nasconderlo.",
+        "footerNote": "Nota a piè pagina",
+        "footerNoteHint": "Testo mostrato nel footer sotto l'eventuale firma dell'organizzazione."
+      },
+      "errors": {
+        "saveFailed": "Salvataggio non riuscito. Verifica i dati e riprova.",
+        "resetFailed": "Impossibile rimuovere l'override. Riprova."
       }
     },
     "languages": {
@@ -1280,6 +1694,19 @@
       "sectionQos": "Qualità del servizio (latenza)",
       "sectionCapacity": "Capacità & JVB",
       "sectionResources": "Risorse hardware",
+      "sectionChat": "Chat in-app & Redis",
+      "chatMessagesPerMin": "Messaggi chat/min",
+      "chatMessagesSubtitle": "media ultimi 5 min",
+      "chatSseConnections": "Connessioni SSE",
+      "chatSseSubtitle": "subscriber attivi",
+      "redisConnectedClients": "Client Redis",
+      "redisConnectedSubtitle": "pubblicatori + subscriber",
+      "redisPubsubChannels": "Canali pub/sub",
+      "redisPubsubSubtitle": "= eventi con chat attiva",
+      "chartRedisMemory": "Memoria Redis",
+      "redisMemoryHelp": "Uso corrente dello store. Operazioni/sec: {ops}.",
+      "chartChatSseConnections": "Connessioni SSE attive",
+      "chatSseHelp": "Subscriber della chat live. Stima di carico: ~300 SSE/pod sono gestibili senza impatto.",
       "sectionEvents": "Analisi eventi & call",
       "sectionRecentCalls": "Call recenti",
       "uptime24h": "Uptime 24h",
@@ -1332,6 +1759,107 @@
       "delete": "Elimina",
       "deleteConfirm": "Stai per eliminare definitivamente {count} eventi con tutti i dati associati (iscrizioni, sessioni, registrazioni, Q&A, sondaggi). Operazione irreversibile.",
       "archiveConfirm": "Stai per archiviare {count} eventi. Gli eventi archiviati non sono più visibili nella lista pubblica ma i dati vengono conservati."
+    },
+    "eventsList": {
+      "search": "Cerca",
+      "searchPlaceholder": "Titolo, slug o organizzatore…",
+      "status": "Stato",
+      "statusAll": "Tutti gli stati",
+      "tags": "Categorie",
+      "sort": "Ordina per",
+      "sortStartsAsc": "Data inizio ↑ (default)",
+      "sortStartsDesc": "Data inizio ↓",
+      "sortCreatedDesc": "Creazione ↓",
+      "sortTitleAsc": "Titolo A→Z",
+      "resetFilters": "Reset filtri",
+      "noResults": "Nessun evento corrisponde ai filtri.",
+      "resultsCount": "{count, plural, =0 {Nessun evento} one {# evento} other {# eventi}}",
+      "durationMinutes": "{minutes} min",
+      "durationHoursMinutes": "{hours}h {minutes}min",
+      "moderatorsSpeakers": "{mods} moderatori · {speakers} relatori",
+      "postEventSummary": "{connected} connessi · {registered} registrazioni",
+      "registeredCount": "{count, plural, =0 {Nessuna registrazione} one {1 registrazione} other {# registrazioni}}"
+    },
+    "tags": {
+      "title": "Gestione tag",
+      "subtitle": "Crea, modifica ed elimina i tag usati per classificare e filtrare gli eventi pubblici.",
+      "backToSettings": "Impostazioni",
+      "addTag": "Nuovo tag",
+      "editTag": "Modifica tag",
+      "columnColor": "Colore",
+      "columnSlug": "Slug",
+      "columnName": "Nome",
+      "columnSortOrder": "Ordine",
+      "columnActions": "Azioni",
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "deleting": "Eliminazione…",
+      "deleteConfirm": "Eliminare il tag \"{name}\"? Verrà rimosso anche dagli eventi collegati.",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "cancel": "Annulla",
+      "slugLabel": "Slug",
+      "slugHelp": "Solo minuscole, cifre e trattini (es. webinar-aperto).",
+      "nameItLabel": "Nome (italiano)",
+      "nameItRequired": "Il nome in italiano è obbligatorio.",
+      "nameEnLabel": "Nome (inglese)",
+      "colorLabel": "Colore",
+      "colorInvalid": "Colore non valido: usa il formato #rrggbb.",
+      "sortOrderLabel": "Ordine",
+      "sortOrderHelp": "Valori più bassi appaiono prima. Default: 0.",
+      "empty": "Nessun tag definito. Crea il primo con il pulsante \"Nuovo tag\".",
+      "countLabel": "{count, plural, one {# tag} other {# tag}}",
+      "slugInUse": "Slug già in uso",
+      "notFound": "Tag non trovato",
+      "saved": "Tag salvato",
+      "deleted": "Tag eliminato",
+      "validationFailed": "Alcuni campi non sono validi.",
+      "genericError": "Si è verificato un errore. Riprova."
+    },
+    "eventDetail": {
+      "copyPublicUrl": "Copia link pubblico",
+      "copyModeratorUrl": "Copia link moderatore",
+      "enterAsModerator": "Entra live",
+      "editEvent": "Modifica evento",
+      "editSettings": "Modifica impostazioni",
+      "featureSummary": "Funzionalità attive",
+      "organizers": "Organizzatori",
+      "privacyGdpr": "Privacy & GDPR",
+      "postEventTitle": "Post-evento & feedback",
+      "recordingSection": "Registrazione",
+      "callSessions": "Sessioni & telemetria",
+      "questionnaires": "Questionari",
+      "questionnaireCount": "{count, plural, =0 {Nessun questionario associato} one {1 questionario associato} other {# questionari associati}}",
+      "manageMaterials": "Gestisci materiali",
+      "manageQuestionnaires": "Gestisci questionari",
+      "tabs": {
+        "overview": "Panoramica",
+        "settings": "Impostazioni",
+        "people": "Persone",
+        "content": "Contenuti",
+        "audit": "Registrazioni & Audit"
+      },
+      "toggles": {
+        "unmute": "Partecipanti possono parlare",
+        "video": "Partecipanti possono attivare video",
+        "screenShare": "Partecipanti possono condividere schermo"
+      },
+      "fields": {
+        "dataRetention": "Retention dati",
+        "dataRetentionValue": "{days, plural, one {# giorno} other {# giorni}}",
+        "privacyUrl": "Informativa privacy",
+        "recordingConsent": "Consenso registrazione"
+      },
+      "sidebar": {
+        "registrations": "Registrazioni",
+        "ofMax": "{current} su {max}",
+        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
+        "noReminders": "Nessun promemoria configurato",
+        "tags": "Tag",
+        "postEventSummary": "{connected} connessi su {registered} registrazioni (stimate {estimated})",
+        "estimatedAttendance": "Stimati: {estimated} partecipanti"
+      },
+      "copyGuestUrl": "Copia link per ospiti"
     }
   },
   "email": {
@@ -1400,7 +1928,9 @@
     "consent": {
       "recording": "Acconsento alla registrazione audio/video dell'evento",
       "recordingRequired": "Il consenso alla registrazione è obbligatorio per partecipare a questo evento",
-      "futureCommunications": "Desidero ricevere informazioni su eventi futuri organizzati dal DTD"
+      "futureCommunications": "Desidero ricevere informazioni su eventi futuri organizzati dal DTD",
+      "addressBook": "Voglio essere inserito nella Rubrica DTD per essere invitato ad eventi simili",
+      "addressBookHelp": "Consenso separato (art. 6.1.a GDPR). Potrai revocarlo in qualsiasi momento dal link \"Rimuovi i miei dati dalla rubrica\" nelle email che riceverai. Il nome e l'organizzazione saranno ricavati dal profilo di registrazione."
     },
     "export": {
       "title": "I miei dati",
@@ -1487,6 +2017,102 @@
           "title": "Limitazioni di responsabilita",
           "body": "Pur adottando misure tecniche e organizzative adeguate, il Dipartimento non garantisce l'assenza assoluta di interruzioni o malfunzionamenti dovuti a cause non prevedibili, manutenzioni o fattori esterni. Restano ferme le responsabilita previste dalla legge."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Sicurezza e trasparenza",
+      "title": "Sicurezza e trasparenza",
+      "intro": "Il codice sorgente di questa piattaforma e pubblico e sottoposto a controlli automatici di sicurezza. Questa pagina riassume gli strumenti di trasparenza disponibili per chi utilizza il servizio.",
+      "sections": {
+        "openSource": {
+          "title": "Software open source",
+          "body": "L'intera piattaforma e rilasciata come software libero. Il codice sorgente e consultabile, scaricabile e auditabile da chiunque, coerentemente con i principi di trasparenza della Pubblica Amministrazione italiana."
+        },
+        "sbom": {
+          "title": "SBOM (Software Bill of Materials)",
+          "body": "Ogni release pubblicata su GitHub include un SBOM in formato SPDX per l'immagine container e un SBOM CycloneDX per le dipendenze npm dell'applicazione. I file sono allegati direttamente alla release e possono essere utilizzati per audit di sicurezza e conformita."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Il repository e analizzato periodicamente da OpenSSF Scorecard, che valuta automaticamente decine di pratiche di sicurezza del progetto (protezione del branch, workflow con permessi minimi, firma dei commit, gestione delle dipendenze). Il punteggio aggiornato e pubblico."
+        },
+        "scanning": {
+          "title": "Scansioni automatiche",
+          "body": "Le dipendenze vengono monitorate in continuo tramite Dependabot e npm audit. La pipeline di release genera immagini firmate e tracciabili tramite la label org.opencontainers.image.revision, che lega ogni immagine al commit esatto da cui proviene."
+        },
+        "disclosure": {
+          "title": "Segnalazione di vulnerabilita",
+          "body": "La politica di disclosure responsabile delle vulnerabilita e descritta nel file SECURITY.md del repository. Eventuali problemi di sicurezza possono essere segnalati in modo confidenziale secondo le istruzioni riportate."
+        }
+      },
+      "links": {
+        "sourceCode": "Codice sorgente",
+        "scorecard": "Punteggio OpenSSF Scorecard",
+        "latestRelease": "Ultima release (con SBOM)",
+        "securityPolicy": "Policy di disclosure (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Inventario servizi",
+      "title": "Inventario servizi del provider",
+      "intro": "Questo documento elenca, per l'istanza corrente, le dipendenze software (DEV) e i servizi operativi (OPS) che compongono la piattaforma. Il formato utilizzato è CycloneDX 1.6, uno standard aperto OWASP che descrive in un unico documento sia le librerie di codice sia i servizi gestiti da fornitori terzi.",
+      "notPublishedTitle": "Inventario non ancora pubblicato",
+      "notPublishedBody": "Il gestore di questa istanza non ha ancora pubblicato un inventario dei servizi. La variabile di configurazione SERVICE_INVENTORY_URL non è stata impostata per questo deploy.",
+      "fetchErrorTitle": "Impossibile caricare l'inventario",
+      "fetchErrorBody": "Il file JSON dell'inventario non è al momento raggiungibile. Riprovare più tardi o contattare il referente del servizio.",
+      "metadata": {
+        "tenant": "Istanza",
+        "provider": "Fornitore cloud",
+        "region": "Regione",
+        "deploymentMode": "Modalità di deploy",
+        "generatedAt": "Generato il",
+        "format": "Formato",
+        "download": "Scarica JSON originale"
+      },
+      "sections": {
+        "componentsTitle": "Componenti software (DEV)",
+        "componentsIntro": "Librerie, container e pacchetti di sistema che formano l'applicazione. Informazione legata alla versione del codice, riproducibile da chiunque scarichi il sorgente.",
+        "servicesTitle": "Servizi operativi (OPS)",
+        "servicesIntro": "Servizi gestiti da terzi su cui questa istanza si appoggia. Informazione legata al tenant: cambia quando il gestore modifica la configurazione o il fornitore cloud.",
+        "dependenciesTitle": "Catena di dipendenze"
+      },
+      "columns": {
+        "name": "Nome",
+        "type": "Tipo",
+        "version": "Versione",
+        "license": "Licenza",
+        "provider": "Fornitore",
+        "dataFlow": "Flusso dati",
+        "description": "Descrizione"
+      },
+      "badges": {
+        "trustBoundary": "attraversa confine di fiducia",
+        "personalData": "dati personali",
+        "recording": "contenuti registrati"
+      },
+      "stack": {
+        "title": "Architettura in breve",
+        "intro": "Una vista sintetica dei quattro livelli che compongono la piattaforma: dall'accesso utente fino alla piattaforma di esecuzione.",
+        "layers": {
+          "access": {
+            "title": "Accesso",
+            "sub": "Ingresso web e terminazione TLS",
+            "endUsers": "Utenti finali (browser)"
+          },
+          "app": {
+            "title": "Applicazione",
+            "sub": "Portale, video, media real-time"
+          },
+          "data": {
+            "title": "Dati",
+            "sub": "Persistenza, cache, archiviazione"
+          },
+          "platform": {
+            "title": "Piattaforma",
+            "sub": "Runtime Kubernetes, SMTP, CI/CD, osservabilità"
+          }
+        },
+        "note": "L'elenco completo di componenti e servizi, con versioni, hash e proprietà tecniche, è disponibile nelle sezioni precedenti e nel JSON scaricabile."
       }
     }
   },
@@ -1628,8 +2254,7 @@
       "redis": {
         "healthy": "Il servizio di chat real-time risponde correttamente.",
         "degraded": "Il servizio di chat risponde con lentezza: i messaggi potrebbero arrivare in ritardo tra i server.",
-        "down": "Il servizio di chat real-time non è raggiungibile. Con più server attivi, i messaggi potrebbero non essere distribuiti: il sistema continua a funzionare in modalità single-server.",
-        "standby": "Il servizio di chat real-time non è configurato (modalità single-server)."
+        "down": "Il servizio di chat real-time non è raggiungibile. La chat live non può distribuire i messaggi tra i server — i messaggi restano salvati in database ma non vengono visti in tempo reale da tutti gli utenti."
       },
       "jitsiWeb": {
         "healthy": "La sala videoconferenza è raggiungibile e pronta per gli eventi.",
@@ -1667,6 +2292,7 @@
     },
     "impacts": {
       "database": "La piattaforma non può caricare eventi, gestire registrazioni o salvare dati.",
+      "redis": "I messaggi della chat live non vengono distribuiti tra i server. Gli utenti vedono solo i messaggi inviati sul proprio pod.",
       "jitsiWeb": "I partecipanti non possono accedere alla sala videoconferenza.",
       "prosody": "I servizi video non possono comunicare. Le conferenze non funzionano.",
       "jicofo": "Non è possibile creare o gestire nuove conferenze video.",
@@ -1797,7 +2423,15 @@
     "contacts": "Contatti",
     "legalNotes": "Note legali",
     "governmentSite": "Governo Italiano",
-    "systemStatus": "Stato del sistema"
+    "systemStatus": "Stato del sistema",
+    "sbomLatest": "SBOM ultima release",
+    "transparency": "Sicurezza e trasparenza",
+    "serviceInventory": "Inventario servizi",
+    "sourceCode": "Codice sorgente",
+    "buildInfoDev": "build di sviluppo",
+    "viewCommit": "Vedi il commit su GitHub",
+    "viewRelease": "Vedi la release su GitHub",
+    "buildDatePrefix": "Compilato il"
   },
   "pages": {
     "privacyTitle": "Informativa sulla privacy",
@@ -1871,7 +2505,29 @@
     "peopleWaiting": "{count, plural, =0 {} =1 {1 persona in attesa} other {{count} persone in attesa}}",
     "jvbScaling": "Sala in preparazione...",
     "jvbScalingDetail": "I server video si stanno avviando. L'operazione richiede circa 2 minuti.",
-    "jvbReady": "Sala pronta!"
+    "jvbReady": "Sala pronta!",
+    "nameLabel": "Il tuo nome",
+    "nameHelp": "Apparirà agli altri partecipanti",
+    "joinNowBtn": "Entra ora",
+    "openingAt": "Apertura alle {time}",
+    "netiquetteTitle": "Buone pratiche per partecipare",
+    "netiquetteBullet1": "Arriva pochi minuti prima per testare microfono e webcam",
+    "netiquetteBullet2": "Accendi webcam e microfono solo quando vuoi intervenire — alza la mano per chiedere la parola",
+    "netiquetteBullet3": "Usa la chat per confronti rapidi, Q&A per domande agli speaker",
+    "netiquetteBullet4": "La registrazione, se attiva, è gestita solo dai moderatori ed è segnalata con un bollino rosso",
+    "watchCatchup": "Guarda dall'inizio",
+    "watchCatchupDesc": "Guarda la registrazione parziale e raggiungi la diretta quando vuoi",
+    "chatPreviewTitle": "Chat dell'evento",
+    "chatPreviewHint": "Leggi cosa dicono gli altri partecipanti mentre ti prepari",
+    "endedTitle": "Evento concluso",
+    "endedWatchRecording": "Guarda la registrazione",
+    "endedLeaveFeedback": "Lascia un feedback",
+    "moderatedBy": "Moderato da {name}",
+    "startEventError": "Errore nell'avvio dell'evento. Riprova.",
+    "emailLabel": "Email (facoltativa)",
+    "emailHelp": "Solo per eventuale follow-up post-evento",
+    "emailInvalid": "Inserisci un indirizzo email valido",
+    "chatLockedMessage": "Inserisci il tuo nome per partecipare alla chat dell'evento."
   },
   "recording": {
     "management": "Registrazione video",
@@ -1929,5 +2585,50 @@
     "tempError": "Stiamo riprovando a contattare il server, nessuna azione necessaria.",
     "ended": "L'evento è terminato.",
     "scaleToZeroNote": "Per ridurre l'impatto ambientale, i nodi video vengono spenti quando nessuno è in chiamata. Il riavvio è automatico al primo ingresso."
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Rimozione dalla Rubrica DTD",
+      "intro": "Stai per revocare il consenso all'inserimento nella Rubrica DTD. Dopo la conferma, non sarai più contattato per essere invitato a eventi simili.",
+      "missingToken": "Il link non è valido o è incompleto. Controlla l'email originale.",
+      "invalidToken": "Il link è scaduto o non valido. Contatta il referente dell'evento per assistenza.",
+      "notFound": "Nessuna persona corrisponde al link. Potrebbe essere già stata rimossa.",
+      "loading": "Caricamento…",
+      "previewHeader": "Stai per rimuovere dalla rubrica:",
+      "warning": "L'operazione non cancella lo storico delle iscrizioni ai singoli eventi.",
+      "confirm": "Conferma la rimozione",
+      "submitting": "Rimozione in corso…",
+      "successTitle": "Rimozione completata",
+      "successBody": "I tuoi dati non sono più presenti nella Rubrica DTD.",
+      "errors": {
+        "generic": "Si è verificato un errore. Riprova più tardi."
+      }
+    }
+  },
+  "deviceCheck": {
+    "preview": "Anteprima video",
+    "micLevel": "Livello microfono",
+    "cameraLabel": "Fotocamera",
+    "micLabel": "Microfono",
+    "permissionNeeded": "Autorizza mic e webcam per testarli. Potrai comunque entrare senza.",
+    "noVideo": "Nessun video",
+    "noAudio": "Microfono non disponibile",
+    "retry": "Riprova",
+    "cameraToggleOn": "Fotocamera ON",
+    "cameraToggleOff": "Fotocamera OFF",
+    "micToggleOn": "Microfono ON",
+    "micToggleOff": "Microfono OFF",
+    "cameraOffPreview": "Fotocamera spenta",
+    "speakerTest": "🔊 Test audio"
+  },
+  "garden": {
+    "enable": "Mostra il giardino",
+    "classicView": "Vista classica",
+    "changeAvatar": "Cambia avatar",
+    "peopleInGarden": "{count, plural, =0 {Nessuno nel giardino} one {1 persona nel giardino} other {# persone nel giardino}}",
+    "hintKeyboard": "Muoviti con WASD o le frecce",
+    "pickerTitle": "Scegli il tuo avatar",
+    "pickerHelp": "Il personaggio rappresenta te nel giardino dell'attesa. Puoi cambiarlo quando vuoi.",
+    "close": "Chiudi"
   }
 }

@@ -21,6 +21,19 @@ model Event {
 
   maxParticipants Int @default(300) @map("max_participants")
 
+  // Expected share of participants that will actually send media (mic
+  // or webcam). Drives JVB sizing — a webinar with 100 attendees and
+  // 20% senders is *very* different infra-load than 100 all-senders.
+  // Percentage (0-100). Null inherits SiteSetting.defaultSenderRatioPct.
+  expectedSenderRatioPct Int? @map("expected_sender_ratio_pct")
+
+  // Soft exit / grace period in minutes past endsAt before the scaler
+  // transitions LIVE → ENDED. Null inherits SiteSetting.eventGracePeriodMinutes.
+  //   0    → hard close at endsAt (legacy behaviour)
+  //   N>0  → show "event in overtime" banner, close at endsAt+N
+  //   -1   → never auto-close on endsAt; let the inactivity cleanup cron decide
+  gracePeriodMinutes Int? @map("grace_period_minutes")
+
   // Jitsi room configuration
   jitsiRoomName String @unique @map("jitsi_room_name") // UUID-based
 
@@ -28,6 +41,13 @@ model Event {
   qaEnabled        Boolean @default(true) @map("qa_enabled")
   chatEnabled      Boolean @default(false) @map("chat_enabled")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
+
+  // When recording is enabled, this skips the "start recording?" moderator
+  // prompt and starts the recording automatically as soon as the moderator
+  // joins and Jibri is ready. Useful for events that want to guarantee
+  // late-joiners have a player to catch up with. Ignored when
+  // recordingEnabled is false.
+  autoStartRecording Boolean @default(false) @map("auto_start_recording")
 
   // AV moderation settings
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
@@ -132,12 +152,38 @@ model Event {
   // Analytics
   peakParticipants Int @default(0) @map("peak_participants")
 
+  // Optional RRULE (RFC 5545) describing a recurring series. When set,
+  // `recurrenceSeriesId` points to the "parent" event (the first occurrence)
+  // and the scheduler will materialize children. When null, the event is a
+  // one-off. The UI (wizard step 1) lets the admin choose a preset
+  // (daily / weekly / weekdays / monthly / custom) which is compiled down
+  // to this string — see app/src/lib/utils/recurrence.ts.
+  recurrenceRule     String? @map("recurrence_rule") @db.VarChar(500)
+  recurrenceSeriesId String? @map("recurrence_series_id") @db.Uuid
+  recurrenceSeries   Event?  @relation("EventRecurrenceSeries", fields: [recurrenceSeriesId], references: [id], onDelete: SetNull)
+  seriesChildren     Event[] @relation("EventRecurrenceSeries")
+
+  // Per-feature role allowlist. Shape:
+  //   { "chat": ["MODERATOR","SPEAKER","GUEST"], "qa": [...], "mic": [...],
+  //     "video": [...], "share": [...], "recording_control": [...] }
+  // When null, the UI falls back to the legacy boolean toggles (qaEnabled,
+  // chatEnabled, participantsCanUnmute, ...). The wizard step 2 writes both
+  // so old code paths keep working.
+  permissionMatrix Json? @map("permission_matrix") @db.JsonB
+
   // Capacity estimate snapshot captured at create/update time (moderator
   // bandwidth, participant bandwidth, JVB count, storage, ...). Persisted
   // so we can later diff against real Prometheus metrics and tune the
   // estimate formula over time, and so Helm/autoscaler flows can pre-warm
   // the right number of JVB replicas for upcoming events.
   capacityEstimateJson Json? @map("capacity_estimate_json") @db.JsonB
+
+  // Per-event override for the editorial "title with kicker" convention.
+  // Null = inherit SiteSetting.parseTitleKicker. When set, overrides the
+  // site-wide default for this event only — lets the admin force the
+  // two-line kicker rendering on events whose title contains a `|` even
+  // when the site default is off (or vice versa).
+  parseTitleKicker Boolean? @map("parse_title_kicker")
 
   // Timestamps
   createdAt DateTime @default(now()) @map("created_at")
@@ -154,24 +200,35 @@ model Event {
   wordCloudRounds  WordCloudRound[]
   callSessions     CallSession[]
   additionalMods   EventModerator[]
+  organizers       EventOrganizer[]
+  invitations      EventInvitation[]
+  tagLinks         EventTagLink[]
   chatMessages     ChatMessage[]
+  questionnaires   EventQuestionnaire[]
 
   @@map("events")
 }
 
-// ─── Additional moderators ───────────────────────────────────
+// ─── Additional moderators / speakers ────────────────────────
 //
 // Beyond the primary `Event.moderatorToken` (which acts as the
-// "owner" magic link), events can have any number of named
-// co-moderators with their own individual magic-link tokens. Each
-// row carries a display name and optional email so:
+// "owner" magic link), events can have any number of named grants
+// with their own magic-link token. `role` splits them into:
 //
-//   - The pre-join screen can greet the co-moderator by name without
-//     leaking the primary moderator's name (fixes the shared-link
-//     issue where everyone showed up as the original moderator).
-//   - Revoking access to a single co-moderator doesn't invalidate the
-//     other moderators' links.
-//   - An audit trail at /admin/events/[id] shows who has access.
+//   - MODERATOR: full moderation powers (kick, mute-everyone,
+//     recording, security, Q&A admin). Same capabilities as the
+//     primary moderator token.
+//   - SPEAKER ("relatore"): full AV rights (mic/camera/screen-share)
+//     but no moderation powers. Intended for invited panelists who
+//     shouldn't be able to end the event or kick people.
+//
+// Note: the table name stays `event_moderators` to avoid a disruptive
+// rename; think of it as "named access grants for an event".
+enum EventModeratorRole {
+  MODERATOR
+  SPEAKER
+}
+
 model EventModerator {
   id    String @id @default(uuid()) @db.Uuid
   eventId String @map("event_id") @db.Uuid
@@ -179,7 +236,9 @@ model EventModerator {
   name  String
   email String?
 
-  // Per-moderator magic link token. Still UUID so `randomUUID()` from
+  role EventModeratorRole @default(MODERATOR)
+
+  // Per-grant magic link token. Still UUID so `randomUUID()` from
   // crypto can generate it safely.
   token String @unique
 
@@ -190,6 +249,148 @@ model EventModerator {
 
   @@index([eventId])
   @@map("event_moderators")
+}
+
+// ─── Event organizers ────────────────────────────────────────
+//
+// Institutions / departments that co-organize the event. Purely
+// display metadata — no access rights, no magic link, no email
+// communication. Shown publicly on the event page (names + logo +
+// optional link). Multiple organizers per event for sponsor lists
+// or cross-department collaborations.
+//
+// Separate from `EventModerator` (which grants room access with a
+// role) and from the legacy `Event.organizerName` single-string
+// column (which we keep as a fallback for older events).
+model EventOrganizer {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId     String   @map("event_id") @db.Uuid
+
+  name        String   @db.VarChar(200)
+  logoUrl     String?  @map("logo_url")
+  websiteUrl  String?  @map("website_url")
+
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, sortOrder])
+  @@map("event_organizers")
+}
+
+// ─── Event invitations ───────────────────────────────────────
+//
+// Pre-registration list surfaced in the create-event wizard (step 3).
+// Distinct from `Registration` (self-service signup) and from
+// `EventModerator` (which grants access via magic link):
+//   - GUEST    → will receive an email with a pre-filled registration
+//                link; no special access granted, same flow as a public
+//                registrant. Useful for curated lists like "internal team".
+//   - SPEAKER  → shorthand for "create an EventModerator SPEAKER row on
+//                invite-send"; kept here primarily as an editorial record.
+//                Institutional co-organizers go to `EventOrganizer`, not
+//                here.
+// Optional `personId` links back to the Person rubrica so repeat invitees
+// can be picked from the address book rather than retyped.
+enum EventInvitationRole {
+  GUEST
+  SPEAKER
+}
+
+model EventInvitation {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId  String @map("event_id") @db.Uuid
+  personId String? @map("person_id") @db.Uuid
+
+  role  EventInvitationRole @default(GUEST)
+  name  String?             @db.VarChar(200)
+  email String              @db.VarChar(200)
+
+  // Magic-link token for the pre-filled registration page. Generated
+  // server-side before the invitation email goes out; null until then
+  // (e.g. for invitations staged in the wizard but not yet sent).
+  token String? @unique
+
+  sentAt     DateTime? @map("sent_at")
+  acceptedAt DateTime? @map("accepted_at")
+  declinedAt DateTime? @map("declined_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event  Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  person Person? @relation(fields: [personId], references: [id], onDelete: SetNull)
+
+  @@unique([eventId, email])
+  @@index([eventId])
+  @@index([personId])
+  @@map("event_invitations")
+}
+
+// ─── Tag taxonomy ────────────────────────────────────────────
+//
+// Reusable tags for classifying events (e.g. "Webinar", "Workshop",
+// "Transizione Digitale"). Shown as small colored badges on the event
+// card and used as a facet on the public /eventi list.
+model Tag {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug      String @unique @db.VarChar(100)
+  name      Json   @default("{}") @db.JsonB
+  color     String? @db.VarChar(10)
+  sortOrder Int    @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  events EventTagLink[]
+
+  @@map("tags")
+}
+
+model EventTagLink {
+  eventId String @map("event_id") @db.Uuid
+  tagId   String @map("tag_id") @db.Uuid
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, tagId])
+  @@index([tagId])
+  @@map("event_tag_links")
+}
+
+// ─── Email templates ────────────────────────────────────────
+//
+// Admin-editable overrides for the system email templates. One row
+// per (key, locale). Null fields fall back to the built-in defaults
+// in src/lib/email/templates.ts — so a partial override works.
+//
+// Supported placeholders (whitelisted in the resolver):
+//   {{eventTitle}}, {{eventDate}}, {{eventTime}}, {{eventDuration}},
+//   {{joinUrl}}, {{eventPageUrl}}, {{siteName}}, {{offsetMinutes}}
+//
+// Keys mirror template modules: 'confirmation', 'reminder'.
+// Adding a new key requires wiring the resolver; templates can't
+// be invented solely from the UI.
+model EmailTemplate {
+  id     String @id @default(uuid()) @db.Uuid
+  key    String
+  locale String
+
+  subject    String?
+  heading    String?
+  bodyIntro  String? @db.Text
+  ctaLabel   String?
+  infoNote   String? @db.Text
+  footerNote String? @db.Text
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  @@unique([key, locale])
+  @@map("email_templates")
 }
 
 // ─── Chat messages ──────────────────────────────────────────
@@ -335,24 +536,36 @@ model Registration {
   // Timestamps
   createdAt DateTime @default(now()) @map("created_at")
 
+  // Optional link to the cross-event Person (rubrica, phase B). Populated
+  // only when the respondent explicitly opts in to the address book —
+  // registrations without consent leave this null. See ADR-011.
+  personId String? @map("person_id") @db.Uuid
+
   // Relations
-  event         Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  questions     Question[]
-  upvotes       QuestionUpvote[]
-  pollVotes     PollVote[]
-  remindersSent ReminderSent[]
-  feedback      EventFeedback[]
+  event                  Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  person                 Person?                  @relation(fields: [personId], references: [id], onDelete: SetNull)
+  questions              Question[]
+  upvotes                QuestionUpvote[]
+  pollVotes              PollVote[]
+  remindersSent          ReminderSent[]
+  feedback               EventFeedback[]
+  questionnaireResponses QuestionnaireResponse[]
 
   @@unique([eventId, emailHash])
+  @@index([personId])
   @@map("registrations")
 }
 
 // ─── Q&A ─────────────────────────────────────────────────────
 
 model Question {
-  id             String @id @default(uuid()) @db.Uuid
-  eventId        String @map("event_id") @db.Uuid
-  registrationId String @map("registration_id") @db.Uuid
+  id             String  @id @default(uuid()) @db.Uuid
+  eventId        String  @map("event_id") @db.Uuid
+  // Nullable so guests (no Registration row) can also submit questions
+  // via the event live page. `authorName` stays authoritative: for
+  // registrations it's copied from Registration.displayName, for guests
+  // it's whatever the guest typed in the waiting room.
+  registrationId String? @map("registration_id") @db.Uuid
 
   authorName String @map("author_name")
   text       String @db.VarChar(500)
@@ -365,8 +578,8 @@ model Question {
   answeredAt    DateTime? @map("answered_at")
 
   // Relations
-  event        Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  registration Registration     @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  event        Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration Registration?     @relation(fields: [registrationId], references: [id], onDelete: Cascade)
   upvotes      QuestionUpvote[]
 
   @@index([eventId, status, upvoteCount(sort: Desc)])
@@ -530,10 +743,15 @@ model EventTemplate {
   qaEnabled                  Boolean @default(true) @map("qa_enabled")
   chatEnabled                Boolean @default(false) @map("chat_enabled")
   recordingEnabled           Boolean @default(false) @map("recording_enabled")
+  autoStartRecording         Boolean @default(false) @map("auto_start_recording")
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")
   maxParticipants            Int     @default(300) @map("max_participants")
+
+  // Mirrors Event.permissionMatrix: when set, the role×feature matrix
+  // is applied on new-event creation instead of the boolean toggles.
+  permissionMatrix Json? @map("permission_matrix") @db.JsonB
 
   isSystem  Boolean  @default(false) @map("is_system")
   sortOrder Int      @default(0) @map("sort_order")
@@ -585,6 +803,11 @@ model SiteSetting {
   publicRegistrationEnabled Boolean @default(true) @map("public_registration_enabled")
   calendarPublic            Boolean @default(false) @map("calendar_public")
 
+  // Editorial convention: when true, an event title containing `|` is rendered
+  // with the part before the pipe as a small eyebrow/kicker label above the
+  // main title. Off by default so existing titles never change appearance.
+  parseTitleKicker Boolean @default(false) @map("parse_title_kicker")
+
   // Jitsi customization
   jitsiWatermarkUrl      String? @map("jitsi_watermark_url")
   jitsiWatermarkEnabled  Boolean @default(true) @map("jitsi_watermark_enabled")
@@ -631,6 +854,35 @@ model SiteSetting {
   // marcare l'orfano come "ignore" (mantenere) o "delete-now" (eliminare
   // subito). Impostare a 0 per disabilitare l'auto-cleanup.
   orphanRecordingGraceDays Int @default(30) @map("orphan_recording_grace_days")
+
+  // ── JVB sizing calculator (admin-tunable, per-cluster) ─────────
+  //
+  // Il software è a riuso: diverse PA eseguono su hardware diverso
+  // (F16s_v2, m5.xlarge, n2-standard-16, on-prem…). Lo scaler deve
+  // calcolare il numero di repliche JVB da questi parametri invece che
+  // da magic-number hard-coded.
+  //
+  // Default calibrati su Azure F16s_v2 (16 vCPU / 32 GiB) con pod
+  // requests=14 core. Per nodo più piccolo/grande l'admin aggiorna qui
+  // — non serve redeploy.
+  jvbCpuCoresPerPod    Int   @default(16)    @map("jvb_cpu_cores_per_pod")
+  jvbReceiversPerCore  Float @default(18.75) @map("jvb_receivers_per_core")
+  jvbSendersPerCore    Float @default(3.125) @map("jvb_senders_per_core")
+  jvbMaxReplicas       Int   @default(6)     @map("jvb_max_replicas")
+  jibriCpuCoresPerPod  Int   @default(4)     @map("jibri_cpu_cores_per_pod")
+
+  // Frazione di partecipanti attesa come "sender" (mic o webcam attivi)
+  // quando l'evento non ne specifica una. 30% è un buon default per
+  // webinar interattivi; i template possono overridare (es. 100% per
+  // call con tutti i partecipanti attivi, 10% per keynote).
+  defaultSenderRatioPct Int @default(30) @map("default_sender_ratio_pct")
+
+  // Soft exit: minuti di "overtime" concessi dopo endsAt prima di chiudere
+  // la call. Mostrato come banner non invasivo ai partecipanti.
+  //   0    → chiusura dura a endsAt (vecchio comportamento)
+  //   N>0  → grace di N min, poi cleanup chiude la call
+  //   -1   → non chiudere automaticamente, lascia al cleanup di inattività
+  eventGracePeriodMinutes Int @default(15) @map("event_grace_period_minutes")
 
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -756,4 +1008,296 @@ model CallSession {
 
   @@index([eventId])
   @@map("call_sessions")
+}
+
+// ─── Questionnaires (fase A) ─────────────────────────
+//
+// Reusable question templates ("gruppi di domande") live at the site
+// level and can be composed into per-event questionnaires. Every event
+// can have at most one PRE_REGISTRATION questionnaire (rendered inside
+// the registration form) and one POST_EVENT questionnaire (rendered on
+// the post-event page after the call ends).
+//
+// An EventQuestionnaire aggregates 0..N QuestionTemplates (via
+// QuestionnaireTemplateLink) plus 0..N ad-hoc QuestionItems that live
+// only for this specific questionnaire. Rendering order: templates in
+// link order, then ad-hoc items in sortOrder.
+//
+// Responses are one-per-(questionnaire, respondent). Respondent is
+// either a Registration (authenticated via accessToken) or a guest
+// (tracked via a nanoid stored in a short-lived cookie, same pattern
+// used by PollVote and WordCloudSubmission).
+//
+// Fase A is strictly per-event: responses scadono con la retention
+// dell'evento. La deduplica cross-evento dei campi profilo stabili è
+// parte di fase B (ADR-011 — Person + rubrica).
+
+enum QuestionItemType {
+  SINGLE_CHOICE
+  MULTI_CHOICE
+  YES_NO
+  LIKERT
+  OPEN_TEXT
+}
+
+enum QuestionnairePlacement {
+  PRE_REGISTRATION
+  POST_EVENT
+}
+
+model QuestionTemplate {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @unique
+  description String? @db.Text
+  // System templates (seeded) cannot be deleted, only cloned.
+  isSystem    Boolean @default(false) @map("is_system")
+  sortOrder   Int     @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  items         QuestionItem[]
+  questionnaires QuestionnaireTemplateLink[]
+
+  @@map("question_templates")
+}
+
+model QuestionItem {
+  id String @id @default(uuid()) @db.Uuid
+
+  // Polymorphic owner: exactly one of these is set.
+  //   templateId set        → library item (reusable across events)
+  //   questionnaireId set   → ad-hoc item for a specific event questionnaire
+  // Enforced at the application layer (service helper) + a partial-unique
+  // CHECK constraint added in the migration SQL.
+  templateId      String? @map("template_id") @db.Uuid
+  questionnaireId String? @map("questionnaire_id") @db.Uuid
+
+  // Multilingual prompt: { it: "...", en: "..." }
+  prompt Json @db.JsonB
+
+  type QuestionItemType
+
+  // For SINGLE_CHOICE / MULTI_CHOICE: array of multilingual option objects.
+  //   [{ "it": "Sì", "en": "Yes" }, { "it": "No", "en": "No" }]
+  // For YES_NO / OPEN_TEXT / LIKERT: null.
+  options Json? @db.JsonB
+
+  // For LIKERT: scale range + optional endpoint labels. Default 1..5.
+  scaleMin      Int?  @map("scale_min")
+  scaleMax      Int?  @map("scale_max")
+  scaleMinLabel Json? @map("scale_min_label") @db.JsonB // i18n
+  scaleMaxLabel Json? @map("scale_max_label") @db.JsonB // i18n
+
+  required  Boolean @default(false)
+  sortOrder Int     @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  template      QuestionTemplate?    @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  questionnaire EventQuestionnaire?  @relation("AdhocItems", fields: [questionnaireId], references: [id], onDelete: Cascade)
+  answers       QuestionnaireAnswer[]
+
+  @@index([templateId, sortOrder])
+  @@index([questionnaireId, sortOrder])
+  @@map("question_items")
+}
+
+model EventQuestionnaire {
+  id       String                 @id @default(uuid()) @db.Uuid
+  eventId  String                 @map("event_id") @db.Uuid
+  placement QuestionnairePlacement
+
+  // Multilingual header text shown above the questionnaire.
+  title       Json @default("{}") @db.JsonB
+  description Json @default("{}") @db.JsonB
+
+  // If true, submitting the registration requires answering all required
+  // questions (for PRE_REGISTRATION) or the post-event page requires
+  // submission before showing the thank-you state (for POST_EVENT).
+  required Boolean @default(false)
+
+  // Whether respondents can change their answers after first submit
+  // (until the event retention deletes them). Default false — once
+  // submitted, the response is frozen.
+  allowEdit Boolean @default(false) @map("allow_edit")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event       Event                       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  templates   QuestionnaireTemplateLink[]
+  adhocItems  QuestionItem[]              @relation("AdhocItems")
+  responses   QuestionnaireResponse[]
+
+  // At most one pre-registration questionnaire and one post-event
+  // questionnaire per event (the form UI enforces this too).
+  @@unique([eventId, placement])
+  @@map("event_questionnaires")
+}
+
+// M2M between an event questionnaire and the templates it includes.
+// sortOrder governs the order in which the templates' items appear,
+// before the ad-hoc items of the questionnaire.
+model QuestionnaireTemplateLink {
+  questionnaireId String @map("questionnaire_id") @db.Uuid
+  templateId      String @map("template_id") @db.Uuid
+  sortOrder       Int    @default(0) @map("sort_order")
+
+  questionnaire EventQuestionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  template      QuestionTemplate   @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@id([questionnaireId, templateId])
+  @@index([templateId])
+  @@map("questionnaire_template_links")
+}
+
+model QuestionnaireResponse {
+  id              String  @id @default(uuid()) @db.Uuid
+  questionnaireId String  @map("questionnaire_id") @db.Uuid
+  registrationId  String? @map("registration_id") @db.Uuid
+  guestId         String? @map("guest_id")
+
+  // Snapshot of respondent name/email at submit time. For guests this is
+  // the only place the name is stored (no Registration row). For registered
+  // respondents this duplicates Registration fields — useful for dashboards
+  // that survive the cascade when a registration is GDPR-cleaned up before
+  // the questionnaire response itself is purged.
+  respondentName  String? @map("respondent_name")
+  respondentEmailHash String? @map("respondent_email_hash")
+
+  submittedAt DateTime @default(now()) @map("submitted_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  questionnaire EventQuestionnaire    @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  registration  Registration?         @relation(fields: [registrationId], references: [id], onDelete: SetNull)
+  answers       QuestionnaireAnswer[]
+
+  @@unique([questionnaireId, registrationId])
+  @@unique([questionnaireId, guestId])
+  @@index([questionnaireId])
+  @@map("questionnaire_responses")
+}
+
+model QuestionnaireAnswer {
+  id         String @id @default(uuid()) @db.Uuid
+  responseId String @map("response_id") @db.Uuid
+  itemId     String @map("item_id") @db.Uuid
+
+  // Exactly one of the three value fields is populated, driven by the
+  // item's type:
+  //   OPEN_TEXT           → valueText
+  //   SINGLE_CHOICE       → valueChoices = [idx]
+  //   MULTI_CHOICE        → valueChoices = [idx, idx, ...]
+  //   YES_NO              → valueScale = 0 (no) | 1 (yes)
+  //   LIKERT              → valueScale = N within [scaleMin..scaleMax]
+  valueText    String? @map("value_text") @db.Text
+  valueChoices Json?   @map("value_choices") @db.JsonB
+  valueScale   Int?    @map("value_scale")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  response QuestionnaireResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  item     QuestionItem          @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([responseId, itemId])
+  @@index([itemId])
+  @@map("questionnaire_answers")
+}
+
+// ─── Person (rubrica, phase B) ───────────────────────────
+//
+// Cross-event identity: deduplicated by email hash. A Person row exists
+// only when the user explicitly opts in to the address book during
+// registration (GDPR Art. 6.1.a — separate consent, not bundled with
+// the per-event Art. 6.1.b basis).
+//
+// Stable profile fields (organization, role) are copied from the latest
+// registration on every re-registration; event-specific questionnaire
+// answers are NOT — those live on QuestionnaireAnswer and expire with
+// the event retention.
+//
+// See docs/adr/011-person-rubrica.md.
+model Person {
+  id        String @id @default(uuid()) @db.Uuid
+  emailHash String @unique @map("email_hash")
+
+  // Latest-known values, updated on each opt-in re-registration.
+  displayName      String?           @map("display_name")
+  organization     String?
+  organizationRole String?           @map("organization_role")
+  organizationType OrganizationType? @map("organization_type")
+
+  // Explicit opt-in state. optedInAt is set when the participant checks
+  // the rubrica consent box; optedOutAt is set when they exercise
+  // Art. 21 opposition (via a dedicated endpoint or admin action).
+  optedInToAddressBook Boolean   @default(false) @map("opted_in_to_address_book")
+  optedInAt            DateTime? @map("opted_in_at")
+  optedOutAt           DateTime? @map("opted_out_at")
+
+  // Used by the inactivity retention cron (ADR-011). Refreshed on every
+  // registration linked to this person.
+  lastActiveAt    DateTime @default(now()) @map("last_active_at")
+  retentionMonths Int      @default(24) @map("retention_months")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  registrations Registration[]
+  invitations   EventInvitation[]
+
+  @@index([optedInToAddressBook, lastActiveAt])
+  @@map("persons")
+}
+
+// ── Email outbox ────────────────────────────────────────────
+//
+// Persistent queue for outgoing emails. Producers (registration API,
+// reminder cron, notification helpers) insert a row; the processor
+// cron (/api/cron/email-outbox) pulls PENDING rows with FOR UPDATE
+// SKIP LOCKED, sends them via SMTP (pooled), and marks SENT or
+// re-schedules with exponential backoff.
+//
+// Rationale: previously the registration API fired a non-blocking
+// Promise that hit SMTP inside the app pod. SMTP handshake + slow
+// upstream providers inflated tail latency and, worse, dropped mails
+// silently on pod restart. The outbox makes delivery durable and
+// decouples user-facing latency from SMTP.
+enum EmailOutboxStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model EmailOutbox {
+  id String @id @default(uuid()) @db.Uuid
+
+  // Delivery target
+  toAddress String @map("to_address")
+  subject   String
+  html      String
+  text      String?
+  // Array of { filename, contentBase64, contentType } — base64 so we
+  // don't have to worry about binary encoding in JSONB.
+  attachments Json? @db.JsonB
+
+  // Scheduling
+  status         EmailOutboxStatus @default(PENDING)
+  attempts       Int               @default(0)
+  nextAttemptAt  DateTime          @default(now()) @map("next_attempt_at")
+  sentAt         DateTime?         @map("sent_at")
+  lastError      String?           @map("last_error")
+
+  // Free-form metadata for traceability — e.g. { kind: 'confirmation',
+  // registrationId, eventId }. Not used by the processor; the producer
+  // owns the shape.
+  metadata Json? @db.JsonB
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Processor query: PENDING rows ready to be sent, oldest first.
+  @@index([status, nextAttemptAt])
+  @@map("email_outbox")
 }

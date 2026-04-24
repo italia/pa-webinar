@@ -1,6 +1,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { readJvbSnapshot } from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
 import { getAppProcessMetrics } from '@/lib/metrics';
 import {
@@ -184,6 +185,7 @@ const EMPTY_JVB: JvbFullStats = {
   octoSendBitrateBps: null,
   octoReceiveBitrateBps: null,
 };
+
 
 async function getJvbStats(): Promise<JvbFullStats> {
   const url = process.env.JVB_HEALTH_URL;
@@ -380,6 +382,7 @@ export const GET = withErrorHandling(async () => {
   const [
     jitsiProbe,
     jvbStats,
+    jvbSnapshot,
     jibriInfo,
     activeEventCount,
     todayRegCount,
@@ -390,6 +393,7 @@ export const GET = withErrorHandling(async () => {
   ] = await Promise.all([
     jitsiDomain ? probeService(`${jitsiDomain.includes('localhost') ? 'http' : 'https'}://${jitsiDomain}/external_api.js`, 5000) : Promise.resolve({ ok: false, responseMs: 0 }),
     getJvbStats(),
+    readJvbSnapshot(),
     getJibriInfo(),
     prisma.event.count({ where: { status: 'LIVE' } }),
     prisma.registration.count({ where: { createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } } }),
@@ -398,6 +402,14 @@ export const GET = withErrorHandling(async () => {
     getAppProcessMetrics(),
     fetchPrometheusData(namespace),
   ]);
+
+  // The scaler CronJob polls every JVB pod individually (app pod lacks the
+  // RBAC) and writes the per-tick aggregate here. When present it's the
+  // source of truth for anything that depends on multi-pod numbers —
+  // replica counts, participants, bitrate, conferences. A snapshot missing
+  // these fields (older scaler image or every exec failed) falls back to
+  // the single-pod /colibri/stats probe below.
+  const snapshotHasTraffic = jvbSnapshot?.pollSuccesses !== undefined && jvbSnapshot.pollSuccesses > 0;
 
   let dbOk = false;
   let dbLatencyMs = 0;
@@ -454,19 +466,75 @@ export const GET = withErrorHandling(async () => {
       startsAt: true,
       provisioningStartedAt: true,
       maxParticipants: true,
+      expectedSenderRatioPct: true,
       participantsCanStartVideo: true,
       recordingEnabled: true,
     },
   });
 
+  const sizing = {
+    cpuCoresPerPod: settings.jvbCpuCoresPerPod ?? 16,
+    receiversPerCore: settings.jvbReceiversPerCore ?? 18.75,
+    sendersPerCore: settings.jvbSendersPerCore ?? 3.125,
+    maxReplicas: maxJvb,
+  };
+  const defaultRatio = settings.defaultSenderRatioPct ?? 30;
+
   let jvbDesired = 0;
   for (const ev of soonEvents) {
-    jvbDesired += jvbsForEvent(ev.maxParticipants, ev.participantsCanStartVideo, maxJvb);
+    const ratio = ev.expectedSenderRatioPct ?? defaultRatio;
+    jvbDesired += jvbsForEvent(ev.maxParticipants, ratio, ev.participantsCanStartVideo, sizing);
   }
   jvbDesired = Math.min(jvbDesired, maxJvb);
   if (soonEvents.length > 0 && jvbDesired === 0) jvbDesired = 1;
 
-  const jvbRunning = jvbStats.healthy ? 1 : 0;
+  // Running = status.readyReplicas from the Deployment (authoritative, written
+  // by the scaler CronJob). `jvbStats.healthy` only tells us "≥1 pod answered
+  // the Service VIP" and so collapses to 0 or 1 regardless of real replica
+  // count — the bug this snapshot was introduced to fix.
+  const jvbRunning = jvbSnapshot
+    ? jvbSnapshot.ready
+    : jvbStats.healthy ? 1 : 0;
+
+  // Aggregated traffic (sum across pods) when the scaler provided it;
+  // otherwise the single-pod jvbStats fallback.
+  const aggregatedParticipants = snapshotHasTraffic
+    ? jvbSnapshot!.participants ?? 0
+    : jvbStats.participants ?? 0;
+  const aggregatedConferences = snapshotHasTraffic
+    ? jvbSnapshot!.conferences ?? 0
+    : jvbStats.conferences ?? activeEventCount;
+  // JVB reports bitrate in kbps; convert to Mbps for the UI.
+  const aggregatedBitDownKbps = snapshotHasTraffic
+    ? jvbSnapshot!.bitRateDownKbps ?? null
+    : jvbStats.bitRateDown;
+  const aggregatedBitUpKbps = snapshotHasTraffic
+    ? jvbSnapshot!.bitRateUpKbps ?? null
+    : jvbStats.bitRateUp;
+  const aggregatedStress = snapshotHasTraffic
+    ? jvbSnapshot!.stressLevel ?? jvbStats.stressLevel
+    : jvbStats.stressLevel;
+  const aggregatedLargestConf = snapshotHasTraffic
+    ? jvbSnapshot!.largestConference ?? jvbStats.largestConference
+    : jvbStats.largestConference;
+  const aggregatedAudioSenders = snapshotHasTraffic
+    ? jvbSnapshot!.endpointsSendingAudio ?? jvbStats.endpointsSendingAudio
+    : jvbStats.endpointsSendingAudio;
+  const aggregatedVideoSenders = snapshotHasTraffic
+    ? jvbSnapshot!.endpointsSendingVideo ?? jvbStats.endpointsSendingVideo
+    : jvbStats.endpointsSendingVideo;
+  const aggregatedOctoConferences = snapshotHasTraffic
+    ? jvbSnapshot!.octoConferences ?? jvbStats.octoConferences
+    : jvbStats.octoConferences;
+  const aggregatedOctoEndpoints = snapshotHasTraffic
+    ? jvbSnapshot!.octoEndpoints ?? jvbStats.octoEndpoints
+    : jvbStats.octoEndpoints;
+  const aggregatedOctoSend = snapshotHasTraffic
+    ? jvbSnapshot!.octoSendBitrateBps ?? jvbStats.octoSendBitrateBps
+    : jvbStats.octoSendBitrateBps;
+  const aggregatedOctoRecv = snapshotHasTraffic
+    ? jvbSnapshot!.octoReceiveBitrateBps ?? jvbStats.octoReceiveBitrateBps
+    : jvbStats.octoReceiveBitrateBps;
 
   // Stale-provisioning: an event with JVB_BILLABLE_STATUSES is waiting for a
   // bridge longer than the configured timeout. Reference timestamp is
@@ -505,11 +573,12 @@ export const GET = withErrorHandling(async () => {
   try { appHost = new URL(appDomain).hostname; } catch { /* */ }
 
   const dbStatus: ServiceStatus = dbOk ? (dbLatencyMs > 1000 ? 'degraded' : 'healthy') : 'down';
-  const redisStatus: ServiceStatus = !redisConfigured
-    ? 'standby'
-    : redisOk
-      ? (redisLatencyMs > 500 ? 'degraded' : 'healthy')
-      : 'down';
+  // Redis is a required dependency for real-time chat fan-out.
+  // A missing or unreachable Redis is reported as `down`, not `standby`,
+  // because the chat fan-out feature is broken for the user.
+  const redisStatus: ServiceStatus = redisConfigured && redisOk
+    ? (redisLatencyMs > 500 ? 'degraded' : 'healthy')
+    : 'down';
   const jitsiWebStatus: ServiceStatus = jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby';
   // Jibri status reflects scale-to-zero semantics, mirroring /api/status:
   //   - unconfigured (no storage backend) → standby with unconfigured verdict
@@ -561,12 +630,10 @@ export const GET = withErrorHandling(async () => {
       technicalName: 'Redis (pub/sub)',
       description: 'infraMap.descriptions.redis',
       status: redisStatus,
-      verdict: !redisConfigured
-        ? 'infraMap.verdicts.redis.standby'
-        : redisOk
-          ? (redisLatencyMs > 500 ? 'infraMap.verdicts.redis.degraded' : 'infraMap.verdicts.redis.healthy')
-          : 'infraMap.verdicts.redis.down',
-      impact: null,
+      verdict: redisConfigured && redisOk
+        ? (redisLatencyMs > 500 ? 'infraMap.verdicts.redis.degraded' : 'infraMap.verdicts.redis.healthy')
+        : 'infraMap.verdicts.redis.down',
+      impact: redisConfigured && redisOk ? null : 'infraMap.impacts.redis',
       replicas: { running: redisOk ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'redis', port: 6379, protocol: 'TCP' }],
       metadata: { configured: redisConfigured, latencyMs: redisLatencyMs },
@@ -641,9 +708,9 @@ export const GET = withErrorHandling(async () => {
         { name: 'colibri', port: 8080, protocol: 'TCP' },
       ],
       metadata: {
-        stressLevel: jvbStats.stressLevel,
-        participants: jvbStats.participants,
-        conferences: jvbStats.conferences,
+        stressLevel: aggregatedStress,
+        participants: aggregatedParticipants,
+        conferences: aggregatedConferences,
         videochannels: jvbStats.videochannels,
         nextEventMin,
       },
@@ -702,8 +769,12 @@ export const GET = withErrorHandling(async () => {
     endpoints.push({ host: jitsiDomain, port: 10000, protocol: 'UDP', tls: false, service: 'jvb', trafficRps: null });
   }
 
-  const bitRateDownMbps = jvbStats.bitRateDown !== null ? jvbStats.bitRateDown / 1024 : null;
-  const bitRateUpMbps = jvbStats.bitRateUp !== null ? jvbStats.bitRateUp / 1024 : null;
+  const bitRateDownMbps = aggregatedBitDownKbps !== null && aggregatedBitDownKbps !== undefined
+    ? aggregatedBitDownKbps / 1024
+    : null;
+  const bitRateUpMbps = aggregatedBitUpKbps !== null && aggregatedBitUpKbps !== undefined
+    ? aggregatedBitUpKbps / 1024
+    : null;
 
   const hasDownService = services.some(s => s.status === 'down');
   const hasDegradedService = services.some(s => s.status === 'degraded');
@@ -728,8 +799,8 @@ export const GET = withErrorHandling(async () => {
       recordings: { count: recordingCount, totalSizeBytes: null },
     },
     traffic: {
-      totalParticipants: jvbStats.participants ?? 0,
-      activeConferences: jvbStats.conferences ?? activeEventCount,
+      totalParticipants: aggregatedParticipants,
+      activeConferences: aggregatedConferences,
       bandwidthInMbps: bitRateDownMbps,
       bandwidthOutMbps: bitRateUpMbps,
     },
@@ -739,19 +810,23 @@ export const GET = withErrorHandling(async () => {
       upcomingCount,
     },
     jvbExtended: {
-      largestConference: jvbStats.largestConference,
+      largestConference: aggregatedLargestConf ?? null,
+      // RTT/jitter/loss and ICE totals aren't meaningfully summable across
+      // pods (they're per-pod aggregates already) and the scaler doesn't
+      // forward them. Keep the single-pod view — still correct when only
+      // one JVB is hot, informative-but-partial when multiple are.
       rttAggregateMs: jvbStats.rttAggregateMs,
       jitterAggregateMs: jvbStats.jitterAggregateMs,
       lossRateDownload: jvbStats.lossRateDownload,
       lossRateUpload: jvbStats.lossRateUpload,
-      endpointsSendingAudio: jvbStats.endpointsSendingAudio,
-      endpointsSendingVideo: jvbStats.endpointsSendingVideo,
+      endpointsSendingAudio: aggregatedAudioSenders ?? null,
+      endpointsSendingVideo: aggregatedVideoSenders ?? null,
       totalConferencesCreated: jvbStats.totalConferencesCreated,
       iceSuccessRate: computeIceSuccessRate(jvbStats.iceSucceeded, jvbStats.iceFailed),
-      octoConferences: jvbStats.octoConferences,
-      octoEndpoints: jvbStats.octoEndpoints,
-      octoSendBitrateBps: jvbStats.octoSendBitrateBps,
-      octoReceiveBitrateBps: jvbStats.octoReceiveBitrateBps,
+      octoConferences: aggregatedOctoConferences ?? null,
+      octoEndpoints: aggregatedOctoEndpoints ?? null,
+      octoSendBitrateBps: aggregatedOctoSend ?? null,
+      octoReceiveBitrateBps: aggregatedOctoRecv ?? null,
     },
     appMetrics: appMetricsRaw,
     prometheus: prometheusData,

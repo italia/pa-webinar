@@ -344,7 +344,11 @@
       "settingsGeneral": "Algemeen",
       "settingsLanguages": "Talen",
       "ariaLabel": "Beheernavigatie",
-      "subNavAriaLabel": "Sectienavigatie"
+      "subNavAriaLabel": "Sectienavigatie",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Beheerpaneel",
@@ -492,6 +496,30 @@
       "noComments": "Geen opmerkingen",
       "stars": "sterren"
     },
+    "coModerators": {
+      "title": "Co-moderators en sprekers",
+      "intro": "Voeg co-moderators en sprekers toe met individuele magic links.",
+      "introHint": "Elke persoon heeft een zichtbare naam in de ruimte en een token dat onafhankelijk van de hoofdlink kan worden ingetrokken. Sprekers krijgen microfoon, camera en schermdeling, maar kunnen niet modereren (verwijderen, iedereen dempen, opnemen).",
+      "add": "Persoon toevoegen",
+      "name": "Zichtbare naam in de ruimte",
+      "email": "E-mail (optioneel)",
+      "emailPlaceholder": "om de link te versturen",
+      "role": "Rol",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Spreker",
+      "roleModeratorHint": "Volledige moderatie: kan opnemen, iedereen dempen, deelnemers verwijderen.",
+      "roleSpeakerHint": "Kan spreken, video tonen en het scherm delen. Kan de ruimte niet modereren.",
+      "copyLink": "Link kopiëren",
+      "copied": "Gekopieerd!",
+      "revoke": "Intrekken",
+      "revoked": "Ingetrokken",
+      "confirmRevoke": "Toegang van deze persoon intrekken? De link stopt onmiddellijk met werken.",
+      "empty": "Geen extra toegang verleend. De primaire moderatorlink blijft de enige bevoorrechte ingang.",
+      "activeCount": "{count, plural, =0 {Geen actieve toegang} =1 {1 actieve toegang} other {# actieve toegangen}}",
+      "errors": {
+        "addFailed": "Opslaan mislukt. Probeer het opnieuw."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR-auditlogboek",
       "date": "Datum",
@@ -509,6 +537,14 @@
       "subtitle": "Configureer het uiterlijk en gedrag van het platform voor hergebruik door overheden",
       "saving": "Opslaan...",
       "saved": "Instellingen succesvol opgeslagen",
+      "sections": {
+        "languagesTitle": "Taalbeheer",
+        "languagesDescription": "Activeer of deactiveer de EU-talen in de interface, kies de standaardtaal en pas vertalingen aan.",
+        "gdprTemplatesTitle": "GDPR-sjablonen",
+        "gdprTemplatesDescription": "Maak herbruikbare privacyverklaringen die aan elk evenement gekoppeld kunnen worden en kies de standaardverklaring voor nieuwe evenementen.",
+        "emailTemplatesTitle": "E-mailsjablonen",
+        "emailTemplatesDescription": "Pas onderwerp, koppen en teksten van de bevestigings- en herinneringsmails aan. Laat leeg om de ingebouwde standaardteksten te gebruiken."
+      },
       "tabs": {
         "branding": "Huisstijl",
         "header": "Header",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Weet u zeker dat u dit bestand wilt verwijderen?",
       "noFiles": "Geen bestanden geüpload. Gebruik de knop \"Bestand uploaden\" om materialen toe te voegen."
     },
+    "emailTemplates": {
+      "title": "E-mailsjablonen",
+      "subtitle": "Pas onderwerp, koppen en teksten van transactionele e-mails aan. Lege velden gebruiken de ingebouwde standaardteksten.",
+      "overridden": "Aangepast",
+      "usingDefault": "Standaard wordt gebruikt",
+      "saved": "Sjabloon succesvol opgeslagen.",
+      "resetDone": "Aanpassing verwijderd: de standaardtekst wordt gebruikt.",
+      "revert": "Wijzigingen verwerpen",
+      "resetToDefault": "Terug naar standaard",
+      "confirmReset": "Aanpassing verwijderen? De ingebouwde standaardtekst wordt gebruikt.",
+      "placeholdersTitle": "Beschikbare placeholders",
+      "placeholdersHelp": "Plaats deze tokens in een veld — ze worden bij verzending vervangen door echte evenementgegevens.",
+      "keys": {
+        "confirmation": "Registratiebevestiging",
+        "reminder": "Evenementherinnering"
+      },
+      "selectors": {
+        "key": "Type e-mail",
+        "locale": "Taal"
+      },
+      "fields": {
+        "subject": "Onderwerp",
+        "subjectHint": "Onderwerp van de e-mail. Ondersteunt placeholders.",
+        "heading": "Hoofdkop",
+        "headingHint": "Kop die bovenaan de e-mail wordt getoond.",
+        "bodyIntro": "Inleidende alinea",
+        "bodyIntroHint": "Tekst vóór de tabel met evenementdetails. Handig voor een welkomstboodschap of extra context.",
+        "ctaLabel": "Knoplabel",
+        "ctaLabelHint": "Label van de primaire knop die naar de persoonlijke deelnamelink leidt.",
+        "infoNote": "Infomelding",
+        "infoNoteHint": "Gele waarschuwing onder de knop. Laat leeg om te verbergen.",
+        "footerNote": "Voettekst",
+        "footerNoteHint": "Tekst in de voettekst onder de eventuele handtekening van de organisatie."
+      },
+      "errors": {
+        "saveFailed": "Opslaan mislukt. Controleer de velden en probeer het opnieuw.",
+        "resetFailed": "Kon aanpassing niet verwijderen. Probeer het opnieuw."
+      }
+    },
     "languages": {
       "title": "Taalbeheer",
       "subtitle": "Configureer beschikbare talen en pas vertalingen aan",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Dupliceren",
+    "duplicateError": "Dupliceren mislukt. Probeer het opnieuw."
   },
   "email": {
     "confirmationSubject": "Inschrijving bevestigd: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Ik stem in met de audio-/video-opname van het evenement",
       "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
-      "futureCommunications": "Ik wil informatie ontvangen over toekomstige evenementen van DTD"
+      "futureCommunications": "Ik wil informatie ontvangen over toekomstige evenementen van DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Mijn gegevens",
@@ -1069,6 +1148,102 @@
           "title": "Beperking van aansprakelijkheid",
           "body": "Ondanks het nemen van passende technische en organisatorische maatregelen kan het Departement niet garanderen dat er geen onderbrekingen of storingen optreden als gevolg van onvoorziene omstandigheden, onderhoud of externe factoren. De wettelijke aansprakelijkheden blijven van kracht."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Beveiliging en transparantie",
+      "title": "Beveiliging en transparantie",
+      "intro": "De broncode van dit platform is openbaar en wordt onderworpen aan geautomatiseerde beveiligingscontroles. Deze pagina vat de transparantie-instrumenten samen die beschikbaar zijn voor iedereen die de dienst gebruikt.",
+      "sections": {
+        "openSource": {
+          "title": "Opensource-software",
+          "body": "Het hele platform wordt uitgebracht als vrije software. De broncode kan door iedereen worden ingezien, gedownload en geauditeerd, in lijn met de transparantieprincipes van de Italiaanse overheid."
+        },
+        "sbom": {
+          "title": "SBOM (softwarecomponentenlijst)",
+          "body": "Elke op GitHub gepubliceerde release bevat een SBOM in SPDX-formaat voor de containerafbeelding en een SBOM in CycloneDX-formaat voor de npm-afhankelijkheden van de applicatie. De bestanden worden direct aan de release gekoppeld en kunnen worden gebruikt voor beveiligings- en compliance-audits."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "De repository wordt periodiek geanalyseerd door OpenSSF Scorecard, die automatisch tientallen beveiligingspraktijken van het project evalueert (branch-bescherming, workflows met minimale rechten, ondertekende commits, beheer van afhankelijkheden). De huidige score is openbaar."
+        },
+        "scanning": {
+          "title": "Geautomatiseerde scans",
+          "body": "Afhankelijkheden worden continu gemonitord via Dependabot en npm audit. De release-pijplijn produceert traceerbare images via het label org.opencontainers.image.revision, dat elke image koppelt aan de exacte commit waaruit deze is gebouwd."
+        },
+        "disclosure": {
+          "title": "Melden van kwetsbaarheden",
+          "body": "Het beleid voor verantwoord melden is beschreven in het bestand SECURITY.md in de repository. Beveiligingsproblemen kunnen vertrouwelijk worden gemeld volgens de daar gegeven instructies."
+        }
+      },
+      "links": {
+        "sourceCode": "Broncode",
+        "scorecard": "OpenSSF Scorecard-score",
+        "latestRelease": "Laatste release (met SBOM)",
+        "securityPolicy": "Meldbeleid (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Contact",
     "legalNotes": "Juridische kennisgeving",
     "governmentSite": "Italiaanse Overheid",
-    "systemStatus": "Systeemstatus"
+    "systemStatus": "Systeemstatus",
+    "sbomLatest": "SBOM van de laatste release",
+    "transparency": "Beveiliging en transparantie",
+    "sourceCode": "Broncode",
+    "buildInfoDev": "ontwikkelbuild",
+    "viewCommit": "Bekijk commit op GitHub",
+    "viewRelease": "Bekijk release op GitHub",
+    "buildDatePrefix": "Gebouwd op",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Privacybeleid",
@@ -1454,6 +1637,25 @@
       "materials": "Materialen",
       "polls": "Peilingen",
       "feedback": "Feedback"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

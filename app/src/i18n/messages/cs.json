@@ -344,7 +344,11 @@
       "settingsGeneral": "Obecné",
       "settingsLanguages": "Jazyky",
       "ariaLabel": "Navigace administrace",
-      "subNavAriaLabel": "Navigace sekce"
+      "subNavAriaLabel": "Navigace sekce",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Administrační panel",
@@ -492,6 +496,30 @@
       "noComments": "Žádné komentáře",
       "stars": "hvězd"
     },
+    "coModerators": {
+      "title": "Spolumoderátoři a řečníci",
+      "intro": "Přidejte spolumoderátory a řečníky s individuálními magickými odkazy.",
+      "introHint": "Každá osoba má vlastní jméno viditelné v místnosti a token, který lze zrušit nezávisle na hlavním odkazu. Řečníci mají mikrofon, kameru a sdílení obrazovky, ale nemohou moderovat (vyhodit, ztlumit všechny, nahrávat).",
+      "add": "Přidat osobu",
+      "name": "Jméno viditelné v místnosti",
+      "email": "E-mail (volitelný)",
+      "emailPlaceholder": "pro zaslání odkazu",
+      "role": "Role",
+      "roleModerator": "Moderátor",
+      "roleSpeaker": "Řečník",
+      "roleModeratorHint": "Plná moderace: může nahrávat, ztlumit všechny, odstraňovat účastníky.",
+      "roleSpeakerHint": "Může mluvit, zapnout video a sdílet obrazovku. Nemůže moderovat místnost.",
+      "copyLink": "Kopírovat odkaz",
+      "copied": "Zkopírováno!",
+      "revoke": "Zrušit",
+      "revoked": "Zrušeno",
+      "confirmRevoke": "Zrušit přístup této osobě? Odkaz okamžitě přestane fungovat.",
+      "empty": "Žádný další přístup nebyl udělen. Hlavní odkaz moderátora je jediným privilegovaným vstupem.",
+      "activeCount": "{count, plural, =0 {Žádné aktivní přístupy} =1 {1 aktivní přístup} other {# aktivních přístupů}}",
+      "errors": {
+        "addFailed": "Nelze uložit. Zkuste to prosím znovu."
+      }
+    },
     "gdprAuditLog": {
       "title": "Auditní protokol GDPR",
       "date": "Datum",
@@ -509,6 +537,14 @@
       "subtitle": "Konfigurujte vzhled a chování platformy pro opakované použití ve veřejné správě",
       "saving": "Ukládání...",
       "saved": "Nastavení úspěšně uloženo",
+      "sections": {
+        "languagesTitle": "Správa jazyků",
+        "languagesDescription": "Povolte nebo zakažte jazyky EU zobrazené v rozhraní, zvolte výchozí jazyk a upravte překlady.",
+        "gdprTemplatesTitle": "Šablony GDPR",
+        "gdprTemplatesDescription": "Vytvářejte opakovaně použitelná zásady ochrany osobních údajů sdílené mezi událostmi a zvolte výchozí šablonu pro nové události.",
+        "emailTemplatesTitle": "E-mailové šablony",
+        "emailTemplatesDescription": "Upravte předmět, nadpisy a texty potvrzovacích a upomínkových e-mailů. Pokud jsou prázdné, použijí se výchozí texty."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Záhlaví",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Opravdu chcete smazat tento soubor?",
       "noFiles": "Žádné nahrané soubory. Použijte tlačítko \"Nahrát soubor\" pro přidání materiálů."
     },
+    "emailTemplates": {
+      "title": "E-mailové šablony",
+      "subtitle": "Upravte předmět, nadpisy a texty transakčních e-mailů. Prázdná pole používají vestavěné výchozí texty.",
+      "overridden": "Přizpůsobeno",
+      "usingDefault": "Výchozí",
+      "saved": "Šablona byla úspěšně uložena.",
+      "resetDone": "Přizpůsobení odstraněno: použije se výchozí text.",
+      "revert": "Zrušit změny",
+      "resetToDefault": "Obnovit výchozí",
+      "confirmReset": "Odstranit přizpůsobení? Použije se vestavěný výchozí text.",
+      "placeholdersTitle": "Dostupné zástupné znaky",
+      "placeholdersHelp": "Vložte tyto zástupné znaky do polí: při odeslání budou nahrazeny skutečnými údaji události.",
+      "keys": {
+        "confirmation": "Potvrzení registrace",
+        "reminder": "Upomínka události"
+      },
+      "selectors": {
+        "key": "Typ e-mailu",
+        "locale": "Jazyk"
+      },
+      "fields": {
+        "subject": "Předmět",
+        "subjectHint": "Předmět e-mailu. Podporuje zástupné znaky.",
+        "heading": "Hlavní nadpis",
+        "headingHint": "Nadpis zobrazený v horní části těla e-mailu.",
+        "bodyIntro": "Úvodní odstavec",
+        "bodyIntroHint": "Text před tabulkou s podrobnostmi události. Užitečný pro uvítací zprávu nebo další kontext.",
+        "ctaLabel": "Popisek tlačítka",
+        "ctaLabelHint": "Text tlačítka vedoucího k osobnímu odkazu pro připojení.",
+        "infoNote": "Informační poznámka",
+        "infoNoteHint": "Žluté varovné pole pod tlačítkem. Ponechte prázdné pro skrytí.",
+        "footerNote": "Poznámka v patičce",
+        "footerNoteHint": "Text zobrazený v patičce pod případným podpisem organizace."
+      },
+      "errors": {
+        "saveFailed": "Uložení se nezdařilo. Zkontrolujte údaje a zkuste to znovu.",
+        "resetFailed": "Přizpůsobení nelze odstranit. Zkuste to prosím znovu."
+      }
+    },
     "languages": {
       "title": "Správa jazyků",
       "subtitle": "Konfigurujte dostupné jazyky a přizpůsobte překlady",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplikovat",
+    "duplicateError": "Duplikace se nezdařila. Zkuste to znovu."
   },
   "email": {
     "confirmationSubject": "Potvrzení registrace: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Souhlasím s audio/video záznamem této události",
       "recordingRequired": "Pro účast na této události je nutný souhlas s nahráváním",
-      "futureCommunications": "Přeji si dostávat informace o budoucích událostech organizovaných DTD"
+      "futureCommunications": "Přeji si dostávat informace o budoucích událostech organizovaných DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Moje údaje",
@@ -1069,6 +1148,102 @@
           "title": "Omezení odpovědnosti",
           "body": "Přestože jsou přijata odpovídající technická a organizační opatření, Odbor nemůže zaručit úplnou absenci přerušení nebo poruch způsobených nepředvídatelnými událostmi, údržbou nebo vnějšími faktory. Zákonné odpovědnosti zůstávají nedotčeny."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Bezpečnost a transparentnost",
+      "title": "Bezpečnost a transparentnost",
+      "intro": "Zdrojový kód této platformy je veřejný a podléhá automatickým bezpečnostním kontrolám. Tato stránka shrnuje nástroje transparentnosti dostupné všem uživatelům služby.",
+      "sections": {
+        "openSource": {
+          "title": "Software s otevřeným kódem",
+          "body": "Celá platforma je vydána jako svobodný software. Zdrojový kód může kdokoli prohlížet, stahovat a auditovat v souladu se zásadami transparentnosti italské veřejné správy."
+        },
+        "sbom": {
+          "title": "SBOM (Software Bill of Materials)",
+          "body": "Každé vydání zveřejněné na GitHubu obsahuje SBOM ve formátu SPDX pro kontejnerový obraz a SBOM ve formátu CycloneDX pro npm závislosti aplikace. Soubory jsou přiloženy přímo k vydání a lze je použít pro bezpečnostní audity a audity shody."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Repozitář je pravidelně analyzován nástrojem OpenSSF Scorecard, který automaticky hodnotí desítky bezpečnostních praktik projektu (ochrana větví, workflow s minimálními oprávněními, podepsané commity, správa závislostí). Aktuální skóre je veřejné."
+        },
+        "scanning": {
+          "title": "Automatizované skenování",
+          "body": "Závislosti jsou průběžně monitorovány pomocí Dependabot a npm audit. Pipeline pro vydání produkuje sledovatelné obrazy prostřednictvím štítku org.opencontainers.image.revision, který spojuje každý obraz s přesným commitem, ze kterého byl sestaven."
+        },
+        "disclosure": {
+          "title": "Hlášení zranitelností",
+          "body": "Zásady odpovědného zveřejňování jsou popsány v souboru SECURITY.md v repozitáři. Bezpečnostní problémy lze nahlásit důvěrně podle tamních pokynů."
+        }
+      },
+      "links": {
+        "sourceCode": "Zdrojový kód",
+        "scorecard": "Skóre OpenSSF Scorecard",
+        "latestRelease": "Nejnovější vydání (se SBOM)",
+        "securityPolicy": "Zásady zveřejňování (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kontakty",
     "legalNotes": "Právní upozornění",
     "governmentSite": "Italská vláda",
-    "systemStatus": "Stav systému"
+    "systemStatus": "Stav systému",
+    "sbomLatest": "SBOM nejnovějšího vydání",
+    "transparency": "Bezpečnost a transparentnost",
+    "sourceCode": "Zdrojový kód",
+    "buildInfoDev": "vývojový build",
+    "viewCommit": "Zobrazit commit na GitHubu",
+    "viewRelease": "Zobrazit vydání na GitHubu",
+    "buildDatePrefix": "Sestaveno",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Zásady ochrany osobních údajů",
@@ -1454,6 +1637,25 @@
       "materials": "Materiály",
       "polls": "Ankety",
       "feedback": "Zpětná vazba"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

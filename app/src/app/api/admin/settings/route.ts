@@ -39,6 +39,7 @@ const updateSettingsSchema = z.object({
   guestAccessEnabled: z.boolean().optional(),
   publicRegistrationEnabled: z.boolean().optional(),
   calendarPublic: z.boolean().optional(),
+  parseTitleKicker: z.boolean().optional(),
   jitsiWatermarkUrl: z.string().url().nullish(),
   jitsiWatermarkEnabled: z.boolean().optional(),
   jitsiWatermarkOpacity: z.number().min(0).max(1).optional(),
@@ -54,6 +55,16 @@ const updateSettingsSchema = z.object({
   jvbStressCriticalPercent: z.number().int().min(0).max(100).optional(),
   jvbProvisioningTimeoutMinutes: z.number().int().min(1).max(120).optional(),
   statusPollIntervalSeconds: z.number().int().min(5).max(600).optional(),
+  // Per-cluster JVB/Jibri sizing — see docs/CONFIGURATION.md "Scaling".
+  jvbCpuCoresPerPod: z.number().int().min(1).max(128).optional(),
+  jvbReceiversPerCore: z.number().min(0.1).max(100).optional(),
+  jvbSendersPerCore: z.number().min(0.1).max(100).optional(),
+  jvbMaxReplicas: z.number().int().min(1).max(50).optional(),
+  jibriCpuCoresPerPod: z.number().int().min(1).max(32).optional(),
+  defaultSenderRatioPct: z.number().int().min(0).max(100).optional(),
+  // Soft-exit grace window applied to LIVE events past endsAt.
+  eventGracePeriodMinutes: z.number().int().min(-1).max(240).optional(),
+  orphanRecordingGraceDays: z.number().int().min(0).max(365).optional(),
 }).strict();
 
 export const GET = withErrorHandling(async () => {

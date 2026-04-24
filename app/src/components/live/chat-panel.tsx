@@ -28,6 +28,22 @@ interface ChatPanelProps {
   token: string;
   displayName: string;
   isGuest?: boolean;
+  /**
+   * Whether the panel is currently visible to the user (selected tab
+   * AND drawer open on mobile). While false, newly arriving messages
+   * accumulate into an unread counter via onUnreadCountChange. While
+   * true, the counter resets and the internal "last-read" cursor
+   * advances to the latest message id.
+   *
+   * Default `true` keeps existing call sites (and tests) working
+   * without changes.
+   */
+  active?: boolean;
+  /**
+   * Notifies the parent whenever the unread count changes (including
+   * back to 0 on read). Parent owns the badge rendering.
+   */
+  onUnreadCountChange?: (count: number) => void;
 }
 
 interface ChatMessage {
@@ -62,6 +78,8 @@ export default function ChatPanel({
   token,
   displayName,
   isGuest = false,
+  active = true,
+  onUnreadCountChange,
 }: ChatPanelProps) {
   const t = useTranslations('live.chat');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -72,6 +90,41 @@ export default function ChatPanel({
   const isAtBottomRef = useRef(true);
   const lastSeenAtRef = useRef<string | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
+
+  // "Last-read" cursor: the id of the most recent message the user has
+  // actually seen (i.e. was visible when it arrived, or was already in
+  // the list when they switched to this tab). Messages appended after
+  // this id while `active=false` count as unread.
+  const lastReadIdRef = useRef<string | null>(null);
+  // We keep the unread count in a ref because the panel itself doesn't
+  // render it — the badge lives in the sidebar tab strip. Using a ref
+  // avoids extra renders on every incoming message.
+  const unreadCountRef = useRef(0);
+  const activeRef = useRef(active);
+  const onUnreadCountChangeRef = useRef(onUnreadCountChange);
+  useEffect(() => { activeRef.current = active; }, [active]);
+  useEffect(() => { onUnreadCountChangeRef.current = onUnreadCountChange; }, [onUnreadCountChange]);
+
+  const setUnread = useCallback((n: number) => {
+    if (unreadCountRef.current === n) return;
+    unreadCountRef.current = n;
+    onUnreadCountChangeRef.current?.(n);
+  }, []);
+
+  // Notification permission: we try exactly once, on the first new
+  // message received while the panel is inactive. If the user denies
+  // (or the browser blocks), we silently fall back to badge + title.
+  const notificationAskedRef = useRef(false);
+  const maybeRequestNotificationPermission = useCallback(() => {
+    if (notificationAskedRef.current) return;
+    notificationAskedRef.current = true;
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    try {
+      if (Notification.permission === 'default') {
+        void Notification.requestPermission().catch(() => { /* denied */ });
+      }
+    } catch { /* some browsers throw in insecure contexts */ }
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     if (listRef.current && isAtBottomRef.current) {
@@ -90,7 +143,33 @@ export default function ChatPanel({
     seenIdsRef.current.add(msg.id);
     lastSeenAtRef.current = msg.createdAt;
     setMessages((prev) => [...prev, msg]);
-  }, []);
+
+    // Unread accounting: increment only if the panel is currently
+    // inactive AND this is someone else's message. Own messages are
+    // always read by definition (the user just sent them).
+    const isOwn = msg.senderName === displayName;
+    if (!activeRef.current && !isOwn) {
+      setUnread(unreadCountRef.current + 1);
+      maybeRequestNotificationPermission();
+    } else if (activeRef.current) {
+      // Active → keep the last-read cursor glued to the newest id.
+      lastReadIdRef.current = msg.id;
+    }
+  }, [displayName, setUnread, maybeRequestNotificationPermission]);
+
+  // When the panel becomes active, reset unread + advance cursor to
+  // the latest message currently in state. When it becomes inactive,
+  // snapshot the current tail as the "last-read" baseline.
+  useEffect(() => {
+    if (active) {
+      setUnread(0);
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last) lastReadIdRef.current = last.id;
+        return prev;
+      });
+    }
+  }, [active, setUnread]);
 
   // 1. Initial history load.
   useEffect(() => {
@@ -106,6 +185,10 @@ export default function ChatPanel({
           seenIdsRef.current.add(m.id);
           lastSeenAtRef.current = m.createdAt;
         });
+        // Treat history as already read — we don't want a giant "unread"
+        // badge on first mount just because the chat has scrollback.
+        const last = data.messages[data.messages.length - 1];
+        if (last) lastReadIdRef.current = last.id;
         setMessages(data.messages);
       } catch { /* soft fail; SSE will still open */ }
     })();

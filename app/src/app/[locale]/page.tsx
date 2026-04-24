@@ -28,6 +28,7 @@ async function loadUpcomingEvents() {
     speakersInfo: e.speakersInfo as Record<string, string> | null,
     organizerName: e.organizerName,
     imageUrl: e.imageUrl,
+    parseTitleKicker: e.parseTitleKicker,
   }));
 }
 
@@ -35,9 +36,10 @@ export default async function HomePage() {
   const _locale = await getLocale();
   const settings = await getSettings();
   const upcoming = await loadUpcomingEvents();
+  const parseTitleKicker = settings.parseTitleKicker;
 
   if (settings.homePageMode === 'EVENTS_LIST') {
-    return <EventsListHome upcoming={upcoming} />;
+    return <EventsListHome upcoming={upcoming} parseTitleKicker={parseTitleKicker} />;
   }
 
   if (settings.homePageMode === 'CUSTOM' && settings.customHomeHtml) {
@@ -47,19 +49,21 @@ export default async function HomePage() {
           className="container py-5"
           dangerouslySetInnerHTML={{ __html: settings.customHomeHtml }}
         />
-        <EventsSection upcoming={upcoming} />
+        <EventsSection upcoming={upcoming} parseTitleKicker={parseTitleKicker} />
       </>
     );
   }
 
   // Default: LANDING
-  return <LandingHome upcoming={upcoming} />;
+  return <LandingHome upcoming={upcoming} parseTitleKicker={parseTitleKicker} />;
 }
 
 async function EventsSection({
   upcoming,
+  parseTitleKicker,
 }: {
   upcoming: Awaited<ReturnType<typeof loadUpcomingEvents>>;
+  parseTitleKicker: boolean;
 }) {
   const t = await getTranslations('home');
 
@@ -86,7 +90,7 @@ async function EventsSection({
             </p>
           </div>
         ) : (
-          <EventListClient events={upcoming} />
+          <EventListClient events={upcoming} parseTitleKicker={parseTitleKicker} />
         )}
       </div>
     </section>
@@ -95,8 +99,10 @@ async function EventsSection({
 
 async function EventsListHome({
   upcoming,
+  parseTitleKicker,
 }: {
   upcoming: Awaited<ReturnType<typeof loadUpcomingEvents>>;
+  parseTitleKicker: boolean;
 }) {
   const t = await getTranslations('home');
 
@@ -114,7 +120,7 @@ async function EventsListHome({
             </p>
           </div>
         ) : (
-          <EventListClient events={upcoming} />
+          <EventListClient events={upcoming} parseTitleKicker={parseTitleKicker} />
         )}
         <div className="text-center mt-4">
           <Link href="/events" className="btn btn-primary btn-lg">
@@ -128,8 +134,10 @@ async function EventsListHome({
 
 async function LandingHome({
   upcoming,
+  parseTitleKicker,
 }: {
   upcoming: Awaited<ReturnType<typeof loadUpcomingEvents>>;
+  parseTitleKicker: boolean;
 }) {
   const t = await getTranslations('home');
 
@@ -255,7 +263,7 @@ async function LandingHome({
       </section>
 
       {/* ── Upcoming events ── */}
-      <EventsSection upcoming={upcoming} />
+      <EventsSection upcoming={upcoming} parseTitleKicker={parseTitleKicker} />
 
       {/* ── How it works ── */}
       <section className="py-5" style={{ backgroundColor: '#F5F7FB' }}>

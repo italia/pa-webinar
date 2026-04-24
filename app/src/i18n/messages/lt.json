@@ -344,7 +344,11 @@
       "settingsGeneral": "Bendri",
       "settingsLanguages": "Kalbos",
       "ariaLabel": "Administravimo navigacija",
-      "subNavAriaLabel": "Skyriaus navigacija"
+      "subNavAriaLabel": "Skyriaus navigacija",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Administravimo skydelis",
@@ -492,6 +496,30 @@
       "noComments": "Komentarų nėra",
       "stars": "žvaigždutės"
     },
+    "coModerators": {
+      "title": "Antriniai moderatoriai ir pranešėjai",
+      "intro": "Pridėkite antrinius moderatorius ir pranešėjus su individualiomis magiškomis nuorodomis.",
+      "introHint": "Kiekvienas asmuo salėje turi matomą vardą ir savo žetoną, kurį galima atšaukti nepriklausomai nuo pagrindinės nuorodos. Pranešėjai gali naudoti mikrofoną, kamerą ir bendrinti ekraną, bet negali moderuoti (pašalinti, nutildyti visus, įrašyti).",
+      "add": "Pridėti asmenį",
+      "name": "Salėje matomas vardas",
+      "email": "El. paštas (neprivaloma)",
+      "emailPlaceholder": "norint išsiųsti nuorodą",
+      "role": "Vaidmuo",
+      "roleModerator": "Moderatorius",
+      "roleSpeaker": "Pranešėjas",
+      "roleModeratorHint": "Visiškas moderavimas: gali įrašyti, nutildyti visus, pašalinti dalyvius.",
+      "roleSpeakerHint": "Gali kalbėti, rodyti vaizdą ir bendrinti ekraną. Negali moderuoti salės.",
+      "copyLink": "Kopijuoti nuorodą",
+      "copied": "Nukopijuota!",
+      "revoke": "Atšaukti",
+      "revoked": "Atšaukta",
+      "confirmRevoke": "Atšaukti šio asmens prieigą? Nuoroda nustos veikti nedelsiant.",
+      "empty": "Papildomų prieigų nesuteikta. Pagrindinė moderatoriaus nuoroda lieka vienintelis privilegijuotas įėjimas.",
+      "activeCount": "{count, plural, =0 {Nėra aktyvių prieigų} =1 {1 aktyvi prieiga} other {# aktyvių prieigų}}",
+      "errors": {
+        "addFailed": "Nepavyko išsaugoti. Bandykite dar kartą."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR audito žurnalas",
       "date": "Data",
@@ -509,6 +537,14 @@
       "subtitle": "Konfigūruokite platformos išvaizdą ir elgseną pakartotiniam VA naudojimui",
       "saving": "Saugoma...",
       "saved": "Nustatymai sėkmingai išsaugoti",
+      "sections": {
+        "languagesTitle": "Kalbų valdymas",
+        "languagesDescription": "Įjunkite arba išjunkite ES kalbas, matomas sąsajoje, pasirinkite numatytąją kalbą ir tinkinkite vertimus.",
+        "gdprTemplatesTitle": "GDPR šablonai",
+        "gdprTemplatesDescription": "Kurkite daugkartinio naudojimo privatumo pranešimus, kuriuos galima susieti su bet kuriuo renginiu, ir pasirinkite numatytąjį naujiems renginiams.",
+        "emailTemplatesTitle": "El. laiškų šablonai",
+        "emailTemplatesDescription": "Tinkinkite patvirtinimo ir priminimo laiškų temą, antraštes ir tekstą. Palikite tuščią, kad būtų naudojami įtaisyti numatytieji tekstai."
+      },
       "tabs": {
         "branding": "Prekės ženklas",
         "header": "Antraštė",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Ar tikrai norite ištrinti šį failą?",
       "noFiles": "Failų neįkelta. Naudokite mygtuką \"Įkelti failą\", kad pridėtumėte medžiagos."
     },
+    "emailTemplates": {
+      "title": "El. laiškų šablonai",
+      "subtitle": "Tinkinkite operacinių el. laiškų temą, antraštes ir tekstą. Palikus tuščius laukus naudojami įtaisyti numatytieji tekstai.",
+      "overridden": "Tinkinta",
+      "usingDefault": "Naudojamas numatytasis",
+      "saved": "Šablonas sėkmingai išsaugotas.",
+      "resetDone": "Tinkinimas pašalintas: bus naudojamas numatytasis tekstas.",
+      "revert": "Atsisakyti pakeitimų",
+      "resetToDefault": "Atstatyti numatytąjį",
+      "confirmReset": "Pašalinti tinkinimą? Bus naudojamas įtaisytas numatytasis tekstas.",
+      "placeholdersTitle": "Galimi rezervuoti žymekliai",
+      "placeholdersHelp": "Įterpkite šiuos žymeklius į bet kurį lauką — siuntimo metu jie bus pakeisti tikrais renginio duomenimis.",
+      "keys": {
+        "confirmation": "Registracijos patvirtinimas",
+        "reminder": "Renginio priminimas"
+      },
+      "selectors": {
+        "key": "Laiško tipas",
+        "locale": "Kalba"
+      },
+      "fields": {
+        "subject": "Tema",
+        "subjectHint": "Laiško tema. Palaiko žymeklius.",
+        "heading": "Pagrindinė antraštė",
+        "headingHint": "Antraštė, rodoma laiško teksto viršuje.",
+        "bodyIntro": "Įvadinė pastraipa",
+        "bodyIntroHint": "Tekstas prieš renginio informacijos lentelę. Tinka pasveikinimo žinutei ar papildomam kontekstui.",
+        "ctaLabel": "Mygtuko etiketė",
+        "ctaLabelHint": "Pagrindinio mygtuko tekstas, vedantis į asmeninį prisijungimo saitą.",
+        "infoNote": "Informacinė pastaba",
+        "infoNoteHint": "Geltonas įspėjimo langelis po mygtuku. Palikite tuščią, kad jis nebūtų rodomas.",
+        "footerNote": "Poraštės pastaba",
+        "footerNoteHint": "Tekstas, rodomas poraštėje po organizacijos parašo."
+      },
+      "errors": {
+        "saveFailed": "Nepavyko išsaugoti. Patikrinkite laukus ir bandykite dar kartą.",
+        "resetFailed": "Nepavyko pašalinti tinkinimo. Bandykite dar kartą."
+      }
+    },
     "languages": {
       "title": "Kalbų valdymas",
       "subtitle": "Konfigūruokite galimas kalbas ir tinkinkite vertimus",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Dubliuoti",
+    "duplicateError": "Dublikavimas nepavyko. Bandykite dar kartą."
   },
   "email": {
     "confirmationSubject": "Registracija patvirtinta: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Sutinku su šio renginio garso/vaizdo įrašymu",
       "recordingRequired": "Norint dalyvauti šiame renginyje, būtinas sutikimas dėl įrašymo",
-      "futureCommunications": "Noriu gauti informaciją apie būsimus DTD organizuojamus renginius"
+      "futureCommunications": "Noriu gauti informaciją apie būsimus DTD organizuojamus renginius",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Mano duomenys",
@@ -1069,6 +1148,102 @@
           "title": "Atsakomybės apribojimai",
           "body": "Nors taikomos tinkamos techninės ir organizacinės priemonės, departamentas negali garantuoti visiško pertrūkių ar gedimų dėl nenumatytų aplinkybių, priežiūros darbų ar išorinių veiksnių nebuvimo. Teisinė atsakomybė reglamentuojama galiojančiais teisės aktais."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Saugumas ir skaidrumas",
+      "title": "Saugumas ir skaidrumas",
+      "intro": "Šios platformos šaltinio kodas yra viešas ir jam taikomi automatiniai saugumo patikrinimai. Šiame puslapyje apžvelgiamos paslaugos naudotojams prieinamos skaidrumo priemonės.",
+      "sections": {
+        "openSource": {
+          "title": "Atvirojo kodo programinė įranga",
+          "body": "Visa platforma išleidžiama kaip laisva programinė įranga. Šaltinio kodą gali peržiūrėti, atsisiųsti ir audituoti bet kas, laikantis Italijos viešojo administravimo skaidrumo principų."
+        },
+        "sbom": {
+          "title": "SBOM (programinės įrangos komponentų sąrašas)",
+          "body": "Kiekvienas „GitHub“ paskelbtas leidimas apima SPDX formato SBOM konteinerio atvaizdui ir CycloneDX formato SBOM programos npm priklausomybėms. Failai pridedami tiesiogiai prie leidimo ir gali būti naudojami saugumo bei atitikties auditams."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Repozitoriją periodiškai analizuoja OpenSSF Scorecard, kuris automatiškai vertina daugybę projekto saugumo praktikų (šakų apsaugą, darbo eigas su minimaliomis teisėmis, pasirašytus commit'us, priklausomybių valdymą). Esamas balas yra viešas."
+        },
+        "scanning": {
+          "title": "Automatiniai patikrinimai",
+          "body": "Priklausomybės nuolat stebimos naudojant „Dependabot“ ir npm audit. Leidimo konvejeris kuria atsekamus atvaizdus naudodamas etiketę org.opencontainers.image.revision, kuri kiekvieną atvaizdą susieja su tiksliu commit'u, iš kurio jis sukurtas."
+        },
+        "disclosure": {
+          "title": "Pažeidžiamumų pranešimas",
+          "body": "Atsakingo atskleidimo politika aprašyta repozitorijos faile SECURITY.md. Saugumo problemas galima konfidencialiai pranešti vadovaujantis ten pateiktomis instrukcijomis."
+        }
+      },
+      "links": {
+        "sourceCode": "Šaltinio kodas",
+        "scorecard": "OpenSSF Scorecard balas",
+        "latestRelease": "Naujausias leidimas (su SBOM)",
+        "securityPolicy": "Atskleidimo politika (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kontaktai",
     "legalNotes": "Teisinės pastabos",
     "governmentSite": "Italijos Vyriausybė",
-    "systemStatus": "Sistemos būsena"
+    "systemStatus": "Sistemos būsena",
+    "sbomLatest": "Naujausio leidimo SBOM",
+    "transparency": "Saugumas ir skaidrumas",
+    "sourceCode": "Šaltinio kodas",
+    "buildInfoDev": "kūrimo versija",
+    "viewCommit": "Peržiūrėti commit'ą „GitHub“",
+    "viewRelease": "Peržiūrėti leidimą „GitHub“",
+    "buildDatePrefix": "Sukurta",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Privatumo politika",
@@ -1454,6 +1637,25 @@
       "materials": "Medžiaga",
       "polls": "Apklausos",
       "feedback": "Atsiliepimai"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

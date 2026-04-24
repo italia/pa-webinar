@@ -344,7 +344,11 @@
       "settingsGeneral": "Generelt",
       "settingsLanguages": "Sprog",
       "ariaLabel": "Administrationsnavigation",
-      "subNavAriaLabel": "Sektionsnavigation"
+      "subNavAriaLabel": "Sektionsnavigation",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Administrationspanel",
@@ -492,6 +496,30 @@
       "noComments": "Ingen kommentarer",
       "stars": "stjerner"
     },
+    "coModerators": {
+      "title": "Medmoderatorer og talere",
+      "intro": "Tilføj medmoderatorer og talere med individuelle magiske links.",
+      "introHint": "Hver person har sit eget synlige navn i rummet og et token, der kan tilbagekaldes uafhængigt af hovedlinket. Talere får mikrofon, kamera og skærmdeling, men kan ikke moderere (smide ud, afbryde lyd for alle, optage).",
+      "add": "Tilføj person",
+      "name": "Navn synligt i rummet",
+      "email": "E-mail (valgfri)",
+      "emailPlaceholder": "for at sende dem linket",
+      "role": "Rolle",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Taler",
+      "roleModeratorHint": "Fuld moderation: kan optage, afbryde lyd for alle og fjerne deltagere.",
+      "roleSpeakerHint": "Kan tale, vise video og dele skærm. Kan ikke moderere rummet.",
+      "copyLink": "Kopier link",
+      "copied": "Kopieret!",
+      "revoke": "Tilbagekald",
+      "revoked": "Tilbagekaldt",
+      "confirmRevoke": "Tilbagekald denne persons adgang? Linket holder straks op med at virke.",
+      "empty": "Ingen ekstra adgang tildelt. Det primære moderatorlink er den eneste privilegerede indgang.",
+      "activeCount": "{count, plural, =0 {Ingen aktive adgange} =1 {1 aktiv adgang} other {# aktive adgange}}",
+      "errors": {
+        "addFailed": "Kunne ikke gemme. Prøv igen."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR-revisionslog",
       "date": "Dato",
@@ -509,6 +537,14 @@
       "subtitle": "Konfigurer platformens udseende og adfærd til genbrug i den offentlige administration",
       "saving": "Gemmer...",
       "saved": "Indstillinger gemt",
+      "sections": {
+        "languagesTitle": "Sproghåndtering",
+        "languagesDescription": "Aktivér eller deaktivér de EU-sprog, der vises i grænsefladen, vælg standardsproget og tilpas oversættelserne.",
+        "gdprTemplatesTitle": "GDPR-skabeloner",
+        "gdprTemplatesDescription": "Opret genanvendelige privatlivserklæringer på tværs af arrangementer, og vælg standardskabelonen for nye arrangementer.",
+        "emailTemplatesTitle": "E-mailskabeloner",
+        "emailTemplatesDescription": "Tilpas emne, overskrifter og tekst i bekræftelses- og påmindelsesmails. Hvis felterne er tomme, bruges standardteksterne."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Header",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Er du sikker på, at du vil slette denne fil?",
       "noFiles": "Ingen filer uploadet. Brug knappen \"Upload fil\" for at tilføje materialer."
     },
+    "emailTemplates": {
+      "title": "E-mailskabeloner",
+      "subtitle": "Tilpas emne, overskrifter og tekst i transaktionsmails. Felter, der efterlades tomme, bruger de indbyggede standardtekster.",
+      "overridden": "Tilpasset",
+      "usingDefault": "Standard",
+      "saved": "Skabelon gemt.",
+      "resetDone": "Tilpasning fjernet: standardteksten bruges nu.",
+      "revert": "Annullér ændringer",
+      "resetToDefault": "Nulstil til standard",
+      "confirmReset": "Fjern tilpasningen? Den indbyggede standardtekst vil blive brugt.",
+      "placeholdersTitle": "Tilgængelige pladsholdere",
+      "placeholdersHelp": "Indsæt disse pladsholdere i felterne: de erstattes ved afsendelse med arrangementets faktiske data.",
+      "keys": {
+        "confirmation": "Bekræftelse af tilmelding",
+        "reminder": "Påmindelse om arrangement"
+      },
+      "selectors": {
+        "key": "E-mailtype",
+        "locale": "Sprog"
+      },
+      "fields": {
+        "subject": "Emne",
+        "subjectHint": "E-mailens emne. Understøtter pladsholdere.",
+        "heading": "Hovedoverskrift",
+        "headingHint": "Overskrift vist øverst i mailens brødtekst.",
+        "bodyIntro": "Indledende afsnit",
+        "bodyIntroHint": "Tekst før tabellen med arrangementsdetaljer. Nyttig til en velkomstmeddelelse eller ekstra kontekst.",
+        "ctaLabel": "Knaptekst",
+        "ctaLabelHint": "Tekst på knappen, der fører til det personlige tilslutningslink.",
+        "infoNote": "Infomeddelelse",
+        "infoNoteHint": "Gult advarselsfelt under knappen. Lad det være tomt for at skjule det.",
+        "footerNote": "Fodnote",
+        "footerNoteHint": "Tekst vist i sidefoden under en eventuel organisationsunderskrift."
+      },
+      "errors": {
+        "saveFailed": "Kunne ikke gemme. Tjek felterne, og prøv igen.",
+        "resetFailed": "Kunne ikke fjerne tilpasningen. Prøv igen."
+      }
+    },
     "languages": {
       "title": "Sprogstyring",
       "subtitle": "Konfigurer tilgængelige sprog, og tilpas oversættelser",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Dupliker",
+    "duplicateError": "Dublering mislykkedes. Prøv igen."
   },
   "email": {
     "confirmationSubject": "Tilmelding bekræftet: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Jeg giver samtykke til lyd-/videooptagelse af denne begivenhed",
       "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
-      "futureCommunications": "Jeg ønsker at modtage information om fremtidige begivenheder arrangeret af DTD"
+      "futureCommunications": "Jeg ønsker at modtage information om fremtidige begivenheder arrangeret af DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Mine data",
@@ -1069,6 +1148,102 @@
           "title": "Ansvarsbegrænsning",
           "body": "Selvom der træffes passende tekniske og organisatoriske foranstaltninger, kan afdelingen ikke garantere fuldstændig fravær af afbrydelser eller fejl forårsaget af uforudsete hændelser, vedligeholdelse eller eksterne faktorer. Det juridiske ansvar reguleres af gældende lov."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Sikkerhed og gennemsigtighed",
+      "title": "Sikkerhed og gennemsigtighed",
+      "intro": "Kildekoden til denne platform er offentlig og underlagt automatiserede sikkerhedskontroller. Denne side opsummerer de gennemsigtighedsværktøjer, der er tilgængelige for alle, der bruger tjenesten.",
+      "sections": {
+        "openSource": {
+          "title": "Open source-software",
+          "body": "Hele platformen er udgivet som fri software. Kildekoden kan undersøges, downloades og auditeres af enhver, i overensstemmelse med den italienske offentlige administrations principper om gennemsigtighed."
+        },
+        "sbom": {
+          "title": "SBOM (Software Bill of Materials)",
+          "body": "Hver udgivelse på GitHub indeholder en SPDX-SBOM for containerbilledet og en CycloneDX-SBOM for applikationens npm-afhængigheder. Filerne er vedhæftet direkte til udgivelsen og kan bruges til sikkerheds- og compliance-audits."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Repositoriet analyseres jævnligt af OpenSSF Scorecard, som automatisk evaluerer snesevis af projektsikkerhedspraksisser (branch-beskyttelse, workflows med mindst mulige rettigheder, signerede commits, afhængighedsstyring). Den aktuelle score er offentlig."
+        },
+        "scanning": {
+          "title": "Automatiseret scanning",
+          "body": "Afhængigheder overvåges løbende via Dependabot og npm audit. Udgivelsespipelinen producerer sporbare billeder via etiketten org.opencontainers.image.revision, som binder hvert billede til den præcise commit, det er bygget fra."
+        },
+        "disclosure": {
+          "title": "Rapportering af sårbarheder",
+          "body": "Politikken for ansvarlig offentliggørelse er beskrevet i filen SECURITY.md i repositoriet. Sikkerhedsproblemer kan rapporteres fortroligt efter instruktionerne der."
+        }
+      },
+      "links": {
+        "sourceCode": "Kildekode",
+        "scorecard": "OpenSSF Scorecard-score",
+        "latestRelease": "Seneste udgivelse (med SBOM)",
+        "securityPolicy": "Offentliggørelsespolitik (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kontakt",
     "legalNotes": "Juridiske bemærkninger",
     "governmentSite": "Den Italienske Regering",
-    "systemStatus": "Systemstatus"
+    "systemStatus": "Systemstatus",
+    "sbomLatest": "SBOM for seneste udgivelse",
+    "transparency": "Sikkerhed og gennemsigtighed",
+    "sourceCode": "Kildekode",
+    "buildInfoDev": "udviklingsbuild",
+    "viewCommit": "Se commit på GitHub",
+    "viewRelease": "Se udgivelse på GitHub",
+    "buildDatePrefix": "Bygget den",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Privatlivspolitik",
@@ -1454,6 +1637,25 @@
       "materials": "Materialer",
       "polls": "Afstemninger",
       "feedback": "Feedback"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

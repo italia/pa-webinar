@@ -329,6 +329,16 @@ interface PromSnapshot {
   memorySeries: Array<[number, number]>;
   uptimeSeries: Array<[number, number]>;
   octoSeries: Array<[number, number]>;
+  // chat + redis
+  chatMessagesPerMin: number | null;
+  chatSseConnections: number | null;
+  redisConnectedClients: number | null;
+  redisMemoryBytes: number | null;
+  redisOpsPerSec: number | null;
+  redisPubsubChannels: number | null;
+  chatMessagesSeries: Array<[number, number]>;
+  chatSseSeries: Array<[number, number]>;
+  redisMemorySeries: Array<[number, number]>;
 }
 
 // ─── Main component ─────────────────────────────────────────────
@@ -374,6 +384,16 @@ export default function MonitoringDashboard() {
         memRange,
         uptimeRange,
         octoRange,
+        // chat + redis
+        chatMsgRateRes,
+        chatSseRes,
+        redisClientsRes,
+        redisMemoryRes,
+        redisOpsRes,
+        redisPubsubRes,
+        chatMsgRateRange,
+        chatSseRange,
+        redisMemoryRange,
         // analytics
         analyticsRes,
       ] = await Promise.all([
@@ -401,6 +421,18 @@ export default function MonitoringDashboard() {
         promRangeQuery(`process_resident_memory_bytes{${app}}`, range),
         promRangeQuery(`avg(up{${app}}) * 100`, range),
         promRangeQuery(`eventi_jvb_octo_send_bitrate_bps{${app}}`, range),
+        // Chat fan-out — app-level counters + the Bitnami redis-exporter.
+        // Redis exporter labels the scrape target by the subchart service
+        // (…-redis-metrics), not by `app`, so we don't constrain on {app}.
+        promQuery(`sum(rate(eventi_chat_messages_total{${app}}[5m])) * 60`),
+        promQuery(`sum(eventi_chat_sse_connections{${app}})`),
+        promQuery(`sum(redis_connected_clients)`),
+        promQuery(`sum(redis_memory_used_bytes)`),
+        promQuery(`sum(rate(redis_commands_processed_total[5m]))`),
+        promQuery(`sum(redis_pubsub_channels)`),
+        promRangeQuery(`sum(rate(eventi_chat_messages_total{${app}}[5m])) * 60`, range),
+        promRangeQuery(`sum(eventi_chat_sse_connections{${app}})`, range),
+        promRangeQuery(`sum(redis_memory_used_bytes)`, range),
         fetch(`/api/admin/monitoring/analytics?range=${range}`).then((r) => r.json() as Promise<AnalyticsResponse>),
       ]);
 
@@ -430,6 +462,15 @@ export default function MonitoringDashboard() {
         memorySeries: extractSeries(memRange),
         uptimeSeries: extractSeries(uptimeRange),
         octoSeries: extractSeries(octoRange),
+        chatMessagesPerMin: extractScalar(chatMsgRateRes),
+        chatSseConnections: extractScalar(chatSseRes),
+        redisConnectedClients: extractScalar(redisClientsRes),
+        redisMemoryBytes: extractScalar(redisMemoryRes),
+        redisOpsPerSec: extractScalar(redisOpsRes),
+        redisPubsubChannels: extractScalar(redisPubsubRes),
+        chatMessagesSeries: extractSeries(chatMsgRateRange),
+        chatSseSeries: extractSeries(chatSseRange),
+        redisMemorySeries: extractSeries(redisMemoryRange),
       });
       setAnalytics(analyticsRes);
     } catch (e) {
@@ -638,6 +679,87 @@ export default function MonitoringDashboard() {
               <div className="fw-semibold mb-2" style={{ fontSize: '0.88rem' }}>{t('chartMemory')}</div>
               <LineChart series={prom?.memorySeries ?? []} color="#7B1FA2" height={120} format={(v) => `${(v / 1024 / 1024).toFixed(0)} MiB`} />
               <div className="text-muted mt-1" style={{ fontSize: '0.72rem' }}>{t('memHelp')}</div>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* ─── Chat & real-time (Redis pub/sub) ───────────────── */}
+      <h5 className="fw-semibold mb-3">{t('sectionChat')}</h5>
+      <Row className="g-3 mb-4">
+        <Col md={3} sm={6}>
+          <KpiCard
+            title={t('chatMessagesPerMin')}
+            value={prom?.chatMessagesPerMin !== null && prom?.chatMessagesPerMin !== undefined
+              ? prom.chatMessagesPerMin.toFixed(1)
+              : '—'}
+            subtitle={t('chatMessagesSubtitle')}
+            color="#0066CC"
+            trend={prom?.chatMessagesSeries}
+          />
+        </Col>
+        <Col md={3} sm={6}>
+          <KpiCard
+            title={t('chatSseConnections')}
+            value={prom?.chatSseConnections !== null && prom?.chatSseConnections !== undefined
+              ? String(Math.round(prom.chatSseConnections))
+              : '—'}
+            subtitle={t('chatSseSubtitle')}
+            color="#008758"
+            trend={prom?.chatSseSeries}
+          />
+        </Col>
+        <Col md={3} sm={6}>
+          <KpiCard
+            title={t('redisConnectedClients')}
+            value={prom?.redisConnectedClients !== null && prom?.redisConnectedClients !== undefined
+              ? String(Math.round(prom.redisConnectedClients))
+              : '—'}
+            subtitle={t('redisConnectedSubtitle')}
+          />
+        </Col>
+        <Col md={3} sm={6}>
+          <KpiCard
+            title={t('redisPubsubChannels')}
+            value={prom?.redisPubsubChannels !== null && prom?.redisPubsubChannels !== undefined
+              ? String(Math.round(prom.redisPubsubChannels))
+              : '—'}
+            subtitle={t('redisPubsubSubtitle')}
+          />
+        </Col>
+      </Row>
+      <Row className="g-3 mb-4">
+        <Col md={6}>
+          <Card className="border-0 shadow-sm h-100">
+            <CardBody className="p-3">
+              <div className="fw-semibold mb-2" style={{ fontSize: '0.88rem' }}>{t('chartRedisMemory')}</div>
+              <LineChart
+                series={prom?.redisMemorySeries ?? []}
+                color="#A66300"
+                height={120}
+                format={(v) => `${(v / 1024 / 1024).toFixed(1)} MiB`}
+              />
+              <div className="text-muted mt-1" style={{ fontSize: '0.72rem' }}>
+                {t('redisMemoryHelp', {
+                  ops: prom?.redisOpsPerSec !== null && prom?.redisOpsPerSec !== undefined
+                    ? prom.redisOpsPerSec.toFixed(1)
+                    : '—',
+                })}
+              </div>
+            </CardBody>
+          </Card>
+        </Col>
+        <Col md={6}>
+          <Card className="border-0 shadow-sm h-100">
+            <CardBody className="p-3">
+              <div className="fw-semibold mb-2" style={{ fontSize: '0.88rem' }}>{t('chartChatSseConnections')}</div>
+              <LineChart
+                series={prom?.chatSseSeries ?? []}
+                color="#008758"
+                height={120}
+                format={(v) => String(Math.round(v))}
+              />
+              <div className="text-muted mt-1" style={{ fontSize: '0.72rem' }}>{t('chatSseHelp')}</div>
             </CardBody>
           </Card>
         </Col>

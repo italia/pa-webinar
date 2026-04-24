@@ -2,10 +2,14 @@ import { describe, it, expect } from 'vitest';
 import {
   baseToolbarButtons,
   moderatorToolbarButtons,
+  mobileBaseToolbarButtons,
+  mobileModeratorToolbarButtons,
   jitsiConfigOverwrite,
   jitsiInterfaceConfigOverwrite,
   participantFeatures,
   moderatorFeatures,
+  speakerFeatures,
+  speakerToolbarButtons,
   instantCallToolbarButtons,
   instantCallModeratorToolbarButtons,
   instantCallConfigOverwrite,
@@ -46,6 +50,42 @@ describe('Jitsi config exports', () => {
     expect(participantFeatures['screen-sharing']).toBe(true);
     expect(moderatorFeatures['screen-sharing']).toBe(true);
   });
+
+  it('speaker features allow screen-sharing but not recording', () => {
+    expect(speakerFeatures['screen-sharing']).toBe(true);
+    expect(speakerFeatures.recording).toBe(false);
+    expect(speakerFeatures.livestreaming).toBe(false);
+  });
+
+  it('speaker toolbar excludes moderator-only buttons', () => {
+    expect(speakerToolbarButtons).not.toContain('hangup');
+    expect(speakerToolbarButtons).not.toContain('mute-everyone');
+    expect(speakerToolbarButtons).not.toContain('security');
+  });
+
+  it('mobileBaseToolbarButtons trims overwhelming controls', () => {
+    expect(mobileBaseToolbarButtons).toContain('microphone');
+    expect(mobileBaseToolbarButtons).toContain('camera');
+    // `desktop` deliberately excluded on mobile: getDisplayMedia() inside an
+    // iframe is rejected by iOS Safari and most Android browsers, so the
+    // button would only surface misleading errors.
+    expect(mobileBaseToolbarButtons).not.toContain('desktop');
+    expect(mobileBaseToolbarButtons).toContain('raisehand');
+    expect(mobileBaseToolbarButtons).toContain('settings');
+    expect(mobileBaseToolbarButtons).not.toContain('filmstrip');
+    expect(mobileBaseToolbarButtons).not.toContain('tileview');
+    expect(mobileBaseToolbarButtons).not.toContain('fullscreen');
+    expect(mobileBaseToolbarButtons).not.toContain('select-background');
+    expect(mobileBaseToolbarButtons).not.toContain('hangup');
+  });
+
+  it('mobileModeratorToolbarButtons extends mobile base with hangup and participants-pane', () => {
+    for (const btn of mobileBaseToolbarButtons) {
+      expect(mobileModeratorToolbarButtons).toContain(btn);
+    }
+    expect(mobileModeratorToolbarButtons).toContain('hangup');
+    expect(mobileModeratorToolbarButtons).toContain('participants-pane');
+  });
 });
 
 describe('Jitsi config overwrite', () => {
@@ -71,6 +111,17 @@ describe('Jitsi config overwrite', () => {
 
   it('disables native reactions (handled by custom overlay)', () => {
     expect(jitsiConfigOverwrite.disableReactions).toBe(true);
+  });
+
+  it('disables kick by default (participants must not see the kick button)', () => {
+    // JitsiRoom flips this to false in configOverwrite when role === 'moderator'
+    // so the participants-pane "rimuovi utente" action fires. Participants keep
+    // the safe default so they never see a non-functional kick option.
+    expect(jitsiConfigOverwrite.remoteVideoMenu.disableKick).toBe(true);
+  });
+
+  it('disables grant-moderator via UI (grant is driven by JWT only)', () => {
+    expect(jitsiConfigOverwrite.remoteVideoMenu.disableGrantModerator).toBe(true);
   });
 
   it('does NOT include customTheme (server-side only)', () => {

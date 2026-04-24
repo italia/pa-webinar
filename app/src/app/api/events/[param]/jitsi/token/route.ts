@@ -9,7 +9,7 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
-import { constantTimeEqual } from '@/lib/auth/moderator';
+import { EventModeratorRole, verifyGrantToken } from '@/lib/auth/moderator';
 import {
   generateJitsiJwt,
   moderatorJitsiId,
@@ -43,26 +43,29 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ConflictError('Event is not active', { currentStatus: event.status });
   }
 
-  // ── Moderator flow ──
+  // ── Grant flow (primary moderator, co-moderator, or speaker) ──
   if (moderatorToken) {
-    if (!constantTimeEqual(event.moderatorToken, moderatorToken)) {
+    const grant = await verifyGrantToken(event.slug, moderatorToken);
+    if (!grant) {
       throw new ForbiddenError('Invalid moderator token');
     }
 
-    const name = displayNameOverride || event.moderatorName || 'Moderatore';
+    const isSpeaker = grant.role === EventModeratorRole.SPEAKER;
+    const fallbackName = isSpeaker ? 'Relatore' : 'Moderatore';
+    const name = displayNameOverride || grant.displayName || fallbackName;
 
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: name,
       uniqueId: moderatorJitsiId(event.id),
-      isModerator: true,
+      isModerator: !isSpeaker,
     });
 
     return Response.json({
       jwt,
       roomName: event.jitsiRoomName,
       displayName: name,
-      role: 'moderator',
+      role: isSpeaker ? 'speaker' : 'moderator',
     }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
@@ -113,8 +116,14 @@ export const POST = withErrorHandling(async (request, context) => {
       throw new ConflictError('Guest access is only available during live events');
     }
 
+    // Default 120/min per IP to accommodate bursts of participants joining
+    // from a shared corporate NAT (common scenario: announcing the link
+    // during an MS Teams call where 100+ colleagues click simultaneously).
+    // Tunable per-deploy via GUEST_JWT_RATE_LIMIT_PER_MINUTE; the in-memory
+    // limiter is per-pod, so the effective ceiling is N_replicas × limit.
     const ip = getClientIp(request);
-    const rl = rateLimit(`guest-jwt:${ip}`, { limit: 5, windowMs: 60_000 });
+    const limit = parseInt(process.env.GUEST_JWT_RATE_LIMIT_PER_MINUTE || '120', 10);
+    const rl = rateLimit(`guest-jwt:${ip}`, { limit, windowMs: 60_000 });
     if (!rl.allowed) {
       throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
     }

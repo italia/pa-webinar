@@ -121,9 +121,10 @@ describe('generateJitsiJwt', () => {
     delete process.env.JITSI_JWT_SUBJECT;
   });
 
-  it('includes avatar URL pointing to our API', async () => {
-    process.env.NEXT_PUBLIC_APP_URL = 'https://videocall-test.innovazione.gov.it';
-
+  it('embeds avatar as inline SVG data URI (CSP-safe for Jitsi web)', async () => {
+    // History: avatars used to be served by /api/avatar, but Jitsi web's CSP
+    // blocks remote images on the prejoin screen, so generateAvatarDataUri
+    // now inlines a Bootstrap Italia initials SVG as a data: URI.
     const jwt = await generateJitsiJwt({
       roomName: 'room',
       displayName: 'Raff',
@@ -133,16 +134,18 @@ describe('generateJitsiJwt', () => {
 
     const payload = await decodeJwt(jwt);
     const ctx = payload.context as { user: Record<string, string> };
-    expect(ctx.user.avatar).toContain('/api/avatar');
-    expect(ctx.user.avatar).toContain('name=Raff');
-    expect(ctx.user.avatar).not.toContain('gh=');
-
-    delete process.env.NEXT_PUBLIC_APP_URL;
+    const avatar = ctx.user.avatar ?? '';
+    expect(avatar).toMatch(/^data:image\/svg\+xml;base64,/);
+    // Initials come from displayName — decode and spot-check.
+    const base64 = avatar.split(',')[1] ?? '';
+    const svg = Buffer.from(base64, 'base64').toString('utf-8');
+    expect(svg).toContain('<svg');
+    expect(svg).toContain('>R<'); // single-initial "R" for "Raff"
   });
 
-  it('includes Gravatar MD5 hash in avatar URL when email provided', async () => {
-    process.env.NEXT_PUBLIC_APP_URL = 'https://videocall-test.innovazione.gov.it';
-
+  it('never leaks raw email into avatar payload (GDPR)', async () => {
+    // Even when we have the email we must not ship it in the JWT; the
+    // avatar is derived from the displayName only.
     const jwt = await generateJitsiJwt({
       roomName: 'room',
       displayName: 'Mario Rossi',
@@ -153,10 +156,9 @@ describe('generateJitsiJwt', () => {
 
     const payload = await decodeJwt(jwt);
     const ctx = payload.context as { user: Record<string, string> };
-    expect(ctx.user.avatar).toContain('gh=');
+    expect(ctx.user.avatar).toMatch(/^data:image\/svg\+xml;base64,/);
     expect(ctx.user.avatar).not.toContain('mario@');
-
-    delete process.env.NEXT_PUBLIC_APP_URL;
+    expect(ctx.user.avatar).not.toContain('example.com');
   });
 
   it('includes features in context', async () => {

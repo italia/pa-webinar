@@ -23,7 +23,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
           <AdminBreadcrumb />
         </>
       )}
-      {children}
+      <div className="admin-form-surface">{children}</div>
     </>
   );
 }

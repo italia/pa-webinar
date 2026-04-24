@@ -5,6 +5,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { getSettings } from '@/lib/settings';
 import EventManagementClient from '@/components/admin/event-management-client';
 
 interface EventManagePageProps {
@@ -73,6 +74,10 @@ export default async function EventManagePage({
         orderBy: { createdAt: 'desc' },
         take: 50,
       },
+      tagLinks: { include: { tag: true } },
+      organizers: { orderBy: { sortOrder: 'asc' } },
+      additionalMods: { orderBy: { createdAt: 'asc' } },
+      questionnaires: true,
       _count: { select: { registrations: true } },
     },
   });
@@ -85,6 +90,7 @@ export default async function EventManagePage({
   }
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
+  const settings = await getSettings();
 
   const serialized = {
     id: event.id,
@@ -95,6 +101,7 @@ export default async function EventManagePage({
     endsAt: event.endsAt.toISOString(),
     timezone: event.timezone,
     maxParticipants: event.maxParticipants,
+    peakParticipants: event.peakParticipants,
     registrationCount: event._count.registrations,
     qaEnabled: event.qaEnabled,
     chatEnabled: event.chatEnabled,
@@ -103,6 +110,11 @@ export default async function EventManagePage({
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
+    coverImageUrl: event.coverImageUrl,
+    imageUrl: event.imageUrl,
+    parseTitleKicker: event.parseTitleKicker,
+    expectedSenderRatioPct: event.expectedSenderRatioPct,
+    capacityEstimateJson: event.capacityEstimateJson as Record<string, unknown> | null,
     recordingUrl: event.recordingUrl,
     tempRecordingUrl: event.tempRecordingUrl,
     tempRecordingStartedAt: event.tempRecordingStartedAt?.toISOString() ?? null,
@@ -131,6 +143,26 @@ export default async function EventManagePage({
     requireOrganization: event.requireOrganization,
     requireOrganizationRole: event.requireOrganizationRole,
     requireOrganizationType: event.requireOrganizationType,
+    tags: event.tagLinks.map((link) => ({
+      id: link.tag.id,
+      slug: link.tag.slug,
+      name: link.tag.name as Record<string, string>,
+      color: link.tag.color,
+    })),
+    organizers: event.organizers.map((o) => ({
+      id: o.id,
+      name: o.name,
+      logoUrl: o.logoUrl,
+      websiteUrl: o.websiteUrl,
+    })),
+    eventModerators: event.additionalMods.map((m) => ({
+      id: m.id,
+      name: m.name,
+      email: m.email,
+      role: m.role,
+      revokedAt: m.revokedAt?.toISOString() ?? null,
+    })),
+    questionnaireCount: event.questionnaires.length,
     registrations: event.registrations.map((r) => ({
       id: r.id,
       displayName: r.displayName,
@@ -164,12 +196,20 @@ export default async function EventManagePage({
     })),
   };
 
+  // The effective kicker flag: per-event override if set, otherwise
+  // inherit the site-wide default.
+  const effectiveKicker =
+    event.parseTitleKicker !== null
+      ? event.parseTitleKicker
+      : settings.parseTitleKicker;
+
   return (
     <div className="container py-5">
       <EventManagementClient
         event={serialized}
         baseUrl={baseUrl}
         locale={locale}
+        kickerEnabled={effectiveKicker}
       />
     </div>
   );
