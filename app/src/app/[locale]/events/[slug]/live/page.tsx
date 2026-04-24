@@ -52,7 +52,20 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // isn't ready, handing out a JWT or embedding Jitsi now would dump the
   // user onto a cold pod. ProvisioningScreen calls /wake and polls until
   // the scaler brings the bridge up, then reloads this page.
-  if (event.status === 'IDLE' || event.status === 'PROVISIONING') {
+  //
+  // EXCEPTION: when an event is PROVISIONING but startsAt is still in
+  // the future (pre-scale window scenario), the bridge warm-up is a
+  // background concern — the user is here early and should see the
+  // waiting room with its countdown, netiquette, device check and
+  // chat preview, not a spinner. Let the waiting room render; it'll
+  // show "Apertura alle HH:MM" and auto-enable "Entra ora" the moment
+  // the scaler promotes PROVISIONING → LIVE at startsAt.
+  const now = new Date();
+  const startsAt = new Date(event.startsAt);
+  const bridgeColdStart =
+    event.status === 'IDLE' ||
+    (event.status === 'PROVISIONING' && startsAt <= now);
+  if (bridgeColdStart) {
     const title = getLocalized(event.title as LocalizedField, locale);
     return (
       <ProvisioningScreen
