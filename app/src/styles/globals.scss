@@ -1748,3 +1748,117 @@
     }
   }
 }
+
+// ── Waiting-room garden scene (ADR-012, fase 0) ──
+// Decorative background displayed behind the waiting-room card. The
+// scene itself is in `<GardenScene>`; this sheet owns the layout +
+// keyframes. Everything respects `prefers-reduced-motion`: users who
+// opted out of motion in their OS see a still scene.
+
+.waiting-garden-bg {
+  position: relative;
+  min-height: 100%;
+  background: linear-gradient(180deg, #BCE0FF 0%, #FFE9CF 60%, #FFD8B8 100%);
+}
+
+.garden-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.garden-scene .garden-sun {
+  transform-origin: 1580px 220px;
+  animation: gardenSunPulse 6s ease-in-out infinite;
+}
+
+.garden-scene .garden-tree {
+  transform-origin: center bottom;
+  animation: gardenSway 5s ease-in-out infinite;
+}
+.garden-scene .garden-tree--2 { animation-delay: -1.3s; animation-duration: 6s; }
+.garden-scene .garden-tree--3 { animation-delay: -2.6s; animation-duration: 5.5s; }
+
+.garden-scene .garden-fountain-jet {
+  animation: gardenJet 1.6s ease-in-out infinite;
+  transform-origin: 0 0;
+}
+
+.garden-scene .garden-fountain-drops circle {
+  animation: gardenDrop 1.8s ease-in-out infinite;
+}
+.garden-scene .garden-fountain-drops circle:nth-child(2) { animation-delay: -0.4s; }
+.garden-scene .garden-fountain-drops circle:nth-child(3) { animation-delay: -0.8s; }
+.garden-scene .garden-fountain-drops circle:nth-child(4) { animation-delay: -1.2s; }
+
+.garden-scene .garden-steam path {
+  animation: gardenSteam 3s ease-in-out infinite;
+  transform-origin: bottom center;
+  opacity: 0;
+}
+.garden-scene .garden-steam path:nth-child(2) { animation-delay: -1s; }
+.garden-scene .garden-steam path:nth-child(3) { animation-delay: -2s; }
+
+.garden-scene .garden-music-notes > g {
+  animation: gardenNote 4s ease-out infinite;
+  transform-origin: center;
+  opacity: 0;
+}
+.garden-scene .garden-music-notes__2 { animation-delay: -1.3s; }
+.garden-scene .garden-music-notes__3 { animation-delay: -2.6s; }
+
+@keyframes gardenSunPulse {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.05); }
+}
+
+@keyframes gardenSway {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50%      { transform: rotate(1.2deg); }
+}
+
+@keyframes gardenJet {
+  0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.85; }
+  50%      { transform: translateY(-6px) scaleY(1.08); opacity: 1; }
+}
+
+@keyframes gardenDrop {
+  0%   { transform: translateY(-20px); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translateY(20px); opacity: 0; }
+}
+
+@keyframes gardenSteam {
+  0%   { transform: translateY(0); opacity: 0; }
+  20%  { opacity: 0.75; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+@keyframes gardenNote {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  10%  { opacity: 0.8; }
+  100% { transform: translate(20px, -80px); opacity: 0; }
+}
+
+// Reduced-motion: honor the OS/browser setting. Users sensitive to
+// motion get a still scene (no sway, no water spray, no steam).
+@media (prefers-reduced-motion: reduce) {
+  .garden-scene *,
+  .garden-scene *::before,
+  .garden-scene *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+// Mobile: scale down the visual weight so the scene never steals
+// focus from the waiting-room card above it.
+@media (max-width: 767.98px) {
+  .garden-scene {
+    opacity: 0.55;
+  }
+}
