@@ -18,6 +18,7 @@ import { Link } from '@/i18n/navigation';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
 import DeviceCheck from '@/components/live/device-check';
+import GardenScene from '@/components/live/garden-scene';
 import VideoPlayer from '@/components/events/video-player';
 import EventTitle from '@/components/events/event-title';
 
@@ -295,10 +296,17 @@ export default function WaitingRoom({
   });
 
   return (
-    <div className="container py-4">
-      <div className="row justify-content-center">
-        <div className="col-lg-8 col-xl-7">
-          <Card className="shadow-sm border-0 overflow-hidden" style={{ borderRadius: 16 }}>
+    <div className="waiting-garden-bg">
+      {/* Decorative pixel-art style garden scene behind the card. Pure
+          SVG + CSS animations, respects prefers-reduced-motion, and is
+          aria-hidden so the card content above remains the accessible
+          source of truth. See ADR-012 for the roadmap towards a full
+          interactive lobby. */}
+      <GardenScene />
+      <div className="container py-4" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="row justify-content-center">
+          <div className="col-lg-8 col-xl-7">
+            <Card className="shadow-sm border-0 overflow-hidden" style={{ borderRadius: 16 }}>
             {/* Hero cover image (or branded gradient fallback) */}
             <div
               className="waiting-hero"
@@ -667,6 +675,7 @@ export default function WaitingRoom({
               )}
             </CardBody>
           </Card>
+          </div>
         </div>
       </div>
     </div>
