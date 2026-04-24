@@ -160,7 +160,7 @@ jobs:
           cat release-notes.md
 
       - name: Upload SBOMs to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body_path: release-notes.md
           files: |
@@ -192,6 +192,6 @@ jobs:
             --app-version "$VERSION"
 
       - name: Upload chart to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: eventi-dtd-*.tgz
