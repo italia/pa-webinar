@@ -299,7 +299,9 @@
       "live": "👥 {count, plural, one {# person} other {# people}}"
     },
     "sidebarTabChatUnread": "New unread messages",
-    "floatingControlsLabel": "Event controls"
+    "floatingControlsLabel": "Event controls",
+    "screenshareActive": "🖥️ {name} is sharing their screen",
+    "screenshareFallbackName": "A participant"
   },
   "qa": {
     "title": "Questions & Answers",
@@ -2616,6 +2618,7 @@
     "cameraToggleOff": "Camera OFF",
     "micToggleOn": "Microphone ON",
     "micToggleOff": "Microphone OFF",
-    "cameraOffPreview": "Camera off"
+    "cameraOffPreview": "Camera off",
+    "speakerTest": "🔊 Test audio"
   }
 }

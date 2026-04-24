@@ -57,6 +57,7 @@ export interface JitsiEventMap {
   tileViewChanged: [{ enabled: boolean }];
   filmstripDisplayChanged: [{ visible: boolean }];
   participantsPaneToggled: [{ open: boolean }];
+  screenSharingStatusChanged: [{ id: string; on: boolean }];
   incomingMessage: [JitsiChatMessage];
   outgoingMessage: [JitsiChatMessage];
 }
