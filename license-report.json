@@ -1351,7 +1351,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/vitest-dev/vitest"
   },
-  "@xmldom/xmldom@0.9.9": {
+  "@xmldom/xmldom@0.8.13": {
     "licenses": "MIT",
     "repository": "https://github.com/xmldom/xmldom"
   },
