@@ -8,7 +8,9 @@
 
 Piattaforma open-source per eventi pubblici digitali della Pubblica Amministrazione italiana, basata su [Jitsi Meet](https://jitsi.org/) e il [design system .italia](https://designers.italia.it/). Sviluppata dal [Dipartimento per la Trasformazione Digitale](https://innovazione.gov.it/).
 
-> **English**: open-source platform for public digital events — webinars, public meetings, participatory sessions — built on Jitsi Meet and Bootstrap Italia. Kubernetes-native with **on-demand bridge scaling** (scale-to-zero between events). See [Architecture](docs/ARCHITECTURE.md).
+Interfaccia utente disponibile in **24 lingue UE** configurabili a runtime dall'amministratore (italiano impostato come default). Rilasciata con licenza EUPL-1.2 e pensata per il riuso in tutta la Pubblica Amministrazione europea.
+
+🇬🇧 **English version**: [README.en.md](README.en.md)
 
 ---
 
