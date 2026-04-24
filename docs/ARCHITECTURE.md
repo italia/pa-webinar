@@ -2,7 +2,7 @@
 
 Documento tecnico di riferimento per sviluppatori, sistemisti e personale tecnico della PA.
 
-Ultimo aggiornamento: aprile 2026
+Ultimo aggiornamento: 24 aprile 2026
 
 ---
 
@@ -79,31 +79,44 @@ Il portale è un'applicazione Next.js 15 con App Router. Utilizza Server Compone
 ```mermaid
 graph TD
     subgraph "App Router - [locale]"
-        HOME["/ <br/> Lista eventi pubblici"]
-        EVENTS["/eventi <br/> Catalogo eventi"]
-        DETAIL["/eventi/[slug] <br/> Dettaglio evento"]
+        HOME["/ <br/> Home (lista o splash, da SiteSetting)"]
+        EVENTS["/eventi <br/> Catalogo (filtro ?tag=)"]
+        DETAIL["/eventi/[slug] <br/> Dettaglio evento + tag chips"]
         REG["/eventi/[slug]/registrazione <br/> Form registrazione"]
-        LIVE["/eventi/[slug]/live <br/> Sala evento con Jitsi"]
-        ADMIN["/admin <br/> Dashboard amministratore"]
-        ADMIN_NEW["/admin/eventi/nuovo <br/> Creazione evento"]
-        ADMIN_EDIT["/admin/eventi/[id] <br/> Gestione evento"]
-        ADMIN_LOGIN["/admin/login <br/> Login amministratore"]
+        LIVE["/eventi/[slug]/live <br/> WaitingRoom → DeviceCheck → Jitsi"]
+        VIDLIB["/video-library <br/> Registrazioni pubbliche + legacy"]
+        RUBRICA_OPTOUT["/rubrica/opt-out <br/> Opt-out Person"]
+        ADMIN["/admin <br/> Dashboard"]
+        ADMIN_NEW["/admin/eventi/nuovo <br/> Wizard (create)"]
+        ADMIN_EDIT["/admin/eventi/[id] <br/> Wizard (edit) + sessions"]
+        ADMIN_RUB["/admin/rubrica <br/> CRUD Person"]
+        ADMIN_TAGS["/admin/settings/tags <br/> CRUD Tag"]
+        ADMIN_SET["/admin/settings <br/> SiteSetting (branding, sizing, jvbScaler…)"]
+        ADMIN_MON["/admin/monitoring <br/> Prometheus dashboard"]
+        ADMIN_LOGIN["/admin/login"]
     end
 
-    subgraph "API Routes"
-        API_EVENTS["/api/events <br/> CRUD eventi"]
-        API_REG["/api/events/[param]/registrations <br/> Registrazioni"]
-        API_JWT["/api/events/[param]/jitsi/token <br/> JWT Jitsi"]
-        API_QA["/api/events/[param]/questions <br/> Domande Q&A"]
-        API_UPVOTE["/api/events/[param]/questions/[id]/upvote <br/> Upvote"]
-        API_CRON_CLEAN["/api/cron/cleanup <br/> Pulizia GDPR"]
-        API_CRON_REMIND["/api/cron/reminders <br/> Promemoria email"]
-        API_HEALTH["/api/health <br/> Health check"]
-        API_ADMIN_LOGIN["/api/admin/login <br/> Autenticazione admin"]
+    subgraph "API Routes (REST)"
+        API_EVENTS["/api/events <br/> CRUD eventi + wizard"]
+        API_REG["/api/events/:param/registrations"]
+        API_JWT["/api/events/:param/jitsi/token"]
+        API_QA["/api/events/:param/questions <br/> (registrationId nullable)"]
+        API_CHAT["/api/events/:param/chat <br/> POST + GET /stream (SSE)"]
+        API_SESS["/api/events/:param/sessions <br/> POST (open) + GET (list)"]
+        API_POLLS["/api/events/:param/polls"]
+        API_WC["/api/events/:param/wordcloud"]
+        API_QNR["/api/events/:param/questionnaires"]
+        API_SCALER["/api/internal/jvb-desired-replicas <br/> (scaler → Redis snapshot)"]
+        API_OPTOUT["/api/rubrica/opt-out <br/> HMAC token"]
+        API_CRON_CLEAN["/api/cron/cleanup"]
+        API_CRON_REMIND["/api/cron/reminders"]
+        API_CRON_RUB["/api/cron/rubrica-retention"]
+        API_HEALTH["/api/health + /api/ready + /api/status"]
+        API_METRICS["/api/metrics <br/> Prometheus (scraped)"]
     end
 
     subgraph "Middleware"
-        MW["middleware.ts <br/> Auth + Locale detection"]
+        MW["middleware.ts <br/> Auth (admin) + Locale detection + CSP"]
     end
 
     MW --> HOME
@@ -126,12 +139,17 @@ graph TD
 | `lib/ical/` | Generazione file .ics per eventi calendario |
 | `lib/validation/` | Schema Zod per tutte le entità |
 | `lib/crypto/` | Cifratura PII (AES-256-GCM) e hashing email (SHA-256) |
+| `lib/persons/` | Identità cross-evento (rubrica): opt-out HMAC signed token, CRUD `Person` |
+| `lib/jvb-sizing.ts` | Formula lineare di sizing JVB (senders/receivers per core) |
+| `lib/jvb-snapshot.ts` | Reader del Redis snapshot `jvb:replicas:snapshot` scritto dallo scaler |
 | `lib/rate-limit.ts` | Rate limiting in-memory per endpoint |
-| `components/jitsi/` | JitsiRoom, ModeratorControls, RecordingConsent, RaisedHandsPanel |
+| `components/jitsi/` | JitsiRoom, ModeratorControls, RaisedHandsPanel (read-only per attendee, con approve-mic/video per moderator) |
+| `components/live/` | WaitingRoom (front-door unificato), DeviceCheck (cam/mic toggle + chime test), ChatPanel, ReactionBar, PresentationTimer, WordCloud, AudioPlayer, LiveEventClient (Meet-style controls) |
+| `components/admin/event-wizard/` | 5-step wizard per create + edit (WizardShell + 5 step components) |
 | `components/qa/` | QuestionForm, QuestionList, QAPanel |
 | `components/admin/` | Dashboard, form creazione, gestione evento |
 | `components/layout/` | Header PA, footer, language switcher, skiplinks |
-| `i18n/messages/` | File JSON con stringhe IT e EN |
+| `i18n/messages/` | File JSON con stringhe IT + 23 lingue EU |
 
 ### Jitsi Meet
 
@@ -299,7 +317,16 @@ erDiagram
     }
 ```
 
-**Enum EventStatus:** `DRAFT` | `PUBLISHED` | `LIVE` | `ENDED` | `ARCHIVED`
+**Enum EventStatus:** `DRAFT` | `PUBLISHED` | `PROVISIONING` | `LIVE` | `IDLE` | `ENDED` | `ARCHIVED`
+
+- `PROVISIONING` — il JVB è in allestimento (nodo in cold-start o pod in boot).
+  Lo scaler solleva lo stato `jvbPreScaleMinutes` prima di `startsAt`.
+- `IDLE` — evento già passato in `LIVE` almeno una volta ma senza partecipanti
+  da ≥ `jvbInactiveGraceMinutes` (default 45 min); i JVB sono stati scalati a 0.
+  Si può tornare in `LIVE` se qualcuno si riconnette entro il grace period
+  dell'evento.
+
+Vedi la sezione [JVB scaler / Event lifecycle](#jvb-scaler-ed-event-lifecycle) per la macchina a stati completa.
 
 **Enum QuestionStatus:** `PENDING` | `HIGHLIGHTED` | `ANSWERED` | `DISMISSED`
 
@@ -309,37 +336,80 @@ erDiagram
 - `QuestionUpvote` ha un vincolo unique composito su `(questionId, registrationId)`: un partecipante può votare una domanda una sola volta
 - `upvoteCount` su `Question` è denormalizzato per performance; viene aggiornato atomicamente con operazioni `increment`/`decrement`
 - L'indice composto `(eventId, status, upvoteCount DESC)` su `Question` ottimizza il caricamento ordinato delle domande durante l'evento live
+- `Question.registrationId` è **nullable** da v0.4.x: consente a guest (senza Registration) di porre domande quando l'evento permette l'accesso anonimo. In tal caso `authorName` è popolato col display name scelto dal guest.
+
+### Entità aggiunte in v0.3.x / v0.4.x
+
+Oltre alle quattro entità principali mostrate sopra, lo schema include modelli per le feature più recenti (elenco non esaustivo, vedi `app/prisma/schema.prisma`):
+
+| Modello | Scopo | File |
+|---|---|---|
+| `Tag` + `EventTagLink` | Tassonomia editoriale: slug unico, nome multi-lingua (JSONB), colore, sort order. Filtri pubblici `/eventi?tag=<slug>` | `app/src/app/api/admin/tags/`, `app/src/app/[locale]/admin/settings/tags/` |
+| `Person` | Identità cross-evento opt-in (rubrica). emailHash unico, opt-in esplicito separato, retention inactivity-based. Vedi [ADR-011](adr/011-person-rubrica.md) | `app/src/lib/persons/`, `app/src/app/api/admin/rubrica/` |
+| `EventModerator` | Co-moderator multipli, ognuno con magic-link UUID indipendente, nome, email, revoca granulare | `app/src/app/api/events/[param]/moderators/` |
+| `EventOrganizer` | Organizzatori/enti patrocinanti (display-only sulla pagina evento, no accesso sala) | `app/src/app/api/events/[param]/organizers/` |
+| `EventInvitation` | Inviti pre-evento (speaker con pre-auth, guest con pre-registrazione) | `app/src/app/api/events/[param]/moderators/` |
+| `ChatMessage` | Chat in-app persistita (sostituisce chat XMPP Jitsi). Postgres + Redis pub/sub + SSE | `app/src/app/api/events/[param]/chat/` |
+| `Poll` + `PollVote` | Polls con risultati real-time, export CSV | `app/src/app/api/events/[param]/polls/` |
+| `WordCloudRound` + `WordCloudSubmission` | Word cloud moderato per round | `app/src/app/api/events/[param]/wordcloud/` |
+| `EventMaterial` | Materiali (link in v0.2, file in v0.5+) con storage provider agnostico | `app/src/app/api/events/[param]/materials/` |
+| `CallSession` | Analytics lifecycle call (aperta a primo `videoConferenceJoined`, chiusa dallo scaler su `LIVE→IDLE` / `*→ENDED`). Vedi [CallSession lifecycle](#callsession-lifecycle) | `app/src/app/api/events/[param]/sessions/` |
+| `QuestionTemplate` + `QuestionItem` + `EventQuestionnaire` + `QuestionnaireResponse` + `QuestionnaireAnswer` | Questionari pre/post evento, 5 tipi di item (single/multi/yes_no/likert/open_text) | `app/src/app/api/events/[param]/questionnaires/` |
+| `EventFeedback` | Feedback post-evento (rating + commento) | `app/src/app/api/events/[param]/feedback/` |
+| `OrphanRecording` | Recording Jibri senza evento di riferimento (es. room eliminata mentre Jibri registrava) | `app/src/app/api/admin/recordings/orphans/` |
+| `EmailOutbox` | Coda email persistente con retry per SMTP degradation | `app/src/app/api/cron/email-outbox/` |
 
 ---
 
 ## Flussi principali
 
-### Creazione evento
+### Creazione evento — 5-step wizard
 
-L'amministratore accede al pannello admin e crea un nuovo evento. Il sistema genera automaticamente slug, room Jitsi e token moderatore.
+Dalla v0.4.x l'amministratore crea (e modifica) eventi tramite un **wizard a 5 step** con stato condiviso. Il form monolitico di v0.3 è rimasto solo come fallback interno alcuni script di test; tutte le UI admin passano dal wizard. I file sono in `app/src/components/admin/event-wizard/`.
+
+| Step | File | Cosa copre |
+|---|---|---|
+| 1. Base | `step-1-base.tsx` | Titolo (multi-lingua), descrizione Markdown, cover image, date/ora/timezone, ricorrenza, tag (multi-select dal `Tag` model), waiting-room audio override, toggle parseTitleKicker |
+| 2. Permessi | `step-2-permissions.tsx` | Matrice ruolo×feature (mic / cam / share screen / chat / Q&A / polls / reactions per ciascun ruolo), `autoStartRecording` |
+| 3. Inviti | `step-3-invites.tsx` | Organizzatori (display-only), relatori (access grant con magic-link individuale via `EventModerator`), guest pre-registrati via RubricaPicker multi-select |
+| 4. Contenuti | `step-4-content.tsx` | Materiali (link, file in futuro), preset Q&A, questionari pre/post evento (collegamento `QuestionTemplate` + domande ad-hoc) |
+| 5. Revisione | `step-5-review.tsx` | GDPR / retention, diagramma di carico stimato (chiama `lib/jvb-sizing.ts`), privacy policy, pubblica-ora vs. salva-bozza |
+
+Lo **stesso componente** è riusato in modalità `edit`: `WizardShell` accetta `mode: 'create' | 'edit'` e, in edit, seeda lo stato da `initialEvent` e sostituisce la POST con una PUT a `/api/events/:id` che fa il diff. La side-API per invitati/moderatori/organizzatori viene sincronizzata dopo la PUT.
 
 ```mermaid
 sequenceDiagram
     participant Admin
-    participant Portale
+    participant Wizard as WizardShell
+    participant API as /api/events
+    participant SideAPI as /api/events/:id/{moderators,organizers,...}
     participant DB as PostgreSQL
     participant Email as Server SMTP
 
-    Admin->>Portale: POST /api/events con dati evento
-    Portale->>Portale: Validazione Zod dello schema
-    Portale->>Portale: Genera slug, jitsiRoomName UUID, moderatorToken UUID
-    Portale->>DB: INSERT evento con status DRAFT
-    DB-->>Portale: Evento creato con ID
-    Portale-->>Admin: 201 Created con dati evento
+    Admin->>Wizard: Naviga step 1..5 (stato condiviso WizardForm)
+    Wizard->>Wizard: Validazione per-step (Zod inline)
+    Admin->>Wizard: Click "Crea" (step 5)
+    Wizard->>API: POST /api/events (payload aggregato)
+    API->>API: Validazione Zod + genera slug, jitsiRoomName, moderatorToken
+    API->>DB: INSERT event status=DRAFT (o PUBLISHED)
+    DB-->>API: Evento con id
+    API-->>Wizard: 201 Created
 
-    Admin->>Portale: PATCH /api/events/[id] status PUBLISHED
-    Portale->>DB: UPDATE status a PUBLISHED
-    Portale->>Email: Invio email moderatore con magic link e iCal
-    Email-->>Portale: Email inviata
-    Portale-->>Admin: 200 OK evento pubblicato
+    par Fan-out side-entities (parallelo)
+        Wizard->>SideAPI: POST moderators (da step 3)
+        Wizard->>SideAPI: POST organizers (da step 3)
+        Wizard->>SideAPI: POST invitations (guest pre-registrati)
+        Wizard->>SideAPI: POST materials (da step 4)
+        Wizard->>SideAPI: POST questionnaires (da step 4)
+    end
+
+    alt Status = PUBLISHED
+        API->>Email: Notifica moderatori + organizzatori
+    end
+    Wizard-->>Admin: Redirect a /admin/eventi/[id]
 ```
 
-Il magic link per il moderatore ha la forma: `https://eventi.dominio.gov.it/it/eventi/{slug}/live?moderator={moderatorToken}`
+Il magic link per il moderatore ha la forma: `https://eventi.dominio.gov.it/it/eventi/{slug}/live?moderator={moderatorToken}`. Con co-moderatori (`EventModerator`), ciascuno riceve un proprio token indipendente.
 
 #### Contenuti autorizzati — descrizioni markdown
 
@@ -433,40 +503,46 @@ sequenceDiagram
     Jitsi-->>Utente: Accesso alla room concesso
 ```
 
-### Sala d'attesa (pianificata)
+### Sala d'attesa (waiting room unificata)
 
-Prima dell'inizio dell'evento, i partecipanti vedono una pagina di attesa. Quando il moderatore avvia l'evento, vengono reindirizzati automaticamente.
+Dalla v0.4.x la waiting room è il **front-door unico** per ogni arrivo sulla live page, indipendentemente dal ruolo (guest, registered, moderator, speaker) e dallo status dell'evento (PUBLISHED / PROVISIONING / LIVE / ENDED). Sostituisce il fork precedente fra `GuestJoinForm`, `PreJoinScreen` e la waiting room scenario-specific. File: `app/src/components/live/waiting-room.tsx`.
+
+Elementi consolidati in un'unica surface presentazionale:
+
+- Cover image / hero con titolo e speakers
+- Name input sempre editabile (prefillato se l'utente è già noto)
+- Device check (`components/live/device-check.tsx`): anteprima cam, waveform mic, toggle cam/mic, chime test altoparlante
+- Netiquette reminder (testo localizzato)
+- Audio player ambientale durante l'attesa (optional, per-event override su `waitingRoomAudioUrl`)
+- Countdown dinamico se `startsAt` è ancora in futuro
+- Catch-up recording (se `tempRecordingUrl` è settato) per chi entra ad evento già iniziato
+- Chat preview lato LIVE per dare "sense of presence"
+- CTA primaria contestuale: entra / start (moderator) / watch recording / feedback
+
+Tutta la logica di auth, fetch JWT e transizioni live resta nel parent `LiveEventClient`: la WaitingRoom è una surface pura che chiama due callback `onEnterLive(name, prefs)` e `onStartEvent()`.
 
 ```mermaid
-sequenceDiagram
-    participant Partecipante
-    participant Portale
-    participant DB as PostgreSQL
-    participant Moderatore
-
-    Partecipante->>Portale: GET /eventi/[slug]/live?token=xxx
-    Portale->>DB: SELECT event e status
-    DB-->>Portale: Status PUBLISHED - non ancora LIVE
-
-    Portale-->>Partecipante: Pagina sala d'attesa con countdown
-
-    loop Polling ogni 5 secondi
-        Partecipante->>Portale: GET /api/events/[slug] - verifica status
-        Portale->>DB: SELECT status evento
-        DB-->>Portale: Status ancora PUBLISHED
-        Portale-->>Partecipante: Evento non ancora iniziato
-    end
-
-    Moderatore->>Portale: Avvia evento
-    Portale->>DB: UPDATE status a LIVE
-
-    Partecipante->>Portale: GET /api/events/[slug] - polling
-    Portale->>DB: SELECT status evento
-    DB-->>Portale: Status LIVE
-    Portale-->>Partecipante: Evento iniziato - redirect alla sala
-
-    Partecipante->>Portale: Caricamento sala evento con Jitsi
+stateDiagram-v2
+    [*] --> WaitingRoom: GET /eventi/:slug/live?(moderator|token)
+    WaitingRoom --> WaitingRoom: countdown + chat preview + catch-up
+    WaitingRoom --> DeviceCheck: attendee clicca "Entra"
+    DeviceCheck --> WaitingRoom: back
+    DeviceCheck --> ProvisioningScreen: event status PROVISIONING
+    DeviceCheck --> JitsiLive: event status LIVE + JWT emesso
+    ProvisioningScreen --> JitsiLive: scaler marca LIVE (polling + wall-clock)
+    JitsiLive --> EventFeedback: videoConferenceLeft
+    JitsiLive --> WaitingRoom: rientro manuale
+    EventFeedback --> [*]: feedback submitted o skipped
 ```
+
+La decisione su quale branch mostrare dipende dal wall-clock combinato con lo status:
+
+- `status = PUBLISHED` e `startsAt` in futuro → countdown
+- `status = PUBLISHED` e `startsAt` passato → "in arrivo" con spinner + chat preview
+- `status = PROVISIONING` → `ProvisioningScreen` (anche se `startsAt` è futuro, la WaitingRoom prevale per mostrare il countdown — v0.4.x fix in commit `70d6a16`)
+- `status = LIVE` → CTA "Entra" (subito device check, poi Jitsi)
+- `status = IDLE` → "Evento in pausa" con re-entry
+- `status = ENDED` → recording / Q&A archive / feedback form
 
 ### Q&A con upvote
 
@@ -741,9 +817,122 @@ graph TD
     JVB_POD1 -. "Jibri upload" .-> BLOB_EXT
 ```
 
-### Scaling
+### Live controls "Meet-style"
 
-Il sistema scala in modo diverso in base alla fase del ciclo di vita degli eventi:
+Dalla v0.4.x la sala live usa un pattern **controls floating + drawer** ispirato a Google Meet, unico per desktop e mobile con breakpoint a 992px. File principale: `app/src/components/live/live-event-client.tsx` (~1280 righe, hub di tutti i pannelli live).
+
+- **Desktop ( ≥992px )**: floating control bar sopra il video Jitsi (in overlay), drawer laterale che scorre da destra con tabs Q&A / Chat / Polls / Materials / Participants. Il toolbar nativo Jitsi è disabilitato per attendee e permanente per moderator (`TOOLBAR_ALWAYS_VISIBLE=true` + timeout 20s, introdotto con commit `306dd20` dopo il feedback caffettino — i due bar non si sovrappongono più).
+- **Mobile ( <992px )**: bottom tab strip (Bootstrap Italia `.it-footer-nav`-style) con 5 tab; il drawer diventa full-screen. Il tasto "condividi schermo" è rimosso dai mobile toolbar buttons (`mobileBaseToolbarButtons` / `mobileModeratorToolbarButtons` in `lib/jitsi/config.ts`): iOS Safari e la maggior parte dei browser Android vietano `getDisplayMedia()` in iframe, meglio nasconderlo che mostrare un errore opaco.
+
+Componenti di supporto:
+
+- **RaisedHandsPanel** (`app/src/components/jitsi/raised-hands-panel.tsx`): coda FIFO delle mani alzate con mapping `jitsi-participant-id → registration.displayName`. Il prop `readOnly` differenzia: moderatori vedono le action approve-mic / approve-video, attendee vedono solo l'ordine. Il panel è nascosto quando la coda è vuota (pure signal, no rumore).
+- **ScreenshareBanner**: banner arancione slim che appare in top del video area quando un remoto inizia uno screenshare. Usa gli eventi Jitsi `screenSharingStatusChanged` + `participantLeft`; self-presenter è filtrato.
+- **DeviceCheck**: riusato dalla waiting room ma anche esposto come "impostazioni rapide" tramite il toolbar del moderatore.
+
+```mermaid
+graph TD
+    subgraph "Desktop ≥992px"
+        VIDEO_D["Jitsi IFrame (full width)"]
+        BAR_D["Floating controls<br/>(overlay top)"]
+        DRAWER_D["Side drawer<br/>Q&A | Chat | Polls | Materials | Participants"]
+    end
+
+    subgraph "Mobile <992px"
+        VIDEO_M["Jitsi IFrame (full height)"]
+        TABS_M["Bottom tab strip<br/>5 tabs"]
+        SHEET_M["Full-screen drawer"]
+    end
+
+    ATTENDEE[Attendee] --> VIDEO_D
+    ATTENDEE --> VIDEO_M
+    BAR_D -.click.-> DRAWER_D
+    TABS_M -.tap.-> SHEET_M
+
+    VIDEO_D -.raisedHand event.-> RH[RaisedHandsPanel read-only]
+    VIDEO_D -.screenSharing event.-> SB[ScreenshareBanner]
+```
+
+### JVB scaler ed event lifecycle
+
+Lo scaler è un `CronJob` Kubernetes che gira ogni 2 minuti (`jvbScaler.schedule`). È l'unico componente con la RBAC per leggere `spec.replicas` del deployment JVB e per fare `kubectl exec curl /colibri/stats` su ogni pod. File: `infra/helm/eventi-dtd/templates/cronjob-jvb-scaler.yaml` + logica di stato in `app/src/app/api/internal/jvb-desired-replicas/route.ts`.
+
+Ogni tick aggrega `/colibri/stats` attraverso **tutti i pod JVB** (senza questa aggregazione, un singolo hit al Service VIP reached solo un pod e gli altri apparivano vuoti) e scrive uno snapshot canonico su Redis come `jvb:replicas:snapshot` (TTL 300s). Le metriche pubbliche — `/api/status`, `/api/status/infrastructure`, `/api/metrics` — leggono questo snapshot come source of truth (file: `app/src/lib/jvb-snapshot.ts`).
+
+```mermaid
+graph LR
+    subgraph "CronJob jvb-scaler (every 2 min)"
+        A1[kubectl get deployment jvb] --> A2[list pods jvb]
+        A2 --> A3[kubectl exec curl /colibri/stats<br/>on each pod]
+        A3 --> A4[aggregate sum(participants, bitrate...)<br/>max(stress_level)]
+        A4 --> A5[GET /api/internal/jvb-desired-replicas<br/>?current=&ready=&participants=&...]
+    end
+
+    A5 --> B1[Next.js API]
+    B1 --> B2{Compute desired}
+    B2 -->|lifecycle + sizing formula| B3[desired = ...]
+    B3 --> B4[SETEX jvb:replicas:snapshot 300s ...]
+    B3 --> B5[UPDATE Event.status<br/>transitions]
+    B3 --> B6[closeOpenSessions]
+
+    B4 --> C1[Redis]
+    A5 -.response{desired, jibriDesired}.-> D1[kubectl scale deployment jvb]
+    A5 -.response.-> D2[kubectl scale jibri]
+
+    C1 --> E1[/api/status]
+    C1 --> E2[/api/status/infrastructure]
+    C1 --> E3[/api/metrics<br/>Prometheus gauges]
+```
+
+**Memory limit**: 256Mi (alzato da 32Mi in commit `3ac77dd` dopo OOMKill con ≥3 pod JVB: fan-out di `kubectl exec` + subshell bash supera il vecchio ceiling). Copre fino a ~6 pod (il default `jvbMaxReplicas`).
+
+**Macchina a stati dell'evento** — lo scaler è l'unico che fa transizioni automatiche (le altre sono manuali via admin UI):
+
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT: Admin crea (wizard, non pubblicato)
+    DRAFT --> PUBLISHED: Admin pubblica
+    PUBLISHED --> PROVISIONING: Scaler (t = startsAt - jvbPreScaleMinutes)
+    PROVISIONING --> LIVE: Primo participantJoined<br/>(handleJitsiReady → POST /sessions)
+    PROVISIONING --> PUBLISHED: Timeout provisioning<br/>(jvbProvisioningTimeoutMinutes senza join)
+    LIVE --> IDLE: 0 partecipanti per ≥ jvbInactiveGraceMinutes<br/>(scaler scala JVB a 0, closeOpenSessions)
+    IDLE --> LIVE: Qualcuno rientra entro grace evento
+    IDLE --> ENDED: t >= endsAt + gracePeriodMinutes<br/>(scaler, closeOpenSessions)
+    LIVE --> ENDED: t >= endsAt + gracePeriodMinutes<br/>(scaler, closeOpenSessions)
+    LIVE --> LIVE: Overtime banner<br/>(endsAt < t < endsAt + grace)
+    ENDED --> ARCHIVED: Cron cleanup dopo dataRetentionDays
+    ENDED --> PUBLISHED: Admin estende endsAt (revival)
+    ENDED --> LIVE: Admin estende endsAt e startsAt ≤ now (revival)
+```
+
+Parametri chiave (tutti `SiteSetting`, override per-evento su `Event` quando applicabile):
+
+| Parametro | Ruolo nello stato |
+|---|---|
+| `jvbPreScaleMinutes` | Lookahead per `PUBLISHED → PROVISIONING` (default 10 min) |
+| `jvbProvisioningTimeoutMinutes` | Timeout per `PROVISIONING → PUBLISHED` se nessuno joina (default 15 min) |
+| `jvbInactiveGraceMinutes` | Soglia per `LIVE → IDLE` su inattività (default 45 min) |
+| `eventGracePeriodMinutes` / `Event.gracePeriodMinutes` | Overtime post `endsAt` prima di `ENDED` (default 15 min; `-1` = mai auto-close) |
+
+### CallSession lifecycle
+
+Da v0.4.x ogni evento che genera traffico produce una `CallSession`, anche senza recording (prima di `233dd60` la riga veniva creata solo dal webhook Jibri):
+
+1. **Apertura** — il live client, dopo il primo `videoConferenceJoined`, fa `POST /api/events/:slug/sessions` (endpoint idempotente: se esiste una sessione `endedAt IS NULL` ritorna quella). Rate-limited 30 req/min per IP, no auth (chi è arrivato nella live room di un evento LIVE/PROVISIONING è signal valido). File: `app/src/app/api/events/[param]/sessions/route.ts`.
+
+2. **Aggiornamento live** — `peakParticipants` è aggiornato in-place dallo scaler ad ogni tick leggendo dall'aggregato cross-pod.
+
+3. **Chiusura** — lo scaler chiude le sessioni ancora aperte in due transizioni dentro lo stesso `$transaction`:
+   - `LIVE → IDLE` (inattività ≥ `jvbInactiveGraceMinutes`)
+   - `* → ENDED` (`t >= endsAt + gracePeriodMinutes`)
+
+   Chiusura = `endedAt = now()`, `duration = endedAt - startedAt`, `peakParticipants` copiato dal latest snapshot.
+
+4. **Webhook recording** — il webhook Jibri esistente (`/api/webhooks/recording`) continua a creare la sua riga con `recordingUrl` / `recordingFileSize` / `recordingDuration`. Le due righe non vengono unite perché scoped a time-window diverse (apertura = lifetime room; webhook = span recording).
+
+Le query analytics in `/admin/monitoring/analytics` joinano via CallSession e quindi ora vedono **tutti** gli eventi che hanno avuto traffico, non solo quelli registrati.
+
+### Scaling
 
 ```mermaid
 graph LR
