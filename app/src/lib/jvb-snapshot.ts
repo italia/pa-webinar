@@ -70,6 +70,33 @@ function numOrUndef(v: unknown): number | undefined {
   return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
 }
 
+/**
+ * Read the authoritative cross-pod JVB snapshot from Redis. Returns
+ * `null` when Redis is unavailable, the key is missing, or parsing
+ * fails — callers should fall back to a best-effort single-pod
+ * `/colibri/stats` probe in that case (the single fetch is still
+ * correct with 1 replica).
+ *
+ * Wrapped in a 1-second timeout so a stuck Redis can't freeze the
+ * metrics or status endpoint.
+ */
+export async function readJvbSnapshot(): Promise<JvbSnapshot | null> {
+  // Dynamic import keeps the tree clean for callers that only want the
+  // TYPE (e.g. build-time scripts) without dragging ioredis along.
+  const { getRedis } = await import('./redis');
+  const redis = getRedis();
+  if (!redis) return null;
+  try {
+    const raw = await Promise.race([
+      redis.get(JVB_SNAPSHOT_KEY),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
+    ]);
+    return parseJvbSnapshot(raw);
+  } catch {
+    return null;
+  }
+}
+
 export function parseJvbSnapshot(raw: string | null): JvbSnapshot | null {
   if (!raw) return null;
   try {

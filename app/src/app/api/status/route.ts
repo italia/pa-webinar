@@ -2,12 +2,10 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import {
-  JVB_SNAPSHOT_KEY,
-  parseJvbSnapshot,
+  readJvbSnapshot,
   type JvbSnapshot,
 } from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
-import { getRedis } from '@/lib/redis';
 import { getSettings } from '@/lib/settings';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -177,20 +175,6 @@ interface JvbSizingInput {
   receiversPerCore: number;
   sendersPerCore: number;
   defaultSenderRatioPct: number;
-}
-
-async function readJvbSnapshot(): Promise<JvbSnapshot | null> {
-  const redis = getRedis();
-  if (!redis) return null;
-  try {
-    const raw = await Promise.race([
-      redis.get(JVB_SNAPSHOT_KEY),
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
-    ]);
-    return parseJvbSnapshot(raw);
-  } catch {
-    return null;
-  }
 }
 
 async function getJvbStatus(
