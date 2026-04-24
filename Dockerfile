@@ -9,7 +9,6 @@ FROM node:20-alpine AS deps
 LABEL maintainer="Dipartimento per la Trasformazione Digitale <innovazione@governo.it>"
 LABEL org.opencontainers.image.title="eventi-dtd"
 LABEL org.opencontainers.image.description="Public digital event platform for the Italian DTD"
-LABEL org.opencontainers.image.version="0.1.0"
 LABEL org.opencontainers.image.source="https://github.com/italia/eventi-dtd"
 
 RUN apk add --no-cache libc6-compat
@@ -53,6 +52,18 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_JITSI_DOMAIN=$NEXT_PUBLIC_JITSI_DOMAIN
 ENV NEXT_PUBLIC_WATERMARK_URL=$NEXT_PUBLIC_WATERMARK_URL
 ENV NEXT_PUBLIC_DEFAULT_LOCALE=$NEXT_PUBLIC_DEFAULT_LOCALE
+
+# Build identity — inlined by webpack so the footer can render version + sha.
+# BUILD_CHANNEL is `dev` for rolling :dev builds and `release` for tagged v*
+# pushes; the footer uses it to pick between commit link and release link.
+ARG NEXT_PUBLIC_BUILD_VERSION=dev
+ARG NEXT_PUBLIC_BUILD_SHA=
+ARG NEXT_PUBLIC_BUILD_CHANNEL=dev
+ARG NEXT_PUBLIC_BUILD_DATE=
+ENV NEXT_PUBLIC_BUILD_VERSION=$NEXT_PUBLIC_BUILD_VERSION
+ENV NEXT_PUBLIC_BUILD_SHA=$NEXT_PUBLIC_BUILD_SHA
+ENV NEXT_PUBLIC_BUILD_CHANNEL=$NEXT_PUBLIC_BUILD_CHANNEL
+ENV NEXT_PUBLIC_BUILD_DATE=$NEXT_PUBLIC_BUILD_DATE
 
 # Copy installed deps from stage 1
 COPY --from=deps /workspace/node_modules ./node_modules

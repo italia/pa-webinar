@@ -570,33 +570,25 @@ export default function InstantCallsList({
           {t('createNew')}
         </ModalHeader>
         <ModalBody>
-          <div className="form-group">
-            <label htmlFor="instant-call-title" className="form-label">
-              {t('form.titleLabel')} *
-            </label>
-            <Input
-              id="instant-call-title"
-              type="text"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              maxLength={120}
-              disabled={submitting}
-              autoFocus
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="instant-call-moderator" className="form-label">
-              {t('form.moderatorLabel')}
-            </label>
-            <Input
-              id="instant-call-moderator"
-              type="text"
-              value={newModerator}
-              onChange={(e) => setNewModerator(e.target.value)}
-              maxLength={100}
-              disabled={submitting}
-            />
-          </div>
+          <Input
+            id="instant-call-title"
+            type="text"
+            label={`${t('form.titleLabel')} *`}
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            maxLength={120}
+            disabled={submitting}
+            autoFocus
+          />
+          <Input
+            id="instant-call-moderator"
+            type="text"
+            label={t('form.moderatorLabel')}
+            value={newModerator}
+            onChange={(e) => setNewModerator(e.target.value)}
+            maxLength={100}
+            disabled={submitting}
+          />
           {error && <div className="text-danger small">{error}</div>}
         </ModalBody>
         <ModalFooter>

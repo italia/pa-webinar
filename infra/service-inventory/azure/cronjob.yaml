@@ -1,0 +1,152 @@
+# CronJob — Azure service-inventory generator (OPS half)
+#
+# Generates the services[] half of the CycloneDX service-inventory document
+# by querying Azure Resource Graph, then uploads the result to a public
+# Azure Blob container (to be referenced from the app via SERVICE_INVENTORY_URL).
+#
+# Authentication: Azure Workload Identity (preferred) — bind the ServiceAccount
+# to a Managed Identity that has:
+#   - 'Reader' on the target subscription or resource group
+#   - 'Storage Blob Data Contributor' on the target storage account
+#
+# The DEV half (components[]) + PA declarations are assumed to be maintained
+# separately (see docs/SERVICE-INVENTORY-GENERATION.md) and merged client-side.
+# This reference keeps responsibilities split so the automation can run
+# without coupling to the app release cycle.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-inventory-scripts
+data:
+  # The python transformer lives under infra/service-inventory/azure/scripts/
+  # in the eventi-dtd repo. Either bake it into a custom image or mount it via
+  # this ConfigMap (kubectl create cm service-inventory-scripts
+  #   --from-file=azure-to-cyclonedx.py=... --dry-run=client -o yaml).
+  azure-to-cyclonedx.py: |
+    # Replaced at deploy-time. See scripts/azure-to-cyclonedx.py.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: service-inventory-generator
+  annotations:
+    # Set to the client-id of the User-Assigned Managed Identity federated
+    # to this ServiceAccount (via AKS workload identity).
+    azure.workload.identity/client-id: "REPLACE_WITH_MI_CLIENT_ID"
+  labels:
+    azure.workload.identity/use: "true"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: service-inventory-generator
+  labels:
+    app.kubernetes.io/name: service-inventory-generator
+    app.kubernetes.io/part-of: eventi-dtd
+spec:
+  # Daily at 04:17 UTC — off-peak, randomized minute to avoid cron-storms.
+  schedule: "17 4 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      ttlSecondsAfterFinished: 86400
+      template:
+        metadata:
+          labels:
+            azure.workload.identity/use: "true"
+        spec:
+          serviceAccountName: service-inventory-generator
+          restartPolicy: OnFailure
+          containers:
+            - name: generator
+              # mcr.microsoft.com/azure-cli ships both `az` and python3 — good
+              # enough for a reference. Replace with a pinned custom image in prod.
+              image: mcr.microsoft.com/azure-cli:2.70.0
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: SUBSCRIPTION_ID
+                  value: "REPLACE_WITH_SUBSCRIPTION_ID"
+                - name: RESOURCE_GROUP
+                  value: "REPLACE_WITH_RESOURCE_GROUP"
+                - name: TENANT_NAME
+                  value: "videocall-prod"
+                - name: BLOB_ACCOUNT
+                  value: "REPLACE_WITH_STORAGE_ACCOUNT"
+                - name: BLOB_CONTAINER
+                  value: "service-inventory"
+                - name: BLOB_NAME
+                  value: "videocall-prod/service-inventory.json"
+                - name: DEV_HALF_URL
+                  # Where to fetch the DEV half (components[] + declarations[])
+                  # produced by the release pipeline. Typically a GitHub raw URL
+                  # or a separate Blob path maintained per app version.
+                  value: "https://raw.githubusercontent.com/italia/eventi-dtd/main/app/public/tenants/videocall-test/service-inventory.json"
+              command:
+                - /bin/bash
+                - -euo
+                - pipefail
+                - -c
+                - |
+                  # Workload identity auth — no 'az login' credentials stored.
+                  az login --identity --allow-no-subscriptions >/dev/null
+                  az account set --subscription "$SUBSCRIPTION_ID"
+
+                  # 1. Generate OPS half (services[]).
+                  python3 /scripts/azure-to-cyclonedx.py \
+                    --subscription "$SUBSCRIPTION_ID" \
+                    --resource-group "$RESOURCE_GROUP" \
+                    --tenant "$TENANT_NAME" \
+                    --output /tmp/ops.json
+
+                  # 2. Fetch DEV half (components[] + declarations[]).
+                  curl -fsSL "$DEV_HALF_URL" -o /tmp/dev.json
+
+                  # 3. Merge. The DEV half is the base document; replace its
+                  # services[] wholesale with the freshly generated OPS half,
+                  # and bump metadata.timestamp.
+                  python3 - <<'PY' /tmp/dev.json /tmp/ops.json /tmp/bom.json
+                  import json, sys, datetime
+                  dev, ops = json.load(open(sys.argv[1])), json.load(open(sys.argv[2]))
+                  dev["services"] = ops["services"]
+                  dev.setdefault("metadata", {})
+                  dev["metadata"]["timestamp"] = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds").replace("+00:00","Z")
+                  # Merge tenant-level properties from the OPS generator.
+                  existing = {p["name"]: p for p in (dev["metadata"].get("properties") or [])}
+                  for p in (ops.get("properties") or []):
+                      existing[p["name"]] = p
+                  dev["metadata"]["properties"] = list(existing.values())
+                  with open(sys.argv[3], "w", encoding="utf-8") as f:
+                      json.dump(dev, f, indent=2, ensure_ascii=False)
+                      f.write("\n")
+                  PY
+
+                  # 4. Upload to Azure Blob. Container must be public read.
+                  az storage blob upload \
+                    --auth-mode login \
+                    --account-name "$BLOB_ACCOUNT" \
+                    --container-name "$BLOB_CONTAINER" \
+                    --name "$BLOB_NAME" \
+                    --file /tmp/bom.json \
+                    --overwrite true \
+                    --content-type application/json
+                  echo "uploaded: https://${BLOB_ACCOUNT}.blob.core.windows.net/${BLOB_CONTAINER}/${BLOB_NAME}"
+              resources:
+                requests: { cpu: 50m,  memory: 128Mi }
+                limits:   { cpu: 500m, memory: 512Mi }
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: scripts
+              configMap:
+                name: service-inventory-scripts
+                defaultMode: 0555
+            - name: tmp
+              emptyDir: {}

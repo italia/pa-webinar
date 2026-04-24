@@ -3,6 +3,8 @@
  * Clean inline-styled HTML — no external images or CSS frameworks.
  */
 
+import type { ResolvedEmailTemplate } from './resolve-template';
+
 type Locale = 'it' | 'en';
 
 export function escapeHtml(str: string): string {
@@ -223,26 +225,70 @@ export function reminderSubject(locale: Locale, eventTitle: string, offsetMinute
   return copy[locale].reminderSubject(eventTitle, offsetMinutes);
 }
 
-export function confirmationHtml(input: EmailTemplateInput): string {
+/**
+ * Produces the default (non-overridden) resolved copy for a given template +
+ * locale + input. The resolver merges admin overrides on top of this result.
+ */
+export function baseConfirmationCopy(input: EmailTemplateInput): ResolvedEmailTemplate {
   const c = copy[input.locale];
+  return {
+    subject: c.confirmationSubject(input.eventTitle),
+    heading: c.confirmationHeading,
+    bodyIntro: null,
+    ctaLabel: c.joinLabel,
+    infoNote: c.keepNote,
+    footerNote: c.unsubscribe,
+  };
+}
+
+export function baseReminderCopy(input: EmailTemplateInput): ResolvedEmailTemplate {
+  const c = copy[input.locale];
+  const offset = input.offsetMinutes ?? 60;
+  return {
+    subject: c.reminderSubject(input.eventTitle, offset),
+    heading: c.reminderHeading,
+    bodyIntro: c.reminderNote(offset),
+    ctaLabel: c.joinLabel,
+    infoNote: null,
+    footerNote: c.unsubscribe,
+  };
+}
+
+export function confirmationHtml(
+  input: EmailTemplateInput,
+  resolved?: ResolvedEmailTemplate,
+): string {
+  const c = copy[input.locale];
+  const r = resolved ?? baseConfirmationCopy(input);
   const calendarHtml = input.calendarLinks
     ? calendarLinksSection(c, input.calendarLinks)
     : '';
   const footerText = input.organizationFooter || c.footer;
+  const intro = r.bodyIntro
+    ? `<p style="margin:0 0 16px;">${escapeHtml(r.bodyIntro)}</p>`
+    : '';
+  const info = r.infoNote
+    ? `<p style="margin:16px 0 0;padding:12px 16px;background:#fff3cd;border-left:4px solid #ffc107;border-radius:2px;font-size:14px;color:#664d03;">
+  ⚠️ ${escapeHtml(r.infoNote)}
+</p>`
+    : '';
   const body = `
+${intro}
 ${detailsTable(c, input)}
-${ctaButton(c.joinLabel, input.joinUrl)}
+${ctaButton(r.ctaLabel, input.joinUrl)}
 ${calendarHtml}
-<p style="margin:16px 0 0;padding:12px 16px;background:#fff3cd;border-left:4px solid #ffc107;border-radius:2px;font-size:14px;color:#664d03;">
-  ⚠️ ${c.keepNote}
-</p>
+${info}
 <p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
 
-  return layout(c.confirmationHeading, body, `${footerText}<br>${c.unsubscribe}`, input.locale, input.siteName);
+  return layout(escapeHtml(r.heading), body, `${footerText}<br>${escapeHtml(r.footerNote)}`, input.locale, input.siteName);
 }
 
-export function confirmationText(input: EmailTemplateInput): string {
+export function confirmationText(
+  input: EmailTemplateInput,
+  resolved?: ResolvedEmailTemplate,
+): string {
   const c = copy[input.locale];
+  const r = resolved ?? baseConfirmationCopy(input);
   const footerText = input.organizationFooter || c.footer;
   const calendarBlock = input.calendarLinks
     ? [
@@ -254,45 +300,63 @@ export function confirmationText(input: EmailTemplateInput): string {
         `${c.downloadIcs}: ${input.calendarLinks.icsDownload}`,
       ]
     : [];
+  const introLines = r.bodyIntro ? [r.bodyIntro, ''] : [];
+  const infoLines = r.infoNote ? [r.infoNote, ''] : [];
   return [
-    c.confirmationHeading,
+    r.heading,
     '',
+    ...introLines,
     `${c.eventLabel}: ${input.eventTitle}`,
     `${c.dateLabel}: ${input.eventDate}`,
     `${c.timeLabel}: ${input.eventTime}`,
     `${c.durationLabel}: ${input.eventDuration}`,
     '',
-    `${c.joinLabel}: ${input.joinUrl}`,
+    `${r.ctaLabel}: ${input.joinUrl}`,
     ...calendarBlock,
     '',
-    c.keepNote,
-    '',
+    ...infoLines,
     `${c.viewEvent}: ${input.eventPageUrl}`,
     '',
     footerText,
+    r.footerNote,
   ].join('\n');
 }
 
-export function reminderHtml(input: EmailTemplateInput): string {
+export function reminderHtml(
+  input: EmailTemplateInput,
+  resolved?: ResolvedEmailTemplate,
+): string {
   const c = copy[input.locale];
-  const offset = input.offsetMinutes ?? 60;
+  const r = resolved ?? baseReminderCopy(input);
   const calendarHtml = input.calendarLinks
     ? calendarLinksSection(c, input.calendarLinks)
     : '';
   const footerText = input.organizationFooter || c.footer;
+  const intro = r.bodyIntro
+    ? `<p style="margin:0 0 16px;">${escapeHtml(r.bodyIntro)}</p>`
+    : '';
+  const info = r.infoNote
+    ? `<p style="margin:16px 0 0;padding:12px 16px;background:#fff3cd;border-left:4px solid #ffc107;border-radius:2px;font-size:14px;color:#664d03;">
+  ⚠️ ${escapeHtml(r.infoNote)}
+</p>`
+    : '';
   const body = `
-<p style="margin:0 0 16px;">${c.reminderNote(offset)}</p>
+${intro}
 ${detailsTable(c, input)}
-${ctaButton(c.joinLabel, input.joinUrl)}
+${ctaButton(r.ctaLabel, input.joinUrl)}
 ${calendarHtml}
+${info}
 <p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
 
-  return layout(c.reminderHeading, body, `${footerText}<br>${c.unsubscribe}`, input.locale, input.siteName);
+  return layout(escapeHtml(r.heading), body, `${footerText}<br>${escapeHtml(r.footerNote)}`, input.locale, input.siteName);
 }
 
-export function reminderText(input: EmailTemplateInput): string {
+export function reminderText(
+  input: EmailTemplateInput,
+  resolved?: ResolvedEmailTemplate,
+): string {
   const c = copy[input.locale];
-  const offset = input.offsetMinutes ?? 60;
+  const r = resolved ?? baseReminderCopy(input);
   const footerText = input.organizationFooter || c.footer;
   const calendarBlock = input.calendarLinks
     ? [
@@ -304,21 +368,24 @@ export function reminderText(input: EmailTemplateInput): string {
         `${c.downloadIcs}: ${input.calendarLinks.icsDownload}`,
       ]
     : [];
+  const introLines = r.bodyIntro ? [r.bodyIntro, ''] : [];
+  const infoLines = r.infoNote ? [r.infoNote, ''] : [];
   return [
-    c.reminderHeading,
+    r.heading,
     '',
-    c.reminderNote(offset),
-    '',
+    ...introLines,
     `${c.eventLabel}: ${input.eventTitle}`,
     `${c.dateLabel}: ${input.eventDate}`,
     `${c.timeLabel}: ${input.eventTime}`,
     `${c.durationLabel}: ${input.eventDuration}`,
     '',
-    `${c.joinLabel}: ${input.joinUrl}`,
+    `${r.ctaLabel}: ${input.joinUrl}`,
     ...calendarBlock,
     '',
+    ...infoLines,
     `${c.viewEvent}: ${input.eventPageUrl}`,
     '',
     footerText,
+    r.footerNote,
   ].join('\n');
 }

@@ -2,13 +2,17 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { sendEmail } from '@/lib/email/send';
+import { enqueueEmail } from '@/lib/email/outbox';
 import { getSettings } from '@/lib/settings';
 import {
-  reminderSubject,
   reminderHtml,
   reminderText,
+  baseReminderCopy,
 } from '@/lib/email/templates';
+import {
+  applyOverride,
+  loadEmailTemplateOverride,
+} from '@/lib/email/resolve-template';
 import {
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
@@ -127,11 +131,27 @@ export const GET = withErrorHandling(async (request) => {
             'noreply@dominio.gov.it',
         });
 
-        await sendEmail({
+        const override = await loadEmailTemplateOverride('reminder', locale);
+        const resolved = applyOverride(
+          baseReminderCopy(templateInput),
+          override,
+          {
+            eventTitle: templateInput.eventTitle,
+            eventDate: templateInput.eventDate,
+            eventTime: templateInput.eventTime,
+            eventDuration: templateInput.eventDuration,
+            joinUrl: templateInput.joinUrl,
+            eventPageUrl: templateInput.eventPageUrl,
+            siteName: settings.siteName || 'Eventi PA',
+            offsetMinutes: reminder.offsetMinutes,
+          },
+        );
+
+        await enqueueEmail({
           to: recipientEmail,
-          subject: reminderSubject(locale, title, reminder.offsetMinutes),
-          html: reminderHtml(templateInput),
-          text: reminderText(templateInput),
+          subject: resolved.subject,
+          html: reminderHtml(templateInput, resolved),
+          text: reminderText(templateInput, resolved),
           attachments: [
             {
               filename: 'event.ics',
@@ -139,6 +159,12 @@ export const GET = withErrorHandling(async (request) => {
               contentType: 'text/calendar; charset=utf-8; method=REQUEST',
             },
           ],
+          metadata: {
+            kind: 'reminder',
+            reminderId: reminder.id,
+            registrationId: reg.id,
+            eventId: reminder.eventId,
+          },
         });
 
         await prisma.reminderSent.create({

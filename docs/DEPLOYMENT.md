@@ -4,11 +4,11 @@
 
 Il chart Helm supporta tre modalita, adatte a diverse dimensioni di PA e infrastrutture.
 
-| Modalita | Database | JVB | Recording | Node pool dedicato | Capacita indicativa (*) | Ideale per |
-|---|---|---|---|---|---|---|
-| **Semplice** | Nel cluster | 1 fisso | No | No | ~50 partecipanti/evento, 1 evento alla volta | Demo, test, piccole PA |
-| **Standard** | Esterno | 1+ fisso | Si | No | ~200 partecipanti/evento, 1-2 eventi concorrenti | PA medie |
-| **Completa** | Esterno | Scale-to-zero | Si | Si | ~300 partecipanti/evento, N eventi concorrenti (N = numero JVB scalato dinamicamente) | Grandi PA, eventi multipli |
+| Modalita | Database | JVB | Recording | Node pool dedicato | Redis (chat) | Capacita indicativa (*) | Ideale per |
+|---|---|---|---|---|---|---|---|
+| **Semplice** | Nel cluster | 1 fisso | No | No | Nel cluster (standalone) | ~50 partecipanti/evento, 1 evento alla volta | Demo, test, piccole PA |
+| **Standard** | Esterno | 1+ fisso | Si | No | Nel cluster (standalone) o esterno | ~200 partecipanti/evento, 1-2 eventi concorrenti | PA medie |
+| **Completa** | Esterno | Scale-to-zero | Si | Si | Esterno (managed) consigliato | ~300 partecipanti/evento, N eventi concorrenti (N = numero JVB scalato dinamicamente) | Grandi PA, eventi multipli |
 
 (*) Valori indicativi su hardware tipico (4 vCPU, 8 GB per JVB). La capacità per singolo evento è limitata da un bridge JVB, perché Jicofo assegna una conferenza a un solo bridge. Per superare ~300 partecipanti in un singolo evento è necessario abilitare il bridge cascading (Octo) — non attivo di default. La capacità totale della piattaforma, invece, scala orizzontalmente aggiungendo pod JVB: più eventi concorrenti = più bridge. Per validare i numeri sulla propria infrastruttura vedere [`LOAD-TESTING.md`](LOAD-TESTING.md).
 
@@ -401,6 +401,57 @@ kubectl logs <pod> -c db-migrate
 1. `kubectl get servicemonitor -n videocall`
 2. Verificare che il label `release: prometheus` corrisponda al selector
 3. `kubectl port-forward svc/videocall 3000:3000 -n videocall` poi `curl localhost:3000/api/metrics`
+
+## JVB scaler (CronJob)
+
+In modalità `full` il chart installa un `CronJob` che tick ogni 2 minuti
+(default `jvbScaler.schedule: */2 * * * *`). È l'unico workload con la
+RBAC per leggere `spec.replicas` del deployment JVB e per fare
+`kubectl exec curl /colibri/stats` su ogni pod.
+
+Risorse del pod scaler:
+
+| Campo | Valore | Note |
+|---|---|---|
+| `requests.cpu` | `10m` | Idle la maggior parte del tempo |
+| `requests.memory` | `64Mi` | Baseline tick + kubectl client |
+| `limits.cpu` | `200m` | Burst per `kubectl exec` fan-out |
+| `limits.memory` | **`256Mi`** | Alzato da 32Mi in v0.4.x dopo OOMKill con ≥3 pod JVB. Copre fino a ~6 pod. |
+| `activeDeadlineSeconds` | `120` | Cap totale del tick (6 pod × 3s curl + overhead) |
+
+Flusso di un tick:
+
+1. `kubectl get deployment jvb` → legge `spec.replicas` e `status.readyReplicas`.
+2. Se `replicas > 0`: elenca pods JVB `Running` e fa `kubectl exec -- curl -sf --max-time 3 http://127.0.0.1:8080/colibri/stats` su ciascuno.
+3. Aggrega `participants`, `conferences`, `bit_rate_upload/download`, `endpoints_sending_audio/video`, `octo_*` come **somma**; `stress_level` e `largest_conference` come **max**.
+4. POST aggregato + `current` + `ready` a `/api/internal/jvb-desired-replicas` (autenticato con `CRON_API_KEY`).
+5. L'API calcola `desired` usando la formula lineare (vedi `lib/jvb-sizing.ts`) + state machine (PROVISIONING / LIVE / IDLE / ENDED), scrive su Redis `jvb:replicas:snapshot` (TTL 300s), chiude `CallSession` su transizioni e ritorna `{ desired, jibriDesired }`.
+6. Se `desired != current`: `kubectl scale deployment jvb --replicas=$desired`.
+7. Idem per Jibri (deployment o statefulset, autodetected).
+
+> **Nota importante** — non passare `--request-timeout` a `kubectl exec` dentro il tick: il client kubectl lo interpreta come "ignora kubeconfig in-cluster" e tenta `localhost:8080`, fallendo tutti i probe (osservato su bitnami/kubectl). Il timeout del singolo probe è già sul `curl --max-time 3`, e il tick intero è bloccato a 120s da `activeDeadlineSeconds`. Vedi commit `706ef8a`.
+
+### Validare il tick
+
+```bash
+# Ultima esecuzione
+kubectl get job -n videocall -l app.kubernetes.io/component=jvb-scaler \
+  --sort-by=.metadata.creationTimestamp | tail -3
+
+# Log ultimo tick
+kubectl logs -n videocall -l app.kubernetes.io/component=jvb-scaler \
+  --tail=100 | grep "JVB Scaler"
+
+# Verifica il snapshot Redis
+kubectl exec -n videocall <redis-pod> -- redis-cli \
+  -a "$REDIS_PASSWORD" GET jvb:replicas:snapshot
+```
+
+Il JSON su Redis ha la shape documentata in `app/src/lib/jvb-snapshot.ts` (`JvbSnapshot` type). Se `pollSuccesses = 0` significa che nessun pod ha risposto: o il deployment è a 0 repliche (atteso in IDLE) o c'è un problema di RBAC / network policy.
+
+### Alternativa KEDA
+
+Per cluster già con KEDA installato, un esempio di `ScaledObject` è in `infra/helm/eventi-dtd/examples/keda-jvb-scaler.yaml`. Il CronJob resta comunque utile perché KEDA non fa il fan-out `/colibri/stats` cross-pod né chiude le `CallSession`.
 
 ## Configurazione registrazione video (Jibri)
 

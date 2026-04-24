@@ -344,7 +344,11 @@
       "settingsGeneral": "Общи",
       "settingsLanguages": "Езици",
       "ariaLabel": "Навигация на администрацията",
-      "subNavAriaLabel": "Навигация на раздела"
+      "subNavAriaLabel": "Навигация на раздела",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Администраторски панел",
@@ -492,6 +496,30 @@
       "noComments": "Няма коментари",
       "stars": "звезди"
     },
+    "coModerators": {
+      "title": "Ко-модератори и лектори",
+      "intro": "Добавете ко-модератори и лектори с индивидуални магически връзки.",
+      "introHint": "Всяко лице има видимо име в залата и токен, който може да бъде отнет независимо от основната връзка. Лекторите имат достъп до микрофон, камера и споделяне на екран, но не могат да модерират (изхвърляне, заглушаване на всички, запис).",
+      "add": "Добавяне на лице",
+      "name": "Име, видимо в залата",
+      "email": "Имейл (по избор)",
+      "emailPlaceholder": "за да му изпратите връзката",
+      "role": "Роля",
+      "roleModerator": "Модератор",
+      "roleSpeaker": "Лектор",
+      "roleModeratorHint": "Пълна модерация: може да записва, да заглушава всички и да премахва участници.",
+      "roleSpeakerHint": "Може да говори, да показва видео и да споделя екран. Не може да модерира залата.",
+      "copyLink": "Копиране на връзката",
+      "copied": "Копирано!",
+      "revoke": "Отнемане",
+      "revoked": "Отнето",
+      "confirmRevoke": "Да се отнеме ли достъпът на това лице? Връзката веднага ще спре да работи.",
+      "empty": "Няма предоставен допълнителен достъп. Основната връзка на модератора остава единственият привилегирован вход.",
+      "activeCount": "{count, plural, =0 {Няма активни достъпи} =1 {1 активен достъп} other {# активни достъпа}}",
+      "errors": {
+        "addFailed": "Запазването не е възможно. Моля, опитайте отново."
+      }
+    },
     "gdprAuditLog": {
       "title": "Регистър GDPR",
       "date": "Дата",
@@ -509,6 +537,14 @@
       "subtitle": "Конфигуриране на външния вид и поведението на платформата за повторно използване от ПА",
       "saving": "Запазване...",
       "saved": "Настройките са запазени успешно",
+      "sections": {
+        "languagesTitle": "Управление на езици",
+        "languagesDescription": "Активирайте или деактивирайте езиците на ЕС, показвани в интерфейса, изберете езика по подразбиране и персонализирайте преводите.",
+        "gdprTemplatesTitle": "GDPR шаблони",
+        "gdprTemplatesDescription": "Създавайте декларации за поверителност за многократна употреба между събития и изберете шаблон по подразбиране за новите събития.",
+        "emailTemplatesTitle": "Шаблони за имейли",
+        "emailTemplatesDescription": "Персонализирайте темата, заглавията и текстовете на имейлите за потвърждение и напомняне. Ако са оставени празни, ще се използват текстовете по подразбиране."
+      },
       "tabs": {
         "branding": "Брандинг",
         "header": "Горен колонтитул",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Сигурни ли сте, че искате да изтриете този файл?",
       "noFiles": "Няма качени файлове. Използвайте бутона «Качване на файл», за да добавите материали."
     },
+    "emailTemplates": {
+      "title": "Шаблони за имейли",
+      "subtitle": "Персонализирайте темата, заглавията и текстовете на транзакционните имейли. Полетата, оставени празни, използват вградените текстове по подразбиране.",
+      "overridden": "Персонализиран",
+      "usingDefault": "По подразбиране",
+      "saved": "Шаблонът е запазен успешно.",
+      "resetDone": "Персонализацията е премахната: ще се използва текстът по подразбиране.",
+      "revert": "Отмяна на промените",
+      "resetToDefault": "Връщане към стойността по подразбиране",
+      "confirmReset": "Да се премахне ли персонализацията? Ще се използва вграденият текст по подразбиране.",
+      "placeholdersTitle": "Налични заместители",
+      "placeholdersHelp": "Вмъкнете тези заместители в полетата: те ще бъдат заменени при изпращане с реалните данни на събитието.",
+      "keys": {
+        "confirmation": "Потвърждение на регистрация",
+        "reminder": "Напомняне за събитие"
+      },
+      "selectors": {
+        "key": "Тип имейл",
+        "locale": "Език"
+      },
+      "fields": {
+        "subject": "Тема",
+        "subjectHint": "Тема на имейла. Поддържа заместители.",
+        "heading": "Основно заглавие",
+        "headingHint": "Заглавие, показвано в горната част на тялото на имейла.",
+        "bodyIntro": "Уводен параграф",
+        "bodyIntroHint": "Текст преди таблицата с подробности за събитието. Полезен за приветствено съобщение или допълнителен контекст.",
+        "ctaLabel": "Етикет на бутон",
+        "ctaLabelHint": "Текст на бутона, водещ към персоналната връзка за достъп.",
+        "infoNote": "Информационна бележка",
+        "infoNoteHint": "Жълто предупредително поле под бутона. Оставете празно, за да го скриете.",
+        "footerNote": "Бележка в подвала",
+        "footerNoteHint": "Текст, показван в подвала под евентуалния подпис на организацията."
+      },
+      "errors": {
+        "saveFailed": "Запазването не е успешно. Проверете данните и опитайте отново.",
+        "resetFailed": "Персонализацията не може да бъде премахната. Моля, опитайте отново."
+      }
+    },
     "languages": {
       "title": "Управление на езици",
       "subtitle": "Конфигуриране на наличните езици и персонализиране на преводите",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Дублиране",
+    "duplicateError": "Дублирането е неуспешно. Опитайте отново."
   },
   "email": {
     "confirmationSubject": "Потвърждение на регистрацията: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Съгласявам се с аудио/видео записа на това събитие",
       "recordingRequired": "Съгласието за запис е задължително за участие в това събитие",
-      "futureCommunications": "Желая да получавам информация за бъдещи събития, организирани от DTD"
+      "futureCommunications": "Желая да получавам информация за бъдещи събития, организирани от DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Моите данни",
@@ -1069,6 +1148,102 @@
           "title": "Ограничение на отговорността",
           "body": "Въпреки предприемането на подходящи технически и организационни мерки, Департаментът не може да гарантира пълната липса на прекъсвания или неизправности, причинени от непредвидени събития, дейности по поддръжка или външни фактори. Правните отговорности се уреждат от приложимото законодателство."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Сигурност и прозрачност",
+      "title": "Сигурност и прозрачност",
+      "intro": "Изходният код на тази платформа е публичен и подлежи на автоматизирани проверки за сигурност. Тази страница обобщава наличните инструменти за прозрачност за потребителите на услугата.",
+      "sections": {
+        "openSource": {
+          "title": "Софтуер с отворен код",
+          "body": "Цялата платформа е публикувана като свободен софтуер. Изходният код може да бъде преглеждан, изтеглян и одитиран от всеки, в съответствие с принципите за прозрачност на италианската публична администрация."
+        },
+        "sbom": {
+          "title": "SBOM (Списък на софтуерните компоненти)",
+          "body": "Всяка версия, публикувана в GitHub, включва SBOM във формат SPDX за контейнерния образ и SBOM във формат CycloneDX за npm зависимостите на приложението. Файловете са приложени директно към версията и могат да се използват за одити на сигурността и съответствието."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Хранилището се анализира периодично от OpenSSF Scorecard, който автоматично оценява десетки практики за сигурност на проекта (защита на клоновете, работни процеси с минимални привилегии, подписани ангажименти, управление на зависимостите). Текущият резултат е публичен."
+        },
+        "scanning": {
+          "title": "Автоматизирани проверки",
+          "body": "Зависимостите се наблюдават непрекъснато чрез Dependabot и npm audit. Пайплайнът за версии създава проследими образи чрез етикета org.opencontainers.image.revision, който свързва всеки образ с точния ангажимент, от който е построен."
+        },
+        "disclosure": {
+          "title": "Докладване на уязвимости",
+          "body": "Политиката за отговорно разкриване е описана във файла SECURITY.md на хранилището. Проблеми със сигурността могат да бъдат докладвани поверително според указанията там."
+        }
+      },
+      "links": {
+        "sourceCode": "Изходен код",
+        "scorecard": "Резултат от OpenSSF Scorecard",
+        "latestRelease": "Последна версия (със SBOM)",
+        "securityPolicy": "Политика за разкриване (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Контакти",
     "legalNotes": "Правни бележки",
     "governmentSite": "Италианско правителство",
-    "systemStatus": "Състояние на системата"
+    "systemStatus": "Състояние на системата",
+    "sbomLatest": "SBOM на последната версия",
+    "transparency": "Сигурност и прозрачност",
+    "sourceCode": "Изходен код",
+    "buildInfoDev": "разработческа компилация",
+    "viewCommit": "Преглед на ангажимента в GitHub",
+    "viewRelease": "Преглед на версията в GitHub",
+    "buildDatePrefix": "Компилирано на",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Политика за поверителност",
@@ -1454,6 +1637,25 @@
       "materials": "Материали",
       "polls": "Анкети",
       "feedback": "Обратна връзка"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

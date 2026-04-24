@@ -344,7 +344,11 @@
       "settingsGeneral": "Generale",
       "settingsLanguages": "Limbi",
       "ariaLabel": "Navigare administrare",
-      "subNavAriaLabel": "Navigare secțiune"
+      "subNavAriaLabel": "Navigare secțiune",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Panou de administrare",
@@ -492,6 +496,30 @@
       "noComments": "Niciun comentariu",
       "stars": "stele"
     },
+    "coModerators": {
+      "title": "Co-moderatori și vorbitori",
+      "intro": "Adăugați co-moderatori și vorbitori cu magic-link-uri individuale.",
+      "introHint": "Fiecare persoană are un nume afișat propriu în sală și un token care poate fi revocat independent de linkul principal. Vorbitorii au microfon, video și partajare de ecran, dar nu pot modera (excludere, dezactivare audio general, înregistrare).",
+      "add": "Adăugați persoană",
+      "name": "Nume afișat în sală",
+      "email": "Email (opțional)",
+      "emailPlaceholder": "pentru a-i trimite linkul",
+      "role": "Rol",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Vorbitor",
+      "roleModeratorHint": "Moderare completă: poate înregistra, dezactiva audio-ul tuturor, elimina participanți.",
+      "roleSpeakerHint": "Poate vorbi, afișa video și partaja ecranul. Nu poate modera sala.",
+      "copyLink": "Copiați linkul",
+      "copied": "Copiat!",
+      "revoke": "Revocați",
+      "revoked": "Revocat",
+      "confirmRevoke": "Revocați accesul acestei persoane? Linkul va înceta să funcționeze imediat.",
+      "empty": "Niciun acces suplimentar acordat. Linkul moderator principal rămâne singura intrare privilegiată.",
+      "activeCount": "{count, plural, =0 {Niciun acces activ} =1 {1 acces activ} other {# accesuri active}}",
+      "errors": {
+        "addFailed": "Nu s-a putut salva. Încercați din nou."
+      }
+    },
     "gdprAuditLog": {
       "title": "Registru GDPR",
       "date": "Data",
@@ -509,6 +537,14 @@
       "subtitle": "Configurați aspectul și comportamentul platformei pentru reutilizarea în AP",
       "saving": "Se salvează...",
       "saved": "Setări salvate cu succes",
+      "sections": {
+        "languagesTitle": "Gestionare limbi",
+        "languagesDescription": "Activați/dezactivați limbile UE expuse în interfață, alegeți limba implicită și personalizați traducerile.",
+        "gdprTemplatesTitle": "Șabloane GDPR",
+        "gdprTemplatesDescription": "Creați informări de confidențialitate reutilizabile între evenimente și alegeți-o pe cea implicită pentru evenimentele noi.",
+        "emailTemplatesTitle": "Șabloane de e-mail",
+        "emailTemplatesDescription": "Personalizați subiectul, titlurile și textele e-mailurilor de confirmare și memento. Dacă sunt lăsate goale, se folosesc textele predefinite."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Antet",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Sigur doriți să ștergeți acest fișier?",
       "noFiles": "Niciun fișier încărcat. Utilizați butonul \"Încărcați fișier\" pentru a adăuga materiale."
     },
+    "emailTemplates": {
+      "title": "Șabloane de e-mail",
+      "subtitle": "Personalizați subiectul, titlurile și textele e-mailurilor tranzacționale. Câmpurile lăsate goale folosesc textele predefinite integrate.",
+      "overridden": "Personalizat",
+      "usingDefault": "Predefinit",
+      "saved": "Șablon salvat cu succes.",
+      "resetDone": "Suprascrierea a fost eliminată: se va folosi textul predefinit.",
+      "revert": "Anulați modificările",
+      "resetToDefault": "Restabiliți la predefinit",
+      "confirmReset": "Eliminați suprascrierea? Se va folosi textul predefinit integrat.",
+      "placeholdersTitle": "Substituenți disponibili",
+      "placeholdersHelp": "Inserați acești substituenți în câmpuri: vor fi înlocuiți la trimitere cu datele reale ale evenimentului.",
+      "keys": {
+        "confirmation": "Confirmare înregistrare",
+        "reminder": "Memento eveniment"
+      },
+      "selectors": {
+        "key": "Tip de e-mail",
+        "locale": "Limbă"
+      },
+      "fields": {
+        "subject": "Subiect",
+        "subjectHint": "Subiectul e-mailului. Acceptă substituenți.",
+        "heading": "Titlu principal",
+        "headingHint": "Titlul afișat în partea de sus a corpului e-mailului.",
+        "bodyIntro": "Paragraf introductiv",
+        "bodyIntroHint": "Text afișat înainte de tabelul cu detaliile evenimentului. Util pentru un mesaj de bun venit sau context suplimentar.",
+        "ctaLabel": "Eticheta butonului",
+        "ctaLabelHint": "Textul butonului care duce la linkul personal de acces.",
+        "infoNote": "Notă informativă",
+        "infoNoteHint": "Caseta galbenă de avertizare de sub buton. Lăsați-o goală pentru a o ascunde.",
+        "footerNote": "Notă de subsol",
+        "footerNoteHint": "Text afișat în subsol, sub eventuala semnătură a organizației."
+      },
+      "errors": {
+        "saveFailed": "Salvarea a eșuat. Verificați datele și încercați din nou.",
+        "resetFailed": "Nu s-a putut elimina suprascrierea. Încercați din nou."
+      }
+    },
     "languages": {
       "title": "Gestionare limbi",
       "subtitle": "Configurați limbile disponibile și personalizați traducerile",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Duplică",
+    "duplicateError": "Duplicarea a eșuat. Încercați din nou."
   },
   "email": {
     "confirmationSubject": "Confirmare înregistrare: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Consimt la înregistrarea audio/video a evenimentului",
       "recordingRequired": "Consimțământul pentru înregistrare este obligatoriu pentru a participa la acest eveniment",
-      "futureCommunications": "Doresc să primesc informații despre evenimentele viitoare organizate de DTD"
+      "futureCommunications": "Doresc să primesc informații despre evenimentele viitoare organizate de DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Datele mele",
@@ -1069,6 +1148,102 @@
           "title": "Limitări de responsabilitate",
           "body": "Deși se adoptă măsuri tehnice și organizatorice adecvate, Departamentul nu garantează absența absolută a întreruperilor sau defecțiunilor cauzate de evenimente neprevăzute, activități de mentenanță sau factori externi. Responsabilitățile legale rămân cele prevăzute de legislația aplicabilă."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Securitate și transparență",
+      "title": "Securitate și transparență",
+      "intro": "Codul sursă al acestei platforme este public și este supus controalelor automate de securitate. Această pagină rezumă instrumentele de transparență disponibile celor care utilizează serviciul.",
+      "sections": {
+        "openSource": {
+          "title": "Software open source",
+          "body": "Întreaga platformă este publicată ca software liber. Codul sursă poate fi examinat, descărcat și auditat de oricine, în conformitate cu principiile de transparență ale Administrației Publice italiene."
+        },
+        "sbom": {
+          "title": "SBOM (listă a componentelor software)",
+          "body": "Fiecare versiune publicată pe GitHub include un SBOM în format SPDX pentru imaginea containerului și un SBOM în format CycloneDX pentru dependențele npm ale aplicației. Fișierele sunt atașate direct la versiune și pot fi utilizate pentru audituri de securitate și conformitate."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Depozitul este analizat periodic de OpenSSF Scorecard, care evaluează automat zeci de practici de securitate ale proiectului (protecția ramurilor, fluxuri de lucru cu privilegii minime, commit-uri semnate, gestionarea dependențelor). Scorul actual este public."
+        },
+        "scanning": {
+          "title": "Scanări automate",
+          "body": "Dependențele sunt monitorizate continuu prin Dependabot și npm audit. Pipeline-ul de lansare produce imagini trasabile prin eticheta org.opencontainers.image.revision, care asociază fiecare imagine cu commit-ul exact din care a fost construită."
+        },
+        "disclosure": {
+          "title": "Raportarea vulnerabilităților",
+          "body": "Politica de dezvăluire responsabilă este descrisă în fișierul SECURITY.md al depozitului. Problemele de securitate pot fi raportate confidențial conform instrucțiunilor furnizate acolo."
+        }
+      },
+      "links": {
+        "sourceCode": "Codul sursă",
+        "scorecard": "Scorul OpenSSF Scorecard",
+        "latestRelease": "Ultima versiune (cu SBOM)",
+        "securityPolicy": "Politica de dezvăluire (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Contacte",
     "legalNotes": "Note legale",
     "governmentSite": "Guvernul Italian",
-    "systemStatus": "Starea sistemului"
+    "systemStatus": "Starea sistemului",
+    "sbomLatest": "SBOM-ul ultimei versiuni",
+    "transparency": "Securitate și transparență",
+    "sourceCode": "Codul sursă",
+    "buildInfoDev": "versiune de dezvoltare",
+    "viewCommit": "Vezi commit-ul pe GitHub",
+    "viewRelease": "Vezi versiunea pe GitHub",
+    "buildDatePrefix": "Compilat la",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Politica de confidențialitate",
@@ -1454,6 +1637,25 @@
       "materials": "Materiale",
       "polls": "Sondaje",
       "feedback": "Feedback"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

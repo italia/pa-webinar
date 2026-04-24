@@ -20,10 +20,13 @@ import {
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import LocaleTabBar from '@/components/ui/locale-tab-bar';
+import { MarkdownEditor } from '@/components/ui/markdown';
 import { useRouter } from '@/i18n/navigation';
 import { createEventSchema } from '@/lib/validation/schemas';
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
+import JvbCapacityPreview from '@/components/admin/jvb-capacity-preview';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 
 interface FieldErrors {
   [key: string]: string | undefined;
@@ -35,6 +38,7 @@ interface TemplatePreset {
   qaEnabled: boolean;
   chatEnabled: boolean;
   recordingEnabled: boolean;
+  autoStartRecording: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
@@ -46,6 +50,8 @@ interface CreateEventFormProps {
   siteTimezone: string;
   enabledLocales?: string[];
   defaultLocale?: string;
+  defaultSenderRatioPct: number;
+  jvbSizingConfig: JvbSizingConfig;
 }
 
 function CollapsibleSection({
@@ -67,17 +73,23 @@ function CollapsibleSection({
 
   return (
     <div
-      className="mb-4"
+      className="mb-4 shadow-sm"
       style={{
         borderRadius: 8,
         border: '1px solid #e8e8e8',
         overflow: 'hidden',
+        backgroundColor: '#fff',
       }}
     >
       <button
         type="button"
-        className="d-flex align-items-center justify-content-between w-100 p-4 border-0 bg-white"
-        style={{ cursor: 'pointer' }}
+        className={`d-flex align-items-center justify-content-between w-100 p-4 border-0 bg-white ${
+          open ? 'border-bottom' : ''
+        }`}
+        style={{
+          cursor: 'pointer',
+          borderBottomColor: open ? '#e8e8e8' : undefined,
+        }}
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-controls={`section-${id}`}
@@ -86,7 +98,7 @@ function CollapsibleSection({
           <Icon icon={icon} size="sm" color="primary" />
           <h5
             className="fw-semibold mb-0"
-            style={{ color: '#17324D', fontSize: '1rem' }}
+            style={{ color: '#17324D' }}
           >
             {title}
           </h5>
@@ -107,7 +119,7 @@ function CollapsibleSection({
         />
       </button>
       {open && (
-        <div id={`section-${id}`} className="px-4 pb-4">
+        <div id={`section-${id}`} className="p-4">
           {children}
         </div>
       )}
@@ -120,6 +132,8 @@ export default function CreateEventForm({
   siteTimezone,
   enabledLocales = ['it', 'en'],
   defaultLocale: defaultLoc = 'it',
+  defaultSenderRatioPct,
+  jvbSizingConfig,
 }: CreateEventFormProps) {
   const t = useTranslations('admin');
   const tc = useTranslations('common');
@@ -138,6 +152,7 @@ export default function CreateEventForm({
     qaEnabled: template?.qaEnabled ?? true,
     chatEnabled: template?.chatEnabled ?? false,
     recordingEnabled: template?.recordingEnabled ?? false,
+    autoStartRecording: template?.autoStartRecording ?? false,
     participantsCanUnmute: template?.participantsCanUnmute ?? false,
     participantsCanStartVideo: template?.participantsCanStartVideo ?? false,
     participantsCanShareScreen: template?.participantsCanShareScreen ?? false,
@@ -155,6 +170,11 @@ export default function CreateEventForm({
     organizerName: '',
     imageUrl: '',
     waitingRoomAudioUrl: '',
+    // null = inherit site default, otherwise a percentage 0-100
+    expectedSenderRatioPct: null as number | null,
+    // null = inherit site default; 0 = hard stop at endsAt; -1 = never
+    // auto-close; N>0 = grace of N minutes
+    gracePeriodMinutes: null as number | null,
   });
 
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -229,6 +249,7 @@ export default function CreateEventForm({
         qaEnabled: form.qaEnabled,
         chatEnabled: form.chatEnabled,
         recordingEnabled: form.recordingEnabled,
+        autoStartRecording: form.autoStartRecording,
         participantsCanUnmute: form.participantsCanUnmute,
         participantsCanStartVideo: form.participantsCanStartVideo,
         participantsCanShareScreen: form.participantsCanShareScreen,
@@ -254,6 +275,8 @@ export default function CreateEventForm({
         organizerName: form.organizerName || undefined,
         imageUrl: form.imageUrl || undefined,
         waitingRoomAudioUrl: form.waitingRoomAudioUrl || undefined,
+        expectedSenderRatioPct: form.expectedSenderRatioPct ?? undefined,
+        gracePeriodMinutes: form.gracePeriodMinutes ?? undefined,
       };
 
       const result = createEventSchema.safeParse(payload);
@@ -361,14 +384,14 @@ export default function CreateEventForm({
           />
         </FormGroup>
         <FormGroup className="mb-3">
-          <TextArea
-            {...localizedInputProps('description', contentLocale, t('form.descriptionLabel'))}
+          <MarkdownEditor
+            id={`description.${contentLocale}`}
+            label={t('form.descriptionLabel')}
             value={(form.description as Record<string, string>)[contentLocale] ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              setLocalizedField('description', contentLocale, e.target.value)
-            }
-            rows={4}
-            required={contentLocale === defaultLoc}
+            onChange={(v) => setLocalizedField('description', contentLocale, v)}
+            rows={8}
+            invalid={!!errors[`description.${contentLocale}`]}
+            errorText={errors[`description.${contentLocale}`]}
           />
         </FormGroup>
       </CollapsibleSection>
@@ -420,7 +443,7 @@ export default function CreateEventForm({
               <Input
                 {...inputProps(
                   'maxParticipants',
-                  t('form.maxParticipants'),
+                  t('form.expectedParticipants'),
                 )}
                 type="number"
                 value={form.maxParticipants.toString()}
@@ -428,8 +451,87 @@ export default function CreateEventForm({
                   setField('maxParticipants', Number(e.target.value) || 0)
                 }
                 min={2}
-                max={500}
+                max={10000}
               />
+              <small className="text-muted">{t('form.expectedParticipantsHint')}</small>
+            </FormGroup>
+          </Col>
+          <Col md={6}>
+            <FormGroup className="mb-3">
+              <Label htmlFor="expectedSenderRatioPct">
+                {t('form.expectedSenderRatio')}
+              </Label>
+              <div className="d-flex align-items-center gap-2">
+                <Input
+                  id="expectedSenderRatioPct"
+                  type="number"
+                  value={form.expectedSenderRatioPct ?? ''}
+                  placeholder={t('form.expectedSenderRatioInherit')}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const v = e.target.value;
+                    setField(
+                      'expectedSenderRatioPct',
+                      v === ''
+                        ? null
+                        : Math.max(0, Math.min(100, Number(v) || 0)),
+                    );
+                  }}
+                  min={0}
+                  max={100}
+                />
+                <span className="text-muted">%</span>
+              </div>
+              <small className="text-muted">
+                {t('form.expectedSenderRatioHint')}
+              </small>
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            <JvbCapacityPreview
+              maxParticipants={form.maxParticipants}
+              senderRatioPct={form.expectedSenderRatioPct}
+              onSenderRatioChange={(next) =>
+                setField('expectedSenderRatioPct', next)
+              }
+              videoEnabled={form.participantsCanStartVideo}
+              defaultSenderRatioPct={defaultSenderRatioPct}
+              sizingConfig={jvbSizingConfig}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col md={6}>
+            <FormGroup className="mb-3">
+              <Label htmlFor="gracePeriodMinutes">{t('form.gracePeriod')}</Label>
+              <select
+                id="gracePeriodMinutes"
+                className="form-control"
+                value={
+                  form.gracePeriodMinutes === null
+                    ? 'inherit'
+                    : String(form.gracePeriodMinutes)
+                }
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setField(
+                    'gracePeriodMinutes',
+                    v === 'inherit' ? null : Number(v),
+                  );
+                }}
+              >
+                <option value="inherit">{t('form.gracePeriodInherit')}</option>
+                <option value="0">{t('form.gracePeriodHardStop')}</option>
+                <option value="5">{t('form.gracePeriodMinutesN', { n: 5 })}</option>
+                <option value="15">{t('form.gracePeriodMinutesN', { n: 15 })}</option>
+                <option value="30">{t('form.gracePeriodMinutesN', { n: 30 })}</option>
+                <option value="60">{t('form.gracePeriodMinutesN', { n: 60 })}</option>
+                <option value="-1">{t('form.gracePeriodNever')}</option>
+              </select>
+              <small className="text-muted d-block mt-1">
+                {t('form.gracePeriodHint')}
+              </small>
             </FormGroup>
           </Col>
           <Col md={6}>
@@ -513,7 +615,7 @@ export default function CreateEventForm({
           </div>
         </div>
 
-        <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+        <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
               <div className="fw-semibold" style={{ color: '#17324D' }}>
@@ -534,7 +636,7 @@ export default function CreateEventForm({
           </div>
         </div>
 
-        <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+        <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
               <div className="fw-semibold" style={{ color: '#17324D' }}>
@@ -556,6 +658,31 @@ export default function CreateEventForm({
             />
           </div>
         </div>
+
+        {form.recordingEnabled && (
+          <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
+            <div className="d-flex justify-content-between align-items-start">
+              <div className="me-3">
+                <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  {t('form.autoStartRecording')}
+                </div>
+                <div
+                  className="text-secondary"
+                  style={{ fontSize: '0.85rem' }}
+                >
+                  {t('form.autoStartRecordingDesc')}
+                </div>
+              </div>
+              <ToggleSwitch
+                label=""
+                checked={form.autoStartRecording}
+                onChange={() =>
+                  setField('autoStartRecording', !form.autoStartRecording)
+                }
+              />
+            </div>
+          </div>
+        )}
 
         <div className="mt-3 mb-3">
           <Label
@@ -720,7 +847,7 @@ export default function CreateEventForm({
           </div>
         </div>
 
-        <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+        <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
               <div className="fw-semibold" style={{ color: '#17324D' }}>
@@ -748,7 +875,7 @@ export default function CreateEventForm({
           </div>
         </div>
 
-        <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+        <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
               <div className="fw-semibold" style={{ color: '#17324D' }}>
@@ -776,7 +903,7 @@ export default function CreateEventForm({
           </div>
         </div>
 
-        <div className="mt-2">
+        <div className="mt-3 pt-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <small className="form-text text-muted">
             {t('form.permissionsNote')}
           </small>
@@ -816,7 +943,7 @@ export default function CreateEventForm({
           </div>
         </div>
 
-        <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+        <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
               <div className="fw-semibold" style={{ color: '#17324D' }}>
@@ -842,7 +969,7 @@ export default function CreateEventForm({
           </div>
         </div>
 
-        <div className="py-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+        <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
               <div className="fw-semibold" style={{ color: '#17324D' }}>

@@ -22,6 +22,13 @@ interface RaisedHandsPanelProps {
    * the name down lets us short-circuit the lookup for the local ID.
    */
   localDisplayName?: string;
+  /**
+   * When true, hides the "approve mic" / "approve video" action buttons
+   * — used to show the same ordered queue to all attendees, so everyone
+   *   can see who raised their hand and in what order (addresses the
+   *   caffettino feedback where only moderators had this visibility).
+   */
+  readOnly?: boolean;
 }
 
 /**
@@ -44,7 +51,7 @@ function resolveDisplayName(
   return p?.displayName || p?.formattedDisplayName || '';
 }
 
-export default function RaisedHandsPanel({ api, localDisplayName = '' }: RaisedHandsPanelProps) {
+export default function RaisedHandsPanel({ api, localDisplayName = '', readOnly = false }: RaisedHandsPanelProps) {
   const t = useTranslations('live.moderator');
   const [hands, setHands] = useState<RaisedHand[]>([]);
   const handsRef = useRef<Map<string, RaisedHand>>(new Map());
@@ -154,6 +161,11 @@ export default function RaisedHandsPanel({ api, localDisplayName = '' }: RaisedH
   );
 
   if (hands.length === 0) {
+    // In read-only mode (visible to non-moderators) hide completely when
+    // nobody has raised a hand — a permanent "nessuna mano alzata" strip
+    // would be visual noise for ordinary attendees. Moderators still get
+    // the placeholder so they know the widget is alive.
+    if (readOnly) return null;
     return (
       <div
         className="text-white px-3 py-2 small text-center"
@@ -202,28 +214,32 @@ export default function RaisedHandsPanel({ api, localDisplayName = '' }: RaisedH
               <span className="small" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 ({timeStr})
               </span>
-              <Button
-                color="success"
-                size="xs"
-                className="px-1 py-0 ms-1"
-                onClick={() => handleApproveAll(h.id)}
-                aria-label={t('approveAll')}
-                title={t('approveAll')}
-                style={{ lineHeight: 1 }}
-              >
-                <Icon icon="it-microphone" size="xs" />
-              </Button>
-              <Button
-                color="light"
-                size="xs"
-                className="px-1 py-0"
-                onClick={() => handleApproveAudioOnly(h.id)}
-                aria-label={t('audioOnly')}
-                title={t('audioOnly')}
-                style={{ lineHeight: 1, fontSize: '0.65rem' }}
-              >
-                <Icon icon="it-hearing" size="xs" />
-              </Button>
+              {!readOnly && (
+                <>
+                  <Button
+                    color="success"
+                    size="xs"
+                    className="px-1 py-0 ms-1"
+                    onClick={() => handleApproveAll(h.id)}
+                    aria-label={t('approveAll')}
+                    title={t('approveAll')}
+                    style={{ lineHeight: 1 }}
+                  >
+                    <Icon icon="it-microphone" size="xs" />
+                  </Button>
+                  <Button
+                    color="light"
+                    size="xs"
+                    className="px-1 py-0"
+                    onClick={() => handleApproveAudioOnly(h.id)}
+                    aria-label={t('audioOnly')}
+                    title={t('audioOnly')}
+                    style={{ lineHeight: 1, fontSize: '0.65rem' }}
+                  >
+                    <Icon icon="it-hearing" size="xs" />
+                  </Button>
+                </>
+              )}
             </div>
           );
         })}

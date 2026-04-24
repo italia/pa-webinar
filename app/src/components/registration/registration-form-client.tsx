@@ -12,6 +12,7 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import QuestionnaireForm from '@/components/questionnaires/questionnaire-form';
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
 
 interface ProfilingConfig {
@@ -49,6 +50,10 @@ export default function RegistrationFormClient({
   const [consentGiven, setConsentGiven] = useState(false);
   const [consentRecording, setConsentRecording] = useState(false);
   const [consentFutureCommunications, setConsentFutureCommunications] = useState(false);
+  // Rubrica (address book) opt-in — separate Art. 6.1.a consent from the
+  // event-registration Art. 6.1.b basis. Default unchecked, as GDPR
+  // requires an affirmative act.
+  const [consentAddressBook, setConsentAddressBook] = useState(false);
   const [privacyExpanded, setPrivacyExpanded] = useState(false);
 
   const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
@@ -58,6 +63,7 @@ export default function RegistrationFormClient({
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [registrationAccessToken, setRegistrationAccessToken] = useState<string | null>(null);
 
   const showOrg = profiling?.requireOrganization ?? false;
   const showRole = profiling?.requireOrganizationRole ?? false;
@@ -90,6 +96,7 @@ export default function RegistrationFormClient({
       email,
       consentGiven,
       consentFutureCommunications,
+      consentAddressBook,
     };
     if (recordingEnabled) payload.consentRecording = consentRecording;
     if (showOrg) payload.organization = organization || undefined;
@@ -124,7 +131,7 @@ export default function RegistrationFormClient({
     }
     setErrors({});
     return true;
-  }, [displayName, email, consentGiven, consentRecording, consentFutureCommunications, organization, organizationRole, organizationType, showOrg, showRole, showType, recordingEnabled]);
+  }, [displayName, email, consentGiven, consentRecording, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, showOrg, showRole, showType, recordingEnabled]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -138,6 +145,7 @@ export default function RegistrationFormClient({
         const body: Record<string, unknown> = {
           displayName, email, consentGiven,
           consentFutureCommunications,
+          consentAddressBook,
         };
         if (recordingEnabled) body.consentRecording = consentRecording;
         if (showOrg && organization) body.organization = organization;
@@ -167,6 +175,10 @@ export default function RegistrationFormClient({
           return;
         }
 
+        const regData = await res.json().catch(() => ({}));
+        if (regData?.accessToken) {
+          setRegistrationAccessToken(regData.accessToken);
+        }
         setSuccess(true);
       } catch {
         setServerError(t('errors.generic'));
@@ -174,20 +186,33 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, consentRecording, consentFutureCommunications, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled],
+    [displayName, email, consentGiven, consentRecording, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled],
   );
 
   if (success) {
     return (
-      <div className="text-center py-4">
-        <Icon icon="it-check-circle" size="xl" className="text-success mb-3" />
-        <h2 className="h3 mb-3">{t('success')}</h2>
-        <p className="mb-4">{t('successMessage')}</p>
-        <Link href={`/events/${eventSlug}`}>
-          <Button color="primary" outline tag="span">
-            {t('backToEvent')}
-          </Button>
-        </Link>
+      <div className="py-4">
+        <div className="text-center">
+          <Icon icon="it-check-circle" size="xl" className="text-success mb-3" />
+          <h2 className="h3 mb-3">{t('success')}</h2>
+          <p className="mb-4">{t('successMessage')}</p>
+        </div>
+        {registrationAccessToken && (
+          <div className="mb-4">
+            <QuestionnaireForm
+              eventSlug={eventSlug}
+              placement="PRE_REGISTRATION"
+              accessToken={registrationAccessToken}
+            />
+          </div>
+        )}
+        <div className="text-center">
+          <Link href={`/events/${eventSlug}`}>
+            <Button color="primary" outline tag="span">
+              {t('backToEvent')}
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -370,7 +395,7 @@ export default function RegistrationFormClient({
       )}
 
       {/* ── Consent 3: Future communications (optional) ── */}
-      <FormGroup check className="mb-4">
+      <FormGroup check className="mb-3">
         <Input
           type="checkbox"
           id="consentFutureCommunications"
@@ -382,6 +407,24 @@ export default function RegistrationFormClient({
         <Label for="consentFutureCommunications" check>
           {tg('consent.futureCommunications')}
         </Label>
+      </FormGroup>
+
+      {/* ── Consent 4: Rubrica (address book) — Art. 6.1.a opt-in ── */}
+      <FormGroup check className="mb-4">
+        <Input
+          type="checkbox"
+          id="consentAddressBook"
+          checked={consentAddressBook}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setConsentAddressBook(e.target.checked)
+          }
+        />
+        <Label for="consentAddressBook" check>
+          {tg('consent.addressBook')}
+        </Label>
+        <div className="form-text text-muted small ms-1">
+          {tg('consent.addressBookHelp')}
+        </div>
       </FormGroup>
 
       <Button

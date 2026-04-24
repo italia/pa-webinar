@@ -10,6 +10,8 @@ import {
   jitsiInterfaceConfigOverwrite,
   baseToolbarButtons,
   moderatorToolbarButtons,
+  mobileBaseToolbarButtons,
+  mobileModeratorToolbarButtons,
 } from '@/lib/jitsi/config';
 
 interface WatermarkSettings {
@@ -30,6 +32,12 @@ interface JitsiRoomProps {
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
   enableFileSharing?: boolean;
+  /** If true, the iframe initializes with the local video track muted.
+   *  Reflects the user's pre-join DeviceCheck toggle so the choice
+   *  actually takes effect when the user lands in the Jitsi room. */
+  startWithVideoMuted?: boolean;
+  /** If true, the iframe initializes with the local audio track muted. */
+  startWithAudioMuted?: boolean;
   watermark?: WatermarkSettings;
   onReady?: () => void;
   onLeft?: () => void;
@@ -60,6 +68,8 @@ export default function JitsiRoom({
   participantsCanStartVideo = true,
   participantsCanShareScreen = true,
   enableFileSharing = false,
+  startWithVideoMuted = false,
+  startWithAudioMuted = false,
   watermark,
   onReady,
   onLeft,
@@ -87,19 +97,57 @@ export default function JitsiRoom({
   useEffect(() => { onApiReadyRef.current = onApiReady; }, [onApiReady]);
 
   const observerRef = useRef<MutationObserver | null>(null);
+  // Mobile detection captured once at mount. We intentionally don't
+  // react to resize: flipping the toolbar mid-call would require
+  // reinitialising the iframe (disconnecting the user).
+  const isMobileRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     disposedRef.current = false;
+    isMobileRef.current = window.matchMedia('(max-width: 767.98px)').matches;
 
     let toolbarButtons = role === 'moderator'
-      ? [...moderatorToolbarButtons]
-      : [...baseToolbarButtons];
+      ? (isMobileRef.current ? [...mobileModeratorToolbarButtons] : [...moderatorToolbarButtons])
+      : (isMobileRef.current ? [...mobileBaseToolbarButtons] : [...baseToolbarButtons]);
 
     const extraConfig: Record<string, unknown> = {};
 
+    // Moderators need the participants-pane "rimuovi utente" (kick) to
+    // actually fire — the global default has `disableKick: true` to hide
+    // the button from participants, so we flip it back on per-instance.
+    // `disableGrantModerator` stays true: grant is driven by JWT, not UI.
+    if (role === 'moderator') {
+      extraConfig.remoteVideoMenu = {
+        ...jitsiConfigOverwrite.remoteVideoMenu,
+        disableKick: false,
+      };
+    }
+
+    // Honor the user's pre-join DeviceCheck choice. The base
+    // `jitsiConfigOverwrite` defaults both flags to `true` (start muted),
+    // so we must explicitly write the prop value — both true AND false —
+    // otherwise a user who turned the camera ON in the preview would
+    // still join muted.
+    //
+    // EXCEPTION: on mobile browsers we always start muted, regardless of
+    // the pre-join choice. iOS Safari (and Chrome in-iframe contexts)
+    // require a fresh user gesture for each getUserMedia call, so
+    // auto-acquiring the camera on join fails and can crash the iframe.
+    // The user taps the Jitsi camera button after joining — that click
+    // counts as a gesture and works reliably.
+    if (isMobileRef.current) {
+      extraConfig.startWithVideoMuted = true;
+      extraConfig.startWithAudioMuted = true;
+    } else {
+      extraConfig.startWithVideoMuted = startWithVideoMuted;
+      extraConfig.startWithAudioMuted = startWithAudioMuted;
+    }
+
     if (role === 'participant') {
       if (!participantsCanUnmute) {
+        // Policy override: participants without unmute permission are
+        // always forced muted. Can't be relaxed by the DeviceCheck.
         extraConfig.startWithAudioMuted = true;
         extraConfig.disableAudioDenied = true;
         toolbarButtons = toolbarButtons.filter(b => b !== 'microphone');
@@ -235,7 +283,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, startWithVideoMuted, startWithAudioMuted]);
 
   return (
     <div className="jitsi-wrapper position-relative">

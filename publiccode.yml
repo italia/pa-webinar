@@ -3,8 +3,8 @@ name: eventi-dtd
 applicationSuite: eventi-dtd
 url: "https://github.com/italia/eventi-dtd"
 landingURL: "https://github.com/italia/eventi-dtd"
-softwareVersion: "0.1.0"
-releaseDate: "2026-03-24"
+softwareVersion: "0.3.44"
+releaseDate: "2026-04-19"
 developmentStatus: beta
 softwareType: standalone/web
 platforms:

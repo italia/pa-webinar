@@ -6,7 +6,7 @@
 import { prisma } from '@/lib/db';
 import { decryptPII } from '@/lib/crypto/pii';
 import { generateEventICal } from '@/lib/ical/generate';
-import { sendEmail } from '@/lib/email/send';
+import { enqueueEmail } from '@/lib/email/outbox';
 import { formatDate, formatTime } from '@/lib/utils/date-format';
 import { getPublicEnv } from '@/lib/env';
 import { localizedUrl } from '@/lib/utils/localized-url';
@@ -115,7 +115,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
       for (const registration of event.registrations) {
         try {
           const recipientEmail = decryptPII(registration.email);
-          await sendEmail({
+          await enqueueEmail({
             to: recipientEmail,
             subject,
             html,
@@ -125,9 +125,15 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
               content: icsContent,
               contentType: 'text/calendar; charset=utf-8; method=REQUEST',
             }],
+            metadata: {
+              kind: 'date-change-notification',
+              registrationId: registration.id,
+              eventId: input.eventId,
+              locale: input.locale,
+            },
           });
         } catch (err) {
-          console.error(`[email] Failed to send date-change notification to registration ${registration.id}:`, err);
+          console.error(`[email] Failed to enqueue date-change notification for registration ${registration.id}:`, err);
         }
       }
     } catch (err) {

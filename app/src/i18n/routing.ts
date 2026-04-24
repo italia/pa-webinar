@@ -12,13 +12,19 @@ export const routing = defineRouting({
     '/events': { it: '/eventi', en: '/events' },
     '/events/[slug]': { it: '/eventi/[slug]', en: '/events/[slug]' },
     '/events/[slug]/registration': { it: '/eventi/[slug]/registrazione', en: '/events/[slug]/registration' },
-    '/events/[slug]/live': '/events/[slug]/live',
+    // Must stay in sync with `lib/utils/localized-url.ts`, which
+    // rewrites `/events/…` → `/eventi/…` wholesale for IT. That helper
+    // builds the join link in the sign-up confirmation email, so the
+    // router has to match `/it/eventi/<slug>/live` — if this stays a
+    // bare string ('/events/[slug]/live') the email link 404s.
+    '/events/[slug]/live': { it: '/eventi/[slug]/live', en: '/events/[slug]/live' },
 
     '/calendar': { it: '/calendario', en: '/calendar' },
     '/accessibility': { it: '/accessibilita', en: '/accessibility' },
     '/legal-notice': { it: '/note-legali', en: '/legal-notice' },
     '/privacy': '/privacy',
     '/privacy/my-data': { it: '/privacy/i-miei-dati', en: '/privacy/my-data' },
+    '/security': { it: '/sicurezza', en: '/security' },
     '/status': '/status',
 
     '/admin/login': '/admin/login',
@@ -36,8 +42,11 @@ export const routing = defineRouting({
     '/admin/recordings': { it: '/admin/registrazioni-video', en: '/admin/recordings' },
     '/admin/moderators': { it: '/admin/moderatori', en: '/admin/moderators' },
     '/admin/gdpr-audit': { it: '/admin/gdpr-audit', en: '/admin/gdpr-audit' },
+    '/admin/publications': { it: '/admin/pubblicazioni', en: '/admin/publications' },
+    '/admin/publications/new': { it: '/admin/pubblicazioni/nuova', en: '/admin/publications/new' },
     '/admin/settings': { it: '/admin/impostazioni', en: '/admin/settings' },
     '/admin/settings/languages': { it: '/admin/impostazioni/lingue', en: '/admin/settings/languages' },
+    '/admin/settings/gdpr-templates': { it: '/admin/impostazioni/modelli-gdpr', en: '/admin/settings/gdpr-templates' },
     '/admin/calendar': { it: '/admin/calendario', en: '/admin/calendar' },
     '/admin/infrastructure': { it: '/admin/infrastruttura', en: '/admin/infrastructure' },
     '/admin/monitoring': '/admin/monitoring',

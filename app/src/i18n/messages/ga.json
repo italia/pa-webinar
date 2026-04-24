@@ -344,7 +344,11 @@
       "settingsGeneral": "Ginearálta",
       "settingsLanguages": "Teangacha",
       "ariaLabel": "Nascleanúint riaracháin",
-      "subNavAriaLabel": "Nascleanúint rannáin"
+      "subNavAriaLabel": "Nascleanúint rannáin",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Painéal riaracháin",
@@ -492,6 +496,30 @@
       "noComments": "Gan nótaí tráchta",
       "stars": "réaltaí"
     },
+    "coModerators": {
+      "title": "Comhmhodhnóirí agus cainteoirí",
+      "intro": "Cuir comhmhodhnóirí agus cainteoirí leis trí naisc dhraíochta ar leith.",
+      "introHint": "Tá ainm ar leith ag gach duine sa seomra agus comhartha is féidir a chúlghairm go neamhspleách ón bpríomhnasc. Tá micreafón, ceamara agus comhroinnt scáileáin ag cainteoirí ach ní féidir leo modhnóireacht a dhéanamh (ciceáil amach, gach duine a chiúiniú, taifeadadh).",
+      "add": "Cuir duine leis",
+      "name": "Ainm infheicthe sa seomra",
+      "email": "Ríomhphost (roghnach)",
+      "emailPlaceholder": "chun an nasc a sheoladh chucu",
+      "role": "Ról",
+      "roleModerator": "Modhnóir",
+      "roleSpeaker": "Cainteoir",
+      "roleModeratorHint": "Lánmhodhnóireacht: is féidir taifeadadh, gach duine a chiúiniú agus rannpháirtithe a bhaint.",
+      "roleSpeakerHint": "Is féidir labhairt, físeán a thaispeáint agus scáileán a chomhroinnt. Ní féidir an seomra a mhodhnóireacht.",
+      "copyLink": "Cóipeáil nasc",
+      "copied": "Cóipeáilte!",
+      "revoke": "Cúlghair",
+      "revoked": "Cúlghairthe",
+      "confirmRevoke": "Rochtain an duine seo a chúlghairm? Stopfaidh an nasc ag obair láithreach.",
+      "empty": "Ní tugadh aon rochtain bhreise. Is é an príomhnasc modhnóra an t-aon slí isteach phribhléideach.",
+      "activeCount": "{count, plural, =0 {Gan rochtain ghníomhach} =1 {1 rochtain ghníomhach} other {# rochtain ghníomhacha}}",
+      "errors": {
+        "addFailed": "Níorbh fhéidir é a shábháil. Déan iarracht arís."
+      }
+    },
     "gdprAuditLog": {
       "title": "Loga iniúchóireachta GDPR",
       "date": "Dáta",
@@ -509,6 +537,14 @@
       "subtitle": "Cumraigh cuma agus iompar an ardáin le haghaidh athúsáide RA",
       "saving": "Ag sábháil...",
       "saved": "Socruithe sábháilte go rathúil",
+      "sections": {
+        "languagesTitle": "Bainistíocht teangacha",
+        "languagesDescription": "Cumasaigh nó díchumasaigh na teangacha AE atá ar fáil d'úsáideoirí, roghnaigh an teanga réamhshocraithe agus saincheap na haistriúcháin.",
+        "gdprTemplatesTitle": "Teimpléid GDPR",
+        "gdprTemplatesDescription": "Cruthaigh fógraí príobháideachta in-athúsáidte is féidir a nascadh le himeachtaí ar bith, agus roghnaigh an ceann réamhshocraithe do imeachtaí nua.",
+        "emailTemplatesTitle": "Teimpléid ríomhphoist",
+        "emailTemplatesDescription": "Saincheap ábhar, cinnteidil agus téacs na ríomhphost deimhnithe agus meabhrúcháin. Fág folamh chun na téacsanna réamhshocraithe a úsáid."
+      },
       "tabs": {
         "branding": "Brandáil",
         "header": "Ceanntásc",
@@ -712,6 +748,45 @@
       "deleteConfirm": "An bhfuil sibh cinnte gur mian libh an comhad seo a scriosadh?",
       "noFiles": "Gan comhad uaslódáilte. Úsáid an cnaipe \"Uaslódáil comhad\" chun ábhair a chur leis."
     },
+    "emailTemplates": {
+      "title": "Teimpléid ríomhphoist",
+      "subtitle": "Saincheap ábhar, cinnteidil agus téacs na ríomhphost idirbheartaíochta. Úsáidtear na téacsanna réamhshocraithe ionsuite i réimsí folmha.",
+      "overridden": "Saincheaptha",
+      "usingDefault": "Réamhshocraithe",
+      "saved": "Teimpléad sábháilte.",
+      "resetDone": "Sáruithe bainte: úsáidfear an téacs réamhshocraithe.",
+      "revert": "Cealaigh athruithe",
+      "resetToDefault": "Athshocraigh go réamhshocraithe",
+      "confirmReset": "An sárú a bhaint? Úsáidfear an téacs réamhshocraithe ionsuite.",
+      "placeholdersTitle": "Ionadchoinneálaithe ar fáil",
+      "placeholdersHelp": "Cuir isteach na comharthaí seo i réimse ar bith — cuirfear sonraí fíor an imeachta ina n-áit tráth an tseolta.",
+      "keys": {
+        "confirmation": "Deimhniú cláraithe",
+        "reminder": "Meabhrúchán imeachta"
+      },
+      "selectors": {
+        "key": "Cineál ríomhphoist",
+        "locale": "Teanga"
+      },
+      "fields": {
+        "subject": "Ábhar",
+        "subjectHint": "Ábhar an ríomhphoist. Tacaíonn sé le hionadchoinneálaithe.",
+        "heading": "Príomhcheannteideal",
+        "headingHint": "Ceannteideal a thaispeántar ag barr chorp an ríomhphoist.",
+        "bodyIntro": "Alt tosaigh",
+        "bodyIntroHint": "Téacs a thaispeántar roimh tábla sonraí an imeachta. Úsáideach do theachtaireacht fáilte nó comhthéacs breise.",
+        "ctaLabel": "Lipéad an chnaipe",
+        "ctaLabelHint": "Lipéad an phríomhchnaipe a nascann leis an URL pearsanta rannpháirtíochta.",
+        "infoNote": "Nóta eolais",
+        "infoNoteHint": "Bosca rabhaidh buí faoin gcnaipe. Fág folamh chun é a cheilt.",
+        "footerNote": "Nóta buntásc",
+        "footerNoteHint": "Téacs a thaispeántar sa bhuntásc faoi shíniú na heagraíochta, más ann dó."
+      },
+      "errors": {
+        "saveFailed": "Theip ar an sábháil. Seiceáil na réimsí agus bain triail eile as.",
+        "resetFailed": "Níorbh fhéidir an sárú a bhaint. Déan iarracht arís."
+      }
+    },
     "languages": {
       "title": "Bainistíocht teangacha",
       "subtitle": "Cumraigh na teangacha atá ar fáil agus saincheap aistriúcháin",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Dúbailte",
+    "duplicateError": "Theip ar an dúbailt. Bain triail eile as."
   },
   "email": {
     "confirmationSubject": "Clárú deimhnithe: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Toilím le taifeadadh fuaime/físe an imeachta seo",
       "recordingRequired": "Tá toiliú leis an taifeadadh riachtanach chun páirt a ghlacadh san imeacht seo",
-      "futureCommunications": "Ba mhaith liom eolas a fháil faoi imeachtaí amach anseo arna n-eagrú ag DTD"
+      "futureCommunications": "Ba mhaith liom eolas a fháil faoi imeachtaí amach anseo arna n-eagrú ag DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Mo chuid sonraí",
@@ -1069,6 +1148,102 @@
           "title": "Teorannú dliteanais",
           "body": "Cé go nglactar bearta teicniúla agus eagraíochtúla cuí, ní féidir leis an Roinn asláithreacht iomlán bristeacha nó mífheidhmithe a ráthú de dheasca teagmhas gan choinne, gníomhaíochtaí cothabhála nó fachtóirí seachtracha. Tá freagrachtaí dlíthiúla fós faoi rialú ag an dlí infheidhme."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Slándáil agus trédhearcacht",
+      "title": "Slándáil agus trédhearcacht",
+      "intro": "Tá cód foinse an ardáin seo poiblí agus faoi réir seiceálacha slándála uathoibrithe. Déanann an leathanach seo achoimre ar na huirlisí trédhearcachta atá ar fáil dóibh siúd a úsáideann an tseirbhís.",
+      "sections": {
+        "openSource": {
+          "title": "Bogearraí foinse oscailte",
+          "body": "Tá an t-ardán iomlán foilsithe mar bhogearraí saor in aisce. Is féidir leis an duine ar bith an cód foinse a scrúdú, a íoslódáil agus a iniúchadh, i gcomhréir le prionsabail trédhearcachta Riaracháin Phoiblí na hIodáile."
+        },
+        "sbom": {
+          "title": "SBOM (Bille Ábhar Bogearraí)",
+          "body": "Cuimsíonn gach eisiúint a fhoilsítear ar GitHub SBOM san fhormáid SPDX don íomhá coimeádáin agus SBOM san fhormáid CycloneDX do spleáchais npm an fheidhmchláir. Tá na comhaid ceangailte go díreach leis an eisiúint agus is féidir iad a úsáid d'iniúchtaí slándála agus comhlíontachta."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Déanann OpenSSF Scorecard anailís ar an stór go tréimhsiúil, ag measúnú go huathoibríoch na mórán de chleachtais slándála an tionscadail (cosaint craoibhe, sreafaí oibre le pribhléidí íosta, commits sínithe, bainistiú spleáchais). Tá an scór reatha poiblí."
+        },
+        "scanning": {
+          "title": "Scanadh uathoibrithe",
+          "body": "Déantar monatóireacht leanúnach ar spleáchais trí Dependabot agus npm audit. Táirgeann an phíblíne eisiúna íomhánna inrianaithe tríd an lipéad org.opencontainers.image.revision, a nascann gach íomhá leis an gcommit cruinn óna tógadh í."
+        },
+        "disclosure": {
+          "title": "Tuairisciú leochaileachtaí",
+          "body": "Tá an beartas nochta freagrach tuairiscithe sa chomhad SECURITY.md sa stór. Is féidir saincheisteanna slándála a thuairisciú faoi rún de réir na dtreoracha a thugtar ansin."
+        }
+      },
+      "links": {
+        "sourceCode": "Cód foinse",
+        "scorecard": "Scór OpenSSF Scorecard",
+        "latestRelease": "An eisiúint is déanaí (le SBOM)",
+        "securityPolicy": "Beartas nochta (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Teagmhálacha",
     "legalNotes": "Nótaí dlíthiúla",
     "governmentSite": "Rialtas na hIodáile",
-    "systemStatus": "Stádas an chórais"
+    "systemStatus": "Stádas an chórais",
+    "sbomLatest": "SBOM an eisiúna is déanaí",
+    "transparency": "Slándáil agus trédhearcacht",
+    "sourceCode": "Cód foinse",
+    "buildInfoDev": "tógáil forbartha",
+    "viewCommit": "Féach ar an gcommit ar GitHub",
+    "viewRelease": "Féach ar an eisiúint ar GitHub",
+    "buildDatePrefix": "Tógtha ar",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Beartas príobháideachta",
@@ -1454,6 +1637,25 @@
       "materials": "Ábhair",
       "polls": "Pobalbhreitheanna",
       "feedback": "Aiseolas"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

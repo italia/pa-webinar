@@ -25,6 +25,22 @@ function IconShield() {
     </svg>
   );
 }
+function IconMail() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" />
+    </svg>
+  );
+}
+function IconTag() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+      <line x1="7" y1="7" x2="7.01" y2="7" />
+    </svg>
+  );
+}
 
 interface Section {
   href: string;
@@ -48,6 +64,20 @@ const SECTIONS: Section[] = [
     descriptionKey: 'gdprTemplatesDescription',
     tone: 'warning',
     icon: <IconShield />,
+  },
+  {
+    href: '/admin/settings/email-templates',
+    titleKey: 'emailTemplatesTitle',
+    descriptionKey: 'emailTemplatesDescription',
+    tone: 'primary',
+    icon: <IconMail />,
+  },
+  {
+    href: '/admin/settings/tags',
+    titleKey: 'tagsTitle',
+    descriptionKey: 'tagsDescription',
+    tone: 'primary',
+    icon: <IconTag />,
   },
 ];
 

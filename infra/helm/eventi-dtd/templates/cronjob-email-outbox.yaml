@@ -1,0 +1,74 @@
+{{- if .Values.cronjobs.emailOutbox.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-email-outbox
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: cronjob-email-outbox
+spec:
+  schedule: {{ .Values.cronjobs.emailOutbox.schedule | quote }}
+  # Forbid overlap: if a previous run is still draining the queue, skip
+  # this tick. The processor's row-level lease prevents double-sends even
+  # across accidental overlap, but serializing keeps SMTP load predictable.
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      # Slightly under the schedule interval so a hung job can't stack up.
+      activeDeadlineSeconds: 55
+      template:
+        metadata:
+          labels:
+            {{- include "eventi-dtd.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: cronjob-email-outbox
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 100
+            runAsGroup: 101
+            seccompProfile:
+              type: RuntimeDefault
+          {{- if .Values.app.nodeSelector }}
+          nodeSelector:
+            {{- toYaml .Values.app.nodeSelector | nindent 12 }}
+          {{- end }}
+          {{- if .Values.app.tolerations }}
+          tolerations:
+            {{- toYaml .Values.app.tolerations | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: email-outbox
+              image: {{ .Values.cronjobs.emailOutbox.image }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  curl -sf \
+                    -H "x-api-key: $(CRON_API_KEY)" \
+                    {{ include "eventi-dtd.internalUrl" . }}/api/cron/email-outbox
+              env:
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "eventi-dtd.secretName" . }}
+                      key: CRON_API_KEY
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                capabilities:
+                  drop:
+                    - ALL
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 32Mi
+                limits:
+                  cpu: 50m
+                  memory: 32Mi
+{{- end }}

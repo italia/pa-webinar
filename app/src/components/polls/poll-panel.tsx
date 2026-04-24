@@ -37,7 +37,6 @@ export default function PollPanel({
   isModerator,
 }: PollPanelProps) {
   const t = useTranslations('polls');
-  const [showOnMobile, setShowOnMobile] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
 
   const apiUrl = `/api/events/${eventSlug}/polls`;
@@ -103,24 +102,10 @@ export default function PollPanel({
   }, [mutate]);
 
   return (
-    <>
-      <div className="d-lg-none p-2 border-top">
-        <Button
-          color="primary"
-          outline
-          size="sm"
-          className="w-100"
-          onClick={() => setShowOnMobile(!showOnMobile)}
-        >
-          <Icon icon="it-chart-line" size="sm" className="me-2" />
-          {showOnMobile ? t('hidePanel') : t('showPanel')}
-        </Button>
-      </div>
-
-      <div
-        className={`poll-sidebar d-flex flex-column ${showOnMobile ? '' : 'd-none d-lg-flex'}`}
-        style={{ width: '100%', maxWidth: '360px', overflowY: 'auto' }}
-      >
+    <div
+      className="d-flex flex-column flex-grow-1"
+      style={{ width: '100%', minHeight: 0 }}
+    >
         <div className="p-3 border-bottom">
           <h3 className="h5 mb-0 d-flex align-items-center">
             <Icon icon="it-chart-line" className="me-2" />
@@ -168,7 +153,6 @@ export default function PollPanel({
             ))}
           </div>
         </div>
-      </div>
-    </>
+    </div>
   );
 }

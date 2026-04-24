@@ -344,7 +344,11 @@
       "settingsGeneral": "Opće",
       "settingsLanguages": "Jezici",
       "ariaLabel": "Navigacija administracije",
-      "subNavAriaLabel": "Navigacija odjeljka"
+      "subNavAriaLabel": "Navigacija odjeljka",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Administratorska ploča",
@@ -492,6 +496,30 @@
       "noComments": "Nema komentara",
       "stars": "zvjezdica"
     },
+    "coModerators": {
+      "title": "Sumoderatori i govornici",
+      "intro": "Dodajte sumoderatore i govornike s pojedinačnim magičnim poveznicama.",
+      "introHint": "Svaka osoba ima vlastito ime vidljivo u sobi i token koji se može opozvati neovisno o glavnoj poveznici. Govornici imaju mikrofon, kameru i dijeljenje zaslona, ali ne mogu moderirati (izbaciti, utišati sve, snimati).",
+      "add": "Dodaj osobu",
+      "name": "Ime vidljivo u sobi",
+      "email": "E-pošta (neobavezno)",
+      "emailPlaceholder": "za slanje poveznice",
+      "role": "Uloga",
+      "roleModerator": "Moderator",
+      "roleSpeaker": "Govornik",
+      "roleModeratorHint": "Potpuna moderacija: može snimati, utišati sve i ukloniti sudionike.",
+      "roleSpeakerHint": "Može govoriti, prikazivati video i dijeliti zaslon. Ne može moderirati sobu.",
+      "copyLink": "Kopiraj poveznicu",
+      "copied": "Kopirano!",
+      "revoke": "Opozovi",
+      "revoked": "Opozvano",
+      "confirmRevoke": "Opozvati pristup ovoj osobi? Poveznica će odmah prestati raditi.",
+      "empty": "Nije dodijeljen dodatni pristup. Glavna moderatorska poveznica jedini je povlašteni ulaz.",
+      "activeCount": "{count, plural, =0 {Nema aktivnih pristupa} =1 {1 aktivni pristup} other {# aktivnih pristupa}}",
+      "errors": {
+        "addFailed": "Spremanje nije uspjelo. Pokušajte ponovno."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR zapisnik",
       "date": "Datum",
@@ -509,6 +537,14 @@
       "subtitle": "Konfigurirajte izgled i ponašanje platforme za ponovnu uporabu u javnoj upravi",
       "saving": "Spremanje...",
       "saved": "Postavke uspješno spremljene",
+      "sections": {
+        "languagesTitle": "Upravljanje jezicima",
+        "languagesDescription": "Omogućite ili onemogućite jezike EU-a dostupne korisnicima, odaberite zadani jezik i prilagodite prijevode.",
+        "gdprTemplatesTitle": "GDPR predlošci",
+        "gdprTemplatesDescription": "Stvorite višekratne obavijesti o privatnosti koje se mogu povezati s bilo kojim događajem i odaberite zadanu za nove događaje.",
+        "emailTemplatesTitle": "Predlošci e-pošte",
+        "emailTemplatesDescription": "Prilagodite predmet, naslove i tekstove e-poruka potvrde i podsjetnika. Ostavite prazno za ugrađene zadane tekstove."
+      },
       "tabs": {
         "branding": "Branding",
         "header": "Zaglavlje",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Jeste li sigurni da želite obrisati ovu datoteku?",
       "noFiles": "Nema učitanih datoteka. Upotrijebite gumb \"Učitaj datoteku\" za dodavanje materijala."
     },
+    "emailTemplates": {
+      "title": "Predlošci e-pošte",
+      "subtitle": "Prilagodite predmet, naslove i tekstove transakcijskih e-poruka. Prazna polja koriste ugrađene zadane tekstove.",
+      "overridden": "Prilagođeno",
+      "usingDefault": "Koristi se zadano",
+      "saved": "Predložak spremljen.",
+      "resetDone": "Prilagodba uklonjena: koristit će se zadani tekst.",
+      "revert": "Odbaci izmjene",
+      "resetToDefault": "Vrati na zadano",
+      "confirmReset": "Ukloniti prilagodbu? Koristit će se ugrađeni zadani tekst.",
+      "placeholdersTitle": "Dostupni placeholderi",
+      "placeholdersHelp": "Umetnite ove oznake u bilo koje polje — bit će zamijenjene stvarnim podacima događaja u trenutku slanja.",
+      "keys": {
+        "confirmation": "Potvrda registracije",
+        "reminder": "Podsjetnik na događaj"
+      },
+      "selectors": {
+        "key": "Vrsta e-pošte",
+        "locale": "Jezik"
+      },
+      "fields": {
+        "subject": "Predmet",
+        "subjectHint": "Predmet e-pošte. Podržava placeholdere.",
+        "heading": "Glavni naslov",
+        "headingHint": "Naslov prikazan na vrhu tijela e-pošte.",
+        "bodyIntro": "Uvodni odlomak",
+        "bodyIntroHint": "Tekst prikazan prije tablice s pojedinostima događaja. Korisno za poruku dobrodošlice ili dodatni kontekst.",
+        "ctaLabel": "Oznaka gumba",
+        "ctaLabelHint": "Oznaka glavnog gumba koji vodi na osobnu poveznicu za pristup.",
+        "infoNote": "Informativna napomena",
+        "infoNoteHint": "Žuti okvir s upozorenjem ispod gumba. Ostavite prazno da biste ga sakrili.",
+        "footerNote": "Napomena u podnožju",
+        "footerNoteHint": "Tekst prikazan u podnožju ispod eventualnog potpisa organizacije."
+      },
+      "errors": {
+        "saveFailed": "Spremanje nije uspjelo. Provjerite polja i pokušajte ponovno.",
+        "resetFailed": "Prilagodbu nije moguće ukloniti. Pokušajte ponovno."
+      }
+    },
     "languages": {
       "title": "Upravljanje jezicima",
       "subtitle": "Konfigurirajte dostupne jezike i prilagodite prijevode",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Dupliciraj",
+    "duplicateError": "Dupliciranje nije uspjelo. Pokušajte ponovno."
   },
   "email": {
     "confirmationSubject": "Potvrda prijave: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Pristajem na audio/video snimanje događaja",
       "recordingRequired": "Pristanak na snimanje je obvezan za sudjelovanje u ovom događaju",
-      "futureCommunications": "Želim primati informacije o budućim događajima koje organizira DTD"
+      "futureCommunications": "Želim primati informacije o budućim događajima koje organizira DTD",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Moji podaci",
@@ -1069,6 +1148,102 @@
           "title": "Ograničenje odgovornosti",
           "body": "Unatoč primjeni odgovarajućih tehničkih i organizacijskih mjera, Odjel ne jamči potpuni izostanak prekida ili kvarova uzrokovanih nepredvidivim događajima, radovima održavanja ili vanjskim čimbenicima. Zakonske odgovornosti ostaju uređene važećim propisima."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Sigurnost i transparentnost",
+      "title": "Sigurnost i transparentnost",
+      "intro": "Izvorni kod ove platforme je javan i podliježe automatskim sigurnosnim provjerama. Ova stranica sažima alate za transparentnost dostupne svima koji koriste uslugu.",
+      "sections": {
+        "openSource": {
+          "title": "Softver otvorenog koda",
+          "body": "Cijela platforma objavljena je kao slobodan softver. Izvorni kod svatko može pregledati, preuzeti i revidirati, u skladu s načelima transparentnosti talijanske javne uprave."
+        },
+        "sbom": {
+          "title": "SBOM (popis komponenata softvera)",
+          "body": "Svako izdanje objavljeno na GitHubu sadrži SBOM u SPDX formatu za sliku kontejnera i SBOM u CycloneDX formatu za npm ovisnosti aplikacije. Datoteke su priložene izravno uz izdanje i mogu se koristiti za sigurnosne revizije i revizije usklađenosti."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Repozitorij periodično analizira OpenSSF Scorecard, koji automatski procjenjuje desetke sigurnosnih praksi projekta (zaštita grana, tijekovi rada s minimalnim ovlastima, potpisani commiti, upravljanje ovisnostima). Trenutni rezultat je javan."
+        },
+        "scanning": {
+          "title": "Automatske provjere",
+          "body": "Ovisnosti se neprekidno nadziru putem Dependabota i npm audita. Cjevovod za izdavanje proizvodi sljedive slike putem oznake org.opencontainers.image.revision, koja svaku sliku povezuje s točnim commitom iz kojeg je izgrađena."
+        },
+        "disclosure": {
+          "title": "Prijava ranjivosti",
+          "body": "Politika odgovornog otkrivanja opisana je u datoteci SECURITY.md u repozitoriju. Sigurnosni problemi mogu se povjerljivo prijaviti prema uputama navedenim tamo."
+        }
+      },
+      "links": {
+        "sourceCode": "Izvorni kod",
+        "scorecard": "Rezultat OpenSSF Scorecard",
+        "latestRelease": "Najnovije izdanje (sa SBOM-om)",
+        "securityPolicy": "Politika otkrivanja (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Kontakti",
     "legalNotes": "Pravne napomene",
     "governmentSite": "Talijanska Vlada",
-    "systemStatus": "Stanje sustava"
+    "systemStatus": "Stanje sustava",
+    "sbomLatest": "SBOM najnovijeg izdanja",
+    "transparency": "Sigurnost i transparentnost",
+    "sourceCode": "Izvorni kod",
+    "buildInfoDev": "razvojna verzija",
+    "viewCommit": "Prikaži commit na GitHubu",
+    "viewRelease": "Prikaži izdanje na GitHubu",
+    "buildDatePrefix": "Izgrađeno",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Politika privatnosti",
@@ -1454,6 +1637,25 @@
       "materials": "Materijali",
       "polls": "Ankete",
       "feedback": "Povratne informacije"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

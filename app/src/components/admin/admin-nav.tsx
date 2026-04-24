@@ -15,6 +15,7 @@ interface NavItem {
 const MAIN_SECTIONS: NavItem[] = [
   { href: '/admin/events', icon: 'it-calendar', labelKey: 'events' },
   { href: '/admin/registrations', icon: 'it-user', labelKey: 'registrations' },
+  { href: '/admin/questionnaires', icon: 'it-help-circle', labelKey: 'questionnaires' },
   { href: '/admin/publications', icon: 'it-files', labelKey: 'publications' },
   { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordings' },
   { href: '/admin/monitoring', icon: 'it-presentation', labelKey: 'monitoring' },
@@ -33,6 +34,7 @@ const EVENTS_SUB_NAV: NavItem[] = [
 // Registrations area groups cross-event attendee management.
 const REGISTRATIONS_SUB_NAV: NavItem[] = [
   { href: '/admin/registrations', icon: 'it-user', labelKey: 'registrationsList', exact: true },
+  { href: '/admin/rubrica', icon: 'it-pa', labelKey: 'rubrica' },
   { href: '/admin/moderators', icon: 'it-key', labelKey: 'moderators' },
   { href: '/admin/gdpr-audit', icon: 'it-files', labelKey: 'gdprAudit' },
 ];
@@ -60,6 +62,11 @@ const SETTINGS_SUB_NAV: NavItem[] = [
   { href: '/admin/settings/gdpr-templates', icon: 'it-lock', labelKey: 'settingsGdprTemplates' },
 ];
 
+const QUESTIONNAIRES_SUB_NAV: NavItem[] = [
+  { href: '/admin/questionnaires', icon: 'it-copy', labelKey: 'questionnairesLibrary', exact: true },
+  { href: '/admin/questionnaires/responses', icon: 'it-chart-line', labelKey: 'questionnairesResponses' },
+];
+
 export default function AdminNav() {
   const t = useTranslations('admin.nav');
   const pathname = usePathname();
@@ -79,12 +86,15 @@ export default function AdminNav() {
   // everything that has to do with the *people* on the platform.
   const inRegistrations = stripped.startsWith('/admin/registrations')
     || stripped.startsWith('/admin/iscrizioni')
+    || stripped.startsWith('/admin/rubrica')
     || stripped.startsWith('/admin/moderators')
     || stripped.startsWith('/admin/moderatori')
     || stripped.startsWith('/admin/gdpr-audit');
   const inRecordings = stripped.startsWith('/admin/recordings')
     || stripped.startsWith('/admin/registrazioni-video');
-  const inPublications = stripped.startsWith('/admin/publications');
+  const inPublications = stripped.startsWith('/admin/publications')
+    || stripped.startsWith('/admin/pubblicazioni');
+  const inQuestionnaires = stripped.startsWith('/admin/questionnaires');
 
   const PATH_ALIASES: Record<string, string[]> = {
     '/admin/events': ['/admin/events', '/admin/eventi'],
@@ -95,15 +105,18 @@ export default function AdminNav() {
     '/admin/calendar': ['/admin/calendar', '/admin/calendario'],
     '/admin/registrations': ['/admin/registrations', '/admin/iscrizioni'],
     '/admin/recordings': ['/admin/recordings', '/admin/registrazioni-video'],
-    '/admin/publications': ['/admin/publications'],
-    '/admin/publications/new': ['/admin/publications/new'],
+    '/admin/publications': ['/admin/publications', '/admin/pubblicazioni'],
+    '/admin/publications/new': ['/admin/publications/new', '/admin/pubblicazioni/nuova'],
     '/admin/moderators': ['/admin/moderators', '/admin/moderatori'],
+    '/admin/rubrica': ['/admin/rubrica'],
     '/admin/gdpr-audit': ['/admin/gdpr-audit'],
     '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
     '/admin/settings/languages': ['/admin/settings/languages', '/admin/impostazioni/lingue'],
-    '/admin/settings/gdpr-templates': ['/admin/settings/gdpr-templates'],
+    '/admin/settings/gdpr-templates': ['/admin/settings/gdpr-templates', '/admin/impostazioni/modelli-gdpr'],
     '/admin/infrastructure': ['/admin/infrastructure', '/admin/infrastruttura'],
     '/admin/monitoring': ['/admin/monitoring'],
+    '/admin/questionnaires': ['/admin/questionnaires'],
+    '/admin/questionnaires/responses': ['/admin/questionnaires/responses'],
   };
 
   function matchesPath(href: string, exact?: boolean): boolean {
@@ -120,6 +133,7 @@ export default function AdminNav() {
     if (item.href === '/admin/registrations') return inRegistrations;
     if (item.href === '/admin/recordings') return inRecordings;
     if (item.href === '/admin/publications') return inPublications;
+    if (item.href === '/admin/questionnaires') return inQuestionnaires;
     return matchesPath(item.href);
   }
 
@@ -140,7 +154,9 @@ export default function AdminNav() {
             ? MONITORING_SUB_NAV
             : inSettings
               ? SETTINGS_SUB_NAV
-              : null;
+              : inQuestionnaires
+                ? QUESTIONNAIRES_SUB_NAV
+                : null;
 
   return (
     <div>

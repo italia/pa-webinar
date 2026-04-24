@@ -344,7 +344,11 @@
       "settingsGeneral": "Yleiset",
       "settingsLanguages": "Kielet",
       "ariaLabel": "Hallinnan navigointi",
-      "subNavAriaLabel": "Osion navigointi"
+      "subNavAriaLabel": "Osion navigointi",
+      "questionnaires": "Questionnaires",
+      "questionnairesLibrary": "Template library",
+      "questionnairesResponses": "Responses and statistics",
+      "rubrica": "Address book"
     },
     "landing": {
       "title": "Hallintapaneeli",
@@ -492,6 +496,30 @@
       "noComments": "Ei kommentteja",
       "stars": "tähteä"
     },
+    "coModerators": {
+      "title": "Apumoderaattorit ja puhujat",
+      "intro": "Lisää apumoderaattoreita ja puhujia yksilöllisillä maagisilla linkeillä.",
+      "introHint": "Jokaisella henkilöllä on oma näkyvä nimi huoneessa ja tunnus, jonka voi perua pääsylinkistä riippumatta. Puhujilla on mikrofoni, kamera ja näytön jako, mutta he eivät voi moderoida (poistaa, mykistää kaikkia, tallentaa).",
+      "add": "Lisää henkilö",
+      "name": "Huoneessa näkyvä nimi",
+      "email": "Sähköposti (valinnainen)",
+      "emailPlaceholder": "linkin lähettämistä varten",
+      "role": "Rooli",
+      "roleModerator": "Moderaattori",
+      "roleSpeaker": "Puhuja",
+      "roleModeratorHint": "Täysi moderointi: voi tallentaa, mykistää kaikki ja poistaa osallistujia.",
+      "roleSpeakerHint": "Voi puhua, näyttää videon ja jakaa näytön. Ei voi moderoida huonetta.",
+      "copyLink": "Kopioi linkki",
+      "copied": "Kopioitu!",
+      "revoke": "Peru",
+      "revoked": "Peruttu",
+      "confirmRevoke": "Perutaanko tämän henkilön pääsy? Linkki lakkaa toimimasta heti.",
+      "empty": "Ei lisäpääsyjä myönnetty. Pääasiallinen moderaattorilinkki on ainoa etuoikeutettu sisäänkäynti.",
+      "activeCount": "{count, plural, =0 {Ei aktiivisia pääsyjä} =1 {1 aktiivinen pääsy} other {# aktiivista pääsyä}}",
+      "errors": {
+        "addFailed": "Tallennus epäonnistui. Yritä uudelleen."
+      }
+    },
     "gdprAuditLog": {
       "title": "GDPR-tarkastusloki",
       "date": "Päivämäärä",
@@ -509,6 +537,14 @@
       "subtitle": "Määritä alustan ulkoasu ja toiminta julkishallinnon uudelleenkäyttöä varten",
       "saving": "Tallennetaan...",
       "saved": "Asetukset tallennettu",
+      "sections": {
+        "languagesTitle": "Kielten hallinta",
+        "languagesDescription": "Ota käyttöön tai poista käytöstä EU-kielet, valitse oletuskieli ja mukauta käännöksiä.",
+        "gdprTemplatesTitle": "GDPR-mallit",
+        "gdprTemplatesDescription": "Luo uudelleenkäytettäviä tietosuojailmoituksia, jotka voidaan liittää tapahtumiin, ja valitse uusien tapahtumien oletusmalli.",
+        "emailTemplatesTitle": "Sähköpostimallit",
+        "emailTemplatesDescription": "Mukauta vahvistus- ja muistutusviestien otsikoita, aiheita ja tekstejä. Tyhjiin kenttiin jää sisäänrakennettu oletusteksti."
+      },
       "tabs": {
         "branding": "Brändi",
         "header": "Ylätunniste",
@@ -712,6 +748,45 @@
       "deleteConfirm": "Haluatko varmasti poistaa tämän tiedoston?",
       "noFiles": "Ei ladattuja tiedostoja. Käytä \"Lataa tiedosto\" -painiketta lisätäksesi materiaaleja."
     },
+    "emailTemplates": {
+      "title": "Sähköpostimallit",
+      "subtitle": "Mukauta transaktioviestien aihetta, otsikoita ja sisältöä. Tyhjiksi jätetyissä kentissä käytetään sisäänrakennettuja oletustekstejä.",
+      "overridden": "Mukautettu",
+      "usingDefault": "Oletus",
+      "saved": "Malli tallennettu.",
+      "resetDone": "Mukautus poistettu: käytetään oletustekstiä.",
+      "revert": "Hylkää muutokset",
+      "resetToDefault": "Palauta oletus",
+      "confirmReset": "Poistetaanko mukautus? Käytetään sisäänrakennettua oletustekstiä.",
+      "placeholdersTitle": "Käytettävissä olevat paikkamerkit",
+      "placeholdersHelp": "Lisää nämä paikkamerkit kenttiin: ne korvataan lähetyshetkellä tapahtuman todellisilla tiedoilla.",
+      "keys": {
+        "confirmation": "Rekisteröinnin vahvistus",
+        "reminder": "Tapahtumamuistutus"
+      },
+      "selectors": {
+        "key": "Sähköpostin tyyppi",
+        "locale": "Kieli"
+      },
+      "fields": {
+        "subject": "Aihe",
+        "subjectHint": "Sähköpostin aihe. Tukee paikkamerkkejä.",
+        "heading": "Pääotsikko",
+        "headingHint": "Sähköpostin ylälaidassa näkyvä otsikko.",
+        "bodyIntro": "Johdantokappale",
+        "bodyIntroHint": "Teksti ennen tapahtumatietojen taulukkoa. Hyödyllinen tervehdysviestiin tai lisätietoon.",
+        "ctaLabel": "Painikkeen teksti",
+        "ctaLabelHint": "Henkilökohtaiseen liittymislinkkiin vievän painikkeen teksti.",
+        "infoNote": "Tiedotus",
+        "infoNoteHint": "Keltainen huomiolaatikko painikkeen alla. Jätä tyhjäksi piilottaaksesi.",
+        "footerNote": "Alatunnisteen huomautus",
+        "footerNoteHint": "Alatunnisteessa organisaation allekirjoituksen alapuolella näkyvä teksti."
+      },
+      "errors": {
+        "saveFailed": "Tallennus epäonnistui. Tarkista kentät ja yritä uudelleen.",
+        "resetFailed": "Mukautuksen poistaminen epäonnistui. Yritä uudelleen."
+      }
+    },
     "languages": {
       "title": "Kielihallinta",
       "subtitle": "Määritä käytettävissä olevat kielet ja muokkaa käännöksiä",
@@ -914,7 +989,9 @@
       "play": "Play",
       "closePlayer": "Close player",
       "playerUnsupported": "Your browser does not support video playback."
-    }
+    },
+    "duplicateEvent": "Monista",
+    "duplicateError": "Monistus epäonnistui. Yritä uudelleen."
   },
   "email": {
     "confirmationSubject": "Ilmoittautuminen vahvistettu: {eventTitle}",
@@ -982,7 +1059,9 @@
     "consent": {
       "recording": "Suostun tämän tapahtuman ääni-/videotallennukseen",
       "recordingRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan osallistumiseksi",
-      "futureCommunications": "Haluan saada tietoa DTD:n järjestämistä tulevista tapahtumista"
+      "futureCommunications": "Haluan saada tietoa DTD:n järjestämistä tulevista tapahtumista",
+      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
       "title": "Omat tietoni",
@@ -1069,6 +1148,102 @@
           "title": "Vastuunrajoitus",
           "body": "Asianmukaisista teknisistä ja organisatorisista toimenpiteistä huolimatta osasto ei voi taata, ettei ennakoimattomista tapahtumista, huoltotoimista tai ulkoisista tekijöistä johtuvia keskeytyksiä tai häiriöitä esiinny. Oikeudellinen vastuu määräytyy sovellettavan lainsäädännön mukaisesti."
         }
+      }
+    },
+    "security": {
+      "metaTitle": "Turvallisuus ja läpinäkyvyys",
+      "title": "Turvallisuus ja läpinäkyvyys",
+      "intro": "Tämän alustan lähdekoodi on julkinen ja siihen kohdistuu automatisoituja turvallisuustarkastuksia. Tämä sivu kokoaa yhteen palvelua käyttäville tarjotut läpinäkyvyyden työkalut.",
+      "sections": {
+        "openSource": {
+          "title": "Avoimen lähdekoodin ohjelmisto",
+          "body": "Koko alusta julkaistaan vapaana ohjelmistona. Kuka tahansa voi tarkastella, ladata ja auditoida lähdekoodia Italian julkishallinnon läpinäkyvyysperiaatteiden mukaisesti."
+        },
+        "sbom": {
+          "title": "SBOM (ohjelmistokomponenttiluettelo)",
+          "body": "Jokainen GitHubissa julkaistu versio sisältää SPDX-muotoisen SBOM:n container-kuvalle ja CycloneDX-muotoisen SBOM:n sovelluksen npm-riippuvuuksille. Tiedostot ovat suoraan julkaisun liitteenä ja niitä voidaan käyttää turvallisuus- ja vaatimustenmukaisuusauditointeihin."
+        },
+        "scorecard": {
+          "title": "OpenSSF Scorecard",
+          "body": "Repositoriota analysoi säännöllisesti OpenSSF Scorecard, joka arvioi automaattisesti kymmeniä projektin turvallisuuskäytäntöjä (haarojen suojaus, vähimmäisoikeuksien työnkulut, allekirjoitetut commitit, riippuvuuksien hallinta). Nykyinen pistemäärä on julkinen."
+        },
+        "scanning": {
+          "title": "Automaattiset skannaukset",
+          "body": "Riippuvuuksia seurataan jatkuvasti Dependabotin ja npm auditin avulla. Julkaisupipeline tuottaa jäljitettäviä kuvia org.opencontainers.image.revision-tunnisteen avulla, joka sitoo jokaisen kuvan täsmälliseen committiin, josta se rakennettiin."
+        },
+        "disclosure": {
+          "title": "Haavoittuvuuksien ilmoittaminen",
+          "body": "Vastuullisen ilmoittamisen käytäntö on kuvattu repositoriossa tiedostossa SECURITY.md. Turvallisuusongelmat voi ilmoittaa luottamuksellisesti siellä annettujen ohjeiden mukaisesti."
+        }
+      },
+      "links": {
+        "sourceCode": "Lähdekoodi",
+        "scorecard": "OpenSSF Scorecard -pistemäärä",
+        "latestRelease": "Viimeisin julkaisu (sisältää SBOM:n)",
+        "securityPolicy": "Ilmoituskäytäntö (SECURITY.md)"
+      }
+    },
+    "serviceInventory": {
+      "metaTitle": "Service inventory",
+      "title": "Provider service inventory",
+      "intro": "For this instance, the document below lists both the software dependencies (DEV) and the operational services (OPS) that make up the platform. It is published in CycloneDX 1.6, an OWASP open standard that describes code libraries and third-party managed services in a single document.",
+      "notPublishedTitle": "Inventory not yet published",
+      "notPublishedBody": "The operator of this instance has not yet published a service inventory. The SERVICE_INVENTORY_URL configuration variable has not been set for this deployment.",
+      "fetchErrorTitle": "Could not load the inventory",
+      "fetchErrorBody": "The inventory JSON file is currently unreachable. Please try again later or contact the service owner.",
+      "metadata": {
+        "tenant": "Instance",
+        "provider": "Cloud provider",
+        "region": "Region",
+        "deploymentMode": "Deployment mode",
+        "generatedAt": "Generated at",
+        "format": "Format",
+        "download": "Download raw JSON"
+      },
+      "sections": {
+        "componentsTitle": "Software components (DEV)",
+        "componentsIntro": "Libraries, containers and OS packages that form the application. Tied to the code version; reproducible by anyone with access to the source.",
+        "servicesTitle": "Operational services (OPS)",
+        "servicesIntro": "Third-party managed services this instance depends on. Tenant-scoped information that changes whenever the operator reconfigures the deployment or switches provider.",
+        "dependenciesTitle": "Dependency chain"
+      },
+      "columns": {
+        "name": "Name",
+        "type": "Type",
+        "version": "Version",
+        "license": "License",
+        "provider": "Provider",
+        "dataFlow": "Data flow",
+        "description": "Description"
+      },
+      "badges": {
+        "trustBoundary": "crosses trust boundary",
+        "personalData": "personal data",
+        "recording": "recorded content"
+      },
+      "stack": {
+        "title": "Architecture at a glance",
+        "intro": "A high-level view of the four layers that make up the platform: from user access down to the runtime platform.",
+        "layers": {
+          "access": {
+            "title": "Access",
+            "sub": "Web entry point and TLS termination",
+            "endUsers": "End users (browser)"
+          },
+          "app": {
+            "title": "Application",
+            "sub": "Portal, video, real-time media"
+          },
+          "data": {
+            "title": "Data",
+            "sub": "Persistence, cache, object storage"
+          },
+          "platform": {
+            "title": "Platform",
+            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+          }
+        },
+        "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
     }
   },
@@ -1345,7 +1520,15 @@
     "contacts": "Yhteystiedot",
     "legalNotes": "Oikeudelliset huomautukset",
     "governmentSite": "Italian hallitus",
-    "systemStatus": "Järjestelmän tila"
+    "systemStatus": "Järjestelmän tila",
+    "sbomLatest": "Viimeisimmän julkaisun SBOM",
+    "transparency": "Turvallisuus ja läpinäkyvyys",
+    "sourceCode": "Lähdekoodi",
+    "buildInfoDev": "kehitysversio",
+    "viewCommit": "Näytä commit GitHubissa",
+    "viewRelease": "Näytä julkaisu GitHubissa",
+    "buildDatePrefix": "Koostettu",
+    "serviceInventory": "Service inventory"
   },
   "pages": {
     "privacyTitle": "Tietosuojaseloste",
@@ -1454,6 +1637,25 @@
       "materials": "Materiaalit",
       "polls": "Kyselyt",
       "feedback": "Palaute"
+    }
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remove me from the DTD address book",
+      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "missingToken": "The link is invalid or incomplete. Please check the original email.",
+      "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
+      "notFound": "No person matches this link — they may already have been removed.",
+      "loading": "Loading…",
+      "previewHeader": "You are about to remove from the address book:",
+      "warning": "This does not delete historical event registrations.",
+      "confirm": "Confirm removal",
+      "submitting": "Removing…",
+      "successTitle": "Removal complete",
+      "successBody": "Your data is no longer in the DTD address book.",
+      "errors": {
+        "generic": "Something went wrong. Please try again later."
+      }
     }
   }
 }

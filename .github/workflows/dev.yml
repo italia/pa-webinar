@@ -55,8 +55,10 @@ jobs:
         id: tags
         run: |
           SHA_SHORT="${GITHUB_SHA::7}"
+          BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           {
             echo "sha_short=$SHA_SHORT"
+            echo "build_date=$BUILD_DATE"
             echo "app_tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev-$SHA_SHORT"
             echo "migrate_tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev-migrate,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev-migrate-$SHA_SHORT"
           } >> "$GITHUB_OUTPUT"
@@ -72,6 +74,11 @@ jobs:
           # (scope=release) stays isolated and we don't cross-contaminate.
           cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev' }}
           cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev' }}
+          build-args: |
+            NEXT_PUBLIC_BUILD_VERSION=dev
+            NEXT_PUBLIC_BUILD_SHA=${{ steps.tags.outputs.sha_short }}
+            NEXT_PUBLIC_BUILD_CHANNEL=dev
+            NEXT_PUBLIC_BUILD_DATE=${{ steps.tags.outputs.build_date }}
           # Commit-SHA label helps tracing which commit is actually running
           # in the test cluster when the `:dev` tag is ambiguous.
           labels: |

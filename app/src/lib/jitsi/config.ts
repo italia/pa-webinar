@@ -44,6 +44,33 @@ export const moderatorToolbarButtons = [
 ];
 
 /**
+ * Trimmed participant toolbar for mobile (<768px). Drops tile/filmstrip/
+ * fullscreen/select-background — non-technical first-timers on a shared
+ * link get lost otherwise. Settings stays because it contains the
+ * device chooser which is the most-asked-for control on mobile.
+ */
+// Mobile: no 'desktop' — iOS Safari + most Android browsers don't
+// support getDisplayMedia() inside an iframe, so the button would
+// surface a misleading error. Feedback on the Friday caffettino
+// confirmed this (several users on mobile couldn't share screen).
+export const mobileBaseToolbarButtons = [
+  'microphone',
+  'camera',
+  'raisehand',
+  'settings',
+];
+
+/**
+ * Moderator mobile toolbar: same trim as participants plus hangup and
+ * the participants-pane button (needed to manage the room on small screens).
+ */
+export const mobileModeratorToolbarButtons = [
+  ...mobileBaseToolbarButtons,
+  'hangup',
+  'participants-pane',
+];
+
+/**
  * Config overrides passed as `configOverwrite`.
  * Toolbar buttons are merged at instantiation time based on role.
  */
@@ -62,6 +89,13 @@ export const jitsiConfigOverwrite = {
 
   disableChat: false,
 
+  // NOTE: `disableKick: true` is the safe default — prevents participants
+  // from even attempting a kick (Jitsi would reject it server-side, but
+  // showing the button confuses users). JitsiRoom flips this to `false`
+  // at instantiation when `role === 'moderator'` so the participants-pane
+  // "rimuovi utente" action actually dispatches. `disableGrantModerator`
+  // stays `true` globally: only the primary moderator (via JWT) should
+  // grant, never via UI.
   remoteVideoMenu: {
     disabled: false,
     disableKick: true,
@@ -97,6 +131,22 @@ export const jitsiConfigOverwrite = {
   // disableThirdPartyRequests blocked JWT avatar data URIs in some Jitsi builds.
   gravatar: { disabled: true },
   brandingRoomAlias: null,
+
+  // ── Video quality tuning ─────────────────────────────────────
+  // Default Jitsi reserves HD only to ~2 dominant speakers and drops
+  // everyone else to 180p, which looks compressed on a community call
+  // where 8-10 people all have their camera on. Raise the ceiling so
+  // all active senders stay at SD/HD — 10 senders × 1.5 Mbps is still
+  // well within any decent uplink and fits our JVB sizing (≤50 senders
+  // per pod). Adjust `maxFullResolutionParticipants` downward on
+  // webinar-style events if needed.
+  constraints: {
+    video: {
+      height: { ideal: 720, max: 720, min: 240 },
+    },
+  },
+  maxFullResolutionParticipants: 25,
+  resolution: 720,
 };
 
 /**
@@ -114,9 +164,12 @@ export const jitsiInterfaceConfigOverwrite = {
   NATIVE_APP_NAME: 'Eventi PA',
 
   TOOLBAR_BUTTONS: baseToolbarButtons as string[],
-  TOOLBAR_ALWAYS_VISIBLE: false,
-  INITIAL_TOOLBAR_TIMEOUT: 5000,
-  TOOLBAR_TIMEOUT: 4000,
+  // Keep the toolbar always visible. Auto-hide at 4s surprised users
+  // on the Friday caffettino — some saw it only as a half-peek when
+  // the pointer was near the bottom and couldn't find mic/cam.
+  TOOLBAR_ALWAYS_VISIBLE: true,
+  INITIAL_TOOLBAR_TIMEOUT: 20000,
+  TOOLBAR_TIMEOUT: 20000,
 
   HIDE_INVITE_MORE_HEADER: true,
   DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
@@ -151,6 +204,26 @@ export const moderatorFeatures: JitsiJwtFeatures = {
   'screen-sharing': true,
   'outbound-call': false,
 };
+
+/**
+ * Speaker ("relatore"): full AV rights like a moderator, but cannot
+ * record, kick or mute-everyone. Mapped to Jitsi's participant role
+ * (moderator:false) so Jitsi's internal permissions also deny mod-only
+ * actions — we don't rely on just hiding buttons.
+ */
+export const speakerFeatures: JitsiJwtFeatures = {
+  recording: false,
+  livestreaming: false,
+  'screen-sharing': true,
+  'outbound-call': false,
+};
+
+/**
+ * Speaker toolbar: same as base participant toolbar. No hangup/
+ * mute-everyone/security/participants-pane — those are moderator-only.
+ * Kept as a named export for clarity and to make i18n/tests explicit.
+ */
+export const speakerToolbarButtons = baseToolbarButtons;
 
 /**
  * Instant call: participants get full AV (mic, camera, screen share)

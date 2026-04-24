@@ -8,6 +8,7 @@ import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
 export const revalidate = 30;
 
@@ -64,7 +65,10 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
   const event = await prisma.event.findUnique({
     where: { slug },
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      _count: { select: { registrations: true } },
+      tagLinks: { include: { tag: true } },
+    },
   });
 
   if (!event || !['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
@@ -232,10 +236,16 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       <EventDetailClient
         event={serialised}
         locale={locale}
+        parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}
         polls={pollsData}
         feedbackSummary={feedbackSummary}
+        tags={event.tagLinks.map((l) => ({
+          slug: l.tag.slug,
+          name: (l.tag.name ?? {}) as Record<string, string>,
+          color: l.tag.color,
+        }))}
       />
     </>
   );

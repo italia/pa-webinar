@@ -265,6 +265,42 @@ Grid** con N browser node distribuiti, oppure il Kubernetes Job in parallel mode
 La workstation è perfetta per lo sviluppo iterativo e per validare changeset;
 per capacity planning vero conviene il cluster.
 
+## Misurazioni reali
+
+### Caffettino demo — 24 aprile 2026
+
+Prima prova di carico "vera" su traffico reale: demo interna DTD con scenario
+webinar tipico (moderatore + relatori + audience passiva), usata come
+baseline per la curva di capacità del deployment `videocall-test` su AKS.
+
+| Metrica | Valore osservato | Note |
+|---|---|---|
+| Picco partecipanti simultanei | **65** | Peak letto dall'aggregato cross-pod del JVB scaler (`jvb:replicas:snapshot` in Redis), confermato da `eventi_jvb_participants` in Prometheus |
+| JVB replicas attive al picco | **3** | Scaler ha provisionato 3 pod JVB (`Standard_F16s_v2`) seguendo la formula lineare di sizing con `defaultSenderRatioPct=30` e `jvbMaxReplicas=6` |
+| Max stress JVB (cross-pod) | **0.186** (18.6%) | Ben dentro i threshold configurati `jvbStressWarnPercent=50` / `jvbStressCriticalPercent=70`. Lo stress è aggregato come **max** fra i pod (il bridge più carico detta le decisioni di capacity) |
+| Bitrate upstream aggregato | **~66 Mbps** | Somma di `bit_rate_upload` sui 3 pod — tipico per 65 utenti con video attivo a 720p @ ~1 Mbps |
+| Durata effettiva | **44 min** | Compresa tra primo `videoConferenceJoined` e ultimo `participantLeft` (misurata via `CallSession.duration`) |
+| Cleanup post-evento | OK | Scaler ha chiuso la `CallSession` al passaggio LIVE → IDLE (45 min di inattività, `jvbInactiveGraceMinutes=45`); node pool JVB tornato a 0 nodi dopo ~10 min di scale-down del cluster autoscaler AKS |
+
+**Osservazioni utili per future capacity planning**:
+
+- Con `jvbMaxReplicas=6` e hardware `F16s_v2`, la curva teorica sostiene
+  ~350 partecipanti concorrenti (3 sender / 18.75 receiver per core × 16 core
+  × 6 pod, con ratio 30% sender). A 65 siamo a **18.5% della capacità
+  nominale** — coerente col 18.6% di stress osservato.
+- Non ci sono stati cambi di regime (scale-up reattivo oltre il predictive):
+  lo stress è sempre rimasto sotto la soglia warn.
+- Due bug infrastrutturali scoperti e fissati in questa sessione sono
+  documentati come regressioni: lo scaler OOMKillato a 32Mi con ≥3 pod
+  (ora 256Mi, commit `3ac77dd`) e il gauge Prometheus `eventi_jvb_participants`
+  che leggeva solo un pod (ora legge il Redis snapshot aggregato,
+  commit `b77a375`). Entrambi visibili solo da 3 pod JVB in su.
+
+Queste misurazioni sostituiscono parzialmente i "valori indicativi basati
+su hardware di riferimento" per la fascia 50-100 partecipanti. Prima di
+pubblicare SLA per eventi > 100 partecipanti resta necessario un
+load-test dedicato (vedi sezione `jitsi-meet-torture` sopra).
+
 ## Risorse
 
 - [jitsi-meet-torture su GitHub](https://github.com/jitsi/jitsi-meet-torture)

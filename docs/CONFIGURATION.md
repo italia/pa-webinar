@@ -180,11 +180,12 @@ Imposta `postgresql.enabled: false` e fornisci `DATABASE_URL` nel Secret:
 
 ## Redis (chat pub/sub)
 
-Richiesto **solo** per il fan-out chat cross-pod. Con una singola replica
-del pod app il codice funziona anche senza Redis (fallback a `null` in
-`lib/redis.ts`): tutti i client SSE sullo stesso pod ricevono i messaggi
-dalla Postgres insert locale, ma due pod diversi non si scambiano
-messaggi in tempo reale.
+Required per il fan-out chat cross-pod. Lo stato canonico dei messaggi
+vive in Postgres (tabella `chat_messages`), ma senza Redis due pod app
+non si scambiano messaggi in tempo reale: gli utenti su pod diversi
+vedono solo i messaggi del proprio pod fino al refresh. `/api/status`
+riporta Redis come **`outage`** (non "idle") quando manca o il ping
+fallisce — la chat real-time è una dipendenza richiesta, non opzionale.
 
 ### Redis nel cluster (modalità semplice)
 
@@ -206,6 +207,19 @@ redis:
   master:
     persistence:
       enabled: false   # pub/sub è ephemeral; canonical state in Postgres
+
+  # Esposizione Prometheus via redis-exporter sidecar. Il chart Bitnami
+  # pinna anche il tag dell'exporter nel Legacy Catalog, quindi va
+  # sovrascritto a :latest come il primary.
+  metrics:
+    enabled: true
+    image:
+      tag: latest
+      pullPolicy: Always
+    serviceMonitor:
+      enabled: true
+      namespace: videocall-test   # il namespace dove esce il ServiceMonitor
+      interval: 30s
 ```
 
 ### Redis esterno (managed)
@@ -221,6 +235,158 @@ Imposta `redis.enabled: false` e fornisci `REDIS_URL` nel Secret:
 
 > Usa lo schema `rediss://` (con doppia `s`) per TLS — obbligatorio su
 > Azure Cache che accetta solo connessioni cifrate.
+
+### High availability (pianificato)
+
+Il default è standalone (1 pod, no persistence, ~80Mi RAM idle). Su nodi
+spot un'eviction = 30-60s di fan-out gap — i messaggi restano in Postgres
+ma non propagano in tempo reale durante il reschedule. Per SLA stretti la
+roadmap prevede switch a **Valkey** (fork BSD-3 di Redis, Linux Foundation)
+con `architecture: replication`: 1 primary + 2 replica + 3 sentinel, ~3×
+risorse. Giustificato quando si aggiungono feature critiche come
+distributed rate-limiting; per PA con eventi saltuari il fallback
+Postgres + reschedule automatico è sufficiente.
+
+### Metriche esposte
+
+Con `redis.metrics.enabled: true` il subchart installa un sidecar
+`redis-exporter` e (se `serviceMonitor.enabled: true`) un ServiceMonitor
+per Prometheus Operator. Metriche rilevanti:
+
+- `redis_connected_clients` — connessioni TCP (pub + subscriber)
+- `redis_memory_used_bytes` — uso memoria
+- `redis_commands_processed_total` — rate ops/sec
+- `redis_pubsub_channels` — canali pub/sub attivi (≈ eventi con chat live)
+
+Le metriche app-level (`eventi_chat_messages_total`,
+`eventi_chat_sse_connections`) sono esposte da `/api/metrics` (prom-client).
+L'admin dashboard `/admin/monitoring` aggrega entrambe le sorgenti nella
+sezione "Chat in-app & Redis" (richiede `PROMETHEUS_URL` configurato).
+
+## Storage provider (file e registrazioni)
+
+Il portale gestisce due **domini di storage** indipendenti, configurabili
+separatamente:
+
+- **files** — materiali evento (PDF, slide, immagini caricate dal moderatore)
+- **recordings** — output Jibri + MP4 caricati manualmente
+
+Ogni dominio supporta 2 backend:
+
+- **Azure Blob Storage** — connection string con account key
+- **S3-compatibile** — AWS S3, MinIO, Cloudflare R2, Wasabi, Google Cloud
+  Storage (via HMAC interop), PSN, qualunque servizio S3 on-prem
+
+Il provider viene scelto per auto-detection dalle env var presenti, oppure
+forzato con `STORAGE_FILES_PROVIDER` / `RECORDING_STORAGE_TYPE`. Tutto
+passa attraverso l'astrazione `app/src/lib/storage/` — nessun altro modulo
+importa SDK vendor direttamente.
+
+### Azure Blob (default DTD)
+
+```yaml
+# ConfigMap
+AZURE_STORAGE_CONTAINER_NAME: "eventi-files"
+RECORDING_STORAGE_TYPE: "azure-blob"
+RECORDING_AZURE_CONTAINER: "recordings"
+
+# Secret
+AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net"
+RECORDING_AZURE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net"
+```
+
+SAS (Shared Access Signature) generati lato app con `StorageSharedKeyCredential`;
+upload con PUT diretto, download con redirect firmato a breve scadenza.
+
+### AWS S3
+
+```yaml
+# ConfigMap
+STORAGE_FILES_PROVIDER: "s3"
+STORAGE_FILES_S3_REGION: "eu-south-1"
+STORAGE_FILES_S3_BUCKET: "eventi-files"
+RECORDING_STORAGE_TYPE: "s3"
+RECORDING_S3_REGION: "eu-south-1"
+RECORDING_S3_BUCKET: "eventi-recordings"
+
+# Secret
+STORAGE_FILES_S3_ACCESS_KEY_ID: "AKIA..."
+STORAGE_FILES_S3_SECRET_ACCESS_KEY: "..."
+RECORDING_S3_ACCESS_KEY_ID: "AKIA..."
+RECORDING_S3_SECRET_ACCESS_KEY: "..."
+```
+
+Omettere `*_ENDPOINT` fa puntare al regional endpoint AWS. Per IAM role
+su EKS, ometti le credential e l'SDK usa il ServiceAccount IRSA.
+
+### MinIO / S3 on-prem
+
+```yaml
+STORAGE_FILES_PROVIDER: "s3"
+STORAGE_FILES_S3_ENDPOINT: "https://minio.example.com"
+STORAGE_FILES_S3_REGION: "us-east-1"     # MinIO accetta qualunque valore
+STORAGE_FILES_S3_BUCKET: "eventi-files"
+STORAGE_FILES_S3_FORCE_PATH_STYLE: "true"  # obbligatorio per MinIO
+```
+
+`forcePathStyle: true` è richiesto perché MinIO non usa DNS virtual-host
+e serve a costruire URL tipo `https://minio/bucket/key` invece di
+`https://bucket.minio/key`.
+
+### Google Cloud Storage (via S3 interop HMAC)
+
+```yaml
+STORAGE_FILES_PROVIDER: "s3"
+STORAGE_FILES_S3_ENDPOINT: "https://storage.googleapis.com"
+STORAGE_FILES_S3_REGION: "auto"
+STORAGE_FILES_S3_BUCKET: "eventi-files"
+STORAGE_FILES_S3_FORCE_PATH_STYLE: "true"
+```
+
+Credenziali HMAC da Cloud Console → Storage → Interoperability. L'SDK AWS
+autentica e GCS traduce le request. Nativo `@google-cloud/storage` non è
+necessario per gli use-case attuali (PUT/GET/DELETE/LIST + presigned URL).
+
+### Cloudflare R2
+
+```yaml
+STORAGE_FILES_PROVIDER: "s3"
+STORAGE_FILES_S3_ENDPOINT: "https://<account-id>.r2.cloudflarestorage.com"
+STORAGE_FILES_S3_REGION: "auto"
+STORAGE_FILES_S3_BUCKET: "eventi-files"
+```
+
+### PSN / cloud sovrani italiani
+
+La maggior parte espone un'API S3-compatibile — configura come MinIO
+sostituendo `STORAGE_FILES_S3_ENDPOINT` con il dominio PSN/CSIRT
+(`https://s3.psn.it` o simili) e verifica con il provider se serve
+`forcePathStyle`. Per registrazioni usa le stesse env con prefisso
+`RECORDING_S3_*`.
+
+### CSP e media-src
+
+Se il bucket ha un dominio custom non coperto automaticamente dal
+middleware (che già gestisce `*.blob.core.windows.net`, `*.amazonaws.com`,
+`storage.googleapis.com`), aggiungi:
+
+```yaml
+RECORDING_MEDIA_CSP_HOSTS: "https://cdn.example.com https://minio.example.com"
+```
+
+Il middleware ammette queste origini in `media-src` e `connect-src` così
+il player e il form di upload possano comunicare con il bucket.
+
+### Matrice di compatibilità
+
+| Provider | Upload PUT | Download GET | Delete | List | Note |
+|---|---|---|---|---|---|
+| Azure Blob | ✅ SAS | ✅ SAS | ✅ | ✅ | Default DTD |
+| AWS S3 | ✅ presigned | ✅ presigned | ✅ | ✅ | IRSA supportato |
+| MinIO | ✅ | ✅ | ✅ | ✅ | `forcePathStyle: true` |
+| Cloudflare R2 | ✅ | ✅ | ✅ | ✅ | region `auto` |
+| GCS (HMAC) | ✅ | ✅ | ✅ | ✅ | via S3 interop |
+| PSN S3 | ✅ | ✅ | ✅ | ✅ | testare per-provider |
 
 ## Secrets management
 
@@ -339,7 +505,7 @@ jitsi-meet:
 | Variable | Required | Description |
 |---|---|---|
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `REDIS_URL` | No | Redis connection string (`redis://` / `rediss://`). Required only for multi-pod chat fan-out. With the in-cluster `redis` subchart the chart derives it at render time from `REDIS_PASSWORD`. |
+| `REDIS_URL` | **Yes (chat)** | Redis connection string (`redis://` / `rediss://`). Required for chat fan-out — senza Redis `/api/status` riporta `outage` e la chat è disabilitata. Con il subchart `redis` in-cluster la chart lo deriva a render time da `REDIS_PASSWORD`. |
 | `REDIS_PASSWORD` | Cond. | Required when the `redis` subchart is enabled or when `REDIS_URL` is not set explicitly. |
 | `APP_SECRET` | Yes | Secret for signing JWTs (admin sessions, Jitsi tokens) |
 | `ADMIN_API_KEY` | Yes | Key for admin login |
@@ -363,3 +529,56 @@ jitsi-meet:
 | `JVB_MAX_REPLICAS` | No | Max JVB replicas for auto-scaler (default: 4) |
 | `RECORDING_STORAGE_TYPE` | No | Recording storage: `azure-blob`, `s3`, `gcs`, `minio`, `local` |
 | `RECORDING_WEBHOOK_URL` | No | Webhook URL for Jibri finalize script notifications |
+| **Files storage (materials uploaded by moderators)** |  |  |
+| `STORAGE_FILES_PROVIDER` | No | `azure-blob` or `s3`. Default: auto-detected from env vars present. |
+| `AZURE_STORAGE_CONTAINER_NAME` | Cond. | Container name per files quando provider = `azure-blob`. |
+| `AZURE_STORAGE_CONNECTION_STRING` | Cond. | Connection string completa (account + key) per Azure Blob files. |
+| `STORAGE_FILES_S3_REGION` | Cond. | Regione AWS/MinIO/etc quando provider = `s3`. |
+| `STORAGE_FILES_S3_BUCKET` | Cond. | Bucket per files. |
+| `STORAGE_FILES_S3_ENDPOINT` | No | Endpoint custom (MinIO, R2, GCS interop, PSN). Ometti per AWS nativo. |
+| `STORAGE_FILES_S3_FORCE_PATH_STYLE` | No | `true` per MinIO / S3 on-prem (path-style URLs). Default: `false`. |
+| `STORAGE_FILES_S3_ACCESS_KEY_ID` | Cond. | HMAC access key. Ometti su EKS con IRSA per usare il ServiceAccount. |
+| `STORAGE_FILES_S3_SECRET_ACCESS_KEY` | Cond. | HMAC secret key. |
+| **Recordings storage (Jibri output + admin uploads)** |  |  |
+| `RECORDING_AZURE_CONTAINER` | Cond. | Container name recordings quando `RECORDING_STORAGE_TYPE=azure-blob`. |
+| `RECORDING_AZURE_CONNECTION_STRING` | Cond. | Connection string Azure per recordings. |
+| `RECORDING_S3_REGION` | Cond. | Regione S3 quando `RECORDING_STORAGE_TYPE=s3`. |
+| `RECORDING_S3_BUCKET` | Cond. | Bucket recordings. |
+| `RECORDING_S3_ENDPOINT` | No | Endpoint S3 custom. |
+| `RECORDING_S3_FORCE_PATH_STYLE` | No | `true` per MinIO / on-prem. |
+| `RECORDING_S3_ACCESS_KEY_ID` | Cond. | HMAC access key recordings. |
+| `RECORDING_S3_SECRET_ACCESS_KEY` | Cond. | HMAC secret key recordings. |
+| `RECORDING_MEDIA_CSP_HOSTS` | No | Origini extra separate da spazi da ammettere in `media-src` / `connect-src` CSP (domini custom / CDN per il bucket). |
+
+### Dynamic runtime settings (SiteSetting DB row)
+
+Alcuni parametri non sono env var ma vivono nella tabella `SiteSetting`
+(singleton) e sono modificabili a caldo dall'admin UI in
+`/admin/settings`. Persistono nel DB e sono riletti a ogni request.
+
+**Infrastructure sizing** (tab "Dimensionamento infra"): serve a calibrare
+il calcolatore JVB per il nodo effettivamente in uso (Azure F-series,
+AWS c6i, GCP n2, on-prem). Il calcolatore stima i JVB pod necessari
+per un evento con formula lineare `ceil((receivers/receiversPerCore +
+senders/sendersPerCore) / cpuCoresPerPod)`.
+
+| Key | Default | Meaning | Impatto |
+|---|---|---|---|
+| `jvbCpuCoresPerPod` | `16` | Core CPU per pod JVB. Default tarato su Azure `Standard_F16s_v2`. Per `F8s_v2` usa `8`. | Numero di partecipanti che un singolo pod JVB può servire; denominatore della formula `ceil(coresNeeded / cpuCoresPerPod)`. |
+| `jvbReceiversPerCore` | `18.75` | Partecipanti passivi (audio-only, no video upstream) sostenibili per core. Default Azure F-series. | Peso nella formula lineare di sizing. |
+| `jvbSendersPerCore` | `3.125` | Partecipanti attivi (video upstream) sostenibili per core. | Peso nella formula lineare di sizing; i sender costano ~6× un receiver. |
+| `jvbMaxReplicas` | `6` | Cap superiore al numero di JVB che il cron scaler può richiedere. | Protezione da cost explosion: anche se la formula chiede 10 pod, lo scaler si ferma al cap. |
+| `jibriCpuCoresPerPod` | `4` | Core CPU per pod Jibri. Default Azure `Standard_F4s_v2`. | Dimensionamento pod Jibri per recording concorrenti. |
+| `defaultSenderRatioPct` | `30` | % di partecipanti attesi come "sender" (video) quando un evento non specifica un override. | Governa quanti JVB lo scaler provisions: ratio alto → più pod a parità di partecipanti. |
+| `eventGracePeriodMinutes` | `15` | Minuti dopo `endsAt` in cui l'evento resta LIVE (banner "overtime"). `0` chiusura netta, `-1` mai. Override per-evento via `Event.gracePeriodMinutes`. | Evita disconnessioni brusche quando l'evento va long. |
+| `jvbInactiveGraceMinutes` | `45` | Minuti di conferenza vuota (zero partecipanti connessi) prima che lo scaler marchi l'evento LIVE → IDLE e scali i JVB a 0. Range consigliato 15-120. | Più alto = più cost se nessuno rientra; più basso = rischio di scalare giù durante una pausa. |
+| `jvbPreScaleMinutes` | `10` | Minuti di lookahead per il pre-scaling da PUBLISHED → PROVISIONING. Il JVB viene avviato N minuti prima di `startsAt`. | Deve coprire cold-start nodo F16 (~3-5 min) + boot JVB (~1 min). Valori tipici: 10 (demo interne), 30 (eventi pubblici critici con warm-overnight). |
+| `jvbProvisioningTimeoutMinutes` | `15` | Timeout massimo dello stato PROVISIONING prima che lo scaler marchi l'evento come failed/back-to-PUBLISHED se nessun partecipante si è collegato. | Copre cold-start nodo + boot JVB + margine. Alzare se il cloud provider è lento al scaling del node pool. |
+| `parseTitleKicker` | `false` | Se `true`, i titoli che contengono `|` vengono renderizzati con la parte prima del pipe come "kicker" (eyebrow label) sopra il titolo principale. Off di default per non cambiare look di titoli legacy. | Cosmetico: abilitato si ottiene il look editoriale "Serie | Episodio". Override per-evento via `Event.parseTitleKicker` (`null` = eredita, `true`/`false` = override). |
+
+**Per-event overrides** (create/edit event, sezione "Programmazione"):
+
+| Event column | Values | Meaning |
+|---|---|---|
+| `expectedSenderRatioPct` | `null` \| `0-100` | Override % sender atteso. `null` = usa `defaultSenderRatioPct`. |
+| `gracePeriodMinutes` | `null` \| `-1` \| `0` \| `5-240` | Override minuti di grace. `null` = usa `eventGracePeriodMinutes`, `-1` = evento mai auto-chiuso (utile per eventi open-ended). |

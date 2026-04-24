@@ -5,8 +5,9 @@ import { useTranslations } from 'next-intl';
 
 import { useRouter } from '@/i18n/navigation';
 import TemplatePicker from '@/components/admin/template-picker';
-import CreateEventForm from '@/components/admin/create-event-form';
+import EventWizard from '@/components/admin/event-wizard/wizard-shell';
 import CreateInstantCall from '@/components/admin/create-instant-call';
+import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 
 interface TemplateSummary {
   id: string;
@@ -16,6 +17,7 @@ interface TemplateSummary {
   qaEnabled: boolean;
   chatEnabled: boolean;
   recordingEnabled: boolean;
+  autoStartRecording: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
@@ -28,6 +30,7 @@ interface TemplatePreset {
   qaEnabled: boolean;
   chatEnabled: boolean;
   recordingEnabled: boolean;
+  autoStartRecording: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
@@ -38,12 +41,28 @@ interface Props {
   templates: TemplateSummary[];
   selectedTemplate: TemplatePreset | null;
   siteTimezone: string;
+  enabledLocales: string[];
+  defaultLocale: string;
+  defaultSenderRatioPct: number;
+  defaultRetentionDays: number;
+  jvbSizingConfig: JvbSizingConfig;
+  availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
+  gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
+  siteDefaultParseTitleKicker: boolean;
 }
 
 export default function CreateEventWithTemplate({
   templates,
   selectedTemplate,
   siteTimezone,
+  enabledLocales,
+  defaultLocale,
+  defaultSenderRatioPct,
+  defaultRetentionDays,
+  jvbSizingConfig,
+  availableTags,
+  gdprTemplates,
+  siteDefaultParseTitleKicker,
 }: Props) {
   const t = useTranslations('admin.templates');
   const ti = useTranslations('admin.instantCall');
@@ -131,5 +150,18 @@ export default function CreateEventWithTemplate({
     );
   }
 
-  return <CreateEventForm template={selectedTemplate ?? undefined} siteTimezone={siteTimezone} />;
+  return (
+    <EventWizard
+      template={selectedTemplate ?? undefined}
+      siteTimezone={siteTimezone}
+      enabledLocales={enabledLocales}
+      defaultLocale={defaultLocale}
+      defaultSenderRatioPct={defaultSenderRatioPct}
+      defaultRetentionDays={defaultRetentionDays}
+      jvbSizingConfig={jvbSizingConfig}
+      availableTags={availableTags}
+      gdprTemplates={gdprTemplates}
+      siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
+    />
+  );
 }

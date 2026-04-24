@@ -14,6 +14,7 @@ export default function CreateInstantCall() {
   const [title, setTitle] = useState('');
   const [moderatorName, setModeratorName] = useState('');
   const [joinPassword, setJoinPassword] = useState('');
+  const [maxParticipants, setMaxParticipants] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [shareLink, setShareLink] = useState('');
@@ -23,6 +24,11 @@ export default function CreateInstantCall() {
     if (!title.trim()) return;
     if (joinPassword && joinPassword.length < 4) {
       setError(t('passwordTooShort'));
+      return;
+    }
+    const maxParticipantsNum = maxParticipants.trim() ? parseInt(maxParticipants, 10) : undefined;
+    if (maxParticipantsNum !== undefined && (Number.isNaN(maxParticipantsNum) || maxParticipantsNum < 2 || maxParticipantsNum > 500)) {
+      setError(t('maxParticipantsInvalid'));
       return;
     }
     setLoading(true);
@@ -36,6 +42,7 @@ export default function CreateInstantCall() {
           title: { it: title.trim() },
           moderatorName: moderatorName.trim() || undefined,
           joinPassword: joinPassword.trim() || undefined,
+          maxParticipants: maxParticipantsNum,
         }),
       });
 
@@ -143,6 +150,23 @@ export default function CreateInstantCall() {
           autoComplete="new-password"
         />
         <small className="form-text text-muted">{t('passwordHint')}</small>
+      </FormGroup>
+
+      <FormGroup className="mb-3">
+        <Label htmlFor="instant-max-participants" className="fw-semibold" style={{ fontSize: '0.85rem' }}>
+          {t('maxParticipantsLabel')}
+        </Label>
+        <Input
+          id="instant-max-participants"
+          type="number"
+          value={maxParticipants}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxParticipants(e.target.value)}
+          placeholder={t('maxParticipantsPlaceholder')}
+          disabled={loading}
+          min={2}
+          max={500}
+        />
+        <small className="form-text text-muted">{t('maxParticipantsHint')}</small>
       </FormGroup>
 
       <div className="d-flex align-items-center gap-2">
