@@ -66,7 +66,10 @@ describe('Jitsi config exports', () => {
   it('mobileBaseToolbarButtons trims overwhelming controls', () => {
     expect(mobileBaseToolbarButtons).toContain('microphone');
     expect(mobileBaseToolbarButtons).toContain('camera');
-    expect(mobileBaseToolbarButtons).toContain('desktop');
+    // `desktop` deliberately excluded on mobile: getDisplayMedia() inside an
+    // iframe is rejected by iOS Safari and most Android browsers, so the
+    // button would only surface misleading errors.
+    expect(mobileBaseToolbarButtons).not.toContain('desktop');
     expect(mobileBaseToolbarButtons).toContain('raisehand');
     expect(mobileBaseToolbarButtons).toContain('settings');
     expect(mobileBaseToolbarButtons).not.toContain('filmstrip');

@@ -2,8 +2,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import {
-  JVB_SNAPSHOT_KEY,
-  parseJvbSnapshot,
+  readJvbSnapshot,
   type JvbSnapshot,
 } from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
@@ -14,7 +13,6 @@ import {
   queryPrometheusRange,
 } from '@/lib/prometheus';
 import { METRICS_APP_LABEL } from '@/lib/metrics';
-import { getRedis } from '@/lib/redis';
 import { getSettings } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
@@ -191,19 +189,6 @@ const EMPTY_JVB: JvbFullStats = {
   octoReceiveBitrateBps: null,
 };
 
-async function readJvbSnapshot(): Promise<JvbSnapshot | null> {
-  const redis = getRedis();
-  if (!redis) return null;
-  try {
-    const raw = await Promise.race([
-      redis.get(JVB_SNAPSHOT_KEY),
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
-    ]);
-    return parseJvbSnapshot(raw);
-  } catch {
-    return null;
-  }
-}
 
 async function getJvbStats(): Promise<JvbFullStats> {
   const url = process.env.JVB_HEALTH_URL;
