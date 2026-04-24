@@ -342,11 +342,21 @@ export default function LiveEventClient({
   }, [event.autoStartRecording, triggerRecording]);
 
   const handleJitsiReady = useCallback(() => {
+    // Open a CallSession server-side so every live event has a row in
+    // `call_sessions` with start/end timestamps even when no recording
+    // is ever triggered. The route is idempotent — repeated calls (mod
+    // + participants all firing onReady) converge on a single open row.
+    void fetch(`/api/events/${event.slug}/sessions`, { method: 'POST' }).catch(() => {
+      // Non-critical: absence of the session row just means the event
+      // won't appear in monitoring/analytics histograms. Don't surface
+      // to the user.
+    });
+
     if (isModerator && event.recordingEnabled && jibriReady && !recPromptShownRef.current) {
       recPromptShownRef.current = true;
       autoOrPromptRecording(jitsiApi);
     }
-  }, [isModerator, event.recordingEnabled, jibriReady, jitsiApi, autoOrPromptRecording]);
+  }, [isModerator, event.recordingEnabled, event.slug, jibriReady, jitsiApi, autoOrPromptRecording]);
 
   // Show recording prompt (or auto-trigger) when Jibri becomes ready after
   // the room is already open.

@@ -198,11 +198,19 @@ export const GET = withErrorHandling(async (request) => {
         select: { id: true },
       });
       if (idleCandidates.length > 0) {
+        const demotedIds = idleCandidates.map((e) => e.id);
         const r = await tx.event.updateMany({
-          where: { id: { in: idleCandidates.map((e) => e.id) } },
+          where: { id: { in: demotedIds } },
           data: { status: 'IDLE' },
         });
         counts.liveToIdle = r.count;
+        // Close any CallSession still open on these events. The client
+        // opened them on first `videoConferenceJoined`; we never know
+        // exactly when the last participant disconnected, so we use
+        // `now` (capped by `endsAt` when set — see below) as the close
+        // time. Tradeoff: a bit of extra "duration" equal to the 45-min
+        // inactivity grace, acceptable for post-event analytics.
+        await closeOpenSessions(tx, demotedIds, now);
       }
     }
 
@@ -213,14 +221,21 @@ export const GET = withErrorHandling(async (request) => {
     //      a soft "overtime" window, then we flip to ENDED. Grace
     //      of -1 means "never auto-close" — the inactivity cleanup in
     //      step (2) will eventually catch it.
-    const r3a = await tx.event.updateMany({
+    const endedByTimeoutCandidates = await tx.event.findMany({
       where: {
         status: { in: ['PUBLISHED', 'PROVISIONING', 'IDLE'] },
         endsAt: { lt: now },
       },
+      select: { id: true },
+    });
+    const r3a = await tx.event.updateMany({
+      where: { id: { in: endedByTimeoutCandidates.map((e) => e.id) } },
       data: { status: 'ENDED' },
     });
     counts.toEnded = r3a.count;
+    if (endedByTimeoutCandidates.length > 0) {
+      await closeOpenSessions(tx, endedByTimeoutCandidates.map((e) => e.id), now);
+    }
 
     const liveOvertime = await tx.event.findMany({
       where: { status: 'LIVE', endsAt: { lt: now } },
@@ -244,6 +259,7 @@ export const GET = withErrorHandling(async (request) => {
         data: { status: 'ENDED' },
       });
       counts.toEnded += r3b.count;
+      await closeOpenSessions(tx, toEndIds, now);
     }
 
     // 4) PUBLISHED → PROVISIONING when startsAt enters the pre-scale window,
@@ -439,3 +455,50 @@ export const GET = withErrorHandling(async (request) => {
     checkedAt: now.toISOString(),
   });
 });
+
+/**
+ * Close any still-open CallSession rows for a batch of events. Called
+ * from the scaler when events transition LIVE → IDLE (empty for 45+
+ * min) or anything → ENDED (past endsAt). Runs inside the outer
+ * `prisma.$transaction` so the status flip + session close are
+ * atomic.
+ *
+ * We also denormalize the final peakParticipants from the event
+ * (bumped live by Jitsi via the JVB IFrame API → admin monitoring
+ * endpoint) so the session row is self-contained for analytics.
+ */
+async function closeOpenSessions(
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
+  eventIds: string[],
+  now: Date,
+) {
+  if (eventIds.length === 0) return;
+  const openSessions = await tx.callSession.findMany({
+    where: { eventId: { in: eventIds }, endedAt: null },
+    select: { id: true, eventId: true, startedAt: true },
+  });
+  if (openSessions.length === 0) return;
+
+  const events = await tx.event.findMany({
+    where: { id: { in: openSessions.map((s) => s.eventId) } },
+    select: { id: true, peakParticipants: true },
+  });
+  const peakById = new Map(events.map((e) => [e.id, e.peakParticipants]));
+
+  await Promise.all(
+    openSessions.map((s) => {
+      const durationSeconds = Math.max(
+        0,
+        Math.floor((now.getTime() - s.startedAt.getTime()) / 1000),
+      );
+      return tx.callSession.update({
+        where: { id: s.id },
+        data: {
+          endedAt: now,
+          duration: durationSeconds,
+          peakParticipants: peakById.get(s.eventId) ?? 0,
+        },
+      });
+    }),
+  );
+}
