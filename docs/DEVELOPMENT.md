@@ -38,7 +38,7 @@ eventi-dtd/
 ├── app/                          # Workspace npm "app"
 │   ├── src/
 │   │   ├── app/                  # Next.js App Router
-│   │   │   ├── [locale]/         # Route group i18n (it, en)
+│   │   │   ├── [locale]/         # Route group i18n (24 lingue UE, IT default)
 │   │   │   │   ├── layout.tsx    # Layout radice con tema Bootstrap Italia
 │   │   │   │   ├── page.tsx      # Landing / elenco eventi
 │   │   │   │   ├── eventi/       # Pagine eventi pubbliche
@@ -60,9 +60,7 @@ eventi-dtd/
 │   │   │   ├── db.ts             # Prisma client singleton
 │   │   │   └── validation/       # Schemi Zod
 │   │   ├── i18n/
-│   │   │   ├── messages/
-│   │   │   │   ├── it.json       # Traduzioni italiano
-│   │   │   │   └── en.json       # Traduzioni inglese
+│   │   │   ├── messages/         # 24 file JSON: it.json (default) + 23 lingue UE
 │   │   │   ├── request.ts
 │   │   │   └── config.ts
 │   │   └── types/                # Interfacce TypeScript

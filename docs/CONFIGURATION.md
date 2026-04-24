@@ -562,15 +562,19 @@ AWS c6i, GCP n2, on-prem). Il calcolatore stima i JVB pod necessari
 per un evento con formula lineare `ceil((receivers/receiversPerCore +
 senders/sendersPerCore) / cpuCoresPerPod)`.
 
-| Key | Default | Meaning |
-|---|---|---|
-| `jvbCpuCoresPerPod` | `16` | Core CPU per pod JVB. Default tarato su Azure `Standard_F16s_v2`. Per `F8s_v2` usa `8`. |
-| `jvbReceiversPerCore` | `18.75` | Partecipanti passivi (audio-only, no video upstream) sostenibili per core. Default Azure F-series. |
-| `jvbSendersPerCore` | `3.125` | Partecipanti attivi (video upstream) sostenibili per core. |
-| `jvbMaxReplicas` | `6` | Cap superiore al numero di JVB che il cron scaler può richiedere. Protezione da cost explosion. |
-| `jibriCpuCoresPerPod` | `4` | Core CPU per pod Jibri. Default Azure `Standard_F4s_v2`. |
-| `defaultSenderRatioPct` | `30` | % di partecipanti attesi come "sender" (video) quando un evento non specifica un override. |
-| `eventGracePeriodMinutes` | `15` | Minuti dopo `endsAt` in cui l'evento resta LIVE (banner "overtime"). `0` chiusura netta, `-1` mai. Override per-evento via `Event.gracePeriodMinutes`. |
+| Key | Default | Meaning | Impatto |
+|---|---|---|---|
+| `jvbCpuCoresPerPod` | `16` | Core CPU per pod JVB. Default tarato su Azure `Standard_F16s_v2`. Per `F8s_v2` usa `8`. | Numero di partecipanti che un singolo pod JVB può servire; denominatore della formula `ceil(coresNeeded / cpuCoresPerPod)`. |
+| `jvbReceiversPerCore` | `18.75` | Partecipanti passivi (audio-only, no video upstream) sostenibili per core. Default Azure F-series. | Peso nella formula lineare di sizing. |
+| `jvbSendersPerCore` | `3.125` | Partecipanti attivi (video upstream) sostenibili per core. | Peso nella formula lineare di sizing; i sender costano ~6× un receiver. |
+| `jvbMaxReplicas` | `6` | Cap superiore al numero di JVB che il cron scaler può richiedere. | Protezione da cost explosion: anche se la formula chiede 10 pod, lo scaler si ferma al cap. |
+| `jibriCpuCoresPerPod` | `4` | Core CPU per pod Jibri. Default Azure `Standard_F4s_v2`. | Dimensionamento pod Jibri per recording concorrenti. |
+| `defaultSenderRatioPct` | `30` | % di partecipanti attesi come "sender" (video) quando un evento non specifica un override. | Governa quanti JVB lo scaler provisions: ratio alto → più pod a parità di partecipanti. |
+| `eventGracePeriodMinutes` | `15` | Minuti dopo `endsAt` in cui l'evento resta LIVE (banner "overtime"). `0` chiusura netta, `-1` mai. Override per-evento via `Event.gracePeriodMinutes`. | Evita disconnessioni brusche quando l'evento va long. |
+| `jvbInactiveGraceMinutes` | `45` | Minuti di conferenza vuota (zero partecipanti connessi) prima che lo scaler marchi l'evento LIVE → IDLE e scali i JVB a 0. Range consigliato 15-120. | Più alto = più cost se nessuno rientra; più basso = rischio di scalare giù durante una pausa. |
+| `jvbPreScaleMinutes` | `10` | Minuti di lookahead per il pre-scaling da PUBLISHED → PROVISIONING. Il JVB viene avviato N minuti prima di `startsAt`. | Deve coprire cold-start nodo F16 (~3-5 min) + boot JVB (~1 min). Valori tipici: 10 (demo interne), 30 (eventi pubblici critici con warm-overnight). |
+| `jvbProvisioningTimeoutMinutes` | `15` | Timeout massimo dello stato PROVISIONING prima che lo scaler marchi l'evento come failed/back-to-PUBLISHED se nessun partecipante si è collegato. | Copre cold-start nodo + boot JVB + margine. Alzare se il cloud provider è lento al scaling del node pool. |
+| `parseTitleKicker` | `false` | Se `true`, i titoli che contengono `|` vengono renderizzati con la parte prima del pipe come "kicker" (eyebrow label) sopra il titolo principale. Off di default per non cambiare look di titoli legacy. | Cosmetico: abilitato si ottiene il look editoriale "Serie | Episodio". Override per-evento via `Event.parseTitleKicker` (`null` = eredita, `true`/`false` = override). |
 
 **Per-event overrides** (create/edit event, sezione "Programmazione"):
 

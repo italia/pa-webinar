@@ -1,6 +1,6 @@
 # Roadmap — eventi-dtd
 
-Allineata al 2026-04-21. Le versioni spedite sono riassunte in forma compatta; le voci pianificate mantengono nota/effort dove utile.
+Allineata al 2026-04-24. Le versioni spedite sono riassunte in forma compatta; le voci pianificate mantengono nota/effort dove utile.
 
 ## v0.1.0 — MVP ✅
 
@@ -78,6 +78,17 @@ Rilasciati tra v0.3.8 e v0.3.44, a seguito del feedback post-demo 2026-04-16.
 - **Libreria video pubblica** `/video-library` — filtri per data/argomento/tipo, import YouTube per legacy, nuove registrazioni Jibri pubblicate automaticamente
 - **Trasparenza `/service-inventory`** — CycloneDX 1.6 per-tenant (DEV: npm+OCI; OPS: servizi Azure/AKS/Postgres/Blob/GHCR/Mailgun/coturn/…); `components[]` + `services[]` + `declarations[]` + `compositions[]` + `vulnerabilities[]` (VEX-ready) + `formulation[]` + `annotations[]`; stack diagram "Architettura in breve" data-driven da property `eventi-dtd:layer`/`stack-label`; artefatto per-tenant servito via `SERVICE_INVENTORY_URL` (file locale su test, Blob pubblico su prod). Reference implementation per OPS half: CronJob AKS + Azure Resource Graph + Workload Identity → upload Blob (`infra/service-inventory/azure/`)
 - Footer build-date con HH:MM UTC
+- **5-step event wizard** ✅ — creazione/edit evento in 5 step (Base, Permessi, Inviti, Contenuti, Revisione) con stato condiviso `WizardForm`; sostituisce il form monolitico precedente (`app/src/components/admin/event-wizard/`)
+- **Title-kicker (pipe split)** ✅ — `SiteSetting.parseTitleKicker` + override per-evento `Event.parseTitleKicker`; rendering editoriale di titoli tipo `Serie | Episodio` con kicker + titolo principale
+- **Tag taxonomy** ✅ — modelli `Tag` + `EventTagLink`, CRUD admin in `/admin/settings/tags`, filtri pubblici `/eventi?tag=<slug>`, tag chips su lista/detail/admin
+- **Rubrica (Person)** ✅ — modello `Person` (emailHash, opt-in esplicito separato, retention inactivity-based), RubricaPicker multi-select nel wizard (step Inviti), pagina admin `/admin/rubrica`, opt-out via signed HMAC token in `src/lib/persons/opt-out-token.ts` (vedi ADR-011)
+- **Auto-start recording** ✅ — flag `autoStartRecording` per-evento (+ template), Jibri viene avviato automaticamente all'ingresso del primo moderatore
+- **Waiting-room unificata** ✅ — front-door unica per guest / partecipante / moderatore (`app/src/components/live/waiting-room.tsx`): email opzionale, name gate, device check (cam/mic toggle + chime test altoparlante), chat preview, netiquette, countdown, catch-up recording
+- **Guest Q&A** ✅ — `Question.registrationId` nullable; i guest (senza Registration) possono porre domande durante eventi open-attendance
+- **Meet-style live controls** ✅ — floating bar sopra il video (desktop), bottom tab strip (<992px mobile), drawer per Q&A/Chat/Polls/Materials/Participants (`app/src/components/live/live-event-client.tsx`)
+- **RaisedHandsPanel read-only** ✅ — coda mani alzate ordinata FIFO visibile a tutti; i moderatori mantengono i controlli approve-mic/video
+- **Screenshare banner** ✅ — banner arancione quando un partecipante remoto inizia a condividere lo schermo
+- **CallSession always-on** ✅ — ogni evento live produce una `CallSession` anche senza recording, aperta al primo `videoConferenceJoined` via `POST /api/events/:slug/sessions` e chiusa dallo scaler su `LIVE→IDLE` / `*→ENDED`
 
 ## Da fare prima del rilascio pubblico
 
@@ -99,8 +110,8 @@ Flussi critici Playwright: registrazione con campi ente, login admin + creazione
 | **Ruolo Relatore (speaker)** | Mic/video/share senza poteri admin. Intermedio tra moderatore e partecipante |
 | **Breakout rooms** | Sottogruppi durante l'evento — Jitsi nativo, da esporre nella UI |
 | **Servizio AI — trascrizioni, sottotitoli, sintesi** | Modulo unificato dietro `lib/ai/` con provider pluggable (self-hosted Whisper vs API esterna, scelta per PIA). Copre: (1) trascrizione post-evento `.vtt`/`.srt`/`.txt` con speaker attribution, (2) sottotitoli live via Jigasi + Vosk/Whisper streaming, (3) sintesi per speaker + abstract globale + estrazione temi. Trascrizione raw sempre persistita (obbligo normativo); versione editata separata |
-| **Questionari pre e post evento — fase A** | Modelli `QuestionTemplate` (gruppi riusabili), `QuestionItem` (tipi: single/multi/yes_no/likert/open_text), `EventQuestionnaire` (istanza con placement `pre_registration` o `post_event`), `QuestionnaireResponse`. Admin: sezione dedicata per gestire template + tab opzionale nell'evento per selezionare template e aggiungere domande ad hoc. Dashboard risposte con filtri (evento/domanda/data), bar chart, Likert distribution, word cloud, export CSV. **Nessuna identità cross-evento**: risposte legate alla registrazione, scadono con retention evento |
-| **Rubrica + identità Persona — fase B** | Richiede ADR-011 (vedi `docs/adr/`). Modello `Person` distinto da `Registration`: identità minima (emailHash, displayName, organization, role) con opt-in esplicito separato dal consenso di partecipazione. Dedup automatica dei **campi profilo stabili** (ente/ruolo pre-compilati da `Person.lastActive` alla registrazione successiva); le **risposte evento-specifiche** invece restano per-evento e scadono. Admin: sezione Rubrica (lista persone con opt-in attivo, dettaglio eventi+risposte stabili, export). Opt-out con token email, cron retention per inattività (default 24 mesi). Non è profilazione comportamentale — niente telemetria AV per persona |
+| **Questionari pre e post evento — fase A** ✅ (spedita) | Modelli `QuestionTemplate`, `QuestionItem` (single/multi/yes_no/likert/open_text), `EventQuestionnaire` con placement `pre_registration` o `post_event`, `QuestionnaireResponse` + `QuestionnaireAnswer`. Admin: `/admin/questionnaires` per gestire template riusabili + sezione nel wizard (step 4 Contenuti) per collegare template e aggiungere domande ad hoc. Dashboard risposte in `/admin/questionnaires` con filtri. Nessuna identità cross-evento: risposte legate alla registrazione, scadono con retention evento |
+| **Rubrica + identità Persona — fase B** ✅ (spedita) | ADR-011 (`docs/adr/011-person-rubrica.md`). Modello `Person` distinto da `Registration`: identità minima (emailHash, displayName, organization, role) con opt-in esplicito separato. Admin: `/admin/rubrica` (lista persone, dettaglio, export), RubricaPicker nel wizard (step Inviti) per inviti multi-select. Opt-out via signed HMAC token (`src/lib/persons/opt-out-token.ts`), cron retention per inattività (`/api/cron/rubrica-retention`, default 24 mesi) |
 | **Upload file nei materiali** | Attualmente solo link — upload diretto via `StorageProvider` (Azure Blob / S3 / …) |
 | **Upload immagine evento** | Cover image tramite storage provider invece di URL esterno |
 | **Automazione OPS service-inventory su prod** | Applicare CronJob `infra/service-inventory/azure/` su tenant produttivo, flippare `SERVICE_INVENTORY_URL` al Blob pubblico; runbook in `docs/SERVICE-INVENTORY-GENERATION.md` |
@@ -136,4 +147,4 @@ Flussi critici Playwright: registrazione con campi ente, login admin + creazione
 
 ## Contribuire
 
-Vedi [CONTRIBUTING.md](../.github/CONTRIBUTING.md) per come proporre nuove funzionalità o segnalare bug.
+Vedi [CONTRIBUTING.md](../CONTRIBUTING.md) per come proporre nuove funzionalità o segnalare bug.
