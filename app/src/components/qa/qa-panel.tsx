@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon } from 'design-react-kit';
+import { Icon } from 'design-react-kit';
 
 import QuestionForm from './question-form';
 import QuestionList from './question-list';

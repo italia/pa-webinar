@@ -1,10 +1,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
-import {
-  readJvbSnapshot,
-  type JvbSnapshot,
-} from '@/lib/jvb-snapshot';
+import { readJvbSnapshot } from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
 import { getAppProcessMetrics } from '@/lib/metrics';
 import {

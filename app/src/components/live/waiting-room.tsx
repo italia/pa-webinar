@@ -121,7 +121,6 @@ export default function WaitingRoom({
     micOn: true,
   });
   const [startError, setStartError] = useState('');
-  const [nowMs, setNowMs] = useState(() => Date.now());
 
   // Rehydrate name + email from localStorage on mount. Name is merged
   // with the server-provided default (registration displayName / grant
@@ -152,7 +151,6 @@ export default function WaitingRoom({
   const heroUrl = event.imageUrl ?? event.coverImageUrl ?? null;
   const hasRecording = !!(event.recordingUrl ?? event.tempRecordingUrl);
   const showChatPreview = isLive && (event.chatEnabled ?? true);
-  const beforeStart = nowMs < startsAtMs;
   // Only LIVE events admit participants into the room. Moderators in
   // PUBLISHED past startsAt get a separate "Avvia evento" action that
   // flips the status to LIVE; once that happens this flag re-opens.
@@ -172,7 +170,6 @@ export default function WaitingRoom({
     }
     const tick = () => {
       const now = Date.now();
-      setNowMs(now);
       const diff = startsAtMs - now;
       if (diff <= 0) {
         setCountdown('');

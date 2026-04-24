@@ -1025,7 +1025,7 @@ interface LiveTopBarProps {
   onLeaveRoom?: () => void;
 }
 
-function LiveTopBar({ title, parseTitleKicker = false, imageUrl, coverImageUrl, participantCount, registrationCount, maxParticipants, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
+function LiveTopBar({ title, parseTitleKicker = false, imageUrl, coverImageUrl, participantCount, registrationCount, maxParticipants: _maxParticipants, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
   const badgeColors = ROLE_BADGE_COLORS[role];
