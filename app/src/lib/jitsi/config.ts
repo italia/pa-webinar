@@ -128,6 +128,22 @@ export const jitsiConfigOverwrite = {
   // disableThirdPartyRequests blocked JWT avatar data URIs in some Jitsi builds.
   gravatar: { disabled: true },
   brandingRoomAlias: null,
+
+  // ── Video quality tuning ─────────────────────────────────────
+  // Default Jitsi reserves HD only to ~2 dominant speakers and drops
+  // everyone else to 180p, which looks compressed on a community call
+  // where 8-10 people all have their camera on. Raise the ceiling so
+  // all active senders stay at SD/HD — 10 senders × 1.5 Mbps is still
+  // well within any decent uplink and fits our JVB sizing (≤50 senders
+  // per pod). Adjust `maxFullResolutionParticipants` downward on
+  // webinar-style events if needed.
+  constraints: {
+    video: {
+      height: { ideal: 720, max: 720, min: 240 },
+    },
+  },
+  maxFullResolutionParticipants: 25,
+  resolution: 720,
 };
 
 /**
