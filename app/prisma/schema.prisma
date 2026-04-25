@@ -206,6 +206,14 @@ model Event {
   chatMessages     ChatMessage[]
   questionnaires   EventQuestionnaire[]
 
+  // FK lookup index: "what events use this GDPR template" / cascade
+  // SetNull on template delete.
+  @@index([gdprTemplateId], map: "events_gdpr_template_id_idx")
+  // FK lookup index: "find all events in this recurring series".
+  @@index([recurrenceSeriesId], map: "events_recurrence_series_id_idx")
+  // Hot path for the JVB scaler / monitoring queries that scan for
+  // LIVE events with stale `last_active_at` (idle reaping).
+  @@index([status, lastActiveAt], map: "events_status_last_active_idx")
   @@map("events")
 }
 
@@ -230,7 +238,7 @@ enum EventModeratorRole {
 }
 
 model EventModerator {
-  id    String @id @default(uuid()) @db.Uuid
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   eventId String @map("event_id") @db.Uuid
 
   name  String
@@ -323,7 +331,7 @@ model EventInvitation {
   event  Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   person Person? @relation(fields: [personId], references: [id], onDelete: SetNull)
 
-  @@unique([eventId, email])
+  @@unique([eventId, email], map: "event_invitations_event_email_ux")
   @@index([eventId])
   @@index([personId])
   @@map("event_invitations")
@@ -375,7 +383,7 @@ model EventTagLink {
 // Adding a new key requires wiring the resolver; templates can't
 // be invented solely from the UI.
 model EmailTemplate {
-  id     String @id @default(uuid()) @db.Uuid
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   key    String
   locale String
 
@@ -407,7 +415,7 @@ model EmailTemplate {
 // and PUBLISHes on `chat:<eventId>`; SSE subscribers on any pod
 // re-emit to their connected clients).
 model ChatMessage {
-  id        String  @id @default(uuid()) @db.Uuid
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   eventId   String  @map("event_id") @db.Uuid
 
   // Who sent it. We intentionally denormalize the sender's display
@@ -449,7 +457,7 @@ model ChatMessage {
 // edit and select templates, so the same GDPR clauses don't need to be
 // pasted into every new event form.
 model GdprTemplate {
-  id          String  @id @default(uuid()) @db.Uuid
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String  @unique
   description String? @db.Text
   // Localized body: { it: "...", en: "..." }; every enabled locale is
@@ -906,12 +914,16 @@ model SiteSetting {
 //   ignore     — operator chose to keep; never auto-deleted
 //   delete-now — operator chose to delete immediately on next sweep
 model OrphanRecording {
-  id           String   @id @default(uuid()) @db.Uuid
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   blobName     String   @unique @map("blob_name")
   sizeBytes    BigInt?  @map("size_bytes")
-  lastModified DateTime? @map("last_modified")
-  discoveredAt DateTime @default(now()) @map("discovered_at")
-  lastSeenAt   DateTime @default(now()) @map("last_seen_at")
+  // The three timestamps below were created by the original migration
+  // without a precision suffix, which Postgres treats as `timestamp` (=
+  // `timestamp(6)`). Pin the precision in schema so `prisma migrate diff`
+  // doesn't keep proposing a downgrade to `timestamp(3)`.
+  lastModified DateTime? @map("last_modified") @db.Timestamp(6)
+  discoveredAt DateTime  @default(now()) @map("discovered_at") @db.Timestamp(6)
+  lastSeenAt   DateTime  @default(now()) @map("last_seen_at") @db.Timestamp(6)
   decision     String   @default("pending") // pending | ignore | delete-now
   note         String?  @db.Text
 
