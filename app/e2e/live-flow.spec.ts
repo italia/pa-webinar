@@ -99,24 +99,28 @@ test.describe('Live event flow (smoke)', () => {
     }
   });
 
-  test('moderator reaches pre-join screen', async ({ page }) => {
+  test('moderator reaches waiting room with join CTA', async ({ page }) => {
     await page.goto(`/it/eventi/${slug}/live?token=${moderatorToken}`);
 
-    const preJoinBtn = page.getByRole('button', { name: /entra nella sala/i });
-    await expect(preJoinBtn).toBeVisible({ timeout: 15_000 });
+    // Since the waiting-room refactor (ADR-012 fase 0), every role lands on
+    // the unified waiting room first. For a LIVE event the primary CTA is
+    // `joinNowBtn` ("Entra ora") rendered by waiting-room.tsx.
+    const joinBtn = page.getByRole('button', { name: /entra ora/i });
+    await expect(joinBtn).toBeVisible({ timeout: 15_000 });
   });
 
-  test('participant reaches pre-join screen', async ({ page }) => {
+  test('participant reaches waiting room with join CTA', async ({ page }) => {
     await page.goto(`/it/eventi/${slug}/live?token=${accessToken}`);
 
-    const preJoinBtn = page.getByRole('button', { name: /entra nella sala/i });
-    await expect(preJoinBtn).toBeVisible({ timeout: 15_000 });
+    const joinBtn = page.getByRole('button', { name: /entra ora/i });
+    await expect(joinBtn).toBeVisible({ timeout: 15_000 });
   });
 
-  test('pre-join screen shows event title', async ({ page }) => {
+  test('waiting room shows event title', async ({ page }) => {
     await page.goto(`/it/eventi/${slug}/live?token=${accessToken}`);
 
-    const heading = page.locator('h1');
+    // The waiting room renders the event title via EventTitle as="h1".
+    const heading = page.locator('h1').first();
     await expect(heading).toBeVisible({ timeout: 15_000 });
     await expect(heading).toContainText('E2E Smoke');
   });
