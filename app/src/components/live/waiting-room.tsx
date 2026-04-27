@@ -305,6 +305,34 @@ export default function WaitingRoom({
       <div className="container py-4" style={{ position: 'relative', zIndex: 1 }}>
         <div className="row justify-content-center">
           <div className="col-lg-8 col-xl-7">
+            {/* Architectural frame around the card. The waiting-room
+                card is the "palazzo" of the garden — flags on the
+                pediment, a stone foundation underneath, a heavier
+                ground shadow. Visually grounds the card so the
+                avatar's collision against it reads as walking around
+                a building instead of bumping into a floating panel.
+                Decorations are pure CSS + tiny inline SVGs and live
+                outside the Card so its overflow:hidden hero-clip
+                stays intact. */}
+            <div className="waiting-card-frame">
+            <span className="waiting-card-flag waiting-card-flag--left" aria-hidden="true">
+              <svg viewBox="0 0 14 38" width="14" height="38" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="0" width="2" height="38" fill="#5A4029" />
+                <circle cx="7" cy="1" r="2" fill="#F7A11A" />
+                <path d="M8 4 L14 8 L8 12 Z" fill="#008758" />
+                <path d="M8 12 L14 16 L8 20 Z" fill="#F5F7FB" />
+                <path d="M8 20 L14 24 L8 28 Z" fill="#D9364F" />
+              </svg>
+            </span>
+            <span className="waiting-card-flag waiting-card-flag--right" aria-hidden="true">
+              <svg viewBox="0 0 14 38" width="14" height="38" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="0" width="2" height="38" fill="#5A4029" />
+                <circle cx="7" cy="1" r="2" fill="#F7A11A" />
+                <path d="M6 4 L0 8 L6 12 Z" fill="#008758" />
+                <path d="M6 12 L0 16 L6 20 Z" fill="#F5F7FB" />
+                <path d="M6 20 L0 24 L6 28 Z" fill="#D9364F" />
+              </svg>
+            </span>
             <Card className="waiting-card shadow-sm border-0 overflow-hidden" style={{ borderRadius: 16 }}>
             {/* Hero cover image (or branded gradient fallback) */}
             <div
@@ -674,6 +702,8 @@ export default function WaitingRoom({
               )}
             </CardBody>
           </Card>
+            <div className="waiting-card-base" aria-hidden="true" />
+            </div>
           </div>
         </div>
       </div>
