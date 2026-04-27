@@ -97,8 +97,14 @@ type LivePhase =
   | 'pre_join'
   | 'fetching_jwt'
   | 'ready'
+  | 'reconnecting'
   | 'ended'
   | 'error';
+
+// Maximum number of automatic rejoin attempts after a network-induced
+// `videoConferenceLeft`. After this many failures we fall through to the
+// "Evento concluso" screen so the user can decide what to do manually.
+const MAX_RECONNECT_ATTEMPTS = 3;
 
 interface JitsiCredentials {
   jwt: string;
@@ -144,6 +150,16 @@ export default function LiveEventClient({
     micOn: true,
   });
 
+  // ── Network-resilience: distinguish intentional hangup (user clicked
+  // "Esci dalla sala" or finished post-event flow) from an unintentional
+  // `videoConferenceLeft` triggered by Jitsi when the participant's
+  // network drops momentarily. Without this, the app immediately shows
+  // "Evento concluso" on every blip and the user loses access to the
+  // call. We retry up to MAX_RECONNECT_ATTEMPTS before giving up.
+  const userHangupRef = useRef(false);
+  const reconnectAttemptsRef = useRef(0);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Poll infrastructure status (JVB + Jibri) when event is LIVE
   useEffect(() => {
     if (eventStatus !== 'LIVE') {
@@ -174,8 +190,18 @@ export default function LiveEventClient({
   // the right content (countdown / join CTA / recording + feedback).
   // `phase='ended'` is now only reached mid-session when the Jitsi
   // connection ends, for the legacy "evento concluso" thank-you screen.
+  // We also preserve `reconnecting` and `fetching_jwt` so a network blip
+  // mid-event doesn't get clobbered back to the waiting room when the
+  // LIVE→LIVE eventStatus poll re-fires this effect.
   useEffect(() => {
-    setPhase((prev) => (prev === 'ready' || prev === 'ended' ? prev : 'waiting'));
+    setPhase((prev) =>
+      prev === 'ready' ||
+      prev === 'ended' ||
+      prev === 'reconnecting' ||
+      prev === 'fetching_jwt'
+        ? prev
+        : 'waiting',
+    );
   }, [eventStatus]);
 
   // Poll event status in waiting room
@@ -302,7 +328,45 @@ export default function LiveEventClient({
     return () => clearInterval(pollInterval);
   }, [phase, event.slug, eventStatus, isModerator]);
 
+  // While in the reconnecting phase, schedule an automatic re-init of
+  // the JitsiRoom by flipping back to `fetching_jwt` (which already
+  // re-runs the JWT exchange and re-mounts the iframe). Backoff is
+  // 2s × current attempt number so we wait progressively longer between
+  // tries (2s → 4s → 6s) without overloading a flaky link.
+  useEffect(() => {
+    if (phase !== 'reconnecting') return;
+    const delay = 2000 * Math.max(1, reconnectAttemptsRef.current);
+    reconnectTimerRef.current = setTimeout(() => {
+      // Drop the stale credentials so the JWT route is re-hit (the JWT
+      // may have aged out by the time the network is back). The
+      // existing fetching_jwt → ready transition handles the rest.
+      setCredentials(null);
+      setPhase('fetching_jwt');
+    }, delay);
+    return () => {
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
+    };
+  }, [phase]);
+
+  const handleReconnectCancel = useCallback(() => {
+    // The user explicitly gave up. Mark this as intentional so any
+    // late-firing `videoConferenceLeft` doesn't loop us back here.
+    userHangupRef.current = true;
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+    setPhase('ended');
+  }, []);
+
   const handleFeedbackClose = useCallback(() => {
+    // Closing the post-event feedback panel is also a legitimate end of
+    // the session — flag it so a late `videoConferenceLeft` doesn't try
+    // to rejoin a call the user has already left for good.
+    userHangupRef.current = true;
     setShowFeedback(false);
     setPhase('ended');
   }, []);
@@ -312,7 +376,10 @@ export default function LiveEventClient({
   const recPromptRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    return () => { if (recPromptRetryRef.current) clearTimeout(recPromptRetryRef.current); };
+    return () => {
+      if (recPromptRetryRef.current) clearTimeout(recPromptRetryRef.current);
+      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+    };
   }, []);
 
   // Shared "fire startRecording on Jitsi, with retry" — used both by the
@@ -352,6 +419,11 @@ export default function LiveEventClient({
       // to the user.
     });
 
+    // Successful (re)entry: clear any pending reconnect bookkeeping so
+    // the next genuine drop starts from a fresh attempt counter.
+    reconnectAttemptsRef.current = 0;
+    userHangupRef.current = false;
+
     if (isModerator && event.recordingEnabled && jibriReady && !recPromptShownRef.current) {
       recPromptShownRef.current = true;
       autoOrPromptRecording(jitsiApi);
@@ -367,8 +439,50 @@ export default function LiveEventClient({
     }
   }, [jibriReady, jitsiApi, isModerator, event.recordingEnabled, autoOrPromptRecording]);
   const handleJitsiLeft = useCallback(() => {
-    if (!showFeedback) setPhase('ended');
-  }, [showFeedback]);
+    // Intentional leave (user clicked "Esci dalla sala" / completed
+    // the feedback flow): preserve the existing behavior — show the
+    // post-event screen unless feedback is still visible.
+    if (userHangupRef.current) {
+      if (!showFeedback) setPhase('ended');
+      return;
+    }
+
+    // Unintentional leave: Jitsi fired `videoConferenceLeft` but we
+    // didn't ask for it. Could be a transient network drop, a JVB
+    // restart, or the event genuinely ending. Ask the server which one
+    // it is before deciding to show the "Evento concluso" screen.
+    void (async () => {
+      try {
+        const res = await fetch(`/api/events/${event.slug}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === 'ENDED') {
+            setEventStatus('ENDED');
+            setPhase('ended');
+            return;
+          }
+        }
+        // Anything else (LIVE, non-OK response we couldn't classify)
+        // → assume the user dropped. Try to rejoin.
+        if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
+          reconnectAttemptsRef.current += 1;
+          setPhase('reconnecting');
+        } else {
+          setPhase('ended');
+        }
+      } catch {
+        // Network error reaching our own API — most likely the user is
+        // still offline. Treat as a transient drop and keep retrying
+        // until we exhaust the attempt budget.
+        if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
+          reconnectAttemptsRef.current += 1;
+          setPhase('reconnecting');
+        } else {
+          setPhase('ended');
+        }
+      }
+    })();
+  }, [showFeedback, event.slug]);
   const handleParticipantCountChanged = useCallback((count: number) => { setParticipantCount(count); }, []);
   const handleRecordingStatusChanged = useCallback((recording: boolean) => { setIsRecording(recording); }, []);
   const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => { setJitsiApi(api); }, []);
@@ -397,6 +511,9 @@ export default function LiveEventClient({
   }, [jitsiApi, isModerator, event.slug, token]);
 
   const handleLeaveRoom = useCallback(() => {
+    // Mark the upcoming `videoConferenceLeft` as a deliberate hangup so
+    // the network-resilience path doesn't try to rejoin behind us.
+    userHangupRef.current = true;
     if (jitsiApi) {
       jitsiApi.executeCommand('hangup');
     } else {
@@ -489,6 +606,40 @@ export default function LiveEventClient({
           <Link href={`/events/${event.slug}`}>
             <Button color="secondary" outline tag="span">{t('backToEvent')}</Button>
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Reconnecting (network drop recovery) ──
+  if (phase === 'reconnecting') {
+    return (
+      <div
+        className="d-flex flex-column align-items-center justify-content-center"
+        style={{ minHeight: '60vh' }}
+      >
+        <div
+          className="card p-4 text-center"
+          style={{ maxWidth: 480, width: '100%' }}
+          role="status"
+          aria-live="polite"
+        >
+          <div className="d-flex justify-content-center mb-3">
+            <Spinner active double />
+          </div>
+          <h2 className="h4 mb-3">{t('reconnecting')}</h2>
+          <p className="mb-3 text-muted">{t('reconnectingMessage')}</p>
+          <p className="small text-muted mb-4">
+            {t('reconnectingAttempt', {
+              n: reconnectAttemptsRef.current,
+              total: MAX_RECONNECT_ATTEMPTS,
+            })}
+          </p>
+          <div>
+            <Button color="secondary" outline onClick={handleReconnectCancel}>
+              {t('reconnectingCancel')}
+            </Button>
+          </div>
         </div>
       </div>
     );
