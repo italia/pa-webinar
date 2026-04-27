@@ -1761,6 +1761,100 @@
   background: linear-gradient(180deg, #BCE0FF 0%, #FFE9CF 60%, #FFD8B8 100%);
 }
 
+// ── Card-as-palazzo decorations (commit 3 of the garden polish pass) ──
+// The wait-room card is the structure in the middle of the garden — the
+// avatar walks around it. To make that read visually rather than feel
+// like a floating panel, we add a stone foundation strip below, two
+// small pennants on the pediment, and a heavier ground shadow. All
+// pure CSS + tiny inline SVGs; no images, no JS.
+.waiting-card-frame {
+  position: relative;
+  // Ground shadow ellipse just below the foundation, anchors the card
+  // into the garden visually.
+  &::after {
+    content: '';
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    bottom: -22px;
+    height: 26px;
+    background: radial-gradient(ellipse at center, rgba(23, 50, 77, 0.32) 0%, rgba(23, 50, 77, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+.waiting-card {
+  position: relative;
+  z-index: 1;
+  // Slightly stronger structural shadow than .shadow-sm — the card is
+  // a building, not a notification card.
+  box-shadow:
+    0 14px 38px rgba(23, 50, 77, 0.18),
+    0 2px 0 rgba(255, 255, 255, 0.55) inset !important;
+}
+
+// Stone foundation. Sits behind the card, slightly wider, with a
+// subtle 2-tone gradient + repeating stone-block hatching for depth.
+.waiting-card-base {
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  bottom: -18px;
+  height: 22px;
+  border-radius: 6px;
+  z-index: 0;
+  background-color: #B3BCC7;
+  background-image:
+    linear-gradient(180deg,
+      #D6DDE4 0%,
+      #B3BCC7 35%,
+      #97A4B0 100%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 38px,
+      rgba(23, 50, 77, 0.18) 38px,
+      rgba(23, 50, 77, 0.18) 40px
+    );
+  background-blend-mode: multiply, normal;
+  box-shadow:
+    0 6px 14px rgba(23, 50, 77, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.55) inset;
+}
+
+// Tricolour pennants on the pediment. Hidden on very small screens
+// where the card is full-bleed and the flags would just be noise.
+.waiting-card-flag {
+  position: absolute;
+  top: -28px;
+  width: 14px;
+  height: 38px;
+  z-index: 2;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+  animation: gardenSway 5s ease-in-out infinite;
+  transform-origin: 7px 0;
+
+  &--left {
+    left: 22px;
+    animation-delay: -1.7s;
+  }
+  &--right {
+    right: 22px;
+    animation-delay: -3.1s;
+  }
+}
+
+@media (max-width: 380px) {
+  .waiting-card-flag { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waiting-card-flag { animation: none; }
+}
+
 .garden-scene {
   position: absolute;
   inset: 0;
