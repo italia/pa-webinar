@@ -43,7 +43,13 @@ export const POST = withErrorHandling(async (request) => {
 
   const data = parsed.data;
   const now = new Date();
-  const maxDuration = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  // Instant calls have no meaningful "end time" — they go LIVE and stay LIVE
+  // until everyone leaves (handled by the inactivity-grace path; see
+  // gracePeriodMinutes=-1 below). The endsAt is a cosmetic upper bound used
+  // by listing/analytics queries that filter `endsAt >= now`; 4h is enough
+  // headroom for any normal call without making the UI render
+  // "ends tomorrow" for a 30-minute meeting.
+  const maxDuration = new Date(now.getTime() + 4 * 60 * 60 * 1000);
 
   const slug = await generateUniqueSlug(data.title);
   const jitsiRoomName = `call-${randomUUID()}`;
@@ -87,8 +93,13 @@ export const POST = withErrorHandling(async (request) => {
       status: 'LIVE',
       // Seed lastActiveAt so the LIVE→IDLE scaler's grace-cutoff OR-clause
       // can match this event. Without it, lastActiveAt stays null and the
-      // call lingers LIVE until the 24h endsAt upper bound kicks in.
+      // call lingers LIVE until the cosmetic endsAt upper bound kicks in.
       lastActiveAt: now,
+      // Instant calls don't auto-close on endsAt — close on inactivity
+      // instead (~45min after the last participant leaves, per the
+      // scaler's inactiveGraceMinutes default). This decouples the
+      // cosmetic "ends at" from the actual lifecycle.
+      gracePeriodMinutes: -1,
       // Align with the scheduled-event flow where the PUBLISHED→PROVISIONING
       // transition stamps this field. For instant calls we skip that state
       // but still set the timestamp — the provisioning-timeout UI path and
