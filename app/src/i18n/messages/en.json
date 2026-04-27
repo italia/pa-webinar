@@ -2633,6 +2633,8 @@
     "hintKeyboard": "Move with WASD or arrow keys",
     "pickerTitle": "Choose your avatar",
     "pickerHelp": "This character represents you in the waiting garden. You can change it any time.",
-    "close": "Close"
+    "close": "Close",
+    "hintBanner": "Press the arrow keys to walk around the garden",
+    "hintJoystick": "Drag to move"
   }
 }

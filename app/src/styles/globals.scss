@@ -1987,6 +1987,99 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     pointer-events: none;
   }
+
+  &__label {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(23, 50, 77, 0.85);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+}
+
+// Discovery hint banner — only shown until the user successfully moves
+// the avatar once (or dismisses it). The pulse animation draws the eye
+// without being aggressive; pauses for users with reduced-motion.
+.garden-hint {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #17324D;
+  color: #fff;
+  padding: 0.45rem 0.6rem 0.45rem 0.75rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  pointer-events: auto;
+  font-size: 0.85rem;
+  max-width: calc(100vw - 24px);
+  animation: gardenHintPulse 2.4s ease-in-out infinite;
+
+  &__keys {
+    display: inline-flex;
+    gap: 0.18rem;
+  }
+
+  &__key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: #0066CC;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  &__text {
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  &__close {
+    background: transparent;
+    border: 0;
+    color: #fff;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0 0.25rem;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover, &:focus { opacity: 1; }
+  }
+}
+
+@keyframes gardenHintPulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(247, 161, 26, 0.55); }
+  50%      { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 0 8px rgba(247, 161, 26, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .garden-hint { animation: none; }
+}
+
+// On mobile the hint stacks on its own line above the card; on small
+// screens the keys sometimes wrap — keep it readable.
+@media (max-width: 480px) {
+  .garden-hint {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.5rem;
+    &__key { width: 18px; height: 18px; font-size: 0.7rem; }
+  }
 }
 
 // Avatar picker modal.
