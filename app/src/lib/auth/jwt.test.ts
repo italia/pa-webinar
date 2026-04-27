@@ -54,6 +54,10 @@ describe('generateJitsiJwt', () => {
 
     const ctx = payload.context as { user: Record<string, string> };
     expect(ctx.user.name).toBe('Moderatore');
+    // `displayName` is set alongside `name` so older Prosody token
+    // modules that look up the alternate field also see the real name
+    // (instead of the random "Judah-hqj" stats_id fallback).
+    expect(ctx.user.displayName).toBe('Moderatore');
     expect(ctx.user.id).toBe('mod-123');
     expect(ctx.user.affiliation).toBe('owner');
     expect(ctx.user.moderator).toBe('true');
@@ -73,6 +77,7 @@ describe('generateJitsiJwt', () => {
 
     const ctx = payload.context as { user: Record<string, string> };
     expect(ctx.user.name).toBe('Mario Rossi');
+    expect(ctx.user.displayName).toBe('Mario Rossi');
     expect(ctx.user.affiliation).toBe('member');
     expect(ctx.user.moderator).toBe('false');
   });
