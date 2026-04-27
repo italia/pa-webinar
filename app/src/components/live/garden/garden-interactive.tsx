@@ -144,9 +144,62 @@ export default function GardenInteractive({
   // triggering a closure refresh on every state change.
   const showHintRef = useRef(false);
   useEffect(() => { showHintRef.current = showHint; }, [showHint]);
+  // Obstacle rect in viewBox-percent coords (0..100). Computed from the
+  // central waiting-room card via DOM measurement; null when there's no
+  // card yet (e.g. SSR or transient layouts). The rAF loop uses this
+  // for axis-by-axis collision so the avatar can't walk through the
+  // card — it has to walk around it.
+  const obstacleRectRef = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
   const [peers, setPeers] = useState<Peer[]>([]);
 
   const selfAvatar = useMemo<AvatarPreset>(() => getAvatar(avatarId), [avatarId]);
+
+  // ── Card collision: measure the waiting-room card and project its
+  //   bounding rect into avatar viewBox-percent coords. The garden SVG
+  //   uses preserveAspectRatio="xMidYMax slice" — the same transform
+  //   we apply here to stay consistent. Recomputed on resize and when
+  //   the card layout shifts (image loads, content reflow). ──
+  useEffect(() => {
+    if (!enabled) return;
+    const compute = () => {
+      const stage = document.querySelector<HTMLElement>('.waiting-garden-bg');
+      const card = document.querySelector<HTMLElement>('.waiting-card');
+      if (!stage || !card) {
+        obstacleRectRef.current = null;
+        return;
+      }
+      const sRect = stage.getBoundingClientRect();
+      const cRect = card.getBoundingClientRect();
+      if (sRect.width <= 0 || sRect.height <= 0) return;
+      // Replicate xMidYMax slice math: scale = max so the SVG fills the
+      // container with one axis cropped; horizontal anchor = center,
+      // vertical anchor = bottom.
+      const scale = Math.max(sRect.width / STAGE_W, sRect.height / STAGE_H);
+      const stageOffsetX = (sRect.width - STAGE_W * scale) / 2;
+      const stageOffsetY = sRect.height - STAGE_H * scale;
+      const localX = cRect.left - sRect.left;
+      const localY = cRect.top - sRect.top;
+      const vbX = (localX - stageOffsetX) / scale;
+      const vbY = (localY - stageOffsetY) / scale;
+      obstacleRectRef.current = {
+        x: (vbX / STAGE_W) * 100,
+        y: (vbY / STAGE_H) * 100,
+        w: (cRect.width / scale / STAGE_W) * 100,
+        h: (cRect.height / scale / STAGE_H) * 100,
+      };
+    };
+    compute();
+    const ro = new ResizeObserver(compute);
+    const stageEl = document.querySelector('.waiting-garden-bg');
+    const cardEl = document.querySelector('.waiting-card');
+    if (stageEl) ro.observe(stageEl);
+    if (cardEl) ro.observe(cardEl);
+    window.addEventListener('resize', compute);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', compute);
+    };
+  }, [enabled]);
 
   // ── Keyboard handling ──
   // Movement keys behave differently depending on the focused element:
@@ -283,8 +336,32 @@ export default function GardenInteractive({
           catch { /* ignore */ }
         }
         const step = WALK_UNITS_PER_SEC * dt;
-        localRef.current.x = Math.max(5, Math.min(95, localRef.current.x + dx * step));
-        localRef.current.y = Math.max(10, Math.min(95, localRef.current.y + dy * step));
+        const nextX = Math.max(5, Math.min(95, localRef.current.x + dx * step));
+        const nextY = Math.max(10, Math.min(95, localRef.current.y + dy * step));
+        // Axis-by-axis collide against the central card. Updating x and
+        // y separately lets the avatar slide along the card's edges
+        // instead of getting fully stopped on diagonal approaches.
+        // Avatar half-extents are stage-percent approximations of the
+        // rendered avatar footprint (~125×165 px in stage units → ~3%
+        // of width, ~5% of height). The hit box is centred on the
+        // avatar's feet (its drawn pivot), shifted up half-height so
+        // the collision feels right when walking against the front
+        // face of the card.
+        const obs = obstacleRectRef.current;
+        const HX = 3.0;
+        const HY = 7.5;
+        const intersects = (px: number, py: number) =>
+          !!obs &&
+          px + HX > obs.x &&
+          px - HX < obs.x + obs.w &&
+          py > obs.y - HY &&
+          py - HY < obs.y + obs.h;
+        let resolvedX = nextX;
+        let resolvedY = nextY;
+        if (intersects(nextX, localRef.current.y)) resolvedX = localRef.current.x;
+        if (intersects(resolvedX, nextY)) resolvedY = localRef.current.y;
+        localRef.current.x = resolvedX;
+        localRef.current.y = resolvedY;
         // Facing — use the dominant axis
         if (Math.abs(dx) > Math.abs(dy)) {
           localRef.current.facing = dx > 0 ? 'right' : 'left';

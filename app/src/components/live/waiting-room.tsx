@@ -305,7 +305,7 @@ export default function WaitingRoom({
       <div className="container py-4" style={{ position: 'relative', zIndex: 1 }}>
         <div className="row justify-content-center">
           <div className="col-lg-8 col-xl-7">
-            <Card className="shadow-sm border-0 overflow-hidden" style={{ borderRadius: 16 }}>
+            <Card className="waiting-card shadow-sm border-0 overflow-hidden" style={{ borderRadius: 16 }}>
             {/* Hero cover image (or branded gradient fallback) */}
             <div
               className="waiting-hero"
