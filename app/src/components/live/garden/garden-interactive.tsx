@@ -52,6 +52,7 @@ const PING_MS = 200;
 const LOCAL_STORAGE_USER_ID = 'eventidtd.garden.userId';
 const LOCAL_STORAGE_AVATAR = 'eventidtd.garden.avatarId';
 const LOCAL_STORAGE_HIDDEN = 'eventidtd.garden.hidden';
+const LOCAL_STORAGE_HINT_DISMISSED = 'eventidtd.garden.hintDismissed';
 
 interface Peer {
   userId: string;
@@ -113,6 +114,19 @@ export default function GardenInteractive({
   const [userId] = useState<string>(loadOrCreateUserId);
   const [avatarId, setAvatarId] = useState<string>(loadAvatarId);
   const [showPicker, setShowPicker] = useState(false);
+  // First-time hint banner. Dismissed permanently once the user moves
+  // (auto) or clicks the close button (manual). Persists across reloads
+  // so returning users don't see it again.
+  const [showHint, setShowHint] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    try { return window.localStorage.getItem(LOCAL_STORAGE_HINT_DISMISSED) !== '1'; }
+    catch { return true; }
+  });
+  const dismissHint = useCallback(() => {
+    setShowHint(false);
+    try { window.localStorage.setItem(LOCAL_STORAGE_HINT_DISMISSED, '1'); }
+    catch { /* ignore */ }
+  }, []);
 
   // Local position + facing, kept in a ref so the rAF loop doesn't
   // thrash state on every frame. React state is only touched on the
@@ -126,21 +140,42 @@ export default function GardenInteractive({
 
   // Input state — the rAF loop reads these each frame.
   const inputRef = useRef({ dx: 0, dy: 0 });
+  // Mirrored ref for showHint so the rAF loop can read it without
+  // triggering a closure refresh on every state change.
+  const showHintRef = useRef(false);
+  useEffect(() => { showHintRef.current = showHint; }, [showHint]);
   const [peers, setPeers] = useState<Peer[]>([]);
 
   const selfAvatar = useMemo<AvatarPreset>(() => getAvatar(avatarId), [avatarId]);
 
   // ── Keyboard handling ──
+  // Movement keys behave differently depending on the focused element:
+  //   - Arrow keys: ALWAYS hijacked for avatar movement. If the user is
+  //     focused in a form input, we blur it so subsequent keys keep
+  //     moving the avatar instead of being eaten by the input. This is
+  //     the fix for the demo finding ("nessuno riusciva a muovere il
+  //     personaggio") — the form auto-focuses the name input on mount
+  //     and the previous handler bailed before reaching `recompute`.
+  //   - WASD: only when focus is NOT on an input — otherwise W/A/S/D
+  //     are letters the user is typing.
   useEffect(() => {
     if (!enabled) return;
     const down = new Set<string>();
     const onKeyDown = (e: KeyboardEvent) => {
-      // Skip when typing into an input / textarea (chat preview, name, etc.)
-      const target = e.target as HTMLElement | null;
-      if (target && /^(input|textarea|select)$/i.test(target.tagName)) return;
-      if (target && target.isContentEditable) return;
       const k = e.key.toLowerCase();
-      if (!['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) return;
+      const isArrow = k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright';
+      const isWasd = k === 'w' || k === 'a' || k === 's' || k === 'd';
+      if (!isArrow && !isWasd) return;
+      const target = e.target as HTMLElement | null;
+      const isInputLike = !!target && (
+        /^(input|textarea|select)$/i.test(target.tagName) ||
+        target.isContentEditable
+      );
+      if (isInputLike) {
+        // Don't intercept WASD while the user is typing — those are letters.
+        if (!isArrow) return;
+        target!.blur();
+      }
       e.preventDefault();
       down.add(k);
       recompute();
@@ -160,11 +195,13 @@ export default function GardenInteractive({
       if (len > 0) { dx /= len; dy /= len; }
       inputRef.current = { dx, dy };
     };
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
+    // Use document with capture so we receive arrow events before the
+    // focused input's default cursor-navigation handling kicks in.
+    document.addEventListener('keydown', onKeyDown, true);
+    document.addEventListener('keyup', onKeyUp, true);
     return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
+      document.removeEventListener('keydown', onKeyDown, true);
+      document.removeEventListener('keyup', onKeyUp, true);
     };
   }, [enabled]);
 
@@ -237,6 +274,14 @@ export default function GardenInteractive({
       const { dx, dy } = inputRef.current;
       const moving = dx !== 0 || dy !== 0;
       if (moving) {
+        // Auto-dismiss the first-time hint as soon as the user actually
+        // moves — they figured it out, no need to keep nagging.
+        if (showHintRef.current) {
+          showHintRef.current = false;
+          setShowHint(false);
+          try { window.localStorage.setItem(LOCAL_STORAGE_HINT_DISMISSED, '1'); }
+          catch { /* ignore */ }
+        }
         const step = WALK_UNITS_PER_SEC * dt;
         localRef.current.x = Math.max(5, Math.min(95, localRef.current.x + dx * step));
         localRef.current.y = Math.max(10, Math.min(95, localRef.current.y + dy * step));
@@ -434,7 +479,35 @@ export default function GardenInteractive({
               : 'translate(-50%, -50%)',
           }}
         />
+        <div className="garden-joystick__label" aria-hidden="true">{t('hintJoystick')}</div>
       </div>
+
+      {/* First-time discovery hint. Floats above the stage, dismisses
+          itself the moment the user actually moves. The whole point is
+          discoverability — the demo found that even users who knew the
+          controls failed to use them because the form input ate the
+          keystrokes. The banner is the visible signal that something
+          interactive lives here. */}
+      {showHint && hasName && (
+        <div className="garden-hint" role="status" aria-live="polite">
+          <div className="garden-hint__keys" aria-hidden="true">
+            <span className="garden-hint__key">←</span>
+            <span className="garden-hint__key">↑</span>
+            <span className="garden-hint__key">↓</span>
+            <span className="garden-hint__key">→</span>
+          </div>
+          <div className="garden-hint__text">{t('hintBanner')}</div>
+          <button
+            type="button"
+            className="garden-hint__close"
+            onClick={dismissHint}
+            aria-label={t('close')}
+            title={t('close')}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Avatar picker modal */}
       {showPicker && (
