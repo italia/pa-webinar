@@ -183,6 +183,15 @@ export default function JitsiRoom({
             ...extraConfig,
             toolbarButtons,
             ...(enableFileSharing ? { enableFileSharing: true } : {}),
+            // Force lib-jitsi-meet's _statsCurrentId to our display name.
+            // Without these, lib-jitsi-meet falls back to a random
+            // RandomUtil.randomElement(firstNames) + '-' + 3-char hex
+            // (e.g. "Judah-hqj"), which is what shows up in Jicofo logs
+            // as `stats-id` and in callstats/JaaS analytics. Keeping this
+            // tied to our portal-issued displayName makes ops logs
+            // traceable back to the registered participant.
+            statisticsId: displayName,
+            statisticsDisplayName: displayName,
           },
           interfaceConfigOverwrite: {
             ...jitsiInterfaceConfigOverwrite,
