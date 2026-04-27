@@ -79,7 +79,13 @@ export async function generateJitsiJwt(
   const jwt = await new SignJWT({
     context: {
       user: {
+        // `name` is the canonical Jitsi field (read by Prosody token
+        // plugin and lib-jitsi-meet for displayName). We also set
+        // `displayName` for older Jitsi forks / token modules that
+        // look at that field instead. Keeping both costs nothing and
+        // avoids surprises when Prosody is upgraded.
         name: payload.displayName,
+        displayName: payload.displayName,
         id: payload.uniqueId,
         avatar: avatarUrl,
         affiliation: payload.isModerator ? 'owner' : 'member',
