@@ -131,10 +131,15 @@ export default function GardenInteractive({
   // Local position + facing, kept in a ref so the rAF loop doesn't
   // thrash state on every frame. React state is only touched on the
   // ping boundary (every 200 ms) to re-render peers.
+  // Spawn in the foreground band (near the fountain / path) so the
+  // avatar starts OUTSIDE the central card's collision rect on every
+  // viewport. Spawning at y=56..62% (the previous default) put the
+  // avatar inside the card on most desktop layouts → collision then
+  // blocked every move because each step stayed inside the obstacle.
   const localRef = useRef({
     x: 46 + Math.random() * 8,
-    y: 56 + Math.random() * 6,
-    facing: 'down' as Peer['facing'],
+    y: 88 + Math.random() * 4,
+    facing: 'up' as Peer['facing'],
     walkPhase: 0,
   });
 
@@ -181,12 +186,40 @@ export default function GardenInteractive({
       const localY = cRect.top - sRect.top;
       const vbX = (localX - stageOffsetX) / scale;
       const vbY = (localY - stageOffsetY) / scale;
-      obstacleRectRef.current = {
+      const obs = {
         x: (vbX / STAGE_W) * 100,
         y: (vbY / STAGE_H) * 100,
         w: (cRect.width / scale / STAGE_W) * 100,
         h: (cRect.height / scale / STAGE_H) * 100,
       };
+      obstacleRectRef.current = obs;
+      // Safety: if the avatar is currently inside the obstacle (e.g.
+      // because the card grew on resize, or the layout settled
+      // post-spawn so the card now covers the spawn point) push it
+      // out to the nearest free edge. Without this, the per-frame
+      // collision check would lock the avatar in place forever.
+      const HX = 3.0;
+      const HY = 7.5;
+      const px = localRef.current.x;
+      const py = localRef.current.y;
+      const insideX = px + HX > obs.x && px - HX < obs.x + obs.w;
+      const insideY = py > obs.y - HY && py - HY < obs.y + obs.h;
+      if (insideX && insideY) {
+        const distLeft = (px + HX) - obs.x;
+        const distRight = (obs.x + obs.w) - (px - HX);
+        const distUp = py - (obs.y - HY);
+        const distDown = (obs.y + obs.h) - (py - HY);
+        const minDist = Math.min(distLeft, distRight, distUp, distDown);
+        if (minDist === distDown) {
+          localRef.current.y = Math.min(95, obs.y + obs.h + HY + 0.5);
+        } else if (minDist === distUp) {
+          localRef.current.y = Math.max(10, obs.y - HY - 0.5);
+        } else if (minDist === distLeft) {
+          localRef.current.x = Math.max(5, obs.x - HX - 0.5);
+        } else {
+          localRef.current.x = Math.min(95, obs.x + obs.w + HX + 0.5);
+        }
+      }
     };
     compute();
     const ro = new ResizeObserver(compute);
@@ -446,18 +479,26 @@ export default function GardenInteractive({
   );
 
   if (!enabled) {
+    // Render the re-enable affordance as a HUD chip in the same
+    // top-right slot the active garden uses for "Vista classica" — so
+    // toggling is symmetric and the button is always discoverable.
+    // The previous implementation rendered a btn-sm in document flow
+    // at the top of the page where users couldn't find it after
+    // hiding the garden once.
     return (
-      <div className="text-center mt-3">
-        <button
-          type="button"
-          className="btn btn-primary btn-sm"
-          onClick={() => {
-            try { window.localStorage.removeItem(LOCAL_STORAGE_HIDDEN); } catch { /* ignore */ }
-            onToggle(true);
-          }}
-        >
-          {t('enable')}
-        </button>
+      <div className="garden-hud garden-hud--disabled" aria-live="polite">
+        <div className="garden-hud__right">
+          <button
+            type="button"
+            className="btn btn-sm garden-hud__toggle"
+            onClick={() => {
+              try { window.localStorage.removeItem(LOCAL_STORAGE_HIDDEN); } catch { /* ignore */ }
+              onToggle(true);
+            }}
+          >
+            {t('enable')}
+          </button>
+        </div>
       </div>
     );
   }
