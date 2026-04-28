@@ -8,7 +8,6 @@ import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { isJibriAvailable } from '@/lib/infrastructure';
 import LiveEventClient from '@/components/live/live-event-client';
-import ProvisioningScreen from '@/components/live/provisioning-screen';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
@@ -48,34 +47,16 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     notFound();
   }
 
-  // Intercept IDLE / PROVISIONING before doing any Jitsi setup: the bridge
-  // isn't ready, handing out a JWT or embedding Jitsi now would dump the
-  // user onto a cold pod. ProvisioningScreen calls /wake and polls until
-  // the scaler brings the bridge up, then reloads this page.
-  //
-  // EXCEPTION: when an event is PROVISIONING but startsAt is still in
-  // the future (pre-scale window scenario), the bridge warm-up is a
-  // background concern — the user is here early and should see the
-  // waiting room with its countdown, netiquette, device check and
-  // chat preview, not a spinner. Let the waiting room render; it'll
-  // show "Apertura alle HH:MM" and auto-enable "Entra ora" the moment
-  // the scaler promotes PROVISIONING → LIVE at startsAt.
-  const now = new Date();
-  const startsAt = new Date(event.startsAt);
-  const bridgeColdStart =
-    event.status === 'IDLE' ||
-    (event.status === 'PROVISIONING' && startsAt <= now);
-  if (bridgeColdStart) {
-    const title = getLocalized(event.title as LocalizedField, locale);
-    return (
-      <ProvisioningScreen
-        slug={event.slug}
-        title={title}
-        initialStatus={event.status}
-        camefromIdle={event.status === 'IDLE'}
-      />
-    );
-  }
+  // IDLE / PROVISIONING used to redirect users to a dedicated
+  // "Sala in allestimento" spinner. Demo feedback: by the time the
+  // bridge is ready and we redirect into the waiting room, the user
+  // only sees the waiting-room garden for a few seconds — the value
+  // of the room (chat preview, netiquette, device check, garden
+  // lobby) is wasted. We now let every joinable state flow into the
+  // waiting room and warm the bridge in the background; the room
+  // shows a "preparing" indicator and disables "Entra ora" until the
+  // scaler flips status to LIVE. The /wake call is fired from
+  // LiveEventClient on mount when the initial status is IDLE.
 
   const settings = await getSettings();
   const jibriAvailable = await isJibriAvailable();
@@ -95,7 +76,15 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
       redirect(`/${locale}/events/${slug}/password`);
     }
-    if (event.status === 'LIVE') {
+    // INSTANT calls: anyone with the link can walk in. Allow guest
+    // access for any joinable status (LIVE / IDLE / PROVISIONING) so
+    // the user lands on the waiting-room garden even when the bridge
+    // is still warming up. SCHEDULED events still require a personal
+    // token for any non-LIVE status — that flow goes via /registration.
+    const guestStatuses = isInstant
+      ? ['LIVE', 'IDLE', 'PROVISIONING']
+      : ['LIVE'];
+    if (guestStatuses.includes(event.status)) {
       const title = getLocalized(event.title as LocalizedField, locale);
       return (
         <LiveEventClient
