@@ -138,6 +138,23 @@ export default function LiveEventClient({
   const [chosenName, setChosenName] = useState(initialDisplayName);
 
   const [eventStatus, setEventStatus] = useState(event.status);
+
+  // If the event was IDLE when this page rendered, the bridge has
+  // been scaled to zero. Fire /wake once on mount so the scaler can
+  // start the bridge in the background while the user reads the
+  // waiting-room card and (if INSTANT) walks the garden. The poll
+  // loop above picks up the LIVE transition and the "Entra ora" CTA
+  // unblocks itself. /wake is idempotent and unauthenticated.
+  const wokeOnceRef = useRef(false);
+  useEffect(() => {
+    if (wokeOnceRef.current) return;
+    if (eventStatus !== 'IDLE') return;
+    wokeOnceRef.current = true;
+    void fetch(`/api/events/${event.slug}/wake`, { method: 'POST' }).catch(() => {
+      // Transient: poll loop will retry the lifecycle check anyway.
+    });
+  }, [eventStatus, event.slug]);
+
   const [showFeedback, setShowFeedback] = useState(false);
   const [guestId] = useState(() => isGuest ? `guest_${Math.random().toString(36).slice(2, 10)}` : '');
   const [jvbReady, setJvbReady] = useState<boolean | null>(null);
@@ -546,7 +563,7 @@ export default function LiveEventClient({
           parseTitleKicker: event.parseTitleKicker,
           startsAt: event.startsAt,
           endsAt: event.endsAt,
-          status: eventStatus as 'PUBLISHED' | 'LIVE' | 'ENDED',
+          status: eventStatus as 'PUBLISHED' | 'LIVE' | 'ENDED' | 'IDLE' | 'PROVISIONING',
           speakers: event.speakers,
           organizerName: event.organizerName,
           moderatorName: event.moderatorName,
