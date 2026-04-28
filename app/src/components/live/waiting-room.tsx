@@ -52,7 +52,7 @@ interface WaitingRoomEvent {
   parseTitleKicker?: boolean;
   startsAt: string;
   endsAt: string;
-  status: 'PUBLISHED' | 'LIVE' | 'ENDED';
+  status: 'PUBLISHED' | 'LIVE' | 'ENDED' | 'IDLE' | 'PROVISIONING';
   speakers?: string | null;
   organizerName?: string | null;
   moderatorName?: string | null;
@@ -146,6 +146,12 @@ export default function WaitingRoom({
   const isLive = event.status === 'LIVE';
   const isEnded = event.status === 'ENDED';
   const isPublished = event.status === 'PUBLISHED';
+  // IDLE = bridge scaled to zero, /wake just fired from LiveEventClient.
+  // PROVISIONING = scaler picked up the wake, JVB is starting.
+  // Both are short-lived "warming up" states — show a non-blocking
+  // banner so the user knows entry is gated, and let them keep using
+  // the rest of the room (garden, name input, device check, chat).
+  const isWarmingUp = event.status === 'IDLE' || event.status === 'PROVISIONING';
   const isGuest = role === 'guest';
   const isModerator = role === 'moderator';
   const heroUrl = event.imageUrl ?? event.coverImageUrl ?? null;
@@ -445,6 +451,26 @@ export default function WaitingRoom({
                 </Alert>
               )}
 
+              {/* Bridge warm-up banner. Replaces the legacy full-page
+                  "Sala in allestimento" spinner: the user can keep
+                  using the room (garden, name, devices, chat preview)
+                  while the bridge starts in the background. The
+                  parent fires /wake on mount and polls the lifecycle
+                  status every 3s — when it flips to LIVE the banner
+                  disappears and the "Entra ora" button activates. */}
+              {isWarmingUp && (
+                <Alert color="info" className="text-start mb-4" style={{ fontSize: '0.88rem' }}>
+                  <div className="d-flex align-items-start">
+                    <Spinner active small className="me-2 mt-1 flex-shrink-0" />
+                    <div>
+                      <strong>{t('warmingUp')}</strong>
+                      <br />
+                      {t('warmingUpDetail')}
+                    </div>
+                  </div>
+                </Alert>
+              )}
+
               {/* Name input — always visible (except ENDED) */}
               {!isEnded && (
                 <FormGroup className="mb-3">
@@ -572,7 +598,10 @@ export default function WaitingRoom({
                     </Button>
                   )}
 
-                  {/* Everyone: ENTER LIVE (when live or moderator starting) */}
+                  {/* Everyone: ENTER LIVE (when live or moderator starting).
+                      Three disabled flavours so the user knows WHY entry
+                      is blocked — bridge warming up vs scheduled opening
+                      vs valid name still missing. */}
                   {canEnterLive ? (
                     <Button
                       color="primary"
@@ -583,6 +612,16 @@ export default function WaitingRoom({
                     >
                       <Icon icon="it-video" size="sm" color="white" className="me-2" />
                       {t('joinNowBtn')}
+                    </Button>
+                  ) : isWarmingUp ? (
+                    <Button
+                      color="primary"
+                      size="lg"
+                      className="fw-semibold"
+                      disabled
+                    >
+                      <Spinner active small className="me-2" />
+                      {t('warmingUpButton')}
                     </Button>
                   ) : (
                     <Button
