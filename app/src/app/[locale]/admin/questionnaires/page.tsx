@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 import QuestionTemplatesManagement from '@/components/admin/question-templates-management';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
@@ -12,15 +12,15 @@ export default async function QuestionnairesPage() {
     redirect(`/${locale}/admin/login`);
   }
 
+  const t = await getTranslations('admin.questionnairesPage');
+
   return (
     <div className="container py-5">
       <div className="mb-5">
         <h1 className="fw-bold mb-1" style={{ color: '#17324D' }}>
-          Questionari
+          {t('title')}
         </h1>
-        <p className="text-secondary mb-0">
-          Template riutilizzabili di domande per i questionari di pre-registrazione e post-evento.
-        </p>
+        <p className="text-secondary mb-0">{t('subtitle')}</p>
       </div>
       <QuestionTemplatesManagement />
     </div>

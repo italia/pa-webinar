@@ -591,7 +591,13 @@
       "questionnaires": "Questionnaires",
       "questionnairesLibrary": "Template library",
       "questionnairesResponses": "Responses and statistics",
-      "rubrica": "Address book"
+      "rubrica": "Address book",
+      "settingsEmailTemplates": "Email templates",
+      "settingsTags": "Tag management",
+      "eventMaterials": "Materials",
+      "eventQuestionnaires": "Questionnaires",
+      "rubricaList": "List",
+      "rubricaDetail": "Entry"
     },
     "landing": {
       "title": "Admin panel",
@@ -1794,6 +1800,23 @@
         "estimatedAttendance": "Estimated: {estimated} attendees"
       },
       "copyGuestUrl": "Copy guest link"
+    },
+    "rubrica": {
+      "title": "Address book",
+      "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Profile information is updated automatically on every re-registration.",
+      "backToList": "← Back to address book"
+    },
+    "questionnairesPage": {
+      "title": "Questionnaires",
+      "subtitle": "Reusable question templates for pre-registration and post-event questionnaires."
+    },
+    "questionnaireResponses": {
+      "title": "Questionnaire responses",
+      "subtitle": "Aggregations by question, filterable by event, phase and date range."
+    },
+    "eventQuestionnaires": {
+      "title": "Questionnaires — {eventTitle}",
+      "subtitle": "Configure a pre-registration and/or post-event questionnaire combining templates and ad-hoc questions."
     }
   },
   "email": {
