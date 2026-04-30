@@ -60,6 +60,8 @@ const SETTINGS_SUB_NAV: NavItem[] = [
   { href: '/admin/settings', icon: 'it-settings', labelKey: 'settingsGeneral', exact: true },
   { href: '/admin/settings/languages', icon: 'it-hearing', labelKey: 'settingsLanguages' },
   { href: '/admin/settings/gdpr-templates', icon: 'it-lock', labelKey: 'settingsGdprTemplates' },
+  { href: '/admin/settings/email-templates', icon: 'it-mail', labelKey: 'settingsEmailTemplates' },
+  { href: '/admin/settings/tags', icon: 'it-bookmark', labelKey: 'settingsTags' },
 ];
 
 const QUESTIONNAIRES_SUB_NAV: NavItem[] = [
@@ -113,6 +115,8 @@ export default function AdminNav() {
     '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
     '/admin/settings/languages': ['/admin/settings/languages', '/admin/impostazioni/lingue'],
     '/admin/settings/gdpr-templates': ['/admin/settings/gdpr-templates', '/admin/impostazioni/modelli-gdpr'],
+    '/admin/settings/email-templates': ['/admin/settings/email-templates', '/admin/impostazioni/modelli-email'],
+    '/admin/settings/tags': ['/admin/settings/tags', '/admin/impostazioni/tag'],
     '/admin/infrastructure': ['/admin/infrastructure', '/admin/infrastruttura'],
     '/admin/monitoring': ['/admin/monitoring'],
     '/admin/questionnaires': ['/admin/questionnaires'],

@@ -7,6 +7,7 @@
     "errorMessage": "Kažkas nepavyko. Bandykite dar kartą.",
     "retry": "Bandyti dar kartą",
     "save": "Išsaugoti",
+    "saving": "Saving...",
     "cancel": "Atšaukti",
     "confirm": "Patvirtinti",
     "close": "Uždaryti",
@@ -22,9 +23,16 @@
     "selectAll": "Select all",
     "deselectAll": "Deselect all"
   },
+  "markdown": {
+    "edit": "Write",
+    "preview": "Preview",
+    "hint": "Supports bold, italic, links, lists, images, tables.",
+    "syntaxHelp": "Markdown: **bold** · *italic* · [text](url) · ![alt](img)"
+  },
   "nav": {
     "home": "Pradžia",
     "events": "Renginiai",
+    "videoLibrary": "Video library",
     "about": "Informacija",
     "privacy": "Privatumas",
     "admin": "Administravimas",
@@ -51,7 +59,8 @@
       "spotsAvailable": "{count} laisvų vietų",
       "fullyBooked": "Visos vietos užimtos",
       "ended": "Pasibaigė",
-      "occupiedSpots": "{registered}/{max} užsiregistravusių"
+      "occupiedSpots": "{registered}/{max} užsiregistravusių",
+      "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}"
     },
     "detail": {
       "title": "Renginio informacija",
@@ -93,7 +102,9 @@
       "toggleChat": "Pokalbiai",
       "toggleQa": "Q&A",
       "toggleRecording": "Įrašymas",
-      "settingsSection": "Renginio nustatymai"
+      "settingsSection": "Renginio nustatymai",
+      "sessionsAndRecordings": "Sessions and video recordings",
+      "postEventSection": "Post-event and feedback"
     },
     "status": {
       "DRAFT": "Juodraštis",
@@ -101,6 +112,10 @@
       "LIVE": "Vyksta",
       "ENDED": "Pasibaigė",
       "ARCHIVED": "Archyvuotas"
+    },
+    "list": {
+      "filterByTag": "Filter by tag",
+      "allTags": "All"
     }
   },
   "registration": {
@@ -147,10 +162,36 @@
       "generic": "Registracijos klaida. Bandykite dar kartą."
     }
   },
+  "videoLibrary": {
+    "title": "Video library",
+    "subtitle": "Replay recordings from past public events. Each card opens the event page with its video and materials.",
+    "searchPlaceholder": "Search by title or description…",
+    "results": "{count, plural, =0 {No videos available} =1 {1 video} other {# videos}}",
+    "empty": "No published recordings for the current filters.",
+    "loading": "Loading…",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}"
+  },
   "live": {
     "title": "Renginio salė",
+    "password": {
+      "title": "Join password",
+      "label": "Enter the password",
+      "submit": "Join",
+      "submitting": "Verifying...",
+      "wrong": "Wrong password. Try again.",
+      "rateLimited": "Too many attempts. Wait a minute and try again.",
+      "generic": "Verification error. Try again."
+    },
     "connecting": "Jungiamasi...",
     "connectionError": "Nepavyko prisijungti prie salės. Patikrinkite ryšį ir bandykite dar kartą.",
+    "activeVsRegistered": "{active} active · {registered} registered",
+    "overtime": {
+      "withCountdown": "The scheduled end time has passed. The event will close automatically in {minutes, plural, one {# minute} other {# minutes}}.",
+      "closingNow": "End time reached. The event is about to close.",
+      "indefinite": "The scheduled end time has passed. The event will stay open while participants are connected."
+    },
     "recordingActive": "Vyksta įrašymas",
     "recordingConsent": "Šis renginys yra įrašomas. Įeidami sutinkate su garso/vaizdo įrašymu.",
     "recordingConsentTitle": "Sutikimas dėl įrašymo",
@@ -163,6 +204,7 @@
     "waitingRoomHint": "Šis puslapis atsinaujins automatiškai, kai moderatorius pradės renginį. Perkrauti nereikia.",
     "startEventButton": "Pradėti renginį",
     "startingEvent": "Paleidžiama...",
+    "startEventError": "Failed to start event. Please try again.",
     "chatNotSaved": "Pokalbių pranešimai nėra saugomi po renginio pabaigos.",
     "registerAndJoin": "Registruotis ir dalyvauti",
     "registerNow": "Vyksta dabar — Registruokitės!",
@@ -174,7 +216,16 @@
     "guestJoinButton": "Prisijungti kaip svečias",
     "guestRedirectToRegister": "Renginys dar neprasidėjo. Užsiregistruokite, kad gautumėte prieigos nuorodą.",
     "jibriUnavailable": "Įrašymas neprieinamas — Jibri nesukonfigūruotas",
+    "endEventError": "Failed to end the event. Please try again.",
     "jibriNotConfigured": "Įrašymas nesukonfigūruotas infrastruktūroje",
+    "jibriScaling": "Recording starting…",
+    "jibriScalingTooltip": "The recording component is starting up. It will be available shortly.",
+    "roomPreparing": "Setting up the room…",
+    "roomPreparingDetail": "Video servers are starting up. This takes about 2 minutes. The room will activate automatically.",
+    "recordingPromptTitle": "Start recording?",
+    "recordingPromptBody": "Recording is enabled for this event. Would you like to start it now?",
+    "recordingPromptStart": "Start now",
+    "recordingPromptLater": "Later",
     "eventEnded": "Renginys baigėsi",
     "eventEndedMessage": "Renginys baigėsi. Dėkojame už dalyvavimą.",
     "reconnecting": "Bandoma prisijungti iš naujo…",
@@ -193,7 +244,10 @@
     "chat": {
       "placeholder": "Rašykite žinutę...",
       "send": "Siųsti",
-      "noMessages": "Nėra žinučių"
+      "noMessages": "Nėra žinučių",
+      "empty": "No messages yet. Be the first!",
+      "inputLabel": "Chat message",
+      "moderatorBadge": "Moderator"
     },
     "role": {
       "moderator": "Moderatorius",
@@ -204,13 +258,22 @@
       "title": "Dalyviai",
       "noParticipants": "Dalyvių nėra",
       "kick": "Pašalinti",
-      "kickConfirm": "Ar tikrai norite pašalinti šį dalyvį?"
+      "kickConfirm": "Ar tikrai norite pašalinti šį dalyvį?",
+      "anonymous": "Participant",
+      "connectionQuality": "Connection",
+      "quality": {
+        "good": "Good",
+        "medium": "Medium",
+        "poor": "Poor",
+        "unknown": "N/A"
+      }
     },
     "moderator": {
       "muteAll": "Nutildyti visus",
       "unmuteAll": "Įjungti garsą visiems",
       "startRecording": "Pradėti įrašymą",
       "stopRecording": "Sustabdyti įrašymą",
+      "recPreparing": "Preparing…",
       "toggleChat": "Pokalbiai įjungti/išjungti",
       "endEvent": "Baigti renginį",
       "endEventConfirm": "Ar tikrai norite baigti renginį visiems dalyviams?",
@@ -222,10 +285,27 @@
       "approveVideo": "Suteikti žodį (vaizdas)",
       "approveAll": "Suteikti žodį",
       "audioOnly": "Tik garsas",
+      "participantFallback": "Participant",
       "audioModeration": "Dalyvių mikrofonas",
+      "micDisabled": "Mic disabled",
       "videoModeration": "Dalyvių vaizdo kamera",
+      "videoDisabled": "Video disabled",
       "eventEndedSuccess": "Renginys sėkmingai baigtas. Nukreipiama..."
-    }
+    },
+    "closeDrawer": "Close",
+    "hintBanner": {
+      "controls": "Controls are at the bottom",
+      "raiseHand": "Raise your hand to speak",
+      "sidebar": "Q&A and chat in the side panel",
+      "dismiss": "Got it"
+    },
+    "topBarCount": {
+      "live": "👥 {count, plural, one {# person} other {# people}}"
+    },
+    "sidebarTabChatUnread": "New unread messages",
+    "floatingControlsLabel": "Event controls",
+    "screenshareActive": "🖥️ {name} is sharing their screen",
+    "screenshareFallbackName": "A participant"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -261,81 +341,228 @@
       "tooLong": "Klausimas negali viršyti 500 simbolių",
       "rateLimit": "Palaukite prieš pateikdami kitą klausimą",
       "generic": "Klaida pateikiant klausimą"
-    }
-  },
-  "polls": {
-    "title": "Apklausos",
-    "showPanel": "Rodyti apklausas",
-    "hidePanel": "Slėpti apklausas",
-    "createPoll": "Sukurti apklausą",
-    "noPolls": "Apklausų nėra. Moderatorius jas sukurs renginio metu.",
-    "questionPlaceholder": "Parašykite apklausos klausimą...",
-    "optionPlaceholder": "Variantas {number}",
-    "addOption": "Pridėti variantą",
-    "removeOption": "Pašalinti variantą",
-    "create": "Sukurti",
-    "creating": "Kuriama...",
-    "cancelCreate": "Atšaukti",
-    "closePoll": "Uždaryti balsavimą",
-    "publishResults": "Paskelbti rezultatus",
-    "reopenPoll": "Atidaryti iš naujo",
-    "totalVotes": "{count} balsų",
-    "voted": "Jūs balsavote",
-    "status": {
-      "OPEN": "Atvira",
-      "CLOSED": "Uždaryta",
-      "PUBLISHED": "Rezultatai"
     },
-    "errors": {
-      "questionRequired": "Parašykite apklausos klausimą",
-      "minOptions": "Reikia bent 2 variantų",
-      "generic": "Klaida kuriant apklausą"
-    }
-  },
-  "materials": {
-    "title": "Medžiaga",
-    "postEventTitle": "Renginio medžiaga",
-    "addMaterial": "Pridėti medžiagą",
-    "titleLabel": "Pavadinimas",
-    "urlLabel": "Nuorodos URL",
-    "descriptionLabel": "Aprašymas (neprivaloma)",
-    "addedBy": "Pridėjo {name}",
-    "noMaterials": "Medžiaga nepasidalinta.",
-    "confirmDelete": "Ar tikrai norite ištrinti šią medžiagą?",
-    "materialAdded": "Medžiaga pridėta",
-    "materialDeleted": "Medžiaga ištrinta",
-    "deleteMaterial": "Ištrinti medžiagą",
-    "add": "Pridėti",
-    "adding": "Pridedama...",
-    "cancel": "Atšaukti",
-    "errors": {
-      "urlInvalid": "Įveskite galiojantį URL",
-      "generic": "Klaida pridedant medžiagą"
-    }
-  },
-  "reminders": {
-    "title": "Pranešimai",
-    "addReminder": "Pridėti priminimą",
-    "removeReminder": "Pašalinti",
-    "maxReminders": "Daugiausiai 5 priminimai vienam renginiui.",
-    "selectPreset": "Pasirinkite laiką...",
-    "sentStatus": "{count} išsiųsta",
-    "notSent": "Neišsiųsta",
-    "presets": {
-      "7days": "Prieš 7 dienas",
-      "3days": "Prieš 3 dienas",
-      "1day": "Prieš 1 dieną",
-      "12hours": "Prieš 12 valandų",
-      "6hours": "Prieš 6 valandas",
-      "3hours": "Prieš 3 valandas",
-      "1hour": "Prieš 1 valandą",
-      "30min": "Prieš 30 minučių",
-      "15min": "Prieš 15 minučių"
-    }
+    "ctaTitle": "Ask the first question",
+    "ctaBody": "Other attendees can upvote your question. Moderators will see it and can answer live or in writing.",
+    "moderatorHint": "Attendees can submit questions from their own panel. They appear here in real time.",
+    "yourQuestionLabel": "Your question",
+    "placeholderInviting": "E.g. Could you explain…",
+    "submitPrimary": "Send question"
   },
   "admin": {
+    "fileOrUrl": {
+      "tabUpload": "Upload file",
+      "tabUrl": "Paste URL",
+      "uploadLabel": "Choose a file from your device",
+      "urlLabel": "File URL",
+      "urlPlaceholder": "https://…",
+      "uploadButton": "Upload",
+      "uploading": "Uploading…",
+      "remove": "Remove",
+      "preview": "Preview",
+      "openFile": "Open file",
+      "invalidUrl": "Please enter a valid URL",
+      "errorSize": "File exceeds the maximum allowed size",
+      "errorMime": "Unsupported file type",
+      "errorGeneric": "Error while uploading the file",
+      "helpImage": "Supported formats: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
+      "helpAudio": "Supported formats: MP3, WAV, OGG, M4A, WebM — max 20 MB",
+      "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+    },
+    "rubricaPicker": {
+      "loading": "Searching…",
+      "noResults": "No results",
+      "addSelected": "Add selected",
+      "selectedCount": "{count, plural, =0 {No people selected} one {1 person selected} other {# people selected}}"
+    },
+    "wizard": {
+      "steps": {
+        "base": "Basics",
+        "permissions": "Permissions",
+        "invites": "People",
+        "content": "Content",
+        "review": "Review"
+      },
+      "saveDraft": "Save as draft",
+      "publish": "Publish event",
+      "updateEvent": "Update event",
+      "step1": {
+        "heading": "Basic information",
+        "intro": "Title, description, cover image and schedule.",
+        "coverImage": "Cover image",
+        "coverImageHelp": "Shown on the public event page and invitation emails.",
+        "scheduleHeading": "Schedule",
+        "timezone": "Timezone",
+        "recurrenceHeading": "Recurrence",
+        "tagsHeading": "Tags",
+        "waitingRoomAudio": "Waiting-room audio (optional)",
+        "waitingRoomAudioHelp": "Played before the live call starts.",
+        "parseTitleKickerLabel": "Use kicker in title (| separator)",
+        "parseTitleKickerHelp": "When on, a title like 'CONFERENCE | Digital innovation' renders CONFERENCE as a small kicker line above the main title.",
+        "maxParticipantsHelp": "Estimate the maximum number of participants. Drives video server capacity and waiting-room UI.",
+        "validation": {
+          "startsAt": "Invalid start date.",
+          "endsAt": "End date must be after start date."
+        },
+        "senderRatioLabel": "Estimated active share",
+        "senderRatioHelp": "How many participants you expect to have mic/camera active. Helps size the video server.",
+        "activeParticipantsEstimate": "≈ {count} active participants",
+        "senderRatioPreset": "{pct}%"
+      },
+      "step2": {
+        "heading": "Who can do what",
+        "intro": "Permission matrix: pick which roles can use each feature. Moderators can always do everything.",
+        "featureCol": "Feature",
+        "role": {
+          "GUEST": "Guest",
+          "SPEAKER": "Speaker",
+          "MODERATOR": "Moderator"
+        },
+        "feature": {
+          "qa": {
+            "label": "Q&A",
+            "desc": "Submit questions to the Q&A panel."
+          },
+          "chat": {
+            "label": "Chat",
+            "desc": "Post messages in the group chat."
+          },
+          "mic": {
+            "label": "Microphone",
+            "desc": "Unmute their own microphone."
+          },
+          "video": {
+            "label": "Video",
+            "desc": "Turn on their own camera."
+          },
+          "share": {
+            "label": "Screen share",
+            "desc": "Share their screen."
+          },
+          "recording_control": {
+            "label": "Recording control",
+            "desc": "Start/stop the recording."
+          }
+        },
+        "recordingHeading": "Recording"
+      },
+      "step3": {
+        "heading": "People and invites",
+        "intro": "Add organizers (shown on the page), moderators, speakers, and invited guests.",
+        "organizersHeading": "Organizers",
+        "organizersHelp": "Appear on the public event page.",
+        "organizerName": "Contact name",
+        "organizerOrganization": "Organization",
+        "organizerWebsite": "Website",
+        "organizerRequired": "Contact name and organization are required.",
+        "moderatorsHeading": "Moderators",
+        "moderatorsHelp": "Moderators can manage the session and control permissions during the event.",
+        "moderatorName": "Name",
+        "moderatorEmail": "Email",
+        "moderatorRequired": "Name and email are required.",
+        "speakersHeading": "Speakers",
+        "speakersHelp": "Receive a moderator link via email.",
+        "speakerName": "Name",
+        "speakerEmail": "Email",
+        "speakerRequired": "Name and email are required.",
+        "invitationsHeading": "Invitations",
+        "invitationsHelp": "Pre-registered attendees — each gets a personal join link.",
+        "invitationName": "Name (optional)",
+        "invitationEmail": "Email",
+        "invitationRole": "Role",
+        "role": {
+          "GUEST": "Guest",
+          "SPEAKER": "Speaker"
+        },
+        "add": "Add",
+        "remove": "Remove",
+        "invalidEmail": "Invalid email address.",
+        "duplicateEmail": "Email already added.",
+        "rubricaPick": "Search from the address book…",
+        "rubricaOrAdd": "or add manually"
+      },
+      "step4": {
+        "heading": "Content and materials",
+        "intro": "Attach materials and link pre/post-event questionnaires.",
+        "materialsHeading": "Materials",
+        "materialsHelp": "Documents, slides, and links to share before, during or after the event.",
+        "materialTitle": "Title",
+        "materialUrl": "File or link",
+        "visibilityLabel": "Visibility",
+        "visibility": {
+          "ALWAYS": "Always",
+          "BEFORE": "Before the event",
+          "DURING": "During the event",
+          "AFTER": "After the event"
+        },
+        "addMaterial": "Add material",
+        "remove": "Remove",
+        "questionnairesHeading": "Questionnaires",
+        "questionnairesIntro": "Combine reusable templates with questions specific to this event.",
+        "questionnairesEmpty": "No questionnaires available. Create one from Settings → Questionnaires.",
+        "preHeading": "Pre-registration questionnaire",
+        "postHeading": "Post-event questionnaire",
+        "templatesLabel": "Reusable templates",
+        "templatesEmpty": "No templates created. Go to Settings → Questionnaires.",
+        "adhocLabel": "Questions specific to this event",
+        "addQuestion": "+ Add question",
+        "questionPrompt": "Question text",
+        "questionType": "Type",
+        "questionTypeSingle": "Single choice",
+        "questionTypeMulti": "Multiple choice",
+        "questionTypeYesNo": "Yes/No",
+        "questionTypeLikert": "Likert scale",
+        "questionTypeOpen": "Open text",
+        "addOption": "+ Add option",
+        "option": "Option",
+        "scaleMin": "Minimum",
+        "scaleMax": "Maximum",
+        "required": "Required",
+        "saveDraftAndGoQuestionnaires": "Save draft and go to questionnaire management",
+        "preQuestionnaire": "Pre-event questionnaire",
+        "postQuestionnaire": "Post-event questionnaire (feedback)",
+        "none": "— None —"
+      },
+      "step5": {
+        "heading": "Review and publish",
+        "intro": "Double-check and publish (or save as draft).",
+        "summary": {
+          "title": "Title",
+          "schedule": "Schedule",
+          "recurrence": "Recurrence",
+          "maxParticipants": "Expected participants",
+          "organizers": "Organizers",
+          "speakers": "Speakers",
+          "invitations": "Invitations",
+          "materials": "Materials",
+          "tags": "Tags",
+          "recording": "Recording",
+          "recordingAuto": "On — auto-start",
+          "recordingManual": "On — manual start",
+          "recordingOff": "Off"
+        },
+        "noRecurrence": "One-off event",
+        "gdprHeading": "Privacy and data retention",
+        "retentionDays": "Retention days",
+        "retentionHelp": "After this threshold, personal data is automatically deleted.",
+        "gdprTemplate": "Privacy template",
+        "gdprTemplateNone": "— Use custom text —",
+        "privacyText": "Privacy notice (text)",
+        "moderatorHeading": "Moderator contact",
+        "moderatorName": "Name",
+        "moderatorEmail": "Email",
+        "capacityHeading": "Estimated capacity",
+        "featuresHeading": "Configuration summary",
+        "privacyDoc": "Privacy notice document (PDF or link)",
+        "privacyDocHelp": "Upload a PDF or paste the URL of an alternative privacy notice. Overrides the GDPR template when set.",
+        "privacyTextHelp": "Short text shown on the registration form; can complement or replace the GDPR template."
+      },
+      "validationFailed": "Please review the highlighted fields before continuing."
+    },
     "nav": {
       "events": "Renginių valdymas",
+      "registrations": "Sign-ups",
+      "recordings": "Video & sessions",
       "settings": "Sistemos nustatymai",
       "eventsList": "Renginių sąrašas",
       "newEvent": "Naujas renginys",
@@ -345,24 +572,289 @@
       "instantCalls": "Instant calls",
       "infrastructure": "Infrastruktūra",
       "monitoring": "Monitoring",
+      "monitoringDashboard": "Dashboard",
+      "registrationsList": "Sign-ups",
+      "moderators": "Moderators",
+      "gdprAudit": "GDPR audit",
+      "recordingsList": "Video recordings",
       "settingsGeneral": "Bendri",
       "settingsLanguages": "Kalbos",
+      "settingsGdprTemplates": "GDPR templates",
+      "admin": "Administration",
+      "eventDetail": "Event detail",
+      "eventEdit": "Edit event",
+      "publications": "Publications",
+      "publicationsList": "All publications",
+      "publicationsNew": "New publication",
       "ariaLabel": "Administravimo navigacija",
       "subNavAriaLabel": "Skyriaus navigacija",
       "questionnaires": "Questionnaires",
       "questionnairesLibrary": "Template library",
       "questionnairesResponses": "Responses and statistics",
-      "rubrica": "Address book"
+      "rubrica": "Address book",
+      "settingsEmailTemplates": "Email templates",
+      "settingsTags": "Tag management",
+      "eventMaterials": "Materials",
+      "eventQuestionnaires": "Questionnaires",
+      "rubricaList": "List",
+      "rubricaDetail": "Entry"
     },
     "landing": {
       "title": "Administravimo skydelis",
       "subtitle": "Valdykite renginius ir konfigūruokite platformą",
       "eventsTitle": "Renginių valdymas",
       "eventsDescription": "Kurkite, redaguokite ir valdykite renginius, šablonus ir statistiką.",
+      "instantCallsTitle": "Instant calls",
+      "instantCallsDescription": "Spin up a public video call on the fly without scheduling — link is shareable immediately.",
+      "instantCallsStat": "{count, plural, =0 {no instant calls in the last 30 days} one {1 instant call in the last 30 days} other {# instant calls in the last 30 days}}",
+      "registrationsTitle": "Sign-ups",
+      "registrationsDescription": "Address book of attendees signed up to events: search, filters, export, moderators and GDPR audit.",
+      "registrationsTotal": "{count, plural, =0 {no people signed up} one {1 person signed up} other {# people signed up}}",
+      "today": "today",
+      "recordingsTitle": "Video & sessions",
+      "recordingsDescription": "Call video recordings, ended live sessions and archived instant calls. Download and management.",
+      "recordingsStat": "{count, plural, =0 {no video recordings} one {1 video recording available} other {# video recordings available}}",
+      "analyticsTitle": "Analytics",
+      "analyticsDescription": "Usage metrics overview: events created, participants, conversion rate, top events.",
+      "monitoringTitle": "Monitoring",
+      "monitoringDescription": "Technical dashboard with infrastructure metrics, performance, availability and quality of service.",
+      "templatesTitle": "Event templates",
+      "templatesDescription": "Reusable models to quickly create events with predefined configurations.",
       "settingsTitle": "Sistemos nustatymai",
       "settingsDescription": "Konfigūruokite prekės ženklą, turinį, kalbas, funkcijas ir infrastruktūrą.",
       "liveNow": "{count, plural, one {# tiesioginis renginys} few {# tiesioginiai renginiai} many {# tiesioginių renginių} other {# tiesioginių renginių}}",
       "upcomingEvents": "{count, plural, one {# artėjantis renginys} few {# artėjantys renginiai} many {# artėjančių renginių} other {# artėjančių renginių}}"
+    },
+    "publications": {
+      "title": "Publications",
+      "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, uploaded archive recordings, and sessions waiting to be promoted.",
+      "newPublication": "New publication",
+      "searchPlaceholder": "Search by title or description…",
+      "listedAny": "All (listed and unlisted)",
+      "listedYes": "Only in library",
+      "listedNo": "Only not in library",
+      "empty": "No publications match the current filters.",
+      "untitled": "(untitled)",
+      "tabs": {
+        "all": "All",
+        "scheduled": "Events",
+        "instant": "Instant calls",
+        "legacy": "Uploaded archive",
+        "pending": "To promote"
+      },
+      "source": {
+        "scheduled": "Event",
+        "instant": "Instant",
+        "legacy": "Legacy"
+      },
+      "badges": {
+        "listed": "In library",
+        "unlisted": "Not in library",
+        "pending": "{count, plural, =1 {1 recording to promote} other {# recordings to promote}}"
+      },
+      "meta": {
+        "registrations": "{count, plural, =0 {No registrations} =1 {1 registered} other {# registered}}"
+      },
+      "actions": {
+        "edit": "Edit event",
+        "preview": "Public preview",
+        "list": "List in library",
+        "unlist": "Remove from library"
+      },
+      "uploadPage": {
+        "title": "New publication",
+        "subtitle": "Upload an existing video file (MP4, WebM or MOV) to the platform storage and enrich it with editorial metadata.",
+        "step1Title": "1. Upload the video file",
+        "startUpload": "Upload",
+        "signing": "Preparing…",
+        "uploading": "Uploading {progress}%",
+        "uploaded": "Upload complete",
+        "uploadHint": "Supported formats: MP4, WebM, MOV, M4V. Max size 5 GB. Upload is direct to object storage (Azure Blob) — nothing passes through our servers.",
+        "step2Title": "2. Publication metadata",
+        "titleIt": "Title (Italian)",
+        "titleEn": "Title (English, optional)",
+        "description": "Description",
+        "startsAt": "Original event date",
+        "organizer": "Organizer",
+        "speakers": "Speakers",
+        "speakersPlaceholder": "Comma-separated",
+        "coverUrl": "Cover URL (16:9, optional)",
+        "coverPlaceholder": "https://...",
+        "coverHint": "Banner used on the library card. If empty we fall back to the event image or a gradient.",
+        "youtubeUrl": "Reference YouTube URL (optional)",
+        "youtubeHint": "Shown as an external link on the event page, never embedded.",
+        "libraryListed": "Publish in the video library now",
+        "save": "Create publication",
+        "errors": {
+          "fileTooLarge": "File exceeds the 5 GB limit.",
+          "unsupportedType": "Unsupported format. Upload MP4, WebM, MOV or M4V.",
+          "signFailed": "Couldn't get an upload URL. Check the storage configuration.",
+          "uploadFailed": "Upload failed. Check your connection and retry.",
+          "uploadFirst": "Upload the file first.",
+          "titleRequired": "The Italian title is required (at least 3 characters).",
+          "dateRequired": "The original date is required.",
+          "saveFailed": "Saving the metadata failed."
+        }
+      }
+    },
+    "recordingsLibrary": {
+      "title": "Video recordings",
+      "subtitle": "Centralised library of call recordings: filter, download, export",
+      "loading": "Loading...",
+      "range": "Range",
+      "range7d": "Last 7 days",
+      "range30d": "Last 30 days",
+      "range90d": "Last 90 days",
+      "rangeAll": "All time",
+      "eventFilter": "Event",
+      "allEvents": "All events",
+      "hasRecording": "With recording",
+      "hasRecordingYes": "Only with video file",
+      "hasRecordingNo": "Without video file",
+      "hasRecordingAny": "All",
+      "searchPlaceholder": "Search by event title or filename…",
+      "statWithRecording": "Video files available",
+      "statTotalSize": "Storage used",
+      "statTotalDuration": "Total duration",
+      "colStartedAt": "Started",
+      "colEvent": "Event",
+      "colSource": "Source",
+      "colDuration": "Duration",
+      "colSize": "Size",
+      "colPeak": "Peak participants",
+      "colActions": "Actions",
+      "sources": {
+        "event": "Event",
+        "session": "Session"
+      },
+      "download": "Download",
+      "noFile": "No file",
+      "noResults": "No recordings for the current filters.",
+      "tabs": {
+        "library": "Library",
+        "orphans": "Orphans"
+      },
+      "orphans": {
+        "noneFound": "No orphan recordings. The bucket is in sync with the database.",
+        "graceDays": "Orphans are automatically deleted after {days} days.",
+        "refresh": "Refresh",
+        "intro": "These recordings exist in the storage bucket but are not linked to any event or session in the database. They will be automatically deleted {days} days after discovery. You can mark them as \"Keep\" to preserve them, \"Delete now\" to remove on the next cron run, or leave them pending until the timeout.",
+        "statTotal": "Total",
+        "statPending": "Pending",
+        "statIgnore": "Kept",
+        "statDeleteNow": "To delete",
+        "selected": "selected",
+        "markIgnore": "Keep",
+        "markDelete": "Delete now",
+        "markPending": "Revert decision",
+        "colBlobName": "Blob name",
+        "colSize": "Size",
+        "colDiscovered": "Discovered on",
+        "colDecision": "Decision",
+        "colDeletesAt": "Scheduled deletion",
+        "decisionPending": "Pending",
+        "decisionIgnore": "Kept",
+        "decisionDeleteNow": "To delete",
+        "nextSweep": "Next run"
+      },
+      "play": "Play",
+      "closePlayer": "Close player",
+      "playerUnsupported": "Your browser does not support video playback.",
+      "detailStart": "Start",
+      "detailEnd": "End",
+      "detailModerator": "Moderator",
+      "detailRoom": "Jitsi room",
+      "detailFilename": "File name"
+    },
+    "gdprAudit": {
+      "title": "GDPR audit",
+      "subtitle": "Log of privacy actions on personal data: deletions, consent, exports",
+      "loading": "Loading...",
+      "range": "Range",
+      "range30d": "Last 30 days",
+      "range90d": "Last 90 days",
+      "range1y": "Last year",
+      "actionFilter": "Action type",
+      "allActions": "All",
+      "actions": {
+        "DATA_DELETED": "Data deleted",
+        "CONSENT_RECORDED": "Consent recorded",
+        "DATA_EXPORTED": "Data exported"
+      },
+      "recordsAffected": "{count} records affected",
+      "colWhen": "When",
+      "colAction": "Action",
+      "colEvent": "Event",
+      "colRecords": "Records",
+      "colDetails": "Details",
+      "noResults": "No audit entries in the selected range."
+    },
+    "moderators": {
+      "title": "Moderators",
+      "subtitle": "Retrieve, copy and regenerate moderator magic links",
+      "searchPlaceholder": "Search by slug, moderator name or email…",
+      "searchHelp": "The magic link contains a unique token: share it only with the designated moderator.",
+      "colEvent": "Event",
+      "colModerator": "Moderator",
+      "colDate": "Date",
+      "colStatus": "Status",
+      "colActions": "Actions",
+      "copy": "Copy link",
+      "copied": "Copied!",
+      "copyLink": "Copy moderator link",
+      "regenerate": "Regenerate",
+      "rotating": "Rotating…",
+      "regenerateTitle": "Regenerate moderator token (old link stops working)",
+      "confirmRegenerate": "Regenerate the token? The old link will stop working.",
+      "noResults": "No events found."
+    },
+    "registrations": {
+      "title": "Sign-ups",
+      "subtitle": "All people signed up to events — search, filter and export",
+      "loading": "Loading...",
+      "range": "Range",
+      "range7d": "Last 7 days",
+      "range30d": "Last 30 days",
+      "range90d": "Last 90 days",
+      "rangeAll": "All time",
+      "eventFilter": "Event",
+      "allEvents": "All events",
+      "orgType": "Org type",
+      "allOrgTypes": "All",
+      "joined": "Attendance",
+      "allRegs": "All",
+      "joinedYes": "Joined",
+      "joinedNo": "Did not join",
+      "searchPlaceholder": "Search by name, email, organization…",
+      "exportCsv": "Export CSV",
+      "statTotal": "Total registrations",
+      "statJoined": "Actual attendance",
+      "showing": "{count} shown on this page",
+      "conversionRate": "conversion",
+      "topOrgTypes": "Top organization types",
+      "orgTypeUnknown": "Unspecified",
+      "colCreatedAt": "Signed up",
+      "colEvent": "Event",
+      "colName": "Name",
+      "colEmail": "Email",
+      "colOrg": "Organization",
+      "colJoined": "Joined",
+      "noResults": "No results for the current filters.",
+      "pageInfo": "{from}–{to} of {total}",
+      "prev": "‹ Previous",
+      "next": "Next ›",
+      "orgTypes": {
+        "MINISTRY": "Ministry",
+        "AGENCY": "Agency",
+        "REGION": "Region",
+        "PROVINCE": "Province",
+        "MUNICIPALITY": "Municipality",
+        "ASL": "Local health authority",
+        "UNIVERSITY": "University",
+        "PUBLIC_ENTITY": "Public entity",
+        "IN_HOUSE": "In-house company",
+        "OTHER": "Other"
+      }
     },
     "recording": {
       "title": "Vaizdo įrašas",
@@ -385,6 +877,8 @@
     "subtitle": "Administravimo skydelis",
     "createEvent": "Sukurti naują renginį",
     "editEvent": "Redaguoti renginį",
+    "duplicateEvent": "Dubliuoti",
+    "duplicateError": "Dublikavimas nepavyko. Bandykite dar kartą.",
     "deleteEvent": "Ištrinti renginį",
     "deleteConfirm": "Ar tikrai norite ištrinti šį renginį? Šio veiksmo negalima atšaukti.",
     "publish": "Paskelbti",
@@ -392,7 +886,7 @@
     "noToken": "Norėdami valdyti renginius, naudokite moderatoriaus nuorodą, gautą el. paštu.",
     "noEvents": "Renginių nerasta. Sukurkite savo pirmąjį renginį.",
     "eventDetails": "Renginio informacija",
-    "registrations": "Registracijos",
+    "registrationsSection": "Sign-ups",
     "registrationCount": "{count} registracijų",
     "noRegistrations": "Dar nėra registruotų dalyvių. Pasidalykite renginio nuoroda!",
     "exportCsv": "Eksportuoti CSV",
@@ -408,6 +902,7 @@
     "startEventSuccess": "Renginys pradėtas! Laukiantys dalyviai bus automatiškai nukreipti.",
     "jvbWarmupWarning": "Vaizdo serveriai paleidžiami (apie 2 minutes). Dalyviai matys pranešimą laukimo salėje.",
     "eventIsLive": "Renginys vyksta",
+    "liveParticipants": "{count} in room / {max} max",
     "joinAsModeratorBtn": "Prisijungti kaip moderatorius",
     "openPublicPage": "Atidaryti viešą puslapį",
     "quickActions": "Greiti veiksmai",
@@ -426,14 +921,50 @@
     "form": {
       "titleIt": "Pavadinimas (italų k.)",
       "titleEn": "Pavadinimas (anglų k.)",
+      "titleLabel": "Title",
       "descriptionIt": "Aprašymas (italų k.)",
       "descriptionEn": "Aprašymas (anglų k.)",
+      "descriptionLabel": "Description",
       "startsAt": "Pradžios data ir laikas",
       "endsAt": "Pabaigos data ir laikas",
       "maxParticipants": "Maksimalus dalyvių skaičius",
+      "expectedParticipants": "Expected participants (estimate)",
+      "expectedParticipantsHint": "Just an estimate for infrastructure sizing. This is not a hard cap: registrations beyond this number are accepted and the infra scales automatically.",
+      "expectedSenderRatio": "Expected sender ratio",
+      "expectedSenderRatioInherit": "Site default",
+      "expectedSenderRatioHint": "Percentage of attendees with mic or webcam on. Classic webinar 10-20%, panel 50-100%. Leave empty to inherit the site default.",
+      "jvbPreview": {
+        "title": "Estimated JVB capacity",
+        "pod": "JVB pod",
+        "pods": "JVB pods",
+        "senders": "Senders",
+        "receivers": "Receivers",
+        "effectiveRatio": "Effective ratio",
+        "inherited": "inherited",
+        "presetLabel": "Preset",
+        "preset": {
+          "webinar": "Webinar",
+          "meeting": "Meeting",
+          "workshop": "Workshop",
+          "allHands": "All senders"
+        },
+        "clearPreset": "Use site default",
+        "atCeiling": "max {max} cap",
+        "videoDisabled": "Video disabled: all attendees count as receivers.",
+        "warnInherited": "With {participants} attendees and the inherited ratio ({defaultPct}%), the estimate relies on the site default. Large events should set an explicit value (webinar 5-20%, meeting 30%, workshop 60%).",
+        "warnCeiling": "Estimate at the configured max ({max} pods). If real attendance or senders exceed the estimate, bridges may saturate. Consider raising the cap or lowering maxParticipants."
+      },
+      "gracePeriod": "Event end (soft exit)",
+      "gracePeriodInherit": "Use site default",
+      "gracePeriodHardStop": "Hard close at endsAt (0 min)",
+      "gracePeriodMinutesN": "{n} minutes grace",
+      "gracePeriodNever": "Don't auto-close (leave to cleanup)",
+      "gracePeriodHint": "How many minutes past the scheduled end to keep the call open. Shown as a non-intrusive banner to attendees during overtime.",
       "qaEnabled": "Įjungti Q&A",
       "chatEnabled": "Įjungti pokalbius",
       "recordingEnabled": "Įjungti vaizdo įrašymą",
+      "autoStartRecording": "Start recording automatically",
+      "autoStartRecordingDesc": "When the event starts, recording begins on its own (the moderator is not prompted). Late joiners immediately find a catch-up player available.",
       "dataRetentionDays": "Duomenų saugojimas (dienomis po renginio)",
       "dataRetentionHint": "Po šio laikotarpio dalyvių registracijos, Q&A klausimai ir vaizdo įrašai bus automatiškai ištrinti.",
       "privacyPolicyUrl": "Privatumo politikos URL",
@@ -441,6 +972,7 @@
       "moderatorEmail": "Moderatoriaus el. paštas",
       "speakersIt": "Pranešėjai (italų k.)",
       "speakersEn": "Pranešėjai (anglų k.)",
+      "speakersLabel": "Speakers",
       "organizerName": "Organizatorius",
       "imageUrl": "Viršelio nuotraukos URL",
       "waitingRoomAudioUrl": "Laukimo salės garso URL (neprivaloma)",
@@ -471,6 +1003,10 @@
       "privacyPolicyMode": "Privatumo politika",
       "privacyPolicyModeUrl": "Išorinis URL",
       "privacyPolicyModeText": "Pasirinktinis tekstas",
+      "privacyPolicyModeTemplate": "Shared template",
+      "privacyPolicyTemplateNone": "— Select a template —",
+      "privacyPolicyTemplateEmpty": "This template has no text yet. Edit it from Settings › GDPR templates.",
+      "privacyPolicyTemplateHint": "Templates are managed under Settings › GDPR templates. ★ marks the default.",
       "privacyPolicyText": "Privatumo politikos tekstas",
       "privacyPolicyTextHint": "Parašykite privatumo politikos tekstą. Jis bus rodomas registracijos formoje.",
       "retentionPreviewTitle": "Kas automatiškai ištrinama",
@@ -486,8 +1022,12 @@
     "links": {
       "title": "Renginio nuorodos",
       "publicPage": "Viešas renginio puslapis",
+      "publicPageHint": "Share this URL to collect new registrations.",
+      "guestJoin": "Direct invite (no registration)",
+      "guestJoinHint": "Quick link to invite a last-minute attendee: they join as a guest while the event is live, without filling in the registration form.",
       "moderatorLink": "Moderatoriaus nuoroda",
       "moderatorLinkHint": "Dalykitės šia nuoroda tik su moderatoriais. Bet kas, turintis šią nuorodą, gali valdyti renginį.",
+      "liveRoomHint": "Direct link to enter the live room as moderator.",
       "copyLink": "Kopijuoti nuorodą",
       "copied": "Nukopijuota!"
     },
@@ -499,6 +1039,23 @@
       "comments": "Dalyvių komentarai",
       "noComments": "Komentarų nėra",
       "stars": "žvaigždutės"
+    },
+    "recordingUpload": {
+      "title": "Upload an existing recording",
+      "subtitle": "Already have a video file of the event (for example a MsTeams recording)? Upload it here — it becomes the official recording on the public page.",
+      "fileLabel": "Video file",
+      "upload": "Upload and attach",
+      "signing": "Preparing…",
+      "uploading": "Uploading {progress}%",
+      "attaching": "Attaching to event…",
+      "hint": "Formats: MP4, WebM, MOV, M4V. Max 5 GB. Upload goes straight to Azure Blob storage.",
+      "errors": {
+        "fileTooLarge": "File exceeds the 5 GB limit.",
+        "unsupportedType": "Unsupported format. Upload MP4, WebM, MOV or M4V.",
+        "signFailed": "Couldn't get the upload URL.",
+        "uploadFailed": "Upload failed. Please retry.",
+        "attachFailed": "Video uploaded but not attached to the event. Retry the last step."
+      }
     },
     "coModerators": {
       "title": "Antriniai moderatoriai ir pranešėjai",
@@ -526,6 +1083,7 @@
     },
     "gdprAuditLog": {
       "title": "GDPR audito žurnalas",
+      "subtitle": "Privacy actions tracked for this event: consent, export, deletions.",
       "date": "Data",
       "action": "Veiksmas",
       "recordCount": "Įrašai",
@@ -540,15 +1098,17 @@
       "title": "Svetainės nustatymai",
       "subtitle": "Konfigūruokite platformos išvaizdą ir elgseną pakartotiniam VA naudojimui",
       "saving": "Saugoma...",
-      "saved": "Nustatymai sėkmingai išsaugoti",
       "sections": {
         "languagesTitle": "Kalbų valdymas",
         "languagesDescription": "Įjunkite arba išjunkite ES kalbas, matomas sąsajoje, pasirinkite numatytąją kalbą ir tinkinkite vertimus.",
         "gdprTemplatesTitle": "GDPR šablonai",
         "gdprTemplatesDescription": "Kurkite daugkartinio naudojimo privatumo pranešimus, kuriuos galima susieti su bet kuriuo renginiu, ir pasirinkite numatytąjį naujiems renginiams.",
         "emailTemplatesTitle": "El. laiškų šablonai",
-        "emailTemplatesDescription": "Tinkinkite patvirtinimo ir priminimo laiškų temą, antraštes ir tekstą. Palikite tuščią, kad būtų naudojami įtaisyti numatytieji tekstai."
+        "emailTemplatesDescription": "Tinkinkite patvirtinimo ir priminimo laiškų temą, antraštes ir tekstą. Palikite tuščią, kad būtų naudojami įtaisyti numatytieji tekstai.",
+        "tagsTitle": "Tag management",
+        "tagsDescription": "Create and edit the tags used to filter events"
       },
+      "saved": "Nustatymai sėkmingai išsaugoti",
       "tabs": {
         "branding": "Prekės ženklas",
         "header": "Antraštė",
@@ -556,7 +1116,29 @@
         "homepage": "Pradžios puslapis",
         "pages": "Puslapiai",
         "footer": "Poraštė",
-        "features": "Funkcijos"
+        "features": "Funkcijos",
+        "scaling": "Infra sizing"
+      },
+      "scaling": {
+        "intro": "Parameters that describe the cluster capacity the platform runs on. Defaults are calibrated for Azure F16s_v2 (16 vCPU / 32 GiB) for JVB and F4s_v2 (4 vCPU / 8 GiB) for Jibri. On different hardware tweak these — the scaler recomputes immediately.",
+        "jvbSection": "Video bridge (JVB) capacity",
+        "jvbCpuCoresPerPod": "vCPU per JVB pod",
+        "jvbCpuCoresPerPodHelp": "CPU cores requested by the JVB container (resources.requests.cpu). Azure F16s_v2 = 16.",
+        "jvbReceiversPerCore": "Passive viewers per core",
+        "jvbReceiversPerCoreHelp": "How many receive-only viewers fit in 1 vCPU. Calibrated to 18.75 (300 webinar ÷ 16 cores) on F16s_v2.",
+        "jvbSendersPerCore": "Active senders per core",
+        "jvbSendersPerCoreHelp": "How many senders (mic+webcam) fit in 1 vCPU. Calibrated to 3.125 (50 all-sender ÷ 16 cores) on F16s_v2.",
+        "jvbMaxReplicas": "Max JVB replicas",
+        "jvbMaxReplicasHelp": "Hard cap to prevent runaway scale-up. Default 6.",
+        "jibriCpuCoresPerPod": "vCPU per Jibri pod",
+        "jibriCpuCoresPerPodHelp": "Cores requested by the Jibri container (ffmpeg + headless Chrome). Azure F4s_v2 = 4.",
+        "defaultSenderRatioPct": "Default sender ratio",
+        "defaultSenderRatioPctHelp": "Share of expected participants that will actually send media (mic+webcam) when the event doesn't specify. Webinar 10-30%, panel 50-100%.",
+        "previewTitle": "Sizing preview",
+        "previewBody": "Event with {participants} expected attendees at {ratio}% senders → {senders} senders + {receivers} passive → {cores} estimated cores → {jvbs} JVBs.",
+        "graceSection": "Soft exit (event end)",
+        "eventGracePeriodMinutes": "Default grace minutes past endsAt",
+        "eventGracePeriodMinutesHelp": "Extra time granted after the scheduled end before closing the call. 0 = hard stop, -1 = never auto-close (let the idle-cleanup decide), 15 = banner then close after 15 minutes. Each event can override."
       },
       "header": {
         "slimBarTitle": "Viršutinė juosta (Slim Header)",
@@ -637,9 +1219,11 @@
         "privacyTitle": "Privatumo politika",
         "privacyIt": "Turinys (italų k.)",
         "privacyEn": "Turinys (anglų k.)",
+        "privacyLabel": "Privacy policy content",
         "accessibilityTitle": "Prieinamumo deklaracija",
         "accessibilityIt": "Turinys (italų k.)",
         "accessibilityEn": "Turinys (anglų k.)",
+        "accessibilityLabel": "Accessibility statement content",
         "preview": "Peržiūra"
       },
       "footer": {
@@ -663,8 +1247,24 @@
         "publicRegistrationEnabledHelp": "Bet kas gali kurti renginius (jei išjungta, tik administratoriai)",
         "calendarPublic": "Viešas kalendorius",
         "calendarPublicHelp": "Paskelbti renginių kalendorių. Lankytojai gali matyti suplanuotus renginius.",
+        "parseTitleKicker": "Editorial title kicker",
+        "parseTitleKickerHelp": "If an event title contains the \"|\" character, the part before it is rendered as a small uppercase label above the main title. Example: \"Coffee chat | Trying the new OSS tool\" → label \"COFFEE CHAT\" + title \"Trying the new OSS tool\".",
         "githubUrl": "GitHub saugyklos URL",
-        "supportEmail": "Pagalbos el. paštas"
+        "supportEmail": "Pagalbos el. paštas",
+        "jvbScalingTitle": "Video bridge scaling (JVB)",
+        "jvbScalingHelp": "Control how long to wait before shutting down an idle video node, and how early to start it for a scheduled event.",
+        "jvbInactiveGraceMinutes": "Inactivity minutes before shutdown",
+        "jvbInactiveGraceMinutesHelp": "How long the conference must stay empty before the video node is scaled down. Recommended 45 minutes. Range 5-240.",
+        "jvbPreScaleMinutes": "Pre-scale lead time (minutes)",
+        "jvbPreScaleMinutesHelp": "How many minutes before startsAt to boot the video node for a scheduled event. Recommended 10 minutes.",
+        "jvbStressWarnPercent": "Stress warning threshold (%)",
+        "jvbStressWarnPercentHelp": "Above this threshold the scaler adds 1 extra JVB replica even if predictive sizing doesn't require it. Default 50.",
+        "jvbStressCriticalPercent": "Stress critical threshold (%)",
+        "jvbStressCriticalPercentHelp": "Above this threshold the scaler adds 2 extra JVB replicas. Default 70. Must be higher than warn.",
+        "jvbProvisioningTimeoutMinutes": "Provisioning timeout (minutes)",
+        "jvbProvisioningTimeoutMinutesHelp": "After how many minutes since startsAt an event without JVB ready is flagged as 'degraded' on the status page. Default 15. Covers node cold-start (~3-5 min) plus safety margin.",
+        "statusPollIntervalSeconds": "Status page poll interval (seconds)",
+        "statusPollIntervalSecondsHelp": "How often the /status page refreshes from the browser. Default 30. Lower values = fresher data but more load on the app."
       }
     },
     "analytics": {
@@ -706,6 +1306,35 @@
         "totalFeedback": "Atsiliepimų atsakymų"
       }
     },
+    "recurrence": {
+      "label": "Recurrence",
+      "helpText": "Make this event recurring. A series will be generated starting from the start date.",
+      "preset": {
+        "none": "None",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "weekdays": "Weekdays",
+        "monthly": "Monthly",
+        "custom": "Custom"
+      },
+      "weekdaysLabel": "Days of the week",
+      "weekdayShort": {
+        "0": "Mon",
+        "1": "Tue",
+        "2": "Wed",
+        "3": "Thu",
+        "4": "Fri",
+        "5": "Sat",
+        "6": "Sun"
+      },
+      "endLabel": "End of recurrence",
+      "endNever": "Never ends",
+      "endDate": "On date...",
+      "endCount": "After N occurrences",
+      "previewLabel": "Preview: next 5 occurrences",
+      "customRRuleLabel": "Custom RRULE",
+      "invalidRRule": "Invalid rule"
+    },
     "templates": {
       "title": "Renginių šablonai",
       "subtitle": "Valdykite numatytuosius šablonus greitam renginių kūrimui",
@@ -731,6 +1360,14 @@
       "namePlaceholder": "pvz. Greitas susitikimas, Projekto demonstracija...",
       "moderatorLabel": "Jūsų vardas (neprivaloma)",
       "moderatorPlaceholder": "Bus rodomas skambutyje",
+      "passwordLabel": "Join password (optional)",
+      "passwordPlaceholder": "Leave empty for public call",
+      "passwordHint": "If set, guests must type this password to join. Minimum 4 characters. Moderators don't need it.",
+      "passwordTooShort": "Password must be at least 4 characters.",
+      "maxParticipantsLabel": "Maximum participants (optional)",
+      "maxParticipantsPlaceholder": "Default: 50",
+      "maxParticipantsHint": "Raise this if you expect a larger audience: the scaler uses this number to decide how many JVB replicas to allocate. Instant calls have no pre-scaling, so for more than ~50 participants prefer a scheduled event with at least 15 minutes' lead time.",
+      "maxParticipantsInvalid": "Number must be between 2 and 500.",
       "create": "Sukurti ir prisijungti",
       "creating": "Kuriama...",
       "copyLink": "Kopijuoti kvietimo nuorodą",
@@ -751,6 +1388,54 @@
       "uploadBtn": "Įkelti",
       "deleteConfirm": "Ar tikrai norite ištrinti šį failą?",
       "noFiles": "Failų neįkelta. Naudokite mygtuką \"Įkelti failą\", kad pridėtumėte medžiagos."
+    },
+    "materials": {
+      "title": "Event materials",
+      "subtitle": "Attachments, links and resources shared before, during and after the event.",
+      "addButton": "Add material",
+      "empty": "No materials added yet.",
+      "deleteConfirm": "Delete this material permanently?",
+      "editButton": "Edit",
+      "cancelButton": "Cancel",
+      "saveButton": "Save",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description (optional)",
+      "visibilityLabel": "Visibility",
+      "visibilityAlways": "Always",
+      "visibilityBefore": "Before the event",
+      "visibilityDuring": "During the event",
+      "visibilityAfter": "After the event",
+      "typeLabel": "Type",
+      "fileUploaded": "File uploaded",
+      "typeFile": "File",
+      "typeLink": "Link",
+      "sizeLabel": "Size",
+      "errorGeneric": "Something went wrong. Please try again."
+    },
+    "gdprTemplates": {
+      "title": "GDPR templates",
+      "subtitle": "Create and manage reusable privacy notices shared across events. A template marked as default is pre-selected on new events.",
+      "newTemplate": "New template",
+      "emptyState": "No templates yet. Create one to reuse the same privacy text across multiple events.",
+      "defaultBadge": "Default",
+      "usedByEvents": "{count, plural, =0 {No events linked} =1 {1 event linked} other {# events linked}}",
+      "confirmDelete": "Delete template \"{name}\"? {count, plural, =0 {} =1 {1 event will lose its reference.} other {# events will lose their reference.}}",
+      "form": {
+        "newTitle": "New GDPR template",
+        "editTitle": "Edit GDPR template",
+        "name": "Internal name",
+        "namePlaceholder": "e.g. DTD standard privacy notice",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Short notes to recognise the template",
+        "bodyIt": "Privacy text (Italian)",
+        "bodyEn": "Privacy text (English)",
+        "bodyPlaceholder": "Paste the privacy notice text for this locale…",
+        "isDefault": "Use as default for new events",
+        "isDefaultHint": "The default template is pre-selected on the new event form. Only one template can be the default at a time."
+      },
+      "errors": {
+        "saveFailed": "Save failed. Check the fields and retry."
+      }
     },
     "emailTemplates": {
       "title": "El. laiškų šablonai",
@@ -794,6 +1479,10 @@
     "languages": {
       "title": "Kalbų valdymas",
       "subtitle": "Konfigūruokite galimas kalbas ir tinkinkite vertimus",
+      "defaultLocaleTitle": "Default language",
+      "defaultLocaleDescription": "The default language is used as fallback when a translation is not available and as the primary language of the site.",
+      "enabledLocales": "Enabled languages",
+      "enabledLocalesDescription": "Select which EU languages to make available in the user interface. The default language is always enabled.",
       "configuredLocales": "Sukonfigūruotos kalbos",
       "localesDescription": "Pasirinkite kalbas, kurios bus prieinamos naudotojo sąsajoje. Italų kalba yra privaloma kaip numatytoji kalba.",
       "addLocale": "Pridėti kalbą",
@@ -805,6 +1494,8 @@
       "editTranslations": "Redaguoti vertimus",
       "saved": "Kalbų konfigūracija išsaugota",
       "saveNote": "Galimų kalbų pakeitimai įsigalioja URL adresuose tik po perkrovimo.",
+      "translationOverridesTitle": "Custom translations",
+      "translationOverridesDescription": "Override default translations for enabled languages. Useful for organisation-specific terminology.",
       "translationOverrides": "Pasirinktiniai vertimai — {locale}",
       "overridesDescription": "Perrašykite numatytuosius šios kalbos vertimus. Naudokite taškų žymėjimą (pvz. common.appName).",
       "keyLabel": "Vertimo raktas",
@@ -914,6 +1605,7 @@
     },
     "sessions": {
       "title": "Call sessions",
+      "empty": "No sessions recorded yet. Live sessions are listed here automatically as soon as the moderator joins the room.",
       "loading": "Loading sessions...",
       "participants": "participants",
       "participantList": "Participants",
@@ -931,26 +1623,72 @@
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Loading metrics...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
-      "activeEvents": "Active events",
-      "participants": "Participants",
-      "registrations": "Total registrations",
+      "rangeLabel": "Time range",
+      "range": {
+        "24h": "24 hours",
+        "7d": "7 days",
+        "30d": "30 days"
+      },
+      "autoRefresh": "Auto-refresh every {seconds}s",
+      "sectionAvailability": "Service availability",
+      "sectionQos": "Quality of service (latency)",
+      "sectionCapacity": "Capacity & JVB",
+      "sectionResources": "Hardware resources",
+      "sectionChat": "In-app chat & Redis",
+      "chatMessagesPerMin": "Chat msgs/min",
+      "chatMessagesSubtitle": "5-min avg",
+      "chatSseConnections": "SSE connections",
+      "chatSseSubtitle": "active subscribers",
+      "redisConnectedClients": "Redis clients",
+      "redisConnectedSubtitle": "publishers + subscribers",
+      "redisPubsubChannels": "Pub/sub channels",
+      "redisPubsubSubtitle": "= events with active chat",
+      "chartRedisMemory": "Redis memory",
+      "redisMemoryHelp": "Current store usage. Ops/sec: {ops}.",
+      "chartChatSseConnections": "Active SSE connections",
+      "chatSseHelp": "Live-chat SSE subscribers. Load heuristic: ~300 SSE/pod is comfortable.",
+      "sectionEvents": "Events & calls analytics",
+      "sectionRecentCalls": "Recent calls",
       "uptime24h": "Uptime 24h",
-      "latencyP95": "Latency P95",
-      "latencyP50": "Latency P50",
+      "uptime7d": "Uptime 7d",
       "errorRate": "Error rate",
+      "podUptime": "Pod uptime",
+      "oldestPod": "Oldest running pod",
+      "latencyP50": "Latency P50",
+      "latencyP95": "Latency P95",
+      "latencyP99": "Latency P99",
+      "requestRate": "Requests/s",
+      "chartLatencyQuantiles": "Application latency — P50 / P95 / P99",
+      "participantsNow": "Active participants",
       "jvbStress": "JVB stress",
-      "sectionPerformance": "Application performance",
-      "sectionJvb": "Jitsi / Video Bridge",
-      "sectionInfra": "Infrastructure",
-      "chartLatency": "Latency (P95)",
-      "chartRequestRate": "Request rate",
-      "chartParticipants": "Participants over time",
-      "chartStress": "JVB stress over time",
+      "conferences": "Active conferences",
+      "octoRelay": "Octo inter-bridge relay",
+      "interBridge": "Octo traffic",
       "chartCpu": "CPU usage",
       "chartMemory": "Memory usage",
-      "last6h": "last 6 hours",
-      "last24h": "last 24 hours",
-      "reqPerSec": "requests/sec"
+      "cpuHelp": "5m CPU rate aggregated across all app replicas.",
+      "memHelp": "Pod RSS memory — useful to spot memory leaks.",
+      "eventsInRange": "Events in range",
+      "byStatus": "{live} live · {ended} ended",
+      "avgParticipants": "Avg participants/event",
+      "callSessions": "Call sessions",
+      "avgDuration": "avg duration {mins}m",
+      "registrationsInRange": "Registrations",
+      "confirmedRatio": "{pct}% joined",
+      "chartEventsBucket": "Events created",
+      "chartRegistrationsBucket": "Registrations",
+      "chartCallsBucket": "Call sessions",
+      "chartPeakBucket": "Peak participants",
+      "colEvent": "Event",
+      "colStartedAt": "Started",
+      "colDuration": "Duration",
+      "colPeakParts": "Peak parts",
+      "colRecording": "Recording",
+      "scaleToZeroTitle": "Scale-to-zero state",
+      "liveNow": "LIVE",
+      "provisioningNow": "provisioning",
+      "idleNow": "IDLE (paused)",
+      "scaleToZeroHelp": "IDLE is the normal state for an event with no traffic past the grace period. On the next user visit it transitions to PROVISIONING and then LIVE."
     },
     "bulk": {
       "selectAll": "Select all",
@@ -962,40 +1700,124 @@
       "deleteConfirm": "You are about to permanently delete {count} events and all associated data (registrations, sessions, recordings, Q&A, polls). This action cannot be undone.",
       "archiveConfirm": "You are about to archive {count} events. Archived events are hidden from the public listing but their data is preserved."
     },
-    "recordingsLibrary": {
-      "tabs": {
-        "library": "Library",
-        "orphans": "Orphans"
-      },
-      "orphans": {
-        "noneFound": "No orphan recordings. The bucket is in sync with the database.",
-        "graceDays": "Orphans are automatically deleted after {days} days.",
-        "refresh": "Refresh",
-        "intro": "These recordings exist in the storage bucket but are not linked to any event or session in the database. They will be automatically deleted {days} days after discovery. You can mark them as \"Keep\" to preserve them, \"Delete now\" to remove on the next cron run, or leave them pending until the timeout.",
-        "statTotal": "Total",
-        "statPending": "Pending",
-        "statIgnore": "Kept",
-        "statDeleteNow": "To delete",
-        "selected": "selected",
-        "markIgnore": "Keep",
-        "markDelete": "Delete now",
-        "markPending": "Revert decision",
-        "colBlobName": "Blob name",
-        "colSize": "Size",
-        "colDiscovered": "Discovered on",
-        "colDecision": "Decision",
-        "colDeletesAt": "Scheduled deletion",
-        "decisionPending": "Pending",
-        "decisionIgnore": "Kept",
-        "decisionDeleteNow": "To delete",
-        "nextSweep": "Next run"
-      },
-      "play": "Play",
-      "closePlayer": "Close player",
-      "playerUnsupported": "Your browser does not support video playback."
+    "eventsList": {
+      "search": "Search",
+      "searchPlaceholder": "Title, slug or organizer…",
+      "status": "Status",
+      "statusAll": "All statuses",
+      "tags": "Tags",
+      "sort": "Sort by",
+      "sortStartsAsc": "Start date ↑ (default)",
+      "sortStartsDesc": "Start date ↓",
+      "sortCreatedDesc": "Created ↓",
+      "sortTitleAsc": "Title A→Z",
+      "resetFilters": "Reset filters",
+      "noResults": "No events match the filters.",
+      "resultsCount": "{count, plural, =0 {No events} one {# event} other {# events}}",
+      "durationMinutes": "{minutes} min",
+      "durationHoursMinutes": "{hours}h {minutes}min",
+      "moderatorsSpeakers": "{mods} moderators · {speakers} speakers",
+      "postEventSummary": "{connected} joined · {registered} registered",
+      "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}"
     },
-    "duplicateEvent": "Dubliuoti",
-    "duplicateError": "Dublikavimas nepavyko. Bandykite dar kartą."
+    "tags": {
+      "title": "Tag management",
+      "subtitle": "Create, edit and delete the tags used to classify and filter public events.",
+      "backToSettings": "Settings",
+      "addTag": "New tag",
+      "editTag": "Edit tag",
+      "columnColor": "Color",
+      "columnSlug": "Slug",
+      "columnName": "Name",
+      "columnSortOrder": "Order",
+      "columnActions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleting": "Deleting…",
+      "deleteConfirm": "Delete tag \"{name}\"? It will also be removed from any events it is linked to.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "slugLabel": "Slug",
+      "slugHelp": "Lowercase letters, digits and hyphens only (e.g. open-webinar).",
+      "nameItLabel": "Name (Italian)",
+      "nameItRequired": "The Italian name is required.",
+      "nameEnLabel": "Name (English)",
+      "colorLabel": "Color",
+      "colorInvalid": "Invalid color: use the #rrggbb format.",
+      "sortOrderLabel": "Order",
+      "sortOrderHelp": "Lower values appear first. Default: 0.",
+      "empty": "No tags defined yet. Create the first one with the \"New tag\" button.",
+      "countLabel": "{count, plural, one {# tag} other {# tags}}",
+      "slugInUse": "Slug already in use",
+      "notFound": "Tag not found",
+      "saved": "Tag saved",
+      "deleted": "Tag deleted",
+      "validationFailed": "Some fields are not valid.",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "eventDetail": {
+      "copyPublicUrl": "Copy public link",
+      "copyModeratorUrl": "Copy moderator link",
+      "enterAsModerator": "Enter live",
+      "editEvent": "Edit event",
+      "editSettings": "Edit settings",
+      "featureSummary": "Active features",
+      "organizers": "Organizers",
+      "privacyGdpr": "Privacy & GDPR",
+      "postEventTitle": "Post-event & feedback",
+      "recordingSection": "Recording",
+      "callSessions": "Sessions & telemetry",
+      "questionnaires": "Questionnaires",
+      "questionnaireCount": "{count, plural, =0 {No questionnaires linked} one {1 questionnaire linked} other {# questionnaires linked}}",
+      "manageMaterials": "Manage materials",
+      "manageQuestionnaires": "Manage questionnaires",
+      "tabs": {
+        "overview": "Overview",
+        "settings": "Settings",
+        "people": "People",
+        "content": "Content",
+        "audit": "Recordings & Audit"
+      },
+      "toggles": {
+        "unmute": "Participants can unmute",
+        "video": "Participants can start video",
+        "screenShare": "Participants can share screen"
+      },
+      "fields": {
+        "dataRetention": "Data retention",
+        "dataRetentionValue": "{days, plural, one {# day} other {# days}}",
+        "privacyUrl": "Privacy policy",
+        "recordingConsent": "Recording consent"
+      },
+      "sidebar": {
+        "registrations": "Registrations",
+        "ofMax": "{current} of {max}",
+        "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
+        "noReminders": "No reminders configured",
+        "tags": "Tags",
+        "postEventSummary": "{connected} joined of {registered} registrations (estimated {estimated})",
+        "estimatedAttendance": "Estimated: {estimated} attendees"
+      },
+      "copyGuestUrl": "Copy guest link"
+    },
+    "rubrica": {
+      "title": "Address book",
+      "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Profile information is updated automatically on every re-registration.",
+      "backToList": "← Back to address book"
+    },
+    "questionnairesPage": {
+      "title": "Questionnaires",
+      "subtitle": "Reusable question templates for pre-registration and post-event questionnaires."
+    },
+    "questionnaireResponses": {
+      "title": "Questionnaire responses",
+      "subtitle": "Aggregations by question, filterable by event, phase and date range."
+    },
+    "eventQuestionnaires": {
+      "title": "Questionnaires — {eventTitle}",
+      "subtitle": "Configure a pre-registration and/or post-event questionnaire combining templates and ad-hoc questions."
+    }
   },
   "email": {
     "confirmationSubject": "Registracija patvirtinta: {eventTitle}",
@@ -1057,6 +1879,76 @@
         "title": "Bendraukite",
         "desc": "Užduokite klausimus, balsuokite, dalyvaukite diskusijoje"
       }
+    }
+  },
+  "polls": {
+    "title": "Apklausos",
+    "showPanel": "Rodyti apklausas",
+    "hidePanel": "Slėpti apklausas",
+    "createPoll": "Sukurti apklausą",
+    "noPolls": "Apklausų nėra. Moderatorius jas sukurs renginio metu.",
+    "questionPlaceholder": "Parašykite apklausos klausimą...",
+    "optionPlaceholder": "Variantas {number}",
+    "addOption": "Pridėti variantą",
+    "removeOption": "Pašalinti variantą",
+    "create": "Sukurti",
+    "creating": "Kuriama...",
+    "cancelCreate": "Atšaukti",
+    "closePoll": "Uždaryti balsavimą",
+    "publishResults": "Paskelbti rezultatus",
+    "reopenPoll": "Atidaryti iš naujo",
+    "totalVotes": "{count} balsų",
+    "voted": "Jūs balsavote",
+    "status": {
+      "OPEN": "Atvira",
+      "CLOSED": "Uždaryta",
+      "PUBLISHED": "Rezultatai"
+    },
+    "errors": {
+      "questionRequired": "Parašykite apklausos klausimą",
+      "minOptions": "Reikia bent 2 variantų",
+      "generic": "Klaida kuriant apklausą"
+    }
+  },
+  "materials": {
+    "title": "Medžiaga",
+    "postEventTitle": "Renginio medžiaga",
+    "addMaterial": "Pridėti medžiagą",
+    "titleLabel": "Pavadinimas",
+    "urlLabel": "Nuorodos URL",
+    "descriptionLabel": "Aprašymas (neprivaloma)",
+    "addedBy": "Pridėjo {name}",
+    "noMaterials": "Medžiaga nepasidalinta.",
+    "confirmDelete": "Ar tikrai norite ištrinti šią medžiagą?",
+    "materialAdded": "Medžiaga pridėta",
+    "materialDeleted": "Medžiaga ištrinta",
+    "deleteMaterial": "Ištrinti medžiagą",
+    "add": "Pridėti",
+    "adding": "Pridedama...",
+    "cancel": "Atšaukti",
+    "errors": {
+      "urlInvalid": "Įveskite galiojantį URL",
+      "generic": "Klaida pridedant medžiagą"
+    }
+  },
+  "reminders": {
+    "title": "Pranešimai",
+    "addReminder": "Pridėti priminimą",
+    "removeReminder": "Pašalinti",
+    "maxReminders": "Daugiausiai 5 priminimai vienam renginiui.",
+    "selectPreset": "Pasirinkite laiką...",
+    "sentStatus": "{count} išsiųsta",
+    "notSent": "Neišsiųsta",
+    "presets": {
+      "7days": "Prieš 7 dienas",
+      "3days": "Prieš 3 dienas",
+      "1day": "Prieš 1 dieną",
+      "12hours": "Prieš 12 valandų",
+      "6hours": "Prieš 6 valandas",
+      "3hours": "Prieš 3 valandas",
+      "1hour": "Prieš 1 valandą",
+      "30min": "Prieš 30 minučių",
+      "15min": "Prieš 15 minučių"
     }
   },
   "gdpr": {
@@ -1290,6 +2182,12 @@
     "noUpcomingEvents": "Artėjančių renginių nėra",
     "jvbActivatesIn": "JVB aktyvuojamas po {minutes} min.",
     "liveNow": "Vyksta dabar",
+    "provisioning": "Provisioning",
+    "idle": "Paused",
+    "jvbOctoActive": "Octo active: {bridges} bridges, {relayMbps} Mbps inter-bridge relay",
+    "staleWarningTitle": "Warning: video components not ready",
+    "staleJvbDetail": "At least one active event has been waiting longer than the configured timeout and the video bridge isn't available yet. Check the cluster autoscaler or JVB pod logs.",
+    "staleJibriDetail": "At least one event with recording enabled has been waiting longer than the configured timeout and Jibri isn't available yet.",
     "activeEvents": "Aktyvūs renginiai",
     "registrationsToday": "Šiandienos registracijos",
     "jvbNodes": "JVB mazgai",
@@ -1332,6 +2230,10 @@
     "sendingVideo": "Vaizdo siuntimas",
     "iceSuccess": "Sėkmingi ryšiai",
     "totalConferences": "Iš viso konferencijų",
+    "octoConferences": "Octo conferences (multi-bridge)",
+    "octoEndpoints": "Endpoints via relay",
+    "octoSend": "Inter-bridge relay out",
+    "octoReceive": "Inter-bridge relay in",
     "lastUpdated": "Paskutinis atnaujinimas",
     "zonePublic": "Viešoji prieiga",
     "zoneCluster": "Platformos paslaugos",
@@ -1344,9 +2246,11 @@
     "connMedia": "vaizdo srautas",
     "connRecording": "įrašymas",
     "connUpload": "įkėlimas",
+    "connPubSub": "chat pub/sub",
     "services": {
       "app": "Žiniatinklio portalas",
       "database": "Duomenų bazė",
+      "redis": "Real-time chat",
       "jitsiWeb": "Vaizdo konferencijų kambarys",
       "prosody": "Vidiniai pranešimai",
       "jicofo": "Konferencijų koordinatorius",
@@ -1357,6 +2261,7 @@
     "descriptions": {
       "app": "Svetainė, kurioje pasiekiate renginius",
       "database": "Kur saugomi renginiai ir registracijos",
+      "redis": "Real-time chat message exchange between servers",
       "jitsiWeb": "Vaizdo konferencijų sąsaja",
       "prosody": "Valdo vaizdo paslaugų tarpusavio ryšį",
       "jicofo": "Koordinuoja, kas dalyvauja kiekvienoje konferencijoje",
@@ -1372,6 +2277,11 @@
         "healthy": "Duomenų bazė atsako teisingai.",
         "degraded": "Duomenų bazė atsako, bet lėčiau nei įprastai. Operacijos gali užtrukti ilgiau.",
         "down": "Duomenų bazė neatsako. Platforma negali tinkamai veikti."
+      },
+      "redis": {
+        "healthy": "Real-time chat service is responding correctly.",
+        "degraded": "Real-time chat service is slow: messages may reach other servers with delay.",
+        "down": "Real-time chat service is unreachable. Live chat cannot fan out messages between servers — messages are still persisted to the database but users don't see each other in real time."
       },
       "jitsiWeb": {
         "healthy": "Vaizdo konferencijų kambarys pasiekiamas ir paruoštas renginiams.",
@@ -1391,13 +2301,16 @@
       "jvb": {
         "healthy": "Vaizdo tiltas aktyvus ir perduoda garsą/vaizdą dalyviams.",
         "scaling": "Vaizdo tiltas ruošiasi artėjančiam renginiui. Serveriai kuriami automatiškai.",
-        "standby": "Vaizdo tiltas budėjimo režime. Automatiškai aktyvuosis prieš suplanuoto renginio pradžią."
+        "standby": "Vaizdo tiltas budėjimo režime. Automatiškai aktyvuosis prieš suplanuoto renginio pradžią.",
+        "stale": "An event has been waiting for the video bridge longer than the configured timeout. Check the cluster autoscaler and JVB pod logs."
       },
       "jibri": {
         "healthy": "Įrašymo paslauga paruošta ir prieinama.",
         "busy": "Įrašymo paslauga aktyvi ir įrašo vykstančią sesiją.",
         "down": "Įrašymo paslauga nepasiekiama. Renginių negalima įrašyti.",
-        "standby": "Vaizdo įrašymas nesukonfigūruotas. Renginiai nebus įrašomi."
+        "standby": "Vaizdo įrašymas nesukonfigūruotas. Renginiai nebus įrašomi.",
+        "unconfigured": "Video recording is not configured (no storage backend). Events will not be recorded.",
+        "stale": "An event with recording enabled has been waiting for Jibri longer than the configured timeout. Check Jibri pod logs."
       },
       "smtp": {
         "healthy": "El. pašto paslauga sukonfigūruota ir paruošta siųsti pranešimus.",
@@ -1406,11 +2319,14 @@
     },
     "impacts": {
       "database": "Platforma negali įkelti renginių, valdyti registracijų ar išsaugoti duomenų.",
+      "redis": "Live chat messages don't fan out across servers. Users only see messages sent on their own pod.",
       "jitsiWeb": "Dalyviai negali pasiekti vaizdo konferencijų kambario.",
       "prosody": "Vaizdo paslaugos negali bendrauti. Konferencijos neveiks.",
       "jicofo": "Negalima kurti ar valdyti naujų vaizdo konferencijų.",
       "jvbScaling": "Vaizdo tiltas aktyvuojasi. Renginys galės prasidėti netrukus.",
+      "jvbStale": "An event has been waiting for the bridge longer than the configured timeout: participants cannot join.",
       "jibri": "Renginių negalima įrašyti. Dalyviai vis tiek gali prisijungti ir dalyvauti.",
+      "jibriStale": "An event with recording enabled has been waiting for Jibri past the timeout: the session is not being recorded.",
       "smtp": "Registracijos patvirtinimo el. laiškai ir priminimai nebus siunčiami."
     },
     "overallVerdicts": {
@@ -1442,6 +2358,16 @@
       "down": "Nepasiekiamas",
       "standby": "Budėjimo režimas",
       "scaling": "Ruošiamasi"
+    },
+    "metrics": {
+      "uptime24h": "Uptime 24h",
+      "uptime7d": "Uptime 7d",
+      "latencyP50": "P50 latency",
+      "latencyP95": "P95 latency",
+      "latencyP99": "P99 latency",
+      "errorRate": "5xx errors",
+      "requestRate": "Requests/s",
+      "podUptime": "Pod uptime"
     }
   },
   "feedback": {
@@ -1527,12 +2453,12 @@
     "systemStatus": "Sistemos būsena",
     "sbomLatest": "Naujausio leidimo SBOM",
     "transparency": "Saugumas ir skaidrumas",
+    "serviceInventory": "Service inventory",
     "sourceCode": "Šaltinio kodas",
     "buildInfoDev": "kūrimo versija",
     "viewCommit": "Peržiūrėti commit'ą „GitHub“",
     "viewRelease": "Peržiūrėti leidimą „GitHub“",
-    "buildDatePrefix": "Sukurta",
-    "serviceInventory": "Service inventory"
+    "buildDatePrefix": "Sukurta"
   },
   "pages": {
     "privacyTitle": "Privatumo politika",
@@ -1560,8 +2486,17 @@
     "estimates": "Išteklių sąmata",
     "moderator": "Moderatorius",
     "participants": "Dalyviai",
+    "bridge": "Video Bridge",
     "jvb": "Video Bridge",
     "jibri": "Įrašymas",
+    "occupancy": "Occupancy",
+    "sizedForRegistrations": "Sized on {count} current registrations",
+    "sizedForCapacity": "Sized on max capacity of {count}",
+    "chips": {
+      "mic": "Microphone",
+      "video": "Webcam",
+      "screen": "Screen share"
+    },
     "bandwidth": {
       "moderator": "Moderatoriaus pralaidumas",
       "participant": "Dalyvio pralaidumas",
@@ -1597,7 +2532,32 @@
     "peopleWaiting": "{count, plural, =0 {} =1 {1 laukiantis asmuo} one {# laukiantis asmuo} few {# laukiantys asmenys} many {# laukiančių asmenų} other {# laukiančių asmenų}}",
     "jvbScaling": "Salė ruošiama...",
     "jvbScalingDetail": "Vaizdo serveriai paleidžiami. Tai trunka apie 2 minutes.",
-    "jvbReady": "Salė paruošta!"
+    "jvbReady": "Salė paruošta!",
+    "warmingUp": "Room warming up",
+    "warmingUpDetail": "We're spinning up the video servers. Get yourself ready in the meantime — everything will be live in 2-3 minutes.",
+    "warmingUpButton": "Room warming up...",
+    "nameLabel": "Your name",
+    "nameHelp": "Other participants will see this",
+    "joinNowBtn": "Enter now",
+    "openingAt": "Opens at {time}",
+    "netiquetteTitle": "How to take part",
+    "netiquetteBullet1": "Arrive a few minutes early to test your microphone and camera",
+    "netiquetteBullet2": "Turn camera and mic on only when speaking — raise your hand to request the floor",
+    "netiquetteBullet3": "Use chat for quick exchanges, Q&A for questions to the speakers",
+    "netiquetteBullet4": "Recording, when enabled, is controlled by moderators and marked with a red indicator",
+    "watchCatchup": "Watch from the start",
+    "watchCatchupDesc": "Watch the partial recording and catch up with the live stream when you want",
+    "chatPreviewTitle": "Event chat",
+    "chatPreviewHint": "Read what other participants are saying while you get ready",
+    "endedTitle": "Event ended",
+    "endedWatchRecording": "Watch the recording",
+    "endedLeaveFeedback": "Leave feedback",
+    "moderatedBy": "Moderated by {name}",
+    "startEventError": "Error starting the event. Please try again.",
+    "emailLabel": "Email (optional)",
+    "emailHelp": "Only for post-event follow-up",
+    "emailInvalid": "Please enter a valid email address",
+    "chatLockedMessage": "Enter your name to join the event chat."
   },
   "recording": {
     "management": "Vaizdo įrašas",
@@ -1621,6 +2581,7 @@
     "delete": "Ištrinti įrašą",
     "deleteConfirm": "Ar esate tikri? Vaizdo įrašas bus ištrintas negrįžtamai.",
     "notConfigured": "Jibri nesukonfigūruotas infrastruktūroje. Vaizdo įrašymas neprieinamas.",
+    "disabledHint": "Video recording is not enabled for this event. To enable it open the Settings section above and toggle \"Recording\" on.",
     "play": "Atkurti",
     "download": "Atsisiųsti"
   },
@@ -1643,6 +2604,18 @@
       "feedback": "Atsiliepimai"
     }
   },
+  "provisioning": {
+    "loading": "Loading",
+    "titleFromIdle": "Reactivating room",
+    "titleColdStart": "Preparing room",
+    "descriptionFromIdle": "The room had been paused due to inactivity to save energy. We're restarting it now — this usually takes 2-3 minutes.",
+    "descriptionColdStart": "We're setting up the virtual room for this event. It takes about 2-3 minutes: you'll be redirected automatically when everything is ready.",
+    "progressLabel": "{seconds} s",
+    "retry": "Reload",
+    "tempError": "Retrying to reach the server, no action needed.",
+    "ended": "The event has ended.",
+    "scaleToZeroNote": "To reduce environmental impact, video nodes are powered off when nobody is in a call. They restart automatically on the first join."
+  },
   "rubrica": {
     "optOut": {
       "title": "Remove me from the DTD address book",
@@ -1661,5 +2634,33 @@
         "generic": "Something went wrong. Please try again later."
       }
     }
+  },
+  "deviceCheck": {
+    "preview": "Video preview",
+    "micLevel": "Microphone level",
+    "cameraLabel": "Camera",
+    "micLabel": "Microphone",
+    "permissionNeeded": "Allow camera and microphone to test them. You can also join without.",
+    "noVideo": "No video",
+    "noAudio": "Microphone unavailable",
+    "retry": "Retry",
+    "cameraToggleOn": "Camera ON",
+    "cameraToggleOff": "Camera OFF",
+    "micToggleOn": "Microphone ON",
+    "micToggleOff": "Microphone OFF",
+    "cameraOffPreview": "Camera off",
+    "speakerTest": "🔊 Test audio"
+  },
+  "garden": {
+    "enable": "Show the garden",
+    "classicView": "Classic view",
+    "changeAvatar": "Change avatar",
+    "peopleInGarden": "{count, plural, =0 {Nobody in the garden} one {1 person in the garden} other {# people in the garden}}",
+    "hintKeyboard": "Move with WASD or arrow keys",
+    "pickerTitle": "Choose your avatar",
+    "pickerHelp": "This character represents you in the waiting garden. You can change it any time.",
+    "close": "Close",
+    "hintBanner": "Press the arrow keys to walk around the garden",
+    "hintJoystick": "Drag to move"
   }
 }

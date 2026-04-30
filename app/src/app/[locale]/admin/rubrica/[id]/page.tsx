@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
+import { Link } from '@/i18n/navigation';
 import RubricaDetail from '@/components/admin/rubrica-detail';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 
@@ -18,11 +18,13 @@ export default async function RubricaDetailPage({
   }
   const { id } = await params;
 
+  const t = await getTranslations('admin.rubrica');
+
   return (
     <div className="container py-5">
       <div className="mb-3">
         <Link href="/admin/rubrica" className="text-decoration-none small">
-          ← Torna alla rubrica
+          {t('backToList')}
         </Link>
       </div>
       <RubricaDetail id={id} />
