@@ -661,7 +661,13 @@
       "questionnairesResponses": "Risposte e statistiche",
       "ariaLabel": "Navigazione amministrazione",
       "subNavAriaLabel": "Navigazione sezione",
-      "rubrica": "Rubrica"
+      "rubrica": "Rubrica",
+      "settingsEmailTemplates": "Template email",
+      "settingsTags": "Gestione tag",
+      "eventMaterials": "Materiali",
+      "eventQuestionnaires": "Questionari",
+      "rubricaList": "Elenco",
+      "rubricaDetail": "Dettaglio"
     },
     "landing": {
       "title": "Pannello di amministrazione",
@@ -1864,6 +1870,23 @@
         "estimatedAttendance": "Stimati: {estimated} partecipanti"
       },
       "copyGuestUrl": "Copia link per ospiti"
+    },
+    "rubrica": {
+      "title": "Rubrica",
+      "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Le informazioni di profilo vengono aggiornate automaticamente ad ogni re-iscrizione.",
+      "backToList": "← Torna alla rubrica"
+    },
+    "questionnairesPage": {
+      "title": "Questionari",
+      "subtitle": "Template riutilizzabili di domande per i questionari di pre-registrazione e post-evento."
+    },
+    "questionnaireResponses": {
+      "title": "Risposte questionari",
+      "subtitle": "Aggregazioni per domanda, filtrabili per evento, fase e intervallo di date."
+    },
+    "eventQuestionnaires": {
+      "title": "Questionari — {eventTitle}",
+      "subtitle": "Configura un questionario di pre-registrazione e/o post-evento combinando template e domande ad-hoc."
     }
   },
   "email": {

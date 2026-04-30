@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 import EventQuestionnairesManager from '@/components/admin/event-questionnaires-manager';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
@@ -28,17 +28,16 @@ export default async function EventQuestionnairesPage({ params }: PageProps) {
   });
   if (!event) notFound();
 
-  const title = (event.title as Record<string, string>)[locale] ?? (event.title as Record<string, string>).it ?? event.slug;
+  const eventTitle = (event.title as Record<string, string>)[locale] ?? (event.title as Record<string, string>).it ?? event.slug;
+  const t = await getTranslations('admin.eventQuestionnaires');
 
   return (
     <div className="container py-5">
       <div className="mb-4">
         <h1 className="fw-bold mb-1" style={{ color: '#17324D' }}>
-          Questionari — {title}
+          {t('title', { eventTitle })}
         </h1>
-        <p className="text-secondary mb-0">
-          Configura un questionario di pre-registrazione e/o post-evento combinando template e domande ad-hoc.
-        </p>
+        <p className="text-secondary mb-0">{t('subtitle')}</p>
       </div>
       <EventQuestionnairesManager eventId={event.id} />
     </div>
