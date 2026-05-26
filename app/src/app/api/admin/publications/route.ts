@@ -22,6 +22,7 @@ import type { EventType } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -223,6 +224,12 @@ export const POST = withErrorHandling(async (request) => {
       postEventPublic: true,
       feedbackEnabled: false,
     },
+  });
+
+  await logAdminAction({
+    request,
+    action: 'LEGACY_EVENT_CREATE',
+    target: event.id,
   });
 
   return Response.json(event, { status: 201 });

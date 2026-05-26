@@ -13,6 +13,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { createMaterialAdminSchema } from '@/lib/validation/materials';
@@ -124,6 +125,13 @@ export const POST = withErrorHandling(async (request, context) => {
       blobPath: parsed.data.blobPath ?? null,
       visibility: parsed.data.visibility,
     },
+  });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_MATERIAL_CREATE',
+    target: material.id,
+    details: { eventId: id, type: material.type },
   });
 
   return Response.json(serializeMaterial(material), { status: 201 });

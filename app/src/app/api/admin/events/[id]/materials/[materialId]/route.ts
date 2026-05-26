@@ -9,6 +9,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { updateMaterialAdminSchema } from '@/lib/validation/materials';
@@ -107,12 +108,19 @@ export const PATCH = withErrorHandling(async (request, context) => {
     data,
   });
 
+  await logAdminAction({
+    request,
+    action: 'EVENT_MATERIAL_UPDATE',
+    target: materialId,
+    details: { eventId: id, fields: Object.keys(parsed.data) },
+  });
+
   return Response.json(serializeMaterial(updated));
 });
 
 // ── DELETE /api/admin/events/[id]/materials/[materialId] ───
 
-export const DELETE = withErrorHandling(async (_request, context) => {
+export const DELETE = withErrorHandling(async (request, context) => {
   const { id, materialId } = await ensureAdminAndIds(context);
 
   const existing = await prisma.eventMaterial.findUnique({
@@ -124,5 +132,13 @@ export const DELETE = withErrorHandling(async (_request, context) => {
   }
 
   await prisma.eventMaterial.delete({ where: { id: materialId } });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_MATERIAL_DELETE',
+    target: materialId,
+    details: { eventId: id },
+  });
+
   return Response.json({ ok: true });
 });

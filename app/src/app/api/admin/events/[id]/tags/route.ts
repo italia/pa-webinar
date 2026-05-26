@@ -15,6 +15,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -72,6 +73,13 @@ export const PUT = withErrorHandling(async (request, context) => {
       skipDuplicates: true,
     }),
   ]);
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_TAGS_SET',
+    target: id,
+    details: { slugs: parsed.data.slugs },
+  });
 
   return Response.json({ updated: true, count: tags.length });
 });

@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
 import {
@@ -100,6 +101,13 @@ export const PUT = withErrorHandling(async (request) => {
     },
   });
 
+  await logAdminAction({
+    request,
+    action: 'EMAIL_TEMPLATE_UPSERT',
+    target: saved.id,
+    details: { key, locale },
+  });
+
   return Response.json({
     id: saved.id,
     key: saved.key,
@@ -129,5 +137,12 @@ export const DELETE = withErrorHandling(async (request) => {
   const { key, locale } = parsed.data;
 
   await prisma.emailTemplate.deleteMany({ where: { key, locale } });
+
+  await logAdminAction({
+    request,
+    action: 'EMAIL_TEMPLATE_DELETE',
+    details: { key, locale },
+  });
+
   return Response.json({ ok: true });
 });
