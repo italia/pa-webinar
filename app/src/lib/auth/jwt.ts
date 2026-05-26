@@ -57,6 +57,15 @@ interface JitsiTokenPayload {
 }
 
 /**
+ * Default TTL for the Jitsi JWT. Moderators get the full event window
+ * (4h); participants get a tighter window (90 min) so a leaked
+ * participant token has a smaller replay surface — Jitsi doesn't
+ * support jti blacklisting natively, so the TTL is our only knob.
+ */
+const MODERATOR_JWT_TTL_SECONDS = 4 * 60 * 60;
+const PARTICIPANT_JWT_TTL_SECONDS = 90 * 60;
+
+/**
  * Generate a Jitsi JWT for authenticating a user to a specific room.
  *
  * `uniqueId` MUST be different for every session/user so Jitsi treats
@@ -104,7 +113,12 @@ export async function generateJitsiJwt(
     .setJti(`${jitsiJwtAppId}:${payload.uniqueId}`)
     .setIssuedAt()
     .setExpirationTime(
-      `${payload.expiresInSeconds ?? 4 * 60 * 60}s`
+      `${
+        payload.expiresInSeconds ??
+        (payload.isModerator
+          ? MODERATOR_JWT_TTL_SECONDS
+          : PARTICIPANT_JWT_TTL_SECONDS)
+      }s`,
     )
     .sign(getJitsiJwtSecret());
 
