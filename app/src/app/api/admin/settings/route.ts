@@ -7,6 +7,7 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
 import { invalidateSettingsCache } from '@/lib/settings';
@@ -127,6 +128,12 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
   });
 
   invalidateSettingsCache();
+
+  await logAdminAction({
+    request,
+    action: 'SITE_SETTINGS_UPDATE',
+    details: { fields: Object.keys(parsed.data) },
+  });
 
   return NextResponse.json(updated);
 });

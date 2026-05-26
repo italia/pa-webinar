@@ -740,6 +740,37 @@ model GdprAuditLog {
   @@map("gdpr_audit_logs")
 }
 
+// ─── Admin Action Audit Log ────────────────────────────
+//
+// Append-only log of mutating actions performed by admin sessions
+// (event create/update/delete, recordings management, moderator
+// rotation, settings changes, etc.). Read-only listings are NOT
+// recorded — only writes — to keep volume manageable.
+//
+// Per Italian PA accountability expectations (and to satisfy any
+// Garante audit) every privileged write must answer "chi ha fatto
+// cosa e quando".
+
+model AdminAuditLog {
+  id        String @id @default(uuid()) @db.Uuid
+  // Hashed admin identifier. The current admin auth has no per-user
+  // accounts (single shared ADMIN_API_KEY), so this is always a short
+  // anonymous tag for now; if/when per-admin sessions land, swap in
+  // the user id and the rest of the model still applies.
+  actorHash String @map("actor_hash")
+  action    String // EVENT_CREATE, EVENT_UPDATE, EVENT_DELETE, RECORDING_DELETE, ...
+  target    String? // free-form target identifier (event id, recording id, ...)
+  ip        String?
+  userAgent String? @map("user_agent") @db.Text
+  details   String? @db.Text // JSON, no PII
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([action, createdAt])
+  @@map("admin_audit_logs")
+}
+
 // ─── Event Templates ─────────────────────────────────────
 
 model EventTemplate {
