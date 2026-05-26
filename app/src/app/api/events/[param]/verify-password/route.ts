@@ -19,17 +19,12 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, RateLimitError } from '@/lib/errors';
 import { verifyJoinPassword } from '@/lib/auth/password';
+import { requireAppSecretKey } from '@/lib/auth/app-secret';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
 const GRANT_TTL_SECONDS = 2 * 60 * 60; // 2h, matches typical call length
-
-function getAppSecret(): Uint8Array {
-  const secret = process.env.APP_SECRET;
-  if (!secret) throw new Error('APP_SECRET not configured');
-  return new TextEncoder().encode(secret);
-}
 
 function joinGrantCookieName(eventId: string): string {
   return `join_granted_${eventId}`;
@@ -73,7 +68,7 @@ export const POST = withErrorHandling(async (request, context) => {
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
     .setIssuedAt()
     .setExpirationTime(`${GRANT_TTL_SECONDS}s`)
-    .sign(getAppSecret());
+    .sign(requireAppSecretKey());
 
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,
