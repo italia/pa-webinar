@@ -19,8 +19,7 @@ import { requireAppSecret } from '@/lib/auth/app-secret';
  */
 
 const TOKEN_TTL_SECONDS = 60 * 60;
-const GDPR_ACTIONS = ['export', 'erasure'] as const;
-export type GdprAction = (typeof GDPR_ACTIONS)[number];
+export type GdprAction = 'export' | 'erasure';
 
 function b64urlEncode(buf: Buffer): string {
   return buf
