@@ -1,10 +1,12 @@
 import { jwtVerify } from 'jose';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
+import { tryGetAppSecret } from './app-secret';
+
 export async function isAdminAuthenticated(
   cookies: ReadonlyRequestCookies,
 ): Promise<boolean> {
-  const appSecret = process.env.APP_SECRET;
+  const appSecret = tryGetAppSecret();
   if (!appSecret) return false;
 
   const token = cookies.get('admin_session')?.value;
