@@ -57,6 +57,42 @@ export function decryptPII(ciphertext: string): string {
 }
 
 /**
+ * Try to decrypt a PII column that may hold either ciphertext (new
+ * rows) or legacy plaintext (rows written before encryption was
+ * enabled). On any decryption failure — wrong size, bad auth tag, not
+ * base64 — return the input untouched so callers see the original
+ * plaintext.
+ *
+ * Detection heuristic: legitimate ciphertext from encryptPII is at
+ * least IV (12) + tag (16) + 1 byte ciphertext = 29 bytes ≈ 40 chars
+ * base64. Email addresses are usually shorter and contain '@', so we
+ * short-circuit on them — saves a noisy decrypt failure per read.
+ */
+export function tryDecryptPII(value: string | null | undefined): string | null {
+  if (value == null) return null;
+  if (value.length < 40 || value.includes('@')) return value;
+  try {
+    return decryptPII(value);
+  } catch {
+    return value;
+  }
+}
+
+/**
+ * Encrypt a value when non-empty, otherwise pass through. Convenience
+ * for write paths that previously stored plaintext into a nullable
+ * column.
+ */
+export function encryptPIIOrNull(
+  value: string | null | undefined,
+): string | null {
+  if (value == null) return null;
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return null;
+  return encryptPII(trimmed);
+}
+
+/**
  * HMAC-SHA-256 hash of an email (lowercased, trimmed) for deduplication.
  * Uses APP_SECRET as HMAC key to prevent rainbow table attacks.
  * Falls back to plain SHA-256 only if APP_SECRET is not set (dev mode).

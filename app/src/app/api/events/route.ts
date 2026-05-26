@@ -12,6 +12,7 @@ import { generateUniqueSlug } from '@/lib/utils/slug';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { encryptPIIOrNull } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
@@ -110,7 +111,7 @@ export const POST = withErrorHandling(async (request) => {
       privacyPolicyUrl: data.privacyPolicyUrl,
       privacyPolicyText: data.privacyPolicyText,
       moderatorName: data.moderatorName,
-      moderatorEmail: data.moderatorEmail,
+      moderatorEmail: encryptPIIOrNull(data.moderatorEmail),
       speakersInfo: data.speakersInfo,
       organizerName: data.organizerName,
       imageUrl: data.imageUrl,

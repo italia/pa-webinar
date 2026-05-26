@@ -16,6 +16,7 @@ import type { Prisma } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -37,10 +38,12 @@ export const GET = withErrorHandling(async (request) => {
     where.status = status as Prisma.EnumEventStatusFilter['equals'];
   }
   if (search) {
+    // Search by moderatorEmail is dropped because the column is now
+    // encrypted at rest — a `contains` match on ciphertext is useless.
+    // Operators can still locate moderators by slug or moderator name.
     where.OR = [
       { slug: { contains: search, mode: 'insensitive' } },
       { moderatorName: { contains: search, mode: 'insensitive' } },
-      { moderatorEmail: { contains: search, mode: 'insensitive' } },
     ];
   }
 
@@ -73,7 +76,7 @@ export const GET = withErrorHandling(async (request) => {
         startsAt: e.startsAt.toISOString(),
         endsAt: e.endsAt.toISOString(),
         moderatorName: e.moderatorName,
-        moderatorEmail: e.moderatorEmail,
+        moderatorEmail: tryDecryptPII(e.moderatorEmail),
         moderatorToken: e.moderatorToken,
       })),
     },
