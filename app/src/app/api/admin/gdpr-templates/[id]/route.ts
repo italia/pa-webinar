@@ -14,6 +14,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { updateGdprTemplateSchema } from '@/lib/validation/schemas';
@@ -91,10 +92,17 @@ export const PUT = withErrorHandling(async (request, context) => {
     });
   });
 
+  await logAdminAction({
+    request,
+    action: 'GDPR_TEMPLATE_UPDATE',
+    target: updated.id,
+    details: { fields: Object.keys(data) },
+  });
+
   return Response.json(updated);
 });
 
-export const DELETE = withErrorHandling(async (_request, context) => {
+export const DELETE = withErrorHandling(async (request, context) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) throw new UnauthorizedError();
 
@@ -108,6 +116,13 @@ export const DELETE = withErrorHandling(async (_request, context) => {
   });
 
   await prisma.gdprTemplate.delete({ where: { id } });
+
+  await logAdminAction({
+    request,
+    action: 'GDPR_TEMPLATE_DELETE',
+    target: id,
+    details: { unlinkedEvents: unlinkedCount },
+  });
 
   return Response.json({ deleted: true, unlinkedEvents: unlinkedCount });
 });

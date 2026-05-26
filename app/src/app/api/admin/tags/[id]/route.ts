@@ -10,6 +10,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -43,6 +44,12 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   try {
     const updated = await prisma.tag.update({ where: { id }, data: parsed.data });
+    await logAdminAction({
+      request,
+      action: 'TAG_UPDATE',
+      target: updated.id,
+      details: { fields: Object.keys(parsed.data) },
+    });
     return Response.json(updated);
   } catch (e: unknown) {
     if (typeof e === 'object' && e && 'code' in e) {
@@ -54,7 +61,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
   }
 });
 
-export const DELETE = withErrorHandling(async (_request, context) => {
+export const DELETE = withErrorHandling(async (request, context) => {
   if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
   const { id } = await context.params;
   if (!UUID_RE.test(id)) throw new AppError('id must be a UUID', 400, 'BAD_REQUEST');
@@ -67,6 +74,8 @@ export const DELETE = withErrorHandling(async (_request, context) => {
     }
     throw e;
   }
+
+  await logAdminAction({ request, action: 'TAG_DELETE', target: id });
 
   return Response.json({ deleted: true, id });
 });

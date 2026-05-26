@@ -23,6 +23,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, UnauthorizedError } from '@/lib/errors';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -51,7 +52,7 @@ function suffixTitle(title: LocalizedField): Record<string, string> {
   return out;
 }
 
-export const POST = withErrorHandling(async (_request, context) => {
+export const POST = withErrorHandling(async (request, context) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) throw new UnauthorizedError();
 
@@ -125,6 +126,13 @@ export const POST = withErrorHandling(async (_request, context) => {
       youtubeUrl: source.youtubeUrl,
       libraryListed: source.libraryListed,
     },
+  });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_DUPLICATE',
+    target: duplicate.id,
+    details: { sourceId: source.id },
   });
 
   return Response.json(

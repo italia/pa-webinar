@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { prisma } from '@/lib/db';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
 import { invalidateSettingsCache } from '@/lib/settings';
@@ -76,6 +77,13 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
     });
 
     invalidateSettingsCache();
+
+    await logAdminAction({
+      request,
+      action: 'LANGUAGES_TRANSLATIONS_UPDATE',
+      details: { locale: parsed.data.locale, keys: Object.keys(parsed.data.overrides) },
+    });
+
     return NextResponse.json(updated);
   }
 
@@ -100,5 +108,12 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
   });
 
   invalidateSettingsCache();
+
+  await logAdminAction({
+    request,
+    action: 'LANGUAGES_LOCALES_UPDATE',
+    details: { availableLocales: parsed.data.availableLocales },
+  });
+
   return NextResponse.json(updated);
 });

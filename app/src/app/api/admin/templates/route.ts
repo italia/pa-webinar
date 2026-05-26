@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { prisma } from '@/lib/db';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -53,6 +54,12 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     },
   });
 
+  await logAdminAction({
+    request,
+    action: 'EVENT_TEMPLATE_CREATE',
+    target: template.id,
+  });
+
   return NextResponse.json(template, { status: 201 });
 });
 
@@ -82,6 +89,13 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
     data: result.data,
   });
 
+  await logAdminAction({
+    request,
+    action: 'EVENT_TEMPLATE_UPDATE',
+    target: updated.id,
+    details: { fields: Object.keys(result.data) },
+  });
+
   return NextResponse.json(updated);
 });
 
@@ -105,5 +119,12 @@ export const DELETE = withErrorHandling(async (request: NextRequest) => {
   }
 
   await prisma.eventTemplate.delete({ where: { id } });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_TEMPLATE_DELETE',
+    target: id,
+  });
+
   return NextResponse.json({ success: true });
 });
