@@ -82,7 +82,7 @@ describe('generateJitsiJwt', () => {
     expect(ctx.user.moderator).toBe('false');
   });
 
-  it('sets correct default expiry (~4 hours)', async () => {
+  it('sets a 90-minute default expiry for participants', async () => {
     const jwt = await generateJitsiJwt({
       roomName: 'room',
       displayName: 'Test',
@@ -91,10 +91,21 @@ describe('generateJitsiJwt', () => {
     });
 
     const payload = await decodeJwt(jwt);
-    const exp = payload.exp!;
-    const iat = payload.iat!;
-    // Default is 4 hours = 14400 seconds
-    expect(exp - iat).toBe(14400);
+    // 90 min = 5400 s — tight window so a leaked participant token
+    // has a small replay surface (Jitsi has no jti blacklist).
+    expect(payload.exp! - payload.iat!).toBe(5400);
+  });
+
+  it('sets a 4-hour default expiry for moderators', async () => {
+    const jwt = await generateJitsiJwt({
+      roomName: 'room',
+      displayName: 'Mod',
+      uniqueId: 'mod-1',
+      isModerator: true,
+    });
+
+    const payload = await decodeJwt(jwt);
+    expect(payload.exp! - payload.iat!).toBe(14400);
   });
 
   it('respects custom expiry', async () => {
