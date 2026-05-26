@@ -9,7 +9,7 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { pollVoteSchema } from '@/lib/validation/schemas';
-import { rateLimit } from '@/lib/rate-limit';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +28,15 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
+
+  const ip = getClientIp(request);
+  const ipRl = rateLimit(`poll-vote-ip:${ip}:${event.id}`, {
+    limit: 60,
+    windowMs: 60_000,
+  });
+  if (!ipRl.allowed) {
+    throw new RateLimitError((ipRl.resetAt - Date.now()) / 1000);
+  }
 
   const poll = await prisma.poll.findUnique({
     where: { id: pollId },
