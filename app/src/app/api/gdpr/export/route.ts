@@ -1,33 +1,46 @@
+/**
+ * GET /api/gdpr/export?t=<signed-token>
+ *
+ * GDPR Art. 15 — right of access (fulfilment step).
+ *
+ * The caller must present a token issued by POST /api/gdpr/export/request
+ * (which is delivered out-of-band to the registered email address). The
+ * token carries the emailHash so we never accept a plaintext email here
+ * — that closes the unauthenticated enumeration oracle the previous
+ * version of this endpoint exposed.
+ */
+
 import { withErrorHandling } from '@/lib/api-handler';
-import { RateLimitError, AppError } from '@/lib/errors';
+import { AppError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
-import { hashEmail, decryptPII } from '@/lib/crypto/pii';
-import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { decryptPII } from '@/lib/crypto/pii';
+import { getClientIp, rateLimit } from '@/lib/rate-limit';
+import { verifyGdprToken } from '@/lib/gdpr/request-token';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * GET /api/gdpr/export?email=xxx
- *
- * GDPR Art. 15 — right of access.
- * Returns all data associated with an email address.
- * Rate limited: 3 requests per hour per IP.
- */
 export const GET = withErrorHandling(async (request) => {
   const ip = getClientIp(request);
-  const rl = rateLimit(`gdpr-export:${ip}`, { limit: 3, windowMs: 3_600_000 });
+  const rl = rateLimit(`gdpr-export-get:${ip}`, {
+    limit: 10,
+    windowMs: 3_600_000,
+  });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
   const url = new URL(request.url);
-  const email = url.searchParams.get('email')?.trim();
-
-  if (!email || !email.includes('@')) {
-    throw new AppError('Valid email required', 400, 'BAD_REQUEST');
+  const token = url.searchParams.get('t');
+  if (!token) {
+    throw new AppError('Missing token', 400, 'BAD_REQUEST');
   }
 
-  const emailHash = hashEmail(email);
+  const verified = verifyGdprToken(token, 'export');
+  if (!verified) {
+    throw new AppError('Invalid or expired token', 401, 'UNAUTHORIZED');
+  }
+
+  const { emailHash } = verified;
 
   const registrations = await prisma.registration.findMany({
     where: { emailHash },
@@ -70,7 +83,8 @@ export const GET = withErrorHandling(async (request) => {
     return Response.json({ data: [] });
   }
 
-  // Write audit log for each event
+  // Audit one row per distinct event, recording only an emailHash prefix
+  // (not the address) so the log itself cannot be reversed.
   const eventIds = [...new Set(registrations.map((r) => r.eventId))];
   for (const eventId of eventIds) {
     await prisma.gdprAuditLog.create({
