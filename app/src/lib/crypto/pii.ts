@@ -93,6 +93,55 @@ export function encryptPIIOrNull(
 }
 
 /**
+ * Encrypt an arbitrary JSON-serialisable value, returning a wrapper
+ * object suitable for storage in a JSONB column that previously held
+ * the plaintext shape. The wrapper has a single `enc` key holding the
+ * base64 ciphertext produced by `encryptPII`.
+ *
+ * Storing a wrapper object (instead of replacing the column type) lets
+ * legacy readers detect "this is not the legacy shape" via a simple
+ * `Array.isArray(value) === false` check and fall through to the
+ * dual-read path (`tryDecryptJSON`).
+ */
+export function encryptJSON(value: unknown): { enc: string } {
+  return { enc: encryptPII(JSON.stringify(value)) };
+}
+
+/**
+ * Inverse of `encryptJSON`. Accepts either:
+ *   - a `{ enc: "<ciphertext>" }` wrapper produced by `encryptJSON`
+ *     → decrypts and JSON.parses the payload.
+ *   - any other shape (legacy plaintext row, e.g. an array)
+ *     → returns it untouched.
+ *   - `null` / `undefined` → returns the fallback (default `null`).
+ *
+ * Errors during decryption or JSON.parse fall back to returning the
+ * original input, mirroring `tryDecryptPII`'s "be lenient on read"
+ * contract so a single bad row never breaks the admin list.
+ */
+export function tryDecryptJSON<T = unknown>(
+  stored: unknown,
+  fallback: T | null = null,
+): T | null {
+  if (stored == null) return fallback;
+  if (
+    typeof stored === 'object' &&
+    stored !== null &&
+    !Array.isArray(stored) &&
+    'enc' in (stored as Record<string, unknown>) &&
+    typeof (stored as { enc: unknown }).enc === 'string'
+  ) {
+    try {
+      const plaintext = decryptPII((stored as { enc: string }).enc);
+      return JSON.parse(plaintext) as T;
+    } catch {
+      return stored as T;
+    }
+  }
+  return stored as T;
+}
+
+/**
  * HMAC-SHA-256 hash of an email (lowercased, trimmed) for deduplication.
  * Uses APP_SECRET as HMAC key to prevent rainbow table attacks.
  * Falls back to plain SHA-256 only if APP_SECRET is not set (dev mode).

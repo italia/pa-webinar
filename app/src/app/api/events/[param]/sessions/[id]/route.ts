@@ -3,6 +3,7 @@ import { ForbiddenError, NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { extractModeratorToken } from '@/lib/auth/moderator';
 import { isAzureConfigured, deleteBlob } from '@/lib/azure/blob-storage';
+import { tryDecryptJSON } from '@/lib/crypto/pii';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +36,7 @@ export const GET = withErrorHandling(async (request, context) => {
     endedAt: session.endedAt?.toISOString() ?? null,
     duration: session.duration,
     peakParticipants: session.peakParticipants,
-    participants: session.participants,
+    participants: tryDecryptJSON(session.participants, []),
     recordingUrl: session.recordingUrl,
     recordingFileSize: session.recordingFileSize ? Number(session.recordingFileSize) : null,
     recordingDuration: session.recordingDuration,
