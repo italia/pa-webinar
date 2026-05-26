@@ -3,7 +3,9 @@ import {
   encryptPII,
   decryptPII,
   encryptPIIOrNull,
+  encryptJSON,
   hashEmail,
+  tryDecryptJSON,
   tryDecryptPII,
 } from './pii';
 
@@ -139,6 +141,56 @@ describe('tryDecryptPII', () => {
   it('returns input unchanged on bogus ciphertext', () => {
     const bogus = 'AAAA'.repeat(15); // long enough, looks base64ish, no '@'
     expect(tryDecryptPII(bogus)).toBe(bogus);
+  });
+});
+
+describe('encryptJSON + tryDecryptJSON', () => {
+  it('round-trips an array of objects (CallSession.participants shape)', () => {
+    const participants = [
+      { id: 'abc', displayName: 'Mario Rossi', joinedAt: 1700000000 },
+      { id: 'def', displayName: 'Anna Bianchi', joinedAt: 1700000010 },
+    ];
+    const wrapped = encryptJSON(participants);
+    // Storage shape: a JSONB-safe wrapper object, not the array itself
+    expect(Array.isArray(wrapped)).toBe(false);
+    expect(typeof wrapped.enc).toBe('string');
+    expect(wrapped.enc).not.toContain('Mario');
+
+    const decrypted = tryDecryptJSON(wrapped);
+    expect(decrypted).toEqual(participants);
+  });
+
+  it('round-trips an empty array', () => {
+    const wrapped = encryptJSON([]);
+    expect(tryDecryptJSON(wrapped)).toEqual([]);
+  });
+
+  it('passes legacy plaintext arrays through unchanged (dual-read)', () => {
+    const legacy = [{ id: 'abc', displayName: 'Legacy User' }];
+    // Simulates a JSONB column written before encryption was enabled
+    expect(tryDecryptJSON(legacy)).toEqual(legacy);
+  });
+
+  it('returns the fallback for null / undefined', () => {
+    expect(tryDecryptJSON(null)).toBeNull();
+    expect(tryDecryptJSON(undefined)).toBeNull();
+    expect(tryDecryptJSON(null, [])).toEqual([]);
+    expect(tryDecryptJSON(undefined, [])).toEqual([]);
+  });
+
+  it('returns input untouched on bogus enc payload', () => {
+    const bogus = { enc: 'not-real-ciphertext' };
+    expect(tryDecryptJSON(bogus)).toEqual(bogus);
+  });
+
+  it('does not treat unrelated objects as encrypted wrappers', () => {
+    const obj = { displayName: 'looks-like-data', count: 3 };
+    expect(tryDecryptJSON(obj)).toEqual(obj);
+  });
+
+  it('handles unicode payloads', () => {
+    const payload = { name: 'François Müller', city: 'Città' };
+    expect(tryDecryptJSON(encryptJSON(payload))).toEqual(payload);
   });
 });
 
