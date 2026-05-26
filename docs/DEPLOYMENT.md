@@ -212,6 +212,54 @@ ingress:
 
 Se si usa un values di override, assicurarsi di includere queste annotation.
 
+## NetworkPolicy (opt-in)
+
+Il chart include un manifest `NetworkPolicy` opzionale che applica un
+default-deny + allow-list di egress (DNS, Postgres, Redis, Jitsi
+Prosody, SMTP, HTTPS verso object storage) e di ingress (controller
+nginx + Prometheus scrape).
+
+```yaml
+networkPolicy:
+  enabled: true
+```
+
+**Requisiti per cloud**:
+
+| Cloud | Cosa serve |
+|-------|------------|
+| AKS   | Cluster creato con `--network-policy azure` o `--network-policy calico`. Non si può abilitare a posteriori senza ricreare il cluster (limitazione AKS). |
+| GKE   | Abilitare Dataplane V2 oppure il legacy NetworkPolicy enforcement durante la creazione del cluster. |
+| EKS   | Installare l'add-on Calico o Cilium. |
+| k3s   | Già abilitato out-of-the-box. |
+
+**Verifica** che la policy sia effettivamente applicata (e non solo
+caricata in etcd):
+
+```bash
+# In un pod test, con kubectl exec, prova a raggiungere un endpoint
+# fuori dalle allow-list (es. il metadata service 169.254.169.254).
+# Senza CNI policy engine: 200 OK. Con policy attiva: timeout.
+kubectl run -i --tty --rm probe --image=curlimages/curl --restart=Never -- \
+  curl -sf --max-time 3 http://169.254.169.254 || echo "blocked ✓"
+```
+
+Override dei pod/namespace selector se l'ingress controller non vive
+in `ingress-nginx` o se le label di Postgres/Redis differiscono dalla
+release Bitnami:
+
+```yaml
+networkPolicy:
+  ingress:
+    fromNamespaceSelectors:
+      - kubernetes.io/metadata.name: my-ingress-ns
+  egress:
+    postgres:
+      to:
+        - ipBlock:
+            cidr: 10.20.0.42/32   # Managed Postgres IP
+```
+
 ## Note specifiche per cloud
 
 ### Azure AKS
