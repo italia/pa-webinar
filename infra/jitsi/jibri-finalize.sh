@@ -17,7 +17,10 @@
 #   RECORDING_MINIO_ENDPOINT, RECORDING_MINIO_BUCKET, RECORDING_MINIO_ACCESS_KEY, RECORDING_MINIO_SECRET_KEY
 #   RECORDING_WEBHOOK_URL — URL to notify the portal when recording is ready
 #   APP_INTERNAL_URL — internal URL for the portal (e.g. http://videocall-test-eventi-dtd:3000)
-#   CRON_API_KEY — authentication key for the webhook and internal API
+#   CRON_API_KEY — bearer-token authentication key for the webhook and internal API
+#   RECORDING_WEBHOOK_SECRET — HMAC-SHA256 secret used to sign the webhook
+#       body (header X-Webhook-Signature: sha256=<hex>). When unset the
+#       portal falls back to bearer-only auth and logs a warning.
 
 set -e
 
@@ -180,10 +183,23 @@ print(json.dumps({
     PAYLOAD="{\"roomName\":\"$ROOM_NAME\",\"recordingUrl\":\"$RECORDING_URL\",\"filename\":\"$FILENAME\",\"duration\":${DURATION:-0},\"fileSize\":${FILE_SIZE:-0}}"
   fi
 
+  # Sign the body with HMAC-SHA256 when a webhook secret is configured.
+  # The portal enforces signature verification iff it sees this header.
+  SIGNATURE_HEADER=()
+  if [ -n "$RECORDING_WEBHOOK_SECRET" ] && command -v openssl >/dev/null 2>&1; then
+    SIG_HEX=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$RECORDING_WEBHOOK_SECRET" -hex 2>/dev/null | awk '{print $NF}')
+    if [ -n "$SIG_HEX" ]; then
+      SIGNATURE_HEADER=(-H "X-Webhook-Signature: sha256=${SIG_HEX}")
+    else
+      log "WARNING: Could not compute webhook signature"
+    fi
+  fi
+
   log "Notifying portal: $RECORDING_WEBHOOK_URL"
   curl -sf -X POST "$RECORDING_WEBHOOK_URL" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${CRON_API_KEY}" \
+    "${SIGNATURE_HEADER[@]}" \
     -d "$PAYLOAD" || log "WARNING: Failed to notify portal"
 fi
 

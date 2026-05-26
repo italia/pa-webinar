@@ -99,9 +99,20 @@ PAYLOAD=$(jq -nc \
   --argjson sz  "$FILE_SIZE" \
   '{roomName: $room, recordingUrl: $url, filename: $file, duration: $dur, fileSize: $sz}')
 
+SIGNATURE_HEADER=()
+if [ -n "$RECORDING_WEBHOOK_SECRET" ] && command -v openssl >/dev/null 2>&1; then
+  SIG_HEX=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$RECORDING_WEBHOOK_SECRET" -hex 2>/dev/null | awk '{print $NF}')
+  if [ -n "$SIG_HEX" ]; then
+    SIGNATURE_HEADER=(-H "X-Webhook-Signature: sha256=${SIG_HEX}")
+  else
+    log "WARN: could not compute webhook signature"
+  fi
+fi
+
 if ! curl -sf -X POST "$APP_INTERNAL_URL/api/webhooks/recording" \
      -H "Content-Type: application/json" \
      -H "Authorization: Bearer $CRON_API_KEY" \
+     "${SIGNATURE_HEADER[@]}" \
      -d "$PAYLOAD" >/dev/null; then
   log "WARN: webhook post failed (blob uploaded, portal unaware — will be picked up by reconcile cron)"
 fi

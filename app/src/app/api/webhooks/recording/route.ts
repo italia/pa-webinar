@@ -1,20 +1,62 @@
 import type { NextRequest } from 'next/server';
 
 import { prisma } from '@/lib/db';
-import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { UnauthorizedError, ValidationError, NotFoundError } from '@/lib/errors';
+import { withErrorHandling } from '@/lib/api-handler';
+import {
+  AppError,
+  UnauthorizedError,
+  ValidationError,
+  NotFoundError,
+} from '@/lib/errors';
 import { constantTimeEqual } from '@/lib/auth/moderator';
+import { verifyWebhookSignature } from '@/lib/auth/webhook-signature';
+
+let warnedSignatureMissing = false;
+
+function logWarningOnce(message: string): void {
+  if (warnedSignatureMissing) return;
+  warnedSignatureMissing = true;
+  console.warn(message);
+}
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
+  // Read the raw body once: HMAC verification must run on the exact bytes
+  // produced by the sender, so we cannot rely on request.json() (which
+  // would also consume the stream and prevent re-reading).
+  const rawBody = await request.text();
+
   const cronKey = process.env.CRON_API_KEY;
   const authHeader = request.headers.get('authorization');
   const providedKey = authHeader?.replace('Bearer ', '') ?? '';
+  const bearerOk = !!cronKey && constantTimeEqual(providedKey, cronKey);
 
-  if (!cronKey || !constantTimeEqual(providedKey, cronKey)) {
-    throw new UnauthorizedError();
+  const webhookSecret = process.env.RECORDING_WEBHOOK_SECRET;
+  if (webhookSecret) {
+    const signature = request.headers.get('x-webhook-signature');
+    const sigOk = verifyWebhookSignature(rawBody, signature, webhookSecret);
+    if (!bearerOk || !sigOk) {
+      throw new UnauthorizedError();
+    }
+  } else {
+    // Legacy mode: only the bearer is required. Loud one-shot warning so
+    // operators notice the missing defence-in-depth in production logs.
+    logWarningOnce(
+      '[eventi-dtd] RECORDING_WEBHOOK_SECRET is not set — recording webhook ' +
+        'falls back to bearer-only auth. Set this env var (and update the ' +
+        'Jibri finalize script) to enforce HMAC signatures.',
+    );
+    if (!bearerOk) {
+      throw new UnauthorizedError();
+    }
   }
 
-  const body = (await parseJsonBody(request)) as Record<string, unknown>;
+  let body: Record<string, unknown>;
+  try {
+    body = JSON.parse(rawBody) as Record<string, unknown>;
+  } catch {
+    throw new AppError('Invalid JSON body', 400, 'INVALID_BODY');
+  }
+
   const roomName = body.roomName as string | undefined;
   const recordingUrl = body.recordingUrl as string | undefined;
   const filename = (body.filename as string) || null;
@@ -25,6 +67,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   if (!roomName || !recordingUrl) {
     throw new ValidationError('roomName and recordingUrl are required');
   }
+
+  // Cap participants array to avoid unbounded payloads writing into the
+  // CallSession row.
+  const cappedParticipants = participants.slice(0, 500);
 
   const event = await prisma.event.findUnique({
     where: { jitsiRoomName: roomName },
@@ -57,7 +103,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         endedAt: new Date(),
         duration,
         peakParticipants: event.peakParticipants,
-        participants: participants as object[],
+        participants: cappedParticipants as object[],
         recordingUrl,
         recordingFileSize: fileSize ? BigInt(fileSize) : null,
         recordingDuration: duration,
