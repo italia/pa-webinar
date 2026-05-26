@@ -15,6 +15,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { NotFoundError, UnauthorizedError } from '@/lib/errors';
 
@@ -70,7 +71,7 @@ export const GET = withErrorHandling(async (_request, context: { params: Promise
   );
 });
 
-export const DELETE = withErrorHandling(async (_request, context: { params: Promise<{ id: string }> }) => {
+export const DELETE = withErrorHandling(async (request, context: { params: Promise<{ id: string }> }) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) throw new UnauthorizedError();
 
@@ -79,6 +80,12 @@ export const DELETE = withErrorHandling(async (_request, context: { params: Prom
   if (!existing) throw new NotFoundError('Person');
 
   await prisma.person.delete({ where: { id } });
+
+  await logAdminAction({
+    request,
+    action: 'RUBRICA_PERSON_DELETE',
+    target: id,
+  });
 
   return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
 });

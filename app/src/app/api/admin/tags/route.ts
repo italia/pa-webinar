@@ -15,6 +15,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -64,6 +65,14 @@ export const POST = withErrorHandling(async (request) => {
         sortOrder: parsed.data.sortOrder ?? 0,
       },
     });
+
+    await logAdminAction({
+      request,
+      action: 'TAG_CREATE',
+      target: created.id,
+      details: { slug: created.slug },
+    });
+
     return Response.json(created, { status: 201 });
   } catch (e: unknown) {
     if (typeof e === 'object' && e && 'code' in e && (e as { code: string }).code === 'P2002') {

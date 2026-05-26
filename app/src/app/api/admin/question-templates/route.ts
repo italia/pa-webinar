@@ -10,6 +10,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { shapeTemplateItemsWrite } from '@/lib/questionnaires';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
@@ -77,6 +78,12 @@ export const POST = withErrorHandling(async (request) => {
       items: { create },
     },
     include: { items: { orderBy: { sortOrder: 'asc' } } },
+  });
+
+  await logAdminAction({
+    request,
+    action: 'QUESTION_TEMPLATE_CREATE',
+    target: created.id,
   });
 
   return Response.json(created, { status: 201 });

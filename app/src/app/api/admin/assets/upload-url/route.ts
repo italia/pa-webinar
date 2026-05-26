@@ -32,6 +32,7 @@ import type { NextRequest } from 'next/server';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { getFilesStorage } from '@/lib/storage';
 import {
@@ -165,6 +166,13 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   const publicUrl = storage.publicUrl(key);
+
+  await logAdminAction({
+    request,
+    action: 'ASSET_UPLOAD',
+    target: key,
+    details: { type, mime, size: buffer.byteLength },
+  });
 
   return Response.json({
     url: publicUrl,

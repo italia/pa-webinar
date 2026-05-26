@@ -16,6 +16,7 @@ import type { Prisma } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
@@ -104,6 +105,12 @@ export const POST = withErrorHandling(async (request) => {
   await prisma.event.update({
     where: { id: body.eventId },
     data: { moderatorToken: newToken },
+  });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_MODERATOR_TOKEN_ROTATE',
+    target: body.eventId,
   });
 
   return Response.json({

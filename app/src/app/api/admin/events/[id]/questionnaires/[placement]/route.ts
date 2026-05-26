@@ -14,6 +14,7 @@ import { Prisma } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import {
@@ -203,10 +204,17 @@ export const PUT = withErrorHandling(async (request, context) => {
     });
   });
 
+  await logAdminAction({
+    request,
+    action: 'EVENT_QUESTIONNAIRE_UPSERT',
+    target: result.id,
+    details: { eventId: id, placement },
+  });
+
   return Response.json(result);
 });
 
-export const DELETE = withErrorHandling(async (_request, context) => {
+export const DELETE = withErrorHandling(async (request, context) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) throw new UnauthorizedError();
 
@@ -223,6 +231,13 @@ export const DELETE = withErrorHandling(async (_request, context) => {
   if (!q) throw new NotFoundError('EventQuestionnaire');
 
   await prisma.eventQuestionnaire.delete({ where: { id: q.id } });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_QUESTIONNAIRE_DELETE',
+    target: q.id,
+    details: { eventId: id, placement, deletedResponses: q._count.responses },
+  });
 
   return Response.json({
     deleted: true,

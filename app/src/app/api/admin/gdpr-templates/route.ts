@@ -12,6 +12,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
 import { createGdprTemplateSchema } from '@/lib/validation/schemas';
@@ -83,6 +84,13 @@ export const POST = withErrorHandling(async (request) => {
         isDefault: data.isDefault ?? false,
       },
     });
+  });
+
+  await logAdminAction({
+    request,
+    action: 'GDPR_TEMPLATE_CREATE',
+    target: created.id,
+    details: { isDefault: created.isDefault },
   });
 
   return Response.json(created, { status: 201 });

@@ -14,6 +14,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -89,6 +90,16 @@ export const POST = withErrorHandling(async (request) => {
   const result = await prisma.orphanRecording.updateMany({
     where: { id: { in: parsed.data.ids } },
     data: { decision: parsed.data.decision },
+  });
+
+  await logAdminAction({
+    request,
+    action: 'ORPHAN_RECORDING_DECISION',
+    details: {
+      ids: parsed.data.ids,
+      decision: parsed.data.decision,
+      updated: result.count,
+    },
   });
 
   return Response.json({ updated: result.count, decision: parsed.data.decision });
