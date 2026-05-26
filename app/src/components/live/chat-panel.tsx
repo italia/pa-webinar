@@ -241,12 +241,15 @@ export default function ChatPanel({
     if (!text || sending) return;
     setSending(true);
     try {
-      const qs = token ? `?token=${encodeURIComponent(token)}` : '';
       const body: Record<string, string> = { text };
       if (isGuest) body.guestName = displayName;
-      const res = await fetch(`/api/events/${eventSlug}/chat${qs}`, {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(`/api/events/${eventSlug}/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(body),
       });
       if (!res.ok) return;

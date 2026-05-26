@@ -16,11 +16,18 @@ export function constantTimeEqual(a: string, b: string): boolean {
   return timingSafeEqual(ha, hb);
 }
 
+let warnedQueryToken = false;
+
 /**
  * Extract the moderator token from the request.
  * Accepted locations (in priority order):
- *   1. Authorization: Bearer <token>
- *   2. ?token=<token> query parameter
+ *   1. Authorization: Bearer <token>  ← preferred for API calls.
+ *   2. ?token=<token> query parameter ← legacy; kept for magic-link
+ *      landing pages. New client-side fetches should use the header.
+ *
+ * When the token arrives via the query string we log a one-shot warning
+ * so operators can spot deployments that still rely on URL-borne tokens
+ * (visible to access logs, CDN logs, browser history, Referer header).
  */
 export function extractModeratorToken(request: Request): string | null {
   const auth = request.headers.get('authorization');
@@ -29,7 +36,16 @@ export function extractModeratorToken(request: Request): string | null {
   }
 
   const url = new URL(request.url);
-  return url.searchParams.get('token');
+  const queryToken = url.searchParams.get('token');
+  if (queryToken && !warnedQueryToken) {
+    warnedQueryToken = true;
+    console.warn(
+      `[eventi-dtd] Moderator/access token received via ?token= query ` +
+        `parameter on ${url.pathname}. Prefer Authorization: Bearer for ` +
+        `API calls — URL tokens leak to access logs and browser history.`,
+    );
+  }
+  return queryToken;
 }
 
 const UUID_RE =
