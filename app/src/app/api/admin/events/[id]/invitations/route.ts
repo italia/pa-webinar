@@ -16,6 +16,8 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
+import { encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -53,7 +55,9 @@ export const GET = withErrorHandling(async (_request, context) => {
     orderBy: [{ role: 'asc' }, { createdAt: 'asc' }],
   });
 
-  return Response.json({ rows });
+  return Response.json({
+    rows: rows.map((r) => ({ ...r, email: tryDecryptPII(r.email) })),
+  });
 });
 
 export const POST = withErrorHandling(async (request, context) => {
@@ -70,14 +74,17 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
-  // Normalize email for the unique (eventId, email) index.
-  const email = parsed.data.email.trim().toLowerCase();
+  // Normalize the email for the deterministic hash. The plaintext is
+  // never stored — only its encryption and its HMAC fingerprint.
+  const emailNorm = parsed.data.email.trim().toLowerCase();
+  const emailHash = hashEmail(emailNorm);
 
   try {
     const created = await prisma.eventInvitation.create({
       data: {
         eventId: event.id,
-        email,
+        email: encryptPII(emailNorm),
+        emailHash,
         name: parsed.data.name ?? null,
         role: parsed.data.role,
         personId: parsed.data.personId ?? null,
@@ -88,7 +95,18 @@ export const POST = withErrorHandling(async (request, context) => {
         },
       },
     });
-    return Response.json(created, { status: 201 });
+
+    await logAdminAction({
+      request,
+      action: 'EVENT_INVITATION_CREATE',
+      target: created.id,
+      details: { eventId: event.id, role: created.role },
+    });
+
+    return Response.json(
+      { ...created, email: emailNorm },
+      { status: 201 },
+    );
   } catch (e: unknown) {
     if (typeof e === 'object' && e && 'code' in e && (e as { code: string }).code === 'P2002') {
       throw new AppError('This email is already invited to the event', 409, 'CONFLICT');
