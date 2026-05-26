@@ -17,7 +17,7 @@ import { z } from 'zod';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
-import { encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
+import { encryptPII, encryptPIIOrNull, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -56,7 +56,11 @@ export const GET = withErrorHandling(async (_request, context) => {
   });
 
   return Response.json({
-    rows: rows.map((r) => ({ ...r, email: tryDecryptPII(r.email) })),
+    rows: rows.map((r) => ({
+      ...r,
+      name: tryDecryptPII(r.name),
+      email: tryDecryptPII(r.email),
+    })),
   });
 });
 
@@ -85,7 +89,7 @@ export const POST = withErrorHandling(async (request, context) => {
         eventId: event.id,
         email: encryptPII(emailNorm),
         emailHash,
-        name: parsed.data.name ?? null,
+        name: encryptPIIOrNull(parsed.data.name),
         role: parsed.data.role,
         personId: parsed.data.personId ?? null,
       },
@@ -104,7 +108,11 @@ export const POST = withErrorHandling(async (request, context) => {
     });
 
     return Response.json(
-      { ...created, email: emailNorm },
+      {
+        ...created,
+        name: tryDecryptPII(created.name),
+        email: emailNorm,
+      },
       { status: 201 },
     );
   } catch (e: unknown) {

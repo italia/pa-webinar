@@ -26,6 +26,7 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { publishChat } from '@/lib/chat/pubsub';
 import { chatMessagesTotal } from '@/lib/metrics';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -98,7 +99,7 @@ async function authenticateSender(
       return {
         eventId: event.id,
         senderId: `mod-${event.id}-${coMod.id}`,
-        senderName: coMod.name,
+        senderName: tryDecryptPII(coMod.name) ?? coMod.name,
         isModerator: true,
       };
     }

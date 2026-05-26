@@ -158,7 +158,7 @@ export default async function EventManagePage({
     })),
     eventModerators: event.additionalMods.map((m) => ({
       id: m.id,
-      name: m.name,
+      name: tryDecryptPII(m.name) ?? m.name,
       email: tryDecryptPII(m.email),
       role: m.role,
       revokedAt: m.revokedAt?.toISOString() ?? null,
