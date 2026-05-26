@@ -1,10 +1,11 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
-import { parseJsonBody } from '@/lib/api-handler';
-import { UnauthorizedError } from '@/lib/errors';
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import { UnauthorizedError, ValidationError } from '@/lib/errors';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import {
   isPrometheusConfigured,
   queryPrometheus,
@@ -13,12 +14,12 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-interface QueryPayload {
-  query: string;
-  start?: string;
-  end?: string;
-  step?: string;
-}
+const queryBodySchema = z.object({
+  query: z.string().min(1).max(4096),
+  start: z.string().min(1).max(64).optional(),
+  end: z.string().min(1).max(64).optional(),
+  step: z.string().min(1).max(32).optional(),
+});
 
 export const POST = withErrorHandling(async (request) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
@@ -28,17 +29,26 @@ export const POST = withErrorHandling(async (request) => {
     return NextResponse.json({ available: false }, { status: 200 });
   }
 
-  const body = await parseJsonBody(request) as QueryPayload;
-  if (!body.query || typeof body.query !== 'string') {
-    return NextResponse.json({ error: 'query is required' }, { status: 400 });
+  const parsed = queryBodySchema.safeParse(await parseJsonBody(request));
+  if (!parsed.success) {
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+    );
   }
+  const { query, start, end, step } = parsed.data;
 
   try {
-    if (body.start && body.end && body.step) {
-      const result = await queryPrometheusRange(body.query, body.start, body.end, body.step);
-      return NextResponse.json({ available: true, ...result });
-    }
-    const result = await queryPrometheus(body.query);
+    const isRange = Boolean(start && end && step);
+    const result = isRange
+      ? await queryPrometheusRange(query, start!, end!, step!)
+      : await queryPrometheus(query);
+    await logAdminAction({
+      request,
+      action: 'ADMIN_METRICS_QUERY',
+      target: query,
+      details: isRange ? { start, end, step } : null,
+    });
     return NextResponse.json({ available: true, ...result });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Prometheus query failed';
