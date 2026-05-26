@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { withErrorHandling } from '@/lib/api-handler';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { generateEventICal } from '@/lib/ical/generate';
@@ -36,7 +37,7 @@ export const GET = withErrorHandling(async (request, context) => {
     url: eventUrl,
     organizerName: event.moderatorName ?? (settings.siteName || 'Eventi PA'),
     organizerEmail:
-      event.moderatorEmail ??
+      tryDecryptPII(event.moderatorEmail) ??
       process.env.SMTP_FROM ??
       'noreply@dominio.gov.it',
   });

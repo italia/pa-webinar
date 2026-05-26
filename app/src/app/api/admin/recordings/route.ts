@@ -18,6 +18,7 @@ import type { Prisma } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError } from '@/lib/errors';
 import { generateRecordingSasUrl } from '@/lib/storage/recordings';
@@ -184,7 +185,7 @@ export const GET = withErrorHandling(async (request) => {
       recordingFileSize: s.recordingFileSize?.toString() ?? null,
       jitsiRoomName: s.jitsiRoomName,
       moderatorName: s.event.moderatorName,
-      moderatorEmail: s.event.moderatorEmail,
+      moderatorEmail: tryDecryptPII(s.event.moderatorEmail),
       createdAt: s.createdAt.toISOString(),
     })),
     ...events.map((e) => ({
@@ -204,7 +205,7 @@ export const GET = withErrorHandling(async (request) => {
       recordingFileSize: e.recordingFileSize?.toString() ?? null,
       jitsiRoomName: e.jitsiRoomName,
       moderatorName: e.moderatorName,
-      moderatorEmail: e.moderatorEmail,
+      moderatorEmail: tryDecryptPII(e.moderatorEmail),
       createdAt: (e.recordingPublishedAt ?? e.createdAt).toISOString(),
     })),
   ];

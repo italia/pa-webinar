@@ -19,6 +19,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
+import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -67,7 +68,9 @@ export const GET = withErrorHandling(async (request, context) => {
     },
   });
 
-  return Response.json({ rows });
+  return Response.json({
+    rows: rows.map((r) => ({ ...r, email: tryDecryptPII(r.email) })),
+  });
 });
 
 export const POST = withErrorHandling(async (request, context) => {
@@ -90,11 +93,14 @@ export const POST = withErrorHandling(async (request, context) => {
     data: {
       eventId: event.id,
       name: parsed.data.name,
-      email: parsed.data.email ?? null,
+      email: encryptPIIOrNull(parsed.data.email),
       role: parsed.data.role ?? EventModeratorRole.MODERATOR,
       token: randomUUID(),
     },
   });
 
-  return Response.json(created, { status: 201 });
+  return Response.json(
+    { ...created, email: tryDecryptPII(created.email) },
+    { status: 201 },
+  );
 });

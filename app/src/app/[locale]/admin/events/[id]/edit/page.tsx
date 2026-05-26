@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
@@ -163,7 +164,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       privacyPolicyText: event.privacyPolicyText,
       privacyPolicyUrl: event.privacyPolicyUrl,
       moderatorName: event.moderatorName,
-      moderatorEmail: event.moderatorEmail,
+      moderatorEmail: tryDecryptPII(event.moderatorEmail),
     },
     organizers: event.organizers.map((o) => ({
       id: o.id,
@@ -178,7 +179,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     eventModerators: event.additionalMods.map((m) => ({
       id: m.id,
       name: m.name,
-      email: m.email,
+      email: tryDecryptPII(m.email),
       role: m.role as 'MODERATOR' | 'SPEAKER',
       personId: null,
     })),

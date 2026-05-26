@@ -1,6 +1,6 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
-import { decryptPII } from '@/lib/crypto/pii';
+import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { getSettings } from '@/lib/settings';
@@ -126,7 +126,7 @@ export const GET = withErrorHandling(async (request) => {
           url: eventPageUrl,
           organizerName: event.moderatorName ?? (settings.siteName || 'Eventi PA'),
           organizerEmail:
-            event.moderatorEmail ??
+            tryDecryptPII(event.moderatorEmail) ??
             process.env.SMTP_FROM ??
             'noreply@dominio.gov.it',
         });

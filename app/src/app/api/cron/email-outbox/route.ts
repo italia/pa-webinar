@@ -17,6 +17,7 @@
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email/send';
 import {
@@ -88,8 +89,12 @@ export const GET = withErrorHandling(async (request) => {
     await Promise.allSettled(
       chunk.map(async (row) => {
         try {
+          // toAddress is stored encrypted; legacy rows may still be in
+          // plaintext, so tryDecryptPII handles both transparently.
+          const recipient = tryDecryptPII(row.to_address);
+          if (!recipient) throw new Error('missing recipient');
           await sendEmail({
-            to: row.to_address,
+            to: recipient,
             subject: row.subject,
             html: row.html,
             text: row.text ?? undefined,

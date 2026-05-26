@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { encryptPII, decryptPII, hashEmail } from './pii';
+import {
+  encryptPII,
+  decryptPII,
+  encryptPIIOrNull,
+  hashEmail,
+  tryDecryptPII,
+} from './pii';
 
 const TEST_KEY = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
 
@@ -108,5 +114,45 @@ describe('hashEmail', () => {
     process.env.APP_SECRET = saved;
     // HMAC and plain SHA-256 should produce different results
     expect(withSecret).not.toBe(withoutSecret);
+  });
+});
+
+describe('tryDecryptPII', () => {
+  it('returns null for null/undefined', () => {
+    expect(tryDecryptPII(null)).toBeNull();
+    expect(tryDecryptPII(undefined)).toBeNull();
+  });
+
+  it('returns plaintext input as-is (legacy row)', () => {
+    expect(tryDecryptPII('mario.rossi@example.com')).toBe(
+      'mario.rossi@example.com',
+    );
+    expect(tryDecryptPII('short')).toBe('short');
+  });
+
+  it('decrypts ciphertext produced by encryptPII', () => {
+    const original = 'someone.long.name@dipartimento.gov.it';
+    const ciphertext = encryptPII(original);
+    expect(tryDecryptPII(ciphertext)).toBe(original);
+  });
+
+  it('returns input unchanged on bogus ciphertext', () => {
+    const bogus = 'AAAA'.repeat(15); // long enough, looks base64ish, no '@'
+    expect(tryDecryptPII(bogus)).toBe(bogus);
+  });
+});
+
+describe('encryptPIIOrNull', () => {
+  it('returns null for null/undefined/empty/whitespace', () => {
+    expect(encryptPIIOrNull(null)).toBeNull();
+    expect(encryptPIIOrNull(undefined)).toBeNull();
+    expect(encryptPIIOrNull('')).toBeNull();
+    expect(encryptPIIOrNull('   ')).toBeNull();
+  });
+
+  it('encrypts trimmed value', () => {
+    const ct = encryptPIIOrNull('  test@example.com  ');
+    expect(ct).not.toBeNull();
+    expect(decryptPII(ct!)).toBe('test@example.com');
   });
 });

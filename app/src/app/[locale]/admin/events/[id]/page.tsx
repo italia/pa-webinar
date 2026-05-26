@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
@@ -133,7 +134,7 @@ export default async function EventManagePage({
     recordingConsentText: event.recordingConsentText,
     moderatorToken: event.moderatorToken,
     moderatorName: event.moderatorName,
-    moderatorEmail: event.moderatorEmail,
+    moderatorEmail: tryDecryptPII(event.moderatorEmail),
     jitsiRoomName: event.jitsiRoomName,
     dataRetentionDays: event.dataRetentionDays,
     privacyPolicyUrl: event.privacyPolicyUrl,
@@ -158,7 +159,7 @@ export default async function EventManagePage({
     eventModerators: event.additionalMods.map((m) => ({
       id: m.id,
       name: m.name,
-      email: m.email,
+      email: tryDecryptPII(m.email),
       role: m.role,
       revokedAt: m.revokedAt?.toISOString() ?? null,
     })),

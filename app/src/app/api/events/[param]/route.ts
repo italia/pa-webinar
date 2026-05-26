@@ -16,6 +16,7 @@ import {
   constantTimeEqual,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
+import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
 
@@ -94,7 +95,7 @@ export const GET = withErrorHandling(async (request, context) => {
       recordingConsentText: event.recordingConsentText,
       moderatorToken: event.moderatorToken,
       moderatorName: event.moderatorName,
-      moderatorEmail: event.moderatorEmail,
+      moderatorEmail: tryDecryptPII(event.moderatorEmail),
       jitsiRoomName: event.jitsiRoomName,
       dataRetentionDays: event.dataRetentionDays,
       privacyPolicyUrl: event.privacyPolicyUrl,
@@ -268,7 +269,7 @@ export const PUT = withErrorHandling(async (request, context) => {
         moderatorName: data.moderatorName,
       }),
       ...(data.moderatorEmail !== undefined && {
-        moderatorEmail: data.moderatorEmail,
+        moderatorEmail: encryptPIIOrNull(data.moderatorEmail),
       }),
       ...(data.speakersInfo !== undefined && { speakersInfo: data.speakersInfo }),
       ...(data.organizerName !== undefined && { organizerName: data.organizerName }),
