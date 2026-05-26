@@ -4,6 +4,7 @@ import { SignJWT } from 'jose';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { UnauthorizedError, AppError } from '@/lib/errors';
 import { constantTimeEqual } from '@/lib/auth/moderator';
+import { requireAppSecretKey } from '@/lib/auth/app-secret';
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const body = await parseJsonBody(request) as { key?: string };
@@ -13,12 +14,13 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     throw new UnauthorizedError('invalid_key');
   }
 
-  const appSecret = process.env.APP_SECRET;
-  if (!appSecret) {
+  let secret: Uint8Array;
+  try {
+    secret = requireAppSecretKey();
+  } catch {
     throw new AppError('server_misconfigured', 500, 'INTERNAL_ERROR');
   }
 
-  const secret = new TextEncoder().encode(appSecret);
   const token = await new SignJWT({ role: 'admin' })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()

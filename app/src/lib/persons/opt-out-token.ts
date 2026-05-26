@@ -1,5 +1,7 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 
+import { requireAppSecret } from '@/lib/auth/app-secret';
+
 /**
  * Signed token for unauthenticated rubrica opt-out links.
  *
@@ -15,14 +17,6 @@ import { createHmac, timingSafeEqual } from 'crypto';
 
 const TOKEN_TTL_SECONDS = 90 * 86400;
 
-function getSecret(): string {
-  const s = process.env.APP_SECRET;
-  if (!s) {
-    throw new Error('APP_SECRET must be set to issue rubrica opt-out tokens');
-  }
-  return s;
-}
-
 function b64urlEncode(buf: Buffer): string {
   return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
@@ -36,7 +30,7 @@ export function issueRubricaOptOutToken(personId: string, now: Date = new Date()
   const issuedAt = Math.floor(now.getTime() / 1000);
   const payloadRaw = `${personId}:${issuedAt}`;
   const payload = b64urlEncode(Buffer.from(payloadRaw, 'utf8'));
-  const sig = createHmac('sha256', getSecret()).update(payload).digest();
+  const sig = createHmac('sha256', requireAppSecret()).update(payload).digest();
   return `${payload}.${b64urlEncode(sig)}`;
 }
 
@@ -51,7 +45,7 @@ export function verifyRubricaOptOutToken(
 
   let expected: Buffer;
   try {
-    expected = createHmac('sha256', getSecret()).update(payload).digest();
+    expected = createHmac('sha256', requireAppSecret()).update(payload).digest();
   } catch {
     return null;
   }

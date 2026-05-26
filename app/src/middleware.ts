@@ -4,6 +4,7 @@ import { jwtVerify } from 'jose';
 
 import { locales, defaultLocale, type Locale } from '@/i18n/config';
 import { routing } from '@/i18n/routing';
+import { tryGetAppSecret } from '@/lib/auth/app-secret';
 import { getPublicEnv } from '@/lib/env';
 
 const LOCALE_SEGMENT = locales.join('|');
@@ -128,7 +129,7 @@ async function isValidAdminSession(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get('admin_session')?.value;
   if (!token) return false;
 
-  const appSecret = process.env.APP_SECRET;
+  const appSecret = tryGetAppSecret();
   if (!appSecret) return false;
 
   try {
