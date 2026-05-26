@@ -292,6 +292,84 @@ service:
   type: ClusterIP
   port: 3000
 
+# ── NetworkPolicy ────────────────────────────────────────────
+# Opt-in default-deny + allow-list for the app pods. Requires a CNI
+# that honours NetworkPolicy: on AKS the cluster must be created with
+# `--network-policy azure` or `--network-policy calico`, on EKS install
+# the Calico/Cilium addon, on GKE enable Dataplane V2. See
+# docs/DEPLOYMENT.md for the per-cloud notes.
+
+networkPolicy:
+  # Default off: lots of installs run on bare AKS without a policy
+  # engine. Turn on once the operator is in place.
+  enabled: false
+
+  ingress:
+    # Labels of the namespace(s) allowed to send traffic to the app
+    # service port. Defaults to the typical ingress-nginx label.
+    fromNamespaceSelectors:
+      - kubernetes.io/metadata.name: ingress-nginx
+    # Extra per-pod selectors (e.g. for a specific ingress controller
+    # deployment) — added as additional `from` blocks.
+    fromPodSelectors: []
+
+    # Whether to also accept scrape traffic from the monitoring
+    # namespace (Prometheus). The /metrics endpoint is still auth-
+    # gated at the application layer.
+    allowMonitoring: true
+    monitoringNamespaceSelector:
+      kubernetes.io/metadata.name: monitoring
+
+  egress:
+    # Postgres allow-list. Override `to` for an external managed DB
+    # (use ipBlock with cidr=<DB IP>/32) or leave as the in-cluster
+    # Bitnami chart match.
+    postgres:
+      port: 5432
+      to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+
+    # Redis allow-list (same pattern as Postgres).
+    redis:
+      port: 6379
+      to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+
+    # Jitsi Prosody — XMPP for JWT-authenticated room creation.
+    # When jitsi.enabled=false this stays effectively empty and the
+    # HTTPS rule below covers the external instance.
+    jitsi:
+      to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: jitsi-meet
+      ports:
+        - port: 5222
+          protocol: TCP
+        - port: 5280
+          protocol: TCP
+
+    # Outbound SMTP port for the email queue cron. Default is the
+    # submission port (587/STARTTLS). Set allowImplicitTlsSmtp to also
+    # open 465 if your relay still uses implicit-TLS.
+    smtpPort: 587
+    allowImplicitTlsSmtp: false
+
+    # CIDRs to *exclude* from the broad TCP/443 egress. The default
+    # blocks only the cloud Instance Metadata Service endpoints (AWS
+    # IMDS / Azure / GCP — all on 169.254.0.0/16), so a compromised
+    # pod cannot reach for cloud credentials. We intentionally do NOT
+    # exclude RFC1918 ranges here because some installs reach private
+    # endpoints (Azure Private Link, AWS PrivateLink) over 443; if
+    # your cluster doesn't need that, add 10.0.0.0/8 etc. to the
+    # override.
+    httpsExcept:
+      - 169.254.0.0/16
+
 # ── ServiceAccount ───────────────────────────────────────────
 
 serviceAccount:
