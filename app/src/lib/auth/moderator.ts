@@ -2,6 +2,7 @@ import { createHash, timingSafeEqual } from 'crypto';
 
 import { EventModeratorRole } from '@prisma/client';
 
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 
 export type GrantRole = EventModeratorRole;
@@ -125,7 +126,11 @@ export async function verifyGrantToken(
 
   const grant = await prisma.eventModerator.findUnique({ where: { token } });
   if (grant && grant.eventId === event.id && grant.revokedAt === null) {
-    return { event, role: grant.role, displayName: grant.name };
+    return {
+      event,
+      role: grant.role,
+      displayName: tryDecryptPII(grant.name) ?? grant.name,
+    };
   }
 
   return null;
@@ -154,7 +159,7 @@ export async function resolveModeratorName(
 
   const coMod = await prisma.eventModerator.findUnique({ where: { token } });
   if (coMod && coMod.eventId === event.id && coMod.revokedAt === null) {
-    return coMod.name;
+    return tryDecryptPII(coMod.name) ?? coMod.name;
   }
 
   return null;

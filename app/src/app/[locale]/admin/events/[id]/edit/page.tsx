@@ -178,14 +178,14 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     })),
     eventModerators: event.additionalMods.map((m) => ({
       id: m.id,
-      name: m.name,
+      name: tryDecryptPII(m.name) ?? m.name,
       email: tryDecryptPII(m.email),
       role: m.role as 'MODERATOR' | 'SPEAKER',
       personId: null,
     })),
     invitations: event.invitations.map((i) => ({
       id: i.id,
-      name: i.name,
+      name: tryDecryptPII(i.name),
       email: tryDecryptPII(i.email) ?? '',
       role: i.role as 'GUEST' | 'SPEAKER',
       personId: i.personId,

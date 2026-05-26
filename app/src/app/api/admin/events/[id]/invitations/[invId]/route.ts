@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
-import { encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
+import { encryptPII, encryptPIIOrNull, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -58,6 +58,9 @@ export const PATCH = withErrorHandling(async (request, context) => {
     data.email = encryptPII(emailNorm);
     data.emailHash = hashEmail(emailNorm);
   }
+  if ('name' in data) {
+    data.name = encryptPIIOrNull(data.name as string | null);
+  }
 
   try {
     const updated = await prisma.eventInvitation.update({
@@ -72,7 +75,11 @@ export const PATCH = withErrorHandling(async (request, context) => {
       details: { fields: Object.keys(parsed.data) },
     });
 
-    return Response.json({ ...updated, email: tryDecryptPII(updated.email) });
+    return Response.json({
+      ...updated,
+      name: tryDecryptPII(updated.name),
+      email: tryDecryptPII(updated.email),
+    });
   } catch (e: unknown) {
     if (typeof e === 'object' && e && 'code' in e && (e as { code: string }).code === 'P2002') {
       throw new AppError('Another invitation for this event already uses that email', 409, 'CONFLICT');
