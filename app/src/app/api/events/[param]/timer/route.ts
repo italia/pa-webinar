@@ -3,12 +3,14 @@ import {
   NotFoundError,
   UnauthorizedError,
   ForbiddenError,
+  RateLimitError,
   ValidationError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { timerActionSchema } from '@/lib/validation/schemas';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { getCached, setCache } from '@/lib/cache';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +44,15 @@ export const POST = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event || !constantTimeEqual(event.moderatorToken, token)) {
     throw new ForbiddenError('Unauthorized');
+  }
+
+  const ip = getClientIp(request);
+  const rl = rateLimit(`timer-set:${ip}:${event.id}`, {
+    limit: 30,
+    windowMs: 60_000,
+  });
+  if (!rl.allowed) {
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
   const body = await parseJsonBody(request);

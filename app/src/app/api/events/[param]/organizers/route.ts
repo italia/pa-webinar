@@ -13,8 +13,9 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
-import { AppError, ForbiddenError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { AppError, ForbiddenError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,6 +56,15 @@ export const POST = withErrorHandling(async (request, context) => {
   const event = await loadEvent(param);
   if (!constantTimeEqual(event.moderatorToken, token)) {
     throw new ForbiddenError('Only the primary moderator can add organizers');
+  }
+
+  const ip = getClientIp(request);
+  const rl = rateLimit(`organizers-add:${ip}:${event.id}`, {
+    limit: 20,
+    windowMs: 60_000,
+  });
+  if (!rl.allowed) {
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
   const body = await parseJsonBody(request);
