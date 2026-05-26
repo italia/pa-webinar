@@ -1327,7 +1327,11 @@ enum EmailOutboxStatus {
 model EmailOutbox {
   id String @id @default(uuid()) @db.Uuid
 
-  // Delivery target
+  // Delivery target. toAddress, html and text are stored as
+  // AES-256-GCM ciphertext (base64) — see src/lib/email/outbox.ts and
+  // src/lib/crypto/pii.ts. `subject` is plaintext on purpose (event
+  // title, already public). Prisma `String` with no length modifier
+  // maps to PostgreSQL `text`, which fits arbitrary ciphertext.
   toAddress String @map("to_address")
   subject   String
   html      String

@@ -3,6 +3,7 @@ import { AppError, ForbiddenError, NotFoundError, RateLimitError } from '@/lib/e
 import { prisma } from '@/lib/db';
 import { extractModeratorToken } from '@/lib/auth/moderator';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { tryDecryptJSON } from '@/lib/crypto/pii';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,7 +38,7 @@ export const GET = withErrorHandling(async (request, context) => {
       endedAt: s.endedAt?.toISOString() ?? null,
       duration: s.duration,
       peakParticipants: s.peakParticipants,
-      participants: s.participants,
+      participants: tryDecryptJSON(s.participants, []),
       recordingUrl: s.recordingUrl,
       recordingFileSize: s.recordingFileSize ? Number(s.recordingFileSize) : null,
       recordingDuration: s.recordingDuration,

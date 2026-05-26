@@ -10,6 +10,7 @@ import {
 } from '@/lib/errors';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { verifyWebhookSignature } from '@/lib/auth/webhook-signature';
+import { encryptJSON } from '@/lib/crypto/pii';
 
 let warnedSignatureMissing = false;
 
@@ -71,6 +72,13 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   // Cap participants array to avoid unbounded payloads writing into the
   // CallSession row.
   const cappedParticipants = participants.slice(0, 500);
+  // Encrypt at rest: the participants array contains names / display
+  // identifiers that originate from Jitsi (PII). We stash it as a
+  // `{ enc: "<base64ct>" }` wrapper in the existing JSONB column so the
+  // dual-read path in tryDecryptJSON keeps legacy plaintext rows
+  // readable without a migration. See ADR (encryption at rest) and
+  // `tryDecryptJSON` in `@/lib/crypto/pii`.
+  const encryptedParticipants = encryptJSON(cappedParticipants);
 
   const event = await prisma.event.findUnique({
     where: { jitsiRoomName: roomName },
@@ -103,7 +111,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         endedAt: new Date(),
         duration,
         peakParticipants: event.peakParticipants,
-        participants: cappedParticipants as object[],
+        participants: encryptedParticipants,
         recordingUrl,
         recordingFileSize: fileSize ? BigInt(fileSize) : null,
         recordingDuration: duration,
