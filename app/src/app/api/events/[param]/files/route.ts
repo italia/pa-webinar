@@ -8,7 +8,7 @@ import {
   verifyModeratorToken,
 } from '@/lib/auth/moderator';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { UnauthorizedError, ValidationError, NotFoundError } from '@/lib/errors';
+import { RateLimitError, UnauthorizedError, ValidationError, NotFoundError } from '@/lib/errors';
 import {
   isAzureConfigured,
   generateUploadSasUrl,
@@ -16,6 +16,7 @@ import {
   getBlobPath,
   ensureContainer,
 } from '@/lib/azure/blob-storage';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 const uploadRequestSchema = z.object({
   fileName: z.string().min(1).max(255),
@@ -66,6 +67,15 @@ export const POST = withErrorHandling(
 
     const event = await verifyModeratorToken(param, token);
     if (!event) throw new UnauthorizedError();
+
+    const ip = getClientIp(request);
+    const rl = rateLimit(`files-upload:${ip}:${event.id}`, {
+      limit: 10,
+      windowMs: 60_000,
+    });
+    if (!rl.allowed) {
+      throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
+    }
 
     if (!isAzureConfigured()) {
       return NextResponse.json(

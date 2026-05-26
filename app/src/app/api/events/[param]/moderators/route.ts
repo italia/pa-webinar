@@ -17,9 +17,10 @@ import { EventModeratorRole } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
-import { AppError, ForbiddenError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { AppError, ForbiddenError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -79,6 +80,15 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!token) throw new UnauthorizedError('Moderator token required');
 
   const event = await requirePrimary(param, token);
+
+  const ip = getClientIp(request);
+  const rl = rateLimit(`moderators-add:${ip}:${event.id}`, {
+    limit: 20,
+    windowMs: 60_000,
+  });
+  if (!rl.allowed) {
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
+  }
 
   const body = await parseJsonBody(request);
   const parsed = addModeratorSchema.safeParse(body);
