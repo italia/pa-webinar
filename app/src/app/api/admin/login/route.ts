@@ -5,6 +5,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { UnauthorizedError, AppError } from '@/lib/errors';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { requireAppSecretKey } from '@/lib/auth/app-secret';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const body = await parseJsonBody(request) as { key?: string };
@@ -26,6 +27,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     .setIssuedAt()
     .setExpirationTime('24h')
     .sign(secret);
+
+  await logAdminAction({ request, action: 'ADMIN_LOGIN' });
 
   const response = NextResponse.json({ success: true });
   response.cookies.set('admin_session', token, {
