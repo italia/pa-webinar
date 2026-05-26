@@ -25,7 +25,7 @@ import {
   RateLimitError,
   ValidationError,
 } from '@/lib/errors';
-import { constantTimeEqual } from '@/lib/auth/moderator';
+import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { publishChat } from '@/lib/chat/pubsub';
 import { chatMessagesTotal } from '@/lib/metrics';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -200,8 +200,7 @@ export const GET = withErrorHandling(async (request, context) => {
 
 export const POST = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
-  const url = new URL(request.url);
-  const token = url.searchParams.get('token');
+  const token = extractModeratorToken(request);
 
   const body = await parseJsonBody(request);
   const parsed = postSchema.safeParse(body);

@@ -270,7 +270,9 @@ export default function EventManagementClient({
     let cancelled = false;
     const poll = async () => {
       try {
-        const res = await fetch(`/api/events/${event.slug}/analytics/peak?token=${event.moderatorToken}`);
+        const res = await fetch(`/api/events/${event.slug}/analytics/peak`, {
+          headers: { Authorization: `Bearer ${event.moderatorToken}` },
+        });
         if (res.ok && !cancelled) {
           const data = await res.json();
           setLiveCount(data.peakParticipants ?? null);
