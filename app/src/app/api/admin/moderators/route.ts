@@ -14,6 +14,8 @@ import { randomUUID } from 'node:crypto';
 import { cookies } from 'next/headers';
 import type { Prisma } from '@prisma/client';
 
+import { z } from 'zod';
+
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
@@ -85,17 +87,26 @@ export const GET = withErrorHandling(async (request) => {
   );
 });
 
+const rotateSchema = z.object({
+  eventId: z.string().uuid(),
+  action: z.literal('regenerate'),
+});
+
 export const POST = withErrorHandling(async (request) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) throw new UnauthorizedError();
 
-  const body = await parseJsonBody(request) as { eventId?: string; action?: string };
-  if (!body.eventId || body.action !== 'regenerate') {
-    throw new ValidationError('Invalid request body');
+  const parsed = rotateSchema.safeParse(await parseJsonBody(request));
+  if (!parsed.success) {
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+    );
   }
+  const { eventId } = parsed.data;
 
   const event = await prisma.event.findUnique({
-    where: { id: body.eventId },
+    where: { id: eventId },
     select: { id: true, moderatorToken: true },
   });
   if (!event) throw new NotFoundError('Event');
@@ -103,18 +114,18 @@ export const POST = withErrorHandling(async (request) => {
   // Rotate: new UUID v4.
   const newToken = randomUUID();
   await prisma.event.update({
-    where: { id: body.eventId },
+    where: { id: eventId },
     data: { moderatorToken: newToken },
   });
 
   await logAdminAction({
     request,
     action: 'EVENT_MODERATOR_TOKEN_ROTATE',
-    target: body.eventId,
+    target: eventId,
   });
 
   return Response.json({
-    eventId: body.eventId,
+    eventId: eventId,
     moderatorToken: newToken,
   }, { headers: { 'Cache-Control': 'no-store' } });
 });
