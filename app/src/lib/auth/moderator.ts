@@ -1,4 +1,4 @@
-import { timingSafeEqual } from 'crypto';
+import { createHash, timingSafeEqual } from 'crypto';
 
 import { EventModeratorRole } from '@prisma/client';
 
@@ -7,13 +7,13 @@ import { prisma } from '@/lib/db';
 export type GrantRole = EventModeratorRole;
 
 export function constantTimeEqual(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) {
-    timingSafeEqual(bufA, bufA);
-    return false;
-  }
-  return timingSafeEqual(bufA, bufB);
+  // Hash both inputs to a fixed-length digest so timingSafeEqual always
+  // runs on equal-length buffers — removes the length-based timing oracle
+  // from the previous implementation. SHA-256 collisions are infeasible,
+  // so digest equality implies input equality.
+  const ha = createHash('sha256').update(a).digest();
+  const hb = createHash('sha256').update(b).digest();
+  return timingSafeEqual(ha, hb);
 }
 
 /**
