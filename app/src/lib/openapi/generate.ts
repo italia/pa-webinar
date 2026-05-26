@@ -464,11 +464,20 @@ registry.registerPath({
 });
 
 registry.registerPath({
+  method: 'post',
+  path: '/api/gdpr/export/request',
+  tags: ['GDPR'],
+  summary: 'Request a GDPR data-export link (Art. 15, step 1)',
+  request: { body: { content: { 'application/json': { schema: z.object({ email: z.string().email(), locale: z.string().min(2).max(5).optional() }) } } } },
+  responses: { 200: { description: 'Request accepted (an email is sent if the address matches a registration)' } },
+});
+
+registry.registerPath({
   method: 'get',
   path: '/api/gdpr/export',
   tags: ['GDPR'],
-  summary: 'GDPR data export (Art. 15)',
-  request: { query: z.object({ email: z.string().email() }) },
+  summary: 'Fulfil a GDPR data export via signed token (Art. 15, step 2)',
+  request: { query: z.object({ t: z.string() }) },
   responses: { 200: { description: 'Exported personal data' } },
 });
 

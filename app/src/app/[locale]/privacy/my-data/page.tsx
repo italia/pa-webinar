@@ -1,7 +1,13 @@
 'use client';
 
-import { useState, useCallback, type FormEvent } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  type FormEvent,
+} from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import {
   Button,
   Alert,
@@ -57,30 +63,36 @@ interface ExportEntry {
 export default function MyDataPage() {
   const t = useTranslations('gdpr.export');
   const locale = useLocale();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   const [results, setResults] = useState<ExportEntry[] | null>(null);
 
-  const handleSubmit = useCallback(
-    async (e: FormEvent) => {
-      e.preventDefault();
-      setError('');
-      setResults(null);
+  // When the user lands here via the signed link emailed to them, the
+  // URL carries ?t=<token>. We then fetch the data directly.
+  const token = searchParams.get('t');
 
-      if (!email.trim() || !email.includes('@')) {
-        setError(t('emailInvalid'));
-        return;
-      }
-
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    (async () => {
       setLoading(true);
+      setError('');
       try {
         const res = await fetch(
-          `/api/gdpr/export?email=${encodeURIComponent(email.trim())}`,
+          `/api/gdpr/export?t=${encodeURIComponent(token)}`,
+          { cache: 'no-store' },
         );
+        if (cancelled) return;
         if (res.status === 429) {
           setError(t('rateLimited'));
+          return;
+        }
+        if (res.status === 400 || res.status === 401) {
+          setError(t('linkInvalid'));
           return;
         }
         if (!res.ok) {
@@ -90,12 +102,50 @@ export default function MyDataPage() {
         const json = await res.json();
         setResults(json.data);
       } catch {
+        if (!cancelled) setError(t('error'));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, t]);
+
+  const handleSubmit = useCallback(
+    async (e: FormEvent) => {
+      e.preventDefault();
+      setError('');
+      setSubmitted(false);
+
+      if (!email.trim() || !email.includes('@')) {
+        setError(t('emailInvalid'));
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await fetch('/api/gdpr/export/request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim(), locale }),
+        });
+        if (res.status === 429) {
+          setError(t('rateLimited'));
+          return;
+        }
+        if (!res.ok) {
+          setError(t('error'));
+          return;
+        }
+        setSubmitted(true);
+      } catch {
         setError(t('error'));
       } finally {
         setLoading(false);
       }
     },
-    [email, t],
+    [email, locale, t],
   );
 
   return (
@@ -105,35 +155,62 @@ export default function MyDataPage() {
           <h1 className="mb-2">{t('title')}</h1>
           <p className="lead text-muted mb-4">{t('subtitle')}</p>
 
-          <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
-            <CardBody className="p-4">
-              <form onSubmit={handleSubmit}>
-                {error && (
-                  <Alert color="danger" className="mb-3">
-                    {error}
+          {/* ── Step 1 form (only when no token in URL) ── */}
+          {!token && (
+            <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
+              <CardBody className="p-4">
+                {submitted ? (
+                  <Alert color="success" className="mb-0">
+                    <h2 className="h5 mb-2">{t('requestSubmittedTitle')}</h2>
+                    <p className="mb-0">{t('requestSubmittedBody')}</p>
                   </Alert>
+                ) : (
+                  <form onSubmit={handleSubmit}>
+                    {error && (
+                      <Alert color="danger" className="mb-3">
+                        {error}
+                      </Alert>
+                    )}
+                    <FormGroup className="mb-3">
+                      <Input
+                        type="email"
+                        id="gdpr-email"
+                        label={t('emailLabel')}
+                        placeholder={t('emailPlaceholder')}
+                        value={email}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setEmail(e.target.value)
+                        }
+                        required
+                      />
+                    </FormGroup>
+                    <Button color="primary" type="submit" disabled={loading}>
+                      {loading ? t('loading') : t('submit')}
+                    </Button>
+                  </form>
                 )}
-                <FormGroup className="mb-3">
-                  <Input
-                    type="email"
-                    id="gdpr-email"
-                    label={t('emailLabel')}
-                    placeholder={t('emailPlaceholder')}
-                    value={email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setEmail(e.target.value)
-                    }
-                    required
-                  />
-                </FormGroup>
-                <Button color="primary" type="submit" disabled={loading}>
-                  {loading ? t('loading') : t('submit')}
-                </Button>
-              </form>
-            </CardBody>
-          </Card>
+              </CardBody>
+            </Card>
+          )}
 
-          {/* ── Results ── */}
+          {/* ── Step 2 results (signed link landing) ── */}
+          {token && loading && (
+            <Alert color="info">
+              <Icon icon="it-info-circle" className="me-2" />
+              {t('loading')}
+            </Alert>
+          )}
+          {token && error && (
+            <Alert color="danger">
+              {error}
+              <div className="mt-3">
+                <Button color="primary" outline href={`/${locale}/privacy/my-data`}>
+                  {t('requestNew')}
+                </Button>
+              </div>
+            </Alert>
+          )}
+
           {results !== null && results.length === 0 && (
             <Alert color="info">
               <Icon icon="it-info-circle" className="me-2" />
