@@ -1967,6 +1967,10 @@
       "emailInvalid": "Zadejte platnou e-mailovou adresu",
       "submit": "Požádat o moje údaje",
       "loading": "Vyhledávání...",
+      "requestSubmittedTitle": "Check your inbox",
+      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
+      "linkInvalid": "This link is invalid or expired. Please request a new link.",
+      "requestNew": "Request a new link",
       "noData": "Pro tuto e-mailovou adresu nebyly nalezeny žádné údaje.",
       "error": "Došlo k chybě. Zkuste to prosím později.",
       "rateLimited": "Příliš mnoho požadavků. Zkuste to znovu za hodinu.",
@@ -1980,7 +1984,31 @@
       "fieldConsent": "Souhlas",
       "questionsTitle": "Otázky Q&A",
       "pollVotesTitle": "Hlasy v anketách",
-      "optionLabel": "Možnost"
+      "optionLabel": "Možnost",
+      "erasureCtaTitle": "Want to delete your data?",
+      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
+      "erasureCtaButton": "Request erasure"
+    },
+    "erasure": {
+      "title": "Erase your data",
+      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
+      "emailLabel": "Your email address",
+      "emailPlaceholder": "Enter the email used for registration",
+      "emailInvalid": "Please enter a valid email address",
+      "submit": "Request erasure",
+      "requestSubmittedTitle": "Check your inbox",
+      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
+      "linkInvalid": "This link is invalid or expired. Please request a new link.",
+      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
+      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
+      "confirmButton": "Confirm erasure",
+      "cancel": "Cancel",
+      "processing": "Deleting...",
+      "doneTitle": "Erasure completed",
+      "doneBody": "{count} registrations and the linked data have been deleted.",
+      "error": "An error occurred. Please try again later.",
+      "rateLimited": "Too many requests. Please try again in one hour.",
+      "back": "Back to my data"
     }
   },
   "legal": {
