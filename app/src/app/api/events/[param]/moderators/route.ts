@@ -19,7 +19,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
-import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
+import { encryptPII, encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { z } from 'zod';
 
@@ -70,7 +70,11 @@ export const GET = withErrorHandling(async (request, context) => {
   });
 
   return Response.json({
-    rows: rows.map((r) => ({ ...r, email: tryDecryptPII(r.email) })),
+    rows: rows.map((r) => ({
+      ...r,
+      name: tryDecryptPII(r.name) ?? r.name,
+      email: tryDecryptPII(r.email),
+    })),
   });
 });
 
@@ -102,7 +106,7 @@ export const POST = withErrorHandling(async (request, context) => {
   const created = await prisma.eventModerator.create({
     data: {
       eventId: event.id,
-      name: parsed.data.name,
+      name: encryptPII(parsed.data.name),
       email: encryptPIIOrNull(parsed.data.email),
       role: parsed.data.role ?? EventModeratorRole.MODERATOR,
       token: randomUUID(),
@@ -110,7 +114,11 @@ export const POST = withErrorHandling(async (request, context) => {
   });
 
   return Response.json(
-    { ...created, email: tryDecryptPII(created.email) },
+    {
+      ...created,
+      name: tryDecryptPII(created.name),
+      email: tryDecryptPII(created.email),
+    },
     { status: 201 },
   );
 });
