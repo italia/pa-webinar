@@ -1984,7 +1984,31 @@
       "fieldConsent": "Consenso",
       "questionsTitle": "Domande Q&A",
       "pollVotesTitle": "Voti sondaggi",
-      "optionLabel": "Opzione"
+      "optionLabel": "Opzione",
+      "erasureCtaTitle": "Vuoi cancellare i tuoi dati?",
+      "erasureCtaBody": "Puoi richiedere la cancellazione completa dei dati associati al tuo indirizzo email (GDPR Art. 17).",
+      "erasureCtaButton": "Richiedi cancellazione"
+    },
+    "erasure": {
+      "title": "Cancellazione dei tuoi dati",
+      "subtitle": "Conferma la cancellazione dei dati personali associati al tuo indirizzo email (GDPR Art. 17).",
+      "emailLabel": "Il tuo indirizzo email",
+      "emailPlaceholder": "Inserisci l'email usata per la registrazione",
+      "emailInvalid": "Inserisci un indirizzo email valido",
+      "submit": "Richiedi cancellazione",
+      "requestSubmittedTitle": "Controlla la tua casella email",
+      "requestSubmittedBody": "Se l'indirizzo email corrisponde a una registrazione, ti abbiamo inviato un link per confermare la cancellazione. Il link sarà valido per 1 ora.",
+      "linkInvalid": "Il link non è valido o è scaduto. Richiedi un nuovo link.",
+      "confirmWarning": "Stai per cancellare in modo definitivo tutti i dati personali associati al tuo indirizzo email.",
+      "confirmBody": "Verranno cancellate le registrazioni, le domande, i voti ai sondaggi, i feedback e i reminder. L'operazione è irreversibile.",
+      "confirmButton": "Conferma cancellazione",
+      "cancel": "Annulla",
+      "processing": "Cancellazione in corso...",
+      "doneTitle": "Cancellazione completata",
+      "doneBody": "Sono state cancellate {count} registrazioni e i dati collegati.",
+      "error": "Si è verificato un errore. Riprova più tardi.",
+      "rateLimited": "Troppe richieste. Riprova tra un'ora.",
+      "back": "Torna ai miei dati"
     }
   },
   "legal": {
