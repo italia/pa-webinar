@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -27,6 +28,12 @@ export const POST = withErrorHandling(async (request) => {
 
   const result = await prisma.event.deleteMany({
     where: { id: { in: parsed.data.ids } },
+  });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_BULK_DELETE',
+    details: { ids: parsed.data.ids, deleted: result.count },
   });
 
   return Response.json({ deleted: result.count });

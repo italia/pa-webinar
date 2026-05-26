@@ -14,6 +14,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -108,6 +109,13 @@ export const PATCH = withErrorHandling(async (request, context) => {
         recordingDuration: parsed.data.recordingDuration,
       }),
     },
+  });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_PUBLICATION_UPDATE',
+    target: updated.id,
+    details: { fields: Object.keys(parsed.data) },
   });
 
   return Response.json({
