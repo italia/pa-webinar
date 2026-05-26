@@ -89,15 +89,20 @@ export const GET = withErrorHandling(async (request) => {
     await Promise.allSettled(
       chunk.map(async (row) => {
         try {
-          // toAddress is stored encrypted; legacy rows may still be in
-          // plaintext, so tryDecryptPII handles both transparently.
+          // toAddress, html and text are stored encrypted; legacy
+          // rows may still be in plaintext, so tryDecryptPII handles
+          // both transparently. `subject` is plaintext by design (see
+          // enqueueEmail).
           const recipient = tryDecryptPII(row.to_address);
           if (!recipient) throw new Error('missing recipient');
+          const html = tryDecryptPII(row.html);
+          if (!html) throw new Error('missing html body');
+          const text = tryDecryptPII(row.text) ?? undefined;
           await sendEmail({
             to: recipient,
             subject: row.subject,
-            html: row.html,
-            text: row.text ?? undefined,
+            html,
+            text,
             attachments: Array.isArray(row.attachments)
               ? (row.attachments as Array<{
                   filename: string;

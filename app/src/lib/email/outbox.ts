@@ -31,15 +31,21 @@ export interface EnqueueEmailInput {
 }
 
 export async function enqueueEmail(input: EnqueueEmailInput): Promise<string> {
-  // toAddress is encrypted at rest so a database dump or admin SELECT
-  // doesn't leak the recipient list. The cron processor decrypts before
-  // handing the row to nodemailer.
+  // toAddress, html and text are encrypted at rest so a database dump
+  // or admin SELECT doesn't leak the recipient list, the personalized
+  // greeting, or magic-link tokens embedded in the body. The cron
+  // processor decrypts before handing the row to nodemailer.
+  //
+  // `subject` is intentionally left in plaintext: it's almost always
+  // just the event title (already public on the event page) and
+  // keeping it readable makes operational triage (DB queries, log
+  // scans, the FAILED row inspector in the admin panel) much easier.
   const row = await prisma.emailOutbox.create({
     data: {
       toAddress: encryptPII(input.to),
       subject: input.subject,
-      html: input.html,
-      text: input.text ?? null,
+      html: encryptPII(input.html),
+      text: input.text != null ? encryptPII(input.text) : null,
       attachments: input.attachments
         ? (input.attachments as unknown as Prisma.InputJsonValue)
         : Prisma.JsonNull,
