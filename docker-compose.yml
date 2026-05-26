@@ -26,7 +26,11 @@ services:
       - JITSI_JWT_APP_ID=eventi_dtd
       - JITSI_JWT_ISSUER=eventi-dtd
       - JITSI_JWT_AUDIENCE=jitsi
-      - APP_SECRET=change_me_in_production
+      # 64-char hex dummy — long enough to satisfy the runtime length
+      # check that fail-closes in NODE_ENV=production. NOT a secret:
+      # this value is shipped in the public docker-compose.yml and is
+      # for local dev / e2e only. Override in real deployments.
+      - APP_SECRET=dev_dev_dev_dev_dev_dev_dev_dev_dev_dev_dev_dev_dev_dev_dev_x
       - SMTP_HOST=mailpit
       - SMTP_PORT=1025
       - SMTP_SECURE=false
