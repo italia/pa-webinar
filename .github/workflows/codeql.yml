@@ -1,3 +1,11 @@
+# CodeQL SAST scan.
+#
+# Requires "Code scanning" to be enabled under Settings → Security
+# → Code security and analysis. The action errors out with
+#   "Advanced Security must be enabled for this repository"
+# until that toggle is on. For public repos the feature is free —
+# just needs the org/repo owner to flip the switch.
+#
 name: CodeQL
 
 on:
