@@ -75,6 +75,7 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
     'Content-Security-Policy',
     [
       "default-src 'self'",
+      "frame-ancestors 'none'",
       // Also allow YouTube for the public video-library embed (legacy
       // events host their recordings on youtube.com before we owned
       // Jibri infra). img-src mirrors this so YT preview thumbs load.
