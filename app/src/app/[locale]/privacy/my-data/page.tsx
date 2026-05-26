@@ -7,6 +7,7 @@ import {
   type FormEvent,
 } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
   Button,
@@ -157,6 +158,7 @@ export default function MyDataPage() {
 
           {/* ── Step 1 form (only when no token in URL) ── */}
           {!token && (
+            <>
             <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
               <CardBody className="p-4">
                 {submitted ? (
@@ -191,6 +193,25 @@ export default function MyDataPage() {
                 )}
               </CardBody>
             </Card>
+
+            {/* GDPR Art. 17 — erasure CTA. Routes to the dedicated
+                request page; the email link then lands on
+                /privacy/my-data/erasure to confirm. */}
+            <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
+              <CardBody className="p-4">
+                <h2 className="h5 mb-2">{t('erasureCtaTitle')}</h2>
+                <p className="text-muted mb-3" style={{ fontSize: '0.95rem' }}>
+                  {t('erasureCtaBody')}
+                </p>
+                <Link
+                  className="btn btn-outline-danger"
+                  href={`/${locale}/privacy/my-data/erasure`}
+                >
+                  {t('erasureCtaButton')}
+                </Link>
+              </CardBody>
+            </Card>
+            </>
           )}
 
           {/* ── Step 2 results (signed link landing) ── */}
