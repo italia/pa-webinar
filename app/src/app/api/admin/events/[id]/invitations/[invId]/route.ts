@@ -10,6 +10,8 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
+import { encryptPII, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 
@@ -51,14 +53,26 @@ export const PATCH = withErrorHandling(async (request, context) => {
   }
 
   const data: Record<string, unknown> = { ...parsed.data };
-  if (typeof data.email === 'string') data.email = data.email.trim().toLowerCase();
+  if (typeof data.email === 'string') {
+    const emailNorm = (data.email as string).trim().toLowerCase();
+    data.email = encryptPII(emailNorm);
+    data.emailHash = hashEmail(emailNorm);
+  }
 
   try {
     const updated = await prisma.eventInvitation.update({
       where: { id: invId },
       data,
     });
-    return Response.json(updated);
+
+    await logAdminAction({
+      request,
+      action: 'EVENT_INVITATION_UPDATE',
+      target: updated.id,
+      details: { fields: Object.keys(parsed.data) },
+    });
+
+    return Response.json({ ...updated, email: tryDecryptPII(updated.email) });
   } catch (e: unknown) {
     if (typeof e === 'object' && e && 'code' in e && (e as { code: string }).code === 'P2002') {
       throw new AppError('Another invitation for this event already uses that email', 409, 'CONFLICT');
@@ -67,11 +81,18 @@ export const PATCH = withErrorHandling(async (request, context) => {
   }
 });
 
-export const DELETE = withErrorHandling(async (_request, context) => {
+export const DELETE = withErrorHandling(async (request, context) => {
   if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
   const { id, invId } = await context.params;
   await requireBelongs(id, invId);
 
   await prisma.eventInvitation.delete({ where: { id: invId } });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_INVITATION_DELETE',
+    target: invId,
+  });
+
   return Response.json({ deleted: true, id: invId });
 });

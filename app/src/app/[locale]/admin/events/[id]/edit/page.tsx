@@ -186,7 +186,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     invitations: event.invitations.map((i) => ({
       id: i.id,
       name: i.name,
-      email: i.email,
+      email: tryDecryptPII(i.email) ?? '',
       role: i.role as 'GUEST' | 'SPEAKER',
       personId: i.personId,
     })),

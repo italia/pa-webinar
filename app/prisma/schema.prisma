@@ -314,7 +314,17 @@ model EventInvitation {
 
   role  EventInvitationRole @default(GUEST)
   name  String?             @db.VarChar(200)
-  email String              @db.VarChar(200)
+  // `email` is encrypted (AES-256-GCM, base64) on new rows; legacy
+  // rows may still hold plaintext until they are rewritten. The
+  // (200 → 500) bump leaves room for the ciphertext.
+  email String              @db.VarChar(500)
+  // Deterministic HMAC-SHA256 hex of the normalized email — populated
+  // alongside the ciphertext so we keep the per-event uniqueness
+  // guarantee (the random IV in `email` makes that column useless for
+  // it). NULL for legacy plaintext rows; uniqueness on this column
+  // applies only to non-NULL values, which is what Postgres does by
+  // default.
+  emailHash String? @map("email_hash") @db.VarChar(64)
 
   // Magic-link token for the pre-filled registration page. Generated
   // server-side before the invitation email goes out; null until then
@@ -332,6 +342,7 @@ model EventInvitation {
   person Person? @relation(fields: [personId], references: [id], onDelete: SetNull)
 
   @@unique([eventId, email], map: "event_invitations_event_email_ux")
+  @@unique([eventId, emailHash])
   @@index([eventId])
   @@index([personId])
   @@map("event_invitations")
