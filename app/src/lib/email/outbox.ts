@@ -9,6 +9,7 @@
 
 import { Prisma } from '@prisma/client';
 
+import { encryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 
 export interface EnqueueEmailInput {
@@ -30,9 +31,12 @@ export interface EnqueueEmailInput {
 }
 
 export async function enqueueEmail(input: EnqueueEmailInput): Promise<string> {
+  // toAddress is encrypted at rest so a database dump or admin SELECT
+  // doesn't leak the recipient list. The cron processor decrypts before
+  // handing the row to nodemailer.
   const row = await prisma.emailOutbox.create({
     data: {
-      toAddress: input.to,
+      toAddress: encryptPII(input.to),
       subject: input.subject,
       html: input.html,
       text: input.text ?? null,
