@@ -23,7 +23,8 @@
   "overrides": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@xmldom/xmldom": "^0.9.10"
+    "@xmldom/xmldom": "^0.9.10",
+    "fast-xml-builder": "^1.2.0"
   },
   "engines": {
     "node": ">=20.0.0",
