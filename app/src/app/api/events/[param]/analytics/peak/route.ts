@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError } from '@/lib/errors';
+import { extractModeratorToken } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,7 @@ function eventWhereClause(param: string) {
 
 export const GET = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
-  const token = request.nextUrl.searchParams.get('token');
+  const token = extractModeratorToken(request);
   if (!token) {
     throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
   }
