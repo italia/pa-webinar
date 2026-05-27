@@ -1,0 +1,7 @@
+Contact: mailto:segreteria.trasformazionedigitale@governo.it
+Expires: 2027-12-31T23:59:59.000Z
+Encryption: https://eventi-dtd.gov.it/pgp-key.txt
+Policy: https://github.com/italia/eventi-dtd/blob/main/SECURITY.md
+Acknowledgments: https://github.com/italia/eventi-dtd/blob/main/SECURITY.md#acknowledgments
+Preferred-Languages: it, en
+Canonical: https://videocall-test.innovazione.gov.it/.well-known/security.txt

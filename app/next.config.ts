@@ -8,6 +8,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // Don't advertise the framework in the response header — minor
+  // information disclosure removed.
+  poweredByHeader: false,
+
   sassOptions: {
     includePaths: [
       path.join(__dirname, 'node_modules'),
