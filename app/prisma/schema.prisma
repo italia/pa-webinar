@@ -190,21 +190,42 @@ model Event {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  registrations    Registration[]
-  questions        Question[]
-  polls            Poll[]
-  materials        EventMaterial[]
-  reminders        EventReminder[]
-  gdprAuditLogs    GdprAuditLog[]
-  feedback         EventFeedback[]
-  wordCloudRounds  WordCloudRound[]
-  callSessions     CallSession[]
-  additionalMods   EventModerator[]
-  organizers       EventOrganizer[]
-  invitations      EventInvitation[]
-  tagLinks         EventTagLink[]
-  chatMessages     ChatMessage[]
-  questionnaires   EventQuestionnaire[]
+  registrations   Registration[]
+  questions       Question[]
+  polls           Poll[]
+  materials       EventMaterial[]
+  reminders       EventReminder[]
+  gdprAuditLogs   GdprAuditLog[]
+  feedback        EventFeedback[]
+  wordCloudRounds WordCloudRound[]
+  callSessions    CallSession[]
+  additionalMods  EventModerator[]
+  organizers      EventOrganizer[]
+  invitations     EventInvitation[]
+  tagLinks        EventTagLink[]
+  chatMessages    ChatMessage[]
+  questionnaires  EventQuestionnaire[]
+  recordings      Recording[]
+
+  // ── Postprod AI feature flags (per-event) ─────────────────────
+  // When true, the postprod pipeline produces a transcript / summary /
+  // translations for the recording of this event. Off by default — the
+  // admin opts in explicitly in the wizard step 5. The participant
+  // disclosure text on the waiting room is driven from SiteSetting
+  // (so the same notice can be edited PA-wide). Voice cloning is NOT
+  // exposed here; that flow is V4 and gated by a separate workflow.
+  aiTranscriptEnabled  Boolean @default(false) @map("ai_transcript_enabled")
+  aiSummaryEnabled     Boolean @default(false) @map("ai_summary_enabled")
+  aiTranslationEnabled Boolean @default(false) @map("ai_translation_enabled")
+  // Dubbing TTS neutro nelle lingue target. Off di default — la voce
+  // sintetica richiede disclosure prominente (AI Act Art. 50) anche se
+  // non è voice clone. Generata SOLO se aiTranslationEnabled è true
+  // (serve il transcript tradotto come input).
+  aiDubbingEnabled     Boolean @default(false) @map("ai_dubbing_enabled")
+  // Comma-separated ISO-639-1 list of target languages for transcript /
+  // summary translation (e.g. "en,fr"). When null, falls back to
+  // SiteSetting.aiDefaultTargetLocales.
+  aiTargetLocales      String? @map("ai_target_locales") @db.VarChar(200)
 
   // FK lookup index: "what events use this GDPR template" / cascade
   // SetNull on template delete.
@@ -238,7 +259,7 @@ enum EventModeratorRole {
 }
 
 model EventModerator {
-  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   eventId String @map("event_id") @db.Uuid
 
   name  String
@@ -271,12 +292,12 @@ model EventModerator {
 // role) and from the legacy `Event.organizerName` single-string
 // column (which we keep as a fallback for older events).
 model EventOrganizer {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  eventId     String   @map("event_id") @db.Uuid
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId String @map("event_id") @db.Uuid
 
-  name        String   @db.VarChar(200)
-  logoUrl     String?  @map("logo_url")
-  websiteUrl  String?  @map("website_url")
+  name       String  @db.VarChar(200)
+  logoUrl    String? @map("logo_url")
+  websiteUrl String? @map("website_url")
 
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
@@ -308,23 +329,23 @@ enum EventInvitationRole {
 }
 
 model EventInvitation {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  eventId  String @map("event_id") @db.Uuid
+  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId  String  @map("event_id") @db.Uuid
   personId String? @map("person_id") @db.Uuid
 
-  role  EventInvitationRole @default(GUEST)
-  name  String?             @db.VarChar(200)
+  role      EventInvitationRole @default(GUEST)
+  name      String?             @db.VarChar(200)
   // `email` is encrypted (AES-256-GCM, base64) on new rows; legacy
   // rows may still hold plaintext until they are rewritten. The
   // (200 → 500) bump leaves room for the ciphertext.
-  email String              @db.VarChar(500)
+  email     String              @db.VarChar(500)
   // Deterministic HMAC-SHA256 hex of the normalized email — populated
   // alongside the ciphertext so we keep the per-event uniqueness
   // guarantee (the random IV in `email` makes that column useless for
   // it). NULL for legacy plaintext rows; uniqueness on this column
   // applies only to non-NULL values, which is what Postgres does by
   // default.
-  emailHash String? @map("email_hash") @db.VarChar(64)
+  emailHash String?             @map("email_hash") @db.VarChar(64)
 
   // Magic-link token for the pre-filled registration page. Generated
   // server-side before the invitation email goes out; null until then
@@ -354,11 +375,11 @@ model EventInvitation {
 // "Transizione Digitale"). Shown as small colored badges on the event
 // card and used as a facet on the public /eventi list.
 model Tag {
-  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  slug      String @unique @db.VarChar(100)
-  name      Json   @default("{}") @db.JsonB
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug      String  @unique @db.VarChar(100)
+  name      Json    @default("{}") @db.JsonB
   color     String? @db.VarChar(10)
-  sortOrder Int    @default(0) @map("sort_order")
+  sortOrder Int     @default(0) @map("sort_order")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -426,8 +447,8 @@ model EmailTemplate {
 // and PUBLISHes on `chat:<eventId>`; SSE subscribers on any pod
 // re-emit to their connected clients).
 model ChatMessage {
-  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  eventId   String  @map("event_id") @db.Uuid
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId String @map("event_id") @db.Uuid
 
   // Who sent it. We intentionally denormalize the sender's display
   // name — participant display names are mutable in Jitsi pre-join,
@@ -438,11 +459,11 @@ model ChatMessage {
   // src/lib/crypto/pii.ts). Reads must go through tryDecryptPII to
   // tolerate any pre-encryption legacy rows. Column type stays
   // String so no migration is required; ciphertext is base64.
-  senderName String @map("sender_name")
+  senderName  String  @map("sender_name")
   // Matches the participant's JWT uniqueId (mod-xxx / reg-xxx /
   // guest-xxx), so we can cluster messages by author for AI summary
   // even after display-name changes.
-  senderId   String @map("sender_id")
+  senderId    String  @map("sender_id")
   // true when the caller authenticated via the moderator magic link.
   // Used by the UI to style moderator messages differently and by
   // moderation actions to prevent partecipanti from deleting others.
@@ -457,8 +478,8 @@ model ChatMessage {
   // Soft-delete flag: moderator/admin can hide a message without
   // losing the audit trail. Hidden messages are excluded from
   // /history but kept in the archive for compliance.
-  hiddenAt  DateTime? @map("hidden_at")
-  hiddenBy  String?   @map("hidden_by")
+  hiddenAt DateTime? @map("hidden_at")
+  hiddenBy String?   @map("hidden_by")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -569,9 +590,21 @@ model Registration {
   // registrations without consent leave this null. See ADR-011.
   personId String? @map("person_id") @db.Uuid
 
+  // ── AI postprod consent (Art. 6.1.a granular) ─────────────────
+  // Three independent opt-ins surfaced in the waiting room when the
+  // event has the corresponding `Event.ai*Enabled` flag on. Default
+  // null = "not asked yet" (a registration created before the flag
+  // existed); the live page treats null as "not consented" and
+  // surfaces the prompt at join time. The pipeline filters
+  // participant-level artifacts (chunked transcript lines etc.) by
+  // checking these flags via the speaker → registration mapping.
+  aiConsentTranscript  Boolean? @map("ai_consent_transcript")
+  aiConsentSummary     Boolean? @map("ai_consent_summary")
+  aiConsentTranslation Boolean? @map("ai_consent_translation")
+
   // Relations
-  event                  Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  person                 Person?                  @relation(fields: [personId], references: [id], onDelete: SetNull)
+  event                  Event                   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  person                 Person?                 @relation(fields: [personId], references: [id], onDelete: SetNull)
   questions              Question[]
   upvotes                QuestionUpvote[]
   pollVotes              PollVote[]
@@ -606,8 +639,8 @@ model Question {
   answeredAt    DateTime? @map("answered_at")
 
   // Relations
-  event        Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  registration Registration?     @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  event        Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration Registration?    @relation(fields: [registrationId], references: [id], onDelete: Cascade)
   upvotes      QuestionUpvote[]
 
   @@index([eventId, status, upvoteCount(sort: Desc)])
@@ -772,12 +805,12 @@ model GdprAuditLog {
 // cosa e quando".
 
 model AdminAuditLog {
-  id        String @id @default(uuid()) @db.Uuid
+  id        String  @id @default(uuid()) @db.Uuid
   // Hashed admin identifier. The current admin auth has no per-user
   // accounts (single shared ADMIN_API_KEY), so this is always a short
   // anonymous tag for now; if/when per-admin sessions land, swap in
   // the user id and the rest of the model still applies.
-  actorHash String @map("actor_hash")
+  actorHash String  @map("actor_hash")
   action    String // EVENT_CREATE, EVENT_UPDATE, EVENT_DELETE, RECORDING_DELETE, ...
   target    String? // free-form target identifier (event id, recording id, ...)
   ip        String?
@@ -924,11 +957,11 @@ model SiteSetting {
   // Default calibrati su Azure F16s_v2 (16 vCPU / 32 GiB) con pod
   // requests=14 core. Per nodo più piccolo/grande l'admin aggiorna qui
   // — non serve redeploy.
-  jvbCpuCoresPerPod    Int   @default(16)    @map("jvb_cpu_cores_per_pod")
-  jvbReceiversPerCore  Float @default(18.75) @map("jvb_receivers_per_core")
-  jvbSendersPerCore    Float @default(3.125) @map("jvb_senders_per_core")
-  jvbMaxReplicas       Int   @default(6)     @map("jvb_max_replicas")
-  jibriCpuCoresPerPod  Int   @default(4)     @map("jibri_cpu_cores_per_pod")
+  jvbCpuCoresPerPod   Int   @default(16) @map("jvb_cpu_cores_per_pod")
+  jvbReceiversPerCore Float @default(18.75) @map("jvb_receivers_per_core")
+  jvbSendersPerCore   Float @default(3.125) @map("jvb_senders_per_core")
+  jvbMaxReplicas      Int   @default(6) @map("jvb_max_replicas")
+  jibriCpuCoresPerPod Int   @default(4) @map("jibri_cpu_cores_per_pod")
 
   // Frazione di partecipanti attesa come "sender" (mic o webcam attivi)
   // quando l'evento non ne specifica una. 30% è un buon default per
@@ -942,6 +975,44 @@ model SiteSetting {
   //   N>0  → grace di N min, poi cleanup chiude la call
   //   -1   → non chiudere automaticamente, lascia al cleanup di inattività
   eventGracePeriodMinutes Int @default(15) @map("event_grace_period_minutes")
+
+  // ── Postprod AI pipeline ──────────────────────────────────────
+  // Master kill-switch: when false, the orchestrator skips creating
+  // worker Jobs even if events have aiTranscriptEnabled=true (so an
+  // operator can pause the pipeline cluster-wide without rolling out
+  // a code change).
+  aiPipelineEnabled       Boolean @default(false) @map("ai_pipeline_enabled")
+  // Default target locales for translation when Event.aiTargetLocales
+  // is null. Comma-separated ISO-639-1.
+  aiDefaultTargetLocales  String  @default("en,fr") @map("ai_default_target_locales")
+  // Provider routing — "vllm" or "ovh" (pluggable). The actual
+  // endpoint URLs / secrets live in env vars (see lib/ai/providers).
+  aiLlmProvider           String  @default("vllm") @map("ai_llm_provider")
+  aiAsrProvider           String  @default("whisperx") @map("ai_asr_provider")
+  // TTS engine per dubbing in lingue target. In-cluster only.
+  //   "piper" → rhasspy/piper (MIT, ONNX, voci pre-trained per IT/EN/
+  //             FR/DE/ES, ~8MB per voce, qualità adeguata per dubbing
+  //             accessibility/operativo). Vendor: progetto OSS
+  //             Mike Hansen (Rhasspy team).
+  // Provider non-commerciali (Coqui XTTS-v2 CPML, Bark non-commercial)
+  // sono esplicitamente esclusi dal default per uso PA.
+  aiTtsEngine             String  @default("piper") @map("ai_tts_engine")
+  // Max parallel worker Jobs the orchestrator will keep running on
+  // the GPU node pool. Per-tick cap; total queue may be larger.
+  aiMaxConcurrentJobs     Int     @default(2) @map("ai_max_concurrent_jobs")
+  // How long an unclaimed PostprodJob can wait before the
+  // orchestrator marks it FAILED (after attempts cap). Defaults align
+  // with EmailOutbox backoff.
+  aiJobMaxAttempts        Int     @default(5) @map("ai_job_max_attempts")
+  // Retention for postprod artifacts (transcripts, summary, subtitles)
+  // expressed in days from creation. 0 = follow the event retention
+  // (default — artifacts vanish with the event). >0 = override (e.g.
+  // 730 for "verbale come atto pubblico").
+  aiArtifactRetentionDays Int     @default(0) @map("ai_artifact_retention_days")
+  // Multilingual disclosure text shown on the waiting room when an
+  // event opts into AI postprod. JSONB so editable per-locale.
+  // Default empty → frontend falls back to a generic i18n string.
+  aiConsentDisclosure     Json    @default("{}") @map("ai_consent_disclosure") @db.JsonB
 
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -965,9 +1036,9 @@ model SiteSetting {
 //   ignore     — operator chose to keep; never auto-deleted
 //   delete-now — operator chose to delete immediately on next sweep
 model OrphanRecording {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  blobName     String   @unique @map("blob_name")
-  sizeBytes    BigInt?  @map("size_bytes")
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  blobName     String    @unique @map("blob_name")
+  sizeBytes    BigInt?   @map("size_bytes")
   // The three timestamps below were created by the original migration
   // without a precision suffix, which Postgres treats as `timestamp` (=
   // `timestamp(6)`). Pin the precision in schema so `prisma migrate diff`
@@ -975,8 +1046,8 @@ model OrphanRecording {
   lastModified DateTime? @map("last_modified") @db.Timestamp(6)
   discoveredAt DateTime  @default(now()) @map("discovered_at") @db.Timestamp(6)
   lastSeenAt   DateTime  @default(now()) @map("last_seen_at") @db.Timestamp(6)
-  decision     String   @default("pending") // pending | ignore | delete-now
-  note         String?  @db.Text
+  decision     String    @default("pending") // pending | ignore | delete-now
+  note         String?   @db.Text
 
   @@index([decision])
   @@index([discoveredAt])
@@ -1067,7 +1138,8 @@ model CallSession {
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  recording Recording?
 
   @@index([eventId])
   @@map("call_sessions")
@@ -1119,7 +1191,7 @@ model QuestionTemplate {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  items         QuestionItem[]
+  items          QuestionItem[]
   questionnaires QuestionnaireTemplateLink[]
 
   @@map("question_templates")
@@ -1158,8 +1230,8 @@ model QuestionItem {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  template      QuestionTemplate?    @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  questionnaire EventQuestionnaire?  @relation("AdhocItems", fields: [questionnaireId], references: [id], onDelete: Cascade)
+  template      QuestionTemplate?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  questionnaire EventQuestionnaire?   @relation("AdhocItems", fields: [questionnaireId], references: [id], onDelete: Cascade)
   answers       QuestionnaireAnswer[]
 
   @@index([templateId, sortOrder])
@@ -1168,8 +1240,8 @@ model QuestionItem {
 }
 
 model EventQuestionnaire {
-  id       String                 @id @default(uuid()) @db.Uuid
-  eventId  String                 @map("event_id") @db.Uuid
+  id        String                 @id @default(uuid()) @db.Uuid
+  eventId   String                 @map("event_id") @db.Uuid
   placement QuestionnairePlacement
 
   // Multilingual header text shown above the questionnaire.
@@ -1189,10 +1261,10 @@ model EventQuestionnaire {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  event       Event                       @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  templates   QuestionnaireTemplateLink[]
-  adhocItems  QuestionItem[]              @relation("AdhocItems")
-  responses   QuestionnaireResponse[]
+  event      Event                       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  templates  QuestionnaireTemplateLink[]
+  adhocItems QuestionItem[]              @relation("AdhocItems")
+  responses  QuestionnaireResponse[]
 
   // At most one pre-registration questionnaire and one post-event
   // questionnaire per event (the form UI enforces this too).
@@ -1227,7 +1299,7 @@ model QuestionnaireResponse {
   // respondents this duplicates Registration fields — useful for dashboards
   // that survive the cascade when a registration is GDPR-cleaned up before
   // the questionnaire response itself is purged.
-  respondentName  String? @map("respondent_name")
+  respondentName      String? @map("respondent_name")
   respondentEmailHash String? @map("respondent_email_hash")
 
   submittedAt DateTime @default(now()) @map("submitted_at")
@@ -1314,6 +1386,7 @@ model Person {
 
   registrations Registration[]
   invitations   EventInvitation[]
+  speakers      Speaker[]
 
   @@index([optedInToAddressBook, lastActiveAt])
   @@map("persons")
@@ -1346,20 +1419,20 @@ model EmailOutbox {
   // src/lib/crypto/pii.ts. `subject` is plaintext on purpose (event
   // title, already public). Prisma `String` with no length modifier
   // maps to PostgreSQL `text`, which fits arbitrary ciphertext.
-  toAddress String @map("to_address")
-  subject   String
-  html      String
-  text      String?
+  toAddress   String  @map("to_address")
+  subject     String
+  html        String
+  text        String?
   // Array of { filename, contentBase64, contentType } — base64 so we
   // don't have to worry about binary encoding in JSONB.
-  attachments Json? @db.JsonB
+  attachments Json?   @db.JsonB
 
   // Scheduling
-  status         EmailOutboxStatus @default(PENDING)
-  attempts       Int               @default(0)
-  nextAttemptAt  DateTime          @default(now()) @map("next_attempt_at")
-  sentAt         DateTime?         @map("sent_at")
-  lastError      String?           @map("last_error")
+  status        EmailOutboxStatus @default(PENDING)
+  attempts      Int               @default(0)
+  nextAttemptAt DateTime          @default(now()) @map("next_attempt_at")
+  sentAt        DateTime?         @map("sent_at")
+  lastError     String?           @map("last_error")
 
   // Free-form metadata for traceability — e.g. { kind: 'confirmation',
   // registrationId, eventId }. Not used by the processor; the producer
@@ -1372,4 +1445,241 @@ model EmailOutbox {
   // Processor query: PENDING rows ready to be sent, oldest first.
   @@index([status, nextAttemptAt])
   @@map("email_outbox")
+}
+
+// ─── Postprod AI pipeline ───────────────────────────────────
+//
+// Adds a post-production lifecycle on top of the existing Jibri
+// recording flow: transcription (WhisperX + pyannote), summary
+// (LLM), translation, subtitles (WebVTT), and — in a separate
+// gated workflow not modelled here — voice-cloned dubbing (Art. 9
+// GDPR, intentionally absent from MVP/V1).
+//
+// Design notes:
+//   • Anchored to `CallSession` (1:1) rather than `Event`, since
+//     `CallSession` is already the timeline source-of-truth.
+//   • Job-queue uses the Postgres outbox pattern (claim with FOR
+//     UPDATE SKIP LOCKED), mirroring `EmailOutbox`. No Redis stream
+//     or external workflow engine.
+//   • One row per produced blob in `PostprodArtifact`; multilingual
+//     fan-out is `(type, language)` rather than columns-per-language.
+//   • `Speaker` carries the diarization → identity mapping. Voice
+//     embeddings (Art. 9) are deliberately NOT stored here.
+
+enum RecordingStatus {
+  READY
+  POSTPROD_QUEUED
+  POSTPROD_RUNNING
+  POSTPROD_PARTIAL
+  POSTPROD_DONE
+  POSTPROD_FAILED
+  ARCHIVED
+}
+
+enum PostprodJobKind {
+  TRANSCRIBE
+  SUMMARIZE
+  TRANSLATE
+  SUBTITLE
+  // Dubbing TTS in lingua target: TTS *neutro* (voce sintetica non
+  // clonata) sul transcript tradotto. Produce un file audio per
+  // lingua + (V2) un MP4 con audio sostituito. Marker AI Act Art. 50
+  // applicato a tutti gli artefatti DUB.
+  DUB
+}
+
+enum PostprodJobStatus {
+  PENDING
+  CLAIMED
+  RUNNING
+  DONE
+  FAILED
+}
+
+enum PostprodArtifactType {
+  TRANSCRIPT_JSON
+  TRANSCRIPT_VTT
+  TRANSCRIPT_TXT
+  SUMMARY_MD
+  SUBTITLE_VTT
+  TRANSLATION_VTT
+  TRANSLATION_MD
+  // Audio sintetico (TTS neutro) per lingua target. AAC encoded,
+  // stesso minutaggio del video originale (segmenti TTS-aligned con
+  // i timestamp del transcript). Player lo carica come traccia
+  // alternativa via <audio src=...> con sync manuale (V1) o HLS
+  // multi-track (V2).
+  DUBBED_AUDIO
+  // (V2) MP4 con audio originale sostituito da DUBBED_AUDIO. Utile
+  // per download offline. Non prodotto in MVP per evitare ridondanza
+  // storage.
+  DUBBED_VIDEO
+}
+
+model Recording {
+  id            String @id @default(uuid()) @db.Uuid
+  // 1:1 with CallSession. Recording rows live longer than the call
+  // (artifacts may outlive the session row depending on retention).
+  callSessionId String @unique @map("call_session_id") @db.Uuid
+  eventId       String @map("event_id") @db.Uuid
+
+  // Reference to the source MP4 in object storage (provider-agnostic
+  // key, NOT a signed URL). Resolved through StorageProvider at read
+  // time. Denormalised from CallSession.recordingFilename for the
+  // common case "load Recording without joining CallSession".
+  blobKey        String  @map("blob_key")
+  durationSec    Int?    @map("duration_sec")
+  fileSizeBytes  BigInt? @map("file_size_bytes")
+  // Source language hint passed to ASR (`it` by default). Can be null
+  // if the admin doesn't know; the worker will let WhisperX detect.
+  sourceLanguage String? @map("source_language") @db.VarChar(8)
+
+  status RecordingStatus @default(READY)
+
+  // Snapshot of consent flags at enqueue time, so a retroactive change
+  // on Event.* doesn't silently invalidate already-produced artifacts.
+  consentSnapshot Json @default("{}") @map("consent_snapshot") @db.JsonB
+
+  // Run counter — incremented every time the orchestrator re-enqueues
+  // the full pipeline (manual retry from admin UI). Used in the
+  // storage path so old runs survive until retention.
+  runCount Int @default(1) @map("run_count")
+
+  // Retention: when set, artifacts beyond this date are purged by the
+  // postprod-retention cron. Null = follow event retention.
+  retentionUntil DateTime? @map("retention_until")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  callSession CallSession        @relation(fields: [callSessionId], references: [id], onDelete: Cascade)
+  event       Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  jobs        PostprodJob[]
+  artifacts   PostprodArtifact[]
+  speakers    Speaker[]
+
+  @@index([eventId])
+  @@index([status])
+  @@map("recordings")
+}
+
+model PostprodJob {
+  id          String @id @default(uuid()) @db.Uuid
+  recordingId String @map("recording_id") @db.Uuid
+
+  kind    PostprodJobKind
+  // Free-form params validated by lib/ai Zod schemas at enqueue +
+  // claim time. Shape varies by `kind`:
+  //   TRANSCRIBE: { runId, sourceLanguage?, model?: 'large-v3' }
+  //   SUMMARIZE:  { runId, sourceLanguage, transcriptArtifactId }
+  //   TRANSLATE:  { runId, sourceLanguage, targetLanguage,
+  //                 transcriptArtifactId, summaryArtifactId? }
+  //   SUBTITLE:   { runId, language, transcriptArtifactId }
+  payload Json            @db.JsonB
+
+  status        PostprodJobStatus @default(PENDING)
+  attempts      Int               @default(0)
+  nextAttemptAt DateTime          @default(now()) @map("next_attempt_at")
+
+  // Lease bookkeeping (mirrors EmailOutbox). When CLAIMED but
+  // next_attempt_at expires, the orchestrator reclaims it on next tick.
+  leasedAt DateTime? @map("leased_at")
+  leasedBy String?   @map("leased_by") // worker pod name
+
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  lastError   String?   @map("last_error") @db.Text
+
+  // Deterministic key so retries / webhook re-deliveries don't enqueue
+  // duplicates. Built as sha256(recordingId|kind|canonical(payload)).
+  idempotencyKey String @unique @map("idempotency_key")
+
+  // Optional FK to a precursor: SUMMARIZE depends on TRANSCRIBE
+  // completing. Used by the orchestrator's "ready jobs" query.
+  dependsOnId String? @map("depends_on_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  recording  Recording          @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  dependsOn  PostprodJob?       @relation("PostprodJobDeps", fields: [dependsOnId], references: [id], onDelete: SetNull)
+  dependents PostprodJob[]      @relation("PostprodJobDeps")
+  artifacts  PostprodArtifact[]
+
+  @@index([status, nextAttemptAt])
+  @@index([recordingId])
+  @@map("postprod_jobs")
+}
+
+model PostprodArtifact {
+  id          String @id @default(uuid()) @db.Uuid
+  recordingId String @map("recording_id") @db.Uuid
+  jobId       String @map("job_id") @db.Uuid
+
+  type     PostprodArtifactType
+  // ISO-639-1 — null for type-agnostic artifacts (TRANSCRIPT_JSON
+  // which holds the multi-language raw output isn't expected today;
+  // we still keep this nullable to leave space).
+  language String?              @db.VarChar(8)
+
+  // Provider-agnostic key in object storage.
+  blobKey   String  @map("blob_key")
+  sizeBytes BigInt? @map("size_bytes")
+  mimeType  String  @map("mime_type")
+
+  // Small artifacts (transcript text < 64KB, summary md) may be
+  // mirrored inline for cheap render. AES-256-GCM via encryptPII
+  // (PII surface: contains participant names + speech).
+  inlineBody String? @map("inline_body") @db.Text
+
+  // Hash for cache invalidation + integrity check.
+  contentHash String @map("content_hash") @db.VarChar(64)
+
+  // AI Act Art. 50 — anything produced by an AI pipeline is flagged
+  // synthetic, even if "just" a transcription. The UI uses this to
+  // render the "AI-generated" badge.
+  isSynthetic   Boolean @default(true) @map("is_synthetic")
+  watermarkType String? @map("watermark_type") // null | "audioseal" (V3)
+
+  // Provenance for traceability: which model + version produced this.
+  modelId      String? @map("model_id") @db.VarChar(120)
+  modelVersion String? @map("model_version") @db.VarChar(80)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  recording Recording   @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  job       PostprodJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  // One (type, language) per recording — newer runs replace older.
+  @@unique([recordingId, type, language])
+  @@index([recordingId])
+  @@map("postprod_artifacts")
+}
+
+model Speaker {
+  id          String @id @default(uuid()) @db.Uuid
+  recordingId String @map("recording_id") @db.Uuid
+
+  // Diarization output label, e.g. "SPEAKER_00". Stable inside a
+  // single recording; not portable across recordings.
+  diarLabel String @map("diar_label") @db.VarChar(40)
+
+  // Manual mapping target. Either a Person from the rubrica or a free-
+  // text display name (e.g. an external guest never in rubrica).
+  displayName String?
+  personId    String? @map("person_id") @db.Uuid
+
+  // Total speaking time in seconds (denormalised from transcript).
+  // Convenient for the admin UI ranking.
+  totalSpeechSec Int @default(0) @map("total_speech_sec")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  recording Recording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  person    Person?   @relation(fields: [personId], references: [id], onDelete: SetNull)
+
+  @@unique([recordingId, diarLabel])
+  @@index([personId])
+  @@map("speakers")
 }

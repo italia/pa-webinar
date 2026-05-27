@@ -40,6 +40,10 @@ const SERVICE_ICONS: Record<string, string> = {
   storage: 'M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z',
   globe: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z',
   server: 'M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zm0-10H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1z',
+  // Chip + sparkle: rappresenta la GPU/AI compute. Path stilizzato
+  // di un microprocessore con tre stelline ai lati per richiamare il
+  // tema "AI generativa".
+  postprod: 'M6 4h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2zm2 4v8h8V8H8zm-6 2h2v4H2v-4zm18 0h2v4h-2v-4zM10 2h4v2h-4V2zm0 18h4v2h-4v-2zM20 6l1.5-1.5L23 6l-1.5 1.5L20 6zM3 18l1-1 1 1-1 1-1-1z',
 };
 
 interface Pos { x: number; y: number }
@@ -60,13 +64,17 @@ const LAYOUT: Record<string, Pos> = {
   // terminates at database.
   redis:       { x: 320, y: 430 },
   jibri:       { x: 680, y: 430 },
+  // Sotto jibri: la pipeline AI consuma le registrazioni che jibri
+  // produce. Linea verticale jibri→postprod dà subito al lettore la
+  // semantica del flusso (recording → trascrizione/sintesi).
+  postprod:    { x: 680, y: 550 },
 };
 
 const FIXED_POS: Record<string, Pos> = {
   'endpoint-app':   { x: 200, y: 55 },
   'endpoint-jitsi': { x: 500, y: 55 },
   'endpoint-media': { x: 830, y: 55 },
-  storage:          { x: 960, y: 430 },
+  storage:          { x: 960, y: 490 },
 };
 
 const ENDPOINT_ID_MAP: Record<string, string> = {
@@ -96,6 +104,12 @@ const CONNECTIONS: ConnDef[] = [
   { from: 'jicofo', to: 'jvb', labelKey: 'connMedia' },
   { from: 'endpoint-media', to: 'jvb', labelKey: 'connMedia' },
   { from: 'jibri', to: 'storage', labelKey: 'connUpload', dashed: true },
+  // Postprod edges. La connessione esiste solo quando il nodo postprod
+  // è presente nei `services` (cioè quando l'admin ha attivato la
+  // pipeline). Il filtro sotto in `connections.filter(...)` rimuove
+  // automaticamente queste edge se i nodi mancano.
+  { from: 'jibri', to: 'postprod', labelKey: 'connPostprod', dashed: true },
+  { from: 'postprod', to: 'storage', labelKey: 'connUpload', dashed: true },
 ];
 
 function pos(id: string): Pos {
@@ -174,7 +188,12 @@ export default function InfrastructureMap() {
   );
 
   const W = 1100;
-  const H = 530;
+  // Altezza dinamica: il nodo postprod sta a y=550 (più alto rispetto
+  // a jibri/redis/smtp a y=430). Quando postprod NON è presente nei
+  // services manteniamo H=530 (compatto come prima); quando c'è
+  // estendiamo a 620 per dare aria al nodo + bottoni dettaglio.
+  const hasPostprodNode = !!data?.services.some((s) => s.id === 'postprod');
+  const H = hasPostprodNode ? 620 : 530;
 
   if (!data && !error) {
     return (
@@ -259,8 +278,20 @@ export default function InfrastructureMap() {
           <rect x="10" y="115" width={W - 20} height="370" rx="12" fill="#F8FAFE" opacity="0.3" />
           <text x="55" y="138" className="infra-map__zone-label">{t('zoneCluster')}</text>
 
-          {/* Connection lines */}
-          {data && CONNECTIONS.map((c) => {
+          {/* Connection lines. Filtriamo le edge i cui endpoint
+              service non esistono nel `data.services` corrente —
+              succede per `postprod` quando `aiPipelineEnabled = false`
+              (il nodo viene escluso server-side e l'edge resterebbe
+              "in aria"). Endpoint pubblici + storage sono sempre
+              ammessi perché non sono service nodes in senso stretto. */}
+          {data && CONNECTIONS.filter((c) => {
+            const serviceIds = new Set(data.services.map((s) => s.id));
+            const isServiceNode = (id: string): boolean =>
+              !id.startsWith('endpoint-') && id !== 'storage';
+            if (isServiceNode(c.from) && !serviceIds.has(c.from)) return false;
+            if (isServiceNode(c.to) && !serviceIds.has(c.to)) return false;
+            return true;
+          }).map((c) => {
             const f = pos(c.from);
             const t2 = pos(c.to);
             const active = connActive(c.from, c.to);

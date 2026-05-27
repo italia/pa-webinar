@@ -1,0 +1,60 @@
+# Postprod AI worker — single container that:
+#   1. Claims one PostprodJob from the app's /api/internal/postprod-claim
+#   2. Downloads the source MP4 from the signed URL
+#   3. Runs WhisperX + pyannote.audio (TRANSCRIBE) or LLM call (SUMMARIZE/TRANSLATE)
+#   4. Uploads artifacts to the signed PUT URLs
+#   5. POSTs metadata to /api/internal/postprod-artifact and exits
+#
+# The worker is a **one-shot** k8s Job: the postprod-orchestrator
+# CronJob creates Nx of them per tick based on /postprod-pending.
+# This keeps the worker stateless and lets cluster-autoscaler scale
+# the GPU node pool down to zero when there's nothing to do.
+#
+# Base image: NVIDIA NGC PyTorch. CUDA 12.6 covers A100 (sm_80, prod
+# in Italy North) and T4 (sm_75, dev). Bump to 25.01-py3 (CUDA 12.8)
+# when targeting Blackwell sm_120 (5090 dev workstations).
+#
+# Sovereignty constraint (see lib/ai/providers.ts):
+#   - the runtime never makes external HTTP calls except to the app,
+#     the in-cluster vLLM Service, and the configured object storage.
+#   - model weights are loaded from the HuggingFace cache mounted on
+#     /models (pre-populated by an init container or a persistent
+#     volume), NOT downloaded at runtime from huggingface.co.
+
+ARG BASE_IMAGE=nvcr.io/nvidia/pytorch:24.10-py3
+FROM ${BASE_IMAGE}
+
+# System tools — ffmpeg for audio extraction from mp4, ca-certificates
+# for HTTPS to the in-cluster app, tini for proper PID-1.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ffmpeg \
+        ca-certificates \
+        tini \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/worker
+
+# Pin requirements so reproducibility is not at the mercy of pip's
+# resolver. Versions are picked for CUDA 12.6 compatibility.
+COPY worker/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Worker code. Layered last so an iteration on Python doesn't rebuild
+# the model layers.
+COPY worker/ ./worker/
+
+# Non-root by default. The cluster admins can override via PSP/PSA.
+RUN useradd --create-home --uid 10001 --shell /bin/bash worker \
+    && mkdir -p /models /work && chown -R worker:worker /opt/worker /models /work
+USER 10001
+ENV HF_HOME=/models \
+    HF_HUB_OFFLINE=1 \
+    TORCH_HOME=/models/torch \
+    WORK_DIR=/work \
+    PYTHONUNBUFFERED=1
+
+# Health: the worker has no HTTP surface (it's a Job, not a service)
+# — readiness is implicit in exit code 0 from the entrypoint.
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["python", "-m", "worker.main"]

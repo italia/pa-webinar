@@ -760,6 +760,84 @@ export const GET = withErrorHandling(async () => {
     },
   ];
 
+  // Postprod AI pipeline — aggiunto al map SOLO quando l'admin ha
+  // abilitato la feature. Senza questo gate, ogni installazione del
+  // chart vedrebbe un nodo "AI postprod" anche se non ha mai
+  // configurato il GPU pool + GPU Operator. Graceful degradation: la
+  // UI vede il nodo apparire/scomparire dinamicamente sul toggle.
+  if (settings.aiPipelineEnabled) {
+    const postprodStats = await prisma.$queryRaw<
+      Array<{ status: string; count: bigint }>
+    >`SELECT status::text, COUNT(*)::bigint FROM postprod_jobs GROUP BY status`;
+
+    const counts = {
+      PENDING: 0,
+      CLAIMED: 0,
+      RUNNING: 0,
+      DONE: 0,
+      FAILED: 0,
+    } satisfies Record<string, number>;
+    for (const r of postprodStats) {
+      if (r.status in counts) {
+        (counts as Record<string, number>)[r.status] = Number(r.count);
+      }
+    }
+
+    const failed24h = await prisma.postprodJob.count({
+      where: {
+        status: 'FAILED',
+        completedAt: { gte: new Date(Date.now() - 24 * 3600_000) },
+      },
+    });
+
+    const claimedOrRunning = counts.CLAIMED + counts.RUNNING;
+    const postprodStatus: ServiceStatus = failed24h > 0
+      ? 'degraded'
+      : claimedOrRunning > 0
+        ? 'healthy'
+        : counts.PENDING > 0
+          ? 'scaling'
+          : 'standby';
+
+    services.push({
+      id: 'postprod',
+      name: 'infraMap.services.postprod',
+      technicalName: `AI postprod (${settings.aiAsrProvider}+${settings.aiLlmProvider})`,
+      description: 'infraMap.descriptions.postprod',
+      status: postprodStatus,
+      verdict:
+        failed24h > 0
+          ? 'infraMap.verdicts.postprod.degraded'
+          : claimedOrRunning > 0
+            ? 'infraMap.verdicts.postprod.healthy'
+            : counts.PENDING > 0
+              ? 'infraMap.verdicts.postprod.scaling'
+              : 'infraMap.verdicts.postprod.standby',
+      impact: failed24h > 0 ? 'infraMap.impacts.postprodDegraded' : null,
+      replicas: {
+        running: claimedOrRunning,
+        desired: counts.PENDING + claimedOrRunning,
+        max: settings.aiMaxConcurrentJobs,
+      },
+      // La pipeline non espone porte HTTP pubbliche (i worker parlano
+      // con l'app via API interna, non viceversa). Manteniamo l'array
+      // popolato per coerenza UI ma con la porta vLLM in-cluster.
+      ports: [{ name: 'vllm', port: 8000, protocol: 'TCP' }],
+      metadata: {
+        llmProvider: settings.aiLlmProvider,
+        asrProvider: settings.aiAsrProvider,
+        nodePool: 'ai-gpu',
+        pendingJobs: counts.PENDING,
+        claimedJobs: counts.CLAIMED,
+        runningJobs: counts.RUNNING,
+        doneJobs: counts.DONE,
+        failedJobs: counts.FAILED,
+        failed24h,
+        artifactRetentionDays: settings.aiArtifactRetentionDays,
+      },
+    });
+  }
+
   const endpoints: Endpoint[] = [];
   if (appHost) {
     endpoints.push({ host: appHost, port: 443, protocol: 'HTTPS', tls: true, service: 'app', trafficRps: null });

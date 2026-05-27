@@ -1,0 +1,174 @@
+{{- if and .Values.postprod.enabled .Values.postprod.orchestrator.enabled }}
+# Postprod orchestrator — runs every minute, queries the app for the
+# number of runnable jobs and creates as many one-shot worker Jobs on
+# the GPU node pool. Mirrors `cronjob-jvb-scaler.yaml` in spirit
+# (application-driven scaling) but produces Jobs instead of `kubectl
+# scale` calls because the worker is one-shot, not a long-lived
+# Deployment.
+#
+# No KEDA, no Argo: just kubectl + a small shell script. The app is
+# the source of truth for the queue (Postgres outbox pattern); the
+# orchestrator never reads the DB directly.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-postprod-orchestrator
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: cronjob-postprod-orchestrator
+spec:
+  schedule: {{ .Values.postprod.orchestrator.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 90
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            {{- include "eventi-dtd.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: cronjob-postprod-orchestrator
+        spec:
+          serviceAccountName: {{ include "eventi-dtd.fullname" . }}-postprod-orchestrator
+          automountServiceAccountToken: true
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          {{- if .Values.app.nodeSelector }}
+          nodeSelector:
+            {{- toYaml .Values.app.nodeSelector | nindent 12 }}
+          {{- end }}
+          {{- if .Values.app.tolerations }}
+          tolerations:
+            {{- toYaml .Values.app.tolerations | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: orchestrator
+              image: {{ .Values.postprod.orchestrator.image | default "bitnami/kubectl:latest" }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  log() { echo "[$(date -u '+%Y-%m-%d %H:%M:%S')] postprod-orchestrator: $1"; }
+
+                  APP_URL="{{ include "eventi-dtd.internalUrl" . }}"
+                  NS="{{ .Release.Namespace }}"
+                  WORKER_TPL="{{ include "eventi-dtd.fullname" . }}-postprod-worker"
+
+                  # ── 1. Query desired count from the app ──────────
+                  RESPONSE=$(curl -sf \
+                    -H "x-api-key: $CRON_API_KEY" \
+                    "${APP_URL}/api/internal/postprod-pending" 2>/dev/null || true)
+                  if [ -z "$RESPONSE" ]; then
+                    log "ERROR: empty response from /postprod-pending"
+                    exit 0
+                  fi
+                  log "API response: $RESPONSE"
+
+                  ENABLED=$(echo "$RESPONSE" | grep -o '"pipelineEnabled":\(true\|false\)' | grep -o 'true\|false')
+                  DESIRED=$(echo "$RESPONSE" | grep -o '"desired":[0-9]*' | grep -o '[0-9]*' || echo "0")
+                  RUNNABLE=$(echo "$RESPONSE" | grep -o '"runnable":[0-9]*' | grep -o '[0-9]*' || echo "0")
+
+                  if [ "$ENABLED" != "true" ]; then
+                    log "pipeline disabled — nothing to do"
+                    exit 0
+                  fi
+
+                  # ── 2. How many workers are currently active? ────
+                  ACTIVE=$(kubectl get jobs -n "$NS" \
+                    -l "app.kubernetes.io/component=postprod-worker" \
+                    -o json 2>/dev/null \
+                    | grep -o '"active":[1-9][0-9]*' | grep -o '[1-9][0-9]*' \
+                    | awk '{s+=$1} END {print s+0}')
+                  ACTIVE=${ACTIVE:-0}
+                  log "active workers=$ACTIVE desired=$DESIRED runnable=$RUNNABLE"
+
+                  NEEDED=$((DESIRED - ACTIVE))
+                  if [ "$NEEDED" -le 0 ]; then
+                    log "no new workers needed"
+                    exit 0
+                  fi
+
+                  # ── 3. Spawn N worker Jobs from the template ─────
+                  # The template lives as a CronJob (suspended) in the
+                  # cluster so we can use `kubectl create job
+                  # --from=cronjob/...`. This gives us nodeSelector +
+                  # tolerations + resource limits for free.
+                  for i in $(seq 1 "$NEEDED"); do
+                    JOB_NAME="${WORKER_TPL}-$(date -u +%s)-$i"
+                    log "creating worker job: $JOB_NAME"
+                    kubectl create job -n "$NS" "$JOB_NAME" \
+                      --from=cronjob/"$WORKER_TPL" \
+                      || log "failed to create $JOB_NAME"
+                  done
+              env:
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "eventi-dtd.secretName" . }}
+                      key: CRON_API_KEY
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 1001
+                capabilities:
+                  drop:
+                    - ALL
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-postprod-orchestrator
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postprod-orchestrator
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-postprod-orchestrator
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postprod-orchestrator
+rules:
+  # Read the worker template CronJob to create Jobs from it.
+  - apiGroups: ["batch"]
+    resources: ["cronjobs"]
+    verbs: ["get", "list"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "create", "delete"]
+  # No access to pods / exec / secrets — workers receive secrets via
+  # envFrom in their own podSpec, not through the orchestrator.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-postprod-orchestrator
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postprod-orchestrator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "eventi-dtd.fullname" . }}-postprod-orchestrator
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "eventi-dtd.fullname" . }}-postprod-orchestrator
+    namespace: {{ .Release.Namespace }}
+{{- end }}

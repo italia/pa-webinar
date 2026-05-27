@@ -144,6 +144,80 @@ export const eventDurationHistogram = new client.Histogram({
   registers: [register],
 });
 
+// ── Postprod AI pipeline ─────────────────────────────────────
+//
+// Metriche emesse solo quando la pipeline AI è abilitata e in uso. I
+// gauge restano a 0 quando il chart è installato ma `aiPipelineEnabled`
+// è false (graceful degradation: nessun rumore in Prometheus). Tutti i
+// counter/histogram sono lazy-incremented dagli endpoint
+// `/api/internal/postprod-*` e dal cron reclaim/retention.
+
+// Stato della coda — gauge popolato dal cron `postprod-reclaim` ogni
+// minuto leggendo COUNT(*) GROUP BY status su postprod_jobs.
+export const postprodJobsByStatusGauge = new client.Gauge({
+  name: 'eventi_postprod_jobs_by_status',
+  help: 'Number of postprod jobs by status',
+  labelNames: ['status'] as const, // PENDING|CLAIMED|RUNNING|DONE|FAILED
+  registers: [register],
+});
+
+// Pipeline enabled? 0=off, 1=on. Read da SiteSetting.aiPipelineEnabled.
+// Utile per alert "pipeline-down": se questa è 1 ma jobs_by_status[PENDING]
+// resta alto per >15min senza CLAIMED, l'orchestrator è bloccato.
+export const postprodPipelineEnabledGauge = new client.Gauge({
+  name: 'eventi_postprod_pipeline_enabled',
+  help: 'Whether the postprod AI pipeline is enabled (1) or off (0)',
+  registers: [register],
+});
+
+// Counter per kind+terminal-status (DONE o FAILED). Permette il
+// classic SLO ratio: rate(eventi_postprod_jobs_completed_total{status="DONE"}[1h])
+// / rate(eventi_postprod_jobs_completed_total[1h]) >= 0.95.
+export const postprodJobsCompletedTotal = new client.Counter({
+  name: 'eventi_postprod_jobs_completed_total',
+  help: 'Total postprod jobs that reached a terminal status',
+  labelNames: ['kind', 'status'] as const, // kind: TRANSCRIBE|SUMMARIZE|TRANSLATE|SUBTITLE; status: DONE|FAILED
+  registers: [register],
+});
+
+// Durata end-to-end per kind. Buckets espressi in secondi tarati sui
+// tempi reali misurati: TRANSCRIBE 60-3600s (Whisper x4-realtime su
+// A100), SUMMARIZE 5-120s, TRANSLATE 10-180s per lingua.
+export const postprodJobDurationSeconds = new client.Histogram({
+  name: 'eventi_postprod_job_duration_seconds',
+  help: 'Duration of postprod jobs from claim to terminal status',
+  labelNames: ['kind'] as const,
+  buckets: [5, 15, 60, 180, 600, 1800, 3600, 7200],
+  registers: [register],
+});
+
+// Tentativi falliti prima del successo (counter). Alta media indica
+// instabilità del worker / GPU node che fatica a partire.
+export const postprodJobAttemptsTotal = new client.Counter({
+  name: 'eventi_postprod_job_attempts_total',
+  help: 'Total claim attempts on postprod jobs (cumulative across retries)',
+  labelNames: ['kind'] as const,
+  registers: [register],
+});
+
+// Artefatti prodotti. Una riga ogni POST /postprod-artifact che va
+// in DB con successo. Permette di tracciare il fan-out multilingua
+// (es. 1 evento → 1 TRANSCRIBE → N TRANSLATION per lingua).
+export const postprodArtifactsTotal = new client.Counter({
+  name: 'eventi_postprod_artifacts_total',
+  help: 'Total artifacts registered by postprod workers',
+  labelNames: ['type', 'language'] as const, // language: '' for type-agnostic (TRANSCRIPT_JSON)
+  registers: [register],
+});
+
+// Bytes complessivi scritti su storage. Aiuta a stimare i costi blob.
+export const postprodArtifactBytesTotal = new client.Counter({
+  name: 'eventi_postprod_artifact_bytes_total',
+  help: 'Total bytes written across postprod artifacts',
+  labelNames: ['type'] as const,
+  registers: [register],
+});
+
 export { register };
 
 export async function getAppProcessMetrics(): Promise<{
