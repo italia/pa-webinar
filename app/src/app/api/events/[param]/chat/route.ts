@@ -26,7 +26,7 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
-import { tryDecryptPII } from '@/lib/crypto/pii';
+import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { publishChat } from '@/lib/chat/pubsub';
 import { chatMessagesTotal } from '@/lib/metrics';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -112,7 +112,7 @@ async function authenticateSender(
       return {
         eventId: event.id,
         senderId: `reg-${registration.id}`,
-        senderName: registration.displayName,
+        senderName: tryDecryptPII(registration.displayName) ?? registration.displayName,
         isModerator: false,
       };
     }
@@ -189,9 +189,12 @@ export const GET = withErrorHandling(async (request, context) => {
     messages: ordered.map((m) => ({
       id: m.id,
       senderId: m.senderId,
-      senderName: m.senderName,
+      // senderName + text are encrypted at rest (see schema comment).
+      // tryDecryptPII falls back to the input string for legacy
+      // plaintext rows, so this is safe across the migration boundary.
+      senderName: tryDecryptPII(m.senderName) ?? m.senderName,
       isModerator: m.isModerator,
-      text: m.text,
+      text: tryDecryptPII(m.text) ?? m.text,
       createdAt: m.createdAt.toISOString(),
     })),
   }, {
@@ -224,27 +227,36 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
+  // Encrypt PII fields at rest. senderName and text are the only
+  // PII-bearing columns on ChatMessage; everything else (senderId,
+  // eventId, isModerator) is non-PII metadata. We keep plaintext in
+  // local vars so the Redis envelope below stays human-readable
+  // without an extra decrypt on the fan-out hot path.
+  const plaintextSenderName = auth.senderName;
+  const plaintextText = parsed.data.text;
+
   const created = await prisma.chatMessage.create({
     data: {
       eventId: auth.eventId,
       senderId: auth.senderId,
-      senderName: auth.senderName,
+      senderName: encryptPII(plaintextSenderName),
       isModerator: auth.isModerator,
-      text: parsed.data.text,
+      text: encryptPII(plaintextText),
     },
   });
   chatMessagesTotal.inc({ event_id: auth.eventId });
 
   // Fire-and-forget Redis fan-out — persistence is already done, and
   // pubsub failure is survivable (clients fall back to GET /history
-  // polling on reconnect).
+  // polling on reconnect). Redis carries plaintext (encryption is
+  // at-rest only); SSE subscribers re-emit verbatim to clients.
   void publishChat({
     id: created.id,
     eventId: created.eventId,
     senderId: created.senderId,
-    senderName: created.senderName,
+    senderName: plaintextSenderName,
     isModerator: created.isModerator,
-    text: created.text,
+    text: plaintextText,
     createdAt: created.createdAt.toISOString(),
   });
 
