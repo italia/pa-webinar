@@ -1,0 +1,41 @@
+# Postprod AI worker dependencies. Versions pinned for CUDA 12.6
+# (nvcr.io/nvidia/pytorch:24.10-py3). Adjust when bumping the base
+# image. Do NOT install packages that talk to external APIs other
+# than the in-cluster app and vLLM Service.
+
+# HTTP client — used to talk to the app's /api/internal/* endpoints
+# and to the in-cluster vLLM service. Sync API is plenty here: a
+# worker is sequential by design (one job per Pod).
+httpx==0.27.2
+
+# Pydantic — validates the claim response shape so we don't deref
+# `None`s on a malformed payload. Matches what `lib/ai/schemas.ts`
+# enforces server-side.
+pydantic==2.9.2
+
+# ASR + diarization. WhisperX bundles faster-whisper + pyannote
+# integration + word-level alignment via wav2vec2.
+# Pin a 3.3.x (compatible with pyannote 3.3) — whisperx 3.1.x bloccava
+# pyannote a 3.1.1 (vecchia, alcune voci IT mal allineate).
+# Pyannote stesso lo lasciamo libero: whisperx tira la versione
+# compatibile per sua dipendenza.
+whisperx>=3.3.0,<3.5.0
+
+# CTranslate2 backend for faster-whisper. Lasciamo a pip risolverlo
+# transitively da whisperx per evitare conflitti.
+
+# Subtitle / VTT writing. Custom helpers in worker/vtt.py use this.
+webvtt-py==0.5.1
+
+# Storage upload uses presigned PUT URLs — no SDK needed.
+
+# Tokenizer for prompt construction (used by LLM client).
+transformers==4.46.2
+
+# TTS — Piper (rhasspy/piper-tts). MIT license, voci pre-trained
+# scaricate da huggingface.co/rhasspy/piper-voices. Gira su CPU
+# (ONNX runtime), niente GPU richiesta. Per DUB job.
+piper-tts==1.2.0
+
+# Sentry / structured logging optional — we use stdlib logging
+# configured for JSON. Cluster Loki picks them up.
