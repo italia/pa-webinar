@@ -16,7 +16,7 @@ import {
   participantJitsiId,
   guestJitsiId,
 } from '@/lib/auth/jwt';
-import { decryptPII } from '@/lib/crypto/pii';
+import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -86,7 +86,7 @@ export const POST = withErrorHandling(async (request, context) => {
       });
     }
 
-    const name = registration.displayName;
+    const name = tryDecryptPII(registration.displayName) ?? registration.displayName;
     let email: string | undefined;
     try {
       email = decryptPII(registration.email);
