@@ -16,6 +16,7 @@ import { cookies } from 'next/headers';
 import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { NotFoundError, UnauthorizedError } from '@/lib/errors';
 
@@ -43,7 +44,7 @@ export const GET = withErrorHandling(async (_request, context: { params: Promise
   return Response.json(
     {
       id: person.id,
-      displayName: person.displayName,
+      displayName: tryDecryptPII(person.displayName),
       organization: person.organization,
       organizationRole: person.organizationRole,
       organizationType: person.organizationType,
