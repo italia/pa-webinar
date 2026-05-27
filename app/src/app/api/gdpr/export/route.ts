@@ -13,7 +13,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { AppError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
-import { decryptPII } from '@/lib/crypto/pii';
+import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
 
@@ -107,7 +107,7 @@ export const GET = withErrorHandling(async (request) => {
 
     return {
       registration: {
-        displayName: r.displayName,
+        displayName: tryDecryptPII(r.displayName) ?? r.displayName,
         email: decryptedEmail,
         organization: r.organization,
         organizationRole: r.organizationRole,

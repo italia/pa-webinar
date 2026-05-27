@@ -166,7 +166,7 @@ export default async function EventManagePage({
     questionnaireCount: event.questionnaires.length,
     registrations: event.registrations.map((r) => ({
       id: r.id,
-      displayName: r.displayName,
+      displayName: tryDecryptPII(r.displayName) ?? r.displayName,
       organization: r.organization,
       organizationRole: r.organizationRole,
       organizationType: r.organizationType,

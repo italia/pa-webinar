@@ -22,7 +22,7 @@ import {
   RateLimitError,
   ValidationError,
 } from '@/lib/errors';
-import { hashEmail } from '@/lib/crypto/pii';
+import { hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import {
   findEventQuestionnaireByPlacement,
   submitResponse,
@@ -88,7 +88,7 @@ export const POST = withErrorHandling(async (request, context) => {
     }
     registrationId = reg.id;
     respondentEmailHash = hashEmail(reg.email);
-    nameFromRegistration = reg.displayName;
+    nameFromRegistration = tryDecryptPII(reg.displayName) ?? reg.displayName;
   }
 
   const normalized = validateAnswers(q, answers);

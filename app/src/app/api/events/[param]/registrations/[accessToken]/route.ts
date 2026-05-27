@@ -1,6 +1,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { resolveLocale, getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -34,7 +35,7 @@ export const GET = withErrorHandling(async (request, context) => {
 
   return Response.json({
     id: registration.id,
-    displayName: registration.displayName,
+    displayName: tryDecryptPII(registration.displayName) ?? registration.displayName,
     eventSlug: registration.event.slug,
     eventTitle: getLocalized(registration.event.title as LocalizedField, locale),
     eventStatus: registration.event.status,

@@ -4,6 +4,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
@@ -43,7 +44,7 @@ export const GET = withErrorHandling(async (request) => {
   const description = getLocalized(event.description as LocalizedField, 'it');
 
   const participants = event.registrations.map((r) => ({
-    name: r.displayName,
+    name: tryDecryptPII(r.displayName) ?? r.displayName,
     joinedAt: r.joinedAt?.toISOString() ?? null,
     leftAt: r.leftAt?.toISOString() ?? null,
   }));

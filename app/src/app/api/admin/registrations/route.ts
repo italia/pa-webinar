@@ -22,7 +22,7 @@ import type { OrganizationType, Prisma } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
-import { decryptPII } from '@/lib/crypto/pii';
+import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError } from '@/lib/errors';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -119,7 +119,7 @@ export const GET = withErrorHandling(async (request) => {
     eventTitle: getLocalized(r.event.title as LocalizedField, 'it'),
     eventSlug: r.event.slug,
     eventStartsAt: r.event.startsAt.toISOString(),
-    displayName: r.displayName,
+    displayName: tryDecryptPII(r.displayName) ?? r.displayName,
     email: bestEffortDecrypt(r.email),
     organization: r.organization,
     organizationRole: r.organizationRole,
