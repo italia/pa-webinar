@@ -96,7 +96,7 @@ describe('generateJitsiJwt', () => {
     expect(payload.exp! - payload.iat!).toBe(5400);
   });
 
-  it('sets a 4-hour default expiry for moderators', async () => {
+  it('sets a 2-hour default expiry for moderators', async () => {
     const jwt = await generateJitsiJwt({
       roomName: 'room',
       displayName: 'Mod',
@@ -105,7 +105,9 @@ describe('generateJitsiJwt', () => {
     });
 
     const payload = await decodeJwt(jwt);
-    expect(payload.exp! - payload.iat!).toBe(14400);
+    // 2h = 7200s. Tighter than the original 4h because Jitsi has no
+    // jti blacklist; moderators rejoin via magic link to refresh.
+    expect(payload.exp! - payload.iat!).toBe(7200);
   });
 
   it('respects custom expiry', async () => {
