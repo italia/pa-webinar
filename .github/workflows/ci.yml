@@ -136,8 +136,31 @@ jobs:
       # but not the compose v2 plugin — install it on the fly so `docker compose`
       # works on the self-hosted runner the same way it does on ubuntu-latest.
       - uses: docker/setup-compose-action@v2
-      - name: Start stack
-        run: docker compose up -d --wait
+      # Authenticate to Docker Hub when credentials are provided as
+      # repo secrets. Anonymous pulls share a low rate limit (100 / 6h
+      # per IP) that the shared ARC runner exhausts quickly during a
+      # multi-image compose; an authenticated account raises it to
+      # 200 / 6h for free / 5000 for paid. The login is a no-op when
+      # the secrets aren't set, keeping forks working.
+      - name: Login to Docker Hub (rate-limit lift)
+        if: ${{ env.DOCKERHUB_USERNAME != '' }}
+        uses: docker/login-action@v3
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Start stack (with retry on Docker Hub rate-limit)
+        run: |
+          for attempt in 1 2 3; do
+            if docker compose up -d --wait; then
+              exit 0
+            fi
+            echo "::warning::compose up failed on attempt $attempt — likely Docker Hub rate-limit. Backing off."
+            docker compose down --remove-orphans || true
+            sleep $((attempt * 30))
+          done
+          exit 1
         env:
           APP_BUILD_TARGET: production
       - name: Run database migrations
