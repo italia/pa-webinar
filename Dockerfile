@@ -3,8 +3,16 @@
 # Multi-stage build: deps → builder → runner
 # ─────────────────────────────────────────────────────────────
 
+# Base image is pulled from Google's public mirror of Docker Hub so
+# CI runners don't hit the anonymous-pull rate limit (the shared ARC
+# runner exhausts the 100-per-6h Docker Hub quota during a single
+# busy day). The mirror is content-addressable and serves the exact
+# same digests as docker.io/library — overridable at build time:
+#   docker build --build-arg NODE_BASE=node:20-alpine .
+ARG NODE_BASE=mirror.gcr.io/library/node:20-alpine
+
 # ── Stage 1: Dependencies ────────────────────────────────────
-FROM node:20-alpine AS deps
+FROM ${NODE_BASE} AS deps
 
 LABEL maintainer="Dipartimento per la Trasformazione Digitale <innovazione@governo.it>"
 LABEL org.opencontainers.image.title="eventi-dtd"
@@ -31,7 +39,7 @@ RUN cd app && npx prisma generate
 
 
 # ── Stage 2: Builder ─────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM ${NODE_BASE} AS builder
 
 RUN apk add --no-cache libc6-compat
 
@@ -90,7 +98,7 @@ RUN find .next/standalone -name '.env*' -type f -delete && \
 
 
 # ── Stage 3: Production runner ───────────────────────────────
-FROM node:20-alpine AS runner
+FROM ${NODE_BASE} AS runner
 
 RUN apk upgrade --no-cache && apk add --no-cache tini && \
     npm cache clean --force && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx

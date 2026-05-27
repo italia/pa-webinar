@@ -71,7 +71,9 @@ services:
 
   # ── PostgreSQL ───────────────────────────────────────────
   postgres:
-    image: postgres:16-alpine
+    # Pulled from Google's Docker Hub mirror to avoid the anonymous
+    # pull rate limit on shared CI runners. Same digest as docker.io/library.
+    image: mirror.gcr.io/library/postgres:16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: eventi_dtd
