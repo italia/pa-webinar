@@ -57,12 +57,15 @@ interface JitsiTokenPayload {
 }
 
 /**
- * Default TTL for the Jitsi JWT. Moderators get the full event window
- * (4h); participants get a tighter window (90 min) so a leaked
- * participant token has a smaller replay surface — Jitsi doesn't
- * support jti blacklisting natively, so the TTL is our only knob.
+ * Default TTL for the Jitsi JWT. Even moderators are kept at 2h: a
+ * leaked moderator token grants full room control until expiry and
+ * Jitsi has no native jti blacklist, so the TTL is our only revocation
+ * lever. Most live events run 60–90 min — moderators that need to
+ * stay longer can rejoin via the magic link to mint a fresh token.
+ * Participants get the tighter 90-min window already pegged to the
+ * room lifecycle.
  */
-const MODERATOR_JWT_TTL_SECONDS = 4 * 60 * 60;
+const MODERATOR_JWT_TTL_SECONDS = 2 * 60 * 60;
 const PARTICIPANT_JWT_TTL_SECONDS = 90 * 60;
 
 /**
