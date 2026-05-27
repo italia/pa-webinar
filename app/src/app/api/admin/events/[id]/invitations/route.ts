@@ -60,6 +60,11 @@ export const GET = withErrorHandling(async (_request, context) => {
       ...r,
       name: tryDecryptPII(r.name),
       email: tryDecryptPII(r.email),
+      // Person.displayName is encrypted at rest; decrypt for the response
+      // so the rubrica-linked invitation row shows a readable name.
+      person: r.person
+        ? { ...r.person, displayName: tryDecryptPII(r.person.displayName) }
+        : null,
     })),
   });
 });
@@ -112,6 +117,9 @@ export const POST = withErrorHandling(async (request, context) => {
         ...created,
         name: tryDecryptPII(created.name),
         email: emailNorm,
+        person: created.person
+          ? { ...created.person, displayName: tryDecryptPII(created.person.displayName) }
+          : null,
       },
       { status: 201 },
     );

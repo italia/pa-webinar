@@ -4,10 +4,17 @@
  * Returns all Person rows currently opted in to the cross-event address
  * book. This is the people directory, independent of a single event
  * registration. Supports filtering by organization type, text search
- * (displayName / organization), and inactivity window.
+ * (organization only — see trade-off below), and inactivity window.
  *
  * GET params:
- *   q?          — case-insensitive substring match on displayName or organization
+ *   q?          — case-insensitive substring match on organization only.
+ *                 displayName is encrypted at rest (AES-256-GCM); a
+ *                 `contains` query against ciphertext is meaningless, so
+ *                 we drop that clause (same trade-off taken for
+ *                 moderatorEmail in the moderators admin route). If we
+ *                 ever need full-text rubrica search we'll add a
+ *                 deterministic hash column for equality lookup, but
+ *                 substring search on encrypted PII is out of scope.
  *   orgType?    — OrganizationType enum value
  *   includeOpted?  — 'out' to include opted-out persons (default: only opted-in).
  *                   Admin-side pickers (e.g. event wizard rubrica picker) may
@@ -22,6 +29,7 @@ import type { OrganizationType, Prisma } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError } from '@/lib/errors';
 
@@ -48,16 +56,19 @@ export const GET = withErrorHandling(async (request) => {
   if (includeOpted !== 'out') where.optedInToAddressBook = true;
   if (orgTypeParam) where.organizationType = orgTypeParam as OrganizationType;
   if (q) {
-    where.OR = [
-      { displayName: { contains: q, mode: 'insensitive' } },
-      { organization: { contains: q, mode: 'insensitive' } },
-    ];
+    // displayName is stored encrypted at rest, so a `contains` clause on
+    // ciphertext would never match. We drop the displayName search and
+    // keep substring matching on `organization` only. Same trade-off as
+    // the moderators admin route after moderatorEmail was encrypted.
+    where.organization = { contains: q, mode: 'insensitive' };
   }
 
   const [rows, total] = await Promise.all([
     prisma.person.findMany({
       where,
-      orderBy: [{ lastActiveAt: 'desc' }, { displayName: 'asc' }],
+      // Sort by lastActiveAt only — alphabetical sort on encrypted
+      // displayName is meaningless (ciphertext order is random).
+      orderBy: [{ lastActiveAt: 'desc' }],
       take: limit,
       skip: offset,
       select: {
@@ -82,7 +93,7 @@ export const GET = withErrorHandling(async (request) => {
     {
       rows: rows.map((r) => ({
         id: r.id,
-        displayName: r.displayName,
+        displayName: tryDecryptPII(r.displayName),
         organization: r.organization,
         organizationRole: r.organizationRole,
         organizationType: r.organizationType,
