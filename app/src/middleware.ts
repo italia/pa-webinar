@@ -104,10 +104,21 @@ function applySecurityHeaders(
       // API external script. Removes 'unsafe-inline' — the historic
       // XSS amplifier in the policy.
       `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: https://${jitsiDomain}`,
-      // style-src deliberately keeps 'unsafe-inline': React inline
-      // style props (`style={{...}}`) and Bootstrap Italia utility
-      // classes are everywhere. Removing it would require a separate
-      // refactor sweep — tracked as a follow-up.
+      // style-src keeps 'unsafe-inline' as an architectural trade-off:
+      // React renders `style={{...}}` props as DOM `style="..."`
+      // attributes, which CSP treats as inline styles. The codebase
+      // currently has ~1k such occurrences across ~60 files. Two
+      // viable removal paths, both out of scope for the middleware:
+      //   (1) refactor every inline style to className + CSS module
+      //       / Bootstrap-Italia utility (multi-sprint effort);
+      //   (2) move to a CSS-in-JS library that generates a stylesheet
+      //       (linaria, vanilla-extract) — also large.
+      // Note: nonce on style-src doesn't help here because the nonce
+      // attribute only applies to `<style>` blocks, not to inline
+      // style attributes (CSP3 'unsafe-hashes' would, but each style
+      // attribute would need its own hash and React renders
+      // dynamic values — hashes would mismatch at runtime).
+      // See docs/SECURITY-CSP.md for the migration plan.
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       "img-src 'self' data: blob: https://i.ytimg.com",
