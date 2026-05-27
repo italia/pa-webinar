@@ -10,6 +10,7 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { createQuestionSchema } from '@/lib/validation/schemas';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { getCached, setCache } from '@/lib/cache';
@@ -177,7 +178,7 @@ export const POST = withErrorHandling(async (request, context) => {
       throw new ForbiddenError('Invalid access token');
     }
     registrationId = registration.id;
-    authorName = registration.displayName;
+    authorName = tryDecryptPII(registration.displayName) ?? registration.displayName;
   } else {
     // Guest path: requires a non-empty display name, rate-limited by IP
     // since there's no stable participant id to key on.

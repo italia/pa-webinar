@@ -10,6 +10,7 @@ import { isJibriAvailable } from '@/lib/infrastructure';
 import LiveEventClient from '@/components/live/live-event-client';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 
 async function hasJoinGrant(eventId: string): Promise<boolean> {
   const appSecret = process.env.APP_SECRET;
@@ -159,7 +160,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     if (!registration || registration.eventId !== event.id) {
       notFound();
     }
-    participantInfo = { displayName: registration.displayName };
+    participantInfo = {
+      displayName: tryDecryptPII(registration.displayName) ?? registration.displayName,
+    };
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);

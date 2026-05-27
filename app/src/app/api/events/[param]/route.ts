@@ -104,7 +104,14 @@ export const GET = withErrorHandling(async (request, context) => {
       imageUrl: event.imageUrl,
       waitingRoomAudioUrl: event.waitingRoomAudioUrl,
       createdAt: event.createdAt.toISOString(),
-      registrations: event.registrations,
+      registrations: event.registrations
+        ? event.registrations.map((r) => ({
+            id: r.id,
+            displayName: tryDecryptPII(r.displayName) ?? r.displayName,
+            joinedAt: r.joinedAt,
+            createdAt: r.createdAt,
+          }))
+        : event.registrations,
     });
   }
 

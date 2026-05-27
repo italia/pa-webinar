@@ -86,7 +86,7 @@ export const POST = withErrorHandling(async (request, context) => {
     const reg = await tx.registration.create({
       data: {
         eventId: event.id,
-        displayName,
+        displayName: encryptPII(displayName),
         email: encryptedEmail,
         emailHash,
         organization: organization || null,
@@ -137,7 +137,9 @@ export const POST = withErrorHandling(async (request, context) => {
   return Response.json(
     {
       id: registration.id,
-      displayName: registration.displayName,
+      // displayName is encrypted at rest; return the plaintext we received
+      // so the caller (registration confirmation UI) sees a readable name.
+      displayName,
       eventSlug: slug,
       accessToken,
       joinUrl,
