@@ -1,5 +1,7 @@
 import type { OrganizationType, Prisma, PrismaClient } from '@prisma/client';
 
+import { encryptPIIOrNull } from '@/lib/crypto/pii';
+
 export interface PersonUpsertInput {
   emailHash: string;
   displayName?: string | null;
@@ -42,11 +44,16 @@ export async function upsertPersonOnRegistration(
 
   const now = new Date();
 
+  // displayName is PII and is encrypted at rest (AES-256-GCM); all other
+  // profile fields stay in plaintext because the admin search/filter
+  // surface needs to query them.
+  const encryptedDisplayName = encryptPIIOrNull(input.displayName);
+
   if (!existing) {
     const created = await tx.person.create({
       data: {
         emailHash: input.emailHash,
-        displayName: input.displayName ?? null,
+        displayName: encryptedDisplayName,
         organization: input.organization ?? null,
         organizationRole: input.organizationRole ?? null,
         organizationType: input.organizationType ?? null,
@@ -63,7 +70,7 @@ export async function upsertPersonOnRegistration(
     const updated = await tx.person.update({
       where: { id: existing.id },
       data: {
-        displayName: input.displayName ?? null,
+        displayName: encryptedDisplayName,
         organization: input.organization ?? null,
         organizationRole: input.organizationRole ?? null,
         organizationType: input.organizationType ?? null,

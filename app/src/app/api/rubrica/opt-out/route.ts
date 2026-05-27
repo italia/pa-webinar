@@ -18,6 +18,7 @@
  */
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { NotFoundError, ValidationError, UnauthorizedError } from '@/lib/errors';
 import { verifyRubricaOptOutToken } from '@/lib/persons/opt-out-token';
@@ -46,7 +47,7 @@ export const GET = withErrorHandling(async (request) => {
   const person = await resolveToken(token);
   return Response.json(
     {
-      displayName: person.displayName,
+      displayName: tryDecryptPII(person.displayName),
       organization: person.organization,
       alreadyOptedOut: !person.optedInToAddressBook,
     },
