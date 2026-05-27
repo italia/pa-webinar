@@ -25,7 +25,7 @@ jobs:
     runs-on: arc-runner-eventi-dtd
     services:
       postgres:
-        image: postgres:16-alpine
+        image: mirror.gcr.io/library/postgres:16-alpine
         env:
           POSTGRES_DB: eventi_dtd_test
           POSTGRES_USER: eventi
@@ -86,7 +86,7 @@ jobs:
     runs-on: arc-runner-eventi-dtd
     services:
       postgres:
-        image: postgres:16-alpine
+        image: mirror.gcr.io/library/postgres:16-alpine
         env:
           POSTGRES_DB: eventi_dtd_test
           POSTGRES_USER: eventi
