@@ -51,7 +51,23 @@ function recordingMediaHosts(): string[] {
   return [...hosts];
 }
 
-function applySecurityHeaders(response: NextResponse): NextResponse {
+/**
+ * Generate a fresh per-request nonce (16 random bytes, base64). Used in
+ * the CSP `script-src` directive AND surfaced to Server Components via
+ * the `x-nonce` request header so they can attach it to any inline
+ * <Script> tags that Next.js inserts (Next propagates the nonce
+ * automatically when it sees the header).
+ */
+function generateNonce(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Buffer.from(bytes).toString('base64');
+}
+
+function applySecurityHeaders(
+  response: NextResponse,
+  nonce: string,
+): NextResponse {
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN');
   const mediaHosts = recordingMediaHosts();
   const mediaSrc = ["'self'", 'blob:', ...mediaHosts].join(' ');
@@ -80,12 +96,26 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
       // events host their recordings on youtube.com before we owned
       // Jibri infra). img-src mirrors this so YT preview thumbs load.
       `frame-src 'self' https://${jitsiDomain} https://www.youtube.com https://www.youtube-nocookie.com`,
-      `script-src 'self' 'unsafe-inline' https://${jitsiDomain}`,
+      // script-src: nonce-based + strict-dynamic. The nonce is set on
+      // every Next.js-emitted inline script (App Router streaming
+      // chunks, hydration markers), and strict-dynamic lets those
+      // trusted scripts load their own children without further
+      // whitelisting. We keep https://${jitsiDomain} for the IFrame
+      // API external script. Removes 'unsafe-inline' — the historic
+      // XSS amplifier in the policy.
+      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: https://${jitsiDomain}`,
+      // style-src deliberately keeps 'unsafe-inline': React inline
+      // style props (`style={{...}}`) and Bootstrap Italia utility
+      // classes are everywhere. Removing it would require a separate
+      // refactor sweep — tracked as a follow-up.
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       "img-src 'self' data: blob: https://i.ytimg.com",
       `connect-src ${connectSrc}`,
       `media-src ${mediaSrc}`,
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
     ].join('; '),
   );
   response.headers.set(
@@ -155,16 +185,26 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
+  // Generate a per-request nonce and surface it to Server Components via
+  // the x-nonce request header. Next.js picks this up automatically and
+  // attaches it to every inline <script> it emits.
+  const nonce = generateNonce();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+
   const response = intlMiddleware(request);
+  // Carry the x-nonce forward on the response request so downstream
+  // Server Components see it via headers().get('x-nonce').
+  response.headers.set('x-nonce', nonce);
 
   if (!ADMIN_PATH_RE.test(pathname) || ADMIN_LOGIN_RE.test(pathname)) {
-    return applySecurityHeaders(response);
+    return applySecurityHeaders(response, nonce);
   }
 
   if (ADMIN_EVENT_RE.test(pathname)) {
     const tokenParam = request.nextUrl.searchParams.get('token');
     if (tokenParam && UUID_RE.test(tokenParam)) {
-      return applySecurityHeaders(response);
+      return applySecurityHeaders(response, nonce);
     }
   }
 
@@ -176,7 +216,7 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  return applySecurityHeaders(response);
+  return applySecurityHeaders(response, nonce);
 }
 
 export const config = {
