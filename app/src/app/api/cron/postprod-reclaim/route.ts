@@ -22,7 +22,6 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import { refreshPostprodGauges } from '@/lib/ai/metrics';
-import { postprodJobAttemptsTotal } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
 
