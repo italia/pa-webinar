@@ -6,6 +6,10 @@ import { UnauthorizedError, AppError } from '@/lib/errors';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { requireAppSecretKey } from '@/lib/auth/app-secret';
 import { logAdminAction } from '@/lib/audit/admin-audit';
+import {
+  ADMIN_SESSION_TTL_SECONDS,
+  setAdminSessionCookie,
+} from '@/lib/auth/admin-session';
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const body = await parseJsonBody(request) as { key?: string };
@@ -25,19 +29,12 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const token = await new SignJWT({ role: 'admin' })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('24h')
+    .setExpirationTime(`${ADMIN_SESSION_TTL_SECONDS}s`)
     .sign(secret);
 
   await logAdminAction({ request, action: 'ADMIN_LOGIN' });
 
   const response = NextResponse.json({ success: true });
-  response.cookies.set('admin_session', token, {
-    httpOnly: true,
-    path: '/',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24,
-    secure: process.env.NODE_ENV === 'production',
-  });
-
+  setAdminSessionCookie(response, token);
   return response;
 });
