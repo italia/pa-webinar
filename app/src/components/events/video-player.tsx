@@ -534,7 +534,14 @@ function VideoPlayerImpl(
         src={src}
         poster={poster}
         preload="metadata"
-        crossOrigin="anonymous"
+        /* Niente crossOrigin: il blob storage Azure (developersitaliarec)
+           non emette `Access-Control-Allow-Origin` per i nostri domini,
+           e l'endpoint /api/.../recording fa un 302 redirect al SAS URL
+           del blob. Con `crossOrigin="anonymous"` il browser fa CORS
+           check sul redirect e il <video> rimane bloccato.
+           Le subtitle `<track>` sono servite dalla stessa origin
+           (/api/events/...postprod/subtitle/<lang>), quindi non
+           richiedono CORS sul video. */
         onClick={togglePlay}
         onPlay={() => { setPlaying(true); scheduleHideControls(); }}
         onPause={() => { setPlaying(false); setShowControls(true); }}
