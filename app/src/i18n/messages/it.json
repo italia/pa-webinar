@@ -2670,6 +2670,8 @@
     "followLive": "Segui il video",
     "followManual": "Lettura libera",
     "followResume": "Torna a seguire il video",
+    "lowConfidenceBadge": "verifica",
+    "lowConfidenceTitle": "Questa porzione di trascrizione ha confidenza bassa: la registrazione potrebbe contenere parole diverse. Fai sempre riferimento al video originale.",
     "provenance": {
       "triggerLabel": "Trasparenza del processing AI",
       "closeLabel": "Nascondi dettagli del processing",

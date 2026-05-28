@@ -116,6 +116,8 @@ def run_transcribe(app: cli.AppClient, job: cli.ClaimResponse) -> None:
                 language_hint=src_lang,
                 asr_model_id=asr_model,
                 hf_token=os.environ.get("HF_TOKEN"),
+                initial_prompt=job.providerHints.asrInitialPrompt,
+                expected_speakers=job.providerHints.expectedSpeakers,
             )
 
         app.progress(job.jobId, "RUNNING", percent=80.0, message="asr+diar done")

@@ -24,10 +24,14 @@ from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import normalize
 from speechbrain.inference.speaker import EncoderClassifier
 
+import os
 AUDIO = "audio.wav"
 TRANSCRIPT_IN = "transcript_raw.json"
 TRANSCRIPT_OUT = "transcript_diarized.json"
 MIN_SEG_DURATION = 1.0
+# Quando l'admin conosce il numero (Event.expectedSpeakers), forziamo k:
+# evita gli outlier (cluster da 1-5 sec). Env override per test locale.
+EXPECTED_SPEAKERS = int(os.environ.get("EXPECTED_SPEAKERS", "0")) or None
 MAX_SPEAKERS = 6
 
 print("Loading ECAPA-TDNN…")
@@ -69,21 +73,31 @@ for i, s in enumerate(segs):
 print(f"Embedded {len(embeds)} segments")
 X = normalize(np.stack(embeds))  # L2 → cosine = dot
 
-# 2) stima k via silhouette
-best_k, best_score, best_labels = 1, -1.0, np.zeros(len(X), dtype=int)
-for k in range(2, min(MAX_SPEAKERS, len(X)) + 1):
-    if len(X) < k * 2:
-        break
-    clu = AgglomerativeClustering(n_clusters=k, metric="cosine", linkage="average")
-    labels = clu.fit_predict(X)
+# 2) k: forzato se EXPECTED_SPEAKERS (admin lo sa), altrimenti via silhouette
+if EXPECTED_SPEAKERS:
+    best_k = max(2, min(EXPECTED_SPEAKERS, len(X) // 2))
+    clu = AgglomerativeClustering(n_clusters=best_k, metric="cosine", linkage="average")
+    best_labels = clu.fit_predict(X)
     try:
-        score = silhouette_score(X, labels, metric="cosine")
+        best_score = silhouette_score(X, best_labels, metric="cosine")
     except Exception:
-        score = -1
-    print(f"  k={k} silhouette={score:.3f}")
-    if score > best_score:
-        best_k, best_score, best_labels = k, score, labels
-print(f"-> chosen k={best_k} (silhouette={best_score:.3f})")
+        best_score = -1
+    print(f"-> forced k={best_k} (silhouette={best_score:.3f})")
+else:
+    best_k, best_score, best_labels = 1, -1.0, np.zeros(len(X), dtype=int)
+    for k in range(2, min(MAX_SPEAKERS, len(X)) + 1):
+        if len(X) < k * 2:
+            break
+        clu = AgglomerativeClustering(n_clusters=k, metric="cosine", linkage="average")
+        labels = clu.fit_predict(X)
+        try:
+            score = silhouette_score(X, labels, metric="cosine")
+        except Exception:
+            score = -1
+        print(f"  k={k} silhouette={score:.3f}")
+        if score > best_score:
+            best_k, best_score, best_labels = k, score, labels
+    print(f"-> chosen k={best_k} (silhouette={best_score:.3f})")
 
 # 3) mappa segmenti → label
 seg_speaker = {i: f"SPEAKER_{l:02d}" for i, l in zip(seg_ix, best_labels)}

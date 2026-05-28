@@ -329,6 +329,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.aiTargetLocales !== undefined && {
         aiTargetLocales: data.aiTargetLocales,
       }),
+      ...(data.expectedSpeakers !== undefined && {
+        expectedSpeakers: data.expectedSpeakers,
+      }),
     },
   });
 

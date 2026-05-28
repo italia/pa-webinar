@@ -100,6 +100,10 @@ const eventBaseSchema = z.object({
   aiDubbingEnabled: z.boolean().optional(),
   // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales: z.string().max(200).nullable().optional(),
+  // Numero di parlanti attesi (1-30). Quando valorizzato, la pipeline
+  // postprod forza k=N nel clustering della diarization invece di
+  // auto-detect via silhouette. Null = lascia decidere al modello.
+  expectedSpeakers: z.number().int().min(1).max(30).nullable().optional(),
 });
 
 export const createEventSchema = eventBaseSchema.refine(

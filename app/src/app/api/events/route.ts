@@ -142,6 +142,9 @@ export const POST = withErrorHandling(async (request) => {
       ...(data.aiTargetLocales !== undefined && {
         aiTargetLocales: data.aiTargetLocales,
       }),
+      ...(data.expectedSpeakers !== undefined && {
+        expectedSpeakers: data.expectedSpeakers,
+      }),
       // Default reminders: 1 day and 1 hour before
       reminders: {
         create: [

@@ -52,6 +52,7 @@ interface Segment {
   speaker: string | null;
   speakerName: string | null;
   words?: SegmentWord[];
+  lowConfidence?: boolean;
 }
 
 interface TranscriptResponse {
@@ -717,6 +718,25 @@ export default function TranscriptPanel({
                     <span className="fw-semibold" style={{ color: palette.color }}>
                       {speakerLabel}
                     </span>
+                    {seg.lowConfidence && (
+                      <span
+                        title={t('lowConfidenceTitle')}
+                        aria-label={t('lowConfidenceTitle')}
+                        className="d-inline-flex align-items-center"
+                        style={{
+                          marginLeft: 4,
+                          fontSize: 11,
+                          color: '#A66300',
+                          background: '#FFF6DA',
+                          border: '1px solid #F2D88A',
+                          borderRadius: 4,
+                          padding: '0 5px',
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {t('lowConfidenceBadge')}
+                      </span>
+                    )}
                     <div className="ms-auto d-flex align-items-center gap-1 postprod-segment__actions">
                       <button
                         type="button"
