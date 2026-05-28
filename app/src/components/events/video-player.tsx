@@ -1,18 +1,87 @@
 'use client';
 
 import {
+  forwardRef,
+  useImperativeHandle,
   useRef,
   useState,
   useCallback,
   useEffect,
   type KeyboardEvent,
+  type ForwardedRef,
 } from 'react';
 import { useTranslations } from 'next-intl';
+
+export interface SubtitleTrack {
+  /** ISO-639-1 language code, e.g. "it", "en", "fr". */
+  language: string;
+  /** Public VTT URL (typically `/api/events/{slug}/postprod/subtitle/{lang}`). */
+  src: string;
+  /** Human label, e.g. "Italiano". */
+  label: string;
+  /** When true, this track is rendered as the default `<track default>`. */
+  isDefault?: boolean;
+}
+
+/**
+ * Alternative audio track (dubbed audio). The player swaps the active
+ * audio between the original video track and one of these external
+ * `<audio>` elements, synced to the video's currentTime.
+ *
+ * AI Act Art. 50: ogni traccia con `isSynthetic: true` viene mostrata
+ * con un badge "Doppiaggio AI" e una nota nel menu di selezione audio.
+ */
+export interface AudioTrack {
+  /** ISO-639-1 language code or "original" for the source audio. */
+  language: string;
+  /** Public URL of the audio file (m4a / mp3). Ignored when `language === 'original'`. */
+  src?: string;
+  /** Human label, e.g. "English (AI dubbed)". */
+  label: string;
+  /** True for synthetic / AI-generated audio. */
+  isSynthetic?: boolean;
+}
 
 interface VideoPlayerProps {
   src: string;
   title: string;
   poster?: string;
+  /**
+   * Optional WebVTT subtitle tracks. Each becomes a `<track>` element.
+   * The active track is exposed via a small in-player switcher (CC
+   * button) shown only when at least one track is present.
+   */
+  subtitleTracks?: SubtitleTrack[];
+  /** Hook fired when the user picks a different subtitle language. */
+  onSubtitleChange?: (lang: string | null) => void;
+  /**
+   * Optional dubbed audio tracks. When present, the player shows an
+   * "Audio" button next to the CC button and the user can switch the
+   * playback audio to a dubbed language. Selecting any of these
+   * mutes the video's audio and plays the external <audio> in sync.
+   */
+  audioTracks?: AudioTrack[];
+  /** Hook fired when the user picks a different audio track. */
+  onAudioChange?: (lang: string) => void;
+}
+
+/**
+ * Handle esposto via ref dal player. Permette ai consumer (es. il
+ * TranscriptPanel) di leggere il tempo corrente, fare seek, gestire
+ * pause/play senza dover possedere il `<video>` element diretto.
+ */
+export interface VideoPlayerHandle {
+  /** Current playback time in seconds. */
+  currentTime: () => number;
+  /** Seek to `seconds`. If `play` is true, resume after seek. */
+  seekTo: (seconds: number, play?: boolean) => void;
+  /** Pause the playback. */
+  pause: () => void;
+  /** Play the playback (returns a Promise like HTMLMediaElement.play). */
+  play: () => Promise<void> | void;
+  /** Raw video element — escape hatch for advanced cases (timeupdate
+   *  listener registration), used by TranscriptPanel. */
+  videoEl: () => HTMLVideoElement | null;
 }
 
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
@@ -26,13 +95,97 @@ function formatTime(seconds: number): string {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
-export default function VideoPlayer({ src, title, poster }: VideoPlayerProps) {
+function VideoPlayerImpl(
+  {
+    src,
+    title,
+    poster,
+    subtitleTracks,
+    onSubtitleChange,
+    audioTracks,
+    onAudioChange,
+  }: VideoPlayerProps,
+  ref: ForwardedRef<VideoPlayerHandle>,
+) {
   const t = useTranslations('video');
   const videoRef = useRef<HTMLVideoElement>(null);
+  const dubbedAudioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [playing, setPlaying] = useState(false);
+  const [activeSubtitle, setActiveSubtitle] = useState<string | null>(
+    subtitleTracks?.find((t) => t.isDefault)?.language ?? null,
+  );
+  const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
+  const [activeAudio, setActiveAudio] = useState<string>('original');
+  const [showAudioMenu, setShowAudioMenu] = useState(false);
+
+  // Imperative handle per consumer esterni (TranscriptPanel ecc.).
+  useImperativeHandle(ref, () => ({
+    currentTime: () => videoRef.current?.currentTime ?? 0,
+    seekTo: (seconds, play = true) => {
+      const v = videoRef.current;
+      if (!v) return;
+      v.currentTime = seconds;
+      if (play && v.paused) void v.play();
+    },
+    pause: () => videoRef.current?.pause(),
+    play: () => videoRef.current?.play() ?? Promise.resolve(),
+    videoEl: () => videoRef.current,
+  }), []);
+
+  // Sincronizza l'audio dubbed con il video. Quando l'utente cambia
+  // traccia audio:
+  //  - 'original': il video usa il suo audio nativo, l'<audio> esterno
+  //    è silenziato e in pausa.
+  //  - 'en' / 'fr' / ecc.: il video viene mutato (muted=true), e
+  //    l'<audio> esterno parte sincronizzato.
+  // Tutti i seek / play / pause sul video vengono propagati all'audio
+  // esterno via i listener qui sotto.
+  useEffect(() => {
+    const v = videoRef.current;
+    const a = dubbedAudioRef.current;
+    if (!v) return;
+
+    const isDubbed = activeAudio !== 'original';
+    v.muted = isDubbed;
+
+    if (!a) return;
+    if (!isDubbed) {
+      a.pause();
+      a.currentTime = 0;
+      return;
+    }
+
+    // Mantieni l'audio in sincrono col video. Eventi-driven (più
+    // efficiente del setInterval) — registriamo i listener qui e li
+    // smontiamo nel cleanup.
+    a.currentTime = v.currentTime;
+    if (!v.paused) void a.play().catch(() => undefined);
+
+    const onPlay = (): void => {
+      a.currentTime = v.currentTime;
+      void a.play().catch(() => undefined);
+    };
+    const onPause = (): void => a.pause();
+    const onSeek = (): void => {
+      a.currentTime = v.currentTime;
+    };
+    const onRate = (): void => {
+      a.playbackRate = v.playbackRate;
+    };
+    v.addEventListener('play', onPlay);
+    v.addEventListener('pause', onPause);
+    v.addEventListener('seeked', onSeek);
+    v.addEventListener('ratechange', onRate);
+    return () => {
+      v.removeEventListener('play', onPlay);
+      v.removeEventListener('pause', onPause);
+      v.removeEventListener('seeked', onSeek);
+      v.removeEventListener('ratechange', onRate);
+    };
+  }, [activeAudio]);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
@@ -47,6 +200,37 @@ export default function VideoPlayer({ src, title, poster }: VideoPlayerProps) {
   useEffect(() => {
     setPipSupported('pictureInPictureEnabled' in document && document.pictureInPictureEnabled);
   }, []);
+
+  // Keep <video>.textTracks[i].mode in sync with the selected
+  // subtitle language. The `default` attribute on <track> is only
+  // consulted on initial load, so switching at runtime requires
+  // poking the TextTrack API directly. We also walk the list on
+  // every change so newly-added tracks (track.src loads
+  // asynchronously) are reconciled.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !subtitleTracks?.length) return;
+    const apply = (): void => {
+      for (let i = 0; i < video.textTracks.length; i += 1) {
+        const tt = video.textTracks[i];
+        if (!tt) continue;
+        // textTracks are matched by language; if multiple kinds with the
+        // same language are present, only `subtitles`/`captions` count.
+        const kind = tt.kind === 'captions' || tt.kind === 'subtitles';
+        tt.mode =
+          kind && activeSubtitle && tt.language === activeSubtitle
+            ? 'showing'
+            : 'hidden';
+      }
+    };
+    apply();
+    // Tracks may not all be loaded yet when this effect first runs;
+    // the addtrack event refires reconciliation.
+    video.textTracks.addEventListener('addtrack', apply);
+    return () => {
+      video.textTracks.removeEventListener('addtrack', apply);
+    };
+  }, [activeSubtitle, subtitleTracks]);
 
   const scheduleHideControls = useCallback(() => {
     if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
@@ -218,6 +402,7 @@ export default function VideoPlayer({ src, title, poster }: VideoPlayerProps) {
         src={src}
         poster={poster}
         preload="metadata"
+        crossOrigin="anonymous"
         onClick={togglePlay}
         onPlay={() => { setPlaying(true); scheduleHideControls(); }}
         onPause={() => { setPlaying(false); setShowControls(true); }}
@@ -226,7 +411,64 @@ export default function VideoPlayer({ src, title, poster }: VideoPlayerProps) {
           if (videoRef.current) setDuration(videoRef.current.duration);
         }}
         className="video-player__video"
-      />
+      >
+        {subtitleTracks?.map((track) => (
+          <track
+            key={track.language}
+            kind="subtitles"
+            srcLang={track.language}
+            src={track.src}
+            label={track.label}
+            default={
+              activeSubtitle ? activeSubtitle === track.language : track.isDefault
+            }
+          />
+        ))}
+      </video>
+
+      {/* Hidden audio element per traccia dubbed. Solo uno alla volta
+          attivo: cambiamo src quando l'utente switcha lingua. Resta in
+          sync via i listener nel useEffect [activeAudio] sopra. */}
+      {audioTracks && audioTracks.length > 0 && (
+        <audio
+          ref={dubbedAudioRef}
+          src={
+            activeAudio !== 'original'
+              ? audioTracks.find((a) => a.language === activeAudio)?.src
+              : undefined
+          }
+          preload="metadata"
+          crossOrigin="anonymous"
+          style={{ display: 'none' }}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Banner AI Act Art. 50 quando l'utente sta ascoltando audio
+          sintetico — discoverabile, persistente (non un toast), non
+          intrusivo (sopra il video, semitrasparente). */}
+      {activeAudio !== 'original' &&
+        audioTracks?.find((a) => a.language === activeAudio)?.isSynthetic && (
+          <div
+            role="note"
+            className="video-player__ai-banner"
+            style={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              right: 8,
+              background: 'rgba(0,40,80,0.85)',
+              color: '#fff',
+              padding: '6px 12px',
+              borderRadius: 4,
+              fontSize: 13,
+              zIndex: 5,
+              pointerEvents: 'none',
+            }}
+          >
+            🔊 {t('audioSyntheticBanner')}
+          </div>
+        )}
 
       {/* Large centered play overlay when paused */}
       {!playing && (
@@ -323,6 +565,142 @@ export default function VideoPlayer({ src, title, poster }: VideoPlayerProps) {
 
           <div className="video-player__spacer" />
 
+          {/* Audio track selector (lingua audio doppiata) */}
+          {audioTracks && audioTracks.length > 0 && (
+            <div className="video-player__speed-wrapper">
+              <button
+                className="video-player__btn"
+                onClick={() => setShowAudioMenu((v) => !v)}
+                aria-label={t('audioLabel')}
+                aria-expanded={showAudioMenu}
+                type="button"
+                title={t('audioLabel')}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <path d="M12 3c-4.97 0-9 4.03-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7c0-4.97-4.03-9-9-9z" />
+                </svg>
+                {activeAudio !== 'original' && (
+                  <span
+                    className="video-player__speed-badge"
+                    style={{ marginLeft: 6 }}
+                  >
+                    {activeAudio.toUpperCase()}
+                  </span>
+                )}
+              </button>
+              {showAudioMenu && (
+                <div
+                  className="video-player__speed-menu"
+                  role="listbox"
+                  aria-label={t('audioLabel')}
+                >
+                  <button
+                    key="original"
+                    className={`video-player__speed-option${activeAudio === 'original' ? ' video-player__speed-option--active' : ''}`}
+                    onClick={() => {
+                      setActiveAudio('original');
+                      setShowAudioMenu(false);
+                      onAudioChange?.('original');
+                    }}
+                    role="option"
+                    aria-selected={activeAudio === 'original'}
+                    type="button"
+                  >
+                    {t('audioOriginal')}
+                  </button>
+                  {audioTracks.map((track) => (
+                    <button
+                      key={track.language}
+                      className={`video-player__speed-option${activeAudio === track.language ? ' video-player__speed-option--active' : ''}`}
+                      onClick={() => {
+                        setActiveAudio(track.language);
+                        setShowAudioMenu(false);
+                        onAudioChange?.(track.language);
+                      }}
+                      role="option"
+                      aria-selected={activeAudio === track.language}
+                      type="button"
+                    >
+                      {track.label}
+                      {track.isSynthetic && (
+                        <span
+                          aria-hidden="true"
+                          title={t('audioSyntheticHint')}
+                          style={{ marginLeft: 6, opacity: 0.7 }}
+                        >
+                          🤖
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Subtitle (CC) selector */}
+          {subtitleTracks && subtitleTracks.length > 0 && (
+            <div className="video-player__speed-wrapper">
+              <button
+                className="video-player__btn"
+                onClick={() => setShowSubtitleMenu((v) => !v)}
+                aria-label={t('subtitles')}
+                aria-expanded={showSubtitleMenu}
+                type="button"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z" />
+                </svg>
+                {activeSubtitle && (
+                  <span
+                    className="video-player__speed-badge"
+                    style={{ marginLeft: 6 }}
+                  >
+                    {activeSubtitle.toUpperCase()}
+                  </span>
+                )}
+              </button>
+              {showSubtitleMenu && (
+                <div
+                  className="video-player__speed-menu"
+                  role="listbox"
+                  aria-label={t('subtitles')}
+                >
+                  <button
+                    key="off"
+                    className={`video-player__speed-option${activeSubtitle === null ? ' video-player__speed-option--active' : ''}`}
+                    onClick={() => {
+                      setActiveSubtitle(null);
+                      setShowSubtitleMenu(false);
+                      onSubtitleChange?.(null);
+                    }}
+                    role="option"
+                    aria-selected={activeSubtitle === null}
+                    type="button"
+                  >
+                    {t('subtitlesOff')}
+                  </button>
+                  {subtitleTracks.map((track) => (
+                    <button
+                      key={track.language}
+                      className={`video-player__speed-option${activeSubtitle === track.language ? ' video-player__speed-option--active' : ''}`}
+                      onClick={() => {
+                        setActiveSubtitle(track.language);
+                        setShowSubtitleMenu(false);
+                        onSubtitleChange?.(track.language);
+                      }}
+                      role="option"
+                      aria-selected={activeSubtitle === track.language}
+                      type="button"
+                    >
+                      {track.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Speed selector */}
           <div className="video-player__speed-wrapper">
             <button
@@ -387,3 +765,10 @@ export default function VideoPlayer({ src, title, poster }: VideoPlayerProps) {
     </div>
   );
 }
+
+const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
+  VideoPlayerImpl,
+);
+VideoPlayer.displayName = 'VideoPlayer';
+
+export default VideoPlayer;

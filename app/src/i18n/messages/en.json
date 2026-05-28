@@ -1806,6 +1806,43 @@
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Profile information is updated automatically on every re-registration.",
       "backToList": "← Back to address book"
     },
+    "postprod": {
+      "title": "AI post-production pipeline",
+      "subtitle": "Transcripts, summaries and translations produced by the in-cluster AI pipeline. Map speakers, re-run or cancel jobs.",
+      "filterStatus": "Status",
+      "all": "All",
+      "queued": "Queued",
+      "running": "Running",
+      "done": "Done",
+      "partial": "Partial",
+      "failed": "Failed",
+      "totalRows": "{count, plural, =0 {no recordings} one {1 recording} other {# recordings}}",
+      "colEvent": "Event",
+      "colCreated": "Created",
+      "colDuration": "Duration",
+      "colStatus": "Status",
+      "colJobs": "Jobs",
+      "colArtifacts": "Artifacts",
+      "colActions": "Actions",
+      "rerun": "Re-run",
+      "rerunTooltip": "Creates a new run by bumping runCount; previous artifacts persist until retention",
+      "cancel": "Cancel",
+      "cancelConfirm": "Cancel all pending jobs for this recording?",
+      "rerunFailed": "Re-run failed (HTTP {code})",
+      "cancelFailed": "Cancel failed (HTTP {code})",
+      "speakerUpdateFailed": "Speaker update failed (HTTP {code})",
+      "loadError": "Could not load the job list",
+      "empty": "No recordings match the current filters",
+      "detailJobs": "Jobs",
+      "detailArtifacts": "Artifacts",
+      "detailSpeakers": "Speakers",
+      "noArtifacts": "No artifacts produced yet",
+      "noSpeakers": "No speakers detected",
+      "attempts": "attempt {n}",
+      "speakerPlaceholder": "Real name (optional)",
+      "speakerSpoke": "Speaking time: {sec}s",
+      "save": "Save"
+    },
     "questionnairesPage": {
       "title": "Questionnaires",
       "subtitle": "Reusable question templates for pre-registration and post-event questionnaires."
@@ -2274,6 +2311,7 @@
     "connMedia": "video stream",
     "connRecording": "recording",
     "connUpload": "upload",
+    "connPostprod": "AI postprod",
     "connPubSub": "chat pub/sub",
     "services": {
       "app": "Web portal",
@@ -2284,7 +2322,8 @@
       "jicofo": "Conference coordinator",
       "jvb": "Video bridge",
       "jibri": "Video recording",
-      "smtp": "Email service"
+      "smtp": "Email service",
+      "postprod": "AI post-production pipeline"
     },
     "descriptions": {
       "app": "The website where you access events",
@@ -2295,7 +2334,8 @@
       "jicofo": "Coordinates who participates in each conference",
       "jvb": "Transmits audio and video to participants",
       "jibri": "Records video sessions of events",
-      "smtp": "Sends confirmation emails and reminders"
+      "smtp": "Sends confirmation emails and reminders",
+      "postprod": "Transcribes, summarises and translates recordings using in-cluster AI models (NVIDIA A100 GPU). Activates only when an event opts into AI features."
     },
     "verdicts": {
       "app": {
@@ -2343,6 +2383,12 @@
       "smtp": {
         "healthy": "The email service is configured and ready to send notifications.",
         "standby": "The email service is not configured. Confirmation emails and reminders will not be sent."
+      },
+      "postprod": {
+        "healthy": "The AI pipeline is processing a recording (GPU worker active).",
+        "scaling": "Postprod jobs queued — the GPU node is starting up (cold-start ~3 min).",
+        "standby": "AI pipeline enabled but idle: no recordings to process. The GPU node is powered down to save energy.",
+        "degraded": "One or more AI jobs failed in the last 24h. Check /admin/postprod for details."
       }
     },
     "impacts": {
@@ -2355,7 +2401,8 @@
       "jvbStale": "An event has been waiting for the bridge longer than the configured timeout: participants cannot join.",
       "jibri": "Events cannot be recorded. Participants can still join and participate.",
       "jibriStale": "An event with recording enabled has been waiting for Jibri past the timeout: the session is not being recorded.",
-      "smtp": "Registration confirmation emails and reminders will not be sent."
+      "smtp": "Registration confirmation emails and reminders will not be sent.",
+      "postprodDegraded": "Transcripts and summaries for some recent recordings were not generated. Video recordings remain available."
     },
     "overallVerdicts": {
       "operational": "All services are working correctly. The platform is fully operational.",
@@ -2505,7 +2552,22 @@
     "unmute": "Unmute",
     "download": "Download recording",
     "speedLabel": "Playback speed",
-    "progress": "Progress bar"
+    "progress": "Progress bar",
+    "subtitles": "Subtitles",
+    "subtitlesOff": "Off",
+    "audioLabel": "Audio",
+    "audioOriginal": "Original",
+    "audioSyntheticBanner": "AI-dubbed audio — synthetic voice, automatically generated content.",
+    "audioSyntheticHint": "AI-generated audio"
+  },
+  "postprod": {
+    "loading": "Loading transcript…",
+    "loadError": "Could not load the transcript: {error}",
+    "empty": "No transcript available for this event.",
+    "tabTranscript": "Transcript",
+    "tabSummary": "Summary",
+    "aiBadgeLabel": "AI-generated content",
+    "aiBadgeBody": "Transcript and summary are produced automatically by the in-cluster AI pipeline. They may contain errors; the video remains the authoritative source."
   },
   "diagram": {
     "title": "Event configuration",
@@ -2629,7 +2691,8 @@
       "qa": "Questions & Answers",
       "materials": "Materials",
       "polls": "Polls",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "transcript": "AI transcript"
     }
   },
   "provisioning": {

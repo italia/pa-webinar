@@ -10,6 +10,14 @@ name: Dev build
 #
 # Manual dispatch supports `no_cache=true` to force a clean rebuild when
 # layer caching is suspected of serving a stale artifact.
+#
+# Il job `postprod-worker` builda il container Python con CUDA + WhisperX
+# + pyannote + Piper TTS — è MOLTO più pesante (~22GB) e parte solo se
+# i sorgenti `infra/ai/` sono cambiati nel push (path filter più sotto).
+# Lo isoliamo in un job separato così l'iterazione "veloce" sull'app
+# (sub-3min) resta indipendente dal ciclo pesante del worker
+# (~25 min build + push). Entrambi i job pushano tag `:dev` mutable +
+# `:dev-<sha>` immutable.
 
 on:
   push:
@@ -21,10 +29,15 @@ on:
         description: "Disable buildx layer cache (use for cache poisoning emergencies)"
         type: boolean
         default: false
+      force_worker_build:
+        description: "Forza il build del postprod worker anche se infra/ai/ non è cambiato"
+        type: boolean
+        default: false
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/eventi-dtd
+  WORKER_IMAGE_NAME: italia/eventi-dtd-postprod-worker
 
 concurrency:
   # Cancel in-flight dev builds when a new push lands — we only care about
@@ -108,4 +121,109 @@ jobs:
           echo 'Deploy to test cluster:' >> "$GITHUB_STEP_SUMMARY"
           echo '```sh' >> "$GITHUB_STEP_SUMMARY"
           echo 'kubectl -n videocall-test rollout restart deploy/videocall-test-eventi-dtd' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  # Postprod AI worker: container Python con CUDA + WhisperX + pyannote
+  # + Piper TTS. Image size ~22GB compressi → ~7-10GB pushati su GHCR.
+  # Build pesante (~20-25 min cold, ~5-10 min con cache). Lo isoliamo
+  # dal build app per non rallentare il cycle "dev iteration" sulla
+  # codebase Next.js.
+  #
+  # Path filter: parte solo se i sorgenti `infra/ai/` o
+  # `infra/helm/eventi-dtd/templates/cronjob-postprod-*.yaml` sono
+  # cambiati nel push, OPPURE su workflow_dispatch con
+  # `force_worker_build=true`. Per il primo run, usa workflow_dispatch.
+  detect-worker-changes:
+    name: Detect postprod worker changes
+    runs-on: arc-runner-eventi-dtd
+    outputs:
+      worker_changed: ${{ steps.filter.outputs.worker }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Filter changed files
+        id: filter
+        run: |
+          # Su workflow_dispatch con flag forzato, build sempre.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ inputs.force_worker_build }}" = "true" ]; then
+            echo "worker=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Su push: diff con HEAD~1 — qualunque modifica sotto
+          # infra/ai/ o sui template Helm postprod fa scattare il build.
+          CHANGED=$(git diff --name-only HEAD~1 HEAD || git ls-files)
+          if echo "$CHANGED" | grep -qE '^(infra/ai/|infra/helm/eventi-dtd/templates/cronjob-postprod-)'; then
+            echo "worker=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "worker=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-worker:
+    name: Build & Push Postprod Worker Image
+    needs: detect-worker-changes
+    if: needs.detect-worker-changes.outputs.worker_changed == 'true'
+    runs-on: arc-runner-eventi-dtd
+    permissions:
+      contents: read
+      packages: write
+    # Build pesante: il base NGC pytorch image è ~10GB, pyannote+whisperx
+    # tirano modelli da HF al runtime ma il pip install è ~5GB. 60 min
+    # è un buffer ampio (cold senza cache fa ~25-30 min).
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute worker tags
+        id: tags
+        run: |
+          SHA_SHORT="${GITHUB_SHA::7}"
+          {
+            echo "sha_short=$SHA_SHORT"
+            echo "worker_tags=${{ env.REGISTRY }}/${{ env.WORKER_IMAGE_NAME }}:dev,${{ env.REGISTRY }}/${{ env.WORKER_IMAGE_NAME }}:dev-$SHA_SHORT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push worker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./infra/ai
+          file: ./infra/ai/Dockerfile.worker
+          push: true
+          tags: ${{ steps.tags.outputs.worker_tags }}
+          platforms: linux/amd64
+          # Cache GHA scope dedicato — non condividere con l'app che
+          # ha layer diversi e cache-poisoning sarebbe rischioso (un
+          # cambio di pytorch base invaliderebbe layer non legati).
+          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-postprod-worker' }}
+          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-postprod-worker' }}
+          labels: |
+            org.opencontainers.image.title=eventi-dtd-postprod-worker
+            org.opencontainers.image.description=Postprod AI worker (WhisperX + pyannote + Piper TTS) for eventi-dtd
+            org.opencontainers.image.source=https://github.com/italia/eventi-dtd
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.ref.name=dev
+
+      - name: Summary
+        run: |
+          echo "### Postprod worker image pushed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '| image | tag |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          echo '| postprod-worker | `dev`, `dev-${{ steps.tags.outputs.sha_short }}` |' >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Deploy nuovi worker (i Job sono one-shot, picckano la nuova image al prossimo claim):' >> "$GITHUB_STEP_SUMMARY"
+          echo '```sh' >> "$GITHUB_STEP_SUMMARY"
+          echo '# Nessuna azione: il CronJob orchestrator crea Job nuovi col tag :dev a ogni tick.' >> "$GITHUB_STEP_SUMMARY"
+          echo '# Per forzare un re-pull dei nodi GPU già allocati:' >> "$GITHUB_STEP_SUMMARY"
+          echo 'kubectl -n videocall-test delete jobs -l app.kubernetes.io/component=postprod-worker' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
