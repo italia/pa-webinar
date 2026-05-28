@@ -99,14 +99,17 @@ export default function SiteSettingsForm({
 
   return (
     <div>
-      {/* Tab navigation */}
+      {/* Tab navigation. Wrap su più righe invece dello scroll
+          orizzontale: con N tab (9 a maggio 2026), lo scroll era
+          difficile da scoprire — tab oltre la fold restavano nascoste
+          finché l'utente non swipava. Wrap garantisce visibilità di
+          tutte le sezioni a colpo d'occhio anche su viewport mobile. */}
       <ul
-        className="nav nav-tabs flex-nowrap mb-4"
+        className="nav nav-tabs flex-wrap mb-4"
         role="tablist"
-        style={{ overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}
       >
         {tabs.map((tab) => (
-          <li key={tab.id} className="nav-item flex-shrink-0" role="presentation">
+          <li key={tab.id} className="nav-item" role="presentation">
             <button
               className={`nav-link d-inline-flex align-items-center gap-2 text-nowrap ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
@@ -1472,16 +1475,21 @@ function PostprodTab({ settings, updateField }: TabProps) {
         <Col md={6}>
           <FormGroup>
             <Label htmlFor="aiAsrProvider">{t('asrProvider')}</Label>
-            <Input
+            {/* Native <select> — il wrapper <Input type="select"> di
+                design-react-kit ha mostrato il React #137 in produzione,
+                il pattern adottato nel resto del codebase
+                (recordings-dashboard, gdpr-audit-dashboard) è il
+                <select> con className="form-control". */}
+            <select
               id="aiAsrProvider"
-              type="select"
+              className="form-control"
               value={settings.aiAsrProvider ?? 'whisperx'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e) =>
                 updateField('aiAsrProvider', e.target.value as 'whisperx')
               }
             >
               <option value="whisperx">WhisperX (large-v3 + pyannote)</option>
-            </Input>
+            </select>
             <small className="text-muted d-block mt-1">
               {t('asrProviderHelp')}
             </small>
@@ -1490,16 +1498,16 @@ function PostprodTab({ settings, updateField }: TabProps) {
         <Col md={6}>
           <FormGroup>
             <Label htmlFor="aiLlmProvider">{t('llmProvider')}</Label>
-            <Input
+            <select
               id="aiLlmProvider"
-              type="select"
+              className="form-control"
               value={settings.aiLlmProvider ?? 'vllm'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e) =>
                 updateField('aiLlmProvider', e.target.value as 'vllm')
               }
             >
               <option value="vllm">vLLM in-cluster (Mistral)</option>
-            </Input>
+            </select>
             <small className="text-muted d-block mt-1">
               {t('llmProviderHelp')}
             </small>
@@ -1508,16 +1516,16 @@ function PostprodTab({ settings, updateField }: TabProps) {
         <Col md={6}>
           <FormGroup>
             <Label htmlFor="aiTtsEngine">{t('ttsEngine')}</Label>
-            <Input
+            <select
               id="aiTtsEngine"
-              type="select"
+              className="form-control"
               value={settings.aiTtsEngine ?? 'piper'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e) =>
                 updateField('aiTtsEngine', e.target.value as 'piper')
               }
             >
               <option value="piper">Piper TTS (voce neutra, MIT)</option>
-            </Input>
+            </select>
             <small className="text-muted d-block mt-1">
               {t('ttsEngineHelp')}
             </small>
