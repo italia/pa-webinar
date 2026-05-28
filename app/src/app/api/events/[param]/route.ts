@@ -19,6 +19,7 @@ import { sendDateChangeNotifications } from '@/lib/email/notification';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 
 export const dynamic = 'force-dynamic';
 
@@ -313,6 +314,21 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.parseTitleKicker !== undefined && {
         parseTitleKicker: data.parseTitleKicker,
       }),
+      ...(data.aiTranscriptEnabled !== undefined && {
+        aiTranscriptEnabled: data.aiTranscriptEnabled,
+      }),
+      ...(data.aiSummaryEnabled !== undefined && {
+        aiSummaryEnabled: data.aiSummaryEnabled,
+      }),
+      ...(data.aiTranslationEnabled !== undefined && {
+        aiTranslationEnabled: data.aiTranslationEnabled,
+      }),
+      ...(data.aiDubbingEnabled !== undefined && {
+        aiDubbingEnabled: data.aiDubbingEnabled,
+      }),
+      ...(data.aiTargetLocales !== undefined && {
+        aiTargetLocales: data.aiTargetLocales,
+      }),
     },
   });
 
@@ -320,6 +336,13 @@ export const PUT = withErrorHandling(async (request, context) => {
     const locale = resolveLocale(request) as 'it' | 'en';
     sendDateChangeNotifications({ eventId, locale });
   }
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_UPDATE',
+    target: eventId,
+    details: { fields: Object.keys(data), dateChanged },
+  });
 
   return Response.json({ ...updated, dateChanged });
 });
@@ -340,6 +363,13 @@ export const DELETE = withErrorHandling(async (request, context) => {
   if (!event) throw new ForbiddenError('Invalid moderator token or event not found');
 
   await prisma.event.delete({ where: { id: eventId } });
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_DELETE',
+    target: eventId,
+    details: { slug: event.slug },
+  });
 
   return Response.json({ deleted: true, id: eventId });
 });

@@ -89,6 +89,17 @@ const eventBaseSchema = z.object({
   // Null (or omitted) inherits SiteSetting.parseTitleKicker; true/false
   // force on/off for this event only.
   parseTitleKicker: z.boolean().nullable().optional(),
+
+  // ── AI postprod opt-ins (per-event). Master gate is the global
+  //    SiteSetting.aiPipelineEnabled; these toggles let an organizer
+  //    decide cosa generare per il singolo evento. Vedi schema.prisma
+  //    `Event.aiTranscriptEnabled` ecc.
+  aiTranscriptEnabled: z.boolean().optional(),
+  aiSummaryEnabled: z.boolean().optional(),
+  aiTranslationEnabled: z.boolean().optional(),
+  aiDubbingEnabled: z.boolean().optional(),
+  // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
+  aiTargetLocales: z.string().max(200).nullable().optional(),
 });
 
 export const createEventSchema = eventBaseSchema.refine(

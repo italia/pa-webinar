@@ -195,6 +195,7 @@ function VideoPlayerImpl(
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [pipSupported, setPipSupported] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
@@ -327,38 +328,106 @@ function VideoPlayerImpl(
     }
   }, []);
 
+  // Toggle captions (C key + button): walks textTracks and either
+  // hides the active track or shows the default/first track. Mirrors
+  // the menu state via setActiveSubtitle so the badge stays in sync.
+  const toggleCaptions = useCallback(() => {
+    if (!subtitleTracks || subtitleTracks.length === 0) return;
+    if (activeSubtitle) {
+      setActiveSubtitle(null);
+      onSubtitleChange?.(null);
+    } else {
+      const pick =
+        subtitleTracks.find((tr) => tr.isDefault)?.language ??
+        subtitleTracks[0]?.language ??
+        null;
+      if (pick) {
+        setActiveSubtitle(pick);
+        onSubtitleChange?.(pick);
+      }
+    }
+  }, [subtitleTracks, activeSubtitle, onSubtitleChange]);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
       const video = videoRef.current;
       if (!video) return;
 
+      // Lasciamo che gli input testuali (cerca trascrizione, ecc.)
+      // ricevano il loro tasto — solo i controlli del player gestiscono
+      // le scorciatoie. Se l'utente sta digitando in un <input> non
+      // intercettare nulla.
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const tag = target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable) {
+          return;
+        }
+      }
+
       switch (e.key) {
         case ' ':
+        case 'k':
+        case 'K':
           e.preventDefault();
           togglePlay();
           break;
         case 'ArrowLeft':
           e.preventDefault();
-          video.currentTime = Math.max(0, video.currentTime - 10);
+          video.currentTime = Math.max(0, video.currentTime - 5);
           break;
         case 'ArrowRight':
+          e.preventDefault();
+          video.currentTime = Math.min(duration, video.currentTime + 5);
+          break;
+        case 'j':
+        case 'J':
+          e.preventDefault();
+          video.currentTime = Math.max(0, video.currentTime - 10);
+          break;
+        case 'l':
+        case 'L':
           e.preventDefault();
           video.currentTime = Math.min(duration, video.currentTime + 10);
           break;
         case 'ArrowUp':
           e.preventDefault();
-          video.volume = Math.min(1, video.volume + 0.1);
+          video.volume = Math.min(1, video.volume + 0.05);
           setVolume(video.volume);
+          if (video.muted) {
+            video.muted = false;
+            setMuted(false);
+          }
           break;
         case 'ArrowDown':
           e.preventDefault();
-          video.volume = Math.max(0, video.volume - 0.1);
+          video.volume = Math.max(0, video.volume - 0.05);
           setVolume(video.volume);
+          break;
+        case 'm':
+        case 'M':
+          e.preventDefault();
+          toggleMute();
+          break;
+        case 'c':
+        case 'C':
+          e.preventDefault();
+          toggleCaptions();
           break;
         case 'f':
         case 'F':
           e.preventDefault();
           toggleFullscreen();
+          break;
+        case '?':
+          e.preventDefault();
+          setShowShortcuts((v) => !v);
+          break;
+        case 'Escape':
+          if (showShortcuts) {
+            e.preventDefault();
+            setShowShortcuts(false);
+          }
           break;
         case ',':
           e.preventDefault();
@@ -381,7 +450,17 @@ function VideoPlayerImpl(
       }
       scheduleHideControls();
     },
-    [duration, speed, togglePlay, toggleFullscreen, changeSpeed, scheduleHideControls],
+    [
+      duration,
+      speed,
+      showShortcuts,
+      togglePlay,
+      toggleMute,
+      toggleCaptions,
+      toggleFullscreen,
+      changeSpeed,
+      scheduleHideControls,
+    ],
   );
 
   const playedPct = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -396,6 +475,7 @@ function VideoPlayerImpl(
       tabIndex={0}
       role="region"
       aria-label={title}
+      aria-keyshortcuts="Space K ArrowLeft ArrowRight ArrowUp ArrowDown J L M C F ? , ."
     >
       <video
         ref={videoRef}
@@ -466,9 +546,99 @@ function VideoPlayerImpl(
               pointerEvents: 'none',
             }}
           >
-            🔊 {t('audioSyntheticBanner')}
+            {t('audioSyntheticBanner')}
           </div>
         )}
+
+      {/* Keyboard shortcuts help button (top-right) + popover. Sempre
+          visibile (anche con controlli nascosti) per essere
+          discoverabile; il popover si chiude con Esc o clic sul
+          backdrop. */}
+      <button
+        type="button"
+        className="video-player__help-btn"
+        onClick={() => setShowShortcuts((v) => !v)}
+        aria-label={
+          showShortcuts ? t('shortcutsHelpClose') : t('shortcutsHelpOpen')
+        }
+        aria-expanded={showShortcuts}
+        aria-controls="video-player-shortcuts-popover"
+        title={t('shortcutsHelpOpen')}
+      >
+        <span aria-hidden="true" style={{ fontWeight: 700 }}>?</span>
+      </button>
+
+      {showShortcuts && (
+        <div
+          id="video-player-shortcuts-popover"
+          role="dialog"
+          aria-label={t('shortcutsTitle')}
+          className="video-player__shortcuts"
+        >
+          <div className="video-player__shortcuts-header">
+            <strong>{t('shortcutsTitle')}</strong>
+            <button
+              type="button"
+              className="video-player__shortcuts-close"
+              onClick={() => setShowShortcuts(false)}
+              aria-label={t('shortcutsHelpClose')}
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <dl className="video-player__shortcuts-list">
+            <div>
+              <dt>
+                <kbd>Space</kbd> <span aria-hidden="true">/</span>{' '}
+                <kbd>K</kbd>
+              </dt>
+              <dd>{t('shortcutsSpace')}</dd>
+            </div>
+            <div>
+              <dt>
+                <kbd>←</kbd> <kbd>→</kbd>
+              </dt>
+              <dd>{t('shortcutsArrowsLR')}</dd>
+            </div>
+            <div>
+              <dt>
+                <kbd>J</kbd> <kbd>L</kbd>
+              </dt>
+              <dd>{t('shortcutsJL')}</dd>
+            </div>
+            <div>
+              <dt>
+                <kbd>↑</kbd> <kbd>↓</kbd>
+              </dt>
+              <dd>{t('shortcutsArrowsUD')}</dd>
+            </div>
+            <div>
+              <dt>
+                <kbd>M</kbd>
+              </dt>
+              <dd>{t('shortcutsM')}</dd>
+            </div>
+            <div>
+              <dt>
+                <kbd>C</kbd>
+              </dt>
+              <dd>{t('shortcutsC')}</dd>
+            </div>
+            <div>
+              <dt>
+                <kbd>F</kbd>
+              </dt>
+              <dd>{t('shortcutsF')}</dd>
+            </div>
+            <div>
+              <dt>
+                <kbd>,</kbd> <kbd>.</kbd>
+              </dt>
+              <dd>{t('shortcutsSpeed')}</dd>
+            </div>
+          </dl>
+        </div>
+      )}
 
       {/* Large centered play overlay when paused */}
       {!playing && (
@@ -624,11 +794,11 @@ function VideoPlayerImpl(
                       {track.label}
                       {track.isSynthetic && (
                         <span
-                          aria-hidden="true"
+                          aria-label={t('audioSyntheticHint')}
                           title={t('audioSyntheticHint')}
-                          style={{ marginLeft: 6, opacity: 0.7 }}
+                          className="video-player__ai-tag"
                         >
-                          🤖
+                          AI
                         </span>
                       )}
                     </button>

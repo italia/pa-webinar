@@ -14,6 +14,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import { assertPostprodAccessible } from '@/lib/ai/access';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,15 +34,10 @@ interface TranscriptJson {
 export const GET = withErrorHandling(async (_request, context) => {
   const { param: slug } = (await (context as { params: Promise<{ param: string }> }).params);
 
-  const event = await prisma.event.findUnique({
-    where: { slug },
-    select: { id: true, recordingPublished: true },
-  });
-  if (!event) throw new NotFoundError('Event');
-  if (!event.recordingPublished) throw new NotFoundError('Transcript');
+  const { eventId } = await assertPostprodAccessible(slug);
 
   const recording = await prisma.recording.findFirst({
-    where: { eventId: event.id, status: { in: ['POSTPROD_DONE', 'POSTPROD_PARTIAL'] } },
+    where: { eventId, status: { in: ['POSTPROD_DONE', 'POSTPROD_PARTIAL'] } },
     orderBy: { createdAt: 'desc' },
     select: {
       id: true,
