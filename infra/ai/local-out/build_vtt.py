@@ -18,6 +18,15 @@ def fmt(t: float) -> str:
 
 
 def write_vtt(segments, key, path, *, speaker_names=None):
+    """Genera un file WebVTT con:
+      - voice tag `<v Name>` per la semantica (screen reader, JS API)
+      - prefisso "Name:" inline nel testo per la VISIBILITÀ. Il browser
+        HTML5 ignora il `<v>` di default; aggiungere il nome al testo
+        garantisce che chi guarda i sottotitoli sappia chi parla anche
+        senza CSS `::cue(v)` (che è inconsistent cross-browser).
+      - separatore in nuova riga: il nome è su una riga, il testo sotto.
+        L'overlay sottotitoli mostra entrambi in posizioni stabili.
+    """
     with open(path, "w") as f:
         f.write("WEBVTT\n\n")
         for i, s in enumerate(segments, 1):
@@ -26,8 +35,9 @@ def write_vtt(segments, key, path, *, speaker_names=None):
             text = s.get(key, "").strip()
             if not text:
                 continue
-            prefix = f"<v {label}>" if label else ""
-            f.write(f"{i}\n{fmt(s['start'])} --> {fmt(s['end'])}\n{prefix}{text}\n\n")
+            # `<v Label>` per semantica + prefisso testuale per visibilità
+            cue = f"<v {label}>{label}: {text}" if label else text
+            f.write(f"{i}\n{fmt(s['start'])} --> {fmt(s['end'])}\n{cue}\n\n")
 
 
 def main():

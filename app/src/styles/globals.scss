@@ -881,6 +881,27 @@
     max-height: 70vh;
     object-fit: contain;
     cursor: pointer;
+
+    // ::cue styling — overlay sottotitoli renderizzati dal browser.
+    // I VTT prodotti dalla pipeline AI hanno la forma
+    // `<v Name>Name: text`: il prefisso testuale "Name:" garantisce
+    // visibilità cross-browser perché Chrome/Safari ignorano
+    // ::cue(v) o lo trattano in modo inconsistente. Qui aggiungiamo
+    // solo styling generico — niente affidamento su attr().
+    &::cue {
+      background: rgba(0, 0, 0, 0.78);
+      color: #fff;
+      font-size: 0.95em;
+      line-height: 1.4;
+      padding: 0.25em 0.6em;
+      border-radius: 4px;
+    }
+    // Voice tag `<v Name>` — Firefox lo espone come pseudo-element
+    // separato. Quando disponibile, evidenziamo il prefisso speaker.
+    &::cue(v) {
+      color: #FFD96B;
+      font-weight: 600;
+    }
   }
 
   &__play-overlay {
