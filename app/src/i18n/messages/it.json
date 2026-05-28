@@ -2094,6 +2094,10 @@
         "retention": {
           "title": "Conservazione dei dati e diritti",
           "body": "I dati vengono conservati per il periodo configurato per ciascun evento e poi eliminati automaticamente, salvo obblighi normativi diversi. In qualunque momento e possibile esercitare i diritti previsti dal GDPR, inclusi accesso, rettifica e cancellazione, attraverso i canali istituzionali del Dipartimento."
+        },
+        "automatedProcessing": {
+          "title": "Trascrizione, sintesi e doppiaggio generati da intelligenza artificiale",
+          "body": "Per gli eventi che ne fanno richiesta, dopo la fine della diretta la registrazione viene elaborata da una pipeline di intelligenza artificiale interamente eseguita sull'infrastruttura cluster del Dipartimento. La pipeline produce la trascrizione del parlato (con separazione dei diversi parlanti), una sintesi divulgativa, eventuali traduzioni in altre lingue europee e una versione doppiata dell'audio con voce sintetica generica. Tutti i modelli usati (WhisperX per la trascrizione, Mistral-Small per la sintesi e la traduzione, Piper TTS per il doppiaggio) sono eseguiti su GPU dedicate all'interno del cluster: nessun dato del partecipante viene inviato a servizi di terze parti. La voce dei partecipanti non viene clonata e non viene archiviata come dato biometrico (Art. 9 GDPR): il doppiaggio usa voci sintetiche pre-addestrate pubbliche, assegnate in modo arbitrario ai diversi parlanti. Per ogni registrazione l'utente può consultare nella pagina dell'evento la fotografia esatta dei modelli usati ('Trasparenza del processing AI'). I contenuti generati possono contenere imprecisioni: la fonte di riferimento autoritativa resta sempre il video originale (AI Act, Art. 50)."
         }
       },
       "note": {
