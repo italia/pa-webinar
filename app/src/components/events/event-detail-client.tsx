@@ -26,7 +26,9 @@ import PostEventHero, { type StructuredSummary } from '@/components/events/post-
 import type { PipelineSnapshot } from '@/components/events/pipeline-provenance';
 import NowSpeakingChip from '@/components/events/now-speaking-chip';
 import VideoMiniPlayer from '@/components/events/video-mini-player';
+import MiniTranscript from '@/components/events/mini-transcript';
 import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
+import { localeDisplayName as locName } from '@/lib/utils/locale-display';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 
@@ -141,6 +143,7 @@ export default function EventDetailClient({
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tv = useTranslations('video');
+  const tPostprod = useTranslations('postprod');
   const format = useFormatter();
 
   // Ref del player — usato dal TranscriptPanel per click-to-seek + da
@@ -164,7 +167,7 @@ export default function EventDetailClient({
     transcriptAvailable: boolean;
     summariesStructured?: Record<string, StructuredSummary>;
     /** Lightweight segments shape per il NowSpeakingChip (no words). */
-    segmentsLite?: Array<{ start: number; end: number; speaker: string | null; speakerName: string | null }>;
+    segmentsLite?: Array<{ start: number; end: number; speaker: string | null; speakerName: string | null; text: string }>;
     pipelineSnapshot?: PipelineSnapshot;
   } | null>(null);
 
@@ -206,6 +209,7 @@ export default function EventDetailClient({
             end: number;
             speaker: string | null;
             speakerName: string | null;
+            text: string;
           }>;
           pipelineSnapshot?: PipelineSnapshot;
         };
@@ -228,6 +232,7 @@ export default function EventDetailClient({
           end: s.end,
           speaker: s.speaker,
           speakerName: s.speakerName,
+          text: s.text,
         }));
         return {
           subtitles,
@@ -498,6 +503,45 @@ export default function EventDetailClient({
                 title={title}
                 poster={event.imageUrl}
               />
+
+              {/* Mini-transcript inline sotto al video: 3 righe
+                  (precedente / attiva / successiva) seguono il
+                  playhead in tempo reale. L'utente vede chi parla e
+                  cosa dice senza dover scrollare al transcript
+                  completo (che resta disponibile nelle tab più sotto). */}
+              {postprodMeta?.segmentsLite && (
+                <MiniTranscript
+                  playerRef={playerRef}
+                  segments={postprodMeta.segmentsLite}
+                />
+              )}
+
+              {/* Scoperibilità del doppiaggio: nota sobria sotto al video
+                  che indica al visitatore dove cliccare per cambiare
+                  audio. Renderizzata solo se ci sono tracce doppiate. */}
+              {postprodMeta?.audioTracks && postprodMeta.audioTracks.length > 0 && (
+                <div
+                  className="d-flex align-items-start gap-2 mb-3"
+                  style={{
+                    fontSize: '0.82rem',
+                    color: '#5A768A',
+                    background: '#f7faff',
+                    border: '1px solid #d6e3f1',
+                    borderRadius: 8,
+                    padding: '8px 12px',
+                  }}
+                >
+                  <Icon icon="it-volume-high" size="sm" color={undefined} />
+                  <span>
+                    {tPostprod('dubAvailableHint', {
+                      langs: postprodMeta.audioTracks
+                        .map((a) => locName(a.language, locale))
+                        .join(', '),
+                    })}
+                  </span>
+                </div>
+              )}
+
               <div className="mt-2">
                 <a
                   href={`/api/events/${event.slug}/recording`}
