@@ -2602,7 +2602,20 @@
     "audioLabel": "Audio",
     "audioOriginal": "Originale",
     "audioSyntheticBanner": "Audio doppiato con AI — voce sintetica, contenuto generato automaticamente.",
-    "audioSyntheticHint": "Audio generato da AI"
+    "audioSyntheticHint": "Audio generato da AI",
+    "shortcutsHelpOpen": "Mostra scorciatoie da tastiera",
+    "shortcutsHelpClose": "Chiudi scorciatoie da tastiera",
+    "shortcutsTitle": "Scorciatoie da tastiera",
+    "shortcutsSpace": "Riproduci o metti in pausa",
+    "shortcutsArrowsLR": "Sposta avanti o indietro di 5 secondi",
+    "shortcutsArrowsUD": "Aumenta o diminuisce il volume del 5%",
+    "shortcutsJL": "Sposta avanti o indietro di 10 secondi",
+    "shortcutsM": "Attiva o disattiva l'audio",
+    "shortcutsC": "Mostra o nascondi i sottotitoli",
+    "shortcutsF": "Schermo intero",
+    "shortcutsSpeed": "Diminuisce o aumenta la velocità",
+    "captionsOn": "Sottotitoli attivi",
+    "captionsOff": "Sottotitoli disattivati"
   },
   "postprod": {
     "loading": "Caricamento trascrizione…",
@@ -2611,7 +2624,18 @@
     "tabTranscript": "Trascrizione",
     "tabSummary": "Sintesi",
     "aiBadgeLabel": "Contenuto generato da AI",
-    "aiBadgeBody": "Trascrizione e sintesi sono prodotte automaticamente dalla pipeline AI in cluster. Possono contenere errori; il video resta la fonte autoritativa."
+    "aiBadgeBody": "Trascrizione e sintesi sono prodotte automaticamente dalla pipeline AI in cluster. Possono contenere errori; il video resta la fonte autoritativa.",
+    "searchPlaceholder": "Cerca nella trascrizione…",
+    "searchLabel": "Cerca nella trascrizione",
+    "searchClear": "Pulisci ricerca",
+    "searchNoMatches": "Nessun risultato per «{query}».",
+    "searchMatches": "{count, plural, =1 {1 risultato} other {# risultati}}",
+    "downloadLabel": "Scarica",
+    "downloadMenu": "Opzioni di download",
+    "downloadTranscriptTxt": "Trascrizione (.txt)",
+    "downloadTranscriptSrt": "Sottotitoli (.srt)",
+    "downloadTranscriptVtt": "Sottotitoli (.vtt)",
+    "downloadSummaryMd": "Sintesi (.md)"
   },
   "diagram": {
     "title": "Configurazione evento",
