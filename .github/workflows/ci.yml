@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Trigger manuale via UI / `gh workflow run ci.yml`. Utile quando
+  # un sync event della PR viene saltato (raro, ma osservato — es. PR
+  # #62 ha richiesto il dispatch manuale per far partire i check).
+  workflow_dispatch:
 
 jobs:
   lint:

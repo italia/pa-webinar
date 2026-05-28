@@ -66,6 +66,20 @@ const updateSettingsSchema = z.object({
   // Soft-exit grace window applied to LIVE events past endsAt.
   eventGracePeriodMinutes: z.number().int().min(-1).max(240).optional(),
   orphanRecordingGraceDays: z.number().int().min(0).max(365).optional(),
+  // ── Postprod AI pipeline ──────────────────────────────────────
+  // Kill-switch + provider routing. I provider sono limitati al
+  // sottoinsieme "in-cluster" supportato — vedi lib/ai/providers.ts.
+  aiPipelineEnabled: z.boolean().optional(),
+  aiLlmProvider: z.enum(['vllm']).optional(),
+  aiAsrProvider: z.enum(['whisperx']).optional(),
+  aiTtsEngine: z.enum(['piper']).optional(),
+  // Comma-separated ISO-639-1, gestito come stringa per coerenza
+  // con la colonna `text` in DB (parsing fatto in lib/ai/providers).
+  aiDefaultTargetLocales: z.string().max(200).optional(),
+  aiMaxConcurrentJobs: z.number().int().min(1).max(20).optional(),
+  aiJobMaxAttempts: z.number().int().min(1).max(20).optional(),
+  aiArtifactRetentionDays: z.number().int().min(0).max(3650).optional(),
+  aiConsentDisclosure: z.record(z.string(), z.string().max(2000)).optional(),
 }).strict();
 
 export const GET = withErrorHandling(async () => {
