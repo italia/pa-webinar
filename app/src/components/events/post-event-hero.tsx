@@ -16,6 +16,9 @@ import { useTranslations } from 'next-intl';
 import { Badge, Icon } from 'design-react-kit';
 
 import type { VideoPlayerHandle } from '@/components/events/video-player';
+import PipelineProvenance, {
+  type PipelineSnapshot,
+} from '@/components/events/pipeline-provenance';
 import { speakerColor } from '@/lib/utils/speaker-palette';
 import { localeDisplayName } from '@/lib/utils/locale-display';
 
@@ -35,6 +38,10 @@ interface Props {
   playerRef?: RefObject<VideoPlayerHandle | null>;
   /** Slug dell'evento — usato per il link share-at-time. */
   eventSlug?: string;
+  /** Snapshot dei modelli usati per produrre questa registrazione.
+   *  Quando presente, mostra il link "Trasparenza del processing AI"
+   *  in fondo all'hero. */
+  pipelineSnapshot?: PipelineSnapshot | null;
   /** Hook quando il visitatore espande "vedi tutto" (analytics opzionale). */
   onExpand?: () => void;
 }
@@ -52,6 +59,7 @@ export default function PostEventHero({
   preferredLocale,
   playerRef,
   eventSlug,
+  pipelineSnapshot,
   onExpand,
 }: Props) {
   const t = useTranslations('postprod.hero');
@@ -363,6 +371,20 @@ export default function PostEventHero({
               {expanded ? t('collapseDetails') : t('expandDetails')}
             </button>
           </>
+        )}
+
+        {/* Trasparenza del processing AI — link sobrio in fondo all'hero.
+            Il pannello si apre inline, sotto la sintesi. */}
+        {pipelineSnapshot && (
+          <div
+            className="mt-3 pt-3"
+            style={{ borderTop: '1px solid #e3eaf1' }}
+          >
+            <PipelineProvenance
+              snapshot={pipelineSnapshot}
+              locale={preferredLocale}
+            />
+          </div>
         )}
       </div>
     </section>

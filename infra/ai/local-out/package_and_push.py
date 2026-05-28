@@ -46,6 +46,68 @@ def md_summary(summary_obj, *, lang="it"):
     return "\n".join(lines)
 
 
+def build_pipeline_snapshot(tx: dict, sm: dict, dubbed_blob_key: str | None) -> dict:
+    """Compone la "fotografia" canonica della pipeline che ha prodotto
+    questa registrazione: motori, modelli, lingue, voce per speaker,
+    data run, pipeline version. Esposta al visitatore come dettaglio
+    di trasparenza (Pipeline Provenance card).
+    """
+    speakers_named = sm.get("speakers_named") or {}
+    # Replico la logica di assign_voices(... ) per ricavare la voce
+    # effettivamente assegnata a ogni speaker — qui per non importare
+    # il modulo Python servirei comunque sys.path; lo importo nel
+    # contesto di main(). In questa funzione costruisco solo il
+    # mapping da Speaker → displayName se presente.
+    voice_assignments = []
+    for sp in tx.get("speakers", []):
+        voice_assignments.append({
+            "diarLabel": sp.get("diarLabel"),
+            "displayName": speakers_named.get(sp.get("diarLabel")) or None,
+            "totalSpeechSec": sp.get("totalSpeechSec"),
+        })
+    target_locales = list((sm.get("summary_en") and {"en"}) or set())
+    # Costruisco l'elenco target da segments_en presenza
+    for seg in sm.get("transcript_en", [])[:1]:
+        if seg.get("text_en"):
+            target_locales = list(set(target_locales) | {"en"})
+
+    snap = {
+        "asr": {
+            "engine": "faster-whisper",
+            "model": "large-v3",
+            "version": "5090-local",
+            "diarization": {
+                "engine": "speechbrain ECAPA-TDNN",
+                "model": "spkrec-ecapa-voxceleb",
+                "method": tx.get("diarization", {}).get("method"),
+                "k": tx.get("diarization", {}).get("k"),
+                "silhouette": tx.get("diarization", {}).get("silhouette"),
+            },
+        },
+        "llm": {
+            "engine": os.environ.get("LLM_ENGINE", "ollama"),
+            "model": sm.get("model") or "mistral-small3.2:24b",
+            "vendor": "Mistral AI",
+            "license": "Apache-2.0",
+            "country": "FR",
+        },
+        "tts": {
+            "engine": "piper-tts",
+            "license": "MIT",
+            "voiceAssignmentPolicy": "deterministic-by-speech-time, gender-aware when name maps to a gender",
+        },
+        "voiceAssignments": voice_assignments,
+        "languages": {
+            "source": tx.get("language") or "it",
+            "translation": target_locales,
+            "dubbing": ["en"] if dubbed_blob_key else [],
+        },
+        "runAt": __import__("datetime").datetime.utcnow().isoformat() + "Z",
+        "pipelineVersion": os.environ.get("PIPELINE_VERSION", "local-rtx5090"),
+    }
+    return snap
+
+
 def main():
     with open(SUMMARY_FILE) as f:
         sm = json.load(f)
@@ -114,6 +176,8 @@ def main():
     else:
         print(f"Dubbed audio not found: {DUBBED_LOCAL}")
 
+    pipeline_snapshot = build_pipeline_snapshot(tx, sm, blob_key)
+
     payload = {
         "recordingId": RECORDING_ID,
         "sourceLanguage": tx.get("language", "it"),
@@ -129,6 +193,7 @@ def main():
         "summaryMdIt": summary_md_it,
         "summaryMdEn": summary_md_en,
         "dubbedAudioBlobKey": blob_key,
+        "pipelineSnapshot": pipeline_snapshot,
         "publishRecording": True,
     }
 

@@ -23,6 +23,7 @@ import VideoPlayer, {
 } from '@/components/events/video-player';
 import PostEventTabs from '@/components/events/post-event-tabs';
 import PostEventHero, { type StructuredSummary } from '@/components/events/post-event-hero';
+import type { PipelineSnapshot } from '@/components/events/pipeline-provenance';
 import NowSpeakingChip from '@/components/events/now-speaking-chip';
 import VideoMiniPlayer from '@/components/events/video-mini-player';
 import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
@@ -164,6 +165,7 @@ export default function EventDetailClient({
     summariesStructured?: Record<string, StructuredSummary>;
     /** Lightweight segments shape per il NowSpeakingChip (no words). */
     segmentsLite?: Array<{ start: number; end: number; speaker: string | null; speakerName: string | null }>;
+    pipelineSnapshot?: PipelineSnapshot;
   } | null>(null);
 
   const title = getLocalized(event.title, locale);
@@ -205,6 +207,7 @@ export default function EventDetailClient({
             speaker: string | null;
             speakerName: string | null;
           }>;
+          pipelineSnapshot?: PipelineSnapshot;
         };
         const subtitles: SubtitleTrack[] = (data.subtitleTracks ?? []).map(
           (lang) => ({
@@ -232,6 +235,7 @@ export default function EventDetailClient({
           sourceLang: data.sourceLanguage,
           summariesStructured: data.summariesStructured,
           segmentsLite,
+          pipelineSnapshot: data.pipelineSnapshot,
         };
       })
       .then((meta) => {
@@ -245,6 +249,10 @@ export default function EventDetailClient({
               ? meta.summariesStructured
               : undefined,
           segmentsLite: meta.segmentsLite.length > 0 ? meta.segmentsLite : undefined,
+          pipelineSnapshot:
+            meta.pipelineSnapshot && Object.keys(meta.pipelineSnapshot).length > 0
+              ? meta.pipelineSnapshot
+              : undefined,
         });
         setActiveTranscriptLanguage(meta.sourceLang);
       })
@@ -452,6 +460,7 @@ export default function EventDetailClient({
               preferredLocale={locale}
               playerRef={playerRef}
               eventSlug={event.slug}
+              pipelineSnapshot={postprodMeta.pipelineSnapshot ?? null}
             />
           )}
 

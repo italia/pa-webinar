@@ -2669,7 +2669,52 @@
     "miniPlayerHint": "Resta vicino al video mentre scorri la pagina",
     "followLive": "Segui il video",
     "followManual": "Lettura libera",
-    "followResume": "Torna a seguire il video"
+    "followResume": "Torna a seguire il video",
+    "provenance": {
+      "triggerLabel": "Trasparenza del processing AI",
+      "closeLabel": "Nascondi dettagli del processing",
+      "intro": "Questi sono i modelli che hanno generato la trascrizione, la sintesi e il doppiaggio di questa registrazione. Sono salvati al termine del processing: vedi ciò che è stato usato in quel momento, indipendentemente da eventuali modifiche successive alle impostazioni.",
+      "asr": {
+        "title": "Trascrizione",
+        "hint": "Riconoscimento del parlato e separazione dei parlanti.",
+        "engine": "Motore",
+        "model": "Modello",
+        "version": "Versione",
+        "diarizationEngine": "Diarization",
+        "diarizationSpeakers": "Parlanti rilevati"
+      },
+      "llm": {
+        "title": "Sintesi e traduzione",
+        "hint": "Riassunto della riunione e traduzione di trascrizione e sintesi.",
+        "engine": "Servito da",
+        "model": "Modello",
+        "vendor": "Fornitore",
+        "license": "Licenza",
+        "country": "Sede legale"
+      },
+      "tts": {
+        "title": "Doppiaggio",
+        "hint": "Sintesi vocale per generare l'audio nelle lingue target.",
+        "engine": "Motore",
+        "license": "Licenza",
+        "policy": "Regola di assegnazione voci"
+      },
+      "languages": {
+        "title": "Lingue trattate",
+        "hint": "Origine della registrazione e destinazioni di traduzione e doppiaggio.",
+        "source": "Lingua originale",
+        "translation": "Traduzioni",
+        "dubbing": "Doppiaggi",
+        "none": "Nessuna"
+      },
+      "voices": {
+        "title": "Voci sintetiche assegnate ai parlanti",
+        "male": "voce maschile",
+        "female": "voce femminile"
+      },
+      "runAt": "Elaborazione completata il",
+      "version": "Versione pipeline"
+    }
   },
   "diagram": {
     "title": "Configurazione evento",

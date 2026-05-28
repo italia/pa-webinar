@@ -150,7 +150,13 @@ const crypto = require('crypto');
 
   await p.recording.update({
     where: { id: recordingId },
-    data: { status: 'POSTPROD_DONE', sourceLanguage },
+    data: {
+      status: 'POSTPROD_DONE',
+      sourceLanguage,
+      ...(input.pipelineSnapshot
+        ? { pipelineSnapshot: input.pipelineSnapshot }
+        : {}),
+    },
   });
   console.log('recording → POSTPROD_DONE');
 
