@@ -11,6 +11,8 @@ import {
   Col,
 } from 'design-react-kit';
 
+import PostprodStatusCard from './postprod-status-card';
+
 interface SystemStatus {
   overall: 'operational' | 'degraded' | 'outage';
   components: unknown[];
@@ -308,6 +310,17 @@ export default function StatusDashboard() {
               )}
             </CardBody>
           </Card>
+        </Col>
+      </Row>
+
+      {/* Postprod AI pipeline — il componente si auto-nasconde quando
+          la pipeline è disabilitata (graceful degradation, vedi
+          PostprodStatusCard). Quando visibile occupa una riga intera
+          per dare spazio a queue bar + provider info + footer last
+          success/failure. */}
+      <Row className="mb-4">
+        <Col>
+          <PostprodStatusCard />
         </Col>
       </Row>
 
