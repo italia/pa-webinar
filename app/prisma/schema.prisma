@@ -1545,6 +1545,26 @@ model Recording {
   // on Event.* doesn't silently invalidate already-produced artifacts.
   consentSnapshot Json @default("{}") @map("consent_snapshot") @db.JsonB
 
+  // Snapshot della composizione effettiva della pipeline AI usata per
+  // questa specifica registrazione (motori, modelli, versioni,
+  // assegnazione voci, lingue, data run). NON segue le impostazioni
+  // correnti di SiteSetting: è una fotografia del momento. Esposta
+  // al visitatore del video come "Dettagli del processing AI", per
+  // trasparenza ai sensi dell'AI Act Art. 50.
+  //
+  // Shape attesa (è JSON libero per evolvere senza migration):
+  //   {
+  //     asr: {engine, model, version},
+  //     diarization: {engine, model, k, method},
+  //     llm: {engine, model, vendor, license},
+  //     tts: {engine, version, voices: ["alan","amy",…]},
+  //     voiceAssignments: [{diarLabel, displayName, voiceId, gender}],
+  //     languages: {source, translation: [...], dubbing: [...]},
+  //     runAt: ISO timestamp,
+  //     pipelineVersion: "git-sha"
+  //   }
+  pipelineSnapshot Json @default("{}") @map("pipeline_snapshot") @db.JsonB
+
   // Run counter — incremented every time the orchestrator re-enqueues
   // the full pipeline (manual retry from admin UI). Used in the
   // storage path so old runs survive until retention.

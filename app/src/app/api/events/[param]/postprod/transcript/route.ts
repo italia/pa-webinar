@@ -42,6 +42,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     select: {
       id: true,
       sourceLanguage: true,
+      pipelineSnapshot: true,
       artifacts: {
         where: {
           type: {
@@ -152,5 +153,6 @@ export const GET = withErrorHandling(async (_request, context) => {
     summaries,
     summariesStructured,
     dubbedAudio,
+    pipelineSnapshot: recording.pipelineSnapshot ?? {},
   });
 });

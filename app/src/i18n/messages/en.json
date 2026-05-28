@@ -2669,7 +2669,52 @@
     "miniPlayerHint": "Stay close to the video while you scroll",
     "followLive": "Follow the video",
     "followManual": "Free reading",
-    "followResume": "Resume following the video"
+    "followResume": "Resume following the video",
+    "provenance": {
+      "triggerLabel": "AI processing transparency",
+      "closeLabel": "Hide processing details",
+      "intro": "These are the models that produced the transcript, summary and dubbing for this recording. The snapshot is saved when the processing finishes: you see what was actually used at that time, regardless of any later changes to the settings.",
+      "asr": {
+        "title": "Transcription",
+        "hint": "Speech recognition and speaker separation.",
+        "engine": "Engine",
+        "model": "Model",
+        "version": "Version",
+        "diarizationEngine": "Diarization",
+        "diarizationSpeakers": "Speakers detected"
+      },
+      "llm": {
+        "title": "Summary and translation",
+        "hint": "Meeting summary and translation of transcript and summary.",
+        "engine": "Served by",
+        "model": "Model",
+        "vendor": "Vendor",
+        "license": "License",
+        "country": "Headquarters"
+      },
+      "tts": {
+        "title": "Dubbing",
+        "hint": "Speech synthesis for the audio in the target languages.",
+        "engine": "Engine",
+        "license": "License",
+        "policy": "Voice assignment rule"
+      },
+      "languages": {
+        "title": "Languages",
+        "hint": "Source of the recording and translation/dubbing targets.",
+        "source": "Original language",
+        "translation": "Translations",
+        "dubbing": "Dubbing",
+        "none": "None"
+      },
+      "voices": {
+        "title": "Synthetic voices assigned to speakers",
+        "male": "male voice",
+        "female": "female voice"
+      },
+      "runAt": "Processing completed on",
+      "version": "Pipeline version"
+    }
   },
   "diagram": {
     "title": "Event configuration",
