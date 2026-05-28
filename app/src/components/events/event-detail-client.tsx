@@ -22,6 +22,8 @@ import VideoPlayer, {
   type AudioTrack,
 } from '@/components/events/video-player';
 import PostEventTabs from '@/components/events/post-event-tabs';
+import PostEventHero, { type StructuredSummary } from '@/components/events/post-event-hero';
+import NowSpeakingChip from '@/components/events/now-speaking-chip';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 
@@ -155,6 +157,9 @@ export default function EventDetailClient({
     subtitleTracks?: SubtitleTrack[];
     audioTracks?: AudioTrack[];
     transcriptAvailable: boolean;
+    summariesStructured?: Record<string, StructuredSummary>;
+    /** Lightweight segments shape per il NowSpeakingChip (no words). */
+    segmentsLite?: Array<{ start: number; end: number; speaker: string | null; speakerName: string | null }>;
   } | null>(null);
 
   const title = getLocalized(event.title, locale);
@@ -188,7 +193,14 @@ export default function EventDetailClient({
           sourceLanguage: string;
           subtitleTracks: string[];
           summaries: Record<string, string>;
+          summariesStructured?: Record<string, StructuredSummary>;
           dubbedAudio?: Array<{ language: string; src: string }>;
+          segments?: Array<{
+            start: number;
+            end: number;
+            speaker: string | null;
+            speakerName: string | null;
+          }>;
         };
         const subtitles: SubtitleTrack[] = (data.subtitleTracks ?? []).map(
           (lang) => ({
@@ -204,7 +216,19 @@ export default function EventDetailClient({
           label: `${localeDisplayName(d.language)} (AI)`,
           isSynthetic: true,
         }));
-        return { subtitles, audio, sourceLang: data.sourceLanguage };
+        const segmentsLite = (data.segments ?? []).map((s) => ({
+          start: s.start,
+          end: s.end,
+          speaker: s.speaker,
+          speakerName: s.speakerName,
+        }));
+        return {
+          subtitles,
+          audio,
+          sourceLang: data.sourceLanguage,
+          summariesStructured: data.summariesStructured,
+          segmentsLite,
+        };
       })
       .then((meta) => {
         if (cancelled || !meta) return;
@@ -212,6 +236,11 @@ export default function EventDetailClient({
           subtitleTracks: meta.subtitles.length > 0 ? meta.subtitles : undefined,
           audioTracks: meta.audio.length > 0 ? meta.audio : undefined,
           transcriptAvailable: meta.subtitles.length > 0 || meta.audio.length > 0,
+          summariesStructured:
+            meta.summariesStructured && Object.keys(meta.summariesStructured).length > 0
+              ? meta.summariesStructured
+              : undefined,
+          segmentsLite: meta.segmentsLite.length > 0 ? meta.segmentsLite : undefined,
         });
         setActiveTranscriptLanguage(meta.sourceLang);
       })
@@ -407,6 +436,20 @@ export default function EventDetailClient({
       {/* ─── Content + Sidebar ─── */}
       <Row>
         <Col lg={8} className="mb-4 mb-lg-0">
+          {/* Hero post-evento: renderizzata solo se la pipeline AI ha
+              prodotto un SUMMARY_JSON strutturato. Card prominente con
+              sintesi + topic-chip-navigator che fa seek al punto del
+              video. Quando manca (postprod non attivato o ancora in
+              corso), niente UI — il visitatore vede comunque il video
+              e la trascrizione nel tab sotto. */}
+          {isEnded && postprodMeta?.summariesStructured && (
+            <PostEventHero
+              structured={postprodMeta.summariesStructured}
+              preferredLocale={locale}
+              playerRef={playerRef}
+            />
+          )}
+
           {/* Video player for ended events with a recording. YouTube
               embed wins when set (legacy uploads / mirrored streams);
               otherwise the self-hosted MP4 is served via our signed
@@ -418,15 +461,23 @@ export default function EventDetailClient({
           )}
           {isEnded && !event.youtubeUrl && event.recordingUrl && (
             <div className="mb-4">
-              <VideoPlayer
-                ref={playerRef}
-                src={`/api/events/${event.slug}/recording`}
-                title={title}
-                poster={event.imageUrl ?? undefined}
-                subtitleTracks={postprodMeta?.subtitleTracks}
-                audioTracks={postprodMeta?.audioTracks}
-                onSubtitleChange={(lang) => setActiveTranscriptLanguage(lang)}
-              />
+              <div style={{ position: 'relative' }}>
+                <VideoPlayer
+                  ref={playerRef}
+                  src={`/api/events/${event.slug}/recording`}
+                  title={title}
+                  poster={event.imageUrl ?? undefined}
+                  subtitleTracks={postprodMeta?.subtitleTracks}
+                  audioTracks={postprodMeta?.audioTracks}
+                  onSubtitleChange={(lang) => setActiveTranscriptLanguage(lang)}
+                />
+                {postprodMeta?.segmentsLite && (
+                  <NowSpeakingChip
+                    playerRef={playerRef}
+                    segments={postprodMeta.segmentsLite}
+                  />
+                )}
+              </div>
               <div className="mt-2">
                 <a
                   href={`/api/events/${event.slug}/recording`}

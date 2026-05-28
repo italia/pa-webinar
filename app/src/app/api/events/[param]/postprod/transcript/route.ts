@@ -50,6 +50,7 @@ export const GET = withErrorHandling(async (_request, context) => {
               'TRANSCRIPT_VTT',
               'TRANSLATION_VTT',
               'SUMMARY_MD',
+              'SUMMARY_JSON',
               'TRANSLATION_MD',
               'DUBBED_AUDIO',
             ],
@@ -104,6 +105,11 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   // Summaries (inline rendered) — IT default + any translated ones.
   const summaries: Record<string, string> = {};
+  // Structured summaries: object {overall_summary, key_decisions[],
+  // action_items[], topics[{title, start_mmss, summary}]} per lingua.
+  // Permette al frontend di render hero card + topic chips senza
+  // ri-parsare markdown.
+  const summariesStructured: Record<string, unknown> = {};
   for (const a of recording.artifacts) {
     if (
       (a.type === 'SUMMARY_MD' || a.type === 'TRANSLATION_MD') &&
@@ -112,6 +118,15 @@ export const GET = withErrorHandling(async (_request, context) => {
     ) {
       const decoded = tryDecryptPII(a.inlineBody);
       if (decoded) summaries[a.language] = decoded;
+    } else if (a.type === 'SUMMARY_JSON' && a.language && a.inlineBody) {
+      const decoded = tryDecryptPII(a.inlineBody);
+      if (decoded) {
+        try {
+          summariesStructured[a.language] = JSON.parse(decoded);
+        } catch {
+          // ignora: payload corrotto, il frontend resta sul .md
+        }
+      }
     }
   }
 
@@ -135,6 +150,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     speakers: recording.speakers,
     subtitleTracks,
     summaries,
+    summariesStructured,
     dubbedAudio,
   });
 });
