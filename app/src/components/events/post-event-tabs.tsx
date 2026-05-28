@@ -152,6 +152,7 @@ export default function PostEventTabs({
         <TranscriptPanel
           playerRef={playerRef}
           endpoint={`/api/events/${eventSlug}/postprod/transcript`}
+          eventSlug={eventSlug}
           activeLanguage={transcriptLanguage ?? null}
         />
       )}
