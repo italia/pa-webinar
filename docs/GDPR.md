@@ -228,3 +228,101 @@ quando l'evento li consente:
 Ai guest non viene chiesta l'email; il display name è sotto il controllo
 dell'utente e può essere lasciato vuoto (sostituito con un placeholder
 generico). Nessuna PII viene persistita senza un display name esplicito.
+
+
+## Pipeline AI post-evento
+
+La pipeline AI di post-produzione (trascrizione, sintesi, traduzione,
+doppiaggio) ha un perimetro GDPR specifico — tutto in-cluster, niente
+API esterne. Le sezioni seguenti sono il riferimento normativo del
+codice in `app/src/lib/ai/`, `app/src/app/api/cron/postprod-retention/`
+e dei worker in `infra/ai/worker/`.
+
+### Base giuridica e finalità
+
+| Trattamento | Base giuridica | Finalità |
+|---|---|---|
+| Trascrizione (WhisperX) | Art. 6.1.e (compito di interesse pubblico — accessibilità degli atti di un evento PA) | Rendere il contenuto fruibile da non udenti / consultabile a posteriori |
+| Sintesi e traduzione (Mistral via vLLM) | Art. 6.1.e | Sintesi divulgativa multilingue dell'evento pubblico |
+| Doppiaggio sintetico (Piper TTS) | Art. 6.1.e | Accessibilità linguistica della registrazione pubblicata |
+| Identificazione speaker (`Speaker.displayName`) | Art. 6.1.e + ruolo di moderatore/relatore reso pubblico al momento dell'iscrizione | Etichettare i segmenti della trascrizione |
+
+Il trattamento avviene **solo dopo** la fine dell'evento, sulla
+registrazione caricata da Jibri; non c'è elaborazione AI in tempo
+reale sul flusso live.
+
+### Voice cloning: non supportato
+
+Il doppiaggio AI **non** clona la voce dei relatori reali. Il sistema
+usa Piper TTS con una voce sintetica neutra fissa, identica per ogni
+evento. Imitare la voce di una persona identificabile costituirebbe
+trattamento di dati biometrici ai sensi dell'**Art. 9 GDPR** e
+richiederebbe consenso esplicito per finalità specifica difficile da
+ottenere da partecipanti di un evento pubblico. La scelta è
+deliberata, persistente e documentata in ADR-005 e nell'UI del tab
+`Pipeline AI` di `/admin/settings`.
+
+### Dove vivono i dati AI
+
+| Tabella / Storage | Contiene | Note GDPR |
+|---|---|---|
+| `Recording.consentSnapshot` (JSONB) | Snapshot dei flag AI all'avvio della pipeline | Mai modificato dopo il primo write — audit consenso |
+| `Recording.sourceLanguage` | ISO-639-1 | Non PII |
+| `PostprodArtifact.inlineBody` (cifrato) | Trascrizione, sintesi, traduzioni inline | Cifrato a riposo con la chiave PII |
+| `PostprodArtifact.blobKey` | Path nel postprod bucket | I blob (VTT, audio dubbed) restano nello storage finché esiste l'artifact row |
+| `Speaker.displayName` | Nome del moderatore/relatore | Copiato da `Person.displayName` al momento del mapping admin |
+| `Speaker.diarLabel` | "SPEAKER_00" ecc., generato da pyannote | Non PII |
+| `PostprodJob.payload` (JSONB) | Parametri del job (runId, lingua sorgente, lingua target) | Può contenere riferimenti a `recordingId` |
+| `PostprodJob.lastError` | Stack trace dell'ultimo errore | Può contenere snippet di trascrizione in caso di fallimento mid-processing |
+
+### Retention
+
+La retention degli artefatti AI è governata da due meccanismi che
+coesistono:
+
+1. **Event-bound (default)**: `Recording.retentionUntil = null`. Gli
+   artefatti AI vengono cancellati a cascata insieme all'evento
+   quando il cron `cleanup` purga le righe Event ai sensi di
+   `dataRetentionDays`.
+2. **Override globale**: `SiteSetting.aiArtifactRetentionDays > 0`.
+   Il cron `/api/cron/postprod-retention` (quotidiano) cancella ogni
+   artifact AI più vecchio di N giorni anche se l'evento è ancora
+   vivo. Caso d'uso: "verbale come atto pubblico" che vive 730 giorni
+   dopo l'evento.
+3. **Override per-recording**: `Recording.retentionUntil != null`.
+   Quando passa, lo stesso cron:
+   - cancella i blob postprod dallo storage (best-effort, log su
+     failure);
+   - cancella le righe `PostprodArtifact`;
+   - **`deleteMany` su `Speaker`** della recording — `displayName` è
+     PII e non sopravvive alla retention;
+   - **`updateMany` su `PostprodJob`** azzerando `payload` a
+     `{scrubbed: true}` e `lastError` a `null` — le righe restano
+     per audit (count, durate, esiti) ma niente più snippet PII;
+   - marca `Recording.status = ARCHIVED`.
+
+### Accesso pubblico agli artefatti AI
+
+Gli endpoint pubblici `/api/events/[slug]/postprod/{transcript,
+subtitle/[lang], dubbed-audio/[lang], download/[file]}` sono protetti
+dall'helper `assertPostprodAccessible(slug)` (in
+`app/src/lib/ai/access.ts`) che verifica in cascata:
+
+1. `SiteSetting.aiPipelineEnabled` — kill-switch globale.
+2. `event.recordingPublished` — la moderazione ha pubblicato il video.
+3. `event.postEventPublic` — il post-evento è pubblico (toggle privacy).
+4. `event.postEventPublicUntil` — eventuale finestra temporale.
+
+Qualsiasi check fallito ritorna `404` (non `403`) per non distinguere
+"evento inesistente" da "post-evento ritirato".
+
+### Disclaimer AI Act (Art. 50)
+
+La status page pubblica e il player video mostrano un banner
+permanente quando la pipeline è attiva: "Trascrizioni, sintesi e
+doppiaggi sono generati automaticamente da modelli AI in cluster. Il
+contenuto può contenere errori; il video resta la fonte autoritativa.
+Niente voice cloning, niente API esterne". Il testo è
+internazionalizzato (`status.postprod.aiBadge` in
+`app/src/i18n/messages/*.json`) e visibile in ognuno dei 24 locali
+UE supportati.

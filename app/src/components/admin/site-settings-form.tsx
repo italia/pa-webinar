@@ -1446,9 +1446,10 @@ function PostprodTab({ settings, updateField }: TabProps) {
 
   return (
     <div>
-      {/* Kill-switch principale + warning prerequisiti */}
+      {/* Prerequisiti operativi. NIENTE <Icon> nell'alert: Bootstrap
+          Italia ne disegna già una "i" via ::before — vedi memoria
+          feedback_bootstrap-italia-alert.md. */}
       <div className="alert alert-info" role="note" style={{ fontSize: '0.88rem' }}>
-        <Icon icon="it-info-circle" size="sm" className="me-2" />
         {t('prerequisitesNote')}
       </div>
 
@@ -1465,21 +1466,33 @@ function PostprodTab({ settings, updateField }: TabProps) {
         </small>
       </div>
 
+      {/* Nota tempistica: pipeline solo post-evento, no live captioning.
+          Idem niente <Icon>: l'alert.alert-warning ne ha già una. */}
+      <div className="alert alert-warning" role="note" style={{ fontSize: '0.88rem' }}>
+        {t('timingNote')}
+      </div>
+
       <hr className="my-4" />
 
       <h6 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
         {t('providersSection')}
       </h6>
+      <p className="text-muted mb-3" style={{ fontSize: '0.85rem' }}>
+        {t('providersIntro')}
+      </p>
 
       <Row>
         <Col md={6}>
           <FormGroup>
             <Label htmlFor="aiAsrProvider">{t('asrProvider')}</Label>
             {/* Native <select> — il wrapper <Input type="select"> di
-                design-react-kit ha mostrato il React #137 in produzione,
-                il pattern adottato nel resto del codebase
+                design-react-kit ha provocato React #137 in produzione.
+                Il pattern in uso nel resto del codebase
                 (recordings-dashboard, gdpr-audit-dashboard) è il
-                <select> con className="form-control". */}
+                <select> con className="form-control". Le option sono
+                hardcoded perché i provider supportati sono fissati al
+                deploy: per aggiungerne uno servono changes in
+                lib/ai/providers.ts + Zod schema + Deployment k8s. */}
             <select
               id="aiAsrProvider"
               className="form-control"
@@ -1488,7 +1501,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
                 updateField('aiAsrProvider', e.target.value as 'whisperx')
               }
             >
-              <option value="whisperx">WhisperX (large-v3 + pyannote)</option>
+              <option value="whisperx">{t('asrOptionWhisperx')}</option>
             </select>
             <small className="text-muted d-block mt-1">
               {t('asrProviderHelp')}
@@ -1506,7 +1519,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
                 updateField('aiLlmProvider', e.target.value as 'vllm')
               }
             >
-              <option value="vllm">vLLM in-cluster (Mistral)</option>
+              <option value="vllm">{t('llmOptionVllm')}</option>
             </select>
             <small className="text-muted d-block mt-1">
               {t('llmProviderHelp')}
@@ -1524,7 +1537,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
                 updateField('aiTtsEngine', e.target.value as 'piper')
               }
             >
-              <option value="piper">Piper TTS (voce neutra, MIT)</option>
+              <option value="piper">{t('ttsOptionPiper')}</option>
             </select>
             <small className="text-muted d-block mt-1">
               {t('ttsEngineHelp')}
@@ -1621,6 +1634,17 @@ function PostprodTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
+
+      <hr className="my-4" />
+
+      <h6 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+        {t('voiceCloningSection')}
+      </h6>
+      {/* Nota stabile sull'esclusione del voice cloning. Stesso vincolo
+          della memoria progettuale: niente <Icon> dentro l'alert. */}
+      <div className="alert alert-warning" role="note" style={{ fontSize: '0.88rem' }}>
+        {t('voiceCloningNote')}
+      </div>
     </div>
   );
 }
