@@ -1884,6 +1884,8 @@
       "attempts": "attempt {n}",
       "speakerPlaceholder": "Real name (optional)",
       "speakerSpoke": "Speaking time: {sec}s",
+      "suggestedApply": "Apply suggestion: {name}",
+      "suggestedTitle": "Name suggested by the AI pipeline based on proper nouns mentioned in the transcript. Click to fill the field (you can still edit it before saving).",
       "save": "Save"
     },
     "questionnairesPage": {
