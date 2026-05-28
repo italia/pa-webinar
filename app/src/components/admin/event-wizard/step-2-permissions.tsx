@@ -26,6 +26,16 @@ export interface Step2Value {
   permissionMatrix: PermissionMatrix;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
+  // ── Post-produzione AI (subordinata a recordingEnabled) ──
+  aiTranscriptEnabled: boolean;
+  aiSummaryEnabled: boolean;
+  aiTranslationEnabled: boolean;
+  aiDubbingEnabled: boolean;
+  /** Comma-separated ISO-639-1 (es. "en,fr"). Null/empty = usa il
+   *  default impostato a livello sito. */
+  aiTargetLocales: string | null;
+  /** Numero di parlanti attesi (forza k nella diarization). */
+  expectedSpeakers: number | null;
 }
 
 interface Props {
@@ -161,6 +171,184 @@ export default function Step2Permissions({ value, onChange }: Props) {
           </div>
         )}
       </section>
+
+      {/* Post-produzione AI — solo se recording attiva. Renderizzata
+          come sezione separata sotto la registrazione (la AI lavora
+          sulla registrazione, ne è subordinata). */}
+      {value.recordingEnabled && (
+        <section className="mb-3">
+          <h3 className="h6 fw-semibold mb-1" style={{ color: '#17324D' }}>
+            {tAdmin('form.aiSectionHeading')}
+          </h3>
+          <p className="text-secondary mb-3" style={{ fontSize: '0.85rem' }}>
+            {tAdmin('form.aiSectionDesc')}
+          </p>
+
+          <AiToggle
+            label={tAdmin('form.aiTranscriptEnabled')}
+            desc={tAdmin('form.aiTranscriptEnabledDesc')}
+            checked={value.aiTranscriptEnabled}
+            onToggle={() => {
+              const next = !value.aiTranscriptEnabled;
+              // Disattivare la trascrizione disattiva anche sintesi,
+              // traduzione e doppiaggio (dipendenze): non avrebbero
+              // input.
+              onChange(
+                next
+                  ? { aiTranscriptEnabled: true }
+                  : {
+                      aiTranscriptEnabled: false,
+                      aiSummaryEnabled: false,
+                      aiTranslationEnabled: false,
+                      aiDubbingEnabled: false,
+                    },
+              );
+            }}
+          />
+
+          {value.aiTranscriptEnabled && (
+            <>
+              <AiToggle
+                label={tAdmin('form.aiSummaryEnabled')}
+                desc={tAdmin('form.aiSummaryEnabledDesc')}
+                checked={value.aiSummaryEnabled}
+                onToggle={() =>
+                  onChange({ aiSummaryEnabled: !value.aiSummaryEnabled })
+                }
+              />
+
+              <AiToggle
+                label={tAdmin('form.aiTranslationEnabled')}
+                desc={tAdmin('form.aiTranslationEnabledDesc')}
+                checked={value.aiTranslationEnabled}
+                onToggle={() => {
+                  const next = !value.aiTranslationEnabled;
+                  onChange(
+                    next
+                      ? { aiTranslationEnabled: true }
+                      : {
+                          aiTranslationEnabled: false,
+                          aiDubbingEnabled: false,
+                        },
+                  );
+                }}
+              />
+
+              {value.aiTranslationEnabled && (
+                <div
+                  className="py-2"
+                  style={{ borderTop: '1px solid #e8e8e8' }}
+                >
+                  <label
+                    className="fw-semibold mb-1 d-block"
+                    style={{ color: '#17324D', fontSize: '0.9rem' }}
+                    htmlFor="aiTargetLocales"
+                  >
+                    {tAdmin('form.aiTargetLocales')}
+                  </label>
+                  <p
+                    className="text-secondary mb-2"
+                    style={{ fontSize: '0.82rem' }}
+                  >
+                    {tAdmin('form.aiTargetLocalesDesc')}
+                  </p>
+                  <input
+                    id="aiTargetLocales"
+                    type="text"
+                    className="form-control form-control-sm"
+                    style={{ maxWidth: 260 }}
+                    placeholder="en,fr,de"
+                    value={value.aiTargetLocales ?? ''}
+                    onChange={(e) =>
+                      onChange({
+                        aiTargetLocales:
+                          e.target.value.trim() === '' ? null : e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              )}
+
+              {value.aiTranslationEnabled && (
+                <AiToggle
+                  label={tAdmin('form.aiDubbingEnabled')}
+                  desc={tAdmin('form.aiDubbingEnabledDesc')}
+                  checked={value.aiDubbingEnabled}
+                  onToggle={() =>
+                    onChange({ aiDubbingEnabled: !value.aiDubbingEnabled })
+                  }
+                />
+              )}
+
+              <div
+                className="py-2"
+                style={{ borderTop: '1px solid #e8e8e8' }}
+              >
+                <label
+                  className="fw-semibold mb-1 d-block"
+                  style={{ color: '#17324D', fontSize: '0.9rem' }}
+                  htmlFor="expectedSpeakers"
+                >
+                  {tAdmin('form.expectedSpeakers')}
+                </label>
+                <p
+                  className="text-secondary mb-2"
+                  style={{ fontSize: '0.82rem' }}
+                >
+                  {tAdmin('form.expectedSpeakersDesc')}
+                </p>
+                <input
+                  id="expectedSpeakers"
+                  type="number"
+                  min={1}
+                  max={30}
+                  className="form-control form-control-sm"
+                  style={{ maxWidth: 120 }}
+                  value={value.expectedSpeakers ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === '') {
+                      onChange({ expectedSpeakers: null });
+                    } else {
+                      const n = Number(v);
+                      if (!Number.isNaN(n)) onChange({ expectedSpeakers: n });
+                    }
+                  }}
+                />
+              </div>
+            </>
+          )}
+        </section>
+      )}
+    </div>
+  );
+}
+
+function AiToggle({
+  label,
+  desc,
+  checked,
+  onToggle,
+}: {
+  label: string;
+  desc: string;
+  checked: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div
+      className="py-2 d-flex justify-content-between align-items-start"
+      style={{ borderTop: '1px solid #e8e8e8' }}
+    >
+      <div className="me-3">
+        <div className="fw-semibold" style={{ color: '#17324D' }}>
+          {label}
+        </div>
+        <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+          {desc}
+        </div>
+      </div>
+      <ToggleSwitch label="" checked={checked} onChange={onToggle} />
     </div>
   );
 }
