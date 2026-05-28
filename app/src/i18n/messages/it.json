@@ -2259,7 +2259,29 @@
     "overallStatus": "Stato generale",
     "lastChecked": "Ultimo controllo",
     "responseTime": "Tempo di risposta",
-    "systemStatus": "Stato del sistema"
+    "systemStatus": "Stato del sistema",
+    "postprod": {
+      "title": "Pipeline AI post-produzione",
+      "status": {
+        "idle": "In attesa",
+        "running": "In esecuzione",
+        "degraded": "Degradata"
+      },
+      "aiBadge": "Trascrizioni, sintesi e doppiaggi sono generati automaticamente da modelli AI in cluster. Il contenuto può contenere errori; il video resta la fonte autoritativa.",
+      "idleMessage": "Pipeline pronta, nessuna registrazione da elaborare in questo momento.",
+      "queueAriaLabel": "Composizione della coda di post-produzione",
+      "queuePending": "in coda",
+      "queueRunning": "in lavorazione",
+      "queueDone": "completati",
+      "queueFailed": "falliti",
+      "asrProvider": "Trascrizione",
+      "llmProvider": "Sintesi/Traduzione",
+      "targetLocales": "Lingue target",
+      "lastSuccess": "Ultimo successo {when}",
+      "lastFailure": "Ultimo errore {when}",
+      "artifactsProduced": "{count, plural, =0 {nessun artefatto} one {1 artefatto prodotto} other {# artefatti prodotti}}",
+      "eventsEnabled": "{count, plural, =0 {nessun evento con AI} one {1 evento con AI attiva} other {# eventi con AI attiva}}"
+    }
   },
   "infraMap": {
     "loading": "Caricamento mappa infrastruttura...",

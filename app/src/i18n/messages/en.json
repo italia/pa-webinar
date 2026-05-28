@@ -2259,7 +2259,29 @@
     "overallStatus": "Overall status",
     "lastChecked": "Last checked",
     "responseTime": "Response time",
-    "systemStatus": "System status"
+    "systemStatus": "System status",
+    "postprod": {
+      "title": "AI post-production pipeline",
+      "status": {
+        "idle": "Idle",
+        "running": "Running",
+        "degraded": "Degraded"
+      },
+      "aiBadge": "Transcripts, summaries and dubbed audio are generated automatically by in-cluster AI models. Content may contain errors; the video remains the authoritative source.",
+      "idleMessage": "Pipeline ready, no recordings to process right now.",
+      "queueAriaLabel": "Post-production queue composition",
+      "queuePending": "queued",
+      "queueRunning": "in progress",
+      "queueDone": "completed",
+      "queueFailed": "failed",
+      "asrProvider": "Transcription",
+      "llmProvider": "Summary/Translation",
+      "targetLocales": "Target languages",
+      "lastSuccess": "Last success {when}",
+      "lastFailure": "Last failure {when}",
+      "artifactsProduced": "{count, plural, =0 {no artifacts} one {1 artifact produced} other {# artifacts produced}}",
+      "eventsEnabled": "{count, plural, =0 {no AI-enabled events} one {1 event with AI active} other {# events with AI active}}"
+    }
   },
   "infraMap": {
     "loading": "Loading infrastructure map...",
