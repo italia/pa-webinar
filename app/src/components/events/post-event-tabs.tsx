@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type RefObject } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Badge,
@@ -8,6 +8,9 @@ import {
   CardBody,
   Icon,
 } from 'design-react-kit';
+
+import TranscriptPanel from '@/components/events/transcript-panel';
+import type { VideoPlayerHandle } from '@/components/events/video-player';
 
 interface QuestionData {
   id: string;
@@ -49,9 +52,22 @@ interface PostEventTabsProps {
   showMaterials: boolean;
   showPolls: boolean;
   showFeedback: boolean;
+  /** Slug evento — usato per costruire l'endpoint trascrizione AI. */
+  eventSlug?: string;
+  /** Ref del VideoPlayer parent — usato dalla tab Trascrizione per
+   *  click-to-seek sui segmenti. Quando assente, la tab Trascrizione
+   *  non viene mostrata (graceful degradation: l'evento non ha pipeline
+   *  AI abilitata). */
+  playerRef?: RefObject<VideoPlayerHandle | null>;
+  /** Lingua attiva (dal subtitle switcher del player), usata per
+   *  scegliere la variante di summary da mostrare nel tab. */
+  transcriptLanguage?: string | null;
+  /** True quando il fetch postprod ha trovato almeno un artifact
+   *  visibile (subtitle o audio). Se false la tab non appare. */
+  transcriptAvailable?: boolean;
 }
 
-type TabKey = 'qa' | 'materials' | 'polls' | 'feedback';
+type TabKey = 'transcript' | 'qa' | 'materials' | 'polls' | 'feedback';
 
 export default function PostEventTabs({
   questions,
@@ -62,10 +78,26 @@ export default function PostEventTabs({
   showMaterials,
   showPolls,
   showFeedback,
+  eventSlug,
+  playerRef,
+  transcriptLanguage,
+  transcriptAvailable,
 }: PostEventTabsProps) {
   const t = useTranslations('postEvent.tabs');
 
+  // Trascrizione visibile solo quando 3 condizioni si verificano insieme:
+  //   1. `transcriptAvailable` true (la fetch postprod ha trovato
+  //      almeno un sottotitolo o audio dubbed),
+  //   2. abbiamo lo slug dell'evento per costruire l'endpoint,
+  //   3. abbiamo un ref del player per il click-to-seek.
+  // Mancanza di una qualsiasi → tab nascosta (graceful degradation:
+  // l'evento può non aver attivato pipeline AI, oppure non c'è ancora
+  // nessun artifact pronto).
+  const transcriptShow =
+    !!transcriptAvailable && !!eventSlug && !!playerRef;
+
   const tabs: { key: TabKey; label: string; count: number; show: boolean }[] = [
+    { key: 'transcript', label: t('transcript'), count: 0, show: transcriptShow },
     { key: 'qa', label: t('qa'), count: questions.length, show: showQA && questions.length > 0 },
     { key: 'materials', label: t('materials'), count: materials.length, show: showMaterials && materials.length > 0 },
     { key: 'polls', label: t('polls'), count: polls.length, show: showPolls && polls.length > 0 },
@@ -116,6 +148,13 @@ export default function PostEventTabs({
       </div>
 
       {/* Tab content */}
+      {activeTab === 'transcript' && transcriptShow && eventSlug && playerRef && (
+        <TranscriptPanel
+          playerRef={playerRef}
+          endpoint={`/api/events/${eventSlug}/postprod/transcript`}
+          activeLanguage={transcriptLanguage ?? null}
+        />
+      )}
       {activeTab === 'qa' && showQA && (
         <QATabContent questions={questions} />
       )}

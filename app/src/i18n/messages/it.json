@@ -1876,6 +1876,43 @@
       "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Le informazioni di profilo vengono aggiornate automaticamente ad ogni re-iscrizione.",
       "backToList": "← Torna alla rubrica"
     },
+    "postprod": {
+      "title": "Pipeline AI post-produzione",
+      "subtitle": "Trascrizioni, sintesi e traduzioni generate dalla pipeline AI in cluster. Mappa gli speaker, rilancia o annulla i job.",
+      "filterStatus": "Stato",
+      "all": "Tutti",
+      "queued": "In coda",
+      "running": "In esecuzione",
+      "done": "Completato",
+      "partial": "Parziale",
+      "failed": "Fallito",
+      "totalRows": "{count, plural, =0 {nessuna registrazione} one {1 registrazione} other {# registrazioni}}",
+      "colEvent": "Evento",
+      "colCreated": "Creato",
+      "colDuration": "Durata",
+      "colStatus": "Stato",
+      "colJobs": "Job",
+      "colArtifacts": "Artefatti",
+      "colActions": "Azioni",
+      "rerun": "Rilancia",
+      "rerunTooltip": "Crea una nuova run incrementando runCount; gli artefatti precedenti restano fino alla retention",
+      "cancel": "Annulla",
+      "cancelConfirm": "Annullare tutti i job pendenti per questa registrazione?",
+      "rerunFailed": "Rilancio fallito (HTTP {code})",
+      "cancelFailed": "Annullamento fallito (HTTP {code})",
+      "speakerUpdateFailed": "Aggiornamento speaker fallito (HTTP {code})",
+      "loadError": "Impossibile caricare la lista dei job",
+      "empty": "Nessuna registrazione corrisponde ai filtri",
+      "detailJobs": "Job",
+      "detailArtifacts": "Artefatti",
+      "detailSpeakers": "Speaker",
+      "noArtifacts": "Nessun artefatto ancora prodotto",
+      "noSpeakers": "Nessuno speaker rilevato",
+      "attempts": "tentativo {n}",
+      "speakerPlaceholder": "Nome reale (opzionale)",
+      "speakerSpoke": "Tempo parlato: {sec}s",
+      "save": "Salva"
+    },
     "questionnairesPage": {
       "title": "Questionari",
       "subtitle": "Template riutilizzabili di domande per i questionari di pre-registrazione e post-evento."
@@ -2275,6 +2312,7 @@
     "connRecording": "registrazione",
     "connUpload": "caricamento",
     "connPubSub": "chat pub/sub",
+    "connPostprod": "post-produzione AI",
     "services": {
       "app": "Portale web",
       "database": "Database",
@@ -2284,7 +2322,8 @@
       "jicofo": "Coordinatore conferenze",
       "jvb": "Ponte video",
       "jibri": "Registrazione video",
-      "smtp": "Servizio email"
+      "smtp": "Servizio email",
+      "postprod": "Pipeline AI post-produzione"
     },
     "descriptions": {
       "app": "Il sito web dove si accede agli eventi",
@@ -2295,7 +2334,8 @@
       "jicofo": "Coordina chi partecipa a ogni conferenza",
       "jvb": "Trasmette audio e video ai partecipanti",
       "jibri": "Registra le sessioni video degli eventi",
-      "smtp": "Invia email di conferma e promemoria"
+      "smtp": "Invia email di conferma e promemoria",
+      "postprod": "Trascrive, riassume e traduce le registrazioni con modelli AI in cluster (GPU NVIDIA A100). Si attiva solo quando un evento abilita le feature AI."
     },
     "verdicts": {
       "app": {
@@ -2343,6 +2383,12 @@
       "smtp": {
         "healthy": "Il servizio email è configurato e pronto a inviare notifiche.",
         "standby": "Il servizio email non è configurato. Le email di conferma e i promemoria non verranno inviati."
+      },
+      "postprod": {
+        "healthy": "La pipeline AI sta processando una registrazione (worker GPU attivo).",
+        "scaling": "Job postprod in coda — il nodo GPU si sta avviando (cold-start ~3 min).",
+        "standby": "Pipeline AI attiva ma in attesa: nessuna registrazione da processare. Il nodo GPU è spento per risparmio energetico.",
+        "degraded": "Uno o più job AI sono falliti nelle ultime 24h. Controllare /admin/postprod per dettagli."
       }
     },
     "impacts": {
@@ -2355,7 +2401,8 @@
       "jvbStale": "Un evento attende il bridge da più del timeout configurato: i partecipanti non possono entrare.",
       "jibri": "Non è possibile registrare gli eventi. I partecipanti possono comunque partecipare.",
       "jibriStale": "Un evento con registrazione attiva attende Jibri da più del timeout: la sessione non viene registrata.",
-      "smtp": "Le email di conferma registrazione e i promemoria non verranno inviati."
+      "smtp": "Le email di conferma registrazione e i promemoria non verranno inviati.",
+      "postprodDegraded": "Le trascrizioni e i verbali per alcune registrazioni recenti non sono stati generati. Le registrazioni video sono comunque disponibili."
     },
     "overallVerdicts": {
       "operational": "Tutti i servizi funzionano correttamente. La piattaforma è pienamente operativa.",
@@ -2505,7 +2552,22 @@
     "unmute": "Attiva audio",
     "download": "Scarica registrazione",
     "speedLabel": "Velocità di riproduzione",
-    "progress": "Barra di avanzamento"
+    "progress": "Barra di avanzamento",
+    "subtitles": "Sottotitoli",
+    "subtitlesOff": "Disattivati",
+    "audioLabel": "Audio",
+    "audioOriginal": "Originale",
+    "audioSyntheticBanner": "Audio doppiato con AI — voce sintetica, contenuto generato automaticamente.",
+    "audioSyntheticHint": "Audio generato da AI"
+  },
+  "postprod": {
+    "loading": "Caricamento trascrizione…",
+    "loadError": "Impossibile caricare la trascrizione: {error}",
+    "empty": "Nessuna trascrizione disponibile per questo evento.",
+    "tabTranscript": "Trascrizione",
+    "tabSummary": "Sintesi",
+    "aiBadgeLabel": "Contenuto generato da AI",
+    "aiBadgeBody": "Trascrizione e sintesi sono prodotte automaticamente dalla pipeline AI in cluster. Possono contenere errori; il video resta la fonte autoritativa."
   },
   "diagram": {
     "title": "Configurazione evento",
@@ -2629,7 +2691,8 @@
       "qa": "Domande e Risposte",
       "materials": "Materiali",
       "polls": "Sondaggi",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "transcript": "Trascrizione AI"
     }
   },
   "provisioning": {

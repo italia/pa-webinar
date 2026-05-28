@@ -1153,6 +1153,63 @@ La separazione liveness/readiness è importante: un pod con schema DB incompatib
 
 ---
 
+## Postprod AI pipeline
+
+Dalla v0.5.0, le registrazioni Jibri sono opzionalmente arricchite da
+una pipeline di post-produzione che produce trascrizione, sintesi e
+traduzioni. Tutta la pipeline gira **in-cluster** sul node pool GPU
+dedicato — niente API esterne, niente egress dati. Documentazione
+completa in [`docs/POSTPROD.md`](POSTPROD.md).
+
+```mermaid
+graph LR
+    JIBRI[Jibri finalize.sh] -->|HMAC POST| WH["/api/webhooks/recording"]
+    WH --> REC[(Recording)]
+    WH --> QJ[(PostprodJob queue)]
+    ORCH[CronJob postprod-orchestrator<br/>every minute] -->|GET /postprod-pending| API[Next.js app]
+    ORCH -->|kubectl create job| WORKER[Worker Pod<br/>workload=ai-gpu]
+    WORKER -->|POST /postprod-claim| API
+    WORKER -->|WhisperX + pyannote| ASR[ASR + diarization]
+    WORKER -->|OpenAI /chat| VLLM[in-cluster vLLM<br/>Qwen3-32B]
+    WORKER -->|PUT presigned| STORE[(postprod/...)]
+    WORKER -->|POST /postprod-artifact| API
+    API --> ART[(PostprodArtifact)]
+    ART --> PLAYER[Video player &lt;track&gt;<br/>TranscriptPanel]
+```
+
+| Component | Tipo | Node pool |
+|---|---|---|
+| postprod-orchestrator | CronJob (1 min) | app pool |
+| postprod-reclaim / -retention | CronJob | app pool |
+| postprod-worker | Job one-shot | `workload=ai-gpu` |
+| vLLM | Deployment (out-of-chart) | `workload=ai-gpu` |
+
+La queue è Postgres-outbox (claim atomico con `FOR UPDATE SKIP
+LOCKED`, lease + backoff esponenziale, idempotency-key SHA-256
+deterministica) — stesso pattern di `EmailOutbox`. Lo scaling
+on-demand del GPU pool è ottenuto con `kubectl create job --from=cronjob`
+sul template `postprod-worker` (suspended): replica del pattern dello
+scaler JVB.
+
+I modelli aggiunti allo schema (`prisma/schema.prisma`):
+
+| Modello | Scopo |
+|---|---|
+| `Recording` | Lifecycle post-prod, 1:1 con `CallSession` |
+| `PostprodJob` | Coda di job tipizzati (TRANSCRIBE / SUMMARIZE / TRANSLATE / SUBTITLE) con dependency graph |
+| `PostprodArtifact` | Una riga per blob prodotto, unique `(recordingId, type, language)` |
+| `Speaker` | Diarization label → Person (rubrica) o free-text |
+
+GDPR / AI Act:
+- Base giuridica Art. 6.1.b per trascrizione/sintesi (esecuzione
+  contratto). Voice cloning resta esplicitamente fuori scope
+  (Art. 9 → richiede DPIA dedicata).
+- Ogni artefatto ha `isSynthetic=true` (AI Act Art. 50). La UI
+  pubblica espone un badge "AI-generated content" sul TranscriptPanel.
+- Retention configurabile in `SiteSetting.aiArtifactRetentionDays`
+  oppure per-recording via `Recording.retentionUntil`. Cron
+  `postprod-retention` daily.
+
 ## Sicurezza
 
 Riepilogo delle misure di sicurezza implementate:

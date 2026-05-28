@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
   Alert,
@@ -15,7 +16,11 @@ import {
 import { Link } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import AddToCalendar from '@/components/events/add-to-calendar';
-import VideoPlayer from '@/components/events/video-player';
+import VideoPlayer, {
+  type VideoPlayerHandle,
+  type SubtitleTrack,
+  type AudioTrack,
+} from '@/components/events/video-player';
 import PostEventTabs from '@/components/events/post-event-tabs';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
@@ -107,6 +112,18 @@ const STATUS_COLOR: Record<string, string> = {
   ENDED: '#5A768A',
 };
 
+/** Display name for ISO language codes, used in the subtitle / audio
+ *  switcher menus. Uses Intl.DisplayNames con fallback al codice se
+ *  Intl non riconosce il tag. */
+function localeDisplayName(lang: string): string {
+  try {
+    const n = new Intl.DisplayNames(['it'], { type: 'language' });
+    return n.of(lang) ?? lang.toUpperCase();
+  } catch {
+    return lang.toUpperCase();
+  }
+}
+
 export default function EventDetailClient({
   event,
   locale,
@@ -120,6 +137,25 @@ export default function EventDetailClient({
   const t = useTranslations('events');
   const tv = useTranslations('video');
   const format = useFormatter();
+
+  // Ref del player — usato dal TranscriptPanel per click-to-seek + da
+  // future feature live (es. timestamp deeplink ?t=120).
+  const playerRef = useRef<VideoPlayerHandle>(null);
+  // Lingua attiva dei sottotitoli — guida quale variante di summary
+  // mostrare nel TranscriptPanel ("la sintesi nella lingua che stai
+  // guardando").
+  const [activeTranscriptLanguage, setActiveTranscriptLanguage] = useState<
+    string | null
+  >(null);
+  // Metadata postprod (subtitle/audio tracks disponibili, transcript
+  // endpoint). Fetched solo per recording pubblicate; se la fetch
+  // fallisce o ritorna 404 (postprod non abilitato per l'evento) i
+  // tracks restano vuoti e il player gira nudo come prima.
+  const [postprodMeta, setPostprodMeta] = useState<{
+    subtitleTracks?: SubtitleTrack[];
+    audioTracks?: AudioTrack[];
+    transcriptAvailable: boolean;
+  } | null>(null);
 
   const title = getLocalized(event.title, locale);
   const description = getLocalized(event.description, locale);
@@ -136,6 +172,54 @@ export default function EventDetailClient({
   const isEnded = event.status === 'ENDED';
   const isLive = event.status === 'LIVE';
   const accentColor = STATUS_COLOR[event.status] ?? STATUS_COLOR.PUBLISHED;
+
+  // Fetch postprod transcript metadata. Skip se l'evento non è ended
+  // o non ha recording pubblicata — niente trascrizione da mostrare.
+  // L'endpoint 404 quando postprod non è abilitato per l'evento; in
+  // quel caso lasciamo lo state null e il player gira "nudo".
+  useEffect(() => {
+    if (!isEnded || !event.recordingUrl) return;
+    let cancelled = false;
+    fetch(`/api/events/${event.slug}/postprod/transcript`, { credentials: 'include' })
+      .then(async (r) => {
+        if (!r.ok) return null;
+        const data = (await r.json()) as {
+          recordingId: string;
+          sourceLanguage: string;
+          subtitleTracks: string[];
+          summaries: Record<string, string>;
+          dubbedAudio?: Array<{ language: string; src: string }>;
+        };
+        const subtitles: SubtitleTrack[] = (data.subtitleTracks ?? []).map(
+          (lang) => ({
+            language: lang,
+            src: `/api/events/${event.slug}/postprod/subtitle/${lang}`,
+            label: localeDisplayName(lang),
+            isDefault: lang === data.sourceLanguage,
+          }),
+        );
+        const audio: AudioTrack[] = (data.dubbedAudio ?? []).map((d) => ({
+          language: d.language,
+          src: d.src,
+          label: `${localeDisplayName(d.language)} (AI)`,
+          isSynthetic: true,
+        }));
+        return { subtitles, audio, sourceLang: data.sourceLanguage };
+      })
+      .then((meta) => {
+        if (cancelled || !meta) return;
+        setPostprodMeta({
+          subtitleTracks: meta.subtitles.length > 0 ? meta.subtitles : undefined,
+          audioTracks: meta.audio.length > 0 ? meta.audio : undefined,
+          transcriptAvailable: meta.subtitles.length > 0 || meta.audio.length > 0,
+        });
+        setActiveTranscriptLanguage(meta.sourceLang);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [isEnded, event.recordingUrl, event.slug]);
 
   return (
     <div className="container py-5">
@@ -335,9 +419,13 @@ export default function EventDetailClient({
           {isEnded && !event.youtubeUrl && event.recordingUrl && (
             <div className="mb-4">
               <VideoPlayer
+                ref={playerRef}
                 src={`/api/events/${event.slug}/recording`}
                 title={title}
                 poster={event.imageUrl ?? undefined}
+                subtitleTracks={postprodMeta?.subtitleTracks}
+                audioTracks={postprodMeta?.audioTracks}
+                onSubtitleChange={(lang) => setActiveTranscriptLanguage(lang)}
               />
               <div className="mt-2">
                 <a
@@ -370,6 +458,10 @@ export default function EventDetailClient({
               showMaterials={event.postEventShowMaterials !== false}
               showPolls={event.postEventShowPolls !== false}
               showFeedback={event.postEventShowFeedback !== false}
+              eventSlug={event.slug}
+              playerRef={playerRef}
+              transcriptLanguage={activeTranscriptLanguage}
+              transcriptAvailable={postprodMeta?.transcriptAvailable ?? false}
             />
           )}
 

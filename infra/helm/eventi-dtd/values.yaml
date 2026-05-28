@@ -788,6 +788,110 @@ redis:
     # slow consumers. Defaults are 32mb hard / 8mb soft for pubsub.
     client-output-buffer-limit pubsub 64mb 16mb 60
 
+# ── Postprod AI pipeline ────────────────────────────────────
+#
+# Adds a post-production lifecycle on top of Jibri recordings:
+# transcription (WhisperX large-v3 + pyannote 3.1), summary + translation
+# (in-cluster vLLM, default model Qwen3-32B-Instruct). See docs/POSTPROD.md.
+#
+# Sovereignty: every component runs in-cluster on the GPU node pool.
+# No external API calls. Pre-populate model weights into a PVC mounted
+# at /models (see `worker.modelsPvc`) — at runtime HF_HUB_OFFLINE=1
+# is set in the container.
+#
+# Recommended hardware (Italy North, 2026):
+#   - 1× A100 80GB (Standard_NC24ads_A100_v4) — ospita Qwen3-32B fp16
+#     + WhisperX large-v3 + pyannote 3.1 simultaneamente.
+#   - Pool con `min_count=0, max_count=2`, taint `workload=ai-gpu:NoSchedule`.
+#   - Vedi `iac-azure/environments/prod` per la definizione Tofu del pool.
+#
+# Enable the orchestrator only on clusters that have a GPU node pool
+# AND a vLLM Service reachable from the worker.
+postprod:
+  enabled: false
+
+  # Janitor: every ~1 min, reclaims expired leases and terminal-fails
+  # over-attempt jobs.
+  reclaim:
+    enabled: true
+    schedule: "* * * * *"
+    image: curlimages/curl:8.10.1
+
+  # Retention sweeper: daily.
+  retention:
+    enabled: true
+    schedule: "30 3 * * *"
+    image: curlimages/curl:8.10.1
+
+  # Orchestrator: every minute, queries `/api/internal/postprod-pending`
+  # and creates worker Jobs from the suspended template CronJob.
+  orchestrator:
+    enabled: true
+    schedule: "* * * * *"
+    image: bitnami/kubectl:latest
+
+  # Worker template (CronJob, suspended). The orchestrator runs
+  # `kubectl create job --from=cronjob/<this>`, inheriting the pod
+  # spec defined here (image, nodeSelector, tolerations, resources).
+  worker:
+    enabled: true
+    image: ghcr.io/italia/eventi-dtd-postprod-worker:dev
+    imagePullPolicy: IfNotPresent
+    # Hard ceiling per Job (kills runaway transcription). 1h is enough
+    # for a 2h call at ~2x realtime on A100.
+    activeDeadlineSeconds: 3600
+    # Keep finished Job objects around for 10m so the orchestrator can
+    # see their state in `kubectl get jobs`.
+    ttlSecondsAfterFinished: 600
+
+    # Run WhisperX + LLM stub mode — skips real ASR/LLM and emits
+    # canned outputs. Useful for end-to-end smoke tests of the
+    # claim/upload/register loop without a GPU.
+    stub: false
+
+    # Place workers on the GPU node pool. Override per-cluster.
+    nodeSelector:
+      workload: ai-gpu
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: ai-gpu
+        effect: NoSchedule
+    affinity: {}
+
+    # PVC with prefetched HF cache. Recommended for prod — first cold
+    # download of WhisperX large-v3 + pyannote 3.1 is ~6GB. Without a
+    # PVC, the worker re-downloads on every node cold-start (and with
+    # HF_HUB_OFFLINE=1 in the image, the download must be primed
+    # manually before the first run).
+    #   modelsPvc: ai-models
+    modelsPvc: ""
+    modelsSizeLimit: "30Gi"
+    workSizeLimit: "20Gi"
+
+    # HuggingFace token for the gated pyannote model. Without it,
+    # diarization fails at load time. Create a Secret manually:
+    #   kubectl create secret generic hf-token --from-literal=HF_TOKEN=hf_xxx
+    hfTokenSecret:
+      name: ""
+      key: HF_TOKEN
+
+    extraEnv: {}
+      # AI_VLLM_BASE_URL: "http://eventi-dtd-vllm.ai:8000/v1"
+      # AI_VLLM_MODEL_ID: "Qwen/Qwen3-32B-Instruct"
+
+    gpu:
+      enabled: true
+      count: 1
+
+    resources:
+      requests:
+        cpu: "4"
+        memory: "16Gi"
+      limits:
+        cpu: "12"
+        memory: "48Gi"
+
 # ── Name overrides ──────────────────────────────────────────
 nameOverride: ""
 fullnameOverride: ""

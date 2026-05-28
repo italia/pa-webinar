@@ -11,6 +11,7 @@ import {
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { verifyWebhookSignature } from '@/lib/auth/webhook-signature';
 import { encryptJSON } from '@/lib/crypto/pii';
+import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
 
 let warnedSignatureMissing = false;
 
@@ -87,6 +88,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       slug: true,
       startsAt: true,
       peakParticipants: true,
+      aiTranscriptEnabled: true,
     },
   });
 
@@ -94,16 +96,24 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     throw new NotFoundError('Event');
   }
 
-  const [updatedEvent, callSession] = await prisma.$transaction([
-    prisma.event.update({
+  // Wrapped in a callback transaction so we can both:
+  //   - run the existing Event/CallSession writes,
+  //   - create the Recording row,
+  //   - enqueue postprod jobs (which themselves do dependent SELECTs)
+  // atomically. A throw rolls everything back. The callback form (vs
+  // an array of operations) is required because enqueuePostprodForRecording
+  // needs to read the recording row it just inserted.
+  const result = await prisma.$transaction(async (tx) => {
+    const updatedEvent = await tx.event.update({
       where: { id: event.id },
       data: {
         recordingUrl,
         recordingDuration: duration,
         recordingFileSize: fileSize ? BigInt(fileSize) : null,
       },
-    }),
-    prisma.callSession.create({
+    });
+
+    const callSession = await tx.callSession.create({
       data: {
         eventId: event.id,
         jitsiRoomName: roomName,
@@ -118,13 +128,61 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         recordingFilename: filename,
         telemetry: {},
       },
-    }),
-  ]);
+    });
+
+    // Recording row exists 1:1 with CallSession. The blob key is
+    // derived from the filename — Jibri uploads under `recordings/`
+    // (see jibri-finalize.sh) but the StorageProvider abstraction
+    // works on bare object keys, not URLs.
+    const blobKey = filename
+      ? `recordings/${filename}`
+      : (() => {
+          // Fallback: try to extract the key from the URL. Best-effort
+          // — workflows that aren't filename-shaped still get a row
+          // but their key will not match the live blob.
+          try {
+            const u = new URL(recordingUrl);
+            const path = u.pathname.split('/').filter(Boolean);
+            // Path-style: /<bucket>/<...key>; virtual-hosted: /<...key>
+            return path.length > 1 ? path.slice(1).join('/') : path.join('/');
+          } catch {
+            return recordingUrl;
+          }
+        })();
+
+    const recording = await tx.recording.create({
+      data: {
+        callSessionId: callSession.id,
+        eventId: event.id,
+        blobKey,
+        durationSec: duration,
+        fileSizeBytes: fileSize ? BigInt(fileSize) : null,
+      },
+      select: { id: true },
+    });
+
+    let postprod = { enqueued: 0, skippedExisting: 0, jobIds: [] as string[] };
+    if (event.aiTranscriptEnabled) {
+      postprod = await enqueuePostprodForRecording(tx, {
+        recordingId: recording.id,
+      });
+    }
+
+    return {
+      updatedEvent,
+      callSession,
+      recording,
+      postprod,
+    };
+  });
 
   return Response.json({
     success: true,
-    eventId: updatedEvent.id,
+    eventId: result.updatedEvent.id,
     slug: event.slug,
-    sessionId: callSession.id,
+    sessionId: result.callSession.id,
+    recordingId: result.recording.id,
+    postprodEnqueued: result.postprod.enqueued,
+    postprodJobIds: result.postprod.jobIds,
   });
 });
