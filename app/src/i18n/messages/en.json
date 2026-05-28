@@ -2094,6 +2094,10 @@
         "retention": {
           "title": "Retention and rights",
           "body": "Data is retained for the period configured for each event and then automatically deleted, unless different legal obligations apply. Data subjects may exercise their GDPR rights at any time, including access, rectification and erasure, through the Department's institutional channels."
+        },
+        "automatedProcessing": {
+          "title": "AI-generated transcript, summary and dubbing",
+          "body": "For events that opt in, after the live session ends the recording is processed by an artificial-intelligence pipeline running entirely on the Department's own cluster infrastructure. The pipeline produces the transcript of the speech (with speaker separation), a plain-language summary, optional translations into other European languages and a dubbed version of the audio with a generic synthetic voice. The models used (WhisperX for transcription, Mistral-Small for summary and translation, Piper TTS for dubbing) all run on dedicated GPUs inside the cluster: no participant data is sent to third-party services. The voice of the participants is not cloned and is not stored as biometric data (Art. 9 GDPR): the dubbing uses pre-trained public synthetic voices, assigned to the different speakers in an arbitrary way. Each recording exposes the exact snapshot of the models used on the event page ('AI processing transparency'). Generated content may contain inaccuracies: the authoritative reference is always the original video (AI Act, Art. 50)."
         }
       },
       "note": {
