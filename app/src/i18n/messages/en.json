@@ -2602,7 +2602,20 @@
     "audioLabel": "Audio",
     "audioOriginal": "Original",
     "audioSyntheticBanner": "AI-dubbed audio — synthetic voice, automatically generated content.",
-    "audioSyntheticHint": "AI-generated audio"
+    "audioSyntheticHint": "AI-generated audio",
+    "shortcutsHelpOpen": "Show keyboard shortcuts",
+    "shortcutsHelpClose": "Close keyboard shortcuts",
+    "shortcutsTitle": "Keyboard shortcuts",
+    "shortcutsSpace": "Play or pause",
+    "shortcutsArrowsLR": "Seek backward or forward 5 seconds",
+    "shortcutsArrowsUD": "Volume down or up 5%",
+    "shortcutsJL": "Seek backward or forward 10 seconds",
+    "shortcutsM": "Toggle mute",
+    "shortcutsC": "Toggle captions",
+    "shortcutsF": "Toggle fullscreen",
+    "shortcutsSpeed": "Decrease or increase speed",
+    "captionsOn": "Captions on",
+    "captionsOff": "Captions off"
   },
   "postprod": {
     "loading": "Loading transcript…",
@@ -2611,7 +2624,18 @@
     "tabTranscript": "Transcript",
     "tabSummary": "Summary",
     "aiBadgeLabel": "AI-generated content",
-    "aiBadgeBody": "Transcript and summary are produced automatically by the in-cluster AI pipeline. They may contain errors; the video remains the authoritative source."
+    "aiBadgeBody": "Transcript and summary are produced automatically by the in-cluster AI pipeline. They may contain errors; the video remains the authoritative source.",
+    "searchPlaceholder": "Search transcript…",
+    "searchLabel": "Search transcript",
+    "searchClear": "Clear search",
+    "searchNoMatches": "No results for «{query}».",
+    "searchMatches": "{count, plural, =1 {1 match} other {# matches}}",
+    "downloadLabel": "Download",
+    "downloadMenu": "Download options",
+    "downloadTranscriptTxt": "Transcript (.txt)",
+    "downloadTranscriptSrt": "Subtitles (.srt)",
+    "downloadTranscriptVtt": "Subtitles (.vtt)",
+    "downloadSummaryMd": "Summary (.md)"
   },
   "diagram": {
     "title": "Event configuration",
