@@ -27,6 +27,7 @@ import type { PipelineSnapshot } from '@/components/events/pipeline-provenance';
 import NowSpeakingChip from '@/components/events/now-speaking-chip';
 import VideoMiniPlayer from '@/components/events/video-mini-player';
 import MiniTranscript from '@/components/events/mini-transcript';
+import BookmarksPanel from '@/components/events/bookmarks-panel';
 import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
 import { localeDisplayName as locName } from '@/lib/utils/locale-display';
 import EventTitle from '@/components/events/event-title';
@@ -644,6 +645,13 @@ export default function EventDetailClient({
               )}
             </CardBody>
           </Card>
+
+          {/* Bookmarks personali del visitatore (localStorage), sotto
+              alla card info evento. La card scompare quando la lista
+              è vuota: niente UI vuota a sprecare spazio. */}
+          {isEnded && (
+            <BookmarksPanel slug={event.slug} playerRef={playerRef} />
+          )}
         </Col>
       </Row>
     </div>
