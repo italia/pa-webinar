@@ -2644,7 +2644,19 @@
     "downloadTranscriptTxt": "Transcript (.txt)",
     "downloadTranscriptSrt": "Subtitles (.srt)",
     "downloadTranscriptVtt": "Subtitles (.vtt)",
-    "downloadSummaryMd": "Summary (.md)"
+    "downloadSummaryMd": "Summary (.md)",
+    "hero": {
+      "badge": "AI summary",
+      "aiActArt50": "AI Act Art. 50",
+      "title": "What was discussed in this event",
+      "availableIn": "Available in {langs}",
+      "topicsLabel": "Topics — click to jump to that point",
+      "keyDecisions": "Key decisions",
+      "actionItems": "Action items",
+      "expandDetails": "Show decisions and actions",
+      "collapseDetails": "Hide decisions and actions"
+    },
+    "nowSpeaking": "Now speaking"
   },
   "diagram": {
     "title": "Event configuration",

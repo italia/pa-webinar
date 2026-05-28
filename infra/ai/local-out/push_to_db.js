@@ -111,6 +111,12 @@ const crypto = require('crypto');
   push('TRANSLATION_VTT', 'en', transcriptVttEn, 'text/vtt', 'TRANSLATE');
   push('SUMMARY_MD', sourceLanguage, summaryMdIt, 'text/markdown', 'SUMMARIZE');
   push('TRANSLATION_MD', 'en', summaryMdEn, 'text/markdown', 'TRANSLATE');
+  if (input.summaryIt) {
+    push('SUMMARY_JSON', sourceLanguage, JSON.stringify(input.summaryIt), 'application/json', 'SUMMARIZE');
+  }
+  if (input.summaryEn) {
+    push('SUMMARY_JSON', 'en', JSON.stringify(input.summaryEn), 'application/json', 'TRANSLATE');
+  }
 
   if (dubbedAudioBlobKey) {
     artifactRows.push({

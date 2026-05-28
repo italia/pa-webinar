@@ -29,6 +29,11 @@ import {
 } from 'react';
 import { useTranslations } from 'next-intl';
 
+import {
+  speakerColor,
+  initials as speakerInitials,
+} from '@/lib/utils/speaker-palette';
+
 import type { VideoPlayerHandle } from './video-player';
 
 interface Segment {
@@ -450,6 +455,11 @@ export default function TranscriptPanel({
             {filteredSegments.map(({ seg, idx }) => {
               const speakerLabel = seg.speakerName ?? seg.speaker ?? '—';
               const isActive = idx === activeIdx;
+              // Palette stabile per speaker — stesso colore in tutti i
+              // segmenti dello stesso parlante. Identity key = displayName
+              // se mapped, altrimenti il diarLabel anonimo.
+              const identity = seg.speakerName ?? seg.speaker ?? '';
+              const palette = speakerColor(identity);
               return (
                 <button
                   key={`${seg.start}-${idx}`}
@@ -460,16 +470,42 @@ export default function TranscriptPanel({
                     isActive ? 'postprod-segment--active' : ''
                   }`}
                   style={{
-                    borderLeft: isActive
-                      ? '3px solid #0066cc'
-                      : '3px solid transparent',
-                    background: isActive ? 'rgba(0,102,204,0.08)' : undefined,
+                    borderLeft: `3px solid ${isActive ? palette.color : palette.color + '66'}`,
+                    background: isActive ? palette.bg : undefined,
                   }}
                   aria-current={isActive ? 'true' : undefined}
                 >
-                  <div className="d-flex gap-2 small text-secondary mb-1">
-                    <code style={{ minWidth: 56 }}>{formatTs(seg.start)}</code>
-                    <span className="fw-semibold">{speakerLabel}</span>
+                  <div className="d-flex align-items-center gap-2 small mb-1">
+                    <code
+                      style={{
+                        minWidth: 56,
+                        color: '#5A768A',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {formatTs(seg.start)}
+                    </code>
+                    <span
+                      aria-hidden
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 22,
+                        height: 22,
+                        borderRadius: 11,
+                        background: palette.color,
+                        color: 'white',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {speakerInitials(speakerLabel)}
+                    </span>
+                    <span className="fw-semibold" style={{ color: palette.color }}>
+                      {speakerLabel}
+                    </span>
                   </div>
                   <div className="postprod-segment__text">
                     {highlightMatches(seg.text, trimmedSearch)}

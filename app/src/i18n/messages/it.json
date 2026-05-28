@@ -2644,7 +2644,19 @@
     "downloadTranscriptTxt": "Trascrizione (.txt)",
     "downloadTranscriptSrt": "Sottotitoli (.srt)",
     "downloadTranscriptVtt": "Sottotitoli (.vtt)",
-    "downloadSummaryMd": "Sintesi (.md)"
+    "downloadSummaryMd": "Sintesi (.md)",
+    "hero": {
+      "badge": "Sintesi AI",
+      "aiActArt50": "AI Act Art. 50",
+      "title": "Cosa è stato detto in questo evento",
+      "availableIn": "Disponibile in {langs}",
+      "topicsLabel": "Argomenti — clicca per saltare al punto",
+      "keyDecisions": "Decisioni chiave",
+      "actionItems": "Azioni",
+      "expandDetails": "Mostra decisioni e azioni",
+      "collapseDetails": "Nascondi decisioni e azioni"
+    },
+    "nowSpeaking": "Sta parlando"
   },
   "diagram": {
     "title": "Configurazione evento",
