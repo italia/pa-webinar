@@ -34,7 +34,7 @@ webvtt-py==0.5.1
 # HIGH severity rilevato da Trivy nel CI dell'app — anche se l'uso qui
 # è solo per costruire prompt, e non scarichiamo modelli arbitrari,
 # evita il blocco del security scan).
-transformers==4.48.3
+transformers==5.0.0rc3
 
 # TTS — Piper (rhasspy/piper-tts). MIT license, voci pre-trained
 # scaricate da huggingface.co/rhasspy/piper-voices. Gira su CPU
