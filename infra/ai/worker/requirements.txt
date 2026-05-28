@@ -30,7 +30,11 @@ webvtt-py==0.5.1
 # Storage upload uses presigned PUT URLs — no SDK needed.
 
 # Tokenizer for prompt construction (used by LLM client).
-transformers==4.46.2
+# Bump >=4.48.0 per CVE-2024-11392 (deserialization untrusted data,
+# HIGH severity rilevato da Trivy nel CI dell'app — anche se l'uso qui
+# è solo per costruire prompt, e non scarichiamo modelli arbitrari,
+# evita il blocco del security scan).
+transformers==4.48.3
 
 # TTS — Piper (rhasspy/piper-tts). MIT license, voci pre-trained
 # scaricate da huggingface.co/rhasspy/piper-voices. Gira su CPU
