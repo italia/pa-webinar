@@ -1,0 +1,15 @@
+# Non committare modelli, MP4, audio prodotti, venv
+*.mp4
+*.wav
+*.m4a
+*.onnx
+*.onnx.json
+.venv/
+piper-voices/
+db_push_payload.json
+# Output intermedi che derivano da run interattivi
+transcript_*.vtt
+transcript_*.srt
+transcript_*.txt
+transcript_*.json
+summary.json
