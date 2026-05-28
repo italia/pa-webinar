@@ -2672,6 +2672,8 @@
     "followResume": "Torna a seguire il video",
     "lowConfidenceBadge": "verifica",
     "lowConfidenceTitle": "Questa porzione di trascrizione ha confidenza bassa: la registrazione potrebbe contenere parole diverse. Fai sempre riferimento al video originale.",
+    "miniTranscriptLabel": "Trascrizione live",
+    "dubAvailableHint": "Audio doppiato disponibile in {langs}. Usa il selettore audio nei controlli del player per ascoltare la versione tradotta.",
     "provenance": {
       "triggerLabel": "Trasparenza del processing AI",
       "closeLabel": "Nascondi dettagli del processing",

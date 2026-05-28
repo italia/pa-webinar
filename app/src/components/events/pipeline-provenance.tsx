@@ -138,7 +138,7 @@ export default function PipelineProvenance({ snapshot, locale }: Props) {
           <div className="row g-3">
             {/* ASR */}
             <ProvBlock
-              icon="it-volume-up"
+              icon="it-mic"
               title={t('asr.title')}
               hint={t('asr.hint')}
             >
@@ -178,7 +178,7 @@ export default function PipelineProvenance({ snapshot, locale }: Props) {
 
             {/* TTS */}
             <ProvBlock
-              icon="it-headphones"
+              icon="it-volume-high"
               title={t('tts.title')}
               hint={t('tts.hint')}
             >
@@ -194,7 +194,7 @@ export default function PipelineProvenance({ snapshot, locale }: Props) {
 
             {/* Lingue */}
             <ProvBlock
-              icon="it-comment"
+              icon="it-pa"
               title={t('languages.title')}
               hint={t('languages.hint')}
             >

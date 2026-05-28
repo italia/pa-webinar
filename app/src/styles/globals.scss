@@ -2489,3 +2489,14 @@
     transition: none !important;
   }
 }
+
+// Pulse del dot "live" nel mini-transcript.
+@keyframes mini-transcript-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(1.18); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mini-transcript [style*='mini-transcript-pulse'] {
+    animation: none !important;
+  }
+}

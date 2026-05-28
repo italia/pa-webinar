@@ -2672,6 +2672,8 @@
     "followResume": "Resume following the video",
     "lowConfidenceBadge": "review",
     "lowConfidenceTitle": "This part of the transcript has low confidence: the recording may contain different words. Always refer back to the original video.",
+    "miniTranscriptLabel": "Live transcript",
+    "dubAvailableHint": "Dubbed audio available in {langs}. Use the audio selector in the player controls to listen to the translated version.",
     "provenance": {
       "triggerLabel": "AI processing transparency",
       "closeLabel": "Hide processing details",

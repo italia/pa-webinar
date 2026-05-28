@@ -87,7 +87,19 @@ export const GET = withErrorHandling(async (_request, context) => {
     ? (JSON.parse(tryDecryptPII(transcriptJson.inlineBody) ?? '{}') as TranscriptJson)
     : {};
 
+  // Mapping speaker → label umano. Per gli speaker mappati dall'admin
+  // usiamo il displayName. Per i SPEAKER_xx anonimi, sostituiamo con
+  // "Partecipante N" ordinato per tempo di parola (top speaker = 1):
+  // visivamente molto più gentile di "SPEAKER_03" per il visitatore.
+  // L'admin può sempre identificarli a posteriori col mapping; finché
+  // non lo fa, "Partecipante" è meglio del diar label crudo.
   const speakerMap = new Map<string, string>();
+  const sortedAnonymousByTime = recording.speakers
+    .filter((sp) => !sp.displayName)
+    .sort((a, b) => (b.totalSpeechSec ?? 0) - (a.totalSpeechSec ?? 0));
+  sortedAnonymousByTime.forEach((sp, i) => {
+    speakerMap.set(sp.diarLabel, `Partecipante ${i + 1}`);
+  });
   for (const sp of recording.speakers) {
     if (sp.displayName) speakerMap.set(sp.diarLabel, sp.displayName);
   }
