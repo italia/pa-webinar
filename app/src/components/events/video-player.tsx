@@ -143,6 +143,15 @@ function VideoPlayerImpl(
   //    l'<audio> esterno parte sincronizzato.
   // Tutti i seek / play / pause sul video vengono propagati all'audio
   // esterno via i listener qui sotto.
+  //
+  // Note importanti su robustezza:
+  //  - aspettiamo `loadedmetadata` sull'audio prima di settare
+  //    currentTime e fare play(): impostare `currentTime` su un
+  //    media element non ancora pronto è no-op silente.
+  //  - niente `crossOrigin="anonymous"` sull'<audio>: il blob storage
+  //    Azure non ha CORS configurato per i nostri domini e il check
+  //    CORS fallirebbe sul 302 → SAS URL, lasciando il <audio> muto
+  //    senza errore visibile. Per la sola riproduzione non serve.
   useEffect(() => {
     const v = videoRef.current;
     const a = dubbedAudioRef.current;
@@ -154,23 +163,66 @@ function VideoPlayerImpl(
     if (!a) return;
     if (!isDubbed) {
       a.pause();
-      a.currentTime = 0;
+      try {
+        a.currentTime = 0;
+      } catch {
+        // ignora: src appena cambiato, audio non ancora pronto.
+      }
       return;
     }
 
-    // Mantieni l'audio in sincrono col video. Eventi-driven (più
-    // efficiente del setInterval) — registriamo i listener qui e li
-    // smontiamo nel cleanup.
-    a.currentTime = v.currentTime;
-    if (!v.paused) void a.play().catch(() => undefined);
+    const syncTimeAndPlay = (): void => {
+      try {
+        a.currentTime = v.currentTime;
+      } catch {
+        // se non è ancora pronto, ritentiamo su loadedmetadata sotto.
+      }
+      a.playbackRate = v.playbackRate;
+      if (!v.paused) {
+        void a.play().catch((err) => {
+          console.warn('[VideoPlayer] dub audio play() failed', err);
+        });
+      }
+    };
+
+    // Se l'audio è già pronto, sincronizza subito. Altrimenti aspetta
+    // loadedmetadata (e play della stessa traccia).
+    if (a.readyState >= 1 /* HAVE_METADATA */) {
+      syncTimeAndPlay();
+    } else {
+      const onReady = (): void => {
+        a.removeEventListener('loadedmetadata', onReady);
+        a.removeEventListener('canplay', onReady);
+        syncTimeAndPlay();
+      };
+      a.addEventListener('loadedmetadata', onReady);
+      a.addEventListener('canplay', onReady);
+      // Forziamo il fetch nel caso preload non abbia ancora cominciato
+      // (può accadere dopo cambio src).
+      try {
+        a.load();
+      } catch {
+        // ignora: alcuni browser lanciano AbortError quando load() viene
+        // chiamato in rapida sequenza.
+      }
+    }
 
     const onPlay = (): void => {
-      a.currentTime = v.currentTime;
+      try {
+        a.currentTime = v.currentTime;
+      } catch {
+        // se l'utente preme play subito dopo aver switchato audio, il
+        // src potrebbe non essere ancora pronto: ignoriamo.
+      }
       void a.play().catch(() => undefined);
     };
     const onPause = (): void => a.pause();
     const onSeek = (): void => {
-      a.currentTime = v.currentTime;
+      try {
+        a.currentTime = v.currentTime;
+      } catch {
+        // ignora
+      }
     };
     const onRate = (): void => {
       a.playbackRate = v.playbackRate;
@@ -517,8 +569,10 @@ function VideoPlayerImpl(
               ? audioTracks.find((a) => a.language === activeAudio)?.src
               : undefined
           }
-          preload="metadata"
-          crossOrigin="anonymous"
+          preload="auto"
+          /* niente crossOrigin: il blob storage Azure non ha CORS
+             attivo per il nostro origin, l'audio resterebbe muto in
+             silenzio. Per la sola playback non serve. */
           style={{ display: 'none' }}
           aria-hidden="true"
         />

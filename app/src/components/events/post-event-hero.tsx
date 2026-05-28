@@ -129,6 +129,57 @@ export default function PostEventHero({
     playerRef?.current?.seekTo?.(sec, true);
   };
 
+  // Topic corrente: l'ultimo topic con `start_mmss` <= playhead. Il
+  // chip corrispondente nel topic-navigator viene "illuminato" così
+  // l'utente capisce a quale capitolo sta corrispondendo il segmento
+  // che sta guardando.
+  const [activeTopicIdx, setActiveTopicIdx] = useState<number>(-1);
+  useEffect(() => {
+    if (!playerRef?.current) return undefined;
+    const v = playerRef.current.videoEl?.();
+    if (!v) return undefined;
+    const topicTimes = (sm.topics ?? []).map((tp) => mmssToSec(tp.start_mmss ?? ''));
+    if (topicTimes.every((t) => t == null)) return undefined;
+    let rafId: number | null = null;
+    const tick = () => {
+      const now = v.currentTime;
+      let found = -1;
+      for (let i = 0; i < topicTimes.length; i += 1) {
+        const t = topicTimes[i];
+        if (t != null && now >= t) found = i;
+      }
+      setActiveTopicIdx(found);
+      rafId = window.requestAnimationFrame(tick);
+    };
+    const onPlay = () => {
+      if (rafId == null) rafId = window.requestAnimationFrame(tick);
+    };
+    const onPause = () => {
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+      rafId = null;
+    };
+    const onSeek = () => {
+      const now = v.currentTime;
+      let found = -1;
+      for (let i = 0; i < topicTimes.length; i += 1) {
+        const t = topicTimes[i];
+        if (t != null && now >= t) found = i;
+      }
+      setActiveTopicIdx(found);
+    };
+    v.addEventListener('play', onPlay);
+    v.addEventListener('pause', onPause);
+    v.addEventListener('seeked', onSeek);
+    if (!v.paused) onPlay();
+    onSeek();
+    return () => {
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+      v.removeEventListener('play', onPlay);
+      v.removeEventListener('pause', onPause);
+      v.removeEventListener('seeked', onSeek);
+    };
+  }, [playerRef, sm.topics]);
+
   return (
     <section
       className="post-event-hero mb-4"
@@ -240,15 +291,17 @@ export default function PostEventHero({
                 const seekable = !!stamp && mmssToSec(stamp) != null;
                 const palette = speakerColor(`topic:${i}:${tp.title ?? ''}`);
                 const isCopied = copiedTopic === i;
+                const isLive = i === activeTopicIdx;
                 return (
                   <div
                     key={`${i}-${tp.title ?? ''}`}
                     className="d-inline-flex align-items-center"
                     style={{
-                      background: palette.bg,
-                      border: `1px solid ${palette.color}33`,
+                      background: isLive ? palette.color + '24' : palette.bg,
+                      border: `1px solid ${isLive ? palette.color : palette.color + '33'}`,
                       borderRadius: 999,
-                      transition: 'transform 0.12s, box-shadow 0.12s',
+                      transition: 'transform 0.12s, box-shadow 0.12s, border 0.12s, background 0.12s',
+                      boxShadow: isLive ? `0 0 0 3px ${palette.color}22` : undefined,
                     }}
                     onMouseEnter={(e) => {
                       if (!seekable) return;
@@ -257,7 +310,7 @@ export default function PostEventHero({
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = '';
-                      e.currentTarget.style.boxShadow = '';
+                      e.currentTarget.style.boxShadow = isLive ? `0 0 0 3px ${palette.color}22` : '';
                     }}
                   >
                     <button

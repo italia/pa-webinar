@@ -39,12 +39,19 @@ import { useBookmarks } from '@/lib/utils/use-bookmarks';
 
 import type { VideoPlayerHandle } from './video-player';
 
+interface SegmentWord {
+  start: number;
+  end: number;
+  word: string;
+}
+
 interface Segment {
   start: number;
   end: number;
   text: string;
   speaker: string | null;
   speakerName: string | null;
+  words?: SegmentWord[];
 }
 
 interface TranscriptResponse {
@@ -142,6 +149,50 @@ function highlightMatches(
   return out;
 }
 
+/**
+ * Renderizza il testo di un segmento con highlight per-parola
+ * sincronizzato col playhead del video. Le parole prima del cursore
+ * temporale appaiono nel colore semantico (dim), quella corrente
+ * viene evidenziata col background del segment (full color), quelle
+ * successive appaiono dim. Effetto karaoke leggero — niente
+ * animazione brusca, niente "spinta" del layout (le parole occupano
+ * lo stesso spazio in ogni stato).
+ */
+function WordLevelText({
+  words,
+  playheadSec,
+  color,
+}: {
+  words: SegmentWord[];
+  playheadSec: number;
+  color: string;
+}) {
+  return (
+    <span className="postprod-segment__words">
+      {words.map((w, i) => {
+        const passed = playheadSec >= w.end;
+        const current = !passed && playheadSec >= w.start;
+        return (
+          <span
+            key={`${w.start}-${i}`}
+            className="postprod-segment__word"
+            style={{
+              color: passed ? color : current ? '#0c1a2b' : '#5A768A',
+              fontWeight: current ? 600 : 400,
+              background: current ? color + '22' : undefined,
+              borderRadius: current ? 3 : 0,
+              padding: current ? '0 2px' : '0',
+              transition: 'color 0.12s, background 0.12s',
+            }}
+          >
+            {w.word}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 export default function TranscriptPanel({
   playerRef,
   endpoint,
@@ -185,25 +236,79 @@ export default function TranscriptPanel({
     };
   }, [endpoint]);
 
-  // Track currentTime to highlight the right segment.
+  // Tempo corrente del video — alimenta sia l'highlight del segment
+  // sia il highlight word-level. requestAnimationFrame anziché solo
+  // timeupdate (che fa fire ogni 250ms su Chrome) per avere un
+  // segno fluido sulle parole; cap a ~10fps quando il video è in
+  // pausa per non sprecare cicli.
+  const [playheadSec, setPlayheadSec] = useState(0);
   useEffect(() => {
     const video = resolveVideo(playerRef);
     if (!video || !data) return;
-    const segments = data.segments;
-    const onTime = (): void => {
-      const now = video.currentTime;
-      for (let i = 0; i < segments.length; i += 1) {
-        const seg = segments[i]!;
-        if (now >= seg.start && now <= seg.end) {
-          setActiveIdx((prev) => (prev === i ? prev : i));
-          return;
-        }
-      }
-      setActiveIdx(-1);
+    let rafId: number | null = null;
+    const tick = (): void => {
+      setPlayheadSec(video.currentTime);
+      rafId = window.requestAnimationFrame(tick);
     };
-    video.addEventListener('timeupdate', onTime);
-    return () => video.removeEventListener('timeupdate', onTime);
+    const onPlay = (): void => {
+      if (rafId == null) rafId = window.requestAnimationFrame(tick);
+    };
+    const onPause = (): void => {
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+      rafId = null;
+      setPlayheadSec(video.currentTime);
+    };
+    const onSeek = (): void => setPlayheadSec(video.currentTime);
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
+    video.addEventListener('seeked', onSeek);
+    if (!video.paused) onPlay();
+    else onPause();
+    return () => {
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+      video.removeEventListener('play', onPlay);
+      video.removeEventListener('pause', onPause);
+      video.removeEventListener('seeked', onSeek);
+    };
   }, [data, playerRef]);
+
+  // Calcola activeIdx dal playhead (binary search). Ricorda lo
+  // ultimo indice trovato per evitare scan completo ad ogni tick.
+  const lastIdxRef = useRef(0);
+  useEffect(() => {
+    if (!data) return;
+    const segments = data.segments;
+    const now = playheadSec;
+    // tentativo veloce: l'idx corrente è ancora valido o il successivo?
+    const li = Math.max(0, Math.min(segments.length - 1, lastIdxRef.current));
+    const here = segments[li];
+    if (here && now >= here.start && now <= here.end) {
+      if (activeIdx !== li) setActiveIdx(li);
+      return;
+    }
+    const next = segments[li + 1];
+    if (next && now >= next.start && now <= next.end) {
+      lastIdxRef.current = li + 1;
+      setActiveIdx(li + 1);
+      return;
+    }
+    // fallback: binary search
+    let lo = 0;
+    let hi = segments.length - 1;
+    let found = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      const s = segments[mid]!;
+      if (now < s.start) hi = mid - 1;
+      else if (now > s.end) lo = mid + 1;
+      else {
+        found = mid;
+        break;
+      }
+    }
+    if (found !== -1) lastIdxRef.current = found;
+    if (activeIdx !== found) setActiveIdx(found);
+  }, [playheadSec, data, activeIdx]);
 
   // Auto-scroll the active segment into view (smooth, center). Skip
   // while:
@@ -654,7 +759,15 @@ export default function TranscriptPanel({
                     </div>
                   </div>
                   <div className="postprod-segment__text">
-                    {highlightMatches(seg.text, trimmedSearch)}
+                    {isActive && seg.words && seg.words.length > 0 && !trimmedSearch ? (
+                      <WordLevelText
+                        words={seg.words}
+                        playheadSec={playheadSec}
+                        color={palette.color}
+                      />
+                    ) : (
+                      highlightMatches(seg.text, trimmedSearch)
+                    )}
                   </div>
                 </div>
               );
