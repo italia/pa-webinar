@@ -24,6 +24,7 @@ import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
 import { presignArtifactDownload, isPostprodStorageConfigured } from '@/lib/storage/postprod';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import { assertPostprodAccessible } from '@/lib/ai/access';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,26 +37,13 @@ const ALLOWED_TYPES = [
 export const GET = withErrorHandling(async (request, context) => {
   const { param: slug, lang } = (await (context as { params: Promise<{ param: string; lang: string }> }).params);
 
-  // We don't need the recording details — just resolve to an event
-  // whose latest published recording has a matching artifact.
-  const event = await prisma.event.findUnique({
-    where: { slug },
-    select: { id: true, recordingPublished: true },
-  });
-  if (!event) throw new NotFoundError('Event');
-
-  if (!event.recordingPublished) {
-    // Recording not public: 404 to avoid leaking the artifact
-    // existence to a random visitor. Moderator/admin flows fetch via
-    // the admin API instead.
-    throw new NotFoundError('Subtitle');
-  }
+  const { eventId } = await assertPostprodAccessible(slug);
 
   const artifact = await prisma.postprodArtifact.findFirst({
     where: {
       type: { in: ALLOWED_TYPES },
       language: lang.toLowerCase(),
-      recording: { eventId: event.id },
+      recording: { eventId },
     },
     orderBy: { createdAt: 'desc' },
     select: { id: true, blobKey: true, inlineBody: true, mimeType: true },

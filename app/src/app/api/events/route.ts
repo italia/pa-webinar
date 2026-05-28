@@ -12,6 +12,7 @@ import { generateUniqueSlug } from '@/lib/utils/slug';
 import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
 import { calculateEstimates } from '@/lib/estimates';
@@ -126,6 +127,21 @@ export const POST = withErrorHandling(async (request) => {
         data.joinPassword && data.joinPassword.length > 0
           ? hashJoinPassword(data.joinPassword)
           : null,
+      ...(data.aiTranscriptEnabled !== undefined && {
+        aiTranscriptEnabled: data.aiTranscriptEnabled,
+      }),
+      ...(data.aiSummaryEnabled !== undefined && {
+        aiSummaryEnabled: data.aiSummaryEnabled,
+      }),
+      ...(data.aiTranslationEnabled !== undefined && {
+        aiTranslationEnabled: data.aiTranslationEnabled,
+      }),
+      ...(data.aiDubbingEnabled !== undefined && {
+        aiDubbingEnabled: data.aiDubbingEnabled,
+      }),
+      ...(data.aiTargetLocales !== undefined && {
+        aiTargetLocales: data.aiTargetLocales,
+      }),
       // Default reminders: 1 day and 1 hour before
       reminders: {
         create: [
@@ -153,6 +169,13 @@ export const POST = withErrorHandling(async (request) => {
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const locale = resolveLocale(request);
+
+  await logAdminAction({
+    request,
+    action: 'EVENT_CREATE',
+    target: event.id,
+    details: { slug: event.slug, fields: Object.keys(data) },
+  });
 
   return Response.json(
     {

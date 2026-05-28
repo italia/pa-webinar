@@ -72,6 +72,19 @@ export async function enqueuePostprodForRecording(
     return { enqueued: 0, skippedExisting: 0, jobIds: [] };
   }
 
+  // Master kill-switch: when an operator pauses the AI pipeline
+  // cluster-wide via SiteSetting.aiPipelineEnabled=false, every
+  // enqueue path (webhook, admin rerun, post-event lifecycle) is a
+  // no-op. Without this, an admin could fill the queue with orphan
+  // jobs while the orchestrator is paused.
+  const site = await tx.siteSetting.findUnique({
+    where: { id: 'singleton' },
+    select: { aiPipelineEnabled: true },
+  });
+  if (!site?.aiPipelineEnabled) {
+    return { enqueued: 0, skippedExisting: 0, jobIds: [] };
+  }
+
   const sourceLanguage = opts.sourceLanguage ?? recording.sourceLanguage ?? 'it';
   const runCount = recording.runCount;
 

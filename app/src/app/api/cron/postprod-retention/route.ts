@@ -72,12 +72,22 @@ export const GET = withErrorHandling(async (request) => {
       }
     }
 
-    // Cascade: artifact rows then mark recording archived. The job
-    // rows are kept (small) for audit; only the bulk artifacts go.
+    // Cascade: artifact rows, scrub PII su Speaker e PostprodJob,
+    // poi marca il recording archived. I PostprodJob restano per
+    // audit (count, esiti, durate), ma `payload` e `lastError`
+    // possono contenere snippet di trascrizione o nomi → scrub.
+    // Speaker.displayName è PII piena (copiata da Person al link)
+    // → cancellata insieme agli artifact, non sopravvive a retention.
     const del = await prisma.postprodArtifact.deleteMany({
       where: { recordingId: rec.id },
     });
     artifactsDeleted += del.count;
+
+    await prisma.speaker.deleteMany({ where: { recordingId: rec.id } });
+    await prisma.postprodJob.updateMany({
+      where: { recordingId: rec.id },
+      data: { payload: { scrubbed: true }, lastError: null },
+    });
 
     await prisma.recording.update({
       where: { id: rec.id },
