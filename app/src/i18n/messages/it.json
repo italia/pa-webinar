@@ -1187,7 +1187,29 @@
         "pages": "Pagine",
         "footer": "Footer",
         "features": "Funzionalità",
-        "scaling": "Dimensionamento infra"
+        "scaling": "Dimensionamento infra",
+        "postprod": "Pipeline AI"
+      },
+      "postprod": {
+        "prerequisitesNote": "Prima di attivare la pipeline verifica che: (1) il pool GPU aigpu sia operativo; (2) il GPU Operator NVIDIA sia installato; (3) il Secret hf-token esista nel namespace; (4) la PVC ai-models sia pre-seedata con i pesi; (5) il Deployment vLLM Mistral sia in esecuzione. Vedi docs/POSTPROD.md.",
+        "pipelineEnabled": "Pipeline AI post-produzione attiva",
+        "pipelineEnabledHelp": "Kill-switch globale: quando è OFF, l'orchestrator non crea nuovi worker e nessuna trascrizione/sintesi/traduzione/doppiaggio viene prodotta — anche se gli eventi hanno i flag AI attivati individualmente. Le pagine pubbliche non mostrano artefatti AI.",
+        "providersSection": "Provider AI in-cluster",
+        "asrProvider": "Motore ASR (trascrizione)",
+        "asrProviderHelp": "Solo provider in-cluster ammessi. WhisperX = WhisperX large-v3 con diarization pyannote.audio 3.1.",
+        "llmProvider": "Motore LLM (sintesi / traduzione)",
+        "llmProviderHelp": "Solo provider in-cluster ammessi. vLLM serve Mistral-Small-3.2-24B (vendor EU) via interfaccia OpenAI-compatibile.",
+        "ttsEngine": "Motore TTS (doppiaggio)",
+        "ttsEngineHelp": "Piper TTS — voce neutra sintetica (no voice cloning, evita Art. 9 GDPR). Doppiaggio attivo solo se Event.aiDubbingEnabled per evento.",
+        "defaultTargetLocales": "Lingue target di default",
+        "defaultTargetLocalesHelp": "ISO-639-1 separati da virgola (es. en,fr). Usato quando l'evento non specifica aiTargetLocales.",
+        "limitsSection": "Limiti operativi",
+        "maxConcurrentJobs": "Job worker concorrenti",
+        "maxConcurrentJobsHelp": "Numero massimo di worker Pod in esecuzione contemporanea sul pool aigpu. Aumenta per maggior parallelismo (richiede quota GPU sufficiente).",
+        "jobMaxAttempts": "Tentativi max per job",
+        "jobMaxAttemptsHelp": "Numero di tentativi prima che un job postprod vada in FAILED terminale. Backoff esponenziale 30s → 2h.",
+        "artifactRetentionDays": "Retention artefatti (giorni)",
+        "artifactRetentionDaysHelp": "0 = artefatti vivono finché vive l'evento. >0 = override globale, gli artefatti più vecchi di N giorni vengono cancellati dal cron retention quotidiano."
       },
       "scaling": {
         "intro": "Parametri che descrivono la capacità del cluster dove gira la piattaforma. I valori di default sono tarati per Azure F16s_v2 (16 vCPU / 32 GiB) per JVB e F4s_v2 (4 vCPU / 8 GiB) per Jibri. Se usi hardware diverso, aggiorna qui — lo scaler ricalcola subito.",
