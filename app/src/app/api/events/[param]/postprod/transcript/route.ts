@@ -18,11 +18,19 @@ import { assertPostprodAccessible } from '@/lib/ai/access';
 
 export const dynamic = 'force-dynamic';
 
+interface SegmentWord {
+  start: number;
+  end: number;
+  word: string;
+  prob?: number;
+}
+
 interface Segment {
   start: number;
   end: number;
   text: string;
   speaker?: string | null;
+  words?: SegmentWord[];
 }
 
 interface TranscriptJson {
@@ -88,6 +96,23 @@ export const GET = withErrorHandling(async (_request, context) => {
     text: s.text,
     speaker: s.speaker ?? null,
     speakerName: s.speaker ? speakerMap.get(s.speaker) ?? null : null,
+    // Words con timing per il highlight per-parola nel TranscriptPanel.
+    // Filtriamo eventuali entry malformate per evitare runtime errors
+    // sul client (es. parole senza start/end nel JSON storico).
+    words: Array.isArray(s.words)
+      ? s.words
+          .filter(
+            (w): w is SegmentWord =>
+              typeof w?.start === 'number' &&
+              typeof w?.end === 'number' &&
+              typeof w?.word === 'string',
+          )
+          .map((w) => ({
+            start: w.start,
+            end: w.end,
+            word: w.word,
+          }))
+      : undefined,
   }));
 
   // Available subtitle tracks for the player's track switcher. A
