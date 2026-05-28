@@ -28,11 +28,14 @@ import {
   type RefObject,
 } from 'react';
 import { useTranslations } from 'next-intl';
+import { Icon } from 'design-react-kit';
+import type React from 'react';
 
 import {
   speakerColor,
   initials as speakerInitials,
 } from '@/lib/utils/speaker-palette';
+import { useBookmarks } from '@/lib/utils/use-bookmarks';
 
 import type { VideoPlayerHandle } from './video-player';
 
@@ -152,8 +155,14 @@ export default function TranscriptPanel({
   const [activeIdx, setActiveIdx] = useState<number>(-1);
   const [search, setSearch] = useState<string>('');
   const [showDownload, setShowDownload] = useState<boolean>(false);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  /** Follow-mode: quando true, l'autoscroll segue il segment attivo;
+   *  passa a false quando l'utente scrolla manualmente fino a quando
+   *  preme "Riprendi" o torna sopra il segment attivo. */
+  const [followLive, setFollowLive] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const downloadRef = useRef<HTMLDivElement>(null);
+  const bookmarks = useBookmarks(eventSlug ?? '');
 
   // Fetch on mount.
   useEffect(() => {
@@ -197,12 +206,13 @@ export default function TranscriptPanel({
   }, [data, playerRef]);
 
   // Auto-scroll the active segment into view (smooth, center). Skip
-  // while the user is actively filtering (search) — il container è
-  // ridisegnato e lo scroll programmatico rovinerebbe il flusso di
-  // lettura.
+  // while:
+  //   - l'utente sta filtrando (search): container ridisegnato
+  //   - follow-mode è OFF (l'utente sta leggendo "in libertà")
   useEffect(() => {
     if (activeIdx < 0) return;
     if (search.trim().length > 0) return;
+    if (!followLive) return;
     const container = containerRef.current;
     if (!container) return;
     const el = container.querySelector<HTMLElement>(
@@ -211,15 +221,55 @@ export default function TranscriptPanel({
     if (!el) return;
     const cRect = container.getBoundingClientRect();
     const eRect = el.getBoundingClientRect();
-    // Centriamo sempre quando esce dalla zona di confort (40% top/bottom
-    // del viewport del container).
     const margin = cRect.height * 0.2;
     const out =
       eRect.top < cRect.top + margin || eRect.bottom > cRect.bottom - margin;
     if (out) {
       el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
-  }, [activeIdx, search]);
+  }, [activeIdx, search, followLive]);
+
+  // Follow-mode UX: se l'utente scrolla dentro il container con la
+  // rotella / dito, disattiva il follow finché non clicca "Riprendi".
+  // Distinguamo lo scroll user-driven (wheel / touchmove / keydown
+  // nei tasti freccia) dallo scroll programmatico (scrollIntoView
+  // chiamato sopra), che NON deve disattivare il follow.
+  useEffect(() => {
+    const c = containerRef.current;
+    if (!c) return undefined;
+    const stop = () => setFollowLive(false);
+    c.addEventListener('wheel', stop, { passive: true });
+    c.addEventListener('touchmove', stop, { passive: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (
+        e.key === 'ArrowDown' ||
+        e.key === 'ArrowUp' ||
+        e.key === 'PageDown' ||
+        e.key === 'PageUp' ||
+        e.key === 'Home' ||
+        e.key === 'End'
+      ) {
+        stop();
+      }
+    };
+    c.addEventListener('keydown', onKey);
+    return () => {
+      c.removeEventListener('wheel', stop);
+      c.removeEventListener('touchmove', stop);
+      c.removeEventListener('keydown', onKey);
+    };
+  }, []);
+
+  // Quando il follow viene riattivato, ri-centra subito il segment attivo.
+  useEffect(() => {
+    if (!followLive || activeIdx < 0) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const el = container.querySelector<HTMLElement>(
+      `[data-segment-idx="${activeIdx}"]`,
+    );
+    el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, [followLive, activeIdx]);
 
   // Close download dropdown on outside click / Escape.
   useEffect(() => {
@@ -445,35 +495,91 @@ export default function TranscriptPanel({
             </div>
           )}
 
+          {/* Follow-mode indicator + Riprendi (visibile solo quando OFF) */}
+          {!followLive && (
+            <button
+              type="button"
+              onClick={() => setFollowLive(true)}
+              className="btn btn-sm d-inline-flex align-items-center gap-1 mb-2"
+              style={{
+                fontSize: '0.78rem',
+                background: '#FFF6DA',
+                color: '#7A5A00',
+                border: '1px solid #F2D88A',
+                borderRadius: 999,
+                padding: '4px 12px',
+              }}
+            >
+              <Icon icon="it-refresh" size="sm" color={undefined} />
+              {t('followResume')}
+            </button>
+          )}
           <div
             ref={containerRef}
             className="postprod-panel__transcript"
             style={{ maxHeight: 480, overflowY: 'auto' }}
             role="region"
             aria-label={t('tabTranscript')}
+            tabIndex={0}
           >
             {filteredSegments.map(({ seg, idx }) => {
               const speakerLabel = seg.speakerName ?? seg.speaker ?? '—';
               const isActive = idx === activeIdx;
-              // Palette stabile per speaker — stesso colore in tutti i
-              // segmenti dello stesso parlante. Identity key = displayName
-              // se mapped, altrimenti il diarLabel anonimo.
               const identity = seg.speakerName ?? seg.speaker ?? '';
               const palette = speakerColor(identity);
+              const tSec = Math.floor(seg.start);
+              const bookmarked = bookmarks.has(tSec);
+              const isCopied = copiedIdx === idx;
+              const shareUrl =
+                typeof window === 'undefined'
+                  ? ''
+                  : `${window.location.origin}${window.location.pathname.split('#')[0]}#t=${tSec}`;
+              const copyShare = async (e: React.MouseEvent) => {
+                e.stopPropagation();
+                if (!shareUrl) return;
+                try {
+                  await navigator.clipboard?.writeText(shareUrl);
+                  setCopiedIdx(idx);
+                  window.setTimeout(
+                    () => setCopiedIdx((p) => (p === idx ? null : p)),
+                    2000,
+                  );
+                } catch {
+                  // ignore
+                }
+              };
+              const toggleBookmark = (e: React.MouseEvent) => {
+                e.stopPropagation();
+                if (bookmarked) bookmarks.remove(tSec);
+                else
+                  bookmarks.add({
+                    tSec,
+                    label: `${speakerLabel}: ${seg.text.slice(0, 80)}`,
+                  });
+              };
               return (
-                <button
+                <div
                   key={`${seg.start}-${idx}`}
-                  type="button"
                   data-segment-idx={idx}
-                  onClick={() => seekTo(seg.start)}
-                  className={`postprod-segment d-block text-start w-100 border-0 bg-transparent p-2 ${
+                  className={`postprod-segment d-block p-2 ${
                     isActive ? 'postprod-segment--active' : ''
                   }`}
                   style={{
                     borderLeft: `3px solid ${isActive ? palette.color : palette.color + '66'}`,
                     background: isActive ? palette.bg : undefined,
+                    cursor: 'pointer',
+                    position: 'relative',
                   }}
                   aria-current={isActive ? 'true' : undefined}
+                  onClick={() => seekTo(seg.start)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      seekTo(seg.start);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
                 >
                   <div className="d-flex align-items-center gap-2 small mb-1">
                     <code
@@ -506,11 +612,51 @@ export default function TranscriptPanel({
                     <span className="fw-semibold" style={{ color: palette.color }}>
                       {speakerLabel}
                     </span>
+                    <div className="ms-auto d-flex align-items-center gap-1 postprod-segment__actions">
+                      <button
+                        type="button"
+                        onClick={toggleBookmark}
+                        title={bookmarked ? t('bookmarkRemove') : t('bookmarkAdd')}
+                        aria-label={bookmarked ? t('bookmarkRemove') : t('bookmarkAdd')}
+                        className="btn p-0 border-0 bg-transparent"
+                        style={{
+                          width: 26,
+                          height: 26,
+                          color: bookmarked ? '#FFC107' : '#9AAAB8',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Icon
+                          icon={bookmarked ? 'it-star-full' : 'it-star-outline'}
+                          size="sm"
+                          color={undefined}
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={copyShare}
+                        title={isCopied ? t('shareSegmentCopied') : t('shareSegment')}
+                        aria-label={isCopied ? t('shareSegmentCopied') : t('shareSegment')}
+                        className="btn p-0 border-0 bg-transparent"
+                        style={{
+                          width: 26,
+                          height: 26,
+                          color: isCopied ? palette.color : '#9AAAB8',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Icon
+                          icon={isCopied ? 'it-check' : 'it-link'}
+                          size="sm"
+                          color={undefined}
+                        />
+                      </button>
+                    </div>
                   </div>
                   <div className="postprod-segment__text">
                     {highlightMatches(seg.text, trimmedSearch)}
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>

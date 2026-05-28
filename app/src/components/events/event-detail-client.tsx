@@ -24,6 +24,8 @@ import VideoPlayer, {
 import PostEventTabs from '@/components/events/post-event-tabs';
 import PostEventHero, { type StructuredSummary } from '@/components/events/post-event-hero';
 import NowSpeakingChip from '@/components/events/now-speaking-chip';
+import VideoMiniPlayer from '@/components/events/video-mini-player';
+import { useDeepLinkSeek } from '@/lib/utils/use-deep-link';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 
@@ -143,6 +145,8 @@ export default function EventDetailClient({
   // Ref del player — usato dal TranscriptPanel per click-to-seek + da
   // future feature live (es. timestamp deeplink ?t=120).
   const playerRef = useRef<VideoPlayerHandle>(null);
+  const playerAnchorRef = useRef<HTMLDivElement>(null);
+  useDeepLinkSeek(playerRef);
   // Lingua attiva dei sottotitoli — guida quale variante di summary
   // mostrare nel TranscriptPanel ("la sintesi nella lingua che stai
   // guardando").
@@ -447,6 +451,7 @@ export default function EventDetailClient({
               structured={postprodMeta.summariesStructured}
               preferredLocale={locale}
               playerRef={playerRef}
+              eventSlug={event.slug}
             />
           )}
 
@@ -461,7 +466,7 @@ export default function EventDetailClient({
           )}
           {isEnded && !event.youtubeUrl && event.recordingUrl && (
             <div className="mb-4">
-              <div style={{ position: 'relative' }}>
+              <div ref={playerAnchorRef} style={{ position: 'relative' }}>
                 <VideoPlayer
                   ref={playerRef}
                   src={`/api/events/${event.slug}/recording`}
@@ -478,6 +483,12 @@ export default function EventDetailClient({
                   />
                 )}
               </div>
+              <VideoMiniPlayer
+                playerRef={playerRef}
+                anchorRef={playerAnchorRef}
+                title={title}
+                poster={event.imageUrl}
+              />
               <div className="mt-2">
                 <a
                   href={`/api/events/${event.slug}/recording`}
