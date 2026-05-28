@@ -31,6 +31,8 @@ interface Segment {
   text: string;
   speaker?: string | null;
   words?: SegmentWord[];
+  avg_logprob?: number;
+  no_speech_prob?: number;
 }
 
 interface TranscriptJson {
@@ -90,15 +92,19 @@ export const GET = withErrorHandling(async (_request, context) => {
     if (sp.displayName) speakerMap.set(sp.diarLabel, sp.displayName);
   }
 
+  // Soglie per il badge "trascrizione meno sicura" nel frontend.
+  // Allineate ai filtri di hallucination nel worker (-1.0 / 0.6): un
+  // segment con avg_logprob in [-1.0, -0.6] è "borderline" — è stato
+  // tenuto perché non sicuro hallucination ma vale la pena segnalarlo
+  // al visitatore. > -0.6 è normale.
+  const LOWCONF_AVG_LOGPROB = -0.6;
+
   const segments = (transcript.segments ?? []).map((s) => ({
     start: s.start,
     end: s.end,
     text: s.text,
     speaker: s.speaker ?? null,
     speakerName: s.speaker ? speakerMap.get(s.speaker) ?? null : null,
-    // Words con timing per il highlight per-parola nel TranscriptPanel.
-    // Filtriamo eventuali entry malformate per evitare runtime errors
-    // sul client (es. parole senza start/end nel JSON storico).
     words: Array.isArray(s.words)
       ? s.words
           .filter(
@@ -113,6 +119,11 @@ export const GET = withErrorHandling(async (_request, context) => {
             word: w.word,
           }))
       : undefined,
+    // Confidence "low" quando Whisper aveva avg_logprob borderline.
+    // Esposto come flag boolean per non confondere il client con la
+    // semantica del valore raw (log probabilità < 0).
+    lowConfidence:
+      typeof s.avg_logprob === 'number' && s.avg_logprob < LOWCONF_AVG_LOGPROB,
   }));
 
   // Available subtitle tracks for the player's track switcher. A

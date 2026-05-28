@@ -2670,6 +2670,8 @@
     "followLive": "Follow the video",
     "followManual": "Free reading",
     "followResume": "Resume following the video",
+    "lowConfidenceBadge": "review",
+    "lowConfidenceTitle": "This part of the transcript has low confidence: the recording may contain different words. Always refer back to the original video.",
     "provenance": {
       "triggerLabel": "AI processing transparency",
       "closeLabel": "Hide processing details",

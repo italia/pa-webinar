@@ -226,6 +226,12 @@ model Event {
   // summary translation (e.g. "en,fr"). When null, falls back to
   // SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales      String? @map("ai_target_locales") @db.VarChar(200)
+  // Numero di parlanti attesi nell'evento. Quando valorizzato (1-30),
+  // la pipeline forza `k = expectedSpeakers` nel clustering della
+  // diarization invece di lasciare che il modello decida via silhouette
+  // score. Tipicamente il moderatore lo conosce — il caso "dubbio"
+  // (lascia null) è il default sicuro per i webinar pubblici.
+  expectedSpeakers     Int?    @map("expected_speakers")
 
   // FK lookup index: "what events use this GDPR template" / cascade
   // SetNull on template delete.

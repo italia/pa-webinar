@@ -45,6 +45,43 @@ import { postprodJobAttemptsTotal } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Costruisce l'initial_prompt per WhisperX dai metadata dell'evento.
+ * Aiuta Whisper a riconoscere nomi propri, sigle, organizzazioni
+ * specifiche dell'evento (es. "PCM", "OVH", "Raffaele Vitiello").
+ *
+ * Cap a 800 caratteri per stare ben dentro la token-window di Whisper
+ * (~224 tokens il modello accetta come prompt iniziale).
+ */
+function buildAsrInitialPrompt(event: {
+  title: unknown;
+  organizerName: string | null;
+  speakersInfo: unknown;
+}): string | undefined {
+  const localised = (v: unknown): string | undefined => {
+    if (typeof v === 'string') return v;
+    if (v && typeof v === 'object') {
+      const obj = v as Record<string, unknown>;
+      for (const key of ['it', 'en', 'fr', 'de', 'es']) {
+        const candidate = obj[key];
+        if (typeof candidate === 'string' && candidate.trim()) return candidate;
+      }
+    }
+    return undefined;
+  };
+  const parts: string[] = [];
+  const title = localised(event.title);
+  if (title) parts.push(title.trim());
+  if (event.organizerName) {
+    parts.push(`Organizzato da ${event.organizerName.trim()}.`);
+  }
+  const speakers = localised(event.speakersInfo);
+  if (speakers) parts.push(`Partecipanti e relatori: ${speakers.trim()}.`);
+  const out = parts.join(' ').trim();
+  if (!out) return undefined;
+  return out.length > 800 ? out.slice(0, 800) : out;
+}
+
 const claimRequestSchema = z.object({
   /** Worker pod name — recorded as leased_by for observability. */
   workerId: z.string().min(1).max(120),
@@ -128,7 +165,17 @@ export const POST = withErrorHandling(async (request) => {
   const recording = await prisma.recording.findUnique({
     where: { id: row.recording_id },
     include: {
-      event: { select: { id: true, slug: true, aiTargetLocales: true } },
+      event: {
+        select: {
+          id: true,
+          slug: true,
+          aiTargetLocales: true,
+          title: true,
+          organizerName: true,
+          speakersInfo: true,
+          expectedSpeakers: true,
+        },
+      },
     },
   });
   if (!recording) throw new NotFoundError('Recording');
@@ -278,6 +325,15 @@ export const POST = withErrorHandling(async (request) => {
         llmModelId: llm.modelId,
         asrModelId: asr.modelId,
         ttsVoicesPath: tts.voicesPath,
+        // Context-aware quality knobs (TRANSCRIBE job).
+        // - initial_prompt: nomi propri + termini specifici dell'evento.
+        // - expectedSpeakers: forza k nella diarization se admin lo sa.
+        ...(row.kind === 'TRANSCRIBE'
+          ? {
+              asrInitialPrompt: buildAsrInitialPrompt(recording.event),
+              expectedSpeakers: recording.event.expectedSpeakers ?? undefined,
+            }
+          : {}),
       },
     },
     { status: 200 },

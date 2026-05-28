@@ -76,12 +76,21 @@ def build_pipeline_snapshot(tx: dict, sm: dict, dubbed_blob_key: str | None) -> 
             "engine": "faster-whisper",
             "model": "large-v3",
             "version": "5090-local",
+            # Quality knobs applied to this specific run.
+            "initialPromptUsed": True,
+            "hallucinationFiltering": "avg_logprob<-1.0 || no_speech_prob>0.6",
+            "postCorrection": {
+                "applied": True,
+                "engine": "mistral-small3.2:24b",
+                "glossaryTerms": True,
+            },
             "diarization": {
                 "engine": "speechbrain ECAPA-TDNN",
                 "model": "spkrec-ecapa-voxceleb",
                 "method": tx.get("diarization", {}).get("method"),
                 "k": tx.get("diarization", {}).get("k"),
                 "silhouette": tx.get("diarization", {}).get("silhouette"),
+                "kForced": tx.get("diarization", {}).get("k_forced", True),
             },
         },
         "llm": {
@@ -118,7 +127,9 @@ def main():
     names = {k: v for k, v in (sm.get("speakers_named") or {}).items() if isinstance(v, str) and v.strip()}
 
     # Costruisco il transcript_json "canonico" — quello che il worker
-    # tipicamente persiste come TRANSCRIPT_JSON.
+    # tipicamente persiste come TRANSCRIPT_JSON. Propaghiamo
+    # `avg_logprob` e `no_speech_prob` così l'endpoint può derivare
+    # `lowConfidence` per il badge frontend.
     transcript_json = {
         "language": tx.get("language", "it"),
         "duration": tx["duration"],
@@ -133,6 +144,9 @@ def main():
                 "text": s["text"],
                 "speaker": s.get("speaker"),
                 "words": s.get("words"),
+                "avg_logprob": s.get("avg_logprob"),
+                "no_speech_prob": s.get("no_speech_prob"),
+                **({"text_raw": s["text_raw"]} if "text_raw" in s else {}),
             }
             for s in tx["segments"]
         ],

@@ -49,6 +49,13 @@ class ProviderHints(BaseModel):
     llmModelId: Optional[str] = None
     asrModelId: Optional[str] = None
     ttsVoicesPath: Optional[str] = None
+    # Initial prompt per Whisper, costruito server-side dai metadata
+    # dell'evento (titolo, organizzazione, speakers). Migliora la
+    # trascrizione dei nomi propri e dei termini tecnici dell'evento.
+    asrInitialPrompt: Optional[str] = None
+    # Numero di speaker attesi (dall'Event.expectedSpeakers). Quando
+    # valorizzato, il worker forza k nel clustering della diarization.
+    expectedSpeakers: Optional[int] = None
 
 
 class ClaimResponse(BaseModel):
