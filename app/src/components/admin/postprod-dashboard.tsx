@@ -55,6 +55,9 @@ interface SpeakerRow {
   /** Prima frase pronunciata dallo speaker (max 140 caratteri) —
    *  sample per identificare chi è prima di compilarne il nome. */
   sampleText?: string | null;
+  /** Nome suggerito dal LLM in fase di pipeline. Applicabile con un
+   *  click invece di scrivere a mano. */
+  suggestedName?: string | null;
 }
 
 interface RecordingRow {
@@ -407,9 +410,32 @@ function SpeakersEditor({
                 {t('save')}
               </button>
             </div>
-            <small className="text-secondary ms-1">
-              {t('speakerSpoke', { sec: s.totalSpeechSec })}
-            </small>
+            <div className="d-flex align-items-center gap-2 ms-1">
+              <small className="text-secondary">
+                {t('speakerSpoke', { sec: s.totalSpeechSec })}
+              </small>
+              {s.suggestedName && current !== s.suggestedName && (
+                <button
+                  type="button"
+                  className="btn btn-sm p-0"
+                  onClick={() =>
+                    setEdits((m) => ({ ...m, [s.id]: s.suggestedName! }))
+                  }
+                  style={{
+                    color: '#0066CC',
+                    fontSize: '0.78rem',
+                    textDecoration: 'underline',
+                    textDecorationStyle: 'dotted',
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                  }}
+                  title={t('suggestedTitle')}
+                >
+                  {t('suggestedApply', { name: s.suggestedName })}
+                </button>
+              )}
+            </div>
             {s.sampleText && (
               <blockquote
                 className="ms-1 mt-1 mb-0 ps-2"

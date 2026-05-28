@@ -1954,6 +1954,8 @@
       "attempts": "tentativo {n}",
       "speakerPlaceholder": "Nome reale (opzionale)",
       "speakerSpoke": "Tempo parlato: {sec}s",
+      "suggestedApply": "Applica suggerimento: {name}",
+      "suggestedTitle": "Nome suggerito dalla pipeline AI in base ai nomi propri menzionati nella trascrizione. Cliccalo per inserirlo nel campo (puoi sempre modificarlo prima di salvare).",
       "save": "Salva"
     },
     "questionnairesPage": {

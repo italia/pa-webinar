@@ -150,10 +150,30 @@ export const GET = withErrorHandling(async (request) => {
         // questo speaker — serve all'admin per riconoscere chi è
         // (anziché doversi ascoltare la registrazione).
         sampleText: extractSampleText(r.artifacts, s.diarLabel),
+        // Suggerimento di nome derivato dal LLM in fase di
+        // pipeline (Mistral `speakers_named` → pipelineSnapshot).
+        // L'admin può applicarlo con un click invece di scrivere.
+        suggestedName: extractSuggestedName(r.pipelineSnapshot, s.diarLabel),
       })),
     })),
   });
 });
+
+/** Suggerimento di nome derivato dal pipelineSnapshot.voiceAssignments
+ *  (popolato in fase di pipeline dal LLM che indovina i nomi propri
+ *  menzionati nel transcript). L'admin lo può applicare con un click. */
+function extractSuggestedName(
+  pipelineSnapshot: Prisma.JsonValue,
+  diarLabel: string,
+): string | null {
+  if (!pipelineSnapshot || typeof pipelineSnapshot !== 'object') return null;
+  const snap = pipelineSnapshot as {
+    voiceAssignments?: Array<{ diarLabel?: string; displayName?: string | null }>;
+  };
+  const va = snap.voiceAssignments?.find((v) => v.diarLabel === diarLabel);
+  const name = va?.displayName?.trim();
+  return name && name.length > 0 ? name : null;
+}
 
 /** Recupera la prima frase pronunciata da `diarLabel` dal TRANSCRIPT_JSON
  *  artifact, se presente, decifrato. Ritorna null se non disponibile. */
