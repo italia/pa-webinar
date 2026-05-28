@@ -23,6 +23,7 @@ import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError } from '@/lib/errors';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,6 +88,7 @@ export const GET = withErrorHandling(async (request) => {
             language: true,
             sizeBytes: true,
             modelId: true,
+            inlineBody: true,
             createdAt: true,
           },
         },
@@ -144,7 +146,38 @@ export const GET = withErrorHandling(async (request) => {
         displayName: s.displayName,
         personId: s.personId,
         totalSpeechSec: s.totalSpeechSec,
+        // Estraggo dal TRANSCRIPT_JSON la prima frase pronunciata da
+        // questo speaker — serve all'admin per riconoscere chi è
+        // (anziché doversi ascoltare la registrazione).
+        sampleText: extractSampleText(r.artifacts, s.diarLabel),
       })),
     })),
   });
 });
+
+/** Recupera la prima frase pronunciata da `diarLabel` dal TRANSCRIPT_JSON
+ *  artifact, se presente, decifrato. Ritorna null se non disponibile. */
+function extractSampleText(
+  artifacts: Array<{ type: string; inlineBody: string | null }>,
+  diarLabel: string,
+): string | null {
+  const tx = artifacts.find((a) => a.type === 'TRANSCRIPT_JSON');
+  if (!tx?.inlineBody) return null;
+  const decoded = tryDecryptPII(tx.inlineBody);
+  if (!decoded) return null;
+  try {
+    const parsed = JSON.parse(decoded) as {
+      segments?: Array<{ speaker?: string; text?: string }>;
+    };
+    const segs = parsed.segments ?? [];
+    for (const s of segs) {
+      if (s.speaker === diarLabel && s.text && s.text.trim().length > 5) {
+        const trimmed = s.text.trim();
+        return trimmed.length > 140 ? trimmed.slice(0, 140) + '…' : trimmed;
+      }
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}

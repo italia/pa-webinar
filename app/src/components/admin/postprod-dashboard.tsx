@@ -52,6 +52,9 @@ interface SpeakerRow {
   displayName: string | null;
   personId: string | null;
   totalSpeechSec: number;
+  /** Prima frase pronunciata dallo speaker (max 140 caratteri) —
+   *  sample per identificare chi è prima di compilarne il nome. */
+  sampleText?: string | null;
 }
 
 interface RecordingRow {
@@ -407,6 +410,19 @@ function SpeakersEditor({
             <small className="text-secondary ms-1">
               {t('speakerSpoke', { sec: s.totalSpeechSec })}
             </small>
+            {s.sampleText && (
+              <blockquote
+                className="ms-1 mt-1 mb-0 ps-2"
+                style={{
+                  borderLeft: '3px solid #d6e3f1',
+                  fontSize: '0.82rem',
+                  color: '#5A768A',
+                  fontStyle: 'italic',
+                }}
+              >
+                {s.sampleText}
+              </blockquote>
+            )}
           </li>
         );
       })}
