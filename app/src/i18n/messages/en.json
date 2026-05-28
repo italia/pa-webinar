@@ -1118,28 +1118,35 @@
         "footer": "Footer",
         "features": "Features",
         "scaling": "Infra sizing",
-        "postprod": "AI pipeline"
+        "postprod": "Post-event AI pipeline"
       },
       "postprod": {
-        "prerequisitesNote": "Before enabling the pipeline, verify: (1) the aigpu GPU pool is up; (2) the NVIDIA GPU Operator is installed; (3) the hf-token Secret exists in this namespace; (4) the ai-models PVC is pre-seeded with the weights; (5) the vLLM Mistral Deployment is running. See docs/POSTPROD.md.",
-        "pipelineEnabled": "AI post-production pipeline active",
-        "pipelineEnabledHelp": "Global kill-switch: when OFF, the orchestrator creates no workers and no transcript/summary/translation/dubbing is produced — even if individual events have AI flags on. Public pages don't show AI artifacts.",
-        "providersSection": "In-cluster AI providers",
-        "asrProvider": "ASR engine (transcription)",
-        "asrProviderHelp": "Only in-cluster providers allowed. WhisperX = WhisperX large-v3 with pyannote.audio 3.1 diarization.",
-        "llmProvider": "LLM engine (summary / translation)",
-        "llmProviderHelp": "Only in-cluster providers allowed. vLLM serves Mistral-Small-3.2-24B (EU vendor) over OpenAI-compatible API.",
-        "ttsEngine": "TTS engine (dubbing)",
-        "ttsEngineHelp": "Piper TTS — synthetic neutral voice (no voice cloning, avoids GDPR Art. 9). Dubbing only runs if Event.aiDubbingEnabled per event.",
+        "prerequisitesNote": "The AI pipeline runs ONLY after the event ends, on the Jibri-uploaded recording. The `aigpu` GPU pool wakes up when jobs are queued and scales back to zero when the queue is empty. Prerequisites: (1) `aigpu` GPU pool configured in cluster; (2) NVIDIA GPU Operator installed; (3) `hf-token` Secret present in this namespace; (4) `ai-models` PVC pre-seeded with the weights; (5) vLLM Mistral Deployment running. Full checklist in docs/POSTPROD.md.",
+        "pipelineEnabled": "Post-event AI pipeline active",
+        "pipelineEnabledHelp": "Global kill-switch. OFF = no transcript, summary, translation or dubbing is generated — even if individual events have AI flags on. AI artifacts already produced stay in storage but are no longer exposed publicly. Toggle off to pause the entire pipeline without a redeploy.",
+        "timingNote": "AI jobs run ONLY after the event ends and Jibri has uploaded the recording. The GPU pool is never used during the live event (no live captioning): deliberate choice for quality control and cost containment (see ADR-007).",
+        "providersSection": "In-cluster AI engines",
+        "providersIntro": "Engines are fixed at deploy time: no dynamic loading. To add a new engine (e.g. another EU LLM) you need (a) a Kubernetes Deployment serving it, (b) an extension to `lib/ai/providers.ts`, (c) a new entry in the Zod schema. See docs/POSTPROD.md section \"Adding a provider\".",
+        "asrProvider": "Transcription engine (ASR)",
+        "asrProviderHelp": "Extracts text from the video with per-segment timing and speaker identification. WhisperX large-v3 + pyannote.audio 3.1, open-source models running in cluster — no external APIs.",
+        "asrOptionWhisperx": "WhisperX large-v3 + pyannote (diarization)",
+        "llmProvider": "Summary and translation engine (LLM)",
+        "llmProviderHelp": "Produces the event summary and translates transcript and summary into the target languages. Mistral-Small-3.2-24B served via vLLM, EU vendor (France), Apache 2.0 license.",
+        "llmOptionVllm": "vLLM in-cluster · Mistral-Small-3.2-24B (EU)",
+        "ttsEngine": "Synthetic dubbing engine (TTS)",
+        "ttsEngineHelp": "Generates dubbed audio in the target languages with a neutral synthetic voice. Dubbing does NOT use voice cloning: deliberate choice to avoid processing biometric data (Art. 9 GDPR). Dubbing only runs if the event organizer has enabled the `aiDubbingEnabled` flag.",
+        "ttsOptionPiper": "Piper TTS · neutral synthetic voice (no cloning)",
+        "voiceCloningSection": "Voice cloning",
+        "voiceCloningNote": "Voice cloning (synthesis that imitates real speakers' voices) is NOT and will NOT be supported. Imitating an identifiable person's voice is processing of biometric data under Art. 9 GDPR and requires explicit, purpose-specific consent that is hard to obtain from public webinar attendees. The eventi-dtd AI dubbing therefore always uses a single neutral synthetic voice (not the speakers'), clearly identifiable as AI by the listener.",
         "defaultTargetLocales": "Default target languages",
-        "defaultTargetLocalesHelp": "ISO-639-1 comma-separated (e.g. en,fr). Used when the event doesn't specify aiTargetLocales.",
+        "defaultTargetLocalesHelp": "ISO-639-1 codes comma-separated (e.g. `en,fr,de`). Used when the individual event doesn't specify `aiTargetLocales`. The source language is always excluded automatically.",
         "limitsSection": "Operational limits",
         "maxConcurrentJobs": "Concurrent worker jobs",
-        "maxConcurrentJobsHelp": "Maximum number of worker Pods running concurrently on the aigpu pool. Increase for more parallelism (requires sufficient GPU quota).",
+        "maxConcurrentJobsHelp": "Maximum number of worker Pods running concurrently on the `aigpu` pool. Increase for more parallelism (requires sufficient GPU quota). Default 2 = one A100 80GB GPU runs 2 jobs in parallel.",
         "jobMaxAttempts": "Max attempts per job",
-        "jobMaxAttemptsHelp": "Number of attempts before a postprod job goes to terminal FAILED. Exponential backoff 30s → 2h.",
+        "jobMaxAttemptsHelp": "Number of attempts before a postprod job goes to terminal FAILED. Exponential backoff 30s → 2h. Default 5.",
         "artifactRetentionDays": "Artifact retention (days)",
-        "artifactRetentionDaysHelp": "0 = artifacts live as long as the event lives. >0 = global override, artifacts older than N days are purged by the daily retention cron."
+        "artifactRetentionDaysHelp": "0 = AI artifacts live as long as the event lives (GDPR-friendly default). >0 = global override: artifacts older than N days are purged by the daily retention cron (together with Speaker.displayName and job payload, consistent with docs/GDPR.md)."
       },
       "scaling": {
         "intro": "Parameters that describe the cluster capacity the platform runs on. Defaults are calibrated for Azure F16s_v2 (16 vCPU / 32 GiB) for JVB and F4s_v2 (4 vCPU / 8 GiB) for Jibri. On different hardware tweak these — the scaler recomputes immediately.",
@@ -2283,13 +2290,15 @@
     "responseTime": "Response time",
     "systemStatus": "System status",
     "postprod": {
-      "title": "AI post-production pipeline",
+      "title": "Post-event AI pipeline",
       "status": {
         "idle": "Idle",
         "running": "Running",
         "degraded": "Degraded"
       },
-      "aiBadge": "Transcripts, summaries and dubbed audio are generated automatically by in-cluster AI models. Content may contain errors; the video remains the authoritative source.",
+      "subtitle": "Transcription · Summary · Translation · Neutral dubbing",
+      "whatItDoes": "After an event ends the recording is processed in cluster by European AI models (WhisperX for transcription with speaker identification, Mistral for summary and translation, Piper for synthetic neutral dubbing in the target languages). It all happens on dedicated GPUs that wake only when jobs arrive and scale back to zero when the queue is empty — no external APIs, no data leaves the cluster.",
+      "aiBadge": "Transcripts, summaries and dubbed audio are generated automatically by in-cluster AI models. Content may contain errors: the video remains the authoritative source. No voice cloning, no external APIs.",
       "idleMessage": "Pipeline ready, no recordings to process right now.",
       "queueAriaLabel": "Post-production queue composition",
       "queuePending": "queued",
@@ -2367,7 +2376,7 @@
       "jvb": "Video bridge",
       "jibri": "Video recording",
       "smtp": "Email service",
-      "postprod": "AI post-production pipeline"
+      "postprod": "Post-event AI pipeline"
     },
     "descriptions": {
       "app": "The website where you access events",
