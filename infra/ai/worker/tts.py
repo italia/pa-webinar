@@ -114,6 +114,47 @@ def _find_voice(voices_path: str, language: str) -> tuple[str, str]:
     return str(onnx_files[0]), onnx_files[0].stem
 
 
+def _voice_pool(voices_path: str, language: str) -> list[tuple[str, str]]:
+    """Tutte le voci disponibili per `language` nella PVC, in ordine
+    deterministico. Ritorna `[(model_path, voice_id), ...]`.
+
+    Permette il dubbing **multivoce**: con N speaker distinti, ogni
+    SPEAKER_xx riceve una delle voci del pool. Restano voci sintetiche
+    pre-trained pubbliche — NON è voice cloning, nessuna imitazione
+    della voce reale. Vedi `assign_voices` per la logica di assegnazione.
+
+    Se la PVC contiene una sola voce per lingua, il pool ha un solo
+    elemento e il dub fallback su single-voice (comportamento V1).
+    """
+    lang_dir = Path(voices_path) / language
+    onnx_files = sorted(lang_dir.glob("*.onnx"))
+    if not onnx_files:
+        raise FileNotFoundError(f"No .onnx file in {lang_dir}")
+    return [(str(f), f.stem) for f in onnx_files]
+
+
+def assign_voices(
+    segments: List[Segment],
+    pool: list[tuple[str, str]],
+) -> dict[str, tuple[str, str]]:
+    """Mapping SPEAKER_xx → (voice_path, voice_id) deterministico.
+
+    Strategia: ordina gli speaker per tempo totale di parola
+    decrescente; assegna le voci del pool nell'ordine. Lo speaker che
+    parla di più riceve la voce più "central" (primo elemento del
+    pool); a seguire le altre. Pool ciclico se gli speaker eccedono.
+    """
+    times: dict[str, float] = {}
+    for s in segments:
+        sp = s.get("speaker") or "SPEAKER_??"
+        times[sp] = times.get(sp, 0.0) + max(0.0, float(s.get("end", 0)) - float(s.get("start", 0)))
+    ordered = sorted(times.items(), key=lambda kv: -kv[1])
+    mapping: dict[str, tuple[str, str]] = {}
+    for i, (sp_label, _) in enumerate(ordered):
+        mapping[sp_label] = pool[i % len(pool)]
+    return mapping
+
+
 def _format_silence(duration_sec: float, out_path: str) -> None:
     """Genera N secondi di silenzio mono 22050Hz per i gap fra segmenti."""
     if duration_sec <= 0:
@@ -155,10 +196,25 @@ def dub_with_piper(
     """
     import piper  # type: ignore[import-not-found]
 
-    model_path, voice_id = _find_voice(voices_path, target_language)
-    log.info("Piper voice loaded: %s", voice_id)
+    pool = _voice_pool(voices_path, target_language)
+    voice_map = assign_voices(segments, pool)
+    log.info(
+        "Piper voice pool=%d, speaker assignment: %s",
+        len(pool),
+        {k: vid for k, (_, vid) in voice_map.items()},
+    )
 
-    voice = piper.PiperVoice.load(model_path)
+    # Cache di PiperVoice istanze caricate (evita reload per ogni segmento).
+    loaded: dict[str, "piper.PiperVoice"] = {}
+
+    def get_voice(model_path: str) -> "piper.PiperVoice":
+        v = loaded.get(model_path)
+        if v is None:
+            v = piper.PiperVoice.load(model_path)
+            loaded[model_path] = v
+        return v
+
+    fallback_voice = pool[0]
 
     with tempfile.TemporaryDirectory(prefix="dub-") as workdir:
         chunks: list[str] = []
@@ -178,10 +234,16 @@ def dub_with_piper(
                 chunks.append(sil_path)
                 cursor += gap
 
+            # Voce per questo segmento = voce assegnata allo speaker.
+            voice_model_path, _ = voice_map.get(
+                seg.get("speaker") or "", fallback_voice
+            )
+            piper_voice = get_voice(voice_model_path)
+
             # TTS del testo. Piper API: voice.synthesize_wav(text, file).
             seg_path = os.path.join(workdir, f"seg-{idx:04d}.wav")
             with open(seg_path, "wb") as f:
-                voice.synthesize_wav(text, f)
+                piper_voice.synthesize_wav(text, f)
             chunks.append(seg_path)
 
             # Stima della durata del wav generato per aggiornare il cursore.
@@ -236,6 +298,14 @@ def dub_with_piper(
         )
         final.close()
         shutil.copy(out_path, final.name)
+
+    # voice_id riportato nel result è un multi-voice id sintetico,
+    # es. "multivoice:lessac,amy,alan" (massimo 3 entry per leggibilità).
+    used_voices = sorted({vid for _, vid in voice_map.values()})
+    voice_id = (
+        used_voices[0] if len(used_voices) == 1
+        else "multivoice:" + ",".join(used_voices[:3]) + ("…" if len(used_voices) > 3 else "")
+    )
 
     return DubResult(
         audio_path=final.name,

@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 """
-Dubbing sintetico EN con Piper TTS (voce neutra, no cloning).
+Dubbing sintetico EN con Piper TTS — **multivoce**.
 
-Input:  summary.json (transcript_en)
-Output: dubbed_en.wav (mono 22050, sincronizzato cue-to-cue con sorgente)
-        + dubbed_en.m4a (compresso AAC per delivery)
+A ogni SPEAKER_xx viene assegnata UNA voce sintetica distinta tra
+quelle pre-trained pubbliche di Piper. NON è voice cloning: nessuna
+imitazione della voce reale. Restano voci sintetiche neutre, fungibili,
+identificabili come AI dal listener — l'unica differenza con la V1
+single-voice è che si distinguono N parlanti invece di averli tutti
+appiattiti su una sola voce.
 
-Strategia di sync:
-- Genera il TTS di OGNI segmento separatamente.
-- Time-stretch (rubberband o atempo di ffmpeg) ogni clip per farla
-  rientrare nell'intervallo [start, end] del segmento originale.
-- Concatena tutti i clip in una traccia continua, paddata con silenzio.
+Trade-off GDPR/AI Act:
+- Voci pre-trained pubbliche, dataset open. Niente fingerprint vocale.
+- Mapping SPEAKER → voice è arbitrario (sorted-by-speech-time + indice).
+  Il listener NON può risalire all'identità reale dalla voce sintetica.
+- Stesso disclaimer "AI-generated" del single-voice. Resta `isSynthetic=true`.
+
+Strategia di sync (invariata vs V1):
+- TTS per segmento → atempo per match con la finestra temporale →
+  amix con padding silenzio.
 """
 from __future__ import annotations
 import json
@@ -19,21 +26,48 @@ import tempfile
 import wave
 from pathlib import Path
 
-VOICE = "piper-voices/en_US-lessac-medium.onnx"
+# Pool di voci EN disponibili nella dir piper-voices/. Ordine =
+# preferenza di assegnazione (il top speaker prende la voce più
+# "central/neutra" — Lessac M neutral; gli altri ruotano). Tutte
+# medium-quality (~22kHz), licenza MIT.
+EN_VOICE_POOL = [
+    "piper-voices/en_US-lessac-medium.onnx",     # M neutral central
+    "piper-voices/en_US-amy-medium.onnx",        # F americana
+    "piper-voices/en_GB-alan-medium.onnx",       # M britannico
+    "piper-voices/en_US-ryan-medium.onnx",       # M giovane
+    "piper-voices/en_GB-jenny_dioco-medium.onnx",# F britannica
+    "piper-voices/en_US-kristin-medium.onnx",    # F americana
+]
 SAMPLE_RATE = 22050
 SUMMARY_IN = "summary.json"
+TX_IN = "transcript_diarized.json"
 OUT_WAV = "dubbed_en.wav"
 OUT_M4A = "dubbed_en.m4a"
 
 
-def piper_say(text: str, out: Path) -> None:
-    # piper CLI accetta stdin (testo) e scrive su stdout (WAV)
-    p = sp.run(
-        ["piper", "--model", VOICE, "--output_file", str(out)],
-        input=text.encode(),
-        check=True,
-        capture_output=True,
+def piper_say(text: str, out: Path, *, voice: str) -> None:
+    sp.run(
+        ["piper", "--model", voice, "--output_file", str(out)],
+        input=text.encode(), check=True, capture_output=True,
     )
+
+
+def assign_voices(transcript: dict) -> dict[str, str]:
+    """Mapping SPEAKER_xx → voice path.
+
+    Ordina gli speaker per tempo di parola decrescente e li assegna
+    alle voci del pool nell'ordine di preferenza. Lo speaker che parla
+    di più prende la voce "central" (Lessac neutral M); a seguire le
+    altre. Il mapping è deterministico (stessa input → stesso mapping).
+    """
+    speakers = sorted(
+        transcript.get("speakers", []),
+        key=lambda s: -s.get("totalSpeechSec", 0),
+    )
+    mapping = {}
+    for i, sp_row in enumerate(speakers):
+        mapping[sp_row["diarLabel"]] = EN_VOICE_POOL[i % len(EN_VOICE_POOL)]
+    return mapping
 
 
 def wav_duration(path: Path) -> float:
@@ -57,11 +91,18 @@ def atempo_chain(ratio: float) -> str:
 def main():
     with open(SUMMARY_IN) as f:
         sm = json.load(f)
+    with open(TX_IN) as f:
+        tx = json.load(f)
     segs = sm.get("transcript_en", [])
     if not segs:
         raise SystemExit("transcript_en vuoto — esegui prima summarize.py")
     duration = max((s["end"] for s in segs), default=0)
+
+    voice_map = assign_voices(tx)
     print(f"Dubbing {len(segs)} segments, target duration {duration:.0f}s")
+    print("Voice assignment (most spoken first):")
+    for sp_label, voice in sorted(voice_map.items(), key=lambda x: x[0]):
+        print(f"  {sp_label} → {Path(voice).stem}")
 
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
@@ -73,8 +114,11 @@ def main():
             target = s["end"] - s["start"]
             if target < 0.3:
                 continue
+            # Voce per il segmento = voce assegnata allo speaker.
+            # Se lo speaker non è mappato (caso outlier), fallback Lessac.
+            voice = voice_map.get(s.get("speaker"), EN_VOICE_POOL[0])
             raw = td / f"seg{i:04d}_raw.wav"
-            piper_say(text_en, raw)
+            piper_say(text_en, raw, voice=voice)
             d = wav_duration(raw)
             # se la voce TTS è più lunga del target, time-stretch up; se più
             # corta, lasciamo (paddiamo dopo). atempo ratio = TTS_len / target.

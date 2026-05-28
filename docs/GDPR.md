@@ -254,13 +254,25 @@ reale sul flusso live.
 ### Voice cloning: non supportato
 
 Il doppiaggio AI **non** clona la voce dei relatori reali. Il sistema
-usa Piper TTS con una voce sintetica neutra fissa, identica per ogni
-evento. Imitare la voce di una persona identificabile costituirebbe
-trattamento di dati biometrici ai sensi dell'**Art. 9 GDPR** e
-richiederebbe consenso esplicito per finalità specifica difficile da
-ottenere da partecipanti di un evento pubblico. La scelta è
-deliberata, persistente e documentata in ADR-005 e nell'UI del tab
-`Pipeline AI` di `/admin/settings`.
+usa Piper TTS con voci sintetiche pre-trained pubbliche (MIT). Imitare
+la voce di una persona identificabile costituirebbe trattamento di
+dati biometrici ai sensi dell'**Art. 9 GDPR** e richiederebbe consenso
+esplicito per finalità specifica difficile da ottenere da partecipanti
+di un evento pubblico. La scelta è deliberata, persistente e
+documentata in ADR-005 e nell'UI del tab `Pipeline AI` di
+`/admin/settings`.
+
+**Doppiaggio multivoce ≠ voice cloning.** Quando nella PVC `ai-models`
+sono presenti più voci Piper per la lingua target, il worker assegna a
+ogni `SPEAKER_xx` distinto **una voce diversa del pool** in modo
+deterministico (ordinamento per tempo totale di parola → indice nel
+pool). Non c'è inferenza dalla voce reale alla voce sintetica: le voci
+del pool sono pre-trained pubbliche, fungibili, non identificative di
+nessuna persona reale. Lo speaker A che parla in una voce sintetica F
+americana in un evento può parlare in voce sintetica M britannica in
+un altro — l'assegnazione cambia con la composizione degli speaker
+dell'evento. È solo una scelta editoriale per facilitare la
+comprensione di chi sta parlando nel doppiaggio.
 
 ### Dove vivono i dati AI
 
