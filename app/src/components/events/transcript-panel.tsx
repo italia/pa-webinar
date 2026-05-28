@@ -12,9 +12,21 @@
  *
  * Both transcript and summary carry an "AI-generated" disclosure
  * badge per AI Act Art. 50.
+ *
+ * Improvements:
+ *   - search input (live filter + highlight keywords)
+ *   - download dropdown (.txt / .srt / .vtt / summary .md)
+ *   - smooth scroll auto-center for active segment
  */
 
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactElement,
+  type RefObject,
+} from 'react';
 import { useTranslations } from 'next-intl';
 
 import type { VideoPlayerHandle } from './video-player';
@@ -52,6 +64,9 @@ export interface TranscriptPanelProps {
     | RefObject<HTMLVideoElement | null>;
   /** Public API path producing TranscriptResponse. */
   endpoint: string;
+  /** Slug evento — usato per costruire gli endpoint di download. Quando
+   *  assente, il menu Scarica viene nascosto. */
+  eventSlug?: string;
   /** Currently displayed subtitle language; controls which summary
    *  variant is shown. Null = source language summary. */
   activeLanguage?: string | null;
@@ -68,7 +83,6 @@ function resolveVideo(
   const c = ref.current;
   if (!c) return null;
   if (c instanceof HTMLVideoElement) return c;
-  // VideoPlayerHandle expose videoEl().
   if ('videoEl' in c && typeof c.videoEl === 'function') return c.videoEl();
   return null;
 }
@@ -81,9 +95,49 @@ function formatTs(seconds: number): string {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
+/**
+ * Escape RegExp meta-characters in a user-supplied query so we can
+ * highlight literal matches safely (and avoid silently swallowing
+ * "?", "*", "(" etc.).
+ */
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Splits `text` at every occurrence of `query` (case-insensitive) and
+ * returns an array of React nodes with the matched ranges wrapped in
+ * a highlight span. Returns the plain text as a single string when
+ * the query is empty.
+ */
+function highlightMatches(
+  text: string,
+  query: string,
+): Array<string | ReactElement> {
+  if (!query) return [text];
+  const re = new RegExp(escapeRegExp(query), 'gi');
+  const out: Array<string | ReactElement> = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let k = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    out.push(
+      <mark key={`m-${k++}`} className="postprod-segment__match">
+        {m[0]}
+      </mark>,
+    );
+    last = m.index + m[0].length;
+    if (m[0].length === 0) re.lastIndex += 1; // avoid infinite loop on zero-width
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
 export default function TranscriptPanel({
   playerRef,
   endpoint,
+  eventSlug,
   activeLanguage,
 }: TranscriptPanelProps) {
   const t = useTranslations('postprod');
@@ -91,7 +145,10 @@ export default function TranscriptPanel({
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<'transcript' | 'summary'>('transcript');
   const [activeIdx, setActiveIdx] = useState<number>(-1);
+  const [search, setSearch] = useState<string>('');
+  const [showDownload, setShowDownload] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const downloadRef = useRef<HTMLDivElement>(null);
 
   // Fetch on mount.
   useEffect(() => {
@@ -121,7 +178,6 @@ export default function TranscriptPanel({
     const segments = data.segments;
     const onTime = (): void => {
       const now = video.currentTime;
-      // Binary-search-style linear walk — segments are sorted.
       for (let i = 0; i < segments.length; i += 1) {
         const seg = segments[i]!;
         if (now >= seg.start && now <= seg.end) {
@@ -135,11 +191,13 @@ export default function TranscriptPanel({
     return () => video.removeEventListener('timeupdate', onTime);
   }, [data, playerRef]);
 
-  // Auto-scroll the active segment into view (smooth, only when
-  // outside the visible area to avoid hijacking the scroll position
-  // when the user is reading elsewhere).
+  // Auto-scroll the active segment into view (smooth, center). Skip
+  // while the user is actively filtering (search) — il container è
+  // ridisegnato e lo scroll programmatico rovinerebbe il flusso di
+  // lettura.
   useEffect(() => {
     if (activeIdx < 0) return;
+    if (search.trim().length > 0) return;
     const container = containerRef.current;
     if (!container) return;
     const el = container.querySelector<HTMLElement>(
@@ -148,15 +206,37 @@ export default function TranscriptPanel({
     if (!el) return;
     const cRect = container.getBoundingClientRect();
     const eRect = el.getBoundingClientRect();
-    if (eRect.top < cRect.top || eRect.bottom > cRect.bottom) {
+    // Centriamo sempre quando esce dalla zona di confort (40% top/bottom
+    // del viewport del container).
+    const margin = cRect.height * 0.2;
+    const out =
+      eRect.top < cRect.top + margin || eRect.bottom > cRect.bottom - margin;
+    if (out) {
       el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
-  }, [activeIdx]);
+  }, [activeIdx, search]);
+
+  // Close download dropdown on outside click / Escape.
+  useEffect(() => {
+    if (!showDownload) return;
+    const onDocClick = (e: MouseEvent): void => {
+      if (!downloadRef.current) return;
+      if (!downloadRef.current.contains(e.target as Node)) {
+        setShowDownload(false);
+      }
+    };
+    const onEsc = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') setShowDownload(false);
+    };
+    document.addEventListener('mousedown', onDocClick);
+    document.addEventListener('keydown', onEsc);
+    return () => {
+      document.removeEventListener('mousedown', onDocClick);
+      document.removeEventListener('keydown', onEsc);
+    };
+  }, [showDownload]);
 
   function seekTo(start: number): void {
-    // Preferiamo il handle quando disponibile (espone seekTo + play in
-    // un'unica chiamata); fallback al video element per i consumer
-    // legacy che passano un ref raw.
     const c = playerRef.current;
     if (c && !(c instanceof HTMLVideoElement) && 'seekTo' in c) {
       c.seekTo(start, true);
@@ -167,6 +247,17 @@ export default function TranscriptPanel({
     video.currentTime = start;
     if (video.paused) void video.play();
   }
+
+  // Filtered list. Memoized: filtering ricalcolato solo quando i
+  // segmenti o la query cambiano.
+  const filteredSegments = useMemo(() => {
+    if (!data) return [];
+    const q = search.trim().toLowerCase();
+    if (!q) return data.segments.map((seg, idx) => ({ seg, idx }));
+    return data.segments
+      .map((seg, idx) => ({ seg, idx }))
+      .filter(({ seg }) => seg.text.toLowerCase().includes(q));
+  }, [data, search]);
 
   if (error) {
     return (
@@ -195,6 +286,11 @@ export default function TranscriptPanel({
         ? data.sourceLanguage
         : Object.keys(data.summaries)[0] ?? null;
 
+  const trimmedSearch = search.trim();
+  const showSearchStatus = trimmedSearch.length > 0;
+  const downloadLang = activeLanguage ?? data.sourceLanguage;
+  const downloadEnabled = !!eventSlug;
+
   return (
     <div className="postprod-panel">
       <div
@@ -204,69 +300,185 @@ export default function TranscriptPanel({
         <strong>{t('aiBadgeLabel')}</strong> · {t('aiBadgeBody')}
       </div>
 
-      <ul className="nav nav-pills mb-3" role="tablist">
-        <li className="nav-item" role="presentation">
-          <button
-            type="button"
-            className={`nav-link ${tab === 'transcript' ? 'active' : ''}`}
-            onClick={() => setTab('transcript')}
-            role="tab"
-            aria-selected={tab === 'transcript'}
-          >
-            {t('tabTranscript')}
-          </button>
-        </li>
-        {summaryLang && (
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <ul className="nav nav-pills mb-0" role="tablist">
           <li className="nav-item" role="presentation">
             <button
               type="button"
-              className={`nav-link ${tab === 'summary' ? 'active' : ''}`}
-              onClick={() => setTab('summary')}
+              className={`nav-link ${tab === 'transcript' ? 'active' : ''}`}
+              onClick={() => setTab('transcript')}
               role="tab"
-              aria-selected={tab === 'summary'}
+              aria-selected={tab === 'transcript'}
             >
-              {t('tabSummary')} · {summaryLang.toUpperCase()}
+              {t('tabTranscript')}
             </button>
           </li>
+          {summaryLang && (
+            <li className="nav-item" role="presentation">
+              <button
+                type="button"
+                className={`nav-link ${tab === 'summary' ? 'active' : ''}`}
+                onClick={() => setTab('summary')}
+                role="tab"
+                aria-selected={tab === 'summary'}
+              >
+                {t('tabSummary')} · {summaryLang.toUpperCase()}
+              </button>
+            </li>
+          )}
+        </ul>
+
+        {downloadEnabled && (
+          <div className="postprod-download" ref={downloadRef}>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+              onClick={() => setShowDownload((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={showDownload}
+              aria-label={t('downloadMenu')}
+              style={{ borderRadius: 20 }}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
+              </svg>
+              {t('downloadLabel')}
+            </button>
+            {showDownload && (
+              <div role="menu" className="postprod-download__menu">
+                <a
+                  role="menuitem"
+                  className="postprod-download__item"
+                  href={`/api/events/${eventSlug}/postprod/download/transcript.txt?lang=${downloadLang}`}
+                  download
+                  onClick={() => setShowDownload(false)}
+                >
+                  {t('downloadTranscriptTxt')}
+                </a>
+                <a
+                  role="menuitem"
+                  className="postprod-download__item"
+                  href={`/api/events/${eventSlug}/postprod/download/transcript.srt?lang=${downloadLang}`}
+                  download
+                  onClick={() => setShowDownload(false)}
+                >
+                  {t('downloadTranscriptSrt')}
+                </a>
+                <a
+                  role="menuitem"
+                  className="postprod-download__item"
+                  href={`/api/events/${eventSlug}/postprod/subtitle/${downloadLang}`}
+                  download={`subtitles.${downloadLang}.vtt`}
+                  onClick={() => setShowDownload(false)}
+                >
+                  {t('downloadTranscriptVtt')}
+                </a>
+                {summaryLang && (
+                  <a
+                    role="menuitem"
+                    className="postprod-download__item"
+                    href={`/api/events/${eventSlug}/postprod/download/summary.md?lang=${summaryLang}`}
+                    download
+                    onClick={() => setShowDownload(false)}
+                  >
+                    {t('downloadSummaryMd')}
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
         )}
-      </ul>
+      </div>
 
       {tab === 'transcript' && (
-        <div
-          ref={containerRef}
-          className="postprod-panel__transcript"
-          style={{ maxHeight: 480, overflowY: 'auto' }}
-          role="region"
-          aria-label={t('tabTranscript')}
-        >
-          {data.segments.map((seg, idx) => {
-            const speakerLabel = seg.speakerName ?? seg.speaker ?? '—';
-            const isActive = idx === activeIdx;
-            return (
+        <>
+          <div className="postprod-panel__search">
+            <label htmlFor="postprod-search" className="visually-hidden">
+              {t('searchLabel')}
+            </label>
+            {/* select NATIVO non serve qui — è un text input. Restiamo
+                fuori dal pattern Input di design-react-kit per non
+                triggerare React #137 in caso di re-render. */}
+            <input
+              id="postprod-search"
+              type="search"
+              className="form-control form-control-sm"
+              placeholder={t('searchPlaceholder')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label={t('searchLabel')}
+              autoComplete="off"
+            />
+            {search.length > 0 && (
               <button
-                key={`${seg.start}-${idx}`}
                 type="button"
-                data-segment-idx={idx}
-                onClick={() => seekTo(seg.start)}
-                className={`postprod-segment d-block text-start w-100 border-0 bg-transparent p-2 ${
-                  isActive ? 'postprod-segment--active' : ''
-                }`}
-                style={{
-                  borderLeft: isActive
-                    ? '3px solid #0066cc'
-                    : '3px solid transparent',
-                  background: isActive ? 'rgba(0,102,204,0.06)' : undefined,
-                }}
+                className="postprod-panel__search-clear"
+                onClick={() => setSearch('')}
+                aria-label={t('searchClear')}
+                title={t('searchClear')}
               >
-                <div className="d-flex gap-2 small text-secondary mb-1">
-                  <code style={{ minWidth: 56 }}>{formatTs(seg.start)}</code>
-                  <span className="fw-semibold">{speakerLabel}</span>
-                </div>
-                <div className="postprod-segment__text">{seg.text}</div>
+                <span aria-hidden="true">×</span>
               </button>
-            );
-          })}
-        </div>
+            )}
+          </div>
+
+          {showSearchStatus && (
+            <div
+              className="postprod-panel__search-status"
+              role="status"
+              aria-live="polite"
+            >
+              {filteredSegments.length === 0
+                ? t('searchNoMatches', { query: trimmedSearch })
+                : t('searchMatches', { count: filteredSegments.length })}
+            </div>
+          )}
+
+          <div
+            ref={containerRef}
+            className="postprod-panel__transcript"
+            style={{ maxHeight: 480, overflowY: 'auto' }}
+            role="region"
+            aria-label={t('tabTranscript')}
+          >
+            {filteredSegments.map(({ seg, idx }) => {
+              const speakerLabel = seg.speakerName ?? seg.speaker ?? '—';
+              const isActive = idx === activeIdx;
+              return (
+                <button
+                  key={`${seg.start}-${idx}`}
+                  type="button"
+                  data-segment-idx={idx}
+                  onClick={() => seekTo(seg.start)}
+                  className={`postprod-segment d-block text-start w-100 border-0 bg-transparent p-2 ${
+                    isActive ? 'postprod-segment--active' : ''
+                  }`}
+                  style={{
+                    borderLeft: isActive
+                      ? '3px solid #0066cc'
+                      : '3px solid transparent',
+                    background: isActive ? 'rgba(0,102,204,0.08)' : undefined,
+                  }}
+                  aria-current={isActive ? 'true' : undefined}
+                >
+                  <div className="d-flex gap-2 small text-secondary mb-1">
+                    <code style={{ minWidth: 56 }}>{formatTs(seg.start)}</code>
+                    <span className="fw-semibold">{speakerLabel}</span>
+                  </div>
+                  <div className="postprod-segment__text">
+                    {highlightMatches(seg.text, trimmedSearch)}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {tab === 'summary' && summaryLang && (
