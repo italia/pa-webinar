@@ -11,12 +11,13 @@
  * TranscriptPanel resta primario.
  */
 
-import { useState, type RefObject } from 'react';
+import { useEffect, useState, type RefObject } from 'react';
 import { useTranslations } from 'next-intl';
 import { Badge, Icon } from 'design-react-kit';
 
 import type { VideoPlayerHandle } from '@/components/events/video-player';
 import { speakerColor } from '@/lib/utils/speaker-palette';
+import { localeDisplayName } from '@/lib/utils/locale-display';
 
 export interface StructuredSummary {
   overall_summary?: string;
@@ -32,6 +33,8 @@ interface Props {
   preferredLocale: string;
   /** Ref del VideoPlayer parent — usato dalle topic chips per seek. */
   playerRef?: RefObject<VideoPlayerHandle | null>;
+  /** Slug dell'evento — usato per il link share-at-time. */
+  eventSlug?: string;
   /** Hook quando il visitatore espande "vedi tutto" (analytics opzionale). */
   onExpand?: () => void;
 }
@@ -42,21 +45,70 @@ const mmssToSec = (mmss: string): number | null => {
   return Number(m[1]) * 60 + Number(m[2]);
 };
 
+const LANG_STORAGE_KEY = 'eventi-dtd:summary-lang';
+
 export default function PostEventHero({
   structured,
   preferredLocale,
   playerRef,
+  eventSlug,
   onExpand,
 }: Props) {
   const t = useTranslations('postprod.hero');
+  const tShare = useTranslations('postprod');
   const [expanded, setExpanded] = useState(false);
 
   const availableLocales = Object.keys(structured);
+  // Init lang da localStorage prima del preferred, così la scelta
+  // dell'utente persiste fra eventi.
+  const initialLang = (() => {
+    if (availableLocales.length === 0) return preferredLocale;
+    if (typeof window !== 'undefined') {
+      const stored = window.localStorage.getItem(LANG_STORAGE_KEY);
+      if (stored && availableLocales.includes(stored)) return stored;
+    }
+    return availableLocales.includes(preferredLocale)
+      ? preferredLocale
+      : availableLocales[0]!;
+  })();
+  const [lang, setLang] = useState<string>(initialLang);
+  // Allinea se il browser carica un valore stale (es. SSR mismatch).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = window.localStorage.getItem(LANG_STORAGE_KEY);
+    if (stored && availableLocales.includes(stored) && stored !== lang) {
+      setLang(stored);
+    }
+  }, [availableLocales, lang]);
+
+  const onLangChange = (next: string) => {
+    setLang(next);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(LANG_STORAGE_KEY, next);
+      } catch {
+        // localStorage non disponibile (private mode safari etc.) — ignora
+      }
+    }
+  };
+
   if (availableLocales.length === 0) return null;
-  const lang = availableLocales.includes(preferredLocale)
-    ? preferredLocale
-    : availableLocales[0]!;
-  const sm = structured[lang]!;
+  const sm = structured[lang] ?? structured[availableLocales[0]!]!;
+
+  const [copiedTopic, setCopiedTopic] = useState<number | null>(null);
+  const shareTopic = async (i: number, mmss: string) => {
+    if (!eventSlug || typeof window === 'undefined') return;
+    const sec = mmssToSec(mmss);
+    if (sec == null) return;
+    const url = `${window.location.origin}${window.location.pathname.split('#')[0]}#t=${sec}`;
+    try {
+      await navigator.clipboard?.writeText(url);
+      setCopiedTopic(i);
+      window.setTimeout(() => setCopiedTopic((prev) => (prev === i ? null : prev)), 2000);
+    } catch {
+      // fallback: niente clipboard API → no-op
+    }
+  };
 
   const topics = sm.topics ?? [];
   const hasDecisions = (sm.key_decisions ?? []).length > 0;
@@ -89,31 +141,58 @@ export default function PostEventHero({
             color=""
             pill
             style={{
-              background: '#0066CC',
-              color: 'white',
-              fontSize: '0.7rem',
-              letterSpacing: 0.4,
+              background: 'rgba(0,102,204,0.12)',
+              color: '#0066CC',
+              fontSize: '0.72rem',
+              letterSpacing: 0.3,
+              padding: '4px 12px',
+              border: '1px solid rgba(0,102,204,0.22)',
+              fontWeight: 600,
             }}
           >
-            <Icon icon="it-presentation" size="xs" className="me-1" color="white" />
             {t('badge')}
           </Badge>
           <Badge
             color=""
             pill
             style={{
-              background: '#FFD96B',
-              color: '#5C4400',
+              background: 'rgba(120,93,0,0.10)',
+              color: '#7A5A00',
               fontSize: '0.68rem',
-              letterSpacing: 0.4,
+              letterSpacing: 0.3,
+              padding: '4px 10px',
+              border: '1px solid rgba(120,93,0,0.18)',
+              fontWeight: 500,
             }}
           >
             {t('aiActArt50')}
           </Badge>
           {availableLocales.length > 1 && (
-            <span className="text-muted ms-auto" style={{ fontSize: '0.78rem' }}>
-              {t('availableIn', { langs: availableLocales.map((l) => l.toUpperCase()).join(', ') })}
-            </span>
+            <label
+              className="d-inline-flex align-items-center gap-2 ms-auto"
+              style={{ fontSize: '0.78rem', color: '#5A768A' }}
+            >
+              <span>{t('summaryLanguageLabel')}</span>
+              <select
+                className="form-control form-control-sm"
+                style={{
+                  width: 'auto',
+                  fontSize: '0.85rem',
+                  background: 'white',
+                  border: '1px solid #c9d4de',
+                  padding: '4px 28px 4px 10px',
+                }}
+                value={lang}
+                onChange={(e) => onLangChange(e.target.value)}
+                aria-label={t('summaryLanguageLabel')}
+              >
+                {availableLocales.map((l) => (
+                  <option key={l} value={l}>
+                    {localeDisplayName(l, lang).replace(/^./, (c) => c.toUpperCase())}
+                  </option>
+                ))}
+              </select>
+            </label>
           )}
         </div>
 
@@ -150,24 +229,17 @@ export default function PostEventHero({
             <div className="d-flex flex-wrap gap-2">
               {topics.map((tp, i) => {
                 const stamp = tp.start_mmss ?? '';
-                const seekable = stamp && mmssToSec(stamp) != null;
+                const seekable = !!stamp && mmssToSec(stamp) != null;
                 const palette = speakerColor(`topic:${i}:${tp.title ?? ''}`);
+                const isCopied = copiedTopic === i;
                 return (
-                  <button
+                  <div
                     key={`${i}-${tp.title ?? ''}`}
-                    type="button"
-                    onClick={() => stamp && seekTo(stamp)}
-                    disabled={!seekable}
-                    className="btn p-0 d-inline-flex align-items-center gap-2"
+                    className="d-inline-flex align-items-center"
                     style={{
                       background: palette.bg,
-                      color: palette.color,
                       border: `1px solid ${palette.color}33`,
                       borderRadius: 999,
-                      padding: '5px 12px 5px 6px',
-                      fontSize: '0.85rem',
-                      lineHeight: 1.2,
-                      cursor: seekable ? 'pointer' : 'default',
                       transition: 'transform 0.12s, box-shadow 0.12s',
                     }}
                     onMouseEnter={(e) => {
@@ -179,26 +251,71 @@ export default function PostEventHero({
                       e.currentTarget.style.transform = '';
                       e.currentTarget.style.boxShadow = '';
                     }}
-                    title={tp.summary ?? ''}
-                    aria-label={`${tp.title ?? ''} ${stamp ? `(${stamp})` : ''}`}
                   >
-                    <span
-                      className="d-inline-flex align-items-center justify-content-center"
+                    <button
+                      type="button"
+                      onClick={() => stamp && seekTo(stamp)}
+                      disabled={!seekable}
+                      className="btn p-0 d-inline-flex align-items-center gap-2"
                       style={{
-                        background: palette.color,
-                        color: 'white',
+                        background: 'transparent',
+                        color: palette.color,
+                        border: 'none',
                         borderRadius: 999,
-                        width: 28,
-                        height: 22,
-                        fontSize: '0.7rem',
-                        fontVariantNumeric: 'tabular-nums',
-                        fontWeight: 600,
+                        padding: '5px 4px 5px 6px',
+                        fontSize: '0.85rem',
+                        lineHeight: 1.2,
+                        cursor: seekable ? 'pointer' : 'default',
                       }}
+                      title={tp.summary ?? ''}
+                      aria-label={`${tp.title ?? ''} ${stamp ? `(${stamp})` : ''}`}
                     >
-                      {stamp || `T${i + 1}`}
-                    </span>
-                    <span className="fw-medium">{tp.title ?? `Topic ${i + 1}`}</span>
-                  </button>
+                      <span
+                        className="d-inline-flex align-items-center justify-content-center"
+                        style={{
+                          background: palette.color,
+                          color: 'white',
+                          borderRadius: 999,
+                          width: 28,
+                          height: 22,
+                          fontSize: '0.7rem',
+                          fontVariantNumeric: 'tabular-nums',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {stamp || `T${i + 1}`}
+                      </span>
+                      <span className="fw-medium">{tp.title ?? `Topic ${i + 1}`}</span>
+                    </button>
+                    {seekable && eventSlug && (
+                      <button
+                        type="button"
+                        onClick={() => shareTopic(i, stamp)}
+                        className="btn p-0 d-inline-flex align-items-center justify-content-center"
+                        title={isCopied ? tShare('shareSegmentCopied') : tShare('shareSegment')}
+                        aria-label={isCopied ? tShare('shareSegmentCopied') : tShare('shareSegment')}
+                        style={{
+                          background: 'transparent',
+                          color: palette.color,
+                          border: 'none',
+                          borderLeft: `1px solid ${palette.color}33`,
+                          marginLeft: 4,
+                          width: 30,
+                          height: 24,
+                          borderRadius: 999,
+                          cursor: 'pointer',
+                          opacity: isCopied ? 1 : 0.65,
+                          fontSize: 14,
+                        }}
+                      >
+                        <Icon
+                          icon={isCopied ? 'it-check' : 'it-link'}
+                          size="sm"
+                          color={undefined}
+                        />
+                      </button>
+                    )}
+                  </div>
                 );
               })}
             </div>
