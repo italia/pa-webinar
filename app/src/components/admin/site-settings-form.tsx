@@ -18,7 +18,7 @@ import {
 import type { SiteSetting } from '@prisma/client';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 
-type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features' | 'scaling';
+type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features' | 'scaling' | 'postprod';
 
 const COMMON_TIMEZONES = [
   'Europe/Rome', 'Europe/London', 'Europe/Paris', 'Europe/Berlin',
@@ -94,6 +94,7 @@ export default function SiteSettingsForm({
     { id: 'footer', label: t('tabs.footer'), icon: 'it-link' },
     { id: 'features', label: t('tabs.features'), icon: 'it-tool' },
     { id: 'scaling', label: t('tabs.scaling'), icon: 'it-chart-line' },
+    { id: 'postprod', label: t('tabs.postprod'), icon: 'it-presentation' },
   ];
 
   return (
@@ -146,6 +147,9 @@ export default function SiteSettingsForm({
           )}
           {activeTab === 'scaling' && (
             <ScalingTab settings={settings} updateField={updateField} />
+          )}
+          {activeTab === 'postprod' && (
+            <PostprodTab settings={settings} updateField={updateField} />
           )}
         </CardBody>
       </Card>
@@ -1417,6 +1421,195 @@ function ScalingTab({ settings, updateField }: TabProps) {
               }
             />
             <small className="text-muted d-block mt-1">{t('eventGracePeriodMinutesHelp')}</small>
+          </FormGroup>
+        </Col>
+      </Row>
+    </div>
+  );
+}
+
+/**
+ * Tab "Postprod AI" — controlli per la pipeline di post-produzione
+ * (trascrizione, sintesi, traduzione, dubbing). Kill-switch generale
+ * + provider routing + retention. La pipeline è disabled di default,
+ * va attivata esplicitamente qui dopo aver verificato i prerequisiti
+ * (vedi docs/POSTPROD.md per la checklist completa).
+ *
+ * Stile visivo coerente con FeaturesTab (toggle switch + small helper
+ * text) e ScalingTab (number input per i parametri operativi).
+ */
+function PostprodTab({ settings, updateField }: TabProps) {
+  const t = useTranslations('admin.settings.postprod');
+
+  return (
+    <div>
+      {/* Kill-switch principale + warning prerequisiti */}
+      <div className="alert alert-info" role="note" style={{ fontSize: '0.88rem' }}>
+        <Icon icon="it-info-circle" size="sm" className="me-2" />
+        {t('prerequisitesNote')}
+      </div>
+
+      <div className="mb-4">
+        <ToggleSwitch
+          label={t('pipelineEnabled')}
+          checked={settings.aiPipelineEnabled ?? false}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField('aiPipelineEnabled', e.target.checked)
+          }
+        />
+        <small className="text-muted d-block mt-1">
+          {t('pipelineEnabledHelp')}
+        </small>
+      </div>
+
+      <hr className="my-4" />
+
+      <h6 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+        {t('providersSection')}
+      </h6>
+
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="aiAsrProvider">{t('asrProvider')}</Label>
+            <Input
+              id="aiAsrProvider"
+              type="select"
+              value={settings.aiAsrProvider ?? 'whisperx'}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('aiAsrProvider', e.target.value as 'whisperx')
+              }
+            >
+              <option value="whisperx">WhisperX (large-v3 + pyannote)</option>
+            </Input>
+            <small className="text-muted d-block mt-1">
+              {t('asrProviderHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="aiLlmProvider">{t('llmProvider')}</Label>
+            <Input
+              id="aiLlmProvider"
+              type="select"
+              value={settings.aiLlmProvider ?? 'vllm'}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('aiLlmProvider', e.target.value as 'vllm')
+              }
+            >
+              <option value="vllm">vLLM in-cluster (Mistral)</option>
+            </Input>
+            <small className="text-muted d-block mt-1">
+              {t('llmProviderHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="aiTtsEngine">{t('ttsEngine')}</Label>
+            <Input
+              id="aiTtsEngine"
+              type="select"
+              value={settings.aiTtsEngine ?? 'piper'}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('aiTtsEngine', e.target.value as 'piper')
+              }
+            >
+              <option value="piper">Piper TTS (voce neutra, MIT)</option>
+            </Input>
+            <small className="text-muted d-block mt-1">
+              {t('ttsEngineHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="aiDefaultTargetLocales">
+              {t('defaultTargetLocales')}
+            </Label>
+            <Input
+              id="aiDefaultTargetLocales"
+              type="text"
+              placeholder="en,fr"
+              value={settings.aiDefaultTargetLocales ?? 'en,fr'}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('aiDefaultTargetLocales', e.target.value)
+              }
+            />
+            <small className="text-muted d-block mt-1">
+              {t('defaultTargetLocalesHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <hr className="my-4" />
+
+      <h6 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+        {t('limitsSection')}
+      </h6>
+
+      <Row>
+        <Col md={4}>
+          <FormGroup>
+            <Label htmlFor="aiMaxConcurrentJobs">
+              {t('maxConcurrentJobs')}
+            </Label>
+            <Input
+              id="aiMaxConcurrentJobs"
+              type="number"
+              min={1}
+              max={20}
+              value={settings.aiMaxConcurrentJobs ?? 2}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = Number(e.target.value);
+                if (!Number.isNaN(v)) updateField('aiMaxConcurrentJobs', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('maxConcurrentJobsHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={4}>
+          <FormGroup>
+            <Label htmlFor="aiJobMaxAttempts">{t('jobMaxAttempts')}</Label>
+            <Input
+              id="aiJobMaxAttempts"
+              type="number"
+              min={1}
+              max={20}
+              value={settings.aiJobMaxAttempts ?? 5}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = Number(e.target.value);
+                if (!Number.isNaN(v)) updateField('aiJobMaxAttempts', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('jobMaxAttemptsHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={4}>
+          <FormGroup>
+            <Label htmlFor="aiArtifactRetentionDays">
+              {t('artifactRetentionDays')}
+            </Label>
+            <Input
+              id="aiArtifactRetentionDays"
+              type="number"
+              min={0}
+              max={3650}
+              value={settings.aiArtifactRetentionDays ?? 0}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = Number(e.target.value);
+                if (!Number.isNaN(v)) updateField('aiArtifactRetentionDays', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('artifactRetentionDaysHelp')}
+            </small>
           </FormGroup>
         </Col>
       </Row>
