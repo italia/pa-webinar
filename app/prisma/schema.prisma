@@ -1666,7 +1666,7 @@ model Speaker {
 
   // Manual mapping target. Either a Person from the rubrica or a free-
   // text display name (e.g. an external guest never in rubrica).
-  displayName String?
+  displayName String? @map("display_name")
   personId    String? @map("person_id") @db.Uuid
 
   // Total speaking time in seconds (denormalised from transcript).
