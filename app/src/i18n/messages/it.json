@@ -1892,7 +1892,8 @@
         "settings": "Impostazioni",
         "people": "Persone",
         "content": "Contenuti",
-        "audit": "Registrazioni & Audit"
+        "audit": "Registrazioni & Audit",
+        "postEvent": "Post-evento"
       },
       "toggles": {
         "unmute": "Partecipanti possono parlare",
@@ -1914,7 +1915,11 @@
         "postEventSummary": "{connected} connessi su {registered} registrazioni (stimate {estimated})",
         "estimatedAttendance": "Stimati: {estimated} partecipanti"
       },
-      "copyGuestUrl": "Copia link per ospiti"
+      "copyGuestUrl": "Copia link per ospiti",
+      "aiManageTitle": "Trascrizione, sintesi e traduzioni",
+      "aiManageDesc": "Gestisci la post-produzione AI di questa registrazione: correggi la trascrizione e l'assegnazione dei relatori (chi dice cosa), modifica la sintesi e gestisci le lingue di traduzione.",
+      "aiManageCta": "Apri la gestione post-produzione",
+      "aiManageNotEnded": "Disponibile a evento concluso, quando la registrazione è stata elaborata dalla pipeline AI."
     },
     "rubrica": {
       "title": "Rubrica",
