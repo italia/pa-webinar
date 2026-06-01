@@ -104,43 +104,44 @@ export const POST = withErrorHandling(async (request) => {
   );
 
   await prisma.$transaction(async (tx) => {
-    await tx.postprodArtifact.upsert({
+    // We can't use upsert() here: the composite unique
+    // `recordingId_type_language` doesn't accept a NULL `language` in its
+    // `where` input (Prisma throws PrismaClientValidationError), and
+    // language-agnostic artifacts (TRANSCRIPT_JSON, WAVEFORM_JSON) carry
+    // language=null. findFirst translates null to `IS NULL` correctly;
+    // we then update the existing row (newer run replaces older) or
+    // create a fresh one.
+    const existing = await tx.postprodArtifact.findFirst({
       where: {
-        recordingId_type_language: {
-          recordingId: job.recording.id,
-          type: parsed.type,
-          // Composite key with NULL language — see note in postprod-claim.
-          // For artifacts with language=null (TRANSCRIPT_JSON) we
-          // rely on the unique partial behaviour of Postgres which
-          // treats NULLs as distinct, so the upsert may "miss" and
-          // create a new row. We then de-dup explicitly.
-          language: parsed.language as unknown as string,
-        },
-      },
-      create: {
         recordingId: job.recording.id,
-        jobId: job.id,
         type: parsed.type,
         language: parsed.language,
-        blobKey: parsed.blobKey,
-        sizeBytes: BigInt(parsed.sizeBytes),
-        mimeType: parsed.mimeType,
-        inlineBody,
-        contentHash: parsed.contentHash,
-        modelId: parsed.modelId ?? null,
-        modelVersion: parsed.modelVersion ?? null,
       },
-      update: {
-        jobId: job.id,
-        blobKey: parsed.blobKey,
-        sizeBytes: BigInt(parsed.sizeBytes),
-        mimeType: parsed.mimeType,
-        inlineBody,
-        contentHash: parsed.contentHash,
-        modelId: parsed.modelId ?? null,
-        modelVersion: parsed.modelVersion ?? null,
-      },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true },
     });
+    const writeData = {
+      jobId: job.id,
+      blobKey: parsed.blobKey,
+      sizeBytes: BigInt(parsed.sizeBytes),
+      mimeType: parsed.mimeType,
+      inlineBody,
+      contentHash: parsed.contentHash,
+      modelId: parsed.modelId ?? null,
+      modelVersion: parsed.modelVersion ?? null,
+    };
+    if (existing) {
+      await tx.postprodArtifact.update({ where: { id: existing.id }, data: writeData });
+    } else {
+      await tx.postprodArtifact.create({
+        data: {
+          recordingId: job.recording.id,
+          type: parsed.type,
+          language: parsed.language,
+          ...writeData,
+        },
+      });
+    }
 
     // Speaker map upsert (TRANSCRIPT_JSON only — see schema).
     if (parsed.speakerMap && parsed.speakerMap.length > 0) {

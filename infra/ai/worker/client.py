@@ -49,6 +49,13 @@ class ProviderHints(BaseModel):
     llmModelId: Optional[str] = None
     asrModelId: Optional[str] = None
     ttsVoicesPath: Optional[str] = None
+    # Initial prompt per Whisper, costruito server-side dai metadata
+    # dell'evento (titolo, organizzazione, speakers). Migliora la
+    # trascrizione dei nomi propri e dei termini tecnici dell'evento.
+    asrInitialPrompt: Optional[str] = None
+    # Numero di speaker attesi (dall'Event.expectedSpeakers). Quando
+    # valorizzato, il worker forza k nel clustering della diarization.
+    expectedSpeakers: Optional[int] = None
 
 
 class ClaimResponse(BaseModel):
@@ -204,17 +211,31 @@ def upload_from_file(
         r = httpx.put(
             url,
             content=f.read(),
-            headers={"content-type": content_type},
+            headers=_put_headers(url, content_type),
             timeout=600.0,
         )
     r.raise_for_status()
+
+
+def _put_headers(url: str, content_type: str) -> Dict[str, str]:
+    """Headers for a presigned PUT.
+
+    Azure Blob requires `x-ms-blob-type: BlockBlob` on PUT Blob, else it
+    rejects with 400 "An HTTP header that's mandatory for this request is
+    not specified." S3/GCS/MinIO presigned PUTs don't need it (and ignore
+    the extra header), so we only add it for Azure blob endpoints.
+    """
+    headers = {"content-type": content_type}
+    if "blob.core.windows.net" in url:
+        headers["x-ms-blob-type"] = "BlockBlob"
+    return headers
 
 
 def upload_bytes(url: str, body: bytes, *, content_type: str) -> None:
     r = httpx.put(
         url,
         content=body,
-        headers={"content-type": content_type},
+        headers=_put_headers(url, content_type),
         timeout=600.0,
     )
     r.raise_for_status()

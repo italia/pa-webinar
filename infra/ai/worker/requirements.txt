@@ -43,3 +43,4 @@ piper-tts==1.2.0
 
 # Sentry / structured logging optional — we use stdlib logging
 # configured for JSON. Cluster Loki picks them up.
+gender-guesser>=0.4,<1

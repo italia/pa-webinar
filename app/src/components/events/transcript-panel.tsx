@@ -12,12 +12,38 @@
  *
  * Both transcript and summary carry an "AI-generated" disclosure
  * badge per AI Act Art. 50.
+ *
+ * Improvements:
+ *   - search input (live filter + highlight keywords)
+ *   - download dropdown (.txt / .srt / .vtt / summary .md)
+ *   - smooth scroll auto-center for active segment
  */
 
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactElement,
+  type RefObject,
+} from 'react';
 import { useTranslations } from 'next-intl';
+import { Icon } from 'design-react-kit';
+import type React from 'react';
+
+import {
+  speakerColor,
+  initials as speakerInitials,
+} from '@/lib/utils/speaker-palette';
+import { useBookmarks } from '@/lib/utils/use-bookmarks';
 
 import type { VideoPlayerHandle } from './video-player';
+
+interface SegmentWord {
+  start: number;
+  end: number;
+  word: string;
+}
 
 interface Segment {
   start: number;
@@ -25,6 +51,8 @@ interface Segment {
   text: string;
   speaker: string | null;
   speakerName: string | null;
+  words?: SegmentWord[];
+  lowConfidence?: boolean;
 }
 
 interface TranscriptResponse {
@@ -52,6 +80,9 @@ export interface TranscriptPanelProps {
     | RefObject<HTMLVideoElement | null>;
   /** Public API path producing TranscriptResponse. */
   endpoint: string;
+  /** Slug evento — usato per costruire gli endpoint di download. Quando
+   *  assente, il menu Scarica viene nascosto. */
+  eventSlug?: string;
   /** Currently displayed subtitle language; controls which summary
    *  variant is shown. Null = source language summary. */
   activeLanguage?: string | null;
@@ -68,7 +99,6 @@ function resolveVideo(
   const c = ref.current;
   if (!c) return null;
   if (c instanceof HTMLVideoElement) return c;
-  // VideoPlayerHandle expose videoEl().
   if ('videoEl' in c && typeof c.videoEl === 'function') return c.videoEl();
   return null;
 }
@@ -81,9 +111,93 @@ function formatTs(seconds: number): string {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
+/**
+ * Escape RegExp meta-characters in a user-supplied query so we can
+ * highlight literal matches safely (and avoid silently swallowing
+ * "?", "*", "(" etc.).
+ */
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Splits `text` at every occurrence of `query` (case-insensitive) and
+ * returns an array of React nodes with the matched ranges wrapped in
+ * a highlight span. Returns the plain text as a single string when
+ * the query is empty.
+ */
+function highlightMatches(
+  text: string,
+  query: string,
+): Array<string | ReactElement> {
+  if (!query) return [text];
+  const re = new RegExp(escapeRegExp(query), 'gi');
+  const out: Array<string | ReactElement> = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let k = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    out.push(
+      <mark key={`m-${k++}`} className="postprod-segment__match">
+        {m[0]}
+      </mark>,
+    );
+    last = m.index + m[0].length;
+    if (m[0].length === 0) re.lastIndex += 1; // avoid infinite loop on zero-width
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
+/**
+ * Renderizza il testo di un segmento con highlight per-parola
+ * sincronizzato col playhead del video. Le parole prima del cursore
+ * temporale appaiono nel colore semantico (dim), quella corrente
+ * viene evidenziata col background del segment (full color), quelle
+ * successive appaiono dim. Effetto karaoke leggero — niente
+ * animazione brusca, niente "spinta" del layout (le parole occupano
+ * lo stesso spazio in ogni stato).
+ */
+function WordLevelText({
+  words,
+  playheadSec,
+  color,
+}: {
+  words: SegmentWord[];
+  playheadSec: number;
+  color: string;
+}) {
+  return (
+    <span className="postprod-segment__words">
+      {words.map((w, i) => {
+        const passed = playheadSec >= w.end;
+        const current = !passed && playheadSec >= w.start;
+        return (
+          <span
+            key={`${w.start}-${i}`}
+            className="postprod-segment__word"
+            style={{
+              color: passed ? color : current ? '#0c1a2b' : '#5A768A',
+              fontWeight: current ? 600 : 400,
+              background: current ? color + '22' : undefined,
+              borderRadius: current ? 3 : 0,
+              padding: current ? '0 2px' : '0',
+              transition: 'color 0.12s, background 0.12s',
+            }}
+          >
+            {w.word}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 export default function TranscriptPanel({
   playerRef,
   endpoint,
+  eventSlug,
   activeLanguage,
 }: TranscriptPanelProps) {
   const t = useTranslations('postprod');
@@ -91,7 +205,16 @@ export default function TranscriptPanel({
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<'transcript' | 'summary'>('transcript');
   const [activeIdx, setActiveIdx] = useState<number>(-1);
+  const [search, setSearch] = useState<string>('');
+  const [showDownload, setShowDownload] = useState<boolean>(false);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  /** Follow-mode: quando true, l'autoscroll segue il segment attivo;
+   *  passa a false quando l'utente scrolla manualmente fino a quando
+   *  preme "Riprendi" o torna sopra il segment attivo. */
+  const [followLive, setFollowLive] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const downloadRef = useRef<HTMLDivElement>(null);
+  const bookmarks = useBookmarks(eventSlug ?? '');
 
   // Fetch on mount.
   useEffect(() => {
@@ -114,32 +237,88 @@ export default function TranscriptPanel({
     };
   }, [endpoint]);
 
-  // Track currentTime to highlight the right segment.
+  // Tempo corrente del video — alimenta sia l'highlight del segment
+  // sia il highlight word-level. requestAnimationFrame anziché solo
+  // timeupdate (che fa fire ogni 250ms su Chrome) per avere un
+  // segno fluido sulle parole; cap a ~10fps quando il video è in
+  // pausa per non sprecare cicli.
+  const [playheadSec, setPlayheadSec] = useState(0);
   useEffect(() => {
     const video = resolveVideo(playerRef);
     if (!video || !data) return;
-    const segments = data.segments;
-    const onTime = (): void => {
-      const now = video.currentTime;
-      // Binary-search-style linear walk — segments are sorted.
-      for (let i = 0; i < segments.length; i += 1) {
-        const seg = segments[i]!;
-        if (now >= seg.start && now <= seg.end) {
-          setActiveIdx((prev) => (prev === i ? prev : i));
-          return;
-        }
-      }
-      setActiveIdx(-1);
+    let rafId: number | null = null;
+    const tick = (): void => {
+      setPlayheadSec(video.currentTime);
+      rafId = window.requestAnimationFrame(tick);
     };
-    video.addEventListener('timeupdate', onTime);
-    return () => video.removeEventListener('timeupdate', onTime);
+    const onPlay = (): void => {
+      if (rafId == null) rafId = window.requestAnimationFrame(tick);
+    };
+    const onPause = (): void => {
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+      rafId = null;
+      setPlayheadSec(video.currentTime);
+    };
+    const onSeek = (): void => setPlayheadSec(video.currentTime);
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
+    video.addEventListener('seeked', onSeek);
+    if (!video.paused) onPlay();
+    else onPause();
+    return () => {
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+      video.removeEventListener('play', onPlay);
+      video.removeEventListener('pause', onPause);
+      video.removeEventListener('seeked', onSeek);
+    };
   }, [data, playerRef]);
 
-  // Auto-scroll the active segment into view (smooth, only when
-  // outside the visible area to avoid hijacking the scroll position
-  // when the user is reading elsewhere).
+  // Calcola activeIdx dal playhead (binary search). Ricorda lo
+  // ultimo indice trovato per evitare scan completo ad ogni tick.
+  const lastIdxRef = useRef(0);
+  useEffect(() => {
+    if (!data) return;
+    const segments = data.segments;
+    const now = playheadSec;
+    // tentativo veloce: l'idx corrente è ancora valido o il successivo?
+    const li = Math.max(0, Math.min(segments.length - 1, lastIdxRef.current));
+    const here = segments[li];
+    if (here && now >= here.start && now <= here.end) {
+      if (activeIdx !== li) setActiveIdx(li);
+      return;
+    }
+    const next = segments[li + 1];
+    if (next && now >= next.start && now <= next.end) {
+      lastIdxRef.current = li + 1;
+      setActiveIdx(li + 1);
+      return;
+    }
+    // fallback: binary search
+    let lo = 0;
+    let hi = segments.length - 1;
+    let found = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      const s = segments[mid]!;
+      if (now < s.start) hi = mid - 1;
+      else if (now > s.end) lo = mid + 1;
+      else {
+        found = mid;
+        break;
+      }
+    }
+    if (found !== -1) lastIdxRef.current = found;
+    if (activeIdx !== found) setActiveIdx(found);
+  }, [playheadSec, data, activeIdx]);
+
+  // Auto-scroll the active segment into view (smooth, center). Skip
+  // while:
+  //   - l'utente sta filtrando (search): container ridisegnato
+  //   - follow-mode è OFF (l'utente sta leggendo "in libertà")
   useEffect(() => {
     if (activeIdx < 0) return;
+    if (search.trim().length > 0) return;
+    if (!followLive) return;
     const container = containerRef.current;
     if (!container) return;
     const el = container.querySelector<HTMLElement>(
@@ -148,15 +327,77 @@ export default function TranscriptPanel({
     if (!el) return;
     const cRect = container.getBoundingClientRect();
     const eRect = el.getBoundingClientRect();
-    if (eRect.top < cRect.top || eRect.bottom > cRect.bottom) {
+    const margin = cRect.height * 0.2;
+    const out =
+      eRect.top < cRect.top + margin || eRect.bottom > cRect.bottom - margin;
+    if (out) {
       el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
-  }, [activeIdx]);
+  }, [activeIdx, search, followLive]);
+
+  // Follow-mode UX: se l'utente scrolla dentro il container con la
+  // rotella / dito, disattiva il follow finché non clicca "Riprendi".
+  // Distinguamo lo scroll user-driven (wheel / touchmove / keydown
+  // nei tasti freccia) dallo scroll programmatico (scrollIntoView
+  // chiamato sopra), che NON deve disattivare il follow.
+  useEffect(() => {
+    const c = containerRef.current;
+    if (!c) return undefined;
+    const stop = () => setFollowLive(false);
+    c.addEventListener('wheel', stop, { passive: true });
+    c.addEventListener('touchmove', stop, { passive: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (
+        e.key === 'ArrowDown' ||
+        e.key === 'ArrowUp' ||
+        e.key === 'PageDown' ||
+        e.key === 'PageUp' ||
+        e.key === 'Home' ||
+        e.key === 'End'
+      ) {
+        stop();
+      }
+    };
+    c.addEventListener('keydown', onKey);
+    return () => {
+      c.removeEventListener('wheel', stop);
+      c.removeEventListener('touchmove', stop);
+      c.removeEventListener('keydown', onKey);
+    };
+  }, []);
+
+  // Quando il follow viene riattivato, ri-centra subito il segment attivo.
+  useEffect(() => {
+    if (!followLive || activeIdx < 0) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const el = container.querySelector<HTMLElement>(
+      `[data-segment-idx="${activeIdx}"]`,
+    );
+    el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, [followLive, activeIdx]);
+
+  // Close download dropdown on outside click / Escape.
+  useEffect(() => {
+    if (!showDownload) return;
+    const onDocClick = (e: MouseEvent): void => {
+      if (!downloadRef.current) return;
+      if (!downloadRef.current.contains(e.target as Node)) {
+        setShowDownload(false);
+      }
+    };
+    const onEsc = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') setShowDownload(false);
+    };
+    document.addEventListener('mousedown', onDocClick);
+    document.addEventListener('keydown', onEsc);
+    return () => {
+      document.removeEventListener('mousedown', onDocClick);
+      document.removeEventListener('keydown', onEsc);
+    };
+  }, [showDownload]);
 
   function seekTo(start: number): void {
-    // Preferiamo il handle quando disponibile (espone seekTo + play in
-    // un'unica chiamata); fallback al video element per i consumer
-    // legacy che passano un ref raw.
     const c = playerRef.current;
     if (c && !(c instanceof HTMLVideoElement) && 'seekTo' in c) {
       c.seekTo(start, true);
@@ -167,6 +408,17 @@ export default function TranscriptPanel({
     video.currentTime = start;
     if (video.paused) void video.play();
   }
+
+  // Filtered list. Memoized: filtering ricalcolato solo quando i
+  // segmenti o la query cambiano.
+  const filteredSegments = useMemo(() => {
+    if (!data) return [];
+    const q = search.trim().toLowerCase();
+    if (!q) return data.segments.map((seg, idx) => ({ seg, idx }));
+    return data.segments
+      .map((seg, idx) => ({ seg, idx }))
+      .filter(({ seg }) => seg.text.toLowerCase().includes(q));
+  }, [data, search]);
 
   if (error) {
     return (
@@ -195,6 +447,11 @@ export default function TranscriptPanel({
         ? data.sourceLanguage
         : Object.keys(data.summaries)[0] ?? null;
 
+  const trimmedSearch = search.trim();
+  const showSearchStatus = trimmedSearch.length > 0;
+  const downloadLang = activeLanguage ?? data.sourceLanguage;
+  const downloadEnabled = !!eventSlug;
+
   return (
     <div className="postprod-panel">
       <div
@@ -204,69 +461,339 @@ export default function TranscriptPanel({
         <strong>{t('aiBadgeLabel')}</strong> · {t('aiBadgeBody')}
       </div>
 
-      <ul className="nav nav-pills mb-3" role="tablist">
-        <li className="nav-item" role="presentation">
-          <button
-            type="button"
-            className={`nav-link ${tab === 'transcript' ? 'active' : ''}`}
-            onClick={() => setTab('transcript')}
-            role="tab"
-            aria-selected={tab === 'transcript'}
-          >
-            {t('tabTranscript')}
-          </button>
-        </li>
-        {summaryLang && (
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <ul className="nav nav-pills mb-0" role="tablist">
           <li className="nav-item" role="presentation">
             <button
               type="button"
-              className={`nav-link ${tab === 'summary' ? 'active' : ''}`}
-              onClick={() => setTab('summary')}
+              className={`nav-link ${tab === 'transcript' ? 'active' : ''}`}
+              onClick={() => setTab('transcript')}
               role="tab"
-              aria-selected={tab === 'summary'}
+              aria-selected={tab === 'transcript'}
             >
-              {t('tabSummary')} · {summaryLang.toUpperCase()}
+              {t('tabTranscript')}
             </button>
           </li>
+          {summaryLang && (
+            <li className="nav-item" role="presentation">
+              <button
+                type="button"
+                className={`nav-link ${tab === 'summary' ? 'active' : ''}`}
+                onClick={() => setTab('summary')}
+                role="tab"
+                aria-selected={tab === 'summary'}
+              >
+                {t('tabSummary')} · {summaryLang.toUpperCase()}
+              </button>
+            </li>
+          )}
+        </ul>
+
+        {downloadEnabled && (
+          <div className="postprod-download" ref={downloadRef}>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+              onClick={() => setShowDownload((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={showDownload}
+              aria-label={t('downloadMenu')}
+              style={{ borderRadius: 20 }}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
+              </svg>
+              {t('downloadLabel')}
+            </button>
+            {showDownload && (
+              <div role="menu" className="postprod-download__menu">
+                <a
+                  role="menuitem"
+                  className="postprod-download__item"
+                  href={`/api/events/${eventSlug}/postprod/download/transcript.txt?lang=${downloadLang}`}
+                  download
+                  onClick={() => setShowDownload(false)}
+                >
+                  {t('downloadTranscriptTxt')}
+                </a>
+                <a
+                  role="menuitem"
+                  className="postprod-download__item"
+                  href={`/api/events/${eventSlug}/postprod/download/transcript.srt?lang=${downloadLang}`}
+                  download
+                  onClick={() => setShowDownload(false)}
+                >
+                  {t('downloadTranscriptSrt')}
+                </a>
+                <a
+                  role="menuitem"
+                  className="postprod-download__item"
+                  href={`/api/events/${eventSlug}/postprod/subtitle/${downloadLang}`}
+                  download={`subtitles.${downloadLang}.vtt`}
+                  onClick={() => setShowDownload(false)}
+                >
+                  {t('downloadTranscriptVtt')}
+                </a>
+                {summaryLang && (
+                  <a
+                    role="menuitem"
+                    className="postprod-download__item"
+                    href={`/api/events/${eventSlug}/postprod/download/summary.md?lang=${summaryLang}`}
+                    download
+                    onClick={() => setShowDownload(false)}
+                  >
+                    {t('downloadSummaryMd')}
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
         )}
-      </ul>
+      </div>
 
       {tab === 'transcript' && (
-        <div
-          ref={containerRef}
-          className="postprod-panel__transcript"
-          style={{ maxHeight: 480, overflowY: 'auto' }}
-          role="region"
-          aria-label={t('tabTranscript')}
-        >
-          {data.segments.map((seg, idx) => {
-            const speakerLabel = seg.speakerName ?? seg.speaker ?? '—';
-            const isActive = idx === activeIdx;
-            return (
+        <>
+          <div className="postprod-panel__search">
+            <label htmlFor="postprod-search" className="visually-hidden">
+              {t('searchLabel')}
+            </label>
+            {/* select NATIVO non serve qui — è un text input. Restiamo
+                fuori dal pattern Input di design-react-kit per non
+                triggerare React #137 in caso di re-render. */}
+            <input
+              id="postprod-search"
+              type="search"
+              className="form-control form-control-sm"
+              placeholder={t('searchPlaceholder')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label={t('searchLabel')}
+              autoComplete="off"
+            />
+            {search.length > 0 && (
               <button
-                key={`${seg.start}-${idx}`}
                 type="button"
-                data-segment-idx={idx}
-                onClick={() => seekTo(seg.start)}
-                className={`postprod-segment d-block text-start w-100 border-0 bg-transparent p-2 ${
-                  isActive ? 'postprod-segment--active' : ''
-                }`}
-                style={{
-                  borderLeft: isActive
-                    ? '3px solid #0066cc'
-                    : '3px solid transparent',
-                  background: isActive ? 'rgba(0,102,204,0.06)' : undefined,
-                }}
+                className="postprod-panel__search-clear"
+                onClick={() => setSearch('')}
+                aria-label={t('searchClear')}
+                title={t('searchClear')}
               >
-                <div className="d-flex gap-2 small text-secondary mb-1">
-                  <code style={{ minWidth: 56 }}>{formatTs(seg.start)}</code>
-                  <span className="fw-semibold">{speakerLabel}</span>
-                </div>
-                <div className="postprod-segment__text">{seg.text}</div>
+                <span aria-hidden="true">×</span>
               </button>
-            );
-          })}
-        </div>
+            )}
+          </div>
+
+          {showSearchStatus && (
+            <div
+              className="postprod-panel__search-status"
+              role="status"
+              aria-live="polite"
+            >
+              {filteredSegments.length === 0
+                ? t('searchNoMatches', { query: trimmedSearch })
+                : t('searchMatches', { count: filteredSegments.length })}
+            </div>
+          )}
+
+          {/* Follow-mode indicator + Riprendi (visibile solo quando OFF) */}
+          {!followLive && (
+            <button
+              type="button"
+              onClick={() => setFollowLive(true)}
+              className="btn btn-sm d-inline-flex align-items-center gap-1 mb-2"
+              style={{
+                fontSize: '0.78rem',
+                background: '#FFF6DA',
+                color: '#7A5A00',
+                border: '1px solid #F2D88A',
+                borderRadius: 999,
+                padding: '4px 12px',
+              }}
+            >
+              <Icon icon="it-refresh" size="sm" color={undefined} />
+              {t('followResume')}
+            </button>
+          )}
+          <div
+            ref={containerRef}
+            className="postprod-panel__transcript"
+            style={{ maxHeight: 480, overflowY: 'auto' }}
+            role="region"
+            aria-label={t('tabTranscript')}
+            tabIndex={0}
+          >
+            {filteredSegments.map(({ seg, idx }) => {
+              const speakerLabel = seg.speakerName ?? seg.speaker ?? '—';
+              const isActive = idx === activeIdx;
+              const identity = seg.speakerName ?? seg.speaker ?? '';
+              const palette = speakerColor(identity);
+              const tSec = Math.floor(seg.start);
+              const bookmarked = bookmarks.has(tSec);
+              const isCopied = copiedIdx === idx;
+              const shareUrl =
+                typeof window === 'undefined'
+                  ? ''
+                  : `${window.location.origin}${window.location.pathname.split('#')[0]}#t=${tSec}`;
+              const copyShare = async (e: React.MouseEvent) => {
+                e.stopPropagation();
+                if (!shareUrl) return;
+                try {
+                  await navigator.clipboard?.writeText(shareUrl);
+                  setCopiedIdx(idx);
+                  window.setTimeout(
+                    () => setCopiedIdx((p) => (p === idx ? null : p)),
+                    2000,
+                  );
+                } catch {
+                  // ignore
+                }
+              };
+              const toggleBookmark = (e: React.MouseEvent) => {
+                e.stopPropagation();
+                if (bookmarked) bookmarks.remove(tSec);
+                else
+                  bookmarks.add({
+                    tSec,
+                    label: `${speakerLabel}: ${seg.text.slice(0, 80)}`,
+                  });
+              };
+              return (
+                <div
+                  key={`${seg.start}-${idx}`}
+                  data-segment-idx={idx}
+                  className={`postprod-segment d-block p-2 ${
+                    isActive ? 'postprod-segment--active' : ''
+                  }`}
+                  style={{
+                    borderLeft: `3px solid ${isActive ? palette.color : palette.color + '66'}`,
+                    background: isActive ? palette.bg : undefined,
+                    cursor: 'pointer',
+                    position: 'relative',
+                  }}
+                  aria-current={isActive ? 'true' : undefined}
+                  onClick={() => seekTo(seg.start)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      seekTo(seg.start);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="d-flex align-items-center gap-2 small mb-1">
+                    <code
+                      style={{
+                        minWidth: 56,
+                        color: '#5A768A',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {formatTs(seg.start)}
+                    </code>
+                    <span
+                      aria-hidden
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 22,
+                        height: 22,
+                        borderRadius: 11,
+                        background: palette.color,
+                        color: 'white',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {speakerInitials(speakerLabel)}
+                    </span>
+                    <span className="fw-semibold" style={{ color: palette.color }}>
+                      {speakerLabel}
+                    </span>
+                    {seg.lowConfidence && (
+                      <span
+                        title={t('lowConfidenceTitle')}
+                        aria-label={t('lowConfidenceTitle')}
+                        className="d-inline-flex align-items-center"
+                        style={{
+                          marginLeft: 4,
+                          fontSize: 11,
+                          color: '#A66300',
+                          background: '#FFF6DA',
+                          border: '1px solid #F2D88A',
+                          borderRadius: 4,
+                          padding: '0 5px',
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {t('lowConfidenceBadge')}
+                      </span>
+                    )}
+                    <div className="ms-auto d-flex align-items-center gap-1 postprod-segment__actions">
+                      <button
+                        type="button"
+                        onClick={toggleBookmark}
+                        title={bookmarked ? t('bookmarkRemove') : t('bookmarkAdd')}
+                        aria-label={bookmarked ? t('bookmarkRemove') : t('bookmarkAdd')}
+                        className="btn p-0 border-0 bg-transparent"
+                        style={{
+                          width: 26,
+                          height: 26,
+                          color: bookmarked ? '#FFC107' : '#9AAAB8',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Icon
+                          icon={bookmarked ? 'it-star-full' : 'it-star-outline'}
+                          size="sm"
+                          color={undefined}
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={copyShare}
+                        title={isCopied ? t('shareSegmentCopied') : t('shareSegment')}
+                        aria-label={isCopied ? t('shareSegmentCopied') : t('shareSegment')}
+                        className="btn p-0 border-0 bg-transparent"
+                        style={{
+                          width: 26,
+                          height: 26,
+                          color: isCopied ? palette.color : '#9AAAB8',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Icon
+                          icon={isCopied ? 'it-check' : 'it-link'}
+                          size="sm"
+                          color={undefined}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="postprod-segment__text">
+                    {isActive && seg.words && seg.words.length > 0 && !trimmedSearch ? (
+                      <WordLevelText
+                        words={seg.words}
+                        playheadSec={playheadSec}
+                        color={palette.color}
+                      />
+                    ) : (
+                      highlightMatches(seg.text, trimmedSearch)
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {tab === 'summary' && summaryLang && (

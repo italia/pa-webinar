@@ -99,14 +99,17 @@ export default function SiteSettingsForm({
 
   return (
     <div>
-      {/* Tab navigation */}
+      {/* Tab navigation. Wrap su più righe invece dello scroll
+          orizzontale: con N tab (9 a maggio 2026), lo scroll era
+          difficile da scoprire — tab oltre la fold restavano nascoste
+          finché l'utente non swipava. Wrap garantisce visibilità di
+          tutte le sezioni a colpo d'occhio anche su viewport mobile. */}
       <ul
-        className="nav nav-tabs flex-nowrap mb-4"
+        className="nav nav-tabs flex-wrap mb-4"
         role="tablist"
-        style={{ overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}
       >
         {tabs.map((tab) => (
-          <li key={tab.id} className="nav-item flex-shrink-0" role="presentation">
+          <li key={tab.id} className="nav-item" role="presentation">
             <button
               className={`nav-link d-inline-flex align-items-center gap-2 text-nowrap ${activeTab === tab.id ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
@@ -1443,9 +1446,10 @@ function PostprodTab({ settings, updateField }: TabProps) {
 
   return (
     <div>
-      {/* Kill-switch principale + warning prerequisiti */}
+      {/* Prerequisiti operativi. NIENTE <Icon> nell'alert: Bootstrap
+          Italia ne disegna già una "i" via ::before — vedi memoria
+          feedback_bootstrap-italia-alert.md. */}
       <div className="alert alert-info" role="note" style={{ fontSize: '0.88rem' }}>
-        <Icon icon="it-info-circle" size="sm" className="me-2" />
         {t('prerequisitesNote')}
       </div>
 
@@ -1462,26 +1466,43 @@ function PostprodTab({ settings, updateField }: TabProps) {
         </small>
       </div>
 
+      {/* Nota tempistica: pipeline solo post-evento, no live captioning.
+          Idem niente <Icon>: l'alert.alert-warning ne ha già una. */}
+      <div className="alert alert-warning" role="note" style={{ fontSize: '0.88rem' }}>
+        {t('timingNote')}
+      </div>
+
       <hr className="my-4" />
 
       <h6 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
         {t('providersSection')}
       </h6>
+      <p className="text-muted mb-3" style={{ fontSize: '0.85rem' }}>
+        {t('providersIntro')}
+      </p>
 
       <Row>
         <Col md={6}>
           <FormGroup>
             <Label htmlFor="aiAsrProvider">{t('asrProvider')}</Label>
-            <Input
+            {/* Native <select> — il wrapper <Input type="select"> di
+                design-react-kit ha provocato React #137 in produzione.
+                Il pattern in uso nel resto del codebase
+                (recordings-dashboard, gdpr-audit-dashboard) è il
+                <select> con className="form-control". Le option sono
+                hardcoded perché i provider supportati sono fissati al
+                deploy: per aggiungerne uno servono changes in
+                lib/ai/providers.ts + Zod schema + Deployment k8s. */}
+            <select
               id="aiAsrProvider"
-              type="select"
+              className="form-control"
               value={settings.aiAsrProvider ?? 'whisperx'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e) =>
                 updateField('aiAsrProvider', e.target.value as 'whisperx')
               }
             >
-              <option value="whisperx">WhisperX (large-v3 + pyannote)</option>
-            </Input>
+              <option value="whisperx">{t('asrOptionWhisperx')}</option>
+            </select>
             <small className="text-muted d-block mt-1">
               {t('asrProviderHelp')}
             </small>
@@ -1490,16 +1511,16 @@ function PostprodTab({ settings, updateField }: TabProps) {
         <Col md={6}>
           <FormGroup>
             <Label htmlFor="aiLlmProvider">{t('llmProvider')}</Label>
-            <Input
+            <select
               id="aiLlmProvider"
-              type="select"
+              className="form-control"
               value={settings.aiLlmProvider ?? 'vllm'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e) =>
                 updateField('aiLlmProvider', e.target.value as 'vllm')
               }
             >
-              <option value="vllm">vLLM in-cluster (Mistral)</option>
-            </Input>
+              <option value="vllm">{t('llmOptionVllm')}</option>
+            </select>
             <small className="text-muted d-block mt-1">
               {t('llmProviderHelp')}
             </small>
@@ -1508,16 +1529,16 @@ function PostprodTab({ settings, updateField }: TabProps) {
         <Col md={6}>
           <FormGroup>
             <Label htmlFor="aiTtsEngine">{t('ttsEngine')}</Label>
-            <Input
+            <select
               id="aiTtsEngine"
-              type="select"
+              className="form-control"
               value={settings.aiTtsEngine ?? 'piper'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e) =>
                 updateField('aiTtsEngine', e.target.value as 'piper')
               }
             >
-              <option value="piper">Piper TTS (voce neutra, MIT)</option>
-            </Input>
+              <option value="piper">{t('ttsOptionPiper')}</option>
+            </select>
             <small className="text-muted d-block mt-1">
               {t('ttsEngineHelp')}
             </small>
@@ -1613,6 +1634,17 @@ function PostprodTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
+
+      <hr className="my-4" />
+
+      <h6 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+        {t('voiceCloningSection')}
+      </h6>
+      {/* Nota stabile sull'esclusione del voice cloning. Stesso vincolo
+          della memoria progettuale: niente <Icon> dentro l'alert. */}
+      <div className="alert alert-warning" role="note" style={{ fontSize: '0.88rem' }}>
+        {t('voiceCloningNote')}
+      </div>
     </div>
   );
 }

@@ -28,6 +28,7 @@ from . import llm as llmmod
 from . import transcribe as tr
 from . import tts as ttsmod
 from . import vtt as vttmod
+from . import waveform as wfmod
 
 log = logging.getLogger("postprod-worker")
 
@@ -116,6 +117,8 @@ def run_transcribe(app: cli.AppClient, job: cli.ClaimResponse) -> None:
                 language_hint=src_lang,
                 asr_model_id=asr_model,
                 hf_token=os.environ.get("HF_TOKEN"),
+                initial_prompt=job.providerHints.asrInitialPrompt,
+                expected_speakers=job.providerHints.expectedSpeakers,
             )
 
         app.progress(job.jobId, "RUNNING", percent=80.0, message="asr+diar done")
@@ -159,6 +162,25 @@ def run_transcribe(app: cli.AppClient, job: cli.ClaimResponse) -> None:
             model_id=result.model_id,
             model_version=result.model_version,
         )
+
+        # WAVEFORM_JSON (optional). Best-effort: a failure here must NOT
+        # fail the job — the editor degrades to a segment-only timeline.
+        # The target is absent when claimed by/for an older app version.
+        wf_target = job.uploadTargets.get("waveform")
+        if wf_target is not None:
+            try:
+                wf = wfmod.compute_waveform(mp4_path)
+                wf_bytes = json.dumps(wf).encode("utf-8")
+                _write_and_upload(
+                    app,
+                    job.jobId,
+                    target=wf_target,
+                    artifact_type="WAVEFORM_JSON",
+                    language=None,
+                    body_bytes=wf_bytes,
+                )
+            except Exception:  # noqa: BLE001 — waveform is non-critical
+                log.exception("waveform extraction failed; skipping")
 
 
 def run_summarize(app: cli.AppClient, job: cli.ClaimResponse) -> None:

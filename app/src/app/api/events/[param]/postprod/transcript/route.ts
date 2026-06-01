@@ -14,14 +14,25 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import { assertPostprodAccessible } from '@/lib/ai/access';
 
 export const dynamic = 'force-dynamic';
+
+interface SegmentWord {
+  start: number;
+  end: number;
+  word: string;
+  prob?: number;
+}
 
 interface Segment {
   start: number;
   end: number;
   text: string;
   speaker?: string | null;
+  words?: SegmentWord[];
+  avg_logprob?: number;
+  no_speech_prob?: number;
 }
 
 interface TranscriptJson {
@@ -33,19 +44,15 @@ interface TranscriptJson {
 export const GET = withErrorHandling(async (_request, context) => {
   const { param: slug } = (await (context as { params: Promise<{ param: string }> }).params);
 
-  const event = await prisma.event.findUnique({
-    where: { slug },
-    select: { id: true, recordingPublished: true },
-  });
-  if (!event) throw new NotFoundError('Event');
-  if (!event.recordingPublished) throw new NotFoundError('Transcript');
+  const { eventId } = await assertPostprodAccessible(slug);
 
   const recording = await prisma.recording.findFirst({
-    where: { eventId: event.id, status: { in: ['POSTPROD_DONE', 'POSTPROD_PARTIAL'] } },
+    where: { eventId, status: { in: ['POSTPROD_DONE', 'POSTPROD_PARTIAL'] } },
     orderBy: { createdAt: 'desc' },
     select: {
       id: true,
       sourceLanguage: true,
+      pipelineSnapshot: true,
       artifacts: {
         where: {
           type: {
@@ -54,6 +61,7 @@ export const GET = withErrorHandling(async (_request, context) => {
               'TRANSCRIPT_VTT',
               'TRANSLATION_VTT',
               'SUMMARY_MD',
+              'SUMMARY_JSON',
               'TRANSLATION_MD',
               'DUBBED_AUDIO',
             ],
@@ -79,10 +87,29 @@ export const GET = withErrorHandling(async (_request, context) => {
     ? (JSON.parse(tryDecryptPII(transcriptJson.inlineBody) ?? '{}') as TranscriptJson)
     : {};
 
+  // Mapping speaker → label umano. Per gli speaker mappati dall'admin
+  // usiamo il displayName. Per i SPEAKER_xx anonimi, sostituiamo con
+  // "Partecipante N" ordinato per tempo di parola (top speaker = 1):
+  // visivamente molto più gentile di "SPEAKER_03" per il visitatore.
+  // L'admin può sempre identificarli a posteriori col mapping; finché
+  // non lo fa, "Partecipante" è meglio del diar label crudo.
   const speakerMap = new Map<string, string>();
+  const sortedAnonymousByTime = recording.speakers
+    .filter((sp) => !sp.displayName)
+    .sort((a, b) => (b.totalSpeechSec ?? 0) - (a.totalSpeechSec ?? 0));
+  sortedAnonymousByTime.forEach((sp, i) => {
+    speakerMap.set(sp.diarLabel, `Partecipante ${i + 1}`);
+  });
   for (const sp of recording.speakers) {
     if (sp.displayName) speakerMap.set(sp.diarLabel, sp.displayName);
   }
+
+  // Soglie per il badge "trascrizione meno sicura" nel frontend.
+  // Allineate ai filtri di hallucination nel worker (-1.0 / 0.6): un
+  // segment con avg_logprob in [-1.0, -0.6] è "borderline" — è stato
+  // tenuto perché non sicuro hallucination ma vale la pena segnalarlo
+  // al visitatore. > -0.6 è normale.
+  const LOWCONF_AVG_LOGPROB = -0.6;
 
   const segments = (transcript.segments ?? []).map((s) => ({
     start: s.start,
@@ -90,6 +117,25 @@ export const GET = withErrorHandling(async (_request, context) => {
     text: s.text,
     speaker: s.speaker ?? null,
     speakerName: s.speaker ? speakerMap.get(s.speaker) ?? null : null,
+    words: Array.isArray(s.words)
+      ? s.words
+          .filter(
+            (w): w is SegmentWord =>
+              typeof w?.start === 'number' &&
+              typeof w?.end === 'number' &&
+              typeof w?.word === 'string',
+          )
+          .map((w) => ({
+            start: w.start,
+            end: w.end,
+            word: w.word,
+          }))
+      : undefined,
+    // Confidence "low" quando Whisper aveva avg_logprob borderline.
+    // Esposto come flag boolean per non confondere il client con la
+    // semantica del valore raw (log probabilità < 0).
+    lowConfidence:
+      typeof s.avg_logprob === 'number' && s.avg_logprob < LOWCONF_AVG_LOGPROB,
   }));
 
   // Available subtitle tracks for the player's track switcher. A
@@ -108,6 +154,11 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   // Summaries (inline rendered) — IT default + any translated ones.
   const summaries: Record<string, string> = {};
+  // Structured summaries: object {overall_summary, key_decisions[],
+  // action_items[], topics[{title, start_mmss, summary}]} per lingua.
+  // Permette al frontend di render hero card + topic chips senza
+  // ri-parsare markdown.
+  const summariesStructured: Record<string, unknown> = {};
   for (const a of recording.artifacts) {
     if (
       (a.type === 'SUMMARY_MD' || a.type === 'TRANSLATION_MD') &&
@@ -116,6 +167,15 @@ export const GET = withErrorHandling(async (_request, context) => {
     ) {
       const decoded = tryDecryptPII(a.inlineBody);
       if (decoded) summaries[a.language] = decoded;
+    } else if (a.type === 'SUMMARY_JSON' && a.language && a.inlineBody) {
+      const decoded = tryDecryptPII(a.inlineBody);
+      if (decoded) {
+        try {
+          summariesStructured[a.language] = JSON.parse(decoded);
+        } catch {
+          // ignora: payload corrotto, il frontend resta sul .md
+        }
+      }
     }
   }
 
@@ -139,6 +199,8 @@ export const GET = withErrorHandling(async (_request, context) => {
     speakers: recording.speakers,
     subtitleTracks,
     summaries,
+    summariesStructured,
     dubbedAudio,
+    pipelineSnapshot: recording.pipelineSnapshot ?? {},
   });
 });

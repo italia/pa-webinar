@@ -226,6 +226,12 @@ model Event {
   // summary translation (e.g. "en,fr"). When null, falls back to
   // SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales      String? @map("ai_target_locales") @db.VarChar(200)
+  // Numero di parlanti attesi nell'evento. Quando valorizzato (1-30),
+  // la pipeline forza `k = expectedSpeakers` nel clustering della
+  // diarization invece di lasciare che il modello decida via silhouette
+  // score. Tipicamente il moderatore lo conosce — il caso "dubbio"
+  // (lascia null) è il default sicuro per i webinar pubblici.
+  expectedSpeakers     Int?    @map("expected_speakers")
 
   // FK lookup index: "what events use this GDPR template" / cascade
   // SetNull on template delete.
@@ -1500,7 +1506,18 @@ enum PostprodArtifactType {
   TRANSCRIPT_JSON
   TRANSCRIPT_VTT
   TRANSCRIPT_TXT
+  // Picchi audio pre-calcolati (envelope normalizzato 0..1) per la
+  // waveform/timeline dell'editor admin. Evita di scaricare l'MP4
+  // intero nel browser: il worker decodifica l'audio una volta e ne
+  // salva una rappresentazione compatta (~qualche KB) come JSON.
+  // language=null (globale alla registrazione, come TRANSCRIPT_JSON).
+  WAVEFORM_JSON
   SUMMARY_MD
+  // Sintesi strutturata (overall_summary, key_decisions, action_items,
+  // topics[{title, start_mmss, summary}]) per lingua. Permette al
+  // frontend di renderizzare il post-evento con hero card + topic-chip
+  // navigator invece del solo blob markdown.
+  SUMMARY_JSON
   SUBTITLE_VTT
   TRANSLATION_VTT
   TRANSLATION_MD
@@ -1539,6 +1556,26 @@ model Recording {
   // Snapshot of consent flags at enqueue time, so a retroactive change
   // on Event.* doesn't silently invalidate already-produced artifacts.
   consentSnapshot Json @default("{}") @map("consent_snapshot") @db.JsonB
+
+  // Snapshot della composizione effettiva della pipeline AI usata per
+  // questa specifica registrazione (motori, modelli, versioni,
+  // assegnazione voci, lingue, data run). NON segue le impostazioni
+  // correnti di SiteSetting: è una fotografia del momento. Esposta
+  // al visitatore del video come "Dettagli del processing AI", per
+  // trasparenza ai sensi dell'AI Act Art. 50.
+  //
+  // Shape attesa (è JSON libero per evolvere senza migration):
+  //   {
+  //     asr: {engine, model, version},
+  //     diarization: {engine, model, k, method},
+  //     llm: {engine, model, vendor, license},
+  //     tts: {engine, version, voices: ["alan","amy",…]},
+  //     voiceAssignments: [{diarLabel, displayName, voiceId, gender}],
+  //     languages: {source, translation: [...], dubbing: [...]},
+  //     runAt: ISO timestamp,
+  //     pipelineVersion: "git-sha"
+  //   }
+  pipelineSnapshot Json @default("{}") @map("pipeline_snapshot") @db.JsonB
 
   // Run counter — incremented every time the orchestrator re-enqueues
   // the full pipeline (manual retry from admin UI). Used in the

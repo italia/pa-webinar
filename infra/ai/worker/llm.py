@@ -120,6 +120,90 @@ def summarize_transcript(
     )
 
 
+CORRECT_SYSTEM_IT = (
+    "Sei un editor che corregge una trascrizione automatica di una riunione "
+    "della Pubblica Amministrazione italiana. Riceverai la trascrizione "
+    "originale e un elenco di nomi propri, sigle e termini tecnici noti. "
+    "Il tuo compito è correggere SOLO ortografia, nomi propri e sigle, "
+    "senza inventare o aggiungere contenuto, senza modificare il senso, "
+    "senza accorpare o splittare frasi. Mantieni esattamente la stessa "
+    "struttura di righe. Se una riga è incomprensibile, lasciala invariata. "
+    "Output: una riga per ogni riga di input, nello stesso ordine, niente "
+    "preamboli, niente numerazione aggiuntiva."
+)
+
+
+def correct_transcript_segments(
+    *,
+    segments_text: list[str],
+    glossary_terms: list[str],
+    source_language: str,
+    base_url: Optional[str],
+    model_id: Optional[str],
+) -> list[str]:
+    """Passa N righe di trascrizione a Mistral per correggere nomi
+    propri, sigle e termini tecnici. Ritorna N righe corrette nello
+    stesso ordine. In stub mode o senza LLM, ritorna l'input invariato.
+
+    `glossary_terms`: lista di nomi propri / sigle dell'evento
+    (`speakersInfo`, organizzazione, etc.) che Mistral deve preservare
+    e correggere se Whisper li ha approssimati. Es. ["Raffaele",
+    "PCM", "OVH", "Azure", "Kubernetes"].
+    """
+    if not segments_text:
+        return []
+    if _stub_enabled() or not base_url or not model_id:
+        log.info("LLM stub mode for correct_transcript_segments")
+        return list(segments_text)
+
+    # Batch: ogni richiesta corregge N=40 righe per stare sotto i
+    # limiti di token e per ridurre il rischio di "drift" su prompt
+    # troppo lunghi.
+    BATCH = 40
+    corrected: list[str] = []
+    glossary_block = (
+        "Glossario evento: " + ", ".join(glossary_terms[:60]) + "."
+        if glossary_terms
+        else ""
+    )
+    for i in range(0, len(segments_text), BATCH):
+        batch = segments_text[i : i + BATCH]
+        numbered = "\n".join(f"{j + 1}. {line}" for j, line in enumerate(batch))
+        try:
+            resp = _chat_completions(
+                base_url=base_url,
+                model_id=model_id,
+                messages=[
+                    {"role": "system", "content": CORRECT_SYSTEM_IT},
+                    {
+                        "role": "user",
+                        "content": (
+                            f"Lingua sorgente: {source_language}.\n"
+                            + (glossary_block + "\n\n" if glossary_block else "\n")
+                            + "Trascrizione (una frase per riga, numerata):\n"
+                            + numbered
+                        ),
+                    },
+                ],
+            )
+        except Exception as e:
+            log.warning("correction batch %d failed: %s — keeping originals", i, e)
+            corrected.extend(batch)
+            continue
+        # Parsing: estrai N righe nel formato "N. testo"
+        parsed: dict[int, str] = {}
+        for raw in resp.splitlines():
+            import re
+
+            m = re.match(r"^\s*(\d+)\.\s*(.*)$", raw)
+            if m:
+                idx = int(m.group(1)) - 1
+                parsed[idx] = m.group(2).strip()
+        for j, original in enumerate(batch):
+            corrected.append(parsed.get(j, original))
+    return corrected
+
+
 def translate_text(
     *,
     text: str,

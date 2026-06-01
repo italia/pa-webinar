@@ -128,7 +128,7 @@ Flussi critici Playwright: registrazione con campi ente, login admin + creazione
 | **Offuscamento video** | Volti/voci offuscati prima della pubblicazione (GDPR-by-design) |
 | **SSE/WebSocket per Q&A** | Sostituire polling 3s per scalare a 300+ utenti |
 | **Redis per rate-limiting distribuito** | Necessario se HPA multi-replica attivo |
-| **Editor trascrizione post-evento** | Timeline + waveform + speaker reassignment + export WebVTT/SRT; si appoggia al servizio AI di v0.5.0 |
+| **Editor trascrizione post-evento** 🟢 base spedita | Editor admin per segmento: correzione testo + riassegnazione speaker, riscrittura `TRANSCRIPT_JSON` + rigenerazione `TRANSCRIPT_VTT` sorgente + ricalcolo `totalSpeechSec`. Export WebVTT/SRT/TXT già attivo (download endpoint). Pendenti: timeline + waveform, rigenerazione automatica di traduzioni/dub dopo l'edit |
 | **Ricerca full-text trascrizioni** | PostgreSQL `tsvector` sufficiente per volumi previsti |
 | **Questionario AI-assisted** | Pre-compilazione automatica del questionario post-evento dai temi emersi nella trascrizione (richiede servizio AI + modello `EventQuestionnaire` di v0.5.0) |
 

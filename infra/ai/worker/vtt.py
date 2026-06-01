@@ -35,13 +35,27 @@ def _format_ts(seconds: float) -> str:
     return f"{hours:02d}:{minutes:02d}:{secs:06.3f}"
 
 
-def segments_to_vtt(segments: Iterable[Segment], *, include_speaker: bool = True) -> str:
+def segments_to_vtt(
+    segments: Iterable[Segment],
+    *,
+    include_speaker: bool = True,
+    speaker_names: Optional[dict] = None,
+) -> str:
     """Serialise segments to a WebVTT string.
 
-    Cue identifiers are 1-based positional integers. Speaker labels are
-    emitted as a Voice tag ``<v Speaker_00>`` so HTML5 ``<track>`` can
-    style them via ::cue(v[voice="SPEAKER_00"]).
+    Each cue contains BOTH a Voice tag ``<v Label>`` (semantic — picked
+    up by some screen readers and the JS ``TextTrackCue.voice`` API)
+    AND a textual prefix ``Label: `` so the speaker is **visible** in
+    the on-video subtitle overlay. Browser HTML5 hides the ``<v>`` tag
+    by default and ``::cue(v)`` styling is inconsistent across
+    Chromium/Firefox/Safari, so the redundant text prefix is the only
+    reliable way to make sure the viewer can tell who's speaking.
+
+    `speaker_names`: optional mapping ``diarLabel -> displayName``
+    (e.g. ``{'SPEAKER_00': 'Alex'}``). When present, the human name
+    is used; otherwise the diar label is kept.
     """
+    speaker_names = speaker_names or {}
     lines: List[str] = ["WEBVTT", ""]
     for i, seg in enumerate(segments, start=1):
         start = _format_ts(float(seg.get("start", 0.0)))
@@ -50,10 +64,11 @@ def segments_to_vtt(segments: Iterable[Segment], *, include_speaker: bool = True
         if not text:
             continue
         speaker = seg.get("speaker") if include_speaker else None
+        label = speaker_names.get(speaker, speaker) if speaker else None
         lines.append(str(i))
         lines.append(f"{start} --> {end}")
-        if speaker:
-            lines.append(f"<v {speaker}>{text}")
+        if label:
+            lines.append(f"<v {label}>{label}: {text}")
         else:
             lines.append(text)
         lines.append("")
