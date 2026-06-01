@@ -114,6 +114,42 @@ def _find_voice(voices_path: str, language: str) -> tuple[str, str]:
     return str(onnx_files[0]), onnx_files[0].stem
 
 
+# Pitch variants di default: ±300 cents (~3 semitoni). Generano 3
+# timbri distinguibili dalla stessa voce-base preservando il gender.
+# Utile per lingue povere (IT, RO, CS) dove il pool single-speaker è
+# piccolo. Per EN il pool è già abbondante senza pitch.
+DEFAULT_PITCH_VARIANTS: tuple[int, ...] = (0, -300, +300)
+
+
+def _apply_pitch_shift(in_wav: str, out_wav: str, cents: int) -> None:
+    """Pitch shift via `asetrate + atempo` ffmpeg: ricampiona per
+    spostare la pitch, poi compensa con atempo per mantenere la
+    durata originale. Niente time-stretch pitch-preserved (servirebbe
+    rubberband). Per dubbing operativo è sufficiente.
+
+    `cents`: 100 = 1 semitono. ±300 = ±3 semitoni.
+    """
+    if cents == 0:
+        # No-op: copy. Lasciamo a ffmpeg per uniformità output format.
+        subprocess.check_call(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", in_wav,
+             "-ar", "22050", "-ac", "1", out_wav],
+        )
+        return
+    # asetrate sposta la pitch del fattore 2^(cents/1200)
+    ratio = 2 ** (cents / 1200)
+    # atempo accetta 0.5..2; per ratio piccoli un solo step basta
+    inv_ratio = 1 / ratio
+    if inv_ratio < 0.5 or inv_ratio > 2:
+        # split chain (raro a cents in -1200..+1200)
+        inv_ratio = max(0.5, min(2, inv_ratio))
+    subprocess.check_call(
+        ["ffmpeg", "-y", "-loglevel", "error", "-i", in_wav,
+         "-filter:a", f"asetrate=22050*{ratio:.5f},aresample=22050,atempo={inv_ratio:.5f}",
+         "-ar", "22050", "-ac", "1", out_wav],
+    )
+
+
 def _format_silence(duration_sec: float, out_path: str) -> None:
     """Genera N secondi di silenzio mono 22050Hz per i gap fra segmenti."""
     if duration_sec <= 0:
@@ -138,6 +174,8 @@ def dub_with_piper(
     target_language: str,
     voices_path: str,
     total_duration_sec: float,
+    speakers: Optional[list[dict]] = None,
+    speaker_names: Optional[dict[str, str]] = None,
 ) -> DubResult:
     """Genera audio TTS allineato ai timestamp dei segmenti tradotti.
 
@@ -155,10 +193,64 @@ def dub_with_piper(
     """
     import piper  # type: ignore[import-not-found]
 
-    model_path, voice_id = _find_voice(voices_path, target_language)
-    log.info("Piper voice loaded: %s", voice_id)
+    # Import locale per evitare di pesare a livello modulo: il pool
+    # builder gira solo in handler DUB.
+    from . import voice_pool as vp
+    from . import name_gender as ng
 
-    voice = piper.PiperVoice.load(model_path)
+    # Costruisci il pool. Pitch variants attivi così copriamo bene
+    # anche le lingue povere (es. IT con 2 voci → 6 timbri).
+    pool = vp.build_voice_pool(
+        voices_path, target_language,
+        pitch_variants=DEFAULT_PITCH_VARIANTS,
+    )
+
+    # Speaker list canonica per assign_voices. Se il chiamante non
+    # passa esplicitamente `speakers`, la deriviamo dai segmenti
+    # (per backward-compat coi caller V1).
+    if speakers is None:
+        times: dict[str, float] = {}
+        for s in segments:
+            sp_label = s.get("speaker") or "SPEAKER_??"
+            times[sp_label] = times.get(sp_label, 0.0) + max(
+                0.0, float(s.get("end", 0)) - float(s.get("start", 0))
+            )
+        speakers = [
+            {"diarLabel": k, "displayName": (speaker_names or {}).get(k), "totalSpeechSec": v}
+            for k, v in times.items()
+        ]
+    elif speaker_names:
+        # arricchisci con displayName se fornito separatamente
+        for sp in speakers:
+            if not sp.get("displayName"):
+                sp["displayName"] = speaker_names.get(sp.get("diarLabel"))
+
+    # Pre-compute gender map (firstname.lower → "M"|"F"|"N")
+    display_names = [s.get("displayName") or "" for s in speakers]
+    gender_map = ng.name_gender_map(display_names)
+
+    voice_map: dict[str, vp.VoiceEntry] = vp.assign_voices(
+        speakers, pool, name_gender=gender_map,
+    )
+    log.info(
+        "Piper pool=%d entries, gender map=%s, assignment=%s",
+        len(pool),
+        gender_map,
+        {k: v.voice_id for k, v in voice_map.items()},
+    )
+
+    # Cache di PiperVoice istanze caricate (evita reload per ogni segmento).
+    loaded: dict[str, "piper.PiperVoice"] = {}
+
+    def get_voice(model_path: str) -> "piper.PiperVoice":
+        v = loaded.get(model_path)
+        if v is None:
+            v = piper.PiperVoice.load(model_path)
+            loaded[model_path] = v
+        return v
+
+    # Fallback se uno speaker non è nel mapping (caso outlier).
+    fallback_entry = pool[0]
 
     with tempfile.TemporaryDirectory(prefix="dub-") as workdir:
         chunks: list[str] = []
@@ -178,10 +270,21 @@ def dub_with_piper(
                 chunks.append(sil_path)
                 cursor += gap
 
-            # TTS del testo. Piper API: voice.synthesize_wav(text, file).
+            entry = voice_map.get(seg.get("speaker") or "", fallback_entry)
+            piper_voice = get_voice(entry.voice_path)
+
+            # TTS del testo. Piper API: voice.synthesize_wav(text, file,
+            # speaker_id=N).
+            raw_path = os.path.join(workdir, f"seg-{idx:04d}_raw.wav")
+            with open(raw_path, "wb") as f:
+                if entry.speaker_id is not None:
+                    piper_voice.synthesize_wav(text, f, speaker_id=entry.speaker_id)
+                else:
+                    piper_voice.synthesize_wav(text, f)
+
+            # Pitch shift (no-op se pitch_cents=0)
             seg_path = os.path.join(workdir, f"seg-{idx:04d}.wav")
-            with open(seg_path, "wb") as f:
-                voice.synthesize_wav(text, f)
+            _apply_pitch_shift(raw_path, seg_path, entry.pitch_cents)
             chunks.append(seg_path)
 
             # Stima della durata del wav generato per aggiornare il cursore.
@@ -236,6 +339,14 @@ def dub_with_piper(
         )
         final.close()
         shutil.copy(out_path, final.name)
+
+    # voice_id riportato nel result è un multi-voice id sintetico,
+    # es. "multivoice:lessac,amy,alan…" (max 3 entry per leggibilità).
+    used_voices = sorted({entry.voice_id for entry in voice_map.values()})
+    voice_id = (
+        used_voices[0] if len(used_voices) == 1
+        else "multivoice:" + ",".join(used_voices[:3]) + ("…" if len(used_voices) > 3 else "")
+    )
 
     return DubResult(
         audio_path=final.name,

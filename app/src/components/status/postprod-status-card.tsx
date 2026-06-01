@@ -134,7 +134,7 @@ export default function PostprodStatusCard() {
     <Card className="h-100 border-0 shadow-sm">
       <CardBody className="p-4">
         {/* Header con titolo + status pill */}
-        <div className="d-flex justify-content-between align-items-start mb-3">
+        <div className="d-flex justify-content-between align-items-start mb-1">
           <h5 className="fw-semibold mb-0">
             <Icon icon="it-presentation" size="sm" className="me-2" />
             {t('title')}
@@ -148,15 +148,39 @@ export default function PostprodStatusCard() {
           </Badge>
         </div>
 
+        {/* Sottotitolo: enumerazione concisa delle fasi della pipeline,
+            così il visitatore capisce subito a cosa serve la card. */}
+        <p
+          className="text-muted mb-2"
+          style={{ fontSize: '0.78rem', letterSpacing: 0.2 }}
+        >
+          {t('subtitle')}
+        </p>
+
+        {/* Cosa fa, in una riga lunga: stack europeo, GPU on-demand,
+            niente API esterne. Più informativo del solo aiBadge. */}
+        <p
+          className="mb-3"
+          style={{ fontSize: '0.8rem', color: '#3B4A57', lineHeight: 1.5 }}
+        >
+          {t('whatItDoes')}
+        </p>
+
         {/* Disclaimer AI Act Art. 50 — sempre visibile quando la card
             è renderizzata, perché significa che l'admin ha attivato la
-            pipeline. Stile non invasivo (icon + small text). */}
+            pipeline. Estetica nota in box laterale invece di icona-i
+            inline (che duplicava quella implicita di Bootstrap Italia
+            nei contesti alert; vedi feedback_bootstrap-italia-alert). */}
         <p
-          className="mb-3 d-flex align-items-start gap-2"
-          style={{ fontSize: '0.78rem', color: '#5A768A' }}
+          className="mb-3 p-2 rounded"
+          style={{
+            fontSize: '0.76rem',
+            color: '#5A768A',
+            background: '#f5f7f9',
+            borderLeft: '3px solid #0066CC',
+          }}
         >
-          <Icon icon="it-info-circle" size="xs" className="flex-shrink-0 mt-1" />
-          <span>{t('aiBadge')}</span>
+          {t('aiBadge')}
         </p>
 
         {/* Stato della coda: bar visiva + counter per stato. Quando

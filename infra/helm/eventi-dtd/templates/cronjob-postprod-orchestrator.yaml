@@ -81,11 +81,18 @@ spec:
                   fi
 
                   # ── 2. How many workers are currently active? ────
+                  # `status.active` su Job conta i pod NON ancora
+                  # completati (Pending + Running). Estratto via
+                  # jsonpath invece che regex perché `kubectl -o json`
+                  # produce pretty-print con spazio dopo i `:` e la
+                  # vecchia regex `"active":[1-9][0-9]*` falliva il
+                  # match — risultato: l'orchestrator vedeva
+                  # ACTIVE=0 ogni tick e creava un worker in più ogni
+                  # minuto finché GPU non disponibile.
                   ACTIVE=$(kubectl get jobs -n "$NS" \
                     -l "app.kubernetes.io/component=postprod-worker" \
-                    -o json 2>/dev/null \
-                    | grep -o '"active":[1-9][0-9]*' | grep -o '[1-9][0-9]*' \
-                    | awk '{s+=$1} END {print s+0}')
+                    -o jsonpath='{range .items[*]}{.status.active}{"\n"}{end}' 2>/dev/null \
+                    | awk 'NF{s+=$1} END {print s+0}')
                   ACTIVE=${ACTIVE:-0}
                   log "active workers=$ACTIVE desired=$DESIRED runnable=$RUNNABLE"
 

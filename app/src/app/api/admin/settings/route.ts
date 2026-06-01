@@ -36,6 +36,7 @@ const updateSettingsSchema = z.object({
   privacyPolicy: z.record(z.string(), z.string().max(100000)).optional(),
   accessibility: z.record(z.string(), z.string().max(100000)).optional(),
   defaultLocale: z.string().min(2).max(5).optional(),
+  defaultTimezone: z.string().min(1).max(64).optional(),
   statusPageEnabled: z.boolean().optional(),
   guestAccessEnabled: z.boolean().optional(),
   publicRegistrationEnabled: z.boolean().optional(),

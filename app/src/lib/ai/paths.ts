@@ -82,6 +82,8 @@ export function artifactPath(
   switch (type) {
     case 'TRANSCRIPT_JSON':
       return `${base}/transcript.raw.json`;
+    case 'WAVEFORM_JSON':
+      return `${base}/waveform.json`;
     case 'TRANSCRIPT_VTT':
       if (!language) throw new Error('TRANSCRIPT_VTT requires a language');
       return `${base}/transcript.${language}.vtt`;
@@ -109,6 +111,9 @@ export function artifactPath(
     case 'DUBBED_VIDEO':
       if (!language) throw new Error('DUBBED_VIDEO requires a language');
       return `${base}/dubbed.${language}.mp4`;
+    case 'SUMMARY_JSON':
+      if (!language) throw new Error('SUMMARY_JSON requires a language');
+      return `${base}/summary.${language}.json`;
     default: {
       const _exhaustive: never = type;
       throw new Error(`unknown artifact type: ${String(_exhaustive)}`);
@@ -120,6 +125,8 @@ export function artifactPath(
 export function artifactMimeType(type: PostprodArtifactType): string {
   switch (type) {
     case 'TRANSCRIPT_JSON':
+    case 'SUMMARY_JSON':
+    case 'WAVEFORM_JSON':
       return 'application/json';
     case 'TRANSCRIPT_VTT':
     case 'SUBTITLE_VTT':

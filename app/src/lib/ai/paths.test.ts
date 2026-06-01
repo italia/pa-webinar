@@ -72,11 +72,16 @@ describe('artifactPath', () => {
   it('SUMMARY_MD uses .md', () => {
     expect(artifactPath(input, 'SUMMARY_MD', 'it')).toBe(`${base}/summary.it.md`);
   });
+
+  it('WAVEFORM_JSON is language-agnostic', () => {
+    expect(artifactPath(input, 'WAVEFORM_JSON', null)).toBe(`${base}/waveform.json`);
+  });
 });
 
 describe('artifactMimeType', () => {
   it('maps types to MIME', () => {
     expect(artifactMimeType('TRANSCRIPT_JSON')).toBe('application/json');
+    expect(artifactMimeType('WAVEFORM_JSON')).toBe('application/json');
     expect(artifactMimeType('TRANSCRIPT_VTT')).toBe('text/vtt');
     expect(artifactMimeType('SUMMARY_MD')).toMatch(/markdown/);
     expect(artifactMimeType('TRANSCRIPT_TXT')).toMatch(/plain/);

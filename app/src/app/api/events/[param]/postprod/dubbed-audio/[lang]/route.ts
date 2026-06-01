@@ -16,6 +16,7 @@ import {
   isPostprodStorageConfigured,
   presignArtifactDownload,
 } from '@/lib/storage/postprod';
+import { assertPostprodAccessible } from '@/lib/ai/access';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,18 +25,13 @@ export const GET = withErrorHandling(async (_request, context) => {
     context as { params: Promise<{ param: string; lang: string }> }
   ).params);
 
-  const event = await prisma.event.findUnique({
-    where: { slug },
-    select: { id: true, recordingPublished: true },
-  });
-  if (!event) throw new NotFoundError('Event');
-  if (!event.recordingPublished) throw new NotFoundError('Dubbed audio');
+  const { eventId } = await assertPostprodAccessible(slug);
 
   const artifact = await prisma.postprodArtifact.findFirst({
     where: {
       type: 'DUBBED_AUDIO',
       language: lang.toLowerCase(),
-      recording: { eventId: event.id },
+      recording: { eventId },
     },
     orderBy: { createdAt: 'desc' },
     select: { blobKey: true },

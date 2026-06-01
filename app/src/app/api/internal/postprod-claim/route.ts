@@ -45,6 +45,43 @@ import { postprodJobAttemptsTotal } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Costruisce l'initial_prompt per WhisperX dai metadata dell'evento.
+ * Aiuta Whisper a riconoscere nomi propri, sigle, organizzazioni
+ * specifiche dell'evento (es. "PCM", "OVH", "Raffaele Vitiello").
+ *
+ * Cap a 800 caratteri per stare ben dentro la token-window di Whisper
+ * (~224 tokens il modello accetta come prompt iniziale).
+ */
+function buildAsrInitialPrompt(event: {
+  title: unknown;
+  organizerName: string | null;
+  speakersInfo: unknown;
+}): string | undefined {
+  const localised = (v: unknown): string | undefined => {
+    if (typeof v === 'string') return v;
+    if (v && typeof v === 'object') {
+      const obj = v as Record<string, unknown>;
+      for (const key of ['it', 'en', 'fr', 'de', 'es']) {
+        const candidate = obj[key];
+        if (typeof candidate === 'string' && candidate.trim()) return candidate;
+      }
+    }
+    return undefined;
+  };
+  const parts: string[] = [];
+  const title = localised(event.title);
+  if (title) parts.push(title.trim());
+  if (event.organizerName) {
+    parts.push(`Organizzato da ${event.organizerName.trim()}.`);
+  }
+  const speakers = localised(event.speakersInfo);
+  if (speakers) parts.push(`Partecipanti e relatori: ${speakers.trim()}.`);
+  const out = parts.join(' ').trim();
+  if (!out) return undefined;
+  return out.length > 800 ? out.slice(0, 800) : out;
+}
+
 const claimRequestSchema = z.object({
   /** Worker pod name — recorded as leased_by for observability. */
   workerId: z.string().min(1).max(120),
@@ -84,7 +121,13 @@ export const POST = withErrorHandling(async (request) => {
         AND (j.depends_on_id IS NULL OR dep.status = 'DONE')
       ORDER BY j.next_attempt_at ASC
       LIMIT 1
-      FOR UPDATE SKIP LOCKED
+      -- Lock ONLY j (the row we claim). Without OF j, Postgres tries to
+      -- lock both sides of the LEFT JOIN and rejects locking the
+      -- nullable dep side with SQLSTATE 0A000 (FOR UPDATE cannot be
+      -- applied to the nullable side of an outer join), which made every
+      -- cluster claim 500. We never update dep, so locking it was never
+      -- intended.
+      FOR UPDATE OF j SKIP LOCKED
     )
     UPDATE postprod_jobs o
     SET status = 'CLAIMED',
@@ -100,7 +143,11 @@ export const POST = withErrorHandling(async (request) => {
   `;
 
   if (claimed.length === 0) {
-    return Response.json({ claimed: false }, { status: 204 });
+    // 204 No Content MUST NOT carry a body — `Response.json(..., 204)`
+    // throws "Invalid response status code 204" in undici and surfaces
+    // as a 500. The worker treats 204 as "nothing to claim" (see
+    // client.py claim()), so return a bodyless 204.
+    return new Response(null, { status: 204 });
   }
 
   const row = claimed[0]!;
@@ -128,7 +175,17 @@ export const POST = withErrorHandling(async (request) => {
   const recording = await prisma.recording.findUnique({
     where: { id: row.recording_id },
     include: {
-      event: { select: { id: true, slug: true, aiTargetLocales: true } },
+      event: {
+        select: {
+          id: true,
+          slug: true,
+          aiTargetLocales: true,
+          title: true,
+          organizerName: true,
+          speakersInfo: true,
+          expectedSpeakers: true,
+        },
+      },
     },
   });
   if (!recording) throw new NotFoundError('Recording');
@@ -179,6 +236,37 @@ export const POST = withErrorHandling(async (request) => {
       expiresInMinutes: lease,
     });
     uploadTargets[a.role] = { url: uploadUrl, blobKey, contentType };
+  }
+
+  // Waveform peaks are an OPTIONAL extra output of TRANSCRIBE — handed
+  // to the worker as an upload target but deliberately kept OUT of
+  // `expectedArtifactsForJob` so the job's DONE accounting (which keys
+  // off the expected count) is unaffected. This decouples app/worker
+  // rollouts: an old worker that ignores this target still completes
+  // the job, and a new worker just registers a bonus WAVEFORM_JSON
+  // artifact. The admin transcript editor uses it to draw a waveform
+  // without downloading the source MP4.
+  if (row.kind === 'TRANSCRIBE') {
+    const waveformKey = artifactPath(
+      {
+        eventId: recording.eventId,
+        recordingId: recording.id,
+        runCount: recording.runCount,
+      },
+      'WAVEFORM_JSON',
+      null,
+    );
+    const waveformMime = artifactMimeType('WAVEFORM_JSON');
+    const presigned = await presignArtifactUpload({
+      blobKey: waveformKey,
+      contentType: waveformMime,
+      expiresInMinutes: lease,
+    });
+    uploadTargets.waveform = {
+      url: presigned.uploadUrl,
+      blobKey: waveformKey,
+      contentType: waveformMime,
+    };
   }
 
   // Inputs: dependency artifacts the worker needs to read. For now
@@ -278,6 +366,15 @@ export const POST = withErrorHandling(async (request) => {
         llmModelId: llm.modelId,
         asrModelId: asr.modelId,
         ttsVoicesPath: tts.voicesPath,
+        // Context-aware quality knobs (TRANSCRIBE job).
+        // - initial_prompt: nomi propri + termini specifici dell'evento.
+        // - expectedSpeakers: forza k nella diarization se admin lo sa.
+        ...(row.kind === 'TRANSCRIBE'
+          ? {
+              asrInitialPrompt: buildAsrInitialPrompt(recording.event),
+              expectedSpeakers: recording.event.expectedSpeakers ?? undefined,
+            }
+          : {}),
       },
     },
     { status: 200 },

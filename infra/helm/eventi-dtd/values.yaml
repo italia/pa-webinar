@@ -837,6 +837,11 @@ postprod:
     enabled: true
     image: ghcr.io/italia/eventi-dtd-postprod-worker:dev
     imagePullPolicy: IfNotPresent
+    # Pull credentials for the (private) worker image. The worker lands
+    # on a fresh scale-from-zero GPU node with no cached image, so it
+    # needs these. Empty → inherits `app.imagePullSecrets` (see the
+    # worker CronJob template). Set explicitly only to override.
+    imagePullSecrets: []
     # Hard ceiling per Job (kills runaway transcription). 1h is enough
     # for a 2h call at ~2x realtime on A100.
     activeDeadlineSeconds: 3600
@@ -884,13 +889,21 @@ postprod:
       enabled: true
       count: 1
 
+    # The worker owns a dedicated GPU node (nodeSelector + taint), e.g.
+    # NC24ads_A100_v4 = 24 vCPU / ~220 GB / 1×A100, shared only with
+    # system DaemonSets. With one worker per node the old 4/16→12/48
+    # caps left most of the box idle and throttled WhisperX + pyannote
+    # (CPU-bound audio decode/diarization) and risked OOM on long calls.
+    # Burstable: schedule on solid requests, burst to nearly the whole
+    # node. Limits stay under allocatable (~23.6 CPU / ~215Gi) to leave
+    # headroom for kubelet + DaemonSets.
     resources:
       requests:
-        cpu: "4"
-        memory: "16Gi"
+        cpu: "8"
+        memory: "32Gi"
       limits:
-        cpu: "12"
-        memory: "48Gi"
+        cpu: "22"
+        memory: "200Gi"
 
 # ── Name overrides ──────────────────────────────────────────
 nameOverride: ""

@@ -109,6 +109,12 @@ export interface InitialEventShape {
     participantsCanShareScreen: boolean;
     recordingEnabled: boolean;
     autoStartRecording: boolean;
+    aiTranscriptEnabled?: boolean | null;
+    aiSummaryEnabled?: boolean | null;
+    aiTranslationEnabled?: boolean | null;
+    aiDubbingEnabled?: boolean | null;
+    aiTargetLocales?: string | null;
+    expectedSpeakers?: number | null;
     dataRetentionDays: number;
     gdprTemplateId: string | null;
     privacyPolicyText: string | null;
@@ -225,6 +231,12 @@ export default function EventWizard(props: WizardProps) {
         permissionMatrix: matrix,
         recordingEnabled: ev.recordingEnabled,
         autoStartRecording: ev.autoStartRecording,
+        aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
+        aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
+        aiTranslationEnabled: ev.aiTranslationEnabled ?? false,
+        aiDubbingEnabled: ev.aiDubbingEnabled ?? false,
+        aiTargetLocales: ev.aiTargetLocales ?? null,
+        expectedSpeakers: ev.expectedSpeakers ?? null,
 
         // Step 3 — seed lists from related entities.
         organizers: initialEvent.organizers.map((o) => ({
@@ -308,6 +320,12 @@ export default function EventWizard(props: WizardProps) {
       permissionMatrix: matrix,
       recordingEnabled: tpl?.recordingEnabled ?? false,
       autoStartRecording: tpl?.autoStartRecording ?? false,
+      aiTranscriptEnabled: false,
+      aiSummaryEnabled: false,
+      aiTranslationEnabled: false,
+      aiDubbingEnabled: false,
+      aiTargetLocales: null,
+      expectedSpeakers: null,
 
       // Step 3
       organizers: [],
@@ -420,6 +438,25 @@ export default function EventWizard(props: WizardProps) {
           participantsCanShareScreen: toggles.participantsCanShareScreen,
           recordingEnabled: form.recordingEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
+
+          // Postprod AI — subordinate al recording (server-side resta
+          // un'invariante: senza recordingEnabled non c'è transcript).
+          aiTranscriptEnabled: form.recordingEnabled && form.aiTranscriptEnabled,
+          aiSummaryEnabled:
+            form.recordingEnabled &&
+            form.aiTranscriptEnabled &&
+            form.aiSummaryEnabled,
+          aiTranslationEnabled:
+            form.recordingEnabled &&
+            form.aiTranscriptEnabled &&
+            form.aiTranslationEnabled,
+          aiDubbingEnabled:
+            form.recordingEnabled &&
+            form.aiTranscriptEnabled &&
+            form.aiTranslationEnabled &&
+            form.aiDubbingEnabled,
+          aiTargetLocales: form.aiTargetLocales,
+          expectedSpeakers: form.expectedSpeakers,
 
           // Review step
           dataRetentionDays: form.dataRetentionDays,

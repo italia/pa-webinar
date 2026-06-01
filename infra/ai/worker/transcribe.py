@@ -76,6 +76,14 @@ def transcribe_stub(*, language_hint: Optional[str]) -> TranscriptResult:
 # ---------------------------------------------------------------------------
 
 
+# Soglie per il filtro hallucination: segmenti con probabilità
+# media troppo bassa o probabilità di "no speech" troppo alta sono
+# tipicamente Whisper che inventa parole su silenzio/musica/respiro.
+# Valori scelti da test empirici su recording PA italiane.
+HALLUCINATION_AVG_LOGPROB_THRESHOLD = -1.0
+HALLUCINATION_NO_SPEECH_THRESHOLD = 0.6
+
+
 def transcribe_with_whisperx(
     audio_path: str,
     *,
@@ -84,8 +92,22 @@ def transcribe_with_whisperx(
     device: str = "cuda",
     compute_type: str = "float16",
     hf_token: Optional[str] = None,
+    initial_prompt: Optional[str] = None,
+    expected_speakers: Optional[int] = None,
 ) -> TranscriptResult:
-    """Run WhisperX + pyannote diarization on the given audio file."""
+    """Run WhisperX + pyannote diarization on the given audio file.
+
+    Quality knobs:
+      - `initial_prompt`: contesto testuale passato a Whisper (nomi
+        propri, sigle, termini tecnici dell'evento). Migliora
+        drasticamente trascrizione di "PCM", "OVH", "Raffaele", etc.
+      - `expected_speakers`: quando noto, forza k nel clustering di
+        diarization invece dell'auto-detect. Risolve i casi
+        "abbiamo 3 speaker ma il modello ne trova 6 (con outlier)".
+      - Filtro hallucination via `avg_logprob` / `no_speech_prob` per
+        scartare i segmenti dove Whisper inventa testo su silenzio o
+        musica di fondo.
+    """
     # Imports kept local so the module is loadable without CUDA.
     import whisperx  # type: ignore[import-not-found]
 
@@ -93,9 +115,39 @@ def transcribe_with_whisperx(
     asr = whisperx.load_model(asr_model_id, device, compute_type=compute_type)
     audio = whisperx.load_audio(audio_path)
 
-    log.info("running ASR")
+    # ASR call. faster-whisper espone `initial_prompt` via gli
+    # `asr_options`; lo settiamo prima della chiamata.
+    if initial_prompt:
+        try:
+            # whisperx >=3.3: setattr su model.options
+            asr.options = asr.options._replace(initial_prompt=initial_prompt)  # type: ignore[attr-defined]
+        except Exception:
+            log.warning("could not set initial_prompt on ASR options")
+    log.info("running ASR (initial_prompt=%s)", bool(initial_prompt))
     result = asr.transcribe(audio, language=language_hint, batch_size=16)
     language = result.get("language") or language_hint or "it"
+
+    # Filtra hallucination — segmenti con probabilità media troppo
+    # bassa o no_speech troppo alto. Whisper espone queste statistiche
+    # per ogni segmento nel campo raw.
+    raw_segments = result.get("segments") or []
+    kept_segments: List[Dict[str, Any]] = []
+    dropped = 0
+    for seg in raw_segments:
+        avg_logprob = seg.get("avg_logprob")
+        no_speech_prob = seg.get("no_speech_prob")
+        if (
+            avg_logprob is not None
+            and avg_logprob < HALLUCINATION_AVG_LOGPROB_THRESHOLD
+        ) or (
+            no_speech_prob is not None
+            and no_speech_prob > HALLUCINATION_NO_SPEECH_THRESHOLD
+        ):
+            dropped += 1
+            continue
+        kept_segments.append(seg)
+    log.info("hallucination filter: kept %d, dropped %d", len(kept_segments), dropped)
+    result["segments"] = kept_segments
 
     # Word-level alignment (improves cue boundaries — Whisper alone is
     # phrase-level which produces lumpy subtitles).
@@ -113,22 +165,36 @@ def transcribe_with_whisperx(
 
     # Diarization. Uses pyannote 3.1 — model is gated, the HF token
     # must be set (and TOS accepted) before the image is built.
-    log.info("running diarization")
+    log.info("running diarization (expected_speakers=%s)", expected_speakers)
     diarize_pipeline = whisperx.DiarizationPipeline(
         use_auth_token=hf_token, device=device
     )
-    diarize_segments = diarize_pipeline(audio)
+    # Quando il moderatore conosce il numero di speaker, lo forziamo:
+    # entrambi min_speakers e max_speakers a expected_speakers fissa k.
+    if expected_speakers and expected_speakers > 0:
+        diarize_segments = diarize_pipeline(
+            audio,
+            min_speakers=expected_speakers,
+            max_speakers=expected_speakers,
+        )
+    else:
+        diarize_segments = diarize_pipeline(audio)
     diarized = whisperx.assign_word_speakers(diarize_segments, aligned)
 
     segments = []
     speech_by_label: Dict[str, float] = {}
     for seg in diarized["segments"]:
         speaker = seg.get("speaker") or "SPEAKER_??"
+        # Propaga avg_logprob come confidence per il frontend (badge
+        # "trascrizione meno sicura"). Il segment originale lo
+        # contiene se l'allineamento non l'ha rimosso.
         seg_out = {
             "start": float(seg["start"]),
             "end": float(seg["end"]),
             "text": (seg.get("text") or "").strip(),
             "speaker": speaker,
+            "avg_logprob": seg.get("avg_logprob"),
+            "no_speech_prob": seg.get("no_speech_prob"),
         }
         segments.append(seg_out)
         speech_by_label[speaker] = speech_by_label.get(speaker, 0.0) + (
@@ -148,3 +214,34 @@ def transcribe_with_whisperx(
         model_version=os.environ.get("WHISPERX_VERSION", "whisperx-3.1"),
         raw_json={"segments": segments, "language": language, "speakers": speakers},
     )
+
+
+def build_initial_prompt(
+    *,
+    event_title: Optional[str],
+    organizer: Optional[str],
+    speakers_info: Optional[str],
+    extra_terms: Optional[List[str]] = None,
+) -> str:
+    """Costruisce l'`initial_prompt` per WhisperX dal contesto evento.
+
+    L'initial_prompt è un testo (~200 tokens max) che guida Whisper
+    sul vocabolario specifico dell'evento. Non viene trascritto: è
+    solo "memoria" del modello durante la decodifica. Tipico contenuto:
+    nome evento, organizzazione, nomi propri dei relatori, sigle.
+
+    Esempio:
+      "Riunione del Dipartimento per la Trasformazione Digitale.
+       Partecipanti: Raffaele Vitiello, Alex Marchetti, Paolo Rossi.
+       Argomenti: piattaforma video, Kubernetes, Azure, OVH, PCM."
+    """
+    parts: List[str] = []
+    if event_title:
+        parts.append(event_title.strip())
+    if organizer:
+        parts.append(f"Organizzato da {organizer.strip()}.")
+    if speakers_info:
+        parts.append(f"Partecipanti e relatori: {speakers_info.strip()}.")
+    if extra_terms:
+        parts.append("Termini tecnici: " + ", ".join(extra_terms) + ".")
+    return " ".join(parts)[:800]  # safety cap

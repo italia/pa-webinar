@@ -56,6 +56,10 @@ export default async function PrivacyPage() {
           title: t('sections.retention.title'),
           body: t('sections.retention.body'),
         },
+        {
+          title: t('sections.automatedProcessing.title'),
+          body: t('sections.automatedProcessing.body'),
+        },
       ]}
       noteTitle={t('note.title')}
       noteBody={t('note.body')}
