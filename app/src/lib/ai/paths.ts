@@ -164,7 +164,13 @@ export function expectedArtifactsForJob(
   payload: { sourceLanguage?: string; language?: string; targetLanguage?: string },
 ): ExpectedArtifact[] {
   switch (kind) {
-    case 'TRANSCRIBE': {
+    // TRANSCRIBE (mix Jibri, diarization pyannote) e TRANSCRIBE_MULTITRACK
+    // (una traccia per partecipante, merge senza diarization — ADR-013)
+    // producono gli stessi artifact: transcript JSON/VTT/TXT nella lingua
+    // sorgente. Cambia solo COME il worker li ottiene (diarization vs
+    // merge di tracce), non l'output.
+    case 'TRANSCRIBE':
+    case 'TRANSCRIBE_MULTITRACK': {
       const lang = payload.sourceLanguage ?? 'it';
       return [
         { role: 'transcriptJson', type: 'TRANSCRIPT_JSON', language: null },

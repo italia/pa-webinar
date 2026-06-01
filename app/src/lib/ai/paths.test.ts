@@ -88,6 +88,19 @@ describe('artifactMimeType', () => {
   });
 });
 
+describe('expectedArtifactsForJob — multitrack', () => {
+  it('TRANSCRIBE_MULTITRACK produces the same artifacts as TRANSCRIBE', () => {
+    const mt = expectedArtifactsForJob('TRANSCRIBE_MULTITRACK', { sourceLanguage: 'it' });
+    const tr = expectedArtifactsForJob('TRANSCRIBE', { sourceLanguage: 'it' });
+    expect(mt).toEqual(tr);
+    expect(mt.map((a) => a.type)).toEqual([
+      'TRANSCRIPT_JSON',
+      'TRANSCRIPT_VTT',
+      'TRANSCRIPT_TXT',
+    ]);
+  });
+});
+
 describe('expectedArtifactsForJob', () => {
   it('TRANSCRIBE produces JSON+VTT+TXT in source language (default it)', () => {
     const out = expectedArtifactsForJob('TRANSCRIBE', {});
