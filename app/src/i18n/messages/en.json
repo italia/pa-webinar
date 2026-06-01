@@ -1822,7 +1822,8 @@
         "settings": "Settings",
         "people": "People",
         "content": "Content",
-        "audit": "Recordings & Audit"
+        "audit": "Recordings & Audit",
+        "postEvent": "Post-event"
       },
       "toggles": {
         "unmute": "Participants can unmute",
@@ -1844,7 +1845,11 @@
         "postEventSummary": "{connected} joined of {registered} registrations (estimated {estimated})",
         "estimatedAttendance": "Estimated: {estimated} attendees"
       },
-      "copyGuestUrl": "Copy guest link"
+      "copyGuestUrl": "Copy guest link",
+      "aiManageTitle": "Transcript, summary and translations",
+      "aiManageDesc": "Manage the AI post-production of this recording: fix the transcript and speaker attribution (who says what), edit the summary and manage translation languages.",
+      "aiManageCta": "Open post-production management",
+      "aiManageNotEnded": "Available once the event has ended and the recording has been processed by the AI pipeline."
     },
     "rubrica": {
       "title": "Address book",
