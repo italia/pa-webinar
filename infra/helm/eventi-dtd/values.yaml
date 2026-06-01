@@ -837,6 +837,11 @@ postprod:
     enabled: true
     image: ghcr.io/italia/eventi-dtd-postprod-worker:dev
     imagePullPolicy: IfNotPresent
+    # Pull credentials for the (private) worker image. The worker lands
+    # on a fresh scale-from-zero GPU node with no cached image, so it
+    # needs these. Empty → inherits `app.imagePullSecrets` (see the
+    # worker CronJob template). Set explicitly only to override.
+    imagePullSecrets: []
     # Hard ceiling per Job (kills runaway transcription). 1h is enough
     # for a 2h call at ~2x realtime on A100.
     activeDeadlineSeconds: 3600
