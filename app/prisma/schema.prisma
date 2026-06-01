@@ -1142,6 +1142,14 @@ model CallSession {
 
   telemetry Json @default("{}") @db.JsonB
 
+  // ADR-013 Fase 0 — timeline del dominant speaker catturata in diretta
+  // dall'IFrame API (`dominantSpeakerChanged`). Array append-only di
+  // `{ atMs, participantId, displayName }` (displayName cifrato a valle
+  // = PII). Post-evento serve ad attribuire i cluster pyannote ai
+  // partecipanti reali (auto-naming) quando NON c'è registrazione
+  // multi-traccia. Capped lato ingest per non gonfiare la riga.
+  dominantSpeakerLog Json @default("[]") @map("dominant_speaker_log") @db.JsonB
+
   createdAt DateTime @default(now()) @map("created_at")
 
   event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -1484,6 +1492,12 @@ enum RecordingStatus {
 
 enum PostprodJobKind {
   TRANSCRIBE
+  // Trascrizione multi-traccia (ADR-013): una traccia audio per
+  // partecipante (registrate separatamente dal multitrack-recorder).
+  // Ogni traccia ha UN solo parlante noto → niente diarization pyannote;
+  // i segmenti delle tracce vengono fusi su timeline globale con
+  // attribuzione certa + overlap nativi. Vedi infra/ai/worker/multitrack.py.
+  TRANSCRIBE_MULTITRACK
   SUMMARIZE
   TRANSLATE
   SUBTITLE
@@ -1593,11 +1607,52 @@ model Recording {
   event       Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
   jobs        PostprodJob[]
   artifacts   PostprodArtifact[]
+  tracks      RecordingTrack[]
   speakers    Speaker[]
 
   @@index([eventId])
   @@index([status])
   @@map("recordings")
+}
+
+// ADR-013 Fase 2 — una traccia audio per-partecipante prodotta dal
+// multitrack-recorder. A differenza dello Speaker (cluster pyannote
+// mappato a mano), qui l'identità è CERTA (dal JWB del portale). Il
+// worker trascrive ogni traccia senza diarization e fonde i segmenti.
+// L'audio per-partecipante è PII quasi-biometrica → retention BREVE
+// (le tracce sono input intermedio, cancellabili dopo la trascrizione)
+// e mai esposto al pubblico (solo input worker via signed URL).
+model RecordingTrack {
+  id          String @id @default(uuid()) @db.Uuid
+  recordingId String @map("recording_id") @db.Uuid
+
+  // Identità del partecipante dal JWT del portale (endpoint id / sub).
+  participantId String  @map("participant_id")
+  // displayName cifrato a riposo (AES-256-GCM via encryptPII) — PII.
+  displayName   String? @map("display_name")
+
+  // Chiave provider-agnostica della traccia audio in object storage.
+  blobKey   String  @map("blob_key")
+  mimeType  String  @default("audio/ogg") @map("mime_type")
+  sizeBytes BigInt? @map("size_bytes")
+
+  // Offset di inizio traccia rispetto al t0 della registrazione (ms) e
+  // durata (ms): servono al merge per allineare le tracce sulla stessa
+  // timeline globale.
+  startOffsetMs Int  @default(0) @map("start_offset_ms")
+  durationMs    Int? @map("duration_ms")
+
+  // Quando la traccia (audio grezzo PII) è stata cancellata dopo la
+  // trascrizione — minimizzazione GDPR. Null = ancora presente.
+  audioPurgedAt DateTime? @map("audio_purged_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  recording Recording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+
+  @@unique([recordingId, participantId])
+  @@index([recordingId])
+  @@map("recording_tracks")
 }
 
 model PostprodJob {
