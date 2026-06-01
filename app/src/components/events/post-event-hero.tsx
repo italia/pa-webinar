@@ -100,45 +100,22 @@ export default function PostEventHero({
     }
   };
 
-  if (availableLocales.length === 0) return null;
-  const sm = structured[lang] ?? structured[availableLocales[0]!]!;
-
+  // Hook order must stay stable across renders, so every hook lives
+  // ABOVE the `availableLocales.length === 0` early return below. These
+  // two pieces of state + the playhead-tracking effect used to sit
+  // after the return, which violated rules-of-hooks.
   const [copiedTopic, setCopiedTopic] = useState<number | null>(null);
-  const shareTopic = async (i: number, mmss: string) => {
-    if (!eventSlug || typeof window === 'undefined') return;
-    const sec = mmssToSec(mmss);
-    if (sec == null) return;
-    const url = `${window.location.origin}${window.location.pathname.split('#')[0]}#t=${sec}`;
-    try {
-      await navigator.clipboard?.writeText(url);
-      setCopiedTopic(i);
-      window.setTimeout(() => setCopiedTopic((prev) => (prev === i ? null : prev)), 2000);
-    } catch {
-      // fallback: niente clipboard API → no-op
-    }
-  };
-
-  const topics = sm.topics ?? [];
-  const hasDecisions = (sm.key_decisions ?? []).length > 0;
-  const hasActions = (sm.action_items ?? []).length > 0;
-  const showExpand = hasDecisions || hasActions;
-
-  const seekTo = (mmss: string) => {
-    const sec = mmssToSec(mmss);
-    if (sec == null) return;
-    playerRef?.current?.seekTo?.(sec, true);
-  };
-
+  const [activeTopicIdx, setActiveTopicIdx] = useState<number>(-1);
   // Topic corrente: l'ultimo topic con `start_mmss` <= playhead. Il
   // chip corrispondente nel topic-navigator viene "illuminato" così
   // l'utente capisce a quale capitolo sta corrispondendo il segmento
   // che sta guardando.
-  const [activeTopicIdx, setActiveTopicIdx] = useState<number>(-1);
   useEffect(() => {
     if (!playerRef?.current) return undefined;
     const v = playerRef.current.videoEl?.();
     if (!v) return undefined;
-    const topicTimes = (sm.topics ?? []).map((tp) => mmssToSec(tp.start_mmss ?? ''));
+    const smEff = structured[lang] ?? structured[Object.keys(structured)[0]!];
+    const topicTimes = (smEff?.topics ?? []).map((tp) => mmssToSec(tp.start_mmss ?? ''));
     if (topicTimes.every((t) => t == null)) return undefined;
     let rafId: number | null = null;
     const tick = () => {
@@ -178,7 +155,35 @@ export default function PostEventHero({
       v.removeEventListener('pause', onPause);
       v.removeEventListener('seeked', onSeek);
     };
-  }, [playerRef, sm.topics]);
+  }, [playerRef, lang, structured]);
+
+  if (availableLocales.length === 0) return null;
+  const sm = structured[lang] ?? structured[availableLocales[0]!]!;
+
+  const shareTopic = async (i: number, mmss: string) => {
+    if (!eventSlug || typeof window === 'undefined') return;
+    const sec = mmssToSec(mmss);
+    if (sec == null) return;
+    const url = `${window.location.origin}${window.location.pathname.split('#')[0]}#t=${sec}`;
+    try {
+      await navigator.clipboard?.writeText(url);
+      setCopiedTopic(i);
+      window.setTimeout(() => setCopiedTopic((prev) => (prev === i ? null : prev)), 2000);
+    } catch {
+      // fallback: niente clipboard API → no-op
+    }
+  };
+
+  const topics = sm.topics ?? [];
+  const hasDecisions = (sm.key_decisions ?? []).length > 0;
+  const hasActions = (sm.action_items ?? []).length > 0;
+  const showExpand = hasDecisions || hasActions;
+
+  const seekTo = (mmss: string) => {
+    const sec = mmssToSec(mmss);
+    if (sec == null) return;
+    playerRef?.current?.seekTo?.(sec, true);
+  };
 
   return (
     <section

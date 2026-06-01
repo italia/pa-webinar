@@ -1886,7 +1886,21 @@
       "speakerSpoke": "Speaking time: {sec}s",
       "suggestedApply": "Apply suggestion: {name}",
       "suggestedTitle": "Name suggested by the AI pipeline based on proper nouns mentioned in the transcript. Click to fill the field (you can still edit it before saving).",
-      "save": "Save"
+      "save": "Save",
+      "editTranscript": "Edit transcript",
+      "editClose": "Close editor",
+      "editTranscriptTitle": "Transcript editor",
+      "editHint": "Fix the text or reassign the speaker of each segment. On save, the transcript and the source-language subtitles are updated. Translations and dubbing are NOT regenerated: use “Re-run” if you also need the other languages refreshed.",
+      "editLoading": "Loading transcript…",
+      "editLoadError": "Could not load the transcript",
+      "editEmpty": "No editable segments",
+      "editSpeakerNone": "— none —",
+      "editSave": "Save changes",
+      "editSaving": "Saving…",
+      "editDirty": "{n, plural, one {1 unsaved change} other {# unsaved changes}}",
+      "editSaved": "Saved: {text} texts, {speaker} speakers.",
+      "editFailed": "Save failed (HTTP {code})",
+      "editSeek": "Jump to this point in the video"
     },
     "questionnairesPage": {
       "title": "Questionnaires",

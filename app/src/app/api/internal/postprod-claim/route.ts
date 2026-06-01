@@ -228,6 +228,37 @@ export const POST = withErrorHandling(async (request) => {
     uploadTargets[a.role] = { url: uploadUrl, blobKey, contentType };
   }
 
+  // Waveform peaks are an OPTIONAL extra output of TRANSCRIBE — handed
+  // to the worker as an upload target but deliberately kept OUT of
+  // `expectedArtifactsForJob` so the job's DONE accounting (which keys
+  // off the expected count) is unaffected. This decouples app/worker
+  // rollouts: an old worker that ignores this target still completes
+  // the job, and a new worker just registers a bonus WAVEFORM_JSON
+  // artifact. The admin transcript editor uses it to draw a waveform
+  // without downloading the source MP4.
+  if (row.kind === 'TRANSCRIBE') {
+    const waveformKey = artifactPath(
+      {
+        eventId: recording.eventId,
+        recordingId: recording.id,
+        runCount: recording.runCount,
+      },
+      'WAVEFORM_JSON',
+      null,
+    );
+    const waveformMime = artifactMimeType('WAVEFORM_JSON');
+    const presigned = await presignArtifactUpload({
+      blobKey: waveformKey,
+      contentType: waveformMime,
+      expiresInMinutes: lease,
+    });
+    uploadTargets.waveform = {
+      url: presigned.uploadUrl,
+      blobKey: waveformKey,
+      contentType: waveformMime,
+    };
+  }
+
   // Inputs: dependency artifacts the worker needs to read. For now
   // SUMMARIZE/TRANSLATE need the transcript raw JSON produced by
   // TRANSCRIBE (which is recorded as TRANSCRIPT_JSON). We look it up

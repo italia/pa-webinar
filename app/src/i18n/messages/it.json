@@ -1956,7 +1956,21 @@
       "speakerSpoke": "Tempo parlato: {sec}s",
       "suggestedApply": "Applica suggerimento: {name}",
       "suggestedTitle": "Nome suggerito dalla pipeline AI in base ai nomi propri menzionati nella trascrizione. Cliccalo per inserirlo nel campo (puoi sempre modificarlo prima di salvare).",
-      "save": "Salva"
+      "save": "Salva",
+      "editTranscript": "Modifica trascrizione",
+      "editClose": "Chiudi editor",
+      "editTranscriptTitle": "Editor trascrizione",
+      "editHint": "Correggi il testo o riassegna lo speaker di ogni segmento. Salvando, la trascrizione e i sottotitoli nella lingua sorgente vengono aggiornati. Le traduzioni e il doppiaggio NON vengono rigenerati: usa «Rilancia» se ti servono aggiornati anche nelle altre lingue.",
+      "editLoading": "Caricamento trascrizione…",
+      "editLoadError": "Impossibile caricare la trascrizione",
+      "editEmpty": "Nessun segmento modificabile",
+      "editSpeakerNone": "— nessuno —",
+      "editSave": "Salva modifiche",
+      "editSaving": "Salvataggio…",
+      "editDirty": "{n, plural, one {1 modifica non salvata} other {# modifiche non salvate}}",
+      "editSaved": "Salvato: {text} testi, {speaker} speaker.",
+      "editFailed": "Salvataggio fallito (HTTP {code})",
+      "editSeek": "Vai a questo punto del video"
     },
     "questionnairesPage": {
       "title": "Questionari",
