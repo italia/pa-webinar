@@ -12,7 +12,7 @@ import {
 } from 'design-react-kit';
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, Link } from '@/i18n/navigation';
 import RecordingUploadWidget from './recording-upload-widget';
 
 interface RecordingManagementProps {
@@ -291,6 +291,15 @@ export default function RecordingManagement({
                     <Icon icon="it-download" size="sm" />
                     {t('download')}
                   </a>
+                  {/* Apre la gestione post-produzione (trascrizione, speaker,
+                      traduzione, editor) per questo evento. */}
+                  <Link
+                    href={`/admin/postprod?eventId=${event.id}`}
+                    className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
+                  >
+                    <Icon icon="it-comment" size="sm" />
+                    {t('transcriptManage')}
+                  </Link>
                 </>
               )}
               <Button

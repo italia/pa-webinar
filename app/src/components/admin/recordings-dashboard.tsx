@@ -442,6 +442,13 @@ export default function RecordingsDashboard({
                                 >
                                   <Icon icon="it-download" size="xs" />
                                 </a>
+                                <Link
+                                  href={`/admin/postprod?eventId=${r.eventId}`}
+                                  className="btn btn-sm btn-outline-secondary"
+                                  title={t('transcriptManage')}
+                                >
+                                  <Icon icon="it-comment" size="xs" />
+                                </Link>
                               </div>
                             ) : (
                               <span className="text-muted" style={{ fontSize: '0.78rem' }}>{t('noFile')}</span>
