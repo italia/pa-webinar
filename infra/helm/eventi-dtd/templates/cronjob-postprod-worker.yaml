@@ -33,6 +33,15 @@ spec:
         spec:
           restartPolicy: Never
           automountServiceAccountToken: false
+          # The worker runs on a scale-from-zero GPU node where the (private)
+          # worker image is never cached, so it MUST present pull credentials —
+          # unlike the orchestrator/reclaim/retention cronjobs which reuse the
+          # app image already cached on the app nodes. Inherit the app's pull
+          # secret unless a worker-specific one is set.
+          {{- with (.Values.postprod.worker.imagePullSecrets | default .Values.app.imagePullSecrets) }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with .Values.postprod.worker.nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
