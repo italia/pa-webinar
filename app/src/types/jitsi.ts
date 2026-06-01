@@ -103,6 +103,8 @@ export interface JitsiMeetExternalAPI {
   // Queries
   getParticipantsInfo(): JitsiParticipant[];
   getNumberOfParticipants(): number;
+  /** displayName del partecipante per endpoint id (ADR-013 Fase 0). */
+  getDisplayName(participantId: string): string | undefined;
   isAudioMuted(): Promise<boolean>;
   isVideoMuted(): Promise<boolean>;
 

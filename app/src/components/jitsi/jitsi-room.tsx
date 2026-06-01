@@ -27,6 +27,9 @@ interface JitsiRoomProps {
   jwt: string;
   displayName: string;
   locale: string;
+  /** Slug dell'evento, usato per l'ingest della timeline dominant-speaker
+   *  (ADR-013 Fase 0). Se assente, la cattura è disabilitata. */
+  eventSlug?: string;
   role: 'moderator' | 'participant';
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
@@ -63,6 +66,7 @@ export default function JitsiRoom({
   jwt,
   displayName,
   locale,
+  eventSlug,
   role,
   participantsCanUnmute = true,
   participantsCanStartVideo = true,
@@ -101,6 +105,16 @@ export default function JitsiRoom({
   // react to resize: flipping the toolbar mid-call would require
   // reinitialising the iframe (disconnecting the user).
   const isMobileRef = useRef<boolean>(false);
+
+  // ADR-013 Fase 0 — buffer della timeline dominant-speaker. Accumuliamo i
+  // cambi e li inviamo in batch (debounce + flush all'unload) all'ingest
+  // `/api/events/[slug]/speaker-events`. `eventSlug` è letto via ref così il
+  // closure dei listener non va ricreato e non forza la reinit dell'iframe.
+  const eventSlugRef = useRef(eventSlug);
+  useEffect(() => { eventSlugRef.current = eventSlug; }, [eventSlug]);
+  const speakerT0Ref = useRef<number>(0);
+  const speakerBufferRef = useRef<Array<{ atMs: number; participantId: string; displayName?: string }>>([]);
+  const speakerFlushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -164,6 +178,44 @@ export default function JitsiRoom({
 
     const IFRAME_ALLOW = 'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock';
 
+    // ADR-013 Fase 0 — invia il buffer dominant-speaker all'ingest. Usa
+    // sendBeacon all'unload (sopravvive alla chiusura tab); fetch keepalive
+    // negli altri casi. Svuota sempre il buffer, fire-and-forget.
+    function flushSpeakerBuffer(useBeacon = false) {
+      const slug = eventSlugRef.current;
+      const buf = speakerBufferRef.current;
+      if (!slug || buf.length === 0) return;
+      // Cap difensivo lato client coerente col tetto della route (2000).
+      const events = buf.splice(0, 2000);
+      speakerBufferRef.current = [];
+      const url = `/api/events/${encodeURIComponent(slug)}/speaker-events`;
+      const payload = JSON.stringify({ events });
+      try {
+        if (useBeacon && typeof navigator !== 'undefined' && navigator.sendBeacon) {
+          navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+          return;
+        }
+        void fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true,
+        }).catch(() => { /* ingest best-effort: non rompere il flusso live */ });
+      } catch {
+        /* best-effort */
+      }
+    }
+
+    function scheduleSpeakerFlush() {
+      if (speakerFlushTimerRef.current) return;
+      speakerFlushTimerRef.current = setTimeout(() => {
+        speakerFlushTimerRef.current = null;
+        flushSpeakerBuffer(false);
+      }, 10_000);
+    }
+
+    const handlePageHide = () => flushSpeakerBuffer(true);
+
     function initJitsi() {
       if (disposedRef.current || initializingRef.current || apiRef.current) return;
       if (!containerRef.current || !window.JitsiMeetExternalAPI) return;
@@ -224,12 +276,35 @@ export default function JitsiRoom({
         api.addListener('videoConferenceJoined', () => {
           if (disposedRef.current) return;
           setLoadState('ready');
+          // ADR-013 Fase 0 — t0 della timeline = momento del join. Gli atMs
+          // accumulati sono relativi a questo istante.
+          speakerT0Ref.current = Date.now();
           onReadyRef.current?.();
         });
 
         api.addListener('videoConferenceLeft', () => {
           if (disposedRef.current) return;
+          flushSpeakerBuffer(true);
           onLeftRef.current?.();
+        });
+
+        // ADR-013 Fase 0 — cattura la timeline del dominant speaker. A ogni
+        // cambio accumuliamo `{ atMs, participantId, displayName }`; l'invio
+        // è batchato (debounce 10s) o al pagehide/leave.
+        api.addListener('dominantSpeakerChanged', (evt: { id: string }) => {
+          if (disposedRef.current || !eventSlugRef.current || !evt?.id) return;
+          let name: string | undefined;
+          try {
+            name = api.getDisplayName?.(evt.id) || undefined;
+          } catch {
+            name = undefined;
+          }
+          speakerBufferRef.current.push({
+            atMs: Date.now() - speakerT0Ref.current,
+            participantId: evt.id,
+            displayName: name,
+          });
+          scheduleSpeakerFlush();
         });
 
         api.addListener('participantJoined', () => {
@@ -254,6 +329,9 @@ export default function JitsiRoom({
 
     let scriptLoadHandler: (() => void) | null = null;
     let attachedScript: HTMLScriptElement | null = null;
+
+    // Flush della timeline anche se la tab viene chiusa/messa in background.
+    window.addEventListener('pagehide', handlePageHide);
 
     if (window.JitsiMeetExternalAPI) {
       initJitsi();
@@ -284,6 +362,14 @@ export default function JitsiRoom({
       if (attachedScript && scriptLoadHandler) {
         attachedScript.removeEventListener('load', scriptLoadHandler);
       }
+      // ADR-013 Fase 0 — svuota il buffer residuo prima di staccare i
+      // listener/iframe, così non perdiamo gli ultimi cambi di speaker.
+      window.removeEventListener('pagehide', handlePageHide);
+      if (speakerFlushTimerRef.current) {
+        clearTimeout(speakerFlushTimerRef.current);
+        speakerFlushTimerRef.current = null;
+      }
+      flushSpeakerBuffer(true);
       if (apiRef.current) {
         apiRef.current.dispose();
         apiRef.current = null;

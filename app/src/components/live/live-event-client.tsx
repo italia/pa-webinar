@@ -780,6 +780,7 @@ export default function LiveEventClient({
               jwt={credentials.jwt}
               displayName={credentials.displayName}
               locale={locale}
+              eventSlug={event.slug}
               role={isActualModerator ? 'moderator' : 'participant'}
               participantsCanUnmute={event.participantsCanUnmute}
               participantsCanStartVideo={event.participantsCanStartVideo}
