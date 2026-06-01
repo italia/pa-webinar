@@ -143,7 +143,11 @@ export const POST = withErrorHandling(async (request) => {
   `;
 
   if (claimed.length === 0) {
-    return Response.json({ claimed: false }, { status: 204 });
+    // 204 No Content MUST NOT carry a body — `Response.json(..., 204)`
+    // throws "Invalid response status code 204" in undici and surfaces
+    // as a 500. The worker treats 204 as "nothing to claim" (see
+    // client.py claim()), so return a bodyless 204.
+    return new Response(null, { status: 204 });
   }
 
   const row = claimed[0]!;
