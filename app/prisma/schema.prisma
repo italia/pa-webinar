@@ -1506,6 +1506,12 @@ enum PostprodArtifactType {
   TRANSCRIPT_JSON
   TRANSCRIPT_VTT
   TRANSCRIPT_TXT
+  // Picchi audio pre-calcolati (envelope normalizzato 0..1) per la
+  // waveform/timeline dell'editor admin. Evita di scaricare l'MP4
+  // intero nel browser: il worker decodifica l'audio una volta e ne
+  // salva una rappresentazione compatta (~qualche KB) come JSON.
+  // language=null (globale alla registrazione, come TRANSCRIPT_JSON).
+  WAVEFORM_JSON
   SUMMARY_MD
   // Sintesi strutturata (overall_summary, key_decisions, action_items,
   // topics[{title, start_mmss, summary}]) per lingua. Permette al

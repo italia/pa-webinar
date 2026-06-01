@@ -16,6 +16,8 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 
+import TranscriptEditor from './transcript-editor';
+
 const fetcher = (url: string): Promise<unknown> =>
   fetch(url, { credentials: 'include' }).then((r) => {
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -273,7 +275,11 @@ export default function PostprodDashboard() {
                   {isExpanded && (
                     <tr key={`${row.id}-detail`}>
                       <td colSpan={7} className="bg-light">
-                        <RecordingDetails row={row} onSpeakerSave={updateSpeaker} />
+                        <RecordingDetails
+                          row={row}
+                          onSpeakerSave={updateSpeaker}
+                          onMutate={mutate}
+                        />
                       </td>
                     </tr>
                   )}
@@ -297,6 +303,7 @@ export default function PostprodDashboard() {
 function RecordingDetails({
   row,
   onSpeakerSave,
+  onMutate,
 }: {
   row: RecordingRow;
   onSpeakerSave: (
@@ -304,8 +311,11 @@ function RecordingDetails({
     displayName: string | null,
     personId: string | null,
   ) => Promise<void>;
+  onMutate: () => Promise<unknown>;
 }) {
   const t = useTranslations('admin.postprod');
+  const [editing, setEditing] = useState(false);
+  const hasTranscript = row.artifacts.some((a) => a.type === 'TRANSCRIPT_JSON');
   return (
     <div className="p-3">
       <div className="row g-3">
@@ -358,6 +368,24 @@ function RecordingDetails({
           <SpeakersEditor speakers={row.speakers} onSave={onSpeakerSave} />
         </div>
       </div>
+
+      {hasTranscript && (
+        <div className="mt-3 pt-3 border-top">
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-primary"
+            onClick={() => setEditing((v) => !v)}
+            aria-expanded={editing}
+          >
+            {editing ? t('editClose') : t('editTranscript')}
+          </button>
+          {editing && (
+            <div className="mt-3">
+              <TranscriptEditor recordingId={row.id} onSaved={() => void onMutate()} />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
