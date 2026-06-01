@@ -241,3 +241,95 @@ export async function enqueuePostprodForRecording(
 
   return { enqueued, skippedExisting: skipped, jobIds };
 }
+
+export interface EnqueueTranslateLanguageResult {
+  /** true if a new TRANSLATE job was created, false if it already existed. */
+  enqueued: boolean;
+  jobId: string;
+  /** Idempotency key of the (created or existing) TRANSLATE job. */
+  idempotencyKey: string;
+}
+
+/**
+ * Enqueue a SINGLE TRANSLATE job for one target language, on demand
+ * (admin "add a translation language" action). This is a narrow,
+ * additive counterpart to `enqueuePostprodForRecording`: it does NOT
+ * touch recording status, consent snapshot, runCount, or any other job
+ * in the pipeline.
+ *
+ * Preconditions the CALLER must enforce (kept out of here so the helper
+ * stays composable and the API route can return precise HTTP errors):
+ *   - the master kill-switch `SiteSetting.aiPipelineEnabled` is on,
+ *   - a TRANSCRIPT_JSON artifact already exists for the recording,
+ *   - `targetLanguage` is neither the source language nor already
+ *     translated.
+ *
+ * The TRANSLATE job depends on the root job that produced the existing
+ * TRANSCRIPT_JSON, preserving the orchestrator's "ready jobs" ordering
+ * invariant. Because the transcript already exists, the dependency is
+ * effectively already satisfied.
+ *
+ * Idempotent: re-invoking for an already-queued language returns the
+ * existing job (`enqueued: false`).
+ */
+export async function enqueueTranslateLanguage(
+  tx: PrismaClient | Prisma.TransactionClient,
+  opts: { recordingId: string; targetLanguage: string },
+): Promise<EnqueueTranslateLanguageResult> {
+  const recording = await tx.recording.findUnique({
+    where: { id: opts.recordingId },
+    select: { id: true, runCount: true, sourceLanguage: true },
+  });
+  if (!recording) {
+    throw new Error(`recording not found: ${opts.recordingId}`);
+  }
+
+  const sourceLanguage = recording.sourceLanguage ?? 'it';
+
+  // Locate the existing TRANSCRIPT_JSON and the root job that produced
+  // it, so the new TRANSLATE job both references the transcript artifact
+  // in its payload and depends on the correct precursor.
+  const transcriptArtifact = await tx.postprodArtifact.findFirst({
+    where: { recordingId: recording.id, type: 'TRANSCRIPT_JSON' },
+    select: { id: true, jobId: true },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (!transcriptArtifact) {
+    throw new Error(`no TRANSCRIPT_JSON for recording: ${opts.recordingId}`);
+  }
+
+  const payload = {
+    runId: recording.id,
+    sourceLanguage,
+    targetLanguage: opts.targetLanguage,
+    transcriptArtifactId: transcriptArtifact.id,
+  };
+
+  const idempotencyKey = deriveIdempotencyKey({
+    recordingId: recording.id,
+    kind: 'TRANSLATE',
+    runCount: recording.runCount,
+    payload,
+  });
+
+  const existing = await tx.postprodJob.findUnique({
+    where: { idempotencyKey },
+    select: { id: true },
+  });
+  if (existing) {
+    return { enqueued: false, jobId: existing.id, idempotencyKey };
+  }
+
+  const created = await tx.postprodJob.create({
+    data: {
+      recordingId: recording.id,
+      kind: 'TRANSLATE',
+      payload: payload as Prisma.InputJsonValue,
+      idempotencyKey,
+      dependsOnId: transcriptArtifact.jobId,
+    },
+    select: { id: true },
+  });
+
+  return { enqueued: true, jobId: created.id, idempotencyKey };
+}

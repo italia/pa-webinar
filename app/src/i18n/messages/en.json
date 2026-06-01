@@ -1902,7 +1902,16 @@
       "editDirty": "{n, plural, one {1 unsaved change} other {# unsaved changes}}",
       "editSaved": "Saved: {text} texts, {speaker} speakers.",
       "editFailed": "Save failed (HTTP {code})",
-      "editSeek": "Jump to this point in the video"
+      "editSeek": "Jump to this point in the video",
+      "manageTabTranscript": "Transcript",
+      "manageTabSummary": "Summary",
+      "manageTabTranslations": "Translations",
+      "manageBackToList": "All recordings",
+      "manageDuration": "Duration",
+      "manageSource": "Source language",
+      "manageOpenPublic": "Public page",
+      "manageRerunOk": "Pipeline re-run started.",
+      "manageOpen": "Manage"
     },
     "questionnairesPage": {
       "title": "Questionnaires",

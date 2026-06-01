@@ -17,6 +17,7 @@ import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 
+import { Link, useRouter } from '@/i18n/navigation';
 import TranscriptEditor from './transcript-editor';
 
 const fetcher = (url: string): Promise<unknown> =>
@@ -126,6 +127,7 @@ export default function PostprodDashboard() {
   //   /admin/postprod?recordingId=<id>  oppure  ?eventId=<id>
   // Auto-espande e scrolla alla registrazione giusta una volta caricati
   // i dati. Usiamo eventId come chiave robusta (presente ovunque).
+  const router = useRouter();
   const searchParams = useSearchParams();
   const deepRecordingId = searchParams.get('recordingId');
   const deepEventId = searchParams.get('eventId');
@@ -147,15 +149,12 @@ export default function PostprodDashboard() {
     );
     if (match) {
       deepLinkApplied.current = true;
-      setExpanded(match.id);
-      // Scrolla alla riga dopo il render dell'espansione.
-      setTimeout(() => {
-        document
-          .querySelector(`[data-recording="${match.id}"]`)
-          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
+      // Deep-link da registrazioni/evento → pagina di gestione completa
+      // del video (trascrizione + sintesi + traduzioni), non l'editor
+      // inline cramped della lista.
+      router.push(`/admin/postprod/${match.id}`);
     }
-  }, [data, deepRecordingId, deepEventId]);
+  }, [data, deepRecordingId, deepEventId, router]);
 
   async function rerun(recordingId: string): Promise<void> {
     const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/rerun`, {
@@ -274,6 +273,13 @@ export default function PostprodDashboard() {
                     </td>
                     <td>{row.artifacts.length}</td>
                     <td className="text-end">
+                      <Link
+                        href={`/admin/postprod/${row.id}`}
+                        className="btn btn-sm btn-primary me-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {t('manageOpen')}
+                      </Link>
                       <button
                         type="button"
                         className="btn btn-sm btn-outline-secondary me-1"
