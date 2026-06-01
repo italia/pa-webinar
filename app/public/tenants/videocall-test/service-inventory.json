@@ -1114,7 +1114,7 @@
         "name": "self-hosted (eventi-dtd, in-cluster)"
       },
       "name": "Multitrack Recorder (speaker attribution)",
-      "description": "Servizio in-cluster che cattura una traccia audio isolata per partecipante (RecordingTrack) e la fornisce al worker di trascrizione per attribuire il transcript al relatore corretto. Diverso dall'audio misto del recording standard: la traccia individuale e' un dato personale ad alta sensibilita' (vicino al biometrico vocale, art. 9 GDPR se usato per identificazione). Non clona ne' identifica la voce: produce solo testo attribuito. Vedi docs/adr/013-multitrack-speaker-attribution.md e docs/POSTPROD.md.",
+      "description": "[PIANIFICATO — non ancora operativo nel cluster; codice in infra/recorder/, core WebRTC e deploy da completare] Servizio in-cluster che cattura una traccia audio isolata per partecipante (RecordingTrack) e la fornisce al worker di trascrizione per attribuire il transcript al relatore corretto. Diverso dall'audio misto del recording standard: la traccia individuale e' un dato personale ad alta sensibilita' (vicino al biometrico vocale, art. 9 GDPR se usato per identificazione). Non clona ne' identifica la voce: produce solo testo attribuito. Vedi docs/adr/013-multitrack-speaker-attribution.md e docs/POSTPROD.md.",
       "authenticated": true,
       "x-trust-boundary": true,
       "data": [
@@ -1135,6 +1135,10 @@
         }
       ],
       "properties": [
+        {
+          "name": "eventi-dtd:status",
+          "value": "planned — non ancora deployato (vedi ADR-013 Fase 3)"
+        },
         {
           "name": "eventi-dtd:gdpr-legal-basis",
           "value": "art. 6.1.a (consenso esplicito), distinto da consentRecording"
