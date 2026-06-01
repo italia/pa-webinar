@@ -1972,7 +1972,16 @@
       "editDirty": "{n, plural, one {1 modifica non salvata} other {# modifiche non salvate}}",
       "editSaved": "Salvato: {text} testi, {speaker} speaker.",
       "editFailed": "Salvataggio fallito (HTTP {code})",
-      "editSeek": "Vai a questo punto del video"
+      "editSeek": "Vai a questo punto del video",
+      "manageTabTranscript": "Trascrizione",
+      "manageTabSummary": "Sintesi",
+      "manageTabTranslations": "Traduzioni",
+      "manageBackToList": "Tutte le registrazioni",
+      "manageDuration": "Durata",
+      "manageSource": "Lingua sorgente",
+      "manageOpenPublic": "Pagina pubblica",
+      "manageRerunOk": "Pipeline rilanciata.",
+      "manageOpen": "Gestisci"
     },
     "questionnairesPage": {
       "title": "Questionari",
