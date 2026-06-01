@@ -1986,7 +1986,9 @@
       "manageSource": "Lingua sorgente",
       "manageOpenPublic": "Pagina pubblica",
       "manageRerunOk": "Pipeline rilanciata.",
-      "manageOpen": "Gestisci"
+      "manageOpen": "Gestisci",
+      "cancelConfirmTitle": "Annulla post-produzione",
+      "speakerUpdateSuccess": "Speaker aggiornato"
     },
     "questionnairesPage": {
       "title": "Questionari",
@@ -2877,7 +2879,10 @@
     "disabledHint": "La registrazione video non è abilitata per questo evento. Per attivarla, apri la sezione Impostazioni più in alto e accendi il toggle \"Registrazione\".",
     "play": "Riproduci",
     "download": "Scarica",
-    "transcriptManage": "Trascrizione / AI"
+    "transcriptManage": "Trascrizione / AI",
+    "deleteConfirmTitle": "Elimina registrazione",
+    "deleteFailed": "Eliminazione non riuscita",
+    "deleteSuccess": "Registrazione eliminata"
   },
   "postEvent": {
     "config": "Configurazione post-evento",
