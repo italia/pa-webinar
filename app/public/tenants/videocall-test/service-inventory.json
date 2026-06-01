@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "serialNumber": "urn:uuid:5b0c41ec-1f2b-4a53-9b2e-1d2f3a4b5c6d",
-  "version": 3,
+  "version": 2,
   "metadata": {
-    "timestamp": "2026-05-28T21:06:27Z",
+    "timestamp": "2026-04-21T11:15:00Z",
     "lifecycles": [
       {
         "phase": "operations"
@@ -616,232 +616,6 @@
           "value": "application-layer encryption of PII at rest"
         }
       ]
-    },
-    {
-      "bom-ref": "pkg:pypi/faster-whisper@1.0.3",
-      "type": "library",
-      "publisher": "SYSTRAN",
-      "supplier": {
-        "name": "PyPI"
-      },
-      "name": "faster-whisper",
-      "version": "1.0.3",
-      "purl": "pkg:pypi/faster-whisper@1.0.3",
-      "description": "Reimplementazione in CTranslate2 di Whisper. Usata dal worker postprod per trascrivere l'audio della registrazione (WhisperX large-v3).",
-      "scope": "required",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/SYSTRAN/faster-whisper"
-        }
-      ],
-      "properties": [
-        {
-          "name": "eventi-dtd:layer",
-          "value": "postprod"
-        },
-        {
-          "name": "eventi-dtd:role",
-          "value": "ASR"
-        }
-      ]
-    },
-    {
-      "bom-ref": "pkg:pypi/whisperx@3.3.0",
-      "type": "library",
-      "publisher": "Max Bain",
-      "supplier": {
-        "name": "PyPI"
-      },
-      "name": "whisperx",
-      "version": "3.3.0",
-      "purl": "pkg:pypi/whisperx@3.3.0",
-      "description": "Wrapper di faster-whisper con allineamento word-level e diarization. Usata dal worker postprod per ottenere timestamp di parola e attribuzione speaker.",
-      "scope": "required",
-      "licenses": [
-        {
-          "license": {
-            "id": "BSD-4-Clause"
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/m-bain/whisperX"
-        }
-      ],
-      "properties": [
-        {
-          "name": "eventi-dtd:layer",
-          "value": "postprod"
-        },
-        {
-          "name": "eventi-dtd:role",
-          "value": "ASR alignment"
-        }
-      ]
-    },
-    {
-      "bom-ref": "pkg:pypi/pyannote-audio@3.3.0",
-      "type": "library",
-      "publisher": "pyannote",
-      "supplier": {
-        "name": "PyPI"
-      },
-      "name": "pyannote.audio",
-      "version": "3.3.0",
-      "purl": "pkg:pypi/pyannote-audio@3.3.0",
-      "description": "Speaker diarization (chi parla quando) sull'audio della registrazione. Usata dal worker postprod in cluster prod; il modello pyannote/speaker-diarization-3.1 è gated dietro HuggingFace TOS.",
-      "scope": "required",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/pyannote/pyannote-audio"
-        }
-      ],
-      "properties": [
-        {
-          "name": "eventi-dtd:layer",
-          "value": "postprod"
-        },
-        {
-          "name": "eventi-dtd:role",
-          "value": "Diarization"
-        }
-      ]
-    },
-    {
-      "bom-ref": "hf:mistralai/Mistral-Small-3.2-24B-Instruct-2506",
-      "type": "machine-learning-model",
-      "publisher": "Mistral AI",
-      "supplier": {
-        "name": "Mistral AI",
-        "url": [
-          "https://mistral.ai"
-        ]
-      },
-      "manufacturer": {
-        "name": "Mistral AI (Parigi, Francia)"
-      },
-      "name": "Mistral-Small-3.2-24B-Instruct-2506",
-      "version": "2506",
-      "purl": "pkg:huggingface/mistralai/Mistral-Small-3.2-24B-Instruct-2506@2506",
-      "description": "LLM 24B parametri fornitore europeo, usato in cluster (servito via vLLM) per la sintesi dell'evento, la segmentazione in capitoli, la traduzione di transcript e sintesi nelle lingue target.",
-      "scope": "required",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "documentation",
-          "url": "https://huggingface.co/mistralai/Mistral-Small-3.2-24B-Instruct-2506"
-        }
-      ],
-      "properties": [
-        {
-          "name": "eventi-dtd:layer",
-          "value": "postprod"
-        },
-        {
-          "name": "eventi-dtd:role",
-          "value": "LLM (summary/translation)"
-        },
-        {
-          "name": "eventi-dtd:vendor-country",
-          "value": "FR"
-        }
-      ]
-    },
-    {
-      "bom-ref": "pkg:pypi/piper-tts@1.2.0",
-      "type": "library",
-      "publisher": "rhasspy",
-      "supplier": {
-        "name": "PyPI"
-      },
-      "name": "piper-tts",
-      "version": "1.2.0",
-      "purl": "pkg:pypi/piper-tts@1.2.0",
-      "description": "Text-to-speech ONNX usato per produrre l'audio doppiato nelle lingue target. Voci sintetiche pre-addestrate pubbliche (no voice cloning); ogni parlante riceve una voce diversa del pool quando disponibile.",
-      "scope": "required",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/rhasspy/piper"
-        }
-      ],
-      "properties": [
-        {
-          "name": "eventi-dtd:layer",
-          "value": "postprod"
-        },
-        {
-          "name": "eventi-dtd:role",
-          "value": "TTS (dubbing)"
-        }
-      ]
-    },
-    {
-      "bom-ref": "pkg:pypi/speechbrain@1.0.2",
-      "type": "library",
-      "publisher": "SpeechBrain",
-      "supplier": {
-        "name": "PyPI"
-      },
-      "name": "speechbrain",
-      "version": "1.0.2",
-      "purl": "pkg:pypi/speechbrain@1.0.2",
-      "description": "Embedding speaker ECAPA-TDNN (modello pubblico, non gated) usato come alternativa a pyannote quando l'HF token non e disponibile (es. dry-run locali).",
-      "scope": "optional",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/speechbrain/speechbrain"
-        }
-      ],
-      "properties": [
-        {
-          "name": "eventi-dtd:layer",
-          "value": "postprod"
-        },
-        {
-          "name": "eventi-dtd:role",
-          "value": "Diarization fallback"
-        }
-      ]
     }
   ],
   "services": [
@@ -1335,21 +1109,59 @@
       ]
     },
     {
-      "bom-ref": "azure:aks-nodepool/aigpu",
-      "group": "Microsoft.ContainerService",
+      "bom-ref": "svc:multitrack-recorder",
       "provider": {
-        "name": "Microsoft Azure",
-        "url": [
-          "https://portal.azure.com"
-        ]
+        "name": "self-hosted (eventi-dtd, in-cluster)"
       },
-      "name": "AKS Node Pool 'aigpu' (Standard_NC24ads_A100_v4)",
-      "description": "Pool dedicato per la post-produzione AI. VM con GPU NVIDIA A100 80GB. Scale-to-zero: il pool si attiva solo quando arrivano job postprod in coda. Min 0, max 2 nodi. Taint workload=ai-gpu:NoSchedule per impedire allocazioni accidentali.",
-      "endpoints": [],
+      "name": "Multitrack Recorder (speaker attribution)",
+      "description": "Servizio in-cluster che cattura una traccia audio isolata per partecipante (RecordingTrack) e la fornisce al worker di trascrizione per attribuire il transcript al relatore corretto. Diverso dall'audio misto del recording standard: la traccia individuale e' un dato personale ad alta sensibilita' (vicino al biometrico vocale, art. 9 GDPR se usato per identificazione). Non clona ne' identifica la voce: produce solo testo attribuito. Vedi docs/adr/013-multitrack-speaker-attribution.md e docs/POSTPROD.md.",
+      "authenticated": true,
+      "x-trust-boundary": true,
       "data": [
         {
-          "flow": "inbound",
-          "classification": "Registrazione video (audio + video). I dati del cluster restano nel cluster: l'unico traffico verso questo pool e' la pipeline postprod interna."
+          "classification": "personal-data-sensitive",
+          "flow": "bi-directional",
+          "description": "Audio isolato per-partecipante (input intermedio) + displayName cifrato per l'attribuzione. Base giuridica: consenso esplicito (art. 6.1.a GDPR), distinto dal consenso alla registrazione video. NON e' biometria: nessun voiceprint o modello vocale e' calcolato o conservato."
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "documentation",
+          "url": "https://github.com/italia/eventi-dtd/blob/main/docs/adr/013-multitrack-speaker-attribution.md"
+        },
+        {
+          "type": "documentation",
+          "url": "https://github.com/italia/eventi-dtd/blob/main/docs/GDPR.md"
+        }
+      ],
+      "properties": [
+        {
+          "name": "eventi-dtd:gdpr-legal-basis",
+          "value": "art. 6.1.a (consenso esplicito), distinto da consentRecording"
+        },
+        {
+          "name": "eventi-dtd:data-minimization",
+          "value": "traccia = input intermedio; blob purgato dopo trascrizione (RecordingTrack.audioPurgedAt)"
+        },
+        {
+          "name": "eventi-dtd:retention-days",
+          "value": "ore (purga post-trascrizione), molto piu' breve del transcript"
+        },
+        {
+          "name": "eventi-dtd:access-pattern",
+          "value": "blob mai pubblico; solo worker via signed URL a breve scadenza; displayName cifrato AES-256-GCM"
+        },
+        {
+          "name": "eventi-dtd:not-biometric",
+          "value": "nessun voiceprint o modello vocale: solo speech-to-text attribuito"
+        },
+        {
+          "name": "eventi-dtd:layer",
+          "value": "app"
+        },
+        {
+          "name": "eventi-dtd:stack-label",
+          "value": "Multitrack Recorder (AI speaker attribution)"
         }
       ]
     }
@@ -1381,7 +1193,8 @@
         "svc:letsencrypt",
         "svc:redis-in-cluster",
         "svc:coturn",
-        "svc:kube-prometheus-stack"
+        "svc:kube-prometheus-stack",
+        "svc:multitrack-recorder"
       ]
     },
     {
@@ -1422,7 +1235,8 @@
         "svc:letsencrypt",
         "svc:redis-in-cluster",
         "svc:coturn",
-        "svc:kube-prometheus-stack"
+        "svc:kube-prometheus-stack",
+        "svc:multitrack-recorder"
       ],
       "description": "L'elenco dei servizi operativi è esaustivo alla data del documento per l'ambiente videocall-test. Eventuali sub-processors dei fornitori (es. sub-regioni Azure) non sono qui enumerati; riferirsi ai rispettivi DPA linkati in services[*].externalReferences."
     },
@@ -1537,13 +1351,6 @@
             "url": "https://catalogocloud.agid.gov.it/"
           }
         ]
-      },
-      {
-        "bom-ref": "claim:ai-pipeline-local",
-        "target": "pkg:oci/italia/eventi-dtd",
-        "predicate": "La pipeline di post-produzione AI (trascrizione, sintesi, traduzione, doppiaggio) e' eseguita interamente in cluster su GPU dedicate. Nessun dato del partecipante viene inviato a servizi di terze parti; le voci dei partecipanti non vengono clonate ne' archiviate come dati biometrici (art. 9 GDPR). Per ogni evento elaborato e' disponibile pubblicamente la fotografia dei modelli usati ('Trasparenza del processing AI'), in conformita all'art. 50 AI Act.",
-        "mitigationStrategies": [],
-        "reasoning": "L'AI Act obbliga alla trasparenza sui contenuti generati artificialmente. La scelta di non usare API esterne e di voci sintetiche generiche risponde a un obbligo di sovranita' del dato (PA italiana) e a una valutazione di rischio sul trattamento di dati biometrici."
       }
     ],
     "evidence": [

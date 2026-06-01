@@ -1,0 +1,7 @@
+node_modules
+dist
+.cache
+*.test.ts
+coverage
+README.md
+vitest.config.ts
