@@ -2752,7 +2752,9 @@
       },
       "runAt": "Processing completed on",
       "version": "Pipeline version"
-    }
+    },
+    "overlapBadge": "overlapping",
+    "overlapTitle": "Simultaneous speech: more than one person is speaking at the same time in this interval."
   },
   "diagram": {
     "title": "Event configuration",

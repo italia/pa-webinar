@@ -2752,7 +2752,9 @@
       },
       "runAt": "Elaborazione completata il",
       "version": "Versione pipeline"
-    }
+    },
+    "overlapBadge": "simultaneo",
+    "overlapTitle": "Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente."
   },
   "diagram": {
     "title": "Configurazione evento",
