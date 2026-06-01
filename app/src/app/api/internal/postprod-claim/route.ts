@@ -121,7 +121,13 @@ export const POST = withErrorHandling(async (request) => {
         AND (j.depends_on_id IS NULL OR dep.status = 'DONE')
       ORDER BY j.next_attempt_at ASC
       LIMIT 1
-      FOR UPDATE SKIP LOCKED
+      -- Lock ONLY j (the row we claim). Without OF j, Postgres tries to
+      -- lock both sides of the LEFT JOIN and rejects locking the
+      -- nullable dep side with SQLSTATE 0A000 (FOR UPDATE cannot be
+      -- applied to the nullable side of an outer join), which made every
+      -- cluster claim 500. We never update dep, so locking it was never
+      -- intended.
+      FOR UPDATE OF j SKIP LOCKED
     )
     UPDATE postprod_jobs o
     SET status = 'CLAIMED',
