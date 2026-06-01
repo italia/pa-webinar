@@ -85,6 +85,13 @@ spec:
               env:
                 - name: APP_INTERNAL_URL
                   value: {{ include "eventi-dtd.internalUrl" . | quote }}
+                # The container runs read-only / non-root, so /tmp isn't
+                # writable: Python's tempfile would raise "No usable
+                # temporary directory". Point TMPDIR at the writable
+                # scratch emptyDir mounted at /work (where the worker
+                # downloads the source MP4 and stages artifacts anyway).
+                - name: TMPDIR
+                  value: /work
                 - name: CRON_API_KEY
                   valueFrom:
                     secretKeyRef:
