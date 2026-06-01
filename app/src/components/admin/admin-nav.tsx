@@ -42,6 +42,11 @@ const REGISTRATIONS_SUB_NAV: NavItem[] = [
 // Recordings / instant calls / live sessions — everything video-output.
 const RECORDINGS_SUB_NAV: NavItem[] = [
   { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordingsList', exact: true },
+  // Gestione post-produzione AI delle registrazioni (trascrizione,
+  // traduzione, speaker, editor, re-run). Vive sotto "Registrazioni"
+  // perché opera SULLE registrazioni — non è configurazione (quella sta
+  // in Impostazioni → Pipeline AI).
+  { href: '/admin/postprod', icon: 'it-comment', labelKey: 'recordingsPostprod' },
 ];
 
 // Publications area: unified library editing.
@@ -93,7 +98,8 @@ export default function AdminNav() {
     || stripped.startsWith('/admin/moderatori')
     || stripped.startsWith('/admin/gdpr-audit');
   const inRecordings = stripped.startsWith('/admin/recordings')
-    || stripped.startsWith('/admin/registrazioni-video');
+    || stripped.startsWith('/admin/registrazioni-video')
+    || stripped.startsWith('/admin/postprod');
   const inPublications = stripped.startsWith('/admin/publications')
     || stripped.startsWith('/admin/pubblicazioni');
   const inQuestionnaires = stripped.startsWith('/admin/questionnaires');
@@ -107,6 +113,7 @@ export default function AdminNav() {
     '/admin/calendar': ['/admin/calendar', '/admin/calendario'],
     '/admin/registrations': ['/admin/registrations', '/admin/iscrizioni'],
     '/admin/recordings': ['/admin/recordings', '/admin/registrazioni-video'],
+    '/admin/postprod': ['/admin/postprod'],
     '/admin/publications': ['/admin/publications', '/admin/pubblicazioni'],
     '/admin/publications/new': ['/admin/publications/new', '/admin/pubblicazioni/nuova'],
     '/admin/moderators': ['/admin/moderators', '/admin/moderatori'],

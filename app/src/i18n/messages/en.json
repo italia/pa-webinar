@@ -597,7 +597,8 @@
       "eventMaterials": "Materials",
       "eventQuestionnaires": "Questionnaires",
       "rubricaList": "List",
-      "rubricaDetail": "Entry"
+      "rubricaDetail": "Entry",
+      "recordingsPostprod": "Transcripts / AI"
     },
     "landing": {
       "title": "Admin panel",
