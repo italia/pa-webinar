@@ -1,0 +1,25 @@
+{
+  "name": "@eventi-dtd/multitrack-recorder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multitrack per-participant audio recorder for Jitsi events (ADR-013, Fase 3). Headless-Chrome bot that records one audio track per participant for exact speaker attribution.",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "puppeteer": "^23.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
