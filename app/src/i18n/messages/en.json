@@ -1916,7 +1916,9 @@
       "manageSource": "Source language",
       "manageOpenPublic": "Public page",
       "manageRerunOk": "Pipeline re-run started.",
-      "manageOpen": "Manage"
+      "manageOpen": "Manage",
+      "cancelConfirmTitle": "Cancel post-production",
+      "speakerUpdateSuccess": "Speaker updated"
     },
     "questionnairesPage": {
       "title": "Questionnaires",
@@ -2877,7 +2879,10 @@
     "disabledHint": "Video recording is not enabled for this event. To enable it open the Settings section above and toggle \"Recording\" on.",
     "play": "Play",
     "download": "Download",
-    "transcriptManage": "Transcript / AI"
+    "transcriptManage": "Transcript / AI",
+    "deleteConfirmTitle": "Delete recording",
+    "deleteFailed": "Delete failed",
+    "deleteSuccess": "Recording deleted"
   },
   "postEvent": {
     "config": "Post-event configuration",

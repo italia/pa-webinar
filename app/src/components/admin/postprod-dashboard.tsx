@@ -18,6 +18,8 @@ import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 
 import { Link, useRouter } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import TranscriptEditor from './transcript-editor';
 
 const fetcher = (url: string): Promise<unknown> =>
@@ -120,6 +122,8 @@ function formatDuration(seconds: number | null): string {
 
 export default function PostprodDashboard() {
   const t = useTranslations('admin.postprod');
+  const toast = useToast();
+  const confirm = useConfirm();
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -162,20 +166,26 @@ export default function PostprodDashboard() {
       credentials: 'include',
     });
     if (!r.ok) {
-      alert(t('rerunFailed', { code: r.status }));
+      toast.error(t('rerunFailed', { code: r.status }));
       return;
     }
     await mutate();
   }
 
   async function cancel(recordingId: string): Promise<void> {
-    if (!confirm(t('cancelConfirm'))) return;
+    const ok = await confirm({
+      title: t('cancelConfirmTitle'),
+      message: t('cancelConfirm'),
+      confirmLabel: t('cancel'),
+      danger: true,
+    });
+    if (!ok) return;
     const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/cancel`, {
       method: 'POST',
       credentials: 'include',
     });
     if (!r.ok) {
-      alert(t('cancelFailed', { code: r.status }));
+      toast.error(t('cancelFailed', { code: r.status }));
       return;
     }
     await mutate();
@@ -193,9 +203,10 @@ export default function PostprodDashboard() {
       body: JSON.stringify({ displayName, personId }),
     });
     if (!r.ok) {
-      alert(t('speakerUpdateFailed', { code: r.status }));
+      toast.error(t('speakerUpdateFailed', { code: r.status }));
       return;
     }
+    toast.success(t('speakerUpdateSuccess'));
     await mutate();
   }
 

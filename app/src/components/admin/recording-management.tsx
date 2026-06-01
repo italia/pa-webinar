@@ -13,6 +13,8 @@ import {
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useRouter, Link } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import RecordingUploadWidget from './recording-upload-widget';
 
 interface RecordingManagementProps {
@@ -61,6 +63,8 @@ export default function RecordingManagement({
   jibriAvailable = true,
 }: RecordingManagementProps) {
   const t = useTranslations('recording');
+  const toast = useToast();
+  const confirm = useConfirm();
   const fmt = useFormatter();
   const router = useRouter();
 
@@ -120,13 +124,24 @@ export default function RecordingManagement({
   );
 
   const handleDelete = useCallback(async () => {
-    if (!window.confirm(t('deleteConfirm'))) return;
-    await fetch(`/api/events/${event.slug}/recording`, {
+    const ok = await confirm({
+      title: t('deleteConfirmTitle'),
+      message: t('deleteConfirm'),
+      confirmLabel: t('delete'),
+      danger: true,
+    });
+    if (!ok) return;
+    const r = await fetch(`/api/events/${event.slug}/recording`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${event.moderatorToken}` },
     });
+    if (!r.ok) {
+      toast.error(t('deleteFailed'));
+      return;
+    }
+    toast.success(t('deleteSuccess'));
     router.refresh();
-  }, [event.slug, event.moderatorToken, t, router]);
+  }, [event.slug, event.moderatorToken, t, router, confirm, toast]);
 
   if (!event.recordingEnabled && !hasRecording) {
     return (
