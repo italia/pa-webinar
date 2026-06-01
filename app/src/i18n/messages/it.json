@@ -667,7 +667,8 @@
       "eventMaterials": "Materiali",
       "eventQuestionnaires": "Questionari",
       "rubricaList": "Elenco",
-      "rubricaDetail": "Dettaglio"
+      "rubricaDetail": "Dettaglio",
+      "recordingsPostprod": "Trascrizioni / AI"
     },
     "landing": {
       "title": "Pannello di amministrazione",
