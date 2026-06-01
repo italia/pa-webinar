@@ -835,7 +835,8 @@
       "detailEnd": "Fine",
       "detailModerator": "Moderatore",
       "detailRoom": "Stanza Jitsi",
-      "detailFilename": "Nome file"
+      "detailFilename": "Nome file",
+      "transcriptManage": "Gestisci trascrizione / AI"
     },
     "gdprAudit": {
       "title": "Audit GDPR",
@@ -2861,7 +2862,8 @@
     "notConfigured": "Jibri non è configurato nell'infrastruttura. La registrazione video non è disponibile.",
     "disabledHint": "La registrazione video non è abilitata per questo evento. Per attivarla, apri la sezione Impostazioni più in alto e accendi il toggle \"Registrazione\".",
     "play": "Riproduci",
-    "download": "Scarica"
+    "download": "Scarica",
+    "transcriptManage": "Trascrizione / AI"
   },
   "postEvent": {
     "config": "Configurazione post-evento",

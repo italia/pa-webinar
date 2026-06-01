@@ -765,7 +765,8 @@
       "detailEnd": "End",
       "detailModerator": "Moderator",
       "detailRoom": "Jitsi room",
-      "detailFilename": "File name"
+      "detailFilename": "File name",
+      "transcriptManage": "Manage transcript / AI"
     },
     "gdprAudit": {
       "title": "GDPR audit",
@@ -2861,7 +2862,8 @@
     "notConfigured": "Jibri is not configured. Video recording is not available.",
     "disabledHint": "Video recording is not enabled for this event. To enable it open the Settings section above and toggle \"Recording\" on.",
     "play": "Play",
-    "download": "Download"
+    "download": "Download",
+    "transcriptManage": "Transcript / AI"
   },
   "postEvent": {
     "config": "Post-event configuration",

@@ -12,7 +12,8 @@
  * primary view is a table; clicking a row expands the details inline.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 
@@ -121,6 +122,15 @@ export default function PostprodDashboard() {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [expanded, setExpanded] = useState<string | null>(null);
 
+  // Deep-link da "Registrazioni" e dalla pagina evento:
+  //   /admin/postprod?recordingId=<id>  oppure  ?eventId=<id>
+  // Auto-espande e scrolla alla registrazione giusta una volta caricati
+  // i dati. Usiamo eventId come chiave robusta (presente ovunque).
+  const searchParams = useSearchParams();
+  const deepRecordingId = searchParams.get('recordingId');
+  const deepEventId = searchParams.get('eventId');
+  const deepLinkApplied = useRef(false);
+
   const qs = new URLSearchParams();
   if (statusFilter) qs.set('status', statusFilter);
   const { data, error, isLoading, mutate } = useSWR<ListResponse>(
@@ -128,6 +138,24 @@ export default function PostprodDashboard() {
     fetcher as (url: string) => Promise<ListResponse>,
     { refreshInterval: 10_000 },
   );
+
+  useEffect(() => {
+    if (deepLinkApplied.current || !data) return;
+    if (!deepRecordingId && !deepEventId) return;
+    const match = data.rows.find(
+      (r) => r.id === deepRecordingId || r.eventId === deepEventId,
+    );
+    if (match) {
+      deepLinkApplied.current = true;
+      setExpanded(match.id);
+      // Scrolla alla riga dopo il render dell'espansione.
+      setTimeout(() => {
+        document
+          .querySelector(`[data-recording="${match.id}"]`)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [data, deepRecordingId, deepEventId]);
 
   async function rerun(recordingId: string): Promise<void> {
     const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/rerun`, {
@@ -226,6 +254,7 @@ export default function PostprodDashboard() {
                 <>
                   <tr
                     key={row.id}
+                    data-recording={row.id}
                     onClick={() => setExpanded(isExpanded ? null : row.id)}
                     style={{ cursor: 'pointer' }}
                   >
