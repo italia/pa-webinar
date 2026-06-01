@@ -22,6 +22,13 @@ export interface EnqueueOptions {
   recordingId: string;
   /** ISO-639-1 (default 'it'). */
   sourceLanguage?: string;
+  /**
+   * ADR-013: quando true il job radice è TRANSCRIBE_MULTITRACK (una
+   * traccia per partecipante, attribuzione certa) invece di TRANSCRIBE
+   * (mix + diarization pyannote). Il resto della pipeline è identico:
+   * dipende dallo stesso TRANSCRIPT_JSON prodotto dal job radice.
+   */
+  multitrack?: boolean;
 }
 
 export interface EnqueueResult {
@@ -126,7 +133,7 @@ export async function enqueuePostprodForRecording(
   }
 
   type PendingJob = {
-    kind: 'TRANSCRIBE' | 'SUMMARIZE' | 'TRANSLATE' | 'DUB';
+    kind: 'TRANSCRIBE' | 'TRANSCRIBE_MULTITRACK' | 'SUMMARIZE' | 'TRANSLATE' | 'DUB';
     payload: Record<string, unknown>;
     dependsOnKey?: string; // forward reference resolved via map below
     key: string;
@@ -138,7 +145,7 @@ export async function enqueuePostprodForRecording(
   const pending: PendingJob[] = [];
 
   pending.push({
-    kind: 'TRANSCRIBE',
+    kind: opts.multitrack ? 'TRANSCRIBE_MULTITRACK' : 'TRANSCRIBE',
     payload: {
       runId: recording.id,
       sourceLanguage,
