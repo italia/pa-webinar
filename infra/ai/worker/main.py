@@ -25,6 +25,7 @@ from typing import Any, Dict, List, Optional
 
 from . import client as cli
 from . import llm as llmmod
+from . import multitrack as mtmod
 from . import transcribe as tr
 from . import tts as ttsmod
 from . import vtt as vttmod
@@ -181,6 +182,94 @@ def run_transcribe(app: cli.AppClient, job: cli.ClaimResponse) -> None:
                 )
             except Exception:  # noqa: BLE001 — waveform is non-critical
                 log.exception("waveform extraction failed; skipping")
+
+
+def run_transcribe_multitrack(app: cli.AppClient, job: cli.ClaimResponse) -> None:
+    """ADR-013: trascrizione multi-traccia (una traccia per partecipante).
+
+    Ogni traccia ha UN solo parlante noto → niente diarization. Trascriviamo
+    ogni traccia (single-speaker), poi fondiamo i segmenti su timeline globale
+    con attribuzione certa (multitrack.merge_tracks). Produce gli stessi
+    artifact di TRANSCRIBE (JSON/VTT/TXT), ma con nomi reali e overlap.
+    """
+    src_lang = job.payload.get("sourceLanguage") or "it"
+    track_inputs = [i for i in job.inputs if i.role == "track"]
+    if not track_inputs:
+        raise RuntimeError("TRANSCRIBE_MULTITRACK without track inputs")
+    stub = os.environ.get("WORKER_STUB") == "1"
+
+    with tempfile.TemporaryDirectory(prefix="postprod-mt-") as workdir:
+        track_results: List[Dict[str, Any]] = []
+        detected_lang = src_lang
+        total = len(track_inputs)
+        for idx, ti in enumerate(track_inputs):
+            audio_path = os.path.join(workdir, f"track-{idx}.audio")
+            cli.download_to_file(ti.downloadUrl, audio_path)
+            app.progress(
+                job.jobId, "RUNNING",
+                percent=10.0 + 70.0 * idx / max(1, total),
+                message=f"track {idx + 1}/{total}",
+            )
+            if stub:
+                tres = tr.transcribe_single_speaker_stub(language_hint=src_lang)
+            else:
+                tres = tr.transcribe_single_speaker(
+                    audio_path,
+                    language_hint=src_lang,
+                    asr_model_id=(job.providerHints.asrModelId or "large-v3"),
+                    initial_prompt=job.providerHints.asrInitialPrompt,
+                )
+            detected_lang = tres.get("language") or detected_lang
+            track_results.append(
+                {
+                    "participant_id": ti.participantId or f"track-{idx}",
+                    "display_name": ti.displayName,
+                    "start_offset_ms": ti.startOffsetMs or 0,
+                    "segments": tres.get("segments") or [],
+                }
+            )
+
+        merged = mtmod.merge_tracks(track_results, language=detected_lang)
+        app.progress(job.jobId, "RUNNING", percent=85.0, message="merged tracks")
+
+        # Nomi reali per la VTT + speakerMap (con displayName → il portale
+        # popola Speaker.displayName senza mapping manuale).
+        names = {
+            t["participant_id"]: t["display_name"]
+            for t in track_results
+            if t.get("display_name")
+        }
+        speaker_map = [
+            {
+                "diarLabel": s["diarLabel"],
+                "displayName": s.get("displayName"),
+                "totalSpeechSec": s["totalSpeechSec"],
+            }
+            for s in merged["speakers"]
+        ]
+        model_version = os.environ.get("WHISPERX_VERSION", "whisperx-3.1") + "+multitrack"
+
+        raw_bytes = json.dumps(merged, ensure_ascii=False).encode("utf-8")
+        _write_and_upload(
+            app, job.jobId, target=job.uploadTargets["transcriptJson"],
+            artifact_type="TRANSCRIPT_JSON", language=None, body_bytes=raw_bytes,
+            model_id="multitrack", model_version=model_version, speaker_map=speaker_map,
+        )
+        vtt_bytes = vttmod.segments_to_vtt(merged["segments"], speaker_names=names).encode("utf-8")
+        _write_and_upload(
+            app, job.jobId, target=job.uploadTargets["transcriptVtt"],
+            artifact_type="TRANSCRIPT_VTT", language=detected_lang, body_bytes=vtt_bytes,
+            model_id="multitrack", model_version=model_version,
+        )
+        txt_bytes = vttmod.segments_to_plain_text(merged["segments"]).encode("utf-8")
+        _write_and_upload(
+            app, job.jobId, target=job.uploadTargets["transcriptTxt"],
+            artifact_type="TRANSCRIPT_TXT", language=detected_lang, body_bytes=txt_bytes,
+            model_id="multitrack", model_version=model_version,
+        )
+        # Niente waveform qui: il multitrack non ha un MP4 misto unico
+        # (l'editor gestisce waveform assente). Se esiste il mix Jibri,
+        # la waveform è prodotta dal flusso TRANSCRIBE classico.
 
 
 def run_summarize(app: cli.AppClient, job: cli.ClaimResponse) -> None:
@@ -419,6 +508,8 @@ def run_one() -> int:
             app.progress(job.jobId, "RUNNING", percent=5.0, message="claimed")
             if job.kind == "TRANSCRIBE":
                 run_transcribe(app, job)
+            elif job.kind == "TRANSCRIBE_MULTITRACK":
+                run_transcribe_multitrack(app, job)
             elif job.kind == "SUMMARIZE":
                 run_summarize(app, job)
             elif job.kind == "TRANSLATE":
