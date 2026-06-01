@@ -216,6 +216,78 @@ def transcribe_with_whisperx(
     )
 
 
+def transcribe_single_speaker(
+    audio_path: str,
+    *,
+    language_hint: Optional[str] = None,
+    asr_model_id: str = "large-v3",
+    device: str = "cuda",
+    compute_type: str = "float16",
+    initial_prompt: Optional[str] = None,
+) -> Dict[str, Any]:
+    """ASR di UNA traccia mono-parlante (ADR-013, multitrack).
+
+    Identica a `transcribe_with_whisperx` ma SENZA diarization: la traccia
+    ha un solo parlante noto, quindi pyannote è superfluo. Ritorna
+    ``{"segments": [...], "language": str}`` con tempi LOCALI alla traccia
+    (il merge li shifta su timeline globale). Stesso filtro hallucination
+    + allineamento word-level del path principale.
+    """
+    import whisperx  # type: ignore[import-not-found]
+
+    asr = whisperx.load_model(asr_model_id, device, compute_type=compute_type)
+    audio = whisperx.load_audio(audio_path)
+    if initial_prompt:
+        try:
+            asr.options = asr.options._replace(initial_prompt=initial_prompt)  # type: ignore[attr-defined]
+        except Exception:
+            log.warning("could not set initial_prompt on ASR options")
+    result = asr.transcribe(audio, language=language_hint, batch_size=16)
+    language = result.get("language") or language_hint or "it"
+
+    kept = []
+    for seg in result.get("segments") or []:
+        avg_logprob = seg.get("avg_logprob")
+        no_speech_prob = seg.get("no_speech_prob")
+        if (
+            avg_logprob is not None and avg_logprob < HALLUCINATION_AVG_LOGPROB_THRESHOLD
+        ) or (
+            no_speech_prob is not None and no_speech_prob > HALLUCINATION_NO_SPEECH_THRESHOLD
+        ):
+            continue
+        kept.append(seg)
+    result["segments"] = kept
+
+    align_model, metadata = whisperx.load_align_model(language_code=language, device=device)
+    aligned = whisperx.align(
+        result["segments"], align_model, metadata, audio, device, return_char_alignments=False
+    )
+    segments = [
+        {
+            "start": float(s["start"]),
+            "end": float(s["end"]),
+            "text": (s.get("text") or "").strip(),
+            "words": s.get("words"),
+            "avg_logprob": s.get("avg_logprob"),
+            "no_speech_prob": s.get("no_speech_prob"),
+        }
+        for s in aligned["segments"]
+    ]
+    return {"segments": segments, "language": language}
+
+
+def transcribe_single_speaker_stub(*, language_hint: Optional[str] = None) -> Dict[str, Any]:
+    """Stub mono-parlante (WORKER_STUB=1): poche battute canned."""
+    lang = language_hint or "it"
+    return {
+        "segments": [
+            {"start": 0.0, "end": 2.0, "text": "Battuta di prova traccia."},
+            {"start": 3.0, "end": 5.0, "text": "Seconda battuta."},
+        ],
+        "language": lang,
+    }
+
+
 def build_initial_prompt(
     *,
     event_title: Optional[str],

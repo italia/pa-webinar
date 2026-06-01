@@ -251,6 +251,10 @@ export const artifactRegisterSchema = z.object({
       z.object({
         diarLabel: z.string().min(1).max(40),
         totalSpeechSec: z.number().int().min(0),
+        // ADR-013: per il multitrack l'identità è certa (dal JWT) → il
+        // worker la manda qui e il portale popola Speaker.displayName
+        // senza mapping manuale. Assente per la diarization pyannote.
+        displayName: z.string().max(200).nullable().optional(),
       }),
     )
     .optional(),
