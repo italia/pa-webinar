@@ -10,11 +10,11 @@ Dopo **6 fix** (sotto), il worker ha completato: claim → tempdir `/work` → d
 
 ## Esito sintetico
 
-- ✅ Feature **waveform/timeline** + **editor trascrizione**: codice completo, typecheck/lint/build/test verdi (667 test), `compute_waveform` provato su audio reale (141s→563 bucket, JSON 3.4KB).
-- ✅ **3 bug infra pre-esistenti** trovati e corretti+deployati (vedi sotto).
+- ✅ Feature **waveform/timeline** + **editor trascrizione**: codice completo, typecheck/lint/build/test verdi (667 test), `compute_waveform` provato su audio reale.
+- ✅ **6 bug infra pre-esistenti** trovati e corretti+deployati (vedi tabella).
 - ✅ App live su `videocall-test` (editor, timeline, route admin, migration `WAVEFORM_JSON`).
-- ❌ **Waveform NON prodotta end-to-end nel cluster**: il worker postprod crasha durante l'esecuzione (path worker→storage mai eseguito in-cluster; gira anche in `WORKER_STUB=1`). Diagnosi sotto.
-- ✅ **GPU sotto controllo**: 3 nodi A100, max singolo nodo **42m**, **nessuno > 1h** (vincolo rispettato). Totale ~87min A100 (con spreco da crash-loop, vedi note).
+- ✅ **Waveform prodotta end-to-end nel cluster** (run #8): `WAVEFORM_JSON` 13829 B, 2374 bucket su 593.57s, servito dall'editor admin (`waveform` non-null).
+- ✅ **GPU sotto controllo**: 7 nodi A100 nella sessione, max singolo nodo **~42m**, **nessuno > 1h** (vincolo rispettato). Spreco da crash-loop sui tentativi intermedi (vedi note).
 
 ## Bug pre-esistenti trovati & corretti
 
@@ -51,17 +51,23 @@ Inoltre: **risorse worker** ottimizzate (`9a32f87`): req 4/16→8/32, lim 12/48�
 - `postprod-artifact`: **0 chiamate** → worker crashato prima di registrare artifact.
 - `postprod-progress`: chiamato (worker oltre il download).
 
-## Diagnosi crash worker (residuo, fuori scope waveform)
+## Diagnosi crash worker — RISOLTA
 
-Il worker: claim **200** ✓ → `postprod-progress` ✓ → **crash ~40s** → `postprod-artifact` mai chiamato → `arts` invariato a 9.
-Gira in **`WORKER_STUB=1`** (trascrizione finta, no WhisperX) con `HF_TOKEN` vuoto, quindi il crash NON è nell'ASR ma nel **path upload/registrazione** (`cli.upload_bytes` = PUT presigned verso Azure blob) oppure nel download — codice mai eseguito in-cluster.
-**Per pinpointare serve lo stderr del pod worker** (catturato live durante un run controllato, prima che il nodo venga distrutto).
+Catturato lo stderr live (run diagnostico): il primo crash era `tempfile`
+su `/tmp` read-only (bug #4, `TMPDIR=/work`); poi PUT Azure 400 (bug #5,
+`x-ms-blob-type`); poi register 500 su NULL language (bug #6). Risolti
+tutti e tre → run #8 completa e produce `WAVEFORM_JSON`.
+
+Il worker gira in **`WORKER_STUB=1`** (trascrizione finta): il transcript
+è canned ma la **waveform è reale** (calcolata da `waveform.py` sull'MP4).
+Per una trascrizione reale servirà `WORKER_STUB=0` + models PVC + `HF_TOKEN`.
 
 ## Stato finale & raccomandazioni
 
-- **GPU**: 0 nodi aigpu, 0 worker pod, 0 job PENDING (tutte TRANSCRIBE FAILED/cancellate) → orchestrator non rilancia, costo GPU fermo.
-- **204 fix** (`2c6ab5b`) buildato ma **non ancora rollato** (l'app live è `9a32f87`). Roll-out opzionale.
-- **Prossimi passi (richiedono OK per GPU)**:
-  1. Run diagnostico controllato con `kubectl logs -f` sul pod worker per vedere lo stderr esatto del crash upload.
-  2. Valutare `WORKER_STUB=0` per una trascrizione reale (e popolare il models PVC + `HF_TOKEN`).
-  3. Aggiungere al watchdog il taglio del run dopo N fallimenti worker per evitare crash-loop.
+- **GPU**: 0 nodi aigpu, 0 worker pod (verificato post-run). Vincolo ≤1h/nodo sempre rispettato.
+- Tutti i 6 fix committati+deployati su `dev`→`videocall-test` (app + worker images + helm).
+- Recording resta in `POSTPROD_PARTIAL/FAILED` cosmetico (downstream cancellato di proposito per fermare la GPU dopo la waveform).
+- **Prossimi passi (opzionali, richiedono OK GPU)**:
+  1. `WORKER_STUB=0` + models PVC + `HF_TOKEN` per validare la trascrizione reale (oltre la waveform).
+  2. Aggiungere al watchdog/orchestrator il taglio del run dopo N fallimenti worker per evitare crash-loop.
+  3. Aprire PR `dev`→`main` con i 6 fix (sbloccano la pipeline postprod in-cluster, mai funzionante prima).
