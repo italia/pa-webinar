@@ -836,7 +836,9 @@
       "detailModerator": "Moderatore",
       "detailRoom": "Stanza Jitsi",
       "detailFilename": "Nome file",
-      "transcriptManage": "Gestisci trascrizione / AI"
+      "transcriptManage": "Gestisci trascrizione / AI",
+      "transcriptReady": "Trascritto",
+      "transcriptProcessing": "In elab."
     },
     "gdprAudit": {
       "title": "Audit GDPR",
