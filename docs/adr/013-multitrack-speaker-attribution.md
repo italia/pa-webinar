@@ -148,11 +148,13 @@ Lo stesso operator, lo stesso loop, gli stessi label/naming deterministici: camb
 - 1 replica + `leaderElection` non necessario a questa scala (Deployment con `Recreate`); la riconciliazione è idempotente quindi anche un doppio pod transitorio è sicuro.
 
 ### Stato implementazione
-- ✅ Recorder bot: core cattura WebRTC, upload signed-URL, ingest allineato a `multitrack-manifest`, immagine CI. Unit-test verdi.
-- ☐ `recorder-controller`: pacchetto + logica reconcile (diff desired/actual, **pura e unit-testabile**) → poi il glue K8s (`@kubernetes/client-node`) e l'HTTP server `/dispatch`.
-- ☐ Portale: `recorder-desired`, `recorder-claim` (+ creazione Recording al claim + JWT bot + presign per-traccia), hook best-effort in `jvb-desired-replicas`.
-- ☐ Helm: Deployment controller + RBAC + CronJob `recorder` sospeso (template) + sezione `recorder.*` in `values.yaml`.
-- ⚠️ La cattura WebRTC e l'intera catena vanno validate **in-cluster contro Jitsi reale**: non sono E2E-testabili in locale. Procedere a incrementi, con `recorder.enabled=false` di default.
+- ✅ Recorder bot: core cattura WebRTC; flusso **claim** (JWT bot + room da `recorder-claim`); upload **presign per-traccia** (`recorder-upload-url`); ingest `multitrack-manifest`; immagine CI. 37 unit-test.
+- ✅ `recorder-controller`: pacchetto, `reconcile` puro (15 test), astrazione **`RecorderRunner`** con **KubernetesRunner** (Job) + **DockerRunner** (container, per VM/compose), HTTP `/dispatch` + reconcile loop, immagine CI.
+- ✅ Portale: `recorder-desired` (crea Recording early, lifecycle unificato) + `recorder-claim` (JWT bot) + `recorder-upload-url` (presign per-traccia path-confinata); webhook Jibri reso idempotente (riusa il segnaposto multitraccia); edge-trigger best-effort in `jvb-desired-replicas`.
+- ✅ Helm: Deployment controller + RBAC namespaced + Service + CronJob `recorder` sospeso (template) + sezione `recorder.*` in `values.yaml` (default `enabled=false`). Helm lint/template verdi.
+- ✅ Compose: servizio `recorder-controller` opt-in (`--profile recorder`, `RUNNER=docker`, socket Docker) per il riuso su VM senza K8s.
+- ⚠️ La cattura WebRTC e l'intera catena vanno validate **in-cluster/VM contro Jitsi reale**: non sono E2E-testabili in locale. Default `recorder.enabled=false`.
+- ☐ Fase 5 GDPR: consenso esplicito multi-traccia prima della prod (gate oggi su `aiTranscriptEnabled`+`recordingEnabled`); TTL JWT bot per eventi > 90min (oggi TTL participant); retention breve tracce (già coperta da `multitrack-purge`).
 
 ## Conseguenze
 
