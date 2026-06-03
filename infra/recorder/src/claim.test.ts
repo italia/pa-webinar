@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { claimWorkOrder } from './claim';
+import { claimWorkOrder } from './claim.js';
 
 describe('claimWorkOrder', () => {
   it('POST a recorder-claim con x-api-key e ritorna il work-order', async () => {

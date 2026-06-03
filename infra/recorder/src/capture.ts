@@ -33,8 +33,8 @@ import { join } from 'node:path';
 
 import puppeteer, { type Browser, type Page } from 'puppeteer';
 
-import { localTrackFilename } from './paths';
-import type { TrackRecording } from './manifest';
+import { localTrackFilename } from './paths.js';
+import type { TrackRecording } from './manifest.js';
 
 export interface CaptureConfig {
   jitsiDomain: string;

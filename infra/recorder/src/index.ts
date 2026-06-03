@@ -16,17 +16,17 @@
 
 import { join } from 'node:path';
 
-import { captureRoom, type CaptureConfig } from './capture';
-import { buildManifest, type ManifestTrack } from './manifest';
-import { localTrackFilename } from './paths';
-import { claimWorkOrder } from './claim';
+import { captureRoom, type CaptureConfig } from './capture.js';
+import { buildManifest, type ManifestTrack } from './manifest.js';
+import { localTrackFilename } from './paths.js';
+import { claimWorkOrder } from './claim.js';
 import {
   PresignStorageProvider,
   uploadRecording,
   buildIngestBody,
   notifyPortal,
   type LocalTrackFile,
-} from './upload';
+} from './upload.js';
 
 interface RecorderEnv {
   jitsiDomain: string;

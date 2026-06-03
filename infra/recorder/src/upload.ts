@@ -17,12 +17,12 @@
 
 import { readFile } from 'node:fs/promises';
 
-import { manifestKey, trackKey } from './paths';
+import { manifestKey, trackKey } from './paths.js';
 import {
   serializeManifest,
   type Manifest,
   type ManifestTrack,
-} from './manifest';
+} from './manifest.js';
 
 // ── Storage provider abstraction ────────────────────────────────────────
 

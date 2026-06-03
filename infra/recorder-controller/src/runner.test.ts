@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 
-import { collectRecorderEnv } from './config';
-import { containerPhase } from './docker';
-import { recorderHandleName } from './labels';
+import { collectRecorderEnv } from './config.js';
+import { containerPhase } from './docker.js';
+import { recorderHandleName } from './labels.js';
 
 describe('collectRecorderEnv', () => {
   it('estrae solo le RECORDER_ENV_* spogliando il prefisso', () => {

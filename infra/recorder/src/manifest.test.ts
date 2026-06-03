@@ -4,8 +4,8 @@ import {
   buildManifest,
   serializeManifest,
   type TrackRecording,
-} from './manifest';
-import { trackKey } from './paths';
+} from './manifest.js';
+import { trackKey } from './paths.js';
 
 function rec(over: Partial<TrackRecording> & { participantId: string }): TrackRecording {
   return {
