@@ -277,8 +277,13 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
 
     const armIdle = () => {
       if (idleTimer) clearTimeout(idleTimer);
-      // Solo il bot in stanza → chiudi dopo idleTimeout.
-      const others = conference ? conference.getParticipantCount() - 1 : 0;
+      // Conta i partecipanti REMOTI VISIBILI: getParticipants() esclude il
+      // bot stesso e i partecipanti nascosti (focus/jicofo). Usare
+      // getParticipantCount()-1 contava il focus → others>0 → l'idle timer
+      // non scattava mai e il bot restava in stanza fino a maxDuration (4h),
+      // tenendo su il JVB. Vedi collaudo ADR-013.
+      const parts: any[] = conference?.getParticipants?.() ?? [];
+      const others = parts.filter((p) => !p.isHidden?.()).length;
       if (others <= 0) idleTimer = setTimeout(finish, cfg.idleTimeoutMs);
     };
 
