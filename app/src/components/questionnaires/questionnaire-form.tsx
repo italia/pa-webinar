@@ -156,7 +156,7 @@ export default function QuestionnaireForm({
   return (
     <div>
       {q.title[locale] || q.title.it ? (
-        <h5 className="fw-semibold mb-1" style={{ color: '#17324D' }}>
+        <h5 className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
           {localize(q.title, locale)}
         </h5>
       ) : null}

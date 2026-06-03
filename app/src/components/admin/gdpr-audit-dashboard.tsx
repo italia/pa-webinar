@@ -100,7 +100,7 @@ export default function GdprAuditDashboard() {
                   <Badge color={ACTION_COLORS[s.action] ?? 'secondary'} className="mb-2" style={{ fontSize: '0.72rem' }}>
                     {t(`actions.${s.action}` as 'actions.DATA_DELETED' | 'actions.CONSENT_RECORDED' | 'actions.DATA_EXPORTED')}
                   </Badge>
-                  <div className="fw-bold" style={{ fontSize: '1.4rem', color: '#17324D' }}>
+                  <div className="fw-bold" style={{ fontSize: '1.4rem', color: 'var(--app-text)' }}>
                     {s.count}
                   </div>
                   <div className="text-muted" style={{ fontSize: '0.72rem' }}>

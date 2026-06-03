@@ -115,9 +115,9 @@ interface EventDetailClientProps {
 }
 
 const STATUS_COLOR: Record<string, string> = {
-  PUBLISHED: '#0066CC',
+  PUBLISHED: 'var(--app-primary)',
   LIVE: '#008758',
-  ENDED: '#5A768A',
+  ENDED: 'var(--app-muted)',
 };
 
 /** Display name for ISO language codes, used in the subtitle / audio
@@ -328,7 +328,7 @@ export default function EventDetailClient({
           kickerEnabled={parseTitleKicker}
           as="h1"
           className="mb-3"
-          style={{ color: '#17324D', lineHeight: 1.3 }}
+          style={{ color: 'var(--app-text)', lineHeight: 1.3 }}
         />
 
         {tags.length > 0 && (
@@ -373,7 +373,7 @@ export default function EventDetailClient({
                 <Icon icon="it-calendar" className="text-primary" />
               </div>
               <div>
-                <div className="fw-semibold" style={{ color: '#17324D' }}>
+                <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                   {format.dateTime(startsAt, {
                     weekday: 'long',
                     day: 'numeric',
@@ -414,7 +414,7 @@ export default function EventDetailClient({
                   <Icon icon="it-user" className="text-primary" />
                 </div>
                 <div>
-                  <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                     {t('detail.speakers')}
                   </div>
                   <div className="text-muted" style={{ fontSize: '0.9rem' }}>
@@ -438,7 +438,7 @@ export default function EventDetailClient({
                   <Icon icon="it-pa" className="text-primary" />
                 </div>
                 <div>
-                  <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                     {t('detail.organizer')}
                   </div>
                   <div className="text-muted" style={{ fontSize: '0.9rem' }}>
@@ -525,7 +525,7 @@ export default function EventDetailClient({
                   className="d-flex align-items-start gap-2 mb-3"
                   style={{
                     fontSize: '0.82rem',
-                    color: '#5A768A',
+                    color: 'var(--app-muted)',
                     background: '#f7faff',
                     border: '1px solid #d6e3f1',
                     borderRadius: 8,
@@ -558,7 +558,7 @@ export default function EventDetailClient({
           )}
           {/* // TODO v0.5.0: Live catch-up player with HLS */}
 
-          <h2 className="h4 fw-semibold mb-3" style={{ color: '#17324D' }}>
+          <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('detail.description')}
           </h2>
           <MarkdownRenderer content={description} className="mb-4" />
@@ -601,12 +601,12 @@ export default function EventDetailClient({
                 <>
                   <h3
                     className="h6 text-uppercase fw-semibold mb-3"
-                    style={{ letterSpacing: '0.04em', color: '#5A768A', fontSize: '0.8rem' }}
+                    style={{ letterSpacing: '0.04em', color: 'var(--app-muted)', fontSize: '0.8rem' }}
                   >
                     {t('detail.participants')}
                   </h3>
 
-                  <div className="mb-2 fw-semibold" style={{ fontSize: '1.5rem', color: '#17324D' }}>
+                  <div className="mb-2 fw-semibold" style={{ fontSize: '1.5rem', color: 'var(--app-text)' }}>
                     {event.registrationCount}
                   </div>
                   <div className="text-muted small mb-4">
@@ -661,11 +661,11 @@ export default function EventDetailClient({
 function StatusPill({ status }: { status: string }) {
   const t = useTranslations('events.status');
   const colorMap: Record<string, { bg: string; fg: string }> = {
-    PUBLISHED: { bg: '#E8F0FE', fg: '#0066CC' },
+    PUBLISHED: { bg: '#E8F0FE', fg: 'var(--app-primary)' },
     LIVE: { bg: '#D4EDDA', fg: '#155724' },
-    ENDED: { bg: '#E9ECEF', fg: '#5A768A' },
+    ENDED: { bg: '#E9ECEF', fg: 'var(--app-muted)' },
     DRAFT: { bg: '#FFF3CD', fg: '#856404' },
-    ARCHIVED: { bg: '#E9ECEF', fg: '#5A768A' },
+    ARCHIVED: { bg: '#E9ECEF', fg: 'var(--app-muted)' },
   };
   const fallback = { bg: '#FFF3CD', fg: '#856404' };
   const c = colorMap[status] ?? fallback;
@@ -701,7 +701,7 @@ function PostEventSidebar({
     <>
       <h3
         className="h6 text-uppercase fw-semibold mb-3"
-        style={{ letterSpacing: '0.04em', color: '#5A768A', fontSize: '0.8rem' }}
+        style={{ letterSpacing: '0.04em', color: 'var(--app-muted)', fontSize: '0.8rem' }}
       >
         {t('detail.eventEnded')}
       </h3>
@@ -755,7 +755,7 @@ function PostEventSidebar({
             borderLeft: '3px solid #5c9ec8',
             background: '#E8F0FE',
             borderRadius: '0 4px 4px 0',
-            color: '#17324D',
+            color: 'var(--app-text)',
           }}
         >
           {tp('availableUntil', {

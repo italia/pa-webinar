@@ -140,7 +140,7 @@ function OverviewCards({ overview }: { overview: OverviewData }) {
       value: overview.totalEvents,
       label: t('totalEvents'),
       icon: 'it-calendar',
-      color: '#0066CC',
+      color: 'var(--app-primary)',
     },
     {
       value: overview.totalRegistrations,
@@ -186,7 +186,7 @@ function OverviewCards({ overview }: { overview: OverviewData }) {
               </div>
               <div
                 className="fw-bold"
-                style={{ fontSize: '1.8rem', color: '#17324D' }}
+                style={{ fontSize: '1.8rem', color: 'var(--app-text)' }}
               >
                 {card.value}
               </div>
@@ -221,7 +221,7 @@ function TimelineChart({ data }: { data: TimelineEntry[] }) {
         <span className="d-flex align-items-center gap-1" style={{ fontSize: '0.8rem' }}>
           <span
             className="d-inline-block rounded"
-            style={{ width: 12, height: 12, backgroundColor: '#0066CC' }}
+            style={{ width: 12, height: 12, backgroundColor: 'var(--app-primary)' }}
           />
           {t('metrics.totalRegistrations')}
         </span>
@@ -248,7 +248,7 @@ function TimelineChart({ data }: { data: TimelineEntry[] }) {
                 style={{
                   width: '45%',
                   height: `${Math.max((d.registrations / maxValue) * 100, 1)}%`,
-                  backgroundColor: '#0066CC',
+                  backgroundColor: 'var(--app-primary)',
                   borderRadius: '2px 2px 0 0',
                   minHeight: 2,
                 }}
@@ -311,7 +311,7 @@ function EventsTable({ events }: { events: EventAnalytics[] }) {
                 <Link
                   href={`/admin/events/${event.eventId}`}
                   className="text-decoration-none fw-semibold"
-                  style={{ color: '#0066CC' }}
+                  style={{ color: 'var(--app-primary)' }}
                 >
                   {event.title}
                 </Link>
@@ -397,7 +397,7 @@ function QuickStats({ overview }: { overview: OverviewData }) {
               <div className="text-center">
                 <div
                   className="fw-bold mb-1"
-                  style={{ fontSize: '1.4rem', color: '#17324D' }}
+                  style={{ fontSize: '1.4rem', color: 'var(--app-text)' }}
                 >
                   {stat.value}
                 </div>

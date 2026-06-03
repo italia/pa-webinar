@@ -145,7 +145,7 @@ export default function Step1Base({
 
   return (
     <div>
-      <h2 className="h4 fw-bold mb-3" style={{ color: '#17324D' }}>
+      <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('heading')}
       </h2>
       <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
@@ -230,7 +230,7 @@ export default function Step1Base({
 
       {/* Schedule */}
       <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('scheduleHeading')}
         </h3>
         <div className="row g-3">
@@ -377,7 +377,7 @@ export default function Step1Base({
 
       {/* Recurrence */}
       <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('recurrenceHeading')}
         </h3>
         <RecurrencePicker
@@ -391,7 +391,7 @@ export default function Step1Base({
       {/* Tags */}
       {availableTags.length > 0 && (
         <section className="mb-4">
-          <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+          <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
             {t('tagsHeading')}
           </h3>
           <div className="d-flex flex-wrap gap-2">

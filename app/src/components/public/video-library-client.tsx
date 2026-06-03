@@ -166,7 +166,7 @@ export default function VideoLibraryClient({ locale }: { locale: string }) {
                             </Badge>
                           )}
                         </div>
-                        <h6 className="fw-semibold mb-1" style={{ color: '#17324D', lineHeight: 1.3 }}>
+                        <h6 className="fw-semibold mb-1" style={{ color: 'var(--app-text)', lineHeight: 1.3 }}>
                           {r.title}
                         </h6>
                         {r.description && (

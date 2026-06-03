@@ -123,7 +123,7 @@ export default function LanguageSwitcher() {
                 locale={loc}
                 className="d-flex align-items-center gap-2 px-3 py-2 text-decoration-none"
                 style={{
-                  color: loc === currentLocale ? '#0066CC' : '#17324D',
+                  color: loc === currentLocale ? '#0066CC' : 'var(--app-text)',
                   backgroundColor: loc === currentLocale ? '#f0f7ff' : 'transparent',
                   fontSize: '0.85rem',
                 }}

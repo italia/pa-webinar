@@ -64,7 +64,7 @@ export default function ParticipantPanel({
   const roleBadge = (role: string) => {
     if (role === 'moderator') {
       return (
-        <Badge color="" pill style={{ fontSize: '0.68rem', backgroundColor: '#E8F0FE', color: '#0066CC' }}>
+        <Badge color="" pill style={{ fontSize: '0.68rem', backgroundColor: '#E8F0FE', color: 'var(--app-primary)' }}>
           {tr('moderator')}
         </Badge>
       );

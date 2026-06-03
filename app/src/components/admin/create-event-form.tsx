@@ -98,7 +98,7 @@ function CollapsibleSection({
           <Icon icon={icon} size="sm" color="primary" />
           <h5
             className="fw-semibold mb-0"
-            style={{ color: '#17324D' }}
+            style={{ color: 'var(--app-text)' }}
           >
             {title}
           </h5>
@@ -352,7 +352,7 @@ export default function CreateEventForm({
           style={{ backgroundColor: '#E6F0FF', border: '1px solid #B8D4F0' }}
         >
           <Icon icon="it-info-circle" size="sm" color="primary" />
-          <span style={{ color: '#17324D', fontSize: '0.9rem' }}>
+          <span style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}>
             {t('form.templateApplied', { name: template.name })}
           </span>
         </div>
@@ -597,7 +597,7 @@ export default function CreateEventForm({
         <div className="py-3">
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {t('form.qaEnabled')}
               </div>
               <div
@@ -618,7 +618,7 @@ export default function CreateEventForm({
         <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {t('form.chatEnabled')}
               </div>
               <div
@@ -639,7 +639,7 @@ export default function CreateEventForm({
         <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {t('form.recordingEnabled')}
               </div>
               <div
@@ -663,7 +663,7 @@ export default function CreateEventForm({
           <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
             <div className="d-flex justify-content-between align-items-start">
               <div className="me-3">
-                <div className="fw-semibold" style={{ color: '#17324D' }}>
+                <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                   {t('form.autoStartRecording')}
                 </div>
                 <div
@@ -687,7 +687,7 @@ export default function CreateEventForm({
         <div className="mt-3 mb-3">
           <Label
             className="fw-semibold mb-2 d-block"
-            style={{ color: '#17324D' }}
+            style={{ color: 'var(--app-text)' }}
           >
             {t('form.privacyPolicyMode')}
           </Label>
@@ -747,7 +747,7 @@ export default function CreateEventForm({
               {form.gdprTemplateId && (
                 <div
                   className="border rounded p-3 mt-2 bg-white"
-                  style={{ fontSize: '0.82rem', maxHeight: 180, overflowY: 'auto', whiteSpace: 'pre-wrap', color: '#17324D' }}
+                  style={{ fontSize: '0.82rem', maxHeight: 180, overflowY: 'auto', whiteSpace: 'pre-wrap', color: 'var(--app-text)' }}
                 >
                   {(() => {
                     const tpl = gdprTemplates.find((x) => x.id === form.gdprTemplateId);
@@ -822,7 +822,7 @@ export default function CreateEventForm({
         <div className="py-3">
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {t('form.participantsCanUnmute')}
               </div>
               <div
@@ -850,7 +850,7 @@ export default function CreateEventForm({
         <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {t('form.participantsCanStartVideo')}
               </div>
               <div
@@ -878,7 +878,7 @@ export default function CreateEventForm({
         <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {t('form.participantsCanShareScreen')}
               </div>
               <div
@@ -920,7 +920,7 @@ export default function CreateEventForm({
         <div className="py-3">
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {t('form.requireOrganization')}
               </div>
               <div
@@ -946,7 +946,7 @@ export default function CreateEventForm({
         <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {t('form.requireOrganizationRole')}
               </div>
               <div
@@ -972,7 +972,7 @@ export default function CreateEventForm({
         <div className="py-3" style={{ borderTop: '1px solid #e8e8e8' }}>
           <div className="d-flex justify-content-between align-items-start">
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {t('form.requireOrganizationType')}
               </div>
               <div

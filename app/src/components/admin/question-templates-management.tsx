@@ -270,7 +270,7 @@ export default function QuestionTemplatesManagement() {
       {editing ? (
         <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8 }}>
           <CardBody className="p-4">
-            <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
               {editingId === 'new' ? 'Nuovo template' : 'Modifica template'}
             </h5>
 
@@ -317,7 +317,7 @@ export default function QuestionTemplatesManagement() {
               <Card key={idx} className="mb-3 border" style={{ borderRadius: 6 }}>
                 <CardBody className="p-3">
                   <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
-                    <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: '#0066CC' }}>
+                    <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: 'var(--app-primary)' }}>
                       #{idx + 1}
                     </Badge>
                     <Button color="danger" outline size="xs" onClick={() => removeItem(idx)}>
@@ -484,7 +484,7 @@ export default function QuestionTemplatesManagement() {
                 <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
                   <div style={{ minWidth: 0 }}>
                     <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
-                      <h6 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+                      <h6 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
                         {row.name}
                       </h6>
                       {row.isSystem && (

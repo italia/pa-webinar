@@ -244,7 +244,7 @@ function Row({
         <code
           style={{
             minWidth: 50,
-            color: '#5A768A',
+            color: 'var(--app-muted)',
             fontVariantNumeric: 'tabular-nums',
             fontSize: active ? '0.78rem' : '0.72rem',
             paddingTop: active ? 4 : 2,
@@ -284,7 +284,7 @@ function Row({
           </div>
           <div
             style={{
-              color: active ? '#26354A' : '#5A768A',
+              color: active ? '#26354A' : 'var(--app-muted)',
               fontSize: active ? '1rem' : '0.85rem',
               lineHeight: 1.45,
             }}

@@ -22,17 +22,17 @@ export default function GlobalError({
             textAlign: 'center',
           }}
         >
-          <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#17324D' }}>
+          <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--app-text)' }}>
             Si è verificato un errore
           </h1>
-          <p style={{ color: '#5A768A', marginBottom: '1.5rem', maxWidth: '480px' }}>
+          <p style={{ color: 'var(--app-muted)', marginBottom: '1.5rem', maxWidth: '480px' }}>
             {error.message || 'Qualcosa è andato storto. Per favore riprova.'}
           </p>
           <button
             onClick={reset}
             style={{
               padding: '0.75rem 2rem',
-              backgroundColor: '#0066CC',
+              backgroundColor: 'var(--app-primary)',
               color: '#fff',
               border: 'none',
               borderRadius: '4px',

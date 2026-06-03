@@ -54,13 +54,13 @@ interface AdminDashboardClientProps {
 }
 
 const STATUS_BORDER: Record<string, string> = {
-  DRAFT: '#5A768A',
-  PUBLISHED: '#0066CC',
+  DRAFT: 'var(--app-muted)',
+  PUBLISHED: 'var(--app-primary)',
   PROVISIONING: '#A66300',
   LIVE: '#008758',
   IDLE: '#A66300',
   ENDED: '#A66300',
-  ARCHIVED: '#5A768A',
+  ARCHIVED: 'var(--app-muted)',
 };
 
 const STATUSES = [
@@ -270,7 +270,7 @@ export default function AdminDashboardClient({
             <label
               htmlFor="events-search"
               className="form-label small fw-semibold mb-1"
-              style={{ color: '#17324D' }}
+              style={{ color: 'var(--app-text)' }}
             >
               {tList('search')}
             </label>
@@ -296,7 +296,7 @@ export default function AdminDashboardClient({
             <label
               htmlFor="events-status"
               className="form-label small fw-semibold mb-1"
-              style={{ color: '#17324D' }}
+              style={{ color: 'var(--app-text)' }}
             >
               {tList('status')}
             </label>
@@ -318,7 +318,7 @@ export default function AdminDashboardClient({
             <label
               htmlFor="events-sort"
               className="form-label small fw-semibold mb-1"
-              style={{ color: '#17324D' }}
+              style={{ color: 'var(--app-text)' }}
             >
               {tList('sort')}
             </label>
@@ -340,7 +340,7 @@ export default function AdminDashboardClient({
           <div className="mt-3">
             <div
               className="small fw-semibold mb-2"
-              style={{ color: '#17324D' }}
+              style={{ color: 'var(--app-text)' }}
             >
               {tList('tags')}
             </div>
@@ -583,7 +583,7 @@ export default function AdminDashboardClient({
                         style={{
                           cursor: 'pointer',
                           backgroundColor: 'rgba(255,255,255,0.9)',
-                          borderColor: '#17324D',
+                          borderColor: 'var(--app-text)',
                         }}
                       />
                     </div>
@@ -596,7 +596,7 @@ export default function AdminDashboardClient({
                       kickerEnabled={kickerEnabled}
                       as="h5"
                       className="fw-semibold mb-2"
-                      style={{ color: '#17324D', lineHeight: 1.35 }}
+                      style={{ color: 'var(--app-text)', lineHeight: 1.35 }}
                       wrapMain={(main) => (
                         <Link
                           href={manageUrl}
@@ -640,7 +640,7 @@ export default function AdminDashboardClient({
                             className="badge"
                             style={{
                               backgroundColor: '#F5F7FB',
-                              color: '#5A768A',
+                              color: 'var(--app-muted)',
                               fontSize: '0.72rem',
                               padding: '3px 8px',
                               borderRadius: 12,
@@ -728,7 +728,7 @@ export default function AdminDashboardClient({
                         <Link
                           href={manageUrl}
                           className="text-decoration-none fw-semibold d-inline-flex align-items-center gap-1"
-                          style={{ color: '#0066CC', fontSize: '0.9rem' }}
+                          style={{ color: 'var(--app-primary)', fontSize: '0.9rem' }}
                         >
                           {t('manage')}
                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>

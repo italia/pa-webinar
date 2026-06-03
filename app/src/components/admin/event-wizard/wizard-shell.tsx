@@ -792,7 +792,7 @@ function StepNav({
           const isActive = i === activeIdx;
           const isDone = i < activeIdx;
           const bg = isActive ? '#0066CC' : isDone ? '#5C9EFF' : '#DEE5EC';
-          const color = isActive || isDone ? '#fff' : '#17324D';
+          const color = isActive || isDone ? '#fff' : 'var(--app-text)';
           return (
             <li key={s.key} className="flex-grow-1">
               <button
@@ -821,7 +821,7 @@ function StepNav({
                 <span
                   className={isActive ? 'fw-bold' : ''}
                   style={{
-                    color: isActive ? '#0066CC' : '#17324D',
+                    color: isActive ? '#0066CC' : 'var(--app-text)',
                     fontSize: '0.9rem',
                     textAlign: 'left',
                   }}

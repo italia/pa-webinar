@@ -185,7 +185,7 @@ export default function LanguageManagement({
       {/* Default locale selector */}
       <Card className="border-0 shadow-sm mb-4">
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('defaultLocaleTitle')}
           </h5>
           <p className="text-muted mb-3" style={{ fontSize: '0.85rem' }}>
@@ -212,7 +212,7 @@ export default function LanguageManagement({
       <Card className="border-0 shadow-sm mb-4">
         <CardBody className="p-4">
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h5 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+            <h5 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
               {t('enabledLocales')}
             </h5>
             <Badge color="primary" style={{ fontSize: '0.85rem' }}>
@@ -297,7 +297,7 @@ export default function LanguageManagement({
       {/* Translation overrides */}
       <Card className="border-0 shadow-sm mb-4">
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('translationOverridesTitle')}
           </h5>
           <p className="text-muted mb-3" style={{ fontSize: '0.85rem' }}>

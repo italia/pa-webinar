@@ -64,7 +64,7 @@ const STATUS_THEME: Record<
   { badgeColor: 'success' | 'primary' | 'warning'; accent: string; bg: string }
 > = {
   idle: { badgeColor: 'success', accent: '#008758', bg: '#e8f5e9' },
-  running: { badgeColor: 'primary', accent: '#0066CC', bg: '#e3f2fd' },
+  running: { badgeColor: 'primary', accent: 'var(--app-primary)', bg: '#e3f2fd' },
   degraded: { badgeColor: 'warning', accent: '#A66300', bg: '#fff3e0' },
 };
 
@@ -175,7 +175,7 @@ export default function PostprodStatusCard() {
           className="mb-3 p-2 rounded"
           style={{
             fontSize: '0.76rem',
-            color: '#5A768A',
+            color: 'var(--app-muted)',
             background: '#f5f7f9',
             borderLeft: '3px solid #0066CC',
           }}
@@ -199,7 +199,7 @@ export default function PostprodStatusCard() {
                   className="progress-bar"
                   style={{
                     width: `${seg(pending)}%`,
-                    backgroundColor: '#5A768A',
+                    backgroundColor: 'var(--app-muted)',
                   }}
                   title={`${t('queuePending')}: ${pending}`}
                 />
@@ -209,7 +209,7 @@ export default function PostprodStatusCard() {
                   className="progress-bar progress-bar-striped progress-bar-animated"
                   style={{
                     width: `${seg(claimed + running)}%`,
-                    backgroundColor: '#0066CC',
+                    backgroundColor: 'var(--app-primary)',
                   }}
                   title={`${t('queueRunning')}: ${claimed + running}`}
                 />
@@ -298,7 +298,7 @@ export default function PostprodStatusCard() {
         {/* Last success/failure + artifact totals — il "footer" della
             card. Stile più compatto, info di contesto operativo. */}
         <hr style={{ margin: '1rem 0', borderColor: '#eceff1' }} />
-        <div style={{ fontSize: '0.78rem', color: '#5A768A' }}>
+        <div style={{ fontSize: '0.78rem', color: 'var(--app-muted)' }}>
           {data.lastSuccessAt && (
             <div className="mb-1">
               <Icon icon="it-check" size="xs" className="me-1" color="success" />

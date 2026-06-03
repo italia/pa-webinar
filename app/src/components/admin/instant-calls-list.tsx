@@ -501,7 +501,7 @@ export default function InstantCallsList({
                         <div className="flex-grow-1">
                           <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
                             <Icon icon="it-video" size="sm" className="text-primary" />
-                            <span className="fw-semibold" style={{ color: '#17324D' }}>
+                            <span className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                               {call.title}
                             </span>
                             <StatusBadge

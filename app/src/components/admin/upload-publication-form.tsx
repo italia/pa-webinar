@@ -186,7 +186,7 @@ export default function UploadPublicationForm() {
 
       <Card className="border-0 shadow-sm mb-4">
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('step1Title')}
           </h5>
           <div className="d-flex gap-2 align-items-center flex-wrap">
@@ -227,7 +227,7 @@ export default function UploadPublicationForm() {
 
       <Card className="border-0 shadow-sm mb-4" style={{ opacity: uploaded ? 1 : 0.5 }}>
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('step2Title')}
           </h5>
 

@@ -237,7 +237,7 @@ function WordLevelText({
             key={`${w.start}-${i}`}
             className="postprod-segment__word"
             style={{
-              color: passed ? color : current ? '#0c1a2b' : '#5A768A',
+              color: passed ? color : current ? '#0c1a2b' : 'var(--app-muted)',
               fontWeight: current ? 600 : 400,
               background: current ? color + '22' : undefined,
               borderRadius: current ? 3 : 0,
@@ -798,7 +798,7 @@ export default function TranscriptPanel({
                     <code
                       style={{
                         minWidth: 56,
-                        color: '#5A768A',
+                        color: 'var(--app-muted)',
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     >

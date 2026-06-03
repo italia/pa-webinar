@@ -117,7 +117,7 @@ export default function CallSessionsPanel({
     return (
       <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: 8 }}>
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-2" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
             <Icon icon="it-video" className="me-2" />
             {t('title')}
           </h5>
@@ -132,7 +132,7 @@ export default function CallSessionsPanel({
   return (
     <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: 8 }}>
       <CardBody className="p-4">
-        <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+        <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
           <Icon icon="it-video" className="me-2" />
           {t('title')} ({sessions.length})
         </h5>
