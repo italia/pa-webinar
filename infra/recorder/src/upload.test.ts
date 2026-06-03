@@ -1,29 +1,18 @@
 import { describe, it, expect } from 'vitest';
-import { createHmac } from 'node:crypto';
 
 import {
-  signWebhookBody,
-  buildWebhookPayload,
+  buildIngestBody,
+  notifyPortal,
   NoopStorageProvider,
   SignedUrlStorageProvider,
   createStorageProvider,
   composeObjectUrl,
 } from './upload';
 import { buildManifest } from './manifest';
-import { manifestKey } from './paths';
+import { trackKey } from './paths';
 
-describe('signWebhookBody', () => {
-  it('produce sha256=<hex> coerente con HMAC-SHA256 (come jibri-finalize.sh)', () => {
-    const body = '{"a":1}';
-    const secret = 'topsecret';
-    const expected =
-      'sha256=' + createHmac('sha256', secret).update(body).digest('hex');
-    expect(signWebhookBody(body, secret)).toBe(expected);
-  });
-});
-
-describe('buildWebhookPayload', () => {
-  it('riassume il manifest con type=multitrack e manifestKey', () => {
+describe('buildIngestBody', () => {
+  it('mappa il manifest sul contratto multitrack-manifest (blobKey=trackKey)', () => {
     const m = buildManifest({
       eventId: 'evt1',
       recordingId: 'rec1',
@@ -38,16 +27,70 @@ describe('buildWebhookPayload', () => {
         },
       ],
     });
-    const payload = buildWebhookPayload(m);
-    expect(payload).toEqual({
-      type: 'multitrack',
-      roomName: 'room-1',
+    const body = buildIngestBody(m, { p1: 4242 });
+    expect(body).toEqual({
       eventId: 'evt1',
       recordingId: 'rec1',
-      manifestKey: manifestKey('evt1', 'rec1'),
-      trackCount: 1,
-      recordingStartedAtMs: 0,
+      tracks: [
+        {
+          participantId: 'p1',
+          displayName: 'Ada',
+          blobKey: trackKey('evt1', 'rec1', 'p1'),
+          mimeType: 'audio/ogg; codecs=opus',
+          sizeBytes: 4242,
+          startOffsetMs: 0,
+          durationMs: 1000,
+        },
+      ],
     });
+    // blobKey deve stare sotto il prefisso che il portale impone.
+    expect(body.tracks[0]!.blobKey.startsWith('recordings/multitrack/evt1/rec1/')).toBe(
+      true,
+    );
+  });
+
+  it('omette sizeBytes se non noto', () => {
+    const m = buildManifest({
+      eventId: 'e',
+      recordingId: 'r',
+      roomName: 'room',
+      recordings: [
+        { participantId: 'p', displayName: null, firstFrameAtMs: 0, lastFrameAtMs: 5, bytesWritten: 1 },
+      ],
+    });
+    expect(buildIngestBody(m).tracks[0]).not.toHaveProperty('sizeBytes');
+  });
+});
+
+describe('notifyPortal', () => {
+  it('POST a ingestUrl con header x-api-key e body JSON', async () => {
+    const calls: Array<{ url: string; init: RequestInit | undefined }> = [];
+    const fakeFetch = (async (url: string | URL | Request, init?: RequestInit) => {
+      calls.push({ url: String(url), init });
+      return new Response(null, { status: 200 });
+    }) as unknown as typeof fetch;
+
+    await notifyPortal(
+      { eventId: 'e', recordingId: 'r', tracks: [] },
+      { ingestUrl: 'https://app/api/internal/multitrack-manifest', cronApiKey: 'k', fetchImpl: fakeFetch },
+    );
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.url).toBe('https://app/api/internal/multitrack-manifest');
+    const headers = calls[0]!.init?.headers as Record<string, string>;
+    expect(headers['x-api-key']).toBe('k');
+    expect(calls[0]!.init?.method).toBe('POST');
+  });
+
+  it('lancia se la risposta non è ok', async () => {
+    const fakeFetch = (async () =>
+      new Response(null, { status: 401, statusText: 'Unauthorized' })) as unknown as typeof fetch;
+    await expect(
+      notifyPortal(
+        { eventId: 'e', recordingId: 'r', tracks: [] },
+        { ingestUrl: 'https://app/x', cronApiKey: 'k', fetchImpl: fakeFetch },
+      ),
+    ).rejects.toThrow(/401/);
   });
 });
 

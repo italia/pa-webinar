@@ -15,7 +15,6 @@
  * così il portale può autenticare allo stesso modo.
  */
 
-import { createHmac } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
 import { manifestKey, trackKey } from './paths';
@@ -186,9 +185,10 @@ export async function uploadRecording(
     manifest: Manifest;
     files: LocalTrackFile[];
   },
-): Promise<{ uploaded: number }> {
+): Promise<{ uploaded: number; trackSizes: Record<string, number> }> {
   const { manifest, files } = params;
   let uploaded = 0;
+  const trackSizes: Record<string, number> = {};
 
   for (const f of files) {
     const expectedKey = trackKey(
@@ -207,6 +207,7 @@ export async function uploadRecording(
       body,
       contentType: OPUS_CONTENT_TYPE,
     });
+    trackSizes[f.track.participantId] = body.length;
     uploaded += 1;
   }
 
@@ -216,90 +217,90 @@ export async function uploadRecording(
     contentType: MANIFEST_CONTENT_TYPE,
   });
 
-  return { uploaded };
+  return { uploaded, trackSizes };
 }
 
-// ── Webhook al portale ───────────────────────────────────────────────────
+// ── Ingest al portale ────────────────────────────────────────────────────
+//
+// A fine evento il recorder chiama `POST /api/internal/multitrack-manifest`
+// (ADR-013 Fase 2, già implementato nel portale). Il contratto è: array di
+// tracce con `blobKey` sotto il prefisso `recordings/multitrack/{eventId}/
+// {recordingId}/`, autenticato con CRON_API_KEY (header `x-api-key`, come
+// gli altri endpoint /internal). Il portale cifra i displayName (il recorder
+// non ha le chiavi PII), crea le RecordingTrack e accoda TRANSCRIBE_MULTITRACK.
 
-/**
- * Payload del webhook multitraccia. È un superset del payload Jibri
- * (`roomName`) così il portale può riconoscere l'evento, più i campi
- * specifici della registrazione multitraccia. Il portale dovrà aggiungere
- * un endpoint/branch dedicato (vedi TODO ingest nell'ADR): qui ci limitiamo
- * a produrre un payload coerente e firmato.
- */
-export interface MultitrackWebhookPayload {
-  type: 'multitrack';
-  roomName: string;
+/** Una traccia nel body d'ingest, allineata a `multitrack-manifest` (zod). */
+export interface IngestTrack {
+  participantId: string;
+  displayName: string | null;
+  /** = `track.trackKey`; il portale verifica il prefisso. */
+  blobKey: string;
+  mimeType: string;
+  sizeBytes?: number;
+  startOffsetMs: number;
+  durationMs?: number;
+}
+
+export interface IngestBody {
   eventId: string;
   recordingId: string;
-  /** Key del manifest nello storage (l'ingest lo scarica da lì). */
-  manifestKey: string;
-  trackCount: number;
-  recordingStartedAtMs: number;
+  tracks: IngestTrack[];
 }
 
-export function buildWebhookPayload(manifest: Manifest): MultitrackWebhookPayload {
+/**
+ * Costruisce il body d'ingest dal manifest. Logica pura → testabile.
+ * `trackSizes` (da `uploadRecording`) popola `sizeBytes` per participantId.
+ */
+export function buildIngestBody(
+  manifest: Manifest,
+  trackSizes: Record<string, number> = {},
+): IngestBody {
   return {
-    type: 'multitrack',
-    roomName: manifest.roomName,
     eventId: manifest.eventId,
     recordingId: manifest.recordingId,
-    manifestKey: manifestKey(manifest.eventId, manifest.recordingId),
-    trackCount: manifest.tracks.length,
-    recordingStartedAtMs: manifest.recordingStartedAtMs,
+    tracks: manifest.tracks.map((t) => ({
+      participantId: t.participantId,
+      displayName: t.displayName,
+      blobKey: t.trackKey,
+      mimeType: OPUS_CONTENT_TYPE,
+      ...(trackSizes[t.participantId] != null
+        ? { sizeBytes: trackSizes[t.participantId] }
+        : {}),
+      startOffsetMs: t.startOffsetMs,
+      durationMs: t.durationMs,
+    })),
   };
 }
 
-/**
- * Calcola la firma HMAC-SHA256 del body, nello stesso formato atteso dal
- * portale (`sha256=<hex>`, header `X-Webhook-Signature`). Logica pura,
- * testabile. Replica `jibri-finalize.sh` e `verifyWebhookSignature`.
- */
-export function signWebhookBody(body: string, secret: string): string {
-  const hex = createHmac('sha256', secret).update(body).digest('hex');
-  return `sha256=${hex}`;
-}
-
-export interface NotifyWebhookOptions {
-  webhookUrl: string;
-  /** CRON_API_KEY: bearer-token, come in jibri-finalize.sh. */
-  cronApiKey?: string;
-  /** RECORDING_WEBHOOK_SECRET: se presente, firma il body HMAC. */
-  webhookSecret?: string;
+export interface NotifyIngestOptions {
+  /** URL completo di `/api/internal/multitrack-manifest`. */
+  ingestUrl: string;
+  /** CRON_API_KEY: inviato come header `x-api-key` (come gli /internal). */
+  cronApiKey: string;
   /** Iniettabile per i test (default: global fetch). */
   fetchImpl?: typeof fetch;
 }
 
 /**
- * POST del webhook al portale. Side-effect (rete): non unit-testato
- * contro un server reale, ma `signWebhookBody` / `buildWebhookPayload`
- * sono puri e testabili e `fetchImpl` è iniettabile.
+ * POST del manifest d'ingest al portale. Side-effect (rete);
+ * `buildIngestBody` è puro e testato, `fetchImpl` è iniettabile.
  */
 export async function notifyPortal(
-  payload: MultitrackWebhookPayload,
-  opts: NotifyWebhookOptions,
+  body: IngestBody,
+  opts: NotifyIngestOptions,
 ): Promise<void> {
-  const body = JSON.stringify(payload);
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (opts.cronApiKey) {
-    headers['Authorization'] = `Bearer ${opts.cronApiKey}`;
-  }
-  if (opts.webhookSecret) {
-    headers['X-Webhook-Signature'] = signWebhookBody(body, opts.webhookSecret);
-  }
-
   const doFetch = opts.fetchImpl ?? fetch;
-  const res = await doFetch(opts.webhookUrl, {
+  const res = await doFetch(opts.ingestUrl, {
     method: 'POST',
-    headers,
-    body,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': opts.cronApiKey,
+    },
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     throw new Error(
-      `webhook al portale fallito: ${res.status} ${res.statusText}`,
+      `ingest multitrack al portale fallito: ${res.status} ${res.statusText}`,
     );
   }
 }

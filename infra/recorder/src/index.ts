@@ -22,7 +22,7 @@ import { localTrackFilename } from './paths';
 import {
   createStorageProvider,
   uploadRecording,
-  buildWebhookPayload,
+  buildIngestBody,
   notifyPortal,
   type LocalTrackFile,
 } from './upload';
@@ -34,9 +34,8 @@ interface RecorderEnv {
   recordingId: string;
   eventId: string;
   outputDir: string;
-  webhookUrl?: string;
+  ingestUrl?: string;
   cronApiKey?: string;
-  webhookSecret?: string;
   botDisplayName?: string;
 }
 
@@ -56,9 +55,8 @@ function readEnv(): RecorderEnv {
     recordingId: requireEnv('RECORDING_ID'),
     eventId: requireEnv('EVENT_ID'),
     outputDir: process.env.OUTPUT_DIR ?? '/recordings',
-    webhookUrl: process.env.WEBHOOK_URL,
+    ingestUrl: process.env.INGEST_URL,
     cronApiKey: process.env.CRON_API_KEY,
-    webhookSecret: process.env.RECORDING_WEBHOOK_SECRET,
     botDisplayName: process.env.BOT_DISPLAY_NAME ?? '📼 Recorder',
   };
 }
@@ -102,19 +100,20 @@ export async function main(): Promise<void> {
   // ── 4. Upload tracce + manifest ──
   const provider = createStorageProvider(process.env);
   const files = manifest.tracks.map((t) => toLocalFile(t, env.outputDir));
-  const { uploaded } = await uploadRecording(provider, { manifest, files });
+  const { uploaded, trackSizes } = await uploadRecording(provider, { manifest, files });
   console.log(`[recorder] upload completato (${uploaded} tracce, provider=${provider.name})`);
 
-  // ── 5. Webhook al portale ──
-  if (env.webhookUrl) {
-    await notifyPortal(buildWebhookPayload(manifest), {
-      webhookUrl: env.webhookUrl,
+  // ── 5. Ingest al portale (POST /api/internal/multitrack-manifest) ──
+  if (env.ingestUrl && env.cronApiKey) {
+    await notifyPortal(buildIngestBody(manifest, trackSizes), {
+      ingestUrl: env.ingestUrl,
       cronApiKey: env.cronApiKey,
-      webhookSecret: env.webhookSecret,
     });
-    console.log('[recorder] portale notificato');
+    console.log('[recorder] portale notificato (multitrack-manifest)');
   } else {
-    console.warn('[recorder] WEBHOOK_URL non impostato — salto la notifica');
+    console.warn(
+      '[recorder] INGEST_URL/CRON_API_KEY non impostati — salto la notifica',
+    );
   }
 }
 
