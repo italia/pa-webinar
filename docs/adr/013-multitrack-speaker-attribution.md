@@ -94,6 +94,60 @@ L'audio isolato del singolo parlante è **dato personale ad alta sensibilità** 
 - **Fase 4 — UI overlap** + nomi reali nell'editor/transcript/VTT.
 - **Fase 5 — GDPR**: consenso, retention breve tracce, informativa, service inventory.
 
+## Fase 3 — Orchestrazione del recorder (operator a pod fisso)
+
+> Amendment (giugno 2026). Risolve "come si avvia il recorder quando un evento è LIVE?" tenendo conto dei requisiti: **reattivo**, **efficiente** (niente Job speculativi), **portabile** (AKS/GKE/EKS/k3s), **sicuro**, **affidabile**.
+
+### Perché NON un CronJob (come il postprod-orchestrator)
+Il `cronjob-postprod-orchestrator` va bene per la coda postprod (lavoro batch, claim da una coda), ma è il modello sbagliato per il recorder:
+- **Latenza**: un tick al minuto può perdere i primi ~60s dell'evento (l'apertura).
+- **Spreco**: l'orchestrator postprod spawna worker *generici* fino a `desired`; un pattern analogo per il recorder creerebbe Job anche quando non servono.
+- L'utente vuole esplicitamente **un pod fisso con RBAC** (operator).
+
+### Modello scelto: operator riconciliante (edge-triggered + level-triggered)
+Un **Deployment fisso a 1 replica** (`recorder-controller`, immagine leggera Node, **senza** Chrome/puppeteer) con RBAC namespaced minimale. È il pattern classico degli operator K8s:
+
+- **Edge-triggered (reattività)**: il portale, nel punto in cui *rileva* la transizione → `LIVE` (oggi `POST /api/internal/jvb-desired-replicas`, chiamato dallo scaler JVB), fa un best-effort `POST` al controller (`/dispatch {eventId}`). Il controller crea **subito** il Job recorder. Niente attesa del prossimo tick.
+- **Level-triggered (affidabilità)**: il controller ha un **reconcile loop** a bassa frequenza (es. 30s) che interroga il portale (`GET /api/internal/recorder-desired`) per la lista degli eventi che *dovrebbero* avere un recorder attivo (LIVE + `aiTranscriptEnabled` + consenso multi-traccia) e **diffonde** verso lo stato reale dei Job nel namespace. Ripara i push persi, ricrea Job falliti, e fa **GC** dei Job per eventi non più LIVE. È la spina dorsale: il push è solo un'ottimizzazione di latenza.
+- **Idempotenza/efficienza**: **un solo** Job per `recordingId`, nome deterministico + label `recordingId=<uuid>`. Push duplicati o reconcile concorrenti non raddoppiano. Job creati **solo** per eventi che servono davvero → zero spreco.
+
+```
+  ┌────────── portale (Next.js, K8s-agnostico) ──────────┐
+  │  jvb-desired-replicas: rileva LIVE                    │
+  │     └─(best-effort) POST controller /dispatch         │  edge
+  │  GET /api/internal/recorder-desired  ← reconcile      │  level
+  │  POST /api/internal/recorder-claim   ← work-order      │
+  │  POST /api/internal/multitrack-manifest ← ingest (✓Fase2)│
+  └───────────────────────────────────────────────────────┘
+            ▲ (HTTP, x-api-key)        │ crea Job (K8s API, RBAC)
+            │                          ▼
+     recorder-controller (pod fisso) ──► Job recorder (per recordingId)
+                                              └─ claim → cattura → upload → ingest
+```
+
+### Chi conia cosa (sicurezza: credenziali fuori dall'operator)
+Il controller **non** tocca credenziali Jitsi/storage: passa solo `recordingId`/`eventId` come env del Job. Il recorder, all'avvio, fa **`POST /api/internal/recorder-claim`** (x-api-key) e riceve il work-order:
+- **JWT bot** coniato da `generateJitsiJwt` (identità `rec-bot-<recordingId>`, `affiliation: member`, receive-only, TTL = durata max evento).
+- **Recording row** creata *al claim* (oggi nasce dal webhook Jibri, troppo tardi per il multitrack): si crea `CallSession`+`Recording` con `consentSnapshot`/`pipelineSnapshot` al dispatch.
+- **Upload**: per-traccia, a fine evento, il recorder chiede un **PUT firmato per singolo blob** (riusa `presignArtifactUpload`, scope minimo per-blob — preferito a una SAS di container per sicurezza) sotto il prefisso `recordings/multitrack/{eventId}/{recordingId}/`. In alternativa, una SAS prefissata se si vuole evitare il round-trip per traccia (documentato, ma scope più ampio).
+- L'**ingest** finale (`multitrack-manifest`, già esistente) è path-confinato: anche un recorder compromesso non può scrivere RecordingTrack fuori dal prefisso.
+
+### Portabilità
+Il controller parla **solo** K8s API (`@kubernetes/client-node`, `loadFromCluster`) + HTTP al portale. RBAC = `Role`/`RoleBinding`/`ServiceAccount` namespaced standard (clone del SA dell'orchestrator postprod): `batch/jobs` get/list/create/delete, `batch/cronjobs` get/list (per `--from` template), `pods`/`pods/log` get/list (osservabilità). Nessuna primitiva provider-specifica → funziona su AKS/GKE/EKS/k3s identico. Lo spec del Job (nodeSelector/tolerations/resources del pool **normale**, non GPU) viene da `values.yaml` (`recorder.*`), montato come template (CronJob sospeso `recorder`) così l'operator usa `kubectl create job --from` e non duplica lo spec.
+
+### Affidabilità
+- Reconcile periodico = self-healing (push persi, pod riavviato, Job crashati).
+- `activeDeadlineSeconds` = durata max evento; `ttlSecondsAfterFinished` per GC automatica.
+- Il recorder ha già idle/max-duration timeout interni (esce da solo a fine evento → Job `Completed`).
+- 1 replica + `leaderElection` non necessario a questa scala (Deployment con `Recreate`); la riconciliazione è idempotente quindi anche un doppio pod transitorio è sicuro.
+
+### Stato implementazione
+- ✅ Recorder bot: core cattura WebRTC, upload signed-URL, ingest allineato a `multitrack-manifest`, immagine CI. Unit-test verdi.
+- ☐ `recorder-controller`: pacchetto + logica reconcile (diff desired/actual, **pura e unit-testabile**) → poi il glue K8s (`@kubernetes/client-node`) e l'HTTP server `/dispatch`.
+- ☐ Portale: `recorder-desired`, `recorder-claim` (+ creazione Recording al claim + JWT bot + presign per-traccia), hook best-effort in `jvb-desired-replicas`.
+- ☐ Helm: Deployment controller + RBAC + CronJob `recorder` sospeso (template) + sezione `recorder.*` in `values.yaml`.
+- ⚠️ La cattura WebRTC e l'intera catena vanno validate **in-cluster contro Jitsi reale**: non sono E2E-testabili in locale. Procedere a incrementi, con `recorder.enabled=false` di default.
+
 ## Conseguenze
 
 - Elimina il mapping manuale degli speaker e la dipendenza da pyannote per gli eventi con recorder multi-traccia; pyannote resta fallback per il mix.
