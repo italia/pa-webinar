@@ -292,6 +292,20 @@ export const GET = withErrorHandling(async (request) => {
     return counts;
   });
 
+  // ── Edge-trigger del recorder (ADR-013 Fase 3) ───────────────────
+  // Quando un evento è appena passato a LIVE, notifichiamo (best-effort,
+  // fire-and-forget) l'operator recorder così crea subito il Job/container
+  // senza attendere il suo tick di reconcile. Se RECORDER_CONTROLLER_URL non
+  // è impostato (deployment senza recorder), non facciamo nulla. Un errore
+  // qui non deve mai compromettere lo scaler: il reconcile level-triggered
+  // dell'operator recupera comunque.
+  if (transitions.provisioningToLive > 0 && process.env.RECORDER_CONTROLLER_URL) {
+    const url = `${process.env.RECORDER_CONTROLLER_URL.replace(/\/+$/, '')}/dispatch`;
+    void fetch(url, { method: 'POST' }).catch((err) => {
+      console.warn('[jvb] dispatch recorder best-effort fallito:', err);
+    });
+  }
+
   // ── Compute desired replicas from the updated state ──────────────
   // LIVE events within endsAt+grace are still billable. Step (3) above
   // has already flipped past-grace LIVE → ENDED, so whatever remains
