@@ -122,15 +122,17 @@ export default function RecordingManageClient({
         </div>
       </div>
 
-      {/* Tabs */}
-      <ul className="nav nav-tabs mb-3" role="tablist">
+      {/* Tabs — il pannello sotto è una Card (superficie bianca, bordo,
+          ombra leggera) così ogni sezione è contenuta e leggibile, non
+          testo sciolto sulla pagina. */}
+      <ul className="nav nav-tabs" role="tablist" style={{ borderBottom: 'none' }}>
         {tabs.map((tb) => (
           <li className="nav-item" role="presentation" key={tb.key}>
             <button
               type="button"
               role="tab"
               aria-selected={tab === tb.key}
-              className={`nav-link ${tab === tb.key ? 'active' : ''}`}
+              className={`nav-link ${tab === tb.key ? 'active fw-semibold' : ''}`}
               onClick={() => setTab(tb.key)}
             >
               {tb.label}
@@ -139,7 +141,11 @@ export default function RecordingManageClient({
         ))}
       </ul>
 
-      <div role="tabpanel">
+      <div
+        role="tabpanel"
+        className="bg-white border rounded-bottom rounded-end p-4 shadow-sm"
+        style={{ borderTopLeftRadius: tab === tabs[0]?.key ? 0 : 8 }}
+      >
         {tab === 'transcript' && <TranscriptEditor recordingId={recordingId} />}
         {tab === 'summary' && <SummaryEditor recordingId={recordingId} />}
         {tab === 'translations' && <TranslationManager recordingId={recordingId} />}
