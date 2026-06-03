@@ -15,35 +15,49 @@
 
 import { createServer } from 'node:http';
 
-import { readConfig } from './config';
+import { readConfig, type ControllerConfig } from './config';
 import { PortalClient } from './portal';
-import { RecorderJobManager } from './k8s';
 import { reconcile } from './reconcile';
+import type { RecorderRunner } from './runner';
+
+/** Costruisce il runner giusto in base alla config (K8s o Docker). */
+async function makeRunner(cfg: ControllerConfig): Promise<RecorderRunner> {
+  if (cfg.runner === 'kubernetes') {
+    const { KubernetesRunner } = await import('./k8s');
+    return new KubernetesRunner(cfg.k8s!.namespace, cfg.k8s!.recorderCronJobName);
+  }
+  const { DockerRunner } = await import('./docker');
+  return new DockerRunner({
+    image: cfg.docker!.image,
+    network: cfg.docker!.network,
+    recorderEnv: cfg.docker!.recorderEnv,
+  });
+}
 
 async function runReconcile(
   portal: PortalClient,
-  jobs: RecorderJobManager,
+  runner: RecorderRunner,
 ): Promise<void> {
   const [desired, actual] = await Promise.all([
     portal.getRecorderDesired(),
-    jobs.listRecorderJobs(),
+    runner.list(),
   ]);
   const plan = reconcile(desired, actual);
 
   for (const d of plan.toCreate) {
     try {
-      await jobs.createRecorderJob(d);
-      console.log(`[controller] creato recorder per recording=${d.recordingId}`);
+      await runner.start(d);
+      console.log(`[controller] avviato recorder per recording=${d.recordingId}`);
     } catch (err) {
-      console.error(`[controller] create fallita per ${d.recordingId}:`, err);
+      console.error(`[controller] start fallita per ${d.recordingId}:`, err);
     }
   }
   for (const name of plan.toDelete) {
     try {
-      await jobs.deleteJob(name);
-      console.log(`[controller] eliminato Job duplicato ${name}`);
+      await runner.stop(name);
+      console.log(`[controller] fermato recorder duplicato ${name}`);
     } catch (err) {
-      console.error(`[controller] delete fallita per ${name}:`, err);
+      console.error(`[controller] stop fallita per ${name}:`, err);
     }
   }
 }
@@ -54,7 +68,7 @@ export async function main(): Promise<void> {
     portalUrl: cfg.portalUrl,
     cronApiKey: cfg.cronApiKey,
   });
-  const jobs = new RecorderJobManager(cfg.namespace, cfg.recorderCronJobName);
+  const runner = await makeRunner(cfg);
 
   // Serializza i reconcile: edge e level non si calpestano.
   let running = false;
@@ -62,7 +76,7 @@ export async function main(): Promise<void> {
     if (running) return;
     running = true;
     try {
-      await runReconcile(portal, jobs);
+      await runReconcile(portal, runner);
     } catch (err) {
       console.error(`[controller] reconcile (${trigger}) errore:`, err);
     } finally {
@@ -89,8 +103,8 @@ export async function main(): Promise<void> {
 
   // Loop level-triggered.
   console.log(
-    `[controller] avvio reconcile ogni ${cfg.reconcileIntervalMs}ms ` +
-      `(ns=${cfg.namespace}, portale=${cfg.portalUrl})`,
+    `[controller] runner=${runner.kind} reconcile ogni ${cfg.reconcileIntervalMs}ms ` +
+      `(portale=${cfg.portalUrl})`,
   );
   await tick('startup');
   setInterval(() => void tick('interval'), cfg.reconcileIntervalMs);

@@ -1,5 +1,5 @@
 /**
- * Glue Kubernetes dell'operator. Sottile wrapper attorno a `reconcile`:
+ * Runner Kubernetes (full mode). Sottile wrapper attorno a `reconcile`:
  * legge i Job recorder reali, ne crea di nuovi dal template (CronJob
  * sospeso) e ne elimina i duplicati. Parla SOLO l'API K8s standard →
  * portabile su AKS/GKE/EKS/k3s.
@@ -16,12 +16,14 @@ import {
 } from '@kubernetes/client-node';
 
 import type { ActualJob, DesiredRecorder, JobPhase } from './reconcile';
-
-const COMPONENT_LABEL = 'app.kubernetes.io/component';
-const COMPONENT_VALUE = 'recorder';
-/** Label che lega un Job al suo recordingId (chiave del dedup). */
-export const RECORDING_ID_LABEL = 'eventi-dtd.it/recording-id';
-const EVENT_ID_LABEL = 'eventi-dtd.it/event-id';
+import type { RecorderRunner } from './runner';
+import {
+  COMPONENT_LABEL,
+  COMPONENT_VALUE,
+  RECORDING_ID_LABEL,
+  EVENT_ID_LABEL,
+  recorderHandleName,
+} from './labels';
 
 function jobPhase(job: V1Job): JobPhase {
   const s = job.status;
@@ -31,13 +33,8 @@ function jobPhase(job: V1Job): JobPhase {
   return 'active';
 }
 
-/** Nome Job deterministico per recordingId (idempotenza lato API). */
-export function recorderJobName(recordingId: string): string {
-  const compact = recordingId.replace(/-/g, '').slice(0, 20);
-  return `recorder-${compact}`;
-}
-
-export class RecorderJobManager {
+export class KubernetesRunner implements RecorderRunner {
+  readonly kind = 'kubernetes';
   private readonly batch: BatchV1Api;
 
   constructor(
@@ -49,7 +46,7 @@ export class RecorderJobManager {
   }
 
   /** I Job recorder reali nel namespace, mappati per `reconcile`. */
-  async listRecorderJobs(): Promise<ActualJob[]> {
+  async list(): Promise<ActualJob[]> {
     const res = await this.batch.listNamespacedJob(
       this.namespace,
       undefined,
@@ -73,7 +70,7 @@ export class RecorderJobManager {
    * RECORDING_ID/EVENT_ID come env così il recorder reclama lo SPECIFICO
    * recording. Idempotente: nome deterministico → un 409 è benigno.
    */
-  async createRecorderJob(d: DesiredRecorder): Promise<void> {
+  async start(d: DesiredRecorder): Promise<void> {
     const cron = await this.batch.readNamespacedCronJob(
       this.recorderCronJobName,
       this.namespace,
@@ -85,7 +82,7 @@ export class RecorderJobManager {
       );
     }
 
-    const name = recorderJobName(d.recordingId);
+    const name = recorderHandleName(d.recordingId);
     const labels = {
       [COMPONENT_LABEL]: COMPONENT_VALUE,
       [RECORDING_ID_LABEL]: d.recordingId,
@@ -119,7 +116,7 @@ export class RecorderJobManager {
   }
 
   /** Elimina un Job (propagazione Background → elimina anche i pod). */
-  async deleteJob(name: string): Promise<void> {
+  async stop(name: string): Promise<void> {
     try {
       await this.batch.deleteNamespacedJob(
         name,
