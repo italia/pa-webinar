@@ -696,7 +696,8 @@
           "dateRequired": "The original date is required.",
           "saveFailed": "Saving the metadata failed."
         }
-      }
+      },
+      "updateFailed": "Update failed."
     },
     "recordingsLibrary": {
       "title": "Video recordings",
@@ -1482,7 +1483,8 @@
       },
       "errors": {
         "saveFailed": "Save failed. Check the fields and retry."
-      }
+      },
+      "deleteTitle": "Delete template"
     },
     "emailTemplates": {
       "title": "Email templates",
@@ -1663,7 +1665,8 @@
       "play": "Play",
       "hidePlayer": "Hide player",
       "download": "Download",
-      "deleteConfirm": "Delete this session and its recording?"
+      "deleteConfirm": "Delete this session and its recording?",
+      "deleteTitle": "Delete session"
     },
     "monitoring": {
       "title": "Monitoring",

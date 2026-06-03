@@ -87,9 +87,9 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
           body: JSON.stringify({ libraryListed: !row.libraryListed }),
         });
         if (res.ok) await fetchData();
-        else toast.error('Aggiornamento non riuscito.');
+        else toast.error(t('updateFailed'));
       } catch {
-        toast.error('Aggiornamento non riuscito.');
+        toast.error(t('updateFailed'));
       } finally {
         setBusyId(null);
       }

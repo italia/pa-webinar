@@ -133,7 +133,7 @@ export default function GdprTemplatesManagement() {
 
   const handleDelete = useCallback(async (row: TemplateRow) => {
     const ok = await confirm({
-      title: 'Elimina template',
+      title: t('deleteTitle'),
       message: t('confirmDelete', { name: row.name, count: row.usedByEvents }),
       confirmLabel: tc('delete'),
       danger: true,
