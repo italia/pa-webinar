@@ -82,19 +82,19 @@ abbiamo affidabilità e parità col path di produzione.
 
 ## Variabili d'ambiente
 
+Modello **claim**: l'operator passa solo gli id + come raggiungere il portale.
+JWT bot e nome stanza arrivano dal `recorder-claim`; l'upload presigna ogni
+traccia just-in-time via `recorder-upload-url`. Le credenziali non vivono
+nell'operator né nello spec del Job/container.
+
 | Variabile | Obbligatoria | Default | Descrizione |
 |-----------|:---:|---------|-------------|
 | `JITSI_DOMAIN` | ✅ | — | Dominio Jitsi (origin per lib-jitsi-meet). |
-| `ROOM_NAME` | ✅ | — | Nome stanza Jitsi (`Event.jitsiRoomName`). |
-| `JWT` | ✅ | — | JWT del portale per entrare come bot (vedi `app/.../jitsi/token`). |
-| `RECORDING_ID` | ✅ | — | Id registrazione (lega il manifest alla riga `RecordingTrack`). |
-| `EVENT_ID` | ✅ | — | Id evento (path storage + lookup ingest). |
+| `RECORDING_ID` | ✅ | — | Id registrazione (iniettato dall'operator; chiave del claim). |
+| `EVENT_ID` | ✅ | — | Id evento (path storage). |
+| `PORTAL_URL` | ✅ | — | Base URL interna del portale (claim, upload-url, ingest). |
+| `CRON_API_KEY` | ✅ | — | Header `x-api-key` verso il portale. |
 | `OUTPUT_DIR` | — | `/recordings` | Dir locale per le tracce prima dell'upload. |
-| `INGEST_URL` | — | — | URL di `POST /api/internal/multitrack-manifest` (ADR-013 Fase 2). |
-| `CRON_API_KEY` | — | — | Inviato come header `x-api-key` all'ingest (come gli altri `/internal`). |
-| `RECORDING_UPLOAD_BASE_URL` | — | — | Base URL firmata (SAS Azure / presigned S3 / signed GCS) emessa dal portale verso il prefisso della registrazione. Se presente, si usa l'upload reale; altrimenti noop locale. |
-| `BOT_DISPLAY_NAME` | — | `📼 Recorder` | Nome del bot in stanza. |
-| `RECORDING_STORAGE_TYPE` | — | `local` | Usato solo per il warning se manca `RECORDING_UPLOAD_BASE_URL`. L'upload reale passa sempre per la base URL firmata dal portale. |
 
 ## Layout storage e manifest
 

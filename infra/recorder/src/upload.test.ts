@@ -5,6 +5,7 @@ import {
   notifyPortal,
   NoopStorageProvider,
   SignedUrlStorageProvider,
+  PresignStorageProvider,
   createStorageProvider,
   composeObjectUrl,
 } from './upload';
@@ -195,6 +196,61 @@ describe('SignedUrlStorageProvider', () => {
     await expect(
       p.putObject({ key: 'k', body: Buffer.from('a'), contentType: 'text/plain' }),
     ).rejects.toThrow(/403/);
+  });
+});
+
+describe('PresignStorageProvider', () => {
+  it('presigna per-traccia (x-api-key) poi fa PUT sull URL firmato', async () => {
+    const calls: Array<{ url: string; init: RequestInit | undefined }> = [];
+    const fakeFetch = (async (url: string | URL | Request, init?: RequestInit) => {
+      const u = String(url);
+      calls.push({ url: u, init });
+      if (u.endsWith('/recorder-upload-url')) {
+        return new Response(
+          JSON.stringify({ uploadUrl: 'https://acct.blob.core.windows.net/c/k?sig=z' }),
+          { status: 200 },
+        );
+      }
+      return new Response(null, { status: 201 }); // il PUT
+    }) as unknown as typeof fetch;
+
+    const p = new PresignStorageProvider({
+      uploadUrlEndpoint: 'https://app/api/internal/recorder-upload-url',
+      recordingId: 'rec1',
+      cronApiKey: 'k',
+      fetchImpl: fakeFetch,
+    });
+    await p.putObject({
+      key: 'recordings/multitrack/e/rec1/audio/p1.opus',
+      body: Buffer.from('xyz'),
+      contentType: 'audio/ogg; codecs=opus',
+    });
+
+    expect(calls).toHaveLength(2);
+    // 1ª chiamata: presign con x-api-key e blobKey nel body.
+    const presign = calls[0]!;
+    expect(presign.url).toBe('https://app/api/internal/recorder-upload-url');
+    expect((presign.init?.headers as Record<string, string>)['x-api-key']).toBe('k');
+    expect(String(presign.init?.body)).toContain('recordings/multitrack/e/rec1/audio/p1.opus');
+    // 2ª chiamata: PUT sull URL firmato, con x-ms-blob-type (Azure).
+    const put = calls[1]!;
+    expect(put.url).toBe('https://acct.blob.core.windows.net/c/k?sig=z');
+    expect(put.init?.method).toBe('PUT');
+    expect((put.init?.headers as Record<string, string>)['x-ms-blob-type']).toBe('BlockBlob');
+  });
+
+  it('lancia se il presign fallisce', async () => {
+    const fakeFetch = (async () =>
+      new Response(null, { status: 403, statusText: 'Forbidden' })) as unknown as typeof fetch;
+    const p = new PresignStorageProvider({
+      uploadUrlEndpoint: 'https://app/x',
+      recordingId: 'r',
+      cronApiKey: 'k',
+      fetchImpl: fakeFetch,
+    });
+    await expect(
+      p.putObject({ key: 'k', body: Buffer.from('a'), contentType: 'text/plain' }),
+    ).rejects.toThrow(/presign.*403/);
   });
 });
 

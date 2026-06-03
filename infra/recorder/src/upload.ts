@@ -83,23 +83,79 @@ export class SignedUrlStorageProvider implements StorageProvider {
 
   async putObject(input: PutObjectInput): Promise<void> {
     const url = composeObjectUrl(this.baseUrl, input.key);
-    const headers: Record<string, string> = {
-      'Content-Type': input.contentType,
-    };
-    // Azure Blob: PUT Blob richiede x-ms-blob-type (vedi client.py:233).
-    if (url.includes('blob.core.windows.net')) {
-      headers['x-ms-blob-type'] = 'BlockBlob';
-    }
-    const res = await this.fetchImpl(url, {
-      method: 'PUT',
-      headers,
-      body: new Uint8Array(input.body),
+    await putToSignedUrl(this.fetchImpl, url, input);
+  }
+}
+
+/**
+ * Provider con presign per-traccia just-in-time (modalità claim, cluster).
+ *
+ * I partecipanti non sono noti al claim, quindi per OGNI oggetto chiediamo
+ * al portale un PUT firmato (`/api/internal/recorder-upload-url`, x-api-key)
+ * e ci carichiamo sopra. Scope minimo (un blob per firma) → preferito alla
+ * SAS di prefisso lato sicurezza; il portale path-confina ogni blobKey.
+ */
+export class PresignStorageProvider implements StorageProvider {
+  readonly name = 'presign';
+
+  constructor(
+    private readonly opts: {
+      uploadUrlEndpoint: string;
+      recordingId: string;
+      cronApiKey: string;
+      fetchImpl?: typeof fetch;
+    },
+  ) {}
+
+  private get fetchImpl(): typeof fetch {
+    return this.opts.fetchImpl ?? fetch;
+  }
+
+  async putObject(input: PutObjectInput): Promise<void> {
+    const presignRes = await this.fetchImpl(this.opts.uploadUrlEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.opts.cronApiKey,
+      },
+      body: JSON.stringify({
+        recordingId: this.opts.recordingId,
+        blobKey: input.key,
+        contentType: input.contentType,
+      }),
     });
-    if (!res.ok) {
+    if (!presignRes.ok) {
       throw new Error(
-        `upload "${input.key}" fallito: ${res.status} ${res.statusText}`,
+        `presign "${input.key}" fallito: ${presignRes.status} ${presignRes.statusText}`,
       );
     }
+    const { uploadUrl } = (await presignRes.json()) as { uploadUrl: string };
+    await putToSignedUrl(this.fetchImpl, uploadUrl, input);
+  }
+}
+
+/** PUT raw su un URL firmato (+ x-ms-blob-type per Azure). Condiviso. */
+async function putToSignedUrl(
+  fetchImpl: typeof fetch,
+  url: string,
+  input: PutObjectInput,
+): Promise<void> {
+  const headers: Record<string, string> = {
+    'Content-Type': input.contentType,
+  };
+  // Azure Blob: PUT Blob richiede x-ms-blob-type (vedi client.py:233).
+  if (url.includes('blob.core.windows.net')) {
+    headers['x-ms-blob-type'] = 'BlockBlob';
+  }
+  const res = await fetchImpl(url, {
+    method: 'PUT',
+    headers,
+    body: new Uint8Array(input.body),
+  });
+  if (!res.ok) {
+    throw new Error(
+      `upload "${input.key}" fallito: ${res.status} ${res.statusText}`,
+    );
   }
 }
 

@@ -2,16 +2,16 @@
  * Entrypoint del multitrack recorder (ADR-013, Fase 3).
  *
  * Orchestrazione (tutta logica determinabile è delegata ai moduli puri):
- *   1. legge la config dall'env;
- *   2. entra nella stanza Jitsi come bot receive-only invisibile e registra
- *      UNA traccia audio per partecipante (`capture.ts` — WebRTC, richiede
- *      Jitsi reale);
- *   3. costruisce il manifest `tracks.json` (`manifest.ts` — puro);
- *   4. carica tracce + manifest allo storage (`upload.ts`);
- *   5. notifica il portale via webhook (`upload.ts`).
+ *   1. legge la config dall'env (solo id + come raggiungere il portale);
+ *   2. RECLAMA il work-order dal portale → JWT bot + nome stanza (`claim.ts`);
+ *   3. entra nella stanza Jitsi come bot receive-only invisibile e registra
+ *      UNA traccia audio per partecipante (`capture.ts` — WebRTC, Jitsi reale);
+ *   4. costruisce il manifest `tracks.json` (`manifest.ts` — puro);
+ *   5. carica tracce + manifest allo storage (presign per-traccia, `upload.ts`);
+ *   6. ingesta al portale (`multitrack-manifest`).
  *
- * Deploy: scale-with-events come Jibri — un pod per evento attivo, avviato
- * dal portale/scaler con le env qui sotto. Vedi README.
+ * Avvio: dall'operator `recorder-controller` (K8s Job o container Docker), che
+ * passa solo RECORDING_ID/EVENT_ID + l'accesso al portale. Vedi README.
  */
 
 import { join } from 'node:path';
@@ -19,8 +19,9 @@ import { join } from 'node:path';
 import { captureRoom, type CaptureConfig } from './capture';
 import { buildManifest, type ManifestTrack } from './manifest';
 import { localTrackFilename } from './paths';
+import { claimWorkOrder } from './claim';
 import {
-  createStorageProvider,
+  PresignStorageProvider,
   uploadRecording,
   buildIngestBody,
   notifyPortal,
@@ -29,14 +30,11 @@ import {
 
 interface RecorderEnv {
   jitsiDomain: string;
-  roomName: string;
-  jwt: string;
   recordingId: string;
   eventId: string;
+  portalUrl: string;
+  cronApiKey: string;
   outputDir: string;
-  ingestUrl?: string;
-  cronApiKey?: string;
-  botDisplayName?: string;
 }
 
 function requireEnv(name: string): string {
@@ -50,14 +48,11 @@ function requireEnv(name: string): string {
 function readEnv(): RecorderEnv {
   return {
     jitsiDomain: requireEnv('JITSI_DOMAIN'),
-    roomName: requireEnv('ROOM_NAME'),
-    jwt: requireEnv('JWT'),
     recordingId: requireEnv('RECORDING_ID'),
     eventId: requireEnv('EVENT_ID'),
+    portalUrl: requireEnv('PORTAL_URL').replace(/\/+$/, ''),
+    cronApiKey: requireEnv('CRON_API_KEY'),
     outputDir: process.env.OUTPUT_DIR ?? '/recordings',
-    ingestUrl: process.env.INGEST_URL,
-    cronApiKey: process.env.CRON_API_KEY,
-    botDisplayName: process.env.BOT_DISPLAY_NAME ?? '📼 Recorder',
   };
 }
 
@@ -72,49 +67,52 @@ function toLocalFile(track: ManifestTrack, outputDir: string): LocalTrackFile {
 export async function main(): Promise<void> {
   const env = readEnv();
 
-  const captureConfig: CaptureConfig = {
-    jitsiDomain: env.jitsiDomain,
-    roomName: env.roomName,
-    jwt: env.jwt,
-    outputDir: env.outputDir,
-    botDisplayName: env.botDisplayName,
-  };
-
+  // ── 1-2. Claim del work-order (JWT bot + stanza) ──
+  const wo = await claimWorkOrder({
+    portalUrl: env.portalUrl,
+    cronApiKey: env.cronApiKey,
+    recordingId: env.recordingId,
+  });
   console.log(
-    `[recorder] avvio cattura: room=${env.roomName} event=${env.eventId} ` +
-      `recording=${env.recordingId}`,
+    `[recorder] work-order: room=${wo.roomName} event=${wo.eventId} ` +
+      `recording=${wo.recordingId}`,
   );
 
-  // ── 1-2. Cattura WebRTC (blocca fino a fine evento) ──
+  const captureConfig: CaptureConfig = {
+    jitsiDomain: env.jitsiDomain,
+    roomName: wo.roomName,
+    jwt: wo.jwt,
+    outputDir: env.outputDir,
+  };
+
+  // ── 3. Cattura WebRTC (blocca fino a fine evento) ──
   const { recordings } = await captureRoom(captureConfig);
 
-  // ── 3. Manifest (puro) ──
+  // ── 4. Manifest (puro) ──
   const manifest = buildManifest({
     eventId: env.eventId,
     recordingId: env.recordingId,
-    roomName: env.roomName,
+    roomName: wo.roomName,
     recordings,
   });
   console.log(`[recorder] manifest: ${manifest.tracks.length} tracce`);
 
-  // ── 4. Upload tracce + manifest ──
-  const provider = createStorageProvider(process.env);
+  // ── 5. Upload tracce + manifest (presign per-traccia) ──
+  const provider = new PresignStorageProvider({
+    uploadUrlEndpoint: `${env.portalUrl}/api/internal/recorder-upload-url`,
+    recordingId: env.recordingId,
+    cronApiKey: env.cronApiKey,
+  });
   const files = manifest.tracks.map((t) => toLocalFile(t, env.outputDir));
   const { uploaded, trackSizes } = await uploadRecording(provider, { manifest, files });
   console.log(`[recorder] upload completato (${uploaded} tracce, provider=${provider.name})`);
 
-  // ── 5. Ingest al portale (POST /api/internal/multitrack-manifest) ──
-  if (env.ingestUrl && env.cronApiKey) {
-    await notifyPortal(buildIngestBody(manifest, trackSizes), {
-      ingestUrl: env.ingestUrl,
-      cronApiKey: env.cronApiKey,
-    });
-    console.log('[recorder] portale notificato (multitrack-manifest)');
-  } else {
-    console.warn(
-      '[recorder] INGEST_URL/CRON_API_KEY non impostati — salto la notifica',
-    );
-  }
+  // ── 6. Ingest al portale (POST /api/internal/multitrack-manifest) ──
+  await notifyPortal(buildIngestBody(manifest, trackSizes), {
+    ingestUrl: `${env.portalUrl}/api/internal/multitrack-manifest`,
+    cronApiKey: env.cronApiKey,
+  });
+  console.log('[recorder] portale notificato (multitrack-manifest)');
 }
 
 // Esegui solo se invocato direttamente (non quando importato dai test).
