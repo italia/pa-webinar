@@ -59,46 +59,107 @@ export class NoopStorageProvider implements StorageProvider {
   }
 }
 
+/**
+ * Provider basato su URL firmato (SAS Azure / presigned S3 / signed GCS).
+ *
+ * Le credenziali NON vivono nel recorder: il portale, quando avvia il
+ * recorder per un evento, gli passa una *base URL firmata* con scadenza
+ * breve (`RECORDING_UPLOAD_BASE_URL`) che punta al prefisso/container della
+ * registrazione. Per ogni oggetto facciamo un `PUT` raw verso
+ * `<base>/<key>?<firma>`. È lo stesso pattern collaudato del worker
+ * (`infra/ai/worker/client.py`): per Azure Blob aggiungiamo l'header
+ * obbligatorio `x-ms-blob-type: BlockBlob`, senza il quale il PUT torna 400.
+ *
+ * Vantaggi: zero SDK pesanti, funziona per Azure/S3/GCS (tutti accettano
+ * un PUT su URL firmato), e tiene le chiavi di storage fuori dal bot —
+ * coerente coi requisiti GDPR dell'ADR (tracce per-partecipante sensibili).
+ */
+export class SignedUrlStorageProvider implements StorageProvider {
+  readonly name = 'signed-url';
+
+  constructor(
+    private readonly baseUrl: string,
+    private readonly fetchImpl: typeof fetch = fetch,
+  ) {}
+
+  async putObject(input: PutObjectInput): Promise<void> {
+    const url = composeObjectUrl(this.baseUrl, input.key);
+    const headers: Record<string, string> = {
+      'Content-Type': input.contentType,
+    };
+    // Azure Blob: PUT Blob richiede x-ms-blob-type (vedi client.py:233).
+    if (url.includes('blob.core.windows.net')) {
+      headers['x-ms-blob-type'] = 'BlockBlob';
+    }
+    const res = await this.fetchImpl(url, {
+      method: 'PUT',
+      headers,
+      body: new Uint8Array(input.body),
+    });
+    if (!res.ok) {
+      throw new Error(
+        `upload "${input.key}" fallito: ${res.status} ${res.statusText}`,
+      );
+    }
+  }
+}
+
+/**
+ * Compone l'URL del singolo oggetto a partire dalla base firmata e dalla
+ * key. La firma (query string) va preservata DOPO il path: splittiamo su
+ * `?`, accodiamo `/<key>` al path e ri-appendiamo la query. Logica pura →
+ * unit-testata.
+ */
+export function composeObjectUrl(baseUrl: string, key: string): string {
+  const qIdx = baseUrl.indexOf('?');
+  const path = qIdx === -1 ? baseUrl : baseUrl.slice(0, qIdx);
+  const query = qIdx === -1 ? '' : baseUrl.slice(qIdx + 1);
+  const trimmedPath = path.replace(/\/+$/, '');
+  const trimmedKey = key.replace(/^\/+/, '');
+  const full = `${trimmedPath}/${trimmedKey}`;
+  return query ? `${full}?${query}` : full;
+}
+
 export interface StorageEnv {
   RECORDING_STORAGE_TYPE?: string;
-  // I provider reali leggono le proprie credenziali dall'env, allineate a
-  // jibri-finalize.sh (RECORDING_AZURE_CONNECTION_STRING, RECORDING_S3_BUCKET, …).
+  /**
+   * Base URL firmata emessa dal portale (SAS Azure / presigned S3 / signed
+   * GCS) verso il prefisso della registrazione. Se presente, si usa il
+   * provider signed-URL indipendentemente da RECORDING_STORAGE_TYPE.
+   */
+  RECORDING_UPLOAD_BASE_URL?: string;
   [key: string]: string | undefined;
 }
 
 /**
  * Factory del provider di storage.
  *
- * TODO(ADR-013 Fase 3 — upload reale): implementare i provider veri
- * riusando le stesse env var e bucket di `jibri-finalize.sh`:
- *   - `azure-blob` → @azure/storage-blob (RECORDING_AZURE_CONNECTION_STRING,
- *     RECORDING_AZURE_CONTAINER)
- *   - `s3`         → @aws-sdk/client-s3 (RECORDING_S3_BUCKET, RECORDING_S3_REGION)
- *   - `gcs`        → @google-cloud/storage (RECORDING_GCS_BUCKET)
- *   - `minio`      → minio o @aws-sdk/client-s3 con endpoint custom
- * Le tracce per-partecipante vanno cifrate at-rest (chiavi separate dagli
- * artifact pubblici, vedi GDPR nell'ADR) — preferire SSE lato bucket.
- * Finché non implementato, ritorniamo il noop per non bloccare la Fase 3.
+ * Se il portale ha passato `RECORDING_UPLOAD_BASE_URL` (caso cluster),
+ * usiamo `SignedUrlStorageProvider`. Altrimenti, in locale
+ * (`RECORDING_STORAGE_TYPE=local` o non impostato), restiamo sul noop:
+ * i file restano su disco in OUTPUT_DIR e non c'è nulla da caricare.
+ *
+ * Se è impostato un tipo cloud SENZA base URL firmata è un errore di
+ * configurazione: lo segnaliamo e degradiamo al noop per non perdere
+ * silenziosamente le tracce credendo di averle caricate.
  */
-export function createStorageProvider(env: StorageEnv): StorageProvider {
-  const type = env.RECORDING_STORAGE_TYPE ?? 'local';
-  switch (type) {
-    case 'azure-blob':
-    case 's3':
-    case 'gcs':
-    case 'minio':
-      // TODO: implementare. Per ora fallback esplicito al noop con warning.
-      console.warn(
-        `[recorder] storage provider "${type}" non ancora implementato — ` +
-          'uso NoopStorageProvider (le tracce NON vengono caricate). ' +
-          'Vedi TODO in upload.ts.',
-      );
-      return new NoopStorageProvider();
-    case 'local':
-    default:
-      // In locale teniamo i file su disco in OUTPUT_DIR; non serve upload.
-      return new NoopStorageProvider();
+export function createStorageProvider(
+  env: StorageEnv,
+  fetchImpl: typeof fetch = fetch,
+): StorageProvider {
+  if (env.RECORDING_UPLOAD_BASE_URL) {
+    return new SignedUrlStorageProvider(env.RECORDING_UPLOAD_BASE_URL, fetchImpl);
   }
+  const type = env.RECORDING_STORAGE_TYPE ?? 'local';
+  if (type !== 'local') {
+    console.warn(
+      `[recorder] RECORDING_STORAGE_TYPE="${type}" ma manca ` +
+        'RECORDING_UPLOAD_BASE_URL (URL firmato dal portale): uso ' +
+        'NoopStorageProvider, le tracce NON verranno caricate. ' +
+        'Il portale deve passare una base URL firmata allo spawn del recorder.',
+    );
+  }
+  return new NoopStorageProvider();
 }
 
 // ── Upload tracce + manifest ─────────────────────────────────────────────
