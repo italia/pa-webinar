@@ -97,6 +97,14 @@ export async function main(): Promise<void> {
   });
   console.log(`[recorder] manifest: ${manifest.tracks.length} tracce`);
 
+  // Nessuna traccia (stanza vuota o cattura non riuscita): niente da
+  // caricare né da ingestare. Usciamo puliti — l'ingest rifiuterebbe un
+  // array vuoto (422) e non avrebbe senso accodare la pipeline.
+  if (manifest.tracks.length === 0) {
+    console.warn('[recorder] nessuna traccia catturata — niente upload/ingest');
+    return;
+  }
+
   // ── 5. Upload tracce + manifest (presign per-traccia) ──
   const provider = new PresignStorageProvider({
     uploadUrlEndpoint: `${env.portalUrl}/api/internal/recorder-upload-url`,

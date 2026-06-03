@@ -173,6 +173,11 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
       timeout: 60_000,
     });
     await page.addScriptTag({ url: `https://${config.jitsiDomain}/libs/lib-jitsi-meet.min.js` });
+    // Carichiamo anche il config.js del deployment Jitsi: definisce
+    // `window.config` con gli host XMPP reali (es. domain=meet.jitsi,
+    // muc=muc.meet.jitsi) e l'endpoint BOSH/WebSocket effettivo. Sintetizzarli
+    // dal dominio pubblico è sbagliato (ogni deployment differisce).
+    await page.addScriptTag({ url: `https://${config.jitsiDomain}/config.js` });
 
     // Bootstrap in-page: connessione + conference receive-only + un
     // MediaRecorder per traccia audio remota. Vedi pseudo-flusso sopra.
@@ -233,9 +238,17 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     JitsiMeetJS.init({ disableAudioLevels: true });
     JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
 
-    const connection = new JitsiMeetJS.JitsiConnection(cfg.appId, cfg.jwt, {
-      hosts: { domain: cfg.domain, muc: cfg.mucDomain },
-      serviceUrl: cfg.serviceUrl,
+    // Usa la config reale del deployment (window.config da config.js); i
+    // valori sintetizzati in `cfg` restano solo come fallback.
+    const jcfg = w.config ?? {};
+    const hosts = jcfg.hosts ?? { domain: cfg.domain, muc: cfg.mucDomain };
+    // serviceUrl: preferisci WebSocket, poi BOSH, poi il fallback sintetico.
+    const serviceUrl = jcfg.websocket ?? jcfg.bosh ?? cfg.serviceUrl;
+    log(`connessione: domain=${hosts.domain} muc=${hosts.muc} svc=${serviceUrl}`);
+
+    const connection = new JitsiMeetJS.JitsiConnection(null, cfg.jwt, {
+      hosts,
+      serviceUrl,
       clientNode: 'https://jitsi.org/jitsimeet',
     });
 
