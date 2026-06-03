@@ -766,7 +766,8 @@
           "dateRequired": "La data originale è obbligatoria.",
           "saveFailed": "Salvataggio metadati non riuscito."
         }
-      }
+      },
+      "updateFailed": "Aggiornamento non riuscito."
     },
     "recordingsLibrary": {
       "title": "Registrazioni video",
@@ -1552,7 +1553,8 @@
       },
       "errors": {
         "saveFailed": "Salvataggio non riuscito. Verifica i dati e riprova."
-      }
+      },
+      "deleteTitle": "Elimina template"
     },
     "emailTemplates": {
       "title": "Template email",
@@ -1733,7 +1735,8 @@
       "play": "Riproduci",
       "hidePlayer": "Nascondi player",
       "download": "Scarica",
-      "deleteConfirm": "Eliminare questa sessione e la registrazione associata?"
+      "deleteConfirm": "Eliminare questa sessione e la registrazione associata?",
+      "deleteTitle": "Elimina sessione"
     },
     "monitoring": {
       "title": "Monitoraggio",

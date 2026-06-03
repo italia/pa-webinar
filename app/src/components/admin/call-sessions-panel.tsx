@@ -74,6 +74,7 @@ export default function CallSessionsPanel({
   moderatorToken,
 }: CallSessionsPanelProps) {
   const t = useTranslations('admin.sessions');
+  const tc = useTranslations('common');
   const fmt = useFormatter();
   const confirm = useConfirm();
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -98,9 +99,9 @@ export default function CallSessionsPanel({
 
   const handleDelete = useCallback(async (sessionId: string) => {
     const ok = await confirm({
-      title: 'Elimina sessione',
+      title: t('deleteTitle'),
       message: t('deleteConfirm'),
-      confirmLabel: 'Elimina',
+      confirmLabel: tc('delete'),
       danger: true,
     });
     if (!ok) return;
