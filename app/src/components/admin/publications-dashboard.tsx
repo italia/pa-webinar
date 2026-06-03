@@ -5,6 +5,8 @@ import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Button, Card, CardBody, Input } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
+import { SkeletonLines } from '@/components/ui/skeleton';
 
 interface PublicationRow {
   id: string;
@@ -45,6 +47,7 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
   const t = useTranslations('admin.publications');
   const tc = useTranslations('common');
   const fmt = useFormatter();
+  const toast = useToast();
 
   const [tab, setTab] = useState<Tab>('all');
   const [listedFilter, setListedFilter] = useState<'any' | 'yes' | 'no'>('any');
@@ -84,11 +87,14 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
           body: JSON.stringify({ libraryListed: !row.libraryListed }),
         });
         if (res.ok) await fetchData();
+        else toast.error('Aggiornamento non riuscito.');
+      } catch {
+        toast.error('Aggiornamento non riuscito.');
       } finally {
         setBusyId(null);
       }
     },
-    [fetchData],
+    [fetchData, toast],
   );
 
   const counters = data?.counters;
@@ -161,7 +167,13 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
         </CardBody>
       </Card>
 
-      {loading && !data && <div className="text-muted">{tc('loading')}</div>}
+      {loading && !data && (
+        <Card className="border-0 shadow-sm">
+          <CardBody className="p-3">
+            <SkeletonLines lines={6} loadingLabel={tc('loading')} />
+          </CardBody>
+        </Card>
+      )}
 
       {data && data.rows.length === 0 && (
         <Card className="border-0 shadow-sm">

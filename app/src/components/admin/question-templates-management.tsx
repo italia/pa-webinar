@@ -14,6 +14,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
 
 const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
@@ -74,6 +78,8 @@ const EMPTY_ITEM: ItemDraft = {
 };
 
 export default function QuestionTemplatesManagement() {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [rows, setRows] = useState<TemplateRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | 'new' | null>(null);
@@ -243,16 +249,22 @@ export default function QuestionTemplatesManagement() {
   const handleDelete = useCallback(
     async (row: TemplateRow) => {
       if (row.isSystem) return;
-      if (!confirm(`Eliminare "${row.name}"? Usato da ${row.usedByQuestionnaires} questionari attivi.`)) return;
+      const ok = await confirm({
+        title: 'Elimina template',
+        message: `Eliminare "${row.name}"? Usato da ${row.usedByQuestionnaires} questionari attivi.`,
+        confirmLabel: 'Elimina',
+        danger: true,
+      });
+      if (!ok) return;
       const res = await fetch(`/api/admin/question-templates/${row.id}`, { method: 'DELETE' });
       if (res.ok) {
         await fetchRows();
       } else {
         const err = await res.json().catch(() => ({}));
-        alert(err.error ?? 'Eliminazione fallita');
+        toast.error(err.error ?? 'Eliminazione fallita');
       }
     },
-    [fetchRows],
+    [fetchRows, confirm, toast],
   );
 
   const editing = editingId !== null;
@@ -466,7 +478,7 @@ export default function QuestionTemplatesManagement() {
           </CardBody>
         </Card>
       ) : loading && rows.length === 0 ? (
-        <div className="text-muted">Caricamento…</div>
+        <SkeletonLines lines={4} loadingLabel="Caricamento template…" />
       ) : rows.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardBody className="p-5 text-center">

@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Badge, Button, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
 
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 interface TemplateRow {
   id: string;
   name: string;
@@ -38,6 +42,8 @@ const EMPTY_DRAFT: Draft = {
 export default function GdprTemplatesManagement() {
   const t = useTranslations('admin.gdprTemplates');
   const tc = useTranslations('common');
+  const toast = useToast();
+  const confirm = useConfirm();
 
   const [rows, setRows] = useState<TemplateRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -126,10 +132,17 @@ export default function GdprTemplatesManagement() {
   }, [draft, editingId, fetchRows, t]);
 
   const handleDelete = useCallback(async (row: TemplateRow) => {
-    if (!confirm(t('confirmDelete', { name: row.name, count: row.usedByEvents }))) return;
+    const ok = await confirm({
+      title: 'Elimina template',
+      message: t('confirmDelete', { name: row.name, count: row.usedByEvents }),
+      confirmLabel: tc('delete'),
+      danger: true,
+    });
+    if (!ok) return;
     const res = await fetch(`/api/admin/gdpr-templates/${row.id}`, { method: 'DELETE' });
     if (res.ok) await fetchRows();
-  }, [fetchRows, t]);
+    else toast.error(t('errors.saveFailed'));
+  }, [confirm, fetchRows, t, tc, toast]);
 
   const editing = editingId !== null;
 
@@ -236,7 +249,11 @@ export default function GdprTemplatesManagement() {
           </CardBody>
         </Card>
       ) : loading && rows.length === 0 ? (
-        <div className="text-muted">{tc('loading')}</div>
+        <Card className="border-0 shadow-sm">
+          <CardBody className="p-3">
+            <SkeletonLines lines={5} loadingLabel={tc('loading')} />
+          </CardBody>
+        </Card>
       ) : rows.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardBody className="p-5 text-center">

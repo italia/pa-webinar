@@ -12,6 +12,10 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { Button, Card, CardBody } from 'design-react-kit';
 
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 interface Detail {
   id: string;
   displayName: string | null;
@@ -36,6 +40,8 @@ interface Detail {
 
 export default function RubricaDetail({ id }: { id: string }) {
   const router = useRouter();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [data, setData] = useState<Detail | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -60,23 +66,30 @@ export default function RubricaDetail({ id }: { id: string }) {
   }, [load]);
 
   const handleDelete = useCallback(async () => {
-    if (!confirm('Eliminare definitivamente questa persona dalla rubrica? L\'operazione è irreversibile ma preserva lo storico delle iscrizioni.')) return;
+    const ok = await confirm({
+      title: 'Elimina dalla rubrica',
+      message:
+        "Eliminare definitivamente questa persona dalla rubrica? L'operazione è irreversibile ma preserva lo storico delle iscrizioni.",
+      confirmLabel: 'Elimina',
+      danger: true,
+    });
+    if (!ok) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/admin/rubrica/${id}`, { method: 'DELETE' });
       if (res.ok) {
         router.push('/admin/rubrica');
       } else {
-        alert('Errore durante l\'eliminazione.');
+        toast.error("Errore durante l'eliminazione.");
         setDeleting(false);
       }
     } catch {
-      alert('Errore di rete.');
+      toast.error('Errore di rete.');
       setDeleting(false);
     }
-  }, [id, router]);
+  }, [id, router, confirm, toast]);
 
-  if (loading) return <div className="text-muted">Caricamento…</div>;
+  if (loading) return <SkeletonLines lines={5} loadingLabel="Caricamento…" />;
   if (notFound) return <div className="text-muted">Persona non trovata.</div>;
   if (!data) return <div className="text-muted">Errore.</div>;
 

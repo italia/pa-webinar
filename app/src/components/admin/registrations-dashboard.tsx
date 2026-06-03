@@ -15,6 +15,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
 
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 interface EventOption {
   id: string;
   slug: string;
@@ -292,7 +294,13 @@ export default function RegistrationsDashboard({
 
       {/* Table */}
       {error && <div className="alert alert-danger">{error}</div>}
-      {loading && <div className="text-muted">{t('loading')}</div>}
+      {loading && (
+        <Card className="border-0 shadow-sm">
+          <CardBody className="p-3">
+            <SkeletonLines lines={8} loadingLabel={t('loading')} />
+          </CardBody>
+        </Card>
+      )}
 
       {data && (
         <Card className="border-0 shadow-sm">

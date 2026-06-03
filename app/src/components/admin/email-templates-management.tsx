@@ -4,6 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Input, Label } from 'design-react-kit';
 
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 type TemplateKey = 'confirmation' | 'reminder';
 type LocaleCode = 'it' | 'en';
 
@@ -69,6 +72,7 @@ function rowToDraft(row: TemplateRow | undefined): Draft {
 export default function EmailTemplatesManagement() {
   const t = useTranslations('admin.emailTemplates');
   const tc = useTranslations('common');
+  const confirm = useConfirm();
 
   const [rows, setRows] = useState<TemplateRow[]>([]);
   const [defaults, setDefaults] = useState<DefaultsMap>({});
@@ -154,7 +158,13 @@ export default function EmailTemplatesManagement() {
   }, [draft, selectedKey, selectedLocale, fetchAll, t]);
 
   const resetToDefault = useCallback(async () => {
-    if (!confirm(t('confirmReset'))) return;
+    const ok = await confirm({
+      title: t('resetToDefault'),
+      message: t('confirmReset'),
+      confirmLabel: t('resetToDefault'),
+      danger: true,
+    });
+    if (!ok) return;
     setSaving(true);
     setError(null);
     setFlash(null);
@@ -173,7 +183,7 @@ export default function EmailTemplatesManagement() {
     } finally {
       setSaving(false);
     }
-  }, [selectedKey, selectedLocale, fetchAll, t]);
+  }, [selectedKey, selectedLocale, fetchAll, t, confirm]);
 
   const isOverridden = !!currentRow;
 
@@ -182,7 +192,7 @@ export default function EmailTemplatesManagement() {
   return (
     <div>
       {loading && rows.length === 0 ? (
-        <div className="text-muted">{tc('loading')}</div>
+        <SkeletonLines lines={6} loadingLabel={tc('loading')} />
       ) : (
         <>
           <div
