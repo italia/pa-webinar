@@ -87,7 +87,7 @@ export default function CreateInstantCall() {
           <Icon icon="it-video" size="sm" style={{ color: '#008758' }} />
         </div>
         <div>
-          <h5 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
             {t('title')}
           </h5>
           <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>

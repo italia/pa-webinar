@@ -289,7 +289,7 @@ async function LandingHome({
                         left: 'calc(50% + 35px)',
                         width: 'calc(100% - 70px)',
                         height: 2,
-                        backgroundColor: '#0066CC',
+                        backgroundColor: 'var(--app-primary)',
                         opacity: 0.25,
                       }}
                       aria-hidden="true"

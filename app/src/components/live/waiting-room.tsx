@@ -242,7 +242,7 @@ export default function WaitingRoom({
         <div className="row justify-content-center">
           <div className="col-lg-10 col-xl-8">
             <div className="d-flex align-items-center justify-content-between mb-3">
-              <h2 className="h5 fw-semibold mb-0" style={{ color: '#17324D' }}>
+              <h2 className="h5 fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
                 {event.title}
               </h2>
               <Button
@@ -373,7 +373,7 @@ export default function WaitingRoom({
                     right: 12,
                     fontSize: '0.75rem',
                     backgroundColor: '#E9ECEF',
-                    color: '#5A768A',
+                    color: 'var(--app-muted)',
                   }}
                 >
                   {t('endedTitle')}
@@ -387,7 +387,7 @@ export default function WaitingRoom({
                 kickerEnabled={event.parseTitleKicker ?? false}
                 as="h1"
                 className="h4 fw-bold mb-2"
-                style={{ color: '#17324D' }}
+                style={{ color: 'var(--app-text)' }}
               />
 
               {organizerLine && (
@@ -537,7 +537,7 @@ export default function WaitingRoom({
               {/* Primary CTA area */}
               {isEnded ? (
                 <div className="d-grid gap-2 mb-3">
-                  <h2 className="h5 fw-semibold mb-1" style={{ color: '#17324D' }}>
+                  <h2 className="h5 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
                     {t('endedTitle')}
                   </h2>
                   {hasRecording && (
@@ -659,7 +659,7 @@ export default function WaitingRoom({
 
               {/* Netiquette reminder */}
               <div className="waiting-netiquette rounded-3 p-3 mb-3" style={{ backgroundColor: '#F5F7FA' }}>
-                <div className="fw-semibold mb-2" style={{ color: '#17324D', fontSize: '0.9rem' }}>
+                <div className="fw-semibold mb-2" style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}>
                   <Icon icon="it-info-circle" size="xs" className="me-1" />
                   {t('netiquetteTitle')}
                 </div>
@@ -691,7 +691,7 @@ export default function WaitingRoom({
                   style={{ border: '1px solid #E2E8F0' }}
                 >
                   <div className="px-3 py-2" style={{ backgroundColor: '#F5F7FA' }}>
-                    <div className="fw-semibold" style={{ color: '#17324D', fontSize: '0.85rem' }}>
+                    <div className="fw-semibold" style={{ color: 'var(--app-text)', fontSize: '0.85rem' }}>
                       <Icon icon="it-comment" size="xs" className="me-1" />
                       {t('chatPreviewTitle')}
                     </div>
@@ -711,7 +711,7 @@ export default function WaitingRoom({
                   ) : (
                     <div
                       className="d-flex flex-column align-items-center justify-content-center text-center p-4"
-                      style={{ height: 220, backgroundColor: '#F5F7FA', color: '#5A768A' }}
+                      style={{ height: 220, backgroundColor: '#F5F7FA', color: 'var(--app-muted)' }}
                     >
                       <Icon icon="it-lock" size="sm" className="mb-2" />
                       <div style={{ fontSize: '0.85rem' }}>{t('chatLockedMessage')}</div>

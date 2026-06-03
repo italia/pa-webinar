@@ -217,7 +217,7 @@ export default function EmailTemplatesManagement() {
             </div>
             <div className="ms-auto text-muted" style={{ fontSize: '0.8rem' }}>
               {isOverridden ? (
-                <span style={{ color: '#0066CC' }}>● {t('overridden')}</span>
+                <span style={{ color: 'var(--app-primary)' }}>● {t('overridden')}</span>
               ) : (
                 <span>○ {t('usingDefault')}</span>
               )}

@@ -173,7 +173,7 @@ export default function CollapsibleSection({
           <div style={{ minWidth: 0 }}>
             <h5
               className="fw-semibold mb-0"
-              style={{ color: '#17324D', fontSize: '1rem' }}
+              style={{ color: 'var(--app-text)', fontSize: '1rem' }}
             >
               {title}
               {badge !== undefined && badge !== '' && (

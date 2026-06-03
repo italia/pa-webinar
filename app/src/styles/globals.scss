@@ -4,6 +4,15 @@
 // Bootstrap Italia — the .italia design system CSS framework
 @import 'bootstrap-italia/src/scss/bootstrap-italia';
 
+/* Design token applicativi (.italia): centralizzano i 3 colori brand
+   prima hardcoded inline in centinaia di punti. Valori identici → zero
+   regressione visiva, piena coerenza/temabilità. */
+:root {
+  --app-text: #17324D;    /* heading/testo scuro brand */
+  --app-primary: #0066CC; /* blu primario .italia */
+  --app-muted: #5A768A;   /* testo secondario */
+}
+
 // ── Bootstrap Italia overrides ───────────────────────────────────────────
 //
 // Bootstrap Italia's `.alert` renders the contextual icon (warning / info /

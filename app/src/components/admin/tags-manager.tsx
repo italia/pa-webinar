@@ -281,7 +281,7 @@ export default function TagsManager({ initialTags }: Props) {
       className="p-3 p-md-4 mb-3 rounded-3"
       style={{ background: '#f8f9fa', border: '1px solid #e8e8e8' }}
     >
-      <h2 className="h5 fw-semibold mb-3" style={{ color: '#17324D' }}>
+      <h2 className="h5 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
         {editingId === 'new' ? t('addTag') : t('editTag')}
       </h2>
       <div className="row g-3">
@@ -374,7 +374,7 @@ export default function TagsManager({ initialTags }: Props) {
               type="color"
               className="form-control form-control-color"
               style={{ width: 48, minWidth: 48 }}
-              value={HEX_COLOR_RE.test(draft.color) ? draft.color : '#0066CC'}
+              value={HEX_COLOR_RE.test(draft.color) ? draft.color : 'var(--app-primary)'}
               onChange={(e) =>
                 setDraft((d) => ({ ...d, color: e.target.value }))
               }

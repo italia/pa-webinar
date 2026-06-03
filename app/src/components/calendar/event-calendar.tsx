@@ -15,8 +15,8 @@ import type { EventInput, DatesSetArg, EventClickArg } from '@fullcalendar/core'
 import { useRouter } from '@/i18n/navigation';
 
 const STATUS_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  DRAFT: { bg: '#E9ECEF', border: '#5A768A', text: '#5A768A' },
-  PUBLISHED: { bg: '#E8F0FE', border: '#0066CC', text: '#0066CC' },
+  DRAFT: { bg: '#E9ECEF', border: 'var(--app-muted)', text: 'var(--app-muted)' },
+  PUBLISHED: { bg: '#E8F0FE', border: 'var(--app-primary)', text: 'var(--app-primary)' },
   LIVE: { bg: '#D4EDDA', border: '#008758', text: '#008758' },
   ENDED: { bg: '#FFF3CD', border: '#A66300', text: '#A66300' },
   ARCHIVED: { bg: '#E9ECEF', border: '#6C757D', text: '#6C757D' },
@@ -82,7 +82,7 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
     }
   }, [mode, router]);
 
-  const defaultColors = { bg: '#E9ECEF', border: '#5A768A', text: '#5A768A' };
+  const defaultColors = { bg: '#E9ECEF', border: 'var(--app-muted)', text: 'var(--app-muted)' };
 
   const calendarEvents: EventInput[] = events.map((evt) => {
     const colors = STATUS_COLORS[evt.status] ?? defaultColors;
@@ -155,7 +155,7 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
               <Icon icon="it-arrow-right" size="sm" />
             </Button>
           </div>
-          <h5 className="mb-0 fw-semibold" style={{ color: '#17324D', fontSize: '1.1rem' }}>
+          <h5 className="mb-0 fw-semibold" style={{ color: 'var(--app-text)', fontSize: '1.1rem' }}>
             {headerTitle}
           </h5>
           {loading && <Spinner active small className="ms-2" />}

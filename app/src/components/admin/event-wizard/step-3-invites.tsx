@@ -54,7 +54,7 @@ export default function Step3Invites({ value, onChange }: Props) {
 
   return (
     <div>
-      <h2 className="h4 fw-bold mb-3" style={{ color: '#17324D' }}>
+      <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('heading')}
       </h2>
       <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
@@ -128,7 +128,7 @@ function OrganizersSection({
 
   return (
     <section className="mb-4">
-      <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
         {t('organizersHeading')}
       </h3>
       <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
@@ -286,7 +286,7 @@ function ModeratorsSection({
 
   return (
     <section className="mb-4">
-      <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
         {t('moderatorsHeading')}
       </h3>
       <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
@@ -424,7 +424,7 @@ function SpeakersSection({
 
   return (
     <section className="mb-4">
-      <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
         {t('speakersHeading')}
       </h3>
       <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
@@ -566,7 +566,7 @@ function InvitationsSection({
 
   return (
     <section className="mb-3">
-      <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
         {t('invitationsHeading')}
       </h3>
       <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>

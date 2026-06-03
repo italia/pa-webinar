@@ -146,7 +146,7 @@ export default function FileManagement({
     <Card className="border-0 shadow-sm">
       <CardBody className="p-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
             <Icon icon="it-files" size="sm" className="me-2" />
             {t('title')}
           </h5>

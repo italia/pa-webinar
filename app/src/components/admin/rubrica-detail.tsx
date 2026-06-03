@@ -86,7 +86,7 @@ export default function RubricaDetail({ id }: { id: string }) {
         <CardBody className="p-4">
           <div className="d-flex justify-content-between flex-wrap gap-2 mb-3">
             <div>
-              <h2 className="fw-semibold mb-1" style={{ color: '#17324D' }}>
+              <h2 className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
                 {data.displayName || '(senza nome)'}
               </h2>
               <div className="text-muted small">

@@ -496,7 +496,7 @@ function SpeakersEditor({
                     setEdits((m) => ({ ...m, [s.id]: s.suggestedName! }))
                   }
                   style={{
-                    color: '#0066CC',
+                    color: 'var(--app-primary)',
                     fontSize: '0.78rem',
                     textDecoration: 'underline',
                     textDecorationStyle: 'dotted',
@@ -516,7 +516,7 @@ function SpeakersEditor({
                 style={{
                   borderLeft: '3px solid #d6e3f1',
                   fontSize: '0.82rem',
-                  color: '#5A768A',
+                  color: 'var(--app-muted)',
                   fontStyle: 'italic',
                 }}
               >

@@ -186,7 +186,7 @@ export default function TemplateManagement({
       {editing === 'new' && (
         <Card className="mb-4 border shadow-sm" style={{ borderRadius: 8 }}>
           <CardBody className="p-4">
-            <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
               {t('create')}
             </h5>
             <TemplateForm
@@ -232,7 +232,7 @@ export default function TemplateManagement({
                     <Icon icon={tpl.icon} size="sm" color="primary" />
                     <h5
                       className="fw-semibold mb-0"
-                      style={{ color: '#17324D' }}
+                      style={{ color: 'var(--app-text)' }}
                     >
                       {tpl.name}
                     </h5>

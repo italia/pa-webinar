@@ -90,7 +90,7 @@ export default function RecordingManageClient({
       </div>
       <div className="d-flex flex-wrap align-items-center gap-3 mb-4">
         <div className="flex-grow-1">
-          <h1 className="fw-bold mb-1" style={{ color: '#17324D', fontSize: '1.5rem' }}>
+          <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)', fontSize: '1.5rem' }}>
             {eventTitle}
           </h1>
           <div className="d-flex flex-wrap align-items-center gap-2 small text-secondary">

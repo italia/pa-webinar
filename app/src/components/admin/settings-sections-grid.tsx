@@ -87,7 +87,7 @@ export default function SettingsSectionsGrid() {
   return (
     <div className="row g-3 mb-5">
       {SECTIONS.map((s) => {
-        const accent = s.tone === 'warning' ? '#A66300' : '#0066CC';
+        const accent = s.tone === 'warning' ? '#A66300' : 'var(--app-primary)';
         const accentBg =
           s.tone === 'warning' ? 'rgba(166,99,0,0.08)' : 'rgba(0,102,204,0.08)';
         return (
@@ -112,7 +112,7 @@ export default function SettingsSectionsGrid() {
                   {s.icon}
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <div className="fw-semibold mb-1" style={{ color: '#17324D' }}>
+                  <div className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
                     {t(s.titleKey)}
                   </div>
                   <div className="text-secondary" style={{ fontSize: '0.85rem', lineHeight: 1.35 }}>

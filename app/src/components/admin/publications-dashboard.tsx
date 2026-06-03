@@ -120,7 +120,7 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
               >
                 {tb.label}
                 {tb.count !== undefined && (
-                  <Badge color="" pill className="ms-2" style={{ fontSize: '0.65rem', background: '#E9ECEF', color: '#5A768A' }}>
+                  <Badge color="" pill className="ms-2" style={{ fontSize: '0.65rem', background: '#E9ECEF', color: 'var(--app-muted)' }}>
                     {tb.count}
                   </Badge>
                 )}
@@ -201,7 +201,7 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
                     </div>
                     <div style={{ minWidth: 0, flexGrow: 1 }}>
                       <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
-                        <h6 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+                        <h6 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
                           {r.title || <em className="text-muted">{t('untitled')}</em>}
                         </h6>
                         <SourceBadge source={r.source} />
@@ -210,7 +210,7 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
                             {t('badges.listed')}
                           </Badge>
                         ) : (
-                          <Badge color="" pill style={{ fontSize: '0.65rem', background: '#E9ECEF', color: '#5A768A' }}>
+                          <Badge color="" pill style={{ fontSize: '0.65rem', background: '#E9ECEF', color: 'var(--app-muted)' }}>
                             {t('badges.unlisted')}
                           </Badge>
                         )}

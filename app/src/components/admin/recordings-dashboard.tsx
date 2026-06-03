@@ -356,7 +356,7 @@ export default function RecordingsDashboard({
             <Card className="border-0 shadow-sm h-100">
               <CardBody className="p-3">
                 <div className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase' }}>{t('statWithRecording')}</div>
-                <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#17324D' }}>{data.stats.withRecording}</div>
+                <div className="fw-bold" style={{ fontSize: '1.6rem', color: 'var(--app-text)' }}>{data.stats.withRecording}</div>
               </CardBody>
             </Card>
           </div>
@@ -364,7 +364,7 @@ export default function RecordingsDashboard({
             <Card className="border-0 shadow-sm h-100">
               <CardBody className="p-3">
                 <div className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase' }}>{t('statTotalSize')}</div>
-                <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#0066CC' }}>{fmtSize(data.stats.totalBytes)}</div>
+                <div className="fw-bold" style={{ fontSize: '1.6rem', color: 'var(--app-primary)' }}>{fmtSize(data.stats.totalBytes)}</div>
               </CardBody>
             </Card>
           </div>
@@ -609,7 +609,7 @@ function OrphansView({
               <div className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase' }}>
                 {t('orphans.statTotal')}
               </div>
-              <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#17324D' }}>
+              <div className="fw-bold" style={{ fontSize: '1.6rem', color: 'var(--app-text)' }}>
                 {data.total}
               </div>
               <small className="text-muted">{fmtOrphanSize(data.totalBytes)}</small>
@@ -634,7 +634,7 @@ function OrphansView({
               <div className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase' }}>
                 {t('orphans.statIgnore')}
               </div>
-              <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#5A768A' }}>
+              <div className="fw-bold" style={{ fontSize: '1.6rem', color: 'var(--app-muted)' }}>
                 {countIgnore}
               </div>
             </CardBody>
@@ -767,7 +767,7 @@ function OrphansView({
                         />
                       </td>
                       <td>
-                        <code style={{ fontSize: '0.78rem', color: '#17324D' }}>{r.blobName}</code>
+                        <code style={{ fontSize: '0.78rem', color: 'var(--app-text)' }}>{r.blobName}</code>
                       </td>
                       <td className="text-end">{fmtOrphanSize(r.sizeBytes)}</td>
                       <td className="text-muted" style={{ fontSize: '0.78rem' }}>

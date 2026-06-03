@@ -91,7 +91,7 @@ export default function CreateEventWithTemplate({
   if (showPicker) {
     return (
       <div>
-        <h4 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+        <h4 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
           {t('pickerTitle')}
         </h4>
 

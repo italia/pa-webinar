@@ -147,7 +147,7 @@ export default function RecordingManagement({
     return (
       <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('management')}
           </h5>
           <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
@@ -163,7 +163,7 @@ export default function RecordingManagement({
     return (
       <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('management')}
           </h5>
           <Alert color="warning" className="mb-0">
@@ -178,7 +178,7 @@ export default function RecordingManagement({
     <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
       <CardBody className="p-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
             {t('management')}
           </h5>
           {isLive && event.tempRecordingStartedAt && (
@@ -245,7 +245,7 @@ export default function RecordingManagement({
             <div className="border rounded p-3 mb-3">
               <div className="d-flex justify-content-between align-items-start">
                 <div className="me-3">
-                  <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                     {t('publish')}
                   </div>
                   <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
@@ -263,7 +263,7 @@ export default function RecordingManagement({
 
             {/* Retention options */}
             <div className="border rounded p-3 mb-3">
-              <div className="fw-semibold mb-2" style={{ color: '#17324D' }}>
+              <div className="fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
                 {t('retentionLabel')}
               </div>
               <div className="d-flex flex-column gap-1">

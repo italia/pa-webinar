@@ -47,7 +47,7 @@ export default function Step5Review({
 
   return (
     <div>
-      <h2 className="h4 fw-bold mb-3" style={{ color: '#17324D' }}>
+      <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('heading')}
       </h2>
       <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
@@ -119,7 +119,7 @@ export default function Step5Review({
 
       {/* GDPR / retention */}
       <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('gdprHeading')}
         </h3>
         <div className="row g-3">
@@ -198,7 +198,7 @@ export default function Step5Review({
 
       {/* Moderator contact (optional but used for confirmation mail) */}
       <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('moderatorHeading')}
         </h3>
         <div className="row g-3">
@@ -231,7 +231,7 @@ export default function Step5Review({
 
       {/* Load capacity */}
       <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('capacityHeading')}
         </h3>
         <JvbCapacityPreview
@@ -248,7 +248,7 @@ export default function Step5Review({
 
       {/* Feature diagram */}
       <section className="mb-3">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: '#17324D' }}>
+        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('featuresHeading')}
         </h3>
         <EventConfigDiagram
@@ -278,7 +278,7 @@ function SummaryItem({ label, value }: { label: string; value: string }) {
       >
         {label}
       </div>
-      <div className="fw-semibold" style={{ color: '#17324D', wordBreak: 'break-word' }}>
+      <div className="fw-semibold" style={{ color: 'var(--app-text)', wordBreak: 'break-word' }}>
         {value}
       </div>
     </div>

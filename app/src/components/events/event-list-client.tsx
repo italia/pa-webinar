@@ -92,7 +92,7 @@ export default function EventListClient({
           ? '#008758'
           : isEnded
             ? '#5A768A'
-            : '#0066CC';
+            : 'var(--app-primary)';
 
         const eventTags = event.tags ?? [];
         const visibleTags = eventTags.slice(0, 3);
@@ -139,12 +139,12 @@ export default function EventListClient({
                   kickerEnabled={resolveKickerEnabled(event, parseTitleKicker)}
                   as="h3"
                   className="h5 fw-semibold mb-2"
-                  style={{ color: '#17324D' }}
+                  style={{ color: 'var(--app-text)' }}
                   wrapMain={(main) => (
                     <Link
                       href={`/events/${event.slug}`}
                       className="text-decoration-none"
-                      style={{ color: '#17324D' }}
+                      style={{ color: 'var(--app-text)' }}
                     >
                       {main}
                     </Link>
@@ -183,7 +183,7 @@ export default function EventListClient({
                         className="badge"
                         style={{
                           backgroundColor: '#F5F7FB',
-                          color: '#5A768A',
+                          color: 'var(--app-muted)',
                           fontSize: '0.72rem',
                           padding: '3px 8px',
                           borderRadius: 12,

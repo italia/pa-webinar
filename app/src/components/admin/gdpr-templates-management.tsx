@@ -147,7 +147,7 @@ export default function GdprTemplatesManagement() {
       {editing ? (
         <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
           <CardBody className="p-4">
-            <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
               {editingId === 'new' ? t('form.newTitle') : t('form.editTitle')}
             </h5>
 
@@ -255,7 +255,7 @@ export default function GdprTemplatesManagement() {
                 <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
                   <div style={{ minWidth: 0 }}>
                     <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
-                      <h6 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+                      <h6 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
                         {row.name}
                       </h6>
                       {row.isDefault && (
@@ -264,7 +264,7 @@ export default function GdprTemplatesManagement() {
                         </Badge>
                       )}
                       {row.locales.map((l) => (
-                        <Badge key={l} color="" pill className="px-2 py-1" style={{ fontSize: '0.65rem', backgroundColor: '#E8F0FE', color: '#0066CC', textTransform: 'uppercase' }}>
+                        <Badge key={l} color="" pill className="px-2 py-1" style={{ fontSize: '0.65rem', backgroundColor: '#E8F0FE', color: 'var(--app-primary)', textTransform: 'uppercase' }}>
                           {l}
                         </Badge>
                       ))}

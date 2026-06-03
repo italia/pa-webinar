@@ -50,7 +50,7 @@ export default function PreJoinScreen({
                 >
                   <Icon icon="it-video" size="sm" color="white" />
                 </div>
-                <h1 className="h4 fw-bold mb-1" style={{ color: '#17324D' }}>
+                <h1 className="h4 fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
                   {eventTitle}
                 </h1>
                 <p className="text-muted mb-0">{t('preJoinSubtitle')}</p>

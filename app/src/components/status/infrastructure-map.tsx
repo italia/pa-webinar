@@ -13,8 +13,8 @@ const STATUS_COLORS: Record<string, string> = {
   healthy: '#008758',
   degraded: '#A66300',
   down: '#CC334D',
-  standby: '#5A768A',
-  scaling: '#0066CC',
+  standby: 'var(--app-muted)',
+  scaling: 'var(--app-primary)',
 };
 
 const STATUS_BG: Record<string, string> = {
@@ -243,11 +243,11 @@ export default function InfrastructureMap() {
       {/* Stats bar */}
       {data && (
         <div className="infra-map__stats-bar">
-          <StatPill label={t('participants')} value={String(data.traffic.totalParticipants)} color={data.traffic.totalParticipants > 0 ? '#008758' : '#5A768A'} iconPath={SERVICE_ICONS.globe ?? ''} />
-          <StatPill label={t('conferences')} value={String(data.traffic.activeConferences)} color={data.traffic.activeConferences > 0 ? '#0066CC' : '#5A768A'} iconPath={SERVICE_ICONS.jvb ?? ''} />
+          <StatPill label={t('participants')} value={String(data.traffic.totalParticipants)} color={data.traffic.totalParticipants > 0 ? '#008758' : 'var(--app-muted)'} iconPath={SERVICE_ICONS.globe ?? ''} />
+          <StatPill label={t('conferences')} value={String(data.traffic.activeConferences)} color={data.traffic.activeConferences > 0 ? '#0066CC' : 'var(--app-muted)'} iconPath={SERVICE_ICONS.jvb ?? ''} />
           <StatPill label={t('bandwidthIn')} value={formatMbps(data.traffic.bandwidthInMbps)} color="#0066CC" iconPath="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
           <StatPill label={t('bandwidthOut')} value={formatMbps(data.traffic.bandwidthOutMbps)} color="#0066CC" iconPath="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
-          <StatPill label={t('recordings')} value={String(data.storage.recordings.count)} color={data.storage.configured ? '#008758' : '#5A768A'} iconPath={SERVICE_ICONS.jibri ?? ''} />
+          <StatPill label={t('recordings')} value={String(data.storage.recordings.count)} color={data.storage.configured ? '#008758' : 'var(--app-muted)'} iconPath={SERVICE_ICONS.jibri ?? ''} />
           <StatPill label={t('registrationsToday')} value={String(data.events.registrationsToday)} color="#0066CC" iconPath="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
         </div>
       )}
@@ -312,14 +312,14 @@ export default function InfrastructureMap() {
 
                 {hasTraffic && (
                   <>
-                    <circle r="3" fill={c.labelKey === 'connMedia' ? '#008758' : '#0066CC'} opacity="0.8">
+                    <circle r="3" fill={c.labelKey === 'connMedia' ? '#008758' : 'var(--app-primary)'} opacity="0.8">
                       <animateMotion
                         dur={`${getAnimDur(key)}s`}
                         repeatCount="indefinite"
                         path={`M${f.x},${f.y} L${t2.x},${t2.y}`}
                       />
                     </circle>
-                    <circle r="2" fill={c.labelKey === 'connMedia' ? '#008758' : '#0066CC'} opacity="0.5">
+                    <circle r="2" fill={c.labelKey === 'connMedia' ? '#008758' : 'var(--app-primary)'} opacity="0.5">
                       <animateMotion
                         dur={`${getAnimDur(key) + 0.7}s`}
                         repeatCount="indefinite"
@@ -372,7 +372,7 @@ export default function InfrastructureMap() {
             const isMedia = ep.service === 'jvb';
             const pillFill = isMedia ? '#E8F5E9' : '#E3F2FD';
             const pillStroke = isMedia ? (hi ? '#008758' : '#A5D6A7') : (hi ? '#0066CC' : '#90CAF9');
-            const iconColor = isMedia ? '#008758' : '#0066CC';
+            const iconColor = isMedia ? '#008758' : 'var(--app-primary)';
             const label = t(ENDPOINT_LABEL_KEY[ep.service] as Parameters<typeof t>[0]);
 
             return (
@@ -759,7 +759,7 @@ function VerdictCard({ service, t }: {
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
           <path d={iconPath} fill={sc} />
         </svg>
-        <span className="fw-semibold" style={{ color: '#17324D', fontSize: '0.88rem' }}>{svcName}</span>
+        <span className="fw-semibold" style={{ color: 'var(--app-text)', fontSize: '0.88rem' }}>{svcName}</span>
         <Badge style={{ backgroundColor: sc, fontSize: '0.68rem', marginLeft: 'auto' }}>
           {t(`statuses.${service.status}` as Parameters<typeof t>[0])}
         </Badge>
