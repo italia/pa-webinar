@@ -20,6 +20,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import { SkeletonLines } from '@/components/ui/skeleton';
 
 const fetcher = (url: string): Promise<unknown> =>
   fetch(url, { credentials: 'include' }).then((r) => {
@@ -191,7 +192,7 @@ export default function SummaryEditor({
     );
   }
   if (isLoading || !data) {
-    return <p className="text-secondary small mb-0">Caricamento sintesi…</p>;
+    return <SkeletonLines lines={5} loadingLabel="Caricamento sintesi…" />;
   }
   if (data.languages.length === 0) {
     return (

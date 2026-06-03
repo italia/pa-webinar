@@ -15,6 +15,7 @@
 
 import { useState } from 'react';
 import useSWR from 'swr';
+import { SkeletonLines } from '@/components/ui/skeleton';
 
 const fetcher = (url: string): Promise<unknown> =>
   fetch(url, { credentials: 'include' }).then(async (r) => {
@@ -86,11 +87,7 @@ export default function TranslationManager({
   }
 
   if (isLoading) {
-    return (
-      <div className="text-secondary small" aria-live="polite">
-        Caricamento lingue di traduzione…
-      </div>
-    );
+    return <SkeletonLines lines={2} loadingLabel="Caricamento lingue di traduzione…" />;
   }
 
   if (error || !data) {
