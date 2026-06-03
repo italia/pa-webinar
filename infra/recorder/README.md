@@ -90,11 +90,11 @@ abbiamo affidabilità e parità col path di produzione.
 | `RECORDING_ID` | ✅ | — | Id registrazione (lega il manifest alla riga `RecordingTrack`). |
 | `EVENT_ID` | ✅ | — | Id evento (path storage + lookup ingest). |
 | `OUTPUT_DIR` | — | `/recordings` | Dir locale per le tracce prima dell'upload. |
-| `WEBHOOK_URL` | — | — | URL webhook portale (riusa il pattern `/api/webhooks/recording`). |
-| `CRON_API_KEY` | — | — | Bearer-token per il webhook (come Jibri). |
-| `RECORDING_WEBHOOK_SECRET` | — | — | Se presente, firma il body HMAC-SHA256 (`X-Webhook-Signature`). |
+| `INGEST_URL` | — | — | URL di `POST /api/internal/multitrack-manifest` (ADR-013 Fase 2). |
+| `CRON_API_KEY` | — | — | Inviato come header `x-api-key` all'ingest (come gli altri `/internal`). |
+| `RECORDING_UPLOAD_BASE_URL` | — | — | Base URL firmata (SAS Azure / presigned S3 / signed GCS) emessa dal portale verso il prefisso della registrazione. Se presente, si usa l'upload reale; altrimenti noop locale. |
 | `BOT_DISPLAY_NAME` | — | `📼 Recorder` | Nome del bot in stanza. |
-| `RECORDING_STORAGE_TYPE` | — | `local` | `azure-blob`\|`s3`\|`gcs`\|`minio`\|`local` (credenziali come `jibri-finalize.sh`). |
+| `RECORDING_STORAGE_TYPE` | — | `local` | Usato solo per il warning se manca `RECORDING_UPLOAD_BASE_URL`. L'upload reale passa sempre per la base URL firmata dal portale. |
 
 ## Layout storage e manifest
 
