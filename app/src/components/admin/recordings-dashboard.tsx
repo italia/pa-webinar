@@ -59,6 +59,7 @@ interface RecordingRow {
   jitsiRoomName: string | null;
   moderatorName: string | null;
   moderatorEmail: string | null;
+  transcript: { recordingId: string; status: string; hasTranscript: boolean } | null;
 }
 
 interface ApiResponse {
@@ -443,11 +444,26 @@ export default function RecordingsDashboard({
                                   <Icon icon="it-download" size="xs" />
                                 </a>
                                 <Link
-                                  href={`/admin/postprod?eventId=${r.eventId}`}
-                                  className="btn btn-sm btn-outline-secondary"
+                                  href={
+                                    r.transcript
+                                      ? `/admin/postprod/${r.transcript.recordingId}`
+                                      : `/admin/postprod?eventId=${r.eventId}`
+                                  }
+                                  className={`btn btn-sm d-inline-flex align-items-center gap-1 ${
+                                    r.transcript?.hasTranscript
+                                      ? 'btn-outline-success'
+                                      : 'btn-outline-secondary'
+                                  }`}
                                   title={t('transcriptManage')}
                                 >
                                   <Icon icon="it-comment" size="xs" />
+                                  {r.transcript && (
+                                    <span style={{ fontSize: '0.66rem' }}>
+                                      {r.transcript.hasTranscript
+                                        ? t('transcriptReady')
+                                        : t('transcriptProcessing')}
+                                    </span>
+                                  )}
                                 </Link>
                               </div>
                             ) : (

@@ -766,7 +766,9 @@
       "detailModerator": "Moderator",
       "detailRoom": "Jitsi room",
       "detailFilename": "File name",
-      "transcriptManage": "Manage transcript / AI"
+      "transcriptManage": "Manage transcript / AI",
+      "transcriptReady": "Transcribed",
+      "transcriptProcessing": "Processing"
     },
     "gdprAudit": {
       "title": "GDPR audit",
