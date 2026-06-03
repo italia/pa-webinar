@@ -14,6 +14,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 
+import { useConfirm } from '@/components/ui/confirm-dialog';
+
 type Placement = 'PRE_REGISTRATION' | 'POST_EVENT';
 
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
@@ -195,6 +197,7 @@ function PlacementCard({
   eventId: string;
   onRefresh: () => void;
 }) {
+  const confirm = useConfirm();
   const locked = state.responseCount > 0;
 
   const save = async () => {
@@ -254,7 +257,13 @@ function PlacementCard({
   };
 
   const remove = async () => {
-    if (!confirm(`Eliminare il questionario ${placement}? Verranno cancellate anche le risposte raccolte.`)) return;
+    const ok = await confirm({
+      title: 'Elimina questionario',
+      message: 'Eliminare questo questionario? Verranno cancellate anche le risposte raccolte.',
+      confirmLabel: 'Elimina',
+      danger: true,
+    });
+    if (!ok) return;
     const res = await fetch(`/api/admin/events/${eventId}/questionnaires/${placement}`, {
       method: 'DELETE',
     });

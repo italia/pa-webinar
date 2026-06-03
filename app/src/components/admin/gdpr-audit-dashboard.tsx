@@ -5,6 +5,7 @@ import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Card, CardBody, Label } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { SkeletonLines } from '@/components/ui/skeleton';
 
 interface AuditRow {
   id: string;
@@ -114,7 +115,13 @@ export default function GdprAuditDashboard() {
       )}
 
       {error && <div className="alert alert-danger">{error}</div>}
-      {loading && <div className="text-muted">{t('loading')}</div>}
+      {loading && (
+        <Card className="border-0 shadow-sm">
+          <CardBody className="p-3">
+            <SkeletonLines lines={6} loadingLabel={t('loading')} />
+          </CardBody>
+        </Card>
+      )}
 
       {data && (
         <Card className="border-0 shadow-sm">

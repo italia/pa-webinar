@@ -17,6 +17,7 @@ import {
 } from 'design-react-kit';
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 
 interface SerializedTemplate {
   id: string;
@@ -71,6 +72,7 @@ export default function TemplateManagement({
 }: TemplateManagementProps) {
   const t = useTranslations('admin.templates');
   const tc = useTranslations('common');
+  const confirm = useConfirm();
   const [templates, setTemplates] =
     useState<SerializedTemplate[]>(initialTemplates);
   const [editing, setEditing] = useState<string | 'new' | null>(null);
@@ -141,7 +143,13 @@ export default function TemplateManagement({
   }, [editing, form]);
 
   const handleDelete = useCallback(async (id: string) => {
-    if (!confirm(t('deleteConfirm'))) return;
+    const ok = await confirm({
+      title: tc('delete'),
+      message: t('deleteConfirm'),
+      confirmLabel: tc('delete'),
+      danger: true,
+    });
+    if (!ok) return;
     try {
       const res = await fetch(`/api/admin/templates?id=${id}`, {
         method: 'DELETE',
@@ -154,7 +162,7 @@ export default function TemplateManagement({
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error');
     }
-  }, [t]);
+  }, [confirm, t, tc]);
 
   const setField = useCallback(
     <K extends keyof EditingTemplate>(key: K, value: EditingTemplate[K]) => {

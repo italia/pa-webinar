@@ -14,6 +14,8 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import TranscriptEditor from './transcript-editor';
 import SummaryEditor from './summary-editor';
 import TranslationManager from './translation-manager';
@@ -53,22 +55,28 @@ export default function RecordingManageClient({
   createdAt: string;
 }) {
   const t = useTranslations('admin.postprod');
+  const toast = useToast();
+  const confirm = useConfirm();
   const [tab, setTab] = useState<TabKey>('transcript');
   const [rerunning, setRerunning] = useState(false);
-  const [rerunMsg, setRerunMsg] = useState<string | null>(null);
 
   async function rerun(): Promise<void> {
-    if (!confirm(t('rerunTooltip'))) return;
+    const ok = await confirm({
+      title: t('rerun'),
+      message: t('rerunTooltip'),
+      confirmLabel: t('rerun'),
+    });
+    if (!ok) return;
     setRerunning(true);
-    setRerunMsg(null);
     try {
       const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/rerun`, {
         method: 'POST',
         credentials: 'include',
       });
-      setRerunMsg(r.ok ? t('manageRerunOk') : t('rerunFailed', { code: r.status }));
+      if (r.ok) toast.success(t('manageRerunOk'));
+      else toast.error(t('rerunFailed', { code: r.status }));
     } catch {
-      setRerunMsg(t('rerunFailed', { code: 0 }));
+      toast.error(t('rerunFailed', { code: 0 }));
     } finally {
       setRerunning(false);
     }
@@ -101,7 +109,6 @@ export default function RecordingManageClient({
           </div>
         </div>
         <div className="d-flex align-items-center gap-2">
-          {rerunMsg && <span className="small text-secondary">{rerunMsg}</span>}
           {eventSlug && (
             <Link
               href={`/eventi/${eventSlug}`}
