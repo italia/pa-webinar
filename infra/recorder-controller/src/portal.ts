@@ -4,7 +4,7 @@
  * JWT bot e presign li conia il portale al `recorder-claim` lato recorder.
  */
 
-import type { DesiredRecorder } from './reconcile';
+import type { DesiredRecorder } from './reconcile.js';
 
 export interface PortalClientOptions {
   portalUrl: string;

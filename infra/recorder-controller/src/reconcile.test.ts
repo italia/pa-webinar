@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { reconcile, type ActualJob, type DesiredRecorder } from './reconcile';
+import { reconcile, type ActualJob, type DesiredRecorder } from './reconcile.js';
 
 const d = (recordingId: string, eventId = `evt-${recordingId}`): DesiredRecorder => ({
   recordingId,

@@ -9,7 +9,7 @@ import {
   MULTITRACK_ROOT,
   MANIFEST_FILENAME,
   TRACK_FILE_EXT,
-} from './paths';
+} from './paths.js';
 
 describe('sanitizeSegment', () => {
   it('lascia passare alfanumerici, trattino e underscore', () => {

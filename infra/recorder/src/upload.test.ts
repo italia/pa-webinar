@@ -8,9 +8,9 @@ import {
   PresignStorageProvider,
   createStorageProvider,
   composeObjectUrl,
-} from './upload';
-import { buildManifest } from './manifest';
-import { trackKey } from './paths';
+} from './upload.js';
+import { buildManifest } from './manifest.js';
+import { trackKey } from './paths.js';
 
 describe('buildIngestBody', () => {
   it('mappa il manifest sul contratto multitrack-manifest (blobKey=trackKey)', () => {

@@ -14,7 +14,7 @@
  * chiavi PII e non deve averle: minimizzazione.
  */
 
-import { trackKey } from './paths';
+import { trackKey } from './paths.js';
 
 /**
  * Stato di registrazione di una singola traccia, accumulato in memoria

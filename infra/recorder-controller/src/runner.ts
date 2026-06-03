@@ -11,7 +11,7 @@
  * sia su cluster sia su una singola VM, senza dipendere da K8s.
  */
 
-import type { ActualJob, DesiredRecorder } from './reconcile';
+import type { ActualJob, DesiredRecorder } from './reconcile.js';
 
 export interface RecorderRunner {
   /** Nome del runner (logging). */

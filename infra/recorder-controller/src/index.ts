@@ -15,18 +15,18 @@
 
 import { createServer } from 'node:http';
 
-import { readConfig, type ControllerConfig } from './config';
-import { PortalClient } from './portal';
-import { reconcile } from './reconcile';
-import type { RecorderRunner } from './runner';
+import { readConfig, type ControllerConfig } from './config.js';
+import { PortalClient } from './portal.js';
+import { reconcile } from './reconcile.js';
+import type { RecorderRunner } from './runner.js';
 
 /** Costruisce il runner giusto in base alla config (K8s o Docker). */
 async function makeRunner(cfg: ControllerConfig): Promise<RecorderRunner> {
   if (cfg.runner === 'kubernetes') {
-    const { KubernetesRunner } = await import('./k8s');
+    const { KubernetesRunner } = await import('./k8s.js');
     return new KubernetesRunner(cfg.k8s!.namespace, cfg.k8s!.recorderCronJobName);
   }
-  const { DockerRunner } = await import('./docker');
+  const { DockerRunner } = await import('./docker.js');
   return new DockerRunner({
     image: cfg.docker!.image,
     network: cfg.docker!.network,

@@ -13,15 +13,15 @@
 
 import Dockerode from 'dockerode';
 
-import type { ActualJob, DesiredRecorder, JobPhase } from './reconcile';
-import type { RecorderRunner } from './runner';
+import type { ActualJob, DesiredRecorder, JobPhase } from './reconcile.js';
+import type { RecorderRunner } from './runner.js';
 import {
   COMPONENT_LABEL,
   COMPONENT_VALUE,
   RECORDING_ID_LABEL,
   EVENT_ID_LABEL,
   recorderHandleName,
-} from './labels';
+} from './labels.js';
 
 export interface DockerRunnerOptions {
   /** Immagine del recorder (es. ghcr.io/italia/eventi-dtd-recorder:dev). */
