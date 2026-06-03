@@ -52,7 +52,7 @@
     "react-dom": "^19.0.0",
     "rrule": "^2.8.1",
     "swr": "^2.3.0",
-    "zod": "^3.24.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
