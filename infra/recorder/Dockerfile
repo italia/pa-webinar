@@ -9,10 +9,12 @@
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 
-COPY package.json ./
-# Nessun lockfile committato in questa fase iniziale: install best-effort.
-# In CI sostituire con `npm ci` una volta generato il package-lock.json.
-RUN npm install --no-audit --no-fund
+# Puppeteer scarica il Chrome compatibile durante l'install: lo dirigiamo in
+# /app/.cache così lo stage runtime può copiarlo (default sarebbe ~/.cache).
+ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
+
+COPY package.json package-lock.json* ./
+RUN npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 
 COPY tsconfig.json ./
 COPY src ./src
