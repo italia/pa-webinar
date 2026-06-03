@@ -30,10 +30,10 @@ import RecordingManagement from './recording-management';
 import StatusBadge from './status-badge';
 
 // ── Palette ──
-const C_PRIMARY = '#0066CC';
+const C_PRIMARY = 'var(--app-primary)';
 const C_SUCCESS = '#008758';
-const C_INK = '#17324D';
-const C_MUTED = '#5A768A';
+const C_INK = 'var(--app-text)';
+const C_MUTED = 'var(--app-muted)';
 const C_DANGER = '#CC334D';
 
 // ── Shared styles ──

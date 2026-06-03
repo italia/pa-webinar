@@ -120,6 +120,43 @@ function formatDuration(seconds: number | null): string {
   return `${m}m ${s}s`;
 }
 
+/**
+ * Badge tipizzati che mostrano a colpo d'occhio cosa la pipeline ha
+ * prodotto per la registrazione: trascrizione, sintesi, quante lingue
+ * tradotte, waveform. Più informativo del semplice conteggio.
+ */
+function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
+  const has = (t: string) => artifacts.some((a) => a.type === t);
+  const translated = Array.from(
+    new Set(
+      artifacts
+        .filter((a) => a.type === 'TRANSLATION_MD' || a.type === 'TRANSLATION_VTT')
+        .map((a) => a.language)
+        .filter(Boolean),
+    ),
+  );
+  const pill = (on: boolean, label: string, title: string) => (
+    <span
+      className={`badge ${on ? 'bg-success-subtle text-success-emphasis' : 'bg-light text-secondary'}`}
+      style={{ fontSize: '0.66rem', fontWeight: 500, border: '1px solid #e3e8ef' }}
+      title={title}
+    >
+      {label}
+    </span>
+  );
+  if (artifacts.length === 0) {
+    return <span className="text-secondary small">–</span>;
+  }
+  return (
+    <div className="d-flex flex-wrap gap-1">
+      {pill(has('TRANSCRIPT_JSON'), 'Trascr.', 'Trascrizione')}
+      {pill(has('SUMMARY_MD') || has('SUMMARY_JSON'), 'Sintesi', 'Sintesi')}
+      {pill(translated.length > 0, `Trad. ${translated.length || ''}`.trim(), `Traduzioni: ${translated.join(', ') || 'nessuna'}`)}
+      {has('WAVEFORM_JSON') && pill(true, 'Waveform', 'Waveform')}
+    </div>
+  );
+}
+
 export default function PostprodDashboard() {
   const t = useTranslations('admin.postprod');
   const toast = useToast();
@@ -282,7 +319,7 @@ export default function PostprodDashboard() {
                     <td>
                       {doneJobs}/{row.jobs.length}
                     </td>
-                    <td>{row.artifacts.length}</td>
+                    <td><ArtifactBadges artifacts={row.artifacts} /></td>
                     <td className="text-end">
                       <Link
                         href={`/admin/postprod/${row.id}`}
@@ -334,8 +371,17 @@ export default function PostprodDashboard() {
             })}
             {data && data.rows.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center text-secondary py-4">
-                  {t('empty')}
+                <td colSpan={7} className="text-center text-secondary py-5">
+                  <svg
+                    width="40" height="40" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth={1.5} strokeLinecap="round"
+                    strokeLinejoin="round" aria-hidden="true"
+                    style={{ color: 'var(--app-muted)', opacity: 0.6, marginBottom: 8 }}
+                  >
+                    <rect x="2" y="6" width="14" height="12" rx="2" />
+                    <path d="M22 8l-6 4 6 4V8z" />
+                  </svg>
+                  <div>{t('empty')}</div>
                 </td>
               </tr>
             )}
