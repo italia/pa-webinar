@@ -132,8 +132,14 @@ Il controller **non** tocca credenziali Jitsi/storage: passa solo `recordingId`/
 - **Upload**: per-traccia, a fine evento, il recorder chiede un **PUT firmato per singolo blob** (riusa `presignArtifactUpload`, scope minimo per-blob — preferito a una SAS di container per sicurezza) sotto il prefisso `recordings/multitrack/{eventId}/{recordingId}/`. In alternativa, una SAS prefissata se si vuole evitare il round-trip per traccia (documentato, ma scope più ampio).
 - L'**ingest** finale (`multitrack-manifest`, già esistente) è path-confinato: anche un recorder compromesso non può scrivere RecordingTrack fuori dal prefisso.
 
-### Portabilità
-Il controller parla **solo** K8s API (`@kubernetes/client-node`, `loadFromCluster`) + HTTP al portale. RBAC = `Role`/`RoleBinding`/`ServiceAccount` namespaced standard (clone del SA dell'orchestrator postprod): `batch/jobs` get/list/create/delete, `batch/cronjobs` get/list (per `--from` template), `pods`/`pods/log` get/list (osservabilità). Nessuna primitiva provider-specifica → funziona su AKS/GKE/EKS/k3s identico. Lo spec del Job (nodeSelector/tolerations/resources del pool **normale**, non GPU) viene da `values.yaml` (`recorder.*`), montato come template (CronJob sospeso `recorder`) così l'operator usa `kubectl create job --from` e non duplica lo spec.
+### Portabilità — NON K8s-native only (riuso open-source su VM/compose)
+Vincolo di riuso: l'applicativo va rilasciato anche **open-source su VM con docker-compose** (eventualmente "full mode" in meno). L'orchestrazione **non deve dipendere da Kubernetes**. Per questo il controller è strutturato così:
+- la **logica di riconciliazione è pura e platform-agnostica** (`reconcile.ts`);
+- l'unica parte ambiente-specifica è dietro l'astrazione **`RecorderRunner`** (`list`/`start`/`stop` su un'unità di lavoro con handle opaco), con due implementazioni intercambiabili via env `RUNNER`:
+  - **`KubernetesRunner`** (full mode): crea un **Job** dal template CronJob sospeso `recorder`, via `@kubernetes/client-node` (solo API standard → AKS/GKE/EKS/k3s identico). RBAC = `Role`/`RoleBinding`/`ServiceAccount` namespaced (clone del SA dell'orchestrator postprod): `batch/jobs` CRUD, `batch/cronjobs` get/list, `pods`/`pods/log` get/list. Niente cluster-wide.
+  - **`DockerRunner`** (VM/compose): crea un **container** recorder via socket Docker (`dockerode`, `/var/run/docker.sock`), elenca/ferma per label. Pattern noto e portabile su qualsiasi VM con Docker — nessun cluster. L'env del recorder è composta da un allowlist passthrough `RECORDER_ENV_*` (no CronJob template in compose).
+
+Lo stesso operator, lo stesso loop, gli stessi label/naming deterministici: cambia solo il runner. In K8s lo spec del recorder (nodeSelector/tolerations/resources del pool **normale**, non GPU) viene da `values.yaml` (`recorder.*`) come CronJob sospeso; in compose viene dall'immagine + env. **Modalità ridotta**: chi non vuole il recorder lascia `recorder.enabled=false` (Helm) o non avvia il servizio controller (compose) — il resto della piattaforma funziona identico.
 
 ### Affidabilità
 - Reconcile periodico = self-healing (push persi, pod riavviato, Job crashati).
