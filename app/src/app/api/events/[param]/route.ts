@@ -329,6 +329,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.multitrackRecordingEnabled !== undefined && {
         multitrackRecordingEnabled: data.multitrackRecordingEnabled,
       }),
+      ...(data.retainParticipantTracks !== undefined && {
+        retainParticipantTracks: data.retainParticipantTracks,
+      }),
       ...(data.agendaEnabled !== undefined && {
         agendaEnabled: data.agendaEnabled,
       }),

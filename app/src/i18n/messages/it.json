@@ -1072,6 +1072,8 @@
       "aiDubbingEnabledDesc": "Audio doppiato nelle lingue target, generato con voci sintetiche pre-addestrate. Non clona la voce dei partecipanti.",
       "multitrackRecordingEnabled": "Registrazione per-partecipante (alta precisione)",
       "multitrackRecordingEnabledDesc": "Registra una traccia audio separata per ogni partecipante, così la trascrizione attribuisce con certezza chi dice cosa (niente più \"Parlante 1/2\"). Tratta l'audio isolato del singolo parlante (dato personale sensibile): le tracce sono temporanee e cancellate subito dopo la trascrizione. Richiede il consenso alla registrazione.",
+      "retainParticipantTracks": "Conserva le tracce per-partecipante",
+      "retainParticipantTracksDesc": "Mantiene le singole tracce audio oltre la trascrizione, per l'archivio scaricabile e il riascolto per relatore. ATTENZIONE: estende la conservazione di dati personali sensibili (voce isolata) fino alla scadenza di retention dell'evento. Da attivare solo se necessario e con consenso/informativa adeguati.",
       "expectedSpeakers": "Numero di parlanti attesi",
       "expectedSpeakersDesc": "Quando lo sai (es. 3 relatori), indicarlo migliora la qualità dell'identificazione dei parlanti. Lascia vuoto per lasciare decidere alla pipeline.",
       "dataRetentionDays": "Conservazione dati (giorni dopo l'evento)",
