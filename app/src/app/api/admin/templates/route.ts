@@ -21,6 +21,12 @@ const templateSchema = z.object({
   participantsCanStartVideo: z.boolean().optional(),
   participantsCanShareScreen: z.boolean().optional(),
   maxParticipants: z.number().int().min(2).max(500).optional(),
+  // Default wizard (semplificazione utenti meno esperti): pre-popolano i
+  // campi alla creazione, restano modificabili.
+  defaultDurationMinutes: z.number().int().min(5).max(1440).nullish(),
+  aiTranscriptEnabled: z.boolean().optional(),
+  aiSummaryEnabled: z.boolean().optional(),
+  aiTranslationEnabled: z.boolean().optional(),
   sortOrder: z.number().int().optional(),
 });
 

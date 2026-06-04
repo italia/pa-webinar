@@ -859,6 +859,18 @@ model EventTemplate {
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")
   maxParticipants            Int     @default(300) @map("max_participants")
 
+  // Default sensati per semplificare il wizard agli utenti meno esperti
+  // (ADR: "default in base al template"). Pre-popolano i campi nel wizard
+  // di creazione; restano tutti modificabili.
+  // - defaultDurationMinutes: il wizard calcola endsAt = startsAt + durata,
+  //   così l'utente imposta solo l'orario di inizio. Null = lascia +2h.
+  defaultDurationMinutes Int?    @map("default_duration_minutes")
+  // Pre-attivazione della pipeline AI per tipo di evento (es. un template
+  // "Webinar registrato" attiva trascrizione + sintesi di default).
+  aiTranscriptEnabled    Boolean @default(false) @map("ai_transcript_enabled")
+  aiSummaryEnabled       Boolean @default(false) @map("ai_summary_enabled")
+  aiTranslationEnabled   Boolean @default(false) @map("ai_translation_enabled")
+
   // Mirrors Event.permissionMatrix: when set, the role×feature matrix
   // is applied on new-event creation instead of the boolean toggles.
   permissionMatrix Json? @map("permission_matrix") @db.JsonB

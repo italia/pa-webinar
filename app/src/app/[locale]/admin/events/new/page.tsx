@@ -5,6 +5,7 @@ import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
+import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 
 interface CreateEventPageProps {
   searchParams: Promise<{ template?: string }>;
@@ -57,6 +58,14 @@ export default async function CreateEventPage({
         participantsCanStartVideo: selectedTemplate.participantsCanStartVideo,
         participantsCanShareScreen: selectedTemplate.participantsCanShareScreen,
         maxParticipants: selectedTemplate.maxParticipants,
+        // Default wizard (semplificazione) + permissionMatrix (prima non
+        // veniva passata → la matrice del template non arrivava al wizard).
+        permissionMatrix:
+          (selectedTemplate.permissionMatrix as PermissionMatrix | null) ?? null,
+        defaultDurationMinutes: selectedTemplate.defaultDurationMinutes,
+        aiTranscriptEnabled: selectedTemplate.aiTranscriptEnabled,
+        aiSummaryEnabled: selectedTemplate.aiSummaryEnabled,
+        aiTranslationEnabled: selectedTemplate.aiTranslationEnabled,
       }
     : null;
 

@@ -52,6 +52,11 @@ export interface WizardTemplatePreset {
   participantsCanShareScreen: boolean;
   maxParticipants: number;
   permissionMatrix?: PermissionMatrix | null;
+  // Default wizard (semplificazione utenti meno esperti).
+  defaultDurationMinutes?: number | null;
+  aiTranscriptEnabled?: boolean;
+  aiSummaryEnabled?: boolean;
+  aiTranslationEnabled?: boolean;
 }
 
 export interface WizardProps {
@@ -186,7 +191,11 @@ export default function EventWizard(props: WizardProps) {
   const initialEvent = props.initialEvent;
 
   const defaultStart = new Date(Date.now() + 24 * 3600_000);
-  const defaultEnd = new Date(defaultStart.getTime() + 2 * 3600_000);
+  // Durata predefinita dal template (semplificazione): l'utente meno esperto
+  // imposta solo l'inizio e la fine è calcolata. Default 120 min se il
+  // template non la specifica.
+  const defaultDurationMin = props.template?.defaultDurationMinutes ?? 120;
+  const defaultEnd = new Date(defaultStart.getTime() + defaultDurationMin * 60_000);
 
   // Initial form state seeded from template (when given) + sensible defaults,
   // or — in edit mode — from `initialEvent`.
@@ -322,9 +331,18 @@ export default function EventWizard(props: WizardProps) {
       permissionMatrix: matrix,
       recordingEnabled: tpl?.recordingEnabled ?? false,
       autoStartRecording: tpl?.autoStartRecording ?? false,
-      aiTranscriptEnabled: false,
-      aiSummaryEnabled: false,
-      aiTranslationEnabled: false,
+      // Default AI dal template (semplificazione): un template "registrato"
+      // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
+      // registrazione, quindi la attiviamo solo se recordingEnabled.
+      aiTranscriptEnabled: (tpl?.recordingEnabled ?? false) && (tpl?.aiTranscriptEnabled ?? false),
+      aiSummaryEnabled:
+        (tpl?.recordingEnabled ?? false) &&
+        (tpl?.aiTranscriptEnabled ?? false) &&
+        (tpl?.aiSummaryEnabled ?? false),
+      aiTranslationEnabled:
+        (tpl?.recordingEnabled ?? false) &&
+        (tpl?.aiTranscriptEnabled ?? false) &&
+        (tpl?.aiTranslationEnabled ?? false),
       aiDubbingEnabled: false,
       multitrackRecordingEnabled: false,
       aiTargetLocales: null,
