@@ -1,0 +1,954 @@
+# ============================================================================
+# pa-webinar Helm Chart — Configurazione base
+# ============================================================================
+#
+# Questo file contiene i valori predefiniti. Per il deployment, sovrapponi
+# con uno dei file di esempio:
+#
+#   Semplice:  helm install videocall . -f examples/values-simple.yaml
+#   Standard:  helm install videocall . -f examples/values-standard.yaml
+#   Completa:  helm install videocall . -f examples/values-full.yaml
+#
+# Personalizza i valori specifici del tuo ambiente in un file separato.
+# NON modificare questo file — crea un override.
+#
+# Documentazione: docs/DEPLOYMENT.md, docs/CONFIGURATION.md
+# ============================================================================
+
+# ── Application ──────────────────────────────────────────────
+
+app:
+  # Number of pod replicas (ignored when autoscaling.enabled=true)
+  replicaCount: 2
+
+  image:
+    # Container image registry/repository
+    repository: ghcr.io/italia/pa-webinar
+    # Image tag — defaults to Chart.appVersion if empty
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  # ── Database migration image ──
+  # The production runner image does not include npm/prisma CLI.
+  # Migrations run in an initContainer using the builder-stage image,
+  # which includes npx and prisma. Build with:
+  #   docker build --target builder -t <repo>:<tag>-migrate .
+  migration:
+    image:
+      repository: ghcr.io/italia/pa-webinar
+      tag: ""  # Defaults to Chart.appVersion + "-migrate" suffix
+      pullPolicy: IfNotPresent
+
+  # Image pull secrets for private registries (e.g. ACR, ECR, GCR)
+  imagePullSecrets: []
+  #   - name: registry-credentials
+
+  # Resource requests and limits
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+  # Node scheduling constraints (cloud-agnostic — set per environment)
+  # Examples:
+  #   AKS:  { agentpool: applications }
+  #   GKE:  { cloud.google.com/gke-nodepool: applications }
+  #   EKS:  { eks.amazonaws.com/nodegroup: applications }
+  #   k3s:  {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  # ── Non-secret environment variables ──
+  # These are injected as a ConfigMap and mounted via envFrom.
+  # NEXT_PUBLIC_* vars are read at runtime via lib/env.ts (server-side)
+  # and passed as props to client components. A single pre-built image
+  # works across environments — no rebuild needed per FQDN.
+  env:
+    NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.videocall.example.com"
+    NEXT_PUBLIC_APP_URL: "https://videocall.example.com"
+    NEXT_PUBLIC_DEFAULT_LOCALE: "it"
+    DEFAULT_DATA_RETENTION_DAYS: "30"
+    DEFAULT_PRIVACY_POLICY_URL: "https://videocall.example.com/it/privacy"
+    # Prometheus URL for PromQL queries from the app (admin monitoring, status page).
+    # Set to the internal Prometheus service URL, e.g.:
+    #   http://kube-prometheus-stack-prometheus.monitoring:9090
+    # Leave empty to disable Prometheus integration (probe-only status page).
+    PROMETHEUS_URL: ""
+
+    # ── Service inventory (CycloneDX 1.6) ──
+    #
+    # Public transparency artifact served at /service-inventory. Describes
+    # both software dependencies (DEV) and operational services (OPS) that
+    # make up THIS tenant's deployment. See docs/ARCHITECTURE.md or the
+    # OWASP CycloneDX spec for the format.
+    #
+    # Accepted forms:
+    #   - absolute https URL (e.g. Azure Blob public container) — fetched
+    #     with revalidate:3600
+    #   - path starting with "/" served from the app's public/ directory
+    #
+    # Leave empty to render a "not yet published" placeholder. A sample
+    # document (the videocall-test tenant) is shipped at
+    # /tenants/videocall-test/service-inventory.json — use it as a
+    # structure reference when building per-tenant artifacts.
+    # Generation runbook + Azure reference implementation:
+    #   docs/SERVICE-INVENTORY-GENERATION.md
+    #   infra/service-inventory/azure/
+    SERVICE_INVENTORY_URL: ""
+
+    # ── Storage provider ──
+    #
+    # Two independent storage domains, each backed by any S3-compatible
+    # service (AWS S3, MinIO, Cloudflare R2, Wasabi, GCS via HMAC, PSN)
+    # or Azure Blob Storage. Auto-detected from whichever *_BUCKET or
+    # CONNECTION_STRING is set, or force via STORAGE_FILES_PROVIDER /
+    # RECORDING_STORAGE_TYPE.
+    #
+    # (Non-sensitive hints live here; credentials go in the Secret.)
+    #
+    # Files domain — event materials (PDFs, slides, images)
+    #   AZURE_STORAGE_CONTAINER_NAME: "eventi-files"
+    #   STORAGE_FILES_PROVIDER: "s3"          # azure | s3
+    #   STORAGE_FILES_S3_ENDPOINT: ""         # e.g. https://minio.example.com (leave blank for AWS)
+    #   STORAGE_FILES_S3_REGION: "eu-south-1"
+    #   STORAGE_FILES_S3_BUCKET: "eventi-files"
+    #   STORAGE_FILES_S3_FORCE_PATH_STYLE: "true"  # required for MinIO
+    #
+    # Recordings domain — Jibri MP4 + manual publications
+    #   RECORDING_STORAGE_TYPE: "azure-blob"  # azure-blob | s3 | gcs | minio
+    #   RECORDING_AZURE_CONTAINER: "recordings"
+    #   RECORDING_S3_ENDPOINT: ""
+    #   RECORDING_S3_REGION: "eu-south-1"
+    #   RECORDING_S3_BUCKET: "recordings"
+    #   RECORDING_S3_FORCE_PATH_STYLE: "true"
+    #
+    # CSP override when serving media from a non-standard host (e.g. R2,
+    # custom MinIO with HTTP): set RECORDING_MEDIA_CSP_HOSTS to a
+    # space-separated list of origins allowed in `media-src`.
+    #   RECORDING_MEDIA_CSP_HOSTS: "https://cdn.example.com"
+
+  # ── Security context ──
+
+  securityContext:
+    # Pod-level security context
+    pod:
+      runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 1001
+      fsGroup: 1001
+      seccompProfile:
+        type: RuntimeDefault
+
+    # Container-level security context
+    container:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1001
+      capabilities:
+        drop:
+          - ALL
+
+  # ── Writable volumes ──
+  # Required because readOnlyRootFilesystem is enabled.
+  # Next.js standalone needs /tmp and optionally .next/cache.
+  extraVolumes:
+    - name: tmp
+      emptyDir:
+        sizeLimit: 100Mi
+    - name: next-cache
+      emptyDir:
+        sizeLimit: 500Mi
+
+  extraVolumeMounts:
+    - name: tmp
+      mountPath: /tmp
+    - name: next-cache
+      mountPath: /app/.next/cache
+
+  # ── Health probes ──
+
+  probes:
+    # Liveness probe — restarts the container if it becomes unresponsive.
+    liveness:
+      httpGet:
+        path: /api/health
+        port: http
+      initialDelaySeconds: 15
+      periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+    # Readiness probe — removes the pod from Service endpoints when unhealthy.
+    # Uses /api/ready which validates DB schema compatibility via ORM queries,
+    # catching migration drift that /api/health (SELECT 1) would miss.
+    readiness:
+      httpGet:
+        path: /api/ready
+        port: http
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+    # Startup probe — gives the container time for initial startup.
+    # Prevents liveness probe from killing a slow-starting container.
+    # Uses /api/ready to ensure schema is valid before marking as started.
+    startup:
+      httpGet:
+        path: /api/ready
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 5
+      failureThreshold: 30
+
+  # Additional pod annotations (e.g. for Vault agent injector)
+  podAnnotations: {}
+
+  # Additional pod labels
+  podLabels: {}
+
+# ── Secrets ─────────────────────────────────────────────────
+#
+# Three modes for managing secrets:
+#   "existing"  — reference a pre-created Kubernetes Secret (default)
+#   "external"  — use External Secrets Operator (Azure Key Vault, AWS SM, GCP SM)
+#   "generate"  — chart creates Secret from values (dev/test ONLY)
+
+secrets:
+  mode: "existing"
+
+  # Name of the Kubernetes Secret (used by all modes as the target name)
+  existingSecretName: "videocall-secrets"
+
+  # ── External Secrets Operator config (mode: "external") ──
+  external:
+    # Provider: "azure-key-vault", "aws-secrets-manager", "gcp-secret-manager"
+    provider: "azure-key-vault"
+    refreshInterval: "1h"
+
+    azureKeyVault:
+      vaultUrl: ""
+      tenantId: ""
+      # Maps Kubernetes secret keys → Key Vault secret names
+      secretMappings:
+        DATABASE_URL: "pa-webinar-database-url"
+        REDIS_URL: "pa-webinar-redis-url"
+        JITSI_JWT_SECRET: "pa-webinar-jitsi-jwt-secret"
+        APP_SECRET: "pa-webinar-app-secret"
+        ADMIN_API_KEY: "pa-webinar-admin-api-key"
+        PII_ENCRYPTION_KEY: "pa-webinar-pii-encryption-key"
+        CRON_API_KEY: "pa-webinar-cron-api-key"
+        SMTP_HOST: "pa-webinar-smtp-host"
+        SMTP_PORT: "pa-webinar-smtp-port"
+        SMTP_USER: "pa-webinar-smtp-user"
+        SMTP_PASSWORD: "pa-webinar-smtp-password"
+
+    awsSecretsManager:
+      region: ""
+      # Maps Kubernetes secret keys → AWS Secrets Manager secret names
+      secretMappings: {}
+
+    gcpSecretManager:
+      projectID: ""
+      # Maps Kubernetes secret keys → GCP Secret Manager secret names
+      secretMappings: {}
+
+  # ── Generated secrets (mode: "generate", dev/test ONLY) ──
+  generate:
+    DATABASE_URL: ""
+    # Leave empty when using the in-cluster `redis` subchart: the
+    # templates inject an svc-based default at render time. Set
+    # explicitly when pointing at an external / managed Redis.
+    REDIS_URL: ""
+    # Random password used by both the redis subchart (auth.enabled)
+    # and the app (as part of the derived REDIS_URL). Regenerate per
+    # deploy with: openssl rand -base64 32
+    REDIS_PASSWORD: ""
+    JITSI_JWT_SECRET: ""
+    JITSI_JWT_APP_ID: "pa_webinar"
+    JITSI_JWT_ISSUER: "pa-webinar"
+    JITSI_JWT_AUDIENCE: "jitsi"
+    APP_SECRET: ""
+    ADMIN_API_KEY: ""
+    PII_ENCRYPTION_KEY: ""
+    CRON_API_KEY: ""
+    SMTP_HOST: ""
+    SMTP_PORT: "587"
+    SMTP_SECURE: "false"
+    SMTP_USER: ""
+    SMTP_PASSWORD: ""
+    SMTP_FROM: ""
+    SMTP_FROM_NAME: ""
+
+# ── Service ──────────────────────────────────────────────────
+
+service:
+  type: ClusterIP
+  port: 3000
+
+# ── NetworkPolicy ────────────────────────────────────────────
+# Opt-in default-deny + allow-list for the app pods. Requires a CNI
+# that honours NetworkPolicy: on AKS the cluster must be created with
+# `--network-policy azure` or `--network-policy calico`, on EKS install
+# the Calico/Cilium addon, on GKE enable Dataplane V2. See
+# docs/DEPLOYMENT.md for the per-cloud notes.
+
+networkPolicy:
+  # Default off: lots of installs run on bare AKS without a policy
+  # engine. Turn on once the operator is in place.
+  enabled: false
+
+  ingress:
+    # Labels of the namespace(s) allowed to send traffic to the app
+    # service port. Defaults to the typical ingress-nginx label.
+    fromNamespaceSelectors:
+      - kubernetes.io/metadata.name: ingress-nginx
+    # Extra per-pod selectors (e.g. for a specific ingress controller
+    # deployment) — added as additional `from` blocks.
+    fromPodSelectors: []
+
+    # Whether to also accept scrape traffic from the monitoring
+    # namespace (Prometheus). The /metrics endpoint is still auth-
+    # gated at the application layer.
+    allowMonitoring: true
+    monitoringNamespaceSelector:
+      kubernetes.io/metadata.name: monitoring
+
+  egress:
+    # Postgres allow-list. Override `to` for an external managed DB
+    # (use ipBlock with cidr=<DB IP>/32) or leave as the in-cluster
+    # Bitnami chart match.
+    postgres:
+      port: 5432
+      to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+
+    # Redis allow-list (same pattern as Postgres).
+    redis:
+      port: 6379
+      to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+
+    # Jitsi Prosody — XMPP for JWT-authenticated room creation.
+    # When jitsi.enabled=false this stays effectively empty and the
+    # HTTPS rule below covers the external instance.
+    jitsi:
+      to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: jitsi-meet
+      ports:
+        - port: 5222
+          protocol: TCP
+        - port: 5280
+          protocol: TCP
+
+    # Outbound SMTP port for the email queue cron. Default is the
+    # submission port (587/STARTTLS). Set allowImplicitTlsSmtp to also
+    # open 465 if your relay still uses implicit-TLS.
+    smtpPort: 587
+    allowImplicitTlsSmtp: false
+
+    # CIDRs to *exclude* from the broad TCP/443 egress. The default
+    # blocks only the cloud Instance Metadata Service endpoints (AWS
+    # IMDS / Azure / GCP — all on 169.254.0.0/16), so a compromised
+    # pod cannot reach for cloud credentials. We intentionally do NOT
+    # exclude RFC1918 ranges here because some installs reach private
+    # endpoints (Azure Private Link, AWS PrivateLink) over 443; if
+    # your cluster doesn't need that, add 10.0.0.0/8 etc. to the
+    # override.
+    httpsExcept:
+      - 169.254.0.0/16
+
+# ── ServiceAccount ───────────────────────────────────────────
+
+serviceAccount:
+  # Create a dedicated ServiceAccount for the app pods
+  create: true
+  # Annotations (e.g. for Azure Workload Identity, GKE Workload Identity, IRSA)
+  annotations: {}
+  #   azure.workload.identity/client-id: "<managed-identity-client-id>"
+  #   iam.gke.io/gcp-service-account: "<gsa-name>@<project>.iam.gserviceaccount.com"
+  #   eks.amazonaws.com/role-arn: "arn:aws:iam::<account>:role/<role>"
+  # Override the ServiceAccount name (defaults to release fullname)
+  name: ""
+
+# ── Ingress ──────────────────────────────────────────────────
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+    nginx.ingress.kubernetes.io/rate-limit: "10"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/hsts: "true"
+    nginx.ingress.kubernetes.io/hsts-max-age: "31536000"
+    nginx.ingress.kubernetes.io/hsts-include-subdomains: "true"
+    nginx.ingress.kubernetes.io/hsts-preload: "true"
+  hosts:
+    - host: videocall.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: videocall-tls
+      hosts:
+        - videocall.example.com
+
+# ── Horizontal Pod Autoscaler ────────────────────────────────
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  # Scale up when average CPU across all pods exceeds 70%
+  targetCPUUtilizationPercentage: 70
+  # Scale up when average memory exceeds 80%
+  targetMemoryUtilizationPercentage: 80
+  behavior:
+    scaleDown:
+      # Wait 5 minutes before scaling down to avoid flapping
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleUp:
+      # React to load spikes within 30 seconds
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+
+# ── Pod Disruption Budget ────────────────────────────────────
+
+podDisruptionBudget:
+  enabled: true
+  # At least 1 pod must remain available during voluntary disruptions
+  # (e.g. node drain, rolling update)
+  minAvailable: 1
+
+# ── CronJobs ─────────────────────────────────────────────────
+
+cronjobs:
+  # Email reminders for upcoming events (runs every 15 minutes)
+  reminders:
+    enabled: true
+    schedule: "*/15 * * * *"
+    image: curlimages/curl:8.11.1
+
+  # GDPR data cleanup — deletes PII past retention period (daily at 03:00)
+  cleanup:
+    enabled: true
+    schedule: "0 3 * * *"
+    image: curlimages/curl:8.11.1
+
+  # Orphan recording reconciliation — scans the recording bucket,
+  # upserts orphan_recordings rows for blobs not linked to any event or
+  # session, and sweeps entries whose grace period has expired.
+  # Runs every 6h by default; keep this disabled in dev where the
+  # bucket isn't configured.
+  recordingsReconcile:
+    enabled: true
+    schedule: "17 */6 * * *"
+    image: curlimages/curl:8.11.1
+
+  # Inactive-person rubrica cleanup — deletes Person rows past their
+  # per-row retention window (default 24 months since last activity)
+  # and purges opt-outed persons. Runs daily at 04:00.
+  rubricaRetention:
+    enabled: true
+    schedule: "0 4 * * *"
+    image: curlimages/curl:8.11.1
+
+  # Email outbox processor — drains queued emails (confirmations,
+  # reminders, date-change notifications) via pooled SMTP. Runs every
+  # minute; see src/app/api/cron/email-outbox/route.ts for batch size
+  # and retry policy.
+  emailOutbox:
+    enabled: true
+    schedule: "*/1 * * * *"
+    image: curlimages/curl:8.11.1
+
+# ── JVB Auto-Scaler ─────────────────────────────────────────
+# CronJob that scales JVB replicas based on upcoming/active events.
+# Only used with jitsi.mode=full. No external dependencies (no KEDA).
+# Calls the internal /api/internal/jvb-desired-replicas endpoint.
+
+jvbScaler:
+  enabled: false
+  schedule: "*/2 * * * *"
+  image: bitnami/kubectl:latest
+  # Name of the JVB Deployment to scale.
+  # Leave empty to auto-detect by label (app.kubernetes.io/component=jvb)
+  # or name pattern. Set explicitly if auto-detection fails.
+  jvbDeploymentName: ""
+
+# ── Prometheus Metrics ───────────────────────────────────────
+
+metrics:
+  # Path where the app exposes Prometheus metrics
+  path: /api/metrics
+  serviceMonitor:
+    enabled: false
+    interval: 15s
+    scrapeTimeout: 10s
+    # Extra labels to match Prometheus Operator's serviceMonitorSelector
+    additionalLabels: {}
+    #   release: prometheus
+  # Optional: authenticate scrapes with a bearer token from a Secret
+  # bearerTokenSecret:
+  #   name: videocall-secrets
+  #   key: CRON_API_KEY
+
+  # ── PrometheusRule (alerting) ──
+  # Requires Prometheus Operator. Creates alert rules for app health,
+  # latency, error rate, JVB stress, and event loop lag.
+  prometheusRule:
+    enabled: false
+    # Extra labels to match Prometheus Operator's ruleSelector
+    additionalLabels: {}
+    #   release: prometheus
+    # Custom additional rules (appended to built-in rules)
+    rules: []
+
+  # ── Grafana Dashboard ──
+  # Creates a ConfigMap with the pa-webinar Grafana dashboard JSON.
+  # The Grafana sidecar auto-discovers ConfigMaps with grafana_dashboard: "1".
+  grafanaDashboard:
+    enabled: false
+    # Grafana folder to place the dashboard in
+    folder: ""
+    # Extra labels for the ConfigMap
+    additionalLabels: {}
+
+# ── Jitsi Meet ───────────────────────────────────────────────
+
+jitsi:
+  # Set to false to use an external Jitsi instance.
+  # When true, the jitsi-meet subchart is deployed.
+  enabled: true
+
+  # Deployment mode:
+  #   "simple"   — JVB runs on any node, no scale-to-zero, no Jibri
+  #   "standard" — JVB on any node, Jibri enabled, no scale-to-zero
+  #   "full"     — JVB on dedicated nodes with taints, scale-to-zero ready, Jibri on dedicated nodes
+  mode: "simple"
+
+  # ── Jitsi root redirect ──
+  # Creates an Exact / ingress that redirects to the portal URL (301).
+  # The subchart's Prefix / ingress still serves all other paths.
+  # Nginx gives Exact match higher priority than Prefix.
+  webIngress:
+    redirectUrl: ""  # e.g. "https://videocall.example.com"
+    ingressClassName: nginx
+    annotations: {}
+    hosts:
+      - host: jitsi.videocall.example.com
+    tls:
+      - secretName: jitsi-tls
+        hosts:
+          - jitsi.videocall.example.com
+
+  # ── External Jitsi configuration (when jitsi.enabled=false) ──
+  external:
+    # Jitsi domain as seen by the browser (e.g. jitsi.example.com)
+    domain: ""
+    jwtSecret: ""
+    jwtAppId: ""
+    jwtIssuer: ""
+    jwtAudience: ""
+
+# ── jitsi-meet subchart values ───────────────────────────────
+# These are passed directly to the jitsi-meet Helm subchart.
+# Only effective when jitsi.enabled=true.
+# Docs: https://github.com/jitsi-contrib/jitsi-helm
+
+jitsi-meet:
+  publicURL: "https://jitsi.videocall.example.com"
+  enableAuth: true
+  enableGuests: false
+
+  prosody:
+    auth:
+      type: jwt
+      jwt:
+        appId: "pa_webinar"
+        appSecret: ""  # Set via --set or Secret
+        acceptedIssuers: "pa-webinar"
+        acceptedAudiences: "jitsi"
+
+  jvb:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "3"
+        memory: 4Gi
+    nodeSelector: {}
+    tolerations: []
+    useHostPort: true
+    useNodeIP: true
+    UDPPort: 10000
+
+  jibri:
+    enabled: false
+    replicaCount: 0
+    singleUseMode: true
+    nodeSelector: {}
+    tolerations: []
+
+  web:
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - host: jitsi.videocall.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: jitsi-tls
+          hosts:
+            - jitsi.videocall.example.com
+
+# ── Recording Pipeline ────────────────────────────────────────
+# Configuration for Jibri recording storage and finalize script.
+# Only effective when jitsi-meet.jibri.enabled=true.
+#
+# The finalize script (infra/jitsi/jibri-finalize.sh) is mounted as a ConfigMap
+# in the Jibri pod. It:
+#   1. Extracts duration/size via ffprobe
+#   2. Re-muxes with faststart (no re-encode) for streaming
+#   3. Tags MP4 metadata (title, organizer, participants) from the portal
+#   4. Uploads to configured object storage
+#   5. Notifies the portal webhook with enriched payload (creates CallSession)
+#
+# Required env vars for finalize (set automatically from secrets/configmap):
+#   RECORDING_STORAGE_TYPE, RECORDING_WEBHOOK_URL, CRON_API_KEY, APP_INTERNAL_URL
+
+recording:
+  storage:
+    # local | azure-blob | s3 | gcs | minio
+    type: "local"
+
+    # Azure Blob Storage (AKS recommended)
+    azure:
+      connectionString: ""  # From secret
+      containerName: "recordings"
+
+    # AWS S3
+    s3:
+      bucket: ""
+      region: ""
+      accessKeyId: ""     # From secret
+      secretAccessKey: "" # From secret
+
+    # Google Cloud Storage
+    gcs:
+      bucket: ""
+      credentials: ""    # From secret (service account JSON)
+
+    # MinIO (self-hosted S3-compatible)
+    minio:
+      endpoint: ""
+      bucket: ""
+      accessKey: ""      # From secret
+      secretKey: ""      # From secret
+
+  # Jibri local PVC for in-progress recording
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClassName: ""  # Use cluster default
+
+  # GDPR retention — cleanup cron deletes recordings after this period
+  retentionDays: 90
+  # Safety limit for maximum recording duration
+  maxDurationMinutes: 240
+
+# ── PostgreSQL ───────────────────────────────────────────────
+
+postgresql:
+  # Set to false to use an external database (Azure DB, RDS, Cloud SQL, etc.)
+  enabled: true
+
+  auth:
+    username: eventi
+    database: pa_webinar
+    # Pre-existing Secret for PostgreSQL passwords
+    existingSecret: "videocall-secrets"
+    secretKeys:
+      adminPasswordKey: POSTGRES_ADMIN_PASSWORD
+      userPasswordKey: POSTGRES_PASSWORD
+
+  primary:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: ""  # Use cluster default
+
+    securityContext:
+      enabled: true
+      fsGroup: 1001
+
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+          - ALL
+
+  # ── External PostgreSQL (when postgresql.enabled=false) ──
+  external:
+    host: ""
+    port: 5432
+    database: "pa_webinar"
+    # Pre-existing Secret containing DATABASE_URL
+    existingSecret: ""
+    secretKey: "DATABASE_URL"
+
+# ── Redis ────────────────────────────────────────────────────
+#
+# Redis powers real-time chat fan-out (pub/sub) across app pods.
+# Disable and point the REDIS_URL secret at a managed Redis (Azure
+# Cache, ElastiCache, MemoryStore, …) for production deployments.
+redis:
+  enabled: true
+
+  architecture: standalone  # single node is enough for pub/sub + rate-limit
+
+  # As of 2025-08-28 Bitnami moved most pinned image tags to their
+  # "Legacy Catalog"; the chart's default tag may disappear from the
+  # public registry. We deliberately track `latest` because we only
+  # rely on PUBLISH/SUBSCRIBE/GET/SET — those are stable across major
+  # Redis versions. Override in values-<env>.yaml if your org pins a
+  # specific digest.
+  image:
+    tag: "latest"
+    pullPolicy: Always
+
+  auth:
+    enabled: true
+    # Pre-existing Secret containing REDIS_PASSWORD. Required: Redis
+    # refuses to start without a password when auth is enabled.
+    existingSecret: "videocall-secrets"
+    existingSecretPasswordKey: "REDIS_PASSWORD"
+
+  master:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    persistence:
+      # pub/sub is ephemeral; we don't need AOF/RDB durability. Turn
+      # it on if you plan to reuse the same Redis for other stateful
+      # features (distributed rate-limit counters, cache).
+      enabled: false
+
+  commonConfiguration: |
+    # No persistence: pub/sub is fire-and-forget and canonical chat
+    # state lives in Postgres.
+    save ""
+    appendonly no
+    # Pub/sub buffers: allow bigger spikes during a live event (300
+    # subscribers × a few messages/sec peak) without Redis killing
+    # slow consumers. Defaults are 32mb hard / 8mb soft for pubsub.
+    client-output-buffer-limit pubsub 64mb 16mb 60
+
+# ── Postprod AI pipeline ────────────────────────────────────
+#
+# Adds a post-production lifecycle on top of Jibri recordings:
+# transcription (WhisperX large-v3 + pyannote 3.1), summary + translation
+# (in-cluster vLLM, default model Qwen3-32B-Instruct). See docs/POSTPROD.md.
+#
+# Sovereignty: every component runs in-cluster on the GPU node pool.
+# No external API calls. Pre-populate model weights into a PVC mounted
+# at /models (see `worker.modelsPvc`) — at runtime HF_HUB_OFFLINE=1
+# is set in the container.
+#
+# Recommended hardware (Italy North, 2026):
+#   - 1× A100 80GB (Standard_NC24ads_A100_v4) — ospita Qwen3-32B fp16
+#     + WhisperX large-v3 + pyannote 3.1 simultaneamente.
+#   - Pool con `min_count=0, max_count=2`, taint `workload=ai-gpu:NoSchedule`.
+#   - Vedi `iac-azure/environments/prod` per la definizione Tofu del pool.
+#
+# Enable the orchestrator only on clusters that have a GPU node pool
+# AND a vLLM Service reachable from the worker.
+postprod:
+  enabled: false
+
+  # Janitor: every ~1 min, reclaims expired leases and terminal-fails
+  # over-attempt jobs.
+  reclaim:
+    enabled: true
+    schedule: "* * * * *"
+    image: curlimages/curl:8.10.1
+
+  # Retention sweeper: daily.
+  retention:
+    enabled: true
+    schedule: "30 3 * * *"
+    image: curlimages/curl:8.10.1
+
+  # Orchestrator: every minute, queries `/api/internal/postprod-pending`
+  # and creates worker Jobs from the suspended template CronJob.
+  orchestrator:
+    enabled: true
+    schedule: "* * * * *"
+    image: bitnami/kubectl:latest
+
+  # Worker template (CronJob, suspended). The orchestrator runs
+  # `kubectl create job --from=cronjob/<this>`, inheriting the pod
+  # spec defined here (image, nodeSelector, tolerations, resources).
+  worker:
+    enabled: true
+    image: ghcr.io/italia/pa-webinar-postprod-worker:dev
+    imagePullPolicy: IfNotPresent
+    # Pull credentials for the (private) worker image. The worker lands
+    # on a fresh scale-from-zero GPU node with no cached image, so it
+    # needs these. Empty → inherits `app.imagePullSecrets` (see the
+    # worker CronJob template). Set explicitly only to override.
+    imagePullSecrets: []
+    # Hard ceiling per Job (kills runaway transcription). 1h is enough
+    # for a 2h call at ~2x realtime on A100.
+    activeDeadlineSeconds: 3600
+    # Keep finished Job objects around for 10m so the orchestrator can
+    # see their state in `kubectl get jobs`.
+    ttlSecondsAfterFinished: 600
+
+    # Run WhisperX + LLM stub mode — skips real ASR/LLM and emits
+    # canned outputs. Useful for end-to-end smoke tests of the
+    # claim/upload/register loop without a GPU.
+    stub: false
+
+    # Place workers on the GPU node pool. Override per-cluster.
+    nodeSelector:
+      workload: ai-gpu
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: ai-gpu
+        effect: NoSchedule
+    affinity: {}
+
+    # PVC with prefetched HF cache. Recommended for prod — first cold
+    # download of WhisperX large-v3 + pyannote 3.1 is ~6GB. Without a
+    # PVC, the worker re-downloads on every node cold-start (and with
+    # HF_HUB_OFFLINE=1 in the image, the download must be primed
+    # manually before the first run).
+    #   modelsPvc: ai-models
+    modelsPvc: ""
+    modelsSizeLimit: "30Gi"
+    workSizeLimit: "20Gi"
+
+    # HuggingFace token for the gated pyannote model. Without it,
+    # diarization fails at load time. Create a Secret manually:
+    #   kubectl create secret generic hf-token --from-literal=HF_TOKEN=hf_xxx
+    hfTokenSecret:
+      name: ""
+      key: HF_TOKEN
+
+    extraEnv: {}
+      # AI_VLLM_BASE_URL: "http://pa-webinar-vllm.ai:8000/v1"
+      # AI_VLLM_MODEL_ID: "Qwen/Qwen3-32B-Instruct"
+
+    gpu:
+      enabled: true
+      count: 1
+
+    # The worker owns a dedicated GPU node (nodeSelector + taint), e.g.
+    # NC24ads_A100_v4 = 24 vCPU / ~220 GB / 1×A100, shared only with
+    # system DaemonSets. With one worker per node the old 4/16→12/48
+    # caps left most of the box idle and throttled WhisperX + pyannote
+    # (CPU-bound audio decode/diarization) and risked OOM on long calls.
+    # Burstable: schedule on solid requests, burst to nearly the whole
+    # node. Limits stay under allocatable (~23.6 CPU / ~215Gi) to leave
+    # headroom for kubelet + DaemonSets.
+    resources:
+      requests:
+        cpu: "8"
+        memory: "32Gi"
+      limits:
+        cpu: "22"
+        memory: "200Gi"
+
+# ── Recorder multi-traccia (ADR-013 Fase 3) ─────────────────
+# Feature "full mode": registrazione audio per-partecipante per attribuzione
+# speaker certa. Disabilitata di default. Su VM/compose si usa il runner Docker
+# del controller (RUNNER=docker), non questo chart. Vedi infra/recorder-controller.
+recorder:
+  enabled: false
+
+  # Immagine del bot recorder (Puppeteer + lib-jitsi-meet, un'audio-track per
+  # partecipante). Gira sul pool NORMALE, non GPU.
+  image: ghcr.io/italia/pa-webinar-recorder:dev
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  # Dominio Jitsi per il bot; se vuoto usa app.env.NEXT_PUBLIC_JITSI_DOMAIN.
+  jitsiDomain: ""
+  backoffLimit: 1
+  activeDeadlineSeconds: 21600   # 6h max per evento
+  ttlSecondsAfterFinished: 600
+  workSizeLimit: "10Gi"
+  nodeSelector: {}
+  tolerations: []
+  resources:
+    requests:
+      cpu: "1"
+      memory: "2Gi"
+    limits:
+      cpu: "2"
+      memory: "4Gi"
+
+  # Operator riconciliante (pod fisso) che orchestra i Job recorder.
+  controller:
+    enabled: true
+    image: ghcr.io/italia/pa-webinar-recorder-controller:dev
+    imagePullPolicy: IfNotPresent
+    imagePullSecrets: []
+    port: 8080
+    reconcileIntervalMs: 30000
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "250m"
+        memory: "128Mi"
+
+# ── Name overrides ──────────────────────────────────────────
+nameOverride: ""
+fullnameOverride: ""

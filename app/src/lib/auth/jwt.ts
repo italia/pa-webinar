@@ -1,5 +1,5 @@
 /**
- * Authentication utilities for eventi-dtd.
+ * Authentication utilities for pa-webinar.
  *
  * Two authentication flows:
  * 1. Moderators: magic link with UUID token → validates against Event.moderatorToken
@@ -24,11 +24,11 @@ function getJitsiJwtSecret(): Uint8Array {
 }
 
 function getJitsiJwtAppId(): string {
-  return process.env.JITSI_JWT_APP_ID ?? 'eventi_dtd';
+  return process.env.JITSI_JWT_APP_ID ?? 'pa_webinar';
 }
 
 function getJitsiJwtIssuer(): string {
-  return process.env.JITSI_JWT_ISSUER ?? 'eventi-dtd';
+  return process.env.JITSI_JWT_ISSUER ?? 'pa-webinar';
 }
 
 function getJitsiJwtAudience(): string {

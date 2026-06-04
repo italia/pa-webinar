@@ -1,7 +1,7 @@
-# eventi-dtd
+# pa-webinar
 
-[![CI](https://github.com/italia/eventi-dtd/actions/workflows/ci.yml/badge.svg)](https://github.com/italia/eventi-dtd/actions/workflows/ci.yml)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/italia/eventi-dtd/badge)](https://scorecard.dev/viewer/?uri=github.com/italia/eventi-dtd)
+[![CI](https://github.com/italia/pa-webinar/actions/workflows/ci.yml/badge.svg)](https://github.com/italia/pa-webinar/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/italia/pa-webinar/badge)](https://scorecard.dev/viewer/?uri=github.com/italia/pa-webinar)
 [![License: EUPL-1.2](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
 [![publiccode.yml](https://img.shields.io/badge/publiccode-available-brightgreen.svg)](publiccode.yml)
 [![Tests](https://img.shields.io/badge/tests-568%20passing-brightgreen.svg)](#qualità-e-sicurezza)
@@ -66,7 +66,7 @@ flowchart LR
   Moderatore(["🎙 Moderatore"])
   Admin(["🛠 Admin"])
 
-  subgraph App["eventi-dtd (Next.js 15)"]
+  subgraph App["pa-webinar (Next.js 15)"]
     API["API Routes<br/>/api/*"]
     Pages["App Router<br/>pages RSC"]
   end
@@ -171,7 +171,7 @@ Dettagli tecnici + tuning dei parametri (`jvbPreScaleMinutes`, `jvbInactiveGrace
 ## Componenti
 
 ```
-eventi-dtd/
+pa-webinar/
 ├── app/                                 Next.js 15 (App Router)
 │   ├── src/
 │   │   ├── app/                          Pages + API routes
@@ -206,7 +206,7 @@ eventi-dtd/
 │   │   └── migrations/                   Schema evolution (idempotent)
 │   └── public/                           Static assets, watermarks, cover
 ├── infra/
-│   ├── helm/eventi-dtd/                  Chart: 3 profili (simple/standard/full)
+│   ├── helm/pa-webinar/                  Chart: 3 profili (simple/standard/full)
 │   │   └── templates/cronjob-jvb-scaler.yaml  fan-out K8s RBAC + Redis write
 │   ├── tofu/                             Azure/AKS reference (OpenTofu)
 │   └── jitsi/jibri-finalize.sh           Upload webhook Jibri → /api/webhooks/recording
@@ -222,8 +222,8 @@ Struttura dettagliata per directory: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.
 ## Quick Start
 
 ```bash
-git clone https://github.com/italia/eventi-dtd.git
-cd eventi-dtd
+git clone https://github.com/italia/pa-webinar.git
+cd pa-webinar
 
 # Stack completo (PostgreSQL + Jitsi + Mailpit + app)
 docker compose up --build -d

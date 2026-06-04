@@ -508,11 +508,11 @@ export function generateOpenApiSpec(): object {
   return generator.generateDocument({
     openapi: '3.1.0',
     info: {
-      title: 'eventi-dtd API',
+      title: 'pa-webinar API',
       version: process.env.npm_package_version || '0.1.0',
-      description: 'REST API for the eventi-dtd public event platform. Supports event management, registration, live interaction (Q&A, polls, word cloud, reactions), recording, and administration.',
+      description: 'REST API for the pa-webinar public event platform. Supports event management, registration, live interaction (Q&A, polls, word cloud, reactions), recording, and administration.',
       license: { name: 'EUPL-1.2', url: 'https://opensource.org/licenses/EUPL-1.2' },
-      contact: { name: 'GitHub', url: 'https://github.com/italia/eventi-dtd' },
+      contact: { name: 'GitHub', url: 'https://github.com/italia/pa-webinar' },
     },
     servers: [
       { url: process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000', description: 'Current instance' },

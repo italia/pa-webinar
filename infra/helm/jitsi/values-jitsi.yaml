@@ -2,7 +2,7 @@
 # Chart: https://github.com/jitsi-contrib/jitsi-helm
 #
 # helm repo add jitsi https://jitsi-contrib.github.io/jitsi-helm/
-# helm install jitsi jitsi/jitsi-meet -f values-jitsi.yaml -n eventi-dtd
+# helm install jitsi jitsi/jitsi-meet -f values-jitsi.yaml -n pa-webinar
 
 publicURL: "https://jitsi.eventi.dominio.gov.it"
 
@@ -14,9 +14,9 @@ prosody:
   auth:
     type: jwt
     jwt:
-      appId: "eventi_dtd"
+      appId: "pa_webinar"
       appSecret: ""           # Set via --set or sealed secret
-      acceptedIssuers: "eventi-dtd"
+      acceptedIssuers: "pa-webinar"
       acceptedAudiences: "jitsi"
 
   extraEnvs:

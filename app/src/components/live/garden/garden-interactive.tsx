@@ -49,10 +49,10 @@ const STAGE_H = 1080;
 const AVATAR_SCALE = 2.6; // avatar viewBox is 48×64 → drawn ~125×165 in stage units
 const WALK_UNITS_PER_SEC = 26; // percent of stage traversed per second
 const PING_MS = 200;
-const LOCAL_STORAGE_USER_ID = 'eventidtd.garden.userId';
-const LOCAL_STORAGE_AVATAR = 'eventidtd.garden.avatarId';
-const LOCAL_STORAGE_HIDDEN = 'eventidtd.garden.hidden';
-const LOCAL_STORAGE_HINT_DISMISSED = 'eventidtd.garden.hintDismissed';
+const LOCAL_STORAGE_USER_ID = 'pawebinar.garden.userId';
+const LOCAL_STORAGE_AVATAR = 'pawebinar.garden.avatarId';
+const LOCAL_STORAGE_HIDDEN = 'pawebinar.garden.hidden';
+const LOCAL_STORAGE_HINT_DISMISSED = 'pawebinar.garden.hintDismissed';
 
 interface Peer {
   userId: string;

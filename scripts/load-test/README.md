@@ -1,7 +1,7 @@
-# Load testing eventi-dtd — guida operativa
+# Load testing pa-webinar — guida operativa
 
 Questa directory contiene tutto il necessario per eseguire load test realistici
-contro un deploy eventi-dtd usando [jitsi-meet-torture](https://github.com/jitsi/jitsi-meet-torture)
+contro un deploy pa-webinar usando [jitsi-meet-torture](https://github.com/jitsi/jitsi-meet-torture)
 (in particolare lo scenario `MalleusJitsificus`) confezionato in un container
 unico che funziona con `podman` o `docker`.
 
@@ -22,9 +22,9 @@ Per la sezione **teorica** (architettura, capacità, bottleneck di Jitsi) vedere
 
 ```bash
 # 1. Build dell'immagine (una volta, 3-5 min)
-cd eventi-dtd/scripts/load-test
-podman build -t eventi-dtd-load-test .
-# oppure: docker build -t eventi-dtd-load-test .
+cd pa-webinar/scripts/load-test
+podman build -t pa-webinar-load-test .
+# oppure: docker build -t pa-webinar-load-test .
 
 # 2. Estrai il JWT secret dal cluster test
 export JITSI_JWT_SECRET="$(kubectl -n videocall-test get secret videocall-secrets \
@@ -44,7 +44,7 @@ podman run --rm --shm-size=4g \
   -e DURATION=300 \
   -e USE_LOAD_TEST=false \
   -e MAVEN_OPTS='-Xss256k -Xmx8g -XX:+UseG1GC' \
-  localhost/eventi-dtd-load-test
+  localhost/pa-webinar-load-test
 
 # 4. In un altro terminale, osserva le metriche lato JVB
 kubectl -n videocall-test exec <jvb-pod> -- \
@@ -62,7 +62,7 @@ Per una lista completa di env var e scenari, continua a leggere.
 | `JITSI_URL` | *(required)* | URL pubblico del dominio Jitsi (es. `https://jitsi-test.innovazione.gov.it`) |
 | `JITSI_JWT_SECRET` | *(required)* | Segreto HS256 usato da Prosody per validare il JWT |
 | `JITSI_JWT_SUBJECT` | *(required)* | Claim `sub` del JWT (tipicamente il dominio Jitsi) |
-| `JITSI_JWT_ISSUER` | `eventi-dtd` | Claim `iss` |
+| `JITSI_JWT_ISSUER` | `pa-webinar` | Claim `iss` |
 | `JITSI_JWT_AUDIENCE` | `jitsi` | Claim `aud` |
 | `JITSI_ROOM` | `load-test-room` | Prefisso del nome della room (Malleus appende `0`) |
 | `PARTICIPANTS` | `20` | Numero totale di bot che entrano in conferenza |
@@ -334,7 +334,7 @@ su più bridge. Strategia di default `RegionBasedBridgeSelectionStrategy`
 ```mermaid
 flowchart LR
     U1[Utenti pubblici]-->|HTTPS|ING[NGINX Ingress]
-    ING-->|/|APP[eventi-dtd<br/>Next.js]
+    ING-->|/|APP[pa-webinar<br/>Next.js]
     ING-->|/event/*|JWEB[Jitsi Web]
     APP-->|Prisma|DB[(Azure Postgres<br/>videocall_test)]
     APP-->|REST /colibri/stats|JVB1
@@ -701,8 +701,8 @@ Passi concreti per rifare i test:
 
 3. **Build dell'immagine load-test**:
    ```bash
-   cd eventi-dtd/scripts/load-test
-   podman build -t eventi-dtd-load-test .
+   cd pa-webinar/scripts/load-test
+   podman build -t pa-webinar-load-test .
    ```
 
 4. **Estrai il secret JWT**:

@@ -5,7 +5,7 @@ Usage (inside the container):
     python -m worker.main           # claim one job, run it, exit
 
 Environment:
-    APP_INTERNAL_URL    e.g. http://eventi-dtd-web:3000
+    APP_INTERNAL_URL    e.g. http://pa-webinar-web:3000
     CRON_API_KEY        shared secret with the app
     WORKER_ID           pod name (auto-detected if unset)
     WORKER_STUB=1       skip real ASR + LLM, use canned outputs

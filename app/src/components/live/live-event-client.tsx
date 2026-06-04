@@ -1393,7 +1393,7 @@ function LiveTopBar({ title, parseTitleKicker = false, imageUrl, coverImageUrl, 
 // One-time dismissible tips shown the first time a user reaches phase=ready.
 // Dismissal persists in localStorage so repeat joiners don't see it again.
 
-const HINT_DISMISSED_KEY = 'eventidtd.liveHint.dismissed';
+const HINT_DISMISSED_KEY = 'pawebinar.liveHint.dismissed';
 
 function FirstEntryHintBanner() {
   const t = useTranslations('live.hintBanner');

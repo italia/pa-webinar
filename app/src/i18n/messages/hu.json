@@ -2015,7 +2015,7 @@
     "privacy": {
       "metaTitle": "Adatvédelmi tájékoztató",
       "title": "Adatvédelmi tájékoztató",
-      "intro": "Ez az oldal összefoglalja az Eventi DTD platform használatával és a szervezett nyilvános eseményeken való részvétellel kapcsolatos személyes adatkezelést.",
+      "intro": "Ez az oldal összefoglalja az PA Webinar platform használatával és a szervezett nyilvános eseményeken való részvétellel kapcsolatos személyes adatkezelést.",
       "sections": {
         "controller": {
           "title": "Adatkezelő",
@@ -2058,7 +2058,7 @@
     "legalNotes": {
       "metaTitle": "Jogi közlemények",
       "title": "Jogi közlemények",
-      "intro": "Az Eventi DTD platformhoz való hozzáférés és annak használata ezen közleményeknek megfelelően történik, amelyek összefoglalják az általános használati feltételeket és a szolgáltatással kapcsolatos főbb információkat.",
+      "intro": "Az PA Webinar platformhoz való hozzáférés és annak használata ezen közleményeknek megfelelően történik, amelyek összefoglalják az általános használati feltételeket és a szolgáltatással kapcsolatos főbb információkat.",
       "sections": {
         "ownership": {
           "title": "A szolgáltatás tulajdonosa",

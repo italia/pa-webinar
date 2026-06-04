@@ -6,8 +6,8 @@ import { Alert, Button } from 'design-react-kit';
 
 type PermissionState = 'idle' | 'requesting' | 'granted' | 'denied';
 
-const CAMERA_PREF_KEY = 'eventidtd.deviceCheck.cameraOn';
-const MIC_PREF_KEY = 'eventidtd.deviceCheck.micOn';
+const CAMERA_PREF_KEY = 'pawebinar.deviceCheck.cameraOn';
+const MIC_PREF_KEY = 'pawebinar.deviceCheck.micOn';
 
 function readBoolPref(key: string, fallback: boolean): boolean {
   if (typeof window === 'undefined') return fallback;

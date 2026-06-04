@@ -1,4 +1,4 @@
-# AKS Node Pool Configuration — eventi-dtd
+# AKS Node Pool Configuration — pa-webinar
 
 ## Node Pool: jvb
 
@@ -67,7 +67,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: jvb-scaler
-  namespace: eventi-dtd
+  namespace: pa-webinar
 spec:
   schedule: "*/5 * * * *"  # Check every 5 minutes
   jobTemplate:
@@ -97,7 +97,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: jvb-scaler
-  namespace: eventi-dtd
+  namespace: pa-webinar
 spec:
   scaleTargetRef:
     name: jitsi-jvb

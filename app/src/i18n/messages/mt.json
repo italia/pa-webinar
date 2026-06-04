@@ -2015,7 +2015,7 @@
     "privacy": {
       "metaTitle": "Avviż dwar il-privatezza",
       "title": "Avviż dwar il-privatezza",
-      "intro": "Din il-paġna tiġbor fil-qosor l-ipproċessar tad-dejta personali relatata mal-użu tal-pjattaforma Eventi DTD u l-parteċipazzjoni fl-avvenimenti pubbliċi ospitati.",
+      "intro": "Din il-paġna tiġbor fil-qosor l-ipproċessar tad-dejta personali relatata mal-użu tal-pjattaforma PA Webinar u l-parteċipazzjoni fl-avvenimenti pubbliċi ospitati.",
       "sections": {
         "controller": {
           "title": "Kontrollur tad-dejta",
@@ -2058,7 +2058,7 @@
     "legalNotes": {
       "metaTitle": "Noti legali",
       "title": "Noti legali",
-      "intro": "L-aċċess għall-pjattaforma Eventi DTD u l-użu tagħha huma soġġetti għal dawn in-noti, li jiġbru fil-qosor it-termini ġenerali tal-użu u l-informazzjoni prinċipali dwar is-servizz.",
+      "intro": "L-aċċess għall-pjattaforma PA Webinar u l-użu tagħha huma soġġetti għal dawn in-noti, li jiġbru fil-qosor it-termini ġenerali tal-użu u l-informazzjoni prinċipali dwar is-servizz.",
       "sections": {
         "ownership": {
           "title": "Titolarità tas-servizz",

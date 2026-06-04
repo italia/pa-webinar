@@ -1,4 +1,4 @@
-# Licenze di terze parti — eventi-dtd
+# Licenze di terze parti — pa-webinar
 
 Questo documento elenca tutte le dipendenze utilizzate dal progetto e le relative licenze, ai fini della trasparenza e della conformità con la licenza EUPL-1.2.
 
@@ -94,8 +94,8 @@ La MPL-2.0 è esplicitamente elencata come licenza compatibile nell'Art. 5 della
 Questo file viene aggiornato ad ogni release. Per rigenerare:
 
 ```bash
-cd eventi-dtd && npx license-checker --summary
-cd eventi-dtd && npx license-checker --json --out license-report.json
+cd pa-webinar && npx license-checker --summary
+cd pa-webinar && npx license-checker --json --out license-report.json
 ```
 
 ## CI
