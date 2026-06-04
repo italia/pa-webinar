@@ -53,7 +53,7 @@ export async function sendEmail(input: SendEmailInput): Promise<void> {
   const transport = getTransporter();
 
   await transport.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME ?? 'Eventi PA'}" <${process.env.SMTP_FROM ?? 'noreply@dominio.gov.it'}>`,
+    from: `"${process.env.SMTP_FROM_NAME ?? 'PA Webinar'}" <${process.env.SMTP_FROM ?? 'noreply@dominio.gov.it'}>`,
     to: input.to,
     subject: input.subject,
     html: input.html,

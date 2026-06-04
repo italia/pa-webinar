@@ -136,6 +136,8 @@ le mitigazioni di minimizzazione e cancellazione precoce qui descritte.
 Il principio cardine è la **minimizzazione** (Art. 5.1.c GDPR): la traccia
 per-partecipante è un **artefatto intermedio**, non un output conservato.
 
+> **Eccezione opt-in — conservazione per archivio/riascolto** (`Event.retainParticipantTracks`, default OFF). Un organizzatore può scegliere di **conservare** le tracce per-partecipante oltre la trascrizione, per produrre un archivio scaricabile (file unico con tracce audio etichettate per nome + sottotitoli) e per il riascolto per-relatore nella video-library. È una **finalità ulteriore** che estende la conservazione di PII sensibile: si applica **solo** se l'organizzatore l'ha attivata esplicitamente, va dichiarata nell'informativa dell'evento e richiede il consenso `consentMultitrack`. Quando attiva, il purge **non** cancella subito le tracce: vengono mantenute fino alla scadenza di retention del recording (`Recording.retentionUntil`), poi purgate. Quando OFF vale la minimizzazione standard descritta sotto.
+
 - Ogni traccia è modellata da `RecordingTrack`, distinto dal `Recording`
   (audio misto) e dai `PostprodArtifact` (transcript, sintesi, sottotitoli).
 - Appena la trascrizione e l'attribuzione sono completate, il blob audio

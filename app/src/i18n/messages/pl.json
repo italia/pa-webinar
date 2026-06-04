@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Publiczne wydarzenia cyfrowe",
-      "subtitle": "Platforma webinariów, prezentacji i spotkań publicznych Departamentu ds. Transformacji Cyfrowej",
-      "browseEvents": "Przeglądaj wydarzenia",
-      "organizeEvent": "Zorganizuj wydarzenie"
-    },
-    "features": {
-      "title": "Platforma wydarzeń administracji publicznej",
-      "video": {
-        "title": "Wideokonferencja",
-        "desc": "Uczestnictwo w wydarzeniach publicznych z udziałem do 300 osób. Bez konieczności instalowania oprogramowania."
-      },
-      "qa": {
-        "title": "Pytania i odpowiedzi",
-        "desc": "Zadawaj pytania podczas wydarzenia i głosuj na najważniejsze. Moderator odpowiada na żywo."
-      },
-      "privacy": {
-        "title": "Prywatność i bezpieczeństwo",
-        "desc": "Dane chronione zgodnie z GDPR. Infrastruktura samodzielnie hostowana we Włoszech."
+      "kicker": "Dla wszystkich · na żywo · na żądanie",
+      "title": "Webinary i wydarzenia społeczności transformacji cyfrowej",
+      "subtitle": "Śledź na żywo prezentacje, spotkania publiczne i sesje Q&A społeczności transformacji cyfrowej. Dołącz z przeglądarki, zadawaj pytania i oglądaj nagrania, kiedy tylko chcesz.",
+      "browseEvents": "Przeglądaj nadchodzące wydarzenia",
+      "watchRecordings": "Oglądaj nagrania",
+      "badges": {
+        "noInstall": "Z przeglądarki, bez instalacji",
+        "interactive": "Q&A i ankiety na żywo",
+        "recordings": "Nagrania i napisy",
+        "accessible": "Dostępne, w 24 językach"
       }
     },
     "upcoming": {
       "title": "Nadchodzące wydarzenia",
       "viewAll": "Zobacz wszystkie wydarzenia",
-      "noEvents": "Brak zaplanowanych wydarzeń. Zapraszamy wkrótce!"
+      "noEvents": "Brak zaplanowanych wydarzeń. Zajrzyj wkrótce!"
     },
     "howItWorks": {
-      "title": "Jak to działa",
+      "title": "Jak wziąć udział",
+      "subtitle": "Wystarczy kilka kroków, bez konta i bez instalacji.",
       "step1": {
         "title": "Zarejestruj się",
-        "desc": "Bezpłatna rejestracja na wydarzenie"
+        "desc": "Zapisz się na wydarzenie bezpłatnie z jego publicznej strony."
       },
       "step2": {
         "title": "Otrzymaj link",
-        "desc": "E-mail z osobistym linkiem dostępu"
+        "desc": "Otrzymasz e-mail z osobistym linkiem i załącznikiem do kalendarza."
       },
       "step3": {
         "title": "Dołącz",
-        "desc": "Wejdź na wydarzenie z przeglądarki, bez instalacji"
+        "desc": "Wejdź na wydarzenie z przeglądarki, bez niczego do instalacji."
       },
       "step4": {
-        "title": "Interaguj",
-        "desc": "Zadawaj pytania, głosuj, uczestniacz w dyskusji"
+        "title": "Wchodź w interakcję",
+        "desc": "Zadawaj pytania, głosuj, odpowiadaj na ankiety i włącz się do dyskusji."
+      }
+    },
+    "during": {
+      "title": "Co możesz robić podczas wydarzenia",
+      "subtitle": "Nie tylko oglądać: wydarzenia są interaktywne.",
+      "qa": {
+        "title": "Pytania i odpowiedzi",
+        "desc": "Zadawaj pytania i głosuj na pytania innych: moderator odpowiada na żywo."
+      },
+      "polls": {
+        "title": "Ankiety",
+        "desc": "Odpowiadaj na ankiety w czasie rzeczywistym i od razu zobacz wyniki."
+      },
+      "wordcloud": {
+        "title": "Chmura słów",
+        "desc": "Dodaj swoje słowa do wspólnej chmury słów wydarzenia."
+      },
+      "reactions": {
+        "title": "Reakcje i podniesione ręce",
+        "desc": "Reaguj i proś o głos, podnosząc rękę: kolejka jest obsługiwana po kolei."
+      },
+      "chat": {
+        "title": "Czat",
+        "desc": "Pisz na czacie wydarzenia i śledź rozmowę z innymi uczestnikami."
+      },
+      "agenda": {
+        "title": "Agenda i notatki",
+        "desc": "Śledź agendę i notatki, którymi moderatorzy dzielą się podczas wydarzenia."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Projekt",
+      "title": "Open source i suwerenny, zbudowany przez administrację dla administracji",
+      "body": "PA Webinar to platforma Departamentu Transformacji Cyfrowej do publicznych wydarzeń cyfrowych: system projektowy .italia, silnik wideo Jitsi Meet i w pełni in-cluster pipeline AI. Jest udostępniana jako open source, aby każda administracja mogła ją ponownie wykorzystać.",
+      "sovereignty": {
+        "title": "Suwerenność danych",
+        "desc": "Self-hosted na infrastrukturze administracji: dane nigdy jej nie opuszczają i nie ma narażenia na CLOUD Act."
+      },
+      "openSource": {
+        "title": "Open source EUPL-1.2",
+        "desc": "Kod możliwy do ponownego wykorzystania przez każdą administrację, z publicznym SBOM i service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII szyfrowane w spoczynku, szczegółowe zgody i konfigurowalny okres przechowywania."
+      },
+      "cta": "Przejrzystość usługi",
+      "techTitle": "Zbudowano w oparciu o otwarte technologie",
+      "archTitle": "Jak to działa, w skrócie"
+    },
+    "afterEvent": {
+      "title": "Po wydarzeniu",
+      "subtitle": "Nic nie ginie: wszystko pozostaje dostępne i osiągalne.",
+      "library": {
+        "title": "Biblioteka nagrań",
+        "desc": "Obejrzyj ponownie minione wydarzenia w publicznej bibliotece, wraz z archiwum pytań i ankiet."
+      },
+      "transcript": {
+        "title": "Transkrypcja i napisy",
+        "desc": "Każde nagranie może mieć transkrypcję i napisy, generowane automatycznie przez działający w klastrze potok AI."
+      },
+      "translation": {
+        "title": "Automatyczne tłumaczenie",
+        "desc": "Napisy i podsumowanie tłumaczone na kilka języków, abyś mógł śledzić wydarzenie także w innym języku."
+      },
+      "dubbing": {
+        "title": "Dubbing audio",
+        "desc": "Zdubbingowana ścieżka dźwiękowa z neutralnym głosem syntetycznym (bez klonowania głosu), aby słuchać wydarzenia w innym języku."
       }
     }
   },
@@ -2037,22 +2098,38 @@
       }
     },
     "accessibility": {
-      "metaTitle": "Oświadczenie o dostępności",
-      "title": "Oświadczenie o dostępności",
-      "intro": "Departament ds. Transformacji Cyfrowej zobowiązuje się do zapewnienia dostępności tej platformy, zgodnie z obowiązującymi wymogami dotyczącymi usług cyfrowych administracji publicznej.",
+      "metaTitle": "Deklaracja dostępności",
+      "title": "Deklaracja dostępności",
+      "intro": "Departament Transformacji Cyfrowej zobowiązuje się zapewnić dostępność PA Webinar zgodnie z włoską ustawą nr 4/2004, dyrektywą UE 2016/2102 oraz wytycznymi AgID dotyczącymi dostępności narzędzi ICT.",
       "sections": {
-        "commitment": {
-          "title": "Zobowiązanie do dostępności",
-          "body": "Platforma została zaprojektowana z wykorzystaniem komponentów zgodnych z design systemem .italia, ze szczególnym uwzględnieniem nawigacji klawiaturowej, semantycznej struktury treści i czytelności interfejsu na głównych rozmiarach ekranu."
+        "conformance": {
+          "title": "Stan zgodności",
+          "body": "PA Webinar został zaprojektowany tak, aby spełniać wymagania WCAG 2.1 na poziomie AA. Każda administracja świadcząca tę usługę jest zobowiązana opublikować własną deklarację, wskazując rzeczywisty stan zgodności (w pełni zgodny, częściowo zgodny lub niezgodny) na podstawie aktualnej oceny."
         },
-        "status": {
-          "title": "Status zgodności",
-          "body": "Trwają stałe prace weryfikacyjne i ulepszające w zakresie dostępności. Ewentualne pozostałe ograniczenia są sukcesywnie eliminowane w ramach rozwoju usługi i regularnej konserwacji."
+        "nonAccessible": {
+          "title": "Treści niedostępne",
+          "body": "Pokój wideo jest udostępniany za pośrednictwem Jitsi Meet: niektóre funkcje działające w czasie rzeczywistym mogą mieć ograniczenia w przypadku technologii wspomagających. Treści generowane automatycznie przez AI (transkrypcje, napisy, tłumaczenia i dubbing) mogą zawierać nieścisłości i są zawsze oznaczane jako takie."
+        },
+        "preparation": {
+          "title": "Sporządzenie niniejszej deklaracji",
+          "body": "Niniejsza wzorcowa deklaracja została sporządzona na podstawie samooceny przeprowadzonej przez dostawcę usługi. Interfejs zbudowano przy użyciu systemu projektowania .italia, z uwzględnieniem nawigacji za pomocą klawiatury, semantyki treści, kontrastu kolorów oraz zgodności z czytnikami ekranu. Daty sporządzenia i ostatniego przeglądu należy uzupełnić w momencie publikacji."
         },
         "feedback": {
-          "title": "Zgłoszenia i kontakt",
-          "body": "W celu zgłoszenia problemów z dostępnością lub korzystaniem z usługi prosimy o kontakt za pośrednictwem kanałów instytucjonalnych Departamentu, z podaniem strony, której dotyczy problem, oraz jego opisu."
+          "title": "Informacje zwrotne i kontakt",
+          "body": "Aby zgłosić przypadki niezgodności lub poprosić o informacje i treści wyłączone z zakresu obowiązywania przepisów, można skorzystać z instytucjonalnych kanałów kontaktowych administracji świadczącej usługę, wskazując odpowiednią stronę oraz opis problemu."
+        },
+        "enforcement": {
+          "title": "Procedura egzekwowania",
+          "body": "Jeśli odpowiedź jest niezadowalająca lub nie zostanie udzielona w ciągu 30 dni, można zwrócić się do Cyfrowego Rzecznika Obywatelskiego AgID (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Ponowne wykorzystanie i publikacja deklaracji",
+        "body": "PA Webinar to oprogramowanie open source, które może być ponownie wykorzystywane przez inne administracje. Każdy podmiot wdrażający platformę musi sporządzić i opublikować własną deklarację dostępności za pomocą oficjalnego formularza AgID, zastępując ten wzorcowy tekst własnymi danymi."
+      },
+      "links": {
+        "agidForm": "Formularz deklaracji dostępności (AgID)",
+        "difensore": "Dostępność i Cyfrowy Rzecznik Obywatelski (AgID)"
       }
     },
     "legalNotes": {

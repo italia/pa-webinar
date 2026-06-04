@@ -123,6 +123,7 @@ export interface InitialEventShape {
     aiTranslationEnabled?: boolean | null;
     aiDubbingEnabled?: boolean | null;
     multitrackRecordingEnabled?: boolean | null;
+    retainParticipantTracks?: boolean | null;
     aiTargetLocales?: string | null;
     expectedSpeakers?: number | null;
     dataRetentionDays: number;
@@ -251,6 +252,7 @@ export default function EventWizard(props: WizardProps) {
         aiTranslationEnabled: ev.aiTranslationEnabled ?? false,
         aiDubbingEnabled: ev.aiDubbingEnabled ?? false,
         multitrackRecordingEnabled: ev.multitrackRecordingEnabled ?? false,
+        retainParticipantTracks: ev.retainParticipantTracks ?? false,
         aiTargetLocales: ev.aiTargetLocales ?? null,
         expectedSpeakers: ev.expectedSpeakers ?? null,
 
@@ -355,6 +357,7 @@ export default function EventWizard(props: WizardProps) {
         (tpl?.aiTranslationEnabled ?? false),
       aiDubbingEnabled: false,
       multitrackRecordingEnabled: false,
+      retainParticipantTracks: false,
       aiTargetLocales: null,
       expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
@@ -500,6 +503,12 @@ export default function EventWizard(props: WizardProps) {
             form.recordingEnabled &&
             form.aiTranscriptEnabled &&
             form.multitrackRecordingEnabled,
+          // Conserva tracce: solo se il multitrack è effettivamente attivo.
+          retainParticipantTracks:
+            form.recordingEnabled &&
+            form.aiTranscriptEnabled &&
+            form.multitrackRecordingEnabled &&
+            form.retainParticipantTracks,
           aiTargetLocales: form.aiTargetLocales,
           expectedSpeakers: form.expectedSpeakers,
 

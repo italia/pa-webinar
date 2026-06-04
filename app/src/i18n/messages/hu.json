@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Nyilvános digitális események",
-      "subtitle": "A Digitális Átalakulási Főosztály webináriumainak, prezentációinak és nyilvános találkozóinak platformja",
-      "browseEvents": "Események böngészése",
-      "organizeEvent": "Esemény szervezése"
-    },
-    "features": {
-      "title": "A közigazgatási események platformja",
-      "video": {
-        "title": "Videokonferencia",
-        "desc": "Vegyen részt nyilvános eseményeken akár 300 résztvevővel. Nincs szükség szoftvertelepítésre."
-      },
-      "qa": {
-        "title": "Kérdések és válaszok",
-        "desc": "Tegyen fel kérdéseket az esemény során, és szavazzon a legfontosabbakra. A moderátor élőben válaszol."
-      },
-      "privacy": {
-        "title": "Adatvédelem és biztonság",
-        "desc": "GDPR-kompatibilis adatvédelem. Saját infrastruktúra Olaszországban."
+      "kicker": "Mindenki számára nyitott · élőben · igény szerint",
+      "title": "A digitális átállás közösségeinek webináriumai és eseményei",
+      "subtitle": "Kövesse élőben a digitális átállás közösségeinek előadásait, nyilvános üléseit és Q&A munkameneteit. Csatlakozzon a böngészőjéből, tegyen fel kérdéseket, és nézze vissza a felvételeket, amikor csak szeretné.",
+      "browseEvents": "Közelgő események böngészése",
+      "watchRecordings": "Felvételek megtekintése",
+      "badges": {
+        "noInstall": "A böngészőből, telepítés nélkül",
+        "interactive": "Élő Q&A és szavazások",
+        "recordings": "Felvételek és feliratok",
+        "accessible": "Akadálymentes, 24 nyelven"
       }
     },
     "upcoming": {
       "title": "Közelgő események",
       "viewAll": "Összes esemény megtekintése",
-      "noEvents": "Nincsenek közelgő események. Látogasson vissza hamarosan!"
+      "noEvents": "Nincs tervezett esemény. Nézzen vissza hamarosan!"
     },
     "howItWorks": {
-      "title": "Hogyan működik",
+      "title": "Hogyan vehet részt",
+      "subtitle": "Csak néhány lépés, fiók és telepítés nélkül.",
       "step1": {
         "title": "Regisztráljon",
-        "desc": "Iratkozzon fel ingyenesen az eseményre"
+        "desc": "Jelentkezzen be ingyenesen az eseményre annak nyilvános oldaláról."
       },
       "step2": {
         "title": "Kapja meg a linket",
-        "desc": "E-mail a személyes hozzáférési linkkel"
+        "desc": "E-mailt kap a személyes linkjével és egy naptármelléklettel."
       },
       "step3": {
         "title": "Csatlakozzon",
-        "desc": "Lépjen be az eseményre a böngészőből, telepítés nélkül"
+        "desc": "Lépjen be az eseménybe a böngészőjéből, telepítés nélkül."
       },
       "step4": {
-        "title": "Interakcióba léphet",
-        "desc": "Tegyen fel kérdéseket, szavazzon, vegyen részt a vitában"
+        "title": "Vegyen részt",
+        "desc": "Tegyen fel kérdéseket, szavazzon, válaszoljon a szavazásokra, és kapcsolódjon be a beszélgetésbe."
+      }
+    },
+    "during": {
+      "title": "Mit tehet egy esemény alatt",
+      "subtitle": "Nem csak nézheti: az események interaktívak.",
+      "qa": {
+        "title": "Kérdések és válaszok",
+        "desc": "Tegyen fel kérdéseket, és szavazzon másokéira: a moderátor élőben válaszol."
+      },
+      "polls": {
+        "title": "Szavazások",
+        "desc": "Válaszoljon a szavazásokra valós időben, és azonnal lássa az eredményeket."
+      },
+      "wordcloud": {
+        "title": "Szófelhő",
+        "desc": "Adja hozzá saját szavait az esemény közös szófelhőjéhez."
+      },
+      "reactions": {
+        "title": "Reakciók és felemelt kezek",
+        "desc": "Reagáljon, és kérjen szót a keze felemelésével: a sor sorrendben kerül kezelésre."
+      },
+      "chat": {
+        "title": "Csevegés",
+        "desc": "Írjon az esemény csevegésébe, és kövesse a beszélgetést a többi résztvevővel."
+      },
+      "agenda": {
+        "title": "Napirend és jegyzetek",
+        "desc": "Kövesse a napirendet és a moderátorok által az esemény során megosztott jegyzeteket."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "A projekt",
+      "title": "Nyílt forráskódú és szuverén, a közigazgatás által a közigazgatás számára építve",
+      "body": "A PA Webinar a Digitális Átállásért Felelős Minisztérium platformja a nyilvános digitális eseményekhez: a .italia tervezési rendszer, a Jitsi Meet videómotor és egy teljesen in-cluster AI pipeline. Nyílt forráskódként jelent meg, hogy bármely közigazgatás újrahasználhassa.",
+      "sovereignty": {
+        "title": "Adatszuverenitás",
+        "desc": "Self-hosted a közigazgatás infrastruktúráján: az adatok soha nem hagyják el azt, és nincs CLOUD Act-kitettség."
+      },
+      "openSource": {
+        "title": "Nyílt forráskód EUPL-1.2",
+        "desc": "Bármely közigazgatás által újrahasználható kód, nyilvános SBOM-mal és service inventoryval."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "Nyugalmi állapotban titkosított PII, részletes hozzájárulások és konfigurálható megőrzés."
+      },
+      "cta": "Szolgáltatás átláthatósága",
+      "techTitle": "Nyílt technológiákkal építve",
+      "archTitle": "Hogyan működik, röviden"
+    },
+    "afterEvent": {
+      "title": "Az esemény után",
+      "subtitle": "Semmi sem vész el: minden elérhető és hozzáférhető marad.",
+      "library": {
+        "title": "Felvételek könyvtára",
+        "desc": "Nézze vissza a korábbi eseményeket a nyilvános könyvtárban, a kérdések és szavazások archívumával együtt."
+      },
+      "transcript": {
+        "title": "Átirat és feliratok",
+        "desc": "Minden felvételhez tartozhat átirat és felirat, amelyet a fürtön belüli AI-folyamat automatikusan készít el."
+      },
+      "translation": {
+        "title": "Automatikus fordítás",
+        "desc": "A feliratok és az összefoglaló több nyelvre lefordítva, hogy az eseményt más nyelven is követhesse."
+      },
+      "dubbing": {
+        "title": "Hangszinkronizálás",
+        "desc": "Szinkronizált hangsáv semleges szintetikus hanggal (hangklónozás nélkül), hogy az eseményt más nyelven is meghallgathassa."
       }
     }
   },
@@ -2037,22 +2098,38 @@
       }
     },
     "accessibility": {
-      "metaTitle": "Akadálymentességi nyilatkozat",
-      "title": "Akadálymentességi nyilatkozat",
-      "intro": "A Digitális Átalakulási Főosztály elkötelezett amellett, hogy ezt a platformot akadálymentessé tegye, összhangban a közszféra digitális szolgáltatásaira vonatkozó hatályos követelményekkel.",
+      "metaTitle": "Akadálymentesítési nyilatkozat",
+      "title": "Akadálymentesítési nyilatkozat",
+      "intro": "A Digitális Átalakítási Osztály elkötelezett amellett, hogy a PA Webinar akadálymentes legyen, összhangban a 4/2004. számú olasz törvénnyel, az (EU) 2016/2102 irányelvvel és az AgID informatikai eszközök akadálymentességére vonatkozó iránymutatásaival.",
       "sections": {
-        "commitment": {
-          "title": "Akadálymentességi kötelezettségvállalás",
-          "body": "A platform a .italia designrendszerrel összhangban lévő komponensekkel készült, különös figyelmet fordítva a billentyűzetes navigációra, a tartalom szemantikus szerkezetére és a felület olvashatóságára a fő képernyőméreteken."
-        },
-        "status": {
+        "conformance": {
           "title": "Megfelelőségi állapot",
-          "body": "Az akadálymentességi ellenőrzések és fejlesztések folyamatosan zajlanak. Az esetleges fennmaradó hiányosságokat a szolgáltatás fejlesztése és a rendszeres karbantartási tevékenységek keretében fokozatosan pótoljuk."
+          "body": "A PA Webinar úgy lett kialakítva, hogy megfeleljen a WCAG 2.1 AA szintjének. A szolgáltatást nyújtó minden közigazgatási szerv köteles közzétenni saját nyilatkozatát, amelyben naprakész értékelés alapján feltünteti a tényleges megfelelőségi állapotot (teljesen, részben vagy nem megfelelő)."
+        },
+        "nonAccessible": {
+          "title": "Nem akadálymentes tartalom",
+          "body": "A videoszobát a Jitsi Meet biztosítja: egyes valós idejű funkciók korlátozottan működhetnek a segítő technológiákkal. Az AI által automatikusan generált tartalom (átiratok, feliratok, fordítások és szinkronizálás) pontatlanságokat tartalmazhat, és mindig ekként van megjelölve."
+        },
+        "preparation": {
+          "title": "E nyilatkozat elkészítése",
+          "body": "Ezt a mintanyilatkozatot a szolgáltató által végzett önértékelés alapján készítették el. A felület a .italia tervezőrendszerrel készült, figyelmet fordítva a billentyűzetes navigációra, a tartalom szemantikájára, a színkontrasztra és a képernyőolvasókkal való kompatibilitásra. Az elkészítés és az utolsó felülvizsgálat dátumát a közzétételkor kell kitölteni."
         },
         "feedback": {
           "title": "Visszajelzés és kapcsolat",
-          "body": "Az akadálymentességi akadályok vagy a szolgáltatás használatával kapcsolatos problémák jelzéséhez a felhasználók a Főosztály intézményi csatornáin keresztül fordulhatnak hozzánk, megjelölve az érintett oldalt és a probléma rövid leírását."
+          "body": "A nem megfelelőség eseteinek bejelentéséhez, illetve a szabályozás hatálya alól kizárt információk és tartalmak igényléséhez használhatja a szolgáltatást nyújtó közigazgatási szerv intézményi kapcsolattartási csatornáit, megjelölve az érintett oldalt és a probléma leírását."
+        },
+        "enforcement": {
+          "title": "Végrehajtási eljárás",
+          "body": "Ha a válasz nem kielégítő, vagy ha 30 napon belül nem érkezik válasz, az AgID digitális közvédőjéhez (Difensore civico per il digitale) fordulhat."
         }
+      },
+      "note": {
+        "title": "A nyilatkozat újrafelhasználása és közzététele",
+        "body": "A PA Webinar nyílt forráskódú szoftver, amelyet más közigazgatási szervek is újrahasználhatnak. A platformot átvevő minden szervnek el kell készítenie és közzé kell tennie saját akadálymentesítési nyilatkozatát az AgID hivatalos űrlapján keresztül, ezt a mintaszöveget a saját adataival helyettesítve."
+      },
+      "links": {
+        "agidForm": "Akadálymentesítési nyilatkozat űrlap (AgID)",
+        "difensore": "Akadálymentesség és digitális közvédő (AgID)"
       }
     },
     "legalNotes": {

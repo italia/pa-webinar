@@ -4,18 +4,21 @@
 
 ### Versioni supportate
 
+Riceve correzioni di sicurezza l'ultima versione minore rilasciata.
+
 | Versione | Supportata |
 | -------- | ---------- |
-| 0.1.x    | Si         |
+| 0.5.x    | Sì         |
+| < 0.5    | No         |
 
-### Segnalare una vulnerabilita
+### Segnalare una vulnerabilità
 
-Se hai trovato una vulnerabilita di sicurezza in questo progetto, **non aprire una issue pubblica**. Invia una segnalazione a:
+Se hai trovato una vulnerabilità di sicurezza in questo progetto, **non aprire una issue pubblica**.
 
-**Email**: segreteria.trasformazionedigitale@governo.it
+Usa la segnalazione privata di GitHub: apri la scheda **Security** del repository e seleziona **"Report a vulnerability"** (Private Vulnerability Reporting). La segnalazione resta visibile solo ai manutentori.
 
 Includi nella segnalazione:
-- Descrizione della vulnerabilita
+- Descrizione della vulnerabilità
 - Passi per riprodurla
 - Possibile impatto
 - Suggerimento per la correzione (se possibile)
@@ -31,15 +34,18 @@ Ci impegniamo a:
 
 ### Supported versions
 
+The latest released minor version receives security fixes.
+
 | Version | Supported |
 | ------- | --------- |
-| 0.1.x   | Yes       |
+| 0.5.x   | Yes       |
+| < 0.5   | No        |
 
 ### Reporting a vulnerability
 
-If you have found a security vulnerability in this project, **do not open a public issue**. Send a report to:
+If you have found a security vulnerability in this project, **do not open a public issue**.
 
-**Email**: segreteria.trasformazionedigitale@governo.it
+Use GitHub private reporting: open the repository's **Security** tab and choose **"Report a vulnerability"** (Private Vulnerability Reporting). The report stays visible only to the maintainers.
 
 Include in your report:
 - Description of the vulnerability

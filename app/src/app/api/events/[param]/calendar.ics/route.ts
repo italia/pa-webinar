@@ -35,7 +35,7 @@ export const GET = withErrorHandling(async (request, context) => {
     endsAt: event.endsAt,
     timezone: event.timezone,
     url: eventUrl,
-    organizerName: event.moderatorName ?? (settings.siteName || 'Eventi PA'),
+    organizerName: event.moderatorName ?? (settings.siteName || 'PA Webinar'),
     organizerEmail:
       tryDecryptPII(event.moderatorEmail) ??
       process.env.SMTP_FROM ??

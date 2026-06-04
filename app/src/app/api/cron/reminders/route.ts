@@ -124,7 +124,7 @@ export const GET = withErrorHandling(async (request) => {
           endsAt: event.endsAt,
           timezone: event.timezone,
           url: eventPageUrl,
-          organizerName: event.moderatorName ?? (settings.siteName || 'Eventi PA'),
+          organizerName: event.moderatorName ?? (settings.siteName || 'PA Webinar'),
           organizerEmail:
             tryDecryptPII(event.moderatorEmail) ??
             process.env.SMTP_FROM ??
@@ -142,7 +142,7 @@ export const GET = withErrorHandling(async (request) => {
             eventDuration: templateInput.eventDuration,
             joinUrl: templateInput.joinUrl,
             eventPageUrl: templateInput.eventPageUrl,
-            siteName: settings.siteName || 'Eventi PA',
+            siteName: settings.siteName || 'PA Webinar',
             offsetMinutes: reminder.offsetMinutes,
           },
         );

@@ -1,5 +1,3 @@
-import { Card, CardBody } from 'design-react-kit';
-
 import { Link } from '@/i18n/navigation';
 
 interface LegalDocumentSection {
@@ -22,6 +20,9 @@ interface LegalDocumentPageProps {
   noteLink?: LegalDocumentLink;
 }
 
+// Plain Bootstrap Italia card markup (not design-react-kit's <Card>): this is a
+// Server Component, and design-react-kit's Card pulls in a React context that
+// only works in Client Components, which throws under RSC.
 export default function LegalDocumentPage({
   title,
   intro,
@@ -41,27 +42,34 @@ export default function LegalDocumentPage({
           </header>
 
           {htmlContent ? (
-            <Card className="shadow-sm border-0">
-              <CardBody className="p-4">
+            <div className="card shadow-sm border-0" style={{ borderRadius: 8 }}>
+              <div className="card-body p-4">
                 <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-              </CardBody>
-            </Card>
+              </div>
+            </div>
           ) : (
             <div className="d-flex flex-column gap-3">
               {sections?.map((section) => (
-                <Card key={section.title} className="shadow-sm border-0">
-                  <CardBody className="p-4">
+                <div
+                  key={section.title}
+                  className="card shadow-sm border-0"
+                  style={{ borderRadius: 8 }}
+                >
+                  <div className="card-body p-4">
                     <h2 className="h4 mb-3">{section.title}</h2>
                     <p className="mb-0">{section.body}</p>
-                  </CardBody>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           )}
 
           {(noteTitle || noteBody || noteLink) && (
-            <Card className="shadow-sm border-0 mt-3">
-              <CardBody className="p-4">
+            <div
+              className="card shadow-sm border-0 mt-3"
+              style={{ borderRadius: 8 }}
+            >
+              <div className="card-body p-4">
                 {noteTitle ? <h2 className="h4 mb-3">{noteTitle}</h2> : null}
                 {noteBody ? <p className="mb-3">{noteBody}</p> : null}
                 {noteLink ? (
@@ -69,8 +77,8 @@ export default function LegalDocumentPage({
                     {noteLink.label}
                   </Link>
                 ) : null}
-              </CardBody>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
       </div>
