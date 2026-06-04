@@ -42,9 +42,10 @@ export interface Step2Value {
 interface Props {
   value: Step2Value;
   onChange: (patch: Partial<Step2Value>) => void;
+  fieldErrors?: Record<string, string>;
 }
 
-export default function Step2Permissions({ value, onChange }: Props) {
+export default function Step2Permissions({ value, onChange, fieldErrors = {} }: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
 
@@ -268,7 +269,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
                   <input
                     id="aiTargetLocales"
                     type="text"
-                    className="form-control form-control-sm"
+                    className={`form-control form-control-sm${fieldErrors.aiTargetLocales ? ' is-invalid' : ''}`}
                     style={{ maxWidth: 260 }}
                     placeholder="en,fr,de"
                     value={value.aiTargetLocales ?? ''}
@@ -279,6 +280,11 @@ export default function Step2Permissions({ value, onChange }: Props) {
                       })
                     }
                   />
+                  {fieldErrors.aiTargetLocales && (
+                    <div className="invalid-feedback d-block">
+                      {tAdmin('form.aiTargetLocalesRequired')}
+                    </div>
+                  )}
                 </div>
               )}
 

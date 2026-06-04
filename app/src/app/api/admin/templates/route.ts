@@ -2,7 +2,6 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
-
 import { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
