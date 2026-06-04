@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@kubernetes/client-node": "^0.22.3",
+    "@kubernetes/client-node": "^1.4.0",
     "dockerode": "^4.0.2"
   },
   "devDependencies": {
