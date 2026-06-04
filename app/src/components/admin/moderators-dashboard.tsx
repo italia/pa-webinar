@@ -5,6 +5,8 @@ import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Card, CardBody, Icon, Input } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 
 interface ModeratorRow {
   id: string;
@@ -32,6 +34,8 @@ export default function ModeratorsDashboard({
 }) {
   const t = useTranslations('admin.moderators');
   const fmt = useFormatter();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [data, setData] = useState<ApiResponse | null>(null);
   const [search, setSearch] = useState('');
   const [debounced, setDebounced] = useState('');
@@ -75,7 +79,13 @@ export default function ModeratorsDashboard({
   }
 
   async function regenerate(row: ModeratorRow) {
-    if (!confirm(t('confirmRegenerate'))) return;
+    const ok = await confirm({
+      title: t('regenerate'),
+      message: t('confirmRegenerate'),
+      confirmLabel: t('regenerate'),
+      danger: true,
+    });
+    if (!ok) return;
     setRotating(row.id);
     try {
       const res = await fetch('/api/admin/moderators', {
@@ -86,7 +96,7 @@ export default function ModeratorsDashboard({
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       await fetchRows();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'regenerate failed');
+      toast.error(e instanceof Error ? e.message : 'regenerate failed');
     } finally {
       setRotating(null);
     }

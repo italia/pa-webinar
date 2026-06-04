@@ -117,7 +117,7 @@ export default function AdminBreadcrumb() {
                 aria-current={isLast ? 'page' : undefined}
               >
                 {isLast || !c.href ? (
-                  <span style={{ color: '#5A768A' }}>{t(c.labelKey)}</span>
+                  <span style={{ color: 'var(--app-muted)' }}>{t(c.labelKey)}</span>
                 ) : (
                   <Link href={c.href} className="text-decoration-none">
                     {t(c.labelKey)}

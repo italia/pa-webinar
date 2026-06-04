@@ -91,7 +91,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
   return (
     <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
       <CardBody className="p-4">
-        <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+        <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
           {t('config')}
         </h5>
 
@@ -154,7 +154,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
         <hr className="my-3" />
 
         <div className="mb-3">
-          <div className="fw-semibold mb-2" style={{ fontSize: '0.9rem', color: '#17324D' }}>
+          <div className="fw-semibold mb-2" style={{ fontSize: '0.9rem', color: 'var(--app-text)' }}>
             {t('pageVisible')}
           </div>
           <div className="d-flex flex-column gap-1">

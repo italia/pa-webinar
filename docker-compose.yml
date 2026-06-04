@@ -42,6 +42,9 @@ services:
       - ADMIN_API_KEY=dev_admin_key_2026
       - JVB_PRE_SCALE_MINUTES=30
       - JVB_MAX_REPLICAS=4
+      # Edge-trigger del recorder multi-traccia (opt-in, profilo "recorder").
+      # Punta al servizio controller; inerte se il controller non è avviato.
+      - RECORDER_CONTROLLER_URL=http://recorder-controller:8080
     depends_on:
       postgres:
         condition: service_healthy
@@ -203,6 +206,38 @@ services:
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+  # ── Recorder controller (ADR-013 Fase 3, opt-in: --profile recorder) ──
+  # Operator riconciliante in modalità DOCKER: spawna container recorder via
+  # socket Docker quando un evento va LIVE (stessa logica del runner K8s).
+  # È la variante NON-K8s per il riuso open-source su VM ("full mode").
+  # ATTENZIONE: monta /var/run/docker.sock (accesso Docker host) — abilitare
+  # solo se si vuole la registrazione multi-traccia.
+  recorder-controller:
+    build:
+      context: ./infra/recorder-controller
+      dockerfile: Dockerfile
+    environment:
+      - RUNNER=docker
+      - PORTAL_URL=http://app:3000
+      - CRON_API_KEY=dev_cron_key_change_in_production
+      # Immagine del bot recorder che il controller avvia (pull da GHCR o
+      # build locale: docker build -t eventi-dtd-recorder:local infra/recorder).
+      - RECORDER_IMAGE=ghcr.io/italia/eventi-dtd-recorder:dev
+      - PORT=8080
+      # Network compose a cui agganciare i container recorder, così
+      # raggiungono `app` e `jitsi-web`. Default = network di default del
+      # progetto compose; adatta se usi un COMPOSE_PROJECT_NAME diverso.
+      - DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-eventi-dtd}_default
+      # Env statiche passate a ogni recorder (allowlist passthrough):
+      - RECORDER_ENV_JITSI_DOMAIN=localhost:8443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      app:
+        condition: service_healthy
+    profiles: ["recorder"]
+    restart: unless-stopped
 
 volumes:
   postgres_data:

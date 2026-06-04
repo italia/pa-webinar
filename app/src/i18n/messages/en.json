@@ -597,7 +597,8 @@
       "eventMaterials": "Materials",
       "eventQuestionnaires": "Questionnaires",
       "rubricaList": "List",
-      "rubricaDetail": "Entry"
+      "rubricaDetail": "Entry",
+      "recordingsPostprod": "Transcripts / AI"
     },
     "landing": {
       "title": "Admin panel",
@@ -695,7 +696,8 @@
           "dateRequired": "The original date is required.",
           "saveFailed": "Saving the metadata failed."
         }
-      }
+      },
+      "updateFailed": "Update failed."
     },
     "recordingsLibrary": {
       "title": "Video recordings",
@@ -764,7 +766,10 @@
       "detailEnd": "End",
       "detailModerator": "Moderator",
       "detailRoom": "Jitsi room",
-      "detailFilename": "File name"
+      "detailFilename": "File name",
+      "transcriptManage": "Manage transcript / AI",
+      "transcriptReady": "Transcribed",
+      "transcriptProcessing": "Processing"
     },
     "gdprAudit": {
       "title": "GDPR audit",
@@ -1478,7 +1483,8 @@
       },
       "errors": {
         "saveFailed": "Save failed. Check the fields and retry."
-      }
+      },
+      "deleteTitle": "Delete template"
     },
     "emailTemplates": {
       "title": "Email templates",
@@ -1659,7 +1665,8 @@
       "play": "Play",
       "hidePlayer": "Hide player",
       "download": "Download",
-      "deleteConfirm": "Delete this session and its recording?"
+      "deleteConfirm": "Delete this session and its recording?",
+      "deleteTitle": "Delete session"
     },
     "monitoring": {
       "title": "Monitoring",
@@ -1820,7 +1827,8 @@
         "settings": "Settings",
         "people": "People",
         "content": "Content",
-        "audit": "Recordings & Audit"
+        "audit": "Recordings & Audit",
+        "postEvent": "Post-event"
       },
       "toggles": {
         "unmute": "Participants can unmute",
@@ -1842,7 +1850,11 @@
         "postEventSummary": "{connected} joined of {registered} registrations (estimated {estimated})",
         "estimatedAttendance": "Estimated: {estimated} attendees"
       },
-      "copyGuestUrl": "Copy guest link"
+      "copyGuestUrl": "Copy guest link",
+      "aiManageTitle": "Transcript, summary and translations",
+      "aiManageDesc": "Manage the AI post-production of this recording: fix the transcript and speaker attribution (who says what), edit the summary and manage translation languages.",
+      "aiManageCta": "Open post-production management",
+      "aiManageNotEnded": "Available once the event has ended and the recording has been processed by the AI pipeline."
     },
     "rubrica": {
       "title": "Address book",
@@ -1900,7 +1912,18 @@
       "editDirty": "{n, plural, one {1 unsaved change} other {# unsaved changes}}",
       "editSaved": "Saved: {text} texts, {speaker} speakers.",
       "editFailed": "Save failed (HTTP {code})",
-      "editSeek": "Jump to this point in the video"
+      "editSeek": "Jump to this point in the video",
+      "manageTabTranscript": "Transcript",
+      "manageTabSummary": "Summary",
+      "manageTabTranslations": "Translations",
+      "manageBackToList": "All recordings",
+      "manageDuration": "Duration",
+      "manageSource": "Source language",
+      "manageOpenPublic": "Public page",
+      "manageRerunOk": "Pipeline re-run started.",
+      "manageOpen": "Manage",
+      "cancelConfirmTitle": "Cancel post-production",
+      "speakerUpdateSuccess": "Speaker updated"
     },
     "questionnairesPage": {
       "title": "Questionnaires",
@@ -2752,7 +2775,9 @@
       },
       "runAt": "Processing completed on",
       "version": "Pipeline version"
-    }
+    },
+    "overlapBadge": "overlapping",
+    "overlapTitle": "Simultaneous speech: more than one person is speaking at the same time in this interval."
   },
   "diagram": {
     "title": "Event configuration",
@@ -2858,7 +2883,11 @@
     "notConfigured": "Jibri is not configured. Video recording is not available.",
     "disabledHint": "Video recording is not enabled for this event. To enable it open the Settings section above and toggle \"Recording\" on.",
     "play": "Play",
-    "download": "Download"
+    "download": "Download",
+    "transcriptManage": "Transcript / AI",
+    "deleteConfirmTitle": "Delete recording",
+    "deleteFailed": "Delete failed",
+    "deleteSuccess": "Recording deleted"
   },
   "postEvent": {
     "config": "Post-event configuration",

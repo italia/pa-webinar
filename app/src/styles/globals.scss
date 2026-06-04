@@ -4,6 +4,15 @@
 // Bootstrap Italia — the .italia design system CSS framework
 @import 'bootstrap-italia/src/scss/bootstrap-italia';
 
+/* Design token applicativi (.italia): centralizzano i 3 colori brand
+   prima hardcoded inline in centinaia di punti. Valori identici → zero
+   regressione visiva, piena coerenza/temabilità. */
+:root {
+  --app-text: #17324D;    /* heading/testo scuro brand */
+  --app-primary: #0066CC; /* blu primario .italia */
+  --app-muted: #5A768A;   /* testo secondario */
+}
+
 // ── Bootstrap Italia overrides ───────────────────────────────────────────
 //
 // Bootstrap Italia's `.alert` renders the contextual icon (warning / info /
@@ -2498,5 +2507,37 @@
 @media (prefers-reduced-motion: reduce) {
   .mini-transcript [style*='mini-transcript-pulse'] {
     animation: none !important;
+  }
+}
+
+/* Skeleton loader (.italia-coerente): placeholder con shimmer per gli
+   stati di caricamento, al posto di "Caricamento…" testuale. */
+.app-skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: #e9eef5;
+  border-radius: 6px;
+}
+.app-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: app-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes app-skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-skeleton::after {
+    animation: none;
   }
 }

@@ -32,7 +32,7 @@ export default async function LanguagesPage() {
   return (
     <div className="container py-5">
       <div className="mb-5">
-        <h1 className="fw-bold mb-1" style={{ color: '#17324D' }}>
+        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
           {t('title')}
         </h1>
         <p className="text-secondary mb-0">{t('subtitle')}</p>

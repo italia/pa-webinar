@@ -57,7 +57,7 @@ function AdminCard({
               <Icon icon={icon} size="lg" color="primary" />
             </div>
             <div>
-              <h2 className="h5 mb-0 fw-bold" style={{ color: '#17324D' }}>
+              <h2 className="h5 mb-0 fw-bold" style={{ color: 'var(--app-text)' }}>
                 {title}
               </h2>
             </div>

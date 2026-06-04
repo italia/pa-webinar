@@ -1,0 +1,26 @@
+{
+  "name": "eventi-dtd-recorder-controller",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Operator riconciliante che orchestra i Job recorder multi-traccia (ADR-013 Fase 3)",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@kubernetes/client-node": "^0.22.3",
+    "dockerode": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^3.3.31",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.9"
+  },
+  "overrides": {
+    "form-data": "2.5.5"
+  }
+}

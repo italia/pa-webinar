@@ -18,7 +18,7 @@ export default async function PublicCalendarPage() {
   return (
     <div className="container py-5">
       <div className="text-center mb-5">
-        <h1 className="h2 fw-bold mb-2" style={{ color: '#17324D' }}>
+        <h1 className="h2 fw-bold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('publicTitle')}
         </h1>
         <p className="text-secondary">{t('publicSubtitle')}</p>

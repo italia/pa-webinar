@@ -1,0 +1,83 @@
+{{- if and .Values.recorder.enabled .Values.recorder.controller.enabled }}
+# Recorder template (ADR-013 Fase 3) — CronJob creato **sospeso**, usato come
+# Pod spec template dal recorder-controller (`kubectl create job --from`).
+# Non parte mai da solo. Il controller inietta RECORDING_ID/EVENT_ID per Job;
+# JWT bot e nome stanza il recorder li reclama dal portale (recorder-claim).
+# Gira sul pool NORMALE (CPU/Chrome), non sul nodo GPU.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-recorder
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: recorder
+spec:
+  schedule: "@yearly"
+  suspend: true
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "eventi-dtd.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: recorder
+    spec:
+      backoffLimit: {{ .Values.recorder.backoffLimit | default 1 }}
+      activeDeadlineSeconds: {{ .Values.recorder.activeDeadlineSeconds | default 21600 }}
+      ttlSecondsAfterFinished: {{ .Values.recorder.ttlSecondsAfterFinished | default 600 }}
+      template:
+        metadata:
+          labels:
+            {{- include "eventi-dtd.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: recorder
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          {{- with (.Values.recorder.imagePullSecrets | default .Values.app.imagePullSecrets) }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.recorder.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.recorder.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          volumes:
+            - name: recordings
+              emptyDir:
+                sizeLimit: {{ .Values.recorder.workSizeLimit | default "10Gi" }}
+          containers:
+            - name: recorder
+              image: {{ .Values.recorder.image }}
+              imagePullPolicy: {{ .Values.recorder.imagePullPolicy | default "IfNotPresent" }}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: recordings
+                  mountPath: /recordings
+              env:
+                - name: JITSI_DOMAIN
+                  value: {{ .Values.recorder.jitsiDomain | default (index .Values.app.env "NEXT_PUBLIC_JITSI_DOMAIN") | quote }}
+                - name: PORTAL_URL
+                  value: {{ include "eventi-dtd.internalUrl" . | quote }}
+                - name: OUTPUT_DIR
+                  value: "/recordings"
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "eventi-dtd.secretName" . }}
+                      key: CRON_API_KEY
+                # RECORDING_ID / EVENT_ID iniettati dal controller per-Job.
+              resources:
+                {{- toYaml (.Values.recorder.resources | default dict) | nindent 16 }}
+{{- end }}

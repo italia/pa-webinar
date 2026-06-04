@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import {
   Alert,
   Button,
@@ -46,6 +48,7 @@ export default function FileManagement({
 }: FileManagementProps) {
   const t = useTranslations('admin.files');
   const tc = useTranslations('common');
+  const confirm = useConfirm();
 
   const [files, setFiles] = useState<FileMaterial[]>(initialFiles);
   const [uploading, setUploading] = useState(false);
@@ -111,7 +114,13 @@ export default function FileManagement({
 
   const handleDelete = useCallback(
     async (materialId: string) => {
-      if (!confirm(t('deleteConfirm'))) return;
+      const ok = await confirm({
+        title: tc('delete'),
+        message: t('deleteConfirm'),
+        confirmLabel: tc('delete'),
+        danger: true,
+      });
+      if (!ok) return;
       try {
         const res = await fetch(
           `/api/events/${eventId}/files?materialId=${materialId}`,
@@ -129,7 +138,7 @@ export default function FileManagement({
         setError(e instanceof Error ? e.message : 'Error');
       }
     },
-    [eventId, moderatorToken, t],
+    [eventId, moderatorToken, t, tc, confirm],
   );
 
   const visibilityLabel = (v: string) => {
@@ -146,7 +155,7 @@ export default function FileManagement({
     <Card className="border-0 shadow-sm">
       <CardBody className="p-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
             <Icon icon="it-files" size="sm" className="me-2" />
             {t('title')}
           </h5>

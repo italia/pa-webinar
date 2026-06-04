@@ -12,6 +12,7 @@ import { constantTimeEqual } from '@/lib/auth/moderator';
 import { verifyWebhookSignature } from '@/lib/auth/webhook-signature';
 import { encryptJSON } from '@/lib/crypto/pii';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { MULTITRACK_PREFIX } from '@/lib/recorder/lifecycle';
 
 let warnedSignatureMissing = false;
 
@@ -19,6 +20,22 @@ function logWarningOnce(message: string): void {
   if (warnedSignatureMissing) return;
   warnedSignatureMissing = true;
   console.warn(message);
+}
+
+/**
+ * Deriva la blobKey del mix Jibri. Jibri carica sotto `recordings/`
+ * (vedi jibri-finalize.sh); la StorageProvider lavora su key nude, non URL.
+ */
+function deriveMixBlobKey(filename: string | null, recordingUrl: string): string {
+  if (filename) return `recordings/${filename}`;
+  try {
+    const u = new URL(recordingUrl);
+    const path = u.pathname.split('/').filter(Boolean);
+    // Path-style: /<bucket>/<...key>; virtual-hosted: /<...key>
+    return path.length > 1 ? path.slice(1).join('/') : path.join('/');
+  } catch {
+    return recordingUrl;
+  }
 }
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
@@ -113,6 +130,49 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       },
     });
 
+    const mixBlobKey = deriveMixBlobKey(filename, recordingUrl);
+
+    // ADR-013 Fase 3 (lifecycle unificato): se per questo evento esiste già
+    // una Recording multi-traccia (segnaposto creato al dispatch del
+    // recorder), arricchiscila col mix Jibri invece di crearne una seconda.
+    // Questo branch scatta SOLO per eventi multi-traccia → i flussi
+    // single-track restano identici. Nessun enqueue qui: la pipeline
+    // multitraccia parte dall'ingest delle tracce (`multitrack-manifest`).
+    const placeholder = await tx.recording.findFirst({
+      where: { eventId: event.id, blobKey: { startsWith: MULTITRACK_PREFIX } },
+      select: { id: true, callSessionId: true },
+    });
+    if (placeholder) {
+      await tx.callSession.update({
+        where: { id: placeholder.callSessionId },
+        data: {
+          endedAt: new Date(),
+          duration,
+          peakParticipants: event.peakParticipants,
+          participants: encryptedParticipants,
+          recordingUrl,
+          recordingFileSize: fileSize ? BigInt(fileSize) : null,
+          recordingDuration: duration,
+          recordingFilename: filename,
+        },
+      });
+      const recording = await tx.recording.update({
+        where: { id: placeholder.id },
+        data: {
+          blobKey: mixBlobKey,
+          durationSec: duration,
+          fileSizeBytes: fileSize ? BigInt(fileSize) : null,
+        },
+        select: { id: true },
+      });
+      return {
+        updatedEvent,
+        callSession: { id: placeholder.callSessionId },
+        recording,
+        postprod: { enqueued: 0, skippedExisting: 0, jobIds: [] as string[] },
+      };
+    }
+
     const callSession = await tx.callSession.create({
       data: {
         eventId: event.id,
@@ -130,31 +190,12 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       },
     });
 
-    // Recording row exists 1:1 with CallSession. The blob key is
-    // derived from the filename — Jibri uploads under `recordings/`
-    // (see jibri-finalize.sh) but the StorageProvider abstraction
-    // works on bare object keys, not URLs.
-    const blobKey = filename
-      ? `recordings/${filename}`
-      : (() => {
-          // Fallback: try to extract the key from the URL. Best-effort
-          // — workflows that aren't filename-shaped still get a row
-          // but their key will not match the live blob.
-          try {
-            const u = new URL(recordingUrl);
-            const path = u.pathname.split('/').filter(Boolean);
-            // Path-style: /<bucket>/<...key>; virtual-hosted: /<...key>
-            return path.length > 1 ? path.slice(1).join('/') : path.join('/');
-          } catch {
-            return recordingUrl;
-          }
-        })();
-
+    // Recording row exists 1:1 with CallSession.
     const recording = await tx.recording.create({
       data: {
         callSessionId: callSession.id,
         eventId: event.id,
-        blobKey,
+        blobKey: mixBlobKey,
         durationSec: duration,
         fileSizeBytes: fileSize ? BigInt(fileSize) : null,
       },

@@ -40,10 +40,49 @@ function formatTs(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+/**
+ * Trova TUTTI i segmenti attivi all'istante `now` (start <= now < end).
+ * Con la registrazione multi-traccia (ADR-013) i segmenti possono
+ * sovrapporsi nel tempo, quindi più parlanti possono essere correnti.
+ * Non si può usare la binary search "un solo intervallo" (presuppone
+ * intervalli disgiunti). I segmenti sono ordinati per start: troviamo
+ * l'ultimo con start <= now, poi scansioniamo a ritroso raccogliendo
+ * quelli che coprono ancora `now`. Restituiti dal più recente (primario)
+ * al più vecchio. Nel caso sequenziale la scansione trova un solo
+ * indice e si ferma subito.
+ */
+function findCurrentIdxs(segments: Segment[], now: number): number[] {
+  let lo = 0;
+  let hi = segments.length - 1;
+  let hiStart = -1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (segments[mid]!.start <= now) {
+      hiStart = mid;
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  const out: number[] = [];
+  for (let i = hiStart; i >= 0; i--) {
+    const s = segments[i]!;
+    if (now >= s.start && now < s.end) out.push(i);
+    // Stop euristico: improbabile che un segmento iniziato >60s prima
+    // copra ancora `now` (le battute non durano minuti). Evita scan O(n).
+    if (s.start < now - 60) break;
+  }
+  return out;
+}
+
 export default function MiniTranscript({ playerRef, segments }: Props) {
   const t = useTranslations('postprod');
-  const [activeIdx, setActiveIdx] = useState<number>(-1);
-  const lastIdxRef = useRef(0);
+  const tf = (key: string, fallback: string): string =>
+    t.has(key) ? t(key) : fallback;
+  // Indici correnti (può essere >1 con overlap multi-traccia). Ordinati
+  // dal più recente. Stringa-keyed per confronto stabile fra tick.
+  const [currentIdxs, setCurrentIdxs] = useState<number[]>([]);
+  const lastKeyRef = useRef<string>('');
 
   useEffect(() => {
     const v = playerRef.current?.videoEl?.();
@@ -51,29 +90,11 @@ export default function MiniTranscript({ playerRef, segments }: Props) {
     let rafId: number | null = null;
     const tick = (): void => {
       const now = v.currentTime;
-      const li = Math.max(0, Math.min(segments.length - 1, lastIdxRef.current));
-      const here = segments[li];
-      if (here && now >= here.start && now <= here.end) {
-        if (activeIdx !== li) setActiveIdx(li);
-      } else {
-        // binary search fallback
-        let lo = 0;
-        let hi = segments.length - 1;
-        let found = -1;
-        while (lo <= hi) {
-          const mid = (lo + hi) >> 1;
-          const s = segments[mid]!;
-          if (now < s.start) hi = mid - 1;
-          else if (now > s.end) lo = mid + 1;
-          else {
-            found = mid;
-            break;
-          }
-        }
-        if (found !== -1) {
-          lastIdxRef.current = found;
-          setActiveIdx(found);
-        }
+      const idxs = findCurrentIdxs(segments, now);
+      const key = idxs.join(',');
+      if (key !== lastKeyRef.current) {
+        lastKeyRef.current = key;
+        setCurrentIdxs(idxs);
       }
       rafId = window.requestAnimationFrame(tick);
     };
@@ -92,14 +113,29 @@ export default function MiniTranscript({ playerRef, segments }: Props) {
       v.removeEventListener('play', onPlay);
       v.removeEventListener('pause', onPause);
     };
-  }, [playerRef, segments, activeIdx]);
+  }, [playerRef, segments]);
 
-  if (activeIdx < 0) return null;
+  if (currentIdxs.length === 0) return null;
 
-  // Mostra: precedente (opacità 50%), attivo (full), successivo (opacità 50%)
-  const prev = activeIdx > 0 ? segments[activeIdx - 1]! : null;
-  const curr = segments[activeIdx]!;
-  const next = activeIdx < segments.length - 1 ? segments[activeIdx + 1]! : null;
+  // Primario = il segmento corrente iniziato più di recente (primo
+  // dell'array, che è ordinato dal più recente). prev/next sono calcolati
+  // rispetto al primario per dare contesto. Gli altri correnti (overlap)
+  // sono parlanti simultanei, mostrati tutti come righe "active".
+  const primaryIdx = currentIdxs[0]!;
+  const overlapping = currentIdxs.length > 1;
+  // Mostriamo i correnti in ordine cronologico (per start) per stabilità
+  // visiva quando sono più di uno.
+  const currentSorted = [...currentIdxs].sort(
+    (a, b) => segments[a]!.start - segments[b]!.start,
+  );
+  const prev = primaryIdx > 0 ? segments[primaryIdx - 1]! : null;
+  const next =
+    primaryIdx < segments.length - 1 ? segments[primaryIdx + 1]! : null;
+  // prev/next non devono duplicare un segmento già mostrato come corrente
+  // (può capitare con gli overlap: il "successivo per indice" è in realtà
+  // già attivo).
+  const prevSeg = prev && !currentIdxs.includes(primaryIdx - 1) ? prev : null;
+  const nextSeg = next && !currentIdxs.includes(primaryIdx + 1) ? next : null;
 
   const seek = (sec: number) => {
     playerRef.current?.seekTo?.(sec, true);
@@ -131,11 +167,51 @@ export default function MiniTranscript({ playerRef, segments }: Props) {
           }}
         />
         {t('miniTranscriptLabel')}
+        {overlapping && (
+          // Badge "parlato simultaneo": più parlanti correnti insieme.
+          // Inline SVG (niente <Icon> design-react-kit per evitare
+          // hydration mismatch — vedi note progetto).
+          <span
+            className="d-inline-flex align-items-center gap-1"
+            title={tf(
+              'overlapTitle',
+              'Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente.',
+            )}
+            style={{
+              color: '#6633CC',
+              background: '#6633CC14',
+              border: '1px solid #6633CC55',
+              borderRadius: 4,
+              padding: '0 5px',
+              letterSpacing: 0,
+              textTransform: 'none',
+            }}
+          >
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M8 10h6M8 14h4" />
+              <path d="M3 15a2 2 0 0 0 2 2h1v3l3-3h4a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" />
+              <path d="M9 5V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-1" />
+            </svg>
+            {tf('overlapBadge', 'simultaneo')}
+          </span>
+        )}
       </div>
 
-      {prev && <Row seg={prev} dim onSeek={seek} />}
-      <Row seg={curr} active onSeek={seek} />
-      {next && <Row seg={next} dim onSeek={seek} />}
+      {prevSeg && <Row seg={prevSeg} dim onSeek={seek} />}
+      {currentSorted.map((i) => (
+        <Row key={`cur-${i}`} seg={segments[i]!} active onSeek={seek} />
+      ))}
+      {nextSeg && <Row seg={nextSeg} dim onSeek={seek} />}
     </section>
   );
 }
@@ -168,7 +244,7 @@ function Row({
         <code
           style={{
             minWidth: 50,
-            color: '#5A768A',
+            color: 'var(--app-muted)',
             fontVariantNumeric: 'tabular-nums',
             fontSize: active ? '0.78rem' : '0.72rem',
             paddingTop: active ? 4 : 2,
@@ -208,7 +284,7 @@ function Row({
           </div>
           <div
             style={{
-              color: active ? '#26354A' : '#5A768A',
+              color: active ? '#26354A' : 'var(--app-muted)',
               fontSize: active ? '1rem' : '0.85rem',
               lineHeight: 1.45,
             }}

@@ -1266,7 +1266,7 @@ function ScalingTab({ settings, updateField }: TabProps) {
         {t('intro')}
       </Alert>
 
-      <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+      <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('jvbSection')}
       </h5>
       <Row>
@@ -1387,7 +1387,7 @@ function ScalingTab({ settings, updateField }: TabProps) {
 
       <Card className="border-0 shadow-sm mb-4" style={{ background: '#F5F7FB' }}>
         <CardBody className="p-3">
-          <div className="fw-semibold mb-1" style={{ color: '#17324D', fontSize: '0.9rem' }}>
+          <div className="fw-semibold mb-1" style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}>
             {t('previewTitle')}
           </div>
           <div className="text-muted" style={{ fontSize: '0.88rem' }}>
@@ -1403,7 +1403,7 @@ function ScalingTab({ settings, updateField }: TabProps) {
         </CardBody>
       </Card>
 
-      <h5 className="fw-semibold mb-3 mt-4" style={{ color: '#17324D' }}>
+      <h5 className="fw-semibold mb-3 mt-4" style={{ color: 'var(--app-text)' }}>
         {t('graceSection')}
       </h5>
       <Row>
@@ -1474,7 +1474,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
 
       <hr className="my-4" />
 
-      <h6 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+      <h6 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('providersSection')}
       </h6>
       <p className="text-muted mb-3" style={{ fontSize: '0.85rem' }}>
@@ -1567,7 +1567,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
 
       <hr className="my-4" />
 
-      <h6 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+      <h6 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('limitsSection')}
       </h6>
 
@@ -1637,7 +1637,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
 
       <hr className="my-4" />
 
-      <h6 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+      <h6 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('voiceCloningSection')}
       </h6>
       {/* Nota stabile sull'esclusione del voice cloning. Stesso vincolo

@@ -5,6 +5,8 @@ import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Button, Card, CardBody, Input } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
+import { SkeletonLines } from '@/components/ui/skeleton';
 
 interface PublicationRow {
   id: string;
@@ -45,6 +47,7 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
   const t = useTranslations('admin.publications');
   const tc = useTranslations('common');
   const fmt = useFormatter();
+  const toast = useToast();
 
   const [tab, setTab] = useState<Tab>('all');
   const [listedFilter, setListedFilter] = useState<'any' | 'yes' | 'no'>('any');
@@ -84,11 +87,14 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
           body: JSON.stringify({ libraryListed: !row.libraryListed }),
         });
         if (res.ok) await fetchData();
+        else toast.error(t('updateFailed'));
+      } catch {
+        toast.error(t('updateFailed'));
       } finally {
         setBusyId(null);
       }
     },
-    [fetchData],
+    [fetchData, toast],
   );
 
   const counters = data?.counters;
@@ -120,7 +126,7 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
               >
                 {tb.label}
                 {tb.count !== undefined && (
-                  <Badge color="" pill className="ms-2" style={{ fontSize: '0.65rem', background: '#E9ECEF', color: '#5A768A' }}>
+                  <Badge color="" pill className="ms-2" style={{ fontSize: '0.65rem', background: '#E9ECEF', color: 'var(--app-muted)' }}>
                     {tb.count}
                   </Badge>
                 )}
@@ -161,7 +167,13 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
         </CardBody>
       </Card>
 
-      {loading && !data && <div className="text-muted">{tc('loading')}</div>}
+      {loading && !data && (
+        <Card className="border-0 shadow-sm">
+          <CardBody className="p-3">
+            <SkeletonLines lines={6} loadingLabel={tc('loading')} />
+          </CardBody>
+        </Card>
+      )}
 
       {data && data.rows.length === 0 && (
         <Card className="border-0 shadow-sm">
@@ -201,7 +213,7 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
                     </div>
                     <div style={{ minWidth: 0, flexGrow: 1 }}>
                       <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
-                        <h6 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+                        <h6 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
                           {r.title || <em className="text-muted">{t('untitled')}</em>}
                         </h6>
                         <SourceBadge source={r.source} />
@@ -210,7 +222,7 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
                             {t('badges.listed')}
                           </Badge>
                         ) : (
-                          <Badge color="" pill style={{ fontSize: '0.65rem', background: '#E9ECEF', color: '#5A768A' }}>
+                          <Badge color="" pill style={{ fontSize: '0.65rem', background: '#E9ECEF', color: 'var(--app-muted)' }}>
                             {t('badges.unlisted')}
                           </Badge>
                         )}

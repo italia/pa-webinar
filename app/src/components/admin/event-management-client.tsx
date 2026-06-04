@@ -30,10 +30,10 @@ import RecordingManagement from './recording-management';
 import StatusBadge from './status-badge';
 
 // ── Palette ──
-const C_PRIMARY = '#0066CC';
+const C_PRIMARY = 'var(--app-primary)';
 const C_SUCCESS = '#008758';
-const C_INK = '#17324D';
-const C_MUTED = '#5A768A';
+const C_INK = 'var(--app-text)';
+const C_MUTED = 'var(--app-muted)';
 const C_DANGER = '#CC334D';
 
 // ── Shared styles ──
@@ -148,7 +148,7 @@ interface EventManagementClientProps {
   event: EventData; baseUrl: string; locale: string; kickerEnabled: boolean;
 }
 
-type TabId = 'panoramica' | 'impostazioni' | 'persone' | 'contenuti' | 'audit';
+type TabId = 'panoramica' | 'impostazioni' | 'persone' | 'contenuti' | 'postevento' | 'audit';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   MINISTRY: { it: 'Ministero', en: 'Ministry' },
@@ -414,7 +414,8 @@ export default function EventManagementClient({
               <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv} />
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} />}
-            {activeTab === 'audit' && <AuditTab event={event} status={status} />}
+            {activeTab === 'postevento' && <PostEventTab event={event} status={status} />}
+            {activeTab === 'audit' && <AuditTab event={event} />}
           </div>
         </div>
 
@@ -537,6 +538,7 @@ function TabNav({ active, onChange, t }: {
     { id: 'impostazioni', icon: 'settings', key: 'tabs.settings' },
     { id: 'persone', icon: 'user-group', key: 'tabs.people' },
     { id: 'contenuti', icon: 'folder', key: 'tabs.content' },
+    { id: 'postevento', icon: 'video', key: 'tabs.postEvent' },
     { id: 'audit', icon: 'shield', key: 'tabs.audit' },
   ];
   return (
@@ -867,20 +869,43 @@ function ContentTab({ event }: { event: EventData }) {
   );
 }
 
-function AuditTab({ event, status }: { event: EventData; status: string }) {
+function PostEventTab({ event, status }: { event: EventData; status: string }) {
   const td = useTranslations('admin.eventDetail');
-  const t = useTranslations('admin');
-  const format = useFormatter();
-
-  // Small helper for the action-badge color mapping.
-  const actionColor = (action: string) => {
-    if (action === 'DATA_DELETED') return { bg: '#FFF3CD', fg: '#856404' };
-    if (action === 'DATA_EXPORTED') return { bg: '#D1ECF1', fg: '#0C5460' };
-    return { bg: '#D4EDDA', fg: '#155724' };
-  };
+  const isEnded = status === 'ENDED' || status === 'ARCHIVED';
 
   return (
     <>
+      {/* CTA prominente verso la gestione AI completa del video:
+          trascrizione (testo + diarization), sintesi, traduzioni.
+          È il collegamento che mancava fra evento e post-produzione. */}
+      <div
+        className="mb-4 p-4"
+        style={{
+          border: `1px solid ${C_PRIMARY}33`,
+          borderRadius: 12,
+          background: 'linear-gradient(135deg, #f5f9ff 0%, #ffffff 70%)',
+        }}
+      >
+        <H>{td('aiManageTitle')}</H>
+        <p style={{ color: C_MUTED, fontSize: '0.9rem', maxWidth: 640 }}>
+          {td('aiManageDesc')}
+        </p>
+        {isEnded ? (
+          <Link
+            href={`/admin/postprod?eventId=${event.id}`}
+            className="btn btn-primary d-inline-flex align-items-center gap-2"
+          >
+            <Svg name="video" size={16} /> {td('aiManageCta')}
+          </Link>
+        ) : (
+          <div className="alert alert-info mb-0" role="note" style={{ fontSize: '0.88rem' }}>
+            {td('aiManageNotEnded')}
+          </div>
+        )}
+      </div>
+
+      {/* Gestione del file di registrazione (play, download, pubblica,
+          elimina) — spostata qui dal tab Audit: è contenuto post-evento. */}
       <div className="mb-4">
         <H>{td('recordingSection')}</H>
         <RecordingManagement
@@ -899,7 +924,24 @@ function AuditTab({ event, status }: { event: EventData; status: string }) {
           }}
         />
       </div>
+    </>
+  );
+}
 
+function AuditTab({ event }: { event: EventData }) {
+  const td = useTranslations('admin.eventDetail');
+  const t = useTranslations('admin');
+  const format = useFormatter();
+
+  // Small helper for the action-badge color mapping.
+  const actionColor = (action: string) => {
+    if (action === 'DATA_DELETED') return { bg: '#FFF3CD', fg: '#856404' };
+    if (action === 'DATA_EXPORTED') return { bg: '#D1ECF1', fg: '#0C5460' };
+    return { bg: '#D4EDDA', fg: '#155724' };
+  };
+
+  return (
+    <>
       <div className="mb-4">
         <H>{td('callSessions')}</H>
         <CallSessionsPanel eventId={event.id} eventSlug={event.slug}

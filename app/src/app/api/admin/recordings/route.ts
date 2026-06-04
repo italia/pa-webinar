@@ -56,6 +56,16 @@ interface RecordingRow {
   moderatorName: string | null;
   moderatorEmail: string | null;
   createdAt: string;
+  // Stato post-produzione AI (per badge + link alla gestione). null se
+  // non esiste una Recording postprod per questa registrazione.
+  transcript: { recordingId: string; status: string; hasTranscript: boolean } | null;
+}
+
+function postprodInfo(
+  rec: { id: string; status: string; artifacts: { id: string }[] } | null | undefined,
+): RecordingRow['transcript'] {
+  if (!rec) return null;
+  return { recordingId: rec.id, status: rec.status, hasTranscript: rec.artifacts.length > 0 };
 }
 
 function csvEscape(v: string | null | undefined): string {
@@ -123,6 +133,15 @@ export const GET = withErrorHandling(async (request) => {
             moderatorEmail: true,
           },
         },
+        // Stato post-produzione AI per il badge in lista (link alla
+        // pagina di gestione). 1:1 con la CallSession.
+        recording: {
+          select: {
+            id: true,
+            status: true,
+            artifacts: { where: { type: 'TRANSCRIPT_JSON' }, select: { id: true } },
+          },
+        },
       },
     }),
     includeEventRows
@@ -147,6 +166,15 @@ export const GET = withErrorHandling(async (request) => {
             jitsiRoomName: true,
             moderatorName: true,
             moderatorEmail: true,
+            recordings: {
+              select: {
+                id: true,
+                status: true,
+                artifacts: { where: { type: 'TRANSCRIPT_JSON' }, select: { id: true } },
+              },
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+            },
           },
         })
       : Promise.resolve([]),
@@ -187,6 +215,7 @@ export const GET = withErrorHandling(async (request) => {
       moderatorName: s.event.moderatorName,
       moderatorEmail: tryDecryptPII(s.event.moderatorEmail),
       createdAt: s.createdAt.toISOString(),
+      transcript: postprodInfo(s.recording),
     })),
     ...events.map((e) => ({
       id: `event:${e.id}`,
@@ -207,6 +236,7 @@ export const GET = withErrorHandling(async (request) => {
       moderatorName: e.moderatorName,
       moderatorEmail: tryDecryptPII(e.moderatorEmail),
       createdAt: (e.recordingPublishedAt ?? e.createdAt).toISOString(),
+      transcript: postprodInfo(e.recordings[0] ?? null),
     })),
   ];
 

@@ -12,10 +12,14 @@
  * primary view is a table; clicking a row expands the details inline.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 
+import { Link, useRouter } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import TranscriptEditor from './transcript-editor';
 
 const fetcher = (url: string): Promise<unknown> =>
@@ -116,10 +120,59 @@ function formatDuration(seconds: number | null): string {
   return `${m}m ${s}s`;
 }
 
+/**
+ * Badge tipizzati che mostrano a colpo d'occhio cosa la pipeline ha
+ * prodotto per la registrazione: trascrizione, sintesi, quante lingue
+ * tradotte, waveform. Più informativo del semplice conteggio.
+ */
+function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
+  const has = (t: string) => artifacts.some((a) => a.type === t);
+  const translated = Array.from(
+    new Set(
+      artifacts
+        .filter((a) => a.type === 'TRANSLATION_MD' || a.type === 'TRANSLATION_VTT')
+        .map((a) => a.language)
+        .filter(Boolean),
+    ),
+  );
+  const pill = (on: boolean, label: string, title: string) => (
+    <span
+      className={`badge ${on ? 'bg-success-subtle text-success-emphasis' : 'bg-light text-secondary'}`}
+      style={{ fontSize: '0.66rem', fontWeight: 500, border: '1px solid #e3e8ef' }}
+      title={title}
+    >
+      {label}
+    </span>
+  );
+  if (artifacts.length === 0) {
+    return <span className="text-secondary small">–</span>;
+  }
+  return (
+    <div className="d-flex flex-wrap gap-1">
+      {pill(has('TRANSCRIPT_JSON'), 'Trascr.', 'Trascrizione')}
+      {pill(has('SUMMARY_MD') || has('SUMMARY_JSON'), 'Sintesi', 'Sintesi')}
+      {pill(translated.length > 0, `Trad. ${translated.length || ''}`.trim(), `Traduzioni: ${translated.join(', ') || 'nessuna'}`)}
+      {has('WAVEFORM_JSON') && pill(true, 'Waveform', 'Waveform')}
+    </div>
+  );
+}
+
 export default function PostprodDashboard() {
   const t = useTranslations('admin.postprod');
+  const toast = useToast();
+  const confirm = useConfirm();
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Deep-link da "Registrazioni" e dalla pagina evento:
+  //   /admin/postprod?recordingId=<id>  oppure  ?eventId=<id>
+  // Auto-espande e scrolla alla registrazione giusta una volta caricati
+  // i dati. Usiamo eventId come chiave robusta (presente ovunque).
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const deepRecordingId = searchParams.get('recordingId');
+  const deepEventId = searchParams.get('eventId');
+  const deepLinkApplied = useRef(false);
 
   const qs = new URLSearchParams();
   if (statusFilter) qs.set('status', statusFilter);
@@ -129,26 +182,47 @@ export default function PostprodDashboard() {
     { refreshInterval: 10_000 },
   );
 
+  useEffect(() => {
+    if (deepLinkApplied.current || !data) return;
+    if (!deepRecordingId && !deepEventId) return;
+    const match = data.rows.find(
+      (r) => r.id === deepRecordingId || r.eventId === deepEventId,
+    );
+    if (match) {
+      deepLinkApplied.current = true;
+      // Deep-link da registrazioni/evento → pagina di gestione completa
+      // del video (trascrizione + sintesi + traduzioni), non l'editor
+      // inline cramped della lista.
+      router.push(`/admin/postprod/${match.id}`);
+    }
+  }, [data, deepRecordingId, deepEventId, router]);
+
   async function rerun(recordingId: string): Promise<void> {
     const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/rerun`, {
       method: 'POST',
       credentials: 'include',
     });
     if (!r.ok) {
-      alert(t('rerunFailed', { code: r.status }));
+      toast.error(t('rerunFailed', { code: r.status }));
       return;
     }
     await mutate();
   }
 
   async function cancel(recordingId: string): Promise<void> {
-    if (!confirm(t('cancelConfirm'))) return;
+    const ok = await confirm({
+      title: t('cancelConfirmTitle'),
+      message: t('cancelConfirm'),
+      confirmLabel: t('cancel'),
+      danger: true,
+    });
+    if (!ok) return;
     const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/cancel`, {
       method: 'POST',
       credentials: 'include',
     });
     if (!r.ok) {
-      alert(t('cancelFailed', { code: r.status }));
+      toast.error(t('cancelFailed', { code: r.status }));
       return;
     }
     await mutate();
@@ -166,9 +240,10 @@ export default function PostprodDashboard() {
       body: JSON.stringify({ displayName, personId }),
     });
     if (!r.ok) {
-      alert(t('speakerUpdateFailed', { code: r.status }));
+      toast.error(t('speakerUpdateFailed', { code: r.status }));
       return;
     }
+    toast.success(t('speakerUpdateSuccess'));
     await mutate();
   }
 
@@ -226,6 +301,7 @@ export default function PostprodDashboard() {
                 <>
                   <tr
                     key={row.id}
+                    data-recording={row.id}
                     onClick={() => setExpanded(isExpanded ? null : row.id)}
                     style={{ cursor: 'pointer' }}
                   >
@@ -243,8 +319,15 @@ export default function PostprodDashboard() {
                     <td>
                       {doneJobs}/{row.jobs.length}
                     </td>
-                    <td>{row.artifacts.length}</td>
+                    <td><ArtifactBadges artifacts={row.artifacts} /></td>
                     <td className="text-end">
+                      <Link
+                        href={`/admin/postprod/${row.id}`}
+                        className="btn btn-sm btn-primary me-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {t('manageOpen')}
+                      </Link>
                       <button
                         type="button"
                         className="btn btn-sm btn-outline-secondary me-1"
@@ -288,8 +371,17 @@ export default function PostprodDashboard() {
             })}
             {data && data.rows.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center text-secondary py-4">
-                  {t('empty')}
+                <td colSpan={7} className="text-center text-secondary py-5">
+                  <svg
+                    width="40" height="40" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth={1.5} strokeLinecap="round"
+                    strokeLinejoin="round" aria-hidden="true"
+                    style={{ color: 'var(--app-muted)', opacity: 0.6, marginBottom: 8 }}
+                  >
+                    <rect x="2" y="6" width="14" height="12" rx="2" />
+                    <path d="M22 8l-6 4 6 4V8z" />
+                  </svg>
+                  <div>{t('empty')}</div>
                 </td>
               </tr>
             )}
@@ -450,7 +542,7 @@ function SpeakersEditor({
                     setEdits((m) => ({ ...m, [s.id]: s.suggestedName! }))
                   }
                   style={{
-                    color: '#0066CC',
+                    color: 'var(--app-primary)',
                     fontSize: '0.78rem',
                     textDecoration: 'underline',
                     textDecorationStyle: 'dotted',
@@ -470,7 +562,7 @@ function SpeakersEditor({
                 style={{
                   borderLeft: '3px solid #d6e3f1',
                   fontSize: '0.82rem',
-                  color: '#5A768A',
+                  color: 'var(--app-muted)',
                   fontStyle: 'italic',
                 }}
               >

@@ -11,6 +11,8 @@ import {
   Icon,
 } from 'design-react-kit';
 
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { SkeletonLines } from '@/components/ui/skeleton';
 import VideoPlayer from './video-player';
 
 interface Participant {
@@ -72,7 +74,9 @@ export default function CallSessionsPanel({
   moderatorToken,
 }: CallSessionsPanelProps) {
   const t = useTranslations('admin.sessions');
+  const tc = useTranslations('common');
   const fmt = useFormatter();
+  const confirm = useConfirm();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -94,20 +98,25 @@ export default function CallSessionsPanel({
   useEffect(() => { fetchSessions(); }, [fetchSessions]);
 
   const handleDelete = useCallback(async (sessionId: string) => {
-    if (!window.confirm(t('deleteConfirm'))) return;
+    const ok = await confirm({
+      title: t('deleteTitle'),
+      message: t('deleteConfirm'),
+      confirmLabel: tc('delete'),
+      danger: true,
+    });
+    if (!ok) return;
     await fetch(`/api/events/${eventSlug}/sessions/${sessionId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${moderatorToken}` },
     });
     fetchSessions();
-  }, [eventSlug, moderatorToken, t, fetchSessions]);
+  }, [eventSlug, moderatorToken, t, fetchSessions, confirm]);
 
   if (loading) {
     return (
       <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: 8 }}>
-        <CardBody className="p-4 text-center text-muted">
-          <div className="spinner-border spinner-border-sm me-2" role="status" />
-          {t('loading')}
+        <CardBody className="p-4">
+          <SkeletonLines lines={3} loadingLabel={t('loading')} />
         </CardBody>
       </Card>
     );
@@ -117,7 +126,7 @@ export default function CallSessionsPanel({
     return (
       <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: 8 }}>
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-2" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
             <Icon icon="it-video" className="me-2" />
             {t('title')}
           </h5>
@@ -132,7 +141,7 @@ export default function CallSessionsPanel({
   return (
     <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: 8 }}>
       <CardBody className="p-4">
-        <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+        <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
           <Icon icon="it-video" className="me-2" />
           {t('title')} ({sessions.length})
         </h5>

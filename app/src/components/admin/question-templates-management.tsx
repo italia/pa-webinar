@@ -14,6 +14,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
 
 const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
@@ -74,6 +78,8 @@ const EMPTY_ITEM: ItemDraft = {
 };
 
 export default function QuestionTemplatesManagement() {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [rows, setRows] = useState<TemplateRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | 'new' | null>(null);
@@ -243,16 +249,22 @@ export default function QuestionTemplatesManagement() {
   const handleDelete = useCallback(
     async (row: TemplateRow) => {
       if (row.isSystem) return;
-      if (!confirm(`Eliminare "${row.name}"? Usato da ${row.usedByQuestionnaires} questionari attivi.`)) return;
+      const ok = await confirm({
+        title: 'Elimina template',
+        message: `Eliminare "${row.name}"? Usato da ${row.usedByQuestionnaires} questionari attivi.`,
+        confirmLabel: 'Elimina',
+        danger: true,
+      });
+      if (!ok) return;
       const res = await fetch(`/api/admin/question-templates/${row.id}`, { method: 'DELETE' });
       if (res.ok) {
         await fetchRows();
       } else {
         const err = await res.json().catch(() => ({}));
-        alert(err.error ?? 'Eliminazione fallita');
+        toast.error(err.error ?? 'Eliminazione fallita');
       }
     },
-    [fetchRows],
+    [fetchRows, confirm, toast],
   );
 
   const editing = editingId !== null;
@@ -270,7 +282,7 @@ export default function QuestionTemplatesManagement() {
       {editing ? (
         <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8 }}>
           <CardBody className="p-4">
-            <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
               {editingId === 'new' ? 'Nuovo template' : 'Modifica template'}
             </h5>
 
@@ -317,7 +329,7 @@ export default function QuestionTemplatesManagement() {
               <Card key={idx} className="mb-3 border" style={{ borderRadius: 6 }}>
                 <CardBody className="p-3">
                   <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
-                    <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: '#0066CC' }}>
+                    <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: 'var(--app-primary)' }}>
                       #{idx + 1}
                     </Badge>
                     <Button color="danger" outline size="xs" onClick={() => removeItem(idx)}>
@@ -466,7 +478,7 @@ export default function QuestionTemplatesManagement() {
           </CardBody>
         </Card>
       ) : loading && rows.length === 0 ? (
-        <div className="text-muted">Caricamento…</div>
+        <SkeletonLines lines={4} loadingLabel="Caricamento template…" />
       ) : rows.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardBody className="p-5 text-center">
@@ -484,7 +496,7 @@ export default function QuestionTemplatesManagement() {
                 <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
                   <div style={{ minWidth: 0 }}>
                     <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
-                      <h6 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+                      <h6 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
                         {row.name}
                       </h6>
                       {row.isSystem && (

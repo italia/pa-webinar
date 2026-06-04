@@ -71,6 +71,96 @@ Le registrazioni video vengono effettuate tramite Jibri (headless Chrome) e cari
 - I video non sono indicizzati dai motori di ricerca (noindex, nofollow).
 - Il player video non scarica il file intero — streaming progressivo.
 
+## Registrazione multi-traccia (speaker attribution)
+
+A differenza della registrazione video standard — che cattura un **audio
+misto** (tutti i partecipanti in un'unica traccia) ed è già coperta dalla
+sezione precedente — la funzione di *speaker attribution* introduce la
+cattura di **una traccia audio isolata per partecipante**. Lo scopo è
+unicamente attribuire le porzioni di transcript al relatore corretto
+(chi ha detto cosa), non identificare la voce come tale. Il razionale
+tecnico e l'analisi completa sono in
+[ADR-013](adr/013-multitrack-speaker-attribution.md).
+
+L'audio isolato del singolo individuo è un dato personale ad **alta
+sensibilità**: in quanto vicino al dato biometrico vocale, ricadrebbe
+nell'Art. 9 GDPR **se** usato per identificare la persona dalla voce.
+Per questo è trattato come un trattamento nuovo e distinto, soggetto a
+garanzie aggiuntive rispetto all'audio misto.
+
+### Base giuridica e consenso
+
+- Il trattamento richiede il **consenso esplicito** dell'interessato
+  (Art. 6.1.a GDPR), separato dal consenso alla registrazione audio/video
+  standard (`consentRecording`). Il consenso al missaggio non implica il
+  consenso alla traccia isolata.
+- La traccia isolata viene catturata solo quando l'evento ha la funzione
+  abilitata **e** il partecipante ha prestato il consenso specifico. In
+  assenza del consenso specifico, il partecipante concorre all'audio
+  misto ma non viene isolato in una propria traccia.
+- Lo stato dei flag di consenso al momento dell'avvio è cristallizzato in
+  uno snapshot (coerente con `Recording.consentSnapshot`, vedi
+  `docs/POSTPROD.md`), così che la base giuridica resti dimostrabile anche
+  a posteriori.
+
+### Distinzione dal voice-cloning (NON è biometria)
+
+Va sottolineato senza ambiguità: la piattaforma **non clona, non sintetizza
+e non identifica** la voce. La traccia isolata è un mero input acustico per
+un trascrittore (WhisperX + diarization pyannote, vedi `docs/POSTPROD.md`):
+serve a produrre **testo attribuito**, non un'impronta vocale. Non viene
+calcolato né conservato alcun *voiceprint*, embedding biometrico o modello
+vocale per-persona. Coerentemente con `docs/POSTPROD.md` ("Art. 9 GDPR —
+dati biometrici"), l'Art. 9 non si applica perché non c'è identificazione
+biometrica; la sensibilità deriva dalla natura dell'input, non dall'uso,
+ed è proprio per neutralizzare il rischio di uso biometrico che si adottano
+le mitigazioni di minimizzazione e cancellazione precoce qui descritte.
+
+### Minimizzazione: la traccia è un input intermedio
+
+Il principio cardine è la **minimizzazione** (Art. 5.1.c GDPR): la traccia
+per-partecipante è un **artefatto intermedio**, non un output conservato.
+
+- Ogni traccia è modellata da `RecordingTrack`, distinto dal `Recording`
+  (audio misto) e dai `PostprodArtifact` (transcript, sintesi, sottotitoli).
+- Appena la trascrizione e l'attribuzione sono completate, il blob audio
+  isolato viene **cancellato** e il campo `RecordingTrack.audioPurgedAt`
+  viene valorizzato con il timestamp della purga. Da quel momento resta solo
+  il riferimento di attribuzione (chi ha detto quale segmento), non l'audio.
+- La **retention** della traccia isolata è quindi molto più breve di quella
+  del transcript: il transcript segue la retention dell'evento /
+  `SiteSetting.aiArtifactRetentionDays` (vedi `docs/POSTPROD.md`), mentre la
+  traccia audio è tipicamente purgata **entro poche ore** dal completamento
+  del post-processing, indipendentemente dalla retention dell'evento.
+- Un eventuale fallback (transcript senza speaker attribution, vedi
+  `docs/POSTPROD.md`) non produce né conserva tracce isolate.
+
+### Cifratura e isolamento at-rest
+
+- Il blob della traccia isolata **non è mai pubblico** e non è indicizzato:
+  niente SAS URL/link pubblici come per i video pubblicati. È accessibile
+  solo al worker di post-processing tramite **signed URL a breve scadenza**,
+  per il tempo strettamente necessario alla trascrizione.
+- L'associazione tra traccia e persona usa il **`displayName` cifrato**
+  (AES-256-GCM via `encryptPII`, coerente con `crypto:encryption/pii`): il
+  worker e lo storage non vedono il nome in chiaro.
+- La cifratura at-rest del blob è quella del provider (Azure SSE / S3 SSE),
+  come per i recording standard.
+
+### Diritti dell'interessato
+
+- **Accesso (Art. 15)**: l'export GDPR (`/api/gdpr/export`) riporta
+  l'esistenza dell'attribuzione testuale; la traccia audio isolata, se già
+  purgata (`audioPurgedAt` valorizzato), non è più disponibile per
+  definizione.
+- **Cancellazione (Art. 17)**: cancellare una `RecordingTrack` (o la sua
+  purga automatica) **non intacca il transcript già attribuito**, che è un
+  artefatto derivato e autonomo. La cancellazione dell'audio non riscrive
+  retroattivamente il testo: il transcript resta valido finché vive secondo
+  la propria retention. Chi richiede la rimozione del proprio contributo
+  testuale dal transcript esercita il diritto sul `PostprodArtifact`, non
+  sulla traccia (che potrebbe già non esistere più).
+
 ## Conservazione dei dati / Data Retention
 
 Ogni evento ha un periodo di conservazione configurabile (`dataRetentionDays`, default: 30 giorni dopo la fine dell'evento). Dopo questo periodo, il cron di pulizia (`/api/cron/cleanup`) elimina automaticamente:
@@ -229,112 +319,21 @@ Ai guest non viene chiesta l'email; il display name è sotto il controllo
 dell'utente e può essere lasciato vuoto (sostituito con un placeholder
 generico). Nessuna PII viene persistita senza un display name esplicito.
 
+## Proposta stringhe i18n — informativa multi-traccia
 
-## Pipeline AI post-evento
+> **Nota per chi implementa**: blocco **proposto**, non ancora applicato ai
+> file di messaggi. L'informativa privacy e il modulo di consenso dovranno
+> esporre queste chiavi. Testi IT (default) ed EN; le altre 23 lingue
+> seguiranno la traduzione standard. Le chiavi sono raggruppate sotto
+> `privacy.multitrack` per coerenza con il namespacing esistente.
 
-La pipeline AI di post-produzione (trascrizione, sintesi, traduzione,
-doppiaggio) ha un perimetro GDPR specifico — tutto in-cluster, niente
-API esterne. Le sezioni seguenti sono il riferimento normativo del
-codice in `app/src/lib/ai/`, `app/src/app/api/cron/postprod-retention/`
-e dei worker in `infra/ai/worker/`.
-
-### Base giuridica e finalità
-
-| Trattamento | Base giuridica | Finalità |
+| Chiave | IT | EN |
 |---|---|---|
-| Trascrizione (WhisperX) | Art. 6.1.e (compito di interesse pubblico — accessibilità degli atti di un evento PA) | Rendere il contenuto fruibile da non udenti / consultabile a posteriori |
-| Sintesi e traduzione (Mistral via vLLM) | Art. 6.1.e | Sintesi divulgativa multilingue dell'evento pubblico |
-| Doppiaggio sintetico (Piper TTS) | Art. 6.1.e | Accessibilità linguistica della registrazione pubblicata |
-| Identificazione speaker (`Speaker.displayName`) | Art. 6.1.e + ruolo di moderatore/relatore reso pubblico al momento dell'iscrizione | Etichettare i segmenti della trascrizione |
-
-Il trattamento avviene **solo dopo** la fine dell'evento, sulla
-registrazione caricata da Jibri; non c'è elaborazione AI in tempo
-reale sul flusso live.
-
-### Voice cloning: non supportato
-
-Il doppiaggio AI **non** clona la voce dei relatori reali. Il sistema
-usa Piper TTS con voci sintetiche pre-trained pubbliche (MIT). Imitare
-la voce di una persona identificabile costituirebbe trattamento di
-dati biometrici ai sensi dell'**Art. 9 GDPR** e richiederebbe consenso
-esplicito per finalità specifica difficile da ottenere da partecipanti
-di un evento pubblico. La scelta è deliberata, persistente e
-documentata in ADR-005 e nell'UI del tab `Pipeline AI` di
-`/admin/settings`.
-
-**Doppiaggio multivoce ≠ voice cloning.** Quando nella PVC `ai-models`
-sono presenti più voci Piper per la lingua target, il worker assegna a
-ogni `SPEAKER_xx` distinto **una voce diversa del pool** in modo
-deterministico (ordinamento per tempo totale di parola → indice nel
-pool). Non c'è inferenza dalla voce reale alla voce sintetica: le voci
-del pool sono pre-trained pubbliche, fungibili, non identificative di
-nessuna persona reale. Lo speaker A che parla in una voce sintetica F
-americana in un evento può parlare in voce sintetica M britannica in
-un altro — l'assegnazione cambia con la composizione degli speaker
-dell'evento. È solo una scelta editoriale per facilitare la
-comprensione di chi sta parlando nel doppiaggio.
-
-### Dove vivono i dati AI
-
-| Tabella / Storage | Contiene | Note GDPR |
-|---|---|---|
-| `Recording.consentSnapshot` (JSONB) | Snapshot dei flag AI all'avvio della pipeline | Mai modificato dopo il primo write — audit consenso |
-| `Recording.sourceLanguage` | ISO-639-1 | Non PII |
-| `PostprodArtifact.inlineBody` (cifrato) | Trascrizione, sintesi, traduzioni inline | Cifrato a riposo con la chiave PII |
-| `PostprodArtifact.blobKey` | Path nel postprod bucket | I blob (VTT, audio dubbed) restano nello storage finché esiste l'artifact row |
-| `Speaker.displayName` | Nome del moderatore/relatore | Copiato da `Person.displayName` al momento del mapping admin |
-| `Speaker.diarLabel` | "SPEAKER_00" ecc., generato da pyannote | Non PII |
-| `PostprodJob.payload` (JSONB) | Parametri del job (runId, lingua sorgente, lingua target) | Può contenere riferimenti a `recordingId` |
-| `PostprodJob.lastError` | Stack trace dell'ultimo errore | Può contenere snippet di trascrizione in caso di fallimento mid-processing |
-
-### Retention
-
-La retention degli artefatti AI è governata da due meccanismi che
-coesistono:
-
-1. **Event-bound (default)**: `Recording.retentionUntil = null`. Gli
-   artefatti AI vengono cancellati a cascata insieme all'evento
-   quando il cron `cleanup` purga le righe Event ai sensi di
-   `dataRetentionDays`.
-2. **Override globale**: `SiteSetting.aiArtifactRetentionDays > 0`.
-   Il cron `/api/cron/postprod-retention` (quotidiano) cancella ogni
-   artifact AI più vecchio di N giorni anche se l'evento è ancora
-   vivo. Caso d'uso: "verbale come atto pubblico" che vive 730 giorni
-   dopo l'evento.
-3. **Override per-recording**: `Recording.retentionUntil != null`.
-   Quando passa, lo stesso cron:
-   - cancella i blob postprod dallo storage (best-effort, log su
-     failure);
-   - cancella le righe `PostprodArtifact`;
-   - **`deleteMany` su `Speaker`** della recording — `displayName` è
-     PII e non sopravvive alla retention;
-   - **`updateMany` su `PostprodJob`** azzerando `payload` a
-     `{scrubbed: true}` e `lastError` a `null` — le righe restano
-     per audit (count, durate, esiti) ma niente più snippet PII;
-   - marca `Recording.status = ARCHIVED`.
-
-### Accesso pubblico agli artefatti AI
-
-Gli endpoint pubblici `/api/events/[slug]/postprod/{transcript,
-subtitle/[lang], dubbed-audio/[lang], download/[file]}` sono protetti
-dall'helper `assertPostprodAccessible(slug)` (in
-`app/src/lib/ai/access.ts`) che verifica in cascata:
-
-1. `SiteSetting.aiPipelineEnabled` — kill-switch globale.
-2. `event.recordingPublished` — la moderazione ha pubblicato il video.
-3. `event.postEventPublic` — il post-evento è pubblico (toggle privacy).
-4. `event.postEventPublicUntil` — eventuale finestra temporale.
-
-Qualsiasi check fallito ritorna `404` (non `403`) per non distinguere
-"evento inesistente" da "post-evento ritirato".
-
-### Disclaimer AI Act (Art. 50)
-
-La status page pubblica e il player video mostrano un banner
-permanente quando la pipeline è attiva: "Trascrizioni, sintesi e
-doppiaggi sono generati automaticamente da modelli AI in cluster. Il
-contenuto può contenere errori; il video resta la fonte autoritativa.
-Niente voice cloning, niente API esterne". Il testo è
-internazionalizzato (`status.postprod.aiBadge` in
-`app/src/i18n/messages/*.json`) e visibile in ognuno dei 24 locali
-UE supportati.
+| `privacy.multitrack.consentLabel` | Acconsento alla registrazione di una traccia audio separata della mia voce, al solo scopo di attribuire correttamente la trascrizione a chi parla. | I consent to recording a separate audio track of my voice, for the sole purpose of correctly attributing the transcript to each speaker. |
+| `privacy.multitrack.purpose` | La traccia separata serve unicamente ad associare il testo trascritto al relatore corretto. Non viene usata per identificare, riconoscere o riprodurre la tua voce. | The separate track is used only to associate the transcribed text with the correct speaker. It is not used to identify, recognise or reproduce your voice. |
+| `privacy.multitrack.notBiometric` | Non creiamo alcuna impronta vocale né modello della tua voce: trattiamo l'audio solo per trasformarlo in testo. | We do not create any voiceprint or model of your voice: we process the audio only to turn it into text. |
+| `privacy.multitrack.minimization` | La traccia audio separata è temporanea: viene cancellata subito dopo la trascrizione e conservata per un periodo molto più breve del testo prodotto. | The separate audio track is temporary: it is deleted right after transcription and kept for a much shorter period than the resulting text. |
+| `privacy.multitrack.encryption` | La traccia è cifrata, non è mai pubblica ed è accessibile solo al sistema di trascrizione per il tempo strettamente necessario. | The track is encrypted, never public, and accessible only to the transcription system for the strictly necessary time. |
+| `privacy.multitrack.rights` | Puoi chiedere in qualsiasi momento la cancellazione della tua traccia audio. La cancellazione dell'audio non modifica il testo già trascritto e attribuito. | You can request deletion of your audio track at any time. Deleting the audio does not change text that has already been transcribed and attributed. |
+| `privacy.multitrack.legalBasis` | Base giuridica: consenso esplicito (art. 6, par. 1, lett. a, GDPR), distinto dal consenso alla registrazione video. | Legal basis: explicit consent (Art. 6(1)(a) GDPR), distinct from consent to video recording. |
+| `privacy.multitrack.optionalNotice` | Se non presti questo consenso, potrai comunque partecipare ed essere registrato nell'audio comune dell'evento; semplicemente non verrà creata una tua traccia separata. | If you do not give this consent, you can still take part and be recorded in the event's shared audio; simply no separate track of you will be created. |

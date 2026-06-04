@@ -137,7 +137,7 @@ export default function PostEventTabs({
                   fontSize: '0.68rem',
                   padding: '1px 6px',
                   backgroundColor: activeTab === tab.key ? 'rgba(255,255,255,0.25)' : 'rgba(0,102,204,0.1)',
-                  color: activeTab === tab.key ? '#fff' : '#0066CC',
+                  color: activeTab === tab.key ? '#fff' : 'var(--app-primary)',
                 }}
               >
                 {tab.count}
@@ -180,7 +180,7 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
           <CardBody className="p-3">
             <div className="d-flex justify-content-between align-items-start">
               <div style={{ minWidth: 0 }}>
-                <p className="fw-semibold mb-1" style={{ color: '#17324D' }}>
+                <p className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
                   {q.text}
                 </p>
                 <div className="text-muted" style={{ fontSize: '0.82rem' }}>
@@ -194,7 +194,7 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
               </div>
               <div className="d-flex align-items-center gap-1 flex-shrink-0 ms-2">
                 <Icon icon="it-arrow-up" size="xs" className="text-primary" />
-                <span className="fw-semibold" style={{ fontSize: '0.85rem', color: '#0066CC' }}>
+                <span className="fw-semibold" style={{ fontSize: '0.85rem', color: 'var(--app-primary)' }}>
                   {q.upvotes}
                 </span>
               </div>
@@ -239,7 +239,7 @@ function PollsTabContent({ polls }: { polls: PollData[] }) {
       {polls.map((poll) => (
         <Card key={poll.id} className="shadow-sm border-0" style={{ borderRadius: '0.5rem' }}>
           <CardBody className="p-3">
-            <p className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            <p className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
               {poll.question}
             </p>
             <div className="d-flex flex-column gap-2">
@@ -284,10 +284,10 @@ function FeedbackTabContent({ feedback }: { feedback: FeedbackSummary }) {
       <CardBody className="p-3">
         {feedback.average !== null && (
           <div className="text-center mb-3">
-            <div className="display-6 fw-bold" style={{ color: '#17324D' }}>
+            <div className="display-6 fw-bold" style={{ color: 'var(--app-text)' }}>
               {'⭐'.repeat(Math.round(feedback.average))}
             </div>
-            <div className="fw-semibold" style={{ fontSize: '1.1rem', color: '#17324D' }}>
+            <div className="fw-semibold" style={{ fontSize: '1.1rem', color: 'var(--app-text)' }}>
               {feedback.average.toFixed(1)}/5
             </div>
             <div className="text-muted" style={{ fontSize: '0.85rem' }}>

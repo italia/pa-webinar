@@ -72,7 +72,7 @@ export default async function EventMaterialsAdminPage({ params }: PageProps) {
         >
           ← {tCommon('back')}
         </Link>
-        <h1 className="fw-bold mb-1 mt-2" style={{ color: '#17324D' }}>
+        <h1 className="fw-bold mb-1 mt-2" style={{ color: 'var(--app-text)' }}>
           {t('title')} — {eventTitle}
         </h1>
         <p className="text-secondary mb-0">{t('subtitle')}</p>

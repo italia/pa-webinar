@@ -14,6 +14,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 
+import { useConfirm } from '@/components/ui/confirm-dialog';
+
 type Placement = 'PRE_REGISTRATION' | 'POST_EVENT';
 
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
@@ -195,6 +197,7 @@ function PlacementCard({
   eventId: string;
   onRefresh: () => void;
 }) {
+  const confirm = useConfirm();
   const locked = state.responseCount > 0;
 
   const save = async () => {
@@ -254,7 +257,13 @@ function PlacementCard({
   };
 
   const remove = async () => {
-    if (!confirm(`Eliminare il questionario ${placement}? Verranno cancellate anche le risposte raccolte.`)) return;
+    const ok = await confirm({
+      title: 'Elimina questionario',
+      message: 'Eliminare questo questionario? Verranno cancellate anche le risposte raccolte.',
+      confirmLabel: 'Elimina',
+      danger: true,
+    });
+    if (!ok) return;
     const res = await fetch(`/api/admin/events/${eventId}/questionnaires/${placement}`, {
       method: 'DELETE',
     });
@@ -287,7 +296,7 @@ function PlacementCard({
       <CardBody className="p-4">
         <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
           <div>
-            <h5 className="fw-semibold mb-1" style={{ color: '#17324D' }}>
+            <h5 className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
               {title}
             </h5>
             <p className="text-secondary mb-0" style={{ fontSize: '0.85rem' }}>
@@ -296,7 +305,7 @@ function PlacementCard({
           </div>
           <div className="d-flex gap-2">
             {state.exists && (
-              <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: '#0066CC' }}>
+              <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: 'var(--app-primary)' }}>
                 {state.responseCount} risposte
               </Badge>
             )}
@@ -472,7 +481,7 @@ function AdhocItemEditor({
     <Card className="mb-2 border" style={{ borderRadius: 6 }}>
       <CardBody className="p-3">
         <div className="d-flex justify-content-between align-items-start mb-2">
-          <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: '#0066CC' }}>
+          <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: 'var(--app-primary)' }}>
             Ad-hoc #{idx + 1}
           </Badge>
           <Button color="danger" outline size="xs" onClick={onRemove}>

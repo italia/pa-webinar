@@ -15,6 +15,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
+import { SkeletonLines } from '@/components/ui/skeleton';
 import { useTranslations } from 'next-intl';
 
 import TranscriptTimeline, {
@@ -115,7 +116,7 @@ export default function TranscriptEditor({
     return <p className="text-danger small mb-0">{t('editLoadError')}</p>;
   }
   if (isLoading || !data) {
-    return <p className="text-secondary small mb-0">{t('editLoading')}</p>;
+    return <SkeletonLines lines={6} loadingLabel={t('editLoading')} />;
   }
   if (data.segments.length === 0) {
     return <p className="text-secondary small mb-0">{t('editEmpty')}</p>;

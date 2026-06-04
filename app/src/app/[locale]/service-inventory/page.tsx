@@ -92,10 +92,10 @@ type StackLayerKey = 'access' | 'app' | 'data' | 'platform';
 type StackItem = { key: string; label: string };
 
 const STACK_LAYER_COLORS: Record<StackLayerKey, string> = {
-  access: '#0066CC',
+  access: 'var(--app-primary)',
   app: '#004C99',
-  data: '#17324D',
-  platform: '#5A768A',
+  data: 'var(--app-text)',
+  platform: 'var(--app-muted)',
 };
 
 // Build the 4 stack layers from items that carry an eventi-dtd:layer property.

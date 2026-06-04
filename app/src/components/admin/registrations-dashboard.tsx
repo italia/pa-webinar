@@ -15,6 +15,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
 
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 interface EventOption {
   id: string;
   slug: string;
@@ -244,7 +246,7 @@ export default function RegistrationsDashboard({
             <Card className="border-0 shadow-sm h-100">
               <CardBody className="p-3">
                 <div className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase' }}>{t('statTotal')}</div>
-                <div className="fw-bold" style={{ fontSize: '1.6rem', color: '#17324D' }}>{data.total}</div>
+                <div className="fw-bold" style={{ fontSize: '1.6rem', color: 'var(--app-text)' }}>{data.total}</div>
                 <div className="text-muted" style={{ fontSize: '0.72rem' }}>
                   {t('showing', { count: visibleRows.length })}
                 </div>
@@ -292,7 +294,13 @@ export default function RegistrationsDashboard({
 
       {/* Table */}
       {error && <div className="alert alert-danger">{error}</div>}
-      {loading && <div className="text-muted">{t('loading')}</div>}
+      {loading && (
+        <Card className="border-0 shadow-sm">
+          <CardBody className="p-3">
+            <SkeletonLines lines={8} loadingLabel={t('loading')} />
+          </CardBody>
+        </Card>
+      )}
 
       {data && (
         <Card className="border-0 shadow-sm">

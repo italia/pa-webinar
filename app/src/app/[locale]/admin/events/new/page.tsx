@@ -73,7 +73,7 @@ export default async function CreateEventPage({
         </Link>
       </div>
 
-      <h1 className="fw-bold mb-3" style={{ color: '#17324D' }}>
+      <h1 className="fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('createEvent')}
       </h1>
 
@@ -85,7 +85,7 @@ export default async function CreateEventPage({
           borderRadius: 8,
         }}
       >
-        <p className="mb-0 fw-semibold" style={{ color: '#17324D' }}>
+        <p className="mb-0 fw-semibold" style={{ color: 'var(--app-text)' }}>
           {t('createEventExplanation')}
         </p>
       </div>

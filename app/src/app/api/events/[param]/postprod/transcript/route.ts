@@ -15,6 +15,7 @@ import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { assertPostprodAccessible } from '@/lib/ai/access';
+import { alignDiarizationToSpeakers } from '@/lib/ai/speaker-align';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,6 +77,9 @@ export const GET = withErrorHandling(async (_request, context) => {
           totalSpeechSec: true,
         },
       },
+      // ADR-013 Fase 0 — timeline dominant-speaker per auto-nominare i
+      // cluster pyannote anonimi (vedi sotto).
+      callSession: { select: { dominantSpeakerLog: true } },
     },
   });
   if (!recording) throw new NotFoundError('Transcript');
@@ -93,13 +97,39 @@ export const GET = withErrorHandling(async (_request, context) => {
   // visivamente molto più gentile di "SPEAKER_03" per il visitatore.
   // L'admin può sempre identificarli a posteriori col mapping; finché
   // non lo fa, "Partecipante" è meglio del diar label crudo.
+  // ADR-013 Fase 0: prova ad attribuire i cluster anonimi ai nomi reali
+  // usando la timeline del dominant speaker catturata in diretta. Se un
+  // cluster pyannote si sovrappone prevalentemente a un partecipante
+  // noto, usiamo quel nome invece di "Partecipante N". Best-effort:
+  // senza log o senza match si ricade sul fallback numerico.
+  const dominantLog = Array.isArray(recording.callSession?.dominantSpeakerLog)
+    ? (recording.callSession.dominantSpeakerLog as Array<{
+        atMs: number;
+        participantId: string;
+        displayName?: string;
+      }>)
+    : [];
+  const alignedNames = alignDiarizationToSpeakers(
+    (transcript.segments ?? [])
+      .filter((s) => s.speaker)
+      .map((s) => ({ start: s.start, end: s.end, speaker: s.speaker as string })),
+    dominantLog,
+  );
+
   const speakerMap = new Map<string, string>();
-  const sortedAnonymousByTime = recording.speakers
+  let anonCounter = 0;
+  recording.speakers
     .filter((sp) => !sp.displayName)
-    .sort((a, b) => (b.totalSpeechSec ?? 0) - (a.totalSpeechSec ?? 0));
-  sortedAnonymousByTime.forEach((sp, i) => {
-    speakerMap.set(sp.diarLabel, `Partecipante ${i + 1}`);
-  });
+    .sort((a, b) => (b.totalSpeechSec ?? 0) - (a.totalSpeechSec ?? 0))
+    .forEach((sp) => {
+      const aligned = alignedNames.get(sp.diarLabel);
+      if (aligned) {
+        speakerMap.set(sp.diarLabel, aligned);
+      } else {
+        anonCounter += 1;
+        speakerMap.set(sp.diarLabel, `Partecipante ${anonCounter}`);
+      }
+    });
   for (const sp of recording.speakers) {
     if (sp.displayName) speakerMap.set(sp.diarLabel, sp.displayName);
   }

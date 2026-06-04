@@ -41,6 +41,7 @@ import {
   presignArtifactDownload,
   presignArtifactUpload,
 } from '@/lib/storage/postprod';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { postprodJobAttemptsTotal } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
@@ -92,7 +93,7 @@ const claimRequestSchema = z.object({
 interface ClaimedRow {
   id: string;
   recording_id: string;
-  kind: 'TRANSCRIBE' | 'SUMMARIZE' | 'TRANSLATE' | 'SUBTITLE' | 'DUB';
+  kind: 'TRANSCRIBE' | 'TRANSCRIBE_MULTITRACK' | 'SUMMARIZE' | 'TRANSLATE' | 'SUBTITLE' | 'DUB';
   payload: unknown;
   attempts: number;
   next_attempt_at: Date;
@@ -246,7 +247,7 @@ export const POST = withErrorHandling(async (request) => {
   // the job, and a new worker just registers a bonus WAVEFORM_JSON
   // artifact. The admin transcript editor uses it to draw a waveform
   // without downloading the source MP4.
-  if (row.kind === 'TRANSCRIBE') {
+  if (row.kind === 'TRANSCRIBE' || row.kind === 'TRANSCRIBE_MULTITRACK') {
     const waveformKey = artifactPath(
       {
         eventId: recording.eventId,
@@ -273,11 +274,49 @@ export const POST = withErrorHandling(async (request) => {
   // SUMMARIZE/TRANSLATE need the transcript raw JSON produced by
   // TRANSCRIBE (which is recorded as TRANSCRIPT_JSON). We look it up
   // by (recordingId, type, language=NULL).
-  const inputs: Array<{ role: string; downloadUrl: string; blobKey: string }> = [];
+  const inputs: Array<{
+    role: string;
+    downloadUrl: string;
+    blobKey: string;
+    participantId?: string;
+    displayName?: string | null;
+    startOffsetMs?: number;
+  }> = [];
   const sourceDownloadUrl = await presignArtifactDownload({
     blobKey: recording.blobKey,
     expiresInMinutes: lease,
   });
+
+  if (row.kind === 'TRANSCRIBE_MULTITRACK') {
+    // ADR-013: una traccia audio per partecipante. Passiamo al worker le
+    // signed URL + l'identità certa (dal JWT del portale, decifrata qui)
+    // + l'offset per il merge. Il worker trascrive ogni traccia senza
+    // diarization e fonde via multitrack.merge_tracks.
+    const tracks = await prisma.recordingTrack.findMany({
+      where: { recordingId: recording.id, audioPurgedAt: null },
+      select: {
+        participantId: true,
+        displayName: true,
+        blobKey: true,
+        startOffsetMs: true,
+      },
+      orderBy: { startOffsetMs: 'asc' },
+    });
+    for (const tr of tracks) {
+      const downloadUrl = await presignArtifactDownload({
+        blobKey: tr.blobKey,
+        expiresInMinutes: lease,
+      });
+      inputs.push({
+        role: 'track',
+        downloadUrl,
+        blobKey: tr.blobKey,
+        participantId: tr.participantId,
+        displayName: tr.displayName ? tryDecryptPII(tr.displayName) : null,
+        startOffsetMs: tr.startOffsetMs,
+      });
+    }
+  }
 
   if (row.kind === 'SUMMARIZE' || row.kind === 'TRANSLATE' || row.kind === 'DUB') {
     // Prisma's findUnique on a composite key with a nullable column

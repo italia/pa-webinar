@@ -132,7 +132,7 @@ export default function RecordingUploadWidget({
       style={compact ? undefined : { borderColor: '#e8e8e8' }}
     >
       {!compact && (
-        <h6 className="fw-semibold mb-2" style={{ color: '#17324D' }}>
+        <h6 className="fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('title')}
         </h6>
       )}

@@ -308,7 +308,7 @@ export default function ChatPanel({
                         {m.isModerator && (
                           <span
                             className="ms-1"
-                            style={{ fontSize: '0.55rem', color: '#0066CC' }}
+                            style={{ fontSize: '0.55rem', color: 'var(--app-primary)' }}
                             aria-label={t('moderatorBadge')}
                             title={t('moderatorBadge')}
                           >

@@ -107,7 +107,7 @@ export default function StatusDashboard() {
     ? '#A66300'
     : jvbRunning > 0
       ? '#008758'
-      : '#5A768A';
+      : 'var(--app-muted)';
 
   const stressLevel = data.metrics.jvbStressLevel;
   const stressColor = stressLevel === null
@@ -149,7 +149,7 @@ export default function StatusDashboard() {
               {data.metrics.jvbStatus === 'standby' ? (
                 <div>
                   <p className="text-muted mb-2">{t('jvbStandby')}</p>
-                  <p className="mb-0" style={{ fontSize: '0.82rem', color: '#5A768A' }}>
+                  <p className="mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-muted)' }}>
                     {t('jvbStandbyDetail')}
                   </p>
                 </div>
@@ -199,7 +199,7 @@ export default function StatusDashboard() {
                   {stressLevel !== null && (
                     <div className="mt-3">
                       <div className="d-flex justify-content-between align-items-center mb-1">
-                        <span style={{ fontSize: '0.8rem', color: '#5A768A' }}>{t('jvbStress')}</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--app-muted)' }}>{t('jvbStress')}</span>
                         <span style={{ fontSize: '0.8rem', fontWeight: 600, color: stressColor }}>
                           {Math.round(stressLevel * 100)}%
                         </span>
@@ -218,13 +218,13 @@ export default function StatusDashboard() {
                   )}
 
                   {data.metrics.jvbParticipants !== null && data.metrics.jvbParticipants > 0 && (
-                    <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: '#5A768A' }}>
+                    <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-muted)' }}>
                       {data.metrics.jvbParticipants} {t('participantsConnected')}
                     </p>
                   )}
 
                   {data.metrics.jvbOctoEnabled && (
-                    <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: '#0066CC' }}>
+                    <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-primary)' }}>
                       <Icon icon="it-link" size="xs" className="me-1" />
                       {t('jvbOctoActive', {
                         bridges: (data.metrics.jvbOctoConferences ?? 0) + 1,

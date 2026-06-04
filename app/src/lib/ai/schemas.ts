@@ -106,6 +106,10 @@ export const dubPayloadSchema = z.object({
  */
 export const postprodJobPayloadSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('TRANSCRIBE'), payload: transcribePayloadSchema }),
+  // ADR-013: stesso payload di TRANSCRIBE (runId, sourceLanguage, model?).
+  // Le tracce per-partecipante arrivano al worker come `inputs` nel claim,
+  // non nel payload.
+  z.object({ kind: z.literal('TRANSCRIBE_MULTITRACK'), payload: transcribePayloadSchema }),
   z.object({ kind: z.literal('SUMMARIZE'), payload: summarizePayloadSchema }),
   z.object({ kind: z.literal('TRANSLATE'), payload: translatePayloadSchema }),
   z.object({ kind: z.literal('SUBTITLE'), payload: subtitlePayloadSchema }),
@@ -124,7 +128,7 @@ export type PostprodJobPayload = z.infer<typeof postprodJobPayloadSchema>;
 export const claimResponseSchema = z.object({
   jobId: uuidSchema,
   recordingId: uuidSchema,
-  kind: z.enum(['TRANSCRIBE', 'SUMMARIZE', 'TRANSLATE', 'SUBTITLE', 'DUB']),
+  kind: z.enum(['TRANSCRIBE', 'TRANSCRIBE_MULTITRACK', 'SUMMARIZE', 'TRANSLATE', 'SUBTITLE', 'DUB']),
   payload: z.unknown(), // narrowed via postprodJobPayloadSchema downstream
   attempts: z.number().int().min(0),
   leaseExpiresAt: z.string().datetime(),
@@ -153,9 +157,14 @@ export const claimResponseSchema = z.object({
    */
   inputs: z.array(
     z.object({
-      role: z.string(), // "transcript" | "summary" | ...
+      role: z.string(), // "transcript" | "summary" | "track" | ...
       downloadUrl: z.string().url(),
       blobKey: z.string(),
+      // ADR-013: presenti solo per role="track" (TRANSCRIBE_MULTITRACK).
+      // Identità certa del parlante + offset per il merge su timeline.
+      participantId: z.string().optional(),
+      displayName: z.string().nullable().optional(),
+      startOffsetMs: z.number().int().optional(),
     }),
   ),
   /**
@@ -242,6 +251,10 @@ export const artifactRegisterSchema = z.object({
       z.object({
         diarLabel: z.string().min(1).max(40),
         totalSpeechSec: z.number().int().min(0),
+        // ADR-013: per il multitrack l'identità è certa (dal JWT) → il
+        // worker la manda qui e il portale popola Speaker.displayName
+        // senza mapping manuale. Assente per la diarization pyannote.
+        displayName: z.string().max(200).nullable().optional(),
       }),
     )
     .optional(),

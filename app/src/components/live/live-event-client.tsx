@@ -780,6 +780,7 @@ export default function LiveEventClient({
               jwt={credentials.jwt}
               displayName={credentials.displayName}
               locale={locale}
+              eventSlug={event.slug}
               role={isActualModerator ? 'moderator' : 'participant'}
               participantsCanUnmute={event.participantsCanUnmute}
               participantsCanStartVideo={event.participantsCanStartVideo}
@@ -1109,9 +1110,9 @@ type UserRole = 'moderator' | 'participant' | 'guest';
 
 // Unified top bar (primary blue) with role-specific badge colors
 const ROLE_BADGE_COLORS: Record<UserRole, { badge: string; badgeFg: string }> = {
-  moderator: { badge: '#E8F0FE', badgeFg: '#0066CC' },
+  moderator: { badge: '#E8F0FE', badgeFg: 'var(--app-primary)' },
   participant: { badge: '#D4EDDA', badgeFg: '#155724' },
-  guest: { badge: '#E9ECEF', badgeFg: '#5A768A' },
+  guest: { badge: '#E9ECEF', badgeFg: 'var(--app-muted)' },
 };
 
 /**

@@ -81,7 +81,7 @@ export default async function EventsListPage({
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-start mb-5 flex-wrap gap-3">
         <div>
-          <h1 className="mb-1 fw-bold" style={{ color: '#17324D' }}>
+          <h1 className="mb-1 fw-bold" style={{ color: 'var(--app-text)' }}>
             {t('title')}
           </h1>
           <p className="text-secondary mb-0">{t('subtitle')}</p>

@@ -64,7 +64,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
 
   return (
     <div>
-      <h2 className="h4 fw-bold mb-3" style={{ color: '#17324D' }}>
+      <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('heading')}
       </h2>
       <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
@@ -92,7 +92,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
             {visibleFeatures.map((feature) => (
               <tr key={feature}>
                 <th scope="row">
-                  <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                     {t(`feature.${feature}.label`)}
                   </div>
                   <div className="text-secondary" style={{ fontSize: '0.8rem' }}>
@@ -123,13 +123,13 @@ export default function Step2Permissions({ value, onChange }: Props) {
 
       {/* Recording toggles (global) */}
       <section className="mb-3">
-        <h3 className="h6 fw-semibold mb-3" style={{ color: '#17324D' }}>
+        <h3 className="h6 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
           {t('recordingHeading')}
         </h3>
 
         <div className="py-2 d-flex justify-content-between align-items-start">
           <div className="me-3">
-            <div className="fw-semibold" style={{ color: '#17324D' }}>
+            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
               {tAdmin('form.recordingEnabled')}
             </div>
             <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
@@ -154,7 +154,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
             style={{ borderTop: '1px solid #e8e8e8' }}
           >
             <div className="me-3">
-              <div className="fw-semibold" style={{ color: '#17324D' }}>
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                 {tAdmin('form.autoStartRecording')}
               </div>
               <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
@@ -177,7 +177,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
           sulla registrazione, ne è subordinata). */}
       {value.recordingEnabled && (
         <section className="mb-3">
-          <h3 className="h6 fw-semibold mb-1" style={{ color: '#17324D' }}>
+          <h3 className="h6 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
             {tAdmin('form.aiSectionHeading')}
           </h3>
           <p className="text-secondary mb-3" style={{ fontSize: '0.85rem' }}>
@@ -241,7 +241,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
                 >
                   <label
                     className="fw-semibold mb-1 d-block"
-                    style={{ color: '#17324D', fontSize: '0.9rem' }}
+                    style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}
                     htmlFor="aiTargetLocales"
                   >
                     {tAdmin('form.aiTargetLocales')}
@@ -286,7 +286,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
               >
                 <label
                   className="fw-semibold mb-1 d-block"
-                  style={{ color: '#17324D', fontSize: '0.9rem' }}
+                  style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}
                   htmlFor="expectedSpeakers"
                 >
                   {tAdmin('form.expectedSpeakers')}
@@ -341,7 +341,7 @@ function AiToggle({
       style={{ borderTop: '1px solid #e8e8e8' }}
     >
       <div className="me-3">
-        <div className="fw-semibold" style={{ color: '#17324D' }}>
+        <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
           {label}
         </div>
         <div className="text-secondary" style={{ fontSize: '0.85rem' }}>

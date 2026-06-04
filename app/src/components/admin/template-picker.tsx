@@ -74,7 +74,7 @@ export default function TemplatePicker({
                     </div>
                     <h6
                       className="fw-semibold mb-0"
-                      style={{ color: '#17324D', fontSize: '0.95rem' }}
+                      style={{ color: 'var(--app-text)', fontSize: '0.95rem' }}
                     >
                       {tpl.name}
                     </h6>
