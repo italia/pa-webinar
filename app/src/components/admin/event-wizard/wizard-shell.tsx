@@ -398,11 +398,18 @@ export default function EventWizard(props: WizardProps) {
       if (Object.keys(aggregated).length > 0) {
         setFieldErrors(aggregated);
         setSubmitError(t('validationFailed'));
-        // Jump to the first failing step.
+        // Jump to the first failing step. Gli errori di validatePublish
+        // (moderatorName/moderatorEmail) non sono coperti da validateStep e
+        // i campi vivono nello step 'review': se solo quelli falliscono,
+        // portiamo l'utente lì (altrimenti il messaggio resta senza campo
+        // evidenziato visibile).
         const firstFailing = STEP_KEYS.find((k) =>
           Object.keys(validateStep(k, form, props.defaultLocale)).length > 0,
         );
         if (firstFailing) setActiveStep(firstFailing);
+        else if (aggregated.moderatorName || aggregated.moderatorEmail) {
+          setActiveStep('review');
+        }
         return;
       }
       setSubmitting(true);
@@ -721,6 +728,7 @@ export default function EventWizard(props: WizardProps) {
             jvbSizingConfig={props.jvbSizingConfig}
             defaultSenderRatioPct={props.defaultSenderRatioPct}
             gdprTemplates={props.gdprTemplates}
+            fieldErrors={fieldErrors}
           />
         )}
       </div>
