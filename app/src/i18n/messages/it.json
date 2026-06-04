@@ -158,6 +158,7 @@
       "organizationRequired": "Inserisci il tuo ente di appartenenza",
       "consentRequired": "Il consenso al trattamento dati è obbligatorio",
       "recordingConsentRequired": "Il consenso alla registrazione è obbligatorio per questo evento",
+      "multitrackConsentRequired": "Il consenso alla registrazione della tua traccia audio è obbligatorio per questo evento",
       "eventFull": "L'evento ha raggiunto il numero massimo di partecipanti",
       "generic": "Errore durante la registrazione. Riprova."
     }
@@ -2076,6 +2077,8 @@
     "consent": {
       "recording": "Acconsento alla registrazione audio/video dell'evento",
       "recordingRequired": "Il consenso alla registrazione è obbligatorio per partecipare a questo evento",
+      "multitrack": "Acconsento alla registrazione di una traccia audio separata della mia voce, al solo scopo di attribuire correttamente la trascrizione a chi parla. La traccia è temporanea e cancellata dopo la trascrizione; non viene usata per identificare o riprodurre la mia voce.",
+      "multitrackRequired": "Il consenso alla registrazione della tua traccia audio è obbligatorio per partecipare a questo evento",
       "futureCommunications": "Desidero ricevere informazioni su eventi futuri organizzati dal DTD",
       "addressBook": "Voglio essere inserito nella Rubrica DTD per essere invitato ad eventi simili",
       "addressBookHelp": "Consenso separato (art. 6.1.a GDPR). Potrai revocarlo in qualsiasi momento dal link \"Rimuovi i miei dati dalla rubrica\" nelle email che riceverai. Il nome e l'organizzazione saranno ricavati dal profilo di registrazione."

@@ -234,6 +234,9 @@ export const createRegistrationSchema = z.object({
       errorMap: () => ({ message: 'registration.errors.consentRequired' }),
     }),
   consentRecording: z.boolean().optional(),
+  // ADR-013 Fase 5 — consenso separato alla registrazione per-partecipante.
+  // Obbligatorio (true) lato route quando l'evento ha multitrackRecordingEnabled.
+  consentMultitrack: z.boolean().optional(),
   consentFutureCommunications: z.boolean().default(false),
   // Rubrica (Person address book) opt-in. This is a SEPARATE Art. 6.1.a
   // consent from the event-registration Art. 6.1.b basis — it controls

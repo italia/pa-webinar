@@ -78,6 +78,7 @@ export default async function RegistrationPage({
             privacyPolicyUrl={privacyUrl}
             privacyPolicyText={privacyText}
             recordingEnabled={event.recordingEnabled}
+            multitrackRecordingEnabled={event.multitrackRecordingEnabled}
             profiling={{
               requireOrganization: event.requireOrganization,
               requireOrganizationRole: event.requireOrganizationRole,
