@@ -1,0 +1,160 @@
+{{- if and .Values.recorder.enabled .Values.recorder.controller.enabled }}
+# Recorder controller (ADR-013 Fase 3) — operator riconciliante a pod fisso
+# che crea/elimina i Job recorder (runner=kubernetes). Edge-triggered dal
+# portale (POST /dispatch) + level-triggered (reconcile loop su
+# /api/internal/recorder-desired). RBAC namespaced minimale.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-recorder-controller
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: recorder-controller
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-recorder-controller
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: recorder-controller
+rules:
+  # Legge il CronJob template sospeso `recorder` per creare Job da esso.
+  - apiGroups: ["batch"]
+    resources: ["cronjobs"]
+    verbs: ["get", "list"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "create", "delete"]
+  # Osservabilità (tail log dei recorder).
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-recorder-controller
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: recorder-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "pa-webinar.fullname" . }}-recorder-controller
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "pa-webinar.fullname" . }}-recorder-controller
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-recorder-controller
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: recorder-controller
+spec:
+  selector:
+    {{- include "pa-webinar.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: recorder-controller
+  ports:
+    # Porta chiamata "ctrl" (NON "http"): il Service dell'app usa
+    # targetPort: http e seleziona per {instance,name} — che il controller
+    # eredita dalle selectorLabels. Con un nome diverso il pod del controller
+    # NON viene aggiunto agli endpoint dell'app (altrimenti /api/* andrebbe
+    # talvolta al controller → 404 flaky).
+    - name: ctrl
+      port: {{ .Values.recorder.controller.port | default 8080 }}
+      targetPort: ctrl
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-recorder-controller
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: recorder-controller
+spec:
+  # Un solo replica: il reconcile è idempotente, niente leader-election.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "pa-webinar.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: recorder-controller
+  template:
+    metadata:
+      labels:
+        {{- include "pa-webinar.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: recorder-controller
+    spec:
+      serviceAccountName: {{ include "pa-webinar.fullname" . }}-recorder-controller
+      automountServiceAccountToken: true
+      {{- with (.Values.recorder.controller.imagePullSecrets | default .Values.app.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: controller
+          image: {{ .Values.recorder.controller.image }}
+          imagePullPolicy: {{ .Values.recorder.controller.imagePullPolicy | default "IfNotPresent" }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: ctrl
+              containerPort: {{ .Values.recorder.controller.port | default 8080 }}
+              protocol: TCP
+          env:
+            - name: RUNNER
+              value: "kubernetes"
+            - name: NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: PORTAL_URL
+              value: {{ include "pa-webinar.internalUrl" . | quote }}
+            - name: RECORDER_CRONJOB_NAME
+              value: {{ include "pa-webinar.fullname" . }}-recorder
+            - name: PORT
+              value: {{ .Values.recorder.controller.port | default 8080 | quote }}
+            - name: RECONCILE_INTERVAL_MS
+              value: {{ .Values.recorder.controller.reconcileIntervalMs | default 30000 | quote }}
+            - name: CRON_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pa-webinar.secretName" . }}
+                  key: CRON_API_KEY
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: ctrl
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: ctrl
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            {{- toYaml (.Values.recorder.controller.resources | default dict) | nindent 12 }}
+{{- end }}

@@ -8,7 +8,7 @@ from faster_whisper import WhisperModel
 INITIAL_PROMPT = (
     "Riunione interna del Dipartimento per la Trasformazione Digitale (DTD). "
     "Partecipanti: Raffaele Vitiello, Alex, Paolo, Marco. "
-    "Argomenti trattati: piattaforma video eventi-dtd, Jitsi Meet, "
+    "Argomenti trattati: piattaforma video pa-webinar, Jitsi Meet, "
     "Kubernetes, cluster Azure, PCM, OVH, Teams, registrazione delle call, "
     "calendario, moderazione, qualità della connessione, codec, "
     "certificazione dell'accessibilità."

@@ -1,7 +1,7 @@
 /**
  * Inserisce nel DB di test (videocall-test) gli artifact prodotti
  * localmente. Da lanciare via:
- *   kubectl exec deploy/videocall-test-eventi-dtd -c eventi-dtd -- node -
+ *   kubectl exec deploy/videocall-test-pa-webinar -c pa-webinar -- node -
  *
  * Lo script riceve via stdin un JSON con:
  *   {

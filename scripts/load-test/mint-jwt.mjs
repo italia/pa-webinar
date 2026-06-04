@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Mint a Jitsi JWT for load testing with jitsi-meet-torture.
 //
-// Produces a token compatible with the JWT layout used by eventi-dtd
+// Produces a token compatible with the JWT layout used by pa-webinar
 // (see app/src/lib/auth/jwt.ts). The token grants participant-level
 // access to a given room on the configured Jitsi tenant.
 //
@@ -10,8 +10,8 @@
 //
 // Required env vars (same names used by the app):
 //   JITSI_JWT_SECRET       shared HS256 secret configured on Prosody
-//   JITSI_JWT_APP_ID       app id claim (default: eventi_dtd)
-//   JITSI_JWT_ISSUER       iss claim   (default: eventi-dtd)
+//   JITSI_JWT_APP_ID       app id claim (default: pa_webinar)
+//   JITSI_JWT_ISSUER       iss claim   (default: pa-webinar)
 //   JITSI_JWT_AUDIENCE     aud claim   (default: jitsi)
 //   JITSI_JWT_SUBJECT      sub claim, typically the Jitsi domain
 
@@ -39,8 +39,8 @@ if (!secret) {
   process.exit(1);
 }
 
-const appId = process.env.JITSI_JWT_APP_ID ?? 'eventi_dtd';
-const issuer = process.env.JITSI_JWT_ISSUER ?? 'eventi-dtd';
+const appId = process.env.JITSI_JWT_APP_ID ?? 'pa_webinar';
+const issuer = process.env.JITSI_JWT_ISSUER ?? 'pa-webinar';
 const audience = process.env.JITSI_JWT_AUDIENCE ?? 'jitsi';
 const subject = process.env.JITSI_JWT_SUBJECT ?? 'meet.jitsi';
 

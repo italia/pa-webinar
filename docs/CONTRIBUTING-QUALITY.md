@@ -1,4 +1,4 @@
-# Standard di qualità — eventi-dtd
+# Standard di qualità — pa-webinar
 
 Questo progetto segue gli standard di qualità ispirati al programma badge di
 [OpenCoDE](https://opencode.de/en/knowledge/software-index/badges-en) e

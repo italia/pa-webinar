@@ -1,6 +1,6 @@
 #!/bin/bash
 # ──────────────────────────────────────────────────────────────
-# eventi-dtd — Full feature verification
+# pa-webinar — Full feature verification
 # Tests all engagement features against a running instance.
 #
 # Usage:
@@ -16,7 +16,7 @@ ADMIN_KEY="${2:-dev_admin_key_2026}"
 CRON_KEY="${3:-dev_cron_key_change_in_production}"
 
 echo "=========================================="
-echo "  eventi-dtd Feature Verification"
+echo "  pa-webinar Feature Verification"
 echo "  Target: $BASE_URL"
 echo "=========================================="
 

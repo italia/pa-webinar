@@ -3,7 +3,7 @@
 #
 # Richiede:
 #   - podman o docker installato
-#   - l'immagine `eventi-dtd-load-test` già built
+#   - l'immagine `pa-webinar-load-test` già built
 #       (altrimenti build automatico al primo run con --build)
 #
 # Uso:
@@ -23,7 +23,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-IMAGE="${IMAGE:-eventi-dtd-load-test}"
+IMAGE="${IMAGE:-pa-webinar-load-test}"
 
 # Scegli runtime (podman preferito, docker fallback)
 if command -v podman >/dev/null 2>&1; then

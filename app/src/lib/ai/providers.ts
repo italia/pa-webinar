@@ -78,7 +78,7 @@ export function resolveLlmProvider(opts: {
         baseUrl:
           opts.envBaseUrl ??
           process.env.AI_VLLM_BASE_URL ??
-          'http://eventi-dtd-vllm:8000/v1',
+          'http://pa-webinar-vllm:8000/v1',
         // Default: Mistral-Small-3.2-24B-Instruct-2506 (Mistral AI,
         // Parigi — vendor europeo, Apache 2.0, ~48GB in fp16 → entra
         // in A100 80GB con ampio margine). Scelta DTD per privilegiare

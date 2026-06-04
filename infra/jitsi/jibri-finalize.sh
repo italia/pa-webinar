@@ -16,7 +16,7 @@
 #   RECORDING_GCS_BUCKET, GOOGLE_APPLICATION_CREDENTIALS
 #   RECORDING_MINIO_ENDPOINT, RECORDING_MINIO_BUCKET, RECORDING_MINIO_ACCESS_KEY, RECORDING_MINIO_SECRET_KEY
 #   RECORDING_WEBHOOK_URL — URL to notify the portal when recording is ready
-#   APP_INTERNAL_URL — internal URL for the portal (e.g. http://videocall-test-eventi-dtd:3000)
+#   APP_INTERNAL_URL — internal URL for the portal (e.g. http://videocall-test-pa-webinar:3000)
 #   CRON_API_KEY — bearer-token authentication key for the webhook and internal API
 #   RECORDING_WEBHOOK_SECRET — HMAC-SHA256 secret used to sign the webhook
 #       body (header X-Webhook-Signature: sha256=<hex>). When unset the

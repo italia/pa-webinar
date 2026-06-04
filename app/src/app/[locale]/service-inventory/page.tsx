@@ -98,7 +98,7 @@ const STACK_LAYER_COLORS: Record<StackLayerKey, string> = {
   platform: 'var(--app-muted)',
 };
 
-// Build the 4 stack layers from items that carry an eventi-dtd:layer property.
+// Build the 4 stack layers from items that carry an pa-webinar:layer property.
 // Display label falls back to the component/service name if no stack-label
 // override is set — so a tenant can surface items in the stack just by tagging
 // them, without editing this file.
@@ -108,9 +108,9 @@ function buildStack(bom: Bom): Record<StackLayerKey, StackItem[]> {
   };
   const collect = (items: Array<BomComponent | BomService>) => {
     for (const it of items) {
-      const layer = getProp(it.properties, 'eventi-dtd:layer') as StackLayerKey | undefined;
+      const layer = getProp(it.properties, 'pa-webinar:layer') as StackLayerKey | undefined;
       if (!layer || !(layer in out)) continue;
-      const label = getProp(it.properties, 'eventi-dtd:stack-label') ?? it.name;
+      const label = getProp(it.properties, 'pa-webinar:stack-label') ?? it.name;
       out[layer].push({ key: it['bom-ref'] ?? label, label });
     }
   };
@@ -179,10 +179,10 @@ export default async function ServiceInventoryPage() {
   }
 
   const meta = bom.metadata ?? {};
-  const tenant = getProp(meta.properties, 'eventi-dtd:tenant') ?? meta.component?.name ?? '—';
-  const provider = getProp(meta.properties, 'eventi-dtd:cloud-provider') ?? '—';
-  const region = getProp(meta.properties, 'eventi-dtd:region');
-  const deploymentMode = getProp(meta.properties, 'eventi-dtd:deployment-mode');
+  const tenant = getProp(meta.properties, 'pa-webinar:tenant') ?? meta.component?.name ?? '—';
+  const provider = getProp(meta.properties, 'pa-webinar:cloud-provider') ?? '—';
+  const region = getProp(meta.properties, 'pa-webinar:region');
+  const deploymentMode = getProp(meta.properties, 'pa-webinar:deployment-mode');
   const components = bom.components ?? [];
   const services = bom.services ?? [];
 

@@ -203,13 +203,13 @@ Ogni servizio diventa un oggetto `services[]`. Campi rilevanti:
     { "name": "<provider>:sla", "value": "99.95%" },
     { "name": "<provider>:certifications",
       "value": "ISO 27001, ISO 27018, AgID Circolare 2/2018" },
-    { "name": "eventi-dtd:layer", "value": "access|app|data|platform" },
-    { "name": "eventi-dtd:stack-label", "value": "etichetta breve per la pagina" }
+    { "name": "pa-webinar:layer", "value": "access|app|data|platform" },
+    { "name": "pa-webinar:stack-label", "value": "etichetta breve per la pagina" }
   ]
 }
 ```
 
-> La proprietà `eventi-dtd:layer` è letta dalla pagina `/service-inventory` per renderizzare il diagramma a quattro livelli (accesso, applicazione, dati, piattaforma). Senza questa, il servizio appare solo nella card-list. `eventi-dtd:stack-label` permette un'etichetta compatta da usare nel diagramma.
+> La proprietà `pa-webinar:layer` è letta dalla pagina `/service-inventory` per renderizzare il diagramma a quattro livelli (accesso, applicazione, dati, piattaforma). Senza questa, il servizio appare solo nella card-list. `pa-webinar:stack-label` permette un'etichetta compatta da usare nel diagramma.
 
 ## 6. Arricchimenti PA-specifici
 
@@ -247,12 +247,12 @@ In produzione, la forma consigliata è: CronJob genera il JSON → upload su sto
 3. Per la parte DEV: rigenerare con `cdxgen` + `syft` oppure riusare quella della release target (non è tenant-specific).
 4. Per la parte OPS: seguire §4 per il provider target e sostituire `services[]` di conseguenza.
 5. Aggiornare `metadata.declarations` con le evidenze della PA specifica.
-6. Puntare `SERVICE_INVENTORY_URL` al nuovo path (via tenant Helm values) — vedi [`infra/helm/eventi-dtd/values.yaml`](../infra/helm/eventi-dtd/values.yaml).
+6. Puntare `SERVICE_INVENTORY_URL` al nuovo path (via tenant Helm values) — vedi [`infra/helm/pa-webinar/values.yaml`](../infra/helm/pa-webinar/values.yaml).
 7. Verificare la resa su `/<locale>/service-inventory` e scaricare il JSON dal link "Scarica JSON originale" per double-check.
 
 ## 10. Limitazioni note
 
-- Il diagramma "Architettura in breve" della pagina è derivato **solo** dai componenti/servizi con proprietà `eventi-dtd:layer`. Chi non tagga dimentica gli elementi dalla vista d'insieme pur mantenendoli nelle tabelle dettagliate.
+- Il diagramma "Architettura in breve" della pagina è derivato **solo** dai componenti/servizi con proprietà `pa-webinar:layer`. Chi non tagga dimentica gli elementi dalla vista d'insieme pur mantenendoli nelle tabelle dettagliate.
 - La generazione automatica completa del DEV (npm + OCI + OS layer) richiede di eseguire `syft` dentro un contesto con accesso alle immagini — tipicamente una GitHub Action dopo `docker build`.
 - La generazione OPS cross-provider (cluster multi-cloud) deve produrre un documento per provider e fonderli; non c'è uno strumento single-source.
 

@@ -8,7 +8,7 @@
  * non vedrà i suoi bookmark — è una semplice "memo locale".
  *
  * Schema in localStorage:
- *   key:   "eventi-dtd:bookmarks:<slug>"
+ *   key:   "pa-webinar:bookmarks:<slug>"
  *   value: JSON [{ tSec: 183, label: "Mute al singolo", at: 1716922800000 }]
  */
 import { useCallback, useEffect, useState } from 'react';
@@ -22,7 +22,7 @@ export interface Bookmark {
   at: number;
 }
 
-const PREFIX = 'eventi-dtd:bookmarks:';
+const PREFIX = 'pa-webinar:bookmarks:';
 const MAX_LABEL_LEN = 80;
 
 function readAll(slug: string): Bookmark[] {

@@ -1,4 +1,4 @@
-# JVB Node Pool for eventi-dtd — Azure AKS Example
+# JVB Node Pool for pa-webinar — Azure AKS Example
 # This file is a REFERENCE — adapt and add to your IaC repo.
 #
 # This node pool hosts Jitsi Video Bridge (JVB) and Jibri (recording) pods.
@@ -57,7 +57,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "jvb" {
 
   tags = {
     environment = "production"
-    project     = "eventi-dtd"
+    project     = "pa-webinar"
     managed_by  = "tofu"
   }
 }

@@ -56,7 +56,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "ai_gpu" {
 
   tags = {
     environment = "production"
-    project     = "eventi-dtd"
+    project     = "pa-webinar"
     managed_by  = "tofu"
     purpose     = "ai-postprod"
   }
@@ -81,5 +81,5 @@ resource "azurerm_kubernetes_cluster_node_pool" "ai_gpu" {
 #    `pyannote/speaker-diarization-3.1`. Necessario UNA VOLTA durante il
 #    seed della PVC; a runtime il container ha `HF_HUB_OFFLINE=1`.
 #
-# 4. Deployment vLLM in-cluster + Service `eventi-dtd-vllm.<ns>` esposto
+# 4. Deployment vLLM in-cluster + Service `pa-webinar-vllm.<ns>` esposto
 #    in OpenAI-compat. Vedi `docs/POSTPROD.md` §"Deploy on AKS Italy North".

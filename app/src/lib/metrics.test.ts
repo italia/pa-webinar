@@ -38,7 +38,7 @@ describe('metrics registry', () => {
 
   it('has default app label', async () => {
     const output = await register.metrics();
-    expect(output).toContain('app="eventi-dtd"');
+    expect(output).toContain('app="pa-webinar"');
   });
 
   it('counter increments', () => {

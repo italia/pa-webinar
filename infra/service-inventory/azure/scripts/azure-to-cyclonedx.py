@@ -33,7 +33,7 @@ from typing import Any
 # starts with one of these prefixes is turned into a services[] entry. Order
 # matters: the first matching mapper wins.
 TYPE_MAPPERS: list[tuple[str, str, str]] = [
-    # azure type prefix, service display name, layer for eventi-dtd:layer
+    # azure type prefix, service display name, layer for pa-webinar:layer
     ("microsoft.containerservice/managedclusters",  "Azure Kubernetes Service",                  "platform"),
     ("microsoft.dbforpostgresql/flexibleservers",   "Azure Database for PostgreSQL Flexible",    "data"),
     ("microsoft.dbformysql/flexibleservers",        "Azure Database for MySQL Flexible",         "data"),
@@ -120,8 +120,8 @@ def to_service(r: dict[str, Any], tenant: str) -> dict[str, Any] | None:
             {"name": "azure:resource-name",   "value": r["name"]},
             {"name": "azure:region",          "value": r.get("location", "unknown")},
             {"name": "azure:resource-id",     "value": r["id"]},
-            {"name": "eventi-dtd:tenant",     "value": tenant},
-            {"name": "eventi-dtd:layer",      "value": layer},
+            {"name": "pa-webinar:tenant",     "value": tenant},
+            {"name": "pa-webinar:layer",      "value": layer},
         ],
     }
 
@@ -183,8 +183,8 @@ def main() -> int:
         "resourceGroup": args.resource_group,
         "services": services,
         "properties": [
-            {"name": "eventi-dtd:tenant",        "value": args.tenant},
-            {"name": "eventi-dtd:cloud-provider","value": "Microsoft Azure"},
+            {"name": "pa-webinar:tenant",        "value": args.tenant},
+            {"name": "pa-webinar:cloud-provider","value": "Microsoft Azure"},
             {"name": "azure:subscription-id",    "value": args.subscription},
             {"name": "azure:resource-group",     "value": args.resource_group},
         ],
