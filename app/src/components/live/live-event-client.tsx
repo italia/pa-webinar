@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import useSWR from 'swr';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import {
@@ -866,7 +867,45 @@ interface LiveSidebarProps {
 
 function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, agendaEnabled, jitsiApi, displayName, isInstantCall = false }: LiveSidebarProps) {
   const t = useTranslations('live');
-  const showChat = chatEnabled !== false;
+  // Live feature flags: i flag arrivano come props al mount, ma un moderatore
+  // può attivarli/disattivarli DURANTE l'evento → li ripolliamo così i tab
+  // reagiscono per tutti. I valori "eff*" sono quelli effettivi correnti.
+  const { data: liveFlags, mutate: mutateFlags } = useSWR<{
+    qaEnabled: boolean;
+    chatEnabled: boolean;
+    agendaEnabled: boolean;
+    recordingEnabled: boolean;
+  }>(
+    isInstantCall ? null : `/api/events/${eventSlug}/flags`,
+    (url: string) => fetch(url).then((r) => r.json()),
+    { refreshInterval: 15000 },
+  );
+  const effQa = liveFlags?.qaEnabled ?? qaEnabled;
+  const effChat = liveFlags?.chatEnabled ?? chatEnabled;
+  const effAgenda = liveFlags?.agendaEnabled ?? agendaEnabled;
+  const showChat = effChat !== false;
+
+  // Toggle di una funzione durante l'evento (moderatore): PUT del flag +
+  // refresh ottimistico locale; gli altri client si allineano al prossimo
+  // poll (15s).
+  const toggleFeature = useCallback(
+    async (key: 'qaEnabled' | 'chatEnabled' | 'agendaEnabled', current: boolean) => {
+      await mutateFlags(
+        (cur) => (cur ? { ...cur, [key]: !current } : cur),
+        { revalidate: false },
+      );
+      await fetch(`/api/events/${eventSlug}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ [key]: !current }),
+      });
+      await mutateFlags();
+    },
+    [eventSlug, token, mutateFlags],
+  );
   const [activeTab, setActiveTab] = useState<SidebarTab>(
     isInstantCall ? 'participants' : (qaEnabled ? 'qa' : (showChat ? 'chat' : 'polls'))
   );
@@ -934,7 +973,7 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
       key: 'qa',
       label: t('sidebarTabQa'),
       svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>),
-      show: !isInstantCall && qaEnabled,
+      show: !isInstantCall && effQa,
     },
     {
       key: 'chat',
@@ -953,7 +992,7 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
       key: 'agenda',
       label: t('sidebarTabAgenda'),
       svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>),
-      show: !isInstantCall && agendaEnabled,
+      show: !isInstantCall && effAgenda,
     },
     {
       key: 'materials',
@@ -1066,7 +1105,33 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
         </div>
 
         <div className="flex-grow-1 d-flex flex-column live-sidebar-body" style={{ minHeight: 0, overflowY: 'auto' }}>
-          {activeTab === 'qa' && qaEnabled && (
+          {/* Attivazione funzioni durante l'evento (solo moderatore). Le
+              modifiche si propagano agli altri client via polling dei flag. */}
+          {isModerator && !isInstantCall && (
+            <div
+              className="d-flex flex-wrap gap-2 px-3 py-2 align-items-center"
+              style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.8rem' }}
+            >
+              <span className="text-secondary fw-semibold me-1">{t('liveFeaturesLabel')}</span>
+              {([
+                ['qaEnabled', t('sidebarTabQa'), effQa],
+                ['chatEnabled', t('sidebarTabChat'), effChat],
+                ['agendaEnabled', t('sidebarTabAgenda'), effAgenda],
+              ] as const).map(([key, label, on]) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={`btn btn-sm ${on ? 'btn-primary' : 'btn-outline-secondary'} py-0 px-2`}
+                  style={{ fontSize: '0.78rem' }}
+                  onClick={() => void toggleFeature(key, on)}
+                  aria-pressed={on}
+                >
+                  {on ? '✓ ' : ''}{label}
+                </button>
+              ))}
+            </div>
+          )}
+          {activeTab === 'qa' && effQa && (
             <QAPanel
               eventSlug={eventSlug}
               token={token}
@@ -1098,7 +1163,7 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
           {activeTab === 'polls' && (
             <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
-          {activeTab === 'agenda' && agendaEnabled && (
+          {activeTab === 'agenda' && effAgenda && (
             <AgendaPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
           {activeTab === 'materials' && (
