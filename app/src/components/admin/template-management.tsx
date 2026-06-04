@@ -31,6 +31,10 @@ interface SerializedTemplate {
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
   maxParticipants: number;
+  defaultDurationMinutes: number | null;
+  aiTranscriptEnabled: boolean;
+  aiSummaryEnabled: boolean;
+  aiTranslationEnabled: boolean;
   isSystem: boolean;
   sortOrder: number;
   createdAt: string;
@@ -52,6 +56,10 @@ interface EditingTemplate {
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
   maxParticipants: number;
+  defaultDurationMinutes: number | null;
+  aiTranscriptEnabled: boolean;
+  aiSummaryEnabled: boolean;
+  aiTranslationEnabled: boolean;
 }
 
 const DEFAULT_NEW: EditingTemplate = {
@@ -65,6 +73,10 @@ const DEFAULT_NEW: EditingTemplate = {
   participantsCanStartVideo: false,
   participantsCanShareScreen: false,
   maxParticipants: 300,
+  defaultDurationMinutes: 120,
+  aiTranscriptEnabled: false,
+  aiSummaryEnabled: false,
+  aiTranslationEnabled: false,
 };
 
 export default function TemplateManagement({
@@ -98,6 +110,10 @@ export default function TemplateManagement({
       participantsCanStartVideo: tpl.participantsCanStartVideo,
       participantsCanShareScreen: tpl.participantsCanShareScreen,
       maxParticipants: tpl.maxParticipants,
+      defaultDurationMinutes: tpl.defaultDurationMinutes,
+      aiTranscriptEnabled: tpl.aiTranscriptEnabled,
+      aiSummaryEnabled: tpl.aiSummaryEnabled,
+      aiTranslationEnabled: tpl.aiTranslationEnabled,
     });
     setEditing(tpl.id);
     setError('');
@@ -393,6 +409,25 @@ function TemplateForm({
         />
       </FormGroup>
 
+      <FormGroup className="mb-3">
+        <Input
+          id="tpl-duration"
+          label={t('durationLabel')}
+          type="number"
+          value={form.defaultDurationMinutes?.toString() ?? ''}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setField(
+              'defaultDurationMinutes',
+              e.target.value.trim() === '' ? null : Number(e.target.value) || null,
+            )
+          }
+          min={5}
+          max={1440}
+          placeholder="120"
+        />
+        <small className="form-text text-muted">{t('durationHint')}</small>
+      </FormGroup>
+
       <div className="mb-3">
         <strong className="d-block mb-2" style={{ fontSize: '0.85rem' }}>
           {t('featuresLabel')}
@@ -405,6 +440,9 @@ function TemplateForm({
             ['participantsCanUnmute', t('unmute')],
             ['participantsCanStartVideo', t('video')],
             ['participantsCanShareScreen', t('screen')],
+            ['aiTranscriptEnabled', t('aiTranscript')],
+            ['aiSummaryEnabled', t('aiSummary')],
+            ['aiTranslationEnabled', t('aiTranslation')],
           ] as const
         ).map(([key, label]) => (
           <div

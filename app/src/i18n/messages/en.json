@@ -1405,6 +1405,11 @@
       "unmute": "Participant microphone",
       "video": "Participant video",
       "screen": "Screen sharing",
+      "durationLabel": "Default duration (minutes)",
+      "durationHint": "Pre-fills the event end (start + duration). The user can change it. Empty = 2 hours.",
+      "aiTranscript": "Automatic transcription (default)",
+      "aiSummary": "Automatic summary (default)",
+      "aiTranslation": "Automatic translation (default)",
       "pickerTitle": "Choose a template",
       "pickerSubtitle": "Select a template to pre-configure event settings, or skip to configure everything manually.",
       "skipTemplate": "Configure manually"

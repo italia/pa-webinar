@@ -1475,6 +1475,11 @@
       "unmute": "Microfono partecipanti",
       "video": "Video partecipanti",
       "screen": "Condivisione schermo",
+      "durationLabel": "Durata predefinita (minuti)",
+      "durationHint": "Pre-compila la fine dell'evento (inizio + durata). L'utente può modificarla. Vuoto = 2 ore.",
+      "aiTranscript": "Trascrizione automatica (default)",
+      "aiSummary": "Sintesi automatica (default)",
+      "aiTranslation": "Traduzione automatica (default)",
       "pickerTitle": "Scegli un template",
       "pickerSubtitle": "Seleziona un template per pre-configurare le impostazioni dell'evento, oppure salta per configurare tutto manualmente.",
       "skipTemplate": "Configura manualmente"
