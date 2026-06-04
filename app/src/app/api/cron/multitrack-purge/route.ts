@@ -37,6 +37,15 @@ export const GET = withErrorHandling(async (request) => {
         jobs: {
           some: { kind: 'TRANSCRIBE_MULTITRACK', status: 'DONE' },
         },
+        OR: [
+          // Default (minimizzazione): purge appena trascritto.
+          { event: { retainParticipantTracks: false } },
+          // Opt-in "conserva": purge solo dopo la scadenza di retention.
+          {
+            event: { retainParticipantTracks: true },
+            retentionUntil: { not: null, lte: new Date() },
+          },
+        ],
       },
     },
     select: { id: true, blobKey: true },

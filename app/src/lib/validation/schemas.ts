@@ -101,6 +101,8 @@ const eventBaseSchema = z.object({
   // ADR-013 Fase 5 — opt-in registrazione per-partecipante (PII sensibile,
   // off di default). Vedi schema.prisma `Event.multitrackRecordingEnabled`.
   multitrackRecordingEnabled: z.boolean().optional(),
+  // Conserva le tracce per-partecipante oltre la trascrizione (archivio/riascolto).
+  retainParticipantTracks: z.boolean().optional(),
   // Agenda/note live (checklist opt-in).
   agendaEnabled: z.boolean().optional(),
   // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.

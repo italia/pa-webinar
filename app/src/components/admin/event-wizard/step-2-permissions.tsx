@@ -34,6 +34,8 @@ export interface Step2Value {
   aiTranslationEnabled: boolean;
   aiDubbingEnabled: boolean;
   multitrackRecordingEnabled: boolean;
+  /** Conserva le tracce per-partecipante (archivio/riascolto). PII. */
+  retainParticipantTracks: boolean;
   /** Comma-separated ISO-639-1 (es. "en,fr"). Null/empty = usa il
    *  default impostato a livello sito. */
   aiTargetLocales: string | null;
@@ -239,9 +241,26 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
                 onToggle={() =>
                   onChange({
                     multitrackRecordingEnabled: !value.multitrackRecordingEnabled,
+                    // Disattivare il multitrack disattiva anche la conservazione.
+                    retainParticipantTracks: !value.multitrackRecordingEnabled
+                      ? value.retainParticipantTracks
+                      : false,
                   })
                 }
               />
+
+              {value.multitrackRecordingEnabled && (
+                <AiToggle
+                  label={tAdmin('form.retainParticipantTracks')}
+                  desc={tAdmin('form.retainParticipantTracksDesc')}
+                  checked={value.retainParticipantTracks}
+                  onToggle={() =>
+                    onChange({
+                      retainParticipantTracks: !value.retainParticipantTracks,
+                    })
+                  }
+                />
+              )}
 
               <AiToggle
                 label={tAdmin('form.aiSummaryEnabled')}

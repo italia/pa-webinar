@@ -235,6 +235,12 @@ model Event {
   // con questo flag + recordingEnabled + aiTranscriptEnabled. Le tracce sono
   // intermedie e cancellate dopo la trascrizione (multitrack-purge).
   multitrackRecordingEnabled Boolean @default(false) @map("multitrack_recording_enabled")
+  // ADR-013 — opt-in a CONSERVARE le tracce per-partecipante oltre la
+  // trascrizione (per archivio scaricabile + riascolto per-relatore in
+  // video-library). Off di default = minimizzazione (purge subito dopo la
+  // trascrizione). On = le tracce sopravvivono fino a retentionUntil del
+  // recording, con disclosure/consenso dedicati (PII sensibile).
+  retainParticipantTracks Boolean @default(false) @map("retain_participant_tracks")
   // Comma-separated ISO-639-1 list of target languages for transcript /
   // summary translation (e.g. "en,fr"). When null, falls back to
   // SiteSetting.aiDefaultTargetLocales.
