@@ -158,6 +158,7 @@
       "organizationRequired": "Please enter your organization",
       "consentRequired": "Consent to data processing is required",
       "recordingConsentRequired": "Recording consent is required for this event",
+      "multitrackConsentRequired": "Consent to recording your audio track is required for this event",
       "eventFull": "The event has reached the maximum number of participants",
       "generic": "Registration error. Please try again."
     }
@@ -2076,6 +2077,8 @@
     "consent": {
       "recording": "I consent to the audio/video recording of this event",
       "recordingRequired": "Recording consent is required to participate in this event",
+      "multitrack": "I consent to recording a separate audio track of my voice, for the sole purpose of correctly attributing the transcript to each speaker. The track is temporary and deleted after transcription; it is not used to identify or reproduce my voice.",
+      "multitrackRequired": "Consent to recording your audio track is required to participate in this event",
       "futureCommunications": "I would like to receive information about future events organized by DTD",
       "addressBook": "I want to be added to the DTD address book to be invited to similar events",
       "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."

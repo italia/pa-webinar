@@ -584,6 +584,10 @@ model Registration {
   consentGiven                Boolean  @map("consent_given")
   consentTimestamp            DateTime @map("consent_timestamp")
   consentRecording            Boolean? @map("consent_recording") // null if event has no recording
+  // ADR-013 Fase 5 — consenso esplicito SEPARATO alla registrazione audio
+  // per-partecipante (traccia isolata = PII sensibile). Null se l'evento non
+  // ha il multitrack abilitato; obbligatorio (true) per registrarsi se lo ha.
+  consentMultitrack           Boolean? @map("consent_multitrack")
   consentFutureCommunications Boolean  @default(false) @map("consent_future_communications")
 
   // Access token (for personal join link)
