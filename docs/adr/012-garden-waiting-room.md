@@ -1,7 +1,7 @@
 # ADR-012 — Waiting room "Giardino": lobby sociale stile Pokemon
 
 **Stato**: Proposto (2026-04-24)
-**Decisori**: team eventi-dtd / DTD
+**Decisori**: team pa-webinar / DTD
 **Contesto abilitante**: feedback informale post-caffettino 24 aprile — "la sala d'attesa potrebbe essere più divertente"
 
 ## Contesto

@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────
-# eventi-dtd — Production Dockerfile
+# pa-webinar — Production Dockerfile
 # Multi-stage build: deps → builder → runner
 # ─────────────────────────────────────────────────────────────
 
@@ -15,9 +15,9 @@ ARG NODE_BASE=mirror.gcr.io/library/node:20-alpine
 FROM ${NODE_BASE} AS deps
 
 LABEL maintainer="Dipartimento per la Trasformazione Digitale <innovazione@governo.it>"
-LABEL org.opencontainers.image.title="eventi-dtd"
+LABEL org.opencontainers.image.title="pa-webinar"
 LABEL org.opencontainers.image.description="Public digital event platform for the Italian DTD"
-LABEL org.opencontainers.image.source="https://github.com/italia/eventi-dtd"
+LABEL org.opencontainers.image.source="https://github.com/italia/pa-webinar"
 
 RUN apk add --no-cache libc6-compat
 

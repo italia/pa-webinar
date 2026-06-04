@@ -2015,7 +2015,7 @@
     "privacy": {
       "metaTitle": "Privatumo politika",
       "title": "Privatumo politika",
-      "intro": "Šiame puslapyje apibendrinamas asmens duomenų tvarkymas, susijęs su platformos Eventi DTD naudojimu ir dalyvavimu viešuose renginiuose.",
+      "intro": "Šiame puslapyje apibendrinamas asmens duomenų tvarkymas, susijęs su platformos PA Webinar naudojimu ir dalyvavimu viešuose renginiuose.",
       "sections": {
         "controller": {
           "title": "Duomenų valdytojas",
@@ -2058,7 +2058,7 @@
     "legalNotes": {
       "metaTitle": "Teisinės pastabos",
       "title": "Teisinės pastabos",
-      "intro": "Prieiga prie platformos Eventi DTD ir jos naudojimas vyksta pagal šias pastabas, kuriose apibendrinamos bendrosios naudojimo sąlygos ir pagrindinė informacija apie paslaugą.",
+      "intro": "Prieiga prie platformos PA Webinar ir jos naudojimas vyksta pagal šias pastabas, kuriose apibendrinamos bendrosios naudojimo sąlygos ir pagrindinė informacija apie paslaugą.",
       "sections": {
         "ownership": {
           "title": "Paslaugos nuosavybė",

@@ -26,7 +26,7 @@ Implementazione di riferimento per generare la metà OPS del documento `/service
 
 ## Contenuto
 
-- **`scripts/azure-to-cyclonedx.py`** — trasformatore Python che interroga Azure Resource Graph e produce un JSON con `services[]` in formato CycloneDX 1.6. Mappa i resource type Azure noti (AKS, Postgres Flexible, Storage, Key Vault, DNS, Log Analytics, ACR, …) a servizi con `eventi-dtd:layer` per il diagramma di architettura.
+- **`scripts/azure-to-cyclonedx.py`** — trasformatore Python che interroga Azure Resource Graph e produce un JSON con `services[]` in formato CycloneDX 1.6. Mappa i resource type Azure noti (AKS, Postgres Flexible, Storage, Key Vault, DNS, Log Analytics, ACR, …) a servizi con `pa-webinar:layer` per il diagramma di architettura.
 - **`cronjob.yaml`** — manifesto Kubernetes che orchestra generazione + upload. Usa [Azure Workload Identity](https://azure.github.io/azure-workload-identity/) per autenticazione senza credenziali hardcoded.
 
 ## Prerequisiti

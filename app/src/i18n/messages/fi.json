@@ -2015,7 +2015,7 @@
     "privacy": {
       "metaTitle": "Tietosuojaseloste",
       "title": "Tietosuojaseloste",
-      "intro": "Tällä sivulla kuvataan yhteenvetona henkilötietojen käsittely, joka liittyy Eventi DTD -alustan käyttöön ja julkisiin tapahtumiin osallistumiseen.",
+      "intro": "Tällä sivulla kuvataan yhteenvetona henkilötietojen käsittely, joka liittyy PA Webinar -alustan käyttöön ja julkisiin tapahtumiin osallistumiseen.",
       "sections": {
         "controller": {
           "title": "Rekisterinpitäjä",
@@ -2058,7 +2058,7 @@
     "legalNotes": {
       "metaTitle": "Oikeudelliset huomautukset",
       "title": "Oikeudelliset huomautukset",
-      "intro": "Eventi DTD -alustan käyttö on näiden huomautusten alaista. Ne sisältävät yleiset käyttöehdot ja keskeiset tiedot palvelusta.",
+      "intro": "PA Webinar -alustan käyttö on näiden huomautusten alaista. Ne sisältävät yleiset käyttöehdot ja keskeiset tiedot palvelusta.",
       "sections": {
         "ownership": {
           "title": "Palvelun omistajuus",

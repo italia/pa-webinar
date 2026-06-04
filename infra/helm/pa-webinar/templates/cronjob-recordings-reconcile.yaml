@@ -1,0 +1,70 @@
+{{- if .Values.cronjobs.recordingsReconcile.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-recordings-reconcile
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: cronjob-recordings-reconcile
+spec:
+  schedule: {{ .Values.cronjobs.recordingsReconcile.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            {{- include "pa-webinar.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: cronjob-recordings-reconcile
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 100
+            runAsGroup: 101
+            seccompProfile:
+              type: RuntimeDefault
+          {{- if .Values.app.nodeSelector }}
+          nodeSelector:
+            {{- toYaml .Values.app.nodeSelector | nindent 12 }}
+          {{- end }}
+          {{- if .Values.app.tolerations }}
+          tolerations:
+            {{- toYaml .Values.app.tolerations | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: recordings-reconcile
+              image: {{ .Values.cronjobs.recordingsReconcile.image }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  curl -sfX POST \
+                    -H "x-api-key: $(CRON_API_KEY)" \
+                    {{ include "pa-webinar.internalUrl" . }}/api/cron/recordings-reconcile
+              env:
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "pa-webinar.secretName" . }}
+                      key: CRON_API_KEY
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                capabilities:
+                  drop:
+                    - ALL
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+{{- end }}

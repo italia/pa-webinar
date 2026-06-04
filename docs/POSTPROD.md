@@ -1,4 +1,4 @@
-# Postprod AI pipeline — eventi-dtd
+# Postprod AI pipeline — pa-webinar
 
 Pipeline di post-produzione che trasforma le registrazioni Jibri in
 trascrizioni, sintesi e traduzioni. Tutto gira **in-cluster** (vincolo
@@ -235,7 +235,7 @@ canonico — defence in depth contro worker buggati).
 | Component | Image | Schedule | Resources | RBAC |
 |---|---|---|---|---|
 | **postprod-orchestrator** (CronJob) | `bitnami/kubectl` | `* * * * *` | 10m cpu / 64Mi | `batch/jobs:get,list,create,delete`, `batch/cronjobs:get` |
-| **postprod-worker** (Job template, suspended CronJob) | `ghcr.io/italia/eventi-dtd-postprod-worker:dev` | `@yearly` + `suspend: true` | 4 cpu / 16Gi + 1× GPU | none |
+| **postprod-worker** (Job template, suspended CronJob) | `ghcr.io/italia/pa-webinar-postprod-worker:dev` | `@yearly` + `suspend: true` | 4 cpu / 16Gi + 1× GPU | none |
 | **postprod-reclaim** (CronJob) | `curlimages/curl` | `* * * * *` | 50m cpu / 32Mi | none (curl only) |
 | **postprod-retention** (CronJob) | `curlimages/curl` | `30 3 * * *` | 50m cpu / 64Mi | none |
 | **vLLM** (Deployment, fuori chart attuale) | tuo | always on opt | 1× GPU + 24Gi+ | none |
@@ -249,7 +249,7 @@ secrets). Non viene eseguito sul suo schedule.
 
 ## Configurazione
 
-### Helm values (`infra/helm/eventi-dtd/values.yaml`)
+### Helm values (`infra/helm/pa-webinar/values.yaml`)
 
 Off di default. Per abilitare in un cluster esistente:
 
@@ -258,7 +258,7 @@ postprod:
   enabled: true
 
   worker:
-    image: ghcr.io/italia/eventi-dtd-postprod-worker:dev
+    image: ghcr.io/italia/pa-webinar-postprod-worker:dev
     # In sviluppo iniziale, lascia stub: true per saltare WhisperX/LLM
     # e generare artefatti "canned". Toglilo quando arrivano i modelli.
     stub: false
@@ -281,7 +281,7 @@ postprod:
       key: HF_TOKEN
 
     extraEnv:
-      AI_VLLM_BASE_URL: "http://eventi-dtd-vllm.ai:8000/v1"
+      AI_VLLM_BASE_URL: "http://pa-webinar-vllm.ai:8000/v1"
       AI_VLLM_MODEL_ID: "Qwen/Qwen3-32B-Instruct"
 
     gpu:
@@ -321,7 +321,7 @@ Modificabile dal pannello senza redeploy:
 
 | Secret | Chiavi | Da chi consumato | Note |
 |---|---|---|---|
-| `eventi-dtd-secrets` | `CRON_API_KEY` | app + tutti i cron + orchestrator + worker | Già esistente |
+| `pa-webinar-secrets` | `CRON_API_KEY` | app + tutti i cron + orchestrator + worker | Già esistente |
 | `hf-token` | `HF_TOKEN` | worker pod | Per gated `pyannote/speaker-diarization-3.1`. Generare con TOS accettato su huggingface.co |
 
 ---
@@ -427,7 +427,7 @@ az aks nodepool show -g developersitalia-prod \
 ```
 
 > Reference standalone (per PA terze che adottano il chart fuori da
-> `iac-azure`): `infra/tofu/ai-gpu-nodepool.tf` nel repo eventi-dtd
+> `iac-azure`): `infra/tofu/ai-gpu-nodepool.tf` nel repo pa-webinar
 > (`count = 0` di default — il file è solo template).
 
 ### 2. NVIDIA GPU Operator
@@ -541,12 +541,12 @@ vLLM gira in un proprio Deployment + Service. Esempio minimal:
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
-metadata: { name: eventi-dtd-vllm, namespace: ai }
+metadata: { name: pa-webinar-vllm, namespace: ai }
 spec:
   replicas: 1
-  selector: { matchLabels: { app: eventi-dtd-vllm } }
+  selector: { matchLabels: { app: pa-webinar-vllm } }
   template:
-    metadata: { labels: { app: eventi-dtd-vllm } }
+    metadata: { labels: { app: pa-webinar-vllm } }
     spec:
       nodeSelector: { workload: ai-gpu }
       tolerations:
@@ -573,9 +573,9 @@ spec:
 ---
 apiVersion: v1
 kind: Service
-metadata: { name: eventi-dtd-vllm, namespace: ai }
+metadata: { name: pa-webinar-vllm, namespace: ai }
 spec:
-  selector: { app: eventi-dtd-vllm }
+  selector: { app: pa-webinar-vllm }
   ports: [{ port: 8000, targetPort: 8000 }]
 ```
 
@@ -587,8 +587,8 @@ worker o vLLM è running. Se hai bisogno di latenza bassa, pinna
 
 ```bash
 cd infra/ai
-docker build -f Dockerfile.worker -t ghcr.io/italia/eventi-dtd-postprod-worker:dev .
-docker push ghcr.io/italia/eventi-dtd-postprod-worker:dev
+docker build -f Dockerfile.worker -t ghcr.io/italia/pa-webinar-postprod-worker:dev .
+docker push ghcr.io/italia/pa-webinar-postprod-worker:dev
 ```
 
 Da CI/CD: integrare in `.github/workflows/release.yml` con la sua
@@ -810,7 +810,7 @@ video resta la fonte autoritativa".
 - schemas (discriminated union, claim response, artifact register)
 
 ```bash
-cd eventi-dtd
+cd pa-webinar
 npm run test --workspace=app -- src/lib/ai
 ```
 
@@ -837,7 +837,7 @@ sintesi placeholder. Utile per smoke test su minikube/k3s.
 
 ```bash
 cd infra/ai
-docker build -f Dockerfile.worker -t eventi-dtd-postprod-worker:local .
+docker build -f Dockerfile.worker -t pa-webinar-postprod-worker:local .
 ```
 
 (Richiede ~10 minuti perché installa torch+whisperx+pyannote.)
@@ -861,7 +861,7 @@ kubectl logs -n gpu-operator -l app=nvidia-device-plugin
 
 `CRON_API_KEY` non è in sync tra app e worker. Il worker prende il
 secret via `secretRef` nel CronJob worker template — controlla che
-`{{ include "eventi-dtd.secretName" . }}` punti allo stesso Secret
+`{{ include "pa-webinar.secretName" . }}` punti allo stesso Secret
 del cron postprod-orchestrator.
 
 ### "blobKey mismatch" nel register
@@ -933,7 +933,7 @@ dedicato:
    `AI_ARTIFACT_DELETED` / `AI_VOICE_CLONE_USED` (l'ultimo per V4).
 
 8. **CI image push**: pipeline GitHub Actions per buildare e pushare
-   `ghcr.io/italia/eventi-dtd-postprod-worker` insieme alle release.
+   `ghcr.io/italia/pa-webinar-postprod-worker` insieme alle release.
 
 9. **Bench reale**: misurare throughput (~minuti di video per minuto
    di GPU) e tempo di sintesi su Qwen3-32B per stimare costi reali.

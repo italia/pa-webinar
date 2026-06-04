@@ -44,10 +44,10 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: italia/eventi-dtd
-  WORKER_IMAGE_NAME: italia/eventi-dtd-postprod-worker
-  RECORDER_IMAGE_NAME: italia/eventi-dtd-recorder
-  RECORDER_CONTROLLER_IMAGE_NAME: italia/eventi-dtd-recorder-controller
+  IMAGE_NAME: italia/pa-webinar
+  WORKER_IMAGE_NAME: italia/pa-webinar-postprod-worker
+  RECORDER_IMAGE_NAME: italia/pa-webinar-recorder
+  RECORDER_CONTROLLER_IMAGE_NAME: italia/pa-webinar-recorder-controller
 
 concurrency:
   # Cancel in-flight dev builds when a new push lands — we only care about
@@ -58,7 +58,7 @@ concurrency:
 jobs:
   build-and-push:
     name: Build & Push Dev Image
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       packages: write
@@ -130,7 +130,7 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo 'Deploy to test cluster:' >> "$GITHUB_STEP_SUMMARY"
           echo '```sh' >> "$GITHUB_STEP_SUMMARY"
-          echo 'kubectl -n videocall-test rollout restart deploy/videocall-test-eventi-dtd' >> "$GITHUB_STEP_SUMMARY"
+          echo 'kubectl -n videocall-test rollout restart deploy/videocall-test-pa-webinar' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
   # Postprod AI worker: container Python con CUDA + WhisperX + pyannote
@@ -140,12 +140,12 @@ jobs:
   # codebase Next.js.
   #
   # Path filter: parte solo se i sorgenti `infra/ai/` o
-  # `infra/helm/eventi-dtd/templates/cronjob-postprod-*.yaml` sono
+  # `infra/helm/pa-webinar/templates/cronjob-postprod-*.yaml` sono
   # cambiati nel push, OPPURE su workflow_dispatch con
   # `force_worker_build=true`. Per il primo run, usa workflow_dispatch.
   detect-worker-changes:
     name: Detect postprod worker changes
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     outputs:
       worker_changed: ${{ steps.filter.outputs.worker }}
     steps:
@@ -164,7 +164,7 @@ jobs:
           # Su push: diff con HEAD~1 — qualunque modifica sotto
           # infra/ai/ o sui template Helm postprod fa scattare il build.
           CHANGED=$(git diff --name-only HEAD~1 HEAD || git ls-files)
-          if echo "$CHANGED" | grep -qE '^(infra/ai/|infra/helm/eventi-dtd/templates/cronjob-postprod-)'; then
+          if echo "$CHANGED" | grep -qE '^(infra/ai/|infra/helm/pa-webinar/templates/cronjob-postprod-)'; then
             echo "worker=true" >> "$GITHUB_OUTPUT"
           else
             echo "worker=false" >> "$GITHUB_OUTPUT"
@@ -174,7 +174,7 @@ jobs:
     name: Build & Push Postprod Worker Image
     needs: detect-worker-changes
     if: needs.detect-worker-changes.outputs.worker_changed == 'true'
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       packages: write
@@ -217,9 +217,9 @@ jobs:
           cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-postprod-worker' }}
           cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-postprod-worker' }}
           labels: |
-            org.opencontainers.image.title=eventi-dtd-postprod-worker
-            org.opencontainers.image.description=Postprod AI worker (WhisperX + pyannote + Piper TTS) for eventi-dtd
-            org.opencontainers.image.source=https://github.com/italia/eventi-dtd
+            org.opencontainers.image.title=pa-webinar-postprod-worker
+            org.opencontainers.image.description=Postprod AI worker (WhisperX + pyannote + Piper TTS) for pa-webinar
+            org.opencontainers.image.source=https://github.com/italia/pa-webinar
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.ref.name=dev
 
@@ -245,7 +245,7 @@ jobs:
   # workflow_dispatch con force_recorder_build=true.
   detect-recorder-changes:
     name: Detect recorder changes
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     outputs:
       recorder_changed: ${{ steps.filter.outputs.recorder }}
     steps:
@@ -271,7 +271,7 @@ jobs:
     name: Build & Push Recorder Image
     needs: detect-recorder-changes
     if: needs.detect-recorder-changes.outputs.recorder_changed == 'true'
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       packages: write
@@ -309,9 +309,9 @@ jobs:
           cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-recorder' }}
           cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-recorder' }}
           labels: |
-            org.opencontainers.image.title=eventi-dtd-recorder
-            org.opencontainers.image.description=Multi-track per-participant audio recorder (Puppeteer + lib-jitsi-meet) for eventi-dtd
-            org.opencontainers.image.source=https://github.com/italia/eventi-dtd
+            org.opencontainers.image.title=pa-webinar-recorder
+            org.opencontainers.image.description=Multi-track per-participant audio recorder (Puppeteer + lib-jitsi-meet) for pa-webinar
+            org.opencontainers.image.source=https://github.com/italia/pa-webinar
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.ref.name=dev
 
@@ -328,7 +328,7 @@ jobs:
   # `infra/recorder-controller/` è cambiato, o force_recorder_controller_build=true.
   detect-recorder-controller-changes:
     name: Detect recorder-controller changes
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     outputs:
       changed: ${{ steps.filter.outputs.changed }}
     steps:
@@ -354,7 +354,7 @@ jobs:
     name: Build & Push Recorder Controller Image
     needs: detect-recorder-controller-changes
     if: needs.detect-recorder-controller-changes.outputs.changed == 'true'
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       packages: write
@@ -391,9 +391,9 @@ jobs:
           cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-recorder-controller' }}
           cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-recorder-controller' }}
           labels: |
-            org.opencontainers.image.title=eventi-dtd-recorder-controller
-            org.opencontainers.image.description=Reconciling operator that orchestrates recorder Jobs/containers (ADR-013) for eventi-dtd
-            org.opencontainers.image.source=https://github.com/italia/eventi-dtd
+            org.opencontainers.image.title=pa-webinar-recorder-controller
+            org.opencontainers.image.description=Reconciling operator that orchestrates recorder Jobs/containers (ADR-013) for pa-webinar
+            org.opencontainers.image.source=https://github.com/italia/pa-webinar
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.ref.name=dev
 

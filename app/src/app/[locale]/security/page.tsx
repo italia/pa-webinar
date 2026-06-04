@@ -18,7 +18,7 @@ export async function generateMetadata({
 export default async function SecurityPage() {
   const t = await getTranslations('legal.security');
   const settings = await getSettings();
-  const repoUrl = settings.githubUrl || 'https://github.com/italia/eventi-dtd';
+  const repoUrl = settings.githubUrl || 'https://github.com/italia/pa-webinar';
   const repoPath = repoUrl.replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, '');
   const scorecardBadge = `https://api.scorecard.dev/projects/github.com/${repoPath}/badge`;
   const scorecardViewer = `https://scorecard.dev/viewer/?uri=github.com/${repoPath}`;

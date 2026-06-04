@@ -7,7 +7,7 @@
     "remove": "Rimuovi"
   },
   "common": {
-    "appName": "Eventi DTD",
+    "appName": "PA Webinar",
     "appDescription": "Piattaforma per eventi pubblici digitali del Dipartimento per la Trasformazione Digitale",
     "loading": "Caricamento...",
     "error": "Si è verificato un errore",
@@ -2165,7 +2165,7 @@
     "privacy": {
       "metaTitle": "Informativa privacy",
       "title": "Informativa privacy",
-      "intro": "Questa pagina riassume il trattamento dei dati personali connesso all'uso della piattaforma Eventi DTD e alla partecipazione agli eventi pubblici ospitati.",
+      "intro": "Questa pagina riassume il trattamento dei dati personali connesso all'uso della piattaforma PA Webinar e alla partecipazione agli eventi pubblici ospitati.",
       "sections": {
         "controller": {
           "title": "Titolare del trattamento",
@@ -2212,7 +2212,7 @@
     "legalNotes": {
       "metaTitle": "Note legali",
       "title": "Note legali",
-      "intro": "L'accesso e l'utilizzo della piattaforma Eventi DTD avvengono nel rispetto delle presenti note, che descrivono le condizioni generali di utilizzo e le principali informazioni sul servizio.",
+      "intro": "L'accesso e l'utilizzo della piattaforma PA Webinar avvengono nel rispetto delle presenti note, che descrivono le condizioni generali di utilizzo e le principali informazioni sul servizio.",
       "sections": {
         "ownership": {
           "title": "Titolarita del servizio",

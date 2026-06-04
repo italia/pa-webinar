@@ -24,7 +24,7 @@ import {
 } from './labels.js';
 
 export interface DockerRunnerOptions {
-  /** Immagine del recorder (es. ghcr.io/italia/eventi-dtd-recorder:dev). */
+  /** Immagine del recorder (es. ghcr.io/italia/pa-webinar-recorder:dev). */
   image: string;
   /** Network a cui agganciare il container (per raggiungere il portale). */
   network?: string;

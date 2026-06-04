@@ -3,7 +3,7 @@
  *
  * Based on: https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-iframe/
  * These types are NOT exhaustive — they cover the commands and events
- * we actually use in eventi-dtd.
+ * we actually use in pa-webinar.
  */
 
 export interface JitsiMeetExternalAPIOptions {

@@ -49,10 +49,10 @@
     "component": {
       "bom-ref": "tenant:videocall-test",
       "type": "application",
-      "name": "eventi-dtd",
+      "name": "pa-webinar",
       "version": "0.3.44",
       "publisher": "Dipartimento per la Trasformazione Digitale",
-      "description": "Istanza eventi-dtd per il tenant videocall-test (ambiente di collaudo sul cluster AKS italynorth).",
+      "description": "Istanza pa-webinar per il tenant videocall-test (ambiente di collaudo sul cluster AKS italynorth).",
       "scope": "required",
       "licenses": [
         {
@@ -65,7 +65,7 @@
       "externalReferences": [
         {
           "type": "vcs",
-          "url": "https://github.com/italia/eventi-dtd"
+          "url": "https://github.com/italia/pa-webinar"
         },
         {
           "type": "website",
@@ -73,7 +73,7 @@
         },
         {
           "type": "release-notes",
-          "url": "https://github.com/italia/eventi-dtd/releases"
+          "url": "https://github.com/italia/pa-webinar/releases"
         },
         {
           "type": "bom",
@@ -83,38 +83,38 @@
     },
     "properties": [
       {
-        "name": "eventi-dtd:tenant",
+        "name": "pa-webinar:tenant",
         "value": "videocall-test"
       },
       {
-        "name": "eventi-dtd:environment",
+        "name": "pa-webinar:environment",
         "value": "test"
       },
       {
-        "name": "eventi-dtd:cloud-provider",
+        "name": "pa-webinar:cloud-provider",
         "value": "Microsoft Azure"
       },
       {
-        "name": "eventi-dtd:region",
+        "name": "pa-webinar:region",
         "value": "italynorth"
       },
       {
-        "name": "eventi-dtd:kubernetes-version",
+        "name": "pa-webinar:kubernetes-version",
         "value": "v1.34.4"
       },
       {
-        "name": "eventi-dtd:deployment-mode",
+        "name": "pa-webinar:deployment-mode",
         "value": "standard"
       },
       {
-        "name": "eventi-dtd:helm-chart",
-        "value": "eventi-dtd-0.1.1"
+        "name": "pa-webinar:helm-chart",
+        "value": "pa-webinar-0.1.1"
       }
     ]
   },
   "components": [
     {
-      "bom-ref": "pkg:oci/eventi-dtd",
+      "bom-ref": "pkg:oci/pa-webinar",
       "type": "container",
       "publisher": "Dipartimento per la Trasformazione Digitale",
       "supplier": {
@@ -126,9 +126,9 @@
       "manufacturer": {
         "name": "Italia DTD"
       },
-      "name": "eventi-dtd",
+      "name": "pa-webinar",
       "version": "0.3.44",
-      "purl": "pkg:oci/italia/eventi-dtd@sha256:185e0a4c1ac8daf974687dd1560dd403b1985b180cd337058524534ecfe52c23?repository_url=ghcr.io",
+      "purl": "pkg:oci/italia/pa-webinar@sha256:185e0a4c1ac8daf974687dd1560dd403b1985b180cd337058524534ecfe52c23?repository_url=ghcr.io",
       "description": "Immagine OCI dell'applicazione Next.js. Base: Debian 12 slim.",
       "scope": "required",
       "hashes": [
@@ -147,21 +147,21 @@
       "externalReferences": [
         {
           "type": "vcs",
-          "url": "https://github.com/italia/eventi-dtd"
+          "url": "https://github.com/italia/pa-webinar"
         },
         {
           "type": "distribution",
-          "url": "https://ghcr.io/italia/eventi-dtd"
+          "url": "https://ghcr.io/italia/pa-webinar"
         }
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "app"
         },
         {
-          "name": "eventi-dtd:stack-label",
-          "value": "eventi-dtd (Next.js)"
+          "name": "pa-webinar:stack-label",
+          "value": "pa-webinar (Next.js)"
         }
       ]
     },
@@ -202,11 +202,11 @@
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "app"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Jitsi Web"
         }
       ]
@@ -239,11 +239,11 @@
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "app"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Jitsi Prosody (XMPP)"
         }
       ]
@@ -276,11 +276,11 @@
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "app"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Jitsi Jicofo (focus)"
         }
       ]
@@ -308,11 +308,11 @@
       "description": "Video Bridge. Digest catturato dinamicamente dai pod JVB quando scalano da zero.",
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "app"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Jitsi JVB (SFU)"
         }
       ]
@@ -670,31 +670,31 @@
           "value": "ISO 27001, ISO 27017, ISO 27018, SOC 1/2/3, HIPAA, PCI DSS, AgID Circolare 2/2018 (cloud qualificato)"
         },
         {
-          "name": "eventi-dtd:node-pools",
+          "name": "pa-webinar:node-pools",
           "value": "system, jitsi-jvb, jitsi-jibri"
         },
         {
-          "name": "eventi-dtd:node-pool.app.provisioning-model",
+          "name": "pa-webinar:node-pool.app.provisioning-model",
           "value": "spot"
         },
         {
-          "name": "eventi-dtd:node-pool.app.availability-impact",
+          "name": "pa-webinar:node-pool.app.availability-impact",
           "value": "interruptible — i nodi spot possono essere revocati da Azure con 30s di preavviso; accettabile in ambiente di collaudo, in produzione si useranno VM regular con SLA garantito."
         },
         {
-          "name": "eventi-dtd:node-pool.jitsi-jvb.provisioning-model",
+          "name": "pa-webinar:node-pool.jitsi-jvb.provisioning-model",
           "value": "regular (scale-to-zero)"
         },
         {
-          "name": "eventi-dtd:node-pool.jitsi-jibri.provisioning-model",
+          "name": "pa-webinar:node-pool.jitsi-jibri.provisioning-model",
           "value": "regular (scale-to-zero)"
         },
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "platform"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "AKS (italynorth)"
         }
       ]
@@ -748,19 +748,19 @@
           "value": "geo-redundant, 7 giorni"
         },
         {
-          "name": "eventi-dtd:retention-days",
+          "name": "pa-webinar:retention-days",
           "value": "30 (videocall-test)"
         },
         {
-          "name": "eventi-dtd:pii-encryption",
+          "name": "pa-webinar:pii-encryption",
           "value": "application-layer AES-256-GCM (chiave in Kubernetes Secret, non visibile al servizio gestito)"
         },
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "data"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Postgres Flexible"
         }
       ]
@@ -805,19 +805,19 @@
           "value": "Microsoft-managed keys (MSKM), AES-256"
         },
         {
-          "name": "eventi-dtd:retention-days",
+          "name": "pa-webinar:retention-days",
           "value": "90"
         },
         {
-          "name": "eventi-dtd:access-pattern",
+          "name": "pa-webinar:access-pattern",
           "value": "SAS URL pre-signed per upload (Jibri) e download (cittadini autenticati)"
         },
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "data"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Azure Blob (recordings)"
         }
       ]
@@ -864,19 +864,19 @@
           "value": "https://www.mailgun.com/legal/dpa/"
         },
         {
-          "name": "eventi-dtd:sender-domain",
+          "name": "pa-webinar:sender-domain",
           "value": "videocall-test.innovazione.gov.it"
         },
         {
-          "name": "eventi-dtd:credentials-rotation",
+          "name": "pa-webinar:credentials-rotation",
           "value": "manuale, secret riutilizzato da plebiscitum-test"
         },
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "platform"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Mailgun EU (SMTP)"
         }
       ]
@@ -890,7 +890,7 @@
         ]
       },
       "name": "GitHub Container Registry",
-      "description": "Registry OCI da cui AKS pull-a l'immagine eventi-dtd. Autenticazione tramite pull secret kubernetes ghcr-secret.",
+      "description": "Registry OCI da cui AKS pull-a l'immagine pa-webinar. Autenticazione tramite pull secret kubernetes ghcr-secret.",
       "endpoints": [
         "https://ghcr.io"
       ],
@@ -904,11 +904,11 @@
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "platform"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "GHCR (container registry)"
         }
       ]
@@ -919,9 +919,9 @@
         "name": "GitHub, Inc. (Microsoft)"
       },
       "name": "GitHub (source & CI/CD)",
-      "description": "Repository sorgente italia/eventi-dtd e pipeline GitHub Actions che produce le immagini :dev e :release e pubblica SBOM alla release. La catena di fornitura del software parte qui.",
+      "description": "Repository sorgente italia/pa-webinar e pipeline GitHub Actions che produce le immagini :dev e :release e pubblica SBOM alla release. La catena di fornitura del software parte qui.",
       "endpoints": [
-        "https://github.com/italia/eventi-dtd"
+        "https://github.com/italia/pa-webinar"
       ],
       "authenticated": false,
       "x-trust-boundary": true,
@@ -934,16 +934,16 @@
       "externalReferences": [
         {
           "type": "build-system",
-          "url": "https://github.com/italia/eventi-dtd/actions"
+          "url": "https://github.com/italia/pa-webinar/actions"
         }
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "platform"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "GitHub · CI/CD"
         }
       ]
@@ -960,11 +960,11 @@
       "x-trust-boundary": false,
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "access"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "ingress-nginx"
         }
       ]
@@ -981,11 +981,11 @@
       "x-trust-boundary": false,
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "access"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "cert-manager"
         }
       ]
@@ -1013,11 +1013,11 @@
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "access"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Let’s Encrypt"
         }
       ]
@@ -1041,11 +1041,11 @@
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "data"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Redis (in-cluster)"
         }
       ]
@@ -1072,11 +1072,11 @@
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "access"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "coturn (TURN/STUN)"
         }
       ]
@@ -1099,11 +1099,11 @@
       ],
       "properties": [
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "platform"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "kube-prometheus-stack"
         }
       ]
@@ -1111,7 +1111,7 @@
     {
       "bom-ref": "svc:multitrack-recorder",
       "provider": {
-        "name": "self-hosted (eventi-dtd, in-cluster)"
+        "name": "self-hosted (pa-webinar, in-cluster)"
       },
       "name": "Multitrack Recorder (speaker attribution)",
       "description": "[PIANIFICATO — non ancora operativo nel cluster; codice in infra/recorder/, core WebRTC e deploy da completare] Servizio in-cluster che cattura una traccia audio isolata per partecipante (RecordingTrack) e la fornisce al worker di trascrizione per attribuire il transcript al relatore corretto. Diverso dall'audio misto del recording standard: la traccia individuale e' un dato personale ad alta sensibilita' (vicino al biometrico vocale, art. 9 GDPR se usato per identificazione). Non clona ne' identifica la voce: produce solo testo attribuito. Vedi docs/adr/013-multitrack-speaker-attribution.md e docs/POSTPROD.md.",
@@ -1127,44 +1127,44 @@
       "externalReferences": [
         {
           "type": "documentation",
-          "url": "https://github.com/italia/eventi-dtd/blob/main/docs/adr/013-multitrack-speaker-attribution.md"
+          "url": "https://github.com/italia/pa-webinar/blob/main/docs/adr/013-multitrack-speaker-attribution.md"
         },
         {
           "type": "documentation",
-          "url": "https://github.com/italia/eventi-dtd/blob/main/docs/GDPR.md"
+          "url": "https://github.com/italia/pa-webinar/blob/main/docs/GDPR.md"
         }
       ],
       "properties": [
         {
-          "name": "eventi-dtd:status",
+          "name": "pa-webinar:status",
           "value": "planned — non ancora deployato (vedi ADR-013 Fase 3)"
         },
         {
-          "name": "eventi-dtd:gdpr-legal-basis",
+          "name": "pa-webinar:gdpr-legal-basis",
           "value": "art. 6.1.a (consenso esplicito), distinto da consentRecording"
         },
         {
-          "name": "eventi-dtd:data-minimization",
+          "name": "pa-webinar:data-minimization",
           "value": "traccia = input intermedio; blob purgato dopo trascrizione (RecordingTrack.audioPurgedAt)"
         },
         {
-          "name": "eventi-dtd:retention-days",
+          "name": "pa-webinar:retention-days",
           "value": "ore (purga post-trascrizione), molto piu' breve del transcript"
         },
         {
-          "name": "eventi-dtd:access-pattern",
+          "name": "pa-webinar:access-pattern",
           "value": "blob mai pubblico; solo worker via signed URL a breve scadenza; displayName cifrato AES-256-GCM"
         },
         {
-          "name": "eventi-dtd:not-biometric",
+          "name": "pa-webinar:not-biometric",
           "value": "nessun voiceprint o modello vocale: solo speech-to-text attribuito"
         },
         {
-          "name": "eventi-dtd:layer",
+          "name": "pa-webinar:layer",
           "value": "app"
         },
         {
-          "name": "eventi-dtd:stack-label",
+          "name": "pa-webinar:stack-label",
           "value": "Multitrack Recorder (AI speaker attribution)"
         }
       ]
@@ -1174,7 +1174,7 @@
     {
       "ref": "tenant:videocall-test",
       "dependsOn": [
-        "pkg:oci/eventi-dtd",
+        "pkg:oci/pa-webinar",
         "pkg:oci/jitsi-web",
         "pkg:oci/jitsi-prosody",
         "pkg:oci/jitsi-jicofo",
@@ -1202,7 +1202,7 @@
       ]
     },
     {
-      "ref": "pkg:oci/eventi-dtd",
+      "ref": "pkg:oci/pa-webinar",
       "dependsOn": [
         "pkg:deb/debian/debian@12",
         "pkg:npm/next@15.5.15",
@@ -1220,7 +1220,7 @@
       "bom-ref": "comp:dev-components-incomplete",
       "aggregate": "incomplete_first_party_only",
       "assemblies": [
-        "pkg:oci/eventi-dtd"
+        "pkg:oci/pa-webinar"
       ],
       "description": "L'elenco npm visibile è quello delle dipendenze dirette più significative (7 pacchetti). L'immagine runtime risolve circa 800 pacchetti inclusi i transitive. Un SBOM completo sarà generato a ogni release da cdxgen + syft e pubblicato come allegato GitHub Release."
     },
@@ -1308,7 +1308,7 @@
       {
         "bom-ref": "claim:open-source",
         "target": "tenant:videocall-test",
-        "predicate": "Il codice sorgente della piattaforma è pubblicato con licenza AGPL-3.0-only ed è auditabile da chiunque su github.com/italia/eventi-dtd.",
+        "predicate": "Il codice sorgente della piattaforma è pubblicato con licenza AGPL-3.0-only ed è auditabile da chiunque su github.com/italia/pa-webinar.",
         "evidence": [
           "evidence:repo"
         ]
@@ -1365,7 +1365,7 @@
           {
             "contents": {
               "attachment": {
-                "content": "https://github.com/italia/eventi-dtd",
+                "content": "https://github.com/italia/pa-webinar",
                 "contentType": "text/uri-list"
               }
             }
@@ -1383,7 +1383,7 @@
           {
             "contents": {
               "attachment": {
-                "content": "https://github.com/italia/eventi-dtd/releases/latest",
+                "content": "https://github.com/italia/pa-webinar/releases/latest",
                 "contentType": "text/uri-list"
               }
             }
@@ -1396,10 +1396,10 @@
       }
     ],
     "affirmation": {
-      "statement": "Il Dipartimento per la Trasformazione Digitale attesta che le informazioni contenute in questo documento riflettono, al meglio delle conoscenze del team al 2026-04-21, la composizione software e operativa dell'istanza videocall-test della piattaforma eventi-dtd.",
+      "statement": "Il Dipartimento per la Trasformazione Digitale attesta che le informazioni contenute in questo documento riflettono, al meglio delle conoscenze del team al 2026-04-21, la composizione software e operativa dell'istanza videocall-test della piattaforma pa-webinar.",
       "signatories": [
         {
-          "name": "Team Piattaforma Eventi DTD",
+          "name": "Team Piattaforma PA Webinar",
           "role": "Responsabile tecnico",
           "organization": {
             "name": "Dipartimento per la Trasformazione Digitale"
@@ -1415,9 +1415,9 @@
         {
           "bom-ref": "formulation:helm-chart",
           "type": "application",
-          "name": "eventi-dtd Helm chart",
+          "name": "pa-webinar Helm chart",
           "version": "0.1.1",
-          "description": "Chart OSS pubblicato in infra/helm/eventi-dtd del repo italia/eventi-dtd."
+          "description": "Chart OSS pubblicato in infra/helm/pa-webinar del repo italia/pa-webinar."
         },
         {
           "bom-ref": "formulation:values",
@@ -1431,7 +1431,7 @@
           "bom-ref": "formulation:ci-dev-build",
           "uid": "github-actions/dev.yml",
           "name": "Build & Push Dev Image",
-          "description": "Pipeline GitHub Actions che costruisce l'immagine :dev ad ogni push sul branch dev e la pubblica su ghcr.io/italia/eventi-dtd:dev.",
+          "description": "Pipeline GitHub Actions che costruisce l'immagine :dev ad ogni push sul branch dev e la pubblica su ghcr.io/italia/pa-webinar:dev.",
           "taskTypes": [
             "build",
             "release"
@@ -1461,7 +1461,7 @@
         }
       },
       "timestamp": "2026-04-21T11:15:00Z",
-      "text": "Questo documento è un esempio di Service Inventory per un'istanza eventi-dtd, pensato per mostrare come CycloneDX 1.6 modella sia le dipendenze software (components[]) sia i servizi del provider (services[]) in un unico artefatto. Le sezioni declarations[], compositions[], vulnerabilities[] e formulation[] illustrano i livelli di trasparenza richiesti dalla normativa italiana ed europea per i servizi erogati alla Pubblica Amministrazione. Nella produzione reale la parte DEV sarà rigenerata automaticamente in CI, la parte OPS da un job che interroga Azure Resource Graph, e l'intero BOM sarà firmato con cosign e pubblicato come artefatto versionato."
+      "text": "Questo documento è un esempio di Service Inventory per un'istanza pa-webinar, pensato per mostrare come CycloneDX 1.6 modella sia le dipendenze software (components[]) sia i servizi del provider (services[]) in un unico artefatto. Le sezioni declarations[], compositions[], vulnerabilities[] e formulation[] illustrano i livelli di trasparenza richiesti dalla normativa italiana ed europea per i servizi erogati alla Pubblica Amministrazione. Nella produzione reale la parte DEV sarà rigenerata automaticamente in CI, la parte OPS da un job che interroga Azure Resource Graph, e l'intero BOM sarà firmato con cosign e pubblicato come artefatto versionato."
     }
   ]
 }

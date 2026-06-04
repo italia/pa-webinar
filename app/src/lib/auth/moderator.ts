@@ -41,7 +41,7 @@ export function extractModeratorToken(request: Request): string | null {
   if (queryToken && !warnedQueryToken) {
     warnedQueryToken = true;
     console.warn(
-      `[eventi-dtd] Moderator/access token received via ?token= query ` +
+      `[pa-webinar] Moderator/access token received via ?token= query ` +
         `parameter on ${url.pathname}. Prefer Authorization: Bearer for ` +
         `API calls — URL tokens leak to access logs and browser history.`,
     );

@@ -1,4 +1,4 @@
-# Deployment Guide — eventi-dtd
+# Deployment Guide — pa-webinar
 
 ## Modalita di deployment
 
@@ -29,7 +29,7 @@ Tutto nel cluster, nessuna dipendenza esterna. Ideale per valutare la piattaform
 kubectl create namespace videocall
 
 # 2. Installa
-helm upgrade --install videocall ./infra/helm/eventi-dtd \
+helm upgrade --install videocall ./infra/helm/pa-webinar \
   -f examples/values-simple.yaml \
   -n videocall \
   --set postgresql.auth.password="$(openssl rand -hex 16)" \
@@ -54,14 +54,14 @@ Database esterno, JVB e Jibri attivi, HPA sull'app.
 # 1. Crea namespace e segreti
 kubectl create namespace videocall
 kubectl create secret generic videocall-secrets -n videocall \
-  --from-literal=DATABASE_URL="postgresql://user:pass@db-host:5432/eventi_dtd?sslmode=require" \
+  --from-literal=DATABASE_URL="postgresql://user:pass@db-host:5432/pa_webinar?sslmode=require" \
   --from-literal=APP_SECRET="$(openssl rand -hex 32)" \
   --from-literal=JITSI_JWT_SECRET="$(openssl rand -hex 32)" \
   --from-literal=PII_ENCRYPTION_KEY="$(openssl rand -hex 32)" \
   --from-literal=CRON_API_KEY="$(openssl rand -hex 32)" \
   --from-literal=ADMIN_API_KEY="$(openssl rand -hex 32)" \
-  --from-literal=JITSI_JWT_APP_ID="eventi_dtd" \
-  --from-literal=JITSI_JWT_ISSUER="eventi-dtd" \
+  --from-literal=JITSI_JWT_APP_ID="pa_webinar" \
+  --from-literal=JITSI_JWT_ISSUER="pa-webinar" \
   --from-literal=JITSI_JWT_AUDIENCE="jitsi" \
   --from-literal=SMTP_HOST="smtp.eu.mailgun.org" \
   --from-literal=SMTP_PORT="587" \
@@ -72,7 +72,7 @@ kubectl create secret generic videocall-secrets -n videocall \
   --from-literal=SMTP_FROM_NAME="Eventi PA"
 
 # 2. Installa
-helm upgrade --install videocall ./infra/helm/eventi-dtd \
+helm upgrade --install videocall ./infra/helm/pa-webinar \
   -f examples/values-standard.yaml \
   -n videocall \
   --set app.env.NEXT_PUBLIC_APP_URL=https://videocall.tuodominio.com \
@@ -104,7 +104,7 @@ kubectl create namespace videocall
 kubectl create secret generic videocall-secrets -n videocall --from-literal=...
 
 # 2. Installa
-helm upgrade --install videocall ./infra/helm/eventi-dtd \
+helm upgrade --install videocall ./infra/helm/pa-webinar \
   -f examples/values-full.yaml \
   -n videocall \
   --set app.env.NEXT_PUBLIC_APP_URL=https://videocall.tuodominio.com \
@@ -335,7 +335,7 @@ git tag -a v0.3.0 -m "v0.3.0"
 git push origin v0.3.0
 
 # 2. Aggiorna il deployment
-helm upgrade videocall ./infra/helm/eventi-dtd \
+helm upgrade videocall ./infra/helm/pa-webinar \
   -f examples/values-full.yaml \  # o il tuo file di override
   -n videocall \
   --set app.image.tag=v0.3.0
@@ -499,7 +499,7 @@ Il JSON su Redis ha la shape documentata in `app/src/lib/jvb-snapshot.ts` (`JvbS
 
 ### Alternativa KEDA
 
-Per cluster già con KEDA installato, un esempio di `ScaledObject` è in `infra/helm/eventi-dtd/examples/keda-jvb-scaler.yaml`. Il CronJob resta comunque utile perché KEDA non fa il fan-out `/colibri/stats` cross-pod né chiude le `CallSession`.
+Per cluster già con KEDA installato, un esempio di `ScaledObject` è in `infra/helm/pa-webinar/examples/keda-jvb-scaler.yaml`. Il CronJob resta comunque utile perché KEDA non fa il fan-out `/colibri/stats` cross-pod né chiude le `CallSession`.
 
 ## Configurazione registrazione video (Jibri)
 
@@ -649,7 +649,7 @@ metrics:
       release: kube-prometheus-stack
 ```
 
-Alert inclusi: `EventiDtdDown`, `EventiDtdHighLatency`, `EventiDtdHighErrorRate`, `EventiDtdDatabaseDown`, `JvbHighStress`, `JvbScalingStuck`, `JibriUnavailable`, `HighEventLoopLag`.
+Alert inclusi: `PaWebinarDown`, `PaWebinarHighLatency`, `PaWebinarHighErrorRate`, `PaWebinarDatabaseDown`, `JvbHighStress`, `JvbScalingStuck`, `JibriUnavailable`, `HighEventLoopLag`.
 
 #### Abilitare Grafana Dashboard (auto-import via sidecar)
 
@@ -657,12 +657,12 @@ Alert inclusi: `EventiDtdDown`, `EventiDtdHighLatency`, `EventiDtdHighErrorRate`
 metrics:
   grafanaDashboard:
     enabled: true
-    folder: "eventi-dtd"
+    folder: "pa-webinar"
 ```
 
 La dashboard viene caricata automaticamente se il sidecar Grafana è configurato per leggere ConfigMap con label `grafana_dashboard: "1"`.
 
-Per l'import manuale: il file JSON è in `infra/grafana/eventi-dtd-dashboard.json`.
+Per l'import manuale: il file JSON è in `infra/grafana/pa-webinar-dashboard.json`.
 
 #### Prometheus URL per monitoring avanzato
 
