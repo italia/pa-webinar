@@ -223,7 +223,7 @@ services:
       - CRON_API_KEY=dev_cron_key_change_in_production
       # Immagine del bot recorder che il controller avvia (pull da GHCR o
       # build locale: docker build -t pa-webinar-recorder:local infra/recorder).
-      - RECORDER_IMAGE=ghcr.io/italia/eventi-dtd-recorder:dev
+      - RECORDER_IMAGE=ghcr.io/italia/pa-webinar-recorder:dev
       - PORT=8080
       # Network compose a cui agganciare i container recorder, così
       # raggiungono `app` e `jitsi-web`. Default = network di default del

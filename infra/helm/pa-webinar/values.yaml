@@ -23,7 +23,7 @@ app:
 
   image:
     # Container image registry/repository
-    repository: ghcr.io/italia/eventi-dtd
+    repository: ghcr.io/italia/pa-webinar
     # Image tag — defaults to Chart.appVersion if empty
     tag: ""
     pullPolicy: IfNotPresent
@@ -35,7 +35,7 @@ app:
   #   docker build --target builder -t <repo>:<tag>-migrate .
   migration:
     image:
-      repository: ghcr.io/italia/eventi-dtd
+      repository: ghcr.io/italia/pa-webinar
       tag: ""  # Defaults to Chart.appVersion + "-migrate" suffix
       pullPolicy: IfNotPresent
 
@@ -835,7 +835,7 @@ postprod:
   # spec defined here (image, nodeSelector, tolerations, resources).
   worker:
     enabled: true
-    image: ghcr.io/italia/eventi-dtd-postprod-worker:dev
+    image: ghcr.io/italia/pa-webinar-postprod-worker:dev
     imagePullPolicy: IfNotPresent
     # Pull credentials for the (private) worker image. The worker lands
     # on a fresh scale-from-zero GPU node with no cached image, so it
@@ -914,7 +914,7 @@ recorder:
 
   # Immagine del bot recorder (Puppeteer + lib-jitsi-meet, un'audio-track per
   # partecipante). Gira sul pool NORMALE, non GPU.
-  image: ghcr.io/italia/eventi-dtd-recorder:dev
+  image: ghcr.io/italia/pa-webinar-recorder:dev
   imagePullPolicy: IfNotPresent
   imagePullSecrets: []
   # Dominio Jitsi per il bot; se vuoto usa app.env.NEXT_PUBLIC_JITSI_DOMAIN.
@@ -936,7 +936,7 @@ recorder:
   # Operator riconciliante (pod fisso) che orchestra i Job recorder.
   controller:
     enabled: true
-    image: ghcr.io/italia/eventi-dtd-recorder-controller:dev
+    image: ghcr.io/italia/pa-webinar-recorder-controller:dev
     imagePullPolicy: IfNotPresent
     imagePullSecrets: []
     port: 8080
