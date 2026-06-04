@@ -23,6 +23,7 @@ import sys
 import tempfile
 from typing import Any, Dict, List, Optional
 
+from . import align as almod
 from . import client as cli
 from . import llm as llmmod
 from . import multitrack as mtmod
@@ -202,6 +203,21 @@ def run_transcribe_multitrack(app: cli.AppClient, job: cli.ClaimResponse) -> Non
         track_results: List[Dict[str, Any]] = []
         detected_lang = src_lang
         total = len(track_inputs)
+
+        # Opzione C — allineamento preciso al mix Jibri. Best-effort: se il
+        # mix (sourceDownloadUrl = recording.blobKey) è disponibile, lo
+        # scarichiamo una volta per raffinare gli offset via cross-correlazione;
+        # altrimenti restiamo sugli offset wall-clock del manifest.
+        mix_path: Optional[str] = None
+        if not stub and getattr(job, "sourceDownloadUrl", None):
+            try:
+                cand = os.path.join(workdir, "mix.media")
+                cli.download_to_file(job.sourceDownloadUrl, cand)
+                if os.path.getsize(cand) > 0:
+                    mix_path = cand
+            except Exception:  # noqa: BLE001 — mix opzionale (Jibri assente)
+                log.info("mix Jibri non disponibile: uso gli offset del manifest")
+
         for idx, ti in enumerate(track_inputs):
             audio_path = os.path.join(workdir, f"track-{idx}.audio")
             cli.download_to_file(ti.downloadUrl, audio_path)
@@ -220,11 +236,26 @@ def run_transcribe_multitrack(app: cli.AppClient, job: cli.ClaimResponse) -> Non
                     initial_prompt=job.providerHints.asrInitialPrompt,
                 )
             detected_lang = tres.get("language") or detected_lang
+
+            # Offset: parti dal manifest, poi raffina col mix se disponibile.
+            offset_ms = ti.startOffsetMs or 0
+            if mix_path is not None:
+                refined = almod.estimate_track_offset_ms(
+                    audio_path, mix_path, prior_ms=offset_ms,
+                )
+                if refined is not None:
+                    new_off, conf = refined
+                    log.info(
+                        "track %d offset raffinato: %d→%d ms (conf=%.2f)",
+                        idx, offset_ms, new_off, conf,
+                    )
+                    offset_ms = new_off
+
             track_results.append(
                 {
                     "participant_id": ti.participantId or f"track-{idx}",
                     "display_name": ti.displayName,
-                    "start_offset_ms": ti.startOffsetMs or 0,
+                    "start_offset_ms": offset_ms,
                     "segments": tres.get("segments") or [],
                 }
             )
