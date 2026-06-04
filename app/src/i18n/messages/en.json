@@ -540,7 +540,9 @@
           "recording": "Recording",
           "recordingAuto": "On — auto-start",
           "recordingManual": "On — manual start",
-          "recordingOff": "Off"
+          "recordingOff": "Off",
+          "multitrack": "Per-participant recording",
+          "multitrackOn": "On — requires explicit consent at registration"
         },
         "noRecurrence": "One-off event",
         "gdprHeading": "Privacy and data retention",

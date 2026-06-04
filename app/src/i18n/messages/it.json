@@ -610,7 +610,9 @@
           "recording": "Registrazione",
           "recordingAuto": "Attiva — avvio automatico",
           "recordingManual": "Attiva — avvio manuale",
-          "recordingOff": "Non attiva"
+          "recordingOff": "Non attiva",
+          "multitrack": "Registrazione per-partecipante",
+          "multitrackOn": "Attiva — richiede consenso esplicito in registrazione"
         },
         "noRecurrence": "Evento singolo",
         "gdprHeading": "Privacy e conservazione dati",
