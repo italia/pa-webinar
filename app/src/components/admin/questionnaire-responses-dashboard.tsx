@@ -155,7 +155,7 @@ function QuestionnaireCard({ row }: { row: Row }) {
       <CardBody className="p-4">
         <div className="d-flex justify-content-between flex-wrap gap-2 mb-3">
           <div>
-            <h5 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+            <h5 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
               {eventTitle}
             </h5>
             <div className="text-muted small">
@@ -217,7 +217,7 @@ function ItemSummary({ item }: { item: ItemAgg }) {
             <div className="text-muted small">Nessuna risposta.</div>
           ) : (
             summary.samples.map((s, i) => (
-              <div key={i} className="border-start border-2 ps-2 small" style={{ borderColor: '#0066CC' }}>
+              <div key={i} className="border-start border-2 ps-2 small" style={{ borderColor: 'var(--app-primary)' }}>
                 {s}
               </div>
             ))
@@ -244,7 +244,7 @@ function Bars({ bars, total }: { bars: { label: string; count: number }[]; total
                 style={{
                   width: `${pct}%`,
                   height: '100%',
-                  backgroundColor: '#0066CC',
+                  backgroundColor: 'var(--app-primary)',
                   borderRadius: 4,
                 }}
               />

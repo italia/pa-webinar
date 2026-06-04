@@ -101,6 +101,16 @@ function CenterHeader({
           </HeaderBrand>
         )}
         <HeaderRightZone>
+          {/* Archivio registrazioni pubblico: prima era raggiungibile solo
+              dal footer → poco scopribile. Esposto in header su ogni pagina. */}
+          <Link
+            href="/video-library"
+            className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
+            style={{ fontSize: '0.9rem' }}
+          >
+            <Icon icon="it-video" size="sm" color="white" />
+            <span className="d-none d-md-inline">{t('videoLibrary')}</span>
+          </Link>
           {isAdmin && (
             <Link
               href="/admin"

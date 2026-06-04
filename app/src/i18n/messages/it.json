@@ -667,7 +667,8 @@
       "eventMaterials": "Materiali",
       "eventQuestionnaires": "Questionari",
       "rubricaList": "Elenco",
-      "rubricaDetail": "Dettaglio"
+      "rubricaDetail": "Dettaglio",
+      "recordingsPostprod": "Trascrizioni / AI"
     },
     "landing": {
       "title": "Pannello di amministrazione",
@@ -765,7 +766,8 @@
           "dateRequired": "La data originale è obbligatoria.",
           "saveFailed": "Salvataggio metadati non riuscito."
         }
-      }
+      },
+      "updateFailed": "Aggiornamento non riuscito."
     },
     "recordingsLibrary": {
       "title": "Registrazioni video",
@@ -834,7 +836,10 @@
       "detailEnd": "Fine",
       "detailModerator": "Moderatore",
       "detailRoom": "Stanza Jitsi",
-      "detailFilename": "Nome file"
+      "detailFilename": "Nome file",
+      "transcriptManage": "Gestisci trascrizione / AI",
+      "transcriptReady": "Trascritto",
+      "transcriptProcessing": "In elab."
     },
     "gdprAudit": {
       "title": "Audit GDPR",
@@ -1548,7 +1553,8 @@
       },
       "errors": {
         "saveFailed": "Salvataggio non riuscito. Verifica i dati e riprova."
-      }
+      },
+      "deleteTitle": "Elimina template"
     },
     "emailTemplates": {
       "title": "Template email",
@@ -1729,7 +1735,8 @@
       "play": "Riproduci",
       "hidePlayer": "Nascondi player",
       "download": "Scarica",
-      "deleteConfirm": "Eliminare questa sessione e la registrazione associata?"
+      "deleteConfirm": "Eliminare questa sessione e la registrazione associata?",
+      "deleteTitle": "Elimina sessione"
     },
     "monitoring": {
       "title": "Monitoraggio",
@@ -1890,7 +1897,8 @@
         "settings": "Impostazioni",
         "people": "Persone",
         "content": "Contenuti",
-        "audit": "Registrazioni & Audit"
+        "audit": "Registrazioni & Audit",
+        "postEvent": "Post-evento"
       },
       "toggles": {
         "unmute": "Partecipanti possono parlare",
@@ -1912,7 +1920,11 @@
         "postEventSummary": "{connected} connessi su {registered} registrazioni (stimate {estimated})",
         "estimatedAttendance": "Stimati: {estimated} partecipanti"
       },
-      "copyGuestUrl": "Copia link per ospiti"
+      "copyGuestUrl": "Copia link per ospiti",
+      "aiManageTitle": "Trascrizione, sintesi e traduzioni",
+      "aiManageDesc": "Gestisci la post-produzione AI di questa registrazione: correggi la trascrizione e l'assegnazione dei relatori (chi dice cosa), modifica la sintesi e gestisci le lingue di traduzione.",
+      "aiManageCta": "Apri la gestione post-produzione",
+      "aiManageNotEnded": "Disponibile a evento concluso, quando la registrazione è stata elaborata dalla pipeline AI."
     },
     "rubrica": {
       "title": "Rubrica",
@@ -1970,7 +1982,18 @@
       "editDirty": "{n, plural, one {1 modifica non salvata} other {# modifiche non salvate}}",
       "editSaved": "Salvato: {text} testi, {speaker} speaker.",
       "editFailed": "Salvataggio fallito (HTTP {code})",
-      "editSeek": "Vai a questo punto del video"
+      "editSeek": "Vai a questo punto del video",
+      "manageTabTranscript": "Trascrizione",
+      "manageTabSummary": "Sintesi",
+      "manageTabTranslations": "Traduzioni",
+      "manageBackToList": "Tutte le registrazioni",
+      "manageDuration": "Durata",
+      "manageSource": "Lingua sorgente",
+      "manageOpenPublic": "Pagina pubblica",
+      "manageRerunOk": "Pipeline rilanciata.",
+      "manageOpen": "Gestisci",
+      "cancelConfirmTitle": "Annulla post-produzione",
+      "speakerUpdateSuccess": "Speaker aggiornato"
     },
     "questionnairesPage": {
       "title": "Questionari",
@@ -2752,7 +2775,9 @@
       },
       "runAt": "Elaborazione completata il",
       "version": "Versione pipeline"
-    }
+    },
+    "overlapBadge": "simultaneo",
+    "overlapTitle": "Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente."
   },
   "diagram": {
     "title": "Configurazione evento",
@@ -2858,7 +2883,11 @@
     "notConfigured": "Jibri non è configurato nell'infrastruttura. La registrazione video non è disponibile.",
     "disabledHint": "La registrazione video non è abilitata per questo evento. Per attivarla, apri la sezione Impostazioni più in alto e accendi il toggle \"Registrazione\".",
     "play": "Riproduci",
-    "download": "Scarica"
+    "download": "Scarica",
+    "transcriptManage": "Trascrizione / AI",
+    "deleteConfirmTitle": "Elimina registrazione",
+    "deleteFailed": "Eliminazione non riuscita",
+    "deleteSuccess": "Registrazione eliminata"
   },
   "postEvent": {
     "config": "Configurazione post-evento",

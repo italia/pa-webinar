@@ -17,7 +17,7 @@ interface PostEventQAProps {
 
 const STATUS_COLOR: Record<string, string> = {
   ANSWERED: '#008758',
-  HIGHLIGHTED: '#0066CC',
+  HIGHLIGHTED: 'var(--app-primary)',
 };
 
 export default function PostEventQA({ questions }: PostEventQAProps) {
@@ -41,7 +41,7 @@ export default function PostEventQA({ questions }: PostEventQAProps) {
         >
           <CardBody className="p-3">
             <div className="d-flex justify-content-between align-items-start mb-2">
-              <span className="fw-semibold" style={{ fontSize: '0.85rem', color: '#5A768A' }}>
+              <span className="fw-semibold" style={{ fontSize: '0.85rem', color: 'var(--app-muted)' }}>
                 {q.authorName}
               </span>
               <div className="d-flex align-items-center gap-2">
@@ -65,7 +65,7 @@ export default function PostEventQA({ questions }: PostEventQAProps) {
                 )}
               </div>
             </div>
-            <p className="mb-0" style={{ color: '#17324D', lineHeight: 1.5 }}>
+            <p className="mb-0" style={{ color: 'var(--app-text)', lineHeight: 1.5 }}>
               {q.text}
             </p>
           </CardBody>

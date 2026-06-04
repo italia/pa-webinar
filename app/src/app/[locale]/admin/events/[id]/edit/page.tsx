@@ -221,7 +221,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         </Link>
       </div>
 
-      <h1 className="fw-bold mb-4" style={{ color: '#17324D' }}>
+      <h1 className="fw-bold mb-4" style={{ color: 'var(--app-text)' }}>
         {t('editEvent')}
       </h1>
 

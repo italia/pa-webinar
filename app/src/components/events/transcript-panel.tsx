@@ -62,6 +62,65 @@ interface TranscriptResponse {
   subtitleTracks: string[];
   summaries: Record<string, string>;
   speakers: Array<{ diarLabel: string; displayName: string | null }>;
+  /**
+   * True quando il transcript proviene dalla pipeline multi-traccia
+   * (ADR-013): i segmenti POSSONO sovrapporsi nel tempo (parlato
+   * simultaneo). La route oggi non lo propaga sempre, perciò la UI non
+   * si affida a questo flag: l'overlap è rilevato per-segmento sui
+   * timestamp (vedi `computeOverlapInfo`). Tenuto qui solo per
+   * documentazione / eventuale uso futuro.
+   */
+  multitrack?: boolean;
+}
+
+/**
+ * Metadati di sovrapposizione per-segmento. `concurrent` è true quando
+ * il segmento si sovrappone nel tempo ad almeno un altro segmento di
+ * uno speaker DIVERSO (parlato simultaneo). Nel caso sequenziale
+ * (pyannote: un solo speaker per istante) `concurrent` resta sempre
+ * false e la UI è identica a prima.
+ */
+interface OverlapInfo {
+  concurrent: boolean;
+}
+
+/**
+ * Calcola, per ogni segmento, se si sovrappone temporalmente ad altri
+ * segmenti di speaker diversi. I segmenti arrivano ordinati per
+ * (start, end) dalla route; due segmenti [aS,aE) e [bS,bE) si
+ * sovrappongono se `aS < bE && bS < aE`. Scansione lineare con finestra
+ * scorrevole dei segmenti "ancora aperti" (la cui fine supera l'inizio
+ * del corrente): O(n) nel caso sequenziale, O(n·k) con k = grado di
+ * sovrapposizione locale. Non assume `end[i] <= start[i+1]`.
+ */
+function computeOverlapInfo(segments: Segment[]): OverlapInfo[] {
+  const info: OverlapInfo[] = segments.map(() => ({ concurrent: false }));
+  const open: number[] = [];
+  for (let i = 0; i < segments.length; i++) {
+    const cur = segments[i]!;
+    // Chiudi la finestra: rimuovi i segmenti terminati prima dell'inizio
+    // del corrente — non possono più sovrapporsi a niente di successivo.
+    for (let w = open.length - 1; w >= 0; w--) {
+      const j = open[w]!;
+      if (segments[j]!.end <= cur.start) open.splice(w, 1);
+    }
+    for (const j of open) {
+      const other = segments[j]!;
+      // Per la finestra: other.end > cur.start e other.start <= cur.start
+      // ⇒ overlap garantito. Marca "concurrent" solo se lo speaker è
+      // diverso: due segmenti adiacenti dello stesso parlante non sono
+      // "simultaneo".
+      const sameSpeaker =
+        (cur.speaker ?? cur.speakerName) ===
+        (other.speaker ?? other.speakerName);
+      if (!sameSpeaker) {
+        info[i]!.concurrent = true;
+        info[j]!.concurrent = true;
+      }
+    }
+    open.push(i);
+  }
+  return info;
 }
 
 export interface TranscriptPanelProps {
@@ -178,7 +237,7 @@ function WordLevelText({
             key={`${w.start}-${i}`}
             className="postprod-segment__word"
             style={{
-              color: passed ? color : current ? '#0c1a2b' : '#5A768A',
+              color: passed ? color : current ? '#0c1a2b' : 'var(--app-muted)',
               fontWeight: current ? 600 : 400,
               background: current ? color + '22' : undefined,
               borderRadius: current ? 3 : 0,
@@ -201,10 +260,24 @@ export default function TranscriptPanel({
   activeLanguage,
 }: TranscriptPanelProps) {
   const t = useTranslations('postprod');
+  // Fallback inline temporaneo per le chiavi overlap non ancora presenti
+  // nei file i18n (vedi report). Quando le chiavi verranno aggiunte,
+  // `t.has` diventa true e si usa la traduzione localizzata.
+  const tf = (key: string, fallback: string): string =>
+    t.has(key) ? t(key) : fallback;
   const [data, setData] = useState<TranscriptResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<'transcript' | 'summary'>('transcript');
+  /** Indice "primario" attivo: il segmento attivo iniziato più di
+   *  recente (per word-level karaoke + autoscroll). -1 = nessuno. */
   const [activeIdx, setActiveIdx] = useState<number>(-1);
+  /** Insieme di TUTTI gli indici attivi all'istante corrente. Con
+   *  overlap (multi-traccia) possono essere >1 — evidenziamo tutti i
+   *  parlanti simultanei, non solo il primario. Nel caso sequenziale
+   *  contiene al più un indice. Set per lookup O(1) nel render. */
+  const [activeSet, setActiveSet] = useState<ReadonlySet<number>>(
+    () => new Set(),
+  );
   const [search, setSearch] = useState<string>('');
   const [showDownload, setShowDownload] = useState<boolean>(false);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
@@ -273,42 +346,64 @@ export default function TranscriptPanel({
     };
   }, [data, playerRef]);
 
-  // Calcola activeIdx dal playhead (binary search). Ricorda lo
-  // ultimo indice trovato per evitare scan completo ad ogni tick.
-  const lastIdxRef = useRef(0);
+  // Calcola gli indici attivi dal playhead. NON si può usare la binary
+  // search "un solo intervallo" perché con il multi-traccia i segmenti
+  // possono sovrapporsi (più segmenti attivi nello stesso istante) e
+  // non valgono i presupposti di ordinamento per la ricerca binaria
+  // sugli end. Usiamo invece una binary search per il primo indice con
+  // `start <= now` e poi scansioniamo a ritroso i candidati che possono
+  // ancora coprire `now` (start <= now < end). Nel caso sequenziale
+  // questa scansione si ferma quasi subito (overlap nullo).
   useEffect(() => {
     if (!data) return;
     const segments = data.segments;
     const now = playheadSec;
-    // tentativo veloce: l'idx corrente è ancora valido o il successivo?
-    const li = Math.max(0, Math.min(segments.length - 1, lastIdxRef.current));
-    const here = segments[li];
-    if (here && now >= here.start && now <= here.end) {
-      if (activeIdx !== li) setActiveIdx(li);
-      return;
-    }
-    const next = segments[li + 1];
-    if (next && now >= next.start && now <= next.end) {
-      lastIdxRef.current = li + 1;
-      setActiveIdx(li + 1);
-      return;
-    }
-    // fallback: binary search
+
+    // Binary search: ultimo indice con start <= now (segmenti ordinati
+    // per start). I segmenti che coprono `now` hanno tutti start <= now,
+    // quindi stanno in [0..hiStart].
     let lo = 0;
     let hi = segments.length - 1;
-    let found = -1;
+    let hiStart = -1;
     while (lo <= hi) {
       const mid = (lo + hi) >> 1;
-      const s = segments[mid]!;
-      if (now < s.start) hi = mid - 1;
-      else if (now > s.end) lo = mid + 1;
-      else {
-        found = mid;
-        break;
+      if (segments[mid]!.start <= now) {
+        hiStart = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
       }
     }
-    if (found !== -1) lastIdxRef.current = found;
-    if (activeIdx !== found) setActiveIdx(found);
+
+    // Scansiona a ritroso da hiStart raccogliendo tutti i segmenti che
+    // coprono `now`. Mi fermo quando il massimo `end` ancora possibile
+    // non può più raggiungere `now`: dato che gli end NON sono ordinati,
+    // mi affido al fatto che gli overlap sono locali (qualche segmento),
+    // limitando comunque la scansione a una finestra ragionevole.
+    const active: number[] = [];
+    let primary = -1;
+    for (let i = hiStart; i >= 0; i--) {
+      const s = segments[i]!;
+      if (now >= s.start && now < s.end) {
+        active.push(i);
+        // primario = quello iniziato più di recente fra gli attivi;
+        // hiStart scorre da start decrescenti ⇒ il primo trovato vince.
+        if (primary === -1) primary = i;
+      }
+      // Heuristica di stop: se siamo già indietro di oltre 60s rispetto
+      // a `now`, è improbabile che un segmento ancora più vecchio copra
+      // `now` (le battute non durano minuti). Evita scan O(n) su long-form.
+      if (s.start < now - 60) break;
+    }
+
+    if (activeIdx !== primary) setActiveIdx(primary);
+    // Aggiorna activeSet solo se cambiato (evita re-render inutili).
+    setActiveSet((prev) => {
+      if (prev.size === active.length && active.every((i) => prev.has(i))) {
+        return prev;
+      }
+      return new Set(active);
+    });
   }, [playheadSec, data, activeIdx]);
 
   // Auto-scroll the active segment into view (smooth, center). Skip
@@ -408,6 +503,13 @@ export default function TranscriptPanel({
     video.currentTime = start;
     if (video.paused) void video.play();
   }
+
+  // Overlap per-segmento. Memoizzato sui segmenti: nel caso sequenziale
+  // è tutto false (nessun costo a runtime nel render).
+  const overlapInfo = useMemo(
+    () => (data ? computeOverlapInfo(data.segments) : []),
+    [data],
+  );
 
   // Filtered list. Memoized: filtering ricalcolato solo quando i
   // segmenti o la query cambiano.
@@ -630,7 +732,12 @@ export default function TranscriptPanel({
           >
             {filteredSegments.map(({ seg, idx }) => {
               const speakerLabel = seg.speakerName ?? seg.speaker ?? '—';
-              const isActive = idx === activeIdx;
+              // "active" = evidenziato (qualsiasi segmento attivo ora,
+              // anche se concorrente). "isPrimary" = il segmento su cui
+              // gira il karaoke word-level e l'autoscroll (uno solo).
+              const isActive = activeSet.has(idx) || idx === activeIdx;
+              const isPrimary = idx === activeIdx;
+              const isOverlap = overlapInfo[idx]?.concurrent ?? false;
               const identity = seg.speakerName ?? seg.speaker ?? '';
               const palette = speakerColor(identity);
               const tSec = Math.floor(seg.start);
@@ -691,7 +798,7 @@ export default function TranscriptPanel({
                     <code
                       style={{
                         minWidth: 56,
-                        color: '#5A768A',
+                        color: 'var(--app-muted)',
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     >
@@ -718,6 +825,53 @@ export default function TranscriptPanel({
                     <span className="fw-semibold" style={{ color: palette.color }}>
                       {speakerLabel}
                     </span>
+                    {isOverlap && (
+                      // Marcatore "parlato simultaneo": il segmento si
+                      // sovrappone nel tempo a quello di un altro
+                      // parlante. Inline SVG (niente <Icon> di
+                      // design-react-kit: causa hydration mismatch nei
+                      // nodi renderizzati in liste — vedi note progetto).
+                      <span
+                        title={tf(
+                          'overlapTitle',
+                          'Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente.',
+                        )}
+                        aria-label={tf(
+                          'overlapTitle',
+                          'Parlato simultaneo: in questo intervallo parla più di una persona contemporaneamente.',
+                        )}
+                        className="d-inline-flex align-items-center gap-1"
+                        style={{
+                          marginLeft: 2,
+                          fontSize: 11,
+                          color: '#6633CC',
+                          background: '#6633CC14',
+                          border: '1px solid #6633CC55',
+                          borderRadius: 4,
+                          padding: '0 5px',
+                          lineHeight: 1.4,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          {/* due fumetti sovrapposti = voci concorrenti */}
+                          <path d="M8 10h6M8 14h4" />
+                          <path d="M3 15a2 2 0 0 0 2 2h1v3l3-3h4a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" />
+                          <path d="M9 5V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-1" />
+                        </svg>
+                        {tf('overlapBadge', 'simultaneo')}
+                      </span>
+                    )}
                     {seg.lowConfidence && (
                       <span
                         title={t('lowConfidenceTitle')}
@@ -779,7 +933,7 @@ export default function TranscriptPanel({
                     </div>
                   </div>
                   <div className="postprod-segment__text">
-                    {isActive && seg.words && seg.words.length > 0 && !trimmedSearch ? (
+                    {isPrimary && seg.words && seg.words.length > 0 && !trimmedSearch ? (
                       <WordLevelText
                         words={seg.words}
                         playheadSec={playheadSec}

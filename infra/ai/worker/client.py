@@ -39,6 +39,10 @@ class ClaimInput(BaseModel):
     role: str
     downloadUrl: str
     blobKey: str
+    # ADR-013: presenti solo per role="track" (TRANSCRIBE_MULTITRACK).
+    participantId: Optional[str] = None
+    displayName: Optional[str] = None
+    startOffsetMs: Optional[int] = None
 
 
 class ProviderHints(BaseModel):

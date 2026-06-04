@@ -1,0 +1,73 @@
+{{- if .Values.postprod.enabled }}
+# ADR-013 Fase 5 — purge frequente delle tracce audio per-partecipante
+# dopo la trascrizione (minimizzazione GDPR). Cancella i blob e marca
+# RecordingTrack.audioPurgedAt. Vedi /api/cron/multitrack-purge.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "eventi-dtd.fullname" . }}-multitrack-purge
+  labels:
+    {{- include "eventi-dtd.labels" . | nindent 4 }}
+    app.kubernetes.io/component: cronjob-multitrack-purge
+spec:
+  schedule: {{ .Values.postprod.multitrackPurgeSchedule | default "*/15 * * * *" | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 300
+      template:
+        metadata:
+          labels:
+            {{- include "eventi-dtd.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: cronjob-multitrack-purge
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 100
+            runAsGroup: 101
+            seccompProfile:
+              type: RuntimeDefault
+          {{- if .Values.app.nodeSelector }}
+          nodeSelector:
+            {{- toYaml .Values.app.nodeSelector | nindent 12 }}
+          {{- end }}
+          {{- if .Values.app.tolerations }}
+          tolerations:
+            {{- toYaml .Values.app.tolerations | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: multitrack-purge
+              image: {{ .Values.postprod.retention.image }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  curl -sf \
+                    -H "x-api-key: $(CRON_API_KEY)" \
+                    {{ include "eventi-dtd.internalUrl" . }}/api/cron/multitrack-purge
+              env:
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "eventi-dtd.secretName" . }}
+                      key: CRON_API_KEY
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                capabilities:
+                  drop:
+                    - ALL
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
+{{- end }}

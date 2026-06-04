@@ -17,6 +17,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from 'design-react-kit';
 
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import {
   MATERIAL_VISIBILITIES,
@@ -140,6 +143,7 @@ export default function EventMaterialsManager({
 }: EventMaterialsManagerProps) {
   const t = useTranslations('admin.materials');
   const tCommon = useTranslations('common');
+  const confirm = useConfirm();
 
   const [materials, setMaterials] = useState<MaterialRow[]>(initialMaterials ?? []);
   const [loading, setLoading] = useState(!initialMaterials);
@@ -305,7 +309,13 @@ export default function EventMaterialsManager({
   // ── delete ──────────────────────────────────────────────
   const remove = useCallback(
     async (id: string) => {
-      if (!confirm(t('deleteConfirm'))) return;
+      const ok = await confirm({
+        title: tCommon('delete'),
+        message: t('deleteConfirm'),
+        confirmLabel: tCommon('delete'),
+        danger: true,
+      });
+      if (!ok) return;
       const prev = materials;
       setMaterials((list) => list.filter((m) => m.id !== id));
       try {
@@ -318,7 +328,7 @@ export default function EventMaterialsManager({
         setError(t('errorGeneric'));
       }
     },
-    [materials, eventId, t],
+    [materials, eventId, t, tCommon, confirm],
   );
 
   // ── form ────────────────────────────────────────────────
@@ -444,7 +454,7 @@ export default function EventMaterialsManager({
       {form}
 
       {loading ? (
-        <div className="text-center py-4 text-muted">{tCommon('loading')}</div>
+        <SkeletonLines lines={4} loadingLabel={tCommon('loading')} />
       ) : materials.length === 0 ? (
         <div className="text-center py-4 text-muted border rounded">
           {t('empty')}

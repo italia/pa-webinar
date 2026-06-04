@@ -4,6 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Badge, Button, Input, Label } from 'design-react-kit';
 
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 type GrantRole = 'MODERATOR' | 'SPEAKER';
 
 interface ModeratorRow {
@@ -33,6 +36,7 @@ export default function EventModeratorsPanel({
 }: Props) {
   const t = useTranslations('admin.coModerators');
   const tc = useTranslations('common');
+  const confirm = useConfirm();
 
   const [rows, setRows] = useState<ModeratorRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -101,14 +105,20 @@ export default function EventModeratorsPanel({
 
   const handleRevoke = useCallback(
     async (id: string) => {
-      if (!confirm(t('confirmRevoke'))) return;
+      const ok = await confirm({
+        title: t('revoke'),
+        message: t('confirmRevoke'),
+        confirmLabel: t('revoke'),
+        danger: true,
+      });
+      if (!ok) return;
       const res = await fetch(`/api/events/${eventId}/moderators/${id}`, {
         method: 'DELETE',
         headers: authHeader,
       });
       if (res.ok) fetchRows();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [eventId, moderatorToken, fetchRows, t],
+    }, [eventId, moderatorToken, fetchRows, t, confirm],
   );
 
   const magicLink = useCallback(
@@ -128,7 +138,7 @@ export default function EventModeratorsPanel({
     <div>
       <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
         <div>
-          <div className="fw-semibold" style={{ color: '#17324D' }}>
+          <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
             {t('intro')}
           </div>
           <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
@@ -198,7 +208,7 @@ export default function EventModeratorsPanel({
       )}
 
       {loading && rows.length === 0 ? (
-        <div className="text-muted">{tc('loading')}</div>
+        <SkeletonLines lines={3} loadingLabel={tc('loading')} />
       ) : rows.length === 0 ? (
         <div className="text-muted text-center py-3" style={{ fontSize: '0.88rem' }}>
           {t('empty')}
@@ -216,7 +226,7 @@ export default function EventModeratorsPanel({
               >
                 <div style={{ minWidth: 0 }}>
                   <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
-                    <span className="fw-semibold" style={{ color: '#17324D' }}>
+                    <span className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                       {row.name}
                     </span>
                     <Badge
@@ -231,7 +241,7 @@ export default function EventModeratorsPanel({
                       {row.role === 'SPEAKER' ? t('roleSpeaker') : t('roleModerator')}
                     </Badge>
                     {revoked && (
-                      <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: '#5A768A' }}>
+                      <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: 'var(--app-muted)' }}>
                         {t('revoked')}
                       </Badge>
                     )}
@@ -250,7 +260,7 @@ export default function EventModeratorsPanel({
                         borderRadius: 4,
                         fontSize: '0.72rem',
                         wordBreak: 'break-all',
-                        color: '#17324D',
+                        color: 'var(--app-text)',
                       }}
                     >
                       {link}

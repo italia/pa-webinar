@@ -117,7 +117,7 @@ export default function Step4Content({
 
   return (
     <div>
-      <h2 className="h4 fw-bold mb-3" style={{ color: '#17324D' }}>
+      <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('heading')}
       </h2>
       <p className="text-secondary mb-4" style={{ fontSize: '0.9rem' }}>
@@ -159,7 +159,7 @@ function QuestionnairesSection({
 
   return (
     <section className="mb-4">
-      <h3 className="h5 fw-semibold mb-2" style={{ color: '#17324D' }}>
+      <h3 className="h5 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
         {t('questionnairesHeading')}
       </h3>
       <p className="text-secondary mb-3" style={{ fontSize: '0.85rem' }}>
@@ -244,7 +244,7 @@ function PlacementBlock({
       className="border rounded p-3 mb-3 bg-white"
       style={{ borderColor: '#e8e8e8' }}
     >
-      <h4 className="h6 fw-semibold mb-3" style={{ color: '#17324D' }}>
+      <h4 className="h6 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
         {heading}
       </h4>
 
@@ -528,7 +528,7 @@ function MaterialsSection({
 
   return (
     <section className="mb-4">
-      <h3 className="h5 fw-semibold mb-2" style={{ color: '#17324D' }}>
+      <h3 className="h5 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
         {t('materialsHeading')}
       </h3>
       <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>

@@ -905,6 +905,50 @@ postprod:
         cpu: "22"
         memory: "200Gi"
 
+# ── Recorder multi-traccia (ADR-013 Fase 3) ─────────────────
+# Feature "full mode": registrazione audio per-partecipante per attribuzione
+# speaker certa. Disabilitata di default. Su VM/compose si usa il runner Docker
+# del controller (RUNNER=docker), non questo chart. Vedi infra/recorder-controller.
+recorder:
+  enabled: false
+
+  # Immagine del bot recorder (Puppeteer + lib-jitsi-meet, un'audio-track per
+  # partecipante). Gira sul pool NORMALE, non GPU.
+  image: ghcr.io/italia/eventi-dtd-recorder:dev
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  # Dominio Jitsi per il bot; se vuoto usa app.env.NEXT_PUBLIC_JITSI_DOMAIN.
+  jitsiDomain: ""
+  backoffLimit: 1
+  activeDeadlineSeconds: 21600   # 6h max per evento
+  ttlSecondsAfterFinished: 600
+  workSizeLimit: "10Gi"
+  nodeSelector: {}
+  tolerations: []
+  resources:
+    requests:
+      cpu: "1"
+      memory: "2Gi"
+    limits:
+      cpu: "2"
+      memory: "4Gi"
+
+  # Operator riconciliante (pod fisso) che orchestra i Job recorder.
+  controller:
+    enabled: true
+    image: ghcr.io/italia/eventi-dtd-recorder-controller:dev
+    imagePullPolicy: IfNotPresent
+    imagePullSecrets: []
+    port: 8080
+    reconcileIntervalMs: 30000
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "250m"
+        memory: "128Mi"
+
 # ── Name overrides ──────────────────────────────────────────
 nameOverride: ""
 fullnameOverride: ""

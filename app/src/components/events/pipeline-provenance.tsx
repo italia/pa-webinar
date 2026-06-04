@@ -101,7 +101,7 @@ export default function PipelineProvenance({ snapshot, locale }: Props) {
         style={{
           background: 'transparent',
           border: 'none',
-          color: '#5A768A',
+          color: 'var(--app-muted)',
           fontSize: '0.78rem',
           letterSpacing: 0.2,
           textDecoration: 'underline',
@@ -259,12 +259,12 @@ export default function PipelineProvenance({ snapshot, locale }: Props) {
                         {id}
                       </span>
                       {va.voiceId && (
-                        <span style={{ color: '#5A768A' }}>
+                        <span style={{ color: 'var(--app-muted)' }}>
                           → {va.voiceId}
                         </span>
                       )}
                       {va.gender && va.gender !== 'N' && (
-                        <span style={{ color: '#5A768A', fontSize: '0.7rem' }}>
+                        <span style={{ color: 'var(--app-muted)', fontSize: '0.7rem' }}>
                           {va.gender === 'M' ? t('voices.male') : t('voices.female')}
                         </span>
                       )}
@@ -278,7 +278,7 @@ export default function PipelineProvenance({ snapshot, locale }: Props) {
           {/* Footer: run timestamp + pipeline version */}
           <div
             className="mt-3 d-flex flex-wrap gap-3"
-            style={{ fontSize: '0.74rem', color: '#5A768A' }}
+            style={{ fontSize: '0.74rem', color: 'var(--app-muted)' }}
           >
             {runFmt && (
               <span>
@@ -322,7 +322,7 @@ function ProvBlock({
       >
         <div className="d-flex align-items-center gap-2 mb-1">
           <Icon icon={icon} size="sm" color={undefined} />
-          <span className="fw-semibold" style={{ color: '#17324D', fontSize: '0.92rem' }}>
+          <span className="fw-semibold" style={{ color: 'var(--app-text)', fontSize: '0.92rem' }}>
             {title}
           </span>
         </div>
@@ -357,7 +357,7 @@ function KV({
       <dt
         className="fw-medium"
         style={{
-          color: '#5A768A',
+          color: 'var(--app-muted)',
           minWidth: 110,
           fontSize: '0.78rem',
         }}

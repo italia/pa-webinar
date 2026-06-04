@@ -57,13 +57,13 @@ export default function BookmarksPanel({ slug, playerRef }: Props) {
     >
       <div
         className="d-flex align-items-center gap-2 mb-3"
-        style={{ color: '#17324D' }}
+        style={{ color: 'var(--app-text)' }}
       >
         <Icon icon="it-star-full" size="sm" color={undefined} />
         <span className="fw-semibold">{t('bookmarksHeader')}</span>
         <span
           className="ms-auto"
-          style={{ fontSize: '0.72rem', color: '#5A768A' }}
+          style={{ fontSize: '0.72rem', color: 'var(--app-muted)' }}
         >
           {bookmarks.items.length}
         </span>
@@ -84,7 +84,7 @@ export default function BookmarksPanel({ slug, playerRef }: Props) {
             >
               <code
                 style={{
-                  color: '#0066CC',
+                  color: 'var(--app-primary)',
                   fontVariantNumeric: 'tabular-nums',
                   fontSize: '0.78rem',
                 }}

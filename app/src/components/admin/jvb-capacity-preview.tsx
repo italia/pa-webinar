@@ -66,7 +66,7 @@ export default function JvbCapacityPreview({
 
   return (
     <div className="mb-3" style={containerStyle} aria-live="polite">
-      <div className="fw-semibold mb-2" style={{ color: '#17324D' }}>
+      <div className="fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
         {t('title')}
       </div>
 

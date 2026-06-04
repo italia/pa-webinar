@@ -135,7 +135,7 @@ async function TagFilterRow({ tags, activeTag, locale }: TagFilterRowProps) {
 
   return (
     <div className="mb-4">
-      <div className="small fw-semibold mb-2" style={{ color: '#17324D' }}>
+      <div className="small fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
         {t('filterByTag')}
       </div>
       <div className="d-flex flex-wrap gap-2">
@@ -147,7 +147,7 @@ async function TagFilterRow({ tags, activeTag, locale }: TagFilterRowProps) {
             borderRadius: 20,
             border: '1px solid #0066CC',
             backgroundColor: !activeTag ? '#0066CC' : 'rgba(0,102,204,0.1)',
-            color: !activeTag ? '#fff' : '#0066CC',
+            color: !activeTag ? '#fff' : 'var(--app-primary)',
             fontWeight: 500,
             padding: '4px 12px',
           }}

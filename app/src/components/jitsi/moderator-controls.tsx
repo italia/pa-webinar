@@ -33,7 +33,7 @@ interface ModeratorControlsProps {
 }
 
 const BAR_STYLE: React.CSSProperties = {
-  background: '#17324D',
+  background: 'var(--app-text)',
   borderBottom: '2px solid #0066CC',
 };
 
@@ -47,7 +47,7 @@ const BTN_DEFAULT: React.CSSProperties = {
 
 const BTN_ACTIVE_WARN: React.CSSProperties = {
   fontSize: '0.82rem',
-  background: '#0066CC',
+  background: 'var(--app-primary)',
   color: '#fff',
 };
 

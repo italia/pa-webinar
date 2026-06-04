@@ -12,7 +12,9 @@ import {
 } from 'design-react-kit';
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, Link } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
 import RecordingUploadWidget from './recording-upload-widget';
 
 interface RecordingManagementProps {
@@ -61,6 +63,8 @@ export default function RecordingManagement({
   jibriAvailable = true,
 }: RecordingManagementProps) {
   const t = useTranslations('recording');
+  const toast = useToast();
+  const confirm = useConfirm();
   const fmt = useFormatter();
   const router = useRouter();
 
@@ -120,19 +124,30 @@ export default function RecordingManagement({
   );
 
   const handleDelete = useCallback(async () => {
-    if (!window.confirm(t('deleteConfirm'))) return;
-    await fetch(`/api/events/${event.slug}/recording`, {
+    const ok = await confirm({
+      title: t('deleteConfirmTitle'),
+      message: t('deleteConfirm'),
+      confirmLabel: t('delete'),
+      danger: true,
+    });
+    if (!ok) return;
+    const r = await fetch(`/api/events/${event.slug}/recording`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${event.moderatorToken}` },
     });
+    if (!r.ok) {
+      toast.error(t('deleteFailed'));
+      return;
+    }
+    toast.success(t('deleteSuccess'));
     router.refresh();
-  }, [event.slug, event.moderatorToken, t, router]);
+  }, [event.slug, event.moderatorToken, t, router, confirm, toast]);
 
   if (!event.recordingEnabled && !hasRecording) {
     return (
       <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('management')}
           </h5>
           <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
@@ -148,7 +163,7 @@ export default function RecordingManagement({
     return (
       <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
             {t('management')}
           </h5>
           <Alert color="warning" className="mb-0">
@@ -163,7 +178,7 @@ export default function RecordingManagement({
     <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
       <CardBody className="p-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+          <h5 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
             {t('management')}
           </h5>
           {isLive && event.tempRecordingStartedAt && (
@@ -230,7 +245,7 @@ export default function RecordingManagement({
             <div className="border rounded p-3 mb-3">
               <div className="d-flex justify-content-between align-items-start">
                 <div className="me-3">
-                  <div className="fw-semibold" style={{ color: '#17324D' }}>
+                  <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                     {t('publish')}
                   </div>
                   <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
@@ -248,7 +263,7 @@ export default function RecordingManagement({
 
             {/* Retention options */}
             <div className="border rounded p-3 mb-3">
-              <div className="fw-semibold mb-2" style={{ color: '#17324D' }}>
+              <div className="fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
                 {t('retentionLabel')}
               </div>
               <div className="d-flex flex-column gap-1">
@@ -291,6 +306,15 @@ export default function RecordingManagement({
                     <Icon icon="it-download" size="sm" />
                     {t('download')}
                   </a>
+                  {/* Apre la gestione post-produzione (trascrizione, speaker,
+                      traduzione, editor) per questo evento. */}
+                  <Link
+                    href={`/admin/postprod?eventId=${event.id}`}
+                    className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
+                  >
+                    <Icon icon="it-comment" size="sm" />
+                    {t('transcriptManage')}
+                  </Link>
                 </>
               )}
               <Button

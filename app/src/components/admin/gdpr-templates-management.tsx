@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Badge, Button, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
 
+import { useToast } from '@/components/ui/toast';
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { SkeletonLines } from '@/components/ui/skeleton';
+
 interface TemplateRow {
   id: string;
   name: string;
@@ -38,6 +42,8 @@ const EMPTY_DRAFT: Draft = {
 export default function GdprTemplatesManagement() {
   const t = useTranslations('admin.gdprTemplates');
   const tc = useTranslations('common');
+  const toast = useToast();
+  const confirm = useConfirm();
 
   const [rows, setRows] = useState<TemplateRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -126,10 +132,17 @@ export default function GdprTemplatesManagement() {
   }, [draft, editingId, fetchRows, t]);
 
   const handleDelete = useCallback(async (row: TemplateRow) => {
-    if (!confirm(t('confirmDelete', { name: row.name, count: row.usedByEvents }))) return;
+    const ok = await confirm({
+      title: t('deleteTitle'),
+      message: t('confirmDelete', { name: row.name, count: row.usedByEvents }),
+      confirmLabel: tc('delete'),
+      danger: true,
+    });
+    if (!ok) return;
     const res = await fetch(`/api/admin/gdpr-templates/${row.id}`, { method: 'DELETE' });
     if (res.ok) await fetchRows();
-  }, [fetchRows, t]);
+    else toast.error(t('errors.saveFailed'));
+  }, [confirm, fetchRows, t, tc, toast]);
 
   const editing = editingId !== null;
 
@@ -147,7 +160,7 @@ export default function GdprTemplatesManagement() {
       {editing ? (
         <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
           <CardBody className="p-4">
-            <h5 className="fw-semibold mb-3" style={{ color: '#17324D' }}>
+            <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
               {editingId === 'new' ? t('form.newTitle') : t('form.editTitle')}
             </h5>
 
@@ -236,7 +249,11 @@ export default function GdprTemplatesManagement() {
           </CardBody>
         </Card>
       ) : loading && rows.length === 0 ? (
-        <div className="text-muted">{tc('loading')}</div>
+        <Card className="border-0 shadow-sm">
+          <CardBody className="p-3">
+            <SkeletonLines lines={5} loadingLabel={tc('loading')} />
+          </CardBody>
+        </Card>
       ) : rows.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardBody className="p-5 text-center">
@@ -255,7 +272,7 @@ export default function GdprTemplatesManagement() {
                 <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
                   <div style={{ minWidth: 0 }}>
                     <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
-                      <h6 className="fw-semibold mb-0" style={{ color: '#17324D' }}>
+                      <h6 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
                         {row.name}
                       </h6>
                       {row.isDefault && (
@@ -264,7 +281,7 @@ export default function GdprTemplatesManagement() {
                         </Badge>
                       )}
                       {row.locales.map((l) => (
-                        <Badge key={l} color="" pill className="px-2 py-1" style={{ fontSize: '0.65rem', backgroundColor: '#E8F0FE', color: '#0066CC', textTransform: 'uppercase' }}>
+                        <Badge key={l} color="" pill className="px-2 py-1" style={{ fontSize: '0.65rem', backgroundColor: '#E8F0FE', color: 'var(--app-primary)', textTransform: 'uppercase' }}>
                           {l}
                         </Badge>
                       ))}

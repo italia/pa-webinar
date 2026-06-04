@@ -37,14 +37,14 @@ export default async function TagsSettingsPage() {
         <Link
           href="/admin/settings"
           className="text-decoration-none"
-          style={{ color: '#0066CC', fontSize: '0.9rem' }}
+          style={{ color: 'var(--app-primary)', fontSize: '0.9rem' }}
         >
           {'←'} {t('backToSettings')}
         </Link>
       </div>
 
       <div className="mb-5">
-        <h1 className="fw-bold mb-1" style={{ color: '#17324D' }}>
+        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
           {t('title')}
         </h1>
         <p className="text-secondary mb-0">{t('subtitle')}</p>

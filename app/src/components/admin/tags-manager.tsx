@@ -4,6 +4,8 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 
+import { useConfirm } from '@/components/ui/confirm-dialog';
+
 interface Tag {
   id: string;
   slug: string;
@@ -105,6 +107,7 @@ interface Props {
 export default function TagsManager({ initialTags }: Props) {
   const t = useTranslations('admin.tags');
   const router = useRouter();
+  const confirm = useConfirm();
 
   const [editingId, setEditingId] = useState<string | 'new' | null>(null);
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
@@ -252,7 +255,13 @@ export default function TagsManager({ initialTags }: Props) {
   const remove = useCallback(
     async (tag: Tag) => {
       const label = tag.name.it || tag.slug;
-      if (!window.confirm(t('deleteConfirm', { name: label }))) return;
+      const ok = await confirm({
+        title: t('delete'),
+        message: t('deleteConfirm', { name: label }),
+        confirmLabel: t('delete'),
+        danger: true,
+      });
+      if (!ok) return;
 
       setDeletingId(tag.id);
       setError(null);
@@ -273,7 +282,7 @@ export default function TagsManager({ initialTags }: Props) {
         setDeletingId(null);
       }
     },
-    [handleApiError, router, t],
+    [handleApiError, router, t, confirm],
   );
 
   const renderEditForm = () => (
@@ -281,7 +290,7 @@ export default function TagsManager({ initialTags }: Props) {
       className="p-3 p-md-4 mb-3 rounded-3"
       style={{ background: '#f8f9fa', border: '1px solid #e8e8e8' }}
     >
-      <h2 className="h5 fw-semibold mb-3" style={{ color: '#17324D' }}>
+      <h2 className="h5 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
         {editingId === 'new' ? t('addTag') : t('editTag')}
       </h2>
       <div className="row g-3">
@@ -374,7 +383,7 @@ export default function TagsManager({ initialTags }: Props) {
               type="color"
               className="form-control form-control-color"
               style={{ width: 48, minWidth: 48 }}
-              value={HEX_COLOR_RE.test(draft.color) ? draft.color : '#0066CC'}
+              value={HEX_COLOR_RE.test(draft.color) ? draft.color : 'var(--app-primary)'}
               onChange={(e) =>
                 setDraft((d) => ({ ...d, color: e.target.value }))
               }

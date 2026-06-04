@@ -206,7 +206,7 @@ export default function PostEventHero({
             pill
             style={{
               background: 'rgba(0,102,204,0.12)',
-              color: '#0066CC',
+              color: 'var(--app-primary)',
               fontSize: '0.72rem',
               letterSpacing: 0.3,
               padding: '4px 12px',
@@ -234,7 +234,7 @@ export default function PostEventHero({
           {availableLocales.length > 1 && (
             <label
               className="d-inline-flex align-items-center gap-2 ms-auto"
-              style={{ fontSize: '0.78rem', color: '#5A768A' }}
+              style={{ fontSize: '0.78rem', color: 'var(--app-muted)' }}
             >
               <span>{t('summaryLanguageLabel')}</span>
               <select
@@ -263,7 +263,7 @@ export default function PostEventHero({
         <h2
           id="post-event-hero-title"
           className="h4 fw-semibold mb-2"
-          style={{ color: '#17324D' }}
+          style={{ color: 'var(--app-text)' }}
         >
           {t('title')}
         </h2>

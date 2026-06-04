@@ -157,9 +157,14 @@ export const POST = withErrorHandling(async (request) => {
             recordingId: job.recording.id,
             diarLabel: sp.diarLabel,
             totalSpeechSec: sp.totalSpeechSec,
+            // ADR-013: nome reale dal multitrack (assente per pyannote).
+            displayName: sp.displayName ?? null,
           },
           update: {
             totalSpeechSec: sp.totalSpeechSec,
+            // Aggiorna il nome SOLO se fornito (multitrack): non sovrascrive
+            // un mapping manuale dell'admin con null per la diarization.
+            ...(sp.displayName != null ? { displayName: sp.displayName } : {}),
           },
         });
       }
