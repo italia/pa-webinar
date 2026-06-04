@@ -58,7 +58,7 @@ concurrency:
 jobs:
   build-and-push:
     name: Build & Push Dev Image
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       packages: write
@@ -145,7 +145,7 @@ jobs:
   # `force_worker_build=true`. Per il primo run, usa workflow_dispatch.
   detect-worker-changes:
     name: Detect postprod worker changes
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     outputs:
       worker_changed: ${{ steps.filter.outputs.worker }}
     steps:
@@ -174,7 +174,7 @@ jobs:
     name: Build & Push Postprod Worker Image
     needs: detect-worker-changes
     if: needs.detect-worker-changes.outputs.worker_changed == 'true'
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       packages: write
@@ -245,7 +245,7 @@ jobs:
   # workflow_dispatch con force_recorder_build=true.
   detect-recorder-changes:
     name: Detect recorder changes
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     outputs:
       recorder_changed: ${{ steps.filter.outputs.recorder }}
     steps:
@@ -271,7 +271,7 @@ jobs:
     name: Build & Push Recorder Image
     needs: detect-recorder-changes
     if: needs.detect-recorder-changes.outputs.recorder_changed == 'true'
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       packages: write
@@ -328,7 +328,7 @@ jobs:
   # `infra/recorder-controller/` è cambiato, o force_recorder_controller_build=true.
   detect-recorder-controller-changes:
     name: Detect recorder-controller changes
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     outputs:
       changed: ${{ steps.filter.outputs.changed }}
     steps:
@@ -354,7 +354,7 @@ jobs:
     name: Build & Push Recorder Controller Image
     needs: detect-recorder-controller-changes
     if: needs.detect-recorder-controller-changes.outputs.changed == 'true'
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       packages: write
