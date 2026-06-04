@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────
-# eventi-dtd — Docker Compose dev override (hot-reload)
+# pa-webinar — Docker Compose dev override (hot-reload)
 #
 # Usage:
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build

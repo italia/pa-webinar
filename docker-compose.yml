@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────
-# eventi-dtd — Docker Compose (full local stack)
+# pa-webinar — Docker Compose (full local stack)
 #
 # Usage:
 #   docker compose up --build -d          # Start everything
@@ -18,13 +18,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://eventi:eventi_local_dev@postgres:5432/eventi_dtd
+      - DATABASE_URL=postgresql://eventi:eventi_local_dev@postgres:5432/pa_webinar
       - NEXT_PUBLIC_JITSI_DOMAIN=localhost:8443
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
       - NEXT_PUBLIC_DEFAULT_LOCALE=it
       - JITSI_JWT_SECRET=${JITSI_JWT_SECRET:-s3cr3t_dev_only}
-      - JITSI_JWT_APP_ID=eventi_dtd
-      - JITSI_JWT_ISSUER=eventi-dtd
+      - JITSI_JWT_APP_ID=pa_webinar
+      - JITSI_JWT_ISSUER=pa-webinar
       - JITSI_JWT_AUDIENCE=jitsi
       # 64-char hex dummy — long enough to satisfy the runtime length
       # check that fail-closes in NODE_ENV=production. NOT a secret:
@@ -35,7 +35,7 @@ services:
       - SMTP_PORT=1025
       - SMTP_SECURE=false
       - SMTP_FROM=eventi@dominio.gov.it
-      - SMTP_FROM_NAME=Eventi DTD
+      - SMTP_FROM_NAME=PA Webinar
       - PII_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       - DEFAULT_PRIVACY_POLICY_URL=http://localhost:3000/it/privacy
       - CRON_API_KEY=dev_cron_key_change_in_production
@@ -66,7 +66,7 @@ services:
     command: >
       sh -c "npx prisma migrate deploy && npx tsx prisma/seed.ts"
     environment:
-      - DATABASE_URL=postgresql://eventi:eventi_local_dev@postgres:5432/eventi_dtd
+      - DATABASE_URL=postgresql://eventi:eventi_local_dev@postgres:5432/pa_webinar
     depends_on:
       postgres:
         condition: service_healthy
@@ -79,7 +79,7 @@ services:
     image: mirror.gcr.io/library/postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: eventi_dtd
+      POSTGRES_DB: pa_webinar
       POSTGRES_USER: eventi
       POSTGRES_PASSWORD: eventi_local_dev
     ports:
@@ -87,7 +87,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U eventi -d eventi_dtd"]
+      test: ["CMD-SHELL", "pg_isready -U eventi -d pa_webinar"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -105,9 +105,9 @@ services:
     environment:
       - ENABLE_AUTH=1
       - AUTH_TYPE=jwt
-      - JWT_APP_ID=eventi_dtd
+      - JWT_APP_ID=pa_webinar
       - JWT_APP_SECRET=${JITSI_JWT_SECRET:-s3cr3t_dev_only}
-      - JWT_ACCEPTED_ISSUERS=eventi-dtd
+      - JWT_ACCEPTED_ISSUERS=pa-webinar
       - JWT_ACCEPTED_AUDIENCES=jitsi
       - ENABLE_GUESTS=0
       - PUBLIC_URL=https://localhost:8443
@@ -128,9 +128,9 @@ services:
     environment:
       - ENABLE_AUTH=1
       - AUTH_TYPE=jwt
-      - JWT_APP_ID=eventi_dtd
+      - JWT_APP_ID=pa_webinar
       - JWT_APP_SECRET=${JITSI_JWT_SECRET:-s3cr3t_dev_only}
-      - JWT_ACCEPTED_ISSUERS=eventi-dtd
+      - JWT_ACCEPTED_ISSUERS=pa-webinar
       - JWT_ACCEPTED_AUDIENCES=jitsi
       - JWT_ALLOW_EMPTY=0
       - JWT_TOKEN_AUTH_MODULE=token_verification
@@ -222,13 +222,13 @@ services:
       - PORTAL_URL=http://app:3000
       - CRON_API_KEY=dev_cron_key_change_in_production
       # Immagine del bot recorder che il controller avvia (pull da GHCR o
-      # build locale: docker build -t eventi-dtd-recorder:local infra/recorder).
+      # build locale: docker build -t pa-webinar-recorder:local infra/recorder).
       - RECORDER_IMAGE=ghcr.io/italia/eventi-dtd-recorder:dev
       - PORT=8080
       # Network compose a cui agganciare i container recorder, così
       # raggiungono `app` e `jitsi-web`. Default = network di default del
       # progetto compose; adatta se usi un COMPOSE_PROJECT_NAME diverso.
-      - DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-eventi-dtd}_default
+      - DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-pa-webinar}_default
       # Env statiche passate a ogni recorder (allowlist passthrough):
       - RECORDER_ENV_JITSI_DOMAIN=localhost:8443
     volumes:

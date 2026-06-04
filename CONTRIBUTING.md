@@ -2,11 +2,11 @@
 
 ## Italiano
 
-Grazie per il tuo interesse nel contribuire a **eventi-dtd**!
+Grazie per il tuo interesse nel contribuire a **pa-webinar**!
 
 ### Segnalazione bug
 
-Apri una [issue](https://github.com/italia/eventi-dtd/issues) descrivendo:
+Apri una [issue](https://github.com/italia/pa-webinar/issues) descrivendo:
 - Cosa ti aspettavi
 - Cosa e successo effettivamente
 - Passi per riprodurre il problema
@@ -79,11 +79,11 @@ Contribuendo a questo progetto, accetti che il tuo contributo sia rilasciato sot
 
 ## English
 
-Thank you for your interest in contributing to **eventi-dtd**!
+Thank you for your interest in contributing to **pa-webinar**!
 
 ### Reporting bugs
 
-Open an [issue](https://github.com/italia/eventi-dtd/issues) describing:
+Open an [issue](https://github.com/italia/pa-webinar/issues) describing:
 - What you expected
 - What actually happened
 - Steps to reproduce

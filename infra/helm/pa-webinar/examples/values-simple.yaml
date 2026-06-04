@@ -1,0 +1,100 @@
+# ============================================================================
+# Modalità semplice — tutto nel cluster, ideale per test o piccole PA
+# ============================================================================
+#
+# Deploy:
+#   helm upgrade --install videocall ./infra/helm/pa-webinar \
+#     -f examples/values-simple.yaml \
+#     -n videocall \
+#     --set postgresql.auth.password=<password> \
+#     --set app.env.NEXT_PUBLIC_APP_URL=https://your-domain.com
+#
+# Cosa include:
+#   - 1 replica dell'app (no autoscaling)
+#   - PostgreSQL nel cluster (subchart Bitnami)
+#   - Jitsi con 1 JVB fisso (no scale-to-zero, no recording)
+#   - Nessun requisito di node pool dedicati
+#
+# Ideale per: demo, sviluppo, PA con meno di 50 partecipanti per evento
+# ============================================================================
+
+app:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+autoscaling:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: false
+
+# Secrets — generate mode for simplicity (dev/test only!)
+# For production, switch to mode: "existing" and create the Secret manually
+secrets:
+  mode: "generate"
+  existingSecretName: "videocall-secrets"
+  generate:
+    DATABASE_URL: ""        # Auto-configured if postgresql.enabled=true
+    JITSI_JWT_SECRET: ""    # Set via --set
+    JITSI_JWT_APP_ID: "pa_webinar"
+    JITSI_JWT_ISSUER: "pa-webinar"
+    JITSI_JWT_AUDIENCE: "jitsi"
+    APP_SECRET: ""          # Set via --set
+    ADMIN_API_KEY: ""       # Set via --set
+    PII_ENCRYPTION_KEY: ""  # Set via --set
+    CRON_API_KEY: ""        # Set via --set
+    SMTP_HOST: ""
+    SMTP_PORT: "587"
+    SMTP_SECURE: "false"
+    SMTP_USER: ""
+    SMTP_PASSWORD: ""
+    SMTP_FROM: "eventi@example.com"
+    SMTP_FROM_NAME: "Eventi PA"
+
+# PostgreSQL nel cluster
+postgresql:
+  enabled: true
+  auth:
+    username: eventi
+    database: pa_webinar
+    password: ""  # Set via --set postgresql.auth.password=...
+  primary:
+    persistence:
+      size: 5Gi
+      storageClass: ""  # Use cluster default
+
+# Jitsi — simple mode, no dedicated nodes
+jitsi:
+  enabled: true
+  mode: simple
+
+jitsi-meet:
+  jvb:
+    replicaCount: 1  # Always 1, no autoscaling
+    nodeSelector: {}  # Runs on any node
+    tolerations: []
+  jibri:
+    enabled: false  # No recording in simple mode
+
+ingress:
+  enabled: true
+  className: nginx
+  # Minimal annotations — add TLS config for your environment
+  annotations: {}
+  hosts:
+    - host: videocall.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# No monitoring
+metrics:
+  serviceMonitor:
+    enabled: false

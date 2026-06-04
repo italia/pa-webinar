@@ -1,0 +1,75 @@
+╔══════════════════════════════════════════════════════════════╗
+║              pa-webinar installato con successo!            ║
+╚══════════════════════════════════════════════════════════════╝
+
+─── Portale ──────────────────────────────────────────────────
+{{- if .Values.ingress.enabled }}
+  URL:   https://{{ (index .Values.ingress.hosts 0).host }}
+{{- else }}
+  kubectl port-forward svc/{{ include "pa-webinar.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+  URL:   http://localhost:{{ .Values.service.port }}
+{{- end }}
+
+─── Area amministrazione ─────────────────────────────────────
+{{- if .Values.ingress.enabled }}
+  URL:   https://{{ (index .Values.ingress.hosts 0).host }}/it/admin/login
+{{- else }}
+  URL:   http://localhost:{{ .Values.service.port }}/it/admin/login
+{{- end }}
+  Usa la chiave di accesso configurata in ADMIN_API_KEY
+  nel Secret "{{ include "pa-webinar.secretName" . }}".
+
+─── Modalità ─────────────────────────────────────────────────
+  Jitsi: {{ if .Values.jitsi.enabled }}subchart (mode: {{ .Values.jitsi.mode | default "simple" }}){{ else }}esterno ({{ .Values.jitsi.external.domain }}){{ end }}
+  Database: {{ if .Values.postgresql.enabled }}subchart PostgreSQL{{ else }}esterno{{ end }}
+  Secrets: {{ .Values.secrets.mode | default "existing" }}
+
+─── Metriche ─────────────────────────────────────────────────
+{{- if .Values.metrics.serviceMonitor.enabled }}
+  ServiceMonitor creato — le metriche saranno raccolte da Prometheus.
+  Endpoint: {{ .Values.metrics.path | default "/api/metrics" }}
+{{- else }}
+  ServiceMonitor non abilitato. Per abilitare:
+    helm upgrade {{ .Release.Name }} ... --set metrics.serviceMonitor.enabled=true
+{{- end }}
+
+─── Database ─────────────────────────────────────────────────
+{{- if .Values.postgresql.enabled }}
+  PostgreSQL installato come subchart nel namespace {{ .Release.Namespace }}.
+  Database: {{ .Values.postgresql.auth.database }}
+  Utente:   {{ .Values.postgresql.auth.username }}
+{{- else }}
+  Connessione al database esterno.
+  Verifica che DATABASE_URL sia configurato nel Secret "{{ include "pa-webinar.secretName" . }}".
+{{- end }}
+
+─── Jitsi Meet ───────────────────────────────────────────────
+{{- if .Values.jitsi.enabled }}
+  Jitsi Meet installato come subchart.
+  {{- if eq (default "simple" .Values.jitsi.mode) "full" }}
+  Modalità completa: JVB su nodi dedicati con scale-to-zero.
+    {{- if .Values.jvbScaler.enabled }}
+  JVB Scaler CronJob attivo (ogni {{ .Values.jvbScaler.schedule }}).
+    {{- end }}
+  {{- else if eq .Values.jitsi.mode "standard" }}
+  Modalità standard: JVB e Jibri attivi.
+  {{- else }}
+  Modalità semplice: 1 JVB fisso, no recording.
+  {{- end }}
+{{- else }}
+  Connessione a Jitsi esterno: {{ .Values.jitsi.external.domain }}
+  Verifica che JITSI_JWT_SECRET sia configurato nel Secret "{{ include "pa-webinar.secretName" . }}".
+{{- end }}
+
+─── Prossimi passi ───────────────────────────────────────────
+{{- if eq (default "existing" .Values.secrets.mode) "existing" }}
+  1. Crea il Secret "{{ include "pa-webinar.secretName" . }}" se non esiste
+{{- else }}
+  1. I secrets sono gestiti automaticamente (mode: {{ .Values.secrets.mode }})
+{{- end }}
+  2. Le migrazioni del database vengono eseguite automaticamente
+     dall'initContainer db-migrate ad ogni deploy
+  3. Accedi al pannello admin e crea il primo evento
+  4. Configura i backup del database
+
+  Documentazione: docs/DEPLOYMENT.md, docs/CONFIGURATION.md

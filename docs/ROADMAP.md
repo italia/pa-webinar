@@ -1,4 +1,4 @@
-# Roadmap — eventi-dtd
+# Roadmap — pa-webinar
 
 Allineata al 2026-04-24. Le versioni spedite sono riassunte in forma compatta; le voci pianificate mantengono nota/effort dove utile.
 
@@ -76,7 +76,7 @@ Rilasciati tra v0.3.8 e v0.3.44, a seguito del feedback post-demo 2026-04-16.
 - GDPR cleanup 3 fasi (immediate PII / retention content / hard delete)
 - **Two-phase JVB autoscaling** (Redis snapshot per status page; skip LIVE→IDLE quando replicas > 1 per evitare race su `/colibri/stats` multi-pod)
 - **Libreria video pubblica** `/video-library` — filtri per data/argomento/tipo, import YouTube per legacy, nuove registrazioni Jibri pubblicate automaticamente
-- **Trasparenza `/service-inventory`** — CycloneDX 1.6 per-tenant (DEV: npm+OCI; OPS: servizi Azure/AKS/Postgres/Blob/GHCR/Mailgun/coturn/…); `components[]` + `services[]` + `declarations[]` + `compositions[]` + `vulnerabilities[]` (VEX-ready) + `formulation[]` + `annotations[]`; stack diagram "Architettura in breve" data-driven da property `eventi-dtd:layer`/`stack-label`; artefatto per-tenant servito via `SERVICE_INVENTORY_URL` (file locale su test, Blob pubblico su prod). Reference implementation per OPS half: CronJob AKS + Azure Resource Graph + Workload Identity → upload Blob (`infra/service-inventory/azure/`)
+- **Trasparenza `/service-inventory`** — CycloneDX 1.6 per-tenant (DEV: npm+OCI; OPS: servizi Azure/AKS/Postgres/Blob/GHCR/Mailgun/coturn/…); `components[]` + `services[]` + `declarations[]` + `compositions[]` + `vulnerabilities[]` (VEX-ready) + `formulation[]` + `annotations[]`; stack diagram "Architettura in breve" data-driven da property `pa-webinar:layer`/`stack-label`; artefatto per-tenant servito via `SERVICE_INVENTORY_URL` (file locale su test, Blob pubblico su prod). Reference implementation per OPS half: CronJob AKS + Azure Resource Graph + Workload Identity → upload Blob (`infra/service-inventory/azure/`)
 - Footer build-date con HH:MM UTC
 - **5-step event wizard** ✅ — creazione/edit evento in 5 step (Base, Permessi, Inviti, Contenuti, Revisione) con stato condiviso `WizardForm`; sostituisce il form monolitico precedente (`app/src/components/admin/event-wizard/`)
 - **Title-kicker (pipe split)** ✅ — `SiteSetting.parseTitleKicker` + override per-evento `Event.parseTitleKicker`; rendering editoriale di titoli tipo `Serie | Episodio` con kicker + titolo principale

@@ -1,8 +1,8 @@
 publiccodeYmlVersion: "0.4"
-name: eventi-dtd
-applicationSuite: eventi-dtd
-url: "https://github.com/italia/eventi-dtd"
-landingURL: "https://github.com/italia/eventi-dtd"
+name: pa-webinar
+applicationSuite: pa-webinar
+url: "https://github.com/italia/pa-webinar"
+landingURL: "https://github.com/italia/pa-webinar"
 softwareVersion: "0.3.44"
 releaseDate: "2026-04-19"
 developmentStatus: beta
@@ -18,7 +18,7 @@ categories:
 usedBy:
   - Dipartimento per la Trasformazione Digitale
 
-roadmap: "https://github.com/italia/eventi-dtd/blob/main/docs/ROADMAP.md"
+roadmap: "https://github.com/italia/pa-webinar/blob/main/docs/ROADMAP.md"
 
 dependsOn:
   open:
@@ -91,7 +91,7 @@ description:
     shortDescription: >
       Piattaforma open-source per eventi pubblici digitali della PA, basata su Jitsi Meet e design system .italia.
     longDescription: >
-      eventi-dtd è una piattaforma web per organizzare e gestire eventi pubblici digitali — webinar,
+      pa-webinar è una piattaforma web per organizzare e gestire eventi pubblici digitali — webinar,
       presentazioni, meeting pubblici. Utilizza Jitsi Meet come motore video/audio self-hosted e il
       design system .italia per l'interfaccia utente.
 
@@ -104,8 +104,8 @@ description:
       reazioni live, registrazione partecipanti GDPR-compliant, registrazione video, moderazione
       avanzata, inviti email con allegato iCal, interfaccia multilingue (24 lingue UE), design system
       .italia, API REST documentate in OpenAPI 3, cloud-native (Kubernetes, Helm).
-    documentation: "https://github.com/italia/eventi-dtd/tree/main/docs"
-    apiDocumentation: "https://github.com/italia/eventi-dtd/blob/main/api/openapi.json"
+    documentation: "https://github.com/italia/pa-webinar/tree/main/docs"
+    apiDocumentation: "https://github.com/italia/pa-webinar/blob/main/api/openapi.json"
     features:
       - Video conferenza con Jitsi Meet, scalabile orizzontalmente su Kubernetes
       - Q&A con sistema di upvote
@@ -127,15 +127,15 @@ description:
     shortDescription: >
       Open-source platform for public digital events, built on Jitsi Meet and the Italian .italia design system.
     longDescription: >
-      eventi-dtd is a web platform for organizing and managing public digital events — webinars,
+      pa-webinar is a web platform for organizing and managing public digital events — webinars,
       presentations, public meetings. It uses Jitsi Meet as a self-hosted video/audio engine and the
       .italia design system for the user interface.
 
       Horizontally scalable architecture on Kubernetes: per-event capacity ~300 participants on a
       standard JVB bridge (extendable via bridge cascading); total platform capacity bounded only by
       cluster resources, with auto-scaling JVB bridges and scale-to-zero when idle.
-    documentation: "https://github.com/italia/eventi-dtd/tree/main/docs"
-    apiDocumentation: "https://github.com/italia/eventi-dtd/blob/main/api/openapi.json"
+    documentation: "https://github.com/italia/pa-webinar/tree/main/docs"
+    apiDocumentation: "https://github.com/italia/pa-webinar/blob/main/api/openapi.json"
     features:
       - Video conferencing with Jitsi Meet, horizontally scalable on Kubernetes
       - Q&A with upvote system

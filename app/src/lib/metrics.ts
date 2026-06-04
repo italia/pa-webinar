@@ -2,7 +2,7 @@ import client from 'prom-client';
 
 const register = new client.Registry();
 
-const METRICS_APP_LABEL = process.env['METRICS_APP_LABEL'] || 'eventi-dtd';
+const METRICS_APP_LABEL = process.env['METRICS_APP_LABEL'] || 'pa-webinar';
 register.setDefaultLabels({ app: METRICS_APP_LABEL });
 
 export { METRICS_APP_LABEL };

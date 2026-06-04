@@ -217,13 +217,13 @@ def main():
     # 2) trova un pod dell'app, copia push_to_db.js, esegui via kubectl
     pod = sp.run(
         ["kubectl", "get", "pods", "-n", "videocall-test",
-         "-l", "app.kubernetes.io/name=eventi-dtd",
+         "-l", "app.kubernetes.io/name=pa-webinar",
          "--field-selector=status.phase=Running",
          "-o", "jsonpath={.items[0].metadata.name}"],
         capture_output=True, text=True, check=True,
     ).stdout.strip()
     print(f"Pod: {pod}")
-    sp.run(["kubectl", "cp", "-n", "videocall-test", "-c", "eventi-dtd",
+    sp.run(["kubectl", "cp", "-n", "videocall-test", "-c", "pa-webinar",
             "push_to_db.js", f"{pod}:/tmp/push.js"], check=True)
     print("Pushing to DB via kubectl exec…")
     # NODE_PATH=/app/node_modules per risolvere @prisma/client dai
@@ -231,7 +231,7 @@ def main():
     # leggibile, basta puntare il loader lì).
     result = sp.run(
         ["kubectl", "exec", "-i", "-n", "videocall-test", pod,
-         "-c", "eventi-dtd", "--",
+         "-c", "pa-webinar", "--",
          "sh", "-c", "cd /app && NODE_PATH=/app/node_modules node /tmp/push.js"],
         input=json.dumps(payload).encode(),
         capture_output=True,

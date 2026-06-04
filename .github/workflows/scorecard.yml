@@ -16,7 +16,7 @@ permissions: read-all
 jobs:
   analysis:
     name: Scorecard analysis
-    runs-on: arc-runner-eventi-dtd
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       actions: read
