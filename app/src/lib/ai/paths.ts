@@ -114,6 +114,10 @@ export function artifactPath(
     case 'SUMMARY_JSON':
       if (!language) throw new Error('SUMMARY_JSON requires a language');
       return `${base}/summary.${language}.json`;
+    case 'ARCHIVE_MKV':
+      // Contenitore multi-traccia (video + N audio + sottotitoli),
+      // language-agnostico → nessun suffisso lingua.
+      return `${base}/archive.mkv`;
     default: {
       const _exhaustive: never = type;
       throw new Error(`unknown artifact type: ${String(_exhaustive)}`);
@@ -141,6 +145,8 @@ export function artifactMimeType(type: PostprodArtifactType): string {
       return 'audio/mp4';
     case 'DUBBED_VIDEO':
       return 'video/mp4';
+    case 'ARCHIVE_MKV':
+      return 'video/x-matroska';
     default: {
       const _exhaustive: never = type;
       throw new Error(`unknown artifact type: ${String(_exhaustive)}`);
@@ -196,6 +202,10 @@ export function expectedArtifactsForJob(
     case 'DUB': {
       const lang = payload.targetLanguage ?? 'en';
       return [{ role: 'dubbedAudio', type: 'DUBBED_AUDIO', language: lang }];
+    }
+    case 'ARCHIVE': {
+      // Un singolo contenitore MKV multi-traccia, language-agnostico.
+      return [{ role: 'archive', type: 'ARCHIVE_MKV', language: null }];
     }
     default: {
       const _exhaustive: never = kind;

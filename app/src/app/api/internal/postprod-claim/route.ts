@@ -93,7 +93,7 @@ const claimRequestSchema = z.object({
 interface ClaimedRow {
   id: string;
   recording_id: string;
-  kind: 'TRANSCRIBE' | 'TRANSCRIBE_MULTITRACK' | 'SUMMARIZE' | 'TRANSLATE' | 'SUBTITLE' | 'DUB';
+  kind: 'TRANSCRIBE' | 'TRANSCRIBE_MULTITRACK' | 'SUMMARIZE' | 'TRANSLATE' | 'SUBTITLE' | 'DUB' | 'ARCHIVE';
   payload: unknown;
   attempts: number;
   next_attempt_at: Date;
@@ -320,6 +320,60 @@ export const POST = withErrorHandling(async (request) => {
         participantId: tr.participantId,
         displayName: tr.displayName ? tryDecryptPII(tr.displayName) : null,
         startOffsetMs: tr.startOffsetMs,
+      });
+    }
+  }
+
+  if (row.kind === 'ARCHIVE') {
+    // Archivio multi-traccia. Il worker muxa:
+    //   - il mix video Jibri (sourceDownloadUrl, già presignato sopra),
+    //   - una traccia audio per partecipante (role="track", con nome +
+    //     offset; allineate via cross-correlazione lato worker),
+    //   - i sottotitoli sorgente (role="subtitle", il TRANSCRIPT_VTT).
+    // Le tracce purgate (audioPurgedAt) non sono più disponibili: se
+    // l'evento non ha retainParticipantTracks l'archivio conterrà solo
+    // il video + i sottotitoli (degradazione pulita).
+    const tracks = await prisma.recordingTrack.findMany({
+      where: { recordingId: recording.id, audioPurgedAt: null },
+      select: {
+        participantId: true,
+        displayName: true,
+        blobKey: true,
+        startOffsetMs: true,
+      },
+      orderBy: { startOffsetMs: 'asc' },
+    });
+    for (const tr of tracks) {
+      const downloadUrl = await presignArtifactDownload({
+        blobKey: tr.blobKey,
+        expiresInMinutes: lease,
+      });
+      inputs.push({
+        role: 'track',
+        downloadUrl,
+        blobKey: tr.blobKey,
+        participantId: tr.participantId,
+        displayName: tr.displayName ? tryDecryptPII(tr.displayName) : null,
+        startOffsetMs: tr.startOffsetMs,
+      });
+    }
+    // Sottotitoli sorgente (best-effort): se il TRANSCRIBE non è ancora
+    // completato non c'è VTT — l'archivio si genera comunque senza.
+    const vtt = await prisma.postprodArtifact.findFirst({
+      where: { recordingId: recording.id, type: 'TRANSCRIPT_VTT' },
+      orderBy: { createdAt: 'desc' },
+      select: { blobKey: true, language: true },
+    });
+    if (vtt) {
+      const vttUrl = await presignArtifactDownload({
+        blobKey: vtt.blobKey,
+        expiresInMinutes: lease,
+      });
+      inputs.push({
+        role: 'subtitle',
+        downloadUrl: vttUrl,
+        blobKey: vtt.blobKey,
+        displayName: vtt.language ?? recording.sourceLanguage ?? 'it',
       });
     }
   }

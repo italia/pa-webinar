@@ -1567,6 +1567,12 @@ enum PostprodJobKind {
   // lingua + (V2) un MP4 con audio sostituito. Marker AI Act Art. 50
   // applicato a tutti gli artefatti DUB.
   DUB
+  // Archivio scaricabile (on-demand): muxa il video Jibri + N tracce
+  // audio per-partecipante (etichettate col nome, allineate via
+  // cross-correlazione) + sottotitoli VTT in un singolo file MKV.
+  // Richiede Event.retainParticipantTracks (le tracce devono essere
+  // ancora presenti, non purgate). Vedi infra/ai/worker/archive.py.
+  ARCHIVE
 }
 
 enum PostprodJobStatus {
@@ -1606,6 +1612,13 @@ enum PostprodArtifactType {
   // per download offline. Non prodotto in MVP per evitare ridondanza
   // storage.
   DUBBED_VIDEO
+  // Archivio multi-traccia (job ARCHIVE): un MKV con il video Jibri +
+  // una traccia audio per-partecipante (etichettata col displayName,
+  // allineata via cross-correlazione) + i sottotitoli VTT come traccia
+  // sottotitoli embedded. language=null (è un contenitore multi-lingua).
+  // Contiene voce isolata per-partecipante (PII sensibile) → scaricabile
+  // solo da admin/moderatore, mai esposto pubblicamente.
+  ARCHIVE_MKV
 }
 
 model Recording {
