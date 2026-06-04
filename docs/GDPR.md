@@ -90,14 +90,29 @@ garanzie aggiuntive rispetto all'audio misto.
 
 ### Base giuridica e consenso
 
+- **Opt-in a livello evento** (minimizzazione): la registrazione per-partecipante
+  NON è automatica per gli eventi con trascrizione. L'organizzatore la abilita
+  esplicitamente con il flag `Event.multitrackRecordingEnabled` (toggle dedicato
+  nel wizard, sotto "Trascrizione automatica"). Il recorder multi-traccia viene
+  avviato solo per eventi con `recordingEnabled` + `aiTranscriptEnabled` +
+  `multitrackRecordingEnabled` (gate in `/api/internal/recorder-desired`). Senza
+  l'opt-in, la trascrizione usa il fallback su traccia mista (diarization pyannote),
+  senza isolare l'audio del singolo parlante.
 - Il trattamento richiede il **consenso esplicito** dell'interessato
-  (Art. 6.1.a GDPR), separato dal consenso alla registrazione audio/video
-  standard (`consentRecording`). Il consenso al missaggio non implica il
-  consenso alla traccia isolata.
-- La traccia isolata viene catturata solo quando l'evento ha la funzione
-  abilitata **e** il partecipante ha prestato il consenso specifico. In
-  assenza del consenso specifico, il partecipante concorre all'audio
-  misto ma non viene isolato in una propria traccia.
+  (Art. 6.1.a GDPR), **separato** dal consenso alla registrazione audio/video
+  standard (`Registration.consentRecording`). Il consenso al missaggio non
+  implica il consenso alla traccia isolata: è una casella distinta
+  (`Registration.consentMultitrack`).
+- **Consenso come gate alla registrazione** (coerente con `consentRecording`):
+  quando l'evento ha `multitrackRecordingEnabled`, il consenso multi-traccia è
+  **obbligatorio per registrarsi** (validato in
+  `/api/events/[param]/registrations`). Così ogni partecipante presente in
+  stanza ha prestato il consenso e il recorder può registrare tutte le tracce
+  senza filtri runtime fragili. Chi non acconsente non completa la
+  registrazione (come già avviene per il consenso alla registrazione standard).
+  > Scelta di design: alternativa più inclusiva (il non-consenziente entra solo
+  > nel mix, non isolato) richiederebbe un filtro per-partecipante lato recorder
+  > basato sull'identità Jitsi — fragile e rimandato. Vedi ADR-013.
 - Lo stato dei flag di consenso al momento dell'avvio è cristallizzato in
   uno snapshot (coerente con `Recording.consentSnapshot`, vedi
   `docs/POSTPROD.md`), così che la base giuridica resti dimostrabile anche

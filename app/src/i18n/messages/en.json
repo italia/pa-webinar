@@ -1,4 +1,11 @@
 {
+  "agenda": {
+    "title": "Agenda / Notes",
+    "empty": "No agenda items yet. Add the topics to cover and check them off as you go.",
+    "add": "Add",
+    "addPlaceholder": "New agenda item…",
+    "remove": "Remove"
+  },
   "common": {
     "appName": "DTD Events",
     "appDescription": "Public digital event platform by the Department for Digital Transformation",
@@ -158,6 +165,7 @@
       "organizationRequired": "Please enter your organization",
       "consentRequired": "Consent to data processing is required",
       "recordingConsentRequired": "Recording consent is required for this event",
+      "multitrackConsentRequired": "Consent to recording your audio track is required for this event",
       "eventFull": "The event has reached the maximum number of participants",
       "generic": "Registration error. Please try again."
     }
@@ -237,8 +245,10 @@
     "qaSidebarPlaceholder": "The Q&A panel will be available when the event starts.",
     "invalidToken": "Invalid link. Please check the link you received by email.",
     "sidebarTabQa": "Q&A",
+    "liveFeaturesLabel": "Features:",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Polls",
+    "sidebarTabAgenda": "Agenda",
     "sidebarTabMaterials": "Materials",
     "sidebarTabParticipants": "Participants",
     "chat": {
@@ -539,7 +549,9 @@
           "recording": "Recording",
           "recordingAuto": "On — auto-start",
           "recordingManual": "On — manual start",
-          "recordingOff": "Off"
+          "recordingOff": "Off",
+          "multitrack": "Per-participant recording",
+          "multitrackOn": "On — requires explicit consent at registration"
         },
         "noRecurrence": "One-off event",
         "gdprHeading": "Privacy and data retention",
@@ -549,6 +561,9 @@
         "gdprTemplateNone": "— Use custom text —",
         "privacyText": "Privacy notice (text)",
         "moderatorHeading": "Moderator contact",
+        "moderatorPublishHint": "Name and email are required to publish the event (used for the moderator link and confirmation email). Not required to save as draft.",
+        "moderatorRequired": "Enter the moderator name",
+        "moderatorEmailRequired": "Enter a valid moderator email",
         "moderatorName": "Name",
         "moderatorEmail": "Email",
         "capacityHeading": "Estimated capacity",
@@ -968,6 +983,8 @@
       "qaEnabled": "Enable Q&A",
       "chatEnabled": "Enable chat",
       "recordingEnabled": "Enable video recording",
+      "agendaEnabled": "Live agenda / notes",
+      "agendaEnabledDesc": "A checklist of topics to cover that moderators tick off during the event. Feeds the automatic summary. Optional and can also be enabled during the event.",
       "autoStartRecording": "Start recording automatically",
       "autoStartRecordingDesc": "When the event starts, recording begins on its own (the moderator is not prompted). Late joiners immediately find a catch-up player available.",
       "aiSectionHeading": "Automatic post-production",
@@ -980,8 +997,11 @@
       "aiTranslationEnabledDesc": "Transcript and summary translated into the languages set below.",
       "aiTargetLocales": "Translation languages",
       "aiTargetLocalesDesc": "ISO language codes (e.g. en, fr, de) separated by commas. Leave empty to use the site-wide languages.",
+      "aiTargetLocalesRequired": "Set at least one translation language, or turn off automatic translation.",
       "aiDubbingEnabled": "Audio dubbing",
       "aiDubbingEnabledDesc": "Dubbed audio in the target languages, generated with pre-trained synthetic voices. Does not clone participants' voices.",
+      "multitrackRecordingEnabled": "Per-participant recording (high accuracy)",
+      "multitrackRecordingEnabledDesc": "Records a separate audio track per participant so the transcript attributes who said what with certainty (no more \"Speaker 1/2\"). It processes isolated single-speaker audio (sensitive personal data): tracks are temporary and deleted right after transcription. Requires recording consent.",
       "expectedSpeakers": "Expected number of speakers",
       "expectedSpeakersDesc": "When known (e.g. 3 speakers), setting this improves speaker identification quality. Leave empty to let the pipeline decide.",
       "dataRetentionDays": "Data retention (days after event)",
@@ -1397,6 +1417,15 @@
       "unmute": "Participant microphone",
       "video": "Participant video",
       "screen": "Screen sharing",
+      "durationLabel": "Default duration (minutes)",
+      "durationHint": "Pre-fills the event end (start + duration). The user can change it. Empty = 2 hours.",
+      "retentionLabel": "Default data retention (days)",
+      "expectedSpeakersLabel": "Expected number of speakers (default)",
+      "descriptionTemplateLabel": "Default description",
+      "descriptionTemplateHint": "Text pre-filled into the event description (editable).",
+      "aiTranscript": "Automatic transcription (default)",
+      "aiSummary": "Automatic summary (default)",
+      "aiTranslation": "Automatic translation (default)",
       "pickerTitle": "Choose a template",
       "pickerSubtitle": "Select a template to pre-configure event settings, or skip to configure everything manually.",
       "skipTemplate": "Configure manually"
@@ -2074,6 +2103,8 @@
     "consent": {
       "recording": "I consent to the audio/video recording of this event",
       "recordingRequired": "Recording consent is required to participate in this event",
+      "multitrack": "I consent to recording a separate audio track of my voice, for the sole purpose of correctly attributing the transcript to each speaker. The track is temporary and deleted after transcription; it is not used to identify or reproduce my voice.",
+      "multitrackRequired": "Consent to recording your audio track is required to participate in this event",
       "futureCommunications": "I would like to receive information about future events organized by DTD",
       "addressBook": "I want to be added to the DTD address book to be invited to similar events",
       "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."

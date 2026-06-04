@@ -115,6 +115,7 @@ export const GET = withErrorHandling(async (request) => {
         consentGiven: r.consentGiven,
         consentTimestamp: r.consentTimestamp.toISOString(),
         consentRecording: r.consentRecording,
+        consentMultitrack: r.consentMultitrack,
         consentFutureCommunications: r.consentFutureCommunications,
         registeredAt: r.createdAt.toISOString(),
         joinedAt: r.joinedAt?.toISOString() ?? null,

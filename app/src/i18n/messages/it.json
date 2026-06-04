@@ -1,4 +1,11 @@
 {
+  "agenda": {
+    "title": "Agenda / Note",
+    "empty": "Nessun punto in agenda. Aggiungi i temi da trattare e spuntali man mano.",
+    "add": "Aggiungi",
+    "addPlaceholder": "Nuovo punto all'ordine del giorno…",
+    "remove": "Rimuovi"
+  },
   "common": {
     "appName": "Eventi DTD",
     "appDescription": "Piattaforma per eventi pubblici digitali del Dipartimento per la Trasformazione Digitale",
@@ -158,6 +165,7 @@
       "organizationRequired": "Inserisci il tuo ente di appartenenza",
       "consentRequired": "Il consenso al trattamento dati è obbligatorio",
       "recordingConsentRequired": "Il consenso alla registrazione è obbligatorio per questo evento",
+      "multitrackConsentRequired": "Il consenso alla registrazione della tua traccia audio è obbligatorio per questo evento",
       "eventFull": "L'evento ha raggiunto il numero massimo di partecipanti",
       "generic": "Errore durante la registrazione. Riprova."
     }
@@ -237,8 +245,10 @@
     "qaSidebarPlaceholder": "Il pannello Q&A sarà disponibile quando l'evento inizia.",
     "invalidToken": "Link non valido. Verifica il link ricevuto via email.",
     "sidebarTabQa": "Q&A",
+    "liveFeaturesLabel": "Funzioni:",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondaggi",
+    "sidebarTabAgenda": "Agenda",
     "sidebarTabMaterials": "Materiali",
     "sidebarTabParticipants": "Partecipanti",
     "chat": {
@@ -609,7 +619,9 @@
           "recording": "Registrazione",
           "recordingAuto": "Attiva — avvio automatico",
           "recordingManual": "Attiva — avvio manuale",
-          "recordingOff": "Non attiva"
+          "recordingOff": "Non attiva",
+          "multitrack": "Registrazione per-partecipante",
+          "multitrackOn": "Attiva — richiede consenso esplicito in registrazione"
         },
         "noRecurrence": "Evento singolo",
         "gdprHeading": "Privacy e conservazione dati",
@@ -619,6 +631,9 @@
         "gdprTemplateNone": "— Usa testo personalizzato —",
         "privacyText": "Informativa privacy (testo)",
         "moderatorHeading": "Contatto moderatore",
+        "moderatorPublishHint": "Nome ed email sono obbligatori per pubblicare l'evento (servono per il link moderatore e l'email di conferma). Per salvare come bozza non sono richiesti.",
+        "moderatorRequired": "Inserisci il nome del moderatore",
+        "moderatorEmailRequired": "Inserisci un'email valida del moderatore",
         "moderatorName": "Nome",
         "moderatorEmail": "Email",
         "capacityHeading": "Capacità stimata",
@@ -1038,6 +1053,8 @@
       "qaEnabled": "Abilita Q&A",
       "chatEnabled": "Abilita chat",
       "recordingEnabled": "Abilita registrazione video",
+      "agendaEnabled": "Agenda / Note live",
+      "agendaEnabledDesc": "Una checklist dei punti da trattare che i moderatori spuntano durante l'evento. Confluisce nella sintesi automatica. Opzionale e attivabile anche durante l'evento.",
       "autoStartRecording": "Avvia la registrazione automaticamente",
       "autoStartRecordingDesc": "Al momento dell'inizio dell'evento la registrazione parte da sola (senza chiedere conferma al moderatore). Così eventuali ritardatari trovano già il player disponibile.",
       "aiSectionHeading": "Post-produzione automatica",
@@ -1050,8 +1067,11 @@
       "aiTranslationEnabledDesc": "Trascrizione e sintesi tradotte nelle lingue indicate qui sotto.",
       "aiTargetLocales": "Lingue di traduzione",
       "aiTargetLocalesDesc": "Codici lingua ISO (es. en, fr, de) separati da virgola. Lascia vuoto per usare le lingue impostate a livello sito.",
+      "aiTargetLocalesRequired": "Indica almeno una lingua di traduzione, oppure disattiva la traduzione automatica.",
       "aiDubbingEnabled": "Doppiaggio audio",
       "aiDubbingEnabledDesc": "Audio doppiato nelle lingue target, generato con voci sintetiche pre-addestrate. Non clona la voce dei partecipanti.",
+      "multitrackRecordingEnabled": "Registrazione per-partecipante (alta precisione)",
+      "multitrackRecordingEnabledDesc": "Registra una traccia audio separata per ogni partecipante, così la trascrizione attribuisce con certezza chi dice cosa (niente più \"Parlante 1/2\"). Tratta l'audio isolato del singolo parlante (dato personale sensibile): le tracce sono temporanee e cancellate subito dopo la trascrizione. Richiede il consenso alla registrazione.",
       "expectedSpeakers": "Numero di parlanti attesi",
       "expectedSpeakersDesc": "Quando lo sai (es. 3 relatori), indicarlo migliora la qualità dell'identificazione dei parlanti. Lascia vuoto per lasciare decidere alla pipeline.",
       "dataRetentionDays": "Conservazione dati (giorni dopo l'evento)",
@@ -1467,6 +1487,15 @@
       "unmute": "Microfono partecipanti",
       "video": "Video partecipanti",
       "screen": "Condivisione schermo",
+      "durationLabel": "Durata predefinita (minuti)",
+      "durationHint": "Pre-compila la fine dell'evento (inizio + durata). L'utente può modificarla. Vuoto = 2 ore.",
+      "retentionLabel": "Conservazione dati predefinita (giorni)",
+      "expectedSpeakersLabel": "Numero relatori atteso (default)",
+      "descriptionTemplateLabel": "Descrizione predefinita",
+      "descriptionTemplateHint": "Testo pre-compilato nella descrizione dell'evento (modificabile).",
+      "aiTranscript": "Trascrizione automatica (default)",
+      "aiSummary": "Sintesi automatica (default)",
+      "aiTranslation": "Traduzione automatica (default)",
       "pickerTitle": "Scegli un template",
       "pickerSubtitle": "Seleziona un template per pre-configurare le impostazioni dell'evento, oppure salta per configurare tutto manualmente.",
       "skipTemplate": "Configura manualmente"
@@ -2074,6 +2103,8 @@
     "consent": {
       "recording": "Acconsento alla registrazione audio/video dell'evento",
       "recordingRequired": "Il consenso alla registrazione è obbligatorio per partecipare a questo evento",
+      "multitrack": "Acconsento alla registrazione di una traccia audio separata della mia voce, al solo scopo di attribuire correttamente la trascrizione a chi parla. La traccia è temporanea e cancellata dopo la trascrizione; non viene usata per identificare o riprodurre la mia voce.",
+      "multitrackRequired": "Il consenso alla registrazione della tua traccia audio è obbligatorio per partecipare a questo evento",
       "futureCommunications": "Desidero ricevere informazioni su eventi futuri organizzati dal DTD",
       "addressBook": "Voglio essere inserito nella Rubrica DTD per essere invitato ad eventi simili",
       "addressBookHelp": "Consenso separato (art. 6.1.a GDPR). Potrai revocarlo in qualsiasi momento dal link \"Rimuovi i miei dati dalla rubrica\" nelle email che riceverai. Il nome e l'organizzazione saranno ricavati dal profilo di registrazione."

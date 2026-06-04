@@ -26,11 +26,14 @@ export interface Step2Value {
   permissionMatrix: PermissionMatrix;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
+  /** Agenda/note live (checklist opt-in). */
+  agendaEnabled: boolean;
   // ── Post-produzione AI (subordinata a recordingEnabled) ──
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
   aiTranslationEnabled: boolean;
   aiDubbingEnabled: boolean;
+  multitrackRecordingEnabled: boolean;
   /** Comma-separated ISO-639-1 (es. "en,fr"). Null/empty = usa il
    *  default impostato a livello sito. */
   aiTargetLocales: string | null;
@@ -41,9 +44,10 @@ export interface Step2Value {
 interface Props {
   value: Step2Value;
   onChange: (patch: Partial<Step2Value>) => void;
+  fieldErrors?: Record<string, string>;
 }
 
-export default function Step2Permissions({ value, onChange }: Props) {
+export default function Step2Permissions({ value, onChange, fieldErrors = {} }: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
 
@@ -172,6 +176,25 @@ export default function Step2Permissions({ value, onChange }: Props) {
         )}
       </section>
 
+      {/* Interazione live — feature opzionali della stanza */}
+      <section className="mb-3">
+        <div className="py-2 d-flex justify-content-between align-items-start">
+          <div className="me-3">
+            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+              {tAdmin('form.agendaEnabled')}
+            </div>
+            <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+              {tAdmin('form.agendaEnabledDesc')}
+            </div>
+          </div>
+          <ToggleSwitch
+            label=""
+            checked={value.agendaEnabled}
+            onChange={() => onChange({ agendaEnabled: !value.agendaEnabled })}
+          />
+        </div>
+      </section>
+
       {/* Post-produzione AI — solo se recording attiva. Renderizzata
           come sezione separata sotto la registrazione (la AI lavora
           sulla registrazione, ne è subordinata). */}
@@ -201,6 +224,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
                       aiSummaryEnabled: false,
                       aiTranslationEnabled: false,
                       aiDubbingEnabled: false,
+                      multitrackRecordingEnabled: false,
                     },
               );
             }}
@@ -208,6 +232,17 @@ export default function Step2Permissions({ value, onChange }: Props) {
 
           {value.aiTranscriptEnabled && (
             <>
+              <AiToggle
+                label={tAdmin('form.multitrackRecordingEnabled')}
+                desc={tAdmin('form.multitrackRecordingEnabledDesc')}
+                checked={value.multitrackRecordingEnabled}
+                onToggle={() =>
+                  onChange({
+                    multitrackRecordingEnabled: !value.multitrackRecordingEnabled,
+                  })
+                }
+              />
+
               <AiToggle
                 label={tAdmin('form.aiSummaryEnabled')}
                 desc={tAdmin('form.aiSummaryEnabledDesc')}
@@ -255,7 +290,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
                   <input
                     id="aiTargetLocales"
                     type="text"
-                    className="form-control form-control-sm"
+                    className={`form-control form-control-sm${fieldErrors.aiTargetLocales ? ' is-invalid' : ''}`}
                     style={{ maxWidth: 260 }}
                     placeholder="en,fr,de"
                     value={value.aiTargetLocales ?? ''}
@@ -266,6 +301,11 @@ export default function Step2Permissions({ value, onChange }: Props) {
                       })
                     }
                   />
+                  {fieldErrors.aiTargetLocales && (
+                    <div className="invalid-feedback d-block">
+                      {tAdmin('form.aiTargetLocalesRequired')}
+                    </div>
+                  )}
                 </div>
               )}
 

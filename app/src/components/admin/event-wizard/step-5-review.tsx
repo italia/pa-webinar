@@ -27,6 +27,7 @@ interface Props {
   jvbSizingConfig: JvbSizingConfig;
   defaultSenderRatioPct: number;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
+  fieldErrors?: Record<string, string>;
 }
 
 export default function Step5Review({
@@ -35,6 +36,7 @@ export default function Step5Review({
   jvbSizingConfig,
   defaultSenderRatioPct,
   gdprTemplates,
+  fieldErrors = {},
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
   const toggles = togglesFromMatrix(form.permissionMatrix);
@@ -114,6 +116,12 @@ export default function Step5Review({
                 : t('summary.recordingOff')
             }
           />
+          {form.multitrackRecordingEnabled && (
+            <SummaryItem
+              label={t('summary.multitrack')}
+              value={t('summary.multitrackOn')}
+            />
+          )}
         </div>
       </div>
 
@@ -201,6 +209,9 @@ export default function Step5Review({
         <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('moderatorHeading')}
         </h3>
+        <p className="text-secondary mb-2" style={{ fontSize: '0.82rem' }}>
+          {t('moderatorPublishHint')}
+        </p>
         <div className="row g-3">
           <div className="col-md-6">
             <label className="form-label" htmlFor="rev-mod-name">
@@ -209,10 +220,13 @@ export default function Step5Review({
             <input
               id="rev-mod-name"
               type="text"
-              className="form-control"
+              className={`form-control${fieldErrors.moderatorName ? ' is-invalid' : ''}`}
               value={form.moderatorName ?? ''}
               onChange={(e) => onChange({ moderatorName: e.target.value })}
             />
+            {fieldErrors.moderatorName && (
+              <div className="invalid-feedback d-block">{t('moderatorRequired')}</div>
+            )}
           </div>
           <div className="col-md-6">
             <label className="form-label" htmlFor="rev-mod-email">
@@ -221,10 +235,13 @@ export default function Step5Review({
             <input
               id="rev-mod-email"
               type="email"
-              className="form-control"
+              className={`form-control${fieldErrors.moderatorEmail ? ' is-invalid' : ''}`}
               value={form.moderatorEmail ?? ''}
               onChange={(e) => onChange({ moderatorEmail: e.target.value })}
             />
+            {fieldErrors.moderatorEmail && (
+              <div className="invalid-feedback d-block">{t('moderatorEmailRequired')}</div>
+            )}
           </div>
         </div>
       </section>

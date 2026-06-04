@@ -185,6 +185,12 @@ export const POST = withErrorHandling(async (request) => {
           organizerName: true,
           speakersInfo: true,
           expectedSpeakers: true,
+          // Agenda/note (se la funzione è attiva): confluisce nel prompt
+          // della sintesi (job SUMMARIZE) — vedi più sotto.
+          agendaItems: {
+            orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+            select: { label: true, completed: true },
+          },
         },
       },
     },
@@ -385,13 +391,22 @@ export const POST = withErrorHandling(async (request) => {
     }
   }
 
+  // Per la sintesi: inietta l'agenda (punti + spunte) nel payload, così il
+  // worker la include nel prompt LLM. Funzione opzionale: se non ci sono
+  // item (agenda spenta/vuota) il payload resta invariato e nulla cambia.
+  const agenda = recording.event.agendaItems ?? [];
+  const payloadOut =
+    row.kind === 'SUMMARIZE' && agenda.length > 0
+      ? { ...(parsed.data.payload as Record<string, unknown>), agenda }
+      : parsed.data.payload;
+
   return Response.json(
     {
       claimed: true,
       jobId: row.id,
       recordingId: row.recording_id,
       kind: row.kind,
-      payload: parsed.data.payload,
+      payload: payloadOut,
       attempts: row.attempts,
       leaseExpiresAt: leaseUntil.toISOString(),
       sourceDownloadUrl,

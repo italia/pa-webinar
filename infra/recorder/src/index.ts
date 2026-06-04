@@ -35,6 +35,15 @@ interface RecorderEnv {
   portalUrl: string;
   cronApiKey: string;
   outputDir: string;
+  idleTimeoutSec?: number;
+  maxDurationSec?: number;
+}
+
+function readIntEnv(name: string): number | undefined {
+  const v = process.env[name];
+  if (!v) return undefined;
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : undefined;
 }
 
 function requireEnv(name: string): string {
@@ -53,6 +62,10 @@ function readEnv(): RecorderEnv {
     portalUrl: requireEnv('PORTAL_URL').replace(/\/+$/, ''),
     cronApiKey: requireEnv('CRON_API_KEY'),
     outputDir: process.env.OUTPUT_DIR ?? '/recordings',
+    // Quanto il bot resta in stanza vuota prima di chiudere (default 90s in
+    // capture.ts). Configurabile per dare tempo ai partecipanti di entrare.
+    idleTimeoutSec: readIntEnv('IDLE_TIMEOUT_SEC'),
+    maxDurationSec: readIntEnv('MAX_DURATION_SEC'),
   };
 }
 

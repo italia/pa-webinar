@@ -37,6 +37,7 @@ interface RegistrationRow {
   organizationRole: string | null;
   organizationType: string | null;
   consentRecording: boolean | null;
+  consentMultitrack: boolean | null;
   consentFutureCommunications: boolean;
   joinedAt: string | null;
   leftAt: string | null;

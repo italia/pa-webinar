@@ -44,6 +44,7 @@ interface RegistrationRow {
   organizationRole: string | null;
   organizationType: string | null;
   consentRecording: boolean | null;
+  consentMultitrack: boolean | null;
   consentFutureCommunications: boolean;
   joinedAt: string | null;
   leftAt: string | null;
@@ -125,6 +126,7 @@ export const GET = withErrorHandling(async (request) => {
     organizationRole: r.organizationRole,
     organizationType: r.organizationType,
     consentRecording: r.consentRecording,
+    consentMultitrack: r.consentMultitrack,
     consentFutureCommunications: r.consentFutureCommunications,
     joinedAt: r.joinedAt?.toISOString() ?? null,
     leftAt: r.leftAt?.toISOString() ?? null,
@@ -143,6 +145,7 @@ export const GET = withErrorHandling(async (request) => {
       'organization_role',
       'organization_type',
       'consent_recording',
+      'consent_multitrack',
       'consent_future_communications',
       'joined',
     ];
@@ -159,6 +162,7 @@ export const GET = withErrorHandling(async (request) => {
         csvEscape(r.organizationRole),
         r.organizationType ?? '',
         r.consentRecording === null ? '' : r.consentRecording ? 'yes' : 'no',
+        r.consentMultitrack === null ? '' : r.consentMultitrack ? 'yes' : 'no',
         r.consentFutureCommunications ? 'yes' : 'no',
         r.joinedAt ? 'yes' : 'no',
       ].join(','));

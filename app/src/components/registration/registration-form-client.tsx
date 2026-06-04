@@ -26,6 +26,7 @@ interface RegistrationFormClientProps {
   privacyPolicyUrl: string;
   privacyPolicyText?: string;
   recordingEnabled?: boolean;
+  multitrackRecordingEnabled?: boolean;
   profiling?: ProfilingConfig;
 }
 
@@ -36,6 +37,7 @@ export default function RegistrationFormClient({
   privacyPolicyUrl,
   privacyPolicyText,
   recordingEnabled,
+  multitrackRecordingEnabled,
   profiling,
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
@@ -49,6 +51,7 @@ export default function RegistrationFormClient({
   const [organizationType, setOrganizationType] = useState('');
   const [consentGiven, setConsentGiven] = useState(false);
   const [consentRecording, setConsentRecording] = useState(false);
+  const [consentMultitrack, setConsentMultitrack] = useState(false);
   const [consentFutureCommunications, setConsentFutureCommunications] = useState(false);
   // Rubrica (address book) opt-in — separate Art. 6.1.a consent from the
   // event-registration Art. 6.1.b basis. Default unchecked, as GDPR
@@ -99,6 +102,7 @@ export default function RegistrationFormClient({
       consentAddressBook,
     };
     if (recordingEnabled) payload.consentRecording = consentRecording;
+    if (multitrackRecordingEnabled) payload.consentMultitrack = consentMultitrack;
     if (showOrg) payload.organization = organization || undefined;
     if (showRole) payload.organizationRole = organizationRole || undefined;
     if (showType && organizationType) payload.organizationType = organizationType;
@@ -124,6 +128,10 @@ export default function RegistrationFormClient({
     if (recordingEnabled && !consentRecording) {
       fieldErrors.consentRecording = 'registration.errors.recordingConsentRequired';
     }
+    // Multitrack consent is mandatory when per-participant recording is enabled
+    if (multitrackRecordingEnabled && !consentMultitrack) {
+      fieldErrors.consentMultitrack = 'registration.errors.multitrackConsentRequired';
+    }
 
     if (Object.keys(fieldErrors).length > 0) {
       setErrors(fieldErrors);
@@ -131,7 +139,7 @@ export default function RegistrationFormClient({
     }
     setErrors({});
     return true;
-  }, [displayName, email, consentGiven, consentRecording, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, showOrg, showRole, showType, recordingEnabled]);
+  }, [displayName, email, consentGiven, consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, showOrg, showRole, showType, recordingEnabled, multitrackRecordingEnabled]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -148,6 +156,7 @@ export default function RegistrationFormClient({
           consentAddressBook,
         };
         if (recordingEnabled) body.consentRecording = consentRecording;
+        if (multitrackRecordingEnabled) body.consentMultitrack = consentMultitrack;
         if (showOrg && organization) body.organization = organization;
         if (showRole && organizationRole) body.organizationRole = organizationRole;
         if (showType && organizationType) body.organizationType = organizationType;
@@ -186,7 +195,7 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, consentRecording, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled],
+    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled, multitrackRecordingEnabled],
   );
 
   if (success) {
@@ -389,6 +398,28 @@ export default function RegistrationFormClient({
           {errors.consentRecording && (
             <div className="text-danger small mt-1">
               {tg('consent.recordingRequired')}
+            </div>
+          )}
+        </FormGroup>
+      )}
+
+      {/* ── Consent 2b: Multitrack per-participant recording (ADR-013 F5) ── */}
+      {multitrackRecordingEnabled && (
+        <FormGroup check className="mb-3">
+          <Input
+            type="checkbox"
+            id="consentMultitrack"
+            checked={consentMultitrack}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setConsentMultitrack(e.target.checked)
+            }
+          />
+          <Label for="consentMultitrack" check>
+            {tg('consent.multitrack')}
+          </Label>
+          {errors.consentMultitrack && (
+            <div className="text-danger small mt-1">
+              {tg('consent.multitrackRequired')}
             </div>
           )}
         </FormGroup>

@@ -98,6 +98,11 @@ const eventBaseSchema = z.object({
   aiSummaryEnabled: z.boolean().optional(),
   aiTranslationEnabled: z.boolean().optional(),
   aiDubbingEnabled: z.boolean().optional(),
+  // ADR-013 Fase 5 — opt-in registrazione per-partecipante (PII sensibile,
+  // off di default). Vedi schema.prisma `Event.multitrackRecordingEnabled`.
+  multitrackRecordingEnabled: z.boolean().optional(),
+  // Agenda/note live (checklist opt-in).
+  agendaEnabled: z.boolean().optional(),
   // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales: z.string().max(200).nullable().optional(),
   // Numero di parlanti attesi (1-30). Quando valorizzato, la pipeline
@@ -231,6 +236,9 @@ export const createRegistrationSchema = z.object({
       errorMap: () => ({ message: 'registration.errors.consentRequired' }),
     }),
   consentRecording: z.boolean().optional(),
+  // ADR-013 Fase 5 — consenso separato alla registrazione per-partecipante.
+  // Obbligatorio (true) lato route quando l'evento ha multitrackRecordingEnabled.
+  consentMultitrack: z.boolean().optional(),
   consentFutureCommunications: z.boolean().default(false),
   // Rubrica (Person address book) opt-in. This is a SEPARATE Art. 6.1.a
   // consent from the event-registration Art. 6.1.b basis — it controls
