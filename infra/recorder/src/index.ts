@@ -130,8 +130,16 @@ const isMain =
   import.meta.url === `file://${process.argv[1]}`;
 
 if (isMain) {
-  main().catch((err) => {
-    console.error('[recorder] errore fatale:', err);
-    process.exit(1);
-  });
+  main()
+    .then(() => {
+      // Uscita esplicita: Puppeteer/Chrome può lasciare handle aperti che
+      // tengono vivo l'event loop anche dopo browser.close(), impedendo al
+      // processo di terminare → il Job resterebbe Running fino ad
+      // activeDeadlineSeconds. Forziamo l'exit a lavoro completato.
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error('[recorder] errore fatale:', err);
+      process.exit(1);
+    });
 }
