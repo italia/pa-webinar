@@ -100,7 +100,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       endsAt: event.endsAt,
       timezone: event.timezone,
       url: input.eventPageUrl,
-      organizerName: event.moderatorName ?? 'Eventi PA',
+      organizerName: event.moderatorName ?? 'PA Webinar',
       organizerEmail: event.moderatorEmail ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
     });
 

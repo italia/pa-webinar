@@ -16,11 +16,13 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+
 import TranscriptEditor from './transcript-editor';
 import SummaryEditor from './summary-editor';
 import TranslationManager from './translation-manager';
+import ArchivePanel from './archive-panel';
 
-type TabKey = 'transcript' | 'summary' | 'translations';
+type TabKey = 'transcript' | 'summary' | 'translations' | 'archive';
 
 function statusBadgeClass(status: string): string {
   if (status.endsWith('DONE')) return 'bg-success';
@@ -86,6 +88,7 @@ export default function RecordingManageClient({
     { key: 'transcript', label: t('manageTabTranscript') },
     { key: 'summary', label: t('manageTabSummary') },
     { key: 'translations', label: t('manageTabTranslations') },
+    { key: 'archive', label: t('manageTabArchive') },
   ];
 
   return (
@@ -156,6 +159,7 @@ export default function RecordingManageClient({
         {tab === 'transcript' && <TranscriptEditor recordingId={recordingId} />}
         {tab === 'summary' && <SummaryEditor recordingId={recordingId} />}
         {tab === 'translations' && <TranslationManager recordingId={recordingId} />}
+        {tab === 'archive' && <ArchivePanel recordingId={recordingId} />}
       </div>
     </div>
   );

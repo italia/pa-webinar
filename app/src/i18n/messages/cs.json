@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Veřejné digitální události",
-      "subtitle": "Platforma pro webináře, prezentace a veřejná setkání Odboru pro digitální transformaci",
-      "browseEvents": "Prohlédnout události",
-      "organizeEvent": "Uspořádat událost"
-    },
-    "features": {
-      "title": "Platforma pro události veřejné správy",
-      "video": {
-        "title": "Videokonference",
-        "desc": "Zúčastněte se veřejných událostí až s 300 účastníky. Bez nutnosti instalace softwaru."
-      },
-      "qa": {
-        "title": "Otázky a odpovědi",
-        "desc": "Pokládejte otázky během události a hlasujte o nejdůležitějších. Moderátor odpovídá živě."
-      },
-      "privacy": {
-        "title": "Ochrana soukromí a bezpečnost",
-        "desc": "Ochrana dat v souladu s GDPR. Vlastní infrastruktura v Itálii."
+      "kicker": "Otevřeno všem · živě · na vyžádání",
+      "title": "Webináře a akce komunit digitální transformace",
+      "subtitle": "Sledujte živě prezentace, veřejná setkání a Q&A relace komunit digitální transformace. Připojte se z prohlížeče, pokládejte otázky a přehrávejte si záznamy, kdykoli budete chtít.",
+      "browseEvents": "Prohlédnout nadcházející akce",
+      "watchRecordings": "Sledovat záznamy",
+      "badges": {
+        "noInstall": "Z prohlížeče, bez instalace",
+        "interactive": "Živé Q&A a ankety",
+        "recordings": "Záznamy a titulky",
+        "accessible": "Přístupné, ve 24 jazycích"
       }
     },
     "upcoming": {
-      "title": "Nadcházející události",
-      "viewAll": "Zobrazit všechny události",
-      "noEvents": "Žádné nadcházející události. Navštivte nás znovu!"
+      "title": "Nadcházející akce",
+      "viewAll": "Zobrazit všechny akce",
+      "noEvents": "Žádné naplánované akce. Podívejte se brzy znovu!"
     },
     "howItWorks": {
-      "title": "Jak to funguje",
+      "title": "Jak se zúčastnit",
+      "subtitle": "Stačí pár kroků, bez účtu a bez instalace.",
       "step1": {
         "title": "Zaregistrujte se",
-        "desc": "Přihlaste se zdarma na událost"
+        "desc": "Přihlaste se na akci zdarma z její veřejné stránky."
       },
       "step2": {
-        "title": "Obdržíte odkaz",
-        "desc": "E-mail s vaším osobním přístupovým odkazem"
+        "title": "Získejte odkaz",
+        "desc": "Obdržíte e-mail s vaším osobním odkazem a přílohou do kalendáře."
       },
       "step3": {
         "title": "Připojte se",
-        "desc": "Vstupte do události z prohlížeče, bez instalace"
+        "desc": "Vstupte na akci z prohlížeče, není třeba nic instalovat."
       },
       "step4": {
-        "title": "Komunikujte",
-        "desc": "Pokládejte otázky, hlasujte, účastněte se diskuse"
+        "title": "Interagujte",
+        "desc": "Pokládejte otázky, hlasujte, odpovídejte v anketách a zapojte se do diskuze."
+      }
+    },
+    "during": {
+      "title": "Co můžete během akce dělat",
+      "subtitle": "Nejen sledovat: akce jsou interaktivní.",
+      "qa": {
+        "title": "Otázky a odpovědi",
+        "desc": "Pokládejte otázky a hlasujte pro otázky ostatních: moderátor odpovídá živě."
+      },
+      "polls": {
+        "title": "Ankety",
+        "desc": "Odpovídejte v anketách v reálném čase a okamžitě vidíte výsledky."
+      },
+      "wordcloud": {
+        "title": "Slovní mrak",
+        "desc": "Přidejte svá slova do sdíleného slovního mraku akce."
+      },
+      "reactions": {
+        "title": "Reakce a zvednuté ruce",
+        "desc": "Reagujte a požádejte o slovo zvednutím ruky: fronta se zpracovává v pořadí."
+      },
+      "chat": {
+        "title": "Chat",
+        "desc": "Pište v chatu akce a sledujte konverzaci s ostatními účastníky."
+      },
+      "agenda": {
+        "title": "Program a poznámky",
+        "desc": "Sledujte program a poznámky, které moderátoři sdílejí během akce."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Projekt",
+      "title": "Open source a svrchovaný, vytvořený veřejnou správou pro veřejnou správu",
+      "body": "PA Webinar je platforma Odboru pro digitální transformaci pro veřejné digitální akce: designový systém .italia, video engine Jitsi Meet a plně in-cluster AI pipeline. Je uvolněna jako open source, aby ji mohla znovu použít jakákoli administrativa.",
+      "sovereignty": {
+        "title": "Datová svrchovanost",
+        "desc": "Self-hosted na infrastruktuře administrativy: data nikdy neopustí prostředí a nehrozí vystavení CLOUD Act."
+      },
+      "openSource": {
+        "title": "Open source EUPL-1.2",
+        "desc": "Kód znovu použitelný jakoukoli administrativou, s veřejným SBOM a service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII šifrované v klidu, granulární souhlasy a konfigurovatelné uchovávání."
+      },
+      "cta": "Transparentnost služby",
+      "techTitle": "Postaveno na otevřených technologiích",
+      "archTitle": "Jak to funguje, ve zkratce"
+    },
+    "afterEvent": {
+      "title": "Po akci",
+      "subtitle": "Nic se neztratí: vše zůstává dostupné a přístupné.",
+      "library": {
+        "title": "Knihovna záznamů",
+        "desc": "Znovu si přehrajte minulé akce ve veřejné knihovně, s archivem dotazů a anket."
+      },
+      "transcript": {
+        "title": "Přepis a titulky",
+        "desc": "Každý záznam může mít přepis a titulky, generované automaticky pomocí AI pipeline in-cluster."
+      },
+      "translation": {
+        "title": "Automatický překlad",
+        "desc": "Titulky a shrnutí přeložené do několika jazyků, abyste mohli akci sledovat i v jiném jazyce."
+      },
+      "dubbing": {
+        "title": "Zvukový dabing",
+        "desc": "Dabovaná zvuková stopa s neutrálním syntetickým hlasem (bez klonování hlasu), abyste mohli událost poslouchat v jiném jazyce."
       }
     }
   },
@@ -2039,20 +2100,36 @@
     "accessibility": {
       "metaTitle": "Prohlášení o přístupnosti",
       "title": "Prohlášení o přístupnosti",
-      "intro": "Odbor pro digitální transformaci se zavazuje zajistit přístupnost této platformy v souladu s platnými požadavky na digitální služby veřejné správy.",
+      "intro": "Ministerstvo pro digitální transformaci se zavazuje učinit PA Webinar přístupným v souladu s italským zákonem 4/2004, směrnicí (EU) 2016/2102 a pokyny AgID k přístupnosti nástrojů IKT.",
       "sections": {
-        "commitment": {
-          "title": "Závazek přístupnosti",
-          "body": "Platforma je navržena s komponentami v souladu s designovým systémem .italia a s důrazem na navigaci z klávesnice, sémantickou strukturu obsahu a čitelnost rozhraní na hlavních velikostech obrazovky."
+        "conformance": {
+          "title": "Stav souladu",
+          "body": "PA Webinar je navržen tak, aby splňoval WCAG 2.1 úrovně AA. Každá veřejná správa poskytující službu musí zveřejnit vlastní prohlášení, v němž uvede skutečný stav souladu (plně, částečně nebo nesouladný) na základě aktuálního posouzení."
         },
-        "status": {
-          "title": "Stav shody",
-          "body": "Probíhají průběžné kontroly a zlepšování přístupnosti. Případné zbývající nedostatky jsou postupně odstraňovány v rámci vývoje služby a běžné údržby."
+        "nonAccessible": {
+          "title": "Nepřístupný obsah",
+          "body": "Videomístnost je poskytována prostřednictvím Jitsi Meet: některé funkce v reálném čase mohou mít omezení s asistivními technologiemi. Obsah generovaný automaticky pomocí AI (přepisy, titulky, překlady a dabing) může obsahovat nepřesnosti a je vždy jako takový označen."
+        },
+        "preparation": {
+          "title": "Vypracování tohoto prohlášení",
+          "body": "Toto vzorové prohlášení bylo vypracováno na základě sebehodnocení provedeného poskytovatelem služby. Rozhraní je vytvořeno pomocí designového systému .italia, s důrazem na navigaci klávesnicí, sémantiku obsahu, barevný kontrast a kompatibilitu se čtečkami obrazovky. Data vypracování a poslední revize je nutné doplnit při zveřejnění."
         },
         "feedback": {
-          "title": "Zpětná vazba a kontakty",
-          "body": "Pro nahlášení problémů s přístupností nebo potíží při používání služby mohou uživatelé kontaktovat Odbor prostřednictvím jeho institucionálních kanálů s uvedením dotčené stránky a stručným popisem problému."
+          "title": "Zpětná vazba a kontakt",
+          "body": "Pro nahlášení případů nesouladu nebo pro vyžádání informací a obsahu vyňatého z působnosti předpisu můžete využít institucionální kontaktní kanály veřejné správy poskytující službu, přičemž uveďte dotčenou stránku a popis problému."
+        },
+        "enforcement": {
+          "title": "Postup vymáhání",
+          "body": "Pokud je odpověď neuspokojivá nebo neobdržíte odpověď do 30 dnů, můžete se obrátit na Digitálního občanského ochránce AgID (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Opětovné použití a zveřejnění prohlášení",
+        "body": "PA Webinar je software s otevřeným zdrojovým kódem, který mohou znovu použít jiné veřejné správy. Každý subjekt přijímající platformu musí vypracovat a zveřejnit vlastní prohlášení o přístupnosti prostřednictvím oficiálního formuláře AgID a nahradit tento vzorový text vlastními údaji."
+      },
+      "links": {
+        "agidForm": "Formulář prohlášení o přístupnosti (AgID)",
+        "difensore": "Přístupnost a Digitální občanský ochránce (AgID)"
       }
     },
     "legalNotes": {

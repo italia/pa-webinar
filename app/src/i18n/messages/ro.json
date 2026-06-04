@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Evenimente publice digitale",
-      "subtitle": "Platformă pentru webinarii, prezentări și întâlniri publice a Departamentului pentru Transformarea Digitală",
-      "browseEvents": "Descoperiți evenimentele",
-      "organizeEvent": "Organizați un eveniment"
-    },
-    "features": {
-      "title": "Platforma pentru evenimentele administrației publice",
-      "video": {
-        "title": "Videoconferință",
-        "desc": "Participați la evenimente publice cu până la 300 de participanți. Fără software de instalat."
-      },
-      "qa": {
-        "title": "Întrebări și răspunsuri",
-        "desc": "Puneți întrebări în timpul evenimentului și votați-le pe cele mai importante. Moderatorul răspunde în direct."
-      },
-      "privacy": {
-        "title": "Confidențialitate și securitate",
-        "desc": "Date protejate și conforme cu GDPR. Infrastructură self-hosted în Italia."
+      "kicker": "Deschis tuturor · în direct · la cerere",
+      "title": "Webinarii și evenimente ale comunităților transformării digitale",
+      "subtitle": "Urmărește în direct prezentări, întâlniri publice și sesiuni de Q&A ale comunităților transformării digitale. Participă din browser, pune întrebări și revezi înregistrările oricând dorești.",
+      "browseEvents": "Vezi evenimentele viitoare",
+      "watchRecordings": "Vezi înregistrările",
+      "badges": {
+        "noInstall": "Din browser, fără instalări",
+        "interactive": "Q&A și sondaje în direct",
+        "recordings": "Înregistrări și subtitrări",
+        "accessible": "Accesibil, în 24 de limbi"
       }
     },
     "upcoming": {
       "title": "Evenimente viitoare",
-      "viewAll": "Vedeți toate evenimentele",
-      "noEvents": "Niciun eveniment programat. Reveniți în curând!"
+      "viewAll": "Vezi toate evenimentele",
+      "noEvents": "Niciun eveniment programat. Revino în curând!"
     },
     "howItWorks": {
-      "title": "Cum funcționează",
+      "title": "Cum participi",
+      "subtitle": "Doar câțiva pași, fără cont și fără instalări.",
       "step1": {
-        "title": "Înregistrați-vă",
-        "desc": "Înscrieți-vă gratuit la eveniment"
+        "title": "Înregistrează-te",
+        "desc": "Înscrie-te gratuit la eveniment de pe pagina sa publică."
       },
       "step2": {
-        "title": "Primiți linkul",
-        "desc": "Un email cu linkul personal de acces"
+        "title": "Primește linkul",
+        "desc": "Primești un e-mail cu linkul tău personal și un atașament pentru calendar."
       },
       "step3": {
-        "title": "Participați",
-        "desc": "Intrați la eveniment din browser, fără instalări"
+        "title": "Participă",
+        "desc": "Intri la eveniment din browser, fără să instalezi nimic."
       },
       "step4": {
-        "title": "Interacționați",
-        "desc": "Puneți întrebări, votați, participați la discuție"
+        "title": "Interacționează",
+        "desc": "Pune întrebări, votează, răspunde la sondaje și alătură-te discuției."
+      }
+    },
+    "during": {
+      "title": "Ce poți face în timpul unui eveniment",
+      "subtitle": "Nu doar să urmărești: evenimentele sunt interactive.",
+      "qa": {
+        "title": "Întrebări și răspunsuri",
+        "desc": "Pune întrebări și votează-le pe ale altora: moderatorul răspunde în direct."
+      },
+      "polls": {
+        "title": "Sondaje",
+        "desc": "Răspunde la sondaje în timp real și vezi rezultatele instantaneu."
+      },
+      "wordcloud": {
+        "title": "Nor de cuvinte",
+        "desc": "Adaugă-ți cuvintele în norul de cuvinte comun al evenimentului."
+      },
+      "reactions": {
+        "title": "Reacții și mâini ridicate",
+        "desc": "Reacționează și cere cuvântul ridicând mâna: coada este gestionată în ordine."
+      },
+      "chat": {
+        "title": "Chat",
+        "desc": "Scrie în chatul evenimentului și urmărește conversația cu ceilalți participanți."
+      },
+      "agenda": {
+        "title": "Agendă și notițe",
+        "desc": "Urmărește agenda și notițele pe care moderatorii le partajează în timpul evenimentului."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Proiectul",
+      "title": "Open source și suveran, construit de administrație pentru administrație",
+      "body": "PA Webinar este platforma Departamentului pentru Transformare Digitală pentru evenimente publice digitale: sistemul de design .italia, motorul video Jitsi Meet și un pipeline AI complet in-cluster. Este lansată ca open source pentru ca orice administrație să o poată reutiliza.",
+      "sovereignty": {
+        "title": "Suveranitatea datelor",
+        "desc": "Self-hosted pe infrastructura administrației: datele nu ies niciodată și nu există expunere la CLOUD Act."
+      },
+      "openSource": {
+        "title": "Open source EUPL-1.2",
+        "desc": "Cod reutilizabil de orice administrație, cu un SBOM public și service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII criptate în repaus, consimțăminte granulare și retenție configurabilă."
+      },
+      "cta": "Transparența serviciului",
+      "techTitle": "Construit cu tehnologii deschise",
+      "archTitle": "Cum funcționează, pe scurt"
+    },
+    "afterEvent": {
+      "title": "După eveniment",
+      "subtitle": "Nimic nu se pierde: totul rămâne disponibil și accesibil.",
+      "library": {
+        "title": "Bibliotecă de înregistrări",
+        "desc": "Revezi evenimentele trecute în biblioteca publică, cu arhiva de întrebări și sondaje."
+      },
+      "transcript": {
+        "title": "Transcriere și subtitrări",
+        "desc": "Fiecare înregistrare poate avea transcriere și subtitrări, generate automat de pipeline-ul AI in-cluster."
+      },
+      "translation": {
+        "title": "Traducere automată",
+        "desc": "Subtitrări și rezumat traduse în mai multe limbi, ca să poți urmări evenimentul și în altă limbă."
+      },
+      "dubbing": {
+        "title": "Dublaj audio",
+        "desc": "O pistă audio dublată cu o voce sintetică neutră (fără clonare vocală), pentru a asculta evenimentul în altă limbă."
       }
     }
   },
@@ -2037,22 +2098,38 @@
       }
     },
     "accessibility": {
-      "metaTitle": "Declarația de accesibilitate",
-      "title": "Declarația de accesibilitate",
-      "intro": "Departamentul pentru Transformarea Digitală se angajează să facă această platformă accesibilă, în conformitate cu cerințele prevăzute de legislația în vigoare pentru serviciile digitale ale administrației publice.",
+      "metaTitle": "Declarație de accesibilitate",
+      "title": "Declarație de accesibilitate",
+      "intro": "Departamentul pentru Transformare Digitală se angajează să facă PA Webinar accesibil, în conformitate cu Legea italiană 4/2004, cu Directiva (UE) 2016/2102 și cu orientările AgID privind accesibilitatea instrumentelor informatice.",
       "sections": {
-        "commitment": {
-          "title": "Angajamentul pentru accesibilitate",
-          "body": "Platforma este proiectată cu componente aliniate la sistemul de design .italia și cu o atenție deosebită acordată navigării de la tastatură, semanticii conținutului și lizibilității interfețelor pe principalele dimensiuni de ecran."
+        "conformance": {
+          "title": "Stadiul conformității",
+          "body": "PA Webinar este conceput pentru a fi conform cu WCAG 2.1 nivelul AA. Fiecare administrație care furnizează serviciul trebuie să publice propria declarație, indicând stadiul efectiv de conformitate (conform, parțial conform sau neconform) pe baza unei evaluări actualizate."
         },
-        "status": {
-          "title": "Starea conformității",
-          "body": "Sunt în curs activități continue de verificare și îmbunătățire a accesibilității aplicației. Eventualele probleme reziduale sunt corectate progresiv în cadrul evoluției serviciului și al mentenanței ordinare."
+        "nonAccessible": {
+          "title": "Conținut neaccesibil",
+          "body": "Sala video este furnizată prin Jitsi Meet: unele funcții în timp real pot prezenta limitări cu tehnologiile de asistare. Conținutul generat automat de AI (transcrieri, subtitrări, traduceri și dublaj) poate conține inexactități și este întotdeauna semnalat ca atare."
+        },
+        "preparation": {
+          "title": "Întocmirea prezentei declarații",
+          "body": "Această declarație-model a fost întocmită pe baza unei autoevaluări efectuate de furnizorul serviciului. Interfața este realizată cu sistemul de design .italia, acordând atenție navigării de la tastatură, semanticii conținutului, contrastului culorilor și compatibilității cu cititoarele de ecran. Datele întocmirii și ale ultimei revizuiri trebuie completate la momentul publicării."
         },
         "feedback": {
-          "title": "Semnalări și contacte",
-          "body": "Pentru a semnala dificultăți de acces la conținut sau probleme de utilizare a serviciului, puteți utiliza canalele de contact instituționale ale Departamentului, indicând pagina afectată și o descriere a problemei întâmpinate."
+          "title": "Feedback și contact",
+          "body": "Pentru a semnala cazuri de neconformitate sau pentru a solicita informații și conținut exclus din domeniul de aplicare al reglementării, puteți utiliza canalele de contact instituționale ale administrației care furnizează serviciul, indicând pagina vizată și o descriere a problemei."
+        },
+        "enforcement": {
+          "title": "Procedura de aplicare",
+          "body": "În cazul unui răspuns nesatisfăcător sau al lipsei unui răspuns în termen de 30 de zile, vă puteți adresa Avocatului poporului civic pentru domeniul digital al AgID (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Reutilizarea și publicarea declarației",
+        "body": "PA Webinar este software cu sursă deschisă reutilizabil de alte administrații. Fiecare entitate care adoptă platforma trebuie să întocmească și să publice propria declarație de accesibilitate prin formularul oficial al AgID, înlocuind acest text-model cu propriile date."
+      },
+      "links": {
+        "agidForm": "Formular de declarație de accesibilitate (AgID)",
+        "difensore": "Accesibilitate și Avocatul poporului civic pentru domeniul digital (AgID)"
       }
     },
     "legalNotes": {

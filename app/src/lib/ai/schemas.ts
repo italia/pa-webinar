@@ -99,6 +99,20 @@ export const dubPayloadSchema = z.object({
 });
 
 /**
+ * Payload per ARCHIVE — archivio scaricabile multi-traccia.
+ *
+ * Il worker riceve via `inputs` il mix video (sourceDownloadUrl), le N
+ * tracce audio per-partecipante (role="track", con displayName + offset)
+ * e i sottotitoli (role="subtitle", il TRANSCRIPT_VTT sorgente). Il
+ * payload porta solo la lingua sorgente per etichettare la traccia
+ * sottotitoli nel contenitore MKV.
+ */
+export const archivePayloadSchema = z.object({
+  runId: uuidSchema,
+  sourceLanguage: languageCodeSchema.optional(),
+});
+
+/**
  * Discriminated union over all known kinds. Use it to validate a row
  * before handing it to a worker:
  *
@@ -114,6 +128,7 @@ export const postprodJobPayloadSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('TRANSLATE'), payload: translatePayloadSchema }),
   z.object({ kind: z.literal('SUBTITLE'), payload: subtitlePayloadSchema }),
   z.object({ kind: z.literal('DUB'), payload: dubPayloadSchema }),
+  z.object({ kind: z.literal('ARCHIVE'), payload: archivePayloadSchema }),
 ]);
 
 export type PostprodJobPayload = z.infer<typeof postprodJobPayloadSchema>;
@@ -128,7 +143,7 @@ export type PostprodJobPayload = z.infer<typeof postprodJobPayloadSchema>;
 export const claimResponseSchema = z.object({
   jobId: uuidSchema,
   recordingId: uuidSchema,
-  kind: z.enum(['TRANSCRIBE', 'TRANSCRIBE_MULTITRACK', 'SUMMARIZE', 'TRANSLATE', 'SUBTITLE', 'DUB']),
+  kind: z.enum(['TRANSCRIBE', 'TRANSCRIBE_MULTITRACK', 'SUMMARIZE', 'TRANSLATE', 'SUBTITLE', 'DUB', 'ARCHIVE']),
   payload: z.unknown(), // narrowed via postprodJobPayloadSchema downstream
   attempts: z.number().int().min(0),
   leaseExpiresAt: z.string().datetime(),
@@ -228,6 +243,7 @@ export const artifactRegisterSchema = z.object({
     'TRANSLATION_MD',
     'DUBBED_AUDIO',
     'DUBBED_VIDEO',
+    'ARCHIVE_MKV',
   ]),
   language: languageCodeSchema.nullable(),
   blobKey: z.string().min(1).max(1_024),

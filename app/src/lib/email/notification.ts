@@ -27,7 +27,7 @@ const COPY = {
     newDate: 'Nuova data',
     newTime: 'Nuovo orario',
     linkNote: 'Il tuo link personale per partecipare resta invariato.',
-    footer: 'Questa email è stata inviata automaticamente da Eventi PA.',
+    footer: 'Questa email è stata inviata automaticamente da PA Webinar.',
   },
   en: {
     subject: (title: string) => `Update: ${title} — New date`,
@@ -36,7 +36,7 @@ const COPY = {
     newDate: 'New date',
     newTime: 'New time',
     linkNote: 'Your personal join link remains unchanged.',
-    footer: 'This email was sent automatically by Eventi PA.',
+    footer: 'This email was sent automatically by PA Webinar.',
   },
 } as const;
 
@@ -104,7 +104,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
         endsAt: event.endsAt,
         timezone: event.timezone,
         url: eventPageUrl,
-        organizerName: event.moderatorName ?? 'Eventi PA',
+        organizerName: event.moderatorName ?? 'PA Webinar',
         organizerEmail: event.moderatorEmail ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
       });
 

@@ -235,6 +235,12 @@ model Event {
   // con questo flag + recordingEnabled + aiTranscriptEnabled. Le tracce sono
   // intermedie e cancellate dopo la trascrizione (multitrack-purge).
   multitrackRecordingEnabled Boolean @default(false) @map("multitrack_recording_enabled")
+  // ADR-013 — opt-in a CONSERVARE le tracce per-partecipante oltre la
+  // trascrizione (per archivio scaricabile + riascolto per-relatore in
+  // video-library). Off di default = minimizzazione (purge subito dopo la
+  // trascrizione). On = le tracce sopravvivono fino a retentionUntil del
+  // recording, con disclosure/consenso dedicati (PII sensibile).
+  retainParticipantTracks Boolean @default(false) @map("retain_participant_tracks")
   // Comma-separated ISO-639-1 list of target languages for transcript /
   // summary translation (e.g. "en,fr"). When null, falls back to
   // SiteSetting.aiDefaultTargetLocales.
@@ -920,7 +926,7 @@ model SiteSetting {
   id String @id @default("singleton")
 
   // Branding
-  siteName              String  @default("Eventi PA") @map("site_name")
+  siteName              String  @default("PA Webinar") @map("site_name")
   siteDescription       String  @default("Piattaforma per eventi pubblici digitali") @map("site_description") @db.Text
   organizationName      String  @default("") @map("organization_name")
   organizationNameShort String  @default("") @map("organization_name_short")
@@ -935,7 +941,7 @@ model SiteSetting {
   defaultTimezone String @default("Europe/Rome") @map("default_timezone")
 
   // SEO
-  seoTitle       String  @default("Eventi PA") @map("seo_title")
+  seoTitle       String  @default("PA Webinar") @map("seo_title")
   seoDescription String  @default("") @map("seo_description") @db.Text
   seoImage       String? @map("seo_image")
 
@@ -1561,6 +1567,12 @@ enum PostprodJobKind {
   // lingua + (V2) un MP4 con audio sostituito. Marker AI Act Art. 50
   // applicato a tutti gli artefatti DUB.
   DUB
+  // Archivio scaricabile (on-demand): muxa il video Jibri + N tracce
+  // audio per-partecipante (etichettate col nome, allineate via
+  // cross-correlazione) + sottotitoli VTT in un singolo file MKV.
+  // Richiede Event.retainParticipantTracks (le tracce devono essere
+  // ancora presenti, non purgate). Vedi infra/ai/worker/archive.py.
+  ARCHIVE
 }
 
 enum PostprodJobStatus {
@@ -1600,6 +1612,13 @@ enum PostprodArtifactType {
   // per download offline. Non prodotto in MVP per evitare ridondanza
   // storage.
   DUBBED_VIDEO
+  // Archivio multi-traccia (job ARCHIVE): un MKV con il video Jibri +
+  // una traccia audio per-partecipante (etichettata col displayName,
+  // allineata via cross-correlazione) + i sottotitoli VTT come traccia
+  // sottotitoli embedded. language=null (è un contenitore multi-lingua).
+  // Contiene voce isolata per-partecipante (PII sensibile) → scaricabile
+  // solo da admin/moderatore, mai esposto pubblicamente.
+  ARCHIVE_MKV
 }
 
 model Recording {

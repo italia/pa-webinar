@@ -1002,6 +1002,8 @@
       "aiDubbingEnabledDesc": "Dubbed audio in the target languages, generated with pre-trained synthetic voices. Does not clone participants' voices.",
       "multitrackRecordingEnabled": "Per-participant recording (high accuracy)",
       "multitrackRecordingEnabledDesc": "Records a separate audio track per participant so the transcript attributes who said what with certainty (no more \"Speaker 1/2\"). It processes isolated single-speaker audio (sensitive personal data): tracks are temporary and deleted right after transcription. Requires recording consent.",
+      "retainParticipantTracks": "Keep per-participant tracks",
+      "retainParticipantTracksDesc": "Keeps the individual audio tracks beyond transcription, for the downloadable archive and per-speaker playback. WARNING: this extends retention of sensitive personal data (isolated voice) until the event's retention deadline. Enable only if needed and with adequate consent/notice.",
       "expectedSpeakers": "Expected number of speakers",
       "expectedSpeakersDesc": "When known (e.g. 3 speakers), setting this improves speaker identification quality. Leave empty to let the pipeline decide.",
       "dataRetentionDays": "Data retention (days after event)",
@@ -1945,6 +1947,25 @@
       "manageTabTranscript": "Transcript",
       "manageTabSummary": "Summary",
       "manageTabTranslations": "Translations",
+      "manageTabArchive": "Archive",
+      "manageLoading": "Loading…",
+      "archivePiiNote": "Isolated per-participant audio tracks are sensitive personal data (isolated voice): this section is restricted to admins/moderators and is never publicly exposed.",
+      "archiveNoTracks": "No per-participant tracks available for this recording (multi-track recording not enabled, or tracks already deleted for GDPR minimization).",
+      "archivePlayerTitle": "Per-speaker playback",
+      "archiveAudioHint": "Use the player's \"Audio\" selector to listen to the mix or a single participant's isolated track, synced to the video.",
+      "archiveTitle": "Downloadable archive",
+      "archiveIntro": "Generate an MKV file with the video, one audio track per participant (labelled with their name, precisely aligned) and subtitles. Meant for download and archival: browsers can't switch audio tracks inside an MKV, so use the player above for playback.",
+      "archiveGenerate": "Generate archive",
+      "archiveStatusLabel": "Status",
+      "archiveStatus_none": "not generated",
+      "archiveStatus_pending": "queued",
+      "archiveStatus_running": "processing",
+      "archiveStatus_done": "ready",
+      "archiveStatus_failed": "failed",
+      "archiveDownload": "Download MKV",
+      "archiveGenerateOk": "Archive generation started.",
+      "archiveGenerateErr": "Archive generation failed (HTTP {code}).",
+      "archiveTrackFallback": "Participant",
       "manageBackToList": "All recordings",
       "manageDuration": "Duration",
       "manageSource": "Source language",
@@ -1984,48 +2005,109 @@
   },
   "home": {
     "hero": {
-      "title": "Public digital events",
-      "subtitle": "Platform for webinars, presentations and public meetings by the Department for Digital Transformation",
-      "browseEvents": "Browse events",
-      "organizeEvent": "Organise an event"
-    },
-    "features": {
-      "title": "The platform for PA events",
-      "video": {
-        "title": "Video conferencing",
-        "desc": "Join public events with up to 300 participants. No software to install."
-      },
-      "qa": {
-        "title": "Questions & Answers",
-        "desc": "Ask questions during the event and upvote the most important ones. The moderator answers live."
-      },
-      "privacy": {
-        "title": "Privacy & Security",
-        "desc": "GDPR-compliant data protection. Self-hosted infrastructure in Italy."
+      "kicker": "Open to everyone · live · on demand",
+      "title": "Webinars and events from the digital transformation communities",
+      "subtitle": "Follow presentations, public meetings and Q&A sessions from the digital transformation communities live. Join from your browser, ask questions and rewatch the recordings whenever you like.",
+      "browseEvents": "Browse upcoming events",
+      "watchRecordings": "Watch recordings",
+      "badges": {
+        "noInstall": "From the browser, no installs",
+        "interactive": "Live Q&A and polls",
+        "recordings": "Recordings and subtitles",
+        "accessible": "Accessible, in 24 languages"
       }
     },
     "upcoming": {
       "title": "Upcoming events",
       "viewAll": "View all events",
-      "noEvents": "No upcoming events. Check back soon!"
+      "noEvents": "No events scheduled. Check back soon!"
     },
     "howItWorks": {
-      "title": "How it works",
+      "title": "How to take part",
+      "subtitle": "Just a few steps, with no account and no installs.",
       "step1": {
         "title": "Register",
-        "desc": "Sign up for free to the event"
+        "desc": "Sign up to the event for free from its public page."
       },
       "step2": {
-        "title": "Get your link",
-        "desc": "An email with your personal access link"
+        "title": "Get the link",
+        "desc": "You receive an email with your personal link and a calendar attachment."
       },
       "step3": {
         "title": "Join",
-        "desc": "Enter the event from your browser, no installation needed"
+        "desc": "Enter the event from your browser, with nothing to install."
       },
       "step4": {
         "title": "Interact",
-        "desc": "Ask questions, vote, join the discussion"
+        "desc": "Ask questions, vote, answer polls and join the discussion."
+      }
+    },
+    "during": {
+      "title": "What you can do during an event",
+      "subtitle": "Not just watch: events are interactive.",
+      "qa": {
+        "title": "Questions and answers",
+        "desc": "Ask questions and upvote others': the moderator answers live."
+      },
+      "polls": {
+        "title": "Polls",
+        "desc": "Answer polls in real time and see the results instantly."
+      },
+      "wordcloud": {
+        "title": "Word cloud",
+        "desc": "Add your words to the event's shared word cloud."
+      },
+      "reactions": {
+        "title": "Reactions and raised hands",
+        "desc": "React and ask to speak by raising your hand: the queue is handled in order."
+      },
+      "chat": {
+        "title": "Chat",
+        "desc": "Write in the event chat and follow the conversation with other participants."
+      },
+      "agenda": {
+        "title": "Agenda and notes",
+        "desc": "Follow the agenda and the notes the moderators share during the event."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "The project",
+      "title": "Open source and sovereign, built by government for government",
+      "body": "PA Webinar is the Department for Digital Transformation's platform for public digital events: the .italia design system, the Jitsi Meet video engine and a fully in-cluster AI pipeline. It is released as open source so any administration can reuse it.",
+      "sovereignty": {
+        "title": "Data sovereignty",
+        "desc": "Self-hosted on the administration's infrastructure: data never leaves and there is no CLOUD Act exposure."
+      },
+      "openSource": {
+        "title": "Open source EUPL-1.2",
+        "desc": "Code reusable by any administration, with a public SBOM and service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII encrypted at rest, granular consents and configurable retention."
+      },
+      "cta": "Service transparency",
+      "techTitle": "Built with open technologies",
+      "archTitle": "How it works, in brief"
+    },
+    "afterEvent": {
+      "title": "After the event",
+      "subtitle": "Nothing is lost: everything stays available and accessible.",
+      "library": {
+        "title": "Recordings library",
+        "desc": "Rewatch past events in the public library, with the archive of questions and polls."
+      },
+      "transcript": {
+        "title": "Transcript and subtitles",
+        "desc": "Each recording can have a transcript and subtitles, generated automatically by the in-cluster AI pipeline."
+      },
+      "translation": {
+        "title": "Automatic translation",
+        "desc": "Subtitles and summary translated into several languages, so you can follow the event in another language too."
+      },
+      "dubbing": {
+        "title": "Audio dubbing",
+        "desc": "A dubbed audio track with a neutral synthetic voice (no voice cloning), to listen to the event in another language."
       }
     }
   },
@@ -2193,20 +2275,36 @@
     "accessibility": {
       "metaTitle": "Accessibility statement",
       "title": "Accessibility statement",
-      "intro": "The Department for Digital Transformation is committed to making this platform accessible, in line with the applicable requirements for public sector digital services.",
+      "intro": "The Department for Digital Transformation is committed to making PA Webinar accessible, in line with Italian Law 4/2004, EU Directive 2016/2102 and AgID's guidelines on the accessibility of ICT tools.",
       "sections": {
-        "commitment": {
-          "title": "Accessibility commitment",
-          "body": "The platform is designed with components aligned with the .italia design system and with attention to keyboard navigation, semantic content structure and interface readability across the main screen sizes."
+        "conformance": {
+          "title": "Conformance status",
+          "body": "PA Webinar is designed to conform to WCAG 2.1 level AA. Each administration providing the service must publish its own statement, indicating the actual conformance status (fully, partially or non conformant) based on an up-to-date assessment."
         },
-        "status": {
-          "title": "Compliance status",
-          "body": "Accessibility checks and improvements are ongoing. Any residual issues are addressed progressively as part of the service evolution and regular maintenance activities."
+        "nonAccessible": {
+          "title": "Non-accessible content",
+          "body": "The video room is provided through Jitsi Meet: some real-time features may have limitations with assistive technologies. Content generated automatically by AI (transcripts, subtitles, translations and dubbing) may contain inaccuracies and is always flagged as such."
+        },
+        "preparation": {
+          "title": "Preparation of this statement",
+          "body": "This template statement was prepared on the basis of a self-assessment carried out by the service provider. The interface is built with the .italia design system, with attention to keyboard navigation, content semantics, colour contrast and screen-reader compatibility. The preparation and last-review dates must be filled in at publication time."
         },
         "feedback": {
-          "title": "Feedback and contacts",
-          "body": "To report accessibility barriers or issues in using the service, users can contact the Department through its institutional channels, specifying the affected page and a brief description of the problem."
+          "title": "Feedback and contact",
+          "body": "To report cases of non-conformance, or to request information and content excluded from the scope of the regulation, you can use the institutional contact channels of the administration providing the service, indicating the page concerned and a description of the problem."
+        },
+        "enforcement": {
+          "title": "Enforcement procedure",
+          "body": "If the response is unsatisfactory or no reply is received within 30 days, you can contact AgID's Digital Civic Ombudsman (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Reuse and publication of the statement",
+        "body": "PA Webinar is open-source software reusable by other administrations. Each body adopting the platform must prepare and publish its own accessibility statement through AgID's official form, replacing this template text with its own data."
+      },
+      "links": {
+        "agidForm": "Accessibility statement form (AgID)",
+        "difensore": "Accessibility and Digital Civic Ombudsman (AgID)"
       }
     },
     "legalNotes": {

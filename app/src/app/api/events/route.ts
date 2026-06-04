@@ -142,6 +142,9 @@ export const POST = withErrorHandling(async (request) => {
       ...(data.multitrackRecordingEnabled !== undefined && {
         multitrackRecordingEnabled: data.multitrackRecordingEnabled,
       }),
+      ...(data.retainParticipantTracks !== undefined && {
+        retainParticipantTracks: data.retainParticipantTracks,
+      }),
       ...(data.agendaEnabled !== undefined && {
         agendaEnabled: data.agendaEnabled,
       }),
