@@ -31,6 +31,7 @@ export interface Step2Value {
   aiSummaryEnabled: boolean;
   aiTranslationEnabled: boolean;
   aiDubbingEnabled: boolean;
+  multitrackRecordingEnabled: boolean;
   /** Comma-separated ISO-639-1 (es. "en,fr"). Null/empty = usa il
    *  default impostato a livello sito. */
   aiTargetLocales: string | null;
@@ -201,6 +202,7 @@ export default function Step2Permissions({ value, onChange }: Props) {
                       aiSummaryEnabled: false,
                       aiTranslationEnabled: false,
                       aiDubbingEnabled: false,
+                      multitrackRecordingEnabled: false,
                     },
               );
             }}
@@ -208,6 +210,17 @@ export default function Step2Permissions({ value, onChange }: Props) {
 
           {value.aiTranscriptEnabled && (
             <>
+              <AiToggle
+                label={tAdmin('form.multitrackRecordingEnabled')}
+                desc={tAdmin('form.multitrackRecordingEnabledDesc')}
+                checked={value.multitrackRecordingEnabled}
+                onToggle={() =>
+                  onChange({
+                    multitrackRecordingEnabled: !value.multitrackRecordingEnabled,
+                  })
+                }
+              />
+
               <AiToggle
                 label={tAdmin('form.aiSummaryEnabled')}
                 desc={tAdmin('form.aiSummaryEnabledDesc')}

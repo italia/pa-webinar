@@ -98,6 +98,9 @@ const eventBaseSchema = z.object({
   aiSummaryEnabled: z.boolean().optional(),
   aiTranslationEnabled: z.boolean().optional(),
   aiDubbingEnabled: z.boolean().optional(),
+  // ADR-013 Fase 5 — opt-in registrazione per-partecipante (PII sensibile,
+  // off di default). Vedi schema.prisma `Event.multitrackRecordingEnabled`.
+  multitrackRecordingEnabled: z.boolean().optional(),
   // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales: z.string().max(200).nullable().optional(),
   // Numero di parlanti attesi (1-30). Quando valorizzato, la pipeline

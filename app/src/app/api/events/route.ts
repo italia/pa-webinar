@@ -139,6 +139,9 @@ export const POST = withErrorHandling(async (request) => {
       ...(data.aiDubbingEnabled !== undefined && {
         aiDubbingEnabled: data.aiDubbingEnabled,
       }),
+      ...(data.multitrackRecordingEnabled !== undefined && {
+        multitrackRecordingEnabled: data.multitrackRecordingEnabled,
+      }),
       ...(data.aiTargetLocales !== undefined && {
         aiTargetLocales: data.aiTargetLocales,
       }),
