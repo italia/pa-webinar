@@ -29,7 +29,7 @@ Apri una [issue](https://github.com/italia/pa-webinar/issues) descrivendo:
 
 ### Branch e workflow di build
 
-- **`dev`** — branch di integrazione. Ogni push fa partire il workflow `dev.yml` che pubblica un'immagine `ghcr.io/italia/eventi-dtd:dev` (tag mobile) e `:dev-<sha>` (tag immutabile). Sub-3 minuti, niente SBOM, niente chart Helm: serve solo per feedback veloce su un cluster di test.
+- **`dev`** — branch di integrazione. Ogni push fa partire il workflow `dev.yml` che pubblica un'immagine `ghcr.io/italia/pa-webinar:dev` (tag mobile) e `:dev-<sha>` (tag immutabile). Sub-3 minuti, niente SBOM, niente chart Helm: serve solo per feedback veloce su un cluster di test.
 - **`main`** — branch protetto. I merge devono arrivare via Pull Request da `dev`. Su PR gira `ci.yml` (typecheck, lint, test) come gate.
 - **Tag `v*`** — release formale. Il tag fa partire `release.yml` che produce immagine versionata, SBOM SPDX + CycloneDX, chart Helm packaged e release GitHub con gli asset.
 
@@ -106,7 +106,7 @@ Open an [issue](https://github.com/italia/pa-webinar/issues) describing:
 
 ### Branch and build workflow
 
-- **`dev`** — integration branch. Every push triggers `dev.yml`, which publishes `ghcr.io/italia/eventi-dtd:dev` (rolling) and `:dev-<sha>` (immutable). Sub-3 minutes, no SBOM, no Helm chart — used only for fast iteration on a test cluster.
+- **`dev`** — integration branch. Every push triggers `dev.yml`, which publishes `ghcr.io/italia/pa-webinar:dev` (rolling) and `:dev-<sha>` (immutable). Sub-3 minutes, no SBOM, no Helm chart — used only for fast iteration on a test cluster.
 - **`main`** — protected branch. Merges must come via Pull Request from `dev`. PRs run `ci.yml` (typecheck, lint, tests) as a gate.
 - **Tag `v*`** — formal release. Tagging triggers `release.yml` which builds the versioned image, SBOM SPDX + CycloneDX, packaged Helm chart, and a GitHub release with the assets attached.
 

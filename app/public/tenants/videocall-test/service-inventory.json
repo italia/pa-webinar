@@ -151,7 +151,7 @@
         },
         {
           "type": "distribution",
-          "url": "https://ghcr.io/italia/eventi-dtd"
+          "url": "https://ghcr.io/italia/pa-webinar"
         }
       ],
       "properties": [
@@ -1431,7 +1431,7 @@
           "bom-ref": "formulation:ci-dev-build",
           "uid": "github-actions/dev.yml",
           "name": "Build & Push Dev Image",
-          "description": "Pipeline GitHub Actions che costruisce l'immagine :dev ad ogni push sul branch dev e la pubblica su ghcr.io/italia/eventi-dtd:dev.",
+          "description": "Pipeline GitHub Actions che costruisce l'immagine :dev ad ogni push sul branch dev e la pubblica su ghcr.io/italia/pa-webinar:dev.",
           "taskTypes": [
             "build",
             "release"
