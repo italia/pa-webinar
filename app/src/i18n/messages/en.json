@@ -245,6 +245,7 @@
     "qaSidebarPlaceholder": "The Q&A panel will be available when the event starts.",
     "invalidToken": "Invalid link. Please check the link you received by email.",
     "sidebarTabQa": "Q&A",
+    "liveFeaturesLabel": "Features:",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Polls",
     "sidebarTabAgenda": "Agenda",
