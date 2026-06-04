@@ -986,6 +986,7 @@
       "aiTranslationEnabledDesc": "Transcript and summary translated into the languages set below.",
       "aiTargetLocales": "Translation languages",
       "aiTargetLocalesDesc": "ISO language codes (e.g. en, fr, de) separated by commas. Leave empty to use the site-wide languages.",
+      "aiTargetLocalesRequired": "Set at least one translation language, or turn off automatic translation.",
       "aiDubbingEnabled": "Audio dubbing",
       "aiDubbingEnabledDesc": "Dubbed audio in the target languages, generated with pre-trained synthetic voices. Does not clone participants' voices.",
       "multitrackRecordingEnabled": "Per-participant recording (high accuracy)",

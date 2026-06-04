@@ -1056,6 +1056,7 @@
       "aiTranslationEnabledDesc": "Trascrizione e sintesi tradotte nelle lingue indicate qui sotto.",
       "aiTargetLocales": "Lingue di traduzione",
       "aiTargetLocalesDesc": "Codici lingua ISO (es. en, fr, de) separati da virgola. Lascia vuoto per usare le lingue impostate a livello sito.",
+      "aiTargetLocalesRequired": "Indica almeno una lingua di traduzione, oppure disattiva la traduzione automatica.",
       "aiDubbingEnabled": "Doppiaggio audio",
       "aiDubbingEnabledDesc": "Audio doppiato nelle lingue target, generato con voci sintetiche pre-addestrate. Non clona la voce dei partecipanti.",
       "multitrackRecordingEnabled": "Registrazione per-partecipante (alta precisione)",

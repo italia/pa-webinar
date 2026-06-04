@@ -730,6 +730,7 @@ export default function EventWizard(props: WizardProps) {
           <Step2Permissions
             value={form}
             onChange={updateForm}
+            fieldErrors={fieldErrors}
           />
         )}
         {activeStep === 'invites' && (
@@ -911,6 +912,13 @@ function validateStep(
       form.maxParticipants > 500
     ) {
       errs['maxParticipants'] = 'outOfRange';
+    }
+  }
+  if (step === 'permissions') {
+    // La traduzione automatica senza lingue target non produce nulla:
+    // richiediamo almeno una lingua. (Errore mostrato nello step 2.)
+    if (form.aiTranslationEnabled && !(form.aiTargetLocales ?? '').trim()) {
+      errs['aiTargetLocales'] = 'required';
     }
   }
   return errs;
