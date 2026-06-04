@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Imeachtaí poiblí digiteacha",
-      "subtitle": "Ardán le haghaidh seimineáir ghréasáin, cur i láthair agus cruinnithe poiblí na Roinne um Chlaochlú Digiteach",
-      "browseEvents": "Brabhsáil imeachtaí",
-      "organizeEvent": "Eagraigh imeacht"
-    },
-    "features": {
-      "title": "An t-ardán d'imeachtaí RA",
-      "video": {
-        "title": "Físchomhdháil",
-        "desc": "Glac páirt in imeachtaí poiblí le suas le 300 rannpháirtí. Ní theastaíonn aon bhogearraí a shuiteáil."
-      },
-      "qa": {
-        "title": "Ceisteanna agus Freagraí",
-        "desc": "Cuir ceisteanna le linn an imeachta agus vótáil do na cinn is tábhachtaí. Freagraíonn an modhnóir beo."
-      },
-      "privacy": {
-        "title": "Príobháideacht agus Slándáil",
-        "desc": "Sonraí cosanta agus comhlíontach le GDPR. Bonneagar féin-óstáilte san Iodáil."
+      "kicker": "Oscailte do chách · beo · ar éileamh",
+      "title": "Seimineáir ghréasáin agus imeachtaí ó na pobail um chlaochlú digiteach",
+      "subtitle": "Lean cur i láthair, cruinnithe poiblí agus seisiúin Q&A ó na pobail um chlaochlú digiteach beo. Glac páirt ó do bhrabhsálaí, cuir ceisteanna agus féach ar na taifeadtaí arís nuair is mian leat.",
+      "browseEvents": "Brabhsáil imeachtaí atá le teacht",
+      "watchRecordings": "Féach ar na taifeadtaí",
+      "badges": {
+        "noInstall": "Ón bhrabhsálaí, gan suiteáil",
+        "interactive": "Q&A agus pobalbhreitheanna beo",
+        "recordings": "Taifeadtaí agus fotheidil",
+        "accessible": "Inrochtana, i 24 teanga"
       }
     },
     "upcoming": {
       "title": "Imeachtaí atá le teacht",
       "viewAll": "Féach ar na himeachtaí go léir",
-      "noEvents": "Níl aon imeacht beartaithe. Tar ar ais go luath!"
+      "noEvents": "Níl aon imeacht sceidealta. Fill go luath!"
     },
     "howItWorks": {
-      "title": "Conas a oibríonn sé",
+      "title": "Conas páirt a ghlacadh",
+      "subtitle": "Níl uait ach cúpla céim, gan cuntas ná suiteáil.",
       "step1": {
         "title": "Cláraigh",
-        "desc": "Cláraigh saor in aisce don imeacht"
+        "desc": "Cláraigh saor in aisce don imeacht óna leathanach poiblí."
       },
       "step2": {
-        "title": "Faigh bhur nasc",
-        "desc": "Ríomhphost le bhur nasc rochtana pearsanta"
+        "title": "Faigh an nasc",
+        "desc": "Gheobhaidh tú ríomhphost le do nasc pearsanta agus iatán féilire."
       },
       "step3": {
-        "title": "Bí páirteach",
-        "desc": "Téigh isteach san imeacht ó bhur mbrabhsálaí, gan aon suiteáil"
+        "title": "Glac páirt",
+        "desc": "Téigh isteach san imeacht ó do bhrabhsálaí, gan aon rud a shuiteáil."
       },
       "step4": {
         "title": "Idirghníomhaigh",
-        "desc": "Cuir ceisteanna, vótáil, glac páirt sa díospóireacht"
+        "desc": "Cuir ceisteanna, vótáil, freagair pobalbhreitheanna agus glac páirt sa phlé."
+      }
+    },
+    "during": {
+      "title": "Cad is féidir leat a dhéanamh le linn imeachta",
+      "subtitle": "Ní hamháin breathnú: tá na himeachtaí idirghníomhach.",
+      "qa": {
+        "title": "Ceisteanna agus freagraí",
+        "desc": "Cuir ceisteanna agus tabhair vóta do cheisteanna daoine eile: freagraíonn an modhnóir beo."
+      },
+      "polls": {
+        "title": "Pobalbhreitheanna",
+        "desc": "Freagair pobalbhreitheanna i bhfíor-am agus féach na torthaí láithreach."
+      },
+      "wordcloud": {
+        "title": "Scamall focal",
+        "desc": "Cuir do chuid focal le scamall focal comhroinnte an imeachta."
+      },
+      "reactions": {
+        "title": "Frithghníomhartha agus lámha ardaithe",
+        "desc": "Frithghníomhaigh agus iarr cead labhairt trí do lámh a ardú: déantar an scuaine a bhainistiú in ord."
+      },
+      "chat": {
+        "title": "Comhrá",
+        "desc": "Scríobh i gcomhrá an imeachta agus lean an comhrá leis na rannpháirtithe eile."
+      },
+      "agenda": {
+        "title": "Clár oibre agus nótaí",
+        "desc": "Lean an clár oibre agus na nótaí a roinneann na modhnóirí le linn an imeachta."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "An tionscadal",
+      "title": "Foinse oscailte agus ceannasach, tógtha ag an rialtas don rialtas",
+      "body": "Is é PA Webinar ardán na Roinne um Chlaochlú Digiteach le haghaidh imeachtaí poiblí digiteacha: an córas dearaidh .italia, an t-inneall físe Jitsi Meet agus píblíne AI atá go hiomlán in-cluster. Eisítear é mar fhoinse oscailte ionas gur féidir le riarachán ar bith é a athúsáid.",
+      "sovereignty": {
+        "title": "Ceannasacht sonraí",
+        "desc": "Self-hosted ar bhonneagar an riaracháin: ní fhágann na sonraí riamh agus níl aon nochtadh don CLOUD Act ann."
+      },
+      "openSource": {
+        "title": "Foinse oscailte EUPL-1.2",
+        "desc": "Cód in-athúsáidte ag riarachán ar bith, le SBOM agus service inventory poiblí."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII criptithe ag fanacht, toilithe gráinneacha agus coinneáil inchumraithe."
+      },
+      "cta": "Trédhearcacht seirbhíse",
+      "techTitle": "Tógtha le teicneolaíochtaí oscailte",
+      "archTitle": "Conas a oibríonn sé, go hachomair"
+    },
+    "afterEvent": {
+      "title": "Tar éis an imeachta",
+      "subtitle": "Ní chailltear aon rud: fanann gach rud ar fáil agus inrochtana.",
+      "library": {
+        "title": "Leabharlann taifeadtaí",
+        "desc": "Féach arís ar imeachtaí a bhí ann sa leabharlann phoiblí, le cartlann na gceisteanna agus na vótaíochtaí."
+      },
+      "transcript": {
+        "title": "Tras-scríbhinn agus fotheidil",
+        "desc": "Is féidir tras-scríbhinn agus fotheidil a bheith ag gach taifeadadh, a ghintear go huathoibríoch leis an bpíblíne AI laistigh den bhraisle."
+      },
+      "translation": {
+        "title": "Aistriúchán uathoibríoch",
+        "desc": "Fotheidil agus achoimre aistrithe go roinnt teangacha, ionas gur féidir leat an t-imeacht a leanúint i dteanga eile freisin."
+      },
+      "dubbing": {
+        "title": "Athghuthú fuaime",
+        "desc": "Rian fuaime athghuthaithe le guth sintéiseach neodrach (gan clónáil gutha), chun éisteacht leis an imeacht i dteanga eile."
       }
     }
   },
@@ -2039,20 +2100,36 @@
     "accessibility": {
       "metaTitle": "Ráiteas inrochtaineachta",
       "title": "Ráiteas inrochtaineachta",
-      "intro": "Tá an Roinn um Chlaochlú Digiteach tiomanta an t-ardán seo a dhéanamh inrochtana, i gcomhréir leis na ceanglais infheidhme do sheirbhísí digiteacha na hearnála poiblí.",
+      "intro": "Tá an Roinn um Chlaochlú Digiteach tiomanta do PA Webinar a dhéanamh inrochtana, i gcomhréir le Dlí na hIodáile 4/2004, le Treoir (AE) 2016/2102 agus le treoirlínte AgID maidir le hinrochtaineacht uirlisí TFC.",
       "sections": {
-        "commitment": {
-          "title": "Tiomantas don inrochtaineacht",
-          "body": "Tá an t-ardán deartha le comhpháirteanna atá ailínithe le córas deartha .italia agus le haird ar nascleanúint méarchláir, struchtúr séimeantach ábhair agus inléiteacht an chomhéadain ar na príomhmhéideanna scáileáin."
+        "conformance": {
+          "title": "Stádas comhréireachta",
+          "body": "Tá PA Webinar deartha chun bheith comhréireach le WCAG 2.1 leibhéal AA. Ní mór do gach riarachán a sholáthraíonn an tseirbhís a ráiteas féin a fhoilsiú, ag léiriú an stádais chomhréireachta iarbhír (comhréireach go hiomlán, go páirteach nó neamhchomhréireach) ar bhonn measúnaithe atá cothrom le dáta."
         },
-        "status": {
-          "title": "Stádas comhlíontachta",
-          "body": "Tá seiceálacha agus feabhsúcháin inrochtaineachta ar siúl go leanúnach. Réitítear aon saincheisteanna iarmharacha de réir a chéile mar chuid d'fhorbairt na seirbhíse agus de ghníomhaíochtaí cothabhála rialta."
+        "nonAccessible": {
+          "title": "Ábhar nach bhfuil inrochtana",
+          "body": "Soláthraítear an seomra físe trí Jitsi Meet: d'fhéadfadh teorainneacha a bheith ag roinnt gnéithe fíor-ama le teicneolaíochtaí cúntaimh. D'fhéadfadh míchruinneas a bheith in ábhar a ghineann an AI go huathoibríoch (trascríbhinní, fotheidil, aistriúcháin agus athghuthú), agus comharthaítear i gcónaí é mar sin."
+        },
+        "preparation": {
+          "title": "Ullmhú an ráitis seo",
+          "body": "Ullmhaíodh an ráiteas teimpléid seo ar bhonn féinmheasúnaithe a rinne soláthraí na seirbhíse. Tá an comhéadan tógtha leis an gcóras dearaidh .italia, le haird ar nascleanúint méarchláir, ar shéimeantaic an ábhair, ar chodarsnacht na ndathanna agus ar chomhoiriúnacht le léitheoirí scáileáin. Ní mór dátaí an ullmhúcháin agus an athbhreithnithe dheireanaigh a líonadh isteach ag am an fhoilsithe."
         },
         "feedback": {
-          "title": "Aiseolas agus teagmhálacha",
-          "body": "Chun bacainní inrochtaineachta nó deacrachtaí le húsáid na seirbhíse a thuairisciú, is féidir le húsáideoirí teagmháil a dhéanamh leis an Roinn trína bealaí institiúideacha, ag sonrú an leathanaigh lena mbaineann agus cur síos gairid ar an bhfadhb."
+          "title": "Aiseolas agus teagmháil",
+          "body": "Chun cásanna neamhchomhréireachta a thuairisciú, nó chun faisnéis agus ábhar atá lasmuigh de raon feidhme an rialacháin a iarraidh, is féidir leat na bealaí teagmhála institiúideacha den riarachán a sholáthraíonn an tseirbhís a úsáid, ag léiriú an leathanaigh lena mbaineann agus cur síos ar an bhfadhb."
+        },
+        "enforcement": {
+          "title": "Nós imeachta forfheidhmithe",
+          "body": "Mura bhfuil an freagra sásúil nó mura bhfaightear freagra laistigh de 30 lá, is féidir leat dul i dteagmháil le hOmbudsman Cathartha Digiteach AgID (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Athúsáid agus foilsiú an ráitis",
+        "body": "Is bogearraí foinse oscailte é PA Webinar is féidir le riaracháin eile a athúsáid. Ní mór do gach comhlacht a ghlacann an t-ardán a ráiteas inrochtaineachta féin a ullmhú agus a fhoilsiú trí fhoirm oifigiúil AgID, agus an téacs teimpléid seo a chur in ionad a shonraí féin."
+      },
+      "links": {
+        "agidForm": "Foirm ráitis inrochtaineachta (AgID)",
+        "difensore": "Inrochtaineacht agus Ombudsman Cathartha Digiteach (AgID)"
       }
     },
     "legalNotes": {

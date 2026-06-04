@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Avalikud digitaalsed üritused",
-      "subtitle": "Veebiseminaride, esitluste ja avalike kohtumiste platvorm, mille on loonud Digitaalse Ümberkujundamise Osakond",
-      "browseEvents": "Sirvi üritusi",
-      "organizeEvent": "Korralda üritus"
-    },
-    "features": {
-      "title": "Avaliku halduse ürituste platvorm",
-      "video": {
-        "title": "Videokonverentsid",
-        "desc": "Osalege avalikel üritustel kuni 300 osalejaga. Tarkvara pole vaja paigaldada."
-      },
-      "qa": {
-        "title": "Küsimused ja vastused",
-        "desc": "Esitage küsimusi ürituse ajal ja hääletage olulisemate poolt. Moderaator vastab otseülekandes."
-      },
-      "privacy": {
-        "title": "Privaatsus ja turvalisus",
-        "desc": "Andmed on kaitstud ja vastavad GDPR nõuetele. Isehallatav infrastruktuur Itaalias."
+      "kicker": "Avatud kõigile · otse · nõudmisel",
+      "title": "Digipöörde kogukondade veebiseminarid ja üritused",
+      "subtitle": "Jälgi otse digipöörde kogukondade ettekandeid, avalikke kohtumisi ja Q&A sessioone. Liitu oma brauserist, esita küsimusi ja vaata salvestusi uuesti, millal soovid.",
+      "browseEvents": "Sirvi tulevasi üritusi",
+      "watchRecordings": "Vaata salvestusi",
+      "badges": {
+        "noInstall": "Brauserist, ilma paigaldusteta",
+        "interactive": "Otse küsimused ja küsitlused",
+        "recordings": "Salvestused ja subtiitrid",
+        "accessible": "Ligipääsetav, 24 keeles"
       }
     },
     "upcoming": {
-      "title": "Eelseisvad üritused",
+      "title": "Tulevased üritused",
       "viewAll": "Vaata kõiki üritusi",
-      "noEvents": "Eelseisvaid üritusi pole. Tulge peagi tagasi!"
+      "noEvents": "Üritusi pole kavas. Tule varsti tagasi!"
     },
     "howItWorks": {
-      "title": "Kuidas see toimib",
+      "title": "Kuidas osaleda",
+      "subtitle": "Vaid mõni samm, ilma kontota ja ilma paigaldusteta.",
       "step1": {
-        "title": "Registreeruge",
-        "desc": "Registreeruge üritusele tasuta"
+        "title": "Registreeru",
+        "desc": "Registreeru üritusele tasuta selle avalikul lehel."
       },
       "step2": {
-        "title": "Saate lingi",
-        "desc": "E-kiri teie isikliku ligipääsu lingiga"
+        "title": "Saa link",
+        "desc": "Saad e-kirja oma isikliku lingi ja kalendrimanusega."
       },
       "step3": {
-        "title": "Osalege",
-        "desc": "Sisenege üritusele brauserist, paigaldamist pole vaja"
+        "title": "Liitu",
+        "desc": "Sisene üritusele oma brauserist, ilma midagi paigaldamata."
       },
       "step4": {
-        "title": "Suhelge",
-        "desc": "Esitage küsimusi, hääletage, osalege arutelus"
+        "title": "Suhtle",
+        "desc": "Esita küsimusi, hääleta, vasta küsitlustele ja liitu aruteluga."
+      }
+    },
+    "during": {
+      "title": "Mida saad ürituse ajal teha",
+      "subtitle": "Mitte ainult vaadata: üritused on interaktiivsed.",
+      "qa": {
+        "title": "Küsimused ja vastused",
+        "desc": "Esita küsimusi ja hääleta teiste omade poolt: moderaator vastab otse."
+      },
+      "polls": {
+        "title": "Küsitlused",
+        "desc": "Vasta küsitlustele reaalajas ja näe tulemusi kohe."
+      },
+      "wordcloud": {
+        "title": "Sõnapilv",
+        "desc": "Lisa oma sõnad ürituse jagatud sõnapilve."
+      },
+      "reactions": {
+        "title": "Reaktsioonid ja tõstetud käed",
+        "desc": "Reageeri ja palu sõna kätt tõstes: järjekorda hallatakse järjekorras."
+      },
+      "chat": {
+        "title": "Vestlus",
+        "desc": "Kirjuta ürituse vestlusesse ja jälgi vestlust teiste osalejatega."
+      },
+      "agenda": {
+        "title": "Päevakord ja märkmed",
+        "desc": "Jälgi päevakorda ja märkmeid, mida moderaatorid ürituse ajal jagavad."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Projekt",
+      "title": "Avatud lähtekoodiga ja suveräänne, loodud halduse poolt halduse jaoks",
+      "body": "PA Webinar on Digipöörde osakonna platvorm avalike digiürituste jaoks: .italia disainisüsteem, Jitsi Meet videomootor ja täielikult in-cluster AI torustik. See on avaldatud avatud lähtekoodiga, et iga haldusasutus saaks seda taaskasutada.",
+      "sovereignty": {
+        "title": "Andmesuveräänsus",
+        "desc": "Self-hosted halduse taristus: andmed ei lahku kunagi ja CLOUD Act'i mõju ei ole."
+      },
+      "openSource": {
+        "title": "Avatud lähtekood EUPL-1.2",
+        "desc": "Kood, mida iga haldusasutus saab taaskasutada, koos avaliku SBOM-i ja service inventory'ga."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII krüpteeritud puhkeolekus, täpsed nõusolekud ja seadistatav säilitamine."
+      },
+      "cta": "Teenuse läbipaistvus",
+      "techTitle": "Ehitatud avatud tehnoloogiatega",
+      "archTitle": "Kuidas see lühidalt toimib"
+    },
+    "afterEvent": {
+      "title": "Pärast üritust",
+      "subtitle": "Miski ei lähe kaduma: kõik jääb kättesaadavaks ja juurdepääsetavaks.",
+      "library": {
+        "title": "Salvestiste raamatukogu",
+        "desc": "Vaata varasemaid üritusi avalikus raamatukogus üle, koos küsimuste ja küsitluste arhiiviga."
+      },
+      "transcript": {
+        "title": "Transkriptsioon ja subtiitrid",
+        "desc": "Igal salvestisel võib olla transkriptsioon ja subtiitrid, mille loob automaatselt klastrisisene AI-konveier."
+      },
+      "translation": {
+        "title": "Automaatne tõlge",
+        "desc": "Subtiitrid ja kokkuvõte tõlgitakse mitmesse keelde, et saaksid üritust jälgida ka teises keeles."
+      },
+      "dubbing": {
+        "title": "Helidubleerimine",
+        "desc": "Dubleeritud helirada neutraalse sünteeshäälega (ilma hääle kloonimiseta), et kuulata sündmust teises keeles."
       }
     }
   },
@@ -2037,22 +2098,38 @@
       }
     },
     "accessibility": {
-      "metaTitle": "Ligipääsetavuse avaldus",
-      "title": "Ligipääsetavuse avaldus",
-      "intro": "Digitaalse Ümberkujundamise Osakond on pühendunud selle platvormi ligipääsetavaks muutmisele vastavalt avaliku sektori digiteenuste kehtivatele nõuetele.",
+      "metaTitle": "Juurdepääsetavuse deklaratsioon",
+      "title": "Juurdepääsetavuse deklaratsioon",
+      "intro": "Digipöörde osakond on võtnud kohustuse muuta PA Webinar juurdepääsetavaks kooskõlas Itaalia seadusega 4/2004, ELi direktiiviga 2016/2102 ja AgID suunistega info- ja kommunikatsioonitehnoloogia vahendite juurdepääsetavuse kohta.",
       "sections": {
-        "commitment": {
-          "title": "Ligipääsetavuse kohustus",
-          "body": "Platvorm on loodud komponentidega, mis on kooskõlas .italia disainisüsteemiga, pöörates erilist tähelepanu klaviatuurinavigatsioonile, sisu semantilisele struktuurile ja liidese loetavusele peamiste ekraanisuuruste puhul."
+        "conformance": {
+          "title": "Vastavuse seisund",
+          "body": "PA Webinar on kavandatud vastama standardile WCAG 2.1 tase AA. Iga teenust osutav asutus peab avaldama oma deklaratsiooni, milles märgitakse ajakohastatud hindamise põhjal tegelik vastavuse seisund (täielikult, osaliselt või mittevastav)."
         },
-        "status": {
-          "title": "Vastavuse olek",
-          "body": "Ligipääsetavuse kontrolle ja parandusi tehakse pidevalt. Kõik järelejäänud probleemid lahendatakse järk-järgult teenuse arendamise ja korralise hoolduse käigus."
+        "nonAccessible": {
+          "title": "Juurdepääsmatu sisu",
+          "body": "Videoruumi pakutakse Jitsi Meeti kaudu: mõnedel reaalajafunktsioonidel võib esineda piiranguid abitehnoloogiatega. AI poolt automaatselt loodud sisu (transkriptsioonid, subtiitrid, tõlked ja dubleeringud) võib sisaldada ebatäpsusi ning on alati sellisena tähistatud."
+        },
+        "preparation": {
+          "title": "Käesoleva deklaratsiooni koostamine",
+          "body": "See näidisdeklaratsioon koostati teenuseosutaja tehtud enesehindamise alusel. Liides on üles ehitatud .italia disainisüsteemiga, pöörates tähelepanu klaviatuuriga navigeerimisele, sisu semantikale, värvikontrastile ja ekraanilugejatega ühilduvusele. Koostamise ja viimase ülevaatamise kuupäevad tuleb avaldamise hetkel täita."
         },
         "feedback": {
-          "title": "Tagasiside ja kontaktid",
-          "body": "Ligipääsetavuse takistustest või teenuse kasutamise probleemidest teatamiseks saavad kasutajad pöörduda osakonna poole selle institutsiooniliste kanalite kaudu, märkides mõjutatud lehe ja probleemi lühikirjelduse."
+          "title": "Tagasiside ja kontakt",
+          "body": "Mittevastavuse juhtumitest teatamiseks või määruse kohaldamisalast välja jäetud teabe ja sisu taotlemiseks võite kasutada teenust osutava asutuse ametlikke kontaktkanaleid, märkides ära asjaomase lehe ja probleemi kirjelduse."
+        },
+        "enforcement": {
+          "title": "Jõustamismenetlus",
+          "body": "Kui vastus on ebarahuldav või vastust ei saada 30 päeva jooksul, võite pöörduda AgID digitaalse õigusvahemehe poole (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Deklaratsiooni taaskasutamine ja avaldamine",
+        "body": "PA Webinar on avatud lähtekoodiga tarkvara, mida teised asutused saavad taaskasutada. Iga platvormi kasutusele võttev asutus peab koostama ja avaldama oma juurdepääsetavuse deklaratsiooni AgID ametliku vormi kaudu, asendades selle näidisteksti oma andmetega."
+      },
+      "links": {
+        "agidForm": "Juurdepääsetavuse deklaratsiooni vorm (AgID)",
+        "difensore": "Juurdepääsetavus ja digitaalne õigusvahemees (AgID)"
       }
     },
     "legalNotes": {

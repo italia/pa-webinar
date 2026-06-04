@@ -926,7 +926,7 @@ model SiteSetting {
   id String @id @default("singleton")
 
   // Branding
-  siteName              String  @default("Eventi PA") @map("site_name")
+  siteName              String  @default("PA Webinar") @map("site_name")
   siteDescription       String  @default("Piattaforma per eventi pubblici digitali") @map("site_description") @db.Text
   organizationName      String  @default("") @map("organization_name")
   organizationNameShort String  @default("") @map("organization_name_short")
@@ -941,7 +941,7 @@ model SiteSetting {
   defaultTimezone String @default("Europe/Rome") @map("default_timezone")
 
   // SEO
-  seoTitle       String  @default("Eventi PA") @map("seo_title")
+  seoTitle       String  @default("PA Webinar") @map("seo_title")
   seoDescription String  @default("") @map("seo_description") @db.Text
   seoImage       String? @map("seo_image")
 
