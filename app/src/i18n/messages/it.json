@@ -1,4 +1,11 @@
 {
+  "agenda": {
+    "title": "Agenda / Note",
+    "empty": "Nessun punto in agenda. Aggiungi i temi da trattare e spuntali man mano.",
+    "add": "Aggiungi",
+    "addPlaceholder": "Nuovo punto all'ordine del giorno…",
+    "remove": "Rimuovi"
+  },
   "common": {
     "appName": "Eventi DTD",
     "appDescription": "Piattaforma per eventi pubblici digitali del Dipartimento per la Trasformazione Digitale",
@@ -240,6 +247,7 @@
     "sidebarTabQa": "Q&A",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondaggi",
+    "sidebarTabAgenda": "Agenda",
     "sidebarTabMaterials": "Materiali",
     "sidebarTabParticipants": "Partecipanti",
     "chat": {
@@ -1044,6 +1052,8 @@
       "qaEnabled": "Abilita Q&A",
       "chatEnabled": "Abilita chat",
       "recordingEnabled": "Abilita registrazione video",
+      "agendaEnabled": "Agenda / Note live",
+      "agendaEnabledDesc": "Una checklist dei punti da trattare che i moderatori spuntano durante l'evento. Confluisce nella sintesi automatica. Opzionale e attivabile anche durante l'evento.",
       "autoStartRecording": "Avvia la registrazione automaticamente",
       "autoStartRecordingDesc": "Al momento dell'inizio dell'evento la registrazione parte da sola (senza chiedere conferma al moderatore). Così eventuali ritardatari trovano già il player disponibile.",
       "aiSectionHeading": "Post-produzione automatica",

@@ -26,6 +26,8 @@ export interface Step2Value {
   permissionMatrix: PermissionMatrix;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
+  /** Agenda/note live (checklist opt-in). */
+  agendaEnabled: boolean;
   // ── Post-produzione AI (subordinata a recordingEnabled) ──
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
@@ -172,6 +174,25 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
             />
           </div>
         )}
+      </section>
+
+      {/* Interazione live — feature opzionali della stanza */}
+      <section className="mb-3">
+        <div className="py-2 d-flex justify-content-between align-items-start">
+          <div className="me-3">
+            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+              {tAdmin('form.agendaEnabled')}
+            </div>
+            <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+              {tAdmin('form.agendaEnabledDesc')}
+            </div>
+          </div>
+          <ToggleSwitch
+            label=""
+            checked={value.agendaEnabled}
+            onChange={() => onChange({ agendaEnabled: !value.agendaEnabled })}
+          />
+        </div>
       </section>
 
       {/* Post-produzione AI — solo se recording attiva. Renderizzata

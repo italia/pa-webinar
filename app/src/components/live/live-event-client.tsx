@@ -25,6 +25,7 @@ import ModeratorControls from '@/components/jitsi/moderator-controls';
 import RaisedHandsPanel from '@/components/jitsi/raised-hands-panel';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
+import AgendaPanel from '@/components/live/agenda-panel';
 import MaterialPanel from '@/components/materials/material-panel';
 import ParticipantPanel from '@/components/participants/participant-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
@@ -49,6 +50,7 @@ interface EventInfo {
   autoStartRecording?: boolean;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  agendaEnabled: boolean;
   waitingRoomAudioUrl: string | null;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -809,6 +811,7 @@ export default function LiveEventClient({
           isModerator={isActualModerator}
           qaEnabled={event.qaEnabled}
           chatEnabled={event.chatEnabled}
+          agendaEnabled={event.agendaEnabled}
           jitsiApi={jitsiApi}
           displayName={credentials.displayName}
           isInstantCall={isInstantCall}
@@ -847,7 +850,7 @@ export default function LiveEventClient({
 
 // ── Sidebar with tabs ──
 
-type SidebarTab = 'qa' | 'chat' | 'polls' | 'materials' | 'participants';
+type SidebarTab = 'qa' | 'chat' | 'polls' | 'agenda' | 'materials' | 'participants';
 
 interface LiveSidebarProps {
   eventSlug: string;
@@ -855,12 +858,13 @@ interface LiveSidebarProps {
   isModerator: boolean;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  agendaEnabled: boolean;
   jitsiApi: JitsiMeetExternalAPI | null;
   displayName: string;
   isInstantCall?: boolean;
 }
 
-function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, jitsiApi, displayName, isInstantCall = false }: LiveSidebarProps) {
+function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, agendaEnabled, jitsiApi, displayName, isInstantCall = false }: LiveSidebarProps) {
   const t = useTranslations('live');
   const showChat = chatEnabled !== false;
   const [activeTab, setActiveTab] = useState<SidebarTab>(
@@ -944,6 +948,12 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
       label: t('sidebarTabPolls'),
       svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>),
       show: !isInstantCall,
+    },
+    {
+      key: 'agenda',
+      label: t('sidebarTabAgenda'),
+      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>),
+      show: !isInstantCall && agendaEnabled,
     },
     {
       key: 'materials',
@@ -1087,6 +1097,9 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ji
           )}
           {activeTab === 'polls' && (
             <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+          )}
+          {activeTab === 'agenda' && agendaEnabled && (
+            <AgendaPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
           {activeTab === 'materials' && (
             <MaterialPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />

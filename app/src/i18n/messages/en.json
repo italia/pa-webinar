@@ -1,4 +1,11 @@
 {
+  "agenda": {
+    "title": "Agenda / Notes",
+    "empty": "No agenda items yet. Add the topics to cover and check them off as you go.",
+    "add": "Add",
+    "addPlaceholder": "New agenda item…",
+    "remove": "Remove"
+  },
   "common": {
     "appName": "DTD Events",
     "appDescription": "Public digital event platform by the Department for Digital Transformation",
@@ -240,6 +247,7 @@
     "sidebarTabQa": "Q&A",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Polls",
+    "sidebarTabAgenda": "Agenda",
     "sidebarTabMaterials": "Materials",
     "sidebarTabParticipants": "Participants",
     "chat": {
@@ -974,6 +982,8 @@
       "qaEnabled": "Enable Q&A",
       "chatEnabled": "Enable chat",
       "recordingEnabled": "Enable video recording",
+      "agendaEnabled": "Live agenda / notes",
+      "agendaEnabledDesc": "A checklist of topics to cover that moderators tick off during the event. Feeds the automatic summary. Optional and can also be enabled during the event.",
       "autoStartRecording": "Start recording automatically",
       "autoStartRecordingDesc": "When the event starts, recording begins on its own (the moderator is not prompted). Late joiners immediately find a catch-up player available.",
       "aiSectionHeading": "Automatic post-production",
