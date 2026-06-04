@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 
+import { Prisma } from '@prisma/client';
+
 import { prisma } from '@/lib/db';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
@@ -27,8 +29,28 @@ const templateSchema = z.object({
   aiTranscriptEnabled: z.boolean().optional(),
   aiSummaryEnabled: z.boolean().optional(),
   aiTranslationEnabled: z.boolean().optional(),
+  descriptionTemplate: z.record(z.string()).nullish(),
+  defaultRetentionDays: z.number().int().min(1).max(3650).nullish(),
+  defaultExpectedSpeakers: z.number().int().min(1).max(30).nullish(),
   sortOrder: z.number().int().optional(),
 });
+
+/**
+ * Normalizza il campo JSON nullable `descriptionTemplate` per Prisma:
+ * un `null` esplicito (cancellazione) va espresso come `Prisma.DbNull`,
+ * non come `null` raw. `undefined` lascia il campo invariato.
+ */
+function toTemplateData<
+  T extends { descriptionTemplate?: Record<string, string> | null },
+>(d: T) {
+  const { descriptionTemplate, ...rest } = d;
+  if (descriptionTemplate === undefined) return rest;
+  return {
+    ...rest,
+    descriptionTemplate:
+      descriptionTemplate === null ? Prisma.DbNull : descriptionTemplate,
+  };
+}
 
 export const GET = withErrorHandling(async () => {
   const templates = await prisma.eventTemplate.findMany({
@@ -55,7 +77,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   const template = await prisma.eventTemplate.create({
     data: {
-      ...result.data,
+      ...toTemplateData(result.data),
       sortOrder: result.data.sortOrder ?? (maxOrder._max.sortOrder ?? 0) + 1,
     },
   });
@@ -92,7 +114,7 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
 
   const updated = await prisma.eventTemplate.update({
     where: { id },
-    data: result.data,
+    data: toTemplateData(result.data),
   });
 
   await logAdminAction({

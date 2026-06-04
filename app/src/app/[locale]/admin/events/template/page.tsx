@@ -21,6 +21,8 @@ export default async function TemplatesPage() {
 
   const serialized = templates.map((tpl) => ({
     ...tpl,
+    descriptionTemplate:
+      (tpl.descriptionTemplate as Record<string, string> | null) ?? null,
     createdAt: tpl.createdAt.toISOString(),
     updatedAt: tpl.updatedAt.toISOString(),
   }));
