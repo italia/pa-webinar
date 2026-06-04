@@ -49,7 +49,7 @@ npx @cyclonedx/cdxgen -t js --no-recurse-packages -o bom-npm-direct.json -r app/
 Installare [`syft`](https://github.com/anchore/syft):
 
 ```bash
-syft ghcr.io/italia/eventi-dtd:0.3.44 -o cyclonedx-json=bom-container-app.json
+syft ghcr.io/italia/pa-webinar:0.3.44 -o cyclonedx-json=bom-container-app.json
 syft docker.io/jitsi/web:stable-9258 -o cyclonedx-json=bom-container-jitsi-web.json
 # ...ripetere per ogni immagine in uso
 ```

@@ -235,7 +235,7 @@ canonico — defence in depth contro worker buggati).
 | Component | Image | Schedule | Resources | RBAC |
 |---|---|---|---|---|
 | **postprod-orchestrator** (CronJob) | `bitnami/kubectl` | `* * * * *` | 10m cpu / 64Mi | `batch/jobs:get,list,create,delete`, `batch/cronjobs:get` |
-| **postprod-worker** (Job template, suspended CronJob) | `ghcr.io/italia/eventi-dtd-postprod-worker:dev` | `@yearly` + `suspend: true` | 4 cpu / 16Gi + 1× GPU | none |
+| **postprod-worker** (Job template, suspended CronJob) | `ghcr.io/italia/pa-webinar-postprod-worker:dev` | `@yearly` + `suspend: true` | 4 cpu / 16Gi + 1× GPU | none |
 | **postprod-reclaim** (CronJob) | `curlimages/curl` | `* * * * *` | 50m cpu / 32Mi | none (curl only) |
 | **postprod-retention** (CronJob) | `curlimages/curl` | `30 3 * * *` | 50m cpu / 64Mi | none |
 | **vLLM** (Deployment, fuori chart attuale) | tuo | always on opt | 1× GPU + 24Gi+ | none |
@@ -258,7 +258,7 @@ postprod:
   enabled: true
 
   worker:
-    image: ghcr.io/italia/eventi-dtd-postprod-worker:dev
+    image: ghcr.io/italia/pa-webinar-postprod-worker:dev
     # In sviluppo iniziale, lascia stub: true per saltare WhisperX/LLM
     # e generare artefatti "canned". Toglilo quando arrivano i modelli.
     stub: false
@@ -587,8 +587,8 @@ worker o vLLM è running. Se hai bisogno di latenza bassa, pinna
 
 ```bash
 cd infra/ai
-docker build -f Dockerfile.worker -t ghcr.io/italia/eventi-dtd-postprod-worker:dev .
-docker push ghcr.io/italia/eventi-dtd-postprod-worker:dev
+docker build -f Dockerfile.worker -t ghcr.io/italia/pa-webinar-postprod-worker:dev .
+docker push ghcr.io/italia/pa-webinar-postprod-worker:dev
 ```
 
 Da CI/CD: integrare in `.github/workflows/release.yml` con la sua
@@ -933,7 +933,7 @@ dedicato:
    `AI_ARTIFACT_DELETED` / `AI_VOICE_CLONE_USED` (l'ultimo per V4).
 
 8. **CI image push**: pipeline GitHub Actions per buildare e pushare
-   `ghcr.io/italia/eventi-dtd-postprod-worker` insieme alle release.
+   `ghcr.io/italia/pa-webinar-postprod-worker` insieme alle release.
 
 9. **Bench reale**: misurare throughput (~minuti di video per minuto
    di GPU) e tempo di sintesi su Qwen3-32B per stimare costi reali.
