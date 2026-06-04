@@ -40,6 +40,10 @@ model Event {
   // Feature toggles
   qaEnabled        Boolean @default(true) @map("qa_enabled")
   chatEnabled      Boolean @default(false) @map("chat_enabled")
+  // Agenda/note live (opt-in): checklist dei punti da trattare che i
+  // moderatori spuntano durante l'evento. Off di default → quando spenta
+  // non mostra nulla; attivabile in creazione o durante l'evento.
+  agendaEnabled    Boolean @default(false) @map("agenda_enabled")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
 
   // When recording is enabled, this skips the "start recording?" moderator
@@ -193,6 +197,7 @@ model Event {
   registrations   Registration[]
   questions       Question[]
   polls           Poll[]
+  agendaItems     EventAgendaItem[]
   materials       EventMaterial[]
   reminders       EventReminder[]
   gdprAuditLogs   GdprAuditLog[]
@@ -222,6 +227,14 @@ model Event {
   // non è voice clone. Generata SOLO se aiTranslationEnabled è true
   // (serve il transcript tradotto come input).
   aiDubbingEnabled     Boolean @default(false) @map("ai_dubbing_enabled")
+  // ADR-013 Fase 3/5 — registrazione audio PER-PARTECIPANTE (multi-traccia)
+  // per attribuzione speaker certa. OPT-IN esplicito dell'admin: l'audio
+  // isolato del singolo parlante è PII ad alta sensibilità (vicino al
+  // biometrico vocale), quindi NON va attivato automaticamente con la sola
+  // trascrizione. Il recorder-controller crea un recorder SOLO per gli eventi
+  // con questo flag + recordingEnabled + aiTranscriptEnabled. Le tracce sono
+  // intermedie e cancellate dopo la trascrizione (multitrack-purge).
+  multitrackRecordingEnabled Boolean @default(false) @map("multitrack_recording_enabled")
   // Comma-separated ISO-639-1 list of target languages for transcript /
   // summary translation (e.g. "en,fr"). When null, falls back to
   // SiteSetting.aiDefaultTargetLocales.
@@ -576,6 +589,10 @@ model Registration {
   consentGiven                Boolean  @map("consent_given")
   consentTimestamp            DateTime @map("consent_timestamp")
   consentRecording            Boolean? @map("consent_recording") // null if event has no recording
+  // ADR-013 Fase 5 — consenso esplicito SEPARATO alla registrazione audio
+  // per-partecipante (traccia isolata = PII sensibile). Null se l'evento non
+  // ha il multitrack abilitato; obbligatorio (true) per registrarsi se lo ha.
+  consentMultitrack           Boolean? @map("consent_multitrack")
   consentFutureCommunications Boolean  @default(false) @map("consent_future_communications")
 
   // Access token (for personal join link)
@@ -719,6 +736,25 @@ model PollVote {
   @@map("poll_votes")
 }
 
+// ─── Agenda / Note live (checklist punti da trattare) ───
+// ADR: funzione opzionale (agendaEnabled). I moderatori definiscono i punti
+// e li spuntano dal vivo; lo stato confluisce nella sintesi/descrizione AI.
+model EventAgendaItem {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId   String  @map("event_id") @db.Uuid
+  label     String  @db.VarChar(500)
+  sortOrder Int     @default(0) @map("sort_order")
+  completed Boolean @default(false)
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  completedAt DateTime? @map("completed_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@map("event_agenda_items")
+}
+
 // ─── Event Materials ────────────────────────────────────
 
 model EventMaterial {
@@ -846,6 +882,25 @@ model EventTemplate {
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")
   maxParticipants            Int     @default(300) @map("max_participants")
+
+  // Default sensati per semplificare il wizard agli utenti meno esperti
+  // (ADR: "default in base al template"). Pre-popolano i campi nel wizard
+  // di creazione; restano tutti modificabili.
+  // - defaultDurationMinutes: il wizard calcola endsAt = startsAt + durata,
+  //   così l'utente imposta solo l'orario di inizio. Null = lascia +2h.
+  defaultDurationMinutes Int?    @map("default_duration_minutes")
+  // Pre-attivazione della pipeline AI per tipo di evento (es. un template
+  // "Webinar registrato" attiva trascrizione + sintesi di default).
+  aiTranscriptEnabled    Boolean @default(false) @map("ai_transcript_enabled")
+  aiSummaryEnabled       Boolean @default(false) @map("ai_summary_enabled")
+  aiTranslationEnabled   Boolean @default(false) @map("ai_translation_enabled")
+  // Altri default che pre-popolano il wizard (modificabili):
+  // - descriptionTemplate: testo descrizione multilingua pre-compilato.
+  // - defaultRetentionDays: giorni di conservazione dati suggeriti.
+  // - defaultExpectedSpeakers: n° relatori atteso (migliora la diarization).
+  descriptionTemplate     Json? @map("description_template") @db.JsonB
+  defaultRetentionDays    Int?  @map("default_retention_days")
+  defaultExpectedSpeakers Int?  @map("default_expected_speakers")
 
   // Mirrors Event.permissionMatrix: when set, the role×feature matrix
   // is applied on new-event creation instead of the boolean toggles.

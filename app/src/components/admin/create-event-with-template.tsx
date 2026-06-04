@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import TemplatePicker from '@/components/admin/template-picker';
 import EventWizard from '@/components/admin/event-wizard/wizard-shell';
+import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 import CreateInstantCall from '@/components/admin/create-instant-call';
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 
@@ -35,6 +36,14 @@ interface TemplatePreset {
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
   maxParticipants: number;
+  permissionMatrix?: PermissionMatrix | null;
+  defaultDurationMinutes?: number | null;
+  aiTranscriptEnabled?: boolean;
+  aiSummaryEnabled?: boolean;
+  aiTranslationEnabled?: boolean;
+  descriptionTemplate?: Record<string, string> | null;
+  defaultRetentionDays?: number | null;
+  defaultExpectedSpeakers?: number | null;
 }
 
 interface Props {

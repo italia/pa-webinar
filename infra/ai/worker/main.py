@@ -289,11 +289,15 @@ def run_summarize(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         text = vttmod.segments_to_plain_text(transcript.get("segments", []))
         app.progress(job.jobId, "RUNNING", percent=30.0, message="calling LLM")
 
+        # Agenda/note (opzionale): se l'evento la usa, il claim la mette nel
+        # payload come lista {label, completed}. Confluisce nel prompt LLM.
+        agenda_items = job.payload.get("agenda") if isinstance(job.payload, dict) else None
         summary_md = llmmod.summarize_transcript(
             transcript_text=text,
             source_language=src_lang,
             base_url=job.providerHints.llmBaseUrl,
             model_id=job.providerHints.llmModelId,
+            agenda_items=agenda_items,
         )
         body = summary_md.encode("utf-8")
         _write_and_upload(

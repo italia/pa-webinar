@@ -88,12 +88,40 @@ def _chat_completions(
     return data["choices"][0]["message"]["content"]
 
 
+def _format_agenda(agenda_items: Optional[list]) -> str:
+    """Rende l'agenda (punti + spunte) come blocco testuale per il prompt.
+
+    `agenda_items` è la lista opzionale dal payload del job: ogni elemento
+    ``{"label": str, "completed": bool}``. Vuota/assente → stringa vuota
+    (funzione opzionale: se l'agenda non è usata, il prompt resta invariato).
+    """
+    if not agenda_items:
+        return ""
+    lines = []
+    for it in agenda_items:
+        if not isinstance(it, dict):
+            continue
+        label = str(it.get("label", "")).strip()
+        if not label:
+            continue
+        mark = "[trattato]" if it.get("completed") else "[non trattato]"
+        lines.append(f"- {mark} {label}")
+    if not lines:
+        return ""
+    return (
+        "\n\nAgenda dei punti previsti (con stato dichiarato dal moderatore "
+        "durante la riunione). Usala per strutturare il verbale e segnala "
+        "esplicitamente i punti NON trattati:\n" + "\n".join(lines)
+    )
+
+
 def summarize_transcript(
     *,
     transcript_text: str,
     source_language: str,
     base_url: Optional[str],
     model_id: Optional[str],
+    agenda_items: Optional[list] = None,
 ) -> str:
     if _stub_enabled() or not base_url or not model_id:
         log.info("LLM stub mode for summarise")
@@ -110,6 +138,7 @@ def summarize_transcript(
             "content": (
                 "Lingua sorgente: "
                 + source_language
+                + _format_agenda(agenda_items)
                 + ".\n\nTranscript:\n"
                 + transcript_text
             ),

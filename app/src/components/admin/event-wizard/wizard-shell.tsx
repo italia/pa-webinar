@@ -52,6 +52,14 @@ export interface WizardTemplatePreset {
   participantsCanShareScreen: boolean;
   maxParticipants: number;
   permissionMatrix?: PermissionMatrix | null;
+  // Default wizard (semplificazione utenti meno esperti).
+  defaultDurationMinutes?: number | null;
+  aiTranscriptEnabled?: boolean;
+  aiSummaryEnabled?: boolean;
+  aiTranslationEnabled?: boolean;
+  descriptionTemplate?: Record<string, string> | null;
+  defaultRetentionDays?: number | null;
+  defaultExpectedSpeakers?: number | null;
 }
 
 export interface WizardProps {
@@ -108,11 +116,13 @@ export interface InitialEventShape {
     participantsCanStartVideo: boolean;
     participantsCanShareScreen: boolean;
     recordingEnabled: boolean;
+    agendaEnabled?: boolean | null;
     autoStartRecording: boolean;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
     aiTranslationEnabled?: boolean | null;
     aiDubbingEnabled?: boolean | null;
+    multitrackRecordingEnabled?: boolean | null;
     aiTargetLocales?: string | null;
     expectedSpeakers?: number | null;
     dataRetentionDays: number;
@@ -185,7 +195,11 @@ export default function EventWizard(props: WizardProps) {
   const initialEvent = props.initialEvent;
 
   const defaultStart = new Date(Date.now() + 24 * 3600_000);
-  const defaultEnd = new Date(defaultStart.getTime() + 2 * 3600_000);
+  // Durata predefinita dal template (semplificazione): l'utente meno esperto
+  // imposta solo l'inizio e la fine è calcolata. Default 120 min se il
+  // template non la specifica.
+  const defaultDurationMin = props.template?.defaultDurationMinutes ?? 120;
+  const defaultEnd = new Date(defaultStart.getTime() + defaultDurationMin * 60_000);
 
   // Initial form state seeded from template (when given) + sensible defaults,
   // or — in edit mode — from `initialEvent`.
@@ -230,11 +244,13 @@ export default function EventWizard(props: WizardProps) {
         // Step 2
         permissionMatrix: matrix,
         recordingEnabled: ev.recordingEnabled,
+        agendaEnabled: ev.agendaEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
         aiTranslationEnabled: ev.aiTranslationEnabled ?? false,
         aiDubbingEnabled: ev.aiDubbingEnabled ?? false,
+        multitrackRecordingEnabled: ev.multitrackRecordingEnabled ?? false,
         aiTargetLocales: ev.aiTargetLocales ?? null,
         expectedSpeakers: ev.expectedSpeakers ?? null,
 
@@ -300,7 +316,11 @@ export default function EventWizard(props: WizardProps) {
     return {
       // Step 1
       title: { it: '', en: '' },
-      description: { it: '', en: '' },
+      // Descrizione pre-compilata dal template (semplificazione), modificabile.
+      description: {
+        it: tpl?.descriptionTemplate?.it ?? '',
+        en: tpl?.descriptionTemplate?.en ?? '',
+      },
       startsAt: toDatetimeLocalInTz(defaultStart, props.siteTimezone),
       endsAt: toDatetimeLocalInTz(defaultEnd, props.siteTimezone),
       timezone: props.siteTimezone,
@@ -319,13 +339,24 @@ export default function EventWizard(props: WizardProps) {
       // Step 2
       permissionMatrix: matrix,
       recordingEnabled: tpl?.recordingEnabled ?? false,
+      agendaEnabled: false,
       autoStartRecording: tpl?.autoStartRecording ?? false,
-      aiTranscriptEnabled: false,
-      aiSummaryEnabled: false,
-      aiTranslationEnabled: false,
+      // Default AI dal template (semplificazione): un template "registrato"
+      // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
+      // registrazione, quindi la attiviamo solo se recordingEnabled.
+      aiTranscriptEnabled: (tpl?.recordingEnabled ?? false) && (tpl?.aiTranscriptEnabled ?? false),
+      aiSummaryEnabled:
+        (tpl?.recordingEnabled ?? false) &&
+        (tpl?.aiTranscriptEnabled ?? false) &&
+        (tpl?.aiSummaryEnabled ?? false),
+      aiTranslationEnabled:
+        (tpl?.recordingEnabled ?? false) &&
+        (tpl?.aiTranscriptEnabled ?? false) &&
+        (tpl?.aiTranslationEnabled ?? false),
       aiDubbingEnabled: false,
+      multitrackRecordingEnabled: false,
       aiTargetLocales: null,
-      expectedSpeakers: null,
+      expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
       // Step 3
       organizers: [],
@@ -339,7 +370,7 @@ export default function EventWizard(props: WizardProps) {
       postEventQuestionnaire: { templateIds: [], adhocQuestions: [] },
 
       // Step 5 fields written here so review can surface them
-      dataRetentionDays: props.defaultRetentionDays,
+      dataRetentionDays: tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
       gdprTemplateId: null,
       privacyPolicyText: '',
       privacyPolicyUrl: null,
@@ -395,11 +426,18 @@ export default function EventWizard(props: WizardProps) {
       if (Object.keys(aggregated).length > 0) {
         setFieldErrors(aggregated);
         setSubmitError(t('validationFailed'));
-        // Jump to the first failing step.
+        // Jump to the first failing step. Gli errori di validatePublish
+        // (moderatorName/moderatorEmail) non sono coperti da validateStep e
+        // i campi vivono nello step 'review': se solo quelli falliscono,
+        // portiamo l'utente lì (altrimenti il messaggio resta senza campo
+        // evidenziato visibile).
         const firstFailing = STEP_KEYS.find((k) =>
           Object.keys(validateStep(k, form, props.defaultLocale)).length > 0,
         );
         if (firstFailing) setActiveStep(firstFailing);
+        else if (aggregated.moderatorName || aggregated.moderatorEmail) {
+          setActiveStep('review');
+        }
         return;
       }
       setSubmitting(true);
@@ -437,6 +475,7 @@ export default function EventWizard(props: WizardProps) {
           participantsCanStartVideo: toggles.participantsCanStartVideo,
           participantsCanShareScreen: toggles.participantsCanShareScreen,
           recordingEnabled: form.recordingEnabled,
+          agendaEnabled: form.agendaEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
 
           // Postprod AI — subordinate al recording (server-side resta
@@ -455,6 +494,12 @@ export default function EventWizard(props: WizardProps) {
             form.aiTranscriptEnabled &&
             form.aiTranslationEnabled &&
             form.aiDubbingEnabled,
+          // Multi-traccia: subordinato a recording + transcript (è l'input
+          // della trascrizione per-partecipante).
+          multitrackRecordingEnabled:
+            form.recordingEnabled &&
+            form.aiTranscriptEnabled &&
+            form.multitrackRecordingEnabled,
           aiTargetLocales: form.aiTargetLocales,
           expectedSpeakers: form.expectedSpeakers,
 
@@ -689,6 +734,7 @@ export default function EventWizard(props: WizardProps) {
           <Step2Permissions
             value={form}
             onChange={updateForm}
+            fieldErrors={fieldErrors}
           />
         )}
         {activeStep === 'invites' && (
@@ -712,6 +758,7 @@ export default function EventWizard(props: WizardProps) {
             jvbSizingConfig={props.jvbSizingConfig}
             defaultSenderRatioPct={props.defaultSenderRatioPct}
             gdprTemplates={props.gdprTemplates}
+            fieldErrors={fieldErrors}
           />
         )}
       </div>
@@ -869,6 +916,13 @@ function validateStep(
       form.maxParticipants > 500
     ) {
       errs['maxParticipants'] = 'outOfRange';
+    }
+  }
+  if (step === 'permissions') {
+    // La traduzione automatica senza lingue target non produce nulla:
+    // richiediamo almeno una lingua. (Errore mostrato nello step 2.)
+    if (form.aiTranslationEnabled && !(form.aiTargetLocales ?? '').trim()) {
+      errs['aiTargetLocales'] = 'required';
     }
   }
   return errs;

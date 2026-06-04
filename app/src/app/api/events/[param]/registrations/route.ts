@@ -53,12 +53,18 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const {
     displayName, email, consentGiven, organization, organizationRole, organizationType,
-    consentRecording, consentFutureCommunications, consentAddressBook,
+    consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook,
   } = parsed.data;
 
   // If recording is enabled, consentRecording must be true
   if (event.recordingEnabled && consentRecording !== true) {
     throw new ValidationError('Validation failed', [{ path: ['consentRecording'], message: 'registration.errors.recordingConsentRequired' }]);
+  }
+
+  // ADR-013 Fase 5 — se l'evento registra le tracce per-partecipante,
+  // serve il consenso esplicito separato (PII sensibile).
+  if (event.multitrackRecordingEnabled && consentMultitrack !== true) {
+    throw new ValidationError('Validation failed', [{ path: ['consentMultitrack'], message: 'registration.errors.multitrackConsentRequired' }]);
   }
 
   const emailHash = hashEmail(email);
@@ -95,6 +101,7 @@ export const POST = withErrorHandling(async (request, context) => {
         consentGiven,
         consentTimestamp: new Date(),
         consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
+        consentMultitrack: event.multitrackRecordingEnabled ? (consentMultitrack ?? false) : null,
         consentFutureCommunications: consentFutureCommunications ?? false,
         accessToken,
         personId,
@@ -110,6 +117,7 @@ export const POST = withErrorHandling(async (request, context) => {
         details: JSON.stringify({
           consentGiven: true,
           consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
+          consentMultitrack: event.multitrackRecordingEnabled ? (consentMultitrack ?? false) : null,
           consentFutureCommunications: consentFutureCommunications ?? false,
           consentAddressBook: consentAddressBook === true,
         }),
