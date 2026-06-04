@@ -32,17 +32,33 @@ export const POST = withErrorHandling(async (request) => {
 
   const recording = await prisma.recording.findUnique({
     where: { id: recordingId },
-    select: { id: true, eventId: true, event: { select: { jitsiRoomName: true } } },
+    select: {
+      id: true,
+      eventId: true,
+      event: { select: { jitsiRoomName: true, endsAt: true } },
+    },
   });
   if (!recording) throw new NotFoundError('Recording');
 
   const roomName = recording.event.jitsiRoomName;
+  // TTL del JWT bot legato alla durata residua dell'evento (+30min di
+  // margine), così su eventi lunghi il bot non si disconnette a metà (il
+  // default participant sarebbe 90min). Cap a 6h = activeDeadlineSeconds
+  // del Job recorder; minimo 10min.
+  const remainingSec = Math.ceil(
+    (recording.event.endsAt.getTime() - Date.now()) / 1000,
+  );
+  const expiresInSeconds = Math.min(
+    Math.max(remainingSec + 30 * 60, 10 * 60),
+    6 * 60 * 60,
+  );
   const jwt = await generateJitsiJwt({
     roomName,
     displayName: '📼 Recorder',
     // uniqueId stabile per recording → Jitsi lo tratta come un endpoint solo.
     uniqueId: `rec-bot-${recording.id}`,
     isModerator: false,
+    expiresInSeconds,
   });
 
   return Response.json({

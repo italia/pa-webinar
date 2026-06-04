@@ -80,8 +80,8 @@ export interface CaptureResult {
  *      a. `JitsiMeetJS.init({ disableAudioLevels: false })`
  *      b. crea la connection con il JWT (`new JitsiMeetJS.JitsiConnection(
  *         appId, jwt, { hosts, serviceUrl })`)
- *      c. su CONNECTION_ESTABLISHED, `initJitsiConference(roomName, {
- *         startSilent: true })` — NON crea track locali (receive-only).
+ *      c. su CONNECTION_ESTABLISHED, `initJitsiConference(roomName, {})` —
+ *         receive-only perché non crea né pubblica track locali.
  *      d. `conference.setDisplayName(botDisplayName)` e `conference.join(jwt)`.
  *
  * 3. Per ogni `TRACK_ADDED` remoto di tipo 'audio':
@@ -340,7 +340,11 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     connection.addEventListener(
       JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
       () => {
-        conference = connection.initJitsiConference(cfg.room, { startSilent: true });
+        // NB: niente `startSilent` — è un'ottimizzazione per client "muti"
+        // che può sopprimere la RICEZIONE dell'audio remoto su alcuni
+        // bridge. Il recorder è receive-only semplicemente perché non crea
+        // né pubblica track locali (nessun getUserMedia, nessun addTrack).
+        conference = connection.initJitsiConference(cfg.room, {});
         conference.setDisplayName(cfg.botName);
         conference.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
         conference.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
@@ -350,6 +354,16 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
           if (idleTimer) clearTimeout(idleTimer);
         });
         conference.join();
+        // Vogliamo l'audio di TUTTI i partecipanti (no last-N sul video,
+        // che non ci serve). Best-effort: l'API varia per versione.
+        try {
+          conference.setReceiverConstraints?.({
+            lastN: -1,
+            defaultConstraints: { maxHeight: 0 },
+          });
+        } catch {
+          /* versione lib-jitsi-meet senza setReceiverConstraints */
+        }
       },
     );
     connection.addEventListener(
