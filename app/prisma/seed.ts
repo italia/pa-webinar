@@ -104,14 +104,17 @@ async function main() {
     update: {},
     create: {
       id: 'singleton',
-      siteName: 'Eventi PA',
+      siteName: 'PA Webinar',
       siteDescription:
-        'Piattaforma per eventi pubblici digitali della Pubblica Amministrazione',
-      organizationName: 'Nome Ente',
-      organizationNameShort: 'Ente',
-      organizationUrl: 'https://www.example.gov.it',
-      parentOrganization: 'Organizzazione superiore',
-      parentOrganizationUrl: 'https://www.governo.it',
+        'Webinar ed eventi pubblici delle community della trasformazione digitale',
+      organizationName: 'Dipartimento per la Trasformazione Digitale',
+      organizationNameShort: 'DTD',
+      organizationUrl: 'https://innovazione.gov.it',
+      // Parent body shown in the .italia slim header. Left without a URL on
+      // purpose: an unconfigured deploy shows the name as plain text rather
+      // than linking out to an unrelated site.
+      parentOrganization: '',
+      parentOrganizationUrl: '',
       homePageMode: 'LANDING',
       statusPageEnabled: true,
       guestAccessEnabled: true,

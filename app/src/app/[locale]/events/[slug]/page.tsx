@@ -41,7 +41,7 @@ export async function generateMetadata({
       url: pageUrl,
       type: 'website',
       locale: locale === 'en' ? 'en_GB' : 'it_IT',
-      siteName: settings.siteName || 'Eventi PA',
+      siteName: settings.siteName || 'PA Webinar',
     },
     twitter: {
       card: 'summary',
@@ -97,7 +97,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     },
     organizer: {
       '@type': 'Organization',
-      name: settings.organizationName || 'Eventi PA',
+      name: settings.organizationName || 'PA Webinar',
       url: settings.organizationUrl || '',
     },
     maximumAttendeeCapacity: event.maxParticipants,
