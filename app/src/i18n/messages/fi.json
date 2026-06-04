@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Julkiset digitaaliset tapahtumat",
-      "subtitle": "Alusta webinaareja, esityksiä ja julkisia kokouksia varten — Digitaalisen muutoksen osasto",
-      "browseEvents": "Selaa tapahtumia",
-      "organizeEvent": "Järjestä tapahtuma"
-    },
-    "features": {
-      "title": "Julkishallinnon tapahtuma-alusta",
-      "video": {
-        "title": "Videoneuvottelu",
-        "desc": "Osallistu julkisiin tapahtumiin jopa 300 osallistujan kanssa. Ohjelmistoja ei tarvitse asentaa."
-      },
-      "qa": {
-        "title": "Kysymykset ja vastaukset",
-        "desc": "Esitä kysymyksiä tapahtuman aikana ja äänestä tärkeimpiä. Moderaattori vastaa suorana."
-      },
-      "privacy": {
-        "title": "Tietosuoja ja turvallisuus",
-        "desc": "GDPR:n mukainen tietosuoja. Itseisännöity infrastruktuuri Italiassa."
+      "kicker": "Avoinna kaikille · suorana · tallenteina",
+      "title": "Digimuutosyhteisöjen verkkoseminaarit ja tapahtumat",
+      "subtitle": "Seuraa suorana digimuutosyhteisöjen esityksiä, julkisia kokouksia ja Q&A-istuntoja. Osallistu selaimestasi, esitä kysymyksiä ja katso tallenteet uudelleen milloin haluat.",
+      "browseEvents": "Selaa tulevia tapahtumia",
+      "watchRecordings": "Katso tallenteet",
+      "badges": {
+        "noInstall": "Selaimesta, ilman asennuksia",
+        "interactive": "Suorat kysymykset ja kyselyt",
+        "recordings": "Tallenteet ja tekstitykset",
+        "accessible": "Saavutettava, 24 kielellä"
       }
     },
     "upcoming": {
       "title": "Tulevat tapahtumat",
       "viewAll": "Näytä kaikki tapahtumat",
-      "noEvents": "Ei tulevia tapahtumia. Tarkista pian uudelleen!"
+      "noEvents": "Ei suunniteltuja tapahtumia. Tule pian uudelleen!"
     },
     "howItWorks": {
-      "title": "Näin se toimii",
+      "title": "Miten osallistua",
+      "subtitle": "Vain muutama vaihe, ilman tiliä ja ilman asennuksia.",
       "step1": {
-        "title": "Ilmoittaudu",
-        "desc": "Ilmoittaudu tapahtumaan maksutta"
+        "title": "Rekisteröidy",
+        "desc": "Ilmoittaudu tapahtumaan maksutta sen julkisella sivulla."
       },
       "step2": {
         "title": "Saat linkin",
-        "desc": "Sähköpostiviesti henkilökohtaisella pääsylinkillä"
+        "desc": "Saat sähköpostin, jossa on henkilökohtainen linkkisi ja kalenteriliite."
       },
       "step3": {
         "title": "Osallistu",
-        "desc": "Liity tapahtumaan suoraan selaimella, asennuksia ei tarvita"
+        "desc": "Liity tapahtumaan selaimestasi, ilman mitään asennuksia."
       },
       "step4": {
-        "title": "Vuorovaikuta",
-        "desc": "Esitä kysymyksiä, äänestä ja osallistu keskusteluun"
+        "title": "Ole vuorovaikutuksessa",
+        "desc": "Esitä kysymyksiä, äänestä, vastaa kyselyihin ja osallistu keskusteluun."
+      }
+    },
+    "during": {
+      "title": "Mitä voit tehdä tapahtuman aikana",
+      "subtitle": "Et vain katso: tapahtumat ovat vuorovaikutteisia.",
+      "qa": {
+        "title": "Kysymykset ja vastaukset",
+        "desc": "Esitä kysymyksiä ja äänestä muiden kysymyksiä: moderaattori vastaa suorana."
+      },
+      "polls": {
+        "title": "Kyselyt",
+        "desc": "Vastaa kyselyihin reaaliajassa ja näe tulokset heti."
+      },
+      "wordcloud": {
+        "title": "Sanapilvi",
+        "desc": "Lisää sanasi tapahtuman jaettuun sanapilveen."
+      },
+      "reactions": {
+        "title": "Reaktiot ja nostetut kädet",
+        "desc": "Reagoi ja pyydä puheenvuoroa nostamalla kätesi: jono käsitellään järjestyksessä."
+      },
+      "chat": {
+        "title": "Keskustelu",
+        "desc": "Kirjoita tapahtuman keskusteluun ja seuraa keskustelua muiden osallistujien kanssa."
+      },
+      "agenda": {
+        "title": "Ohjelma ja muistiinpanot",
+        "desc": "Seuraa ohjelmaa ja moderaattorien tapahtuman aikana jakamia muistiinpanoja."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Projekti",
+      "title": "Avoin lähdekoodi ja suvereeni, julkishallinnon tekemä julkishallinnolle",
+      "body": "PA Webinar on Digitaalisen muutoksen osaston alusta julkisia digitaalisia tapahtumia varten: .italia-suunnittelujärjestelmä, Jitsi Meet -videomoottori ja täysin in-cluster AI-putki. Se julkaistaan avoimena lähdekoodina, jotta mikä tahansa hallinto voi käyttää sitä uudelleen.",
+      "sovereignty": {
+        "title": "Datan suvereniteetti",
+        "desc": "Self-hosted hallinnon infrastruktuurissa: data ei poistu koskaan eikä CLOUD Act -altistumista ole."
+      },
+      "openSource": {
+        "title": "Avoin lähdekoodi EUPL-1.2",
+        "desc": "Koodi, jota mikä tahansa hallinto voi käyttää uudelleen, julkisella SBOM:lla ja service inventoryllä."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII salattu levossa, tarkat suostumukset ja määritettävä säilytys."
+      },
+      "cta": "Palvelun läpinäkyvyys",
+      "techTitle": "Rakennettu avoimilla teknologioilla",
+      "archTitle": "Miten se toimii, lyhyesti"
+    },
+    "afterEvent": {
+      "title": "Tapahtuman jälkeen",
+      "subtitle": "Mitään ei mene hukkaan: kaikki pysyy saatavilla ja saavutettavana.",
+      "library": {
+        "title": "Tallenteiden kirjasto",
+        "desc": "Katso menneitä tapahtumia uudelleen julkisessa kirjastossa, kysymysten ja kyselyiden arkiston kanssa."
+      },
+      "transcript": {
+        "title": "Litterointi ja tekstitys",
+        "desc": "Jokaisessa tallenteessa voi olla litterointi ja tekstitys, jotka klusterin sisäinen AI-putki luo automaattisesti."
+      },
+      "translation": {
+        "title": "Automaattinen käännös",
+        "desc": "Tekstitykset ja tiivistelmä käännetään useille kielille, jotta voit seurata tapahtumaa myös toisella kielellä."
+      },
+      "dubbing": {
+        "title": "Äänen jälkiäänitys",
+        "desc": "Jälkiäänitetty ääniraita neutraalilla synteettisellä äänellä (ilman äänen kloonausta), jotta voit kuunnella tapahtuman toisella kielellä."
       }
     }
   },
@@ -2039,20 +2100,36 @@
     "accessibility": {
       "metaTitle": "Saavutettavuusseloste",
       "title": "Saavutettavuusseloste",
-      "intro": "Digitaalisen muutoksen osasto sitoutuu tekemään tästä alustasta saavutettavan julkisen sektorin digitaalisia palveluita koskevien vaatimusten mukaisesti.",
+      "intro": "Digitalisaatio-osasto sitoutuu tekemään PA Webinarista saavutettavan Italian lain 4/2004, EU-direktiivin 2016/2102 sekä AgID:n tieto- ja viestintätekniikan välineiden saavutettavuutta koskevien ohjeiden mukaisesti.",
       "sections": {
-        "commitment": {
-          "title": "Sitoumus saavutettavuuteen",
-          "body": "Alusta on suunniteltu .italia-suunnittelujärjestelmän mukaisilla komponenteilla kiinnittäen erityistä huomiota näppäimistönavigointiin, semanttiseen sisältörakenteeseen ja käyttöliittymän luettavuuteen yleisimmissä näyttöko'oissa."
-        },
-        "status": {
+        "conformance": {
           "title": "Vaatimustenmukaisuuden tila",
-          "body": "Saavutettavuustarkistuksia ja -parannuksia tehdään jatkuvasti. Mahdolliset jäljelle jääneet puutteet korjataan asteittain osana palvelun kehitystä ja säännöllistä ylläpitoa."
+          "body": "PA Webinar on suunniteltu noudattamaan WCAG 2.1 -tason AA vaatimuksia. Jokaisen palvelua tarjoavan hallintoelimen on julkaistava oma selosteensa, jossa ilmoitetaan ajantasaiseen arviointiin perustuva todellinen vaatimustenmukaisuuden tila (täysin, osittain tai ei vaatimustenmukainen)."
+        },
+        "nonAccessible": {
+          "title": "Ei-saavutettava sisältö",
+          "body": "Videohuone tarjotaan Jitsi Meetin kautta: joillakin reaaliaikaisilla toiminnoilla voi olla rajoituksia avustavien teknologioiden kanssa. Tekoälyn (AI) automaattisesti tuottama sisältö (litteroinnit, tekstitykset, käännökset ja jälkiäänitykset) voi sisältää epätarkkuuksia, ja se merkitään aina sellaiseksi."
+        },
+        "preparation": {
+          "title": "Tämän selosteen laatiminen",
+          "body": "Tämä mallisleloste laadittiin palveluntarjoajan tekemän itsearvioinnin perusteella. Käyttöliittymä on rakennettu .italia-suunnittelujärjestelmällä kiinnittäen huomiota näppäimistönavigointiin, sisällön semantiikkaan, värikontrastiin ja ruudunlukuohjelmien yhteensopivuuteen. Laatimis- ja viimeisimmän tarkistuksen päivämäärät on täytettävä julkaisuhetkellä."
         },
         "feedback": {
           "title": "Palaute ja yhteystiedot",
-          "body": "Saavutettavuusesteiden tai palvelun käyttöongelmien ilmoittamiseksi käyttäjät voivat ottaa yhteyttä osastoon sen institutionaalisten kanavien kautta ilmoittaen kyseisen sivun ja lyhyen kuvauksen ongelmasta."
+          "body": "Vaatimustenvastaisuustapauksista ilmoittamiseksi tai säädöksen soveltamisalan ulkopuolelle jätettyjen tietojen ja sisällön pyytämiseksi voit käyttää palvelua tarjoavan hallintoelimen virallisia yhteyskanavia ilmoittaen kyseessä olevan sivun ja kuvauksen ongelmasta."
+        },
+        "enforcement": {
+          "title": "Täytäntöönpanomenettely",
+          "body": "Jos vastaus on epätyydyttävä tai vastausta ei saada 30 päivän kuluessa, voit ottaa yhteyttä AgID:n digitaaliseen oikeusasiamieheen (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Selosteen uudelleenkäyttö ja julkaiseminen",
+        "body": "PA Webinar on avoimen lähdekoodin ohjelmisto, jota muut hallintoelimet voivat käyttää uudelleen. Jokaisen alustan käyttöön ottavan elimen on laadittava ja julkaistava oma saavutettavuusselosteensa AgID:n virallisen lomakkeen kautta korvaten tämän mallitekstin omilla tiedoillaan."
+      },
+      "links": {
+        "agidForm": "Saavutettavuusselosteen lomake (AgID)",
+        "difensore": "Saavutettavuus ja digitaalinen oikeusasiamies (AgID)"
       }
     },
     "legalNotes": {

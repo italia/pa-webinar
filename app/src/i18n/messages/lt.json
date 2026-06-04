@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Viešieji skaitmeniniai renginiai",
-      "subtitle": "Internetinių seminarų, pristatymų ir viešų susitikimų platforma, sukurta Skaitmeninės transformacijos departamento",
-      "browseEvents": "Naršyti renginius",
-      "organizeEvent": "Organizuoti renginį"
-    },
-    "features": {
-      "title": "Viešojo administravimo renginių platforma",
-      "video": {
-        "title": "Vaizdo konferencijos",
-        "desc": "Dalyvaukite viešuose renginiuose su iki 300 dalyvių. Nereikia diegti jokios programinės įrangos."
-      },
-      "qa": {
-        "title": "Klausimai ir atsakymai",
-        "desc": "Užduokite klausimus renginio metu ir balsuokite už svarbiausius. Moderatorius atsako tiesiogiai."
-      },
-      "privacy": {
-        "title": "Privatumas ir saugumas",
-        "desc": "Duomenys apsaugoti ir atitinka GDPR reikalavimus. Savarankiškai tvarkoma infrastruktūra Italijoje."
+      "kicker": "Atvira visiems · tiesiogiai · pagal poreikį",
+      "title": "Skaitmeninės transformacijos bendruomenių internetiniai seminarai ir renginiai",
+      "subtitle": "Tiesiogiai stebėkite skaitmeninės transformacijos bendruomenių pristatymus, viešus susitikimus ir klausimų bei atsakymų sesijas. Prisijunkite iš naršyklės, užduokite klausimus ir peržiūrėkite įrašus, kada tik norite.",
+      "browseEvents": "Naršyti būsimus renginius",
+      "watchRecordings": "Žiūrėti įrašus",
+      "badges": {
+        "noInstall": "Iš naršyklės, be diegimų",
+        "interactive": "Tiesioginiai Q&A ir apklausos",
+        "recordings": "Įrašai ir subtitrai",
+        "accessible": "Prieinama 24 kalbomis"
       }
     },
     "upcoming": {
-      "title": "Artėjantys renginiai",
+      "title": "Būsimi renginiai",
       "viewAll": "Peržiūrėti visus renginius",
-      "noEvents": "Artėjančių renginių nėra. Užsukite netrukus!"
+      "noEvents": "Renginių nesuplanuota. Užsukite netrukus!"
     },
     "howItWorks": {
-      "title": "Kaip tai veikia",
+      "title": "Kaip dalyvauti",
+      "subtitle": "Tik keli žingsniai, be paskyros ir be diegimų.",
       "step1": {
-        "title": "Užsiregistruokite",
-        "desc": "Nemokamai prisiregistruokite prie renginio"
+        "title": "Registruokitės",
+        "desc": "Nemokamai užsiregistruokite į renginį jo viešame puslapyje."
       },
       "step2": {
         "title": "Gaukite nuorodą",
-        "desc": "El. laiškas su jūsų asmenine prieigos nuoroda"
+        "desc": "Gausite el. laišką su asmenine nuoroda ir kalendoriaus priedu."
       },
       "step3": {
-        "title": "Dalyvaukite",
-        "desc": "Prisijunkite prie renginio per naršyklę, nereikia nieko diegti"
+        "title": "Prisijunkite",
+        "desc": "Įsijunkite į renginį iš naršyklės, nieko nediegdami."
       },
       "step4": {
-        "title": "Bendraukite",
-        "desc": "Užduokite klausimus, balsuokite, dalyvaukite diskusijoje"
+        "title": "Sąveikaukite",
+        "desc": "Užduokite klausimus, balsuokite, atsakykite į apklausas ir dalyvaukite diskusijoje."
+      }
+    },
+    "during": {
+      "title": "Ką galite daryti renginio metu",
+      "subtitle": "Ne tik žiūrėti: renginiai yra interaktyvūs.",
+      "qa": {
+        "title": "Klausimai ir atsakymai",
+        "desc": "Užduokite klausimus ir balsuokite už kitų: moderatorius atsako tiesiogiai."
+      },
+      "polls": {
+        "title": "Apklausos",
+        "desc": "Atsakykite į apklausas realiuoju laiku ir iškart matykite rezultatus."
+      },
+      "wordcloud": {
+        "title": "Žodžių debesis",
+        "desc": "Pridėkite savo žodžius prie bendro renginio žodžių debesies."
+      },
+      "reactions": {
+        "title": "Reakcijos ir pakeltos rankos",
+        "desc": "Reaguokite ir prašykite žodžio pakeldami ranką: eilė tvarkoma iš eilės."
+      },
+      "chat": {
+        "title": "Pokalbiai",
+        "desc": "Rašykite renginio pokalbiuose ir sekite pokalbį su kitais dalyviais."
+      },
+      "agenda": {
+        "title": "Darbotvarkė ir užrašai",
+        "desc": "Sekite darbotvarkę ir užrašus, kuriais moderatoriai dalijasi renginio metu."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Projektas",
+      "title": "Atvirojo kodo ir suverenus, sukurtas valdžios institucijų valdžios institucijoms",
+      "body": "PA Webinar yra Skaitmeninės transformacijos departamento platforma viešiems skaitmeniniams renginiams: .italia dizaino sistema, Jitsi Meet vaizdo variklis ir visiškai in-cluster AI procesas. Ji išleista kaip atvirojo kodo, kad bet kuri administracija galėtų ją pakartotinai naudoti.",
+      "sovereignty": {
+        "title": "Duomenų suverenumas",
+        "desc": "Self-hosted administracijos infrastruktūroje: duomenys niekur neišeina ir nėra CLOUD Act poveikio."
+      },
+      "openSource": {
+        "title": "Atvirojo kodo EUPL-1.2",
+        "desc": "Kodas, kurį gali pakartotinai naudoti bet kuri administracija, su viešu SBOM ir service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII užšifruoti ramybės būsenoje, detalūs sutikimai ir konfigūruojamas saugojimas."
+      },
+      "cta": "Paslaugos skaidrumas",
+      "techTitle": "Sukurta naudojant atviras technologijas",
+      "archTitle": "Kaip tai veikia, trumpai"
+    },
+    "afterEvent": {
+      "title": "Po renginio",
+      "subtitle": "Niekas neprarandama: viskas lieka prieinama ir pasiekiama.",
+      "library": {
+        "title": "Įrašų biblioteka",
+        "desc": "Peržiūrėkite praėjusius renginius viešoje bibliotekoje su klausimų ir apklausų archyvu."
+      },
+      "transcript": {
+        "title": "Transkripcija ir subtitrai",
+        "desc": "Kiekvienas įrašas gali turėti transkripciją ir subtitrus, automatiškai sugeneruotus klasteryje veikiančio AI dujotiekio."
+      },
+      "translation": {
+        "title": "Automatinis vertimas",
+        "desc": "Subtitrai ir santrauka išversti į kelias kalbas, kad galėtumėte sekti renginį ir kita kalba."
+      },
+      "dubbing": {
+        "title": "Garso įgarsinimas",
+        "desc": "Įgarsinta garso takelis su neutraliu sintetiniu balsu (be balso klonavimo), kad galėtumėte klausytis renginio kita kalba."
       }
     }
   },
@@ -2039,20 +2100,36 @@
     "accessibility": {
       "metaTitle": "Prieinamumo deklaracija",
       "title": "Prieinamumo deklaracija",
-      "intro": "Skaitmeninės transformacijos departamentas įsipareigoja padaryti šią platformą prieinamą, laikydamasis galiojančių reikalavimų viešojo sektoriaus skaitmeninėms paslaugoms.",
+      "intro": "Skaitmeninės transformacijos departamentas įsipareigoja užtikrinti, kad „PA Webinar“ būtų prieinama, laikantis Italijos 2004 m. įstatymo Nr. 4, ES direktyvos 2016/2102 ir AgID gairių dėl IRT priemonių prieinamumo.",
       "sections": {
-        "commitment": {
-          "title": "Įsipareigojimas prieinamumui",
-          "body": "Platforma sukurta naudojant komponentus, suderintus su .italia dizaino sistema, ypatingą dėmesį skiriant navigacijai klaviatūra, turinio semantikai ir sąsajos skaitomumui visų pagrindinių ekrano dydžių atveju."
+        "conformance": {
+          "title": "Atitikties būklė",
+          "body": "„PA Webinar“ sukurta taip, kad atitiktų WCAG 2.1 AA lygį. Kiekviena paslaugą teikianti administracija turi paskelbti savo deklaraciją, nurodydama faktinę atitikties būklę (visiškai atitinka, iš dalies atitinka arba neatitinka), remdamasi atnaujintu vertinimu."
         },
-        "status": {
-          "title": "Atitikties būsena",
-          "body": "Nuolat vykdomi prieinamumo patikrinimai ir tobulinimai. Visos likusios problemos sprendžiamos laipsniškai, kaip paslaugos tobulinimo ir reguliarios priežiūros dalis."
+        "nonAccessible": {
+          "title": "Neprieinamas turinys",
+          "body": "Vaizdo kambarys teikiamas per „Jitsi Meet“: kai kurios realiojo laiko funkcijos gali turėti apribojimų naudojant pagalbines technologijas. Dirbtinio intelekto (AI) automatiškai sukurtas turinys (transkripcijos, subtitrai, vertimai ir įgarsinimas) gali turėti netikslumų ir visada yra atitinkamai pažymėtas."
+        },
+        "preparation": {
+          "title": "Šios deklaracijos parengimas",
+          "body": "Ši deklaracijos šablonas parengtas remiantis paslaugos teikėjo atliktu įsivertinimu. Sąsaja sukurta naudojant „.italia“ dizaino sistemą, atkreipiant dėmesį į navigaciją klaviatūra, turinio semantiką, spalvų kontrastą ir suderinamumą su ekrano skaitytuvais. Parengimo ir paskutinės peržiūros datos turi būti nurodytos paskelbimo metu."
         },
         "feedback": {
           "title": "Atsiliepimai ir kontaktai",
-          "body": "Norėdami pranešti apie prieinamumo kliūtis ar paslaugos naudojimo problemas, naudotojai gali kreiptis į departamentą per jo institucinius kanalus, nurodydami paveiktą puslapį ir trumpą problemos aprašymą."
+          "body": "Norėdami pranešti apie neatitikties atvejus arba paprašyti informacijos ir turinio, kuriam reglamentas netaikomas, galite naudotis paslaugą teikiančios administracijos instituciniais kontaktų kanalais, nurodydami atitinkamą puslapį ir problemos aprašymą."
+        },
+        "enforcement": {
+          "title": "Vykdymo užtikrinimo procedūra",
+          "body": "Jei atsakymas nepatenkinamas arba per 30 dienų negaunamas joks atsakymas, galite kreiptis į AgID skaitmeninį civilinį ombudsmeną (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Deklaracijos pakartotinis naudojimas ir skelbimas",
+        "body": "„PA Webinar“ yra atvirojo kodo programinė įranga, kurią gali pakartotinai naudoti kitos administracijos. Kiekviena platformą diegianti įstaiga turi parengti ir paskelbti savo prieinamumo deklaraciją naudodama oficialią AgID formą, pakeisdama šį šablono tekstą savo duomenimis."
+      },
+      "links": {
+        "agidForm": "Prieinamumo deklaracijos forma (AgID)",
+        "difensore": "Prieinamumas ir skaitmeninis civilinis ombudsmenas (AgID)"
       }
     },
     "legalNotes": {

@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Publieke digitale evenementen",
-      "subtitle": "Platform voor webinars, presentaties en publieke bijeenkomsten van het Departement voor Digitale Transformatie",
-      "browseEvents": "Evenementen ontdekken",
-      "organizeEvent": "Een evenement organiseren"
-    },
-    "features": {
-      "title": "Het platform voor overheidsevenementen",
-      "video": {
-        "title": "Videoconferentie",
-        "desc": "Neem deel aan publieke evenementen met maximaal 300 deelnemers. Geen software te installeren."
-      },
-      "qa": {
-        "title": "Vragen en antwoorden",
-        "desc": "Stel vragen tijdens het evenement en stem op de belangrijkste. De moderator beantwoordt live."
-      },
-      "privacy": {
-        "title": "Privacy en veiligheid",
-        "desc": "GDPR-conforme gegevensbescherming. Zelf-gehoste infrastructuur in Italië."
+      "kicker": "Open voor iedereen · live · op aanvraag",
+      "title": "Webinars en evenementen van de digitale-transformatiegemeenschappen",
+      "subtitle": "Volg presentaties, openbare bijeenkomsten en Q&A-sessies van de digitale-transformatiegemeenschappen live. Doe mee vanuit je browser, stel vragen en bekijk de opnames wanneer je maar wilt.",
+      "browseEvents": "Bekijk komende evenementen",
+      "watchRecordings": "Bekijk opnames",
+      "badges": {
+        "noInstall": "Vanuit de browser, zonder installaties",
+        "interactive": "Live Q&A en polls",
+        "recordings": "Opnames en ondertiteling",
+        "accessible": "Toegankelijk, in 24 talen"
       }
     },
     "upcoming": {
       "title": "Komende evenementen",
-      "viewAll": "Alle evenementen bekijken",
-      "noEvents": "Geen evenementen gepland. Kom binnenkort terug!"
+      "viewAll": "Bekijk alle evenementen",
+      "noEvents": "Geen evenementen gepland. Kom snel terug!"
     },
     "howItWorks": {
-      "title": "Hoe het werkt",
+      "title": "Hoe je meedoet",
+      "subtitle": "Slechts een paar stappen, zonder account en zonder installaties.",
       "step1": {
-        "title": "Schrijf u in",
-        "desc": "Gratis inschrijving voor het evenement"
+        "title": "Registreer",
+        "desc": "Schrijf je gratis in voor het evenement via de openbare pagina."
       },
       "step2": {
-        "title": "Ontvang uw link",
-        "desc": "Een e-mail met uw persoonlijke toegangslink"
+        "title": "Ontvang de link",
+        "desc": "Je ontvangt een e-mail met je persoonlijke link en een agendabijlage."
       },
       "step3": {
-        "title": "Neem deel",
-        "desc": "Betreed het evenement vanuit uw browser, zonder installaties"
+        "title": "Doe mee",
+        "desc": "Ga het evenement binnen vanuit je browser, zonder iets te installeren."
       },
       "step4": {
-        "title": "Communiceer",
-        "desc": "Stel vragen, stem, neem deel aan de discussie"
+        "title": "Doe mee aan de interactie",
+        "desc": "Stel vragen, stem, beantwoord polls en neem deel aan de discussie."
+      }
+    },
+    "during": {
+      "title": "Wat je tijdens een evenement kunt doen",
+      "subtitle": "Niet alleen kijken: de evenementen zijn interactief.",
+      "qa": {
+        "title": "Vragen en antwoorden",
+        "desc": "Stel vragen en stem op die van anderen: de moderator antwoordt live."
+      },
+      "polls": {
+        "title": "Polls",
+        "desc": "Beantwoord polls in realtime en zie de resultaten meteen."
+      },
+      "wordcloud": {
+        "title": "Woordwolk",
+        "desc": "Voeg je woorden toe aan de gedeelde woordwolk van het evenement."
+      },
+      "reactions": {
+        "title": "Reacties en opgestoken handen",
+        "desc": "Reageer en vraag het woord door je hand op te steken: de wachtrij wordt op volgorde afgehandeld."
+      },
+      "chat": {
+        "title": "Chat",
+        "desc": "Schrijf in de chat van het evenement en volg het gesprek met andere deelnemers."
+      },
+      "agenda": {
+        "title": "Agenda en notities",
+        "desc": "Volg de agenda en de notities die de moderatoren tijdens het evenement delen."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Het project",
+      "title": "Open source en soeverein, gebouwd door de overheid voor de overheid",
+      "body": "PA Webinar is het platform van het Departement voor Digitale Transformatie voor openbare digitale evenementen: het .italia-ontwerpsysteem, de Jitsi Meet-videomotor en een volledig in-cluster AI-pijplijn. Het wordt als open source uitgebracht zodat elke overheidsinstantie het kan hergebruiken.",
+      "sovereignty": {
+        "title": "Datasoevereiniteit",
+        "desc": "Self-hosted op de infrastructuur van de overheidsinstantie: gegevens verlaten die nooit en er is geen blootstelling aan de CLOUD Act."
+      },
+      "openSource": {
+        "title": "Open source EUPL-1.2",
+        "desc": "Code die door elke overheidsinstantie hergebruikt kan worden, met een openbare SBOM en service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII versleuteld in rust, granulaire toestemmingen en configureerbare bewaartermijn."
+      },
+      "cta": "Transparantie van de dienst",
+      "techTitle": "Gebouwd met open technologieën",
+      "archTitle": "Hoe het werkt, in het kort"
+    },
+    "afterEvent": {
+      "title": "Na het evenement",
+      "subtitle": "Niets gaat verloren: alles blijft beschikbaar en toegankelijk.",
+      "library": {
+        "title": "Opnamebibliotheek",
+        "desc": "Bekijk eerdere evenementen terug in de openbare bibliotheek, met het archief van vragen en peilingen."
+      },
+      "transcript": {
+        "title": "Transcriptie en ondertiteling",
+        "desc": "Elke opname kan een transcriptie en ondertiteling hebben, automatisch gegenereerd door de in-cluster AI-pipeline."
+      },
+      "translation": {
+        "title": "Automatische vertaling",
+        "desc": "Ondertiteling en samenvatting vertaald in meerdere talen, zodat je het evenement ook in een andere taal kunt volgen."
+      },
+      "dubbing": {
+        "title": "Audionasynchronisatie",
+        "desc": "Een nagesynchroniseerd audiospoor met een neutrale synthetische stem (zonder stemklonen), om het evenement in een andere taal te beluisteren."
       }
     }
   },
@@ -2039,20 +2100,36 @@
     "accessibility": {
       "metaTitle": "Toegankelijkheidsverklaring",
       "title": "Toegankelijkheidsverklaring",
-      "intro": "Het Departement voor Digitale Transformatie zet zich in om dit platform toegankelijk te maken, in overeenstemming met de geldende eisen voor digitale overheidsdiensten.",
+      "intro": "Het Departement voor Digitale Transformatie zet zich in om PA Webinar toegankelijk te maken, in overeenstemming met de Italiaanse Wet 4/2004, de EU-richtlijn 2016/2102 en de richtsnoeren van AgID over de toegankelijkheid van ICT-middelen.",
       "sections": {
-        "commitment": {
-          "title": "Toewijding aan toegankelijkheid",
-          "body": "Het platform is ontworpen met componenten die aansluiten bij het .italia design system, met bijzondere aandacht voor toetsenbordnavigatie, semantische inhoudsstructuur en leesbaarheid van de interface op de belangrijkste schermformaten."
+        "conformance": {
+          "title": "Nalevingsstatus",
+          "body": "PA Webinar is ontworpen om te voldoen aan WCAG 2.1 niveau AA. Elke administratie die de dienst aanbiedt, moet haar eigen verklaring publiceren en daarbij de feitelijke nalevingsstatus aangeven (volledig conform, gedeeltelijk conform of niet conform) op basis van een actuele beoordeling."
         },
-        "status": {
-          "title": "Conformiteitsstatus",
-          "body": "Er worden doorlopend controles en verbeteringen uitgevoerd op het gebied van toegankelijkheid. Eventuele resterende beperkingen worden geleidelijk verholpen in het kader van de doorontwikkeling en het reguliere onderhoud van de dienst."
+        "nonAccessible": {
+          "title": "Niet-toegankelijke inhoud",
+          "body": "De videoruimte wordt aangeboden via Jitsi Meet: sommige realtimefuncties kunnen beperkingen hebben met ondersteunende technologieën. Inhoud die automatisch door AI wordt gegenereerd (transcripties, ondertitels, vertalingen en nasynchronisatie) kan onnauwkeurigheden bevatten en wordt altijd als zodanig aangemerkt."
+        },
+        "preparation": {
+          "title": "Opstelling van deze verklaring",
+          "body": "Deze modelverklaring is opgesteld op basis van een zelfevaluatie uitgevoerd door de dienstverlener. De interface is gebouwd met het .italia-ontwerpsysteem, met aandacht voor toetsenbordnavigatie, semantiek van de inhoud, kleurcontrast en compatibiliteit met schermlezers. De datum van opstelling en van de laatste herziening moeten bij publicatie worden ingevuld."
         },
         "feedback": {
-          "title": "Meldingen en contact",
-          "body": "Om problemen met de toegankelijkheid of het gebruik van de dienst te melden, kunt u contact opnemen via de institutionele kanalen van het Departement, met vermelding van de betreffende pagina en een beschrijving van het probleem."
+          "title": "Feedback en contact",
+          "body": "Om gevallen van niet-naleving te melden of om informatie en inhoud aan te vragen die buiten het toepassingsgebied van de regelgeving vallen, kunt u gebruikmaken van de institutionele contactkanalen van de administratie die de dienst aanbiedt, met vermelding van de betreffende pagina en een beschrijving van het probleem."
+        },
+        "enforcement": {
+          "title": "Handhavingsprocedure",
+          "body": "Als het antwoord onbevredigend is of als er binnen 30 dagen geen antwoord wordt ontvangen, kunt u contact opnemen met de Digitale Civiele Ombudsman van AgID (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Hergebruik en publicatie van de verklaring",
+        "body": "PA Webinar is opensourcesoftware die door andere administraties kan worden hergebruikt. Elke instantie die het platform in gebruik neemt, moet haar eigen toegankelijkheidsverklaring opstellen en publiceren via het officiële formulier van AgID, waarbij deze modeltekst door haar eigen gegevens wordt vervangen."
+      },
+      "links": {
+        "agidForm": "Formulier voor toegankelijkheidsverklaring (AgID)",
+        "difensore": "Toegankelijkheid en Digitale Civiele Ombudsman (AgID)"
       }
     },
     "legalNotes": {

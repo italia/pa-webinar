@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Avvenimenti pubbliċi diġitali",
-      "subtitle": "Pjattaforma għal webinars, preżentazzjonijiet u laqgħat pubbliċi tad-Dipartiment għat-Trasformazzjoni Diġitali",
-      "browseEvents": "Skopri l-avvenimenti",
-      "organizeEvent": "Organizza avveniment"
-    },
-    "features": {
-      "title": "Il-pjattaforma għall-avvenimenti tal-PA",
-      "video": {
-        "title": "Vidjokonferenza",
-        "desc": "Ipparteċipa f'avvenimenti pubbliċi sa 300 parteċipant. L-ebda software xi tniżżel."
-      },
-      "qa": {
-        "title": "Mistoqsijiet u Tweġibiet",
-        "desc": "Staqsi mistoqsijiet matul l-avveniment u vvota għall-aktar importanti. Il-moderatur iwieġeb ħaj."
-      },
-      "privacy": {
-        "title": "Privatezza u Sigurtà",
-        "desc": "Dejta protetta u konformi mal-GDPR. Infrastruttura self-hosted fl-Italja."
+      "kicker": "Miftuħ għal kulħadd · dirett · fuq talba",
+      "title": "Webinars u avvenimenti mill-komunitajiet tat-trasformazzjoni diġitali",
+      "subtitle": "Segwi preżentazzjonijiet, laqgħat pubbliċi u sessjonijiet ta' Q&A mill-komunitajiet tat-trasformazzjoni diġitali f'ħin reali. Ingħaqad mill-browser tiegħek, staqsi mistoqsijiet u erġa' ara r-reġistrazzjonijiet kull meta tixtieq.",
+      "browseEvents": "Fittex l-avvenimenti li ġejjin",
+      "watchRecordings": "Ara r-reġistrazzjonijiet",
+      "badges": {
+        "noInstall": "Mill-browser, bla installazzjonijiet",
+        "interactive": "Q&A u stħarriġ dirett",
+        "recordings": "Reġistrazzjonijiet u sottotitli",
+        "accessible": "Aċċessibbli, f'24 lingwa"
       }
     },
     "upcoming": {
       "title": "Avvenimenti li ġejjin",
       "viewAll": "Ara l-avvenimenti kollha",
-      "noEvents": "L-ebda avvenimenti skedati. Erġa' ċċekkja dalwaqt!"
+      "noEvents": "L-ebda avveniment ippjanat. Erġa' lura dalwaqt!"
     },
     "howItWorks": {
-      "title": "Kif taħdem",
+      "title": "Kif tieħu sehem",
+      "subtitle": "Biss ftit passi, mingħajr kont u mingħajr installazzjonijiet.",
       "step1": {
         "title": "Irreġistra",
-        "desc": "Irreġistra b'xejn għall-avveniment"
+        "desc": "Irreġistra b'xejn għall-avveniment mill-paġna pubblika tiegħu."
       },
       "step2": {
-        "title": "Irċievi l-link tiegħek",
-        "desc": "Email bil-link personali tiegħek ta' aċċess"
+        "title": "Irċievi l-link",
+        "desc": "Tirċievi email bil-link personali tiegħek u anness għall-kalendarju."
       },
       "step3": {
-        "title": "Ipparteċipa",
-        "desc": "Idħol fl-avveniment mill-browser tiegħek, bla installazzjonijiet"
+        "title": "Ingħaqad",
+        "desc": "Idħol fl-avveniment mill-browser tiegħek, bla xejn x'tinstalla."
       },
       "step4": {
         "title": "Interaġixxi",
-        "desc": "Staqsi mistoqsijiet, ivvota, ipparteċipa fid-diskussjoni"
+        "desc": "Staqsi mistoqsijiet, ivvota, wieġeb għall-istħarriġ u ħu sehem fid-diskussjoni."
+      }
+    },
+    "during": {
+      "title": "X'tista' tagħmel matul avveniment",
+      "subtitle": "Mhux biss tara: l-avvenimenti huma interattivi.",
+      "qa": {
+        "title": "Mistoqsijiet u tweġibiet",
+        "desc": "Staqsi mistoqsijiet u vvota għal dawk tal-oħrajn: il-moderatur iwieġeb dirett."
+      },
+      "polls": {
+        "title": "Stħarriġ",
+        "desc": "Wieġeb għall-istħarriġ f'ħin reali u ara r-riżultati mill-ewwel."
+      },
+      "wordcloud": {
+        "title": "Sħaba ta' kliem",
+        "desc": "Żid il-kliem tiegħek mas-sħaba ta' kliem kondiviża tal-avveniment."
+      },
+      "reactions": {
+        "title": "Reazzjonijiet u idejn merfugħa",
+        "desc": "Irreaġixxi u itlob li titkellem billi terfa' idejk: il-kju jiġi mmaniġġat skont l-ordni."
+      },
+      "chat": {
+        "title": "Chat",
+        "desc": "Ikteb fil-chat tal-avveniment u segwi l-konversazzjoni mal-parteċipanti l-oħra."
+      },
+      "agenda": {
+        "title": "Aġenda u noti",
+        "desc": "Segwi l-aġenda u n-noti li l-moderaturi jaqsmu matul l-avveniment."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Il-proġett",
+      "title": "Open source u sovran, mibni mill-gvern għall-gvern",
+      "body": "PA Webinar hija l-pjattaforma tad-Dipartiment għat-Trasformazzjoni Diġitali għall-avvenimenti diġitali pubbliċi: is-sistema ta' disinn .italia, il-magna tal-video Jitsi Meet u pipeline tal-AI kompletament in-cluster. Hija rilaxxata bħala open source biex kwalunkwe amministrazzjoni tkun tista' terġa' tużaha.",
+      "sovereignty": {
+        "title": "Sovranità tad-data",
+        "desc": "Self-hosted fuq l-infrastruttura tal-amministrazzjoni: id-data qatt ma toħroġ u m'hemm l-ebda esponiment għas-CLOUD Act."
+      },
+      "openSource": {
+        "title": "Open source EUPL-1.2",
+        "desc": "Kodiċi li jista' jerġa' jintuża minn kwalunkwe amministrazzjoni, b'SBOM pubbliku u service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII kriptati waqt il-mistrieħ, kunsensi granulari u retention konfigurabbli."
+      },
+      "cta": "Trasparenza tas-servizz",
+      "techTitle": "Mibni b'teknoloġiji miftuħa",
+      "archTitle": "Kif jaħdem, fil-qosor"
+    },
+    "afterEvent": {
+      "title": "Wara l-avveniment",
+      "subtitle": "Xejn ma jintilef: kollox jibqa' disponibbli u aċċessibbli.",
+      "library": {
+        "title": "Librerija tar-reġistrazzjonijiet",
+        "desc": "Erġa' ara avvenimenti tal-passat fil-librerija pubblika, bl-arkivju tal-mistoqsijiet u l-istħarriġ."
+      },
+      "transcript": {
+        "title": "Traskrizzjoni u sottotitli",
+        "desc": "Kull reġistrazzjoni jista' jkollha traskrizzjoni u sottotitli, iġġenerati awtomatikament mill-pipeline tal-AI in-cluster."
+      },
+      "translation": {
+        "title": "Traduzzjoni awtomatika",
+        "desc": "Sottotitli u sommarju tradotti f'diversi lingwi, biex tkun tista' ssegwi l-avveniment ukoll f'lingwa oħra."
+      },
+      "dubbing": {
+        "title": "Doppjaġġ tal-awdjo",
+        "desc": "Trakka tal-awdjo doppjata b'leħen sintetiku newtrali (mingħajr klonazzjoni tal-leħen), biex tisma' l-avveniment f'lingwa oħra."
       }
     }
   },
@@ -2037,22 +2098,38 @@
       }
     },
     "accessibility": {
-      "metaTitle": "Dikjarazzjoni ta' aċċessibbiltà",
-      "title": "Dikjarazzjoni ta' aċċessibbiltà",
-      "intro": "Id-Dipartiment għat-Trasformazzjoni Diġitali huwa impenjat li jagħmel din il-pjattaforma aċċessibbli, skont ir-rekwiżiti applikabbli għas-servizzi diġitali tas-settur pubbliku.",
+      "metaTitle": "Dikjarazzjoni dwar l-aċċessibbiltà",
+      "title": "Dikjarazzjoni dwar l-aċċessibbiltà",
+      "intro": "Id-Dipartiment għat-Trasformazzjoni Diġitali jimpenja ruħu li jagħmel lil PA Webinar aċċessibbli, f'konformità mal-Liġi Taljana 4/2004, mad-Direttiva tal-UE 2016/2102 u mal-linji gwida tal-AgID dwar l-aċċessibbiltà tal-għodod tal-ICT.",
       "sections": {
-        "commitment": {
-          "title": "Impenn għall-aċċessibbiltà",
-          "body": "Il-pjattaforma hija ddisinjata b'komponenti li huma allinjati mas-sistema tad-disinn .italia u b'attenzjoni għan-navigazzjoni bil-keyboard, l-istruttura semantika tal-kontenut u l-leġibbiltà tal-interfaċċja fid-dimensjonijiet prinċipali tal-iskrin."
+        "conformance": {
+          "title": "Stat ta' konformità",
+          "body": "PA Webinar huwa ddisinjat biex jikkonforma mal-livell AA tal-WCAG 2.1. Kull amministrazzjoni li tipprovdi s-servizz trid tippubblika d-dikjarazzjoni tagħha stess, billi tindika l-istat ta' konformità reali (konformi għalkollox, parzjalment konformi jew mhux konformi) abbażi ta' valutazzjoni aġġornata."
         },
-        "status": {
-          "title": "Status tal-konformità",
-          "body": "Verifiki u titjib tal-aċċessibbiltà huma kontinwi. Kwalunkwe kwistjoni residwa tiġi indirizzata progressivament bħala parti mill-evoluzzjoni tas-servizz u l-attivitajiet ta' manutenzjoni regolari."
+        "nonAccessible": {
+          "title": "Kontenut mhux aċċessibbli",
+          "body": "Il-kamra tal-vidjo tiġi pprovduta permezz ta' Jitsi Meet: xi funzjonijiet f'ħin reali jista' jkollhom limitazzjonijiet mat-teknoloġiji ta' assistenza. Il-kontenut iġġenerat awtomatikament mill-AI (traskrizzjonijiet, sottotitli, traduzzjonijiet u doppjaġġ) jista' jkun fih ineżattezzi u dejjem jiġi indikat bħala tali."
+        },
+        "preparation": {
+          "title": "Preparazzjoni ta' din id-dikjarazzjoni",
+          "body": "Din id-dikjarazzjoni mudell tħejjiet abbażi ta' awtovalutazzjoni mwettqa mill-fornitur tas-servizz. L-interfaċċa hija mibnija bis-sistema ta' disinn .italia, b'attenzjoni għan-navigazzjoni bit-tastiera, is-semantika tal-kontenut, il-kuntrast tal-kuluri u l-kompatibbiltà mal-qarrejja tal-iskrin. Id-dati tal-preparazzjoni u tal-aħħar reviżjoni jridu jiġu indikati fil-mument tal-pubblikazzjoni."
         },
         "feedback": {
-          "title": "Feedback u kuntatti",
-          "body": "Biex tirrapporta ostakli ta' aċċessibbiltà jew diffikultajiet fl-użu tas-servizz, l-utenti jistgħu jikkuntattjaw lid-Dipartiment permezz tal-kanali istituzzjonali tiegħu, billi jispeċifikaw il-paġna kkonċernata u deskrizzjoni qasira tal-problema."
+          "title": "Feedback u kuntatt",
+          "body": "Biex tirrapporta każijiet ta' nuqqas ta' konformità, jew biex titlob informazzjoni u kontenut eskluż mill-ambitu tar-regolament, tista' tuża l-kanali ta' kuntatt istituzzjonali tal-amministrazzjoni li tipprovdi s-servizz, billi tindika l-paġna kkonċernata u deskrizzjoni tal-problema."
+        },
+        "enforcement": {
+          "title": "Proċedura ta' infurzar",
+          "body": "Jekk it-tweġiba ma tkunx sodisfaċenti jew ma tasal l-ebda tweġiba fi żmien 30 jum, tista' tikkuntattja lill-Ombudsman Ċiviku Diġitali tal-AgID (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Użu mill-ġdid u pubblikazzjoni tad-dikjarazzjoni",
+        "body": "PA Webinar huwa softwer b'sors miftuħ li jista' jerġa' jintuża minn amministrazzjonijiet oħra. Kull entità li tadotta l-pjattaforma trid tħejji u tippubblika d-dikjarazzjoni tagħha dwar l-aċċessibbiltà permezz tal-formola uffiċjali tal-AgID, billi tissostitwixxi dan it-test mudell bid-data tagħha stess."
+      },
+      "links": {
+        "agidForm": "Formola tad-dikjarazzjoni dwar l-aċċessibbiltà (AgID)",
+        "difensore": "Aċċessibbiltà u Ombudsman Ċiviku Diġitali (AgID)"
       }
     },
     "legalNotes": {

@@ -160,8 +160,8 @@ export const jitsiInterfaceConfigOverwrite = {
   JITSI_WATERMARK_LINK: '',
   SHOW_POWERED_BY: false,
   PROVIDER_NAME: '',
-  APP_NAME: 'Eventi PA',
-  NATIVE_APP_NAME: 'Eventi PA',
+  APP_NAME: 'PA Webinar',
+  NATIVE_APP_NAME: 'PA Webinar',
 
   TOOLBAR_BUTTONS: baseToolbarButtons as string[],
   // Keep the toolbar always visible. Auto-hide at 4s surprised users

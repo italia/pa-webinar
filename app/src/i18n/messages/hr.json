@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Javni digitalni događaji",
-      "subtitle": "Platforma za webinare, prezentacije i javne sastanke Odjela za digitalnu transformaciju",
-      "browseEvents": "Pregledajte događaje",
-      "organizeEvent": "Organizirajte događaj"
-    },
-    "features": {
-      "title": "Platforma za događaje javne uprave",
-      "video": {
-        "title": "Videokonferencija",
-        "desc": "Sudjelujte na javnim događajima s do 300 sudionika. Bez instalacije softvera."
-      },
-      "qa": {
-        "title": "Pitanja i odgovori",
-        "desc": "Postavljajte pitanja tijekom događaja i glasajte za najvažnija. Moderator odgovara uživo."
-      },
-      "privacy": {
-        "title": "Privatnost i sigurnost",
-        "desc": "Podaci zaštićeni i usklađeni s GDPR-om. Vlastita infrastruktura u Italiji."
+      "kicker": "Otvoreno za sve · uživo · na zahtjev",
+      "title": "Webinari i događanja zajednica digitalne transformacije",
+      "subtitle": "Pratite uživo prezentacije, javne sastanke i Q&A sesije zajednica digitalne transformacije. Pridružite se iz preglednika, postavljajte pitanja i ponovno gledajte snimke kad god želite.",
+      "browseEvents": "Pregledajte nadolazeća događanja",
+      "watchRecordings": "Pogledajte snimke",
+      "badges": {
+        "noInstall": "Iz preglednika, bez instalacija",
+        "interactive": "Q&A i ankete uživo",
+        "recordings": "Snimke i titlovi",
+        "accessible": "Pristupačno, na 24 jezika"
       }
     },
     "upcoming": {
-      "title": "Nadolazeći događaji",
-      "viewAll": "Pogledajte sve događaje",
-      "noEvents": "Nema zakazanih događaja. Svratite uskoro!"
+      "title": "Nadolazeća događanja",
+      "viewAll": "Pogledajte sva događanja",
+      "noEvents": "Nema zakazanih događanja. Vratite se uskoro!"
     },
     "howItWorks": {
-      "title": "Kako funkcionira",
+      "title": "Kako sudjelovati",
+      "subtitle": "Samo nekoliko koraka, bez računa i bez instalacija.",
       "step1": {
-        "title": "Prijavite se",
-        "desc": "Besplatno se prijavite za događaj"
+        "title": "Registrirajte se",
+        "desc": "Besplatno se prijavite na događanje s njegove javne stranice."
       },
       "step2": {
         "title": "Primite poveznicu",
-        "desc": "Email s osobnom poveznicom za pristup"
+        "desc": "Dobivate e-poštu s vašom osobnom poveznicom i privitkom za kalendar."
       },
       "step3": {
-        "title": "Sudjelujte",
-        "desc": "Uđite u događaj iz preglednika, bez instalacija"
+        "title": "Pridružite se",
+        "desc": "Uđite u događanje iz preglednika, bez ikakve instalacije."
       },
       "step4": {
         "title": "Komunicirajte",
-        "desc": "Postavljajte pitanja, glasajte, sudjelujte u raspravi"
+        "desc": "Postavljajte pitanja, glasajte, odgovarajte na ankete i sudjelujte u raspravi."
+      }
+    },
+    "during": {
+      "title": "Što možete raditi tijekom događanja",
+      "subtitle": "Ne samo gledati: događanja su interaktivna.",
+      "qa": {
+        "title": "Pitanja i odgovori",
+        "desc": "Postavljajte pitanja i glasajte za tuđa: moderator odgovara uživo."
+      },
+      "polls": {
+        "title": "Ankete",
+        "desc": "Odgovarajte na ankete u stvarnom vremenu i odmah vidite rezultate."
+      },
+      "wordcloud": {
+        "title": "Oblak riječi",
+        "desc": "Dodajte svoje riječi u zajednički oblak riječi događanja."
+      },
+      "reactions": {
+        "title": "Reakcije i podignute ruke",
+        "desc": "Reagirajte i zatražite riječ podizanjem ruke: red se obrađuje redom."
+      },
+      "chat": {
+        "title": "Razgovor",
+        "desc": "Pišite u razgovoru događanja i pratite razgovor s ostalim sudionicima."
+      },
+      "agenda": {
+        "title": "Dnevni red i bilješke",
+        "desc": "Pratite dnevni red i bilješke koje moderatori dijele tijekom događaja."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Projekt",
+      "title": "Otvorenog koda i suveren, izgrađen od strane javne uprave za javnu upravu",
+      "body": "PA Webinar je platforma Odjela za digitalnu transformaciju za javna digitalna događanja: dizajnerski sustav .italia, videomotor Jitsi Meet i AI pipeline u cijelosti in-cluster. Objavljena je kao otvoreni kod kako bi je svaka uprava mogla ponovno upotrijebiti.",
+      "sovereignty": {
+        "title": "Suverenost podataka",
+        "desc": "Self-hosted na infrastrukturi uprave: podaci nikada ne izlaze i nema izloženosti CLOUD Act-u."
+      },
+      "openSource": {
+        "title": "Otvoreni kod EUPL-1.2",
+        "desc": "Kôd koji može ponovno upotrijebiti svaka uprava, s javnim SBOM-om i service inventoryjem."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII šifriran u mirovanju, granularni pristanci i prilagodljivo zadržavanje."
+      },
+      "cta": "Transparentnost usluge",
+      "techTitle": "Izrađeno otvorenim tehnologijama",
+      "archTitle": "Kako funkcionira, ukratko"
+    },
+    "afterEvent": {
+      "title": "Nakon događaja",
+      "subtitle": "Ništa se ne gubi: sve ostaje dostupno i pristupačno.",
+      "library": {
+        "title": "Knjižnica snimaka",
+        "desc": "Ponovno pogledajte prošle događaje u javnoj knjižnici, s arhivom pitanja i anketa."
+      },
+      "transcript": {
+        "title": "Transkript i titlovi",
+        "desc": "Svaka snimka može imati transkript i titlove, koje automatski generira AI cjevovod unutar klastera."
+      },
+      "translation": {
+        "title": "Automatsko prevođenje",
+        "desc": "Titlovi i sažetak prevedeni na nekoliko jezika, kako biste mogli pratiti događaj i na drugom jeziku."
+      },
+      "dubbing": {
+        "title": "Audio sinkronizacija",
+        "desc": "Sinkronizirani audiozapis s neutralnim sintetskim glasom (bez kloniranja glasa), za slušanje događaja na drugom jeziku."
       }
     }
   },
@@ -2039,20 +2100,36 @@
     "accessibility": {
       "metaTitle": "Izjava o pristupačnosti",
       "title": "Izjava o pristupačnosti",
-      "intro": "Odjel za digitalnu transformaciju obvezuje se ovu platformu učiniti pristupačnom, u skladu sa zahtjevima važećih propisa za digitalne usluge javne uprave.",
+      "intro": "Odjel za digitalnu transformaciju obvezuje se učiniti PA Webinar pristupačnim, u skladu s talijanskim Zakonom 4/2004, Direktivom (EU) 2016/2102 i smjernicama AgID-a o pristupačnosti informatičkih alata.",
       "sections": {
-        "commitment": {
-          "title": "Obveza pristupačnosti",
-          "body": "Platforma je dizajnirana s komponentama usklađenima s dizajnerskim sustavom .italia i s posebnom pažnjom na navigaciju tipkovnicom, semantičku strukturu sadržaja i čitljivost sučelja na glavnim veličinama zaslona."
-        },
-        "status": {
+        "conformance": {
           "title": "Status usklađenosti",
-          "body": "U tijeku su kontinuirane provjere i poboljšanja pristupačnosti aplikacije. Eventualni preostali problemi ispravljaju se postupno u okviru razvoja usluge i redovnog održavanja."
+          "body": "PA Webinar je osmišljen tako da bude usklađen s WCAG 2.1 razinom AA. Svako tijelo koje pruža uslugu dužno je objaviti vlastitu izjavu, navodeći stvarni status usklađenosti (potpuno, djelomično ili neusklađeno) na temelju ažurirane procjene."
+        },
+        "nonAccessible": {
+          "title": "Nepristupačan sadržaj",
+          "body": "Videosoba se pruža putem Jitsi Meeta: neke značajke u stvarnom vremenu mogu imati ograničenja s pomoćnim tehnologijama. Sadržaj koji AI generira automatski (transkripti, titlovi, prijevodi i sinkronizacija) može sadržavati netočnosti i uvijek je označen kao takav."
+        },
+        "preparation": {
+          "title": "Izrada ove izjave",
+          "body": "Ova predložna izjava izrađena je na temelju samoprocjene koju je proveo pružatelj usluge. Sučelje je izgrađeno pomoću dizajnerskog sustava .italia, s pažnjom posvećenom navigaciji tipkovnicom, semantici sadržaja, kontrastu boja i kompatibilnosti s čitačima zaslona. Datumi izrade i posljednje revizije moraju se ispuniti u trenutku objave."
         },
         "feedback": {
-          "title": "Prijave i kontakti",
-          "body": "Za prijavu poteškoća u pristupu sadržaju ili problema u korištenju usluge, možete koristiti institucionalne kontaktne kanale Odjela, navodeći pogođenu stranicu i opis nastalog problema."
+          "title": "Povratne informacije i kontakt",
+          "body": "Za prijavu slučajeva neusklađenosti ili za traženje informacija i sadržaja izuzetih iz područja primjene propisa, možete koristiti institucionalne kontaktne kanale tijela koje pruža uslugu, navodeći predmetnu stranicu i opis problema."
+        },
+        "enforcement": {
+          "title": "Postupak provedbe",
+          "body": "Ako je odgovor nezadovoljavajući ili ako odgovor ne stigne u roku od 30 dana, možete se obratiti AgID-ovu digitalnom pravobranitelju (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Ponovna uporaba i objava izjave",
+        "body": "PA Webinar je softver otvorenog koda koji mogu ponovno koristiti druga tijela. Svako tijelo koje usvoji platformu mora izraditi i objaviti vlastitu izjavu o pristupačnosti putem službenog obrasca AgID-a, zamjenjujući ovaj predložni tekst vlastitim podacima."
+      },
+      "links": {
+        "agidForm": "Obrazac izjave o pristupačnosti (AgID)",
+        "difensore": "Pristupačnost i digitalni pravobranitelj (AgID)"
       }
     },
     "legalNotes": {

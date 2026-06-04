@@ -2075,24 +2075,16 @@
   },
   "home": {
     "hero": {
-      "title": "Eventi pubblici digitali",
-      "subtitle": "Piattaforma per webinar, presentazioni e incontri pubblici del Dipartimento per la Trasformazione Digitale",
-      "browseEvents": "Scopri gli eventi",
-      "organizeEvent": "Organizza un evento"
-    },
-    "features": {
-      "title": "La piattaforma per gli eventi della PA",
-      "video": {
-        "title": "Video conferenza",
-        "desc": "Partecipa a eventi pubblici con fino a 300 partecipanti. Nessun software da installare."
-      },
-      "qa": {
-        "title": "Domande e risposte",
-        "desc": "Fai domande durante l'evento e vota le più importanti. Il moderatore risponde in diretta."
-      },
-      "privacy": {
-        "title": "Privacy e sicurezza",
-        "desc": "Dati protetti e conformi al GDPR. Infrastruttura self-hosted in Italia."
+      "kicker": "Aperti a tutti · in diretta · da rivedere",
+      "title": "I webinar e gli eventi delle community della trasformazione digitale",
+      "subtitle": "Segui in diretta presentazioni, incontri pubblici e sessioni di domande delle community della trasformazione digitale. Partecipi dal browser, fai domande e rivedi le registrazioni quando vuoi.",
+      "browseEvents": "Scopri i prossimi eventi",
+      "watchRecordings": "Rivedi le registrazioni",
+      "badges": {
+        "noInstall": "Dal browser, senza installazioni",
+        "interactive": "Domande e sondaggi dal vivo",
+        "recordings": "Registrazioni e sottotitoli",
+        "accessible": "Accessibile, in 24 lingue"
       }
     },
     "upcoming": {
@@ -2101,22 +2093,91 @@
       "noEvents": "Nessun evento in programma. Torna presto!"
     },
     "howItWorks": {
-      "title": "Come funziona",
+      "title": "Come si partecipa",
+      "subtitle": "Bastano pochi passi, senza account né installazioni.",
       "step1": {
         "title": "Registrati",
-        "desc": "Iscriviti gratuitamente all'evento"
+        "desc": "Iscriviti gratuitamente all'evento dalla sua pagina pubblica."
       },
       "step2": {
         "title": "Ricevi il link",
-        "desc": "Un'email con il link personale per accedere"
+        "desc": "Arriva un'email con il tuo link personale e l'allegato per il calendario."
       },
       "step3": {
         "title": "Partecipa",
-        "desc": "Entra nell'evento dal browser, senza installazioni"
+        "desc": "Entri nell'evento dal browser, senza installare nulla."
       },
       "step4": {
         "title": "Interagisci",
-        "desc": "Fai domande, vota, partecipa alla discussione"
+        "desc": "Fai domande, vota, rispondi ai sondaggi e partecipa alla discussione."
+      }
+    },
+    "during": {
+      "title": "Cosa puoi fare durante un evento",
+      "subtitle": "Non solo guardare: gli eventi sono interattivi.",
+      "qa": {
+        "title": "Domande e risposte",
+        "desc": "Fai domande e vota quelle degli altri: il moderatore risponde in diretta."
+      },
+      "polls": {
+        "title": "Sondaggi",
+        "desc": "Rispondi ai sondaggi in tempo reale e vedi i risultati all'istante."
+      },
+      "wordcloud": {
+        "title": "Word cloud",
+        "desc": "Contribuisci con le tue parole alla nuvola condivisa dell'evento."
+      },
+      "reactions": {
+        "title": "Reazioni e mani alzate",
+        "desc": "Reagisci e chiedi la parola alzando la mano: la coda è gestita in ordine."
+      },
+      "chat": {
+        "title": "Chat",
+        "desc": "Scrivi nella chat dell'evento e segui la conversazione con gli altri partecipanti."
+      },
+      "agenda": {
+        "title": "Agenda e note",
+        "desc": "Segui l'ordine del giorno e le note condivise dai moderatori durante l'evento."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Il progetto",
+      "title": "Open source e sovrano, costruito dalla PA per la PA",
+      "body": "PA Webinar è la piattaforma del Dipartimento per la Trasformazione Digitale per gli eventi pubblici digitali: design system .italia, motore video Jitsi Meet e una pipeline AI interamente in-cluster. È rilasciata in open source perché ogni amministrazione possa riusarla.",
+      "sovereignty": {
+        "title": "Sovranità del dato",
+        "desc": "Self-hosted sull'infrastruttura della PA: i dati non escono e non c'è esposizione al CLOUD Act."
+      },
+      "openSource": {
+        "title": "Open source EUPL-1.2",
+        "desc": "Codice riusabile da qualsiasi amministrazione, con SBOM e service inventory pubblici."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII cifrate at-rest, consensi granulari e retention configurabile."
+      },
+      "cta": "Trasparenza del servizio",
+      "techTitle": "Costruito con tecnologie aperte",
+      "archTitle": "Come funziona, in breve"
+    },
+    "afterEvent": {
+      "title": "Dopo l'evento",
+      "subtitle": "Niente va perso: tutto resta disponibile e accessibile.",
+      "library": {
+        "title": "Libreria delle registrazioni",
+        "desc": "Rivedi gli eventi conclusi nella libreria pubblica, con l'archivio di domande e sondaggi."
+      },
+      "transcript": {
+        "title": "Trascrizione e sottotitoli",
+        "desc": "Ogni registrazione può avere trascrizione e sottotitoli, generati automaticamente dalla pipeline AI in-cluster."
+      },
+      "translation": {
+        "title": "Traduzione automatica",
+        "desc": "Sottotitoli e sintesi tradotti in più lingue, per seguire l'evento anche in una lingua diversa."
+      },
+      "dubbing": {
+        "title": "Doppiaggio audio",
+        "desc": "Traccia audio doppiata con voce sintetica neutra (senza clonazione vocale), per ascoltare l'evento in un'altra lingua."
       }
     }
   },
@@ -2212,22 +2273,38 @@
       }
     },
     "accessibility": {
-      "metaTitle": "Dichiarazione di accessibilita",
-      "title": "Dichiarazione di accessibilita",
-      "intro": "Il Dipartimento per la Trasformazione Digitale si impegna a rendere questa piattaforma accessibile, in linea con i requisiti previsti dalla normativa vigente per i servizi digitali della Pubblica Amministrazione.",
+      "metaTitle": "Dichiarazione di accessibilità",
+      "title": "Dichiarazione di accessibilità",
+      "intro": "Il Dipartimento per la Trasformazione Digitale si impegna a rendere accessibile PA Webinar, in conformità alla Legge 9 gennaio 2004, n. 4, alla Direttiva (UE) 2016/2102 e alle Linee guida sull'accessibilità degli strumenti informatici di AgID.",
       "sections": {
-        "commitment": {
-          "title": "Impegno all'accessibilita",
-          "body": "La piattaforma e progettata con componenti coerenti con il design system .italia e con particolare attenzione alla navigazione da tastiera, alla semantica dei contenuti e alla leggibilita delle interfacce nelle principali dimensioni di schermo."
+        "conformance": {
+          "title": "Stato di conformità",
+          "body": "PA Webinar è progettato per essere conforme ai requisiti delle WCAG 2.1 di livello AA. Ogni amministrazione che eroga il servizio è tenuta a pubblicare la propria dichiarazione, indicando lo stato di conformità effettivo (conforme, parzialmente conforme o non conforme) sulla base di una valutazione aggiornata."
         },
-        "status": {
-          "title": "Stato di conformita",
-          "body": "Sono in corso attivita continue di verifica e miglioramento dell'accessibilita applicativa. Eventuali limiti residui vengono corretti progressivamente nell'ambito dell'evoluzione del servizio e della manutenzione ordinaria."
+        "nonAccessible": {
+          "title": "Contenuti non accessibili",
+          "body": "La sala video è erogata tramite Jitsi Meet: alcune funzioni in tempo reale possono presentare limiti con le tecnologie assistive. I contenuti generati automaticamente dall'AI (trascrizioni, sottotitoli, traduzioni e doppiaggio) possono contenere imprecisioni e sono sempre segnalati come tali."
+        },
+        "preparation": {
+          "title": "Redazione della dichiarazione",
+          "body": "Questa dichiarazione modello è stata redatta sulla base di un'autovalutazione effettuata dal fornitore del servizio. L'interfaccia è realizzata con il design system .italia, con attenzione a navigazione da tastiera, semantica dei contenuti, contrasto dei colori e compatibilità con gli screen reader. La data di redazione e l'ultimo aggiornamento vanno indicati al momento della pubblicazione."
         },
         "feedback": {
-          "title": "Segnalazioni e contatti",
-          "body": "Per segnalare difficolta di accesso ai contenuti o problemi di fruizione del servizio, e possibile utilizzare i canali di contatto istituzionali del Dipartimento, indicando la pagina interessata e una descrizione del problema riscontrato."
+          "title": "Modalità di invio delle segnalazioni",
+          "body": "Per segnalare casi di mancata conformità o per richiedere informazioni e contenuti esclusi dall'ambito di applicazione della normativa, è possibile utilizzare i canali di contatto istituzionali dell'amministrazione che eroga il servizio, indicando la pagina interessata e una descrizione del problema."
+        },
+        "enforcement": {
+          "title": "Procedura di attuazione",
+          "body": "In caso di risposta insoddisfacente o di mancata risposta entro 30 giorni alla segnalazione, è possibile rivolgersi al Difensore civico per il digitale di AgID."
         }
+      },
+      "note": {
+        "title": "Riuso e pubblicazione della dichiarazione",
+        "body": "PA Webinar è un software open source riusabile da altre amministrazioni. Ogni ente che adotta la piattaforma deve redigere e pubblicare la propria dichiarazione di accessibilità tramite il modulo ufficiale di AgID, sostituendo questo testo modello con i propri dati."
+      },
+      "links": {
+        "agidForm": "Modulo di dichiarazione di accessibilità (AgID)",
+        "difensore": "Accessibilità e Difensore civico per il digitale (AgID)"
       }
     },
     "legalNotes": {

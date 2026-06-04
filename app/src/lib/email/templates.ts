@@ -129,7 +129,7 @@ const copy: Record<Locale, LocaleCopy> = {
   },
 };
 
-function layout(heading: string, body: string, footerText: string, locale: Locale = 'it', siteName = 'Eventi PA'): string {
+function layout(heading: string, body: string, footerText: string, locale: Locale = 'it', siteName = 'PA Webinar'): string {
   return `<!DOCTYPE html>
 <html lang="${locale}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>

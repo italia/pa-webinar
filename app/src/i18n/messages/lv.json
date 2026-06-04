@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Publiskie digitālie pasākumi",
-      "subtitle": "Tīmekļsemināru, prezentāciju un publisko sanāksmju platforma, ko izstrādājis Digitālās transformācijas departaments",
-      "browseEvents": "Pārlūkot pasākumus",
-      "organizeEvent": "Organizēt pasākumu"
-    },
-    "features": {
-      "title": "Valsts pārvaldes pasākumu platforma",
-      "video": {
-        "title": "Video konferences",
-        "desc": "Piedalieties publiskos pasākumos ar līdz 300 dalībniekiem. Nav jāinstalē nekāda programmatūra."
-      },
-      "qa": {
-        "title": "Jautājumi un atbildes",
-        "desc": "Uzdodiet jautājumus pasākuma laikā un balsojiet par svarīgākajiem. Moderators atbild tiešraidē."
-      },
-      "privacy": {
-        "title": "Privātums un drošība",
-        "desc": "Dati aizsargāti un atbilst GDPR prasībām. Pašizvietota infrastruktūra Itālijā."
+      "kicker": "Atvērts visiem · tiešraidē · pēc pieprasījuma",
+      "title": "Digitālās transformācijas kopienu vebināri un pasākumi",
+      "subtitle": "Sekojiet līdzi digitālās transformācijas kopienu prezentācijām, publiskām tikšanām un jautājumu un atbilžu sesijām tiešraidē. Pievienojieties no pārlūkprogrammas, uzdodiet jautājumus un pārskatiet ierakstus, kad vien vēlaties.",
+      "browseEvents": "Pārlūkot gaidāmos pasākumus",
+      "watchRecordings": "Skatīties ierakstus",
+      "badges": {
+        "noInstall": "No pārlūkprogrammas, bez instalēšanas",
+        "interactive": "Tiešraides Q&A un aptaujas",
+        "recordings": "Ieraksti un subtitri",
+        "accessible": "Pieejams 24 valodās"
       }
     },
     "upcoming": {
       "title": "Gaidāmie pasākumi",
       "viewAll": "Skatīt visus pasākumus",
-      "noEvents": "Nav gaidāmu pasākumu. Apmeklējiet drīz!"
+      "noEvents": "Nav ieplānotu pasākumu. Atgriezieties drīz!"
     },
     "howItWorks": {
-      "title": "Kā tas darbojas",
+      "title": "Kā piedalīties",
+      "subtitle": "Tikai daži soļi, bez konta un bez instalēšanas.",
       "step1": {
         "title": "Reģistrējieties",
-        "desc": "Piereģistrējieties pasākumam bez maksas"
+        "desc": "Bez maksas pierakstieties pasākumam tā publiskajā lapā."
       },
       "step2": {
         "title": "Saņemiet saiti",
-        "desc": "E-pasts ar jūsu personīgo piekļuves saiti"
+        "desc": "Jūs saņemat e-pastu ar savu personīgo saiti un kalendāra pielikumu."
       },
       "step3": {
-        "title": "Piedalieties",
-        "desc": "Ienāciet pasākumā no pārlūka, bez instalēšanas"
+        "title": "Pievienojieties",
+        "desc": "Ieejiet pasākumā no pārlūkprogrammas, neko neinstalējot."
       },
       "step4": {
         "title": "Mijiedarbojieties",
-        "desc": "Uzdodiet jautājumus, balsojiet, piedalieties diskusijā"
+        "desc": "Uzdodiet jautājumus, balsojiet, atbildiet uz aptaujām un piedalieties diskusijā."
+      }
+    },
+    "during": {
+      "title": "Ko jūs varat darīt pasākuma laikā",
+      "subtitle": "Ne tikai skatīties: pasākumi ir interaktīvi.",
+      "qa": {
+        "title": "Jautājumi un atbildes",
+        "desc": "Uzdodiet jautājumus un balsojiet par citu jautājumiem: moderators atbild tiešraidē."
+      },
+      "polls": {
+        "title": "Aptaujas",
+        "desc": "Atbildiet uz aptaujām reāllaikā un redziet rezultātus uzreiz."
+      },
+      "wordcloud": {
+        "title": "Vārdu mākonis",
+        "desc": "Pievienojiet savus vārdus pasākuma kopīgajam vārdu mākonim."
+      },
+      "reactions": {
+        "title": "Reakcijas un paceltas rokas",
+        "desc": "Reaģējiet un lūdziet vārdu, paceļot roku: rinda tiek pārvaldīta secīgi."
+      },
+      "chat": {
+        "title": "Tērzēšana",
+        "desc": "Rakstiet pasākuma tērzēšanā un sekojiet sarunai ar citiem dalībniekiem."
+      },
+      "agenda": {
+        "title": "Darba kārtība un piezīmes",
+        "desc": "Sekojiet darba kārtībai un piezīmēm, ko moderatori kopīgo pasākuma laikā."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Projekts",
+      "title": "Atvērtā koda un suverēns, ko valsts pārvalde veidojusi valsts pārvaldei",
+      "body": "PA Webinar ir Digitālās transformācijas departamenta platforma publiskiem digitāliem pasākumiem: .italia dizaina sistēma, Jitsi Meet video dzinējs un pilnībā in-cluster AI process. Tā ir izlaista kā atvērtā koda, lai jebkura pārvalde to varētu atkārtoti izmantot.",
+      "sovereignty": {
+        "title": "Datu suverenitāte",
+        "desc": "Self-hosted pārvaldes infrastruktūrā: dati nekur neaiziet, un nav CLOUD Act ietekmes."
+      },
+      "openSource": {
+        "title": "Atvērtā koda EUPL-1.2",
+        "desc": "Kods, ko var atkārtoti izmantot jebkura pārvalde, ar publisku SBOM un service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII šifrēti miera stāvoklī, detalizētas piekrišanas un konfigurējama glabāšana."
+      },
+      "cta": "Pakalpojuma caurspīdīgums",
+      "techTitle": "Veidots ar atvērtām tehnoloģijām",
+      "archTitle": "Kā tas darbojas, īsumā"
+    },
+    "afterEvent": {
+      "title": "Pēc pasākuma",
+      "subtitle": "Nekas nepazūd: viss paliek pieejams un sasniedzams.",
+      "library": {
+        "title": "Ierakstu bibliotēka",
+        "desc": "Pārskatiet iepriekšējos pasākumus publiskajā bibliotēkā ar jautājumu un aptauju arhīvu."
+      },
+      "transcript": {
+        "title": "Transkripcija un subtitri",
+        "desc": "Katram ierakstam var būt transkripcija un subtitri, ko automātiski ģenerē klasterī izvietotais AI konveijers."
+      },
+      "translation": {
+        "title": "Automātiska tulkošana",
+        "desc": "Subtitri un kopsavilkums tulkoti vairākās valodās, lai jūs varētu sekot pasākumam arī citā valodā."
+      },
+      "dubbing": {
+        "title": "Audio dublēšana",
+        "desc": "Dublēts audio ieraksts ar neitrālu sintētisku balsi (bez balss klonēšanas), lai klausītos pasākumu citā valodā."
       }
     }
   },
@@ -2039,20 +2100,36 @@
     "accessibility": {
       "metaTitle": "Pieejamības paziņojums",
       "title": "Pieejamības paziņojums",
-      "intro": "Digitālās transformācijas departaments apņemas padarīt šo platformu pieejamu saskaņā ar spēkā esošajām prasībām publiskā sektora digitālajiem pakalpojumiem.",
+      "intro": "Digitālās transformācijas departaments apņemas padarīt “PA Webinar” pieejamu saskaņā ar Itālijas 2004. gada Likumu Nr. 4, ES Direktīvu 2016/2102 un AgID vadlīnijām par IKT rīku pieejamību.",
       "sections": {
-        "commitment": {
-          "title": "Apņemšanās nodrošināt pieejamību",
-          "body": "Platforma ir izstrādāta ar komponentiem, kas saskaņoti ar .italia dizaina sistēmu, īpašu uzmanību pievēršot tastatūras navigācijai, satura semantiskajai struktūrai un saskarnes lasāmībai galvenajiem ekrānu izmēriem."
-        },
-        "status": {
+        "conformance": {
           "title": "Atbilstības statuss",
-          "body": "Pieejamības pārbaudes un uzlabojumi notiek pastāvīgi. Jebkādas atlikušās problēmas tiek risinātas pakāpeniski kā daļa no pakalpojuma attīstības un regulārās uzturēšanas."
+          "body": "“PA Webinar” ir izstrādāts atbilstoši WCAG 2.1 AA līmenim. Katrai administrācijai, kas sniedz pakalpojumu, ir jāpublicē savs paziņojums, norādot faktisko atbilstības statusu (pilnībā atbilstošs, daļēji atbilstošs vai neatbilstošs), pamatojoties uz aktualizētu novērtējumu."
+        },
+        "nonAccessible": {
+          "title": "Nepieejams saturs",
+          "body": "Video telpa tiek nodrošināta, izmantojot “Jitsi Meet”: dažām reāllaika funkcijām var būt ierobežojumi ar palīgtehnoloģijām. Mākslīgā intelekta (AI) automātiski ģenerēts saturs (transkripcijas, subtitri, tulkojumi un dublēšana) var saturēt neprecizitātes un vienmēr tiek attiecīgi atzīmēts."
+        },
+        "preparation": {
+          "title": "Šī paziņojuma sagatavošana",
+          "body": "Šis paraugpaziņojums tika sagatavots, pamatojoties uz pakalpojuma sniedzēja veikto pašnovērtējumu. Saskarne ir izveidota ar “.italia” dizaina sistēmu, pievēršot uzmanību navigācijai ar tastatūru, satura semantikai, krāsu kontrastam un saderībai ar ekrāna lasītājiem. Sagatavošanas un pēdējās pārskatīšanas datumi jānorāda publicēšanas brīdī."
         },
         "feedback": {
           "title": "Atsauksmes un kontakti",
-          "body": "Lai ziņotu par pieejamības šķēršļiem vai pakalpojuma lietošanas problēmām, lietotāji var sazināties ar departamentu, izmantojot tā institucionālos kanālus, norādot skarto lapu un īsu problēmas aprakstu."
+          "body": "Lai ziņotu par neatbilstības gadījumiem vai pieprasītu informāciju un saturu, uz kuru neattiecas regulējuma darbības joma, varat izmantot pakalpojumu sniedzošās administrācijas institucionālos kontaktu kanālus, norādot attiecīgo lapu un problēmas aprakstu."
+        },
+        "enforcement": {
+          "title": "Izpildes procedūra",
+          "body": "Ja atbilde ir neapmierinoša vai 30 dienu laikā netiek saņemta atbilde, varat vērsties pie AgID digitālā tiesībsarga (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Paziņojuma atkārtota izmantošana un publicēšana",
+        "body": "“PA Webinar” ir atvērtā pirmkoda programmatūra, ko var atkārtoti izmantot citas administrācijas. Katrai iestādei, kas ievieš platformu, ir jāsagatavo un jāpublicē savs pieejamības paziņojums, izmantojot oficiālo AgID veidlapu, aizstājot šo parauga tekstu ar saviem datiem."
+      },
+      "links": {
+        "agidForm": "Pieejamības paziņojuma veidlapa (AgID)",
+        "difensore": "Pieejamība un digitālais tiesībsargs (AgID)"
       }
     },
     "legalNotes": {

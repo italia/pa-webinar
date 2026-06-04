@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Öffentliche digitale Veranstaltungen",
-      "subtitle": "Plattform für Webinare, Präsentationen und öffentliche Treffen des Departements für digitale Transformation",
-      "browseEvents": "Veranstaltungen entdecken",
-      "organizeEvent": "Veranstaltung organisieren"
-    },
-    "features": {
-      "title": "Die Plattform für Veranstaltungen der öffentlichen Verwaltung",
-      "video": {
-        "title": "Videokonferenz",
-        "desc": "Nehmen Sie an öffentlichen Veranstaltungen mit bis zu 300 Teilnehmenden teil. Keine Software-Installation erforderlich."
-      },
-      "qa": {
-        "title": "Fragen und Antworten",
-        "desc": "Stellen Sie Fragen während der Veranstaltung und stimmen Sie für die wichtigsten ab. Der Moderator antwortet live."
-      },
-      "privacy": {
-        "title": "Datenschutz und Sicherheit",
-        "desc": "GDPR-konforme Daten. Selbst gehostete Infrastruktur in Italien."
+      "kicker": "Für alle offen · live · auf Abruf",
+      "title": "Webinare und Veranstaltungen der Communities für digitale Transformation",
+      "subtitle": "Verfolgen Sie Präsentationen, öffentliche Treffen und Q&A-Sessions der Communities für digitale Transformation live. Nehmen Sie über Ihren Browser teil, stellen Sie Fragen und sehen Sie sich die Aufzeichnungen an, wann immer Sie möchten.",
+      "browseEvents": "Kommende Veranstaltungen entdecken",
+      "watchRecordings": "Aufzeichnungen ansehen",
+      "badges": {
+        "noInstall": "Über den Browser, ohne Installation",
+        "interactive": "Live-Q&A und Umfragen",
+        "recordings": "Aufzeichnungen und Untertitel",
+        "accessible": "Barrierefrei, in 24 Sprachen"
       }
     },
     "upcoming": {
       "title": "Kommende Veranstaltungen",
-      "viewAll": "Alle Veranstaltungen anzeigen",
-      "noEvents": "Keine geplanten Veranstaltungen. Schauen Sie bald wieder vorbei!"
+      "viewAll": "Alle Veranstaltungen ansehen",
+      "noEvents": "Keine Veranstaltungen geplant. Schauen Sie bald wieder vorbei!"
     },
     "howItWorks": {
-      "title": "So funktioniert es",
+      "title": "So nehmen Sie teil",
+      "subtitle": "Nur wenige Schritte, ohne Konto und ohne Installation.",
       "step1": {
-        "title": "Anmelden",
-        "desc": "Melden Sie sich kostenlos zur Veranstaltung an"
+        "title": "Registrieren",
+        "desc": "Melden Sie sich kostenlos über die öffentliche Seite zur Veranstaltung an."
       },
       "step2": {
         "title": "Link erhalten",
-        "desc": "Eine E-Mail mit Ihrem persönlichen Zugangslink"
+        "desc": "Sie erhalten eine E-Mail mit Ihrem persönlichen Link und einem Kalenderanhang."
       },
       "step3": {
         "title": "Teilnehmen",
-        "desc": "Betreten Sie die Veranstaltung über den Browser, ohne Installation"
+        "desc": "Betreten Sie die Veranstaltung über Ihren Browser, ohne etwas installieren zu müssen."
       },
       "step4": {
-        "title": "Interagieren",
-        "desc": "Stellen Sie Fragen, stimmen Sie ab, nehmen Sie an der Diskussion teil"
+        "title": "Mitmachen",
+        "desc": "Stellen Sie Fragen, stimmen Sie ab, beantworten Sie Umfragen und beteiligen Sie sich an der Diskussion."
+      }
+    },
+    "during": {
+      "title": "Was Sie während einer Veranstaltung tun können",
+      "subtitle": "Nicht nur zusehen: Die Veranstaltungen sind interaktiv.",
+      "qa": {
+        "title": "Fragen und Antworten",
+        "desc": "Stellen Sie Fragen und stimmen Sie für die Fragen anderer: Die Moderation antwortet live."
+      },
+      "polls": {
+        "title": "Umfragen",
+        "desc": "Beantworten Sie Umfragen in Echtzeit und sehen Sie die Ergebnisse sofort."
+      },
+      "wordcloud": {
+        "title": "Wortwolke",
+        "desc": "Fügen Sie Ihre Wörter zur gemeinsamen Wortwolke der Veranstaltung hinzu."
+      },
+      "reactions": {
+        "title": "Reaktionen und erhobene Hände",
+        "desc": "Reagieren Sie und bitten Sie per Handzeichen ums Wort: Die Warteschlange wird der Reihe nach abgearbeitet."
+      },
+      "chat": {
+        "title": "Chat",
+        "desc": "Schreiben Sie im Chat der Veranstaltung und verfolgen Sie das Gespräch mit den anderen Teilnehmenden."
+      },
+      "agenda": {
+        "title": "Agenda und Notizen",
+        "desc": "Folgen Sie der Agenda und den Notizen, die die Moderatoren während der Veranstaltung teilen."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Das Projekt",
+      "title": "Open Source und souverän, von der Verwaltung für die Verwaltung entwickelt",
+      "body": "PA Webinar ist die Plattform des Ministeriums für digitale Transformation für öffentliche digitale Veranstaltungen: das Designsystem .italia, die Video-Engine Jitsi Meet und eine vollständig in-cluster AI-Pipeline. Sie wird als Open Source veröffentlicht, damit jede Verwaltung sie wiederverwenden kann.",
+      "sovereignty": {
+        "title": "Datensouveränität",
+        "desc": "Self-hosted auf der Infrastruktur der Verwaltung: Die Daten verlassen sie nie und es besteht keine Exposition gegenüber dem CLOUD Act."
+      },
+      "openSource": {
+        "title": "Open Source EUPL-1.2",
+        "desc": "Code, der von jeder Verwaltung wiederverwendet werden kann, mit öffentlichem SBOM und service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII im Ruhezustand verschlüsselt, granulare Einwilligungen und konfigurierbare Aufbewahrung."
+      },
+      "cta": "Transparenz des Dienstes",
+      "techTitle": "Mit offenen Technologien gebaut",
+      "archTitle": "Wie es funktioniert, kurz erklärt"
+    },
+    "afterEvent": {
+      "title": "Nach der Veranstaltung",
+      "subtitle": "Nichts geht verloren: Alles bleibt verfügbar und zugänglich.",
+      "library": {
+        "title": "Aufzeichnungsbibliothek",
+        "desc": "Sehen Sie sich vergangene Veranstaltungen in der öffentlichen Bibliothek erneut an, mit dem Archiv der Fragen und Umfragen."
+      },
+      "transcript": {
+        "title": "Transkript und Untertitel",
+        "desc": "Jede Aufzeichnung kann ein Transkript und Untertitel haben, automatisch erzeugt von der AI-Pipeline in-cluster."
+      },
+      "translation": {
+        "title": "Automatische Übersetzung",
+        "desc": "Untertitel und Zusammenfassung in mehrere Sprachen übersetzt, damit Sie die Veranstaltung auch in einer anderen Sprache verfolgen können."
+      },
+      "dubbing": {
+        "title": "Audio-Synchronisation",
+        "desc": "Eine synchronisierte Tonspur mit einer neutralen synthetischen Stimme (ohne Stimmklonung), um die Veranstaltung in einer anderen Sprache zu hören."
       }
     }
   },
@@ -2037,22 +2098,38 @@
       }
     },
     "accessibility": {
-      "metaTitle": "Barrierefreiheitserklärung",
-      "title": "Barrierefreiheitserklärung",
-      "intro": "Das Departement für digitale Transformation ist bestrebt, diese Plattform barrierefrei zu gestalten, im Einklang mit den geltenden Anforderungen für digitale Dienste des öffentlichen Sektors.",
+      "metaTitle": "Erklärung zur Barrierefreiheit",
+      "title": "Erklärung zur Barrierefreiheit",
+      "intro": "Das Ministerium für digitale Transformation verpflichtet sich, PA Webinar in Übereinstimmung mit dem italienischen Gesetz 4/2004, der EU-Richtlinie 2016/2102 und den Leitlinien der AgID zur Barrierefreiheit von IKT-Werkzeugen barrierefrei zu gestalten.",
       "sections": {
-        "commitment": {
-          "title": "Engagement für Barrierefreiheit",
-          "body": "Die Plattform wurde mit Komponenten gestaltet, die dem .italia-Design-System entsprechen, mit besonderer Aufmerksamkeit auf Tastaturnavigation, semantische Inhaltsstruktur und Schnittstellenlesbarkeit in den gängigen Bildschirmgrößen."
+        "conformance": {
+          "title": "Stand der Vereinbarkeit",
+          "body": "PA Webinar ist so konzipiert, dass es die WCAG 2.1 Stufe AA erfüllt. Jede Verwaltung, die den Dienst bereitstellt, muss eine eigene Erklärung veröffentlichen und darin den tatsächlichen Stand der Vereinbarkeit (vollständig, teilweise oder nicht vereinbar) auf Grundlage einer aktuellen Bewertung angeben."
         },
-        "status": {
-          "title": "Konformitätsstatus",
-          "body": "Barrierefreiheitsprüfungen und -verbesserungen werden fortlaufend durchgeführt. Verbleibende Einschränkungen werden im Rahmen der Weiterentwicklung des Dienstes und der regelmäßigen Wartungsaktivitäten schrittweise behoben."
+        "nonAccessible": {
+          "title": "Nicht barrierefreie Inhalte",
+          "body": "Der Videoraum wird über Jitsi Meet bereitgestellt: Einige Echtzeitfunktionen können bei assistiven Technologien Einschränkungen aufweisen. Automatisch durch AI generierte Inhalte (Transkriptionen, Untertitel, Übersetzungen und Synchronisation) können Ungenauigkeiten enthalten und werden stets als solche gekennzeichnet."
+        },
+        "preparation": {
+          "title": "Erstellung dieser Erklärung",
+          "body": "Diese Mustererklärung wurde auf der Grundlage einer Selbstbewertung durch den Diensteanbieter erstellt. Die Benutzeroberfläche ist mit dem Designsystem .italia umgesetzt, mit besonderem Augenmerk auf Tastaturnavigation, Semantik der Inhalte, Farbkontrast und Kompatibilität mit Screenreadern. Die Daten der Erstellung und der letzten Überprüfung sind zum Zeitpunkt der Veröffentlichung einzutragen."
         },
         "feedback": {
-          "title": "Feedback und Kontakte",
-          "body": "Um Barrieren bei der Barrierefreiheit oder Nutzungsprobleme zu melden, können Nutzer das Departement über seine institutionellen Kanäle kontaktieren und die betroffene Seite sowie eine kurze Beschreibung des Problems angeben."
+          "title": "Feedback und Kontakt",
+          "body": "Um Fälle von Nichtvereinbarkeit zu melden oder Informationen und vom Anwendungsbereich der Verordnung ausgenommene Inhalte anzufordern, können Sie die institutionellen Kontaktkanäle der den Dienst bereitstellenden Verwaltung nutzen und dabei die betroffene Seite sowie eine Beschreibung des Problems angeben."
+        },
+        "enforcement": {
+          "title": "Durchsetzungsverfahren",
+          "body": "Wenn die Antwort unbefriedigend ausfällt oder innerhalb von 30 Tagen keine Antwort eingeht, können Sie sich an den digitalen Bürgerbeauftragten der AgID (Difensore civico per il digitale) wenden."
         }
+      },
+      "note": {
+        "title": "Weiterverwendung und Veröffentlichung der Erklärung",
+        "body": "PA Webinar ist eine quelloffene Software, die von anderen Verwaltungen weiterverwendet werden kann. Jede Stelle, die die Plattform übernimmt, muss über das offizielle Formular der AgID eine eigene Erklärung zur Barrierefreiheit erstellen und veröffentlichen und diesen Mustertext durch ihre eigenen Daten ersetzen."
+      },
+      "links": {
+        "agidForm": "Formular zur Erklärung der Barrierefreiheit (AgID)",
+        "difensore": "Barrierefreiheit und digitaler Bürgerbeauftragter (AgID)"
       }
     },
     "legalNotes": {
