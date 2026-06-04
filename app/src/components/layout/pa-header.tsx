@@ -27,7 +27,11 @@ export default function PAHeader({ isAdmin }: PAHeaderProps) {
     settings.parentOrganization || t('header.slimTitle');
   const slimSubtitle =
     settings.organizationNameShort || settings.organizationName || t('header.slimSubtitle');
-  const parentUrl = settings.parentOrganizationUrl || 'https://www.governo.it';
+  // Only link the slim-header brand when the adopting PA has configured a
+  // parent-organisation URL. We intentionally do NOT fall back to a hardcoded
+  // governo.it link: an unconfigured deploy should show the parent body as
+  // plain text, not point at an unrelated site.
+  const parentUrl = settings.parentOrganizationUrl?.trim() || undefined;
   const appName = settings.siteName || t('common.appName');
 
   return (
@@ -53,20 +57,31 @@ function SlimHeader({
 }: {
   slimTitle: string;
   slimSubtitle: string;
-  parentUrl: string;
+  parentUrl?: string;
 }) {
+  const brandInner = (
+    <>
+      <span className="d-none d-lg-inline">{slimTitle}</span>
+      <span className="d-lg-none">{slimSubtitle}</span>
+    </>
+  );
+
   return (
     <Header type="slim" theme="dark">
       <HeaderContent>
-        <HeaderBrand
-          tag="a"
-          href={parentUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span className="d-none d-lg-inline">{slimTitle}</span>
-          <span className="d-lg-none">{slimSubtitle}</span>
-        </HeaderBrand>
+        {parentUrl ? (
+          <HeaderBrand
+            tag="a"
+            href={parentUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {brandInner}
+          </HeaderBrand>
+        ) : (
+          // No parent URL configured → render the parent body as plain text.
+          <HeaderBrand tag="span">{brandInner}</HeaderBrand>
+        )}
         <HeaderRightZone>
           <LanguageSwitcher />
         </HeaderRightZone>

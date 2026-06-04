@@ -1836,48 +1836,109 @@
   },
   "home": {
     "hero": {
-      "title": "Offentliga digitala evenemang",
-      "subtitle": "Plattform för webbinarier, presentationer och offentliga möten från Avdelningen för digital omvandling",
-      "browseEvents": "Utforska evenemang",
-      "organizeEvent": "Arrangera ett evenemang"
-    },
-    "features": {
-      "title": "Plattformen för offentliga evenemang",
-      "video": {
-        "title": "Videokonferens",
-        "desc": "Delta i offentliga evenemang med upp till 300 deltagare. Ingen programvara behöver installeras."
-      },
-      "qa": {
-        "title": "Frågor och svar",
-        "desc": "Ställ frågor under evenemanget och rösta upp de viktigaste. Moderatorn svarar live."
-      },
-      "privacy": {
-        "title": "Integritet och säkerhet",
-        "desc": "GDPR-kompatibelt dataskydd. Självhostad infrastruktur i Italien."
+      "kicker": "Öppet för alla · live · på begäran",
+      "title": "Webbinarier och evenemang från gemenskaperna för digital omställning",
+      "subtitle": "Följ presentationer, offentliga möten och Q&A-sessioner från gemenskaperna för digital omställning live. Delta från din webbläsare, ställ frågor och se inspelningarna igen när du vill.",
+      "browseEvents": "Bläddra bland kommande evenemang",
+      "watchRecordings": "Se inspelningar",
+      "badges": {
+        "noInstall": "Från webbläsaren, inga installationer",
+        "interactive": "Q&A och omröstningar live",
+        "recordings": "Inspelningar och undertexter",
+        "accessible": "Tillgängligt, på 24 språk"
       }
     },
     "upcoming": {
       "title": "Kommande evenemang",
       "viewAll": "Visa alla evenemang",
-      "noEvents": "Inga kommande evenemang. Kom tillbaka snart!"
+      "noEvents": "Inga evenemang planerade. Kom tillbaka snart!"
     },
     "howItWorks": {
-      "title": "Så fungerar det",
+      "title": "Så här deltar du",
+      "subtitle": "Bara några få steg, utan konto och utan installationer.",
       "step1": {
-        "title": "Anmäl dig",
-        "desc": "Anmäl dig kostnadsfritt till evenemanget"
+        "title": "Registrera dig",
+        "desc": "Anmäl dig till evenemanget gratis från dess offentliga sida."
       },
       "step2": {
-        "title": "Få din länk",
-        "desc": "Ett e-postmeddelande med din personliga åtkomstlänk"
+        "title": "Få länken",
+        "desc": "Du får ett e-postmeddelande med din personliga länk och en kalenderbilaga."
       },
       "step3": {
         "title": "Delta",
-        "desc": "Delta i evenemanget direkt från webbläsaren, ingen installation behövs"
+        "desc": "Gå in i evenemanget från din webbläsare, utan att installera något."
       },
       "step4": {
         "title": "Interagera",
-        "desc": "Ställ frågor, rösta och delta i diskussionen"
+        "desc": "Ställ frågor, rösta, svara på omröstningar och delta i diskussionen."
+      }
+    },
+    "during": {
+      "title": "Vad du kan göra under ett evenemang",
+      "subtitle": "Inte bara titta: evenemangen är interaktiva.",
+      "qa": {
+        "title": "Frågor och svar",
+        "desc": "Ställ frågor och rösta upp andras: moderatorn svarar live."
+      },
+      "polls": {
+        "title": "Omröstningar",
+        "desc": "Svara på omröstningar i realtid och se resultaten direkt."
+      },
+      "wordcloud": {
+        "title": "Ordmoln",
+        "desc": "Lägg till dina ord i evenemangets gemensamma ordmoln."
+      },
+      "reactions": {
+        "title": "Reaktioner och uppräckta händer",
+        "desc": "Reagera och be om ordet genom att räcka upp handen: kön hanteras i tur och ordning."
+      },
+      "chat": {
+        "title": "Chatt",
+        "desc": "Skriv i evenemangets chatt och följ samtalet med andra deltagare."
+      },
+      "agenda": {
+        "title": "Agenda och anteckningar",
+        "desc": "Följ agendan och anteckningarna som moderatorerna delar under evenemanget."
+      }
+    },
+    "projectTeaser": {
+      "kicker": "Projektet",
+      "title": "Öppen källkod och suverän, byggd av offentlig förvaltning för offentlig förvaltning",
+      "body": "PA Webinar är Avdelningen för digital omställnings plattform för offentliga digitala evenemang: designsystemet .italia, videomotorn Jitsi Meet och en helt in-cluster AI-pipeline. Den släpps som öppen källkod så att alla förvaltningar kan återanvända den.",
+      "sovereignty": {
+        "title": "Datasuveränitet",
+        "desc": "Self-hosted på förvaltningens infrastruktur: data lämnar aldrig miljön och det finns ingen exponering mot CLOUD Act."
+      },
+      "openSource": {
+        "title": "Öppen källkod EUPL-1.2",
+        "desc": "Kod som kan återanvändas av alla förvaltningar, med en offentlig SBOM och service inventory."
+      },
+      "gdpr": {
+        "title": "GDPR-by-design",
+        "desc": "PII krypterad i vila, granulära samtycken och konfigurerbar lagring."
+      },
+      "cta": "Tjänstetransparens",
+      "techTitle": "Byggt med öppna tekniker",
+      "archTitle": "Så fungerar det, i korthet"
+    },
+    "afterEvent": {
+      "title": "Efter evenemanget",
+      "subtitle": "Inget går förlorat: allt förblir tillgängligt och åtkomligt.",
+      "library": {
+        "title": "Bibliotek med inspelningar",
+        "desc": "Se om tidigare evenemang i det offentliga biblioteket, med arkivet över frågor och omröstningar."
+      },
+      "transcript": {
+        "title": "Transkription och undertexter",
+        "desc": "Varje inspelning kan ha transkription och undertexter, automatiskt genererade av AI-pipelinen in-cluster."
+      },
+      "translation": {
+        "title": "Automatisk översättning",
+        "desc": "Undertexter och sammanfattning översatta till flera språk, så att du kan följa evenemanget även på ett annat språk."
+      },
+      "dubbing": {
+        "title": "Ljuddubbning",
+        "desc": "Ett dubbat ljudspår med en neutral syntetisk röst (utan röstkloning), för att lyssna på evenemanget på ett annat språk."
       }
     }
   },
@@ -2037,22 +2098,38 @@
       }
     },
     "accessibility": {
-      "metaTitle": "Tillgänglighetsförklaring",
-      "title": "Tillgänglighetsförklaring",
-      "intro": "Avdelningen för digital omvandling åtar sig att göra denna plattform tillgänglig i enlighet med gällande krav för digitala tjänster inom offentlig sektor.",
+      "metaTitle": "Tillgänglighetsutlåtande",
+      "title": "Tillgänglighetsutlåtande",
+      "intro": "Departementet för digital omvandling åtar sig att göra PA Webinar tillgängligt, i enlighet med italiensk lag 4/2004, EU-direktiv 2016/2102 och AgID:s riktlinjer om tillgänglighet för IT-verktyg.",
       "sections": {
-        "commitment": {
-          "title": "Åtagande om tillgänglighet",
-          "body": "Plattformen är utformad med komponenter som följer designsystemet .italia, med särskild hänsyn till tangentbordsnavigering, semantisk innehållsstruktur och gränssnittsläsbarhet i de vanligaste skärmstorlekarna."
+        "conformance": {
+          "title": "Överensstämmelsestatus",
+          "body": "PA Webinar är utformat för att överensstämma med WCAG 2.1 nivå AA. Varje förvaltning som tillhandahåller tjänsten måste publicera sitt eget utlåtande och ange den faktiska överensstämmelsestatusen (helt, delvis eller inte överensstämmande) utifrån en uppdaterad bedömning."
         },
-        "status": {
-          "title": "Efterlevnadsstatus",
-          "body": "Tillgänglighetskontroller och förbättringar pågår löpande. Eventuella kvarvarande problem åtgärdas successivt som en del av tjänstens utveckling och regelbundna underhåll."
+        "nonAccessible": {
+          "title": "Otillgängligt innehåll",
+          "body": "Videorummet tillhandahålls via Jitsi Meet: vissa realtidsfunktioner kan ha begränsningar med hjälpmedelsteknik. Innehåll som genereras automatiskt av AI (transkriptioner, undertexter, översättningar och dubbning) kan innehålla felaktigheter och markeras alltid som sådant."
+        },
+        "preparation": {
+          "title": "Utarbetande av detta utlåtande",
+          "body": "Detta mallutlåtande har utarbetats på grundval av en självutvärdering som utförts av tjänsteleverantören. Gränssnittet är byggt med designsystemet .italia, med uppmärksamhet på tangentbordsnavigering, innehållets semantik, färgkontrast och kompatibilitet med skärmläsare. Datumen för utarbetande och senaste granskning måste fyllas i vid publiceringen."
         },
         "feedback": {
-          "title": "Feedback och kontakt",
-          "body": "För att rapportera tillgänglighetshinder eller problem med att använda tjänsten kan användare kontakta avdelningen via dess institutionella kanaler med angivelse av berörd sida och en kort beskrivning av problemet."
+          "title": "Återkoppling och kontakt",
+          "body": "För att rapportera fall av bristande överensstämmelse, eller för att begära information och innehåll som är undantaget från förordningens tillämpningsområde, kan du använda de institutionella kontaktkanalerna hos den förvaltning som tillhandahåller tjänsten, med angivande av den berörda sidan och en beskrivning av problemet."
+        },
+        "enforcement": {
+          "title": "Verkställighetsförfarande",
+          "body": "Om svaret är otillfredsställande eller om du inte får något svar inom 30 dagar kan du kontakta AgID:s digitala medborgarombudsman (Difensore civico per il digitale)."
         }
+      },
+      "note": {
+        "title": "Återanvändning och publicering av utlåtandet",
+        "body": "PA Webinar är programvara med öppen källkod som kan återanvändas av andra förvaltningar. Varje organ som antar plattformen måste utarbeta och publicera sitt eget tillgänglighetsutlåtande via AgID:s officiella formulär och ersätta denna malltext med sina egna uppgifter."
+      },
+      "links": {
+        "agidForm": "Formulär för tillgänglighetsutlåtande (AgID)",
+        "difensore": "Tillgänglighet och digital medborgarombudsman (AgID)"
       }
     },
     "legalNotes": {
