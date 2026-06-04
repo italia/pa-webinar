@@ -114,6 +114,12 @@ export default function Step5Review({
                 : t('summary.recordingOff')
             }
           />
+          {form.multitrackRecordingEnabled && (
+            <SummaryItem
+              label={t('summary.multitrack')}
+              value={t('summary.multitrackOn')}
+            />
+          )}
         </div>
       </div>
 
