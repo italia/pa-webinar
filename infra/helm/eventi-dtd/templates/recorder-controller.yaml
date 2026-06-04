@@ -60,9 +60,14 @@ spec:
     {{- include "eventi-dtd.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: recorder-controller
   ports:
-    - name: http
+    # Porta chiamata "ctrl" (NON "http"): il Service dell'app usa
+    # targetPort: http e seleziona per {instance,name} — che il controller
+    # eredita dalle selectorLabels. Con un nome diverso il pod del controller
+    # NON viene aggiunto agli endpoint dell'app (altrimenti /api/* andrebbe
+    # talvolta al controller → 404 flaky).
+    - name: ctrl
       port: {{ .Values.recorder.controller.port | default 8080 }}
-      targetPort: http
+      targetPort: ctrl
       protocol: TCP
 ---
 apiVersion: apps/v1
@@ -117,7 +122,7 @@ spec:
             capabilities:
               drop: ["ALL"]
           ports:
-            - name: http
+            - name: ctrl
               containerPort: {{ .Values.recorder.controller.port | default 8080 }}
               protocol: TCP
           env:
@@ -141,13 +146,13 @@ spec:
           readinessProbe:
             httpGet:
               path: /healthz
-              port: http
+              port: ctrl
             initialDelaySeconds: 3
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /healthz
-              port: http
+              port: ctrl
             initialDelaySeconds: 10
             periodSeconds: 20
           resources:
