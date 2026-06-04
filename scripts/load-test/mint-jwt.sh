@@ -1,10 +1,10 @@
 #!/bin/sh
 # Mint a Jitsi JWT using openssl + jq. Produces a token compatible with
-# Prosody's JWT module in eventi-dtd (same iss/aud/sub layout as app/src/lib/auth/jwt.ts).
+# Prosody's JWT module in pa-webinar (same iss/aud/sub layout as app/src/lib/auth/jwt.ts).
 #
 # Required env vars:
 #   JITSI_JWT_SECRET    HS256 shared secret configured on Prosody
-#   JITSI_JWT_ISSUER    iss claim (e.g. "eventi-dtd")
+#   JITSI_JWT_ISSUER    iss claim (e.g. "pa-webinar")
 #   JITSI_JWT_AUDIENCE  aud claim (e.g. "jitsi")
 #   JITSI_JWT_SUBJECT   sub claim (Jitsi domain, e.g. "jitsi-test.innovazione.gov.it")
 #
@@ -22,7 +22,7 @@ set -eu
 
 BOT_NAME="${BOT_NAME:-LoadBot}"
 JWT_TTL_SECONDS="${JWT_TTL_SECONDS:-7200}"
-JITSI_JWT_APP_ID="${JITSI_JWT_APP_ID:-eventi_dtd}"
+JITSI_JWT_APP_ID="${JITSI_JWT_APP_ID:-pa_webinar}"
 
 # Unique user id per token (not shared across bots — avoids JID collisions)
 USER_ID=$(openssl rand -hex 8)

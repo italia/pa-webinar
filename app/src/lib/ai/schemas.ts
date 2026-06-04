@@ -176,7 +176,7 @@ export const claimResponseSchema = z.object({
     asrProvider: z.enum(['whisperx']).default('whisperx'),
     ttsProvider: z.enum(['piper']).default('piper'),
     /**
-     * Cluster-internal base URL (e.g. http://eventi-dtd-vllm:8000/v1).
+     * Cluster-internal base URL (e.g. http://pa-webinar-vllm:8000/v1).
      * Refuse to set if the worker network policy doesn't permit egress
      * to this destination.
      */

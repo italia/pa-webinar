@@ -1,0 +1,75 @@
+{{- if .Values.metrics.grafanaDashboard.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-grafana-dashboard
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+    {{- with .Values.metrics.grafanaDashboard.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.metrics.grafanaDashboard.folder }}
+  annotations:
+    grafana-folder: {{ .Values.metrics.grafanaDashboard.folder | quote }}
+  {{- end }}
+data:
+  pa-webinar-dashboard.json: |-
+    {
+      "annotations": { "list": [] },
+      "editable": true,
+      "graphTooltip": 1,
+      "refresh": "30s",
+      "schemaVersion": 39,
+      "tags": ["pa-webinar", "jitsi", "nextjs"],
+      "time": { "from": "now-6h", "to": "now" },
+      "timezone": "browser",
+      "title": "pa-webinar Overview",
+      "uid": "pa-webinar-overview",
+      "version": 1,
+      "templating": {
+        "list": [
+          {
+            "name": "namespace",
+            "type": "query",
+            "datasource": "prometheus",
+            "query": "label_values(up{app=\"pa-webinar\"}, namespace)",
+            "current": { "text": "{{ .Release.Namespace }}", "value": "{{ .Release.Namespace }}" },
+            "refresh": 2,
+            "includeAll": false,
+            "multi": false
+          },
+          {
+            "name": "instance",
+            "type": "query",
+            "datasource": "prometheus",
+            "query": "label_values(up{app=\"pa-webinar\", namespace=\"$namespace\"}, instance)",
+            "current": {},
+            "refresh": 2,
+            "includeAll": true,
+            "multi": true
+          }
+        ]
+      },
+      "panels": [
+        { "title": "Overview", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "collapsed": false },
+        { "title": "Active Events", "type": "stat", "datasource": "prometheus", "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 }, "targets": [{ "expr": "eventi_active_events{namespace=\"$namespace\"}" }], "fieldConfig": { "defaults": { "thresholds": { "steps": [{ "color": "blue", "value": null }, { "color": "green", "value": 1 }] } } } },
+        { "title": "Participants", "type": "stat", "datasource": "prometheus", "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 }, "targets": [{ "expr": "eventi_jvb_participants{namespace=\"$namespace\"}" }], "fieldConfig": { "defaults": { "thresholds": { "steps": [{ "color": "blue", "value": null }, { "color": "green", "value": 1 }] } } } },
+        { "title": "Uptime (24h)", "type": "gauge", "datasource": "prometheus", "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 }, "targets": [{ "expr": "avg_over_time(up{namespace=\"$namespace\", app=\"pa-webinar\"}[24h]) * 100" }], "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "thresholds": { "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 99 }, { "color": "green", "value": 99.9 }] } } } },
+        { "title": "Error Rate", "type": "gauge", "datasource": "prometheus", "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 }, "targets": [{ "expr": "rate(http_requests_total{namespace=\"$namespace\",app=\"pa-webinar\",status_code=~\"5..\"}[5m]) / rate(http_requests_total{namespace=\"$namespace\",app=\"pa-webinar\"}[5m]) * 100" }], "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] } } } },
+        { "title": "Application", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 }, "collapsed": false },
+        { "title": "Request Rate", "type": "timeseries", "datasource": "prometheus", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 }, "targets": [{ "expr": "sum(rate(http_requests_total{namespace=\"$namespace\",app=\"pa-webinar\"}[5m])) by (status_code)", "legendFormat": "{{ "{{" }}status_code{{ "}}" }}" }], "fieldConfig": { "defaults": { "unit": "reqps" } } },
+        { "title": "Latency P50/P95/P99", "type": "timeseries", "datasource": "prometheus", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 }, "targets": [{ "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{namespace=\"$namespace\",app=\"pa-webinar\"}[5m]))", "legendFormat": "P50" }, { "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{namespace=\"$namespace\",app=\"pa-webinar\"}[5m]))", "legendFormat": "P95" }, { "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{namespace=\"$namespace\",app=\"pa-webinar\"}[5m]))", "legendFormat": "P99" }], "fieldConfig": { "defaults": { "unit": "s" } } },
+        { "title": "JVB", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 }, "collapsed": false },
+        { "title": "Participants (aggregate)", "type": "timeseries", "datasource": "prometheus", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 }, "targets": [{ "expr": "eventi_jvb_participants{namespace=\"$namespace\"}", "legendFormat": "Participants" }], "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } } },
+        { "title": "JVB Stress", "type": "timeseries", "datasource": "prometheus", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 }, "targets": [{ "expr": "eventi_jvb_stress_level{namespace=\"$namespace\"}", "legendFormat": "Stress" }], "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.6 }, { "color": "red", "value": 0.8 }] } } } },
+        { "title": "JVB Pods (direct scrape)", "type": "timeseries", "datasource": "prometheus", "gridPos": { "h": 8, "w": 24, "x": 0, "y": 23 }, "targets": [{ "expr": "sum by (pod) (jitsi_total_participants{namespace=\"$namespace\"})", "legendFormat": "parts {{ "{{" }}pod{{ "}}" }}" }, { "expr": "sum by (pod) (jitsi_stress_level{namespace=\"$namespace\"}) * 100", "legendFormat": "stress% {{ "{{" }}pod{{ "}}" }}" }], "description": "Per-pod participant and stress counts scraped directly from each JVB's Prometheus exporter. Requires the Jitsi prom-exporter sidecar (podmonitor). Both metrics plotted together: stress shown as percentage so values stay on one axis.", "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 10 } } } },
+        { "title": "Octo (cascaded bridges)", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 }, "collapsed": false },
+        { "title": "Octo conferences + endpoints", "type": "timeseries", "datasource": "prometheus", "gridPos": { "h": 8, "w": 8, "x": 0, "y": 32 }, "targets": [{ "expr": "eventi_jvb_octo_conferences{namespace=\"$namespace\"}", "legendFormat": "Conferences" }, { "expr": "eventi_jvb_octo_endpoints{namespace=\"$namespace\"}", "legendFormat": "Endpoints" }], "description": "Non-zero values indicate the same conference is spread across multiple JVB pods and media is relayed between them over Octo (UDP 4096). Sourced from /colibri/stats via the /api/metrics scrape.", "fieldConfig": { "defaults": { "unit": "short" } } },
+        { "title": "Octo relay bitrate", "type": "timeseries", "datasource": "prometheus", "gridPos": { "h": 8, "w": 16, "x": 8, "y": 32 }, "targets": [{ "expr": "eventi_jvb_octo_send_bitrate_bps{namespace=\"$namespace\"} * 8", "legendFormat": "send" }, { "expr": "eventi_jvb_octo_receive_bitrate_bps{namespace=\"$namespace\"} * 8", "legendFormat": "receive" }], "description": "Inter-bridge media relay traffic. For a single-bridge conference this stays at 0; it ramps up once Jicofo starts spilling endpoints onto a second JVB. Unit conversion: /colibri/stats reports bytes/s, multiplied by 8 to get bits/s for the 'bps' unit.", "fieldConfig": { "defaults": { "unit": "bps" } } },
+        { "title": "Resources", "type": "row", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 40 }, "collapsed": false },
+        { "title": "CPU Usage", "type": "timeseries", "datasource": "prometheus", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 41 }, "targets": [{ "expr": "rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",container!=\"\",container!=\"POD\"}[5m])", "legendFormat": "{{ "{{" }}pod{{ "}}" }}" }], "fieldConfig": { "defaults": { "unit": "short" } } },
+        { "title": "Memory Usage", "type": "timeseries", "datasource": "prometheus", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 41 }, "targets": [{ "expr": "container_memory_working_set_bytes{namespace=\"$namespace\",container!=\"\",container!=\"POD\"}", "legendFormat": "{{ "{{" }}pod{{ "}}" }}" }], "fieldConfig": { "defaults": { "unit": "bytes" } } }
+      ]
+    }
+{{- end }}

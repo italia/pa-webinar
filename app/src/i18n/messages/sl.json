@@ -2015,7 +2015,7 @@
     "privacy": {
       "metaTitle": "Politika zasebnosti",
       "title": "Politika zasebnosti",
-      "intro": "Ta stran povzema obdelavo osebnih podatkov, povezano z uporabo platforme Eventi DTD in udeležbo na gostečih javnih dogodkih.",
+      "intro": "Ta stran povzema obdelavo osebnih podatkov, povezano z uporabo platforme PA Webinar in udeležbo na gostečih javnih dogodkih.",
       "sections": {
         "controller": {
           "title": "Upravljavec podatkov",
@@ -2058,7 +2058,7 @@
     "legalNotes": {
       "metaTitle": "Pravna obvestila",
       "title": "Pravna obvestila",
-      "intro": "Dostop do platforme Eventi DTD in njena uporaba potekata v skladu s temi obvestili, ki opisujejo splošne pogoje uporabe in glavne informacije o storitvi.",
+      "intro": "Dostop do platforme PA Webinar in njena uporaba potekata v skladu s temi obvestili, ki opisujejo splošne pogoje uporabe in glavne informacije o storitvi.",
       "sections": {
         "ownership": {
           "title": "Lastništvo storitve",

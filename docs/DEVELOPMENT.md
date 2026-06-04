@@ -14,8 +14,8 @@
 
 ```bash
 # 1. Clona il repository
-git clone https://github.com/italia/eventi-dtd.git
-cd eventi-dtd
+git clone https://github.com/italia/pa-webinar.git
+cd pa-webinar
 
 # 2. Avvia lo stack completo (build + start)
 docker compose up --build -d
@@ -34,7 +34,7 @@ L'admin panel è accessibile con l'API key configurata nella variabile d'ambient
 ## Struttura del progetto
 
 ```
-eventi-dtd/
+pa-webinar/
 ├── app/                          # Workspace npm "app"
 │   ├── src/
 │   │   ├── app/                  # Next.js App Router

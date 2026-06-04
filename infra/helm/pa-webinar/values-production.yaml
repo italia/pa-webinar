@@ -1,0 +1,229 @@
+# ─────────────────────────────────────────────────────────────
+# pa-webinar — Production values for developers-italia-prod cluster
+#
+# This is DTD's own production config. It builds on examples/values-full.yaml
+# with DTD-specific domains, resources, and Azure Key Vault integration.
+#
+# Usage:
+#   helm upgrade --install videocall ./infra/helm/pa-webinar \
+#     -f values.yaml \
+#     -f values-production.yaml \
+#     -n videocall \
+#     --set jitsi-meet.prosody.auth.jwt.appSecret=$JITSI_JWT_SECRET
+# ─────────────────────────────────────────────────────────────
+
+app:
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/italia/eventi-dtd
+    tag: "v0.2.0"
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+  # AKS "applications" node pool
+  nodeSelector:
+    agentpool: applications
+
+  env:
+    NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.eventi.developers.italia.it"
+    NEXT_PUBLIC_APP_URL: "https://eventi.developers.italia.it"
+    NEXT_PUBLIC_DEFAULT_LOCALE: "it"
+    DEFAULT_DATA_RETENTION_DAYS: "90"
+    DEFAULT_PRIVACY_POLICY_URL: "https://eventi.developers.italia.it/it/privacy"
+
+# ── Secrets ──────────────────────────────────────────────────
+
+secrets:
+  mode: "existing"
+  existingSecretName: "videocall-secrets"
+
+# ── Ingress ──────────────────────────────────────────────────
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Rate limiting: 10 req/s per IP, burst up to 50 (5x multiplier)
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+    nginx.ingress.kubernetes.io/limit-connections: "20"
+    # WebSocket support for live event polling
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  hosts:
+    - host: eventi.developers.italia.it
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: videocall-tls
+      hosts:
+        - eventi.developers.italia.it
+
+# ── Autoscaling ──────────────────────────────────────────────
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# ── PostgreSQL — Azure Database for PostgreSQL Flexible Server ──
+
+postgresql:
+  enabled: false
+  external:
+    host: "pa-webinar-db.postgres.database.azure.com"
+    port: 5432
+    database: "pa_webinar"
+    existingSecret: "videocall-secrets"
+    secretKey: "DATABASE_URL"
+
+# ── Jitsi Meet — full mode with dedicated JVB nodes ──
+
+jitsi:
+  enabled: true
+  mode: full
+
+jitsi-meet:
+  publicURL: "https://jitsi.eventi.developers.italia.it"
+  enableAuth: true
+  enableGuests: false
+
+  prosody:
+    auth:
+      type: jwt
+      jwt:
+        appId: "pa_webinar"
+        appSecret: ""
+        acceptedIssuers: "pa-webinar"
+        acceptedAudiences: "jitsi"
+
+    nodeSelector:
+      agentpool: applications
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+  jicofo:
+    nodeSelector:
+      agentpool: applications
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    env:
+      JICOFO_ENABLE_AUTO_OWNER: "false"
+      JICOFO_AUTHENTICATION_TYPE: "jwt"
+      JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT: "30"
+      JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT: "0"
+
+  jvb:
+    replicaCount: 0
+    nodeSelector:
+      workload: jitsi-jvb
+    tolerations:
+      - key: workload
+        value: jitsi-jvb
+        effect: NoSchedule
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "3"
+        memory: 4Gi
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        selector:
+          release: prometheus
+
+  jibri:
+    enabled: true
+    replicaCount: 0
+    singleUseMode: true
+    nodeSelector:
+      workload: jitsi-jvb
+    tolerations:
+      - key: workload
+        value: jitsi-jvb
+        effect: NoSchedule
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
+
+  web:
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/server-snippet: |
+          location = / { return 403; }
+          location = /index.html { return 403; }
+      hosts:
+        - host: jitsi.eventi.developers.italia.it
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: jitsi-tls
+          hosts:
+            - jitsi.eventi.developers.italia.it
+
+# ── JVB auto-scaler ─────────────────────────────────────────
+
+jvbScaler:
+  enabled: true
+  schedule: "*/2 * * * *"
+  image: bitnami/kubectl:1.29
+  jvbDeploymentName: ""  # Auto-detect by label
+
+# ── CronJobs ─────────────────────────────────────────────────
+
+cronjobs:
+  reminders:
+    enabled: true
+    schedule: "*/15 * * * *"
+  cleanup:
+    enabled: true
+    schedule: "0 3 * * *"
+
+# ── Metrics ──────────────────────────────────────────────────
+
+metrics:
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    additionalLabels:
+      release: prometheus

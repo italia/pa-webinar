@@ -92,8 +92,8 @@ interface WaitingRoomProps {
   onLeaveFeedback?: () => void;
 }
 
-const PARTICIPANT_NAME_KEY = 'eventidtd.participant.name';
-const PARTICIPANT_EMAIL_KEY = 'eventidtd.participant.email';
+const PARTICIPANT_NAME_KEY = 'pawebinar.participant.name';
+const PARTICIPANT_EMAIL_KEY = 'pawebinar.participant.email';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function WaitingRoom({
@@ -762,7 +762,7 @@ function InteractiveGardenSlot({ slug, displayName }: { slug: string; displayNam
   const [enabled, setEnabled] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
     try {
-      return window.localStorage.getItem('eventidtd.garden.hidden') !== '1';
+      return window.localStorage.getItem('pawebinar.garden.hidden') !== '1';
     } catch {
       return true;
     }

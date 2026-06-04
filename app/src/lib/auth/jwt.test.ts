@@ -13,7 +13,7 @@ import {
 } from './jwt';
 
 const JWT_SECRET = 'test-secret-for-jwt-tests';
-const JWT_ISSUER = 'eventi-dtd';
+const JWT_ISSUER = 'pa-webinar';
 const JWT_AUDIENCE = 'jitsi';
 const JWT_SUBJECT = 'jitsi.test.local';
 

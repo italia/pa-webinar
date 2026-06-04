@@ -19,7 +19,7 @@ export function register() {
 
   if (missing.length > 0) {
     console.error(
-      `[eventi-dtd] Missing required environment variables: ${missing.join(', ')}. ` +
+      `[pa-webinar] Missing required environment variables: ${missing.join(', ')}. ` +
         'The application may not function correctly.',
     );
   }
@@ -27,7 +27,7 @@ export function register() {
   const appSecret = process.env.APP_SECRET;
   if (appSecret && appSecret.length < MIN_APP_SECRET_BYTES) {
     const msg =
-      `[eventi-dtd] APP_SECRET is too short (${appSecret.length} bytes, ` +
+      `[pa-webinar] APP_SECRET is too short (${appSecret.length} bytes, ` +
       `minimum ${MIN_APP_SECRET_BYTES}). Short HS256 keys are brute-forceable.`;
     if (process.env.NODE_ENV === 'production') {
       // Fatal in production — refuse to start with a weak signing key.
@@ -41,7 +41,7 @@ export function register() {
 
   if (missingRecommended.length > 0) {
     console.warn(
-      `[eventi-dtd] Missing recommended environment variables: ${missingRecommended.join(', ')}.`,
+      `[pa-webinar] Missing recommended environment variables: ${missingRecommended.join(', ')}.`,
     );
   }
 }

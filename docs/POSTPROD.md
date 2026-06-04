@@ -1,4 +1,4 @@
-# Postprod AI pipeline — eventi-dtd
+# Postprod AI pipeline — pa-webinar
 
 Pipeline di post-produzione che trasforma le registrazioni Jibri in
 trascrizioni, sintesi e traduzioni. Tutto gira **in-cluster** (vincolo
@@ -249,7 +249,7 @@ secrets). Non viene eseguito sul suo schedule.
 
 ## Configurazione
 
-### Helm values (`infra/helm/eventi-dtd/values.yaml`)
+### Helm values (`infra/helm/pa-webinar/values.yaml`)
 
 Off di default. Per abilitare in un cluster esistente:
 
@@ -281,7 +281,7 @@ postprod:
       key: HF_TOKEN
 
     extraEnv:
-      AI_VLLM_BASE_URL: "http://eventi-dtd-vllm.ai:8000/v1"
+      AI_VLLM_BASE_URL: "http://pa-webinar-vllm.ai:8000/v1"
       AI_VLLM_MODEL_ID: "Qwen/Qwen3-32B-Instruct"
 
     gpu:
@@ -321,7 +321,7 @@ Modificabile dal pannello senza redeploy:
 
 | Secret | Chiavi | Da chi consumato | Note |
 |---|---|---|---|
-| `eventi-dtd-secrets` | `CRON_API_KEY` | app + tutti i cron + orchestrator + worker | Già esistente |
+| `pa-webinar-secrets` | `CRON_API_KEY` | app + tutti i cron + orchestrator + worker | Già esistente |
 | `hf-token` | `HF_TOKEN` | worker pod | Per gated `pyannote/speaker-diarization-3.1`. Generare con TOS accettato su huggingface.co |
 
 ---
@@ -427,7 +427,7 @@ az aks nodepool show -g developersitalia-prod \
 ```
 
 > Reference standalone (per PA terze che adottano il chart fuori da
-> `iac-azure`): `infra/tofu/ai-gpu-nodepool.tf` nel repo eventi-dtd
+> `iac-azure`): `infra/tofu/ai-gpu-nodepool.tf` nel repo pa-webinar
 > (`count = 0` di default — il file è solo template).
 
 ### 2. NVIDIA GPU Operator
@@ -541,12 +541,12 @@ vLLM gira in un proprio Deployment + Service. Esempio minimal:
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
-metadata: { name: eventi-dtd-vllm, namespace: ai }
+metadata: { name: pa-webinar-vllm, namespace: ai }
 spec:
   replicas: 1
-  selector: { matchLabels: { app: eventi-dtd-vllm } }
+  selector: { matchLabels: { app: pa-webinar-vllm } }
   template:
-    metadata: { labels: { app: eventi-dtd-vllm } }
+    metadata: { labels: { app: pa-webinar-vllm } }
     spec:
       nodeSelector: { workload: ai-gpu }
       tolerations:
@@ -573,9 +573,9 @@ spec:
 ---
 apiVersion: v1
 kind: Service
-metadata: { name: eventi-dtd-vllm, namespace: ai }
+metadata: { name: pa-webinar-vllm, namespace: ai }
 spec:
-  selector: { app: eventi-dtd-vllm }
+  selector: { app: pa-webinar-vllm }
   ports: [{ port: 8000, targetPort: 8000 }]
 ```
 
@@ -810,7 +810,7 @@ video resta la fonte autoritativa".
 - schemas (discriminated union, claim response, artifact register)
 
 ```bash
-cd eventi-dtd
+cd pa-webinar
 npm run test --workspace=app -- src/lib/ai
 ```
 
@@ -837,7 +837,7 @@ sintesi placeholder. Utile per smoke test su minikube/k3s.
 
 ```bash
 cd infra/ai
-docker build -f Dockerfile.worker -t eventi-dtd-postprod-worker:local .
+docker build -f Dockerfile.worker -t pa-webinar-postprod-worker:local .
 ```
 
 (Richiede ~10 minuti perché installa torch+whisperx+pyannote.)
@@ -861,7 +861,7 @@ kubectl logs -n gpu-operator -l app=nvidia-device-plugin
 
 `CRON_API_KEY` non è in sync tra app e worker. Il worker prende il
 secret via `secretRef` nel CronJob worker template — controlla che
-`{{ include "eventi-dtd.secretName" . }}` punti allo stesso Secret
+`{{ include "pa-webinar.secretName" . }}` punti allo stesso Secret
 del cron postprod-orchestrator.
 
 ### "blobKey mismatch" nel register

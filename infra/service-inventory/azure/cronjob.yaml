@@ -20,7 +20,7 @@ metadata:
   name: service-inventory-scripts
 data:
   # The python transformer lives under infra/service-inventory/azure/scripts/
-  # in the eventi-dtd repo. Either bake it into a custom image or mount it via
+  # in the pa-webinar repo. Either bake it into a custom image or mount it via
   # this ConfigMap (kubectl create cm service-inventory-scripts
   #   --from-file=azure-to-cyclonedx.py=... --dry-run=client -o yaml).
   azure-to-cyclonedx.py: |
@@ -43,7 +43,7 @@ metadata:
   name: service-inventory-generator
   labels:
     app.kubernetes.io/name: service-inventory-generator
-    app.kubernetes.io/part-of: eventi-dtd
+    app.kubernetes.io/part-of: pa-webinar
 spec:
   # Daily at 04:17 UTC — off-peak, randomized minute to avoid cron-storms.
   schedule: "17 4 * * *"
@@ -84,7 +84,7 @@ spec:
                   # Where to fetch the DEV half (components[] + declarations[])
                   # produced by the release pipeline. Typically a GitHub raw URL
                   # or a separate Blob path maintained per app version.
-                  value: "https://raw.githubusercontent.com/italia/eventi-dtd/main/app/public/tenants/videocall-test/service-inventory.json"
+                  value: "https://raw.githubusercontent.com/italia/pa-webinar/main/app/public/tenants/videocall-test/service-inventory.json"
               command:
                 - /bin/bash
                 - -euo

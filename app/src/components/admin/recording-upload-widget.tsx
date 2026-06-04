@@ -15,7 +15,7 @@ type Phase = 'idle' | 'signing' | 'uploading' | 'attaching';
 /**
  * Upload an MP4 / WebM / MOV onto an **existing** event as its
  * primary recording. Useful when Jibri wasn't active (external
- * MsTeams meeting mirrored to an eventi-dtd event, a recording
+ * MsTeams meeting mirrored to an pa-webinar event, a recording
  * recovered from another system, a re-upload after manual editing).
  *
  * Flow mirrors /admin/publications/new but targets an existing event:

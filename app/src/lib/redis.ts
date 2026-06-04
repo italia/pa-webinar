@@ -37,7 +37,7 @@ function buildClient(tag: string): RedisClient | null {
     },
     // Named connection for observability — Redis `CLIENT LIST` shows
     // our pods clearly distinguishing chat publisher vs subscriber.
-    connectionName: `eventi-dtd:${tag}`,
+    connectionName: `pa-webinar:${tag}`,
   });
 
   client.on('error', (err) => {

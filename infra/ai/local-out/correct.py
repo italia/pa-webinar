@@ -26,7 +26,7 @@ TX_FILE = "transcript_diarized.json"
 GLOSSARY = [
     "DTD", "Dipartimento per la Trasformazione Digitale",
     "Raffaele", "Raffaele Vitiello", "Alex", "Paolo", "Marco",
-    "Jitsi", "Jitsi Meet", "eventi-dtd",
+    "Jitsi", "Jitsi Meet", "pa-webinar",
     "PCM", "Microsoft", "Azure", "OVH", "Teams",
     "Kubernetes", "container", "cluster", "endpoint",
     "moderatore", "webinar", "codec",

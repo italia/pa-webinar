@@ -1,0 +1,52 @@
+{{/*
+Redirect Jitsi root (/) to the portal URL.
+
+The subchart's ingress serves all Jitsi content with Prefix /.
+This Ingress matches only Exact / — which in nginx has higher priority
+than prefix matching — and returns a 301 redirect to the portal.
+
+Requires: jitsi.webIngress.redirectUrl set to the portal URL.
+The subchart's own ingress (jitsi-meet.web.ingress.enabled=true) must
+remain enabled to serve IFrame API, room pages, and static assets.
+*/}}
+{{- if and .Values.jitsi.enabled .Values.jitsi.webIngress.redirectUrl }}
+{{- $svcName := printf "%s-jitsi-meet-web" .Release.Name }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-jitsi-redirect
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/permanent-redirect: {{ .Values.jitsi.webIngress.redirectUrl | quote }}
+    {{- with .Values.jitsi.webIngress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- with .Values.jitsi.webIngress.ingressClassName }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.jitsi.webIngress.tls }}
+  tls:
+    {{- range . }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.jitsi.webIngress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Exact
+            backend:
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: 80
+    {{- end }}
+{{- end }}

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Entrypoint del container eventi-dtd-load-test.
+# Entrypoint del container pa-webinar-load-test.
 # Conia un JWT, lancia Malleus Jitsificus con i parametri passati via env.
 #
 # Env richieste:
@@ -8,7 +8,7 @@
 #   JITSI_JWT_SUBJECT       sub claim (il Jitsi domain)
 #
 # Env opzionali (default tra parentesi):
-#   JITSI_JWT_ISSUER        (eventi-dtd)
+#   JITSI_JWT_ISSUER        (pa-webinar)
 #   JITSI_JWT_AUDIENCE      (jitsi)
 #   JITSI_ROOM              (load-test-room)
 #   PARTICIPANTS            (20)
@@ -25,7 +25,7 @@ set -euo pipefail
 : "${JITSI_JWT_SECRET:?JITSI_JWT_SECRET required}"
 : "${JITSI_JWT_SUBJECT:?JITSI_JWT_SUBJECT required}"
 
-export JITSI_JWT_ISSUER="${JITSI_JWT_ISSUER:-eventi-dtd}"
+export JITSI_JWT_ISSUER="${JITSI_JWT_ISSUER:-pa-webinar}"
 export JITSI_JWT_AUDIENCE="${JITSI_JWT_AUDIENCE:-jitsi}"
 
 JITSI_ROOM="${JITSI_ROOM:-load-test-room}"

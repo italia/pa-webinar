@@ -219,7 +219,7 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
           <Icon icon="it-info-circle" className="me-2" />
           {t('jibri.configureHint')}{' '}
           <a
-            href="https://github.com/italia/eventi-dtd/blob/main/docs/DEPLOYMENT.md#configurazione-registrazione-video-jibri"
+            href="https://github.com/italia/pa-webinar/blob/main/docs/DEPLOYMENT.md#configurazione-registrazione-video-jibri"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -235,7 +235,7 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
           {t('note')}
         </p>
         <Link
-          href="https://github.com/italia/eventi-dtd/blob/main/docs/DEPLOYMENT.md"
+          href="https://github.com/italia/pa-webinar/blob/main/docs/DEPLOYMENT.md"
           className="small"
         >
           {t('deployDocs')}

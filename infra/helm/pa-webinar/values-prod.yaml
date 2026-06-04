@@ -1,0 +1,43 @@
+# ─────────────────────────────────────────────────────────────
+# pa-webinar — Generic production overrides
+#
+# For a specific cluster config, use values-production.yaml or
+# create your own override file based on examples/values-full.yaml.
+#
+# Usage:
+#   helm install videocall ./infra/helm/pa-webinar \
+#     -f values.yaml -f values-prod.yaml -n videocall
+# ─────────────────────────────────────────────────────────────
+
+app:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 8
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Use external database — no subchart
+postgresql:
+  enabled: false
+  external:
+    existingSecret: "videocall-secrets"
+    secretKey: "DATABASE_URL"
+
+jitsi:
+  enabled: true
+
+jitsi-meet:
+  jvb:
+    replicaCount: 0

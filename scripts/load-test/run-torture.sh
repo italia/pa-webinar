@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run jitsi-meet-torture against an eventi-dtd deployment.
+# Run jitsi-meet-torture against an pa-webinar deployment.
 #
 # Wraps Maven invocation of the Malleus Jitsificus scenario with
 # sensible defaults for this project. Supports three access modes:

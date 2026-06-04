@@ -52,7 +52,7 @@ const mmssToSec = (mmss: string): number | null => {
   return Number(m[1]) * 60 + Number(m[2]);
 };
 
-const LANG_STORAGE_KEY = 'eventi-dtd:summary-lang';
+const LANG_STORAGE_KEY = 'pa-webinar:summary-lang';
 
 export default function PostEventHero({
   structured,
