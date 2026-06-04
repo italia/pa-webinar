@@ -31,7 +31,7 @@ jobs:
       postgres:
         image: mirror.gcr.io/library/postgres:16-alpine
         env:
-          POSTGRES_DB: eventi_dtd_test
+          POSTGRES_DB: pa_webinar_test
           POSTGRES_USER: eventi
           POSTGRES_PASSWORD: test
         ports: ["5432:5432"]
@@ -49,7 +49,7 @@ jobs:
       - run: npm ci
       - run: npm run test --workspace=app
         env:
-          DATABASE_URL: postgresql://eventi:test@localhost:5432/eventi_dtd_test
+          DATABASE_URL: postgresql://eventi:test@localhost:5432/pa_webinar_test
 
   security:
     name: Security Scan
@@ -92,7 +92,7 @@ jobs:
       postgres:
         image: mirror.gcr.io/library/postgres:16-alpine
         env:
-          POSTGRES_DB: eventi_dtd_test
+          POSTGRES_DB: pa_webinar_test
           POSTGRES_USER: eventi
           POSTGRES_PASSWORD: test
         ports: ["5432:5432"]
@@ -111,16 +111,16 @@ jobs:
       - name: Apply migrations
         run: npx prisma migrate deploy --schema=app/prisma/schema.prisma
         env:
-          DATABASE_URL: postgresql://eventi:test@localhost:5432/eventi_dtd_test
+          DATABASE_URL: postgresql://eventi:test@localhost:5432/pa_webinar_test
       - name: Verify schema is in sync with migrations
         run: |
           npx prisma migrate diff \
             --from-migrations app/prisma/migrations \
             --to-schema-datamodel app/prisma/schema.prisma \
-            --shadow-database-url postgresql://eventi:test@localhost:5432/eventi_dtd_test \
+            --shadow-database-url postgresql://eventi:test@localhost:5432/pa_webinar_test \
             --exit-code
         env:
-          DATABASE_URL: postgresql://eventi:test@localhost:5432/eventi_dtd_test
+          DATABASE_URL: postgresql://eventi:test@localhost:5432/pa_webinar_test
 
   e2e:
     name: E2E Smoke Tests
@@ -209,7 +209,7 @@ jobs:
         with:
           context: .
           push: false
-          tags: eventi-dtd:${{ github.sha }}
+          tags: pa-webinar:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           no-cache-filters: runner
@@ -217,6 +217,6 @@ jobs:
       - name: Run Trivy on Docker image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: "eventi-dtd:${{ github.sha }}"
+          image-ref: "pa-webinar:${{ github.sha }}"
           severity: "CRITICAL,HIGH"
           exit-code: "1"

@@ -28,7 +28,7 @@ import {
   Row,
 } from 'design-react-kit';
 
-const APP_LABEL = 'eventi-dtd';
+const APP_LABEL = 'pa-webinar';
 const REFRESH_MS = 30_000;
 
 type Range = '24h' | '7d' | '30d';

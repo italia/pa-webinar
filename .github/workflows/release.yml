@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: italia/eventi-dtd
+  IMAGE_NAME: italia/pa-webinar
 
 jobs:
   build-and-push:
@@ -186,12 +186,12 @@ jobs:
       - name: Package chart
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          helm dependency update infra/helm/eventi-dtd
-          helm package infra/helm/eventi-dtd \
+          helm dependency update infra/helm/pa-webinar
+          helm package infra/helm/pa-webinar \
             --version "$VERSION" \
             --app-version "$VERSION"
 
       - name: Upload chart to release
         uses: softprops/action-gh-release@v2
         with:
-          files: eventi-dtd-*.tgz
+          files: pa-webinar-*.tgz

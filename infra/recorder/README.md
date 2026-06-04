@@ -1,6 +1,6 @@
 # multitrack-recorder
 
-Servizio "multitrack recorder" di eventi-dtd — **ADR-013, Fase 3**.
+Servizio "multitrack recorder" di pa-webinar — **ADR-013, Fase 3**.
 
 Un bot headless entra nella stanza Jitsi come partecipante **receive-only
 invisibile**, si sottoscrive a **ogni traccia audio remota** e registra

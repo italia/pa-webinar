@@ -1,0 +1,70 @@
+{{- if and .Values.postprod.enabled .Values.postprod.retention.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-postprod-retention
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: cronjob-postprod-retention
+spec:
+  schedule: {{ .Values.postprod.retention.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 300
+      template:
+        metadata:
+          labels:
+            {{- include "pa-webinar.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: cronjob-postprod-retention
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 100
+            runAsGroup: 101
+            seccompProfile:
+              type: RuntimeDefault
+          {{- if .Values.app.nodeSelector }}
+          nodeSelector:
+            {{- toYaml .Values.app.nodeSelector | nindent 12 }}
+          {{- end }}
+          {{- if .Values.app.tolerations }}
+          tolerations:
+            {{- toYaml .Values.app.tolerations | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: postprod-retention
+              image: {{ .Values.postprod.retention.image }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  curl -sf \
+                    -H "x-api-key: $(CRON_API_KEY)" \
+                    {{ include "pa-webinar.internalUrl" . }}/api/cron/postprod-retention
+              env:
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "pa-webinar.secretName" . }}
+                      key: CRON_API_KEY
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                capabilities:
+                  drop:
+                    - ALL
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
+{{- end }}

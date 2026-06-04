@@ -10,7 +10,7 @@ function warnOnce(len: number): void {
   if (warnedShort) return;
   warnedShort = true;
   console.warn(
-    `[eventi-dtd] APP_SECRET must be at least ${MIN_APP_SECRET_BYTES} bytes ` +
+    `[pa-webinar] APP_SECRET must be at least ${MIN_APP_SECRET_BYTES} bytes ` +
       `(got ${len}). Allowed in non-production environments only.`,
   );
 }

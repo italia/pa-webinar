@@ -163,7 +163,7 @@ postgresql:
   enabled: true
   auth:
     username: eventi
-    database: eventi_dtd
+    database: pa_webinar
     password: "..."
 ```
 
@@ -173,10 +173,10 @@ Imposta `postgresql.enabled: false` e fornisci `DATABASE_URL` nel Secret:
 
 | Provider | Formato |
 |---|---|
-| Azure DB for PostgreSQL | `postgresql://user:pass@server.postgres.database.azure.com:5432/eventi_dtd?sslmode=require` |
-| Amazon RDS | `postgresql://user:pass@instance.region.rds.amazonaws.com:5432/eventi_dtd?sslmode=require` |
-| Google Cloud SQL | `postgresql://user:pass@private-ip:5432/eventi_dtd?sslmode=require` |
-| Self-hosted | `postgresql://user:pass@host:5432/eventi_dtd` |
+| Azure DB for PostgreSQL | `postgresql://user:pass@server.postgres.database.azure.com:5432/pa_webinar?sslmode=require` |
+| Amazon RDS | `postgresql://user:pass@instance.region.rds.amazonaws.com:5432/pa_webinar?sslmode=require` |
+| Google Cloud SQL | `postgresql://user:pass@private-ip:5432/pa_webinar?sslmode=require` |
+| Self-hosted | `postgresql://user:pass@host:5432/pa_webinar` |
 
 ## Redis (chat pub/sub)
 
@@ -514,8 +514,8 @@ jitsi-meet:
 | `NEXT_PUBLIC_APP_URL` | Yes | Public base URL (e.g. `https://videocall.example.com`) |
 | `NEXT_PUBLIC_JITSI_DOMAIN` | Yes | Jitsi Meet server domain (e.g. `jitsi.videocall.example.com`) |
 | `JITSI_JWT_SECRET` | Yes | Shared secret for Jitsi JWT authentication |
-| `JITSI_JWT_APP_ID` | Yes | App identifier used in JWT metadata / `jti` (default: `eventi_dtd`) |
-| `JITSI_JWT_ISSUER` | Yes | JWT issuer (default: `eventi-dtd`) |
+| `JITSI_JWT_APP_ID` | Yes | App identifier used in JWT metadata / `jti` (default: `pa_webinar`) |
+| `JITSI_JWT_ISSUER` | Yes | JWT issuer (default: `pa-webinar`) |
 | `JITSI_JWT_AUDIENCE` | Yes | JWT audience (default: `jitsi`) |
 | `JITSI_JWT_SUBJECT` | No | Jitsi tenant/domain for the `sub` claim. Defaults to `NEXT_PUBLIC_JITSI_DOMAIN` |
 | `SMTP_HOST` | Yes | SMTP server host |

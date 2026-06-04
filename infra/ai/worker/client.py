@@ -1,7 +1,7 @@
-"""HTTP client for the eventi-dtd app's /api/internal/postprod-* endpoints.
+"""HTTP client for the pa-webinar app's /api/internal/postprod-* endpoints.
 
 The worker talks to the app over cluster-internal Service DNS
-(``http://eventi-dtd-web:3000`` by default). All endpoints are
+(``http://pa-webinar-web:3000`` by default). All endpoints are
 authenticated with the shared ``CRON_API_KEY`` via the ``x-api-key``
 header.
 

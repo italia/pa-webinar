@@ -1,4 +1,4 @@
-# Architettura — eventi-dtd
+# Architettura — pa-webinar
 
 Documento tecnico di riferimento per sviluppatori, sistemisti e personale tecnico della PA.
 
@@ -8,12 +8,12 @@ Ultimo aggiornamento: 24 aprile 2026
 
 ## Panoramica del sistema
 
-eventi-dtd è una piattaforma fullstack per eventi digitali pubblici (webinar, presentazioni, riunioni aperte) del Dipartimento per la Trasformazione Digitale. Combina un portale costruito con Next.js e il design system .italia con Jitsi Meet come motore video, collegati tramite IFrame API.
+pa-webinar è una piattaforma fullstack per eventi digitali pubblici (webinar, presentazioni, riunioni aperte) del Dipartimento per la Trasformazione Digitale. Combina un portale costruito con Next.js e il design system .italia con Jitsi Meet come motore video, collegati tramite IFrame API.
 
 ```mermaid
 graph TD
     subgraph Browser
-        UI["Portale eventi-dtd<br/>React + Bootstrap Italia"]
+        UI["Portale pa-webinar<br/>React + Bootstrap Italia"]
         IFRAME["Jitsi IFrame<br/>WebRTC"]
         UI -- "IFrame API commands" --> IFRAME
     end
@@ -748,8 +748,8 @@ Il JWT inviato a Jitsi per autenticare l'accesso alla room:
     }
   },
   "room": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "iss": "eventi-dtd",
-  "sub": "eventi-dtd-app",
+  "iss": "pa-webinar",
+  "sub": "pa-webinar-app",
   "aud": "jitsi",
   "moderator": false,
   "exp": 1711305600
@@ -782,7 +782,7 @@ graph TD
     subgraph "Azure AKS Cluster"
         subgraph "Node Pool: system"
             INGRESS["Ingress Controller<br/>NGINX"]
-            NEXTJS_POD["eventi-dtd<br/>Next.js standalone<br/>2-6 repliche HPA"]
+            NEXTJS_POD["pa-webinar<br/>Next.js standalone<br/>2-6 repliche HPA"]
             PROSODY_POD["Prosody"]
             JICOFO_POD["Jicofo"]
             COTURN_POD["coturn<br/>TURN/STUN relay<br/>TURNS TCP 443"]
@@ -855,7 +855,7 @@ graph TD
 
 ### JVB scaler ed event lifecycle
 
-Lo scaler è un `CronJob` Kubernetes che gira ogni 2 minuti (`jvbScaler.schedule`). È l'unico componente con la RBAC per leggere `spec.replicas` del deployment JVB e per fare `kubectl exec curl /colibri/stats` su ogni pod. File: `infra/helm/eventi-dtd/templates/cronjob-jvb-scaler.yaml` + logica di stato in `app/src/app/api/internal/jvb-desired-replicas/route.ts`.
+Lo scaler è un `CronJob` Kubernetes che gira ogni 2 minuti (`jvbScaler.schedule`). È l'unico componente con la RBAC per leggere `spec.replicas` del deployment JVB e per fare `kubectl exec curl /colibri/stats` su ogni pod. File: `infra/helm/pa-webinar/templates/cronjob-jvb-scaler.yaml` + logica di stato in `app/src/app/api/internal/jvb-desired-replicas/route.ts`.
 
 Ogni tick aggrega `/colibri/stats` attraverso **tutti i pod JVB** (senza questa aggregazione, un singolo hit al Service VIP reached solo un pod e gli altri apparivano vuoti) e scrive uno snapshot canonico su Redis come `jvb:replicas:snapshot` (TTL 300s). Le metriche pubbliche — `/api/status`, `/api/status/infrastructure`, `/api/metrics` — leggono questo snapshot come source of truth (file: `app/src/lib/jvb-snapshot.ts`).
 
@@ -1266,8 +1266,8 @@ L'app espone un endpoint interno `POST /api/admin/metrics/query` (protetto da au
 
 ### Alerting
 
-8 regole PrometheusRule pre-configurate: `EventiDtdDown`, `EventiDtdHighLatency`, `EventiDtdHighErrorRate`, `EventiDtdDatabaseDown`, `JvbHighStress`, `JvbScalingStuck`, `JibriUnavailable`, `HighEventLoopLag`.
+8 regole PrometheusRule pre-configurate: `PaWebinarDown`, `PaWebinarHighLatency`, `PaWebinarHighErrorRate`, `PaWebinarDatabaseDown`, `JvbHighStress`, `JvbScalingStuck`, `JibriUnavailable`, `HighEventLoopLag`.
 
 ### Grafana Dashboard
 
-Dashboard JSON importabile in `infra/grafana/eventi-dtd-dashboard.json` con 5 sezioni: Overview, Application Performance, JVB/Jitsi, Infrastructure, Events Lifecycle. Auto-importabile via Helm ConfigMap con sidecar Grafana.
+Dashboard JSON importabile in `infra/grafana/pa-webinar-dashboard.json` con 5 sezioni: Overview, Application Performance, JVB/Jitsi, Infrastructure, Events Lifecycle. Auto-importabile via Helm ConfigMap con sidecar Grafana.

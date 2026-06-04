@@ -1,7 +1,7 @@
 # ADR-011 — Identità cross-evento `Person` + Rubrica
 
 **Stato**: Proposto (2026-04-21)
-**Decisori**: team eventi-dtd / DTD
+**Decisori**: team pa-webinar / DTD
 **Contesto abilitante**: v0.5.0 — Questionari + Rubrica (fase B)
 
 ## Contesto

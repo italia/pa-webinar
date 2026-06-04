@@ -1,6 +1,6 @@
-# Load testing — eventi-dtd
+# Load testing — pa-webinar
 
-Guida pratica per misurare la capacità di un deployment eventi-dtd usando
+Guida pratica per misurare la capacità di un deployment pa-webinar usando
 [jitsi-meet-torture](https://github.com/jitsi/jitsi-meet-torture) — lo stesso
 tool di load test che il progetto Jitsi utilizza in CI per validare le release.
 
@@ -15,8 +15,8 @@ infrastruttura prima di metterla in produzione.
 export JITSI_ROOM="load-test-$(date +%s)"
 
 # 2. Conia un JWT valido (usa lo stesso segreto del tuo deployment)
-export JITSI_JWT_SECRET="$(kubectl -n eventi-dtd get secret \
-  eventi-dtd-app-secrets -o jsonpath='{.data.JITSI_JWT_SECRET}' | base64 -d)"
+export JITSI_JWT_SECRET="$(kubectl -n pa-webinar get secret \
+  pa-webinar-app-secrets -o jsonpath='{.data.JITSI_JWT_SECRET}' | base64 -d)"
 export JITSI_JWT=$(node scripts/load-test/mint-jwt.mjs \
   --room "$JITSI_ROOM" --name "LoadBot")
 
@@ -28,14 +28,14 @@ PARTICIPANTS=100 SENDERS=5 DURATION=600 \
   ./scripts/load-test/run-torture.sh
 ```
 
-## Compatibilità con eventi-dtd
+## Compatibilità con pa-webinar
 
 jitsi-meet-torture è **compatibile** con questo progetto, con alcune note:
 
 | Aspetto | Stato | Note |
 |---|---|---|
-| Accesso alle room | ✅ | Torture apre `<JITSI_URL>/<room>?jwt=...` — è l'URL della room Jitsi, non del portale eventi-dtd |
-| Autenticazione JWT | ✅ | Il chart eventi-dtd configura Prosody per richiedere un JWT valido. `scripts/load-test/mint-jwt.mjs` produce token compatibili con la stessa configurazione dell'app (`app/src/lib/auth/jwt.ts`) |
+| Accesso alle room | ✅ | Torture apre `<JITSI_URL>/<room>?jwt=...` — è l'URL della room Jitsi, non del portale pa-webinar |
+| Autenticazione JWT | ✅ | Il chart pa-webinar configura Prosody per richiedere un JWT valido. `scripts/load-test/mint-jwt.mjs` produce token compatibili con la stessa configurazione dell'app (`app/src/lib/auth/jwt.ts`) |
 | IFrame API del portale | ❌ | Torture **non** usa l'IFrame del portale: va direttamente al dominio Jitsi. Il test misura la capacità del motore video, non del portale Next.js |
 | Q&A, polls, word cloud | ❌ | Non testabili con torture: sono feature del portale. Per un load test end-to-end del portale usa un tool HTTP (k6, Locust) contro le API REST |
 | Recording (Jibri) | ⚠️ | Torture non avvia registrazioni. Se vuoi testare anche Jibri, lancia una registrazione manuale via moderator API durante il run |
@@ -48,7 +48,7 @@ dedicata](#load-test-del-portale).
 ## Come accedere a Jitsi durante i test
 
 Il chart di default espone Jitsi su un hostname pubblico ma **redirecta la
-home page `/`** verso il portale (vedi `infra/helm/eventi-dtd/templates/ingress-jitsi-web.yaml`).
+home page `/`** verso il portale (vedi `infra/helm/pa-webinar/templates/ingress-jitsi-web.yaml`).
 I path delle room (`/nomeroom`), IFrame API (`/external_api.js`), BOSH
 (`/http-bind`) e XMPP WebSocket (`/xmpp-websocket`) restano invece raggiungibili:
 senza di questi l'IFrame del portale non funzionerebbe.
@@ -75,7 +75,7 @@ reali.
 Evita qualunque traffico pubblico usando `kubectl port-forward`:
 
 ```bash
-kubectl -n eventi-dtd port-forward svc/eventi-dtd-jitsi-meet-web 8443:443 &
+kubectl -n pa-webinar port-forward svc/pa-webinar-jitsi-meet-web 8443:443 &
 export JITSI_URL=https://localhost:8443
 ./scripts/load-test/run-torture.sh
 ```
@@ -91,15 +91,15 @@ su rete interna e il test non consuma banda egress:
 
 ```bash
 # 1. Conia un JWT e caricalo come secret
-kubectl -n eventi-dtd create secret generic torture-jwt \
+kubectl -n pa-webinar create secret generic torture-jwt \
   --from-literal=jwt="$(JITSI_JWT_SECRET=$SECRET \
     node scripts/load-test/mint-jwt.mjs --room load-test --name Bot)"
 
 # 2. Modifica scripts/load-test/k8s-job.yaml: sostituisci RELEASE-NAME e NAMESPACE
 # 3. Applica il Job
-kubectl -n eventi-dtd apply -f scripts/load-test/k8s-job.yaml
-kubectl -n eventi-dtd logs -f job/torture
-kubectl -n eventi-dtd delete job torture
+kubectl -n pa-webinar apply -f scripts/load-test/k8s-job.yaml
+kubectl -n pa-webinar logs -f job/torture
+kubectl -n pa-webinar delete job torture
 ```
 
 Questa è la modalità che consigliamo per **validare il sizing di produzione**
@@ -111,7 +111,7 @@ JVB e Prosody, ma evita l'ingress.
 Durante il test tieni d'occhio le metriche Prometheus che il chart espone:
 
 ```bash
-kubectl -n eventi-dtd port-forward svc/prometheus-operated 9090:9090
+kubectl -n pa-webinar port-forward svc/prometheus-operated 9090:9090
 ```
 
 Metriche chiave (vedi `docs/ARCHITECTURE.md` § Metriche):
@@ -173,7 +173,7 @@ il riuso.
 
 Quando pubblichi risultati, includi:
 
-- Versione eventi-dtd e versione Jitsi
+- Versione pa-webinar e versione Jitsi
 - Cloud/provider e tipo istanza del node pool JVB
 - Banda di uplink cluster
 - Config `values.yaml` rilevante (CPU/memory JVB, `octo.enabled`, numero repliche)
@@ -204,10 +204,10 @@ dipendenze Maven pre-scaricate. Il build dura 3-5 minuti ma successivamente
 ogni run parte in ~5 secondi.
 
 ```bash
-cd eventi-dtd/scripts/load-test
-podman build -t eventi-dtd-load-test .
+cd pa-webinar/scripts/load-test
+podman build -t pa-webinar-load-test .
 # oppure
-docker build -t eventi-dtd-load-test .
+docker build -t pa-webinar-load-test .
 ```
 
 ### Esecuzione

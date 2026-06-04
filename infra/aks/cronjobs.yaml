@@ -1,16 +1,16 @@
-# Kubernetes CronJobs for eventi-dtd scheduled tasks.
-# Both reference CRON_API_KEY from the eventi-dtd-secrets Secret.
+# Kubernetes CronJobs for pa-webinar scheduled tasks.
+# Both reference CRON_API_KEY from the pa-webinar-secrets Secret.
 #
-# Apply: kubectl apply -f infra/aks/cronjobs.yaml -n eventi-dtd
+# Apply: kubectl apply -f infra/aks/cronjobs.yaml -n pa-webinar
 
 ---
 # 1. Pre-event reminder emails — every 15 minutes
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: eventi-dtd-reminders
+  name: pa-webinar-reminders
   labels:
-    app.kubernetes.io/name: eventi-dtd
+    app.kubernetes.io/name: pa-webinar
     app.kubernetes.io/component: cron-reminders
 spec:
   schedule: "*/15 * * * *"
@@ -24,7 +24,7 @@ spec:
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: eventi-dtd
+            app.kubernetes.io/name: pa-webinar
             app.kubernetes.io/component: cron-reminders
         spec:
           restartPolicy: Never
@@ -42,19 +42,19 @@ spec:
                 - name: CRON_API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: eventi-dtd-secrets
+                      name: pa-webinar-secrets
                       key: CRON_API_KEY
                 - name: APP_URL
-                  value: "http://eventi-dtd-web.eventi-dtd.svc.cluster.local:3000"
+                  value: "http://pa-webinar-web.pa-webinar.svc.cluster.local:3000"
 
 ---
 # 2. GDPR data cleanup — daily at 03:00 UTC
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: eventi-dtd-cleanup
+  name: pa-webinar-cleanup
   labels:
-    app.kubernetes.io/name: eventi-dtd
+    app.kubernetes.io/name: pa-webinar
     app.kubernetes.io/component: cron-cleanup
 spec:
   schedule: "0 3 * * *"
@@ -68,7 +68,7 @@ spec:
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: eventi-dtd
+            app.kubernetes.io/name: pa-webinar
             app.kubernetes.io/component: cron-cleanup
         spec:
           restartPolicy: Never
@@ -86,7 +86,7 @@ spec:
                 - name: CRON_API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: eventi-dtd-secrets
+                      name: pa-webinar-secrets
                       key: CRON_API_KEY
                 - name: APP_URL
-                  value: "http://eventi-dtd-web.eventi-dtd.svc.cluster.local:3000"
+                  value: "http://pa-webinar-web.pa-webinar.svc.cluster.local:3000"

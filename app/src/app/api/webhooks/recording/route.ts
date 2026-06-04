@@ -60,7 +60,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     // Legacy mode: only the bearer is required. Loud one-shot warning so
     // operators notice the missing defence-in-depth in production logs.
     logWarningOnce(
-      '[eventi-dtd] RECORDING_WEBHOOK_SECRET is not set — recording webhook ' +
+      '[pa-webinar] RECORDING_WEBHOOK_SECRET is not set — recording webhook ' +
         'falls back to bearer-only auth. Set this env var (and update the ' +
         'Jibri finalize script) to enforce HMAC signatures.',
     );

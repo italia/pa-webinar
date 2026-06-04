@@ -1,12 +1,12 @@
 # Image pre-built per eseguire jitsi-meet-torture in locale contro un deploy
-# eventi-dtd. Include: OpenJDK 17, Maven, Google Chrome stable, chromedriver
+# pa-webinar. Include: OpenJDK 17, Maven, Google Chrome stable, chromedriver
 # matched, xvfb, jitsi-meet-torture clonato. Il JWT viene generato ogni volta
 # dall'entrypoint leggendo le env JITSI_JWT_*.
 #
 # Build:
-#   docker build -t eventi-dtd-load-test scripts/load-test/
+#   docker build -t pa-webinar-load-test scripts/load-test/
 #   # oppure con podman
-#   podman build -t eventi-dtd-load-test scripts/load-test/
+#   podman build -t pa-webinar-load-test scripts/load-test/
 #
 # Run: vedi scripts/load-test/run-local.sh
 FROM docker.io/library/maven:3.9-eclipse-temurin-17

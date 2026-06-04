@@ -1,5 +1,5 @@
 # Run jitsi-meet-torture as a Kubernetes Job inside the same namespace
-# as the eventi-dtd / jitsi deployment. Bypasses the public ingress and
+# as the pa-webinar / jitsi deployment. Bypasses the public ingress and
 # hits the Jitsi web Service via ClusterIP DNS.
 #
 # Usage:
