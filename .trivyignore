@@ -1,0 +1,10 @@
+# Trivy ignore file (auto-caricato dalla working dir).
+#
+# Falso positivo del secret-scanner: @azure/storage-blob include la
+# connection-string PUBBLICA e ben nota dell'emulatore Azurite
+# (UseDevelopmentStorage=true → account "devstoreaccount1" + AccountKey
+# documentata da Microsoft). Finisce nei bundle compilati .next/ e Trivy
+# la segnala come "azure-storage-account-key". NON è un segreto reale: i
+# segreti di produzione vivono nei Secret Kubernetes, mai nel codice/immagine,
+# e sono coperti dal check GitGuardian.
+azure-storage-account-key
