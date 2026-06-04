@@ -335,3 +335,83 @@ export async function enqueueTranslateLanguage(
 
   return { enqueued: true, jobId: created.id, idempotencyKey };
 }
+
+export interface EnqueueArchiveResult {
+  /** true if a new ARCHIVE job was created, false if it already existed. */
+  enqueued: boolean;
+  jobId: string;
+  idempotencyKey: string;
+}
+
+/**
+ * Enqueue a SINGLE ARCHIVE job for a recording, on demand (admin
+ * "Genera archivio" action). Additive counterpart to
+ * `enqueuePostprodForRecording`: does NOT touch recording status,
+ * consent snapshot or runCount.
+ *
+ * The ARCHIVE job depends on the root job that produced TRANSCRIPT_JSON
+ * (TRANSCRIBE or TRANSCRIBE_MULTITRACK), so it only runs once the
+ * transcript exists — the worker embeds the source-language subtitles
+ * into the MKV. The per-participant tracks are pulled at claim time
+ * (only the still-present ones; purged tracks degrade to video+subs).
+ *
+ * Idempotent: re-invoking for an already-queued archive returns the
+ * existing job (`enqueued: false`).
+ */
+export async function enqueueArchiveJob(
+  tx: PrismaClient | Prisma.TransactionClient,
+  opts: { recordingId: string },
+): Promise<EnqueueArchiveResult> {
+  const recording = await tx.recording.findUnique({
+    where: { id: opts.recordingId },
+    select: { id: true, runCount: true, sourceLanguage: true },
+  });
+  if (!recording) {
+    throw new Error(`recording not found: ${opts.recordingId}`);
+  }
+
+  const sourceLanguage = recording.sourceLanguage ?? 'it';
+
+  // Depend on the root job that produced TRANSCRIPT_JSON so the
+  // subtitles exist when the archive runs. The transcript already
+  // exists at this point (caller enforces), so the dependency is
+  // effectively satisfied.
+  const transcriptArtifact = await tx.postprodArtifact.findFirst({
+    where: { recordingId: recording.id, type: 'TRANSCRIPT_JSON' },
+    select: { jobId: true },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const payload = {
+    runId: recording.id,
+    sourceLanguage,
+  };
+
+  const idempotencyKey = deriveIdempotencyKey({
+    recordingId: recording.id,
+    kind: 'ARCHIVE',
+    runCount: recording.runCount,
+    payload,
+  });
+
+  const existing = await tx.postprodJob.findUnique({
+    where: { idempotencyKey },
+    select: { id: true },
+  });
+  if (existing) {
+    return { enqueued: false, jobId: existing.id, idempotencyKey };
+  }
+
+  const created = await tx.postprodJob.create({
+    data: {
+      recordingId: recording.id,
+      kind: 'ARCHIVE',
+      payload: payload as Prisma.InputJsonValue,
+      idempotencyKey,
+      dependsOnId: transcriptArtifact?.jobId ?? null,
+    },
+    select: { id: true },
+  });
+
+  return { enqueued: true, jobId: created.id, idempotencyKey };
+}

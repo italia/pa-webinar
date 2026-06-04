@@ -24,6 +24,7 @@ import tempfile
 from typing import Any, Dict, List, Optional
 
 from . import align as almod
+from . import archive as arcmod
 from . import client as cli
 from . import llm as llmmod
 from . import multitrack as mtmod
@@ -50,6 +51,15 @@ def configure_logging() -> None:
 
 def _sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _sha256_file(path: str, *, chunk_size: int = 1 << 20) -> str:
+    """SHA-256 di un file in streaming (per artefatti grandi, es. MKV)."""
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
+            h.update(chunk)
+    return h.hexdigest()
 
 
 def _write_and_upload(
@@ -524,6 +534,80 @@ def _parse_vtt_ts(ts: str) -> float:
     return float(parts[0])
 
 
+def run_archive(app: cli.AppClient, job: cli.ClaimResponse) -> None:
+    """Archivio scaricabile multi-traccia (ADR-013).
+
+    Muxa il mix video Jibri + una traccia audio per partecipante
+    (allineata al mix via cross-correlazione) + i sottotitoli VTT in un
+    MKV. Per il download admin/moderatore — l'audio isolato è PII.
+    """
+    if not getattr(job, "sourceDownloadUrl", None):
+        raise RuntimeError("ARCHIVE without source mix (sourceDownloadUrl)")
+    track_inputs = [i for i in job.inputs if i.role == "track"]
+    subtitle_input = next((i for i in job.inputs if i.role == "subtitle"), None)
+    if not track_inputs:
+        raise RuntimeError("ARCHIVE without participant tracks")
+
+    with tempfile.TemporaryDirectory(prefix="postprod-archive-") as workdir:
+        app.progress(job.jobId, "RUNNING", percent=10.0, message="download mix")
+        mix_path = os.path.join(workdir, "mix.mp4")
+        cli.download_to_file(job.sourceDownloadUrl, mix_path)
+
+        sub_path: Optional[str] = None
+        if subtitle_input is not None:
+            sub_path = os.path.join(workdir, "subtitle.vtt")
+            cli.download_to_file(subtitle_input.downloadUrl, sub_path)
+
+        tracks: List[arcmod.ArchiveTrack] = []
+        total = len(track_inputs)
+        for idx, ti in enumerate(track_inputs):
+            tpath = os.path.join(workdir, f"track-{idx}.audio")
+            cli.download_to_file(ti.downloadUrl, tpath)
+            app.progress(
+                job.jobId, "RUNNING",
+                percent=20.0 + 50.0 * idx / max(1, total),
+                message=f"align track {idx + 1}/{total}",
+            )
+            # Allineamento preciso al mix (Opzione C): parti dall'offset
+            # wall-clock del manifest, raffinalo via cross-correlazione.
+            offset_ms = ti.startOffsetMs or 0
+            refined = almod.estimate_track_offset_ms(tpath, mix_path, prior_ms=offset_ms)
+            if refined is not None:
+                offset_ms = refined[0]
+            tracks.append(
+                {
+                    "path": tpath,
+                    "title": ti.displayName or ti.participantId or f"Partecipante {idx + 1}",
+                    "language": None,
+                    "offset_ms": offset_ms,
+                }
+            )
+
+        app.progress(job.jobId, "RUNNING", percent=80.0, message="mux mkv")
+        out_path = os.path.join(workdir, "archive.mkv")
+        arcmod.build_archive_mkv(
+            mix_path=mix_path,
+            tracks=tracks,
+            subtitle_path=sub_path,
+            out_path=out_path,
+        )
+
+        target = job.uploadTargets["archive"]
+        size = os.path.getsize(out_path)
+        cli.upload_from_file(target.url, out_path, content_type=target.contentType)
+        app.register_artifact(
+            job_id=job.jobId,
+            artifact_type="ARCHIVE_MKV",
+            language=None,
+            blob_key=target.blobKey,
+            size_bytes=size,
+            mime_type=target.contentType,
+            content_hash=_sha256_file(out_path),
+            model_id="archive-mux",
+            model_version="ffmpeg-matroska",
+        )
+
+
 def run_one() -> int:
     with cli.AppClient() as app:
         job = app.claim()
@@ -551,6 +635,8 @@ def run_one() -> int:
                 run_translate(app, job)
             elif job.kind == "DUB":
                 run_dub(app, job)
+            elif job.kind == "ARCHIVE":
+                run_archive(app, job)
             elif job.kind == "SUBTITLE":
                 # SUBTITLE is satisfied by TRANSCRIBE today (it emits
                 # the source-lang VTT). If we ever decouple them this

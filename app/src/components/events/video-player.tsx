@@ -40,6 +40,14 @@ export interface AudioTrack {
   label: string;
   /** True for synthetic / AI-generated audio. */
   isSynthetic?: boolean;
+  /**
+   * Offset (secondi) di inizio della traccia rispetto al t0 del video.
+   * Usato dalle tracce per-partecipante (ADR-013): la traccia parte
+   * quando il partecipante è entrato, quindi al tempo-video T l'audio
+   * va posizionato a `T - offsetSec`. Default 0 (doppiaggio: stessa
+   * timeline del video).
+   */
+  offsetSec?: number;
 }
 
 interface VideoPlayerProps {
@@ -171,17 +179,27 @@ function VideoPlayerImpl(
       return;
     }
 
+    // Offset della traccia attiva (per-partecipante: la traccia parte
+    // quando il partecipante è entrato). Posizione audio = videoTime −
+    // offset; prima dell'offset la traccia non esiste (silenzio).
+    const activeOffset =
+      audioTracks?.find((tr) => tr.language === activeAudio)?.offsetSec ?? 0;
+
     const syncTimeAndPlay = (): void => {
+      const rel = v.currentTime - activeOffset;
       try {
-        a.currentTime = v.currentTime;
+        a.currentTime = Math.max(0, rel);
       } catch {
         // se non è ancora pronto, ritentiamo su loadedmetadata sotto.
       }
       a.playbackRate = v.playbackRate;
-      if (!v.paused) {
+      // Prima che il partecipante entri (rel<0): tieni l'audio in pausa.
+      if (!v.paused && rel >= 0) {
         void a.play().catch((err) => {
-          console.warn('[VideoPlayer] dub audio play() failed', err);
+          console.warn('[VideoPlayer] alt audio play() failed', err);
         });
+      } else {
+        a.pause();
       }
     };
 
@@ -208,21 +226,26 @@ function VideoPlayerImpl(
     }
 
     const onPlay = (): void => {
+      const rel = v.currentTime - activeOffset;
       try {
-        a.currentTime = v.currentTime;
+        a.currentTime = Math.max(0, rel);
       } catch {
         // se l'utente preme play subito dopo aver switchato audio, il
         // src potrebbe non essere ancora pronto: ignoriamo.
       }
-      void a.play().catch(() => undefined);
+      if (rel >= 0) void a.play().catch(() => undefined);
     };
     const onPause = (): void => a.pause();
     const onSeek = (): void => {
+      const rel = v.currentTime - activeOffset;
       try {
-        a.currentTime = v.currentTime;
+        a.currentTime = Math.max(0, rel);
       } catch {
         // ignora
       }
+      // Entrato/uscito dalla finestra di presenza del partecipante.
+      if (rel >= 0 && !v.paused) void a.play().catch(() => undefined);
+      else a.pause();
     };
     const onRate = (): void => {
       a.playbackRate = v.playbackRate;
@@ -237,7 +260,7 @@ function VideoPlayerImpl(
       v.removeEventListener('seeked', onSeek);
       v.removeEventListener('ratechange', onRate);
     };
-  }, [activeAudio]);
+  }, [activeAudio, audioTracks]);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
