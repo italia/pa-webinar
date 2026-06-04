@@ -870,6 +870,13 @@ model EventTemplate {
   aiTranscriptEnabled    Boolean @default(false) @map("ai_transcript_enabled")
   aiSummaryEnabled       Boolean @default(false) @map("ai_summary_enabled")
   aiTranslationEnabled   Boolean @default(false) @map("ai_translation_enabled")
+  // Altri default che pre-popolano il wizard (modificabili):
+  // - descriptionTemplate: testo descrizione multilingua pre-compilato.
+  // - defaultRetentionDays: giorni di conservazione dati suggeriti.
+  // - defaultExpectedSpeakers: n° relatori atteso (migliora la diarization).
+  descriptionTemplate     Json? @map("description_template") @db.JsonB
+  defaultRetentionDays    Int?  @map("default_retention_days")
+  defaultExpectedSpeakers Int?  @map("default_expected_speakers")
 
   // Mirrors Event.permissionMatrix: when set, the role×feature matrix
   // is applied on new-event creation instead of the boolean toggles.

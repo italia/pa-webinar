@@ -66,6 +66,10 @@ export default async function CreateEventPage({
         aiTranscriptEnabled: selectedTemplate.aiTranscriptEnabled,
         aiSummaryEnabled: selectedTemplate.aiSummaryEnabled,
         aiTranslationEnabled: selectedTemplate.aiTranslationEnabled,
+        descriptionTemplate:
+          (selectedTemplate.descriptionTemplate as Record<string, string> | null) ?? null,
+        defaultRetentionDays: selectedTemplate.defaultRetentionDays,
+        defaultExpectedSpeakers: selectedTemplate.defaultExpectedSpeakers,
       }
     : null;
 

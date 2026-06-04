@@ -35,6 +35,9 @@ interface SerializedTemplate {
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
   aiTranslationEnabled: boolean;
+  descriptionTemplate: Record<string, string> | null;
+  defaultRetentionDays: number | null;
+  defaultExpectedSpeakers: number | null;
   isSystem: boolean;
   sortOrder: number;
   createdAt: string;
@@ -60,6 +63,9 @@ interface EditingTemplate {
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
   aiTranslationEnabled: boolean;
+  descriptionTemplateIt: string;
+  defaultRetentionDays: number | null;
+  defaultExpectedSpeakers: number | null;
 }
 
 const DEFAULT_NEW: EditingTemplate = {
@@ -77,6 +83,9 @@ const DEFAULT_NEW: EditingTemplate = {
   aiTranscriptEnabled: false,
   aiSummaryEnabled: false,
   aiTranslationEnabled: false,
+  descriptionTemplateIt: '',
+  defaultRetentionDays: null,
+  defaultExpectedSpeakers: null,
 };
 
 export default function TemplateManagement({
@@ -114,6 +123,9 @@ export default function TemplateManagement({
       aiTranscriptEnabled: tpl.aiTranscriptEnabled,
       aiSummaryEnabled: tpl.aiSummaryEnabled,
       aiTranslationEnabled: tpl.aiTranslationEnabled,
+      descriptionTemplateIt: tpl.descriptionTemplate?.it ?? '',
+      defaultRetentionDays: tpl.defaultRetentionDays,
+      defaultExpectedSpeakers: tpl.defaultExpectedSpeakers,
     });
     setEditing(tpl.id);
     setError('');
@@ -124,9 +136,15 @@ export default function TemplateManagement({
     setError('');
     try {
       const isNew = editing === 'new';
-      const body = isNew
-        ? form
-        : { id: editing, ...form };
+      // Mappa il campo UI `descriptionTemplateIt` sul JSON {it} atteso dall'API.
+      const { descriptionTemplateIt, ...rest } = form;
+      const payload = {
+        ...rest,
+        descriptionTemplate: descriptionTemplateIt.trim()
+          ? { it: descriptionTemplateIt.trim() }
+          : null,
+      };
+      const body = isNew ? payload : { id: editing, ...payload };
 
       const res = await fetch('/api/admin/templates', {
         method: isNew ? 'POST' : 'PUT',
@@ -426,6 +444,53 @@ function TemplateForm({
           placeholder="120"
         />
         <small className="form-text text-muted">{t('durationHint')}</small>
+      </FormGroup>
+
+      <FormGroup className="mb-3">
+        <Input
+          id="tpl-retention"
+          label={t('retentionLabel')}
+          type="number"
+          value={form.defaultRetentionDays?.toString() ?? ''}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setField(
+              'defaultRetentionDays',
+              e.target.value.trim() === '' ? null : Number(e.target.value) || null,
+            )
+          }
+          min={1}
+          max={3650}
+        />
+      </FormGroup>
+
+      <FormGroup className="mb-3">
+        <Input
+          id="tpl-speakers"
+          label={t('expectedSpeakersLabel')}
+          type="number"
+          value={form.defaultExpectedSpeakers?.toString() ?? ''}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setField(
+              'defaultExpectedSpeakers',
+              e.target.value.trim() === '' ? null : Number(e.target.value) || null,
+            )
+          }
+          min={1}
+          max={30}
+        />
+      </FormGroup>
+
+      <FormGroup className="mb-3">
+        <TextArea
+          id="tpl-desc-it"
+          label={t('descriptionTemplateLabel')}
+          rows={3}
+          value={form.descriptionTemplateIt}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            setField('descriptionTemplateIt', e.target.value)
+          }
+        />
+        <small className="form-text text-muted">{t('descriptionTemplateHint')}</small>
       </FormGroup>
 
       <div className="mb-3">

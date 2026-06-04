@@ -41,6 +41,9 @@ interface TemplatePreset {
   aiTranscriptEnabled?: boolean;
   aiSummaryEnabled?: boolean;
   aiTranslationEnabled?: boolean;
+  descriptionTemplate?: Record<string, string> | null;
+  defaultRetentionDays?: number | null;
+  defaultExpectedSpeakers?: number | null;
 }
 
 interface Props {

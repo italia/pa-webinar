@@ -57,6 +57,9 @@ export interface WizardTemplatePreset {
   aiTranscriptEnabled?: boolean;
   aiSummaryEnabled?: boolean;
   aiTranslationEnabled?: boolean;
+  descriptionTemplate?: Record<string, string> | null;
+  defaultRetentionDays?: number | null;
+  defaultExpectedSpeakers?: number | null;
 }
 
 export interface WizardProps {
@@ -311,7 +314,11 @@ export default function EventWizard(props: WizardProps) {
     return {
       // Step 1
       title: { it: '', en: '' },
-      description: { it: '', en: '' },
+      // Descrizione pre-compilata dal template (semplificazione), modificabile.
+      description: {
+        it: tpl?.descriptionTemplate?.it ?? '',
+        en: tpl?.descriptionTemplate?.en ?? '',
+      },
       startsAt: toDatetimeLocalInTz(defaultStart, props.siteTimezone),
       endsAt: toDatetimeLocalInTz(defaultEnd, props.siteTimezone),
       timezone: props.siteTimezone,
@@ -346,7 +353,7 @@ export default function EventWizard(props: WizardProps) {
       aiDubbingEnabled: false,
       multitrackRecordingEnabled: false,
       aiTargetLocales: null,
-      expectedSpeakers: null,
+      expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
       // Step 3
       organizers: [],
@@ -360,7 +367,7 @@ export default function EventWizard(props: WizardProps) {
       postEventQuestionnaire: { templateIds: [], adhocQuestions: [] },
 
       // Step 5 fields written here so review can surface them
-      dataRetentionDays: props.defaultRetentionDays,
+      dataRetentionDays: tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
       gdprTemplateId: null,
       privacyPolicyText: '',
       privacyPolicyUrl: null,
