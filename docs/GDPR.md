@@ -90,6 +90,14 @@ garanzie aggiuntive rispetto all'audio misto.
 
 ### Base giuridica e consenso
 
+- **Opt-in a livello evento** (minimizzazione): la registrazione per-partecipante
+  NON è automatica per gli eventi con trascrizione. L'organizzatore la abilita
+  esplicitamente con il flag `Event.multitrackRecordingEnabled` (toggle dedicato
+  nel wizard, sotto "Trascrizione automatica"). Il recorder multi-traccia viene
+  avviato solo per eventi con `recordingEnabled` + `aiTranscriptEnabled` +
+  `multitrackRecordingEnabled` (gate in `/api/internal/recorder-desired`). Senza
+  l'opt-in, la trascrizione usa il fallback su traccia mista (diarization pyannote),
+  senza isolare l'audio del singolo parlante.
 - Il trattamento richiede il **consenso esplicito** dell'interessato
   (Art. 6.1.a GDPR), separato dal consenso alla registrazione audio/video
   standard (`consentRecording`). Il consenso al missaggio non implica il

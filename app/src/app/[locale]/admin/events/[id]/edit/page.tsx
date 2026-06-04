@@ -163,6 +163,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       aiSummaryEnabled: event.aiSummaryEnabled,
       aiTranslationEnabled: event.aiTranslationEnabled,
       aiDubbingEnabled: event.aiDubbingEnabled,
+      multitrackRecordingEnabled: event.multitrackRecordingEnabled,
       aiTargetLocales: event.aiTargetLocales,
       expectedSpeakers: event.expectedSpeakers,
       dataRetentionDays: event.dataRetentionDays,

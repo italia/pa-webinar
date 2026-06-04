@@ -222,6 +222,14 @@ model Event {
   // non è voice clone. Generata SOLO se aiTranslationEnabled è true
   // (serve il transcript tradotto come input).
   aiDubbingEnabled     Boolean @default(false) @map("ai_dubbing_enabled")
+  // ADR-013 Fase 3/5 — registrazione audio PER-PARTECIPANTE (multi-traccia)
+  // per attribuzione speaker certa. OPT-IN esplicito dell'admin: l'audio
+  // isolato del singolo parlante è PII ad alta sensibilità (vicino al
+  // biometrico vocale), quindi NON va attivato automaticamente con la sola
+  // trascrizione. Il recorder-controller crea un recorder SOLO per gli eventi
+  // con questo flag + recordingEnabled + aiTranscriptEnabled. Le tracce sono
+  // intermedie e cancellate dopo la trascrizione (multitrack-purge).
+  multitrackRecordingEnabled Boolean @default(false) @map("multitrack_recording_enabled")
   // Comma-separated ISO-639-1 list of target languages for transcript /
   // summary translation (e.g. "en,fr"). When null, falls back to
   // SiteSetting.aiDefaultTargetLocales.

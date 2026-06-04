@@ -326,6 +326,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.aiDubbingEnabled !== undefined && {
         aiDubbingEnabled: data.aiDubbingEnabled,
       }),
+      ...(data.multitrackRecordingEnabled !== undefined && {
+        multitrackRecordingEnabled: data.multitrackRecordingEnabled,
+      }),
       ...(data.aiTargetLocales !== undefined && {
         aiTargetLocales: data.aiTargetLocales,
       }),

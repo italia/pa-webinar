@@ -982,6 +982,8 @@
       "aiTargetLocalesDesc": "ISO language codes (e.g. en, fr, de) separated by commas. Leave empty to use the site-wide languages.",
       "aiDubbingEnabled": "Audio dubbing",
       "aiDubbingEnabledDesc": "Dubbed audio in the target languages, generated with pre-trained synthetic voices. Does not clone participants' voices.",
+      "multitrackRecordingEnabled": "Per-participant recording (high accuracy)",
+      "multitrackRecordingEnabledDesc": "Records a separate audio track per participant so the transcript attributes who said what with certainty (no more \"Speaker 1/2\"). It processes isolated single-speaker audio (sensitive personal data): tracks are temporary and deleted right after transcription. Requires recording consent.",
       "expectedSpeakers": "Expected number of speakers",
       "expectedSpeakersDesc": "When known (e.g. 3 speakers), setting this improves speaker identification quality. Leave empty to let the pipeline decide.",
       "dataRetentionDays": "Data retention (days after event)",
