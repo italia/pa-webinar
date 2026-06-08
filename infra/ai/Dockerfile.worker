@@ -37,7 +37,19 @@ WORKDIR /opt/worker
 # Pin requirements so reproducibility is not at the mercy of pip's
 # resolver. Versions are picked for CUDA 12.6 compatibility.
 COPY worker/requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Freeze the NGC-provided torch stack (torch/torchvision/torchaudio are
+# built together by NVIDIA against this image's CUDA 12.6). Installing
+# whisperx/pyannote without this constraint lets pip upgrade `torch`
+# (and torchaudio) to a PyPI wheel while leaving torchvision at the NGC
+# build → ABI mismatch → "RuntimeError: operator torchvision::nms does
+# not exist" at `import transformers.pipelines` (whisperx.load_model).
+# Capturing the exact installed versions (incl. local +<hash> segment)
+# into a constraints file keeps pip on the NGC-matched, CUDA-12.6 stack.
+RUN pip list --format=freeze 2>/dev/null \
+        | grep -iE '^(torch|torchvision|torchaudio)==' > /tmp/ngc-torch.txt \
+    && echo "== Freezing NGC torch stack ==" && cat /tmp/ngc-torch.txt \
+    && pip install --no-cache-dir -c /tmp/ngc-torch.txt -r requirements.txt \
+    && python -c "import torch, torchvision; from transformers import pipelines; print('build-check OK: torch', torch.__version__, 'torchvision', torchvision.__version__)"
 
 # Worker code. Layered last so an iteration on Python doesn't rebuild
 # the model layers.
