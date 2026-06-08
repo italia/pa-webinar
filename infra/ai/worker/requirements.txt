@@ -38,8 +38,14 @@ pydantic==2.9.2
 # compatibile per sua dipendenza.
 whisperx>=3.3.0,<3.5.0
 
-# CTranslate2 backend for faster-whisper. Lasciamo a pip risolverlo
-# transitively da whisperx per evitare conflitti.
+# CTranslate2 backend for faster-whisper. MUST be a cuDNN-9 build:
+# CT2 <=4.4.x links cuDNN 8 (libcudnn_ops_infer.so.8), but the base
+# image + the cu124 torch ship cuDNN 9 only, so the older CT2 crashes
+# at ASR time with "Could not load library libcudnn_ops_infer.so.8".
+# CT2 >=4.5.0 links cuDNN 9.x (libcudnn_*.so.9), matching what's present.
+# faster-whisper >=1.1.1 is the first release that allows CT2 4.5.
+ctranslate2>=4.5.0,<5
+faster-whisper>=1.1.1
 
 # Subtitle / VTT writing. Custom helpers in worker/vtt.py use this.
 webvtt-py==0.5.1
