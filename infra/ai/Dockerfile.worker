@@ -55,6 +55,7 @@ COPY worker/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt \
     && (pip uninstall -y flash-attn flash_attn transformer-engine transformer_engine apex || true) \
     && python -c "import torch, torchvision, torchaudio, numpy; from transformers import pipelines, Wav2Vec2ForCTC, Wav2Vec2Processor; import whisperx; print('imports OK: torch', torch.__version__, 'torchaudio', torchaudio.__version__, 'numpy', numpy.__version__)" \
+    && python -c "import ctranslate2 as c; v=tuple(int(x) for x in c.__version__.split('.')[:2]); print('ctranslate2', c.__version__); assert v>=(4,5), 'CT2 must be >=4.5 for cuDNN 9'" \
     && if pip list 2>/dev/null | grep -i 'cu13'; then echo 'BUILD FAIL: a CUDA-13 wheel is present but the GPU driver (550) only supports CUDA 12'; exit 1; else echo 'build-check OK: no CUDA-13 wheels'; fi
 
 # Worker code. Layered last so an iteration on Python doesn't rebuild
