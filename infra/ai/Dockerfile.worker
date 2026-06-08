@@ -45,11 +45,16 @@ COPY worker/requirements.txt ./requirements.txt
 # not exist" at `import transformers.pipelines` (whisperx.load_model).
 # Capturing the exact installed versions (incl. local +<hash> segment)
 # into a constraints file keeps pip on the NGC-matched, CUDA-12.6 stack.
-RUN pip list --format=freeze 2>/dev/null \
-        | grep -iE '^(torch|torchvision|torchaudio)==' > /tmp/ngc-torch.txt \
-    && echo "== Freezing NGC torch stack ==" && cat /tmp/ngc-torch.txt \
-    && pip install --no-cache-dir -c /tmp/ngc-torch.txt -r requirements.txt \
-    && python -c "import torch, torchvision; from transformers import pipelines; print('build-check OK: torch', torch.__version__, 'torchvision', torchvision.__version__)"
+# Capture EXACT installed versions via importlib.metadata (pip's
+# `--format=freeze` renders NGC's torch/torchaudio as `@ file://` refs,
+# so a `^torch==` grep misses them and only pins torchvision — which
+# leaves torch free to drift to a PyPI cu13x wheel + numpy 2.x). We pin
+# the whole scientific quartet (torch/torchvision/torchaudio/numpy) to
+# the NGC-installed versions so installing whisperx/pyannote never
+# upgrades the CUDA-12.6 stack underneath them.
+RUN python -c "import importlib.metadata as md, importlib.util as iu; pkgs=['torch','torchvision','torchaudio','numpy']; lines=[p+'=='+md.version(p) for p in pkgs if iu.find_spec(p)]; open('/tmp/ngc-constraints.txt','w').write('\n'.join(lines)+'\n'); print('== NGC constraints ==\n'+'\n'.join(lines))" \
+    && pip install --no-cache-dir -c /tmp/ngc-constraints.txt -r requirements.txt \
+    && python -c "import torch, torchvision, numpy; from transformers import pipelines; print('build-check OK: torch '+torch.__version__+' torchvision '+torchvision.__version__+' numpy '+numpy.__version__)"
 
 # Worker code. Layered last so an iteration on Python doesn't rebuild
 # the model layers.
