@@ -1,7 +1,24 @@
-# Postprod AI worker dependencies. Versions pinned for CUDA 12.6
-# (nvcr.io/nvidia/pytorch:24.10-py3). Adjust when bumping the base
-# image. Do NOT install packages that talk to external APIs other
-# than the in-cluster app and vLLM Service.
+# Postprod AI worker dependencies.
+# Do NOT install packages that talk to external APIs other than the
+# in-cluster app and vLLM Service.
+#
+# CUDA pinning: the GPU nodes run driver 550.x (A100), which supports
+# CUDA 12.x up to 12.4 but NOT CUDA 13. The NGC base (24.10) ships an
+# *alpha* torch 2.5 and NO torchaudio, so pip pulled torchaudio from
+# PyPI — and the latest (2.11.0) is a CUDA-13 build, crashing the worker
+# with `OSError: libcudart.so.13: cannot open shared object file`.
+# Fix: install a single, self-consistent torch/torchvision/torchaudio
+# trio from the CUDA-12.4 wheel index, overriding the NGC alpha torch.
+# These wheels bundle the CUDA-12 runtime (libcudart.so.12) which the
+# 550 driver runs natively. ctranslate2 (faster-whisper backend) stays
+# on its CUDA-12 build. Bump cu124→cu126/cu128 only after the GPU node
+# driver is bumped to 565+/580+.
+--extra-index-url https://download.pytorch.org/whl/cu124
+torch==2.6.0
+torchvision==0.21.0
+torchaudio==2.6.0
+# pyannote / transformers behave best on numpy 1.x; avoid the 2.x ABI flip.
+numpy<2
 
 # HTTP client — used to talk to the app's /api/internal/* endpoints
 # and to the in-cluster vLLM service. Sync API is plenty here: a
