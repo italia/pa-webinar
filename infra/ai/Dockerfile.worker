@@ -37,25 +37,26 @@ WORKDIR /opt/worker
 # Pin requirements so reproducibility is not at the mercy of pip's
 # resolver. Versions are picked for CUDA 12.6 compatibility.
 COPY worker/requirements.txt ./requirements.txt
-# Freeze the NGC-provided torch stack (torch/torchvision/torchaudio are
-# built together by NVIDIA against this image's CUDA 12.6). Installing
-# whisperx/pyannote without this constraint lets pip upgrade `torch`
-# (and torchaudio) to a PyPI wheel while leaving torchvision at the NGC
-# build → ABI mismatch → "RuntimeError: operator torchvision::nms does
-# not exist" at `import transformers.pipelines` (whisperx.load_model).
-# Capturing the exact installed versions (incl. local +<hash> segment)
-# into a constraints file keeps pip on the NGC-matched, CUDA-12.6 stack.
-# requirements.txt pins a self-consistent CUDA-12.4 torch trio (see the
-# header there) which overrides the NGC alpha torch and brings the
-# matching CUDA-12 runtime. The build-time check below (a) imports the
-# exact chain that used to crash (transformers.pipelines → torchvision)
-# and (b) FAILS the build if any CUDA-13 wheel slipped in, since the
-# GPU node driver (550) cannot run CUDA 13 — catching the libcudart.so.13
-# regression at build time instead of at runtime on the GPU node.
+# requirements.txt pins a self-consistent CUDA-12.4 torch trio (torch/
+# torchvision/torchaudio) that overrides the NGC alpha torch. Then:
+#  - drop NGC's flash-attn / apex / transformer-engine: they were built
+#    against the OLD torch ABI, so after the torch swap they fail to load
+#    ("undefined symbol: _ZN3c105Error...") and transformers auto-imports
+#    flash-attn for wav2vec2 (whisperx alignment). We don't need them.
+#  - install cuDNN 8 into a SIDE dir: whisperx pins faster-whisper to a
+#    CTranslate2 4.4.x build that links cuDNN 8 (libcudnn_ops_infer.so.8),
+#    but the base ships cuDNN 9 only. Bumping CT2 to a cuDNN-9 build would
+#    require dropping the whisperx<3.5 cap (pyannote-3.3 align). cuDNN 8
+#    and 9 coexist (distinct sonames); LD_LIBRARY_PATH (set below) puts
+#    the cuDNN-8 dir first so CT2 finds .so.8 while torch keeps its .so.9.
+# Build-time check imports the full whisperx chain (catches ABI breaks in
+# CI) and fails if any CUDA-13 wheel slipped in (driver 550 = CUDA 12 max).
 RUN pip install --no-cache-dir -r requirements.txt \
     && (pip uninstall -y flash-attn flash_attn transformer-engine transformer_engine apex || true) \
-    && python -c "import torch, torchvision, torchaudio, numpy; from transformers import pipelines, Wav2Vec2ForCTC, Wav2Vec2Processor; import whisperx; print('imports OK: torch', torch.__version__, 'torchaudio', torchaudio.__version__, 'numpy', numpy.__version__)" \
-    && python -c "import ctranslate2 as c; v=tuple(int(x) for x in c.__version__.split('.')[:2]); print('ctranslate2', c.__version__); assert v>=(4,5), 'CT2 must be >=4.5 for cuDNN 9'" \
+    && pip install --no-cache-dir --no-deps --target=/opt/cudnn8 nvidia-cudnn-cu12==8.9.7.29 \
+    && test -f /opt/cudnn8/nvidia/cudnn/lib/libcudnn_ops_infer.so.8 \
+    && echo 'cuDNN 8 libs staged for CTranslate2' \
+    && python -c "import torch, torchvision, torchaudio, numpy; from transformers import pipelines, Wav2Vec2ForCTC, Wav2Vec2Processor; import whisperx, ctranslate2; print('imports OK: torch', torch.__version__, 'CT2', ctranslate2.__version__)" \
     && if pip list 2>/dev/null | grep -i 'cu13'; then echo 'BUILD FAIL: a CUDA-13 wheel is present but the GPU driver (550) only supports CUDA 12'; exit 1; else echo 'build-check OK: no CUDA-13 wheels'; fi
 
 # Worker code. Layered last so an iteration on Python doesn't rebuild
@@ -71,6 +72,9 @@ ENV HF_HOME=/models \
     TORCH_HOME=/models/torch \
     WORK_DIR=/work \
     PYTHONUNBUFFERED=1
+# Put the staged cuDNN-8 libs first so CTranslate2 (faster-whisper) finds
+# libcudnn_*.so.8; torch still resolves its own bundled cuDNN 9 (.so.9).
+ENV LD_LIBRARY_PATH=/opt/cudnn8/nvidia/cudnn/lib:${LD_LIBRARY_PATH}
 
 # Health: the worker has no HTTP surface (it's a Job, not a service)
 # — readiness is implicit in exit code 0 from the entrypoint.
