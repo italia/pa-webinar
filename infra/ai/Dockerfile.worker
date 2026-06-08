@@ -53,7 +53,8 @@ COPY worker/requirements.txt ./requirements.txt
 # GPU node driver (550) cannot run CUDA 13 — catching the libcudart.so.13
 # regression at build time instead of at runtime on the GPU node.
 RUN pip install --no-cache-dir -r requirements.txt \
-    && python -c "import torch, torchvision, torchaudio, numpy; from transformers import pipelines; print('imports OK: torch', torch.__version__, 'torchaudio', torchaudio.__version__, 'numpy', numpy.__version__)" \
+    && (pip uninstall -y flash-attn flash_attn transformer-engine transformer_engine apex || true) \
+    && python -c "import torch, torchvision, torchaudio, numpy; from transformers import pipelines, Wav2Vec2ForCTC, Wav2Vec2Processor; import whisperx; print('imports OK: torch', torch.__version__, 'torchaudio', torchaudio.__version__, 'numpy', numpy.__version__)" \
     && if pip list 2>/dev/null | grep -i 'cu13'; then echo 'BUILD FAIL: a CUDA-13 wheel is present but the GPU driver (550) only supports CUDA 12'; exit 1; else echo 'build-check OK: no CUDA-13 wheels'; fi
 
 # Worker code. Layered last so an iteration on Python doesn't rebuild
