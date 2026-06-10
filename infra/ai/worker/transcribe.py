@@ -84,6 +84,93 @@ HALLUCINATION_AVG_LOGPROB_THRESHOLD = -1.0
 HALLUCINATION_NO_SPEECH_THRESHOLD = 0.6
 
 
+def _hf_token_usable(token: Optional[str]) -> bool:
+    """True se il token HF sembra reale.
+
+    I token HuggingFace iniziano con ``hf_`` e sono lunghi ~37 char.
+    Segnaposti come ``stub-hf-token`` (quello cablato di default nel
+    secret) o stringhe vuote → False, così saltiamo del tutto la
+    diarization invece di tentare (e fallire) il download del modello
+    gated pyannote — che ritorna ``None`` e fa esplodere
+    ``.to(device)`` (l'errore "'NoneType' object has no attribute 'to'"
+    che bruciava un'intera run GPU prima di crashare).
+    """
+    return bool(token and token.startswith("hf_") and len(token) >= 20)
+
+
+def _single_speaker_segments(aligned: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Fallback senza diarization: tutti i segmenti → un unico SPEAKER_00.
+
+    Usato quando il token HF non è valido o pyannote fallisce. Il
+    transcript resta pienamente utilizzabile a valle (sintesi,
+    traduzione, dubbing); manca solo la separazione per-speaker.
+    """
+    out: List[Dict[str, Any]] = []
+    for seg in aligned.get("segments", []):
+        # Stessa forma del path diarizzato (start/end/text/speaker +
+        # confidence): niente array `words` pesante da trascinare.
+        out.append({
+            "start": seg["start"],
+            "end": seg["end"],
+            "text": (seg.get("text") or "").strip(),
+            "speaker": "SPEAKER_00",
+            "avg_logprob": seg.get("avg_logprob"),
+            "no_speech_prob": seg.get("no_speech_prob"),
+        })
+    return out
+
+
+def _diarize_segments(
+    whisperx: Any,
+    aligned: Dict[str, Any],
+    audio: Any,
+    *,
+    hf_token: Optional[str],
+    expected_speakers: Optional[int],
+    device: str,
+) -> List[Dict[str, Any]]:
+    """Diarizza i segmenti allineati, con fallback single-speaker.
+
+    Ritorna la lista di segmenti con campo ``speaker``. La diarization è
+    **best-effort**: se il token HF non è valido (segnaposto/assente) o
+    pyannote fallisce per qualunque ragione, ogni segmento riceve
+    ``SPEAKER_00`` invece di far fallire il job. Così un token non
+    configurato non spreca mai una run GPU completa.
+    """
+    if not _hf_token_usable(hf_token):
+        log.warning(
+            "HF token assente o non valido (atteso 'hf_…'): salto la "
+            "diarization e produco un transcript single-speaker. Imposta "
+            "un token HF reale (con le condizioni pyannote accettate) nel "
+            "secret per ottenere l'attribuzione per-speaker."
+        )
+        return _single_speaker_segments(aligned)
+
+    try:
+        log.info("running diarization (expected_speakers=%s)", expected_speakers)
+        diarize_pipeline = whisperx.DiarizationPipeline(
+            use_auth_token=hf_token, device=device
+        )
+        # Quando il moderatore conosce il numero di speaker, lo forziamo:
+        # min_speakers == max_speakers == expected_speakers fissa k.
+        if expected_speakers and expected_speakers > 0:
+            diarize_segments = diarize_pipeline(
+                audio,
+                min_speakers=expected_speakers,
+                max_speakers=expected_speakers,
+            )
+        else:
+            diarize_segments = diarize_pipeline(audio)
+        diarized = whisperx.assign_word_speakers(diarize_segments, aligned)
+        return diarized["segments"]
+    except Exception:  # noqa: BLE001 — diarization è best-effort
+        log.exception(
+            "diarization fallita — degrado a single-speaker (il transcript "
+            "resta valido per sintesi/traduzione/dubbing)"
+        )
+        return _single_speaker_segments(aligned)
+
+
 def transcribe_with_whisperx(
     audio_path: str,
     *,
@@ -163,28 +250,22 @@ def transcribe_with_whisperx(
         return_char_alignments=False,
     )
 
-    # Diarization. Uses pyannote 3.1 — model is gated, the HF token
-    # must be set (and TOS accepted) before the image is built.
-    log.info("running diarization (expected_speakers=%s)", expected_speakers)
-    diarize_pipeline = whisperx.DiarizationPipeline(
-        use_auth_token=hf_token, device=device
+    # Diarization (chi-parla) con pyannote 3.1 — modello GATED. È
+    # best-effort: senza token HF valido o se pyannote fallisce,
+    # `_diarize_segments` degrada a single-speaker invece di crashare.
+    diarized_segments = _diarize_segments(
+        whisperx,
+        aligned,
+        audio,
+        hf_token=hf_token,
+        expected_speakers=expected_speakers,
+        device=device,
     )
-    # Quando il moderatore conosce il numero di speaker, lo forziamo:
-    # entrambi min_speakers e max_speakers a expected_speakers fissa k.
-    if expected_speakers and expected_speakers > 0:
-        diarize_segments = diarize_pipeline(
-            audio,
-            min_speakers=expected_speakers,
-            max_speakers=expected_speakers,
-        )
-    else:
-        diarize_segments = diarize_pipeline(audio)
-    diarized = whisperx.assign_word_speakers(diarize_segments, aligned)
 
     segments = []
     speech_by_label: Dict[str, float] = {}
-    for seg in diarized["segments"]:
-        speaker = seg.get("speaker") or "SPEAKER_??"
+    for seg in diarized_segments:
+        speaker = seg.get("speaker") or "SPEAKER_00"
         # Propaga avg_logprob come confidence per il frontend (badge
         # "trascrizione meno sicura"). Il segment originale lo
         # contiene se l'allineamento non l'ha rimosso.
