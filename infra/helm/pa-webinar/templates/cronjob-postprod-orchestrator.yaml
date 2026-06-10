@@ -95,6 +95,29 @@ spec:
                     | awk 'NF{s+=$1} END {print s+0}')
                   ACTIVE=${ACTIVE:-0}
                   log "active workers=$ACTIVE desired=$DESIRED runnable=$RUNNABLE"
+{{- if .Values.postprod.vllm.autoscale }}
+
+                  # ── 1b. vLLM on-demand ───────────────────────────
+                  # vLLM e' un Deployment GPU persistente: lasciarlo a
+                  # replicas=1 tiene acceso l'A100 (~3.40 EUR/h) anche a
+                  # vuoto e vanifica lo scale-to-zero del pool. Lo
+                  # accendiamo solo quando c'e' lavoro (desired>0 o worker
+                  # ancora attivi) e lo spegniamo quando la pipeline e' idle.
+                  # Idempotente: scala solo se serve. Se il Deployment non
+                  # esiste (vLLM non deployato) non fa nulla.
+                  VLLM_DEPLOY="{{ .Values.postprod.vllm.deploymentName | default (printf "%s-vllm" (include "pa-webinar.fullname" .)) }}"
+                  if [ "$DESIRED" -gt 0 ] || [ "$ACTIVE" -gt 0 ]; then
+                    VLLM_WANT=1
+                  else
+                    VLLM_WANT=0
+                  fi
+                  VLLM_HAVE=$(kubectl get deploy -n "$NS" "$VLLM_DEPLOY" \
+                    -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "")
+                  if [ -n "$VLLM_HAVE" ] && [ "$VLLM_HAVE" != "$VLLM_WANT" ]; then
+                    log "vLLM $VLLM_DEPLOY: scaling $VLLM_HAVE -> $VLLM_WANT"
+                    kubectl scale deploy -n "$NS" "$VLLM_DEPLOY" --replicas="$VLLM_WANT" || true
+                  fi
+{{- end }}
 
                   NEEDED=$((DESIRED - ACTIVE))
                   if [ "$NEEDED" -le 0 ]; then
@@ -160,6 +183,16 @@ rules:
   - apiGroups: ["batch"]
     resources: ["jobs"]
     verbs: ["get", "list", "create", "delete"]
+{{- if .Values.postprod.vllm.autoscale }}
+  # vLLM on-demand: l'orchestrator scala il Deployment vLLM su/giu'
+  # in base al carico (vedi sezione 1b dello script).
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "update", "patch"]
+{{- end }}
   # No access to pods / exec / secrets — workers receive secrets via
   # envFrom in their own podSpec, not through the orchestrator.
 ---

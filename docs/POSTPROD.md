@@ -550,6 +550,11 @@ spec:
     spec:
       nodeSelector: { workload: ai-gpu }
       tolerations:
+        # Il pool aigpu e' Spot (priority=Spot): oltre al taint custom
+        # workload=ai-gpu va tollerato il taint di sistema
+        # kubernetes.azure.com/scalesetpriority=spot, altrimenti vLLM non
+        # si schedula sul pool.
+        - { key: kubernetes.azure.com/scalesetpriority, operator: Equal, value: spot, effect: NoSchedule }
         - { key: workload, operator: Equal, value: ai-gpu, effect: NoSchedule }
       containers:
         - name: vllm
@@ -582,6 +587,22 @@ spec:
 Con `min_count = 0` su autoscaler, il pool si spegne quando nessun
 worker o vLLM è running. Se hai bisogno di latenza bassa, pinna
 `min_count = 1` (costo: ~€2500/mese sempre on).
+
+> **⚠️ vLLM persistente vanifica lo scale-to-zero.** Questo Deployment a
+> `replicas: 1` tiene un pod che richiede `nvidia.com/gpu` sempre
+> schedulato → il cluster-autoscaler non può mai rimuovere il nodo A100
+> (~€3.40/h anche a vuoto). Due opzioni:
+> - **On-demand (consigliato):** abilita `postprod.vllm.autoscale=true`
+>   nei values del chart. L'orchestrator scala vLLM a 1 quando c'è lavoro
+>   (desired>0 o worker attivi) e a 0 quando la pipeline è idle. Tieni
+>   allora il Deployment a `replicas: 0` come stato di riposo.
+> - **Sempre-on:** solo se serve latenza bassa costante, accettando il
+>   costo continuo.
+>
+> Il pool `aigpu` è ora **Spot** (`ai_gpu_spot=true` in iac-azure): un
+> guardrail (`k8s-configuration/manifests/gpu-node-guardrail.yaml`)
+> avvisa via email se un nodo GPU resta acceso >1h e lo spegne d'ufficio
+> a >2h, come rete di sicurezza contro vLLM lasciato acceso.
 
 ### 5. Build + push immagine worker
 
