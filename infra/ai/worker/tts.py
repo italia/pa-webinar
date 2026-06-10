@@ -24,6 +24,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import wave
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, TypedDict
@@ -314,11 +315,16 @@ def dub_with_piper(
             # TTS del testo. Piper API: voice.synthesize_wav(text, file,
             # speaker_id=N).
             raw_path = os.path.join(workdir, f"seg-{idx:04d}_raw.wav")
-            with open(raw_path, "wb") as f:
+            # piper-tts 1.2.0: `synthesize(text, wave.Wave_write[, speaker_id])`.
+            # NON `synthesize_wav` (esiste solo in piper più recenti → l'errore
+            # "'PiperVoice' object has no attribute 'synthesize_wav'") e NON un
+            # file binario grezzo: vuole un oggetto `wave.open(..., "wb")`, su
+            # cui synthesize imposta framerate/sampwidth/nchannels e scrive.
+            with wave.open(raw_path, "wb") as wav_file:
                 if entry.speaker_id is not None:
-                    piper_voice.synthesize_wav(text, f, speaker_id=entry.speaker_id)
+                    piper_voice.synthesize(text, wav_file, speaker_id=entry.speaker_id)
                 else:
-                    piper_voice.synthesize_wav(text, f)
+                    piper_voice.synthesize(text, wav_file)
 
             # Pitch shift (no-op se pitch_cents=0)
             seg_path = os.path.join(workdir, f"seg-{idx:04d}.wav")

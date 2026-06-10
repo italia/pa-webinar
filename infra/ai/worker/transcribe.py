@@ -161,8 +161,26 @@ def _diarize_segments(
             )
         else:
             diarize_segments = diarize_pipeline(audio)
+        # Diagnostica: quanti speaker ha trovato pyannote (raw) PRIMA di
+        # assign_word_speakers — per distinguere "pyannote collassa a 1"
+        # da "assign_word_speakers collassa" (un dialogo a 2 etichettato
+        # tutto SPEAKER_00). diarize_segments è un DataFrame (start/end/speaker).
+        try:
+            uniq = sorted(set(diarize_segments["speaker"].tolist()))
+            durs = {}
+            for _, r in diarize_segments.iterrows():
+                durs[r["speaker"]] = durs.get(r["speaker"], 0.0) + float(r["end"]) - float(r["start"])
+            log.info(
+                "pyannote raw: %d speaker(s) %s durations(s)=%s",
+                len(uniq), uniq, {k: round(v, 1) for k, v in durs.items()},
+            )
+        except Exception:  # noqa: BLE001 — solo diagnostica
+            log.info("pyannote raw: diarize_segments type=%s (no summary)", type(diarize_segments).__name__)
         diarized = whisperx.assign_word_speakers(diarize_segments, aligned)
-        return diarized["segments"]
+        segs = diarized["segments"]
+        assigned = sorted({s.get("speaker") for s in segs if s.get("speaker")})
+        log.info("after assign_word_speakers: %d speaker(s) %s", len(assigned), assigned)
+        return segs
     except Exception:  # noqa: BLE001 — diarization è best-effort
         log.exception(
             "diarization fallita — degrado a single-speaker (il transcript "
