@@ -78,9 +78,36 @@ l'URL pubblico del JSON.
   ```
 - **On-prem / qualsiasi web server**: pubblica il file su un host HTTPS che già
   gestisci (anche un bucket MinIO, un Nginx statico, una GitHub Pages).
-- **Kubernetes ConfigMap + rotta dedicata** (se preferisci tenerlo nel cluster
-  senza object storage): monta il JSON da una `ConfigMap` e servilo da un piccolo
-  endpoint, poi punta `SERVICE_INVENTORY_URL` a quell'endpoint interno.
+- **Kubernetes ConfigMap + path relativo** (nel cluster, senza object storage —
+  utile se lo storage non consente blob pubblici): crea una ConfigMap dal JSON e
+  montala dentro `public/tenants/<tenant>/` del pod app, poi
+  `SERVICE_INVENTORY_URL=/tenants/<tenant>/service-inventory.json`. Con il chart
+  Helm di pa-webinar si fa via `app.extraVolumes`/`extraVolumeMounts` (ricordando
+  di **re-includere** i default `tmp` e `next-cache`, perché Helm sostituisce le
+  liste invece di fonderle):
+  ```bash
+  kubectl create configmap pa-webinar-service-inventory -n <ns> \
+    --from-file=service-inventory.json=service-inventory.json \
+    --dry-run=client -o yaml | kubectl apply -f -
+  ```
+  ```yaml
+  app:
+    env:
+      SERVICE_INVENTORY_URL: "/tenants/<tenant>/service-inventory.json"
+    extraVolumes:
+      - { name: tmp,        emptyDir: { sizeLimit: 100Mi } }
+      - { name: next-cache, emptyDir: { sizeLimit: 500Mi } }
+      - name: service-inventory
+        configMap: { name: pa-webinar-service-inventory }
+    extraVolumeMounts:
+      - { name: tmp,        mountPath: /tmp }
+      - { name: next-cache, mountPath: /app/.next/cache }
+      - name: service-inventory
+        mountPath: /app/app/public/tenants/<tenant>   # public/ dell'immagine standalone (cwd Node = /app/app)
+        readOnly: true
+  ```
+  La ConfigMap (limite 1 MiB) si aggiorna ricreandola; il volume si rinfresca
+  entro ~1 min (o `kubectl rollout restart deploy/<app>` per pickup immediato).
 - **Bake nell'immagine downstream** (`/tenants/<nome>/service-inventory.json` +
   path relativo): sconsigliato per il riuso, accettabile solo per build
   proprietarie; richiede rebuild a ogni modifica.
