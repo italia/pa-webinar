@@ -452,37 +452,10 @@ def run_dub(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         with open(vtt_path, "r", encoding="utf-8") as f:
             vtt_text = f.read()
 
-        # Parse manuale WebVTT → segmenti. webvtt-py è in requirements
-        # ma il parser di base è semplice e più portabile.
-        segments: list[ttsmod.Segment] = []
-        total_duration = 0.0
-        block_lines: list[str] = []
-        for line in vtt_text.split("\n"):
-            if " --> " in line:
-                # nuovo segmento
-                if block_lines:
-                    segments.append({
-                        "start": parsed_start,
-                        "end": parsed_end,
-                        "text": " ".join(block_lines).strip(),
-                    })
-                    block_lines = []
-                ts = line.split(" --> ")
-                parsed_start = _parse_vtt_ts(ts[0].strip())
-                parsed_end = _parse_vtt_ts(ts[1].strip().split()[0])
-                total_duration = max(total_duration, parsed_end)
-            elif line.strip() and not line.strip().isdigit() and line.strip() != "WEBVTT":
-                # Drop the <v Speaker> tag if present.
-                txt = line.strip()
-                if txt.startswith("<v "):
-                    txt = txt.split(">", 1)[-1]
-                block_lines.append(txt)
-        if block_lines:
-            segments.append({
-                "start": parsed_start,
-                "end": parsed_end,
-                "text": " ".join(block_lines).strip(),
-            })
+        # Parse WebVTT tradotto → segmenti TTS (helper puro in vtt.py,
+        # testato: rimuove tag <v> + prefisso "LABEL: " duplicato così
+        # il TTS non pronuncia l'etichetta speaker).
+        segments, total_duration = vttmod.parse_translated_vtt(vtt_text)
 
         app.progress(job.jobId, "RUNNING", percent=20.0, message="parsed transcript")
 
@@ -520,18 +493,6 @@ def run_dub(app: cli.AppClient, job: cli.ClaimResponse) -> None:
             model_version=result.model_version,
             inline_max_bytes=0,  # binario, niente inline
         )
-
-
-def _parse_vtt_ts(ts: str) -> float:
-    """Parse 'HH:MM:SS.mmm' o 'MM:SS.mmm' → float seconds."""
-    parts = ts.strip().split(":")
-    if len(parts) == 3:
-        h, m, s = parts
-        return int(h) * 3600 + int(m) * 60 + float(s)
-    if len(parts) == 2:
-        m, s = parts
-        return int(m) * 60 + float(s)
-    return float(parts[0])
 
 
 def run_archive(app: cli.AppClient, job: cli.ClaimResponse) -> None:

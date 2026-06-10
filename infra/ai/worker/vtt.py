@@ -93,3 +93,70 @@ def segments_to_plain_text(segments: Iterable[Segment]) -> str:
             continue
         out.append(f"[{ts}] {spk}: {text}")
     return "\n".join(out)
+
+
+def _parse_ts(ts: str) -> float:
+    """Parse 'HH:MM:SS.mmm' o 'MM:SS.mmm' → secondi (float)."""
+    parts = ts.strip().split(":")
+    if len(parts) == 3:
+        h, m, s = parts
+        return int(h) * 3600 + int(m) * 60 + float(s)
+    if len(parts) == 2:
+        m, s = parts
+        return int(m) * 60 + float(s)
+    return float(parts[0])
+
+
+def parse_translated_vtt(vtt_text: str) -> "tuple[List[Segment], float]":
+    """Parse un WebVTT (prodotto da `segments_to_vtt`) in segmenti TTS.
+
+    `segments_to_vtt` emette per ogni cue ``<v LABEL>LABEL: testo``:
+    contiene SIA il tag vocale ``<v LABEL>`` SIA un prefisso visibile
+    ``LABEL: `` duplicato. Qui rimuoviamo ENTRAMBI — altrimenti un TTS a
+    valle (Piper, job DUB) pronuncerebbe l'etichetta dello speaker
+    ("SPEAKER zero zero") — e catturiamo LABEL come ``speaker`` del
+    segmento, così il dubbing può assegnare una voce per-speaker (coi
+    nomi reali quando presenti). Viene rimosso SOLO il prefisso che
+    combacia esattamente con l'etichetta del tag, per non intaccare
+    testi tradotti che contengono ':'.
+
+    Ritorna ``(segments, total_duration_sec)``.
+    """
+    segments: List[Segment] = []
+    total_duration = 0.0
+    block_lines: List[str] = []
+    current_speaker: Optional[str] = None
+    parsed_start = 0.0
+    parsed_end = 0.0
+
+    def _push() -> None:
+        if block_lines:
+            segments.append({
+                "start": parsed_start,
+                "end": parsed_end,
+                "text": " ".join(block_lines).strip(),
+                "speaker": current_speaker,
+            })
+
+    for line in vtt_text.split("\n"):
+        if " --> " in line:
+            _push()
+            block_lines = []
+            current_speaker = None
+            ts = line.split(" --> ")
+            parsed_start = _parse_ts(ts[0].strip())
+            parsed_end = _parse_ts(ts[1].strip().split()[0])
+            total_duration = max(total_duration, parsed_end)
+        elif line.strip() and not line.strip().isdigit() and line.strip() != "WEBVTT":
+            txt = line.strip()
+            if txt.startswith("<v "):
+                close = txt.find(">")
+                if close != -1:
+                    current_speaker = txt[3:close].strip() or current_speaker
+                    txt = txt[close + 1:]
+                    prefix = f"{current_speaker}: " if current_speaker else ""
+                    if prefix and txt.startswith(prefix):
+                        txt = txt[len(prefix):]
+            block_lines.append(txt)
+    _push()
+    return segments, total_duration

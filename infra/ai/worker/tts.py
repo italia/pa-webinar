@@ -31,6 +31,40 @@ from typing import List, Optional, TypedDict
 log = logging.getLogger(__name__)
 
 
+# Path delle voci Piper bakate nell'immagine (vedi Dockerfile.worker).
+# Serve da fallback quando il path configurato (providerHints.ttsVoicesPath,
+# es. /models/piper su una PVC/emptyDir non popolata) non contiene voci
+# per la lingua richiesta — così il DUB non fallisce con FileNotFoundError.
+BAKED_VOICES_PATH = "/opt/piper-voices"
+
+
+def _has_voice(root: str, language: str) -> bool:
+    """True se `root/<language>` esiste e contiene almeno un .onnx."""
+    if not root:
+        return False
+    d = Path(root) / language
+    return d.is_dir() and any(d.glob("*.onnx"))
+
+
+def resolve_voices_path(configured: str, language: str) -> str:
+    """Sceglie la dir voci da usare per `language`.
+
+    Preferisce il path configurato; se non esiste/è vuota, ricade sulle
+    voci bakate nell'immagine (`/opt/piper-voices`). Se nessuna delle due
+    ha voci ritorna il path configurato, così l'errore originale
+    (FileNotFoundError in build_voice_pool) resta esplicito.
+    """
+    if _has_voice(configured, language):
+        return configured
+    if _has_voice(BAKED_VOICES_PATH, language):
+        log.info(
+            "voci Piper per '%s' assenti in %s; uso quelle bakate in %s",
+            language, configured, BAKED_VOICES_PATH,
+        )
+        return BAKED_VOICES_PATH
+    return configured
+
+
 class Segment(TypedDict, total=False):
     start: float
     end: float
@@ -197,6 +231,10 @@ def dub_with_piper(
     # builder gira solo in handler DUB.
     from . import voice_pool as vp
     from . import name_gender as ng
+
+    # Risolvi il path voci: se quello configurato è vuoto (es. /models/piper
+    # su emptyDir non seedato), ricadi sulle voci bakate nell'immagine.
+    voices_path = resolve_voices_path(voices_path, target_language)
 
     # Costruisci il pool. Pitch variants attivi così copriamo bene
     # anche le lingue povere (es. IT con 2 voci → 6 timbri).

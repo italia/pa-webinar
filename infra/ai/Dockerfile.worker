@@ -59,6 +59,34 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && python -c "import torch, torchvision, torchaudio, numpy; from transformers import pipelines, Wav2Vec2ForCTC, Wav2Vec2Processor; import whisperx, ctranslate2; print('imports OK: torch', torch.__version__, 'CT2', ctranslate2.__version__)" \
     && if pip list 2>/dev/null | grep -i 'cu13'; then echo 'BUILD FAIL: a CUDA-13 wheel is present but the GPU driver (550) only supports CUDA 12'; exit 1; else echo 'build-check OK: no CUDA-13 wheels'; fi
 
+# Pre-bake Piper TTS voices into the image (rhasspy/piper-voices, MIT,
+# ~20-60MB each, NOT gated → no HF token at build). The DUB job reads
+# them from /opt/piper-voices/<lang>/ at runtime; readOnlyRootFilesystem
+# is fine because Piper only READS the .onnx. This removes the DUB
+# dependency on a seeded /models PVC: worker/tts.py `resolve_voices_path`
+# falls back here when the configured AI_TTS_VOICES_PATH dir is empty
+# (e.g. /models is an unseeded emptyDir). en/fr get an M+F pair for
+# gender-aware multivoice dubbing; it gets paola (source-lang context).
+RUN set -eux; \
+    base="https://huggingface.co/rhasspy/piper-voices/resolve/main"; \
+    for spec in \
+        "en/en_US/lessac/medium/en_US-lessac-medium:en" \
+        "en/en_US/amy/medium/en_US-amy-medium:en" \
+        "fr/fr_FR/tom/medium/fr_FR-tom-medium:fr" \
+        "fr/fr_FR/siwis/medium/fr_FR-siwis-medium:fr" \
+        "it/it_IT/paola/medium/it_IT-paola-medium:it" ; do \
+        stem="${spec%:*}"; lang="${spec##*:}"; fn="${stem##*/}"; \
+        mkdir -p "/opt/piper-voices/$lang"; \
+        for ext in onnx onnx.json; do \
+            python -c "import urllib.request; urllib.request.urlretrieve('$base/$stem.$ext', '/opt/piper-voices/$lang/$fn.$ext')"; \
+        done; \
+        test "$(stat -c%s /opt/piper-voices/$lang/$fn.onnx)" -gt 1000000; \
+        test "$(stat -c%s /opt/piper-voices/$lang/$fn.onnx.json)" -gt 100; \
+        python -c "import json; json.load(open('/opt/piper-voices/$lang/$fn.onnx.json'))"; \
+    done; \
+    chmod -R a+rX /opt/piper-voices; \
+    ls -la /opt/piper-voices/*/
+
 # Worker code. Layered last so an iteration on Python doesn't rebuild
 # the model layers.
 COPY worker/ ./worker/
