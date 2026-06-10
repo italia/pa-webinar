@@ -164,71 +164,71 @@ def main():
         speakers_named = json.loads(m.group(0)) if m else {}
     print("  guesses:", speakers_named)
 
-    # 4) Sintesi inglese
-    print("LLM: translate summary EN…")
-    t0 = time.time()
-    en_resp = llm(
-        [
-            {"role": "system", "content": "You translate Italian PA meeting summaries to English. Output JSON only."},
-            {
-                "role": "user",
-                "content": (
-                    "Translate the following structured Italian summary to English. Output JSON with the same keys "
-                    "(overall_summary, key_decisions, action_items, topics each with title and summary), "
-                    "but English values:\n\n" + json.dumps(summary_it, ensure_ascii=False)
-                ),
-            },
-        ],
-        temperature=0.0,
-        max_tokens=2500,
-        json_mode=True,
-    )
-    print(f"  done in {time.time()-t0:.1f}s")
-    en_resp = re.sub(r"^```(?:json)?\n|\n```$", "", en_resp.strip())
-    try:
-        summary_en = json.loads(en_resp)
-    except Exception:
-        m = re.search(r"\{.*\}", en_resp, re.S)
-        summary_en = json.loads(m.group(0)) if m else {"overall_summary": en_resp}
-
-    # 5) Translate every segment to EN (batch by chunks of N segs)
-    print("LLM: translate transcript EN segment-by-segment…")
-    BATCH = 20
-    en_segments = []
-    t0 = time.time()
-    for i in range(0, len(segs), BATCH):
-        batch = segs[i : i + BATCH]
-        prompt_lines = [f"{j}. {s['text']}" for j, s in enumerate(batch)]
-        resp = llm(
-            [
-                {"role": "system", "content": "Translate Italian transcript lines to English, preserving the numbering. Output one translated line per input. Nothing else."},
-                {"role": "user", "content": "\n".join(prompt_lines)},
-            ],
-            temperature=0.0,
-            max_tokens=1500,
-        )
-        # parse numbered lines
-        translations = {}
-        for ln in resp.splitlines():
-            m = re.match(r"^\s*(\d+)\.\s*(.*)$", ln)
-            if m:
-                translations[int(m.group(1))] = m.group(2).strip()
-        for j, s in enumerate(batch):
-            en = translations.get(j, "")
-            en_segments.append({**s, "text_en": en})
-        print(f"  batch {i // BATCH + 1}/{(len(segs) + BATCH - 1) // BATCH} ({len(translations)}/{len(batch)} translated)")
-    print(f"  total {time.time()-t0:.1f}s")
-
+    # 4+5) Per ogni lingua target: traduci la sintesi strutturata + i
+    # segmenti. Output FLAT: summary_<lang> + transcript_<lang> (segmenti
+    # con campo text_<lang>). EN resta identico (backward-compat con
+    # build_vtt/dub); FR si aggiunge in parallelo. Lingue via env
+    # TARGET_LANGS (default "en,fr").
+    target_langs = [t.strip() for t in os.environ.get("TARGET_LANGS", "en,fr").split(",") if t.strip()]
+    LANG_NAMES = {"en": "English", "fr": "French", "de": "German", "es": "Spanish"}
     out = {
         "summary_it": summary_it,
-        "summary_en": summary_en,
         "speakers_named": speakers_named,
-        "transcript_en": en_segments,
         "model": LLM_MODEL,
+        "target_langs": target_langs,
     }
+    BATCH = 20
+    for lang in target_langs:
+        lname = LANG_NAMES.get(lang, lang)
+        print(f"LLM: translate summary -> {lname}…")
+        t0 = time.time()
+        tr_resp = llm(
+            [
+                {"role": "system", "content": f"You translate Italian PA meeting summaries to {lname}. Output JSON only."},
+                {"role": "user", "content": (
+                    f"Translate the following structured Italian summary to {lname}. Output JSON with the same keys "
+                    "(overall_summary, key_decisions, action_items, topics each with title and summary), "
+                    f"but {lname} values:\n\n" + json.dumps(summary_it, ensure_ascii=False)
+                )},
+            ],
+            temperature=0.0, max_tokens=2500, json_mode=True,
+        )
+        print(f"  done in {time.time()-t0:.1f}s")
+        tr_resp = re.sub(r"^```(?:json)?\n|\n```$", "", tr_resp.strip())
+        try:
+            summary_tr = json.loads(tr_resp)
+        except Exception:
+            m = re.search(r"\{.*\}", tr_resp, re.S)
+            summary_tr = json.loads(m.group(0)) if m else {"overall_summary": tr_resp}
+        out[f"summary_{lang}"] = summary_tr
+
+        print(f"LLM: translate transcript -> {lname} (segment-by-segment)…")
+        tr_segments = []
+        t0 = time.time()
+        for i in range(0, len(segs), BATCH):
+            batch = segs[i : i + BATCH]
+            prompt_lines = [f"{j}. {s['text']}" for j, s in enumerate(batch)]
+            resp = llm(
+                [
+                    {"role": "system", "content": f"Translate Italian transcript lines to {lname}, preserving the numbering. Output one translated line per input. Nothing else."},
+                    {"role": "user", "content": "\n".join(prompt_lines)},
+                ],
+                temperature=0.0, max_tokens=1500,
+            )
+            translations = {}
+            for ln in resp.splitlines():
+                mm = re.match(r"^\s*(\d+)\.\s*(.*)$", ln)
+                if mm:
+                    translations[int(mm.group(1))] = mm.group(2).strip()
+            for j, s in enumerate(batch):
+                tr_segments.append({**s, f"text_{lang}": translations.get(j, "")})
+            print(f"  {lang} batch {i // BATCH + 1}/{(len(segs) + BATCH - 1) // BATCH} ({len(translations)}/{len(batch)})")
+        print(f"  {lang} total {time.time()-t0:.1f}s")
+        out[f"transcript_{lang}"] = tr_segments
+
     with open(OUT, "w") as f:
         json.dump(out, f, indent=2, ensure_ascii=False)
-    print(f"Saved {OUT}")
+    print(f"Saved {OUT} (langs: it + {', '.join(target_langs)})")
 
 
 if __name__ == "__main__":
