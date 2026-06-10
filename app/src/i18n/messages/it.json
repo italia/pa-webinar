@@ -2986,7 +2986,11 @@
     "emailLabel": "Email (facoltativa)",
     "emailHelp": "Solo per eventuale follow-up post-evento",
     "emailInvalid": "Inserisci un indirizzo email valido",
-    "chatLockedMessage": "Inserisci il tuo nome per partecipare alla chat dell'evento."
+    "chatLockedMessage": "Inserisci il tuo nome per partecipare alla chat dell'evento.",
+    "classicView": "Vista classica",
+    "backToGarden": "Torna al parco",
+    "details": "Mostra dettagli",
+    "hideDetails": "Nascondi dettagli"
   },
   "recording": {
     "management": "Registrazione video",
@@ -3090,6 +3094,7 @@
     "classicView": "Vista classica",
     "changeAvatar": "Cambia avatar",
     "peopleInGarden": "{count, plural, =0 {Nessuno nel giardino} one {1 persona nel giardino} other {# persone nel giardino}}",
+    "guestName": "Ospite",
     "hintKeyboard": "Muoviti con WASD o le frecce",
     "hintBanner": "Premi le frecce per camminare nel giardino",
     "hintJoystick": "Trascina per muoverti",

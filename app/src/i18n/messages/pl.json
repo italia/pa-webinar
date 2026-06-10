@@ -2662,7 +2662,11 @@
     "emailLabel": "E-mail (opcjonalny)",
     "emailHelp": "Tylko do ewentualnego kontaktu po wydarzeniu",
     "emailInvalid": "Wprowadź prawidłowy adres e-mail",
-    "chatLockedMessage": "Wprowadź swoje imię, aby uczestniczyć w czacie wydarzenia."
+    "chatLockedMessage": "Wprowadź swoje imię, aby uczestniczyć w czacie wydarzenia.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Nagranie wideo",
@@ -2761,6 +2765,7 @@
     "classicView": "Widok klasyczny",
     "changeAvatar": "Zmień awatara",
     "peopleInGarden": "{count, plural, =0 {Nikt w ogrodzie} one {1 osoba w ogrodzie} few {# osoby w ogrodzie} many {# osób w ogrodzie} other {# osób w ogrodzie}}",
+    "guestName": "Guest",
     "hintKeyboard": "Poruszaj się za pomocą WASD lub strzałek",
     "pickerTitle": "Wybierz swojego awatara",
     "pickerHelp": "Postać reprezentuje Cię w ogrodzie oczekiwania. Możesz ją zmienić w dowolnej chwili.",

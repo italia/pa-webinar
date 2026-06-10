@@ -28,19 +28,26 @@ export interface AvatarPreset {
   hairStyle: 'short' | 'curly' | 'long' | 'hat';
 }
 
+// NOTE: these colours are consumed as SVG *presentation attributes*
+// (`fill={preset.shirt}`), NOT CSS properties. CSS custom properties
+// (`var(--app-*)`) are only resolved inside CSS declarations — a browser
+// treats `fill="var(--app-primary)"` as an invalid attribute value and
+// falls back to the default fill (black), so the avatars rendered as
+// black blobs. Keep literal hex here. The values mirror the design
+// tokens: --app-primary #0066CC, --app-text #17324D, --app-muted #5A768A.
 export const AVATAR_PRESETS: AvatarPreset[] = [
   { id: 'a1', label: 'Azzurro', skin: '#F4C89B', hair: '#2E2219', hairStyle: 'short',
-    shirt: 'var(--app-primary)', trousers: 'var(--app-text)', accent: '#F7A11A' },
+    shirt: '#0066CC', trousers: '#17324D', accent: '#F7A11A' },
   { id: 'a2', label: 'Corallo', skin: '#D4A373', hair: '#3A2419', hairStyle: 'curly',
-    shirt: '#D9364F', trousers: 'var(--app-text)', accent: '#F4E4D1' },
+    shirt: '#D9364F', trousers: '#17324D', accent: '#F4E4D1' },
   { id: 'a3', label: 'Verde',   skin: '#E8C199', hair: '#4A2E1A', hairStyle: 'long',
     shirt: '#008758', trousers: '#3A5472', accent: '#F7A11A' },
   { id: 'a4', label: 'Arancio', skin: '#A67B5B', hair: '#1A0E07', hairStyle: 'short',
-    shirt: '#F7A11A', trousers: 'var(--app-text)', accent: 'var(--app-primary)' },
+    shirt: '#F7A11A', trousers: '#17324D', accent: '#0066CC' },
   { id: 'a5', label: 'Viola',   skin: '#F4C89B', hair: '#6B4423', hairStyle: 'hat',
     shirt: '#7B5AAE', trousers: '#3A5472', accent: '#F4E4D1' },
   { id: 'a6', label: 'Notte',   skin: '#6F4E37', hair: '#0F0804', hairStyle: 'curly',
-    shirt: 'var(--app-text)', trousers: 'var(--app-muted)', accent: '#F7A11A' },
+    shirt: '#17324D', trousers: '#5A768A', accent: '#F7A11A' },
 ];
 
 export function getAvatar(id: string | undefined | null): AvatarPreset {
