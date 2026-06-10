@@ -1,36 +1,37 @@
 'use client';
 
 /**
- * GardenInteractive — fase 2 of ADR-012.
+ * GardenInteractive — fase 2 of ADR-012, full-screen "arcade" redesign.
  *
- * Turns the static waiting-room garden backdrop into a live presence
- * layer: every attendee gets a small avatar, can walk it around with
- * WASD / arrow keys on desktop or a touch joystick on mobile, and
- * sees the other waiting attendees moving in near-real-time.
+ * The waiting room is a full-screen 2D park where the attendee's avatar
+ * is the protagonist: it is present and walkable the moment the page
+ * loads (no name required — a default "guest" identity is used until the
+ * user types a name in the dock), can be moved with WASD / arrow keys on
+ * desktop or a touch joystick on mobile, and shows the other waiting
+ * attendees moving in near-real-time.
  *
  * Movement protocol: the client ticks an animation loop via rAF at
  * 60 Hz, accumulates velocity from keyboard / joystick input, clamps
- * position to [5..95]% of the stage, and POSTs a "ping" every 200 ms
+ * position to the visible play area, and POSTs a "ping" every 200 ms
  * to `/api/events/:slug/garden/ping`. The server writes the peer to
  * Redis with a 10 s TTL and publishes on a channel; the POST response
  * also returns the full current peer list so every tick gives a
- * ~200 ms-fresh view, even without SSE. Polling + pub/sub sidestep
- * the need for a dedicated WebSocket server.
+ * ~200 ms-fresh view, even without SSE.
  *
- * Why not a canvas game engine: scope creep. This stays SVG so it
- * degrades gracefully (screen readers see the card above, not the
- * stage) and doesn't add a heavyweight dependency. Phaser / proper
- * engine lands later if community use justifies it (see ADR-012).
+ * Layout integration (see waiting-room.tsx):
+ *   - This component is mounted inside `.arcade-stage`, which fills the
+ *     viewport. The functional UI (name, countdown, "Entra ora", chat,
+ *     netiquette…) lives in `.arcade-topbar` / `.arcade-dock` / a
+ *     `.arcade-drawer` that float over the stage. The avatar play area
+ *     is clamped vertically so the character never disappears behind
+ *     those overlays (see the bounds effect).
  *
  * Accessibility:
- *   - The stage itself is `aria-hidden`; all informational content
- *     (name input, netiquette, countdown, device check, CTAs) stays
- *     in the waiting-room card above at z-index 1.
- *   - `prefers-reduced-motion` stops the walk-cycle animation so the
- *     avatars translate without bobbing.
- *   - A fallback "Vista classica" toggle hides the entire interactive
- *     layer for users who prefer a static page (also good for
- *     keyboard-only users who don't want to navigate a grid).
+ *   - The stage SVG is `aria-hidden`; all informational content stays in
+ *     the dock/drawer above with real semantics. A "Vista classica"
+ *     toggle (owned by WaitingRoom) swaps the whole experience for a
+ *     static scrollable card for users who prefer no movement.
+ *   - `prefers-reduced-motion` stops the walk-cycle bobbing.
  */
 
 import {
@@ -51,7 +52,6 @@ const WALK_UNITS_PER_SEC = 26; // percent of stage traversed per second
 const PING_MS = 200;
 const LOCAL_STORAGE_USER_ID = 'pawebinar.garden.userId';
 const LOCAL_STORAGE_AVATAR = 'pawebinar.garden.avatarId';
-const LOCAL_STORAGE_HIDDEN = 'pawebinar.garden.hidden';
 const LOCAL_STORAGE_HINT_DISMISSED = 'pawebinar.garden.hintDismissed';
 
 interface Peer {
@@ -67,13 +67,10 @@ interface Peer {
 
 interface GardenInteractiveProps {
   eventSlug: string;
-  /** Display name the local user picked in the waiting-room form.
-   *  Empty string = user hasn't typed anything yet → avatar hidden. */
+  /** Display name the local user picked in the dock. Empty string =
+   *  user hasn't typed anything yet → a localized "guest" label is used
+   *  so the avatar is still present and walkable. */
   displayName: string;
-  /** When true the user opted into the garden experience; false = hidden. */
-  enabled: boolean;
-  /** Called when the user toggles the "Vista classica" button. */
-  onToggle: (enabled: boolean) => void;
 }
 
 function makeId(): string {
@@ -94,52 +91,52 @@ function loadOrCreateUserId(): string {
   }
 }
 
-function loadAvatarId(): string {
-  if (typeof window === 'undefined') return AVATAR_PRESETS[0]!.id;
-  try {
-    return window.localStorage.getItem(LOCAL_STORAGE_AVATAR) || AVATAR_PRESETS[0]!.id;
-  } catch {
-    return AVATAR_PRESETS[0]!.id;
-  }
-}
-
 export default function GardenInteractive({
   eventSlug,
   displayName,
-  enabled,
-  onToggle,
 }: GardenInteractiveProps) {
   const t = useTranslations('garden');
 
   const [userId] = useState<string>(loadOrCreateUserId);
-  const [avatarId, setAvatarId] = useState<string>(loadAvatarId);
+  // avatarId / showHint start at SSR-safe defaults and are hydrated from
+  // localStorage in the mount effect below, so the server and first client
+  // render agree (no hydration mismatch).
+  const [avatarId, setAvatarId] = useState<string>(AVATAR_PRESETS[0]!.id);
   const [showPicker, setShowPicker] = useState(false);
-  // First-time hint banner. Dismissed permanently once the user moves
-  // (auto) or clicks the close button (manual). Persists across reloads
-  // so returning users don't see it again.
-  const [showHint, setShowHint] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    try { return window.localStorage.getItem(LOCAL_STORAGE_HINT_DISMISSED) !== '1'; }
-    catch { return true; }
-  });
+  const [showHint, setShowHint] = useState(false);
+  // The local avatar spawns at a random position, which would differ
+  // between server and client render. Render it only after mount so SSR
+  // never emits a position the client has to reconcile.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    try {
+      const storedAvatar = window.localStorage.getItem(LOCAL_STORAGE_AVATAR);
+      if (storedAvatar) setAvatarId(storedAvatar);
+      setShowHint(window.localStorage.getItem(LOCAL_STORAGE_HINT_DISMISSED) !== '1');
+    } catch {
+      setShowHint(true);
+    }
+  }, []);
   const dismissHint = useCallback(() => {
     setShowHint(false);
     try { window.localStorage.setItem(LOCAL_STORAGE_HINT_DISMISSED, '1'); }
     catch { /* ignore */ }
   }, []);
 
+  // Default identity shown until the user types a name in the dock.
+  const guestLabel = t('guestName');
+  const effectiveName = displayName.trim() || guestLabel;
+
   // Local position + facing, kept in a ref so the rAF loop doesn't
   // thrash state on every frame. React state is only touched on the
-  // ping boundary (every 200 ms) to re-render peers.
-  // Spawn in the foreground band (near the fountain / path) so the
-  // avatar starts OUTSIDE the central card's collision rect on every
-  // viewport. Spawning at y=56..62% (the previous default) put the
-  // avatar inside the card on most desktop layouts → collision then
-  // blocked every move because each step stayed inside the obstacle.
+  // ping boundary (every 200 ms) to re-render peers. Spawn near the
+  // centre of the visible stage so the character is immediately the
+  // protagonist on screen.
   const localRef = useRef({
-    x: 46 + Math.random() * 8,
-    y: 88 + Math.random() * 4,
-    facing: 'up' as Peer['facing'],
+    x: 44 + Math.random() * 12,
+    y: 50 + Math.random() * 8,
+    facing: 'down' as Peer['facing'],
     walkPhase: 0,
   });
 
@@ -149,127 +146,67 @@ export default function GardenInteractive({
   // triggering a closure refresh on every state change.
   const showHintRef = useRef(false);
   useEffect(() => { showHintRef.current = showHint; }, [showHint]);
-  // Obstacle rect in viewBox-percent coords (0..100). Computed from the
-  // central waiting-room card via DOM measurement; null when there's no
-  // card yet (e.g. SSR or transient layouts). The rAF loop uses this
-  // for axis-by-axis collision so the avatar can't walk through the
-  // card — it has to walk around it.
-  const obstacleRectRef = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
+
+  // Vertical play bounds (stage-percent). The topbar caps the top and
+  // the dock caps the bottom so the avatar never walks behind the
+  // floating overlays. Recomputed on resize.
+  const boundsRef = useRef<{ minY: number; maxY: number }>({ minY: 8, maxY: 90 });
   const [peers, setPeers] = useState<Peer[]>([]);
 
   const selfAvatar = useMemo<AvatarPreset>(() => getAvatar(avatarId), [avatarId]);
 
-  // ── Card collision: measure the waiting-room card and project its
-  //   bounding rect into avatar viewBox-percent coords. The garden SVG
-  //   uses preserveAspectRatio="xMidYMax slice" — the same transform
-  //   we apply here to stay consistent. Recomputed on resize and when
-  //   the card layout shifts (image loads, content reflow). ──
+  // ── Play-area bounds: project the topbar/dock screen rects into
+  //   the avatars SVG viewBox-percent space (same viewBox +
+  //   preserveAspectRatio="xMidYMax slice" as the stage). ──
   useEffect(() => {
-    if (!enabled) return;
     const compute = () => {
-      const stage = document.querySelector<HTMLElement>('.waiting-garden-bg');
-      const card = document.querySelector<HTMLElement>('.waiting-card');
-      if (!stage || !card) {
-        obstacleRectRef.current = null;
-        return;
-      }
-      const sRect = stage.getBoundingClientRect();
-      const cRect = card.getBoundingClientRect();
-      if (sRect.width <= 0 || sRect.height <= 0) return;
-      // Replicate xMidYMax slice math: scale = max so the SVG fills the
-      // container with one axis cropped; horizontal anchor = center,
-      // vertical anchor = bottom.
-      const scale = Math.max(sRect.width / STAGE_W, sRect.height / STAGE_H);
-      const stageOffsetX = (sRect.width - STAGE_W * scale) / 2;
-      const stageOffsetY = sRect.height - STAGE_H * scale;
-      const localX = cRect.left - sRect.left;
-      const localY = cRect.top - sRect.top;
-      const vbX = (localX - stageOffsetX) / scale;
-      const vbY = (localY - stageOffsetY) / scale;
-      const obs = {
-        x: (vbX / STAGE_W) * 100,
-        y: (vbY / STAGE_H) * 100,
-        w: (cRect.width / scale / STAGE_W) * 100,
-        h: (cRect.height / scale / STAGE_H) * 100,
+      const stage = document.querySelector<HTMLElement>('.garden-avatars-layer');
+      if (!stage) return;
+      const s = stage.getBoundingClientRect();
+      if (s.width <= 0 || s.height <= 0) return;
+      // Replicate xMidYMax slice: scale = max so the SVG fills the box
+      // with one axis cropped; vertical anchor = bottom.
+      const scale = Math.max(s.width / STAGE_W, s.height / STAGE_H);
+      const offsetY = s.height - STAGE_H * scale;
+      const projectY = (clientY: number) => {
+        const localY = clientY - s.top;
+        const vbY = (localY - offsetY) / scale;
+        return Math.max(0, Math.min(100, (vbY / STAGE_H) * 100));
       };
-      obstacleRectRef.current = obs;
-      // Safety: if the avatar is currently inside the obstacle (e.g.
-      // because the card grew on resize, or the layout settled
-      // post-spawn so the card now covers the spawn point) push it
-      // out to the nearest free edge. Without this, the per-frame
-      // collision check would lock the avatar in place forever.
-      const HX = 3.0;
-      const HY = 7.5;
-      const px = localRef.current.x;
-      const py = localRef.current.y;
-      const insideX = px + HX > obs.x && px - HX < obs.x + obs.w;
-      const insideY = py > obs.y - HY && py - HY < obs.y + obs.h;
-      if (insideX && insideY) {
-        const distLeft = (px + HX) - obs.x;
-        const distRight = (obs.x + obs.w) - (px - HX);
-        const distUp = py - (obs.y - HY);
-        const distDown = (obs.y + obs.h) - (py - HY);
-        const minDist = Math.min(distLeft, distRight, distUp, distDown);
-        if (minDist === distDown) {
-          localRef.current.y = Math.min(95, obs.y + obs.h + HY + 0.5);
-        } else if (minDist === distUp) {
-          localRef.current.y = Math.max(10, obs.y - HY - 0.5);
-        } else if (minDist === distLeft) {
-          localRef.current.x = Math.max(5, obs.x - HX - 0.5);
-        } else {
-          localRef.current.x = Math.min(95, obs.x + obs.w + HX + 0.5);
-        }
-      }
+      const topbar = document.querySelector<HTMLElement>('.arcade-topbar');
+      const dock = document.querySelector<HTMLElement>('.arcade-dock');
+      // Avatar half-height (feet pivot) is ~7% of stage height; add a
+      // little breathing room so the label stays clear of the overlays.
+      const MARGIN = 8;
+      let minY = 6;
+      let maxY = 92;
+      if (topbar) minY = projectY(topbar.getBoundingClientRect().bottom) + MARGIN;
+      if (dock) maxY = projectY(dock.getBoundingClientRect().top) - 2;
+      if (maxY - minY < 12) maxY = Math.min(96, minY + 12); // safety
+      boundsRef.current = { minY, maxY };
+      // Keep the avatar inside the freshly-measured band.
+      localRef.current.y = Math.max(minY, Math.min(maxY, localRef.current.y));
     };
-    compute();
+    // Defer one frame so the dock/topbar have laid out.
+    const raf = requestAnimationFrame(compute);
     const ro = new ResizeObserver(compute);
-    const stageEl = document.querySelector('.waiting-garden-bg');
-    const cardEl = document.querySelector('.waiting-card');
+    const stageEl = document.querySelector('.arcade-stage');
     if (stageEl) ro.observe(stageEl);
-    if (cardEl) ro.observe(cardEl);
     window.addEventListener('resize', compute);
     return () => {
+      cancelAnimationFrame(raf);
       ro.disconnect();
       window.removeEventListener('resize', compute);
     };
-  }, [enabled]);
+  }, []);
 
   // ── Keyboard handling ──
-  // Movement keys behave differently depending on the focused element:
-  //   - Arrow keys: ALWAYS hijacked for avatar movement. If the user is
-  //     focused in a form input, we blur it so subsequent keys keep
-  //     moving the avatar instead of being eaten by the input. This is
-  //     the fix for the demo finding ("nessuno riusciva a muovere il
-  //     personaggio") — the form auto-focuses the name input on mount
-  //     and the previous handler bailed before reaching `recompute`.
-  //   - WASD: only when focus is NOT on an input — otherwise W/A/S/D
-  //     are letters the user is typing.
+  // Arrow keys are ALWAYS hijacked for movement; if focus is in a form
+  // input we blur it so subsequent keys keep moving the avatar instead
+  // of being eaten by the input. WASD only moves when focus is NOT on an
+  // input (otherwise they're letters the user is typing).
   useEffect(() => {
-    if (!enabled) return;
     const down = new Set<string>();
-    const onKeyDown = (e: KeyboardEvent) => {
-      const k = e.key.toLowerCase();
-      const isArrow = k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright';
-      const isWasd = k === 'w' || k === 'a' || k === 's' || k === 'd';
-      if (!isArrow && !isWasd) return;
-      const target = e.target as HTMLElement | null;
-      const isInputLike = !!target && (
-        /^(input|textarea|select)$/i.test(target.tagName) ||
-        target.isContentEditable
-      );
-      if (isInputLike) {
-        // Don't intercept WASD while the user is typing — those are letters.
-        if (!isArrow) return;
-        target!.blur();
-      }
-      e.preventDefault();
-      down.add(k);
-      recompute();
-    };
-    const onKeyUp = (e: KeyboardEvent) => {
-      down.delete(e.key.toLowerCase());
-      recompute();
-    };
     const recompute = () => {
       let dx = 0;
       let dy = 0;
@@ -281,21 +218,40 @@ export default function GardenInteractive({
       if (len > 0) { dx /= len; dy /= len; }
       inputRef.current = { dx, dy };
     };
-    // Use document with capture so we receive arrow events before the
-    // focused input's default cursor-navigation handling kicks in.
+    const onKeyDown = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase();
+      const isArrow = k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright';
+      const isWasd = k === 'w' || k === 'a' || k === 's' || k === 'd';
+      if (!isArrow && !isWasd) return;
+      const target = e.target as HTMLElement | null;
+      const isInputLike = !!target && (
+        /^(input|textarea|select)$/i.test(target.tagName) ||
+        target.isContentEditable
+      );
+      if (isInputLike) {
+        if (!isArrow) return; // don't steal WASD letters while typing
+        target!.blur();
+      }
+      e.preventDefault();
+      down.add(k);
+      recompute();
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      down.delete(e.key.toLowerCase());
+      recompute();
+    };
     document.addEventListener('keydown', onKeyDown, true);
     document.addEventListener('keyup', onKeyUp, true);
     return () => {
       document.removeEventListener('keydown', onKeyDown, true);
       document.removeEventListener('keyup', onKeyUp, true);
     };
-  }, [enabled]);
+  }, []);
 
   // ── Touch joystick handling ──
   const joystickRef = useRef<HTMLDivElement | null>(null);
   const [joystickOffset, setJoystickOffset] = useState<{ x: number; y: number } | null>(null);
   useEffect(() => {
-    if (!enabled) return;
     const el = joystickRef.current;
     if (!el) return;
 
@@ -321,7 +277,6 @@ export default function GardenInteractive({
       const nx = len > 0 ? (dx / len) * clampedLen : 0;
       const ny = len > 0 ? (dy / len) * clampedLen : 0;
       setJoystickOffset({ x: nx, y: ny });
-      // Normalised direction
       const ux = len > 0 ? dx / len : 0;
       const uy = len > 0 ? dy / len : 0;
       const intensity = clampedLen / maxRadius;
@@ -345,12 +300,11 @@ export default function GardenInteractive({
       el.removeEventListener('pointercancel', onEnd);
       el.removeEventListener('pointerleave', onEnd);
     };
-  }, [enabled]);
+  }, []);
 
   // ── rAF animation loop ──
   const [, forceRender] = useState(0);
   useEffect(() => {
-    if (!enabled) return;
     let raf = 0;
     let last = performance.now();
 
@@ -360,8 +314,7 @@ export default function GardenInteractive({
       const { dx, dy } = inputRef.current;
       const moving = dx !== 0 || dy !== 0;
       if (moving) {
-        // Auto-dismiss the first-time hint as soon as the user actually
-        // moves — they figured it out, no need to keep nagging.
+        // Auto-dismiss the first-time hint as soon as the user moves.
         if (showHintRef.current) {
           showHintRef.current = false;
           setShowHint(false);
@@ -369,32 +322,9 @@ export default function GardenInteractive({
           catch { /* ignore */ }
         }
         const step = WALK_UNITS_PER_SEC * dt;
-        const nextX = Math.max(5, Math.min(95, localRef.current.x + dx * step));
-        const nextY = Math.max(10, Math.min(95, localRef.current.y + dy * step));
-        // Axis-by-axis collide against the central card. Updating x and
-        // y separately lets the avatar slide along the card's edges
-        // instead of getting fully stopped on diagonal approaches.
-        // Avatar half-extents are stage-percent approximations of the
-        // rendered avatar footprint (~125×165 px in stage units → ~3%
-        // of width, ~5% of height). The hit box is centred on the
-        // avatar's feet (its drawn pivot), shifted up half-height so
-        // the collision feels right when walking against the front
-        // face of the card.
-        const obs = obstacleRectRef.current;
-        const HX = 3.0;
-        const HY = 7.5;
-        const intersects = (px: number, py: number) =>
-          !!obs &&
-          px + HX > obs.x &&
-          px - HX < obs.x + obs.w &&
-          py > obs.y - HY &&
-          py - HY < obs.y + obs.h;
-        let resolvedX = nextX;
-        let resolvedY = nextY;
-        if (intersects(nextX, localRef.current.y)) resolvedX = localRef.current.x;
-        if (intersects(resolvedX, nextY)) resolvedY = localRef.current.y;
-        localRef.current.x = resolvedX;
-        localRef.current.y = resolvedY;
+        const { minY, maxY } = boundsRef.current;
+        localRef.current.x = Math.max(5, Math.min(95, localRef.current.x + dx * step));
+        localRef.current.y = Math.max(minY, Math.min(maxY, localRef.current.y + dy * step));
         // Facing — use the dominant axis
         if (Math.abs(dx) > Math.abs(dy)) {
           localRef.current.facing = dx > 0 ? 'right' : 'left';
@@ -406,19 +336,18 @@ export default function GardenInteractive({
         localRef.current.walkPhase = 0;
       }
       // Re-render every frame so the local avatar position updates.
-      // Peers only update on ping boundary (cheaper).
       forceRender((n) => (n + 1) % 1_000_000);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [enabled]);
+  }, []);
 
-  // ── Polling ping ──
+  // ── Polling ping ── always pings (using the guest label until the
+  //   user types a name) so presence works from the first second.
   useEffect(() => {
-    if (!enabled) return;
-    if (!displayName || displayName.trim().length < 2) return;
     let cancelled = false;
+    const name = displayName.trim() || guestLabel;
     const tick = async () => {
       if (cancelled) return;
       try {
@@ -427,7 +356,7 @@ export default function GardenInteractive({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userId,
-            displayName: displayName.trim(),
+            displayName: name,
             avatarId,
             x: localRef.current.x,
             y: localRef.current.y,
@@ -448,11 +377,10 @@ export default function GardenInteractive({
     return () => {
       cancelled = true;
       clearInterval(interval);
-      // Best-effort leave signal so others see us disappear sooner than the 10s TTL.
       try {
         const blob = new Blob([JSON.stringify({
           userId,
-          displayName: displayName.trim() || '_',
+          displayName: name,
           avatarId,
           x: localRef.current.x,
           y: localRef.current.y,
@@ -463,7 +391,7 @@ export default function GardenInteractive({
         navigator.sendBeacon?.(`/api/events/${eventSlug}/garden/ping`, blob);
       } catch { /* ignore */ }
     };
-  }, [enabled, eventSlug, displayName, userId, avatarId]);
+  }, [eventSlug, displayName, userId, avatarId, guestLabel]);
 
   // ── Avatar picker ──
   const handlePickAvatar = useCallback((id: string) => {
@@ -472,53 +400,23 @@ export default function GardenInteractive({
     setShowPicker(false);
   }, []);
 
-  // Derive peers excluding self (server echoes our own ping back; filter client-side).
+  // Derive peers excluding self (server echoes our own ping back).
   const otherPeers = useMemo(
     () => peers.filter((p) => p.userId !== userId),
     [peers, userId],
   );
 
-  if (!enabled) {
-    // Render the re-enable affordance as a HUD chip in the same
-    // top-right slot the active garden uses for "Vista classica" — so
-    // toggling is symmetric and the button is always discoverable.
-    // The previous implementation rendered a btn-sm in document flow
-    // at the top of the page where users couldn't find it after
-    // hiding the garden once.
-    return (
-      <div className="garden-hud garden-hud--disabled" aria-live="polite">
-        <div className="garden-hud__right">
-          <button
-            type="button"
-            className="btn btn-sm garden-hud__toggle"
-            onClick={() => {
-              try { window.localStorage.removeItem(LOCAL_STORAGE_HIDDEN); } catch { /* ignore */ }
-              onToggle(true);
-            }}
-          >
-            {t('enable')}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const hasName = displayName.trim().length >= 2;
-
   return (
     <>
       {/* Avatar overlay on the garden stage — absolutely positioned,
-          pointer-events none so the user can still interact with the
-          card above. The local avatar is rendered only if the user
-          has typed a display name (so strangers can't be pinned
-          anonymously). */}
+          pointer-events none so the controls above still work. The local
+          avatar is always rendered (guest identity until a name). */}
       <svg
         className="garden-avatars-layer"
         viewBox={`0 0 ${STAGE_W} ${STAGE_H}`}
         preserveAspectRatio="xMidYMax slice"
         aria-hidden="true"
       >
-        {/* Peers */}
         {otherPeers.map((p) => (
           <g
             key={p.userId}
@@ -532,8 +430,8 @@ export default function GardenInteractive({
             />
           </g>
         ))}
-        {/* Local avatar on top */}
-        {hasName && (
+        {/* Local avatar on top — client-only (random spawn) */}
+        {mounted && (
           <g
             transform={`translate(${(localRef.current.x / 100) * STAGE_W} ${(localRef.current.y / 100) * STAGE_H}) scale(${AVATAR_SCALE})`}
           >
@@ -541,16 +439,14 @@ export default function GardenInteractive({
               preset={selfAvatar}
               facing={localRef.current.facing}
               walkPhase={localRef.current.walkPhase}
-              label={displayName.trim()}
+              label={effectiveName}
               isSelf
             />
           </g>
         )}
       </svg>
 
-      {/* Controls HUD: avatar badge + "vista classica" fallback + joystick (mobile).
-          Kept in its own layer with pointer-events:auto so we don't block the
-          card above the stage. */}
+      {/* Controls HUD: avatar badge + people count + keyboard hint. */}
       <div className="garden-hud" aria-live="polite">
         <div className="garden-hud__left">
           <button
@@ -566,23 +462,10 @@ export default function GardenInteractive({
           </button>
           <div className="garden-hud__meta">
             <div className="garden-hud__count">
-              {t('peopleInGarden', { count: otherPeers.length + (hasName ? 1 : 0) })}
+              {t('peopleInGarden', { count: otherPeers.length + 1 })}
             </div>
             <div className="garden-hud__hint d-none d-md-block">{t('hintKeyboard')}</div>
           </div>
-        </div>
-
-        <div className="garden-hud__right">
-          <button
-            type="button"
-            className="btn btn-sm btn-outline-secondary garden-hud__toggle"
-            onClick={() => {
-              try { window.localStorage.setItem(LOCAL_STORAGE_HIDDEN, '1'); } catch { /* ignore */ }
-              onToggle(false);
-            }}
-          >
-            {t('classicView')}
-          </button>
         </div>
       </div>
 
@@ -601,12 +484,8 @@ export default function GardenInteractive({
       </div>
 
       {/* First-time discovery hint. Floats above the stage, dismisses
-          itself the moment the user actually moves. The whole point is
-          discoverability — the demo found that even users who knew the
-          controls failed to use them because the form input ate the
-          keystrokes. The banner is the visible signal that something
-          interactive lives here. */}
-      {showHint && hasName && (
+          itself the moment the user actually moves. */}
+      {showHint && (
         <div className="garden-hint" role="status" aria-live="polite">
           <div className="garden-hint__keys" aria-hidden="true">
             <span className="garden-hint__key">←</span>

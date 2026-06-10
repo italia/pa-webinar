@@ -2986,7 +2986,11 @@
     "emailLabel": "Email (optional)",
     "emailHelp": "Only for post-event follow-up",
     "emailInvalid": "Please enter a valid email address",
-    "chatLockedMessage": "Enter your name to join the event chat."
+    "chatLockedMessage": "Enter your name to join the event chat.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Video recording",
@@ -3090,6 +3094,7 @@
     "classicView": "Classic view",
     "changeAvatar": "Change avatar",
     "peopleInGarden": "{count, plural, =0 {Nobody in the garden} one {1 person in the garden} other {# people in the garden}}",
+    "guestName": "Guest",
     "hintKeyboard": "Move with WASD or arrow keys",
     "pickerTitle": "Choose your avatar",
     "pickerHelp": "This character represents you in the waiting garden. You can change it any time.",

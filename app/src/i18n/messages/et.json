@@ -2662,7 +2662,11 @@
     "emailLabel": "E-post (valikuline)",
     "emailHelp": "Ainult võimalikuks sündmusejärgseks järelkontaktiks",
     "emailInvalid": "Sisestage kehtiv e-posti aadress",
-    "chatLockedMessage": "Sisestage oma nimi sündmuse vestlusega liitumiseks."
+    "chatLockedMessage": "Sisestage oma nimi sündmuse vestlusega liitumiseks.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Videosalvestis",
@@ -2761,6 +2765,7 @@
     "classicView": "Klassikaline vaade",
     "changeAvatar": "Muuda avatari",
     "peopleInGarden": "{count, plural, =0 {Aias pole kedagi} one {1 inimene aias} other {# inimest aias}}",
+    "guestName": "Guest",
     "hintKeyboard": "Liigu klahvidega WASD või nooltega",
     "pickerTitle": "Vali oma avatar",
     "pickerHelp": "See tegelane esindab teid ooteaias. Saate seda igal ajal muuta.",
