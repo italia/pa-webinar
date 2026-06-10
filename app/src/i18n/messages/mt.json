@@ -2662,7 +2662,11 @@
     "emailLabel": "Email (fakultattiva)",
     "emailHelp": "Biss per eventualu follow-up post-avveniment",
     "emailInvalid": "Daħħal wieħed indirizz email validu",
-    "chatLockedMessage": "Daħħal il-tuo nomu per tipparteċipa lill-chat tal-avveniment."
+    "chatLockedMessage": "Daħħal il-tuo nomu per tipparteċipa lill-chat tal-avveniment.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",
@@ -2761,6 +2765,7 @@
     "classicView": "Vista classica",
     "changeAvatar": "Tbiddel avatar",
     "peopleInGarden": "{count, plural, =0 {Ħadd fil-giardino} one {1 persona fil-giardino} other {# personu fil-giardino}}",
+    "guestName": "Guest",
     "hintKeyboard": "Muoviti ma' WASD jew lu frecce",
     "pickerTitle": "Agħżel il tuo avatar",
     "pickerHelp": "Il personaggio rappresenta tu fil-giardino tal-stennija. Puoi tbiddelrlo meta vuoi.",

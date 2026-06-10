@@ -2662,7 +2662,11 @@
     "emailLabel": "E-pošta (neobavezno)",
     "emailHelp": "Samo za eventualnu naknadnu komunikaciju",
     "emailInvalid": "Unesite valjanu adresu e-pošte",
-    "chatLockedMessage": "Unesite svoje ime za sudjelovanje u chatu događaja."
+    "chatLockedMessage": "Unesite svoje ime za sudjelovanje u chatu događaja.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Video snimka",
@@ -2761,6 +2765,7 @@
     "classicView": "Klasičan prikaz",
     "changeAvatar": "Promijeni avatar",
     "peopleInGarden": "{count, plural, =0 {Nitko u vrtu} one {1 osoba u vrtu} few {# osobe u vrtu} other {# osoba u vrtu}}",
+    "guestName": "Guest",
     "hintKeyboard": "Krećite se WASD ili tipkama sa strelicama",
     "pickerTitle": "Odaberite svoj avatar",
     "pickerHelp": "Lik vas predstavlja u vrtu čekanja. Možete ga promijeniti kad god želite.",

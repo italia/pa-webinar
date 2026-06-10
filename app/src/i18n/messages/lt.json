@@ -2662,7 +2662,11 @@
     "emailLabel": "El. paštas (neprivaloma)",
     "emailHelp": "Tik galimam susisiekimui po renginio",
     "emailInvalid": "Įveskite teisingą el. pašto adresą",
-    "chatLockedMessage": "Įveskite savo vardą, kad galėtumėte dalyvauti renginio pokalbyje."
+    "chatLockedMessage": "Įveskite savo vardą, kad galėtumėte dalyvauti renginio pokalbyje.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Vaizdo įrašas",
@@ -2761,6 +2765,7 @@
     "classicView": "Klasikinis vaizdas",
     "changeAvatar": "Keisti avatarą",
     "peopleInGarden": "{count, plural, =0 {Sode nieko nėra} one {1 asmuo sode} other {# asmenys sode}}",
+    "guestName": "Guest",
     "hintKeyboard": "Judėkite WASD arba rodyklėmis",
     "pickerTitle": "Pasirinkite avatarą",
     "pickerHelp": "Personažas atstovauja jus laukiamajame sode. Galite jį keisti bet kada.",

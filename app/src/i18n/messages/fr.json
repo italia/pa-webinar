@@ -2662,7 +2662,11 @@
     "emailLabel": "E-mail (facultatif)",
     "emailHelp": "Uniquement pour un éventuel suivi après l'événement",
     "emailInvalid": "Saisissez une adresse e-mail valide",
-    "chatLockedMessage": "Saisissez votre nom pour participer à la chat de l'événement."
+    "chatLockedMessage": "Saisissez votre nom pour participer à la chat de l'événement.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Enregistrement vidéo",
@@ -2761,6 +2765,7 @@
     "classicView": "Vue classique",
     "changeAvatar": "Changer d'avatar",
     "peopleInGarden": "{count, plural, =0 {Personne dans le jardin} one {1 personne dans le jardin} other {# personnes dans le jardin}}",
+    "guestName": "Guest",
     "hintKeyboard": "Déplacez-vous avec WASD ou les flèches",
     "pickerTitle": "Choisissez votre avatar",
     "pickerHelp": "Ce personnage vous représente dans le jardin d'attente. Vous pouvez le changer à tout moment.",

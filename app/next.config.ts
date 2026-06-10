@@ -8,6 +8,11 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
+  // The Phaser lobby ships as raw TS from the workspace; let Next transpile it.
+  // It's only ever loaded via a client-only dynamic import (the flagged
+  // experimental waiting-room engine), so Phaser stays out of the main bundle.
+  transpilePackages: ['@pa-webinar/lobby'],
+
   // Don't advertise the framework in the response header — minor
   // information disclosure removed.
   poweredByHeader: false,

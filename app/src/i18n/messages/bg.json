@@ -2662,7 +2662,11 @@
     "emailLabel": "Имейл (по избор)",
     "emailHelp": "Само за евентуален follow-up след събитието",
     "emailInvalid": "Въведете валиден имейл адрес",
-    "chatLockedMessage": "Въведете името си, за да участвате в чата на събитието."
+    "chatLockedMessage": "Въведете името си, за да участвате в чата на събитието.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Видеозапис",
@@ -2761,6 +2765,7 @@
     "classicView": "Класически изглед",
     "changeAvatar": "Смени аватара",
     "peopleInGarden": "{count, plural, =0 {Никой в градината} one {1 човек в градината} other {# души в градината}}",
+    "guestName": "Guest",
     "hintKeyboard": "Движете се с WASD или стрелките",
     "pickerTitle": "Изберете своя аватар",
     "pickerHelp": "Персонажът Ви представлява в градината на изчакване. Можете да го промените по всяко време.",

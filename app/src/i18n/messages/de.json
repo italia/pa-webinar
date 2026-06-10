@@ -2662,7 +2662,11 @@
     "emailLabel": "E-Mail (optional)",
     "emailHelp": "Nur für ein eventuelles Follow-up nach dem Event",
     "emailInvalid": "Bitte eine gültige E-Mail-Adresse eingeben",
-    "chatLockedMessage": "Geben Sie Ihren Namen ein, um am Event-Chat teilzunehmen."
+    "chatLockedMessage": "Geben Sie Ihren Namen ein, um am Event-Chat teilzunehmen.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Videoaufzeichnung",
@@ -2761,6 +2765,7 @@
     "classicView": "Klassische Ansicht",
     "changeAvatar": "Avatar wechseln",
     "peopleInGarden": "{count, plural, =0 {Niemand im Garten} one {1 Person im Garten} other {# Personen im Garten}}",
+    "guestName": "Guest",
     "hintKeyboard": "Bewegen Sie sich mit WASD oder den Pfeiltasten",
     "pickerTitle": "Wählen Sie Ihren Avatar",
     "pickerHelp": "Die Figur repräsentiert Sie im Wartegarten. Sie können sie jederzeit wechseln.",

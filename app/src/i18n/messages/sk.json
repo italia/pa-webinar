@@ -2662,7 +2662,11 @@
     "emailLabel": "E-mail (voliteľný)",
     "emailHelp": "Iba pre prípadný follow-up po podujatí",
     "emailInvalid": "Zadajte platnú e-mailovú adresu",
-    "chatLockedMessage": "Zadajte svoje meno na pripojenie do chatu podujatia."
+    "chatLockedMessage": "Zadajte svoje meno na pripojenie do chatu podujatia.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Videozáznam",
@@ -2761,6 +2765,7 @@
     "classicView": "Klasický pohľad",
     "changeAvatar": "Zmeniť avatar",
     "peopleInGarden": "{count, plural, =0 {Nikto v záhrade} one {1 osoba v záhrade} other {# osôb v záhrade}}",
+    "guestName": "Guest",
     "hintKeyboard": "Pohyb pomocou WASD alebo šípok",
     "pickerTitle": "Vyberte si avatar",
     "pickerHelp": "Postava reprezentuje vás v čakacej záhrade. Môžete ju kedykoľvek zmeniť.",
