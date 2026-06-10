@@ -76,77 +76,64 @@ def apply_pitch(in_wav: Path, out_wav: Path, cents: int) -> None:
             "-ar", str(SAMPLE_RATE), "-ac", "1", str(out_wav)], check=True)
 
 
-def main() -> None:
-    with open(SUMMARY_IN) as f:
-        sm = json.load(f)
-    with open(TX_IN) as f:
-        tx = json.load(f)
-    segs = sm.get("transcript_en", [])
+def _setup_lang_dir(lang: str) -> None:
+    """piper-voices/<lang>/ con symlink alle SOLE voci di quella lingua
+    (es. 'en' → en_US-*/en_GB-*, 'fr' → fr_FR-*). build_voice_pool si
+    aspetta voices_path/<lang>/*.onnx."""
+    lang_dir = Path(VOICES_PATH) / lang
+    lang_dir.mkdir(parents=True, exist_ok=True)
+    for onnx in Path(VOICES_PATH).glob(f"{lang}_*.onnx"):
+        for fn in (onnx.name, onnx.name + ".json"):
+            link = lang_dir / fn
+            if not link.exists():
+                link.symlink_to(Path("..") / fn)
+
+
+def dub_one(lang: str, sm: dict, tx: dict) -> str | None:
+    """Genera dubbed_<lang>.m4a dai segmenti tradotti `transcript_<lang>`."""
+    segs = sm.get(f"transcript_{lang}", [])
+    text_key = f"text_{lang}"
     if not segs:
-        raise SystemExit("transcript_en vuoto — esegui prima summarize.py")
+        print(f"[{lang}] transcript_{lang} vuoto — skip")
+        return None
+    _setup_lang_dir(lang)
+    try:
+        pool = vp.build_voice_pool(VOICES_PATH, lang, pitch_variants=(0, -300, +300), multispeaker_limit=20)
+    except FileNotFoundError as e:
+        print(f"[{lang}] nessuna voce Piper ({e}) — skip")
+        return None
     duration = max((s["end"] for s in segs), default=0)
 
-    # Pool (single-speaker delle 16 onnx scaricate + pitch variants).
-    # Per il setup locale la "dir lang" è piatta, dato che ho tutto in
-    # piper-voices/. Il builder si aspetta voices_path/<lang>/, quindi
-    # creo simlink (idempotente) prima di chiamarlo.
-    lang_dir = Path(VOICES_PATH) / LANGUAGE
-    lang_dir.parent.mkdir(parents=True, exist_ok=True)
-    if not lang_dir.exists():
-        # creo dir e copio-symlinko tutti gli onnx dentro
-        lang_dir.mkdir()
-        for onnx in Path(VOICES_PATH).glob("*.onnx"):
-            (lang_dir / onnx.name).symlink_to(Path("..") / onnx.name)
-            cfg = Path(str(onnx) + ".json")
-            (lang_dir / cfg.name).symlink_to(Path("..") / cfg.name)
-
-    pool = vp.build_voice_pool(VOICES_PATH, LANGUAGE,
-                               pitch_variants=(0, -300, +300),
-                               multispeaker_limit=20)
-
     speakers = tx.get("speakers", [])
-    # innesto displayName dai speakers_named
     names = sm.get("speakers_named") or {}
     for sp_row in speakers:
         if not sp_row.get("displayName"):
             n = names.get(sp_row["diarLabel"])
             if isinstance(n, str) and n.strip():
                 sp_row["displayName"] = n
-
     display_names = [s.get("displayName") or "" for s in speakers]
     gender_map = ng.name_gender_map(display_names)
     voice_map = vp.assign_voices(speakers, pool, name_gender=gender_map)
+    print(f"[{lang}] pool={len(pool)} voci; dubbing {len(segs)} segmenti, dur {duration:.0f}s; "
+          f"assign={ {k: v.voice_id for k, v in voice_map.items()} }")
 
-    print(f"Pool: {len(pool)} entries (gender-aware + pitch variants)")
-    print("Gender inference:")
-    for k, v in gender_map.items():
-        print(f"  {k}: {v}")
-    print("Voice assignment:")
-    for sp_label, entry in sorted(voice_map.items(), key=lambda x: x[0]):
-        dname = next((s.get("displayName") for s in speakers if s["diarLabel"] == sp_label), None)
-        print(f"  {sp_label} ({dname or '?'}, {entry.gender}) → {entry.voice_id}  pitch={entry.pitch_cents}c sid={entry.speaker_id}")
-
-    print(f"Dubbing {len(segs)} segments, target duration {duration:.0f}s")
-
+    out_wav, out_m4a = f"dubbed_{lang}.wav", f"dubbed_{lang}.m4a"
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
         parts: list[tuple[float, Path]] = []
         for i, s in enumerate(segs):
-            text_en = (s.get("text_en") or "").strip()
-            if not text_en:
+            text = (s.get(text_key) or "").strip()
+            if not text:
                 continue
             target = s["end"] - s["start"]
             if target < 0.3:
                 continue
             entry = voice_map.get(s.get("speaker") or "", pool[0])
-
             raw = td / f"seg{i:04d}_raw.wav"
-            piper_say(text_en, raw, voice_path=entry.voice_path, speaker_id=entry.speaker_id)
-
+            piper_say(text, raw, voice_path=entry.voice_path, speaker_id=entry.speaker_id)
             pitched = td / f"seg{i:04d}_pitch.wav"
             apply_pitch(raw, pitched, entry.pitch_cents)
             d = wav_duration(pitched)
-
             stretched = td / f"seg{i:04d}_fit.wav"
             if d > target * 1.05:
                 sp.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(pitched),
@@ -155,19 +142,12 @@ def main() -> None:
             else:
                 stretched = pitched
             parts.append((s["start"], stretched))
-            if (i + 1) % 20 == 0:
-                print(f"  segment {i + 1}/{len(segs)}")
-
-        # Mix con silenzio base + adelay
-        print("Concatenating with silence padding…")
         silence = td / "silence.wav"
-        sp.run(["ffmpeg", "-y", "-loglevel", "error",
-                "-f", "lavfi", "-t", str(duration + 5),
+        sp.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-t", str(duration + 5),
                 "-i", f"anullsrc=channel_layout=mono:sample_rate={SAMPLE_RATE}",
                 "-c:a", "pcm_s16le", str(silence)], check=True)
-
         inputs = ["-i", str(silence)]
-        filters = []
+        filters: list[str] = []
         amix_inputs = ["[0:a]"]
         for k, (start, path) in enumerate(parts, start=1):
             inputs.extend(["-i", str(path)])
@@ -175,15 +155,22 @@ def main() -> None:
             filters.append(f"[{k}:a]adelay={delay_ms}|{delay_ms},apad[a{k}]")
             amix_inputs.append(f"[a{k}]")
         filt = ";".join(filters + ["".join(amix_inputs) + f"amix=inputs={len(amix_inputs)}:duration=longest:normalize=0[out]"])
-        sp.run(["ffmpeg", "-y", "-loglevel", "error", *inputs,
-                "-filter_complex", filt, "-map", "[out]",
-                "-ac", "1", "-ar", str(SAMPLE_RATE), "-t", str(duration + 1),
-                OUT_WAV], check=True)
-        print(f"  -> {OUT_WAV}")
+        sp.run(["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", filt, "-map", "[out]",
+                "-ac", "1", "-ar", str(SAMPLE_RATE), "-t", str(duration + 1), out_wav], check=True)
+    sp.run(["ffmpeg", "-y", "-loglevel", "error", "-i", out_wav, "-c:a", "aac", "-b:a", "96k",
+            "-movflags", "+faststart", out_m4a], check=True)
+    print(f"[{lang}] -> {out_m4a}")
+    return out_m4a
 
-    sp.run(["ffmpeg", "-y", "-loglevel", "error", "-i", OUT_WAV,
-            "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", OUT_M4A], check=True)
-    print(f"  -> {OUT_M4A}")
+
+def main() -> None:
+    with open(SUMMARY_IN) as f:
+        sm = json.load(f)
+    with open(TX_IN) as f:
+        tx = json.load(f)
+    langs = sm.get("target_langs") or ["en"]
+    for lang in langs:
+        dub_one(lang, sm, tx)
 
 
 if __name__ == "__main__":
