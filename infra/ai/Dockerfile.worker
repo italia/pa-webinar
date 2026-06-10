@@ -95,9 +95,19 @@ COPY worker/ ./worker/
 RUN useradd --create-home --uid 10001 --shell /bin/bash worker \
     && mkdir -p /models /work && chown -R worker:worker /opt/worker /models /work
 USER 10001
+# readOnlyRootFilesystem=true in cluster → SOLO /models e /work sono
+# scrivibili. Senza questi redirect, pyannote prova a creare la sua cache
+# in ~/.cache (=/home/worker/.cache, read-only) → OSError [Errno 30] →
+# la diarization falliva e ripiegava su single-speaker. HOME=/work rende
+# scrivibili tutti i path ~/… (pyannote, matplotlib, ecc.); PYANNOTE_CACHE
+# e MPLCONFIGDIR sono espliciti per chiarezza/robustezza.
 ENV HF_HOME=/models \
     HF_HUB_OFFLINE=1 \
     TORCH_HOME=/models/torch \
+    PYANNOTE_CACHE=/models/pyannote \
+    HOME=/work \
+    XDG_CACHE_HOME=/work/.cache \
+    MPLCONFIGDIR=/work/.config/matplotlib \
     WORK_DIR=/work \
     PYTHONUNBUFFERED=1
 # Put the staged cuDNN-8 libs first so CTranslate2 (faster-whisper) finds

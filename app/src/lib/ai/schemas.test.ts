@@ -37,17 +37,19 @@ describe('postprodJobPayloadSchema (discriminated) — DUB', () => {
     ).toThrow();
   });
 
-  it('rejects DUB without translatedTranscriptArtifactId', () => {
-    expect(() =>
-      postprodJobPayloadSchema.parse({
-        kind: 'DUB',
-        payload: {
-          runId: UUID,
-          sourceLanguage: 'it',
-          targetLanguage: 'en',
-        },
-      }),
-    ).toThrow();
+  // translatedTranscriptArtifactId è opzionale: il worker lo riceve via
+  // claim `inputs` (il TRANSLATION_VTT non esiste all'enqueue, lo produce
+  // TRANSLATE). Renderlo required faceva fallire ogni claim DUB con 422.
+  it('accepts DUB without translatedTranscriptArtifactId', () => {
+    const ok = postprodJobPayloadSchema.parse({
+      kind: 'DUB',
+      payload: {
+        runId: UUID,
+        sourceLanguage: 'it',
+        targetLanguage: 'en',
+      },
+    });
+    expect(ok.kind).toBe('DUB');
   });
 
   it('accepts a DUBBED_AUDIO artifact register payload', () => {
@@ -76,13 +78,14 @@ describe('postprodJobPayloadSchema (discriminated)', () => {
     expect(ok.payload.sourceLanguage).toBe('it');
   });
 
-  it('rejects SUMMARIZE without transcriptArtifactId', () => {
-    expect(() =>
-      postprodJobPayloadSchema.parse({
-        kind: 'SUMMARIZE',
-        payload: { runId: UUID, sourceLanguage: 'it' },
-      }),
-    ).toThrow();
+  // transcriptArtifactId è opzionale: risolto via claim `inputs`, non noto
+  // all'enqueue (che gira prima di TRANSCRIBE). Era required → claim 422.
+  it('accepts SUMMARIZE without transcriptArtifactId', () => {
+    const ok = postprodJobPayloadSchema.parse({
+      kind: 'SUMMARIZE',
+      payload: { runId: UUID, sourceLanguage: 'it' },
+    });
+    expect(ok.kind).toBe('SUMMARIZE');
   });
 
   it('rejects TRANSLATE missing targetLanguage', () => {
