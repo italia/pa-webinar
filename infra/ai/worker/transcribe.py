@@ -198,18 +198,21 @@ def transcribe_with_whisperx(
     # Imports kept local so the module is loadable without CUDA.
     import whisperx  # type: ignore[import-not-found]
 
-    log.info("loading WhisperX model %s on %s", asr_model_id, device)
-    asr = whisperx.load_model(asr_model_id, device, compute_type=compute_type)
+    log.info(
+        "loading WhisperX model %s on %s (initial_prompt=%s)",
+        asr_model_id, device, bool(initial_prompt),
+    )
+    # L'initial_prompt (nomi propri/sigle/termini dell'evento) va passato a
+    # `load_model` via `asr_options` — API stabile di whisperx 3.x. NON
+    # mutare `asr.options` dopo il load: in whisperx 3.4 quell'oggetto è
+    # cambiato e `._replace` solleva, quindi il prompt veniva silenziosamente
+    # SCARTATO (nomi propri non innescati → ortografia imprecisa).
+    asr_options = {"initial_prompt": initial_prompt} if initial_prompt else None
+    asr = whisperx.load_model(
+        asr_model_id, device, compute_type=compute_type, asr_options=asr_options
+    )
     audio = whisperx.load_audio(audio_path)
 
-    # ASR call. faster-whisper espone `initial_prompt` via gli
-    # `asr_options`; lo settiamo prima della chiamata.
-    if initial_prompt:
-        try:
-            # whisperx >=3.3: setattr su model.options
-            asr.options = asr.options._replace(initial_prompt=initial_prompt)  # type: ignore[attr-defined]
-        except Exception:
-            log.warning("could not set initial_prompt on ASR options")
     log.info("running ASR (initial_prompt=%s)", bool(initial_prompt))
     result = asr.transcribe(audio, language=language_hint, batch_size=16)
     language = result.get("language") or language_hint or "it"
@@ -316,13 +319,12 @@ def transcribe_single_speaker(
     """
     import whisperx  # type: ignore[import-not-found]
 
-    asr = whisperx.load_model(asr_model_id, device, compute_type=compute_type)
+    # initial_prompt via asr_options (vedi nota in transcribe_with_whisperx).
+    asr_options = {"initial_prompt": initial_prompt} if initial_prompt else None
+    asr = whisperx.load_model(
+        asr_model_id, device, compute_type=compute_type, asr_options=asr_options
+    )
     audio = whisperx.load_audio(audio_path)
-    if initial_prompt:
-        try:
-            asr.options = asr.options._replace(initial_prompt=initial_prompt)  # type: ignore[attr-defined]
-        except Exception:
-            log.warning("could not set initial_prompt on ASR options")
     result = asr.transcribe(audio, language=language_hint, batch_size=16)
     language = result.get("language") or language_hint or "it"
 
