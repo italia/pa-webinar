@@ -4,7 +4,7 @@
   "private": true,
   "description": "Piattaforma open-source per eventi pubblici digitali del DTD",
   "license": "EUPL-1.2",
-  "workspaces": ["app"],
+  "workspaces": ["app", "lobby"],
   "scripts": {
     "dev": "npm run dev --workspace=app",
     "build": "npm run build --workspace=app",
@@ -18,6 +18,9 @@
     "format": "prettier --write .",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
+    "lobby:dev": "npm run dev --workspace=lobby",
+    "lobby:build": "npm run build --workspace=lobby",
+    "lobby:typecheck": "npm run typecheck --workspace=lobby",
     "license:report": "node scripts/generate-license-report.mjs"
   },
   "overrides": {

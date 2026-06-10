@@ -23,9 +23,10 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /workspace
 
-# Copy workspace root config and app package.json for npm ci
+# Copy workspace root config and each workspace's package.json for npm ci
 COPY package.json package-lock.json ./
 COPY app/package.json ./app/
+COPY lobby/package.json ./lobby/
 
 RUN npm ci --ignore-scripts && npm cache clean --force
 
@@ -77,8 +78,10 @@ ENV NEXT_PUBLIC_BUILD_DATE=$NEXT_PUBLIC_BUILD_DATE
 COPY --from=deps /workspace/node_modules ./node_modules
 COPY --from=deps /workspace/package.json ./
 
-# Copy full app source
+# Copy full app source + the lobby workspace (transpiled by Next via
+# transpilePackages; only loaded through a client-only dynamic import).
 COPY app/ ./app/
+COPY lobby/ ./lobby/
 
 WORKDIR /workspace/app
 
