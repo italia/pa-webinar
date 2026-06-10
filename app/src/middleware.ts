@@ -103,7 +103,16 @@ function applySecurityHeaders(
       // whitelisting. We keep https://${jitsiDomain} for the IFrame
       // API external script. Removes 'unsafe-inline' — the historic
       // XSS amplifier in the policy.
-      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: https://${jitsiDomain}`,
+      //
+      // DEV-ONLY: `next dev` (HMR + React Refresh + webpack eval modules)
+      // requires 'unsafe-eval' to execute the client bundle. Without it
+      // the browser blocks the dev runtime and the app never hydrates —
+      // every page renders as static HTML with no interactivity. We add
+      // 'unsafe-eval' exclusively when NODE_ENV !== 'production' so the
+      // production policy stays strict (nonce + strict-dynamic, no eval).
+      process.env.NODE_ENV === 'production'
+        ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: https://${jitsiDomain}`
+        : `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic' https: https://${jitsiDomain}`,
       // style-src keeps 'unsafe-inline' as an architectural trade-off:
       // React renders `style={{...}}` props as DOM `style="..."`
       // attributes, which CSP treats as inline styles. The codebase

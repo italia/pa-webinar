@@ -2662,7 +2662,11 @@
     "emailLabel": "E-pasts (neobligāts)",
     "emailHelp": "Tikai iespējamai pēcpasākuma saziņai",
     "emailInvalid": "Lūdzu, ievadiet derīgu e-pasta adresi",
-    "chatLockedMessage": "Ievadiet savu vārdu, lai piedalītos pasākuma tērzēšanā."
+    "chatLockedMessage": "Ievadiet savu vārdu, lai piedalītos pasākuma tērzēšanā.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Video ieraksts",
@@ -2761,6 +2765,7 @@
     "classicView": "Klasiskais skats",
     "changeAvatar": "Mainīt avataru",
     "peopleInGarden": "{count, plural, =0 {Dārzā nav neviena} one {1 persona dārzā} other {# personas dārzā}}",
+    "guestName": "Guest",
     "hintKeyboard": "Pārvietojieties ar WASD vai bultiņām",
     "pickerTitle": "Izvēlieties savu avataru",
     "pickerHelp": "Šis varonis pārstāv jūs gaidīšanas dārzā. Varat to mainīt jebkurā laikā.",

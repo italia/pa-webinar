@@ -2662,7 +2662,11 @@
     "emailLabel": "E-mail (opțional)",
     "emailHelp": "Doar pentru eventual follow-up post-eveniment",
     "emailInvalid": "Introduceți o adresă de e-mail validă",
-    "chatLockedMessage": "Introduceți numele pentru a participa la chatul evenimentului."
+    "chatLockedMessage": "Introduceți numele pentru a participa la chatul evenimentului.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Înregistrare video",
@@ -2761,6 +2765,7 @@
     "classicView": "Vizualizare clasică",
     "changeAvatar": "Schimbați avatarul",
     "peopleInGarden": "{count, plural, =0 {Nimeni în grădină} one {1 persoană în grădină} other {# persoane în grădină}}",
+    "guestName": "Guest",
     "hintKeyboard": "Deplasați-vă cu WASD sau săgețile",
     "pickerTitle": "Alegeți avatarul",
     "pickerHelp": "Personajul vă reprezintă în grădina de așteptare. Îl puteți schimba oricând.",

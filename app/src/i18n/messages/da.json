@@ -2662,7 +2662,11 @@
     "emailLabel": "E-mail (valgfri)",
     "emailHelp": "Kun til en eventuel opfølgning efter arrangementet",
     "emailInvalid": "Indtast en gyldig e-mailadresse",
-    "chatLockedMessage": "Indtast dit navn for at deltage i arrangementets chat."
+    "chatLockedMessage": "Indtast dit navn for at deltage i arrangementets chat.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Videooptagelse",
@@ -2761,6 +2765,7 @@
     "classicView": "Klassisk visning",
     "changeAvatar": "Skift avatar",
     "peopleInGarden": "{count, plural, =0 {Ingen i haven} one {1 person i haven} other {# personer i haven}}",
+    "guestName": "Guest",
     "hintKeyboard": "Bevæg dig med WASD eller piletasterne",
     "pickerTitle": "Vælg din avatar",
     "pickerHelp": "Figuren repræsenterer dig i venteområdets have. Du kan skifte den når som helst.",

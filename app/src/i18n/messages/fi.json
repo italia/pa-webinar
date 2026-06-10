@@ -2662,7 +2662,11 @@
     "emailLabel": "Sähköposti (valinnainen)",
     "emailHelp": "Vain mahdollista tapahtuman jälkeistä yhteydenpitoa varten",
     "emailInvalid": "Anna kelvollinen sähköpostiosoite",
-    "chatLockedMessage": "Anna nimesi, jotta voit liittyä tapahtuman chattiin."
+    "chatLockedMessage": "Anna nimesi, jotta voit liittyä tapahtuman chattiin.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Videotallenne",
@@ -2761,6 +2765,7 @@
     "classicView": "Klassinen näkymä",
     "changeAvatar": "Vaihda avatar",
     "peopleInGarden": "{count, plural, =0 {Ei ketään puutarhassa} one {1 henkilö puutarhassa} other {# henkilöä puutarhassa}}",
+    "guestName": "Guest",
     "hintKeyboard": "Liiku WASD- tai nuolinäppäimillä",
     "pickerTitle": "Valitse avatarisi",
     "pickerHelp": "Hahmo edustaa sinua odotuspuutarhassa. Voit vaihtaa sen milloin tahansa.",
