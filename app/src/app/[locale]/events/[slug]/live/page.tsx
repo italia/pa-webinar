@@ -69,6 +69,22 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     position: settings.jitsiWatermarkPosition,
   };
 
+  // Informativa AI per la sala d'attesa (AI Act / GDPR trasparenza): la
+  // mostriamo quando il master switch è attivo E l'evento ha almeno una
+  // feature AI. Il testo è il custom per-locale dell'admin
+  // (SiteSetting.aiConsentDisclosure) oppure null → la WaitingRoom usa il
+  // fallback i18n `waiting.aiNotice`.
+  const aiPostprodEnabled =
+    !!settings.aiPipelineEnabled &&
+    (event.aiTranscriptEnabled ||
+      event.aiSummaryEnabled ||
+      event.aiTranslationEnabled ||
+      event.aiDubbingEnabled);
+  const aiConsentDisclosure =
+    ((settings.aiConsentDisclosure as Record<string, string> | null) ?? {})[
+      locale
+    ] ?? null;
+
   const isInstant = event.eventType === 'INSTANT';
 
   // No token: guest access or redirect. Password-protected events
@@ -119,6 +135,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             registrationCount: event._count.registrations,
             effectiveGraceMinutes:
               event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
+            aiPostprodEnabled,
+            aiConsentDisclosure,
           }}
           token=""
           isModerator={false}
@@ -200,6 +218,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         registrationCount: event._count.registrations,
         effectiveGraceMinutes:
           event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
+        aiPostprodEnabled,
+        aiConsentDisclosure,
       }}
       token={token}
       isModerator={isModerator}

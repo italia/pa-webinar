@@ -1257,7 +1257,10 @@
         "jobMaxAttempts": "Tentativi prima del fallimento",
         "jobMaxAttemptsHelp": "Quante volte la pipeline ritenta un lavoro prima di marcarlo come fallito. Il backoff fra un tentativo e l'altro cresce esponenzialmente (da 30 secondi fino a 2 ore). Il valore tipico è 5.",
         "artifactRetentionDays": "Conservazione degli artefatti (giorni)",
-        "artifactRetentionDaysHelp": "Lasciato a 0, gli artefatti AI seguono la stessa scadenza dell'evento. Un valore maggiore di zero li conserva per il numero di giorni indicato, anche dopo la chiusura dell'evento, finché un cron quotidiano non li cancella. La cancellazione include nomi dei parlanti e payload dei job, in linea con docs/GDPR.md."
+        "artifactRetentionDaysHelp": "Lasciato a 0, gli artefatti AI seguono la stessa scadenza dell'evento. Un valore maggiore di zero li conserva per il numero di giorni indicato, anche dopo la chiusura dell'evento, finché un cron quotidiano non li cancella. La cancellazione include nomi dei parlanti e payload dei job, in linea con docs/GDPR.md.",
+        "consentDisclosureSection": "Informativa AI in sala d'attesa",
+        "consentDisclosureHelp": "Testo mostrato ai partecipanti nella sala d'attesa quando l'evento usa la post-produzione AI (trascrizione, sintesi, traduzione, doppiaggio). Personalizzabile per lingua. Lascia vuoto per usare il testo predefinito di sistema.",
+        "consentDisclosurePlaceholder": "Es. Questo evento sarà trascritto e sintetizzato automaticamente con strumenti di IA dopo la diretta…"
       },
       "scaling": {
         "intro": "Parametri che descrivono la capacità del cluster dove gira la piattaforma. I valori di default sono tarati per Azure F16s_v2 (16 vCPU / 32 GiB) per JVB e F4s_v2 (4 vCPU / 8 GiB) per Jibri. Se usi hardware diverso, aggiorna qui — lo scaler ricalcola subito.",
@@ -3005,7 +3008,9 @@
     "classicView": "Vista classica",
     "backToGarden": "Torna al parco",
     "details": "Mostra dettagli",
-    "hideDetails": "Nascondi dettagli"
+    "hideDetails": "Nascondi dettagli",
+    "aiNoticeTitle": "Elaborazione AI dopo l'evento",
+    "aiNotice": "Al termine, la registrazione sarà elaborata da strumenti di intelligenza artificiale per generare trascrizione, sintesi ed eventuali traduzioni e doppiaggi. Gli artefatti possono contenere imprecisioni; il video resta la fonte autoritativa."
   },
   "recording": {
     "management": "Registrazione video",

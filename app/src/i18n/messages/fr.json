@@ -1312,7 +1312,10 @@
         "jobMaxAttempts": "Tentatives avant échec",
         "jobMaxAttemptsHelp": "Nombre de fois où la chaîne de traitement relance une tâche avant de la marquer comme échouée. Le délai entre tentatives croît de façon exponentielle (de 30 secondes jusqu'à 2 heures). La valeur typique est 5.",
         "artifactRetentionDays": "Conservation des artefacts (jours)",
-        "artifactRetentionDaysHelp": "Laissé à 0, les artefacts IA suivent la même échéance que l'événement. Une valeur supérieure à zéro les conserve pendant le nombre de jours indiqué, même après la clôture de l'événement, jusqu'à ce qu'un cron quotidien les supprime. La suppression inclut les noms des intervenants et les charges utiles des tâches, conformément à docs/GDPR.md."
+        "artifactRetentionDaysHelp": "Laissé à 0, les artefacts IA suivent la même échéance que l'événement. Une valeur supérieure à zéro les conserve pendant le nombre de jours indiqué, même après la clôture de l'événement, jusqu'à ce qu'un cron quotidien les supprime. La suppression inclut les noms des intervenants et les charges utiles des tâches, conformément à docs/GDPR.md.",
+        "consentDisclosureSection": "Avis IA dans la salle d'attente",
+        "consentDisclosureHelp": "Texte affiché aux participants dans la salle d'attente lorsque l'événement utilise la post-production IA (transcription, synthèse, traduction, doublage). Personnalisable par langue. Laissez vide pour utiliser le texte par défaut du système.",
+        "consentDisclosurePlaceholder": "Ex. Cet événement sera transcrit et résumé automatiquement à l'aide d'outils d'IA après le direct…"
       }
     },
     "analytics": {
@@ -2871,7 +2874,9 @@
     "classicView": "Classic view",
     "backToGarden": "Back to the park",
     "details": "Show details",
-    "hideDetails": "Hide details"
+    "hideDetails": "Hide details",
+    "aiNoticeTitle": "Traitement IA après l'événement",
+    "aiNotice": "À la fin, l'enregistrement sera traité par des outils d'intelligence artificielle pour générer une transcription, une synthèse et d'éventuelles traductions et doublages. Les artefacts peuvent contenir des imprécisions ; la vidéo reste la source de référence."
   },
   "recording": {
     "management": "Enregistrement vidéo",

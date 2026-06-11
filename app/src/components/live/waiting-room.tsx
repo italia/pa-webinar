@@ -74,6 +74,11 @@ interface WaitingRoomEvent {
   chatEnabled?: boolean;
   qaEnabled?: boolean;
   timezone?: string;
+  /** L'evento verrà processato dalla pipeline AI post-evento → mostra
+   *  l'informativa in sala d'attesa (AI Act / GDPR trasparenza). */
+  aiPostprodEnabled?: boolean;
+  /** Testo custom per-locale dell'informativa AI; vuoto/null → fallback i18n. */
+  aiConsentDisclosure?: string | null;
 }
 
 export interface WaitingRoomJoinPrefs {
@@ -423,6 +428,22 @@ export default function WaitingRoom({
     </Alert>
   ) : null;
 
+  // Informativa AI in sala d'attesa: mostrata quando l'evento usa la
+  // pipeline AI post-evento. Testo custom dell'admin (per-locale) con
+  // fallback al testo generico i18n. NIENTE <Icon> dentro <Alert>:
+  // Bootstrap Italia ne disegna già una via ::before (vedi memoria
+  // feedback_bootstrap-italia-alert).
+  const aiConsentText =
+    event.aiConsentDisclosure && event.aiConsentDisclosure.trim()
+      ? event.aiConsentDisclosure
+      : t('aiNotice');
+  const aiNoticeBlock = event.aiPostprodEnabled && !isEnded ? (
+    <Alert color="info" className="text-start mb-0" style={{ fontSize: '0.82rem' }}>
+      <span className="fw-semibold d-block mb-1">{t('aiNoticeTitle')}</span>
+      {aiConsentText}
+    </Alert>
+  ) : null;
+
   const chatPreviewBlock = showChatPreview ? (
     <div className="waiting-chat-preview rounded-3 overflow-hidden" style={{ border: '1px solid #E2E8F0' }}>
       <div className="px-3 py-2" style={{ backgroundColor: '#F5F7FA' }}>
@@ -721,6 +742,7 @@ export default function WaitingRoom({
 
                     <div className="mb-3">{netiquetteBlock}</div>
                     {recordingNoticeBlock && <div className="mb-3">{recordingNoticeBlock}</div>}
+                    {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}
                     {chatPreviewBlock && <div className="mb-3">{chatPreviewBlock}</div>}
                     {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
 
@@ -828,6 +850,7 @@ export default function WaitingRoom({
               </div>
               {netiquetteBlock}
               {recordingNoticeBlock}
+              {aiNoticeBlock}
               {chatPreviewBlock}
               {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
             </div>
