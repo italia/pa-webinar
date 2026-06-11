@@ -346,17 +346,15 @@ export default function TemplateManagement({
                     >
                       {tc('edit')}
                     </Button>
-                    {!tpl.isSystem && (
-                      <Button
-                        color="danger"
-                        outline
-                        size="sm"
-                        onClick={() => handleDelete(tpl.id)}
-                        disabled={editing !== null}
-                      >
-                        {tc('delete')}
-                      </Button>
-                    )}
+                    <Button
+                      color="danger"
+                      outline
+                      size="sm"
+                      onClick={() => handleDelete(tpl.id)}
+                      disabled={editing !== null}
+                    >
+                      {tc('delete')}
+                    </Button>
                   </div>
                 </CardBody>
               </Card>

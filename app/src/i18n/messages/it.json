@@ -4,7 +4,12 @@
     "empty": "Nessun punto in agenda. Aggiungi i temi da trattare e spuntali man mano.",
     "add": "Aggiungi",
     "addPlaceholder": "Nuovo punto all'ordine del giorno…",
-    "remove": "Rimuovi"
+    "remove": "Rimuovi",
+    "inProgress": "in corso",
+    "agree": "D'accordo",
+    "disagree": "Non d'accordo",
+    "favorablePct": "{pct}% favorevole",
+    "noReactions": "Esprimi la tua opinione"
   },
   "common": {
     "appName": "PA Webinar",

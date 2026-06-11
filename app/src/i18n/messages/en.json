@@ -4,10 +4,15 @@
     "empty": "No agenda items yet. Add the topics to cover and check them off as you go.",
     "add": "Add",
     "addPlaceholder": "New agenda item…",
-    "remove": "Remove"
+    "remove": "Remove",
+    "inProgress": "in progress",
+    "agree": "Agree",
+    "disagree": "Disagree",
+    "favorablePct": "{pct}% in favour",
+    "noReactions": "Share your view"
   },
   "common": {
-    "appName": "DTD Events",
+    "appName": "PA Webinar",
     "appDescription": "Public digital event platform by the Department for Digital Transformation",
     "loading": "Loading...",
     "error": "An error occurred",
@@ -2324,7 +2329,7 @@
     "privacy": {
       "metaTitle": "Privacy policy",
       "title": "Privacy policy",
-      "intro": "This page summarises the processing of personal data related to the use of the DTD Events platform and participation in hosted public events.",
+      "intro": "This page summarises the processing of personal data related to the use of the PA Webinar platform and participation in hosted public events.",
       "sections": {
         "controller": {
           "title": "Data controller",
@@ -2387,7 +2392,7 @@
     "legalNotes": {
       "metaTitle": "Legal notes",
       "title": "Legal notes",
-      "intro": "Access to and use of the DTD Events platform is subject to these notes, which summarise the general terms of use and the main information about the service.",
+      "intro": "Access to and use of the PA Webinar platform is subject to these notes, which summarise the general terms of use and the main information about the service.",
       "sections": {
         "ownership": {
           "title": "Service ownership",
