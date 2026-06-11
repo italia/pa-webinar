@@ -150,6 +150,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       tagSlugs: event.tagLinks.map((l) => l.tag.slug),
       recurrenceRule: event.recurrenceRule,
       parseTitleKicker: event.parseTitleKicker,
+      waitingRoomEngine: event.waitingRoomEngine,
       expectedSenderRatioPct: event.expectedSenderRatioPct,
       permissionMatrix: matrix,
       qaEnabled: event.qaEnabled,

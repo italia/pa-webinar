@@ -332,6 +332,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.parseTitleKicker !== undefined && {
         parseTitleKicker: data.parseTitleKicker,
       }),
+      ...(data.waitingRoomEngine !== undefined && {
+        waitingRoomEngine: data.waitingRoomEngine,
+      }),
       ...(data.aiTranscriptEnabled !== undefined && {
         aiTranscriptEnabled: data.aiTranscriptEnabled,
       }),

@@ -57,6 +57,10 @@ interface WaitingRoomEvent {
   slug: string;
   /** Resolved kicker flag (per-event override merged with site default). */
   parseTitleKicker?: boolean;
+  /** Resolved waiting-room engine (per-event override merged with the site
+   *  default). GARDEN = SVG garden, GAME = Phaser videogame lobby, CLASSIC =
+   *  static accessible card. Defaults to GARDEN when absent. */
+  waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
   startsAt: string;
   endsAt: string;
   status: 'PUBLISHED' | 'LIVE' | 'ENDED' | 'IDLE' | 'PROVISIONING';
@@ -137,19 +141,11 @@ export default function WaitingRoom({
   const [pulseCountdown, setPulseCountdown] = useState(false);
   const [name, setName] = useState(defaultName);
   const [email, setEmail] = useState('');
-  // Experimental waiting-room engine: SVG garden (default) vs. Phaser lobby.
-  // Opt-in via `?engine=phaser`; resolved client-side post-mount to avoid any
-  // SSR/hydration mismatch.
+  // Waiting-room engine state. Resolved post-mount (see the resolution effect
+  // below) from the configured default (admin: site + per-event) + `?engine=`
+  // override + the classic preference. Kept on the SSR-safe default 'svg' (the
+  // Phaser lobby is client-only, ssr:false) so there's no hydration mismatch.
   const [engine, setEngine] = useState<'svg' | 'phaser'>('svg');
-  useEffect(() => {
-    try {
-      if (new URLSearchParams(window.location.search).get('engine') === 'phaser') {
-        setEngine('phaser');
-      }
-    } catch {
-      /* ignore */
-    }
-  }, []);
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
   const [classicView, setClassicView] = useState(false);
@@ -184,18 +180,30 @@ export default function WaitingRoom({
     }
   }, [defaultName]);
 
-  // Restore the classic-view preference (accessibility fallback). Done in
-  // an effect (not lazy init) so SSR and the first client render agree.
+  // Resolve the waiting-room engine + classic-view post-mount, in priority
+  // order (highest first):
+  //   1. `?engine=` URL param (manual override: phaser | svg | classic)
+  //   2. the user's "Versione classica" localStorage preference (accessibility)
+  //   3. the configured default — per-event override merged with the site
+  //      default, arriving resolved on `event.waitingRoomEngine`
+  //   4. GARDEN
+  // GARDEN/GAME drive `engine` (svg vs phaser); CLASSIC drives `classicView`
+  // (the static-card branch wins before either engine renders).
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      if (window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1') {
-        setClassicView(true);
-      }
+      let mode: 'GARDEN' | 'GAME' | 'CLASSIC' = event.waitingRoomEngine ?? 'GARDEN';
+      const urlE = new URLSearchParams(window.location.search).get('engine');
+      if (urlE === 'phaser') mode = 'GAME';
+      else if (urlE === 'svg') mode = 'GARDEN';
+      else if (urlE === 'classic') mode = 'CLASSIC';
+      if (window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1') mode = 'CLASSIC';
+      setEngine(mode === 'GAME' ? 'phaser' : 'svg');
+      setClassicView(mode === 'CLASSIC');
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [event.waitingRoomEngine]);
 
   const startsAtMs = new Date(event.startsAt).getTime();
   const isLive = event.status === 'LIVE';
