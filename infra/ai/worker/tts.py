@@ -203,6 +203,60 @@ def _format_silence(duration_sec: float, out_path: str) -> None:
     )
 
 
+def watermark_m4a_inplace(m4a_path: str) -> bool:
+    """Applica un watermark AudioSeal (Meta, MIT) all'm4a doppiato,
+    in-place — AI Act Art. 50 (marca inudibile, rilevabile da un modello).
+
+    AudioSeal è 16 kHz-native: l'audio viene ricampionato a 16k (qualità
+    "speech" adeguata per una voce sintetica neutra), watermarkato e
+    ri-codificato in m4a. Best-effort: ritorna True se applicato; solleva
+    se le dipendenze/modelli mancano (il chiamante cattura e pubblica
+    l'audio non watermarkato). Richiede torch + torchaudio + audioseal
+    (vedi requirements.txt) + download modello da HuggingFace.
+    """
+    import numpy as np  # type: ignore[import-not-found]
+    import torch  # type: ignore[import-not-found]
+    from audioseal import AudioSeal  # type: ignore[import-not-found]
+
+    wav16 = m4a_path + ".wm16.wav"
+    out_wav = m4a_path + ".wm.wav"
+    try:
+        # m4a (AAC) → wav PCM 16-bit mono 16k. I/O del WAV via stdlib
+        # `wave` + numpy (NON torchaudio.load: nelle torchaudio recenti
+        # richiede torchcodec; questo è backend-indipendente).
+        subprocess.check_call(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", m4a_path,
+             "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", wav16],
+        )
+        with wave.open(wav16, "rb") as w:
+            sr = w.getframerate()
+            frames = w.readframes(w.getnframes())
+        audio = np.frombuffer(frames, dtype=np.int16).astype(np.float32) / 32768.0
+        x = torch.from_numpy(audio).reshape(1, 1, -1)  # [batch=1, channels=1, T]
+        model = AudioSeal.load_generator("audioseal_wm_16bits")
+        with torch.no_grad():
+            watermark = model.get_watermark(x, sr)
+            wm = (x + watermark).clamp(-1.0, 1.0).squeeze().cpu().numpy()
+        wm_i16 = (wm * 32767.0).astype(np.int16)
+        with wave.open(out_wav, "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(sr)
+            w.writeframes(wm_i16.tobytes())
+        subprocess.check_call(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", out_wav,
+             "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", m4a_path],
+        )
+        log.info("AudioSeal watermark applicato a %s", os.path.basename(m4a_path))
+        return True
+    finally:
+        for p in (wav16, out_wav):
+            try:
+                os.remove(p)
+            except OSError:
+                pass
+
+
 def dub_with_piper(
     *,
     segments: List[Segment],

@@ -269,6 +269,11 @@ export const artifactRegisterSchema = z.object({
   modelId: z.string().max(120).optional(),
   modelVersion: z.string().max(80).optional(),
   /**
+   * AI Act Art. 50 watermark applied to this artifact (es. 'audioseal'
+   * sul DUBBED_AUDIO/DUBBED_VIDEO). null/assente = non watermarkato.
+   */
+  watermarkType: z.string().min(1).max(40).optional(),
+  /**
    * Speaker map produced by diarization. Only set on TRANSCRIPT_JSON.
    * The app upserts `Speaker` rows from this.
    */

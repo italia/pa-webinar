@@ -171,6 +171,7 @@ class AppClient:
         model_id: Optional[str] = None,
         model_version: Optional[str] = None,
         speaker_map: Optional[List[Dict[str, Any]]] = None,
+        watermark_type: Optional[str] = None,
     ) -> None:
         payload: Dict[str, Any] = {
             "jobId": job_id,
@@ -189,6 +190,8 @@ class AppClient:
             payload["modelVersion"] = model_version
         if speaker_map is not None:
             payload["speakerMap"] = speaker_map
+        if watermark_type is not None:
+            payload["watermarkType"] = watermark_type
         r = self._client.post("/api/internal/postprod-artifact", json=payload)
         r.raise_for_status()
 

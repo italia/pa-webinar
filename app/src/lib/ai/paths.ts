@@ -186,13 +186,21 @@ export function expectedArtifactsForJob(
     }
     case 'SUMMARIZE': {
       const lang = payload.sourceLanguage ?? 'it';
-      return [{ role: 'summary', type: 'SUMMARY_MD', language: lang }];
+      return [
+        { role: 'summary', type: 'SUMMARY_MD', language: lang },
+        // SUMMARY_JSON strutturato (overall/decisioni/azioni/topics) —
+        // sorgente per hero card, topic-chips e per la traduzione.
+        { role: 'summaryJson', type: 'SUMMARY_JSON', language: lang },
+      ];
     }
     case 'TRANSLATE': {
       const lang = payload.targetLanguage ?? 'en';
       return [
         { role: 'transcriptVtt', type: 'TRANSLATION_VTT', language: lang },
         { role: 'summary', type: 'TRANSLATION_MD', language: lang },
+        // Sintesi strutturata tradotta (stesso shape di SUMMARY_JSON,
+        // lingua target) — alimenta hero/topics multilingua.
+        { role: 'summaryJson', type: 'SUMMARY_JSON', language: lang },
       ];
     }
     case 'SUBTITLE': {

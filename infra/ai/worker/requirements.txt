@@ -66,3 +66,11 @@ piper-tts==1.2.0
 # Sentry / structured logging optional — we use stdlib logging
 # configured for JSON. Cluster Loki picks them up.
 gender-guesser>=0.4,<1
+
+# AudioSeal (Meta, MIT) — watermark inudibile sull'audio doppiato per
+# conformità AI Act Art. 50. Gira sul torch già pinnato (2.6 cu124); il
+# trio torch/torchvision/torchaudio resta fissato sopra (pin esatti
+# vincono sulle dipendenze >= di audioseal). Modello scaricato da HF a
+# runtime (audioseal_wm_16bits, ~pochi MB). Best-effort: il DUB non
+# fallisce se il watermark non riesce (vedi worker/tts.py).
+audioseal==0.1.4
