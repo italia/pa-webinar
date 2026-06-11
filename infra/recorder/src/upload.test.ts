@@ -1,3 +1,7 @@
+import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { describe, it, expect } from 'vitest';
 
 import {
@@ -8,9 +12,13 @@ import {
   PresignStorageProvider,
   createStorageProvider,
   composeObjectUrl,
+  uploadRecording,
+  type StorageProvider,
+  type PutObjectInput,
+  type LocalTrackFile,
 } from './upload.js';
 import { buildManifest } from './manifest.js';
-import { trackKey } from './paths.js';
+import { trackKey, localTrackFilename } from './paths.js';
 
 describe('buildIngestBody', () => {
   it('mappa il manifest sul contratto multitrack-manifest (blobKey=trackKey)', () => {
@@ -270,5 +278,104 @@ describe('NoopStorageProvider', () => {
         size: 3,
       },
     ]);
+  });
+});
+
+// ── uploadRecording: tolleranza parziale + rejoin + retry (MED-infra/HIGH-1) ──
+
+class MockProvider implements StorageProvider {
+  readonly name = 'mock';
+  puts: string[] = [];
+  /** key che falliscono SEMPRE (3 tentativi → skip). */
+  alwaysFail = new Set<string>();
+  /** key che falliscono N volte poi vanno (test del retry). */
+  failTimes = new Map<string, number>();
+  async putObject(input: PutObjectInput): Promise<void> {
+    const left = this.failTimes.get(input.key);
+    if (left && left > 0) {
+      this.failTimes.set(input.key, left - 1);
+      throw new Error(`transient ${input.key}`);
+    }
+    if (this.alwaysFail.has(input.key)) throw new Error(`boom ${input.key}`);
+    this.puts.push(input.key);
+  }
+}
+
+async function setupFiles(): Promise<{
+  dir: string;
+  manifest: ReturnType<typeof buildManifest>;
+  files: LocalTrackFile[];
+}> {
+  const dir = await mkdtemp(join(tmpdir(), 'rec-upl-'));
+  // Due sessioni dello STESSO pid (rejoin) + una di un altro pid.
+  const manifest = buildManifest({
+    eventId: 'e1',
+    recordingId: 'r1',
+    roomName: 'room',
+    recordings: [
+      { participantId: 'paolo', trackFileId: 'paolo-0', displayName: 'Paolo', firstFrameAtMs: 0, lastFrameAtMs: 5000, bytesWritten: 10 },
+      { participantId: 'paolo', trackFileId: 'paolo-1', displayName: 'Paolo', firstFrameAtMs: 60000, lastFrameAtMs: 65000, bytesWritten: 10 },
+      { participantId: 'raff', trackFileId: 'raff-0', displayName: 'Raffaele', firstFrameAtMs: 1000, lastFrameAtMs: 9000, bytesWritten: 10 },
+    ],
+  });
+  const files: LocalTrackFile[] = [];
+  for (const t of manifest.tracks) {
+    const p = join(dir, localTrackFilename(t.trackFileId));
+    await writeFile(p, Buffer.from(`audio-${t.trackFileId}`));
+    files.push({ track: t, localPath: p });
+  }
+  return { dir, manifest, files };
+}
+
+describe('uploadRecording — tolleranza parziale + rejoin', () => {
+  it('rejoin: due sessioni dello stesso pid → due blob DISTINTI caricati', async () => {
+    const { dir, manifest, files } = await setupFiles();
+    try {
+      const provider = new MockProvider();
+      const res = await uploadRecording(provider, { manifest, files });
+      // 3 tracce + manifest = 4 put; le due di paolo hanno key distinte.
+      expect(res.uploaded).toBe(3);
+      expect(res.failed).toEqual([]);
+      const trackKeys = manifest.tracks.map((t) => t.trackKey);
+      expect(new Set(trackKeys).size).toBe(3);
+      for (const k of trackKeys) expect(provider.puts).toContain(k);
+      // il manifest effettivo contiene tutte e 3 le tracce
+      expect(res.manifest.tracks).toHaveLength(3);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('una traccia fallisce → saltata, le altre proseguono, manifest filtrato', async () => {
+    const { dir, manifest, files } = await setupFiles();
+    try {
+      const provider = new MockProvider();
+      const failingKey = manifest.tracks[1]!.trackKey; // paolo-1
+      provider.alwaysFail.add(failingKey);
+      const res = await uploadRecording(provider, { manifest, files });
+      expect(res.uploaded).toBe(2);
+      expect(res.failed).toEqual([failingKey]);
+      // il manifest EFFETTIVO non contiene la traccia fallita (niente riga orfana)
+      expect(res.manifest.tracks.map((t) => t.trackKey)).not.toContain(failingKey);
+      expect(res.manifest.tracks).toHaveLength(2);
+      // l'ingest costruito dal manifest effettivo non referenzia il blob mancante
+      const body = buildIngestBody(res.manifest, res.trackSizes);
+      expect(body.tracks.map((t) => t.blobKey)).not.toContain(failingKey);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('errore transiente → retry e successo', async () => {
+    const { dir, manifest, files } = await setupFiles();
+    try {
+      const provider = new MockProvider();
+      provider.failTimes.set(manifest.tracks[0]!.trackKey, 2); // fallisce 2 volte poi va
+      const res = await uploadRecording(provider, { manifest, files });
+      expect(res.uploaded).toBe(3);
+      expect(res.failed).toEqual([]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });
