@@ -1990,7 +1990,13 @@
         "adding": "Adding…",
         "addButton": "Add language",
         "unexpectedError": "Unexpected error",
-        "note": "Adding a language generates the translation of transcript and summary — and the audio dubbing, if enabled for the event. Processing runs in the background."
+        "note": "Adding a language generates the translation of transcript and summary — and the audio dubbing, if enabled for the event. Processing runs in the background.",
+        "summary": "Summary",
+        "subtitles": "Subtitles",
+        "dub": "Dubbing",
+        "download": "download",
+        "allTranslated": "All active languages are already translated.",
+        "translatedHeader": "Translated languages"
       },
       "ov": {
         "tab": "Overview",
@@ -2041,7 +2047,10 @@
         "chars": "characters",
         "model": "Model",
         "notAvailable": "n/a"
-      }
+      },
+      "archiveSourceTitle": "Source recording",
+      "archiveSourceHint": "Original event video. Separate per-participant tracks and the MKV archive require multi-track recording (not enabled for this event).",
+      "archiveSourceDownload": "Download original video"
     },
     "questionnairesPage": {
       "title": "Questionnaires",

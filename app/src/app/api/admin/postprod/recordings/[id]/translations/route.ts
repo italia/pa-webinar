@@ -56,9 +56,10 @@ export const GET = withErrorHandling(async (_request, context) => {
     select: {
       id: true,
       sourceLanguage: true,
+      event: { select: { slug: true } },
       artifacts: {
-        where: { type: { in: ['TRANSLATION_MD', 'TRANSLATION_VTT'] } },
-        select: { language: true },
+        where: { type: { in: ['TRANSLATION_MD', 'TRANSLATION_VTT', 'DUBBED_AUDIO'] } },
+        select: { language: true, type: true },
       },
     },
   });
@@ -66,24 +67,37 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   const sourceLanguage = recording.sourceLanguage ?? 'it';
 
-  // Languages with at least one translation artifact (MD or VTT). A
-  // partial translation (only one of the two) still counts as "present"
-  // so the admin sees it and isn't offered a confusing re-add.
-  const translated = Array.from(
-    new Set(
-      recording.artifacts
-        .map((a) => a.language)
-        .filter((l): l is string => Boolean(l)),
-    ),
-  ).sort();
+  // Lingue con almeno un artefatto di traduzione (MD o VTT). Per ogni lingua
+  // riportiamo COSA esiste (sintesi/sottotitoli/doppiaggio) così la tab mostra
+  // contenuto reale e link di download, non solo un badge.
+  const langSet = new Set(
+    recording.artifacts
+      .filter((a) => a.type !== 'DUBBED_AUDIO')
+      .map((a) => a.language)
+      .filter((l): l is string => Boolean(l)),
+  );
+  const has = (lang: string, type: string) =>
+    recording.artifacts.some((a) => a.language === lang && a.type === type);
+  const translated = Array.from(langSet)
+    .sort()
+    .map((lang) => ({
+      lang,
+      hasSummary: has(lang, 'TRANSLATION_MD'),
+      hasSubtitle: has(lang, 'TRANSLATION_VTT'),
+      hasDub: has(lang, 'DUBBED_AUDIO'),
+    }));
 
   const enabledLocales = await loadEnabledLocales();
-  const translatedSet = new Set(translated);
   const available = enabledLocales
-    .filter((l) => l !== sourceLanguage && !translatedSet.has(l))
+    .filter((l) => l !== sourceLanguage && !langSet.has(l))
     .sort();
 
-  return Response.json({ sourceLanguage, translated, available });
+  return Response.json({
+    sourceLanguage,
+    eventSlug: recording.event?.slug ?? null,
+    translated,
+    available,
+  });
 });
 
 const bodySchema = z.object({
