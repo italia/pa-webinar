@@ -293,14 +293,38 @@ export default function EventDetailClient({
         </Alert>
       )}
 
-      {/* ─── Hero section ─── */}
+      {/* ─── Event header: cover + hero in one cohesive card ─── */}
       <div
-        className="rounded-3 p-4 p-lg-5 mb-5"
-        style={{
-          background: 'linear-gradient(135deg, #F5F7FB 0%, #E8F0FE 100%)',
-          borderLeft: `5px solid ${accentColor}`,
-        }}
+        className="mb-5 rounded-3 shadow-sm overflow-hidden"
+        style={{ border: '1px solid #e3e9f0' }}
       >
+        {/* 16:9 cover, cover-filled — same treatment as the event cards and
+            video-library thumbnails, so it looks consistent in every view
+            regardless of the asset's native ratio. The admin sets coverImageUrl
+            and imageUrl to the same asset; imageUrl carries it here (it also
+            doubles as the post-event video poster). */}
+        {event.imageUrl && (
+          <div
+            style={{
+              aspectRatio: '16 / 9',
+              backgroundImage: `url(${event.imageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundColor: '#E8F0FE',
+            }}
+            role="img"
+            aria-label={title}
+          />
+        )}
+
+        {/* ─── Hero content ─── */}
+        <div
+          className="p-4 p-lg-5"
+          style={{
+            background: 'linear-gradient(135deg, #F5F7FB 0%, #E8F0FE 100%)',
+            borderLeft: `5px solid ${accentColor}`,
+          }}
+        >
         <div className="d-flex align-items-center gap-2 mb-3">
           <StatusPill status={event.status} />
           {isLive && (
@@ -449,6 +473,7 @@ export default function EventDetailClient({
             </Col>
           )}
         </Row>
+        </div>
       </div>
 
       {/* ─── Content + Sidebar ─── */}
