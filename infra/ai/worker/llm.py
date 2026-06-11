@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from typing import Any, Dict, List, Optional
 
 import httpx
@@ -84,14 +85,45 @@ def _chat_completions(
     }
     if json_mode:
         body["response_format"] = {"type": "json_object"}
-    r = httpx.post(
-        base_url.rstrip("/") + "/chat/completions",
-        json=body,
-        timeout=timeout,
-    )
-    r.raise_for_status()
-    data = r.json()
-    return data["choices"][0]["message"]["content"]
+    url = base_url.rstrip("/") + "/chat/completions"
+
+    # vLLM è scalato a 0 quando la coda è vuota e impiega ~6 min a caricare
+    # i pesi di Mistral-Small-24B + compilazione CUDA-graph. Se il worker
+    # fallisse subito su ConnectError/503 (backend in cold-start), il job
+    # andrebbe in backoff: l'orchestrator vedrebbe runnable=0 e riscalerebbe
+    # vLLM a 0, buttando via il warmup → ciclo infinito (cold-start race).
+    # Restando invece in attesa qui, il job resta RUNNING, l'orchestrator
+    # mantiene running>0 e vLLM finisce di caricare → la chiamata va a buon
+    # fine. Atteso fino a LLM_CONNECT_WAIT_S (default 12 min); poi propaga.
+    connect_wait = float(os.environ.get("LLM_CONNECT_WAIT_S", "720"))
+    deadline = time.monotonic() + connect_wait
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            r = httpx.post(url, json=body, timeout=timeout)
+        except (httpx.ConnectError, httpx.ConnectTimeout, httpx.RemoteProtocolError) as e:
+            # Backend irraggiungibile: vLLM in cold-start → attendi e ritenta.
+            if time.monotonic() >= deadline:
+                raise
+            wait = min(15.0, 2.0 * attempt)
+            log.info(
+                "LLM backend non raggiungibile (%s) — attendo cold-start vLLM, retry in %.0fs",
+                type(e).__name__,
+                wait,
+            )
+            time.sleep(wait)
+            continue
+        # 503 = vLLM in piedi ma modello non ancora caricato → ritenta.
+        # Ogni altro non-2xx è un errore reale (400/422/500) → propaga subito.
+        if r.status_code == 503 and time.monotonic() < deadline:
+            wait = min(15.0, 2.0 * attempt)
+            log.info("vLLM 503 (modello in caricamento) — retry in %.0fs", wait)
+            time.sleep(wait)
+            continue
+        r.raise_for_status()
+        data = r.json()
+        return data["choices"][0]["message"]["content"]
 
 
 def _parse_json_lenient(raw: str) -> Dict[str, Any]:
