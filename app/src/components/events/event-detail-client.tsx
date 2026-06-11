@@ -306,10 +306,16 @@ export default function EventDetailClient({
         {event.imageUrl && (
           <div
             style={{
+              width: '100%',
               aspectRatio: '16 / 9',
+              // Cap the height so a wide screen can't blow the banner up to
+              // ~full-viewport. `contain` keeps a designed cover graphic fully
+              // visible (no crop) centred on a soft brand background.
+              maxHeight: 'min(38vh, 340px)',
               backgroundImage: `url(${event.imageUrl})`,
-              backgroundSize: 'cover',
+              backgroundSize: 'contain',
               backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
               backgroundColor: '#E8F0FE',
             }}
             role="img"
