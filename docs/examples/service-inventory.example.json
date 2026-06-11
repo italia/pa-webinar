@@ -1,0 +1,182 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:00000000-0000-0000-0000-000000000000",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-01-01T00:00:00Z",
+    "lifecycles": [{ "phase": "operations" }],
+    "manufacturer": {
+      "name": "<NOME PUBBLICA AMMINISTRAZIONE / OPERATORE>",
+      "url": ["https://<dominio-operatore>"]
+    },
+    "component": {
+      "bom-ref": "tenant:<TENANT-ID>",
+      "type": "application",
+      "name": "pa-webinar",
+      "version": "<VERSIONE APP DEPLOYATA, es. 0.5.1>",
+      "description": "Istanza pa-webinar per il tenant <TENANT-ID> (ambiente <test|production>).",
+      "licenses": [{ "license": { "id": "AGPL-3.0-only" } }],
+      "externalReferences": [
+        { "type": "vcs", "url": "https://github.com/italia/pa-webinar" },
+        { "type": "website", "url": "https://<host-pubblico-istanza>" }
+      ]
+    },
+    "properties": [
+      { "name": "pa-webinar:tenant", "value": "<TENANT-ID>" },
+      { "name": "pa-webinar:environment", "value": "<test|production>" },
+      { "name": "pa-webinar:cloud-provider", "value": "<Microsoft Azure | AWS | GCP | on-prem>" },
+      { "name": "pa-webinar:region", "value": "<es. italynorth / eu-south-1 / europe-west8>" },
+      { "name": "pa-webinar:deployment-mode", "value": "<simple|standard|full>" }
+    ]
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:oci/pa-webinar",
+      "type": "container",
+      "name": "pa-webinar",
+      "version": "<VERSIONE/TAG>",
+      "purl": "pkg:oci/italia/pa-webinar@sha256:<DIGEST>?repository_url=ghcr.io",
+      "description": "Immagine OCI dell'applicazione Next.js.",
+      "licenses": [{ "license": { "id": "AGPL-3.0-only" } }],
+      "properties": [
+        { "name": "pa-webinar:layer", "value": "app" },
+        { "name": "pa-webinar:stack-label", "value": "pa-webinar (Next.js)" }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/next",
+      "type": "framework",
+      "name": "next",
+      "version": "<VERSIONE>",
+      "purl": "pkg:npm/next@<VERSIONE>",
+      "licenses": [{ "license": { "id": "MIT" } }]
+    },
+    {
+      "bom-ref": "crypto:tls",
+      "type": "cryptographic-asset",
+      "name": "Certificato TLS <host>",
+      "description": "X.509 emesso da <CA> e rinnovato automaticamente. Chiavi in Secret/keystore gestito.",
+      "properties": [
+        { "name": "crypto:algorithm", "value": "RSA-2048 | ECDSA-P256" },
+        { "name": "crypto:issuer", "value": "<es. Let's Encrypt (ISRG)>" }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "bom-ref": "svc:compute",
+      "provider": { "name": "<provider, es. Microsoft Corporation>" },
+      "name": "<servizio compute, es. Azure Kubernetes Service>",
+      "version": "<versione k8s/runtime>",
+      "description": "Piattaforma di esecuzione dei container dell'applicazione.",
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [{ "classification": "application", "flow": "bi-directional" }],
+      "properties": [
+        { "name": "pa-webinar:layer", "value": "platform" },
+        { "name": "pa-webinar:stack-label", "value": "<etichetta compute>" }
+      ]
+    },
+    {
+      "bom-ref": "svc:database",
+      "provider": { "name": "<provider DB>" },
+      "name": "<database gestito, es. PostgreSQL Flexible Server>",
+      "description": "Dati applicativi: eventi, iscrizioni, consensi GDPR. PII cifrati AES-256-GCM a livello applicativo prima della scrittura.",
+      "endpoints": ["<host-db>:5432"],
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [
+        {
+          "classification": "personal-data",
+          "flow": "bi-directional",
+          "description": "Nominativi, email, consensi. Base giuridica: consenso (art. 6.1.a GDPR)."
+        }
+      ],
+      "properties": [
+        { "name": "pa-webinar:layer", "value": "data" },
+        { "name": "pa-webinar:stack-label", "value": "Database" }
+      ]
+    },
+    {
+      "bom-ref": "svc:object-storage",
+      "provider": { "name": "<provider storage>" },
+      "name": "<object storage, es. Azure Blob / S3 / GCS / MinIO>",
+      "description": "Conserva le registrazioni video.",
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [
+        {
+          "classification": "recording",
+          "flow": "outbound",
+          "description": "File video delle sessioni. Base giuridica: consenso esplicito del partecipante."
+        }
+      ],
+      "properties": [
+        { "name": "pa-webinar:layer", "value": "data" },
+        { "name": "pa-webinar:stack-label", "value": "Object storage (recordings)" }
+      ]
+    },
+    {
+      "bom-ref": "svc:smtp",
+      "provider": { "name": "<provider SMTP>" },
+      "name": "<servizio email transazionale>",
+      "description": "Email di conferma iscrizione, link moderatore, reminder.",
+      "endpoints": ["<smtp-host>:587"],
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [
+        {
+          "classification": "personal-data",
+          "flow": "outbound",
+          "description": "Email, nominativo, link personalizzato. Base giuridica: esecuzione del servizio (art. 6.1.b GDPR)."
+        }
+      ],
+      "externalReferences": [{ "type": "license", "url": "<URL del DPA del fornitore>" }],
+      "properties": [
+        { "name": "pa-webinar:layer", "value": "platform" },
+        { "name": "pa-webinar:stack-label", "value": "SMTP" }
+      ]
+    },
+    {
+      "bom-ref": "svc:turn",
+      "provider": { "name": "self-hosted (coturn)" },
+      "name": "TURN/STUN relay",
+      "description": "Relay A/V per partecipanti dietro NAT simmetrici. Media non conservato.",
+      "endpoints": ["turn:<host>:3478", "turns:<host>:443"],
+      "authenticated": true,
+      "x-trust-boundary": true,
+      "data": [{ "classification": "media", "flow": "bi-directional" }],
+      "properties": [
+        { "name": "pa-webinar:layer", "value": "access" },
+        { "name": "pa-webinar:stack-label", "value": "coturn (TURN/STUN)" }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "tenant:<TENANT-ID>",
+      "dependsOn": [
+        "pkg:oci/pa-webinar",
+        "crypto:tls",
+        "svc:compute",
+        "svc:database",
+        "svc:object-storage",
+        "svc:smtp",
+        "svc:turn"
+      ]
+    },
+    { "ref": "pkg:oci/pa-webinar", "dependsOn": ["pkg:npm/next"] }
+  ],
+  "vulnerabilities": [],
+  "annotations": [
+    {
+      "bom-ref": "annotation:howto",
+      "subjects": ["tenant:<TENANT-ID>"],
+      "annotator": { "organization": { "name": "<OPERATORE>" } },
+      "timestamp": "2026-01-01T00:00:00Z",
+      "text": "Template di Service Inventory per un'istanza pa-webinar. Sostituisci i segnaposto <...> con i valori REALI del tuo ambiente (vedi docs/SERVICE-INVENTORY.md §4 per le ricette di discovery per Azure/AWS/GCP/on-prem), ospita il file su un URL HTTPS e impostalo in SERVICE_INVENTORY_URL. La parte components[] (DEV) può essere generata automaticamente a ogni release da cdxgen + syft."
+    }
+  ]
+}

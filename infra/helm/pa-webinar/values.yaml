@@ -830,6 +830,20 @@ postprod:
     schedule: "* * * * *"
     image: bitnami/kubectl:latest
 
+  # vLLM (LLM server per i task SUMMARIZE/TRANSLATE). E' un Deployment GPU
+  # separato (oggi applicato a mano, vedi docs/POSTPROD.md). Su un pool
+  # aigpu scale-to-zero, tenerlo sempre a replicas=1 vanifica lo
+  # scale-to-zero e tiene acceso l'A100 (~3.40 EUR/h) anche a vuoto.
+  vllm:
+    # Se true, l'orchestrator scala il Deployment vLLM a 1 quando c'e'
+    # lavoro postprod (desired>0 o worker attivi) e a 0 quando la pipeline
+    # e' idle. Concede automaticamente all'orchestrator l'RBAC
+    # deployments/scale. Default false: abilitare dopo aver reso il
+    # Deployment vLLM gestito e tollerante al taint Spot del pool aigpu.
+    autoscale: false
+    # Nome del Deployment vLLM da scalare. Vuoto => "<fullname>-vllm".
+    deploymentName: ""
+
   # Worker template (CronJob, suspended). The orchestrator runs
   # `kubectl create job --from=cronjob/<this>`, inheriting the pod
   # spec defined here (image, nodeSelector, tolerations, resources).

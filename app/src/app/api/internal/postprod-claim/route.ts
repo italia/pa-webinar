@@ -276,6 +276,33 @@ export const POST = withErrorHandling(async (request) => {
     };
   }
 
+  // DUBBED_VIDEO is an OPTIONAL extra output of DUB (source MP4 muxed
+  // with the dubbed audio track). Like waveform, it's kept OUT of
+  // expectedArtifactsForJob (best-effort: a mux failure must NOT fail
+  // the DUB job — the dubbed AUDIO is the primary deliverable) and the
+  // upload target is handed out manually here.
+  if (row.kind === 'DUB') {
+    const targetLang = (parsed.data.payload as { targetLanguage?: string }).targetLanguage;
+    if (targetLang) {
+      const dvKey = artifactPath(
+        { eventId: recording.eventId, recordingId: recording.id, runCount: recording.runCount },
+        'DUBBED_VIDEO',
+        targetLang,
+      );
+      const dvMime = artifactMimeType('DUBBED_VIDEO');
+      const dvPresigned = await presignArtifactUpload({
+        blobKey: dvKey,
+        contentType: dvMime,
+        expiresInMinutes: lease,
+      });
+      uploadTargets.dubbedVideo = {
+        url: dvPresigned.uploadUrl,
+        blobKey: dvKey,
+        contentType: dvMime,
+      };
+    }
+  }
+
   // Inputs: dependency artifacts the worker needs to read. For now
   // SUMMARIZE/TRANSLATE need the transcript raw JSON produced by
   // TRANSCRIBE (which is recorded as TRANSCRIPT_JSON). We look it up
@@ -288,6 +315,13 @@ export const POST = withErrorHandling(async (request) => {
     displayName?: string | null;
     startOffsetMs?: number;
   }> = [];
+  // Mappa diarLabel→nome reale (Speaker DB): la passiamo al worker per
+  // SUMMARIZE/TRANSLATE così la SINTESI e i sottotitoli tradotti usano il
+  // nome ("Raffaele") invece di "SPEAKER_00". Su multitrack i nomi (JWT) ci
+  // sono sempre; su blind diarization compaiono dopo il mapping admin (→
+  // ri-esegui SUMMARIZE). Speaker.displayName è in chiaro (vedi transcript
+  // route che lo usa diretto).
+  const speakerNames: Record<string, string> = {};
   const sourceDownloadUrl = await presignArtifactDownload({
     blobKey: recording.blobKey,
     expiresInMinutes: lease,
@@ -409,6 +443,38 @@ export const POST = withErrorHandling(async (request) => {
       blobKey: transcript.blobKey,
     });
 
+    // Nomi reali per la sintesi/traduzione (vedi speakerNames sopra).
+    const speakerRows = await prisma.speaker.findMany({
+      where: { recordingId: recording.id, displayName: { not: null } },
+      select: { diarLabel: true, displayName: true },
+    });
+    for (const sp of speakerRows) {
+      if (sp.displayName) speakerNames[sp.diarLabel] = sp.displayName;
+    }
+
+    // TRANSLATE: fornisci ANCHE la sintesi strutturata SORGENTE
+    // (SUMMARY_JSON nella lingua sorgente) così il worker la traduce →
+    // SUMMARY_JSON[target] + TRANSLATION_MD[target]. Se l'evento non ha
+    // aiSummaryEnabled l'artifact non esiste: input assente e il worker
+    // salta la sintesi tradotta (niente più placeholder vuoto).
+    if (row.kind === 'TRANSLATE') {
+      const srcLang =
+        recording.sourceLanguage ??
+        (parsed.data.payload as { sourceLanguage?: string }).sourceLanguage ??
+        'it';
+      const summaryJson = await prisma.postprodArtifact.findFirst({
+        where: { recordingId: recording.id, type: 'SUMMARY_JSON', language: srcLang },
+        select: { blobKey: true },
+      });
+      if (summaryJson) {
+        const sUrl = await presignArtifactDownload({
+          blobKey: summaryJson.blobKey,
+          expiresInMinutes: lease,
+        });
+        inputs.push({ role: 'summary', downloadUrl: sUrl, blobKey: summaryJson.blobKey });
+      }
+    }
+
     // DUB richiede ANCHE il TRANSLATION_VTT della lingua target —
     // contiene i segmenti tradotti con timestamp originali su cui
     // il TTS allinea l'audio generato.
@@ -466,6 +532,7 @@ export const POST = withErrorHandling(async (request) => {
       sourceDownloadUrl,
       uploadTargets,
       inputs,
+      speakerNames,
       providerHints: {
         llmProvider: llm.provider,
         asrProvider: asr.provider,

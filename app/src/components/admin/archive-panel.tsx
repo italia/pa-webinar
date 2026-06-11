@@ -144,8 +144,29 @@ export default function ArchivePanel({ recordingId }: { recordingId: string }) {
       <p className="text-secondary small mb-3">{t('archivePiiNote')}</p>
 
       {!hasTracks ? (
-        <div className="alert alert-secondary mb-0" role="status">
-          {t('archiveNoTracks')}
+        <div>
+          {/* Niente tracce per-partecipante (multitrack non attivo): invece
+              di una tab vuota, offriamo la registrazione SORGENTE (riascolto
+              + download) e spieghiamo perché l'archivio MKV non è disponibile. */}
+          <div className="alert alert-secondary" role="status">{t('archiveNoTracks')}</div>
+          {data?.mixUrl && (
+            <>
+              <h2 className="h6 fw-semibold mb-2">{t('archiveSourceTitle')}</h2>
+              <p className="text-secondary small mb-2">{t('archiveSourceHint')}</p>
+              <VideoPlayer
+                src={data.mixUrl}
+                title={t('archiveSourceTitle')}
+                subtitleTracks={subtitleTracks}
+              />
+              <a
+                href={data.mixUrl}
+                className="btn btn-sm btn-outline-secondary mt-2"
+                download
+              >
+                {t('archiveSourceDownload')}
+              </a>
+            </>
+          )}
         </div>
       ) : (
         <>

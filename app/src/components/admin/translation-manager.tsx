@@ -1,42 +1,49 @@
 'use client';
 
 /**
- * Per-recording translation language manager (admin).
+ * Tab "Traduzioni" della gestione registrazione.
  *
- * Loaded inside an expanded recording row in the postprod dashboard.
- * Shows the languages the recording is already translated into and lets
- * the operator add a new one, which enqueues a single TRANSLATE job via
+ * Mostra le lingue già tradotte con i loro contenuti scaricabili (sintesi /
+ * sottotitoli / doppiaggio) e permette di aggiungere una nuova lingua, che
+ * accoda un TRANSLATE (+ DUB se il doppiaggio è attivo) via
  * POST /api/admin/postprod/recordings/[id]/translations.
  *
- * UI strings are inline Italian for now (i18n keys listed in the PR
- * report). Bootstrap Italia utility classes only — no <Icon> (it
- * triggers hydration mismatches), inline SVG where a glyph is needed.
+ * Strings sotto `admin.postprod.tm.*`. Bootstrap Italia, no <Icon>.
  */
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
+
 import { SkeletonLines } from '@/components/ui/skeleton';
 
-const fetcher = (url: string): Promise<unknown> =>
+interface TranslatedLang {
+  lang: string;
+  hasSummary: boolean;
+  hasSubtitle: boolean;
+  hasDub: boolean;
+}
+interface TranslationsResponse {
+  sourceLanguage: string;
+  eventSlug: string | null;
+  translated: TranslatedLang[];
+  available: string[];
+}
+
+const fetcher = (url: string): Promise<TranslationsResponse> =>
   fetch(url, { credentials: 'include' }).then(async (r) => {
     if (!r.ok) {
       let msg = `HTTP ${r.status}`;
       try {
-        const body = (await r.json()) as { error?: string; message?: string };
-        msg = body.error ?? body.message ?? msg;
+        const b = (await r.json()) as { error?: string; message?: string };
+        msg = b.error ?? b.message ?? msg;
       } catch {
-        /* keep status message */
+        /* keep */
       }
       throw new Error(msg);
     }
-    return r.json();
+    return r.json() as Promise<TranslationsResponse>;
   });
-
-interface TranslationsResponse {
-  sourceLanguage: string;
-  translated: string[];
-  available: string[];
-}
 
 export default function TranslationManager({
   recordingId,
@@ -45,11 +52,9 @@ export default function TranslationManager({
   recordingId: string;
   onChanged?: () => void;
 }) {
+  const t = useTranslations('admin.postprod.tm');
   const url = `/api/admin/postprod/recordings/${recordingId}/translations`;
-  const { data, error, isLoading, mutate } = useSWR<TranslationsResponse>(
-    url,
-    fetcher as (u: string) => Promise<TranslationsResponse>,
-  );
+  const { data, error, isLoading, mutate } = useSWR<TranslationsResponse>(url, fetcher);
 
   const [selected, setSelected] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -69,10 +74,10 @@ export default function TranslationManager({
       if (!res.ok) {
         let msg = `HTTP ${res.status}`;
         try {
-          const body = (await res.json()) as { error?: string; message?: string };
-          msg = body.error ?? body.message ?? msg;
+          const b = (await res.json()) as { error?: string; message?: string };
+          msg = b.error ?? b.message ?? msg;
         } catch {
-          /* keep status message */
+          /* keep */
         }
         throw new Error(msg);
       }
@@ -80,102 +85,125 @@ export default function TranslationManager({
       await mutate();
       onChanged?.();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Errore imprevisto');
+      setActionError(err instanceof Error ? err.message : t('unexpectedError'));
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (isLoading) {
-    return <SkeletonLines lines={2} loadingLabel="Caricamento lingue di traduzione…" />;
+  if (isLoading) return <SkeletonLines lines={3} loadingLabel={t('loading')} />;
+  if (error || !data) {
+    return <div className="alert alert-danger small mb-0" role="alert">{t('loadError')}</div>;
   }
 
-  if (error || !data) {
-    return (
-      <div className="alert alert-danger small mb-0" role="alert">
-        Impossibile caricare le lingue di traduzione.
-      </div>
-    );
-  }
+  const slug = data.eventSlug;
+  const dl = (lang: string, kind: 'summary' | 'subtitle' | 'dub') => {
+    if (!slug) return null;
+    if (kind === 'summary') return `/api/events/${slug}/postprod/download/summary.md?lang=${lang}`;
+    if (kind === 'subtitle') return `/api/events/${slug}/postprod/subtitle/${lang}`;
+    return `/api/events/${slug}/postprod/dubbed-audio/${lang}`;
+  };
 
   return (
     <div>
-      <h6 className="text-uppercase text-secondary small mb-2">
-        Lingue di traduzione
-      </h6>
-
-      <div className="mb-2">
-        <span className="text-secondary small me-2">Lingua sorgente:</span>
-        <span className="badge bg-secondary text-uppercase">
-          {data.sourceLanguage}
-        </span>
-      </div>
-
       <div className="mb-3">
-        <span className="text-secondary small d-block mb-1">Già tradotte:</span>
-        {data.translated.length === 0 ? (
-          <span className="text-secondary small">Nessuna traduzione ancora.</span>
-        ) : (
-          <div className="d-flex flex-wrap gap-1">
-            {data.translated.map((lang) => (
-              <span
-                key={lang}
-                className="badge bg-success-subtle text-success-emphasis text-uppercase border border-success-subtle"
-              >
-                {lang}
-              </span>
-            ))}
+        <span className="text-secondary small me-2">{t('sourceLabel')}</span>
+        <span className="badge bg-secondary text-uppercase">{data.sourceLanguage}</span>
+      </div>
+
+      <h6 className="text-uppercase text-secondary small mb-2">{t('translatedHeader')}</h6>
+      {data.translated.length === 0 ? (
+        <p className="text-secondary small">{t('noneYet')}</p>
+      ) : (
+        <div className="table-responsive mb-3">
+          <table className="table table-sm align-middle mb-0">
+            <thead>
+              <tr className="small text-secondary">
+                <th>{/* lang */}</th>
+                <th>{t('summary')}</th>
+                <th>{t('subtitles')}</th>
+                <th>{t('dub')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.translated.map((tl) => (
+                <tr key={tl.lang}>
+                  <td>
+                    <span className="badge bg-success-subtle text-success-emphasis border border-success-subtle text-uppercase">
+                      {tl.lang}
+                    </span>
+                  </td>
+                  <td>
+                    {tl.hasSummary && slug ? (
+                      <a className="small text-decoration-none" href={dl(tl.lang, 'summary')!}>
+                        ✓ {t('download')}
+                      </a>
+                    ) : (
+                      <span className="text-secondary">–</span>
+                    )}
+                  </td>
+                  <td>
+                    {tl.hasSubtitle && slug ? (
+                      <a className="small text-decoration-none" href={dl(tl.lang, 'subtitle')!}>
+                        ✓ {t('download')}
+                      </a>
+                    ) : (
+                      <span className="text-secondary">–</span>
+                    )}
+                  </td>
+                  <td>
+                    {tl.hasDub && slug ? (
+                      <a className="small text-decoration-none" href={dl(tl.lang, 'dub')!}>
+                        ✓ {t('download')}
+                      </a>
+                    ) : (
+                      <span className="text-secondary">–</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Aggiungi lingua, oppure messaggio chiaro quando sono tutte tradotte. */}
+      {data.available.length === 0 ? (
+        <p className="text-secondary small mb-2">{t('allTranslated')}</p>
+      ) : (
+        <div className="d-flex flex-wrap gap-2 align-items-end mb-2">
+          <div>
+            <label htmlFor={`add-lang-${recordingId}`} className="form-label small mb-1">
+              {t('addLabel')}
+            </label>
+            <select
+              id={`add-lang-${recordingId}`}
+              className="form-select form-select-sm"
+              value={selected}
+              onChange={(e) => setSelected(e.target.value)}
+              disabled={submitting}
+            >
+              <option value="">{t('selectPlaceholder')}</option>
+              {data.available.map((lang) => (
+                <option key={lang} value={lang}>{lang}</option>
+              ))}
+            </select>
           </div>
-        )}
-      </div>
-
-      <div className="d-flex flex-wrap gap-2 align-items-end">
-        <div>
-          <label
-            htmlFor={`add-lang-${recordingId}`}
-            className="form-label small mb-1"
+          <button
+            type="button"
+            className="btn btn-sm btn-primary"
+            onClick={() => void handleAdd()}
+            disabled={!selected || submitting}
           >
-            Aggiungi una lingua
-          </label>
-          <select
-            id={`add-lang-${recordingId}`}
-            className="form-select form-select-sm"
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            disabled={submitting || data.available.length === 0}
-          >
-            <option value="">
-              {data.available.length === 0
-                ? 'Nessuna lingua disponibile'
-                : 'Seleziona una lingua…'}
-            </option>
-            {data.available.map((lang) => (
-              <option key={lang} value={lang}>
-                {lang}
-              </option>
-            ))}
-          </select>
+            {submitting ? t('adding') : t('addButton')}
+          </button>
         </div>
-        <button
-          type="button"
-          className="btn btn-sm btn-primary"
-          onClick={handleAdd}
-          disabled={!selected || submitting}
-        >
-          {submitting ? 'Aggiunta in corso…' : 'Aggiungi lingua'}
-        </button>
-      </div>
+      )}
 
-      {actionError ? (
-        <div className="alert alert-danger small mt-2 mb-0" role="alert">
-          {actionError}
-        </div>
-      ) : null}
-
-      <p className="text-secondary small mt-2 mb-0">
-        L&apos;aggiunta di una lingua genera la traduzione di transcript e
-        sintesi: la lavorazione avviene in background.
-      </p>
+      {actionError && (
+        <div className="alert alert-danger small mt-2 mb-0" role="alert">{actionError}</div>
+      )}
+      <p className="text-secondary small mt-2 mb-0">{t('note')}</p>
     </div>
   );
 }

@@ -32,6 +32,7 @@ interface TemplatePreset {
   chatEnabled: boolean;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
+  agendaEnabled?: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;

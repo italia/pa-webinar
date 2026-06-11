@@ -49,13 +49,21 @@ export function recordingPrefix(eventId: string, recordingId: string): string {
   return `${MULTITRACK_ROOT}/${sanitizeSegment(eventId)}/${sanitizeSegment(recordingId)}`;
 }
 
-/** Object key della singola traccia audio di un partecipante. */
+/**
+ * Object key della singola traccia audio.
+ *
+ * `trackFileId` identifica la SESSIONE di traccia, NON il solo partecipante:
+ * un rejoin o un mute→unmute dello stesso partecipante produce una nuova
+ * sessione (es. `${pid}-0`, `${pid}-1`) e quindi un file/blob DISTINTO.
+ * Usare il solo participantId qui causava la sovrascrittura della traccia
+ * al secondo intervento (audio perso) — vedi ADR-013 / audit recorder.
+ */
 export function trackKey(
   eventId: string,
   recordingId: string,
-  participantId: string,
+  trackFileId: string,
 ): string {
-  return `${recordingPrefix(eventId, recordingId)}/audio/${sanitizeSegment(participantId)}.${TRACK_FILE_EXT}`;
+  return `${recordingPrefix(eventId, recordingId)}/audio/${sanitizeSegment(trackFileId)}.${TRACK_FILE_EXT}`;
 }
 
 /** Object key del manifest `tracks.json` della registrazione. */
@@ -64,11 +72,12 @@ export function manifestKey(eventId: string, recordingId: string): string {
 }
 
 /**
- * Nome file locale (su disco, in OUTPUT_DIR) della traccia di un
- * partecipante, prima dell'upload. Volutamente PIATTO (niente
- * sottocartelle) per semplificare la cattura: la gerarchia esiste solo
- * lato storage. La mappa locale→remoto la fa `trackKey`.
+ * Nome file locale (su disco, in OUTPUT_DIR) di una SESSIONE di traccia,
+ * prima dell'upload. `trackFileId` è univoco per sessione (vedi `trackKey`):
+ * due sessioni dello stesso partecipante (rejoin / mute→unmute) scrivono su
+ * file DISTINTI, così la seconda non tronca la prima. Volutamente PIATTO
+ * (niente sottocartelle); la mappa locale→remoto la fa `trackKey`.
  */
-export function localTrackFilename(participantId: string): string {
-  return `${sanitizeSegment(participantId)}.${TRACK_FILE_EXT}`;
+export function localTrackFilename(trackFileId: string): string {
+  return `${sanitizeSegment(trackFileId)}.${TRACK_FILE_EXT}`;
 }

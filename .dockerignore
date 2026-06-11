@@ -1,10 +1,13 @@
 # Dependencies (installed fresh in container)
 node_modules
 app/node_modules
+lobby/node_modules
 
 # Build output (built fresh in container)
 app/.next
 .next
+lobby/dist
+lobby/dist-harness
 
 # Git
 .git

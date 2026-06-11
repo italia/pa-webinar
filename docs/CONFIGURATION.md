@@ -471,6 +471,29 @@ jitsi-meet:
           config.p2p.iceTransportPolicy = 'all';
 ```
 
+## Service inventory (trasparenza)
+
+La pagina pubblica `/service-inventory` mostra le dipendenze software e i
+servizi del fornitore in formato CycloneDX 1.6. È **per-ambiente** e **non**
+inclusa nell'immagine: ogni operatore pubblica il proprio documento.
+
+```yaml
+app:
+  env:
+    # URL HTTPS al proprio documento (consigliato: nessun rebuild immagine).
+    # Vuoto = pagina "inventario non pubblicato".
+    SERVICE_INVENTORY_URL: "https://<tuo-host>/service-inventory.json"
+```
+
+| Valore | Comportamento |
+|---|---|
+| vuoto | pagina "non pubblicato" |
+| `https://…` | `fetch()` lato server con cache ISR 1h (nessun rebuild) |
+| `/path` | letto da `public/path` dentro l'immagine (legacy/demo) |
+
+Vedi **[`SERVICE-INVENTORY.md`](SERVICE-INVENTORY.md)** per template, ricette
+di discovery per Azure/AWS/GCP/on-prem e opzioni di hosting.
+
 **Parametri importanti:**
 
 | Parametro | Valore | Motivo |

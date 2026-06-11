@@ -24,11 +24,46 @@ import os
 import shutil
 import subprocess
 import tempfile
+import wave
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, TypedDict
 
 log = logging.getLogger(__name__)
+
+
+# Path delle voci Piper bakate nell'immagine (vedi Dockerfile.worker).
+# Serve da fallback quando il path configurato (providerHints.ttsVoicesPath,
+# es. /models/piper su una PVC/emptyDir non popolata) non contiene voci
+# per la lingua richiesta — così il DUB non fallisce con FileNotFoundError.
+BAKED_VOICES_PATH = "/opt/piper-voices"
+
+
+def _has_voice(root: str, language: str) -> bool:
+    """True se `root/<language>` esiste e contiene almeno un .onnx."""
+    if not root:
+        return False
+    d = Path(root) / language
+    return d.is_dir() and any(d.glob("*.onnx"))
+
+
+def resolve_voices_path(configured: str, language: str) -> str:
+    """Sceglie la dir voci da usare per `language`.
+
+    Preferisce il path configurato; se non esiste/è vuota, ricade sulle
+    voci bakate nell'immagine (`/opt/piper-voices`). Se nessuna delle due
+    ha voci ritorna il path configurato, così l'errore originale
+    (FileNotFoundError in build_voice_pool) resta esplicito.
+    """
+    if _has_voice(configured, language):
+        return configured
+    if _has_voice(BAKED_VOICES_PATH, language):
+        log.info(
+            "voci Piper per '%s' assenti in %s; uso quelle bakate in %s",
+            language, configured, BAKED_VOICES_PATH,
+        )
+        return BAKED_VOICES_PATH
+    return configured
 
 
 class Segment(TypedDict, total=False):
@@ -168,6 +203,60 @@ def _format_silence(duration_sec: float, out_path: str) -> None:
     )
 
 
+def watermark_m4a_inplace(m4a_path: str) -> bool:
+    """Applica un watermark AudioSeal (Meta, MIT) all'm4a doppiato,
+    in-place — AI Act Art. 50 (marca inudibile, rilevabile da un modello).
+
+    AudioSeal è 16 kHz-native: l'audio viene ricampionato a 16k (qualità
+    "speech" adeguata per una voce sintetica neutra), watermarkato e
+    ri-codificato in m4a. Best-effort: ritorna True se applicato; solleva
+    se le dipendenze/modelli mancano (il chiamante cattura e pubblica
+    l'audio non watermarkato). Richiede torch + torchaudio + audioseal
+    (vedi requirements.txt) + download modello da HuggingFace.
+    """
+    import numpy as np  # type: ignore[import-not-found]
+    import torch  # type: ignore[import-not-found]
+    from audioseal import AudioSeal  # type: ignore[import-not-found]
+
+    wav16 = m4a_path + ".wm16.wav"
+    out_wav = m4a_path + ".wm.wav"
+    try:
+        # m4a (AAC) → wav PCM 16-bit mono 16k. I/O del WAV via stdlib
+        # `wave` + numpy (NON torchaudio.load: nelle torchaudio recenti
+        # richiede torchcodec; questo è backend-indipendente).
+        subprocess.check_call(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", m4a_path,
+             "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", wav16],
+        )
+        with wave.open(wav16, "rb") as w:
+            sr = w.getframerate()
+            frames = w.readframes(w.getnframes())
+        audio = np.frombuffer(frames, dtype=np.int16).astype(np.float32) / 32768.0
+        x = torch.from_numpy(audio).reshape(1, 1, -1)  # [batch=1, channels=1, T]
+        model = AudioSeal.load_generator("audioseal_wm_16bits")
+        with torch.no_grad():
+            watermark = model.get_watermark(x, sr)
+            wm = (x + watermark).clamp(-1.0, 1.0).squeeze().cpu().numpy()
+        wm_i16 = (wm * 32767.0).astype(np.int16)
+        with wave.open(out_wav, "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(sr)
+            w.writeframes(wm_i16.tobytes())
+        subprocess.check_call(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", out_wav,
+             "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", m4a_path],
+        )
+        log.info("AudioSeal watermark applicato a %s", os.path.basename(m4a_path))
+        return True
+    finally:
+        for p in (wav16, out_wav):
+            try:
+                os.remove(p)
+            except OSError:
+                pass
+
+
 def dub_with_piper(
     *,
     segments: List[Segment],
@@ -197,6 +286,10 @@ def dub_with_piper(
     # builder gira solo in handler DUB.
     from . import voice_pool as vp
     from . import name_gender as ng
+
+    # Risolvi il path voci: se quello configurato è vuoto (es. /models/piper
+    # su emptyDir non seedato), ricadi sulle voci bakate nell'immagine.
+    voices_path = resolve_voices_path(voices_path, target_language)
 
     # Costruisci il pool. Pitch variants attivi così copriamo bene
     # anche le lingue povere (es. IT con 2 voci → 6 timbri).
@@ -276,11 +369,16 @@ def dub_with_piper(
             # TTS del testo. Piper API: voice.synthesize_wav(text, file,
             # speaker_id=N).
             raw_path = os.path.join(workdir, f"seg-{idx:04d}_raw.wav")
-            with open(raw_path, "wb") as f:
+            # piper-tts 1.2.0: `synthesize(text, wave.Wave_write[, speaker_id])`.
+            # NON `synthesize_wav` (esiste solo in piper più recenti → l'errore
+            # "'PiperVoice' object has no attribute 'synthesize_wav'") e NON un
+            # file binario grezzo: vuole un oggetto `wave.open(..., "wb")`, su
+            # cui synthesize imposta framerate/sampwidth/nchannels e scrive.
+            with wave.open(raw_path, "wb") as wav_file:
                 if entry.speaker_id is not None:
-                    piper_voice.synthesize_wav(text, f, speaker_id=entry.speaker_id)
+                    piper_voice.synthesize(text, wav_file, speaker_id=entry.speaker_id)
                 else:
-                    piper_voice.synthesize_wav(text, f)
+                    piper_voice.synthesize(text, wav_file)
 
             # Pitch shift (no-op se pitch_cents=0)
             seg_path = os.path.join(workdir, f"seg-{idx:04d}.wav")

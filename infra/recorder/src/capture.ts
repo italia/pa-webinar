@@ -49,8 +49,13 @@ export interface CaptureConfig {
   serviceUrl?: string;
   /** MUC domain. Default: conference.{domain}. */
   mucDomain?: string;
-  /** Chiusura quando la stanza resta senza partecipanti per N secondi. */
+  /** Chiusura quando la stanza resta senza partecipanti per N secondi
+   *  DOPO che almeno un partecipante è stato visto. */
   idleTimeoutSec?: number;
+  /** Grace iniziale: quanto attendere l'ARRIVO del primo partecipante prima
+   *  di chiudere (il bot può entrare prima dei partecipanti). Default 15min:
+   *  evita che il recorder se ne vada se gli utenti tardano. */
+  initialGraceSec?: number;
   /** Hard cap di durata della cattura (safety). Default 4h. */
   maxDurationSec?: number;
 }
@@ -108,21 +113,23 @@ export interface CaptureResult {
 export async function captureRoom(config: CaptureConfig): Promise<CaptureResult> {
   await mkdir(config.outputDir, { recursive: true });
 
-  // Writer per-traccia, chiave = track-instance id (un rejoin dello stesso
-  // pid produce un nuovo file). Popolati dagli handler lib-jitsi-meet che
-  // girano DENTRO la pagina e ci chiamano via le funzioni esposte sotto.
+  // Writer per-traccia. La chiave `trackFileId` (= `${pid}-${seq}` dalla
+  // pagina) è univoca per SESSIONE: un rejoin / mute→unmute dello stesso
+  // partecipante crea una NUOVA chiave → un NUOVO file (prima riusava
+  // `${pid}.opus` e troncava la sessione precedente: audio perso).
   const writers = new Map<string, TrackWriter>();
-  function getOrCreateWriter(trackKey: string, pid: string, name: string | null): TrackWriter {
-    let w = writers.get(trackKey);
+  function getOrCreateWriter(trackFileId: string, pid: string, name: string | null): TrackWriter {
+    let w = writers.get(trackFileId);
     if (!w) {
-      w = new TrackWriter(pid, name, config.outputDir);
-      writers.set(trackKey, w);
+      w = new TrackWriter(pid, trackFileId, name, config.outputDir);
+      writers.set(trackFileId, w);
     }
     if (name && !w.displayName) w.displayName = name;
     return w;
   }
 
   const idleTimeoutMs = (config.idleTimeoutSec ?? 90) * 1000;
+  const initialGraceMs = (config.initialGraceSec ?? 15 * 60) * 1000;
   const maxDurationMs = (config.maxDurationSec ?? 4 * 3600) * 1000;
   const serviceUrl = config.serviceUrl ?? `wss://${config.jitsiDomain}/xmpp-websocket`;
   const mucDomain = config.mucDomain ?? `conference.${config.jitsiDomain}`;
@@ -160,6 +167,16 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
         }
       },
     );
+    // Ancora la timeline della traccia all'istante in cui parte il
+    // MediaRecorder (origine del file), NON al primo chunk (~1s dopo, con
+    // jitter FileReader/IPC): così startOffsetMs (= firstFrame - t0) è
+    // accurato e i late-joiner finiscono al tempo assoluto giusto.
+    await page.exposeFunction(
+      'onTrackStarted',
+      (trackKey: string, pid: string, name: string | null, startedAtMs: number) => {
+        getOrCreateWriter(trackKey, pid, name).anchor(startedAtMs);
+      },
+    );
     await page.exposeFunction('onTrackEnded', async (trackKey: string) => {
       await writers.get(trackKey)?.close();
     });
@@ -190,6 +207,7 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
       mucDomain,
       domain: config.jitsiDomain,
       idleTimeoutMs,
+      initialGraceMs,
     });
 
     // Attendi fine conference o hard-cap di durata.
@@ -222,6 +240,7 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
   mucDomain: string;
   domain: string;
   idleTimeoutMs: number;
+  initialGraceMs: number;
 }): Promise<void> =>
   new Promise<void>((resolve) => {
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -255,16 +274,39 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     let conference: any = null;
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
     const recorders = new Map<string, { rec: any; key: string }>();
+    // Contatore monotono per generare un trackFileId univoco per sessione,
+    // robusto a due TRACK_ADDED nello stesso ms (Date.now() poteva collidere).
+    let trackSeq = 0;
+    // È mai entrato un partecipante? Distingue "stanza ancora vuota all'avvio"
+    // (grace lungo: il bot può entrare prima degli utenti) da "tutti usciti
+    // dopo l'attività" (idle breve).
+    let seenParticipant = false;
+    let finishing = false;
 
-    const finish = () => {
-      for (const { rec, key } of recorders.values()) {
-        try {
-          rec.stop();
-        } catch {
-          /* già fermo */
-        }
-        w.onTrackEnded?.(key);
-      }
+    const finish = async (): Promise<void> => {
+      if (finishing) return;
+      finishing = true;
+      if (idleTimer) clearTimeout(idleTimer);
+      // Ferma i recorder e ATTENDI l'onstop (che dispatcha l'ultimo
+      // dataavailable): senza l'attesa l'ultimo ~1s di audio poteva non
+      // essere flushato. + piccola attesa per drenare FileReader/IPC dei
+      // chunk finali (best-effort; da validare su Jitsi reale).
+      await Promise.all(
+        [...recorders.values()].map(
+          ({ rec }) =>
+            new Promise<void>((res) => {
+              if (!rec || rec.state === 'inactive') return res();
+              rec.onstop = () => res();
+              try {
+                rec.stop();
+              } catch {
+                res();
+              }
+            }),
+        ),
+      );
+      await new Promise<void>((res) => setTimeout(res, 500));
+      for (const { key } of recorders.values()) w.onTrackEnded?.(key);
       try {
         conference?.leave();
         connection.disconnect();
@@ -280,20 +322,41 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       // Conta i partecipanti REMOTI VISIBILI: getParticipants() esclude il
       // bot stesso e i partecipanti nascosti (focus/jicofo). Usare
       // getParticipantCount()-1 contava il focus → others>0 → l'idle timer
-      // non scattava mai e il bot restava in stanza fino a maxDuration (4h),
-      // tenendo su il JVB. Vedi collaudo ADR-013.
+      // non scattava mai e il bot restava in stanza fino a maxDuration (4h).
       const parts: any[] = conference?.getParticipants?.() ?? [];
       const others = parts.filter((p) => !p.isHidden?.()).length;
-      if (others <= 0) idleTimer = setTimeout(finish, cfg.idleTimeoutMs);
+      if (others > 0) {
+        seenParticipant = true;
+        return; // c'è qualcuno: nessun timer di chiusura
+      }
+      // Stanza vuota: grace LUNGO finché non si è mai visto nessuno (attesa
+      // dell'arrivo), BREVE dopo che l'evento ha avuto attività.
+      void (idleTimer = setTimeout(
+        () => void finish(),
+        seenParticipant ? cfg.idleTimeoutMs : cfg.initialGraceMs,
+      ));
     };
 
     const onTrackAdded = (track: any) => {
       if (track.isLocal?.() || track.getType?.() !== 'audio') return;
+      seenParticipant = true;
+      if (idleTimer) clearTimeout(idleTimer);
       const pid: string = track.getParticipantId?.() ?? 'unknown';
       const name: string | null =
         conference?.getParticipantById?.(pid)?.getDisplayName?.() ?? null;
-      const key = `${pid}-${Date.now()}`;
-      const stream: MediaStream = track.getOriginalStream();
+      // trackFileId univoco per sessione: rejoin/unmute → file distinto.
+      const key = `${pid}-${trackSeq++}`;
+      // Registra SOLO la audio track di questo partecipante, non l'intero
+      // getOriginalStream() (che può contenere altre track, es. video) →
+      // garantisce "una voce per file" e nessun cross-content.
+      const original: MediaStream = track.getOriginalStream();
+      const audioOnly =
+        typeof track.getTrack === 'function'
+          ? new MediaStream([track.getTrack()])
+          : new MediaStream(original.getAudioTracks());
+      const stream: MediaStream = audioOnly.getAudioTracks().length
+        ? audioOnly
+        : original;
       let rec: MediaRecorder;
       try {
         rec = new MediaRecorder(stream, {
@@ -314,7 +377,11 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         };
         reader.readAsDataURL(ev.data);
       };
-      rec.start(1000); // chunk/sec → offset accurato
+      // Ancora l'origine della traccia ALL'AVVIO del recorder (non al primo
+      // chunk, che arriva ~1s dopo con jitter): è il riferimento per gli
+      // offset di sincronizzazione dei late-joiner.
+      w.onTrackStarted?.(key, pid, name, Date.now());
+      rec.start(1000); // chunk/sec
       recorders.set(track.getId?.() ?? key, { rec, key });
     };
 
@@ -351,8 +418,20 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         conference.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
         conference.on(JitsiMeetJS.events.conference.USER_LEFT, armIdle);
         conference.on(JitsiMeetJS.events.conference.USER_JOINED, () => {
+          seenParticipant = true;
           if (idleTimer) clearTimeout(idleTimer);
         });
+        // Errore di conference (kick, bridge down, ICE failed): NON uscire
+        // in silenzio. Logga il motivo così l'operator/portale lo vede; chiude
+        // pulito salvando ciò che è stato catturato finora. Un reconnect
+        // completo (mantenendo i writer aperti) va validato su Jitsi reale.
+        conference.on(
+          JitsiMeetJS.events.conference.CONFERENCE_FAILED,
+          (err: unknown) => {
+            log('conference FAILED: ' + String(err));
+            void finish();
+          },
+        );
         conference.join();
         // Vogliamo l'audio di TUTTI i partecipanti (no last-N sul video,
         // che non ci serve). Best-effort: l'API varia per versione.
@@ -370,7 +449,7 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       JitsiMeetJS.events.connection.CONNECTION_FAILED,
       () => {
         log('connection failed');
-        finish();
+        void finish();
       },
     );
     connection.connect();
@@ -385,6 +464,8 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
  */
 class TrackWriter {
   readonly participantId: string;
+  /** Id univoco della sessione di traccia (rejoin/unmute → file distinto). */
+  readonly trackFileId: string;
   displayName: string | null;
   firstFrameAtMs = 0;
   lastFrameAtMs = 0;
@@ -393,16 +474,37 @@ class TrackWriter {
   private fileHandle: Awaited<ReturnType<typeof open>> | null = null;
   private readonly path: string;
 
-  constructor(participantId: string, displayName: string | null, outputDir: string) {
+  constructor(
+    participantId: string,
+    trackFileId: string,
+    displayName: string | null,
+    outputDir: string,
+  ) {
     this.participantId = participantId;
+    this.trackFileId = trackFileId;
     this.displayName = displayName;
-    this.path = join(outputDir, localTrackFilename(participantId));
+    // Nome file per SESSIONE (trackFileId), non per pid: una seconda
+    // sessione dello stesso partecipante NON tronca più la prima.
+    this.path = join(outputDir, localTrackFilename(trackFileId));
+  }
+
+  /**
+   * Ancora la timeline della traccia all'istante di avvio del MediaRecorder
+   * (origine epoch del file .opus). È il riferimento corretto per
+   * `startOffsetMs`: il primo chunk arriva ~1s dopo (recorder.start(1000)) e
+   * con jitter, quindi ancorare a quello introdurrebbe skew fra le tracce.
+   */
+  anchor(startedAtMs: number): void {
+    if (this.firstFrameAtMs === 0) this.firstFrameAtMs = startedAtMs;
   }
 
   async appendChunk(chunk: Buffer, nowMs: number): Promise<void> {
     if (this.fileHandle === null) {
       this.fileHandle = await open(this.path, 'w');
-      this.firstFrameAtMs = nowMs;
+      // Fallback se onTrackStarted non è arrivato (difensivo): usa il primo
+      // chunk come origine. In condizioni normali anchor() ha già impostato
+      // firstFrameAtMs all'avvio del recorder.
+      if (this.firstFrameAtMs === 0) this.firstFrameAtMs = nowMs;
     }
     await this.fileHandle.write(chunk);
     this.bytesWritten += chunk.length;
@@ -419,6 +521,7 @@ class TrackWriter {
   toRecording(): TrackRecording {
     return {
       participantId: this.participantId,
+      trackFileId: this.trackFileId,
       displayName: this.displayName,
       firstFrameAtMs: this.firstFrameAtMs,
       lastFrameAtMs: this.lastFrameAtMs,

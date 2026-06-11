@@ -2007,6 +2007,241 @@
   background: linear-gradient(180deg, #BCE0FF 0%, #FFE9CF 60%, #FFD8B8 100%);
 }
 
+// ── Full-screen "arcade" waiting room (walkable 2D park) ──
+// The park fills the viewport and the avatar is the protagonist (walkable
+// from the first second). The functional UI floats over the stage in a
+// topbar (event identity + countdown) and a bottom dock (name + CTA +
+// expandable drawer). Replaces the old sticky-stage + negative-margin
+// card layout where the avatar was buried behind a central card.
+// Fill the content area between the site header and footer. The app
+// layout is a `min-vh-100` flex column with `<main class="flex-grow-1">`,
+// so `height: 100%` resolves to "viewport minus header/footer" and the
+// bottom dock stays on screen without the page scrolling. `100dvh` is the
+// fallback if an ancestor ever fails to provide a definite height.
+.waiting-arcade {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: min(100dvh, 32rem);
+  max-height: 100dvh;
+  overflow: hidden;
+  background: linear-gradient(180deg, #BCE0FF 0%, #FFE9CF 60%, #FFD8B8 100%);
+}
+
+.arcade-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none; // HUD / joystick re-enable pointer events themselves
+}
+
+// Keep the park vivid in arcade mode (the mobile .garden-scene dim rule
+// was meant for the old "behind a card" layout). Higher specificity wins.
+.arcade-stage .garden-scene { opacity: 1; }
+
+// Push the in-stage HUD / discovery hint below the topbar so they don't
+// collide with the event title + countdown.
+.waiting-arcade .garden-hud { top: 64px; }
+.waiting-arcade .garden-hint { top: 76px; }
+// Lift the mobile joystick clear of the bottom dock.
+.waiting-arcade .garden-joystick {
+  bottom: calc(174px + env(safe-area-inset-bottom, 0));
+}
+
+// Topbar — event identity + countdown/status. Floating glass gradient.
+.arcade-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  // Above the dock (z-index 5) so the topbar controls stay clickable even
+  // when an open drawer makes the dock grow upward into the topbar band.
+  z-index: 6;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.95rem 1.4rem;
+  background: linear-gradient(180deg, rgba(23, 50, 77, 0.85) 0%, rgba(23, 50, 77, 0) 100%);
+  color: #fff;
+  pointer-events: none;
+
+  &__info {
+    pointer-events: auto;
+    min-width: 0;
+  }
+
+  &__title {
+    color: #fff !important;
+    line-height: 1.15;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  }
+
+  &__meta {
+    font-size: 0.78rem;
+    opacity: 0.92;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    pointer-events: auto;
+  }
+}
+
+.arcade-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.82rem;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  &__label {
+    opacity: 0.82;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  &--live {
+    background: #D9364F;
+    border-color: #D9364F;
+    font-weight: 700;
+  }
+
+  &--pulse { animation: arcadeChipPulse 1.6s ease-in-out infinite; }
+}
+
+@keyframes arcadeChipPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(247, 161, 26, 0.5); }
+  50%      { box-shadow: 0 0 0 6px rgba(247, 161, 26, 0); }
+}
+
+.arcade-classic-btn {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover, &:focus-visible {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: #fff;
+  }
+}
+
+// Bottom dock — name + CTA + details toggle. Glass panel pinned bottom.
+.arcade-dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  padding: 0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0));
+  background: rgba(255, 255, 255, 0.94);
+  border-top: 1px solid rgba(23, 50, 77, 0.12);
+  box-shadow: 0 -6px 24px rgba(23, 50, 77, 0.16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+
+  &__banners { margin-bottom: 0.6rem; }
+
+  &__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.9rem;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  &__name {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__cta {
+    flex: 0 0 auto;
+    width: clamp(190px, 32%, 280px);
+  }
+
+  &__more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    background: transparent;
+    border: 0;
+    color: #0066CC;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// Expandable drawer (inside the dock, grows upward; scrolls internally).
+.arcade-drawer {
+  max-width: 980px;
+  margin: 0 auto 0.7rem;
+
+  &__inner {
+    max-height: 46dvh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.15rem 0.15rem 0.25rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .arcade-dock__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+  .arcade-dock__cta { width: 100%; }
+  .arcade-topbar__meta { white-space: normal; }
+}
+
+// ── Classic / accessibility layout ──
+// Static, scrollable card on a decorative (non-interactive) garden. Used
+// by the "Vista classica" toggle and for ENDED events.
+.waiting-classic {
+  position: relative;
+  min-height: 100%;
+  background: linear-gradient(180deg, #BCE0FF 0%, #FFE9CF 60%, #FFD8B8 100%);
+
+  &__content {
+    position: relative;
+    z-index: 1;
+  }
+}
+
 // ── Card-as-palazzo decorations (commit 3 of the garden polish pass) ──
 // The wait-room card is the structure in the middle of the garden — the
 // avatar walks around it. To make that read visually rather than feel

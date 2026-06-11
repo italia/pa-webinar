@@ -17,12 +17,13 @@ import { Link } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 
+import RecordingOverview from './recording-overview';
 import TranscriptEditor from './transcript-editor';
 import SummaryEditor from './summary-editor';
 import TranslationManager from './translation-manager';
 import ArchivePanel from './archive-panel';
 
-type TabKey = 'transcript' | 'summary' | 'translations' | 'archive';
+type TabKey = 'overview' | 'transcript' | 'summary' | 'translations' | 'archive';
 
 function statusBadgeClass(status: string): string {
   if (status.endsWith('DONE')) return 'bg-success';
@@ -59,7 +60,7 @@ export default function RecordingManageClient({
   const t = useTranslations('admin.postprod');
   const toast = useToast();
   const confirm = useConfirm();
-  const [tab, setTab] = useState<TabKey>('transcript');
+  const [tab, setTab] = useState<TabKey>('overview');
   const [rerunning, setRerunning] = useState(false);
 
   async function rerun(): Promise<void> {
@@ -85,6 +86,7 @@ export default function RecordingManageClient({
   }
 
   const tabs: { key: TabKey; label: string }[] = [
+    { key: 'overview', label: t('ov.tab') },
     { key: 'transcript', label: t('manageTabTranscript') },
     { key: 'summary', label: t('manageTabSummary') },
     { key: 'translations', label: t('manageTabTranslations') },
@@ -156,6 +158,7 @@ export default function RecordingManageClient({
         className="bg-white border rounded-bottom rounded-end p-4 shadow-sm"
         style={{ borderTopLeftRadius: tab === tabs[0]?.key ? 0 : 8 }}
       >
+        {tab === 'overview' && <RecordingOverview recordingId={recordingId} />}
         {tab === 'transcript' && <TranscriptEditor recordingId={recordingId} />}
         {tab === 'summary' && <SummaryEditor recordingId={recordingId} />}
         {tab === 'translations' && <TranslationManager recordingId={recordingId} />}

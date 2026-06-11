@@ -75,6 +75,10 @@ class ClaimResponse(BaseModel):
     sourceDownloadUrl: str
     uploadTargets: Dict[str, UploadTarget]
     inputs: List[ClaimInput] = Field(default_factory=list)
+    # Mappa diarLabel→nome reale dai Speaker (DB). Usata da SUMMARIZE/TRANSLATE
+    # per dare all'LLM/VTT i nomi veri invece di "SPEAKER_00". Vuota su blind
+    # pre-mapping (fallback al label).
+    speakerNames: Dict[str, str] = Field(default_factory=dict)
     providerHints: ProviderHints
 
 
@@ -171,6 +175,7 @@ class AppClient:
         model_id: Optional[str] = None,
         model_version: Optional[str] = None,
         speaker_map: Optional[List[Dict[str, Any]]] = None,
+        watermark_type: Optional[str] = None,
     ) -> None:
         payload: Dict[str, Any] = {
             "jobId": job_id,
@@ -189,6 +194,8 @@ class AppClient:
             payload["modelVersion"] = model_version
         if speaker_map is not None:
             payload["speakerMap"] = speaker_map
+        if watermark_type is not None:
+            payload["watermarkType"] = watermark_type
         r = self._client.post("/api/internal/postprod-artifact", json=payload)
         r.raise_for_status()
 

@@ -2662,7 +2662,11 @@
     "emailLabel": "Email (προαιρετικό)",
     "emailHelp": "Μόνο για τυχόν follow-up μετά την εκδήλωση",
     "emailInvalid": "Εισαγάγετε έγκυρη διεύθυνση email",
-    "chatLockedMessage": "Εισαγάγετε το όνομά σας για να συμμετάσχετε στο chat της εκδήλωσης."
+    "chatLockedMessage": "Εισαγάγετε το όνομά σας για να συμμετάσχετε στο chat της εκδήλωσης.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Βιντεοσκόπηση",
@@ -2761,6 +2765,7 @@
     "classicView": "Κλασική προβολή",
     "changeAvatar": "Αλλαγή avatar",
     "peopleInGarden": "{count, plural, =0 {Κανείς στον κήπο} one {1 άτομο στον κήπο} other {# άτομα στον κήπο}}",
+    "guestName": "Guest",
     "hintKeyboard": "Μετακινηθείτε με WASD ή τα βέλη",
     "pickerTitle": "Επιλέξτε το avatar σας",
     "pickerHelp": "Ο χαρακτήρας σας αντιπροσωπεύει στον κήπο της αναμονής. Μπορείτε να τον αλλάξετε όποτε θέλετε.",

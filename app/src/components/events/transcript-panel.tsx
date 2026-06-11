@@ -36,6 +36,7 @@ import {
   initials as speakerInitials,
 } from '@/lib/utils/speaker-palette';
 import { useBookmarks } from '@/lib/utils/use-bookmarks';
+import { MarkdownRenderer } from '@/components/ui/markdown';
 
 import type { VideoPlayerHandle } from './video-player';
 
@@ -955,15 +956,16 @@ export default function TranscriptPanel({
           className="postprod-panel__summary"
           style={{ maxHeight: 480, overflowY: 'auto' }}
         >
-          {/* The summary is markdown; we render as <pre> for a faithful
-              fallback — a future iteration can pipe through `marked`
-              like `EventDescription`. */}
-          <pre
-            className="bg-white border rounded p-3 small"
-            style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}
-          >
-            {data.summaries[summaryLang]}
-          </pre>
+          {/* Sintesi in markdown: resa via MarkdownRenderer (marked +
+              DOMPurify) come le description evento, così heading/liste/
+              grassetti sono formattati. Questo è il surface secondario:
+              quando esiste un SUMMARY_JSON strutturato, la card hero
+              (PostEventHero) sopra il video è quella primaria. */}
+          <MarkdownRenderer
+            content={data.summaries[summaryLang] ?? ''}
+            className="bg-white border rounded p-3"
+          />
+          <p className="text-muted small mt-2 mb-0">{t('aiBadgeBody')}</p>
         </div>
       )}
     </div>

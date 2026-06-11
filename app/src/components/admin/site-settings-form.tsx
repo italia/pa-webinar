@@ -1645,6 +1645,50 @@ function PostprodTab({ settings, updateField }: TabProps) {
       <div className="alert alert-warning" role="note" style={{ fontSize: '0.88rem' }}>
         {t('voiceCloningNote')}
       </div>
+
+      <hr className="my-4" />
+
+      <h6 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+        {t('consentDisclosureSection')}
+      </h6>
+      <p className="text-muted mb-3" style={{ fontSize: '0.85rem' }}>
+        {t('consentDisclosureHelp')}
+      </p>
+      <Row>
+        {(['it', 'en', 'fr'] as const).map((loc) => {
+          // JSONB per-locale (vedi PagesTab.updateJsonLocale): rimuove la
+          // chiave quando il testo è vuoto così il default i18n riprende.
+          const disclosure = (settings.aiConsentDisclosure ?? {}) as Record<
+            string,
+            string
+          >;
+          return (
+            <Col md={4} key={loc}>
+              <FormGroup>
+                <Label htmlFor={`aiConsentDisclosure-${loc}`}>
+                  {loc.toUpperCase()}
+                </Label>
+                <Input
+                  id={`aiConsentDisclosure-${loc}`}
+                  type="textarea"
+                  value={disclosure[loc] ?? ''}
+                  placeholder={t('consentDisclosurePlaceholder')}
+                  maxLength={2000}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const updated = { ...disclosure, [loc]: e.target.value };
+                    if (!e.target.value) delete updated[loc];
+                    updateField(
+                      'aiConsentDisclosure',
+                      updated as SiteSetting['aiConsentDisclosure'],
+                    );
+                  }}
+                  style={{ fontSize: '0.85rem', minHeight: 110 }}
+                />
+              </FormGroup>
+            </Col>
+          );
+        })}
+      </Row>
     </div>
   );
 }

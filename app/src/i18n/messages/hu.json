@@ -2662,7 +2662,11 @@
     "emailLabel": "E-mail (opcionális)",
     "emailHelp": "Kizárólag esetleges esemény utáni utánkövetéshez",
     "emailInvalid": "Adjon meg egy érvényes e-mail címet",
-    "chatLockedMessage": "Adja meg a nevét, hogy csatlakozhasson az esemény chatjéhez."
+    "chatLockedMessage": "Adja meg a nevét, hogy csatlakozhasson az esemény chatjéhez.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Videofelvétel",
@@ -2761,6 +2765,7 @@
     "classicView": "Klasszikus nézet",
     "changeAvatar": "Avatar megváltoztatása",
     "peopleInGarden": "{count, plural, =0 {Senki sincs a kertben} one {1 személy van a kertben} other {# személy van a kertben}}",
+    "guestName": "Guest",
     "hintKeyboard": "Mozgás a WASD-vel vagy a nyilakkal",
     "pickerTitle": "Válassza ki az avatarját",
     "pickerHelp": "A karakter Önt képviseli a várakozási kertben. Bármikor megváltoztathatja.",

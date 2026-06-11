@@ -9,7 +9,7 @@
  */
 
 import { prisma } from '@/lib/db';
-import { decryptPII } from '@/lib/crypto/pii';
+import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { generateEventICal } from '@/lib/ical/generate';
 import {
   generateGoogleCalendarUrl,
@@ -101,7 +101,13 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       timezone: event.timezone,
       url: input.eventPageUrl,
       organizerName: event.moderatorName ?? 'PA Webinar',
-      organizerEmail: event.moderatorEmail ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
+      // moderatorEmail is stored AES-256-GCM encrypted — decrypt it before it
+      // becomes the iCal ORGANIZER mailto, otherwise calendar clients receive
+      // base64 ciphertext as the organizer address. (tryDecryptPII returns the
+      // decrypted email, leaves legacy plaintext as-is, and yields null only
+      // when the value is absent — so SMTP_FROM is the fallback for no organizer.)
+      organizerEmail:
+        tryDecryptPII(event.moderatorEmail) ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
     });
 
     const override = await loadEmailTemplateOverride('confirmation', input.locale);
