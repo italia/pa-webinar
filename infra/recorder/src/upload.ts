@@ -226,7 +226,11 @@ export interface LocalTrackFile {
   localPath: string;
 }
 
-const OPUS_CONTENT_TYPE = 'audio/ogg; codecs=opus';
+// Il MediaRecorder produce un container WebM (mimeType 'audio/webm;codecs=opus'),
+// NON Ogg: dichiariamo il content-type reale. Il worker comunque decodifica
+// via ffmpeg che sonda il contenuto (l'estensione .opus resta solo
+// un'etichetta di storage).
+const OPUS_CONTENT_TYPE = 'audio/webm; codecs=opus';
 const MANIFEST_CONTENT_TYPE = 'application/json';
 
 /**
