@@ -107,6 +107,21 @@ def merge_tracks(
     # Stable sort by start then end — overlaps preserved.
     all_segments.sort(key=lambda s: (s["start"], s["end"]))
 
+    # Marca i segmenti CONCORRENTI: quelli che si sovrappongono nel tempo a un
+    # segmento di un PARLANTE DIVERSO (parlato simultaneo). Con le tracce
+    # per-voce l'overlap è REALE e va segnalato esplicitamente (`concurrent`),
+    # così VTT/serializzazione/LLM e frontend sanno che il parlato è
+    # simultaneo invece di trattarlo come sequenziale. Sweep O(n·k) con
+    # finestra dei segmenti "aperti" (i segmenti sono già ordinati per start).
+    open_segs: List[Dict[str, Any]] = []
+    for seg in all_segments:
+        open_segs = [o for o in open_segs if o["end"] > seg["start"]]
+        for o in open_segs:
+            if o.get("speaker") != seg.get("speaker"):
+                o["concurrent"] = True
+                seg["concurrent"] = True
+        open_segs.append(seg)
+
     speakers = [
         {
             "diarLabel": pid,  # reuse the diarLabel slot for the real id
