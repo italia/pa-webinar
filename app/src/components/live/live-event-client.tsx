@@ -168,7 +168,26 @@ export default function LiveEventClient({
   }, [eventStatus, event.slug]);
 
   const [showFeedback, setShowFeedback] = useState(false);
-  const [guestId] = useState(() => isGuest ? `guest_${Math.random().toString(36).slice(2, 10)}` : '');
+  // Stable anonymous id for guests, persisted in localStorage so a refresh or
+  // a network-induced Jitsi reconnect keeps the same identity (poll/agenda
+  // dedup + "my reaction" recall depend on it). SSR-safe: falls back to a
+  // fresh in-memory id when window/localStorage is unavailable.
+  const [guestId] = useState(() => {
+    if (!isGuest) return '';
+    const fresh = () => `guest_${Math.random().toString(36).slice(2, 10)}`;
+    if (typeof window === 'undefined') return fresh();
+    try {
+      const k = 'paw_guest_id';
+      let v = window.localStorage.getItem(k);
+      if (!v) {
+        v = fresh();
+        window.localStorage.setItem(k, v);
+      }
+      return v;
+    } catch {
+      return fresh();
+    }
+  });
   const [jvbReady, setJvbReady] = useState<boolean | null>(null);
   const [jibriReady, setJibriReady] = useState<boolean | null>(null);
   // Pre-join camera/mic choice captured by the waiting room's DeviceCheck.
@@ -828,6 +847,8 @@ export default function LiveEventClient({
           jitsiApi={jitsiApi}
           displayName={credentials.displayName}
           isInstantCall={isInstantCall}
+          canReactAgenda={!isModerator && !isSpeaker}
+          guestId={isGuest ? guestId : undefined}
         />
       </div>
 
@@ -875,9 +896,15 @@ interface LiveSidebarProps {
   jitsiApi: JitsiMeetExternalAPI | null;
   displayName: string;
   isInstantCall?: boolean;
+  /** Audience (guests + registered participants) may react to agenda items;
+   *  presenters (moderators/speakers) only see the tallies. */
+  canReactAgenda?: boolean;
+  /** Stable guest id (anonymous) for agenda-reaction dedup; undefined for
+   *  registered participants (identified by their accessToken). */
+  guestId?: string;
 }
 
-function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, agendaEnabled, jitsiApi, displayName, isInstantCall = false }: LiveSidebarProps) {
+function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, agendaEnabled, jitsiApi, displayName, isInstantCall = false, canReactAgenda = false, guestId }: LiveSidebarProps) {
   const t = useTranslations('live');
   // Live feature flags: i flag arrivano come props al mount, ma un moderatore
   // può attivarli/disattivarli DURANTE l'evento → li ripolliamo così i tab
@@ -1176,7 +1203,13 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
             <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
           {activeTab === 'agenda' && effAgenda && (
-            <AgendaPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+            <AgendaPanel
+              eventSlug={eventSlug}
+              token={token}
+              isModerator={isModerator}
+              canReact={canReactAgenda}
+              guestId={guestId}
+            />
           )}
           {activeTab === 'materials' && (
             <MaterialPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />

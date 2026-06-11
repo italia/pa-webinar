@@ -637,6 +637,7 @@ model Registration {
   questions              Question[]
   upvotes                QuestionUpvote[]
   pollVotes              PollVote[]
+  agendaReactions        AgendaItemReaction[]
   remindersSent          ReminderSent[]
   feedback               EventFeedback[]
   questionnaireResponses QuestionnaireResponse[]
@@ -755,10 +756,38 @@ model EventAgendaItem {
   createdAt   DateTime  @default(now()) @map("created_at")
   completedAt DateTime? @map("completed_at")
 
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event     Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  reactions AgendaItemReaction[]
 
   @@index([eventId])
   @@map("event_agenda_items")
+}
+
+// Assenso/dissenso dei partecipanti su un singolo punto d'agenda (audience
+// pulse). L'opt-in segue agendaEnabled. Dedup allineato a PollVote: un voto
+// per identità (partecipante registrato via registrationId, o guest anonimo
+// via guestId). Cambiare valore fa upsert in place — nessun double-count.
+enum AgendaReactionValue {
+  AGREE
+  DISAGREE
+}
+
+model AgendaItemReaction {
+  id             String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  agendaItemId   String              @map("agenda_item_id") @db.Uuid
+  registrationId String?             @map("registration_id") @db.Uuid
+  guestId        String?             @map("guest_id")
+  value          AgendaReactionValue
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+
+  agendaItem   EventAgendaItem @relation(fields: [agendaItemId], references: [id], onDelete: Cascade)
+  registration Registration?   @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@unique([agendaItemId, registrationId])
+  @@unique([agendaItemId, guestId])
+  @@index([agendaItemId])
+  @@map("agenda_item_reactions")
 }
 
 // ─── Event Materials ────────────────────────────────────
@@ -884,6 +913,9 @@ model EventTemplate {
   chatEnabled                Boolean @default(false) @map("chat_enabled")
   recordingEnabled           Boolean @default(false) @map("recording_enabled")
   autoStartRecording         Boolean @default(false) @map("auto_start_recording")
+  // Pre-attiva la checklist/note live (Event.agendaEnabled) per gli eventi
+  // creati da questo template. Modificabile nel wizard (step 2).
+  agendaEnabled              Boolean @default(false) @map("agenda_enabled")
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")

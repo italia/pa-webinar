@@ -4,7 +4,7 @@
  */
 
 import { prisma } from '@/lib/db';
-import { decryptPII } from '@/lib/crypto/pii';
+import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { generateEventICal } from '@/lib/ical/generate';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { formatDate, formatTime } from '@/lib/utils/date-format';
@@ -105,7 +105,11 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
         timezone: event.timezone,
         url: eventPageUrl,
         organizerName: event.moderatorName ?? 'PA Webinar',
-        organizerEmail: event.moderatorEmail ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
+        // moderatorEmail is stored AES-256-GCM encrypted — decrypt before it
+        // becomes the iCal ORGANIZER mailto (otherwise calendar clients get
+        // base64 ciphertext). Mirrors confirmation.ts / calendar.ics.
+        organizerEmail:
+          tryDecryptPII(event.moderatorEmail) ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
       });
 
       const subject = COPY[input.locale].subject(title);

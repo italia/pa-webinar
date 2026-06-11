@@ -94,6 +94,9 @@ export const POST = withErrorHandling(async (request, context) => {
       participantsCanUnmute: source.participantsCanUnmute,
       participantsCanStartVideo: source.participantsCanStartVideo,
       participantsCanShareScreen: source.participantsCanShareScreen,
+      // Preserve the role×feature matrix exactly (not just the GUEST-projected
+      // booleans above) so a duplicate keeps any SPEAKER-specific grants.
+      permissionMatrix: source.permissionMatrix ?? undefined,
 
       requireOrganization: source.requireOrganization,
       requireOrganizationRole: source.requireOrganizationRole,
