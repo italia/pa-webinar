@@ -9,6 +9,9 @@ import { trackKey } from './paths.js';
 
 function rec(over: Partial<TrackRecording> & { participantId: string }): TrackRecording {
   return {
+    // Default: trackFileId = participantId (sessione singola). I test di
+    // rejoin passano trackFileId distinti per lo stesso pid.
+    trackFileId: over.trackFileId ?? over.participantId,
     displayName: null,
     firstFrameAtMs: 0,
     lastFrameAtMs: 0,
@@ -97,17 +100,23 @@ describe('buildManifest', () => {
     expect(m.tracks[0]?.startOffsetMs).toBe(0);
   });
 
-  it('tiene entry separate per lo stesso pid (rejoin)', () => {
+  it('tiene entry separate per lo stesso pid (rejoin) con blob/file DISTINTI', () => {
     const m = buildManifest({
       eventId: 'e',
       recordingId: 'r',
       roomName: 'room',
       recordings: [
-        rec({ participantId: 'p1', firstFrameAtMs: 0, lastFrameAtMs: 1_000 }),
-        rec({ participantId: 'p1', firstFrameAtMs: 2_000, lastFrameAtMs: 3_000 }),
+        rec({ participantId: 'p1', trackFileId: 'p1-0', firstFrameAtMs: 0, lastFrameAtMs: 1_000 }),
+        rec({ participantId: 'p1', trackFileId: 'p1-1', firstFrameAtMs: 2_000, lastFrameAtMs: 3_000 }),
       ],
     });
     expect(m.tracks).toHaveLength(2);
+    // Entrambe sono il parlante p1, ma con trackKey/blob DISTINTI: senza
+    // questo la seconda sessione sovrascriveva la prima (audio perso).
+    expect(m.tracks.map((t) => t.participantId)).toEqual(['p1', 'p1']);
+    const keys = m.tracks.map((t) => t.trackKey);
+    expect(new Set(keys).size).toBe(2);
+    expect(keys[0]).not.toBe(keys[1]);
   });
 
   it('manifest vuoto quando non ci sono tracce valide', () => {

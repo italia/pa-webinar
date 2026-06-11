@@ -250,7 +250,7 @@ export async function uploadRecording(
     const expectedKey = trackKey(
       manifest.eventId,
       manifest.recordingId,
-      f.track.participantId,
+      f.track.trackFileId,
     );
     if (expectedKey !== f.track.trackKey) {
       throw new Error(
@@ -263,7 +263,9 @@ export async function uploadRecording(
       body,
       contentType: OPUS_CONTENT_TYPE,
     });
-    trackSizes[f.track.participantId] = body.length;
+    // Chiave per SESSIONE: due tracce dello stesso pid non si sovrascrivono
+    // più la dimensione (prima trackSizes[participantId] collideva).
+    trackSizes[f.track.trackFileId] = body.length;
     uploaded += 1;
   }
 
@@ -319,8 +321,8 @@ export function buildIngestBody(
       displayName: t.displayName,
       blobKey: t.trackKey,
       mimeType: OPUS_CONTENT_TYPE,
-      ...(trackSizes[t.participantId] != null
-        ? { sizeBytes: trackSizes[t.participantId] }
+      ...(trackSizes[t.trackFileId] != null
+        ? { sizeBytes: trackSizes[t.trackFileId] }
         : {}),
       startOffsetMs: t.startOffsetMs,
       durationMs: t.durationMs,

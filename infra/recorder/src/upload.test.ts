@@ -21,6 +21,7 @@ describe('buildIngestBody', () => {
       recordings: [
         {
           participantId: 'p1',
+          trackFileId: 'p1',
           displayName: 'Ada',
           firstFrameAtMs: 0,
           lastFrameAtMs: 1000,
@@ -56,7 +57,7 @@ describe('buildIngestBody', () => {
       recordingId: 'r',
       roomName: 'room',
       recordings: [
-        { participantId: 'p', displayName: null, firstFrameAtMs: 0, lastFrameAtMs: 5, bytesWritten: 1 },
+        { participantId: 'p', trackFileId: 'p', displayName: null, firstFrameAtMs: 0, lastFrameAtMs: 5, bytesWritten: 1 },
       ],
     });
     expect(buildIngestBody(m).tracks[0]).not.toHaveProperty('sizeBytes');

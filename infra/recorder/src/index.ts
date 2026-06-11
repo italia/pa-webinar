@@ -73,7 +73,8 @@ function readEnv(): RecorderEnv {
 function toLocalFile(track: ManifestTrack, outputDir: string): LocalTrackFile {
   return {
     track,
-    localPath: join(outputDir, localTrackFilename(track.participantId)),
+    // File locale per SESSIONE (trackFileId), coerente con capture/manifest.
+    localPath: join(outputDir, localTrackFilename(track.trackFileId)),
   };
 }
 
