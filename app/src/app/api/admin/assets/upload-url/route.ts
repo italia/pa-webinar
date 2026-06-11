@@ -35,6 +35,7 @@ import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { getFilesStorage } from '@/lib/storage';
+import { getPublicEnv } from '@/lib/env';
 import {
   buildAssetKey,
   sanitizeFilename,
@@ -165,7 +166,15 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     );
   }
 
-  const publicUrl = storage.publicUrl(key);
+  // Persist a STABLE, app-served URL rather than the bare blob URL: the files
+  // container is private (the storage account has public blob access disabled),
+  // so /api/assets/<key> streams the blob through a short server-side SAS. We
+  // strip the `assets/` prefix here because the serving route re-adds it (and
+  // only ever serves that prefix). Absolute when NEXT_PUBLIC_APP_URL is set so
+  // the value works as an og:image too.
+  const appBase = getPublicEnv('NEXT_PUBLIC_APP_URL').replace(/\/+$/, '');
+  const servePath = `/api/assets/${key.replace(/^assets\//, '')}`;
+  const servedUrl = appBase ? `${appBase}${servePath}` : servePath;
 
   await logAdminAction({
     request,
@@ -175,7 +184,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   });
 
   return Response.json({
-    url: publicUrl,
+    url: servedUrl,
     key,
     mime,
     size: buffer.byteLength,
