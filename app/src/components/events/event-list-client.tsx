@@ -108,8 +108,21 @@ export default function EventListClient({
                 border: `1px solid #e8e8e8`,
                 borderTopWidth: 4,
                 borderTopColor: borderColor,
+                overflow: 'hidden',
               }}
             >
+              {event.imageUrl && (
+                <div
+                  style={{
+                    aspectRatio: '16 / 9',
+                    backgroundImage: `url(${event.imageUrl})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundColor: '#E8F0FE',
+                  }}
+                  aria-hidden="true"
+                />
+              )}
               <CardBody className="d-flex flex-column p-4">
                 <div className="mb-3">
                   <Badge color="primary" className="me-2">
