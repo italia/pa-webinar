@@ -5,15 +5,17 @@
  *
  * Loaded inside an expanded recording row in the postprod dashboard.
  * Shows the languages the recording is already translated into and lets
- * the operator add a new one, which enqueues a single TRANSLATE job via
+ * the operator add a new one, which enqueues a TRANSLATE job (plus a DUB
+ * job when the event has dubbing enabled) via
  * POST /api/admin/postprod/recordings/[id]/translations.
  *
- * UI strings are inline Italian for now (i18n keys listed in the PR
- * report). Bootstrap Italia utility classes only — no <Icon> (it
- * triggers hydration mismatches), inline SVG where a glyph is needed.
+ * Strings live under `admin.postprod.tm.*`. Bootstrap Italia utility
+ * classes only — no <Icon> (it triggers hydration mismatches), inline
+ * SVG where a glyph is needed.
  */
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import { SkeletonLines } from '@/components/ui/skeleton';
 
@@ -45,6 +47,7 @@ export default function TranslationManager({
   recordingId: string;
   onChanged?: () => void;
 }) {
+  const t = useTranslations('admin.postprod.tm');
   const url = `/api/admin/postprod/recordings/${recordingId}/translations`;
   const { data, error, isLoading, mutate } = useSWR<TranslationsResponse>(
     url,
@@ -80,20 +83,20 @@ export default function TranslationManager({
       await mutate();
       onChanged?.();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Errore imprevisto');
+      setActionError(err instanceof Error ? err.message : t('unexpectedError'));
     } finally {
       setSubmitting(false);
     }
   }
 
   if (isLoading) {
-    return <SkeletonLines lines={2} loadingLabel="Caricamento lingue di traduzione…" />;
+    return <SkeletonLines lines={2} loadingLabel={t('loading')} />;
   }
 
   if (error || !data) {
     return (
       <div className="alert alert-danger small mb-0" role="alert">
-        Impossibile caricare le lingue di traduzione.
+        {t('loadError')}
       </div>
     );
   }
@@ -101,20 +104,20 @@ export default function TranslationManager({
   return (
     <div>
       <h6 className="text-uppercase text-secondary small mb-2">
-        Lingue di traduzione
+        {t('title')}
       </h6>
 
       <div className="mb-2">
-        <span className="text-secondary small me-2">Lingua sorgente:</span>
+        <span className="text-secondary small me-2">{t('sourceLabel')}</span>
         <span className="badge bg-secondary text-uppercase">
           {data.sourceLanguage}
         </span>
       </div>
 
       <div className="mb-3">
-        <span className="text-secondary small d-block mb-1">Già tradotte:</span>
+        <span className="text-secondary small d-block mb-1">{t('already')}</span>
         {data.translated.length === 0 ? (
-          <span className="text-secondary small">Nessuna traduzione ancora.</span>
+          <span className="text-secondary small">{t('noneYet')}</span>
         ) : (
           <div className="d-flex flex-wrap gap-1">
             {data.translated.map((lang) => (
@@ -135,7 +138,7 @@ export default function TranslationManager({
             htmlFor={`add-lang-${recordingId}`}
             className="form-label small mb-1"
           >
-            Aggiungi una lingua
+            {t('addLabel')}
           </label>
           <select
             id={`add-lang-${recordingId}`}
@@ -146,8 +149,8 @@ export default function TranslationManager({
           >
             <option value="">
               {data.available.length === 0
-                ? 'Nessuna lingua disponibile'
-                : 'Seleziona una lingua…'}
+                ? t('noneAvailable')
+                : t('selectPlaceholder')}
             </option>
             {data.available.map((lang) => (
               <option key={lang} value={lang}>
@@ -162,7 +165,7 @@ export default function TranslationManager({
           onClick={handleAdd}
           disabled={!selected || submitting}
         >
-          {submitting ? 'Aggiunta in corso…' : 'Aggiungi lingua'}
+          {submitting ? t('adding') : t('addButton')}
         </button>
       </div>
 
@@ -172,10 +175,7 @@ export default function TranslationManager({
         </div>
       ) : null}
 
-      <p className="text-secondary small mt-2 mb-0">
-        L&apos;aggiunta di una lingua genera la traduzione di transcript e
-        sintesi: la lavorazione avviene in background.
-      </p>
+      <p className="text-secondary small mt-2 mb-0">{t('note')}</p>
     </div>
   );
 }

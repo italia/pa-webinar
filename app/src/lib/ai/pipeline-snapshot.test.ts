@@ -2,6 +2,19 @@ import { describe, expect, it } from 'vitest';
 
 import { buildPipelineSnapshot } from './pipeline-snapshot';
 
+/** Shape projection for assertions (buildPipelineSnapshot returns a loose
+ *  Record<string, unknown>; we narrow it here for typed access in tests). */
+interface SnapShape {
+  asr: { model: string };
+  diarization: { engine: string };
+  llm: { model: string | null };
+  tts: { engine: string } | null;
+  watermark: string[] | null;
+  languages: { source: string; translation: string[]; dubbing: string[] };
+  speakers: Array<{ displayName: string | null }>;
+  runAt: string;
+}
+
 describe('buildPipelineSnapshot', () => {
   const runAt = '2026-06-11T08:00:00.000Z';
 
@@ -18,16 +31,16 @@ describe('buildPipelineSnapshot', () => {
       [{ diarLabel: 'SPEAKER_00', displayName: 'Paolo', totalSpeechSec: 120 }],
       'it',
       runAt,
-    ) as Record<string, any>;
+    ) as unknown as SnapShape;
 
     expect(snap.asr.model).toBe('large-v3');
     expect(snap.diarization.engine).toBe('pyannote.audio');
     expect(snap.llm.model).toBe('mistral-small');
-    expect(snap.tts.engine).toBe('piper');
+    expect(snap.tts?.engine).toBe('piper');
     expect(snap.watermark).toEqual(['audioseal']);
     expect(snap.languages).toEqual({ source: 'it', translation: ['en', 'fr'], dubbing: ['en', 'fr'] });
     expect(snap.speakers).toHaveLength(1);
-    expect(snap.speakers[0].displayName).toBe('Paolo');
+    expect(snap.speakers[0]?.displayName).toBe('Paolo');
     expect(snap.runAt).toBe(runAt);
   });
 
@@ -37,7 +50,7 @@ describe('buildPipelineSnapshot', () => {
       [],
       'it',
       runAt,
-    ) as Record<string, any>;
+    ) as unknown as SnapShape;
     expect(snap.diarization.engine).toBe('multitrack-recorder');
     expect(snap.tts).toBeNull();
     expect(snap.watermark).toBeNull();

@@ -118,17 +118,24 @@ describe('expectedArtifactsForJob', () => {
     expect(out.find((a) => a.type === 'TRANSCRIPT_VTT')?.language).toBe('en');
   });
 
-  it('SUMMARIZE produces a single MD in source language', () => {
+  it('SUMMARIZE produces MD + structured JSON in source language', () => {
     const out = expectedArtifactsForJob('SUMMARIZE', { sourceLanguage: 'it' });
-    expect(out).toEqual([{ role: 'summary', type: 'SUMMARY_MD', language: 'it' }]);
+    expect(out).toEqual([
+      { role: 'summary', type: 'SUMMARY_MD', language: 'it' },
+      { role: 'summaryJson', type: 'SUMMARY_JSON', language: 'it' },
+    ]);
   });
 
-  it('TRANSLATE produces VTT+MD in target language', () => {
+  it('TRANSLATE produces VTT + MD + structured JSON in target language', () => {
     const out = expectedArtifactsForJob('TRANSLATE', {
       sourceLanguage: 'it',
       targetLanguage: 'en',
     });
-    expect(out.map((a) => a.type)).toEqual(['TRANSLATION_VTT', 'TRANSLATION_MD']);
+    expect(out.map((a) => a.type)).toEqual([
+      'TRANSLATION_VTT',
+      'TRANSLATION_MD',
+      'SUMMARY_JSON',
+    ]);
     expect(out.every((a) => a.language === 'en')).toBe(true);
   });
 

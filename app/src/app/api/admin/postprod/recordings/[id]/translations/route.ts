@@ -144,7 +144,11 @@ export const POST = withErrorHandling(async (request, context) => {
     request,
     action: 'POSTPROD_TRANSLATE_ADD',
     target: id,
-    details: { targetLanguage, enqueued: result.enqueued },
+    details: {
+      targetLanguage,
+      enqueued: result.enqueued,
+      dubEnqueued: result.dubEnqueued ?? false,
+    },
   });
 
   return Response.json({ ok: true, targetLanguage, ...result });
