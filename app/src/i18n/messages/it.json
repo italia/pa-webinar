@@ -2060,7 +2060,13 @@
         "adding": "Aggiunta in corso…",
         "addButton": "Aggiungi lingua",
         "unexpectedError": "Errore imprevisto",
-        "note": "L'aggiunta di una lingua genera la traduzione di transcript e sintesi — e il doppiaggio audio, se attivo per l'evento. La lavorazione avviene in background."
+        "note": "L'aggiunta di una lingua genera la traduzione di transcript e sintesi — e il doppiaggio audio, se attivo per l'evento. La lavorazione avviene in background.",
+        "summary": "Sintesi",
+        "subtitles": "Sottotitoli",
+        "dub": "Doppiaggio",
+        "download": "scarica",
+        "allTranslated": "Tutte le lingue attive sono già tradotte.",
+        "translatedHeader": "Lingue tradotte"
       },
       "ov": {
         "tab": "Panoramica",
@@ -2111,7 +2117,10 @@
         "chars": "caratteri",
         "model": "Modello",
         "notAvailable": "n/d"
-      }
+      },
+      "archiveSourceTitle": "Registrazione sorgente",
+      "archiveSourceHint": "Video originale dell’evento. Le tracce separate per partecipante e l’archivio MKV richiedono la registrazione multi-traccia (non attiva per questo evento).",
+      "archiveSourceDownload": "Scarica video originale"
     },
     "questionnairesPage": {
       "title": "Questionari",

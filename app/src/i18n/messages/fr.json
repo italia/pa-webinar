@@ -1968,7 +1968,13 @@
         "adding": "Ajout en cours…",
         "addButton": "Ajouter la langue",
         "unexpectedError": "Erreur inattendue",
-        "note": "L'ajout d'une langue génère la traduction de la transcription et de la synthèse — ainsi que le doublage audio, s'il est activé pour l'événement. Le traitement s'effectue en arrière-plan."
+        "note": "L'ajout d'une langue génère la traduction de la transcription et de la synthèse — ainsi que le doublage audio, s'il est activé pour l'événement. Le traitement s'effectue en arrière-plan.",
+        "summary": "Synthèse",
+        "subtitles": "Sous-titres",
+        "dub": "Doublage",
+        "download": "télécharger",
+        "allTranslated": "Toutes les langues actives sont déjà traduites.",
+        "translatedHeader": "Langues traduites"
       },
       "ov": {
         "tab": "Vue d'ensemble",
@@ -2019,7 +2025,10 @@
         "chars": "caractères",
         "model": "Modèle",
         "notAvailable": "n/d"
-      }
+      },
+      "archiveSourceTitle": "Enregistrement source",
+      "archiveSourceHint": "Vidéo originale de l'événement. Les pistes séparées par participant et l'archive MKV nécessitent l'enregistrement multipiste (non activé pour cet événement).",
+      "archiveSourceDownload": "Télécharger la vidéo originale"
     }
   },
   "email": {
