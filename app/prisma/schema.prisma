@@ -1724,8 +1724,16 @@ model RecordingTrack {
 
   recording Recording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
 
-  @@unique([recordingId, participantId])
+  // Univoco per SESSIONE di traccia (blobKey include il trackFileId =
+  // ${pid}-${seq}), NON per partecipante: un rejoin / mute->unmute dello
+  // stesso partecipante produce un blob distinto e quindi una riga distinta
+  // (prima il vincolo (recordingId, participantId) collassava le sessioni
+  // sullo stesso upsert → l'audio del secondo intervento andava perso).
+  // Il worker (multitrack.py) rifonde le righe dello stesso participantId
+  // sotto un unico speaker.
+  @@unique([recordingId, blobKey])
   @@index([recordingId])
+  @@index([recordingId, participantId])
   @@map("recording_tracks")
 }
 

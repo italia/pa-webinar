@@ -70,22 +70,25 @@ export const POST = withErrorHandling(async (request) => {
   const result = await prisma.$transaction(async (tx) => {
     for (const t of tracks) {
       const data = {
+        participantId: t.participantId,
         displayName: encryptPIIOrNull(t.displayName ?? null),
-        blobKey: t.blobKey,
         mimeType: t.mimeType,
         sizeBytes: t.sizeBytes != null ? BigInt(t.sizeBytes) : null,
         startOffsetMs: t.startOffsetMs,
         durationMs: t.durationMs ?? null,
       };
-      // upsert su (recordingId, participantId): un re-run sovrascrive.
+      // upsert su (recordingId, blobKey): blobKey è univoco PER SESSIONE
+      // (include il trackFileId), quindi un rejoin dello stesso pid crea una
+      // riga distinta invece di sovrascrivere. Idempotente sul retry del
+      // webhook (stesso blobKey → update).
       await tx.recordingTrack.upsert({
         where: {
-          recordingId_participantId: {
+          recordingId_blobKey: {
             recordingId,
-            participantId: t.participantId,
+            blobKey: t.blobKey,
           },
         },
-        create: { recordingId, participantId: t.participantId, ...data },
+        create: { recordingId, blobKey: t.blobKey, ...data },
         update: data,
       });
     }
