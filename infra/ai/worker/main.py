@@ -11,6 +11,12 @@ Environment:
     WORKER_STUB=1       skip real ASR + LLM, use canned outputs
     HF_TOKEN            HuggingFace access token for pyannote
     WHISPERX_VERSION    optional version label recorded on artifacts
+    LLM_CONNECT_WAIT_S  attesa max per il cold-start di vLLM (default 720)
+
+Risoluzione nomi: SUMMARIZE/TRANSLATE usano `claim.speakerNames`
+(diarLabel→nome reale dai Speaker del DB) per dare all'LLM e ai sottotitoli
+il NOME del parlante invece di "SPEAKER_00" (fallback ai nomi embeddati nel
+transcript, poi al label). Vedi run_summarize/run_translate.
 """
 
 from __future__ import annotations
