@@ -14,7 +14,7 @@
 # on its CUDA-12 build. Bump cu124→cu126/cu128 only after the GPU node
 # driver is bumped to 565+/580+.
 --extra-index-url https://download.pytorch.org/whl/cu124
-torch==2.6.0
+torch==2.12.0
 torchvision==0.21.0
 torchaudio==2.6.0
 # pyannote / transformers behave best on numpy 1.x; avoid the 2.x ABI flip.
