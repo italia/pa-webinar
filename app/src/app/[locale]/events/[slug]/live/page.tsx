@@ -137,6 +137,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
               event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
             aiPostprodEnabled,
             aiConsentDisclosure,
+            multitrackRecordingEnabled: isInstant
+              ? false
+              : event.multitrackRecordingEnabled,
           }}
           token=""
           isModerator={false}
@@ -220,6 +223,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
         aiPostprodEnabled,
         aiConsentDisclosure,
+        multitrackRecordingEnabled: event.multitrackRecordingEnabled,
       }}
       token={token}
       isModerator={isModerator}

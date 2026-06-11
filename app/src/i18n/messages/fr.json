@@ -2876,7 +2876,9 @@
     "details": "Show details",
     "hideDetails": "Hide details",
     "aiNoticeTitle": "Traitement IA après l'événement",
-    "aiNotice": "À la fin, l'enregistrement sera traité par des outils d'intelligence artificielle pour générer une transcription, une synthèse et d'éventuelles traductions et doublages. Les artefacts peuvent contenir des imprécisions ; la vidéo reste la source de référence."
+    "aiNotice": "À la fin, l'enregistrement sera traité par des outils d'intelligence artificielle pour générer une transcription, une synthèse et d'éventuelles traductions et doublages. Les artefacts peuvent contenir des imprécisions ; la vidéo reste la source de référence.",
+    "multitrackConsentTitle": "Enregistrement par participant",
+    "multitrackConsentRequired": "Vous devez accepter l'enregistrement de votre piste audio pour entrer"
   },
   "recording": {
     "management": "Enregistrement vidéo",

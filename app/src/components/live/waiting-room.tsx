@@ -79,6 +79,9 @@ interface WaitingRoomEvent {
   aiPostprodEnabled?: boolean;
   /** Testo custom per-locale dell'informativa AI; vuoto/null → fallback i18n. */
   aiConsentDisclosure?: string | null;
+  /** L'evento registra una traccia audio separata per partecipante:
+   *  richiede consenso esplicito (hard-gate) prima di entrare. */
+  multitrackRecordingEnabled?: boolean;
 }
 
 export interface WaitingRoomJoinPrefs {
@@ -125,6 +128,7 @@ export default function WaitingRoom({
 }: WaitingRoomProps) {
   const t = useTranslations('waiting');
   const tc = useTranslations('common');
+  const tGdpr = useTranslations('gdpr.consent');
   const format = useFormatter();
 
   const [countdown, setCountdown] = useState('');
@@ -157,6 +161,8 @@ export default function WaitingRoom({
     micOn: true,
   });
   const [startError, setStartError] = useState('');
+  // Consenso esplicito alla registrazione per-partecipante (multitrack).
+  const [multitrackConsent, setMultitrackConsent] = useState(false);
 
   // Rehydrate name + email from localStorage on mount. Name is merged
   // with the server-provided default (registration displayName / grant
@@ -214,7 +220,12 @@ export default function WaitingRoom({
   const nameValid = trimmedName.length >= 2;
   const trimmedEmail = email.trim();
   const emailValid = trimmedEmail.length === 0 || EMAIL_RE.test(trimmedEmail);
-  const canEnter = nameValid && emailValid;
+  // Consenso multitrack: se l'evento registra una traccia per partecipante
+  // (audio isolato, dato quasi-biometrico — ADR-013/GDPR art.9), l'ingresso è
+  // gated da un consenso esplicito. Niente consenso → niente ingresso.
+  const multitrackRequired = !!event.multitrackRecordingEnabled && !isEnded;
+  const canEnter =
+    nameValid && emailValid && (!multitrackRequired || multitrackConsent);
 
   // Countdown tick: only needed while PUBLISHED. Live / ended do not use it.
   useEffect(() => {
@@ -442,6 +453,44 @@ export default function WaitingRoom({
       <span className="fw-semibold d-block mb-1">{t('aiNoticeTitle')}</span>
       {aiConsentText}
     </Alert>
+  ) : null;
+
+  // Consenso esplicito alla registrazione per-partecipante (multitrack):
+  // hard-gate. Senza la spunta, `canEnter` è false e il CTA resta disabilitato
+  // → non si entra. Non è un <Alert> (serve un input + evita l'icona ::before).
+  const multitrackConsentBlock = multitrackRequired ? (
+    <div
+      className="rounded-3 p-3 text-start"
+      style={{ background: '#FFF8E6', border: '1px solid #E0C97A' }}
+    >
+      <div
+        className="fw-semibold mb-2"
+        style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}
+      >
+        {t('multitrackConsentTitle')}
+      </div>
+      <div className="form-check mb-0">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          id="waiting-multitrack-consent"
+          checked={multitrackConsent}
+          onChange={(e) => setMultitrackConsent(e.target.checked)}
+        />
+        <label
+          className="form-check-label"
+          htmlFor="waiting-multitrack-consent"
+          style={{ fontSize: '0.84rem', color: '#455B71' }}
+        >
+          {tGdpr('multitrack')}
+        </label>
+      </div>
+      {!multitrackConsent && (
+        <div className="small text-muted mt-2" style={{ fontSize: '0.78rem' }}>
+          {t('multitrackConsentRequired')}
+        </div>
+      )}
+    </div>
   ) : null;
 
   const chatPreviewBlock = showChatPreview ? (
@@ -731,7 +780,12 @@ export default function WaitingRoom({
                         )}
                       </div>
                     ) : (
-                      <div className="mb-3">{primaryCta}</div>
+                      <>
+                        {multitrackConsentBlock && (
+                          <div className="mb-3">{multitrackConsentBlock}</div>
+                        )}
+                        <div className="mb-3">{primaryCta}</div>
+                      </>
                     )}
 
                     {event.tempRecordingUrl && !isEnded && (
@@ -764,7 +818,10 @@ export default function WaitingRoom({
   }
 
   // ── Experimental Phaser lobby engine (opt-in, replaces the arcade) ──
-  if (engine === 'phaser') {
+  // Disattivato quando serve il consenso multitrack: la lobby Phaser non
+  // espone il gate di consenso, quindi forziamo il percorso SVG/classic
+  // dove l'hard-gate è garantito.
+  if (engine === 'phaser' && !multitrackRequired) {
     return (
       <PhaserLobby
         eventSlug={event.slug}
@@ -858,6 +915,11 @@ export default function WaitingRoom({
         )}
         {(isWarmingUp || (isLive && jvbReady === false)) && (
           <div className="arcade-dock__banners">{statusBanners}</div>
+        )}
+        {/* Consenso multitrack: sempre visibile sopra il CTA (non nel
+            drawer collassabile) perché è un hard-gate all'ingresso. */}
+        {multitrackConsentBlock && (
+          <div className="arcade-dock__banners">{multitrackConsentBlock}</div>
         )}
         <div className="arcade-dock__row">
           <div className="arcade-dock__name">{nameField}</div>
