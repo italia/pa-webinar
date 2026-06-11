@@ -1187,7 +1187,10 @@
         "jobMaxAttempts": "Attempts before failure",
         "jobMaxAttemptsHelp": "How many times the pipeline retries a job before marking it as failed. Backoff between attempts grows exponentially (from 30 seconds up to 2 hours). The typical value is 5.",
         "artifactRetentionDays": "Artifact retention (days)",
-        "artifactRetentionDaysHelp": "Left at 0, AI artifacts follow the event's own retention schedule. A positive value keeps them for the given number of days even after the event is closed, until a daily cron deletes them. Deletion includes speaker names and job payloads, consistent with docs/GDPR.md."
+        "artifactRetentionDaysHelp": "Left at 0, AI artifacts follow the event's own retention schedule. A positive value keeps them for the given number of days even after the event is closed, until a daily cron deletes them. Deletion includes speaker names and job payloads, consistent with docs/GDPR.md.",
+        "consentDisclosureSection": "AI notice in the waiting room",
+        "consentDisclosureHelp": "Text shown to participants in the waiting room when the event uses AI post-production (transcription, summary, translation, dubbing). Customisable per language. Leave empty to use the built-in default text.",
+        "consentDisclosurePlaceholder": "E.g. This event will be automatically transcribed and summarised with AI tools after the live session…"
       },
       "scaling": {
         "intro": "Parameters that describe the cluster capacity the platform runs on. Defaults are calibrated for Azure F16s_v2 (16 vCPU / 32 GiB) for JVB and F4s_v2 (4 vCPU / 8 GiB) for Jibri. On different hardware tweak these — the scaler recomputes immediately.",
@@ -3005,7 +3008,9 @@
     "classicView": "Classic view",
     "backToGarden": "Back to the park",
     "details": "Show details",
-    "hideDetails": "Hide details"
+    "hideDetails": "Hide details",
+    "aiNoticeTitle": "AI processing after the event",
+    "aiNotice": "After it ends, the recording will be processed by AI tools to generate a transcript, summary and any translations and dubbing. The artifacts may contain inaccuracies; the video remains the authoritative source."
   },
   "recording": {
     "management": "Video recording",

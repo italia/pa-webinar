@@ -71,6 +71,12 @@ interface EventInfo {
   recordingUrl?: string | null;
   feedbackEnabled?: boolean;
   timezone?: string;
+  /** True quando il master switch AI è attivo e l'evento usa almeno una
+   *  feature di post-produzione AI — abilita l'informativa in sala d'attesa. */
+  aiPostprodEnabled?: boolean;
+  /** Testo custom per-locale dell'informativa AI (SiteSetting); null →
+   *  la WaitingRoom usa il fallback i18n. */
+  aiConsentDisclosure?: string | null;
 }
 
 interface WatermarkSettings {
@@ -581,6 +587,8 @@ export default function LiveEventClient({
           chatEnabled: event.chatEnabled,
           qaEnabled: event.qaEnabled,
           timezone: event.timezone,
+          aiPostprodEnabled: event.aiPostprodEnabled,
+          aiConsentDisclosure: event.aiConsentDisclosure,
         }}
         participantCount={participantCount}
         role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
