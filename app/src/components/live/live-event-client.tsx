@@ -77,6 +77,9 @@ interface EventInfo {
   /** Testo custom per-locale dell'informativa AI (SiteSetting); null →
    *  la WaitingRoom usa il fallback i18n. */
   aiConsentDisclosure?: string | null;
+  /** L'evento registra una traccia audio separata per partecipante →
+   *  richiede consenso esplicito (hard-gate) prima di entrare. */
+  multitrackRecordingEnabled?: boolean;
 }
 
 interface WatermarkSettings {
@@ -589,6 +592,7 @@ export default function LiveEventClient({
           timezone: event.timezone,
           aiPostprodEnabled: event.aiPostprodEnabled,
           aiConsentDisclosure: event.aiConsentDisclosure,
+          multitrackRecordingEnabled: event.multitrackRecordingEnabled,
         }}
         participantCount={participantCount}
         role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
