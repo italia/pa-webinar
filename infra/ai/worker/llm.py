@@ -70,22 +70,46 @@ def _chat_completions(
     temperature: float = 0.2,
     max_tokens: int = 2048,
     timeout: float = 300.0,
+    json_mode: bool = False,
 ) -> str:
     """OpenAI-compatible /chat/completions call. Returns the content
-    string from the first choice."""
+    string from the first choice. ``json_mode`` sets response_format to
+    json_object (vLLM + OpenAI compatible) so the model returns parseable
+    JSON — used for the structured summary (SUMMARY_JSON)."""
+    body: Dict[str, Any] = {
+        "model": model_id,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }
+    if json_mode:
+        body["response_format"] = {"type": "json_object"}
     r = httpx.post(
         base_url.rstrip("/") + "/chat/completions",
-        json={
-            "model": model_id,
-            "messages": messages,
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-        },
+        json=body,
         timeout=timeout,
     )
     r.raise_for_status()
     data = r.json()
     return data["choices"][0]["message"]["content"]
+
+
+def _parse_json_lenient(raw: str) -> Dict[str, Any]:
+    """Parse JSON from an LLM reply, tolerating code fences / preamble."""
+    import json
+    import re
+
+    s = re.sub(r"^```(?:json)?\n|\n```$", "", raw.strip())
+    try:
+        return json.loads(s)
+    except Exception:
+        m = re.search(r"\{.*\}", s, re.S)
+        if m:
+            try:
+                return json.loads(m.group(0))
+            except Exception:
+                pass
+    return {}
 
 
 def _format_agenda(agenda_items: Optional[list]) -> str:
@@ -297,3 +321,144 @@ def _stub_summary(source_language: str) -> str:
         "_NB: questo verbale è generato in modalità stub "
         f"({source_language})._\n"
     )
+
+
+# ---------------------------------------------------------------------------
+# Structured summary (SUMMARY_JSON) — overall + decisioni + azioni + topics
+# con timestamp. UNA chiamata LLM JSON-mode; il Markdown è renderizzato
+# deterministicamente dal JSON (niente seconda chiamata). Le traduzioni
+# riusano lo stesso shape (SUMMARY_JSON per lingua + TRANSLATION_MD renderizzato).
+# ---------------------------------------------------------------------------
+
+SUMMARIZE_JSON_SYSTEM_IT = """\
+Sei un assistente che analizza la trascrizione di una riunione della
+Pubblica Amministrazione italiana. Stile formale, neutro, fedele: NON
+inventare fatti, persone, decisioni o date non presenti nel transcript.
+Rispondi SOLO con un oggetto JSON valido (nessun preambolo, nessun
+markdown), con questa struttura ESATTA:
+{
+  "overall_summary": "sintesi di 3-5 frasi dell'intera riunione",
+  "key_decisions": ["decisioni concrete, max 6, [] se nessuna"],
+  "action_items": ["azioni con eventuale owner/scadenza, max 6, [] se nessuna"],
+  "topics": [
+    {"title": "titolo conciso", "start_mmss": "MM:SS di inizio approssimato (dai timestamp del transcript)", "summary": "sintesi di 2-3 frasi del topic"}
+  ]
+}
+"""
+
+_SUMMARY_HEADINGS = {
+    "it": {"overall": "Sintesi generale", "dec": "Decisioni chiave", "act": "Azioni", "top": "Argomenti trattati"},
+    "en": {"overall": "Overall summary", "dec": "Key decisions", "act": "Action items", "top": "Topics covered"},
+    "fr": {"overall": "Synthèse générale", "dec": "Décisions clés", "act": "Actions", "top": "Sujets traités"},
+}
+
+
+def _normalize_summary(data: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "overall_summary": str(data.get("overall_summary") or "").strip(),
+        "key_decisions": [str(x).strip() for x in (data.get("key_decisions") or []) if str(x).strip()],
+        "action_items": [str(x).strip() for x in (data.get("action_items") or []) if str(x).strip()],
+        "topics": [
+            {
+                "title": str(t.get("title") or "").strip(),
+                "start_mmss": str(t.get("start_mmss") or "").strip(),
+                "summary": str(t.get("summary") or "").strip(),
+            }
+            for t in (data.get("topics") or []) if isinstance(t, dict)
+        ],
+    }
+
+
+def summarize_transcript_structured(
+    *,
+    transcript_text: str,
+    source_language: str,
+    base_url: Optional[str],
+    model_id: Optional[str],
+    agenda_items: Optional[list] = None,
+) -> Dict[str, Any]:
+    """SUMMARY_JSON: sintesi strutturata via LLM JSON-mode."""
+    if _stub_enabled() or not base_url or not model_id:
+        log.info("LLM stub mode for structured summary")
+        return _stub_summary_structured(source_language)
+    messages = [
+        {"role": "system", "content": SUMMARIZE_JSON_SYSTEM_IT},
+        {
+            "role": "user",
+            "content": (
+                "Lingua sorgente: " + source_language
+                + _format_agenda(agenda_items)
+                + ".\n\nTranscript:\n" + transcript_text
+            ),
+        },
+    ]
+    raw = _chat_completions(
+        base_url=base_url, model_id=model_id, messages=messages,
+        temperature=0.2, max_tokens=2500, json_mode=True,
+    )
+    return _normalize_summary(_parse_json_lenient(raw))
+
+
+def render_summary_md(summary: Dict[str, Any], lang: str = "it") -> str:
+    """Render deterministico Markdown dalla sintesi strutturata (no LLM)."""
+    h = _SUMMARY_HEADINGS.get(lang, _SUMMARY_HEADINGS["en"])
+    lines = [f"## {h['overall']}\n", (summary.get("overall_summary") or "").strip() + "\n"]
+    if summary.get("key_decisions"):
+        lines.append(f"\n## {h['dec']}\n")
+        lines += [f"- {k}" for k in summary["key_decisions"]]
+    if summary.get("action_items"):
+        lines.append(f"\n## {h['act']}\n")
+        lines += [f"- {k}" for k in summary["action_items"]]
+    if summary.get("topics"):
+        lines.append(f"\n## {h['top']}\n")
+        for t in summary["topics"]:
+            ts = t.get("start_mmss") or ""
+            lines.append(f"\n### [{ts}] {t.get('title', '')}\n")
+            lines.append((t.get("summary") or "").strip())
+    return "\n".join(lines)
+
+
+def translate_summary_structured(
+    *,
+    summary: Dict[str, Any],
+    target_language: str,
+    base_url: Optional[str],
+    model_id: Optional[str],
+) -> Dict[str, Any]:
+    """Traduce la sintesi strutturata mantenendo lo shape; i `start_mmss`
+    dei topic restano invariati (timestamp). Fallback alla sorgente se
+    la traduzione viene vuota."""
+    import json
+    if _stub_enabled() or not base_url or not model_id:
+        return {**summary, "overall_summary": f"[stub {target_language}] " + (summary.get("overall_summary") or "")}
+    raw = _chat_completions(
+        base_url=base_url, model_id=model_id,
+        messages=[
+            {"role": "system", "content": (
+                f"You translate Italian PA meeting summaries to {target_language}. "
+                "Keep the SAME JSON keys and the topics' start_mmss values UNCHANGED. "
+                "Translate only human-readable text. Output JSON only."
+            )},
+            {"role": "user", "content": json.dumps(summary, ensure_ascii=False)},
+        ],
+        temperature=0.0, max_tokens=2500, json_mode=True,
+    )
+    data = _parse_json_lenient(raw)
+    if not data.get("overall_summary") and not data.get("topics"):
+        return summary
+    out = _normalize_summary(data)
+    # robustezza: preserva start_mmss per indice dalla sintesi sorgente
+    src_topics = summary.get("topics") or []
+    for i, t in enumerate(out["topics"]):
+        if not t.get("start_mmss") and i < len(src_topics):
+            t["start_mmss"] = src_topics[i].get("start_mmss") or ""
+    return out
+
+
+def _stub_summary_structured(source_language: str) -> Dict[str, Any]:
+    return {
+        "overall_summary": f"Sintesi di prova (stub, {source_language}).",
+        "key_decisions": ["Nessuna decisione, sessione di test"],
+        "action_items": [],
+        "topics": [{"title": "Apertura", "start_mmss": "00:00", "summary": "Apertura della riunione (stub)."}],
+    }
