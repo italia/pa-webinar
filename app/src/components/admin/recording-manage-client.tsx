@@ -158,7 +158,7 @@ export default function RecordingManageClient({
         className="bg-white border rounded-bottom rounded-end p-4 shadow-sm"
         style={{ borderTopLeftRadius: tab === tabs[0]?.key ? 0 : 8 }}
       >
-        {tab === 'overview' && <RecordingOverview eventSlug={eventSlug} />}
+        {tab === 'overview' && <RecordingOverview recordingId={recordingId} />}
         {tab === 'transcript' && <TranscriptEditor recordingId={recordingId} />}
         {tab === 'summary' && <SummaryEditor recordingId={recordingId} />}
         {tab === 'translations' && <TranslationManager recordingId={recordingId} />}

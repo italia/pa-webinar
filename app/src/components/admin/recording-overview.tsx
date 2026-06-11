@@ -1,16 +1,19 @@
 'use client';
 
 /**
- * Panoramica admin di una registrazione: a colpo d'occhio COSA ha prodotto
- * la pipeline AI, lingua per lingua (trascrizione / sintesi / sottotitoli /
- * doppiaggio), con player audio per i dub e anteprima della sintesi tradotta.
+ * Panoramica admin COMPLETA di una registrazione (feedback: "non si capisce
+ * niente"). Vista d'insieme professionale e scansionabile:
+ *   - KPI (durata, partecipanti, tracce, lingue, artefatti, stato/data);
+ *   - timeline dei job della pipeline;
+ *   - matrice lingue × artefatti con dimensioni + download;
+ *   - player audio dei doppiaggi;
+ *   - metriche dell'output LLM (sintesi) per lingua;
+ *   - elenco dei file reali nello storage (con dimensioni);
+ *   - tracce per-partecipante + parlanti;
+ *   - trasparenza modelli (PipelineProvenance).
  *
- * Sostituisce l'esperienza "tutto a tab di editor senza una vista d'insieme"
- * (feedback: "non si capisce niente"). I dati vengono dalla stessa route
- * pubblica del viewer (`/api/events/[slug]/postprod/transcript`), che espone
- * già inventario per-lingua + URL firmati per audio/sottotitoli/sintesi.
- *
- * Niente <Icon> (hydration); glifi testuali. Solo classi Bootstrap Italia.
+ * Dati da `/api/admin/postprod/recordings/[id]/details` (un solo round-trip).
+ * Niente <Icon> (hydration): glifi testuali. Solo Bootstrap Italia.
  */
 
 import { useState } from 'react';
@@ -22,141 +25,190 @@ import PipelineProvenance, {
   type PipelineSnapshot,
 } from '@/components/events/pipeline-provenance';
 
-const fetcher = (url: string): Promise<OverviewData> =>
-  fetch(url, { credentials: 'include' }).then((r) => {
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json() as Promise<OverviewData>;
-  });
-
-interface Structured {
-  overall_summary?: string;
-  key_decisions?: string[];
-  action_items?: string[];
-  topics?: Array<{ title?: string; start_mmss?: string; summary?: string }>;
+interface Metrics {
+  topics: number;
+  decisions: number;
+  actionItems: number;
+  overallChars: number;
 }
-
-interface OverviewData {
-  sourceLanguage: string;
-  speakers: Array<{ diarLabel: string; displayName: string | null }>;
-  subtitleTracks: string[];
-  summaries: Record<string, string>;
-  summariesStructured: Record<string, Structured>;
-  dubbedAudio: Array<{ language: string; src: string }>;
+interface Details {
+  recording: {
+    id: string;
+    status: string;
+    runCount: number;
+    sourceLanguage: string | null;
+    durationSec: number | null;
+    fileSizeBytes: number | null;
+    createdAt: string;
+    updatedAt: string;
+    retentionUntil: string | null;
+    eventTitle: string | null;
+    eventSlug: string | null;
+  };
+  participants: { peak: number | null };
+  tracks: {
+    count: number;
+    purged: number;
+    items: Array<{
+      participantId: string;
+      displayName: string | null;
+      startOffsetMs: number;
+      durationMs: number | null;
+      sizeBytes: number | null;
+      purged: boolean;
+    }>;
+  };
+  jobs: Array<{
+    kind: string;
+    status: string;
+    attempts: number;
+    durationSec: number | null;
+    lastError: string | null;
+    createdAt: string;
+  }>;
+  artifacts: Array<{
+    type: string;
+    language: string | null;
+    sizeBytes: number | null;
+    blobKey: string;
+    modelId: string | null;
+    watermark: string | null;
+  }>;
+  storageFiles: Array<{ key: string; sizeBytes: number | null }>;
+  llm: { perLanguage: Record<string, Metrics>; model: string | null };
+  dubbedAudio: Array<{ language: string; url: string; sizeBytes: number | null; watermark: string | null }>;
+  speakers: Array<{ diarLabel: string; displayName: string | null; totalSpeechSec: number }>;
   pipelineSnapshot?: PipelineSnapshot | null;
 }
 
-export default function RecordingOverview({ eventSlug }: { eventSlug: string | null }) {
+const fetcher = (url: string): Promise<Details> =>
+  fetch(url, { credentials: 'include' }).then((r) => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json() as Promise<Details>;
+  });
+
+function fmtBytes(n: number | null): string {
+  if (n == null) return '–';
+  if (n === 0) return '0';
+  const u = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.min(u.length - 1, Math.floor(Math.log(n) / Math.log(1024)));
+  return `${(n / 1024 ** i).toFixed(i === 0 ? 0 : 1)} ${u[i]}`;
+}
+function fmtDur(sec: number | null): string {
+  if (sec == null) return '–';
+  const m = Math.floor(sec / 60);
+  const s = Math.round(sec % 60);
+  return m > 0 ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`;
+}
+function jobStatusClass(s: string): string {
+  if (s === 'DONE') return 'bg-success';
+  if (s === 'FAILED') return 'bg-danger';
+  if (s === 'RUNNING' || s === 'CLAIMED') return 'bg-info text-dark';
+  return 'bg-secondary';
+}
+
+function Kpi({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="border rounded p-3 text-center" style={{ background: '#fff', minWidth: 120 }}>
+      <div className="fw-bold" style={{ fontSize: '1.4rem', color: 'var(--app-text)' }}>{value}</div>
+      <div className="small text-secondary text-uppercase" style={{ fontSize: '0.68rem', letterSpacing: 0.4 }}>{label}</div>
+      {sub && <div className="small text-secondary" style={{ fontSize: '0.72rem' }}>{sub}</div>}
+    </div>
+  );
+}
+
+export default function RecordingOverview({ recordingId }: { recordingId: string }) {
   const t = useTranslations('admin.postprod.ov');
   const locale = useLocale();
-  const { data, error, isLoading } = useSWR<OverviewData>(
-    eventSlug ? `/api/events/${eventSlug}/postprod/transcript` : null,
+  const { data, error, isLoading } = useSWR<Details>(
+    `/api/admin/postprod/recordings/${recordingId}/details`,
     fetcher,
   );
   const [sumLang, setSumLang] = useState<string | null>(null);
+  const [showFiles, setShowFiles] = useState(false);
 
-  if (!eventSlug || error) {
-    // 404 = registrazione non ancora POSTPROD_DONE/PARTIAL → nessun artefatto.
-    return <div className="alert alert-info small mb-0" role="status">{t('processing')}</div>;
-  }
-  if (isLoading) return <SkeletonLines lines={6} loadingLabel={t('tab')} />;
+  if (isLoading) return <SkeletonLines lines={8} loadingLabel={t('tab')} />;
+  if (error) return <div className="alert alert-info small mb-0" role="status">{t('processing')}</div>;
   if (!data) return <div className="alert alert-danger small mb-0" role="alert">{t('loadError')}</div>;
 
-  const dubByLang = new Map(data.dubbedAudio.map((d) => [d.language, d.src]));
-  const langs = Array.from(
-    new Set([
-      data.sourceLanguage,
-      ...data.subtitleTracks,
-      ...Object.keys(data.summaries),
-      ...data.dubbedAudio.map((d) => d.language),
-    ]),
-  ).sort((a, b) =>
-    a === data.sourceLanguage ? -1 : b === data.sourceLanguage ? 1 : a.localeCompare(b),
-  );
+  const { recording: r, participants, tracks, jobs, artifacts, storageFiles, llm, dubbedAudio, speakers } = data;
+  const slug = r.eventSlug;
 
-  const structuredLangs = Object.keys(data.summariesStructured);
+  // Lingue presenti (union da artefatti + sorgente).
+  const artLangs = new Set<string>();
+  for (const a of artifacts) if (a.language) artLangs.add(a.language);
+  const langs = Array.from(new Set([r.sourceLanguage ?? 'it', ...artLangs])).sort((a, b) =>
+    a === (r.sourceLanguage ?? 'it') ? -1 : b === (r.sourceLanguage ?? 'it') ? 1 : a.localeCompare(b),
+  );
+  const hasType = (type: string, lang: string | null) =>
+    artifacts.find((a) => a.type === type && (lang ? a.language === lang : true));
+
+  const structuredLangs = Object.keys(llm.perLanguage);
   const activeSumLang =
-    sumLang && data.summariesStructured[sumLang]
-      ? sumLang
-      : data.summariesStructured[data.sourceLanguage]
-        ? data.sourceLanguage
+    sumLang && llm.perLanguage[sumLang] ? sumLang
+      : llm.perLanguage[r.sourceLanguage ?? 'it'] ? (r.sourceLanguage ?? 'it')
         : (structuredLangs[0] ?? null);
-  const sm = activeSumLang ? data.summariesStructured[activeSumLang] : null;
-  const decisions = sm?.key_decisions ?? [];
-  const actions = sm?.action_items ?? [];
-  const topics = sm?.topics ?? [];
+  const metrics = activeSumLang ? llm.perLanguage[activeSumLang] : null;
 
-  const present = (
-    <span className="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-      ✓ {t('present')}
-    </span>
-  );
-  const absent = <span className="text-secondary small">– {t('absent')}</span>;
+  const cell = (present: boolean, extra?: React.ReactNode) =>
+    present ? <>{extra ?? <span className="text-success">✓</span>}</> : <span className="text-secondary">–</span>;
 
   return (
     <div>
-      <p className="text-secondary small mb-3">{t('intro')}</p>
+      {/* ── KPI ───────────────────────────────────────────── */}
+      <div className="d-flex flex-wrap gap-2 mb-4">
+        <Kpi label={t('kpiDuration')} value={fmtDur(r.durationSec)} sub={r.fileSizeBytes != null ? fmtBytes(r.fileSizeBytes) : undefined} />
+        <Kpi label={t('kpiParticipants')} value={participants.peak != null ? String(participants.peak) : '–'} />
+        <Kpi label={t('kpiTracks')} value={String(tracks.count)} sub={tracks.purged > 0 ? `${tracks.purged} ${t('trackPurged')}` : undefined} />
+        <Kpi label={t('kpiLanguages')} value={String(langs.length)} sub={langs.map((l) => l.toUpperCase()).join(' · ')} />
+        <Kpi label={t('kpiArtifacts')} value={String(artifacts.length)} />
+        <Kpi label={t('kpiProcessed')} value={new Date(r.updatedAt).toLocaleDateString(locale)} sub={`${t('run')} #${r.runCount}`} />
+      </div>
 
-      {/* Matrice lingue × artefatti — la vista d'insieme che mancava. */}
+      {/* ── Timeline job ──────────────────────────────────── */}
+      <h6 className="fw-semibold mb-2">{t('jobsTitle')}</h6>
+      {jobs.length === 0 ? (
+        <p className="text-secondary small">{t('jobsNone')}</p>
+      ) : (
+        <div className="d-flex flex-wrap gap-2 mb-4">
+          {jobs.map((j, i) => (
+            <div key={i} className="border rounded px-2 py-1 small" style={{ background: '#fff' }} title={j.lastError ?? ''}>
+              <span className={`badge ${jobStatusClass(j.status)} me-1`} style={{ fontSize: '0.62rem' }}>{j.status}</span>
+              <span className="fw-medium">{j.kind}</span>
+              {j.durationSec != null && <span className="text-secondary"> · {fmtDur(j.durationSec)}</span>}
+              {j.attempts > 1 && <span className="text-warning"> · {t('attempts', { n: j.attempts })}</span>}
+              {j.lastError && <span className="text-danger"> · ⚠</span>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Matrice lingue × artefatti ────────────────────── */}
       <h6 className="fw-semibold mb-2">{t('langsTitle')}</h6>
       <div className="table-responsive mb-4">
         <table className="table table-sm align-middle mb-0">
-          <thead>
-            <tr className="small text-secondary">
-              <th>{t('colLang')}</th>
-              <th>{t('colTranscript')}</th>
-              <th>{t('colSummary')}</th>
-              <th>{t('colSubtitles')}</th>
-              <th>{t('colDub')}</th>
-            </tr>
-          </thead>
+          <thead><tr className="small text-secondary">
+            <th>{t('colLang')}</th><th>{t('colTranscript')}</th><th>{t('colSummary')}</th><th>{t('colSubtitles')}</th><th>{t('colDub')}</th>
+          </tr></thead>
           <tbody>
             {langs.map((l) => {
-              const isSrc = l === data.sourceLanguage;
-              const hasSummary = !!(data.summaries[l] || data.summariesStructured[l]);
-              const hasSub = data.subtitleTracks.includes(l);
-              const dub = dubByLang.get(l);
+              const isSrc = l === (r.sourceLanguage ?? 'it');
+              const sumArt = hasType('SUMMARY_MD', l) || hasType('SUMMARY_JSON', l) || hasType('TRANSLATION_MD', l);
+              const subArt = hasType('TRANSCRIPT_VTT', l) || hasType('TRANSLATION_VTT', l) || hasType('SUBTITLE_VTT', l);
+              const dubArt = artifacts.find((a) => a.type === 'DUBBED_AUDIO' && a.language === l);
               return (
                 <tr key={l}>
-                  <td>
-                    <strong className="text-uppercase">{l}</strong>
-                    {isSrc && <span className="text-secondary small"> ({t('source')})</span>}
-                  </td>
-                  {/* La trascrizione completa esiste solo nella lingua originale;
-                      le altre lingue sono sottotitoli + sintesi tradotti. */}
-                  <td>{isSrc ? present : absent}</td>
-                  <td>
-                    {hasSummary ? (
-                      <a
-                        className="small text-decoration-none"
-                        href={`/api/events/${eventSlug}/postprod/download/summary.md?lang=${l}`}
-                      >
-                        ✓ {t('download')} .md
-                      </a>
-                    ) : (
-                      absent
-                    )}
-                  </td>
-                  <td>
-                    {hasSub ? (
-                      <a
-                        className="small text-decoration-none"
-                        href={`/api/events/${eventSlug}/postprod/subtitle/${l}`}
-                      >
-                        ✓ {t('download')} .vtt
-                      </a>
-                    ) : (
-                      absent
-                    )}
-                  </td>
-                  <td>
-                    {dub ? (
-                      <a className="small text-decoration-none" href={dub}>
-                        ✓ {t('download')} .m4a
-                      </a>
-                    ) : (
-                      absent
-                    )}
-                  </td>
+                  <td><strong className="text-uppercase">{l}</strong>{isSrc && <span className="text-secondary small"> ({t('source')})</span>}</td>
+                  <td>{cell(isSrc)}</td>
+                  <td>{cell(!!sumArt, sumArt && slug ? (
+                    <a className="small text-decoration-none" href={`/api/events/${slug}/postprod/download/summary.md?lang=${l}`}>✓ .md <span className="text-secondary">({fmtBytes(sumArt.sizeBytes)})</span></a>
+                  ) : undefined)}</td>
+                  <td>{cell(!!subArt, subArt && slug ? (
+                    <a className="small text-decoration-none" href={`/api/events/${slug}/postprod/subtitle/${l}`}>✓ .vtt <span className="text-secondary">({fmtBytes(subArt.sizeBytes)})</span></a>
+                  ) : undefined)}</td>
+                  <td>{cell(!!dubArt, dubArt ? (
+                    <span className="small">✓ <span className="text-secondary">({fmtBytes(dubArt.sizeBytes)}{dubArt.watermark ? ' · 🔏' : ''})</span></span>
+                  ) : undefined)}</td>
                 </tr>
               );
             })}
@@ -164,110 +216,105 @@ export default function RecordingOverview({ eventSlug }: { eventSlug: string | n
         </table>
       </div>
 
-      {/* Player dub: ascolto diretto, una riga per lingua. */}
+      {/* ── Player dub ────────────────────────────────────── */}
       <h6 className="fw-semibold mb-2">{t('dubTitle')}</h6>
-      {data.dubbedAudio.length === 0 ? (
+      {dubbedAudio.length === 0 ? (
         <p className="text-secondary small">{t('dubNone')}</p>
       ) : (
         <div className="d-flex flex-column gap-2 mb-4">
-          {data.dubbedAudio.map((d) => (
+          {dubbedAudio.map((d) => (
             <div key={d.language} className="d-flex align-items-center gap-2">
-              <span className="badge bg-secondary text-uppercase" style={{ minWidth: 38 }}>
-                {d.language}
-              </span>
-              {/* eslint-disable-next-line jsx-a11y/media-has-caption -- audio doppiato, i sottotitoli sono separati */}
-              <audio controls preload="none" src={d.src} style={{ height: 38, maxWidth: 460 }} />
+              <span className="badge bg-secondary text-uppercase" style={{ minWidth: 38 }}>{d.language}</span>
+              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              <audio controls preload="none" src={d.url} style={{ height: 38, maxWidth: 460 }} />
+              <span className="small text-secondary">{fmtBytes(d.sizeBytes)}{d.watermark ? ` · ${d.watermark}` : ''}</span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Anteprima sintesi (selettore lingua). */}
+      {/* ── Metriche LLM + anteprima sintesi ──────────────── */}
       <h6 className="fw-semibold mb-2 d-flex align-items-center gap-2">
-        {t('summaryTitle')}
+        {t('metricsTitle')}
         {structuredLangs.length > 1 && (
-          <select
-            className="form-select form-select-sm"
-            style={{ width: 'auto' }}
-            value={activeSumLang ?? ''}
-            onChange={(e) => setSumLang(e.target.value)}
-            aria-label={t('summaryLang')}
-          >
-            {structuredLangs.map((l) => (
-              <option key={l} value={l}>
-                {l.toUpperCase()}
-              </option>
-            ))}
+          <select className="form-select form-select-sm" style={{ width: 'auto' }} value={activeSumLang ?? ''} onChange={(e) => setSumLang(e.target.value)} aria-label={t('summaryLang')}>
+            {structuredLangs.map((l) => <option key={l} value={l}>{l.toUpperCase()}</option>)}
           </select>
         )}
       </h6>
-      {!sm ? (
-        <p className="text-secondary small">{t('summaryNone')}</p>
-      ) : (
-        <div className="border rounded p-3 mb-4" style={{ background: '#f8f9fb' }}>
-          {sm.overall_summary && (
-            <p className="mb-2" style={{ whiteSpace: 'pre-wrap' }}>
-              {sm.overall_summary}
-            </p>
-          )}
-          {decisions.length > 0 && (
-            <>
-              <div className="fw-semibold small text-uppercase text-secondary mt-2">
-                {t('decisions')}
-              </div>
-              <ul className="small mb-2">
-                {decisions.map((d, i) => (
-                  <li key={i}>{d}</li>
-                ))}
-              </ul>
-            </>
-          )}
-          {actions.length > 0 && (
-            <>
-              <div className="fw-semibold small text-uppercase text-secondary">{t('actions')}</div>
-              <ul className="small mb-2">
-                {actions.map((d, i) => (
-                  <li key={i}>{d}</li>
-                ))}
-              </ul>
-            </>
-          )}
-          {topics.length > 0 && (
-            <>
-              <div className="fw-semibold small text-uppercase text-secondary">{t('topics')}</div>
-              <ul className="small mb-0">
-                {topics.map((tp, i) => (
-                  <li key={i}>
-                    {tp.start_mmss && (
-                      <span className="font-monospace text-secondary">{tp.start_mmss} </span>
-                    )}
-                    {tp.title}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Parlanti: nome reale o "non assegnato". */}
-      <h6 className="fw-semibold mb-2">{t('speakersTitle')}</h6>
-      {data.speakers.length === 0 ? (
-        <p className="text-secondary small">–</p>
+      {!metrics ? (
+        <p className="text-secondary small mb-4">{t('summaryNone')}</p>
       ) : (
         <div className="d-flex flex-wrap gap-2 mb-4">
-          {data.speakers.map((sp) => (
-            <span key={sp.diarLabel} className="badge bg-light text-dark border">
-              {sp.displayName || `${sp.diarLabel} · ${t('speakerAnon')}`}
-            </span>
-          ))}
+          <Kpi label={t('topics')} value={String(metrics.topics)} />
+          <Kpi label={t('decisions')} value={String(metrics.decisions)} />
+          <Kpi label={t('actions')} value={String(metrics.actionItems)} />
+          <Kpi label={t('chars')} value={String(metrics.overallChars)} />
+          {llm.model && <Kpi label={t('model')} value={llm.model} />}
         </div>
       )}
 
-      {/* Trasparenza modelli (stessa card del viewer pubblico). */}
-      {data.pipelineSnapshot && (
-        <PipelineProvenance snapshot={data.pipelineSnapshot} locale={locale} />
+      {/* ── Tracce per partecipante ───────────────────────── */}
+      <h6 className="fw-semibold mb-2">{t('tracksTitle')}</h6>
+      {tracks.items.length === 0 ? (
+        <p className="text-secondary small mb-4">{t('tracksNone')}</p>
+      ) : (
+        <div className="table-responsive mb-4">
+          <table className="table table-sm align-middle mb-0">
+            <tbody>
+              {tracks.items.map((tr, i) => (
+                <tr key={i}>
+                  <td><strong>{tr.displayName || tr.participantId.slice(0, 10)}</strong></td>
+                  <td className="small text-secondary">{t('trackEnters', { s: Math.round(tr.startOffsetMs / 1000) })}</td>
+                  <td className="small text-secondary">{tr.durationMs != null ? fmtDur(tr.durationMs / 1000) : '–'}</td>
+                  <td className="small text-secondary">{fmtBytes(tr.sizeBytes)}</td>
+                  <td>{tr.purged && <span className="badge bg-light text-secondary border">{t('trackPurged')}</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
+
+      {/* ── Parlanti ──────────────────────────────────────── */}
+      <h6 className="fw-semibold mb-2">{t('speakersTitle')}</h6>
+      <div className="d-flex flex-wrap gap-2 mb-4">
+        {speakers.length === 0 ? <span className="text-secondary small">–</span> : speakers.map((sp) => (
+          <span key={sp.diarLabel} className="badge bg-light text-dark border">
+            {sp.displayName || `${sp.diarLabel} · ${t('speakerAnon')}`}
+            <span className="text-secondary"> · {fmtDur(sp.totalSpeechSec)}</span>
+          </span>
+        ))}
+      </div>
+
+      {/* ── File nello storage ────────────────────────────── */}
+      <h6 className="fw-semibold mb-2">{t('filesTitle')}</h6>
+      {storageFiles.length === 0 ? (
+        <p className="text-secondary small mb-4">{t('filesNone')}</p>
+      ) : (
+        <div className="mb-4">
+          <button type="button" className="btn btn-sm btn-outline-secondary mb-2" onClick={() => setShowFiles((v) => !v)} aria-expanded={showFiles}>
+            {t('filesToggle', { n: storageFiles.length })}
+          </button>
+          {showFiles && (
+            <div className="table-responsive">
+              <table className="table table-sm font-monospace mb-0" style={{ fontSize: '0.78rem' }}>
+                <tbody>
+                  {storageFiles.map((f) => (
+                    <tr key={f.key}>
+                      <td className="text-break">{f.key}</td>
+                      <td className="text-end text-secondary" style={{ whiteSpace: 'nowrap' }}>{fmtBytes(f.sizeBytes)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Trasparenza modelli ───────────────────────────── */}
+      {data.pipelineSnapshot && <PipelineProvenance snapshot={data.pipelineSnapshot} locale={locale} />}
 
       <p className="text-secondary small mt-3 mb-0">{t('editHint')}</p>
     </div>
