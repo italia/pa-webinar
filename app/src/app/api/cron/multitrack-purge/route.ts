@@ -34,9 +34,22 @@ export const GET = withErrorHandling(async (request) => {
     where: {
       audioPurgedAt: null,
       recording: {
-        jobs: {
-          some: { kind: 'TRANSCRIBE_MULTITRACK', status: 'DONE' },
-        },
+        AND: [
+          // La trascrizione multi-traccia è completata almeno una volta.
+          { jobs: { some: { kind: 'TRANSCRIBE_MULTITRACK', status: 'DONE' } } },
+          // NESSUN job ATTIVO che consuma ancora le tracce: una re-run di
+          // TRANSCRIBE_MULTITRACK o un ARCHIVE in coda/esecuzione le leggono.
+          // Senza questo guard il purge poteva cancellare l'audio DURANTE una
+          // re-run (transcript vuoto) o prima dell'archivio (archivio degradato).
+          {
+            jobs: {
+              none: {
+                kind: { in: ['TRANSCRIBE_MULTITRACK', 'ARCHIVE'] },
+                status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] },
+              },
+            },
+          },
+        ],
         OR: [
           // Default (minimizzazione): purge appena trascritto.
           { event: { retainParticipantTracks: false } },
