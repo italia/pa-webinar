@@ -43,6 +43,8 @@ interface EventInfo {
   title: string;
   /** Resolved kicker flag (per-event override merged with site default). */
   parseTitleKicker?: boolean;
+  /** Resolved waiting-room engine (per-event override merged with site default). */
+  waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
   startsAt: string;
   endsAt: string;
   status: string;
@@ -592,6 +594,7 @@ export default function LiveEventClient({
           title: event.title,
           slug: event.slug,
           parseTitleKicker: event.parseTitleKicker,
+          waitingRoomEngine: event.waitingRoomEngine,
           startsAt: event.startsAt,
           endsAt: event.endsAt,
           status: eventStatus as 'PUBLISHED' | 'LIVE' | 'ENDED' | 'IDLE' | 'PROVISIONING',

@@ -109,6 +109,7 @@ export interface InitialEventShape {
     tagSlugs: string[];
     recurrenceRule: string | null;
     parseTitleKicker: boolean | null;
+    waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
     expectedSenderRatioPct: number | null;
     permissionMatrix: PermissionMatrix | null;
     qaEnabled: boolean;
@@ -241,6 +242,7 @@ export default function EventWizard(props: WizardProps) {
         recurrenceUntil: null,
         recurrenceCount: null,
         parseTitleKicker: ev.parseTitleKicker,
+        waitingRoomEngine: ev.waitingRoomEngine,
         expectedSenderRatioPct: ev.expectedSenderRatioPct,
 
         // Step 2
@@ -352,6 +354,7 @@ export default function EventWizard(props: WizardProps) {
       recurrenceUntil: null,
       recurrenceCount: null,
       parseTitleKicker: null,
+      waitingRoomEngine: null,
       expectedSenderRatioPct: null,
 
       // Step 2
@@ -484,6 +487,7 @@ export default function EventWizard(props: WizardProps) {
           tagSlugs: form.tagSlugs,
           recurrenceRule: form.recurrenceRule,
           parseTitleKicker: form.parseTitleKicker,
+          waitingRoomEngine: form.waitingRoomEngine,
           expectedSenderRatioPct: form.expectedSenderRatioPct,
 
           // Permissions (matrix + derived booleans)
