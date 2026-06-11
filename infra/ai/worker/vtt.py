@@ -75,23 +75,31 @@ def segments_to_vtt(
     return "\n".join(lines)
 
 
-def segments_to_plain_text(segments: Iterable[Segment]) -> str:
+def segments_to_plain_text(
+    segments: Iterable[Segment],
+    speaker_names: Optional[dict] = None,
+) -> str:
     """Render segments as plain text with speaker prefixes.
 
     Used both for the .txt artifact and for the prompt to the LLM
-    (summarisation / translation). Format::
+    (summarisation / translation). `speaker_names` mappa diarLabel→nome reale
+    (es. {"SPEAKER_00": "Raffaele"}): se presente, il prefisso usa il NOME
+    invece dell'etichetta acustica, così la SINTESI dell'LLM cita "Raffaele"
+    e non "SPEAKER_00". Senza mappa (blind pre-mapping) resta il label. Format::
 
-        [00:01:23] SPEAKER_00: Lorem ipsum
-        [00:01:27] SPEAKER_01: Dolor sit amet
+        [00:01:23] Raffaele: Lorem ipsum
+        [00:01:27] Paolo: Dolor sit amet
     """
+    names = speaker_names or {}
     out: List[str] = []
     for seg in segments:
         ts = _format_ts(float(seg.get("start", 0.0))).split(".")[0]
         spk = seg.get("speaker") or "SPEAKER_??"
+        label = names.get(spk, spk)
         text = (seg.get("text") or "").strip()
         if not text:
             continue
-        out.append(f"[{ts}] {spk}: {text}")
+        out.append(f"[{ts}] {label}: {text}")
     return "\n".join(out)
 
 

@@ -47,3 +47,26 @@ def test_parse_ts_formats():
     assert vtt._parse_ts("00:01:30.500") == 90.5
     assert vtt._parse_ts("02:05.000") == 125.0
     assert vtt._parse_ts("7.250") == 7.25
+
+
+def test_plain_text_resolves_speaker_names():
+    """La sintesi/LLM deve vedere il NOME reale, non SPEAKER_00."""
+    from vtt import segments_to_plain_text
+
+    segs = [
+        {"start": 1.0, "end": 2.0, "text": "ciao", "speaker": "SPEAKER_00"},
+        {"start": 3.0, "end": 4.0, "text": "salve", "speaker": "SPEAKER_01"},
+    ]
+    out = segments_to_plain_text(segs, speaker_names={"SPEAKER_00": "Raffaele"})
+    assert "Raffaele: ciao" in out
+    assert "SPEAKER_00" not in out  # risolto al nome
+    assert "SPEAKER_01: salve" in out  # non mappato → resta il label
+
+
+def test_plain_text_without_names_keeps_label():
+    from vtt import segments_to_plain_text
+
+    out = segments_to_plain_text(
+        [{"start": 0.0, "end": 1.0, "text": "x", "speaker": "SPEAKER_00"}]
+    )
+    assert "SPEAKER_00: x" in out

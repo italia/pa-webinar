@@ -305,7 +305,7 @@ def run_transcribe_multitrack(app: cli.AppClient, job: cli.ClaimResponse) -> Non
             artifact_type="TRANSCRIPT_VTT", language=detected_lang, body_bytes=vtt_bytes,
             model_id="multitrack", model_version=model_version,
         )
-        txt_bytes = vttmod.segments_to_plain_text(merged["segments"]).encode("utf-8")
+        txt_bytes = vttmod.segments_to_plain_text(merged["segments"], speaker_names=names).encode("utf-8")
         _write_and_upload(
             app, job.jobId, target=job.uploadTargets["transcriptTxt"],
             artifact_type="TRANSCRIPT_TXT", language=detected_lang, body_bytes=txt_bytes,
@@ -330,7 +330,15 @@ def run_summarize(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         with open(transcript_path, "r", encoding="utf-8") as f:
             transcript = json.load(f)
 
-        text = vttmod.segments_to_plain_text(transcript.get("segments", []))
+        # Nomi reali per l'LLM: priorità ai Speaker del DB (job.speakerNames,
+        # mapping admin/multitrack), fallback ai nomi embeddati nel transcript
+        # (multitrack: dal JWT). Così la sintesi cita "Raffaele" non "SPEAKER_00".
+        names = dict(getattr(job, "speakerNames", {}) or {})
+        for sp in transcript.get("speakers", []) or []:
+            dl, dn = sp.get("diarLabel"), sp.get("displayName")
+            if dl and dn and dl not in names:
+                names[dl] = dn
+        text = vttmod.segments_to_plain_text(transcript.get("segments", []), speaker_names=names)
         app.progress(job.jobId, "RUNNING", percent=30.0, message="calling LLM")
 
         # Agenda/note (opzionale): se l'evento la usa, il claim la mette nel
@@ -388,6 +396,14 @@ def run_translate(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         with open(transcript_path, "r", encoding="utf-8") as f:
             transcript = json.load(f)
 
+        # Nomi reali (DB Speaker + fallback transcript) per i sottotitoli
+        # tradotti: la label nel VTT diventa "Raffaele" non "SPEAKER_00".
+        names = dict(getattr(job, "speakerNames", {}) or {})
+        for sp in transcript.get("speakers", []) or []:
+            dl, dn = sp.get("diarLabel"), sp.get("displayName")
+            if dl and dn and dl not in names:
+                names[dl] = dn
+
         app.progress(job.jobId, "RUNNING", percent=20.0, message="translating segments")
         translated_segments = llmmod.translate_segments(
             segments=transcript.get("segments", []),
@@ -397,7 +413,7 @@ def run_translate(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         )
 
         # TRANSLATION_VTT (subtitle track in the target language).
-        vtt_bytes = vttmod.segments_to_vtt(translated_segments).encode("utf-8")
+        vtt_bytes = vttmod.segments_to_vtt(translated_segments, speaker_names=names).encode("utf-8")
         _write_and_upload(
             app,
             job.jobId,

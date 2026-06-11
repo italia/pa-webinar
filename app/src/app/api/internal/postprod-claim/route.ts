@@ -315,6 +315,13 @@ export const POST = withErrorHandling(async (request) => {
     displayName?: string | null;
     startOffsetMs?: number;
   }> = [];
+  // Mappa diarLabel→nome reale (Speaker DB): la passiamo al worker per
+  // SUMMARIZE/TRANSLATE così la SINTESI e i sottotitoli tradotti usano il
+  // nome ("Raffaele") invece di "SPEAKER_00". Su multitrack i nomi (JWT) ci
+  // sono sempre; su blind diarization compaiono dopo il mapping admin (→
+  // ri-esegui SUMMARIZE). Speaker.displayName è in chiaro (vedi transcript
+  // route che lo usa diretto).
+  const speakerNames: Record<string, string> = {};
   const sourceDownloadUrl = await presignArtifactDownload({
     blobKey: recording.blobKey,
     expiresInMinutes: lease,
@@ -436,6 +443,15 @@ export const POST = withErrorHandling(async (request) => {
       blobKey: transcript.blobKey,
     });
 
+    // Nomi reali per la sintesi/traduzione (vedi speakerNames sopra).
+    const speakerRows = await prisma.speaker.findMany({
+      where: { recordingId: recording.id, displayName: { not: null } },
+      select: { diarLabel: true, displayName: true },
+    });
+    for (const sp of speakerRows) {
+      if (sp.displayName) speakerNames[sp.diarLabel] = sp.displayName;
+    }
+
     // TRANSLATE: fornisci ANCHE la sintesi strutturata SORGENTE
     // (SUMMARY_JSON nella lingua sorgente) così il worker la traduce →
     // SUMMARY_JSON[target] + TRANSLATION_MD[target]. Se l'evento non ha
@@ -516,6 +532,7 @@ export const POST = withErrorHandling(async (request) => {
       sourceDownloadUrl,
       uploadTargets,
       inputs,
+      speakerNames,
       providerHints: {
         llmProvider: llm.provider,
         asrProvider: asr.provider,

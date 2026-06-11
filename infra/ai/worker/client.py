@@ -75,6 +75,10 @@ class ClaimResponse(BaseModel):
     sourceDownloadUrl: str
     uploadTargets: Dict[str, UploadTarget]
     inputs: List[ClaimInput] = Field(default_factory=list)
+    # Mappa diarLabel→nome reale dai Speaker (DB). Usata da SUMMARIZE/TRANSLATE
+    # per dare all'LLM/VTT i nomi veri invece di "SPEAKER_00". Vuota su blind
+    # pre-mapping (fallback al label).
+    speakerNames: Dict[str, str] = Field(default_factory=dict)
     providerHints: ProviderHints
 
 
