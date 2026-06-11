@@ -56,7 +56,12 @@ export const transcribePayloadSchema = z.object({
 export const summarizePayloadSchema = z.object({
   runId: uuidSchema,
   sourceLanguage: languageCodeSchema,
-  transcriptArtifactId: uuidSchema,
+  // Optional: il transcript non esiste ancora quando enqueuePostprodForRecording
+  // crea il job (gira PRIMA di TRANSCRIBE). Il worker riceve il TRANSCRIPT_JSON
+  // via `inputs[role='transcript']` risolto al claim-time, non dal payload.
+  // Era required → ogni claim SUMMARIZE falliva 422 (bug latente: la pipeline
+  // oltre TRANSCRIBE non era mai stata eseguita davvero in cluster).
+  transcriptArtifactId: uuidSchema.optional(),
   /** LLM model id. Null = provider default. */
   model: z.string().min(1).max(120).optional(),
 });
@@ -65,7 +70,9 @@ export const translatePayloadSchema = z.object({
   runId: uuidSchema,
   sourceLanguage: languageCodeSchema,
   targetLanguage: languageCodeSchema,
-  transcriptArtifactId: uuidSchema,
+  // Optional per lo stesso motivo di summarize: risolto via claim `inputs`,
+  // non noto all'enqueue (pre-TRANSCRIBE). Era required → claim 422.
+  transcriptArtifactId: uuidSchema.optional(),
   /** When set, the translator also produces a translated SUMMARY_MD. */
   summaryArtifactId: uuidSchema.optional(),
   model: z.string().min(1).max(120).optional(),
@@ -94,7 +101,10 @@ export const dubPayloadSchema = z.object({
   runId: uuidSchema,
   sourceLanguage: languageCodeSchema,
   targetLanguage: languageCodeSchema,
-  translatedTranscriptArtifactId: uuidSchema,
+  // Optional: il TRANSLATION_VTT non esiste all'enqueue (lo produce TRANSLATE).
+  // Il worker lo riceve via `inputs[role='translatedTranscript']` al claim-time.
+  // Era required → claim DUB 422.
+  translatedTranscriptArtifactId: uuidSchema.optional(),
   engine: z.string().min(1).max(40).optional(),
 });
 
@@ -258,6 +268,11 @@ export const artifactRegisterSchema = z.object({
   inlineBody: z.string().max(64 * 1024).optional(),
   modelId: z.string().max(120).optional(),
   modelVersion: z.string().max(80).optional(),
+  /**
+   * AI Act Art. 50 watermark applied to this artifact (es. 'audioseal'
+   * sul DUBBED_AUDIO/DUBBED_VIDEO). null/assente = non watermarkato.
+   */
+  watermarkType: z.string().min(1).max(40).optional(),
   /**
    * Speaker map produced by diarization. Only set on TRANSCRIPT_JSON.
    * The app upserts `Speaker` rows from this.

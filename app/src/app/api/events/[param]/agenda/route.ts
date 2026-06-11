@@ -34,7 +34,55 @@ export const GET = withErrorHandling(async (request, context) => {
     select: { id: true, label: true, completed: true, sortOrder: true },
   });
 
-  return Response.json({ agendaEnabled: event.agendaEnabled, items });
+  // Audience-pulse tallies per item (assenso/dissenso). Aggregated in one
+  // groupBy instead of N+1 counts.
+  const counts = await prisma.agendaItemReaction.groupBy({
+    by: ['agendaItemId', 'value'],
+    where: { agendaItem: { eventId: event.id } },
+    _count: { _all: true },
+  });
+  const tally = new Map<string, { agree: number; disagree: number }>();
+  for (const c of counts) {
+    const t = tally.get(c.agendaItemId) ?? { agree: 0, disagree: 0 };
+    if (c.value === 'AGREE') t.agree = c._count._all;
+    else t.disagree = c._count._all;
+    tally.set(c.agendaItemId, t);
+  }
+
+  // The caller's own reaction per item, so the UI can highlight the chosen
+  // button after a refresh. Identity comes from the participant accessToken
+  // (Authorization: Bearer) or the anonymous guestId (?guestId= query).
+  const url = new URL(request.url);
+  const guestId = url.searchParams.get('guestId');
+  const bearer = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') || null;
+  let registrationId: string | null = null;
+  if (bearer) {
+    const reg = await prisma.registration.findUnique({
+      where: { accessToken: bearer },
+      select: { id: true, eventId: true },
+    });
+    if (reg && reg.eventId === event.id) registrationId = reg.id;
+  }
+  const mine = new Map<string, 'AGREE' | 'DISAGREE'>();
+  if (registrationId || guestId) {
+    const myRx = await prisma.agendaItemReaction.findMany({
+      where: {
+        agendaItem: { eventId: event.id },
+        ...(registrationId ? { registrationId } : { guestId }),
+      },
+      select: { agendaItemId: true, value: true },
+    });
+    for (const r of myRx) mine.set(r.agendaItemId, r.value);
+  }
+
+  const itemsWithReactions = items.map((i) => ({
+    ...i,
+    agreeCount: tally.get(i.id)?.agree ?? 0,
+    disagreeCount: tally.get(i.id)?.disagree ?? 0,
+    myReaction: mine.get(i.id) ?? null,
+  }));
+
+  return Response.json({ agendaEnabled: event.agendaEnabled, items: itemsWithReactions });
 });
 
 export const POST = withErrorHandling(async (request, context) => {

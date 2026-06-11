@@ -54,10 +54,14 @@ def main():
     write_vtt(tx["segments"], "text", "transcript_it.vtt", speaker_names=names)
     print(f"transcript_it.vtt  ({len(tx['segments'])} cues)")
 
-    # EN (segmenti tradotti)
-    en_segs = sm.get("transcript_en", [])
-    write_vtt(en_segs, "text_en", "transcript_en.vtt", speaker_names=names)
-    print(f"transcript_en.vtt  ({len(en_segs)} cues)")
+    # Traduzioni: una VTT per ciascuna lingua target.
+    target_langs = sm.get("target_langs") or ["en"]
+    tr_by_lang = {}
+    for lang in target_langs:
+        segs_l = sm.get(f"transcript_{lang}", [])
+        tr_by_lang[lang] = segs_l
+        write_vtt(segs_l, f"text_{lang}", f"transcript_{lang}.vtt", speaker_names=names)
+        print(f"transcript_{lang}.vtt  ({len(segs_l)} cues)")
 
     # Versione "named": riscrivo i segmenti applicando il mapping
     def apply_names(segs):
@@ -75,7 +79,7 @@ def main():
         "speakers": tx.get("speakers", []),
         "speakers_named": names,
         "segments": apply_names(tx["segments"]),
-        "segments_en": apply_names(en_segs),
+        **{f"segments_{lang}": apply_names(tr_by_lang[lang]) for lang in target_langs},
     }
     with open("transcript_named.json", "w") as f:
         json.dump(named, f, indent=2, ensure_ascii=False)
@@ -107,7 +111,10 @@ def main():
         ms = int((t - int(t)) * 1000)
         return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
 
-    for lang, segs, key in [("it", tx["segments"], "text"), ("en", en_segs, "text_en")]:
+    srt_targets = [("it", tx["segments"], "text")] + [
+        (lang, tr_by_lang[lang], f"text_{lang}") for lang in target_langs
+    ]
+    for lang, segs, key in srt_targets:
         with open(f"transcript_{lang}.srt", "w") as f:
             for i, s in enumerate(segs, 1):
                 text = s.get(key, "").strip()

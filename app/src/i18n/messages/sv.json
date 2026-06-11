@@ -2662,7 +2662,11 @@
     "emailLabel": "E-post (valfritt)",
     "emailHelp": "Endast för eventuell uppföljning efter evenemanget",
     "emailInvalid": "Ange en giltig e-postadress",
-    "chatLockedMessage": "Ange ditt namn för att delta i evenemangets chatt."
+    "chatLockedMessage": "Ange ditt namn för att delta i evenemangets chatt.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Videoinspelning",
@@ -2761,6 +2765,7 @@
     "classicView": "Klassisk vy",
     "changeAvatar": "Byt avatar",
     "peopleInGarden": "{count, plural, =0 {Ingen i trädgården} one {1 person i trädgården} other {# personer i trädgården}}",
+    "guestName": "Guest",
     "hintKeyboard": "Rör dig med WASD eller piltangenterna",
     "pickerTitle": "Välj din avatar",
     "pickerHelp": "Karaktären representerar dig i väntrummets trädgård. Du kan byta när du vill.",

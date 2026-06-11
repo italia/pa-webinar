@@ -135,6 +135,14 @@ function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
         .filter(Boolean),
     ),
   );
+  const dubbed = Array.from(
+    new Set(
+      artifacts
+        .filter((a) => a.type === 'DUBBED_AUDIO' || a.type === 'DUBBED_VIDEO')
+        .map((a) => a.language)
+        .filter(Boolean),
+    ),
+  );
   const pill = (on: boolean, label: string, title: string) => (
     <span
       className={`badge ${on ? 'bg-success-subtle text-success-emphasis' : 'bg-light text-secondary'}`}
@@ -152,6 +160,7 @@ function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
       {pill(has('TRANSCRIPT_JSON'), 'Trascr.', 'Trascrizione')}
       {pill(has('SUMMARY_MD') || has('SUMMARY_JSON'), 'Sintesi', 'Sintesi')}
       {pill(translated.length > 0, `Trad. ${translated.length || ''}`.trim(), `Traduzioni: ${translated.join(', ') || 'nessuna'}`)}
+      {dubbed.length > 0 && pill(true, `Doppi. ${dubbed.length}`, `Doppiaggio: ${dubbed.join(', ')}`)}
       {has('WAVEFORM_JSON') && pill(true, 'Waveform', 'Waveform')}
     </div>
   );

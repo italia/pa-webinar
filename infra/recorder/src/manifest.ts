@@ -23,8 +23,14 @@ import { trackKey } from './paths.js';
  * tracce che iniziano/finiscono in momenti diversi.
  */
 export interface TrackRecording {
-  /** Endpoint id Jitsi (stabile per la sessione del partecipante). */
+  /** Endpoint id Jitsi (identità del PARLANTE; può ripetersi su rejoin). */
   participantId: string;
+  /**
+   * Identificatore univoco della SESSIONE di traccia (es. `${pid}-0`,
+   * `${pid}-1`). Distingue rejoin/unmute dello stesso partecipante così
+   * ogni sessione ha un file/blob proprio (niente sovrascrittura).
+   */
+  trackFileId: string;
   /** Nome reale dal JWT del portale (PII, in chiaro qui). Può mancare. */
   displayName: string | null;
   /** Epoch ms in cui è arrivata la prima frame audio della traccia. */
@@ -41,7 +47,10 @@ export interface TrackRecording {
 
 /** Una entry del manifest `tracks.json` (shape concordato nell'ADR). */
 export interface ManifestTrack {
+  /** Identità del parlante (può ripetersi fra sessioni/rejoin). */
   participantId: string;
+  /** Id univoco della sessione di traccia (chiave file/blob distinta). */
+  trackFileId: string;
   /** PII in chiaro — il portale la cifra all'ingest. */
   displayName: string | null;
   /** Object key relativa allo storage (vedi `paths.trackKey`). */
@@ -112,8 +121,11 @@ export function buildManifest(input: BuildManifestInput): Manifest {
   const tracks: ManifestTrack[] = valid
     .map((r) => ({
       participantId: r.participantId,
+      trackFileId: r.trackFileId,
       displayName: r.displayName,
-      trackKey: trackKey(eventId, recordingId, r.participantId),
+      // Chiave per SESSIONE (trackFileId), non per partecipante: due
+      // sessioni dello stesso pid → due blob distinti (no overwrite).
+      trackKey: trackKey(eventId, recordingId, r.trackFileId),
       startOffsetMs: Math.max(0, r.firstFrameAtMs - recordingStartedAtMs),
       durationMs: Math.max(0, r.lastFrameAtMs - r.firstFrameAtMs),
     }))

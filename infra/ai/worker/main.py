@@ -11,6 +11,12 @@ Environment:
     WORKER_STUB=1       skip real ASR + LLM, use canned outputs
     HF_TOKEN            HuggingFace access token for pyannote
     WHISPERX_VERSION    optional version label recorded on artifacts
+    LLM_CONNECT_WAIT_S  attesa max per il cold-start di vLLM (default 720)
+
+Risoluzione nomi: SUMMARIZE/TRANSLATE usano `claim.speakerNames`
+(diarLabel→nome reale dai Speaker del DB) per dare all'LLM e ai sottotitoli
+il NOME del parlante invece di "SPEAKER_00" (fallback ai nomi embeddati nel
+transcript, poi al label). Vedi run_summarize/run_translate.
 """
 
 from __future__ import annotations
@@ -19,6 +25,7 @@ import hashlib
 import json
 import logging
 import os
+import subprocess
 import sys
 import tempfile
 from typing import Any, Dict, List, Optional
@@ -74,6 +81,7 @@ def _write_and_upload(
     model_version: Optional[str] = None,
     inline_max_bytes: int = 64 * 1024,
     speaker_map: Optional[List[Dict[str, Any]]] = None,
+    watermark_type: Optional[str] = None,
 ) -> None:
     """Upload bytes via presigned PUT and register the artifact."""
     cli.upload_bytes(target.url, body_bytes, content_type=target.contentType)
@@ -100,6 +108,7 @@ def _write_and_upload(
         model_id=model_id,
         model_version=model_version,
         speaker_map=speaker_map,
+        watermark_type=watermark_type,
     )
 
 
@@ -302,7 +311,7 @@ def run_transcribe_multitrack(app: cli.AppClient, job: cli.ClaimResponse) -> Non
             artifact_type="TRANSCRIPT_VTT", language=detected_lang, body_bytes=vtt_bytes,
             model_id="multitrack", model_version=model_version,
         )
-        txt_bytes = vttmod.segments_to_plain_text(merged["segments"]).encode("utf-8")
+        txt_bytes = vttmod.segments_to_plain_text(merged["segments"], speaker_names=names).encode("utf-8")
         _write_and_upload(
             app, job.jobId, target=job.uploadTargets["transcriptTxt"],
             artifact_type="TRANSCRIPT_TXT", language=detected_lang, body_bytes=txt_bytes,
@@ -327,27 +336,51 @@ def run_summarize(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         with open(transcript_path, "r", encoding="utf-8") as f:
             transcript = json.load(f)
 
-        text = vttmod.segments_to_plain_text(transcript.get("segments", []))
+        # Nomi reali per l'LLM: priorità ai Speaker del DB (job.speakerNames,
+        # mapping admin/multitrack), fallback ai nomi embeddati nel transcript
+        # (multitrack: dal JWT). Così la sintesi cita "Raffaele" non "SPEAKER_00".
+        names = dict(getattr(job, "speakerNames", {}) or {})
+        for sp in transcript.get("speakers", []) or []:
+            dl, dn = sp.get("diarLabel"), sp.get("displayName")
+            if dl and dn and dl not in names:
+                names[dl] = dn
+        text = vttmod.segments_to_plain_text(transcript.get("segments", []), speaker_names=names)
         app.progress(job.jobId, "RUNNING", percent=30.0, message="calling LLM")
 
         # Agenda/note (opzionale): se l'evento la usa, il claim la mette nel
         # payload come lista {label, completed}. Confluisce nel prompt LLM.
         agenda_items = job.payload.get("agenda") if isinstance(job.payload, dict) else None
-        summary_md = llmmod.summarize_transcript(
+
+        # Sintesi STRUTTURATA (una chiamata vLLM JSON-mode): overall +
+        # decisioni + azioni + topics con start_mmss. È la sorgente di
+        # verità; il Markdown è renderizzato deterministicamente da qui.
+        summary_obj = llmmod.summarize_transcript_structured(
             transcript_text=text,
             source_language=src_lang,
             base_url=job.providerHints.llmBaseUrl,
             model_id=job.providerHints.llmModelId,
             agenda_items=agenda_items,
         )
-        body = summary_md.encode("utf-8")
+
+        # SUMMARY_JSON (strutturato) — usato da hero card + topic-chips.
+        json_bytes = json.dumps(summary_obj, ensure_ascii=False).encode("utf-8")
         _write_and_upload(
-            app,
-            job.jobId,
+            app, job.jobId,
+            target=job.uploadTargets["summaryJson"],
+            artifact_type="SUMMARY_JSON",
+            language=src_lang,
+            body_bytes=json_bytes,
+            model_id=job.providerHints.llmModelId,
+        )
+
+        # SUMMARY_MD (render deterministico dal JSON, niente seconda LLM).
+        summary_md = llmmod.render_summary_md(summary_obj, lang=src_lang)
+        _write_and_upload(
+            app, job.jobId,
             target=job.uploadTargets["summary"],
             artifact_type="SUMMARY_MD",
             language=src_lang,
-            body_bytes=body,
+            body_bytes=summary_md.encode("utf-8"),
             model_id=job.providerHints.llmModelId,
         )
 
@@ -369,6 +402,14 @@ def run_translate(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         with open(transcript_path, "r", encoding="utf-8") as f:
             transcript = json.load(f)
 
+        # Nomi reali (DB Speaker + fallback transcript) per i sottotitoli
+        # tradotti: la label nel VTT diventa "Raffaele" non "SPEAKER_00".
+        names = dict(getattr(job, "speakerNames", {}) or {})
+        for sp in transcript.get("speakers", []) or []:
+            dl, dn = sp.get("diarLabel"), sp.get("displayName")
+            if dl and dn and dl not in names:
+                names[dl] = dn
+
         app.progress(job.jobId, "RUNNING", percent=20.0, message="translating segments")
         translated_segments = llmmod.translate_segments(
             segments=transcript.get("segments", []),
@@ -378,7 +419,7 @@ def run_translate(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         )
 
         # TRANSLATION_VTT (subtitle track in the target language).
-        vtt_bytes = vttmod.segments_to_vtt(translated_segments).encode("utf-8")
+        vtt_bytes = vttmod.segments_to_vtt(translated_segments, speaker_names=names).encode("utf-8")
         _write_and_upload(
             app,
             job.jobId,
@@ -389,33 +430,48 @@ def run_translate(app: cli.AppClient, job: cli.ClaimResponse) -> None:
             model_id=job.providerHints.llmModelId,
         )
 
-        # TRANSLATION_MD (translated summary, if the source summary is
-        # available). We don't always have it (the orchestrator may
-        # have skipped SUMMARIZE for this event), so the worker tries
-        # to fetch a SUMMARY_MD via the recording's existing artifacts
-        # — but the dependency graph already ensured SUMMARIZE ran
-        # first if the event enabled it. If the input role is missing
-        # we just emit an empty placeholder.
-        summary_text = transcript.get("summary") or ""
-        if summary_text:
-            translated_summary = llmmod.translate_text(
-                text=summary_text,
-                target_language=target_lang,
-                base_url=job.providerHints.llmBaseUrl,
-                model_id=job.providerHints.llmModelId,
-            )
-        else:
-            translated_summary = (
-                f"<!-- no source summary to translate to {target_lang} -->\n"
-            )
-        body = translated_summary.encode("utf-8")
+        # Sintesi tradotta. Il claim fornisce la sintesi STRUTTURATA
+        # sorgente come input role 'summary' (SUMMARY_JSON nella lingua
+        # sorgente). La traduciamo mantenendo lo shape → SUMMARY_JSON
+        # [target] + TRANSLATION_MD[target] (render deterministico).
+        # FIX del bug storico: prima leggeva transcript.get("summary")
+        # (campo inesistente nel TRANSCRIPT_JSON) → placeholder vuoto.
+        # Se l'evento non ha aiSummaryEnabled, l'input manca: produciamo
+        # comunque artifact vuoti (richiesti da expectedArtifactsForJob).
+        summary_obj = {"overall_summary": "", "key_decisions": [], "action_items": [], "topics": []}
+        summary_input = next((i for i in job.inputs if i.role == "summary"), None)
+        if summary_input:
+            summary_path = os.path.join(workdir, "summary.json")
+            cli.download_to_file(summary_input.downloadUrl, summary_path)
+            try:
+                with open(summary_path, "r", encoding="utf-8") as f:
+                    src_summary = json.load(f)
+                summary_obj = llmmod.translate_summary_structured(
+                    summary=src_summary,
+                    target_language=target_lang,
+                    base_url=job.providerHints.llmBaseUrl,
+                    model_id=job.providerHints.llmModelId,
+                )
+            except Exception:  # noqa: BLE001 — sintesi tradotta best-effort
+                log.exception("translate summary failed — emit empty summary for %s", target_lang)
+
+        # SUMMARY_JSON[target] (strutturato, lingua target).
         _write_and_upload(
-            app,
-            job.jobId,
+            app, job.jobId,
+            target=job.uploadTargets["summaryJson"],
+            artifact_type="SUMMARY_JSON",
+            language=target_lang,
+            body_bytes=json.dumps(summary_obj, ensure_ascii=False).encode("utf-8"),
+            model_id=job.providerHints.llmModelId,
+        )
+        # TRANSLATION_MD[target] (render Markdown dalla sintesi tradotta).
+        translated_md = llmmod.render_summary_md(summary_obj, lang=target_lang)
+        _write_and_upload(
+            app, job.jobId,
             target=job.uploadTargets["summary"],
             artifact_type="TRANSLATION_MD",
             language=target_lang,
-            body_bytes=body,
+            body_bytes=translated_md.encode("utf-8"),
             model_id=job.providerHints.llmModelId,
         )
 
@@ -452,37 +508,10 @@ def run_dub(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         with open(vtt_path, "r", encoding="utf-8") as f:
             vtt_text = f.read()
 
-        # Parse manuale WebVTT → segmenti. webvtt-py è in requirements
-        # ma il parser di base è semplice e più portabile.
-        segments: list[ttsmod.Segment] = []
-        total_duration = 0.0
-        block_lines: list[str] = []
-        for line in vtt_text.split("\n"):
-            if " --> " in line:
-                # nuovo segmento
-                if block_lines:
-                    segments.append({
-                        "start": parsed_start,
-                        "end": parsed_end,
-                        "text": " ".join(block_lines).strip(),
-                    })
-                    block_lines = []
-                ts = line.split(" --> ")
-                parsed_start = _parse_vtt_ts(ts[0].strip())
-                parsed_end = _parse_vtt_ts(ts[1].strip().split()[0])
-                total_duration = max(total_duration, parsed_end)
-            elif line.strip() and not line.strip().isdigit() and line.strip() != "WEBVTT":
-                # Drop the <v Speaker> tag if present.
-                txt = line.strip()
-                if txt.startswith("<v "):
-                    txt = txt.split(">", 1)[-1]
-                block_lines.append(txt)
-        if block_lines:
-            segments.append({
-                "start": parsed_start,
-                "end": parsed_end,
-                "text": " ".join(block_lines).strip(),
-            })
+        # Parse WebVTT tradotto → segmenti TTS (helper puro in vtt.py,
+        # testato: rimuove tag <v> + prefisso "LABEL: " duplicato così
+        # il TTS non pronuncia l'etichetta speaker).
+        segments, total_duration = vttmod.parse_translated_vtt(vtt_text)
 
         app.progress(job.jobId, "RUNNING", percent=20.0, message="parsed transcript")
 
@@ -505,6 +534,18 @@ def run_dub(app: cli.AppClient, job: cli.ClaimResponse) -> None:
 
         app.progress(job.jobId, "RUNNING", percent=80.0, message="tts done")
 
+        # Watermark AudioSeal (AI Act Art.50) sull'audio doppiato —
+        # best-effort: se fallisce, pubblichiamo l'audio non watermarkato.
+        # Disattivabile con AI_WATERMARK=0.
+        watermark_type: Optional[str] = None
+        if os.environ.get("AI_WATERMARK", "1") != "0":
+            try:
+                if ttsmod.watermark_m4a_inplace(result.audio_path):
+                    watermark_type = "audioseal"
+                    app.progress(job.jobId, "RUNNING", percent=85.0, message="watermarked")
+            except Exception:  # noqa: BLE001 — watermark best-effort
+                log.exception("audioseal watermark fallito — pubblico audio non watermarkato")
+
         # Upload + register DUBBED_AUDIO. Niente inline body (binary).
         with open(result.audio_path, "rb") as f:
             audio_bytes = f.read()
@@ -519,19 +560,44 @@ def run_dub(app: cli.AppClient, job: cli.ClaimResponse) -> None:
             model_id=f"{result.engine}:{result.voice_id}",
             model_version=result.model_version,
             inline_max_bytes=0,  # binario, niente inline
+            watermark_type=watermark_type,
         )
 
-
-def _parse_vtt_ts(ts: str) -> float:
-    """Parse 'HH:MM:SS.mmm' o 'MM:SS.mmm' → float seconds."""
-    parts = ts.strip().split(":")
-    if len(parts) == 3:
-        h, m, s = parts
-        return int(h) * 3600 + int(m) * 60 + float(s)
-    if len(parts) == 2:
-        m, s = parts
-        return int(m) * 60 + float(s)
-    return float(parts[0])
+        # DUBBED_VIDEO (best-effort, bonus): muxa il video sorgente con
+        # l'audio doppiato → MP4 riproducibile/scaricabile offline. Un
+        # fallimento qui NON fa fallire il job (l'audio è il deliverable
+        # primario). Target presente solo se il claim l'ha generato.
+        dv_target = job.uploadTargets.get("dubbedVideo")
+        if dv_target is not None and getattr(job, "sourceDownloadUrl", None):
+            try:
+                src_mp4 = os.path.join(workdir, "source.mp4")
+                cli.download_to_file(job.sourceDownloadUrl, src_mp4)
+                dubbed_mp4 = os.path.join(workdir, f"dubbed.{target_lang}.mp4")
+                subprocess.check_call(
+                    [
+                        "ffmpeg", "-y", "-loglevel", "error",
+                        "-i", src_mp4, "-i", result.audio_path,
+                        "-map", "0:v:0", "-map", "1:a:0",
+                        "-c:v", "copy", "-c:a", "aac", "-b:a", "96k",
+                        "-shortest", "-movflags", "+faststart", dubbed_mp4,
+                    ]
+                )
+                cli.upload_from_file(dv_target.url, dubbed_mp4, content_type=dv_target.contentType)
+                app.register_artifact(
+                    job_id=job.jobId,
+                    artifact_type="DUBBED_VIDEO",
+                    language=target_lang,
+                    blob_key=dv_target.blobKey,
+                    size_bytes=os.path.getsize(dubbed_mp4),
+                    mime_type=dv_target.contentType,
+                    content_hash=_sha256_file(dubbed_mp4),
+                    model_id=f"{result.engine}:{result.voice_id}",
+                    model_version=result.model_version,
+                    watermark_type=watermark_type,
+                )
+                app.progress(job.jobId, "RUNNING", percent=92.0, message="dubbed video muxed")
+            except Exception:  # noqa: BLE001 — dubbed video best-effort
+                log.exception("DUBBED_VIDEO mux failed — skip (audio già pubblicato)")
 
 
 def run_archive(app: cli.AppClient, job: cli.ClaimResponse) -> None:

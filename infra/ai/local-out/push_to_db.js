@@ -1,31 +1,19 @@
 /**
  * Inserisce nel DB di test (videocall-test) gli artifact prodotti
- * localmente. Da lanciare via:
- *   kubectl exec deploy/videocall-test-pa-webinar -c pa-webinar -- node -
+ * localmente. Lanciato da package_and_push.py via kubectl exec.
  *
- * Lo script riceve via stdin un JSON con:
+ * stdin JSON:
  *   {
- *     recordingId: '...',
- *     sourceLanguage: 'it',
- *     summaryIt:    { overall_summary, topics, key_decisions, action_items },
- *     summaryEn:    { ... },
- *     speakersNamed: { 'SPEAKER_00': 'Alex', ... },
- *     transcriptJson: {...},          // raw faster-whisper + diarization
- *     transcriptVttIt: '...',
- *     transcriptVttEn: '...',
- *     transcriptTxtIt: '...',
- *     transcriptSrtIt: '...',
- *     transcriptSrtEn: '...',
- *     summaryMdIt: '...',             // markdown
- *     summaryMdEn: '...',
- *     dubbedAudioBlobKey: 'postprod/.../dubbed_en.m4a' (opzionale),
+ *     recordingId, sourceLanguage,
+ *     summaryIt, summaryMdIt, speakersNamed, transcriptJson,
+ *     transcriptVttIt, transcriptTxtIt, transcriptSrtIt,
+ *     translations: [ { lang, vtt, srt, summaryMd, summaryJson, dubbedBlobKey } ],
+ *     pipelineSnapshot, publishRecording
  *   }
  *
- * Crea:
- *   - 1 PostprodArtifact per ciascun tipo
- *   - 1 Speaker row per ciascuno speaker (con displayName se mapped)
- *   - aggiorna Recording.status = POSTPROD_DONE
- *   - aggiorna Event.recordingPublished = true (se richiesto)
+ * Nota: inlineBody salvato in CHIARO (shortcut test; tryDecryptPII lato
+ * app degrada a plaintext su decrypt-failure). Non usare per dati reali
+ * in prod.
  */
 const { PrismaClient } = require('@prisma/client');
 const crypto = require('crypto');
@@ -38,17 +26,12 @@ const crypto = require('crypto');
     recordingId,
     sourceLanguage,
     summaryIt,
-    summaryEn,
+    summaryMdIt,
     speakersNamed,
     transcriptJson,
     transcriptVttIt,
-    transcriptVttEn,
     transcriptTxtIt,
-    transcriptSrtIt,
-    transcriptSrtEn,
-    summaryMdIt,
-    summaryMdEn,
-    dubbedAudioBlobKey,
+    translations = [],
     publishRecording = true,
   } = input;
 
@@ -56,28 +39,19 @@ const crypto = require('crypto');
   if (!rec) throw new Error('recording not found');
   console.log('rec:', rec.id, 'eventId:', rec.eventId);
 
-  // Wipe stato precedente (idempotenza)
+  // Idempotenza: pulisci lo stato precedente.
   await p.postprodArtifact.deleteMany({ where: { recordingId } });
   await p.speaker.deleteMany({ where: { recordingId } });
   await p.postprodJob.deleteMany({ where: { recordingId } });
 
-  // 4 job DONE — uno per kind. Servono come FK per gli artifact.
   const jobByKind = {};
   for (const kind of ['TRANSCRIBE', 'SUMMARIZE', 'TRANSLATE', 'DUB']) {
     const payload = { runId: rec.id, sourceLanguage, source: 'local-pipeline' };
     const idemRaw = `${rec.id}|${kind}|${rec.runCount}|local`;
     const idempotencyKey = crypto.createHash('sha256').update(idemRaw).digest('hex').slice(0, 40);
     const j = await p.postprodJob.create({
-      data: {
-        recordingId,
-        kind,
-        payload,
-        idempotencyKey,
-        status: 'DONE',
-        attempts: 1,
-        completedAt: new Date(),
-      },
-      select: { id: true, kind: true },
+      data: { recordingId, kind, payload, idempotencyKey, status: 'DONE', attempts: 1, completedAt: new Date() },
+      select: { id: true },
     });
     jobByKind[kind] = j.id;
   }
@@ -87,9 +61,9 @@ const crypto = require('crypto');
     `postprod/${rec.eventId}/${rec.id}/run-${rec.runCount}/${kind}${lang ? '-' + lang : ''}`;
   const sha = (b) => crypto.createHash('sha256').update(b || '').digest('hex');
 
-  const artifactRows = [];
+  const rows = [];
   const push = (type, language, body, mime, jobKind) => {
-    artifactRows.push({
+    rows.push({
       recordingId,
       jobId: jobByKind[jobKind],
       type,
@@ -103,45 +77,42 @@ const crypto = require('crypto');
     });
   };
 
-  // TRANSCRIPT_SRT non esiste nell'enum — il player lo costruisce al volo
-  // dall'endpoint download/[file].
+  // ── Source language (IT) ───────────────────────────────────────
   push('TRANSCRIPT_JSON', null, JSON.stringify(transcriptJson), 'application/json', 'TRANSCRIBE');
   push('TRANSCRIPT_VTT', sourceLanguage, transcriptVttIt, 'text/vtt', 'TRANSCRIBE');
   push('TRANSCRIPT_TXT', sourceLanguage, transcriptTxtIt, 'text/plain', 'TRANSCRIBE');
-  push('TRANSLATION_VTT', 'en', transcriptVttEn, 'text/vtt', 'TRANSLATE');
-  push('SUMMARY_MD', sourceLanguage, summaryMdIt, 'text/markdown', 'SUMMARIZE');
-  push('TRANSLATION_MD', 'en', summaryMdEn, 'text/markdown', 'TRANSLATE');
-  if (input.summaryIt) {
-    push('SUMMARY_JSON', sourceLanguage, JSON.stringify(input.summaryIt), 'application/json', 'SUMMARIZE');
-  }
-  if (input.summaryEn) {
-    push('SUMMARY_JSON', 'en', JSON.stringify(input.summaryEn), 'application/json', 'TRANSLATE');
+  if (summaryMdIt) push('SUMMARY_MD', sourceLanguage, summaryMdIt, 'text/markdown', 'SUMMARIZE');
+  if (summaryIt) push('SUMMARY_JSON', sourceLanguage, JSON.stringify(summaryIt), 'application/json', 'SUMMARIZE');
+
+  // ── Una set di artifact per ogni lingua target ─────────────────
+  for (const t of translations) {
+    if (t.vtt) push('TRANSLATION_VTT', t.lang, t.vtt, 'text/vtt', 'TRANSLATE');
+    if (t.summaryMd) push('TRANSLATION_MD', t.lang, t.summaryMd, 'text/markdown', 'TRANSLATE');
+    if (t.summaryJson) push('SUMMARY_JSON', t.lang, JSON.stringify(t.summaryJson), 'application/json', 'TRANSLATE');
+    if (t.dubbedBlobKey) {
+      rows.push({
+        recordingId,
+        jobId: jobByKind['DUB'],
+        type: 'DUBBED_AUDIO',
+        language: t.lang,
+        blobKey: t.dubbedBlobKey,
+        inlineBody: null,
+        mimeType: 'audio/mp4',
+        sizeBytes: null,
+        contentHash: sha(t.dubbedBlobKey),
+        isSynthetic: true,
+      });
+    }
   }
 
-  if (dubbedAudioBlobKey) {
-    artifactRows.push({
-      recordingId,
-      jobId: jobByKind['DUB'],
-      type: 'DUBBED_AUDIO',
-      language: 'en',
-      blobKey: dubbedAudioBlobKey,
-      inlineBody: null,
-      mimeType: 'audio/mp4',
-      sizeBytes: null,
-      contentHash: sha(dubbedAudioBlobKey),
-      isSynthetic: true,
-    });
-  }
+  const created = await p.postprodArtifact.createMany({ data: rows });
+  console.log('artifacts created:', created.count, '(langs: it +', translations.map((t) => t.lang).join(',') + ')');
 
-  const created = await p.postprodArtifact.createMany({ data: artifactRows });
-  console.log('artifacts created:', created.count);
-
-  // Speakers (basato sul totalSpeechSec calcolato in transcriptJson.speakers)
   const speakerRows = (transcriptJson.speakers || []).map((sp) => ({
     recordingId,
     diarLabel: sp.diarLabel,
-    displayName: speakersNamed[sp.diarLabel] || null,
-    totalSpeechSec: sp.totalSpeechSec || 0,
+    displayName: (speakersNamed || {})[sp.diarLabel] || null,
+    totalSpeechSec: Math.round(sp.totalSpeechSec || 0),
   }));
   if (speakerRows.length) {
     const cSp = await p.speaker.createMany({ data: speakerRows });
@@ -153,9 +124,7 @@ const crypto = require('crypto');
     data: {
       status: 'POSTPROD_DONE',
       sourceLanguage,
-      ...(input.pipelineSnapshot
-        ? { pipelineSnapshot: input.pipelineSnapshot }
-        : {}),
+      ...(input.pipelineSnapshot ? { pipelineSnapshot: input.pipelineSnapshot } : {}),
     },
   });
   console.log('recording → POSTPROD_DONE');
@@ -168,11 +137,7 @@ const crypto = require('crypto');
     console.log('event.recordingPublished → true');
   }
 
-  // Auto-flag SiteSetting per essere sicuri (kill-switch on)
-  await p.siteSetting.update({
-    where: { id: 'singleton' },
-    data: { aiPipelineEnabled: true },
-  });
+  await p.siteSetting.update({ where: { id: 'singleton' }, data: { aiPipelineEnabled: true } });
 
   await p.$disconnect();
   console.log('DONE');

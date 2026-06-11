@@ -47,6 +47,7 @@ export interface WizardTemplatePreset {
   chatEnabled: boolean;
   recordingEnabled: boolean;
   autoStartRecording: boolean;
+  agendaEnabled?: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
@@ -314,7 +315,22 @@ export default function EventWizard(props: WizardProps) {
     }
 
     const tpl = props.template;
-    const matrix: PermissionMatrix = tpl?.permissionMatrix ?? defaultMatrix();
+    // Seed the permission matrix from the template. Prefer the template's
+    // stored matrix; if it has none (the common case — templates only persist
+    // the legacy boolean toggles), PROJECT those booleans into the matrix so
+    // the template's permission choices actually reach step 2. Falling back to
+    // defaultMatrix() here (the old behaviour) silently dropped every
+    // template's permissions — "come se non si potessero scegliere".
+    const matrix: PermissionMatrix = tpl
+      ? ((tpl.permissionMatrix && coerceMatrix(tpl.permissionMatrix)) ??
+          matrixFromToggles({
+            qaEnabled: tpl.qaEnabled,
+            chatEnabled: tpl.chatEnabled,
+            participantsCanUnmute: tpl.participantsCanUnmute,
+            participantsCanStartVideo: tpl.participantsCanStartVideo,
+            participantsCanShareScreen: tpl.participantsCanShareScreen,
+          }))
+      : defaultMatrix();
     return {
       // Step 1
       title: { it: '', en: '' },
@@ -341,7 +357,7 @@ export default function EventWizard(props: WizardProps) {
       // Step 2
       permissionMatrix: matrix,
       recordingEnabled: tpl?.recordingEnabled ?? false,
-      agendaEnabled: false,
+      agendaEnabled: tpl?.agendaEnabled ?? false,
       autoStartRecording: tpl?.autoStartRecording ?? false,
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la

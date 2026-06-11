@@ -38,6 +38,7 @@ import {
   artifactRegisterSchema,
 } from '@/lib/ai';
 import { encryptPII } from '@/lib/crypto/pii';
+import { buildPipelineSnapshot } from '@/lib/ai/pipeline-snapshot';
 import {
   postprodArtifactBytesTotal,
   postprodArtifactsTotal,
@@ -56,7 +57,7 @@ export const POST = withErrorHandling(async (request) => {
   const job = await prisma.postprodJob.findUnique({
     where: { id: parsed.jobId },
     include: {
-      recording: { select: { id: true, eventId: true, runCount: true } },
+      recording: { select: { id: true, eventId: true, runCount: true, sourceLanguage: true } },
     },
   });
   if (!job) throw new NotFoundError('PostprodJob');
@@ -129,6 +130,7 @@ export const POST = withErrorHandling(async (request) => {
       contentHash: parsed.contentHash,
       modelId: parsed.modelId ?? null,
       modelVersion: parsed.modelVersion ?? null,
+      watermarkType: parsed.watermarkType ?? null,
     };
     if (existing) {
       await tx.postprodArtifact.update({ where: { id: existing.id }, data: writeData });
@@ -207,10 +209,29 @@ export const POST = withErrorHandling(async (request) => {
         const anyFailed = await tx.postprodJob.count({
           where: { recordingId: job.recording.id, status: 'FAILED' },
         });
+        // Costruisci il pipelineSnapshot (AI Act Art. 50) dagli artefatti
+        // realmente prodotti — prima era sempre {} per le run in-cluster.
+        const [snapArtifacts, snapSpeakers] = await Promise.all([
+          tx.postprodArtifact.findMany({
+            where: { recordingId: job.recording.id },
+            select: { type: true, language: true, modelId: true, modelVersion: true, watermarkType: true },
+          }),
+          tx.speaker.findMany({
+            where: { recordingId: job.recording.id },
+            select: { diarLabel: true, displayName: true, totalSpeechSec: true },
+          }),
+        ]);
+        const snapshot = buildPipelineSnapshot(
+          snapArtifacts,
+          snapSpeakers,
+          job.recording.sourceLanguage,
+          completedAt.toISOString(),
+        );
         await tx.recording.update({
           where: { id: job.recording.id },
           data: {
             status: anyFailed > 0 ? 'POSTPROD_PARTIAL' : 'POSTPROD_DONE',
+            pipelineSnapshot: snapshot as Prisma.InputJsonValue,
           },
         });
       }

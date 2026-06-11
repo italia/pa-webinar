@@ -73,7 +73,8 @@ function readEnv(): RecorderEnv {
 function toLocalFile(track: ManifestTrack, outputDir: string): LocalTrackFile {
   return {
     track,
-    localPath: join(outputDir, localTrackFilename(track.participantId)),
+    // File locale per SESSIONE (trackFileId), coerente con capture/manifest.
+    localPath: join(outputDir, localTrackFilename(track.trackFileId)),
   };
 }
 
@@ -125,11 +126,31 @@ export async function main(): Promise<void> {
     cronApiKey: env.cronApiKey,
   });
   const files = manifest.tracks.map((t) => toLocalFile(t, env.outputDir));
-  const { uploaded, trackSizes } = await uploadRecording(provider, { manifest, files });
-  console.log(`[recorder] upload completato (${uploaded} tracce, provider=${provider.name})`);
+  // `uploadedManifest` contiene SOLO le tracce realmente salite (tolleranza
+  // parziale): è quello da ingestare, così il portale non referenzia blob
+  // mancanti.
+  const {
+    uploaded,
+    trackSizes,
+    manifest: uploadedManifest,
+    failed,
+  } = await uploadRecording(provider, { manifest, files });
+  console.log(
+    `[recorder] upload completato (${uploaded} tracce, ${failed.length} fallite, provider=${provider.name})`,
+  );
+  if (failed.length > 0) {
+    console.warn(`[recorder] tracce NON caricate (saltate): ${failed.join(', ')}`);
+  }
+
+  // Tutte le tracce fallite: niente da ingestare (l'ingest rifiuterebbe un
+  // array vuoto e non avrebbe senso accodare la pipeline).
+  if (uploadedManifest.tracks.length === 0) {
+    console.warn('[recorder] nessuna traccia caricata con successo — niente ingest');
+    return;
+  }
 
   // ── 6. Ingest al portale (POST /api/internal/multitrack-manifest) ──
-  await notifyPortal(buildIngestBody(manifest, trackSizes), {
+  await notifyPortal(buildIngestBody(uploadedManifest, trackSizes), {
     ingestUrl: `${env.portalUrl}/api/internal/multitrack-manifest`,
     cronApiKey: env.cronApiKey,
   });

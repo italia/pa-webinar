@@ -78,3 +78,49 @@ def test_word_timestamps_shifted_to_global_and_blanks_dropped():
     seg = out["segments"][0]
     assert seg["start"] == 3.0  # 1.0 + 2.0s offset
     assert seg["words"][0]["start"] == 3.0
+
+
+def test_marks_concurrent_segments_on_cross_speaker_overlap():
+    """Parlato simultaneo (tracce diverse che si sovrappongono nel tempo)
+    deve essere marcato `concurrent`; il parlato sequenziale no."""
+    tracks = [
+        {
+            "participant_id": "r",
+            "display_name": "Raffaele",
+            "start_offset_ms": 0,
+            "segments": [
+                {"start": 0.0, "end": 5.0, "text": "da solo"},
+                {"start": 62.0, "end": 64.0, "text": "insieme R"},
+            ],
+        },
+        {
+            "participant_id": "p",
+            "display_name": "Paolo",
+            "start_offset_ms": 60_000,  # entra +60s
+            "segments": [{"start": 0.0, "end": 5.0, "text": "insieme P"}],
+        },
+    ]
+    out = merge_tracks(tracks, language="it")
+    by_text = {s["text"]: s for s in out["segments"]}
+    # "da solo" (0-5, unico parlante) NON è concorrente
+    assert not by_text["da solo"].get("concurrent")
+    # "insieme P" (60-65) e "insieme R" (62-64) si sovrappongono → concorrenti
+    assert by_text["insieme P"].get("concurrent") is True
+    assert by_text["insieme R"].get("concurrent") is True
+
+
+def test_no_concurrent_flag_for_same_speaker_adjacent():
+    """Due segmenti dello STESSO parlante che si toccano NON sono concorrenti."""
+    tracks = [
+        {
+            "participant_id": "solo",
+            "display_name": "Solo",
+            "start_offset_ms": 0,
+            "segments": [
+                {"start": 0.0, "end": 5.0, "text": "uno"},
+                {"start": 4.0, "end": 8.0, "text": "due"},  # overlap stesso pid
+            ],
+        },
+    ]
+    out = merge_tracks(tracks, language="it")
+    assert all(not s.get("concurrent") for s in out["segments"])

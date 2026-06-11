@@ -20,6 +20,7 @@ import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
 import { logAdminAction } from '@/lib/audit/admin-audit';
+import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 
 export const dynamic = 'force-dynamic';
 
@@ -228,10 +229,27 @@ export const PUT = withErrorHandling(async (request, context) => {
     now: new Date(),
   });
 
+  // Permission matrix (mirrors the POST/create path): when the client sends a
+  // matrix, it is the source of truth — persist it AND re-derive the legacy
+  // boolean toggles from it so the two representations never drift. When no
+  // matrix is sent, fall back to whatever individual booleans the caller
+  // supplied (partial updates from non-wizard callers keep working).
+  const matrixUpdate = data.permissionMatrix ? coerceMatrix(data.permissionMatrix) : null;
+  const avToggles = matrixUpdate
+    ? togglesFromMatrix(matrixUpdate)
+    : {
+        qaEnabled: data.qaEnabled,
+        chatEnabled: data.chatEnabled,
+        participantsCanUnmute: data.participantsCanUnmute,
+        participantsCanStartVideo: data.participantsCanStartVideo,
+        participantsCanShareScreen: data.participantsCanShareScreen,
+      };
+
   const updated = await prisma.event.update({
     where: { id: eventId },
     data: {
       ...(revivedStatus && { status: revivedStatus }),
+      ...(matrixUpdate && { permissionMatrix: matrixUpdate }),
       ...(data.title !== undefined && { title: data.title }),
       ...(data.description !== undefined && { description: data.description }),
       ...(data.startsAt !== undefined && {
@@ -248,9 +266,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.maxParticipants !== undefined && {
         maxParticipants: data.maxParticipants,
       }),
-      ...(data.qaEnabled !== undefined && { qaEnabled: data.qaEnabled }),
-      ...(data.chatEnabled !== undefined && {
-        chatEnabled: data.chatEnabled,
+      ...(avToggles.qaEnabled !== undefined && { qaEnabled: avToggles.qaEnabled }),
+      ...(avToggles.chatEnabled !== undefined && {
+        chatEnabled: avToggles.chatEnabled,
       }),
       ...(data.recordingEnabled !== undefined && {
         recordingEnabled: data.recordingEnabled,
@@ -258,14 +276,14 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.autoStartRecording !== undefined && {
         autoStartRecording: data.autoStartRecording,
       }),
-      ...(data.participantsCanUnmute !== undefined && {
-        participantsCanUnmute: data.participantsCanUnmute,
+      ...(avToggles.participantsCanUnmute !== undefined && {
+        participantsCanUnmute: avToggles.participantsCanUnmute,
       }),
-      ...(data.participantsCanStartVideo !== undefined && {
-        participantsCanStartVideo: data.participantsCanStartVideo,
+      ...(avToggles.participantsCanStartVideo !== undefined && {
+        participantsCanStartVideo: avToggles.participantsCanStartVideo,
       }),
-      ...(data.participantsCanShareScreen !== undefined && {
-        participantsCanShareScreen: data.participantsCanShareScreen,
+      ...(avToggles.participantsCanShareScreen !== undefined && {
+        participantsCanShareScreen: avToggles.participantsCanShareScreen,
       }),
       ...(data.dataRetentionDays !== undefined && {
         dataRetentionDays: data.dataRetentionDays,

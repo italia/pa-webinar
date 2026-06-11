@@ -37,7 +37,55 @@ WORKDIR /opt/worker
 # Pin requirements so reproducibility is not at the mercy of pip's
 # resolver. Versions are picked for CUDA 12.6 compatibility.
 COPY worker/requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# requirements.txt pins a self-consistent CUDA-12.4 torch trio (torch/
+# torchvision/torchaudio) that overrides the NGC alpha torch. Then:
+#  - drop NGC's flash-attn / apex / transformer-engine: they were built
+#    against the OLD torch ABI, so after the torch swap they fail to load
+#    ("undefined symbol: _ZN3c105Error...") and transformers auto-imports
+#    flash-attn for wav2vec2 (whisperx alignment). We don't need them.
+#  - install cuDNN 8 into a SIDE dir: whisperx pins faster-whisper to a
+#    CTranslate2 4.4.x build that links cuDNN 8 (libcudnn_ops_infer.so.8),
+#    but the base ships cuDNN 9 only. Bumping CT2 to a cuDNN-9 build would
+#    require dropping the whisperx<3.5 cap (pyannote-3.3 align). cuDNN 8
+#    and 9 coexist (distinct sonames); LD_LIBRARY_PATH (set below) puts
+#    the cuDNN-8 dir first so CT2 finds .so.8 while torch keeps its .so.9.
+# Build-time check imports the full whisperx chain (catches ABI breaks in
+# CI) and fails if any CUDA-13 wheel slipped in (driver 550 = CUDA 12 max).
+RUN pip install --no-cache-dir -r requirements.txt \
+    && (pip uninstall -y flash-attn flash_attn transformer-engine transformer_engine apex || true) \
+    && pip install --no-cache-dir --no-deps --target=/opt/cudnn8 nvidia-cudnn-cu12==8.9.7.29 \
+    && test -f /opt/cudnn8/nvidia/cudnn/lib/libcudnn_ops_infer.so.8 \
+    && echo 'cuDNN 8 libs staged for CTranslate2' \
+    && python -c "import torch, torchvision, torchaudio, numpy; from transformers import pipelines, Wav2Vec2ForCTC, Wav2Vec2Processor; import whisperx, ctranslate2; print('imports OK: torch', torch.__version__, 'CT2', ctranslate2.__version__)" \
+    && if pip list 2>/dev/null | grep -i 'cu13'; then echo 'BUILD FAIL: a CUDA-13 wheel is present but the GPU driver (550) only supports CUDA 12'; exit 1; else echo 'build-check OK: no CUDA-13 wheels'; fi
+
+# Pre-bake Piper TTS voices into the image (rhasspy/piper-voices, MIT,
+# ~20-60MB each, NOT gated → no HF token at build). The DUB job reads
+# them from /opt/piper-voices/<lang>/ at runtime; readOnlyRootFilesystem
+# is fine because Piper only READS the .onnx. This removes the DUB
+# dependency on a seeded /models PVC: worker/tts.py `resolve_voices_path`
+# falls back here when the configured AI_TTS_VOICES_PATH dir is empty
+# (e.g. /models is an unseeded emptyDir). en/fr get an M+F pair for
+# gender-aware multivoice dubbing; it gets paola (source-lang context).
+RUN set -eux; \
+    base="https://huggingface.co/rhasspy/piper-voices/resolve/main"; \
+    for spec in \
+        "en/en_US/lessac/medium/en_US-lessac-medium:en" \
+        "en/en_US/amy/medium/en_US-amy-medium:en" \
+        "fr/fr_FR/tom/medium/fr_FR-tom-medium:fr" \
+        "fr/fr_FR/siwis/medium/fr_FR-siwis-medium:fr" \
+        "it/it_IT/paola/medium/it_IT-paola-medium:it" ; do \
+        stem="${spec%:*}"; lang="${spec##*:}"; fn="${stem##*/}"; \
+        mkdir -p "/opt/piper-voices/$lang"; \
+        for ext in onnx onnx.json; do \
+            python -c "import urllib.request; urllib.request.urlretrieve('$base/$stem.$ext', '/opt/piper-voices/$lang/$fn.$ext')"; \
+        done; \
+        test "$(stat -c%s /opt/piper-voices/$lang/$fn.onnx)" -gt 1000000; \
+        test "$(stat -c%s /opt/piper-voices/$lang/$fn.onnx.json)" -gt 100; \
+        python -c "import json; json.load(open('/opt/piper-voices/$lang/$fn.onnx.json'))"; \
+    done; \
+    chmod -R a+rX /opt/piper-voices; \
+    ls -la /opt/piper-voices/*/
 
 # Worker code. Layered last so an iteration on Python doesn't rebuild
 # the model layers.
@@ -47,11 +95,24 @@ COPY worker/ ./worker/
 RUN useradd --create-home --uid 10001 --shell /bin/bash worker \
     && mkdir -p /models /work && chown -R worker:worker /opt/worker /models /work
 USER 10001
+# readOnlyRootFilesystem=true in cluster → SOLO /models e /work sono
+# scrivibili. Senza questi redirect, pyannote prova a creare la sua cache
+# in ~/.cache (=/home/worker/.cache, read-only) → OSError [Errno 30] →
+# la diarization falliva e ripiegava su single-speaker. HOME=/work rende
+# scrivibili tutti i path ~/… (pyannote, matplotlib, ecc.); PYANNOTE_CACHE
+# e MPLCONFIGDIR sono espliciti per chiarezza/robustezza.
 ENV HF_HOME=/models \
     HF_HUB_OFFLINE=1 \
     TORCH_HOME=/models/torch \
+    PYANNOTE_CACHE=/models/pyannote \
+    HOME=/work \
+    XDG_CACHE_HOME=/work/.cache \
+    MPLCONFIGDIR=/work/.config/matplotlib \
     WORK_DIR=/work \
     PYTHONUNBUFFERED=1
+# Put the staged cuDNN-8 libs first so CTranslate2 (faster-whisper) finds
+# libcudnn_*.so.8; torch still resolves its own bundled cuDNN 9 (.so.9).
+ENV LD_LIBRARY_PATH=/opt/cudnn8/nvidia/cudnn/lib:${LD_LIBRARY_PATH}
 
 # Health: the worker has no HTTP surface (it's a Job, not a service)
 # — readiness is implicit in exit code 0 from the entrypoint.

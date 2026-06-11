@@ -2662,7 +2662,11 @@
     "emailLabel": "E-mail (optioneel)",
     "emailHelp": "Alleen voor eventuele follow-up na afloop",
     "emailInvalid": "Voer een geldig e-mailadres in",
-    "chatLockedMessage": "Voer uw naam in om deel te nemen aan de chat van het evenement."
+    "chatLockedMessage": "Voer uw naam in om deel te nemen aan de chat van het evenement.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details"
   },
   "recording": {
     "management": "Video-opname",
@@ -2761,6 +2765,7 @@
     "classicView": "Klassieke weergave",
     "changeAvatar": "Avatar wijzigen",
     "peopleInGarden": "{count, plural, =0 {Niemand in de tuin} one {1 persoon in de tuin} other {# personen in de tuin}}",
+    "guestName": "Guest",
     "hintKeyboard": "Beweeg met WASD of de pijltjestoetsen",
     "pickerTitle": "Kies uw avatar",
     "pickerHelp": "Het personage vertegenwoordigt u in de wachttuin. U kunt het op elk moment wijzigen.",

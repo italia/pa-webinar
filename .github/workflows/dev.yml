@@ -161,10 +161,14 @@ jobs:
             echo "worker=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Su push: diff con HEAD~1 — qualunque modifica sotto
-          # infra/ai/ o sui template Helm postprod fa scattare il build.
+          # Su push: diff con HEAD~1 — modifiche sotto infra/ai/ o sui
+          # template Helm postprod fanno scattare il build. ECCEZIONE:
+          # `infra/ai/local-out/` è una utility di sviluppo (pipeline
+          # locale sul 5090) che NON entra nell'immagine worker (il
+          # Dockerfile copia solo `worker/`) → la escludiamo dal trigger.
           CHANGED=$(git diff --name-only HEAD~1 HEAD || git ls-files)
-          if echo "$CHANGED" | grep -qE '^(infra/ai/|infra/helm/pa-webinar/templates/cronjob-postprod-)'; then
+          RELEVANT=$(echo "$CHANGED" | grep -E '^(infra/ai/|infra/helm/pa-webinar/templates/cronjob-postprod-)' | grep -vE '^infra/ai/local-out/' || true)
+          if [ -n "$RELEVANT" ]; then
             echo "worker=true" >> "$GITHUB_OUTPUT"
           else
             echo "worker=false" >> "$GITHUB_OUTPUT"

@@ -226,14 +226,44 @@ export interface LocalTrackFile {
   localPath: string;
 }
 
-const OPUS_CONTENT_TYPE = 'audio/ogg; codecs=opus';
+// Il MediaRecorder produce un container WebM (mimeType 'audio/webm;codecs=opus'),
+// NON Ogg: dichiariamo il content-type reale. Il worker comunque decodifica
+// via ffmpeg che sonda il contenuto (l'estensione .opus resta solo
+// un'etichetta di storage).
+const OPUS_CONTENT_TYPE = 'audio/webm; codecs=opus';
 const MANIFEST_CONTENT_TYPE = 'application/json';
 
+/** putObject con qualche retry (errori di rete transienti). Non ri-presigna:
+ * l'URL firmato è valido per la finestra di lease. */
+async function putWithRetry(
+  provider: StorageProvider,
+  key: string,
+  body: Buffer,
+  contentType: string,
+  attempts = 3,
+): Promise<void> {
+  let lastErr: unknown;
+  for (let i = 1; i <= attempts; i += 1) {
+    try {
+      await provider.putObject({ key, body, contentType });
+      return;
+    } catch (e) {
+      lastErr = e;
+      if (i < attempts) await new Promise((r) => setTimeout(r, 300 * i));
+    }
+  }
+  throw lastErr;
+}
+
 /**
- * Carica tutte le tracce + il manifest. La key di ogni traccia è
- * ricalcolata da `paths.trackKey` (single source of truth) e DEVE
- * combaciare con `track.trackKey` del manifest — lo verifichiamo per
- * intercettare drift fra manifest e layout.
+ * Carica le tracce + il manifest, con TOLLERANZA PARZIALE: se l'upload di una
+ * traccia fallisce (dopo i retry) si salta SOLO quella e le altre proseguono.
+ * Il manifest caricato/ingestato contiene SOLO le tracce realmente salite, così
+ * il portale non crea righe RecordingTrack che puntano a blob mancanti (il
+ * worker andrebbe in 404). Ritorna il manifest EFFETTIVO da usare per l'ingest.
+ *
+ * La key di ogni traccia è ricalcolata da `paths.trackKey` (single source of
+ * truth) e DEVE combaciare con `track.trackKey` (drift = bug → throw).
  */
 export async function uploadRecording(
   provider: StorageProvider,
@@ -241,39 +271,54 @@ export async function uploadRecording(
     manifest: Manifest;
     files: LocalTrackFile[];
   },
-): Promise<{ uploaded: number; trackSizes: Record<string, number> }> {
+): Promise<{
+  uploaded: number;
+  trackSizes: Record<string, number>;
+  manifest: Manifest;
+  failed: string[];
+}> {
   const { manifest, files } = params;
-  let uploaded = 0;
   const trackSizes: Record<string, number> = {};
+  const failed: string[] = [];
+  const okTracks: ManifestTrack[] = [];
 
   for (const f of files) {
     const expectedKey = trackKey(
       manifest.eventId,
       manifest.recordingId,
-      f.track.participantId,
+      f.track.trackFileId,
     );
     if (expectedKey !== f.track.trackKey) {
       throw new Error(
         `track key mismatch: manifest=${f.track.trackKey} expected=${expectedKey}`,
       );
     }
-    const body = await readFile(f.localPath);
-    await provider.putObject({
-      key: f.track.trackKey,
-      body,
-      contentType: OPUS_CONTENT_TYPE,
-    });
-    trackSizes[f.track.participantId] = body.length;
-    uploaded += 1;
+    try {
+      const body = await readFile(f.localPath);
+      await putWithRetry(provider, f.track.trackKey, body, OPUS_CONTENT_TYPE);
+      // Chiave per SESSIONE (no collisioni su rejoin dello stesso pid).
+      trackSizes[f.track.trackFileId] = body.length;
+      okTracks.push(f.track);
+    } catch (e) {
+      console.error(
+        `[recorder] upload traccia ${f.track.trackKey} fallito dopo i retry, la salto:`,
+        e,
+      );
+      failed.push(f.track.trackKey);
+    }
   }
 
-  await provider.putObject({
-    key: manifestKey(manifest.eventId, manifest.recordingId),
-    body: Buffer.from(serializeManifest(manifest), 'utf-8'),
-    contentType: MANIFEST_CONTENT_TYPE,
-  });
+  // Manifest effettivo = solo le tracce caricate. Se TUTTE falliscono,
+  // tracks=[] e il chiamante non ingesta (evita righe orfane / 404 worker).
+  const effectiveManifest: Manifest = { ...manifest, tracks: okTracks };
+  await putWithRetry(
+    provider,
+    manifestKey(manifest.eventId, manifest.recordingId),
+    Buffer.from(serializeManifest(effectiveManifest), 'utf-8'),
+    MANIFEST_CONTENT_TYPE,
+  );
 
-  return { uploaded, trackSizes };
+  return { uploaded: okTracks.length, trackSizes, manifest: effectiveManifest, failed };
 }
 
 // ── Ingest al portale ────────────────────────────────────────────────────
@@ -319,8 +364,8 @@ export function buildIngestBody(
       displayName: t.displayName,
       blobKey: t.trackKey,
       mimeType: OPUS_CONTENT_TYPE,
-      ...(trackSizes[t.participantId] != null
-        ? { sizeBytes: trackSizes[t.participantId] }
+      ...(trackSizes[t.trackFileId] != null
+        ? { sizeBytes: trackSizes[t.trackFileId] }
         : {}),
       startOffsetMs: t.startOffsetMs,
       durationMs: t.durationMs,

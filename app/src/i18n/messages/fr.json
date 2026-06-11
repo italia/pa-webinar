@@ -159,7 +159,8 @@
       "consentRequired": "Le consentement au traitement des données est obligatoire",
       "recordingConsentRequired": "Le consentement à l'enregistrement est obligatoire pour cet événement",
       "eventFull": "L'événement a atteint le nombre maximum de participants",
-      "generic": "Erreur lors de l'inscription. Veuillez réessayer."
+      "generic": "Erreur lors de l'inscription. Veuillez réessayer.",
+      "multitrackConsentRequired": "Le consentement à l'enregistrement de votre piste audio est obligatoire pour cet événement"
     }
   },
   "videoLibrary": {
@@ -539,7 +540,9 @@
           "recording": "Enregistrement",
           "recordingAuto": "Activé — démarrage automatique",
           "recordingManual": "Activé — démarrage manuel",
-          "recordingOff": "Désactivé"
+          "recordingOff": "Désactivé",
+          "multitrack": "Enregistrement par participant",
+          "multitrackOn": "Activé — nécessite un consentement explicite à l'inscription"
         },
         "noRecurrence": "Événement unique",
         "gdprHeading": "Confidentialité et conservation des données",
@@ -597,7 +600,8 @@
       "eventMaterials": "Ressources",
       "eventQuestionnaires": "Questionnaires",
       "rubricaList": "Liste",
-      "rubricaDetail": "Détail"
+      "rubricaDetail": "Détail",
+      "recordingsPostprod": "Transcriptions / IA"
     },
     "landing": {
       "title": "Panneau d'administration",
@@ -764,7 +768,10 @@
       "detailEnd": "Fin",
       "detailModerator": "Modérateur",
       "detailRoom": "Salle Jitsi",
-      "detailFilename": "Nom du fichier"
+      "detailFilename": "Nom du fichier",
+      "transcriptManage": "Gérer la transcription / IA",
+      "transcriptReady": "Transcrit",
+      "transcriptProcessing": "En cours"
     },
     "gdprAudit": {
       "title": "Audit RGPD",
@@ -1017,7 +1024,19 @@
       "retentionPreviewRecordings": "Enregistrements vidéo",
       "retentionPreviewKept": "Les statistiques agrégées et les métadonnées de l'événement sont conservées.",
       "configPreview": "Aperçu de la configuration",
-      "templateApplied": "Modèle appliqué : {name}. Vous pouvez modifier tous les paramètres."
+      "templateApplied": "Modèle appliqué : {name}. Vous pouvez modifier tous les paramètres.",
+      "aiTranscriptEnabled": "Transcription automatique",
+      "aiTranscriptEnabledDesc": "Reconnaissance de la parole avec identification des intervenants. Nécessaire pour activer la synthèse, les traductions et le doublage.",
+      "aiSummaryEnabled": "Synthèse et chapitres",
+      "aiSummaryEnabledDesc": "Résumé de la réunion, décisions prises, actions à mener et découpage en chapitres horodatés.",
+      "aiTranslationEnabled": "Traduction dans d'autres langues",
+      "aiTranslationEnabledDesc": "Transcription et synthèse traduites dans les langues indiquées ci-dessous.",
+      "aiDubbingEnabled": "Doublage audio",
+      "aiDubbingEnabledDesc": "Audio doublé dans les langues cibles, généré avec des voix synthétiques pré-entraînées. Ne clone pas la voix des participants.",
+      "multitrackRecordingEnabled": "Enregistrement par participant (haute précision)",
+      "multitrackRecordingEnabledDesc": "Enregistre une piste audio distincte pour chaque participant, de sorte que la transcription attribue avec certitude qui dit quoi (fini les « Intervenant 1/2 »). Elle traite l'audio isolé d'un seul intervenant (donnée personnelle sensible) : les pistes sont temporaires et supprimées juste après la transcription. Nécessite le consentement à l'enregistrement.",
+      "expectedSpeakers": "Nombre d'intervenants attendu",
+      "expectedSpeakersDesc": "Lorsque vous le connaissez (ex. 3 intervenants), l'indiquer améliore la qualité de l'identification des intervenants. Laissez vide pour laisser la chaîne de traitement décider."
     },
     "links": {
       "title": "Liens de l'événement",
@@ -1117,7 +1136,8 @@
         "pages": "Pages",
         "footer": "Pied de page",
         "features": "Fonctionnalités",
-        "scaling": "Dimensionnement infra"
+        "scaling": "Dimensionnement infra",
+        "postprod": "Chaîne de traitement IA post-événement"
       },
       "scaling": {
         "intro": "Paramètres décrivant la capacité du cluster sur lequel tourne la plateforme. Les valeurs par défaut sont calibrées pour Azure F16s_v2 (16 vCPU / 32 Gio) pour JVB et F4s_v2 (4 vCPU / 8 Gio) pour Jibri. Si vous utilisez un matériel différent, mettez à jour ici — le scaler recalcule immédiatement.",
@@ -1265,6 +1285,37 @@
         "jvbProvisioningTimeoutMinutesHelp": "Au bout de combien de minutes depuis startsAt un événement dont JVB n'est pas encore prêt est signalé comme « degraded » sur la status page. Par défaut 15. Couvre le cold-start du nœud (~3-5 min) plus une marge de sécurité.",
         "statusPollIntervalSeconds": "Intervalle de polling de la status page (secondes)",
         "statusPollIntervalSecondsHelp": "À quelle fréquence en secondes la page /status rafraîchit les données côté navigateur. Par défaut 30. Des valeurs plus basses = données plus fraîches mais plus de charge sur l'application."
+      },
+      "postprod": {
+        "prerequisitesNote": "La post-production traite l'enregistrement complet, après la fin de l'événement. Le pool GPU dédié s'active à l'arrivée de la première tâche en file et s'éteint lorsque la file est vide, afin de limiter les coûts. Avant d'activer la chaîne de traitement, vérifiez que le cluster dispose du pool GPU configuré, de l'opérateur NVIDIA installé, des identifiants HuggingFace présents dans le namespace et du volume contenant les poids des modèles préchargé. La checklist opérationnelle se trouve dans docs/POSTPROD.md.",
+        "pipelineEnabled": "Chaîne de traitement post-événement active",
+        "pipelineEnabledHelp": "Interrupteur général. Lorsqu'il est désactivé, aucune transcription, synthèse, traduction ni aucun doublage n'est produit pour les nouveaux événements, même si la post-production est activée pour des événements individuels. Les artefacts déjà générés ne sont plus exposés au public tant que vous ne réactivez pas l'interrupteur. Utile pour mettre la chaîne en pause sans redéployer l'application.",
+        "timingNote": "La chaîne de traitement n'intervient jamais sur le direct. Tout se déroule après la fin de l'événement, une fois l'enregistrement archivé : les sous-titres et la synthèse ne sont jamais disponibles en temps réel. Ce choix privilégie la qualité de la transcription et limite la consommation de GPU par rapport au sous-titrage en direct.",
+        "providersSection": "Moteurs d'intelligence artificielle",
+        "providersIntro": "Les moteurs utilisés pour la transcription, la synthèse et le doublage sont déclarés au moment du déploiement. En ajouter un nouveau nécessite une intervention sur l'infrastructure (déploiement du moteur dans le cluster, enregistrement dans la liste des fournisseurs pris en charge, mise à jour du schéma). Les menus déroulants ci-dessous affichent les moteurs actuellement disponibles sur cette instance.",
+        "asrProvider": "Moteur de transcription",
+        "asrProviderHelp": "Génère la transcription de la vidéo avec indication de la minute et séparation des intervenants. Nous utilisons WhisperX large-v3 associé à pyannote.audio pour la diarisation. Les deux modèles s’exécutent dans le cluster sur les poids chargés sur le volume dédié.",
+        "asrOptionWhisperx": "WhisperX large-v3 + diarisation pyannote",
+        "llmProvider": "Moteur de synthèse et de traduction",
+        "llmProviderHelp": "Produit le résumé de la réunion, identifie les thèmes abordés et traduit la transcription et la synthèse dans les langues cibles. Modèle Mistral-Small-3.2-24B (fournisseur européen, licence Apache 2.0) servi via vLLM dans le cluster.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM dans le cluster",
+        "ttsEngine": "Moteur de doublage",
+        "ttsEngineHelp": "Synthétise l'audio dans les langues choisies à l'aide de voix pré-entraînées publiques. Lorsqu'il y a plusieurs intervenants, chacun reçoit une voix différente du pool disponible pour faciliter l'écoute : l'attribution est arbitraire et ne reproduit en aucune manière la voix réelle des participants. Le doublage n'est produit que si l'organisateur le demande pour l'événement concerné.",
+        "ttsOptionPiper": "Piper TTS · voix synthétiques pré-entraînées",
+        "voiceCloningSection": "Ligne éditoriale sur la voix",
+        "voiceCloningNote": "Le système utilise exclusivement des voix synthétiques génériques (Piper TTS, modèles publics sous licence MIT). Il n'analyse pas, ne mémorise pas et ne reproduit pas la voix des participants réels : chaque intervenant est représenté par une voix du pool, choisie de manière déterministe en fonction du temps de parole, sans aucun lien avec son identité vocale. La voix attribuée change selon la composition des intervenants de chaque événement, de sorte qu'un même intervenant peut être doublé avec des voix différentes lors d'événements différents. Ce choix évite le traitement de données biométriques régi par l'article 9 du RGPD.",
+        "defaultTargetLocales": "Langues de traduction par défaut",
+        "defaultTargetLocalesHelp": "Codes ISO-639-1 séparés par des virgules (ex. `en,fr,de`). Ils s'appliquent aux événements qui ne précisent pas leurs propres langues de traduction. La langue d'origine de l'événement est toujours exclue automatiquement.",
+        "limitsSection": "Limites opérationnelles",
+        "maxConcurrentJobs": "Tâches en parallèle",
+        "maxConcurrentJobsHelp": "Nombre maximal de tâches que la chaîne de traitement exécute simultanément sur le pool GPU. Davantage de tâches en parallèle accélèrent l'écoulement de la file lorsque plusieurs événements se terminent à la suite, mais cela exige des GPU disponibles. La valeur typique est 2.",
+        "jobMaxAttempts": "Tentatives avant échec",
+        "jobMaxAttemptsHelp": "Nombre de fois où la chaîne de traitement relance une tâche avant de la marquer comme échouée. Le délai entre tentatives croît de façon exponentielle (de 30 secondes jusqu'à 2 heures). La valeur typique est 5.",
+        "artifactRetentionDays": "Conservation des artefacts (jours)",
+        "artifactRetentionDaysHelp": "Laissé à 0, les artefacts IA suivent la même échéance que l'événement. Une valeur supérieure à zéro les conserve pendant le nombre de jours indiqué, même après la clôture de l'événement, jusqu'à ce qu'un cron quotidien les supprime. La suppression inclut les noms des intervenants et les charges utiles des tâches, conformément à docs/GDPR.md.",
+        "consentDisclosureSection": "Avis IA dans la salle d'attente",
+        "consentDisclosureHelp": "Texte affiché aux participants dans la salle d'attente lorsque l'événement utilise la post-production IA (transcription, synthèse, traduction, doublage). Personnalisable par langue. Laissez vide pour utiliser le texte par défaut du système.",
+        "consentDisclosurePlaceholder": "Ex. Cet événement sera transcrit et résumé automatiquement à l'aide d'outils d'IA après le direct…"
       }
     },
     "analytics": {
@@ -1351,7 +1402,11 @@
       "screen": "Partage d'écran",
       "pickerTitle": "Choisir un modèle",
       "pickerSubtitle": "Sélectionnez un modèle pour préconfigurer les paramètres de l'événement, ou passez cette étape pour tout configurer manuellement.",
-      "skipTemplate": "Configurer manuellement"
+      "skipTemplate": "Configurer manuellement",
+      "expectedSpeakersLabel": "Nombre d'intervenants attendu (par défaut)",
+      "aiTranscript": "Transcription automatique (par défaut)",
+      "aiSummary": "Synthèse automatique (par défaut)",
+      "aiTranslation": "Traduction automatique (par défaut)"
     },
     "instantCall": {
       "title": "Appel vidéo instantané",
@@ -1817,6 +1872,163 @@
     "eventQuestionnaires": {
       "title": "Questionnaires — {eventTitle}",
       "subtitle": "Configurez un questionnaire de pré-inscription et/ou après l'événement en combinant des modèles et des questions ad-hoc."
+    },
+    "postprod": {
+      "title": "Chaîne de traitement IA (post-production)",
+      "subtitle": "Transcriptions, synthèses et traductions produites par la chaîne de traitement IA dans le cluster. Associez les intervenants, relancez ou annulez les tâches.",
+      "filterStatus": "Statut",
+      "all": "Tous",
+      "queued": "En file",
+      "running": "En cours",
+      "done": "Terminé",
+      "partial": "Partiel",
+      "failed": "Échoué",
+      "totalRows": "{count, plural, =0 {aucun enregistrement} one {1 enregistrement} other {# enregistrements}}",
+      "colEvent": "Événement",
+      "colCreated": "Créé",
+      "colDuration": "Durée",
+      "colStatus": "Statut",
+      "colJobs": "Tâches",
+      "colArtifacts": "Artefacts",
+      "colActions": "Actions",
+      "rerun": "Relancer",
+      "rerunTooltip": "Crée une nouvelle exécution en incrémentant runCount ; les artefacts précédents sont conservés jusqu'à la rétention",
+      "cancel": "Annuler",
+      "cancelConfirm": "Annuler toutes les tâches en attente pour cet enregistrement ?",
+      "rerunFailed": "Échec de la relance (HTTP {code})",
+      "cancelFailed": "Échec de l'annulation (HTTP {code})",
+      "speakerUpdateFailed": "Échec de la mise à jour de l'intervenant (HTTP {code})",
+      "loadError": "Impossible de charger la liste des tâches",
+      "empty": "Aucun enregistrement ne correspond aux filtres",
+      "detailJobs": "Tâches",
+      "detailArtifacts": "Artefacts",
+      "detailSpeakers": "Intervenants",
+      "noArtifacts": "Aucun artefact produit pour le moment",
+      "noSpeakers": "Aucun intervenant détecté",
+      "attempts": "tentative {n}",
+      "speakerPlaceholder": "Nom réel (facultatif)",
+      "speakerSpoke": "Temps de parole : {sec} s",
+      "suggestedApply": "Appliquer la suggestion : {name}",
+      "suggestedTitle": "Nom suggéré par la chaîne de traitement IA d'après les noms propres mentionnés dans la transcription. Cliquez pour le renseigner dans le champ (vous pouvez encore le modifier avant d'enregistrer).",
+      "save": "Enregistrer",
+      "editTranscript": "Modifier la transcription",
+      "editClose": "Fermer l'éditeur",
+      "editTranscriptTitle": "Éditeur de transcription",
+      "editHint": "Corrigez le texte ou réassignez l'intervenant de chaque segment. À l'enregistrement, la transcription et les sous-titres dans la langue d'origine sont mis à jour. Les traductions et le doublage ne sont PAS régénérés : utilisez « Relancer » si vous avez aussi besoin des autres langues à jour.",
+      "editLoading": "Chargement de la transcription…",
+      "editLoadError": "Impossible de charger la transcription",
+      "editEmpty": "Aucun segment modifiable",
+      "editSpeakerNone": "— aucun —",
+      "editSave": "Enregistrer les modifications",
+      "editSaving": "Enregistrement…",
+      "editDirty": "{n, plural, one {1 modification non enregistrée} other {# modifications non enregistrées}}",
+      "editSaved": "Enregistré : {text} textes, {speaker} intervenants.",
+      "editFailed": "Échec de l'enregistrement (HTTP {code})",
+      "editSeek": "Aller à ce point de la vidéo",
+      "manageTabTranscript": "Transcription",
+      "manageTabSummary": "Synthèse",
+      "manageTabTranslations": "Traductions",
+      "manageTabArchive": "Archive",
+      "manageLoading": "Chargement…",
+      "archivePiiNote": "Les pistes audio isolées par participant sont des données personnelles sensibles (voix isolée) : cette section est réservée aux administrateurs/modérateurs et n'est jamais exposée publiquement.",
+      "archiveNoTracks": "Aucune piste par participant disponible pour cet enregistrement (enregistrement multipiste non activé, ou pistes déjà supprimées pour minimisation RGPD).",
+      "archivePlayerTitle": "Réécoute par intervenant",
+      "archiveAudioHint": "Utilisez le sélecteur « Audio » du lecteur pour écouter le mixage ou la piste isolée d'un seul participant, synchronisé avec la vidéo.",
+      "archiveTitle": "Archive téléchargeable",
+      "archiveIntro": "Générez un fichier MKV avec la vidéo, une piste audio par participant (étiquetée à son nom, alignée avec précision) et les sous-titres. Pensé pour le téléchargement et l'archivage : les navigateurs ne savent pas changer de piste audio dans un MKV, utilisez le lecteur ci-dessus pour la réécoute.",
+      "archiveGenerate": "Générer l'archive",
+      "archiveStatusLabel": "Statut",
+      "archiveStatus_none": "non générée",
+      "archiveStatus_pending": "en file",
+      "archiveStatus_running": "en cours",
+      "archiveStatus_done": "prête",
+      "archiveStatus_failed": "échouée",
+      "archiveDownload": "Télécharger le MKV",
+      "archiveGenerateOk": "Génération de l'archive lancée.",
+      "archiveGenerateErr": "Échec de la génération de l'archive (HTTP {code}).",
+      "archiveTrackFallback": "Participant",
+      "manageBackToList": "Tous les enregistrements",
+      "manageDuration": "Durée",
+      "manageSource": "Langue d'origine",
+      "manageOpenPublic": "Page publique",
+      "manageRerunOk": "Chaîne de traitement relancée.",
+      "manageOpen": "Gérer",
+      "cancelConfirmTitle": "Annuler la post-production",
+      "speakerUpdateSuccess": "Intervenant mis à jour",
+      "tm": {
+        "loading": "Chargement des langues de traduction…",
+        "loadError": "Impossible de charger les langues de traduction.",
+        "title": "Langues de traduction",
+        "sourceLabel": "Langue d’origine :",
+        "already": "Déjà traduites :",
+        "noneYet": "Aucune traduction pour le moment.",
+        "addLabel": "Ajouter une langue",
+        "noneAvailable": "Aucune langue disponible",
+        "selectPlaceholder": "Sélectionnez une langue…",
+        "adding": "Ajout en cours…",
+        "addButton": "Ajouter la langue",
+        "unexpectedError": "Erreur inattendue",
+        "note": "L'ajout d'une langue génère la traduction de la transcription et de la synthèse — ainsi que le doublage audio, s'il est activé pour l'événement. Le traitement s'effectue en arrière-plan.",
+        "summary": "Synthèse",
+        "subtitles": "Sous-titres",
+        "dub": "Doublage",
+        "download": "télécharger",
+        "allTranslated": "Toutes les langues actives sont déjà traduites.",
+        "translatedHeader": "Langues traduites"
+      },
+      "ov": {
+        "tab": "Vue d'ensemble",
+        "intro": "Ce que la chaîne IA a produit pour cet enregistrement, langue par langue.",
+        "processing": "Traitement en cours ou aucun artefact. Revenez quand le statut est « Terminé ».",
+        "loadError": "Impossible de charger la vue d'ensemble.",
+        "langsTitle": "Langues et artefacts",
+        "colLang": "Langue",
+        "colTranscript": "Transcription",
+        "colSummary": "Synthèse",
+        "colSubtitles": "Sous-titres",
+        "colDub": "Doublage",
+        "source": "original",
+        "present": "disponible",
+        "absent": "absent",
+        "listen": "Écouter",
+        "download": "Télécharger",
+        "dubTitle": "Doublage audio (une voix par intervenant, synchronisé)",
+        "dubNone": "Aucun doublage produit.",
+        "summaryTitle": "Synthèse",
+        "summaryLang": "Langue",
+        "summaryNone": "Aucune synthèse disponible.",
+        "decisions": "Décisions",
+        "actions": "Actions",
+        "topics": "Chapitres",
+        "speakersTitle": "Intervenants",
+        "speakerAnon": "non attribué",
+        "editHint": "Pour corriger le texte, les noms ou la synthèse, utilisez les onglets ci-dessus.",
+        "kpiDuration": "Durée",
+        "kpiParticipants": "Participants (pic)",
+        "kpiTracks": "Pistes audio",
+        "kpiLanguages": "Langues",
+        "kpiArtifacts": "Artefacts",
+        "kpiProcessed": "Traité",
+        "statusLabel": "Statut",
+        "run": "exécution",
+        "jobsTitle": "Progression de la chaîne",
+        "jobsNone": "Aucune tâche pour cet enregistrement.",
+        "attempts": "{n} tentatives",
+        "filesTitle": "Fichiers dans le stockage",
+        "filesNone": "Aucun fichier trouvé dans le stockage.",
+        "filesToggle": "Afficher/masquer les {n} fichiers",
+        "tracksTitle": "Pistes par participant",
+        "tracksNone": "Aucune piste par participant (multipiste désactivé ou pistes déjà supprimées).",
+        "trackPurged": "supprimée (RGPD)",
+        "trackEnters": "arrivée +{s}s",
+        "metricsTitle": "Métriques de synthèse (LLM)",
+        "chars": "caractères",
+        "model": "Modèle",
+        "notAvailable": "n/d"
+      },
+      "archiveSourceTitle": "Enregistrement source",
+      "archiveSourceHint": "Vidéo originale de l'événement. Les pistes séparées par participant et l'archive MKV nécessitent l'enregistrement multipiste (non activé pour cet événement).",
+      "archiveSourceDownload": "Télécharger la vidéo originale"
     }
   },
   "email": {
@@ -2018,7 +2230,9 @@
       "recordingRequired": "Le consentement à l'enregistrement est obligatoire pour participer à cet événement",
       "futureCommunications": "Je souhaite recevoir des informations sur les futurs événements organisés par le DTD",
       "addressBook": "Je souhaite être inscrit dans le Carnet d'adresses DTD pour être invité à des événements similaires",
-      "addressBookHelp": "Consentement séparé (art. 6.1.a RGPD). Vous pourrez le retirer à tout moment via le lien « Supprimer mes données du carnet d'adresses » présent dans les e-mails que vous recevrez. Le nom et l'organisation seront repris du profil d'inscription."
+      "addressBookHelp": "Consentement séparé (art. 6.1.a RGPD). Vous pourrez le retirer à tout moment via le lien « Supprimer mes données du carnet d'adresses » présent dans les e-mails que vous recevrez. Le nom et l'organisation seront repris du profil d'inscription.",
+      "multitrack": "J'accepte l'enregistrement d'une piste audio distincte de ma voix, dans le seul but d'attribuer correctement la transcription à chaque intervenant. La piste est temporaire et supprimée après la transcription ; elle n'est pas utilisée pour identifier ou reproduire ma voix.",
+      "multitrackRequired": "Le consentement à l'enregistrement de votre piste audio est obligatoire pour participer à cet événement"
     },
     "export": {
       "title": "Mes données",
@@ -2299,7 +2513,31 @@
     "overallStatus": "État général",
     "lastChecked": "Dernière vérification",
     "responseTime": "Temps de réponse",
-    "systemStatus": "État du système"
+    "systemStatus": "État du système",
+    "postprod": {
+      "title": "Chaîne de traitement post-événement",
+      "subtitle": "Transcription, synthèse, traduction et doublage de l'enregistrement",
+      "whatItDoes": "Lorsqu'un événement se termine, l'enregistrement passe par une chaîne de traitement interne : la transcription est générée par WhisperX, la synthèse et les traductions par un modèle Mistral, l'audio doublé par Piper TTS. Tous les modèles s'exécutent sur un GPU du cluster qui ne reste allumé que le temps du traitement, de sorte que l'énergie consommée suit la charge réelle.",
+      "status": {
+        "idle": "En attente",
+        "running": "En cours",
+        "degraded": "Dégradée"
+      },
+      "aiBadge": "La transcription, la synthèse et le doublage de cet événement sont générés par des modèles d'intelligence artificielle et peuvent contenir des imprécisions. Pour une certitude totale, référez-vous toujours à la vidéo d'origine.",
+      "idleMessage": "Chaîne de traitement prête, aucun enregistrement à traiter pour le moment.",
+      "queueAriaLabel": "Composition de la file de post-production",
+      "queuePending": "en file",
+      "queueRunning": "en cours",
+      "queueDone": "terminés",
+      "queueFailed": "échoués",
+      "asrProvider": "Transcription",
+      "llmProvider": "Synthèse/Traduction",
+      "targetLocales": "Langues cibles",
+      "lastSuccess": "Dernier succès {when}",
+      "lastFailure": "Dernière erreur {when}",
+      "artifactsProduced": "{count, plural, =0 {aucun artefact} one {1 artefact produit} other {# artefacts produits}}",
+      "eventsEnabled": "{count, plural, =0 {aucun événement avec IA} one {1 événement avec IA active} other {# événements avec IA active}}"
+    }
   },
   "infraMap": {
     "loading": "Chargement de la carte d'infrastructure...",
@@ -2361,7 +2599,8 @@
       "jicofo": "Coordinateur de conférences",
       "jvb": "Pont vidéo",
       "jibri": "Enregistrement vidéo",
-      "smtp": "Service e-mail"
+      "smtp": "Service e-mail",
+      "postprod": "Chaîne de traitement IA post-événement"
     },
     "descriptions": {
       "app": "Le site web où vous accédez aux événements",
@@ -2372,7 +2611,8 @@
       "jicofo": "Coordonne les participants de chaque conférence",
       "jvb": "Transmet l'audio et la vidéo aux participants",
       "jibri": "Enregistre les sessions vidéo des événements",
-      "smtp": "Envoie les e-mails de confirmation et les rappels"
+      "smtp": "Envoie les e-mails de confirmation et les rappels",
+      "postprod": "Transcrit, résume et traduit les enregistrements avec des modèles IA dans le cluster (GPU NVIDIA A100). Ne s'active que lorsqu'un événement active les fonctionnalités IA."
     },
     "verdicts": {
       "app": {
@@ -2420,6 +2660,12 @@
       "smtp": {
         "healthy": "Le service e-mail est configuré et prêt à envoyer des notifications.",
         "standby": "Le service e-mail n'est pas configuré. Les e-mails de confirmation et les rappels ne seront pas envoyés."
+      },
+      "postprod": {
+        "healthy": "La chaîne de traitement IA traite un enregistrement (worker GPU actif).",
+        "scaling": "Tâches de post-production en file — le nœud GPU démarre (démarrage à froid ~3 min).",
+        "standby": "Chaîne de traitement IA activée mais en attente : aucun enregistrement à traiter. Le nœud GPU est éteint pour économiser l'énergie.",
+        "degraded": "Une ou plusieurs tâches IA ont échoué au cours des dernières 24 h. Consultez /admin/postprod pour les détails."
       }
     },
     "impacts": {
@@ -2432,7 +2678,8 @@
       "jvbStale": "Un événement attend le bridge depuis plus longtemps que le délai configuré : les participants ne peuvent pas entrer.",
       "jibri": "Les événements ne peuvent pas être enregistrés. Les participants peuvent toujours rejoindre et participer.",
       "jibriStale": "Un événement avec enregistrement actif attend Jibri depuis plus longtemps que le délai : la session n'est pas enregistrée.",
-      "smtp": "Les e-mails de confirmation d'inscription et les rappels ne seront pas envoyés."
+      "smtp": "Les e-mails de confirmation d'inscription et les rappels ne seront pas envoyés.",
+      "postprodDegraded": "Les transcriptions et les comptes rendus de certains enregistrements récents n'ont pas été générés. Les enregistrements vidéo restent disponibles."
     },
     "overallVerdicts": {
       "operational": "Tous les services fonctionnent correctement. La plateforme est pleinement opérationnelle.",
@@ -2473,7 +2720,8 @@
       "errorRate": "Erreurs 5xx",
       "requestRate": "Requêtes/s",
       "podUptime": "Uptime pod"
-    }
+    },
+    "connPostprod": "post-production IA"
   },
   "feedback": {
     "title": "Comment évaluez-vous cet événement ?",
@@ -2582,7 +2830,26 @@
     "unmute": "Rétablir le son",
     "download": "Télécharger l'enregistrement",
     "speedLabel": "Vitesse de lecture",
-    "progress": "Barre de progression"
+    "progress": "Barre de progression",
+    "subtitles": "Sous-titres",
+    "subtitlesOff": "Désactivés",
+    "audioLabel": "Audio",
+    "audioOriginal": "Original",
+    "audioSyntheticBanner": "Audio doublé par IA — voix synthétique, contenu généré automatiquement.",
+    "audioSyntheticHint": "Audio généré par IA",
+    "shortcutsHelpOpen": "Afficher les raccourcis clavier",
+    "shortcutsHelpClose": "Fermer les raccourcis clavier",
+    "shortcutsTitle": "Raccourcis clavier",
+    "shortcutsSpace": "Lecture ou pause",
+    "shortcutsArrowsLR": "Reculer ou avancer de 5 secondes",
+    "shortcutsArrowsUD": "Diminuer ou augmenter le volume de 5 %",
+    "shortcutsJL": "Reculer ou avancer de 10 secondes",
+    "shortcutsM": "Activer ou couper le son",
+    "shortcutsC": "Afficher ou masquer les sous-titres",
+    "shortcutsF": "Plein écran",
+    "shortcutsSpeed": "Diminuer ou augmenter la vitesse",
+    "captionsOn": "Sous-titres activés",
+    "captionsOff": "Sous-titres désactivés"
   },
   "diagram": {
     "title": "Configuration de l'événement",
@@ -2662,7 +2929,15 @@
     "emailLabel": "E-mail (facultatif)",
     "emailHelp": "Uniquement pour un éventuel suivi après l'événement",
     "emailInvalid": "Saisissez une adresse e-mail valide",
-    "chatLockedMessage": "Saisissez votre nom pour participer à la chat de l'événement."
+    "chatLockedMessage": "Saisissez votre nom pour participer à la chat de l'événement.",
+    "classicView": "Classic view",
+    "backToGarden": "Back to the park",
+    "details": "Show details",
+    "hideDetails": "Hide details",
+    "aiNoticeTitle": "Traitement IA après l'événement",
+    "aiNotice": "À la fin, l'enregistrement sera traité par des outils d'intelligence artificielle pour générer une transcription, une synthèse et d'éventuelles traductions et doublages. Les artefacts peuvent contenir des imprécisions ; la vidéo reste la source de référence.",
+    "multitrackConsentTitle": "Enregistrement par participant",
+    "multitrackConsentRequired": "Vous devez accepter l'enregistrement de votre piste audio pour entrer"
   },
   "recording": {
     "management": "Enregistrement vidéo",
@@ -2688,7 +2963,11 @@
     "notConfigured": "Jibri n'est pas configuré. L'enregistrement vidéo n'est pas disponible.",
     "disabledHint": "L'enregistrement vidéo n'est pas activé pour cet événement. Pour l'activer, ouvrez la section Paramètres ci-dessus et activez le toggle « Enregistrement ».",
     "play": "Lire",
-    "download": "Télécharger"
+    "download": "Télécharger",
+    "transcriptManage": "Transcription / IA",
+    "deleteConfirmTitle": "Supprimer l'enregistrement",
+    "deleteFailed": "Échec de la suppression",
+    "deleteSuccess": "Enregistrement supprimé"
   },
   "postEvent": {
     "config": "Configuration post-événement",
@@ -2706,7 +2985,8 @@
       "qa": "Questions et Réponses",
       "materials": "Documents",
       "polls": "Sondages",
-      "feedback": "Retours"
+      "feedback": "Retours",
+      "transcript": "Transcription IA"
     }
   },
   "provisioning": {
@@ -2761,11 +3041,108 @@
     "classicView": "Vue classique",
     "changeAvatar": "Changer d'avatar",
     "peopleInGarden": "{count, plural, =0 {Personne dans le jardin} one {1 personne dans le jardin} other {# personnes dans le jardin}}",
+    "guestName": "Guest",
     "hintKeyboard": "Déplacez-vous avec WASD ou les flèches",
     "pickerTitle": "Choisissez votre avatar",
     "pickerHelp": "Ce personnage vous représente dans le jardin d'attente. Vous pouvez le changer à tout moment.",
     "close": "Fermer",
     "hintBanner": "Appuyez sur les flèches pour vous déplacer dans le jardin",
     "hintJoystick": "Faites glisser pour vous déplacer"
+  },
+  "postprod": {
+    "loading": "Chargement de la transcription…",
+    "loadError": "Impossible de charger la transcription : {error}",
+    "empty": "Aucune transcription disponible pour cet événement.",
+    "tabTranscript": "Transcription",
+    "tabSummary": "Synthèse",
+    "aiBadgeLabel": "Contenu généré par IA",
+    "aiBadgeBody": "La transcription et la synthèse sont produites automatiquement par la chaîne de traitement IA dans le cluster. Elles peuvent contenir des erreurs ; la vidéo reste la source de référence.",
+    "searchPlaceholder": "Rechercher dans la transcription…",
+    "searchLabel": "Rechercher dans la transcription",
+    "searchClear": "Effacer la recherche",
+    "searchNoMatches": "Aucun résultat pour « {query} ».",
+    "searchMatches": "{count, plural, =1 {1 résultat} other {# résultats}}",
+    "downloadLabel": "Télécharger",
+    "downloadMenu": "Options de téléchargement",
+    "downloadTranscriptTxt": "Transcription (.txt)",
+    "downloadTranscriptSrt": "Sous-titres (.srt)",
+    "downloadTranscriptVtt": "Sous-titres (.vtt)",
+    "downloadSummaryMd": "Synthèse (.md)",
+    "hero": {
+      "badge": "Synthèse automatique",
+      "aiActArt50": "Contenu généré par IA",
+      "title": "En résumé",
+      "availableIn": "Synthèse également disponible en {langs}",
+      "summaryLanguageLabel": "Langue de la synthèse",
+      "topicsLabel": "Chapitres — cliquez pour aller à ce point de la vidéo",
+      "keyDecisions": "Décisions prises",
+      "actionItems": "Actions à mener",
+      "expandDetails": "Afficher les décisions et les actions",
+      "collapseDetails": "Masquer les décisions et les actions"
+    },
+    "nowSpeaking": "Prise de parole",
+    "shareSegment": "Partager ce point",
+    "shareSegmentCopied": "Lien copié dans le presse-papiers",
+    "bookmarkAdd": "Ajouter aux favoris",
+    "bookmarkRemove": "Retirer des favoris",
+    "bookmarksHeader": "Vos favoris",
+    "bookmarksEmpty": "Vous n'avez encore enregistré aucun moment. Ouvrez un segment de la transcription et cliquez sur l'étoile pour l'ajouter ici.",
+    "miniPlayerOpen": "Ramener la vidéo au premier plan",
+    "miniPlayerClose": "Fermer le mini-lecteur",
+    "miniPlayerHint": "Gardez la vidéo à portée pendant le défilement",
+    "followLive": "Suivre la vidéo",
+    "followManual": "Lecture libre",
+    "followResume": "Revenir au suivi de la vidéo",
+    "lowConfidenceBadge": "à vérifier",
+    "lowConfidenceTitle": "Cette portion de la transcription a une faible confiance : l'enregistrement peut contenir des mots différents. Référez-vous toujours à la vidéo d'origine.",
+    "miniTranscriptLabel": "Transcription en direct",
+    "dubAvailableHint": "Audio doublé disponible en {langs}. Utilisez le sélecteur audio dans les commandes du lecteur pour écouter la version traduite.",
+    "provenance": {
+      "triggerLabel": "Transparence du traitement IA",
+      "closeLabel": "Masquer les détails du traitement",
+      "intro": "Voici les modèles qui ont produit la transcription, la synthèse et le doublage de cet enregistrement. Ils sont enregistrés à la fin du traitement : vous voyez ce qui a réellement été utilisé à ce moment-là, indépendamment de modifications ultérieures des paramètres.",
+      "asr": {
+        "title": "Transcription",
+        "hint": "Reconnaissance de la parole et séparation des intervenants.",
+        "engine": "Moteur",
+        "model": "Modèle",
+        "version": "Version",
+        "diarizationEngine": "Diarisation",
+        "diarizationSpeakers": "Intervenants détectés"
+      },
+      "llm": {
+        "title": "Synthèse et traduction",
+        "hint": "Résumé de la réunion et traduction de la transcription et de la synthèse.",
+        "engine": "Fourni par",
+        "model": "Modèle",
+        "vendor": "Fournisseur",
+        "license": "Licence",
+        "country": "Siège social"
+      },
+      "tts": {
+        "title": "Doublage",
+        "hint": "Synthèse vocale pour générer l'audio dans les langues cibles.",
+        "engine": "Moteur",
+        "license": "Licence",
+        "policy": "Règle d'attribution des voix"
+      },
+      "languages": {
+        "title": "Langues traitées",
+        "hint": "Langue d'origine de l'enregistrement et langues cibles de traduction et de doublage.",
+        "source": "Langue d'origine",
+        "translation": "Traductions",
+        "dubbing": "Doublages",
+        "none": "Aucune"
+      },
+      "voices": {
+        "title": "Voix synthétiques attribuées aux intervenants",
+        "male": "voix masculine",
+        "female": "voix féminine"
+      },
+      "runAt": "Traitement terminé le",
+      "version": "Version de la chaîne de traitement"
+    },
+    "overlapBadge": "simultané",
+    "overlapTitle": "Parole simultanée : plusieurs personnes parlent en même temps sur cet intervalle."
   }
 }
