@@ -1973,7 +1973,22 @@
       "manageRerunOk": "Pipeline re-run started.",
       "manageOpen": "Manage",
       "cancelConfirmTitle": "Cancel post-production",
-      "speakerUpdateSuccess": "Speaker updated"
+      "speakerUpdateSuccess": "Speaker updated",
+      "tm": {
+        "loading": "Loading translation languages…",
+        "loadError": "Could not load the translation languages.",
+        "title": "Translation languages",
+        "sourceLabel": "Source language:",
+        "already": "Already translated:",
+        "noneYet": "No translations yet.",
+        "addLabel": "Add a language",
+        "noneAvailable": "No languages available",
+        "selectPlaceholder": "Select a language…",
+        "adding": "Adding…",
+        "addButton": "Add language",
+        "unexpectedError": "Unexpected error",
+        "note": "Adding a language generates the translation of transcript and summary — and the audio dubbing, if enabled for the event. Processing runs in the background."
+      }
     },
     "questionnairesPage": {
       "title": "Questionnaires",

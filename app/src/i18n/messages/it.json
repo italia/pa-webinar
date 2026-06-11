@@ -2043,7 +2043,22 @@
       "manageRerunOk": "Pipeline rilanciata.",
       "manageOpen": "Gestisci",
       "cancelConfirmTitle": "Annulla post-produzione",
-      "speakerUpdateSuccess": "Speaker aggiornato"
+      "speakerUpdateSuccess": "Speaker aggiornato",
+      "tm": {
+        "loading": "Caricamento lingue di traduzione…",
+        "loadError": "Impossibile caricare le lingue di traduzione.",
+        "title": "Lingue di traduzione",
+        "sourceLabel": "Lingua sorgente:",
+        "already": "Già tradotte:",
+        "noneYet": "Nessuna traduzione ancora.",
+        "addLabel": "Aggiungi una lingua",
+        "noneAvailable": "Nessuna lingua disponibile",
+        "selectPlaceholder": "Seleziona una lingua…",
+        "adding": "Aggiunta in corso…",
+        "addButton": "Aggiungi lingua",
+        "unexpectedError": "Errore imprevisto",
+        "note": "L'aggiunta di una lingua genera la traduzione di transcript e sintesi — e il doppiaggio audio, se attivo per l'evento. La lavorazione avviene in background."
+      }
     },
     "questionnairesPage": {
       "title": "Questionari",

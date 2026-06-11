@@ -250,6 +250,11 @@ export interface EnqueueTranslateLanguageResult {
   jobId: string;
   /** Idempotency key of the (created or existing) TRANSLATE job. */
   idempotencyKey: string;
+  /** true if a new DUB job was created (only when the event has dubbing
+   *  enabled and it didn't already exist). */
+  dubEnqueued?: boolean;
+  /** Id of the (created or existing) DUB job, when dubbing is enabled. */
+  dubJobId?: string;
 }
 
 /**
@@ -280,7 +285,15 @@ export async function enqueueTranslateLanguage(
 ): Promise<EnqueueTranslateLanguageResult> {
   const recording = await tx.recording.findUnique({
     where: { id: opts.recordingId },
-    select: { id: true, runCount: true, sourceLanguage: true },
+    select: {
+      id: true,
+      runCount: true,
+      sourceLanguage: true,
+      // Serve per accodare anche il DUB quando il doppiaggio è attivo
+      // sull'evento (vedi sotto): l'aggiunta on-demand di una lingua deve
+      // comportarsi come la pipeline completa, che accoda TRANSLATE+DUB.
+      event: { select: { aiDubbingEnabled: true } },
+    },
   });
   if (!recording) {
     throw new Error(`recording not found: ${opts.recordingId}`);
@@ -318,22 +331,72 @@ export async function enqueueTranslateLanguage(
     where: { idempotencyKey },
     select: { id: true },
   });
-  if (existing) {
-    return { enqueued: false, jobId: existing.id, idempotencyKey };
+  const translateJobId = existing
+    ? existing.id
+    : (
+        await tx.postprodJob.create({
+          data: {
+            recordingId: recording.id,
+            kind: 'TRANSLATE',
+            payload: payload as Prisma.InputJsonValue,
+            idempotencyKey,
+            dependsOnId: transcriptArtifact.jobId,
+          },
+          select: { id: true },
+        })
+      ).id;
+  const translateEnqueued = !existing;
+
+  // Quando l'evento ha il doppiaggio attivo, accoda anche il DUB della
+  // nuova lingua — dipendente dal TRANSLATE che produrrà il transcript
+  // tradotto. Senza questo, aggiungere una lingua a posteriori generava
+  // traduzione + sintesi MA mai l'audio doppiato, a differenza della
+  // pipeline completa (enqueuePostprodForRecording). Payload allineato a
+  // quello della pipeline completa così l'idempotency key coincide e non
+  // si creano DUB duplicati se più tardi gira una run completa.
+  let dubEnqueued = false;
+  let dubJobId: string | undefined;
+  if (recording.event?.aiDubbingEnabled) {
+    const dubPayload = {
+      runId: recording.id,
+      sourceLanguage,
+      targetLanguage: opts.targetLanguage,
+    };
+    const dubKey = deriveIdempotencyKey({
+      recordingId: recording.id,
+      kind: 'DUB',
+      runCount: recording.runCount,
+      payload: dubPayload,
+    });
+    const existingDub = await tx.postprodJob.findUnique({
+      where: { idempotencyKey: dubKey },
+      select: { id: true },
+    });
+    if (existingDub) {
+      dubJobId = existingDub.id;
+    } else {
+      const createdDub = await tx.postprodJob.create({
+        data: {
+          recordingId: recording.id,
+          kind: 'DUB',
+          payload: dubPayload as Prisma.InputJsonValue,
+          idempotencyKey: dubKey,
+          dependsOnId: translateJobId,
+        },
+        select: { id: true },
+      });
+      dubJobId = createdDub.id;
+      dubEnqueued = true;
+    }
   }
 
-  const created = await tx.postprodJob.create({
-    data: {
-      recordingId: recording.id,
-      kind: 'TRANSLATE',
-      payload: payload as Prisma.InputJsonValue,
-      idempotencyKey,
-      dependsOnId: transcriptArtifact.jobId,
-    },
-    select: { id: true },
-  });
-
-  return { enqueued: true, jobId: created.id, idempotencyKey };
+  return {
+    enqueued: translateEnqueued,
+    jobId: translateJobId,
+    idempotencyKey,
+    dubEnqueued,
+    dubJobId,
+  };
 }
 
 export interface EnqueueArchiveResult {
