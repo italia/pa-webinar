@@ -38,7 +38,7 @@ describe('buildIngestBody', () => {
           participantId: 'p1',
           displayName: 'Ada',
           blobKey: trackKey('evt1', 'rec1', 'p1'),
-          mimeType: 'audio/ogg; codecs=opus',
+          mimeType: 'audio/webm; codecs=opus',
           sizeBytes: 4242,
           startOffsetMs: 0,
           durationMs: 1000,
