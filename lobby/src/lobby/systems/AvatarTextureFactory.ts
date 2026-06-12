@@ -20,14 +20,15 @@ export const AVATAR_H = 64;
 
 /** Curated "geek but tidy" shirt palette (PA-ish, high-contrast). */
 export const AVATAR_COLORS = [
-  '#1d6fb8',
-  '#d65745',
-  '#2e8540',
-  '#7b54bd',
-  '#e0911e',
-  '#0aa2b0',
-  '#c0398b',
-  '#48566a',
+  // .italia design-system palette (see avatar.tsx AVATAR_PRESETS).
+  '#0066CC',
+  '#D9364F',
+  '#008758',
+  '#7B5AAE',
+  '#F7A11A',
+  '#17324D',
+  '#5A768A',
+  '#3A5472',
 ] as const;
 
 export interface AvatarAppearance {
@@ -39,15 +40,18 @@ export interface AvatarAppearance {
   inCall: boolean;
 }
 
-const SKIN = 0xf1c9a5;
-const HAIR = 0x4a3526;
-const TROUSERS = 0x2b3a55;
-const SHOE = 0x1b2230;
-const HELMET = 0xf4b400;
-const GLASSES = 0x20242c;
-const VISOR_BODY = 0x11161f;
-const VISOR_GLOW = 0x36e0ff;
-const OUTLINE = 0x1a2230;
+// Flatter, .italia-keyed palette: softer navy outline (reads as ink, not
+// cartoon black), cooler trousers/shoes that sit in-key against the pastel
+// piazza instead of the old near-black.
+const SKIN = 0xf3cdac;
+const HAIR = 0x5a4636;
+const TROUSERS = 0x3a5472;
+const SHOE = 0x2b3a55;
+const HELMET = 0xf2b134;
+const GLASSES = 0x17324d;
+const VISOR_BODY = 0x17324d;
+const VISOR_GLOW = 0x0066cc;
+const OUTLINE = 0x17324d;
 
 function hexToInt(hex: string): number {
   const h = hex.replace('#', '');
@@ -64,8 +68,9 @@ function drawAvatar(g: Phaser.GameObjects.Graphics, a: AvatarAppearance): void {
   const shirt = hexToInt(a.color);
   const cx = AVATAR_W / 2;
 
-  // Thin unifying outline behind the body mass for a crisp silhouette.
-  g.lineStyle(2, OUTLINE, 0.55);
+  // Thin unifying outline behind the body mass for a crisp silhouette —
+  // soft navy ink, not cartoon black.
+  g.lineStyle(1.5, OUTLINE, 0.4);
 
   // Legs + shoes
   g.fillStyle(TROUSERS, 1);
