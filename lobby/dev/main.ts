@@ -22,6 +22,9 @@ const $ = <T extends HTMLElement = HTMLElement>(id: string): T => {
 };
 
 const params = new URLSearchParams(location.search);
+// App-context preview: ?ctx=app renders the game at full app width (hides the
+// chat/controls panels) to judge proportions + palette as it reads in the app.
+if (params.get('ctx') === 'app') document.body.classList.add('ctx-app');
 const startInSeconds = params.has('in') ? Number(params.get('in')) : 60;
 const host = params.get('host') === '1';
 const nBots = params.has('bots') ? Number(params.get('bots')) : 80;

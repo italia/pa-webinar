@@ -356,10 +356,12 @@ export class WorldScene extends Phaser.Scene {
     // margins) — this also makes it degrade gracefully in a SMALL embedded
     // container instead of showing a tiny sliver of a huge world. Clamp the
     // extremes.
-    const DESIRED_VIEW_H = 820;
+    // Show more of the piazza (smaller avatars/props): frame the FULL world
+    // height and pan horizontally. We no longer force the world to fill the
+    // viewport — a calm pastel margin reads better than a zoomed-in slice.
+    const DESIRED_VIEW_H = world.h;
     let zoom = vh / DESIRED_VIEW_H;
-    zoom = Math.max(zoom, vw / world.w, vh / world.h);
-    zoom = Math.min(2.4, Math.max(0.55, zoom));
+    zoom = Math.min(1.2, Math.max(0.42, zoom));
     this.cameras.main.setZoom(zoom);
   };
 
