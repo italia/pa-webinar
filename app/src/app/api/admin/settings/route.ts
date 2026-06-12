@@ -27,6 +27,7 @@ const updateSettingsSchema = z.object({
   seoDescription: z.string().max(2000).optional(),
   seoImage: z.string().url().nullish(),
   homePageMode: z.enum(['LANDING', 'EVENTS_LIST', 'CUSTOM']).optional(),
+  waitingRoomEngine: z.enum(['GARDEN', 'GAME', 'CLASSIC']).optional(),
   customHomeHtml: z.string().max(50000).nullish(),
   footerLinks: z.array(z.object({
     title: z.string().max(100),

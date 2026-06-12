@@ -189,6 +189,12 @@ model Event {
   // when the site default is off (or vice versa).
   parseTitleKicker Boolean? @map("parse_title_kicker")
 
+  // Per-event override for the waiting-room engine. Null = inherit
+  // SiteSetting.waitingRoomEngine. Lets an admin force the videogame lobby
+  // (GAME), the SVG garden (GARDEN) or the static classic card (CLASSIC) on a
+  // single event, regardless of the site-wide default.
+  waitingRoomEngine WaitingRoomEngine? @map("waiting_room_engine")
+
   // Timestamps
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -999,6 +1005,13 @@ model SiteSetting {
   // main title. Off by default so existing titles never change appearance.
   parseTitleKicker Boolean @default(false) @map("parse_title_kicker")
 
+  // Sala d'attesa: quale "engine" mostrare di default a tutti gli eventi.
+  //   GARDEN  = giardino SVG interattivo (avatar, default storico)
+  //   GAME    = lobby 2D Phaser (videogame, teatro + zone tematiche)
+  //   CLASSIC = card statica (accessibile, niente animazioni)
+  // Sovrascrivibile per-evento (Event.waitingRoomEngine) e via ?engine= URL.
+  waitingRoomEngine WaitingRoomEngine @default(GARDEN) @map("waiting_room_engine")
+
   // Jitsi customization
   jitsiWatermarkUrl      String? @map("jitsi_watermark_url")
   jitsiWatermarkEnabled  Boolean @default(true) @map("jitsi_watermark_enabled")
@@ -1157,6 +1170,14 @@ enum HomePageMode {
   LANDING
   EVENTS_LIST
   CUSTOM
+}
+
+// Engine della sala d'attesa (pre-join). Vedi SiteSetting.waitingRoomEngine
+// (default sito) e Event.waitingRoomEngine (override per-evento).
+enum WaitingRoomEngine {
+  GARDEN // giardino SVG interattivo (default storico)
+  GAME // lobby 2D Phaser (videogame)
+  CLASSIC // card statica (accessibile)
 }
 
 // ─── Event Feedback ─────────────────────────────────
