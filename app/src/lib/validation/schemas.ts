@@ -90,6 +90,11 @@ const eventBaseSchema = z.object({
   // force on/off for this event only.
   parseTitleKicker: z.boolean().nullable().optional(),
 
+  // Per-event waiting-room engine override. Null/omitted inherits
+  // SiteSetting.waitingRoomEngine. GARDEN = SVG garden, GAME = Phaser
+  // videogame lobby, CLASSIC = static accessible card.
+  waitingRoomEngine: z.enum(['GARDEN', 'GAME', 'CLASSIC']).nullable().optional(),
+
   // ── AI postprod opt-ins (per-event). Master gate is the global
   //    SiteSetting.aiPipelineEnabled; these toggles let an organizer
   //    decide cosa generare per il singolo evento. Vedi schema.prisma

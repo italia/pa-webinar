@@ -274,6 +274,29 @@ function BrandingTab({ settings, updateField }: TabProps) {
             </select>
             <small className="text-muted">{t('defaultTimezoneHelp')}</small>
           </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="waitingRoomEngine">Sala d&apos;attesa (default)</Label>
+            <select
+              className="form-select"
+              id="waitingRoomEngine"
+              value={settings.waitingRoomEngine}
+              onChange={(e) =>
+                updateField(
+                  'waitingRoomEngine',
+                  e.target.value as 'GARDEN' | 'GAME' | 'CLASSIC',
+                )
+              }
+            >
+              <option value="GARDEN">Giardino (normale)</option>
+              <option value="GAME">Videogame (lobby Phaser)</option>
+              <option value="CLASSIC">Classica (statica)</option>
+            </select>
+            <small className="text-muted">
+              Modalità di default della sala d&apos;attesa; sovrascrivibile per
+              singolo evento e con <code>?engine=</code> nell&apos;URL.
+            </small>
+          </FormGroup>
         </Col>
         <Col md={6}>
           <FormGroup>

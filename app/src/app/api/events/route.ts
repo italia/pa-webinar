@@ -118,6 +118,7 @@ export const POST = withErrorHandling(async (request) => {
       imageUrl: data.imageUrl,
       waitingRoomAudioUrl: data.waitingRoomAudioUrl,
       parseTitleKicker: data.parseTitleKicker ?? null,
+      waitingRoomEngine: data.waitingRoomEngine ?? null,
       expectedSenderRatioPct: data.expectedSenderRatioPct ?? null,
       capacityEstimateJson: {
         ...capacityEstimate,

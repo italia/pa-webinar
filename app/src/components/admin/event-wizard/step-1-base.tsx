@@ -41,6 +41,8 @@ export interface Step1Value {
   /** Per-event override: true/false forces the behaviour, null inherits
    *  the site default. */
   parseTitleKicker: boolean | null;
+  /** Per-event waiting-room engine override. Null inherits the site default. */
+  waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   /** Per-event estimate of how many participants will send audio/video.
    *  Null inherits the site default. */
   expectedSenderRatioPct: number | null;
@@ -199,6 +201,36 @@ export default function Step1Base({
             </label>
             <small className="form-text text-muted d-block">
               {t('parseTitleKickerHelp')}
+            </small>
+          </div>
+
+          {/* Per-event waiting-room engine override (inherits the site default
+              when "Predefinita del sito" is selected). */}
+          <div className="mt-3">
+            <label className="form-label mb-1" htmlFor="ev-waiting-room-engine">
+              Sala d&apos;attesa (questo evento)
+            </label>
+            <select
+              id="ev-waiting-room-engine"
+              className="form-select form-select-sm"
+              style={{ maxWidth: 340 }}
+              value={value.waitingRoomEngine ?? ''}
+              onChange={(e) =>
+                onChange({
+                  waitingRoomEngine:
+                    e.target.value === ''
+                      ? null
+                      : (e.target.value as 'GARDEN' | 'GAME' | 'CLASSIC'),
+                })
+              }
+            >
+              <option value="">Predefinita del sito</option>
+              <option value="GARDEN">Giardino (normale)</option>
+              <option value="GAME">Videogame (lobby Phaser)</option>
+              <option value="CLASSIC">Classica (statica)</option>
+            </select>
+            <small className="form-text text-muted d-block">
+              Sovrascrive il default del sito per questo evento.
             </small>
           </div>
         </div>
