@@ -51,6 +51,7 @@ export class LobbyGame {
     const resolved: ResolvedConfig = {
       worldSize: config.worldSize ?? { ...DEFAULT_WORLD },
       capacityHint: config.capacityHint ?? DEFAULT_CAPACITY,
+      map: config.map ?? 'piazza',
       assets: config.assets,
       canExitClassic: !!config.onExitToClassic,
     };
@@ -96,7 +97,7 @@ export class LobbyGame {
     this.game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: this.gameRoot,
-      backgroundColor: '#26344a',
+      backgroundColor: '#eaf3fb',
       scale: {
         mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,

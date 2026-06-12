@@ -7,25 +7,117 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
-    <title>PA Webinar — Sala d'attesa (dev harness)</title>
-    <style>
-      html,
-      body {
-        margin: 0;
-        height: 100%;
-        background: #0e1726;
-        overflow: hidden;
-        font-family:
-          'Titillium Web', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      }
-      #lobby {
-        position: fixed;
-        inset: 0;
-      }
-    </style>
+    <title>PA Webinar — Sala d'attesa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&family=Roboto+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <div id="lobby"></div>
+    <div class="shell">
+      <!-- ── Topbar: identità evento + stato ── -->
+      <header class="topbar">
+        <div class="brand">
+          <span class="tricolore" aria-hidden="true"></span>
+          <div>
+            <div class="brand__kicker">PA Webinar · Sala d'attesa</div>
+            <h1 class="brand__title" id="ev-title">Il Caffettino ☕ del DTD</h1>
+          </div>
+        </div>
+        <div class="topbar__status">
+          <span class="status-chip" id="status-chip">…</span>
+          <button class="ghost-btn" id="classic-btn" type="button">Vista classica</button>
+        </div>
+      </header>
+
+      <!-- ── 3 zone: chat | gioco | controlli ── -->
+      <main class="stage-grid">
+        <!-- CHAT -->
+        <aside class="panel panel--chat">
+          <div class="panel__head"><span class="dot"></span> Chat dell'evento</div>
+          <div class="chat__list" id="chat-list" aria-live="polite"></div>
+          <form class="chat__compose" id="chat-form">
+            <input id="chat-input" type="text" placeholder="Scrivi un messaggio…" autocomplete="off" maxlength="280" />
+            <button type="submit" aria-label="Invia messaggio">→</button>
+          </form>
+        </aside>
+
+        <!-- GIOCO (Phaser) — il gioco porta la sua HUD (countdown, conteggio,
+             ingresso, avatar). Qui lo incorniciamo soltanto. -->
+        <section class="stage">
+          <div class="stage__game" id="lobby-stage"></div>
+        </section>
+
+        <!-- CONTROLLI + CONFIG VIDEO + CONSENSO -->
+        <aside class="panel panel--controls">
+          <div class="ctrl-card">
+            <h2 class="ctrl-card__title">Preparati a entrare</h2>
+            <p class="ctrl-card__sub">Controlla nome, audio e video prima di entrare nella sala.</p>
+
+            <div class="field">
+              <label for="name-input">Il tuo nome</label>
+              <input id="name-input" type="text" placeholder="Es. Mario Rossi" maxlength="100" />
+            </div>
+
+            <div class="section-label">Configurazione video</div>
+            <div class="cam-preview" id="cam-preview" data-on="false">
+              <video id="cam-video" autoplay playsinline muted></video>
+              <div class="cam-preview__off">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 2l20 20M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2M22 8l-6 4 6 4V8z" />
+                </svg>
+                <span>Videocamera spenta</span>
+              </div>
+              <div class="cam-preview__mic" id="cam-mic" hidden>
+                <span style="font-size:0.8rem">🎙️</span>
+                <span class="cam-meter"><i id="mic-bar"></i></span>
+              </div>
+            </div>
+
+            <div class="toggles">
+              <button class="toggle is-on" id="t-cam" type="button" aria-pressed="true">
+                <span class="toggle__sw"></span><span class="toggle__txt">Videocamera</span>
+              </button>
+              <button class="toggle is-on" id="t-mic" type="button" aria-pressed="true">
+                <span class="toggle__sw"></span><span class="toggle__txt">Microfono</span>
+              </button>
+            </div>
+
+            <div class="field">
+              <label for="cam-select">Videocamera</label>
+              <select id="cam-select"><option value="">Predefinita</option></select>
+            </div>
+            <div class="field">
+              <label for="mic-select">Microfono</label>
+              <select id="mic-select"><option value="">Predefinito</option></select>
+            </div>
+
+            <div class="section-label">Consenso e privacy</div>
+            <div class="consent" id="consent-box">
+              <div class="consent__title">📹 Registrazione per partecipante</div>
+              <label>
+                <input type="checkbox" id="consent-multitrack" />
+                Acconsento alla registrazione di una traccia audio/video separata col mio nome, per pubblicazione e accessibilità (art. 6.1.a GDPR).
+              </label>
+            </div>
+            <div class="notice notice--info">
+              <span>ℹ️</span>
+              <span><b>Trasparenza AI</b>L'evento può essere trascritto, sintetizzato e tradotto da strumenti di intelligenza artificiale dopo la diretta (AI Act / GDPR).</span>
+            </div>
+
+            <button class="cta" id="enter-btn" type="button" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7zM3 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>
+              <span id="enter-label">Inserisci il tuo nome</span>
+            </button>
+            <div class="cta-foot" id="enter-foot"></div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
     <script type="module" src="/dev/main.ts"></script>
   </body>
 </html>

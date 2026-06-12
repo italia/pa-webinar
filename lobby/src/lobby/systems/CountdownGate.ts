@@ -64,7 +64,7 @@ export class CountdownGate {
         fontFamily: 'system-ui, sans-serif',
         fontSize: '34px',
         fontStyle: 'bold',
-        color: '#36e0ff',
+        color: '#0066CC',
         align: 'center',
       })
       .setOrigin(0.5)
@@ -109,8 +109,8 @@ export class CountdownGate {
 
   private refreshLabels(remainingMs: number): void {
     if (this.status === 'live') {
-      this.gateLabel.setText('Ingresso aperto').setColor('#7CFFB2');
-      this.stageLabel.setText('● IN DIRETTA').setColor('#ff5470');
+      this.gateLabel.setText('Ingresso aperto').setColor('#008758');
+      this.stageLabel.setText('● IN DIRETTA').setColor('#D9364F');
       return;
     }
     if (this.status === 'ended') {
@@ -122,7 +122,7 @@ export class CountdownGate {
     this.gateLabel
       .setText(this.schedule.isHost() ? 'Ingresso anticipato (host)' : label)
       .setColor('#ffffff');
-    this.stageLabel.setText(formatClock(remainingMs)).setColor('#36e0ff');
+    this.stageLabel.setText(formatClock(remainingMs)).setColor('#0066CC');
   }
 
   private redraw(): void {
@@ -133,36 +133,36 @@ export class CountdownGate {
     const slide = this.openAmount * (leafW - 6);
     const open = this.openAmount;
 
-    // Glow behind the gate when (nearly) open.
+    // Glow behind the gate when (nearly) open — soft cyan, .italia palette.
     this.glow.clear();
     if (open > 0.05) {
-      this.glow.fillStyle(0x36e0ff, 0.12 * open);
+      this.glow.fillStyle(0x3da5dc, 0.16 * open);
       this.glow.fillEllipse(gate.centerX, dividerY, gate.width + 80, 90);
     }
 
-    // Door leaves.
+    // Door leaves — white panels with an azzurro top inset (.italia portal).
     this.doors.clear();
-    const closedTint = this.status === 'ended' ? 0x5a6270 : 0x8a6b3f;
-    const woodTop = this.status === 'ended' ? 0x6b7280 : 0xa6814d;
+    const leafFill = this.status === 'ended' ? 0xdfe6ef : 0xffffff;
+    const leafTop = this.status === 'ended' ? 0xc3d4e6 : 0xd6e8f7;
     const leftX = gate.centerX - leafW - slide;
     const rightX = gate.centerX + slide;
     for (const x of [leftX, rightX]) {
-      this.doors.fillStyle(closedTint, 1);
-      this.doors.fillRoundedRect(x, dividerY - 26, leafW, 52, 4);
-      this.doors.fillStyle(woodTop, 1);
+      this.doors.fillStyle(leafFill, 1);
+      this.doors.fillRoundedRect(x, dividerY - 26, leafW, 52, 5);
+      this.doors.fillStyle(leafTop, 1);
       this.doors.fillRoundedRect(x + 2, dividerY - 24, leafW - 4, 22, 3);
-      this.doors.lineStyle(2, 0x000000, 0.25);
-      this.doors.strokeRoundedRect(x, dividerY - 26, leafW, 52, 4);
+      this.doors.lineStyle(2, 0xc3d4e6, 1);
+      this.doors.strokeRoundedRect(x, dividerY - 26, leafW, 52, 5);
     }
 
-    // Padlock while shut.
+    // Padlock while shut — institutional blue.
     if (open < 0.5) {
       const a = 1 - open * 2;
       const cx = gate.centerX;
       const cy = dividerY - 2;
-      this.doors.lineStyle(3, 0xf4d35e, a);
+      this.doors.lineStyle(3, 0x0066cc, a);
       this.doors.strokeCircle(cx, cy - 6, 5); // shackle
-      this.doors.fillStyle(0xf4d35e, a);
+      this.doors.fillStyle(0x0066cc, a);
       this.doors.fillRoundedRect(cx - 7, cy - 4, 14, 12, 2); // body
     }
   }
