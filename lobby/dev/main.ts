@@ -26,7 +26,9 @@ const startInSeconds = params.has('in') ? Number(params.get('in')) : 60;
 const host = params.get('host') === '1';
 const nBots = params.has('bots') ? Number(params.get('bots')) : 80;
 
-const world = { w: 2400, h: 1600 };
+// Map theme: 'piazza' (default — .italia pastel civic square) or 'classic'.
+const mapTheme: 'piazza' | 'classic' = params.get('map') === 'classic' ? 'classic' : 'piazza';
+const world = mapTheme === 'classic' ? { w: 2400, h: 1600 } : { w: 1800, h: 1120 };
 const presence = new MockPresenceClient(nBots, { world });
 const conference = new MockConferenceState();
 const schedule = new MockEventSchedule({ startInSeconds, host });
@@ -50,6 +52,7 @@ const handle = mountLobby(
   {
     worldSize: world,
     capacityHint: nBots,
+    map: mapTheme,
     initialProfile: { name: savedName || 'Ospite' },
   },
   { presence, conference, schedule, media },

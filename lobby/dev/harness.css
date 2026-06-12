@@ -187,7 +187,7 @@ body::before {
 .stage {
   position: relative; min-width: 0; min-height: 0;
   border-radius: var(--r-lg); overflow: hidden;
-  background: #26344a;
+  background: #eaf3fb;
   box-shadow: var(--shadow-2);
   animation: scale-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -195,9 +195,9 @@ body::before {
   content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; z-index: 3;
   background: linear-gradient(90deg, var(--tri-green) 0 33.3%, var(--tri-white) 33.3% 66.6%, var(--tri-red) 66.6%);
 }
-.stage::after { /* vignettatura interna per profondità */
+.stage::after { /* cornice interna chiara per la mappa pastello */
   content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 2;
-  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 60px rgba(0, 89, 179, 0.1), inset 0 0 0 1px rgba(23, 50, 77, 0.06);
   border-radius: var(--r-lg);
 }
 .stage__game { position: absolute; inset: 0; }
