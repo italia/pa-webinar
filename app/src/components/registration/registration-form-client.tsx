@@ -43,6 +43,7 @@ export default function RegistrationFormClient({
   const t = useTranslations('registration');
   const tg = useTranslations('gdpr');
   const tc = useTranslations('common');
+  const tlive = useTranslations('live');
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -215,7 +216,23 @@ export default function RegistrationFormClient({
             />
           </div>
         )}
-        <div className="text-center">
+        {/* Immediate entry: the registration API already returned the
+            personal accessToken, so we send the user straight into the
+            waiting room instead of forcing them to wait for the
+            confirmation email. The /live token path renders the waiting
+            room for any joinable status and auto-enables entry once the
+            event is LIVE — this is what was missing during the caffettino
+            run (people registered but had no on-screen way in). */}
+        <div className="text-center d-flex flex-column align-items-center gap-2">
+          {registrationAccessToken && (
+            <Link
+              href={`/events/${eventSlug}/live?token=${registrationAccessToken}`}
+            >
+              <Button color="primary" size="lg" tag="span">
+                {tlive('enterRoom')}
+              </Button>
+            </Link>
+          )}
           <Link href={`/events/${eventSlug}`}>
             <Button color="primary" outline tag="span">
               {t('backToEvent')}
