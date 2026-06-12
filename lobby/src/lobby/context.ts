@@ -12,6 +12,7 @@ import type { AudioSystem } from './systems/AudioSystem';
 export interface ResolvedConfig {
   worldSize: { w: number; h: number };
   capacityHint: number;
+  map: 'piazza' | 'classic';
   assets: AssetConfig | undefined;
   /** Whether the host wired an onExitToClassic handler (shows the button). */
   canExitClassic: boolean;

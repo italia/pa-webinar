@@ -76,22 +76,25 @@ export class AvatarSprite {
     this.targetX = x;
     this.targetY = y;
 
-    this.shadow = scene.add.ellipse(0, 0, 28, 11, 0x000000, 0.28);
+    // Soft navy shadow (low alpha) to stay airy on the pastel piazza floor.
+    this.shadow = scene.add.ellipse(0, 0, 28, 11, 0x17324d, 0.14);
 
     const texKey = ensureAvatarTexture(scene, this.appearance);
     this.body = scene.add.image(0, 1, texKey).setOrigin(0.5, 1);
 
     this.ring = this.isSelf
-      ? scene.add.circle(0, -1, 17).setStrokeStyle(2.5, 0x36e0ff, 0.9)
+      ? scene.add.circle(0, -1, 17).setStrokeStyle(2.5, 0x0066cc, 0.9)
       : null;
 
+    // Nametag: navy ink with a white halo — legible on the light .italia floor
+    // (the old white-on-dark tuning vanished on the pale piazza).
     this.nametag = scene.add
       .text(0, -AVATAR_H - 4, displayName(profile, this.isSelf), {
-        fontFamily: 'system-ui, sans-serif',
+        fontFamily: 'Titillium Web, system-ui, sans-serif',
         fontSize: '13px',
-        color: '#ffffff',
-        stroke: '#0c1422',
-        strokeThickness: 3,
+        color: '#17324d',
+        stroke: '#ffffff',
+        strokeThickness: 4,
         fontStyle: this.isSelf ? 'bold' : 'normal',
       })
       .setOrigin(0.5, 1);
