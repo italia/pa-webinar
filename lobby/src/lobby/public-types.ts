@@ -21,6 +21,11 @@ export interface LobbyConfig {
   capacityHint?: number;
   /** Seed identity/appearance for the local player. */
   initialProfile?: Partial<PlayerProfile>;
+  /**
+   * Map theme. 'piazza' (default) = the .italia pastel civic-square map;
+   * 'classic' = the legacy garden + theatre map.
+   */
+  map?: 'piazza' | 'classic';
   /** Override the placeholder art with real tilemap / spritesheet. */
   assets?: AssetConfig;
   /**

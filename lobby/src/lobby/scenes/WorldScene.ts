@@ -10,6 +10,7 @@ import { applyNametagCulling, type CullEntry } from '../systems/NametagCulling';
 import { PeerStore, type MergedPeer, type PeerStoreEvent } from '../systems/PeerStore';
 import { ProximityLinks } from '../systems/ProximityLinks';
 import { buildPlaceholderMap, type Collider, type WorldLayout } from '../systems/WorldMap';
+import { buildPiazzaMap } from '../systems/PiazzaMap';
 import { Movement } from '../systems/Movement';
 
 /** Margin (px) around the camera view within which avatars stay un-culled. */
@@ -56,9 +57,14 @@ export class WorldScene extends Phaser.Scene {
 
     const cam = this.cameras.main;
     cam.setBounds(0, 0, world.w, world.h);
-    cam.setBackgroundColor('#26344a');
 
-    this.layout = buildPlaceholderMap(this, world);
+    // Map theme: "piazza" (default — .italia pastel civic square) or the legacy
+    // "classic" garden+theatre. buildPiazzaMap sets its own pastel camera bg.
+    const useClassic = this.ctx.config.map === 'classic';
+    if (useClassic) cam.setBackgroundColor('#26344a');
+    this.layout = useClassic
+      ? buildPlaceholderMap(this, world)
+      : buildPiazzaMap(this, world);
     this.initialSeatCount = this.layout.seats.length;
     this.freeSeats = this.layout.seats.map((_, i) => i).reverse();
 
