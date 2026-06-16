@@ -313,11 +313,18 @@ export async function enqueueTranslateLanguage(
     throw new Error(`no TRANSCRIPT_JSON for recording: ${opts.recordingId}`);
   }
 
+  // IMPORTANTE: il payload TRANSLATE deve restare IDENTICO a quello del
+  // full-pipeline ({runId, sourceLanguage, targetLanguage}) perché la chiave
+  // d'idempotenza è hash(payload): aggiungere qui `transcriptArtifactId`
+  // produceva una chiave DIVERSA dalla pipeline completa → stesso lavoro
+  // (recording+lingua+runCount) accodato due volte = TRANSLATE duplicato e
+  // tempo-GPU sprecato. Il transcript NON serve nel payload: il claim
+  // (postprod-claim/route.ts) ri-risolve sempre l'ultimo TRANSCRIPT_JSON via
+  // findFirst, e la dipendenza è già espressa da `dependsOnId` (sotto).
   const payload = {
     runId: recording.id,
     sourceLanguage,
     targetLanguage: opts.targetLanguage,
-    transcriptArtifactId: transcriptArtifact.id,
   };
 
   const idempotencyKey = deriveIdempotencyKey({
