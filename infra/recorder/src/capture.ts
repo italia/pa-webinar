@@ -456,10 +456,18 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         // che può sopprimere la RICEZIONE dell'audio remoto su alcuni
         // bridge. Il recorder è receive-only semplicemente perché non crea
         // né pubblica track locali (nessun getUserMedia, nessun addTrack).
-        // Opzioni conference: esenta esplicitamente dal relay anche a livello
-        // di conference (oltre al global w.config sopra) per i build che leggono
-        // l'iceTransportPolicy dalle opzioni e non dal config globale.
-        conference = connection.initJitsiConference(cfg.room, { iceTransportPolicy: 'all' });
+        // Opzioni conference = config REALE servita (jcfg=window.config) con
+        // relay esentato. Passare `{}` (o un config minimale) lasciava la
+        // conference SENZA le impostazioni del bridge (es. openBridgeChannel,
+        // tipo canale websocket/datachannel, octo): la segnalazione e i
+        // TRACK_ADDED arrivavano, ma il media RTP non veniva mai negoziato →
+        // MediaRecorder a 0 byte → 0 tracce. L'app meet passa la config completa
+        // a initJitsiConference; il recorder deve fare lo stesso.
+        conference = connection.initJitsiConference(cfg.room, {
+          ...jcfg,
+          iceTransportPolicy: 'all',
+          useStunTurn: false,
+        });
         conference.setDisplayName(cfg.botName);
         conference.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
         conference.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
