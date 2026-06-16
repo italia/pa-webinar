@@ -283,6 +283,16 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     // Usa la config reale del deployment (window.config da config.js); i
     // valori sintetizzati in `cfg` restano solo come fallback.
     const jcfg = w.config ?? {};
+    // ESENZIONE RELAY (critico): il recorder è IN-CLUSTER e raggiunge il JVB
+    // via pod-IP diretto (host candidates). La config.js servita forza
+    // `iceTransportPolicy='relay'` (piano media TURN, necessario ai client
+    // ESTERNI dietro firewall), ma per il bot interno instradare il media via
+    // coturn PUBBLICO in hairpin NON consegna l'audio in ricezione → 0 tracce
+    // (segnalazione OK, media assente). Forziamo ICE 'all' + niente STUN/TURN:
+    // il bot usa il path diretto in-cluster, più affidabile ed efficiente.
+    jcfg.iceTransportPolicy = 'all';
+    jcfg.useStunTurn = false;
+    if (jcfg.p2p) jcfg.p2p.iceTransportPolicy = 'all';
     const hosts = jcfg.hosts ?? { domain: cfg.domain, muc: cfg.mucDomain };
     // serviceUrl: preferisci WebSocket, poi BOSH, poi il fallback sintetico.
     const serviceUrl = jcfg.websocket ?? jcfg.bosh ?? cfg.serviceUrl;
@@ -439,7 +449,10 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         // che può sopprimere la RICEZIONE dell'audio remoto su alcuni
         // bridge. Il recorder è receive-only semplicemente perché non crea
         // né pubblica track locali (nessun getUserMedia, nessun addTrack).
-        conference = connection.initJitsiConference(cfg.room, {});
+        // Opzioni conference: esenta esplicitamente dal relay anche a livello
+        // di conference (oltre al global w.config sopra) per i build che leggono
+        // l'iceTransportPolicy dalle opzioni e non dal config globale.
+        conference = connection.initJitsiConference(cfg.room, { iceTransportPolicy: 'all' });
         conference.setDisplayName(cfg.botName);
         conference.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
         conference.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
