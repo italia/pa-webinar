@@ -371,6 +371,9 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     };
 
     const onTrackAdded = (track: any) => {
+      log(
+        `TRACK_ADDED type=${track.getType?.()} local=${track.isLocal?.()} pid=${track.getParticipantId?.()}`,
+      );
       if (track.isLocal?.() || track.getType?.() !== 'audio') return;
       seenParticipant = true;
       if (idleTimer) clearTimeout(idleTimer);
@@ -421,6 +424,7 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       // perdita di accuratezza temporale.
       rec.start(3000);
       recorders.set(track.getId?.() ?? key, { rec, key });
+      log(`recording audio track key=${key} pid=${pid} name=${name} (recorders=${recorders.size})`);
     };
 
     const onTrackRemoved = (track: any) => {
@@ -438,7 +442,10 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     };
 
     const onConferenceJoined = () => {
-      log('conference joined: ' + cfg.room);
+      log(
+        'conference joined: ' + cfg.room +
+        ' participants=' + (conference?.getParticipants?.()?.length ?? 0),
+      );
       armIdle();
     };
 
@@ -458,10 +465,17 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         conference.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
         conference.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
         conference.on(JitsiMeetJS.events.conference.USER_LEFT, armIdle);
-        conference.on(JitsiMeetJS.events.conference.USER_JOINED, () => {
+        conference.on(JitsiMeetJS.events.conference.USER_JOINED, (id: string) => {
           seenParticipant = true;
           if (idleTimer) clearTimeout(idleTimer);
+          log('USER_JOINED ' + id + ' (participants=' + (conference?.getParticipants?.()?.length ?? 0) + ')');
         });
+        // Diagnostica salute media (ICE/bridge): se il media non si stabilisce
+        // i TRACK_ADDED non arrivano. Logghiamo gli eventi disponibili.
+        try {
+          conference.on(JitsiMeetJS.events.conference.CONNECTION_INTERRUPTED, () => log('media CONNECTION_INTERRUPTED'));
+          conference.on(JitsiMeetJS.events.conference.CONNECTION_RESTORED, () => log('media CONNECTION_RESTORED'));
+        } catch { /* eventi non disponibili in questo build */ }
         // Errore di conference (kick, bridge down, ICE failed): NON uscire
         // in silenzio. Logga il motivo così l'operator/portale lo vede; chiude
         // pulito salvando ciò che è stato catturato finora. Un reconnect
