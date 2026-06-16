@@ -138,6 +138,13 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   // receive-only), autoplay senza gesture, no sandbox in container.
   const browser: Browser = await puppeteer.launch({
     headless: true,
+    // protocolTimeout:0 disabilita il timeout per-comando CDP. Il bootstrap
+    // in-page (`page.evaluate(IN_PAGE_BOOTSTRAP)`) resta volutamente *pending*
+    // per TUTTA la sessione (la sua Promise risolve solo dentro `finish()`).
+    // Col default 180s Puppeteer abortiva quel callFunctionOn dopo 3 minuti
+    // ("Runtime.callFunctionOn timed out") uccidendo il recorder PRIMA di
+    // finish()/upload/ingest → zero tracce per qualsiasi sessione reale. 0 = no cap.
+    protocolTimeout: 0,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -185,10 +192,26 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
 
     // Stessa origin di lib-jitsi-meet (CSP/CORS): carichiamo la pagina del
     // dominio Jitsi e iniettiamo lo script lib-jitsi-meet servito da lì.
-    await page.goto(`https://${config.jitsiDomain}/`, {
-      waitUntil: 'domcontentloaded',
-      timeout: 60_000,
-    });
+    // Chrome headless in pod può lanciare `net::ERR_NETWORK_CHANGED` se la rete
+    // del pod (veth/CNI) si assesta DOPO l'avvio del browser: è una race di
+    // startup, non un errore reale. Ritenta il caricamento pagina alcune volte
+    // con backoff prima di arrendersi (osservato fallire ~1 volta su 2 al boot).
+    let gotoErr: unknown;
+    for (let attempt = 1; attempt <= 4; attempt++) {
+      try {
+        await page.goto(`https://${config.jitsiDomain}/`, {
+          waitUntil: 'domcontentloaded',
+          timeout: 60_000,
+        });
+        gotoErr = undefined;
+        break;
+      } catch (e) {
+        gotoErr = e;
+        console.error(`[recorder] page.goto tentativo ${attempt}/4 fallito: ${String(e)}`);
+        await new Promise((r) => setTimeout(r, 2_000 * attempt));
+      }
+    }
+    if (gotoErr) throw gotoErr;
     await page.addScriptTag({ url: `https://${config.jitsiDomain}/libs/lib-jitsi-meet.min.js` });
     // Carichiamo anche il config.js del deployment Jitsi: definisce
     // `window.config` con gli host XMPP reali (es. domain=meet.jitsi,
