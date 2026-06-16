@@ -130,7 +130,12 @@
     "submitting": "Bezig met inschrijven...",
     "success": "Inschrijving voltooid!",
     "successMessage": "U ontvangt een bevestigingsmail met de link om toegang te krijgen tot het evenement.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "U bent al ingeschreven voor dit evenement",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Terug naar evenement",
     "organization": "Organisatie",
     "organizationPlaceholder": "bijv. AGID, Ministerie van Economie, Gemeente Rome",
@@ -1138,7 +1143,22 @@
         "previewBody": "Evenement met {participants} verwachte deelnemers bij {ratio}% senders → {senders} senders + {receivers} passief → {cores} geschatte cores → {jvbs} JVB.",
         "graceSection": "Soft exit (einde evenement)",
         "eventGracePeriodMinutes": "Standaard respijtminuten na endsAt",
-        "eventGracePeriodMinutesHelp": "Extra tijd toegestaan na de geplande eindtijd voordat de call wordt gesloten. 0 = harde sluiting, -1 = niet automatisch sluiten (laten aan inactiviteit-cleanup), 15 = banner en sluiting na 15 min. Elk evenement kan dit overrulen."
+        "eventGracePeriodMinutesHelp": "Extra tijd toegestaan na de geplande eindtijd voordat de call wordt gesloten. 0 = harde sluiting, -1 = niet automatisch sluiten (laten aan inactiviteit-cleanup), 15 = banner en sluiting na 15 min. Elk evenement kan dit overrulen.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Bovenste balk (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Uw naam",
     "nameHelp": "De andere deelnemers zien deze",
     "joinNowBtn": "Nu binnenkomen",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Opening om {time}",
     "netiquetteTitle": "Goede praktijken voor deelname",
     "netiquetteBullet1": "Kom enkele minuten van tevoren om uw microfoon en webcam te testen",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Voer een geldig e-mailadres in",
     "chatLockedMessage": "Voer uw naam in om deel te nemen aan de chat van het evenement.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Video-opname",

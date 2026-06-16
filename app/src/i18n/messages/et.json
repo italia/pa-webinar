@@ -130,7 +130,12 @@
     "submitting": "Registreerimine...",
     "success": "Registreerumine lõpetatud!",
     "successMessage": "Saate kinnitusmeili koos lingiga üritusele ligipääsuks.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Olete juba sellele üritusele registreeritud",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Tagasi ürituse juurde",
     "organization": "Organisatsioon",
     "organizationPlaceholder": "nt AGID, Majandusministeerium, Rooma linnavalitsus",
@@ -1138,7 +1143,22 @@
         "previewBody": "Sündmus {participants} hinnatud osalejaga {ratio}% saatjate juures → {senders} saatjat + {receivers} passiivset → {cores} hinnatud tuuma → {jvbs} JVB-d.",
         "graceSection": "Pehme väljumine (sündmuse lõpp)",
         "eventGracePeriodMinutes": "Vaikepikenduse minutid pärast endsAt",
-        "eventGracePeriodMinutesHelp": "Lisaaeg pärast planeeritud lõpuaega enne kõne sulgemist. 0 = kõva sulgemine, -1 = ära sulge automaatselt (jäta tegevusetuse puhastusele), 15 = bänner ja sulgemine 15 min pärast. Iga sündmus saab seda üle kirjutada."
+        "eventGracePeriodMinutesHelp": "Lisaaeg pärast planeeritud lõpuaega enne kõne sulgemist. 0 = kõva sulgemine, -1 = ära sulge automaatselt (jäta tegevusetuse puhastusele), 15 = bänner ja sulgemine 15 min pärast. Iga sündmus saab seda üle kirjutada.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Ülemine riba (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Teie nimi",
     "nameHelp": "Teised osalejad näevad seda",
     "joinNowBtn": "Sisene kohe",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Avaneb kell {time}",
     "netiquetteTitle": "Head tavad osalemiseks",
     "netiquetteBullet1": "Tulge mõni minut varem, et mikrofoni ja veebikaamerat testida",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Sisestage kehtiv e-posti aadress",
     "chatLockedMessage": "Sisestage oma nimi sündmuse vestlusega liitumiseks.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Videosalvestis",

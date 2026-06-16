@@ -142,7 +142,12 @@
     "submitting": "Registering...",
     "success": "Registration complete!",
     "successMessage": "You will receive a confirmation email with the link to access the event.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "You are already registered for this event",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Back to event",
     "organization": "Organization",
     "organizationPlaceholder": "e.g. AGID, Ministry of Economy, City of Rome",
@@ -422,7 +427,16 @@
         "senderRatioLabel": "Estimated active share",
         "senderRatioHelp": "How many participants you expect to have mic/camera active. Helps size the video server.",
         "activeParticipantsEstimate": "≈ {count} active participants",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "videoQuality": "Video/audio quality (this event)",
+        "videoQualityHelp": "Overrides the site default for this event. Higher quality uses more bandwidth.",
+        "videoQualitySiteDefault": "Site default",
+        "videoQualityOptions": {
+          "MAX": "Maximum (1080p, high fidelity)",
+          "HIGH": "High (720p, recommended)",
+          "BALANCED": "Balanced (540p)",
+          "SAVE_DATA": "Save data (360p)"
+        }
       },
       "step2": {
         "heading": "Who can do what",
@@ -1216,7 +1230,22 @@
         "previewBody": "Event with {participants} expected attendees at {ratio}% senders → {senders} senders + {receivers} passive → {cores} estimated cores → {jvbs} JVBs.",
         "graceSection": "Soft exit (event end)",
         "eventGracePeriodMinutes": "Default grace minutes past endsAt",
-        "eventGracePeriodMinutesHelp": "Extra time granted after the scheduled end before closing the call. 0 = hard stop, -1 = never auto-close (let the idle-cleanup decide), 15 = banner then close after 15 minutes. Each event can override."
+        "eventGracePeriodMinutesHelp": "Extra time granted after the scheduled end before closing the call. 0 = hard stop, -1 = never auto-close (let the idle-cleanup decide), 15 = banner then close after 15 minutes. Each event can override.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Top bar (Slim Header)",
@@ -3050,6 +3079,8 @@
     "nameLabel": "Your name",
     "nameHelp": "Other participants will see this",
     "joinNowBtn": "Enter now",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Opens at {time}",
     "netiquetteTitle": "How to take part",
     "netiquetteBullet1": "Arrive a few minutes early to test your microphone and camera",
@@ -3071,8 +3102,6 @@
     "chatLockedMessage": "Enter your name to join the event chat.",
     "classicView": "Classic view",
     "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details",
     "aiNoticeTitle": "AI processing after the event",
     "aiNotice": "After it ends, the recording will be processed by AI tools to generate a transcript, summary and any translations and dubbing. The artifacts may contain inaccuracies; the video remains the authoritative source.",
     "multitrackConsentTitle": "Per-participant recording",

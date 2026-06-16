@@ -130,7 +130,12 @@
     "submitting": "Reģistrēšana...",
     "success": "Reģistrācija pabeigta!",
     "successMessage": "Jūs saņemsiet apstiprinājuma e-pastu ar saiti piekļuvei pasākumam.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Jūs jau esat reģistrēts šim pasākumam",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Atpakaļ pie pasākuma",
     "organization": "Organizācija",
     "organizationPlaceholder": "piem. AGID, Ekonomikas ministrija, Romas pašvaldība",
@@ -1138,7 +1143,22 @@
         "previewBody": "Pasākums ar {participants} sagaidāmiem dalībniekiem pie {ratio}% sūtītāju → {senders} sūtītāji + {receivers} pasīvi → {cores} aplēstie kodoli → {jvbs} JVB.",
         "graceSection": "Mīkstā izeja (pasākuma beigas)",
         "eventGracePeriodMinutes": "Žēlastības minūtes pēc endsAt (noklusējums)",
-        "eventGracePeriodMinutesHelp": "Papildu laiks, kas piešķirts pēc plānotajām beigām pirms zvana slēgšanas. 0 = stingra apturēšana, -1 = neslēgt automātiski (atstāt dīkstāves attīrīšanai), 15 = banneris un slēgšana pēc 15 min. Katrs pasākums var pārrakstīt."
+        "eventGracePeriodMinutesHelp": "Papildu laiks, kas piešķirts pēc plānotajām beigām pirms zvana slēgšanas. 0 = stingra apturēšana, -1 = neslēgt automātiski (atstāt dīkstāves attīrīšanai), 15 = banneris un slēgšana pēc 15 min. Katrs pasākums var pārrakstīt.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Augšējā josla (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Jūsu vārds",
     "nameHelp": "Tas būs redzams citiem dalībniekiem",
     "joinNowBtn": "Ieiet tagad",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Atveras {time}",
     "netiquetteTitle": "Labas līdzdalības prakses",
     "netiquetteBullet1": "Ierodieties dažas minūtes agrāk, lai pārbaudītu mikrofonu un kameru",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Lūdzu, ievadiet derīgu e-pasta adresi",
     "chatLockedMessage": "Ievadiet savu vārdu, lai piedalītos pasākuma tērzēšanā.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Video ieraksts",

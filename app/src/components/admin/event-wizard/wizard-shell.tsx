@@ -29,6 +29,7 @@ import {
 } from '@/lib/utils/permission-matrix';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
+import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
 import Step1Base, { type Step1Value } from './step-1-base';
 import Step2Permissions, { type Step2Value } from './step-2-permissions';
@@ -76,6 +77,9 @@ export interface WizardProps {
   /** Site-wide default for the title-kicker parse. Used to decide whether
    *  to surface the per-event override in step 1 (hidden when already on). */
   siteDefaultParseTitleKicker: boolean;
+  /** Site-wide default video/audio quality, shown as the resolved value
+   *  for the per-event override in step 1. */
+  siteDefaultVideoQuality: VideoQualityPreset;
   /** When `'edit'`, the wizard seeds state from `initialEvent`, PUTs to
    *  /api/events/:id on submit, and redirects to the admin detail page.
    *  When `'create'` (default), it POSTs to /api/events and falls into the
@@ -110,6 +114,7 @@ export interface InitialEventShape {
     recurrenceRule: string | null;
     parseTitleKicker: boolean | null;
     waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
+    videoQuality: VideoQualityPreset | null;
     expectedSenderRatioPct: number | null;
     permissionMatrix: PermissionMatrix | null;
     qaEnabled: boolean;
@@ -243,6 +248,7 @@ export default function EventWizard(props: WizardProps) {
         recurrenceCount: null,
         parseTitleKicker: ev.parseTitleKicker,
         waitingRoomEngine: ev.waitingRoomEngine,
+        videoQuality: ev.videoQuality,
         expectedSenderRatioPct: ev.expectedSenderRatioPct,
 
         // Step 2
@@ -355,6 +361,7 @@ export default function EventWizard(props: WizardProps) {
       recurrenceCount: null,
       parseTitleKicker: null,
       waitingRoomEngine: null,
+      videoQuality: null,
       expectedSenderRatioPct: null,
 
       // Step 2
@@ -488,6 +495,7 @@ export default function EventWizard(props: WizardProps) {
           recurrenceRule: form.recurrenceRule,
           parseTitleKicker: form.parseTitleKicker,
           waitingRoomEngine: form.waitingRoomEngine,
+          videoQuality: form.videoQuality ?? null,
           expectedSenderRatioPct: form.expectedSenderRatioPct,
 
           // Permissions (matrix + derived booleans)
@@ -757,6 +765,7 @@ export default function EventWizard(props: WizardProps) {
             fieldErrors={fieldErrors}
             siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
             defaultSenderRatioPct={props.defaultSenderRatioPct}
+            siteDefaultVideoQuality={props.siteDefaultVideoQuality}
           />
         )}
         {activeStep === 'permissions' && (

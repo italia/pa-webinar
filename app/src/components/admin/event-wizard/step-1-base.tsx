@@ -22,6 +22,7 @@ import {
   type RecurrenceValue,
 } from '@/lib/utils/recurrence';
 import { fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
 export interface Step1Value {
   title: Record<string, string>;
@@ -43,6 +44,8 @@ export interface Step1Value {
   parseTitleKicker: boolean | null;
   /** Per-event waiting-room engine override. Null inherits the site default. */
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
+  /** Per-event video/audio quality override. Null inherits the site default. */
+  videoQuality?: VideoQualityPreset | null;
   /** Per-event estimate of how many participants will send audio/video.
    *  Null inherits the site default. */
   expectedSenderRatioPct: number | null;
@@ -64,6 +67,9 @@ interface Props {
   siteDefaultParseTitleKicker: boolean;
   /** Site-wide default sender-ratio %, used as fallback/initial estimate. */
   defaultSenderRatioPct: number;
+  /** Site-wide default video/audio quality. Shown as the resolved value
+   *  when the per-event override is null (inherit). */
+  siteDefaultVideoQuality: VideoQualityPreset;
 }
 
 const SENDER_RATIO_PRESETS = [15, 25, 35, 50, 75] as const;
@@ -77,6 +83,7 @@ export default function Step1Base({
   fieldErrors,
   siteDefaultParseTitleKicker,
   defaultSenderRatioPct,
+  siteDefaultVideoQuality,
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
   const tAdmin = useTranslations('admin');
@@ -231,6 +238,45 @@ export default function Step1Base({
             </select>
             <small className="form-text text-muted d-block">
               Sovrascrive il default del sito per questo evento.
+            </small>
+          </div>
+
+          {/* Per-event video/audio quality override (inherits the site
+              default when "Site default" is selected). */}
+          <div className="mt-3">
+            <label className="form-label mb-1" htmlFor="ev-video-quality">
+              {t('videoQuality')}
+            </label>
+            <select
+              id="ev-video-quality"
+              className="form-select form-select-sm"
+              style={{ maxWidth: 340 }}
+              value={value.videoQuality ?? ''}
+              onChange={(e) =>
+                onChange({
+                  videoQuality:
+                    e.target.value === ''
+                      ? null
+                      : (e.target.value as VideoQualityPreset),
+                })
+              }
+            >
+              <option value="">
+                {t('videoQualitySiteDefault')}
+                {' — '}
+                {t(`videoQualityOptions.${siteDefaultVideoQuality}`)}
+              </option>
+              <option value="MAX">{t('videoQualityOptions.MAX')}</option>
+              <option value="HIGH">{t('videoQualityOptions.HIGH')}</option>
+              <option value="BALANCED">
+                {t('videoQualityOptions.BALANCED')}
+              </option>
+              <option value="SAVE_DATA">
+                {t('videoQualityOptions.SAVE_DATA')}
+              </option>
+            </select>
+            <small className="form-text text-muted d-block">
+              {t('videoQualityHelp')}
             </small>
           </div>
         </div>

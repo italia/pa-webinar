@@ -130,7 +130,12 @@
     "submitting": "Регистрация в ход...",
     "success": "Регистрацията е завършена!",
     "successMessage": "Ще получите имейл за потвърждение с линк за достъп до събитието.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Вие вече сте регистрирани за това събитие",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Обратно към събитието",
     "organization": "Организация",
     "organizationPlaceholder": "напр. AGID, Министерство на икономиката, Община Рим",
@@ -1138,7 +1143,22 @@
         "previewBody": "Събитие с {participants} оценени участници при {ratio}% sender → {senders} sender + {receivers} пасивни → {cores} оценени ядра → {jvbs} JVB.",
         "graceSection": "Soft exit (край на събитието)",
         "eventGracePeriodMinutes": "Минути отсрочка след endsAt (по подразбиране)",
-        "eventGracePeriodMinutesHelp": "Допълнително време, предоставено след планирания краен час преди затваряне на разговора. 0 = твърдо затваряне, -1 = не затваряй автоматично (остави на cleanup за неактивност), 15 = банер и затваряне след 15 мин. Всяко събитие може да го override."
+        "eventGracePeriodMinutesHelp": "Допълнително време, предоставено след планирания краен час преди затваряне на разговора. 0 = твърдо затваряне, -1 = не затваряй автоматично (остави на cleanup за неактивност), 15 = банер и затваряне след 15 мин. Всяко събитие може да го override.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Горна лента (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Вашето име",
     "nameHelp": "Ще се вижда от другите участници",
     "joinNowBtn": "Влез сега",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Отваряне в {time}",
     "netiquetteTitle": "Добри практики за участие",
     "netiquetteBullet1": "Пристигнете няколко минути по-рано, за да тествате микрофона и уеб камерата",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Въведете валиден имейл адрес",
     "chatLockedMessage": "Въведете името си, за да участвате в чата на събитието.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Видеозапис",

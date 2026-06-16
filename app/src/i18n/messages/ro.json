@@ -130,7 +130,12 @@
     "submitting": "Înregistrare în curs...",
     "success": "Înregistrare finalizată!",
     "successMessage": "Veți primi un email de confirmare cu linkul de acces la eveniment.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Sunteți deja înregistrat la acest eveniment",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Înapoi la eveniment",
     "organization": "Instituția de apartenență",
     "organizationPlaceholder": "de ex. AGID, Ministerul Economiei, Primăria Romei",
@@ -1138,7 +1143,22 @@
         "previewBody": "Eveniment cu {participants} participanți estimați la {ratio}% sender → {senders} sender + {receivers} pasivi → {cores} nuclee estimate → {jvbs} JVB.",
         "graceSection": "Soft exit (sfârșit eveniment)",
         "eventGracePeriodMinutes": "Minute de grație după endsAt (implicit)",
-        "eventGracePeriodMinutesHelp": "Timp suplimentar acordat după ora de încheiere prevăzută înainte de a închide apelul. 0 = închidere dură, -1 = nu închideți automat (lăsați la cleanup-ul de inactivitate), 15 = banner și închidere după 15 min. Fiecare eveniment poate suprascrie."
+        "eventGracePeriodMinutesHelp": "Timp suplimentar acordat după ora de încheiere prevăzută înainte de a închide apelul. 0 = închidere dură, -1 = nu închideți automat (lăsați la cleanup-ul de inactivitate), 15 = banner și închidere după 15 min. Fiecare eveniment poate suprascrie.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Bară superioară (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Numele dvs.",
     "nameHelp": "Va apărea celorlalți participanți",
     "joinNowBtn": "Intrați acum",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Deschidere la {time}",
     "netiquetteTitle": "Bune practici de participare",
     "netiquetteBullet1": "Sosiți cu câteva minute mai devreme pentru a testa microfonul și camera web",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Introduceți o adresă de e-mail validă",
     "chatLockedMessage": "Introduceți numele pentru a participa la chatul evenimentului.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Înregistrare video",

@@ -18,6 +18,7 @@ import {
 
 import { Link, useRouter } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
+import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import RecordingConsent, {
   RecordingBanner,
@@ -45,6 +46,8 @@ interface EventInfo {
   parseTitleKicker?: boolean;
   /** Resolved waiting-room engine (per-event override merged with site default). */
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC';
+  /** Resolved video/audio quality preset (per-event override merged with site default). */
+  videoQuality?: VideoQualityPreset;
   startsAt: string;
   endsAt: string;
   status: string;
@@ -119,6 +122,13 @@ type LivePhase =
 // `videoConferenceLeft`. After this many failures we fall through to the
 // "Evento concluso" screen so the user can decide what to do manually.
 const MAX_RECONNECT_ATTEMPTS = 3;
+
+// Phases that render the full-bleed call surface. While in one of these we
+// flip the page into "immersive" mode (see `.live-call-immersive` in
+// globals.scss): the call overlays the PA header/footer and the outer
+// document scroll is locked, so the video sits in a single viewport-locked
+// frame with no double scroll. The waiting room keeps the normal chrome.
+const IMMERSIVE_PHASES = new Set<LivePhase>(['fetching_jwt', 'ready', 'reconnecting']);
 
 interface JitsiCredentials {
   jwt: string;
@@ -253,6 +263,16 @@ export default function LiveEventClient({
         : 'waiting',
     );
   }, [eventStatus]);
+
+  // Viewport-lock the call surface: hide the PA chrome behind the video and
+  // kill the outer document scroll while the call (or its loading/reconnect
+  // spinners) is on screen. The class is removed on unmount so navigating
+  // away (or dropping to the waiting room / ended screen) restores scrolling.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('live-call-immersive', IMMERSIVE_PHASES.has(phase));
+    return () => root.classList.remove('live-call-immersive');
+  }, [phase]);
 
   // Poll event status in waiting room
   useEffect(() => {
@@ -823,6 +843,7 @@ export default function LiveEventClient({
               participantsCanStartVideo={event.participantsCanStartVideo}
               participantsCanShareScreen={event.participantsCanShareScreen}
               enableFileSharing={isInstantCall}
+              videoQuality={event.videoQuality}
               startWithVideoMuted={!joinPrefs.cameraOn}
               startWithAudioMuted={!joinPrefs.micOn}
               watermark={watermark}

@@ -1,5 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// Allow pointing the suite at an already-running server on a non-default
+// port (e.g. when 3000 is taken by another local project). Defaults to the
+// CI/dev convention of localhost:3000.
+const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -8,7 +13,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: BASE_URL,
     trace: 'on-first-retry',
     locale: 'it-IT',
   },
@@ -26,7 +31,7 @@ export default defineConfig({
     ? undefined
     : {
         command: 'npm run dev',
-        url: 'http://localhost:3000',
+        url: BASE_URL,
         reuseExistingServer: true,
       },
 });
