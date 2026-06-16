@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Alert,
+  Badge,
   Button,
   Card,
   CardBody,
@@ -17,6 +18,7 @@ import {
 } from 'design-react-kit';
 import type { SiteSetting } from '@prisma/client';
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import { videoQualityMaxHeight } from '@/lib/jitsi/config';
 
 type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features' | 'scaling' | 'postprod';
 
@@ -1288,6 +1290,54 @@ function ScalingTab({ settings, updateField }: TabProps) {
         <Icon icon="it-info-circle" className="me-2" />
         {t('intro')}
       </Alert>
+
+      {/* ── Qualità video/audio ───────────────────────────────────── */}
+      <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+        {t('videoQualitySection')}
+      </h5>
+      <Row className="mb-4 align-items-stretch">
+        <Col md={5}>
+          <FormGroup>
+            <Label htmlFor="videoQuality">{t('videoQuality')}</Label>
+            <Input
+              id="videoQuality"
+              type="select"
+              value={settings.videoQuality ?? 'HIGH'}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('videoQuality', e.target.value as SiteSetting['videoQuality'])
+              }
+            >
+              {/* Order high→low so the recommended default sits near the top */}
+              {(['MAX', 'HIGH', 'BALANCED', 'SAVE_DATA'] as const).map((q) => (
+                <option key={q} value={q}>
+                  {t(`videoQualityOptions.${q}`)}
+                </option>
+              ))}
+            </Input>
+            <small className="text-muted d-block mt-1">{t('videoQualityHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={7}>
+          {/* Live spec preview of the selected preset */}
+          <div
+            className="h-100 rounded p-3 d-flex flex-column justify-content-center"
+            style={{ background: 'var(--app-surface-2, #f3f5f8)', border: '1px solid var(--app-border, #d4d8dd)' }}
+          >
+            <div className="d-flex align-items-center gap-2 mb-1">
+              <Icon icon="it-video" size="sm" />
+              <span className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+                {t(`videoQualityOptions.${settings.videoQuality ?? 'HIGH'}`)}
+              </span>
+              <Badge color="primary" pill>
+                {videoQualityMaxHeight(settings.videoQuality ?? 'HIGH')}p
+              </Badge>
+            </div>
+            <small className="text-muted">
+              {t(`videoQualityDesc.${settings.videoQuality ?? 'HIGH'}`)}
+            </small>
+          </div>
+        </Col>
+      </Row>
 
       <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('jvbSection')}

@@ -130,7 +130,12 @@
     "submitting": "Ag clárú...",
     "success": "Clárú críochnaithe!",
     "successMessage": "Gheobhaidh sibh ríomhphost deimhnithe leis an nasc chun rochtain a fháil ar an imeacht.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Tá sibh cláraithe cheana féin don imeacht seo",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Ar ais go dtí an t-imeacht",
     "organization": "Eagraíocht",
     "organizationPlaceholder": "m.sh. AGID, An Roinn Airgeadais, Bardas na Róimhe",
@@ -1138,7 +1143,22 @@
         "previewBody": "Imeacht le {participants} rannpháirtí measta ag {ratio}% seoltóirí → {senders} seoltóirí + {receivers} éighníomhacha → {cores} croí measta → {jvbs} JVB.",
         "graceSection": "Imeacht bog (deireadh imeachta)",
         "eventGracePeriodMinutes": "Nóiméid mhaithiúnais tar éis endsAt (réamhshocrú)",
-        "eventGracePeriodMinutesHelp": "Am breise tar éis an ama deiridh sceidealaithe sular dúnadh an glao. 0 = stop crua, -1 = ná dún go huathoibríoch (fág faoin nglanadh díomhaointe é), 15 = meirge agus dúnadh tar éis 15 nóim. Is féidir le gach imeacht é a sháraíocht."
+        "eventGracePeriodMinutesHelp": "Am breise tar éis an ama deiridh sceidealaithe sular dúnadh an glao. 0 = stop crua, -1 = ná dún go huathoibríoch (fág faoin nglanadh díomhaointe é), 15 = meirge agus dúnadh tar éis 15 nóim. Is féidir le gach imeacht é a sháraíocht.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Barra barr (Ceanntásc Caol)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "D'ainm",
     "nameHelp": "Feicfidh rannpháirtithe eile é seo",
     "joinNowBtn": "Téigh isteach anois",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Osclaíonn ag {time}",
     "netiquetteTitle": "Conas páirt a ghlacadh",
     "netiquetteBullet1": "Tar cúpla nóiméad luath chun do mhicreafón agus do cheamara a thástáil",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Iontráil seoladh ríomhphoist bailí",
     "chatLockedMessage": "Iontráil d'ainm chun páirt a ghlacadh i gcomhrá an imeachta.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Taifeadadh físe",

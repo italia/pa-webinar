@@ -24,6 +24,9 @@ import { EventStatusSchedule, type AppEventStatus } from '@/lib/lobby/schedule-a
 import type { LobbyLocalState } from '@/lib/lobby/shared';
 
 const WORLD = { w: 2400, h: 1600 };
+// A smaller world for the boxed "Mentre aspetti" embed so the camera shows
+// enough context inside the ~440px-tall card instead of a tiny crop.
+const EMBED_WORLD = { w: 1400, h: 1000 };
 
 interface PhaserLobbyProps {
   eventSlug: string;
@@ -34,6 +37,9 @@ interface PhaserLobbyProps {
   onEnterLive: (name: string, prefs: JoinPrefs) => void;
   /** "Versione classica" pressed inside the lobby → switch back to the SVG UI. */
   onExitClassic: () => void;
+  /** Render boxed inside the waiting-room shell (no full-screen chrome /
+   *  takeover; the host owns the name + "Entra" CTA). Default false. */
+  embed?: boolean;
 }
 
 export default function PhaserLobby({
@@ -44,6 +50,7 @@ export default function PhaserLobby({
   isHost,
   onEnterLive,
   onExitClassic,
+  embed = false,
 }: PhaserLobbyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<LobbyHandle | null>(null);
@@ -58,26 +65,28 @@ export default function PhaserLobby({
     const el = containerRef.current;
     if (!el) return;
 
-    // Fill the space between the app header and footer (no white gap) while
-    // staying INSIDE the page chrome. The container's own height is computed
-    // from the viewport minus its offset and the footer; the Phaser canvas
-    // (RESIZE scale mode) follows on the synthetic resize.
+    // Sizing. Embed: fill the host box exactly (its `.wr-stage` sets the
+    // height) and follow the box on resize. Full-screen: fill from just under
+    // the app header to the bottom of the viewport. The Phaser canvas (RESIZE
+    // scale mode) refits on the synthetic resize either way.
     const applyHeight = (): void => {
+      if (embed) {
+        el.style.height = '100%';
+        return;
+      }
       const top = el.getBoundingClientRect().top;
-      // Fill from just under the app header to the bottom of the viewport — a
-      // large game area with no white gap. The app's (tall) footer sits just
-      // below the fold; scrolling reveals it. Keeps the app chrome, no takeover.
       el.style.height = `${Math.max(480, Math.round(window.innerHeight - top))}px`;
     };
     applyHeight();
 
+    const world = embed ? EMBED_WORLD : WORLD;
     const shared: LobbyLocalState = {
       name: displayName.trim() || 'Ospite',
       color: '#1d6fb8',
       helmet: false,
       glasses: false,
     };
-    const presence = new GardenPresenceClient(eventSlug, WORLD, shared);
+    const presence = new GardenPresenceClient(eventSlug, world, shared);
     const conference = new EnterLiveConference(shared, (name, prefs) =>
       onEnterRef.current(name, prefs),
     );
@@ -88,7 +97,8 @@ export default function PhaserLobby({
     const handle = mountLobby(
       el,
       {
-        worldSize: WORLD,
+        worldSize: world,
+        embed,
         initialProfile: { name: displayName.trim() },
         onExitToClassic: () => onExitRef.current(),
       },
@@ -99,14 +109,26 @@ export default function PhaserLobby({
     // The canvas was created at the fitted size; keep it fitted on resize.
     window.dispatchEvent(new Event('resize'));
     const onResize = (): void => applyHeight();
-    window.addEventListener('resize', onResize);
+    // Embed follows the host box (it can resize independently of the window);
+    // full-screen just tracks the window.
+    let boxObserver: ResizeObserver | null = null;
+    if (embed) {
+      boxObserver = new ResizeObserver(() => {
+        applyHeight();
+        window.dispatchEvent(new Event('resize'));
+      });
+      boxObserver.observe(el);
+    } else {
+      window.addEventListener('resize', onResize);
+    }
     const settle = window.setTimeout(() => {
       applyHeight();
       window.dispatchEvent(new Event('resize'));
     }, 150);
 
     return () => {
-      window.removeEventListener('resize', onResize);
+      if (boxObserver) boxObserver.disconnect();
+      else window.removeEventListener('resize', onResize);
       window.clearTimeout(settle);
       handle.destroy();
       handleRef.current = null;
@@ -125,12 +147,18 @@ export default function PhaserLobby({
     handleRef.current?.setProfile({ name: displayName.trim() });
   }, [displayName]);
 
-  // Rendered INSIDE the page (header + footer stay visible); the mount effect
-  // sizes this to fill the space between them, so there's no white gap.
+  // Embed: fill the host box (its `.wr-stage` sets the height). Full-screen:
+  // the mount effect sizes this to fill the space between header and footer.
   return (
     <div
       ref={containerRef}
-      style={{ position: 'relative', width: '100%', overflow: 'hidden', background: '#26344a' }}
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: embed ? '100%' : undefined,
+        overflow: 'hidden',
+        background: embed ? '#eaf3fb' : '#26344a',
+      }}
     />
   );
 }

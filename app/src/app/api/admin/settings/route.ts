@@ -47,6 +47,7 @@ const updateSettingsSchema = z.object({
   jitsiWatermarkEnabled: z.boolean().optional(),
   jitsiWatermarkOpacity: z.number().min(0).max(1).optional(),
   jitsiWatermarkPosition: z.enum(['top-left', 'top-right', 'bottom-left', 'bottom-right']).optional(),
+  videoQuality: z.enum(['SAVE_DATA', 'BALANCED', 'HIGH', 'MAX']).optional(),
   githubUrl: z.string().url().nullish(),
   supportEmail: z.string().email().nullish(),
   availableLocales: z.array(z.string().min(2).max(5)).optional(),

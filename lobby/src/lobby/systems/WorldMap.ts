@@ -269,7 +269,7 @@ function drawStage(scene: Phaser.Scene, cx: number, screen: Phaser.Geom.Rectangl
 
   g.fillStyle(0x0a0f1a, 1);
   g.fillRoundedRect(screen.x - 8, screen.y - 8, screen.width + 16, screen.height + 16, 8);
-  g.lineStyle(3, 0x36e0ff, 0.7);
+  g.lineStyle(3, 0x0066CC, 0.7);
   g.strokeRoundedRect(screen.x - 8, screen.y - 8, screen.width + 16, screen.height + 16, 8);
 
   drawCurtain(g, cx - halfW + 6, 10, screen.x - 16 - (cx - halfW + 6), stageBottom);
@@ -286,7 +286,7 @@ function drawStage(scene: Phaser.Scene, cx: number, screen: Phaser.Geom.Rectangl
   g.fillRoundedRect(cx - 16, stageBottom - 34, 32, 30, 3);
   g.fillStyle(0x55402b, 1);
   g.fillRoundedRect(cx - 20, stageBottom - 40, 40, 10, 3);
-  g.fillStyle(0x36e0ff, 0.5);
+  g.fillStyle(0x0066CC, 0.5);
   g.fillRoundedRect(cx - 14, stageBottom - 38, 28, 5, 2);
 }
 
@@ -406,7 +406,7 @@ function drawCoffeeKiosk(scene: Phaser.Scene, x: number, y: number): Collider[] 
   // Coffee machine + cups + steam.
   g.fillStyle(0xb0b6bf, 1);
   g.fillRoundedRect(x + 18, y - 50, 26, 22, 3);
-  g.fillStyle(0x36e0ff, 0.7);
+  g.fillStyle(0x0066CC, 0.7);
   g.fillCircle(x + 31, y - 41, 3);
   for (let i = 0; i < 3; i++) {
     g.fillStyle(0xf4f4f4, 1);
@@ -511,10 +511,10 @@ function drawBuildSite(scene: Phaser.Scene, x: number, y: number): Collider[] {
   g.lineBetween(x + 50, y - 6, x + 50, y - 64);
   g.lineBetween(x + 50, y - 64, x + 88, y - 64);
   g.lineBetween(x + 84, y - 64, x + 84, y - 48);
-  g.fillStyle(0x36e0ff, 1);
+  g.fillStyle(0x0066CC, 1);
   g.fillRoundedRect(x + 72, y - 48, 24, 20, 3); // hanging code block
   scene.add
-    .text(x + 84, y - 38, '</>', { fontFamily: 'monospace', fontSize: '12px', color: '#04222e', fontStyle: 'bold' })
+    .text(x + 84, y - 38, '</>', { fontFamily: 'monospace', fontSize: '12px', color: '#ffffff', fontStyle: 'bold' })
     .setOrigin(0.5)
     .setDepth(y + 1);
   colliders.push({ kind: 'circle', x: x + 50, y, r: 20 });

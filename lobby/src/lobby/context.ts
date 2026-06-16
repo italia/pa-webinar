@@ -16,6 +16,8 @@ export interface ResolvedConfig {
   assets: AssetConfig | undefined;
   /** Whether the host wired an onExitToClassic handler (shows the button). */
   canExitClassic: boolean;
+  /** Boxed-in-host mode: suppress the full-screen chrome (see LobbyConfig). */
+  embed: boolean;
 }
 
 /**

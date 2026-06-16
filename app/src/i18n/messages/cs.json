@@ -130,7 +130,12 @@
     "submitting": "Probíhá registrace...",
     "success": "Registrace dokončena!",
     "successMessage": "Obdržíte potvrzovací e-mail s odkazem pro přístup k události.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Na tuto událost jste již registrováni",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Zpět na událost",
     "organization": "Organizace",
     "organizationPlaceholder": "např. AGID, Ministerstvo hospodářství, Obec Praha",
@@ -1138,7 +1143,22 @@
         "previewBody": "Událost s {participants} odhadovanými účastníky při {ratio} % odesílatelů → {senders} odesílatelů + {receivers} pasivních → {cores} odhadovaných jader → {jvbs} JVB.",
         "graceSection": "Měkké ukončení (konec události)",
         "eventGracePeriodMinutes": "Výchozí minuty tolerance po endsAt",
-        "eventGracePeriodMinutesHelp": "Dodatečný čas povolený po plánovaném konci před uzavřením hovoru. 0 = tvrdé ukončení, -1 = neuzavírat automaticky (ponechat na úklidu nečinnosti), 15 = banner a uzavření po 15 min. Každá událost může přepsat."
+        "eventGracePeriodMinutesHelp": "Dodatečný čas povolený po plánovaném konci před uzavřením hovoru. 0 = tvrdé ukončení, -1 = neuzavírat automaticky (ponechat na úklidu nečinnosti), 15 = banner a uzavření po 15 min. Každá událost může přepsat.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Horní lišta (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Vaše jméno",
     "nameHelp": "Zobrazí se ostatním účastníkům",
     "joinNowBtn": "Vstoupit nyní",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Otevření v {time}",
     "netiquetteTitle": "Doporučené postupy pro účast",
     "netiquetteBullet1": "Přijďte několik minut předem a otestujte mikrofon a webkameru",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Zadejte platnou e-mailovou adresu",
     "chatLockedMessage": "Zadejte své jméno pro účast v chatu události.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Videozáznam",

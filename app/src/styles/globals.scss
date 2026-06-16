@@ -155,15 +155,26 @@
 
 .live-page-bg {
   background: #0F1B2D;
-  height: calc(100vh - 80px);
+  // The call is a viewport-locked overlay. `position: fixed; inset: 0` makes
+  // it fill the viewport and sit ABOVE the PA header/footer (which live in
+  // the shared root layout and can't be removed per-route). Together with
+  // the scroll lock on `<html>` below (.live-call-immersive, toggled by
+  // LiveEventClient for the call phases) this kills the old double scroll —
+  // the page used to be header(80px) + calc(100vh - 80px) + footer, taller
+  // than the viewport, so the whole document scrolled behind the iframe.
+  position: fixed;
+  inset: 0;
+  z-index: 1035; // above the BI header, below the live sidebar (1050)
+}
 
-  // On mobile the page fills the viewport strictly — no scroll, no
-  // collapse. Using `svh` ensures the live area excludes the URL bar
-  // and on-screen keyboard so the iframe never ends up clipped.
-  @media (max-width: 991.98px) {
-    height: 100svh;
-    min-height: 100svh;
-  }
+// Outer scroll lock while the call surface is mounted. Applied to <html>
+// (and body) so neither can scroll behind the fixed overlay. `overscroll-
+// behavior: none` stops iOS Safari's rubber-band from revealing the (hidden)
+// PA chrome behind the call.
+html.live-call-immersive,
+html.live-call-immersive body {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 .live-top-bar {
@@ -201,13 +212,16 @@
     min-height: 300px;
   }
 
-  // Mobile: .live-page-bg is now a strict 100svh flex column, so
-  // .live-main just grows into the remaining space after the top bar
-  // and banners. The floating control bar overlays the video directly
-  // (via .live-floating-controls-slot) so no bottom padding is needed.
+  // Mobile: .live-main grows into the space left after the top bar and
+  // banners. We reserve a bottom band the height of the fixed tab strip
+  // (.live-floating-controls-slot, ~52px + safe-area) so the Jitsi iframe
+  // ends ABOVE it — otherwise Jitsi's own mic/cam toolbar (pinned to the
+  // bottom of the iframe) lands under the strip and the user loses the AV
+  // controls.
   @media (max-width: 991.98px) {
     flex: 1 1 0;
     overflow: hidden;
+    padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px));
   }
 
   // `position: relative` lets the floating-controls-slot be
@@ -404,7 +418,7 @@
   transition: transform 240ms ease-out;
 
   @media (min-width: 992px) {
-    top: 80px; // .live-page-bg margin allowance (header 80px above)
+    top: 0; // call overlays the header (.live-page-bg is fixed inset:0)
     right: 0;
     bottom: 0;
     width: 420px;
@@ -2018,16 +2032,8 @@
 // so `height: 100%` resolves to "viewport minus header/footer" and the
 // bottom dock stays on screen without the page scrolling. `100dvh` is the
 // fallback if an ancestor ever fails to provide a definite height.
-.waiting-arcade {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: min(100dvh, 32rem);
-  max-height: 100dvh;
-  overflow: hidden;
-  background: linear-gradient(180deg, #BCE0FF 0%, #FFE9CF 60%, #FFD8B8 100%);
-}
-
+// Boxed garden stage — the container GardenInteractive's ResizeObserver
+// measures (inside the waiting-room shell's "Mentre aspetti" card).
 .arcade-stage {
   position: absolute;
   inset: 0;
@@ -2036,234 +2042,86 @@
   pointer-events: none; // HUD / joystick re-enable pointer events themselves
 }
 
-// Keep the park vivid in arcade mode (the mobile .garden-scene dim rule
-// was meant for the old "behind a card" layout). Higher specificity wins.
+// Keep the garden vivid inside the box (the mobile .garden-scene dim rule was
+// meant for the old "behind a card" layout). Higher specificity wins.
 .arcade-stage .garden-scene { opacity: 1; }
-
-// Push the in-stage HUD / discovery hint below the topbar so they don't
-// collide with the event title + countdown.
-.waiting-arcade .garden-hud { top: 64px; }
-.waiting-arcade .garden-hint { top: 76px; }
-// Lift the mobile joystick clear of the bottom dock.
-.waiting-arcade .garden-joystick {
-  bottom: calc(174px + env(safe-area-inset-bottom, 0));
-}
-
-// Topbar — event identity + countdown/status. Floating glass gradient.
-.arcade-topbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  // Above the dock (z-index 5) so the topbar controls stay clickable even
-  // when an open drawer makes the dock grow upward into the topbar band.
-  z-index: 6;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.65rem 0.95rem 1.4rem;
-  background: linear-gradient(180deg, rgba(23, 50, 77, 0.85) 0%, rgba(23, 50, 77, 0) 100%);
-  color: #fff;
-  pointer-events: none;
-
-  &__info {
-    pointer-events: auto;
-    min-width: 0;
-  }
-
-  &__title {
-    color: #fff !important;
-    line-height: 1.15;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-  }
-
-  &__meta {
-    font-size: 0.78rem;
-    opacity: 0.92;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  }
-
-  &__status {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    pointer-events: auto;
-  }
-}
-
-.arcade-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  color: #fff;
-  border-radius: 999px;
-  padding: 0.25rem 0.7rem;
-  font-size: 0.82rem;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
-  &__label {
-    opacity: 0.82;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-
-  &--live {
-    background: #D9364F;
-    border-color: #D9364F;
-    font-weight: 700;
-  }
-
-  &--pulse { animation: arcadeChipPulse 1.6s ease-in-out infinite; }
-}
 
 @keyframes arcadeChipPulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(247, 161, 26, 0.5); }
   50%      { box-shadow: 0 0 0 6px rgba(247, 161, 26, 0); }
 }
 
-.arcade-classic-btn {
-  display: inline-flex;
+// Pulse for the classic-layout countdown box in its last minute
+// (waiting-room.tsx applies `.waiting-countdown--pulse` when < 60s). The
+// class was referenced but never defined — the box sat static. Reuses the
+// arcade pulse so the "starts in" panel draws the eye as the event nears.
+.waiting-countdown--pulse {
+  animation: arcadeChipPulse 1.6s ease-in-out infinite;
+}
+
+// ── Waiting-room DSI shell ──
+// The controls card is the focus; the interactive garden + chat sit in a
+// delimited "Mentre aspetti" aside (a secondary "di cui"). This is the
+// default for every state — the old full-screen arcade takeover is retired.
+.waiting-shell {
+  // dvh (not vh) so iOS Safari's dynamic URL bar doesn't leave the shell
+  // overflowing the viewport.
+  min-height: calc(100dvh - 80px);
+  background: linear-gradient(180deg, #f4f8fc 0%, #e9f1f9 100%);
+}
+
+.wr-aside {
+  border-radius: 16px;
+  overflow: hidden;
+
+  @media (min-width: 992px) {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.wr-aside__head {
+  display: flex;
   align-items: center;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(90deg, #004d99 0%, #0066cc 100%);
   color: #fff;
-  border-radius: 999px;
-  padding: 0.25rem 0.7rem;
+}
+
+.wr-aside__toggle {
+  border: 0;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
   font-size: 0.76rem;
   font-weight: 600;
-  cursor: pointer;
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
 
-  &:hover, &:focus-visible {
-    background: rgba(255, 255, 255, 0.16);
-    border-color: #fff;
+  &:hover {
+    background: rgba(255, 255, 255, 0.28);
   }
 }
 
-// Bottom dock — name + CTA + details toggle. Glass panel pinned bottom.
-.arcade-dock {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 5;
-  padding: 0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0));
-  background: rgba(255, 255, 255, 0.94);
-  border-top: 1px solid rgba(23, 50, 77, 0.12);
-  box-shadow: 0 -6px 24px rgba(23, 50, 77, 0.16);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  pointer-events: auto;
-
-  &__banners { margin-bottom: 0.6rem; }
-
-  &__row {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.9rem;
-    max-width: 980px;
-    margin: 0 auto;
-  }
-
-  &__name {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  &__cta {
-    flex: 0 0 auto;
-    width: clamp(190px, 32%, 280px);
-  }
-
-  &__more {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.2rem;
-    width: 100%;
-    margin-top: 0.5rem;
-    background: transparent;
-    border: 0;
-    color: #0066CC;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-
-    &:hover { text-decoration: underline; }
-  }
+.wr-aside__body {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-// Expandable drawer (inside the dock, grows upward; scrolls internally).
-.arcade-drawer {
-  max-width: 980px;
-  margin: 0 auto 0.7rem;
-
-  &__inner {
-    max-height: 46dvh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.15rem 0.15rem 0.25rem;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .arcade-dock__row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.6rem;
-  }
-  .arcade-dock__cta { width: 100%; }
-  .arcade-topbar__meta { white-space: normal; }
-}
-
-// ── Classic / accessibility layout ──
-// Static, scrollable card on a decorative (non-interactive) garden. Used
-// by the "Vista classica" toggle and for ENDED events.
-.waiting-classic {
+// Boxed game stage — a sized, relative container for GardenInteractive. The
+// inner `.arcade-stage` is absolute inset:0 and is what its ResizeObserver
+// measures, so the avatar fits THIS box instead of the viewport.
+.wr-stage {
   position: relative;
-  min-height: 100%;
-  background: linear-gradient(180deg, #BCE0FF 0%, #FFE9CF 60%, #FFD8B8 100%);
-
-  &__content {
-    position: relative;
-    z-index: 1;
-  }
-}
-
-// ── Card-as-palazzo decorations (commit 3 of the garden polish pass) ──
-// The wait-room card is the structure in the middle of the garden — the
-// avatar walks around it. To make that read visually rather than feel
-// like a floating panel, we add a stone foundation strip below, two
-// small pennants on the pediment, and a heavier ground shadow. All
-// pure CSS + tiny inline SVGs; no images, no JS.
-.waiting-card-frame {
-  position: relative;
-  // Ground shadow ellipse just below the foundation, anchors the card
-  // into the garden visually.
-  &::after {
-    content: '';
-    position: absolute;
-    left: 4%;
-    right: 4%;
-    bottom: -22px;
-    height: 26px;
-    background: radial-gradient(ellipse at center, rgba(23, 50, 77, 0.32) 0%, rgba(23, 50, 77, 0) 70%);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 0;
-  }
+  height: clamp(280px, 42vh, 440px);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #d4e0ec;
+  background: linear-gradient(180deg, #bce0ff 0%, #e8f3d8 100%);
 }
 
 .waiting-card {
@@ -2274,66 +2132,6 @@
   box-shadow:
     0 14px 38px rgba(23, 50, 77, 0.18),
     0 2px 0 rgba(255, 255, 255, 0.55) inset !important;
-}
-
-// Stone foundation. Sits behind the card, slightly wider, with a
-// subtle 2-tone gradient + repeating stone-block hatching for depth.
-.waiting-card-base {
-  position: absolute;
-  left: -10px;
-  right: -10px;
-  bottom: -18px;
-  height: 22px;
-  border-radius: 6px;
-  z-index: 0;
-  background-color: #B3BCC7;
-  background-image:
-    linear-gradient(180deg,
-      #D6DDE4 0%,
-      #B3BCC7 35%,
-      #97A4B0 100%),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0,
-      transparent 38px,
-      rgba(23, 50, 77, 0.18) 38px,
-      rgba(23, 50, 77, 0.18) 40px
-    );
-  background-blend-mode: multiply, normal;
-  box-shadow:
-    0 6px 14px rgba(23, 50, 77, 0.22),
-    0 1px 0 rgba(255, 255, 255, 0.55) inset;
-}
-
-// Tricolour pennants on the pediment. Hidden on very small screens
-// where the card is full-bleed and the flags would just be noise.
-.waiting-card-flag {
-  position: absolute;
-  top: -28px;
-  width: 14px;
-  height: 38px;
-  z-index: 2;
-  pointer-events: none;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
-  animation: gardenSway 5s ease-in-out infinite;
-  transform-origin: 7px 0;
-
-  &--left {
-    left: 22px;
-    animation-delay: -1.7s;
-  }
-  &--right {
-    right: 22px;
-    animation-delay: -3.1s;
-  }
-}
-
-@media (max-width: 380px) {
-  .waiting-card-flag { display: none; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .waiting-card-flag { animation: none; }
 }
 
 .garden-scene {

@@ -24,7 +24,7 @@ export class AudioSystem {
   private loopTimer: ReturnType<typeof setInterval> | null = null;
   private step = 0;
   private stepAccum = STEP_INTERVAL_MS;
-  private enabled = true;
+  private enabled = false;
 
   /** Start (or resume) audio — must be called from a user gesture. */
   resume(): void {

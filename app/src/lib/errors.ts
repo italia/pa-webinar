@@ -44,6 +44,19 @@ export class ConflictError extends AppError {
   }
 }
 
+/**
+ * Duplicate sign-up for the same event+email. A dedicated 409 code
+ * (distinct from the generic CONFLICT used for "event not open for
+ * registration") so the registration form can show the right message
+ * and offer to re-send the access link — instead of falling through to
+ * the generic error the dead `already_registered` branch produced.
+ */
+export class AlreadyRegisteredError extends AppError {
+  constructor(message = 'Already registered for this event') {
+    super(message, 409, 'ALREADY_REGISTERED');
+  }
+}
+
 export class RateLimitError extends AppError {
   constructor(retryAfterSeconds?: number) {
     super('Too many requests', 429, 'RATE_LIMIT');
