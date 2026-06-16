@@ -318,30 +318,89 @@ def transcribe_with_whisperx(
     )
 
 
-def transcribe_single_speaker(
-    audio_path: str,
+def load_asr_model(
+    asr_model_id: str,
     *,
-    language_hint: Optional[str] = None,
-    asr_model_id: str = "large-v3",
     device: str = "cuda",
     compute_type: str = "float16",
     initial_prompt: Optional[str] = None,
-) -> Dict[str, Any]:
-    """ASR di UNA traccia mono-parlante (ADR-013, multitrack).
+) -> Any:
+    """Carica SOLO il modello ASR WhisperX (~3GB).
 
-    Identica a `transcribe_with_whisperx` ma SENZA diarization: la traccia
-    ha un solo parlante noto, quindi pyannote è superfluo. Ritorna
-    ``{"segments": [...], "language": str}`` con tempi LOCALI alla traccia
-    (il merge li shifta su timeline globale). Stesso filtro hallucination
-    + allineamento word-level del path principale.
+    L'ASR è indipendente dalla lingua (Whisper rileva la lingua in fase di
+    decodifica), quindi nel path multitrack va caricato UNA volta e riusato
+    su tutte le tracce. initial_prompt via asr_options (vedi nota in
+    transcribe_with_whisperx).
     """
     import whisperx  # type: ignore[import-not-found]
 
-    # initial_prompt via asr_options (vedi nota in transcribe_with_whisperx).
     asr_options = {"initial_prompt": initial_prompt} if initial_prompt else None
-    asr = whisperx.load_model(
+    return whisperx.load_model(
         asr_model_id, device, compute_type=compute_type, asr_options=asr_options
     )
+
+
+def load_align_model(language: str, *, device: str = "cuda") -> tuple[Any, Any]:
+    """Carica (align_model, align_metadata) per una data lingua.
+
+    Il modello di allineamento dipende SOLO dalla lingua, quindi nel path
+    multitrack va memoizzato per lingua (tracce che condividono lingua
+    condividono il modello)."""
+    import whisperx  # type: ignore[import-not-found]
+
+    return whisperx.load_align_model(language_code=language, device=device)
+
+
+def load_models(
+    asr_model_id: str,
+    language: str,
+    *,
+    device: str = "cuda",
+    compute_type: str = "float16",
+    initial_prompt: Optional[str] = None,
+) -> tuple[Any, Any, Any]:
+    """Carica (ASR, align_model, align_metadata) per WhisperX.
+
+    Convenience combiner di `load_asr_model` + `load_align_model`, usato dal
+    wrapper single-track. Il path multitrack chiama invece i due loader
+    separatamente per riusare l'ASR e memoizzare l'align per lingua.
+
+    initial_prompt via asr_options (vedi nota in transcribe_with_whisperx).
+    """
+    asr = load_asr_model(
+        asr_model_id, device=device, compute_type=compute_type, initial_prompt=initial_prompt
+    )
+    align_model, align_metadata = load_align_model(language, device=device)
+    return asr, align_model, align_metadata
+
+
+def transcribe_single_speaker_with_models(
+    audio_path: str,
+    *,
+    asr: Any,
+    align_model: Any = None,
+    align_metadata: Any = None,
+    get_align_model: Any = None,
+    language_hint: Optional[str] = None,
+    device: str = "cuda",
+) -> Dict[str, Any]:
+    """ASR di UNA traccia mono-parlante usando modelli GIÀ caricati.
+
+    Cuore di `transcribe_single_speaker`: accetta l'ASR precaricato (vedi
+    `load_asr_model`) così il path multitrack può caricarlo una volta e
+    riusarlo su tutte le tracce. Ritorna ``{"segments": [...], "language":
+    str}`` con tempi LOCALI alla traccia. Stesso filtro hallucination +
+    allineamento word-level del path principale.
+
+    Il modello di allineamento è specifico per lingua, ma la lingua è nota
+    solo DOPO l'ASR. Due modi di fornirlo:
+      * `align_model`/`align_metadata` espliciti (lingua già nota), oppure
+      * `get_align_model(language) -> (model, metadata)`: callback chiamata
+        con la lingua rilevata, usata dal path multitrack per memoizzare
+        l'align per lingua tra le tracce.
+    """
+    import whisperx  # type: ignore[import-not-found]
+
     audio = whisperx.load_audio(audio_path)
     result = asr.transcribe(audio, language=language_hint, batch_size=16)
     language = result.get("language") or language_hint or "it"
@@ -359,9 +418,10 @@ def transcribe_single_speaker(
         kept.append(seg)
     result["segments"] = kept
 
-    align_model, metadata = whisperx.load_align_model(language_code=language, device=device)
+    if get_align_model is not None:
+        align_model, align_metadata = get_align_model(language)
     aligned = whisperx.align(
-        result["segments"], align_model, metadata, audio, device, return_char_alignments=False
+        result["segments"], align_model, align_metadata, audio, device, return_char_alignments=False
     )
     segments = [
         {
@@ -375,6 +435,47 @@ def transcribe_single_speaker(
         for s in aligned["segments"]
     ]
     return {"segments": segments, "language": language}
+
+
+def transcribe_single_speaker(
+    audio_path: str,
+    *,
+    language_hint: Optional[str] = None,
+    asr_model_id: str = "large-v3",
+    device: str = "cuda",
+    compute_type: str = "float16",
+    initial_prompt: Optional[str] = None,
+) -> Dict[str, Any]:
+    """ASR di UNA traccia mono-parlante (ADR-013, multitrack).
+
+    Identica a `transcribe_with_whisperx` ma SENZA diarization: la traccia
+    ha un solo parlante noto, quindi pyannote è superfluo. Ritorna
+    ``{"segments": [...], "language": str}`` con tempi LOCALI alla traccia
+    (il merge li shifta su timeline globale). Stesso filtro hallucination
+    + allineamento word-level del path principale.
+
+    Wrapper thin: carica i modelli (per la lingua nota/`it` di default) e
+    delega a `transcribe_single_speaker_with_models`. I chiamanti
+    single-track conservano il comportamento originale (load-then-call). Il
+    path multitrack usa invece `load_models` + il core per riusare i modelli
+    tra le tracce.
+    """
+    language = (language_hint or "it").lower()
+    asr, align_model, align_metadata = load_models(
+        asr_model_id,
+        language,
+        device=device,
+        compute_type=compute_type,
+        initial_prompt=initial_prompt,
+    )
+    return transcribe_single_speaker_with_models(
+        audio_path,
+        asr=asr,
+        align_model=align_model,
+        align_metadata=align_metadata,
+        language_hint=language_hint,
+        device=device,
+    )
 
 
 def transcribe_single_speaker_stub(*, language_hint: Optional[str] = None) -> Dict[str, Any]:
