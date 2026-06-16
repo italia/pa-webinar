@@ -404,7 +404,12 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       // chunk, che arriva ~1s dopo con jitter): è il riferimento per gli
       // offset di sincronizzazione dei late-joiner.
       w.onTrackStarted?.(key, pid, name, Date.now());
-      rec.start(1000); // chunk/sec
+      // timeslice 3s: a molti speaker concorrenti (es. webinar 50pax) un chunk
+      // ogni 1s = un giro IPC pagina→Node per traccia al secondo (qui ×N). 3s
+      // riduce ~3× l'overhead IPC/encode; l'offset è ancorato a onTrackStarted
+      // (non al primo chunk) e finish() flusha l'ultimo chunk su onstop → nessuna
+      // perdita di accuratezza temporale.
+      rec.start(3000);
       recorders.set(track.getId?.() ?? key, { rec, key });
     };
 
