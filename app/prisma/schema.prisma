@@ -195,6 +195,11 @@ model Event {
   // single event, regardless of the site-wide default.
   waitingRoomEngine WaitingRoomEngine? @map("waiting_room_engine")
 
+  // Per-event override for the video/audio quality preset. Null = inherit
+  // SiteSetting.videoQuality. Lets an admin force e.g. MAX on a small
+  // high-stakes call, or SAVE_DATA on a low-bandwidth audience event.
+  videoQuality VideoQuality? @map("video_quality")
+
   // Timestamps
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1018,6 +1023,11 @@ model SiteSetting {
   jitsiWatermarkOpacity  Float   @default(0.4) @map("jitsi_watermark_opacity")
   jitsiWatermarkPosition String  @default("bottom-left") @map("jitsi_watermark_position")
 
+  // Default video/audio quality preset for all events. Overridable per event
+  // (Event.videoQuality). HIGH = 720p with a capped bitrate (favours quality
+  // without maxing bandwidth). See lib/jitsi/config.ts VIDEO_QUALITY_PRESETS.
+  videoQuality VideoQuality @default(HIGH) @map("video_quality")
+
   // External links
   githubUrl    String? @map("github_url")
   supportEmail String? @map("support_email")
@@ -1178,6 +1188,16 @@ enum WaitingRoomEngine {
   GARDEN // giardino SVG interattivo (default storico)
   GAME // lobby 2D Phaser (videogame)
   CLASSIC // card statica (accessibile)
+}
+
+// Preset qualità video/audio. Vedi SiteSetting.videoQuality (default sito),
+// Event.videoQuality (override per-evento) e lib/jitsi/config.ts per la
+// mappatura sui parametri Jitsi (risoluzione, bitrate, Opus).
+enum VideoQuality {
+  SAVE_DATA // 360p, bitrate minimo (banda scarsa)
+  BALANCED // 540p, compromesso
+  HIGH // 720p, bitrate limitato (default — qualità senza saturare la banda)
+  MAX // 1080p, alta fedeltà (call piccole importanti)
 }
 
 // ─── Event Feedback ─────────────────────────────────

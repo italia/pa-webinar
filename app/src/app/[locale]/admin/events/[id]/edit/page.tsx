@@ -151,6 +151,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       recurrenceRule: event.recurrenceRule,
       parseTitleKicker: event.parseTitleKicker,
       waitingRoomEngine: event.waitingRoomEngine,
+      videoQuality: event.videoQuality,
       expectedSenderRatioPct: event.expectedSenderRatioPct,
       permissionMatrix: matrix,
       qaEnabled: event.qaEnabled,
@@ -255,6 +256,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         }))}
         gdprTemplates={gdprTemplates}
         siteDefaultParseTitleKicker={siteSettings.parseTitleKicker}
+        siteDefaultVideoQuality={siteSettings.videoQuality}
       />
     </div>
   );

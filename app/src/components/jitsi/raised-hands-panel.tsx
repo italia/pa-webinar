@@ -6,6 +6,8 @@ import { Button, Icon } from 'design-react-kit';
 
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 
+import { resolveDisplayName, RETRY_DELAYS_MS } from './raised-hands-resolve';
+
 interface RaisedHand {
   id: string;
   displayName: string;
@@ -29,26 +31,6 @@ interface RaisedHandsPanelProps {
    *   caffettino feedback where only moderators had this visibility).
    */
   readOnly?: boolean;
-}
-
-/**
- * Resolves the display name for a participant, retrying once after a
- * short delay if the initial lookup returns empty (race with MUC presence).
- * `localId` + `localName` handle the local-participant case where Jitsi's
- * getParticipantsInfo() returns nothing (it only lists remotes).
- */
-function resolveDisplayName(
-  api: JitsiMeetExternalAPI,
-  participantId: string,
-  localId: string | null,
-  localName: string,
-): string {
-  if (localId && participantId === localId && localName) {
-    return localName;
-  }
-  const info = api.getParticipantsInfo();
-  const p = info.find((pp) => pp.id === participantId);
-  return p?.displayName || p?.formattedDisplayName || '';
 }
 
 export default function RaisedHandsPanel({ api, localDisplayName = '', readOnly = false }: RaisedHandsPanelProps) {
@@ -77,6 +59,34 @@ export default function RaisedHandsPanel({ api, localDisplayName = '', readOnly 
       localIdRef.current = evt.id;
     };
 
+    // For moderators the panel mounts *lazily*, i.e. after
+    // `videoConferenceJoined` has already fired, so the listener above
+    // never runs and `localIdRef` would stay null — leaving the
+    // moderator's own raised hand resolving to empty (getParticipantsInfo
+    // excludes self, so the scan can't recover it either). The
+    // getDisplayName accessor used inside resolveDisplayName still works
+    // for self in most Jitsi builds, and the staggered retries + periodic
+    // sweep below give late presence another chance; the localDisplayName
+    // short-circuit additionally kicks in once the local id is known.
+
+    // Schedule staggered re-resolves for an entry whose name is still empty
+    // (MUC presence in JWT rooms arrives after the raiseHandUpdated event).
+    const scheduleRetries = (id: string) => {
+      RETRY_DELAYS_MS.forEach((delay) => {
+        const timer = setTimeout(() => {
+          retryTimers.delete(timer);
+          const entry = handsRef.current.get(id);
+          if (!entry || entry.displayName) return; // gone or already resolved
+          const retried = resolveDisplayName(api, id, localIdRef.current, localDisplayName);
+          if (retried) {
+            handsRef.current.set(id, { ...entry, displayName: retried });
+            syncHands();
+          }
+        }, delay);
+        retryTimers.add(timer);
+      });
+    };
+
     const onRaiseHand = (evt: { id: string; handRaised: number }) => {
       if (evt.handRaised > 0) {
         const name = resolveDisplayName(api, evt.id, localIdRef.current, localDisplayName);
@@ -87,20 +97,9 @@ export default function RaisedHandsPanel({ api, localDisplayName = '', readOnly 
         });
         syncHands();
 
-        // If name was empty, retry after MUC presence propagates
+        // If name was empty, retry after MUC presence propagates.
         if (!name) {
-          const timer = setTimeout(() => {
-            retryTimers.delete(timer);
-            const entry = handsRef.current.get(evt.id);
-            if (entry && !entry.displayName) {
-              const retried = resolveDisplayName(api, evt.id, localIdRef.current, localDisplayName);
-              if (retried) {
-                handsRef.current.set(evt.id, { ...entry, displayName: retried });
-                syncHands();
-              }
-            }
-          }, 500);
-          retryTimers.add(timer);
+          scheduleRetries(evt.id);
         }
       } else {
         handsRef.current.delete(evt.id);
@@ -137,11 +136,28 @@ export default function RaisedHandsPanel({ api, localDisplayName = '', readOnly 
     };
   }, [api, syncHands, localDisplayName]);
 
-  // Refresh elapsed-time display periodically
+  // Refresh elapsed-time display periodically, and on every tick re-resolve
+  // any raiser whose name is still empty. `displayNameChange` only fires on
+  // an explicit name *change*, not on the initial MUC presence that
+  // populates JWT rooms — this sweep closes that gap for names that arrived
+  // after the staggered retries gave up.
   useEffect(() => {
-    const interval = setInterval(() => setTick((n) => n + 1), 10_000);
+    const interval = setInterval(() => {
+      setTick((n) => n + 1);
+      if (!api) return;
+      let changed = false;
+      for (const [id, entry] of handsRef.current) {
+        if (entry.displayName) continue;
+        const resolved = resolveDisplayName(api, id, localIdRef.current, localDisplayName);
+        if (resolved) {
+          handsRef.current.set(id, { ...entry, displayName: resolved });
+          changed = true;
+        }
+      }
+      if (changed) syncHands();
+    }, 10_000);
     return () => clearInterval(interval);
-  }, []);
+  }, [api, syncHands, localDisplayName]);
 
   const handleApproveAll = useCallback(
     (id: string) => {

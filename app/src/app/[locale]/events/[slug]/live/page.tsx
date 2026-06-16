@@ -11,6 +11,7 @@ import LiveEventClient from '@/components/live/live-event-client';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 
 async function hasJoinGrant(eventId: string): Promise<boolean> {
   const appSecret = process.env.APP_SECRET;
@@ -36,7 +37,9 @@ interface LivePageProps {
 
 export default async function LivePage({ params, searchParams }: LivePageProps) {
   const { slug } = await params;
-  const { token } = await searchParams;
+  // Mutable: a registered participant returning without `?token=` can be
+  // re-identified from the per-event access cookie (see below).
+  let { token } = await searchParams;
   const locale = await getLocale();
 
   const event = await prisma.event.findUnique({
@@ -69,6 +72,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     position: settings.jitsiWatermarkPosition,
   };
 
+  // Video/audio quality: per-event override (Event.videoQuality) inherits the
+  // site default (SiteSetting.videoQuality) when null. Flows down to JitsiRoom.
+  const videoQuality = event.videoQuality ?? settings.videoQuality;
+
   // Informativa AI per la sala d'attesa (AI Act / GDPR trasparenza): la
   // mostriamo quando il master switch è attivo E l'evento ha almeno una
   // feature AI. Il testo è il custom per-locale dell'admin
@@ -93,15 +100,28 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
       redirect(`/${locale}/events/${slug}/password`);
     }
-    // INSTANT calls: anyone with the link can walk in. Allow guest
-    // access for any joinable status (LIVE / IDLE / PROVISIONING) so
-    // the user lands on the waiting-room garden even when the bridge
-    // is still warming up. SCHEDULED events still require a personal
-    // token for any non-LIVE status — that flow goes via /registration.
-    const guestStatuses = isInstant
-      ? ['LIVE', 'IDLE', 'PROVISIONING']
-      : ['LIVE'];
-    if (guestStatuses.includes(event.status)) {
+    // Re-establish a registered participant from the signed per-event access
+    // cookie (set at registration) BEFORE falling back to guest access or the
+    // registration redirect. This is what keeps a refresh / shared link that
+    // dropped the `?token=` out of the /registration → 409 loop.
+    const cookieStore = await cookies();
+    const cookieToken = await verifyEventAccess(
+      event.id,
+      cookieStore.get(eventAccessCookieName(event.id))?.value,
+    );
+    if (cookieToken) {
+      // Fall through to the participant-resolution path below with this token.
+      token = cookieToken;
+    } else if (
+      // INSTANT calls: anyone with the link can walk in. Allow guest access
+      // for any joinable status (LIVE / IDLE / PROVISIONING) so the user lands
+      // on the waiting room even while the bridge warms up. SCHEDULED events
+      // still require a personal token for any non-LIVE status — via
+      // /registration.
+      (isInstant ? ['LIVE', 'IDLE', 'PROVISIONING'] : ['LIVE']).includes(
+        event.status,
+      )
+    ) {
       const title = getLocalized(event.title as LocalizedField, locale);
       return (
         <LiveEventClient
@@ -111,6 +131,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             title,
             parseTitleKicker: resolveKickerEnabled(event, settings.parseTitleKicker),
             waitingRoomEngine: event.waitingRoomEngine ?? settings.waitingRoomEngine,
+            videoQuality,
             startsAt: event.startsAt.toISOString(),
             endsAt: event.endsAt.toISOString(),
             status: event.status,
@@ -152,11 +173,11 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           jibriAvailable={jibriAvailable}
         />
       );
-    }
-    if (isInstant) {
+    } else if (isInstant) {
       notFound();
+    } else {
+      redirect(`/${locale}/events/${slug}/registration`);
     }
-    redirect(`/${locale}/events/${slug}/registration`);
   }
 
   const isPrimaryModerator = event.moderatorToken === token;

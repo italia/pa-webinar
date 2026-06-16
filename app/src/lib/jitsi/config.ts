@@ -257,3 +257,131 @@ export const instantCallConfigOverwrite = {
   startWithAudioMuted: true,
   startWithVideoMuted: true,
 };
+
+// ── Video / audio quality presets ──────────────────────────────────
+//
+// Admin-configurable quality (SiteSetting.videoQuality, overridable per
+// event via Event.videoQuality). Each preset maps to a set of Jitsi
+// IFrame `configOverwrite` keys that ACTUALLY change the stream:
+//   • resolution + constraints.video.height → captured/sent resolution
+//   • videoQuality.maxBitratesVideo          → per-layer bitrate caps (bps)
+//   • maxFullResolutionParticipants          → how many senders keep full-res
+//   • channelLastN                           → how many remote videos received (-1 = all)
+//   • enableLayerSuspension                  → drop unused simulcast layers (saves uplink)
+//   • audioQuality.opusMaxAverageBitrate + stereo + enableOpusRed → audio fidelity
+//
+// `maxHeight` is ALSO applied at runtime via
+// `executeCommand('setVideoQuality', maxHeight)` on join — that command is
+// the most reliable lever across Jitsi builds, so quality changes take
+// effect even if a given build ignores some configOverwrite keys.
+//
+// Note: there is no true "lossless" in WebRTC (VP8/VP9/AV1 + Opus are lossy);
+// MAX is the closest to a no-perceived-loss experience (1080p, high bitrate,
+// 510 kbps stereo Opus). Echo cancellation / noise suppression are kept ON in
+// every preset to avoid regressions on laptop speakers.
+export type VideoQualityPreset = 'SAVE_DATA' | 'BALANCED' | 'HIGH' | 'MAX';
+
+export const VIDEO_QUALITY_PRESETS = ['SAVE_DATA', 'BALANCED', 'HIGH', 'MAX'] as const;
+
+/** Prod default: best perceived quality at 720p with a hard bitrate cap —
+ *  favours quality without maxing bandwidth (the single-JVB-friendly sweet
+ *  spot). Changeable in admin and per event. */
+export const DEFAULT_VIDEO_QUALITY_PRESET: VideoQualityPreset = 'HIGH';
+
+interface VideoQualityDefinition {
+  /** Sent/received resolution ceiling (px height). Used for setVideoQuality. */
+  maxHeight: number;
+  configOverwrite: {
+    resolution: number;
+    constraints: { video: { height: { ideal: number; max: number; min: number } } };
+    maxFullResolutionParticipants: number;
+    channelLastN: number;
+    enableLayerSuspension: boolean;
+    videoQuality: { maxBitratesVideo: { low: number; standard: number; high: number } };
+    audioQuality: { opusMaxAverageBitrate: number };
+    stereo: boolean;
+    enableOpusRed: boolean;
+  };
+}
+
+const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = {
+  SAVE_DATA: {
+    maxHeight: 360,
+    configOverwrite: {
+      resolution: 360,
+      constraints: { video: { height: { ideal: 360, max: 360, min: 180 } } },
+      maxFullResolutionParticipants: 5,
+      channelLastN: 6,
+      enableLayerSuspension: true,
+      videoQuality: { maxBitratesVideo: { low: 120_000, standard: 300_000, high: 600_000 } },
+      audioQuality: { opusMaxAverageBitrate: 24_000 },
+      stereo: false,
+      enableOpusRed: false,
+    },
+  },
+  BALANCED: {
+    maxHeight: 540,
+    configOverwrite: {
+      resolution: 540,
+      constraints: { video: { height: { ideal: 540, max: 540, min: 240 } } },
+      maxFullResolutionParticipants: 10,
+      channelLastN: 20,
+      enableLayerSuspension: true,
+      videoQuality: { maxBitratesVideo: { low: 150_000, standard: 500_000, high: 1_000_000 } },
+      audioQuality: { opusMaxAverageBitrate: 48_000 },
+      stereo: false,
+      enableOpusRed: false,
+    },
+  },
+  HIGH: {
+    maxHeight: 720,
+    configOverwrite: {
+      resolution: 720,
+      constraints: { video: { height: { ideal: 720, max: 720, min: 360 } } },
+      maxFullResolutionParticipants: 25,
+      channelLastN: -1,
+      // Still suspend layers nobody is watching — keeps "favour quality" from
+      // turning into "always max uplink" when a sender is off-screen.
+      enableLayerSuspension: true,
+      videoQuality: { maxBitratesVideo: { low: 200_000, standard: 700_000, high: 2_200_000 } },
+      audioQuality: { opusMaxAverageBitrate: 96_000 },
+      stereo: false,
+      enableOpusRed: true,
+    },
+  },
+  MAX: {
+    maxHeight: 1080,
+    configOverwrite: {
+      resolution: 1080,
+      constraints: { video: { height: { ideal: 1080, max: 1080, min: 540 } } },
+      maxFullResolutionParticipants: 25,
+      channelLastN: -1,
+      // Keep every layer: this preset is for small, high-stakes calls where
+      // fidelity beats bandwidth thrift.
+      enableLayerSuspension: false,
+      videoQuality: { maxBitratesVideo: { low: 300_000, standard: 1_200_000, high: 4_000_000 } },
+      audioQuality: { opusMaxAverageBitrate: 510_000 },
+      stereo: true,
+      enableOpusRed: true,
+    },
+  },
+};
+
+function normalizeQualityPreset(preset?: string | null): VideoQualityPreset {
+  return preset && (VIDEO_QUALITY_PRESETS as readonly string[]).includes(preset)
+    ? (preset as VideoQualityPreset)
+    : DEFAULT_VIDEO_QUALITY_PRESET;
+}
+
+/** Jitsi `configOverwrite` keys for a quality preset. Spread into the iframe
+ *  config so they override the static defaults. Unknown-to-this-build keys are
+ *  harmlessly ignored by Jitsi. */
+export function resolveVideoQualityConfig(preset?: string | null): Record<string, unknown> {
+  return { ...QUALITY_DEFINITIONS[normalizeQualityPreset(preset)].configOverwrite };
+}
+
+/** Max video height (px) for the preset — pass to
+ *  `executeCommand('setVideoQuality', …)` to enforce at runtime. */
+export function videoQualityMaxHeight(preset?: string | null): number {
+  return QUALITY_DEFINITIONS[normalizeQualityPreset(preset)].maxHeight;
+}

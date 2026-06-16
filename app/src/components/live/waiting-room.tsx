@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
@@ -149,9 +149,6 @@ export default function WaitingRoom({
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
   const [classicView, setClassicView] = useState(false);
-  // Expandable bottom drawer in arcade mode (device check, email,
-  // netiquette, recording notice, chat preview).
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [devicePrefs, setDevicePrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: true,
     micOn: true,
@@ -159,6 +156,13 @@ export default function WaitingRoom({
   const [startError, setStartError] = useState('');
   // Consenso esplicito alla registrazione per-partecipante (multitrack).
   const [multitrackConsent, setMultitrackConsent] = useState(false);
+  // "La sala è aperta" cue: a short 3→2→1 countdown shown to a waiting
+  // participant the moment the event flips to LIVE, so the now-active
+  // "Entra ora" CTA can't slip by unnoticed (the old behaviour silently
+  // re-enabled the button). Purely presentational — it never auto-enters
+  // (iOS gesture + multitrack consent are still required on the tap).
+  const prevStatusRef = useRef(event.status);
+  const [liveCountdown, setLiveCountdown] = useState<number | null>(null);
 
   // Rehydrate name + email from localStorage on mount. Name is merged
   // with the server-provided default (registration displayName / grant
@@ -194,9 +198,18 @@ export default function WaitingRoom({
     try {
       let mode: 'GARDEN' | 'GAME' | 'CLASSIC' = event.waitingRoomEngine ?? 'GARDEN';
       const urlE = new URLSearchParams(window.location.search).get('engine');
+      // Touch / coarse-pointer devices (phones, tablets) default to the
+      // accessible CLASSIC card: the walkable park + joystick don't work
+      // well on small touch screens, and the classic layout shows the real
+      // controls (name, email, device check) inline instead of hiding them
+      // in the arcade drawer. An explicit `?engine=` still wins, so a mobile
+      // user can opt back into the game.
+      const isCoarsePointer =
+        window.matchMedia?.('(pointer: coarse)')?.matches ?? false;
       if (urlE === 'phaser') mode = 'GAME';
       else if (urlE === 'svg') mode = 'GARDEN';
       else if (urlE === 'classic') mode = 'CLASSIC';
+      else if (isCoarsePointer) mode = 'CLASSIC';
       if (window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1') mode = 'CLASSIC';
       setEngine(mode === 'GAME' ? 'phaser' : 'svg');
       setClassicView(mode === 'CLASSIC');
@@ -266,6 +279,31 @@ export default function WaitingRoom({
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [isPublished, startsAtMs]);
+
+  // Detect the transition into LIVE while the user is still waiting. The
+  // moderator who pressed "Avvia evento" doesn't need the cue (they know),
+  // so it's participant/guest-only.
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = event.status;
+    if (event.status === 'LIVE' && prev !== 'LIVE' && !isModerator) {
+      setLiveCountdown(3);
+    }
+  }, [event.status, isModerator]);
+
+  // Drive the 3→2→1 cue, then clear it (the active CTA stays put after).
+  useEffect(() => {
+    if (liveCountdown === null) return;
+    if (liveCountdown <= 0) {
+      setLiveCountdown(null);
+      return;
+    }
+    const id = setTimeout(
+      () => setLiveCountdown((n) => (n === null ? null : n - 1)),
+      1000,
+    );
+    return () => clearTimeout(id);
+  }, [liveCountdown]);
 
   const handleStartEvent = useCallback(async () => {
     if (!onStartEvent) return;
@@ -570,12 +608,26 @@ export default function WaitingRoom({
 
   // Primary CTA (non-ended): start (moderator) / enter live / warming-up /
   // scheduled-opening disabled state, plus optional catch-up.
+  const liveCueActive = canEnterLive && liveCountdown !== null;
   const primaryCta = (
     <div className="d-grid gap-2">
       {startError && (
         <Alert color="danger" className="mb-0" style={{ fontSize: '0.85rem' }}>
           {startError}
         </Alert>
+      )}
+      {liveCueActive && (
+        <div
+          className="text-center rounded-3 p-2"
+          role="status"
+          aria-live="assertive"
+          style={{ background: 'linear-gradient(135deg, #008758, #00592f)', color: '#fff' }}
+        >
+          <div className="small text-uppercase fw-semibold opacity-75">
+            {t('roomOpen')}
+          </div>
+          <div className="display-6 fw-bold font-monospace lh-1">{liveCountdown}</div>
+        </div>
       )}
       {isPublished && isModerator && onStartEvent && (
         <Button
@@ -635,314 +687,220 @@ export default function WaitingRoom({
     </div>
   );
 
-  // ── Classic / accessibility layout (also used for ENDED) ──
-  // Static, scrollable card. No interactive avatar — decorative scene
-  // only. Reached via the "Vista classica" toggle or when the event has
-  // ENDED (no point playing in a concluded room).
-  if (isEnded || classicView) {
-    return (
-      <div className="waiting-classic">
-        <GardenScene />
-        <div className="container py-4 waiting-classic__content">
-          <div className="row justify-content-center">
-            <div className="col-lg-8 col-xl-7">
-              {!isEnded && (
-                <div className="text-center mb-3">
-                  <Button
-                    color="primary"
-                    outline
-                    size="sm"
-                    className="fw-semibold"
-                    onClick={() => toggleClassic(false)}
-                  >
-                    <Icon icon="it-arrow-left" size="xs" className="me-1" />
-                    {t('backToGarden')}
-                  </Button>
-                </div>
-              )}
-              <div className="waiting-card-frame">
-                <span className="waiting-card-flag waiting-card-flag--left" aria-hidden="true">
-                  <svg viewBox="0 0 14 38" width="14" height="38" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="6" y="0" width="2" height="38" fill="#5A4029" />
-                    <circle cx="7" cy="1" r="2" fill="#F7A11A" />
-                    <path d="M8 4 L14 8 L8 12 Z" fill="#008758" />
-                    <path d="M8 12 L14 16 L8 20 Z" fill="#F5F7FB" />
-                    <path d="M8 20 L14 24 L8 28 Z" fill="#D9364F" />
-                  </svg>
-                </span>
-                <span className="waiting-card-flag waiting-card-flag--right" aria-hidden="true">
-                  <svg viewBox="0 0 14 38" width="14" height="38" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="6" y="0" width="2" height="38" fill="#5A4029" />
-                    <circle cx="7" cy="1" r="2" fill="#F7A11A" />
-                    <path d="M6 4 L0 8 L6 12 Z" fill="#008758" />
-                    <path d="M6 12 L0 16 L6 20 Z" fill="#F5F7FB" />
-                    <path d="M6 20 L0 24 L6 28 Z" fill="#D9364F" />
-                  </svg>
-                </span>
-                <Card className="waiting-card shadow-sm border-0 overflow-hidden" style={{ borderRadius: 16 }}>
-                  <div
-                    className="waiting-hero"
-                    style={{
-                      height: 180,
-                      background: heroUrl
-                        ? `url("${heroUrl}") center/cover no-repeat`
-                        : 'linear-gradient(135deg, #0066CC, #004080)',
-                      position: 'relative',
-                    }}
-                    aria-hidden={!heroUrl}
-                  >
-                    {isLive && (
-                      <Badge color="danger" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem' }}>
-                        <span className="me-1">●</span>
-                        {t('eventLive')}
-                      </Badge>
-                    )}
-                    {isEnded && (
-                      <Badge color="" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem', backgroundColor: '#E9ECEF', color: 'var(--app-muted)' }}>
-                        {t('endedTitle')}
-                      </Badge>
-                    )}
-                  </div>
-
-                  <CardBody className="p-4 p-md-5">
-                    <EventTitle
-                      title={event.title}
-                      kickerEnabled={event.parseTitleKicker ?? false}
-                      as="h1"
-                      className="h4 fw-bold mb-2"
-                      style={{ color: 'var(--app-text)' }}
-                    />
-
-                    {organizerLine && (
-                      <p className="text-muted mb-2" style={{ fontSize: '0.9rem' }}>{organizerLine}</p>
-                    )}
-
-                    {event.moderatorName && (
-                      <p className="text-muted mb-2" style={{ fontSize: '0.85rem' }}>
-                        <Icon icon="it-user" size="xs" className="me-1" />
-                        {t('moderatedBy', { name: event.moderatorName })}
-                      </p>
-                    )}
-
-                    <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-                      <Icon icon="it-calendar" size="xs" className="me-1" />
-                      {dateLabel}
-                      {' · '}
-                      {startTimeLabel} – {endTimeLabel}
-                    </div>
-
-                    {participantCount > 0 && (
-                      <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-                        <Icon icon="it-user" size="xs" className="me-1" />
-                        {isLive
-                          ? t('connectedParticipants', { count: participantCount })
-                          : t('peopleWaiting', { count: participantCount })}
-                      </div>
-                    )}
-
-                    {isPublished && countdown && (
-                      <div
-                        className={`rounded-3 p-3 mb-4 text-center${pulseCountdown ? ' waiting-countdown--pulse' : ''}`}
-                        style={{ background: 'linear-gradient(135deg, #0066CC, #004080)', color: '#fff' }}
-                      >
-                        <div className="small text-uppercase mb-1 opacity-75">{t('startsIn')}</div>
-                        <div className="display-6 fw-bold font-monospace">{countdown}</div>
-                      </div>
-                    )}
-
-                    {(isWarmingUp || (isLive && jvbReady === false)) && (
-                      <div className="mb-4">{statusBanners}</div>
-                    )}
-
-                    {!isEnded && <div className="mb-3">{nameField}</div>}
-                    {!isEnded && <div className="mb-3">{emailField}</div>}
-                    {!isEnded && <div className="mb-3">{deviceCheckField}</div>}
-
-                    {isPublished && event.waitingRoomAudioUrl && (
-                      <div className="mb-4 d-flex justify-content-center">
-                        <AudioPlayer audioUrl={event.waitingRoomAudioUrl} />
-                      </div>
-                    )}
-
-                    {isEnded ? (
-                      <div className="d-grid gap-2 mb-3">
-                        <h2 className="h5 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
-                          {t('endedTitle')}
-                        </h2>
-                        {hasRecording && (
-                          <a
-                            className="btn btn-primary btn-lg fw-semibold"
-                            href={event.recordingUrl ?? event.tempRecordingUrl ?? '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Icon icon="it-video" size="sm" color="white" className="me-2" />
-                            {t('endedWatchRecording')}
-                          </a>
-                        )}
-                        {(event.feedbackEnabled ?? true) && onLeaveFeedback && (
-                          <Button color="primary" outline size="lg" className="fw-semibold" onClick={onLeaveFeedback}>
-                            <Icon icon="it-star-outline" size="sm" className="me-2" />
-                            {t('endedLeaveFeedback')}
-                          </Button>
-                        )}
-                      </div>
-                    ) : (
-                      <>
-                        {multitrackConsentBlock && (
-                          <div className="mb-3">{multitrackConsentBlock}</div>
-                        )}
-                        <div className="mb-3">{primaryCta}</div>
-                      </>
-                    )}
-
-                    {event.tempRecordingUrl && !isEnded && (
-                      <p className="text-muted mb-3 text-center" style={{ fontSize: '0.8rem' }}>
-                        {t('watchCatchupDesc')}
-                      </p>
-                    )}
-
-                    <div className="mb-3">{netiquetteBlock}</div>
-                    {recordingNoticeBlock && <div className="mb-3">{recordingNoticeBlock}</div>}
-                    {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}
-                    {chatPreviewBlock && <div className="mb-3">{chatPreviewBlock}</div>}
-                    {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
-
-                    {isPublished && !isModerator && (
-                      <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: '0.8rem' }}>
-                        <Icon icon="it-refresh" size="xs" className="me-1" />
-                        {t('autoRefreshHint')}
-                      </p>
-                    )}
-                  </CardBody>
-                </Card>
-                <div className="waiting-card-base" aria-hidden="true" />
-              </div>
-            </div>
-          </div>
+  // ── Unified DSI shell (default for every state) ──
+  // The controls are the focus (main column); the interactive garden/lobby +
+  // chat live in a delimited "Mentre aspetti" box — a secondary "di cui", not
+  // the fulcro. The game box is hidden for ENDED, when multitrack consent is
+  // required (hard-gate), and in the accessibility "classic" view (the default
+  // on touch devices — see the engine-resolution effect above).
+  const showGameBox = !isEnded && !classicView && !multitrackRequired;
+  const gameStageBox =
+    engine === 'phaser' ? (
+      // GAME engine: the Phaser lobby, embedded in the box (no full-screen
+      // chrome — the shell owns the name input + the gated "Entra" CTA, and
+      // the embed has no in-game enter button, so onEnterLive never fires
+      // from here; it's kept wired only for symmetry).
+      <div className="wr-stage">
+        <PhaserLobby
+          embed
+          eventSlug={event.slug}
+          displayName={trimmedName}
+          status={event.status}
+          startsAtMs={startsAtMs}
+          isHost={isModerator}
+          onEnterLive={onEnterLive}
+          onExitClassic={() => toggleClassic(true)}
+        />
+      </div>
+    ) : (
+      // GARDEN engine (default): the SVG walkable garden. Wrapped in
+      // `.arcade-stage` (absolute inset:0) so GardenInteractive's
+      // ResizeObserver fits the avatar to THIS box, not the viewport.
+      <div className="wr-stage" role="group" aria-label={t('whileYouWait')}>
+        <div className="arcade-stage">
+          <GardenScene />
+          <GardenInteractive eventSlug={event.slug} displayName={trimmedName} />
         </div>
       </div>
     );
-  }
-
-  // ── Experimental Phaser lobby engine (opt-in, replaces the arcade) ──
-  // Disattivato quando serve il consenso multitrack: la lobby Phaser non
-  // espone il gate di consenso, quindi forziamo il percorso SVG/classic
-  // dove l'hard-gate è garantito.
-  if (engine === 'phaser' && !multitrackRequired) {
-    return (
-      <PhaserLobby
-        eventSlug={event.slug}
-        displayName={trimmedName}
-        status={event.status}
-        startsAtMs={startsAtMs}
-        isHost={isModerator}
-        onEnterLive={(chosenName, prefs) => {
-          // Persist the name the user settled on inside the lobby, mirroring the
-          // SVG path's handleEnter, before handing off to the consent/Jitsi flow.
-          try {
-            if (chosenName.trim().length >= 2) {
-              window.localStorage.setItem(PARTICIPANT_NAME_KEY, chosenName.trim());
-            }
-          } catch {
-            /* ignore */
-          }
-          onEnterLive(chosenName, prefs);
-        }}
-        // Go straight to the simple static classic card (not the intermediate
-        // SVG arcade). Its own back button returns here to the Phaser lobby.
-        onExitClassic={() => toggleClassic(true)}
-      />
-    );
-  }
-
-  // ── Full-screen walkable park (default experience) ──
-  return (
-    <div className="waiting-arcade">
-      {/* The park fills the viewport; the avatar is the protagonist and
-          is walkable from the first second (see <GardenInteractive>). The
-          functional UI floats over the stage in the topbar/dock/drawer. */}
-      <div className="arcade-stage">
-        <GardenScene />
-        <GardenInteractive eventSlug={event.slug} displayName={trimmedName} />
-      </div>
-
-      {/* Top bar: event identity + countdown / status + classic toggle */}
-      <div className="arcade-topbar">
-        <div className="arcade-topbar__info">
-          <EventTitle
-            title={event.title}
-            kickerEnabled={event.parseTitleKicker ?? false}
-            as="h1"
-            className="h6 fw-bold mb-0 arcade-topbar__title"
-          />
-          <div className="arcade-topbar__meta">
-            <Icon icon="it-calendar" size="xs" className="me-1" />
-            {dateLabel} · {startTimeLabel}–{endTimeLabel}
-            {organizerLine ? ` · ${organizerLine}` : ''}
-          </div>
-        </div>
-        <div className="arcade-topbar__status">
-          {isPublished && countdown && (
-            <span className={`arcade-chip${pulseCountdown ? ' arcade-chip--pulse' : ''}`}>
-              <span className="arcade-chip__label">{t('startsIn')}</span>
-              <strong className="font-monospace">{countdown}</strong>
-            </span>
-          )}
-          {isLive && (
-            <span className="arcade-chip arcade-chip--live">
-              <span className="me-1" aria-hidden="true">●</span>
-              {t('eventLive')}
-            </span>
-          )}
-          <button type="button" className="arcade-classic-btn" onClick={() => toggleClassic(true)}>
+  const asideBox = showGameBox || chatPreviewBlock ? (
+    <Card className="wr-aside shadow-sm border-0">
+      <div className="wr-aside__head">
+        <span className="fw-semibold">{t('whileYouWait')}</span>
+        {showGameBox && (
+          <button
+            type="button"
+            className="wr-aside__toggle"
+            onClick={() => toggleClassic(true)}
+          >
             <Icon icon="it-list" size="xs" className="me-1" />
             {t('classicView')}
           </button>
-        </div>
+        )}
       </div>
+      <div className="wr-aside__body">
+        {showGameBox && gameStageBox}
+        {chatPreviewBlock}
+      </div>
+    </Card>
+  ) : null;
 
-      {/* Bottom dock: (expandable drawer) + name + primary CTA + toggle.
-          The drawer lives inside the dock so the panel grows upward
-          (the dock is pinned to the bottom) and scrolls internally. */}
-      <div className="arcade-dock">
-        {drawerOpen && (
-          <div className="arcade-drawer" id="arcade-drawer" role="region" aria-label={t('details')}>
-            <div className="arcade-drawer__inner">
-              <div className="row g-3">
-                <div className="col-12 col-md-6">{emailField}</div>
-                <div className="col-12 col-md-6">{deviceCheckField}</div>
+  return (
+    <div className="waiting-shell">
+      <div className="container py-4 py-md-5">
+        <div className="row g-4 justify-content-center">
+          <div className={asideBox ? 'col-lg-7 col-xl-6' : 'col-lg-8 col-xl-7'}>
+            <Card className="waiting-card shadow-sm border-0 overflow-hidden" style={{ borderRadius: 16 }}>
+              <div
+                className="waiting-hero"
+                style={{
+                  height: 160,
+                  background: heroUrl
+                    ? `url("${heroUrl}") center/cover no-repeat`
+                    : 'linear-gradient(135deg, #0066CC, #004080)',
+                  position: 'relative',
+                }}
+                aria-hidden={!heroUrl}
+              >
+                {isLive && (
+                  <Badge color="danger" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem' }}>
+                    <span className="me-1">●</span>
+                    {t('eventLive')}
+                  </Badge>
+                )}
+                {isEnded && (
+                  <Badge color="" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem', backgroundColor: '#E9ECEF', color: 'var(--app-muted)' }}>
+                    {t('endedTitle')}
+                  </Badge>
+                )}
               </div>
-              {netiquetteBlock}
-              {recordingNoticeBlock}
-              {aiNoticeBlock}
-              {chatPreviewBlock}
-              {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
-            </div>
+
+              <CardBody className="p-4 p-md-5">
+                <EventTitle
+                  title={event.title}
+                  kickerEnabled={event.parseTitleKicker ?? false}
+                  as="h1"
+                  className="h4 fw-bold mb-2"
+                  style={{ color: 'var(--app-text)' }}
+                />
+
+                {organizerLine && (
+                  <p className="text-muted mb-2" style={{ fontSize: '0.9rem' }}>{organizerLine}</p>
+                )}
+
+                {event.moderatorName && (
+                  <p className="text-muted mb-2" style={{ fontSize: '0.85rem' }}>
+                    <Icon icon="it-user" size="xs" className="me-1" />
+                    {t('moderatedBy', { name: event.moderatorName })}
+                  </p>
+                )}
+
+                <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+                  <Icon icon="it-calendar" size="xs" className="me-1" />
+                  {dateLabel}
+                  {' · '}
+                  {startTimeLabel} – {endTimeLabel}
+                </div>
+
+                {participantCount > 0 && (
+                  <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+                    <Icon icon="it-user" size="xs" className="me-1" />
+                    {isLive
+                      ? t('connectedParticipants', { count: participantCount })
+                      : t('peopleWaiting', { count: participantCount })}
+                  </div>
+                )}
+
+                {isPublished && countdown && (
+                  <div
+                    className={`rounded-3 p-3 mb-4 text-center${pulseCountdown ? ' waiting-countdown--pulse' : ''}`}
+                    style={{ background: 'linear-gradient(135deg, #0066CC, #004080)', color: '#fff' }}
+                  >
+                    <div className="small text-uppercase mb-1 opacity-75">{t('startsIn')}</div>
+                    <div className="display-6 fw-bold font-monospace">{countdown}</div>
+                  </div>
+                )}
+
+                {(isWarmingUp || (isLive && jvbReady === false)) && (
+                  <div className="mb-4">{statusBanners}</div>
+                )}
+
+                {!isEnded && <div className="mb-3">{nameField}</div>}
+                {!isEnded && <div className="mb-3">{emailField}</div>}
+                {!isEnded && <div className="mb-3">{deviceCheckField}</div>}
+
+                {isPublished && event.waitingRoomAudioUrl && (
+                  <div className="mb-4 d-flex justify-content-center">
+                    <AudioPlayer audioUrl={event.waitingRoomAudioUrl} />
+                  </div>
+                )}
+
+                {isEnded ? (
+                  <div className="d-grid gap-2 mb-3">
+                    <h2 className="h5 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+                      {t('endedTitle')}
+                    </h2>
+                    {hasRecording && (
+                      <a
+                        className="btn btn-primary btn-lg fw-semibold"
+                        href={event.recordingUrl ?? event.tempRecordingUrl ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Icon icon="it-video" size="sm" color="white" className="me-2" />
+                        {t('endedWatchRecording')}
+                      </a>
+                    )}
+                    {(event.feedbackEnabled ?? true) && onLeaveFeedback && (
+                      <Button color="primary" outline size="lg" className="fw-semibold" onClick={onLeaveFeedback}>
+                        <Icon icon="it-star-outline" size="sm" className="me-2" />
+                        {t('endedLeaveFeedback')}
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    {multitrackConsentBlock && (
+                      <div className="mb-3">{multitrackConsentBlock}</div>
+                    )}
+                    <div className="mb-3">{primaryCta}</div>
+                  </>
+                )}
+
+                {event.tempRecordingUrl && !isEnded && (
+                  <p className="text-muted mb-3 text-center" style={{ fontSize: '0.8rem' }}>
+                    {t('watchCatchupDesc')}
+                  </p>
+                )}
+
+                {/* Re-show the game box after it was hidden (accessibility /
+                    touch default). Only when the game is actually available. */}
+                {!isEnded && !multitrackRequired && classicView && (
+                  <div className="text-center mb-3">
+                    <Button color="primary" outline size="sm" className="fw-semibold" onClick={() => toggleClassic(false)}>
+                      <Icon icon="it-arrow-left" size="xs" className="me-1" />
+                      {t('backToGarden')}
+                    </Button>
+                  </div>
+                )}
+
+                <div className="mb-3">{netiquetteBlock}</div>
+                {recordingNoticeBlock && <div className="mb-3">{recordingNoticeBlock}</div>}
+                {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}
+                {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
+
+                {isPublished && !isModerator && (
+                  <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: '0.8rem' }}>
+                    <Icon icon="it-refresh" size="xs" className="me-1" />
+                    {t('autoRefreshHint')}
+                  </p>
+                )}
+              </CardBody>
+            </Card>
           </div>
-        )}
-        {(isWarmingUp || (isLive && jvbReady === false)) && (
-          <div className="arcade-dock__banners">{statusBanners}</div>
-        )}
-        {/* Consenso multitrack: sempre visibile sopra il CTA (non nel
-            drawer collassabile) perché è un hard-gate all'ingresso. */}
-        {multitrackConsentBlock && (
-          <div className="arcade-dock__banners">{multitrackConsentBlock}</div>
-        )}
-        <div className="arcade-dock__row">
-          <div className="arcade-dock__name">{nameField}</div>
-          <div className="arcade-dock__cta">{primaryCta}</div>
+
+          {asideBox && <div className="col-lg-5 col-xl-5">{asideBox}</div>}
         </div>
-        <button
-          type="button"
-          className="arcade-dock__more"
-          onClick={() => setDrawerOpen((o) => !o)}
-          aria-expanded={drawerOpen}
-          aria-controls="arcade-drawer"
-        >
-          <Icon icon={drawerOpen ? 'it-collapse' : 'it-expand'} size="xs" className="me-1" />
-          {drawerOpen ? t('hideDetails') : t('details')}
-        </button>
       </div>
     </div>
   );

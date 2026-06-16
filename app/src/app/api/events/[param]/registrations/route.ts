@@ -4,6 +4,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import {
   NotFoundError,
   ConflictError,
+  AlreadyRegisteredError,
   RateLimitError,
   ValidationError,
 } from '@/lib/errors';
@@ -15,6 +16,11 @@ import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { upsertPersonOnRegistration } from '@/lib/persons';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import {
+  buildEventAccessSetCookie,
+  eventAccessTtlSeconds,
+  signEventAccess,
+} from '@/lib/event-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,7 +83,7 @@ export const POST = withErrorHandling(async (request, context) => {
       where: { eventId_emailHash: { eventId: event.id, emailHash } },
     });
     if (existing) {
-      throw new ConflictError('Already registered for this event');
+      throw new AlreadyRegisteredError();
     }
 
     const personId = await upsertPersonOnRegistration(tx, {
@@ -142,6 +148,16 @@ export const POST = withErrorHandling(async (request, context) => {
     eventPageUrl,
   });
 
+  // Per-event access cookie: lets the browser return to /live after losing
+  // the `?token=` (refresh, bookmark, back via the event page) without being
+  // bounced into the /registration → 409 loop.
+  const ttl = eventAccessTtlSeconds(event.endsAt);
+  const eventCookie = buildEventAccessSetCookie(
+    event.id,
+    await signEventAccess(event.id, accessToken, ttl),
+    ttl,
+  );
+
   return Response.json(
     {
       id: registration.id,
@@ -152,6 +168,6 @@ export const POST = withErrorHandling(async (request, context) => {
       accessToken,
       joinUrl,
     },
-    { status: 201, headers: { 'Cache-Control': 'no-store' } },
+    { status: 201, headers: { 'Cache-Control': 'no-store', 'Set-Cookie': eventCookie } },
   );
 });

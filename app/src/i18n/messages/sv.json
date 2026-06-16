@@ -130,7 +130,12 @@
     "submitting": "Anmäler...",
     "success": "Anmälan genomförd!",
     "successMessage": "Du kommer att få ett bekräftelsemeddelande med länken till evenemanget.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Du är redan anmäld till detta evenemang",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Tillbaka till evenemanget",
     "organization": "Organisation",
     "organizationPlaceholder": "t.ex. AGID, Ekonomiministeriet, Roms kommun",
@@ -1138,7 +1143,22 @@
         "previewBody": "Evenemang med {participants} förväntade deltagare med {ratio}% sender → {senders} sender + {receivers} passiva → {cores} uppskattade kärnor → {jvbs} JVB.",
         "graceSection": "Mjuk avslutning (slut på evenemang)",
         "eventGracePeriodMinutes": "Minuter respit efter endsAt (standard)",
-        "eventGracePeriodMinutesHelp": "Extra tid som ges efter den planerade sluttiden innan samtalet stängs. 0 = hård stopp, -1 = aldrig auto-stäng (lämnas till idle-cleanup), 15 = banner och stängning efter 15 min. Varje evenemang kan åsidosätta."
+        "eventGracePeriodMinutesHelp": "Extra tid som ges efter den planerade sluttiden innan samtalet stängs. 0 = hård stopp, -1 = aldrig auto-stäng (lämnas till idle-cleanup), 15 = banner och stängning efter 15 min. Varje evenemang kan åsidosätta.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Topplisten (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Ditt namn",
     "nameHelp": "Visas för andra deltagare",
     "joinNowBtn": "Anslut nu",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Öppnas {time}",
     "netiquetteTitle": "Goda råd för deltagande",
     "netiquetteBullet1": "Kom några minuter tidigare för att testa mikrofon och webbkamera",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Ange en giltig e-postadress",
     "chatLockedMessage": "Ange ditt namn för att delta i evenemangets chatt.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Videoinspelning",

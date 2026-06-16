@@ -12,6 +12,9 @@ import {
   moderatorToolbarButtons,
   mobileBaseToolbarButtons,
   mobileModeratorToolbarButtons,
+  resolveVideoQualityConfig,
+  videoQualityMaxHeight,
+  type VideoQualityPreset,
 } from '@/lib/jitsi/config';
 
 interface WatermarkSettings {
@@ -35,6 +38,10 @@ interface JitsiRoomProps {
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
   enableFileSharing?: boolean;
+  /** Video/audio quality preset (admin SiteSetting, per-event override).
+   *  Drives resolution, bitrate caps, channelLastN and Opus settings, and is
+   *  also enforced at runtime via setVideoQuality. Defaults to HIGH. */
+  videoQuality?: VideoQualityPreset;
   /** If true, the iframe initializes with the local video track muted.
    *  Reflects the user's pre-join DeviceCheck toggle so the choice
    *  actually takes effect when the user lands in the Jitsi room. */
@@ -72,6 +79,7 @@ export default function JitsiRoom({
   participantsCanStartVideo = true,
   participantsCanShareScreen = true,
   enableFileSharing = false,
+  videoQuality,
   startWithVideoMuted = false,
   startWithAudioMuted = false,
   watermark,
@@ -126,6 +134,12 @@ export default function JitsiRoom({
       : (isMobileRef.current ? [...mobileBaseToolbarButtons] : [...baseToolbarButtons]);
 
     const extraConfig: Record<string, unknown> = {};
+
+    // Video/audio quality preset (admin-configurable). Spread first so the
+    // per-role/per-permission keys below can still win on any overlap; these
+    // keys (resolution, constraints, videoQuality, channelLastN, audioQuality…)
+    // override the static defaults in `jitsiConfigOverwrite`.
+    Object.assign(extraConfig, resolveVideoQualityConfig(videoQuality));
 
     // Moderators need the participants-pane "rimuovi utente" (kick) to
     // actually fire — the global default has `disableKick: true` to hide
@@ -276,6 +290,14 @@ export default function JitsiRoom({
         api.addListener('videoConferenceJoined', () => {
           if (disposedRef.current) return;
           setLoadState('ready');
+          // Enforce the quality preset at runtime too. setVideoQuality is the
+          // most reliable lever across Jitsi builds (caps the received video
+          // height); the configOverwrite keys above cap the sent stream.
+          try {
+            api.executeCommand('setVideoQuality', videoQualityMaxHeight(videoQuality));
+          } catch {
+            /* older builds may not expose the command — configOverwrite still applies */
+          }
           // ADR-013 Fase 0 — t0 della timeline = momento del join. Gli atMs
           // accumulati sono relativi a questo istante.
           speakerT0Ref.current = Date.now();
@@ -378,7 +400,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, startWithVideoMuted, startWithAudioMuted]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, videoQuality, startWithVideoMuted, startWithAudioMuted]);
 
   return (
     <div className="jitsi-wrapper position-relative">

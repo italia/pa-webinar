@@ -119,6 +119,7 @@ export const POST = withErrorHandling(async (request) => {
       waitingRoomAudioUrl: data.waitingRoomAudioUrl,
       parseTitleKicker: data.parseTitleKicker ?? null,
       waitingRoomEngine: data.waitingRoomEngine ?? null,
+      videoQuality: data.videoQuality ?? null,
       expectedSenderRatioPct: data.expectedSenderRatioPct ?? null,
       capacityEstimateJson: {
         ...capacityEstimate,

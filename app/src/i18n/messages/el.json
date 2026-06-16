@@ -130,7 +130,12 @@
     "submitting": "Εγγραφή σε εξέλιξη...",
     "success": "Η εγγραφή ολοκληρώθηκε!",
     "successMessage": "Θα λάβετε email επιβεβαίωσης με τον σύνδεσμο πρόσβασης στην εκδήλωση.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Είστε ήδη εγγεγραμμένοι σε αυτή την εκδήλωση",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Επιστροφή στην εκδήλωση",
     "organization": "Φορέας",
     "organizationPlaceholder": "π.χ. AGID, Υπουργείο Οικονομικών, Δήμος Ρώμης",
@@ -1138,7 +1143,22 @@
         "previewBody": "Εκδήλωση με {participants} εκτιμώμενους συμμετέχοντες στο {ratio}% senders → {senders} senders + {receivers} παθητικοί → {cores} εκτιμώμενα cores → {jvbs} JVB.",
         "graceSection": "Ομαλή έξοδος (λήξη εκδήλωσης)",
         "eventGracePeriodMinutes": "Λεπτά περιθωρίου μετά το endsAt (προεπιλογή)",
-        "eventGracePeriodMinutesHelp": "Επιπλέον χρόνος μετά την προγραμματισμένη ώρα λήξης πριν κλείσει η κλήση. 0 = σκληρό κλείσιμο, -1 = χωρίς αυτόματο κλείσιμο (στον cleanup αδράνειας), 15 = banner και κλείσιμο μετά από 15 λεπτά. Κάθε εκδήλωση μπορεί να το παρακάμψει."
+        "eventGracePeriodMinutesHelp": "Επιπλέον χρόνος μετά την προγραμματισμένη ώρα λήξης πριν κλείσει η κλήση. 0 = σκληρό κλείσιμο, -1 = χωρίς αυτόματο κλείσιμο (στον cleanup αδράνειας), 15 = banner και κλείσιμο μετά από 15 λεπτά. Κάθε εκδήλωση μπορεί να το παρακάμψει.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Επάνω γραμμή (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Το όνομά σας",
     "nameHelp": "Θα εμφανιστεί στους άλλους συμμετέχοντες",
     "joinNowBtn": "Είσοδος τώρα",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Άνοιγμα στις {time}",
     "netiquetteTitle": "Καλές πρακτικές συμμετοχής",
     "netiquetteBullet1": "Φτάστε λίγα λεπτά νωρίτερα για να ελέγξετε μικρόφωνο και κάμερα",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Εισαγάγετε έγκυρη διεύθυνση email",
     "chatLockedMessage": "Εισαγάγετε το όνομά σας για να συμμετάσχετε στο chat της εκδήλωσης.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Βιντεοσκόπηση",

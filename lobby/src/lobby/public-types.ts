@@ -33,6 +33,15 @@ export interface LobbyConfig {
    * to the classic/SVG experience. No-op (button hidden) when not provided.
    */
   onExitToClassic?: () => void;
+  /**
+   * Embed mode: the lobby renders inside a small boxed area of the host page
+   * (the waiting-room "Mentre aspetti" card) rather than full-screen. The
+   * full-screen chrome (onboarding modal, top bar + enter button, status
+   * badge, device panel) is suppressed — the host shell owns the name input
+   * and the "Entra" CTA, so the box is an ambient, walkable world preview.
+   * Default false (stand-alone full-screen lobby).
+   */
+  embed?: boolean;
 }
 
 export interface LobbyDeps {

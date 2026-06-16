@@ -142,7 +142,12 @@
     "submitting": "Registrazione in corso...",
     "success": "Registrazione completata!",
     "successMessage": "Riceverai un'email di conferma con il link per accedere all'evento.",
+    "enteringRoom": "Ti stiamo portando nella sala d'attesa dell'evento.",
+    "enteringRoomHint": "Apertura della sala…",
     "alreadyRegistered": "Sei già registrato a questo evento",
+    "resendLink": "Invia di nuovo il link di accesso",
+    "resending": "Invio in corso…",
+    "resendSent": "Se l'indirizzo è registrato, ti abbiamo inviato di nuovo il link di accesso via email.",
     "backToEvent": "Torna all'evento",
     "organization": "Ente di appartenenza",
     "organizationPlaceholder": "es. AGID, Ministero dell'Economia, Comune di Roma",
@@ -492,7 +497,16 @@
         "senderRatioLabel": "Percentuale attiva stimata",
         "senderRatioHelp": "Quanti partecipanti si aspettano di avere microfono/video attivo. Aiuta a dimensionare il server video.",
         "activeParticipantsEstimate": "≈ {count} partecipanti attivi",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "videoQuality": "Qualità video/audio (questo evento)",
+        "videoQualityHelp": "Sovrascrive il default del sito per questo evento. Qualità più alta consuma più banda.",
+        "videoQualitySiteDefault": "Predefinita del sito",
+        "videoQualityOptions": {
+          "MAX": "Massima (1080p, alta fedeltà)",
+          "HIGH": "Alta (720p, consigliata)",
+          "BALANCED": "Bilanciata (540p)",
+          "SAVE_DATA": "Risparmio dati (360p)"
+        }
       },
       "step2": {
         "heading": "Chi può fare cosa",
@@ -1286,7 +1300,22 @@
         "previewBody": "Evento con {participants} partecipanti stimati al {ratio}% di sender → {senders} sender + {receivers} passivi → {cores} core stimati → {jvbs} JVB.",
         "graceSection": "Soft exit (fine evento)",
         "eventGracePeriodMinutes": "Minuti di grazia dopo endsAt (default)",
-        "eventGracePeriodMinutesHelp": "Tempo extra concesso dopo l'orario di fine previsto prima di chiudere la call. 0 = chiusura dura, -1 = non auto-chiudere (lascia al cleanup di inattività), 15 = banner e chiusura dopo 15 min. Ogni evento può overridare."
+        "eventGracePeriodMinutesHelp": "Tempo extra concesso dopo l'orario di fine previsto prima di chiudere la call. 0 = chiusura dura, -1 = non auto-chiudere (lascia al cleanup di inattività), 15 = banner e chiusura dopo 15 min. Ogni evento può overridare.",
+        "videoQualitySection": "Qualità video/audio",
+        "videoQuality": "Qualità predefinita",
+        "videoQualityHelp": "Preset applicato a tutti gli eventi (sovrascrivibile per singolo evento). Più alta è la qualità, più banda serve: «Alta» è il miglior compromesso. Si applica subito, senza riavvii.",
+        "videoQualityOptions": {
+          "MAX": "Massima — 1080p",
+          "HIGH": "Alta — 720p (consigliata)",
+          "BALANCED": "Bilanciata — 540p",
+          "SAVE_DATA": "Risparmio dati — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, bitrate fino a ~4 Mbps, audio Opus stereo 510 kbps. Massima fedeltà per call piccole e importanti — consuma più banda e carica di più il ponte video.",
+          "HIGH": "720p con bitrate limitato (~2,2 Mbps di picco) e audio Opus 96 kbps. Qualità ottima senza saturare la banda: il compromesso consigliato per la produzione.",
+          "BALANCED": "540p con bitrate contenuto (~1 Mbps) e meno video ricevuti in contemporanea. Adatto a pubblici numerosi o reti deboli.",
+          "SAVE_DATA": "360p a bitrate minimo (~600 kbps) con sospensione dei livelli inutilizzati. Per connessioni molto lente."
+        }
       },
       "header": {
         "slimBarTitle": "Barra superiore (Slim Header)",
@@ -3050,6 +3079,8 @@
     "nameLabel": "Il tuo nome",
     "nameHelp": "Apparirà agli altri partecipanti",
     "joinNowBtn": "Entra ora",
+    "roomOpen": "La sala è aperta",
+    "whileYouWait": "Mentre aspetti",
     "openingAt": "Apertura alle {time}",
     "netiquetteTitle": "Buone pratiche per partecipare",
     "netiquetteBullet1": "Arriva pochi minuti prima per testare microfono e webcam",
@@ -3071,8 +3102,6 @@
     "chatLockedMessage": "Inserisci il tuo nome per partecipare alla chat dell'evento.",
     "classicView": "Vista classica",
     "backToGarden": "Torna al parco",
-    "details": "Mostra dettagli",
-    "hideDetails": "Nascondi dettagli",
     "aiNoticeTitle": "Elaborazione AI dopo l'evento",
     "aiNotice": "Al termine, la registrazione sarà elaborata da strumenti di intelligenza artificiale per generare trascrizione, sintesi ed eventuali traduzioni e doppiaggi. Gli artefatti possono contenere imprecisioni; il video resta la fonte autoritativa.",
     "multitrackConsentTitle": "Registrazione per partecipante",

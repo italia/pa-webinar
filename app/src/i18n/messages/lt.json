@@ -130,7 +130,12 @@
     "submitting": "Registruojama...",
     "success": "Registracija baigta!",
     "successMessage": "Gausite patvirtinimo el. laišką su nuoroda prisijungti prie renginio.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Jūs jau esate užsiregistravę į šį renginį",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Grįžti prie renginio",
     "organization": "Organizacija",
     "organizationPlaceholder": "pvz. AGID, Ekonomikos ministerija, Romos savivaldybė",
@@ -1138,7 +1143,22 @@
         "previewBody": "Renginys su {participants} numatomais dalyviais, esant {ratio}% siuntėjų → {senders} siuntėjų + {receivers} pasyvūs → {cores} numatomi branduoliai → {jvbs} JVB.",
         "graceSection": "Švelnus išėjimas (renginio pabaiga)",
         "eventGracePeriodMinutes": "Numatytasis malonės minutės po endsAt",
-        "eventGracePeriodMinutesHelp": "Papildomas laikas po numatytos pabaigos prieš uždarant skambutį. 0 = griežtas uždarymas, -1 = neuždaryti automatiškai (palikti neaktyvumo valymui), 15 = reklamjuostė ir uždarymas po 15 min. Kiekvienas renginys gali pakeisti."
+        "eventGracePeriodMinutesHelp": "Papildomas laikas po numatytos pabaigos prieš uždarant skambutį. 0 = griežtas uždarymas, -1 = neuždaryti automatiškai (palikti neaktyvumo valymui), 15 = reklamjuostė ir uždarymas po 15 min. Kiekvienas renginys gali pakeisti.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Viršutinė juosta (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Jūsų vardas",
     "nameHelp": "Jį matys kiti dalyviai",
     "joinNowBtn": "Įeiti dabar",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Atidaroma {time}",
     "netiquetteTitle": "Geroji dalyvavimo praktika",
     "netiquetteBullet1": "Atvykite kelias minutes anksčiau, kad galėtumėte išbandyti mikrofoną ir kamerą",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Įveskite teisingą el. pašto adresą",
     "chatLockedMessage": "Įveskite savo vardą, kad galėtumėte dalyvauti renginio pokalbyje.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Vaizdo įrašas",

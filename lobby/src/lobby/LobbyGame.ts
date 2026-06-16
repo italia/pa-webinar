@@ -54,6 +54,7 @@ export class LobbyGame {
       map: config.map ?? 'piazza',
       assets: config.assets,
       canExitClassic: !!config.onExitToClassic,
+      embed: config.embed ?? false,
     };
 
     this.onExitToClassic = config.onExitToClassic;
@@ -112,18 +113,26 @@ export class LobbyGame {
     });
 
     // ── UI overlays ──
+    // In embed mode the host shell owns identity + the "Entra" CTA, so the
+    // full-screen chrome is suppressed: no onboarding modal, no top bar (and
+    // therefore no enter button / device panel trigger — entry is the host's
+    // job), no status badge. The world + the mobile joystick remain so the box
+    // is a walkable ambient preview. This also removes the in-game join path,
+    // so entry only ever goes through the host's gated CTA.
     const profileDeps = {
       getProfile: () => this.snapshot(),
       setProfile: (p: Partial<PlayerProfile>) => this.setProfile(p),
     };
-    this.ui.push(
-      new StatusBadge(this.uiRoot, this.bus),
-      new TopBar(this.uiRoot, this.bus, { canExitClassic: resolved.canExitClassic }),
-      new PersonalizationBar(this.uiRoot, this.bus, profileDeps),
-      new ConfigPanel(this.uiRoot, this.bus, deps.media),
-      new Onboarding(this.uiRoot, this.bus, profileDeps),
-      new Joystick(this.uiRoot, this.bus),
-    );
+    if (!resolved.embed) {
+      this.ui.push(
+        new StatusBadge(this.uiRoot, this.bus),
+        new TopBar(this.uiRoot, this.bus, { canExitClassic: resolved.canExitClassic }),
+        new PersonalizationBar(this.uiRoot, this.bus, profileDeps),
+        new ConfigPanel(this.uiRoot, this.bus, deps.media),
+        new Onboarding(this.uiRoot, this.bus, profileDeps),
+      );
+    }
+    this.ui.push(new Joystick(this.uiRoot, this.bus));
 
     // ── Top-bar actions ──
     this.busUnsubs.push(

@@ -95,6 +95,10 @@ const eventBaseSchema = z.object({
   // videogame lobby, CLASSIC = static accessible card.
   waitingRoomEngine: z.enum(['GARDEN', 'GAME', 'CLASSIC']).nullable().optional(),
 
+  // Per-event video/audio quality override. Null/omitted inherits
+  // SiteSetting.videoQuality. See lib/jitsi/config.ts VIDEO_QUALITY_PRESETS.
+  videoQuality: z.enum(['SAVE_DATA', 'BALANCED', 'HIGH', 'MAX']).nullable().optional(),
+
   // ── AI postprod opt-ins (per-event). Master gate is the global
   //    SiteSetting.aiPipelineEnabled; these toggles let an organizer
   //    decide cosa generare per il singolo evento. Vedi schema.prisma
