@@ -237,6 +237,23 @@ def run_transcribe_multitrack(app: cli.AppClient, job: cli.ClaimResponse) -> Non
             except Exception:  # noqa: BLE001 — mix opzionale (Jibri assente)
                 log.info("mix Jibri non disponibile: uso gli offset del manifest")
 
+        # Riuso modelli tra tracce: l'ASR (~3GB) è indipendente dalla lingua
+        # → caricato UNA volta prima del loop (non N volte, una per traccia).
+        # Il modello di allineamento dipende dalla lingua → memoizzato per
+        # lingua (le tracce condividono tipicamente la stessa lingua).
+        asr_model = None
+        align_cache: Dict[str, Any] = {}
+        if not stub:
+            asr_model = tr.load_asr_model(
+                job.providerHints.asrModelId or "large-v3",
+                initial_prompt=job.providerHints.asrInitialPrompt,
+            )
+
+        def _get_align(language: str):
+            if language not in align_cache:
+                align_cache[language] = tr.load_align_model(language)
+            return align_cache[language]
+
         for idx, ti in enumerate(track_inputs):
             audio_path = os.path.join(workdir, f"track-{idx}.audio")
             cli.download_to_file(ti.downloadUrl, audio_path)
@@ -248,11 +265,11 @@ def run_transcribe_multitrack(app: cli.AppClient, job: cli.ClaimResponse) -> Non
             if stub:
                 tres = tr.transcribe_single_speaker_stub(language_hint=src_lang)
             else:
-                tres = tr.transcribe_single_speaker(
+                tres = tr.transcribe_single_speaker_with_models(
                     audio_path,
+                    asr=asr_model,
+                    get_align_model=_get_align,
                     language_hint=src_lang,
-                    asr_model_id=(job.providerHints.asrModelId or "large-v3"),
-                    initial_prompt=job.providerHints.asrInitialPrompt,
                 )
             detected_lang = tres.get("language") or detected_lang
 

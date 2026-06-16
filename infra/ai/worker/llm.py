@@ -316,6 +316,36 @@ def translate_text(
     )
 
 
+TRANSLATE_BATCH_SYSTEM_PROMPT = """\
+You are a professional translator for public administration documents.
+You will receive a numbered list of subtitle lines (one phrase per line,
+in the form "N. text"). Translate EACH line into {target}, preserving
+meaning, tone, named entities and any in-text formatting. Keep EXACTLY
+the same numbering and the same number of lines, one translation per
+input line, in the same order. Do not merge or split lines. Do not add
+commentary. Output only the numbered translated lines.
+Target language: {target}.
+"""
+
+
+def _parse_numbered_lines(resp: str, n: int) -> Optional[List[str]]:
+    """Parse an LLM reply formatted as ``N. text`` back into a list of
+    length ``n``, in index order. Returns ``None`` if the round-trip
+    fails (any of the ``n`` expected indices is missing) so the caller
+    can fall back to per-segment translation."""
+    import re
+
+    parsed: Dict[int, str] = {}
+    for raw in resp.splitlines():
+        m = re.match(r"^\s*(\d+)\.\s*(.*)$", raw)
+        if m:
+            idx = int(m.group(1)) - 1
+            parsed[idx] = m.group(2).strip()
+    if len(parsed) != n or any(i not in parsed for i in range(n)):
+        return None
+    return [parsed[i] for i in range(n)]
+
+
 def translate_segments(
     *,
     segments: List[Dict[str, Any]],
@@ -323,22 +353,105 @@ def translate_segments(
     base_url: Optional[str],
     model_id: Optional[str],
 ) -> List[Dict[str, Any]]:
-    """Translate each segment's text in-place, preserving timing and
-    speaker labels. Done one segment at a time (simple, predictable;
-    optimise to batched calls when latency becomes a concern)."""
+    """Translate each segment's text, preserving timing and speaker
+    labels and the input order.
+
+    Segments are translated in batches (one numbered prompt per
+    ~``BATCH`` lines, parsed back by index) to avoid one vLLM
+    round-trip per segment — a 1-2h meeting would otherwise pin the
+    GPU with hundreds-to-thousands of serial calls per locale. Mirrors
+    the proven pattern in ``correct_transcript_segments``. If a batch's
+    reply fails the line-count round-trip, we fall back to per-segment
+    translation for that batch only (count mismatch → safe recovery).
+    """
     out: List[Dict[str, Any]] = []
-    for seg in segments:
-        src = (seg.get("text") or "").strip()
-        if not src:
-            out.append(seg)
+    if _stub_enabled() or not base_url or not model_id:
+        # Mantieni il comportamento storico in stub mode (test downstream):
+        # delega a translate_text per ogni segmento non vuoto.
+        for seg in segments:
+            src = (seg.get("text") or "").strip()
+            if not src:
+                out.append(seg)
+                continue
+            translated = translate_text(
+                text=src,
+                target_language=target_language,
+                base_url=base_url,
+                model_id=model_id,
+            )
+            out.append({**seg, "text": translated.strip()})
+        return out
+
+    # Batch: N=40 righe per richiesta — sotto i limiti di token e riduce
+    # il "drift" su prompt troppo lunghi (stesso valore di
+    # correct_transcript_segments).
+    BATCH = 40
+    for i in range(0, len(segments), BATCH):
+        batch = segments[i : i + BATCH]
+        # Solo i segmenti con testo vanno tradotti; gli altri passano intatti
+        # ma manteniamo le posizioni per ricomporre l'output nell'ordine.
+        nonempty_idx = [j for j, seg in enumerate(batch) if (seg.get("text") or "").strip()]
+        if not nonempty_idx:
+            out.extend(batch)
             continue
-        translated = translate_text(
-            text=src,
-            target_language=target_language,
-            base_url=base_url,
-            model_id=model_id,
-        )
-        out.append({**seg, "text": translated.strip()})
+        texts = [(batch[j].get("text") or "").strip() for j in nonempty_idx]
+        numbered = "\n".join(f"{k + 1}. {line}" for k, line in enumerate(texts))
+        translations: Optional[List[str]] = None
+        try:
+            resp = _chat_completions(
+                base_url=base_url,
+                model_id=model_id,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": TRANSLATE_BATCH_SYSTEM_PROMPT.format(
+                            target=target_language
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            "Lines to translate (one phrase per line, numbered):\n"
+                            + numbered
+                        ),
+                    },
+                ],
+                # Translations should be deterministic.
+                temperature=0.0,
+            )
+            translations = _parse_numbered_lines(resp, len(texts))
+        except Exception as e:  # noqa: BLE001
+            log.warning(
+                "translation batch %d failed: %s — falling back to per-segment", i, e
+            )
+            translations = None
+
+        if translations is None:
+            # Round-trip fallito (count mismatch o errore) → traduci la
+            # batch un segmento alla volta, recuperando il risultato.
+            log.info("translation batch %d round-trip failed — per-segment fallback", i)
+            per_seg = {
+                j: translate_text(
+                    text=(batch[j].get("text") or "").strip(),
+                    target_language=target_language,
+                    base_url=base_url,
+                    model_id=model_id,
+                ).strip()
+                for j in nonempty_idx
+            }
+            for j, seg in enumerate(batch):
+                if j in per_seg:
+                    out.append({**seg, "text": per_seg[j]})
+                else:
+                    out.append(seg)
+            continue
+
+        by_idx = dict(zip(nonempty_idx, translations))
+        for j, seg in enumerate(batch):
+            if j in by_idx:
+                out.append({**seg, "text": by_idx[j].strip()})
+            else:
+                out.append(seg)
     return out
 
 
