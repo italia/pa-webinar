@@ -9,6 +9,7 @@ import EventWizard from '@/components/admin/event-wizard/wizard-shell';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 import CreateInstantCall from '@/components/admin/create-instant-call';
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
+import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
 interface TemplateSummary {
   id: string;
@@ -59,6 +60,7 @@ interface Props {
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   siteDefaultParseTitleKicker: boolean;
+  siteDefaultVideoQuality: VideoQualityPreset;
 }
 
 export default function CreateEventWithTemplate({
@@ -73,6 +75,7 @@ export default function CreateEventWithTemplate({
   availableTags,
   gdprTemplates,
   siteDefaultParseTitleKicker,
+  siteDefaultVideoQuality,
 }: Props) {
   const t = useTranslations('admin.templates');
   const ti = useTranslations('admin.instantCall');
@@ -172,6 +175,7 @@ export default function CreateEventWithTemplate({
       availableTags={availableTags}
       gdprTemplates={gdprTemplates}
       siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
+      siteDefaultVideoQuality={siteDefaultVideoQuality}
     />
   );
 }

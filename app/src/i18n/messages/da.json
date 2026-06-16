@@ -130,7 +130,12 @@
     "submitting": "Tilmelder...",
     "success": "Tilmelding gennemført!",
     "successMessage": "Du modtager en bekræftelsesmail med linket til begivenheden.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Du er allerede tilmeldt denne begivenhed",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Tilbage til begivenheden",
     "organization": "Organisation",
     "organizationPlaceholder": "f.eks. AGID, Økonomiministeriet, Roms Kommune",
@@ -1138,7 +1143,22 @@
         "previewBody": "Arrangement med {participants} estimerede deltagere ved {ratio} % sendere → {senders} sendere + {receivers} passive → {cores} estimerede kerner → {jvbs} JVB.",
         "graceSection": "Soft exit (afslutning af arrangement)",
         "eventGracePeriodMinutes": "Minutters henstand efter endsAt (standard)",
-        "eventGracePeriodMinutesHelp": "Ekstra tid efter den planlagte sluttid før opkaldet lukkes. 0 = hård lukning, -1 = luk aldrig automatisk (overlad til inaktivitetsoprydning), 15 = banner og lukning efter 15 min. Hvert arrangement kan tilsidesætte."
+        "eventGracePeriodMinutesHelp": "Ekstra tid efter den planlagte sluttid før opkaldet lukkes. 0 = hård lukning, -1 = luk aldrig automatisk (overlad til inaktivitetsoprydning), 15 = banner og lukning efter 15 min. Hvert arrangement kan tilsidesætte.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Topbjælke (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Dit navn",
     "nameHelp": "Vises for de andre deltagere",
     "joinNowBtn": "Gå ind nu",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Åbner kl. {time}",
     "netiquetteTitle": "Gode råd til at deltage",
     "netiquetteBullet1": "Mød op et par minutter før for at teste mikrofon og webcam",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Indtast en gyldig e-mailadresse",
     "chatLockedMessage": "Indtast dit navn for at deltage i arrangementets chat.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Videooptagelse",

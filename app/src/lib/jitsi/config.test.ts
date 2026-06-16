@@ -13,6 +13,10 @@ import {
   instantCallToolbarButtons,
   instantCallModeratorToolbarButtons,
   instantCallConfigOverwrite,
+  VIDEO_QUALITY_PRESETS,
+  DEFAULT_VIDEO_QUALITY_PRESET,
+  resolveVideoQualityConfig,
+  videoQualityMaxHeight,
 } from './config';
 
 describe('Jitsi config exports', () => {
@@ -200,5 +204,82 @@ describe('Instant call config', () => {
 
   it('instant call config has chat enabled in Jitsi backend (for API events)', () => {
     expect(instantCallConfigOverwrite.disableChat).toBe(false);
+  });
+});
+
+describe('Video quality presets', () => {
+  it('default preset is HIGH (720p, capped bitrate)', () => {
+    expect(DEFAULT_VIDEO_QUALITY_PRESET).toBe('HIGH');
+  });
+
+  it('exposes exactly the four presets', () => {
+    expect([...VIDEO_QUALITY_PRESETS]).toEqual(['SAVE_DATA', 'BALANCED', 'HIGH', 'MAX']);
+  });
+
+  it('maps each preset to its max height', () => {
+    expect(videoQualityMaxHeight('SAVE_DATA')).toBe(360);
+    expect(videoQualityMaxHeight('BALANCED')).toBe(540);
+    expect(videoQualityMaxHeight('HIGH')).toBe(720);
+    expect(videoQualityMaxHeight('MAX')).toBe(1080);
+  });
+
+  it('falls back to HIGH for unknown / nullish preset', () => {
+    expect(videoQualityMaxHeight(undefined)).toBe(720);
+    expect(videoQualityMaxHeight(null)).toBe(720);
+    expect(videoQualityMaxHeight('BOGUS')).toBe(720);
+    expect(resolveVideoQualityConfig('BOGUS').resolution).toBe(720);
+  });
+
+  it('every preset produces the keys that actually change the stream', () => {
+    for (const q of VIDEO_QUALITY_PRESETS) {
+      const c = resolveVideoQualityConfig(q) as Record<string, unknown>;
+      expect(c.resolution).toBeTypeOf('number');
+      expect(c.constraints).toBeTruthy();
+      expect(c.maxFullResolutionParticipants).toBeTypeOf('number');
+      expect(c.channelLastN).toBeTypeOf('number');
+      expect(c.videoQuality).toBeTruthy();
+      expect(c.audioQuality).toBeTruthy();
+    }
+  });
+
+  it('resolution rises monotonically SAVE_DATA → MAX', () => {
+    const heights = VIDEO_QUALITY_PRESETS.map((q) => videoQualityMaxHeight(q));
+    expect(heights).toEqual([...heights].sort((a, b) => a - b));
+  });
+
+  it('top video bitrate rises with the preset but HIGH stays bandwidth-conscious (< MAX)', () => {
+    const top = (q: string) =>
+      (resolveVideoQualityConfig(q).videoQuality as { maxBitratesVideo: { high: number } })
+        .maxBitratesVideo.high;
+    expect(top('SAVE_DATA')).toBeLessThan(top('BALANCED'));
+    expect(top('BALANCED')).toBeLessThan(top('HIGH'));
+    expect(top('HIGH')).toBeLessThan(top('MAX'));
+    // HIGH (prod default) caps the top layer well below MAX — "favour quality
+    // without maxing bandwidth".
+    expect(top('HIGH')).toBeLessThanOrEqual(2_500_000);
+    expect(top('MAX')).toBeGreaterThanOrEqual(3_500_000);
+  });
+
+  it('MAX uses rich stereo Opus; SAVE_DATA uses low mono', () => {
+    const max = resolveVideoQualityConfig('MAX') as {
+      stereo: boolean;
+      audioQuality: { opusMaxAverageBitrate: number };
+    };
+    const save = resolveVideoQualityConfig('SAVE_DATA') as {
+      stereo: boolean;
+      audioQuality: { opusMaxAverageBitrate: number };
+    };
+    expect(max.stereo).toBe(true);
+    expect(max.audioQuality.opusMaxAverageBitrate).toBeGreaterThan(
+      save.audioQuality.opusMaxAverageBitrate,
+    );
+    expect(save.stereo).toBe(false);
+  });
+
+  it('returns a fresh object each call (no shared mutable state)', () => {
+    const a = resolveVideoQualityConfig('HIGH');
+    const b = resolveVideoQualityConfig('HIGH');
+    expect(a).not.toBe(b);
+    expect(a).toEqual(b);
   });
 });

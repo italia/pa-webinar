@@ -130,7 +130,12 @@
     "submitting": "Inscription en cours...",
     "success": "Inscription terminée !",
     "successMessage": "Vous recevrez un e-mail de confirmation avec le lien d'accès à l'événement.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Vous êtes déjà inscrit à cet événement",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Retour à l'événement",
     "organization": "Organisme d'appartenance",
     "organizationPlaceholder": "p. ex. AGID, Ministère de l'Économie, Ville de Rome",
@@ -1158,7 +1163,22 @@
         "previewBody": "Événement avec {participants} participants estimés à {ratio}% d'émetteurs → {senders} émetteurs + {receivers} passifs → {cores} cœurs estimés → {jvbs} JVB.",
         "graceSection": "Sortie en douceur (fin d'événement)",
         "eventGracePeriodMinutes": "Minutes de tolérance après endsAt (par défaut)",
-        "eventGracePeriodMinutesHelp": "Temps supplémentaire accordé après l'horaire de fin prévu avant de fermer l'appel. 0 = fermeture stricte, -1 = jamais de fermeture automatique (laisser au cleanup d'inactivité décider), 15 = bannière puis fermeture après 15 min. Chaque événement peut redéfinir ce paramètre."
+        "eventGracePeriodMinutesHelp": "Temps supplémentaire accordé après l'horaire de fin prévu avant de fermer l'appel. 0 = fermeture stricte, -1 = jamais de fermeture automatique (laisser au cleanup d'inactivité décider), 15 = bannière puis fermeture après 15 min. Chaque événement peut redéfinir ce paramètre.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Barre supérieure (Slim Header)",
@@ -2911,6 +2931,8 @@
     "nameLabel": "Votre nom",
     "nameHelp": "Visible des autres participants",
     "joinNowBtn": "Entrer maintenant",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Ouverture à {time}",
     "netiquetteTitle": "Bonnes pratiques pour participer",
     "netiquetteBullet1": "Arrivez quelques minutes en avance pour tester votre microphone et votre webcam",
@@ -2932,8 +2954,6 @@
     "chatLockedMessage": "Saisissez votre nom pour participer à la chat de l'événement.",
     "classicView": "Classic view",
     "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details",
     "aiNoticeTitle": "Traitement IA après l'événement",
     "aiNotice": "À la fin, l'enregistrement sera traité par des outils d'intelligence artificielle pour générer une transcription, une synthèse et d'éventuelles traductions et doublages. Les artefacts peuvent contenir des imprécisions ; la vidéo reste la source de référence.",
     "multitrackConsentTitle": "Enregistrement par participant",

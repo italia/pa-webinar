@@ -335,6 +335,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.waitingRoomEngine !== undefined && {
         waitingRoomEngine: data.waitingRoomEngine,
       }),
+      ...(data.videoQuality !== undefined && {
+        videoQuality: data.videoQuality,
+      }),
       ...(data.aiTranscriptEnabled !== undefined && {
         aiTranscriptEnabled: data.aiTranscriptEnabled,
       }),

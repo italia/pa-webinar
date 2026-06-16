@@ -32,6 +32,16 @@ export default async function RegistrationPage({
     notFound();
   }
 
+  // A PRE_REGISTRATION questionnaire must be filled in on the success
+  // screen before the participant proceeds — so we only auto-redirect
+  // straight into the waiting room when there is none. Resolved here
+  // (server) so the client doesn't have to wait for the questionnaire
+  // fetch to decide whether to redirect.
+  const preRegistrationQuestionnaire = await prisma.eventQuestionnaire.findFirst({
+    where: { eventId: event.id, placement: 'PRE_REGISTRATION' },
+    select: { id: true },
+  });
+
   const title = getLocalized(event.title as LocalizedField, locale);
   const settings = await getSettings();
 
@@ -79,6 +89,7 @@ export default async function RegistrationPage({
             privacyPolicyText={privacyText}
             recordingEnabled={event.recordingEnabled}
             multitrackRecordingEnabled={event.multitrackRecordingEnabled}
+            hasPreRegistrationQuestionnaire={!!preRegistrationQuestionnaire}
             profiling={{
               requireOrganization: event.requireOrganization,
               requireOrganizationRole: event.requireOrganizationRole,

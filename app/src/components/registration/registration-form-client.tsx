@@ -9,9 +9,10 @@ import {
   FormGroup,
   Label,
   Icon,
+  Spinner,
 } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import QuestionnaireForm from '@/components/questionnaires/questionnaire-form';
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
 
@@ -27,6 +28,10 @@ interface RegistrationFormClientProps {
   privacyPolicyText?: string;
   recordingEnabled?: boolean;
   multitrackRecordingEnabled?: boolean;
+  /** When the event has a PRE_REGISTRATION questionnaire, the success
+   *  screen must show it (and stay put) instead of auto-redirecting the
+   *  user into the waiting room. */
+  hasPreRegistrationQuestionnaire?: boolean;
   profiling?: ProfilingConfig;
 }
 
@@ -38,12 +43,14 @@ export default function RegistrationFormClient({
   privacyPolicyText,
   recordingEnabled,
   multitrackRecordingEnabled,
+  hasPreRegistrationQuestionnaire,
   profiling,
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
   const tg = useTranslations('gdpr');
   const tc = useTranslations('common');
   const tlive = useTranslations('live');
+  const router = useRouter();
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -68,6 +75,11 @@ export default function RegistrationFormClient({
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [registrationAccessToken, setRegistrationAccessToken] = useState<string | null>(null);
+  // Duplicate sign-up: offer to re-send the original access link instead
+  // of leaving the user stuck on a generic error.
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
 
   const showOrg = profiling?.requireOrganization ?? false;
   const showRole = profiling?.requireOrganizationRole ?? false;
@@ -146,6 +158,8 @@ export default function RegistrationFormClient({
     async (e: FormEvent) => {
       e.preventDefault();
       setServerError('');
+      setAlreadyRegistered(false);
+      setResent(false);
 
       if (!validate()) return;
 
@@ -169,11 +183,14 @@ export default function RegistrationFormClient({
         });
 
         if (res.status === 409) {
-          const data = await res.json();
-          if (data.error === 'already_registered') {
+          const data = await res.json().catch(() => ({}));
+          // The API now tags a duplicate sign-up with the dedicated
+          // ALREADY_REGISTERED code (errors.ts). Any other 409 here
+          // (e.g. the event flipped out of PUBLISHED/LIVE between page
+          // load and submit) stays generic.
+          if (data.code === 'ALREADY_REGISTERED') {
             setServerError(t('alreadyRegistered'));
-          } else if (data.error === 'event_full') {
-            setServerError(t('errors.eventFull'));
+            setAlreadyRegistered(true);
           } else {
             setServerError(t('errors.generic'));
           }
@@ -199,13 +216,68 @@ export default function RegistrationFormClient({
     [displayName, email, consentGiven, consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled, multitrackRecordingEnabled],
   );
 
+  // Duplicate sign-up recovery: re-send the original confirmation email
+  // (with the personal join link). The endpoint always answers 200 with a
+  // neutral body, so this never reveals whether the address is registered.
+  const handleResend = useCallback(async () => {
+    setResending(true);
+    try {
+      await fetch(`/api/events/${eventSlug}/registrations/resend`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      setResent(true);
+    } catch {
+      /* leave the button live so the user can retry */
+    } finally {
+      setResending(false);
+    }
+  }, [eventSlug, email]);
+
+  // One-step access: the registration API already handed us the personal
+  // accessToken, so when there's no PRE_REGISTRATION questionnaire to fill
+  // we send the user straight into the waiting room instead of making them
+  // click "Enter room" (or wait for the confirmation email). A short delay
+  // lets the "Registration complete" confirmation register; the manual
+  // button below stays as a no-JS / slow-redirect fallback.
+  useEffect(() => {
+    if (!success || !registrationAccessToken || hasPreRegistrationQuestionnaire) return;
+    const target = `/events/${eventSlug}/live?token=${registrationAccessToken}`;
+    const id = setTimeout(() => router.push(target), 1200);
+    return () => clearTimeout(id);
+  }, [success, registrationAccessToken, hasPreRegistrationQuestionnaire, eventSlug, router]);
+
   if (success) {
+    // Auto-redirect straight into the waiting room when there's nothing
+    // left to do on this screen (no PRE_REGISTRATION questionnaire). When
+    // a questionnaire is present we stay so the user can fill it first.
+    const autoRedirecting = !!registrationAccessToken && !hasPreRegistrationQuestionnaire;
     return (
       <div className="py-4">
         <div className="text-center">
-          <Icon icon="it-check-circle" size="xl" className="text-success mb-3" />
+          {/* Inline SVG (not design-react-kit <Icon>) — this node mounts
+              right after a state change, where the icon-font <Icon> is a
+              known hydration-mismatch source. */}
+          <svg
+            className="text-success mb-3"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 12.5l2.5 2.5L16 9" />
+          </svg>
           <h2 className="h3 mb-3">{t('success')}</h2>
-          <p className="mb-4">{t('successMessage')}</p>
+          <p className="mb-4">
+            {autoRedirecting ? t('enteringRoom') : t('successMessage')}
+          </p>
         </div>
         {registrationAccessToken && (
           <div className="mb-4">
@@ -222,8 +294,15 @@ export default function RegistrationFormClient({
             confirmation email. The /live token path renders the waiting
             room for any joinable status and auto-enables entry once the
             event is LIVE — this is what was missing during the caffettino
-            run (people registered but had no on-screen way in). */}
+            run (people registered but had no on-screen way in). When we
+            auto-redirect, this button is the manual fallback. */}
         <div className="text-center d-flex flex-column align-items-center gap-2">
+          {autoRedirecting && (
+            <div className="text-muted mb-1 d-inline-flex align-items-center" style={{ fontSize: '0.9rem' }}>
+              <Spinner active small className="me-2" />
+              {t('enteringRoomHint')}
+            </div>
+          )}
           {registrationAccessToken && (
             <Link
               href={`/events/${eventSlug}/live?token=${registrationAccessToken}`}
@@ -249,6 +328,33 @@ export default function RegistrationFormClient({
         <Alert color="danger" className="mb-4">
           {serverError}
         </Alert>
+      )}
+
+      {alreadyRegistered && (
+        <div className="mb-4">
+          {resent ? (
+            <Alert color="success" className="mb-0">
+              {t('resendSent')}
+            </Alert>
+          ) : (
+            <Button
+              color="primary"
+              outline
+              type="button"
+              onClick={handleResend}
+              disabled={resending}
+            >
+              {resending ? (
+                <>
+                  <Spinner active small className="me-2" />
+                  {t('resending')}
+                </>
+              ) : (
+                t('resendLink')
+              )}
+            </Button>
+          )}
+        </div>
       )}
 
       <FormGroup className="mb-4">

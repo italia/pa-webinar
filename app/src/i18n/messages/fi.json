@@ -130,7 +130,12 @@
     "submitting": "Ilmoittaudutaan...",
     "success": "Ilmoittautuminen onnistui!",
     "successMessage": "Saat vahvistusviestin, jossa on linkki tapahtumaan.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Olet jo ilmoittautunut tähän tapahtumaan",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Takaisin tapahtumaan",
     "organization": "Organisaatio",
     "organizationPlaceholder": "esim. AGID, Talousministeriö, Rooman kaupunki",
@@ -1138,7 +1143,22 @@
         "previewBody": "Tapahtuma {participants} osallistujalla, {ratio} % lähettäjiä → {senders} lähettäjää + {receivers} passiivista → {cores} arvioitua ydintä → {jvbs} JVB:tä.",
         "graceSection": "Pehmeä poistuminen (tapahtuman päättyminen)",
         "eventGracePeriodMinutes": "Armonaika minuutteina endsAt:n jälkeen (oletus)",
-        "eventGracePeriodMinutesHelp": "Lisäaika, joka annetaan suunnitellun päättymisajan jälkeen ennen puhelun sulkemista. 0 = kova pysäytys, -1 = ei automaattista sulkemista (jätä idle-cleanupin päätettäväksi), 15 = banneri ja sulkeminen 15 minuutin kuluttua. Jokainen tapahtuma voi ohittaa."
+        "eventGracePeriodMinutesHelp": "Lisäaika, joka annetaan suunnitellun päättymisajan jälkeen ennen puhelun sulkemista. 0 = kova pysäytys, -1 = ei automaattista sulkemista (jätä idle-cleanupin päätettäväksi), 15 = banneri ja sulkeminen 15 minuutin kuluttua. Jokainen tapahtuma voi ohittaa.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Yläpalkki (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Nimesi",
     "nameHelp": "Muut osallistujat näkevät tämän",
     "joinNowBtn": "Liity nyt",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Avautuu klo {time}",
     "netiquetteTitle": "Hyvät käytännöt osallistumiseen",
     "netiquetteBullet1": "Saavu muutamia minuutteja etukäteen testataksesi mikrofonisi ja kamerasi",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Anna kelvollinen sähköpostiosoite",
     "chatLockedMessage": "Anna nimesi, jotta voit liittyä tapahtuman chattiin.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Videotallenne",

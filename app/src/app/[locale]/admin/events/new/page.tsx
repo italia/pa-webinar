@@ -130,6 +130,7 @@ export default async function CreateEventPage({
         }))}
         gdprTemplates={gdprTemplates}
         siteDefaultParseTitleKicker={siteSettings.parseTitleKicker}
+        siteDefaultVideoQuality={siteSettings.videoQuality}
       />
     </div>
   );

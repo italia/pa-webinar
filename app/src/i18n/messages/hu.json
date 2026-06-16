@@ -130,7 +130,12 @@
     "submitting": "Regisztráció folyamatban...",
     "success": "Regisztráció sikeres!",
     "successMessage": "Visszaigazoló e-mailt kap az eseményhez való hozzáférési linkkel.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Ön már regisztrált erre az eseményre",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Vissza az eseményhez",
     "organization": "Szervezet",
     "organizationPlaceholder": "pl. AGID, Gazdasági Minisztérium, Budapest Főváros",
@@ -1138,7 +1143,22 @@
         "previewBody": "Esemény becsült {participants} résztvevővel, {ratio}% küldővel → {senders} küldő + {receivers} passzív → {cores} becsült mag → {jvbs} JVB.",
         "graceSection": "Soft exit (esemény vége)",
         "eventGracePeriodMinutes": "Türelmi percek endsAt után (alapértelmezett)",
-        "eventGracePeriodMinutesHelp": "A tervezett befejezési időpont után a hívás lezárásáig engedélyezett extra idő. 0 = kemény leállás, -1 = ne záruljon automatikusan (az inaktivitási cleanup dönt), 15 = banner, majd 15 perc utáni lezárás. Eseményenként felülbírálható."
+        "eventGracePeriodMinutesHelp": "A tervezett befejezési időpont után a hívás lezárásáig engedélyezett extra idő. 0 = kemény leállás, -1 = ne záruljon automatikusan (az inaktivitási cleanup dönt), 15 = banner, majd 15 perc utáni lezárás. Eseményenként felülbírálható.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Felső sáv (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Az Ön neve",
     "nameHelp": "A többi résztvevő számára látható lesz",
     "joinNowBtn": "Belépés most",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Nyitás {time}-kor",
     "netiquetteTitle": "Bevált gyakorlatok a részvételhez",
     "netiquetteBullet1": "Érkezzen néhány perccel korábban a mikrofon és a webkamera teszteléséhez",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Adjon meg egy érvényes e-mail címet",
     "chatLockedMessage": "Adja meg a nevét, hogy csatlakozhasson az esemény chatjéhez.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Videofelvétel",

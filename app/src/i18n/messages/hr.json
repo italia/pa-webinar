@@ -130,7 +130,12 @@
     "submitting": "Prijava u tijeku...",
     "success": "Prijava dovršena!",
     "successMessage": "Primit ćete potvrdni email s poveznicom za pristup događaju.",
+    "enteringRoom": "We're taking you to the event waiting room.",
+    "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "Već ste prijavljeni za ovaj događaj",
+    "resendLink": "Resend my access link",
+    "resending": "Sending…",
+    "resendSent": "If the address is registered, we've re-sent the access link by email.",
     "backToEvent": "Natrag na događaj",
     "organization": "Ustanova",
     "organizationPlaceholder": "npr. AGID, Ministarstvo gospodarstva, Grad Rim",
@@ -1138,7 +1143,22 @@
         "previewBody": "Događaj s {participants} procijenjenih sudionika uz {ratio}% sendera → {senders} sendera + {receivers} pasivnih → {cores} procijenjenih jezgri → {jvbs} JVB.",
         "graceSection": "Mekani izlaz (završetak događaja)",
         "eventGracePeriodMinutes": "Minute odgode nakon endsAt (zadano)",
-        "eventGracePeriodMinutesHelp": "Dodatno vrijeme nakon predviđenog vremena završetka prije zatvaranja poziva. 0 = trenutno zatvaranje, -1 = bez automatskog zatvaranja (prepusti čišćenju neaktivnosti), 15 = natpis i zatvaranje nakon 15 min. Svaki događaj može nadjačati."
+        "eventGracePeriodMinutesHelp": "Dodatno vrijeme nakon predviđenog vremena završetka prije zatvaranja poziva. 0 = trenutno zatvaranje, -1 = bez automatskog zatvaranja (prepusti čišćenju neaktivnosti), 15 = natpis i zatvaranje nakon 15 min. Svaki događaj može nadjačati.",
+        "videoQualitySection": "Video/audio quality",
+        "videoQuality": "Default quality",
+        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualityOptions": {
+          "MAX": "Maximum — 1080p",
+          "HIGH": "High — 720p (recommended)",
+          "BALANCED": "Balanced — 540p",
+          "SAVE_DATA": "Save data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
+          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
+          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
+          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+        }
       },
       "header": {
         "slimBarTitle": "Gornja traka (Slim Header)",
@@ -2644,6 +2664,8 @@
     "nameLabel": "Vaše ime",
     "nameHelp": "Bit će vidljivo ostalim sudionicima",
     "joinNowBtn": "Uđi sada",
+    "roomOpen": "The room is open",
+    "whileYouWait": "While you wait",
     "openingAt": "Otvaranje u {time}",
     "netiquetteTitle": "Dobre prakse za sudjelovanje",
     "netiquetteBullet1": "Dođite nekoliko minuta ranije za testiranje mikrofona i kamere",
@@ -2664,9 +2686,7 @@
     "emailInvalid": "Unesite valjanu adresu e-pošte",
     "chatLockedMessage": "Unesite svoje ime za sudjelovanje u chatu događaja.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "details": "Show details",
-    "hideDetails": "Hide details"
+    "backToGarden": "Back to the park"
   },
   "recording": {
     "management": "Video snimka",
