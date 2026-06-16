@@ -499,6 +499,23 @@ jvbScaler:
   # or name pattern. Set explicitly if auto-detection fails.
   jvbDeploymentName: ""
 
+# ── Web config-reload hook ───────────────────────────────────
+# Post-upgrade/post-install Job that `rollout restart`s the Jitsi components
+# whose runtime config (config.js, …) is generated at pod startup from
+# configmaps. The jitsi-meet web Deployment's checksum/config only covers the
+# MAIN web configmap, NOT the custom-config one (_custom_config_js), so changes
+# to the custom config (e.g. TURN / iceTransportPolicy='relay') don't roll the
+# web pod by themselves and the served config.js stays stale until a manual
+# `kubectl rollout restart`. This hook automates that on every deploy.
+configReloadHook:
+  enabled: true
+  # Jitsi components (by app.kubernetes.io/component label) to rollout-restart.
+  # Default: web (config.js). Add jicofo / prosody if you change their custom config.
+  components:
+    - web
+  # Image with kubectl. Empty → falls back to jvbScaler.image, else bitnami/kubectl:latest.
+  image: ""
+
 # ── Prometheus Metrics ───────────────────────────────────────
 
 metrics:
