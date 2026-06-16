@@ -305,6 +305,9 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     });
 
     let conference: any = null;
+    // AudioContext condiviso: serve a "consumare" le track audio remote
+    // (vedi onTrackAdded) così Chrome headless ne decodifica l'RTP.
+    let sharedAudioCtx: any = null;
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
     const recorders = new Map<string, { rec: any; key: string }>();
     // Contatore monotono per generare un trackFileId univoco per sessione,
@@ -390,9 +393,31 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         typeof track.getTrack === 'function'
           ? new MediaStream([track.getTrack()])
           : new MediaStream(original.getAudioTracks());
-      const stream: MediaStream = audioOnly.getAudioTracks().length
+      const rawStream: MediaStream = audioOnly.getAudioTracks().length
         ? audioOnly
         : original;
+      // FIX cattura headless: un MediaRecorder su una track audio REMOTA in
+      // Chrome headless NON riceve campioni se la track non viene "consumata"
+      // da un sink audio. Instradiamo la track via WebAudio (source→destination):
+      // forza la decodifica dell'RTP e alimenta il MediaRecorder con la
+      // destination stream. Senza il sink, MediaRecorder produce 0 byte (la
+      // segnalazione e i TRACK_ADDED arrivano, ma nessun campione).
+      let stream: MediaStream = rawStream;
+      try {
+        const AC = w.AudioContext || w.webkitAudioContext;
+        if (!sharedAudioCtx && AC) {
+          sharedAudioCtx = new AC();
+          void sharedAudioCtx.resume?.();
+        }
+        if (sharedAudioCtx) {
+          const srcNode = sharedAudioCtx.createMediaStreamSource(rawStream);
+          const destNode = sharedAudioCtx.createMediaStreamDestination();
+          srcNode.connect(destNode);
+          stream = destNode.stream;
+        }
+      } catch (e) {
+        log('WebAudio routing ko (fallback raw track): ' + String(e));
+      }
       let rec: MediaRecorder;
       try {
         rec = new MediaRecorder(stream, {
@@ -403,8 +428,15 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         log('MediaRecorder ko: ' + String(e));
         return;
       }
+      let chunkCount = 0;
+      let chunkBytes = 0;
       rec.ondataavailable = (ev: BlobEvent) => {
         if (!ev.data || ev.data.size === 0) return;
+        chunkCount += 1;
+        chunkBytes += ev.data.size;
+        if (chunkCount <= 2 || chunkCount % 10 === 0) {
+          log(`chunk ${key} #${chunkCount} +${ev.data.size}B (tot ${chunkBytes}B)`);
+        }
         const reader = new FileReader();
         reader.onloadend = () => {
           const res = reader.result as string;
