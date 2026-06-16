@@ -118,6 +118,10 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   // partecipante crea una NUOVA chiave → un NUOVO file (prima riusava
   // `${pid}.opus` e troncava la sessione precedente: audio perso).
   const writers = new Map<string, TrackWriter>();
+  // Append in volo (IPC chunk page→Node): vanno attesi PRIMA di chiudere i
+  // writer e leggere i file, altrimenti l'upload legge file troncati (i chunk
+  // arrivano async via exposeFunction mentre finish() già chiude/uploada).
+  const pendingAppends = new Set<Promise<void>>();
   function getOrCreateWriter(trackFileId: string, pid: string, name: string | null): TrackWriter {
     let w = writers.get(trackFileId);
     if (!w) {
@@ -167,11 +171,16 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
     await page.exposeFunction(
       'onTrackChunk',
       async (trackKey: string, pid: string, name: string | null, b64: string, nowMs: number) => {
-        try {
-          await getOrCreateWriter(trackKey, pid, name).appendChunk(Buffer.from(b64, 'base64'), nowMs);
-        } catch (e) {
-          console.error('[recorder] appendChunk failed', e);
-        }
+        const p = (async () => {
+          try {
+            await getOrCreateWriter(trackKey, pid, name).appendChunk(Buffer.from(b64, 'base64'), nowMs);
+          } catch (e) {
+            console.error('[recorder] appendChunk failed', e);
+          }
+        })();
+        pendingAppends.add(p);
+        await p;
+        pendingAppends.delete(p);
       },
     );
     // Ancora la timeline della traccia all'istante in cui parte il
@@ -236,6 +245,13 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
     // Attendi fine conference o hard-cap di durata.
     await Promise.race([done, new Promise<void>((r) => setTimeout(r, maxDurationMs))]);
   } finally {
+    // Drena gli append in volo (IPC chunk page→Node ancora in coda quando la
+    // pagina ha risolto finish()), poi una breve attesa per gli ultimi
+    // bindingCalled in arrivo, e RIDRENA. Senza, l'upload leggeva i file prima
+    // che gli ultimi chunk fossero scritti → file troncati (~250B vs ~20KB+).
+    await Promise.allSettled([...pendingAppends]);
+    await new Promise<void>((r) => setTimeout(r, 1500));
+    await Promise.allSettled([...pendingAppends]);
     for (const w of writers.values()) {
       await w.close();
     }
@@ -568,6 +584,12 @@ class TrackWriter {
 
   private fileHandle: Awaited<ReturnType<typeof open>> | null = null;
   private readonly path: string;
+  // Serializza le scritture: gli onTrackChunk arrivano async (IPC) e possono
+  // sovrapporsi (specie se la coda IPC flusha in burst a fine sessione). Due
+  // fileHandle.write concorrenti sullo stesso handle si pestano (posizione non
+  // atomica) → file troncato/corrotto (~250B invece di ~20KB). La catena rende
+  // gli append strettamente sequenziali.
+  private writeChain: Promise<void> = Promise.resolve();
 
   constructor(
     participantId: string,
@@ -593,20 +615,26 @@ class TrackWriter {
     if (this.firstFrameAtMs === 0) this.firstFrameAtMs = startedAtMs;
   }
 
-  async appendChunk(chunk: Buffer, nowMs: number): Promise<void> {
-    if (this.fileHandle === null) {
-      this.fileHandle = await open(this.path, 'w');
-      // Fallback se onTrackStarted non è arrivato (difensivo): usa il primo
-      // chunk come origine. In condizioni normali anchor() ha già impostato
-      // firstFrameAtMs all'avvio del recorder.
-      if (this.firstFrameAtMs === 0) this.firstFrameAtMs = nowMs;
-    }
-    await this.fileHandle.write(chunk);
-    this.bytesWritten += chunk.length;
-    this.lastFrameAtMs = nowMs;
+  appendChunk(chunk: Buffer, nowMs: number): Promise<void> {
+    // Accoda alla catena: ogni write attende la precedente (no race sul handle).
+    this.writeChain = this.writeChain.then(async () => {
+      if (this.fileHandle === null) {
+        this.fileHandle = await open(this.path, 'w');
+        // Fallback se onTrackStarted non è arrivato (difensivo): usa il primo
+        // chunk come origine. In condizioni normali anchor() ha già impostato
+        // firstFrameAtMs all'avvio del recorder.
+        if (this.firstFrameAtMs === 0) this.firstFrameAtMs = nowMs;
+      }
+      await this.fileHandle.write(chunk);
+      this.bytesWritten += chunk.length;
+      this.lastFrameAtMs = nowMs;
+    });
+    return this.writeChain;
   }
 
   async close(): Promise<void> {
+    // Assicura che TUTTI gli append accodati siano scritti prima di chiudere.
+    await this.writeChain.catch(() => {});
     if (this.fileHandle) {
       await this.fileHandle.close();
       this.fileHandle = null;
