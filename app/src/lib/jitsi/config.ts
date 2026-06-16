@@ -147,6 +147,17 @@ export const jitsiConfigOverwrite = {
   },
   maxFullResolutionParticipants: 25,
   resolution: 720,
+
+  // ── Audio processing (esplicito, non affidato ai default del build) ──
+  // Webinar = parlato su speaker di laptop: AEC/NS/AGC ON evitano eco e
+  // sbalzi di volume. enableNoisyMicDetection avvisa chi ha un mic disturbato;
+  // enableTalkWhileMuted ricorda "sei mutato" a chi parla da mutato (errore
+  // tipico dei partecipanti non tecnici).
+  disableAEC: false,
+  disableNS: false,
+  disableAGC: false,
+  enableNoisyMicDetection: true,
+  enableTalkWhileMuted: true,
 };
 
 /**
@@ -297,7 +308,15 @@ interface VideoQualityDefinition {
     maxFullResolutionParticipants: number;
     channelLastN: number;
     enableLayerSuspension: boolean;
-    videoQuality: { maxBitratesVideo: { low: number; standard: number; high: number } };
+    videoQuality: {
+      maxBitratesVideo: { low: number; standard: number; high: number };
+      // Preferenza codec video. VP9 è ~30-50% più efficiente di VP8 (default
+      // build): immagine più nitida a parità di bitrate cap — vale doppio sul
+      // piano relay-only (ogni bit rimbalza su coturn). VP8 come fallback per
+      // device/browser che non negoziano VP9. Su SAVE_DATA preferiamo VP8
+      // (encode più leggero su device deboli).
+      codecPreferenceOrder: string[];
+    };
     audioQuality: { opusMaxAverageBitrate: number };
     stereo: boolean;
     enableOpusRed: boolean;
@@ -313,7 +332,10 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       maxFullResolutionParticipants: 5,
       channelLastN: 6,
       enableLayerSuspension: true,
-      videoQuality: { maxBitratesVideo: { low: 120_000, standard: 300_000, high: 600_000 } },
+      videoQuality: {
+        maxBitratesVideo: { low: 120_000, standard: 300_000, high: 600_000 },
+        codecPreferenceOrder: ['VP8', 'VP9'], // VP8 first: encode leggero su device deboli
+      },
       audioQuality: { opusMaxAverageBitrate: 24_000 },
       stereo: false,
       enableOpusRed: false,
@@ -323,11 +345,14 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
     maxHeight: 540,
     configOverwrite: {
       resolution: 540,
-      constraints: { video: { height: { ideal: 540, max: 540, min: 240 } } },
+      constraints: { video: { height: { ideal: 540, max: 540, min: 180 } } },
       maxFullResolutionParticipants: 10,
       channelLastN: 20,
       enableLayerSuspension: true,
-      videoQuality: { maxBitratesVideo: { low: 150_000, standard: 500_000, high: 1_000_000 } },
+      videoQuality: {
+        maxBitratesVideo: { low: 150_000, standard: 500_000, high: 1_000_000 },
+        codecPreferenceOrder: ['VP9', 'VP8'],
+      },
       audioQuality: { opusMaxAverageBitrate: 48_000 },
       stereo: false,
       enableOpusRed: false,
@@ -337,13 +362,18 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
     maxHeight: 720,
     configOverwrite: {
       resolution: 720,
-      constraints: { video: { height: { ideal: 720, max: 720, min: 360 } } },
+      // min abbassato a 180: sotto vincolo di banda l'uplink degrada al layer
+      // basso invece di freezare (il floor 360 prima poteva bloccarsi).
+      constraints: { video: { height: { ideal: 720, max: 720, min: 180 } } },
       maxFullResolutionParticipants: 25,
       channelLastN: -1,
       // Still suspend layers nobody is watching — keeps "favour quality" from
       // turning into "always max uplink" when a sender is off-screen.
       enableLayerSuspension: true,
-      videoQuality: { maxBitratesVideo: { low: 200_000, standard: 700_000, high: 2_200_000 } },
+      videoQuality: {
+        maxBitratesVideo: { low: 200_000, standard: 700_000, high: 2_200_000 },
+        codecPreferenceOrder: ['VP9', 'VP8'],
+      },
       audioQuality: { opusMaxAverageBitrate: 96_000 },
       stereo: false,
       enableOpusRed: true,
@@ -353,13 +383,16 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
     maxHeight: 1080,
     configOverwrite: {
       resolution: 1080,
-      constraints: { video: { height: { ideal: 1080, max: 1080, min: 540 } } },
+      constraints: { video: { height: { ideal: 1080, max: 1080, min: 240 } } },
       maxFullResolutionParticipants: 25,
       channelLastN: -1,
       // Keep every layer: this preset is for small, high-stakes calls where
       // fidelity beats bandwidth thrift.
       enableLayerSuspension: false,
-      videoQuality: { maxBitratesVideo: { low: 300_000, standard: 1_200_000, high: 4_000_000 } },
+      videoQuality: {
+        maxBitratesVideo: { low: 300_000, standard: 1_200_000, high: 4_000_000 },
+        codecPreferenceOrder: ['VP9', 'VP8'],
+      },
       audioQuality: { opusMaxAverageBitrate: 510_000 },
       stereo: true,
       enableOpusRed: true,
@@ -373,15 +406,40 @@ function normalizeQualityPreset(preset?: string | null): VideoQualityPreset {
     : DEFAULT_VIDEO_QUALITY_PRESET;
 }
 
+/** Soglie mobile: il preset (anche HIGH = channelLastN -1, 720p) è identico su
+ *  desktop e mobile, ma un telefono che decodifica molti stream remoti fino a
+ *  720p su rete cellulare scalda, scarica e fa crashare l'iframe (utenti
+ *  mobile persi). Su mobile capiamo gli stream ricevuti e la risoluzione. */
+const MOBILE_MAX_HEIGHT = 360;
+const MOBILE_CHANNEL_LAST_N = 4;
+
 /** Jitsi `configOverwrite` keys for a quality preset. Spread into the iframe
  *  config so they override the static defaults. Unknown-to-this-build keys are
- *  harmlessly ignored by Jitsi. */
-export function resolveVideoQualityConfig(preset?: string | null): Record<string, unknown> {
-  return { ...QUALITY_DEFINITIONS[normalizeQualityPreset(preset)].configOverwrite };
+ *  harmlessly ignored by Jitsi. On mobile, received-stream count + resolution
+ *  are capped (decode/radio/battery). */
+export function resolveVideoQualityConfig(
+  preset?: string | null,
+  opts?: { isMobile?: boolean },
+): Record<string, unknown> {
+  const base = { ...QUALITY_DEFINITIONS[normalizeQualityPreset(preset)].configOverwrite };
+  if (!opts?.isMobile) return base;
+  const lastN =
+    base.channelLastN === -1
+      ? MOBILE_CHANNEL_LAST_N
+      : Math.min(base.channelLastN, MOBILE_CHANNEL_LAST_N);
+  return {
+    ...base,
+    channelLastN: lastN,
+    resolution: Math.min(base.resolution, MOBILE_MAX_HEIGHT),
+    constraints: { video: { height: { ideal: MOBILE_MAX_HEIGHT, max: MOBILE_MAX_HEIGHT, min: 180 } } },
+    // Niente "full-res" su mobile: tutti i remoti restano al layer basso.
+    maxFullResolutionParticipants: 0,
+  };
 }
 
 /** Max video height (px) for the preset — pass to
- *  `executeCommand('setVideoQuality', …)` to enforce at runtime. */
-export function videoQualityMaxHeight(preset?: string | null): number {
-  return QUALITY_DEFINITIONS[normalizeQualityPreset(preset)].maxHeight;
+ *  `executeCommand('setVideoQuality', …)` to enforce at runtime. Capped on mobile. */
+export function videoQualityMaxHeight(preset?: string | null, opts?: { isMobile?: boolean }): number {
+  const h = QUALITY_DEFINITIONS[normalizeQualityPreset(preset)].maxHeight;
+  return opts?.isMobile ? Math.min(h, MOBILE_MAX_HEIGHT) : h;
 }

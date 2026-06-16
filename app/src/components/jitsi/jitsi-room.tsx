@@ -139,7 +139,7 @@ export default function JitsiRoom({
     // per-role/per-permission keys below can still win on any overlap; these
     // keys (resolution, constraints, videoQuality, channelLastN, audioQuality…)
     // override the static defaults in `jitsiConfigOverwrite`.
-    Object.assign(extraConfig, resolveVideoQualityConfig(videoQuality));
+    Object.assign(extraConfig, resolveVideoQualityConfig(videoQuality, { isMobile: isMobileRef.current }));
 
     // Moderators need the participants-pane "rimuovi utente" (kick) to
     // actually fire — the global default has `disableKick: true` to hide
@@ -294,7 +294,7 @@ export default function JitsiRoom({
           // most reliable lever across Jitsi builds (caps the received video
           // height); the configOverwrite keys above cap the sent stream.
           try {
-            api.executeCommand('setVideoQuality', videoQualityMaxHeight(videoQuality));
+            api.executeCommand('setVideoQuality', videoQualityMaxHeight(videoQuality, { isMobile: isMobileRef.current }));
           } catch {
             /* older builds may not expose the command — configOverwrite still applies */
           }
@@ -302,6 +302,25 @@ export default function JitsiRoom({
           // accumulati sono relativi a questo istante.
           speakerT0Ref.current = Date.now();
           onReadyRef.current?.();
+        });
+
+        // Ri-applica il cap qualità quando la camera viene ACCESA dopo il join
+        // (al join era mutata → setVideoQuality poteva non agire sul layer
+        // locale) e su cambio device. Senza, il primo frame post-accensione
+        // poteva partire alla risoluzione di default del build, non al preset.
+        const reapplyVideoQuality = (): void => {
+          if (disposedRef.current) return;
+          try {
+            api.executeCommand(
+              'setVideoQuality',
+              videoQualityMaxHeight(videoQuality, { isMobile: isMobileRef.current }),
+            );
+          } catch {
+            /* noop */
+          }
+        };
+        api.addListener('videoMuteStatusChanged', (e: { muted?: boolean }) => {
+          if (e && e.muted === false) reapplyVideoQuality();
         });
 
         api.addListener('videoConferenceLeft', () => {
