@@ -1,0 +1,113 @@
+{{- /*
+Post-upgrade/post-install hook: restart the Jitsi web deployment so config.js
+is regenerated from the (possibly changed) custom-config configmap.
+
+Why this is needed: the jitsi-meet subchart's web Deployment carries a
+`checksum/config` annotation, but it is keyed ONLY to `web/configmap.yaml`
+(the main web env). Changes to `web.custom.configs._custom_config_js` /
+`_custom_interface_config_js` land in a SEPARATE "*-web-conffiles" configmap
+that is NOT in the checksum — so editing the custom config (e.g. the TURN /
+iceTransportPolicy='relay' lines) does NOT roll the web pod, and the served
+config.js stays stale until a manual `kubectl rollout restart`. This hook
+automates that restart on every upgrade/install.
+
+Disable with `configReloadHook.enabled: false`. Restart only when you change
+web custom config in practice — an extra web restart per deploy is cheap and
+safe between events (the web tier is stateless; live media is client↔JVB).
+*/}}
+{{- if .Values.configReloadHook.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-config-reload
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: config-reload
+{{- with .Values.app.imagePullSecrets }}
+imagePullSecrets:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-config-reload
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: config-reload
+rules:
+  # `kubectl rollout restart` patches the Deployment object (sets
+  # spec.template.metadata.annotations[kubectl.kubernetes.io/restartedAt]).
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-config-reload
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: config-reload
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "pa-webinar.fullname" . }}-config-reload
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "pa-webinar.fullname" . }}-config-reload
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-web-config-reload
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: config-reload
+  annotations:
+    "helm.sh/hook": post-upgrade,post-install
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        {{- include "pa-webinar.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: config-reload
+    spec:
+      serviceAccountName: {{ include "pa-webinar.fullname" . }}-config-reload
+      restartPolicy: Never
+      {{- with .Values.app.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: reload
+          image: {{ .Values.configReloadHook.image | default .Values.jvbScaler.image | default "bitnami/kubectl:latest" }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              ns="{{ .Release.Namespace }}"
+              echo "config-reload: rolling Jitsi components reading configmaps at startup"
+              for comp in {{ join " " .Values.configReloadHook.components }}; do
+                dep=$(kubectl get deploy -n "$ns" -l "app.kubernetes.io/component=$comp" -o name 2>/dev/null || true)
+                if [ -n "$dep" ]; then
+                  echo "config-reload: rollout restart $dep"
+                  kubectl rollout restart -n "$ns" $dep
+                else
+                  echo "config-reload: no deployment for component=$comp (skip)"
+                fi
+              done
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+{{- end }}
