@@ -122,6 +122,8 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   // writer e leggere i file, altrimenti l'upload legge file troncati (i chunk
   // arrivano async via exposeFunction mentre finish() già chiude/uploada).
   const pendingAppends = new Set<Promise<void>>();
+  // Diagnostica trasporto: chunk/byte RICEVUTI lato Node per traccia.
+  const nodeChunkStats = new Map<string, { n: number; b: number }>();
   function getOrCreateWriter(trackFileId: string, pid: string, name: string | null): TrackWriter {
     let w = writers.get(trackFileId);
     if (!w) {
@@ -171,9 +173,19 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
     await page.exposeFunction(
       'onTrackChunk',
       async (trackKey: string, pid: string, name: string | null, b64: string, nowMs: number) => {
+        const buf = Buffer.from(b64, 'base64');
+        // DIAGNOSTICA: conta i chunk RICEVUTI lato Node (vs quelli loggati in
+        // pagina) per distinguere perdita-IPC da perdita-write.
+        const st = nodeChunkStats.get(trackKey) ?? { n: 0, b: 0 };
+        st.n += 1;
+        st.b += buf.length;
+        nodeChunkStats.set(trackKey, st);
+        if (st.n <= 2 || st.n % 10 === 0) {
+          console.log(`[recorder] NODE recv ${trackKey} #${st.n} +${buf.length}B (tot ${st.b}B)`);
+        }
         const p = (async () => {
           try {
-            await getOrCreateWriter(trackKey, pid, name).appendChunk(Buffer.from(b64, 'base64'), nowMs);
+            await getOrCreateWriter(trackKey, pid, name).appendChunk(buf, nowMs);
           } catch (e) {
             console.error('[recorder] appendChunk failed', e);
           }
