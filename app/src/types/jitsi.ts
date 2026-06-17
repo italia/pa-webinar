@@ -88,6 +88,7 @@ export interface JitsiMeetExternalAPI {
   executeCommand(command: 'disableVideoModeration'): void;
   executeCommand(command: 'approveAudio', participantId: string): void;
   executeCommand(command: 'approveVideo', participantId: string): void;
+  executeCommand(command: 'setNoiseSuppressionEnabled', enabled: boolean): void;
   executeCommand(command: string, ...args: unknown[]): void;
 
   // Event listeners
