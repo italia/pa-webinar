@@ -18,6 +18,7 @@ import { getPublicEnv } from '@/lib/env';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
+import { FEEDBACK_GENERIC_TEMPLATE_NAME } from '@/lib/feedback/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,10 @@ export const POST = withErrorHandling(async (request) => {
   const body = await parseJsonBody(request);
   const parsed = createEventSchema.safeParse(body);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
   const data = parsed.data;
@@ -106,6 +110,11 @@ export const POST = withErrorHandling(async (request) => {
       participantsCanStartVideo: effectiveToggles.participantsCanStartVideo,
       participantsCanShareScreen: effectiveToggles.participantsCanShareScreen,
       permissionMatrix: matrix ?? undefined,
+      feedbackEnabled: data.feedbackEnabled,
+      postEventShowQA: data.postEventShowQA,
+      postEventShowMaterials: data.postEventShowMaterials,
+      postEventShowPolls: data.postEventShowPolls,
+      postEventShowFeedback: data.postEventShowFeedback,
       recurrenceRule: data.recurrenceRule ?? null,
       recurrenceSeriesId: data.recurrenceSeriesId ?? null,
       dataRetentionDays: data.dataRetentionDays,
@@ -181,6 +190,32 @@ export const POST = withErrorHandling(async (request) => {
     }
   }
 
+  // Auto-attach the default POST_EVENT feedback questionnaire (the system
+  // "Feedback generico" template) unless feedback collection is disabled.
+  // The wizard only PUTs an explicit POST_EVENT questionnaire when the
+  // admin configured one, and that upsert then takes precedence over this
+  // default. Best-effort: a failure here must not fail event creation.
+  if (data.feedbackEnabled !== false) {
+    try {
+      const generic = await prisma.questionTemplate.findUnique({
+        where: { name: FEEDBACK_GENERIC_TEMPLATE_NAME },
+        select: { id: true },
+      });
+      if (generic) {
+        await prisma.eventQuestionnaire.create({
+          data: {
+            eventId: event.id,
+            placement: 'POST_EVENT',
+            title: { it: 'Il tuo feedback', en: 'Your feedback' },
+            templates: { create: [{ templateId: generic.id, sortOrder: 0 }] },
+          },
+        });
+      }
+    } catch {
+      // Non-fatal: admin can attach the questionnaire from the event page.
+    }
+  }
+
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const locale = resolveLocale(request);
 
@@ -199,7 +234,7 @@ export const POST = withErrorHandling(async (request) => {
         moderatorLink: `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`,
       },
     },
-    { status: 201 },
+    { status: 201 }
   );
 });
 
@@ -246,10 +281,7 @@ export const GET = withErrorHandling(async (request) => {
 
   // Public mode: only PUBLISHED, LIVE, ENDED
   let whereStatus: EventStatus[];
-  if (
-    statusFilter &&
-    PUBLIC_STATUSES.includes(statusFilter as EventStatus)
-  ) {
+  if (statusFilter && PUBLIC_STATUSES.includes(statusFilter as EventStatus)) {
     whereStatus = [statusFilter as EventStatus];
   } else {
     whereStatus = PUBLIC_STATUSES;

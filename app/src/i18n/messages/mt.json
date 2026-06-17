@@ -602,7 +602,8 @@
       "eventMaterials": "Materjali",
       "eventQuestionnaires": "Kwestjonarji",
       "rubricaList": "Lista",
-      "rubricaDetail": "Dettall"
+      "rubricaDetail": "Dettall",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Pannell tal-amministrazzjoni",
@@ -2792,5 +2793,14 @@
     "close": "Agħlaq",
     "hintBanner": "Premi il-freccu per camminaru fil-giardino",
     "hintJoystick": "Trascina għal muoverti"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments",
+    "yes": "Iva",
+    "no": "Le"
   }
 }

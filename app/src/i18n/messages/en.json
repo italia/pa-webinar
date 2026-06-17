@@ -632,7 +632,8 @@
       "eventQuestionnaires": "Questionnaires",
       "rubricaList": "List",
       "rubricaDetail": "Entry",
-      "recordingsPostprod": "Transcripts / AI"
+      "recordingsPostprod": "Transcripts / AI",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Admin panel",
@@ -3216,5 +3217,14 @@
     "close": "Close",
     "hintBanner": "Press the arrow keys to walk around the garden",
     "hintJoystick": "Drag to move"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments",
+    "yes": "Yes",
+    "no": "No"
   }
 }

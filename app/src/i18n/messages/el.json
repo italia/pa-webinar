@@ -602,7 +602,8 @@
       "eventMaterials": "Υλικό",
       "eventQuestionnaires": "Ερωτηματολόγια",
       "rubricaList": "Λίστα",
-      "rubricaDetail": "Λεπτομέρεια"
+      "rubricaDetail": "Λεπτομέρεια",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Πίνακας διαχείρισης",
@@ -2792,5 +2793,14 @@
     "close": "Κλείσιμο",
     "hintBanner": "Πατήστε τα βέλη για να περπατήσετε στον κήπο",
     "hintJoystick": "Σύρετε για μετακίνηση"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments",
+    "yes": "Ναι",
+    "no": "Όχι"
   }
 }

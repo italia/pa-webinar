@@ -602,7 +602,8 @@
       "eventMaterials": "Anyagok",
       "eventQuestionnaires": "Kérdőívek",
       "rubricaList": "Lista",
-      "rubricaDetail": "Részletek"
+      "rubricaDetail": "Részletek",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Adminisztrációs panel",
@@ -2792,5 +2793,14 @@
     "close": "Bezárás",
     "hintBanner": "Nyomja meg a nyilakat a kertben való sétához",
     "hintJoystick": "Húzza a mozgáshoz"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments",
+    "yes": "Igen",
+    "no": "Nem"
   }
 }
