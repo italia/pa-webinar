@@ -602,7 +602,8 @@
       "eventMaterials": "Ábhair",
       "eventQuestionnaires": "Ceistneoirí",
       "rubricaList": "Liosta",
-      "rubricaDetail": "Iontráil"
+      "rubricaDetail": "Iontráil",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Painéal riaracháin",
@@ -2792,5 +2793,14 @@
     "close": "Dún",
     "hintBanner": "Brúigh na saigheada chun siúl timpeall an ghairdín",
     "hintJoystick": "Tarraing chun bogadh"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments",
+    "yes": "Tá",
+    "no": "Níl"
   }
 }

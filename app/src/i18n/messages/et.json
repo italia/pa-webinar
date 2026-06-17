@@ -602,7 +602,8 @@
       "eventMaterials": "Materjalid",
       "eventQuestionnaires": "Küsimustikud",
       "rubricaList": "Loend",
-      "rubricaDetail": "Detail"
+      "rubricaDetail": "Detail",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Halduspaneel",
@@ -2792,5 +2793,14 @@
     "close": "Sulge",
     "hintBanner": "Vajutage nooleklahve, et aias jalutada",
     "hintJoystick": "Lohistage liikumiseks"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments",
+    "yes": "Jah",
+    "no": "Ei"
   }
 }

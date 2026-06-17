@@ -33,7 +33,7 @@ export const GET = withErrorHandling(async (request) => {
       // TODO: Delete from Azure Blob Storage when SDK available
       if (evt.tempRecordingUrl) {
         console.warn(
-          `[cron/cleanup] Temp recording for event ${evt.id} should be deleted from storage: ${evt.tempRecordingUrl}`,
+          `[cron/cleanup] Temp recording for event ${evt.id} should be deleted from storage: ${evt.tempRecordingUrl}`
         );
       }
       await prisma.$transaction([
@@ -50,9 +50,14 @@ export const GET = withErrorHandling(async (request) => {
           },
         }),
       ]);
-      console.log(`[cron/cleanup] Temp recording cleared for event ${evt.id} (${evt.slug})`);
+      console.log(
+        `[cron/cleanup] Temp recording cleared for event ${evt.id} (${evt.slug})`
+      );
     } catch (err) {
-      console.error(`[cron/cleanup] Failed to clear temp recording for event ${evt.id}:`, err);
+      console.error(
+        `[cron/cleanup] Failed to clear temp recording for event ${evt.id}:`,
+        err
+      );
     }
   }
 
@@ -76,14 +81,14 @@ export const GET = withErrorHandling(async (request) => {
   for (const evt of recordingRetentionEvents) {
     if (!evt.recordingPublishedAt || !evt.recordingDeleteAfterDays) continue;
     const expiresAt = new Date(
-      evt.recordingPublishedAt.getTime() + evt.recordingDeleteAfterDays * 86_400_000,
+      evt.recordingPublishedAt.getTime() + evt.recordingDeleteAfterDays * 86_400_000
     );
     if (expiresAt >= now) continue;
 
     try {
       // TODO: Delete from Azure Blob Storage when SDK available
       console.warn(
-        `[cron/cleanup] Published recording for event ${evt.id} expired, should be deleted from storage: ${evt.recordingUrl}`,
+        `[cron/cleanup] Published recording for event ${evt.id} expired, should be deleted from storage: ${evt.recordingUrl}`
       );
       await prisma.$transaction([
         prisma.event.update({
@@ -109,7 +114,9 @@ export const GET = withErrorHandling(async (request) => {
           },
         }),
       ]);
-      console.log(`[cron/cleanup] Published recording cleared for event ${evt.id} (${evt.slug})`);
+      console.log(
+        `[cron/cleanup] Published recording cleared for event ${evt.id} (${evt.slug})`
+      );
     } catch (err) {
       console.error(`[cron/cleanup] Failed to clear recording for event ${evt.id}:`, err);
     }
@@ -134,7 +141,7 @@ export const GET = withErrorHandling(async (request) => {
 
   const toClean = expiredEvents.filter((evt) => {
     const retentionExpiry = new Date(
-      evt.endsAt.getTime() + evt.dataRetentionDays * 86_400_000,
+      evt.endsAt.getTime() + evt.dataRetentionDays * 86_400_000
     );
     return retentionExpiry < now;
   });
@@ -165,6 +172,16 @@ export const GET = withErrorHandling(async (request) => {
 
         const feedbackDeleted = await tx.eventFeedback.deleteMany({
           where: { eventId: evt.id },
+        });
+
+        // Post-event feedback converged onto the questionnaire subsystem:
+        // call-exit feedback now lands in QuestionnaireResponse (which holds
+        // a respondent name + email-hash snapshot). The event is only
+        // ARCHIVED (never hard-deleted) and registration deletion only
+        // SetNulls the FK, so these rows must be purged explicitly or PII
+        // would survive past the retention window. Answers cascade.
+        const questionnaireResponsesDeleted = await tx.questionnaireResponse.deleteMany({
+          where: { questionnaire: { eventId: evt.id } },
         });
 
         const wcSubmissionsDeleted = await tx.wordCloudSubmission.deleteMany({
@@ -204,6 +221,7 @@ export const GET = withErrorHandling(async (request) => {
           pollVotes: pollVotesDeleted.count,
           polls: pollsDeleted.count,
           feedback: feedbackDeleted.count,
+          questionnaireResponses: questionnaireResponsesDeleted.count,
           wordCloudSubmissions: wcSubmissionsDeleted.count,
           wordCloudRounds: wcRoundsDeleted.count,
           materials: materialsDeleted.count,
@@ -228,13 +246,13 @@ export const GET = withErrorHandling(async (request) => {
       if (evt.recordingUrl || evt.tempRecordingUrl) {
         console.warn(
           `[cron/cleanup] Event ${evt.id} has recordings that should be deleted from storage. ` +
-            `recordingUrl: ${evt.recordingUrl ?? 'none'}, tempRecordingUrl: ${evt.tempRecordingUrl ?? 'none'}`,
+            `recordingUrl: ${evt.recordingUrl ?? 'none'}, tempRecordingUrl: ${evt.tempRecordingUrl ?? 'none'}`
         );
       }
 
       console.log(
         `[cron/cleanup] Cleaned event ${evt.id} (${evt.slug}): ` +
-          `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes, ${result.polls} polls, ${result.pollVotes} poll votes, ${result.materials} materials deleted`,
+          `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes, ${result.polls} polls, ${result.pollVotes} poll votes, ${result.materials} materials deleted`
       );
 
       totalRegistrationsDeleted += result.registrations;
@@ -242,10 +260,7 @@ export const GET = withErrorHandling(async (request) => {
       totalPollsDeleted += result.polls;
       eventsProcessed++;
     } catch (err) {
-      console.error(
-        `[cron/cleanup] Failed to clean event ${evt.id} (${evt.slug}):`,
-        err,
-      );
+      console.error(`[cron/cleanup] Failed to clean event ${evt.id} (${evt.slug}):`, err);
     }
   }
 
@@ -255,7 +270,7 @@ export const GET = withErrorHandling(async (request) => {
     publishedRecordingsCleaned: recordingRetentionEvents.filter((evt) => {
       if (!evt.recordingPublishedAt || !evt.recordingDeleteAfterDays) return false;
       const expiresAt = new Date(
-        evt.recordingPublishedAt.getTime() + evt.recordingDeleteAfterDays * 86_400_000,
+        evt.recordingPublishedAt.getTime() + evt.recordingDeleteAfterDays * 86_400_000
       );
       return expiresAt < now;
     }).length,

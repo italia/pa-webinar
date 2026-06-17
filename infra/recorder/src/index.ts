@@ -36,6 +36,7 @@ interface RecorderEnv {
   cronApiKey: string;
   outputDir: string;
   idleTimeoutSec?: number;
+  initialGraceSec?: number;
   maxDurationSec?: number;
 }
 
@@ -65,6 +66,10 @@ function readEnv(): RecorderEnv {
     // Quanto il bot resta in stanza vuota prima di chiudere (default 90s in
     // capture.ts). Configurabile per dare tempo ai partecipanti di entrare.
     idleTimeoutSec: readIntEnv('IDLE_TIMEOUT_SEC'),
+    // Grace iniziale (stanza ancora vuota, mai visto nessuno) prima di
+    // arrendersi: default 15min in capture.ts → spesso spreco perché il
+    // controller spawna il recorder solo su evento già LIVE.
+    initialGraceSec: readIntEnv('INITIAL_GRACE_SEC'),
     maxDurationSec: readIntEnv('MAX_DURATION_SEC'),
   };
 }
@@ -97,6 +102,12 @@ export async function main(): Promise<void> {
     roomName: wo.roomName,
     jwt: wo.jwt,
     outputDir: env.outputDir,
+    // Wiring delle env di timing (erano parse-ate ma scartate qui → i default
+    // hardcoded in capture.ts vincevano sempre, rendendo la config operatore
+    // silenziosamente morta).
+    idleTimeoutSec: env.idleTimeoutSec,
+    initialGraceSec: env.initialGraceSec,
+    maxDurationSec: env.maxDurationSec,
   };
 
   // ── 3. Cattura WebRTC (blocca fino a fine evento) ──

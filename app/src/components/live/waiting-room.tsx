@@ -19,8 +19,6 @@ import { Link } from '@/i18n/navigation';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
 import DeviceCheck from '@/components/live/device-check';
-import GardenScene from '@/components/live/garden-scene';
-import GardenInteractive from '@/components/live/garden/garden-interactive';
 import VideoPlayer from '@/components/events/video-player';
 import EventTitle from '@/components/events/event-title';
 
@@ -29,6 +27,18 @@ import EventTitle from '@/components/events/event-title';
 const PhaserLobby = dynamic(() => import('@/components/live/garden/phaser-lobby'), {
   ssr: false,
 });
+
+// SVG garden engine (default, but classic is the default *view* on mobile and
+// for ended/multitrack events). Loaded client-only so the garden JS only ships
+// once the game box is actually rendered with `engine === 'svg'`, not on every
+// waiting-room load.
+const GardenScene = dynamic(() => import('@/components/live/garden-scene'), {
+  ssr: false,
+});
+const GardenInteractive = dynamic(
+  () => import('@/components/live/garden/garden-interactive'),
+  { ssr: false },
+);
 
 /**
  * Unified waiting-room / front-door for the live event page.

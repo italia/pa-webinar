@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
-import EventCalendar from '@/components/calendar/event-calendar';
+import EventCalendar from '@/components/calendar/event-calendar-lazy';
 
 export const dynamic = 'force-dynamic';
 

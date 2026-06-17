@@ -77,6 +77,22 @@ spec:
                     secretKeyRef:
                       name: {{ include "pa-webinar.secretName" . }}
                       key: CRON_API_KEY
+                {{- if .Values.recorder.idleTimeoutSec }}
+                # Chiusura dopo stanza vuota (default capture.ts: 90s).
+                - name: IDLE_TIMEOUT_SEC
+                  value: {{ .Values.recorder.idleTimeoutSec | quote }}
+                {{- end }}
+                {{- if .Values.recorder.initialGraceSec }}
+                # Attesa iniziale prima del primo partecipante (default 900s; il
+                # controller spawna solo su evento gia' LIVE → abbassabile).
+                - name: INITIAL_GRACE_SEC
+                  value: {{ .Values.recorder.initialGraceSec | quote }}
+                {{- end }}
+                {{- if .Values.recorder.maxDurationSec }}
+                # Hard-cap durata sessione; tienilo <= activeDeadlineSeconds.
+                - name: MAX_DURATION_SEC
+                  value: {{ .Values.recorder.maxDurationSec | quote }}
+                {{- end }}
                 # RECORDING_ID / EVENT_ID iniettati dal controller per-Job.
               resources:
                 {{- toYaml (.Values.recorder.resources | default dict) | nindent 16 }}

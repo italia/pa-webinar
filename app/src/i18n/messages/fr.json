@@ -606,7 +606,8 @@
       "eventQuestionnaires": "Questionnaires",
       "rubricaList": "Liste",
       "rubricaDetail": "Détail",
-      "recordingsPostprod": "Transcriptions / IA"
+      "recordingsPostprod": "Transcriptions / IA",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Panneau d'administration",
@@ -3164,5 +3165,14 @@
     },
     "overlapBadge": "simultané",
     "overlapTitle": "Parole simultanée : plusieurs personnes parlent en même temps sur cet intervalle."
+  },
+  "feedbackAdmin": {
+    "title": "Résultats des retours",
+    "totalVotes": "réponses",
+    "noFeedback": "Aucun retour reçu",
+    "comments": "Commentaires",
+    "noComments": "Aucun commentaire",
+    "yes": "Oui",
+    "no": "Non"
   }
 }
