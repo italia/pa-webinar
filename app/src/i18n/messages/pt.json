@@ -602,7 +602,8 @@
       "eventMaterials": "Materiais",
       "eventQuestionnaires": "Questionários",
       "rubricaList": "Lista",
-      "rubricaDetail": "Entrada"
+      "rubricaDetail": "Entrada",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Painel de administração",
@@ -2792,5 +2793,12 @@
     "close": "Fechar",
     "hintBanner": "Carregue nas setas para caminhar pelo jardim",
     "hintJoystick": "Arraste para se mover"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments"
   }
 }

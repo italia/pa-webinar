@@ -602,7 +602,8 @@
       "eventMaterials": "Materiály",
       "eventQuestionnaires": "Dotazníky",
       "rubricaList": "Zoznam",
-      "rubricaDetail": "Detail"
+      "rubricaDetail": "Detail",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Administračný panel",
@@ -2792,5 +2793,12 @@
     "close": "Zavrieť",
     "hintBanner": "Stlačte šípky na chôdzu po záhrade",
     "hintJoystick": "Posúvaním sa pohybujte"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments"
   }
 }

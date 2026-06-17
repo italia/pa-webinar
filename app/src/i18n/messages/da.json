@@ -602,7 +602,8 @@
       "eventMaterials": "Materialer",
       "eventQuestionnaires": "Spørgeskemaer",
       "rubricaList": "Liste",
-      "rubricaDetail": "Post"
+      "rubricaDetail": "Post",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Administrationspanel",
@@ -2792,5 +2793,12 @@
     "close": "Luk",
     "hintBanner": "Tryk på piletasterne for at gå rundt i haven",
     "hintJoystick": "Træk for at flytte"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments"
   }
 }

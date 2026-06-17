@@ -602,7 +602,8 @@
       "eventMaterials": "Materiały",
       "eventQuestionnaires": "Kwestionariusze",
       "rubricaList": "Lista",
-      "rubricaDetail": "Wpis"
+      "rubricaDetail": "Wpis",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Panel administracyjny",
@@ -2792,5 +2793,12 @@
     "close": "Zamknij",
     "hintBanner": "Naciśnij strzałki, aby chodzić po ogrodzie",
     "hintJoystick": "Przeciągnij, aby się poruszać"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments"
   }
 }

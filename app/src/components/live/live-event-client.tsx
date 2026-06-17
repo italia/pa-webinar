@@ -20,9 +20,7 @@ import { Link, useRouter } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
-import RecordingConsent, {
-  RecordingBanner,
-} from '@/components/jitsi/recording-consent';
+import RecordingConsent, { RecordingBanner } from '@/components/jitsi/recording-consent';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
 import RaisedHandsPanel from '@/components/jitsi/raised-hands-panel';
 import QAPanel from '@/components/qa/qa-panel';
@@ -31,7 +29,7 @@ import AgendaPanel from '@/components/live/agenda-panel';
 import MaterialPanel from '@/components/materials/material-panel';
 import ParticipantPanel from '@/components/participants/participant-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
-import EventFeedback from '@/components/live/event-feedback';
+import PostEventFeedbackModal from '@/components/live/post-event-feedback-modal';
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
@@ -237,11 +235,16 @@ export default function LiveEventClient({
           setJvbReady(data.metrics?.jvbStatus === 'ready');
           setJibriReady(data.metrics?.jibriStatus === 'ready');
         }
-      } catch { /* retry on next tick */ }
+      } catch {
+        /* retry on next tick */
+      }
     };
     poll();
     const interval = setInterval(poll, 3000);
-    return () => { cancelled = true; clearInterval(interval); };
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [eventStatus]);
 
   // Determine initial phase. Everyone (guest, participant, moderator,
@@ -260,7 +263,7 @@ export default function LiveEventClient({
       prev === 'reconnecting' ||
       prev === 'fetching_jwt'
         ? prev
-        : 'waiting',
+        : 'waiting'
     );
   }, [eventStatus]);
 
@@ -285,7 +288,9 @@ export default function LiveEventClient({
         if (data.status && data.status !== eventStatus) {
           setEventStatus(data.status);
         }
-      } catch { /* retry */ }
+      } catch {
+        /* retry */
+      }
     }, 3000);
     return () => clearInterval(pollInterval);
   }, [phase, event.slug, eventStatus]);
@@ -338,10 +343,21 @@ export default function LiveEventClient({
       setError(t('connectionError'));
       setPhase('error');
     }
-  }, [event.slug, isModerator, isSpeaker, isGuest, token, chosenName, initialDisplayName, t]);
+  }, [
+    event.slug,
+    isModerator,
+    isSpeaker,
+    isGuest,
+    token,
+    chosenName,
+    initialDisplayName,
+    t,
+  ]);
 
   useEffect(() => {
-    if (phase === 'fetching_jwt') { fetchJwt(); }
+    if (phase === 'fetching_jwt') {
+      fetchJwt();
+    }
   }, [phase, fetchJwt]);
 
   const handleConsentAccept = useCallback(() => {
@@ -364,20 +380,23 @@ export default function LiveEventClient({
   // Unified entry from the waiting room. Dispatches through the
   // consent → pre_join → fetching_jwt pipeline depending on role and
   // whether recording consent is required for this event.
-  const handleEnterFromWaiting = useCallback((name: string, prefs: WaitingRoomJoinPrefs) => {
-    setChosenName(name);
-    setJoinPrefs(prefs);
-    // Moderator + speaker magic-links skip the participant recording-
-    // consent modal (they're the ones driving recording). Guests and
-    // registered participants see it when recording is enabled.
-    if (event.recordingEnabled && !isModerator && !isSpeaker) {
-      setPhase('consent_pending');
-    } else {
-      // The waiting room has already collected the name + device
-      // preferences, so jump straight to the JWT fetch.
-      setPhase('fetching_jwt');
-    }
-  }, [event.recordingEnabled, isModerator, isSpeaker]);
+  const handleEnterFromWaiting = useCallback(
+    (name: string, prefs: WaitingRoomJoinPrefs) => {
+      setChosenName(name);
+      setJoinPrefs(prefs);
+      // Moderator + speaker magic-links skip the participant recording-
+      // consent modal (they're the ones driving recording). Guests and
+      // registered participants see it when recording is enabled.
+      if (event.recordingEnabled && !isModerator && !isSpeaker) {
+        setPhase('consent_pending');
+      } else {
+        // The waiting room has already collected the name + device
+        // preferences, so jump straight to the JWT fetch.
+        setPhase('fetching_jwt');
+      }
+    },
+    [event.recordingEnabled, isModerator, isSpeaker]
+  );
 
   // Poll event status during ready phase to detect ENDED
   useEffect(() => {
@@ -393,7 +412,9 @@ export default function LiveEventClient({
             setShowFeedback(true);
           }
         }
-      } catch { /* retry */ }
+      } catch {
+        /* retry */
+      }
     }, 5000);
     return () => clearInterval(pollInterval);
   }, [phase, event.slug, eventStatus, isModerator]);
@@ -470,13 +491,16 @@ export default function LiveEventClient({
     tryStart();
   }, []);
 
-  const autoOrPromptRecording = useCallback((api: JitsiMeetExternalAPI | null) => {
-    if (event.autoStartRecording && api) {
-      triggerRecording(api);
-    } else {
-      setShowRecPrompt(true);
-    }
-  }, [event.autoStartRecording, triggerRecording]);
+  const autoOrPromptRecording = useCallback(
+    (api: JitsiMeetExternalAPI | null) => {
+      if (event.autoStartRecording && api) {
+        triggerRecording(api);
+      } else {
+        setShowRecPrompt(true);
+      }
+    },
+    [event.autoStartRecording, triggerRecording]
+  );
 
   const handleJitsiReady = useCallback(() => {
     // Open a CallSession server-side so every live event has a row in
@@ -494,16 +518,34 @@ export default function LiveEventClient({
     reconnectAttemptsRef.current = 0;
     userHangupRef.current = false;
 
-    if (isModerator && event.recordingEnabled && jibriReady && !recPromptShownRef.current) {
+    if (
+      isModerator &&
+      event.recordingEnabled &&
+      jibriReady &&
+      !recPromptShownRef.current
+    ) {
       recPromptShownRef.current = true;
       autoOrPromptRecording(jitsiApi);
     }
-  }, [isModerator, event.recordingEnabled, event.slug, jibriReady, jitsiApi, autoOrPromptRecording]);
+  }, [
+    isModerator,
+    event.recordingEnabled,
+    event.slug,
+    jibriReady,
+    jitsiApi,
+    autoOrPromptRecording,
+  ]);
 
   // Show recording prompt (or auto-trigger) when Jibri becomes ready after
   // the room is already open.
   useEffect(() => {
-    if (jibriReady && jitsiApi && isModerator && event.recordingEnabled && !recPromptShownRef.current) {
+    if (
+      jibriReady &&
+      jitsiApi &&
+      isModerator &&
+      event.recordingEnabled &&
+      !recPromptShownRef.current
+    ) {
       recPromptShownRef.current = true;
       autoOrPromptRecording(jitsiApi);
     }
@@ -553,16 +595,24 @@ export default function LiveEventClient({
       }
     })();
   }, [showFeedback, event.slug]);
-  const handleParticipantCountChanged = useCallback((count: number) => { setParticipantCount(count); }, []);
-  const handleRecordingStatusChanged = useCallback((recording: boolean) => { setIsRecording(recording); }, []);
-  const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => { setJitsiApi(api); }, []);
+  const handleParticipantCountChanged = useCallback((count: number) => {
+    setParticipantCount(count);
+  }, []);
+  const handleRecordingStatusChanged = useCallback((recording: boolean) => {
+    setIsRecording(recording);
+  }, []);
+  const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => {
+    setJitsiApi(api);
+  }, []);
 
   const handleRecPromptStart = useCallback(() => {
     setShowRecPrompt(false);
     if (!jitsiApi) return;
     triggerRecording(jitsiApi);
   }, [jitsiApi, triggerRecording]);
-  const handleRecPromptLater = useCallback(() => { setShowRecPrompt(false); }, []);
+  const handleRecPromptLater = useCallback(() => {
+    setShowRecPrompt(false);
+  }, []);
 
   // Peak participant tracking (moderator only)
   useEffect(() => {
@@ -596,7 +646,7 @@ export default function LiveEventClient({
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ status: 'LIVE' }),
     });
@@ -637,7 +687,7 @@ export default function LiveEventClient({
           multitrackRecordingEnabled: event.multitrackRecordingEnabled,
         }}
         participantCount={participantCount}
-        role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
+        role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
         jvbReady={jvbReady}
         defaultName={chosenName || initialDisplayName}
         onEnterLive={handleEnterFromWaiting}
@@ -656,11 +706,15 @@ export default function LiveEventClient({
         <p className="mb-4">{t('eventEndedMessage')}</p>
         {isModerator ? (
           <Link href={`/admin/events/${event.id}?token=${token}`}>
-            <Button color="primary" outline tag="span">{tc('back')}</Button>
+            <Button color="primary" outline tag="span">
+              {tc('back')}
+            </Button>
           </Link>
         ) : (
           <Link href={`/events/${event.slug}`}>
-            <Button color="primary" outline tag="span">{t('backToEvent')}</Button>
+            <Button color="primary" outline tag="span">
+              {t('backToEvent')}
+            </Button>
           </Link>
         )}
       </div>
@@ -676,9 +730,17 @@ export default function LiveEventClient({
           {error || t('connectionError')}
         </Alert>
         <div className="text-center mt-3">
-          <Button color="primary" onClick={() => setPhase('fetching_jwt')} className="me-3">{tc('retry')}</Button>
+          <Button
+            color="primary"
+            onClick={() => setPhase('fetching_jwt')}
+            className="me-3"
+          >
+            {tc('retry')}
+          </Button>
           <Link href={`/events/${event.slug}`}>
-            <Button color="secondary" outline tag="span">{t('backToEvent')}</Button>
+            <Button color="secondary" outline tag="span">
+              {t('backToEvent')}
+            </Button>
           </Link>
         </div>
       </div>
@@ -723,8 +785,19 @@ export default function LiveEventClient({
   if (phase === 'consent_pending') {
     return (
       <>
-        <LiveTopBar title={event.title} parseTitleKicker={event.parseTitleKicker} imageUrl={event.imageUrl} coverImageUrl={event.coverImageUrl} participantCount={0} isRecording={false} role={isModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')} />
-        <RecordingConsent onAccept={handleConsentAccept} onDecline={handleConsentDecline} />
+        <LiveTopBar
+          title={event.title}
+          parseTitleKicker={event.parseTitleKicker}
+          imageUrl={event.imageUrl}
+          coverImageUrl={event.coverImageUrl}
+          participantCount={0}
+          isRecording={false}
+          role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
+        />
+        <RecordingConsent
+          onAccept={handleConsentAccept}
+          onDecline={handleConsentDecline}
+        />
       </>
     );
   }
@@ -743,7 +816,10 @@ export default function LiveEventClient({
   // ── Fetching JWT / Loading ──
   if (phase === 'fetching_jwt' || !credentials) {
     return (
-      <div className="d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '60vh' }}>
+      <div
+        className="d-flex flex-column align-items-center justify-content-center"
+        style={{ minHeight: '60vh' }}
+      >
         <Spinner active double />
         <p className="mt-3 text-muted">{t('connecting')}</p>
       </div>
@@ -758,7 +834,10 @@ export default function LiveEventClient({
   return (
     <div className="d-flex flex-column live-page-bg">
       <RecordingBanner visible={isRecording} />
-      <OvertimeBanner endsAt={event.endsAt} graceMinutes={event.effectiveGraceMinutes ?? 15} />
+      <OvertimeBanner
+        endsAt={event.endsAt}
+        graceMinutes={event.effectiveGraceMinutes ?? 15}
+      />
 
       <LiveTopBar
         title={event.title}
@@ -769,7 +848,7 @@ export default function LiveEventClient({
         registrationCount={event.registrationCount}
         maxParticipants={event.maxParticipants}
         isRecording={isRecording}
-        role={isActualModerator ? 'moderator' : (isGuest ? 'guest' : 'participant')}
+        role={isActualModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
         onLeaveRoom={handleLeaveRoom}
       />
 
@@ -826,7 +905,10 @@ export default function LiveEventClient({
               >
                 <Spinner active double className="mb-3" />
                 <h2 className="h5 text-white fw-semibold mb-2">{t('roomPreparing')}</h2>
-                <p className="text-white-50 mb-0" style={{ maxWidth: 400, textAlign: 'center' }}>
+                <p
+                  className="text-white-50 mb-0"
+                  style={{ maxWidth: 400, textAlign: 'center' }}
+                >
                   {t('roomPreparingDetail')}
                 </p>
               </div>
@@ -857,7 +939,10 @@ export default function LiveEventClient({
             {/* Floating controls slot: the sidebar portals its bar here
                 so it sits on top of the Jitsi iframe (Meet-style) on
                 both desktop and mobile. */}
-            <div id="live-floating-controls-slot" className="live-floating-controls-slot" />
+            <div
+              id="live-floating-controls-slot"
+              className="live-floating-controls-slot"
+            />
           </div>
         </div>
 
@@ -877,7 +962,7 @@ export default function LiveEventClient({
       </div>
 
       {showFeedback && (
-        <EventFeedback
+        <PostEventFeedbackModal
           eventSlug={event.slug}
           accessToken={!isGuest && !isModerator && !isSpeaker ? token : undefined}
           guestId={isGuest ? guestId : undefined}
@@ -928,7 +1013,19 @@ interface LiveSidebarProps {
   guestId?: string;
 }
 
-function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, agendaEnabled, jitsiApi, displayName, isInstantCall = false, canReactAgenda = false, guestId }: LiveSidebarProps) {
+function LiveSidebar({
+  eventSlug,
+  token,
+  isModerator,
+  qaEnabled,
+  chatEnabled,
+  agendaEnabled,
+  jitsiApi,
+  displayName,
+  isInstantCall = false,
+  canReactAgenda = false,
+  guestId,
+}: LiveSidebarProps) {
   const t = useTranslations('live');
   // Live feature flags: i flag arrivano come props al mount, ma un moderatore
   // può attivarli/disattivarli DURANTE l'evento → li ripolliamo così i tab
@@ -941,7 +1038,7 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
   }>(
     isInstantCall ? null : `/api/events/${eventSlug}/flags`,
     (url: string) => fetch(url).then((r) => r.json()),
-    { refreshInterval: 15000 },
+    { refreshInterval: 15000 }
   );
   const effQa = liveFlags?.qaEnabled ?? qaEnabled;
   const effChat = liveFlags?.chatEnabled ?? chatEnabled;
@@ -953,10 +1050,9 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
   // poll (15s).
   const toggleFeature = useCallback(
     async (key: 'qaEnabled' | 'chatEnabled' | 'agendaEnabled', current: boolean) => {
-      await mutateFlags(
-        (cur) => (cur ? { ...cur, [key]: !current } : cur),
-        { revalidate: false },
-      );
+      await mutateFlags((cur) => (cur ? { ...cur, [key]: !current } : cur), {
+        revalidate: false,
+      });
       await fetch(`/api/events/${eventSlug}`, {
         method: 'PUT',
         headers: {
@@ -967,10 +1063,10 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
       });
       await mutateFlags();
     },
-    [eventSlug, token, mutateFlags],
+    [eventSlug, token, mutateFlags]
   );
   const [activeTab, setActiveTab] = useState<SidebarTab>(
-    isInstantCall ? 'participants' : (qaEnabled ? 'qa' : (showChat ? 'chat' : 'polls'))
+    isInstantCall ? 'participants' : qaEnabled ? 'qa' : showChat ? 'chat' : 'polls'
   );
   const [participantCount, setParticipantCount] = useState(0);
   // Drawer-open state only matters on mobile (<992px); on desktop the
@@ -1035,38 +1131,135 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
     {
       key: 'qa',
       label: t('sidebarTabQa'),
-      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+          <path d="M12 17h.01" />
+          <circle cx="12" cy="12" r="10" />
+        </svg>
+      ),
       show: !isInstantCall && effQa,
     },
     {
       key: 'chat',
       label: t('sidebarTabChat'),
-      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      ),
       dot: chatUnread > 0,
       show: !isInstantCall && showChat,
     },
     {
       key: 'polls',
       label: t('sidebarTabPolls'),
-      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 3v18h18" />
+          <path d="M7 14l4-4 4 4 5-5" />
+        </svg>
+      ),
       show: !isInstantCall,
     },
     {
       key: 'agenda',
       label: t('sidebarTabAgenda'),
-      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+      ),
       show: !isInstantCall && effAgenda,
     },
     {
       key: 'materials',
       label: t('sidebarTabMaterials'),
-      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+        </svg>
+      ),
       show: !isInstantCall,
     },
     {
       key: 'participants',
       label: t('sidebarTabParticipants'),
-      svg: (<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      ),
       badge: participantCount,
       show: true,
     },
@@ -1074,15 +1267,18 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
 
   const visibleTabs = tabs.filter((tab) => tab.show);
 
-  const handleTabClick = useCallback((key: SidebarTab) => {
-    // Toggle semantics: clicking the active-and-open tab closes the drawer.
-    if (activeTab === key && drawerOpen) {
-      setDrawerOpen(false);
-      return;
-    }
-    setActiveTab(key);
-    setDrawerOpen(true);
-  }, [activeTab, drawerOpen]);
+  const handleTabClick = useCallback(
+    (key: SidebarTab) => {
+      // Toggle semantics: clicking the active-and-open tab closes the drawer.
+      if (activeTab === key && drawerOpen) {
+        setDrawerOpen(false);
+        return;
+      }
+      setActiveTab(key);
+      setDrawerOpen(true);
+    },
+    [activeTab, drawerOpen]
+  );
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
@@ -1106,7 +1302,11 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
   }, []);
 
   const floatingBar = (
-    <div className="live-floating-controls" role="toolbar" aria-label={t('floatingControlsLabel')}>
+    <div
+      className="live-floating-controls"
+      role="toolbar"
+      aria-label={t('floatingControlsLabel')}
+    >
       {visibleTabs.map((tab) => {
         const isActive = activeTab === tab.key && drawerOpen;
         return (
@@ -1120,7 +1320,9 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
             <span className="live-floating-btn__icon">{tab.svg}</span>
             <span className="live-floating-btn__label">{tab.label}</span>
             {tab.badge !== undefined && tab.badge > 0 && (
-              <span className="live-floating-btn__badge" aria-hidden="true">{tab.badge}</span>
+              <span className="live-floating-btn__badge" aria-hidden="true">
+                {tab.badge}
+              </span>
             )}
             {tab.dot && (
               <span
@@ -1151,7 +1353,9 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
         tabIndex={drawerOpen ? 0 : -1}
       />
 
-      <div className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}`}>
+      <div
+        className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}`}
+      >
         {/* Drawer header: active panel title + close button. */}
         <div className="live-sidebar-header d-flex align-items-center justify-content-between">
           <span className="fw-semibold" style={{ color: '#fff', fontSize: '0.95rem' }}>
@@ -1163,11 +1367,28 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
             onClick={closeDrawer}
             aria-label={t('closeDrawer')}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
 
-        <div className="flex-grow-1 d-flex flex-column live-sidebar-body" style={{ minHeight: 0, overflowY: 'auto' }}>
+        <div
+          className="flex-grow-1 d-flex flex-column live-sidebar-body"
+          style={{ minHeight: 0, overflowY: 'auto' }}
+        >
           {/* Attivazione funzioni durante l'evento (solo moderatore). Le
               modifiche si propagano agli altri client via polling dei flag. */}
           {isModerator && !isInstantCall && (
@@ -1175,12 +1396,16 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
               className="d-flex flex-wrap gap-2 px-3 py-2 align-items-center"
               style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.8rem' }}
             >
-              <span className="text-secondary fw-semibold me-1">{t('liveFeaturesLabel')}</span>
-              {([
-                ['qaEnabled', t('sidebarTabQa'), effQa],
-                ['chatEnabled', t('sidebarTabChat'), effChat],
-                ['agendaEnabled', t('sidebarTabAgenda'), effAgenda],
-              ] as const).map(([key, label, on]) => (
+              <span className="text-secondary fw-semibold me-1">
+                {t('liveFeaturesLabel')}
+              </span>
+              {(
+                [
+                  ['qaEnabled', t('sidebarTabQa'), effQa],
+                  ['chatEnabled', t('sidebarTabChat'), effChat],
+                  ['agendaEnabled', t('sidebarTabAgenda'), effAgenda],
+                ] as const
+              ).map(([key, label, on]) => (
                 <button
                   key={key}
                   type="button"
@@ -1189,7 +1414,8 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
                   onClick={() => void toggleFeature(key, on)}
                   aria-pressed={on}
                 >
-                  {on ? '✓ ' : ''}{label}
+                  {on ? '✓ ' : ''}
+                  {label}
                 </button>
               ))}
             </div>
@@ -1236,7 +1462,11 @@ function LiveSidebar({ eventSlug, token, isModerator, qaEnabled, chatEnabled, ag
             />
           )}
           {activeTab === 'materials' && (
-            <MaterialPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+            <MaterialPanel
+              eventSlug={eventSlug}
+              token={token}
+              isModerator={isModerator}
+            />
           )}
           {activeTab === 'participants' && (
             <ParticipantPanel
@@ -1291,18 +1521,17 @@ function OvertimeBanner({
   // to ENDED instantly and the user gets redirected).
   if (graceMinutes === 0) return null;
 
-  const closeAt = graceMinutes > 0
-    ? new Date(endsAtMs + graceMinutes * 60_000)
-    : null;
+  const closeAt = graceMinutes > 0 ? new Date(endsAtMs + graceMinutes * 60_000) : null;
   const minutesLeft = closeAt
     ? Math.max(0, Math.ceil((closeAt.getTime() - now) / 60_000))
     : null;
 
-  const message = closeAt && minutesLeft !== null
-    ? minutesLeft > 0
-      ? t('overtime.withCountdown', { minutes: minutesLeft })
-      : t('overtime.closingNow')
-    : t('overtime.indefinite');
+  const message =
+    closeAt && minutesLeft !== null
+      ? minutesLeft > 0
+        ? t('overtime.withCountdown', { minutes: minutesLeft })
+        : t('overtime.closingNow')
+      : t('overtime.indefinite');
 
   return (
     <div
@@ -1341,7 +1570,18 @@ interface LiveTopBarProps {
   onLeaveRoom?: () => void;
 }
 
-function LiveTopBar({ title, parseTitleKicker = false, imageUrl, coverImageUrl, participantCount, registrationCount, maxParticipants: _maxParticipants, isRecording, role, onLeaveRoom }: LiveTopBarProps) {
+function LiveTopBar({
+  title,
+  parseTitleKicker = false,
+  imageUrl,
+  coverImageUrl,
+  participantCount,
+  registrationCount,
+  maxParticipants: _maxParticipants,
+  isRecording,
+  role,
+  onLeaveRoom,
+}: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
   const badgeColors = ROLE_BADGE_COLORS[role];
@@ -1405,7 +1645,11 @@ function LiveTopBar({ title, parseTitleKicker = false, imageUrl, coverImageUrl, 
           color=""
           pill
           className="px-2 py-1 me-2"
-          style={{ backgroundColor: badgeColors.badge, color: badgeColors.badgeFg, fontSize: '0.72rem' }}
+          style={{
+            backgroundColor: badgeColors.badge,
+            color: badgeColors.badgeFg,
+            fontSize: '0.72rem',
+          }}
         >
           {tr(role)}
         </Badge>
@@ -1430,13 +1674,17 @@ function LiveTopBar({ title, parseTitleKicker = false, imageUrl, coverImageUrl, 
       <div className="d-flex align-items-center gap-3">
         {isRecording && (
           <Badge color="danger" pill className="px-2 py-1">
-            <span className="me-1">●</span>{t('recordingActive')}
+            <span className="me-1">●</span>
+            {t('recordingActive')}
           </Badge>
         )}
         {registrationCount !== undefined && registrationCount > 0 && (
           <span className="small d-none d-md-inline">
             <Icon icon="it-user" size="sm" color="white" className="me-1" />
-            {t('activeVsRegistered', { active: participantCount, registered: registrationCount })}
+            {t('activeVsRegistered', {
+              active: participantCount,
+              registered: registrationCount,
+            })}
           </span>
         )}
         {onLeaveRoom && (
@@ -1484,7 +1732,9 @@ function FirstEntryHintBanner() {
     setVisible(false);
     try {
       window.localStorage.setItem(HINT_DISMISSED_KEY, '1');
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   if (!visible) return null;
@@ -1502,13 +1752,16 @@ function FirstEntryHintBanner() {
       aria-label="tips"
     >
       <span className="d-inline-flex align-items-center gap-2">
-        <span aria-hidden="true">🎤</span>{t('controls')}
+        <span aria-hidden="true">🎤</span>
+        {t('controls')}
       </span>
       <span className="d-inline-flex align-items-center gap-2">
-        <span aria-hidden="true">✋</span>{t('raiseHand')}
+        <span aria-hidden="true">✋</span>
+        {t('raiseHand')}
       </span>
       <span className="d-inline-flex align-items-center gap-2">
-        <span aria-hidden="true">💬</span>{t('sidebar')}
+        <span aria-hidden="true">💬</span>
+        {t('sidebar')}
       </span>
       <div className="ms-md-auto">
         <Button color="primary" size="xs" onClick={handleDismiss}>
@@ -1585,12 +1838,27 @@ function ScreenshareBanner({ api }: { api: JitsiMeetExternalAPI }) {
       role="status"
       aria-live="polite"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-        <line x1="8" y1="21" x2="16" y2="21"/>
-        <line x1="12" y1="17" x2="12" y2="21"/>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+        <line x1="12" y1="17" x2="12" y2="21" />
       </svg>
-      <span>{t('screenshareActive', { name: activeSharerName || t('screenshareFallbackName') })}</span>
+      <span>
+        {t('screenshareActive', {
+          name: activeSharerName || t('screenshareFallbackName'),
+        })}
+      </span>
     </div>
   );
 }

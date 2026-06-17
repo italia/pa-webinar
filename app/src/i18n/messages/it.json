@@ -702,7 +702,8 @@
       "eventQuestionnaires": "Questionari",
       "rubricaList": "Elenco",
       "rubricaDetail": "Dettaglio",
-      "recordingsPostprod": "Trascrizioni / AI"
+      "recordingsPostprod": "Trascrizioni / AI",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Pannello di amministrazione",
@@ -3216,5 +3217,12 @@
     "pickerTitle": "Scegli il tuo avatar",
     "pickerHelp": "Il personaggio rappresenta te nel giardino dell'attesa. Puoi cambiarlo quando vuoi.",
     "close": "Chiudi"
+  },
+  "feedbackAdmin": {
+    "title": "Risultati feedback",
+    "totalVotes": "risposte",
+    "noFeedback": "Nessun feedback ricevuto",
+    "comments": "Commenti",
+    "noComments": "Nessun commento"
   }
 }

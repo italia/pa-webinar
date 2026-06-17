@@ -602,7 +602,8 @@
       "eventMaterials": "Materiāli",
       "eventQuestionnaires": "Anketas",
       "rubricaList": "Saraksts",
-      "rubricaDetail": "Ieraksts"
+      "rubricaDetail": "Ieraksts",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Administrēšanas panelis",
@@ -2792,5 +2793,12 @@
     "close": "Aizvērt",
     "hintBanner": "Nospiediet bultiņas, lai staigātu pa dārzu",
     "hintJoystick": "Velciet, lai pārvietotos"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments"
   }
 }

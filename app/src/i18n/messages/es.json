@@ -602,7 +602,8 @@
       "eventMaterials": "Materiales",
       "eventQuestionnaires": "Cuestionarios",
       "rubricaList": "Lista",
-      "rubricaDetail": "Detalle"
+      "rubricaDetail": "Detalle",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Panel de administración",
@@ -2792,5 +2793,12 @@
     "close": "Cerrar",
     "hintBanner": "Pulse las flechas para caminar por el jardín",
     "hintJoystick": "Arrastre para moverse"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments"
   }
 }
