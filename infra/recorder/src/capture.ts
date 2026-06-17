@@ -564,6 +564,16 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       },
     );
     connection.connect();
+    // Setup completato → risolviamo SUBITO il page.evaluate. Tenere questa
+    // Promise pending per TUTTA la sessione bloccava la consegna dei
+    // bindingCalled di Puppeteer (le exposeFunction onTrackChunk): i chunk
+    // audio non arrivavano a Node → file ~250B invece di ~20KB+ catturati.
+    // Il resto è guidato dagli eventi lib-jitsi-meet + exposeFunction; la durata
+    // della sessione è gestita lato Node via `done` (onConferenceDone)/maxDuration.
+    // Ancoriamo connection+conference su window per evitarne il GC dopo il ritorno.
+    w.__recorderConnection = connection;
+    w.__recorderGetConference = () => conference;
+    resolve();
     /* eslint-enable @typescript-eslint/no-explicit-any */
   });
 
