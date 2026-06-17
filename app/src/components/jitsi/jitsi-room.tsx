@@ -109,6 +109,9 @@ export default function JitsiRoom({
   useEffect(() => { onApiReadyRef.current = onApiReady; }, [onApiReady]);
 
   const observerRef = useRef<MutationObserver | null>(null);
+  // P4 — interval che ri-asserisce la soppressione rumore OFF per tutta la
+  // call (vedi il listener `videoConferenceJoined`).
+  const nsEnforceTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // Mobile detection captured once at mount. We intentionally don't
   // react to resize: flipping the toolbar mid-call would require
   // reinitialising the iframe (disconnecting the user).
@@ -287,9 +290,37 @@ export default function JitsiRoom({
           }
         }
 
+        // P4 — Forza la "soppressione rumore extra" (rnnoise) OFF e la tiene OFF.
+        // Su jitsi/web:stable-10741 il worklet rnnoise non fa conversione di
+        // sample-rate e ZITTISCE il microfono in uscita su contesti di cattura
+        // non-48kHz (un moderatore è rimasto muto nella demo prova-con-roberto).
+        // Non esiste un flag di config per-feature che la disabiliti, e il toggle
+        // è raggiungibile SIA dal tab Impostazioni>Audio SIA dal popup del caret
+        // accanto al pulsante microfono — nessuno dei due rimovibile senza
+        // perdere anche il selettore dispositivi. Quindi la forziamo via IFrame
+        // API. `setNoiseSuppressionEnabled(false)` è un no-op quando la NS è già
+        // off (il thunk Jitsi ha la guardia `enabled !== current`): l'interval
+        // fa lavoro reale — ri-spegnendola entro un tick — solo se un utente la
+        // riattiva manualmente. Da rimuovere quando l'immagine Jitsi servita
+        // includerà un worklet rnnoise corretto.
+        const enforceNoiseSuppressionOff = (): void => {
+          if (disposedRef.current) return;
+          try {
+            api.executeCommand('setNoiseSuppressionEnabled', false);
+          } catch {
+            /* build più vecchie potrebbero non esporre il comando */
+          }
+        };
+
         api.addListener('videoConferenceJoined', () => {
           if (disposedRef.current) return;
           setLoadState('ready');
+          // Annulla un'eventuale NS persistita da Jitsi in localStorage da una
+          // sessione precedente, poi continua a ri-asserirla off per tutta la call.
+          enforceNoiseSuppressionOff();
+          if (!nsEnforceTimerRef.current) {
+            nsEnforceTimerRef.current = setInterval(enforceNoiseSuppressionOff, 2000);
+          }
           // Enforce the quality preset at runtime too. setVideoQuality is the
           // most reliable lever across Jitsi builds (caps the received video
           // height); the configOverwrite keys above cap the sent stream.
@@ -325,6 +356,10 @@ export default function JitsiRoom({
 
         api.addListener('videoConferenceLeft', () => {
           if (disposedRef.current) return;
+          if (nsEnforceTimerRef.current) {
+            clearInterval(nsEnforceTimerRef.current);
+            nsEnforceTimerRef.current = null;
+          }
           flushSpeakerBuffer(true);
           onLeftRef.current?.();
         });
@@ -409,6 +444,10 @@ export default function JitsiRoom({
       if (speakerFlushTimerRef.current) {
         clearTimeout(speakerFlushTimerRef.current);
         speakerFlushTimerRef.current = null;
+      }
+      if (nsEnforceTimerRef.current) {
+        clearInterval(nsEnforceTimerRef.current);
+        nsEnforceTimerRef.current = null;
       }
       flushSpeakerBuffer(true);
       if (apiRef.current) {
