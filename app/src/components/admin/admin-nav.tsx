@@ -33,7 +33,12 @@ const EVENTS_SUB_NAV: NavItem[] = [
 
 // Registrations area groups cross-event attendee management.
 const REGISTRATIONS_SUB_NAV: NavItem[] = [
-  { href: '/admin/registrations', icon: 'it-user', labelKey: 'registrationsList', exact: true },
+  {
+    href: '/admin/registrations',
+    icon: 'it-user',
+    labelKey: 'registrationsList',
+    exact: true,
+  },
   { href: '/admin/rubrica', icon: 'it-pa', labelKey: 'rubrica' },
   { href: '/admin/moderators', icon: 'it-key', labelKey: 'moderators' },
   { href: '/admin/gdpr-audit', icon: 'it-files', labelKey: 'gdprAudit' },
@@ -41,7 +46,12 @@ const REGISTRATIONS_SUB_NAV: NavItem[] = [
 
 // Recordings / instant calls / live sessions — everything video-output.
 const RECORDINGS_SUB_NAV: NavItem[] = [
-  { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordingsList', exact: true },
+  {
+    href: '/admin/recordings',
+    icon: 'it-video',
+    labelKey: 'recordingsList',
+    exact: true,
+  },
   // Gestione post-produzione AI delle registrazioni (trascrizione,
   // traduzione, speaker, editor, re-run). Vive sotto "Registrazioni"
   // perché opera SULLE registrazioni — non è configurazione (quella sta
@@ -51,27 +61,68 @@ const RECORDINGS_SUB_NAV: NavItem[] = [
 
 // Publications area: unified library editing.
 const PUBLICATIONS_SUB_NAV: NavItem[] = [
-  { href: '/admin/publications', icon: 'it-files', labelKey: 'publicationsList', exact: true },
+  {
+    href: '/admin/publications',
+    icon: 'it-files',
+    labelKey: 'publicationsList',
+    exact: true,
+  },
   { href: '/admin/publications/new', icon: 'it-plus', labelKey: 'publicationsNew' },
 ];
 
 // Monitoring groups together all the observability surfaces.
 const MONITORING_SUB_NAV: NavItem[] = [
-  { href: '/admin/monitoring', icon: 'it-presentation', labelKey: 'monitoringDashboard', exact: true },
+  {
+    href: '/admin/monitoring',
+    icon: 'it-presentation',
+    labelKey: 'monitoringDashboard',
+    exact: true,
+  },
   { href: '/admin/infrastructure', icon: 'it-server', labelKey: 'infrastructure' },
 ];
 
 const SETTINGS_SUB_NAV: NavItem[] = [
-  { href: '/admin/settings', icon: 'it-settings', labelKey: 'settingsGeneral', exact: true },
-  { href: '/admin/settings/languages', icon: 'it-hearing', labelKey: 'settingsLanguages' },
-  { href: '/admin/settings/gdpr-templates', icon: 'it-lock', labelKey: 'settingsGdprTemplates' },
-  { href: '/admin/settings/email-templates', icon: 'it-mail', labelKey: 'settingsEmailTemplates' },
+  {
+    href: '/admin/settings',
+    icon: 'it-settings',
+    labelKey: 'settingsGeneral',
+    exact: true,
+  },
+  {
+    href: '/admin/settings/languages',
+    icon: 'it-hearing',
+    labelKey: 'settingsLanguages',
+  },
+  {
+    href: '/admin/settings/gdpr-templates',
+    icon: 'it-lock',
+    labelKey: 'settingsGdprTemplates',
+  },
+  {
+    href: '/admin/settings/email-templates',
+    icon: 'it-mail',
+    labelKey: 'settingsEmailTemplates',
+  },
   { href: '/admin/settings/tags', icon: 'it-bookmark', labelKey: 'settingsTags' },
 ];
 
 const QUESTIONNAIRES_SUB_NAV: NavItem[] = [
-  { href: '/admin/questionnaires', icon: 'it-copy', labelKey: 'questionnairesLibrary', exact: true },
-  { href: '/admin/questionnaires/responses', icon: 'it-chart-line', labelKey: 'questionnairesResponses' },
+  {
+    href: '/admin/questionnaires',
+    icon: 'it-copy',
+    labelKey: 'questionnairesLibrary',
+    exact: true,
+  },
+  {
+    href: '/admin/questionnaires/responses',
+    icon: 'it-chart-line',
+    labelKey: 'questionnairesResponses',
+  },
+  {
+    href: '/admin/questionnaires/feedback',
+    icon: 'it-star-outline',
+    labelKey: 'feedbackDashboard',
+  },
 ];
 
 export default function AdminNav() {
@@ -79,29 +130,38 @@ export default function AdminNav() {
   const pathname = usePathname();
 
   const stripped = pathname.replace(/^\/[a-z]{2}/, '');
-  const inEvents = stripped.startsWith('/admin/events') || stripped.startsWith('/admin/eventi')
-    || stripped.startsWith('/admin/calendar') || stripped.startsWith('/admin/calendario');
+  const inEvents =
+    stripped.startsWith('/admin/events') ||
+    stripped.startsWith('/admin/eventi') ||
+    stripped.startsWith('/admin/calendar') ||
+    stripped.startsWith('/admin/calendario');
   // Monitoring area groups /admin/monitoring and /admin/infrastructure.
   // These used to live under Settings but they are operational views,
   // not configuration — so they get their own top-level section.
-  const inMonitoring = stripped.startsWith('/admin/monitoring')
-    || stripped.startsWith('/admin/infrastructure')
-    || stripped.startsWith('/admin/infrastruttura');
-  const inSettings = (stripped.startsWith('/admin/settings') || stripped.startsWith('/admin/impostazioni'))
-    && !inMonitoring;
+  const inMonitoring =
+    stripped.startsWith('/admin/monitoring') ||
+    stripped.startsWith('/admin/infrastructure') ||
+    stripped.startsWith('/admin/infrastruttura');
+  const inSettings =
+    (stripped.startsWith('/admin/settings') ||
+      stripped.startsWith('/admin/impostazioni')) &&
+    !inMonitoring;
   // Registrations area: attendee sign-ups, moderators, GDPR audit —
   // everything that has to do with the *people* on the platform.
-  const inRegistrations = stripped.startsWith('/admin/registrations')
-    || stripped.startsWith('/admin/iscrizioni')
-    || stripped.startsWith('/admin/rubrica')
-    || stripped.startsWith('/admin/moderators')
-    || stripped.startsWith('/admin/moderatori')
-    || stripped.startsWith('/admin/gdpr-audit');
-  const inRecordings = stripped.startsWith('/admin/recordings')
-    || stripped.startsWith('/admin/registrazioni-video')
-    || stripped.startsWith('/admin/postprod');
-  const inPublications = stripped.startsWith('/admin/publications')
-    || stripped.startsWith('/admin/pubblicazioni');
+  const inRegistrations =
+    stripped.startsWith('/admin/registrations') ||
+    stripped.startsWith('/admin/iscrizioni') ||
+    stripped.startsWith('/admin/rubrica') ||
+    stripped.startsWith('/admin/moderators') ||
+    stripped.startsWith('/admin/moderatori') ||
+    stripped.startsWith('/admin/gdpr-audit');
+  const inRecordings =
+    stripped.startsWith('/admin/recordings') ||
+    stripped.startsWith('/admin/registrazioni-video') ||
+    stripped.startsWith('/admin/postprod');
+  const inPublications =
+    stripped.startsWith('/admin/publications') ||
+    stripped.startsWith('/admin/pubblicazioni');
   const inQuestionnaires = stripped.startsWith('/admin/questionnaires');
 
   const PATH_ALIASES: Record<string, string[]> = {
@@ -120,9 +180,18 @@ export default function AdminNav() {
     '/admin/rubrica': ['/admin/rubrica'],
     '/admin/gdpr-audit': ['/admin/gdpr-audit'],
     '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
-    '/admin/settings/languages': ['/admin/settings/languages', '/admin/impostazioni/lingue'],
-    '/admin/settings/gdpr-templates': ['/admin/settings/gdpr-templates', '/admin/impostazioni/modelli-gdpr'],
-    '/admin/settings/email-templates': ['/admin/settings/email-templates', '/admin/impostazioni/modelli-email'],
+    '/admin/settings/languages': [
+      '/admin/settings/languages',
+      '/admin/impostazioni/lingue',
+    ],
+    '/admin/settings/gdpr-templates': [
+      '/admin/settings/gdpr-templates',
+      '/admin/impostazioni/modelli-gdpr',
+    ],
+    '/admin/settings/email-templates': [
+      '/admin/settings/email-templates',
+      '/admin/impostazioni/modelli-email',
+    ],
     '/admin/settings/tags': ['/admin/settings/tags', '/admin/impostazioni/tag'],
     '/admin/infrastructure': ['/admin/infrastructure', '/admin/infrastruttura'],
     '/admin/monitoring': ['/admin/monitoring'],
@@ -197,9 +266,7 @@ export default function AdminNav() {
                     aria-current={active ? 'page' : undefined}
                   >
                     <Icon icon={item.icon} size="sm" />
-                    <span className="d-none d-sm-inline">
-                      {t(item.labelKey)}
-                    </span>
+                    <span className="d-none d-sm-inline">{t(item.labelKey)}</span>
                   </Link>
                 </li>
               );
@@ -238,9 +305,7 @@ export default function AdminNav() {
                       aria-current={active ? 'page' : undefined}
                     >
                       <Icon icon={item.icon} size="xs" />
-                      <span className="d-none d-sm-inline">
-                        {t(item.labelKey)}
-                      </span>
+                      <span className="d-none d-sm-inline">{t(item.labelKey)}</span>
                     </Link>
                   </li>
                 );

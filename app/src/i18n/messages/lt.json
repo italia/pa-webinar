@@ -602,7 +602,8 @@
       "eventMaterials": "Medžiaga",
       "eventQuestionnaires": "Klausimynai",
       "rubricaList": "Sąrašas",
-      "rubricaDetail": "Įrašas"
+      "rubricaDetail": "Įrašas",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Administravimo skydelis",
@@ -2792,5 +2793,14 @@
     "close": "Uždaryti",
     "hintBanner": "Spauskite rodykles, kad vaikštinėtumėte sode",
     "hintJoystick": "Vilkite, kad judėtumėte"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback results",
+    "totalVotes": "responses",
+    "noFeedback": "No feedback received",
+    "comments": "Comments",
+    "noComments": "No comments",
+    "yes": "Taip",
+    "no": "Ne"
   }
 }
