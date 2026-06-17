@@ -150,13 +150,15 @@ export const jitsiConfigOverwrite = {
 
   // ── Audio processing (esplicito, non affidato ai default del build) ──
   // Webinar = parlato su speaker di laptop: AEC/NS/AGC ON evitano eco e
-  // sbalzi di volume. enableNoisyMicDetection avvisa chi ha un mic disturbato;
-  // enableTalkWhileMuted ricorda "sei mutato" a chi parla da mutato (errore
-  // tipico dei partecipanti non tecnici).
+  // sbalzi di volume. enableTalkWhileMuted ricorda "sei mutato" a chi parla
+  // da mutato (errore tipico dei partecipanti non tecnici).
+  // enableNoisyMicDetection è OFF: il prompt "mic disturbato" spingeva gli
+  // utenti verso il toggle di noise-suppression (rotto lato served-config),
+  // più dannoso che utile.
   disableAEC: false,
   disableNS: false,
   disableAGC: false,
-  enableNoisyMicDetection: true,
+  enableNoisyMicDetection: false,
   enableTalkWhileMuted: true,
 };
 
@@ -376,7 +378,11 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       },
       audioQuality: { opusMaxAverageBitrate: 96_000 },
       stereo: false,
-      enableOpusRed: true,
+      // OFF: RED (redundant audio) a 96kbps mono contribuisce a eco/raddoppio
+      // della voce; la served config.js lo tiene già a false e il nostro preset
+      // lo riaccendeva. Allineato. (MAX lo lascia ON: chiamate piccole, fedeltà
+      // prima della banda.)
+      enableOpusRed: false,
     },
   },
   MAX: {

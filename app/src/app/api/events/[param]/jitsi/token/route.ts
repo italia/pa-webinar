@@ -51,8 +51,24 @@ export const POST = withErrorHandling(async (request, context) => {
     }
 
     const isSpeaker = grant.role === EventModeratorRole.SPEAKER;
-    const fallbackName = isSpeaker ? 'Relatore' : 'Moderatore';
-    const name = displayNameOverride || grant.displayName || fallbackName;
+
+    // The PRIMARY moderator magic link is SHARED: every moderator opening
+    // it would otherwise mint a JWT under the same generic
+    // event.moderatorName ("Moderatore"), so they all collapse into one
+    // identity in chat / the participant list. Require the client-supplied
+    // name (the waiting room forces it) instead of silently falling back.
+    // Per-row grants (named co-moderator / speaker) keep their own
+    // decrypted grant.displayName.
+    const trimmedOverride = displayNameOverride?.trim();
+    let name: string;
+    if (grant.isPrimaryShared) {
+      if (!trimmedOverride) {
+        throw new ValidationError('Display name is required for moderators');
+      }
+      name = trimmedOverride;
+    } else {
+      name = trimmedOverride || grant.displayName || (isSpeaker ? 'Relatore' : 'Moderatore');
+    }
 
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
