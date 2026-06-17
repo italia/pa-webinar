@@ -612,6 +612,10 @@ class TrackWriter {
   // atomica) → file troncato/corrotto (~250B invece di ~20KB). La catena rende
   // gli append strettamente sequenziali.
   private writeChain: Promise<void> = Promise.resolve();
+  // Una volta chiuso, ignora append tardivi: i chunk finali arrivano via IPC
+  // DOPO che finish() ha chiuso i writer e riaprivano il file in 'w'
+  // troncando tutto l'audio già scritto (21KB → ~550B).
+  private closed = false;
 
   constructor(
     participantId: string,
@@ -638,10 +642,14 @@ class TrackWriter {
   }
 
   appendChunk(chunk: Buffer, nowMs: number): Promise<void> {
+    // Chunk arrivato dopo close(): scartalo, NON riaprire il file (riaprire in
+    // 'w' troncava i 21KB già scritti lasciando solo l'ultimo chunk ~550B).
+    if (this.closed) return Promise.resolve();
     // Accoda alla catena: ogni write attende la precedente (no race sul handle).
     this.writeChain = this.writeChain.then(async () => {
       if (this.fileHandle === null) {
-        this.fileHandle = await open(this.path, 'w');
+        // 'a' (append): difesa extra — anche un'eventuale riapertura NON tronca.
+        this.fileHandle = await open(this.path, 'a');
         // Fallback se onTrackStarted non è arrivato (difensivo): usa il primo
         // chunk come origine. In condizioni normali anchor() ha già impostato
         // firstFrameAtMs all'avvio del recorder.
@@ -655,7 +663,9 @@ class TrackWriter {
   }
 
   async close(): Promise<void> {
-    // Assicura che TUTTI gli append accodati siano scritti prima di chiudere.
+    // Blocca SUBITO nuovi append (no riapertura/troncamento da chunk tardivi),
+    // poi attendi che TUTTI gli append già accodati siano scritti.
+    this.closed = true;
     await this.writeChain.catch(() => {});
     if (this.fileHandle) {
       await this.fileHandle.close();
