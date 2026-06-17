@@ -208,18 +208,21 @@ export default function WaitingRoom({
     try {
       let mode: 'GARDEN' | 'GAME' | 'CLASSIC' = event.waitingRoomEngine ?? 'GARDEN';
       const urlE = new URLSearchParams(window.location.search).get('engine');
-      // Touch / coarse-pointer devices (phones, tablets) default to the
+      // PHONES (coarse pointer AND narrow viewport) default to the
       // accessible CLASSIC card: the walkable park + joystick don't work
       // well on small touch screens, and the classic layout shows the real
       // controls (name, email, device check) inline instead of hiding them
-      // in the arcade drawer. An explicit `?engine=` still wins, so a mobile
-      // user can opt back into the game.
-      const isCoarsePointer =
-        window.matchMedia?.('(pointer: coarse)')?.matches ?? false;
+      // in the arcade drawer. Tablets (coarse pointer but wider than 768px)
+      // keep the rich room — they have the screen real estate for it. An
+      // explicit `?engine=` still wins, so a phone user can opt into the
+      // game and a tablet user can opt into classic.
+      const isPhone =
+        window.matchMedia?.('(pointer: coarse) and (max-width: 768px)')?.matches ??
+        false;
       if (urlE === 'phaser') mode = 'GAME';
       else if (urlE === 'svg') mode = 'GARDEN';
       else if (urlE === 'classic') mode = 'CLASSIC';
-      else if (isCoarsePointer) mode = 'CLASSIC';
+      else if (isPhone) mode = 'CLASSIC';
       if (window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1') mode = 'CLASSIC';
       setEngine(mode === 'GAME' ? 'phaser' : 'svg');
       setClassicView(mode === 'CLASSIC');
@@ -488,9 +491,12 @@ export default function WaitingRoom({
     </div>
   );
 
+  // NIENTE <Icon> dentro <Alert>: Bootstrap Italia disegna già un'icona via
+  // ::before (padding-left:4em riservato) e un Icon inline si sovrappone
+  // (vedi memoria feedback_bootstrap-italia-alert). Solo testo, come
+  // aiNoticeBlock.
   const recordingNoticeBlock = event.recordingEnabled && !isEnded ? (
     <Alert color="warning" className="text-start mb-0" style={{ fontSize: '0.82rem' }}>
-      <Icon icon="it-camera" size="sm" className="me-2" />
       {t('recordingNotice')}
     </Alert>
   ) : null;
@@ -585,12 +591,20 @@ export default function WaitingRoom({
     </Link>
   ) : null;
 
-  // Status banners (warm-up / JVB scaling). Each Alert is mb-0; only one
-  // is ever visible at a time (warming-up implies not LIVE, JVB only LIVE).
+  // Status banners (warm-up / JVB scaling). Only one is ever visible at a
+  // time (warming-up implies not LIVE, JVB only LIVE). Rendered as plain
+  // styled divs — NOT <Alert> — because Bootstrap Italia's .alert draws an
+  // icon via ::before (reserved padding-left:4em) and the leading <Spinner>
+  // would collide with it (see feedback_bootstrap-italia-alert). The div
+  // owns its own spinner+border layout, like multitrackConsentBlock.
   const statusBanners = (
     <>
       {isLive && jvbReady === false && (
-        <Alert color="warning" className="text-start mb-0" style={{ fontSize: '0.85rem' }}>
+        <div
+          className="rounded-3 p-3 text-start"
+          style={{ background: '#FFF8E6', border: '1px solid #E0C97A', fontSize: '0.85rem' }}
+          role="status"
+        >
           <div className="d-flex align-items-start">
             <Spinner active small className="me-2 mt-1 flex-shrink-0" />
             <div>
@@ -599,10 +613,14 @@ export default function WaitingRoom({
               {t('jvbScalingDetail')}
             </div>
           </div>
-        </Alert>
+        </div>
       )}
       {isWarmingUp && (
-        <Alert color="info" className="text-start mb-0" style={{ fontSize: '0.85rem' }}>
+        <div
+          className="rounded-3 p-3 text-start"
+          style={{ background: '#E7F1FB', border: '1px solid #9EC5E9', fontSize: '0.85rem' }}
+          role="status"
+        >
           <div className="d-flex align-items-start">
             <Spinner active small className="me-2 mt-1 flex-shrink-0" />
             <div>
@@ -611,7 +629,7 @@ export default function WaitingRoom({
               {t('warmingUpDetail')}
             </div>
           </div>
-        </Alert>
+        </div>
       )}
     </>
   );

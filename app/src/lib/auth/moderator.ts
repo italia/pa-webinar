@@ -106,7 +106,17 @@ export async function verifyGrantToken(
   eventIdOrSlug: string,
   token: string,
 ): Promise<
-  | { event: Awaited<ReturnType<typeof prisma.event.findUnique>>; role: GrantRole; displayName: string | null }
+  | {
+      event: Awaited<ReturnType<typeof prisma.event.findUnique>>;
+      role: GrantRole;
+      displayName: string | null;
+      /** True for the SHARED primary `Event.moderatorToken` magic link.
+       *  Callers must require a typed display-name override for this case —
+       *  every moderator opening the shared link would otherwise collapse
+       *  to the same generic event.moderatorName. Per-row grants
+       *  (co-moderator / speaker) carry their own `displayName`. */
+      isPrimaryShared: boolean;
+    }
   | null
 > {
   const where = UUID_RE.test(eventIdOrSlug)
@@ -121,6 +131,7 @@ export async function verifyGrantToken(
       event,
       role: EventModeratorRole.MODERATOR,
       displayName: event.moderatorName ?? null,
+      isPrimaryShared: true,
     };
   }
 
@@ -130,6 +141,7 @@ export async function verifyGrantToken(
       event,
       role: grant.role,
       displayName: tryDecryptPII(grant.name) ?? grant.name,
+      isPrimaryShared: false,
     };
   }
 
