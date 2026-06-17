@@ -118,6 +118,12 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   // partecipante crea una NUOVA chiave → un NUOVO file (prima riusava
   // `${pid}.opus` e troncava la sessione precedente: audio perso).
   const writers = new Map<string, TrackWriter>();
+  // Append in volo (IPC chunk page→Node): vanno attesi PRIMA di chiudere i
+  // writer e leggere i file, altrimenti l'upload legge file troncati (i chunk
+  // arrivano async via exposeFunction mentre finish() già chiude/uploada).
+  const pendingAppends = new Set<Promise<void>>();
+  // Diagnostica trasporto: chunk/byte RICEVUTI lato Node per traccia.
+  const nodeChunkStats = new Map<string, { n: number; b: number }>();
   function getOrCreateWriter(trackFileId: string, pid: string, name: string | null): TrackWriter {
     let w = writers.get(trackFileId);
     if (!w) {
@@ -138,6 +144,13 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   // receive-only), autoplay senza gesture, no sandbox in container.
   const browser: Browser = await puppeteer.launch({
     headless: true,
+    // protocolTimeout:0 disabilita il timeout per-comando CDP. Il bootstrap
+    // in-page (`page.evaluate(IN_PAGE_BOOTSTRAP)`) resta volutamente *pending*
+    // per TUTTA la sessione (la sua Promise risolve solo dentro `finish()`).
+    // Col default 180s Puppeteer abortiva quel callFunctionOn dopo 3 minuti
+    // ("Runtime.callFunctionOn timed out") uccidendo il recorder PRIMA di
+    // finish()/upload/ingest → zero tracce per qualsiasi sessione reale. 0 = no cap.
+    protocolTimeout: 0,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -160,11 +173,26 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
     await page.exposeFunction(
       'onTrackChunk',
       async (trackKey: string, pid: string, name: string | null, b64: string, nowMs: number) => {
-        try {
-          await getOrCreateWriter(trackKey, pid, name).appendChunk(Buffer.from(b64, 'base64'), nowMs);
-        } catch (e) {
-          console.error('[recorder] appendChunk failed', e);
+        const buf = Buffer.from(b64, 'base64');
+        // DIAGNOSTICA: conta i chunk RICEVUTI lato Node (vs quelli loggati in
+        // pagina) per distinguere perdita-IPC da perdita-write.
+        const st = nodeChunkStats.get(trackKey) ?? { n: 0, b: 0 };
+        st.n += 1;
+        st.b += buf.length;
+        nodeChunkStats.set(trackKey, st);
+        if (st.n <= 2 || st.n % 10 === 0) {
+          console.log(`[recorder] NODE recv ${trackKey} #${st.n} +${buf.length}B (tot ${st.b}B)`);
         }
+        const p = (async () => {
+          try {
+            await getOrCreateWriter(trackKey, pid, name).appendChunk(buf, nowMs);
+          } catch (e) {
+            console.error('[recorder] appendChunk failed', e);
+          }
+        })();
+        pendingAppends.add(p);
+        await p;
+        pendingAppends.delete(p);
       },
     );
     // Ancora la timeline della traccia all'istante in cui parte il
@@ -185,10 +213,26 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
 
     // Stessa origin di lib-jitsi-meet (CSP/CORS): carichiamo la pagina del
     // dominio Jitsi e iniettiamo lo script lib-jitsi-meet servito da lì.
-    await page.goto(`https://${config.jitsiDomain}/`, {
-      waitUntil: 'domcontentloaded',
-      timeout: 60_000,
-    });
+    // Chrome headless in pod può lanciare `net::ERR_NETWORK_CHANGED` se la rete
+    // del pod (veth/CNI) si assesta DOPO l'avvio del browser: è una race di
+    // startup, non un errore reale. Ritenta il caricamento pagina alcune volte
+    // con backoff prima di arrendersi (osservato fallire ~1 volta su 2 al boot).
+    let gotoErr: unknown;
+    for (let attempt = 1; attempt <= 4; attempt++) {
+      try {
+        await page.goto(`https://${config.jitsiDomain}/`, {
+          waitUntil: 'domcontentloaded',
+          timeout: 60_000,
+        });
+        gotoErr = undefined;
+        break;
+      } catch (e) {
+        gotoErr = e;
+        console.error(`[recorder] page.goto tentativo ${attempt}/4 fallito: ${String(e)}`);
+        await new Promise((r) => setTimeout(r, 2_000 * attempt));
+      }
+    }
+    if (gotoErr) throw gotoErr;
     await page.addScriptTag({ url: `https://${config.jitsiDomain}/libs/lib-jitsi-meet.min.js` });
     // Carichiamo anche il config.js del deployment Jitsi: definisce
     // `window.config` con gli host XMPP reali (es. domain=meet.jitsi,
@@ -213,6 +257,13 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
     // Attendi fine conference o hard-cap di durata.
     await Promise.race([done, new Promise<void>((r) => setTimeout(r, maxDurationMs))]);
   } finally {
+    // Drena gli append in volo (IPC chunk page→Node ancora in coda quando la
+    // pagina ha risolto finish()), poi una breve attesa per gli ultimi
+    // bindingCalled in arrivo, e RIDRENA. Senza, l'upload leggeva i file prima
+    // che gli ultimi chunk fossero scritti → file troncati (~250B vs ~20KB+).
+    await Promise.allSettled([...pendingAppends]);
+    await new Promise<void>((r) => setTimeout(r, 1500));
+    await Promise.allSettled([...pendingAppends]);
     for (const w of writers.values()) {
       await w.close();
     }
@@ -260,6 +311,16 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     // Usa la config reale del deployment (window.config da config.js); i
     // valori sintetizzati in `cfg` restano solo come fallback.
     const jcfg = w.config ?? {};
+    // ESENZIONE RELAY (critico): il recorder è IN-CLUSTER e raggiunge il JVB
+    // via pod-IP diretto (host candidates). La config.js servita forza
+    // `iceTransportPolicy='relay'` (piano media TURN, necessario ai client
+    // ESTERNI dietro firewall), ma per il bot interno instradare il media via
+    // coturn PUBBLICO in hairpin NON consegna l'audio in ricezione → 0 tracce
+    // (segnalazione OK, media assente). Forziamo ICE 'all' + niente STUN/TURN:
+    // il bot usa il path diretto in-cluster, più affidabile ed efficiente.
+    jcfg.iceTransportPolicy = 'all';
+    jcfg.useStunTurn = false;
+    if (jcfg.p2p) jcfg.p2p.iceTransportPolicy = 'all';
     const hosts = jcfg.hosts ?? { domain: cfg.domain, muc: cfg.mucDomain };
     // serviceUrl: preferisci WebSocket, poi BOSH, poi il fallback sintetico.
     const serviceUrl = jcfg.websocket ?? jcfg.bosh ?? cfg.serviceUrl;
@@ -272,6 +333,9 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     });
 
     let conference: any = null;
+    // AudioContext condiviso: serve a "consumare" le track audio remote
+    // (vedi onTrackAdded) così Chrome headless ne decodifica l'RTP.
+    let sharedAudioCtx: any = null;
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
     const recorders = new Map<string, { rec: any; key: string }>();
     // Contatore monotono per generare un trackFileId univoco per sessione,
@@ -338,6 +402,9 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     };
 
     const onTrackAdded = (track: any) => {
+      log(
+        `TRACK_ADDED type=${track.getType?.()} local=${track.isLocal?.()} pid=${track.getParticipantId?.()}`,
+      );
       if (track.isLocal?.() || track.getType?.() !== 'audio') return;
       seenParticipant = true;
       if (idleTimer) clearTimeout(idleTimer);
@@ -354,9 +421,31 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         typeof track.getTrack === 'function'
           ? new MediaStream([track.getTrack()])
           : new MediaStream(original.getAudioTracks());
-      const stream: MediaStream = audioOnly.getAudioTracks().length
+      const rawStream: MediaStream = audioOnly.getAudioTracks().length
         ? audioOnly
         : original;
+      // FIX cattura headless: un MediaRecorder su una track audio REMOTA in
+      // Chrome headless NON riceve campioni se la track non viene "consumata"
+      // da un sink audio. Instradiamo la track via WebAudio (source→destination):
+      // forza la decodifica dell'RTP e alimenta il MediaRecorder con la
+      // destination stream. Senza il sink, MediaRecorder produce 0 byte (la
+      // segnalazione e i TRACK_ADDED arrivano, ma nessun campione).
+      let stream: MediaStream = rawStream;
+      try {
+        const AC = w.AudioContext || w.webkitAudioContext;
+        if (!sharedAudioCtx && AC) {
+          sharedAudioCtx = new AC();
+          void sharedAudioCtx.resume?.();
+        }
+        if (sharedAudioCtx) {
+          const srcNode = sharedAudioCtx.createMediaStreamSource(rawStream);
+          const destNode = sharedAudioCtx.createMediaStreamDestination();
+          srcNode.connect(destNode);
+          stream = destNode.stream;
+        }
+      } catch (e) {
+        log('WebAudio routing ko (fallback raw track): ' + String(e));
+      }
       let rec: MediaRecorder;
       try {
         rec = new MediaRecorder(stream, {
@@ -367,8 +456,15 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         log('MediaRecorder ko: ' + String(e));
         return;
       }
+      let chunkCount = 0;
+      let chunkBytes = 0;
       rec.ondataavailable = (ev: BlobEvent) => {
         if (!ev.data || ev.data.size === 0) return;
+        chunkCount += 1;
+        chunkBytes += ev.data.size;
+        if (chunkCount <= 2 || chunkCount % 10 === 0) {
+          log(`chunk ${key} #${chunkCount} +${ev.data.size}B (tot ${chunkBytes}B)`);
+        }
         const reader = new FileReader();
         reader.onloadend = () => {
           const res = reader.result as string;
@@ -381,8 +477,14 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       // chunk, che arriva ~1s dopo con jitter): è il riferimento per gli
       // offset di sincronizzazione dei late-joiner.
       w.onTrackStarted?.(key, pid, name, Date.now());
-      rec.start(1000); // chunk/sec
+      // timeslice 3s: a molti speaker concorrenti (es. webinar 50pax) un chunk
+      // ogni 1s = un giro IPC pagina→Node per traccia al secondo (qui ×N). 3s
+      // riduce ~3× l'overhead IPC/encode; l'offset è ancorato a onTrackStarted
+      // (non al primo chunk) e finish() flusha l'ultimo chunk su onstop → nessuna
+      // perdita di accuratezza temporale.
+      rec.start(3000);
       recorders.set(track.getId?.() ?? key, { rec, key });
+      log(`recording audio track key=${key} pid=${pid} name=${name} (recorders=${recorders.size})`);
     };
 
     const onTrackRemoved = (track: any) => {
@@ -400,7 +502,10 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     };
 
     const onConferenceJoined = () => {
-      log('conference joined: ' + cfg.room);
+      log(
+        'conference joined: ' + cfg.room +
+        ' participants=' + (conference?.getParticipants?.()?.length ?? 0),
+      );
       armIdle();
     };
 
@@ -411,16 +516,34 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         // che può sopprimere la RICEZIONE dell'audio remoto su alcuni
         // bridge. Il recorder è receive-only semplicemente perché non crea
         // né pubblica track locali (nessun getUserMedia, nessun addTrack).
-        conference = connection.initJitsiConference(cfg.room, {});
+        // Opzioni conference = config REALE servita (jcfg=window.config) con
+        // relay esentato. Passare `{}` (o un config minimale) lasciava la
+        // conference SENZA le impostazioni del bridge (es. openBridgeChannel,
+        // tipo canale websocket/datachannel, octo): la segnalazione e i
+        // TRACK_ADDED arrivavano, ma il media RTP non veniva mai negoziato →
+        // MediaRecorder a 0 byte → 0 tracce. L'app meet passa la config completa
+        // a initJitsiConference; il recorder deve fare lo stesso.
+        conference = connection.initJitsiConference(cfg.room, {
+          ...jcfg,
+          iceTransportPolicy: 'all',
+          useStunTurn: false,
+        });
         conference.setDisplayName(cfg.botName);
         conference.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
         conference.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
         conference.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
         conference.on(JitsiMeetJS.events.conference.USER_LEFT, armIdle);
-        conference.on(JitsiMeetJS.events.conference.USER_JOINED, () => {
+        conference.on(JitsiMeetJS.events.conference.USER_JOINED, (id: string) => {
           seenParticipant = true;
           if (idleTimer) clearTimeout(idleTimer);
+          log('USER_JOINED ' + id + ' (participants=' + (conference?.getParticipants?.()?.length ?? 0) + ')');
         });
+        // Diagnostica salute media (ICE/bridge): se il media non si stabilisce
+        // i TRACK_ADDED non arrivano. Logghiamo gli eventi disponibili.
+        try {
+          conference.on(JitsiMeetJS.events.conference.CONNECTION_INTERRUPTED, () => log('media CONNECTION_INTERRUPTED'));
+          conference.on(JitsiMeetJS.events.conference.CONNECTION_RESTORED, () => log('media CONNECTION_RESTORED'));
+        } catch { /* eventi non disponibili in questo build */ }
         // Errore di conference (kick, bridge down, ICE failed): NON uscire
         // in silenzio. Logga il motivo così l'operator/portale lo vede; chiude
         // pulito salvando ciò che è stato catturato finora. Un reconnect
@@ -453,6 +576,16 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       },
     );
     connection.connect();
+    // Setup completato → risolviamo SUBITO il page.evaluate. Tenere questa
+    // Promise pending per TUTTA la sessione bloccava la consegna dei
+    // bindingCalled di Puppeteer (le exposeFunction onTrackChunk): i chunk
+    // audio non arrivavano a Node → file ~250B invece di ~20KB+ catturati.
+    // Il resto è guidato dagli eventi lib-jitsi-meet + exposeFunction; la durata
+    // della sessione è gestita lato Node via `done` (onConferenceDone)/maxDuration.
+    // Ancoriamo connection+conference su window per evitarne il GC dopo il ritorno.
+    w.__recorderConnection = connection;
+    w.__recorderGetConference = () => conference;
+    resolve();
     /* eslint-enable @typescript-eslint/no-explicit-any */
   });
 
@@ -473,6 +606,16 @@ class TrackWriter {
 
   private fileHandle: Awaited<ReturnType<typeof open>> | null = null;
   private readonly path: string;
+  // Serializza le scritture: gli onTrackChunk arrivano async (IPC) e possono
+  // sovrapporsi (specie se la coda IPC flusha in burst a fine sessione). Due
+  // fileHandle.write concorrenti sullo stesso handle si pestano (posizione non
+  // atomica) → file troncato/corrotto (~250B invece di ~20KB). La catena rende
+  // gli append strettamente sequenziali.
+  private writeChain: Promise<void> = Promise.resolve();
+  // Una volta chiuso, ignora append tardivi: i chunk finali arrivano via IPC
+  // DOPO che finish() ha chiuso i writer e riaprivano il file in 'w'
+  // troncando tutto l'audio già scritto (21KB → ~550B).
+  private closed = false;
 
   constructor(
     participantId: string,
@@ -498,20 +641,32 @@ class TrackWriter {
     if (this.firstFrameAtMs === 0) this.firstFrameAtMs = startedAtMs;
   }
 
-  async appendChunk(chunk: Buffer, nowMs: number): Promise<void> {
-    if (this.fileHandle === null) {
-      this.fileHandle = await open(this.path, 'w');
-      // Fallback se onTrackStarted non è arrivato (difensivo): usa il primo
-      // chunk come origine. In condizioni normali anchor() ha già impostato
-      // firstFrameAtMs all'avvio del recorder.
-      if (this.firstFrameAtMs === 0) this.firstFrameAtMs = nowMs;
-    }
-    await this.fileHandle.write(chunk);
-    this.bytesWritten += chunk.length;
-    this.lastFrameAtMs = nowMs;
+  appendChunk(chunk: Buffer, nowMs: number): Promise<void> {
+    // Chunk arrivato dopo close(): scartalo, NON riaprire il file (riaprire in
+    // 'w' troncava i 21KB già scritti lasciando solo l'ultimo chunk ~550B).
+    if (this.closed) return Promise.resolve();
+    // Accoda alla catena: ogni write attende la precedente (no race sul handle).
+    this.writeChain = this.writeChain.then(async () => {
+      if (this.fileHandle === null) {
+        // 'a' (append): difesa extra — anche un'eventuale riapertura NON tronca.
+        this.fileHandle = await open(this.path, 'a');
+        // Fallback se onTrackStarted non è arrivato (difensivo): usa il primo
+        // chunk come origine. In condizioni normali anchor() ha già impostato
+        // firstFrameAtMs all'avvio del recorder.
+        if (this.firstFrameAtMs === 0) this.firstFrameAtMs = nowMs;
+      }
+      await this.fileHandle.write(chunk);
+      this.bytesWritten += chunk.length;
+      this.lastFrameAtMs = nowMs;
+    });
+    return this.writeChain;
   }
 
   async close(): Promise<void> {
+    // Blocca SUBITO nuovi append (no riapertura/troncamento da chunk tardivi),
+    // poi attendi che TUTTI gli append già accodati siano scritti.
+    this.closed = true;
+    await this.writeChain.catch(() => {});
     if (this.fileHandle) {
       await this.fileHandle.close();
       this.fileHandle = null;

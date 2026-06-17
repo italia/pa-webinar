@@ -602,7 +602,8 @@
       "eventMaterials": "Materialien",
       "eventQuestionnaires": "Fragebögen",
       "rubricaList": "Liste",
-      "rubricaDetail": "Eintrag"
+      "rubricaDetail": "Eintrag",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Verwaltungspanel",
@@ -2792,5 +2793,14 @@
     "close": "Schließen",
     "hintBanner": "Drücken Sie die Pfeiltasten, um durch den Garten zu laufen",
     "hintJoystick": "Ziehen, um sich zu bewegen"
+  },
+  "feedbackAdmin": {
+    "title": "Feedback-Ergebnisse",
+    "totalVotes": "Antworten",
+    "noFeedback": "Noch kein Feedback erhalten",
+    "comments": "Kommentare",
+    "noComments": "Keine Kommentare",
+    "yes": "Ja",
+    "no": "Nein"
   }
 }

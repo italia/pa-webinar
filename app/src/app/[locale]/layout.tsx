@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
@@ -18,6 +18,16 @@ function hexToRgb(hex: string): string {
   const n = parseInt(h, 16);
   return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
 }
+
+// Mobile-friendly viewport. `viewport-fit=cover` lets the app paint under
+// notches/safe-area insets; the themeColor tints the browser chrome. Uses the
+// .italia primary blue (matches the `--bs-primary` default in layout below).
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#0066CC',
+};
 
 interface LocaleLayoutProps {
   children: ReactNode;

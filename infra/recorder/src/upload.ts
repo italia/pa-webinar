@@ -280,8 +280,9 @@ export async function uploadRecording(
   const { manifest, files } = params;
   const trackSizes: Record<string, number> = {};
   const failed: string[] = [];
-  const okTracks: ManifestTrack[] = [];
 
+  // Key-validation (programming-error guard) PRIMA dell'upload: un drift è un
+  // bug, meglio fallire subito e rumorosamente che a metà upload.
   for (const f of files) {
     const expectedKey = trackKey(
       manifest.eventId,
@@ -293,20 +294,42 @@ export async function uploadRecording(
         `track key mismatch: manifest=${f.track.trackKey} expected=${expectedKey}`,
       );
     }
-    try {
-      const body = await readFile(f.localPath);
-      await putWithRetry(provider, f.track.trackKey, body, OPUS_CONTENT_TYPE);
-      // Chiave per SESSIONE (no collisioni su rejoin dello stesso pid).
-      trackSizes[f.track.trackFileId] = body.length;
-      okTracks.push(f.track);
-    } catch (e) {
-      console.error(
-        `[recorder] upload traccia ${f.track.trackKey} fallito dopo i retry, la salto:`,
-        e,
-      );
-      failed.push(f.track.trackKey);
-    }
   }
+
+  // Upload bound-parallel (max 4 in volo): a fine evento con molti speaker
+  // l'upload seriale (readFile + presign + PUT per traccia) allungava l'ingest
+  // in modo lineare nel numero di tracce. Tolleranza parziale invariata: una
+  // traccia fallita (dopo i retry) viene saltata, le altre proseguono.
+  const UPLOAD_CONCURRENCY = 4;
+  const ok: boolean[] = new Array(files.length).fill(false);
+  let next = 0;
+  const worker = async (): Promise<void> => {
+    for (;;) {
+      const i = next;
+      next += 1;
+      if (i >= files.length) return;
+      const f = files[i];
+      if (!f) return;
+      try {
+        const body = await readFile(f.localPath);
+        await putWithRetry(provider, f.track.trackKey, body, OPUS_CONTENT_TYPE);
+        // Chiave per SESSIONE (no collisioni su rejoin dello stesso pid).
+        trackSizes[f.track.trackFileId] = body.length;
+        ok[i] = true;
+      } catch (e) {
+        console.error(
+          `[recorder] upload traccia ${f.track.trackKey} fallito dopo i retry, la salto:`,
+          e,
+        );
+        failed.push(f.track.trackKey);
+      }
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(UPLOAD_CONCURRENCY, files.length) }, () => worker()),
+  );
+  // okTracks nell'ordine di input (deterministico), solo le tracce salite.
+  const okTracks: ManifestTrack[] = files.filter((_, i) => ok[i]).map((f) => f.track);
 
   // Manifest effettivo = solo le tracce caricate. Se TUTTE falliscono,
   // tracks=[] e il chiamante non ingesta (evita righe orfane / 404 worker).

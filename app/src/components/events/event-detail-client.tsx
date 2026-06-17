@@ -2,16 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import {
-  Alert,
-  Button,
-  Badge,
-  Card,
-  CardBody,
-  Icon,
-  Row,
-  Col,
-} from 'design-react-kit';
+import { Alert, Button, Badge, Card, CardBody, Icon, Row, Col } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -22,7 +13,10 @@ import VideoPlayer, {
   type AudioTrack,
 } from '@/components/events/video-player';
 import PostEventTabs from '@/components/events/post-event-tabs';
-import PostEventHero, { type StructuredSummary } from '@/components/events/post-event-hero';
+import PostEventFeedbackInvite from '@/components/events/post-event-feedback-invite';
+import PostEventHero, {
+  type StructuredSummary,
+} from '@/components/events/post-event-hero';
 import type { PipelineSnapshot } from '@/components/events/pipeline-provenance';
 import NowSpeakingChip from '@/components/events/now-speaking-chip';
 import VideoMiniPlayer from '@/components/events/video-mini-player';
@@ -155,9 +149,9 @@ export default function EventDetailClient({
   // Lingua attiva dei sottotitoli — guida quale variante di summary
   // mostrare nel TranscriptPanel ("la sintesi nella lingua che stai
   // guardando").
-  const [activeTranscriptLanguage, setActiveTranscriptLanguage] = useState<
-    string | null
-  >(null);
+  const [activeTranscriptLanguage, setActiveTranscriptLanguage] = useState<string | null>(
+    null
+  );
   // Metadata postprod (subtitle/audio tracks disponibili, transcript
   // endpoint). Fetched solo per recording pubblicate; se la fetch
   // fallisce o ritorna 404 (postprod non abilitato per l'evento) i
@@ -168,7 +162,13 @@ export default function EventDetailClient({
     transcriptAvailable: boolean;
     summariesStructured?: Record<string, StructuredSummary>;
     /** Lightweight segments shape per il NowSpeakingChip (no words). */
-    segmentsLite?: Array<{ start: number; end: number; speaker: string | null; speakerName: string | null; text: string }>;
+    segmentsLite?: Array<{
+      start: number;
+      end: number;
+      speaker: string | null;
+      speakerName: string | null;
+      text: string;
+    }>;
     pipelineSnapshot?: PipelineSnapshot;
   } | null>(null);
 
@@ -214,14 +214,12 @@ export default function EventDetailClient({
           }>;
           pipelineSnapshot?: PipelineSnapshot;
         };
-        const subtitles: SubtitleTrack[] = (data.subtitleTracks ?? []).map(
-          (lang) => ({
-            language: lang,
-            src: `/api/events/${event.slug}/postprod/subtitle/${lang}`,
-            label: localeDisplayName(lang),
-            isDefault: lang === data.sourceLanguage,
-          }),
-        );
+        const subtitles: SubtitleTrack[] = (data.subtitleTracks ?? []).map((lang) => ({
+          language: lang,
+          src: `/api/events/${event.slug}/postprod/subtitle/${lang}`,
+          label: localeDisplayName(lang),
+          isDefault: lang === data.sourceLanguage,
+        }));
         const audio: AudioTrack[] = (data.dubbedAudio ?? []).map((d) => ({
           language: d.language,
           src: d.src,
@@ -331,106 +329,64 @@ export default function EventDetailClient({
             borderLeft: `5px solid ${accentColor}`,
           }}
         >
-        <div className="d-flex align-items-center gap-2 mb-3">
-          <StatusPill status={event.status} />
-          {isLive && (
-            <Badge
-              color="success"
-              className="px-2 py-1 d-inline-flex align-items-center gap-1"
-              style={{ fontSize: '0.75rem' }}
-            >
-              <span
-                className="rounded-circle d-inline-block"
-                style={{
-                  width: 7,
-                  height: 7,
-                  backgroundColor: '#fff',
-                  animation: 'pulse-dot 1.5s ease-in-out infinite',
-                }}
-              />
-              {t('card.liveNow')}
-            </Badge>
-          )}
-        </div>
-
-        <EventTitle
-          title={title}
-          kickerEnabled={parseTitleKicker}
-          as="h1"
-          className="mb-3"
-          style={{ color: 'var(--app-text)', lineHeight: 1.3 }}
-        />
-
-        {tags.length > 0 && (
-          <div className="d-flex flex-wrap gap-2 mb-4">
-            {tags.map((tag) => {
-              const label =
-                tag.name[locale] ?? tag.name.it ?? tag.name.en ?? tag.slug;
-              const color = tag.color ?? '#5A768A';
-              return (
-                <Link
-                  key={tag.slug}
-                  href={`/events?tag=${tag.slug}`}
-                  className="text-decoration-none"
-                  style={{
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: 999,
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                    backgroundColor: `${color}22`,
-                    color,
-                    border: `1px solid ${color}44`,
-                  }}
-                >
-                  {label}
-                </Link>
-              );
-            })}
-          </div>
-        )}
-
-        <Row className="g-3 g-lg-4">
-          <Col xs={12} md="auto">
-            <div className="d-flex align-items-center">
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
-                style={{
-                  width: 44,
-                  height: 44,
-                  backgroundColor: 'rgba(0,102,204,0.1)',
-                }}
+          <div className="d-flex align-items-center gap-2 mb-3">
+            <StatusPill status={event.status} />
+            {isLive && (
+              <Badge
+                color="success"
+                className="px-2 py-1 d-inline-flex align-items-center gap-1"
+                style={{ fontSize: '0.75rem' }}
               >
-                <Icon icon="it-calendar" className="text-primary" />
-              </div>
-              <div>
-                <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                  {format.dateTime(startsAt, {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </div>
-                <div className="text-muted" style={{ fontSize: '0.9rem' }}>
-                  {format.dateTime(startsAt, {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                  {' – '}
-                  {format.dateTime(endsAt, {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                  {' · '}
-                  {t('detail.durationHours', {
-                    hours: durationHours,
-                    minutes: durationMinutes,
-                  })}
-                </div>
-              </div>
+                <span
+                  className="rounded-circle d-inline-block"
+                  style={{
+                    width: 7,
+                    height: 7,
+                    backgroundColor: '#fff',
+                    animation: 'pulse-dot 1.5s ease-in-out infinite',
+                  }}
+                />
+                {t('card.liveNow')}
+              </Badge>
+            )}
+          </div>
+
+          <EventTitle
+            title={title}
+            kickerEnabled={parseTitleKicker}
+            as="h1"
+            className="mb-3"
+            style={{ color: 'var(--app-text)', lineHeight: 1.3 }}
+          />
+
+          {tags.length > 0 && (
+            <div className="d-flex flex-wrap gap-2 mb-4">
+              {tags.map((tag) => {
+                const label = tag.name[locale] ?? tag.name.it ?? tag.name.en ?? tag.slug;
+                const color = tag.color ?? '#5A768A';
+                return (
+                  <Link
+                    key={tag.slug}
+                    href={`/events?tag=${tag.slug}`}
+                    className="text-decoration-none"
+                    style={{
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: 999,
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      backgroundColor: `${color}22`,
+                      color,
+                      border: `1px solid ${color}44`,
+                    }}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
             </div>
-          </Col>
-          {speakers && (
+          )}
+
+          <Row className="g-3 g-lg-4">
             <Col xs={12} md="auto">
               <div className="d-flex align-items-center">
                 <div
@@ -441,44 +397,85 @@ export default function EventDetailClient({
                     backgroundColor: 'rgba(0,102,204,0.1)',
                   }}
                 >
-                  <Icon icon="it-user" className="text-primary" />
+                  <Icon icon="it-calendar" className="text-primary" />
                 </div>
                 <div>
                   <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                    {t('detail.speakers')}
+                    {format.dateTime(startsAt, {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
                   </div>
                   <div className="text-muted" style={{ fontSize: '0.9rem' }}>
-                    {speakers}
+                    {format.dateTime(startsAt, {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                    {' – '}
+                    {format.dateTime(endsAt, {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                    {' · '}
+                    {t('detail.durationHours', {
+                      hours: durationHours,
+                      minutes: durationMinutes,
+                    })}
                   </div>
                 </div>
               </div>
             </Col>
-          )}
-          {event.organizerName && (
-            <Col xs={12} md="auto">
-              <div className="d-flex align-items-center">
-                <div
-                  className="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
-                  style={{
-                    width: 44,
-                    height: 44,
-                    backgroundColor: 'rgba(0,102,204,0.1)',
-                  }}
-                >
-                  <Icon icon="it-pa" className="text-primary" />
-                </div>
-                <div>
-                  <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                    {t('detail.organizer')}
+            {speakers && (
+              <Col xs={12} md="auto">
+                <div className="d-flex align-items-center">
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      backgroundColor: 'rgba(0,102,204,0.1)',
+                    }}
+                  >
+                    <Icon icon="it-user" className="text-primary" />
                   </div>
-                  <div className="text-muted" style={{ fontSize: '0.9rem' }}>
-                    {event.organizerName}
+                  <div>
+                    <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+                      {t('detail.speakers')}
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                      {speakers}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Col>
-          )}
-        </Row>
+              </Col>
+            )}
+            {event.organizerName && (
+              <Col xs={12} md="auto">
+                <div className="d-flex align-items-center">
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      backgroundColor: 'rgba(0,102,204,0.1)',
+                    }}
+                  >
+                    <Icon icon="it-pa" className="text-primary" />
+                  </div>
+                  <div>
+                    <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+                      {t('detail.organizer')}
+                    </div>
+                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                      {event.organizerName}
+                    </div>
+                  </div>
+                </div>
+              </Col>
+            )}
+          </Row>
         </div>
       </div>
 
@@ -612,6 +609,12 @@ export default function EventDetailClient({
             />
           )}
 
+          {/* Post-event feedback questionnaire invite (self-hides when the
+              event has no POST_EVENT questionnaire configured). */}
+          {isEnded && event.postEventShowFeedback !== false && (
+            <PostEventFeedbackInvite eventSlug={event.slug} />
+          )}
+
           {/* Feature diagram moved behind the admin UI — it's internal
               infra/capacity info, not something public attendees need. */}
         </Col>
@@ -632,12 +635,19 @@ export default function EventDetailClient({
                 <>
                   <h3
                     className="h6 text-uppercase fw-semibold mb-3"
-                    style={{ letterSpacing: '0.04em', color: 'var(--app-muted)', fontSize: '0.8rem' }}
+                    style={{
+                      letterSpacing: '0.04em',
+                      color: 'var(--app-muted)',
+                      fontSize: '0.8rem',
+                    }}
                   >
                     {t('detail.participants')}
                   </h3>
 
-                  <div className="mb-2 fw-semibold" style={{ fontSize: '1.5rem', color: 'var(--app-text)' }}>
+                  <div
+                    className="mb-2 fw-semibold"
+                    style={{ fontSize: '1.5rem', color: 'var(--app-text)' }}
+                  >
                     {event.registrationCount}
                   </div>
                   <div className="text-muted small mb-4">
@@ -680,9 +690,7 @@ export default function EventDetailClient({
           {/* Bookmarks personali del visitatore (localStorage), sotto
               alla card info evento. La card scompare quando la lista
               è vuota: niente UI vuota a sprecare spazio. */}
-          {isEnded && (
-            <BookmarksPanel slug={event.slug} playerRef={playerRef} />
-          )}
+          {isEnded && <BookmarksPanel slug={event.slug} playerRef={playerRef} />}
         </Col>
       </Row>
     </div>
@@ -737,22 +745,33 @@ function PostEventSidebar({
         {t('detail.eventEnded')}
       </h3>
 
-      <div className="d-flex align-items-center text-muted mb-2" style={{ fontSize: '0.88rem' }}>
+      <div
+        className="d-flex align-items-center text-muted mb-2"
+        style={{ fontSize: '0.88rem' }}
+      >
         <Icon icon="it-user" size="sm" className="me-2" />
         <span>{t('detail.totalRegistrations', { count: registrationCount })}</span>
       </div>
 
       {event.peakParticipants !== undefined && event.peakParticipants > 0 && (
-        <div className="d-flex align-items-center text-muted mb-2" style={{ fontSize: '0.88rem' }}>
+        <div
+          className="d-flex align-items-center text-muted mb-2"
+          style={{ fontSize: '0.88rem' }}
+        >
           <Icon icon="it-chart-line" size="sm" className="me-2" />
           <span>{t('detail.peakParticipants', { count: event.peakParticipants })}</span>
         </div>
       )}
 
       {feedbackSummary && feedbackSummary.count > 0 && feedbackSummary.average && (
-        <div className="d-flex align-items-center text-muted mb-2" style={{ fontSize: '0.88rem' }}>
+        <div
+          className="d-flex align-items-center text-muted mb-2"
+          style={{ fontSize: '0.88rem' }}
+        >
           <span className="me-2">⭐</span>
-          <span>{feedbackSummary.average.toFixed(1)}/5 ({feedbackSummary.count})</span>
+          <span>
+            {feedbackSummary.average.toFixed(1)}/5 ({feedbackSummary.count})
+          </span>
         </div>
       )}
 
@@ -822,7 +841,9 @@ function toYouTubeEmbed(url: string): string | null {
       const id = u.searchParams.get('v');
       return id ? `https://www.youtube.com/embed/${id}` : null;
     }
-  } catch { /* fall through */ }
+  } catch {
+    /* fall through */
+  }
   return null;
 }
 
@@ -838,14 +859,30 @@ function YouTubeEmbed({ url, title }: { url: string; title: string }) {
     );
   }
   return (
-    <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: 8, background: '#000' }}>
+    <div
+      style={{
+        position: 'relative',
+        paddingBottom: '56.25%',
+        height: 0,
+        overflow: 'hidden',
+        borderRadius: 8,
+        background: '#000',
+      }}
+    >
       <iframe
         src={embed}
         title={title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
         loading="lazy"
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          border: 0,
+        }}
       />
     </div>
   );
