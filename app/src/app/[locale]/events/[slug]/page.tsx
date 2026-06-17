@@ -101,55 +101,78 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       url: settings.organizationUrl || '',
     },
     maximumAttendeeCapacity: event.maxParticipants,
-    remainingAttendeeCapacity:
-      event.maxParticipants - event._count.registrations,
+    remainingAttendeeCapacity: event.maxParticipants - event._count.registrations,
   };
 
   // Fetch post-event data for ENDED events
-  let eventMaterials: { id: string; title: string; url: string; description: string | null; addedBy: string; createdAt: string }[] = [];
-  let answeredQuestions: { id: string; text: string; authorName: string; upvotes: number; status: string }[] = [];
-  let pollsData: { id: string; question: string; options: string[]; voteCounts: number[]; totalVotes: number }[] = [];
-  let feedbackSummary: { average: number | null; count: number; distribution: { rating: number; count: number }[] } | null = null;
+  let eventMaterials: {
+    id: string;
+    title: string;
+    url: string;
+    description: string | null;
+    addedBy: string;
+    createdAt: string;
+  }[] = [];
+  let answeredQuestions: {
+    id: string;
+    text: string;
+    authorName: string;
+    upvotes: number;
+    status: string;
+  }[] = [];
+  let pollsData: {
+    id: string;
+    question: string;
+    options: string[];
+    voteCounts: number[];
+    totalVotes: number;
+  }[] = [];
+  let feedbackSummary: {
+    average: number | null;
+    count: number;
+    distribution: { rating: number; count: number }[];
+  } | null = null;
 
   if (event.status === 'ENDED') {
-    const [materialsRaw, questionsRaw, pollsRaw, feedbackAgg, feedbackDist] = await Promise.all([
-      event.postEventShowMaterials
-        ? prisma.eventMaterial.findMany({
-            where: { eventId: event.id },
-            orderBy: { createdAt: 'desc' },
-          })
-        : Promise.resolve([]),
-      event.postEventShowQA && event.qaEnabled
-        ? prisma.question.findMany({
-            where: {
-              eventId: event.id,
-              status: { in: ['ANSWERED', 'HIGHLIGHTED'] },
-            },
-            orderBy: { upvoteCount: 'desc' },
-          })
-        : Promise.resolve([]),
-      event.postEventShowPolls
-        ? prisma.poll.findMany({
-            where: { eventId: event.id, status: 'PUBLISHED' },
-            include: { votes: { select: { optionIndex: true } } },
-          })
-        : Promise.resolve([]),
-      event.postEventShowFeedback
-        ? prisma.eventFeedback.aggregate({
-            where: { eventId: event.id },
-            _avg: { rating: true },
-            _count: true,
-          })
-        : Promise.resolve(null),
-      event.postEventShowFeedback
-        ? prisma.eventFeedback.groupBy({
-            by: ['rating'],
-            where: { eventId: event.id },
-            _count: true,
-            orderBy: { rating: 'desc' },
-          })
-        : Promise.resolve([]),
-    ]);
+    const [materialsRaw, questionsRaw, pollsRaw, feedbackAgg, feedbackDist] =
+      await Promise.all([
+        event.postEventShowMaterials
+          ? prisma.eventMaterial.findMany({
+              where: { eventId: event.id },
+              orderBy: { createdAt: 'desc' },
+            })
+          : Promise.resolve([]),
+        event.postEventShowQA && event.qaEnabled
+          ? prisma.question.findMany({
+              where: {
+                eventId: event.id,
+                status: { in: ['ANSWERED', 'HIGHLIGHTED'] },
+              },
+              orderBy: { upvoteCount: 'desc' },
+            })
+          : Promise.resolve([]),
+        event.postEventShowPolls
+          ? prisma.poll.findMany({
+              where: { eventId: event.id, status: 'PUBLISHED' },
+              include: { votes: { select: { optionIndex: true } } },
+            })
+          : Promise.resolve([]),
+        event.postEventShowFeedback
+          ? prisma.eventFeedback.aggregate({
+              where: { eventId: event.id },
+              _avg: { rating: true },
+              _count: true,
+            })
+          : Promise.resolve(null),
+        event.postEventShowFeedback
+          ? prisma.eventFeedback.groupBy({
+              by: ['rating'],
+              where: { eventId: event.id },
+              _count: true,
+              orderBy: { rating: 'desc' },
+            })
+          : Promise.resolve([]),
+      ]);
 
     eventMaterials = materialsRaw.map((m) => ({
       id: m.id,
@@ -170,8 +193,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
     pollsData = pollsRaw.map((p) => {
       const opts = (p.options as string[]) ?? [];
-      const voteCounts = opts.map((_, i) =>
-        p.votes.filter((v) => v.optionIndex === i).length,
+      const voteCounts = opts.map(
+        (_, i) => p.votes.filter((v) => v.optionIndex === i).length
       );
       return {
         id: p.id,
@@ -191,6 +214,57 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
           count: d._count,
         })),
       };
+    }
+
+    // Convergence fallback: events created after the feedback redesign
+    // collect ratings via the POST_EVENT questionnaire (QuestionnaireResponse),
+    // not the legacy EventFeedback table. When there is no legacy feedback,
+    // derive the public star summary from the questionnaire's 1-5 LIKERT
+    // answers (averaged across all rating questions) so the public Feedback
+    // tab keeps working for new events.
+    if (!feedbackSummary && event.postEventShowFeedback) {
+      const pq = await prisma.eventQuestionnaire.findUnique({
+        where: { eventId_placement: { eventId: event.id, placement: 'POST_EVENT' } },
+        select: {
+          _count: { select: { responses: true } },
+          responses: {
+            select: {
+              answers: {
+                select: { valueScale: true, item: { select: { type: true } } },
+              },
+            },
+          },
+        },
+      });
+      if (pq && pq._count.responses > 0) {
+        const counts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        let sum = 0;
+        let n = 0;
+        for (const r of pq.responses) {
+          for (const a of r.answers) {
+            if (
+              a.item.type === 'LIKERT' &&
+              a.valueScale != null &&
+              a.valueScale >= 1 &&
+              a.valueScale <= 5
+            ) {
+              counts[a.valueScale] = (counts[a.valueScale] ?? 0) + 1;
+              sum += a.valueScale;
+              n += 1;
+            }
+          }
+        }
+        if (n > 0) {
+          feedbackSummary = {
+            average: sum / n,
+            count: pq._count.responses,
+            distribution: [5, 4, 3, 2, 1].map((rating) => ({
+              rating,
+              count: counts[rating] ?? 0,
+            })),
+          };
+        }
+      }
     }
   }
 
@@ -231,7 +305,9 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+        }}
       />
       <EventDetailClient
         event={serialised}

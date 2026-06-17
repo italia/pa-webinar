@@ -2795,10 +2795,12 @@
     "hintJoystick": "Ziehen, um sich zu bewegen"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments"
+    "title": "Feedback-Ergebnisse",
+    "totalVotes": "Antworten",
+    "noFeedback": "Noch kein Feedback erhalten",
+    "comments": "Kommentare",
+    "noComments": "Keine Kommentare",
+    "yes": "Ja",
+    "no": "Nein"
   }
 }

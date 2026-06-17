@@ -3167,10 +3167,12 @@
     "overlapTitle": "Parole simultanée : plusieurs personnes parlent en même temps sur cet intervalle."
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments"
+    "title": "Résultats des retours",
+    "totalVotes": "réponses",
+    "noFeedback": "Aucun retour reçu",
+    "comments": "Commentaires",
+    "noComments": "Aucun commentaire",
+    "yes": "Oui",
+    "no": "Non"
   }
 }

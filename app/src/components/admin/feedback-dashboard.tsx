@@ -229,14 +229,14 @@ function ItemSummary({
         </p>
         <div className="d-flex flex-column gap-1" style={{ fontSize: '0.85rem' }}>
           <div className="d-flex align-items-center gap-2">
-            <span style={{ width: 40 }}>Sì</span>
+            <span style={{ width: 40 }}>{t('yes')}</span>
             <Bar widthPct={(yes / total) * 100} />
             <span className="text-muted" style={{ width: 60 }}>
               {yes}
             </span>
           </div>
           <div className="d-flex align-items-center gap-2">
-            <span style={{ width: 40 }}>No</span>
+            <span style={{ width: 40 }}>{t('no')}</span>
             <Bar widthPct={(no / total) * 100} />
             <span className="text-muted" style={{ width: 60 }}>
               {no}

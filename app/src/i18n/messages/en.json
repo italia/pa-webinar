@@ -3223,6 +3223,8 @@
     "totalVotes": "responses",
     "noFeedback": "No feedback received",
     "comments": "Comments",
-    "noComments": "No comments"
+    "noComments": "No comments",
+    "yes": "Yes",
+    "no": "No"
   }
 }

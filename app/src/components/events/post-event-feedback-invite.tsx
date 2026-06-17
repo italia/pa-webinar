@@ -4,8 +4,15 @@
  * Invitation to leave POST_EVENT feedback, shown on the public post-event
  * page for attendees who did not submit at call exit. Self-hides when the
  * event has no POST_EVENT questionnaire configured (QuestionnaireForm
- * reports a 404 via onNotFound). Uses the same stable guest id as the live
- * client so a participant who already answered is de-duplicated.
+ * reports a 404 via onNotFound).
+ *
+ * Dedup note: this public surface has no registration accessToken in scope,
+ * so it submits as a guest (keyed by the stable localStorage guest id). A
+ * never-registered attendee is therefore de-duplicated against their own
+ * earlier guest submission. A *registered* attendee who already answered at
+ * call exit (keyed by registrationId) is NOT cross-deduplicated and could
+ * submit again here as a guest — an accepted limitation while the public
+ * page carries no token.
  */
 
 import { useCallback, useState } from 'react';

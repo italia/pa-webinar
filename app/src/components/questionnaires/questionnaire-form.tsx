@@ -174,6 +174,15 @@ export default function QuestionnaireForm({
   }, [q, values, eventSlug, placement, accessToken, guestId, onSubmitted]);
 
   if (loading) return <div className="text-muted">{tc('loading')}</div>;
+  // Surface a load failure (non-404 error) instead of returning null, which
+  // would otherwise leave the post-event modal chrome with an empty body.
+  if (error && !q) {
+    return (
+      <div className="alert alert-danger" role="alert">
+        {error}
+      </div>
+    );
+  }
   if (notFound || !q) return null;
   if (submitted) {
     return (
@@ -365,6 +374,7 @@ function ItemInput({
               max={max}
               value={value?.scale}
               onChange={(n) => onChange({ scale: n })}
+              ariaLabel={prompt}
               minLabel={item.scaleMinLabel ? localize(item.scaleMinLabel, locale) : null}
               maxLabel={item.scaleMaxLabel ? localize(item.scaleMaxLabel, locale) : null}
             />
@@ -410,12 +420,14 @@ function StarScale({
   max,
   value,
   onChange,
+  ariaLabel,
   minLabel,
   maxLabel,
 }: {
   max: number;
   value: number | undefined;
   onChange: (n: number) => void;
+  ariaLabel?: string;
   minLabel: string | null;
   maxLabel: string | null;
 }) {
@@ -424,13 +436,19 @@ function StarScale({
   const stars = Array.from({ length: max }, (_, i) => i + 1);
   return (
     <div style={{ maxWidth: max * 40 }}>
-      <div className="d-flex gap-1 align-items-center" role="radiogroup">
+      {/* Toggle-button group (not a radiogroup) — each star carries an
+          "n/max" accessible name and the group is named by its prompt. */}
+      <div
+        className="d-flex gap-1 align-items-center"
+        role="group"
+        aria-label={ariaLabel}
+      >
         {stars.map((n) => (
           <button
             key={n}
             type="button"
             className="btn btn-link p-0 border-0 lh-1"
-            aria-label={String(n)}
+            aria-label={`${n}/${max}`}
             aria-pressed={value === n}
             onMouseEnter={() => setHover(n)}
             onMouseLeave={() => setHover(0)}
