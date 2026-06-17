@@ -312,9 +312,14 @@ export default function LiveEventClient({
         // Both moderators and speakers arrive via magic link → they use
         // the `moderatorToken` field (the JWT route's grant flow handles
         // the role distinction and issues the right Jitsi features).
+        // The magic link is SHARED, so the generic grant name
+        // ("Moderatore" / "Relatore") is never useful — always forward the
+        // name the moderator typed in the waiting room (required there) so
+        // each one shows up under their own identity in chat / the
+        // participant list instead of all collapsing to "Moderatore".
         body.moderatorToken = token;
-        if (chosenName && chosenName !== initialDisplayName) {
-          body.displayNameOverride = chosenName;
+        if (chosenName.trim()) {
+          body.displayNameOverride = chosenName.trim();
         }
       } else {
         body.accessToken = token;
@@ -408,6 +413,13 @@ export default function LiveEventClient({
         const data = await res.json();
         if (data.status === 'ENDED' && eventStatus !== 'ENDED') {
           setEventStatus('ENDED');
+          // Drive the in-app "Evento concluso" closing screen instead of
+          // leaving phase='ready' (which keeps repainting the JVB warming
+          // overlay over a dead iframe — "Sala in preparazione"). Mark this
+          // as an intentional end so a late `videoConferenceLeft` from the
+          // tearing-down iframe doesn't bounce the user into 'reconnecting'.
+          userHangupRef.current = true;
+          setPhase('ended');
           if (!isModerator) {
             setShowFeedback(true);
           }
@@ -704,6 +716,19 @@ export default function LiveEventClient({
         <Icon icon="it-check-circle" size="xl" className="text-success mb-3" />
         <h1 className="h3 mb-3">{t('eventEnded')}</h1>
         <p className="mb-4">{t('eventEndedMessage')}</p>
+
+        {/* ────────────────────────────────────────────────────────────
+            FEEDBACK FORM SLOT — owned by another agent.
+            Mount the post-event feedback questionnaire here for
+            non-moderators. Pass the same identity props the live
+            `showFeedback` block uses below:
+              - eventSlug={event.slug}
+              - accessToken={!isGuest ? token : undefined}  (registered)
+              - guestId={isGuest ? guestId : undefined}      (anonymous)
+            Until that component lands, the closing screen just offers the
+            navigation links below.
+            ──────────────────────────────────────────────────────────── */}
+
         {isModerator ? (
           <Link href={`/admin/events/${event.id}?token=${token}`}>
             <Button color="primary" outline tag="span">
@@ -829,7 +854,12 @@ export default function LiveEventClient({
   // ── Ready: Jitsi room ──
   const isActualModerator = credentials.role === 'moderator';
   const isInstantCall = event.eventType === 'INSTANT';
-  const showJvbOverlay = jvbReady !== true;
+  // Only ever show the "warming up" overlay while the event is genuinely
+  // LIVE and the bridge isn't ready yet. Once the event is ENDED we render
+  // the closing screen (phase='ended'); guarding here is belt-and-braces so
+  // the overlay can never repaint over a torn-down iframe if we're briefly
+  // still on phase='ready'.
+  const showJvbOverlay = eventStatus === 'LIVE' && jvbReady !== true;
 
   return (
     <div className="d-flex flex-column live-page-bg">

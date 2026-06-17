@@ -117,6 +117,16 @@ describe('Jitsi config overwrite', () => {
     expect(jitsiConfigOverwrite.disableReactions).toBe(true);
   });
 
+  it('keeps echo cancellation / noise suppression / AGC ON', () => {
+    expect(jitsiConfigOverwrite.disableAEC).toBe(false);
+    expect(jitsiConfigOverwrite.disableNS).toBe(false);
+    expect(jitsiConfigOverwrite.disableAGC).toBe(false);
+  });
+
+  it('disables noisy-mic detection (the prompt pushes users into the broken noise-suppression toggle)', () => {
+    expect(jitsiConfigOverwrite.enableNoisyMicDetection).toBe(false);
+  });
+
   it('disables kick by default (participants must not see the kick button)', () => {
     // JitsiRoom flips this to false in configOverwrite when role === 'moderator'
     // so the participants-pane "rimuovi utente" action fires. Participants keep
@@ -258,6 +268,13 @@ describe('Video quality presets', () => {
     // without maxing bandwidth".
     expect(top('HIGH')).toBeLessThanOrEqual(2_500_000);
     expect(top('MAX')).toBeGreaterThanOrEqual(3_500_000);
+  });
+
+  it('HIGH disables Opus RED (echo/doubling at 96kbps mono); MAX keeps it on', () => {
+    const high = resolveVideoQualityConfig('HIGH') as { enableOpusRed: boolean };
+    const max = resolveVideoQualityConfig('MAX') as { enableOpusRed: boolean };
+    expect(high.enableOpusRed).toBe(false);
+    expect(max.enableOpusRed).toBe(true);
   });
 
   it('MAX uses rich stereo Opus; SAVE_DATA uses low mono', () => {
