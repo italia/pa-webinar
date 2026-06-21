@@ -47,7 +47,7 @@
     "nanoid": "^5.0.0",
     "next": "^15.5.18",
     "next-intl": "^4.9.2",
-    "nodemailer": "^8.0.5",
+    "nodemailer": "^9.0.1",
     "prom-client": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
