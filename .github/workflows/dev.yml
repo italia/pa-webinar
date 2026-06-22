@@ -63,7 +63,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/setup-buildx-action@v3
 
@@ -149,7 +149,7 @@ jobs:
     outputs:
       worker_changed: ${{ steps.filter.outputs.worker }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2
       - name: Filter changed files
@@ -187,7 +187,7 @@ jobs:
     # è un buffer ampio (cold senza cache fa ~25-30 min).
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/setup-buildx-action@v3
 
@@ -253,7 +253,7 @@ jobs:
     outputs:
       recorder_changed: ${{ steps.filter.outputs.recorder }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2
       - name: Filter changed files
@@ -282,7 +282,7 @@ jobs:
     # Niente CUDA: il base è node + Chrome headless. Build ~5-10 min cold.
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/setup-buildx-action@v3
 
@@ -336,7 +336,7 @@ jobs:
     outputs:
       changed: ${{ steps.filter.outputs.changed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2
       - name: Filter changed files
@@ -364,7 +364,7 @@ jobs:
       packages: write
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/setup-buildx-action@v3
 
