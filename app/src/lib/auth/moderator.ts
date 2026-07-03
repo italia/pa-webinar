@@ -96,6 +96,29 @@ export async function verifyModeratorToken(
 }
 
 /**
+ * True se `token` autorizza la moderazione dell'evento GIÀ FETCHATO: il token
+ * primario dell'owner, oppure un co-moderatore (EventModerator role=MODERATOR)
+ * non revocato dello stesso evento. Variante di `verifyModeratorToken` che
+ * evita il re-fetch quando il chiamante ha già l'evento in mano — usata dalle
+ * route di conduzione live (sondaggi, Q&A, wordcloud, timer, chat, materiali).
+ * Gli SPEAKER NON sono moderatori. Tollerante al token null/undefined.
+ */
+export async function isEventModerator(
+  event: { id: string; moderatorToken: string },
+  token: string | null | undefined,
+): Promise<boolean> {
+  if (!token) return false;
+  if (constantTimeEqual(event.moderatorToken, token)) return true;
+  const coMod = await prisma.eventModerator.findUnique({ where: { token } });
+  return (
+    !!coMod &&
+    coMod.eventId === event.id &&
+    coMod.revokedAt === null &&
+    coMod.role === EventModeratorRole.MODERATOR
+  );
+}
+
+/**
  * Resolve any grant token (primary moderator, co-moderator, or speaker)
  * for an event. Returns the event + the grant's role and display name.
  *

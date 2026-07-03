@@ -25,7 +25,7 @@ import {
   RateLimitError,
   ValidationError,
 } from '@/lib/errors';
-import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
+import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { publishChat } from '@/lib/chat/pubsub';
 import { chatMessagesTotal } from '@/lib/metrics';
@@ -82,7 +82,7 @@ async function authenticateSender(
 
   if (token) {
     // Primary moderator?
-    if (constantTimeEqual(event.moderatorToken, token)) {
+    if ((await isEventModerator(event, token))) {
       return {
         eventId: event.id,
         senderId: `mod-${event.id}-primary`,

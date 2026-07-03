@@ -13,7 +13,7 @@ import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import {
   extractModeratorToken,
   verifyModeratorToken,
-  constantTimeEqual,
+  isEventModerator,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
@@ -57,8 +57,10 @@ export const GET = withErrorHandling(async (request, context) => {
 
   const { title, description } = localiseEvent(event, locale);
 
-  // Moderator mode: verify token and return full data
-  if (token && constantTimeEqual(event.moderatorToken, token)) {
+  // Moderator mode: verify token and return full data. Accetta anche i
+  // co-moderatori (EventModerator role=MODERATOR): PUT/DELETE già li ammettono
+  // via verifyModeratorToken, quindi negargli la vista sarebbe incoerente.
+  if (token && (await isEventModerator(event, token))) {
     return Response.json({
       id: event.id,
       slug: event.slug,

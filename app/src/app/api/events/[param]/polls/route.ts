@@ -7,7 +7,7 @@ import {
   ForbiddenError,
   ValidationError,
 } from '@/lib/errors';
-import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
+import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { createPollSchema } from '@/lib/validation/schemas';
 
@@ -28,7 +28,7 @@ export const GET = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
-  const isModerator = constantTimeEqual(event.moderatorToken, token);
+  const isModerator = (await isEventModerator(event, token));
 
   const where = isModerator
     ? { eventId: event.id }
@@ -98,7 +98,7 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!token) throw new UnauthorizedError('Moderator token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event || !constantTimeEqual(event.moderatorToken, token)) {
+  if (!event || !(await isEventModerator(event, token))) {
     throw new ForbiddenError('Unauthorized');
   }
 

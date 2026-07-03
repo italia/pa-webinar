@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations, useFormatter } from 'next-intl';
 import { Alert, Button, Badge, Card, CardBody, Icon, Row, Col } from 'design-react-kit';
 
@@ -186,6 +187,9 @@ export default function EventDetailClient({
   const canRegister = event.status === 'PUBLISHED' || event.status === 'LIVE';
   const isEnded = event.status === 'ENDED';
   const isLive = event.status === 'LIVE';
+  // Avviso contestuale quando /live ci ha rimbalzato qui per un token personale
+  // non più valido (link errato o registrazione rimossa dal retention cron).
+  const invalidToken = useSearchParams().get('invalidToken') === '1';
   const accentColor = STATUS_COLOR[event.status] ?? STATUS_COLOR.PUBLISHED;
 
   // Fetch postprod transcript metadata. Skip se l'evento non è ended
@@ -277,6 +281,17 @@ export default function EventDetailClient({
           {t('detail.backToEvents')}
         </Link>
       </div>
+
+      {invalidToken && (
+        <Alert color="warning" className="mb-4">
+          <strong>{t('detail.invalidTokenTitle')}</strong>
+          <div className="mt-1">
+            {isEnded
+              ? t('detail.invalidTokenBodyEnded')
+              : t('detail.invalidTokenBody')}
+          </div>
+        </Alert>
+      )}
 
       {isEnded && (
         <Alert color="info" className="mb-4">
@@ -666,6 +681,23 @@ export default function EventDetailClient({
                         {isLive ? t('detail.registerAndJoin') : t('detail.register')}
                       </Button>
                     </Link>
+                  )}
+
+                  {canRegister && (
+                    // Via d'ingresso per chi si è già registrato: /live lo
+                    // re-identifica dal cookie firmato (o lo fa entrare come
+                    // ospite se LIVE), evitando il loop registrazione → 409.
+                    <p
+                      className="text-center mt-3 mb-0"
+                      style={{ fontSize: '0.85rem' }}
+                    >
+                      <Link
+                        href={`/events/${event.slug}/live`}
+                        className="text-decoration-none fw-semibold text-primary"
+                      >
+                        {t('detail.alreadyRegisteredEnter')}
+                      </Link>
+                    </p>
                   )}
 
                   {event.chatEnabled && (

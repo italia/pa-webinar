@@ -119,6 +119,11 @@ interface WaitingRoomProps {
   onEnterLive: (chosenName: string, prefs: WaitingRoomJoinPrefs) => void;
   onStartEvent?: () => Promise<void>;
   onLeaveFeedback?: () => void;
+  /** True se il consenso multitrack NON va richiesto qui: moderatori/speaker
+   *  (pilotano la registrazione) e partecipanti registrati che hanno già
+   *  prestato il consenso al momento della registrazione. Evita il doppio
+   *  consenso e riabilita il minigioco. */
+  multitrackConsentExempt?: boolean;
 }
 
 const PARTICIPANT_NAME_KEY = 'pawebinar.participant.name';
@@ -139,6 +144,7 @@ export default function WaitingRoom({
   onEnterLive,
   onStartEvent,
   onLeaveFeedback,
+  multitrackConsentExempt = false,
 }: WaitingRoomProps) {
   const t = useTranslations('waiting');
   const tc = useTranslations('common');
@@ -149,6 +155,10 @@ export default function WaitingRoom({
   const [startingEvent, setStartingEvent] = useState(false);
   const [watchingCatchUp, setWatchingCatchUp] = useState(false);
   const [pulseCountdown, setPulseCountdown] = useState(false);
+  // PUBLISHED con orario di inizio già passato ma il moderatore non ha ancora
+  // premuto "Avvia evento": mostriamo uno stato dedicato invece del countdown
+  // vuoto + CTA "Apertura alle {ora passata}" (incoerente e sfiduciante).
+  const [startingSoon, setStartingSoon] = useState(false);
   const [name, setName] = useState(defaultName);
   const [email, setEmail] = useState('');
   // Waiting-room engine state. Resolved post-mount (see the resolution effect
@@ -257,7 +267,8 @@ export default function WaitingRoom({
   // Consenso multitrack: se l'evento registra una traccia per partecipante
   // (audio isolato, dato quasi-biometrico — ADR-013/GDPR art.9), l'ingresso è
   // gated da un consenso esplicito. Niente consenso → niente ingresso.
-  const multitrackRequired = !!event.multitrackRecordingEnabled && !isEnded;
+  const multitrackRequired =
+    !!event.multitrackRecordingEnabled && !isEnded && !multitrackConsentExempt;
   const canEnter =
     nameValid && emailValid && (!multitrackRequired || multitrackConsent);
 
@@ -266,6 +277,7 @@ export default function WaitingRoom({
     if (!isPublished) {
       setCountdown('');
       setPulseCountdown(false);
+      setStartingSoon(false);
       return;
     }
     const tick = () => {
@@ -274,8 +286,10 @@ export default function WaitingRoom({
       if (diff <= 0) {
         setCountdown('');
         setPulseCountdown(false);
+        setStartingSoon(true);
         return;
       }
+      setStartingSoon(false);
       setPulseCountdown(diff < 60_000);
       const days = Math.floor(diff / 86_400_000);
       const hours = Math.floor((diff % 86_400_000) / 3_600_000);
@@ -849,12 +863,30 @@ export default function WaitingRoom({
                   </div>
                 )}
 
+                {isPublished && startingSoon && (
+                  <div
+                    className="rounded-3 p-3 mb-4 text-center d-flex align-items-center justify-content-center"
+                    role="status"
+                    aria-live="polite"
+                    style={{ background: 'var(--app-emphasis-bg, #eef4fb)', color: 'var(--app-text)' }}
+                  >
+                    <Spinner active small className="me-2" />
+                    <span className="fw-semibold">{t('startingSoon')}</span>
+                  </div>
+                )}
+
                 {(isWarmingUp || (isLive && jvbReady === false)) && (
                   <div className="mb-4">{statusBanners}</div>
                 )}
 
                 {!isEnded && <div className="mb-3">{nameField}</div>}
-                {!isEnded && <div className="mb-3">{emailField}</div>}
+                {/* Email: solo per gli ospiti (i registrati l'hanno già data,
+                    per moderatori/speaker è irrilevante). Il valore non è ancora
+                    inviato al server: campo di cortesia locale finché non c'è un
+                    consumer reale del follow-up. */}
+                {!isEnded && isGuest && (
+                  <div className="mb-3">{emailField}</div>
+                )}
                 {!isEnded && <div className="mb-3">{deviceCheckField}</div>}
 
                 {isPublished && event.waitingRoomAudioUrl && (

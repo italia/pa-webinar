@@ -12,7 +12,7 @@ import { prisma } from '@/lib/db';
 import { createQuestionSchema } from '@/lib/validation/schemas';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
-import { constantTimeEqual } from '@/lib/auth/moderator';
+import { isEventModerator } from '@/lib/auth/moderator';
 import { getCached, setCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +34,7 @@ export const GET = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
-  const isModerator = constantTimeEqual(event.moderatorToken, token);
+  const isModerator = (await isEventModerator(event, token));
   let registrationId: string | null = null;
 
   if (!isModerator) {

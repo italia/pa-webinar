@@ -97,6 +97,10 @@
       "noRecording": "Video recording is not available for this event.",
       "watchRecording": "Watch recording",
       "backToEvents": "Back to events",
+      "alreadyRegisteredEnter": "Already registered? Enter the room",
+      "invalidTokenTitle": "Access link no longer valid",
+      "invalidTokenBody": "The link you used is invalid or has expired. If you registered, check your confirmation email for your personal link, or register again below.",
+      "invalidTokenBodyEnded": "The link you used is no longer valid. The event has ended: you can find the recording and materials below.",
       "speakers": "Speakers",
       "organizer": "Organizer",
       "chatNotSaved": "Chat messages are not saved after the event ends.",
@@ -3052,6 +3056,7 @@
   },
   "waiting": {
     "startsIn": "The event starts in",
+    "startingSoon": "The event is about to start, please wait for the organizer…",
     "eventLive": "The event is live!",
     "connectedParticipants": "{count, plural, =0 {No participants} =1 {1 participant connected} other {{count} participants connected}}",
     "elapsedTime": "Running for {minutes} minutes",
