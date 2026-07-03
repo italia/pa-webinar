@@ -443,6 +443,16 @@ podDisruptionBudget:
   # (e.g. node drain, rolling update)
   minAvailable: 1
 
+# PDB per coturn (subchart jitsi-meet, che non ne fornisce uno).
+# coturn e' l'INTERO media path in relay-only e la lifeline TURNS/443 corporate.
+# Con replicaCount=1, minAvailable=1 impedisce a un node drain volontario di eliminare
+# l'unico relay a evento in corso (il drain viene bloccato finche' non c'e' un rimpiazzo).
+# Per avere ANCHE la drenabilita' senza interruzioni, portare coturn a 2 repliche
+# (funziona dietro singolo LB: l'hash 5-tuple di Azure tiene ogni client sullo stesso pod).
+coturnPodDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
 # ── CronJobs ─────────────────────────────────────────────────
 
 cronjobs:

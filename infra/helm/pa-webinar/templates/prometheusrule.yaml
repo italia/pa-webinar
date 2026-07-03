@@ -13,8 +13,10 @@ spec:
     - name: pa-webinar.rules
       rules:
         # App availability
+        # NB: il target ServiceMonitor imposta job = nome del Service (= fullname del chart),
+        # non piu' "eventi-*" dopo il rename. Ancoriamo su namespace per robustezza al rename.
         - alert: PaWebinarDown
-          expr: up{job=~".*eventi.*"} == 0
+          expr: up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"} == 0
           for: 2m
           labels:
             severity: critical
@@ -77,15 +79,49 @@ spec:
             summary: "JVB is overloaded with active participants"
             description: "There are active participants but JVB stress is above 90% for 5 minutes. Scaling may be stuck or insufficient."
 
-        # Jibri unavailable (recording configured but no Jibri metrics)
-        - alert: JibriUnavailable
-          expr: absent(jibri_health_status{namespace="{{ .Release.Namespace }}"}) and on() count(eventi_active_events{app="pa-webinar"}) > 0
+        # NB: rimosso l'alert JibriUnavailable basato su absent(jibri_health_status): quella
+        # metrica non e' mai esportata (nessun exporter/ServiceMonitor per Jibri), quindi
+        # l'alert scattava come falso-positivo a ogni evento LIVE. Reintrodurre solo dopo aver
+        # aggiunto un endpoint metriche per Jibri.
+
+        # ── Media plane (cardine #1: stabilita' videocall) ──────────────────────────
+        # JVB assente durante un evento LIVE: il bridge e' scale-to-zero a riposo (=0 e' OK),
+        # ma se ci sono eventi LIVE e nessuna replica JVB disponibile per 2m, il media plane
+        # e' giu' -> partecipanti senza video. Richiede kube-state-metrics.
+        - alert: JvbAbsentDuringLiveEvent
+          expr: |
+            (max(eventi_active_events{app="pa-webinar"}) > 0)
+            and
+            (max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*jitsi-meet-jvb.*"}) == 0)
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "JVB assente durante un evento LIVE"
+            description: "Ci sono eventi LIVE ma nessuna replica JVB disponibile da 2 minuti: il media plane e' giu'. Verificare scaler/node pool jitsi-jvb."
+
+        # coturn e' l'INTERO media path in relay-only e resta la lifeline TURNS/443 degli
+        # utenti dietro firewall corporate anche dopo il ripristino del path UDP diretto.
+        # E' a replica singola: un suo down interrompe tutti gli eventi in corso.
+        - alert: CoturnDownDuringEvent
+          expr: |
+            (max(eventi_active_events{app="pa-webinar"}) > 0)
+            and
+            (max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*coturn.*"}) == 0)
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "coturn (TURN/TURNS) giu' durante un evento LIVE"
+            description: "coturn non ha repliche disponibili con eventi LIVE in corso: gli utenti dietro NAT/firewall (relay e fallback 443) non riescono a passare il media. Intervento immediato."
+        - alert: CoturnAbsent
+          expr: max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*coturn.*"}) == 0
           for: 5m
           labels:
             severity: warning
           annotations:
-            summary: "Jibri recording service unavailable"
-            description: "Jibri health metrics are not being reported while the application is running."
+            summary: "coturn non disponibile"
+            description: "coturn (media relay TURN/TURNS) e' a 0 repliche disponibili da 5 minuti anche in assenza di eventi: il prossimo evento fallira' per gli utenti che richiedono il relay/fallback 443."
 
         # High event loop lag
         - alert: HighEventLoopLag
