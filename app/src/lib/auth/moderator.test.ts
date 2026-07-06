@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { constantTimeEqual, isEventModerator } from './moderator';
+import {
+  constantTimeEqual,
+  isEventModerator,
+  isEventModeratorCached,
+  verifyModeratorToken,
+} from './moderator';
 
 vi.mock('@/lib/db', () => ({
   prisma: {
@@ -91,5 +96,69 @@ describe('isEventModerator', () => {
     vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(null as never);
     expect(await isEventModerator(event, 'ignoto')).toBe(false);
     expect(await isEventModerator(event, null)).toBe(false);
+  });
+});
+
+describe('isEventModeratorCached', () => {
+  // NB: la cache TTL è condivisa a livello di modulo — ogni test usa un
+  // event.id/token proprio per non leggere le entry dei test precedenti.
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('il token primario non tocca mai DB né cache', async () => {
+    const { prisma } = await import('@/lib/db');
+    const event = { id: 'evt-cache-1', moderatorToken: 'PRIMARY' };
+    expect(await isEventModeratorCached(event, 'PRIMARY')).toBe(true);
+    expect(await isEventModeratorCached(event, 'PRIMARY')).toBe(true);
+    expect(prisma.eventModerator.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('cachea il miss del partecipante: 1 sola lookup DB entro il TTL', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue(null as never);
+    const event = { id: 'evt-cache-2', moderatorToken: 'PRIMARY' };
+    expect(await isEventModeratorCached(event, 'partecipante-x')).toBe(false);
+    expect(await isEventModeratorCached(event, 'partecipante-x')).toBe(false);
+    expect(await isEventModeratorCached(event, 'partecipante-x')).toBe(false);
+    expect(prisma.eventModerator.findUnique).toHaveBeenCalledTimes(1);
+  });
+
+  it('cachea anche l\'esito positivo del co-moderatore', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      eventId: 'evt-cache-3',
+      revokedAt: null,
+      role: 'MODERATOR',
+    } as never);
+    const event = { id: 'evt-cache-3', moderatorToken: 'PRIMARY' };
+    expect(await isEventModeratorCached(event, 'comod-y')).toBe(true);
+    expect(await isEventModeratorCached(event, 'comod-y')).toBe(true);
+    expect(prisma.eventModerator.findUnique).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('verifyModeratorToken (delega a isEventModerator)', () => {
+  const eventRow = { id: 'evt9', moderatorToken: 'PRIMARY-TOKEN' };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('accetta il token primario e ritorna l\'evento', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow as never);
+    expect(await verifyModeratorToken('evt-slug', 'PRIMARY-TOKEN')).toBe(eventRow);
+  });
+
+  it('rifiuta un grant SPEAKER come il resto della catena', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow as never);
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      eventId: 'evt9',
+      revokedAt: null,
+      role: 'SPEAKER',
+    } as never);
+    expect(await verifyModeratorToken('evt-slug', 'speaker-token')).toBeNull();
   });
 });

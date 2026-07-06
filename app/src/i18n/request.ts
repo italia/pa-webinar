@@ -67,6 +67,13 @@ function deepMergeMessages(base: Messages, override: Messages): Messages {
   return out;
 }
 
+// Il merge lavora su due import statici: il risultato è identico per tutta la
+// vita del processo, quindi lo calcoliamo una volta per locale invece che a
+// ogni richiesta SSR (il catalogo sono migliaia di chiavi × 24 locale).
+// Gli override runtime dell'admin NON sono memoizzati: applyOverrides clona e
+// lavora sopra questa base condivisa senza mutarla.
+const mergedMessagesCache = new Map<string, Messages>();
+
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;
 
@@ -102,11 +109,17 @@ export default getRequestConfig(async ({ requestLocale }) => {
   // uno snapshot più vecchio (vedi deepMergeMessages). L'italiano è già completo,
   // quindi non serve merge quando locale === 'it'.
   if (locale !== 'it') {
-    try {
-      const base = (await import('./messages/it.json')).default as Messages;
-      messages = deepMergeMessages(base, messages);
-    } catch {
-      // Se il catalogo di fallback non carica, teniamo i messaggi della locale.
+    const cached = mergedMessagesCache.get(locale);
+    if (cached) {
+      messages = cached;
+    } else {
+      try {
+        const base = (await import('./messages/it.json')).default as Messages;
+        messages = deepMergeMessages(base, messages);
+        mergedMessagesCache.set(locale, messages);
+      } catch {
+        // Se il catalogo di fallback non carica, teniamo i messaggi della locale.
+      }
     }
   }
 

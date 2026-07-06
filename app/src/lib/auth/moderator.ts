@@ -4,6 +4,7 @@ import { EventModeratorRole } from '@prisma/client';
 
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { getCached, setCache } from '@/lib/cache';
 
 export type GrantRole = EventModeratorRole;
 
@@ -78,21 +79,9 @@ export async function verifyModeratorToken(
   const event = await prisma.event.findUnique({ where });
   if (!event) return null;
 
-  if (constantTimeEqual(event.moderatorToken, token)) {
-    return event;
-  }
-
-  const coMod = await prisma.eventModerator.findUnique({ where: { token } });
-  if (
-    coMod &&
-    coMod.eventId === event.id &&
-    coMod.revokedAt === null &&
-    coMod.role === EventModeratorRole.MODERATOR
-  ) {
-    return event;
-  }
-
-  return null;
+  // La regola di accettazione (primario o co-moderatore) vive SOLO in
+  // isEventModerator: due copie di una regola security-sensitive divergono.
+  return (await isEventModerator(event, token)) ? event : null;
 }
 
 /**
@@ -116,6 +105,33 @@ export async function isEventModerator(
     coMod.revokedAt === null &&
     coMod.role === EventModeratorRole.MODERATOR
   );
+}
+
+/** TTL breve: un grant/revoca co-moderatore diventa effettivo sugli endpoint
+ *  di polling entro questo intervallo. */
+const MODERATOR_CACHE_TTL_MS = 5_000;
+
+/**
+ * Variante di `isEventModerator` con cache TTL per le GET di polling
+ * (Q&A, sondaggi: SWR ~3s per partecipante). Il confronto col token primario
+ * resta in-process (mai cacheato); solo l'esito della lookup co-moderatore —
+ * a miss garantito per ogni token partecipante — viene cacheato, così il
+ * polling non aggiunge una query DB per richiesta proprio dove la cache
+ * delle route esiste per toglierle. La chiave usa l'hash del token, mai il
+ * token in chiaro.
+ */
+export async function isEventModeratorCached(
+  event: { id: string; moderatorToken: string },
+  token: string | null | undefined,
+): Promise<boolean> {
+  if (!token) return false;
+  if (constantTimeEqual(event.moderatorToken, token)) return true;
+  const key = `comod:${event.id}:${createHash('sha256').update(token).digest('base64url')}`;
+  const cached = getCached<boolean>(key);
+  if (cached !== null) return cached;
+  const result = await isEventModerator(event, token);
+  setCache(key, result, MODERATOR_CACHE_TTL_MS);
+  return result;
 }
 
 /**

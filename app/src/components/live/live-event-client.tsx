@@ -729,9 +729,13 @@ export default function LiveEventClient({
         onEnterLive={handleEnterFromWaiting}
         onStartEvent={isModerator ? handleStartEvent : undefined}
         onLeaveFeedback={() => setShowFeedback(true)}
-        multitrackConsentExempt={
-          isModerator || isSpeaker || hasMultitrackConsent
-        }
+        // Esente dal consenso multitrack in sala d'attesa: chi l'ha già
+        // prestato alla registrazione, o il moderatore (è chi ha configurato
+        // e controlla la registrazione). Gli speaker NO: non controllano la
+        // registrazione e la loro traccia audio isolata è esattamente il dato
+        // (quasi-biometrico, ADR-013) che il gate protegge — devono spuntare
+        // il consenso come ogni altro partecipante.
+        multitrackConsentExempt={isModerator || hasMultitrackConsent}
       />
         {feedbackModal}
       </>

@@ -12,7 +12,7 @@ import { prisma } from '@/lib/db';
 import { createQuestionSchema } from '@/lib/validation/schemas';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
-import { isEventModerator } from '@/lib/auth/moderator';
+import { isEventModeratorCached } from '@/lib/auth/moderator';
 import { getCached, setCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +34,10 @@ export const GET = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
-  const isModerator = (await isEventModerator(event, token));
+  // Variante cache-ata: questa GET è pollata via SWR da ogni partecipante e
+  // la lookup co-moderatore sarebbe un miss DB garantito a ogni richiesta,
+  // vanificando la cache qa: qui sotto.
+  const isModerator = await isEventModeratorCached(event, token);
   let registrationId: string | null = null;
 
   if (!isModerator) {

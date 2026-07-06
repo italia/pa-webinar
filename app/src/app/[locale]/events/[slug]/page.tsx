@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { eventAccessCookieName } from '@/lib/event-session';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
@@ -14,6 +16,7 @@ export const revalidate = 30;
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ invalidToken?: string }>;
 }
 
 export async function generateMetadata({
@@ -58,8 +61,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function EventDetailPage({ params }: EventDetailPageProps) {
+export default async function EventDetailPage({
+  params,
+  searchParams,
+}: EventDetailPageProps) {
   const { slug } = await params;
+  // Letti lato server (la route è già dynamic per il cookies() del layout):
+  // un useSearchParams() nel client senza <Suspense> è un build breaker
+  // latente il giorno in cui la route torna statica.
+  const invalidToken = (await searchParams)?.invalidToken === '1';
   const locale = await getLocale();
   const settings = await getSettings();
 
@@ -74,6 +84,12 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   if (!event || !['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
     notFound();
   }
+
+  // Cookie d'accesso firmato per-evento (posato alla registrazione): guida la
+  // visibilità del link "Entra nella sala" — su evento non-LIVE senza cookie
+  // il link porterebbe solo al rimbalzo /live → registrazione → 409.
+  const cookieStore = await cookies();
+  const hasRoomAccess = !!cookieStore.get(eventAccessCookieName(event.id))?.value;
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const description = getLocalized(event.description as LocalizedField, locale);
@@ -312,6 +328,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       <EventDetailClient
         event={serialised}
         locale={locale}
+        invalidToken={invalidToken}
+        hasRoomAccess={hasRoomAccess}
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}

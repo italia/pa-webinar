@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { useTranslations, useFormatter } from 'next-intl';
 import { Alert, Button, Badge, Card, CardBody, Icon, Row, Col } from 'design-react-kit';
 
@@ -107,6 +106,13 @@ interface EventDetailClientProps {
   polls?: PollData[];
   feedbackSummary?: FeedbackSummary | null;
   tags?: TagChip[];
+  /** /live ci ha rimbalzato qui per un token personale non più valido. Letto
+   *  dal server (searchParams): useSearchParams() senza <Suspense> è un build
+   *  breaker latente su route statiche. */
+  invalidToken?: boolean;
+  /** Il device ha il cookie d'accesso firmato per questo evento: il link
+   *  "Entra nella sala" può re-identificarlo su /live. */
+  hasRoomAccess?: boolean;
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -136,6 +142,8 @@ export default function EventDetailClient({
   polls = [],
   feedbackSummary = null,
   tags = [],
+  invalidToken = false,
+  hasRoomAccess = false,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tv = useTranslations('video');
@@ -187,9 +195,6 @@ export default function EventDetailClient({
   const canRegister = event.status === 'PUBLISHED' || event.status === 'LIVE';
   const isEnded = event.status === 'ENDED';
   const isLive = event.status === 'LIVE';
-  // Avviso contestuale quando /live ci ha rimbalzato qui per un token personale
-  // non più valido (link errato o registrazione rimossa dal retention cron).
-  const invalidToken = useSearchParams().get('invalidToken') === '1';
   const accentColor = STATUS_COLOR[event.status] ?? STATUS_COLOR.PUBLISHED;
 
   // Fetch postprod transcript metadata. Skip se l'evento non è ended
@@ -683,10 +688,13 @@ export default function EventDetailClient({
                     </Link>
                   )}
 
-                  {canRegister && (
+                  {canRegister && (isLive || hasRoomAccess) && (
                     // Via d'ingresso per chi si è già registrato: /live lo
                     // re-identifica dal cookie firmato (o lo fa entrare come
                     // ospite se LIVE), evitando il loop registrazione → 409.
+                    // Su evento non ancora LIVE il link appare SOLO se il device
+                    // ha il cookie: senza, /live rimbalzerebbe alla registrazione
+                    // — esattamente il dead-end che questo link vuole evitare.
                     <p
                       className="text-center mt-3 mb-0"
                       style={{ fontSize: '0.85rem' }}

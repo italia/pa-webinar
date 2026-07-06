@@ -7,7 +7,11 @@ import {
   ForbiddenError,
   ValidationError,
 } from '@/lib/errors';
-import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
+import {
+  isEventModerator,
+  isEventModeratorCached,
+  extractModeratorToken,
+} from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { createPollSchema } from '@/lib/validation/schemas';
 
@@ -28,7 +32,8 @@ export const GET = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
-  const isModerator = (await isEventModerator(event, token));
+  // Cache-ata: GET pollata da ogni partecipante, vedi questions/route.ts.
+  const isModerator = await isEventModeratorCached(event, token);
 
   const where = isModerator
     ? { eventId: event.id }

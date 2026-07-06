@@ -863,7 +863,9 @@ export default function WaitingRoom({
                   </div>
                 )}
 
-                {isPublished && startingSoon && (
+                {/* "Sta per iniziare, attendi l'organizzatore": non al moderatore —
+                    l'organizzatore è lui, e ha accanto il bottone "Avvia evento". */}
+                {isPublished && startingSoon && !isModerator && (
                   <div
                     className="rounded-3 p-3 mb-4 text-center d-flex align-items-center justify-content-center"
                     role="status"

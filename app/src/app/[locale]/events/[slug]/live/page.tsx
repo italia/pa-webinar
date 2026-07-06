@@ -214,7 +214,12 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // rimossa dal retention cron mentre l'email col link sopravvive): niente 404
       // secco. Torniamo alla pagina evento con un avviso contestuale e le CTA giuste
       // (ri-registrazione, oppure guarda la registrazione se l'evento è concluso).
-      redirect(`/${locale}/events/${slug}?invalidToken=1`);
+      // Solo per stati in cui la pagina evento è raggiungibile: per DRAFT/ARCHIVED
+      // fa notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
+      if (['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
+        redirect(`/${locale}/events/${slug}?invalidToken=1`);
+      }
+      notFound();
     }
     participantInfo = {
       displayName: tryDecryptPII(registration.displayName) ?? registration.displayName,
