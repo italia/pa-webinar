@@ -4,11 +4,14 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
+import { publicEventStatusWhere } from '@/lib/events/visibility';
 import EventListClient from '@/components/events/event-list-client';
 
 async function loadUpcomingEvents() {
   const events = await prisma.event.findMany({
-    where: { status: { in: ['PUBLISHED', 'LIVE'] } },
+    // Anche PROVISIONING/IDLE (schedulati): l'evento non sparisce dalla
+    // home nei minuti di pre-warm prima dell'inizio.
+    where: publicEventStatusWhere({ includeEnded: false }),
     include: { _count: { select: { registrations: true } } },
     orderBy: { startsAt: 'asc' },
     take: 6,

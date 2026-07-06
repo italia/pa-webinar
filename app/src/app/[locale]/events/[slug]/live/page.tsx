@@ -12,6 +12,8 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
+import { resolveGrantForEvent } from '@/lib/auth/moderator';
+import { isEventPubliclyVisible } from '@/lib/events/visibility';
 
 async function hasJoinGrant(eventId: string): Promise<boolean> {
   const appSecret = process.env.APP_SECRET;
@@ -185,18 +187,15 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     }
   }
 
-  const isPrimaryModerator = event.moderatorToken === token;
-
-  // Magic-link path: token may be a co-moderator (role=MODERATOR) or
-  // a speaker (role=SPEAKER). Resolved once so we get the grant's own
-  // display name for the pre-join greeting and the role for JWT + UI.
-  const grant = isPrimaryModerator
-    ? null
-    : await prisma.eventModerator.findUnique({ where: { token } });
-  const isValidGrant =
-    !!grant && grant.eventId === event.id && grant.revokedAt === null;
-  const isCoModerator = isValidGrant && grant.role === 'MODERATOR';
-  const isSpeaker = isValidGrant && grant.role === 'SPEAKER';
+  // Magic-link path: primario condiviso, co-moderatore (role=MODERATOR) o
+  // speaker (role=SPEAKER). Risoluzione unica in resolveGrantForEvent —
+  // nome del grant GIÀ DECIFRATO (EventModerator.name è cifrato a riposo:
+  // la lookup diretta qui mostrava ciphertext base64 nel pre-join).
+  const grant = await resolveGrantForEvent(event, token);
+  const isPrimaryModerator = !!grant?.isPrimaryShared;
+  const isCoModerator =
+    !!grant && !grant.isPrimaryShared && grant.role === 'MODERATOR';
+  const isSpeaker = !!grant && grant.role === 'SPEAKER';
   const isModerator = isPrimaryModerator || isCoModerator;
 
   let participantInfo: { displayName: string } | null = null;
@@ -214,9 +213,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // rimossa dal retention cron mentre l'email col link sopravvive): niente 404
       // secco. Torniamo alla pagina evento con un avviso contestuale e le CTA giuste
       // (ri-registrazione, oppure guarda la registrazione se l'evento è concluso).
-      // Solo per stati in cui la pagina evento è raggiungibile: per DRAFT/ARCHIVED
-      // fa notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
-      if (['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
+      // Solo per stati in cui la pagina evento è raggiungibile (stesso check
+      // della destinazione, lib/events/visibility): per DRAFT/ARCHIVED fa
+      // notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
+      if (isEventPubliclyVisible(event)) {
         redirect(`/${locale}/events/${slug}?invalidToken=1`);
       }
       notFound();
@@ -273,10 +273,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       isGuest={false}
       hasMultitrackConsent={hasMultitrackConsent}
       displayName={
-        isValidGrant && grant
+        grant && !grant.isPrimaryShared
           // Named co-moderator or speaker via EventModerator row —
           // greet them by name in the pre-join input (still editable).
-          ? grant.name
+          ? grant.displayName ?? ''
           : isPrimaryModerator
             // Primary moderator magic-link (shared): keep the input
             // empty so anyone opening the link types their own name

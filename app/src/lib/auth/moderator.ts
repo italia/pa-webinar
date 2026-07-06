@@ -180,22 +180,52 @@ export async function verifyGrantToken(
   const event = await prisma.event.findUnique({ where });
   if (!event) return null;
 
+  const grant = await resolveGrantForEvent(event, token);
+  if (!grant) return null;
+
+  return {
+    event,
+    role: grant.role,
+    displayName: grant.displayName,
+    isPrimaryShared: grant.isPrimaryShared,
+  };
+}
+
+/**
+ * Come `verifyGrantToken`, ma sull'evento GIÀ FETCHATO (evita il re-fetch)
+ * e con in più l'id della riga grant. È l'UNICA implementazione della
+ * risoluzione token→identità (primario condiviso / co-moderatore /
+ * speaker), nome già decifrato: chat e /live non devono re-implementarla.
+ */
+export async function resolveGrantForEvent(
+  event: { id: string; moderatorToken: string; moderatorName?: string | null },
+  token: string,
+): Promise<
+  | {
+      role: GrantRole;
+      displayName: string | null;
+      isPrimaryShared: boolean;
+      /** EventModerator.id per i grant per-riga; null per il primario condiviso. */
+      grantId: string | null;
+    }
+  | null
+> {
   if (constantTimeEqual(event.moderatorToken, token)) {
     return {
-      event,
       role: EventModeratorRole.MODERATOR,
       displayName: event.moderatorName ?? null,
       isPrimaryShared: true,
+      grantId: null,
     };
   }
 
   const grant = await prisma.eventModerator.findUnique({ where: { token } });
   if (grant && grant.eventId === event.id && grant.revokedAt === null) {
     return {
-      event,
       role: grant.role,
       displayName: tryDecryptPII(grant.name) ?? grant.name,
       isPrimaryShared: false,
+      grantId: grant.id,
     };
   }
 

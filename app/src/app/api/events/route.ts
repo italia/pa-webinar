@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 
-import type { EventStatus } from '@prisma/client';
+import type { EventStatus, Prisma } from '@prisma/client';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -19,10 +19,13 @@ import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { FEEDBACK_GENERIC_TEMPLATE_NAME } from '@/lib/feedback/constants';
+import {
+  ALWAYS_PUBLIC_STATUSES,
+  WARMUP_STATUSES,
+  publicEventStatusWhere,
+} from '@/lib/events/visibility';
 
 export const dynamic = 'force-dynamic';
-
-const PUBLIC_STATUSES: EventStatus[] = ['PUBLISHED', 'LIVE', 'ENDED'];
 
 // ── POST /api/events — Create event ──────────────────────────
 
@@ -279,16 +282,22 @@ export const GET = withErrorHandling(async (request) => {
     return Response.json(result);
   }
 
-  // Public mode: only PUBLISHED, LIVE, ENDED
-  let whereStatus: EventStatus[];
-  if (statusFilter && PUBLIC_STATUSES.includes(statusFilter as EventStatus)) {
-    whereStatus = [statusFilter as EventStatus];
-  } else {
-    whereStatus = PUBLIC_STATUSES;
+  // Public mode: stessa regola di visibilità delle superfici HTML
+  // (lib/events/visibility) — include PROVISIONING/IDLE degli schedulati
+  // non finiti, così l'evento non sparisce dall'API nei minuti di pre-warm.
+  // Il filtro ?status= resta vincolato agli stati pubblicamente visibili
+  // (AND con la regola, che porta anche le guardie eventType/endsAt).
+  const publicWhere = publicEventStatusWhere();
+  let where: Prisma.EventWhereInput = publicWhere;
+  if (
+    statusFilter &&
+    ([...ALWAYS_PUBLIC_STATUSES, ...WARMUP_STATUSES] as string[]).includes(statusFilter)
+  ) {
+    where = { AND: [publicWhere, { status: statusFilter as EventStatus }] };
   }
 
   const events = await prisma.event.findMany({
-    where: { status: { in: whereStatus } },
+    where,
     include: { _count: { select: { registrations: true } } },
     orderBy: { startsAt: 'asc' },
   });

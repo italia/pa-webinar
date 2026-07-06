@@ -5,6 +5,7 @@ import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
+import { isEventPubliclyVisible } from '@/lib/events/visibility';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
@@ -81,7 +82,10 @@ export default async function EventDetailPage({
     },
   });
 
-  if (!event || !['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
+  // PROVISIONING/IDLE (pre-warm/pausa di un evento schedulato) restano
+  // raggiungibili: chi apre il link pubblico poco prima dell'inizio non
+  // deve trovare un 404. Vedi lib/events/visibility.ts.
+  if (!event || !isEventPubliclyVisible(event)) {
     notFound();
   }
 
