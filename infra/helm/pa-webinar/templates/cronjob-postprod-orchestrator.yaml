@@ -23,6 +23,10 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      # GC dei Job terminati (successo E fallimento): senza TTL un Job fallito
+      # resta visibile per giorni (failedJobsHistoryLimit) e tiene acceso
+      # KubeJobFailed molto oltre il problema reale.
+      ttlSecondsAfterFinished: {{ .Values.cronjobs.jobTtlSeconds | default 7200 }}
       activeDeadlineSeconds: 90
       backoffLimit: 1
       template:
@@ -62,7 +66,7 @@ spec:
                   WORKER_TPL="{{ include "pa-webinar.fullname" . }}-postprod-worker"
 
                   # ── 1. Query desired count from the app ──────────
-                  RESPONSE=$(curl -sf \
+                  RESPONSE=$(curl -sf --retry 3 --retry-delay 5 --retry-connrefused --connect-timeout 5 \
                     -H "x-api-key: $CRON_API_KEY" \
                     "${APP_URL}/api/internal/postprod-pending" 2>/dev/null || true)
                   if [ -z "$RESPONSE" ]; then
