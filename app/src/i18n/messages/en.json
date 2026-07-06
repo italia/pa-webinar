@@ -220,6 +220,14 @@
     "declineRecording": "Do not participate",
     "enterRoom": "Enter room",
     "leaveRoom": "Leave room",
+    "leaveChoice": {
+      "title": "How do you want to leave?",
+      "body": "You can leave on your own — the call stays live for everyone else — or end it for all participants.",
+      "leaveSelf": "Just leave",
+      "endForAll": "End for everyone",
+      "ending": "Ending…",
+      "endError": "Couldn't end the call. Please try again."
+    },
     "eventNotStarted": "The event has not started yet",
     "eventStartsAt": "The event will start on {date} at {time}",
     "countdown": "Time remaining",

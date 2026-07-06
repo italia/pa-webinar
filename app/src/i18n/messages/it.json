@@ -220,6 +220,14 @@
     "declineRecording": "Non partecipare",
     "enterRoom": "Entra nella sala",
     "leaveRoom": "Esci dalla sala",
+    "leaveChoice": {
+      "title": "Come vuoi uscire?",
+      "body": "Puoi uscire solo tu — la call resta attiva per gli altri — oppure terminarla per tutti i partecipanti.",
+      "leaveSelf": "Esci solo tu",
+      "endForAll": "Termina per tutti",
+      "ending": "Termino…",
+      "endError": "Errore nella terminazione. Riprova."
+    },
     "eventNotStarted": "L'evento non è ancora iniziato",
     "eventStartsAt": "L'evento inizierà il {date} alle {time}",
     "countdown": "Tempo rimanente",

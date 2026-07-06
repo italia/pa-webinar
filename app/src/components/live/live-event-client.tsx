@@ -531,6 +531,13 @@ export default function LiveEventClient({
     setPhase('ended');
   }, []);
 
+  // Moderator exit prompt: on leave, a host chooses "Esci solo tu" (leave,
+  // call continues — the scaler demotes LIVE→IDLE after the inactivity grace)
+  // vs "Termina per tutti" (flip status→ENDED now, everyone out immediately).
+  const [showLeaveChoice, setShowLeaveChoice] = useState(false);
+  const [endingForAll, setEndingForAll] = useState(false);
+  const [endForAllError, setEndForAllError] = useState('');
+
   const [showRecPrompt, setShowRecPrompt] = useState(false);
   const recPromptShownRef = useRef(false);
   const recPromptRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -739,9 +746,9 @@ export default function LiveEventClient({
     return () => clearInterval(interval);
   }, [jitsiApi, isModerator, event.slug, token]);
 
-  const handleLeaveRoom = useCallback(() => {
-    // Mark the upcoming `videoConferenceLeft` as a deliberate hangup so
-    // the network-resilience path doesn't try to rejoin behind us.
+  // Leave for yourself only. Marks the upcoming `videoConferenceLeft` as a
+  // deliberate hangup so the network-resilience path doesn't rejoin behind us.
+  const leaveSelf = useCallback(() => {
     userHangupRef.current = true;
     if (jitsiApi) {
       jitsiApi.executeCommand('hangup');
@@ -749,6 +756,55 @@ export default function LiveEventClient({
       setPhase('ended');
     }
   }, [jitsiApi]);
+
+  const handleLeaveRoom = useCallback(() => {
+    // Moderators get the leave/end-for-all prompt; everyone else leaves for
+    // themselves. (There is no native Jitsi hangup anymore — see config.ts —
+    // so this app button is the single, consistent exit for every role.)
+    if (isModerator) {
+      setEndForAllError('');
+      setShowLeaveChoice(true);
+      return;
+    }
+    leaveSelf();
+  }, [isModerator, leaveSelf]);
+
+  const handleLeaveSelfChoice = useCallback(() => {
+    setShowLeaveChoice(false);
+    leaveSelf();
+  }, [leaveSelf]);
+
+  // "Termina per tutti": flip the event to ENDED (waiting participants and
+  // those in the room detect it via their status poll and are taken to the
+  // closing screen), then hang up our own client. Uses the moderator token.
+  const handleEndForAll = useCallback(async () => {
+    setEndingForAll(true);
+    setEndForAllError('');
+    try {
+      const res = await fetch(`/api/events/${event.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: 'ENDED' }),
+      });
+      if (!res.ok) {
+        setEndingForAll(false);
+        setEndForAllError(t('leaveChoice.endError'));
+        return;
+      }
+      userHangupRef.current = true;
+      setEventStatus('ENDED');
+      setShowLeaveChoice(false);
+      setEndingForAll(false);
+      if (jitsiApi) jitsiApi.executeCommand('hangup');
+      setPhase('ended');
+    } catch {
+      setEndingForAll(false);
+      setEndForAllError(t('leaveChoice.endError'));
+    }
+  }, [event.id, token, jitsiApi, t]);
 
   const handleStartEvent = useCallback(async () => {
     const res = await fetch(`/api/events/${event.id}`, {
@@ -1130,6 +1186,45 @@ export default function LiveEventClient({
           </Button>
           <Button color="primary" onClick={handleRecPromptStart}>
             {t('recordingPromptStart')}
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      {/* Moderator leave prompt: leave for yourself vs end for everyone. */}
+      <Modal
+        isOpen={showLeaveChoice}
+        toggle={() => !endingForAll && setShowLeaveChoice(false)}
+        centered
+      >
+        <ModalHeader toggle={() => !endingForAll && setShowLeaveChoice(false)}>
+          {t('leaveChoice.title')}
+        </ModalHeader>
+        <ModalBody>
+          <p className="mb-0">{t('leaveChoice.body')}</p>
+          {endForAllError && (
+            <Alert color="danger" className="mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
+              {endForAllError}
+            </Alert>
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="secondary"
+            outline
+            onClick={handleLeaveSelfChoice}
+            disabled={endingForAll}
+          >
+            {t('leaveChoice.leaveSelf')}
+          </Button>
+          <Button color="danger" onClick={handleEndForAll} disabled={endingForAll}>
+            {endingForAll ? (
+              <>
+                <Spinner active small className="me-2" />
+                {t('leaveChoice.ending')}
+              </>
+            ) : (
+              t('leaveChoice.endForAll')
+            )}
           </Button>
         </ModalFooter>
       </Modal>
