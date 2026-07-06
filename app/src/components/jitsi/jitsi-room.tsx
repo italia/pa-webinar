@@ -146,6 +146,19 @@ export default function JitsiRoom({
 
     const extraConfig: Record<string, unknown> = {};
 
+    // paFaceFx PoC opt-in via `?facefx=1` on the app URL. It rides into the
+    // Jitsi configOverwrite → the IFrame API serializes it into the iframe
+    // URL hash, which the injected custom-config.js reads to enable the WebGL
+    // face/lighting filter. This is the only opt-in that works on mobile
+    // (the localStorage path lives on the Jitsi origin, unreachable there).
+    // NB: the filter needs Insertable Streams → Chromium only (no iOS Safari).
+    try {
+      const facefx = new URLSearchParams(window.location.search).get('facefx');
+      if (facefx === '1' || facefx === 'true') extraConfig.paFaceFx = true;
+    } catch {
+      /* SSR / no window → skip */
+    }
+
     // Video/audio quality preset (admin-configurable). Spread first so the
     // per-role/per-permission keys below can still win on any overlap; these
     // keys (resolution, constraints, videoQuality, channelLastN, audioQuality…)
