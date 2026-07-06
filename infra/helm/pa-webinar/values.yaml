@@ -456,6 +456,13 @@ coturnPodDisruptionBudget:
 # ── CronJobs ─────────────────────────────────────────────────
 
 cronjobs:
+  # GC dei Job terminati (ttlSecondsAfterFinished, successo E fallimento).
+  # Senza TTL un Job fallito resta visibile per giorni (failedJobsHistoryLimit
+  # conta solo i fallimenti successivi) e tiene acceso l'alert KubeJobFailed
+  # molto oltre il problema reale. 2h lasciano il tempo di leggere i log.
+  # I job lunghi/rari (postprod-worker, recorder) usano 24h fissi.
+  jobTtlSeconds: 7200
+
   # Email reminders for upcoming events (runs every 15 minutes)
   reminders:
     enabled: true
