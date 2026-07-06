@@ -6,6 +6,7 @@ import { Alert, Button, Badge, Card, CardBody, Icon, Row, Col } from 'design-rea
 
 import { Link } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { REGISTRABLE_STATUSES } from '@/lib/events/visibility';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer, {
   type VideoPlayerHandle,
@@ -193,12 +194,17 @@ export default function EventDetailClient({
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
   // PROVISIONING/IDLE = evento schedulato in pre-warm/pausa: registrazione
-  // aperta come per PUBLISHED (le instant call non arrivano a questa pagina:
-  // il server la 404-a per loro in quegli stati).
-  const canRegister = ['PUBLISHED', 'PROVISIONING', 'IDLE', 'LIVE'].includes(event.status);
+  // aperta come per PUBLISHED. Il server ha già applicato i filtri veri
+  // (eventType/endsAt, vedi lib/events/visibility): qui basta lo stato.
+  const canRegister = (REGISTRABLE_STATUSES as string[]).includes(event.status);
+  // Per il pubblico il warm-up È "in programma": badge e colori non hanno
+  // (né devono avere) varianti PROVISIONING/IDLE in 24 lingue.
+  const publicStatus = ['PROVISIONING', 'IDLE'].includes(event.status)
+    ? 'PUBLISHED'
+    : event.status;
   const isEnded = event.status === 'ENDED';
   const isLive = event.status === 'LIVE';
-  const accentColor = STATUS_COLOR[event.status] ?? STATUS_COLOR.PUBLISHED;
+  const accentColor = STATUS_COLOR[publicStatus] ?? STATUS_COLOR.PUBLISHED;
 
   // Fetch postprod transcript metadata. Skip se l'evento non è ended
   // o non ha recording pubblicata — niente trascrizione da mostrare.
@@ -353,7 +359,7 @@ export default function EventDetailClient({
           }}
         >
           <div className="d-flex align-items-center gap-2 mb-3">
-            <StatusPill status={event.status} />
+            <StatusPill status={publicStatus} />
             {isLive && (
               <Badge
                 color="success"

@@ -12,6 +12,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
+import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
 
 async function hasJoinGrant(eventId: string): Promise<boolean> {
@@ -186,18 +187,15 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     }
   }
 
-  const isPrimaryModerator = event.moderatorToken === token;
-
-  // Magic-link path: token may be a co-moderator (role=MODERATOR) or
-  // a speaker (role=SPEAKER). Resolved once so we get the grant's own
-  // display name for the pre-join greeting and the role for JWT + UI.
-  const grant = isPrimaryModerator
-    ? null
-    : await prisma.eventModerator.findUnique({ where: { token } });
-  const isValidGrant =
-    !!grant && grant.eventId === event.id && grant.revokedAt === null;
-  const isCoModerator = isValidGrant && grant.role === 'MODERATOR';
-  const isSpeaker = isValidGrant && grant.role === 'SPEAKER';
+  // Magic-link path: primario condiviso, co-moderatore (role=MODERATOR) o
+  // speaker (role=SPEAKER). Risoluzione unica in resolveGrantForEvent —
+  // nome del grant GIÀ DECIFRATO (EventModerator.name è cifrato a riposo:
+  // la lookup diretta qui mostrava ciphertext base64 nel pre-join).
+  const grant = await resolveGrantForEvent(event, token);
+  const isPrimaryModerator = !!grant?.isPrimaryShared;
+  const isCoModerator =
+    !!grant && !grant.isPrimaryShared && grant.role === 'MODERATOR';
+  const isSpeaker = !!grant && grant.role === 'SPEAKER';
   const isModerator = isPrimaryModerator || isCoModerator;
 
   let participantInfo: { displayName: string } | null = null;
@@ -275,10 +273,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       isGuest={false}
       hasMultitrackConsent={hasMultitrackConsent}
       displayName={
-        isValidGrant && grant
+        grant && !grant.isPrimaryShared
           // Named co-moderator or speaker via EventModerator row —
           // greet them by name in the pre-join input (still editable).
-          ? grant.name
+          ? grant.displayName ?? ''
           : isPrimaryModerator
             // Primary moderator magic-link (shared): keep the input
             // empty so anyone opening the link types their own name

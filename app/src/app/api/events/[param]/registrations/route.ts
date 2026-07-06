@@ -43,9 +43,10 @@ export const POST = withErrorHandling(async (request, context) => {
 
   if (!event) throw new NotFoundError('Event');
 
-  // Include PROVISIONING/IDLE degli eventi schedulati (pre-warm/pausa):
-  // registrarsi 10 minuti prima dell'inizio deve funzionare. Le instant
-  // call restano fuori (link-only, niente registrazioni).
+  // Include PROVISIONING/IDLE degli eventi schedulati non finiti
+  // (pre-warm/pausa): registrarsi 10 minuti prima dell'inizio deve
+  // funzionare. Le instant call restano fuori dagli stati di warm-up
+  // (link-only; per LIVE il comportamento è quello storico).
   if (!isEventOpenForRegistration(event)) {
     throw new ConflictError('Event is not open for registration');
   }

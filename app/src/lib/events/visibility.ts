@@ -11,47 +11,68 @@ import type { EventStatus, Prisma } from '@prisma/client';
  * partecipante che apre il link pubblico 10 minuti prima dell'inizio non
  * deve trovare un 404.
  *
- * Le instant call (eventType INSTANT) restano fuori dalle superfici
- * pubbliche quando sono parcheggiate in IDLE/PROVISIONING: sono chiamate
- * link-only, non eventi a calendario.
+ * Due guardie sugli stati di warm-up:
+ * - le instant call (eventType INSTANT) restano fuori dalle superfici
+ *   pubbliche quando sono parcheggiate: sono chiamate link-only, non
+ *   eventi a calendario;
+ * - endsAt deve essere nel futuro: la transizione IDLE→ENDED la fa lo
+ *   scaler, e se lo scaler è giù o sospeso (successo in prod il 12 giu)
+ *   un evento FINITO ma incagliato in IDLE non deve tornare "in arrivo"
+ *   e registrabile — prima di questo rollout era semplicemente
+ *   invisibile, e quella garanzia va mantenuta.
  */
 
 /** Stati sempre visibili pubblicamente, per qualunque tipo di evento. */
 export const ALWAYS_PUBLIC_STATUSES: EventStatus[] = ['PUBLISHED', 'LIVE', 'ENDED'];
 
-/** Stati di warm-up/pausa: pubblici SOLO per eventi schedulati (non INSTANT). */
+/** Stati di warm-up/pausa: pubblici SOLO per eventi schedulati non finiti. */
 export const WARMUP_STATUSES: EventStatus[] = ['PROVISIONING', 'IDLE'];
+
+/**
+ * Stati in cui la registrazione può essere aperta. Per le superfici CLIENT,
+ * che ricevono solo eventi già passati dal filtro server (eventType/endsAt
+ * inclusi): lato server usare SEMPRE isEventOpenForRegistration.
+ */
+export const REGISTRABLE_STATUSES: EventStatus[] = [
+  'PUBLISHED',
+  'PROVISIONING',
+  'IDLE',
+  'LIVE',
+];
 
 interface EventLike {
   status: string;
-  eventType?: string | null;
+  eventType: string | null;
+  endsAt: Date | string;
+}
+
+function isWarmupPubliclyVisible(event: EventLike): boolean {
+  return (
+    (WARMUP_STATUSES as string[]).includes(event.status) &&
+    event.eventType !== 'INSTANT' &&
+    new Date(event.endsAt).getTime() > Date.now()
+  );
 }
 
 /** True se la pagina pubblica dell'evento deve essere raggiungibile. */
 export function isEventPubliclyVisible(event: EventLike): boolean {
-  if ((ALWAYS_PUBLIC_STATUSES as string[]).includes(event.status)) {
-    return true;
-  }
   return (
-    (WARMUP_STATUSES as string[]).includes(event.status) &&
-    event.eventType !== 'INSTANT'
+    (ALWAYS_PUBLIC_STATUSES as string[]).includes(event.status) ||
+    isWarmupPubliclyVisible(event)
   );
 }
 
 /** True se l'evento accetta nuove registrazioni (pagina + POST API). */
 export function isEventOpenForRegistration(event: EventLike): boolean {
   if (event.status === 'PUBLISHED' || event.status === 'LIVE') return true;
-  return (
-    (WARMUP_STATUSES as string[]).includes(event.status) &&
-    event.eventType !== 'INSTANT'
-  );
+  return isWarmupPubliclyVisible(event);
 }
 
 /**
  * Frammento Prisma `where` per le superfici pubbliche (listing, home,
- * sitemap). `includeEnded: false` per le superfici solo-futuro (home).
- * Da combinare con altre condizioni via spread: le chiavi extra vanno in
- * AND con l'OR restituito.
+ * sitemap, calendario, API pubblica). `includeEnded: false` per le
+ * superfici solo-futuro (home). Da combinare con altre condizioni via
+ * spread: le chiavi extra vanno in AND con l'OR restituito.
  */
 export function publicEventStatusWhere(opts?: {
   includeEnded?: boolean;
@@ -61,7 +82,11 @@ export function publicEventStatusWhere(opts?: {
   return {
     OR: [
       { status: { in: base } },
-      { status: { in: WARMUP_STATUSES }, eventType: { not: 'INSTANT' } },
+      {
+        status: { in: WARMUP_STATUSES },
+        eventType: { not: 'INSTANT' },
+        endsAt: { gt: new Date() },
+      },
     ],
   };
 }

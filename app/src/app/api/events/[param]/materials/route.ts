@@ -8,6 +8,7 @@ import {
 } from '@/lib/errors';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
+import { isEventPubliclyVisible } from '@/lib/events/visibility';
 import { createMaterialSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
@@ -20,10 +21,12 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   const event = await prisma.event.findUnique({
     where: { slug },
-    select: { id: true, status: true },
+    select: { id: true, status: true, eventType: true, endsAt: true },
   });
 
-  if (!event || !['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
+  // Stessa regola delle pagine pubbliche (lib/events/visibility): i materiali
+  // devono restare accessibili anche durante il pre-warm PROVISIONING/IDLE.
+  if (!event || !isEventPubliclyVisible(event)) {
     throw new NotFoundError('Event');
   }
 
