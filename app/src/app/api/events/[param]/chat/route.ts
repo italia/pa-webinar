@@ -81,7 +81,10 @@ async function authenticateSender(
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
 
   if (token) {
-    // Primary moderator?
+    // Primary moderator? SOLO il token primario: usare isEventModerator qui
+    // farebbe corto-circuitare anche i co-moderatori su questo branch,
+    // attribuendo i loro messaggi al nome/senderId del primario (il bug
+    // "tutti Moderatore" che il branch co-moderatore sotto esiste per evitare).
     if (constantTimeEqual(event.moderatorToken, token)) {
       return {
         eventId: event.id,

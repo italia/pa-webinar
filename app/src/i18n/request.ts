@@ -39,6 +39,41 @@ function applyOverrides(messages: Messages, overrides: LocaleOverrides): Message
   return out;
 }
 
+/**
+ * Deep-merge dei cataloghi: `override` (la lingua richiesta) vince dove ha una
+ * stringa non vuota; ovunque manchi, ricade su `base` (italiano). Necessario
+ * perché i cataloghi non-it/en sono fermi a uno snapshot più vecchio: senza
+ * questo fallback next-intl renderizza il path della chiave grezzo
+ * (es. "detail.enterRoom") — visibile all'utente, incluse stringhe di consenso.
+ */
+function deepMergeMessages(base: Messages, override: Messages): Messages {
+  const out: Messages = { ...base };
+  for (const [k, v] of Object.entries(override)) {
+    const b = out[k];
+    if (
+      v &&
+      typeof v === 'object' &&
+      !Array.isArray(v) &&
+      b &&
+      typeof b === 'object' &&
+      !Array.isArray(b)
+    ) {
+      out[k] = deepMergeMessages(b as Messages, v as Messages);
+    } else if (v !== undefined && v !== null && v !== '') {
+      out[k] = v;
+    }
+    // v vuota/nulla → tieni il fallback italiano già presente in `out`.
+  }
+  return out;
+}
+
+// Il merge lavora su due import statici: il risultato è identico per tutta la
+// vita del processo, quindi lo calcoliamo una volta per locale invece che a
+// ogni richiesta SSR (il catalogo sono migliaia di chiavi × 24 locale).
+// Gli override runtime dell'admin NON sono memoizzati: applyOverrides clona e
+// lavora sopra questa base condivisa senza mutarla.
+const mergedMessagesCache = new Map<string, Messages>();
+
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale;
 
@@ -69,6 +104,25 @@ export default getRequestConfig(async ({ requestLocale }) => {
   }
 
   let messages = (await import(`./messages/${locale}.json`)).default as Messages;
+
+  // Fallback profondo sull'italiano per le chiavi mancanti nelle lingue ferme a
+  // uno snapshot più vecchio (vedi deepMergeMessages). L'italiano è già completo,
+  // quindi non serve merge quando locale === 'it'.
+  if (locale !== 'it') {
+    const cached = mergedMessagesCache.get(locale);
+    if (cached) {
+      messages = cached;
+    } else {
+      try {
+        const base = (await import('./messages/it.json')).default as Messages;
+        messages = deepMergeMessages(base, messages);
+        mergedMessagesCache.set(locale, messages);
+      } catch {
+        // Se il catalogo di fallback non carica, teniamo i messaggi della locale.
+      }
+    }
+  }
+
   if (overrides && Object.keys(overrides).length > 0) {
     try {
       messages = applyOverrides(messages, overrides);

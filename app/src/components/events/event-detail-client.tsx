@@ -106,6 +106,13 @@ interface EventDetailClientProps {
   polls?: PollData[];
   feedbackSummary?: FeedbackSummary | null;
   tags?: TagChip[];
+  /** /live ci ha rimbalzato qui per un token personale non più valido. Letto
+   *  dal server (searchParams): useSearchParams() senza <Suspense> è un build
+   *  breaker latente su route statiche. */
+  invalidToken?: boolean;
+  /** Il device ha il cookie d'accesso firmato per questo evento: il link
+   *  "Entra nella sala" può re-identificarlo su /live. */
+  hasRoomAccess?: boolean;
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -135,6 +142,8 @@ export default function EventDetailClient({
   polls = [],
   feedbackSummary = null,
   tags = [],
+  invalidToken = false,
+  hasRoomAccess = false,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tv = useTranslations('video');
@@ -277,6 +286,17 @@ export default function EventDetailClient({
           {t('detail.backToEvents')}
         </Link>
       </div>
+
+      {invalidToken && (
+        <Alert color="warning" className="mb-4">
+          <strong>{t('detail.invalidTokenTitle')}</strong>
+          <div className="mt-1">
+            {isEnded
+              ? t('detail.invalidTokenBodyEnded')
+              : t('detail.invalidTokenBody')}
+          </div>
+        </Alert>
+      )}
 
       {isEnded && (
         <Alert color="info" className="mb-4">
@@ -666,6 +686,29 @@ export default function EventDetailClient({
                         {isLive ? t('detail.registerAndJoin') : t('detail.register')}
                       </Button>
                     </Link>
+                  )}
+
+                  {canRegister && (isLive || (hasRoomAccess && !invalidToken)) && (
+                    // Via d'ingresso per chi si è già registrato: /live lo
+                    // re-identifica dal cookie firmato (o lo fa entrare come
+                    // ospite se LIVE), evitando il loop registrazione → 409.
+                    // Su evento non ancora LIVE il link appare SOLO se il device
+                    // ha il cookie firmato valido: senza, /live rimbalzerebbe alla
+                    // registrazione — esattamente il dead-end che questo link vuole
+                    // evitare. Con invalidToken (cookie valido ma registrazione
+                    // rimossa) /live ci ha appena rimbalzato qui: rimostrare il
+                    // link accanto all'alert creerebbe un ping-pong infinito.
+                    <p
+                      className="text-center mt-3 mb-0"
+                      style={{ fontSize: '0.85rem' }}
+                    >
+                      <Link
+                        href={`/events/${event.slug}/live`}
+                        className="text-decoration-none fw-semibold text-primary"
+                      >
+                        {t('detail.alreadyRegisteredEnter')}
+                      </Link>
+                    </p>
                   )}
 
                   {event.chatEnabled && (

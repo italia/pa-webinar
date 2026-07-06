@@ -97,6 +97,10 @@
       "noRecording": "La registrazione video non è disponibile per questo evento.",
       "watchRecording": "Guarda la registrazione",
       "backToEvents": "Torna agli eventi",
+      "alreadyRegisteredEnter": "Sei già registrato? Entra nella sala",
+      "invalidTokenTitle": "Link di accesso non più valido",
+      "invalidTokenBody": "Il link che hai usato non è valido o è scaduto. Se ti sei registrato, controlla l'email di conferma per il tuo link personale, oppure registrati di nuovo qui sotto.",
+      "invalidTokenBodyEnded": "Il link che hai usato non è più valido. L'evento è concluso: qui sotto trovi la registrazione e i materiali.",
       "speakers": "Relatori",
       "organizer": "Organizzatore",
       "chatNotSaved": "I messaggi della chat non vengono salvati dopo la fine dell'evento.",
@@ -3052,6 +3056,7 @@
   },
   "waiting": {
     "startsIn": "L'evento inizierà tra",
+    "startingSoon": "L'evento sta per iniziare, attendi l'organizzatore…",
     "eventLive": "L'evento è in corso!",
     "connectedParticipants": "{count, plural, =0 {Nessun partecipante} =1 {1 partecipante connesso} other {{count} partecipanti connessi}}",
     "elapsedTime": "In corso da {minutes} minuti",
