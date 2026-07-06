@@ -20,6 +20,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useRouter } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
 import {
   coerceMatrix,
   defaultMatrix,
@@ -200,6 +201,7 @@ export default function EventWizard(props: WizardProps) {
   const t = useTranslations('admin.wizard');
   const tc = useTranslations('common');
   const router = useRouter();
+  const toast = useToast();
 
   const mode: 'create' | 'edit' = props.mode ?? 'create';
   const initialEvent = props.initialEvent;
@@ -439,6 +441,68 @@ export default function EventWizard(props: WizardProps) {
     setForm((prev) => ({ ...prev, ...patch }));
   }, []);
 
+  // ── Draft autosave ────────────────────────────────────────────────────────
+  // Persist the form to localStorage (debounced) so an accidental reload or
+  // navigation doesn't lose all 5 steps. Keyed by event id (edit) or 'new'.
+  // We skip the first render so a pristine form isn't stored as a "draft",
+  // capture any pre-existing draft before the autosave can overwrite it, and
+  // clear the key on a successful submit.
+  const draftKey = `pa-wizard-draft:${initialEvent?.id ?? 'new'}`;
+  const clearDraft = useCallback(() => {
+    try {
+      localStorage.removeItem(draftKey);
+    } catch {
+      /* storage unavailable */
+    }
+  }, [draftKey]);
+
+  const skipFirstAutosave = useRef(true);
+  useEffect(() => {
+    if (skipFirstAutosave.current) {
+      skipFirstAutosave.current = false;
+      return;
+    }
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(draftKey, JSON.stringify(form));
+      } catch {
+        /* quota / unavailable — best effort */
+      }
+    }, 800);
+    return () => clearTimeout(id);
+  }, [form, draftKey]);
+
+  const savedDraftRef = useRef<string | null>(null);
+  const [draftAvailable, setDraftAvailable] = useState(false);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(draftKey);
+      if (raw) {
+        savedDraftRef.current = raw;
+        setDraftAvailable(true);
+      }
+    } catch {
+      /* ignore */
+    }
+    // Run once on mount for this draft key.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const restoreDraft = useCallback(() => {
+    if (savedDraftRef.current) {
+      try {
+        setForm(JSON.parse(savedDraftRef.current) as WizardForm);
+      } catch {
+        /* corrupt draft — ignore */
+      }
+    }
+    setDraftAvailable(false);
+  }, []);
+  const dismissDraft = useCallback(() => {
+    clearDraft();
+    setDraftAvailable(false);
+  }, [clearDraft]);
+
   const stepIndex = STEP_KEYS.indexOf(activeStep);
   const goPrev = () => stepIndex > 0 && setActiveStep(STEP_KEYS[stepIndex - 1]!);
   const goNext = () => {
@@ -605,6 +669,7 @@ export default function EventWizard(props: WizardProps) {
 
           await fanoutEditDiff(eventId, moderatorToken, form, initialEvent, props.defaultLocale);
 
+          clearDraft();
           router.push(
             `/admin/events/${eventId}?token=${encodeURIComponent(moderatorToken)}`,
           );
@@ -635,9 +700,14 @@ export default function EventWizard(props: WizardProps) {
         // the response.
         const moderatorToken = (created as { moderatorToken?: string }).moderatorToken;
 
+        // Track side-resource failures so we can warn the admin instead of
+        // silently dropping invites/moderators/materials. They can re-add them
+        // on the event page — but only if they know something didn't save.
+        const failed = new Set<string>();
+
         // 1) Organizers (primary-moderator auth)
         for (const org of form.organizers) {
-          await fetch(`/api/events/${created.id}/organizers`, {
+          const ok = await fetch(`/api/events/${created.id}/organizers`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -648,14 +718,15 @@ export default function EventWizard(props: WizardProps) {
               logoUrl: org.logoUrl,
               websiteUrl: org.websiteUrl,
             }),
-          }).catch(() => {
-            /* best-effort; admin can fix later */
-          });
+          })
+            .then((r) => r.ok)
+            .catch(() => false);
+          if (!ok) failed.add(t('resources.organizers'));
         }
 
         // 2) Invitations (admin-session auth)
         for (const inv of form.invitations) {
-          await fetch(`/api/admin/events/${created.id}/invitations`, {
+          const ok = await fetch(`/api/admin/events/${created.id}/invitations`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -664,14 +735,15 @@ export default function EventWizard(props: WizardProps) {
               role: inv.role,
               personId: inv.personId ?? undefined,
             }),
-          }).catch(() => {
-            /* best-effort */
-          });
+          })
+            .then((r) => r.ok)
+            .catch(() => false);
+          if (!ok) failed.add(t('resources.invitations'));
         }
 
         // 3) Moderators (EventModerator rows, MODERATOR role)
         for (const mod of form.moderators) {
-          await fetch(`/api/events/${created.id}/moderators`, {
+          const ok = await fetch(`/api/events/${created.id}/moderators`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -682,12 +754,15 @@ export default function EventWizard(props: WizardProps) {
               email: mod.email,
               role: 'MODERATOR',
             }),
-          }).catch(() => {});
+          })
+            .then((r) => r.ok)
+            .catch(() => false);
+          if (!ok) failed.add(t('resources.moderators'));
         }
 
         // 4) Speakers (additional EventModerator rows, SPEAKER role)
         for (const sp of form.speakers) {
-          await fetch(`/api/events/${created.id}/moderators`, {
+          const ok = await fetch(`/api/events/${created.id}/moderators`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -698,16 +773,22 @@ export default function EventWizard(props: WizardProps) {
               email: sp.email,
               role: 'SPEAKER',
             }),
-          }).catch(() => {});
+          })
+            .then((r) => r.ok)
+            .catch(() => false);
+          if (!ok) failed.add(t('resources.speakers'));
         }
 
-        // 4) Materials
+        // 5) Materials
         for (const m of form.materials) {
-          await fetch(`/api/admin/events/${created.id}/materials`, {
+          const ok = await fetch(`/api/admin/events/${created.id}/materials`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(m),
-          }).catch(() => {});
+          })
+            .then((r) => r.ok)
+            .catch(() => false);
+          if (!ok) failed.add(t('resources.materials'));
         }
 
         // 5) Questionnaires (pre/post)
@@ -738,6 +819,15 @@ export default function EventWizard(props: WizardProps) {
           }).catch(() => {});
         }
 
+        // Warn about any side resources that didn't save. The ToastProvider
+        // lives in the admin layout, so this toast survives the redirect to
+        // the edit page where the admin can re-add the missing items.
+        if (failed.size > 0) {
+          toast.error(t('partialFailure', { items: [...failed].join(', ') }));
+        }
+
+        clearDraft();
+
         let destination = `/admin/events/${created.id}/edit?created=1`;
         if (overrideRedirect === '__questionnaires__') {
           destination = `/admin/events/${created.id}/questionnaires`;
@@ -751,7 +841,7 @@ export default function EventWizard(props: WizardProps) {
         setSubmitting(false);
       }
     },
-    [form, router, props.defaultLocale, t, mode, initialEvent],
+    [form, router, toast, clearDraft, props.defaultLocale, t, mode, initialEvent],
   );
 
   const saveDraftAndNavigate = useCallback(
@@ -763,6 +853,31 @@ export default function EventWizard(props: WizardProps) {
 
   return (
     <div>
+      {draftAvailable && (
+        <div
+          className="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2"
+          role="status"
+        >
+          <span>{t('draftFound')}</span>
+          <span className="d-flex gap-2">
+            <button
+              type="button"
+              className="btn btn-sm btn-primary"
+              onClick={restoreDraft}
+            >
+              {t('draftRestore')}
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary"
+              onClick={dismissDraft}
+            >
+              {t('draftDiscard')}
+            </button>
+          </span>
+        </div>
+      )}
+
       <StepNav
         steps={STEP_KEYS.map((k) => ({ key: k, label: t(`steps.${k}`) }))}
         activeStep={activeStep}

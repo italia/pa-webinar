@@ -687,7 +687,18 @@
         "privacyDocHelp": "Carica un PDF o incolla l'URL di un'informativa sostitutiva. Sovrascrive il template GDPR se presente.",
         "privacyTextHelp": "Testo sintetico mostrato nel form di registrazione; può integrare o sostituire il template GDPR."
       },
-      "validationFailed": "Controlla i campi evidenziati prima di procedere."
+      "validationFailed": "Controlla i campi evidenziati prima di procedere.",
+      "partialFailure": "Evento creato, ma alcuni elementi non sono stati salvati: {items}. Puoi aggiungerli dalla pagina dell'evento.",
+      "draftFound": "Abbiamo trovato una bozza non salvata di questo evento. Vuoi ripristinarla?",
+      "draftRestore": "Ripristina bozza",
+      "draftDiscard": "Ignora",
+      "resources": {
+        "organizers": "organizzatori",
+        "invitations": "inviti",
+        "moderators": "moderatori",
+        "speakers": "relatori",
+        "materials": "materiali"
+      }
     },
     "nav": {
       "events": "Eventi",

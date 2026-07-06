@@ -617,7 +617,18 @@
         "privacyDocHelp": "Upload a PDF or paste the URL of an alternative privacy notice. Overrides the GDPR template when set.",
         "privacyTextHelp": "Short text shown on the registration form; can complement or replace the GDPR template."
       },
-      "validationFailed": "Please review the highlighted fields before continuing."
+      "validationFailed": "Please review the highlighted fields before continuing.",
+      "partialFailure": "Event created, but some items weren't saved: {items}. You can add them from the event page.",
+      "draftFound": "We found an unsaved draft of this event. Restore it?",
+      "draftRestore": "Restore draft",
+      "draftDiscard": "Dismiss",
+      "resources": {
+        "organizers": "organizers",
+        "invitations": "invitations",
+        "moderators": "moderators",
+        "speakers": "speakers",
+        "materials": "materials"
+      }
     },
     "nav": {
       "events": "Events",
