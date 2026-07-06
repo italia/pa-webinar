@@ -1077,7 +1077,7 @@ export default function LiveEventClient({
         />
       )}
 
-      {!isInstantCall && !showJvbOverlay && (
+      {!showJvbOverlay && (
         <PresentationTimer
           eventSlug={event.slug}
           token={token}
@@ -1090,7 +1090,7 @@ export default function LiveEventClient({
           moderator still gets the full panel with "approve mic/video"
           buttons inside ModeratorControls above — this one stays
           compact and silent when no hand is up. */}
-      {!isInstantCall && !showJvbOverlay && !isActualModerator && jitsiApi && (
+      {!showJvbOverlay && !isActualModerator && jitsiApi && (
         <RaisedHandsPanel
           api={jitsiApi}
           localDisplayName={credentials?.displayName ?? chosenName ?? ''}
@@ -1101,7 +1101,7 @@ export default function LiveEventClient({
       {/* Screenshare banner — attention cue whenever someone in the
           room starts sharing. Jitsi auto-pins the share but a visible
           banner was requested because users missed the transition. */}
-      {!isInstantCall && !showJvbOverlay && jitsiApi && (
+      {!showJvbOverlay && jitsiApi && (
         <ScreenshareBanner api={jitsiApi} />
       )}
 
@@ -1149,7 +1149,7 @@ export default function LiveEventClient({
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
             />
-            {!isInstantCall && <ReactionBar eventSlug={event.slug} />}
+            <ReactionBar eventSlug={event.slug} />
             {/* Floating controls slot: the sidebar portals its bar here
                 so it sits on top of the Jitsi iframe (Meet-style) on
                 both desktop and mobile. */}
@@ -1169,7 +1169,6 @@ export default function LiveEventClient({
           agendaEnabled={event.agendaEnabled}
           jitsiApi={jitsiApi}
           displayName={credentials.displayName}
-          isInstantCall={isInstantCall}
           canReactAgenda={!isModerator && !isSpeaker}
           guestId={isGuest ? guestId : undefined}
         />
@@ -1250,7 +1249,6 @@ interface LiveSidebarProps {
   agendaEnabled: boolean;
   jitsiApi: JitsiMeetExternalAPI | null;
   displayName: string;
-  isInstantCall?: boolean;
   /** Audience (guests + registered participants) may react to agenda items;
    *  presenters (moderators/speakers) only see the tallies. */
   canReactAgenda?: boolean;
@@ -1268,7 +1266,6 @@ function LiveSidebar({
   agendaEnabled,
   jitsiApi,
   displayName,
-  isInstantCall = false,
   canReactAgenda = false,
   guestId,
 }: LiveSidebarProps) {
@@ -1282,7 +1279,7 @@ function LiveSidebar({
     agendaEnabled: boolean;
     recordingEnabled: boolean;
   }>(
-    isInstantCall ? null : `/api/events/${eventSlug}/flags`,
+    `/api/events/${eventSlug}/flags`,
     (url: string) => fetch(url).then((r) => r.json()),
     { refreshInterval: 15000 }
   );
@@ -1312,7 +1309,7 @@ function LiveSidebar({
     [eventSlug, token, mutateFlags]
   );
   const [activeTab, setActiveTab] = useState<SidebarTab>(
-    isInstantCall ? 'participants' : qaEnabled ? 'qa' : showChat ? 'chat' : 'polls'
+    qaEnabled ? 'qa' : showChat ? 'chat' : 'polls'
   );
   const [participantCount, setParticipantCount] = useState(0);
   // Drawer-open state only matters on mobile (<992px); on desktop the
@@ -1395,7 +1392,7 @@ function LiveSidebar({
           <circle cx="12" cy="12" r="10" />
         </svg>
       ),
-      show: !isInstantCall && effQa,
+      show: effQa,
     },
     {
       key: 'chat',
@@ -1417,7 +1414,7 @@ function LiveSidebar({
         </svg>
       ),
       dot: chatUnread > 0,
-      show: !isInstantCall && showChat,
+      show: showChat,
     },
     {
       key: 'polls',
@@ -1439,7 +1436,7 @@ function LiveSidebar({
           <path d="M7 14l4-4 4 4 5-5" />
         </svg>
       ),
-      show: !isInstantCall,
+      show: true,
     },
     {
       key: 'wordcloud',
@@ -1464,7 +1461,7 @@ function LiveSidebar({
           <path d="M4 17h7" />
         </svg>
       ),
-      show: !isInstantCall,
+      show: true,
     },
     {
       key: 'agenda',
@@ -1486,7 +1483,7 @@ function LiveSidebar({
           <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
         </svg>
       ),
-      show: !isInstantCall && effAgenda,
+      show: effAgenda,
     },
     {
       key: 'materials',
@@ -1507,7 +1504,7 @@ function LiveSidebar({
           <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
         </svg>
       ),
-      show: !isInstantCall,
+      show: true,
     },
     {
       key: 'participants',
@@ -1708,7 +1705,7 @@ function LiveSidebar({
         >
           {/* Attivazione funzioni durante l'evento (solo moderatore). Le
               modifiche si propagano agli altri client via polling dei flag. */}
-          {isModerator && !isInstantCall && (
+          {isModerator && (
             <div
               className="d-flex flex-wrap gap-2 px-3 py-2 align-items-center"
               style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.8rem' }}
