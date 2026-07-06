@@ -15,8 +15,14 @@ spec:
         # App availability
         # NB: il target ServiceMonitor imposta job = nome del Service (= fullname del chart),
         # non piu' "eventi-*" dopo il rename. Ancoriamo su namespace per robustezza al rename.
+        # NB2: tutti i selettori qui sotto sono ancorati a namespace: test e prod condividono
+        # lo stesso Prometheus e le serie di entrambi hanno app="pa-webinar", quindi senza
+        # namespace ogni regola valuterebbe anche le serie dell'altro ambiente.
         - alert: PaWebinarDown
-          expr: up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"} == 0
+          expr: |
+            up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"} == 0
+            or
+            absent(up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"})
           for: 2m
           labels:
             severity: critical
@@ -26,7 +32,7 @@ spec:
 
         # High latency
         - alert: PaWebinarHighLatency
-          expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{app="pa-webinar"}[5m])) > 2
+          expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{namespace="{{ .Release.Namespace }}", app="pa-webinar"}[5m])) > 2
           for: 5m
           labels:
             severity: warning
@@ -38,9 +44,9 @@ spec:
         - alert: PaWebinarHighErrorRate
           expr: |
             (
-              rate(http_requests_total{app="pa-webinar",status_code=~"5.."}[5m])
+              rate(http_requests_total{namespace="{{ .Release.Namespace }}", app="pa-webinar",status_code=~"5.."}[5m])
               /
-              rate(http_requests_total{app="pa-webinar"}[5m])
+              rate(http_requests_total{namespace="{{ .Release.Namespace }}", app="pa-webinar"}[5m])
             ) > 0.05
           for: 5m
           labels:
@@ -51,7 +57,7 @@ spec:
 
         # Database unreachable (metric disappears)
         - alert: PaWebinarDatabaseDown
-          expr: absent(eventi_active_events{app="pa-webinar"})
+          expr: absent(eventi_active_events{namespace="{{ .Release.Namespace }}", app="pa-webinar"})
           for: 3m
           labels:
             severity: critical
@@ -61,7 +67,7 @@ spec:
 
         # JVB high stress
         - alert: JvbHighStress
-          expr: eventi_jvb_stress_level{app="pa-webinar"} > 0.8
+          expr: eventi_jvb_stress_level{namespace="{{ .Release.Namespace }}", app="pa-webinar"} > 0.8
           for: 3m
           labels:
             severity: warning
@@ -71,7 +77,7 @@ spec:
 
         # JVB scaling stuck
         - alert: JvbScalingStuck
-          expr: eventi_jvb_participants{app="pa-webinar"} > 0 and eventi_jvb_stress_level{app="pa-webinar"} > 0.9
+          expr: eventi_jvb_participants{namespace="{{ .Release.Namespace }}", app="pa-webinar"} > 0 and eventi_jvb_stress_level{namespace="{{ .Release.Namespace }}", app="pa-webinar"} > 0.9
           for: 5m
           labels:
             severity: critical
@@ -90,7 +96,7 @@ spec:
         # e' giu' -> partecipanti senza video. Richiede kube-state-metrics.
         - alert: JvbAbsentDuringLiveEvent
           expr: |
-            (max(eventi_active_events{app="pa-webinar"}) > 0)
+            (max(eventi_active_events{namespace="{{ .Release.Namespace }}", app="pa-webinar"}) > 0)
             and
             (max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*jitsi-meet-jvb.*"}) == 0)
           for: 2m
@@ -105,7 +111,7 @@ spec:
         # E' a replica singola: un suo down interrompe tutti gli eventi in corso.
         - alert: CoturnDownDuringEvent
           expr: |
-            (max(eventi_active_events{app="pa-webinar"}) > 0)
+            (max(eventi_active_events{namespace="{{ .Release.Namespace }}", app="pa-webinar"}) > 0)
             and
             (max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*coturn.*"}) == 0)
           for: 1m
@@ -125,7 +131,7 @@ spec:
 
         # High event loop lag
         - alert: HighEventLoopLag
-          expr: nodejs_eventloop_lag_seconds{app="pa-webinar"} > 0.5
+          expr: nodejs_eventloop_lag_seconds{namespace="{{ .Release.Namespace }}", app="pa-webinar"} > 0.5
           for: 2m
           labels:
             severity: warning
