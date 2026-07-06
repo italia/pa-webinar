@@ -322,6 +322,11 @@ interface VideoQualityDefinition {
     audioQuality: { opusMaxAverageBitrate: number };
     stereo: boolean;
     enableOpusRed: boolean;
+    // Framerate dello screenshare. Il default Jitsi è {min:5, max:5}: ok per
+    // slide statiche, inguardabile per demo/video condivisi. Il browser scala
+    // comunque verso il basso sotto vincolo di banda/CPU, quindi alzare il max
+    // non costa nulla nel caso-slide (frame identici non generano bitrate).
+    desktopSharingFrameRate: { min: number; max: number };
   };
 }
 
@@ -341,6 +346,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       audioQuality: { opusMaxAverageBitrate: 24_000 },
       stereo: false,
       enableOpusRed: false,
+      desktopSharingFrameRate: { min: 5, max: 15 },
     },
   },
   BALANCED: {
@@ -358,6 +364,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       audioQuality: { opusMaxAverageBitrate: 48_000 },
       stereo: false,
       enableOpusRed: false,
+      desktopSharingFrameRate: { min: 5, max: 30 },
     },
   },
   HIGH: {
@@ -383,6 +390,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       // lo riaccendeva. Allineato. (MAX lo lascia ON: chiamate piccole, fedeltà
       // prima della banda.)
       enableOpusRed: false,
+      desktopSharingFrameRate: { min: 5, max: 30 },
     },
   },
   MAX: {
@@ -402,6 +410,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       audioQuality: { opusMaxAverageBitrate: 510_000 },
       stereo: true,
       enableOpusRed: true,
+      desktopSharingFrameRate: { min: 5, max: 60 },
     },
   },
 };
