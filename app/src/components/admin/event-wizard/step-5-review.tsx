@@ -228,7 +228,9 @@ export default function Step5Review({
         </div>
       </section>
 
-      {/* Moderator contact (optional but used for confirmation mail) */}
+      {/* Primary moderator: name+email are required to publish. This person
+          receives the moderator magic link (ADR-003) — distinct from the
+          additional co-moderators added in the People step. */}
       <section className="mb-4">
         <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('moderatorHeading')}
@@ -236,6 +238,17 @@ export default function Step5Review({
         <p className="text-secondary mb-2" style={{ fontSize: '0.82rem' }}>
           {t('moderatorPublishHint')}
         </p>
+        <div
+          className="p-2 mb-3 rounded"
+          style={{
+            background: 'rgba(0,102,204,0.08)',
+            border: '1px solid rgba(0,102,204,0.25)',
+            color: 'var(--app-text)',
+            fontSize: '0.82rem',
+          }}
+        >
+          {t('moderatorLinkNote')}
+        </div>
         <div className="row g-3">
           <div className="col-md-6">
             <label className="form-label" htmlFor="rev-mod-name">
