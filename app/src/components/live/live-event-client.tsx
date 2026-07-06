@@ -33,7 +33,10 @@ import PostEventFeedbackModal from '@/components/live/post-event-feedback-modal'
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
-import WaitingRoom, { type WaitingRoomJoinPrefs } from '@/components/live/waiting-room';
+import WaitingRoom, {
+  type WaitingRoomJoinPrefs,
+  type WaitingRoomWarmup,
+} from '@/components/live/waiting-room';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 
 interface EventInfo {
@@ -128,12 +131,31 @@ type LivePhase =
 // "Evento concluso" screen so the user can decide what to do manually.
 const MAX_RECONNECT_ATTEMPTS = 3;
 
+// Grace window after an UNFLAGGED `videoConferenceLeft` before we commit to
+// reconnecting. Jitsi's native hangup fires videoConferenceLeft first and
+// `readyToClose` a moment later; this window lets the intentional-close
+// signal veto the reconnect so clicking hangup doesn't bounce the user back
+// into the call. A genuine drop (no readyToClose) just reconnects 1.2s later.
+const LEAVE_RECONNECT_GRACE_MS = 1200;
+
 // Phases that render the full-bleed call surface. While in one of these we
 // flip the page into "immersive" mode (see `.live-call-immersive` in
 // globals.scss): the call overlays the PA header/footer and the outer
 // document scroll is locked, so the video sits in a single viewport-locked
 // frame with no double scroll. The waiting room keeps the normal chrome.
 const IMMERSIVE_PHASES = new Set<LivePhase>(['fetching_jwt', 'ready', 'reconnecting']);
+
+// Statuses the waiting room knows how to render. The /lifecycle poll accepts
+// a status transition only if it's one of these — DRAFT/ARCHIVED leak through
+// that endpoint (it has no visibility filter) and would otherwise regress a
+// terminal ENDED recap into the blank "opening at …" fallback.
+const WAITING_ROOM_STATUSES = new Set([
+  'PUBLISHED',
+  'PROVISIONING',
+  'IDLE',
+  'LIVE',
+  'ENDED',
+]);
 
 interface JitsiCredentials {
   jwt: string;
@@ -209,6 +231,9 @@ export default function LiveEventClient({
   });
   const [jvbReady, setJvbReady] = useState<boolean | null>(null);
   const [jibriReady, setJibriReady] = useState<boolean | null>(null);
+  // Telemetria warm-up dal poll /lifecycle (solo mentre IDLE/PROVISIONING):
+  // alimenta il pannello di attesa onesto della WaitingRoom.
+  const [warmup, setWarmup] = useState<WaitingRoomWarmup | null>(null);
   // Pre-join camera/mic choice captured by the waiting room's DeviceCheck.
   // Forwarded to JitsiRoom as `startWithVideoMuted`/`startWithAudioMuted`
   // so the user actually lands in the room with the state they picked.
@@ -226,6 +251,9 @@ export default function LiveEventClient({
   const userHangupRef = useRef(false);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Deferred reconnect decision after an unflagged leave (see handleJitsiLeft):
+  // holds the grace timer so `readyToClose` can cancel it.
+  const pendingLeaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Poll infrastructure status (JVB + Jibri) when event is LIVE
   useEffect(() => {
@@ -286,17 +314,37 @@ export default function LiveEventClient({
     return () => root.classList.remove('live-call-immersive');
   }, [phase]);
 
-  // Poll event status in waiting room
+  // Poll event status in waiting room. Usa /lifecycle (più leggero della GET
+  // evento completa) che durante il warm-up porta anche la telemetria JVB
+  // (fase + provisioningStartedAt): è ciò che permette alla sala d'attesa di
+  // mostrare una stima onesta invece dello spinner cieco.
   useEffect(() => {
     if (phase !== 'waiting') return;
     const pollInterval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/events/${event.slug}`);
+        const res = await fetch(`/api/events/${event.slug}/lifecycle`);
         if (!res.ok) return;
         const data = await res.json();
-        if (data.status && data.status !== eventStatus) {
+        // /lifecycle has no visibility filter (unlike the public GET, which
+        // 404s DRAFT/ARCHIVED). Ignore those transitions so an event archived
+        // mid-view doesn't clobber the ENDED recap into the blank
+        // "opening at …" branch — the waiting room only renders these states.
+        if (
+          data.status &&
+          data.status !== eventStatus &&
+          WAITING_ROOM_STATUSES.has(data.status)
+        ) {
           setEventStatus(data.status);
         }
+        setWarmup(
+          data.jvb
+            ? {
+                phase: data.jvb.phase as 'queued' | 'starting' | 'ready',
+                startedAt: data.jvb.startedAt ?? null,
+                serverTime: data.serverTime,
+              }
+            : null,
+        );
       } catch {
         /* retry */
       }
@@ -483,6 +531,13 @@ export default function LiveEventClient({
     setPhase('ended');
   }, []);
 
+  // Moderator exit prompt: on leave, a host chooses "Esci solo tu" (leave,
+  // call continues — the scaler demotes LIVE→IDLE after the inactivity grace)
+  // vs "Termina per tutti" (flip status→ENDED now, everyone out immediately).
+  const [showLeaveChoice, setShowLeaveChoice] = useState(false);
+  const [endingForAll, setEndingForAll] = useState(false);
+  const [endForAllError, setEndForAllError] = useState('');
+
   const [showRecPrompt, setShowRecPrompt] = useState(false);
   const recPromptShownRef = useRef(false);
   const recPromptRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -491,6 +546,7 @@ export default function LiveEventClient({
     return () => {
       if (recPromptRetryRef.current) clearTimeout(recPromptRetryRef.current);
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+      if (pendingLeaveTimerRef.current) clearTimeout(pendingLeaveTimerRef.current);
     };
   }, []);
 
@@ -571,50 +627,89 @@ export default function LiveEventClient({
       autoOrPromptRecording(jitsiApi);
     }
   }, [jibriReady, jitsiApi, isModerator, event.recordingEnabled, autoOrPromptRecording]);
+  // Authoritative "the user intentionally left" signal from Jitsi's
+  // `readyToClose` (native hangup button, our executeCommand('hangup'),
+  // moderator "Termina evento"). It fires ONLY on an intentional close,
+  // never on a transient drop — so it cancels any pending or scheduled
+  // reconnect and takes us straight to the closing screen. This is what
+  // stops the native hangup from bouncing the user back into the call.
+  const handleReadyToClose = useCallback(() => {
+    userHangupRef.current = true;
+    if (pendingLeaveTimerRef.current) {
+      clearTimeout(pendingLeaveTimerRef.current);
+      pendingLeaveTimerRef.current = null;
+    }
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+    if (!showFeedback) setPhase('ended');
+  }, [showFeedback]);
+
   const handleJitsiLeft = useCallback(() => {
-    // Intentional leave (user clicked "Esci dalla sala" / completed
-    // the feedback flow): preserve the existing behavior — show the
-    // post-event screen unless feedback is still visible.
+    // Intentional leave already flagged (app "Esci dalla sala" button /
+    // feedback flow / ENDED poll): show the post-event screen right away.
     if (userHangupRef.current) {
       if (!showFeedback) setPhase('ended');
       return;
     }
 
-    // Unintentional leave: Jitsi fired `videoConferenceLeft` but we
-    // didn't ask for it. Could be a transient network drop, a JVB
-    // restart, or the event genuinely ending. Ask the server which one
-    // it is before deciding to show the "Evento concluso" screen.
-    void (async () => {
-      try {
-        const res = await fetch(`/api/events/${event.slug}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.status === 'ENDED') {
-            setEventStatus('ENDED');
+    // Unflagged `videoConferenceLeft`: EITHER the user clicked Jitsi's own
+    // hangup ("termina chiamata" — a `readyToClose` follows within a moment)
+    // OR the network genuinely dropped. Defer the reconnect decision by a
+    // short grace window so `handleReadyToClose` can veto it; otherwise the
+    // native hangup gets misread as a blip and rejoins immediately.
+    if (pendingLeaveTimerRef.current) clearTimeout(pendingLeaveTimerRef.current);
+    pendingLeaveTimerRef.current = setTimeout(() => {
+      pendingLeaveTimerRef.current = null;
+      // A readyToClose arrived during the grace window → intentional close.
+      if (userHangupRef.current) {
+        if (!showFeedback) setPhase('ended');
+        return;
+      }
+      // No intentional-close signal — ask the server whether the event
+      // ended (→ closing screen) or it's a real drop (→ reconnect).
+      void (async () => {
+        try {
+          const res = await fetch(`/api/events/${event.slug}`);
+          // readyToClose may still land while the fetch is in flight.
+          if (userHangupRef.current) {
             setPhase('ended');
             return;
           }
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === 'ENDED') {
+              setEventStatus('ENDED');
+              setPhase('ended');
+              return;
+            }
+          }
+          // Anything else (LIVE, non-OK response we couldn't classify)
+          // → assume the user dropped. Try to rejoin.
+          if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
+            reconnectAttemptsRef.current += 1;
+            setPhase('reconnecting');
+          } else {
+            setPhase('ended');
+          }
+        } catch {
+          // Network error reaching our own API — most likely the user is
+          // still offline. Treat as a transient drop and keep retrying
+          // until we exhaust the attempt budget.
+          if (userHangupRef.current) {
+            setPhase('ended');
+            return;
+          }
+          if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
+            reconnectAttemptsRef.current += 1;
+            setPhase('reconnecting');
+          } else {
+            setPhase('ended');
+          }
         }
-        // Anything else (LIVE, non-OK response we couldn't classify)
-        // → assume the user dropped. Try to rejoin.
-        if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
-          reconnectAttemptsRef.current += 1;
-          setPhase('reconnecting');
-        } else {
-          setPhase('ended');
-        }
-      } catch {
-        // Network error reaching our own API — most likely the user is
-        // still offline. Treat as a transient drop and keep retrying
-        // until we exhaust the attempt budget.
-        if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
-          reconnectAttemptsRef.current += 1;
-          setPhase('reconnecting');
-        } else {
-          setPhase('ended');
-        }
-      }
-    })();
+      })();
+    }, LEAVE_RECONNECT_GRACE_MS);
   }, [showFeedback, event.slug]);
   const handleParticipantCountChanged = useCallback((count: number) => {
     setParticipantCount(count);
@@ -651,9 +746,9 @@ export default function LiveEventClient({
     return () => clearInterval(interval);
   }, [jitsiApi, isModerator, event.slug, token]);
 
-  const handleLeaveRoom = useCallback(() => {
-    // Mark the upcoming `videoConferenceLeft` as a deliberate hangup so
-    // the network-resilience path doesn't try to rejoin behind us.
+  // Leave for yourself only. Marks the upcoming `videoConferenceLeft` as a
+  // deliberate hangup so the network-resilience path doesn't rejoin behind us.
+  const leaveSelf = useCallback(() => {
     userHangupRef.current = true;
     if (jitsiApi) {
       jitsiApi.executeCommand('hangup');
@@ -661,6 +756,55 @@ export default function LiveEventClient({
       setPhase('ended');
     }
   }, [jitsiApi]);
+
+  const handleLeaveRoom = useCallback(() => {
+    // Moderators get the leave/end-for-all prompt; everyone else leaves for
+    // themselves. (There is no native Jitsi hangup anymore — see config.ts —
+    // so this app button is the single, consistent exit for every role.)
+    if (isModerator) {
+      setEndForAllError('');
+      setShowLeaveChoice(true);
+      return;
+    }
+    leaveSelf();
+  }, [isModerator, leaveSelf]);
+
+  const handleLeaveSelfChoice = useCallback(() => {
+    setShowLeaveChoice(false);
+    leaveSelf();
+  }, [leaveSelf]);
+
+  // "Termina per tutti": flip the event to ENDED (waiting participants and
+  // those in the room detect it via their status poll and are taken to the
+  // closing screen), then hang up our own client. Uses the moderator token.
+  const handleEndForAll = useCallback(async () => {
+    setEndingForAll(true);
+    setEndForAllError('');
+    try {
+      const res = await fetch(`/api/events/${event.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: 'ENDED' }),
+      });
+      if (!res.ok) {
+        setEndingForAll(false);
+        setEndForAllError(t('leaveChoice.endError'));
+        return;
+      }
+      userHangupRef.current = true;
+      setEventStatus('ENDED');
+      setShowLeaveChoice(false);
+      setEndingForAll(false);
+      if (jitsiApi) jitsiApi.executeCommand('hangup');
+      setPhase('ended');
+    } catch {
+      setEndingForAll(false);
+      setEndForAllError(t('leaveChoice.endError'));
+    }
+  }, [event.id, token, jitsiApi, t]);
 
   const handleStartEvent = useCallback(async () => {
     const res = await fetch(`/api/events/${event.id}`, {
@@ -725,6 +869,10 @@ export default function LiveEventClient({
         participantCount={participantCount}
         role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
         jvbReady={jvbReady}
+        warmup={warmup}
+        // Uscita esplicita dalla sala d'attesa: le instant call non hanno una
+        // pagina evento pubblica (404), quindi tornano alla home.
+        exitHref={event.eventType === 'INSTANT' ? '/' : `/events/${event.slug}`}
         defaultName={chosenName || initialDisplayName}
         onEnterLive={handleEnterFromWaiting}
         onStartEvent={isModerator ? handleStartEvent : undefined}
@@ -991,6 +1139,7 @@ export default function LiveEventClient({
               watermark={watermark}
               onReady={handleJitsiReady}
               onLeft={handleJitsiLeft}
+              onReadyToClose={handleReadyToClose}
               onParticipantCountChanged={handleParticipantCountChanged}
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
@@ -1037,6 +1186,45 @@ export default function LiveEventClient({
           </Button>
           <Button color="primary" onClick={handleRecPromptStart}>
             {t('recordingPromptStart')}
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      {/* Moderator leave prompt: leave for yourself vs end for everyone. */}
+      <Modal
+        isOpen={showLeaveChoice}
+        toggle={() => !endingForAll && setShowLeaveChoice(false)}
+        centered
+      >
+        <ModalHeader toggle={() => !endingForAll && setShowLeaveChoice(false)}>
+          {t('leaveChoice.title')}
+        </ModalHeader>
+        <ModalBody>
+          <p className="mb-0">{t('leaveChoice.body')}</p>
+          {endForAllError && (
+            <Alert color="danger" className="mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
+              {endForAllError}
+            </Alert>
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="secondary"
+            outline
+            onClick={handleLeaveSelfChoice}
+            disabled={endingForAll}
+          >
+            {t('leaveChoice.leaveSelf')}
+          </Button>
+          <Button color="danger" onClick={handleEndForAll} disabled={endingForAll}>
+            {endingForAll ? (
+              <>
+                <Spinner active small className="me-2" />
+                {t('leaveChoice.ending')}
+              </>
+            ) : (
+              t('leaveChoice.endForAll')
+            )}
           </Button>
         </ModalFooter>
       </Modal>

@@ -220,6 +220,14 @@
     "declineRecording": "Do not participate",
     "enterRoom": "Enter room",
     "leaveRoom": "Leave room",
+    "leaveChoice": {
+      "title": "How do you want to leave?",
+      "body": "You can leave on your own — the call stays live for everyone else — or end it for all participants.",
+      "leaveSelf": "Just leave",
+      "endForAll": "End for everyone",
+      "ending": "Ending…",
+      "endError": "Couldn't end the call. Please try again."
+    },
     "eventNotStarted": "The event has not started yet",
     "eventStartsAt": "The event will start on {date} at {time}",
     "countdown": "Time remaining",
@@ -3079,6 +3087,16 @@
     "jvbScaling": "Preparing room...",
     "jvbScalingDetail": "Video servers are starting up. This takes about 2 minutes.",
     "jvbReady": "Room ready!",
+    "warmup": {
+      "queued": "Request received",
+      "startingBridge": "Starting the video server…",
+      "provisioningNode": "Provisioning a dedicated video server",
+      "almostReady": "Video server up: almost there",
+      "almostReadyDetail": "A few more moments and the join button will enable itself.",
+      "honestHint": "Typical wait: under a minute when the infrastructure is warm, 3–5 minutes on a cold start. Meanwhile you can check your camera and microphone or use the chat.",
+      "elapsed": "preparing for {time}"
+    },
+    "exitWaiting": "Leave the waiting room",
     "warmingUp": "Room warming up",
     "warmingUpDetail": "We're spinning up the video servers. Get yourself ready in the meantime — everything will be live in 2-3 minutes.",
     "warmingUpButton": "Room warming up...",

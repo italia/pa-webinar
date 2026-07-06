@@ -24,8 +24,11 @@ describe('Jitsi config exports', () => {
     expect(baseToolbarButtons).not.toContain('hangup');
   });
 
-  it('moderatorToolbarButtons includes hangup', () => {
-    expect(moderatorToolbarButtons).toContain('hangup');
+  it('moderatorToolbarButtons excludes native hangup (exit via app prompt)', () => {
+    // Jitsi's own hangup bypasses our exit handler and loops the network-
+    // resilience path; every role now leaves via the app "Esci dalla sala"
+    // button (moderators get an "Esci solo tu / Termina per tutti" prompt).
+    expect(moderatorToolbarButtons).not.toContain('hangup');
   });
 
   it('moderatorToolbarButtons is a superset of baseToolbarButtons', () => {
@@ -83,11 +86,11 @@ describe('Jitsi config exports', () => {
     expect(mobileBaseToolbarButtons).not.toContain('hangup');
   });
 
-  it('mobileModeratorToolbarButtons extends mobile base with hangup and participants-pane', () => {
+  it('mobileModeratorToolbarButtons extends mobile base with participants-pane, no hangup', () => {
     for (const btn of mobileBaseToolbarButtons) {
       expect(mobileModeratorToolbarButtons).toContain(btn);
     }
-    expect(mobileModeratorToolbarButtons).toContain('hangup');
+    expect(mobileModeratorToolbarButtons).not.toContain('hangup');
     expect(mobileModeratorToolbarButtons).toContain('participants-pane');
   });
 });
@@ -188,8 +191,8 @@ describe('Instant call config', () => {
     expect(instantCallToolbarButtons).not.toContain('hangup');
   });
 
-  it('instantCallModeratorToolbarButtons includes hangup', () => {
-    expect(instantCallModeratorToolbarButtons).toContain('hangup');
+  it('instantCallModeratorToolbarButtons excludes native hangup (exit via app prompt)', () => {
+    expect(instantCallModeratorToolbarButtons).not.toContain('hangup');
   });
 
   it('instantCallModeratorToolbarButtons is superset of instantCallToolbarButtons', () => {
