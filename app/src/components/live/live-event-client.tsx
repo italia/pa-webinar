@@ -33,7 +33,10 @@ import PostEventFeedbackModal from '@/components/live/post-event-feedback-modal'
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
-import WaitingRoom, { type WaitingRoomJoinPrefs } from '@/components/live/waiting-room';
+import WaitingRoom, {
+  type WaitingRoomJoinPrefs,
+  type WaitingRoomWarmup,
+} from '@/components/live/waiting-room';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 
 interface EventInfo {
@@ -209,6 +212,9 @@ export default function LiveEventClient({
   });
   const [jvbReady, setJvbReady] = useState<boolean | null>(null);
   const [jibriReady, setJibriReady] = useState<boolean | null>(null);
+  // Telemetria warm-up dal poll /lifecycle (solo mentre IDLE/PROVISIONING):
+  // alimenta il pannello di attesa onesto della WaitingRoom.
+  const [warmup, setWarmup] = useState<WaitingRoomWarmup | null>(null);
   // Pre-join camera/mic choice captured by the waiting room's DeviceCheck.
   // Forwarded to JitsiRoom as `startWithVideoMuted`/`startWithAudioMuted`
   // so the user actually lands in the room with the state they picked.
@@ -286,17 +292,29 @@ export default function LiveEventClient({
     return () => root.classList.remove('live-call-immersive');
   }, [phase]);
 
-  // Poll event status in waiting room
+  // Poll event status in waiting room. Usa /lifecycle (più leggero della GET
+  // evento completa) che durante il warm-up porta anche la telemetria JVB
+  // (fase + provisioningStartedAt): è ciò che permette alla sala d'attesa di
+  // mostrare una stima onesta invece dello spinner cieco.
   useEffect(() => {
     if (phase !== 'waiting') return;
     const pollInterval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/events/${event.slug}`);
+        const res = await fetch(`/api/events/${event.slug}/lifecycle`);
         if (!res.ok) return;
         const data = await res.json();
         if (data.status && data.status !== eventStatus) {
           setEventStatus(data.status);
         }
+        setWarmup(
+          data.jvb
+            ? {
+                phase: data.jvb.phase as 'queued' | 'starting' | 'ready',
+                provisioningStartedAt: data.provisioningStartedAt,
+                serverTime: data.serverTime,
+              }
+            : null,
+        );
       } catch {
         /* retry */
       }
@@ -725,6 +743,10 @@ export default function LiveEventClient({
         participantCount={participantCount}
         role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
         jvbReady={jvbReady}
+        warmup={warmup}
+        // Uscita esplicita dalla sala d'attesa: le instant call non hanno una
+        // pagina evento pubblica (404), quindi tornano alla home.
+        exitHref={event.eventType === 'INSTANT' ? '/' : `/events/${event.slug}`}
         defaultName={chosenName || initialDisplayName}
         onEnterLive={handleEnterFromWaiting}
         onStartEvent={isModerator ? handleStartEvent : undefined}

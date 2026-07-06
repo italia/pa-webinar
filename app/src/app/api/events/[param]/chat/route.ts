@@ -114,9 +114,11 @@ async function authenticateSender(
     throw new ForbiddenError('Invalid token for this event');
   }
 
-  // Guest branch — only allowed while the event is live (mirrors
-  // /events/[slug]/live guest access policy).
-  if (event.status !== 'LIVE') {
+  // Guest branch — consentito su evento LIVE e durante il warm-up del bridge
+  // (IDLE/PROVISIONING): la chat è app-side e non dipende dal JVB, e la sala
+  // d'attesa la mostra proprio mentre si aspetta. Rispecchia la policy di
+  // accesso guest di /events/[slug]/live.
+  if (!['LIVE', 'PROVISIONING', 'IDLE'].includes(event.status)) {
     throw new ForbiddenError('Chat requires a participant or moderator token');
   }
   const name = (guestName ?? '').trim();

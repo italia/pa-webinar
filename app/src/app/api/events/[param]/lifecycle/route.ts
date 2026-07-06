@@ -12,8 +12,26 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { readJvbSnapshot } from '@/lib/jvb-snapshot';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Fase del warm-up del media plane, derivata dallo snapshot Redis che lo
+ * scaler scrive a ogni tick (2 min). Serve alla sala d'attesa per dare
+ * all'utente una stima ONESTA invece dello spinner cieco:
+ *   - queued: lo scaler non ha ancora preso in carico (tick entro 2 min)
+ *   - starting: repliche richieste, nessuna Ready — pod in schedule o
+ *     nodo del pool video in creazione (il caso lungo, ~3-5 min a freddo)
+ *   - ready: almeno un bridge Ready — lo status passa a LIVE al prossimo
+ *     giro di scaler/joiner
+ */
+function jvbPhase(snapshot: Awaited<ReturnType<typeof readJvbSnapshot>>) {
+  if (!snapshot) return 'queued';
+  if (snapshot.ready > 0) return 'ready';
+  if (snapshot.desired > 0) return 'starting';
+  return 'queued';
+}
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { param: slug } = await context.params;
@@ -32,6 +50,11 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   if (!event) throw new NotFoundError('Event');
 
+  // Lo snapshot serve solo mentre si aspetta il bridge: fuori dal warm-up
+  // evitiamo la lettura Redis su ogni poll.
+  const warming = event.status === 'IDLE' || event.status === 'PROVISIONING';
+  const snapshot = warming ? await readJvbSnapshot() : null;
+
   return Response.json(
     {
       status: event.status,
@@ -40,6 +63,14 @@ export const GET = withErrorHandling(async (_request, context) => {
       provisioningStartedAt: event.provisioningStartedAt?.toISOString() ?? null,
       lastActiveAt: event.lastActiveAt?.toISOString() ?? null,
       serverTime: new Date().toISOString(),
+      ...(warming && {
+        jvb: {
+          phase: jvbPhase(snapshot),
+          ready: snapshot?.ready ?? 0,
+          desired: snapshot?.desired ?? 0,
+          checkedAt: snapshot?.checkedAt ?? null,
+        },
+      }),
     },
     { headers: { 'Cache-Control': 'no-store' } },
   );
