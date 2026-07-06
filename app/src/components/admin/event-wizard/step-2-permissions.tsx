@@ -28,6 +28,8 @@ export interface Step2Value {
   autoStartRecording: boolean;
   /** Agenda/note live (checklist opt-in). */
   agendaEnabled: boolean;
+  /** Lavagna condivisa (whiteboard Excalidraw nativa) opt-in. */
+  whiteboardEnabled: boolean;
   // ── Post-produzione AI (subordinata a recordingEnabled) ──
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
@@ -193,6 +195,21 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
             label=""
             checked={value.agendaEnabled}
             onChange={() => onChange({ agendaEnabled: !value.agendaEnabled })}
+          />
+        </div>
+        <div className="py-2 d-flex justify-content-between align-items-start">
+          <div className="me-3">
+            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+              {tAdmin('form.whiteboardEnabled')}
+            </div>
+            <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+              {tAdmin('form.whiteboardEnabledDesc')}
+            </div>
+          </div>
+          <ToggleSwitch
+            label=""
+            checked={value.whiteboardEnabled}
+            onChange={() => onChange({ whiteboardEnabled: !value.whiteboardEnabled })}
           />
         </div>
       </section>

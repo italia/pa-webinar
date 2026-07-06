@@ -38,6 +38,11 @@ interface JitsiRoomProps {
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
   enableFileSharing?: boolean;
+  /** Per-event opt-in (Event.whiteboardEnabled): when true, moderators get the
+   *  native Jitsi/Excalidraw whiteboard button (desktop only). Jitsi still
+   *  feature-gates it on config.whiteboard.enabled (server-side, test only),
+   *  so it stays hidden on prod even for opted-in events. */
+  whiteboardEnabled?: boolean;
   /** Video/audio quality preset (admin SiteSetting, per-event override).
    *  Drives resolution, bitrate caps, channelLastN and Opus settings, and is
    *  also enforced at runtime via setVideoQuality. Defaults to HIGH. */
@@ -84,6 +89,7 @@ export default function JitsiRoom({
   participantsCanStartVideo = true,
   participantsCanShareScreen = true,
   enableFileSharing = false,
+  whiteboardEnabled = false,
   videoQuality,
   startWithVideoMuted = false,
   startWithAudioMuted = false,
@@ -174,6 +180,13 @@ export default function JitsiRoom({
         ...jitsiConfigOverwrite.remoteVideoMenu,
         disableKick: false,
       };
+      // Native whiteboard: per-event opt-in + moderator + desktop only. Jitsi
+      // additionally feature-gates the button on config.whiteboard.enabled
+      // (set server-side, test only), so it stays hidden on prod even when an
+      // event opted in — no client-side check for the server infra needed.
+      if (whiteboardEnabled && !isMobileRef.current) {
+        toolbarButtons.push('whiteboard');
+      }
     }
 
     // Honor the user's pre-join DeviceCheck choice. The base
@@ -495,7 +508,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, videoQuality, startWithVideoMuted, startWithAudioMuted]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, videoQuality, startWithVideoMuted, startWithAudioMuted]);
 
   return (
     <div className="jitsi-wrapper position-relative">

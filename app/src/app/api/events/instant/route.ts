@@ -85,6 +85,9 @@ export const POST = withErrorHandling(async (request) => {
       maxParticipants,
       qaEnabled: false,
       chatEnabled: true,
+      // Whiteboard sempre attiva nelle videocall istantanee (il client la
+      // forza comunque; qui allineiamo lo stato in DB).
+      whiteboardEnabled: true,
       recordingEnabled: true,
       participantsCanUnmute: true,
       participantsCanStartVideo: true,
