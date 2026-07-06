@@ -49,6 +49,7 @@ export interface WizardTemplatePreset {
   recordingEnabled: boolean;
   autoStartRecording: boolean;
   agendaEnabled?: boolean;
+  whiteboardEnabled?: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
@@ -124,6 +125,7 @@ export interface InitialEventShape {
     participantsCanShareScreen: boolean;
     recordingEnabled: boolean;
     agendaEnabled?: boolean | null;
+    whiteboardEnabled?: boolean | null;
     autoStartRecording: boolean;
     aiTranscriptEnabled?: boolean | null;
     aiSummaryEnabled?: boolean | null;
@@ -255,6 +257,7 @@ export default function EventWizard(props: WizardProps) {
         permissionMatrix: matrix,
         recordingEnabled: ev.recordingEnabled,
         agendaEnabled: ev.agendaEnabled ?? false,
+        whiteboardEnabled: ev.whiteboardEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
         aiSummaryEnabled: ev.aiSummaryEnabled ?? false,
@@ -368,6 +371,7 @@ export default function EventWizard(props: WizardProps) {
       permissionMatrix: matrix,
       recordingEnabled: tpl?.recordingEnabled ?? false,
       agendaEnabled: tpl?.agendaEnabled ?? false,
+      whiteboardEnabled: tpl?.whiteboardEnabled ?? false,
       autoStartRecording: tpl?.autoStartRecording ?? false,
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
@@ -507,6 +511,7 @@ export default function EventWizard(props: WizardProps) {
           participantsCanShareScreen: toggles.participantsCanShareScreen,
           recordingEnabled: form.recordingEnabled,
           agendaEnabled: form.agendaEnabled,
+          whiteboardEnabled: form.whiteboardEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
 
           // Postprod AI — subordinate al recording (server-side resta

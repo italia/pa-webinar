@@ -44,6 +44,11 @@ model Event {
   // moderatori spuntano durante l'evento. Off di default → quando spenta
   // non mostra nulla; attivabile in creazione o durante l'evento.
   agendaEnabled    Boolean @default(false) @map("agenda_enabled")
+  // Lavagna condivisa (whiteboard Excalidraw nativa di Jitsi): opt-in per
+  // evento, off di default. Il pulsante compare ai moderatori (desktop) solo
+  // se ON E se l'infra whiteboard è abilitata lato Jitsi (config.whiteboard.
+  // enabled, oggi solo su test) → resta nascosto in prod finché non replicata.
+  whiteboardEnabled Boolean @default(false) @map("whiteboard_enabled")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
 
   // When recording is enabled, this skips the "start recording?" moderator
@@ -927,6 +932,9 @@ model EventTemplate {
   // Pre-attiva la checklist/note live (Event.agendaEnabled) per gli eventi
   // creati da questo template. Modificabile nel wizard (step 2).
   agendaEnabled              Boolean @default(false) @map("agenda_enabled")
+  // Pre-attiva la lavagna condivisa (Event.whiteboardEnabled) per gli eventi
+  // creati da questo template. Modificabile nel wizard (step 2).
+  whiteboardEnabled          Boolean @default(false) @map("whiteboard_enabled")
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")

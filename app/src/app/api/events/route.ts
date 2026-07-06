@@ -162,6 +162,9 @@ export const POST = withErrorHandling(async (request) => {
       ...(data.agendaEnabled !== undefined && {
         agendaEnabled: data.agendaEnabled,
       }),
+      ...(data.whiteboardEnabled !== undefined && {
+        whiteboardEnabled: data.whiteboardEnabled,
+      }),
       ...(data.aiTargetLocales !== undefined && {
         aiTargetLocales: data.aiTargetLocales,
       }),

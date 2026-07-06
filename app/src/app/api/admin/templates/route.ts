@@ -20,6 +20,7 @@ const templateSchema = z.object({
   recordingEnabled: z.boolean().optional(),
   autoStartRecording: z.boolean().optional(),
   agendaEnabled: z.boolean().optional(),
+  whiteboardEnabled: z.boolean().optional(),
   participantsCanUnmute: z.boolean().optional(),
   participantsCanStartVideo: z.boolean().optional(),
   participantsCanShareScreen: z.boolean().optional(),

@@ -59,6 +59,8 @@ interface EventInfo {
   qaEnabled: boolean;
   chatEnabled: boolean;
   agendaEnabled: boolean;
+  /** Per-event opt-in for the native Jitsi/Excalidraw whiteboard. */
+  whiteboardEnabled: boolean;
   waitingRoomAudioUrl: string | null;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -1138,6 +1140,7 @@ export default function LiveEventClient({
               participantsCanStartVideo={event.participantsCanStartVideo}
               participantsCanShareScreen={event.participantsCanShareScreen}
               enableFileSharing={isInstantCall}
+              whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
               videoQuality={event.videoQuality}
               startWithVideoMuted={!joinPrefs.cameraOn}
               startWithAudioMuted={!joinPrefs.micOn}

@@ -26,6 +26,7 @@ interface SerializedTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  whiteboardEnabled: boolean;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -54,6 +55,7 @@ interface EditingTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  whiteboardEnabled: boolean;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -74,6 +76,7 @@ const DEFAULT_NEW: EditingTemplate = {
   icon: 'it-video',
   qaEnabled: true,
   chatEnabled: false,
+  whiteboardEnabled: false,
   recordingEnabled: false,
   participantsCanUnmute: false,
   participantsCanStartVideo: false,
@@ -114,6 +117,7 @@ export default function TemplateManagement({
       icon: tpl.icon,
       qaEnabled: tpl.qaEnabled,
       chatEnabled: tpl.chatEnabled,
+      whiteboardEnabled: tpl.whiteboardEnabled,
       recordingEnabled: tpl.recordingEnabled,
       participantsCanUnmute: tpl.participantsCanUnmute,
       participantsCanStartVideo: tpl.participantsCanStartVideo,
@@ -499,6 +503,7 @@ function TemplateForm({
           [
             ['qaEnabled', 'Q&A'],
             ['chatEnabled', 'Chat'],
+            ['whiteboardEnabled', t('whiteboardLabel')],
             ['recordingEnabled', t('recordingLabel')],
             ['participantsCanUnmute', t('unmute')],
             ['participantsCanStartVideo', t('video')],
