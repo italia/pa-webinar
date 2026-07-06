@@ -37,6 +37,13 @@ describe('Jitsi config exports', () => {
     }
   });
 
+  it('moderatorToolbarButtons offers the whiteboard (self-hides when disabled server-side)', () => {
+    // Jitsi renders this only when config.whiteboard.enabled is true, set via
+    // the web WHITEBOARD_ENABLED env + excalidraw-backend service (test only),
+    // so it is safe to keep in the shared list even where the infra is absent.
+    expect(moderatorToolbarButtons).toContain('whiteboard');
+  });
+
   it('baseToolbarButtons excludes chat (handled by custom ChatPanel)', () => {
     expect(baseToolbarButtons).not.toContain('chat');
   });
