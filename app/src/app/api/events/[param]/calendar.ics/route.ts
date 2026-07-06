@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { tryDecryptPII } from '@/lib/crypto/pii';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { generateEventICal } from '@/lib/ical/generate';
@@ -36,10 +35,12 @@ export const GET = withErrorHandling(async (request, context) => {
     timezone: event.timezone,
     url: eventUrl,
     organizerName: event.moderatorName ?? (settings.siteName || 'PA Webinar'),
-    organizerEmail:
-      tryDecryptPII(event.moderatorEmail) ??
-      process.env.SMTP_FROM ??
-      'noreply@dominio.gov.it',
+    // Route PUBBLICA (anonima, Cache-Control public): l'email personale del
+    // moderatore (cifrata a riposo apposta) non deve finire come ORGANIZER
+    // nell'ICS scaricabile da chiunque. L'indirizzo di piattaforma basta per
+    // la validità del calendario; l'email col link personale resta il canale
+    // per il contatto organizzatore.
+    organizerEmail: process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
   });
 
   return new NextResponse(ics, {
