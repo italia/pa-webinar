@@ -114,6 +114,7 @@ const eventBaseSchema = z.object({
   retainParticipantTracks: z.boolean().optional(),
   // Agenda/note live (checklist opt-in).
   agendaEnabled: z.boolean().optional(),
+  whiteboardEnabled: z.boolean().optional(),
   // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales: z.string().max(200).nullable().optional(),
   // Numero di parlanti attesi (1-30). Quando valorizzato, la pipeline

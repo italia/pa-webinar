@@ -45,12 +45,10 @@ export const moderatorToolbarButtons = [
   'mute-everyone',
   'security',
   'participants-pane',
-  // Native Jitsi whiteboard (Excalidraw). Jitsi only renders this button when
-  // config.whiteboard.enabled is true, which is set server-side via the web
-  // container's WHITEBOARD_ENABLED env (paired with the excalidraw-backend
-  // collab service). Enabled on test; absent on prod until that infra ships,
-  // so the button self-hides there — safe to keep in the shared list.
-  'whiteboard',
+  // NB: 'whiteboard' is NOT here — it's per-event opt-in (Event.whiteboardEnabled)
+  // and appended conditionally for moderators on desktop in JitsiRoom. Jitsi
+  // additionally feature-gates it on config.whiteboard.enabled (set server-side,
+  // test only), so it stays hidden on prod even when an event opted in.
 ];
 
 /**
