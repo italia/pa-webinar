@@ -93,17 +93,21 @@ async function authenticateSender(
         isModerator: true,
       };
     }
-    // Co-moderator?
-    const coMod = await prisma.eventModerator.findUnique({
+    // Grant per-riga (co-moderatore o speaker)? Entrambi chattano col
+    // PROPRIO nome, ma solo role=MODERATOR ottiene il badge moderatore:
+    // uno SPEAKER è un relatore, non staff — coerente con
+    // isEventModerator/verifyModeratorToken che escludono gli SPEAKER.
+    const grant = await prisma.eventModerator.findUnique({
       where: { token },
-      select: { id: true, name: true, eventId: true, revokedAt: true },
+      select: { id: true, name: true, eventId: true, revokedAt: true, role: true },
     });
-    if (coMod && coMod.eventId === event.id && coMod.revokedAt === null) {
+    if (grant && grant.eventId === event.id && grant.revokedAt === null) {
+      const isGrantModerator = grant.role === 'MODERATOR';
       return {
         eventId: event.id,
-        senderId: `mod-${event.id}-${coMod.id}`,
-        senderName: tryDecryptPII(coMod.name) ?? coMod.name,
-        isModerator: true,
+        senderId: `${isGrantModerator ? 'mod' : 'spk'}-${event.id}-${grant.id}`,
+        senderName: tryDecryptPII(grant.name) ?? grant.name,
+        isModerator: isGrantModerator,
       };
     }
     // Registered participant via accessToken?

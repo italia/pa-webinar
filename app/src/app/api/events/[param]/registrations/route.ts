@@ -15,6 +15,7 @@ import { encryptPII, hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { upsertPersonOnRegistration } from '@/lib/persons';
+import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
   buildEventAccessSetCookie,
@@ -42,7 +43,10 @@ export const POST = withErrorHandling(async (request, context) => {
 
   if (!event) throw new NotFoundError('Event');
 
-  if (event.status !== 'PUBLISHED' && event.status !== 'LIVE') {
+  // Include PROVISIONING/IDLE degli eventi schedulati (pre-warm/pausa):
+  // registrarsi 10 minuti prima dell'inizio deve funzionare. Le instant
+  // call restano fuori (link-only, niente registrazioni).
+  if (!isEventOpenForRegistration(event)) {
     throw new ConflictError('Event is not open for registration');
   }
 

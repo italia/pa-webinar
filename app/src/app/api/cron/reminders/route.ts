@@ -48,7 +48,10 @@ export const GET = withErrorHandling(async (request) => {
   const reminders = await prisma.eventReminder.findMany({
     where: {
       event: {
-        status: { in: ['PUBLISHED', 'LIVE'] },
+        // PROVISIONING/IDLE inclusi: lo scaler mette l'evento in pre-warm
+        // PRIMA dell'inizio (anche overnight) — è esattamente la finestra
+        // in cui i reminder T-1h/T-10m devono partire, non essere saltati.
+        status: { in: ['PUBLISHED', 'PROVISIONING', 'IDLE', 'LIVE'] },
       },
     },
     include: {

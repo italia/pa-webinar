@@ -12,6 +12,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
+import { isEventPubliclyVisible } from '@/lib/events/visibility';
 
 async function hasJoinGrant(eventId: string): Promise<boolean> {
   const appSecret = process.env.APP_SECRET;
@@ -214,9 +215,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // rimossa dal retention cron mentre l'email col link sopravvive): niente 404
       // secco. Torniamo alla pagina evento con un avviso contestuale e le CTA giuste
       // (ri-registrazione, oppure guarda la registrazione se l'evento è concluso).
-      // Solo per stati in cui la pagina evento è raggiungibile: per DRAFT/ARCHIVED
-      // fa notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
-      if (['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
+      // Solo per stati in cui la pagina evento è raggiungibile (stesso check
+      // della destinazione, lib/events/visibility): per DRAFT/ARCHIVED fa
+      // notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
+      if (isEventPubliclyVisible(event)) {
         redirect(`/${locale}/events/${slug}?invalidToken=1`);
       }
       notFound();

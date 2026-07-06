@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { publicEventStatusWhere } from '@/lib/events/visibility';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const events = await prisma.event.findMany({
-    where: { status: { in: ['PUBLISHED', 'LIVE', 'ENDED'] } },
+    where: publicEventStatusWhere(),
     select: { slug: true, updatedAt: true },
     orderBy: { startsAt: 'desc' },
   });

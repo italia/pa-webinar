@@ -192,7 +192,10 @@ export default function EventDetailClient({
 
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
-  const canRegister = event.status === 'PUBLISHED' || event.status === 'LIVE';
+  // PROVISIONING/IDLE = evento schedulato in pre-warm/pausa: registrazione
+  // aperta come per PUBLISHED (le instant call non arrivano a questa pagina:
+  // il server la 404-a per loro in quegli stati).
+  const canRegister = ['PUBLISHED', 'PROVISIONING', 'IDLE', 'LIVE'].includes(event.status);
   const isEnded = event.status === 'ENDED';
   const isLive = event.status === 'LIVE';
   const accentColor = STATUS_COLOR[event.status] ?? STATUS_COLOR.PUBLISHED;
