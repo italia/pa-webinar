@@ -16,7 +16,7 @@
  * are pushed to their respective side-APIs (event has an id at that point).
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useRouter } from '@/i18n/navigation';
@@ -419,6 +419,22 @@ export default function EventWizard(props: WizardProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  // On step change move focus to the step region and scroll it into view so
+  // keyboard/screen-reader users aren't left on the footer button (and a
+  // validation jump to a failing step is perceivable). Skip the first render.
+  const contentRef = useRef<HTMLDivElement>(null);
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    const el = contentRef.current;
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeStep]);
+
   const updateForm = useCallback((patch: Partial<WizardForm>) => {
     setForm((prev) => ({ ...prev, ...patch }));
   }, []);
@@ -759,7 +775,14 @@ export default function EventWizard(props: WizardProps) {
         </div>
       )}
 
-      <div className="mt-4">
+      <div
+        className="mt-4"
+        ref={contentRef}
+        tabIndex={-1}
+        role="group"
+        aria-label={t(`steps.${activeStep}`)}
+        style={{ outline: 'none' }}
+      >
         {activeStep === 'base' && (
           <Step1Base
             value={form}
@@ -800,6 +823,7 @@ export default function EventWizard(props: WizardProps) {
             onChange={updateForm}
             jvbSizingConfig={props.jvbSizingConfig}
             defaultSenderRatioPct={props.defaultSenderRatioPct}
+            defaultLocale={props.defaultLocale}
             gdprTemplates={props.gdprTemplates}
             fieldErrors={fieldErrors}
           />
@@ -888,6 +912,7 @@ function StepNav({
               <button
                 type="button"
                 onClick={() => onJump(s.key)}
+                aria-current={isActive ? 'step' : undefined}
                 className="d-flex align-items-center gap-2 w-100 border-0 bg-transparent p-2 rounded"
                 style={{
                   cursor: 'pointer',

@@ -146,6 +146,7 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
           </div>
           <ToggleSwitch
             label=""
+            ariaLabel={tAdmin('form.recordingEnabled')}
             checked={value.recordingEnabled}
             onChange={() =>
               onChange({
@@ -171,6 +172,7 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
             </div>
             <ToggleSwitch
               label=""
+              ariaLabel={tAdmin('form.autoStartRecording')}
               checked={value.autoStartRecording}
               onChange={() =>
                 onChange({ autoStartRecording: !value.autoStartRecording })
@@ -182,6 +184,9 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
 
       {/* Interazione live — feature opzionali della stanza */}
       <section className="mb-3">
+        <h3 className="h6 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+          {t('roomFeaturesHeading')}
+        </h3>
         <div className="py-2 d-flex justify-content-between align-items-start">
           <div className="me-3">
             <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
@@ -193,6 +198,7 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
           </div>
           <ToggleSwitch
             label=""
+            ariaLabel={tAdmin('form.agendaEnabled')}
             checked={value.agendaEnabled}
             onChange={() => onChange({ agendaEnabled: !value.agendaEnabled })}
           />
@@ -208,6 +214,7 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
           </div>
           <ToggleSwitch
             label=""
+            ariaLabel={tAdmin('form.whiteboardEnabled')}
             checked={value.whiteboardEnabled}
             onChange={() => onChange({ whiteboardEnabled: !value.whiteboardEnabled })}
           />
@@ -424,7 +431,7 @@ function AiToggle({
           {desc}
         </div>
       </div>
-      <ToggleSwitch label="" checked={checked} onChange={onToggle} />
+      <ToggleSwitch label="" ariaLabel={label} checked={checked} onChange={onToggle} />
     </div>
   );
 }

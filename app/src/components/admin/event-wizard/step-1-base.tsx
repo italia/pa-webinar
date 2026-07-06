@@ -178,16 +178,28 @@ export default function Step1Base({
           <input
             id="ev-title"
             type="text"
-            className={`form-control ${fieldErrors[`title.${contentLocale}`] ? 'is-invalid' : ''}`}
+            className={`form-control ${
+              contentLocale === defaultLocale && fieldErrors[`title.${defaultLocale}`]
+                ? 'is-invalid'
+                : ''
+            }`}
             value={value.title[contentLocale] ?? ''}
             onChange={(e) => setLocalized('title', contentLocale, e.target.value)}
             required={contentLocale === defaultLocale}
           />
-          {fieldErrors[`title.${contentLocale}`] && (
-            <div className="invalid-feedback">
-              {fieldErrors[`title.${contentLocale}`]}
-            </div>
-          )}
+          {/* Validation targets the default-locale title. Show the inline
+              invalid message on that tab; on any other tab, point the admin
+              back to the required locale so the error isn't invisible (#4). */}
+          {fieldErrors[`title.${defaultLocale}`] &&
+            (contentLocale === defaultLocale ? (
+              <div className="invalid-feedback">{t('validation.titleRequired')}</div>
+            ) : (
+              <div className="small text-danger mt-1">
+                {t('validation.titleRequiredOtherLocale', {
+                  locale: defaultLocale.toUpperCase(),
+                })}
+              </div>
+            ))}
 
           {/* Per-event kicker override — always shown so the admin can
               toggle pipe-splitting on or off for this event. The initial
@@ -384,7 +396,7 @@ export default function Step1Base({
                 type="number"
                 min={2}
                 max={500}
-                className="form-control"
+                className={`form-control ${fieldErrors.maxParticipants ? 'is-invalid' : ''}`}
                 style={{ maxWidth: 96 }}
                 value={value.maxParticipants}
                 onChange={(e) => {
@@ -398,6 +410,11 @@ export default function Step1Base({
             <small className="form-text text-muted">
               {t('maxParticipantsHelp')}
             </small>
+            {fieldErrors.maxParticipants && (
+              <div className="small text-danger mt-1">
+                {t('validation.maxParticipants')}
+              </div>
+            )}
           </div>
           <div className="col-12">
             <label className="form-label" htmlFor="ev-sender-ratio">

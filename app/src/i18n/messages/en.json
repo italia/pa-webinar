@@ -436,7 +436,10 @@
         "maxParticipantsHelp": "Estimate the maximum number of participants. Drives video server capacity and waiting-room UI.",
         "validation": {
           "startsAt": "Invalid start date.",
-          "endsAt": "End date must be after start date."
+          "endsAt": "End date must be after start date.",
+          "titleRequired": "Title is required (at least 3 characters).",
+          "titleRequiredOtherLocale": "The title in the default language ({locale}) is required: switch to the {locale} tab.",
+          "maxParticipants": "Enter a number between 2 and 500."
         },
         "senderRatioLabel": "Estimated active share",
         "senderRatioHelp": "How many participants you expect to have mic/camera active. Helps size the video server.",
@@ -487,7 +490,8 @@
             "desc": "Start/stop the recording."
           }
         },
-        "recordingHeading": "Recording"
+        "recordingHeading": "Recording",
+        "roomFeaturesHeading": "Room features"
       },
       "step3": {
         "heading": "People and invites",

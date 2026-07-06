@@ -506,7 +506,10 @@
         "maxParticipantsHelp": "Stima il numero massimo di partecipanti. Determina la capacità del server video e la UI di sala d'attesa.",
         "validation": {
           "startsAt": "Data di inizio non valida.",
-          "endsAt": "La data di fine deve essere successiva alla data di inizio."
+          "endsAt": "La data di fine deve essere successiva alla data di inizio.",
+          "titleRequired": "Il titolo è obbligatorio (almeno 3 caratteri).",
+          "titleRequiredOtherLocale": "Il titolo nella lingua predefinita ({locale}) è obbligatorio: passa alla scheda {locale}.",
+          "maxParticipants": "Inserisci un numero tra 2 e 500."
         },
         "senderRatioLabel": "Percentuale attiva stimata",
         "senderRatioHelp": "Quanti partecipanti si aspettano di avere microfono/video attivo. Aiuta a dimensionare il server video.",
@@ -557,7 +560,8 @@
             "desc": "Avviare/fermare la registrazione."
           }
         },
-        "recordingHeading": "Registrazione"
+        "recordingHeading": "Registrazione",
+        "roomFeaturesHeading": "Funzioni della stanza"
       },
       "step3": {
         "heading": "Persone e inviti",
