@@ -105,6 +105,17 @@ export interface WaitingRoomJoinPrefs {
   micOn: boolean;
 }
 
+/** Telemetria warm-up dal poll /lifecycle: alimenta il pannello di attesa
+ *  onesto (fase + tempo trascorso) al posto dello spinner cieco. */
+export interface WaitingRoomWarmup {
+  phase: 'queued' | 'starting' | 'ready';
+  /** Stopwatch anchor, già ripulito lato server: valorizzato solo mentre
+   *  PROVISIONING e recente (null in IDLE / se residuo di un ciclo passato),
+   *  così il cronometro non parte mai da un timestamp stantìo. */
+  startedAt: string | null;
+  serverTime: string;
+}
+
 interface WaitingRoomProps {
   event: WaitingRoomEvent;
   participantCount: number;
@@ -119,6 +130,10 @@ interface WaitingRoomProps {
   onEnterLive: (chosenName: string, prefs: WaitingRoomJoinPrefs) => void;
   onStartEvent?: () => Promise<void>;
   onLeaveFeedback?: () => void;
+  /** Telemetria warm-up (null fuori da IDLE/PROVISIONING). */
+  warmup?: WaitingRoomWarmup | null;
+  /** Uscita esplicita dalla sala: pagina evento (scheduled) o home (instant). */
+  exitHref?: string;
   /** True se il consenso multitrack NON va richiesto qui: il moderatore
    *  (configura e controlla la registrazione) e i partecipanti registrati che
    *  hanno già prestato il consenso alla registrazione. Gli SPEAKER non sono
@@ -146,6 +161,8 @@ export default function WaitingRoom({
   onEnterLive,
   onStartEvent,
   onLeaveFeedback,
+  warmup = null,
+  exitHref,
   multitrackConsentExempt = false,
 }: WaitingRoomProps) {
   const t = useTranslations('waiting');
@@ -185,6 +202,11 @@ export default function WaitingRoom({
   // (iOS gesture + multitrack consent are still required on the tap).
   const prevStatusRef = useRef(event.status);
   const [liveCountdown, setLiveCountdown] = useState<number | null>(null);
+  // Cronometro onesto del warm-up: base ancorata all'orologio del SERVER
+  // (serverTime - provisioningStartedAt, dal poll /lifecycle) così lo skew
+  // del client non inventa attese negative o gonfiate; il tick locale
+  // aggiunge i secondi tra un poll e l'altro.
+  const [warmupElapsed, setWarmupElapsed] = useState<number | null>(null);
 
   // Rehydrate name + email from localStorage on mount. Name is merged
   // with the server-provided default (registration displayName / grant
@@ -257,7 +279,10 @@ export default function WaitingRoom({
   const isModerator = role === 'moderator';
   const heroUrl = event.imageUrl ?? event.coverImageUrl ?? null;
   const hasRecording = !!(event.recordingUrl ?? event.tempRecordingUrl);
-  const showChatPreview = isLive && (event.chatEnabled ?? true);
+  // La chat è app-side e NON dipende dal bridge: mentre la sala si scalda
+  // (IDLE/PROVISIONING) chi aspetta può già chiacchierare — è la differenza
+  // tra un'attesa cieca e una sala d'attesa vera.
+  const showChatPreview = (isLive || isWarmingUp) && (event.chatEnabled ?? true);
   // Only LIVE events admit participants into the room. Moderators in
   // PUBLISHED past startsAt get a separate "Avvia evento" action that
   // flips the status to LIVE; once that happens this flag re-opens.
@@ -273,6 +298,35 @@ export default function WaitingRoom({
     !!event.multitrackRecordingEnabled && !isEnded && !multitrackConsentExempt;
   const canEnter =
     nameValid && emailValid && (!multitrackRequired || multitrackConsent);
+
+  // Cronometro warm-up. Ci si ancora UNA volta per ciclo (identità =
+  // warmup.startedAt): senza questo, ri-ancorarsi a ogni poll (3s) fa
+  // sobbalzare/tornare indietro il tempo per via del jitter di rete. La base
+  // server (serverTime - startedAt) la leggiamo da un ref così un nuovo poll
+  // aggiorna la fase senza far ripartire il tick. startedAt null (IDLE /
+  // residuo stantìo, già filtrato dal server) → niente cronometro.
+  const warmupStartedAt = warmup?.startedAt ?? null;
+  const warmupRef = useRef(warmup);
+  warmupRef.current = warmup;
+  useEffect(() => {
+    if (!isWarmingUp || !warmupStartedAt) {
+      setWarmupElapsed(null);
+      return;
+    }
+    const serverNowMs = new Date(
+      warmupRef.current?.serverTime ?? warmupStartedAt,
+    ).getTime();
+    const base = Math.max(
+      0,
+      (serverNowMs - new Date(warmupStartedAt).getTime()) / 1000,
+    );
+    const anchor = Date.now();
+    const tick = () =>
+      setWarmupElapsed(Math.floor(base + (Date.now() - anchor) / 1000));
+    tick();
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [isWarmingUp, warmupStartedAt]);
 
   // Countdown tick: only needed while PUBLISHED. Live / ended do not use it.
   useEffect(() => {
@@ -636,13 +690,42 @@ export default function WaitingRoom({
           className="rounded-3 p-3 text-start"
           style={{ background: '#E7F1FB', border: '1px solid #9EC5E9', fontSize: '0.85rem' }}
           role="status"
+          aria-live="polite"
         >
           <div className="d-flex align-items-start">
             <Spinner active small className="me-2 mt-1 flex-shrink-0" />
-            <div>
-              <strong>{t('warmingUp')}</strong>
-              <br />
-              {t('warmingUpDetail')}
+            <div className="flex-grow-1">
+              <div className="d-flex justify-content-between align-items-baseline flex-wrap gap-2">
+                <strong>
+                  {warmup?.phase === 'ready'
+                    ? t('warmup.almostReady')
+                    : warmup?.phase === 'starting'
+                      ? (warmupElapsed ?? 0) >= 75
+                        ? t('warmup.provisioningNode')
+                        : t('warmup.startingBridge')
+                      : t('warmup.queued')}
+                </strong>
+                {warmupElapsed !== null && warmupElapsed > 0 && (
+                  // aria-hidden: la banda è una live region (role=status +
+                  // aria-live), ma il cronometro cambia ogni secondo — senza
+                  // questo lo screen reader ri-annuncerebbe la banda a ogni
+                  // tick. Restano annunciati solo fase e dettaglio (rari).
+                  <span
+                    className="font-monospace"
+                    style={{ fontSize: '0.8rem', color: 'var(--app-muted)' }}
+                    aria-hidden="true"
+                  >
+                    {t('warmup.elapsed', {
+                      time: `${Math.floor(warmupElapsed / 60)}:${String(warmupElapsed % 60).padStart(2, '0')}`,
+                    })}
+                  </span>
+                )}
+              </div>
+              <div className="mt-1">
+                {warmup?.phase === 'ready'
+                  ? t('warmup.almostReadyDetail')
+                  : t('warmup.honestHint')}
+              </div>
             </div>
           </div>
         </div>
@@ -727,6 +810,19 @@ export default function WaitingRoom({
           <span className="me-2">⏪</span>
           {t('watchCatchup')}
         </Button>
+      )}
+      {/* Uscita esplicita: nella sala d'attesa non si è "intrappolati" —
+          soprattutto durante il warm-up, quando la CTA è disabilitata. Non
+          in PUBLISHED: lì c'è già il backLinkBlock ("Indietro") più in basso,
+          verso la stessa pagina evento — evitiamo il doppione. */}
+      {exitHref && !isEnded && !isPublished && (
+        <Link
+          href={exitHref}
+          className="btn btn-outline-secondary btn-sm mt-1"
+          style={{ justifySelf: 'center' }}
+        >
+          {t('exitWaiting')}
+        </Link>
       )}
     </div>
   );

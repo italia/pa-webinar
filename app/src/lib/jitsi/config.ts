@@ -15,10 +15,13 @@
  */
 
 /**
- * Participant toolbar — NO 'hangup' to avoid "end meeting for all".
- * We provide our own "Esci dalla sala" / "Leave room" button that
- * calls api.executeCommand('hangup') without exposing the
- * "Termina la riunione per tutti" option.
+ * Toolbars carry NO native 'hangup' — for ANY role. Jitsi's own hangup
+ * fires `videoConferenceLeft` without going through our app, so the
+ * network-resilience path used to mistake it for a drop and reconnect the
+ * user in a loop. Instead every exit goes through our top-bar "Esci dalla
+ * sala" button: participants leave for themselves; moderators get a prompt
+ * ("Esci solo tu" vs "Termina per tutti"). See live-event-client
+ * handleLeaveRoom / handleReadyToClose.
  *
  * 'chat' excluded: we use a custom ChatPanel in the sidebar.
  * 'reactions' excluded: we use a custom ReactionBar overlay.
@@ -37,7 +40,8 @@ export const baseToolbarButtons = [
 
 export const moderatorToolbarButtons = [
   ...baseToolbarButtons,
-  'hangup',
+  // NO 'hangup' — see baseToolbarButtons: exit is our app button so the
+  // moderator gets the "Esci solo tu / Termina per tutti" prompt.
   'mute-everyone',
   'security',
   'participants-pane',
@@ -61,12 +65,13 @@ export const mobileBaseToolbarButtons = [
 ];
 
 /**
- * Moderator mobile toolbar: same trim as participants plus hangup and
- * the participants-pane button (needed to manage the room on small screens).
+ * Moderator mobile toolbar: same trim as participants plus the
+ * participants-pane button (needed to manage the room on small screens).
+ * No native 'hangup' — exit goes through the app button (see
+ * baseToolbarButtons) so the moderator gets the leave/end-for-all prompt.
  */
 export const mobileModeratorToolbarButtons = [
   ...mobileBaseToolbarButtons,
-  'hangup',
   'participants-pane',
 ];
 
@@ -258,7 +263,8 @@ export const instantCallToolbarButtons = [
 
 export const instantCallModeratorToolbarButtons = [
   ...instantCallToolbarButtons,
-  'hangup',
+  // NO 'hangup' — consistent with moderatorToolbarButtons: exit is the app
+  // button so the host gets the "Esci solo tu / Termina per tutti" prompt.
   'mute-everyone',
   'security',
 ];

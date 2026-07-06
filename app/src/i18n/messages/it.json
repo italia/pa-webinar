@@ -220,6 +220,14 @@
     "declineRecording": "Non partecipare",
     "enterRoom": "Entra nella sala",
     "leaveRoom": "Esci dalla sala",
+    "leaveChoice": {
+      "title": "Come vuoi uscire?",
+      "body": "Puoi uscire solo tu — la call resta attiva per gli altri — oppure terminarla per tutti i partecipanti.",
+      "leaveSelf": "Esci solo tu",
+      "endForAll": "Termina per tutti",
+      "ending": "Termino…",
+      "endError": "Errore nella terminazione. Riprova."
+    },
     "eventNotStarted": "L'evento non è ancora iniziato",
     "eventStartsAt": "L'evento inizierà il {date} alle {time}",
     "countdown": "Tempo rimanente",
@@ -3079,6 +3087,16 @@
     "jvbScaling": "Sala in preparazione...",
     "jvbScalingDetail": "I server video si stanno avviando. L'operazione richiede circa 2 minuti.",
     "jvbReady": "Sala pronta!",
+    "warmup": {
+      "queued": "Richiesta presa in carico",
+      "startingBridge": "Avvio del server video…",
+      "provisioningNode": "Stiamo creando il server video dedicato",
+      "almostReady": "Server video attivo: ci siamo quasi",
+      "almostReadyDetail": "Ancora qualche istante e il pulsante di ingresso si attiverà da solo.",
+      "honestHint": "Tempo tipico: meno di un minuto se l'infrastruttura è già calda, 3–5 minuti alla prima accensione. Nel frattempo puoi controllare camera e microfono o usare la chat.",
+      "elapsed": "in preparazione da {time}"
+    },
+    "exitWaiting": "Esci dalla sala d'attesa",
     "warmingUp": "Sala in allestimento",
     "warmingUpDetail": "Stiamo accendendo i server video. Intanto puoi prepararti — sarà tutto pronto tra 2-3 minuti e potrai entrare.",
     "warmingUpButton": "Sala in allestimento...",

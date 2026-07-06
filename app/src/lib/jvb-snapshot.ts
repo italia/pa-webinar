@@ -86,14 +86,21 @@ export async function readJvbSnapshot(): Promise<JvbSnapshot | null> {
   const { getRedis } = await import('./redis');
   const redis = getRedis();
   if (!redis) return null;
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const raw = await Promise.race([
       redis.get(JVB_SNAPSHOT_KEY),
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
+      new Promise<null>((resolve) => {
+        timer = setTimeout(() => resolve(null), 1000);
+      }),
     ]);
     return parseJvbSnapshot(raw);
   } catch {
     return null;
+  } finally {
+    // Clear the race timer whichever branch won, so a fast Redis reply
+    // doesn't leave a pending 1s timer holding the event loop open.
+    clearTimeout(timer);
   }
 }
 

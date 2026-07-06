@@ -51,6 +51,11 @@ interface JitsiRoomProps {
   watermark?: WatermarkSettings;
   onReady?: () => void;
   onLeft?: () => void;
+  /** Fired on Jitsi's `readyToClose` — an INTENTIONAL hangup (native toolbar
+   *  button, executeCommand('hangup'), or "Termina evento"), never a transient
+   *  drop. The parent uses it as the authoritative "the user left" signal so
+   *  the native hangup doesn't get mistaken for a network blip and reconnected. */
+  onReadyToClose?: () => void;
   onParticipantCountChanged?: (count: number) => void;
   onRecordingStatusChanged?: (isRecording: boolean) => void;
   onApiReady?: (api: JitsiAPI) => void;
@@ -85,6 +90,7 @@ export default function JitsiRoom({
   watermark,
   onReady,
   onLeft,
+  onReadyToClose,
   onParticipantCountChanged,
   onRecordingStatusChanged,
   onApiReady,
@@ -98,12 +104,14 @@ export default function JitsiRoom({
 
   const onReadyRef = useRef(onReady);
   const onLeftRef = useRef(onLeft);
+  const onReadyToCloseRef = useRef(onReadyToClose);
   const onParticipantCountChangedRef = useRef(onParticipantCountChanged);
   const onRecordingStatusChangedRef = useRef(onRecordingStatusChanged);
   const onApiReadyRef = useRef(onApiReady);
 
   useEffect(() => { onReadyRef.current = onReady; }, [onReady]);
   useEffect(() => { onLeftRef.current = onLeft; }, [onLeft]);
+  useEffect(() => { onReadyToCloseRef.current = onReadyToClose; }, [onReadyToClose]);
   useEffect(() => { onParticipantCountChangedRef.current = onParticipantCountChanged; }, [onParticipantCountChanged]);
   useEffect(() => { onRecordingStatusChangedRef.current = onRecordingStatusChanged; }, [onRecordingStatusChanged]);
   useEffect(() => { onApiReadyRef.current = onApiReady; }, [onApiReady]);
@@ -362,6 +370,17 @@ export default function JitsiRoom({
           }
           flushSpeakerBuffer(true);
           onLeftRef.current?.();
+        });
+
+        // `readyToClose` fires ONLY after an intentional hangup (native
+        // toolbar button, executeCommand('hangup'), moderator "Termina
+        // evento") — never on a transient drop. It's the reliable signal
+        // that the user meant to leave, so the parent can close cleanly
+        // instead of treating the preceding videoConferenceLeft as a blip
+        // and reconnecting. May arrive shortly AFTER videoConferenceLeft.
+        api.addListener('readyToClose', () => {
+          if (disposedRef.current) return;
+          onReadyToCloseRef.current?.();
         });
 
         // ADR-013 Fase 0 — cattura la timeline del dominant speaker. A ogni
