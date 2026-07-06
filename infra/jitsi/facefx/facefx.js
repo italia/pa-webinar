@@ -42,7 +42,10 @@
     typeof window.MediaStreamTrackProcessor === 'function' &&
     typeof window.MediaStreamTrackGenerator === 'function' &&
     typeof window.OffscreenCanvas === 'function' &&
-    typeof window.VideoFrame === 'function';
+    typeof window.VideoFrame === 'function' &&
+    // Contesti senza mediaDevices (origin non sicuri, iframe sandbox):
+    // il patch non ha niente da avvolgere — no-op, mai un throw al load.
+    !!(navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function');
 
   if (!supported) return;
 
