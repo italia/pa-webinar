@@ -13,6 +13,7 @@ import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import {
   extractModeratorToken,
   verifyModeratorToken,
+  isEventModerator,
   constantTimeEqual,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
@@ -57,8 +58,15 @@ export const GET = withErrorHandling(async (request, context) => {
 
   const { title, description } = localiseEvent(event, locale);
 
-  // Moderator mode: verify token and return full data
-  if (token && constantTimeEqual(event.moderatorToken, token)) {
+  // Moderator mode: verify token and return full data. Accetta anche i
+  // co-moderatori (EventModerator role=MODERATOR): PUT/DELETE già li ammettono
+  // via verifyModeratorToken, quindi negargli la vista sarebbe incoerente.
+  // I campi del SOLO primario (magic link irrevocabile + email owner) però
+  // non escono mai verso un co-moderatore: un co-mod col token primario
+  // scalerebbe a owner in modo che la revoca non può più recuperare.
+  const isPrimaryModerator =
+    !!token && constantTimeEqual(event.moderatorToken, token);
+  if (token && (isPrimaryModerator || (await isEventModerator(event, token)))) {
     return Response.json({
       id: event.id,
       slug: event.slug,
@@ -95,9 +103,13 @@ export const GET = withErrorHandling(async (request, context) => {
       postEventShowFeedback: event.postEventShowFeedback,
       feedbackEnabled: event.feedbackEnabled,
       recordingConsentText: event.recordingConsentText,
-      moderatorToken: event.moderatorToken,
+      // Al co-moderatore torna il SUO token (valido su tutte le route che
+      // già lo ammettono), mai quello del primario.
+      moderatorToken: isPrimaryModerator ? event.moderatorToken : token,
       moderatorName: event.moderatorName,
-      moderatorEmail: tryDecryptPII(event.moderatorEmail),
+      moderatorEmail: isPrimaryModerator
+        ? tryDecryptPII(event.moderatorEmail)
+        : null,
       jitsiRoomName: event.jitsiRoomName,
       dataRetentionDays: event.dataRetentionDays,
       privacyPolicyUrl: event.privacyPolicyUrl,

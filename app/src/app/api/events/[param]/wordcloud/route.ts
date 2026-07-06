@@ -7,7 +7,7 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { createWordCloudRoundSchema } from '@/lib/validation/schemas';
-import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
+import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +19,7 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!token) throw new UnauthorizedError('Moderator token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event || !constantTimeEqual(event.moderatorToken, token)) {
+  if (!event || !(await isEventModerator(event, token))) {
     throw new ForbiddenError('Unauthorized');
   }
 

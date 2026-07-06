@@ -96,9 +96,16 @@ interface LiveEventClientProps {
   event: EventInfo;
   token: string;
   isModerator: boolean;
+  /** True solo per il token primario dell'owner (non per i co-moderatori).
+   *  Il pannello /admin accetta solo il token primario: i co-mod devono
+   *  vedere "Torna all'evento", non il link admin che darebbe 404. */
+  isPrimaryModerator?: boolean;
   /** Speaker ("relatore") magic-link grant. Full AV but no moderation. */
   isSpeaker?: boolean;
   isGuest?: boolean;
+  /** Il partecipante registrato ha già prestato il consenso multitrack alla
+   *  registrazione → non lo si richiede di nuovo in sala d'attesa. */
+  hasMultitrackConsent?: boolean;
   displayName: string;
   locale: string;
   jitsiDomain: string;
@@ -139,8 +146,10 @@ export default function LiveEventClient({
   event,
   token,
   isModerator,
+  isPrimaryModerator = false,
   isSpeaker = false,
   isGuest = false,
+  hasMultitrackConsent = false,
   displayName: initialDisplayName,
   locale,
   jitsiDomain,
@@ -669,9 +678,24 @@ export default function LiveEventClient({
   }, [event.id, token]);
 
   // ── Waiting room (unified front door for every arrival) ──
+  // Modal feedback post-evento: montato in TUTTI i branch da cui `showFeedback`
+  // può diventare true (waiting → bottone "Lascia un feedback"; ended → poll che
+  // rileva la fine; ready → chiusura in corso). Prima era montato solo nel return
+  // di phase='ready', quindi il questionario non appariva mai a fine call e il
+  // bottone in sala d'attesa era morto.
+  const feedbackModal = showFeedback ? (
+    <PostEventFeedbackModal
+      eventSlug={event.slug}
+      accessToken={!isGuest && !isModerator && !isSpeaker ? token : undefined}
+      guestId={isGuest ? guestId : undefined}
+      onClose={handleFeedbackClose}
+    />
+  ) : null;
+
   if (phase === 'waiting') {
     return (
-      <WaitingRoom
+      <>
+        <WaitingRoom
         event={{
           title: event.title,
           slug: event.slug,
@@ -705,7 +729,16 @@ export default function LiveEventClient({
         onEnterLive={handleEnterFromWaiting}
         onStartEvent={isModerator ? handleStartEvent : undefined}
         onLeaveFeedback={() => setShowFeedback(true)}
+        // Esente dal consenso multitrack in sala d'attesa: chi l'ha già
+        // prestato alla registrazione, o il moderatore (è chi ha configurato
+        // e controlla la registrazione). Gli speaker NO: non controllano la
+        // registrazione e la loro traccia audio isolata è esattamente il dato
+        // (quasi-biometrico, ADR-013) che il gate protegge — devono spuntare
+        // il consenso come ogni altro partecipante.
+        multitrackConsentExempt={isModerator || hasMultitrackConsent}
       />
+        {feedbackModal}
+      </>
     );
   }
 
@@ -717,25 +750,19 @@ export default function LiveEventClient({
         <h1 className="h3 mb-3">{t('eventEnded')}</h1>
         <p className="mb-4">{t('eventEndedMessage')}</p>
 
-        {/* ────────────────────────────────────────────────────────────
-            FEEDBACK FORM SLOT — owned by another agent.
-            Mount the post-event feedback questionnaire here for
-            non-moderators. Pass the same identity props the live
-            `showFeedback` block uses below:
-              - eventSlug={event.slug}
-              - accessToken={!isGuest ? token : undefined}  (registered)
-              - guestId={isGuest ? guestId : undefined}      (anonymous)
-            Until that component lands, the closing screen just offers the
-            navigation links below.
-            ──────────────────────────────────────────────────────────── */}
+        {/* Questionario post-evento: emerge a fine call (poll ENDED →
+            setShowFeedback(true)) sopra questa schermata di chiusura. */}
+        {feedbackModal}
 
-        {isModerator ? (
+        {isPrimaryModerator ? (
           <Link href={`/admin/events/${event.id}?token=${token}`}>
             <Button color="primary" outline tag="span">
               {tc('back')}
             </Button>
           </Link>
         ) : (
+          // Co-moderatori, speaker e partecipanti: il pannello admin accetta
+          // solo il token primario, quindi torniamo alla pagina evento.
           <Link href={`/events/${event.slug}`}>
             <Button color="primary" outline tag="span">
               {t('backToEvent')}
@@ -844,6 +871,9 @@ export default function LiveEventClient({
       <div
         className="d-flex flex-column align-items-center justify-content-center"
         style={{ minHeight: '60vh' }}
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
       >
         <Spinner active double />
         <p className="mt-3 text-muted">{t('connecting')}</p>
@@ -991,14 +1021,7 @@ export default function LiveEventClient({
         />
       </div>
 
-      {showFeedback && (
-        <PostEventFeedbackModal
-          eventSlug={event.slug}
-          accessToken={!isGuest && !isModerator && !isSpeaker ? token : undefined}
-          guestId={isGuest ? guestId : undefined}
-          onClose={handleFeedbackClose}
-        />
-      )}
+      {feedbackModal}
 
       {/* Recording pre-activation prompt for moderator */}
       <Modal isOpen={showRecPrompt} toggle={handleRecPromptLater} centered>

@@ -8,7 +8,7 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { timerActionSchema } from '@/lib/validation/schemas';
-import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
+import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { getCached, setCache } from '@/lib/cache';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
@@ -42,7 +42,7 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!token) throw new UnauthorizedError('Moderator token required');
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event || !constantTimeEqual(event.moderatorToken, token)) {
+  if (!event || !(await isEventModerator(event, token))) {
     throw new ForbiddenError('Unauthorized');
   }
 

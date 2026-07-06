@@ -175,6 +175,11 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       );
     } else if (isInstant) {
       notFound();
+    } else if (event.status === 'ENDED' || event.status === 'ARCHIVED') {
+      // Evento concluso senza token (link della sala salvato, cookie scaduto):
+      // manda alla pagina evento — registrazione video, archivio Q&A, feedback —
+      // invece che a /registration, che per stati ≠ PUBLISHED/LIVE fa 404.
+      redirect(`/${locale}/events/${slug}`);
     } else {
       redirect(`/${locale}/events/${slug}/registration`);
     }
@@ -195,18 +200,31 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   const isModerator = isPrimaryModerator || isCoModerator;
 
   let participantInfo: { displayName: string } | null = null;
+  // Consenso multitrack già prestato alla registrazione → non lo si richiede di
+  // nuovo in sala d'attesa (evita il doppio consenso). Vedi WaitingRoom.
+  let hasMultitrackConsent = false;
   if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
-      select: { displayName: true, eventId: true },
+      select: { displayName: true, eventId: true, consentMultitrack: true },
     });
 
     if (!registration || registration.eventId !== event.id) {
+      // Token personale non valido/scaduto (refuso nel link email, o registrazione
+      // rimossa dal retention cron mentre l'email col link sopravvive): niente 404
+      // secco. Torniamo alla pagina evento con un avviso contestuale e le CTA giuste
+      // (ri-registrazione, oppure guarda la registrazione se l'evento è concluso).
+      // Solo per stati in cui la pagina evento è raggiungibile: per DRAFT/ARCHIVED
+      // fa notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
+      if (['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
+        redirect(`/${locale}/events/${slug}?invalidToken=1`);
+      }
       notFound();
     }
     participantInfo = {
       displayName: tryDecryptPII(registration.displayName) ?? registration.displayName,
     };
+    hasMultitrackConsent = registration.consentMultitrack ?? false;
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);
@@ -250,8 +268,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       }}
       token={token}
       isModerator={isModerator}
+      isPrimaryModerator={isPrimaryModerator}
       isSpeaker={isSpeaker}
       isGuest={false}
+      hasMultitrackConsent={hasMultitrackConsent}
       displayName={
         isValidGrant && grant
           // Named co-moderator or speaker via EventModerator row —
