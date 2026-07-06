@@ -270,6 +270,7 @@
     "liveFeaturesLabel": "Funzioni:",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondaggi",
+    "sidebarTabWordcloud": "Nuvola di parole",
     "sidebarTabAgenda": "Agenda",
     "sidebarTabMaterials": "Materiali",
     "sidebarTabParticipants": "Partecipanti",
@@ -326,6 +327,7 @@
     },
     "closeDrawer": "Chiudi",
     "hintBanner": {
+      "ariaLabel": "Suggerimenti",
       "controls": "Controlli in basso",
       "raiseHand": "Alza la mano per parlare",
       "sidebar": "Q&A e chat nella barra laterale",

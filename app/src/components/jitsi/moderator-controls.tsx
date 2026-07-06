@@ -30,6 +30,10 @@ interface ModeratorControlsProps {
   /** Local moderator's display name, forwarded to the raised-hands panel
    *  so it can resolve the current user's own raise-hand event. */
   localDisplayName?: string;
+  /** Only the PRIMARY moderator can reach /admin/events/[id]. Co-moderators
+   *  and speakers hold a magic-link token without admin rights, so redirecting
+   *  them there after "Termina evento" lands on a 404 — they just close. */
+  isPrimaryModerator?: boolean;
 }
 
 const BAR_STYLE: React.CSSProperties = {
@@ -64,6 +68,7 @@ export default function ModeratorControls({
   participantsCanUnmute = false,
   participantsCanStartVideo = false,
   localDisplayName = '',
+  isPrimaryModerator = false,
 }: ModeratorControlsProps) {
   const t = useTranslations('live.moderator');
   const tl = useTranslations('live');
@@ -254,9 +259,14 @@ export default function ModeratorControls({
       }
       api?.executeCommand('hangup');
       setEndModalOpen(false);
-      endNavigationTimerRef.current = setTimeout(() => {
-        router.push(`/admin/events/${eventId}?token=${moderatorToken}`);
-      }, 2000);
+      // Only the primary moderator has admin access. Co-moderators/speakers
+      // just close: the hangup fires Jitsi's readyToClose, which the live
+      // client turns into the "evento concluso" screen — no 404 redirect.
+      if (isPrimaryModerator) {
+        endNavigationTimerRef.current = setTimeout(() => {
+          router.push(`/admin/events/${eventId}?token=${moderatorToken}`);
+        }, 2000);
+      }
     } catch {
       setEnding(false);
       setRecToast(tl('endEventError'));

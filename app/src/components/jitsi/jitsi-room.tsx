@@ -293,14 +293,19 @@ export default function JitsiRoom({
         apiRef.current = api;
         onApiReadyRef.current?.(api);
 
+        // Accessible name for the video call iframe (WCAG 4.1.2): without a
+        // title the core of the page is announced generically ("iframe").
+        const frameTitle = t('videoCallFrameTitle');
         const iframeEl = containerRef.current?.querySelector('iframe');
         if (iframeEl) {
           iframeEl.setAttribute('allow', IFRAME_ALLOW);
+          iframeEl.setAttribute('title', frameTitle);
         } else {
           const observer = new MutationObserver((_mutations, obs) => {
             const frame = containerRef.current?.querySelector('iframe');
             if (frame) {
               frame.setAttribute('allow', IFRAME_ALLOW);
+              frame.setAttribute('title', frameTitle);
               obs.disconnect();
               observerRef.current = null;
             }
