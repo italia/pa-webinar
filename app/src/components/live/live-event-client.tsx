@@ -1589,12 +1589,15 @@ function LiveSidebar({
       aria-label={t('floatingControlsLabel')}
     >
       {visibleTabs.map((tab) => {
-        const isActive = activeTab === tab.key && drawerOpen;
+        // Highlight the active tab regardless of drawerOpen: on desktop the
+        // column is always visible; on mobile the strip should still show
+        // which panel is selected even when the drawer is collapsed.
+        const isActive = activeTab === tab.key;
         return (
           <button
             key={tab.key}
             type="button"
-            className={`live-floating-btn${isActive ? ' live-floating-btn--active' : ''}`}
+            className={`live-floating-btn${isActive && drawerOpen ? ' live-floating-btn--active' : ''}`}
             onClick={() => handleTabClick(tab.key)}
             aria-pressed={isActive}
           >
@@ -1637,8 +1640,41 @@ function LiveSidebar({
       <div
         className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}`}
       >
-        {/* Drawer header: active panel title + close button. */}
-        <div className="live-sidebar-header d-flex align-items-center justify-content-between">
+        {/* Desktop persistent-column tab strip (mobile keeps the floating bar
+            + drawer header below). Proper tablist semantics for keyboard/SR. */}
+        <div
+          className="live-sidebar-tabs"
+          role="tablist"
+          aria-label={t('floatingControlsLabel')}
+        >
+          {visibleTabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                title={tab.label}
+                className={`live-sidebar-tab${isActive ? ' live-sidebar-tab--active' : ''}`}
+                onClick={() => setActiveTab(tab.key)}
+              >
+                <span className="live-floating-btn__icon" aria-hidden="true">
+                  {tab.svg}
+                </span>
+                <span className="live-sidebar-tab__label">{tab.label}</span>
+                {tab.badge !== undefined && tab.badge > 0 && (
+                  <span className="live-sidebar-tab__badge">{tab.badge}</span>
+                )}
+                {tab.dot && <span className="live-sidebar-tab__dot" aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Drawer header (mobile only): active panel title + close button.
+            On desktop the tab strip above replaces it. */}
+        <div className="live-sidebar-header d-flex d-lg-none align-items-center justify-content-between">
           <span className="fw-semibold" style={{ color: '#fff', fontSize: '0.95rem' }}>
             {visibleTabs.find((t) => t.key === activeTab)?.label}
           </span>
