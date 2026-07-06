@@ -13,8 +13,16 @@ spec:
     - name: pa-webinar.rules
       rules:
         # App availability
+        # NB: il target ServiceMonitor imposta job = nome del Service (= fullname del chart),
+        # non piu' "eventi-*" dopo il rename. Ancoriamo su namespace per robustezza al rename.
+        # NB2: tutti i selettori qui sotto sono ancorati a namespace: test e prod condividono
+        # lo stesso Prometheus e le serie di entrambi hanno app="pa-webinar", quindi senza
+        # namespace ogni regola valuterebbe anche le serie dell'altro ambiente.
         - alert: PaWebinarDown
-          expr: up{job=~".*eventi.*"} == 0
+          expr: |
+            up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"} == 0
+            or
+            absent(up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"})
           for: 2m
           labels:
             severity: critical
@@ -24,7 +32,7 @@ spec:
 
         # High latency
         - alert: PaWebinarHighLatency
-          expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{app="pa-webinar"}[5m])) > 2
+          expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{namespace="{{ .Release.Namespace }}", app="pa-webinar"}[5m])) > 2
           for: 5m
           labels:
             severity: warning
@@ -36,9 +44,9 @@ spec:
         - alert: PaWebinarHighErrorRate
           expr: |
             (
-              rate(http_requests_total{app="pa-webinar",status_code=~"5.."}[5m])
+              rate(http_requests_total{namespace="{{ .Release.Namespace }}", app="pa-webinar",status_code=~"5.."}[5m])
               /
-              rate(http_requests_total{app="pa-webinar"}[5m])
+              rate(http_requests_total{namespace="{{ .Release.Namespace }}", app="pa-webinar"}[5m])
             ) > 0.05
           for: 5m
           labels:
@@ -49,7 +57,7 @@ spec:
 
         # Database unreachable (metric disappears)
         - alert: PaWebinarDatabaseDown
-          expr: absent(eventi_active_events{app="pa-webinar"})
+          expr: absent(eventi_active_events{namespace="{{ .Release.Namespace }}", app="pa-webinar"})
           for: 3m
           labels:
             severity: critical
@@ -59,7 +67,7 @@ spec:
 
         # JVB high stress
         - alert: JvbHighStress
-          expr: eventi_jvb_stress_level{app="pa-webinar"} > 0.8
+          expr: eventi_jvb_stress_level{namespace="{{ .Release.Namespace }}", app="pa-webinar"} > 0.8
           for: 3m
           labels:
             severity: warning
@@ -69,7 +77,7 @@ spec:
 
         # JVB scaling stuck
         - alert: JvbScalingStuck
-          expr: eventi_jvb_participants{app="pa-webinar"} > 0 and eventi_jvb_stress_level{app="pa-webinar"} > 0.9
+          expr: eventi_jvb_participants{namespace="{{ .Release.Namespace }}", app="pa-webinar"} > 0 and eventi_jvb_stress_level{namespace="{{ .Release.Namespace }}", app="pa-webinar"} > 0.9
           for: 5m
           labels:
             severity: critical
@@ -77,19 +85,53 @@ spec:
             summary: "JVB is overloaded with active participants"
             description: "There are active participants but JVB stress is above 90% for 5 minutes. Scaling may be stuck or insufficient."
 
-        # Jibri unavailable (recording configured but no Jibri metrics)
-        - alert: JibriUnavailable
-          expr: absent(jibri_health_status{namespace="{{ .Release.Namespace }}"}) and on() count(eventi_active_events{app="pa-webinar"}) > 0
+        # NB: rimosso l'alert JibriUnavailable basato su absent(jibri_health_status): quella
+        # metrica non e' mai esportata (nessun exporter/ServiceMonitor per Jibri), quindi
+        # l'alert scattava come falso-positivo a ogni evento LIVE. Reintrodurre solo dopo aver
+        # aggiunto un endpoint metriche per Jibri.
+
+        # ── Media plane (cardine #1: stabilita' videocall) ──────────────────────────
+        # JVB assente durante un evento LIVE: il bridge e' scale-to-zero a riposo (=0 e' OK),
+        # ma se ci sono eventi LIVE e nessuna replica JVB disponibile per 2m, il media plane
+        # e' giu' -> partecipanti senza video. Richiede kube-state-metrics.
+        - alert: JvbAbsentDuringLiveEvent
+          expr: |
+            (max(eventi_active_events{namespace="{{ .Release.Namespace }}", app="pa-webinar"}) > 0)
+            and
+            (max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*jitsi-meet-jvb.*"}) == 0)
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "JVB assente durante un evento LIVE"
+            description: "Ci sono eventi LIVE ma nessuna replica JVB disponibile da 2 minuti: il media plane e' giu'. Verificare scaler/node pool jitsi-jvb."
+
+        # coturn e' l'INTERO media path in relay-only e resta la lifeline TURNS/443 degli
+        # utenti dietro firewall corporate anche dopo il ripristino del path UDP diretto.
+        # E' a replica singola: un suo down interrompe tutti gli eventi in corso.
+        - alert: CoturnDownDuringEvent
+          expr: |
+            (max(eventi_active_events{namespace="{{ .Release.Namespace }}", app="pa-webinar"}) > 0)
+            and
+            (max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*coturn.*"}) == 0)
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "coturn (TURN/TURNS) giu' durante un evento LIVE"
+            description: "coturn non ha repliche disponibili con eventi LIVE in corso: gli utenti dietro NAT/firewall (relay e fallback 443) non riescono a passare il media. Intervento immediato."
+        - alert: CoturnAbsent
+          expr: max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*coturn.*"}) == 0
           for: 5m
           labels:
             severity: warning
           annotations:
-            summary: "Jibri recording service unavailable"
-            description: "Jibri health metrics are not being reported while the application is running."
+            summary: "coturn non disponibile"
+            description: "coturn (media relay TURN/TURNS) e' a 0 repliche disponibili da 5 minuti anche in assenza di eventi: il prossimo evento fallira' per gli utenti che richiedono il relay/fallback 443."
 
         # High event loop lag
         - alert: HighEventLoopLag
-          expr: nodejs_eventloop_lag_seconds{app="pa-webinar"} > 0.5
+          expr: nodejs_eventloop_lag_seconds{namespace="{{ .Release.Namespace }}", app="pa-webinar"} > 0.5
           for: 2m
           labels:
             severity: warning
