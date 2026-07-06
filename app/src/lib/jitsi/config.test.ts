@@ -293,6 +293,18 @@ describe('Video quality presets', () => {
     expect(save.stereo).toBe(false);
   });
 
+  it('unlocks screenshare framerate above the 5fps Jitsi default, scaling with the preset', () => {
+    const fps = (q: string) =>
+      resolveVideoQualityConfig(q).desktopSharingFrameRate as { min: number; max: number };
+    for (const q of VIDEO_QUALITY_PRESETS) {
+      expect(fps(q).min).toBeGreaterThanOrEqual(5);
+      expect(fps(q).max).toBeGreaterThan(5); // il default {min:5,max:5} rende inguardabili demo/video
+      expect(fps(q).max).toBeGreaterThanOrEqual(fps(q).min);
+    }
+    expect(fps('SAVE_DATA').max).toBeLessThan(fps('HIGH').max);
+    expect(fps('MAX').max).toBeGreaterThanOrEqual(fps('HIGH').max);
+  });
+
   it('returns a fresh object each call (no shared mutable state)', () => {
     const a = resolveVideoQualityConfig('HIGH');
     const b = resolveVideoQualityConfig('HIGH');
