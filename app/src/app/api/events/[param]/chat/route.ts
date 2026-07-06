@@ -7,11 +7,17 @@
  *       the moderator UI.
  *
  *   POST /chat                           →  submit a new message.
- *       Auth: participant accessToken OR moderator token OR guest
- *       (only while event.status === 'LIVE'). Guest sender-name comes
- *       from the body (untrusted, same risk profile as Jitsi pre-join
- *       display-name). Message is persisted to Postgres and published
- *       on Redis for real-time fan-out to SSE subscribers on any pod.
+ *       Auth: participant accessToken OR moderator token OR guest.
+ *       Tokenless guests are admitted on any LIVE event, and — only for
+ *       INSTANT calls (open-by-link, no scheduled gate) — also during
+ *       the bridge warm-up (PROVISIONING/IDLE) so the waiting room chat
+ *       works while the JVB spins up. Scheduled/password events never
+ *       admit tokenless guests outside LIVE (a stranger can flip
+ *       PUBLISHED→PROVISIONING via the unauthenticated /wake otherwise).
+ *       Guest sender-name comes from the body (untrusted, same risk
+ *       profile as Jitsi pre-join display-name). Message is persisted to
+ *       Postgres and published on Redis for real-time fan-out to SSE
+ *       subscribers on any pod.
  */
 
 import { NextResponse } from 'next/server';
@@ -76,7 +82,13 @@ async function authenticateSender(
     : { slug: eventIdOrSlug };
   const event = await prisma.event.findUnique({
     where,
-    select: { id: true, status: true, moderatorToken: true, moderatorName: true },
+    select: {
+      id: true,
+      status: true,
+      eventType: true,
+      moderatorToken: true,
+      moderatorName: true,
+    },
   });
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
 
@@ -114,11 +126,19 @@ async function authenticateSender(
     throw new ForbiddenError('Invalid token for this event');
   }
 
-  // Guest branch — consentito su evento LIVE e durante il warm-up del bridge
-  // (IDLE/PROVISIONING): la chat è app-side e non dipende dal JVB, e la sala
-  // d'attesa la mostra proprio mentre si aspetta. Rispecchia la policy di
-  // accesso guest di /events/[slug]/live.
-  if (!['LIVE', 'PROVISIONING', 'IDLE'].includes(event.status)) {
+  // Guest branch — la chat è app-side e non dipende dal JVB. Consentita:
+  //   • su qualunque evento LIVE (comportamento storico), e
+  //   • durante il warm-up del bridge (PROVISIONING/IDLE) SOLO per le call
+  //     INSTANT — aperte per link, senza gate d'orario — dove la sala
+  //     d'attesa mostra la chat mentre il bridge si scalda.
+  // Gli eventi schedulati/con password NON ammettono guest senza token fuori
+  // dal LIVE: /wake è non autenticato e chiunque potrebbe flippare
+  // PUBLISHED→PROVISIONING per iniettare messaggi anonimi (regressione chiusa).
+  const guestAllowed =
+    event.status === 'LIVE' ||
+    (event.eventType === 'INSTANT' &&
+      (event.status === 'PROVISIONING' || event.status === 'IDLE'));
+  if (!guestAllowed) {
     throw new ForbiddenError('Chat requires a participant or moderator token');
   }
   const name = (guestName ?? '').trim();

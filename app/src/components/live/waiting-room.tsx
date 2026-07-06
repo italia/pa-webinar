@@ -109,7 +109,10 @@ export interface WaitingRoomJoinPrefs {
  *  onesto (fase + tempo trascorso) al posto dello spinner cieco. */
 export interface WaitingRoomWarmup {
   phase: 'queued' | 'starting' | 'ready';
-  provisioningStartedAt: string | null;
+  /** Stopwatch anchor, già ripulito lato server: valorizzato solo mentre
+   *  PROVISIONING e recente (null in IDLE / se residuo di un ciclo passato),
+   *  così il cronometro non parte mai da un timestamp stantìo. */
+  startedAt: string | null;
   serverTime: string;
 }
 
@@ -296,27 +299,34 @@ export default function WaitingRoom({
   const canEnter =
     nameValid && emailValid && (!multitrackRequired || multitrackConsent);
 
-  // Tick del cronometro warm-up (vedi warmupElapsed). L'oggetto warmup cambia
-  // identità a ogni poll (3s): l'effect si ri-ancora sulla base server fresca.
+  // Cronometro warm-up. Ci si ancora UNA volta per ciclo (identità =
+  // warmup.startedAt): senza questo, ri-ancorarsi a ogni poll (3s) fa
+  // sobbalzare/tornare indietro il tempo per via del jitter di rete. La base
+  // server (serverTime - startedAt) la leggiamo da un ref così un nuovo poll
+  // aggiorna la fase senza far ripartire il tick. startedAt null (IDLE /
+  // residuo stantìo, già filtrato dal server) → niente cronometro.
+  const warmupStartedAt = warmup?.startedAt ?? null;
+  const warmupRef = useRef(warmup);
+  warmupRef.current = warmup;
   useEffect(() => {
-    if (!isWarmingUp || !warmup) {
+    if (!isWarmingUp || !warmupStartedAt) {
       setWarmupElapsed(null);
       return;
     }
-    const base = warmup.provisioningStartedAt
-      ? Math.max(
-          0,
-          (new Date(warmup.serverTime).getTime() -
-            new Date(warmup.provisioningStartedAt).getTime()) / 1000,
-        )
-      : 0;
+    const serverNowMs = new Date(
+      warmupRef.current?.serverTime ?? warmupStartedAt,
+    ).getTime();
+    const base = Math.max(
+      0,
+      (serverNowMs - new Date(warmupStartedAt).getTime()) / 1000,
+    );
     const anchor = Date.now();
     const tick = () =>
       setWarmupElapsed(Math.floor(base + (Date.now() - anchor) / 1000));
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [isWarmingUp, warmup]);
+  }, [isWarmingUp, warmupStartedAt]);
 
   // Countdown tick: only needed while PUBLISHED. Live / ended do not use it.
   useEffect(() => {
@@ -696,9 +706,14 @@ export default function WaitingRoom({
                       : t('warmup.queued')}
                 </strong>
                 {warmupElapsed !== null && warmupElapsed > 0 && (
+                  // aria-hidden: la banda è una live region (role=status +
+                  // aria-live), ma il cronometro cambia ogni secondo — senza
+                  // questo lo screen reader ri-annuncerebbe la banda a ogni
+                  // tick. Restano annunciati solo fase e dettaglio (rari).
                   <span
                     className="font-monospace"
                     style={{ fontSize: '0.8rem', color: 'var(--app-muted)' }}
+                    aria-hidden="true"
                   >
                     {t('warmup.elapsed', {
                       time: `${Math.floor(warmupElapsed / 60)}:${String(warmupElapsed % 60).padStart(2, '0')}`,
@@ -797,11 +812,13 @@ export default function WaitingRoom({
         </Button>
       )}
       {/* Uscita esplicita: nella sala d'attesa non si è "intrappolati" —
-          soprattutto durante il warm-up, quando la CTA è disabilitata. */}
-      {exitHref && !isEnded && (
+          soprattutto durante il warm-up, quando la CTA è disabilitata. Non
+          in PUBLISHED: lì c'è già il backLinkBlock ("Indietro") più in basso,
+          verso la stessa pagina evento — evitiamo il doppione. */}
+      {exitHref && !isEnded && !isPublished && (
         <Link
           href={exitHref}
-          className="btn btn-outline-secondary btn-sm justify-self-center mt-1"
+          className="btn btn-outline-secondary btn-sm mt-1"
           style={{ justifySelf: 'center' }}
         >
           {t('exitWaiting')}
