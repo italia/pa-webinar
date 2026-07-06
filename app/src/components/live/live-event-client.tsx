@@ -131,12 +131,31 @@ type LivePhase =
 // "Evento concluso" screen so the user can decide what to do manually.
 const MAX_RECONNECT_ATTEMPTS = 3;
 
+// Grace window after an UNFLAGGED `videoConferenceLeft` before we commit to
+// reconnecting. Jitsi's native hangup fires videoConferenceLeft first and
+// `readyToClose` a moment later; this window lets the intentional-close
+// signal veto the reconnect so clicking hangup doesn't bounce the user back
+// into the call. A genuine drop (no readyToClose) just reconnects 1.2s later.
+const LEAVE_RECONNECT_GRACE_MS = 1200;
+
 // Phases that render the full-bleed call surface. While in one of these we
 // flip the page into "immersive" mode (see `.live-call-immersive` in
 // globals.scss): the call overlays the PA header/footer and the outer
 // document scroll is locked, so the video sits in a single viewport-locked
 // frame with no double scroll. The waiting room keeps the normal chrome.
 const IMMERSIVE_PHASES = new Set<LivePhase>(['fetching_jwt', 'ready', 'reconnecting']);
+
+// Statuses the waiting room knows how to render. The /lifecycle poll accepts
+// a status transition only if it's one of these — DRAFT/ARCHIVED leak through
+// that endpoint (it has no visibility filter) and would otherwise regress a
+// terminal ENDED recap into the blank "opening at …" fallback.
+const WAITING_ROOM_STATUSES = new Set([
+  'PUBLISHED',
+  'PROVISIONING',
+  'IDLE',
+  'LIVE',
+  'ENDED',
+]);
 
 interface JitsiCredentials {
   jwt: string;
@@ -232,6 +251,9 @@ export default function LiveEventClient({
   const userHangupRef = useRef(false);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Deferred reconnect decision after an unflagged leave (see handleJitsiLeft):
+  // holds the grace timer so `readyToClose` can cancel it.
+  const pendingLeaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Poll infrastructure status (JVB + Jibri) when event is LIVE
   useEffect(() => {
@@ -303,14 +325,22 @@ export default function LiveEventClient({
         const res = await fetch(`/api/events/${event.slug}/lifecycle`);
         if (!res.ok) return;
         const data = await res.json();
-        if (data.status && data.status !== eventStatus) {
+        // /lifecycle has no visibility filter (unlike the public GET, which
+        // 404s DRAFT/ARCHIVED). Ignore those transitions so an event archived
+        // mid-view doesn't clobber the ENDED recap into the blank
+        // "opening at …" branch — the waiting room only renders these states.
+        if (
+          data.status &&
+          data.status !== eventStatus &&
+          WAITING_ROOM_STATUSES.has(data.status)
+        ) {
           setEventStatus(data.status);
         }
         setWarmup(
           data.jvb
             ? {
                 phase: data.jvb.phase as 'queued' | 'starting' | 'ready',
-                provisioningStartedAt: data.provisioningStartedAt,
+                startedAt: data.jvb.startedAt ?? null,
                 serverTime: data.serverTime,
               }
             : null,
@@ -509,6 +539,7 @@ export default function LiveEventClient({
     return () => {
       if (recPromptRetryRef.current) clearTimeout(recPromptRetryRef.current);
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+      if (pendingLeaveTimerRef.current) clearTimeout(pendingLeaveTimerRef.current);
     };
   }, []);
 
@@ -589,50 +620,89 @@ export default function LiveEventClient({
       autoOrPromptRecording(jitsiApi);
     }
   }, [jibriReady, jitsiApi, isModerator, event.recordingEnabled, autoOrPromptRecording]);
+  // Authoritative "the user intentionally left" signal from Jitsi's
+  // `readyToClose` (native hangup button, our executeCommand('hangup'),
+  // moderator "Termina evento"). It fires ONLY on an intentional close,
+  // never on a transient drop — so it cancels any pending or scheduled
+  // reconnect and takes us straight to the closing screen. This is what
+  // stops the native hangup from bouncing the user back into the call.
+  const handleReadyToClose = useCallback(() => {
+    userHangupRef.current = true;
+    if (pendingLeaveTimerRef.current) {
+      clearTimeout(pendingLeaveTimerRef.current);
+      pendingLeaveTimerRef.current = null;
+    }
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+    if (!showFeedback) setPhase('ended');
+  }, [showFeedback]);
+
   const handleJitsiLeft = useCallback(() => {
-    // Intentional leave (user clicked "Esci dalla sala" / completed
-    // the feedback flow): preserve the existing behavior — show the
-    // post-event screen unless feedback is still visible.
+    // Intentional leave already flagged (app "Esci dalla sala" button /
+    // feedback flow / ENDED poll): show the post-event screen right away.
     if (userHangupRef.current) {
       if (!showFeedback) setPhase('ended');
       return;
     }
 
-    // Unintentional leave: Jitsi fired `videoConferenceLeft` but we
-    // didn't ask for it. Could be a transient network drop, a JVB
-    // restart, or the event genuinely ending. Ask the server which one
-    // it is before deciding to show the "Evento concluso" screen.
-    void (async () => {
-      try {
-        const res = await fetch(`/api/events/${event.slug}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.status === 'ENDED') {
-            setEventStatus('ENDED');
+    // Unflagged `videoConferenceLeft`: EITHER the user clicked Jitsi's own
+    // hangup ("termina chiamata" — a `readyToClose` follows within a moment)
+    // OR the network genuinely dropped. Defer the reconnect decision by a
+    // short grace window so `handleReadyToClose` can veto it; otherwise the
+    // native hangup gets misread as a blip and rejoins immediately.
+    if (pendingLeaveTimerRef.current) clearTimeout(pendingLeaveTimerRef.current);
+    pendingLeaveTimerRef.current = setTimeout(() => {
+      pendingLeaveTimerRef.current = null;
+      // A readyToClose arrived during the grace window → intentional close.
+      if (userHangupRef.current) {
+        if (!showFeedback) setPhase('ended');
+        return;
+      }
+      // No intentional-close signal — ask the server whether the event
+      // ended (→ closing screen) or it's a real drop (→ reconnect).
+      void (async () => {
+        try {
+          const res = await fetch(`/api/events/${event.slug}`);
+          // readyToClose may still land while the fetch is in flight.
+          if (userHangupRef.current) {
             setPhase('ended');
             return;
           }
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === 'ENDED') {
+              setEventStatus('ENDED');
+              setPhase('ended');
+              return;
+            }
+          }
+          // Anything else (LIVE, non-OK response we couldn't classify)
+          // → assume the user dropped. Try to rejoin.
+          if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
+            reconnectAttemptsRef.current += 1;
+            setPhase('reconnecting');
+          } else {
+            setPhase('ended');
+          }
+        } catch {
+          // Network error reaching our own API — most likely the user is
+          // still offline. Treat as a transient drop and keep retrying
+          // until we exhaust the attempt budget.
+          if (userHangupRef.current) {
+            setPhase('ended');
+            return;
+          }
+          if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
+            reconnectAttemptsRef.current += 1;
+            setPhase('reconnecting');
+          } else {
+            setPhase('ended');
+          }
         }
-        // Anything else (LIVE, non-OK response we couldn't classify)
-        // → assume the user dropped. Try to rejoin.
-        if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
-          reconnectAttemptsRef.current += 1;
-          setPhase('reconnecting');
-        } else {
-          setPhase('ended');
-        }
-      } catch {
-        // Network error reaching our own API — most likely the user is
-        // still offline. Treat as a transient drop and keep retrying
-        // until we exhaust the attempt budget.
-        if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
-          reconnectAttemptsRef.current += 1;
-          setPhase('reconnecting');
-        } else {
-          setPhase('ended');
-        }
-      }
-    })();
+      })();
+    }, LEAVE_RECONNECT_GRACE_MS);
   }, [showFeedback, event.slug]);
   const handleParticipantCountChanged = useCallback((count: number) => {
     setParticipantCount(count);
@@ -1013,6 +1083,7 @@ export default function LiveEventClient({
               watermark={watermark}
               onReady={handleJitsiReady}
               onLeft={handleJitsiLeft}
+              onReadyToClose={handleReadyToClose}
               onParticipantCountChanged={handleParticipantCountChanged}
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
