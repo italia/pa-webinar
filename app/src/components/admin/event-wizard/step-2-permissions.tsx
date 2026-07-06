@@ -259,6 +259,8 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
           {value.aiTranscriptEnabled && (
             <>
               <AiToggle
+                warning
+                badge={tAdmin('form.consentBadge')}
                 label={tAdmin('form.multitrackRecordingEnabled')}
                 desc={tAdmin('form.multitrackRecordingEnabledDesc')}
                 checked={value.multitrackRecordingEnabled}
@@ -275,6 +277,8 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
 
               {value.multitrackRecordingEnabled && (
                 <AiToggle
+                  warning
+                  badge={tAdmin('form.retentionBadge')}
                   label={tAdmin('form.retainParticipantTracks')}
                   desc={tAdmin('form.retainParticipantTracksDesc')}
                   checked={value.retainParticipantTracks}
@@ -412,20 +416,55 @@ function AiToggle({
   desc,
   checked,
   onToggle,
+  warning = false,
+  badge,
 }: {
   label: string;
   desc: string;
   checked: boolean;
   onToggle: () => void;
+  /** Render as a consent/PII-sensitive callout (amber accent) with a badge. */
+  warning?: boolean;
+  badge?: string;
 }) {
   return (
     <div
       className="py-2 d-flex justify-content-between align-items-start"
-      style={{ borderTop: '1px solid #e8e8e8' }}
+      style={{
+        borderTop: '1px solid #e8e8e8',
+        ...(warning
+          ? {
+              background: 'rgba(166, 99, 0, 0.06)',
+              borderLeft: '3px solid #A66300',
+              paddingLeft: '0.6rem',
+              borderTopLeftRadius: '4px',
+              borderBottomLeftRadius: '4px',
+            }
+          : {}),
+      }}
     >
       <div className="me-3">
-        <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+        <div
+          className="fw-semibold d-flex align-items-center flex-wrap gap-2"
+          style={{ color: 'var(--app-text)' }}
+        >
           {label}
+          {badge && (
+            <span
+              style={{
+                background: '#A66300',
+                color: '#fff',
+                fontSize: '0.65rem',
+                fontWeight: 700,
+                padding: '2px 6px',
+                borderRadius: '4px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.02em',
+              }}
+            >
+              {badge}
+            </span>
+          )}
         </div>
         <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
           {desc}

@@ -1118,6 +1118,8 @@
       "aiTargetLocalesRequired": "Indica almeno una lingua di traduzione, oppure disattiva la traduzione automatica.",
       "aiDubbingEnabled": "Doppiaggio audio",
       "aiDubbingEnabledDesc": "Audio doppiato nelle lingue target, generato con voci sintetiche pre-addestrate. Non clona la voce dei partecipanti.",
+      "consentBadge": "Consenso esplicito",
+      "retentionBadge": "Estende la retention",
       "multitrackRecordingEnabled": "Registrazione per-partecipante (alta precisione)",
       "multitrackRecordingEnabledDesc": "Registra una traccia audio separata per ogni partecipante, così la trascrizione attribuisce con certezza chi dice cosa (niente più \"Parlante 1/2\"). Tratta l'audio isolato del singolo parlante (dato personale sensibile): le tracce sono temporanee e cancellate subito dopo la trascrizione. Richiede il consenso alla registrazione.",
       "retainParticipantTracks": "Conserva le tracce per-partecipante",
