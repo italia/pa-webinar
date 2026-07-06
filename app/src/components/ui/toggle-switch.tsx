@@ -7,6 +7,10 @@ interface ToggleSwitchProps {
   checked: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
+  /** Accessible name for the input when the visible label lives in a sibling
+   *  element (callers passing label=""). Screen readers otherwise announce an
+   *  unnamed checkbox. */
+  ariaLabel?: string;
 }
 
 export default function ToggleSwitch({
@@ -14,6 +18,7 @@ export default function ToggleSwitch({
   checked,
   onChange,
   disabled,
+  ariaLabel,
 }: ToggleSwitchProps) {
   const id = useId();
 
@@ -27,6 +32,7 @@ export default function ToggleSwitch({
           checked={checked}
           onChange={onChange}
           disabled={disabled}
+          aria-label={ariaLabel}
         />
         <span className="lever" />
       </label>
