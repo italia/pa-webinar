@@ -8,6 +8,7 @@ import EventTitle from '@/components/events/event-title';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { getSettings } from '@/lib/settings';
+import { isEventOpenForRegistration } from '@/lib/events/visibility';
 
 interface RegistrationPageProps {
   params: Promise<{ slug: string }>;
@@ -28,7 +29,7 @@ export default async function RegistrationPage({
     },
   });
 
-  if (!event || !['PUBLISHED', 'LIVE'].includes(event.status)) {
+  if (!event || !isEventOpenForRegistration(event)) {
     notFound();
   }
 

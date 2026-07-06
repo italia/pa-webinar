@@ -25,7 +25,7 @@ import {
   RateLimitError,
   ValidationError,
 } from '@/lib/errors';
-import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
+import { extractModeratorToken, resolveGrantForEvent } from '@/lib/auth/moderator';
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { publishChat } from '@/lib/chat/pubsub';
 import { chatMessagesTotal } from '@/lib/metrics';
@@ -81,29 +81,21 @@ async function authenticateSender(
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
 
   if (token) {
-    // Primary moderator? SOLO il token primario: usare isEventModerator qui
-    // farebbe corto-circuitare anche i co-moderatori su questo branch,
-    // attribuendo i loro messaggi al nome/senderId del primario (il bug
-    // "tutti Moderatore" che il branch co-moderatore sotto esiste per evitare).
-    if (constantTimeEqual(event.moderatorToken, token)) {
+    // Primario condiviso / co-moderatore / speaker: risoluzione unica in
+    // resolveGrantForEvent (nome già decifrato). Ognuno chatta col PROPRIO
+    // nome, ma solo role=MODERATOR ottiene il badge moderatore: uno SPEAKER
+    // è un relatore, non staff — coerente con isEventModerator/
+    // verifyModeratorToken che escludono gli SPEAKER dalla moderazione.
+    const grant = await resolveGrantForEvent(event, token);
+    if (grant) {
+      const isGrantModerator = grant.role === 'MODERATOR';
       return {
         eventId: event.id,
-        senderId: `mod-${event.id}-primary`,
-        senderName: event.moderatorName ?? 'Moderatore',
-        isModerator: true,
-      };
-    }
-    // Co-moderator?
-    const coMod = await prisma.eventModerator.findUnique({
-      where: { token },
-      select: { id: true, name: true, eventId: true, revokedAt: true },
-    });
-    if (coMod && coMod.eventId === event.id && coMod.revokedAt === null) {
-      return {
-        eventId: event.id,
-        senderId: `mod-${event.id}-${coMod.id}`,
-        senderName: tryDecryptPII(coMod.name) ?? coMod.name,
-        isModerator: true,
+        senderId: grant.isPrimaryShared
+          ? `mod-${event.id}-primary`
+          : `${isGrantModerator ? 'mod' : 'spk'}-${event.id}-${grant.grantId}`,
+        senderName: grant.displayName ?? 'Moderatore',
+        isModerator: isGrantModerator,
       };
     }
     // Registered participant via accessToken?

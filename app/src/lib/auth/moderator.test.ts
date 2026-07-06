@@ -5,6 +5,7 @@ import {
   isEventModerator,
   isEventModeratorCached,
   invalidateModeratorCache,
+  resolveGrantForEvent,
   verifyModeratorToken,
 } from './moderator';
 
@@ -180,5 +181,81 @@ describe('verifyModeratorToken (delega a isEventModerator)', () => {
       role: 'SPEAKER',
     } as never);
     expect(await verifyModeratorToken('evt-slug', 'speaker-token')).toBeNull();
+  });
+});
+
+describe('resolveGrantForEvent (risoluzione unica token→identità)', () => {
+  const event = {
+    id: 'evt-g',
+    moderatorToken: 'PRIMARY-TOKEN',
+    moderatorName: 'Organizzatore',
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('primario condiviso: role MODERATOR, isPrimaryShared, nessun grantId', async () => {
+    const { prisma } = await import('@/lib/db');
+    expect(await resolveGrantForEvent(event, 'PRIMARY-TOKEN')).toEqual({
+      role: 'MODERATOR',
+      displayName: 'Organizzatore',
+      isPrimaryShared: true,
+      grantId: null,
+    });
+    expect(prisma.eventModerator.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('co-moderatore: role MODERATOR con grantId e nome proprio', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      id: 'grant-1',
+      eventId: 'evt-g',
+      revokedAt: null,
+      role: 'MODERATOR',
+      name: 'Paolo',
+    } as never);
+    expect(await resolveGrantForEvent(event, 'comod-token')).toMatchObject({
+      role: 'MODERATOR',
+      displayName: 'Paolo',
+      isPrimaryShared: false,
+      grantId: 'grant-1',
+    });
+  });
+
+  it('speaker: role SPEAKER (il chiamante decide i privilegi)', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      id: 'grant-2',
+      eventId: 'evt-g',
+      revokedAt: null,
+      role: 'SPEAKER',
+      name: 'Relatrice',
+    } as never);
+    expect(await resolveGrantForEvent(event, 'speaker-token')).toMatchObject({
+      role: 'SPEAKER',
+      isPrimaryShared: false,
+      grantId: 'grant-2',
+    });
+  });
+
+  it('revocato o di altro evento: null', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      id: 'grant-3',
+      eventId: 'evt-g',
+      revokedAt: new Date('2026-07-06'),
+      role: 'MODERATOR',
+      name: 'Ex',
+    } as never);
+    expect(await resolveGrantForEvent(event, 'revocato')).toBeNull();
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      id: 'grant-4',
+      eventId: 'ALTRO',
+      revokedAt: null,
+      role: 'MODERATOR',
+      name: 'Altrui',
+    } as never);
+    expect(await resolveGrantForEvent(event, 'altrui')).toBeNull();
   });
 });
