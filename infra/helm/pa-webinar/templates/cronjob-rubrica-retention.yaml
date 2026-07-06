@@ -13,10 +13,10 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
-      # GC dei Job terminati (successo E fallimento): senza TTL un Job fallito
-      # resta visibile per giorni (failedJobsHistoryLimit) e tiene acceso
-      # KubeJobFailed molto oltre il problema reale.
-      ttlSecondsAfterFinished: {{ .Values.cronjobs.jobTtlSeconds | default 7200 }}
+      # GC dei Job terminati. TTL LUNGO (72h): questo cron gira raramente, con
+      # un TTL corto un fallimento notturno sparirebbe (Job+log+alert) prima
+      # dell'orario lavorativo e un guasto persistente resterebbe invisibile.
+      ttlSecondsAfterFinished: {{ .Values.cronjobs.dailyJobTtlSeconds | default 259200 }}
       backoffLimit: 2
       activeDeadlineSeconds: 120
       template:
