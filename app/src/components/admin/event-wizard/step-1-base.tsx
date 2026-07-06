@@ -201,10 +201,19 @@ export default function Step1Base({
               </div>
             ))}
 
-          {/* Per-event kicker override — always shown so the admin can
-              toggle pipe-splitting on or off for this event. The initial
-              checked state mirrors the resolved value (override ??
-              site default); flipping it stores an explicit true/false. */}
+          {/* Advanced per-event overrides, collapsed by default so title +
+              description stay the visual anchors. Each inherits the site
+              default when left untouched. */}
+          <details className="mt-3 mb-2">
+            <summary
+              className="fw-semibold"
+              style={{ cursor: 'pointer', color: 'var(--app-text)' }}
+            >
+              {t('advancedOptions')}
+            </summary>
+            <div className="mt-3 ps-1">
+          {/* Per-event kicker override: flipping it stores an explicit
+              true/false; unchanged inherits the site default. */}
           <div className="form-check mt-2">
             <input
               id="ev-parse-title-kicker"
@@ -227,7 +236,7 @@ export default function Step1Base({
               when "Predefinita del sito" is selected). */}
           <div className="mt-3">
             <label className="form-label mb-1" htmlFor="ev-waiting-room-engine">
-              Sala d&apos;attesa (questo evento)
+              {t('waitingRoomEngineLabel')}
             </label>
             <select
               id="ev-waiting-room-engine"
@@ -243,13 +252,13 @@ export default function Step1Base({
                 })
               }
             >
-              <option value="">Predefinita del sito</option>
-              <option value="GARDEN">Giardino (normale)</option>
-              <option value="GAME">Videogame (lobby Phaser)</option>
-              <option value="CLASSIC">Classica (statica)</option>
+              <option value="">{t('waitingRoomEngineSiteDefault')}</option>
+              <option value="GARDEN">{t('waitingRoomEngineGarden')}</option>
+              <option value="GAME">{t('waitingRoomEngineGame')}</option>
+              <option value="CLASSIC">{t('waitingRoomEngineClassic')}</option>
             </select>
             <small className="form-text text-muted d-block">
-              Sovrascrive il default del sito per questo evento.
+              {t('waitingRoomEngineHelp')}
             </small>
           </div>
 
@@ -291,6 +300,8 @@ export default function Step1Base({
               {t('videoQualityHelp')}
             </small>
           </div>
+            </div>
+          </details>
         </div>
 
         <div className="mb-3">
@@ -471,17 +482,24 @@ export default function Step1Base({
       </section>
 
       {/* Recurrence */}
-      <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+      {/* Recurrence collapsed by default — most single events won't touch it.
+          Kept open when a recurrence is already configured (edit case). */}
+      <details className="mb-4" open={value.recurrencePreset !== 'none'}>
+        <summary
+          className="h6 fw-semibold mb-2"
+          style={{ cursor: 'pointer', color: 'var(--app-text)' }}
+        >
           {t('recurrenceHeading')}
-        </h3>
-        <RecurrencePicker
-          value={recurrenceValue}
-          onChange={onRecurrenceChange}
-          dtstart={dtstart}
-          timezone={value.timezone}
-        />
-      </section>
+        </summary>
+        <div className="mt-2">
+          <RecurrencePicker
+            value={recurrenceValue}
+            onChange={onRecurrenceChange}
+            dtstart={dtstart}
+            timezone={value.timezone}
+          />
+        </div>
+      </details>
 
       {/* Tags */}
       {availableTags.length > 0 && (
