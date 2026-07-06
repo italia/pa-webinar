@@ -521,6 +521,7 @@ function TemplateForm({
             <span style={{ fontSize: '0.85rem' }}>{label}</span>
             <ToggleSwitch
               label=""
+              ariaLabel={label}
               checked={form[key] as boolean}
               onChange={() =>
                 setField(key, !form[key as keyof EditingTemplate])

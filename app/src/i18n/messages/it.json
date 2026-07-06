@@ -506,12 +506,22 @@
         "maxParticipantsHelp": "Stima il numero massimo di partecipanti. Determina la capacità del server video e la UI di sala d'attesa.",
         "validation": {
           "startsAt": "Data di inizio non valida.",
-          "endsAt": "La data di fine deve essere successiva alla data di inizio."
+          "endsAt": "La data di fine deve essere successiva alla data di inizio.",
+          "titleRequired": "Il titolo è obbligatorio (almeno 3 caratteri).",
+          "titleRequiredOtherLocale": "Il titolo nella lingua predefinita ({locale}) è obbligatorio: passa alla scheda {locale}.",
+          "maxParticipants": "Inserisci un numero tra 2 e 500."
         },
         "senderRatioLabel": "Percentuale attiva stimata",
         "senderRatioHelp": "Quanti partecipanti si aspettano di avere microfono/video attivo. Aiuta a dimensionare il server video.",
         "activeParticipantsEstimate": "≈ {count} partecipanti attivi",
         "senderRatioPreset": "{pct}%",
+        "advancedOptions": "Opzioni avanzate",
+        "waitingRoomEngineLabel": "Sala d'attesa (questo evento)",
+        "waitingRoomEngineSiteDefault": "Predefinita del sito",
+        "waitingRoomEngineGarden": "Giardino (normale)",
+        "waitingRoomEngineGame": "Videogame (lobby Phaser)",
+        "waitingRoomEngineClassic": "Classica (statica)",
+        "waitingRoomEngineHelp": "Sovrascrive il default del sito per questo evento.",
         "videoQuality": "Qualità video/audio (questo evento)",
         "videoQualityHelp": "Sovrascrive il default del sito per questo evento. Qualità più alta consuma più banda.",
         "videoQualitySiteDefault": "Predefinita del sito",
@@ -557,7 +567,8 @@
             "desc": "Avviare/fermare la registrazione."
           }
         },
-        "recordingHeading": "Registrazione"
+        "recordingHeading": "Registrazione",
+        "roomFeaturesHeading": "Funzioni della stanza"
       },
       "step3": {
         "heading": "Persone e inviti",
@@ -569,7 +580,7 @@
         "organizerWebsite": "Sito web",
         "organizerRequired": "Referente e organizzazione sono obbligatori.",
         "moderatorsHeading": "Moderatori",
-        "moderatorsHelp": "I moderatori possono gestire la sessione e controllare i permessi durante l'evento.",
+        "moderatorsHelp": "Co-moderatori aggiuntivi: ognuno riceve un proprio link per gestire la sessione e i permessi durante l'evento. Il moderatore principale (contatto obbligatorio) si imposta nell'ultimo step, «Riepilogo».",
         "moderatorName": "Nome",
         "moderatorEmail": "Email",
         "moderatorRequired": "Nome ed email sono obbligatori.",
@@ -663,8 +674,9 @@
         "gdprTemplate": "Template informativa",
         "gdprTemplateNone": "— Usa testo personalizzato —",
         "privacyText": "Informativa privacy (testo)",
-        "moderatorHeading": "Contatto moderatore",
+        "moderatorHeading": "Moderatore principale",
         "moderatorPublishHint": "Nome ed email sono obbligatori per pubblicare l'evento (servono per il link moderatore e l'email di conferma). Per salvare come bozza non sono richiesti.",
+        "moderatorLinkNote": "Questa persona è il moderatore principale dell'evento: riceverà via email un link privato per gestirlo (avviare la registrazione, moderare le domande, lanciare sondaggi…). È diverso dai co-moderatori aggiunti nello step «Persone», che ricevono ciascuno il proprio link.",
         "moderatorRequired": "Inserisci il nome del moderatore",
         "moderatorEmailRequired": "Inserisci un'email valida del moderatore",
         "moderatorName": "Nome",
@@ -675,7 +687,18 @@
         "privacyDocHelp": "Carica un PDF o incolla l'URL di un'informativa sostitutiva. Sovrascrive il template GDPR se presente.",
         "privacyTextHelp": "Testo sintetico mostrato nel form di registrazione; può integrare o sostituire il template GDPR."
       },
-      "validationFailed": "Controlla i campi evidenziati prima di procedere."
+      "validationFailed": "Controlla i campi evidenziati prima di procedere.",
+      "partialFailure": "Evento creato, ma alcuni elementi non sono stati salvati: {items}. Puoi aggiungerli dalla pagina dell'evento.",
+      "draftFound": "Abbiamo trovato una bozza non salvata di questo evento. Vuoi ripristinarla?",
+      "draftRestore": "Ripristina bozza",
+      "draftDiscard": "Ignora",
+      "resources": {
+        "organizers": "organizzatori",
+        "invitations": "inviti",
+        "moderators": "moderatori",
+        "speakers": "relatori",
+        "materials": "materiali"
+      }
     },
     "nav": {
       "events": "Eventi",
@@ -1106,6 +1129,8 @@
       "aiTargetLocalesRequired": "Indica almeno una lingua di traduzione, oppure disattiva la traduzione automatica.",
       "aiDubbingEnabled": "Doppiaggio audio",
       "aiDubbingEnabledDesc": "Audio doppiato nelle lingue target, generato con voci sintetiche pre-addestrate. Non clona la voce dei partecipanti.",
+      "consentBadge": "Consenso esplicito",
+      "retentionBadge": "Estende la retention",
       "multitrackRecordingEnabled": "Registrazione per-partecipante (alta precisione)",
       "multitrackRecordingEnabledDesc": "Registra una traccia audio separata per ogni partecipante, così la trascrizione attribuisce con certezza chi dice cosa (niente più \"Parlante 1/2\"). Tratta l'audio isolato del singolo parlante (dato personale sensibile): le tracce sono temporanee e cancellate subito dopo la trascrizione. Richiede il consenso alla registrazione.",
       "retainParticipantTracks": "Conserva le tracce per-partecipante",
