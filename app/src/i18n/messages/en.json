@@ -270,6 +270,7 @@
     "liveFeaturesLabel": "Features:",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Polls",
+    "sidebarTabWordcloud": "Word cloud",
     "sidebarTabAgenda": "Agenda",
     "sidebarTabMaterials": "Materials",
     "sidebarTabParticipants": "Participants",
@@ -326,6 +327,7 @@
     },
     "closeDrawer": "Close",
     "hintBanner": {
+      "ariaLabel": "Tips",
       "controls": "Controls are at the bottom",
       "raiseHand": "Raise your hand to speak",
       "sidebar": "Q&A and chat in the side panel",

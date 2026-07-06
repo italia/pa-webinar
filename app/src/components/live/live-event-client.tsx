@@ -33,6 +33,7 @@ import PostEventFeedbackModal from '@/components/live/post-event-feedback-modal'
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
+import WordCloud from '@/components/live/word-cloud';
 import WaitingRoom, {
   type WaitingRoomJoinPrefs,
   type WaitingRoomWarmup,
@@ -1072,6 +1073,7 @@ export default function LiveEventClient({
           participantsCanUnmute={event.participantsCanUnmute}
           participantsCanStartVideo={event.participantsCanStartVideo}
           localDisplayName={credentials?.displayName ?? chosenName ?? ''}
+          isPrimaryModerator={isPrimaryModerator}
         />
       )}
 
@@ -1110,6 +1112,9 @@ export default function LiveEventClient({
               <div
                 className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
                 style={{ zIndex: 10, background: 'rgba(15, 27, 45, 0.95)' }}
+                role="status"
+                aria-live="polite"
+                aria-busy="true"
               >
                 <Spinner active double className="mb-3" />
                 <h2 className="h5 text-white fw-semibold mb-2">{t('roomPreparing')}</h2>
@@ -1234,7 +1239,7 @@ export default function LiveEventClient({
 
 // ── Sidebar with tabs ──
 
-type SidebarTab = 'qa' | 'chat' | 'polls' | 'agenda' | 'materials' | 'participants';
+type SidebarTab = 'qa' | 'chat' | 'polls' | 'wordcloud' | 'agenda' | 'materials' | 'participants';
 
 interface LiveSidebarProps {
   eventSlug: string;
@@ -1437,6 +1442,31 @@ function LiveSidebar({
       show: !isInstantCall,
     },
     {
+      key: 'wordcloud',
+      label: t('sidebarTabWordcloud'),
+      // Inline SVG (not design-react-kit <Icon>) per the project hydration
+      // rule for components rendered in the live chrome.
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M4 7h10" />
+          <path d="M4 12h16" />
+          <path d="M4 17h7" />
+        </svg>
+      ),
+      show: !isInstantCall,
+    },
+    {
       key: 'agenda',
       label: t('sidebarTabAgenda'),
       svg: (
@@ -1507,6 +1537,16 @@ function LiveSidebar({
   ];
 
   const visibleTabs = tabs.filter((tab) => tab.show);
+
+  // If the moderator turns off the active tab's feature mid-event (e.g.
+  // disables Q&A), that tab drops out of visibleTabs — without this the drawer
+  // header/body would render blank. Fall back to the first still-visible tab.
+  const visibleTabKeys = visibleTabs.map((tab) => tab.key);
+  const firstVisibleKey = visibleTabKeys[0];
+  const activeTabIsVisible = visibleTabKeys.includes(activeTab);
+  useEffect(() => {
+    if (firstVisibleKey && !activeTabIsVisible) setActiveTab(firstVisibleKey);
+  }, [firstVisibleKey, activeTabIsVisible]);
 
   const handleTabClick = useCallback(
     (key: SidebarTab) => {
@@ -1692,6 +1732,9 @@ function LiveSidebar({
           )}
           {activeTab === 'polls' && (
             <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
+          )}
+          {activeTab === 'wordcloud' && (
+            <WordCloud eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
           {activeTab === 'agenda' && effAgenda && (
             <AgendaPanel
@@ -1990,7 +2033,7 @@ function FirstEntryHintBanner() {
         fontSize: '0.85rem',
       }}
       role="note"
-      aria-label="tips"
+      aria-label={t('ariaLabel')}
     >
       <span className="d-inline-flex align-items-center gap-2">
         <span aria-hidden="true">🎤</span>

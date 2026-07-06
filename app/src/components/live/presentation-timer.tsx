@@ -176,8 +176,10 @@ export default function PresentationTimer({ eventSlug, token, isModerator }: Pre
                 type="button"
                 className={`btn btn-sm ${timer.visible ? 'btn-outline-primary' : 'btn-outline-secondary'}`}
                 style={{ fontSize: '0.7rem', padding: '2px 6px' }}
-                onClick={() => sendAction(timer.paused ? 'pause' : 'start', undefined, !timer.visible)}
+                onClick={() => sendAction('visibility', undefined, !timer.visible)}
                 title={t('showToAll')}
+                aria-label={t('showToAll')}
+                aria-pressed={timer.visible}
               >
                 <Icon icon={timer.visible ? 'it-eye' : 'it-password-invisible'} size="xs" />
               </button>

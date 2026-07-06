@@ -102,6 +102,12 @@ export const POST = withErrorHandling(async (request, context) => {
       };
       break;
     }
+    case 'visibility': {
+      // No-op on the countdown itself: the show-to-all flag is applied by the
+      // block below, preserving remaining/startedAt so a running timer keeps
+      // ticking instead of restarting.
+      break;
+    }
   }
 
   if (visible !== undefined && state) {
