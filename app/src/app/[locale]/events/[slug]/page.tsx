@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
-import { eventAccessCookieName } from '@/lib/event-session';
+import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
@@ -88,8 +88,14 @@ export default async function EventDetailPage({
   // Cookie d'accesso firmato per-evento (posato alla registrazione): guida la
   // visibilità del link "Entra nella sala" — su evento non-LIVE senza cookie
   // il link porterebbe solo al rimbalzo /live → registrazione → 409.
+  // Firma VERIFICATA (stesso check di /live), non semplice presenza: un cookie
+  // manomesso o firmato con un APP_SECRET ruotato non deve far apparire un
+  // link che poi rimbalza.
   const cookieStore = await cookies();
-  const hasRoomAccess = !!cookieStore.get(eventAccessCookieName(event.id))?.value;
+  const hasRoomAccess = !!(await verifyEventAccess(
+    event.id,
+    cookieStore.get(eventAccessCookieName(event.id))?.value,
+  ));
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const description = getLocalized(event.description as LocalizedField, locale);

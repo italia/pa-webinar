@@ -688,13 +688,16 @@ export default function EventDetailClient({
                     </Link>
                   )}
 
-                  {canRegister && (isLive || hasRoomAccess) && (
+                  {canRegister && (isLive || (hasRoomAccess && !invalidToken)) && (
                     // Via d'ingresso per chi si è già registrato: /live lo
                     // re-identifica dal cookie firmato (o lo fa entrare come
                     // ospite se LIVE), evitando il loop registrazione → 409.
                     // Su evento non ancora LIVE il link appare SOLO se il device
-                    // ha il cookie: senza, /live rimbalzerebbe alla registrazione
-                    // — esattamente il dead-end che questo link vuole evitare.
+                    // ha il cookie firmato valido: senza, /live rimbalzerebbe alla
+                    // registrazione — esattamente il dead-end che questo link vuole
+                    // evitare. Con invalidToken (cookie valido ma registrazione
+                    // rimossa) /live ci ha appena rimbalzato qui: rimostrare il
+                    // link accanto all'alert creerebbe un ping-pong infinito.
                     <p
                       className="text-center mt-3 mb-0"
                       style={{ fontSize: '0.85rem' }}

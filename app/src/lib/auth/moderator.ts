@@ -4,7 +4,7 @@ import { EventModeratorRole } from '@prisma/client';
 
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { getCached, setCache } from '@/lib/cache';
+import { getCached, setCache, deleteCache } from '@/lib/cache';
 
 export type GrantRole = EventModeratorRole;
 
@@ -108,8 +108,23 @@ export async function isEventModerator(
 }
 
 /** TTL breve: un grant/revoca co-moderatore diventa effettivo sugli endpoint
- *  di polling entro questo intervallo. */
+ *  di polling entro questo intervallo. La revoca invalida comunque la chiave
+ *  subito via invalidateModeratorCache (sul pod locale). */
 const MODERATOR_CACHE_TTL_MS = 5_000;
+
+function moderatorCacheKey(eventId: string, token: string): string {
+  // Hash del token, mai il token in chiaro come chiave.
+  return `comod:${eventId}:${createHash('sha256').update(token).digest('base64url')}`;
+}
+
+/**
+ * Da chiamare alla revoca di un co-moderatore: butta l'esito cacheato per quel
+ * token così le GET di polling smettono di accettarlo immediatamente invece
+ * che entro il TTL. Best-effort in multi-replica (cache per-pod).
+ */
+export function invalidateModeratorCache(eventId: string, token: string): void {
+  deleteCache(moderatorCacheKey(eventId, token));
+}
 
 /**
  * Variante di `isEventModerator` con cache TTL per le GET di polling
@@ -126,7 +141,7 @@ export async function isEventModeratorCached(
 ): Promise<boolean> {
   if (!token) return false;
   if (constantTimeEqual(event.moderatorToken, token)) return true;
-  const key = `comod:${event.id}:${createHash('sha256').update(token).digest('base64url')}`;
+  const key = moderatorCacheKey(event.id, token);
   const cached = getCached<boolean>(key);
   if (cached !== null) return cached;
   const result = await isEventModerator(event, token);

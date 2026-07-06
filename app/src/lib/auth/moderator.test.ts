@@ -4,6 +4,7 @@ import {
   constantTimeEqual,
   isEventModerator,
   isEventModeratorCached,
+  invalidateModeratorCache,
   verifyModeratorToken,
 } from './moderator';
 
@@ -135,6 +136,25 @@ describe('isEventModeratorCached', () => {
     expect(await isEventModeratorCached(event, 'comod-y')).toBe(true);
     expect(await isEventModeratorCached(event, 'comod-y')).toBe(true);
     expect(prisma.eventModerator.findUnique).toHaveBeenCalledTimes(1);
+  });
+
+  it('invalidateModeratorCache rende la revoca immediata (niente attesa TTL)', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      eventId: 'evt-cache-4',
+      revokedAt: null,
+      role: 'MODERATOR',
+    } as never);
+    const event = { id: 'evt-cache-4', moderatorToken: 'PRIMARY' };
+    expect(await isEventModeratorCached(event, 'comod-z')).toBe(true);
+    // Revoca: il DB ora dice revocato e l'endpoint invalida la chiave.
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      eventId: 'evt-cache-4',
+      revokedAt: new Date('2026-07-06'),
+      role: 'MODERATOR',
+    } as never);
+    invalidateModeratorCache('evt-cache-4', 'comod-z');
+    expect(await isEventModeratorCached(event, 'comod-z')).toBe(false);
   });
 });
 

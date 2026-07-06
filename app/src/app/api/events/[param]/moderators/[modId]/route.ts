@@ -11,7 +11,11 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, UnauthorizedError } from '@/lib/errors';
-import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
+import {
+  constantTimeEqual,
+  extractModeratorToken,
+  invalidateModeratorCache,
+} from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +49,11 @@ export const DELETE = withErrorHandling(async (request, context) => {
     where: { id: modId },
     data: { revokedAt: mod.revokedAt ?? new Date() },
   });
+
+  // Le GET di polling (Q&A/sondaggi) cacheano l'esito moderatore per 5s:
+  // senza questa invalidazione il token revocato resterebbe accettato lì
+  // fino alla scadenza del TTL.
+  invalidateModeratorCache(event.id, mod.token);
 
   return Response.json({ revoked: true, id: updated.id });
 });

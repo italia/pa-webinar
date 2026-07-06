@@ -119,10 +119,12 @@ interface WaitingRoomProps {
   onEnterLive: (chosenName: string, prefs: WaitingRoomJoinPrefs) => void;
   onStartEvent?: () => Promise<void>;
   onLeaveFeedback?: () => void;
-  /** True se il consenso multitrack NON va richiesto qui: moderatori/speaker
-   *  (pilotano la registrazione) e partecipanti registrati che hanno già
-   *  prestato il consenso al momento della registrazione. Evita il doppio
-   *  consenso e riabilita il minigioco. */
+  /** True se il consenso multitrack NON va richiesto qui: il moderatore
+   *  (configura e controlla la registrazione) e i partecipanti registrati che
+   *  hanno già prestato il consenso alla registrazione. Gli SPEAKER non sono
+   *  esenti: non controllano la registrazione e la loro traccia isolata è il
+   *  dato che il gate protegge. Evita il doppio consenso e riabilita il
+   *  minigioco. */
   multitrackConsentExempt?: boolean;
 }
 
