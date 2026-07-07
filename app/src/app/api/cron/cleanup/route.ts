@@ -1,6 +1,8 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { assertCronApiKey } from '@/lib/auth/cron';
+import { deleteRecordingBlob } from '@/lib/storage/recordings';
+import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,11 +33,12 @@ export const GET = withErrorHandling(async (request) => {
 
   for (const evt of tempRecordingEvents) {
     try {
-      // TODO: Delete from Azure Blob Storage when SDK available
+      // Delete the blob first (network I/O — kept OUTSIDE the transaction).
+      // deleteRecordingBlob is best-effort: it no-ops + warns when storage
+      // isn't configured (dev) or the URL can't be parsed, and returns false
+      // rather than throwing, so a storage hiccup never blocks the DB cleanup.
       if (evt.tempRecordingUrl) {
-        console.warn(
-          `[cron/cleanup] Temp recording for event ${evt.id} should be deleted from storage: ${evt.tempRecordingUrl}`
-        );
+        await deleteRecordingBlob(evt.tempRecordingUrl).catch(() => false);
       }
       await prisma.$transaction([
         prisma.event.update({
@@ -87,10 +90,10 @@ export const GET = withErrorHandling(async (request) => {
     if (expiresAt >= now) continue;
 
     try {
-      // TODO: Delete from Azure Blob Storage when SDK available
-      console.warn(
-        `[cron/cleanup] Published recording for event ${evt.id} expired, should be deleted from storage: ${evt.recordingUrl}`
-      );
+      // Delete the expired blob (best-effort, outside the transaction).
+      if (evt.recordingUrl) {
+        await deleteRecordingBlob(evt.recordingUrl).catch(() => false);
+      }
       await prisma.$transaction([
         prisma.event.update({
           where: { id: evt.id },
@@ -152,8 +155,19 @@ export const GET = withErrorHandling(async (request) => {
   let totalPollsDeleted = 0;
   let eventsProcessed = 0;
 
+  let totalRecordingBlobsDeleted = 0;
+  let totalMaterialBlobsDeleted = 0;
+
   for (const evt of toClean) {
     try {
+      // Capture FILE material blob keys BEFORE the transaction deletes the rows,
+      // so we can remove the underlying blobs afterwards (network I/O must stay
+      // out of the transaction — see the recording deletes below).
+      const fileMaterialBlobs = await prisma.eventMaterial.findMany({
+        where: { eventId: evt.id, type: 'FILE', blobPath: { not: null } },
+        select: { blobPath: true },
+      });
+
       const result = await prisma.$transaction(async (tx) => {
         const upvotesDeleted = await tx.questionUpvote.deleteMany({
           where: { question: { eventId: evt.id } },
@@ -229,6 +243,29 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // Per-participant audio track rows (ADR-013). `displayName` is encrypted
+        // PII. multitrack-purge already deletes the audio BLOB and stamps
+        // audioPurgedAt but never removes the row, so it lingers. Guard on
+        // audioPurgedAt: rows whose audio is still present (retained tracks not
+        // yet past their own retentionUntil, or a pending ARCHIVE job) are left
+        // for a later run — deleting them now would orphan the blob / break the
+        // archive. The Recording tree itself is untouched.
+        const recordingTracksDeleted = await tx.recordingTrack.deleteMany({
+          where: { recording: { eventId: evt.id }, audioPurgedAt: { not: null } },
+        });
+
+        // CallSession carries PII in dominantSpeakerLog (encrypted display names)
+        // and the participants JSON. We SCRUB rather than delete: a CallSession
+        // deletion cascade-kills the whole Recording tree (RecordingTrack /
+        // PostprodJob / PostprodArtifact / Speaker), which would violate the AI
+        // override retention (Recording.retentionUntil kept as a public record).
+        // Scrubbing the two PII JSON columns removes the PII while preserving
+        // analytics (peakParticipants, duration) and the postprod graph.
+        const callSessionsScrubbed = await tx.callSession.updateMany({
+          where: { eventId: evt.id },
+          data: { dominantSpeakerLog: [], participants: [] },
+        });
+
         if (evt.status !== 'ARCHIVED') {
           await tx.event.update({
             where: { id: evt.id },
@@ -252,6 +289,8 @@ export const GET = withErrorHandling(async (request) => {
           chatMessages: chatMessagesDeleted.count,
           agendaReactions: agendaReactionsDeleted.count,
           agendaItems: agendaItemsDeleted.count,
+          recordingTracks: recordingTracksDeleted.count,
+          callSessionsScrubbed: callSessionsScrubbed.count,
         };
 
         // GDPR audit log — no PII, only counts
@@ -267,11 +306,20 @@ export const GET = withErrorHandling(async (request) => {
         return counts;
       });
 
-      if (evt.recordingUrl || evt.tempRecordingUrl) {
-        console.warn(
-          `[cron/cleanup] Event ${evt.id} has recordings that should be deleted from storage. ` +
-            `recordingUrl: ${evt.recordingUrl ?? 'none'}, tempRecordingUrl: ${evt.tempRecordingUrl ?? 'none'}`
-        );
+      // Blob deletion (network I/O) AFTER the transaction commits — best-effort.
+      for (const url of [evt.recordingUrl, evt.tempRecordingUrl]) {
+        if (url) {
+          const ok = await deleteRecordingBlob(url).catch(() => false);
+          if (ok) totalRecordingBlobsDeleted++;
+        }
+      }
+      if (isAzureConfigured()) {
+        for (const m of fileMaterialBlobs) {
+          if (m.blobPath) {
+            const ok = await deleteBlob(m.blobPath).catch(() => false);
+            if (ok) totalMaterialBlobsDeleted++;
+          }
+        }
       }
 
       console.log(
@@ -302,5 +350,7 @@ export const GET = withErrorHandling(async (request) => {
     registrationsDeleted: totalRegistrationsDeleted,
     questionsDeleted: totalQuestionsDeleted,
     pollsDeleted: totalPollsDeleted,
+    recordingBlobsDeleted: totalRecordingBlobsDeleted,
+    materialBlobsDeleted: totalMaterialBlobsDeleted,
   });
 });
