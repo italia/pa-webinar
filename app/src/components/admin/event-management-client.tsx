@@ -128,6 +128,7 @@ interface EventData {
   recordingUrl: string | null; tempRecordingUrl: string | null; tempRecordingStartedAt: string | null;
   recordingPublished: boolean; recordingPublishedAt: string | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
+  youtubeUrl: string | null; libraryListed: boolean;
   postEventPublic: boolean; postEventPublicUntil: string | null;
   postEventShowQA: boolean; postEventShowMaterials: boolean;
   postEventShowPolls: boolean; postEventShowFeedback: boolean;
@@ -679,6 +680,9 @@ function SettingsTab({ event, editUrl }: { event: EventData; editUrl: string }) 
             id: event.id, moderatorToken: event.moderatorToken,
             postEventPublic: event.postEventPublic,
             postEventPublicUntil: event.postEventPublicUntil,
+            libraryListed: event.libraryListed,
+            hasPlayableRecording:
+              (event.recordingPublished && !!event.recordingUrl) || !!event.youtubeUrl,
             postEventShowQA: event.postEventShowQA,
             postEventShowMaterials: event.postEventShowMaterials,
             postEventShowPolls: event.postEventShowPolls,
@@ -876,6 +880,41 @@ function ContentTab({ event }: { event: EventData }) {
 function PostEventTab({ event, status }: { event: EventData; status: string }) {
   const td = useTranslations('admin.eventDetail');
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
+  // A recording exists (at event level) → the AI pipeline can run on it. Capture
+  // is live-only, so an event with no recording can never be post-processed.
+  const hasRecording = Boolean(event.recordingUrl || event.tempRecordingUrl);
+  const [generatingAi, setGeneratingAi] = useState(false);
+  const [aiGenMsg, setAiGenMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  // One-click "generate AI": flips aiTranscriptEnabled AND enqueues in one shot,
+  // closing the trap where enabling the flag alone never triggers the pipeline.
+  const generateAi = useCallback(async () => {
+    setGeneratingAi(true);
+    setAiGenMsg(null);
+    try {
+      const res = await fetch(`/api/admin/events/${event.id}/generate-ai`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ summary: true }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        enqueued?: number;
+      };
+      if (!res.ok) {
+        setAiGenMsg({ ok: false, text: data.error ?? td('aiGenerateError') });
+      } else {
+        setAiGenMsg({
+          ok: true,
+          text: (data.enqueued ?? 0) > 0 ? td('aiGenerateQueued') : td('aiGenerateAlready'),
+        });
+      }
+    } catch {
+      setAiGenMsg({ ok: false, text: td('aiGenerateError') });
+    } finally {
+      setGeneratingAi(false);
+    }
+  }, [event.id, td]);
 
   return (
     <>
@@ -895,12 +934,41 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
           {td('aiManageDesc')}
         </p>
         {isEnded ? (
-          <Link
-            href={`/admin/postprod?eventId=${event.id}`}
-            className="btn btn-primary d-inline-flex align-items-center gap-2"
-          >
-            <Svg name="video" size={16} /> {td('aiManageCta')}
-          </Link>
+          <div className="d-flex flex-column gap-2">
+            <div className="d-flex flex-wrap gap-2">
+              {hasRecording && (
+                <button
+                  type="button"
+                  className="btn btn-primary d-inline-flex align-items-center gap-2"
+                  onClick={generateAi}
+                  disabled={generatingAi}
+                >
+                  <Svg name="video" size={16} />{' '}
+                  {generatingAi ? td('aiGenerateRunning') : td('aiGenerateCta')}
+                </button>
+              )}
+              <Link
+                href={`/admin/postprod?eventId=${event.id}`}
+                className={`btn d-inline-flex align-items-center gap-2 ${
+                  hasRecording ? 'btn-outline-primary' : 'btn-primary'
+                }`}
+              >
+                {td('aiManageCta')}
+              </Link>
+            </div>
+            {aiGenMsg && (
+              <div
+                className={`alert ${aiGenMsg.ok ? 'alert-success' : 'alert-danger'} mb-0 py-2`}
+                role="status"
+                style={{ fontSize: '0.85rem' }}
+              >
+                {aiGenMsg.text}
+              </div>
+            )}
+            <small style={{ color: C_MUTED, fontSize: '0.8rem' }}>
+              {hasRecording ? td('aiGenerateHelp') : td('aiGenerateNoRecording')}
+            </small>
+          </div>
         ) : (
           <div className="alert alert-info mb-0" role="note" style={{ fontSize: '0.88rem' }}>
             {td('aiManageNotEnded')}

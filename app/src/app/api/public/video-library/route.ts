@@ -35,6 +35,7 @@ export const GET = withErrorHandling(async (request) => {
     PAGE_SIZE_MAX,
   );
 
+  const now = new Date();
   const where: Prisma.EventWhereInput = {
     status: 'ENDED',
     // `libraryListed` is the explicit "show in public library" switch.
@@ -42,9 +43,22 @@ export const GET = withErrorHandling(async (request) => {
     // detail page public for registered attendees while hiding it from
     // the library index (common for internal instant calls).
     libraryListed: true,
-    OR: [
-      { AND: [{ recordingPublished: true }, { recordingUrl: { not: null } }] },
-      { youtubeUrl: { not: null } },
+    // Reconcile with the post-event page visibility gate (publicEventStatusWhere
+    // ENDED branch / isEventPubliclyVisible): a library card links to the detail
+    // page, so an event whose page is hidden (postEventPublic=false) or past its
+    // postEventPublicUntil window must NOT appear here with a link that 404s.
+    // Library membership is thus a subset of page-visible — you can still have a
+    // public page that isn't in the library (libraryListed=false), just not the
+    // reverse. Two OR groups can't sit at one level in Prisma, so combine under AND.
+    postEventPublic: true,
+    AND: [
+      { OR: [{ postEventPublicUntil: null }, { postEventPublicUntil: { gt: now } }] },
+      {
+        OR: [
+          { AND: [{ recordingPublished: true }, { recordingUrl: { not: null } }] },
+          { youtubeUrl: { not: null } },
+        ],
+      },
     ],
   };
 

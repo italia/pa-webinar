@@ -18,6 +18,8 @@ interface PostEventConfigProps {
     moderatorToken: string;
     postEventPublic: boolean;
     postEventPublicUntil: string | null;
+    libraryListed: boolean;
+    hasPlayableRecording: boolean;
     postEventShowQA: boolean;
     postEventShowMaterials: boolean;
     postEventShowPolls: boolean;
@@ -33,6 +35,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
   const t = useTranslations('postEvent');
 
   const [pageVisible, setPageVisible] = useState(event.postEventPublic);
+  const [libraryListed, setLibraryListed] = useState(event.libraryListed);
   const [showQA, setShowQA] = useState(event.postEventShowQA);
   const [showMaterials, setShowMaterials] = useState(event.postEventShowMaterials);
   const [showPolls, setShowPolls] = useState(event.postEventShowPolls);
@@ -112,6 +115,28 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
             </div>
             <small className="text-muted" style={{ fontSize: '0.78rem' }}>
               {t('pageVisibleHelp')}
+            </small>
+          </div>
+
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <span style={{ fontSize: '0.9rem' }}>{t('libraryListed')}</span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={t('libraryListed')}
+                checked={libraryListed}
+                onChange={() =>
+                  handleToggle('libraryListed', !libraryListed, setLibraryListed)
+                }
+              />
+            </div>
+            <small className="text-muted" style={{ fontSize: '0.78rem' }}>
+              {t('libraryListedHelp')}
+              {libraryListed && !event.hasPlayableRecording && (
+                <span className="d-block text-warning mt-1">
+                  {t('libraryListedNoRecording')}
+                </span>
+              )}
             </small>
           </div>
 
