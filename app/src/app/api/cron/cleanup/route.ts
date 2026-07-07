@@ -140,7 +140,6 @@ export const GET = withErrorHandling(async (request) => {
       recordingUrl: true,
       tempRecordingUrl: true,
       recordingPublished: true,
-      libraryListed: true,
       _count: { select: { registrations: true, questions: true, polls: true } },
     },
   });
@@ -314,12 +313,16 @@ export const GET = withErrorHandling(async (request) => {
         const ok = await deleteRecordingBlob(evt.tempRecordingUrl).catch(() => false);
         if (ok) totalRecordingBlobsDeleted++;
       }
-      // recordingUrl: EXEMPT deliberately-published videos. A published /
-      // library-listed recording is a kept public record whose lifetime is
-      // governed by recordingDeleteAfterDays (Phase 2), not the PII retention
-      // window — deleting it here would 404 the still-linked public player and
-      // library card. Only purge the video for un-published leftovers.
-      if (evt.recordingUrl && !evt.recordingPublished && !evt.libraryListed) {
+      // recordingUrl: EXEMPT the PUBLISHED video only. `recordingPublished` is
+      // the single "kept public record" signal — the public page shows
+      // recordingUrl only when recordingPublished, and the library index also
+      // requires it — so its lifetime is governed by recordingDeleteAfterDays
+      // (Phase 2), not the PII retention window. Deleting it here would 404 the
+      // still-linked player/card. Do NOT also exempt on libraryListed: a
+      // library-listed-but-unpublished recording is invisible everywhere, and
+      // since Phase 2 only touches published recordings, exempting it here would
+      // leak its blob forever.
+      if (evt.recordingUrl && !evt.recordingPublished) {
         const ok = await deleteRecordingBlob(evt.recordingUrl).catch(() => false);
         if (ok) totalRecordingBlobsDeleted++;
       }
