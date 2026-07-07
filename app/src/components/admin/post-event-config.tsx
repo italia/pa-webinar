@@ -22,6 +22,7 @@ interface PostEventConfigProps {
     postEventShowMaterials: boolean;
     postEventShowPolls: boolean;
     postEventShowFeedback: boolean;
+    postEventShowRecap: boolean;
     feedbackEnabled: boolean;
     dataRetentionDays: number;
   };
@@ -35,6 +36,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
   const [showMaterials, setShowMaterials] = useState(event.postEventShowMaterials);
   const [showPolls, setShowPolls] = useState(event.postEventShowPolls);
   const [showFeedback, setShowFeedback] = useState(event.postEventShowFeedback);
+  const [showRecap, setShowRecap] = useState(event.postEventShowRecap);
   const [feedbackActive, setFeedbackActive] = useState(event.feedbackEnabled);
   const [visibilityMode, setVisibilityMode] = useState<'always' | 'until'>(
     event.postEventPublicUntil ? 'until' : 'always',
@@ -142,8 +144,19 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
             <span style={{ fontSize: '0.9rem' }}>{t('showFeedback')}</span>
             <ToggleSwitch
               label=""
+              ariaLabel={t('showFeedback')}
               checked={showFeedback}
               onChange={() => handleToggle('postEventShowFeedback', !showFeedback, setShowFeedback)}
+            />
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center">
+            <span style={{ fontSize: '0.9rem' }}>{t('showRecap')}</span>
+            <ToggleSwitch
+              label=""
+              ariaLabel={t('showRecap')}
+              checked={showRecap}
+              onChange={() => handleToggle('postEventShowRecap', !showRecap, setShowRecap)}
             />
           </div>
 

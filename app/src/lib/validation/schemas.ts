@@ -68,6 +68,7 @@ const eventBaseSchema = z.object({
   postEventShowMaterials: z.boolean().default(true),
   postEventShowPolls: z.boolean().default(true),
   postEventShowFeedback: z.boolean().default(true),
+  postEventShowRecap: z.boolean().default(true),
   feedbackEnabled: z.boolean().default(true),
   recordingConsentText: z.string().max(5000).optional(),
 

@@ -6,6 +6,7 @@ import { getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
+import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
@@ -158,8 +159,14 @@ export default async function EventDetailPage({
     count: number;
     distribution: { rating: number; count: number }[];
   } | null = null;
+  let recap: EventRecap | null = null;
 
   if (event.status === 'ENDED') {
+    // Generate + persist the aggregate recap on first view (idempotent). Done
+    // regardless of the display toggle so it survives retention for the future
+    // follow-up email; the page gates DISPLAY on postEventShowRecap below.
+    recap = await ensureEventRecap(event.id);
+
     const [materialsRaw, questionsRaw, pollsRaw, feedbackAgg, feedbackDist] =
       await Promise.all([
         event.postEventShowMaterials
@@ -324,6 +331,7 @@ export default async function EventDetailPage({
     postEventShowMaterials: event.postEventShowMaterials,
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
+    postEventShowRecap: event.postEventShowRecap,
     dataRetentionDays: event.dataRetentionDays,
   };
 
@@ -345,6 +353,7 @@ export default async function EventDetailPage({
         materials={eventMaterials}
         polls={pollsData}
         feedbackSummary={feedbackSummary}
+        recap={recap}
         tags={event.tagLinks.map((l) => ({
           slug: l.tag.slug,
           name: (l.tag.name ?? {}) as Record<string, string>,
