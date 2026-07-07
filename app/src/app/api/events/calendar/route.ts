@@ -1,15 +1,12 @@
-import type { EventStatus } from '@prisma/client';
-
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { resolveLocale, getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getSettings } from '@/lib/settings';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { publicEventStatusWhere } from '@/lib/events/visibility';
 import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
-
-const PUBLIC_STATUSES: EventStatus[] = ['PUBLISHED', 'LIVE'];
 
 export const GET = withErrorHandling(async (request) => {
   const url = new URL(request.url);
@@ -33,10 +30,13 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
+  // Pubblico: stessa regola di visibilità di listing/home/sitemap — un
+  // evento in pre-warm (PROVISIONING/IDLE, ~30' prima dell'inizio) non deve
+  // sparire dal calendario proprio quando i visitatori lo cercano.
   const where = isAdmin
     ? { startsAt: Object.keys(dateFilter).length ? dateFilter : undefined }
     : {
-        status: { in: PUBLIC_STATUSES },
+        ...publicEventStatusWhere({ includeEnded: false }),
         startsAt: Object.keys(dateFilter).length ? dateFilter : undefined,
       };
 

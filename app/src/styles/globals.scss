@@ -270,6 +270,12 @@ html.live-call-immersive body {
   pointer-events: none;
   z-index: 5;
 
+  // Desktop uses the persistent column with its own tab strip, so the
+  // floating pill over the video is not needed there.
+  @media (min-width: 992px) {
+    display: none;
+  }
+
   @media (max-width: 991.98px) {
     position: fixed;
     bottom: 0;
@@ -418,14 +424,16 @@ html.live-call-immersive body {
   transition: transform 240ms ease-out;
 
   @media (min-width: 992px) {
-    top: 0; // call overlays the header (.live-page-bg is fixed inset:0)
-    right: 0;
-    bottom: 0;
-    width: 420px;
-    max-width: 90vw;
+    // Persistent in-flow column (replaces the old right-slide overlay). As a
+    // flex sibling of .live-main the video shrinks to fit and the interaction
+    // panels are ALWAYS visible — the #1 discoverability fix. drawerOpen and
+    // the --open transform are inert here (the drawer model is mobile-only).
+    position: relative;
+    width: 400px;
+    max-width: 42vw;
+    flex: 0 0 400px;
     border-left: 2px solid rgba(0, 102, 204, 0.4);
-    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.25);
-    transform: translateX(100%);
+    transform: none;
   }
 
   @media (max-width: 991.98px) {
@@ -466,6 +474,12 @@ html.live-call-immersive body {
   pointer-events: none;
   transition: background 240ms ease-out, opacity 240ms ease-out;
 
+  // No dimming overlay on desktop: the sidebar is a persistent column, not
+  // a modal drawer, so there is nothing to scrim behind.
+  @media (min-width: 992px) {
+    display: none;
+  }
+
   &--open {
     background: rgba(0, 0, 0, 0.4);
     opacity: 1;
@@ -493,8 +507,8 @@ html.live-call-immersive body {
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -503,6 +517,87 @@ html.live-call-immersive body {
   &:hover {
     background: rgba(255, 255, 255, 0.25);
     color: #fff;
+  }
+}
+
+// Desktop-only tab strip pinned to the top of the persistent sidebar column
+// (the mobile layout keeps its floating bottom strip + drawer header instead).
+.live-sidebar-tabs {
+  display: none;
+  gap: 2px;
+  padding: 6px 6px 0;
+  background: linear-gradient(90deg, #004D99 0%, #0066CC 100%);
+  overflow-x: auto;
+  flex-shrink: 0;
+
+  @media (min-width: 992px) {
+    display: flex;
+  }
+}
+
+.live-sidebar-tab {
+  flex: 1 1 0;
+  min-width: 56px;
+  min-height: 48px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 6px;
+  border: 0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+
+  &--active {
+    background: #fff;
+    color: #0066CC;
+  }
+
+  &__label {
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__badge {
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background: #D9364F;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    border-radius: 8px;
+    line-height: 16px;
+    text-align: center;
+  }
+
+  &__dot {
+    position: absolute;
+    top: 5px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #D9364F;
   }
 }
 

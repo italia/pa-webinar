@@ -44,6 +44,11 @@ model Event {
   // moderatori spuntano durante l'evento. Off di default → quando spenta
   // non mostra nulla; attivabile in creazione o durante l'evento.
   agendaEnabled    Boolean @default(false) @map("agenda_enabled")
+  // Lavagna condivisa (whiteboard Excalidraw nativa di Jitsi): opt-in per
+  // evento, off di default. Il pulsante compare ai moderatori (desktop) solo
+  // se ON E se l'infra whiteboard è abilitata lato Jitsi (config.whiteboard.
+  // enabled, oggi solo su test) → resta nascosto in prod finché non replicata.
+  whiteboardEnabled Boolean @default(false) @map("whiteboard_enabled")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
 
   // When recording is enabled, this skips the "start recording?" moderator
@@ -148,7 +153,23 @@ model Event {
   postEventShowMaterials Boolean   @default(true) @map("post_event_show_materials")
   postEventShowPolls     Boolean   @default(true) @map("post_event_show_polls")
   postEventShowFeedback  Boolean   @default(true) @map("post_event_show_feedback")
+  postEventShowRecap     Boolean   @default(true) @map("post_event_show_recap")
+  postEventShowWordCloud Boolean   @default(true) @map("post_event_show_word_cloud")
   feedbackEnabled        Boolean   @default(true) @map("feedback_enabled")
+
+  // Post-event recap: an anonymized, aggregate snapshot (headcount, top
+  // answered questions, published poll results, top word-cloud words, feedback
+  // average) generated lazily on first view of the concluded page and PERSISTED
+  // here so it survives the retention cleanup that deletes the raw rows.
+  postEventRecap   Json?     @map("post_event_recap")
+  postEventRecapAt DateTime? @map("post_event_recap_at")
+
+  // Post-event follow-up email (opt-in per event). When enabled, the reminders
+  // cron sends a thank-you + recap/feedback email to registrants and a recap
+  // to the moderator once the event has ENDED. `postEventEmailSentAt` guards
+  // against re-sending on subsequent cron runs.
+  postEventEmailEnabled Boolean   @default(false) @map("post_event_email_enabled")
+  postEventEmailSentAt  DateTime? @map("post_event_email_sent_at")
 
   // GDPR recording consent
   recordingConsentText String? @map("recording_consent_text") @db.Text
@@ -927,6 +948,12 @@ model EventTemplate {
   // Pre-attiva la checklist/note live (Event.agendaEnabled) per gli eventi
   // creati da questo template. Modificabile nel wizard (step 2).
   agendaEnabled              Boolean @default(false) @map("agenda_enabled")
+  // Pre-attiva la lavagna condivisa (Event.whiteboardEnabled) per gli eventi
+  // creati da questo template. Modificabile nel wizard (step 2).
+  whiteboardEnabled          Boolean @default(false) @map("whiteboard_enabled")
+  // Motore sala d'attesa pre-popolato nel wizard (Event.waitingRoomEngine).
+  // Nullable: null = usa il default del sito (SiteSetting.waitingRoomEngine).
+  waitingRoomEngine          WaitingRoomEngine? @map("waiting_room_engine")
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")

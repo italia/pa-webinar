@@ -9,7 +9,7 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { updateQuestionStatusSchema } from '@/lib/validation/schemas';
-import { constantTimeEqual } from '@/lib/auth/moderator';
+import { isEventModerator } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +28,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
-  if (!constantTimeEqual(event.moderatorToken, token)) {
+  if (!(await isEventModerator(event, token))) {
     throw new ForbiddenError('Moderator access required');
   }
 

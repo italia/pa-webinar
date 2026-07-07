@@ -34,6 +34,8 @@ interface TemplatePreset {
   recordingEnabled: boolean;
   autoStartRecording: boolean;
   agendaEnabled?: boolean;
+  whiteboardEnabled?: boolean;
+  waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;

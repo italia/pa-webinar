@@ -389,3 +389,132 @@ export function reminderText(
     r.footerNote,
   ].join('\n');
 }
+
+// ── Post-event follow-up emails ──────────────────────────────────────────────
+
+interface PostEventParticipantInput {
+  locale: Locale;
+  eventTitle: string;
+  /** The concluded event page — recap + feedback form live here. */
+  eventPageUrl: string;
+  siteName?: string;
+  organizationFooter?: string;
+}
+
+interface PostEventModeratorInput extends PostEventParticipantInput {
+  /** Plain-text recap summary (see formatRecapSummary). May be empty. */
+  recapSummary: string;
+  /** Public recording URL, when available. */
+  recordingUrl?: string | null;
+}
+
+const postEventCopy: Record<
+  Locale,
+  {
+    participantSubject: (title: string) => string;
+    participantHeading: string;
+    participantIntro: (title: string) => string;
+    participantCta: string;
+    moderatorSubject: (title: string) => string;
+    moderatorHeading: string;
+    moderatorIntro: (title: string) => string;
+    recapLabel: string;
+    moderatorCta: string;
+    recordingCta: string;
+  }
+> = {
+  it: {
+    participantSubject: (t) => `Grazie per aver partecipato: ${t}`,
+    participantHeading: 'Grazie per la partecipazione',
+    participantIntro: (t) =>
+      `Grazie per aver partecipato a "${t}". Sulla pagina dell'evento trovi il riepilogo e puoi lasciare un feedback.`,
+    participantCta: 'Vedi il riepilogo e lascia un feedback',
+    moderatorSubject: (t) => `Evento concluso: ${t}`,
+    moderatorHeading: 'Il tuo evento è concluso',
+    moderatorIntro: (t) => `L'evento "${t}" è concluso. Ecco un riepilogo sintetico.`,
+    recapLabel: 'Riepilogo',
+    moderatorCta: 'Apri la pagina evento',
+    recordingCta: 'Guarda la registrazione',
+  },
+  en: {
+    participantSubject: (t) => `Thanks for attending: ${t}`,
+    participantHeading: 'Thanks for attending',
+    participantIntro: (t) =>
+      `Thanks for attending "${t}". You'll find the recap and a feedback form on the event page.`,
+    participantCta: 'See the recap and leave feedback',
+    moderatorSubject: (t) => `Event concluded: ${t}`,
+    moderatorHeading: 'Your event has ended',
+    moderatorIntro: (t) => `The event "${t}" has ended. Here's a short recap.`,
+    recapLabel: 'Recap',
+    moderatorCta: 'Open the event page',
+    recordingCta: 'Watch the recording',
+  },
+};
+
+export function postEventParticipantEmail(input: PostEventParticipantInput): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const c = postEventCopy[input.locale];
+  const footer = input.organizationFooter || copy[input.locale].footer;
+  const subject = c.participantSubject(input.eventTitle);
+  const body = `
+<p style="margin:0 0 16px;">${escapeHtml(c.participantIntro(input.eventTitle))}</p>
+${ctaButton(c.participantCta, input.eventPageUrl)}`;
+  const html = layout(
+    escapeHtml(c.participantHeading),
+    body,
+    footer,
+    input.locale,
+    input.siteName,
+  );
+  const text = [
+    c.participantHeading,
+    '',
+    c.participantIntro(input.eventTitle),
+    '',
+    `${c.participantCta}: ${input.eventPageUrl}`,
+    '',
+    footer,
+  ].join('\n');
+  return { subject, html, text };
+}
+
+export function postEventModeratorEmail(input: PostEventModeratorInput): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const c = postEventCopy[input.locale];
+  const footer = input.organizationFooter || copy[input.locale].footer;
+  const subject = c.moderatorSubject(input.eventTitle);
+  const recapHtml = input.recapSummary
+    ? `<pre style="margin:0 0 16px;padding:12px 16px;background:#f5f7fb;border:1px solid #dee5ec;border-radius:4px;font-family:inherit;font-size:14px;white-space:pre-wrap;color:#17324d;">${escapeHtml(input.recapSummary)}</pre>`
+    : '';
+  const recordingHtml = input.recordingUrl
+    ? `<p style="margin:16px 0 0;font-size:14px;"><a href="${input.recordingUrl}" style="color:#06c;">${escapeHtml(c.recordingCta)}</a></p>`
+    : '';
+  const body = `
+<p style="margin:0 0 16px;">${escapeHtml(c.moderatorIntro(input.eventTitle))}</p>
+${recapHtml}
+${ctaButton(c.moderatorCta, input.eventPageUrl)}
+${recordingHtml}`;
+  const html = layout(
+    escapeHtml(c.moderatorHeading),
+    body,
+    footer,
+    input.locale,
+    input.siteName,
+  );
+  const textLines = [c.moderatorHeading, '', c.moderatorIntro(input.eventTitle), ''];
+  if (input.recapSummary) {
+    textLines.push(`${c.recapLabel}:`, input.recapSummary, '');
+  }
+  textLines.push(`${c.moderatorCta}: ${input.eventPageUrl}`);
+  if (input.recordingUrl) {
+    textLines.push(`${c.recordingCta}: ${input.recordingUrl}`);
+  }
+  textLines.push('', footer);
+  return { subject, html, text: textLines.join('\n') };
+}

@@ -23,6 +23,8 @@ import { generateEventICal } from '@/lib/ical/generate';
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
+import { WARMUP_STATUSES } from '@/lib/events/visibility';
+import { finalizePostEventEmails } from '@/lib/events/post-event-finalize';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
@@ -48,7 +50,12 @@ export const GET = withErrorHandling(async (request) => {
   const reminders = await prisma.eventReminder.findMany({
     where: {
       event: {
-        status: { in: ['PUBLISHED', 'LIVE'] },
+        // PROVISIONING/IDLE inclusi: lo scaler mette l'evento in pre-warm
+        // PRIMA dell'inizio (anche overnight) — è esattamente la finestra
+        // in cui i reminder T-1h/T-10m devono partire, non essere saltati.
+        // (Il filtro dueReminders sotto richiede startsAt futuro, quindi un
+        // evento incagliato in IDLE dopo la fine non riceve comunque nulla.)
+        status: { in: ['PUBLISHED', 'LIVE', ...WARMUP_STATUSES] },
       },
     },
     include: {
@@ -185,10 +192,20 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
+  // Post-event follow-up emails (opt-in). Same cadence as reminders, so no
+  // dedicated CronJob is needed; the helper is idempotent (claims each event
+  // before sending).
+  const postEvent = await finalizePostEventEmails({
+    now,
+    baseUrl,
+    siteName: settings.siteName || 'PA Webinar',
+  });
+
   return Response.json({
     ok: true,
     remindersProcessed,
     emailsSent,
     emailsFailed,
+    postEvent,
   });
 });

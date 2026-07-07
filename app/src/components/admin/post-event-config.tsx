@@ -18,10 +18,15 @@ interface PostEventConfigProps {
     moderatorToken: string;
     postEventPublic: boolean;
     postEventPublicUntil: string | null;
+    libraryListed: boolean;
+    hasPlayableRecording: boolean;
     postEventShowQA: boolean;
     postEventShowMaterials: boolean;
     postEventShowPolls: boolean;
     postEventShowFeedback: boolean;
+    postEventShowRecap: boolean;
+    postEventShowWordCloud: boolean;
+    postEventEmailEnabled: boolean;
     feedbackEnabled: boolean;
     dataRetentionDays: number;
   };
@@ -31,10 +36,14 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
   const t = useTranslations('postEvent');
 
   const [pageVisible, setPageVisible] = useState(event.postEventPublic);
+  const [libraryListed, setLibraryListed] = useState(event.libraryListed);
   const [showQA, setShowQA] = useState(event.postEventShowQA);
   const [showMaterials, setShowMaterials] = useState(event.postEventShowMaterials);
   const [showPolls, setShowPolls] = useState(event.postEventShowPolls);
   const [showFeedback, setShowFeedback] = useState(event.postEventShowFeedback);
+  const [showRecap, setShowRecap] = useState(event.postEventShowRecap);
+  const [showWordCloud, setShowWordCloud] = useState(event.postEventShowWordCloud);
+  const [emailEnabled, setEmailEnabled] = useState(event.postEventEmailEnabled);
   const [feedbackActive, setFeedbackActive] = useState(event.feedbackEnabled);
   const [visibilityMode, setVisibilityMode] = useState<'always' | 'until'>(
     event.postEventPublicUntil ? 'until' : 'always',
@@ -96,13 +105,41 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
         </h5>
 
         <div className="d-flex flex-column gap-3">
-          <div className="d-flex justify-content-between align-items-center">
-            <span style={{ fontSize: '0.9rem' }}>{t('pageVisible')}</span>
-            <ToggleSwitch
-              label=""
-              checked={pageVisible}
-              onChange={() => handleToggle('postEventPublic', !pageVisible, setPageVisible)}
-            />
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <span style={{ fontSize: '0.9rem' }}>{t('pageVisible')}</span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={t('pageVisible')}
+                checked={pageVisible}
+                onChange={() => handleToggle('postEventPublic', !pageVisible, setPageVisible)}
+              />
+            </div>
+            <small className="text-muted" style={{ fontSize: '0.78rem' }}>
+              {t('pageVisibleHelp')}
+            </small>
+          </div>
+
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <span style={{ fontSize: '0.9rem' }}>{t('libraryListed')}</span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={t('libraryListed')}
+                checked={libraryListed}
+                onChange={() =>
+                  handleToggle('libraryListed', !libraryListed, setLibraryListed)
+                }
+              />
+            </div>
+            <small className="text-muted" style={{ fontSize: '0.78rem' }}>
+              {t('libraryListedHelp')}
+              {libraryListed && !event.hasPlayableRecording && (
+                <span className="d-block text-warning mt-1">
+                  {t('libraryListedNoRecording')}
+                </span>
+              )}
+            </small>
           </div>
 
           <div className="d-flex justify-content-between align-items-center">
@@ -136,9 +173,49 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
             <span style={{ fontSize: '0.9rem' }}>{t('showFeedback')}</span>
             <ToggleSwitch
               label=""
+              ariaLabel={t('showFeedback')}
               checked={showFeedback}
               onChange={() => handleToggle('postEventShowFeedback', !showFeedback, setShowFeedback)}
             />
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center">
+            <span style={{ fontSize: '0.9rem' }}>{t('showRecap')}</span>
+            <ToggleSwitch
+              label=""
+              ariaLabel={t('showRecap')}
+              checked={showRecap}
+              onChange={() => handleToggle('postEventShowRecap', !showRecap, setShowRecap)}
+            />
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center">
+            <span style={{ fontSize: '0.9rem' }}>{t('showWordCloud')}</span>
+            <ToggleSwitch
+              label=""
+              ariaLabel={t('showWordCloud')}
+              checked={showWordCloud}
+              onChange={() =>
+                handleToggle('postEventShowWordCloud', !showWordCloud, setShowWordCloud)
+              }
+            />
+          </div>
+
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <span style={{ fontSize: '0.9rem' }}>{t('emailEnabled')}</span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={t('emailEnabled')}
+                checked={emailEnabled}
+                onChange={() =>
+                  handleToggle('postEventEmailEnabled', !emailEnabled, setEmailEnabled)
+                }
+              />
+            </div>
+            <small className="text-muted" style={{ fontSize: '0.78rem' }}>
+              {t('emailEnabledHelp')}
+            </small>
           </div>
 
           <div className="d-flex justify-content-between align-items-center">

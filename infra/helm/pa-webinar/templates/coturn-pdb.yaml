@@ -1,0 +1,22 @@
+{{- if .Values.coturnPodDisruptionBudget.enabled }}
+{{- if index .Values "jitsi-meet" "coturn" "enabled" }}
+# PodDisruptionBudget per coturn (media relay TURN/TURNS del subchart jitsi-meet).
+# Il subchart non espone un PDB: lo aggiungiamo qui selezionando i pod coturn per label.
+# Protegge lo SPOF del media plane da disruption volontarie (node drain / eviction API)
+# mentre gli eventi sono in corso. Vedi values.yaml -> coturnPodDisruptionBudget.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-coturn
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: coturn
+spec:
+  minAvailable: {{ .Values.coturnPodDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jitsi-meet
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: coturn
+{{- end }}
+{{- end }}

@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
+import { isEventPubliclyVisible } from '@/lib/events/visibility';
+import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
@@ -14,6 +18,7 @@ export const revalidate = 30;
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ invalidToken?: string }>;
 }
 
 export async function generateMetadata({
@@ -58,8 +63,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function EventDetailPage({ params }: EventDetailPageProps) {
+export default async function EventDetailPage({
+  params,
+  searchParams,
+}: EventDetailPageProps) {
   const { slug } = await params;
+  // Letti lato server (la route è già dynamic per il cookies() del layout):
+  // un useSearchParams() nel client senza <Suspense> è un build breaker
+  // latente il giorno in cui la route torna statica.
+  const invalidToken = (await searchParams)?.invalidToken === '1';
   const locale = await getLocale();
   const settings = await getSettings();
 
@@ -71,9 +83,24 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     },
   });
 
-  if (!event || !['PUBLISHED', 'LIVE', 'ENDED'].includes(event.status)) {
+  // PROVISIONING/IDLE (pre-warm/pausa di un evento schedulato) restano
+  // raggiungibili: chi apre il link pubblico poco prima dell'inizio non
+  // deve trovare un 404. Vedi lib/events/visibility.ts.
+  if (!event || !isEventPubliclyVisible(event)) {
     notFound();
   }
+
+  // Cookie d'accesso firmato per-evento (posato alla registrazione): guida la
+  // visibilità del link "Entra nella sala" — su evento non-LIVE senza cookie
+  // il link porterebbe solo al rimbalzo /live → registrazione → 409.
+  // Firma VERIFICATA (stesso check di /live), non semplice presenza: un cookie
+  // manomesso o firmato con un APP_SECRET ruotato non deve far apparire un
+  // link che poi rimbalza.
+  const cookieStore = await cookies();
+  const hasRoomAccess = !!(await verifyEventAccess(
+    event.id,
+    cookieStore.get(eventAccessCookieName(event.id))?.value,
+  ));
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const description = getLocalized(event.description as LocalizedField, locale);
@@ -132,8 +159,14 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     count: number;
     distribution: { rating: number; count: number }[];
   } | null = null;
+  let recap: EventRecap | null = null;
 
   if (event.status === 'ENDED') {
+    // Generate + persist the aggregate recap on first view (idempotent). Done
+    // regardless of the display toggle so it survives retention for the future
+    // follow-up email; the page gates DISPLAY on postEventShowRecap below.
+    recap = await ensureEventRecap(event.id);
+
     const [materialsRaw, questionsRaw, pollsRaw, feedbackAgg, feedbackDist] =
       await Promise.all([
         event.postEventShowMaterials
@@ -298,6 +331,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     postEventShowMaterials: event.postEventShowMaterials,
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
+    postEventShowRecap: event.postEventShowRecap,
+    postEventShowWordCloud: event.postEventShowWordCloud,
     dataRetentionDays: event.dataRetentionDays,
   };
 
@@ -312,11 +347,14 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       <EventDetailClient
         event={serialised}
         locale={locale}
+        invalidToken={invalidToken}
+        hasRoomAccess={hasRoomAccess}
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}
         polls={pollsData}
         feedbackSummary={feedbackSummary}
+        recap={recap}
         tags={event.tagLinks.map((l) => ({
           slug: l.tag.slug,
           name: (l.tag.name ?? {}) as Record<string, string>,

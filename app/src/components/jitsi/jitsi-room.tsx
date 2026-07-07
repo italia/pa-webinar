@@ -38,6 +38,11 @@ interface JitsiRoomProps {
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
   enableFileSharing?: boolean;
+  /** Per-event opt-in (Event.whiteboardEnabled): when true, moderators get the
+   *  native Jitsi/Excalidraw whiteboard button (desktop only). Jitsi still
+   *  feature-gates it on config.whiteboard.enabled (server-side, test only),
+   *  so it stays hidden on prod even for opted-in events. */
+  whiteboardEnabled?: boolean;
   /** Video/audio quality preset (admin SiteSetting, per-event override).
    *  Drives resolution, bitrate caps, channelLastN and Opus settings, and is
    *  also enforced at runtime via setVideoQuality. Defaults to HIGH. */
@@ -51,6 +56,11 @@ interface JitsiRoomProps {
   watermark?: WatermarkSettings;
   onReady?: () => void;
   onLeft?: () => void;
+  /** Fired on Jitsi's `readyToClose` — an INTENTIONAL hangup (native toolbar
+   *  button, executeCommand('hangup'), or "Termina evento"), never a transient
+   *  drop. The parent uses it as the authoritative "the user left" signal so
+   *  the native hangup doesn't get mistaken for a network blip and reconnected. */
+  onReadyToClose?: () => void;
   onParticipantCountChanged?: (count: number) => void;
   onRecordingStatusChanged?: (isRecording: boolean) => void;
   onApiReady?: (api: JitsiAPI) => void;
@@ -79,12 +89,14 @@ export default function JitsiRoom({
   participantsCanStartVideo = true,
   participantsCanShareScreen = true,
   enableFileSharing = false,
+  whiteboardEnabled = false,
   videoQuality,
   startWithVideoMuted = false,
   startWithAudioMuted = false,
   watermark,
   onReady,
   onLeft,
+  onReadyToClose,
   onParticipantCountChanged,
   onRecordingStatusChanged,
   onApiReady,
@@ -98,12 +110,14 @@ export default function JitsiRoom({
 
   const onReadyRef = useRef(onReady);
   const onLeftRef = useRef(onLeft);
+  const onReadyToCloseRef = useRef(onReadyToClose);
   const onParticipantCountChangedRef = useRef(onParticipantCountChanged);
   const onRecordingStatusChangedRef = useRef(onRecordingStatusChanged);
   const onApiReadyRef = useRef(onApiReady);
 
   useEffect(() => { onReadyRef.current = onReady; }, [onReady]);
   useEffect(() => { onLeftRef.current = onLeft; }, [onLeft]);
+  useEffect(() => { onReadyToCloseRef.current = onReadyToClose; }, [onReadyToClose]);
   useEffect(() => { onParticipantCountChangedRef.current = onParticipantCountChanged; }, [onParticipantCountChanged]);
   useEffect(() => { onRecordingStatusChangedRef.current = onRecordingStatusChanged; }, [onRecordingStatusChanged]);
   useEffect(() => { onApiReadyRef.current = onApiReady; }, [onApiReady]);
@@ -138,6 +152,19 @@ export default function JitsiRoom({
 
     const extraConfig: Record<string, unknown> = {};
 
+    // paFaceFx PoC opt-in via `?facefx=1` on the app URL. It rides into the
+    // Jitsi configOverwrite → the IFrame API serializes it into the iframe
+    // URL hash, which the injected custom-config.js reads to enable the WebGL
+    // face/lighting filter. This is the only opt-in that works on mobile
+    // (the localStorage path lives on the Jitsi origin, unreachable there).
+    // NB: the filter needs Insertable Streams → Chromium only (no iOS Safari).
+    try {
+      const facefx = new URLSearchParams(window.location.search).get('facefx');
+      if (facefx === '1' || facefx === 'true') extraConfig.paFaceFx = true;
+    } catch {
+      /* SSR / no window → skip */
+    }
+
     // Video/audio quality preset (admin-configurable). Spread first so the
     // per-role/per-permission keys below can still win on any overlap; these
     // keys (resolution, constraints, videoQuality, channelLastN, audioQuality…)
@@ -153,6 +180,13 @@ export default function JitsiRoom({
         ...jitsiConfigOverwrite.remoteVideoMenu,
         disableKick: false,
       };
+      // Native whiteboard: per-event opt-in + moderator + desktop only. Jitsi
+      // additionally feature-gates the button on config.whiteboard.enabled
+      // (set server-side, test only), so it stays hidden on prod even when an
+      // event opted in — no client-side check for the server infra needed.
+      if (whiteboardEnabled && !isMobileRef.current) {
+        toolbarButtons.push('whiteboard');
+      }
     }
 
     // Honor the user's pre-join DeviceCheck choice. The base
@@ -272,14 +306,19 @@ export default function JitsiRoom({
         apiRef.current = api;
         onApiReadyRef.current?.(api);
 
+        // Accessible name for the video call iframe (WCAG 4.1.2): without a
+        // title the core of the page is announced generically ("iframe").
+        const frameTitle = t('videoCallFrameTitle');
         const iframeEl = containerRef.current?.querySelector('iframe');
         if (iframeEl) {
           iframeEl.setAttribute('allow', IFRAME_ALLOW);
+          iframeEl.setAttribute('title', frameTitle);
         } else {
           const observer = new MutationObserver((_mutations, obs) => {
             const frame = containerRef.current?.querySelector('iframe');
             if (frame) {
               frame.setAttribute('allow', IFRAME_ALLOW);
+              frame.setAttribute('title', frameTitle);
               obs.disconnect();
               observerRef.current = null;
             }
@@ -362,6 +401,17 @@ export default function JitsiRoom({
           }
           flushSpeakerBuffer(true);
           onLeftRef.current?.();
+        });
+
+        // `readyToClose` fires ONLY after an intentional hangup (native
+        // toolbar button, executeCommand('hangup'), moderator "Termina
+        // evento") — never on a transient drop. It's the reliable signal
+        // that the user meant to leave, so the parent can close cleanly
+        // instead of treating the preceding videoConferenceLeft as a blip
+        // and reconnecting. May arrive shortly AFTER videoConferenceLeft.
+        api.addListener('readyToClose', () => {
+          if (disposedRef.current) return;
+          onReadyToCloseRef.current?.();
         });
 
         // ADR-013 Fase 0 — cattura la timeline del dominant speaker. A ogni
@@ -458,7 +508,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, videoQuality, startWithVideoMuted, startWithAudioMuted]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, videoQuality, startWithVideoMuted, startWithAudioMuted]);
 
   return (
     <div className="jitsi-wrapper position-relative">

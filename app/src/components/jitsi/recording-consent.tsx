@@ -60,7 +60,6 @@ export function RecordingBanner({ visible }: RecordingBannerProps) {
 
   return (
     <Alert color="warning" className="mb-0 rounded-0 text-center py-2">
-      <Icon icon="it-video" size="sm" className="me-2" />
       <strong>{t('recordingActive')}</strong>
     </Alert>
   );

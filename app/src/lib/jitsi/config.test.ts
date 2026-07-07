@@ -24,14 +24,25 @@ describe('Jitsi config exports', () => {
     expect(baseToolbarButtons).not.toContain('hangup');
   });
 
-  it('moderatorToolbarButtons includes hangup', () => {
-    expect(moderatorToolbarButtons).toContain('hangup');
+  it('moderatorToolbarButtons excludes native hangup (exit via app prompt)', () => {
+    // Jitsi's own hangup bypasses our exit handler and loops the network-
+    // resilience path; every role now leaves via the app "Esci dalla sala"
+    // button (moderators get an "Esci solo tu / Termina per tutti" prompt).
+    expect(moderatorToolbarButtons).not.toContain('hangup');
   });
 
   it('moderatorToolbarButtons is a superset of baseToolbarButtons', () => {
     for (const btn of baseToolbarButtons) {
       expect(moderatorToolbarButtons).toContain(btn);
     }
+  });
+
+  it('moderatorToolbarButtons does NOT statically include whiteboard (per-event opt-in)', () => {
+    // The whiteboard is opt-in per event (Event.whiteboardEnabled): JitsiRoom
+    // appends 'whiteboard' for moderators on desktop only when the event
+    // enabled it. Jitsi additionally feature-gates it on config.whiteboard.
+    // enabled (server-side, test only), so it stays hidden on prod regardless.
+    expect(moderatorToolbarButtons).not.toContain('whiteboard');
   });
 
   it('baseToolbarButtons excludes chat (handled by custom ChatPanel)', () => {
@@ -83,11 +94,11 @@ describe('Jitsi config exports', () => {
     expect(mobileBaseToolbarButtons).not.toContain('hangup');
   });
 
-  it('mobileModeratorToolbarButtons extends mobile base with hangup and participants-pane', () => {
+  it('mobileModeratorToolbarButtons extends mobile base with participants-pane, no hangup', () => {
     for (const btn of mobileBaseToolbarButtons) {
       expect(mobileModeratorToolbarButtons).toContain(btn);
     }
-    expect(mobileModeratorToolbarButtons).toContain('hangup');
+    expect(mobileModeratorToolbarButtons).not.toContain('hangup');
     expect(mobileModeratorToolbarButtons).toContain('participants-pane');
   });
 });
@@ -188,8 +199,8 @@ describe('Instant call config', () => {
     expect(instantCallToolbarButtons).not.toContain('hangup');
   });
 
-  it('instantCallModeratorToolbarButtons includes hangup', () => {
-    expect(instantCallModeratorToolbarButtons).toContain('hangup');
+  it('instantCallModeratorToolbarButtons excludes native hangup (exit via app prompt)', () => {
+    expect(instantCallModeratorToolbarButtons).not.toContain('hangup');
   });
 
   it('instantCallModeratorToolbarButtons is superset of instantCallToolbarButtons', () => {
@@ -291,6 +302,18 @@ describe('Video quality presets', () => {
       save.audioQuality.opusMaxAverageBitrate,
     );
     expect(save.stereo).toBe(false);
+  });
+
+  it('unlocks screenshare framerate above the 5fps Jitsi default, scaling with the preset', () => {
+    const fps = (q: string) =>
+      resolveVideoQualityConfig(q).desktopSharingFrameRate as { min: number; max: number };
+    for (const q of VIDEO_QUALITY_PRESETS) {
+      expect(fps(q).min).toBeGreaterThanOrEqual(5);
+      expect(fps(q).max).toBeGreaterThan(5); // il default {min:5,max:5} rende inguardabili demo/video
+      expect(fps(q).max).toBeGreaterThanOrEqual(fps(q).min);
+    }
+    expect(fps('SAVE_DATA').max).toBeLessThan(fps('HIGH').max);
+    expect(fps('MAX').max).toBeGreaterThanOrEqual(fps('HIGH').max);
   });
 
   it('returns a fresh object each call (no shared mutable state)', () => {

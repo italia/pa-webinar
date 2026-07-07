@@ -443,9 +443,35 @@ podDisruptionBudget:
   # (e.g. node drain, rolling update)
   minAvailable: 1
 
+# PDB per coturn (subchart jitsi-meet, che non ne fornisce uno).
+# coturn e' l'INTERO media path in relay-only e la lifeline TURNS/443 corporate.
+# Con replicaCount=1, minAvailable=1 impedisce a un node drain volontario di eliminare
+# l'unico relay a evento in corso (il drain viene bloccato finche' non c'e' un rimpiazzo).
+# Per avere ANCHE la drenabilita' senza interruzioni, portare coturn a 2 repliche
+# (funziona dietro singolo LB: l'hash 5-tuple di Azure tiene ogni client sullo stesso pod).
+coturnPodDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
 # ── CronJobs ─────────────────────────────────────────────────
 
 cronjobs:
+  # GC dei Job terminati (ttlSecondsAfterFinished, successo E fallimento).
+  # Senza TTL un Job fallito resta visibile per giorni (failedJobsHistoryLimit
+  # conta solo i fallimenti successivi) e tiene acceso l'alert KubeJobFailed
+  # molto oltre il problema reale.
+  # - jobTtlSeconds (2h): cron FREQUENTI (≤15min) — un guasto persistente
+  #   produce comunque sempre un Job fallito recente, quindi l'alert resta su.
+  # - dailyJobTtlSeconds (72h): cron RARI (giornalieri / ogni 6h) — con un TTL
+  #   corto un fallimento notturno sparirebbe (Job+log+alert) prima dell'orario
+  #   lavorativo e un guasto persistente resterebbe invisibile; 72h copre
+  #   anche il weekend.
+  # postprod-worker e recorder hanno il PROPRIO knob
+  # (postprod.worker.ttlSecondsAfterFinished / recorder.ttlSecondsAfterFinished,
+  # default 600s), invariato.
+  jobTtlSeconds: 7200
+  dailyJobTtlSeconds: 259200
+
   # Email reminders for upcoming events (runs every 15 minutes)
   reminders:
     enabled: true
