@@ -42,6 +42,43 @@ export interface EventRecap {
   feedback: { average: number | null; count: number };
 }
 
+/**
+ * A short plain-text summary of the recap for the moderator follow-up email.
+ * Locale labels are inlined so this stays a pure, server/edge-safe function
+ * (no next-intl dependency). Omits empty sections.
+ */
+export function formatRecapSummary(recap: EventRecap, locale: 'it' | 'en'): string {
+  const L =
+    locale === 'it'
+      ? {
+          participants: 'Partecipanti (picco)',
+          registered: 'Registrati',
+          questions: 'Domande risposte',
+          polls: 'Sondaggi',
+          feedback: 'Media feedback',
+          responses: 'risposte',
+        }
+      : {
+          participants: 'Participants (peak)',
+          registered: 'Registered',
+          questions: 'Answered questions',
+          polls: 'Polls',
+          feedback: 'Average rating',
+          responses: 'responses',
+        };
+  const lines: string[] = [];
+  if (recap.headcount > 0) lines.push(`${L.participants}: ${recap.headcount}`);
+  if (recap.registrations > 0) lines.push(`${L.registered}: ${recap.registrations}`);
+  if (recap.topQuestions.length > 0) lines.push(`${L.questions}: ${recap.topQuestions.length}`);
+  if (recap.polls.length > 0) lines.push(`${L.polls}: ${recap.polls.length}`);
+  if (recap.feedback.average != null && recap.feedback.count > 0) {
+    lines.push(
+      `${L.feedback}: ${recap.feedback.average.toFixed(1)}/5 (${recap.feedback.count} ${L.responses})`,
+    );
+  }
+  return lines.join('\n');
+}
+
 /** True when the recap has no content worth showing (empty event). */
 export function isRecapEmpty(recap: EventRecap): boolean {
   return (

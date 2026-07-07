@@ -3213,6 +3213,8 @@
     "showPolls": "Mostra risultati sondaggi",
     "showFeedback": "Mostra feedback",
     "showRecap": "Mostra riepilogo evento",
+    "emailEnabled": "Invia email di riepilogo a fine evento",
+    "emailEnabledHelp": "Alla conclusione, invia ai partecipanti registrati un'email di ringraziamento con il link al riepilogo e al feedback, e al moderatore un riepilogo sintetico. Parte una sola volta.",
     "feedbackEnabled": "Survey feedback attiva a fine evento",
     "visibilityAlways": "Sempre visibile",
     "visibilityUntil": "Visibile fino a:",

@@ -24,6 +24,7 @@ import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format'
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
 import { WARMUP_STATUSES } from '@/lib/events/visibility';
+import { finalizePostEventEmails } from '@/lib/events/post-event-finalize';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
@@ -191,10 +192,20 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
+  // Post-event follow-up emails (opt-in). Same cadence as reminders, so no
+  // dedicated CronJob is needed; the helper is idempotent (claims each event
+  // before sending).
+  const postEvent = await finalizePostEventEmails({
+    now,
+    baseUrl,
+    siteName: settings.siteName || 'PA Webinar',
+  });
+
   return Response.json({
     ok: true,
     remindersProcessed,
     emailsSent,
     emailsFailed,
+    postEvent,
   });
 });

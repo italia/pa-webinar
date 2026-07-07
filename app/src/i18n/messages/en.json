@@ -3213,6 +3213,8 @@
     "showPolls": "Show poll results",
     "showFeedback": "Show feedback",
     "showRecap": "Show event recap",
+    "emailEnabled": "Send recap email when the event ends",
+    "emailEnabledHelp": "On conclusion, sends registered participants a thank-you email with links to the recap and feedback, and the moderator a short recap. Sent only once.",
     "feedbackEnabled": "Feedback survey active at event end",
     "visibilityAlways": "Always visible",
     "visibilityUntil": "Visible until:",
