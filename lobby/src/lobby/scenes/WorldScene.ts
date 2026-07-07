@@ -334,6 +334,20 @@ export class WorldScene extends Phaser.Scene {
     if (inside !== this.inGateZone) {
       this.inGateZone = inside;
       this.ctx.bus.emit('gateZone', inside);
+      // Embed: the host shell suppresses the in-game device panel, so reaching
+      // the OPEN gate IS the enter action ("cammina fino al cancello → entra").
+      // Fire the same joinRequest the panel would; the host's onEnterLive is
+      // validated (name/consent) and owns the real device choice, so the muted
+      // defaults here are only a placeholder. The standard host "Entra" button
+      // stays available alongside this. Full-screen (dev harness) keeps the
+      // explicit device-panel flow instead.
+      //
+      // Gate strictly on LIVE (not gate.canEnter(), which also opens early for
+      // hosts): the host shell's standard "Entra ora" only appears once LIVE,
+      // so a moderator must never be auto-entered pre-LIVE by brushing the gate.
+      if (inside && this.ctx.config.embed && this.ctx.schedule.getStatus() === 'live') {
+        this.ctx.bus.emit('joinRequest', { videoMuted: true, audioMuted: true });
+      }
     }
   }
 

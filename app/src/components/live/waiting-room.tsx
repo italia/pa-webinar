@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
@@ -16,6 +16,7 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
 import DeviceCheck from '@/components/live/device-check';
@@ -39,6 +40,28 @@ const GardenInteractive = dynamic(
   () => import('@/components/live/garden/garden-interactive'),
   { ssr: false },
 );
+
+/**
+ * Error boundary around the Phaser lobby. Phaser is a lazy chunk (~1MB) loaded
+ * over PA networks; if the chunk fails to load or the game throws at runtime,
+ * we degrade to the accessible CLASSIC card (via `onError`) instead of leaving
+ * a blank box. Renders nothing while erroring, until the parent swaps engines.
+ */
+class PhaserLobbyBoundary extends Component<
+  { onError: () => void; children: ReactNode },
+  { errored: boolean }
+> {
+  state = { errored: false };
+  static getDerivedStateFromError(): { errored: boolean } {
+    return { errored: true };
+  }
+  componentDidCatch(): void {
+    this.props.onError();
+  }
+  render(): ReactNode {
+    return this.state.errored ? null : this.props.children;
+  }
+}
 
 /**
  * Unified waiting-room / front-door for the live event page.
@@ -240,24 +263,20 @@ export default function WaitingRoom({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      let mode: 'GARDEN' | 'GAME' | 'CLASSIC' = event.waitingRoomEngine ?? 'GARDEN';
-      const urlE = new URLSearchParams(window.location.search).get('engine');
-      // PHONES (coarse pointer AND narrow viewport) default to the
-      // accessible CLASSIC card: the walkable park + joystick don't work
-      // well on small touch screens, and the classic layout shows the real
-      // controls (name, email, device check) inline instead of hiding them
-      // in the arcade drawer. Tablets (coarse pointer but wider than 768px)
-      // keep the rich room — they have the screen real estate for it. An
-      // explicit `?engine=` still wins, so a phone user can opt into the
-      // game and a tablet user can opt into classic.
-      const isPhone =
-        window.matchMedia?.('(pointer: coarse) and (max-width: 768px)')?.matches ??
-        false;
-      if (urlE === 'phaser') mode = 'GAME';
-      else if (urlE === 'svg') mode = 'GARDEN';
-      else if (urlE === 'classic') mode = 'CLASSIC';
-      else if (isPhone) mode = 'CLASSIC';
-      if (window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1') mode = 'CLASSIC';
+      // PHONES (coarse pointer AND narrow viewport) default to the accessible
+      // CLASSIC card: the walkable park + joystick don't work well on small
+      // touch screens, and the classic layout shows the real controls (name,
+      // email, device check) inline instead of hiding them in the arcade
+      // drawer. Tablets (coarse pointer but wider than 768px) keep the rich
+      // room. Precedence + the `?engine=` escape hatch live in the pure helper.
+      const mode = resolveWaitingRoomMode({
+        configured: event.waitingRoomEngine ?? 'GARDEN',
+        urlEngine: new URLSearchParams(window.location.search).get('engine'),
+        isPhone:
+          window.matchMedia?.('(pointer: coarse) and (max-width: 768px)')?.matches ??
+          false,
+        classicPref: window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1',
+      });
       setEngine(mode === 'GAME' ? 'phaser' : 'svg');
       setClassicView(mode === 'CLASSIC');
     } catch {
@@ -418,6 +437,27 @@ export default function WaitingRoom({
     }
     onEnterLive(trimmedName, devicePrefs);
   }, [canEnter, onEnterLive, trimmedName, trimmedEmail, devicePrefs]);
+
+  // Entry triggered from INSIDE the Phaser game (walking the avatar into the
+  // open gate). It funnels through the SAME validated handleEnterLive as the
+  // standard button — never the raw onEnterLive — so name/consent and device
+  // prefs are always honoured. When the form isn't complete yet we guide the
+  // user to it and THROW: the game's join state machine treats a rejected
+  // conference.join as "not joined" and resets, so the avatar is never left
+  // phantom-seated when the host never actually entered. The standard "Entra
+  // ora" button stays available for anyone who doesn't want to play.
+  const handleGameEnter = useCallback(() => {
+    if (canEnter) {
+      handleEnterLive();
+      return;
+    }
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById('waiting-name') as HTMLInputElement | null;
+      el?.focus();
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    throw new Error('waiting-room: pre-join not complete');
+  }, [canEnter, handleEnterLive]);
 
   const handleDeviceStateChange = useCallback(
     (s: WaitingRoomJoinPrefs) => setDevicePrefs(s),
@@ -836,22 +876,27 @@ export default function WaitingRoom({
   const showGameBox = !isEnded && !classicView && !multitrackRequired;
   const gameStageBox =
     engine === 'phaser' ? (
-      // GAME engine: the Phaser lobby, embedded in the box (no full-screen
-      // chrome — the shell owns the name input + the gated "Entra" CTA, and
-      // the embed has no in-game enter button, so onEnterLive never fires
-      // from here; it's kept wired only for symmetry).
-      <div className="wr-stage">
-        <PhaserLobby
-          embed
-          eventSlug={event.slug}
-          displayName={trimmedName}
-          status={event.status}
-          startsAtMs={startsAtMs}
-          isHost={isModerator}
-          onEnterLive={onEnterLive}
-          onExitClassic={() => toggleClassic(true)}
-        />
-      </div>
+      // GAME engine: the Phaser lobby, embedded in the box. Walking the avatar
+      // into the OPEN gate (LIVE) is a real, interactive entry path — it routes
+      // through the shell's VALIDATED handleEnterLive (name/consent + device
+      // prefs), exactly like the standard "Entra ora" button, which stays
+      // available alongside it (legacy/a11y/non-players never need the game).
+      // If a chunk-load fails, the boundary degrades to the accessible classic
+      // card instead of a blank box.
+      <PhaserLobbyBoundary onError={() => toggleClassic(true)}>
+        <div className="wr-stage">
+          <PhaserLobby
+            embed
+            eventSlug={event.slug}
+            displayName={trimmedName}
+            status={event.status}
+            startsAtMs={startsAtMs}
+            isHost={isModerator}
+            onEnterLive={handleGameEnter}
+            onExitClassic={() => toggleClassic(true)}
+          />
+        </div>
+      </PhaserLobbyBoundary>
     ) : (
       // GARDEN engine (default): the SVG walkable garden. Wrapped in
       // `.arcade-stage` (absolute inset:0) so GardenInteractive's
