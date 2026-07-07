@@ -124,6 +124,8 @@ export default async function EventManagePage({
     recordingFileSize: event.recordingFileSize ? Number(event.recordingFileSize) : null,
     recordingDuration: event.recordingDuration,
     recordingDeleteAfterDays: event.recordingDeleteAfterDays,
+    youtubeUrl: event.youtubeUrl,
+    libraryListed: event.libraryListed,
     postEventPublic: event.postEventPublic,
     postEventPublicUntil: event.postEventPublicUntil?.toISOString() ?? null,
     postEventShowQA: event.postEventShowQA,

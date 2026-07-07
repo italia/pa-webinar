@@ -194,6 +194,41 @@ export const PUT = withErrorHandling(async (request, context) => {
 
   const data = parsed.data;
 
+  // Guard against the illusion of post-event configurability. These flags govern
+  // LIVE capture — once an event is ENDED/ARCHIVED nothing can be captured
+  // retroactively, so writing them does nothing but mislead. Strip them from a
+  // pure post-event edit (one that isn't reviving the event via a lifecycle
+  // change) and report them back so the UI can warn. NOTE: AI flags
+  // (aiTranscript/Summary/Translation/Dubbing), recordingPublished and the
+  // postEvent* display toggles are deliberately NOT here — those ARE legitimate
+  // post-event controls (jobs run on the already-stored recording).
+  const CREATION_ONLY_FIELDS = [
+    'recordingEnabled',
+    'autoStartRecording',
+    'whiteboardEnabled',
+    'multitrackRecordingEnabled',
+    'retainParticipantTracks',
+    'waitingRoomEngine',
+    'videoQuality',
+  ] as const;
+  const isTerminalStatus = event.status === 'ENDED' || event.status === 'ARCHIVED';
+  // A lifecycle edit (revive: pushing endsAt/startsAt to the future, or an
+  // explicit status change) legitimately brings the event back to life, so the
+  // capture flags matter again — don't strip in that case.
+  const isLifecycleEdit =
+    data.status !== undefined ||
+    data.endsAt !== undefined ||
+    data.startsAt !== undefined;
+  const ignoredCreationOnlyFields: string[] = [];
+  if (isTerminalStatus && !isLifecycleEdit) {
+    for (const field of CREATION_ONLY_FIELDS) {
+      if (data[field] !== undefined) {
+        ignoredCreationOnlyFields.push(field);
+        delete (data as Record<string, unknown>)[field];
+      }
+    }
+  }
+
   const dateChanged =
     (data.startsAt !== undefined && new Date(data.startsAt).getTime() !== event.startsAt.getTime()) ||
     (data.endsAt !== undefined && new Date(data.endsAt).getTime() !== event.endsAt.getTime());
@@ -401,7 +436,11 @@ export const PUT = withErrorHandling(async (request, context) => {
     details: { fields: Object.keys(data), dateChanged },
   });
 
-  return Response.json({ ...updated, dateChanged });
+  return Response.json({
+    ...updated,
+    dateChanged,
+    ...(ignoredCreationOnlyFields.length > 0 && { ignoredCreationOnlyFields }),
+  });
 });
 
 // ── DELETE /api/events/[id] — Delete event (moderator only) ──
