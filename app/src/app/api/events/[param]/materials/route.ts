@@ -21,7 +21,14 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   const event = await prisma.event.findUnique({
     where: { slug },
-    select: { id: true, status: true, eventType: true, endsAt: true },
+    select: {
+      id: true,
+      status: true,
+      eventType: true,
+      endsAt: true,
+      postEventPublic: true,
+      postEventPublicUntil: true,
+    },
   });
 
   // Stessa regola delle pagine pubbliche (lib/events/visibility): i materiali

@@ -46,6 +46,19 @@ interface EventLike {
   endsAt: Date | string;
 }
 
+/**
+ * Campi che governano la visibilità pubblica DOPO la fine dell'evento.
+ * `postEventPublic` è il toggle admin "pagina post-evento visibile";
+ * `postEventPublicUntil`, se valorizzato, è la scadenza oltre la quale la
+ * pagina non è più pubblica. Sono richiesti solo da isEventPubliclyVisible
+ * (che deve poter negare l'accesso a un ENDED spento/scaduto) — i controlli
+ * di warm-up/registrazione non ne hanno bisogno.
+ */
+interface PostEventVisibilityFields {
+  postEventPublic: boolean;
+  postEventPublicUntil: Date | string | null;
+}
+
 function isWarmupPubliclyVisible(event: EventLike): boolean {
   return (
     (WARMUP_STATUSES as string[]).includes(event.status) &&
@@ -54,8 +67,31 @@ function isWarmupPubliclyVisible(event: EventLike): boolean {
   );
 }
 
+/**
+ * True se la pagina post-evento (ENDED) deve restare pubblica: richiede il
+ * toggle attivo e, se impostata, una scadenza ancora futura. Un evento
+ * concluso con `postEventPublic=false` o finestra scaduta torna 404 (e sparisce
+ * dai listing) — coerente con come `lib/ai/access.ts` gestisce già la finestra
+ * per i download di registrazione/AI.
+ */
+function isEndedPostEventVisible(event: PostEventVisibilityFields): boolean {
+  if (!event.postEventPublic) return false;
+  if (
+    event.postEventPublicUntil != null &&
+    new Date(event.postEventPublicUntil).getTime() <= Date.now()
+  ) {
+    return false;
+  }
+  return true;
+}
+
 /** True se la pagina pubblica dell'evento deve essere raggiungibile. */
-export function isEventPubliclyVisible(event: EventLike): boolean {
+export function isEventPubliclyVisible(
+  event: EventLike & PostEventVisibilityFields,
+): boolean {
+  if (event.status === 'ENDED') {
+    return isEndedPostEventVisible(event);
+  }
   return (
     (ALWAYS_PUBLIC_STATUSES as string[]).includes(event.status) ||
     isWarmupPubliclyVisible(event)
@@ -77,16 +113,26 @@ export function isEventOpenForRegistration(event: EventLike): boolean {
 export function publicEventStatusWhere(opts?: {
   includeEnded?: boolean;
 }): Prisma.EventWhereInput {
-  const base: EventStatus[] =
-    opts?.includeEnded === false ? ['PUBLISHED', 'LIVE'] : ALWAYS_PUBLIC_STATUSES;
-  return {
-    OR: [
-      { status: { in: base } },
-      {
-        status: { in: WARMUP_STATUSES },
-        eventType: { not: 'INSTANT' },
-        endsAt: { gt: new Date() },
-      },
-    ],
-  };
+  const or: Prisma.EventWhereInput[] = [
+    { status: { in: ['PUBLISHED', 'LIVE'] } },
+    {
+      status: { in: WARMUP_STATUSES },
+      eventType: { not: 'INSTANT' },
+      endsAt: { gt: new Date() },
+    },
+  ];
+  // ENDED events are public only while the post-event page is enabled and its
+  // (optional) window hasn't expired — same gate as isEventPubliclyVisible, so
+  // an event hidden on its page also drops out of listings/sitemap/API.
+  if (opts?.includeEnded !== false) {
+    or.push({
+      status: 'ENDED',
+      postEventPublic: true,
+      OR: [
+        { postEventPublicUntil: null },
+        { postEventPublicUntil: { gt: new Date() } },
+      ],
+    });
+  }
+  return { OR: or };
 }
