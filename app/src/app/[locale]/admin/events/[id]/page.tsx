@@ -79,7 +79,7 @@ export default async function EventManagePage({
       organizers: { orderBy: { sortOrder: 'asc' } },
       additionalMods: { orderBy: { createdAt: 'asc' } },
       questionnaires: true,
-      _count: { select: { registrations: true } },
+      _count: { select: { registrations: true, recordings: true } },
     },
   });
 
@@ -126,6 +126,10 @@ export default async function EventManagePage({
     recordingDeleteAfterDays: event.recordingDeleteAfterDays,
     youtubeUrl: event.youtubeUrl,
     libraryListed: event.libraryListed,
+    // A Recording ROW exists (live capture happened) → the AI pipeline can run.
+    // Gated separately from recordingUrl: an externally/manually-set recordingUrl
+    // has no Recording row, so "Generate AI" would 404.
+    hasRecordingRow: event._count.recordings > 0,
     postEventPublic: event.postEventPublic,
     postEventPublicUntil: event.postEventPublicUntil?.toISOString() ?? null,
     postEventShowQA: event.postEventShowQA,

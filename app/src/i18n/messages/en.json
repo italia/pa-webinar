@@ -64,6 +64,7 @@
     "past": "Past events",
     "noUpcoming": "No upcoming events at the moment. Check back soon!",
     "noPast": "No past events",
+    "wordCloudTitle": "Word cloud",
     "card": {
       "publicEvent": "Public event",
       "readMore": "Read more",
@@ -284,7 +285,6 @@
     "recordingPromptLater": "Later",
     "eventEnded": "Event ended",
     "eventEndedMessage": "The event has ended. Thank you for participating.",
-    "wordCloudTitle": "Word cloud",
     "reconnecting": "Reconnecting…",
     "reconnectingMessage": "Your network connection dropped. We're trying to bring you back into the call.",
     "reconnectingAttempt": "Attempt {n} of {total}",

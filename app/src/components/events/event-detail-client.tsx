@@ -306,9 +306,7 @@ export default function EventDetailClient({
         <Alert color="warning" className="mb-4">
           <strong>{t('detail.invalidTokenTitle')}</strong>
           <div className="mt-1">
-            {isEnded
-              ? t('detail.invalidTokenBodyEnded')
-              : t('detail.invalidTokenBody')}
+            {isEnded ? t('detail.invalidTokenBodyEnded') : t('detail.invalidTokenBody')}
           </div>
         </Alert>
       )}
@@ -649,31 +647,39 @@ export default function EventDetailClient({
             recap.topWords.length > 0 && (
               <Card className="shadow-sm border-0 mb-4">
                 <CardBody className="p-4">
-                  <h2 className="h5 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+                  <h2
+                    className="h5 fw-semibold mb-3"
+                    style={{ color: 'var(--app-text)' }}
+                  >
                     {t('wordCloudTitle')}
                   </h2>
                   <div className="d-flex flex-wrap gap-2">
-                    {recap.topWords.map((w, i) => {
+                    {(() => {
                       const maxCount = Math.max(1, ...recap.topWords.map((x) => x.count));
-                      const size = 0.9 + (w.count / maxCount) * 0.8;
-                      return (
-                        <span
-                          key={i}
-                          className="px-2 py-1 rounded bg-white"
-                          style={{
-                            border: '1px solid #dee5ec',
-                            fontSize: `${size}rem`,
-                            color: 'var(--app-primary)',
-                          }}
-                        >
-                          {w.word}
-                          <span className="text-secondary" style={{ fontSize: '0.7rem' }}>
-                            {' '}
-                            ·{w.count}
+                      return recap.topWords.map((w, i) => {
+                        const size = 0.9 + (w.count / maxCount) * 0.8;
+                        return (
+                          <span
+                            key={i}
+                            className="px-2 py-1 rounded bg-white"
+                            style={{
+                              border: '1px solid #dee5ec',
+                              fontSize: `${size}rem`,
+                              color: 'var(--app-primary)',
+                            }}
+                          >
+                            {w.word}
+                            <span
+                              className="text-secondary"
+                              style={{ fontSize: '0.7rem' }}
+                            >
+                              {' '}
+                              ·{w.count}
+                            </span>
                           </span>
-                        </span>
-                      );
-                    })}
+                        );
+                      });
+                    })()}
                   </div>
                 </CardBody>
               </Card>
@@ -766,10 +772,7 @@ export default function EventDetailClient({
                     // evitare. Con invalidToken (cookie valido ma registrazione
                     // rimossa) /live ci ha appena rimbalzato qui: rimostrare il
                     // link accanto all'alert creerebbe un ping-pong infinito.
-                    <p
-                      className="text-center mt-3 mb-0"
-                      style={{ fontSize: '0.85rem' }}
-                    >
+                    <p className="text-center mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
                       <Link
                         href={`/events/${event.slug}/live`}
                         className="text-decoration-none fw-semibold text-primary"

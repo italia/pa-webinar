@@ -78,6 +78,11 @@ interface EventInfo {
   effectiveGraceMinutes?: number;
   tempRecordingUrl?: string | null;
   recordingUrl?: string | null;
+  /** Admin-configured post-event visibility — used to seed the end-of-call
+   *  "Destino evento" default so ending the call never silently overrides a
+   *  pre-configured private (postEventPublic=false) or library setting. */
+  postEventPublic?: boolean;
+  libraryListed?: boolean;
   feedbackEnabled?: boolean;
   timezone?: string;
   /** True quando il master switch AI è attivo e l'evento usa almeno una
@@ -346,7 +351,7 @@ export default function LiveEventClient({
                 startedAt: data.jvb.startedAt ?? null,
                 serverTime: data.serverTime,
               }
-            : null,
+            : null
         );
       } catch {
         /* retry */
@@ -542,7 +547,17 @@ export default function LiveEventClient({
   const [endForAllError, setEndForAllError] = useState('');
   // "Destino evento" — chosen when the moderator ends the event for everyone.
   const [showEndDestino, setShowEndDestino] = useState(false);
-  const [endDestino, setEndDestino] = useState<'public' | 'library' | 'archive'>('public');
+  // Seed from the event's CONFIGURED post-event visibility so the modal's
+  // pre-selected option preserves the admin's intent: confirming without
+  // touching it must never flip a private event public, nor drop it from a
+  // library it was set to appear in.
+  const [endDestino, setEndDestino] = useState<'public' | 'library' | 'archive'>(
+    event.libraryListed
+      ? 'library'
+      : event.postEventPublic === false
+        ? 'archive'
+        : 'public'
+  );
   const [endGenAi, setEndGenAi] = useState(false);
 
   const [showRecPrompt, setShowRecPrompt] = useState(false);
@@ -861,51 +876,56 @@ export default function LiveEventClient({
     return (
       <>
         <WaitingRoom
-        event={{
-          title: event.title,
-          slug: event.slug,
-          parseTitleKicker: event.parseTitleKicker,
-          waitingRoomEngine: event.waitingRoomEngine,
-          startsAt: event.startsAt,
-          endsAt: event.endsAt,
-          status: eventStatus as 'PUBLISHED' | 'LIVE' | 'ENDED' | 'IDLE' | 'PROVISIONING',
-          speakers: event.speakers,
-          organizerName: event.organizerName,
-          moderatorName: event.moderatorName,
-          imageUrl: event.imageUrl,
-          coverImageUrl: event.coverImageUrl,
-          maxParticipants: event.maxParticipants ?? 300,
-          recordingEnabled: event.recordingEnabled,
-          tempRecordingUrl: event.tempRecordingUrl,
-          recordingUrl: event.recordingUrl,
-          waitingRoomAudioUrl: event.waitingRoomAudioUrl,
-          feedbackEnabled: event.feedbackEnabled,
-          chatEnabled: event.chatEnabled,
-          qaEnabled: event.qaEnabled,
-          timezone: event.timezone,
-          aiPostprodEnabled: event.aiPostprodEnabled,
-          aiConsentDisclosure: event.aiConsentDisclosure,
-          multitrackRecordingEnabled: event.multitrackRecordingEnabled,
-        }}
-        participantCount={participantCount}
-        role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
-        jvbReady={jvbReady}
-        warmup={warmup}
-        // Uscita esplicita dalla sala d'attesa: le instant call non hanno una
-        // pagina evento pubblica (404), quindi tornano alla home.
-        exitHref={event.eventType === 'INSTANT' ? '/' : `/events/${event.slug}`}
-        defaultName={chosenName || initialDisplayName}
-        onEnterLive={handleEnterFromWaiting}
-        onStartEvent={isModerator ? handleStartEvent : undefined}
-        onLeaveFeedback={() => setShowFeedback(true)}
-        // Esente dal consenso multitrack in sala d'attesa: chi l'ha già
-        // prestato alla registrazione, o il moderatore (è chi ha configurato
-        // e controlla la registrazione). Gli speaker NO: non controllano la
-        // registrazione e la loro traccia audio isolata è esattamente il dato
-        // (quasi-biometrico, ADR-013) che il gate protegge — devono spuntare
-        // il consenso come ogni altro partecipante.
-        multitrackConsentExempt={isModerator || hasMultitrackConsent}
-      />
+          event={{
+            title: event.title,
+            slug: event.slug,
+            parseTitleKicker: event.parseTitleKicker,
+            waitingRoomEngine: event.waitingRoomEngine,
+            startsAt: event.startsAt,
+            endsAt: event.endsAt,
+            status: eventStatus as
+              | 'PUBLISHED'
+              | 'LIVE'
+              | 'ENDED'
+              | 'IDLE'
+              | 'PROVISIONING',
+            speakers: event.speakers,
+            organizerName: event.organizerName,
+            moderatorName: event.moderatorName,
+            imageUrl: event.imageUrl,
+            coverImageUrl: event.coverImageUrl,
+            maxParticipants: event.maxParticipants ?? 300,
+            recordingEnabled: event.recordingEnabled,
+            tempRecordingUrl: event.tempRecordingUrl,
+            recordingUrl: event.recordingUrl,
+            waitingRoomAudioUrl: event.waitingRoomAudioUrl,
+            feedbackEnabled: event.feedbackEnabled,
+            chatEnabled: event.chatEnabled,
+            qaEnabled: event.qaEnabled,
+            timezone: event.timezone,
+            aiPostprodEnabled: event.aiPostprodEnabled,
+            aiConsentDisclosure: event.aiConsentDisclosure,
+            multitrackRecordingEnabled: event.multitrackRecordingEnabled,
+          }}
+          participantCount={participantCount}
+          role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
+          jvbReady={jvbReady}
+          warmup={warmup}
+          // Uscita esplicita dalla sala d'attesa: le instant call non hanno una
+          // pagina evento pubblica (404), quindi tornano alla home.
+          exitHref={event.eventType === 'INSTANT' ? '/' : `/events/${event.slug}`}
+          defaultName={chosenName || initialDisplayName}
+          onEnterLive={handleEnterFromWaiting}
+          onStartEvent={isModerator ? handleStartEvent : undefined}
+          onLeaveFeedback={() => setShowFeedback(true)}
+          // Esente dal consenso multitrack in sala d'attesa: chi l'ha già
+          // prestato alla registrazione, o il moderatore (è chi ha configurato
+          // e controlla la registrazione). Gli speaker NO: non controllano la
+          // registrazione e la loro traccia audio isolata è esattamente il dato
+          // (quasi-biometrico, ADR-013) che il gate protegge — devono spuntare
+          // il consenso come ogni altro partecipante.
+          multitrackConsentExempt={isModerator || hasMultitrackConsent}
+        />
         {feedbackModal}
       </>
     );
@@ -1121,9 +1141,7 @@ export default function LiveEventClient({
       {/* Screenshare banner — attention cue whenever someone in the
           room starts sharing. Jitsi auto-pins the share but a visible
           banner was requested because users missed the transition. */}
-      {!showJvbOverlay && jitsiApi && (
-        <ScreenshareBanner api={jitsiApi} />
-      )}
+      {!showJvbOverlay && jitsiApi && <ScreenshareBanner api={jitsiApi} />}
 
       <div className="d-flex flex-column flex-lg-row flex-grow-1 live-body">
         <div className="d-flex flex-column flex-grow-1 live-main">
@@ -1345,7 +1363,14 @@ export default function LiveEventClient({
 
 // ── Sidebar with tabs ──
 
-type SidebarTab = 'qa' | 'chat' | 'polls' | 'wordcloud' | 'agenda' | 'materials' | 'participants';
+type SidebarTab =
+  | 'qa'
+  | 'chat'
+  | 'polls'
+  | 'wordcloud'
+  | 'agenda'
+  | 'materials'
+  | 'participants';
 
 interface LiveSidebarProps {
   eventSlug: string;

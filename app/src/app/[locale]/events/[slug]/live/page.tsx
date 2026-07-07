@@ -68,7 +68,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   const jibriAvailable = await isJibriAvailable();
 
   const watermark = {
-    url: settings.jitsiWatermarkUrl || settings.logoUrl || '/images/default-watermark.svg',
+    url:
+      settings.jitsiWatermarkUrl || settings.logoUrl || '/images/default-watermark.svg',
     enabled: settings.jitsiWatermarkEnabled,
     opacity: settings.jitsiWatermarkOpacity,
     position: settings.jitsiWatermarkPosition,
@@ -90,9 +91,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       event.aiTranslationEnabled ||
       event.aiDubbingEnabled);
   const aiConsentDisclosure =
-    ((settings.aiConsentDisclosure as Record<string, string> | null) ?? {})[
-      locale
-    ] ?? null;
+    ((settings.aiConsentDisclosure as Record<string, string> | null) ?? {})[locale] ??
+    null;
 
   const isInstant = event.eventType === 'INSTANT';
 
@@ -109,7 +109,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     const cookieStore = await cookies();
     const cookieToken = await verifyEventAccess(
       event.id,
-      cookieStore.get(eventAccessCookieName(event.id))?.value,
+      cookieStore.get(eventAccessCookieName(event.id))?.value
     );
     if (cookieToken) {
       // Fall through to the participant-resolution path below with this token.
@@ -120,9 +120,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // on the waiting room even while the bridge warms up. SCHEDULED events
       // still require a personal token for any non-LIVE status — via
       // /registration.
-      (isInstant ? ['LIVE', 'IDLE', 'PROVISIONING'] : ['LIVE']).includes(
-        event.status,
-      )
+      (isInstant ? ['LIVE', 'IDLE', 'PROVISIONING'] : ['LIVE']).includes(event.status)
     ) {
       const title = getLocalized(event.title as LocalizedField, locale);
       return (
@@ -138,6 +136,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             endsAt: event.endsAt.toISOString(),
             status: event.status,
             eventType: event.eventType,
+            postEventPublic: event.postEventPublic,
+            libraryListed: event.libraryListed,
             recordingEnabled: isInstant ? false : event.recordingEnabled,
             autoStartRecording: isInstant ? false : event.autoStartRecording,
             qaEnabled: event.qaEnabled,
@@ -194,8 +194,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // la lookup diretta qui mostrava ciphertext base64 nel pre-join).
   const grant = await resolveGrantForEvent(event, token);
   const isPrimaryModerator = !!grant?.isPrimaryShared;
-  const isCoModerator =
-    !!grant && !grant.isPrimaryShared && grant.role === 'MODERATOR';
+  const isCoModerator = !!grant && !grant.isPrimaryShared && grant.role === 'MODERATOR';
   const isSpeaker = !!grant && grant.role === 'SPEAKER';
   const isModerator = isPrimaryModerator || isCoModerator;
 
@@ -242,6 +241,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         endsAt: event.endsAt.toISOString(),
         status: event.status,
         eventType: event.eventType,
+        postEventPublic: event.postEventPublic,
+        libraryListed: event.libraryListed,
         recordingEnabled: event.recordingEnabled,
         autoStartRecording: event.autoStartRecording,
         qaEnabled: event.qaEnabled,
@@ -276,15 +277,15 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       hasMultitrackConsent={hasMultitrackConsent}
       displayName={
         grant && !grant.isPrimaryShared
-          // Named co-moderator or speaker via EventModerator row —
-          // greet them by name in the pre-join input (still editable).
-          ? grant.displayName ?? ''
+          ? // Named co-moderator or speaker via EventModerator row —
+            // greet them by name in the pre-join input (still editable).
+            (grant.displayName ?? '')
           : isPrimaryModerator
-            // Primary moderator magic-link (shared): keep the input
-            // empty so anyone opening the link types their own name
-            // rather than inheriting the configured moderatorName.
-            ? ''
-            : participantInfo?.displayName ?? 'Partecipante'
+            ? // Primary moderator magic-link (shared): keep the input
+              // empty so anyone opening the link types their own name
+              // rather than inheriting the configured moderatorName.
+              ''
+            : (participantInfo?.displayName ?? 'Partecipante')
       }
       locale={locale}
       jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
