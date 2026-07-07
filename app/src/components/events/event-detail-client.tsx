@@ -6,6 +6,7 @@ import { Alert, Button, Badge, Card, CardBody, Icon, Row, Col } from 'design-rea
 
 import { Link } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { REGISTRABLE_STATUSES } from '@/lib/events/visibility';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer, {
   type VideoPlayerHandle,
@@ -13,6 +14,8 @@ import VideoPlayer, {
   type AudioTrack,
 } from '@/components/events/video-player';
 import PostEventTabs from '@/components/events/post-event-tabs';
+import PostEventRecap from '@/components/events/post-event-recap';
+import { isRecapEmpty, type EventRecap } from '@/lib/events/recap';
 import PostEventFeedbackInvite from '@/components/events/post-event-feedback-invite';
 import PostEventHero, {
   type StructuredSummary,
@@ -65,6 +68,8 @@ interface EventData {
   postEventShowMaterials?: boolean;
   postEventShowPolls?: boolean;
   postEventShowFeedback?: boolean;
+  postEventShowRecap?: boolean;
+  postEventShowWordCloud?: boolean;
   dataRetentionDays?: number;
 }
 
@@ -105,7 +110,15 @@ interface EventDetailClientProps {
   materials?: MaterialData[];
   polls?: PollData[];
   feedbackSummary?: FeedbackSummary | null;
+  recap?: EventRecap | null;
   tags?: TagChip[];
+  /** /live ci ha rimbalzato qui per un token personale non più valido. Letto
+   *  dal server (searchParams): useSearchParams() senza <Suspense> è un build
+   *  breaker latente su route statiche. */
+  invalidToken?: boolean;
+  /** Il device ha il cookie d'accesso firmato per questo evento: il link
+   *  "Entra nella sala" può re-identificarlo su /live. */
+  hasRoomAccess?: boolean;
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -134,7 +147,10 @@ export default function EventDetailClient({
   materials = [],
   polls = [],
   feedbackSummary = null,
+  recap = null,
   tags = [],
+  invalidToken = false,
+  hasRoomAccess = false,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tv = useTranslations('video');
@@ -183,10 +199,18 @@ export default function EventDetailClient({
 
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
-  const canRegister = event.status === 'PUBLISHED' || event.status === 'LIVE';
+  // PROVISIONING/IDLE = evento schedulato in pre-warm/pausa: registrazione
+  // aperta come per PUBLISHED. Il server ha già applicato i filtri veri
+  // (eventType/endsAt, vedi lib/events/visibility): qui basta lo stato.
+  const canRegister = (REGISTRABLE_STATUSES as string[]).includes(event.status);
+  // Per il pubblico il warm-up È "in programma": badge e colori non hanno
+  // (né devono avere) varianti PROVISIONING/IDLE in 24 lingue.
+  const publicStatus = ['PROVISIONING', 'IDLE'].includes(event.status)
+    ? 'PUBLISHED'
+    : event.status;
   const isEnded = event.status === 'ENDED';
   const isLive = event.status === 'LIVE';
-  const accentColor = STATUS_COLOR[event.status] ?? STATUS_COLOR.PUBLISHED;
+  const accentColor = STATUS_COLOR[publicStatus] ?? STATUS_COLOR.PUBLISHED;
 
   // Fetch postprod transcript metadata. Skip se l'evento non è ended
   // o non ha recording pubblicata — niente trascrizione da mostrare.
@@ -278,6 +302,15 @@ export default function EventDetailClient({
         </Link>
       </div>
 
+      {invalidToken && (
+        <Alert color="warning" className="mb-4">
+          <strong>{t('detail.invalidTokenTitle')}</strong>
+          <div className="mt-1">
+            {isEnded ? t('detail.invalidTokenBodyEnded') : t('detail.invalidTokenBody')}
+          </div>
+        </Alert>
+      )}
+
       {isEnded && (
         <Alert color="info" className="mb-4">
           {t('detail.eventHeldOn', {
@@ -330,7 +363,7 @@ export default function EventDetailClient({
           }}
         >
           <div className="d-flex align-items-center gap-2 mb-3">
-            <StatusPill status={event.status} />
+            <StatusPill status={publicStatus} />
             {isLive && (
               <Badge
                 color="success"
@@ -591,6 +624,67 @@ export default function EventDetailClient({
           </h2>
           <MarkdownRenderer content={description} className="mb-4" />
 
+          {/* Post-event recap: aggregate summary card above the detail tabs. */}
+          {isEnded &&
+            event.postEventShowRecap !== false &&
+            recap &&
+            !isRecapEmpty(recap) && (
+              <PostEventRecap
+                recap={recap}
+                className="mb-4"
+                // Words move to the standalone section below whenever it's on,
+                // so the recap card must not repeat them.
+                hideWords={event.postEventShowWordCloud !== false}
+              />
+            )}
+
+          {/* Standalone word cloud: surfaces the collective words gated by its
+              own toggle, so it can be shown even when the recap card is off (or
+              hidden while the recap stays on). Reads the persisted recap words. */}
+          {isEnded &&
+            event.postEventShowWordCloud !== false &&
+            recap &&
+            recap.topWords.length > 0 && (
+              <Card className="shadow-sm border-0 mb-4">
+                <CardBody className="p-4">
+                  <h2
+                    className="h5 fw-semibold mb-3"
+                    style={{ color: 'var(--app-text)' }}
+                  >
+                    {t('wordCloudTitle')}
+                  </h2>
+                  <div className="d-flex flex-wrap gap-2">
+                    {(() => {
+                      const maxCount = Math.max(1, ...recap.topWords.map((x) => x.count));
+                      return recap.topWords.map((w, i) => {
+                        const size = 0.9 + (w.count / maxCount) * 0.8;
+                        return (
+                          <span
+                            key={i}
+                            className="px-2 py-1 rounded bg-white"
+                            style={{
+                              border: '1px solid #dee5ec',
+                              fontSize: `${size}rem`,
+                              color: 'var(--app-primary)',
+                            }}
+                          >
+                            {w.word}
+                            <span
+                              className="text-secondary"
+                              style={{ fontSize: '0.7rem' }}
+                            >
+                              {' '}
+                              ·{w.count}
+                            </span>
+                          </span>
+                        );
+                      });
+                    })()}
+                  </div>
+                </CardBody>
+              </Card>
+            )}
+
           {/* Post-event tabbed content */}
           {isEnded && (
             <PostEventTabs
@@ -666,6 +760,26 @@ export default function EventDetailClient({
                         {isLive ? t('detail.registerAndJoin') : t('detail.register')}
                       </Button>
                     </Link>
+                  )}
+
+                  {canRegister && (isLive || (hasRoomAccess && !invalidToken)) && (
+                    // Via d'ingresso per chi si è già registrato: /live lo
+                    // re-identifica dal cookie firmato (o lo fa entrare come
+                    // ospite se LIVE), evitando il loop registrazione → 409.
+                    // Su evento non ancora LIVE il link appare SOLO se il device
+                    // ha il cookie firmato valido: senza, /live rimbalzerebbe alla
+                    // registrazione — esattamente il dead-end che questo link vuole
+                    // evitare. Con invalidToken (cookie valido ma registrazione
+                    // rimossa) /live ci ha appena rimbalzato qui: rimostrare il
+                    // link accanto all'alert creerebbe un ping-pong infinito.
+                    <p className="text-center mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
+                      <Link
+                        href={`/events/${event.slug}/live`}
+                        className="text-decoration-none fw-semibold text-primary"
+                      >
+                        {t('detail.alreadyRegisteredEnter')}
+                      </Link>
+                    </p>
                   )}
 
                   {event.chatEnabled && (

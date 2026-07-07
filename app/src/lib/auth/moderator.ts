@@ -4,6 +4,7 @@ import { EventModeratorRole } from '@prisma/client';
 
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { getCached, setCache, deleteCache } from '@/lib/cache';
 
 export type GrantRole = EventModeratorRole;
 
@@ -78,21 +79,74 @@ export async function verifyModeratorToken(
   const event = await prisma.event.findUnique({ where });
   if (!event) return null;
 
-  if (constantTimeEqual(event.moderatorToken, token)) {
-    return event;
-  }
+  // La regola di accettazione (primario o co-moderatore) vive SOLO in
+  // isEventModerator: due copie di una regola security-sensitive divergono.
+  return (await isEventModerator(event, token)) ? event : null;
+}
 
+/**
+ * True se `token` autorizza la moderazione dell'evento GIÀ FETCHATO: il token
+ * primario dell'owner, oppure un co-moderatore (EventModerator role=MODERATOR)
+ * non revocato dello stesso evento. Variante di `verifyModeratorToken` che
+ * evita il re-fetch quando il chiamante ha già l'evento in mano — usata dalle
+ * route di conduzione live (sondaggi, Q&A, wordcloud, timer, chat, materiali).
+ * Gli SPEAKER NON sono moderatori. Tollerante al token null/undefined.
+ */
+export async function isEventModerator(
+  event: { id: string; moderatorToken: string },
+  token: string | null | undefined,
+): Promise<boolean> {
+  if (!token) return false;
+  if (constantTimeEqual(event.moderatorToken, token)) return true;
   const coMod = await prisma.eventModerator.findUnique({ where: { token } });
-  if (
-    coMod &&
+  return (
+    !!coMod &&
     coMod.eventId === event.id &&
     coMod.revokedAt === null &&
     coMod.role === EventModeratorRole.MODERATOR
-  ) {
-    return event;
-  }
+  );
+}
 
-  return null;
+/** TTL breve: un grant/revoca co-moderatore diventa effettivo sugli endpoint
+ *  di polling entro questo intervallo. La revoca invalida comunque la chiave
+ *  subito via invalidateModeratorCache (sul pod locale). */
+const MODERATOR_CACHE_TTL_MS = 5_000;
+
+function moderatorCacheKey(eventId: string, token: string): string {
+  // Hash del token, mai il token in chiaro come chiave.
+  return `comod:${eventId}:${createHash('sha256').update(token).digest('base64url')}`;
+}
+
+/**
+ * Da chiamare alla revoca di un co-moderatore: butta l'esito cacheato per quel
+ * token così le GET di polling smettono di accettarlo immediatamente invece
+ * che entro il TTL. Best-effort in multi-replica (cache per-pod).
+ */
+export function invalidateModeratorCache(eventId: string, token: string): void {
+  deleteCache(moderatorCacheKey(eventId, token));
+}
+
+/**
+ * Variante di `isEventModerator` con cache TTL per le GET di polling
+ * (Q&A, sondaggi: SWR ~3s per partecipante). Il confronto col token primario
+ * resta in-process (mai cacheato); solo l'esito della lookup co-moderatore —
+ * a miss garantito per ogni token partecipante — viene cacheato, così il
+ * polling non aggiunge una query DB per richiesta proprio dove la cache
+ * delle route esiste per toglierle. La chiave usa l'hash del token, mai il
+ * token in chiaro.
+ */
+export async function isEventModeratorCached(
+  event: { id: string; moderatorToken: string },
+  token: string | null | undefined,
+): Promise<boolean> {
+  if (!token) return false;
+  if (constantTimeEqual(event.moderatorToken, token)) return true;
+  const key = moderatorCacheKey(event.id, token);
+  const cached = getCached<boolean>(key);
+  if (cached !== null) return cached;
+  const result = await isEventModerator(event, token);
+  setCache(key, result, MODERATOR_CACHE_TTL_MS);
+  return result;
 }
 
 /**
@@ -126,22 +180,52 @@ export async function verifyGrantToken(
   const event = await prisma.event.findUnique({ where });
   if (!event) return null;
 
+  const grant = await resolveGrantForEvent(event, token);
+  if (!grant) return null;
+
+  return {
+    event,
+    role: grant.role,
+    displayName: grant.displayName,
+    isPrimaryShared: grant.isPrimaryShared,
+  };
+}
+
+/**
+ * Come `verifyGrantToken`, ma sull'evento GIÀ FETCHATO (evita il re-fetch)
+ * e con in più l'id della riga grant. È l'UNICA implementazione della
+ * risoluzione token→identità (primario condiviso / co-moderatore /
+ * speaker), nome già decifrato: chat e /live non devono re-implementarla.
+ */
+export async function resolveGrantForEvent(
+  event: { id: string; moderatorToken: string; moderatorName?: string | null },
+  token: string,
+): Promise<
+  | {
+      role: GrantRole;
+      displayName: string | null;
+      isPrimaryShared: boolean;
+      /** EventModerator.id per i grant per-riga; null per il primario condiviso. */
+      grantId: string | null;
+    }
+  | null
+> {
   if (constantTimeEqual(event.moderatorToken, token)) {
     return {
-      event,
       role: EventModeratorRole.MODERATOR,
       displayName: event.moderatorName ?? null,
       isPrimaryShared: true,
+      grantId: null,
     };
   }
 
   const grant = await prisma.eventModerator.findUnique({ where: { token } });
   if (grant && grant.eventId === event.id && grant.revokedAt === null) {
     return {
-      event,
       role: grant.role,
       displayName: tryDecryptPII(grant.name) ?? grant.name,
       isPrimaryShared: false,
+      grantId: grant.id,
     };
   }
 

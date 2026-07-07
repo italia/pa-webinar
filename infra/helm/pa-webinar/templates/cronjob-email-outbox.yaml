@@ -16,9 +16,16 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      # GC dei Job terminati (successo E fallimento): senza TTL un Job fallito
+      # resta visibile per giorni (failedJobsHistoryLimit) e tiene acceso
+      # KubeJobFailed molto oltre il problema reale.
+      ttlSecondsAfterFinished: {{ .Values.cronjobs.jobTtlSeconds | default 7200 }}
       backoffLimit: 1
-      # Slightly under the schedule interval so a hung job can't stack up.
-      activeDeadlineSeconds: 55
+      # L'endpoint può legittimamente drenare un batch da 50 email (~50s) e i
+      # retry curl al cold-start consumano fino a ~35s: 55s uccideva il job a
+      # metà drenaggio marcandolo Failed. concurrencyPolicy: Forbid evita
+      # comunque l'accumulo (i tick durante una run lunga vengono saltati).
+      activeDeadlineSeconds: 110
       template:
         metadata:
           labels:
@@ -48,7 +55,7 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  curl -sf \
+                  curl -sf --retry 3 --retry-delay 5 --retry-connrefused --connect-timeout 5 \
                     -H "x-api-key: $(CRON_API_KEY)" \
                     {{ include "pa-webinar.internalUrl" . }}/api/cron/email-outbox
               env:

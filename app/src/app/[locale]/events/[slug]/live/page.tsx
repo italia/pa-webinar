@@ -12,6 +12,8 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
+import { resolveGrantForEvent } from '@/lib/auth/moderator';
+import { isEventPubliclyVisible } from '@/lib/events/visibility';
 
 async function hasJoinGrant(eventId: string): Promise<boolean> {
   const appSecret = process.env.APP_SECRET;
@@ -66,7 +68,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   const jibriAvailable = await isJibriAvailable();
 
   const watermark = {
-    url: settings.jitsiWatermarkUrl || settings.logoUrl || '/images/default-watermark.svg',
+    url:
+      settings.jitsiWatermarkUrl || settings.logoUrl || '/images/default-watermark.svg',
     enabled: settings.jitsiWatermarkEnabled,
     opacity: settings.jitsiWatermarkOpacity,
     position: settings.jitsiWatermarkPosition,
@@ -88,9 +91,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       event.aiTranslationEnabled ||
       event.aiDubbingEnabled);
   const aiConsentDisclosure =
-    ((settings.aiConsentDisclosure as Record<string, string> | null) ?? {})[
-      locale
-    ] ?? null;
+    ((settings.aiConsentDisclosure as Record<string, string> | null) ?? {})[locale] ??
+    null;
 
   const isInstant = event.eventType === 'INSTANT';
 
@@ -107,7 +109,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     const cookieStore = await cookies();
     const cookieToken = await verifyEventAccess(
       event.id,
-      cookieStore.get(eventAccessCookieName(event.id))?.value,
+      cookieStore.get(eventAccessCookieName(event.id))?.value
     );
     if (cookieToken) {
       // Fall through to the participant-resolution path below with this token.
@@ -118,9 +120,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // on the waiting room even while the bridge warms up. SCHEDULED events
       // still require a personal token for any non-LIVE status — via
       // /registration.
-      (isInstant ? ['LIVE', 'IDLE', 'PROVISIONING'] : ['LIVE']).includes(
-        event.status,
-      )
+      (isInstant ? ['LIVE', 'IDLE', 'PROVISIONING'] : ['LIVE']).includes(event.status)
     ) {
       const title = getLocalized(event.title as LocalizedField, locale);
       return (
@@ -136,11 +136,14 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             endsAt: event.endsAt.toISOString(),
             status: event.status,
             eventType: event.eventType,
+            postEventPublic: event.postEventPublic,
+            libraryListed: event.libraryListed,
             recordingEnabled: isInstant ? false : event.recordingEnabled,
             autoStartRecording: isInstant ? false : event.autoStartRecording,
             qaEnabled: event.qaEnabled,
             chatEnabled: event.chatEnabled,
             agendaEnabled: event.agendaEnabled,
+            whiteboardEnabled: event.whiteboardEnabled,
             waitingRoomAudioUrl: event.waitingRoomAudioUrl,
             participantsCanUnmute: event.participantsCanUnmute,
             participantsCanStartVideo: event.participantsCanStartVideo,
@@ -175,38 +178,53 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       );
     } else if (isInstant) {
       notFound();
+    } else if (event.status === 'ENDED' || event.status === 'ARCHIVED') {
+      // Evento concluso senza token (link della sala salvato, cookie scaduto):
+      // manda alla pagina evento — registrazione video, archivio Q&A, feedback —
+      // invece che a /registration, che per stati ≠ PUBLISHED/LIVE fa 404.
+      redirect(`/${locale}/events/${slug}`);
     } else {
       redirect(`/${locale}/events/${slug}/registration`);
     }
   }
 
-  const isPrimaryModerator = event.moderatorToken === token;
-
-  // Magic-link path: token may be a co-moderator (role=MODERATOR) or
-  // a speaker (role=SPEAKER). Resolved once so we get the grant's own
-  // display name for the pre-join greeting and the role for JWT + UI.
-  const grant = isPrimaryModerator
-    ? null
-    : await prisma.eventModerator.findUnique({ where: { token } });
-  const isValidGrant =
-    !!grant && grant.eventId === event.id && grant.revokedAt === null;
-  const isCoModerator = isValidGrant && grant.role === 'MODERATOR';
-  const isSpeaker = isValidGrant && grant.role === 'SPEAKER';
+  // Magic-link path: primario condiviso, co-moderatore (role=MODERATOR) o
+  // speaker (role=SPEAKER). Risoluzione unica in resolveGrantForEvent —
+  // nome del grant GIÀ DECIFRATO (EventModerator.name è cifrato a riposo:
+  // la lookup diretta qui mostrava ciphertext base64 nel pre-join).
+  const grant = await resolveGrantForEvent(event, token);
+  const isPrimaryModerator = !!grant?.isPrimaryShared;
+  const isCoModerator = !!grant && !grant.isPrimaryShared && grant.role === 'MODERATOR';
+  const isSpeaker = !!grant && grant.role === 'SPEAKER';
   const isModerator = isPrimaryModerator || isCoModerator;
 
   let participantInfo: { displayName: string } | null = null;
+  // Consenso multitrack già prestato alla registrazione → non lo si richiede di
+  // nuovo in sala d'attesa (evita il doppio consenso). Vedi WaitingRoom.
+  let hasMultitrackConsent = false;
   if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
-      select: { displayName: true, eventId: true },
+      select: { displayName: true, eventId: true, consentMultitrack: true },
     });
 
     if (!registration || registration.eventId !== event.id) {
+      // Token personale non valido/scaduto (refuso nel link email, o registrazione
+      // rimossa dal retention cron mentre l'email col link sopravvive): niente 404
+      // secco. Torniamo alla pagina evento con un avviso contestuale e le CTA giuste
+      // (ri-registrazione, oppure guarda la registrazione se l'evento è concluso).
+      // Solo per stati in cui la pagina evento è raggiungibile (stesso check
+      // della destinazione, lib/events/visibility): per DRAFT/ARCHIVED fa
+      // notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
+      if (isEventPubliclyVisible(event)) {
+        redirect(`/${locale}/events/${slug}?invalidToken=1`);
+      }
       notFound();
     }
     participantInfo = {
       displayName: tryDecryptPII(registration.displayName) ?? registration.displayName,
     };
+    hasMultitrackConsent = registration.consentMultitrack ?? false;
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);
@@ -223,11 +241,14 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         endsAt: event.endsAt.toISOString(),
         status: event.status,
         eventType: event.eventType,
+        postEventPublic: event.postEventPublic,
+        libraryListed: event.libraryListed,
         recordingEnabled: event.recordingEnabled,
         autoStartRecording: event.autoStartRecording,
         qaEnabled: event.qaEnabled,
         chatEnabled: event.chatEnabled,
         agendaEnabled: event.agendaEnabled,
+        whiteboardEnabled: event.whiteboardEnabled,
         waitingRoomAudioUrl: event.waitingRoomAudioUrl,
         participantsCanUnmute: event.participantsCanUnmute,
         participantsCanStartVideo: event.participantsCanStartVideo,
@@ -250,19 +271,21 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       }}
       token={token}
       isModerator={isModerator}
+      isPrimaryModerator={isPrimaryModerator}
       isSpeaker={isSpeaker}
       isGuest={false}
+      hasMultitrackConsent={hasMultitrackConsent}
       displayName={
-        isValidGrant && grant
-          // Named co-moderator or speaker via EventModerator row —
-          // greet them by name in the pre-join input (still editable).
-          ? grant.name
+        grant && !grant.isPrimaryShared
+          ? // Named co-moderator or speaker via EventModerator row —
+            // greet them by name in the pre-join input (still editable).
+            (grant.displayName ?? '')
           : isPrimaryModerator
-            // Primary moderator magic-link (shared): keep the input
-            // empty so anyone opening the link types their own name
-            // rather than inheriting the configured moderatorName.
-            ? ''
-            : participantInfo?.displayName ?? 'Partecipante'
+            ? // Primary moderator magic-link (shared): keep the input
+              // empty so anyone opening the link types their own name
+              // rather than inheriting the configured moderatorName.
+              ''
+            : (participantInfo?.displayName ?? 'Partecipante')
       }
       locale={locale}
       jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}

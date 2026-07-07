@@ -15,10 +15,13 @@
  */
 
 /**
- * Participant toolbar — NO 'hangup' to avoid "end meeting for all".
- * We provide our own "Esci dalla sala" / "Leave room" button that
- * calls api.executeCommand('hangup') without exposing the
- * "Termina la riunione per tutti" option.
+ * Toolbars carry NO native 'hangup' — for ANY role. Jitsi's own hangup
+ * fires `videoConferenceLeft` without going through our app, so the
+ * network-resilience path used to mistake it for a drop and reconnect the
+ * user in a loop. Instead every exit goes through our top-bar "Esci dalla
+ * sala" button: participants leave for themselves; moderators get a prompt
+ * ("Esci solo tu" vs "Termina per tutti"). See live-event-client
+ * handleLeaveRoom / handleReadyToClose.
  *
  * 'chat' excluded: we use a custom ChatPanel in the sidebar.
  * 'reactions' excluded: we use a custom ReactionBar overlay.
@@ -37,10 +40,15 @@ export const baseToolbarButtons = [
 
 export const moderatorToolbarButtons = [
   ...baseToolbarButtons,
-  'hangup',
+  // NO 'hangup' — see baseToolbarButtons: exit is our app button so the
+  // moderator gets the "Esci solo tu / Termina per tutti" prompt.
   'mute-everyone',
   'security',
   'participants-pane',
+  // NB: 'whiteboard' is NOT here — it's per-event opt-in (Event.whiteboardEnabled)
+  // and appended conditionally for moderators on desktop in JitsiRoom. Jitsi
+  // additionally feature-gates it on config.whiteboard.enabled (set server-side,
+  // test only), so it stays hidden on prod even when an event opted in.
 ];
 
 /**
@@ -61,12 +69,13 @@ export const mobileBaseToolbarButtons = [
 ];
 
 /**
- * Moderator mobile toolbar: same trim as participants plus hangup and
- * the participants-pane button (needed to manage the room on small screens).
+ * Moderator mobile toolbar: same trim as participants plus the
+ * participants-pane button (needed to manage the room on small screens).
+ * No native 'hangup' — exit goes through the app button (see
+ * baseToolbarButtons) so the moderator gets the leave/end-for-all prompt.
  */
 export const mobileModeratorToolbarButtons = [
   ...mobileBaseToolbarButtons,
-  'hangup',
   'participants-pane',
 ];
 
@@ -258,7 +267,8 @@ export const instantCallToolbarButtons = [
 
 export const instantCallModeratorToolbarButtons = [
   ...instantCallToolbarButtons,
-  'hangup',
+  // NO 'hangup' — consistent with moderatorToolbarButtons: exit is the app
+  // button so the host gets the "Esci solo tu / Termina per tutti" prompt.
   'mute-everyone',
   'security',
 ];
@@ -322,6 +332,11 @@ interface VideoQualityDefinition {
     audioQuality: { opusMaxAverageBitrate: number };
     stereo: boolean;
     enableOpusRed: boolean;
+    // Framerate dello screenshare. Il default Jitsi è {min:5, max:5}: ok per
+    // slide statiche, inguardabile per demo/video condivisi. Il browser scala
+    // comunque verso il basso sotto vincolo di banda/CPU, quindi alzare il max
+    // non costa nulla nel caso-slide (frame identici non generano bitrate).
+    desktopSharingFrameRate: { min: number; max: number };
   };
 }
 
@@ -341,6 +356,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       audioQuality: { opusMaxAverageBitrate: 24_000 },
       stereo: false,
       enableOpusRed: false,
+      desktopSharingFrameRate: { min: 5, max: 15 },
     },
   },
   BALANCED: {
@@ -358,6 +374,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       audioQuality: { opusMaxAverageBitrate: 48_000 },
       stereo: false,
       enableOpusRed: false,
+      desktopSharingFrameRate: { min: 5, max: 30 },
     },
   },
   HIGH: {
@@ -383,6 +400,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       // lo riaccendeva. Allineato. (MAX lo lascia ON: chiamate piccole, fedeltà
       // prima della banda.)
       enableOpusRed: false,
+      desktopSharingFrameRate: { min: 5, max: 30 },
     },
   },
   MAX: {
@@ -402,6 +420,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       audioQuality: { opusMaxAverageBitrate: 510_000 },
       stereo: true,
       enableOpusRed: true,
+      desktopSharingFrameRate: { min: 5, max: 60 },
     },
   },
 };

@@ -21,11 +21,29 @@ import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 
 import type { WizardForm } from './wizard-shell';
 
+/** Format a timezone-naive "YYYY-MM-DDTHH:MM" wall-clock value (entered in the
+ *  event's own timezone) into a human string, without re-interpreting the zone
+ *  through the browser. Falls back to the raw string if unparseable. */
+function formatWallClock(dtLocal: string, locale: string): string {
+  if (!dtLocal) return '—';
+  const [datePart, timePart] = dtLocal.split('T');
+  const [y, m, d] = (datePart ?? '').split('-').map(Number);
+  if (!y || !m || !d) return dtLocal;
+  const dateStr = new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(y, m - 1, d)));
+  return timePart ? `${dateStr}, ${timePart}` : dateStr;
+}
+
 interface Props {
   form: WizardForm;
   onChange: (patch: Partial<WizardForm>) => void;
   jvbSizingConfig: JvbSizingConfig;
   defaultSenderRatioPct: number;
+  defaultLocale: string;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   fieldErrors?: Record<string, string>;
 }
@@ -35,12 +53,15 @@ export default function Step5Review({
   onChange,
   jvbSizingConfig,
   defaultSenderRatioPct,
+  defaultLocale,
   gdprTemplates,
   fieldErrors = {},
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
   const toggles = togglesFromMatrix(form.permissionMatrix);
-  const locale = (typeof window !== 'undefined' && navigator.language.startsWith('it')) ? 'it' : 'en';
+  // Use the site default locale (not a client-side navigator.language guess)
+  // so the summary is stable and correct for locale-only events.
+  const locale: 'it' | 'en' = defaultLocale === 'it' ? 'it' : 'en';
 
   const recurrenceText =
     form.recurrenceRule && form.recurrencePreset !== 'none'
@@ -64,11 +85,14 @@ export default function Step5Review({
         <div className="row g-2" style={{ fontSize: '0.9rem' }}>
           <SummaryItem
             label={t('summary.title')}
-            value={form.title.it || form.title.en || '—'}
+            value={form.title[defaultLocale] || form.title.it || form.title.en || '—'}
           />
           <SummaryItem
             label={t('summary.schedule')}
-            value={`${form.startsAt} → ${form.endsAt} (${form.timezone})`}
+            value={`${formatWallClock(form.startsAt, locale)} → ${formatWallClock(
+              form.endsAt,
+              locale,
+            )} (${form.timezone})`}
           />
           <SummaryItem
             label={t('summary.recurrence')}
@@ -204,7 +228,9 @@ export default function Step5Review({
         </div>
       </section>
 
-      {/* Moderator contact (optional but used for confirmation mail) */}
+      {/* Primary moderator: name+email are required to publish. This person
+          receives the moderator magic link (ADR-003) — distinct from the
+          additional co-moderators added in the People step. */}
       <section className="mb-4">
         <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
           {t('moderatorHeading')}
@@ -212,6 +238,17 @@ export default function Step5Review({
         <p className="text-secondary mb-2" style={{ fontSize: '0.82rem' }}>
           {t('moderatorPublishHint')}
         </p>
+        <div
+          className="p-2 mb-3 rounded"
+          style={{
+            background: 'rgba(0,102,204,0.08)',
+            border: '1px solid rgba(0,102,204,0.25)',
+            color: 'var(--app-text)',
+            fontSize: '0.82rem',
+          }}
+        >
+          {t('moderatorLinkNote')}
+        </div>
         <div className="row g-3">
           <div className="col-md-6">
             <label className="form-label" htmlFor="rev-mod-name">

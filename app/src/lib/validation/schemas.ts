@@ -68,6 +68,9 @@ const eventBaseSchema = z.object({
   postEventShowMaterials: z.boolean().default(true),
   postEventShowPolls: z.boolean().default(true),
   postEventShowFeedback: z.boolean().default(true),
+  postEventShowRecap: z.boolean().default(true),
+  postEventShowWordCloud: z.boolean().default(true),
+  postEventEmailEnabled: z.boolean().default(false),
   feedbackEnabled: z.boolean().default(true),
   recordingConsentText: z.string().max(5000).optional(),
 
@@ -114,6 +117,7 @@ const eventBaseSchema = z.object({
   retainParticipantTracks: z.boolean().optional(),
   // Agenda/note live (checklist opt-in).
   agendaEnabled: z.boolean().optional(),
+  whiteboardEnabled: z.boolean().optional(),
   // Comma-separated ISO-639-1, null = inherit SiteSetting.aiDefaultTargetLocales.
   aiTargetLocales: z.string().max(200).nullable().optional(),
   // Numero di parlanti attesi (1-30). Quando valorizzato, la pipeline
@@ -390,7 +394,10 @@ export type SubmitWordCloudInput = z.infer<typeof submitWordCloudSchema>;
 // ── Timer Schemas ───────────────────────────────────────
 
 export const timerActionSchema = z.object({
-  action: z.enum(['start', 'pause', 'reset']),
+  // 'visibility' toggles only the show-to-all flag WITHOUT restarting the
+  // countdown — start/pause/reset rebuild the timer state, so the eye toggle
+  // must use this instead (was using 'start' and silently restarting).
+  action: z.enum(['start', 'pause', 'reset', 'visibility']),
   duration: z.number().int().min(10).max(7200).optional(),
   visible: z.boolean().optional(),
 });

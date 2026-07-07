@@ -13,6 +13,7 @@ import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
 import {
   extractModeratorToken,
   verifyModeratorToken,
+  isEventModerator,
   constantTimeEqual,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
@@ -57,8 +58,15 @@ export const GET = withErrorHandling(async (request, context) => {
 
   const { title, description } = localiseEvent(event, locale);
 
-  // Moderator mode: verify token and return full data
-  if (token && constantTimeEqual(event.moderatorToken, token)) {
+  // Moderator mode: verify token and return full data. Accetta anche i
+  // co-moderatori (EventModerator role=MODERATOR): PUT/DELETE già li ammettono
+  // via verifyModeratorToken, quindi negargli la vista sarebbe incoerente.
+  // I campi del SOLO primario (magic link irrevocabile + email owner) però
+  // non escono mai verso un co-moderatore: un co-mod col token primario
+  // scalerebbe a owner in modo che la revoca non può più recuperare.
+  const isPrimaryModerator =
+    !!token && constantTimeEqual(event.moderatorToken, token);
+  if (token && (isPrimaryModerator || (await isEventModerator(event, token)))) {
     return Response.json({
       id: event.id,
       slug: event.slug,
@@ -93,11 +101,18 @@ export const GET = withErrorHandling(async (request, context) => {
       postEventShowMaterials: event.postEventShowMaterials,
       postEventShowPolls: event.postEventShowPolls,
       postEventShowFeedback: event.postEventShowFeedback,
+      postEventShowRecap: event.postEventShowRecap,
+    postEventShowWordCloud: event.postEventShowWordCloud,
+      postEventEmailEnabled: event.postEventEmailEnabled,
       feedbackEnabled: event.feedbackEnabled,
       recordingConsentText: event.recordingConsentText,
-      moderatorToken: event.moderatorToken,
+      // Al co-moderatore torna il SUO token (valido su tutte le route che
+      // già lo ammettono), mai quello del primario.
+      moderatorToken: isPrimaryModerator ? event.moderatorToken : token,
       moderatorName: event.moderatorName,
-      moderatorEmail: tryDecryptPII(event.moderatorEmail),
+      moderatorEmail: isPrimaryModerator
+        ? tryDecryptPII(event.moderatorEmail)
+        : null,
       jitsiRoomName: event.jitsiRoomName,
       dataRetentionDays: event.dataRetentionDays,
       privacyPolicyUrl: event.privacyPolicyUrl,
@@ -148,6 +163,9 @@ export const GET = withErrorHandling(async (request, context) => {
     postEventShowMaterials: event.postEventShowMaterials,
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
+    postEventShowRecap: event.postEventShowRecap,
+    postEventShowWordCloud: event.postEventShowWordCloud,
+    postEventEmailEnabled: event.postEventEmailEnabled,
   }, {
     headers: {
       'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
@@ -177,6 +195,46 @@ export const PUT = withErrorHandling(async (request, context) => {
   }
 
   const data = parsed.data;
+
+  // Guard against the illusion of post-event configurability. These flags govern
+  // LIVE capture — once an event is ENDED/ARCHIVED nothing can be captured
+  // retroactively, so writing them does nothing but mislead. Strip them from a
+  // pure post-event edit (one that isn't reviving the event via a lifecycle
+  // change) and report them back so the UI can warn. NOTE: AI flags
+  // (aiTranscript/Summary/Translation/Dubbing), recordingPublished and the
+  // postEvent* display toggles are deliberately NOT here — those ARE legitimate
+  // post-event controls (jobs run on the already-stored recording).
+  // NB: retainParticipantTracks is intentionally NOT here. Despite being a
+  // capture-adjacent flag, it's read LIVE by cron/multitrack-purge to decide
+  // whether per-participant audio is purged right after transcription (false)
+  // or held until retention (true) — so an admin must stay able to flip it to
+  // false on an ENDED event to force a GDPR minimization. Stripping it would
+  // make already-captured PII *harder* to delete.
+  const CREATION_ONLY_FIELDS = [
+    'recordingEnabled',
+    'autoStartRecording',
+    'whiteboardEnabled',
+    'multitrackRecordingEnabled',
+    'waitingRoomEngine',
+    'videoQuality',
+  ] as const;
+  const isTerminalStatus = event.status === 'ENDED' || event.status === 'ARCHIVED';
+  // A lifecycle edit (revive: pushing endsAt/startsAt to the future, or an
+  // explicit status change) legitimately brings the event back to life, so the
+  // capture flags matter again — don't strip in that case.
+  const isLifecycleEdit =
+    data.status !== undefined ||
+    data.endsAt !== undefined ||
+    data.startsAt !== undefined;
+  const ignoredCreationOnlyFields: string[] = [];
+  if (isTerminalStatus && !isLifecycleEdit) {
+    for (const field of CREATION_ONLY_FIELDS) {
+      if (data[field] !== undefined) {
+        ignoredCreationOnlyFields.push(field);
+        delete (data as Record<string, unknown>)[field];
+      }
+    }
+  }
 
   const dateChanged =
     (data.startsAt !== undefined && new Date(data.startsAt).getTime() !== event.startsAt.getTime()) ||
@@ -307,6 +365,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.postEventShowMaterials !== undefined && { postEventShowMaterials: data.postEventShowMaterials }),
       ...(data.postEventShowPolls !== undefined && { postEventShowPolls: data.postEventShowPolls }),
       ...(data.postEventShowFeedback !== undefined && { postEventShowFeedback: data.postEventShowFeedback }),
+      ...(data.postEventShowRecap !== undefined && { postEventShowRecap: data.postEventShowRecap }),
+      ...(data.postEventShowWordCloud !== undefined && { postEventShowWordCloud: data.postEventShowWordCloud }),
+      ...(data.postEventEmailEnabled !== undefined && { postEventEmailEnabled: data.postEventEmailEnabled }),
       ...(data.feedbackEnabled !== undefined && { feedbackEnabled: data.feedbackEnabled }),
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
       ...(data.recordingPublished !== undefined && {
@@ -359,6 +420,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.agendaEnabled !== undefined && {
         agendaEnabled: data.agendaEnabled,
       }),
+      ...(data.whiteboardEnabled !== undefined && {
+        whiteboardEnabled: data.whiteboardEnabled,
+      }),
       ...(data.aiTargetLocales !== undefined && {
         aiTargetLocales: data.aiTargetLocales,
       }),
@@ -380,7 +444,11 @@ export const PUT = withErrorHandling(async (request, context) => {
     details: { fields: Object.keys(data), dateChanged },
   });
 
-  return Response.json({ ...updated, dateChanged });
+  return Response.json({
+    ...updated,
+    dateChanged,
+    ...(ignoredCreationOnlyFields.length > 0 && { ignoredCreationOnlyFields }),
+  });
 });
 
 // ── DELETE /api/events/[id] — Delete event (moderator only) ──

@@ -36,3 +36,10 @@ export function setCache<T>(key: string, data: T, ttlMs: number): void {
   store.set(key, { data, expiry: Date.now() + ttlMs });
   evictExpired();
 }
+
+/** Invalidazione puntuale: per gli eventi che non possono aspettare il TTL
+ *  (es. revoca di un token). In multi-replica agisce solo sul pod locale —
+ *  sugli altri resta il bound del TTL. */
+export function deleteCache(key: string): void {
+  store.delete(key);
+}

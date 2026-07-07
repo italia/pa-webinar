@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Alert, Icon } from 'design-react-kit';
+import { Button, Alert } from 'design-react-kit';
 
 const MAX_LENGTH = 500;
 const COOLDOWN_SECONDS = 30;
@@ -104,7 +104,6 @@ export default function QuestionForm({
     <form onSubmit={handleSubmit} className="mb-3">
       {success && (
         <Alert color="success" className="py-2 mb-2">
-          <Icon icon="it-check" size="sm" className="me-1" />
           {t('questionSent')}
         </Alert>
       )}

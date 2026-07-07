@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
@@ -16,6 +16,7 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
 import DeviceCheck from '@/components/live/device-check';
@@ -39,6 +40,28 @@ const GardenInteractive = dynamic(
   () => import('@/components/live/garden/garden-interactive'),
   { ssr: false },
 );
+
+/**
+ * Error boundary around the Phaser lobby. Phaser is a lazy chunk (~1MB) loaded
+ * over PA networks; if the chunk fails to load or the game throws at runtime,
+ * we degrade to the accessible CLASSIC card (via `onError`) instead of leaving
+ * a blank box. Renders nothing while erroring, until the parent swaps engines.
+ */
+class PhaserLobbyBoundary extends Component<
+  { onError: () => void; children: ReactNode },
+  { errored: boolean }
+> {
+  state = { errored: false };
+  static getDerivedStateFromError(): { errored: boolean } {
+    return { errored: true };
+  }
+  componentDidCatch(): void {
+    this.props.onError();
+  }
+  render(): ReactNode {
+    return this.state.errored ? null : this.props.children;
+  }
+}
 
 /**
  * Unified waiting-room / front-door for the live event page.
@@ -105,6 +128,17 @@ export interface WaitingRoomJoinPrefs {
   micOn: boolean;
 }
 
+/** Telemetria warm-up dal poll /lifecycle: alimenta il pannello di attesa
+ *  onesto (fase + tempo trascorso) al posto dello spinner cieco. */
+export interface WaitingRoomWarmup {
+  phase: 'queued' | 'starting' | 'ready';
+  /** Stopwatch anchor, già ripulito lato server: valorizzato solo mentre
+   *  PROVISIONING e recente (null in IDLE / se residuo di un ciclo passato),
+   *  così il cronometro non parte mai da un timestamp stantìo. */
+  startedAt: string | null;
+  serverTime: string;
+}
+
 interface WaitingRoomProps {
   event: WaitingRoomEvent;
   participantCount: number;
@@ -119,6 +153,17 @@ interface WaitingRoomProps {
   onEnterLive: (chosenName: string, prefs: WaitingRoomJoinPrefs) => void;
   onStartEvent?: () => Promise<void>;
   onLeaveFeedback?: () => void;
+  /** Telemetria warm-up (null fuori da IDLE/PROVISIONING). */
+  warmup?: WaitingRoomWarmup | null;
+  /** Uscita esplicita dalla sala: pagina evento (scheduled) o home (instant). */
+  exitHref?: string;
+  /** True se il consenso multitrack NON va richiesto qui: il moderatore
+   *  (configura e controlla la registrazione) e i partecipanti registrati che
+   *  hanno già prestato il consenso alla registrazione. Gli SPEAKER non sono
+   *  esenti: non controllano la registrazione e la loro traccia isolata è il
+   *  dato che il gate protegge. Evita il doppio consenso e riabilita il
+   *  minigioco. */
+  multitrackConsentExempt?: boolean;
 }
 
 const PARTICIPANT_NAME_KEY = 'pawebinar.participant.name';
@@ -139,6 +184,9 @@ export default function WaitingRoom({
   onEnterLive,
   onStartEvent,
   onLeaveFeedback,
+  warmup = null,
+  exitHref,
+  multitrackConsentExempt = false,
 }: WaitingRoomProps) {
   const t = useTranslations('waiting');
   const tc = useTranslations('common');
@@ -149,6 +197,10 @@ export default function WaitingRoom({
   const [startingEvent, setStartingEvent] = useState(false);
   const [watchingCatchUp, setWatchingCatchUp] = useState(false);
   const [pulseCountdown, setPulseCountdown] = useState(false);
+  // PUBLISHED con orario di inizio già passato ma il moderatore non ha ancora
+  // premuto "Avvia evento": mostriamo uno stato dedicato invece del countdown
+  // vuoto + CTA "Apertura alle {ora passata}" (incoerente e sfiduciante).
+  const [startingSoon, setStartingSoon] = useState(false);
   const [name, setName] = useState(defaultName);
   const [email, setEmail] = useState('');
   // Waiting-room engine state. Resolved post-mount (see the resolution effect
@@ -173,6 +225,11 @@ export default function WaitingRoom({
   // (iOS gesture + multitrack consent are still required on the tap).
   const prevStatusRef = useRef(event.status);
   const [liveCountdown, setLiveCountdown] = useState<number | null>(null);
+  // Cronometro onesto del warm-up: base ancorata all'orologio del SERVER
+  // (serverTime - provisioningStartedAt, dal poll /lifecycle) così lo skew
+  // del client non inventa attese negative o gonfiate; il tick locale
+  // aggiunge i secondi tra un poll e l'altro.
+  const [warmupElapsed, setWarmupElapsed] = useState<number | null>(null);
 
   // Rehydrate name + email from localStorage on mount. Name is merged
   // with the server-provided default (registration displayName / grant
@@ -206,24 +263,20 @@ export default function WaitingRoom({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      let mode: 'GARDEN' | 'GAME' | 'CLASSIC' = event.waitingRoomEngine ?? 'GARDEN';
-      const urlE = new URLSearchParams(window.location.search).get('engine');
-      // PHONES (coarse pointer AND narrow viewport) default to the
-      // accessible CLASSIC card: the walkable park + joystick don't work
-      // well on small touch screens, and the classic layout shows the real
-      // controls (name, email, device check) inline instead of hiding them
-      // in the arcade drawer. Tablets (coarse pointer but wider than 768px)
-      // keep the rich room — they have the screen real estate for it. An
-      // explicit `?engine=` still wins, so a phone user can opt into the
-      // game and a tablet user can opt into classic.
-      const isPhone =
-        window.matchMedia?.('(pointer: coarse) and (max-width: 768px)')?.matches ??
-        false;
-      if (urlE === 'phaser') mode = 'GAME';
-      else if (urlE === 'svg') mode = 'GARDEN';
-      else if (urlE === 'classic') mode = 'CLASSIC';
-      else if (isPhone) mode = 'CLASSIC';
-      if (window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1') mode = 'CLASSIC';
+      // PHONES (coarse pointer AND narrow viewport) default to the accessible
+      // CLASSIC card: the walkable park + joystick don't work well on small
+      // touch screens, and the classic layout shows the real controls (name,
+      // email, device check) inline instead of hiding them in the arcade
+      // drawer. Tablets (coarse pointer but wider than 768px) keep the rich
+      // room. Precedence + the `?engine=` escape hatch live in the pure helper.
+      const mode = resolveWaitingRoomMode({
+        configured: event.waitingRoomEngine ?? 'GARDEN',
+        urlEngine: new URLSearchParams(window.location.search).get('engine'),
+        isPhone:
+          window.matchMedia?.('(pointer: coarse) and (max-width: 768px)')?.matches ??
+          false,
+        classicPref: window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1',
+      });
       setEngine(mode === 'GAME' ? 'phaser' : 'svg');
       setClassicView(mode === 'CLASSIC');
     } catch {
@@ -245,7 +298,10 @@ export default function WaitingRoom({
   const isModerator = role === 'moderator';
   const heroUrl = event.imageUrl ?? event.coverImageUrl ?? null;
   const hasRecording = !!(event.recordingUrl ?? event.tempRecordingUrl);
-  const showChatPreview = isLive && (event.chatEnabled ?? true);
+  // La chat è app-side e NON dipende dal bridge: mentre la sala si scalda
+  // (IDLE/PROVISIONING) chi aspetta può già chiacchierare — è la differenza
+  // tra un'attesa cieca e una sala d'attesa vera.
+  const showChatPreview = (isLive || isWarmingUp) && (event.chatEnabled ?? true);
   // Only LIVE events admit participants into the room. Moderators in
   // PUBLISHED past startsAt get a separate "Avvia evento" action that
   // flips the status to LIVE; once that happens this flag re-opens.
@@ -257,15 +313,46 @@ export default function WaitingRoom({
   // Consenso multitrack: se l'evento registra una traccia per partecipante
   // (audio isolato, dato quasi-biometrico — ADR-013/GDPR art.9), l'ingresso è
   // gated da un consenso esplicito. Niente consenso → niente ingresso.
-  const multitrackRequired = !!event.multitrackRecordingEnabled && !isEnded;
+  const multitrackRequired =
+    !!event.multitrackRecordingEnabled && !isEnded && !multitrackConsentExempt;
   const canEnter =
     nameValid && emailValid && (!multitrackRequired || multitrackConsent);
+
+  // Cronometro warm-up. Ci si ancora UNA volta per ciclo (identità =
+  // warmup.startedAt): senza questo, ri-ancorarsi a ogni poll (3s) fa
+  // sobbalzare/tornare indietro il tempo per via del jitter di rete. La base
+  // server (serverTime - startedAt) la leggiamo da un ref così un nuovo poll
+  // aggiorna la fase senza far ripartire il tick. startedAt null (IDLE /
+  // residuo stantìo, già filtrato dal server) → niente cronometro.
+  const warmupStartedAt = warmup?.startedAt ?? null;
+  const warmupRef = useRef(warmup);
+  warmupRef.current = warmup;
+  useEffect(() => {
+    if (!isWarmingUp || !warmupStartedAt) {
+      setWarmupElapsed(null);
+      return;
+    }
+    const serverNowMs = new Date(
+      warmupRef.current?.serverTime ?? warmupStartedAt,
+    ).getTime();
+    const base = Math.max(
+      0,
+      (serverNowMs - new Date(warmupStartedAt).getTime()) / 1000,
+    );
+    const anchor = Date.now();
+    const tick = () =>
+      setWarmupElapsed(Math.floor(base + (Date.now() - anchor) / 1000));
+    tick();
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [isWarmingUp, warmupStartedAt]);
 
   // Countdown tick: only needed while PUBLISHED. Live / ended do not use it.
   useEffect(() => {
     if (!isPublished) {
       setCountdown('');
       setPulseCountdown(false);
+      setStartingSoon(false);
       return;
     }
     const tick = () => {
@@ -274,8 +361,10 @@ export default function WaitingRoom({
       if (diff <= 0) {
         setCountdown('');
         setPulseCountdown(false);
+        setStartingSoon(true);
         return;
       }
+      setStartingSoon(false);
       setPulseCountdown(diff < 60_000);
       const days = Math.floor(diff / 86_400_000);
       const hours = Math.floor((diff % 86_400_000) / 3_600_000);
@@ -348,6 +437,27 @@ export default function WaitingRoom({
     }
     onEnterLive(trimmedName, devicePrefs);
   }, [canEnter, onEnterLive, trimmedName, trimmedEmail, devicePrefs]);
+
+  // Entry triggered from INSIDE the Phaser game (walking the avatar into the
+  // open gate). It funnels through the SAME validated handleEnterLive as the
+  // standard button — never the raw onEnterLive — so name/consent and device
+  // prefs are always honoured. When the form isn't complete yet we guide the
+  // user to it and THROW: the game's join state machine treats a rejected
+  // conference.join as "not joined" and resets, so the avatar is never left
+  // phantom-seated when the host never actually entered. The standard "Entra
+  // ora" button stays available for anyone who doesn't want to play.
+  const handleGameEnter = useCallback(() => {
+    if (canEnter) {
+      handleEnterLive();
+      return;
+    }
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById('waiting-name') as HTMLInputElement | null;
+      el?.focus();
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    throw new Error('waiting-room: pre-join not complete');
+  }, [canEnter, handleEnterLive]);
 
   const handleDeviceStateChange = useCallback(
     (s: WaitingRoomJoinPrefs) => setDevicePrefs(s),
@@ -620,13 +730,42 @@ export default function WaitingRoom({
           className="rounded-3 p-3 text-start"
           style={{ background: '#E7F1FB', border: '1px solid #9EC5E9', fontSize: '0.85rem' }}
           role="status"
+          aria-live="polite"
         >
           <div className="d-flex align-items-start">
             <Spinner active small className="me-2 mt-1 flex-shrink-0" />
-            <div>
-              <strong>{t('warmingUp')}</strong>
-              <br />
-              {t('warmingUpDetail')}
+            <div className="flex-grow-1">
+              <div className="d-flex justify-content-between align-items-baseline flex-wrap gap-2">
+                <strong>
+                  {warmup?.phase === 'ready'
+                    ? t('warmup.almostReady')
+                    : warmup?.phase === 'starting'
+                      ? (warmupElapsed ?? 0) >= 75
+                        ? t('warmup.provisioningNode')
+                        : t('warmup.startingBridge')
+                      : t('warmup.queued')}
+                </strong>
+                {warmupElapsed !== null && warmupElapsed > 0 && (
+                  // aria-hidden: la banda è una live region (role=status +
+                  // aria-live), ma il cronometro cambia ogni secondo — senza
+                  // questo lo screen reader ri-annuncerebbe la banda a ogni
+                  // tick. Restano annunciati solo fase e dettaglio (rari).
+                  <span
+                    className="font-monospace"
+                    style={{ fontSize: '0.8rem', color: 'var(--app-muted)' }}
+                    aria-hidden="true"
+                  >
+                    {t('warmup.elapsed', {
+                      time: `${Math.floor(warmupElapsed / 60)}:${String(warmupElapsed % 60).padStart(2, '0')}`,
+                    })}
+                  </span>
+                )}
+              </div>
+              <div className="mt-1">
+                {warmup?.phase === 'ready'
+                  ? t('warmup.almostReadyDetail')
+                  : t('warmup.honestHint')}
+              </div>
             </div>
           </div>
         </div>
@@ -712,6 +851,19 @@ export default function WaitingRoom({
           {t('watchCatchup')}
         </Button>
       )}
+      {/* Uscita esplicita: nella sala d'attesa non si è "intrappolati" —
+          soprattutto durante il warm-up, quando la CTA è disabilitata. Non
+          in PUBLISHED: lì c'è già il backLinkBlock ("Indietro") più in basso,
+          verso la stessa pagina evento — evitiamo il doppione. */}
+      {exitHref && !isEnded && !isPublished && (
+        <Link
+          href={exitHref}
+          className="btn btn-outline-secondary btn-sm mt-1"
+          style={{ justifySelf: 'center' }}
+        >
+          {t('exitWaiting')}
+        </Link>
+      )}
     </div>
   );
 
@@ -724,22 +876,27 @@ export default function WaitingRoom({
   const showGameBox = !isEnded && !classicView && !multitrackRequired;
   const gameStageBox =
     engine === 'phaser' ? (
-      // GAME engine: the Phaser lobby, embedded in the box (no full-screen
-      // chrome — the shell owns the name input + the gated "Entra" CTA, and
-      // the embed has no in-game enter button, so onEnterLive never fires
-      // from here; it's kept wired only for symmetry).
-      <div className="wr-stage">
-        <PhaserLobby
-          embed
-          eventSlug={event.slug}
-          displayName={trimmedName}
-          status={event.status}
-          startsAtMs={startsAtMs}
-          isHost={isModerator}
-          onEnterLive={onEnterLive}
-          onExitClassic={() => toggleClassic(true)}
-        />
-      </div>
+      // GAME engine: the Phaser lobby, embedded in the box. Walking the avatar
+      // into the OPEN gate (LIVE) is a real, interactive entry path — it routes
+      // through the shell's VALIDATED handleEnterLive (name/consent + device
+      // prefs), exactly like the standard "Entra ora" button, which stays
+      // available alongside it (legacy/a11y/non-players never need the game).
+      // If a chunk-load fails, the boundary degrades to the accessible classic
+      // card instead of a blank box.
+      <PhaserLobbyBoundary onError={() => toggleClassic(true)}>
+        <div className="wr-stage">
+          <PhaserLobby
+            embed
+            eventSlug={event.slug}
+            displayName={trimmedName}
+            status={event.status}
+            startsAtMs={startsAtMs}
+            isHost={isModerator}
+            onEnterLive={handleGameEnter}
+            onExitClassic={() => toggleClassic(true)}
+          />
+        </div>
+      </PhaserLobbyBoundary>
     ) : (
       // GARDEN engine (default): the SVG walkable garden. Wrapped in
       // `.arcade-stage` (absolute inset:0) so GardenInteractive's
@@ -849,12 +1006,32 @@ export default function WaitingRoom({
                   </div>
                 )}
 
+                {/* "Sta per iniziare, attendi l'organizzatore": non al moderatore —
+                    l'organizzatore è lui, e ha accanto il bottone "Avvia evento". */}
+                {isPublished && startingSoon && !isModerator && (
+                  <div
+                    className="rounded-3 p-3 mb-4 text-center d-flex align-items-center justify-content-center"
+                    role="status"
+                    aria-live="polite"
+                    style={{ background: 'var(--app-emphasis-bg, #eef4fb)', color: 'var(--app-text)' }}
+                  >
+                    <Spinner active small className="me-2" />
+                    <span className="fw-semibold">{t('startingSoon')}</span>
+                  </div>
+                )}
+
                 {(isWarmingUp || (isLive && jvbReady === false)) && (
                   <div className="mb-4">{statusBanners}</div>
                 )}
 
                 {!isEnded && <div className="mb-3">{nameField}</div>}
-                {!isEnded && <div className="mb-3">{emailField}</div>}
+                {/* Email: solo per gli ospiti (i registrati l'hanno già data,
+                    per moderatori/speaker è irrilevante). Il valore non è ancora
+                    inviato al server: campo di cortesia locale finché non c'è un
+                    consumer reale del follow-up. */}
+                {!isEnded && isGuest && (
+                  <div className="mb-3">{emailField}</div>
+                )}
                 {!isEnded && <div className="mb-3">{deviceCheckField}</div>}
 
                 {isPublished && event.waitingRoomAudioUrl && (

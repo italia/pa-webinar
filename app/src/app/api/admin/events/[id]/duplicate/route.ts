@@ -89,6 +89,8 @@ export const POST = withErrorHandling(async (request, context) => {
 
       qaEnabled: source.qaEnabled,
       chatEnabled: source.chatEnabled,
+      whiteboardEnabled: source.whiteboardEnabled,
+      waitingRoomEngine: source.waitingRoomEngine,
       recordingEnabled: source.recordingEnabled,
 
       participantsCanUnmute: source.participantsCanUnmute,
@@ -124,6 +126,9 @@ export const POST = withErrorHandling(async (request, context) => {
       postEventShowMaterials: source.postEventShowMaterials,
       postEventShowPolls: source.postEventShowPolls,
       postEventShowFeedback: source.postEventShowFeedback,
+      postEventShowRecap: source.postEventShowRecap,
+      postEventShowWordCloud: source.postEventShowWordCloud,
+      postEventEmailEnabled: source.postEventEmailEnabled,
       feedbackEnabled: source.feedbackEnabled,
 
       youtubeUrl: source.youtubeUrl,

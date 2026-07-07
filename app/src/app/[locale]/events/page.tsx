@@ -4,6 +4,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
+import { publicEventStatusWhere } from '@/lib/events/visibility';
 import EventListClient from '@/components/events/event-list-client';
 
 export const revalidate = 60;
@@ -23,9 +24,9 @@ export default async function EventiPage({ searchParams }: EventsPageProps) {
   const settings = await getSettings();
   const { tag: activeTag } = await searchParams;
 
-  const baseWhere: Prisma.EventWhereInput = {
-    status: { in: ['PUBLISHED', 'LIVE', 'ENDED'] },
-  };
+  // Include anche PROVISIONING/IDLE degli eventi schedulati (pre-warm/pausa):
+  // un evento non deve sparire dal listing nei minuti prima dell'inizio.
+  const baseWhere: Prisma.EventWhereInput = publicEventStatusWhere();
 
   const where: Prisma.EventWhereInput = activeTag
     ? {
@@ -49,7 +50,7 @@ export default async function EventiPage({ searchParams }: EventsPageProps) {
   ]);
 
   const upcoming = events
-    .filter((e) => e.status === 'PUBLISHED' || e.status === 'LIVE')
+    .filter((e) => e.status !== 'ENDED')
     .map((e) => serialise(e, locale));
 
   const past = events
