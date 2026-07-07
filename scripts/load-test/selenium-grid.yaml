@@ -1,0 +1,230 @@
+# =============================================================================
+# Selenium 4 distributed Grid (hub + node-chrome) for jitsi-meet-torture
+# Namespace: pa-webinar   |   app.kubernetes.io/component=load-test
+# 6 node replicas x SE_NODE_MAX_SESSIONS=5 = 30 concurrent browser sessions.
+# CHANGE vs proposal: removed the fragile prepare-fake-video initContainer and
+# the jitsi-resources volume (Malleus default = synthetic --use-fake-device-for-
+# media-stream; no y4m needed, and the GitHub fetch could hard-block the grid).
+# Cleanup: kubectl -n pa-webinar delete deploy,svc -l app.kubernetes.io/component=load-test
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selenium-hub
+  namespace: pa-webinar
+  labels:
+    app: selenium-hub
+    app.kubernetes.io/name: selenium-hub
+    app.kubernetes.io/part-of: jitsi-loadtest
+    app.kubernetes.io/component: load-test
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: selenium-hub
+  template:
+    metadata:
+      labels:
+        app: selenium-hub
+        app.kubernetes.io/name: selenium-hub
+        app.kubernetes.io/part-of: jitsi-loadtest
+        app.kubernetes.io/component: load-test
+    spec:
+      nodeSelector:
+        nodepool: applications
+      tolerations:
+        - key: kubernetes.azure.com/scalesetpriority
+          operator: Equal
+          value: spot
+          effect: NoSchedule
+        - key: workload
+          operator: Equal
+          value: test
+          effect: NoSchedule
+      containers:
+        - name: hub
+          image: selenium/hub:4.45.0-20260606
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: publish
+              containerPort: 4442
+            - name: subscribe
+              containerPort: 4443
+            - name: router
+              containerPort: 4444
+          env:
+            - name: SE_SESSION_REQUEST_TIMEOUT
+              value: "600"
+            - name: SE_SESSION_RETRY_INTERVAL
+              value: "2"
+            - name: SE_NEW_SESSION_THREAD_POOL_SIZE
+              value: "30"
+            - name: SE_LOG_LEVEL
+              value: "INFO"
+          readinessProbe:
+            httpGet:
+              path: /wd/hub/status
+              port: 4444
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 24
+          livenessProbe:
+            httpGet:
+              path: /wd/hub/status
+              port: 4444
+            initialDelaySeconds: 45
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: selenium-hub
+  namespace: pa-webinar
+  labels:
+    app: selenium-hub
+    app.kubernetes.io/name: selenium-hub
+    app.kubernetes.io/part-of: jitsi-loadtest
+    app.kubernetes.io/component: load-test
+spec:
+  type: ClusterIP
+  selector:
+    app: selenium-hub
+  ports:
+    - name: publish
+      port: 4442
+      targetPort: 4442
+    - name: subscribe
+      port: 4443
+      targetPort: 4443
+    - name: router
+      port: 4444
+      targetPort: 4444
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selenium-node-chrome
+  namespace: pa-webinar
+  labels:
+    app: selenium-node-chrome
+    app.kubernetes.io/name: selenium-node-chrome
+    app.kubernetes.io/part-of: jitsi-loadtest
+    app.kubernetes.io/component: load-test
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: selenium-node-chrome
+  # start at 1 node for the 3-bot smoke; scale to 6 for the 30-bot run
+  template:
+    metadata:
+      labels:
+        app: selenium-node-chrome
+        app.kubernetes.io/name: selenium-node-chrome
+        app.kubernetes.io/part-of: jitsi-loadtest
+        app.kubernetes.io/component: load-test
+    spec:
+      nodeSelector:
+        nodepool: applications
+      tolerations:
+        - key: kubernetes.azure.com/scalesetpriority
+          operator: Equal
+          value: spot
+          effect: NoSchedule
+        - key: workload
+          operator: Equal
+          value: test
+          effect: NoSchedule
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: selenium-node-chrome
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
+      containers:
+        - name: node-chrome
+          image: selenium/node-chrome:4.45.0-20260606
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: node
+              containerPort: 5555
+          env:
+            - name: SE_EVENT_BUS_HOST
+              value: selenium-hub
+            - name: SE_EVENT_BUS_PUBLISH_PORT
+              value: "4442"
+            - name: SE_EVENT_BUS_SUBSCRIBE_PORT
+              value: "4443"
+            - name: SE_NODE_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: SE_NODE_PORT
+              value: "5555"
+            - name: SE_NODE_GRID_URL
+              value: http://selenium-hub:4444
+            - name: SE_NODE_MAX_SESSIONS
+              value: "5"
+            - name: SE_NODE_OVERRIDE_MAX_SESSIONS
+              value: "true"
+            - name: SE_NODE_SESSION_TIMEOUT
+              value: "900"
+            - name: SE_START_XVFB
+              value: "true"
+            - name: SE_START_VNC
+              value: "false"
+            - name: SE_START_NO_VNC
+              value: "false"
+            - name: SE_SCREEN_WIDTH
+              value: "1280"
+            - name: SE_SCREEN_HEIGHT
+              value: "720"
+            - name: SE_SCREEN_DEPTH
+              value: "24"
+            - name: SE_LOG_LEVEL
+              value: "INFO"
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 5555
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 40
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 5555
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: 4Gi
+            limits:
+              cpu: "4"
+              memory: 6Gi
