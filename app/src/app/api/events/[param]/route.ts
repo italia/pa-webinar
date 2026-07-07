@@ -204,12 +204,17 @@ export const PUT = withErrorHandling(async (request, context) => {
   // (aiTranscript/Summary/Translation/Dubbing), recordingPublished and the
   // postEvent* display toggles are deliberately NOT here — those ARE legitimate
   // post-event controls (jobs run on the already-stored recording).
+  // NB: retainParticipantTracks is intentionally NOT here. Despite being a
+  // capture-adjacent flag, it's read LIVE by cron/multitrack-purge to decide
+  // whether per-participant audio is purged right after transcription (false)
+  // or held until retention (true) — so an admin must stay able to flip it to
+  // false on an ENDED event to force a GDPR minimization. Stripping it would
+  // make already-captured PII *harder* to delete.
   const CREATION_ONLY_FIELDS = [
     'recordingEnabled',
     'autoStartRecording',
     'whiteboardEnabled',
     'multitrackRecordingEnabled',
-    'retainParticipantTracks',
     'waitingRoomEngine',
     'videoQuality',
   ] as const;

@@ -630,7 +630,15 @@ export default function EventDetailClient({
           {isEnded &&
             event.postEventShowRecap !== false &&
             recap &&
-            !isRecapEmpty(recap) && <PostEventRecap recap={recap} className="mb-4" />}
+            !isRecapEmpty(recap) && (
+              <PostEventRecap
+                recap={recap}
+                className="mb-4"
+                // Words move to the standalone section below whenever it's on,
+                // so the recap card must not repeat them.
+                hideWords={event.postEventShowWordCloud !== false}
+              />
+            )}
 
           {/* Standalone word cloud: surfaces the collective words gated by its
               own toggle, so it can be shown even when the recap card is off (or

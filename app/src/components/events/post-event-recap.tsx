@@ -39,9 +39,14 @@ function Stars({ value }: { value: number }) {
 export default function PostEventRecap({
   recap,
   className,
+  hideWords = false,
 }: {
   recap: EventRecap;
   className?: string;
+  /** Suppress the inline top-words block when a standalone word-cloud section
+   *  is rendered separately (postEventShowWordCloud), to avoid showing the
+   *  same words twice on the concluded-event page. */
+  hideWords?: boolean;
 }) {
   const t = useTranslations('events.recap');
 
@@ -177,7 +182,7 @@ export default function PostEventRecap({
       )}
 
       {/* Top words */}
-      {recap.topWords.length > 0 && (
+      {!hideWords && recap.topWords.length > 0 && (
         <div>
           <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
             {t('topWords')}

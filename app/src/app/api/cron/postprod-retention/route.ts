@@ -25,6 +25,7 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import {
   deletePostprodBlob,
+  getPostprodStorage,
   isPostprodStorageConfigured,
 } from '@/lib/storage/postprod';
 
@@ -59,6 +60,33 @@ async function purgeRecordingArtifacts(
   }
   const del = await prisma.postprodArtifact.deleteMany({ where: { recordingId } });
   await prisma.speaker.deleteMany({ where: { recordingId } });
+
+  // Per-participant audio tracks: blobKey points at isolated-voice audio
+  // (quasi-biometric) and displayName is encrypted PII. For RETAINED
+  // (retainParticipantTracks=true) recordings, cron/multitrack-purge never
+  // fires — it waits on a retentionUntil that no app code ever sets — so the
+  // raw audio would outlive retention. Close that here: delete any surviving
+  // track blobs, then the rows (RecordingTrack has no FK dependents).
+  const tracks = await prisma.recordingTrack.findMany({
+    where: { recordingId },
+    select: { blobKey: true, audioPurgedAt: true },
+  });
+  const storage = getPostprodStorage();
+  for (const tr of tracks) {
+    if (tr.audioPurgedAt) continue; // blob already gone
+    try {
+      await storage.delete(tr.blobKey);
+      blobsDeleted += 1;
+    } catch (err) {
+      blobsFailed += 1;
+      console.warn('[postprod-retention] track blob delete failed', {
+        key: tr.blobKey,
+        err: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+  await prisma.recordingTrack.deleteMany({ where: { recordingId } });
+
   await prisma.postprodJob.updateMany({
     where: { recordingId },
     data: { payload: { scrubbed: true }, lastError: null },
@@ -111,7 +139,19 @@ export const GET = withErrorHandling(async (request) => {
     where: {
       retentionUntil: null,
       status: { not: 'ARCHIVED' },
-      event: { status: { in: ['ENDED', 'ARCHIVED'] } },
+      // EXEMPT deliberately-published videos: a recording published to the
+      // public page / video library is a kept public record, and its AI
+      // artifacts (subtitles, multilingual dubbing, transcript) are its
+      // accessibility layer — they must live as long as the video, not be
+      // purged at the event's default 30-day retention. Their lifetime is
+      // instead governed by recordingDeleteAfterDays (cron/cleanup Phase 2),
+      // or an explicit Recording.retentionUntil override. Only unpublished,
+      // event-bound recordings follow the event retention here.
+      event: {
+        status: { in: ['ENDED', 'ARCHIVED'] },
+        recordingPublished: false,
+        libraryListed: false,
+      },
     },
     select: {
       id: true,
