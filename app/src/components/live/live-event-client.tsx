@@ -540,6 +540,10 @@ export default function LiveEventClient({
   const [showLeaveChoice, setShowLeaveChoice] = useState(false);
   const [endingForAll, setEndingForAll] = useState(false);
   const [endForAllError, setEndForAllError] = useState('');
+  // "Destino evento" — chosen when the moderator ends the event for everyone.
+  const [showEndDestino, setShowEndDestino] = useState(false);
+  const [endDestino, setEndDestino] = useState<'public' | 'library' | 'archive'>('public');
+  const [endGenAi, setEndGenAi] = useState(false);
 
   const [showRecPrompt, setShowRecPrompt] = useState(false);
   const recPromptShownRef = useRef(false);
@@ -784,13 +788,26 @@ export default function LiveEventClient({
     setEndingForAll(true);
     setEndForAllError('');
     try {
+      // Single PUT that ends the event AND records the moderator's "destino":
+      //  - archive → post-event page hidden (postEventPublic=false)
+      //  - public  → post-event page visible
+      //  - library → visible + listed in the public video library
+      // + optional "genera AI": the recording hasn't uploaded yet, so we just
+      //   set aiTranscriptEnabled — the Jibri finalize webhook auto-enqueues
+      //   later, reading the now-true flag (no Recording exists to enqueue now).
+      const body: Record<string, unknown> = {
+        status: 'ENDED',
+        postEventPublic: endDestino !== 'archive',
+        ...(endDestino === 'library' && { libraryListed: true }),
+        ...(endGenAi && { aiTranscriptEnabled: true, aiSummaryEnabled: true }),
+      };
       const res = await fetch(`/api/events/${event.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: 'ENDED' }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) {
         setEndingForAll(false);
@@ -800,6 +817,7 @@ export default function LiveEventClient({
       userHangupRef.current = true;
       setEventStatus('ENDED');
       setShowLeaveChoice(false);
+      setShowEndDestino(false);
       setEndingForAll(false);
       if (jitsiApi) jitsiApi.executeCommand('hangup');
       setPhase('ended');
@@ -807,7 +825,7 @@ export default function LiveEventClient({
       setEndingForAll(false);
       setEndForAllError(t('leaveChoice.endError'));
     }
-  }, [event.id, token, jitsiApi, t]);
+  }, [event.id, token, jitsiApi, t, endDestino, endGenAi]);
 
   const handleStartEvent = useCallback(async () => {
     const res = await fetch(`/api/events/${event.id}`, {
@@ -1223,6 +1241,91 @@ export default function LiveEventClient({
           >
             {t('leaveChoice.leaveSelf')}
           </Button>
+          <Button
+            color="danger"
+            onClick={() => {
+              setShowLeaveChoice(false);
+              setEndForAllError('');
+              setShowEndDestino(true);
+            }}
+            disabled={endingForAll}
+          >
+            {t('leaveChoice.endForAll')}
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      {/* "Destino evento": what to do with the event once ended for everyone. */}
+      <Modal
+        isOpen={showEndDestino}
+        toggle={() => !endingForAll && setShowEndDestino(false)}
+        centered
+      >
+        <ModalHeader toggle={() => !endingForAll && setShowEndDestino(false)}>
+          {t('endDestino.title')}
+        </ModalHeader>
+        <ModalBody>
+          <p className="mb-3" style={{ fontSize: '0.9rem' }}>
+            {t('endDestino.body')}
+          </p>
+          <div className="d-flex flex-column gap-2">
+            {(['public', 'library', 'archive'] as const).map((opt) => (
+              <label
+                key={opt}
+                className="d-flex align-items-start gap-2 p-2 rounded"
+                style={{
+                  cursor: 'pointer',
+                  border: `1px solid ${endDestino === opt ? '#0066cc' : '#e0e0e0'}`,
+                  background: endDestino === opt ? '#f0f7ff' : 'transparent',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="endDestino"
+                  className="mt-1"
+                  checked={endDestino === opt}
+                  onChange={() => setEndDestino(opt)}
+                  disabled={endingForAll}
+                />
+                <span>
+                  <span className="fw-semibold d-block">{t(`endDestino.${opt}`)}</span>
+                  <small className="text-muted">{t(`endDestino.${opt}Help`)}</small>
+                </span>
+              </label>
+            ))}
+          </div>
+          {event.recordingEnabled && event.aiPostprodEnabled && (
+            <label
+              className="d-flex align-items-center gap-2 mt-3"
+              style={{ cursor: 'pointer', fontSize: '0.88rem' }}
+            >
+              <input
+                type="checkbox"
+                checked={endGenAi}
+                onChange={(e) => setEndGenAi(e.target.checked)}
+                disabled={endingForAll}
+              />
+              <span>{t('endDestino.genAi')}</span>
+            </label>
+          )}
+          {endForAllError && (
+            <Alert color="danger" className="mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
+              {endForAllError}
+            </Alert>
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="secondary"
+            outline
+            onClick={() => {
+              setShowEndDestino(false);
+              setShowLeaveChoice(true);
+            }}
+            disabled={endingForAll}
+          >
+            {t('endDestino.back')}
+          </Button>
           <Button color="danger" onClick={handleEndForAll} disabled={endingForAll}>
             {endingForAll ? (
               <>
@@ -1230,7 +1333,7 @@ export default function LiveEventClient({
                 {t('leaveChoice.ending')}
               </>
             ) : (
-              t('leaveChoice.endForAll')
+              t('endDestino.confirm')
             )}
           </Button>
         </ModalFooter>

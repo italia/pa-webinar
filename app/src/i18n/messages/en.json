@@ -241,6 +241,19 @@
       "ending": "Ending…",
       "endError": "Couldn't end the call. Please try again."
     },
+    "endDestino": {
+      "title": "Event destiny",
+      "body": "You're about to end the event for everyone. What should happen to it once concluded?",
+      "public": "Keep it public",
+      "publicHelp": "The concluded event page stays visible with recap, Q&A, polls, materials and feedback.",
+      "library": "Publish to the library",
+      "libraryHelp": "As above, and also show the event in the public video library (requires a published recording or a YouTube video).",
+      "archive": "Archive (private)",
+      "archiveHelp": "The concluded event page won't be public (404). Data is kept until retention expires, then deleted.",
+      "genAi": "Generate AI transcript and summary from the recording (once processing finishes)",
+      "back": "Back",
+      "confirm": "End event"
+    },
     "eventNotStarted": "The event has not started yet",
     "eventStartsAt": "The event will start on {date} at {time}",
     "countdown": "Time remaining",
