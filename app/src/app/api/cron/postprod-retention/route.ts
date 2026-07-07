@@ -116,6 +116,25 @@ async function purgeRecordingArtifacts(
   return { blobsDeleted, blobsFailed, artifactsDeleted: del.count };
 }
 
+/**
+ * True if the recording has a postprod job that still needs its raw inputs
+ * (tracks/artifacts). Mirrors cron/multitrack-purge's guard: a re-run of the
+ * multitrack transcription or a pending/running ARCHIVE reads the tracks, so
+ * purging mid-job would yield an empty transcript or a degraded archive. We
+ * defer the whole purge one tick when such a job is in flight.
+ */
+async function hasActivePostprodJob(recordingId: string): Promise<boolean> {
+  const job = await prisma.postprodJob.findFirst({
+    where: {
+      recordingId,
+      kind: { in: ['TRANSCRIBE_MULTITRACK', 'ARCHIVE'] },
+      status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] },
+    },
+    select: { id: true },
+  });
+  return job !== null;
+}
+
 export const GET = withErrorHandling(async (request) => {
   assertCronApiKey(request);
 
@@ -139,7 +158,12 @@ export const GET = withErrorHandling(async (request) => {
   let blobsFailed = 0;
   let artifactsDeleted = 0;
 
+  let deferredActiveJob = 0;
   for (const rec of expired) {
+    if (await hasActivePostprodJob(rec.id)) {
+      deferredActiveJob += 1;
+      continue;
+    }
     const r = await purgeRecordingArtifacts(rec.id);
     blobsDeleted += r.blobsDeleted;
     blobsFailed += r.blobsFailed;
@@ -157,18 +181,19 @@ export const GET = withErrorHandling(async (request) => {
     where: {
       retentionUntil: null,
       status: { not: 'ARCHIVED' },
-      // EXEMPT deliberately-published videos: a recording published to the
-      // public page / video library is a kept public record, and its AI
-      // artifacts (subtitles, multilingual dubbing, transcript) are its
-      // accessibility layer — they must live as long as the video, not be
-      // purged at the event's default 30-day retention. Their lifetime is
-      // instead governed by recordingDeleteAfterDays (cron/cleanup Phase 2),
-      // or an explicit Recording.retentionUntil override. Only unpublished,
-      // event-bound recordings follow the event retention here.
+      // EXEMPT the PUBLISHED video: a published recording is a kept public
+      // record, and its AI artifacts (subtitles, multilingual dubbing,
+      // transcript) are its accessibility layer — they must live as long as the
+      // video, not be purged at the event's default 30-day retention (their
+      // lifetime is governed by recordingDeleteAfterDays / an explicit
+      // Recording.retentionUntil override). `recordingPublished` is the single
+      // "kept public video" signal (same as cleanup Phase 3); a
+      // library-listed-but-unpublished recording is invisible, so it correctly
+      // falls through here and gets fully purged. Pass 3 below still minimizes
+      // the raw tracks of the exempted (published) recordings.
       event: {
         status: { in: ['ENDED', 'ARCHIVED'] },
         recordingPublished: false,
-        libraryListed: false,
       },
     },
     select: {
@@ -181,6 +206,10 @@ export const GET = withErrorHandling(async (request) => {
     if (!rec.event) continue;
     const expiry = rec.event.endsAt.getTime() + rec.event.dataRetentionDays * 86_400_000;
     if (expiry >= now.getTime()) continue;
+    if (await hasActivePostprodJob(rec.id)) {
+      deferredActiveJob += 1;
+      continue;
+    }
     const r = await purgeRecordingArtifacts(rec.id);
     blobsDeleted += r.blobsDeleted;
     blobsFailed += r.blobsFailed;
@@ -188,14 +217,16 @@ export const GET = withErrorHandling(async (request) => {
     eventBoundRecordings += 1;
   }
 
-  // Published/library recordings are exempt from the artifact purge above (their
+  // Published recordings are exempt from the artifact purge above (their
   // subtitles/transcript are the video's accessibility layer). But their RAW
   // per-participant track audio is never a public asset and still must be
   // minimized at retention — otherwise a published event with
   // retainParticipantTracks=true keeps quasi-biometric audio forever (the
   // artifact exemption would otherwise skip the whole recording). Purge ONLY the
-  // tracks here, leaving artifacts + status intact. `tracks: { some: {} }` makes
-  // it self-terminating: once the rows are deleted the recording stops matching.
+  // tracks here, leaving artifacts + status intact. Keyed on recordingPublished
+  // (same signal as the exemption); library-listed-but-unpublished recordings
+  // are handled by pass 2. `tracks: { some: {} }` makes this self-terminating:
+  // once the rows are deleted the recording stops matching.
   let publishedTracksPurged = 0;
   const publishedWithTracks = await prisma.recording.findMany({
     where: {
@@ -203,7 +234,7 @@ export const GET = withErrorHandling(async (request) => {
       tracks: { some: {} },
       event: {
         status: { in: ['ENDED', 'ARCHIVED'] },
-        OR: [{ recordingPublished: true }, { libraryListed: true }],
+        recordingPublished: true,
       },
     },
     select: {
@@ -216,6 +247,12 @@ export const GET = withErrorHandling(async (request) => {
     if (!rec.event) continue;
     const expiry = rec.event.endsAt.getTime() + rec.event.dataRetentionDays * 86_400_000;
     if (expiry >= now.getTime()) continue;
+    // Same active-job guard as the artifact passes: an in-flight ARCHIVE /
+    // multitrack re-run still reads these tracks — defer a tick.
+    if (await hasActivePostprodJob(rec.id)) {
+      deferredActiveJob += 1;
+      continue;
+    }
     const tp = await purgeRecordingTracks(rec.id);
     blobsDeleted += tp.blobsDeleted;
     blobsFailed += tp.blobsFailed;
@@ -260,6 +297,7 @@ export const GET = withErrorHandling(async (request) => {
     expiredRecordings: expired.length,
     eventBoundRecordings,
     publishedTracksPurged,
+    deferredActiveJob,
     blobsDeleted,
     blobsFailed,
     artifactsDeleted,
