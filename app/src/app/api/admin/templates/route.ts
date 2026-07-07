@@ -21,6 +21,8 @@ const templateSchema = z.object({
   autoStartRecording: z.boolean().optional(),
   agendaEnabled: z.boolean().optional(),
   whiteboardEnabled: z.boolean().optional(),
+  // Motore sala d'attesa pre-popolato nel wizard. null = default sito.
+  waitingRoomEngine: z.enum(['GARDEN', 'GAME', 'CLASSIC']).nullish(),
   participantsCanUnmute: z.boolean().optional(),
   participantsCanStartVideo: z.boolean().optional(),
   participantsCanShareScreen: z.boolean().optional(),

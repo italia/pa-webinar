@@ -56,6 +56,7 @@ export default async function CreateEventPage({
         autoStartRecording: selectedTemplate.autoStartRecording,
         agendaEnabled: selectedTemplate.agendaEnabled,
         whiteboardEnabled: selectedTemplate.whiteboardEnabled,
+        waitingRoomEngine: selectedTemplate.waitingRoomEngine,
         participantsCanUnmute: selectedTemplate.participantsCanUnmute,
         participantsCanStartVideo: selectedTemplate.participantsCanStartVideo,
         participantsCanShareScreen: selectedTemplate.participantsCanShareScreen,

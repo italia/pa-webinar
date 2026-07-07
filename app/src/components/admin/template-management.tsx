@@ -27,6 +27,7 @@ interface SerializedTemplate {
   qaEnabled: boolean;
   chatEnabled: boolean;
   whiteboardEnabled: boolean;
+  waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -56,6 +57,7 @@ interface EditingTemplate {
   qaEnabled: boolean;
   chatEnabled: boolean;
   whiteboardEnabled: boolean;
+  waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -77,6 +79,7 @@ const DEFAULT_NEW: EditingTemplate = {
   qaEnabled: true,
   chatEnabled: false,
   whiteboardEnabled: false,
+  waitingRoomEngine: null,
   recordingEnabled: false,
   participantsCanUnmute: false,
   participantsCanStartVideo: false,
@@ -118,6 +121,7 @@ export default function TemplateManagement({
       qaEnabled: tpl.qaEnabled,
       chatEnabled: tpl.chatEnabled,
       whiteboardEnabled: tpl.whiteboardEnabled,
+      waitingRoomEngine: tpl.waitingRoomEngine,
       recordingEnabled: tpl.recordingEnabled,
       participantsCanUnmute: tpl.participantsCanUnmute,
       participantsCanStartVideo: tpl.participantsCanStartVideo,
@@ -529,6 +533,35 @@ function TemplateForm({
             />
           </div>
         ))}
+      </div>
+
+      {/* Motore sala d'attesa pre-popolato nel wizard (null = default sito). */}
+      <div className="mb-3">
+        <label className="form-label mb-1" htmlFor="tpl-waiting-room-engine">
+          {t('waitingRoomEngineLabel')}
+        </label>
+        <select
+          id="tpl-waiting-room-engine"
+          className="form-select form-select-sm"
+          style={{ maxWidth: 340 }}
+          value={form.waitingRoomEngine ?? ''}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+            setField(
+              'waitingRoomEngine',
+              e.target.value === ''
+                ? null
+                : (e.target.value as 'GARDEN' | 'GAME' | 'CLASSIC'),
+            )
+          }
+        >
+          <option value="">{t('waitingRoomEngineSiteDefault')}</option>
+          <option value="GARDEN">{t('waitingRoomEngineGarden')}</option>
+          <option value="GAME">{t('waitingRoomEngineGame')}</option>
+          <option value="CLASSIC">{t('waitingRoomEngineClassic')}</option>
+        </select>
+        <small className="form-text text-muted d-block">
+          {t('waitingRoomEngineHelp')}
+        </small>
       </div>
 
       <div className="d-flex gap-2">
