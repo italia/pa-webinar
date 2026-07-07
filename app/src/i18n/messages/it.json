@@ -241,6 +241,19 @@
       "ending": "Termino…",
       "endError": "Errore nella terminazione. Riprova."
     },
+    "endDestino": {
+      "title": "Destino dell'evento",
+      "body": "Stai per terminare l'evento per tutti. Cosa vuoi farne una volta concluso?",
+      "public": "Mantieni pubblico",
+      "publicHelp": "La pagina dell'evento concluso resta visibile con recap, Q&A, sondaggi, materiali e feedback.",
+      "library": "Pubblica nella libreria",
+      "libraryHelp": "Come sopra, e inoltre mostra l'evento nella libreria video pubblica (richiede una registrazione pubblicata o un video YouTube).",
+      "archive": "Archivia (privato)",
+      "archiveHelp": "La pagina dell'evento concluso non sarà pubblica (404). I dati restano fino alla scadenza della retention, poi vengono cancellati.",
+      "genAi": "Genera trascrizione e sintesi AI dalla registrazione (al termine dell'elaborazione)",
+      "back": "Indietro",
+      "confirm": "Termina evento"
+    },
     "eventNotStarted": "L'evento non è ancora iniziato",
     "eventStartsAt": "L'evento inizierà il {date} alle {time}",
     "countdown": "Tempo rimanente",
