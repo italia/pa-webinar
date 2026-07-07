@@ -74,6 +74,19 @@
       "occupiedSpots": "{registered}/{max} registered",
       "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}"
     },
+    "recap": {
+      "title": "Event recap",
+      "intro": "A summary of what came up during the event.",
+      "participants": "Participants (peak)",
+      "registered": "Registered",
+      "topQuestions": "Top questions",
+      "upvotes": "{count, plural, =0 {no upvotes} one {1 upvote} other {# upvotes}}",
+      "polls": "Poll results",
+      "votes": "{count, plural, =0 {no votes} one {1 vote} other {# votes}}",
+      "topWords": "Most-shared words",
+      "feedback": "Average rating",
+      "feedbackCount": "{count, plural, one {1 response} other {# responses}}"
+    },
     "detail": {
       "title": "Event details",
       "date": "Date and time",
@@ -3199,6 +3212,7 @@
     "showMaterials": "Show shared materials",
     "showPolls": "Show poll results",
     "showFeedback": "Show feedback",
+    "showRecap": "Show event recap",
     "feedbackEnabled": "Feedback survey active at event end",
     "visibilityAlways": "Always visible",
     "visibilityUntil": "Visible until:",

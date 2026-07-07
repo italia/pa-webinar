@@ -130,6 +130,7 @@ export default async function EventManagePage({
     postEventShowMaterials: event.postEventShowMaterials,
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
+    postEventShowRecap: event.postEventShowRecap,
     feedbackEnabled: event.feedbackEnabled,
     recordingConsentText: event.recordingConsentText,
     moderatorToken: event.moderatorToken,

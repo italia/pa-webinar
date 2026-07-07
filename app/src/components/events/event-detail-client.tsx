@@ -14,6 +14,8 @@ import VideoPlayer, {
   type AudioTrack,
 } from '@/components/events/video-player';
 import PostEventTabs from '@/components/events/post-event-tabs';
+import PostEventRecap from '@/components/events/post-event-recap';
+import { isRecapEmpty, type EventRecap } from '@/lib/events/recap';
 import PostEventFeedbackInvite from '@/components/events/post-event-feedback-invite';
 import PostEventHero, {
   type StructuredSummary,
@@ -66,6 +68,7 @@ interface EventData {
   postEventShowMaterials?: boolean;
   postEventShowPolls?: boolean;
   postEventShowFeedback?: boolean;
+  postEventShowRecap?: boolean;
   dataRetentionDays?: number;
 }
 
@@ -106,6 +109,7 @@ interface EventDetailClientProps {
   materials?: MaterialData[];
   polls?: PollData[];
   feedbackSummary?: FeedbackSummary | null;
+  recap?: EventRecap | null;
   tags?: TagChip[];
   /** /live ci ha rimbalzato qui per un token personale non più valido. Letto
    *  dal server (searchParams): useSearchParams() senza <Suspense> è un build
@@ -142,6 +146,7 @@ export default function EventDetailClient({
   materials = [],
   polls = [],
   feedbackSummary = null,
+  recap = null,
   tags = [],
   invalidToken = false,
   hasRoomAccess = false,
@@ -619,6 +624,12 @@ export default function EventDetailClient({
             {t('detail.description')}
           </h2>
           <MarkdownRenderer content={description} className="mb-4" />
+
+          {/* Post-event recap: aggregate summary card above the detail tabs. */}
+          {isEnded &&
+            event.postEventShowRecap !== false &&
+            recap &&
+            !isRecapEmpty(recap) && <PostEventRecap recap={recap} className="mb-4" />}
 
           {/* Post-event tabbed content */}
           {isEnded && (
