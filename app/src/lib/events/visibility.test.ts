@@ -9,15 +9,18 @@ import {
 
 const FUTURE = new Date(Date.now() + 3_600_000);
 const PAST = new Date(Date.now() - 3_600_000);
+// Campi post-evento: per gli stati non-ENDED sono irrilevanti ma richiesti dal
+// tipo, quindi si spreddano i default "pagina attiva, nessuna scadenza".
+const PUB = { postEventPublic: true, postEventPublicUntil: null };
 
 describe('isEventPubliclyVisible', () => {
-  it('PUBLISHED/LIVE/ENDED visibili per qualunque tipo (anche a evento finito)', () => {
-    for (const status of ['PUBLISHED', 'LIVE', 'ENDED']) {
+  it('PUBLISHED/LIVE visibili per qualunque tipo (anche a evento finito)', () => {
+    for (const status of ['PUBLISHED', 'LIVE']) {
       expect(
-        isEventPubliclyVisible({ status, eventType: 'SCHEDULED', endsAt: PAST }),
+        isEventPubliclyVisible({ status, eventType: 'SCHEDULED', endsAt: PAST, ...PUB }),
       ).toBe(true);
       expect(
-        isEventPubliclyVisible({ status, eventType: 'INSTANT', endsAt: FUTURE }),
+        isEventPubliclyVisible({ status, eventType: 'INSTANT', endsAt: FUTURE, ...PUB }),
       ).toBe(true);
     }
   });
@@ -25,7 +28,7 @@ describe('isEventPubliclyVisible', () => {
   it('PROVISIONING/IDLE visibili per gli schedulati non finiti (pre-warm ≠ 404)', () => {
     for (const status of ['PROVISIONING', 'IDLE']) {
       expect(
-        isEventPubliclyVisible({ status, eventType: 'SCHEDULED', endsAt: FUTURE }),
+        isEventPubliclyVisible({ status, eventType: 'SCHEDULED', endsAt: FUTURE, ...PUB }),
       ).toBe(true);
     }
   });
@@ -33,7 +36,7 @@ describe('isEventPubliclyVisible', () => {
   it('un evento FINITO ma incagliato in IDLE/PROVISIONING (scaler giù) resta invisibile', () => {
     for (const status of ['PROVISIONING', 'IDLE']) {
       expect(
-        isEventPubliclyVisible({ status, eventType: 'SCHEDULED', endsAt: PAST }),
+        isEventPubliclyVisible({ status, eventType: 'SCHEDULED', endsAt: PAST, ...PUB }),
       ).toBe(false);
     }
   });
@@ -41,7 +44,7 @@ describe('isEventPubliclyVisible', () => {
   it('le instant call parcheggiate in PROVISIONING/IDLE restano nascoste', () => {
     for (const status of ['PROVISIONING', 'IDLE']) {
       expect(
-        isEventPubliclyVisible({ status, eventType: 'INSTANT', endsAt: FUTURE }),
+        isEventPubliclyVisible({ status, eventType: 'INSTANT', endsAt: FUTURE, ...PUB }),
       ).toBe(false);
     }
   });
@@ -49,9 +52,37 @@ describe('isEventPubliclyVisible', () => {
   it('DRAFT e ARCHIVED mai visibili', () => {
     for (const status of ['DRAFT', 'ARCHIVED']) {
       expect(
-        isEventPubliclyVisible({ status, eventType: 'SCHEDULED', endsAt: FUTURE }),
+        isEventPubliclyVisible({ status, eventType: 'SCHEDULED', endsAt: FUTURE, ...PUB }),
       ).toBe(false);
     }
+  });
+
+  describe('ENDED — gate della pagina post-evento', () => {
+    const base = { status: 'ENDED', eventType: 'SCHEDULED', endsAt: PAST } as const;
+
+    it('visibile se postEventPublic è attivo e non c’è scadenza', () => {
+      expect(
+        isEventPubliclyVisible({ ...base, postEventPublic: true, postEventPublicUntil: null }),
+      ).toBe(true);
+    });
+
+    it('nascosto (404) se il toggle admin postEventPublic è spento', () => {
+      expect(
+        isEventPubliclyVisible({ ...base, postEventPublic: false, postEventPublicUntil: null }),
+      ).toBe(false);
+    });
+
+    it('visibile finché la finestra postEventPublicUntil è futura', () => {
+      expect(
+        isEventPubliclyVisible({ ...base, postEventPublic: true, postEventPublicUntil: FUTURE }),
+      ).toBe(true);
+    });
+
+    it('nascosto (404) quando la finestra postEventPublicUntil è scaduta', () => {
+      expect(
+        isEventPubliclyVisible({ ...base, postEventPublic: true, postEventPublicUntil: PAST }),
+      ).toBe(false);
+    });
   });
 });
 
@@ -91,10 +122,11 @@ describe('isEventOpenForRegistration', () => {
 });
 
 describe('publicEventStatusWhere', () => {
-  it('esclude gli INSTANT e gli eventi finiti dai soli stati di warm-up', () => {
+  it('separa PUBLISHED/LIVE (sempre), warm-up schedulati non finiti, e ENDED col gate post-evento', () => {
     const where = publicEventStatusWhere();
-    expect(where.OR).toHaveLength(2);
-    expect(where.OR?.[0]).toEqual({ status: { in: ['PUBLISHED', 'LIVE', 'ENDED'] } });
+    expect(where.OR).toHaveLength(3);
+    expect(where.OR?.[0]).toEqual({ status: { in: ['PUBLISHED', 'LIVE'] } });
+
     const warmup = where.OR?.[1] as {
       status: { in: string[] };
       eventType: { not: string };
@@ -103,10 +135,25 @@ describe('publicEventStatusWhere', () => {
     expect(warmup.status).toEqual({ in: ['PROVISIONING', 'IDLE'] });
     expect(warmup.eventType).toEqual({ not: 'INSTANT' });
     expect(warmup.endsAt.gt).toBeInstanceOf(Date);
+
+    const ended = where.OR?.[2] as {
+      status: string;
+      postEventPublic: boolean;
+      OR: unknown[];
+    };
+    expect(ended.status).toBe('ENDED');
+    expect(ended.postEventPublic).toBe(true);
+    expect(ended.OR).toEqual([
+      { postEventPublicUntil: null },
+      { postEventPublicUntil: { gt: expect.any(Date) } },
+    ]);
   });
 
-  it('includeEnded: false toglie ENDED dalla parte sempre-pubblica', () => {
+  it('includeEnded: false esclude del tutto gli ENDED', () => {
     const where = publicEventStatusWhere({ includeEnded: false });
+    expect(where.OR).toHaveLength(2);
     expect(where.OR?.[0]).toEqual({ status: { in: ['PUBLISHED', 'LIVE'] } });
+    const serialized = (where.OR ?? []).map((c) => JSON.stringify(c));
+    expect(serialized.some((s) => s.includes('ENDED'))).toBe(false);
   });
 });

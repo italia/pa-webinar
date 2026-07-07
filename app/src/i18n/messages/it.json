@@ -3194,6 +3194,7 @@
   "postEvent": {
     "config": "Configurazione post-evento",
     "pageVisible": "Pagina evento visibile dopo la fine",
+    "pageVisibleHelp": "Se disattivata (o scaduta la finestra di visibilità), la pagina pubblica dell'evento concluso restituisce 404 e l'evento sparisce da elenchi e sitemap.",
     "showQA": "Mostra domande Q&A",
     "showMaterials": "Mostra materiali condivisi",
     "showPolls": "Mostra risultati sondaggi",

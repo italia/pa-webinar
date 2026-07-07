@@ -96,13 +96,19 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
         </h5>
 
         <div className="d-flex flex-column gap-3">
-          <div className="d-flex justify-content-between align-items-center">
-            <span style={{ fontSize: '0.9rem' }}>{t('pageVisible')}</span>
-            <ToggleSwitch
-              label=""
-              checked={pageVisible}
-              onChange={() => handleToggle('postEventPublic', !pageVisible, setPageVisible)}
-            />
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <span style={{ fontSize: '0.9rem' }}>{t('pageVisible')}</span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={t('pageVisible')}
+                checked={pageVisible}
+                onChange={() => handleToggle('postEventPublic', !pageVisible, setPageVisible)}
+              />
+            </div>
+            <small className="text-muted" style={{ fontSize: '0.78rem' }}>
+              {t('pageVisibleHelp')}
+            </small>
           </div>
 
           <div className="d-flex justify-content-between align-items-center">

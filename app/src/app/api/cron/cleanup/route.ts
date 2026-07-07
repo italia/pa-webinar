@@ -7,8 +7,9 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/cron/cleanup
  *
- * GDPR data cleanup: deletes participant PII, questions, and upvotes
- * for events whose retention period has expired.
+ * GDPR data cleanup: deletes participant PII — registrations, questions,
+ * upvotes, poll votes, questionnaire responses, chat messages (encrypted),
+ * agenda reactions — for events whose retention period has expired.
  *
  * Protected by CRON_API_KEY.
  * In production, called daily at 03:00 UTC via a Kubernetes CronJob.
@@ -208,6 +209,26 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // Chat history: sender names + message bodies are PII, encrypted at
+        // rest (encryptPII, AES-256-GCM). The FK is onDelete: Cascade, but the
+        // event row is only ARCHIVED below (never hard-deleted), so the cascade
+        // never fires — these must be purged explicitly or the chat would
+        // survive past the retention window.
+        const chatMessagesDeleted = await tx.chatMessage.deleteMany({
+          where: { eventId: evt.id },
+        });
+
+        // Agenda items + their reactions. Reactions tied to a registration
+        // already cascaded when the registration was deleted above, but guest
+        // reactions and the items themselves are only reachable via the event
+        // (never hard-deleted), so purge them explicitly (child before parent).
+        const agendaReactionsDeleted = await tx.agendaItemReaction.deleteMany({
+          where: { agendaItem: { eventId: evt.id } },
+        });
+        const agendaItemsDeleted = await tx.eventAgendaItem.deleteMany({
+          where: { eventId: evt.id },
+        });
+
         if (evt.status !== 'ARCHIVED') {
           await tx.event.update({
             where: { id: evt.id },
@@ -228,6 +249,9 @@ export const GET = withErrorHandling(async (request) => {
           remindersSent: reminderSentDeleted.count,
           reminders: remindersDeleted.count,
           registrations: registrationsDeleted.count,
+          chatMessages: chatMessagesDeleted.count,
+          agendaReactions: agendaReactionsDeleted.count,
+          agendaItems: agendaItemsDeleted.count,
         };
 
         // GDPR audit log — no PII, only counts
@@ -252,7 +276,7 @@ export const GET = withErrorHandling(async (request) => {
 
       console.log(
         `[cron/cleanup] Cleaned event ${evt.id} (${evt.slug}): ` +
-          `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes, ${result.polls} polls, ${result.pollVotes} poll votes, ${result.materials} materials deleted`
+          `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes, ${result.polls} polls, ${result.pollVotes} poll votes, ${result.materials} materials, ${result.chatMessages} chat messages deleted`
       );
 
       totalRegistrationsDeleted += result.registrations;
