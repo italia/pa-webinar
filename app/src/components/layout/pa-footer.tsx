@@ -315,10 +315,6 @@ function BuildInfo({
 }) {
   const hasRepo = githubUrl.startsWith('http');
   const commitUrl = hasRepo && BUILD_SHA ? `${githubUrl}/commit/${BUILD_SHA}` : null;
-  const releaseUrl =
-    hasRepo && BUILD_CHANNEL === 'release' && BUILD_VERSION
-      ? `${githubUrl}/releases/tag/v${BUILD_VERSION}`
-      : null;
 
   const versionLabel =
     BUILD_CHANNEL === 'release' && BUILD_VERSION
@@ -345,19 +341,9 @@ function BuildInfo({
         <span style={{ opacity: 0.75, display: 'inline-flex' }}>
           <FooterIconTag />
         </span>
-        {releaseUrl ? (
-          <a
-            href={releaseUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={t('footer.viewRelease')}
-            style={linkStyle}
-          >
-            {versionLabel}
-          </a>
-        ) : (
-          <span>{versionLabel}</span>
-        )}
+        <Link href="/changelog" title={t('footer.viewChangelog')} style={linkStyle}>
+          {versionLabel}
+        </Link>
         {BUILD_SHA ? (
           <>
             <span aria-hidden="true">·</span>
