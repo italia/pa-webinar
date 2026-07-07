@@ -940,7 +940,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
-  "@types/nodemailer@6.4.23": {
+  "@types/nodemailer@8.0.1": {
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
@@ -2650,7 +2650,7 @@
     "publisher": "Sergey Rubanov",
     "email": "chi187@gmail.com"
   },
-  "nodemailer@8.0.9": {
+  "nodemailer@9.0.3": {
     "licenses": "MIT-0",
     "repository": "https://github.com/nodemailer/nodemailer",
     "publisher": "Andris Reinman"

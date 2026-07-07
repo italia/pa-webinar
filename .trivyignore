@@ -8,3 +8,14 @@
 # segreti di produzione vivono nei Secret Kubernetes, mai nel codice/immagine,
 # e sono coperti dal check GitGuardian.
 azure-storage-account-key
+
+# CVE-2026-4372 — HuggingFace transformers RCE via untrusted model loading.
+# infra/ai/worker pins transformers==4.48.3 as part of a deliberately balanced
+# stack (whisperx 3.3.x ← pyannote 3.3 ← numpy 1.x ← torch 2.6.0). The only
+# fixed version is 5.3.0, which is incompatible with that stack: dependabot's
+# 5.3.0 bump (#116) fails the worker Docker build. The RCE vector requires
+# loading an attacker-supplied model/config; the worker only loads pinned,
+# trusted HuggingFace models (whisper/pyannote) in an isolated, opt-in batch
+# pod with no untrusted-model path. Risk accepted (VEX: not_affected). Revisit
+# when whisperx/pyannote support a patched transformers line.
+CVE-2026-4372
