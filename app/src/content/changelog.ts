@@ -1,0 +1,175 @@
+/**
+ * Public changelog — curated release history for pa-webinar.
+ *
+ * Source of truth for the `/changelog` page (linked from the footer version
+ * number). Entries are hand-curated from git tags, merged PRs, commit messages
+ * and the roadmap (docs/ROADMAP.md), newest first. Content is in Italian (the
+ * primary audience for release notes); the page chrome is localized via the
+ * `changelog` i18n namespace.
+ *
+ * When cutting a new release, prepend an entry here (version without the "v"
+ * prefix, ISO date, a short theme `title`, and a handful of user-facing
+ * `notes`). Keep bullets outcome-oriented — what changed for operators and
+ * participants — not raw commit subjects.
+ */
+
+export type ChangelogEntry = {
+  /** Semantic version without the leading "v" (matches NEXT_PUBLIC_BUILD_VERSION). */
+  version: string;
+  /** ISO date (YYYY-MM-DD) of the release tag. */
+  date: string;
+  /** Short Italian theme for the release. */
+  title: string;
+  /** User-facing highlights, most notable first. */
+  notes: string[];
+  /** Marks a release whose primary purpose was security/dependency hardening. */
+  security?: boolean;
+};
+
+export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: '0.6.0',
+    date: '2026-07-07',
+    title: 'Workflow post-evento e sala d’attesa interattiva',
+    notes: [
+      'Nuovo workflow di fine evento: al termine il moderatore sceglie la destinazione della registrazione (pubblica sulla pagina, in libreria o solo in archivio) con un prompt dedicato.',
+      'Recap post-evento automatico e anonimizzato (partecipanti, domande più votate, risultati sondaggi, nuvola di parole, valutazioni) mostrato su ogni pagina di evento concluso, anche senza registrazione.',
+      'Email di riepilogo post-evento ai partecipanti, con i contenuti dell’evento.',
+      'Sala d’attesa “Piazza Digitale” interattiva: si cammina con il proprio avatar fino al varco per entrare in call, sempre affiancata dal pulsante di ingresso classico.',
+      'Nuvola di parole come sezione dedicata nella pagina di evento concluso, con toggle di visibilità per l’admin.',
+      'Lavagna condivisa (whiteboard) abilitabile per singolo evento e da template.',
+      'Revisione UX del wizard di creazione evento: opzioni avanzate collassate, moderatore principale con link, avvisi PII, salvataggio bozza e gestione errori parziali.',
+      'Retention differenziata delle registrazioni e delle tracce audio per-relatore, allineata al segnale “video pubblicato”, con pulizia GDPR della chat.',
+    ],
+  },
+  {
+    version: '0.5.11',
+    date: '2026-06-17',
+    title: 'Rifiniture moderazione, chiusura call e audio',
+    notes: [
+      'I moderatori compaiono con il proprio nome reale invece di un generico “Moderatore”.',
+      'Schermata di chiusura in-app quando l’evento termina (niente più “Sala in preparazione”).',
+      'Correzione della sovrapposizione di icone nella sala d’attesa.',
+      'Soppressione del rumore forzata su OFF via IFrame API per risolvere problemi audio.',
+    ],
+  },
+  {
+    version: '0.5.9',
+    date: '2026-06-17',
+    title: 'Registrazione multi-traccia stabile, feedback a stelle e performance',
+    notes: [
+      'Registrazione per-relatore (multi-traccia) resa affidabile end-to-end: audio completo per traccia, niente troncamenti, upload paralleli.',
+      'Questionario di feedback post-evento a stelle con dashboard di riepilogo per l’admin.',
+      'Miglioramenti di performance: codec VP9 per la webcam, caricamento lazy su mobile, tuning del recorder.',
+      'Hook post-upgrade Helm che ricarica automaticamente la config.js di Jitsi.',
+    ],
+  },
+  {
+    version: '0.5.8',
+    date: '2026-06-16',
+    title: 'Qualità video/audio configurabile e nuovo flusso di ingresso',
+    notes: [
+      'Controllo della qualità video/audio configurabile dall’admin (preset per evento).',
+      'Redesign del flusso di join (registrazione → sala d’attesa → videocall).',
+      'L’alzata di mano mostra il nome reale di ciascun partecipante.',
+    ],
+  },
+  {
+    version: '0.5.6',
+    date: '2026-06-12',
+    title: 'Sala d’attesa configurabile e copertine evento',
+    notes: [
+      'Motore della sala d’attesa configurabile (videogioco / giardino / classica), a livello di sito e di singolo evento.',
+      'Immagini di copertina sulla pagina evento e nelle miniature delle card.',
+      'File caricati serviti tramite route dedicata con URL firmati a breve scadenza.',
+      'Pulsante “Entra ora” immediato subito dopo la registrazione.',
+      'Consolidamento della sezione admin per la gestione delle registrazioni AI e irrobustimento della cattura multi-traccia.',
+    ],
+  },
+  {
+    version: '0.5.2',
+    date: '2026-06-11',
+    title: 'Preparazione evento e rifiniture',
+    notes: [
+      'Agenda con assenso/dissenso e correzioni ai permessi ereditati da template.',
+      'Nomi reali (non “SPEAKER_00”) in sintesi e sottotitoli.',
+      'Serie di hotfix (v0.5.2–v0.5.5) in preparazione degli eventi pubblici.',
+    ],
+  },
+  {
+    version: '0.5.1',
+    date: '2026-06-05',
+    title: 'Home community-first e archivio multi-traccia',
+    notes: [
+      'Redesign della home in ottica community-first con override di traduzione a runtime e accessibilità AgID.',
+      'Archivio MKV multi-traccia con player di riascolto per singolo relatore.',
+      'Allineamento delle tracce multi-traccia al mix Jibri tramite cross-correlazione.',
+    ],
+  },
+  {
+    version: '0.5.0',
+    date: '2026-06-04',
+    title: 'Post-produzione AI e registrazione multi-traccia',
+    notes: [
+      'Pipeline di post-produzione AI: trascrizione, sintesi, sottotitoli, traduzioni e doppiaggio multivoce (sempre sintetico), con provenienza dei modelli tracciata.',
+      'Registrazione multi-traccia (una traccia per relatore) con attribuzione speaker e naming automatico (ADR-013).',
+      'Libreria video pubblica e pagina di gestione post-evento per l’admin.',
+      'Editor della trascrizione post-evento con correzione testo e riassegnazione speaker.',
+      'Overhaul della UX admin: toast e modali .italia al posto di alert nativi, skeleton loader, design token colori al posto di centinaia di hex hardcoded.',
+      'Consenso per-partecipante alla registrazione multi-traccia (GDPR) ed export Art.15 esteso.',
+    ],
+  },
+  {
+    version: '0.4.0',
+    date: '2026-04-24',
+    title: 'Engagement & Lifecycle',
+    notes: [
+      'Nuove funzioni live: nuvola di parole, timer di presentazione, contatore reaction, controlli live in stile Meet e pannello mani alzate.',
+      'Ciclo di vita delle registrazioni (temporanea → pubblicata) con gestione admin (anteprima, pubblica, elimina) e retention differenziata.',
+      'Pagina post-evento a schede (registrazione, archivio Q&A, sondaggi, feedback, materiali) con configurazione di cosa esporre e quando.',
+      'Wizard di creazione evento in 5 step, tassonomia dei tag, rubrica contatti (Person) e title-kicker editoriale.',
+      'Libreria video pubblica `/video-library` e trasparenza `/service-inventory` (CycloneDX 1.6 per-tenant).',
+      'Autoscaling JVB a due fasi con snapshot Redis per la pagina di stato.',
+      'Cleanup GDPR a 3 fasi (PII immediata / contenuti a retention / hard delete).',
+    ],
+  },
+  {
+    version: '0.3.0',
+    date: '2026-04-03',
+    title: 'Piattaforma configurabile e infrastruttura',
+    notes: [
+      'Site settings per il riuso da parte di altre PA (branding, colori, favicon, SEO, footer, modalità home, privacy/accessibilità) senza rebuild.',
+      'Dashboard di analytics e pannello admin dell’infrastruttura.',
+      '3 modalità di deploy Helm (simple / standard / full) e JVB scale-to-zero con nodepool dedicato.',
+      'Pipeline Jibri multi-cloud (Azure Blob / S3 / GCS / MinIO / local) e watermark Jitsi configurabile.',
+      'OpenSSF Scorecard, Dependabot, SBOM delle dipendenze, gestione errori centralizzata, rate limiting e oltre 210 test unitari.',
+      'Numerosi incrementi (v0.3.8–v0.3.45) a seguito del feedback post-demo.',
+    ],
+  },
+  {
+    version: '0.2.0',
+    date: '2026-04-01',
+    title: 'Feedback DTD',
+    notes: [
+      'Profilazione dei partecipanti in registrazione (ente, ruolo, tipologia) configurabile per evento, con export CSV e statistiche aggregate.',
+      'Reminder configurabili con più offset ed email differenziate.',
+      'Sondaggi/polling con risultati real-time ed export CSV.',
+      'Miglioramenti GDPR: privacy policy per evento, consensi granulari, audit log delle cancellazioni ed export dati Art.15.',
+      'Consolidamento dei ruoli Moderatore / Auditore e audit delle licenze delle dipendenze.',
+    ],
+  },
+  {
+    version: '0.1.0',
+    date: '2026-03-31',
+    title: 'MVP — prima versione',
+    notes: [
+      'Piattaforma pubblica per eventi digitali con design system .italia (Bootstrap Italia, design-react-kit).',
+      'Sala live con Jitsi Meet (IFrame API, autenticazione JWT) e ruoli enforced server-side.',
+      'Registrazione partecipanti GDPR-compliant con PII cifrate (AES-256-GCM).',
+      'Q&A con upvoting e moderazione, sala d’attesa con countdown e accesso guest.',
+      'Email di conferma/reminder, integrazione calendario (Google, Outlook, Yahoo, iCal).',
+      'Pannello admin con autenticazione API key, cleanup GDPR, metriche Prometheus.',
+      'Helm chart production-grade, Docker non-root/read-only, CI/CD GitHub Actions, publiccode.yml.',
+    ],
+  },
+];

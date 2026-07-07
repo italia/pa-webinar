@@ -2967,7 +2967,16 @@
     "buildInfoDev": "development build",
     "viewCommit": "View commit on GitHub",
     "viewRelease": "View release on GitHub",
+    "viewChangelog": "See what's new (changelog)",
     "buildDatePrefix": "Built on"
+  },
+  "changelog": {
+    "metaTitle": "What's new & changelog",
+    "title": "What's new & changelog",
+    "intro": "Every version of the platform, newest first. Each entry summarizes the main new features, fixes and improvements.",
+    "current": "Current version",
+    "sourceNote": "Notes are curated from the project's tags, pull requests and commits.",
+    "sourceLink": "See all releases on GitHub"
   },
   "pages": {
     "privacyTitle": "Privacy policy",
