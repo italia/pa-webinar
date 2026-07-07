@@ -102,6 +102,7 @@ export const GET = withErrorHandling(async (request, context) => {
       postEventShowPolls: event.postEventShowPolls,
       postEventShowFeedback: event.postEventShowFeedback,
       postEventShowRecap: event.postEventShowRecap,
+    postEventShowWordCloud: event.postEventShowWordCloud,
       postEventEmailEnabled: event.postEventEmailEnabled,
       feedbackEnabled: event.feedbackEnabled,
       recordingConsentText: event.recordingConsentText,
@@ -163,6 +164,7 @@ export const GET = withErrorHandling(async (request, context) => {
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
     postEventShowRecap: event.postEventShowRecap,
+    postEventShowWordCloud: event.postEventShowWordCloud,
     postEventEmailEnabled: event.postEventEmailEnabled,
   }, {
     headers: {
@@ -359,6 +361,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.postEventShowPolls !== undefined && { postEventShowPolls: data.postEventShowPolls }),
       ...(data.postEventShowFeedback !== undefined && { postEventShowFeedback: data.postEventShowFeedback }),
       ...(data.postEventShowRecap !== undefined && { postEventShowRecap: data.postEventShowRecap }),
+      ...(data.postEventShowWordCloud !== undefined && { postEventShowWordCloud: data.postEventShowWordCloud }),
       ...(data.postEventEmailEnabled !== undefined && { postEventEmailEnabled: data.postEventEmailEnabled }),
       ...(data.feedbackEnabled !== undefined && { feedbackEnabled: data.feedbackEnabled }),
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),

@@ -332,6 +332,7 @@ export default async function EventDetailPage({
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
     postEventShowRecap: event.postEventShowRecap,
+    postEventShowWordCloud: event.postEventShowWordCloud,
     dataRetentionDays: event.dataRetentionDays,
   };
 

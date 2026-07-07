@@ -154,6 +154,7 @@ model Event {
   postEventShowPolls     Boolean   @default(true) @map("post_event_show_polls")
   postEventShowFeedback  Boolean   @default(true) @map("post_event_show_feedback")
   postEventShowRecap     Boolean   @default(true) @map("post_event_show_recap")
+  postEventShowWordCloud Boolean   @default(true) @map("post_event_show_word_cloud")
   feedbackEnabled        Boolean   @default(true) @map("feedback_enabled")
 
   // Post-event recap: an anonymized, aggregate snapshot (headcount, top
