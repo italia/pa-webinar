@@ -102,6 +102,7 @@ export const GET = withErrorHandling(async (request, context) => {
       postEventShowPolls: event.postEventShowPolls,
       postEventShowFeedback: event.postEventShowFeedback,
       postEventShowRecap: event.postEventShowRecap,
+      postEventEmailEnabled: event.postEventEmailEnabled,
       feedbackEnabled: event.feedbackEnabled,
       recordingConsentText: event.recordingConsentText,
       // Al co-moderatore torna il SUO token (valido su tutte le route che
@@ -162,6 +163,7 @@ export const GET = withErrorHandling(async (request, context) => {
     postEventShowPolls: event.postEventShowPolls,
     postEventShowFeedback: event.postEventShowFeedback,
     postEventShowRecap: event.postEventShowRecap,
+    postEventEmailEnabled: event.postEventEmailEnabled,
   }, {
     headers: {
       'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
@@ -322,6 +324,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.postEventShowPolls !== undefined && { postEventShowPolls: data.postEventShowPolls }),
       ...(data.postEventShowFeedback !== undefined && { postEventShowFeedback: data.postEventShowFeedback }),
       ...(data.postEventShowRecap !== undefined && { postEventShowRecap: data.postEventShowRecap }),
+      ...(data.postEventEmailEnabled !== undefined && { postEventEmailEnabled: data.postEventEmailEnabled }),
       ...(data.feedbackEnabled !== undefined && { feedbackEnabled: data.feedbackEnabled }),
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
       ...(data.recordingPublished !== undefined && {

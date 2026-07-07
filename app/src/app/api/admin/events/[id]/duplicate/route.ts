@@ -126,6 +126,7 @@ export const POST = withErrorHandling(async (request, context) => {
       postEventShowPolls: source.postEventShowPolls,
       postEventShowFeedback: source.postEventShowFeedback,
       postEventShowRecap: source.postEventShowRecap,
+      postEventEmailEnabled: source.postEventEmailEnabled,
       feedbackEnabled: source.feedbackEnabled,
 
       youtubeUrl: source.youtubeUrl,

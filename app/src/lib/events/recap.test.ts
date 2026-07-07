@@ -13,7 +13,7 @@ vi.mock('@/lib/db', () => ({
 
 import { prisma } from '@/lib/db';
 
-import { buildRecap, isRecapEmpty, type EventRecap } from './recap';
+import { buildRecap, isRecapEmpty, formatRecapSummary, type EventRecap } from './recap';
 
 const mocked = prisma as unknown as {
   event: { findUnique: ReturnType<typeof vi.fn> };
@@ -123,5 +123,45 @@ describe('isRecapEmpty', () => {
     expect(isRecapEmpty({ ...empty, headcount: 5 })).toBe(false);
     expect(isRecapEmpty({ ...empty, topQuestions: [{ text: 'x', upvotes: 1 }] })).toBe(false);
     expect(isRecapEmpty({ ...empty, feedback: { average: 4, count: 2 } })).toBe(false);
+  });
+});
+
+describe('formatRecapSummary', () => {
+  const full: EventRecap = {
+    version: 1,
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    headcount: 42,
+    registrations: 100,
+    topQuestions: [{ text: 'q', upvotes: 3 }],
+    polls: [{ question: 'p', options: [], totalVotes: 0 }],
+    topWords: [],
+    feedback: { average: 4.5, count: 20 },
+  };
+
+  it('elenca solo le sezioni con dati, con etichette localizzate', () => {
+    const it = formatRecapSummary(full, 'it');
+    expect(it).toContain('Partecipanti (picco): 42');
+    expect(it).toContain('Registrati: 100');
+    expect(it).toContain('Media feedback: 4.5/5 (20 risposte)');
+    const en = formatRecapSummary(full, 'en');
+    expect(en).toContain('Participants (peak): 42');
+    expect(en).toContain('Average rating: 4.5/5 (20 responses)');
+  });
+
+  it('omette le sezioni vuote', () => {
+    const summary = formatRecapSummary(
+      {
+        version: 1,
+        generatedAt: '2026-01-01T00:00:00.000Z',
+        headcount: 0,
+        registrations: 10,
+        topQuestions: [],
+        polls: [],
+        topWords: [],
+        feedback: { average: null, count: 0 },
+      },
+      'it',
+    );
+    expect(summary).toBe('Registrati: 10');
   });
 });

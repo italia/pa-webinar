@@ -163,6 +163,13 @@ model Event {
   postEventRecap   Json?     @map("post_event_recap")
   postEventRecapAt DateTime? @map("post_event_recap_at")
 
+  // Post-event follow-up email (opt-in per event). When enabled, the reminders
+  // cron sends a thank-you + recap/feedback email to registrants and a recap
+  // to the moderator once the event has ENDED. `postEventEmailSentAt` guards
+  // against re-sending on subsequent cron runs.
+  postEventEmailEnabled Boolean   @default(false) @map("post_event_email_enabled")
+  postEventEmailSentAt  DateTime? @map("post_event_email_sent_at")
+
   // GDPR recording consent
   recordingConsentText String? @map("recording_consent_text") @db.Text
 
