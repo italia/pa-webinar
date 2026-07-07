@@ -25,6 +25,7 @@ interface PostEventConfigProps {
     postEventShowPolls: boolean;
     postEventShowFeedback: boolean;
     postEventShowRecap: boolean;
+    postEventShowWordCloud: boolean;
     postEventEmailEnabled: boolean;
     feedbackEnabled: boolean;
     dataRetentionDays: number;
@@ -41,6 +42,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
   const [showPolls, setShowPolls] = useState(event.postEventShowPolls);
   const [showFeedback, setShowFeedback] = useState(event.postEventShowFeedback);
   const [showRecap, setShowRecap] = useState(event.postEventShowRecap);
+  const [showWordCloud, setShowWordCloud] = useState(event.postEventShowWordCloud);
   const [emailEnabled, setEmailEnabled] = useState(event.postEventEmailEnabled);
   const [feedbackActive, setFeedbackActive] = useState(event.feedbackEnabled);
   const [visibilityMode, setVisibilityMode] = useState<'always' | 'until'>(
@@ -184,6 +186,18 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
               ariaLabel={t('showRecap')}
               checked={showRecap}
               onChange={() => handleToggle('postEventShowRecap', !showRecap, setShowRecap)}
+            />
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center">
+            <span style={{ fontSize: '0.9rem' }}>{t('showWordCloud')}</span>
+            <ToggleSwitch
+              label=""
+              ariaLabel={t('showWordCloud')}
+              checked={showWordCloud}
+              onChange={() =>
+                handleToggle('postEventShowWordCloud', !showWordCloud, setShowWordCloud)
+              }
             />
           </div>
 

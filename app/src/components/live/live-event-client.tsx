@@ -1188,6 +1188,7 @@ export default function LiveEventClient({
           qaEnabled={event.qaEnabled}
           chatEnabled={event.chatEnabled}
           agendaEnabled={event.agendaEnabled}
+          whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
           jitsiApi={jitsiApi}
           displayName={credentials.displayName}
           canReactAgenda={!isModerator && !isSpeaker}
@@ -1353,6 +1354,8 @@ interface LiveSidebarProps {
   qaEnabled: boolean;
   chatEnabled: boolean;
   agendaEnabled: boolean;
+  /** Whiteboard is enabled for this call → show the "not saved" reminder. */
+  whiteboardEnabled: boolean;
   jitsiApi: JitsiMeetExternalAPI | null;
   displayName: string;
   /** Audience (guests + registered participants) may react to agenda items;
@@ -1370,6 +1373,7 @@ function LiveSidebar({
   qaEnabled,
   chatEnabled,
   agendaEnabled,
+  whiteboardEnabled,
   jitsiApi,
   displayName,
   canReactAgenda = false,
@@ -1838,6 +1842,18 @@ function LiveSidebar({
                   {label}
                 </button>
               ))}
+            </div>
+          )}
+          {/* Whiteboard isn't persisted (native Jitsi/Excalidraw is ephemeral and
+              end-to-end encrypted — there's no capture hook). Remind moderators
+              to export + attach it as a material before the call ends. */}
+          {isModerator && whiteboardEnabled && (
+            <div
+              className="px-3 py-2"
+              style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.78rem' }}
+              role="note"
+            >
+              <span className="text-secondary">💡 {t('whiteboardNotSavedHint')}</span>
             </div>
           )}
           {activeTab === 'qa' && effQa && (

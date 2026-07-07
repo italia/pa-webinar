@@ -133,6 +133,7 @@ interface EventData {
   postEventShowQA: boolean; postEventShowMaterials: boolean;
   postEventShowPolls: boolean; postEventShowFeedback: boolean;
   postEventShowRecap: boolean;
+  postEventShowWordCloud: boolean;
   postEventEmailEnabled: boolean;
   feedbackEnabled: boolean; recordingConsentText: string | null;
   requireOrganization: boolean; requireOrganizationRole: boolean; requireOrganizationType: boolean;
@@ -688,6 +689,7 @@ function SettingsTab({ event, editUrl }: { event: EventData; editUrl: string }) 
             postEventShowPolls: event.postEventShowPolls,
             postEventShowFeedback: event.postEventShowFeedback,
             postEventShowRecap: event.postEventShowRecap,
+            postEventShowWordCloud: event.postEventShowWordCloud,
             postEventEmailEnabled: event.postEventEmailEnabled,
             feedbackEnabled: event.feedbackEnabled,
             dataRetentionDays: event.dataRetentionDays,

@@ -69,6 +69,7 @@ interface EventData {
   postEventShowPolls?: boolean;
   postEventShowFeedback?: boolean;
   postEventShowRecap?: boolean;
+  postEventShowWordCloud?: boolean;
   dataRetentionDays?: number;
 }
 
@@ -630,6 +631,45 @@ export default function EventDetailClient({
             event.postEventShowRecap !== false &&
             recap &&
             !isRecapEmpty(recap) && <PostEventRecap recap={recap} className="mb-4" />}
+
+          {/* Standalone word cloud: surfaces the collective words gated by its
+              own toggle, so it can be shown even when the recap card is off (or
+              hidden while the recap stays on). Reads the persisted recap words. */}
+          {isEnded &&
+            event.postEventShowWordCloud !== false &&
+            recap &&
+            recap.topWords.length > 0 && (
+              <Card className="shadow-sm border-0 mb-4">
+                <CardBody className="p-4">
+                  <h2 className="h5 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+                    {t('wordCloudTitle')}
+                  </h2>
+                  <div className="d-flex flex-wrap gap-2">
+                    {recap.topWords.map((w, i) => {
+                      const maxCount = Math.max(1, ...recap.topWords.map((x) => x.count));
+                      const size = 0.9 + (w.count / maxCount) * 0.8;
+                      return (
+                        <span
+                          key={i}
+                          className="px-2 py-1 rounded bg-white"
+                          style={{
+                            border: '1px solid #dee5ec',
+                            fontSize: `${size}rem`,
+                            color: 'var(--app-primary)',
+                          }}
+                        >
+                          {w.word}
+                          <span className="text-secondary" style={{ fontSize: '0.7rem' }}>
+                            {' '}
+                            ·{w.count}
+                          </span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                </CardBody>
+              </Card>
+            )}
 
           {/* Post-event tabbed content */}
           {isEnded && (
