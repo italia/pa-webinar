@@ -128,7 +128,7 @@ interface EventData {
   recordingUrl: string | null; tempRecordingUrl: string | null; tempRecordingStartedAt: string | null;
   recordingPublished: boolean; recordingPublishedAt: string | null;
   recordingFileSize: number | null; recordingDuration: number | null; recordingDeleteAfterDays: number | null;
-  youtubeUrl: string | null; libraryListed: boolean;
+  youtubeUrl: string | null; libraryListed: boolean; hasRecordingRow: boolean;
   postEventPublic: boolean; postEventPublicUntil: string | null;
   postEventShowQA: boolean; postEventShowMaterials: boolean;
   postEventShowPolls: boolean; postEventShowFeedback: boolean;
@@ -882,9 +882,11 @@ function ContentTab({ event }: { event: EventData }) {
 function PostEventTab({ event, status }: { event: EventData; status: string }) {
   const td = useTranslations('admin.eventDetail');
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
-  // A recording exists (at event level) → the AI pipeline can run on it. Capture
-  // is live-only, so an event with no recording can never be post-processed.
-  const hasRecording = Boolean(event.recordingUrl || event.tempRecordingUrl);
+  // A Recording ROW exists (live capture happened) → the AI pipeline can run on
+  // it. Gated on the row, NOT on recordingUrl: an externally/manually-set
+  // recordingUrl has no Recording row, so generate-ai would 404 — the button
+  // must not offer an action that can never succeed.
+  const hasRecording = event.hasRecordingRow;
   const [generatingAi, setGeneratingAi] = useState(false);
   const [aiGenMsg, setAiGenMsg] = useState<{ ok: boolean; text: string } | null>(null);
 

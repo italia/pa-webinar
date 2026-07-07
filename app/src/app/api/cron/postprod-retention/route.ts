@@ -32,13 +32,53 @@ import {
 export const dynamic = 'force-dynamic';
 
 /**
+ * Purge a recording's per-participant audio tracks: blobKey points at
+ * isolated-voice audio (quasi-biometric) and displayName is encrypted PII.
+ * For RETAINED (retainParticipantTracks=true) recordings, cron/multitrack-purge
+ * never fires — it waits on a retentionUntil that no app code ever sets — so
+ * the raw audio would otherwise outlive retention. Deletes any surviving track
+ * blobs, then the rows (RecordingTrack has no FK dependents). Idempotent.
+ *
+ * This is deliberately independent of the published/library artifact exemption:
+ * subtitles/transcripts are a public video's accessibility layer worth keeping,
+ * but the raw per-participant audio is never a public asset and must always be
+ * minimized at retention.
+ */
+async function purgeRecordingTracks(
+  recordingId: string
+): Promise<{ blobsDeleted: number; blobsFailed: number }> {
+  let blobsDeleted = 0;
+  let blobsFailed = 0;
+  const tracks = await prisma.recordingTrack.findMany({
+    where: { recordingId },
+    select: { blobKey: true, audioPurgedAt: true },
+  });
+  const storage = getPostprodStorage();
+  for (const tr of tracks) {
+    if (tr.audioPurgedAt) continue; // blob already gone
+    try {
+      await storage.delete(tr.blobKey);
+      blobsDeleted += 1;
+    } catch (err) {
+      blobsFailed += 1;
+      console.warn('[postprod-retention] track blob delete failed', {
+        key: tr.blobKey,
+        err: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+  await prisma.recordingTrack.deleteMany({ where: { recordingId } });
+  return { blobsDeleted, blobsFailed };
+}
+
+/**
  * Purge every postprod artifact of a recording: delete the blobs, delete the
- * artifact rows, delete Speaker rows (full PII), scrub PostprodJob payloads,
- * then archive the recording. Shared by the override and the event-bound
- * regimes so the two never drift.
+ * artifact rows, delete Speaker rows (full PII), purge the raw tracks, scrub
+ * PostprodJob payloads, then archive the recording. Shared by the override and
+ * the (non-published) event-bound regimes so the two never drift.
  */
 async function purgeRecordingArtifacts(
-  recordingId: string,
+  recordingId: string
 ): Promise<{ blobsDeleted: number; blobsFailed: number; artifactsDeleted: number }> {
   let blobsDeleted = 0;
   let blobsFailed = 0;
@@ -61,31 +101,9 @@ async function purgeRecordingArtifacts(
   const del = await prisma.postprodArtifact.deleteMany({ where: { recordingId } });
   await prisma.speaker.deleteMany({ where: { recordingId } });
 
-  // Per-participant audio tracks: blobKey points at isolated-voice audio
-  // (quasi-biometric) and displayName is encrypted PII. For RETAINED
-  // (retainParticipantTracks=true) recordings, cron/multitrack-purge never
-  // fires — it waits on a retentionUntil that no app code ever sets — so the
-  // raw audio would outlive retention. Close that here: delete any surviving
-  // track blobs, then the rows (RecordingTrack has no FK dependents).
-  const tracks = await prisma.recordingTrack.findMany({
-    where: { recordingId },
-    select: { blobKey: true, audioPurgedAt: true },
-  });
-  const storage = getPostprodStorage();
-  for (const tr of tracks) {
-    if (tr.audioPurgedAt) continue; // blob already gone
-    try {
-      await storage.delete(tr.blobKey);
-      blobsDeleted += 1;
-    } catch (err) {
-      blobsFailed += 1;
-      console.warn('[postprod-retention] track blob delete failed', {
-        key: tr.blobKey,
-        err: err instanceof Error ? err.message : String(err),
-      });
-    }
-  }
-  await prisma.recordingTrack.deleteMany({ where: { recordingId } });
+  const tp = await purgeRecordingTracks(recordingId);
+  blobsDeleted += tp.blobsDeleted;
+  blobsFailed += tp.blobsFailed;
 
   await prisma.postprodJob.updateMany({
     where: { recordingId },
@@ -170,6 +188,40 @@ export const GET = withErrorHandling(async (request) => {
     eventBoundRecordings += 1;
   }
 
+  // Published/library recordings are exempt from the artifact purge above (their
+  // subtitles/transcript are the video's accessibility layer). But their RAW
+  // per-participant track audio is never a public asset and still must be
+  // minimized at retention — otherwise a published event with
+  // retainParticipantTracks=true keeps quasi-biometric audio forever (the
+  // artifact exemption would otherwise skip the whole recording). Purge ONLY the
+  // tracks here, leaving artifacts + status intact. `tracks: { some: {} }` makes
+  // it self-terminating: once the rows are deleted the recording stops matching.
+  let publishedTracksPurged = 0;
+  const publishedWithTracks = await prisma.recording.findMany({
+    where: {
+      retentionUntil: null,
+      tracks: { some: {} },
+      event: {
+        status: { in: ['ENDED', 'ARCHIVED'] },
+        OR: [{ recordingPublished: true }, { libraryListed: true }],
+      },
+    },
+    select: {
+      id: true,
+      event: { select: { endsAt: true, dataRetentionDays: true } },
+    },
+    take: 50,
+  });
+  for (const rec of publishedWithTracks) {
+    if (!rec.event) continue;
+    const expiry = rec.event.endsAt.getTime() + rec.event.dataRetentionDays * 86_400_000;
+    if (expiry >= now.getTime()) continue;
+    const tp = await purgeRecordingTracks(rec.id);
+    blobsDeleted += tp.blobsDeleted;
+    blobsFailed += tp.blobsFailed;
+    publishedTracksPurged += 1;
+  }
+
   // Also walk the global aiArtifactRetentionDays override (a single
   // site-wide N-days from artifact creation). 0 = disabled.
   const site = await prisma.siteSetting.findUnique({
@@ -207,6 +259,7 @@ export const GET = withErrorHandling(async (request) => {
     ok: true,
     expiredRecordings: expired.length,
     eventBoundRecordings,
+    publishedTracksPurged,
     blobsDeleted,
     blobsFailed,
     artifactsDeleted,

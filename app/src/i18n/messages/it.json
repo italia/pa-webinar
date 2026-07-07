@@ -64,6 +64,7 @@
     "past": "Eventi passati",
     "noUpcoming": "Nessun evento in programma al momento. Torna a trovarci!",
     "noPast": "Nessun evento passato",
+    "wordCloudTitle": "Nuvola di parole",
     "card": {
       "publicEvent": "Evento pubblico",
       "readMore": "Scopri di più",
@@ -284,7 +285,6 @@
     "recordingPromptLater": "Dopo",
     "eventEnded": "Evento concluso",
     "eventEndedMessage": "L'evento è terminato. Grazie per aver partecipato.",
-    "wordCloudTitle": "Nuvola di parole",
     "reconnecting": "Riconnessione in corso…",
     "reconnectingMessage": "La tua connessione di rete è caduta. Stiamo cercando di riportarti in chiamata.",
     "reconnectingAttempt": "Tentativo {n} di {total}",

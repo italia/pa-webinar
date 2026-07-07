@@ -31,8 +31,11 @@ export const GET = withErrorHandling(async (request) => {
   const page = Number.isFinite(pageRaw) && pageRaw > 0 ? Math.floor(pageRaw) : 1;
   const pageSizeRaw = Number(url.searchParams.get('pageSize') ?? PAGE_SIZE_DEFAULT);
   const pageSize = Math.min(
-    Math.max(1, Number.isFinite(pageSizeRaw) ? Math.floor(pageSizeRaw) : PAGE_SIZE_DEFAULT),
-    PAGE_SIZE_MAX,
+    Math.max(
+      1,
+      Number.isFinite(pageSizeRaw) ? Math.floor(pageSizeRaw) : PAGE_SIZE_DEFAULT
+    ),
+    PAGE_SIZE_MAX
   );
 
   const now = new Date();
@@ -62,41 +65,65 @@ export const GET = withErrorHandling(async (request) => {
     ],
   };
 
-  const [rows, total] = await Promise.all([
-    prisma.event.findMany({
-      where,
-      orderBy: [{ recordingPublishedAt: 'desc' }, { endsAt: 'desc' }],
-      take: pageSize,
-      skip: (page - 1) * pageSize,
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        description: true,
-        startsAt: true,
-        endsAt: true,
-        recordingDuration: true,
-        recordingPublishedAt: true,
-        youtubeUrl: true,
-        imageUrl: true,
-        coverImageUrl: true,
-      },
-    }),
-    prisma.event.count({ where }),
-  ]);
+  const librarySelect = {
+    id: true,
+    slug: true,
+    title: true,
+    description: true,
+    startsAt: true,
+    endsAt: true,
+    recordingDuration: true,
+    recordingPublishedAt: true,
+    youtubeUrl: true,
+    imageUrl: true,
+    coverImageUrl: true,
+  } as const;
+  const orderBy = [
+    { recordingPublishedAt: 'desc' as const },
+    { endsAt: 'desc' as const },
+  ];
 
   const q = search.toLowerCase();
-  const filtered = q
-    ? rows.filter((r) => {
-        const t = getLocalized(r.title as LocalizedField, locale).toLowerCase();
-        const d = getLocalized(r.description as LocalizedField, locale).toLowerCase();
-        return t.includes(q) || d.includes(q);
-      })
-    : rows;
+
+  let rows: Prisma.EventGetPayload<{ select: typeof librarySelect }>[];
+  let total: number;
+  if (q) {
+    // Title/description are per-locale JSONB, so a case-insensitive substring
+    // match across locales can't be expressed in the Prisma `where` — it must
+    // run in JS. Fetch the full library set (hard-capped), filter, THEN paginate
+    // in JS, so both `total` and the returned page reflect the SEARCH rather
+    // than the whole library (the previous code filtered only the current DB
+    // page and counted the unfiltered total → wrong counts + empty pages). The
+    // public library is small (tens–low-hundreds of published events).
+    const all = await prisma.event.findMany({
+      where,
+      orderBy,
+      take: 1000,
+      select: librarySelect,
+    });
+    const matched = all.filter((r) => {
+      const t = getLocalized(r.title as LocalizedField, locale).toLowerCase();
+      const d = getLocalized(r.description as LocalizedField, locale).toLowerCase();
+      return t.includes(q) || d.includes(q);
+    });
+    total = matched.length;
+    rows = matched.slice((page - 1) * pageSize, page * pageSize);
+  } else {
+    [rows, total] = await Promise.all([
+      prisma.event.findMany({
+        where,
+        orderBy,
+        take: pageSize,
+        skip: (page - 1) * pageSize,
+        select: librarySelect,
+      }),
+      prisma.event.count({ where }),
+    ]);
+  }
 
   return Response.json(
     {
-      rows: filtered.map((r) => ({
+      rows: rows.map((r) => ({
         id: r.id,
         slug: r.slug,
         title: getLocalized(r.title as LocalizedField, locale),
@@ -114,6 +141,6 @@ export const GET = withErrorHandling(async (request) => {
       pageSize,
       total,
     },
-    { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } },
+    { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } }
   );
 });

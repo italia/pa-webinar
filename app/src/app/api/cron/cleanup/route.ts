@@ -139,6 +139,8 @@ export const GET = withErrorHandling(async (request) => {
       status: true,
       recordingUrl: true,
       tempRecordingUrl: true,
+      recordingPublished: true,
+      libraryListed: true,
       _count: { select: { registrations: true, questions: true, polls: true } },
     },
   });
@@ -307,11 +309,19 @@ export const GET = withErrorHandling(async (request) => {
       });
 
       // Blob deletion (network I/O) AFTER the transaction commits — best-effort.
-      for (const url of [evt.recordingUrl, evt.tempRecordingUrl]) {
-        if (url) {
-          const ok = await deleteRecordingBlob(url).catch(() => false);
-          if (ok) totalRecordingBlobsDeleted++;
-        }
+      // tempRecordingUrl is raw pre-publish Jibri output → always safe to purge.
+      if (evt.tempRecordingUrl) {
+        const ok = await deleteRecordingBlob(evt.tempRecordingUrl).catch(() => false);
+        if (ok) totalRecordingBlobsDeleted++;
+      }
+      // recordingUrl: EXEMPT deliberately-published videos. A published /
+      // library-listed recording is a kept public record whose lifetime is
+      // governed by recordingDeleteAfterDays (Phase 2), not the PII retention
+      // window — deleting it here would 404 the still-linked public player and
+      // library card. Only purge the video for un-published leftovers.
+      if (evt.recordingUrl && !evt.recordingPublished && !evt.libraryListed) {
+        const ok = await deleteRecordingBlob(evt.recordingUrl).catch(() => false);
+        if (ok) totalRecordingBlobsDeleted++;
       }
       if (isAzureConfigured()) {
         for (const m of fileMaterialBlobs) {
