@@ -28,6 +28,16 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.1',
+    date: '2026-07-07',
+    title: 'Changelog pubblico e aggiornamenti di sicurezza',
+    notes: [
+      'Nuova pagina changelog pubblica, raggiungibile cliccando il numero di versione nel footer: elenca tutte le versioni della piattaforma con le principali novità.',
+      'Aggiornamenti di sicurezza delle dipendenze (undici, nodemailer) e hardening della pipeline di build (scansione vulnerabilità).',
+    ],
+    security: true,
+  },
+  {
     version: '0.6.0',
     date: '2026-07-07',
     title: 'Workflow post-evento e sala d’attesa interattiva',
