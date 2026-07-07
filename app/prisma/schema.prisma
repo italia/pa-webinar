@@ -950,6 +950,9 @@ model EventTemplate {
   // Pre-attiva la lavagna condivisa (Event.whiteboardEnabled) per gli eventi
   // creati da questo template. Modificabile nel wizard (step 2).
   whiteboardEnabled          Boolean @default(false) @map("whiteboard_enabled")
+  // Motore sala d'attesa pre-popolato nel wizard (Event.waitingRoomEngine).
+  // Nullable: null = usa il default del sito (SiteSetting.waitingRoomEngine).
+  waitingRoomEngine          WaitingRoomEngine? @map("waiting_room_engine")
   participantsCanUnmute      Boolean @default(false) @map("participants_can_unmute")
   participantsCanStartVideo  Boolean @default(false) @map("participants_can_start_video")
   participantsCanShareScreen Boolean @default(false) @map("participants_can_share_screen")

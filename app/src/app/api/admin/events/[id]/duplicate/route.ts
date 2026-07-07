@@ -90,6 +90,7 @@ export const POST = withErrorHandling(async (request, context) => {
       qaEnabled: source.qaEnabled,
       chatEnabled: source.chatEnabled,
       whiteboardEnabled: source.whiteboardEnabled,
+      waitingRoomEngine: source.waitingRoomEngine,
       recordingEnabled: source.recordingEnabled,
 
       participantsCanUnmute: source.participantsCanUnmute,

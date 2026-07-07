@@ -51,6 +51,7 @@ export interface WizardTemplatePreset {
   autoStartRecording: boolean;
   agendaEnabled?: boolean;
   whiteboardEnabled?: boolean;
+  waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
@@ -365,7 +366,9 @@ export default function EventWizard(props: WizardProps) {
       recurrenceUntil: null,
       recurrenceCount: null,
       parseTitleKicker: null,
-      waitingRoomEngine: null,
+      // Pre-popola dal template (null = default sito); prima era hardcoded a
+      // null → il motore sala d'attesa del template non arrivava al wizard.
+      waitingRoomEngine: tpl?.waitingRoomEngine ?? null,
       videoQuality: null,
       expectedSenderRatioPct: null,
 
