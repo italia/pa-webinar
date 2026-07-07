@@ -5,11 +5,11 @@
  * Two retention regimes coexist:
  *
  *   1. **Event-bound** (default): `Recording.retentionUntil` is null
- *      → the artifact is purged when the parent Event is hard-deleted
- *      by the existing `/api/cron/cleanup` job. We just walk dangling
- *      blobs in `postprod/` that no longer have a backing Recording
- *      row (`OrphanRecording`-like reconciliation, applied to
- *      postprod artifacts).
+ *      → the artifact follows the parent event's retention. Since
+ *      `/api/cron/cleanup` only ARCHIVES the event (it never hard-
+ *      deletes the row), we purge here once the event is past
+ *      `endsAt + dataRetentionDays` — otherwise transcripts/summaries
+ *      (which can carry names) would survive forever.
  *
  *   2. **Override** (`Recording.retentionUntil != null` OR
  *      `SiteSetting.aiArtifactRetentionDays > 0`): artifacts past
@@ -29,6 +29,46 @@ import {
 } from '@/lib/storage/postprod';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Purge every postprod artifact of a recording: delete the blobs, delete the
+ * artifact rows, delete Speaker rows (full PII), scrub PostprodJob payloads,
+ * then archive the recording. Shared by the override and the event-bound
+ * regimes so the two never drift.
+ */
+async function purgeRecordingArtifacts(
+  recordingId: string,
+): Promise<{ blobsDeleted: number; blobsFailed: number; artifactsDeleted: number }> {
+  let blobsDeleted = 0;
+  let blobsFailed = 0;
+  const artifacts = await prisma.postprodArtifact.findMany({
+    where: { recordingId },
+    select: { id: true, blobKey: true },
+  });
+  for (const a of artifacts) {
+    try {
+      await deletePostprodBlob(a.blobKey);
+      blobsDeleted += 1;
+    } catch (err) {
+      blobsFailed += 1;
+      console.warn('[postprod-retention] blob delete failed', {
+        key: a.blobKey,
+        err: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+  const del = await prisma.postprodArtifact.deleteMany({ where: { recordingId } });
+  await prisma.speaker.deleteMany({ where: { recordingId } });
+  await prisma.postprodJob.updateMany({
+    where: { recordingId },
+    data: { payload: { scrubbed: true }, lastError: null },
+  });
+  await prisma.recording.update({
+    where: { id: recordingId },
+    data: { status: 'ARCHIVED' },
+  });
+  return { blobsDeleted, blobsFailed, artifactsDeleted: del.count };
+}
 
 export const GET = withErrorHandling(async (request) => {
   assertCronApiKey(request);
@@ -54,45 +94,40 @@ export const GET = withErrorHandling(async (request) => {
   let artifactsDeleted = 0;
 
   for (const rec of expired) {
-    const artifacts = await prisma.postprodArtifact.findMany({
-      where: { recordingId: rec.id },
-      select: { id: true, blobKey: true },
-    });
+    const r = await purgeRecordingArtifacts(rec.id);
+    blobsDeleted += r.blobsDeleted;
+    blobsFailed += r.blobsFailed;
+    artifactsDeleted += r.artifactsDeleted;
+  }
 
-    for (const a of artifacts) {
-      try {
-        await deletePostprodBlob(a.blobKey);
-        blobsDeleted += 1;
-      } catch (err) {
-        blobsFailed += 1;
-        console.warn('[postprod-retention] blob delete failed', {
-          key: a.blobKey,
-          err: err instanceof Error ? err.message : String(err),
-        });
-      }
-    }
-
-    // Cascade: artifact rows, scrub PII su Speaker e PostprodJob,
-    // poi marca il recording archived. I PostprodJob restano per
-    // audit (count, esiti, durate), ma `payload` e `lastError`
-    // possono contenere snippet di trascrizione o nomi → scrub.
-    // Speaker.displayName è PII piena (copiata da Person al link)
-    // → cancellata insieme agli artifact, non sopravvive a retention.
-    const del = await prisma.postprodArtifact.deleteMany({
-      where: { recordingId: rec.id },
-    });
-    artifactsDeleted += del.count;
-
-    await prisma.speaker.deleteMany({ where: { recordingId: rec.id } });
-    await prisma.postprodJob.updateMany({
-      where: { recordingId: rec.id },
-      data: { payload: { scrubbed: true }, lastError: null },
-    });
-
-    await prisma.recording.update({
-      where: { id: rec.id },
-      data: { status: 'ARCHIVED' },
-    });
+  // Event-bound default (retentionUntil == null): follow the parent event's
+  // retention. `/api/cron/cleanup` only ARCHIVES the event (never hard-deletes),
+  // so WITHOUT this branch these artifacts — transcripts/summaries that can
+  // carry names — would live forever. Purge once the event is past
+  // endsAt + dataRetentionDays. Prisma can't do that date arithmetic in a
+  // `where`, so filter in JS (same pattern as cron/cleanup Phase 3).
+  let eventBoundRecordings = 0;
+  const eventBoundCandidates = await prisma.recording.findMany({
+    where: {
+      retentionUntil: null,
+      status: { not: 'ARCHIVED' },
+      event: { status: { in: ['ENDED', 'ARCHIVED'] } },
+    },
+    select: {
+      id: true,
+      event: { select: { endsAt: true, dataRetentionDays: true } },
+    },
+    take: 50,
+  });
+  for (const rec of eventBoundCandidates) {
+    if (!rec.event) continue;
+    const expiry = rec.event.endsAt.getTime() + rec.event.dataRetentionDays * 86_400_000;
+    if (expiry >= now.getTime()) continue;
+    const r = await purgeRecordingArtifacts(rec.id);
+    blobsDeleted += r.blobsDeleted;
+    blobsFailed += r.blobsFailed;
+    artifactsDeleted += r.artifactsDeleted;
+    eventBoundRecordings += 1;
   }
 
   // Also walk the global aiArtifactRetentionDays override (a single
@@ -131,6 +166,7 @@ export const GET = withErrorHandling(async (request) => {
   return Response.json({
     ok: true,
     expiredRecordings: expired.length,
+    eventBoundRecordings,
     blobsDeleted,
     blobsFailed,
     artifactsDeleted,
