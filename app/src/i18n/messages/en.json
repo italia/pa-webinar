@@ -3194,6 +3194,7 @@
   "postEvent": {
     "config": "Post-event configuration",
     "pageVisible": "Event page visible after end",
+    "pageVisibleHelp": "When off (or once the visibility window expires), the concluded event's public page returns 404 and the event drops out of listings and the sitemap.",
     "showQA": "Show Q&A questions",
     "showMaterials": "Show shared materials",
     "showPolls": "Show poll results",
