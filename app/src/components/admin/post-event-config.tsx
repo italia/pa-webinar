@@ -23,6 +23,7 @@ interface PostEventConfigProps {
     postEventShowPolls: boolean;
     postEventShowFeedback: boolean;
     postEventShowRecap: boolean;
+    postEventEmailEnabled: boolean;
     feedbackEnabled: boolean;
     dataRetentionDays: number;
   };
@@ -37,6 +38,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
   const [showPolls, setShowPolls] = useState(event.postEventShowPolls);
   const [showFeedback, setShowFeedback] = useState(event.postEventShowFeedback);
   const [showRecap, setShowRecap] = useState(event.postEventShowRecap);
+  const [emailEnabled, setEmailEnabled] = useState(event.postEventEmailEnabled);
   const [feedbackActive, setFeedbackActive] = useState(event.feedbackEnabled);
   const [visibilityMode, setVisibilityMode] = useState<'always' | 'until'>(
     event.postEventPublicUntil ? 'until' : 'always',
@@ -158,6 +160,23 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
               checked={showRecap}
               onChange={() => handleToggle('postEventShowRecap', !showRecap, setShowRecap)}
             />
+          </div>
+
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <span style={{ fontSize: '0.9rem' }}>{t('emailEnabled')}</span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={t('emailEnabled')}
+                checked={emailEnabled}
+                onChange={() =>
+                  handleToggle('postEventEmailEnabled', !emailEnabled, setEmailEnabled)
+                }
+              />
+            </div>
+            <small className="text-muted" style={{ fontSize: '0.78rem' }}>
+              {t('emailEnabledHelp')}
+            </small>
           </div>
 
           <div className="d-flex justify-content-between align-items-center">

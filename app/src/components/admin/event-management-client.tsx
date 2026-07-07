@@ -132,6 +132,7 @@ interface EventData {
   postEventShowQA: boolean; postEventShowMaterials: boolean;
   postEventShowPolls: boolean; postEventShowFeedback: boolean;
   postEventShowRecap: boolean;
+  postEventEmailEnabled: boolean;
   feedbackEnabled: boolean; recordingConsentText: string | null;
   requireOrganization: boolean; requireOrganizationRole: boolean; requireOrganizationType: boolean;
   moderatorToken: string; moderatorName: string | null; moderatorEmail: string | null;
@@ -683,6 +684,7 @@ function SettingsTab({ event, editUrl }: { event: EventData; editUrl: string }) 
             postEventShowPolls: event.postEventShowPolls,
             postEventShowFeedback: event.postEventShowFeedback,
             postEventShowRecap: event.postEventShowRecap,
+            postEventEmailEnabled: event.postEventEmailEnabled,
             feedbackEnabled: event.feedbackEnabled,
             dataRetentionDays: event.dataRetentionDays,
           }}
