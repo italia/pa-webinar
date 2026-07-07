@@ -153,7 +153,15 @@ model Event {
   postEventShowMaterials Boolean   @default(true) @map("post_event_show_materials")
   postEventShowPolls     Boolean   @default(true) @map("post_event_show_polls")
   postEventShowFeedback  Boolean   @default(true) @map("post_event_show_feedback")
+  postEventShowRecap     Boolean   @default(true) @map("post_event_show_recap")
   feedbackEnabled        Boolean   @default(true) @map("feedback_enabled")
+
+  // Post-event recap: an anonymized, aggregate snapshot (headcount, top
+  // answered questions, published poll results, top word-cloud words, feedback
+  // average) generated lazily on first view of the concluded page and PERSISTED
+  // here so it survives the retention cleanup that deletes the raw rows.
+  postEventRecap   Json?     @map("post_event_recap")
+  postEventRecapAt DateTime? @map("post_event_recap_at")
 
   // GDPR recording consent
   recordingConsentText String? @map("recording_consent_text") @db.Text

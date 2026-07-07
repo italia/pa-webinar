@@ -74,6 +74,19 @@
       "occupiedSpots": "{registered}/{max} iscritti",
       "registeredCount": "{count, plural, =0 {Nessuna registrazione} one {1 registrazione} other {# registrazioni}}"
     },
+    "recap": {
+      "title": "Riepilogo dell'evento",
+      "intro": "Una sintesi di ciò che è emerso durante l'evento.",
+      "participants": "Partecipanti (picco)",
+      "registered": "Registrati",
+      "topQuestions": "Domande più votate",
+      "upvotes": "{count, plural, =0 {nessun voto} one {1 voto} other {# voti}}",
+      "polls": "Risultati dei sondaggi",
+      "votes": "{count, plural, =0 {nessun voto} one {1 voto} other {# voti}}",
+      "topWords": "Parole più condivise",
+      "feedback": "Valutazione media",
+      "feedbackCount": "{count, plural, one {1 risposta} other {# risposte}}"
+    },
     "detail": {
       "title": "Dettaglio evento",
       "date": "Data e ora",
@@ -3199,6 +3212,7 @@
     "showMaterials": "Mostra materiali condivisi",
     "showPolls": "Mostra risultati sondaggi",
     "showFeedback": "Mostra feedback",
+    "showRecap": "Mostra riepilogo evento",
     "feedbackEnabled": "Survey feedback attiva a fine evento",
     "visibilityAlways": "Sempre visibile",
     "visibilityUntil": "Visibile fino a:",
