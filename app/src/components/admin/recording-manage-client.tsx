@@ -236,8 +236,8 @@ export default function RecordingManageClient({
         style={{ borderTopLeftRadius: tab === tabs[0]?.key ? 0 : 8 }}
       >
         {tab === 'overview' && <RecordingOverview recordingId={recordingId} />}
-        {tab === 'transcript' && <TranscriptEditor recordingId={recordingId} />}
-        {tab === 'summary' && <SummaryEditor recordingId={recordingId} />}
+        {tab === 'transcript' && <TranscriptEditor recordingId={recordingId} status={status} />}
+        {tab === 'summary' && <SummaryEditor recordingId={recordingId} status={status} />}
         {tab === 'translations' && <TranslationManager recordingId={recordingId} />}
         {tab === 'archive' && <ArchivePanel recordingId={recordingId} />}
       </div>

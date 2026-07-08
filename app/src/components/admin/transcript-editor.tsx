@@ -23,9 +23,17 @@ import TranscriptTimeline, {
   type Waveform,
 } from './transcript-timeline';
 
+class FetchError extends Error {
+  status: number;
+  constructor(status: number) {
+    super(`HTTP ${status}`);
+    this.status = status;
+  }
+}
+
 const fetcher = (url: string): Promise<unknown> =>
   fetch(url, { credentials: 'include' }).then((r) => {
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    if (!r.ok) throw new FetchError(r.status);
     return r.json();
   });
 
@@ -50,6 +58,9 @@ interface TranscriptResponse {
   speakers: RosterEntry[];
   waveform: Waveform | null;
   mediaUrl: string;
+  /** False when no TRANSCRIPT_JSON exists yet (pipeline not run / still
+   *  processing) — distinct from an existing transcript with 0 segments. */
+  hasTranscript: boolean;
 }
 
 interface Draft {
@@ -66,9 +77,12 @@ function fmtTs(seconds: number): string {
 
 export default function TranscriptEditor({
   recordingId,
+  status,
   onSaved,
 }: {
   recordingId: string;
+  /** Recording.status — lets the not-ready state say "processing" vs "run AI". */
+  status?: string;
   onSaved?: () => void;
 }) {
   const t = useTranslations('admin.postprod');
@@ -81,6 +95,7 @@ export default function TranscriptEditor({
   const [drafts, setDrafts] = useState<Record<number, Draft>>({});
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
   const playerRef = useRef<TimelineControls | null>(null);
   const segScrollRef = useRef<HTMLDivElement>(null);
@@ -113,10 +128,26 @@ export default function TranscriptEditor({
   }, [activeIndex]);
 
   if (error) {
-    return <p className="text-danger small mb-0">{t('editLoadError')}</p>;
+    const code = (error as { status?: number }).status ?? 0;
+    // 401 = expired admin session (common on this page): tell them to re-login,
+    // not that the transcript is broken. Everything else shows the HTTP code.
+    if (code === 401) {
+      return <p className="text-danger small mb-0">{t('editSessionExpired')}</p>;
+    }
+    return <p className="text-danger small mb-0">{t('editLoadError', { code })}</p>;
   }
   if (isLoading || !data) {
     return <SkeletonLines lines={6} loadingLabel={t('editLoading')} />;
+  }
+  if (!data.hasTranscript) {
+    // No transcript artifact yet — distinguish "still processing" from "never
+    // run" so the operator knows whether to wait or press «Genera AI».
+    const processing = status === 'POSTPROD_QUEUED' || status === 'POSTPROD_RUNNING';
+    return (
+      <p className="text-secondary small mb-0">
+        {processing ? t('editProcessing') : t('editNotReady')}
+      </p>
+    );
   }
   if (data.segments.length === 0) {
     return <p className="text-secondary small mb-0">{t('editEmpty')}</p>;
@@ -133,6 +164,7 @@ export default function TranscriptEditor({
 
   function setDraft(seg: EditableSegment, patch: Partial<Draft>): void {
     setSavedMsg(null);
+    setSaveError(null);
     setDrafts((prev) => {
       const base = prev[seg.index] ?? { text: seg.text, speaker: seg.speaker };
       return { ...prev, [seg.index]: { ...base, ...patch } };
@@ -145,6 +177,7 @@ export default function TranscriptEditor({
     if (dirtySegments.length === 0) return;
     setSaving(true);
     setSavedMsg(null);
+    setSaveError(null);
     try {
       const edits = dirtySegments.map((seg) => {
         const d = draftFor(seg);
@@ -160,7 +193,14 @@ export default function TranscriptEditor({
         },
       );
       if (!r.ok) {
-        setSavedMsg(t('editFailed', { code: r.status }));
+        // Surface the backend's specific reason (e.g. "Unknown speaker label")
+        // instead of a bare HTTP code, and render it as an error (not green).
+        const body = (await r.json().catch(() => null)) as { error?: string } | null;
+        setSaveError(
+          body?.error
+            ? t('editFailedDetail', { message: body.error })
+            : t('editFailed', { code: r.status }),
+        );
         return;
       }
       const res = (await r.json()) as { textChanges: number; speakerChanges: number };
@@ -174,7 +214,7 @@ export default function TranscriptEditor({
       await mutate();
       onSaved?.();
     } catch {
-      setSavedMsg(t('editFailed', { code: 0 }));
+      setSaveError(t('editFailed', { code: 0 }));
     } finally {
       setSaving(false);
     }
@@ -187,6 +227,7 @@ export default function TranscriptEditor({
         <span className="badge bg-light text-dark">{data.sourceLanguage}</span>
         <div className="ms-auto d-flex align-items-center gap-2">
           {savedMsg && <span className="small text-success">{savedMsg}</span>}
+          {saveError && <span className="small text-danger">{saveError}</span>}
           {dirtySegments.length > 0 && (
             <span className="small text-secondary">
               {t('editDirty', { n: dirtySegments.length })}
