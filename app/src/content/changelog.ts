@@ -28,6 +28,15 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.7',
+    date: '2026-07-08',
+    title: 'Reazioni sempre visibili e “Note / Checklist”',
+    notes: [
+      'Le reazioni (emoji) sono ora sempre visibili in una barra in basso a sinistra, non più nascoste dietro un pulsante: più facili da trovare e da usare durante l’evento.',
+      'La funzione “Agenda” è stata rinominata “Note / Checklist” per rendere evidente che è un’area di note a checklist (i contenuti non finiscono in chat); resta attivabile dal moderatore per ogni evento.',
+    ],
+  },
+  {
     version: '0.6.6',
     date: '2026-07-08',
     title: 'Rifiniture: chat, conteggi e accesso',
