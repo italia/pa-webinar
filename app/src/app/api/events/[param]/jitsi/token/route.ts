@@ -18,6 +18,8 @@ import {
 } from '@/lib/auth/jwt';
 import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { cookies } from 'next/headers';
+import { verifyEventAccess, eventAccessCookieName } from '@/lib/event-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,6 +95,51 @@ export const POST = withErrorHandling(async (request, context) => {
 
     if (!registration || registration.eventId !== event.id) {
       throw new ForbiddenError('Invalid access token');
+    }
+
+    // The accessToken lives in the personal join link, so a FORWARDED link would
+    // otherwise let the opener mint the registrant's identity (F7). Bind identity
+    // to the browser that registered: the signed `event_access` cookie must carry
+    // this same token. A non-owner still gets in (possessing the shared token
+    // authorizes entry), but under THEIR OWN typed name and a fresh guest
+    // identity — never the registrant's name, slot, or recording consent.
+    const cookieStore = await cookies();
+    const ownsToken =
+      (await verifyEventAccess(
+        event.id,
+        cookieStore.get(eventAccessCookieName(event.id))?.value,
+      )) === accessToken;
+
+    if (!ownsToken) {
+      const typedName = displayNameOverride?.trim();
+      if (!typedName) {
+        throw new ValidationError('Display name is required');
+      }
+      // This branch mints a GUEST JWT (fresh identity), so rate-limit it per IP
+      // exactly like the pure-guest path below — a forwarded link shouldn't be a
+      // faster route to bulk JWT minting than an anonymous one.
+      const ip = getClientIp(request);
+      const limit = parseInt(process.env.GUEST_JWT_RATE_LIMIT_PER_MINUTE || '120', 10);
+      const rl = rateLimit(`guest-jwt:${ip}`, { limit, windowMs: 60_000 });
+      if (!rl.allowed) {
+        throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
+      }
+      const guestJwt = await generateJitsiJwt({
+        roomName: event.jitsiRoomName,
+        displayName: typedName,
+        uniqueId: guestJitsiId(),
+        isModerator: false,
+        expiresInSeconds: 2 * 60 * 60,
+      });
+      return Response.json(
+        {
+          jwt: guestJwt,
+          roomName: event.jitsiRoomName,
+          displayName: typedName,
+          role: 'participant',
+        },
+        { headers: { 'Cache-Control': 'no-store' } },
+      );
     }
 
     if (!registration.joinedAt) {

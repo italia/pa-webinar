@@ -28,6 +28,18 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.4',
+    date: '2026-07-08',
+    title: 'Sicurezza dell’identità e rifiniture della sala',
+    notes: [
+      'Correzione di sicurezza: condividendo il proprio link personale della sala, chi lo apre entra ora con il PROPRIO nome (prima poteva ereditare il nome di chi aveva inviato il link).',
+      'Condivisione schermo più nitida: ora privilegia la risoluzione (5 fps ad alta qualità) invece della fluidità, così slide e documenti restano leggibili anche quando c’è poco movimento.',
+      'Rimossa la funzione “nascondi la tua immagine” che, una volta attivata, non permetteva più di far riapparire il proprio riquadro.',
+      'Accesso amministratore: dopo una nuova autenticazione a seguito di inattività, la pagina si aggiorna correttamente (niente più pagina apparentemente bloccata fino al ricaricamento manuale).',
+    ],
+    security: true,
+  },
+  {
     version: '0.6.3',
     date: '2026-07-08',
     title: 'Rifiniture della sala evento — round 2',
