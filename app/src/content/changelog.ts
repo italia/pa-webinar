@@ -28,6 +28,17 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.6',
+    date: '2026-07-08',
+    title: 'Rifiniture: chat, conteggi e accesso',
+    notes: [
+      'I link condivisi in chat sono ora cliccabili e si aprono in una nuova scheda in modo sicuro (prima erano semplice testo).',
+      'In sala, il numero di iscritti totali è ora visibile solo ai moderatori: i partecipanti vedono soltanto quante persone sono effettivamente presenti.',
+      'Accesso alla sala più rapido: la connessione al server video viene preparata già durante la sala d’attesa, riducendo l’attesa al momento dell’ingresso.',
+      'Nella lista partecipanti l’intestazione con il conteggio resta sempre visibile mentre si scorre l’elenco.',
+    ],
+  },
+  {
     version: '0.6.5',
     date: '2026-07-08',
     title: 'Registrazioni e conteggi',
