@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import useSWR from 'swr';
-import { createPortal } from 'react-dom';
+import { createPortal, preconnect } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import {
   Alert,
@@ -230,6 +230,19 @@ export default function LiveEventClient({
       // Transient: poll loop will retry the lifecycle check anyway.
     });
   }, [eventStatus, event.slug]);
+
+  // Warm the connection to the Jitsi origin while the user is still in the
+  // waiting room, so external_api.js + the iframe + signaling aren't a cold
+  // DNS/TLS/TCP handshake at join time (NEW-1 join-speed). Purely additive —
+  // preconnect is a hint the browser can ignore, and it never fetches or
+  // executes the script.
+  useEffect(() => {
+    if (!jitsiDomain) return;
+    // No crossOrigin: external_api.js (a plain <script src>) and the iframe
+    // navigation are NOT anonymous-CORS requests, so a same-origin-style
+    // preconnect warms the socket they actually reuse.
+    preconnect(`https://${jitsiDomain}`);
+  }, [jitsiDomain]);
 
   const [showFeedback, setShowFeedback] = useState(false);
   // Stable anonymous id for guests, persisted in localStorage so a refresh or
@@ -2080,9 +2093,10 @@ interface LiveTopBarProps {
    *  is unset — legacy events carry their hero image here. */
   coverImageUrl?: string | null;
   participantCount: number;
-  /** Total confirmed registrations (if known). Shown alongside the live
-   *  Jitsi count as "N attivi · M registrati". Omitted on public/guest
-   *  views where we don't leak the registration total. */
+  /** Total confirmed registrations (if known). Rendered alongside the live
+   *  count as "N attivi · M registrati" ONLY for moderators (role gate at the
+   *  render site); everyone else sees just the present-participant count, so
+   *  the registration total is never leaked to attendees (F5). */
   registrationCount?: number;
   /** Event capacity (maxParticipants). Used by the "live / capacity"
    *  pill in the top bar and as fallback when no one has joined yet. */
@@ -2239,7 +2253,11 @@ function LiveTopBar({
             {t('recordingActive')}
           </Badge>
         )}
-        {registrationCount !== undefined && registrationCount > 0 && (
+        {/* The total registrations are a moderator-only figure (F5 —
+            participants shouldn't see attendance numbers). Everyone already
+            sees the present-participant count in the left-hand badge, so
+            non-moderators get nothing extra here (no duplicated count). */}
+        {role === 'moderator' && registrationCount !== undefined && registrationCount > 0 && (
           <span className="small d-none d-md-inline">
             <Icon icon="it-user" size="sm" color="white" className="me-1" />
             {t('activeVsRegistered', {
