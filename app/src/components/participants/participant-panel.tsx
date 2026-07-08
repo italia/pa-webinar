@@ -6,6 +6,7 @@ import { Badge, Icon } from 'design-react-kit';
 
 import type { JitsiMeetExternalAPI, JitsiParticipant } from '@/types/jitsi';
 import { useJitsiStats, qualityLabel, qualityColor } from '@/hooks/use-jitsi-stats';
+import { isHumanParticipant } from '@/lib/jitsi/participants';
 
 interface ParticipantPanelProps {
   api: JitsiMeetExternalAPI | null;
@@ -25,7 +26,8 @@ export default function ParticipantPanel({
 
   const refresh = useCallback(() => {
     if (!api) return;
-    const list = api.getParticipantsInfo();
+    // Exclude the recording bot from both the roster and the count (F2).
+    const list = api.getParticipantsInfo().filter(isHumanParticipant);
     setParticipants(list);
     onCountChange?.(list.length);
   }, [api, onCountChange]);

@@ -16,6 +16,7 @@ import {
   videoQualityMaxHeight,
   type VideoQualityPreset,
 } from '@/lib/jitsi/config';
+import { humanParticipantCount } from '@/lib/jitsi/participants';
 
 interface WatermarkSettings {
   url?: string;
@@ -435,12 +436,12 @@ export default function JitsiRoom({
 
         api.addListener('participantJoined', () => {
           if (disposedRef.current) return;
-          onParticipantCountChangedRef.current?.(api.getNumberOfParticipants());
+          onParticipantCountChangedRef.current?.(humanParticipantCount(api));
         });
 
         api.addListener('participantLeft', () => {
           if (disposedRef.current) return;
-          onParticipantCountChangedRef.current?.(api.getNumberOfParticipants());
+          onParticipantCountChangedRef.current?.(humanParticipantCount(api));
         });
 
         api.addListener('recordingStatusChanged', (evt: { on: boolean }) => {
