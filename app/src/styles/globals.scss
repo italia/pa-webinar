@@ -204,12 +204,26 @@ html.live-call-immersive body {
 // the ~48px persistent tab strip at the bottom; the sidebar collapses
 // to a bottom-sheet drawer (see `.live-sidebar` mobile overrides below)
 // that overlays the video when a tab is tapped.
+// Flex row/column holding the video area + sidebar; the growing child of the
+// fixed-viewport `.live-page-bg` column. Without `min-height: 0` it keeps
+// flexbox's default `min-height: auto` and refuses to shrink below the video's
+// min-content, so once the stacked top bars/banners grow it overflows the
+// scroll-locked viewport and shoves the Jitsi iframe (mic/cam toolbar pinned to
+// its bottom) below the fold — half-hidden with no way to scroll to it.
+.live-body {
+  min-height: 0;
+}
+
 .live-main {
   min-width: 0;
   min-height: 0;
 
   @media (min-width: 992px) {
-    min-height: 300px;
+    // Was 300px. A hard desktop floor made the video area overflow the fixed,
+    // scroll-locked viewport once the banners (screenshare / first-entry /
+    // overtime) stacked up — exactly the "toolbar cut in half in fullscreen /
+    // when alone" report. Let it shrink to fit, like the mobile path below.
+    min-height: 0;
   }
 
   // Mobile: .live-main grows into the space left after the top bar and
@@ -233,7 +247,10 @@ html.live-call-immersive body {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 400px;
+  // Was 400px. This floor propagated up as `.live-body`'s min-content and was
+  // the root of the toolbar-clipping overflow on short desktop windows. Height
+  // comes from the flex-sized parent; keep 0 like the mobile override below.
+  min-height: 0;
   background: #0F1B2D;
   border-radius: 0;
   overflow: hidden;
