@@ -56,6 +56,9 @@ export const POST = withErrorHandling(async (request, context) => {
   // Senza tracce ancora presenti l'archivio non avrebbe le tracce audio
   // separate (solo video+sottotitoli) → blocchiamo con un errore chiaro
   // invece di produrre un archivio degradato a sorpresa.
+  // NB: la trascrizione NON è richiesta — l'archivio si genera comunque
+  // senza sottotitoli (subtitle_path è opzionale nel worker), quindi non
+  // imponiamo un TRANSCRIPT_JSON qui.
   if (recording._count.tracks === 0) {
     throw new ValidationError(
       'No participant tracks available for this recording (none recorded, or already purged). Enable multi-track recording + track retention before the event.',

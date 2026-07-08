@@ -106,7 +106,21 @@ export const GET = withErrorHandling(async (_request, context) => {
   if (!recording) throw new NotFoundError('Recording');
 
   const jsonArtifact = recording.artifacts.find((a) => a.type === 'TRANSCRIPT_JSON');
-  if (!jsonArtifact) throw new NotFoundError('Transcript');
+  if (!jsonArtifact) {
+    // No transcript produced yet (pipeline not run / still processing). Return
+    // an OK, empty payload with hasTranscript:false so the editor shows a
+    // helpful "not ready" state instead of a 404 that reads as a hard failure.
+    return Response.json({
+      recordingId: recording.id,
+      sourceLanguage: recording.sourceLanguage ?? 'it',
+      durationSec: recording.durationSec ?? null,
+      segments: [],
+      speakers: [],
+      waveform: null,
+      mediaUrl: `/api/admin/postprod/recordings/${recording.id}/media`,
+      hasTranscript: false,
+    });
+  }
 
   const transcript = parseTranscript(jsonArtifact.inlineBody);
   const segments = (transcript.segments ?? []).map((s, index) => ({
@@ -148,6 +162,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     // Same-origin endpoint that 302s to a short-lived signed URL of the
     // source media, so the editor can play audio + drive the playhead.
     mediaUrl: `/api/admin/postprod/recordings/${recording.id}/media`,
+    hasTranscript: true,
   });
 });
 
