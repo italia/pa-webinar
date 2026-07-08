@@ -52,16 +52,41 @@ fi
 
 cd "$TORTURE_DIR"
 
+# Property names mirror upstream scripts/malleus.sh EXACTLY. Gotchas learned
+# the hard way (7 lug):
+#   * The JWT is passed via -Dorg.jitsi.token (NOT -Dorg.jitsi.malleus.jwt,
+#     which does not exist). prosody enforces token auth (allow_empty_token=
+#     false) so a missing/invalid JWT makes the jitsi client fail client-side
+#     before it ever opens the signaling stream -> zero prosody connections.
+#   * Every property is prefixed org.jitsi.malleus.* and uses audio_senders /
+#     room_name_prefix. MalleusJitsificus.createData parses the numeric ones
+#     with NO null-guard, so ALL must be present (NumberFormatException otherwise).
+#   * duration is in SECONDS (do not multiply by 1000).
 MVN_ARGS=(
+  -Dthreadcount=1
   -Djitsi-meet.instance.url="$JITSI_URL"
   -Djitsi-meet.tests.toRun=MalleusJitsificus
-  -Dmalleus.conferences=1
-  -Dmalleus.participants="$PARTICIPANTS"
-  -Dmalleus.senders="$SENDERS"
-  -Dmalleus.audioSenders="$SENDERS"
-  -Dmalleus.duration="${DURATION}000"
-  -Dmalleus.room="$JITSI_ROOM"
-  -Dorg.jitsi.malleus.jwt="$JITSI_JWT"
+  -Dorg.jitsi.malleus.conferences=1
+  -Dorg.jitsi.malleus.max_disrupted_bridges_pct=0
+  -Dorg.jitsi.malleus.participants="$PARTICIPANTS"
+  -Dorg.jitsi.malleus.senders="$SENDERS"
+  -Dorg.jitsi.malleus.audio_senders="$SENDERS"
+  -Dorg.jitsi.malleus.duration="$DURATION"
+  -Dorg.jitsi.malleus.join_delay=0
+  -Dorg.jitsi.malleus.room_name_prefix="$JITSI_ROOM"
+  -Dorg.jitsi.malleus.regions=
+  -Dorg.jitsi.malleus.use_node_types=false
+  -Dorg.jitsi.malleus.sender_tabs_per_browser=1
+  -Dorg.jitsi.malleus.receiver_tabs_per_browser=1
+  -Dorg.jitsi.malleus.senders_per_tab=1
+  -Dorg.jitsi.malleus.receivers_per_tab=1
+  -Dorg.jitsi.malleus.use_load_test=false
+  -Dorg.jitsi.malleus.use_lite_mode=false
+  -Dorg.jitsi.malleus.switch_speakers=false
+  -Dorg.jitsi.malleus.use_stage_view=false
+  -Dorg.jitsi.malleus.enable.headless=true
+  -Dorg.jitsi.malleus.set.saveLogs=false
+  -Dorg.jitsi.token="$JITSI_JWT"
   -Dchrome.disable.nosanbox=true
 )
 

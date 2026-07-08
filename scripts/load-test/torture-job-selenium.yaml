@@ -1,0 +1,129 @@
+# =============================================================================
+# jitsi-meet-torture MalleusJitsificus load Job (Selenium-remote mode)
+# Namespace: pa-webinar   |   app.kubernetes.io/component=load-test
+# CHANGE vs proposal: removed the UNVALIDATED sed patch on WebParticipant.java
+# (it strips config.prejoinConfig.enabled=false and can strand senders on the
+# prejoin screen), and removed -Dremote.resource.path (no fake-video file is
+# used). This is the VALIDATED invocation, only adapted for Selenium remote.
+# Prereq: grid applied & Ready, Secret 'torture-jwt' (key 'jwt') present.
+# Cleanup: kubectl -n pa-webinar delete job -l app.kubernetes.io/component=load-test
+# =============================================================================
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: torture-malleus
+  namespace: pa-webinar
+  labels:
+    app: torture-malleus
+    app.kubernetes.io/name: jitsi-meet-torture
+    app.kubernetes.io/part-of: jitsi-loadtest
+    app.kubernetes.io/component: load-test
+spec:
+  backoffLimit: 0
+  completions: 1
+  parallelism: 1
+  activeDeadlineSeconds: 1800
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: torture-malleus
+        app.kubernetes.io/name: jitsi-meet-torture
+        app.kubernetes.io/part-of: jitsi-loadtest
+        app.kubernetes.io/component: load-test
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        nodepool: applications
+      tolerations:
+        - key: kubernetes.azure.com/scalesetpriority
+          operator: Equal
+          value: spot
+          effect: NoSchedule
+        - key: workload
+          operator: Equal
+          value: test
+          effect: NoSchedule
+      volumes:
+        - name: work
+          emptyDir: {}
+      initContainers:
+        - name: wait-for-grid
+          image: curlimages/curl:8.11.1
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "waiting for selenium grid (ready + 30 slots) ..."
+              for i in $(seq 1 60); do
+                s="$(curl -s -H 'Content-Type: application/json' \
+                  -d '{"query":"{ grid { totalSlots } }"}' \
+                  http://selenium-hub:4444/graphql || true)"
+                slots="$(echo "$s" | tr -d ' \n' | sed -n 's/.*"totalSlots":\([0-9]*\).*/\1/p')"
+                if [ -n "$slots" ] && [ "$slots" -ge 30 ]; then
+                  echo "grid ready: $slots slots"; exit 0
+                fi
+                echo "  attempt $i/60: slots=${slots:-0} (<30)"; sleep 5
+              done
+              echo "ERROR: grid did not reach 30 slots in time"; exit 1
+      containers:
+        - name: torture
+          image: maven:3.9-eclipse-temurin-17
+          imagePullPolicy: IfNotPresent
+          workingDir: /work
+          env:
+            - name: JITSI_JWT
+              valueFrom:
+                secretKeyRef:
+                  name: torture-jwt
+                  key: jwt
+            - name: MAVEN_OPTS
+              value: "-Xmx1500m -Dmaven.repo.local=/work/.m2"
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -euo pipefail
+
+              if ! command -v git >/dev/null 2>&1; then
+                apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+              fi
+
+              rm -rf /work/jitsi-meet-torture
+              git clone --depth 1 https://github.com/jitsi/jitsi-meet-torture.git /work/jitsi-meet-torture
+              cd /work/jitsi-meet-torture
+
+              exec mvn -B test \
+                -Dthreadcount=1 \
+                -Djitsi-meet.instance.url=https://pa-webinar-jitsi.developers.italia.it \
+                -Djitsi-meet.tests.toRun=MalleusJitsificus \
+                -Djitsi-meet.isRemote=true \
+                -Dremote.address=http://selenium-hub:4444/wd/hub \
+                -Dorg.jitsi.malleus.conferences=1 \
+                -Dorg.jitsi.malleus.max_disrupted_bridges_pct=0 \
+                -Dorg.jitsi.malleus.participants=30 \
+                -Dorg.jitsi.malleus.senders=3 \
+                -Dorg.jitsi.malleus.audio_senders=3 \
+                -Dorg.jitsi.malleus.duration=180 \
+                -Dorg.jitsi.malleus.join_delay=2000 \
+                -Dorg.jitsi.malleus.room_name_prefix=loadtest \
+                -Dorg.jitsi.malleus.regions= \
+                -Dorg.jitsi.malleus.use_node_types=false \
+                -Dorg.jitsi.malleus.sender_tabs_per_browser=1 \
+                -Dorg.jitsi.malleus.receiver_tabs_per_browser=1 \
+                -Dorg.jitsi.malleus.senders_per_tab=1 \
+                -Dorg.jitsi.malleus.receivers_per_tab=1 \
+                -Dorg.jitsi.malleus.use_load_test=false \
+                -Dorg.jitsi.malleus.use_lite_mode=false \
+                -Dorg.jitsi.malleus.switch_speakers=false \
+                -Dorg.jitsi.malleus.use_stage_view=false \
+                -Dorg.jitsi.malleus.enable.headless=true \
+                -Dorg.jitsi.malleus.set.saveLogs=false \
+                -Dorg.jitsi.token="$JITSI_JWT" \
+                -Dchrome.disable.nosanbox=true \
+                -DallowInsecureCerts=false
+          resources:
+            requests:
+              cpu: "1"
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 3Gi
