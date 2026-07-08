@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Button, Alert, Input, FormGroup, Label } from 'design-react-kit';
 
 export default function AdminLoginPage() {
   const t = useTranslations('admin');
-  const router = useRouter();
+  const locale = useLocale();
 
   const [key, setKey] = useState('');
   const [error, setError] = useState(false);
@@ -26,7 +25,13 @@ export default function AdminLoginPage() {
       });
 
       if (res.ok) {
-        router.push('/admin');
+        // Hard navigation (not router.push): after an idle re-login the App
+        // Router client cache still holds the stale logged-out RSC for /admin,
+        // so a soft push renders nothing until a manual reload (F14). A full
+        // document request re-runs middleware with the fresh admin_session
+        // cookie and lands on the real admin page.
+        window.location.assign(`/${locale}/admin`);
+        return;
       } else {
         setError(true);
       }

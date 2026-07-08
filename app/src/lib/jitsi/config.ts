@@ -96,6 +96,12 @@ export const jitsiConfigOverwrite = {
   hideConferenceTimer: false,
   disableProfile: true,
 
+  // Self-view "hide" is a one-way trap in our embed (F10): once a user hides
+  // their own thumbnail there's no in-UI way to bring it back. Disable the
+  // control entirely — Jitsi gates BOTH the local-tile "Hide self view" menu
+  // entry and the Settings checkbox on this flag, so nobody can get stuck.
+  disableSelfViewSettings: true,
+
   disableChat: false,
 
   // NOTE: `disableKick: true` is the safe default — prevents participants
@@ -332,10 +338,11 @@ interface VideoQualityDefinition {
     audioQuality: { opusMaxAverageBitrate: number };
     stereo: boolean;
     enableOpusRed: boolean;
-    // Framerate dello screenshare. Il default Jitsi è {min:5, max:5}: ok per
-    // slide statiche, inguardabile per demo/video condivisi. Il browser scala
-    // comunque verso il basso sotto vincolo di banda/CPU, quindi alzare il max
-    // non costa nulla nel caso-slide (frame identici non generano bitrate).
+    // Framerate dello screenshare. Detail-first (F13): i preset di uso comune
+    // (SAVE_DATA/BALANCED/HIGH) stanno a max 5fps così l'encoder spende il
+    // budget di bitrate su pochi frame NITIDI invece di spalmarlo su ~30fps
+    // morbidi — il reclamo era "screenshare sgranato" su slide/documenti.
+    // Solo MAX tiene un max più alto per le rare demo con video in condivisione.
     desktopSharingFrameRate: { min: number; max: number };
   };
 }
@@ -356,7 +363,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       audioQuality: { opusMaxAverageBitrate: 24_000 },
       stereo: false,
       enableOpusRed: false,
-      desktopSharingFrameRate: { min: 5, max: 15 },
+      desktopSharingFrameRate: { min: 5, max: 5 },
     },
   },
   BALANCED: {
@@ -374,7 +381,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       audioQuality: { opusMaxAverageBitrate: 48_000 },
       stereo: false,
       enableOpusRed: false,
-      desktopSharingFrameRate: { min: 5, max: 30 },
+      desktopSharingFrameRate: { min: 5, max: 5 },
     },
   },
   HIGH: {
@@ -400,7 +407,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       // lo riaccendeva. Allineato. (MAX lo lascia ON: chiamate piccole, fedeltà
       // prima della banda.)
       enableOpusRed: false,
-      desktopSharingFrameRate: { min: 5, max: 30 },
+      desktopSharingFrameRate: { min: 5, max: 5 },
     },
   },
   MAX: {
@@ -420,7 +427,7 @@ const QUALITY_DEFINITIONS: Record<VideoQualityPreset, VideoQualityDefinition> = 
       audioQuality: { opusMaxAverageBitrate: 510_000 },
       stereo: true,
       enableOpusRed: true,
-      desktopSharingFrameRate: { min: 5, max: 60 },
+      desktopSharingFrameRate: { min: 5, max: 30 },
     },
   },
 };
