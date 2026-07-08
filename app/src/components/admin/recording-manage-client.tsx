@@ -62,6 +62,7 @@ export default function RecordingManageClient({
   const confirm = useConfirm();
   const [tab, setTab] = useState<TabKey>('overview');
   const [rerunning, setRerunning] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   async function rerun(): Promise<void> {
     const ok = await confirm({
@@ -76,12 +77,78 @@ export default function RecordingManageClient({
         method: 'POST',
         credentials: 'include',
       });
-      if (r.ok) toast.success(t('manageRerunOk'));
-      else toast.error(t('rerunFailed', { code: r.status }));
+      if (r.ok) {
+        // A successful POST can enqueue NOTHING: either nothing was runnable (AI
+        // disabled / pipeline paused → true no-op) or every job already exists at
+        // this runCount (already queued). Distinguish them instead of a false
+        // "OK" (F15, review #1/#4).
+        const data = (await r.json().catch(() => null)) as {
+          enqueued?: number;
+          skippedExisting?: number;
+        } | null;
+        if (data?.enqueued === 0) {
+          if ((data.skippedExisting ?? 0) > 0) toast.success(t('manageRerunAlreadyQueued'));
+          else toast.error(t('manageRerunNoop'));
+        } else {
+          toast.success(t('manageRerunOk'));
+        }
+      } else {
+        toast.error(t('rerunFailed', { code: r.status }));
+      }
     } catch {
       toast.error(t('rerunFailed', { code: 0 }));
     } finally {
       setRerunning(false);
+    }
+  }
+
+  // Start the AI pipeline on a recording that never ran it (status READY, no
+  // jobs) — e.g. an audio-only multitrack recording, or an event captured with
+  // AI off. Unlike Rerun this ENABLES the AI flags first, and the enqueue
+  // auto-detects multitrack, so all three functions (transcript → summary →
+  // translation) actually start. (F15)
+  async function generateAi(): Promise<void> {
+    const ok = await confirm({
+      title: t('generateAi'),
+      message: t('generateAiConfirm'),
+      confirmLabel: t('generateAi'),
+    });
+    if (!ok) return;
+    setGenerating(true);
+    try {
+      const r = await fetch(`/api/admin/postprod/recordings/${recordingId}/generate-ai`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        // Transcript + summary only. Translations are added explicitly, per
+        // language, from the Translations tab — one click shouldn't blanket
+        // auto-translate to every default locale (consent/scope, review #3).
+        body: JSON.stringify({ summary: true }),
+      });
+      if (r.ok) {
+        const data = (await r.json().catch(() => null)) as {
+          enqueued?: number;
+          skippedExisting?: number;
+        } | null;
+        if (data?.enqueued === 0) {
+          if ((data.skippedExisting ?? 0) > 0) {
+            toast.success(t('manageRerunAlreadyQueued'));
+            window.location.reload();
+          } else {
+            toast.error(t('manageRerunNoop'));
+          }
+        } else {
+          toast.success(t('generateAiOk'));
+          window.location.reload();
+        }
+      } else {
+        const data = (await r.json().catch(() => null)) as { error?: string } | null;
+        toast.error(data?.error ?? t('rerunFailed', { code: r.status }));
+      }
+    } catch {
+      toast.error(t('rerunFailed', { code: 0 }));
+    } finally {
+      setGenerating(false);
     }
   }
 
@@ -122,6 +189,16 @@ export default function RecordingManageClient({
             >
               {t('manageOpenPublic')}
             </Link>
+          )}
+          {status === 'READY' && (
+            <button
+              type="button"
+              className="btn btn-sm btn-primary"
+              disabled={generating}
+              onClick={() => void generateAi()}
+            >
+              {generating ? '…' : t('generateAi')}
+            </button>
           )}
           <button
             type="button"

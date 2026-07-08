@@ -17,6 +17,7 @@ import type { Prisma, PrismaClient } from '@prisma/client';
 
 import { deriveIdempotencyKey } from './idempotency';
 import { parseTargetLocales } from './providers';
+import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
 
 export interface EnqueueOptions {
   recordingId: string;
@@ -96,6 +97,24 @@ export async function enqueuePostprodForRecording(
   const sourceLanguage = opts.sourceLanguage ?? recording.sourceLanguage ?? 'it';
   const runCount = recording.runCount;
 
+  // Multitrack recordings have no mixed/video source — the transcript must be
+  // built from the per-speaker opus tracks (TRANSCRIBE_MULTITRACK). Only the
+  // event-end manifest path passes `multitrack` explicitly; admin re-runs and
+  // the webhook don't, so fall back to auto-detection (F15). Without this an
+  // admin-triggered run would enqueue a single-file TRANSCRIBE whose source
+  // isn't a media object → the job fails at input download.
+  let isMultitrack = opts.multitrack;
+  if (isMultitrack === undefined) {
+    // Detect from the placeholder blobKey OR the presence of per-speaker tracks.
+    // blobKey alone misses a multitrack recording that ALSO produced a Jibri mix
+    // (the webhook overwrites the placeholder key with the mix key), which would
+    // wrongly downgrade to single-file TRANSCRIBE and lose the certain
+    // per-speaker attribution the tracks give.
+    isMultitrack =
+      isMultitrackPlaceholder(recording.blobKey) ||
+      (await tx.recordingTrack.count({ where: { recordingId: recording.id } })) > 0;
+  }
+
   // Snapshot consent flags at enqueue time. Even if an admin flips
   // them off later, already-produced artifacts remain governed by the
   // snapshot until manual purge.
@@ -147,7 +166,7 @@ export async function enqueuePostprodForRecording(
   const pending: PendingJob[] = [];
 
   pending.push({
-    kind: opts.multitrack ? 'TRANSCRIBE_MULTITRACK' : 'TRANSCRIBE',
+    kind: isMultitrack ? 'TRANSCRIBE_MULTITRACK' : 'TRANSCRIBE',
     payload: {
       runId: recording.id,
       sourceLanguage,
