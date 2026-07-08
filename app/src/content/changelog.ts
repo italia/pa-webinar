@@ -28,6 +28,19 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.2',
+    date: '2026-07-08',
+    title: 'Rifiniture della sala evento in diretta',
+    notes: [
+      'La barra dei controlli (microfono, webcam, condivisione schermo) resta sempre visibile e cliccabile, anche a schermo intero, durante una condivisione o quando si è da soli in sala.',
+      'Il moderatore può di nuovo attivare e disattivare le funzioni live (Domande, Chat, Agenda) durante l’evento.',
+      'I controlli audio e video sono utilizzabili già durante la preparazione della sala, senza attendere l’avvio del server video.',
+      'L’elenco “Mani alzate” mostra correttamente chi ha chiesto la parola.',
+      'Nuovo pulsante “Condividi” nella sala: copia al volo il link per partecipare e il link della pagina evento (senza esporre token riservati).',
+      'Il marchio PA Webinar torna visibile nella barra superiore della sala evento.',
+    ],
+  },
+  {
     version: '0.6.1',
     date: '2026-07-07',
     title: 'Changelog pubblico e aggiornamenti di sicurezza',

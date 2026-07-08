@@ -34,11 +34,13 @@ import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
 import WordCloud from '@/components/live/word-cloud';
+import LiveShareButton from '@/components/live/live-share-button';
 import WaitingRoom, {
   type WaitingRoomJoinPrefs,
   type WaitingRoomWarmup,
 } from '@/components/live/waiting-room';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
+import { useSettings } from '@/lib/settings-context';
 
 interface EventInfo {
   id: string;
@@ -197,6 +199,12 @@ export default function LiveEventClient({
   const [error, setError] = useState('');
   const [jitsiApi, setJitsiApi] = useState<JitsiMeetExternalAPI | null>(null);
   const [chosenName, setChosenName] = useState(initialDisplayName);
+  // True once THIS client is actually in the conference (Jitsi
+  // `videoConferenceJoined` → handleJitsiReady). Used to lift the "warming up"
+  // overlay as soon as we're in, instead of waiting on the coarse bridge-side
+  // `jvbReady` flag — the opaque overlay otherwise sits over the native
+  // mic/cam toolbar and swallows clicks during the ~2 min JVB warm-up.
+  const [jitsiJoined, setJitsiJoined] = useState(false);
 
   const [eventStatus, setEventStatus] = useState(event.status);
 
@@ -509,6 +517,7 @@ export default function LiveEventClient({
       // may have aged out by the time the network is back). The
       // existing fetching_jwt → ready transition handles the rest.
       setCredentials(null);
+      setJitsiJoined(false);
       setPhase('fetching_jwt');
     }, delay);
     return () => {
@@ -616,6 +625,7 @@ export default function LiveEventClient({
     // the next genuine drop starts from a fresh attempt counter.
     reconnectAttemptsRef.current = 0;
     userHangupRef.current = false;
+    setJitsiJoined(true);
 
     if (
       isModerator &&
@@ -1034,6 +1044,8 @@ export default function LiveEventClient({
           participantCount={0}
           isRecording={false}
           role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
+          slug={event.slug}
+          locale={locale}
         />
         <RecordingConsent
           onAccept={handleConsentAccept}
@@ -1078,7 +1090,13 @@ export default function LiveEventClient({
   // the closing screen (phase='ended'); guarding here is belt-and-braces so
   // the overlay can never repaint over a torn-down iframe if we're briefly
   // still on phase='ready'.
-  const showJvbOverlay = eventStatus === 'LIVE' && jvbReady !== true;
+  // Keep the "warming up" curtain only until THIS client is actually in the
+  // conference. Once joined, lift it even if the coarse bridge-side `jvbReady`
+  // flag is still catching up — the opaque overlay otherwise sits over the
+  // native mic/cam toolbar and swallows clicks during the JVB warm-up, so the
+  // moderator can't set up their camera in the "allestimento" phase.
+  const showJvbOverlay =
+    eventStatus === 'LIVE' && jvbReady !== true && !jitsiJoined;
 
   return (
     <div className="d-flex flex-column live-page-bg">
@@ -1098,6 +1116,8 @@ export default function LiveEventClient({
         maxParticipants={event.maxParticipants}
         isRecording={isRecording}
         role={isActualModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
+        slug={event.slug}
+        locale={locale}
         onLeaveRoom={handleLeaveRoom}
       />
 
@@ -1201,6 +1221,7 @@ export default function LiveEventClient({
 
         <LiveSidebar
           eventSlug={event.slug}
+          eventId={event.id}
           token={token}
           isModerator={isActualModerator}
           qaEnabled={event.qaEnabled}
@@ -1374,6 +1395,11 @@ type SidebarTab =
 
 interface LiveSidebarProps {
   eventSlug: string;
+  /** Event UUID — used for the moderator feature-toggle PUT. The
+   *  /api/events/[param] route accepts updates ONLY by UUID (a slug 400s
+   *  before touching the DB). The slug is still used for the GET /flags poll,
+   *  which resolves by slug. */
+  eventId: string;
   token: string;
   isModerator: boolean;
   qaEnabled: boolean;
@@ -1393,6 +1419,7 @@ interface LiveSidebarProps {
 
 function LiveSidebar({
   eventSlug,
+  eventId,
   token,
   isModerator,
   qaEnabled,
@@ -1431,7 +1458,10 @@ function LiveSidebar({
       await mutateFlags((cur) => (cur ? { ...cur, [key]: !current } : cur), {
         revalidate: false,
       });
-      await fetch(`/api/events/${eventSlug}`, {
+      // PUT by UUID: the /api/events/[param] route rejects a non-UUID param
+      // with 400 before touching the DB, so using the slug here made every
+      // toggle a SILENT no-op (button flipped, then the poll reverted it).
+      const res = await fetch(`/api/events/${eventId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1439,9 +1469,16 @@ function LiveSidebar({
         },
         body: JSON.stringify({ [key]: !current }),
       });
+      // Re-sync from the server. On success it confirms the flip; on failure
+      // the server still holds the old value, so this rolls the optimistic
+      // flip back instead of leaving the button stuck in the wrong state.
       await mutateFlags();
+      if (!res.ok) {
+        // eslint-disable-next-line no-console
+        console.error('toggleFeature failed', key, res.status);
+      }
     },
-    [eventSlug, token, mutateFlags]
+    [eventId, token, mutateFlags]
   );
   const [activeTab, setActiveTab] = useState<SidebarTab>(
     qaEnabled ? 'qa' : showChat ? 'chat' : 'polls'
@@ -2031,6 +2068,11 @@ interface LiveTopBarProps {
   maxParticipants?: number;
   isRecording: boolean;
   role: UserRole;
+  /** Event slug + active locale → build the shareable, token-free call and
+   *  event-page links (never derived from the current URL, which carries the
+   *  moderator/access `?token=`). */
+  slug: string;
+  locale: string;
   onLeaveRoom?: () => void;
 }
 
@@ -2044,10 +2086,14 @@ function LiveTopBar({
   maxParticipants: _maxParticipants,
   isRecording,
   role,
+  slug,
+  locale,
   onLeaveRoom,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
+  const settings = useSettings();
+  const brandName = settings.siteName || 'PA Webinar';
   const badgeColors = ROLE_BADGE_COLORS[role];
   const { kicker, main } = splitTitleKicker(title, parseTitleKicker);
   const thumbUrl = imageUrl ?? coverImageUrl ?? null;
@@ -2062,6 +2108,31 @@ function LiveTopBar({
       }}
     >
       <div className="d-flex align-items-center">
+        {/* PA Webinar brand — the immersive call overlay deliberately hides the
+            site header/footer (wrong to show full chrome over a fullscreen
+            call), so surface the brand here for orientation. Non-navigating on
+            purpose: a stray click must never yank the moderator out of the live
+            call. Hidden below md to keep the bar lean on phones. */}
+        <div
+          className="d-none d-md-flex align-items-center me-3 pe-3 flex-shrink-0"
+          style={{ borderRight: '1px solid rgba(255,255,255,0.25)' }}
+        >
+          {settings.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={settings.logoUrl}
+              alt={brandName}
+              style={{ height: 22, width: 'auto' }}
+            />
+          ) : (
+            <span
+              className="fw-bold text-white text-nowrap"
+              style={{ fontSize: '0.9rem', letterSpacing: '0.01em' }}
+            >
+              {brandName}
+            </span>
+          )}
+        </div>
         {thumbUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -2151,6 +2222,7 @@ function LiveTopBar({
             })}
           </span>
         )}
+        <LiveShareButton slug={slug} locale={locale} />
         {onLeaveRoom && (
           <Button
             color="danger"
