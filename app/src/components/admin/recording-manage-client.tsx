@@ -22,8 +22,9 @@ import TranscriptEditor from './transcript-editor';
 import SummaryEditor from './summary-editor';
 import TranslationManager from './translation-manager';
 import ArchivePanel from './archive-panel';
+import AiReliabilityPanel from './ai-reliability-panel';
 
-type TabKey = 'overview' | 'transcript' | 'summary' | 'translations' | 'archive';
+type TabKey = 'overview' | 'transcript' | 'summary' | 'translations' | 'archive' | 'reliability';
 
 function statusBadgeClass(status: string): string {
   if (status.endsWith('DONE')) return 'bg-success';
@@ -158,6 +159,7 @@ export default function RecordingManageClient({
     { key: 'summary', label: t('manageTabSummary') },
     { key: 'translations', label: t('manageTabTranslations') },
     { key: 'archive', label: t('manageTabArchive') },
+    { key: 'reliability', label: t('manageTabReliability') },
   ];
 
   return (
@@ -240,6 +242,7 @@ export default function RecordingManageClient({
         {tab === 'summary' && <SummaryEditor recordingId={recordingId} status={status} />}
         {tab === 'translations' && <TranslationManager recordingId={recordingId} />}
         {tab === 'archive' && <ArchivePanel recordingId={recordingId} />}
+        {tab === 'reliability' && <AiReliabilityPanel recordingId={recordingId} />}
       </div>
     </div>
   );

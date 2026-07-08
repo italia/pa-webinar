@@ -35,7 +35,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
-import { buildVtt, sha256Hex } from '@/lib/ai/transcript-format';
+import { buildVtt, parseInlineTranscriptJson, sha256Hex } from '@/lib/ai/transcript-format';
 
 export const dynamic = 'force-dynamic';
 
@@ -86,14 +86,7 @@ async function loadRecording(id: string) {
 }
 
 function parseTranscript(inlineBody: string | null): TranscriptJson {
-  if (!inlineBody) return {};
-  const decoded = tryDecryptPII(inlineBody);
-  if (!decoded) return {};
-  try {
-    return JSON.parse(decoded) as TranscriptJson;
-  } catch {
-    return {};
-  }
+  return parseInlineTranscriptJson<TranscriptJson>(inlineBody) ?? {};
 }
 
 export const GET = withErrorHandling(async (_request, context) => {

@@ -15,6 +15,7 @@ import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { assertPostprodAccessible } from '@/lib/ai/access';
+import { LOWCONF_AVG_LOGPROB } from '@/lib/ai/reliability';
 import { alignDiarizationToSpeakers } from '@/lib/ai/speaker-align';
 
 export const dynamic = 'force-dynamic';
@@ -134,13 +135,9 @@ export const GET = withErrorHandling(async (_request, context) => {
     if (sp.displayName) speakerMap.set(sp.diarLabel, sp.displayName);
   }
 
-  // Soglie per il badge "trascrizione meno sicura" nel frontend.
-  // Allineate ai filtri di hallucination nel worker (-1.0 / 0.6): un
-  // segment con avg_logprob in [-1.0, -0.6] è "borderline" — è stato
-  // tenuto perché non sicuro hallucination ma vale la pena segnalarlo
-  // al visitatore. > -0.6 è normale.
-  const LOWCONF_AVG_LOGPROB = -0.6;
-
+  // Soglia per il badge "trascrizione meno sicura" nel frontend.
+  // Importata da lib/ai/reliability così questo pannello e quello di
+  // affidabilità admin concordano su cosa è "borderline" (un unico -0.6).
   const segments = (transcript.segments ?? []).map((s) => ({
     start: s.start,
     end: s.end,
