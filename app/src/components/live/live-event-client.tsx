@@ -148,6 +148,13 @@ const MAX_RECONNECT_ATTEMPTS = 3;
 // into the call. A genuine drop (no readyToClose) just reconnects 1.2s later.
 const LEAVE_RECONNECT_GRACE_MS = 1200;
 
+// The native Jitsi/Excalidraw whiteboard needs a collab backend deployed +
+// Jitsi `config.whiteboard.enabled` server-side, which isn't provisioned yet.
+// Keep BOTH the moderator button (moderator-controls.tsx) and the "export it
+// before the call ends" hint hidden until that infra lands and this build-time
+// env is set — same gate in both files so button and hint appear together.
+const WHITEBOARD_INFRA_READY = process.env.NEXT_PUBLIC_WHITEBOARD_ENABLED === 'true';
+
 // Phases that render the full-bleed call surface. While in one of these we
 // flip the page into "immersive" mode (see `.live-call-immersive` in
 // globals.scss): the call overlays the PA header/footer and the outer
@@ -1920,7 +1927,7 @@ function LiveSidebar({
           {/* Whiteboard isn't persisted (native Jitsi/Excalidraw is ephemeral and
               end-to-end encrypted — there's no capture hook). Remind moderators
               to export + attach it as a material before the call ends. */}
-          {isModerator && whiteboardEnabled && (
+          {isModerator && whiteboardEnabled && WHITEBOARD_INFRA_READY && (
             <div
               className="px-3 py-2"
               style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.78rem' }}
@@ -1964,7 +1971,7 @@ function LiveSidebar({
           {activeTab === 'polls' && (
             <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
-          {activeTab === 'wordcloud' && (
+          {activeTab === 'wordcloud' && effWordCloud && (
             <WordCloud eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
           {activeTab === 'agenda' && effAgenda && (
