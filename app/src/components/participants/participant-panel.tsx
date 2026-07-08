@@ -80,7 +80,12 @@ export default function ParticipantPanel({
 
   return (
     <div className="p-2">
-      <div className="d-flex justify-content-between align-items-center mb-2">
+      {/* Header stays pinned so the title + live count remain visible while
+          scrolling a long roster (F2b). */}
+      <div
+        className="d-flex justify-content-between align-items-center mb-2 pb-2"
+        style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 2 }}
+      >
         <h6 className="mb-0 fw-semibold" style={{ fontSize: '0.9rem' }}>
           {t('title')}
         </h6>

@@ -953,6 +953,18 @@ html.live-call-immersive body {
     word-break: break-word;
   }
 
+  // Clickable links inside a chat message (F17). Long URLs wrap instead of
+  // overflowing the bubble.
+  &__link {
+    color: #0066CC;
+    text-decoration: underline;
+    word-break: break-all;
+
+    &:hover {
+      color: #004080;
+    }
+  }
+
   &__time {
     font-size: 0.65rem;
     color: #8899AA;
