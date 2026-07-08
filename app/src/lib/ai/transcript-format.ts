@@ -12,6 +12,25 @@
 
 import { createHash } from 'crypto';
 
+import { tryDecryptPII } from '@/lib/crypto/pii';
+
+/**
+ * Decode an inline (encrypted) TRANSCRIPT_JSON body into an object.
+ * Shared by the admin transcript editor, the public transcript route, and
+ * the reliability panel so all three read transcripts identically — returns
+ * null on missing/undecryptable/corrupt input.
+ */
+export function parseInlineTranscriptJson<T = unknown>(inlineBody: string | null): T | null {
+  if (!inlineBody) return null;
+  const decoded = tryDecryptPII(inlineBody);
+  if (!decoded) return null;
+  try {
+    return JSON.parse(decoded) as T;
+  } catch {
+    return null;
+  }
+}
+
 export interface TranscriptSegmentLike {
   start: number;
   end: number;
