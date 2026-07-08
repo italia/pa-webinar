@@ -20,11 +20,8 @@ export default function ReactionBar({ eventSlug }: ReactionBarProps) {
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [cooldown, setCooldown] = useState(false);
   const [floating, setFloating] = useState<FloatingEmoji[]>([]);
-  const [open, setOpen] = useState(false);
   const idRef = useRef(0);
   const prevCountsRef = useRef<Record<string, number>>({});
-  const panelRef = useRef<HTMLDivElement>(null);
-  const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchCounts = useCallback(async () => {
     try {
@@ -59,28 +56,6 @@ export default function ReactionBar({ eventSlug }: ReactionBarProps) {
     return () => clearInterval(interval);
   }, [fetchCounts]);
 
-  // Auto-close after 4s idle
-  useEffect(() => {
-    if (!open) return;
-    if (autoCloseRef.current) clearTimeout(autoCloseRef.current);
-    autoCloseRef.current = setTimeout(() => setOpen(false), 4000);
-    return () => {
-      if (autoCloseRef.current) clearTimeout(autoCloseRef.current);
-    };
-  }, [open]);
-
-  // Close on outside click
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
-
   const sendReaction = useCallback(async (emoji: string) => {
     if (cooldown) return;
     setCooldown(true);
@@ -94,10 +69,6 @@ export default function ReactionBar({ eventSlug }: ReactionBarProps) {
 
     setCounts((prev) => ({ ...prev, [emoji]: (prev[emoji] || 0) + 1 }));
 
-    // Reset auto-close timer on interaction
-    if (autoCloseRef.current) clearTimeout(autoCloseRef.current);
-    autoCloseRef.current = setTimeout(() => setOpen(false), 4000);
-
     try {
       await fetch(`/api/events/${eventSlug}/reactions`, {
         method: 'POST',
@@ -107,11 +78,9 @@ export default function ReactionBar({ eventSlug }: ReactionBarProps) {
     } catch { /* ignore */ }
   }, [eventSlug, cooldown]);
 
-  const total = Object.values(counts).reduce((sum, c) => sum + c, 0);
-
   return (
-    <div ref={panelRef} className="reaction-overlay">
-      {/* Floating emojis rising from the button */}
+    <div className="reaction-overlay">
+      {/* Floating emojis rising from the bar */}
       <div className="reaction-overlay__floats">
         {floating.map((f) => (
           <span
@@ -124,47 +93,26 @@ export default function ReactionBar({ eventSlug }: ReactionBarProps) {
         ))}
       </div>
 
-      {/* Emoji picker popover */}
-      {open && (
-        <div className="reaction-overlay__picker">
-          <div className="reaction-overlay__grid">
-            {EMOJIS.map((emoji) => (
-              <button
-                key={emoji}
-                type="button"
-                className="reaction-overlay__emoji-btn"
-                onClick={() => sendReaction(emoji)}
-                disabled={cooldown}
-                title={t('sendReaction')}
-              >
-                <span className="reaction-overlay__emoji">{emoji}</span>
-                {(counts[emoji] || 0) > 0 && (
-                  <span className="reaction-overlay__count">{counts[emoji]}</span>
-                )}
-              </button>
-            ))}
-          </div>
-          {total > 0 && (
-            <div className="reaction-overlay__total">
-              {total} {t('title').toLowerCase()}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Trigger button */}
-      <button
-        type="button"
-        className={`reaction-overlay__trigger${open ? ' reaction-overlay__trigger--active' : ''}`}
-        onClick={() => setOpen((o) => !o)}
-        aria-label={t('title')}
-        aria-expanded={open}
-      >
-        <span className="reaction-overlay__trigger-icon">😊</span>
-        {total > 0 && (
-          <span className="reaction-overlay__trigger-badge">{total > 99 ? '99+' : total}</span>
-        )}
-      </button>
+      {/* Always-visible reaction bar (F6) — no collapse, so it's findable at a
+          glance instead of hidden behind a 😊 trigger. */}
+      <div className="reaction-overlay__bar" role="group" aria-label={t('title')}>
+        {EMOJIS.map((emoji) => (
+          <button
+            key={emoji}
+            type="button"
+            className="reaction-overlay__emoji-btn"
+            onClick={() => sendReaction(emoji)}
+            disabled={cooldown}
+            title={t('sendReaction')}
+            aria-label={emoji}
+          >
+            <span className="reaction-overlay__emoji">{emoji}</span>
+            {(counts[emoji] || 0) > 0 && (
+              <span className="reaction-overlay__count">{counts[emoji]}</span>
+            )}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

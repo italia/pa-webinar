@@ -1919,7 +1919,7 @@ function LiveSidebar({
                 [
                   ['qaEnabled', t('sidebarTabQa'), effQa],
                   ['chatEnabled', t('sidebarTabChat'), effChat],
-                  ['agendaEnabled', t('sidebarTabAgenda'), effAgenda],
+                  ['agendaEnabled', t('liveToggleAgenda'), effAgenda],
                   ['wordCloudEnabled', t('sidebarTabWordcloud'), effWordCloud],
                 ] as const
               ).map(([key, label, on]) => (
