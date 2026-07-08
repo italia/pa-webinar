@@ -14,6 +14,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { speakerColor } from '@/lib/utils/speaker-palette';
 
@@ -65,9 +66,11 @@ export default function TranscriptTimeline({
   const audioRef = useRef<HTMLAudioElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations('admin.postprod');
   const [width, setWidth] = useState(0);
   const [current, setCurrent] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
+  const [mediaError, setMediaError] = useState(false);
   const lastActive = useRef<number>(-2);
 
   // Best available duration: waveform metadata, DB column, then the
@@ -209,11 +212,15 @@ export default function TranscriptTimeline({
           }}
           onTimeUpdate={(e) => setCurrent(e.currentTarget.currentTime)}
           onSeeked={(e) => setCurrent(e.currentTarget.currentTime)}
+          onError={() => setMediaError(true)}
         />
         <span className="small text-secondary text-nowrap" style={{ minWidth: 96 }}>
           {fmt(current)} / {fmt(duration)}
         </span>
       </div>
+      {mediaError && (
+        <p className="small text-warning mb-0 mt-1">{t('editMediaError')}</p>
+      )}
     </div>
   );
 }
