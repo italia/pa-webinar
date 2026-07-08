@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Icon } from 'design-react-kit';
 
+import { linkifyChat } from '@/lib/chat/linkify';
+
 /**
  * In-app chat panel for a live event.
  *
@@ -323,7 +325,7 @@ export default function ChatPanel({
                         )}
                       </div>
                     )}
-                    <div className="chat-panel__text">{m.text}</div>
+                    <div className="chat-panel__text">{linkifyChat(m.text)}</div>
                   </div>
                   <div className="chat-panel__time">{formatTime(m.createdAt)}</div>
                 </div>
