@@ -218,7 +218,11 @@
       "eventLink": "Pagina dell'evento",
       "eventLinkHint": "La pagina pubblica con i dettagli e il modulo di iscrizione.",
       "copy": "Copia",
-      "copied": "Copiato!"
+      "copied": "Copiato!",
+      "moderatorReveal": "Mostra link da moderatore",
+      "moderatorWarning": "Questo link dà accesso da MODERATORE (muta tutti, avvia registrazione, termina l'evento). Condividilo solo con altri moderatori.",
+      "moderatorLink": "Link da moderatore",
+      "moderatorLinkHint": "Chi apre questo link entra come moderatore con pieni poteri di regia."
     },
     "title": "Sala evento",
     "password": {
@@ -347,6 +351,7 @@
       "recPreparing": "Preparazione…",
       "toggleChat": "Chat on/off",
       "endEvent": "Termina evento",
+      "whiteboard": "Lavagna",
       "endEventConfirm": "Sei sicuro di voler terminare l'evento per tutti i partecipanti?",
       "participantCount": "{count} partecipanti",
       "raisedHands": "Mani alzate",

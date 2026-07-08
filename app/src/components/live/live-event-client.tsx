@@ -148,6 +148,13 @@ const MAX_RECONNECT_ATTEMPTS = 3;
 // into the call. A genuine drop (no readyToClose) just reconnects 1.2s later.
 const LEAVE_RECONNECT_GRACE_MS = 1200;
 
+// The native Jitsi/Excalidraw whiteboard needs a collab backend deployed +
+// Jitsi `config.whiteboard.enabled` server-side, which isn't provisioned yet.
+// Keep BOTH the moderator button (moderator-controls.tsx) and the "export it
+// before the call ends" hint hidden until that infra lands and this build-time
+// env is set — same gate in both files so button and hint appear together.
+const WHITEBOARD_INFRA_READY = process.env.NEXT_PUBLIC_WHITEBOARD_ENABLED === 'true';
+
 // Phases that render the full-bleed call surface. While in one of these we
 // flip the page into "immersive" mode (see `.live-call-immersive` in
 // globals.scss): the call overlays the PA header/footer and the outer
@@ -1046,6 +1053,7 @@ export default function LiveEventClient({
           role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
           slug={event.slug}
           locale={locale}
+          moderatorToken={isModerator ? token : undefined}
         />
         <RecordingConsent
           onAccept={handleConsentAccept}
@@ -1118,6 +1126,7 @@ export default function LiveEventClient({
         role={isActualModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
         slug={event.slug}
         locale={locale}
+        moderatorToken={isActualModerator ? token : undefined}
         onLeaveRoom={handleLeaveRoom}
       />
 
@@ -1132,6 +1141,7 @@ export default function LiveEventClient({
           jibriAvailable={jibriReady === true}
           participantsCanUnmute={event.participantsCanUnmute}
           participantsCanStartVideo={event.participantsCanStartVideo}
+          whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
           localDisplayName={credentials?.displayName ?? chosenName ?? ''}
           isPrimaryModerator={isPrimaryModerator}
         />
@@ -1439,6 +1449,7 @@ function LiveSidebar({
     qaEnabled: boolean;
     chatEnabled: boolean;
     agendaEnabled: boolean;
+    wordCloudEnabled: boolean;
     recordingEnabled: boolean;
   }>(
     `/api/events/${eventSlug}/flags`,
@@ -1448,13 +1459,20 @@ function LiveSidebar({
   const effQa = liveFlags?.qaEnabled ?? qaEnabled;
   const effChat = liveFlags?.chatEnabled ?? chatEnabled;
   const effAgenda = liveFlags?.agendaEnabled ?? agendaEnabled;
+  // Word cloud is opt-in and OFF by default: the tab stays hidden until the
+  // flags poll reports it enabled (no per-event prop → safe default false, so
+  // it never flashes on before the real value loads).
+  const effWordCloud = liveFlags?.wordCloudEnabled ?? false;
   const showChat = effChat !== false;
 
   // Toggle di una funzione durante l'evento (moderatore): PUT del flag +
   // refresh ottimistico locale; gli altri client si allineano al prossimo
   // poll (15s).
   const toggleFeature = useCallback(
-    async (key: 'qaEnabled' | 'chatEnabled' | 'agendaEnabled', current: boolean) => {
+    async (
+      key: 'qaEnabled' | 'chatEnabled' | 'agendaEnabled' | 'wordCloudEnabled',
+      current: boolean,
+    ) => {
       await mutateFlags((cur) => (cur ? { ...cur, [key]: !current } : cur), {
         revalidate: false,
       });
@@ -1474,7 +1492,6 @@ function LiveSidebar({
       // flip back instead of leaving the button stuck in the wrong state.
       await mutateFlags();
       if (!res.ok) {
-        // eslint-disable-next-line no-console
         console.error('toggleFeature failed', key, res.status);
       }
     },
@@ -1633,7 +1650,7 @@ function LiveSidebar({
           <path d="M4 17h7" />
         </svg>
       ),
-      show: true,
+      show: effWordCloud,
     },
     {
       key: 'agenda',
@@ -1890,6 +1907,7 @@ function LiveSidebar({
                   ['qaEnabled', t('sidebarTabQa'), effQa],
                   ['chatEnabled', t('sidebarTabChat'), effChat],
                   ['agendaEnabled', t('sidebarTabAgenda'), effAgenda],
+                  ['wordCloudEnabled', t('sidebarTabWordcloud'), effWordCloud],
                 ] as const
               ).map(([key, label, on]) => (
                 <button
@@ -1909,7 +1927,7 @@ function LiveSidebar({
           {/* Whiteboard isn't persisted (native Jitsi/Excalidraw is ephemeral and
               end-to-end encrypted — there's no capture hook). Remind moderators
               to export + attach it as a material before the call ends. */}
-          {isModerator && whiteboardEnabled && (
+          {isModerator && whiteboardEnabled && WHITEBOARD_INFRA_READY && (
             <div
               className="px-3 py-2"
               style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.78rem' }}
@@ -1930,12 +1948,15 @@ function LiveSidebar({
               keep its SSE open and count unreads while the user is on
               another tab. We hide it visually instead of unmounting. */}
           {showChat && (
+            // Kept MOUNTED (SSE open + unread counting on other tabs) but
+            // toggled via d-flex/d-none, not an inline `display`: Bootstrap
+            // Italia's `.d-flex { display:flex !important }` beats a plain
+            // inline `display:none`, so the old inline hide was ignored and
+            // the chat stayed stacked under the active tab (sidebar "spaccata").
+            // Both utilities are !important, so swapping the class wins cleanly.
             <div
-              className="d-flex flex-column flex-grow-1"
-              style={{
-                minHeight: 0,
-                display: activeTab === 'chat' ? undefined : 'none',
-              }}
+              className={`flex-column flex-grow-1 ${activeTab === 'chat' ? 'd-flex' : 'd-none'}`}
+              style={{ minHeight: 0 }}
             >
               <ChatPanel
                 eventSlug={eventSlug}
@@ -1950,7 +1971,7 @@ function LiveSidebar({
           {activeTab === 'polls' && (
             <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
-          {activeTab === 'wordcloud' && (
+          {activeTab === 'wordcloud' && effWordCloud && (
             <WordCloud eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
           {activeTab === 'agenda' && effAgenda && (
@@ -2073,6 +2094,10 @@ interface LiveTopBarProps {
    *  moderator/access `?token=`). */
   slug: string;
   locale: string;
+  /** Privileged moderator magic-link token — passed ONLY when the current
+   *  user is a moderator, so the token never enters a non-moderator tree.
+   *  Surfaced (collapsed, with a warning) in the share popup. */
+  moderatorToken?: string;
   onLeaveRoom?: () => void;
 }
 
@@ -2088,6 +2113,7 @@ function LiveTopBar({
   role,
   slug,
   locale,
+  moderatorToken,
   onLeaveRoom,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
@@ -2222,7 +2248,7 @@ function LiveTopBar({
             })}
           </span>
         )}
-        <LiveShareButton slug={slug} locale={locale} />
+        <LiveShareButton slug={slug} locale={locale} moderatorToken={moderatorToken} />
         {onLeaveRoom && (
           <Button
             color="danger"
