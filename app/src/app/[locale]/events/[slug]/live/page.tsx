@@ -221,10 +221,22 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       }
       notFound();
     }
+    // Only the browser that REGISTERED (matching signed event_access cookie)
+    // inherits the registrant's name/consent. A forwarded personal link →
+    // blank the pre-join name so the opener types their OWN and enters as a
+    // named guest; the JWT route enforces the same rule server-side (F7).
+    const cookieStore = await cookies();
+    const ownsToken =
+      (await verifyEventAccess(
+        event.id,
+        cookieStore.get(eventAccessCookieName(event.id))?.value,
+      )) === token;
     participantInfo = {
-      displayName: tryDecryptPII(registration.displayName) ?? registration.displayName,
+      displayName: ownsToken
+        ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
+        : '',
     };
-    hasMultitrackConsent = registration.consentMultitrack ?? false;
+    hasMultitrackConsent = ownsToken ? (registration.consentMultitrack ?? false) : false;
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);

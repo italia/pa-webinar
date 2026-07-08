@@ -124,6 +124,10 @@ describe('Jitsi config overwrite', () => {
     expect(jitsiConfigOverwrite.p2p.enabled).toBe(false);
   });
 
+  it('disables self-view settings so hiding your own tile is not a one-way trap (F10)', () => {
+    expect(jitsiConfigOverwrite.disableSelfViewSettings).toBe(true);
+  });
+
   it('disables native reactions (handled by custom overlay)', () => {
     expect(jitsiConfigOverwrite.disableReactions).toBe(true);
   });
@@ -304,15 +308,21 @@ describe('Video quality presets', () => {
     expect(save.stereo).toBe(false);
   });
 
-  it('unlocks screenshare framerate above the 5fps Jitsi default, scaling with the preset', () => {
+  it('caps screenshare framerate to a detail-first 5fps on everyday presets, keeping motion headroom only on MAX (F13)', () => {
     const fps = (q: string) =>
       resolveVideoQualityConfig(q).desktopSharingFrameRate as { min: number; max: number };
     for (const q of VIDEO_QUALITY_PRESETS) {
       expect(fps(q).min).toBeGreaterThanOrEqual(5);
-      expect(fps(q).max).toBeGreaterThan(5); // il default {min:5,max:5} rende inguardabili demo/video
       expect(fps(q).max).toBeGreaterThanOrEqual(fps(q).min);
     }
-    expect(fps('SAVE_DATA').max).toBeLessThan(fps('HIGH').max);
+    // Detail-first: the common presets spend the bitrate budget on few SHARP
+    // frames instead of smearing it across ~30fps → fixes "screenshare sgranato"
+    // on slides/documents.
+    expect(fps('SAVE_DATA').max).toBe(5);
+    expect(fps('BALANCED').max).toBe(5);
+    expect(fps('HIGH').max).toBe(5);
+    // MAX keeps motion headroom for the rare video-in-screenshare demo.
+    expect(fps('MAX').max).toBeGreaterThan(5);
     expect(fps('MAX').max).toBeGreaterThanOrEqual(fps('HIGH').max);
   });
 
