@@ -1,15 +1,46 @@
-# Run jitsi-meet-torture as a Kubernetes Job inside the same namespace
-# as the pa-webinar / jitsi deployment. Bypasses the public ingress and
-# hits the Jitsi web Service via ClusterIP DNS.
+# Run jitsi-meet-torture (MalleusJitsificus) as a Kubernetes Job inside the
+# same namespace as the pa-webinar / jitsi deployment.
+#
+# IMPORTANT (learned the hard way, 7 lug):
+#   * Jitsi web config.bosh is an ABSOLUTE public URL, so the browser always
+#     signals to the public domain — hitting the internal web ClusterIP does
+#     NOT bypass the ingress for signaling. Use the PUBLIC instance URL.
+#   * prosody enforces token auth (allow_empty_token=false, ENABLE_GUESTS=false).
+#     Every bot MUST carry a valid JWT or the jitsi client fails client-side
+#     BEFORE opening the BOSH stream -> prosody logs zero connections. The JWT
+#     is passed via -Dorg.jitsi.token (NOT -Dorg.jitsi.malleus.jwt, which does
+#     not exist). Mint it with mint-jwt.sh (room:"*" wildcard) and store it in
+#     the `torture-jwt` secret.
+#   * Malleus property names are prefixed org.jitsi.malleus.* and use
+#     audio_senders / room_name_prefix (see scripts/malleus.sh upstream).
+#   * Headless must be enabled explicitly: org.jitsi.malleus.enable.headless=true.
+#
+# STATUS / KNOWN LIMITATION (7 lug): with all of the above fixed, the run gets
+# all the way to launching browsers — config parses, the JWT is accepted, and
+# MalleusJitsificus creates the participants — but Chrome then exits on startup
+# ("session not created: Chrome instance exited"). Upstream malleus ALWAYS runs
+# browsers on Selenium Grid nodes (selenium/node-chrome), never local Chrome in
+# the maven container, and torture exposes no property to inject the extra
+# container-safe Chrome flags. To finish the browser tier, add a Selenium node:
+#   * run selenium/standalone-chrome (SE_NODE_OVERRIDE_MAX_SESSIONS=true,
+#     SE_NODE_MAX_SESSIONS>=participants) as a native sidecar sharing /dev/shm,
+#   * point torture at it: -Djitsi-meet.isRemote=true
+#     -Dremote.address=http://localhost:4444/wd/hub  (drop chrome.binary.path),
+#   * scale sessions + memory with participant count (~0.5 GiB/session).
+# The JWT-auth + param + headless fixes below are all VERIFIED correct; only the
+# browser runtime needs the Selenium node.
 #
 # Usage:
-#   1. Edit NAMESPACE, RELEASE and PARTICIPANTS below.
-#   2. Mint a JWT with scripts/load-test/mint-jwt.mjs and create a secret:
-#        kubectl -n <ns> create secret generic torture-jwt \
-#          --from-literal=jwt="$(node mint-jwt.mjs --room load-test --name Bot)"
-#   3. kubectl -n <ns> apply -f k8s-job.yaml
-#   4. kubectl -n <ns> logs -f job/torture
-#   5. kubectl -n <ns> delete job torture
+#   1. Mint a JWT and create the secret:
+#        export JITSI_JWT_SECRET=... JITSI_JWT_ISSUER=pa-webinar \
+#               JITSI_JWT_AUDIENCE=jitsi \
+#               JITSI_JWT_SUBJECT=pa-webinar-jitsi.developers.italia.it
+#        kubectl -n pa-webinar create secret generic torture-jwt \
+#          --from-literal=jwt="$(sh mint-jwt.sh)"
+#   2. Edit JITSI_URL / PARTICIPANTS / SENDERS below.
+#   3. kubectl -n pa-webinar apply -f k8s-job.yaml
+#   4. kubectl -n pa-webinar logs -f job/torture
+#   5. kubectl -n pa-webinar delete job torture
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -27,25 +58,41 @@ spec:
         app.kubernetes.io/component: load-test
     spec:
       restartPolicy: Never
+      nodeSelector:
+        nodepool: applications
+      tolerations:
+        - key: kubernetes.azure.com/scalesetpriority
+          operator: Equal
+          value: spot
+          effect: NoSchedule
+        - key: workload
+          operator: Equal
+          value: test
+          effect: NoSchedule
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
       containers:
         - name: torture
-          # Official Maven image bundles JDK + Maven. jitsi-meet-torture
-          # is cloned at startup; for air-gapped clusters build a custom
-          # image with the repo and headless Chrome pre-installed.
           image: maven:3.9-eclipse-temurin-17
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
           env:
-            # Internal Service name of the Jitsi web pod. The exact name
-            # comes from the subchart release (commonly <release>-jitsi-meet-web).
+            # PUBLIC instance URL (BOSH is absolute-public; internal ClusterIP
+            # would only serve the HTML, not the signaling).
             - name: JITSI_URL
-              value: "http://RELEASE-NAME-jitsi-meet-web.NAMESPACE.svc.cluster.local"
+              value: "https://pa-webinar-jitsi.developers.italia.it"
             - name: JITSI_ROOM
-              value: "load-test-room"
+              value: "loadtest"
             - name: PARTICIPANTS
-              value: "100"
+              value: "3"
             - name: SENDERS
-              value: "4"
-            - name: DURATION
-              value: "600"
+              value: "3"
+            - name: DURATION      # seconds
+              value: "120"
             - name: JITSI_JWT
               valueFrom:
                 secretKeyRef:
@@ -55,26 +102,57 @@ spec:
           args:
             - |
               set -euo pipefail
+              # The maven image is Ubuntu-based, where the `chromium` apt package
+              # is a snap stub that cannot run in a container ("Driver server
+              # process died prematurely"). Install REAL Google Chrome from
+              # Google's repo and let WebDriverManager fetch the matching driver.
               apt-get update && apt-get install -y --no-install-recommends \
-                git chromium-driver chromium
+                git wget gnupg ca-certificates fonts-liberation
+              wget -qO- https://dl.google.com/linux/linux_signing_key.pub \
+                | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+              echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" \
+                > /etc/apt/sources.list.d/google-chrome.list
+              apt-get update && apt-get install -y --no-install-recommends google-chrome-stable
               git clone --depth=1 https://github.com/jitsi/jitsi-meet-torture.git /torture
               cd /torture
-              mvn test \
+              echo "== chrome: $(google-chrome-stable --version 2>&1) =="
+              echo "== torture: $PARTICIPANTS participants ($SENDERS senders) -> $JITSI_URL room=$JITSI_ROOM =="
+              # NB: MalleusJitsificus.createData parses many numeric props with
+              # NO null-guard — omitting any yields "NumberFormatException: Cannot
+              # parse null string". Pass the FULL set from upstream scripts/malleus.sh.
+              mvn -B test \
+                -Dthreadcount=1 \
                 -Djitsi-meet.instance.url="$JITSI_URL" \
                 -Djitsi-meet.tests.toRun=MalleusJitsificus \
-                -Dmalleus.conferences=1 \
-                -Dmalleus.participants="$PARTICIPANTS" \
-                -Dmalleus.senders="$SENDERS" \
-                -Dmalleus.audioSenders="$SENDERS" \
-                -Dmalleus.duration="${DURATION}000" \
-                -Dmalleus.room="$JITSI_ROOM" \
-                -Dorg.jitsi.malleus.jwt="$JITSI_JWT" \
-                -Dchrome.binary.path=/usr/bin/chromium \
-                -Dchrome.disable.nosanbox=true
+                -Djitsi-meet.isRemote=false \
+                -Dorg.jitsi.malleus.conferences=1 \
+                -Dorg.jitsi.malleus.max_disrupted_bridges_pct=0 \
+                -Dorg.jitsi.malleus.participants="$PARTICIPANTS" \
+                -Dorg.jitsi.malleus.senders="$SENDERS" \
+                -Dorg.jitsi.malleus.audio_senders="$SENDERS" \
+                -Dorg.jitsi.malleus.duration="$DURATION" \
+                -Dorg.jitsi.malleus.join_delay=0 \
+                -Dorg.jitsi.malleus.room_name_prefix="$JITSI_ROOM" \
+                -Dorg.jitsi.malleus.regions= \
+                -Dorg.jitsi.malleus.use_node_types=false \
+                -Dorg.jitsi.malleus.sender_tabs_per_browser=1 \
+                -Dorg.jitsi.malleus.receiver_tabs_per_browser=1 \
+                -Dorg.jitsi.malleus.senders_per_tab=1 \
+                -Dorg.jitsi.malleus.receivers_per_tab=1 \
+                -Dorg.jitsi.malleus.use_load_test=false \
+                -Dorg.jitsi.malleus.use_lite_mode=false \
+                -Dorg.jitsi.malleus.switch_speakers=false \
+                -Dorg.jitsi.malleus.use_stage_view=false \
+                -Dorg.jitsi.malleus.enable.headless=true \
+                -Dorg.jitsi.malleus.set.saveLogs=false \
+                -Dorg.jitsi.token="$JITSI_JWT" \
+                -Dchrome.binary.path=/usr/bin/google-chrome-stable \
+                -Dchrome.disable.nosanbox=true \
+                -DallowInsecureCerts=false
           resources:
             requests:
               cpu: "2"
               memory: "4Gi"
             limits:
-              cpu: "4"
-              memory: "8Gi"
+              cpu: "6"
+              memory: "10Gi"

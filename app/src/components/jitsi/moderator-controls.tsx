@@ -428,10 +428,16 @@ export default function ModeratorControls({
         </div>
       )}
 
-      {/* Raised hands panel */}
-      {handsOpen && (
+      {/* Raised hands panel — ALWAYS mounted (we toggle visibility, not the
+          mount) so its `raiseHandUpdated` listener subscribes the moment the
+          API is ready and captures hands raised BEFORE the moderator opens the
+          panel. Lazy-mounting on `handsOpen` missed that event and left the
+          list empty — while the badge counter (its own permanent listener)
+          showed the right number, the smoking gun of the mount/listener race.
+          Mirrors the always-mounted read-only panel on the participant side. */}
+      <div className={handsOpen ? '' : 'd-none'}>
         <RaisedHandsPanel api={api} localDisplayName={localDisplayName} />
-      )}
+      </div>
 
       {/* End event confirmation modal */}
       <Modal isOpen={endModalOpen} toggle={() => setEndModalOpen(false)} centered>

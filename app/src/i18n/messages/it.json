@@ -210,6 +210,16 @@
     "pageOf": "Pagina {page} di {total}"
   },
   "live": {
+    "share": {
+      "button": "Condividi",
+      "title": "Condividi l'evento",
+      "callLink": "Link per partecipare",
+      "callLinkHint": "Chi apre questo link entra direttamente quando l'evento è dal vivo; altrimenti passa dalla registrazione. Non contiene token riservati.",
+      "eventLink": "Pagina dell'evento",
+      "eventLinkHint": "La pagina pubblica con i dettagli e il modulo di iscrizione.",
+      "copy": "Copia",
+      "copied": "Copiato!"
+    },
     "title": "Sala evento",
     "password": {
       "title": "Password di accesso",
