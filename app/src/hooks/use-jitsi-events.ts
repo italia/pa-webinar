@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
+import { humanParticipantCount } from '@/lib/jitsi/participants';
 
 interface JitsiEventsState {
   participantCount: number;
@@ -28,13 +29,13 @@ export function useJitsiEvents(api: JitsiMeetExternalAPI | null): JitsiEventsSta
 
   const onParticipantJoined = useCallback(() => {
     if (apiRef.current) {
-      setParticipantCount(apiRef.current.getNumberOfParticipants());
+      setParticipantCount(humanParticipantCount(apiRef.current));
     }
   }, []);
 
   const onParticipantLeft = useCallback(() => {
     if (apiRef.current) {
-      setParticipantCount(apiRef.current.getNumberOfParticipants());
+      setParticipantCount(humanParticipantCount(apiRef.current));
     }
   }, []);
 
@@ -62,7 +63,7 @@ export function useJitsiEvents(api: JitsiMeetExternalAPI | null): JitsiEventsSta
   useEffect(() => {
     if (!api) return;
 
-    const count = api.getNumberOfParticipants();
+    const count = humanParticipantCount(api);
     setParticipantCount(count);
 
     api.addListener('participantJoined', onParticipantJoined);

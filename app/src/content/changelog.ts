@@ -28,6 +28,17 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.5',
+    date: '2026-07-08',
+    title: 'Registrazioni e conteggi',
+    notes: [
+      'Il conteggio dei presenti in sala esclude ora il registratore: mostra solo le persone reali, non il bot che cattura l’audio.',
+      'Post-produzione: nuovo pulsante “Genera AI” per avviare trascrizione, sintesi e traduzione anche sulle registrazioni solo-audio (una traccia per partecipante), che prima non mostravano alcun controllo di avvio.',
+      'Nell’elenco delle tracce, ai soprannomi è affiancato un identificativo: persone diverse con lo stesso soprannome ricevono identificativi distinti, mentre più interventi della stessa persona condividono lo stesso identificativo.',
+      'Messaggio chiaro quando l’avvio della pipeline non accoda alcun lavoro (AI disattivata per l’evento o pipeline in pausa), invece di un falso “operazione riuscita”.',
+    ],
+  },
+  {
     version: '0.6.4',
     date: '2026-07-08',
     title: 'Sicurezza dell’identità e rifiniture della sala',

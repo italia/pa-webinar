@@ -43,9 +43,25 @@ export const POST = withErrorHandling(async (request, context) => {
   const result = await prisma.$transaction(async (tx) => {
     const recording = await tx.recording.findUnique({
       where: { id },
-      select: { id: true, runCount: true, eventId: true },
+      select: {
+        id: true,
+        runCount: true,
+        eventId: true,
+        event: { select: { aiTranscriptEnabled: true } },
+      },
     });
     if (!recording) throw new NotFoundError('Recording');
+
+    // Rerun re-runs an EXISTING pipeline; with AI transcript disabled the
+    // enqueue no-ops. Throw BEFORE the status mutation so the recording stays
+    // at READY and the "Genera AI" button (which enables the flag) remains
+    // available — otherwise a mistaken Rerun strands it in POSTPROD_QUEUED with
+    // zero jobs and no way back. (review #1)
+    if (!recording.event.aiTranscriptEnabled) {
+      throw new ValidationError(
+        'AI transcript is disabled for this event. Use "Genera AI" to enable AI processing and start the pipeline.',
+      );
+    }
 
     await tx.recording.update({
       where: { id: recording.id },
