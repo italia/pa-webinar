@@ -28,6 +28,17 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.8',
+    date: '2026-07-08',
+    title: 'Pagina di editing post-evento più chiara',
+    notes: [
+      'La pagina di correzione (trascrizione, sintesi, traduzioni) ora spiega quando i contenuti AI non sono ancora disponibili — “elaborazione in corso” oppure “avvia l’elaborazione dai controlli in alto” — invece di mostrare un errore rosso che sembrava un guasto.',
+      'Un salvataggio non riuscito viene ora mostrato in rosso e riporta il motivo specifico restituito dal server, invece di apparire in verde come se fosse andato a buon fine.',
+      'Sessione amministratore scaduta e problemi di caricamento vengono ora distinti con messaggi dedicati (invece di un unico errore generico).',
+      'Se l’audio della registrazione non è riproducibile, la pagina lo segnala e resta comunque possibile correggere testo e speaker dei segmenti.',
+    ],
+  },
+  {
     version: '0.6.7',
     date: '2026-07-08',
     title: 'Reazioni sempre visibili e “Note / Checklist”',

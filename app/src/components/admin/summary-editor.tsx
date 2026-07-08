@@ -20,6 +20,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import { useTranslations } from 'next-intl';
 import { SkeletonLines } from '@/components/ui/skeleton';
 
 const fetcher = (url: string): Promise<unknown> =>
@@ -142,11 +143,15 @@ function TrashIcon() {
 
 export default function SummaryEditor({
   recordingId,
+  status,
   onSaved,
 }: {
   recordingId: string;
+  /** Recording.status — lets the empty state say "in corso" vs "mai generata". */
+  status?: string;
   onSaved?: () => void;
 }) {
+  const t = useTranslations('admin.postprod');
   const { data, error, isLoading, mutate } = useSWR<SummaryResponse>(
     `/api/admin/postprod/recordings/${recordingId}/summary`,
     fetcher as (url: string) => Promise<SummaryResponse>,
@@ -185,24 +190,28 @@ export default function SummaryEditor({
   const dirty = !!(draft && pristine && !draftEquals(draft, pristine));
 
   if (error) {
-    return (
-      <p className="text-danger small mb-0">
-        Errore nel caricamento della sintesi.
-      </p>
-    );
+    return <p className="text-danger small mb-0">{t('summaryLoadError')}</p>;
   }
   if (isLoading || !data) {
-    return <SkeletonLines lines={5} loadingLabel="Caricamento sintesi…" />;
+    return <SkeletonLines lines={5} loadingLabel={t('summaryLoading')} />;
   }
   if (data.languages.length === 0) {
+    // Distinguish "still processing" / "failed" / "never generated" so the
+    // operator knows whether to wait or to (re-)run from the controls above.
+    const processing = status === 'POSTPROD_QUEUED' || status === 'POSTPROD_RUNNING';
+    const failed = status === 'POSTPROD_FAILED';
     return (
       <p className="text-secondary small mb-0">
-        Nessuna sintesi AI disponibile per questa registrazione.
+        {processing
+          ? t('summaryEmptyProcessing')
+          : failed
+            ? t('summaryEmptyFailed')
+            : t('summaryEmptyNone')}
       </p>
     );
   }
   if (!lang || !draft) {
-    return <p className="text-secondary small mb-0">Caricamento sintesi…</p>;
+    return <p className="text-secondary small mb-0">{t('summaryLoading')}</p>;
   }
 
   const patch = (p: Partial<Draft>): void => {
