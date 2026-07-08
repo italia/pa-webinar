@@ -243,6 +243,12 @@ export default function ChatPanel({
     try {
       const body: Record<string, string> = { text };
       if (isGuest) body.guestName = displayName;
+      // Moderators on the SHARED primary link would otherwise all chat as the
+      // single event-level name / "Moderatore". Forward the name typed in the
+      // waiting room (same identity used for the JWT/video) so each moderator
+      // chats under their real name (server honours it only for the shared
+      // primary grant; per-row co-moderators/speakers keep their own name).
+      else if (displayName) body.displayNameOverride = displayName;
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };

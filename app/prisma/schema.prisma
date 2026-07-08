@@ -49,6 +49,10 @@ model Event {
   // se ON E se l'infra whiteboard è abilitata lato Jitsi (config.whiteboard.
   // enabled, oggi solo su test) → resta nascosto in prod finché non replicata.
   whiteboardEnabled Boolean @default(false) @map("whiteboard_enabled")
+  // Nuvola di parole live: opt-in, OFF di default. Rimossa come funzione
+  // sempre-attiva (poco usata; in prospettiva sostituita da una sintesi AI).
+  // Attivabile dal moderatore durante l'evento (barra funzioni).
+  wordCloudEnabled Boolean @default(false) @map("word_cloud_enabled")
   recordingEnabled Boolean @default(false) @map("recording_enabled")
 
   // When recording is enabled, this skips the "start recording?" moderator
