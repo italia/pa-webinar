@@ -28,6 +28,19 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.6.3',
+    date: '2026-07-08',
+    title: 'Rifiniture della sala evento — round 2',
+    notes: [
+      'Il timer di presentazione è ora integrato nella barra dei controlli del moderatore, senza occupare una riga dedicata; la barra del conto alla rovescia compare solo quando il timer è attivo.',
+      'In chat compare il nome reale di chi scrive, non più un generico “Moderatore”.',
+      'La chat è diventata un pannello a sé nella barra laterale (non più sempre sovrapposta agli altri contenuti): interfaccia più pulita, con il contatore dei messaggi non letti sul tab.',
+      'Nuovo pulsante “Lavagna” per i moderatori, per aprire la lavagna condivisa direttamente dalla barra dei controlli.',
+      'Pulsante “Condividi” con colore corretto (non più confondibile con “Esci”), icone accanto ai link e, per i soli moderatori, il link di moderazione nascosto dietro un avviso per invitare altri moderatori senza sbagliare.',
+      'La nuvola di parole non è più attiva di default: resta attivabile a scelta dal moderatore durante l’evento.',
+    ],
+  },
+  {
     version: '0.6.2',
     date: '2026-07-08',
     title: 'Rifiniture della sala evento in diretta',

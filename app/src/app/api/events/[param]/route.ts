@@ -420,6 +420,9 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.agendaEnabled !== undefined && {
         agendaEnabled: data.agendaEnabled,
       }),
+      ...(data.wordCloudEnabled !== undefined && {
+        wordCloudEnabled: data.wordCloudEnabled,
+      }),
       ...(data.whiteboardEnabled !== undefined && {
         whiteboardEnabled: data.whiteboardEnabled,
       }),

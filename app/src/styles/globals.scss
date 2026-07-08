@@ -697,6 +697,24 @@ html.live-call-immersive body {
   }
 }
 
+// Share button in the live top bar. Same translucent-white base as
+// .leave-room-btn but stays NEUTRAL on hover/focus (no #D9364F danger red),
+// so it isn't mistaken for "Esci" once clicked/focused.
+.live-share-btn {
+  font-size: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover,
+  &:focus {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    color: #fff;
+  }
+}
+
 // ── Reaction overlay (floating picker) ──
 
 .reaction-overlay {

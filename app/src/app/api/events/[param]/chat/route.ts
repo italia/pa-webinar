@@ -55,6 +55,11 @@ const postSchema = z.object({
   // Provided by guests only — participants and moderators derive the
   // name from their token lookup. Ignored for those branches.
   guestName: z.string().trim().min(1).max(80).optional(),
+  // Self-asserted display name for a moderator on the SHARED primary link,
+  // where the server has no per-person name. Honoured ONLY for that grant
+  // (per-row co-moderators/speakers keep their authoritative decrypted name).
+  // Mirrors the JWT displayName override already used for the video identity.
+  displayNameOverride: z.string().trim().min(1).max(80).optional(),
 });
 
 interface AuthResult {
@@ -75,6 +80,7 @@ async function authenticateSender(
   eventIdOrSlug: string,
   token: string | null,
   guestName: string | undefined,
+  displayNameOverride: string | undefined,
   req: Request,
 ): Promise<AuthResult> {
   const where = UUID_RE.test(eventIdOrSlug)
@@ -101,12 +107,21 @@ async function authenticateSender(
     const grant = await resolveGrantForEvent(event, token);
     if (grant) {
       const isGrantModerator = grant.role === 'MODERATOR';
+      // Shared PRIMARY link: the server only has the single event-level
+      // moderatorName (or none) → honour the client's self-asserted name so
+      // each moderator chats under their real name (same identity as the
+      // JWT/video). Per-row grants carry their own decrypted name → keep it
+      // authoritative and ignore the override.
+      const override = displayNameOverride?.trim();
+      const senderName = grant.isPrimaryShared
+        ? override || grant.displayName || 'Moderatore'
+        : grant.displayName ?? 'Moderatore';
       return {
         eventId: event.id,
         senderId: grant.isPrimaryShared
           ? `mod-${event.id}-primary`
           : `${isGrantModerator ? 'mod' : 'spk'}-${event.id}-${grant.grantId}`,
-        senderName: grant.displayName ?? 'Moderatore',
+        senderName,
         isModerator: isGrantModerator,
       };
     }
@@ -232,7 +247,13 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
-  const auth = await authenticateSender(param, token, parsed.data.guestName, request);
+  const auth = await authenticateSender(
+    param,
+    token,
+    parsed.data.guestName,
+    parsed.data.displayNameOverride,
+    request,
+  );
 
   // Per-sender rate limit: keep chat flowing for a normal speaker
   // (~1 message/sec bursts) but prevent spam / accidental paste loops.
