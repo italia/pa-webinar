@@ -264,7 +264,21 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
             <tbody>
               {tracks.items.map((tr, i) => (
                 <tr key={i}>
-                  <td><strong>{tr.displayName || tr.participantId.slice(0, 10)}</strong></td>
+                  <td>
+                    <strong>{tr.displayName || tr.participantId.slice(0, 10)}</strong>
+                    {/* Same nickname can repeat: different people who typed the
+                        same name, or one person who re-joined (same participantId
+                        → same suffix, distinct blobKey → distinct track). The id
+                        suffix differentiates them (F15). */}
+                    {tr.displayName && (
+                      <span
+                        className="text-secondary ms-1"
+                        style={{ fontFamily: 'monospace', fontSize: '0.72rem' }}
+                      >
+                        #{tr.participantId.slice(0, 6)}
+                      </span>
+                    )}
+                  </td>
                   <td className="small text-secondary">{t('trackEnters', { s: Math.round(tr.startOffsetMs / 1000) })}</td>
                   <td className="small text-secondary">{tr.durationMs != null ? fmtDur(tr.durationMs / 1000) : '–'}</td>
                   <td className="small text-secondary">{fmtBytes(tr.sizeBytes)}</td>
