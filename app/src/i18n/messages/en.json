@@ -1,9 +1,9 @@
 {
   "agenda": {
-    "title": "Agenda / Notes",
-    "empty": "No agenda items yet. Add the topics to cover and check them off as you go.",
+    "title": "Notes / Checklist",
+    "empty": "No items yet. Add the topics to cover and check them off as you go.",
     "add": "Add",
-    "addPlaceholder": "New agenda item…",
+    "addPlaceholder": "New item…",
     "remove": "Remove",
     "inProgress": "in progress",
     "agree": "Agree",
@@ -299,7 +299,8 @@
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Polls",
     "sidebarTabWordcloud": "Word cloud",
-    "sidebarTabAgenda": "Agenda",
+    "sidebarTabAgenda": "Notes / Checklist",
+    "liveToggleAgenda": "Notes / Checklist (agenda)",
     "sidebarTabMaterials": "Materials",
     "sidebarTabParticipants": "Participants",
     "chat": {
@@ -1068,7 +1069,7 @@
       "qaEnabled": "Enable Q&A",
       "chatEnabled": "Enable chat",
       "recordingEnabled": "Enable video recording",
-      "agendaEnabled": "Live agenda / notes",
+      "agendaEnabled": "Live notes / checklist (agenda)",
       "agendaEnabledDesc": "A checklist of topics to cover that moderators tick off during the event. Feeds the automatic summary. Optional and can also be enabled during the event.",
       "whiteboardEnabled": "Shared whiteboard",
       "whiteboardEnabledDesc": "Enables the native collaborative whiteboard (Excalidraw): moderators can open it from the toolbar during the event. Always on for instant calls.",
@@ -2261,8 +2262,8 @@
         "desc": "Write in the event chat and follow the conversation with other participants."
       },
       "agenda": {
-        "title": "Agenda and notes",
-        "desc": "Follow the agenda and the notes the moderators share during the event."
+        "title": "Notes and checklist",
+        "desc": "Follow the notes and checklist the moderators share during the event."
       }
     },
     "projectTeaser": {

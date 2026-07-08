@@ -727,6 +727,13 @@ html.live-call-immersive body {
   align-items: flex-start;
   gap: 8px;
 
+  // On mobile the fixed control strip (.live-floating-controls-slot, ~52px +
+  // safe-area) sits at the bottom; lift the now always-visible reaction bar
+  // above it so its buttons aren't hidden/untappable (F6, review #6).
+  @media (max-width: 991.98px) {
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
   &__floats {
     position: absolute;
     bottom: 48px;
@@ -745,19 +752,17 @@ html.live-call-immersive body {
     pointer-events: none;
   }
 
-  &__picker {
+  // Always-visible reaction bar (F6): a horizontal pill of emoji buttons,
+  // no collapse — findable at a glance without opening a picker.
+  &__bar {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
     background: rgba(15, 27, 45, 0.92);
     backdrop-filter: blur(12px);
-    border-radius: 12px;
-    padding: 10px;
+    border-radius: 999px;
+    padding: 4px 6px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    animation: pickerSlideUp 0.2s ease-out;
-  }
-
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
   }
 
   &__emoji-btn {
@@ -807,71 +812,11 @@ html.live-call-immersive body {
     text-align: center;
   }
 
-  &__total {
-    text-align: center;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.5);
-    padding-top: 4px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 4px;
-  }
-
-  &__trigger {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(15, 27, 45, 0.85);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-
-    &:hover {
-      background: rgba(15, 27, 45, 0.95);
-      transform: scale(1.08);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    &--active {
-      background: #0066CC;
-      box-shadow: 0 4px 20px rgba(0, 102, 204, 0.4);
-    }
-  }
-
-  &__trigger-icon {
-    font-size: 1.3rem;
-    line-height: 1;
-  }
-
-  &__trigger-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    font-size: 0.6rem;
-    font-weight: 700;
-    background: #0066CC;
-    color: #fff;
-    padding: 1px 5px;
-    border-radius: 10px;
-    min-width: 18px;
-    text-align: center;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  }
 }
 
 @keyframes reactionFloat {
   0% { transform: translateY(0) scale(1); opacity: 1; }
   100% { transform: translateY(-120px) scale(0.4); opacity: 0; }
-}
-
-@keyframes pickerSlideUp {
-  0% { opacity: 0; transform: translateY(8px); }
-  100% { opacity: 1; transform: translateY(0); }
 }
 
 // ── Chat panel ──
