@@ -1,9 +1,9 @@
 {
   "agenda": {
-    "title": "Agenda / Note",
-    "empty": "Nessun punto in agenda. Aggiungi i temi da trattare e spuntali man mano.",
+    "title": "Note / Checklist",
+    "empty": "Nessun punto ancora. Aggiungi i temi da trattare e spuntali man mano.",
     "add": "Aggiungi",
-    "addPlaceholder": "Nuovo punto all'ordine del giorno…",
+    "addPlaceholder": "Nuovo punto…",
     "remove": "Rimuovi",
     "inProgress": "in corso",
     "agree": "D'accordo",
@@ -313,7 +313,8 @@
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondaggi",
     "sidebarTabWordcloud": "Nuvola di parole",
-    "sidebarTabAgenda": "Agenda",
+    "sidebarTabAgenda": "Note / Checklist",
+    "liveToggleAgenda": "Note / Checklist (agenda)",
     "sidebarTabMaterials": "Materiali",
     "sidebarTabParticipants": "Partecipanti",
     "chat": {
@@ -1153,7 +1154,7 @@
       "qaEnabled": "Abilita Q&A",
       "chatEnabled": "Abilita chat",
       "recordingEnabled": "Abilita registrazione video",
-      "agendaEnabled": "Agenda / Note live",
+      "agendaEnabled": "Note / Checklist (agenda) live",
       "agendaEnabledDesc": "Una checklist dei punti da trattare che i moderatori spuntano durante l'evento. Confluisce nella sintesi automatica. Opzionale e attivabile anche durante l'evento.",
       "whiteboardEnabled": "Lavagna condivisa",
       "whiteboardEnabledDesc": "Abilita la lavagna collaborativa (Excalidraw) nativa: i moderatori possono aprirla dalla toolbar durante l'evento. Sempre attiva nelle chiamate istantanee.",
@@ -2351,8 +2352,8 @@
         "desc": "Scrivi nella chat dell'evento e segui la conversazione con gli altri partecipanti."
       },
       "agenda": {
-        "title": "Agenda e note",
-        "desc": "Segui l'ordine del giorno e le note condivise dai moderatori durante l'evento."
+        "title": "Note e checklist",
+        "desc": "Segui le note e la checklist condivise dai moderatori durante l'evento."
       }
     },
     "projectTeaser": {
