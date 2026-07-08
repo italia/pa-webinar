@@ -27,6 +27,9 @@ interface ModeratorControlsProps {
   jibriAvailable?: boolean;
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
+  /** Event opted into the native Jitsi/Excalidraw whiteboard → show the
+   *  "Apri lavagna" toggle (desktop only, matching Jitsi's own gating). */
+  whiteboardEnabled?: boolean;
   /** Local moderator's display name, forwarded to the raised-hands panel
    *  so it can resolve the current user's own raise-hand event. */
   localDisplayName?: string;
@@ -59,6 +62,12 @@ const BTN_DANGER: React.CSSProperties = {
   fontSize: '0.82rem',
 };
 
+// The native Jitsi/Excalidraw whiteboard needs a collab backend + Jitsi
+// `config.whiteboard.enabled` server-side, which is NOT deployed yet (no
+// excalidraw backend in any cluster). Keep the toggle hidden until the infra
+// lands and this build-time env is set, so it never shows as a dead button.
+const WHITEBOARD_INFRA_READY = process.env.NEXT_PUBLIC_WHITEBOARD_ENABLED === 'true';
+
 export default function ModeratorControls({
   api,
   eventId,
@@ -67,6 +76,7 @@ export default function ModeratorControls({
   jibriAvailable = true,
   participantsCanUnmute = false,
   participantsCanStartVideo = false,
+  whiteboardEnabled = false,
   localDisplayName = '',
   isPrimaryModerator = false,
 }: ModeratorControlsProps) {
@@ -392,6 +402,31 @@ export default function ModeratorControls({
               </Button>
             )
           )}
+
+          {/* Whiteboard — toggle the native Jitsi/Excalidraw board via the
+              IFrame API. Desktop-only (matches Jitsi's own toolbar gating; the
+              board doesn't render on mobile) and only when the event opted in. */}
+          {whiteboardEnabled && WHITEBOARD_INFRA_READY && (
+            <Button
+              color="secondary"
+              size="sm"
+              className={`${BTN_BASE} d-none d-lg-inline-flex`}
+              onClick={() => api?.executeCommand('toggleWhiteboard')}
+              disabled={!api}
+              style={BTN_DEFAULT}
+            >
+              <Icon icon="it-pencil" size="sm" color="white" />
+              {t('whiteboard')}
+            </Button>
+          )}
+
+          {/* Presentation-timer control slot — PresentationTimer portals its
+              moderator control here so it sits on the controls line instead of
+              a full-width row of its own. Empty (zero size) when unused. */}
+          <div
+            id="live-timer-control-slot"
+            className="d-inline-flex align-items-center gap-2"
+          />
 
           {/* End event */}
           <Button

@@ -22,6 +22,7 @@ export const GET = withErrorHandling(async (request, context) => {
       qaEnabled: true,
       chatEnabled: true,
       agendaEnabled: true,
+      wordCloudEnabled: true,
       recordingEnabled: true,
     },
   });

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { Button, Icon } from 'design-react-kit';
 
@@ -85,6 +86,32 @@ export default function PresentationTimer({ eventSlug, token, isModerator }: Pre
     fetchTimer();
   }, [eventSlug, token, fetchTimer]);
 
+  // The moderator control lives INLINE in the ModeratorControls dark bar
+  // (id="live-timer-control-slot") instead of a full-width row of its own.
+  // The slot sits in a sibling that mounts alongside this component; retry a
+  // few frames because getElementById is null in SSR / before the bar commits.
+  const [slot, setSlot] = useState<Element | null>(null);
+  useEffect(() => {
+    if (!isModerator) {
+      setSlot(null);
+      return;
+    }
+    let tries = 0;
+    let raf = 0;
+    const find = () => {
+      const el = document.getElementById('live-timer-control-slot');
+      if (el) {
+        setSlot(el);
+        return;
+      }
+      if (tries++ < 30) raf = requestAnimationFrame(find);
+    };
+    find();
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isModerator]);
+
   if (!isModerator && !timer.visible) return null;
   if (!isModerator && !timer.active) return null;
 
@@ -92,9 +119,71 @@ export default function PresentationTimer({ eventSlug, token, isModerator }: Pre
   const progress = timer.duration > 0 ? (timer.remaining / timer.duration) * 100 : 0;
   const isPulsing = timer.active && timer.remaining < 60 && timer.remaining > 0;
 
+  // Moderator control — restyled for the dark ModeratorControls bar (light
+  // label text, no light background chip). Portalled into the bar slot.
+  const control = (
+    <div className="d-inline-flex align-items-center gap-2">
+      <Icon icon="it-clock" size="xs" color="white" />
+      <span className="small fw-semibold text-white-50">{t('title')}</span>
+
+      {!timer.active ? (
+        showPresets ? (
+          <div className="d-flex gap-1">
+            {PRESETS.map((p) => (
+              <Button
+                key={p.seconds}
+                color="primary"
+                size="xs"
+                onClick={() => { sendAction('start', p.seconds); setShowPresets(false); }}
+              >
+                {t(`presets.${p.label}`)}
+              </Button>
+            ))}
+            <Button color="secondary" size="xs" onClick={() => setShowPresets(false)}>
+              ✕
+            </Button>
+          </div>
+        ) : (
+          <Button color="primary" size="xs" onClick={() => setShowPresets(true)}>
+            {t('start')}
+          </Button>
+        )
+      ) : (
+        <div className="d-flex gap-1 align-items-center">
+          <span className="font-monospace fw-bold small text-white">{formatTime(timer.remaining)}</span>
+          {timer.paused ? (
+            <Button color="success" size="xs" onClick={() => sendAction('start', timer.remaining)}>
+              {t('start')}
+            </Button>
+          ) : (
+            <Button color="warning" size="xs" onClick={() => sendAction('pause')}>
+              {t('pause')}
+            </Button>
+          )}
+          <Button color="outline-danger" size="xs" onClick={() => sendAction('reset')}>
+            {t('reset')}
+          </Button>
+          <button
+            type="button"
+            className={`btn btn-sm ${timer.visible ? 'btn-outline-light' : 'btn-outline-secondary'}`}
+            style={{ fontSize: '0.7rem', padding: '2px 6px' }}
+            onClick={() => sendAction('visibility', undefined, !timer.visible)}
+            title={t('showToAll')}
+            aria-label={t('showToAll')}
+            aria-pressed={timer.visible}
+          >
+            <Icon icon={timer.visible ? 'it-eye' : 'it-password-invisible'} size="xs" color="white" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <>
-      {/* Timer display bar */}
+      {/* Countdown bar (all attendees) — already active+visible guarded, so it
+          has zero footprint when off. Stays inline; the moderator control is
+          portalled into the controls bar. */}
       {timer.active && timer.visible && (
         <div
           className="text-white px-3 py-1 d-flex align-items-center justify-content-center gap-3"
@@ -127,66 +216,9 @@ export default function PresentationTimer({ eventSlug, token, isModerator }: Pre
         </div>
       )}
 
-      {/* Moderator controls */}
-      {isModerator && (
-        <div className="d-flex align-items-center gap-2 px-3 py-1" style={{ backgroundColor: '#EEF2F6' }}>
-          <Icon icon="it-clock" size="xs" className="text-muted" />
-          <span className="small fw-semibold text-muted">{t('title')}</span>
-
-          {!timer.active ? (
-            <>
-              {showPresets ? (
-                <div className="d-flex gap-1 ms-2">
-                  {PRESETS.map((p) => (
-                    <Button
-                      key={p.seconds}
-                      color="primary"
-                      size="xs"
-                      onClick={() => { sendAction('start', p.seconds); setShowPresets(false); }}
-                    >
-                      {t(`presets.${p.label}`)}
-                    </Button>
-                  ))}
-                  <Button color="outline-secondary" size="xs" onClick={() => setShowPresets(false)}>
-                    ✕
-                  </Button>
-                </div>
-              ) : (
-                <Button color="primary" size="xs" className="ms-2" onClick={() => setShowPresets(true)}>
-                  {t('start')}
-                </Button>
-              )}
-            </>
-          ) : (
-            <div className="d-flex gap-1 ms-2 align-items-center">
-              <span className="font-monospace fw-bold small">{formatTime(timer.remaining)}</span>
-              {timer.paused ? (
-                <Button color="success" size="xs" onClick={() => sendAction('start', timer.remaining)}>
-                  {t('start')}
-                </Button>
-              ) : (
-                <Button color="warning" size="xs" onClick={() => sendAction('pause')}>
-                  {t('pause')}
-                </Button>
-              )}
-              <Button color="outline-danger" size="xs" onClick={() => sendAction('reset')}>
-                {t('reset')}
-              </Button>
-              <button
-                type="button"
-                className={`btn btn-sm ${timer.visible ? 'btn-outline-primary' : 'btn-outline-secondary'}`}
-                style={{ fontSize: '0.7rem', padding: '2px 6px' }}
-                onClick={() => sendAction('visibility', undefined, !timer.visible)}
-                title={t('showToAll')}
-                aria-label={t('showToAll')}
-                aria-pressed={timer.visible}
-              >
-                <Icon icon={timer.visible ? 'it-eye' : 'it-password-invisible'} size="xs" />
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Moderator control → portalled into the ModeratorControls bar slot so
+          it shares the controls line instead of taking a full-width row. */}
+      {isModerator && slot && createPortal(control, slot)}
 
       <style>{`
         @keyframes pulse {
