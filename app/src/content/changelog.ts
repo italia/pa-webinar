@@ -28,6 +28,35 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.7.1',
+    date: '2026-07-09',
+    title: 'Statistiche post-evento per ogni evento',
+    notes: [
+      'Nuova scheda “Statistiche” per ogni evento nel pannello amministratore (disponibile anche per gli eventi senza registrazione o senza registrazione video): mostra l’andamento della call, chi ha parlato di più, il grado di partecipazione complessivo e i principali indicatori.',
+      'Grafico dell’andamento dell’interazione nel tempo — chat, domande, voti alle domande, sondaggi, parole della word cloud e reazioni — con evidenziato il momento di picco della call.',
+      'Classifica di chi ha parlato più a lungo (minuti a testa) con l’equilibrio degli interventi, insieme ai conteggi delle reazioni e delle alzate di mano.',
+      'Nuova stima della permanenza media dei partecipanti in sala, usata anche nel calcolo del grado di attenzione complessivo.',
+    ],
+  },
+  {
+    version: '0.7.0',
+    date: '2026-07-09',
+    title: 'Relatori modificabili e player solo-audio',
+    notes: [
+      'Nel post-evento è ora possibile rinominare i relatori, correggendo i nomi degli speaker riconosciuti automaticamente dalla trascrizione.',
+      'Se la registrazione non ha un video riproducibile, la pagina di correzione mostra comunque un player solo-audio per riascoltare e sistemare testo e speaker.',
+      'Correzione della registrazione multi-traccia: ora viene catturato correttamente l’audio reale dei partecipanti remoti.',
+    ],
+  },
+  {
+    version: '0.6.9',
+    date: '2026-07-09',
+    title: 'Affidabilità dell’elaborazione AI',
+    notes: [
+      'Il pannello amministratore mostra ora un indicatore di affidabilità dell’elaborazione AI post-evento (trascrizione, sintesi, traduzioni), per capire a colpo d’occhio se il risultato è completo e attendibile.',
+    ],
+  },
+  {
     version: '0.6.8',
     date: '2026-07-08',
     title: 'Pagina di editing post-evento più chiara',

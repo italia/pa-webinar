@@ -685,7 +685,33 @@ export default function LiveEventClient({
   // never on a transient drop — so it cancels any pending or scheduled
   // reconnect and takes us straight to the closing screen. This is what
   // stops the native hangup from bouncing the user back into the call.
+  // P1 analytics — record leave time (dwell/retention) for REGISTRANTS only.
+  // Best-effort beacon: on intentional close (below) and on pagehide while
+  // in-call (effect further down). Guests/moderators/speakers carry no
+  // accessToken and are skipped. joinedAt was set at JWT-request time, so by
+  // the time this can fire the user is genuinely a joined registrant.
+  const sendLeaveBeacon = useCallback(() => {
+    if (isGuest || isModerator || isSpeaker || !token) return;
+    try {
+      const url = `/api/events/${event.slug}/attendance/leave`;
+      const payload = JSON.stringify({ accessToken: token });
+      if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+        navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+      } else {
+        void fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true,
+        }).catch(() => { /* analytics-only, best-effort */ });
+      }
+    } catch {
+      /* best-effort */
+    }
+  }, [isGuest, isModerator, isSpeaker, token, event.slug]);
+
   const handleReadyToClose = useCallback(() => {
+    sendLeaveBeacon();
     userHangupRef.current = true;
     if (pendingLeaveTimerRef.current) {
       clearTimeout(pendingLeaveTimerRef.current);
@@ -696,7 +722,23 @@ export default function LiveEventClient({
       reconnectTimerRef.current = null;
     }
     if (!showFeedback) setPhase('ended');
-  }, [showFeedback]);
+  }, [showFeedback, sendLeaveBeacon]);
+
+  // P1 analytics — beacon leave time on tab close / navigation away, but only
+  // while actually in-call (phase 'ready'): before that there's no joinedAt to
+  // pair with, and this avoids a stray leftAt from the waiting room.
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    const onHide = (e: PageTransitionEvent): void => {
+      // persisted === true → the page is entering the bfcache (mobile
+      // app-switch / back-forward cache) and may resume; only a real unload
+      // (persisted === false) is a genuine leave. Avoids stamping leftAt while
+      // the participant is still watching after switching apps.
+      if (!e.persisted) sendLeaveBeacon();
+    };
+    window.addEventListener('pagehide', onHide);
+    return () => window.removeEventListener('pagehide', onHide);
+  }, [phase, sendLeaveBeacon]);
 
   const handleJitsiLeft = useCallback(() => {
     // Intentional leave already flagged (app "Esci dalla sala" button /
