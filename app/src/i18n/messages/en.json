@@ -2039,6 +2039,8 @@
       "kpiDuration": "Duration",
       "kpiInteractors": "Distinct interactors",
       "interactionsWord": "interactions",
+      "kpiHandRaises": "Hand raises",
+      "handRaisesSessionsSub": "from {n, plural, one {# session} other {# sessions}}",
       "timelineTitle": "Call activity over time",
       "timelineEmpty": "No interaction recorded during the call.",
       "timelinePeak": "Interaction peaked at {at} ({n} events in the bucket).",

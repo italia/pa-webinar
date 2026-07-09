@@ -47,6 +47,7 @@ interface Analytics {
   attendance: { registered: number; joined: number; conversionPct: number | null; peakParticipants: number };
   chat: { total: number; byModerator: number; byAudience: number; capped: boolean; topAuthors: { name: string; count: number }[] };
   interactions: { total: number; distinctInteractors: number; capped: boolean };
+  handRaises: { total: number; distinctSessions: number };
   qa: { topQuestions: { text: string; upvotes: number }[] };
   polls: { question: string; options: { text: string; votes: number }[]; totalVotes: number }[];
   topWords: { word: string; count: number }[];
@@ -257,6 +258,8 @@ export default function EventAnalyticsPanel({ eventId, status }: { eventId: stri
         <Kpi value={fmtDur(a.durationSec)} label={t('kpiDuration')} />
         <Kpi value={String(a.interactions.distinctInteractors)} label={t('kpiInteractors')}
           sub={`${a.interactions.total} ${t('interactionsWord')}`} />
+        <Kpi value={String(a.handRaises.total)} label={t('kpiHandRaises')}
+          sub={t('handRaisesSessionsSub', { n: a.handRaises.distinctSessions })} />
       </div>
 
       <Section title={t('timelineTitle')}>
