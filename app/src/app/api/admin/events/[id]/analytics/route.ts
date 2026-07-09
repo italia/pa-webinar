@@ -119,6 +119,7 @@ export const GET = withErrorHandling(async (_request, context) => {
   // ── Attendance / conversion ──
   const registered = registrations.length;
   const joined = registrations.filter((r) => r.joinedAt != null).length;
+  const headcount = callSession?.peakParticipants ?? recap.headcount;
 
   // ── Chat ──
   const chatAudience = chat.filter((m) => !m.isModerator);
@@ -211,16 +212,20 @@ export const GET = withErrorHandling(async (_request, context) => {
   };
 
   // ── Attention score ──
-  const attendees = joined > 0 ? joined : null;
+  // Rate denominator = actual headcount, not just registrants who got a
+  // joinedAt: guests / forwarded-link joiners never set joinedAt, so on a
+  // guest-heavy event `joined` massively undercounts and the rates saturate.
+  // peakParticipants is the real (concurrent) headcount and a far better base.
+  const rateBase = Math.max(joined, headcount) || null;
   const signals: AttentionSignals = {
     attendanceRate: registered > 0 ? joined / registered : null,
-    breadth: attendees ? clamp01(distinctInteractors / attendees) : null,
-    depth: attendees ? clamp01(totalInteractions / attendees / 3) : null,
+    breadth: rateBase ? clamp01(distinctInteractors / rateBase) : null,
+    depth: rateBase ? clamp01(totalInteractions / rateBase / 3) : null,
     chatRate:
-      attendees && durationHours
-        ? clamp01(chatAudience.length / attendees / durationHours / 5)
+      rateBase && durationHours
+        ? clamp01(chatAudience.length / rateBase / durationHours / 5)
         : null,
-    liveParticipation: attendees ? clamp01(distinctLiveParticipants / attendees) : null,
+    liveParticipation: rateBase ? clamp01(distinctLiveParticipants / rateBase) : null,
     talkBalance,
     retention: null, // P1 — needs Registration.leftAt written
   };
@@ -243,7 +248,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       registered,
       joined,
       conversionPct: registered > 0 ? Math.round((joined / registered) * 100) : null,
-      peakParticipants: callSession?.peakParticipants ?? recap.headcount,
+      peakParticipants: headcount,
     },
     chat: {
       total: chat.length,
