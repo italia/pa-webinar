@@ -27,6 +27,7 @@ import {
   clamp01,
   computeAttentionScore,
   gini,
+  retentionSignal,
   speakerLeaderboard,
   summarizeHandRaises,
   type AttentionSignals,
@@ -64,12 +65,12 @@ export const GET = withErrorHandling(async (_request, context) => {
   });
   if (!event) throw new NotFoundError('Event');
 
-  const [recap, registrations, chat, questions, upvotes, pollVotes, words, recording, sessions] =
+  const [recap, registrations, chat, questions, upvotes, pollVotes, words, recording, sessions, reactionRows] =
     await Promise.all([
       // Persisted recap survives the retention cleanup (raw rows are deleted);
       // fall back to a live build for events that aren't concluded yet.
       ensureEventRecap(id).then((r) => r ?? buildRecap(id)),
-      prisma.registration.findMany({ where: { eventId: id }, select: { joinedAt: true } }),
+      prisma.registration.findMany({ where: { eventId: id }, select: { joinedAt: true, leftAt: true } }),
       prisma.chatMessage.findMany({
         where: { eventId: id, hiddenAt: null },
         select: { createdAt: true, senderId: true, senderName: true, isModerator: true },
@@ -119,6 +120,12 @@ export const GET = withErrorHandling(async (_request, context) => {
         orderBy: { createdAt: 'desc' },
         select: { startedAt: true, endedAt: true, peakParticipants: true, handRaiseLog: true },
       }),
+      prisma.reaction.findMany({
+        where: { eventId: id },
+        select: { emoji: true, createdAt: true },
+        orderBy: { createdAt: 'asc' },
+        take: CAP,
+      }),
     ]);
 
   const callSession = sessions[0] ?? null;
@@ -149,6 +156,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     ...upvotes.map((u) => ({ atMs: u.createdAt.getTime(), kind: 'upvote' as const })),
     ...pollVotes.map((v) => ({ atMs: v.createdAt.getTime(), kind: 'poll' as const })),
     ...words.map((w) => ({ atMs: w.createdAt.getTime(), kind: 'word' as const })),
+    ...reactionRows.map((r) => ({ atMs: r.createdAt.getTime(), kind: 'reaction' as const })),
   ];
   const tsList = points.map((p) => p.atMs);
   const windowStart =
@@ -167,6 +175,15 @@ export const GET = withErrorHandling(async (_request, context) => {
       : Math.round((event.endsAt.getTime() - event.startsAt.getTime()) / 1000));
   const durationHours = durationSec > 0 ? durationSec / 3600 : null;
 
+  // ACTUAL call duration (recording or a CLOSED call session) — null if unknown.
+  // Retention divides dwell by THIS, never the scheduled window (which can be
+  // hours longer than the real call and would understate retention).
+  const measuredDurationSec =
+    recording?.durationSec ??
+    (callSession?.startedAt && callSession.endedAt
+      ? Math.round((callSession.endedAt.getTime() - callSession.startedAt.getTime()) / 1000)
+      : null);
+
   // ── Hand raises (P1) — self-reported live into CallSession.handRaiseLog ──
   // Standalone metric, keyed by opaque Jitsi endpoint id (NOT a personKey), so
   // it is reported on its own and deliberately NOT folded into the interactor /
@@ -176,6 +193,17 @@ export const GET = withErrorHandling(async (_request, context) => {
     Array.isArray(s.handRaiseLog) ? (s.handRaiseLog as unknown as HandRaiseLogEntry[]) : [],
   );
   const handRaiseStats = summarizeHandRaises(handRaiseLog);
+
+  // ── Reactions (P1) — one row per live reaction click (no PII) ──
+  const emojiMap = new Map<string, number>();
+  for (const r of reactionRows) emojiMap.set(r.emoji, (emojiMap.get(r.emoji) ?? 0) + 1);
+  const reactionsByEmoji = [...emojiMap.entries()]
+    .map(([emoji, count]) => ({ emoji, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // ── Dwell / retention (P1) — registrants with both joinedAt and leftAt ──
+  // Uses the ACTUAL call duration; a small sample / unknown duration → null.
+  const dwell = retentionSignal(registrations, measuredDurationSec ?? 0);
 
   // ── Distinct interactors (union across streams, one canonical key/person) ──
   const interactorSet = new Set<string>();
@@ -244,7 +272,7 @@ export const GET = withErrorHandling(async (_request, context) => {
         : null,
     liveParticipation: rateBase ? clamp01(distinctLiveParticipants / rateBase) : null,
     talkBalance,
-    retention: null, // P1 — needs Registration.leftAt written
+    retention: dwell.retention,
   };
   const attention = computeAttentionScore(signals);
 
@@ -254,7 +282,8 @@ export const GET = withErrorHandling(async (_request, context) => {
     questions.length >= CAP ||
     upvotes.length >= CAP ||
     pollVotes.length >= CAP ||
-    words.length >= CAP;
+    words.length >= CAP ||
+    reactionRows.length >= CAP;
 
   return Response.json({
     eventId: event.id,
@@ -266,6 +295,10 @@ export const GET = withErrorHandling(async (_request, context) => {
       joined,
       conversionPct: registered > 0 ? Math.round((joined / registered) * 100) : null,
       peakParticipants: headcount,
+      // Dwell / retention (registrants with both joinedAt and leftAt).
+      dwellMeasured: dwell.measured,
+      avgDwellSec: dwell.avgDwellSec,
+      retentionPct: dwell.retention != null ? Math.round(dwell.retention * 100) : null,
     },
     chat: {
       total: chat.length,
@@ -276,6 +309,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     },
     interactions: { total: totalInteractions, distinctInteractors, capped },
     handRaises: { total: handRaiseStats.total, distinctSessions: handRaiseStats.distinctSessions },
+    reactions: { total: reactionRows.length, byEmoji: reactionsByEmoji, capped: reactionRows.length >= CAP },
     qa: { topQuestions: recap.topQuestions },
     polls: recap.polls,
     topWords: recap.topWords,

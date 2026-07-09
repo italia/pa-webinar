@@ -2041,6 +2041,10 @@
       "interactionsWord": "interactions",
       "kpiHandRaises": "Hand raises",
       "handRaisesSessionsSub": "from {n, plural, one {# session} other {# sessions}}",
+      "kpiReactions": "Reactions",
+      "kpiRetention": "Average retention",
+      "dwellSub": "{d} · {n, plural, one {# measured} other {# measured}}",
+      "reactionsTitle": "Reactions",
       "timelineTitle": "Call activity over time",
       "timelineEmpty": "No interaction recorded during the call.",
       "timelinePeak": "Interaction peaked at {at} ({n} events in the bucket).",
@@ -2049,7 +2053,8 @@
         "question": "Questions",
         "upvote": "Upvotes",
         "poll": "Polls",
-        "word": "Word cloud"
+        "word": "Word cloud",
+        "reaction": "Reactions"
       },
       "speakersTitle": "Who spoke",
       "audioUnavailable": "Audio statistics unavailable — event was not recorded (or the recording had no speech).",

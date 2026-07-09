@@ -233,6 +233,13 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // Live emoji reactions (no PII, but event data past retention). FK is
+        // onDelete: Cascade, but the event is only ARCHIVED (never hard-deleted)
+        // so the cascade never fires — purge explicitly, like chat above.
+        const reactionsDeleted = await tx.reaction.deleteMany({
+          where: { eventId: evt.id },
+        });
+
         // Agenda items + their reactions. Reactions tied to a registration
         // already cascaded when the registration was deleted above, but guest
         // reactions and the items themselves are only reachable via the event
@@ -288,6 +295,7 @@ export const GET = withErrorHandling(async (request) => {
           reminders: remindersDeleted.count,
           registrations: registrationsDeleted.count,
           chatMessages: chatMessagesDeleted.count,
+          reactions: reactionsDeleted.count,
           agendaReactions: agendaReactionsDeleted.count,
           agendaItems: agendaItemsDeleted.count,
           recordingTracks: recordingTracksDeleted.count,

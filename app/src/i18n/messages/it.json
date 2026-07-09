@@ -2126,6 +2126,10 @@
       "interactionsWord": "interazioni",
       "kpiHandRaises": "Alzate di mano",
       "handRaisesSessionsSub": "da {n, plural, one {# sessione} other {# sessioni}}",
+      "kpiReactions": "Reazioni",
+      "kpiRetention": "Permanenza media",
+      "dwellSub": "{d} · {n, plural, one {# misurato} other {# misurati}}",
+      "reactionsTitle": "Reazioni",
       "timelineTitle": "Andamento della call",
       "timelineEmpty": "Nessuna interazione registrata durante la call.",
       "timelinePeak": "Picco di interazione a {at} ({n} eventi nel bucket).",
@@ -2134,7 +2138,8 @@
         "question": "Domande",
         "upvote": "Upvote",
         "poll": "Sondaggi",
-        "word": "Word cloud"
+        "word": "Word cloud",
+        "reaction": "Reazioni"
       },
       "speakersTitle": "Chi ha parlato",
       "audioUnavailable": "Statistiche audio non disponibili — evento non registrato (o registrazione senza parlato).",

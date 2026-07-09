@@ -142,6 +142,11 @@ export const POST = withErrorHandling(async (request, context) => {
       );
     }
 
+    // Record the join, set-once. Kept write-free on rejoin so the reconnect
+    // path never depends on a DB write (a write failure here would 500 the
+    // token fetch and eject a reconnecting participant). leftAt is best-effort
+    // and may be stale after a rejoin — the retention signal tolerates that via
+    // its minimum-sample guard.
     if (!registration.joinedAt) {
       await prisma.registration.update({
         where: { id: registration.id },

@@ -21,7 +21,7 @@
 
 // ── Engagement timeline ──────────────────────────────────────────────
 
-export type TimelineKind = 'chat' | 'question' | 'upvote' | 'poll' | 'word';
+export type TimelineKind = 'chat' | 'question' | 'upvote' | 'poll' | 'word' | 'reaction';
 
 export interface TimelinePoint {
   atMs: number; // absolute epoch ms
@@ -36,6 +36,7 @@ export interface EngagementBucket {
   upvote: number;
   poll: number;
   word: number;
+  reaction: number;
   total: number;
 }
 
@@ -89,6 +90,7 @@ export function bucketTimeline(
     upvote: 0,
     poll: 0,
     word: 0,
+    reaction: 0,
     total: 0,
   }));
 
@@ -266,4 +268,55 @@ export function summarizeHandRaises(log: HandRaiseLogEntry[]): HandRaiseStats {
     sessions.add(e.participantId);
   }
   return { total, distinctSessions: sessions.size };
+}
+
+// ── Dwell / retention ────────────────────────────────────────────────
+
+export interface DwellInput {
+  joinedAt: Date | null;
+  leftAt: Date | null;
+}
+
+export interface DwellStats {
+  measured: number; // registrants with BOTH joinedAt and leftAt
+  avgDwellSec: number | null; // mean dwell over the measured set
+  retention: number | null; // mean clamp01(dwell / duration), 0-1; null if unmeasurable
+}
+
+/** Fewer than this many measured leaves is too small a sample to publish a
+ *  retention % (or to feed the attention score) — it would be misleading. */
+export const MIN_RETENTION_SAMPLE = 3;
+
+/**
+ * Dwell time / retention for REGISTRANTS.
+ *
+ * joinedAt is written at JWT-request time; leftAt is a best-effort beacon on
+ * leave, so only a SUBSET of registrants have both. Over that subset we report
+ * the mean dwell and a retention ratio = mean(clamp01(dwell / duration)). Dwell
+ * is floored at 0 (guards clock skew / joinedAt slightly after leftAt).
+ *
+ * `durationSec` MUST be the ACTUAL call duration (recording / call session),
+ * not the scheduled window — else retention is understated. Retention is null
+ * (avgDwell still returned) when the sample is below `minSample` or the duration
+ * is unknown (≤0), so a tiny or denominator-less sample never distorts the KPI
+ * or the attention score.
+ */
+export function retentionSignal(
+  registrations: DwellInput[],
+  durationSec: number,
+  minSample: number = MIN_RETENTION_SAMPLE,
+): DwellStats {
+  const dwells: number[] = [];
+  for (const r of registrations) {
+    if (!r.joinedAt || !r.leftAt) continue;
+    const sec = Math.max(0, (r.leftAt.getTime() - r.joinedAt.getTime()) / 1000);
+    dwells.push(sec);
+  }
+  if (dwells.length === 0) return { measured: 0, avgDwellSec: null, retention: null };
+  const avgDwellSec = Math.round(dwells.reduce((s, x) => s + x, 0) / dwells.length);
+  const retention =
+    dwells.length >= minSample && durationSec > 0
+      ? dwells.reduce((s, x) => s + clamp01(x / durationSec), 0) / dwells.length
+      : null;
+  return { measured: dwells.length, avgDwellSec, retention };
 }
