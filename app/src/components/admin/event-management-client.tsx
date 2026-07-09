@@ -23,6 +23,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
+import EventAnalyticsPanel from './event-analytics-panel';
 import EventConfigDiagram from './event-config-diagram';
 import EventModeratorsPanel from './event-moderators-panel';
 import PostEventConfig from './post-event-config';
@@ -47,10 +48,11 @@ const PILL_MUTED: CSSProperties = { background: '#E9ECEF', color: C_INK, fontSiz
 // mismatch the kit's dynamic icon loader triggers on SSR pages.
 type IconName =
   | 'arrow-left' | 'link' | 'user-group' | 'video' | 'folder' | 'shield'
-  | 'pencil' | 'check' | 'x' | 'info' | 'external' | 'settings';
+  | 'pencil' | 'check' | 'x' | 'info' | 'external' | 'settings' | 'chart';
 
 const ICONS: Record<IconName, ReactNode> = {
   'arrow-left': <path d="M19 12H5M12 19l-7-7 7-7" />,
+  chart: <><path d="M3 20h18" /><path d="M6 20V11" /><path d="M12 20V5" /><path d="M18 20V14" /></>,
   link: <>
     <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.41 4.59" />
     <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.41-1.41" />
@@ -152,7 +154,7 @@ interface EventManagementClientProps {
   event: EventData; baseUrl: string; locale: string; kickerEnabled: boolean;
 }
 
-type TabId = 'panoramica' | 'impostazioni' | 'persone' | 'contenuti' | 'postevento' | 'audit';
+type TabId = 'panoramica' | 'impostazioni' | 'persone' | 'contenuti' | 'postevento' | 'statistiche' | 'audit';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   MINISTRY: { it: 'Ministero', en: 'Ministry' },
@@ -419,6 +421,7 @@ export default function EventManagementClient({
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} />}
             {activeTab === 'postevento' && <PostEventTab event={event} status={status} />}
+            {activeTab === 'statistiche' && <EventAnalyticsPanel eventId={event.id} status={status} />}
             {activeTab === 'audit' && <AuditTab event={event} />}
           </div>
         </div>
@@ -543,6 +546,7 @@ function TabNav({ active, onChange, t }: {
     { id: 'persone', icon: 'user-group', key: 'tabs.people' },
     { id: 'contenuti', icon: 'folder', key: 'tabs.content' },
     { id: 'postevento', icon: 'video', key: 'tabs.postEvent' },
+    { id: 'statistiche', icon: 'chart', key: 'tabs.analytics' },
     { id: 'audit', icon: 'shield', key: 'tabs.audit' },
   ];
   return (
