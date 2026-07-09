@@ -7,6 +7,7 @@ import {
   gini,
   computeAttentionScore,
   summarizeHandRaises,
+  retentionSignal,
   type TimelinePoint,
   type AttentionSignals,
 } from './event-analytics';
@@ -62,6 +63,15 @@ describe('bucketTimeline', () => {
     const r = bucketTimeline(pts([[0, 'chat'], [1, 'upvote'], [2, 'word']]), 0, 100, 24);
     const total = r.buckets.reduce((s, b) => s + b.total, 0);
     expect(total).toBe(3);
+  });
+
+  it('tallies the reaction kind onto the reaction field', () => {
+    const r = bucketTimeline(pts([[0, 'reaction'], [1, 'reaction'], [2, 'chat']]), 0, 100, 24);
+    const reactions = r.buckets.reduce((s, b) => s + b.reaction, 0);
+    const chats = r.buckets.reduce((s, b) => s + b.chat, 0);
+    expect(reactions).toBe(2);
+    expect(chats).toBe(1);
+    expect(r.totalInteractions).toBe(3);
   });
 
   it('collapses a degenerate (zero-span) window to one bucket', () => {
@@ -201,5 +211,74 @@ describe('summarizeHandRaises', () => {
     ]);
     expect(r.total).toBe(1);
     expect(r.distinctSessions).toBe(1);
+  });
+});
+
+describe('retentionSignal', () => {
+  const at = (min: number): Date => new Date(2026, 0, 1, 10, min, 0);
+
+  it('measures dwell + retention over registrants with both timestamps (≥ min sample)', () => {
+    // duration 60 min; A 60m (ratio 1), B 60m (1), C 30m (0.5)
+    const r = retentionSignal(
+      [
+        { joinedAt: at(0), leftAt: at(60) },
+        { joinedAt: at(0), leftAt: at(60) },
+        { joinedAt: at(0), leftAt: at(30) },
+        { joinedAt: at(0), leftAt: null }, // no leftAt → excluded
+        { joinedAt: null, leftAt: at(60) }, // no joinedAt → excluded
+      ],
+      3600,
+    );
+    expect(r.measured).toBe(3);
+    expect(r.avgDwellSec).toBe(Math.round((3600 + 3600 + 1800) / 3)); // 3000
+    expect(r.retention).toBeCloseTo((1 + 1 + 0.5) / 3, 5); // 0.8333
+  });
+
+  it('returns nulls when nothing is measurable', () => {
+    expect(retentionSignal([], 3600)).toEqual({ measured: 0, avgDwellSec: null, retention: null });
+    expect(retentionSignal([{ joinedAt: at(0), leftAt: null }], 3600)).toEqual({
+      measured: 0, avgDwellSec: null, retention: null,
+    });
+  });
+
+  it('suppresses retention below the minimum sample (but still reports avgDwell)', () => {
+    const r = retentionSignal(
+      [
+        { joinedAt: at(0), leftAt: at(60) },
+        { joinedAt: at(0), leftAt: at(30) },
+      ],
+      3600,
+    );
+    expect(r.measured).toBe(2); // < MIN_RETENTION_SAMPLE (3)
+    expect(r.avgDwellSec).toBe(Math.round((3600 + 1800) / 2)); // 2700
+    expect(r.retention).toBeNull(); // too small a sample to publish a %
+  });
+
+  it('floors negative dwell (clock skew) at 0 and clamps ratio at 1', () => {
+    const r = retentionSignal(
+      [
+        { joinedAt: at(10), leftAt: at(5) }, // leftAt before joinedAt → 0
+        { joinedAt: at(0), leftAt: at(120) }, // 120m over a 60m event → ratio clamped to 1
+        { joinedAt: at(0), leftAt: at(60) }, // ratio 1
+      ],
+      3600,
+    );
+    expect(r.measured).toBe(3);
+    expect(r.avgDwellSec).toBe(Math.round((0 + 7200 + 3600) / 3)); // 3600
+    expect(r.retention).toBeCloseTo((0 + 1 + 1) / 3, 5); // 0.6667
+  });
+
+  it('retention is null when duration is unknown (0)', () => {
+    const r = retentionSignal(
+      [
+        { joinedAt: at(0), leftAt: at(30) },
+        { joinedAt: at(0), leftAt: at(30) },
+        { joinedAt: at(0), leftAt: at(30) },
+      ],
+      0,
+    );
+    expect(r.measured).toBe(3);
+    expect(r.avgDwellSec).toBe(1800);
+    expect(r.retention).toBeNull();
   });
 });

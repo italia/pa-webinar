@@ -4,12 +4,10 @@ import { z } from 'zod';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { eventParamWhere } from '@/lib/events/event-param';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
-
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Tetto massimo di eventi conservati per CallSession: protegge la riga JsonB. */
 const MAX_LOG_ENTRIES = 5000;
@@ -30,12 +28,6 @@ const handRaiseEventSchema = z.object({
 const bodySchema = z.object({
   events: z.array(handRaiseEventSchema).min(1).max(MAX_BATCH),
 });
-
-function eventWhereClause(param: string) {
-  return UUID_RE.test(param)
-    ? { OR: [{ id: param }, { slug: param }] }
-    : { slug: param };
-}
 
 /**
  * POST /api/events/[param]/hand-raises  (P1 analytics)
@@ -77,7 +69,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   // Risolvi evento → CallSession ATTIVA (più recente senza endedAt).
   const event = await prisma.event.findFirst({
-    where: eventWhereClause(param),
+    where: eventParamWhere(param),
     select: { id: true },
   });
   if (!event) throw new NotFoundError('Event');

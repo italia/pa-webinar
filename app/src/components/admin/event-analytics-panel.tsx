@@ -29,13 +29,14 @@ const KIND_COLORS: Record<string, string> = {
   upvote: '#e08e0b',
   poll: '#6c5ce7',
   word: '#d9364f',
+  reaction: '#e83e8c',
 };
-const KIND_ORDER = ['chat', 'question', 'upvote', 'poll', 'word'] as const;
+const KIND_ORDER = ['chat', 'question', 'upvote', 'poll', 'word', 'reaction'] as const;
 
 interface Bucket {
   startOffsetSec: number;
   label: string;
-  chat: number; question: number; upvote: number; poll: number; word: number;
+  chat: number; question: number; upvote: number; poll: number; word: number; reaction: number;
   total: number;
 }
 interface SpeakerStat { label: string; name: string; named: boolean; speechSec: number; sharePct: number }
@@ -44,10 +45,14 @@ interface Analytics {
   eventId: string;
   status: string;
   durationSec: number;
-  attendance: { registered: number; joined: number; conversionPct: number | null; peakParticipants: number };
+  attendance: {
+    registered: number; joined: number; conversionPct: number | null; peakParticipants: number;
+    dwellMeasured: number; avgDwellSec: number | null; retentionPct: number | null;
+  };
   chat: { total: number; byModerator: number; byAudience: number; capped: boolean; topAuthors: { name: string; count: number }[] };
   interactions: { total: number; distinctInteractors: number; capped: boolean };
   handRaises: { total: number; distinctSessions: number };
+  reactions: { total: number; byEmoji: { emoji: string; count: number }[]; capped: boolean };
   qa: { topQuestions: { text: string; upvotes: number }[] };
   polls: { question: string; options: { text: string; votes: number }[]; totalVotes: number }[];
   topWords: { word: string; count: number }[];
@@ -260,6 +265,13 @@ export default function EventAnalyticsPanel({ eventId, status }: { eventId: stri
           sub={`${a.interactions.total} ${t('interactionsWord')}`} />
         <Kpi value={String(a.handRaises.total)} label={t('kpiHandRaises')}
           sub={t('handRaisesSessionsSub', { n: a.handRaises.distinctSessions })} />
+        <Kpi value={String(a.reactions.total)} label={t('kpiReactions')} />
+        {a.attendance.retentionPct != null && (
+          <Kpi value={`${a.attendance.retentionPct}%`} label={t('kpiRetention')}
+            sub={a.attendance.avgDwellSec != null
+              ? t('dwellSub', { d: fmtDur(a.attendance.avgDwellSec), n: a.attendance.dwellMeasured })
+              : undefined} />
+        )}
       </div>
 
       <Section title={t('timelineTitle')}>
@@ -336,6 +348,21 @@ export default function EventAnalyticsPanel({ eventId, status }: { eventId: stri
               <span key={w.word} className="badge bg-light text-dark border"
                 style={{ fontSize: `${Math.min(1.4, 0.75 + w.count * 0.12)}rem` }}>
                 {w.word} <span className="text-secondary">{w.count}</span>
+              </span>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {a.reactions.total > 0 && (
+        <Section title={t('reactionsTitle')}>
+          <div className="d-flex flex-wrap gap-3">
+            {a.reactions.byEmoji.map((r) => (
+              <span key={r.emoji} aria-label={`${r.emoji} ${r.count}`}
+                className="d-flex align-items-center gap-1 border rounded px-2 py-1"
+                style={{ fontSize: '1.1rem', background: '#fff' }}>
+                <span aria-hidden>{r.emoji}</span>
+                <span aria-hidden className="text-secondary" style={{ fontSize: '0.9rem', fontVariantNumeric: 'tabular-nums' }}>{r.count}</span>
               </span>
             ))}
           </div>

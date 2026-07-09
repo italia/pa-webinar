@@ -11,6 +11,11 @@ import { getCached, setCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
+// Hard cap on persisted reaction rows per event: the POST is public (the live
+// UX needs it), so this bounds table bloat from a spam/abuse burst. Real events
+// stay far below it; the in-memory live counter is unaffected by the cap.
+const REACTION_ROW_CAP = 20000;
+
 type ReactionCounts = Record<string, number>;
 
 function getReactionsKey(eventId: string): string {
@@ -54,6 +59,23 @@ export const POST = withErrorHandling(async (request, context) => {
 
   counts[emoji] = (counts[emoji] || 0) + 1;
   setCache(key, counts, TTL);
+
+  // P1 analytics — persist each reaction (one row per click; the POST is
+  // already self-originated by the reactor, so there is no broadcast fan-out)
+  // for post-event counts + the engagement timeline. Best-effort: the in-memory
+  // counter above drives the real-time UX, so a DB hiccup must not fail the
+  // click. No PII stored — only the emoji + timestamp. The conditional INSERT
+  // caps rows per event (bounds bloat from an unauthenticated spam burst);
+  // gen_random_uuid() supplies the id server-side.
+  try {
+    await prisma.$executeRaw`
+      INSERT INTO "reactions" ("id", "event_id", "emoji", "created_at")
+      SELECT gen_random_uuid(), ${event.id}::uuid, ${emoji}, CURRENT_TIMESTAMP
+      WHERE (SELECT count(*) FROM "reactions" WHERE "event_id" = ${event.id}::uuid) < ${REACTION_ROW_CAP}
+    `;
+  } catch {
+    /* analytics-only; never break the live reaction */
+  }
 
   return Response.json({ ok: true, emoji, total: counts[emoji] });
 });
