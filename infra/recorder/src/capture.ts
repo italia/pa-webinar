@@ -337,7 +337,10 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     // (vedi onTrackAdded) così Chrome headless ne decodifica l'RTP.
     let sharedAudioCtx: any = null;
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
-    const recorders = new Map<string, { rec: any; key: string }>();
+    const recorders = new Map<
+      string,
+      { rec: any; key: string; sinkEl?: any; srcNode?: any; destNode?: any }
+    >();
     // Contatore monotono per generare un trackFileId univoco per sessione,
     // robusto a due TRACK_ADDED nello stesso ms (Date.now() poteva collidere).
     let trackSeq = 0;
@@ -346,6 +349,35 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     // dopo l'attività" (idle breve).
     let seenParticipant = false;
     let finishing = false;
+
+    // Disconnette il grafo WebAudio e rimuove l'<audio> nascosto usato per
+    // forzare il playout della traccia remota (vedi onTrackAdded). Chiamata
+    // a fine-traccia e in finish() per non lasciare nodi/elementi appesi.
+    const cleanupSink = (entry: {
+      sinkEl?: any;
+      srcNode?: any;
+      destNode?: any;
+    }): void => {
+      try {
+        entry.srcNode?.disconnect?.();
+      } catch {
+        /* ignore */
+      }
+      try {
+        entry.destNode?.disconnect?.();
+      } catch {
+        /* ignore */
+      }
+      try {
+        if (entry.sinkEl) {
+          entry.sinkEl.pause?.();
+          entry.sinkEl.srcObject = null;
+          entry.sinkEl.remove?.();
+        }
+      } catch {
+        /* ignore */
+      }
+    };
 
     const finish = async (): Promise<void> => {
       if (finishing) return;
@@ -370,7 +402,10 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         ),
       );
       await new Promise<void>((res) => setTimeout(res, 500));
-      for (const { key } of recorders.values()) w.onTrackEnded?.(key);
+      for (const entry of recorders.values()) {
+        cleanupSink(entry);
+        w.onTrackEnded?.(entry.key);
+      }
       try {
         conference?.leave();
         connection.disconnect();
@@ -401,7 +436,7 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       ));
     };
 
-    const onTrackAdded = (track: any) => {
+    const onTrackAdded = async (track: any) => {
       log(
         `TRACK_ADDED type=${track.getType?.()} local=${track.isLocal?.()} pid=${track.getParticipantId?.()}`,
       );
@@ -424,22 +459,51 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       const rawStream: MediaStream = audioOnly.getAudioTracks().length
         ? audioOnly
         : original;
-      // FIX cattura headless: un MediaRecorder su una track audio REMOTA in
-      // Chrome headless NON riceve campioni se la track non viene "consumata"
-      // da un sink audio. Instradiamo la track via WebAudio (source→destination):
-      // forza la decodifica dell'RTP e alimenta il MediaRecorder con la
-      // destination stream. Senza il sink, MediaRecorder produce 0 byte (la
-      // segnalazione e i TRACK_ADDED arrivano, ma nessun campione).
+      // FIX cattura headless (SILENZIO): in Chrome headless una track audio
+      // REMOTA (SFU) NON emette campioni decodificati in un
+      // MediaStreamAudioSourceNode a meno che lo STESSO stream sia ANCHE
+      // riprodotto da un media element in play (comportamento Chromium noto,
+      // bug 121673/241543). Il solo routing WebAudio "clocka" il grafo ma
+      // emette ZERI → MediaRecorder scrive opus VALIDO ma SILENZIOSO (byte
+      // proporzionali alla durata, -91 dB). Fix portante: agganciare la track
+      // a un <audio> nascosto in autoplay per forzarne decode/playout, così i
+      // campioni reali fluiscono nel source node. (Un sink audio virtuale nel
+      // container — vedi Dockerfile/entrypoint — garantisce che
+      // l'AudioDeviceModule di Chrome esegua il thread di playout.)
+      let sinkEl: any = null;
+      let srcNode: any = null;
+      let destNode: any = null;
       let stream: MediaStream = rawStream;
+      try {
+        sinkEl = document.createElement('audio');
+        sinkEl.autoplay = true;
+        // NON mutare: un elemento muto non "tira" l'audio remoto.
+        sinkEl.muted = false;
+        sinkEl.srcObject = rawStream;
+        sinkEl.style.display = 'none';
+        document.body.appendChild(sinkEl);
+        await sinkEl.play?.().catch((e: unknown) => log('sink play ko: ' + String(e)));
+      } catch (e) {
+        log('sink element ko: ' + String(e));
+      }
       try {
         const AC = w.AudioContext || w.webkitAudioContext;
         if (!sharedAudioCtx && AC) {
           sharedAudioCtx = new AC();
-          void sharedAudioCtx.resume?.();
         }
         if (sharedAudioCtx) {
-          const srcNode = sharedAudioCtx.createMediaStreamSource(rawStream);
-          const destNode = sharedAudioCtx.createMediaStreamDestination();
+          // Un context 'suspended' emette silenzio: attendi il resume (era
+          // fire-and-forget) e verifica lo stato prima di registrare.
+          try {
+            await sharedAudioCtx.resume?.();
+          } catch (e) {
+            log('AudioContext resume ko: ' + String(e));
+          }
+          if (sharedAudioCtx.state && sharedAudioCtx.state !== 'running') {
+            log('AudioContext state=' + sharedAudioCtx.state + ' (atteso running)');
+          }
+          srcNode = sharedAudioCtx.createMediaStreamSource(rawStream);
+          destNode = sharedAudioCtx.createMediaStreamDestination();
           srcNode.connect(destNode);
           stream = destNode.stream;
         }
@@ -454,6 +518,7 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         });
       } catch (e) {
         log('MediaRecorder ko: ' + String(e));
+        cleanupSink({ sinkEl, srcNode, destNode });
         return;
       }
       let chunkCount = 0;
@@ -483,7 +548,11 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       // (non al primo chunk) e finish() flusha l'ultimo chunk su onstop → nessuna
       // perdita di accuratezza temporale.
       rec.start(3000);
-      recorders.set(track.getId?.() ?? key, { rec, key });
+      // Ancoriamo rec + <audio> + nodi WebAudio nella map: oltre a governare
+      // il ciclo di vita, impedisce che il GC raccolga sinkEl/srcNode/destNode
+      // (locali block-scoped) dopo il ritorno di onTrackAdded → altra fonte di
+      // silenzio.
+      recorders.set(track.getId?.() ?? key, { rec, key, sinkEl, srcNode, destNode });
       log(`recording audio track key=${key} pid=${pid} name=${name} (recorders=${recorders.size})`);
     };
 
@@ -496,6 +565,7 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         } catch {
           /* ignore */
         }
+        cleanupSink(entry);
         w.onTrackEnded?.(entry.key);
         recorders.delete(id);
       }
