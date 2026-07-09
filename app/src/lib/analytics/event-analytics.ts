@@ -231,3 +231,39 @@ export function computeAttentionScore(signals: AttentionSignals): AttentionScore
 
   return { score: Math.round(clamp01(acc) * 100), components, missing };
 }
+
+// ── Hand-raise stats ─────────────────────────────────────────────────
+
+export interface HandRaiseLogEntry {
+  participantId?: string; // Jitsi endpoint id of the raiser's session
+  raised?: boolean;
+}
+
+export interface HandRaiseStats {
+  total: number; // RAISE actions (raised === true)
+  distinctSessions: number; // distinct raising SESSIONS (endpoint ids)
+}
+
+/**
+ * Summarize a CallSession.handRaiseLog into a raise count + distinct raising
+ * sessions.
+ *
+ * Each entry is SELF-REPORTED by the raiser's own client (see jitsi-room.tsx):
+ * `raiseHandUpdated` is broadcast to every participant, so to avoid ~P× inflation
+ * only the raiser persists their own event. That gives exactly one record per
+ * raise, keyed by the raiser's Jitsi ENDPOINT id — an opaque per-SESSION id
+ * (fresh on each (re)join), NOT a stable person id. So `distinctSessions` counts
+ * distinct raising sessions (a rejoin is honestly a new session), and the metric
+ * stands alone — it is NOT cross-linked into the interactor/attention sets.
+ * Moderators are excluded at capture time; lowered events never count.
+ */
+export function summarizeHandRaises(log: HandRaiseLogEntry[]): HandRaiseStats {
+  let total = 0;
+  const sessions = new Set<string>();
+  for (const e of log) {
+    if (!e || e.raised !== true || typeof e.participantId !== 'string' || !e.participantId) continue;
+    total += 1;
+    sessions.add(e.participantId);
+  }
+  return { total, distinctSessions: sessions.size };
+}

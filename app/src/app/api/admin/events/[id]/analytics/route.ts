@@ -28,7 +28,9 @@ import {
   computeAttentionScore,
   gini,
   speakerLeaderboard,
+  summarizeHandRaises,
   type AttentionSignals,
+  type HandRaiseLogEntry,
   type TimelinePoint,
 } from '@/lib/analytics/event-analytics';
 
@@ -62,7 +64,7 @@ export const GET = withErrorHandling(async (_request, context) => {
   });
   if (!event) throw new NotFoundError('Event');
 
-  const [recap, registrations, chat, questions, upvotes, pollVotes, words, recording, callSession] =
+  const [recap, registrations, chat, questions, upvotes, pollVotes, words, recording, sessions] =
     await Promise.all([
       // Persisted recap survives the retention cleanup (raw rows are deleted);
       // fall back to a live build for events that aren't concluded yet.
@@ -109,12 +111,17 @@ export const GET = withErrorHandling(async (_request, context) => {
           },
         },
       }),
-      prisma.callSession.findFirst({
+      // One pass over the event's CallSessions serves both needs: the newest
+      // (first, createdAt desc) drives peak/duration; ALL of them are flat-
+      // mapped for hand-raises, which may be split across sessions on rejoin.
+      prisma.callSession.findMany({
         where: { eventId: id },
         orderBy: { createdAt: 'desc' },
-        select: { startedAt: true, endedAt: true, peakParticipants: true },
+        select: { startedAt: true, endedAt: true, peakParticipants: true, handRaiseLog: true },
       }),
     ]);
+
+  const callSession = sessions[0] ?? null;
 
   // ── Attendance / conversion ──
   const registered = registrations.length;
@@ -159,6 +166,16 @@ export const GET = withErrorHandling(async (_request, context) => {
       ? Math.round((callSession.endedAt.getTime() - callSession.startedAt.getTime()) / 1000)
       : Math.round((event.endsAt.getTime() - event.startsAt.getTime()) / 1000));
   const durationHours = durationSec > 0 ? durationSec / 3600 : null;
+
+  // ── Hand raises (P1) — self-reported live into CallSession.handRaiseLog ──
+  // Standalone metric, keyed by opaque Jitsi endpoint id (NOT a personKey), so
+  // it is reported on its own and deliberately NOT folded into the interactor /
+  // attention sets below (doing so would double-count and break the
+  // distinctInteractors ≤ totalInteractions invariant).
+  const handRaiseLog = sessions.flatMap((s) =>
+    Array.isArray(s.handRaiseLog) ? (s.handRaiseLog as unknown as HandRaiseLogEntry[]) : [],
+  );
+  const handRaiseStats = summarizeHandRaises(handRaiseLog);
 
   // ── Distinct interactors (union across streams, one canonical key/person) ──
   const interactorSet = new Set<string>();
@@ -258,6 +275,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       topAuthors,
     },
     interactions: { total: totalInteractions, distinctInteractors, capped },
+    handRaises: { total: handRaiseStats.total, distinctSessions: handRaiseStats.distinctSessions },
     qa: { topQuestions: recap.topQuestions },
     polls: recap.polls,
     topWords: recap.topWords,

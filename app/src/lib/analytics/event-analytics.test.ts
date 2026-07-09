@@ -6,6 +6,7 @@ import {
   speakerLeaderboard,
   gini,
   computeAttentionScore,
+  summarizeHandRaises,
   type TimelinePoint,
   type AttentionSignals,
 } from './event-analytics';
@@ -168,5 +169,37 @@ describe('computeAttentionScore', () => {
       liveParticipation: null, talkBalance: null, retention: null,
     };
     expect(computeAttentionScore(over).score).toBe(100);
+  });
+});
+
+describe('summarizeHandRaises', () => {
+  // participantId is the raiser's opaque Jitsi endpoint id (~8 hex); entries are
+  // self-reported so there is one record per raise (no broadcast fan-out).
+  it('counts raises (not lowers) and dedups raising sessions by endpoint id', () => {
+    const r = summarizeHandRaises([
+      { participantId: 'a1b2c3d4', raised: true },
+      { participantId: 'a1b2c3d4', raised: false }, // lower → ignored
+      { participantId: 'a1b2c3d4', raised: true }, // same session raises again
+      { participantId: 'e5f6a7b8', raised: true },
+    ]);
+    expect(r.total).toBe(3); // 2 raises from one session + 1 from another
+    expect(r.distinctSessions).toBe(2);
+  });
+  it('is empty for an empty or all-lowered log', () => {
+    expect(summarizeHandRaises([])).toEqual({ total: 0, distinctSessions: 0 });
+    expect(summarizeHandRaises([{ participantId: 'a1b2c3d4', raised: false }])).toEqual({
+      total: 0,
+      distinctSessions: 0,
+    });
+  });
+  it('tolerates malformed entries', () => {
+    const r = summarizeHandRaises([
+      { raised: true }, // no participantId
+      { participantId: 'a1b2c3d4' }, // no raised flag
+      { participantId: '', raised: true }, // empty id
+      { participantId: 'a1b2c3d4', raised: true },
+    ]);
+    expect(r.total).toBe(1);
+    expect(r.distinctSessions).toBe(1);
   });
 });

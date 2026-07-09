@@ -1315,6 +1315,15 @@ model CallSession {
   // multi-traccia. Capped lato ingest per non gonfiare la riga.
   dominantSpeakerLog Json @default("[]") @map("dominant_speaker_log") @db.JsonB
 
+  // P1 analytics — alzate di mano catturate in diretta dall'IFrame API
+  // (`raiseHandUpdated`). Array append-only di `{ participantId, raised }`,
+  // dove participantId è l'endpoint id OPACO della sessione del richiedente
+  // (self-report: ogni client segnala solo la propria alzata → una riga per
+  // alzata, niente PII e niente conteggio ~P×). Serve a contare "quante alzate
+  // di mano" e da quante sessioni distinte. L'append è atomico (JsonB `||`) e
+  // capped; scrubbato dal cleanup insieme a dominantSpeakerLog.
+  handRaiseLog Json @default("[]") @map("hand_raise_log") @db.JsonB
+
   createdAt DateTime @default(now()) @map("created_at")
 
   event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)

@@ -2124,6 +2124,8 @@
       "kpiDuration": "Durata",
       "kpiInteractors": "Interlocutori distinti",
       "interactionsWord": "interazioni",
+      "kpiHandRaises": "Alzate di mano",
+      "handRaisesSessionsSub": "da {n, plural, one {# sessione} other {# sessioni}}",
       "timelineTitle": "Andamento della call",
       "timelineEmpty": "Nessuna interazione registrata durante la call.",
       "timelinePeak": "Picco di interazione a {at} ({n} eventi nel bucket).",

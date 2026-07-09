@@ -264,7 +264,7 @@ export const GET = withErrorHandling(async (request) => {
         // analytics (peakParticipants, duration) and the postprod graph.
         const callSessionsScrubbed = await tx.callSession.updateMany({
           where: { eventId: evt.id },
-          data: { dominantSpeakerLog: [], participants: [] },
+          data: { dominantSpeakerLog: [], handRaiseLog: [], participants: [] },
         });
 
         if (evt.status !== 'ARCHIVED') {

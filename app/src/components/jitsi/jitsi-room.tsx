@@ -142,6 +142,16 @@ export default function JitsiRoom({
   const speakerBufferRef = useRef<Array<{ atMs: number; participantId: string; displayName?: string }>>([]);
   const speakerFlushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // P1 analytics — buffer delle alzate di mano (`raiseHandUpdated`), stesso
+  // schema di batching del dominant speaker: accumula e invia in batch a
+  // `/api/events/[slug]/hand-raises`. Condivide `speakerT0Ref` come t0.
+  // Nessuna PII: solo l'endpoint id opaco della PROPRIA sessione (self-report).
+  const handRaiseBufferRef = useRef<Array<{ participantId: string; raised: boolean }>>([]);
+  const handRaiseFlushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Endpoint id locale (dal `videoConferenceJoined`): serve a segnalare SOLO le
+  // nostre alzate di mano, dato che l'evento arriva in broadcast a ogni client.
+  const myEndpointIdRef = useRef<string>('');
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     disposedRef.current = false;
@@ -230,18 +240,10 @@ export default function JitsiRoom({
 
     const IFRAME_ALLOW = 'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock';
 
-    // ADR-013 Fase 0 — invia il buffer dominant-speaker all'ingest. Usa
-    // sendBeacon all'unload (sopravvive alla chiusura tab); fetch keepalive
-    // negli altri casi. Svuota sempre il buffer, fire-and-forget.
-    function flushSpeakerBuffer(useBeacon = false) {
-      const slug = eventSlugRef.current;
-      const buf = speakerBufferRef.current;
-      if (!slug || buf.length === 0) return;
-      // Cap difensivo lato client coerente col tetto della route (2000).
-      const events = buf.splice(0, 2000);
-      speakerBufferRef.current = [];
-      const url = `/api/events/${encodeURIComponent(slug)}/speaker-events`;
-      const payload = JSON.stringify({ events });
+    // Invio JSON best-effort condiviso dagli ingest live (dominant-speaker e
+    // alzate di mano): sendBeacon all'unload (sopravvive alla chiusura tab),
+    // fetch keepalive altrimenti. Fire-and-forget: non rompe mai il flusso live.
+    function sendJson(url: string, payload: string, useBeacon: boolean) {
       try {
         if (useBeacon && typeof navigator !== 'undefined' && navigator.sendBeacon) {
           navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
@@ -252,10 +254,22 @@ export default function JitsiRoom({
           headers: { 'Content-Type': 'application/json' },
           body: payload,
           keepalive: true,
-        }).catch(() => { /* ingest best-effort: non rompere il flusso live */ });
+        }).catch(() => { /* ingest best-effort */ });
       } catch {
         /* best-effort */
       }
+    }
+
+    // ADR-013 Fase 0 — invia il buffer dominant-speaker all'ingest.
+    function flushSpeakerBuffer(useBeacon = false) {
+      const slug = eventSlugRef.current;
+      const buf = speakerBufferRef.current;
+      if (!slug || buf.length === 0) return;
+      // Cap difensivo lato client coerente col tetto della route (2000).
+      // splice() muta il buffer in-place: l'eventuale eccedenza (>2000) resta
+      // in coda per il flush successivo invece di essere persa.
+      const events = buf.splice(0, 2000);
+      sendJson(`/api/events/${encodeURIComponent(slug)}/speaker-events`, JSON.stringify({ events }), useBeacon);
     }
 
     function scheduleSpeakerFlush() {
@@ -266,7 +280,27 @@ export default function JitsiRoom({
       }, 10_000);
     }
 
-    const handlePageHide = () => flushSpeakerBuffer(true);
+    // P1 analytics — stesso meccanismo per le alzate di mano, endpoint dedicato.
+    function flushHandRaiseBuffer(useBeacon = false) {
+      const slug = eventSlugRef.current;
+      const buf = handRaiseBufferRef.current;
+      if (!slug || buf.length === 0) return;
+      const events = buf.splice(0, 2000);
+      sendJson(`/api/events/${encodeURIComponent(slug)}/hand-raises`, JSON.stringify({ events }), useBeacon);
+    }
+
+    function scheduleHandRaiseFlush() {
+      if (handRaiseFlushTimerRef.current) return;
+      handRaiseFlushTimerRef.current = setTimeout(() => {
+        handRaiseFlushTimerRef.current = null;
+        flushHandRaiseBuffer(false);
+      }, 10_000);
+    }
+
+    const handlePageHide = () => {
+      flushSpeakerBuffer(true);
+      flushHandRaiseBuffer(true);
+    };
 
     function initJitsi() {
       if (disposedRef.current || initializingRef.current || apiRef.current) return;
@@ -352,8 +386,10 @@ export default function JitsiRoom({
           }
         };
 
-        api.addListener('videoConferenceJoined', () => {
+        api.addListener('videoConferenceJoined', (evt: { id?: string }) => {
           if (disposedRef.current) return;
+          // Il nostro endpoint id: usato per segnalare solo le nostre alzate.
+          if (evt?.id) myEndpointIdRef.current = evt.id;
           setLoadState('ready');
           // Annulla un'eventuale NS persistita da Jitsi in localStorage da una
           // sessione precedente, poi continua a ri-asserirla off per tutta la call.
@@ -401,6 +437,7 @@ export default function JitsiRoom({
             nsEnforceTimerRef.current = null;
           }
           flushSpeakerBuffer(true);
+          flushHandRaiseBuffer(true);
           onLeftRef.current?.();
         });
 
@@ -432,6 +469,21 @@ export default function JitsiRoom({
             displayName: name,
           });
           scheduleSpeakerFlush();
+        });
+
+        // P1 analytics — cattura le alzate di mano. `handRaised > 0` = mano
+        // alzata, `0` = mano abbassata. `raiseHandUpdated` è in BROADCAST a ogni
+        // client, quindi segnaliamo SOLO la nostra alzata (evt.id === il nostro
+        // endpoint id): così ogni alzata è registrata una volta sola, non ~P×.
+        // I moderatori sono esclusi (non contano per l'engagement del pubblico).
+        api.addListener('raiseHandUpdated', (evt: { id: string; handRaised: number }) => {
+          if (disposedRef.current || !eventSlugRef.current || !evt?.id) return;
+          if (evt.id !== myEndpointIdRef.current || role === 'moderator') return;
+          handRaiseBufferRef.current.push({
+            participantId: evt.id,
+            raised: evt.handRaised > 0,
+          });
+          scheduleHandRaiseFlush();
         });
 
         api.addListener('participantJoined', () => {
@@ -496,11 +548,16 @@ export default function JitsiRoom({
         clearTimeout(speakerFlushTimerRef.current);
         speakerFlushTimerRef.current = null;
       }
+      if (handRaiseFlushTimerRef.current) {
+        clearTimeout(handRaiseFlushTimerRef.current);
+        handRaiseFlushTimerRef.current = null;
+      }
       if (nsEnforceTimerRef.current) {
         clearInterval(nsEnforceTimerRef.current);
         nsEnforceTimerRef.current = null;
       }
       flushSpeakerBuffer(true);
+      flushHandRaiseBuffer(true);
       if (apiRef.current) {
         apiRef.current.dispose();
         apiRef.current = null;
