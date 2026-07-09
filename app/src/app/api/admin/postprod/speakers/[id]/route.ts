@@ -25,7 +25,10 @@ export const dynamic = 'force-dynamic';
 
 const bodySchema = z.object({
   displayName: z.string().min(1).max(200).nullable(),
-  personId: z.string().uuid().nullable(),
+  // Optional: when omitted, the existing Person link is left untouched (a
+  // plain rename must not drop a previously-mapped rubrica identity). Pass
+  // null explicitly to clear the link.
+  personId: z.string().uuid().nullable().optional(),
 });
 
 export const PUT = withErrorHandling(async (request, context) => {
@@ -59,7 +62,9 @@ export const PUT = withErrorHandling(async (request, context) => {
     where: { id },
     data: {
       displayName: resolvedDisplayName,
-      personId: parsed.personId,
+      // Only touch the link when the caller provided personId (undefined =
+      // leave as-is; null = clear). Prisma treats `undefined` as no-op.
+      ...(parsed.personId !== undefined ? { personId: parsed.personId } : {}),
     },
   });
 
@@ -71,7 +76,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       recordingId: speaker.recordingId,
       diarLabel: speaker.diarLabel,
       displayName: resolvedDisplayName,
-      personId: parsed.personId,
+      personId: updated.personId,
     },
   });
 
