@@ -25,6 +25,8 @@ import PipelineProvenance, {
   type PipelineSnapshot,
 } from '@/components/events/pipeline-provenance';
 
+import SpeakerRosterEditor from './speaker-roster-editor';
+
 interface Metrics {
   topics: number;
   decisions: number;
@@ -77,7 +79,7 @@ interface Details {
   storageFiles: Array<{ key: string; sizeBytes: number | null }>;
   llm: { perLanguage: Record<string, Metrics>; model: string | null };
   dubbedAudio: Array<{ language: string; url: string; sizeBytes: number | null; watermark: string | null }>;
-  speakers: Array<{ diarLabel: string; displayName: string | null; totalSpeechSec: number }>;
+  speakers: Array<{ id: string; diarLabel: string; displayName: string | null; totalSpeechSec: number }>;
   pipelineSnapshot?: PipelineSnapshot | null;
 }
 
@@ -120,7 +122,7 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub?: string
 export default function RecordingOverview({ recordingId }: { recordingId: string }) {
   const t = useTranslations('admin.postprod.ov');
   const locale = useLocale();
-  const { data, error, isLoading } = useSWR<Details>(
+  const { data, error, isLoading, mutate } = useSWR<Details>(
     `/api/admin/postprod/recordings/${recordingId}/details`,
     fetcher,
   );
@@ -225,7 +227,7 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
           {dubbedAudio.map((d) => (
             <div key={d.language} className="d-flex align-items-center gap-2">
               <span className="badge bg-secondary text-uppercase" style={{ minWidth: 38 }}>{d.language}</span>
-              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              { }
               <audio controls preload="none" src={d.url} style={{ height: 38, maxWidth: 460 }} />
               <span className="small text-secondary">{fmtBytes(d.sizeBytes)}{d.watermark ? ` · ${d.watermark}` : ''}</span>
             </div>
@@ -290,16 +292,9 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
         </div>
       )}
 
-      {/* ── Parlanti ──────────────────────────────────────── */}
+      {/* ── Parlanti (roster rinominabile) ─────────────────── */}
       <h6 className="fw-semibold mb-2">{t('speakersTitle')}</h6>
-      <div className="d-flex flex-wrap gap-2 mb-4">
-        {speakers.length === 0 ? <span className="text-secondary small">–</span> : speakers.map((sp) => (
-          <span key={sp.diarLabel} className="badge bg-light text-dark border">
-            {sp.displayName || `${sp.diarLabel} · ${t('speakerAnon')}`}
-            <span className="text-secondary"> · {fmtDur(sp.totalSpeechSec)}</span>
-          </span>
-        ))}
-      </div>
+      <SpeakerRosterEditor speakers={speakers} onSaved={() => void mutate()} />
 
       {/* ── File nello storage ────────────────────────────── */}
       <h6 className="fw-semibold mb-2">{t('filesTitle')}</h6>

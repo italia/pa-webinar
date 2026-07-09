@@ -105,7 +105,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       },
       speakers: {
         orderBy: { totalSpeechSec: 'desc' },
-        select: { diarLabel: true, displayName: true, totalSpeechSec: true },
+        select: { id: true, diarLabel: true, displayName: true, totalSpeechSec: true },
       },
     },
   });
@@ -205,6 +205,7 @@ export const GET = withErrorHandling(async (_request, context) => {
     llm: { perLanguage: llmByLang, model: llmModel },
     dubbedAudio,
     speakers: rec.speakers.map((s) => ({
+      id: s.id,
       diarLabel: s.diarLabel,
       displayName: s.displayName, // Speaker.displayName è in chiaro
       totalSpeechSec: s.totalSpeechSec,

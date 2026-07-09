@@ -270,6 +270,10 @@ function VideoPlayerImpl(
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [pipSupported, setPipSupported] = useState(false);
+  // Audio-only source (e.g. a recording without video): detected from the
+  // media metadata (no video dimensions). Renders an audio cover instead of a
+  // black rectangle so "se manca il video" still gives a usable player.
+  const [isAudioOnly, setIsAudioOnly] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -544,7 +548,7 @@ function VideoPlayerImpl(
   return (
     <div
       ref={containerRef}
-      className={`video-player${showControls ? ' video-player--controls-visible' : ''}`}
+      className={`video-player${showControls ? ' video-player--controls-visible' : ''}${isAudioOnly ? ' video-player--audio' : ''}`}
       onMouseMove={scheduleHideControls}
       onKeyDown={handleKeyDown}
       tabIndex={0}
@@ -570,7 +574,11 @@ function VideoPlayerImpl(
         onPause={() => { setPlaying(false); setShowControls(true); }}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={() => {
-          if (videoRef.current) setDuration(videoRef.current.duration);
+          const v = videoRef.current;
+          if (!v) return;
+          setDuration(v.duration);
+          // No video dimensions → audio-only source.
+          setIsAudioOnly(v.videoWidth === 0 && v.videoHeight === 0);
         }}
         className="video-player__video"
       >
@@ -587,6 +595,26 @@ function VideoPlayerImpl(
           />
         ))}
       </video>
+
+      {/* Cover audio-only: quando la sorgente non ha video mostriamo un
+          pannello con icona + titolo al posto del rettangolo nero. Niente
+          pointer-events così il click arriva al <video> (togglePlay). */}
+      {isAudioOnly && (
+        <div className="video-player__audio-cover" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M9 18V6l10-2v12"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="6" cy="18" r="3" stroke="currentColor" strokeWidth="1.8" />
+            <circle cx="16" cy="16" r="3" stroke="currentColor" strokeWidth="1.8" />
+          </svg>
+          {title && <div className="video-player__audio-title">{title}</div>}
+        </div>
+      )}
 
       {/* Hidden audio element per traccia dubbed. Solo uno alla volta
           attivo: cambiamo src quando l'utente switcha lingua. Resta in
