@@ -309,7 +309,19 @@
       "noMessages": "No messages yet",
       "empty": "No messages yet. Be the first!",
       "inputLabel": "Chat message",
-      "moderatorBadge": "Moderator"
+      "moderatorBadge": "Moderator",
+      "attach": "Attach a file",
+      "attachBadType": "Unsupported file type (images or PDF).",
+      "attachTooLarge": "File too large (max 10 MB).",
+      "attachFailed": "Upload failed. Please try again.",
+      "sendFailed": "Message not sent. Please try again.",
+      "removeAttachment": "Remove attachment",
+      "openAttachment": "Open attachment",
+      "reply": "Reply",
+      "replyingTo": "Replying to {name}",
+      "cancelReply": "Cancel reply",
+      "hide": "Hide",
+      "hideFailed": "Couldn't hide the message. Please try again."
     },
     "role": {
       "moderator": "Moderator",

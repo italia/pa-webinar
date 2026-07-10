@@ -65,3 +65,51 @@ export function linkifyChat(text: string): ReactNode[] {
   if (last < text.length) nodes.push(text.slice(last));
   return nodes;
 }
+
+// A mention is "@" (at a word boundary) followed by a handle of letters/
+// digits/._- (no spaces — multi-word names collapse to a single handle at
+// autocomplete time). Kept deliberately simple; rendering only, no linking.
+const MENTION_RE = /(^|[\s(])@(\p{L}[\p{L}\p{N}._-]*)/gu;
+
+/** First name-token, lowercased — used to flag a mention of the current user. */
+function firstToken(name: string): string {
+  return (name.trim().split(/\s+/)[0] ?? '').toLowerCase();
+}
+
+/**
+ * Render a chat body with BOTH safe URL linking and @mention highlighting.
+ * Mentions of the current user (matched on their first name token) get a
+ * stronger "self" style. Still no dangerouslySetInnerHTML — every text run is
+ * a plain string React escapes, so there is no XSS surface.
+ */
+export function renderChatBody(text: string, selfName?: string): ReactNode[] {
+  const self = selfName ? firstToken(selfName) : '';
+  const out: ReactNode[] = [];
+  let last = 0;
+  let key = 0;
+  for (const m of text.matchAll(MENTION_RE)) {
+    const lead = m[1] ?? '';
+    const handle = m[2] ?? '';
+    const at = (m.index ?? 0) + lead.length; // position of the "@"
+    if (at > last) out.push(...linkifyChat(text.slice(last, at)));
+    const isSelf = self.length > 0 && handle.toLowerCase() === self;
+    out.push(
+      <span
+        key={`m${key++}`}
+        className={isSelf ? 'chat-mention chat-mention--self' : 'chat-mention'}
+        style={{
+          color: 'var(--app-primary, #06c)',
+          fontWeight: 600,
+          ...(isSelf
+            ? { background: 'rgba(0,102,204,0.12)', borderRadius: 4, padding: '0 2px' }
+            : {}),
+        }}
+      >
+        @{handle}
+      </span>,
+    );
+    last = at + 1 + handle.length;
+  }
+  if (last < text.length) out.push(...linkifyChat(text.slice(last)));
+  return out;
+}

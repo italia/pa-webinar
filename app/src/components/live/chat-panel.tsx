@@ -1,10 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Icon } from 'design-react-kit';
 
-import { linkifyChat } from '@/lib/chat/linkify';
+import { renderChatBody } from '@/lib/chat/linkify';
+import {
+  CHAT_ATTACHMENT_MIME,
+  CHAT_ATTACHMENT_MAX_BYTES,
+} from '@/lib/chat/attachments';
 
 /**
  * In-app chat panel for a live event.
@@ -16,35 +20,45 @@ import { linkifyChat } from '@/lib/chat/linkify';
  * Ingress flow:
  *   1. On mount, fetch history once via GET /chat → seed state.
  *   2. Open an EventSource on /chat/stream → append new messages as
- *      they arrive. EventSource auto-reconnects on network blips.
- *   3. On reconnect, fetch GET /chat?since=<lastReceivedTs> to
- *      backfill anything we missed between the disconnect and the
- *      new subscription starting.
+ *      they arrive (op:'delete' removes a moderated message live).
+ *   3. On reconnect, fetch GET /chat?since=<lastReceivedTs> to backfill.
  *
  * Egress: POST /chat with either the participant/moderator token
- * (via ?token=) or a guest display-name in the body.
+ * (via Authorization) or a guest display-name in the body. Authenticated
+ * members can also attach one image/PDF and reply to a message.
  */
+
+interface ChatAttachment {
+  url: string;
+  name: string;
+  mime: string;
+  size: number;
+}
+
+/**
+ * The upload route's response: a rendered `ChatAttachment` (for the local
+ * preview) plus the signed capability `token`. Only the token is sent to POST
+ * /chat — the server re-derives url/mime/size/name from it, so a client cannot
+ * reference another blob or spoof metadata.
+ */
+interface PendingAttachment extends ChatAttachment {
+  token: string;
+}
+
+interface ChatReply {
+  id: string;
+  senderName: string;
+  text: string;
+}
 
 interface ChatPanelProps {
   eventSlug: string;
   token: string;
   displayName: string;
   isGuest?: boolean;
-  /**
-   * Whether the panel is currently visible to the user (selected tab
-   * AND drawer open on mobile). While false, newly arriving messages
-   * accumulate into an unread counter via onUnreadCountChange. While
-   * true, the counter resets and the internal "last-read" cursor
-   * advances to the latest message id.
-   *
-   * Default `true` keeps existing call sites (and tests) working
-   * without changes.
-   */
+  /** Enables the moderator "hide" action on each message. */
+  isModerator?: boolean;
   active?: boolean;
-  /**
-   * Notifies the parent whenever the unread count changes (including
-   * back to 0 on read). Parent owns the badge rendering.
-   */
   onUnreadCountChange?: (count: number) => void;
 }
 
@@ -55,6 +69,8 @@ interface ChatMessage {
   isModerator: boolean;
   text: string;
   createdAt: string; // ISO
+  attachment?: ChatAttachment;
+  replyTo?: ChatReply;
 }
 
 const AVATAR_COLORS = [
@@ -75,11 +91,29 @@ function formatTime(isoOrDate: string | Date): string {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+function humanSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const units = ['KB', 'MB', 'GB'];
+  let v = bytes / 1024;
+  let i = 0;
+  while (v >= 1024 && i < units.length - 1) {
+    v /= 1024;
+    i += 1;
+  }
+  return `${v.toFixed(v < 10 ? 1 : 0)} ${units[i]}`;
+}
+
+/** First name-token used as the @handle for mentions. */
+function mentionHandle(name: string): string {
+  return (name.trim().split(/\s+/)[0] ?? '').replace(/[^\p{L}\p{N}._-]/gu, '');
+}
+
 export default function ChatPanel({
   eventSlug,
   token,
   displayName,
   isGuest = false,
+  isModerator = false,
   active = true,
   onUnreadCountChange,
 }: ChatPanelProps) {
@@ -88,19 +122,21 @@ export default function ChatPanel({
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
 
+  // Compose extras (authenticated members only).
+  const canAttach = !isGuest && !!token;
+  const [replyTo, setReplyTo] = useState<ChatReply | null>(null);
+  const [attachment, setAttachment] = useState<PendingAttachment | null>(null);
+  const [attaching, setAttaching] = useState(false);
+  const [composeError, setComposeError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const listRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
   const lastSeenAtRef = useRef<string | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
 
-  // "Last-read" cursor: the id of the most recent message the user has
-  // actually seen (i.e. was visible when it arrived, or was already in
-  // the list when they switched to this tab). Messages appended after
-  // this id while `active=false` count as unread.
   const lastReadIdRef = useRef<string | null>(null);
-  // We keep the unread count in a ref because the panel itself doesn't
-  // render it — the badge lives in the sidebar tab strip. Using a ref
-  // avoids extra renders on every incoming message.
   const unreadCountRef = useRef(0);
   const activeRef = useRef(active);
   const onUnreadCountChangeRef = useRef(onUnreadCountChange);
@@ -113,9 +149,6 @@ export default function ChatPanel({
     onUnreadCountChangeRef.current?.(n);
   }, []);
 
-  // Notification permission: we try exactly once, on the first new
-  // message received while the panel is inactive. If the user denies
-  // (or the browser blocks), we silently fall back to badge + title.
   const notificationAskedRef = useRef(false);
   const maybeRequestNotificationPermission = useCallback(() => {
     if (notificationAskedRef.current) return;
@@ -140,28 +173,26 @@ export default function ChatPanel({
     isAtBottomRef.current = scrollHeight - scrollTop - clientHeight < 40;
   }, []);
 
+  // Remove a moderated message (op:'delete') everywhere.
+  const removeMessage = useCallback((id: string) => {
+    setMessages((prev) => prev.filter((m) => m.id !== id));
+  }, []);
+
   const upsertMessage = useCallback((msg: ChatMessage) => {
     if (seenIdsRef.current.has(msg.id)) return;
     seenIdsRef.current.add(msg.id);
     lastSeenAtRef.current = msg.createdAt;
     setMessages((prev) => [...prev, msg]);
 
-    // Unread accounting: increment only if the panel is currently
-    // inactive AND this is someone else's message. Own messages are
-    // always read by definition (the user just sent them).
     const isOwn = msg.senderName === displayName;
     if (!activeRef.current && !isOwn) {
       setUnread(unreadCountRef.current + 1);
       maybeRequestNotificationPermission();
     } else if (activeRef.current) {
-      // Active → keep the last-read cursor glued to the newest id.
       lastReadIdRef.current = msg.id;
     }
   }, [displayName, setUnread, maybeRequestNotificationPermission]);
 
-  // When the panel becomes active, reset unread + advance cursor to
-  // the latest message currently in state. When it becomes inactive,
-  // snapshot the current tail as the "last-read" baseline.
   useEffect(() => {
     if (active) {
       setUnread(0);
@@ -187,8 +218,6 @@ export default function ChatPanel({
           seenIdsRef.current.add(m.id);
           lastSeenAtRef.current = m.createdAt;
         });
-        // Treat history as already read — we don't want a giant "unread"
-        // badge on first mount just because the chat has scrollback.
         const last = data.messages[data.messages.length - 1];
         if (last) lastReadIdRef.current = last.id;
         setMessages(data.messages);
@@ -197,15 +226,17 @@ export default function ChatPanel({
     return () => { cancelled = true; };
   }, [eventSlug]);
 
-  // 2. SSE stream for live updates. EventSource auto-reconnects on
-  //    network errors; we rewire a since-query backfill inside the
-  //    onopen handler so gap messages come back in-order.
+  // 2. SSE stream for live updates.
   useEffect(() => {
     const es = new EventSource(`/api/events/${eventSlug}/chat/stream`);
 
     const onMessage = (e: MessageEvent) => {
       try {
-        const env = JSON.parse(e.data) as ChatMessage;
+        const env = JSON.parse(e.data) as ChatMessage & { op?: 'delete' };
+        if (env.op === 'delete') {
+          removeMessage(env.id);
+          return;
+        }
         upsertMessage(env);
       } catch { /* drop malformed */ }
     };
@@ -229,28 +260,100 @@ export default function ChatPanel({
       es.removeEventListener('open', onOpen);
       es.close();
     };
-  }, [eventSlug, upsertMessage]);
+  }, [eventSlug, upsertMessage, removeMessage]);
 
-  // Autoscroll on every append, but only while the user is pinned to
-  // the bottom — if they scrolled up to read history, don't yank them
-  // back on every new incoming message.
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  // ── Mention autocomplete ────────────────────────────────
+  // Candidates are the distinct handles of people who have chatted (minus
+  // the current user). Cheap, self-contained, no roster prop needed.
+  const mentionCandidates = useMemo(() => {
+    const selfHandle = mentionHandle(displayName).toLowerCase();
+    const seen = new Map<string, string>(); // lower → display handle
+    for (const m of messages) {
+      const h = mentionHandle(m.senderName);
+      if (h && h.toLowerCase() !== selfHandle) seen.set(h.toLowerCase(), h);
+    }
+    return Array.from(seen.values());
+  }, [messages, displayName]);
+
+  // Active mention query = an "@word" run at the caret (end of input here).
+  const mentionQuery = useMemo(() => {
+    const m = input.match(/(?:^|\s)@(\p{L}[\p{L}\p{N}._-]*)?$/u);
+    return m ? (m[1] ?? '') : null;
+  }, [input]);
+
+  const mentionSuggestions = useMemo(() => {
+    if (mentionQuery === null) return [];
+    const q = mentionQuery.toLowerCase();
+    return mentionCandidates
+      .filter((h) => h.toLowerCase().startsWith(q))
+      .slice(0, 5);
+  }, [mentionQuery, mentionCandidates]);
+
+  const applyMention = useCallback((handle: string) => {
+    setInput((prev) => prev.replace(/@(\p{L}[\p{L}\p{N}._-]*)?$/u, `@${handle} `));
+    inputRef.current?.focus();
+  }, []);
+
+  // ── Attachment upload ───────────────────────────────────
+  const uploadFile = useCallback(async (file: File) => {
+    setComposeError(null);
+    if (!CHAT_ATTACHMENT_MIME.has(file.type)) {
+      setComposeError(t('attachBadType'));
+      return;
+    }
+    if (file.size > CHAT_ATTACHMENT_MAX_BYTES) {
+      setComposeError(t('attachTooLarge'));
+      return;
+    }
+    setAttaching(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(`/api/events/${eventSlug}/chat/attachment`, {
+        method: 'POST',
+        headers,
+        body: form,
+      });
+      if (!res.ok) {
+        setComposeError(res.status === 413 ? t('attachTooLarge') : t('attachFailed'));
+        return;
+      }
+      const data = (await res.json()) as PendingAttachment;
+      setAttachment(data);
+    } catch {
+      setComposeError(t('attachFailed'));
+    } finally {
+      setAttaching(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }, [eventSlug, token, t]);
+
+  const onPaste = useCallback((e: React.ClipboardEvent) => {
+    if (!canAttach || attachment || attaching) return;
+    const file = Array.from(e.clipboardData.files)[0];
+    if (file) {
+      e.preventDefault();
+      void uploadFile(file);
+    }
+  }, [canAttach, attachment, attaching, uploadFile]);
+
   const handleSend = useCallback(async () => {
     const text = input.trim();
-    if (!text || sending) return;
+    if ((!text && !attachment) || sending || attaching) return;
     setSending(true);
     try {
-      const body: Record<string, string> = { text };
+      const body: Record<string, unknown> = {};
+      if (text) body.text = text;
       if (isGuest) body.guestName = displayName;
-      // Moderators on the SHARED primary link would otherwise all chat as the
-      // single event-level name / "Moderatore". Forward the name typed in the
-      // waiting room (same identity used for the JWT/video) so each moderator
-      // chats under their real name (server honours it only for the shared
-      // primary grant; per-row co-moderators/speakers keep their own name).
       else if (displayName) body.displayNameOverride = displayName;
+      if (replyTo) body.replyToId = replyTo.id;
+      if (attachment) body.attachmentToken = attachment.token;
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
@@ -260,16 +363,41 @@ export default function ChatPanel({
         headers,
         body: JSON.stringify(body),
       });
-      if (!res.ok) return;
-      // Don't append optimistically — Redis will fan the message back
-      // to us through SSE within milliseconds, and upsertMessage's
-      // id-dedup means no double bubble. Keeps the ordering consistent
-      // across every client in the room.
+      if (!res.ok) {
+        // Only blame the attachment when there actually was one; a text-only
+        // send that fails (rate limit, event ended, …) gets the generic error.
+        setComposeError(attachment ? t('attachFailed') : t('sendFailed'));
+        return;
+      }
+      // Redis fans the message back through SSE; id-dedup avoids a double bubble.
       setInput('');
+      setReplyTo(null);
+      setAttachment(null);
+      setComposeError(null);
     } finally {
       setSending(false);
     }
-  }, [input, sending, eventSlug, token, isGuest, displayName]);
+  }, [input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, replyTo, t]);
+
+  const hideMessage = useCallback(async (id: string) => {
+    if (!isModerator || !token) return;
+    // NOT optimistic: a swallowed failure would leave the message live for
+    // everyone while the moderator thinks it's gone. Only remove on a confirmed
+    // hide (the op:'delete' fan-out is idempotent); surface any failure.
+    try {
+      const res = await fetch(`/api/events/${eventSlug}/chat/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        setComposeError(t('hideFailed'));
+        return;
+      }
+      removeMessage(id);
+    } catch {
+      setComposeError(t('hideFailed'));
+    }
+  }, [isModerator, token, eventSlug, removeMessage, t]);
 
   return (
     <div className="chat-panel flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
@@ -325,9 +453,58 @@ export default function ChatPanel({
                         )}
                       </div>
                     )}
-                    <div className="chat-panel__text">{linkifyChat(m.text)}</div>
+                    {m.replyTo && (
+                      <div
+                        className="chat-panel__reply-quote"
+                        style={{
+                          borderLeft: '3px solid var(--app-primary, #06c)',
+                          padding: '2px 6px',
+                          margin: '0 0 4px',
+                          fontSize: '0.78rem',
+                          opacity: 0.85,
+                          background: 'rgba(0,0,0,0.04)',
+                          borderRadius: 3,
+                        }}
+                      >
+                        <strong>{m.replyTo.senderName}</strong>
+                        <div className="text-truncate" style={{ maxWidth: 220 }}>
+                          {m.replyTo.text}
+                        </div>
+                      </div>
+                    )}
+                    {m.text && (
+                      <div className="chat-panel__text">
+                        {renderChatBody(m.text, displayName)}
+                      </div>
+                    )}
+                    {m.attachment && <Attachment att={m.attachment} openLabel={t('openAttachment')} />}
                   </div>
-                  <div className="chat-panel__time">{formatTime(m.createdAt)}</div>
+                  <div className="chat-panel__time">
+                    {formatTime(m.createdAt)}
+                    {!isGuest && token && (
+                      <button
+                        type="button"
+                        className="chat-panel__reply-btn btn btn-link p-0 ms-2"
+                        style={{ fontSize: '0.7rem' }}
+                        onClick={() => {
+                          setReplyTo({ id: m.id, senderName: m.senderName, text: m.text || '📎' });
+                          inputRef.current?.focus();
+                        }}
+                      >
+                        {t('reply')}
+                      </button>
+                    )}
+                    {isModerator && token && (
+                      <button
+                        type="button"
+                        className="chat-panel__hide-btn btn btn-link p-0 ms-2 text-danger"
+                        style={{ fontSize: '0.7rem' }}
+                        onClick={() => hideMessage(m.id)}
+                      >
+                        {t('hide')}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -335,13 +512,110 @@ export default function ChatPanel({
         )}
       </div>
 
+      {/* Reply context bar */}
+      {replyTo && (
+        <div
+          className="chat-panel__reply-bar d-flex align-items-center justify-content-between"
+          style={{ padding: '4px 10px', fontSize: '0.8rem', background: 'rgba(0,0,0,0.05)' }}
+        >
+          <span className="text-truncate">
+            {t('replyingTo', { name: replyTo.senderName })}
+          </span>
+          <button
+            type="button"
+            className="btn btn-link p-0 ms-2"
+            onClick={() => setReplyTo(null)}
+            aria-label={t('cancelReply')}
+            title={t('cancelReply')}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Attachment preview */}
+      {attachment && (
+        <div
+          className="chat-panel__attach-preview d-flex align-items-center justify-content-between"
+          style={{ padding: '4px 10px', fontSize: '0.8rem', background: 'rgba(0,0,0,0.05)' }}
+        >
+          <span className="text-truncate">
+            📎 {attachment.name} <span className="text-muted">({humanSize(attachment.size)})</span>
+          </span>
+          <button
+            type="button"
+            className="btn btn-link p-0 ms-2"
+            onClick={() => setAttachment(null)}
+            aria-label={t('removeAttachment')}
+            title={t('removeAttachment')}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {composeError && (
+        <div className="chat-panel__compose-error text-danger" style={{ padding: '2px 10px', fontSize: '0.78rem' }}>
+          {composeError}
+        </div>
+      )}
+
+      {/* Mention suggestions */}
+      {mentionSuggestions.length > 0 && (
+        <div className="chat-panel__mentions" style={{ padding: '2px 10px' }}>
+          {mentionSuggestions.map((h) => (
+            <button
+              key={h}
+              type="button"
+              className="btn btn-sm btn-outline-primary me-1 mb-1"
+              style={{ fontSize: '0.75rem', padding: '1px 8px' }}
+              onClick={() => applyMention(h)}
+            >
+              @{h}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="chat-panel__input-row">
+        {canAttach && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={Array.from(CHAT_ATTACHMENT_MIME).join(',')}
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void uploadFile(f);
+              }}
+            />
+            <button
+              type="button"
+              className="chat-panel__attach-btn btn btn-link p-1"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={attaching || !!attachment || sending}
+              aria-label={t('attach')}
+              title={t('attach')}
+            >
+              {attaching ? (
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                </svg>
+              )}
+            </button>
+          </>
+        )}
         <input
+          ref={inputRef}
           type="text"
           className="chat-panel__input"
           value={input}
           placeholder={t('placeholder')}
           onChange={(e) => setInput(e.target.value)}
+          onPaste={onPaste}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
@@ -356,7 +630,7 @@ export default function ChatPanel({
           type="button"
           className="chat-panel__send-btn"
           onClick={handleSend}
-          disabled={sending || input.trim().length === 0}
+          disabled={sending || attaching || (input.trim().length === 0 && !attachment)}
           aria-label={t('send')}
           title={t('send')}
         >
@@ -367,5 +641,38 @@ export default function ChatPanel({
         </button>
       </div>
     </div>
+  );
+}
+
+/** Render a message attachment: an inline image thumbnail, or a file chip. */
+function Attachment({ att, openLabel }: { att: ChatAttachment; openLabel: string }) {
+  const isImage = att.mime.startsWith('image/');
+  if (isImage) {
+    return (
+      <a href={att.url} target="_blank" rel="noopener noreferrer" title={att.name} aria-label={openLabel}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={att.url}
+          alt={att.name}
+          style={{ maxWidth: 220, maxHeight: 220, borderRadius: 6, marginTop: 4, display: 'block' }}
+        />
+      </a>
+    );
+  }
+  return (
+    <a
+      href={att.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="chat-panel__file-chip d-inline-flex align-items-center gap-1 mt-1"
+      style={{ fontSize: '0.8rem', textDecoration: 'none' }}
+      title={att.name}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+      </svg>
+      <span className="text-truncate" style={{ maxWidth: 180 }}>{att.name}</span>
+    </a>
   );
 }

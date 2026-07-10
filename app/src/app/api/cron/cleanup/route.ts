@@ -169,6 +169,13 @@ export const GET = withErrorHandling(async (request) => {
         select: { blobPath: true },
       });
 
+      // Chat attachment blobs (files domain, assets/ prefix) — capture before
+      // the rows are deleted so we can purge the underlying blobs afterwards.
+      const chatAttachmentBlobs = await prisma.chatMessage.findMany({
+        where: { eventId: evt.id, attachmentBlobPath: { not: null } },
+        select: { attachmentBlobPath: true },
+      });
+
       const result = await prisma.$transaction(async (tx) => {
         const upvotesDeleted = await tx.questionUpvote.deleteMany({
           where: { question: { eventId: evt.id } },
@@ -338,6 +345,12 @@ export const GET = withErrorHandling(async (request) => {
         for (const m of fileMaterialBlobs) {
           if (m.blobPath) {
             const ok = await deleteBlob(m.blobPath).catch(() => false);
+            if (ok) totalMaterialBlobsDeleted++;
+          }
+        }
+        for (const c of chatAttachmentBlobs) {
+          if (c.attachmentBlobPath) {
+            const ok = await deleteBlob(c.attachmentBlobPath).catch(() => false);
             if (ok) totalMaterialBlobsDeleted++;
           }
         }

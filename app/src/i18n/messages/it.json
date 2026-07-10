@@ -323,7 +323,19 @@
       "noMessages": "Nessun messaggio",
       "empty": "Nessun messaggio ancora. Scrivi per primo!",
       "inputLabel": "Messaggio chat",
-      "moderatorBadge": "Moderatore"
+      "moderatorBadge": "Moderatore",
+      "attach": "Allega un file",
+      "attachBadType": "Tipo di file non supportato (immagini o PDF).",
+      "attachTooLarge": "File troppo grande (max 10 MB).",
+      "attachFailed": "Caricamento non riuscito. Riprova.",
+      "sendFailed": "Invio non riuscito. Riprova.",
+      "removeAttachment": "Rimuovi allegato",
+      "openAttachment": "Apri allegato",
+      "reply": "Rispondi",
+      "replyingTo": "In risposta a {name}",
+      "cancelReply": "Annulla risposta",
+      "hide": "Nascondi",
+      "hideFailed": "Impossibile nascondere il messaggio. Riprova."
     },
     "role": {
       "moderator": "Moderatore",
