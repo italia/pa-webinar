@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import RubricaPicker, {
   type RubricaPickedPerson,
 } from '@/components/admin/rubrica-picker';
+import FileOrUrlInput from '@/components/ui/file-or-url-input';
 
 export interface OrganizerEntry {
   name: string;
@@ -209,6 +210,15 @@ function OrganizersSection({
             onChange={(e) =>
               setDraft({ ...draft, websiteUrl: e.target.value || null })
             }
+          />
+        </div>
+        <div className="col-12">
+          <FileOrUrlInput
+            id="org-logo"
+            label={t('organizerLogo')}
+            assetType="image"
+            value={draft.logoUrl}
+            onChange={(v) => setDraft({ ...draft, logoUrl: v })}
           />
         </div>
         <div className="col-md-2">

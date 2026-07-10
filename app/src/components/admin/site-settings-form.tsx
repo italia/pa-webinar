@@ -18,6 +18,7 @@ import {
 } from 'design-react-kit';
 import type { SiteSetting } from '@prisma/client';
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';
 
 type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features' | 'scaling' | 'postprod';
@@ -390,38 +391,24 @@ function BrandingTab({ settings, updateField }: TabProps) {
       <Row>
         <Col md={6}>
           <FormGroup>
-            <Label htmlFor="logoUrl">{t('logoUrl')}</Label>
-            <Input
+            <FileOrUrlInput
               id="logoUrl"
-              type="url"
-              value={settings.logoUrl ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('logoUrl', e.target.value || null)
-              }
+              label={t('logoUrl')}
+              assetType="image"
+              value={settings.logoUrl ?? null}
+              onChange={(v) => updateField('logoUrl', v)}
+              helpText={t('logoUrlHelp')}
             />
-            <small className="text-muted">{t('logoUrlHelp')}</small>
-            {settings.logoUrl && (
-              <div className="mt-2 p-2 bg-light rounded">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={settings.logoUrl}
-                  alt="Logo preview"
-                  style={{ maxHeight: 48 }}
-                />
-              </div>
-            )}
           </FormGroup>
         </Col>
         <Col md={6}>
           <FormGroup>
-            <Label htmlFor="faviconUrl">{t('faviconUrl')}</Label>
-            <Input
+            <FileOrUrlInput
               id="faviconUrl"
-              type="url"
-              value={settings.faviconUrl ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('faviconUrl', e.target.value || null)
-              }
+              label={t('faviconUrl')}
+              assetType="image"
+              value={settings.faviconUrl ?? null}
+              onChange={(v) => updateField('faviconUrl', v)}
             />
           </FormGroup>
         </Col>
@@ -444,16 +431,14 @@ function BrandingTab({ settings, updateField }: TabProps) {
       {settings.jitsiWatermarkEnabled && (
         <>
           <FormGroup>
-            <Label htmlFor="jitsiWatermarkUrl">{tw('url')}</Label>
-            <Input
+            <FileOrUrlInput
               id="jitsiWatermarkUrl"
-              type="url"
-              value={settings.jitsiWatermarkUrl ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('jitsiWatermarkUrl', e.target.value || null)
-              }
+              label={tw('url')}
+              assetType="image"
+              value={settings.jitsiWatermarkUrl ?? null}
+              onChange={(v) => updateField('jitsiWatermarkUrl', v)}
+              helpText={tw('urlHelp')}
             />
-            <small className="text-muted">{tw('urlHelp')}</small>
           </FormGroup>
 
           <Row>
@@ -557,26 +542,14 @@ function SeoTab({ settings, updateField }: TabProps) {
         <small className="text-muted">{t('descriptionHelp')}</small>
       </FormGroup>
       <FormGroup>
-        <Label htmlFor="seoImage">{t('image')}</Label>
-        <Input
+        <FileOrUrlInput
           id="seoImage"
-          type="url"
-          value={settings.seoImage ?? ''}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            updateField('seoImage', e.target.value || null)
-          }
+          label={t('image')}
+          assetType="image"
+          value={settings.seoImage ?? null}
+          onChange={(v) => updateField('seoImage', v)}
+          helpText={t('imageHelp')}
         />
-        <small className="text-muted">{t('imageHelp')}</small>
-        {settings.seoImage && (
-          <div className="mt-2 p-2 bg-light rounded">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={settings.seoImage}
-              alt="OG image preview"
-              style={{ maxHeight: 120, maxWidth: '100%' }}
-            />
-          </div>
-        )}
       </FormGroup>
     </div>
   );
@@ -977,26 +950,14 @@ function HeaderTab({ settings, updateField }: TabProps) {
       <Row>
         <Col md={6}>
           <FormGroup>
-            <Label htmlFor="hdr-logo">{t('logoUrl')}</Label>
-            <Input
+            <FileOrUrlInput
               id="hdr-logo"
-              type="url"
-              value={settings.logoUrl ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('logoUrl', e.target.value || null)
-              }
+              label={t('logoUrl')}
+              assetType="image"
+              value={settings.logoUrl ?? null}
+              onChange={(v) => updateField('logoUrl', v)}
+              helpText={t('logoUrlHelp')}
             />
-            <small className="text-muted">{t('logoUrlHelp')}</small>
-            {settings.logoUrl && (
-              <div className="mt-2 p-2 bg-light rounded">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={settings.logoUrl}
-                  alt="Logo preview"
-                  style={{ maxHeight: 48 }}
-                />
-              </div>
-            )}
           </FormGroup>
         </Col>
         <Col md={6}>

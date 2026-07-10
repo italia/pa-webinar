@@ -537,6 +537,7 @@
         "organizerName": "Contact name",
         "organizerOrganization": "Organization",
         "organizerWebsite": "Website",
+        "organizerLogo": "Organizer logo",
         "organizerRequired": "Contact name and organization are required.",
         "moderatorsHeading": "Moderators",
         "moderatorsHelp": "Additional co-moderators: each receives their own link to manage the session and permissions during the event. The primary moderator (required contact) is set in the last step, “Review”.",
