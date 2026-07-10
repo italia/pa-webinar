@@ -16,13 +16,16 @@
  *     /api/admin/publications/upload-url.
  *
  * Security notes:
- *   - Gated by the `admin_session` JWT cookie (same as every /admin API).
- *   - MIME is cross-checked: the declared `file.type` must be in the
- *     allow-list for the requested `type`. Extension is not trusted.
- *   - Size cap is enforced *after* reading the buffer (hard cap in MiB).
- *     Next.js's built-in body limit (~ default 1MB for actions, but
- *     route handlers accept multipart normally) means the 25 MiB ceiling
- *     here is the practical upper bound.
+ *   - Gated by the `admin_session` JWT cookie (same as every /admin API),
+ *     plus a per-IP rate limit.
+ *   - MIME is validated in two stages: the declared `file.type` must be in
+ *     the allow-list for the requested `type`, AND the file's real magic
+ *     bytes must match that declared type (contentMatchesDeclaredMime).
+ *     Extension is not trusted.
+ *   - Size is capped three ways: an early Content-Length pre-check (before
+ *     buffering), the File#size, and a post-read byte-length check.
+ *   - Uploads land in a PRIVATE container and are served back through
+ *     /api/assets with nosniff + attachment-for-non-inline-safe headers.
  */
 
 import { randomUUID } from 'crypto';
@@ -33,7 +36,13 @@ import type { NextRequest } from 'next/server';
 import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
-import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import {
+  AppError,
+  RateLimitError,
+  UnauthorizedError,
+  ValidationError,
+} from '@/lib/errors';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { getFilesStorage } from '@/lib/storage';
 import { getPublicEnv } from '@/lib/env';
 import {
@@ -41,6 +50,7 @@ import {
   sanitizeFilename,
   type AssetType,
 } from '@/lib/utils/asset-key';
+import { contentMatchesDeclaredMime } from '@/lib/utils/mime-sniff';
 
 export const dynamic = 'force-dynamic';
 
@@ -88,8 +98,26 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) throw new UnauthorizedError();
 
+  const ip = getClientIp(request);
+  const rl = rateLimit(`asset-upload:${ip}`, { limit: 30, windowMs: 60_000 });
+  if (!rl.allowed) {
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
+  }
+
   const url = new URL(request.url);
   const type = assertAssetKind(url.searchParams.get('type'));
+
+  // Reject oversized bodies BEFORE buffering the whole multipart payload into
+  // memory. Content-Length includes multipart framing overhead, so allow a
+  // small margin over the type's byte cap.
+  const declaredLen = Number(request.headers.get('content-length') ?? '');
+  if (Number.isFinite(declaredLen) && declaredLen > MAX_SIZE[type] + 4096) {
+    throw new AppError(
+      `File too large: declared ${declaredLen} bytes exceeds ${MAX_SIZE[type]} byte cap for assetType=${type}`,
+      413,
+      'PAYLOAD_TOO_LARGE',
+    );
+  }
 
   const storage = getFilesStorage();
   if (!storage) {
@@ -152,6 +180,17 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
   const buffer = Buffer.from(arrayBuffer);
 
+  // Defense-in-depth: the declared MIME is client-controlled and was only
+  // checked against the allow-list above. Sniff the real magic bytes and
+  // reject a mismatch so arbitrary content can't masquerade as an allowed type.
+  if (!contentMatchesDeclaredMime(buffer, mime)) {
+    throw new AppError(
+      `File content does not match declared MIME type "${mime}"`,
+      415,
+      'UNSUPPORTED_MEDIA_TYPE',
+    );
+  }
+
   const originalName = fileField.name || 'upload';
   const key = buildAssetKey(type, originalName, { uuid: randomUUID() });
 
@@ -172,9 +211,15 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   // strip the `assets/` prefix here because the serving route re-adds it (and
   // only ever serves that prefix). Absolute when NEXT_PUBLIC_APP_URL is set so
   // the value works as an og:image too.
-  const appBase = getPublicEnv('NEXT_PUBLIC_APP_URL').replace(/\/+$/, '');
+  // Always absolute: consumers persist this via schemas that require an
+  // absolute URL (materials, site settings). Prefer the configured public
+  // origin; fall back to the request origin when NEXT_PUBLIC_APP_URL is unset
+  // so dev/test deployments don't produce a relative URL the DB layer rejects.
+  const appBase =
+    getPublicEnv('NEXT_PUBLIC_APP_URL').replace(/\/+$/, '') ||
+    new URL(request.url).origin;
   const servePath = `/api/assets/${key.replace(/^assets\//, '')}`;
-  const servedUrl = appBase ? `${appBase}${servePath}` : servePath;
+  const servedUrl = `${appBase}${servePath}`;
 
   await logAdminAction({
     request,

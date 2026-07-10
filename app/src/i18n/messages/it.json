@@ -622,6 +622,7 @@
         "organizerName": "Referente",
         "organizerOrganization": "Organizzazione",
         "organizerWebsite": "Sito web",
+        "organizerLogo": "Logo organizzatore",
         "organizerRequired": "Referente e organizzazione sono obbligatori.",
         "moderatorsHeading": "Moderatori",
         "moderatorsHelp": "Co-moderatori aggiuntivi: ognuno riceve un proprio link per gestire la sessione e i permessi durante l'evento. Il moderatore principale (contatto obbligatorio) si imposta nell'ultimo step, «Riepilogo».",
