@@ -11,6 +11,22 @@
 
 import { getRedis, getRedisSubscriber } from '@/lib/redis';
 
+/** A file/image attached to a chat message. Never carries bytes — just a
+ * reference the client fetches from the access-controlled serving route. */
+export interface ChatAttachmentRef {
+  url: string; // absolute app-served URL
+  name: string; // original filename (decrypted; plaintext on the wire like text)
+  mime: string;
+  size: number;
+}
+
+/** A compact quote of the message being replied to. */
+export interface ChatReplyRef {
+  id: string;
+  senderName: string; // decrypted
+  text: string; // decrypted, truncated snippet
+}
+
 export interface ChatEnvelope {
   id: string;
   eventId: string;
@@ -19,6 +35,10 @@ export interface ChatEnvelope {
   isModerator: boolean;
   text: string;
   createdAt: string; // ISO
+  // Optional single attachment reference (no bytes on the wire).
+  attachment?: ChatAttachmentRef;
+  // Optional quote of the parent message this one replies to.
+  replyTo?: ChatReplyRef;
   // When set to 'delete' the subscriber hides the message instead of
   // appending. Covers the moderation path (hide message live without
   // the sender having to refresh).

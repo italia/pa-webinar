@@ -543,11 +543,28 @@ model ChatMessage {
   hiddenAt DateTime? @map("hidden_at")
   hiddenBy String?   @map("hidden_by")
 
+  // Reply/quote: optional self-reference to the message being replied to.
+  // SetNull on delete so hiding/removing a parent doesn't cascade-delete
+  // replies (the UI degrades a dangling reply to "messaggio rimosso").
+  replyToId String?       @map("reply_to_id") @db.Uuid
+  replyTo   ChatMessage?  @relation("ChatReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   ChatMessage[] @relation("ChatReply")
+
+  // Optional single attachment. attachmentBlobPath is an opaque storage key
+  // (not PII, plaintext). attachmentName is the original filename (PII →
+  // encrypted at rest via encryptPII, read via tryDecryptPII). mime/size are
+  // not PII. Only authenticated senders may attach (see chat upload route).
+  attachmentBlobPath String? @map("attachment_blob_path")
+  attachmentName     String? @map("attachment_name")
+  attachmentMime     String? @map("attachment_mime")
+  attachmentSize     BigInt? @map("attachment_size")
+
   createdAt DateTime @default(now()) @map("created_at")
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId, createdAt])
+  @@index([replyToId])
   @@map("chat_messages")
 }
 

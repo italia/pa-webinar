@@ -2018,6 +2018,7 @@ function LiveSidebar({
                 token={token}
                 displayName={displayName}
                 isGuest={!token}
+                isModerator={isModerator}
                 active={isChatActive}
                 onUnreadCountChange={setChatUnread}
               />

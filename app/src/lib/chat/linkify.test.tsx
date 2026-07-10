@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { isValidElement, type ReactNode } from 'react';
 
-import { linkifyChat } from './linkify';
+import { linkifyChat, renderChatBody } from './linkify';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const props = (n: ReactNode): any => (n as any).props;
 const anchors = (nodes: ReactNode[]) => nodes.filter((n) => isValidElement(n));
+const elements = (nodes: ReactNode[]) => nodes.filter((n) => isValidElement(n));
 
 describe('linkifyChat', () => {
   it('returns plain text unchanged when there is no URL', () => {
@@ -49,5 +50,40 @@ describe('linkifyChat', () => {
   it('preserves query string and fragment in the href', () => {
     const nodes = linkifyChat('https://a.com/p?x=1&y=2#h');
     expect(props(anchors(nodes)[0]).href).toBe('https://a.com/p?x=1&y=2#h');
+  });
+});
+
+describe('renderChatBody (mentions + links)', () => {
+  it('leaves plain text without mentions untouched', () => {
+    expect(renderChatBody('ciao a tutti')).toEqual(['ciao a tutti']);
+  });
+
+  it('wraps a @mention in a highlight span', () => {
+    const nodes = renderChatBody('grazie @Mario per il punto');
+    const spans = elements(nodes);
+    expect(spans).toHaveLength(1);
+    expect(props(spans[0]).className).toBe('chat-mention');
+    expect(props(spans[0]).children).toEqual(['@', 'Mario']);
+  });
+
+  it('marks a mention of the current user as self', () => {
+    const nodes = renderChatBody('@Anna guarda qui', 'Anna Bianchi');
+    const span = elements(nodes)[0];
+    expect(props(span).className).toBe('chat-mention chat-mention--self');
+  });
+
+  it('still linkifies URLs alongside mentions', () => {
+    const nodes = renderChatBody('@Bob vedi https://x.com ok');
+    const els = elements(nodes);
+    // one mention span + one anchor
+    expect(els.length).toBe(2);
+    const hasAnchor = els.some((e) => props(e).href === 'https://x.com');
+    expect(hasAnchor).toBe(true);
+  });
+
+  it('does not treat an email local-part as a mention', () => {
+    // "@" not at a word boundary (preceded by a letter) is not a mention.
+    const nodes = renderChatBody('scrivimi a mario@example.com');
+    expect(elements(nodes).filter((e) => props(e).className?.startsWith('chat-mention'))).toHaveLength(0);
   });
 });
