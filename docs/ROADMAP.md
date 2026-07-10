@@ -1,6 +1,6 @@
 # Roadmap — pa-webinar
 
-Allineata al 2026-04-24. Le versioni spedite sono riassunte in forma compatta; le voci pianificate mantengono nota/effort dove utile.
+Allineata al 2026-07-11. In produzione: **v0.7.1** (v0.8.0 in corso). Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici (v0.8 / v0.9 / v1.0 / backlog) rispetto allo stato attuale del codice.
 
 ## v0.1.0 — MVP ✅
 
@@ -90,60 +90,77 @@ Rilasciati tra v0.3.8 e v0.3.44, a seguito del feedback post-demo 2026-04-16.
 - **Screenshare banner** ✅ — banner arancione quando un partecipante remoto inizia a condividere lo schermo
 - **CallSession always-on** ✅ — ogni evento live produce una `CallSession` anche senza recording, aperta al primo `videoConferenceJoined` via `POST /api/events/:slug/sessions` e chiusa dallo scaler su `LIVE→IDLE` / `*→ENDED`
 
+## v0.5.0 – v0.7.x — Spedite ✅
+
+Rilasciate in produzione tra v0.5 e v0.7.1. Voci che le versioni precedenti di questa roadmap elencavano ancora come "pianificate/in corso" ma che sono **live**:
+
+- **Servizio AI post-evento** ✅ — pipeline in-cluster (vincolo sovranità, nessuna API esterna): trascrizione WhisperX + speaker attribution (pyannote 3.1), sintesi "verbale PA" (vLLM Qwen3-32B), traduzione EN/FR di transcript + sintesi, **sottotitoli WebVTT multilingua nel player**, dubbing (Piper). Coda Postgres-outbox + orchestrator CronJob + GPU nodepool A100 scale-to-zero. Vedi [`docs/POSTPROD.md`](POSTPROD.md)
+- **Editor trascrizione post-evento** ✅ — correzione testo + riassegnazione speaker per segmento, **timeline + waveform** (`WAVEFORM_JSON`), export WebVTT/SRT/TXT. (Resta: rigenerazione automatica di traduzioni/dub dopo un edit → v0.9)
+- **Recorder multi-traccia (ADR-013)** ✅ — cattura audio per-partecipante per speaker attribution reale; **metrica di affidabilità** dell'elaborazione AI nel pannello admin (v0.6.9)
+- **Roster relatori editabile + player solo-audio** ✅ (v0.7.0) — rinomina degli speaker riconosciuti; se manca il video, player solo-audio per correggere testo/speaker
+- **Ruolo Relatore (SPEAKER)** ✅ — `EventModeratorRole.SPEAKER`: mic/camera/share senza poteri di moderazione, cablato nel JWT Jitsi
+- **Questionari pre/post evento** ✅ e **Rubrica/Person** ✅ — vedi v0.4 (fase A/B completate)
+- **Upload materiali (FILE) + immagine cover evento** ✅ — upload diretto via `StorageProvider` (non più solo link/URL esterni)
+- **Statistiche post-evento** ✅ (v0.7.1) — tab "Statistiche" per evento: andamento interazione nel tempo (picco), classifica di chi ha parlato di più, grado di attenzione, **alzate di mano**, **reazioni**, **permanenza media** (dwell/retention). Route admin + `lib/analytics` puro
+- **Dashboard Grafana** ✅ — template `infra/grafana/pa-webinar-dashboard.json` deployabile via Helm, su metriche prom-client
+- **Trasparenza service-inventory su prod** ✅ — pubblicata via ConfigMap + `SERVICE_INVENTORY_URL` relativo (l'automazione Azure CronJob → Blob pubblico resta opzionale)
+- **Changelog pubblico** ✅ — `/changelog` allineato alle release, evidenzia la "Versione attuale"
+
 ## Da fare prima del rilascio pubblico
 
-| Item | Effort |
+| Item | Stato |
 |---|---|
-| Ritocco testi e layout | 1 giorno |
-| Test E2E Playwright (flussi critici) | 2-3 giorni |
-| Smoke test su AKS reale | 1 giorno |
-| Screenshot per README | 0.5 giorni |
-| Evento pilota interno DTD | 1 giorno |
+| Smoke test su AKS reale | ✅ fatto (prod live con eventi reali) |
+| Evento pilota interno DTD | ✅ fatto (Caffettino + eventi v0.6/v0.7) |
+| Ritocco testi e layout | ✅ in gran parte (passaggi UX v0.6.x) |
+| Test E2E Playwright (batteria flussi critici) | 🟡 parziale (solo smoke waiting-room/registrazione) → **v0.8** |
+| Screenshot per README | ❌ da fare → **v0.8** |
 
-Flussi critici Playwright: registrazione con campi ente, login admin + creazione + pubblicazione evento, ingresso sala (moderatore + partecipante), Q&A (invio/upvote/moderazione), polling (creazione/voto/risultati), cambio lingua senza reload, GDPR cleanup, download `.ics`, responsive mobile, chat in-app real-time multi-pod.
+Flussi critici Playwright ancora da coprire: login admin + creazione + pubblicazione evento, ingresso sala (moderatore + partecipante), Q&A (invio/upvote/moderazione), polling, cambio lingua senza reload, GDPR cleanup, download `.ics`, responsive mobile, chat in-app real-time multi-pod.
 
-## v0.5.0 — Pianificata
+## v0.8.0 — In corso / prossima
 
 | Feature | Note |
 |---|---|
-| **HLS live streaming** | Audience passiva illimitata senza caricare JVB. Jibri → RTMP → ffmpeg HLS → Blob → player |
-| **Ruolo Relatore (speaker)** | Mic/video/share senza poteri admin. Intermedio tra moderatore e partecipante |
-| **Breakout rooms** | Sottogruppi durante l'evento — Jitsi nativo, da esporre nella UI |
-| **Servizio AI — trascrizioni, sottotitoli, sintesi** 🟡 in corso | Modulo `lib/ai/` con provider in-cluster (vincolo sovranità: niente API esterne). MVP+V1 spediti: trascrizione post-evento (WhisperX + pyannote 3.1) con speaker attribution, sintesi "verbale PA" via vLLM Qwen3-32B in-cluster, traduzione EN/FR per transcript + summary, sottotitoli WebVTT multilingua nel player. Coda Postgres-outbox; orchestrator CronJob + GPU node pool (Italy North NC24ads_A100_v4) scale-to-zero. Vedi [`docs/POSTPROD.md`](POSTPROD.md). Pendenti: sottotitoli live (v1.0.0), wizard integration, post-event tab |
-| **Questionari pre e post evento — fase A** ✅ (spedita) | Modelli `QuestionTemplate`, `QuestionItem` (single/multi/yes_no/likert/open_text), `EventQuestionnaire` con placement `pre_registration` o `post_event`, `QuestionnaireResponse` + `QuestionnaireAnswer`. Admin: `/admin/questionnaires` per gestire template riusabili + sezione nel wizard (step 4 Contenuti) per collegare template e aggiungere domande ad hoc. Dashboard risposte in `/admin/questionnaires` con filtri. Nessuna identità cross-evento: risposte legate alla registrazione, scadono con retention evento |
-| **Rubrica + identità Persona — fase B** ✅ (spedita) | ADR-011 (`docs/adr/011-person-rubrica.md`). Modello `Person` distinto da `Registration`: identità minima (emailHash, displayName, organization, role) con opt-in esplicito separato. Admin: `/admin/rubrica` (lista persone, dettaglio, export), RubricaPicker nel wizard (step Inviti) per inviti multi-select. Opt-out via signed HMAC token (`src/lib/persons/opt-out-token.ts`), cron retention per inattività (`/api/cron/rubrica-retention`, default 24 mesi) |
-| **Upload file nei materiali** | Attualmente solo link — upload diretto via `StorageProvider` (Azure Blob / S3 / …) |
-| **Upload immagine evento** | Cover image tramite storage provider invece di URL esterno |
-| **Automazione OPS service-inventory su prod** | Applicare CronJob `infra/service-inventory/azure/` su tenant produttivo, flippare `SERVICE_INVENTORY_URL` al Blob pubblico; runbook in `docs/SERVICE-INVENTORY-GENERATION.md` |
-| **HA Redis / migrazione Valkey** | Solo se si introduce una feature con Redis in path critico (rate-limit distribuito, cache sessione). `architecture: replication` 1+2+3-sentinel. Cost ~3× |
+| **Upload completi + hardening** 🟢 in corso | Upload immagini ovunque (logo/favicon/OG/watermark/organizzatore), materiali salvati come `FILE` con `blobPath` (sblocca il cleanup dei blob), hardening sicurezza (nosniff + `Content-Disposition` sul serving, sniff magic-byte, rate-limit, pre-check `Content-Length`), fix `DELETE` recording/session sul dominio storage corretto |
+| **Allegati in chat (F16)** 🟢 in corso | Upload allegati (immagini/documenti) in chat live: gating a soli utenti autenticati (no guest anonimi), allowlist MIME stretta + size + rate-limit dedicati, rotta di moderazione (`hiddenAt` + `op:'delete'` già previsti nell'envelope), serving con accesso controllato, cleanup blob in retention |
+| **Chat: @menziona + rispondi/quote** 🟢 in corso | `@nome` con autocomplete dalla roster + rendering evidenziato; `replyToId` con citazione dello snippet del messaggio padre |
+| **SSE/WebSocket per Q&A** | Sostituire il polling SWR 3s riusando l'infra SSE già provata per la chat (scala a 300+) |
+| **Batteria E2E Playwright** + **screenshot README** | Chiudere i requisiti pre-rilascio pubblico |
 
-## v0.6.0 — Futura
+## v0.9.0 — Pianificata
 
 | Feature | Note |
 |---|---|
-| **SPID/CIE** | Autenticazione partecipanti con identità digitale italiana |
-| **Microsoft Graph API** | Outlook RSVP → auto-registrazione, Teams calendar sync |
-| **Export report PDF** | Statistiche evento, Q&A, poll, partecipanti — documento scaricabile |
-| **Tagging e capitoli video** | Moderatore aggiunge marker durante evento → capitoli nel player |
-| **Offuscamento video** | Volti/voci offuscati prima della pubblicazione (GDPR-by-design) |
-| **SSE/WebSocket per Q&A** | Sostituire polling 3s per scalare a 300+ utenti |
-| **Redis per rate-limiting distribuito** | Necessario se HPA multi-replica attivo |
-| **Editor trascrizione post-evento** 🟢 base spedita | Editor admin per segmento: correzione testo + riassegnazione speaker, riscrittura `TRANSCRIPT_JSON` + rigenerazione `TRANSCRIPT_VTT` sorgente + ricalcolo `totalSpeechSec`. Export WebVTT/SRT/TXT già attivo (download endpoint). Pendenti: timeline + waveform, rigenerazione automatica di traduzioni/dub dopo l'edit |
-| **Ricerca full-text trascrizioni** | PostgreSQL `tsvector` sufficiente per volumi previsti |
-| **Questionario AI-assisted** | Pre-compilazione automatica del questionario post-evento dai temi emersi nella trascrizione (richiede servizio AI + modello `EventQuestionnaire` di v0.5.0) |
+| **Export report PDF** | Statistiche evento + Q&A + poll + partecipanti in un documento scaricabile (naturale seguito della tab Statistiche) |
+| **Rate-limiting distribuito (Redis)** | Il limiter è in-memory per-pod; con HPA multi-replica serve un contatore globale |
+| **Ricerca full-text trascrizioni** | `tsvector` PostgreSQL per la libreria video (oggi solo ricerca client dentro una singola trascrizione) |
+| **Tagging e capitoli video (live)** | Marker del moderatore durante l'evento → capitoli nel player (i capitoli AI esistono già; mancano quelli autoriali live) |
+| **API pubblica documentata** | Lo spec OpenAPI 3.1 è già servito da `/api/openapi.json`; restano docs UI (Swagger/Redoc), garanzie di stabilità e storia auth |
+| **Rigenerazione AI dopo edit trascrizione** | Rigenerare automaticamente traduzioni/dub quando un segmento viene corretto |
 
 ## v1.0.0 — Visione
 
 | Feature | Note |
 |---|---|
-| **Multi-tenancy** | Più enti sullo stesso portale con branding separato |
-| **App mobile** | React Native con Jitsi SDK |
-| **Registrazione multi-camera** | Speaker + slide separati |
-| **Live subtitles** | Sottotitoli in tempo reale (Jigasi + Whisper streaming) |
-| **Marketplace template eventi** | Webinar, workshop, conferenza, Q&A session |
-| **API pubblica documentata** | OpenAPI spec per integrazioni di terze parti |
-| **Dashboard Grafana** | Template dashboard per monitoring operativo |
-| **Runbook operativo** | Guida on-call per troubleshooting produzione |
+| **Sottotitoli live** | Real-time (Jigasi + Whisper streaming). Oggi i sottotitoli sono solo post-evento (WebVTT) per scelta |
+| **Multi-tenancy** | Più enti su un unico portale con branding separato (oggi: white-label singola istanza via `SiteSetting` + deploy separati per tenant) |
+| **Questionario AI-assisted** | Pre-compilazione del questionario post-evento dai temi della trascrizione (prerequisiti — AI + questionari — già presenti) |
+| **Runbook operativo on-call** | Guida consolidata di troubleshooting produzione (oggi frammenti in DEPLOYMENT/POSTPROD) |
+
+## Backlog / condizionale
+
+Voci reali ma non pianificate a breve (grandi, di nicchia, o attivate solo da un trigger):
+
+- **SPID/CIE** — autenticazione partecipanti con identità digitale italiana
+- **Microsoft Graph API** — Outlook RSVP → auto-registrazione, sync calendario Teams
+- **Breakout rooms** — sottogruppi (Jitsi nativo oggi *disabilitato*, non esposto)
+- **Offuscamento video** — blur volti/voci pre-pubblicazione (GDPR-by-design)
+- **HLS live streaming** — audience passiva illimitata senza caricare JVB (Jibri → RTMP → HLS → Blob → player)
+- **App mobile** — React Native + Jitsi SDK (oggi: web responsive)
+- **Registrazione multi-camera** — speaker + slide separati (il multi-traccia attuale è audio per attribution)
+- **Marketplace template eventi** — catalogo condivisibile cross-PA (oggi: template interni riusabili)
+- **HA Redis / migrazione Valkey** — solo se Redis entra in un path critico (rate-limit distribuito, cache sessione)
 
 ## Contribuire
 
