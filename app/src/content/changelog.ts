@@ -28,6 +28,17 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.7.2',
+    date: '2026-07-15',
+    title: 'Chat più ricca: allegati, risposte e menzioni',
+    notes: [
+      'In chat è ora possibile inviare immagini e allegati (PNG, JPEG, WebP, GIF e PDF, fino a 10 MB), con anteprima direttamente nel messaggio.',
+      'Nuova funzione “Rispondi”: si può citare un messaggio specifico e la citazione resta visibile nel filo della conversazione.',
+      'Menzioni con @: è possibile richiamare un partecipante per nome all’interno di un messaggio.',
+      'Moderazione della chat: i moderatori possono rimuovere singoli messaggi durante l’evento.',
+    ],
+  },
+  {
     version: '0.7.1',
     date: '2026-07-09',
     title: 'Statistiche post-evento per ogni evento',
