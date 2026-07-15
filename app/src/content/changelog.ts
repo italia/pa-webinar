@@ -28,6 +28,14 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.7.5',
+    date: '2026-07-16',
+    title: 'La mano alzata resta alzata',
+    notes: [
+      'Quando alzi la mano ora resta alzata finché non la abbassi tu (o un moderatore la gestisce): prima si abbassava da sola nel momento in cui iniziavi a parlare, facendoti “sparire” dalla coda degli interventi.',
+    ],
+  },
+  {
     version: '0.7.4',
     date: '2026-07-15',
     title: 'Nome in chat protetto dai link inoltrati (sicurezza)',

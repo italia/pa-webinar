@@ -133,6 +133,18 @@ export const jitsiConfigOverwrite = {
   notifications: [] as string[],
   disableReactions: true,
 
+  // F8 — keep a raised hand UP until the user lowers it or a moderator handles
+  // it. Stock Jitsi auto-lowers the hand the moment the participant becomes the
+  // dominant speaker (starts talking), which testers found confusing ("ho alzato
+  // la mano e sparisce appena parlo"). MUST be the NESTED form on our served
+  // build (jitsi/web stable 10741): the selector reads only
+  // config.raisedHands?.disableRemoveRaisedHandOnFocus — the legacy TOP-LEVEL
+  // `disableRemoveRaisedHandOnFocus` is deprecated and a silent no-op there, so
+  // do NOT flatten this key.
+  raisedHands: {
+    disableRemoveRaisedHandOnFocus: true,
+  },
+
   breakoutRooms: {
     hideAddRoomButton: true,
     hideAutoAssignButton: true,
