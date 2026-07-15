@@ -972,6 +972,14 @@ recorder:
   # Immagine del bot recorder (Puppeteer + lib-jitsi-meet, un'audio-track per
   # partecipante). Gira sul pool NORMALE, non GPU.
   image: ghcr.io/italia/pa-webinar-recorder:dev
+  # NOTE on stale images: with a MUTABLE tag like `:dev`, IfNotPresent may reuse
+  # a node's cached (possibly outdated) layer for that tag. Prod sets `Always`
+  # via a values override so each recorder Job re-pulls the current `:dev` — the
+  # per-track audio fix landed in recorder commit 9739d70, and a cached pre-fix
+  # layer captures only silence. The chart DEFAULT stays IfNotPresent so an
+  # offline / air-gapped cluster that pre-loads the image (or a registry outage)
+  # doesn't turn every recording into ImagePullBackOff. When you enable the
+  # recorder with registry access, pin an immutable digest or set `Always`.
   imagePullPolicy: IfNotPresent
   imagePullSecrets: []
   # Dominio Jitsi per il bot; se vuoto usa app.env.NEXT_PUBLIC_JITSI_DOMAIN.

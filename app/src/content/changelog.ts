@@ -28,6 +28,15 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.7.6',
+    date: '2026-07-16',
+    title: 'Volume per partecipante',
+    notes: [
+      'Nuovo controllo del volume per singolo partecipante nel pannello “Partecipanti”: se una voce si sente troppo alta o troppo bassa, la regoli solo per te, senza cambiare l’audio degli altri.',
+      'Registrazione audio separata per-partecipante (per la post-produzione) più affidabile: se la cattura risulta muta, il sistema lo rileva subito ed evita di generare trascrizioni vuote.',
+    ],
+  },
+  {
     version: '0.7.5',
     date: '2026-07-16',
     title: 'La mano alzata resta alzata',
