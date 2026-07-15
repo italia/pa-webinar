@@ -62,6 +62,13 @@ ENV NEXT_PUBLIC_JITSI_DOMAIN=$NEXT_PUBLIC_JITSI_DOMAIN
 ENV NEXT_PUBLIC_WATERMARK_URL=$NEXT_PUBLIC_WATERMARK_URL
 ENV NEXT_PUBLIC_DEFAULT_LOCALE=$NEXT_PUBLIC_DEFAULT_LOCALE
 
+# F18: leave EMPTY to keep the safe default (advanced rnnoise noise-cancellation
+# forced OFF, working around jitsi/web:stable-10741 silencing non-48kHz mics).
+# Set to "false" ONLY after bumping the served Jitsi web image to a build with a
+# fixed rnnoise worklet, then re-validate audio on a live call.
+ARG NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE=
+ENV NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE=$NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE
+
 # Build identity — inlined by webpack so the footer can render version + sha.
 # BUILD_CHANNEL is `dev` for rolling :dev builds and `release` for tagged v*
 # pushes; the footer uses it to pick between commit link and release link.

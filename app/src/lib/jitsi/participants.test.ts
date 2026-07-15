@@ -35,7 +35,14 @@ describe('isHumanParticipant', () => {
 });
 
 describe('humanParticipantCount', () => {
-  const api = (total: number, remotes: Array<{ displayName?: string | null }>) => ({
+  const api = (
+    total: number,
+    remotes: Array<{
+      id?: string | null;
+      displayName?: string | null;
+      formattedDisplayName?: string | null;
+    }>,
+  ) => ({
     getNumberOfParticipants: () => total,
     getParticipantsInfo: () => remotes,
   });
@@ -59,5 +66,68 @@ describe('humanParticipantCount', () => {
 
   it('handles an API without getParticipantsInfo (returns the raw total)', () => {
     expect(humanParticipantCount({ getNumberOfParticipants: () => 5 })).toBe(5);
+  });
+
+  // F4: a person re-entering (Back button / rejoin) leaves zombie endpoints
+  // that share their display name; count them once.
+  it('collapses same-name zombie endpoints (F4)', () => {
+    // local + 3 "Mario" endpoints (one live, two zombies) = 4 total → 2 people.
+    expect(
+      humanParticipantCount(
+        api(4, [
+          { id: 'a', displayName: 'Mario' },
+          { id: 'b', displayName: 'Mario' },
+          { id: 'c', displayName: 'Mario' },
+        ]),
+      ),
+    ).toBe(2);
+  });
+
+  it('subtracts both the bot and same-name duplicates together (F4 + F2)', () => {
+    // total 4 = local + Mario + Mario-zombie + bot → 4 - 1 bot - 1 dupe = 2.
+    expect(
+      humanParticipantCount(
+        api(4, [
+          { id: 'a', displayName: 'Mario' },
+          { id: 'b', displayName: 'Mario' },
+          { id: 'c', displayName: RECORDER_DISPLAY_NAME },
+        ]),
+      ),
+    ).toBe(2);
+  });
+
+  it('is case- and whitespace-insensitive when deduping (F4)', () => {
+    expect(
+      humanParticipantCount(
+        api(3, [
+          { id: 'a', displayName: 'Mario' },
+          { id: 'b', displayName: '  mario ' },
+        ]),
+      ),
+    ).toBe(2);
+  });
+
+  it('never merges distinct anonymous (empty-name) endpoints (F4)', () => {
+    // Two nameless endpoints with distinct ids stay distinct.
+    expect(
+      humanParticipantCount(
+        api(3, [
+          { id: 'a', displayName: '' },
+          { id: 'b', displayName: '' },
+        ]),
+      ),
+    ).toBe(3);
+  });
+
+  it("collapses the local user's own zombie via localDisplayName (F4 #5)", () => {
+    // Alex's own screen after a Back-button rejoin: total = local Alex + zombie
+    // Alex = 2, remotes = [zombie Alex]. Seeding the local name collapses it → 1.
+    expect(
+      humanParticipantCount(api(2, [{ id: 'z', displayName: 'Alex' }]), 'Alex'),
+    ).toBe(1);
+    // Without the local name, the local zombie can't be recognized (still 2).
+    expect(
+      humanParticipantCount(api(2, [{ id: 'z', displayName: 'Alex' }])),
+    ).toBe(2);
   });
 });

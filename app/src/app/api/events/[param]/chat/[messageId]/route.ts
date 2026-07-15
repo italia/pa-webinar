@@ -22,8 +22,13 @@ import { getFilesStorage } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
 
+// ChatMessage.id is a Postgres uuid column; a non-UUID path param would make
+// Prisma throw (500). Validate up-front and return a clean 404 instead.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const DELETE = withErrorHandling(async (request, context) => {
   const { param, messageId } = await context.params;
+  if (!UUID_RE.test(messageId)) throw new NotFoundError('Message');
   const token = extractModeratorToken(request);
   if (!token) throw new ForbiddenError('Moderator token required');
 
