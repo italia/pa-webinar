@@ -340,7 +340,9 @@
         "medium": "Medium",
         "poor": "Poor",
         "unknown": "N/A"
-      }
+      },
+      "volume": "Volume",
+      "volumeFor": "Volume for {name}"
     },
     "moderator": {
       "muteAll": "Mute all",

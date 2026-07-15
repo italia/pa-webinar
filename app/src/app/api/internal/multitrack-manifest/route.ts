@@ -24,6 +24,7 @@ import { prisma } from '@/lib/db';
 import { NotFoundError, ValidationError } from '@/lib/errors';
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
+import { allTracksSilent, SILENCE_FLOOR_BYTES_PER_SEC } from '@/lib/ai/track-silence';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,7 +51,11 @@ export const POST = withErrorHandling(async (request) => {
 
   const recording = await prisma.recording.findUnique({
     where: { id: recordingId },
-    select: { id: true, eventId: true },
+    select: {
+      id: true,
+      eventId: true,
+      event: { select: { aiTranscriptEnabled: true } },
+    },
   });
   if (!recording) throw new NotFoundError('Recording');
   if (recording.eventId !== eventId) {
@@ -66,6 +71,17 @@ export const POST = withErrorHandling(async (request) => {
       );
     }
   }
+
+  // Silence guard (ADR-013 defense-in-depth): if the recorder captured only
+  // digital silence on EVERY track — the pre-9739d70 Chrome-headless failure —
+  // a TRANSCRIBE_MULTITRACK would burn GPU and yield empty transcripts that
+  // masquerade as "done". We only act when the AI pipeline would actually run
+  // (enqueue is already a no-op when the event has AI transcription off), and
+  // we mark the recording POSTPROD_FAILED so the failure is VISIBLE in the
+  // admin recordings views and re-runnable via "Genera AI" — rather than
+  // silently stuck at READY. Gates on ALL tracks and fails open (see
+  // allTracksSilent), so a genuinely-recorded event is never blocked.
+  const skipSilent = allTracksSilent(tracks) && recording.event.aiTranscriptEnabled;
 
   const result = await prisma.$transaction(async (tx) => {
     for (const t of tracks) {
@@ -93,14 +109,35 @@ export const POST = withErrorHandling(async (request) => {
       });
     }
 
+    if (skipSilent) {
+      // Mark the recording failed (visible + admin-retryable) instead of
+      // enqueuing a doomed pipeline; the loud log below is the operator signal.
+      await tx.recording.update({
+        where: { id: recordingId },
+        data: { status: 'POSTPROD_FAILED' },
+      });
+      return { enqueued: 0, skippedExisting: 0, jobIds: [] };
+    }
+
     // Accoda la pipeline multi-traccia (idempotente via idempotency_key).
     return enqueuePostprodForRecording(tx, { recordingId, multitrack: true });
   });
+
+  if (skipSilent) {
+    console.error(
+      `[multitrack-manifest] recording=${recordingId} event=${eventId}: all ${tracks.length} ` +
+        `track(s) at/under the ${SILENCE_FLOOR_BYTES_PER_SEC} B/s silence floor — captured audio is ` +
+        `empty (likely a stale/broken recorder image, cf. recorder commit 9739d70). ` +
+        `Marked POSTPROD_FAILED and skipped TRANSCRIBE_MULTITRACK; use the admin "Genera AI" ` +
+        `control to force a re-run if this is wrong.`,
+    );
+  }
 
   return Response.json({
     ok: true,
     tracks: tracks.length,
     enqueued: result.enqueued,
     skipped: result.skippedExisting,
+    silent: skipSilent,
   });
 });

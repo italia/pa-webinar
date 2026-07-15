@@ -56,3 +56,6 @@ infra/terraform/.terraform.lock.hcl
 *.tgz
 *.log
 __pycache__/
+
+# TypeScript incremental build cache (machine-generated; every tsc run mutates it)
+*.tsbuildinfo

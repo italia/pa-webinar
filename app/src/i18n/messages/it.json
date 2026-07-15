@@ -354,7 +354,9 @@
         "medium": "Media",
         "poor": "Scarsa",
         "unknown": "N/D"
-      }
+      },
+      "volume": "Volume",
+      "volumeFor": "Volume di {name}"
     },
     "moderator": {
       "muteAll": "Silenzia tutti",
