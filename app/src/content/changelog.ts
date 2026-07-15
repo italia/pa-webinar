@@ -28,6 +28,18 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.7.3',
+    date: '2026-07-15',
+    title: 'Conteggio presenze corretto, reazioni al centro e ritocchi sala',
+    notes: [
+      'Il conteggio dei presenti non moltiplica più la stessa persona che esce e rientra (per esempio con il tasto “Indietro” del browser): i collegamenti doppi della stessa persona vengono contati una sola volta. La lista partecipanti continua a mostrare ogni collegamento, così il moderatore può sempre vedere e gestire tutti.',
+      'La barra delle reazioni/emoji è ora centrata in basso, ben visibile e facile da trovare, invece che nell’angolo in basso a sinistra.',
+      'Il numero di iscritti non è più mostrato pubblicamente sulla pagina dell’evento e nell’elenco eventi: resta visibile agli amministratori nel pannello. Durante la diretta il pubblico vede soltanto il numero dei presenti.',
+      'Soppressione del rumore di fondo attiva automaticamente su tutti i microfoni (l’elaborazione audio di base — eco e rumore — è sempre abilitata, senza bisogno di attivarla a mano).',
+      'Ingresso in sala leggermente più rapido: il “risveglio” del sistema video parte già al clic sul pulsante di ingresso.',
+    ],
+  },
+  {
     version: '0.7.2',
     date: '2026-07-15',
     title: 'Chat più ricca: allegati, risposte e menzioni',

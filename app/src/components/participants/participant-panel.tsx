@@ -6,7 +6,7 @@ import { Badge, Icon } from 'design-react-kit';
 
 import type { JitsiMeetExternalAPI, JitsiParticipant } from '@/types/jitsi';
 import { useJitsiStats, qualityLabel, qualityColor } from '@/hooks/use-jitsi-stats';
-import { isHumanParticipant } from '@/lib/jitsi/participants';
+import { isHumanParticipant, participantIdentityKey } from '@/lib/jitsi/participants';
 
 interface ParticipantPanelProps {
   api: JitsiMeetExternalAPI | null;
@@ -26,10 +26,17 @@ export default function ParticipantPanel({
 
   const refresh = useCallback(() => {
     if (!api) return;
-    // Exclude the recording bot from both the roster and the count (F2).
+    // Show EVERY human endpoint (F2: minus the recorder bot). We deliberately
+    // do NOT hide same-named connections from the roster — a moderator must be
+    // able to see and kick every participant, and two distinct people can share
+    // a name. But we REPORT a de-duplicated people-count (F4) so the header
+    // matches the "N persone" pill: a person who re-entered (leftover "zombie"
+    // endpoint from a Back-button rejoin) is counted once.
     const list = api.getParticipantsInfo().filter(isHumanParticipant);
     setParticipants(list);
-    onCountChange?.(list.length);
+    const seen = new Set<string>();
+    for (const p of list) seen.add(participantIdentityKey(p) || `#${p.id}`);
+    onCountChange?.(seen.size);
   }, [api, onCountChange]);
 
   useEffect(() => {

@@ -720,16 +720,19 @@ html.live-call-immersive body {
 .reaction-overlay {
   position: absolute;
   bottom: 16px;
-  left: 16px;
+  // F6: centrata orizzontalmente in basso ("mettiamo le emoticons nella barra
+  // centrale" — feedback) invece che nell'angolo in basso a sinistra, così è
+  // ben visibile e facile da trovare. Su desktop il fondo del video è libero
+  // (i controlli stanno nella colonna laterale); su mobile resta sollevata
+  // sopra la striscia controlli, comunque centrata.
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 20;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
 
-  // On mobile the fixed control strip (.live-floating-controls-slot, ~52px +
-  // safe-area) sits at the bottom; lift the now always-visible reaction bar
-  // above it so its buttons aren't hidden/untappable (F6, review #6).
   @media (max-width: 991.98px) {
     bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   }
@@ -737,7 +740,8 @@ html.live-call-immersive body {
   &__floats {
     position: absolute;
     bottom: 48px;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 48px;
     height: 140px;
     pointer-events: none;

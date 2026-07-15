@@ -18,6 +18,18 @@ import {
 } from '@/lib/jitsi/config';
 import { humanParticipantCount } from '@/lib/jitsi/participants';
 
+// F18: forcing Jitsi's advanced rnnoise noise-cancellation OFF is a workaround
+// for jitsi/web:stable-10741, whose rnnoise worklet has no resampling and
+// SILENCES non-48kHz microphones. Base WebRTC noise suppression (AEC/NS/AGC)
+// stays ON automatically via lib/jitsi/config.ts regardless of this flag.
+// Default = enforce-off (safe, = current behaviour). Set
+// NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE=false ONLY after the served Jitsi web image
+// is bumped to a build with the fixed worklet, then re-validate on a LIVE call.
+// Build-time inlined (NEXT_PUBLIC_*), so flipping it requires a rebuild — which
+// coincides with the image bump anyway.
+const RNNOISE_ENFORCE_OFF =
+  process.env.NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE !== 'false';
+
 interface WatermarkSettings {
   url?: string;
   enabled?: boolean;
@@ -393,9 +405,11 @@ export default function JitsiRoom({
           setLoadState('ready');
           // Annulla un'eventuale NS persistita da Jitsi in localStorage da una
           // sessione precedente, poi continua a ri-asserirla off per tutta la call.
-          enforceNoiseSuppressionOff();
-          if (!nsEnforceTimerRef.current) {
-            nsEnforceTimerRef.current = setInterval(enforceNoiseSuppressionOff, 2000);
+          if (RNNOISE_ENFORCE_OFF) {
+            enforceNoiseSuppressionOff();
+            if (!nsEnforceTimerRef.current) {
+              nsEnforceTimerRef.current = setInterval(enforceNoiseSuppressionOff, 2000);
+            }
           }
           // Enforce the quality preset at runtime too. setVideoQuality is the
           // most reliable lever across Jitsi builds (caps the received video
@@ -488,12 +502,12 @@ export default function JitsiRoom({
 
         api.addListener('participantJoined', () => {
           if (disposedRef.current) return;
-          onParticipantCountChangedRef.current?.(humanParticipantCount(api));
+          onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName));
         });
 
         api.addListener('participantLeft', () => {
           if (disposedRef.current) return;
-          onParticipantCountChangedRef.current?.(humanParticipantCount(api));
+          onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName));
         });
 
         api.addListener('recordingStatusChanged', (evt: { on: boolean }) => {
