@@ -84,16 +84,29 @@ export function humanParticipantCount(
 ): number {
   const total = api.getNumberOfParticipants();
   const remotes = api.getParticipantsInfo?.() ?? [];
-  const nonHuman = remotes.filter((p) => !isHumanParticipant(p)).length;
 
-  // F4: collapse zombie duplicates (same person, multiple lingering endpoints),
-  // seeding the local user's own identity so their own zombie collapses too.
+  // One pass over the remotes yields both corrections we subtract from the
+  // ground-truth total:
+  //   • nonHuman   — the recording bot (F2), never a person.
+  //   • duplicates — extra endpoints of a person already counted (F4 "zombies":
+  //     a Back-button rejoin leaves a lingering endpoint under the same name).
+  // We seed the dedup set with the LOCAL user's identity (getParticipantsInfo
+  // is remotes-only) so their OWN zombie collapses on their own screen too —
+  // otherwise the very person who re-entered would still see an inflated count.
   const seen = new Set<string>();
-  const localKey = (localDisplayName ?? '').trim().toLowerCase();
+  const localKey = participantIdentityKey({ displayName: localDisplayName });
   if (localKey) seen.add(localKey);
+
+  let nonHuman = 0;
   let duplicates = 0;
   remotes.forEach((p, i) => {
-    if (!isHumanParticipant(p)) return;
+    if (!isHumanParticipant(p)) {
+      nonHuman += 1;
+      return;
+    }
+    // participantIdentityKey falls back to the endpoint id for nameless
+    // endpoints (distinct anonymous users never merge); `#anon-${i}` covers the
+    // rare both-name-and-id-empty case so it still can't collide with another.
     const key = participantIdentityKey(p) || `#anon-${i}`;
     if (seen.has(key)) duplicates += 1;
     else seen.add(key);

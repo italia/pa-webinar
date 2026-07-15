@@ -28,6 +28,17 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.7.4',
+    date: '2026-07-15',
+    title: 'Nome in chat protetto dai link inoltrati (sicurezza)',
+    security: true,
+    notes: [
+      'In chat il nome reale di una persona iscritta viene mostrato soltanto sul dispositivo con cui si è registrata: chi apre un suo link di partecipazione inoltrato interviene con il nome che digita, non a nome dell’iscritto originale. Chiusa così un’attribuzione impropria dei messaggi.',
+      'Stessa protezione per gli allegati: un file inviato da un link inoltrato non viene più attribuito al nome dell’iscritto originale.',
+      'Chi si collega da un secondo dispositivo (ad esempio dal telefono) o con il link ricevuto in anticipo continua a partecipare, scrivere in chat e inviare allegati senza interruzioni: cambia solo il nome mostrato, che diventa quello digitato al momento dell’ingresso.',
+    ],
+  },
+  {
     version: '0.7.3',
     date: '2026-07-15',
     title: 'Conteggio presenze corretto, reazioni al centro e ritocchi sala',
