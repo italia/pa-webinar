@@ -1,6 +1,6 @@
 # Roadmap — pa-webinar
 
-Allineata al 2026-07-15. In produzione: **v0.7.3** (v0.7.4 in rilascio, v0.8.0 in corso). Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici (v0.8 / v0.9 / v1.0 / backlog) rispetto allo stato attuale del codice.
+Allineata al 2026-07-15. In produzione: **v0.7.4** (v0.8.0 in corso). Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici (v0.8 / v0.9 / v1.0 / backlog) rispetto allo stato attuale del codice.
 
 ## v0.1.0 — MVP ✅
 
