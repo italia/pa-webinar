@@ -128,6 +128,12 @@ async function authenticateSender(
     // participant) is shared with the attachment + moderation routes via
     // resolveTokenSender. Only role=MODERATOR gets the moderator badge — a
     // SPEAKER is a relatore, not staff (coerente con verifyModeratorToken).
+    //
+    // F7 identity binding lives inside resolveTokenSender: an owning registrant
+    // gets their real DB name; a forwarded-link opener keeps the same reg-<id>
+    // seat but is named from what they typed (displayNameOverride), never the
+    // registrant's decrypted name. A genuinely invalid/foreign/deleted token
+    // matches nothing → 403 (contract unchanged).
     const sender = await resolveTokenSender(event, token, displayNameOverride);
     if (sender) return sender;
     throw new ForbiddenError('Invalid token for this event');
