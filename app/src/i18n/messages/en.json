@@ -361,6 +361,7 @@
       "approveVideo": "Approve video",
       "approveAll": "Give the floor",
       "audioOnly": "Audio only",
+      "lowerHand": "Lower hand",
       "participantFallback": "Participant",
       "audioModeration": "Participant mic",
       "micDisabled": "Mic disabled",

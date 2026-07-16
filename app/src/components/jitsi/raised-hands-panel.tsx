@@ -12,6 +12,10 @@ interface RaisedHand {
   id: string;
   displayName: string;
   raisedAt: number;
+  /** Jitsi's raise timestamp (evt.handRaised) — a value shared across all
+   *  clients for this raise. Sent with a "lower hand" so the target only
+   *  lowers THIS raise, never a later one it re-raised in the meantime. */
+  raiseId: number;
 }
 
 interface RaisedHandsPanelProps {
@@ -31,9 +35,24 @@ interface RaisedHandsPanelProps {
    *   caffettino feedback where only moderators had this visibility).
    */
   readOnly?: boolean;
+  /**
+   * F8 — moderator "lower hand": passed ONLY to the full (non-readOnly)
+   * moderator instance. When both are present the panel shows an "abbassa
+   * mano" button that asks the raiser's own client (via the control channel)
+   * to lower its hand. The readOnly attendee instance gets neither, so the
+   * button never renders for participants.
+   */
+  eventId?: string;
+  moderatorToken?: string;
 }
 
-export default function RaisedHandsPanel({ api, localDisplayName = '', readOnly = false }: RaisedHandsPanelProps) {
+export default function RaisedHandsPanel({
+  api,
+  localDisplayName = '',
+  readOnly = false,
+  eventId,
+  moderatorToken,
+}: RaisedHandsPanelProps) {
   const t = useTranslations('live.moderator');
   const [hands, setHands] = useState<RaisedHand[]>([]);
   const handsRef = useRef<Map<string, RaisedHand>>(new Map());
@@ -94,6 +113,7 @@ export default function RaisedHandsPanel({ api, localDisplayName = '', readOnly 
           id: evt.id,
           displayName: name,
           raisedAt: Date.now(),
+          raiseId: evt.handRaised,
         });
         syncHands();
 
@@ -176,6 +196,32 @@ export default function RaisedHandsPanel({ api, localDisplayName = '', readOnly 
     [api],
   );
 
+  // F8: ask the raiser's OWN client to lower its hand (the IFrame API can't
+  // lower a remote hand). Fire-and-forget: we do NOT optimistically remove the
+  // entry here — that would desync the moderator's view from the other panels
+  // (the flaw of the earlier "mark handled" attempt). When the target lowers
+  // its hand, Jitsi's raiseHandUpdated(0) removes the entry from EVERY panel
+  // naturally. If the signal doesn't deliver (offline / stale id), the hand
+  // stays queued (correct — it wasn't lowered) and the moderator can retry.
+  const handleLowerHand = useCallback(
+    (id: string, raiseId: number) => {
+      if (!eventId || !moderatorToken) return;
+      fetch(`/api/events/${eventId}/hand-raises/lower`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${moderatorToken}`,
+        },
+        body: JSON.stringify({ targetEndpointId: id, raiseId }),
+      }).catch(() => {
+        /* best-effort, like chat; moderator can click again */
+      });
+    },
+    [eventId, moderatorToken],
+  );
+
+  const canLowerHand = !readOnly && !!eventId && !!moderatorToken;
+
   if (hands.length === 0) {
     // In read-only mode (visible to non-moderators) hide completely when
     // nobody has raised a hand — a permanent "nessuna mano alzata" strip
@@ -254,6 +300,19 @@ export default function RaisedHandsPanel({ api, localDisplayName = '', readOnly 
                   >
                     <Icon icon="it-hearing" size="xs" />
                   </Button>
+                  {canLowerHand && (
+                    <Button
+                      color="primary"
+                      size="xs"
+                      className="px-1 py-0"
+                      onClick={() => handleLowerHand(h.id, h.raiseId)}
+                      aria-label={t('lowerHand')}
+                      title={t('lowerHand')}
+                      style={{ lineHeight: 1 }}
+                    >
+                      <Icon icon="it-check" size="xs" />
+                    </Button>
+                  )}
                 </>
               )}
             </div>
