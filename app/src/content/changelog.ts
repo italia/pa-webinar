@@ -28,6 +28,14 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.7.8',
+    date: '2026-07-17',
+    title: 'Il moderatore può abbassare una mano alzata',
+    notes: [
+      'Nella coda delle mani alzate il moderatore ha ora un pulsante per abbassare la mano di un singolo partecipante — utile quando qualcuno ha già parlato o ha lasciato la mano alzata per errore. La richiesta raggiunge quel partecipante, che vede la propria mano abbassarsi; nessun altro viene toccato.',
+    ],
+  },
+  {
     version: '0.7.7',
     date: '2026-07-16',
     title: 'Meno rumore di fondo quando parli',
