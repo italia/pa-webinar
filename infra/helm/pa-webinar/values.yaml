@@ -659,6 +659,27 @@ jitsi-meet:
     tolerations: []
 
   web:
+    # F18: patched jitsi/web that forces the rnnoise noise-suppression
+    # AudioContext to 48 kHz (built from infra/jitsi-web-patched). Base image is
+    # stable-10741 (= the subchart appVersion prod already served), so
+    # prosody/jicofo/jvb compatibility is unchanged — only the noise-suppression
+    # context differs.
+    #
+    # pullPolicy: Always — the jitsi-web.yml workflow re-pushes the SAME
+    # `stable-10741-rnnoise` tag whenever the patch changes, so the tag is
+    # MUTABLE in practice. IfNotPresent would let a node keep serving a stale
+    # (e.g. mis-patched, mic-silencing) image it cached under that tag; Always
+    # forces a fresh pull each time the web pod is (re)created on upgrade.
+    #
+    # This is a GHCR image, pulled with `ghcr-secret` — which the jitsi pods
+    # receive via the `pa-webinar-jitsi-meet` ServiceAccount (the subchart's SA
+    # template does not set imagePullSecrets, so the out-of-band secret survives
+    # upgrades). NB: a `--reuse-values` upgrade does NOT pick up this file-level
+    # default, so the deploy also passes repository/tag/pullPolicy via `--set`.
+    image:
+      repository: ghcr.io/italia/pa-webinar-jitsi-web
+      tag: stable-10741-rnnoise
+      pullPolicy: Always
     ingress:
       enabled: true
       annotations:

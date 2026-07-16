@@ -398,6 +398,22 @@ export default function JitsiRoom({
           }
         };
 
+        // F18: enable advanced rnnoise noise-suppression — but ONLY when the
+        // served jitsi/web image is the 48 kHz-patched build (RNNOISE_ENFORCE_OFF
+        // is false). It's a no-op with no local audio track, and everyone joins
+        // startWithAudioMuted, so enabling once at join wouldn't take — we
+        // (re)assert it on every unmute, when the mic track actually exists.
+        // `setNoiseSuppressionEnabled(true)` is idempotent (Jitsi guards on the
+        // current state), so re-asserting on each unmute is cheap.
+        const enableNoiseSuppression = (): void => {
+          if (disposedRef.current || RNNOISE_ENFORCE_OFF) return;
+          try {
+            api.executeCommand('setNoiseSuppressionEnabled', true);
+          } catch {
+            /* older builds may not expose the command */
+          }
+        };
+
         api.addListener('videoConferenceJoined', (evt: { id?: string }) => {
           if (disposedRef.current) return;
           // Il nostro endpoint id: usato per segnalare solo le nostre alzate.
@@ -410,6 +426,15 @@ export default function JitsiRoom({
             if (!nsEnforceTimerRef.current) {
               nsEnforceTimerRef.current = setInterval(enforceNoiseSuppressionOff, 2000);
             }
+          } else {
+            // F18: the served jitsi/web image is patched (noise-suppression
+            // AudioContext forced to 48 kHz), so rnnoise no longer silences
+            // non-48 kHz mics — turn it ON for stronger background-noise removal.
+            // The toolbar toggle is hidden, so we drive it via the IFrame API.
+            // This join-time attempt is a no-op for join-muted clients (no track
+            // yet); the audioMuteStatusChanged listener re-asserts it on unmute.
+            // (Base AEC/NS/AGC is already on via lib/jitsi/config.)
+            enableNoiseSuppression();
           }
           // Enforce the quality preset at runtime too. setVideoQuality is the
           // most reliable lever across Jitsi builds (caps the received video
@@ -442,6 +467,15 @@ export default function JitsiRoom({
         };
         api.addListener('videoMuteStatusChanged', (e: { muted?: boolean }) => {
           if (e && e.muted === false) reapplyVideoQuality();
+        });
+
+        // F18: (re)assert advanced rnnoise whenever the mic is unmuted — that's
+        // when the local audio track exists, so the enable actually takes (the
+        // join-time attempt is a no-op for the startWithAudioMuted majority).
+        // No-op unless the served jitsi/web image is the 48 kHz-patched build.
+        api.addListener('audioMuteStatusChanged', (e: { muted?: boolean }) => {
+          if (disposedRef.current) return;
+          if (e?.muted === false) enableNoiseSuppression();
         });
 
         api.addListener('videoConferenceLeft', () => {

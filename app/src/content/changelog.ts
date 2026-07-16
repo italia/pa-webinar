@@ -28,6 +28,14 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.7.7',
+    date: '2026-07-16',
+    title: 'Meno rumore di fondo quando parli',
+    notes: [
+      'Cancellazione avanzata del rumore di fondo attiva quando prendi la parola: attenua meglio rumori come tastiera, ventole o traffico, oltre alla soppressione di base già presente.',
+    ],
+  },
+  {
     version: '0.7.6',
     date: '2026-07-16',
     title: 'Volume per partecipante',
