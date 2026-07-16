@@ -62,10 +62,13 @@ ENV NEXT_PUBLIC_JITSI_DOMAIN=$NEXT_PUBLIC_JITSI_DOMAIN
 ENV NEXT_PUBLIC_WATERMARK_URL=$NEXT_PUBLIC_WATERMARK_URL
 ENV NEXT_PUBLIC_DEFAULT_LOCALE=$NEXT_PUBLIC_DEFAULT_LOCALE
 
-# F18: leave EMPTY to keep the safe default (advanced rnnoise noise-cancellation
-# forced OFF, working around jitsi/web:stable-10741 silencing non-48kHz mics).
-# Set to "false" ONLY after bumping the served Jitsi web image to a build with a
-# fixed rnnoise worklet, then re-validate audio on a live call.
+# F18: EMPTY = safe default (advanced rnnoise force-OFF, working around stock
+# jitsi/web:stable-10741 silencing non-48kHz mics). Set to "false" to ENABLE
+# rnnoise — only valid when the served jitsi/web image is the patched build
+# (infra/jitsi-web-patched, 48 kHz noise-suppression context), and only after
+# re-validating the mic on a LIVE call (the bundle guards prove the patch is
+# present, not that audio actually works). The prod release passes "false"
+# (see .github/workflows/release.yml); dev/test keep the default.
 ARG NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE=
 ENV NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE=$NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE
 

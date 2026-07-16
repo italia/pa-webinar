@@ -66,6 +66,16 @@ jobs:
             NEXT_PUBLIC_BUILD_SHA=${{ steps.sha.outputs.short }}
             NEXT_PUBLIC_BUILD_CHANNEL=release
             NEXT_PUBLIC_BUILD_DATE=${{ steps.build_date.outputs.iso }}
+            # F18: prod serves the PATCHED jitsi/web (ghcr.io/italia/pa-webinar-jitsi-web:stable-10741-rnnoise,
+            # noise-suppression AudioContext forced to 48 kHz), so advanced rnnoise no longer silences
+            # non-48 kHz mics and is enabled. COUPLING: this ONLY holds while the patched jitsi/web image
+            # is the one served — the helm deploy pins it via `--set jitsi-meet.web.image.*` (and the
+            # committed values.yaml default), and `--reuse-values` preserves that pin across upgrades.
+            # If jitsi/web is ever rolled back to stock, drop this line and re-release so rnnoise is
+            # force-OFF again. The static bundle guards (Dockerfile/jitsi-web.yml) prove the patch is
+            # PRESENT, not that audio works — always re-validate the mic on a LIVE call after deploy.
+            # (dev/test keep the default.)
+            NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE=false
 
       - name: Build and push migration image
         uses: docker/build-push-action@v6

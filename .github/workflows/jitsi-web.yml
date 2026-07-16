@@ -1,0 +1,96 @@
+name: Build patched jitsi/web image
+
+# F18: builds ghcr.io/italia/pa-webinar-jitsi-web:stable-10741-rnnoise — a copy of
+# jitsi/web:stable-10741 with the noise-suppression AudioContext forced to 48 kHz
+# (see infra/jitsi-web-patched/Dockerfile). Rarely changes, so it runs only when
+# that directory changes or on manual dispatch — NOT on every dev push.
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "infra/jitsi-web-patched/**"
+      - ".github/workflows/jitsi-web.yml"
+  workflow_dispatch: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: italia/pa-webinar-jitsi-web
+  IMAGE_TAG: stable-10741-rnnoise
+  BASE_IMAGE: jitsi/web:stable-10741
+
+jobs:
+  build:
+    name: Build & validate patched jitsi/web
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image (load locally, don't push yet)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./infra/jitsi-web-patched
+          file: ./infra/jitsi-web-patched/Dockerfile
+          load: true
+          push: false
+          # The docker exporter (load:true) can't carry provenance/SBOM
+          # attestations; leaving them on makes buildx emit an image index the
+          # local daemon refuses to load. Disable so the exact validated image
+          # loads and is then `docker push`ed unchanged.
+          provenance: false
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+
+      # Independent post-build gate on the EXACT image that will be pushed.
+      # The Dockerfile RUN already fails the build if the patch is wrong, so the
+      # grep counts here are deliberate belt-and-suspenders for a mic-silencing-
+      # critical image; the unique add is `node --check` (bundle still parses).
+      - name: Validate patched bundle
+        run: |
+          set -euo pipefail
+          IMG="${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          docker run --rm "$IMG" cat /usr/share/jitsi-meet/libs/app.bundle.min.js > patched.js
+          docker run --rm "$BASE_IMAGE" cat /usr/share/jitsi-meet/libs/app.bundle.min.js > orig.js
+          # Count OCCURRENCES with `grep -oF … | wc -l` — NOT `grep -c`/`grep -oc`,
+          # which count matching LINES and always return 1 on this single-line
+          # minified bundle. The patched form must appear exactly once and the
+          # unpatched target must be gone (catches a missing target AND an
+          # ambiguous over-patch — the mixer `this.audioContext=new AudioContext`
+          # is never a sed target, so it stays intact).
+          test "$(grep -oF 'Xy=new AudioContext({sampleRate:48000}))' patched.js | wc -l | tr -d ' ')" = "1"
+          test "$(grep -oF 'Xy=new AudioContext)' patched.js | wc -l | tr -d ' ')" = "0"
+          # Syntax-validate — but only gate on it when node can parse the ORIGINAL
+          # too (a webpack browser bundle can use syntax node's script parser
+          # rejects; if the baseline already fails, node --check is unreliable here
+          # and we fall back to the surgical grep guard in the Dockerfile).
+          if node --check orig.js 2>/dev/null; then
+            node --check patched.js
+            echo "patched bundle is valid JS (node --check) and carries the 48 kHz fix"
+          else
+            echo "node --check unreliable on this bundle (baseline also fails); relying on the Dockerfile's before/after grep guard"
+          fi
+
+      # Push the EXACT image that was validated above (loaded into the local
+      # daemon in the build step) — do NOT rebuild, or the pushed artifact could
+      # diverge from the validated one (mutable base tag, cache drift).
+      - name: Push validated image
+        run: docker push "${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+
+      - name: Summary
+        run: |
+          {
+            echo "### Patched jitsi/web pushed"
+            echo ""
+            echo "\`${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}\` — base \`${BASE_IMAGE}\`, rnnoise AudioContext forced to 48 kHz."
+          } >> "$GITHUB_STEP_SUMMARY"
