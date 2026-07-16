@@ -627,6 +627,20 @@ jitsi-meet:
   enableAuth: true
   enableGuests: false
 
+  # Global pull secrets for ALL jitsi component pods (the subchart exposes only a
+  # single global list, not per-component). `ghcr-secret` is required because
+  # `web.image` below is the PRIVATE GHCR patched image (F18); `dockerhub-secret`
+  # keeps the stock Docker Hub images (jvb/jicofo/coturn/prosody/jibri) pulling
+  # without hitting anon rate limits. Both secrets must exist in the namespace
+  # (created out-of-band, like any private-registry chart). Without ghcr-secret a
+  # fresh install's web pod 401s on ghcr.io → ImagePullBackOff → nobody can join.
+  # NB: the existing prod (rev ≤44) was deployed before this default and wires
+  # ghcr-secret via a `kubectl patch deploy …-jitsi-meet-web` instead; a future
+  # non-`--reuse-values` upgrade converges it to this helm-managed value.
+  imagePullSecrets:
+    - name: ghcr-secret
+    - name: dockerhub-secret
+
   prosody:
     auth:
       type: jwt
@@ -666,21 +680,20 @@ jitsi-meet:
     # context differs.
     #
     # pullPolicy: Always — the jitsi-web.yml workflow re-pushes the SAME
-    # `stable-10741-rnnoise` tag whenever the patch changes, so the tag is
-    # MUTABLE in practice. IfNotPresent would let a node keep serving a stale
-    # (e.g. mis-patched, mic-silencing) image it cached under that tag; Always
-    # forces a fresh pull each time the web pod is (re)created on upgrade.
+    # `stable-10741-rnnoise` tag whenever the patch changes, so the tag is MUTABLE
+    # in practice. This is a DELIBERATE trade-off for a mic-silencing-critical
+    # image: IfNotPresent could let a node keep serving a stale, mis-patched image
+    # cached under that tag → SILENT, persistent mic loss after we push a fix (the
+    # worse failure). Always instead re-pulls on every web-pod (re)creation, so a
+    # transient GHCR hiccup during an upgrade can leave the pod ImagePullBackOff —
+    # a LOUD, obvious, self-healing outage. Loud+recoverable beats silent+wrong.
     #
-    # This is a GHCR (not Docker Hub) image, so the web pod needs `ghcr-secret`
-    # in its imagePullSecrets. The subchart only exposes a GLOBAL
-    # `jitsi-meet.imagePullSecrets` (all components), and the SA-injected secret
-    # does NOT reach the web pod on this cluster — so prod wires it directly:
-    #   kubectl patch deploy pa-webinar-jitsi-meet-web -n pa-webinar --type merge \
-    #     -p '{"spec":{"template":{"spec":{"imagePullSecrets":[{"name":"ghcr-secret"},{"name":"dockerhub-secret"}]}}}}'
-    # That patch survives helm upgrades (the web template renders imagePullSecrets
-    # from the empty global, so helm never manages the field). NB: a
-    # `--reuse-values` upgrade does NOT pick up this file-level image default, so
-    # the deploy also passes repository/tag/pullPolicy via `--set`.
+    # Pull auth: this is a PRIVATE GHCR image → the web pod needs `ghcr-secret`,
+    # supplied by the global `jitsi-meet.imagePullSecrets` above. (The existing
+    # prod predates that default and wires it via a `kubectl patch deploy
+    # …-jitsi-meet-web` — see that block's comment.) NB: a `--reuse-values`
+    # upgrade does NOT pick up these file-level defaults, so the prod deploy also
+    # passes repository/tag/pullPolicy via `--set`.
     image:
       repository: ghcr.io/italia/pa-webinar-jitsi-web
       tag: stable-10741-rnnoise
