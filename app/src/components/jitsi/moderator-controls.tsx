@@ -471,7 +471,12 @@ export default function ModeratorControls({
           showed the right number, the smoking gun of the mount/listener race.
           Mirrors the always-mounted read-only panel on the participant side. */}
       <div className={handsOpen ? '' : 'd-none'}>
-        <RaisedHandsPanel api={api} localDisplayName={localDisplayName} />
+        <RaisedHandsPanel
+          api={api}
+          localDisplayName={localDisplayName}
+          eventId={eventId}
+          moderatorToken={moderatorToken}
+        />
       </div>
 
       {/* End event confirmation modal */}

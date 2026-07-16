@@ -840,6 +840,93 @@ export default function LiveEventClient({
     return () => clearInterval(interval);
   }, [jitsiApi, isModerator, event.slug, token]);
 
+  // F8 — receive a moderator "lower your hand" control signal and lower our OWN
+  // hand. The Jitsi IFrame API can lower only the local hand (toggleRaiseHand),
+  // so a moderator's "abbassa mano" reaches the raiser's browser here; the
+  // resulting raiseHandUpdated(0) then drains the queue on every client. Lives
+  // here (not jitsi-room) because this component owns jitsiApi and stays mounted
+  // for the whole live session; the control stream is separate from chat so it
+  // works even when chat is disabled.
+  const myEndpointIdRef = useRef('');
+  // Jitsi's shared raise timestamp (evt.handRaised) for OUR hand; 0 = down. It
+  // is the same value on every client for a given raise and changes on each new
+  // raise, so it uniquely identifies WHICH raise a moderator asked us to lower.
+  const myHandRaiseIdRef = useRef(0);
+  // We only need to HEAR "lower your hand" while our hand is actually up, so the
+  // control SSE is opened only then (effect below). This keeps the overwhelming
+  // majority of participants — hand down — off the control channel entirely,
+  // instead of every client holding an always-open stream for the whole session.
+  const [handControlActive, setHandControlActive] = useState(false);
+  useEffect(() => {
+    if (!jitsiApi) return;
+
+    const onJoined = (evt: { id?: string }) => {
+      if (evt?.id) myEndpointIdRef.current = evt.id;
+    };
+    // Authoritative own-hand identity — sourced ONLY from Jitsi's broadcast for
+    // OUR endpoint, never inferred. Also gates whether we hold the control SSE.
+    const onHand = (evt: { id?: string; handRaised?: number }) => {
+      if (!evt?.id || evt.id !== myEndpointIdRef.current) return;
+      const raiseId = evt.handRaised ?? 0;
+      myHandRaiseIdRef.current = raiseId;
+      setHandControlActive(raiseId > 0);
+    };
+    jitsiApi.addListener('videoConferenceJoined', onJoined);
+    jitsiApi.addListener('raiseHandUpdated', onHand);
+    return () => {
+      jitsiApi.removeListener('videoConferenceJoined', onJoined);
+      jitsiApi.removeListener('raiseHandUpdated', onHand);
+    };
+  }, [jitsiApi]);
+
+  // Hold the control SSE ONLY while our hand is raised. A moderator can only ask
+  // to lower a hand that is up, and by the time they see it and click (seconds
+  // later) this stream is long since open; when our hand goes down, onHand flips
+  // handControlActive false and this effect tears the stream down.
+  useEffect(() => {
+    if (!jitsiApi || !handControlActive) return;
+
+    const es = new EventSource(`/api/events/${event.slug}/control/stream`);
+    const onControl = (e: MessageEvent) => {
+      let env: { op?: string; targetEndpointId?: string; raiseId?: number };
+      try {
+        env = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      if (env.op !== 'lowerHand') return;
+      // Exact endpoint match — a broadcast reaches everyone; a loose filter would
+      // lower every hand.
+      if (!env.targetEndpointId || env.targetEndpointId !== myEndpointIdRef.current) return;
+      // Lower ONLY the exact raise the moderator targeted. toggleRaiseHand is a
+      // toggle, so firing it when our hand is already down would RAISE it. Gating
+      // on the shared raise id means a signal that raced a manual lower+re-raise
+      // (our id differs now) is ignored — closing the re-raise race. Two rare,
+      // benign residuals remain, inherent to a toggle-only API over a best-effort
+      // channel: a moderator click landing in the sub-ms window between a manual
+      // lower and its raiseHandUpdated(0) echo could re-raise once; and if the
+      // toggle is delivered but silently not applied, the optimistic-0 below gates
+      // further retries until the participant acts. Both self-recover.
+      const raiseId = typeof env.raiseId === 'number' ? env.raiseId : 0;
+      if (raiseId <= 0 || myHandRaiseIdRef.current !== raiseId) return;
+      try {
+        jitsiApi.executeCommand('toggleRaiseHand');
+      } catch {
+        return;
+      }
+      // Optimistically mark our hand down NOW. If the confirming
+      // raiseHandUpdated(0) is dropped, a duplicate signal for the same raise
+      // can't re-fire (0 !== raiseId) — closing the lost-confirmation re-raise.
+      // A genuine re-raise later overwrites this via onHand.
+      myHandRaiseIdRef.current = 0;
+    };
+    es.addEventListener('message', onControl);
+
+    return () => {
+      es.close();
+    };
+  }, [jitsiApi, event.slug, handControlActive]);
+
   // Leave for yourself only. Marks the upcoming `videoConferenceLeft` as a
   // deliberate hangup so the network-resilience path doesn't rejoin behind us.
   const leaveSelf = useCallback(() => {
