@@ -376,42 +376,39 @@ export default function JitsiRoom({
           }
         }
 
-        // P4 — Forza la "soppressione rumore extra" (rnnoise) OFF e la tiene OFF.
-        // Su jitsi/web:stable-10741 il worklet rnnoise non fa conversione di
-        // sample-rate e ZITTISCE il microfono in uscita su contesti di cattura
-        // non-48kHz (un moderatore è rimasto muto nella demo prova-con-roberto).
-        // Non esiste un flag di config per-feature che la disabiliti, e il toggle
-        // è raggiungibile SIA dal tab Impostazioni>Audio SIA dal popup del caret
-        // accanto al pulsante microfono — nessuno dei due rimovibile senza
-        // perdere anche il selettore dispositivi. Quindi la forziamo via IFrame
-        // API. `setNoiseSuppressionEnabled(false)` è un no-op quando la NS è già
-        // off (il thunk Jitsi ha la guardia `enabled !== current`): l'interval
-        // fa lavoro reale — ri-spegnendola entro un tick — solo se un utente la
-        // riattiva manualmente. Da rimuovere quando l'immagine Jitsi servita
-        // includerà un worklet rnnoise corretto.
-        const enforceNoiseSuppressionOff = (): void => {
+        // Single wrapper around the (build-dependent) IFrame command — the sole
+        // call site both the enforce-OFF and enable paths below funnel through, so
+        // command name / error handling / logging can evolve in one place.
+        // `setNoiseSuppressionEnabled` is a no-op when already in the requested
+        // state (Jitsi guards `enabled !== current`).
+        const setNoiseSuppression = (enabled: boolean): void => {
           if (disposedRef.current) return;
           try {
-            api.executeCommand('setNoiseSuppressionEnabled', false);
+            api.executeCommand('setNoiseSuppressionEnabled', enabled);
           } catch {
-            /* build più vecchie potrebbero non esporre il comando */
+            /* older builds may not expose the command */
           }
         };
+
+        // P4 — Forza la "soppressione rumore extra" (rnnoise) OFF e la tiene OFF
+        // (default dev/test, RNNOISE_ENFORCE_OFF=true). Su jitsi/web:stable-10741
+        // stock il worklet rnnoise non fa conversione di sample-rate e ZITTISCE il
+        // microfono su contesti non-48kHz (un moderatore è rimasto muto nella demo
+        // prova-con-roberto). Non c'è un flag per-feature né un toggle rimovibile,
+        // quindi la forziamo via IFrame API; l'interval fa lavoro reale — ri-
+        // spegnendola entro un tick — solo se un utente la riattiva manualmente.
+        // In prod si usa invece l'immagine jitsi/web patchata (48kHz) + il ramo
+        // enable qui sotto.
+        const enforceNoiseSuppressionOff = (): void => setNoiseSuppression(false);
 
         // F18: enable advanced rnnoise noise-suppression — but ONLY when the
         // served jitsi/web image is the 48 kHz-patched build (RNNOISE_ENFORCE_OFF
         // is false). It's a no-op with no local audio track, and everyone joins
         // startWithAudioMuted, so enabling once at join wouldn't take — we
         // (re)assert it on every unmute, when the mic track actually exists.
-        // `setNoiseSuppressionEnabled(true)` is idempotent (Jitsi guards on the
-        // current state), so re-asserting on each unmute is cheap.
         const enableNoiseSuppression = (): void => {
-          if (disposedRef.current || RNNOISE_ENFORCE_OFF) return;
-          try {
-            api.executeCommand('setNoiseSuppressionEnabled', true);
-          } catch {
-            /* older builds may not expose the command */
-          }
+          if (RNNOISE_ENFORCE_OFF) return;
+          setNoiseSuppression(true);
         };
 
         api.addListener('videoConferenceJoined', (evt: { id?: string }) => {
