@@ -1,6 +1,6 @@
 # Roadmap — pa-webinar
 
-Allineata al 2026-07-16. In produzione: **v0.7.7** (v0.8.0 in corso). Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici (v0.8 / v0.9 / v1.0 / backlog) rispetto allo stato attuale del codice.
+Allineata al 2026-07-17. In produzione: **v0.7.7** (v0.8.0 in corso). Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici (v0.8 / v0.9 / v1.0 / backlog) rispetto allo stato attuale del codice.
 
 ## v0.1.0 — MVP ✅
 
@@ -126,6 +126,7 @@ Flussi critici Playwright ancora da coprire: login admin + creazione + pubblicaz
 | **Allegati in chat (F16)** 🟢 in corso | Upload allegati (immagini/documenti) in chat live: gating a soli utenti autenticati (no guest anonimi), allowlist MIME stretta + size + rate-limit dedicati, rotta di moderazione (`hiddenAt` + `op:'delete'` già previsti nell'envelope), serving con accesso controllato, cleanup blob in retention |
 | **Chat: @menziona + rispondi/quote** 🟢 in corso | `@nome` con autocomplete dalla roster + rendering evidenziato; `replyToId` con citazione dello snippet del messaggio padre |
 | **SSE/WebSocket per Q&A** | Sostituire il polling SWR 3s riusando l'infra SSE già provata per la chat (scala a 300+) |
+| **Eventi ricorrenti — quick win** 🟡 | Togliere i footgun di clonazione: `duplicate` copia **tutti** i flag (AI/multitraccia/agenda/wordcloud/ricorrenza) + i reminder, `PUT /api/events/[param]` persiste `recurrenceRule` (oggi scartato), `EventTemplate` porta i flag mancanti, affordance admin "Duplica come prossima occorrenza". Dettaglio nella sezione **Eventi ricorrenti / serie** |
 | **Batteria E2E Playwright** + **screenshot README** | Chiudere i requisiti pre-rilascio pubblico |
 
 ## v0.9.0 — Pianificata
@@ -138,6 +139,35 @@ Flussi critici Playwright ancora da coprire: login admin + creazione + pubblicaz
 | **Tagging e capitoli video (live)** | Marker del moderatore durante l'evento → capitoli nel player (i capitoli AI esistono già; mancano quelli autoriali live) |
 | **API pubblica documentata** | Lo spec OpenAPI 3.1 è già servito da `/api/openapi.json`; restano docs UI (Swagger/Redoc), garanzie di stabilità e storia auth |
 | **Rigenerazione AI dopo edit trascrizione** | Rigenerare automaticamente traduzioni/dub quando un segmento viene corretto |
+
+## Eventi ricorrenti / serie — nuova (Caffettino, DevIt)
+
+Due call ricorrenti reali, cadenze diverse: **Caffettino** (ogni venerdì mattina — cadenza fissa ma **data da confermare**) e **DevIt sync** (periodica ma **spesso rimandata di qualche giorno**). Oggi ogni occorrenza si crea a mano (duplica → rimetti la data → **ri-attiva i flag di cattura**): flusso fragile perché la duplicazione **perde silenziosamente** proprio i flag che per queste call devono restare accesi (multitraccia, trascrizione AI, agenda, retention, lingue, speaker attesi).
+
+**Stato attuale del codice** (per chi implementa):
+- **WIRED**: picker RRULE nel wizard (`recurrence-picker.tsx` + `lib/utils/recurrence.ts` + libreria `rrule`); `recurrenceRule` persistito alla creazione; anteprima "prossime 5 date" (solo display).
+- **DORMANT**: `recurrenceRule` dopo il salvataggio (nessuno lo consuma); `recurrenceSeriesId` + relazione `EventRecurrenceSeries` (mai scritti/letti); endpoint `POST /api/admin/events/[id]/duplicate` (nessun caller UI).
+- **ABSENT**: qualsiasi job di materializzazione delle occorrenze da RRULE; "crea da template" server-side; raggruppamento per serie di registrazioni/trascrizioni/libreria; reminder consapevoli della ricorrenza; qualsiasi affordance "programma prossima".
+- **Bug latenti da chiudere comunque**: `PUT /api/events/[param]` **scarta** `recurrenceRule` (round-trip: modifichi la ricorrenza nel wizard, al salvataggio sparisce); `duplicate` scarta `aiTranscript/Summary/Translation/Dubbing`, `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`, `autoStartRecording`, `recurrenceRule` **e i reminder**; `EventTemplate` non porta `multitrackRecordingEnabled` / `retainParticipantTracks` / `aiTargetLocales` / `aiDubbingEnabled` / `wordCloudEnabled`.
+
+**Idea portante** — una **Serie** possiede la configurazione canonica (flag di cattura/AI, retention, lingue, speaker attesi, permessi, descrizione, immagine) e **ogni occorrenza la eredita**: così i flag non possono più essere persi per dimenticanza. La cadenza è un *suggerimento*, non una schedulazione rigida: **occorrenze provvisorie** (bozza con data proiettata) che l'operatore **conferma / sposta / salta** — esattamente ciò che serve quando "le date non sono sempre confermate". Riprogrammare = spostare la data della singola occorrenza senza toccare la serie.
+
+**Fasi:**
+
+- **Quick win (v0.8 — bassa spesa, alto valore)** — togliere i footgun senza ancora introdurre la Serie:
+  - `duplicate` copia **tutta** la config (inclusi i flag AI/multitraccia/agenda/wordcloud/ricorrenza) + crea i reminder di default → un clone è fedele all'originale.
+  - `PUT /api/events/[param]` persiste `recurrenceRule` (fix del round-trip).
+  - `EventTemplate` porta anche i flag mancanti (multitraccia, retain-tracks, lingue, dubbing, wordcloud).
+  - Affordance admin **"Duplica come prossima occorrenza"** (avanza la data, eredita la config) — attiva l'endpoint `duplicate` oggi dormiente. Copre già gran parte del bisogno DevIt (data mobile) e Caffettino con un click.
+- **v0.9 — Serie vera e propria**:
+  - Entità `EventSeries` (attiva `recurrenceSeriesId` + relazione): la serie è la source-of-truth della config; le occorrenze ereditano con override puntuale possibile.
+  - **"Programma prossima occorrenza"**: materializza la prossima occorrenza in **bozza** con data proiettata dalla RRULE; l'operatore conferma (→ PUBLISHED) / sposta (DevIt rimandata) / salta.
+  - Reminder consapevoli della serie (per-occorrenza, non una tantum sul parent).
+- **v0.9 / v1.0 — Post-prod & libreria per serie**:
+  - Rollup: registrazioni/trascrizioni/recap di tutte le occorrenze di una serie in un'unica vista admin + una card "serie" in libreria (oggi ogni evento è una card isolata; `Recording` non ha chiave cross-evento).
+  - **Auto-materializzazione** a cadenza fissa (Caffettino, venerdì) via CronJob che crea la prossima occorrenza provvisoria N giorni prima — sempre **confermabile prima di andare pubblica**, così una settimana saltata non pubblica nulla per sbaglio.
+
+Registrazione e post-prod restano **per-occorrenza** (ogni call è la sua `Recording` + pipeline AI): corretto e già funzionante. La serie aggiunge *ereditarietà della config* (i flag giusti sempre accesi) e *aggregazione della vista*, non cambia il modello di cattura.
 
 ## v1.0.0 — Visione
 
