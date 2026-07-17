@@ -33,15 +33,23 @@ describe('isHumanParticipant', () => {
     ).toBe(false);
   });
 
-  it('excludes the bot despite whitespace or a formatted suffix (📼 marker match, feedback #2)', () => {
+  it('excludes the bot despite whitespace or a formatted suffix (full-name prefix, feedback #2)', () => {
     // The surfaced name can gain leading/trailing whitespace or a
     // "formattedDisplayName" suffix; an exact === match let these through and
-    // the bot reappeared in the roster/count. The '📼' marker catches them.
+    // the bot reappeared in the roster/count. The full-name prefix catches them.
     expect(isHumanParticipant({ displayName: ' 📼 Recorder ' })).toBe(false);
     expect(isHumanParticipant({ displayName: '📼 Recorder (me)' })).toBe(false);
     expect(
       isHumanParticipant({ displayName: null, formattedDisplayName: '📼 Recorder (moderator)' }),
     ).toBe(false);
+  });
+
+  it('keeps a real attendee whose name merely starts with 📼 (not the bot)', () => {
+    // Only the full "📼 Recorder" prefix is the bot; a bare '📼'-prefix match
+    // would wrongly hide these humans from the roster/count (and let a griefer
+    // go invisible to moderation).
+    expect(isHumanParticipant({ displayName: '📼 Mia' })).toBe(true);
+    expect(isHumanParticipant({ displayName: '📼 Party 🎉' })).toBe(true);
   });
 });
 

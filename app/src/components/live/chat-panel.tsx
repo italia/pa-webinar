@@ -182,10 +182,18 @@ export default function ChatPanel({
     setMessages((prev) => prev.filter((m) => m.id !== id));
   }, []);
 
-  const upsertMessage = useCallback((msg: ChatMessage) => {
+  const upsertMessage = useCallback((msg: ChatMessage, opts?: { advanceWatermark?: boolean }) => {
     if (seenIdsRef.current.has(msg.id)) return;
     seenIdsRef.current.add(msg.id);
-    lastSeenAtRef.current = msg.createdAt;
+    // The optimistic echo of our OWN send (advanceWatermark:false) must NOT move
+    // the backfill watermark: its createdAt is the newest timestamp, so advancing
+    // lastSeenAtRef to it would make the poll's `?since=` skip other people's
+    // messages the server already has but our (buffered) SSE hasn't delivered yet
+    // — the exact messages the watchdog exists to recover. Only messages actually
+    // received from the stream/backfill advance the watermark.
+    if (opts?.advanceWatermark !== false) {
+      lastSeenAtRef.current = msg.createdAt;
+    }
     setMessages((prev) => [...prev, msg]);
 
     const isOwn = msg.senderName === displayName;
@@ -243,15 +251,20 @@ export default function ChatPanel({
     const es = new EventSource(`/api/events/${eventSlug}/chat/stream`);
 
     const backfill = async () => {
-      if (!lastSeenAtRef.current) return;
       try {
-        const res = await fetch(
-          `/api/events/${eventSlug}/chat?since=${encodeURIComponent(lastSeenAtRef.current)}`,
-          { cache: 'no-store' },
-        );
+        // No watermark yet (joined an empty room, or the history load soft-failed):
+        // pull the recent window so a buffered-SSE user still receives messages
+        // posted after they joined. Otherwise fetch only what is newer than the
+        // last message we actually received from the stream/backfill. Dedup by id
+        // (seenIdsRef) keeps either path idempotent.
+        const since = lastSeenAtRef.current;
+        const url = since
+          ? `/api/events/${eventSlug}/chat?since=${encodeURIComponent(since)}`
+          : `/api/events/${eventSlug}/chat?limit=200`;
+        const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) return;
         const data = (await res.json()) as { messages: ChatMessage[] };
-        data.messages.forEach(upsertMessage);
+        data.messages.forEach((m) => upsertMessage(m));
       } catch { /* fine, we'll try again on the next tick/reconnect */ }
     };
 
@@ -271,21 +284,33 @@ export default function ChatPanel({
       void backfill();
     };
 
-    // Watchdog: if no SSE message has arrived for 15s, poll for anything since
-    // our last-seen timestamp. Self-throttled to ~15s (we bump lastRecvRef after
-    // firing) so a quiet healthy room issues at most one benign empty GET per
-    // interval, never one every tick.
-    const poll = setInterval(() => {
-      if (!lastSeenAtRef.current) return;
+    // Watchdog: while the tab is VISIBLE, if no SSE message has arrived for 15s,
+    // backfill via GET (works with or without a watermark — see backfill).
+    // Gating on visibility means backgrounded tabs never poll — that steady-state
+    // load (a quiet room × every attendee) was the concern; an active user behind
+    // a silently-buffered proxy is still rescued. Self-throttled to ~15s (we bump
+    // lastRecvRef after firing). We also backfill once immediately on refocus so a
+    // returning user catches up without waiting for the interval.
+    const maybeBackfill = () => {
+      if (document.visibilityState !== 'visible') return;
       if (Date.now() - lastRecvRef.current < 15_000) return;
       lastRecvRef.current = Date.now();
       void backfill();
-    }, 5_000);
+    };
+    const poll = setInterval(maybeBackfill, 5_000);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        lastRecvRef.current = Date.now();
+        void backfill();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
 
     es.addEventListener('message', onMessage);
     es.addEventListener('open', onOpen);
     return () => {
       clearInterval(poll);
+      document.removeEventListener('visibilitychange', onVisible);
       es.removeEventListener('message', onMessage);
       es.removeEventListener('open', onOpen);
       es.close();
@@ -436,7 +461,7 @@ export default function ChatPanel({
                 },
               }
             : {}),
-        });
+        }, { advanceWatermark: false });
       }
       setInput('');
       setReplyTo(null);

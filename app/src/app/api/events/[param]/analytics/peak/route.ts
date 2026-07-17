@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError } from '@/lib/errors';
-import { extractModeratorToken } from '@/lib/auth/moderator';
+import { extractModeratorToken, isEventModerator } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +44,10 @@ export const GET = withErrorHandling(async (request, context) => {
 
 const peakSchema = z.object({
   count: z.number().int().min(0),
-  moderatorToken: z.string().min(1),
+  // Either a moderator token (primary/co-moderator) OR a participant access
+  // token — any authenticated attendee of THIS event may report the live count
+  // so the peak isn't stuck at 0 in a moderator-less session (feedback #4b).
+  token: z.string().min(1),
 });
 
 export const POST = withErrorHandling(async (request, context) => {
@@ -56,25 +59,45 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('Invalid payload', 400, 'INVALID_BODY');
   }
 
-  const { count, moderatorToken } = parsed.data;
+  const { count, token } = parsed.data;
 
   const event = await prisma.event.findFirst({
     where: {
       ...eventWhereClause(param),
-      moderatorToken,
       status: 'LIVE',
     },
-    select: { id: true, peakParticipants: true },
+    select: { id: true, moderatorToken: true, peakParticipants: true, maxParticipants: true },
   });
 
   if (!event) {
     throw new AppError('Event not found or not live', 404, 'NOT_FOUND');
   }
 
-  if (count > event.peakParticipants) {
+  // Authorize: a moderator token (primary or co-moderator) OR a registration
+  // access token bound to this event. Guests (no token) never reach here — the
+  // client only reports when it holds a token.
+  let authorized = await isEventModerator(event, token);
+  if (!authorized) {
+    const reg = await prisma.registration.findUnique({
+      where: { accessToken: token },
+      select: { eventId: true },
+    });
+    authorized = reg?.eventId === event.id;
+  }
+  if (!authorized) {
+    throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
+  }
+
+  // The count is client-reported, so clamp to the configured capacity to bound
+  // any inflation before the monotonic bump.
+  const capped = event.maxParticipants
+    ? Math.min(count, event.maxParticipants)
+    : count;
+
+  if (capped > event.peakParticipants) {
     await prisma.event.update({
       where: { id: event.id },
-      data: { peakParticipants: count },
+      data: { peakParticipants: capped },
     });
   }
 

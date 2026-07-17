@@ -12,17 +12,16 @@
  *  mints its JWT with this exact value). */
 export const RECORDER_DISPLAY_NAME = '📼 Recorder';
 
-/** The distinctive marker that PREFIXES only the recorder bot's name. Matching
- *  on this (rather than the full literal) survives transport variations of the
- *  surfaced name — leading/trailing whitespace, a `formattedDisplayName` suffix
- *  like "📼 Recorder (me)", or NFC/NFKC normalization differences of the astral
- *  '📼' code point — which an exact `=== '📼 Recorder'` comparison silently let
- *  through, making the bot reappear in the roster/count (live feedback #2). */
-export const RECORDER_MARKER = '📼';
-
 function isRecorderName(s?: string | null): boolean {
+  // Match the FULL bot name as a prefix, not just the '📼' emoji. This still
+  // catches whitespace and formatted-suffix variants ("📼 Recorder (me)",
+  // " 📼 Recorder ") that an exact `=== '📼 Recorder'` comparison let slip
+  // through (live feedback #2), but does NOT hide a real attendee whose name
+  // merely begins with 📼 (e.g. "📼 Mia") — a bare '📼'-prefix match would have
+  // wrongly filtered such a person from the roster and headcount, and would let
+  // a griefer go invisible to moderation by prefixing their name with 📼.
   const n = (s ?? '').normalize('NFC').trim();
-  return n === RECORDER_DISPLAY_NAME || n.startsWith(RECORDER_MARKER);
+  return n.startsWith(RECORDER_DISPLAY_NAME);
 }
 
 /** True for a real attendee (i.e. not the recording bot).

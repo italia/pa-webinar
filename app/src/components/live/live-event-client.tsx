@@ -19,6 +19,7 @@ import {
 import { Link, useRouter } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
+import { humanParticipantCount } from '@/lib/jitsi/participants';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import RecordingConsent, { RecordingBanner } from '@/components/jitsi/recording-consent';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
@@ -824,21 +825,29 @@ export default function LiveEventClient({
     setShowRecPrompt(false);
   }, []);
 
-  // Peak participant tracking (moderator only)
+  // Peak participant tracking — reported by ANY authenticated attendee, not
+  // just a moderator (live feedback #4b). Previously this was gated on
+  // `isModerator`, so a moderator-less session (or one the moderator left before
+  // the first tick) never bumped `peakParticipants`, leaving post-event
+  // analytics at 0. We report the human-filtered count (Recorder excluded, same
+  // helper as the sidebar) and fire once immediately + every 30s. Guests have an
+  // empty token and self-exclude; the server clamps to capacity.
   useEffect(() => {
-    if (!jitsiApi || !isModerator) return;
-    const interval = setInterval(() => {
-      const count = jitsiApi.getNumberOfParticipants?.();
-      if (typeof count === 'number' && count > 0) {
+    if (!jitsiApi || !token) return;
+    const report = () => {
+      const count = humanParticipantCount(jitsiApi, credentials?.displayName);
+      if (count > 0) {
         fetch(`/api/events/${event.slug}/analytics/peak`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ count, moderatorToken: token }),
+          body: JSON.stringify({ count, token }),
         }).catch(() => {});
       }
-    }, 30000);
+    };
+    report();
+    const interval = setInterval(report, 30000);
     return () => clearInterval(interval);
-  }, [jitsiApi, isModerator, event.slug, token]);
+  }, [jitsiApi, event.slug, token, credentials]);
 
   // F8 — receive a moderator "lower your hand" control signal and lower our OWN
   // hand. The Jitsi IFrame API can lower only the local hand (toggleRaiseHand),
@@ -2373,10 +2382,12 @@ function LiveTopBar({
             {t('recordingActive')}
           </Badge>
         )}
-        {/* The total registrations are a moderator-only figure (F5 —
-            participants shouldn't see attendance numbers). Everyone already
-            sees the present-participant count in the left-hand badge, so
-            non-moderators get nothing extra here (no duplicated count). */}
+        {/* The "active vs registered" figure is moderator-only (F5 —
+            participants shouldn't see attendance numbers). The live people-count
+            now lives only in the participants sidebar, so non-moderators get
+            nothing extra here. `participantCount` is seeded on join and kept
+            current by JitsiRoom (recorder-excluded), so this reads correctly even
+            when a moderator joins an already-populated room. */}
         {role === 'moderator' && registrationCount !== undefined && registrationCount > 0 && (
           <span className="small d-none d-md-inline">
             <Icon icon="it-user" size="sm" color="white" className="me-1" />
