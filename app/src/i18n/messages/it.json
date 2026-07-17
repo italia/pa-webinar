@@ -237,6 +237,8 @@
     "connecting": "Connessione in corso...",
     "connectionError": "Impossibile connettersi alla sala. Verifica la connessione e riprova.",
     "activeVsRegistered": "{active} attivi · {registered} registrati",
+    "enterFullscreen": "Schermo intero",
+    "exitFullscreen": "Esci da schermo intero",
     "overtime": {
       "withCountdown": "L'orario di fine previsto è passato. L'evento si chiuderà automaticamente fra {minutes, plural, one {# minuto} other {# minuti}}.",
       "closingNow": "L'orario di fine è stato raggiunto. L'evento sta per chiudersi.",
