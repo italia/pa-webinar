@@ -1166,6 +1166,25 @@ function FeaturesTab({ settings, updateField }: TabProps) {
             </small>
           </FormGroup>
         </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="reactionsMode">{t('reactionsMode')}</Label>
+            <select
+              className="form-select"
+              id="reactionsMode"
+              value={settings.reactionsMode}
+              onChange={(e) =>
+                updateField('reactionsMode', e.target.value as 'NATIVE' | 'CUSTOM')
+              }
+            >
+              <option value="NATIVE">{t('reactionsModeNative')}</option>
+              <option value="CUSTOM">{t('reactionsModeCustom')}</option>
+            </select>
+            <small className="text-muted d-block mt-1">
+              {t('reactionsModeHelp')}
+            </small>
+          </FormGroup>
+        </Col>
       </Row>
       <Row>
         <Col md={6}>
