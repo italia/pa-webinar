@@ -4,13 +4,15 @@ import { z } from 'zod';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError } from '@/lib/errors';
-import { extractModeratorToken, verifyGrantToken } from '@/lib/auth/moderator';
+import { extractModeratorToken, resolveGrantForEvent } from '@/lib/auth/moderator';
 
-// Generous absolute ceiling for a client-reported peak: bounds a spoofed value
-// without under-counting real events (a single Jitsi bridge tops out well below
-// this). We deliberately do NOT clamp to maxParticipants — moderators, speakers
-// and guests legitimately join beyond the registration cap.
-const PEAK_HARD_CAP = 2000;
+// Headroom added to the registration capacity for the client-reported peak
+// clamp: moderators/co-moderators/speakers/a few guests legitimately join
+// beyond maxParticipants, so a flat maxParticipants clamp under-counts, while an
+// unbounded value lets an attendee inflate the monotonic peak arbitrarily.
+// capacity + headroom bounds spoofing tightly while covering the extra roles.
+const PEAK_CAPACITY_HEADROOM = 50;
+const PEAK_FALLBACK_CAP = 500; // when maxParticipants is unset/0
 
 export const dynamic = 'force-dynamic';
 
@@ -48,20 +50,13 @@ export const GET = withErrorHandling(async (request, context) => {
   });
 });
 
-const peakSchema = z
-  .object({
-    count: z.number().int().min(0),
-    // Any authenticated attendee of THIS event may report the live count so the
-    // peak isn't stuck at 0 in a moderator-less session (feedback #4b): a
-    // moderator/co-moderator/speaker grant token OR a participant access token.
-    // `moderatorToken` is accepted as a legacy alias so an old client bundle
-    // still in a tab during a rolling deploy doesn't 400.
-    token: z.string().min(1).optional(),
-    moderatorToken: z.string().min(1).optional(),
-  })
-  .refine((d) => !!(d.token ?? d.moderatorToken), {
-    message: 'token is required',
-  });
+const peakSchema = z.object({
+  count: z.number().int().min(0),
+  // Any authenticated attendee of THIS event may report the live count so the
+  // peak isn't stuck at 0 in a moderator-less session (feedback #4b): a
+  // moderator/co-moderator/speaker grant token OR a participant access token.
+  token: z.string().min(1),
+});
 
 export const POST = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
@@ -72,15 +67,14 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('Invalid payload', 400, 'INVALID_BODY');
   }
 
-  const { count } = parsed.data;
-  const token = (parsed.data.token ?? parsed.data.moderatorToken) as string;
+  const { count, token } = parsed.data;
 
   const event = await prisma.event.findFirst({
     where: {
       ...eventWhereClause(param),
       status: 'LIVE',
     },
-    select: { id: true, slug: true, moderatorToken: true, peakParticipants: true },
+    select: { id: true, moderatorToken: true, maxParticipants: true },
   });
 
   if (!event) {
@@ -88,10 +82,10 @@ export const POST = withErrorHandling(async (request, context) => {
   }
 
   // Authorize: ANY valid grant for this event (primary/co-moderator/SPEAKER) OR
-  // a registration access token bound to it. verifyGrantToken covers the speaker
-  // case that isEventModerator (moderator-only) rejected, so a speaker-only
-  // panel still records its peak. Guests (no token) never reach here.
-  let authorized = (await verifyGrantToken(event.slug, token)) !== null;
+  // a registration access token bound to it. resolveGrantForEvent reuses the
+  // already-fetched event (no extra query) and covers the speaker case that a
+  // moderator-only check rejected. Guests (no token) never reach here.
+  let authorized = (await resolveGrantForEvent(event, token)) !== null;
   if (!authorized) {
     const reg = await prisma.registration.findUnique({
       where: { accessToken: token },
@@ -103,17 +97,19 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
   }
 
-  // The count is client-reported, so clamp to a generous absolute ceiling to
-  // bound spoofing — NOT to maxParticipants, which would under-count events
-  // where moderators/speakers/guests join beyond the registration cap.
-  const capped = Math.min(count, PEAK_HARD_CAP);
+  // Clamp the client-reported count to capacity + headroom (bounds a spoofed
+  // value without under-counting mods/speakers/guests), then bump atomically:
+  // a single conditional UPDATE ... WHERE peakParticipants < capped avoids the
+  // read-then-write lost-update race under a concurrent join ramp.
+  const cap = event.maxParticipants
+    ? event.maxParticipants + PEAK_CAPACITY_HEADROOM
+    : PEAK_FALLBACK_CAP;
+  const capped = Math.min(count, cap);
 
-  if (capped > event.peakParticipants) {
-    await prisma.event.update({
-      where: { id: event.id },
-      data: { peakParticipants: capped },
-    });
-  }
+  await prisma.event.updateMany({
+    where: { id: event.id, peakParticipants: { lt: capped } },
+    data: { peakParticipants: capped },
+  });
 
   return NextResponse.json({ ok: true });
 });
