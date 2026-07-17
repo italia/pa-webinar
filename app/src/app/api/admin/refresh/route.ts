@@ -23,11 +23,10 @@ import {
   isAdminAuthenticated,
   setAdminSessionCookie,
 } from '@/lib/auth/admin-session';
-import { logAdminAction } from '@/lib/audit/admin-audit';
 
 export const dynamic = 'force-dynamic';
 
-export const POST = withErrorHandling(async (request) => {
+export const POST = withErrorHandling(async (_request) => {
   const cookieStore = await cookies();
   if (!(await isAdminAuthenticated(cookieStore))) {
     throw new UnauthorizedError();
@@ -46,7 +45,9 @@ export const POST = withErrorHandling(async (request) => {
     .setExpirationTime(`${ADMIN_SESSION_TTL_SECONDS}s`)
     .sign(secret);
 
-  await logAdminAction({ request, action: 'ADMIN_SESSION_REFRESH' });
+  // No audit-log row here: this is a silent keepalive slide (called every few
+  // minutes per active tab by AdminSessionKeepAlive), not a meaningful admin
+  // action — logging it would flood admin_audit_log and bury real actions.
 
   const response = NextResponse.json({ success: true });
   setAdminSessionCookie(response, token);

@@ -5,14 +5,26 @@ import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension
 import { tryGetAppSecret } from './app-secret';
 
 /**
- * Admin session lifetime — long enough that a typical event-management
- * session isn't interrupted, short enough that a walked-away laptop doesn't
- * stay authenticated indefinitely. AdminSessionKeepAlive slides the session
- * via POST /api/admin/refresh while an admin is actively working (tab visible),
- * so an active operator effectively never expires mid-session; this TTL is the
- * ceiling for an IDLE session.
+ * Admin session lifetime (JWT `exp`) — the ceiling for an IDLE session, i.e.
+ * how long a walked-away workstation stays AUTHORIZED. AdminSessionKeepAlive
+ * slides this via POST /api/admin/refresh while an admin is actively working
+ * (tab visible + recent activity), so an active operator never expires
+ * mid-session; only a genuinely idle session decays to this ceiling.
  */
-export const ADMIN_SESSION_TTL_SECONDS = 8 * 60 * 60;
+export const ADMIN_SESSION_TTL_SECONDS = 6 * 60 * 60;
+
+/**
+ * Cookie max-age, deliberately LONGER than the JWT lifetime. This makes the
+ * cookie OUTLIVE the token it carries: once the JWT `exp` passes the session is
+ * no longer authorized (isAdminAuthenticated returns false), but the cookie is
+ * still PRESENT. The middleware uses that "present-but-invalid" state to tell an
+ * admin whose session lapsed (redirect them to /admin/login) apart from a
+ * genuine event moderator reaching a `?token=` page via magic link (who has NO
+ * admin_session cookie at all and must NOT be bounced to an admin login they
+ * can't pass). The lingering cookie grants no access — only the JWT is verified.
+ * Logout clears it explicitly.
+ */
+export const ADMIN_COOKIE_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
 /**
  * Verify the admin_session cookie and return whether it carries a
@@ -48,7 +60,10 @@ export function setAdminSessionCookie(
     httpOnly: true,
     path: '/',
     sameSite: 'lax',
-    maxAge: ADMIN_SESSION_TTL_SECONDS,
+    // Cookie outlives the JWT (see ADMIN_COOKIE_MAX_AGE_SECONDS) so a lapsed
+    // admin session stays detectable as "present-but-invalid". Access is still
+    // bounded by the JWT `exp` inside the token, not by this max-age.
+    maxAge: ADMIN_COOKIE_MAX_AGE_SECONDS,
     secure: process.env.NODE_ENV === 'production',
   });
 }
