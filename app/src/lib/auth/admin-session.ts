@@ -5,13 +5,14 @@ import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension
 import { tryGetAppSecret } from './app-secret';
 
 /**
- * Admin session lifetime — short enough that a walked-away laptop
- * doesn't keep an admin authenticated all day, long enough that a
- * typical event-management session doesn't get interrupted. The admin
- * UI is expected to call POST /api/admin/refresh ahead of expiry to
- * extend the session while the operator is actively working.
+ * Admin session lifetime — long enough that a typical event-management
+ * session isn't interrupted, short enough that a walked-away laptop doesn't
+ * stay authenticated indefinitely. AdminSessionKeepAlive slides the session
+ * via POST /api/admin/refresh while an admin is actively working (tab visible),
+ * so an active operator effectively never expires mid-session; this TTL is the
+ * ceiling for an IDLE session.
  */
-export const ADMIN_SESSION_TTL_SECONDS = 4 * 60 * 60;
+export const ADMIN_SESSION_TTL_SECONDS = 8 * 60 * 60;
 
 /**
  * Verify the admin_session cookie and return whether it carries a

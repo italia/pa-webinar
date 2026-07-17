@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import AdminNav from '@/components/admin/admin-nav';
 import AdminBreadcrumb from '@/components/admin/admin-breadcrumb';
+import AdminSessionKeepAlive from '@/components/admin/admin-session-keepalive';
 import { ToastProvider } from '@/components/ui/toast';
 import { ConfirmProvider } from '@/components/ui/confirm-dialog';
 
@@ -22,6 +23,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
       <ConfirmProvider>
         {isAdmin && (
           <>
+            <AdminSessionKeepAlive />
             <AdminNav />
             <AdminBreadcrumb />
           </>
