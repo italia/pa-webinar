@@ -33,7 +33,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     title: 'Reazioni configurabili, chiusura sala vuota e sicurezza area admin',
     notes: [
       'Le reazioni (emoji) sono ora configurabili dall\'amministratore: di default si usano quelle native di Jitsi, direttamente nella barra dei controlli (leggere ed effimere). In alternativa si possono attivare le reazioni "custom" dell\'app (barra in basso a sinistra) che vengono conteggiate nelle statistiche dell\'evento.',
-      'Una sala rimasta completamente vuota (moderatore incluso) si chiude automaticamente per inattività dopo 30 minuti, senza dover attendere l\'orario di fine previsto; la soglia è configurabile dall\'amministratore.',
+      'Nuova opzione admin: chiudere automaticamente una sala rimasta completamente vuota (moderatore incluso) come segnale di evento abbandonato. È disattivata di default — l\'inattività senza moderatore è già gestita in sicurezza (la sala diventa dormiente dopo 45 minuti) — e attivabile dalle impostazioni.',
       'Area amministrazione più sicura: alla scadenza della sessione si viene riportati alla schermata di login (niente più pagine admin utilizzabili a sessione scaduta), e la sessione dura più a lungo e si rinnova automaticamente mentre si lavora.',
     ],
   },
