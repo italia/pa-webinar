@@ -1123,10 +1123,16 @@ model SiteSetting {
   // DIRETTAMENTE a ENDED (terminale), PRIMA di endsAt e separatamente dalla
   // grace di scale-to-zero (jvbInactiveGraceMinutes/45m) e dalla grace di
   // overtime post-endsAt (eventGracePeriodMinutes/15m).
-  //   -1  → disabilitato (comportamento storico, default)
+  //   -1  → disabilitato
   //    0  → chiudi al primo tick a sala vuota (~cadenza cron)
-  //   N>0 → chiudi dopo N minuti di sala vuota (consigliato 10)
-  jvbEmptyCloseMinutes     Int @default(-1) @map("jvb_empty_close_minutes")
+  //   N>0 → chiudi dopo N minuti di sala vuota
+  // Default 15 = auto-chiusura per inattività attiva (una sala vuota senza
+  // moderatore si chiude da sola dopo 15 min, senza attendere endsAt).
+  jvbEmptyCloseMinutes     Int @default(15) @map("jvb_empty_close_minutes")
+  // Modalità reazioni (#7): 'NATIVE' = pulsante reazioni nativo di Jitsi nella
+  // barra (effimere, nessuna analitica); 'CUSTOM' = barra reazioni custom
+  // dell'app (persistite/aggregate). Default 'NATIVE'.
+  reactionsMode            String @default("NATIVE") @map("reactions_mode")
   // Soglie di stress che attivano il reactive scale-up oltre al predictive.
   // Sopra la warn, aggiunge 1 replica; sopra la critical, 2. Entrambe
   // sono espresse come percentuale 0-100 per comodità dell'admin UI.

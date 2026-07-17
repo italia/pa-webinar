@@ -60,6 +60,10 @@ interface JitsiRoomProps {
    *  Drives resolution, bitrate caps, channelLastN and Opus settings, and is
    *  also enforced at runtime via setVideoQuality. Defaults to HIGH. */
   videoQuality?: VideoQualityPreset;
+  /** Reactions mode (admin SiteSetting, #7). 'NATIVE' → Jitsi's own reactions
+   *  button in the toolbar (ephemeral, no app analytics); 'CUSTOM' → the app's
+   *  ReactionBar overlay (persisted/aggregated). Default 'NATIVE'. */
+  reactionsMode?: 'NATIVE' | 'CUSTOM';
   /** If true, the iframe initializes with the local video track muted.
    *  Reflects the user's pre-join DeviceCheck toggle so the choice
    *  actually takes effect when the user lands in the Jitsi room. */
@@ -104,6 +108,7 @@ export default function JitsiRoom({
   enableFileSharing = false,
   whiteboardEnabled = false,
   videoQuality,
+  reactionsMode = 'NATIVE',
   startWithVideoMuted = false,
   startWithAudioMuted = false,
   watermark,
@@ -210,6 +215,16 @@ export default function JitsiRoom({
       if (whiteboardEnabled && !isMobileRef.current) {
         toolbarButtons.push('whiteboard');
       }
+    }
+
+    // Reactions (#7): NATIVE mode surfaces Jitsi's own reactions button and
+    // enables the feature (the base config disables it in favour of the custom
+    // bar); CUSTOM mode leaves it disabled and the app renders its own
+    // analytics-backed ReactionBar instead. `extraConfig` is spread AFTER
+    // `jitsiConfigOverwrite`, so this override wins.
+    if (reactionsMode === 'NATIVE') {
+      extraConfig.disableReactions = false;
+      if (!toolbarButtons.includes('reactions')) toolbarButtons.push('reactions');
     }
 
     // Honor the user's pre-join DeviceCheck choice. The base
@@ -617,7 +632,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, videoQuality, startWithVideoMuted, startWithAudioMuted]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, videoQuality, reactionsMode, startWithVideoMuted, startWithAudioMuted]);
 
   return (
     <div className="jitsi-wrapper position-relative">

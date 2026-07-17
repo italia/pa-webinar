@@ -125,6 +125,10 @@ interface LiveEventClientProps {
   jitsiDomain: string;
   watermark?: WatermarkSettings;
   jibriAvailable?: boolean;
+  /** Reactions mode (admin SiteSetting, #7): 'NATIVE' = Jitsi's own reactions
+   *  button (ephemeral); 'CUSTOM' = the app's analytics-backed ReactionBar.
+   *  Default 'NATIVE'. */
+  reactionsMode?: 'NATIVE' | 'CUSTOM';
 }
 
 type LivePhase =
@@ -195,6 +199,7 @@ export default function LiveEventClient({
   jitsiDomain,
   watermark,
   jibriAvailable: _jibriAvailable = true,
+  reactionsMode = 'NATIVE',
 }: LiveEventClientProps) {
   const t = useTranslations('live');
   const tc = useTranslations('common');
@@ -1383,6 +1388,7 @@ export default function LiveEventClient({
               enableFileSharing={isInstantCall}
               whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
               videoQuality={event.videoQuality}
+              reactionsMode={reactionsMode}
               startWithVideoMuted={!joinPrefs.cameraOn}
               startWithAudioMuted={!joinPrefs.micOn}
               watermark={watermark}
@@ -1393,7 +1399,9 @@ export default function LiveEventClient({
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
             />
-            <ReactionBar eventSlug={event.slug} />
+            {/* Custom reactions bar only in CUSTOM mode (#7); NATIVE mode uses
+                Jitsi's own reactions button in the toolbar instead. */}
+            {reactionsMode === 'CUSTOM' && <ReactionBar eventSlug={event.slug} />}
             {/* Floating controls slot: the sidebar portals its bar here
                 so it sits on top of the Jitsi iframe (Meet-style) on
                 both desktop and mobile. */}
