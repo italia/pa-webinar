@@ -33,7 +33,11 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
-import { shouldEndLiveEvent, emptyCloseCutoff } from '@/lib/events/lifecycle';
+import {
+  shouldEndLiveEvent,
+  shouldReclaimEmptyOvertime,
+  emptyCloseCutoff,
+} from '@/lib/events/lifecycle';
 import {
   JVB_SNAPSHOT_KEY,
   JVB_SNAPSHOT_TTL_SECONDS,
@@ -228,6 +232,11 @@ export const GET = withErrorHandling(async (request) => {
     //    Use lastActiveAt when set, else fall back to provisioningStartedAt
     //    (for events that went LIVE but never had anyone join). Uses the shared
     //    skipIdleDemotion guard computed above (multi-replica staleness).
+    //    NOTE: this is a REVIVABLE, future-endsAt demotion, so it intentionally
+    //    uses simpler empty-detection than the terminal past-endsAt reclaim in
+    //    step 3b (shouldReclaimEmptyOvertime), which adds max-of-signals +
+    //    endsAt fallback + a stricter reliability gate BECAUSE it closes to
+    //    ENDED. The two are deliberately NOT the same predicate — don't unify.
     if (!skipIdleDemotion) {
       const idleCandidates = await tx.event.findMany({
         where: {
@@ -282,17 +291,61 @@ export const GET = withErrorHandling(async (request) => {
 
     const liveOvertime = await tx.event.findMany({
       where: { status: 'LIVE', endsAt: { lt: now } },
-      select: { id: true, endsAt: true, gracePeriodMinutes: true },
+      select: {
+        id: true,
+        endsAt: true,
+        gracePeriodMinutes: true,
+        lastActiveAt: true,
+        provisioningStartedAt: true,
+      },
     });
     const siteGrace = settings.eventGracePeriodMinutes ?? 15;
+    // A LIVE room past endsAt ends when EITHER of two things is true:
+    //   (a) its grace window elapsed (shouldEndLiveEvent) — a time-based close
+    //       that fires regardless of who's present, including grace=0/N; OR
+    //   (b) it has sat EMPTY for the inactivity grace (shouldReclaimEmptyOvertime)
+    //       — this reclaims the JVB even under grace=-1 ("never auto-close"), so
+    //       an open-ended call people forgot to close doesn't pin a bridge
+    //       forever. Step (2) above only demotes EMPTY rooms whose endsAt is
+    //       still in the FUTURE; without (b) an emptied OVERTIME room with
+    //       grace=-1 matched no branch at all and leaked a JVB node indefinitely.
+    // A past-endsAt LIVE room ends on EITHER the time-based grace close
+    // (shouldEndLiveEvent, ungated — it never looks at the count) OR, for
+    // OPEN-ENDED rooms only, once it has sat empty for the inactivity grace
+    // (shouldReclaimEmptyOvertime — see its JSDoc for the full rationale:
+    // grace<0-only scope, MAX-of-signals /wake-race safety, co-hosted-bridge
+    // caveat, and why terminal ENDED is safe past endsAt).
+    //
+    // canReclaimEmpty gates the empty path: before we TERMINALLY close on
+    // participants=0 the reading must be POSITIVELY known reliable — cross-pod
+    // aggregated, or an explicitly-reported single replica. This is STRICTER
+    // than step 2's `!skipIdleDemotion` guard (which only drops the unreliable
+    // multi-replica-without-aggregation case): an older scaler image that omits
+    // `current` (currentReplicas=null, assumed 1) passes !skipIdleDemotion but
+    // NOT this, so it can't terminally evict an occupied call off a single-pod
+    // probe. countReliableForClose already implies !skipIdleDemotion, so the
+    // latter is intentionally omitted here as redundant. The grace close needs
+    // none of this — it never looks at the count.
+    const countReliableForClose = scalerAggregated || currentReplicas === 1;
+    const canReclaimEmpty = jvbReachable && countReliableForClose;
     const toEndIds: string[] = [];
     for (const ev of liveOvertime) {
-      if (shouldEndLiveEvent({
+      const graceClose = shouldEndLiveEvent({
         endsAt: ev.endsAt,
         gracePeriodMinutes: ev.gracePeriodMinutes,
         siteGraceMinutes: siteGrace,
         now,
-      })) {
+      });
+      const emptyReclaim = shouldReclaimEmptyOvertime({
+        gracePeriodMinutes: ev.gracePeriodMinutes,
+        siteGraceMinutes: siteGrace,
+        lastActiveAt: ev.lastActiveAt,
+        provisioningStartedAt: ev.provisioningStartedAt,
+        endsAt: ev.endsAt,
+        inactiveCutoff,
+        canReclaimEmpty,
+      });
+      if (graceClose || emptyReclaim) {
         toEndIds.push(ev.id);
       }
     }
