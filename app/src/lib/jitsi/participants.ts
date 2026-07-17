@@ -12,20 +12,31 @@
  *  mints its JWT with this exact value). */
 export const RECORDER_DISPLAY_NAME = '📼 Recorder';
 
+/** The distinctive marker that PREFIXES only the recorder bot's name. Matching
+ *  on this (rather than the full literal) survives transport variations of the
+ *  surfaced name — leading/trailing whitespace, a `formattedDisplayName` suffix
+ *  like "📼 Recorder (me)", or NFC/NFKC normalization differences of the astral
+ *  '📼' code point — which an exact `=== '📼 Recorder'` comparison silently let
+ *  through, making the bot reappear in the roster/count (live feedback #2). */
+export const RECORDER_MARKER = '📼';
+
+function isRecorderName(s?: string | null): boolean {
+  const n = (s ?? '').normalize('NFC').trim();
+  return n === RECORDER_DISPLAY_NAME || n.startsWith(RECORDER_MARKER);
+}
+
 /** True for a real attendee (i.e. not the recording bot).
  *
  *  The Jitsi IFrame API can leave `displayName` empty and surface the shown
  *  name in `formattedDisplayName` instead, so we exclude the bot if EITHER
  *  field is the recorder name — otherwise the whole F2 filter could silently
- *  no-op and the bot would reappear in the count/roster. */
+ *  no-op and the bot would reappear in the count/roster. A plain "Recorder"
+ *  with no '📼' marker is still treated as a human (the emoji is the signal). */
 export function isHumanParticipant(p: {
   displayName?: string | null;
   formattedDisplayName?: string | null;
 }): boolean {
-  return (
-    (p.displayName ?? '') !== RECORDER_DISPLAY_NAME &&
-    (p.formattedDisplayName ?? '') !== RECORDER_DISPLAY_NAME
-  );
+  return !isRecorderName(p.displayName) && !isRecorderName(p.formattedDisplayName);
 }
 
 /**

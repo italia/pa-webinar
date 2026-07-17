@@ -682,36 +682,38 @@ html.live-call-immersive body {
   height: 100%;
 }
 
+// "Esci dalla sala": solid Bootstrap Italia danger red BY DEFAULT (not just on
+// hover) so the exit action reads as destructive at rest. Darkens on hover/focus.
 .leave-room-btn {
   font-size: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #D9364F !important;
+  background: #D9364F;
   color: #fff;
   transition: background 0.15s ease, border-color 0.15s ease;
 
   &:hover,
   &:focus {
-    background: #D9364F;
-    border-color: #D9364F !important;
+    background: #b81f38;
+    border-color: #b81f38 !important;
     color: #fff;
   }
 }
 
-// Share button in the live top bar. Same translucent-white base as
-// .leave-room-btn but stays NEUTRAL on hover/focus (no #D9364F danger red),
-// so it isn't mistaken for "Esci" once clicked/focused.
+// "Condividi": solid white pill with BI primary-blue text BY DEFAULT (not just
+// on hover). Sits on the blue top bar so it stands out clearly at rest; the
+// share glyph uses stroke:currentColor so it inherits the blue.
 .live-share-btn {
   font-size: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  border: 1px solid #fff !important;
+  background: #fff;
+  color: #0066CC;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 
   &:hover,
   &:focus {
-    background: rgba(255, 255, 255, 0.22);
-    border-color: rgba(255, 255, 255, 0.9) !important;
-    color: #fff;
+    background: #e9f1fb;
+    border-color: #fff !important;
+    color: #004D99;
   }
 }
 
@@ -719,7 +721,11 @@ html.live-call-immersive body {
 
 .reaction-overlay {
   position: absolute;
-  bottom: 16px;
+  // Lifted from 16px to 80px so the pill clears Jitsi's native bottom toolbar
+  // band (mic/cam/tileview/leave, ~56-64px tall) which lives INSIDE the iframe
+  // and stays persistently visible in tile view — otherwise the overlay sat
+  // right on top of those controls and blocked their clicks.
+  bottom: 80px;
   // F6: centrata orizzontalmente in basso ("mettiamo le emoticons nella barra
   // centrale" — feedback) invece che nell'angolo in basso a sinistra, così è
   // ben visibile e facile da trovare. Su desktop il fondo del video è libero
@@ -728,6 +734,10 @@ html.live-call-immersive body {
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
+  // The container spans a wide/tall box but must NOT intercept clicks meant for
+  // the Jitsi controls beneath it: only the pill (&__bar) re-enables pointer
+  // events. Fixes the "emoji block the control bar in tile view" bug.
+  pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -759,6 +769,10 @@ html.live-call-immersive body {
   // Always-visible reaction bar (F6): a horizontal pill of emoji buttons,
   // no collapse — findable at a glance without opening a picker.
   &__bar {
+    // Re-enable pointer events on the pill only (the container is none), so the
+    // emoji buttons stay clickable while the surrounding overlay area lets
+    // clicks fall through to the Jitsi controls beneath.
+    pointer-events: auto;
     display: flex;
     flex-direction: row;
     gap: 2px;
