@@ -416,6 +416,12 @@ export default function JitsiRoom({
           // Il nostro endpoint id: usato per segnalare solo le nostre alzate.
           if (evt?.id) myEndpointIdRef.current = evt.id;
           setLoadState('ready');
+          // Seed iniziale del conteggio partecipanti (feedback #4b): i listener
+          // participantJoined/Left qui sotto scattano SOLO per i cambiamenti dopo
+          // che ci siamo agganciati, quindi senza questo seed il conteggio parte
+          // da 0 e sotto-riporta per chi entra in una sala già popolata (es. un
+          // moderatore che entra a evento avviato). Recorder escluso.
+          onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName));
           // Annulla un'eventuale NS persistita da Jitsi in localStorage da una
           // sessione precedente, poi continua a ri-asserirla off per tutta la call.
           if (RNNOISE_ENFORCE_OFF) {
