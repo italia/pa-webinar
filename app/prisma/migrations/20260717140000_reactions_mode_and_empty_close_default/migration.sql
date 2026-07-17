@@ -6,11 +6,11 @@
 ALTER TABLE "site_settings"
   ADD COLUMN "reactions_mode" TEXT NOT NULL DEFAULT 'NATIVE';
 
--- #12: empty-conference auto-close default for NEW installs is 30 min. We only
--- change the column DEFAULT (affects rows created later) and deliberately do
--- NOT rewrite existing rows: -1 is both the historical default AND the operator
--- "disable" sentinel, so a blanket UPDATE would silently re-enable a terminal
--- auto-close for an admin who intentionally turned it off. Existing deployments
--- that want it on set the value explicitly in admin settings.
-ALTER TABLE "site_settings"
-  ALTER COLUMN "jvb_empty_close_minutes" SET DEFAULT 30;
+-- #12: the authoritative empty-close stays DISABLED by default (-1, as shipped
+-- in v0.8.0). It is a TERMINAL LIVE->ENDED transition, and adversarial review
+-- flagged real ejection risks (a stale/degraded participants=0 reading could
+-- close a still-populated room; a break where everyone incl. the moderator
+-- leaves could close a room people meant to return to). Safe auto-close for
+-- inactivity is already provided by the revivable 45-min LIVE->IDLE grace, so
+-- the terminal early-close remains an opt-in admin setting. No default change
+-- and no row rewrite here.

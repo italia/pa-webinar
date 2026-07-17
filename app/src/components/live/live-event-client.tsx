@@ -839,13 +839,17 @@ export default function LiveEventClient({
   // `isModerator`, so a moderator-less session (or one the moderator left before
   // the first tick) never bumped `peakParticipants`, leaving post-event
   // analytics at 0. We report the human-filtered count (Recorder excluded, same
-  // helper as the sidebar) and fire once immediately + every 30s. Guests have an
-  // empty token and self-exclude; the server clamps to capacity.
+  // helper as the sidebar). To avoid O(N) redundant writes on a big event, each
+  // client only POSTs when its local count reaches a NEW local maximum (the
+  // server value is monotonic and identical across clients anyway), so a steady
+  // room goes quiet after the peak instead of every attendee POSTing every 30s.
+  const lastReportedPeakRef = useRef(0);
   useEffect(() => {
     if (!jitsiApi || !token) return;
     const report = () => {
       const count = humanParticipantCount(jitsiApi, credentials?.displayName);
-      if (count > 0) {
+      if (count > 0 && count > lastReportedPeakRef.current) {
+        lastReportedPeakRef.current = count;
         fetch(`/api/events/${event.slug}/analytics/peak`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
