@@ -1144,6 +1144,28 @@ function FeaturesTab({ settings, updateField }: TabProps) {
             </small>
           </FormGroup>
         </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="waitingRoomLeadMinutes">
+              {t('waitingRoomLeadMinutes')}
+            </Label>
+            <Input
+              id="waitingRoomLeadMinutes"
+              type="number"
+              min={0}
+              max={1440}
+              step={1}
+              value={settings.waitingRoomLeadMinutes}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('waitingRoomLeadMinutes', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('waitingRoomLeadMinutesHelp')}
+            </small>
+          </FormGroup>
+        </Col>
       </Row>
       <Row>
         <Col md={6}>

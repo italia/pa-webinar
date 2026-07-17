@@ -32,6 +32,12 @@ interface RegistrationFormClientProps {
    *  screen must show it (and stay put) instead of auto-redirecting the
    *  user into the waiting room. */
   hasPreRegistrationQuestionnaire?: boolean;
+  /** Event start (ISO). Routing (#1): registering within waitingRoomLeadMinutes
+   *  of start → straight to the waiting room; registering earlier → thank-you. */
+  startsAt: string;
+  /** Minutes before startsAt inside which we route into the waiting room
+   *  (SiteSetting.waitingRoomLeadMinutes). */
+  waitingRoomLeadMinutes: number;
   profiling?: ProfilingConfig;
 }
 
@@ -44,6 +50,8 @@ export default function RegistrationFormClient({
   recordingEnabled,
   multitrackRecordingEnabled,
   hasPreRegistrationQuestionnaire,
+  startsAt,
+  waitingRoomLeadMinutes,
   profiling,
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
@@ -235,24 +243,35 @@ export default function RegistrationFormClient({
     }
   }, [eventSlug, email]);
 
+  // Registration routing by time (#1): "near start" = the event begins within
+  // waitingRoomLeadMinutes. Computed at call time so it stays correct while the
+  // confirmation screen sits open across the threshold.
+  const isNearStart = useCallback(
+    () => new Date(startsAt).getTime() - Date.now() <= waitingRoomLeadMinutes * 60_000,
+    [startsAt, waitingRoomLeadMinutes],
+  );
+
   // One-step access: the registration API already handed us the personal
-  // accessToken, so when there's no PRE_REGISTRATION questionnaire to fill
-  // we send the user straight into the waiting room instead of making them
-  // click "Enter room" (or wait for the confirmation email). A short delay
-  // lets the "Registration complete" confirmation register; the manual
-  // button below stays as a no-JS / slow-redirect fallback.
+  // accessToken, so when there's no PRE_REGISTRATION questionnaire to fill AND
+  // the event is near start we send the user straight into the waiting room
+  // instead of making them click "Enter room". Registering hours early instead
+  // lands on the thank-you screen (with an iCal link) — see below. A short delay
+  // lets the "Registration complete" confirmation register; the manual button
+  // below stays as a no-JS / slow-redirect fallback.
   useEffect(() => {
     if (!success || !registrationAccessToken || hasPreRegistrationQuestionnaire) return;
+    if (!isNearStart()) return;
     const target = `/events/${eventSlug}/live?token=${registrationAccessToken}`;
     const id = setTimeout(() => router.push(target), 1200);
     return () => clearTimeout(id);
-  }, [success, registrationAccessToken, hasPreRegistrationQuestionnaire, eventSlug, router]);
+  }, [success, registrationAccessToken, hasPreRegistrationQuestionnaire, eventSlug, router, isNearStart]);
 
   if (success) {
     // Auto-redirect straight into the waiting room when there's nothing
     // left to do on this screen (no PRE_REGISTRATION questionnaire). When
     // a questionnaire is present we stay so the user can fill it first.
-    const autoRedirecting = !!registrationAccessToken && !hasPreRegistrationQuestionnaire;
+    const nearStart = isNearStart();
+    const autoRedirecting = !!registrationAccessToken && !hasPreRegistrationQuestionnaire && nearStart;
     return (
       <div className="py-4">
         <div className="text-center">
@@ -276,7 +295,11 @@ export default function RegistrationFormClient({
           </svg>
           <h2 className="h3 mb-3">{t('success')}</h2>
           <p className="mb-4">
-            {autoRedirecting ? t('enteringRoom') : t('successMessage')}
+            {autoRedirecting
+              ? t('enteringRoom')
+              : nearStart
+                ? t('successMessage')
+                : t('successScheduledMessage')}
           </p>
         </div>
         {registrationAccessToken && (
@@ -303,7 +326,7 @@ export default function RegistrationFormClient({
               {t('enteringRoomHint')}
             </div>
           )}
-          {registrationAccessToken && (
+          {registrationAccessToken && nearStart && (
             <Link
               href={`/events/${eventSlug}/live?token=${registrationAccessToken}`}
             >
@@ -311,6 +334,15 @@ export default function RegistrationFormClient({
                 {tlive('enterRoom')}
               </Button>
             </Link>
+          )}
+          {!nearStart && (
+            <a
+              href={`/api/events/${eventSlug}/calendar.ics`}
+              download
+              className="btn btn-outline-primary"
+            >
+              {t('addToCalendar')}
+            </a>
           )}
           <Link href={`/events/${eventSlug}`}>
             <Button color="primary" outline tag="span">

@@ -1111,8 +1111,13 @@ model SiteSetting {
   // e scalare il JVB a 0. Default: 45. Range consigliato: 15-120.
   jvbInactiveGraceMinutes  Int @default(45) @map("jvb_inactive_grace_minutes")
   // Minuti di lookahead per il pre-scaling di eventi PUBLISHED → PROVISIONING.
-  // Il nodo viene avviato N minuti prima di startsAt. Default: 10.
-  jvbPreScaleMinutes       Int @default(10) @map("jvb_pre_scale_minutes")
+  // Il nodo viene avviato N minuti prima di startsAt. Default: 15.
+  jvbPreScaleMinutes       Int @default(15) @map("jvb_pre_scale_minutes")
+  // Finestra "vicino all'inizio" (minuti) entro cui la registrazione instrada
+  // subito nella sala d'attesa; oltre (registrazione con ore di anticipo)
+  // mostra la schermata di conferma con iCal invece della sala. 0 = mai
+  // instradare in sala prima dell'inizio. Default 15 (feedback #1).
+  waitingRoomLeadMinutes   Int @default(15) @map("waiting_room_lead_minutes")
   // Empty-conference authoritative close (feedback #12). Minuti che una sala
   // LIVE che HA avuto traffico può restare vuota prima che lo scaler la porti
   // DIRETTAMENTE a ENDED (terminale), PRIMA di endsAt e separatamente dalla
