@@ -1123,16 +1123,16 @@ model SiteSetting {
   // DIRETTAMENTE a ENDED (terminale), PRIMA di endsAt e separatamente dalla
   // grace di scale-to-zero (jvbInactiveGraceMinutes/45m) e dalla grace di
   // overtime post-endsAt (eventGracePeriodMinutes/15m).
-  //   -1  → disabilitato
+  //   -1  → disabilitato (default)
   //    0  → chiudi al primo tick a sala vuota (~cadenza cron)
-  //   N>0 → chiudi dopo N minuti di sala vuota
-  // Default 30 = auto-chiusura per inattività attiva. Scatta SOLO quando la sala
-  // è COMPLETAMENTE vuota (0 partecipanti, moderatore incluso) da N minuti — se
-  // un moderatore resta in sala non scatta mai. È TERMINALE (ENDED, non
-  // risvegliabile): una soglia troppo bassa rischierebbe di chiudere una sala
-  // durante una pausa in cui tutti (moderatore compreso) hanno chiuso la scheda;
-  // 30 min è un segnale forte di evento abbandonato. Regolabile da admin.
-  jvbEmptyCloseMinutes     Int @default(30) @map("jvb_empty_close_minutes")
+  //   N>0 → chiudi dopo N minuti di sala COMPLETAMENTE vuota (moderatore incluso)
+  // DISATTIVO di default: è un ENDED TERMINALE (non risvegliabile) e la review
+  // ha evidenziato rischi reali (uno stato participants=0 stantìo/degradato
+  // potrebbe chiudere una sala ancora piena; una pausa in cui esce anche il
+  // moderatore chiuderebbe una sala a cui si voleva tornare). L'auto-chiusura
+  // per inattività SICURA è già data dalla grace 45-min LIVE->IDLE (risvegliabile);
+  // questo close terminale anticipato resta un opt-in configurabile da admin.
+  jvbEmptyCloseMinutes     Int @default(-1) @map("jvb_empty_close_minutes")
   // Modalità reazioni (#7): 'NATIVE' = pulsante reazioni nativo di Jitsi nella
   // barra (effimere, nessuna analitica); 'CUSTOM' = barra reazioni custom
   // dell'app (persistite/aggregate). Default 'NATIVE'.

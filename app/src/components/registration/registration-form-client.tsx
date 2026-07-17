@@ -251,6 +251,19 @@ export default function RegistrationFormClient({
     [startsAt, waitingRoomLeadMinutes],
   );
 
+  // `isNearStart()` is time-dependent, so on the confirmation screen we tick a
+  // counter every 30s. This re-renders (re-evaluating nearStart in the render →
+  // the enter-room button + iCal appear once the lead window is reached) AND
+  // re-runs the auto-redirect effect below (nowTick is in its deps), so an early
+  // registrant who keeps the tab open is pulled into the waiting room when the
+  // event nears — instead of being stranded on the thank-you screen forever.
+  const [nowTick, setNowTick] = useState(0);
+  useEffect(() => {
+    if (!success) return;
+    const id = setInterval(() => setNowTick((t) => t + 1), 30_000);
+    return () => clearInterval(id);
+  }, [success]);
+
   // One-step access: the registration API already handed us the personal
   // accessToken, so when there's no PRE_REGISTRATION questionnaire to fill AND
   // the event is near start we send the user straight into the waiting room
@@ -264,7 +277,7 @@ export default function RegistrationFormClient({
     const target = `/events/${eventSlug}/live?token=${registrationAccessToken}`;
     const id = setTimeout(() => router.push(target), 1200);
     return () => clearTimeout(id);
-  }, [success, registrationAccessToken, hasPreRegistrationQuestionnaire, eventSlug, router, isNearStart]);
+  }, [success, registrationAccessToken, hasPreRegistrationQuestionnaire, eventSlug, router, isNearStart, nowTick]);
 
   if (success) {
     // Auto-redirect straight into the waiting room when there's nothing
