@@ -14,8 +14,14 @@ const ADMIN_LOGIN_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/login(?:/|$)`);
 // Event pages under /admin reachable by a NON-admin event moderator via magic
 // link (moderatorLink = /admin/events/{id}?token=…): the shared management page
 // and its /edit. They authenticate on the event moderator token, not the admin
-// session (see events/[id]/page.tsx + edit/page.tsx).
-const ADMIN_EVENT_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/(?:events|eventi)/[^/]+(?:/[^/]+)?$`);
+// session (see events/[id]/page.tsx + edit/page.tsx). The id segment MUST be a
+// UUID — this deliberately EXCLUDES the sibling /admin/events/new create wizard,
+// which has no token auth of its own and must stay behind the admin session
+// (otherwise ?token=<any-uuid> would leak the wizard's templates/settings).
+const ADMIN_EVENT_RE = new RegExp(
+  `^/(?:${LOCALE_SEGMENT})/admin/(?:events|eventi)/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(?:/[^/]+)?$`,
+  'i',
+);
 const LOCALE_PREFIX_RE = new RegExp(`^/(${LOCALE_SEGMENT})(?:/|$)`);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

@@ -2,13 +2,16 @@
  * POST /api/admin/refresh
  *
  * Re-mint the admin_session cookie when the caller already holds a
- * valid one. The admin UI calls this on a timer (every ~3h, well
- * inside the 4h TTL) so a working operator never gets logged out
- * mid-session — but a walked-away laptop loses access after 4h
- * because the timer doesn't fire from the server.
+ * valid one. AdminSessionKeepAlive calls this every ~10 min while the
+ * admin is actively working (tab visible + recent activity), well inside
+ * the 6h JWT TTL, so a working operator never gets logged out mid-session.
+ * A walked-away laptop stops refreshing and decays to the 6h idle ceiling;
+ * the cookie itself lingers ~1 day (ADMIN_COOKIE_MAX_AGE_SECONDS) purely as
+ * a "was an admin here" marker, granting no access.
  *
  * Returns 401 if the current cookie is missing or invalid (no
- * implicit privilege escalation).
+ * implicit privilege escalation). Intentionally writes NO audit-log row:
+ * this is a silent keepalive slide, not a meaningful admin action.
  */
 
 import { cookies } from 'next/headers';
