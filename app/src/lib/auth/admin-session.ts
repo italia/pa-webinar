@@ -22,9 +22,15 @@ export const ADMIN_SESSION_TTL_SECONDS = 6 * 60 * 60;
  * genuine event moderator reaching a `?token=` page via magic link (who has NO
  * admin_session cookie at all and must NOT be bounced to an admin login they
  * can't pass). The lingering cookie grants no access — only the JWT is verified.
- * Logout clears it explicitly.
+ * Logout clears it explicitly. Kept to ~1 day (not weeks) so the "lapsed admin"
+ * marker clears reasonably fast — this bounds the minor friction where someone
+ * who is BOTH an admin and an event moderator, having recently held an admin
+ * session on this browser, is sent to /admin/login on their moderator magic link
+ * instead of straight into the page (a pure external moderator has no cookie and
+ * is never affected). The keepalive re-sets it on every slide, so an active
+ * admin's cookie never actually decays.
  */
-export const ADMIN_COOKIE_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
+export const ADMIN_COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60;
 
 /**
  * Verify the admin_session cookie and return whether it carries a
