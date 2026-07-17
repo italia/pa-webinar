@@ -57,6 +57,11 @@ export default function AdminSessionKeepAlive() {
       }
     };
 
+    // Slide once on mount too: an admin who opens a page with little TTL left
+    // (or returns after being away) gets refreshed immediately instead of
+    // waiting a full interval and risking a mid-work logout.
+    void attempt();
+
     const id = setInterval(attempt, INTERVAL_MS);
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
