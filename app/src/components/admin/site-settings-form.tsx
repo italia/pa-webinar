@@ -1124,6 +1124,30 @@ function FeaturesTab({ settings, updateField }: TabProps) {
       <Row>
         <Col md={6}>
           <FormGroup>
+            <Label htmlFor="jvbEmptyCloseMinutes">
+              {t('jvbEmptyCloseMinutes')}
+            </Label>
+            <Input
+              id="jvbEmptyCloseMinutes"
+              type="number"
+              min={-1}
+              max={240}
+              step={1}
+              value={settings.jvbEmptyCloseMinutes}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('jvbEmptyCloseMinutes', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('jvbEmptyCloseMinutesHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
             <Label htmlFor="jvbStressWarnPercent">
               {t('jvbStressWarnPercent')}
             </Label>

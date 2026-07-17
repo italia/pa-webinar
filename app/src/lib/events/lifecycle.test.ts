@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { shouldEndLiveEvent, reviveStatus } from './lifecycle';
+import { shouldEndLiveEvent, reviveStatus, emptyCloseCutoff } from './lifecycle';
 
 // Frozen reference time for deterministic comparisons.
 const NOW = new Date('2026-04-18T12:00:00Z');
@@ -174,5 +174,17 @@ describe('reviveStatus — event revival on endsAt extension', () => {
       statusExplicitlySet: false,
       now: NOW,
     })).toBeNull();
+  });
+});
+
+describe('emptyCloseCutoff — authoritative empty-close (#12)', () => {
+  it('returns null when disabled (minutes < 0)', () => {
+    expect(emptyCloseCutoff(NOW, -1)).toBeNull();
+  });
+  it('returns now when minutes == 0 (close on first empty poll)', () => {
+    expect(emptyCloseCutoff(NOW, 0)?.getTime()).toBe(NOW.getTime());
+  });
+  it('returns now - N minutes when minutes > 0', () => {
+    expect(emptyCloseCutoff(NOW, 10)?.getTime()).toBe(minutes(-10).getTime());
   });
 });

@@ -33,7 +33,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
-import { shouldEndLiveEvent } from '@/lib/events/lifecycle';
+import { shouldEndLiveEvent, emptyCloseCutoff } from '@/lib/events/lifecycle';
 import {
   JVB_SNAPSHOT_KEY,
   JVB_SNAPSHOT_TTL_SECONDS,
@@ -92,6 +92,13 @@ export const GET = withErrorHandling(async (request) => {
   const preScaleMin =
     settings.jvbPreScaleMinutes ??
     parseInt(process.env.JVB_PRE_SCALE_MINUTES || '10', 10);
+  // Authoritative empty-conference close (feedback #12). Minutes a LIVE room
+  // that HAD traffic may stay empty before we flip it straight to ENDED —
+  // shorter and terminal, distinct from the scale-to-zero inactivity grace.
+  // -1 disables it (default).
+  const emptyCloseMin =
+    settings.jvbEmptyCloseMinutes ??
+    parseInt(process.env.JVB_EMPTY_CLOSE_MIN || '-1', 10);
   // Reactive scale-up thresholds, 0-100 percent. Stored as integer in DB
   // for the admin form; compared against the 0..1 fraction from JVB stats.
   const stressWarn = clampPct(settings.jvbStressWarnPercent ?? 50) / 100;
@@ -100,6 +107,7 @@ export const GET = withErrorHandling(async (request) => {
   const now = new Date();
   const preScaleWindow = new Date(now.getTime() + preScaleMin * 60_000);
   const inactiveCutoff = new Date(now.getTime() - inactiveGraceMin * 60_000);
+  const emptyCloseCut = emptyCloseCutoff(now, emptyCloseMin);
 
   const searchParams = new URL(request.url).searchParams;
   const numParam = (name: string): number | null => {
@@ -152,6 +160,7 @@ export const GET = withErrorHandling(async (request) => {
   const transitions = await prisma.$transaction(async (tx) => {
     const counts = {
       liveRefreshed: 0,
+      liveEmptyClosed: 0,
       liveToIdle: 0,
       toEnded: 0,
       publishedToProvisioning: 0,
@@ -167,24 +176,50 @@ export const GET = withErrorHandling(async (request) => {
       counts.liveRefreshed = r.count;
     }
 
+    // Shared reliability guard for participant-count-driven demotion/close.
+    // /colibri/stats is served by whichever JVB pod the Service VIP routes to
+    // on this tick; with >1 replica and no cross-pod aggregation a
+    // `participants=0` reading is unreliable (the probe may hit a fresh empty
+    // sibling while real traffic lives on another), so we skip BOTH the
+    // empty-close AND the IDLE demotion this tick. When the scaler provided
+    // aggregated cross-pod stats the count is correct and the guard is dropped.
+    const skipIdleDemotion = !scalerAggregated && (currentReplicas ?? 1) > 1;
+
+    // 1b) LIVE → ENDED — authoritative empty-conference close (feedback #12).
+    //     Runs BEFORE the IDLE demotion so, when both would match, ENDED wins
+    //     (terminal) over IDLE (revivable). Fires only for rooms that HAD
+    //     traffic then emptied: lastActiveAt non-null AND older than the
+    //     admin-tunable cutoff, with endsAt still in the future (an EARLY
+    //     close; past-endsAt LIVE rooms are handled by the grace path below).
+    //     Disabled by default (jvbEmptyCloseMinutes = -1 → emptyCloseCut null).
+    //     `jvbReachable` is required: a terminal close must never fire on a
+    //     stale reading during a bridge blip — stricter than the IDLE path on
+    //     purpose, since ENDED is NOT auto-revived on rejoin (only IDLE is, via
+    //     /wake). Honours the same multi-replica skipIdleDemotion guard.
+    if (!skipIdleDemotion && emptyCloseCut && jvbReachable) {
+      const emptyCloseCandidates = await tx.event.findMany({
+        where: {
+          status: 'LIVE',
+          endsAt: { gt: now },
+          lastActiveAt: { not: null, lt: emptyCloseCut },
+        },
+        select: { id: true },
+      });
+      if (emptyCloseCandidates.length > 0) {
+        const closedIds = emptyCloseCandidates.map((e) => e.id);
+        const r = await tx.event.updateMany({
+          where: { id: { in: closedIds } },
+          data: { status: 'ENDED' },
+        });
+        counts.liveEmptyClosed = r.count;
+        await closeOpenSessions(tx, closedIds, now);
+      }
+    }
+
     // 2) LIVE → IDLE when the conference has been empty for ≥ grace.
     //    Use lastActiveAt when set, else fall back to provisioningStartedAt
-    //    (for events that went LIVE but never had anyone join).
-    //
-    //    Safety guard: /colibri/stats is served by whichever JVB pod the
-    //    Service VIP routes to on this tick. With multiple replicas (a
-    //    second event scales the deployment out) the probe might land on
-    //    a freshly-spun-up empty pod while the real traffic lives on a
-    //    sibling — making `participants=0` meaningless for LIVE-ness.
-    //    When currentReplicas > 1 we therefore skip the entire demotion
-    //    step for this tick; operator-visible staleness still surfaces
-    //    via the provisioning-timeout path, and real idleness is caught
-    //    once the deployment scales back down to 1.
-    //
-    //    When the scaler provided aggregated cross-pod stats this tick, the
-    //    `participants` count above is correct for every replica and the
-    //    guard can be dropped.
-    const skipIdleDemotion = !scalerAggregated && (currentReplicas ?? 1) > 1;
+    //    (for events that went LIVE but never had anyone join). Uses the shared
+    //    skipIdleDemotion guard computed above (multi-replica staleness).
     if (!skipIdleDemotion) {
       const idleCandidates = await tx.event.findMany({
         where: {
@@ -376,6 +411,7 @@ export const GET = withErrorHandling(async (request) => {
   // hard-to-reproduce bugs).
   const hasTransitions =
     transitions.liveRefreshed > 0 ||
+    transitions.liveEmptyClosed > 0 ||
     transitions.liveToIdle > 0 ||
     transitions.toEnded > 0 ||
     transitions.publishedToProvisioning > 0 ||

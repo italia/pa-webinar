@@ -73,3 +73,19 @@ export function reviveStatus(input: RevivalInput): 'LIVE' | 'PUBLISHED' | null {
   const effectiveStart = input.newStartsAt ?? input.currentStartsAt;
   return effectiveStart.getTime() <= input.now.getTime() ? 'LIVE' : 'PUBLISHED';
 }
+
+/**
+ * Compute the "empty since" cutoff for the authoritative empty-conference
+ * close (feedback #12). A LIVE room whose `lastActiveAt` is non-null AND
+ * older than this cutoff is considered abandoned and flipped straight to
+ * ENDED, separately from (and typically shorter than) the scale-to-zero
+ * inactivity grace.
+ *
+ *   minutes < 0  → feature disabled, returns null (caller skips the close).
+ *   minutes = 0  → cutoff == now (closes on the first poll with no traffic).
+ *   minutes > 0  → cutoff == now - minutes.
+ */
+export function emptyCloseCutoff(now: Date, minutes: number): Date | null {
+  if (minutes < 0) return null;
+  return new Date(now.getTime() - minutes * 60_000);
+}
