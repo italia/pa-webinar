@@ -1456,6 +1456,8 @@
         "jvbInactiveGraceMinutesHelp": "How long the conference must stay empty before the video node is scaled down. Recommended 45 minutes. Range 5-240.",
         "jvbPreScaleMinutes": "Pre-scale lead time (minutes)",
         "jvbPreScaleMinutesHelp": "How many minutes before startsAt to boot the video node for a scheduled event. Recommended 10 minutes.",
+        "jvbEmptyCloseMinutes": "Empty-room minutes before definitive close",
+        "jvbEmptyCloseMinutesHelp": "If a LIVE room that already had participants stays empty for this many minutes, it is closed for good (ENDED) even before its scheduled end, without waiting for the inactivity grace (45 min). -1 = disabled (legacy behaviour). 0 = close on the first empty poll. Recommended 10.",
         "jvbStressWarnPercent": "Stress warning threshold (%)",
         "jvbStressWarnPercentHelp": "Above this threshold the scaler adds 1 extra JVB replica even if predictive sizing doesn't require it. Default 50.",
         "jvbStressCriticalPercent": "Stress critical threshold (%)",

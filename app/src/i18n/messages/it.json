@@ -1541,6 +1541,8 @@
         "jvbInactiveGraceMinutesHelp": "Dopo quanto tempo di conferenza vuota il nodo video viene messo in pausa. Consigliato 45 minuti. Range 5-240.",
         "jvbPreScaleMinutes": "Minuti di anticipo per avvio programmato",
         "jvbPreScaleMinutesHelp": "Quanto prima di startsAt avviare il nodo video per un evento programmato. Consigliato 10 minuti.",
+        "jvbEmptyCloseMinutes": "Minuti sala vuota prima della chiusura definitiva",
+        "jvbEmptyCloseMinutesHelp": "Se una sala LIVE che ha già avuto partecipanti resta vuota per questi minuti, viene chiusa definitivamente (ENDED) anche prima dell'orario di fine, senza attendere la grace di inattività (45 min). -1 = disattivato (comportamento storico). 0 = chiudi al primo controllo a sala vuota. Consigliato 10.",
         "jvbStressWarnPercent": "Soglia stress warning (%)",
         "jvbStressWarnPercentHelp": "Sopra questa soglia lo scaler aggiunge 1 replica JVB anche se il predictive non la richiede. Default 50.",
         "jvbStressCriticalPercent": "Soglia stress critical (%)",
