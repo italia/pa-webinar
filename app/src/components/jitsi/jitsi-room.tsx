@@ -224,7 +224,12 @@ export default function JitsiRoom({
     // `jitsiConfigOverwrite`, so this override wins.
     if (reactionsMode === 'NATIVE') {
       extraConfig.disableReactions = false;
-      if (!toolbarButtons.includes('reactions')) toolbarButtons.push('reactions');
+      // Desktop only: the mobile toolbar is deliberately trimmed to the bare
+      // essentials for first-time participants, so we don't re-add a reactions
+      // button there (the feature is still enabled server-side, just no trigger).
+      if (!isMobileRef.current && !toolbarButtons.includes('reactions')) {
+        toolbarButtons.push('reactions');
+      }
     }
 
     // Honor the user's pre-join DeviceCheck choice. The base

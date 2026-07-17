@@ -6,9 +6,11 @@
 ALTER TABLE "site_settings"
   ADD COLUMN "reactions_mode" TEXT NOT NULL DEFAULT 'NATIVE';
 
--- #12: empty-conference auto-close is now ON by default (15 min). Change the
--- column default AND flip the existing singleton from the old -1 (disabled) to
--- 15, without overriding an admin who already set a custom value.
+-- #12: empty-conference auto-close default for NEW installs is 30 min. We only
+-- change the column DEFAULT (affects rows created later) and deliberately do
+-- NOT rewrite existing rows: -1 is both the historical default AND the operator
+-- "disable" sentinel, so a blanket UPDATE would silently re-enable a terminal
+-- auto-close for an admin who intentionally turned it off. Existing deployments
+-- that want it on set the value explicitly in admin settings.
 ALTER TABLE "site_settings"
-  ALTER COLUMN "jvb_empty_close_minutes" SET DEFAULT 15;
-UPDATE "site_settings" SET "jvb_empty_close_minutes" = 15 WHERE "jvb_empty_close_minutes" = -1;
+  ALTER COLUMN "jvb_empty_close_minutes" SET DEFAULT 30;

@@ -174,7 +174,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
           watermark={watermark}
           jibriAvailable={jibriAvailable}
-          reactionsMode={settings.reactionsMode as 'NATIVE' | 'CUSTOM'}
+          reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
         />
       );
     } else if (isInstant) {
@@ -304,7 +304,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
       watermark={watermark}
       jibriAvailable={jibriAvailable}
-      reactionsMode={settings.reactionsMode as 'NATIVE' | 'CUSTOM'}
+      reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
     />
   );
 }

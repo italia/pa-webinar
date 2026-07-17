@@ -93,9 +93,11 @@ export const GET = withErrorHandling(async (request) => {
     settings.jvbPreScaleMinutes ??
     parseInt(process.env.JVB_PRE_SCALE_MINUTES || '10', 10);
   // Authoritative empty-conference close (feedback #12). Minutes a LIVE room
-  // that HAD traffic may stay empty before we flip it straight to ENDED —
-  // shorter and terminal, distinct from the scale-to-zero inactivity grace.
-  // -1 disables it (default).
+  // that HAD traffic may stay COMPLETELY empty (moderator included) before we
+  // flip it straight to ENDED — terminal, distinct from the scale-to-zero
+  // inactivity grace. New installs default to 30 (see schema); -1 disables it.
+  // The column is NOT NULL so the env fallback is only a belt-and-suspenders
+  // guard for a hypothetical null (unreachable on a provisioned singleton).
   const emptyCloseMin =
     settings.jvbEmptyCloseMinutes ??
     parseInt(process.env.JVB_EMPTY_CLOSE_MIN || '-1', 10);
@@ -191,7 +193,10 @@ export const GET = withErrorHandling(async (request) => {
     //     traffic then emptied: lastActiveAt non-null AND older than the
     //     admin-tunable cutoff, with endsAt still in the future (an EARLY
     //     close; past-endsAt LIVE rooms are handled by the grace path below).
-    //     Disabled by default (jvbEmptyCloseMinutes = -1 → emptyCloseCut null).
+    //     Default 30 min for new installs (jvbEmptyCloseMinutes = -1 disables →
+    //     emptyCloseCut null). Because it keys on `participants=0`, it only fires
+    //     when EVERYONE — moderator included — has left, i.e. a truly abandoned
+    //     room, not a moderated break where the host keeps the tab open.
     //     `jvbReachable` is required: a terminal close must never fire on a
     //     stale reading during a bridge blip — stricter than the IDLE path on
     //     purpose, since ENDED is NOT auto-revived on rejoin (only IDLE is, via

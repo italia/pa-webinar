@@ -1126,9 +1126,13 @@ model SiteSetting {
   //   -1  → disabilitato
   //    0  → chiudi al primo tick a sala vuota (~cadenza cron)
   //   N>0 → chiudi dopo N minuti di sala vuota
-  // Default 15 = auto-chiusura per inattività attiva (una sala vuota senza
-  // moderatore si chiude da sola dopo 15 min, senza attendere endsAt).
-  jvbEmptyCloseMinutes     Int @default(15) @map("jvb_empty_close_minutes")
+  // Default 30 = auto-chiusura per inattività attiva. Scatta SOLO quando la sala
+  // è COMPLETAMENTE vuota (0 partecipanti, moderatore incluso) da N minuti — se
+  // un moderatore resta in sala non scatta mai. È TERMINALE (ENDED, non
+  // risvegliabile): una soglia troppo bassa rischierebbe di chiudere una sala
+  // durante una pausa in cui tutti (moderatore compreso) hanno chiuso la scheda;
+  // 30 min è un segnale forte di evento abbandonato. Regolabile da admin.
+  jvbEmptyCloseMinutes     Int @default(30) @map("jvb_empty_close_minutes")
   // Modalità reazioni (#7): 'NATIVE' = pulsante reazioni nativo di Jitsi nella
   // barra (effimere, nessuna analitica); 'CUSTOM' = barra reazioni custom
   // dell'app (persistite/aggregate). Default 'NATIVE'.
