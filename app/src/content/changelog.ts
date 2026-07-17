@@ -28,6 +28,20 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.8.0',
+    date: '2026-07-17',
+    title: 'Sala live più pulita: chat, reazioni, schermo intero e registrazione',
+    notes: [
+      'Chat: ora puoi inserire emoji nei messaggi con un selettore dedicato, e un piccolo indicatore avvisa se gli aggiornamenti della chat rallentano. I messaggi che invii compaiono subito, anche dietro reti aziendali che bufferizzano gli aggiornamenti in tempo reale.',
+      'Schermo intero: il pulsante a schermo intero ora mantiene visibile la chat a lato, invece di nasconderla.',
+      'Le reazioni (emoji) non coprono più i controlli in basso: la barra resta sempre cliccabile, anche in vista a mosaico.',
+      'I pulsanti "Condividi" ed "Esci dalla sala" sono ora ben visibili e colorati di default (esci in rosso), non solo al passaggio del mouse.',
+      'Il bot "Recorder" non compare più nella lista dei partecipanti né nel conteggio.',
+      'Registrazione: se ti registri con largo anticipo vieni portato a una pagina di conferma con il link per aggiungere l\'evento al calendario, invece che nella sala d\'attesa; a ridosso dell\'inizio entri direttamente in sala. Sulla pagina evento vedi se sei già registrato.',
+      'La chat è ora il canale di interazione principale della sala. Migliorata anche la chiusura automatica di un evento rimasto vuoto e il conteggio dei partecipanti nelle statistiche.',
+    ],
+  },
+  {
     version: '0.7.8',
     date: '2026-07-17',
     title: 'Il moderatore può abbassare una mano alzata',
