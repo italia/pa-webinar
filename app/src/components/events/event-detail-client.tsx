@@ -730,7 +730,12 @@ export default function EventDetailClient({
                       pubblicamente (né qui né nel listing). Resta visibile
                       agli amministratori nel pannello admin. Il pubblico vede
                       solo il conteggio dei presenti nella sala live. */}
-                  {canRegister && (
+                  {hasRoomAccess && !invalidToken && (
+                    <p className="text-success fw-semibold text-center mb-3" role="status">
+                      {t('detail.registered')}
+                    </p>
+                  )}
+                  {canRegister && !(hasRoomAccess && !invalidToken) && (
                     <Link href={`/events/${event.slug}/registration`}>
                       <Button
                         color="primary"
