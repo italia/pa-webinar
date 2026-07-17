@@ -311,6 +311,7 @@
       "inputLabel": "Chat message",
       "moderatorBadge": "Moderator",
       "attach": "Attach a file",
+      "emojiPicker": "Insert emoji",
       "attachBadType": "Unsupported file type (images or PDF).",
       "attachTooLarge": "File too large (max 10 MB).",
       "attachFailed": "Upload failed. Please try again.",
@@ -321,7 +322,9 @@
       "replyingTo": "Replying to {name}",
       "cancelReply": "Cancel reply",
       "hide": "Hide",
-      "hideFailed": "Couldn't hide the message. Please try again."
+      "hideFailed": "Couldn't hide the message. Please try again.",
+      "connReconnecting": "Reconnecting…",
+      "connDegraded": "Updates delayed"
     },
     "role": {
       "moderator": "Moderator",

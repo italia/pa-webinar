@@ -325,6 +325,7 @@
       "inputLabel": "Messaggio chat",
       "moderatorBadge": "Moderatore",
       "attach": "Allega un file",
+      "emojiPicker": "Inserisci emoji",
       "attachBadType": "Tipo di file non supportato (immagini o PDF).",
       "attachTooLarge": "File troppo grande (max 10 MB).",
       "attachFailed": "Caricamento non riuscito. Riprova.",
@@ -335,7 +336,9 @@
       "replyingTo": "In risposta a {name}",
       "cancelReply": "Annulla risposta",
       "hide": "Nascondi",
-      "hideFailed": "Impossibile nascondere il messaggio. Riprova."
+      "hideFailed": "Impossibile nascondere il messaggio. Riprova.",
+      "connReconnecting": "Riconnessione…",
+      "connDegraded": "Aggiornamenti rallentati"
     },
     "role": {
       "moderator": "Moderatore",

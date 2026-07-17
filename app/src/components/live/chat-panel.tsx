@@ -73,6 +73,14 @@ interface ChatMessage {
   replyTo?: ChatReply;
 }
 
+// Small static emoji set for the compose-box picker (feedback #9). Plain string
+// literals — no npm dep, server/client render identically (no hydration risk).
+// 16 emojis → 2 rows of 8 in the popover grid.
+const CHAT_EMOJIS = [
+  '👍', '🙏', '👏', '😀', '😂', '😍', '🤔', '😮',
+  '😢', '🎉', '❤️', '🔥', '✅', '👀', '💡', '🚀',
+] as const;
+
 const AVATAR_COLORS = [
   '#0066CC', '#008758', '#A66300', '#D9364F',
   '#6A50D3', '#00A8B3', '#B23683', '#73348C',
@@ -121,6 +129,14 @@ export default function ChatPanel({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  // Live-chat transport health, surfaced as an unobtrusive pill (feedback #8c).
+  //   'live'         → SSE stream is delivering frames.
+  //   'reconnecting' → EventSource fired 'error'; the browser is retrying.
+  //   'degraded'     → SSE went silent yet the poll fallback (feedback #8) had to
+  //                    recover messages the stream should have pushed (a silently
+  //                    buffering proxy). Chat still works, just via polling.
+  const [connStatus, setConnStatus] =
+    useState<'live' | 'reconnecting' | 'degraded'>('live');
 
   // Compose extras (authenticated members only).
   const canAttach = !isGuest && !!token;
@@ -130,6 +146,8 @@ export default function ChatPanel({
   const [composeError, setComposeError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const emojiRef = useRef<HTMLDivElement>(null);
 
   const listRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
@@ -250,7 +268,7 @@ export default function ChatPanel({
   useEffect(() => {
     const es = new EventSource(`/api/events/${eventSlug}/chat/stream`);
 
-    const backfill = async () => {
+    const backfill = async (): Promise<number> => {
       try {
         // No watermark yet (joined an empty room, or the history load soft-failed):
         // pull the recent window so a buffered-SSE user still receives messages
@@ -262,14 +280,26 @@ export default function ChatPanel({
           ? `/api/events/${eventSlug}/chat?since=${encodeURIComponent(since)}`
           : `/api/events/${eventSlug}/chat?limit=200`;
         const res = await fetch(url, { cache: 'no-store' });
-        if (!res.ok) return;
+        if (!res.ok) return 0;
         const data = (await res.json()) as { messages: ChatMessage[] };
-        data.messages.forEach((m) => upsertMessage(m));
-      } catch { /* fine, we'll try again on the next tick/reconnect */ }
+        // Count messages the stream never delivered (still unseen) BEFORE upsert
+        // marks them seen. A non-zero count on the POLL path means the SSE is
+        // buffered, not merely quiet (feedback #8c).
+        let recovered = 0;
+        data.messages.forEach((m) => {
+          if (!seenIdsRef.current.has(m.id)) recovered += 1;
+          upsertMessage(m);
+        });
+        return recovered;
+      } catch {
+        /* fine, we'll try again on the next tick/reconnect */
+        return 0;
+      }
     };
 
     const onMessage = (e: MessageEvent) => {
       lastRecvRef.current = Date.now();
+      setConnStatus('live'); // a real SSE frame proves the stream is flowing
       try {
         const env = JSON.parse(e.data) as ChatMessage & { op?: 'delete' };
         if (env.op === 'delete') {
@@ -281,7 +311,16 @@ export default function ChatPanel({
     };
     const onOpen = () => {
       lastRecvRef.current = Date.now();
+      setConnStatus('live');
+      // Join-time catch-up; recovering messages here is expected on a healthy
+      // stream, so (unlike the poll) it must NOT flag 'degraded'.
       void backfill();
+    };
+    const onError = () => {
+      // EventSource auto-reconnects (readyState → CONNECTING); the next 'open'
+      // flips us back to 'live'. If it stays down, the poll keeps chat working,
+      // still surfaced as a non-live state.
+      setConnStatus('reconnecting');
     };
 
     // Watchdog: while the tab is VISIBLE, if no SSE message has arrived for 15s,
@@ -295,7 +334,12 @@ export default function ChatPanel({
       if (document.visibilityState !== 'visible') return;
       if (Date.now() - lastRecvRef.current < 15_000) return;
       lastRecvRef.current = Date.now();
-      void backfill();
+      void backfill().then((recovered) => {
+        // SSE silent ≥15s yet the poll recovered messages that existed
+        // server-side → the stream is buffered/dropped even though EventSource
+        // reported no 'error'. A later real SSE frame resets this to 'live'.
+        if (recovered > 0) setConnStatus('degraded');
+      });
     };
     const poll = setInterval(maybeBackfill, 5_000);
     const onVisible = () => {
@@ -308,11 +352,13 @@ export default function ChatPanel({
 
     es.addEventListener('message', onMessage);
     es.addEventListener('open', onOpen);
+    es.addEventListener('error', onError);
     return () => {
       clearInterval(poll);
       document.removeEventListener('visibilitychange', onVisible);
       es.removeEventListener('message', onMessage);
       es.removeEventListener('open', onOpen);
+      es.removeEventListener('error', onError);
       es.close();
     };
   }, [eventSlug, upsertMessage, removeMessage]);
@@ -352,6 +398,47 @@ export default function ChatPanel({
     setInput((prev) => prev.replace(/@(\p{L}[\p{L}\p{N}._-]*)?$/u, `@${handle} `));
     inputRef.current?.focus();
   }, []);
+
+  // ── Emoji picker (feedback #9) ──────────────────────────
+  // Insert at the input's caret, update `input`, then restore focus + caret. The
+  // emoji buttons preventDefault on mousedown so a mouse click never blurs the
+  // input; the rAF focus() covers the keyboard-activation path.
+  const insertEmoji = useCallback((emoji: string) => {
+    const el = inputRef.current;
+    const start = el?.selectionStart ?? input.length;
+    const end = el?.selectionEnd ?? input.length;
+    const next = input.slice(0, start) + emoji + input.slice(end);
+    if (next.length > 2000) return; // mirror the input maxLength / server cap
+    setInput(next);
+    const caret = start + emoji.length;
+    requestAnimationFrame(() => {
+      const node = inputRef.current;
+      if (!node) return;
+      node.focus();
+      try { node.setSelectionRange(caret, caret); } catch { /* noop */ }
+    });
+  }, [input]);
+
+  useEffect(() => {
+    if (!emojiOpen) return;
+    const onDocMouseDown = (e: MouseEvent) => {
+      if (emojiRef.current && !emojiRef.current.contains(e.target as Node)) {
+        setEmojiOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setEmojiOpen(false);
+        inputRef.current?.focus();
+      }
+    };
+    document.addEventListener('mousedown', onDocMouseDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDocMouseDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [emojiOpen]);
 
   // ── Attachment upload ───────────────────────────────────
   const uploadFile = useCallback(async (file: File) => {
@@ -670,6 +757,36 @@ export default function ChatPanel({
         </div>
       )}
 
+      {connStatus !== 'live' && (
+        <div
+          className={`chat-panel__conn-status chat-panel__conn-status--${connStatus} d-flex align-items-center`}
+          role="status"
+          aria-live="polite"
+          style={{
+            gap: 6,
+            padding: '3px 12px',
+            fontSize: '0.72rem',
+            fontWeight: 500,
+            color: '#A66300',
+            background: '#FFF6E6',
+            borderTop: '1px solid #E8E8E8',
+          }}
+        >
+          <span
+            aria-hidden="true"
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              background: 'currentColor',
+              flexShrink: 0,
+              opacity: connStatus === 'reconnecting' ? 0.55 : 1,
+            }}
+          />
+          {connStatus === 'reconnecting' ? t('connReconnecting') : t('connDegraded')}
+        </div>
+      )}
+
       <div className="chat-panel__input-row">
         {canAttach && (
           <>
@@ -701,6 +818,42 @@ export default function ChatPanel({
             </button>
           </>
         )}
+        <div className="chat-panel__emoji" ref={emojiRef}>
+          <button
+            type="button"
+            className="chat-panel__emoji-btn btn btn-link p-1"
+            onClick={() => setEmojiOpen((v) => !v)}
+            disabled={sending}
+            aria-label={t('emojiPicker')}
+            title={t('emojiPicker')}
+            aria-haspopup="true"
+            aria-expanded={emojiOpen}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+              <line x1="9" y1="9" x2="9.01" y2="9" />
+              <line x1="15" y1="9" x2="15.01" y2="9" />
+            </svg>
+          </button>
+          {emojiOpen && (
+            <div className="chat-panel__emoji-pop" role="group" aria-label={t('emojiPicker')}>
+              {CHAT_EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  className="chat-panel__emoji-pick"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => insertEmoji(emoji)}
+                  aria-label={emoji}
+                  title={emoji}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <input
           ref={inputRef}
           type="text"

@@ -986,6 +986,52 @@ html.live-call-immersive body {
       cursor: default;
     }
   }
+
+  // Emoji picker (feedback #9): toggle button + upward popover in the compose row.
+  &__emoji {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__emoji-btn {
+    color: #5A6772;
+    line-height: 0;
+
+    &:hover:not(:disabled) { color: #0066CC; }
+    &:disabled { opacity: 0.5; cursor: default; }
+  }
+
+  &__emoji-pop {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 2px;
+    width: max-content;
+    max-width: 260px;
+    padding: 6px;
+    background: #fff;
+    border: 1px solid #D9DADB;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  }
+
+  &__emoji-pick {
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    padding: 3px;
+    font-size: 1.15rem;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover { background: #EEF3FA; }
+    &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+  }
 }
 
 @keyframes msgFadeIn {
