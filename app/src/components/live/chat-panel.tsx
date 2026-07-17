@@ -135,6 +135,10 @@ export default function ChatPanel({
   const isAtBottomRef = useRef(true);
   const lastSeenAtRef = useRef<string | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
+  // Last time an SSE 'message'/'open' fired; the poll watchdog (feedback #8)
+  // backfills when this goes stale — a silently-buffered stream is otherwise
+  // indistinguishable from a quiet one (keepalives are invisible to EventSource).
+  const lastRecvRef = useRef(Date.now());
 
   const lastReadIdRef = useRef<string | null>(null);
   const unreadCountRef = useRef(0);
@@ -226,21 +230,19 @@ export default function ChatPanel({
     return () => { cancelled = true; };
   }, [eventSlug]);
 
-  // 2. SSE stream for live updates.
+  // 2. SSE stream for live updates + polling fallback (live feedback #8).
+  //
+  // EventSource fires 'open' on the stream's first byte and the 25s keepalive is
+  // a ':' comment it never surfaces as an event — so a stream that a proxy has
+  // silently buffered looks identical to a healthy-but-quiet one: no 'error', no
+  // 'message'. A time-since-last-message watchdog therefore backfills via GET
+  // when nothing has arrived for a while, rescuing users behind buffering
+  // proxies (some Edge/corporate setups) who would otherwise see no incoming
+  // messages at all.
   useEffect(() => {
     const es = new EventSource(`/api/events/${eventSlug}/chat/stream`);
 
-    const onMessage = (e: MessageEvent) => {
-      try {
-        const env = JSON.parse(e.data) as ChatMessage & { op?: 'delete' };
-        if (env.op === 'delete') {
-          removeMessage(env.id);
-          return;
-        }
-        upsertMessage(env);
-      } catch { /* drop malformed */ }
-    };
-    const onOpen = async () => {
+    const backfill = async () => {
       if (!lastSeenAtRef.current) return;
       try {
         const res = await fetch(
@@ -250,12 +252,40 @@ export default function ChatPanel({
         if (!res.ok) return;
         const data = (await res.json()) as { messages: ChatMessage[] };
         data.messages.forEach(upsertMessage);
-      } catch { /* fine, we'll try again on next reconnect */ }
+      } catch { /* fine, we'll try again on the next tick/reconnect */ }
     };
+
+    const onMessage = (e: MessageEvent) => {
+      lastRecvRef.current = Date.now();
+      try {
+        const env = JSON.parse(e.data) as ChatMessage & { op?: 'delete' };
+        if (env.op === 'delete') {
+          removeMessage(env.id);
+          return;
+        }
+        upsertMessage(env);
+      } catch { /* drop malformed */ }
+    };
+    const onOpen = () => {
+      lastRecvRef.current = Date.now();
+      void backfill();
+    };
+
+    // Watchdog: if no SSE message has arrived for 15s, poll for anything since
+    // our last-seen timestamp. Self-throttled to ~15s (we bump lastRecvRef after
+    // firing) so a quiet healthy room issues at most one benign empty GET per
+    // interval, never one every tick.
+    const poll = setInterval(() => {
+      if (!lastSeenAtRef.current) return;
+      if (Date.now() - lastRecvRef.current < 15_000) return;
+      lastRecvRef.current = Date.now();
+      void backfill();
+    }, 5_000);
 
     es.addEventListener('message', onMessage);
     es.addEventListener('open', onOpen);
     return () => {
+      clearInterval(poll);
       es.removeEventListener('message', onMessage);
       es.removeEventListener('open', onOpen);
       es.close();
@@ -369,7 +399,45 @@ export default function ChatPanel({
         setComposeError(attachment ? t('attachFailed') : t('sendFailed'));
         return;
       }
-      // Redis fans the message back through SSE; id-dedup avoids a double bubble.
+      // Optimistic echo (live feedback #8): render our OWN message immediately
+      // using the REAL server id, instead of relying solely on the Redis→SSE
+      // fan-out. A user behind a proxy that silently buffers the SSE stream
+      // (e.g. some Edge/corporate setups) otherwise never sees anything they
+      // send — not even their own line. Inserting with the canonical id means
+      // the later SSE echo is dropped by seenIdsRef dedup (no double bubble),
+      // and since we only echo on a confirmed 201 no rollback is ever needed.
+      const created = (await res.json().catch(() => null)) as
+        | { id?: string; createdAt?: string }
+        | null;
+      if (created?.id && created.createdAt) {
+        upsertMessage({
+          id: created.id,
+          senderId: '', // own bubble hides the avatar; senderName drives isOwn
+          senderName: displayName,
+          isModerator: !!isModerator,
+          text,
+          createdAt: created.createdAt,
+          ...(attachment
+            ? {
+                attachment: {
+                  url: attachment.url,
+                  name: attachment.name,
+                  mime: attachment.mime,
+                  size: attachment.size,
+                },
+              }
+            : {}),
+          ...(replyTo
+            ? {
+                replyTo: {
+                  id: replyTo.id,
+                  senderName: replyTo.senderName,
+                  text: replyTo.text.slice(0, 140),
+                },
+              }
+            : {}),
+        });
+      }
       setInput('');
       setReplyTo(null);
       setAttachment(null);
@@ -377,7 +445,7 @@ export default function ChatPanel({
     } finally {
       setSending(false);
     }
-  }, [input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, replyTo, t]);
+  }, [input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, isModerator, replyTo, upsertMessage, t]);
 
   const hideMessage = useCallback(async (id: string) => {
     if (!isModerator || !token) return;

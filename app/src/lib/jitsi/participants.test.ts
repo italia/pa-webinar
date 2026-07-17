@@ -32,6 +32,17 @@ describe('isHumanParticipant', () => {
       isHumanParticipant({ displayName: '', formattedDisplayName: RECORDER_DISPLAY_NAME }),
     ).toBe(false);
   });
+
+  it('excludes the bot despite whitespace or a formatted suffix (📼 marker match, feedback #2)', () => {
+    // The surfaced name can gain leading/trailing whitespace or a
+    // "formattedDisplayName" suffix; an exact === match let these through and
+    // the bot reappeared in the roster/count. The '📼' marker catches them.
+    expect(isHumanParticipant({ displayName: ' 📼 Recorder ' })).toBe(false);
+    expect(isHumanParticipant({ displayName: '📼 Recorder (me)' })).toBe(false);
+    expect(
+      isHumanParticipant({ displayName: null, formattedDisplayName: '📼 Recorder (moderator)' }),
+    ).toBe(false);
+  });
 });
 
 describe('humanParticipantCount', () => {

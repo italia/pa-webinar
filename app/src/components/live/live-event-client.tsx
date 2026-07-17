@@ -1272,8 +1272,6 @@ export default function LiveEventClient({
         onLeaveRoom={handleLeaveRoom}
       />
 
-      <FirstEntryHintBanner />
-
       {isActualModerator && !showJvbOverlay && (
         <ModeratorControls
           api={jitsiApi}
@@ -1640,7 +1638,9 @@ function LiveSidebar({
     [eventId, token, mutateFlags]
   );
   const [activeTab, setActiveTab] = useState<SidebarTab>(
-    qaEnabled ? 'qa' : showChat ? 'chat' : 'polls'
+    // Chat is the primary channel (live feedback #10): prefer it as the initial
+    // tab, falling back to Q&A then polls only when chat is disabled.
+    showChat ? 'chat' : qaEnabled ? 'qa' : 'polls'
   );
   const [participantCount, setParticipantCount] = useState(0);
   // Drawer-open state only matters on mobile (<992px); on desktop the
@@ -1702,6 +1702,30 @@ function LiveSidebar({
     dot?: boolean;
     show: boolean;
   }> = [
+    // Chat first (live feedback #10): it is the primary audience channel, so it
+    // renders as the leftmost sidebar tab, ahead of Q&A.
+    {
+      key: 'chat',
+      label: t('sidebarTabChat'),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      ),
+      dot: chatUnread > 0,
+      show: showChat,
+    },
     {
       key: 'qa',
       label: t('sidebarTabQa'),
@@ -1724,28 +1748,6 @@ function LiveSidebar({
         </svg>
       ),
       show: effQa,
-    },
-    {
-      key: 'chat',
-      label: t('sidebarTabChat'),
-      svg: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      ),
-      dot: chatUnread > 0,
-      show: showChat,
     },
     {
       key: 'polls',
@@ -2358,23 +2360,11 @@ function LiveTopBar({
         >
           {tr(role)}
         </Badge>
-        {/* "👥 87" — capacity display is intentionally omitted: the system
-         *  autoscales, so we only surface the live count. */}
-        {participantCount > 0 && (
-          <Badge
-            color=""
-            pill
-            className="px-2 py-1"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.18)',
-              color: '#fff',
-              fontSize: '0.72rem',
-            }}
-            aria-live="polite"
-          >
-            {t('topBarCount.live', { count: participantCount })}
-          </Badge>
-        )}
+        {/* The live people-count is intentionally NOT shown here: it was a
+         *  redundant duplicate of the authoritative count in the participants
+         *  sidebar and, being fed only by post-attach join/leave deltas, it
+         *  under-reported (live feedback #4). The sidebar remains the single
+         *  source of truth for the present-participant count. */}
       </div>
       <div className="d-flex align-items-center gap-3">
         {isRecording && (
@@ -2410,73 +2400,6 @@ function LiveTopBar({
             {t('leaveRoom')}
           </Button>
         )}
-      </div>
-    </div>
-  );
-}
-
-// ── First-entry hint banner ──
-//
-// One-time dismissible tips shown the first time a user reaches phase=ready.
-// Dismissal persists in localStorage so repeat joiners don't see it again.
-
-const HINT_DISMISSED_KEY = 'pawebinar.liveHint.dismissed';
-
-function FirstEntryHintBanner() {
-  const t = useTranslations('live.hintBanner');
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      if (window.localStorage.getItem(HINT_DISMISSED_KEY) !== '1') {
-        setVisible(true);
-      }
-    } catch {
-      // Private mode / blocked storage → show the banner once per session.
-      setVisible(true);
-    }
-  }, []);
-
-  const handleDismiss = useCallback(() => {
-    setVisible(false);
-    try {
-      window.localStorage.setItem(HINT_DISMISSED_KEY, '1');
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  if (!visible) return null;
-
-  return (
-    <div
-      className="px-3 py-2 d-flex flex-column flex-md-row align-items-md-center gap-2 gap-md-3 live-hint-banner"
-      style={{
-        background: '#E8F0FE',
-        color: '#003D80',
-        borderBottom: '1px solid #B6D4FE',
-        fontSize: '0.85rem',
-      }}
-      role="note"
-      aria-label={t('ariaLabel')}
-    >
-      <span className="d-inline-flex align-items-center gap-2">
-        <span aria-hidden="true">🎤</span>
-        {t('controls')}
-      </span>
-      <span className="d-inline-flex align-items-center gap-2">
-        <span aria-hidden="true">✋</span>
-        {t('raiseHand')}
-      </span>
-      <span className="d-inline-flex align-items-center gap-2">
-        <span aria-hidden="true">💬</span>
-        {t('sidebar')}
-      </span>
-      <div className="ms-md-auto">
-        <Button color="primary" size="xs" onClick={handleDismiss}>
-          {t('dismiss')}
-        </Button>
       </div>
     </div>
   );
