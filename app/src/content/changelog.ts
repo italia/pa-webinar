@@ -28,6 +28,15 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.8.1',
+    date: '2026-07-17',
+    title: 'Reazioni configurabili + chiusura automatica della sala vuota',
+    notes: [
+      'Le reazioni (emoji) sono ora configurabili dall\'amministratore: di default si usano quelle native di Jitsi, direttamente nella barra dei controlli (leggere ed effimere). In alternativa si possono attivare le reazioni "custom" dell\'app (barra in basso a sinistra) che vengono conteggiate nelle statistiche dell\'evento.',
+      'Una sala rimasta vuota senza moderatore ora si chiude automaticamente per inattività (dopo 15 minuti, configurabile dall\'amministratore), senza dover attendere l\'orario di fine previsto.',
+    ],
+  },
+  {
     version: '0.8.0',
     date: '2026-07-17',
     title: 'Sala live più pulita: chat, reazioni, schermo intero e registrazione',
