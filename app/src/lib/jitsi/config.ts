@@ -31,7 +31,9 @@ export const baseToolbarButtons = [
   'camera',
   'select-background',
   'desktop',
-  'fullscreen',
+  // No native 'fullscreen': it fullscreens the Jitsi IFRAME only, hiding the
+  // pa-webinar chat/sidebar. Replaced by an app-owned fullscreen on the whole
+  // live wrapper (LiveTopBar toggle → .live-page-bg) so chat stays visible (#6).
   'filmstrip',
   'tileview',
   'settings',
@@ -274,7 +276,8 @@ export const instantCallToolbarButtons = [
   'camera',
   'select-background',
   'desktop',
-  'fullscreen',
+  // No native 'fullscreen' (see baseToolbarButtons): LiveTopBar also renders for
+  // instant calls, so the app-owned fullscreen replaces it here too (#6).
   'filmstrip',
   'tileview',
   'settings',

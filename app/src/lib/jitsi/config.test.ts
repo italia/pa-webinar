@@ -49,6 +49,12 @@ describe('Jitsi config exports', () => {
     expect(baseToolbarButtons).not.toContain('chat');
   });
 
+  it('baseToolbarButtons excludes native fullscreen (app-owned fullscreen keeps chat, #6)', () => {
+    // The native Jitsi fullscreen fullscreens the iframe only, hiding our chat.
+    // LiveTopBar provides an app-owned fullscreen on the whole live wrapper.
+    expect(baseToolbarButtons).not.toContain('fullscreen');
+  });
+
   it('baseToolbarButtons excludes reactions (handled by custom ReactionBar)', () => {
     expect(baseToolbarButtons).not.toContain('reactions');
   });

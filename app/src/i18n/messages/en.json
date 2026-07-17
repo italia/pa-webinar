@@ -223,6 +223,8 @@
     "connecting": "Connecting...",
     "connectionError": "Unable to connect to the room. Check your connection and try again.",
     "activeVsRegistered": "{active} active · {registered} registered",
+    "enterFullscreen": "Fullscreen",
+    "exitFullscreen": "Exit fullscreen",
     "overtime": {
       "withCountdown": "The scheduled end time has passed. The event will close automatically in {minutes, plural, one {# minute} other {# minutes}}.",
       "closingNow": "End time reached. The event is about to close.",

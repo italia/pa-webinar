@@ -206,6 +206,10 @@ export default function LiveEventClient({
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState('');
   const [jitsiApi, setJitsiApi] = useState<JitsiMeetExternalAPI | null>(null);
+  // App-owned fullscreen (#6): fullscreen the whole live wrapper (video +
+  // sidebar) instead of the Jitsi iframe, so the chat stays visible.
+  const liveRootRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [chosenName, setChosenName] = useState(initialDisplayName);
   // True once THIS client is actually in the conference (Jitsi
   // `videoConferenceJoined` → handleJitsiReady). Used to lift the "warming up"
@@ -947,6 +951,26 @@ export default function LiveEventClient({
     }
   }, [jitsiApi]);
 
+  // App-owned fullscreen toggle (#6): targets the live root wrapper so both the
+  // Jitsi iframe AND the chat sidebar are in the fullscreen subtree. Optional
+  // chaining makes it a safe no-op where Element.requestFullscreen is missing
+  // (e.g. iPhone Safari).
+  const toggleFullscreen = useCallback(() => {
+    const root = liveRootRef.current;
+    if (!root) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.();
+    } else {
+      root.requestFullscreen?.();
+    }
+  }, []);
+
+  useEffect(() => {
+    const onFsChange = () => setIsFullscreen(document.fullscreenElement != null);
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
+
   const handleLeaveRoom = useCallback(() => {
     // Moderators get the leave/end-for-all prompt; everyone else leaves for
     // themselves. (There is no native Jitsi hangup anymore — see config.ts —
@@ -1258,7 +1282,7 @@ export default function LiveEventClient({
     eventStatus === 'LIVE' && jvbReady !== true && !jitsiJoined;
 
   return (
-    <div className="d-flex flex-column live-page-bg">
+    <div ref={liveRootRef} className="d-flex flex-column live-page-bg">
       <RecordingBanner visible={isRecording} />
       <OvertimeBanner
         endsAt={event.endsAt}
@@ -1279,6 +1303,8 @@ export default function LiveEventClient({
         locale={locale}
         moderatorToken={isActualModerator ? token : undefined}
         onLeaveRoom={handleLeaveRoom}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={toggleFullscreen}
       />
 
       {isActualModerator && !showJvbOverlay && (
@@ -2254,6 +2280,10 @@ interface LiveTopBarProps {
    *  Surfaced (collapsed, with a warning) in the share popup. */
   moderatorToken?: string;
   onLeaveRoom?: () => void;
+  /** App-owned fullscreen (#6): current state + toggle. Passed only by the
+   *  live-phase top bar (the consent-pending one renders no video/sidebar). */
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
 function LiveTopBar({
@@ -2270,6 +2300,8 @@ function LiveTopBar({
   locale,
   moderatorToken,
   onLeaveRoom,
+  isFullscreen,
+  onToggleFullscreen,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -2396,6 +2428,19 @@ function LiveTopBar({
               registered: registrationCount,
             })}
           </span>
+        )}
+        {onToggleFullscreen && (
+          <Button
+            color="light"
+            outline
+            size="xs"
+            className="d-none d-md-inline-flex align-items-center fullscreen-toggle-btn"
+            onClick={onToggleFullscreen}
+            aria-label={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
+            title={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
+          >
+            <Icon icon={isFullscreen ? 'it-collapse' : 'it-expand'} size="xs" color="white" />
+          </Button>
         )}
         <LiveShareButton slug={slug} locale={locale} moderatorToken={moderatorToken} />
         {onLeaveRoom && (
