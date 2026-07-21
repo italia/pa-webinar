@@ -122,3 +122,37 @@ describe('duplicatedConfig', () => {
     expect(out).not.toHaveProperty('videoQuality');
   });
 });
+
+describe('duplicatedConfig — Prisma Json handling', () => {
+  it('omits a null Json column instead of passing null (Prisma rejects it)', () => {
+    // Every event created before the permission matrix existed, and every
+    // instant call, has permission_matrix NULL. Passing that null straight to
+    // `prisma.event.create` throws PrismaClientValidationError and the whole
+    // duplication 500s.
+    const out = duplicatedConfig({
+      permissionMatrix: null,
+      description: null,
+      speakersInfo: null,
+      chatEnabled: true,
+    });
+    expect(out).not.toHaveProperty('permissionMatrix');
+    expect(out).not.toHaveProperty('description');
+    expect(out).not.toHaveProperty('speakersInfo');
+    expect(out.chatEnabled).toBe(true);
+  });
+
+  it('still copies a Json column that has a value', () => {
+    const matrix = { chat: ['MODERATOR'] };
+    const out = duplicatedConfig({ permissionMatrix: matrix });
+    expect(out.permissionMatrix).toEqual(matrix);
+  });
+
+  it('does not inherit the previous occurrence’s published video or expiry', () => {
+    const out = duplicatedConfig({
+      youtubeUrl: 'https://youtu.be/old',
+      postEventPublicUntil: new Date('2026-01-01'),
+    });
+    expect(out).not.toHaveProperty('youtubeUrl');
+    expect(out).not.toHaveProperty('postEventPublicUntil');
+  });
+});

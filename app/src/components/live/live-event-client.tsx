@@ -858,17 +858,25 @@ export default function LiveEventClient({
   // Guests (no token) report too: the live page passes token="" to anyone
   // joining a public-link / INSTANT room, and gating on it meant precisely the
   // moderator-less sessions #4b was about recorded nothing. The server accepts a
-  // tokenless report only while the event is LIVE.
+  // tokenless report only where nobody could hold a token (INSTANT room, or an
+  // event with no registrations) — elsewhere it answers 401, and we then stop
+  // rather than re-posting a request that will be refused for the whole event.
   useEffect(() => {
     if (!jitsiApi) return;
+    let refused = false;
     const report = () => {
+      if (refused) return;
       const count = participantCountRef.current;
       if (count > 0) {
         fetch(`/api/events/${event.slug}/analytics/peak`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(token ? { count, token } : { count }),
-        }).catch(() => {});
+        })
+          .then((res) => {
+            if (res.status === 401 || res.status === 403) refused = true;
+          })
+          .catch(() => {});
       }
     };
     report();

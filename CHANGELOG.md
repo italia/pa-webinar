@@ -157,7 +157,7 @@ Versions follow [semantic versioning](https://semver.org/). Releases marked
 - In the list of tracks, each nickname is paired with an identifier: different people using the same nickname are given distinct identifiers, while several contributions from the same person share one.
 - A clear message is shown when starting the pipeline queues no work — because AI is disabled for the event or the pipeline is paused — instead of a misleading “operation successful”.
 
-## 0.6.4 — 2026-07-08
+## 0.6.4 — 2026-07-08 🔒
 
 **Identity security and room refinements**
 
@@ -188,7 +188,7 @@ Versions follow [semantic versioning](https://semver.org/). Releases marked
 - A new “Share” button in the room copies the joining link and the event page link in one click, without exposing any private tokens.
 - PA Webinar branding is visible again in the top bar of the event room.
 
-## 0.6.1 — 2026-07-07
+## 0.6.1 — 2026-07-07 🔒
 
 **Public changelog and security updates**
 
