@@ -224,10 +224,13 @@ export default function JitsiRoom({
     // `jitsiConfigOverwrite`, so this override wins.
     if (reactionsMode === 'NATIVE') {
       extraConfig.disableReactions = false;
-      // Desktop only: the mobile toolbar is deliberately trimmed to the bare
-      // essentials for first-time participants, so we don't re-add a reactions
-      // button there (the feature is still enabled server-side, just no trigger).
-      if (!isMobileRef.current && !toolbarButtons.includes('reactions')) {
+      // Mobile included. The trimmed mobile toolbar used to skip this button,
+      // which — now that NATIVE mode also stops rendering the custom
+      // ReactionBar — left phone users with NO way to react at all, a
+      // regression against the floating bar they had before. Reactions are one
+      // tap and the single most-used feature for a silent audience, so they
+      // earn their slot on the small toolbar.
+      if (!toolbarButtons.includes('reactions')) {
         toolbarButtons.push('reactions');
       }
     }
@@ -441,7 +444,7 @@ export default function JitsiRoom({
           // che ci siamo agganciati, quindi senza questo seed il conteggio parte
           // da 0 e sotto-riporta per chi entra in una sala già popolata (es. un
           // moderatore che entra a evento avviato). Recorder escluso.
-          onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName));
+          onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName, myEndpointIdRef.current));
           // Annulla un'eventuale NS persistita da Jitsi in localStorage da una
           // sessione precedente, poi continua a ri-asserirla off per tutta la call.
           if (RNNOISE_ENFORCE_OFF) {
@@ -559,12 +562,12 @@ export default function JitsiRoom({
 
         api.addListener('participantJoined', () => {
           if (disposedRef.current) return;
-          onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName));
+          onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName, myEndpointIdRef.current));
         });
 
         api.addListener('participantLeft', () => {
           if (disposedRef.current) return;
-          onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName));
+          onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName, myEndpointIdRef.current));
         });
 
         api.addListener('recordingStatusChanged', (evt: { on: boolean }) => {

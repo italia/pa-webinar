@@ -48,9 +48,9 @@ describe('resolveDisplayName — distinct raiser names', () => {
     const api = makeApi(
       { 'p-alice': 'Alice', 'p-bob': 'Bob', 'p-carol': 'Carol' },
       [
-        { id: 'p-alice', displayName: '', formattedDisplayName: '', role: 'participant' },
-        { id: 'p-bob', displayName: '', formattedDisplayName: '', role: 'participant' },
-        { id: 'p-carol', displayName: '', formattedDisplayName: '', role: 'participant' },
+        { participantId: 'p-alice', displayName: '', formattedDisplayName: '', role: 'participant' },
+        { participantId: 'p-bob', displayName: '', formattedDisplayName: '', role: 'participant' },
+        { participantId: 'p-carol', displayName: '', formattedDisplayName: '', role: 'participant' },
       ],
     );
 
@@ -78,21 +78,21 @@ describe('resolveDisplayName — resolution order', () => {
 
   it('prefers getDisplayName over the getParticipantsInfo scan', () => {
     const api = makeApi({ x: 'FromDirect' }, [
-      { id: 'x', displayName: 'FromScan', formattedDisplayName: '', role: 'participant' },
+      { participantId: 'x', displayName: 'FromScan', formattedDisplayName: '', role: 'participant' },
     ]);
     expect(resolveDisplayName(api, 'x', null, '')).toBe('FromDirect');
   });
 
   it('falls back to the scan displayName when getDisplayName is empty', () => {
     const api = makeApi({ x: '' }, [
-      { id: 'x', displayName: 'FromScan', formattedDisplayName: '', role: 'participant' },
+      { participantId: 'x', displayName: 'FromScan', formattedDisplayName: '', role: 'participant' },
     ]);
     expect(resolveDisplayName(api, 'x', null, '')).toBe('FromScan');
   });
 
   it('uses formattedDisplayName when both getDisplayName and displayName are empty', () => {
     const api = makeApi({ x: undefined }, [
-      { id: 'x', displayName: '', formattedDisplayName: 'Formatted', role: 'participant' },
+      { participantId: 'x', displayName: '', formattedDisplayName: 'Formatted', role: 'participant' },
     ]);
     expect(resolveDisplayName(api, 'x', null, '')).toBe('Formatted');
   });
@@ -103,7 +103,7 @@ describe('resolveDisplayName — resolution order', () => {
         throw new Error('endpoint unknown');
       },
       getParticipantsInfo: () => [
-        { id: 'x', displayName: 'FromScan', formattedDisplayName: '', role: 'participant' },
+        { participantId: 'x', displayName: 'FromScan', formattedDisplayName: '', role: 'participant' },
       ],
     } as unknown as JitsiMeetExternalAPI;
     expect(resolveDisplayName(api, 'x', null, '')).toBe('FromScan');
@@ -112,7 +112,7 @@ describe('resolveDisplayName — resolution order', () => {
   it('tolerates a missing getDisplayName accessor (optional chaining) and uses the scan', () => {
     const api = {
       getParticipantsInfo: () => [
-        { id: 'x', displayName: 'FromScan', formattedDisplayName: '', role: 'participant' },
+        { participantId: 'x', displayName: 'FromScan', formattedDisplayName: '', role: 'participant' },
       ],
     } as unknown as JitsiMeetExternalAPI;
     expect(resolveDisplayName(api, 'x', null, '')).toBe('FromScan');

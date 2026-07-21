@@ -234,6 +234,22 @@ export default function ChatPanel({
     }
   }, [active, setUnread]);
 
+  // Read auth. History and the SSE stream carry other attendees' names and
+  // messages, so both are token-gated server-side now (lib/chat/read-access);
+  // guests send nothing and are served only while the room is open to guests.
+  // EventSource cannot set headers, so the stream takes the token in the query.
+  const readHeaders = useMemo<Record<string, string> | undefined>(
+    () => (token ? { Authorization: `Bearer ${token}` } : undefined),
+    [token],
+  );
+
+  // Set when the server refuses read access (stale token, or a guest outside the
+  // window in which the room is open to guests). EventSource retries a failed
+  // connection forever and cannot report the status code, so we use the history
+  // request — which can — as the probe and keep the stream shut. Without this a
+  // refused reader would reconnect every few seconds for the whole event.
+  const [readDenied, setReadDenied] = useState(false);
+
   // 1. Initial history load.
   useEffect(() => {
     let cancelled = false;
@@ -241,7 +257,9 @@ export default function ChatPanel({
       try {
         const res = await fetch(`/api/events/${eventSlug}/chat?limit=200`, {
           cache: 'no-store',
+          ...(readHeaders ? { headers: readHeaders } : {}),
         });
+        if (res.status === 403 && !cancelled) setReadDenied(true);
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as { messages: ChatMessage[] };
         data.messages.forEach((m) => {
@@ -254,7 +272,7 @@ export default function ChatPanel({
       } catch { /* soft fail; SSE will still open */ }
     })();
     return () => { cancelled = true; };
-  }, [eventSlug]);
+  }, [eventSlug, readHeaders]);
 
   // 2. SSE stream for live updates + polling fallback (live feedback #8).
   //
@@ -266,7 +284,12 @@ export default function ChatPanel({
   // proxies (some Edge/corporate setups) who would otherwise see no incoming
   // messages at all.
   useEffect(() => {
-    const es = new EventSource(`/api/events/${eventSlug}/chat/stream`);
+    if (readDenied) return;
+    const es = new EventSource(
+      token
+        ? `/api/events/${eventSlug}/chat/stream?token=${encodeURIComponent(token)}`
+        : `/api/events/${eventSlug}/chat/stream`,
+    );
 
     const backfill = async (): Promise<number> => {
       try {
@@ -279,7 +302,10 @@ export default function ChatPanel({
         const url = since
           ? `/api/events/${eventSlug}/chat?since=${encodeURIComponent(since)}`
           : `/api/events/${eventSlug}/chat?limit=200`;
-        const res = await fetch(url, { cache: 'no-store' });
+        const res = await fetch(url, {
+          cache: 'no-store',
+          ...(readHeaders ? { headers: readHeaders } : {}),
+        });
         if (!res.ok) return 0;
         const data = (await res.json()) as { messages: ChatMessage[] };
         // Count messages the stream never delivered (still unseen) BEFORE upsert
@@ -361,7 +387,7 @@ export default function ChatPanel({
       es.removeEventListener('error', onError);
       es.close();
     };
-  }, [eventSlug, upsertMessage, removeMessage]);
+  }, [eventSlug, token, readHeaders, readDenied, upsertMessage, removeMessage]);
 
   useEffect(() => {
     scrollToBottom();

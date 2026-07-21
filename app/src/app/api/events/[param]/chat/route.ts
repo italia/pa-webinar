@@ -38,6 +38,7 @@ import {
   type ChatReplyRef,
   type ChatAttachmentRef,
 } from '@/lib/chat/pubsub';
+import { authorizeChatRead, guestChatWindowOpen } from '@/lib/chat/read-access';
 import { resolveTokenSender } from '@/lib/chat/sender';
 import {
   CHAT_ATTACHMENT_MIME,
@@ -147,11 +148,9 @@ async function authenticateSender(
   // Gli eventi schedulati/con password NON ammettono guest senza token fuori
   // dal LIVE: /wake è non autenticato e chiunque potrebbe flippare
   // PUBLISHED→PROVISIONING per iniettare messaggi anonimi (regressione chiusa).
-  const guestAllowed =
-    event.status === 'LIVE' ||
-    (event.eventType === 'INSTANT' &&
-      (event.status === 'PROVISIONING' || event.status === 'IDLE'));
-  if (!guestAllowed) {
+  // Shared with the read side (lib/chat/read-access) so the guest write window
+  // and the guest read window can never drift apart.
+  if (!guestChatWindowOpen(event)) {
     throw new ForbiddenError('Chat requires a participant or moderator token');
   }
   const name = (guestName ?? '').trim();
@@ -182,18 +181,13 @@ export const GET = withErrorHandling(async (request, context) => {
     HISTORY_MAX_LIMIT,
   );
 
-  const where = UUID_RE.test(param)
-    ? { id: param }
-    : { slug: param };
-  const event = await prisma.event.findUnique({
-    where,
-    select: { id: true },
-  });
-  if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
+  // History is PII (names + free text) and was world-readable for any event in
+  // any status. Readers now clear the same bar as writers — see read-access.
+  const { eventId } = await authorizeChatRead(param, extractModeratorToken(request));
 
   const rows = await prisma.chatMessage.findMany({
     where: {
-      eventId: event.id,
+      eventId,
       hiddenAt: null,
       ...(since && { createdAt: { gt: new Date(since) } }),
     },

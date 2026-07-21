@@ -40,7 +40,7 @@ export default function ParticipantPanel({
     const list = api.getParticipantsInfo().filter(isHumanParticipant);
     setParticipants(list);
     const seen = new Set<string>();
-    for (const p of list) seen.add(participantIdentityKey(p) || `#${p.id}`);
+    for (const p of list) seen.add(participantIdentityKey(p) || `#${p.participantId}`);
     onCountChange?.(seen.size);
   }, [api, onCountChange]);
 
@@ -168,13 +168,13 @@ export default function ParticipantPanel({
               return a.displayName.localeCompare(b.displayName);
             })
             .map((p) => {
-              const vol = volumes[p.id] ?? 1;
+              const vol = volumes[p.participantId] ?? 1;
               const volPct = Math.round(vol * 100);
-              const isVolumeOpen = openVolumeId === p.id;
+              const isVolumeOpen = openVolumeId === p.participantId;
               const shownName = p.displayName || p.formattedDisplayName || t('anonymous');
               return (
                 <div
-                  key={p.id}
+                  key={p.participantId}
                   className="rounded px-2 py-1"
                   style={{ backgroundColor: '#f8f9fa', fontSize: '0.85rem' }}
                 >
@@ -188,14 +188,16 @@ export default function ParticipantPanel({
                     </div>
                     <div className="d-flex gap-2 flex-shrink-0 align-items-center">
                       {/* F12: per-user local playback volume. It only changes what
-                          THIS browser hears, so it's offered to every attendee and
-                          for every remote endpoint (getParticipantsInfo is
-                          remotes-only → the local user is never listed here, so
-                          there is no pointless self-control). */}
+                          THIS browser hears, so it's offered to every attendee.
+                          NB: contrary to the upstream docs, the external_api.js
+                          this platform serves DOES list the local user in
+                          getParticipantsInfo() (`video-conference-joined` falls
+                          through into `participant-joined`), so a self-row can
+                          appear; setParticipantVolume on it is simply inert. */}
                       <button
                         type="button"
                         className="btn btn-sm p-0 border-0"
-                        onClick={() => setOpenVolumeId(isVolumeOpen ? null : p.id)}
+                        onClick={() => setOpenVolumeId(isVolumeOpen ? null : p.participantId)}
                         title={t('volume')}
                         aria-label={t('volume')}
                         aria-expanded={isVolumeOpen}
@@ -214,7 +216,7 @@ export default function ParticipantPanel({
                         <button
                           type="button"
                           className="btn btn-sm p-0 text-danger border-0"
-                          onClick={() => handleKick(p.id)}
+                          onClick={() => handleKick(p.participantId)}
                           title={t('kick')}
                           style={{ fontSize: '0.75rem', lineHeight: 1 }}
                         >
@@ -232,7 +234,7 @@ export default function ParticipantPanel({
                         max={100}
                         step={5}
                         value={volPct}
-                        onChange={(e) => handleVolume(p.id, Number(e.target.value))}
+                        onChange={(e) => handleVolume(p.participantId, Number(e.target.value))}
                         aria-label={t('volumeFor', { name: shownName })}
                         style={{ flex: 1 }}
                       />

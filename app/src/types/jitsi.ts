@@ -23,7 +23,19 @@ export interface JitsiMeetExternalAPIOptions {
 }
 
 export interface JitsiParticipant {
-  id: string;
+  /**
+   * Endpoint id. The field is `participantId`, NOT `id`: external_api.js stamps
+   * it on each row inside `getParticipantsInfo()`
+   * (`e.participantId = <key of _participants>`) and never sets `id`. Declaring
+   * it as `id` — as this type used to — type-checked fine while every read
+   * silently produced `undefined`, which broke the moderator roster (React keys,
+   * per-participant volume, and `kickParticipant(undefined)`).
+   *
+   * NB: participant EVENT payloads (participantJoined, raiseHandUpdated, …) DO
+   * use `id`. Those are typed at their own call sites; this interface describes
+   * only the `getParticipantsInfo()` rows.
+   */
+  participantId: string;
   displayName: string;
   formattedDisplayName: string;
   avatarURL?: string;

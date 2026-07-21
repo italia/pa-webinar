@@ -982,8 +982,10 @@ model EventTemplate {
   description String? @db.Text
   icon        String  @default("it-video")
 
-  qaEnabled                  Boolean @default(true) @map("qa_enabled")
-  chatEnabled                Boolean @default(false) @map("chat_enabled")
+  // Chat primaria, Q&A opt-in (live feedback #10 — "tenere SOLO chat"):
+  // allineato a defaultMatrix() e ai template di sistema.
+  qaEnabled                  Boolean @default(false) @map("qa_enabled")
+  chatEnabled                Boolean @default(true) @map("chat_enabled")
   recordingEnabled           Boolean @default(false) @map("recording_enabled")
   autoStartRecording         Boolean @default(false) @map("auto_start_recording")
   // Pre-attiva la checklist/note live (Event.agendaEnabled) per gli eventi

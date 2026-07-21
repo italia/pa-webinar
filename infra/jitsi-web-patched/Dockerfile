@@ -41,3 +41,29 @@ RUN set -eu; \
     remaining="$(cnt 'Xy=new AudioContext)')"; \
     { [ "$after" = "1" ] && [ "$remaining" = "0" ]; } || { echo "FATAL: rnnoise patch verification failed (patched=$after, unpatched-remaining=$remaining)"; exit 1; }; \
     echo "OK: rnnoise noise-suppression AudioContext forced to 48 kHz (1 site)"
+
+# Flying reaction emoji must not swallow clicks on the toolbar (live feedback #3).
+#
+# WHY: `.reactions-animations-container` is rendered as a SIBLING of
+# `#videoconference_page` (Conference.render mounts it after the page div), and
+# `#videoconference_page` has `transform: translate3d(0,0,0)` — a stacking
+# context that traps `.new-toolbox { z-index: 252 }` inside it. The sibling
+# therefore paints ABOVE the toolbar regardless of that 252, and
+# `.reaction-emoji` ships with no `pointer-events`, so a 32x32 emoji drifting
+# across the control bar eats the click under it. That is the original #3 report
+# ("in vista mosaico non si riesce a cliccare nessun pulsante"), which moved
+# inside the iframe when we switched to NATIVE reactions — out of reach of the
+# app's own stylesheet, hence this patch.
+#
+# The emoji are pure decoration: nothing in them is clickable, so disabling
+# pointer events costs no behaviour. Appending (rather than sed-ing a rule we do
+# not control) survives upstream CSS reshuffles; the guard keeps it idempotent
+# and fails loudly if the target file ever moves.
+RUN set -eu; \
+    C=/usr/share/jitsi-meet/css/all.css; \
+    [ -f "$C" ] || { echo "FATAL: $C not found (base image layout changed?)"; exit 1; }; \
+    grep -qF 'pa-webinar reactions overlay' "$C" && { echo "FATAL: patch already present"; exit 1; }; \
+    grep -qF '.reactions-animations-container' "$C" || { echo "FATAL: .reactions-animations-container missing from $C (reactions UI changed?)"; exit 1; }; \
+    printf '\n/* pa-webinar reactions overlay: flying emoji must never intercept toolbar clicks (feedback #3) */\n.reactions-animations-container,.reactions-animations-container *{pointer-events:none!important}\n' >> "$C"; \
+    tail -c 200 "$C"; \
+    echo "OK: reaction emoji overlay set to pointer-events:none"

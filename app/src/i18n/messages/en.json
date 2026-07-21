@@ -374,7 +374,8 @@
       "micDisabled": "Mic disabled",
       "videoModeration": "Participant video",
       "videoDisabled": "Video disabled",
-      "eventEndedSuccess": "Event ended successfully. Redirecting..."
+      "eventEndedSuccess": "Event ended successfully. Redirecting...",
+      "whiteboard": "Whiteboard"
     },
     "closeDrawer": "Close",
     "hintBanner": {
@@ -390,7 +391,21 @@
     "sidebarTabChatUnread": "New unread messages",
     "floatingControlsLabel": "Event controls",
     "screenshareActive": "🖥️ {name} is sharing their screen",
-    "screenshareFallbackName": "A participant"
+    "screenshareFallbackName": "A participant",
+    "share": {
+      "button": "Share",
+      "title": "Share the event",
+      "callLink": "Link to join",
+      "callLinkHint": "Anyone opening this link joins directly while the event is live; otherwise they go through registration. It carries no private tokens.",
+      "eventLink": "Event page",
+      "eventLinkHint": "The public page with the details and the registration form.",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "moderatorReveal": "Show moderator link",
+      "moderatorWarning": "This link grants MODERATOR access (mute everyone, start recording, end the event). Share it only with other moderators.",
+      "moderatorLink": "Moderator link",
+      "moderatorLinkHint": "Anyone opening this link joins as a moderator with full control of the room."
+    }
   },
   "qa": {
     "title": "Questions & Answers",
@@ -2332,7 +2347,12 @@
       },
       "archiveSourceTitle": "Source recording",
       "archiveSourceHint": "Original event video. Separate per-participant tracks and the MKV archive require multi-track recording (not enabled for this event).",
-      "archiveSourceDownload": "Download original video"
+      "archiveSourceDownload": "Download original video",
+      "manageRerunNoop": "No job started: AI is disabled for this event, or the pipeline is paused. Use “Generate AI”.",
+      "manageRerunAlreadyQueued": "Processing is already queued: nothing new to start.",
+      "generateAi": "Generate AI",
+      "generateAiConfirm": "Run the AI pipeline (transcription and summary) on this recording. AI processing will be enabled for the event and starts in the background. Translations are added afterwards, one language at a time, from the “Translations” tab.",
+      "generateAiOk": "AI pipeline started."
     },
     "questionnairesPage": {
       "title": "Questionnaires",
