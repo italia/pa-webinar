@@ -28,7 +28,10 @@ env:
 jobs:
   build:
     name: Build & validate patched jitsi/web
-    runs-on: ubuntu-latest
+    # Self-hosted ARC runner in the cluster, like ci.yml / release.yml / dev.yml.
+    # GitHub-hosted runners are unavailable to this org (billing), so a
+    # `ubuntu-latest` job never even starts.
+    runs-on: arc-runner-pa-webinar
     permissions:
       contents: read
       packages: write
