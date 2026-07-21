@@ -48,7 +48,7 @@ const PILL_MUTED: CSSProperties = { background: '#E9ECEF', color: C_INK, fontSiz
 // mismatch the kit's dynamic icon loader triggers on SSR pages.
 type IconName =
   | 'arrow-left' | 'link' | 'user-group' | 'video' | 'folder' | 'shield'
-  | 'pencil' | 'check' | 'x' | 'info' | 'external' | 'settings' | 'chart';
+  | 'pencil' | 'check' | 'x' | 'info' | 'external' | 'settings' | 'chart' | 'copy';
 
 const ICONS: Record<IconName, ReactNode> = {
   'arrow-left': <path d="M19 12H5M12 19l-7-7 7-7" />,
@@ -67,6 +67,10 @@ const ICONS: Record<IconName, ReactNode> = {
   pencil: <>
     <path d="M12 20h9" />
     <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+  </>,
+  copy: <>
+    <rect x="9" y="9" width="11" height="11" rx="2" />
+    <path d="M5 15V5a2 2 0 0 1 2-2h10" />
   </>,
   check: <path d="M20 6L9 17l-5-5" />,
   x: <path d="M18 6L6 18M6 6l12 12" />,
@@ -248,6 +252,32 @@ export default function EventManagementClient({
   }, [event.id, event.moderatorToken, isEarlyStart, t]);
 
   const handleDeleted = useCallback(() => { router.push('/admin'); }, [router]);
+
+  // "Duplica come prossima occorrenza" (docs/ROADMAP.md, "Eventi ricorrenti"):
+  // le call ricorrenti reali — Caffettino, sync DevIt — si ricreano a mano ogni
+  // volta, e la copia manuale è proprio dove si perdono i flag di cattura. Qui
+  // l'endpoint eredita l'intera configurazione e, se l'evento ha una cadenza,
+  // proietta la data della prossima occorrenza; la copia nasce in BOZZA, quindi
+  // resta comunque da confermare (le date DevIt slittano spesso).
+  const [duplicating, setDuplicating] = useState(false);
+  const [duplicateError, setDuplicateError] = useState<string | null>(null);
+  const duplicateAsNext = useCallback(async () => {
+    setDuplicating(true);
+    setDuplicateError(null);
+    try {
+      const res = await fetch(`/api/admin/events/${event.id}/duplicate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nextOccurrence: true }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const created = (await res.json()) as { id: string };
+      router.push(`/admin/events/${created.id}/edit`);
+    } catch {
+      setDuplicateError(td('duplicateNextError'));
+      setDuplicating(false);
+    }
+  }, [event.id, router, td]);
 
   const exportCsv = useCallback(() => {
     const headers = ['Nome', 'Ente', 'Ruolo', 'Tipologia ente', 'Data registrazione', 'Entrato'];
@@ -523,9 +553,22 @@ export default function EventManagementClient({
                    className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
                   <Svg name="external" size={14} /> {t('openPublicPage')}
                 </a>
+                <button type="button"
+                        className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                        onClick={duplicateAsNext}
+                        disabled={duplicating}
+                        title={td('duplicateNextHint')}>
+                  <Svg name="copy" size={14} />
+                  {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
+                </button>
                 <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
                                   onDeleted={handleDeleted} />
               </div>
+              {duplicateError && (
+                <div className="alert alert-danger mt-2 mb-0 py-2" role="alert">
+                  {duplicateError}
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -1,0 +1,308 @@
+{
+  "0.8.3": {
+    "title": "Pokalbių privatumas, tikslus dalyvių skaičius ir atkurtos moderavimo priemonės",
+    "notes": [
+      "Pokalbių istorijos nebegali skaityti tie, kurie renginyje nedalyvauja. Anksčiau bet kuris asmuo, žinantis renginio adresą, galėjo atsisiųsti jo žinutes kartu su jas rašiusių žmonių vardais — net ir renginiui pasibaigus. Dabar būtina būti užsiregistravus, būti moderatoriumi arba būti salėje vykstant renginiui.",
+      "Salėje rodytas dalyvių skaičius buvo vienetu mažesnis, nes kiekvienas neįskaičiuodavo savęs. Ta pati klaida patekdavo ir į renginio statistiką (didžiausias dalyvių skaičius). Dabar skaičius tikslus ir sutampa su užfiksuotu statistikoje.",
+      "Atkurti moderatoriaus valdikliai dalyvių sąraše: dalyvio pašalinimas ir atskiro dalyvio garsumo reguliavimas anksčiau neveikė.",
+      "Reakcijas dabar galima siųsti ir išmaniuoju telefonu, kuriame nebebuvo jokio šiam veiksmui skirto mygtuko. Ekranu praskriejantys jaustukai nebeperima valdiklių juostos paspaudimų.",
+      "Viso ekrano režimu vėl matomi dialogo langai — nuorodos bendrinimo ir moderatoriams skirtas „Išeiti iš salės“: anksčiau jie likdavo paslėpti už vaizdo, todėl atrodydavo, kad mygtukai neveikia.",
+      "Renginių šablonuose pokalbiai dabar įjungti iš karto, kaip ir pačioje salėje: anksčiau sukūrus „Webinar“ šablono renginį pokalbių jame vis dar nebūdavo.",
+      "Užbaigtas sąsajos vertimas į anglų kalbą — trūko kelių elementų, tarp jų viso lango „Bendrinti“."
+    ]
+  },
+  "0.8.2": {
+    "title": "Tuščios salės nebelieka veikti pasibaigus renginio laikui",
+    "notes": [
+      "Salė, palikta atidaryta pasibaigus numatytam renginio laikui ir vėliau ištuštėjusi, likdavo aktyvi neribotą laiką ir be reikalo užimdavo vaizdo perdavimo išteklius. Dabar ji uždaroma, jeigu po numatytos pabaigos laiko išbūna tuščia 45 minutes. Salė, kurioje dar yra žmonių, niekada nenutraukiama: pasibaigus numatytam laikui tiesiog parodomas pranešimas ir niekas neatjungiamas."
+    ]
+  },
+  "0.8.1": {
+    "title": "Konfigūruojamos reakcijos, tuščios salės uždarymas ir saugesnė administravimo sritis",
+    "notes": [
+      "Reakcijas (jaustukus) dabar gali konfigūruoti administratorius: pagal numatytuosius nustatymus naudojamos Jitsi reakcijos, pasiekiamos tiesiai valdiklių juostoje (jos paprastos ir trumpalaikės). Kaip alternatyvą galima įjungti pačios platformos reakcijas (juosta apačioje kairėje), kurios įskaičiuojamos į renginio statistiką.",
+      "Nauja administratoriaus parinktis: automatiškai uždaryti salę, kurioje nebeliko nė vieno žmogaus, įskaitant moderatorių, nes tai rodo, kad renginys apleistas. Pagal numatytuosius nustatymus ji išjungta — neveiklumas be moderatoriaus jau tvarkomas saugiai, nes po 45 minučių salė užmiega — ir įjungiama nustatymuose.",
+      "Saugesnė administravimo sritis: pasibaigus seansui grįžtama į prisijungimo langą, todėl administravimo puslapiais po seanso pabaigos naudotis nebegalima. Seansas taip pat trunka ilgiau ir dirbant pratęsiamas automatiškai."
+    ]
+  },
+  "0.8.0": {
+    "title": "Tvarkingesnė tiesioginio renginio salė: pokalbiai, reakcijos, viso ekrano režimas ir registracija",
+    "notes": [
+      "Pokalbiai: žinutėse dabar galima įterpti jaustukų tam skirtu parinkikliu, o nedidelis indikatorius įspėja, jei pokalbių atnaujinimai ima vėluoti. Jūsų siunčiamos žinutės pasirodo iš karto — net ir įstaigų tinkluose, kuriuose realiojo laiko atnaujinimai kaupiami buferyje.",
+      "Viso ekrano režimas: jį įjungus pokalbiai dabar lieka matomi šone, o ne paslepiami.",
+      "Reakcijos (jaustukai) nebeuždengia apatinių valdiklių: juosta visada išlieka paspaudžiama, taip pat ir plytelių rodinyje.",
+      "Mygtukai „Bendrinti“ ir „Išeiti iš salės“ dabar aiškiai matomi ir spalvoti iš karto (išėjimo — raudonas), o ne tik užvedus pelės žymeklį.",
+      "Įrašymo robotas „Recorder“ neberodomas nei dalyvių sąraše, nei jų skaičiuje.",
+      "Registracija: užsiregistravus gerokai iš anksto atveriamas patvirtinimo puslapis su nuoroda renginiui įtraukti į kalendorių, o ne laukimo salė; artėjant pradžiai patenkama tiesiai į salę. Renginio puslapyje matyti, ar jau esate užsiregistravę.",
+      "Pokalbiai dabar yra pagrindinis bendravimo salėje būdas. Taip pat patobulintas automatinis tuščio renginio uždarymas ir dalyvių skaičiavimas statistikoje."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderatorius gali nuleisti pakeltą ranką",
+    "notes": [
+      "Pakeltų rankų eilėje moderatorius dabar turi mygtuką pavienio dalyvio rankai nuleisti — tai naudinga, kai žmogus jau kalbėjo arba paliko ranką pakeltą per klaidą. Prašymas pasiekia būtent tą dalyvį, kuris mato, kaip jo ranka nusileidžia; kitiems tai neturi jokio poveikio."
+    ]
+  },
+  "0.7.7": {
+    "title": "Mažiau foninio triukšmo kalbant",
+    "notes": [
+      "Pradėjus kalbėti įsijungia pažangus foninio triukšmo slopinimas: jis geriau prislopina klaviatūros, ventiliatorių ar gatvės eismo garsus ir papildo jau veikiantį bazinį triukšmo mažinimą."
+    ]
+  },
+  "0.7.6": {
+    "title": "Kiekvieno dalyvio garsumas atskirai",
+    "notes": [
+      "Naujas atskiro dalyvio garsumo valdiklis skydelyje „Dalyviai“: jei kieno nors balsas girdisi per garsiai arba per tyliai, jį galima sureguliuoti tik sau, nekeičiant to, ką girdi kiti.",
+      "Patikimesnis atskiras kiekvieno dalyvio garso įrašymas, naudojamas medžiagai apdoroti po renginio: jei įraše nelieka garso, sistema tai pastebi iš karto ir nesukuria tuščių transkripcijų."
+    ]
+  },
+  "0.7.5": {
+    "title": "Pakelta ranka lieka pakelta",
+    "notes": [
+      "Pakėlus ranką ji dabar lieka pakelta tol, kol ją nuleidžiate patys arba kol ją nuleidžia moderatorius. Anksčiau ranka nusileisdavo pati, vos tik pradėdavote kalbėti, ir jūs dingdavote iš norinčiųjų kalbėti eilės."
+    ]
+  },
+  "0.7.4": {
+    "title": "Pokalbiuose rodomas vardas apsaugotas nuo persiųstų nuorodų (saugumas)",
+    "notes": [
+      "Pokalbiuose tikrasis užsiregistravusio asmens vardas rodomas tik tame įrenginyje, kuriuo jis registravosi: atsidaręs persiųstą dalyvavimo nuorodą žmogus dalyvauja savo įvestu vardu, o ne užsiregistravusio asmens vardu. Taip užkirstas kelias netinkamam žinučių priskyrimui.",
+      "Ta pati apsauga taikoma ir priedams: iš persiųstos nuorodos išsiųstas failas nebepriskiriamas užsiregistravusio asmens vardui.",
+      "Prisijungiantieji iš antro įrenginio (pavyzdžiui, telefono) arba su iš anksto gauta nuoroda ir toliau netrukdomi dalyvauja, rašo pokalbiuose ir siunčia priedus: pasikeičia tik rodomas vardas — juo tampa tas, kuris įvedamas įeinant į salę."
+    ]
+  },
+  "0.7.3": {
+    "title": "Tikslus dalyvaujančiųjų skaičius, reakcijos per vidurį ir salės patobulinimai",
+    "notes": [
+      "Dalyvaujančiųjų skaičius nebedaugina to paties žmogaus, kuris išeina ir vėl grįžta (pavyzdžiui, naršyklės mygtuku „Atgal“): pakartotiniai to paties asmens prisijungimai skaičiuojami tik kartą. Dalyvių sąraše ir toliau rodomas kiekvienas prisijungimas, kad moderatorius visada matytų ir galėtų valdyti visus.",
+      "Reakcijų juosta dabar yra ekrano apačioje per vidurį — gerai matoma ir lengvai randama, o ne apatiniame kairiajame kampe.",
+      "Užsiregistravusiųjų skaičius nebėra viešai rodomas renginio puslapyje ir renginių sąraše: jį valdymo skydelyje mato tik administratoriai. Vykstant tiesioginiam renginiui žiūrovai mato tik dalyvaujančiųjų skaičių.",
+      "Foninio triukšmo slopinimas automatiškai įjungtas visiems mikrofonams (bazinis garso apdorojimas — aido ir triukšmo šalinimas — veikia visada, jo nereikia įjungti rankiniu būdu).",
+      "Kiek greitesnis įėjimas į salę: vaizdo sistema pradedama žadinti jau paspaudus įėjimo mygtuką."
+    ]
+  },
+  "0.7.2": {
+    "title": "Turtingesni pokalbiai: priedai, atsakymai ir paminėjimai",
+    "notes": [
+      "Pokalbiuose dabar galima siųsti paveikslėlius ir priedus (PNG, JPEG, WebP, GIF ir PDF, iki 10 MB); peržiūra rodoma tiesiai žinutėje.",
+      "Nauja funkcija „Atsakyti“: galima cituoti konkrečią žinutę, o citata lieka matoma pokalbio gijoje.",
+      "Paminėjimai su @: žinutėje galima kreiptis į dalyvį vardu.",
+      "Pokalbių moderavimas: renginio metu moderatoriai gali pašalinti pavienes žinutes."
+    ]
+  },
+  "0.7.1": {
+    "title": "Kiekvieno renginio statistika jam pasibaigus",
+    "notes": [
+      "Nauja kiekvieno renginio kortelė „Statistika“ administratoriaus skydelyje (prieinama ir tiems renginiams, kuriuose nebuvo išankstinės registracijos arba vaizdo įrašo): joje matyti, kaip vyko renginys, kas kalbėjo daugiausia, koks bendras įsitraukimo lygis ir pagrindiniai rodikliai.",
+      "Sąveikos kitimo laike diagrama — pokalbiai, klausimai, balsai už klausimus, apklausos, žodžių debesies žodžiai ir reakcijos — su pažymėta didžiausio aktyvumo akimirka.",
+      "Ilgiausiai kalbėjusiųjų sąrašas (minutės kiekvienam) su kalbėjimo laiko pasiskirstymu, taip pat reakcijų ir rankų pakėlimų skaičiai.",
+      "Naujas įvertis, kiek laiko dalyviai vidutiniškai išbuvo salėje; jis naudojamas ir skaičiuojant bendrą dėmesio rodiklį."
+    ]
+  },
+  "0.7.0": {
+    "title": "Redaguojami pranešėjų vardai ir tik garso grotuvas",
+    "notes": [
+      "Pasibaigus renginiui dabar galima pervadinti pranešėjus ir taip pataisyti vardus, kuriuos transkripcija atpažino automatiškai.",
+      "Jei įraše nėra atkuriamo vaizdo, redagavimo puslapyje vis tiek rodomas tik garso grotuvas, kad būtų galima perklausyti ir sutvarkyti tekstą bei pranešėjų vardus.",
+      "Ištaisytas kelių takelių įrašymas: dabar teisingai įrašomas tikrasis nuotolinių dalyvių garsas."
+    ]
+  },
+  "0.6.9": {
+    "title": "Dirbtinio intelekto apdorojimo patikimumas",
+    "notes": [
+      "Administratoriaus skydelyje dabar rodomas dirbtinio intelekto atliekamo apdorojimo po renginio (transkripcijos, santraukų, vertimų) patikimumo rodiklis, kad iš karto būtų aišku, ar rezultatas išsamus ir juo galima pasikliauti."
+    ]
+  },
+  "0.6.8": {
+    "title": "Aiškesnis medžiagos redagavimo puslapis po renginio",
+    "notes": [
+      "Redagavimo puslapyje (transkripcija, santrauka, vertimai) dabar paaiškinama, kodėl dirbtinio intelekto parengto turinio dar nėra — „vyksta apdorojimas“ arba „paleiskite apdorojimą viršuje esančiais valdikliais“ — vietoj raudono klaidos pranešimo, kuris atrodė kaip gedimas.",
+      "Nepavykęs išsaugojimas dabar rodomas raudonai kartu su konkrečia serverio nurodyta priežastimi, o ne žaliai, tarsi viskas būtų pavykę.",
+      "Pasibaigęs administratoriaus seansas ir įkėlimo triktys dabar skiriami atskirais pranešimais, o ne rodomi kaip viena bendra klaida.",
+      "Jei įrašo garso atkurti nepavyksta, puslapis apie tai praneša, tačiau segmentų tekstą ir pranešėjus vis tiek galima taisyti."
+    ]
+  },
+  "0.6.7": {
+    "title": "Visada matomos reakcijos ir „Pastabos / kontrolinis sąrašas“",
+    "notes": [
+      "Reakcijos (jaustukai) dabar visada matomos juostoje apačioje kairėje ir nebeslepiamos po mygtuku: renginio metu jas lengviau rasti ir naudoti.",
+      "Funkcija „Darbotvarkė“ pervadinta į „Pastabos / kontrolinis sąrašas“, kad būtų aišku, jog tai kontrolinio sąrašo pavidalo užrašų sritis, kurios turinys nepatenka į pokalbius; moderatorius ją ir toliau gali įjungti kiekvienam renginiui."
+    ]
+  },
+  "0.6.6": {
+    "title": "Patobulinimai: pokalbiai, skaičiai ir įėjimas",
+    "notes": [
+      "Pokalbiuose bendrinamos nuorodos dabar yra paspaudžiamos ir saugiai atveriamos naujoje kortelėje (anksčiau tai buvo tik tekstas).",
+      "Salėje bendras užsiregistravusiųjų skaičius dabar matomas tik moderatoriams: dalyviai mato tik tai, kiek žmonių iš tikrųjų dalyvauja.",
+      "Greitesnis įėjimas į salę: ryšys su vaizdo serveriu parengiamas dar laukimo salėje, todėl įeinant tenka laukti trumpiau.",
+      "Dalyvių sąraše antraštė su skaičiumi lieka matoma slenkant sąrašą."
+    ]
+  },
+  "0.6.5": {
+    "title": "Įrašai ir dalyvių skaičiai",
+    "notes": [
+      "Salėje dalyvaujančiųjų skaičius dabar neapima įrašymo priemonės: rodomi tik tikri žmonės, o ne garsą įrašantis robotas.",
+      "Medžiagos apdorojimas po renginio: naujas mygtukas „Generuoti su DI“ paleidžia transkripciją, santrauką ir vertimą taip pat ir tik garso įrašams (po vieną takelį kiekvienam dalyviui), kuriuose anksčiau nebuvo jokio paleidimo valdiklio.",
+      "Takelių sąraše prie slapyvardžių rodomas atpažinimo kodas: skirtingi tuo pačiu slapyvardžiu prisistatę žmonės gauna skirtingus kodus, o keli to paties žmogaus pasisakymai žymimi tuo pačiu kodu.",
+      "Aiškus pranešimas, kai paleidus apdorojimą į eilę nepatenka nė viena užduotis (renginiui dirbtinis intelektas išjungtas arba apdorojimas pristabdytas), vietoj klaidingo pranešimo apie sėkmę."
+    ]
+  },
+  "0.6.4": {
+    "title": "Tapatybės apsauga ir salės patobulinimai",
+    "notes": [
+      "Saugumo pataisa: pasidalijus savo asmenine salės nuoroda, ją atsidaręs žmogus dabar įeina SAVO vardu (anksčiau jis galėdavo perimti nuorodą atsiuntusio asmens vardą).",
+      "Aiškesnis ekrano bendrinimas: dabar pirmenybė teikiama raiškai (5 kadrai per sekundę aukšta kokybe), o ne sklandumui, todėl skaidrės ir dokumentai lieka įskaitomi net ir tada, kai vaizde mažai judesio.",
+      "Pašalinta funkcija „slėpti savo vaizdą“: ją įjungus nebebuvo galimybės grąžinti savo vaizdo langelio.",
+      "Administratoriaus prieiga: iš naujo prisijungus po neveiklumo pertraukos puslapis dabar tinkamai atsinaujina — nebelieka tarsi užstrigusio puslapio, kurį reikėdavo įkelti rankiniu būdu."
+    ]
+  },
+  "0.6.3": {
+    "title": "Renginio salės patobulinimai — antrasis etapas",
+    "notes": [
+      "Pranešimo laikmatis dabar įkomponuotas į moderatoriaus valdiklių juostą ir nebeužima atskiros eilutės; atgalinės atskaitos juosta rodoma tik tada, kai laikmatis veikia.",
+      "Pokalbiuose rodomas tikrasis rašančiojo vardas, o ne bendras užrašas „Moderatorius“.",
+      "Pokalbiai tapo atskiru šoninės juostos skydeliu ir nebeuždengia kito turinio: sąsaja tvarkingesnė, o kortelėje rodomas neperskaitytų žinučių skaitiklis.",
+      "Naujas mygtukas „Lenta“ leidžia moderatoriams atverti bendrą lentą tiesiai iš valdiklių juostos.",
+      "Mygtukui „Bendrinti“ parinkta tinkama spalva, kad jo nebebūtų galima supainioti su „Išeiti“; prie nuorodų atsirado piktogramos, o tik moderatoriams matoma moderavimo nuoroda paslėpta po įspėjimu, kad kitus moderatorius būtų galima pakviesti nesuklystant.",
+      "Žodžių debesis nebėra įjungtas iš anksto: moderatorius gali jį įjungti renginio metu savo nuožiūra."
+    ]
+  },
+  "0.6.2": {
+    "title": "Tiesioginio renginio salės patobulinimai",
+    "notes": [
+      "Valdiklių juosta (mikrofonas, kamera, ekrano bendrinimas) visada lieka matoma ir paspaudžiama: ir viso ekrano režimu, ir kam nors bendrinant ekraną, ir tada, kai salėje esate vieni.",
+      "Moderatorius vėl gali renginio metu įjungti ir išjungti tiesiogines funkcijas (klausimus, pokalbius, darbotvarkę).",
+      "Garso ir vaizdo valdikliais galima naudotis dar ruošiant salę, nelaukiant, kol pasileis vaizdo serveris.",
+      "Sąraše „Pakeltos rankos“ teisingai rodoma, kas paprašė žodžio.",
+      "Naujas mygtukas „Bendrinti“ salėje: vienu paspaudimu nukopijuoja dalyvavimo nuorodą ir renginio puslapio nuorodą, neatskleisdamas slaptų prieigos raktų.",
+      "Renginio salės viršutinėje juostoje vėl matomas PA Webinar ženklas."
+    ]
+  },
+  "0.6.1": {
+    "title": "Viešas pakeitimų sąrašas ir saugumo atnaujinimai",
+    "notes": [
+      "Naujas viešas pakeitimų puslapis, pasiekiamas paspaudus versijos numerį poraštėje: jame išvardytos visos platformos versijos su pagrindinėmis naujovėmis.",
+      "Priklausomybių saugumo atnaujinimai (undici, nodemailer) ir sugriežtinta programinės įrangos kūrimo grandinė su pažeidžiamumų patikra."
+    ]
+  },
+  "0.6.0": {
+    "title": "Darbo eiga po renginio ir interaktyvi laukimo salė",
+    "notes": [
+      "Nauja renginio pabaigos eiga: renginiui pasibaigus moderatoriaus atskirai paklausiama, kur turi patekti įrašas — būti paskelbtas renginio puslapyje, įtrauktas į biblioteką ar likti tik archyve.",
+      "Automatinė nuasmeninta renginio apžvalga (dalyvavimas, daugiausia balsų surinkę klausimai, apklausų rezultatai, žodžių debesis, vertinimai), rodoma kiekvieno pasibaigusio renginio puslapyje net ir tada, kai įrašo nėra.",
+      "Dalyviams po renginio siunčiamas apibendrinamasis laiškas su renginio turiniu.",
+      "Interaktyvi laukimo salė „Piazza Digitale“: savo personažu einate iki vartų, pro kuriuos patenkama į vaizdo pokalbį; šalia visada lieka ir įprastas įėjimo mygtukas.",
+      "Žodžių debesis pasibaigusio renginio puslapyje turi atskirą skiltį, o administratorius gali reguliuoti jos matomumą.",
+      "Bendrą lentą galima įjungti atskiram renginiui arba iš šablono.",
+      "Peržiūrėta renginio kūrimo vediklio patirtis: sutrauktos išplėstinės parinktys, pagrindinis moderatorius su nuoroda, įspėjimai apie asmens duomenis, juodraščio išsaugojimas ir geresnis dalinių klaidų tvarkymas.",
+      "Atskiri įrašų ir kiekvieno pranešėjo garso takelių saugojimo terminai, susieti su požymiu „vaizdo įrašas paskelbtas“, kartu su pokalbių žinučių valymu pagal GDPR."
+    ]
+  },
+  "0.5.11": {
+    "title": "Moderavimo, pokalbio užbaigimo ir garso patobulinimai",
+    "notes": [
+      "Moderatoriai rodomi tikraisiais vardais, o ne bendru užrašu „Moderatorius“.",
+      "Renginiui pasibaigus pačioje platformoje rodomas pabaigos langas — nebelieka klaidinančio pranešimo „Salė ruošiama“.",
+      "Ištaisytas piktogramų persidengimas laukimo salėje.",
+      "Triukšmo slopinimas priverstinai išjungtas per IFrame API, kad būtų išspręstos garso problemos."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabilus kelių takelių įrašymas, vertinimai žvaigždutėmis ir našumas",
+    "notes": [
+      "Kiekvieno pranešėjo (kelių takelių) įrašymas tapo patikimas nuo pradžios iki pabaigos: pilnas garsas kiekviename takelyje, jokių nukirtimų, lygiagretus įkėlimas.",
+      "Renginio vertinimo klausimynas su žvaigždutėmis ir apibendrinamoji administratoriaus ataskaitų sritis.",
+      "Našumo patobulinimai: VP9 kodekas kamerai, atidėtasis įkėlimas mobiliuosiuose įrenginiuose, įrašymo priemonės derinimas.",
+      "Po Helm atnaujinimo automatiškai iš naujo įkeliamas Jitsi config.js failas."
+    ]
+  },
+  "0.5.8": {
+    "title": "Konfigūruojama vaizdo ir garso kokybė bei nauja įėjimo eiga",
+    "notes": [
+      "Administratorius gali konfigūruoti vaizdo ir garso kokybę (atskiri parinkčių rinkiniai kiekvienam renginiui).",
+      "Perkurta įėjimo eiga: registracija, laukimo salė, vaizdo pokalbis.",
+      "Pakėlus ranką rodomas tikrasis kiekvieno dalyvio vardas."
+    ]
+  },
+  "0.5.6": {
+    "title": "Konfigūruojama laukimo salė ir renginių viršelių paveikslėliai",
+    "notes": [
+      "Konfigūruojama laukimo salės aplinka (žaidimas, sodas ar įprasta) tiek visai svetainei, tiek atskiram renginiui.",
+      "Viršelių paveikslėliai renginio puslapyje ir kortelių miniatiūrose.",
+      "Įkelti failai pateikiami per atskirą maršrutą, naudojant trumpai galiojančias pasirašytas nuorodas.",
+      "Mygtukas „Įeiti dabar“, pasiekiamas iškart po registracijos.",
+      "Sutvarkyta administravimo skiltis, skirta įrašų apdorojimui dirbtiniu intelektu valdyti, ir patikimesnis kelių takelių įrašymas."
+    ]
+  },
+  "0.5.2": {
+    "title": "Pasirengimas renginiams ir patobulinimai",
+    "notes": [
+      "Darbotvarkė su pritarimo ir nepritarimo žymėjimu bei ištaisytos iš šablonų paveldimos teisės.",
+      "Tikri vardai vietoj „SPEAKER_00“ santraukose ir subtitruose.",
+      "Pataisymų serija (v0.5.2–v0.5.5) rengiantis viešiesiems renginiams."
+    ]
+  },
+  "0.5.1": {
+    "title": "Bendruomenei skirtas pradinis puslapis ir kelių takelių archyvas",
+    "notes": [
+      "Perkurtas pradinis puslapis, orientuotas į bendruomenę, su galimybe keisti vertimus veikimo metu ir su AgID prieinamumo reikalavimų atitiktimi.",
+      "Kelių takelių MKV archyvas su grotuvu, leidžiančiu perklausyti kiekvieną pranešėją atskirai.",
+      "Kelių takelių garso suderinimas su Jibri miksu naudojant kryžminę koreliaciją."
+    ]
+  },
+  "0.5.0": {
+    "title": "Medžiagos apdorojimas dirbtiniu intelektu ir kelių takelių įrašymas",
+    "notes": [
+      "Dirbtinio intelekto apdorojimo grandinė po renginio: transkripcija, santraukos, subtitrai, vertimai ir kelių balsų įgarsinimas (visada sintetinis), fiksuojant naudotų modelių kilmę.",
+      "Kelių takelių įrašymas (po vieną takelį kiekvienam pranešėjui) su pranešėjų atpažinimu ir automatiniu pavadinimų suteikimu (ADR-013).",
+      "Vieša vaizdo įrašų biblioteka ir renginio medžiagos tvarkymo puslapis administratoriams.",
+      "Transkripcijos rengyklė po renginio: galima taisyti tekstą ir iš naujo priskirti pranešėjus.",
+      "Atnaujinta administravimo sąsaja: .italia pranešimai ir dialogo langai vietoj naršyklės įspėjimų, turinio įkėlimo karkasai ir spalvų dizaino žymenys vietoj šimtų tiesiogiai įrašytų spalvų kodų.",
+      "Kiekvieno dalyvio sutikimas dėl kelių takelių įrašymo (GDPR) ir išplėstas duomenų eksportas pagal 15 straipsnį."
+    ]
+  },
+  "0.4.0": {
+    "title": "Įsitraukimas ir gyvavimo ciklas",
+    "notes": [
+      "Naujos tiesioginio renginio funkcijos: žodžių debesis, pranešimo laikmatis, reakcijų skaitiklis, Meet stiliaus tiesioginio renginio valdikliai ir pakeltų rankų skydelis.",
+      "Įrašų gyvavimo ciklas (nuo laikino iki paskelbto) su administravimo priemonėmis (peržiūra, paskelbimas, ištrynimas) ir atskirais saugojimo terminais.",
+      "Kortelėmis suskirstytas puslapis po renginio (įrašas, Q&A archyvas, apklausos, atsiliepimai, medžiaga) su galimybe nustatyti, kas ir kada rodoma.",
+      "Penkių žingsnių renginio kūrimo vediklis, žymų sistema, kontaktų knyga ir redakcinė antraštės eilutė.",
+      "Vieša vaizdo įrašų biblioteka /video-library ir skaidrumo puslapis /service-inventory (CycloneDX 1.6 atskirai kiekvienai įstaigai).",
+      "Dviejų pakopų JVB automatinis mastelio keitimas su Redis momentine kopija, iš kurios duomenis ima būsenos puslapis.",
+      "Trijų pakopų GDPR valymas: neatidėliotinas asmens duomenų šalinimas, turinio šalinimas pasibaigus saugojimo terminui ir galutinis ištrynimas."
+    ]
+  },
+  "0.3.0": {
+    "title": "Konfigūruojama platforma ir infrastruktūra",
+    "notes": [
+      "Svetainės nustatymai, leidžiantys platforma naudotis ir kitoms viešojo sektoriaus įstaigoms — ženklodara, spalvos, svetainės piktograma, SEO, poraštė, pradinio puslapio režimas, privatumo ir prieinamumo puslapiai — jos neperkuriant.",
+      "Analitikos ataskaitų sritis ir infrastruktūros administravimo skydelis.",
+      "Trys Helm diegimo režimai (paprastas, standartinis, pilnas) ir JVB mastelio mažinimas iki nulio atskirame mazgų telkinyje.",
+      "Kelių debesų Jibri grandinė (Azure Blob, S3, GCS, MinIO ar vietinė saugykla) ir konfigūruojamas Jitsi vandenženklis.",
+      "OpenSSF Scorecard, Dependabot, priklausomybių SBOM, centralizuotas klaidų tvarkymas, užklausų dažnio ribojimas ir daugiau nei 210 vienetų testų.",
+      "Daugybė tarpinių leidimų (v0.3.8–v0.3.45), parengtų atsižvelgiant į po demonstracijos gautas pastabas."
+    ]
+  },
+  "0.2.0": {
+    "title": "DTD pastabos",
+    "notes": [
+      "Dalyvių profiliavimas registruojantis (įstaiga, pareigos, tipas), konfigūruojamas kiekvienam renginiui, su CSV eksportu ir apibendrinta statistika.",
+      "Konfigūruojami priminimai su keliais siuntimo laikais ir skirtingais laiškais.",
+      "Apklausos su realiojo laiko rezultatais ir CSV eksportu.",
+      "GDPR patobulinimai: kiekvieno renginio privatumo politika, atskiri sutikimai, ištrynimų audito žurnalas ir duomenų eksportas pagal 15 straipsnį.",
+      "Sutvarkyti moderatoriaus ir auditoriaus vaidmenys bei atliktas priklausomybių licencijų auditas."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP — pirmoji versija",
+    "notes": [
+      "Vieša skaitmeninių renginių platforma, sukurta su .italia dizaino sistema (Bootstrap Italia, design-react-kit).",
+      "Tiesioginio renginio salė su Jitsi Meet (IFrame API, JWT autentifikavimas) ir serveryje užtikrinamais vaidmenimis.",
+      "GDPR reikalavimus atitinkanti dalyvių registracija su šifruotais asmens duomenimis (AES-256-GCM).",
+      "Q&A su balsavimu už klausimus ir moderavimu, laukimo salė su atgaline atskaita ir svečio prieiga.",
+      "Patvirtinimo ir priminimo laiškai, integracija su kalendoriais (Google, Outlook, Yahoo, iCal).",
+      "Administravimo skydelis su API rakto autentifikavimu, GDPR valymu ir Prometheus metrikomis.",
+      "Gamybai parengta Helm diagrama, ne root teisėmis veikiantys ir tik skaitomi Docker atvaizdai, CI/CD su GitHub Actions, publiccode.yml."
+    ]
+  }
+}

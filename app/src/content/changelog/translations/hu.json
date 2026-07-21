@@ -1,0 +1,308 @@
+{
+  "0.8.3": {
+    "title": "A csevegés bizalmassága, pontos résztvevőszám és újra működő moderálás",
+    "notes": [
+      "A csevegés előzményeit többé nem olvashatja el az, aki nem vesz részt az eseményen. Korábban bárki, aki ismerte egy esemény webcímét, letölthette az üzeneteket – az írók nevével együtt –, még az esemény lezárása után is. Mostantól ehhez regisztrált résztvevőnek vagy moderátornak kell lenni, illetve a folyamatban lévő esemény termében kell tartózkodni.",
+      "A teremben megjelenő résztvevőszám eggyel kevesebbet mutatott, mert saját magát senki sem számolta bele. Ugyanez a hiba jelent meg az esemény statisztikáiban is (csúcslétszám). A számlálás mostantól pontos, és megegyezik a statisztikákban rögzített értékkel.",
+      "Ismét működnek a moderátori műveletek a résztvevők listájában: a résztvevő eltávolítása és az egyéni hangerő beállítása korábban hatástalan volt.",
+      "A reakciók mostantól okostelefonon is elérhetők, ahol korábban nem maradt gomb a küldésükhöz. A képernyőn átúszó emojik pedig már nem fogják el a vezérlősávra irányuló kattintásokat.",
+      "Teljes képernyőn ismét láthatók a párbeszédablakok – a hivatkozás megosztása, illetve moderátoroknál a „Kilépés a teremből” –: korábban a videó mögé kerültek, ezért úgy tűnt, mintha a gombok nem működnének.",
+      "Az eseménysablonokban mostantól alapértelmezés szerint be van kapcsolva a csevegés, összhangban a teremmel: a „Webináriumból” korábban csevegés nélküli esemény jött létre.",
+      "Elkészült a felület teljes angol fordítása; korábban több elem hiányzott, köztük a teljes „Megosztás” ablak."
+    ]
+  },
+  "0.8.2": {
+    "title": "Egyetlen üres terem sem marad nyitva a befejezés után",
+    "notes": [
+      "A tervezett befejezésen túl nyitva maradt, majd kiürült terem korlátlan ideig aktív maradt, és feleslegesen foglalta a videoerőforrásokat. Mostantól a rendszer lezárja, ha a tervezett befejezés után 45 percen át üres marad. A még használatban lévő termet semmi nem szakítja meg: a befejezési idő után csak figyelmeztetés jelenik meg, és senkit nem kapcsol ki a rendszer."
+    ]
+  },
+  "0.8.1": {
+    "title": "Beállítható reakciók, üres termek lezárása és biztonságosabb adminisztrációs felület",
+    "notes": [
+      "Az emojis reakciók mostantól az adminisztrátor által beállíthatók: alapértelmezés szerint a Jitsi saját reakciói működnek, közvetlenül a vezérlősávból (könnyűek és rövid életűek). Ehelyett bekapcsolhatók az alkalmazás saját reakciói is – a bal alsó sarokban lévő sávban –, amelyeket a rendszer beszámít az esemény statisztikáiba.",
+      "Új adminisztrátori beállítás: a teljesen üresen maradt terem – a moderátort is beleértve – automatikus lezárása, ami az esemény elhagyását jelzi. Alapértelmezés szerint ki van kapcsolva, hiszen a moderátor nélküli tétlenséget a rendszer már biztonságosan kezeli: a terem 45 perc után alvó állapotba kerül. A beállítások között bármikor bekapcsolható.",
+      "Biztonságosabb adminisztrációs felület: a munkamenet lejártakor a rendszer visszairányít a bejelentkezési képernyőre, így lejárt munkamenettel többé nem használhatók az adminisztrátori oldalak. A munkamenet emellett tovább tart, és munka közben automatikusan megújul."
+    ]
+  },
+  "0.8.0": {
+    "title": "Áttekinthetőbb élő terem: csevegés, reakciók, teljes képernyő és regisztráció",
+    "notes": [
+      "Csevegés: az üzenetekbe mostantól külön választóval szúrhatók be emojik, egy kis jelzés pedig figyelmeztet, ha a csevegés frissítése lelassul. Az elküldött üzenetek azonnal megjelennek, azokon a vállalati hálózatokon is, amelyek pufferelik a valós idejű frissítéseket.",
+      "Teljes képernyő: a teljes képernyős gomb mostantól a videó mellett hagyja a csevegést, nem rejti el.",
+      "Az emojis reakciók már nem takarják el a képernyő alján lévő vezérlőket: a sáv mindig kattintható marad, mozaiknézetben is.",
+      "A „Megosztás” és a „Kilépés a teremből” gomb alapértelmezés szerint is jól láthatóan, színesen jelenik meg (a kilépés pirosan), nem csak akkor, ha az egérmutató fölé kerül.",
+      "A „Recorder” nevű felvevő robot már nem jelenik meg a résztvevők listájában és a létszámban sem.",
+      "Regisztráció: aki jóval a kezdés előtt jelentkezik, a váróterem helyett visszaigazoló oldalra jut, ahonnan az esemény felvehető a naptárba; a kezdéshez közeledve a regisztráció után egyenesen a terembe lehet lépni. Az esemény oldalán az is látszik, hogy a regisztráció már megtörtént-e.",
+      "A csevegés lett a terem elsődleges interakciós csatornája. Javult az üresen maradt események automatikus lezárása és a résztvevők számlálása a statisztikákban is."
+    ]
+  },
+  "0.7.8": {
+    "title": "A moderátor leengedheti a felemelt kezet",
+    "notes": [
+      "A felemelt kezek sorában a moderátor mostantól külön gombbal engedheti le egy-egy résztvevő kezét – ez akkor hasznos, ha valaki már beszélt, vagy tévedésből hagyta fent a kezét. A kérés az adott résztvevőhöz jut el, aki látja, hogy a keze lekerül; ez másokat nem érint."
+    ]
+  },
+  "0.7.7": {
+    "title": "Kevesebb háttérzaj felszólalás közben",
+    "notes": [
+      "Fejlett háttérzaj-szűrés lép működésbe, amikor valaki szót kap: a már meglévő alapszintű zajszűrésen túl hatékonyabban tompítja a billentyűzet, a ventilátorok vagy a forgalom zaját."
+    ]
+  },
+  "0.7.6": {
+    "title": "Résztvevőnkénti hangerő",
+    "notes": [
+      "Új hangerőszabályzó minden egyes résztvevőhöz a „Résztvevők” panelen: ha valakit túl hangosan vagy túl halkan hallani, a hangereje csak a saját eszközön állítható, ez másoknál nem változtat semmit.",
+      "Megbízhatóbb lett az utómunkához használt, résztvevőnként külön készülő hangfelvétel: ha egy sáv némán rögzül, a rendszer ezt azonnal észleli, és nem készít üres átiratot."
+    ]
+  },
+  "0.7.5": {
+    "title": "A felemelt kéz fent marad",
+    "notes": [
+      "A felemelt kéz mostantól addig marad fent, amíg a résztvevő le nem engedi, vagy a moderátor nem intézkedik: korábban magától lekerült abban a pillanatban, amikor az illető beszélni kezdett, így eltűnt a felszólalók sorából."
+    ]
+  },
+  "0.7.4": {
+    "title": "A csevegésben megjelenő név védelme a továbbküldött hivatkozásokkal szemben (biztonság)",
+    "notes": [
+      "A csevegésben a regisztrált résztvevő valódi neve csak azon az eszközön jelenik meg, amelyről a regisztráció történt: aki egy továbbküldött csatlakozási hivatkozást nyit meg, az általa beírt névvel szólal meg, nem az eredeti regisztrált nevében. Ezzel megszűnt az üzenetek téves névhez rendelése.",
+      "Ugyanez a védelem vonatkozik a csatolmányokra is: a továbbküldött hivatkozásról elküldött fájl már nem az eredeti regisztrált résztvevő nevéhez kerül.",
+      "Aki második eszközről – például telefonról – vagy előre megkapott hivatkozással csatlakozik, továbbra is zavartalanul részt vehet, írhat a csevegésben és küldhet csatolmányokat: csak a megjelenített név változik, az lesz, amelyet belépéskor beírt."
+    ]
+  },
+  "0.7.3": {
+    "title": "Pontos jelenléti létszám, középre került reakciók és fejlesztések a teremben",
+    "notes": [
+      "A jelenlévők száma többé nem sokszorozza ugyanazt a személyt, aki kilép és visszatér (például a böngésző „Vissza” gombjával): ugyanannak a személynek a többszörös kapcsolódásait a rendszer egyszer számolja. A résztvevők listája továbbra is minden kapcsolódást megmutat, így a moderátor mindenkit lát és kezelni tud.",
+      "A reakciók és emojik sávja mostantól alul, középen, jól láthatóan jelenik meg, nem a bal alsó sarokban.",
+      "A regisztráltak száma többé nem látható nyilvánosan az esemény oldalán és az eseménylistában: az adminisztrátorok számára a felületen továbbra is megjelenik. Az élő esemény alatt a közönség csak a jelenlévők számát látja.",
+      "A háttérzaj szűrése minden mikrofonon automatikusan bekapcsol: az alapszintű hangfeldolgozás – visszhang- és zajszűrés – mindig aktív, külön bekapcsolni nem kell.",
+      "Valamivel gyorsabb a belépés a terembe: a videorendszer „ébresztése” már a belépési gombra kattintáskor elindul."
+    ]
+  },
+  "0.7.2": {
+    "title": "Gazdagabb csevegés: csatolmányok, válaszok és említések",
+    "notes": [
+      "A csevegésben mostantól képek és csatolmányok is küldhetők (PNG, JPEG, WebP, GIF és PDF, legfeljebb 10 MB méretben), előnézettel közvetlenül az üzenetben.",
+      "Új „Válasz” funkció: egy adott üzenet idézhető, és az idézet a beszélgetés fonalában végig látható marad.",
+      "Említések @ jellel: egy résztvevő néven szólítható az üzeneten belül.",
+      "A csevegés moderálása: a moderátorok az esemény alatt egyes üzeneteket eltávolíthatnak."
+    ]
+  },
+  "0.7.1": {
+    "title": "Esemény utáni statisztikák minden eseményhez",
+    "notes": [
+      "Új „Statisztikák” fül minden eseményhez az adminisztrátori felületen – a regisztráció nélküli és a videofelvétel nélküli események esetében is –: megmutatja a beszélgetés alakulását, hogy ki beszélt a legtöbbet, a részvétel általános mértékét és a legfontosabb mutatókat.",
+      "Az interakciók időbeli alakulását bemutató grafikon – csevegés, kérdések, kérdésekre adott szavazatok, szavazások, a szófelhőbe küldött szavak és a reakciók –, kiemelve a beszélgetés csúcspontját.",
+      "Rangsor arról, ki beszélt a leghosszabban (fejenként percben), a felszólalások megoszlásával, valamint a reakciók és a kézfelemelések számával együtt.",
+      "Új becslés arról, hogy a résztvevők átlagosan mennyi ideig maradtak a teremben; ez az adat a figyelem általános mértékének kiszámításába is beszámít."
+    ]
+  },
+  "0.7.0": {
+    "title": "Szerkeszthető előadónevek és csak hangot lejátszó lejátszó",
+    "notes": [
+      "Az esemény után mostantól átnevezhetők az előadók, így javíthatók az átiratban automatikusan felismert beszélők nevei.",
+      "Ha a felvételhez nem tartozik lejátszható videó, a javító oldal akkor is felkínál egy csak hangot lejátszó lejátszót, amellyel visszahallgatható az anyag, és javítható a szöveg, valamint a beszélők neve.",
+      "Javítás a többsávos rögzítésben: mostantól helyesen rögzül a távoli résztvevők valódi hangja."
+    ]
+  },
+  "0.6.9": {
+    "title": "Az AI-feldolgozás megbízhatósága",
+    "notes": [
+      "Az adminisztrátori felület mostantól megbízhatósági mutatót jelenít meg az esemény utáni AI-feldolgozásról (átirat, összefoglaló, fordítások), így egyetlen pillantással megállapítható, hogy az eredmény teljes és hiteles-e."
+    ]
+  },
+  "0.6.8": {
+    "title": "Áttekinthetőbb esemény utáni szerkesztőoldal",
+    "notes": [
+      "A javító oldal (átirat, összefoglaló, fordítások) mostantól elmagyarázza, ha az AI-tartalmak még nem állnak rendelkezésre – „feldolgozás folyamatban”, illetve „indítsa el a feldolgozást a fenti vezérlőkkel” –, a korábbi piros hibaüzenet helyett, amely meghibásodásnak tűnt.",
+      "A sikertelen mentés mostantól pirossal jelenik meg, és megadja a kiszolgáló által visszaadott konkrét okot, ahelyett hogy zölden, sikeres műveletként látszana.",
+      "A lejárt adminisztrátori munkamenetet és a betöltési hibákat mostantól külön üzenetek különböztetik meg, egyetlen általános hibaüzenet helyett.",
+      "Ha a felvétel hangja nem játszható le, az oldal ezt jelzi, a szakaszok szövege és beszélője ettől függetlenül javítható marad."
+    ]
+  },
+  "0.6.7": {
+    "title": "Mindig látható reakciók és „Jegyzetek / ellenőrzőlista”",
+    "notes": [
+      "Az emojis reakciók mostantól mindig láthatók a bal alsó sarokban lévő sávban, nem rejtőznek egy gomb mögé: így könnyebben megtalálhatók és használhatók az esemény alatt.",
+      "A „Napirend” funkció új neve „Jegyzetek / ellenőrzőlista”, hogy egyértelmű legyen: ellenőrzőlista jellegű jegyzetfelületről van szó, amelynek tartalma nem kerül a csevegésbe. A moderátor továbbra is eseményenként kapcsolhatja be."
+    ]
+  },
+  "0.6.6": {
+    "title": "Finomítások: csevegés, létszámok és belépés",
+    "notes": [
+      "A csevegésben megosztott hivatkozások mostantól kattinthatók, és biztonságos módon, új lapon nyílnak meg; korábban egyszerű szövegként jelentek meg.",
+      "A teremben a regisztráltak teljes száma mostantól csak a moderátorok számára látható: a résztvevők csak azt látják, hányan vannak ténylegesen jelen.",
+      "Gyorsabb belépés a terembe: a videokiszolgálóhoz való kapcsolódás már a váróteremben előkészül, így rövidebb a várakozás a belépéskor.",
+      "A résztvevők listájában a létszámot mutató fejléc a lista görgetése közben is végig látható marad."
+    ]
+  },
+  "0.6.5": {
+    "title": "Felvételek és létszámok",
+    "notes": [
+      "A teremben jelenlévők száma mostantól nem tartalmazza a felvevőt: csak a valódi személyeket mutatja, a hangot rögzítő robotot nem.",
+      "Utómunka: új „AI-tartalom létrehozása” gomb indítja az átiratot, az összefoglalót és a fordítást a csak hangot tartalmazó, résztvevőnként egy sávot rögzítő felvételeknél is, amelyeknél korábban semmilyen indítógomb nem jelent meg.",
+      "A sávok listájában a becenevek mellett azonosító is szerepel: az azonos becenevet használó különböző személyek eltérő azonosítót kapnak, ugyanannak a személynek a több felszólalása pedig azonos azonosítón osztozik.",
+      "Egyértelmű üzenet jelenik meg, ha a feldolgozás indítása egyetlen feladatot sem sorol be – mert az AI ki van kapcsolva az eseményhez, vagy a feldolgozás szünetel –, a korábbi félrevezető „sikeres művelet” helyett."
+    ]
+  },
+  "0.6.4": {
+    "title": "A személyazonosság védelme és fejlesztések a teremben",
+    "notes": [
+      "Biztonsági javítás: ha valaki megosztja a terembe vezető személyes hivatkozását, aki azt megnyitja, mostantól a SAJÁT nevével lép be; korábban örökölhette a hivatkozást küldő személy nevét.",
+      "Élesebb képernyőmegosztás: mostantól a felbontás élvez elsőbbséget a folyamatossággal szemben (5 kép/másodperc jó minőségben), így a diák és a dokumentumok kevés mozgás esetén is olvashatók maradnak.",
+      "Megszűnt a „saját kép elrejtése” funkció, amely bekapcsolás után nem tette lehetővé a saját kép ismételt megjelenítését.",
+      "Adminisztrátori belépés: tétlenség utáni ismételt bejelentkezés után az oldal megfelelően frissül – nincs többé látszólag beragadt oldal, amelyet kézzel kellett újratölteni."
+    ]
+  },
+  "0.6.3": {
+    "title": "Fejlesztések az esemény termében – 2. kör",
+    "notes": [
+      "Az előadásidőzítő mostantól a moderátor vezérlősávjába épül be, és nem foglal külön sort; a visszaszámláló sávja csak akkor jelenik meg, amikor az időzítő fut.",
+      "A csevegésben az író valódi neve jelenik meg, nem az általános „Moderátor” felirat.",
+      "A csevegés önálló panel lett az oldalsávban, nem takarja folyamatosan a többi tartalmat: letisztultabb felület, a fülön az olvasatlan üzenetek számlálójával.",
+      "Új „Tábla” gomb a moderátoroknak, amellyel a megosztott tábla közvetlenül a vezérlősávból nyitható meg.",
+      "A „Megosztás” gomb színe javítva, így többé nem téveszthető össze a „Kilépés” gombbal; a hivatkozások mellett ikonok jelennek meg, a moderátori hivatkozás pedig – kizárólag a moderátorok számára – figyelmeztetés mögé került, hogy más moderátorok tévedés nélkül hívhatók meg.",
+      "A szófelhő már nem alapértelmezés szerint aktív: a moderátor továbbra is bekapcsolhatja az esemény alatt, ha szükségesnek látja."
+    ]
+  },
+  "0.6.2": {
+    "title": "Fejlesztések az élő esemény termében",
+    "notes": [
+      "A vezérlősáv (mikrofon, kamera, képernyőmegosztás) mindig látható és kattintható marad: teljes képernyőn, megosztás közben és akkor is, ha valaki egyedül van a teremben.",
+      "A moderátor ismét be- és kikapcsolhatja az élő funkciókat (Kérdések, Csevegés, Napirend) az esemény alatt.",
+      "A hang- és képvezérlők már a terem előkészítése közben is használhatók, nem kell megvárni a videokiszolgáló elindulását.",
+      "A „Felemelt kezek” lista helyesen mutatja, ki kért szót.",
+      "Új „Megosztás” gomb a teremben: egyetlen mozdulattal másolja a csatlakozási hivatkozást és az esemény oldalának hivatkozását, bizalmas tokenek felfedése nélkül.",
+      "A PA Webinar arculati jelzése ismét látható az esemény termének felső sávjában."
+    ]
+  },
+  "0.6.1": {
+    "title": "Nyilvános változásnapló és biztonsági frissítések",
+    "notes": [
+      "Új nyilvános változásnapló oldal, amely a láblécben lévő verziószámra kattintva érhető el: felsorolja a platform valamennyi verzióját a legfontosabb újdonságokkal.",
+      "Biztonsági frissítések a függőségekben (undici, nodemailer) és a build folyamat megerősítése sebezhetőségvizsgálattal."
+    ]
+  },
+  "0.6.0": {
+    "title": "Esemény utáni munkafolyamat és interaktív váróterem",
+    "notes": [
+      "Új munkafolyamat az esemény végén: befejezéskor a moderátor külön párbeszédablakban dönt a felvétel sorsáról – közzététel az esemény oldalán, elhelyezés a videokönyvtárban vagy csak archiválás.",
+      "Automatikus, anonimizált esemény utáni összegzés (részvétel, legtöbb szavazatot kapott kérdések, szavazási eredmények, szófelhő, értékelések) minden lezárult esemény oldalán, felvétel nélkül is.",
+      "Esemény utáni összefoglaló e-mail a résztvevőknek, az esemény tartalmával.",
+      "Interaktív „Piazza Digitale” váróterem: a saját avatárral a kapuig sétálva lehet belépni a beszélgetésbe, miközben a hagyományos belépési gomb mindig elérhető marad.",
+      "A szófelhő önálló szakaszként jelenik meg a lezárult esemény oldalán, az adminisztrátor által állítható láthatósággal.",
+      "Megosztott tábla, amely eseményenként és sablonból is bekapcsolható.",
+      "Az eseménylétrehozó varázsló felhasználói felületének átdolgozása: összecsukott haladó beállítások, hivatkozással ellátott fő moderátor, személyes adatokra vonatkozó figyelmeztetések, piszkozatmentés és a részleges hibák jobb kezelése.",
+      "A felvételek és az előadónkénti hangsávok eltérő megőrzési ideje, a „videó közzétéve” jelzéshez igazítva, a csevegés GDPR szerinti törlésével együtt."
+    ]
+  },
+  "0.5.11": {
+    "title": "Finomítások a moderálásban, a beszélgetés lezárásában és a hangban",
+    "notes": [
+      "A moderátorok a valódi nevükkel jelennek meg az általános „Moderátor” felirat helyett.",
+      "Az esemény végén alkalmazáson belüli lezáró képernyő jelenik meg, nincs többé félrevezető „A terem előkészítés alatt” üzenet.",
+      "Javítva az ikonok átfedése a váróteremben.",
+      "A zajszűrés kikapcsolása az IFrame API-n keresztül a hangproblémák megoldása érdekében."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabil többsávos rögzítés, csillagos visszajelzés és teljesítmény",
+    "notes": [
+      "Az előadónkénti (többsávos) rögzítés végponttól végpontig megbízhatóvá vált: teljes hanganyag minden sávon, csonkolás nélkül, párhuzamos feltöltéssel.",
+      "Esemény utáni visszajelző kérdőív csillagos értékeléssel és összesítő irányítópulttal az adminisztrátorok számára.",
+      "Teljesítményjavítások: VP9 kodek a kamerához, késleltetett betöltés mobilon, a felvevő hangolása.",
+      "Helm frissítés utáni hook, amely automatikusan újratölti a Jitsi config.js beállításait."
+    ]
+  },
+  "0.5.8": {
+    "title": "Beállítható kép- és hangminőség, új belépési folyamat",
+    "notes": [
+      "A kép- és hangminőség az adminisztrátor által beállítható, eseményenkénti előbeállításokkal.",
+      "Újratervezett belépési folyamat: regisztráció, majd váróterem, majd videohívás.",
+      "A kézfelemelésnél megjelenik minden résztvevő valódi neve."
+    ]
+  },
+  "0.5.6": {
+    "title": "Beállítható váróterem és eseményborítók",
+    "notes": [
+      "Beállítható várótermi élmény (játék / kert / hagyományos), webhely szinten és eseményenként is.",
+      "Borítóképek az esemény oldalán és a kártyák előnézeti képein.",
+      "A feltöltött fájlok külön útvonalon, rövid lejáratú aláírt hivatkozásokkal érhetők el.",
+      "„Belépés most” gomb közvetlenül a regisztráció után.",
+      "A felvételek AI-feldolgozását kezelő adminisztrációs szakasz egységesítése és a többsávos rögzítés megerősítése."
+    ]
+  },
+  "0.5.2": {
+    "title": "Eseményelőkészítés és finomítások",
+    "notes": [
+      "Napirend egyetértést és egyet nem értést jelző visszajelzéssel, valamint javítások a sablonokból örökölt jogosultságokban.",
+      "Valódi nevek a „SPEAKER_00” helyett az összefoglalókban és a feliratokban.",
+      "Hibajavítások sorozata (v0.5.2–v0.5.5) a nyilvános események előkészítéseként."
+    ]
+  },
+  "0.5.1": {
+    "title": "Közösségközpontú kezdőlap és többsávos archívum",
+    "notes": [
+      "A kezdőlap közösségközpontú átalakítása, futásidőben alkalmazható fordítási felülbírálásokkal és AgID akadálymentességi megfeleléssel.",
+      "Többsávos MKV-archívum, előadónként külön visszahallgatható lejátszóval.",
+      "A többsávos hanganyag igazítása a Jibri által készített kevert felvételhez keresztkorrelációval."
+    ]
+  },
+  "0.5.0": {
+    "title": "AI-utómunka és többsávos rögzítés",
+    "notes": [
+      "AI-utómunkafolyamat: átirat, összefoglaló, feliratok, fordítások és többhangú szinkron (mindig mesterséges hanggal), a felhasznált modellek eredetének nyomon követésével.",
+      "Többsávos rögzítés (előadónként egy sáv) a beszélők azonosításával és automatikus elnevezésével (ADR-013).",
+      "Nyilvános videokönyvtár és esemény utáni kezelőoldal az adminisztrátorok számára.",
+      "Esemény utáni átiratszerkesztő a szöveg javításához és a beszélők újbóli hozzárendeléséhez.",
+      "Az adminisztrátori felület átdolgozása: .italia stílusú értesítések és párbeszédablakok a böngésző natív üzenetei helyett, csontvázbetöltők, valamint egységes színtokenek több száz, kódba égetett hexadecimális színkód kiváltására.",
+      "Résztvevőnkénti hozzájárulás a többsávos rögzítéshez (GDPR) és kibővített, 15. cikk szerinti adatexport."
+    ]
+  },
+  "0.4.0": {
+    "title": "Bevonás és életciklus",
+    "notes": [
+      "Új élő funkciók: szófelhő, előadásidőzítő, reakciószámláló, Meet stílusú élő vezérlők és a felemelt kezek panelje.",
+      "A felvételek életciklusa (ideiglenestől a közzétettig) adminisztrátori kezeléssel (előnézet, közzététel, törlés) és eltérő megőrzési idővel.",
+      "Füles esemény utáni oldal (felvétel, Q&A archívum, szavazások, visszajelzés, anyagok), annak beállításával, hogy mi és mikor jelenjen meg.",
+      "Ötlépéses eseménylétrehozó varázsló, címketaxonómia, kapcsolati névjegyzék (Person) és szerkesztői címfelvezető.",
+      "Nyilvános videokönyvtár a /video-library címen és átláthatósági oldal a /service-inventory címen (bérlőnkénti CycloneDX 1.6).",
+      "Kétfázisú JVB automatikus skálázás, Redis-pillanatképpel az állapotoldal számára.",
+      "Háromfázisú GDPR szerinti adattörlés: a személyes adatok azonnal, a tartalmak a megőrzési idő lejártakor, majd végleges törlés."
+    ]
+  },
+  "0.3.0": {
+    "title": "Testreszabható platform és infrastruktúra",
+    "notes": [
+      "Webhelybeállítások, amelyek lehetővé teszik a platform újrahasznosítását más közigazgatási szervek számára – arculat, színek, favikon, SEO, lábléc, kezdőlap módja, adatvédelmi és akadálymentességi oldalak – újraépítés nélkül.",
+      "Elemzési irányítópult és az infrastruktúra adminisztrációs felülete.",
+      "Három Helm telepítési mód (simple / standard / full) és JVB nullára skálázás dedikált csomópontkészleten.",
+      "Több felhőt támogató Jibri folyamat (Azure Blob / S3 / GCS / MinIO / helyi tárolás) és beállítható Jitsi vízjel.",
+      "OpenSSF Scorecard, Dependabot, a függőségek SBOM-ja, központosított hibakezelés, kérésszám-korlátozás és több mint 210 egységteszt.",
+      "Számos részfrissítés (v0.3.8–v0.3.45) a bemutató utáni visszajelzések nyomán."
+    ]
+  },
+  "0.2.0": {
+    "title": "A DTD visszajelzései",
+    "notes": [
+      "A résztvevők adatainak felvétele a regisztráció során (intézmény, beosztás, típus), eseményenként beállíthatóan, CSV-exporttal és összesített statisztikákkal.",
+      "Beállítható emlékeztetők több időponttal és eltérő e-mail szövegekkel.",
+      "Szavazások valós idejű eredményekkel és CSV-exporttal.",
+      "GDPR-fejlesztések: eseményenkénti adatvédelmi tájékoztató, részletes hozzájárulások, a törlések naplózása és 15. cikk szerinti adatexport.",
+      "A moderátori és auditori szerepkör egységesítése, valamint a függőségek licenceinek auditálása."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP – első verzió",
+    "notes": [
+      "Nyilvános platform digitális eseményekhez, a .italia designrendszerre építve (Bootstrap Italia, design-react-kit).",
+      "Élő terem Jitsi Meet alapon (IFrame API, JWT-hitelesítés), kiszolgálóoldalon érvényesített szerepkörökkel.",
+      "A GDPR-nak megfelelő résztvevői regisztráció titkosított személyes adatokkal (AES-256-GCM).",
+      "Q&A szavazással és moderálással, váróterem visszaszámlálóval és vendégként való belépéssel.",
+      "Visszaigazoló és emlékeztető e-mailek, naptárintegráció (Google, Outlook, Yahoo, iCal).",
+      "Adminisztrátori felület API-kulcsos hitelesítéssel, GDPR szerinti adattörléssel és Prometheus-mérőszámokkal.",
+      "Éles üzemre kész Helm chart, nem root jogosultságú, csak olvasható Docker-képek, CI/CD GitHub Actions segítségével, publiccode.yml."
+    ]
+  }
+}

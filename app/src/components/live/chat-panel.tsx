@@ -243,15 +243,29 @@ export default function ChatPanel({
     [token],
   );
 
-  // Set when the server refuses read access (stale token, or a guest outside the
-  // window in which the room is open to guests). EventSource retries a failed
-  // connection forever and cannot report the status code, so we use the history
-  // request — which can — as the probe and keep the stream shut. Without this a
-  // refused reader would reconnect every few seconds for the whole event.
+  // Set when the server refuses read access (stale token, or a reader outside
+  // the window in which the room is open without one). EventSource retries a
+  // failed connection forever and cannot report the status code, so the history
+  // request — which can — is the probe, and while it says 403 the stream stays
+  // shut and the watchdog poll stops. Otherwise a refused reader would hammer a
+  // refused endpoint for the whole event.
   const [readDenied, setReadDenied] = useState(false);
+
+  // Denial is not necessarily permanent: a guest waiting for a scheduled event
+  // is refused until the room goes LIVE, and then must be let back in. Clear the
+  // flag on a timer so the effects below re-probe once a minute instead of
+  // latching the panel shut for the rest of the session.
+  useEffect(() => {
+    if (!readDenied) return;
+    const retry = setTimeout(() => setReadDenied(false), 60_000);
+    return () => clearTimeout(retry);
+  }, [readDenied]);
 
   // 1. Initial history load.
   useEffect(() => {
+    // Guard, not just a dependency: without it, setting the flag inside this
+    // effect would immediately re-trigger it and spin.
+    if (readDenied) return;
     let cancelled = false;
     (async () => {
       try {
@@ -272,7 +286,7 @@ export default function ChatPanel({
       } catch { /* soft fail; SSE will still open */ }
     })();
     return () => { cancelled = true; };
-  }, [eventSlug, readHeaders]);
+  }, [eventSlug, readHeaders, readDenied]);
 
   // 2. SSE stream for live updates + polling fallback (live feedback #8).
   //
@@ -306,6 +320,14 @@ export default function ChatPanel({
           cache: 'no-store',
           ...(readHeaders ? { headers: readHeaders } : {}),
         });
+        // Access can be withdrawn mid-session (the event is archived, a
+        // registration is deleted by the retention cron, a grant is revoked).
+        // Without this branch the 15s watchdog would keep polling a refused
+        // endpoint — and the stream keep reconnecting — until the tab closes.
+        if (res.status === 403) {
+          setReadDenied(true);
+          return 0;
+        }
         if (!res.ok) return 0;
         const data = (await res.json()) as { messages: ChatMessage[] };
         // Count messages the stream never delivered (still unseen) BEFORE upsert

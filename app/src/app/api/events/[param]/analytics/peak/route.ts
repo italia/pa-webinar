@@ -55,11 +55,10 @@ const peakSchema = z.object({
   count: z.number().int().min(0),
   // Any attendee of THIS event may report the live count so the peak isn't
   // stuck at 0 in a moderator-less session (feedback #4b): a moderator/
-  // co-moderator/speaker grant token, a participant access token — or, on a
-  // LIVE event, a guest with no token at all (public-link and INSTANT rooms
-  // have no registrations, so requiring a token left exactly those sessions
-  // reporting nothing).
-  token: z.string().min(1).optional(),
+  // co-moderator/speaker grant token, or a participant access token. INSTANT
+  // rooms are the one tokenless case — see the authorization block below.
+  // Bounded so a caller cannot use it as an unbounded rate-limiter key.
+  token: z.string().min(1).max(512).optional(),
 });
 
 export const POST = withErrorHandling(async (request, context) => {
@@ -73,19 +72,19 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const { count, token } = parsed.data;
 
-  // Every reporting client posts twice a minute (immediate + 30s interval), and
-  // since #4b that is N clients instead of one moderator. Without a limit this
-  // was the only public write endpoint with no throttle: a 300-person room means
-  // ~600 lookups+updates/min, and a single valid token (or none at all, on the
-  // guest branch) could hammer it. Bucket per event+identity, with enough
-  // headroom for remounts/reconnects.
+  // Two throttles, deliberately in this order.
+  //
+  // 1) Pre-auth, keyed on the CLIENT IP — never on the request body. Keying on
+  //    an unauthenticated token would be self-defeating twice over: a caller
+  //    rotating tokens gets a fresh bucket every request (no limit at all), and
+  //    each unique value pins another entry in the in-memory store. The IP is
+  //    the only identity we have before the lookups, and this bound is what
+  //    protects those lookups. Generous, because a whole organisation can share
+  //    one egress IP and each client legitimately posts twice a minute.
   const ip = getClientIp(request);
-  const rl = rateLimit(`peak:${param}:${token ?? ip}`, {
-    limit: 10,
-    windowMs: 60_000,
-  });
-  if (!rl.allowed) {
-    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
+  const ipLimit = rateLimit(`peak:ip:${ip}`, { limit: 120, windowMs: 60_000 });
+  if (!ipLimit.allowed) {
+    throw new RateLimitError((ipLimit.resetAt - Date.now()) / 1000);
   }
 
   const event = await prisma.event.findFirst({
@@ -93,7 +92,7 @@ export const POST = withErrorHandling(async (request, context) => {
       ...eventWhereClause(param),
       status: 'LIVE',
     },
-    select: { id: true, moderatorToken: true, maxParticipants: true },
+    select: { id: true, moderatorToken: true, maxParticipants: true, eventType: true },
   });
 
   if (!event) {
@@ -105,25 +104,45 @@ export const POST = withErrorHandling(async (request, context) => {
   // already-fetched event (no extra query) and covers the speaker case that a
   // moderator-only check rejected.
   //
-  // No token → guest. Allowed, because the event query above already pins
-  // status=LIVE: a guest may only report while the room is open, exactly the
-  // window in which they may also join and chat. A token that is PRESENT but
-  // matches nothing is still rejected — a bad token is an error, not a silent
-  // downgrade to the guest path. Worst case a guest inflates the peak up to the
-  // clamp below (capacity + headroom); it is an analytics figure, rate-limited,
-  // and bounded — versus the certainty of recording 0 for every public-link room.
+  // Tokenless reporting is accepted ONLY for INSTANT rooms. Those are opened by
+  // link and have no registrations at all, so requiring a token guaranteed a
+  // peak of 0 for them — the very hole #4b was about. Everywhere else a token
+  // stays mandatory: a scheduled event's slug is public, and a monotonic,
+  // publicly-rendered attendance figure that any anonymous caller can pin to
+  // the clamp is worth more to a vandal than it is to us.
+  // `reporter` is the identity the per-event throttle is keyed on — resolved,
+  // never caller-supplied.
+  let reporter: string;
   if (token) {
-    let authorized = (await resolveGrantForEvent(event, token)) !== null;
-    if (!authorized) {
+    const grant = await resolveGrantForEvent(event, token);
+    if (grant) {
+      reporter = `grant:${grant.grantId ?? 'primary'}`;
+    } else {
       const reg = await prisma.registration.findUnique({
         where: { accessToken: token },
-        select: { eventId: true },
+        select: { id: true, eventId: true },
       });
-      authorized = reg?.eventId === event.id;
+      if (!reg || reg.eventId !== event.id) {
+        throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
+      }
+      reporter = `reg:${reg.id}`;
     }
-    if (!authorized) {
+  } else {
+    if (event.eventType !== 'INSTANT') {
       throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
     }
+    reporter = `ip:${ip}`;
+  }
+
+  // 2) Post-auth, keyed on the resolved reporter (house style: `auth.senderId`,
+  //    `registration.id`, …). One client reports twice a minute; the headroom
+  //    covers remounts and reconnects.
+  const rl = rateLimit(`peak:${event.id}:${reporter}`, {
+    limit: 10,
+    windowMs: 60_000,
+  });
+  if (!rl.allowed) {
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
   // Clamp the client-reported count to capacity + headroom (bounds a spoofed

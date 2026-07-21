@@ -2124,7 +2124,11 @@
       "aiGenerateAlready": "La pipeline AI era già stata avviata per questa registrazione: nessun nuovo job aggiunto.",
       "aiGenerateError": "Impossibile avviare la pipeline AI. Verifica che l'AI sia abilitata a livello di sito e che esista una registrazione.",
       "aiGenerateHelp": "Abilita la trascrizione + sintesi AI ed avvia la pipeline sulla registrazione, in un solo clic. Idempotente: cliccare due volte non duplica i job.",
-      "aiGenerateNoRecording": "Nessuna registrazione: l'AI post-evento richiede una registrazione (la cattura avviene solo durante l'evento). Puoi comunque gestire la post-produzione qui."
+      "aiGenerateNoRecording": "Nessuna registrazione: l'AI post-evento richiede una registrazione (la cattura avviene solo durante l'evento). Puoi comunque gestire la post-produzione qui.",
+      "duplicateNext": "Duplica per la prossima",
+      "duplicateNextBusy": "Duplicazione…",
+      "duplicateNextHint": "Crea una bozza con l'intera configurazione di questo evento (registrazione, tracce separate, AI, agenda, promemoria). Se l'evento ha una cadenza, la data viene portata alla prossima occorrenza; altrimenti resta da impostare.",
+      "duplicateNextError": "Duplicazione non riuscita. Riprova."
     },
     "rubrica": {
       "title": "Rubrica",

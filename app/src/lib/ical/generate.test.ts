@@ -60,9 +60,31 @@ describe('generateEventICal', () => {
     expect(ics).toContain('METHOD:REQUEST');
   });
 
-  it('sets timezone', () => {
+  // Regression guard for the DevIt invitation bug: the .ics used to carry
+  // `DTSTART;TZID=Europe/Rome:20260615T100000` — the UTC wall clock relabelled
+  // as Rome time, with no VTIMEZONE to resolve the TZID against — so calendars
+  // booked the event two hours early.
+  it('emits the START instant in UTC, not a TZID-tagged local time', () => {
     const ics = generateEventICal(baseInput());
-    expect(ics).toContain('Europe/Rome');
+    expect(ics).toContain('DTSTART:20260615T100000Z');
+    expect(ics).toContain('DTEND:20260615T120000Z');
+    expect(ics).not.toMatch(/DTSTART;TZID=/);
+    expect(ics).not.toMatch(/DTEND;TZID=/);
+  });
+
+  it('never labels a time with a TZID it does not define', () => {
+    const ics = generateEventICal(baseInput());
+    // Either both (TZID + its VTIMEZONE definition) or neither. We ship neither.
+    if (ics.includes('TZID=')) {
+      expect(ics).toContain('BEGIN:VTIMEZONE');
+    }
+  });
+
+  it('keeps the same instant regardless of the event timezone field', () => {
+    const rome = generateEventICal(baseInput());
+    const utc = generateEventICal({ ...baseInput(), timezone: 'UTC' });
+    const start = (s: string) => s.match(/DTSTART[^\r\n]*/)?.[0];
+    expect(start(rome)).toBe(start(utc));
   });
 
   it('contains PRODID with DTD', () => {

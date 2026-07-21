@@ -1139,6 +1139,8 @@ export default function LiveEventClient({
           // Uscita esplicita dalla sala d'attesa: le instant call non hanno una
           // pagina evento pubblica (404), quindi tornano alla home.
           exitHref={event.eventType === 'INSTANT' ? '/' : `/events/${event.slug}`}
+          chatToken={token}
+          eventType={event.eventType === 'INSTANT' ? 'INSTANT' : 'SCHEDULED'}
           defaultName={chosenName || initialDisplayName}
           onEnterLive={handleEnterFromWaiting}
           onStartEvent={isModerator ? handleStartEvent : undefined}

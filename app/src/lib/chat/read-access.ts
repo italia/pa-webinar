@@ -4,38 +4,32 @@
  * WHY THIS EXISTS: `GET /chat` and `GET /chat/stream` used to be completely
  * unauthenticated. Chat rows carry PII (attendee display names plus whatever
  * they typed), so anyone who knew a slug could fetch the full transcript of any
- * event, in any status, forever — verified on prod: an ENDED event returned 25
- * messages with real first/last names and `reg-<uuid>` seat ids to an anonymous
- * curl. The POST side had elaborate auth; the read side had none.
+ * event, in any status, forever — verified on prod: an anonymous curl against
+ * an ENDED event returned 25 messages with real names. The POST side had
+ * elaborate auth; the read side had none.
  *
- * Readers now clear the SAME bar as writers (see `authenticateSender` in the
+ * Readers now clear the same bar as writers (see `authenticateSender` in the
  * chat route), minus the display name a reader has no need for:
  *   • a valid grant token (primary moderator link, per-row co-moderator or
  *     speaker) or a registration accessToken for THIS event → allowed in any
  *     status, so moderators keep post-event access to the archive;
  *   • no token → only while the room is genuinely open to guests, i.e. the same
- *     LIVE / INSTANT-warm-up window that lets a guest POST. This is what closes
- *     the "readable forever after the event" hole without breaking the public
- *     link flow.
+ *     LIVE / INSTANT-warm-up window that lets a guest POST, AND only when the
+ *     event is not password-protected. The password check is the one place the
+ *     read side is deliberately STRICTER than the write side: posting injects a
+ *     message, reading exfiltrates everyone else's, so "I have the URL" cannot
+ *     be enough for an event whose whole point is that the URL isn't enough.
  *
  * Deliberately lighter than `resolveTokenSender`: it answers "may you read?",
- * not "who are you?", so it never reads the event_access cookie and never
- * decrypts a name. That keeps the SSE stream — which runs outside the normal
- * route handler wrapper — free of request-scope dependencies.
+ * not "who are you?", so it never decrypts a name. That keeps the SSE stream —
+ * which runs outside the normal route handler wrapper — cheap.
  */
 
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError } from '@/lib/errors';
-
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-export interface ChatReadAccess {
-  eventId: string;
-  /** True when a token identified the caller as a grant holder or registrant. */
-  isMember: boolean;
-}
+import { eventParamWhere } from '@/lib/events/event-param';
+import { hasJoinGrant } from '@/lib/events/join-grant';
 
 /** Status window in which an anonymous reader may follow the chat. Mirrors the
  *  guest POST branch exactly — if you may write here, you may read here. */
@@ -56,35 +50,34 @@ export function guestChatWindowOpen(event: {
  *
  * @throws AppError(404) when the event does not exist
  * @throws ForbiddenError when the token matches nothing, or when an anonymous
- *         reader asks for an event outside the guest window
+ *         reader asks for an event outside the guest window / behind a password
  */
 export async function authorizeChatRead(
   eventIdOrSlug: string,
   token: string | null,
-): Promise<ChatReadAccess> {
-  const event = await prisma.event.findUnique({
-    where: UUID_RE.test(eventIdOrSlug)
-      ? { id: eventIdOrSlug }
-      : { slug: eventIdOrSlug },
+): Promise<{ eventId: string }> {
+  const event = await prisma.event.findFirst({
+    where: eventParamWhere(eventIdOrSlug),
     select: {
       id: true,
       status: true,
       eventType: true,
       moderatorToken: true,
+      joinPasswordHash: true,
     },
   });
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
 
   if (token) {
     const grant = await resolveGrantForEvent(event, token);
-    if (grant) return { eventId: event.id, isMember: true };
+    if (grant) return { eventId: event.id };
 
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
       select: { eventId: true },
     });
     if (registration && registration.eventId === event.id) {
-      return { eventId: event.id, isMember: true };
+      return { eventId: event.id };
     }
     // A token that matches nothing is an error, not a downgrade to guest: same
     // contract as the POST route, so a stale/foreign token fails loudly instead
@@ -95,5 +88,13 @@ export async function authorizeChatRead(
   if (!guestChatWindowOpen(event)) {
     throw new ForbiddenError('Chat requires a participant or moderator token');
   }
-  return { eventId: event.id, isMember: false };
+
+  // A password-protected event: knowing the URL is explicitly not enough to get
+  // into the room, so it must not be enough to read the room either. The grant
+  // cookie is the same one the live page requires before issuing a guest JWT.
+  if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
+    throw new ForbiddenError('Chat requires the event join password');
+  }
+
+  return { eventId: event.id };
 }

@@ -1,0 +1,308 @@
+{
+  "0.8.3": {
+    "title": "Vestluse privaatsus, täpne osalejate arv ja taastatud modereerimine",
+    "notes": [
+      "Vestluse ajalugu ei ole enam nähtav neile, kes üritusel ei osale. Varem sai igaüks, kes teadis ürituse aadressi, sõnumid koos kirjutajate nimedega alla laadida ka pärast ürituse lõppu. Nüüd on selleks vaja olla üritusele registreerunud, olla moderaator või viibida ruumis ürituse toimumise ajal.",
+      "Ruumis kuvatud osalejate arv oli ühe võrra vale, sest osaleja ennast kaasa ei arvestanud. Sama viga kandus edasi ürituse statistikasse (osalejate tippnumber). Nüüd on arv õige ja langeb kokku statistikas talletatud näitajaga.",
+      "Osalejate loendis toimivad taas moderaatori juhtnupud: osaleja eemaldamine ja üksiku osaleja helitugevuse muutmine ei andnud varem mingit tulemust.",
+      "Reaktsioone saab nüüd saata ka nutitelefonist, kus vastav nupp oli kaduma läinud. Ekraanil lendavad emojid ei püüa enam kinni juhtribal tehtavaid klõpse.",
+      "Täisekraanil on dialoogiaknad – lingi jagamine ja moderaatoritel „Lahku ruumist“ – jälle nähtaval: varem jäid need video taha peitu ja nupud näisid katki olevat.",
+      "Ürituse mallides on vestlus nüüd algusest peale sisse lülitatud, nagu ka ruumis endas: malli „Veebiseminar“ põhjal loodud üritus jäi seni vestluseta.",
+      "Kasutajaliidese ingliskeelne tõlge on lõpule viidud – puudu oli mitu kirjet, sealhulgas kogu aken „Jaga“."
+    ]
+  },
+  "0.8.2": {
+    "title": "Ükski tühi ruum ei jää enam pärast lõpuaega tööle",
+    "notes": [
+      "Ruum, mis jäi pärast lõpuaega avatuks ja seejärel tühjenes, püsis piiramatult aktiivsena ning hoidis asjatult kinni videoressursse. Nüüd suletakse ruum, kui see on olnud pärast kavandatud lõpuaega 45 minutit tühi. Kasutuses olevat ruumi ei katkestata kunagi: pärast lõpuaega kuvatakse üksnes teade ja kellegi ühendust ei katkestata."
+    ]
+  },
+  "0.8.1": {
+    "title": "Seadistatavad reaktsioonid, tühja ruumi sulgemine ja turvalisem administraatori ala",
+    "notes": [
+      "Emoji-reaktsioone saab nüüd administraator seadistada. Vaikimisi kasutatakse Jitsi enda reaktsioone, mis on kättesaadavad otse juhtribalt (kerged ja lühiajalised). Teise võimalusena saab sisse lülitada platvormi enda reaktsioonid, mis kuvatakse ribal ekraani all vasakus servas ja mida arvestatakse ürituse statistikas.",
+      "Uus administraatori valik: sulgeda automaatselt ruum, mis on jäänud täiesti tühjaks (ka ilma moderaatorita), sest see viitab hüljatud üritusele. Vaikimisi on valik välja lülitatud – tegevusetus ilma moderaatorita on juba turvaliselt lahendatud, sest ruum jääb 45 minuti järel uinuma – ja selle saab sisse lülitada seadetest.",
+      "Turvalisem administraatori ala: seansi aegumisel suunatakse kasutaja tagasi sisselogimisvaatesse, nii et aegunud seansiga ei saa halduslehti enam kasutada. Ühtlasi kestab seanss kauem ja pikeneb töötamise ajal automaatselt."
+    ]
+  },
+  "0.8.0": {
+    "title": "Korrastatum otseülekande ruum: vestlus, reaktsioonid, täisekraan ja registreerumine",
+    "notes": [
+      "Vestlus: sõnumitesse saab nüüd lisada emojisid eraldi valikuaknast ning väike näidik hoiatab, kui vestluse uuendused hakkavad viibima. Saadetud sõnumid ilmuvad kohe ka asutuste võrkudes, mis reaalajas saabuvaid uuendusi puhverdavad.",
+      "Täisekraan: täisekraaninupp hoiab nüüd vestluse video kõrval nähtaval, selle asemel et see ära peita.",
+      "Emoji-reaktsioonid ei kata enam all asuvaid juhtnuppe: riba on alati klõpsatav, ka ruudustikvaates.",
+      "Nupud „Jaga“ ja „Lahku ruumist“ on nüüd algusest peale selgelt nähtavad ja värvilised (lahkumine punane), mitte ainult hiirega peale liikudes.",
+      "Robot „Recorder“ ei ilmu enam osalejate loendisse ega lähe osalejate arvestusse.",
+      "Registreerumine: kui registreeruda tublisti ette, avaneb ooteruumi asemel kinnituse leht koos lingiga, millega saab ürituse kalendrisse lisada; vahetult enne algust pääseb kohe ruumi. Ürituse lehel on näha, kas registreerumine on juba tehtud.",
+      "Vestlus on nüüd ruumis peamine suhtluskanal. Samuti on parandatud tühjaks jäänud ürituse automaatset sulgemist ja osalejate arvestust statistikas."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderaator saab tõstetud käe langetada",
+    "notes": [
+      "Tõstetud käte järjekorras on moderaatoril nüüd nupp, millega langetada üksiku osaleja käsi – sellest on abi, kui inimene on juba sõna saanud või jättis käe kogemata üles. Käsklus jõuab just selle osalejani, kes näeb oma käe langemist; teisi see ei puuduta."
+    ]
+  },
+  "0.7.7": {
+    "title": "Vähem taustamüra rääkimise ajal",
+    "notes": [
+      "Sõna võttes rakendub täiustatud taustamüra summutamine: see vaigistab senisest paremini näiteks klaviatuuri, ventilaatorite või liikluse müra, lisaks juba olemasolevale põhitasemel müravähendusele."
+    ]
+  },
+  "0.7.6": {
+    "title": "Helitugevus osaleja kaupa",
+    "notes": [
+      "Paneelis „Osalejad“ on uus helitugevuse regulaator iga osaleja jaoks eraldi: kui keegi kõlab liiga valjult või liiga vaikselt, saab heli muuta ainult enda jaoks, ilma et see mõjutaks teiste kuuldavat heli.",
+      "Järeltöötluses kasutatav osalejapõhine eraldi helisalvestus on usaldusväärsem: kui salvestis osutub tummaks, tuvastab süsteem selle kohe ega loo tühje transkriptsioone."
+    ]
+  },
+  "0.7.5": {
+    "title": "Tõstetud käsi jääb üles",
+    "notes": [
+      "Kui käsi üles tõsta, jääb see nüüd üles seniks, kuni osaleja selle ise langetab või moderaator sellega tegeleb. Varem langes käsi ise alla hetkel, mil inimene rääkima hakkas, ja ta kadus sõnavõtjate järjekorrast."
+    ]
+  },
+  "0.7.4": {
+    "title": "Vestluses kuvatav nimi on kaitstud edasi saadetud linkide eest (turvalisus)",
+    "notes": [
+      "Vestluses kuvatakse registreerunu pärisnime ainult seadmes, milles ta registreerus: kes avab edasi saadetud liitumislingi, osaleb selle nimega, mille ta ise sisestab, mitte algse registreerunu nime all. Nii on kõrvaldatud sõnumite vale omistamine.",
+      "Sama kaitse kehtib manuste kohta: edasi saadetud lingi kaudu saadetud faili ei omistata enam algse registreerunu nimele.",
+      "Kes liitub teisest seadmest (näiteks telefonist) või varem saadud lingiga, saab endiselt katkestusteta osaleda, vestluses kirjutada ja manuseid saata: muutub üksnes kuvatav nimi, milleks saab ruumi sisenemisel sisestatud nimi."
+    ]
+  },
+  "0.7.3": {
+    "title": "Täpne kohalolijate arv, keskele toodud reaktsioonid ja ruumi täiendused",
+    "notes": [
+      "Kohalolijate arvestus ei korruta enam sama inimest, kes ruumist lahkub ja uuesti siseneb (näiteks brauseri tagasinupuga): sama inimese korduvad ühendused loetakse üheks. Osalejate loendis on endiselt näha iga ühendus, nii et moderaator näeb ja saab hallata kõiki.",
+      "Reaktsioonide ja emojide riba asub nüüd ekraani all keskel, kus see on hästi nähtav ja kergesti leitav, varasema alumise vasaku nurga asemel.",
+      "Registreerunute arvu ei kuvata enam avalikult ürituse lehel ega ürituste loendis: see jääb nähtavaks administraatoritele halduspaneelis. Otseülekande ajal näeb publik üksnes kohalolijate arvu.",
+      "Taustamüra summutamine on nüüd kõigil mikrofonidel automaatselt sees: heli põhitöötlus – kaja ja müra vähendamine – on alati aktiivne ning seda ei pea käsitsi sisse lülitama.",
+      "Ruumi sisenemine on veidi kiirem: videosüsteemi äratamine algab juba sisenemisnupule klõpsates."
+    ]
+  },
+  "0.7.2": {
+    "title": "Rikkalikum vestlus: manused, vastused ja mainimised",
+    "notes": [
+      "Vestluses saab nüüd saata pilte ja manuseid (PNG, JPEG, WebP, GIF ja PDF kuni 10 MB), mille eelvaade kuvatakse otse sõnumis.",
+      "Uus võimalus „Vasta“: konkreetset sõnumit saab tsiteerida ja tsitaat jääb vestluse lõimes nähtavale.",
+      "Mainimine @-märgiga: sõnumis saab osaleja poole nimepidi pöörduda.",
+      "Vestluse modereerimine: moderaatorid saavad ürituse ajal üksikuid sõnumeid eemaldada."
+    ]
+  },
+  "0.7.1": {
+    "title": "Ürituse järgne statistika iga ürituse kohta",
+    "notes": [
+      "Uus vahekaart „Statistika“ iga ürituse juures halduspaneelis; see on saadaval ka ürituste puhul, kus registreerumist ei olnud või videosalvestist ei tehtud. Vahekaart näitab, kuidas kohtumine kulges, kes rääkis kõige rohkem, milline oli üldine osalusaktiivsus ja millised on peamised näitajad.",
+      "Graafik suhtluse kulgemisest ajas – vestlus, küsimused, küsimuste hääletused, küsitlused, sõnapilve sõnad ja reaktsioonid – koos esile tõstetud kohtumise tipphetkega.",
+      "Edetabel sellest, kes rääkis kõige kauem (minutid inimese kohta), koos sõnavõttude tasakaaluga ning reaktsioonide ja käetõstete arvuga.",
+      "Uus hinnang selle kohta, kui kaua osalejad keskmiselt ruumis viibisid; seda kasutatakse ka üldise tähelepanunäitaja arvutamisel."
+    ]
+  },
+  "0.7.0": {
+    "title": "Muudetavad esinejate nimed ja ainult heli esitav pleier",
+    "notes": [
+      "Pärast üritust saab nüüd esinejaid ümber nimetada ja parandada nimesid, mille süsteem transkriptsiooni põhjal automaatselt tuvastas.",
+      "Kui salvestisel ei ole taasesitatavat videot, pakub parandusleht siiski ainult heli esitavat pleierit, et salvestist üle kuulata ning teksti ja esinejate nimesid korrastada.",
+      "Mitmerajalise salvestamise parandus: kaugosalejate tegelik heli salvestatakse nüüd õigesti."
+    ]
+  },
+  "0.6.9": {
+    "title": "Tehisintellekti töötluse usaldusväärsus",
+    "notes": [
+      "Halduspaneelis kuvatakse nüüd ürituse järgse tehisintellekti töötluse (transkriptsioon, kokkuvõtted, tõlked) usaldusväärsuse näidik, mis annab kiire ülevaate, kas tulemus on täielik ja usaldusväärne."
+    ]
+  },
+  "0.6.8": {
+    "title": "Selgem ürituse järgne toimetamisleht",
+    "notes": [
+      "Transkriptsiooni, kokkuvõtete ja tõlgete parandusleht selgitab nüüd, miks tehisintellekti loodud sisu ei ole veel saadaval – „töötlus käib“ või „käivitage töötlus ülal olevate nuppudega“ – punase veateate asemel, mis jättis mulje rikkest.",
+      "Ebaõnnestunud salvestamist näidatakse nüüd punaselt koos serveri tagastatud täpse põhjusega, mitte rohelisena, nagu oleks kõik korras.",
+      "Aegunud administraatori seanss ja laadimistõrge annavad nüüd kumbki oma eraldi teate ühe üldise veateate asemel.",
+      "Kui salvestise heli ei ole taasesitatav, annab leht sellest teada ja lõikude teksti ning esineja nime saab siiski parandada."
+    ]
+  },
+  "0.6.7": {
+    "title": "Alati nähtavad reaktsioonid ja „Märkmed / kontrollnimekiri“",
+    "notes": [
+      "Emoji-reaktsioonid on nüüd alati nähtaval ribal ekraani all vasakus servas, mitte peidus nupu taga: neid on lihtsam leida ja ürituse ajal kasutada.",
+      "Funktsioon „Päevakava“ on ümber nimetatud – uus nimi on „Märkmed / kontrollnimekiri“ –, et oleks selge, et tegu on kontrollnimekirja laadse märkmealaga, mille sisu vestlusesse ei jõua. Moderaator saab selle iga ürituse jaoks endiselt sisse lülitada."
+    ]
+  },
+  "0.6.6": {
+    "title": "Täiendused: vestlus, arvestus ja ligipääs",
+    "notes": [
+      "Vestluses jagatud lingid on nüüd klõpsatavad ja avanevad turvaliselt uuel vahekaardil; varem olid need lihtsalt tekst.",
+      "Ruumis näevad registreerunute koguarvu nüüd ainult moderaatorid: osalejad näevad üksnes seda, kui palju inimesi on tegelikult kohal.",
+      "Kiirem pääs ruumi: ühendus videoserveriga valmistatakse ette juba ooteruumis, nii et sisenemisel tuleb vähem oodata.",
+      "Osalejate loendis jääb loenduriga päis loendit kerides alati nähtavale."
+    ]
+  },
+  "0.6.5": {
+    "title": "Salvestised ja osalejate arvestus",
+    "notes": [
+      "Ruumis kohalolijate arvestusest on nüüd välja jäetud salvestaja: näidatakse ainult päris inimesi, mitte heli salvestavat robotit.",
+      "Järeltöötlus: uus nupp „Loo AI-ga“ käivitab transkriptsiooni, kokkuvõtte ja tõlke ka ainult heli sisaldavate salvestiste puhul (üks rada osaleja kohta), kus seni ei olnud käivitamiseks ühtegi nuppu.",
+      "Radade loendis kuvatakse hüüdnime kõrval tunnus: sama hüüdnime kasutavad eri inimesed saavad eri tunnused, sama inimese mitu sõnavõttu aga jagavad ühte tunnust.",
+      "Selge teade siis, kui töövoo käivitamine ei lisa järjekorda ühtegi tööd – näiteks kui tehisintellekt on ürituse jaoks välja lülitatud või töövoog on peatatud – eksitava teate „toiming õnnestus“ asemel."
+    ]
+  },
+  "0.6.4": {
+    "title": "Identiteedi kaitse ja ruumi täiendused",
+    "notes": [
+      "Turvaparandus: kui jagada oma isiklikku ruumilinki, siseneb selle avaja nüüd OMA nimega – varem võis ta pärida lingi saatja nime.",
+      "Selgem ekraanijagamine: nüüd eelistatakse sujuvusele resolutsiooni (5 kaadrit sekundis kõrge kvaliteediga), nii et slaidid ja dokumendid püsivad loetavad ka siis, kui liikumist on vähe.",
+      "Eemaldatud on valik „peida enda pilt“, mille sisselülitamise järel ei olnud enam võimalik oma pilti tagasi tuua.",
+      "Administraatori ligipääs: pärast tegevusetuse tõttu uuesti sisselogimist värskendub leht korralikult – enam ei jää ekraan näiliselt kinni kuni käsitsi uuesti laadimiseni."
+    ]
+  },
+  "0.6.3": {
+    "title": "Ürituse ruumi täiendused – teine voor",
+    "notes": [
+      "Esitluse taimer on nüüd moderaatori juhtribal ega võta enam eraldi rida; pöördloenduse riba ilmub ainult siis, kui taimer töötab.",
+      "Vestluses kuvatakse kirjutaja pärisnimi, mitte üldine nimetus „Moderaator“.",
+      "Vestlusest on saanud külgribal omaette paneel, mis ei kata enam pidevalt muud sisu: liides on korrastatum ja vahekaardil on lugemata sõnumite loendur.",
+      "Uus nupp „Tahvel“ võimaldab moderaatoritel avada jagatud tahvli otse juhtribalt.",
+      "Nupp „Jaga“ on nüüd õiget värvi ja seda ei aja enam segamini nupuga „Lahku“; linkide kõrval on ikoonid ning ainult moderaatoritele nähtav moderaatorilink on peidetud hoiatuse taha, et teisi moderaatoreid saaks kutsuda ilma eksimusteta.",
+      "Sõnapilv ei ole enam algusest peale sees: moderaator saab selle soovi korral ürituse ajal sisse lülitada."
+    ]
+  },
+  "0.6.2": {
+    "title": "Otseülekande ruumi täiendused",
+    "notes": [
+      "Juhtriba (mikrofon, veebikaamera, ekraanijagamine) püsib alati nähtaval ja klõpsatav – ka täisekraanil, kellegi ekraanijagamise ajal ja siis, kui ruumis ollakse üksi.",
+      "Moderaator saab ürituse ajal taas otsefunktsioone (Küsimused, Vestlus, Päevakava) sisse ja välja lülitada.",
+      "Heli ja video juhtnuppe saab kasutada juba ruumi ettevalmistamise ajal, ilma videoserveri käivitumist ootamata.",
+      "Loend „Tõstetud käed“ näitab nüüd õigesti, kes on sõna palunud.",
+      "Uus nupp „Jaga“ ruumis kopeerib ühe klõpsuga liitumislingi ja ürituse lehe lingi, avaldamata seejuures salajasi juurdepääsutunnuseid.",
+      "PA Webinari kaubamärk on ürituse ruumi ülaribal jälle nähtaval."
+    ]
+  },
+  "0.6.1": {
+    "title": "Avalik muudatuste logi ja turvauuendused",
+    "notes": [
+      "Uus avalik muudatuste logi leht, kuhu pääseb jaluses olevale versiooninumbrile klõpsates: see loetleb platvormi kõik versioonid koos peamiste uuendustega.",
+      "Sõltuvuste turvauuendused (undici, nodemailer) ja tugevdatud koostetöövoog koos haavatavuste kontrolliga."
+    ]
+  },
+  "0.6.0": {
+    "title": "Ürituse järgne töövoog ja interaktiivne ooteruum",
+    "notes": [
+      "Uus ürituse lõpetamise töövoog: lõpus küsitakse moderaatorilt eraldi aknas, kuhu salvestis suunata – avaldada ürituse lehel, lisada videokogusse või hoida ainult arhiivis.",
+      "Automaatne ja anonüümitud ürituse järgne kokkuvõte (osalejad, enim hääli saanud küsimused, küsitluste tulemused, sõnapilv, hinnangud), mida kuvatakse iga lõppenud ürituse lehel ka siis, kui salvestist ei ole.",
+      "Ürituse järgne kokkuvõtlik e-kiri osalejatele koos ürituse sisuga.",
+      "Interaktiivne ooteruum „Piazza Digitale“: oma avatariga kõnnitakse väravani, et kohtumisega liituda, ja selle kõrval on alati ka tavapärane sisenemisnupp.",
+      "Sõnapilvel on lõppenud ürituse lehel nüüd omaette osa, mille nähtavust saab administraator ise juhtida.",
+      "Jagatud tahvli saab sisse lülitada iga ürituse jaoks eraldi või malli kaudu.",
+      "Ürituse loomise viisardi kasutuskogemus on üle vaadatud: lisavalikud on kokku volditud, peamoderaator koos lingiga, hoiatused isikuandmete kohta, mustandi salvestamine ja osaliste vigade parem käsitlemine.",
+      "Salvestistele ja esinejapõhistele heliradadele eraldi säilitustähtajad, mis on seotud märkega „video avaldatud“, ning vestluse puhastamine GDPR-i nõuete kohaselt."
+    ]
+  },
+  "0.5.11": {
+    "title": "Modereerimise, kohtumise lõpetamise ja heli täiendused",
+    "notes": [
+      "Moderaatorid kuvatakse pärisnimega, mitte üldise nimetusega „Moderaator“.",
+      "Ürituse lõppedes kuvatakse rakenduses lõpetamise vaade eksitava teate „Ruumi valmistatakse ette“ asemel.",
+      "Parandatud ikoonide kattumine ooteruumis.",
+      "Müra summutamine on IFrame API kaudu sunniviisiliselt välja lülitatud, et lahendada heliprobleemid."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabiilne mitmerajaline salvestamine, tärnihinnangud ja jõudlus",
+    "notes": [
+      "Esinejapõhine (mitmerajaline) salvestamine on muudetud algusest lõpuni usaldusväärseks: iga raja heli on terviklik, midagi ei kärbita ja üleslaadimised toimuvad paralleelselt.",
+      "Ürituse järgne tärnihinnangutega tagasisideküsimustik ja kokkuvõtlik ülevaade administraatorile.",
+      "Jõudluse parandused: veebikaameral VP9-koodek, mobiilis järkjärguline laadimine ja salvestaja häälestus.",
+      "Helmi uuendusjärgne hook, mis laadib Jitsi faili config.js automaatselt uuesti."
+    ]
+  },
+  "0.5.8": {
+    "title": "Seadistatav video- ja helikvaliteet ning uus sisenemisvoog",
+    "notes": [
+      "Administraator saab video- ja helikvaliteeti seadistada, kasutades iga ürituse jaoks eelseadistusi.",
+      "Ümber kujundatud liitumisteekond: registreerumine, seejärel ooteruum ja siis videokohtumine.",
+      "Käetõste juures kuvatakse iga osaleja pärisnimi."
+    ]
+  },
+  "0.5.6": {
+    "title": "Seadistatav ooteruum ja ürituste kaanepildid",
+    "notes": [
+      "Ooteruumi lahendust saab valida (mäng, aed või klassikaline) nii kogu saidi kui ka üksiku ürituse jaoks.",
+      "Kaanepildid ürituse lehel ja kaartide pisipiltidel.",
+      "Üleslaaditud failid tehakse kättesaadavaks eraldi marsruudi kaudu, kasutades lühikese kehtivusega allkirjastatud URL-e.",
+      "Nupp „Sisene kohe“ on kättesaadav vahetult pärast registreerumist.",
+      "Halduspaneelis on salvestiste tehisintellekti töötluse haldamine koondatud ühte kohta ja mitmerajaline salvestamine muudetud töökindlamaks."
+    ]
+  },
+  "0.5.2": {
+    "title": "Ürituse ettevalmistus ja täiendused",
+    "notes": [
+      "Päevakava koos poolt- ja vastuhäältega ning parandused mallidest päritud õigustes.",
+      "Kokkuvõtetes ja subtiitrites kuvatakse pärisnimed, mitte „SPEAKER_00“.",
+      "Rida kiirparandusi (v0.5.2–v0.5.5) avalike ürituste ettevalmistuseks."
+    ]
+  },
+  "0.5.1": {
+    "title": "Kogukonnakeskne avaleht ja mitmerajaline arhiiv",
+    "notes": [
+      "Avaleht on kujundatud ümber kogukonnakesksena, tõlkeid saab töö ajal üle kirjutada ja leht vastab AgID ligipääsetavusnõuetele.",
+      "Mitmerajaline MKV-arhiiv koos pleieriga, mis võimaldab iga esineja eraldi üle kuulata.",
+      "Mitmerajalise heli joondamine Jibri koondsalvestisega ristkorrelatsiooni abil."
+    ]
+  },
+  "0.5.0": {
+    "title": "Tehisintellektil põhinev järeltöötlus ja mitmerajaline salvestamine",
+    "notes": [
+      "Tehisintellekti järeltöötluse töövoog: transkriptsioon, kokkuvõtted, subtiitrid, tõlked ja mitmehäälne dubleerimine (alati sünteetiline), kusjuures kasutatud mudelite päritolu on jälgitav.",
+      "Mitmerajaline salvestamine (üks rada esineja kohta) koos esinejate tuvastamise ja automaatse nimetamisega (ADR-013).",
+      "Avalik videokogu ja ürituse järgse töö haldusleht administraatorile.",
+      "Ürituse järgne transkriptsiooni toimetaja, kus saab teksti parandada ja lõike teisele esinejale määrata.",
+      "Halduspaneeli kasutuskogemuse põhjalik uuendus: brauseri enda hoiatusakende asemel .italia teated ja dialoogid, sisu laadimise ajal kuvatavad paigutusvaated ning sadade kõvasti kirjutatud värvikoodide asemel disainitokenid.",
+      "Osalejapõhine nõusolek mitmerajaliseks salvestamiseks (GDPR) ja laiendatud artikli 15 andmeväljavõte."
+    ]
+  },
+  "0.4.0": {
+    "title": "Kaasamine ja elutsükkel",
+    "notes": [
+      "Uued otsefunktsioonid: sõnapilv, esitluse taimer, reaktsioonide loendur, Meeti stiilis juhtnupud ja tõstetud käte paneel.",
+      "Salvestiste elutsükkel ajutisest avaldatuni koos halduse võimalustega (eelvaade, avaldamine, kustutamine) ja eraldi säilitustähtaegadega.",
+      "Ürituse järgne leht vahekaartidega (salvestis, Q&A arhiiv, küsitlused, tagasiside, materjalid) ning võimalus määrata, mida ja millal avaldada.",
+      "Viieastmeline ürituse loomise viisard, siltide taksonoomia, kontaktide register ja toimetuslik pealkirjaeelne rida.",
+      "Avalik videokogu aadressil /video-library ja läbipaistvusleht /service-inventory (CycloneDX 1.6 iga keskkonna kohta eraldi).",
+      "Kaheastmeline JVB automaatne skaleerimine koos Redise hetktõmmisega olekulehe jaoks.",
+      "Kolmeastmeline GDPR-i andmepuhastus: isikuandmed kustutatakse kohe, sisu säilitustähtaja lõppedes ja seejärel toimub lõplik kustutamine."
+    ]
+  },
+  "0.3.0": {
+    "title": "Seadistatav platvorm ja taristu",
+    "notes": [
+      "Saidi seaded, mis võimaldavad teistel asutustel platvormi taaskasutada – kaubamärk, värvid, favicon, SEO, jalus, avalehe kuvamisviis, privaatsuse ja ligipääsetavuse lehed – ilma platvormi uuesti koostamata.",
+      "Analüütika töölaud ja taristu halduspaneel.",
+      "Kolm Helmi paigaldusrežiimi (lihtne, tavaline, täielik) ja JVB skaleerimine nullini eraldi sõlmede kogumis.",
+      "Mitut pilveteenust toetav Jibri töövoog (Azure Blob, S3, GCS, MinIO või kohalik salvestus) ja seadistatav Jitsi vesimärk.",
+      "OpenSSF Scorecard, Dependabot, sõltuvuste SBOM, keskne veakäsitlus, päringute piiramine ja üle 210 ühiktesti.",
+      "Arvukad väiksemad väljalasked (v0.3.8–v0.3.45) demo järel saadud tagasiside põhjal."
+    ]
+  },
+  "0.2.0": {
+    "title": "DTD tagasiside",
+    "notes": [
+      "Osalejate andmete kogumine registreerumisel (asutus, roll, kategooria), mida saab iga ürituse jaoks eraldi seadistada, koos CSV-väljavõtte ja koondstatistikaga.",
+      "Seadistatavad meeldetuletused mitme etteteatamisajaga ja erineva sisuga e-kirjadega.",
+      "Küsitlused reaalajas tulemuste ja CSV-väljavõttega.",
+      "GDPR-i parandused: iga ürituse oma privaatsusteade, täpsemad nõusolekud, kustutamiste auditilogi ja artikli 15 andmeväljavõte.",
+      "Moderaatori ja audiitori rolli koondamine ning sõltuvuste litsentside audit."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP – esimene versioon",
+    "notes": [
+      "Avalik digiürituste platvorm, mis põhineb .italia disainisüsteemil (Bootstrap Italia, design-react-kit).",
+      "Otseülekande ruum Jitsi Meeti baasil (IFrame API, JWT-autentimine) ja serveripoolselt jõustatud rollid.",
+      "GDPR-i nõuetele vastav osalejate registreerumine krüpteeritud isikuandmetega (AES-256-GCM).",
+      "Q&A koos küsimuste hääletamise ja modereerimisega ning ooteruum pöördloenduse ja külalisena sisenemise võimalusega.",
+      "Kinnitus- ja meeldetuletuskirjad ning kalendrilõimingud (Google, Outlook, Yahoo, iCal).",
+      "Halduspaneel API-võtmega autentimise, GDPR-i andmepuhastuse ja Prometheuse mõõdikutega.",
+      "Tootmiskõlblik Helmi chart, non-root ja kirjutuskaitstud Docker-tõmmised, CI/CD GitHub Actionsiga ja publiccode.yml."
+    ]
+  }
+}

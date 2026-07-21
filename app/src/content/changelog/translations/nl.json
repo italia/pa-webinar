@@ -1,0 +1,308 @@
+{
+  "0.8.3": {
+    "title": "Vertrouwelijkheid van de chat, een juist deelnemersaantal en herstelde moderatie",
+    "notes": [
+      "De chatgeschiedenis is niet langer te lezen voor wie niet aan het evenement deelneemt. Voorheen kon iedereen die het adres van een evenement kende de berichten downloaden — inclusief de namen van de mensen die ze hadden geschreven — ook nadat het evenement was afgelopen. Voortaan moet u aangemeld zijn, moderator zijn of in de zaal aanwezig zijn terwijl het evenement loopt.",
+      "Het aantal deelnemers dat in de zaal werd getoond, was steeds één te laag: niemand telde zichzelf mee. Dezelfde fout werkte door in de statistieken van het evenement (piekaantal deelnemers). Het aantal klopt nu en komt overeen met de waarde die in de statistieken wordt vastgelegd.",
+      "De moderatorfuncties in de deelnemerslijst werken weer: een deelnemer uit de zaal verwijderen en het volume per persoon aanpassen hadden geen enkel effect.",
+      "Reacties zijn nu ook op de smartphone beschikbaar, waar de knop om ze te versturen ontbrak. Zwevende emoji’s onderscheppen geen kliks meer op de bedieningsbalk.",
+      "In volledig scherm zijn de dialoogvensters — het delen van de link en, voor moderatoren, ‘Verlaat de zaal’ — weer zichtbaar: voorheen bleven ze achter de video verborgen, waardoor het leek alsof de knoppen niet werkten.",
+      "Evenementsjablonen starten nu met de chat ingeschakeld, net als de zaal zelf: wie een ‘Webinar’ aanmaakte, kreeg tot nu toe een evenement zonder chat.",
+      "De Engelse vertaling van de interface is nu volledig; er ontbraken nog enkele onderdelen, waaronder het hele venster ‘Delen’."
+    ]
+  },
+  "0.8.2": {
+    "title": "Geen lege zaal die na de eindtijd blijft draaien",
+    "notes": [
+      "Een zaal die na de eindtijd open bleef en daarna leegliep, bleef onbeperkt actief en hield zo onnodig videocapaciteit bezet. Voortaan wordt de zaal gesloten zodra die 45 minuten leeg is na de geplande eindtijd. Een zaal waarin nog mensen aanwezig zijn, wordt nooit onderbroken: na de eindtijd verschijnt alleen een melding en wordt niemand weggestuurd."
+    ]
+  },
+  "0.8.1": {
+    "title": "Instelbare reacties, sluiten van lege zalen en een veiligere beheeromgeving",
+    "notes": [
+      "Emoji-reacties zijn nu in te stellen door de beheerder: standaard worden de reacties van Jitsi zelf gebruikt, rechtstreeks in de bedieningsbalk (licht en kortstondig). U kunt in plaats daarvan de eigen reacties van het platform inschakelen, in een balk linksonder; die worden meegeteld in de statistieken van het evenement.",
+      "Nieuwe instelling voor de beheerder: een zaal die volledig leeg is achtergebleven — ook zonder moderator — automatisch sluiten, als teken dat het evenement is verlaten. De instelling staat standaard uit, omdat inactiviteit zonder moderator al veilig wordt afgehandeld (de zaal gaat na 45 minuten in slaapstand), en is aan te zetten bij de instellingen.",
+      "Veiligere beheeromgeving: als de sessie verloopt, keert u terug naar het inlogscherm en zijn beheerpagina’s na afloop van de sessie niet langer bruikbaar. Bovendien duurt een sessie langer en wordt die automatisch verlengd terwijl u werkt."
+    ]
+  },
+  "0.8.0": {
+    "title": "Een overzichtelijkere zaal tijdens het evenement: chat, reacties, volledig scherm en aanmelding",
+    "notes": [
+      "Chat: u kunt nu emoji’s in uw berichten invoegen met een eigen keuzemenu, en een kleine indicator waarschuwt wanneer de chat trager wordt bijgewerkt. Berichten die u verstuurt, verschijnen meteen, ook achter bedrijfsnetwerken die realtime-updates bufferen.",
+      "Volledig scherm: de knop voor volledig scherm houdt de chat nu zichtbaar naast de video in plaats van die te verbergen.",
+      "De emoji-reacties bedekken de knoppen onderaan niet langer: de bedieningsbalk blijft altijd aanklikbaar, ook in de tegelweergave.",
+      "De knoppen ‘Delen’ en ‘Verlaat de zaal’ zijn nu standaard duidelijk zichtbaar en gekleurd (verlaten in het rood), niet pas wanneer u de muis erop plaatst.",
+      "De bot ‘Recorder’ verschijnt niet meer in de deelnemerslijst en telt niet meer mee in het aantal aanwezigen.",
+      "Aanmelding: wie zich ruim van tevoren aanmeldt, komt op een bevestigingspagina met de link om het evenement aan de agenda toe te voegen, in plaats van in de wachtruimte; vlak voor aanvang komt u meteen in de zaal. Op de evenementpagina ziet u of u zich al hebt aangemeld.",
+      "De chat is nu het belangrijkste interactiekanaal in de zaal. Ook het automatisch sluiten van een leeg gebleven evenement en het tellen van de deelnemers in de statistieken zijn verbeterd."
+    ]
+  },
+  "0.7.8": {
+    "title": "De moderator kan een opgestoken hand laten zakken",
+    "notes": [
+      "In de wachtrij met opgestoken handen heeft de moderator nu een knop om de hand van één afzonderlijke deelnemer te laten zakken — handig wanneer iemand al aan het woord is geweest of de hand per ongeluk omhoog heeft laten staan. Het verzoek bereikt die deelnemer, die de eigen hand ziet zakken; niemand anders merkt er iets van."
+    ]
+  },
+  "0.7.7": {
+    "title": "Minder achtergrondgeluid wanneer u spreekt",
+    "notes": [
+      "Geavanceerde onderdrukking van achtergrondgeluid is actief zodra u het woord neemt: geluiden zoals een toetsenbord, ventilatoren of verkeer worden beter gedempt, bovenop de basisonderdrukking die er al was."
+    ]
+  },
+  "0.7.6": {
+    "title": "Volume per deelnemer",
+    "notes": [
+      "Nieuwe volumeregeling per afzonderlijke deelnemer in het paneel ‘Deelnemers’: klinkt iemand te hard of te zacht, dan past u dat alleen voor uzelf aan, zonder het geluid voor anderen te wijzigen.",
+      "De afzonderlijke geluidsopname per deelnemer (voor de nabewerking) is betrouwbaarder: als een opname stil blijkt te zijn, merkt het systeem dat meteen op en worden lege transcripties voorkomen."
+    ]
+  },
+  "0.7.5": {
+    "title": "Een opgestoken hand blijft omhoog",
+    "notes": [
+      "Wanneer u uw hand opsteekt, blijft die nu omhoog tot u hem zelf laat zakken of tot een moderator de vraag afhandelt: voorheen ging de hand vanzelf omlaag zodra u begon te spreken, waardoor u uit de wachtrij met sprekers verdween."
+    ]
+  },
+  "0.7.4": {
+    "title": "Naam in de chat beschermd tegen doorgestuurde links (veiligheid)",
+    "notes": [
+      "In de chat wordt de echte naam van een aangemelde deelnemer alleen getoond op het apparaat waarmee die zich heeft aangemeld: wie een doorgestuurde deelnamelink opent, neemt deel onder de naam die bij het binnenkomen wordt ingevuld, niet onder de naam van de oorspronkelijke deelnemer. Daarmee is een onterechte toeschrijving van berichten uitgesloten.",
+      "Dezelfde bescherming geldt voor bijlagen: een bestand dat via een doorgestuurde link wordt verstuurd, wordt niet langer toegeschreven aan de naam van de oorspronkelijke deelnemer.",
+      "Wie zich met een tweede apparaat aanmeldt (bijvoorbeeld de telefoon) of met een link die eerder is ontvangen, kan zonder onderbreking blijven deelnemen, chatten en bijlagen versturen: alleen de getoonde naam verandert en wordt de naam die bij het binnenkomen is ingevuld."
+    ]
+  },
+  "0.7.3": {
+    "title": "Juist aantal aanwezigen, reacties in het midden en verfijningen in de zaal",
+    "notes": [
+      "Het aantal aanwezigen telt dezelfde persoon niet langer meerdere keren wanneer die de zaal verlaat en opnieuw binnenkomt (bijvoorbeeld met de knop ‘Vorige’ van de browser): dubbele verbindingen van dezelfde persoon worden één keer geteld. De deelnemerslijst toont nog steeds elke verbinding, zodat de moderator iedereen kan blijven zien en beheren.",
+      "De balk met reacties en emoji’s staat nu onderaan in het midden, goed zichtbaar en gemakkelijk te vinden, in plaats van in de hoek linksonder.",
+      "Het aantal aanmeldingen wordt niet langer openbaar getoond op de evenementpagina en in het overzicht van evenementen: het blijft zichtbaar voor beheerders in het beheerpaneel. Tijdens het live-evenement ziet het publiek alleen het aantal aanwezigen.",
+      "Onderdrukking van achtergrondgeluid staat automatisch aan op alle microfoons (de basisbewerking van het geluid — echo en ruis — is altijd ingeschakeld en hoeft niet handmatig te worden aangezet).",
+      "Iets sneller de zaal binnen: het videosysteem begint al op te starten zodra u op de knop klikt om deel te nemen."
+    ]
+  },
+  "0.7.2": {
+    "title": "Rijkere chat: bijlagen, antwoorden en vermeldingen",
+    "notes": [
+      "In de chat kunt u nu afbeeldingen en bijlagen versturen (PNG, JPEG, WebP, GIF en PDF, tot 10 MB), met een voorbeeldweergave in het bericht zelf.",
+      "Nieuwe functie ‘Beantwoorden’: u kunt naar een specifiek bericht verwijzen en het citaat blijft zichtbaar in de draad van het gesprek.",
+      "Vermeldingen met @: u kunt een deelnemer binnen een bericht bij naam aanspreken.",
+      "Moderatie van de chat: moderatoren kunnen tijdens het evenement afzonderlijke berichten verwijderen."
+    ]
+  },
+  "0.7.1": {
+    "title": "Statistieken na afloop voor elk evenement",
+    "notes": [
+      "Nieuw tabblad ‘Statistieken’ bij elk evenement in het beheerpaneel (ook beschikbaar voor evenementen zonder aanmelding of zonder video-opname): het toont het verloop van de bijeenkomst, wie het meest aan het woord was, de mate van deelname in het algemeen en de belangrijkste indicatoren.",
+      "Grafiek van het verloop van de interactie in de tijd — chat, vragen, stemmen op vragen, peilingen, woorden uit de woordwolk en reacties — met het piekmoment van de bijeenkomst gemarkeerd.",
+      "Overzicht van wie het langst aan het woord was (minuten per persoon) en hoe evenwichtig de spreektijd verdeeld was, samen met het aantal reacties en opgestoken handen.",
+      "Nieuwe schatting van hoelang deelnemers gemiddeld in de zaal blijven, die ook meetelt bij de berekening van de algemene mate van aandacht."
+    ]
+  },
+  "0.7.0": {
+    "title": "Namen van sprekers aanpasbaar en een speler met alleen geluid",
+    "notes": [
+      "Na afloop van een evenement kunt u sprekers hernoemen en zo de namen corrigeren die automatisch uit de transcriptie zijn afgeleid.",
+      "Als een opname geen afspeelbare video bevat, toont de correctiepagina toch een speler met alleen geluid, zodat u kunt terugluisteren en de tekst en de sprekers kunt bijwerken.",
+      "Correctie in de opname met meerdere sporen: het werkelijke geluid van deelnemers op afstand wordt nu goed vastgelegd."
+    ]
+  },
+  "0.6.9": {
+    "title": "Betrouwbaarheid van de AI-verwerking",
+    "notes": [
+      "Het beheerpaneel toont nu een betrouwbaarheidsindicator voor de AI-verwerking na afloop van het evenement (transcriptie, samenvatting, vertalingen), zodat in één oogopslag duidelijk is of het resultaat volledig en betrouwbaar is."
+    ]
+  },
+  "0.6.8": {
+    "title": "Duidelijkere pagina voor het bijwerken na afloop",
+    "notes": [
+      "De correctiepagina (transcriptie, samenvatting, vertalingen) legt nu uit wanneer de AI-inhoud nog niet beschikbaar is — ‘verwerking loopt’ of ‘start de verwerking met de knoppen bovenaan’ — in plaats van een rode foutmelding te tonen die op een storing leek.",
+      "Een mislukte poging tot opslaan wordt nu in het rood weergegeven, met de specifieke reden die de server teruggeeft, in plaats van in het groen alsof het gelukt was.",
+      "Een verlopen beheerderssessie en problemen bij het laden worden nu onderscheiden met eigen meldingen (in plaats van één algemene foutmelding).",
+      "Als het geluid van de opname niet afspeelbaar is, meldt de pagina dat en blijft het mogelijk om de tekst en de sprekers van de fragmenten te corrigeren."
+    ]
+  },
+  "0.6.7": {
+    "title": "Reacties altijd zichtbaar en ‘Notities / Checklist’",
+    "notes": [
+      "De emoji-reacties staan nu altijd zichtbaar in een balk linksonder en zijn niet langer verborgen achter een knop: gemakkelijker te vinden en te gebruiken tijdens het evenement.",
+      "De functie ‘Agenda’ heet voortaan ‘Notities / Checklist’, zodat duidelijk is dat het om een notitieveld met checklist gaat (de inhoud komt niet in de chat terecht). De moderator kan de functie per evenement blijven inschakelen."
+    ]
+  },
+  "0.6.6": {
+    "title": "Verfijningen: chat, aantallen en toegang",
+    "notes": [
+      "Links die in de chat worden gedeeld, zijn nu aanklikbaar en openen veilig in een nieuw tabblad (voorheen waren het gewone tekst).",
+      "In de zaal is het totale aantal aanmeldingen alleen nog zichtbaar voor moderatoren: deelnemers zien alleen hoeveel mensen daadwerkelijk aanwezig zijn.",
+      "Sneller toegang tot de zaal: de verbinding met de videoserver wordt al in de wachtruimte voorbereid, zodat u bij het binnenkomen minder lang wacht.",
+      "In de deelnemerslijst blijft de kop met het aantal zichtbaar terwijl u door de lijst bladert."
+    ]
+  },
+  "0.6.5": {
+    "title": "Opnames en aantallen",
+    "notes": [
+      "Bij het aantal aanwezigen in de zaal telt de recorder niet meer mee: alleen echte mensen worden getoond, niet de bot die het geluid opneemt.",
+      "Nabewerking: nieuwe knop ‘AI genereren’ om transcriptie, samenvatting en vertaling ook te starten voor opnames met alleen geluid (één spoor per deelnemer), waarvoor tot nu toe geen enkele startknop beschikbaar was.",
+      "In de lijst met sporen staat bij elke bijnaam een kenmerk: verschillende personen met dezelfde bijnaam krijgen een verschillend kenmerk, terwijl meerdere bijdragen van dezelfde persoon hetzelfde kenmerk delen.",
+      "Duidelijke melding wanneer het starten van de verwerking geen enkele taak in de wachtrij zet (AI uitgeschakeld voor het evenement of verwerking gepauzeerd), in plaats van een onterecht ‘gelukt’."
+    ]
+  },
+  "0.6.4": {
+    "title": "Veiligheid van de identiteit en verfijningen in de zaal",
+    "notes": [
+      "Beveiligingsherstel: wie uw persoonlijke link naar de zaal opent, komt nu binnen onder de EIGEN naam (voorheen kon die de naam overnemen van degene die de link had gestuurd).",
+      "Scherper scherm delen: er wordt nu voorrang gegeven aan de resolutie (5 fps in hoge kwaliteit) in plaats van aan vloeiendheid, zodat dia’s en documenten leesbaar blijven wanneer er weinig beweging is.",
+      "De functie ‘verberg uw eigen beeld’ is verwijderd: eenmaal ingeschakeld was er geen manier meer om het eigen venster weer zichtbaar te maken.",
+      "Toegang voor beheerders: na een nieuwe aanmelding wegens inactiviteit wordt de pagina correct bijgewerkt (geen ogenschijnlijk vastgelopen pagina meer die handmatig herladen moest worden)."
+    ]
+  },
+  "0.6.3": {
+    "title": "Verfijningen in de evenementzaal — ronde 2",
+    "notes": [
+      "De presentatietimer is nu opgenomen in de bedieningsbalk van de moderator en neemt geen eigen regel meer in beslag; de balk met het aftellen verschijnt alleen wanneer de timer loopt.",
+      "In de chat verschijnt de echte naam van wie schrijft, niet langer een algemeen ‘Moderator’.",
+      "De chat is een apart paneel in de zijbalk geworden en ligt niet langer altijd over de andere inhoud heen: een overzichtelijkere interface, met een teller voor ongelezen berichten op het tabblad.",
+      "Nieuwe knop ‘Whiteboard’ voor moderatoren, om het gedeelde whiteboard rechtstreeks vanuit de bedieningsbalk te openen.",
+      "De knop ‘Delen’ heeft de juiste kleur gekregen (niet langer te verwarren met ‘Verlaten’), naast de links staan pictogrammen en alleen moderatoren zien de moderatielink, verborgen achter een waarschuwing, zodat andere moderatoren zonder vergissingen kunnen worden uitgenodigd.",
+      "De woordwolk staat niet langer standaard aan: de moderator kan die tijdens het evenement naar keuze inschakelen."
+    ]
+  },
+  "0.6.2": {
+    "title": "Verfijningen in de zaal tijdens het live-evenement",
+    "notes": [
+      "De bedieningsbalk (microfoon, camera, scherm delen) blijft altijd zichtbaar en aanklikbaar, ook in volledig scherm, tijdens het delen van een scherm of wanneer u alleen in de zaal bent.",
+      "De moderator kan de livefuncties (Vragen, Chat, Agenda) tijdens het evenement weer in- en uitschakelen.",
+      "De knoppen voor geluid en beeld zijn al te gebruiken terwijl de zaal wordt klaargezet, zonder te wachten tot de videoserver is gestart.",
+      "De lijst ‘Opgestoken handen’ toont correct wie het woord heeft gevraagd.",
+      "Nieuwe knop ‘Delen’ in de zaal: kopieert in één keer de deelnamelink en de link naar de evenementpagina (zonder vertrouwelijke tokens prijs te geven).",
+      "Het merk PA Webinar is weer zichtbaar in de bovenste balk van de evenementzaal."
+    ]
+  },
+  "0.6.1": {
+    "title": "Openbare changelog en beveiligingsupdates",
+    "notes": [
+      "Nieuwe openbare changelogpagina, te bereiken door in de voettekst op het versienummer te klikken: de pagina toont alle versies van het platform met de belangrijkste vernieuwingen.",
+      "Beveiligingsupdates van de afhankelijkheden (undici, nodemailer) en een steviger beveiligde bouwstraat (scannen op kwetsbaarheden)."
+    ]
+  },
+  "0.6.0": {
+    "title": "Werkwijze na afloop van het evenement en interactieve wachtruimte",
+    "notes": [
+      "Nieuwe werkwijze bij het beëindigen van een evenement: aan het eind kiest de moderator via een apart venster wat er met de opname gebeurt (openbaar op de pagina, in de bibliotheek of alleen in het archief).",
+      "Automatische en geanonimiseerde samenvatting na afloop (deelnemers, vragen met de meeste stemmen, resultaten van peilingen, woordwolk, beoordelingen), getoond op de pagina van elk afgerond evenement, ook zonder opname.",
+      "Samenvattende e-mail na afloop aan de deelnemers, met de inhoud van het evenement.",
+      "Interactieve wachtruimte ‘Piazza Digitale’: u loopt met uw eigen avatar naar de doorgang om de bijeenkomst binnen te gaan, met daarnaast altijd de gewone knop om deel te nemen.",
+      "De woordwolk krijgt een eigen onderdeel op de pagina van een afgerond evenement, met een zichtbaarheidsknop voor de beheerder.",
+      "Gedeeld whiteboard, per evenement en via sjablonen in te schakelen.",
+      "Herziene gebruikerservaring van de wizard om een evenement aan te maken: geavanceerde opties ingeklapt, hoofdmoderator met link, waarschuwingen over persoonsgegevens, concept opslaan en betere afhandeling van gedeeltelijke fouten.",
+      "Onderscheiden bewaartermijnen voor de opnames en voor de geluidssporen per spreker, afgestemd op het signaal ‘video gepubliceerd’, met opschoning van de chat volgens de GDPR."
+    ]
+  },
+  "0.5.11": {
+    "title": "Verfijningen in moderatie, afsluiting van de bijeenkomst en geluid",
+    "notes": [
+      "Moderatoren verschijnen met hun echte naam in plaats van met een algemeen ‘Moderator’.",
+      "Afsluitscherm in de toepassing wanneer het evenement eindigt (niet langer ‘Zaal wordt klaargezet’).",
+      "Overlappende pictogrammen in de wachtruimte gecorrigeerd.",
+      "Onderdrukking van achtergrondgeluid via de IFrame API geforceerd uitgeschakeld om geluidsproblemen op te lossen."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabiele opname met meerdere sporen, beoordeling met sterren en prestaties",
+    "notes": [
+      "Opname per spreker (meerdere sporen) van begin tot eind betrouwbaar gemaakt: volledig geluid per spoor, geen afgekapte opnames, parallelle uploads.",
+      "Vragenlijst met sterbeoordeling na afloop van het evenement, met een overzichtsdashboard voor de beheerder.",
+      "Betere prestaties: VP9-codec voor de camera, lui laden op mobiele apparaten, afstemming van de recorder.",
+      "Helm-hook na de upgrade die de config.js van Jitsi automatisch opnieuw laadt."
+    ]
+  },
+  "0.5.8": {
+    "title": "Instelbare video- en geluidskwaliteit en een nieuwe manier om deel te nemen",
+    "notes": [
+      "Instelbare controle over de video- en geluidskwaliteit door de beheerder (voorinstellingen per evenement).",
+      "Herontworpen deelnameproces (aanmelding → wachtruimte → videogesprek).",
+      "Bij het opsteken van de hand wordt de echte naam van elke deelnemer getoond."
+    ]
+  },
+  "0.5.6": {
+    "title": "Instelbare wachtruimte en omslagafbeeldingen voor evenementen",
+    "notes": [
+      "Instelbare vormgeving van de wachtruimte (spel / tuin / klassiek), voor de hele site en per afzonderlijk evenement.",
+      "Omslagafbeeldingen op de evenementpagina en in de miniaturen van de kaarten.",
+      "Geüploade bestanden worden aangeboden via een eigen route met ondertekende links die snel verlopen.",
+      "Knop ‘Nu deelnemen’ direct na de aanmelding.",
+      "Samenvoeging van het beheergedeelte voor de AI-verwerking van opnames en robuustere opname met meerdere sporen."
+    ]
+  },
+  "0.5.2": {
+    "title": "Voorbereiding van evenementen en verfijningen",
+    "notes": [
+      "Agenda met instemmen en afwijzen en correcties in de rechten die uit sjablonen worden overgenomen.",
+      "Echte namen (geen ‘SPEAKER_00’ meer) in samenvattingen en ondertitels.",
+      "Reeks hotfixes (v0.5.2–v0.5.5) ter voorbereiding van de openbare evenementen."
+    ]
+  },
+  "0.5.1": {
+    "title": "Community-first homepage en archief met meerdere sporen",
+    "notes": [
+      "Herontwerp van de homepage vanuit een community-first benadering, met vertaalaanpassingen tijdens de uitvoering en toegankelijkheid volgens AgID.",
+      "MKV-archief met meerdere sporen en een speler om per spreker terug te luisteren.",
+      "Uitlijning van de afzonderlijke sporen op de mix van Jibri met behulp van kruiscorrelatie."
+    ]
+  },
+  "0.5.0": {
+    "title": "AI-nabewerking en opname met meerdere sporen",
+    "notes": [
+      "Pipeline voor AI-nabewerking: transcriptie, samenvatting, ondertitels, vertalingen en nasynchronisatie met meerdere stemmen (altijd synthetisch), met herleidbare herkomst van de modellen.",
+      "Opname met meerdere sporen (één spoor per spreker) met toewijzing van sprekers en automatische naamgeving (ADR-013).",
+      "Openbare videobibliotheek en beheerpagina voor de periode na afloop van het evenement.",
+      "Editor voor de transcriptie na afloop, met correctie van de tekst en het opnieuw toewijzen van sprekers.",
+      "Vernieuwde gebruikerservaring in het beheerpaneel: meldingen en dialoogvensters in .italia-stijl in plaats van de standaardmeldingen van de browser, laadskeletten en kleurtokens in plaats van honderden vast ingestelde hex-waarden.",
+      "Toestemming per deelnemer voor de opname met meerdere sporen (GDPR) en uitgebreide gegevensexport volgens artikel 15."
+    ]
+  },
+  "0.4.0": {
+    "title": "Betrokkenheid en levenscyclus",
+    "notes": [
+      "Nieuwe livefuncties: woordwolk, presentatietimer, teller voor reacties, livebediening in Meet-stijl en een paneel met opgestoken handen.",
+      "Levenscyclus van de opnames (tijdelijk → gepubliceerd) met beheer door de beheerder (voorbeeld bekijken, publiceren, verwijderen) en onderscheiden bewaartermijnen.",
+      "Pagina met tabbladen na afloop van het evenement (opname, Q&A-archief, peilingen, feedback, materialen), met instellingen voor wat wanneer wordt getoond.",
+      "Wizard in 5 stappen om een evenement aan te maken, indeling met labels, contactenlijst (Person) en redactionele bovenkop bij de titel.",
+      "Openbare videobibliotheek /video-library en transparantiepagina /service-inventory (CycloneDX 1.6 per tenant).",
+      "JVB-autoscaling in twee fasen met Redis-momentopname voor de statuspagina.",
+      "Opschoning volgens de GDPR in 3 fasen (persoonsgegevens direct, inhoud na de bewaartermijn, definitieve verwijdering)."
+    ]
+  },
+  "0.3.0": {
+    "title": "Instelbaar platform en infrastructuur",
+    "notes": [
+      "Site-instellingen voor hergebruik door andere overheidsorganisaties (huisstijl, kleuren, favicon, SEO, voettekst, weergave van de homepage, privacy en toegankelijkheid) zonder opnieuw te bouwen.",
+      "Analysedashboard en beheerpaneel voor de infrastructuur.",
+      "3 Helm-installatiemodi (simple / standard / full) en JVB scale-to-zero met een eigen nodepool.",
+      "Jibri-pipeline voor meerdere clouds (Azure Blob / S3 / GCS / MinIO / lokaal) en instelbaar Jitsi-watermerk.",
+      "OpenSSF Scorecard, Dependabot, SBOM van de afhankelijkheden, centrale foutafhandeling, beperking van het aantal aanvragen en meer dan 210 eenheidstests.",
+      "Talrijke tussentijdse versies (v0.3.8–v0.3.45) naar aanleiding van de feedback na de demo."
+    ]
+  },
+  "0.2.0": {
+    "title": "Feedback van het DTD",
+    "notes": [
+      "Profilering van de deelnemers bij de aanmelding (organisatie, functie, categorie), per evenement in te stellen, met CSV-export en samengevoegde statistieken.",
+      "Instelbare herinneringen met meerdere momenten en verschillende e-mails.",
+      "Peilingen met resultaten in realtime en CSV-export.",
+      "Verbeteringen voor de GDPR: privacyverklaring per evenement, gedetailleerde toestemmingen, auditlogboek van de verwijderingen en gegevensexport volgens artikel 15.",
+      "Samenvoeging van de rollen Moderator en Auditor en audit van de licenties van de afhankelijkheden."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP — eerste versie",
+    "notes": [
+      "Openbaar platform voor digitale evenementen met het ontwerpsysteem .italia (Bootstrap Italia, design-react-kit).",
+      "Zaal voor live-evenementen met Jitsi Meet (IFrame API, JWT-authenticatie) en rollen die op de server worden afgedwongen.",
+      "Aanmelding van deelnemers volgens de GDPR met versleutelde persoonsgegevens (AES-256-GCM).",
+      "Q&A met stemmen en moderatie, wachtruimte met aftelklok en toegang voor gasten.",
+      "Bevestigings- en herinneringsmails, agenda-integratie (Google, Outlook, Yahoo, iCal).",
+      "Beheerpaneel met authenticatie via API-sleutel, opschoning volgens de GDPR, Prometheus-metingen.",
+      "Helm chart geschikt voor productie, Docker zonder root-rechten en alleen-lezen, CI/CD met GitHub Actions, publiccode.yml."
+    ]
+  }
+}

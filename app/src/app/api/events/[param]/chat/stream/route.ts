@@ -23,7 +23,7 @@
 import { extractModeratorToken } from '@/lib/auth/moderator';
 import { authorizeChatRead } from '@/lib/chat/read-access';
 import { subscribeChat, type ChatEnvelope } from '@/lib/chat/pubsub';
-import { AppError } from '@/lib/errors';
+import { errorResponse } from '@/lib/errors';
 import { chatSseConnectionsGauge } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
@@ -50,16 +50,14 @@ export async function GET(
   // extractModeratorToken already accepts alongside the Bearer header.
   //
   // This route builds raw Responses (no withErrorHandling wrapper), so the
-  // AppError thrown by authorizeChatRead is mapped by hand.
+  // AppError is mapped through the shared `errorResponse` — same JSON body and
+  // status codes as every other route, instead of a hand-rolled mapping that
+  // would drift (and that returned a 500 whose body read "Forbidden").
   let eventId: string;
   try {
     ({ eventId } = await authorizeChatRead(param, extractModeratorToken(request)));
   } catch (err) {
-    const status = err instanceof AppError ? err.statusCode : 500;
-    return new Response(
-      status === 404 ? 'Event not found' : 'Forbidden',
-      { status },
-    );
+    return errorResponse(err);
   }
 
   const encoder = new TextEncoder();

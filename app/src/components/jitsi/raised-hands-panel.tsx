@@ -22,10 +22,12 @@ interface RaisedHandsPanelProps {
   api: JitsiMeetExternalAPI | null;
   /**
    * Display name of the local participant (from our pre-join flow / JWT).
-   * Jitsi's `getParticipantsInfo()` returns **remote** participants only,
-   * so when the local moderator raises their own hand the lookup by ID
-   * comes back empty and the UI falls back to "Partecipante". Passing
-   * the name down lets us short-circuit the lookup for the local ID.
+   * The local row in `getParticipantsInfo()` can carry an EMPTY displayName
+   * (presence has not propagated yet), so when the local moderator raises
+   * their own hand the lookup by ID resolves to nothing and the UI falls back
+   * to "Partecipante". Passing the name down short-circuits that for the
+   * local ID. (The roster does list self on the build we serve — see
+   * lib/jitsi/participants.ts — it just isn't always named yet.)
    */
   localDisplayName?: string;
   /**
@@ -73,7 +75,8 @@ export default function RaisedHandsPanel({
 
     // Capture the local participant id as soon as Jitsi joins the
     // conference — needed to map a local "raiseHandUpdated" event back
-    // to the name we already know (getParticipantsInfo excludes self).
+    // to the name we already know, since the roster's own row may still
+    // be unnamed at that point.
     const onConferenceJoined = (evt: { id: string }) => {
       localIdRef.current = evt.id;
     };
@@ -81,8 +84,8 @@ export default function RaisedHandsPanel({
     // For moderators the panel mounts *lazily*, i.e. after
     // `videoConferenceJoined` has already fired, so the listener above
     // never runs and `localIdRef` would stay null — leaving the
-    // moderator's own raised hand resolving to empty (getParticipantsInfo
-    // excludes self, so the scan can't recover it either). The
+    // moderator's own raised hand resolving to empty (the roster row for
+    // self may still be unnamed, so the scan can't recover it either). The
     // getDisplayName accessor used inside resolveDisplayName still works
     // for self in most Jitsi builds, and the staggered retries + periodic
     // sweep below give late presence another chance; the localDisplayName

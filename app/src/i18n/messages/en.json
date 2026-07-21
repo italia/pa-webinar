@@ -2054,7 +2054,11 @@
       "aiGenerateAlready": "The AI pipeline was already started for this recording: no new jobs added.",
       "aiGenerateError": "Could not start the AI pipeline. Check that AI is enabled site-wide and that a recording exists.",
       "aiGenerateHelp": "Enables AI transcription + summary and starts the pipeline on the recording, in one click. Idempotent: clicking twice won't duplicate jobs.",
-      "aiGenerateNoRecording": "No recording: post-event AI needs a recording (capture only happens during the event). You can still manage post-production here."
+      "aiGenerateNoRecording": "No recording: post-event AI needs a recording (capture only happens during the event). You can still manage post-production here.",
+      "duplicateNext": "Duplicate for next time",
+      "duplicateNextBusy": "Duplicating…",
+      "duplicateNextHint": "Creates a draft carrying this event’s entire configuration (recording, separate tracks, AI, agenda, reminders). If the event has a cadence the date moves to the next occurrence; otherwise it is left for you to set.",
+      "duplicateNextError": "Could not duplicate. Please try again."
     },
     "rubrica": {
       "title": "Address book",

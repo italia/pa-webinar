@@ -120,7 +120,9 @@ export function humanParticipantCount(
 ): number {
   const roster = api.getParticipantsInfo?.() ?? [];
   // No roster to count (API not ready, or a build without getParticipantsInfo):
-  // fall back to the raw total rather than reporting an empty room.
+  // fall back to the raw total rather than reporting an empty room. The bot
+  // cannot be filtered out of a number, so this transient value may be one too
+  // high in the seconds before the roster populates; the next event corrects it.
   if (roster.length === 0) return Math.max(0, api.getNumberOfParticipants());
 
   const identities = new Set<string>();
