@@ -7,13 +7,19 @@
 -- from "Webinar" or "Presentazione pubblica" reproduced exactly the incoherence
 -- the feedback reported: the admin sees a Q&A flag, the room shows only chat.
 --
--- Scope: system templates only. Templates an admin created or edited themselves
--- are their own decision and are left untouched. Q&A is not removed — it stays a
--- per-event toggle a moderator can switch back on.
+-- Scope: system templates the admin has never touched. `is_system` alone is not
+-- enough — the admin UI edits system templates exactly like custom ones (no
+-- isSystem guard on PUT /api/admin/templates), so a deployment that deliberately
+-- turned Q&A on for its "Webinar" template would have had that silently
+-- reverted. `updated_at = created_at` is the precise "still as shipped"
+-- predicate: Prisma stamps updated_at on every write through the app, while raw
+-- SQL migrations like this one leave it alone.
+-- Q&A is not removed — it stays a per-event toggle a moderator can switch on.
 UPDATE "event_templates"
 SET "chat_enabled" = true,
     "qa_enabled" = false
-WHERE "is_system" = true;
+WHERE "is_system" = true
+  AND "updated_at" = "created_at";
 
 -- Same rationale for the column defaults, so a template row inserted without an
 -- explicit value (admin form, future migrations) starts chat-primary too.

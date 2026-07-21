@@ -5,17 +5,31 @@
  * can tweak the next occurrence without re-entering all the config
  * (privacy policy, feature toggles, speakers, branding, …).
  *
- * What we copy: all authored content — titles (with "(copia)" appended),
- * description, schedule, feature toggles, registration rules, privacy
- * text, speakers/organiser info, GDPR template link, cover image, event
- * type, sizing overrides.
+ * What we copy: the ENTIRE configuration — titles (with "(copia)" appended),
+ * description, schedule, every feature toggle, the capture/AI flags,
+ * registration rules, privacy text, speakers/organiser info, GDPR template
+ * link, cover image, event type, sizing overrides — plus the reminder schedule.
+ *
+ * The capture flags matter more than they look: this endpoint used to drop
+ * `multitrackRecordingEnabled`, `retainParticipantTracks`, the four AI flags,
+ * `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`,
+ * `autoStartRecording`, `videoQuality` and `recurrenceRule` on the floor. For a
+ * recurring call (Caffettino, DevIt sync) that is the whole point of duplicating:
+ * the operator would only discover the loss after the event, with no multitrack
+ * audio and no transcript. See docs/ROADMAP.md, "Eventi ricorrenti / serie".
  *
  * What we reset: status (→ DRAFT), moderatorToken, jitsiRoomName, slug,
  * runtime/analytics state (lastActiveAt, provisioningStartedAt,
- * peakParticipants, recording URLs/metadata, capacityEstimateJson).
+ * peakParticipants, recording URLs/metadata, capacityEstimateJson) and the join
+ * password — a fresh copy must not inherit a secret the operator cannot see.
  *
- * What we skip: relations (registrations, questions, polls, materials,
- * reminders, feedback, sessions). The duplicate is a blank canvas.
+ * What we skip: the other relations (registrations, questions, polls,
+ * materials, feedback, sessions) — those belong to the occurrence that ran.
+ *
+ * Optional body:
+ *   { "nextOccurrence": true }        project the date from the source's RRULE
+ *   { "startsAt": ISO, "endsAt": ISO } explicit reschedule
+ * Neither → same dates as the source (historic behaviour).
  */
 import { randomUUID } from 'crypto';
 
@@ -26,6 +40,8 @@ import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, UnauthorizedError } from '@/lib/errors';
+import { duplicatedConfig } from '@/lib/events/duplicate-fields';
+import { nextOccurrences } from '@/lib/utils/recurrence';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import type { LocalizedField } from '@/lib/utils/locale';
 
@@ -52,6 +68,61 @@ function suffixTitle(title: LocalizedField): Record<string, string> {
   return out;
 }
 
+interface DuplicateOptions {
+  nextOccurrence?: boolean;
+  startsAt?: string;
+  endsAt?: string;
+}
+
+/** Body is optional: an empty POST keeps the historic "same dates" behaviour. */
+async function readOptions(request: Request): Promise<DuplicateOptions> {
+  try {
+    const raw = await request.json();
+    return raw && typeof raw === 'object' ? (raw as DuplicateOptions) : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Dates for the copy. Explicit values win; `nextOccurrence` projects the first
+ * date the source's RRULE yields strictly after now, keeping the original
+ * duration and time of day. With no rule to project from we fall back to the
+ * source dates rather than inventing a cadence — the operator can still edit
+ * the draft, and a wrong guessed date is worse than an obvious placeholder.
+ */
+function resolveSchedule(
+  source: { startsAt: Date; endsAt: Date; recurrenceRule: string | null },
+  options: DuplicateOptions,
+): { startsAt: Date; endsAt: Date } {
+  const durationMs = source.endsAt.getTime() - source.startsAt.getTime();
+
+  const explicitStart = options.startsAt ? new Date(options.startsAt) : null;
+  if (explicitStart && !Number.isNaN(explicitStart.getTime())) {
+    const explicitEnd = options.endsAt ? new Date(options.endsAt) : null;
+    return {
+      startsAt: explicitStart,
+      endsAt:
+        explicitEnd && !Number.isNaN(explicitEnd.getTime()) && explicitEnd > explicitStart
+          ? explicitEnd
+          : new Date(explicitStart.getTime() + durationMs),
+    };
+  }
+
+  if (options.nextOccurrence && source.recurrenceRule) {
+    const now = new Date();
+    // Ask for a handful and take the first in the future: the series may have
+    // been running for a while, so occurrence #1 is usually in the past.
+    const upcoming = nextOccurrences(source.recurrenceRule, source.startsAt, 60)
+      .find((d) => d.getTime() > now.getTime());
+    if (upcoming) {
+      return { startsAt: upcoming, endsAt: new Date(upcoming.getTime() + durationMs) };
+    }
+  }
+
+  return { startsAt: source.startsAt, endsAt: source.endsAt };
+}
+
 export const POST = withErrorHandling(async (request, context) => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) throw new UnauthorizedError();
@@ -64,6 +135,14 @@ export const POST = withErrorHandling(async (request, context) => {
   const source = await prisma.event.findUnique({ where: { id } });
   if (!source) throw new NotFoundError('Event not found');
 
+  const reminders = await prisma.eventReminder.findMany({
+    where: { eventId: source.id },
+    select: { offsetMinutes: true, label: true },
+    orderBy: { offsetMinutes: 'desc' },
+  });
+
+  const { startsAt, endsAt } = resolveSchedule(source, await readOptions(request));
+
   const newTitle = suffixTitle(source.title as LocalizedField);
   const newSlug = await generateUniqueSlug(newTitle);
   const moderatorToken = randomUUID();
@@ -71,68 +150,29 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const duplicate = await prisma.event.create({
     data: {
+      // Everything the copy inherits, from the single classified list — see
+      // lib/events/duplicate-fields.ts for why this is not spelled out inline.
+      ...duplicatedConfig(source),
+
+      // …and the handful of values a copy must NOT inherit.
       slug: newSlug,
+      title: newTitle,
       jitsiRoomName,
       moderatorToken,
       status: 'DRAFT',
+      startsAt,
+      endsAt,
 
-      title: newTitle,
-      description: source.description ?? {},
-
-      startsAt: source.startsAt,
-      endsAt: source.endsAt,
-      timezone: source.timezone,
-
-      maxParticipants: source.maxParticipants,
-      expectedSenderRatioPct: source.expectedSenderRatioPct,
-      gracePeriodMinutes: source.gracePeriodMinutes,
-
-      qaEnabled: source.qaEnabled,
-      chatEnabled: source.chatEnabled,
-      whiteboardEnabled: source.whiteboardEnabled,
-      waitingRoomEngine: source.waitingRoomEngine,
-      recordingEnabled: source.recordingEnabled,
-
-      participantsCanUnmute: source.participantsCanUnmute,
-      participantsCanStartVideo: source.participantsCanStartVideo,
-      participantsCanShareScreen: source.participantsCanShareScreen,
-      // Preserve the role×feature matrix exactly (not just the GUEST-projected
-      // booleans above) so a duplicate keeps any SPEAKER-specific grants.
-      permissionMatrix: source.permissionMatrix ?? undefined,
-
-      requireOrganization: source.requireOrganization,
-      requireOrganizationRole: source.requireOrganizationRole,
-      requireOrganizationType: source.requireOrganizationType,
-
-      moderatorName: source.moderatorName,
-      moderatorEmail: source.moderatorEmail,
-
-      dataRetentionDays: source.dataRetentionDays,
-      privacyPolicyUrl: source.privacyPolicyUrl,
-      privacyPolicyText: source.privacyPolicyText,
-      gdprTemplateId: source.gdprTemplateId,
-      recordingConsentText: source.recordingConsentText,
-
-      speakersInfo: source.speakersInfo ?? {},
-      organizerName: source.organizerName,
-      imageUrl: source.imageUrl,
-      coverImageUrl: source.coverImageUrl,
-      waitingRoomAudioUrl: source.waitingRoomAudioUrl,
-
-      eventType: source.eventType,
-
-      postEventPublic: source.postEventPublic,
-      postEventShowQA: source.postEventShowQA,
-      postEventShowMaterials: source.postEventShowMaterials,
-      postEventShowPolls: source.postEventShowPolls,
-      postEventShowFeedback: source.postEventShowFeedback,
-      postEventShowRecap: source.postEventShowRecap,
-      postEventShowWordCloud: source.postEventShowWordCloud,
-      postEventEmailEnabled: source.postEventEmailEnabled,
-      feedbackEnabled: source.feedbackEnabled,
-
-      youtubeUrl: source.youtubeUrl,
-      libraryListed: source.libraryListed,
+      // Reminder schedule: a duplicate with no reminders quietly stops warning
+      // registrants, which is exactly the kind of loss nobody notices in time.
+      ...(reminders.length > 0 && {
+        reminders: {
+          create: reminders.map((r) => ({
+            offsetMinutes: r.offsetMinutes,
+            label: r.label,
+          })),
+        },
+      }),
     },
   });
 

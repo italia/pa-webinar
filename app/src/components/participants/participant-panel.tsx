@@ -40,7 +40,10 @@ export default function ParticipantPanel({
     const list = api.getParticipantsInfo().filter(isHumanParticipant);
     setParticipants(list);
     const seen = new Set<string>();
-    for (const p of list) seen.add(participantIdentityKey(p) || `#${p.participantId}`);
+    // Fallback allineato a humanParticipantCount: senza nome NÉ endpoint id la
+    // chiave per-indice tiene distinti gli anonimi, mentre `#${p.participantId}`
+    // valeva `#undefined` per tutti e li collassava in una persona sola.
+    list.forEach((p, i) => seen.add(participantIdentityKey(p) || `#anon-${i}`));
     onCountChange?.(seen.size);
   }, [api, onCountChange]);
 

@@ -1,7 +1,6 @@
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
-import { jwtVerify } from 'jose';
 
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
@@ -14,21 +13,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
-
-async function hasJoinGrant(eventId: string): Promise<boolean> {
-  const appSecret = process.env.APP_SECRET;
-  if (!appSecret) return false;
-  const cookieStore = await cookies();
-  const cookie = cookieStore.get(`join_granted_${eventId}`)?.value;
-  if (!cookie) return false;
-  try {
-    const secret = new TextEncoder().encode(appSecret);
-    const { payload } = await jwtVerify(cookie, secret);
-    return payload.eventId === eventId;
-  } catch {
-    return false;
-  }
-}
+import { hasJoinGrant } from '@/lib/events/join-grant';
 
 export const dynamic = 'force-dynamic';
 

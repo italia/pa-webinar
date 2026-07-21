@@ -1,0 +1,308 @@
+{
+  "0.8.3": {
+    "title": "Príobháideacht an chomhrá, líon cruinn rannpháirtithe agus modhnú ar ais i bhfeidhm",
+    "notes": [
+      "Ní féidir le duine nach bhfuil páirteach san imeacht stair an chomhrá a léamh a thuilleadh. Roimhe seo, d’fhéadfadh aon duine a raibh seoladh an imeachta aige na teachtaireachtaí a íoslódáil — mar aon le hainmneacha na ndaoine a scríobh iad — fiú tar éis don imeacht a bheith thart. Anois ní mór duit a bheith cláraithe, a bheith i do mhodhnóir, nó a bheith sa seomra agus an t-imeacht ar siúl.",
+      "Bhí líon na rannpháirtithe a taispeánadh sa seomra mícheart faoi dhuine amháin, mar nach raibh gach duine á chomhaireamh féin. Bhí an earráid chéanna le feiceáil i staitisticí an imeachta (buaiclíon rannpháirtithe). Tá an comhaireamh ceart anois agus tagann sé leis an bhfigiúr atá taifeadta sna staitisticí.",
+      "Tá rialtáin an mhodhnóra ag obair arís i liosta na rannpháirtithe: ní raibh aon éifeacht le rannpháirtí a chur amach ná le hairde fuaime duine aonair a athrú.",
+      "Tá na frithghníomhartha ar fáil ar an nguthán cliste anois freisin, áit nach raibh cnaipe ar bith ann chun iad a sheoladh. Ní chuireann na emoji atá ag gluaiseacht trasna an scáileáin isteach ar chliceanna ar bharra na rialtán a thuilleadh.",
+      "Ar lánscáileán, tá na boscaí dialóige le feiceáil arís — an nasc a chomhroinnt agus, i gcás an mhodhnóra, “Fág an seomra”. Bhídís i bhfolach taobh thiar den fhíseán, rud a d’fhág gur chosúil nach raibh na cnaipí ag obair.",
+      "Tosaíonn na teimpléid imeachta anois agus an comhrá cumasaithe, ar aon dul leis an seomra féin: roimhe seo, nuair a chruthaítí imeacht ón teimpléad “Webinar”, ní bhíodh comhrá ar fáil ann.",
+      "Tá aistriúchán Béarla an chomhéadain críochnaithe anois; bhí roinnt míreanna in easnamh, an bosca dialóige “Comhroinn” ina iomláine ina measc."
+    ]
+  },
+  "0.8.2": {
+    "title": "Ní fhágtar seomra folamh ar siúl thar an am deiridh",
+    "notes": [
+      "Nuair a d’fhanadh seomra oscailte thar an am deiridh agus nuair a d’imíodh gach duine as ina dhiaidh sin, d’fhanadh sé gníomhach gan teorainn ama, rud a choinníodh acmhainní físe in úsáid gan aon ghá. Anois, má fhanann seomra folamh ar feadh 45 nóiméad tar éis an ama deiridh sceidealta, dúntar é. Ní chuirtear isteach riamh ar sheomra a bhfuil daoine ann fós: tar éis an ama deiridh ní thaispeántar ach fógra, agus ní dhícheanglaítear duine ar bith."
+    ]
+  },
+  "0.8.1": {
+    "title": "Frithghníomhartha inchumraithe, dúnadh seomraí folmha agus slándáil an limistéir riaracháin",
+    "notes": [
+      "Is féidir leis an riarthóir na frithghníomhartha (emoji) a chumrú anois: de réir réamhshocraithe úsáidtear frithghníomhartha dúchasacha Jitsi, atá ar fáil díreach ar bharra na rialtán, agus iad éadrom gearrshaolach. Mar rogha air sin, is féidir frithghníomhartha an ardáin féin a chumasú — barra ag bun an scáileáin ar chlé — agus áirítear iadsan i staitisticí an imeachta.",
+      "Rogha nua don riarthóir: seomra atá fágtha go hiomlán folamh, gan mhodhnóir fiú, a dhúnadh go huathoibríoch mar chomhartha gur tréigeadh an t-imeacht. Tá sí díchumasaithe de réir réamhshocraithe — déantar neamhghníomhaíocht gan mhodhnóir a láimhseáil go sábháilte cheana féin, ó théann an seomra chun suain tar éis 45 nóiméad — agus is féidir í a chumasú sna socruithe.",
+      "Limistéar riaracháin níos sláine: nuair a théann an seisiún in éag, tugtar ar ais go dtí an scáileán logála isteach thú, sa chaoi nach féidir leathanaigh riaracháin a úsáid a thuilleadh tar éis don seisiún dul in éag. Maireann an seisiún níos faide freisin agus athnuaitear go huathoibríoch é fad is atá tú i mbun oibre."
+    ]
+  },
+  "0.8.0": {
+    "title": "Seomra beo níos glaine: comhrá, frithghníomhartha, lánscáileán agus clárú",
+    "notes": [
+      "Comhrá: is féidir leat emoji a chur i do theachtaireachtaí anois le roghnóir tiomnaithe, agus tugann táscaire beag rabhadh duit má thosaíonn nuashonruithe an chomhrá ag moilliú. Taispeántar na teachtaireachtaí a sheolann tú láithreach, fiú ar líonraí corparáideacha a chuireann nuashonruithe fíor-ama i maolán.",
+      "Lánscáileán: coinníonn an cnaipe lánscáileáin an comhrá le feiceáil ar an taobh anois, in ionad é a chur i bhfolach.",
+      "Ní chlúdaíonn na frithghníomhartha (emoji) na rialtáin ag bun an scáileáin a thuilleadh: fanann an barra inchliceáilte i gcónaí, fiú san amharc tíleanna.",
+      "Tá na cnaipí “Comhroinn” agus “Fág an seomra” soiléir agus daite de réir réamhshocraithe anois — dearg atá ar chnaipe na fágála — seachas gan iad a bheith le feiceáil ach nuair a bhogtar an luch os a gcionn.",
+      "Ní thaispeántar an bot “Recorder” i liosta na rannpháirtithe ná sa chomhaireamh a thuilleadh.",
+      "Clárú: má chláraíonn tú fada roimh ré, tugtar go leathanach deimhnithe thú a bhfuil nasc air chun an t-imeacht a chur le do fhéilire, in ionad thú a chur sa seomra feithimh; gar don am tosaithe téann tú díreach isteach sa seomra. Taispeánann leathanach an imeachta duit anois an bhfuil tú cláraithe cheana féin.",
+      "Is é an comhrá príomhbhealach idirghníomhaíochta an tseomra anois. Feabhsaíodh freisin dúnadh uathoibríoch imeachta a fágadh folamh, agus comhaireamh na rannpháirtithe sna staitisticí."
+    ]
+  },
+  "0.7.8": {
+    "title": "Is féidir leis an modhnóir lámh atá in airde a ísliú",
+    "notes": [
+      "I scuaine na lámh in airde, tá cnaipe ag an modhnóir anois chun lámh rannpháirtí aonair a ísliú — rud atá áisiúil nuair atá duine tar éis labhairt cheana féin nó nuair a d’fhág sé a lámh in airde trí dhearmad. Sroicheann an t-iarratas an rannpháirtí sin, a fheiceann a lámh féin ag ísliú; ní chuirtear isteach ar aon duine eile."
+    ]
+  },
+  "0.7.7": {
+    "title": "Níos lú torainn chúlra agus tú ag labhairt",
+    "notes": [
+      "Cuirtear ardchealú torainn chúlra i bhfeidhm nuair a thosaíonn tú ag caint: maolaítear fuaimeanna ar nós méarchláir, feananna nó tráchta níos fearr ná riamh, sa bhreis ar an mbunmhaolú atá i bhfeidhm cheana."
+    ]
+  },
+  "0.7.6": {
+    "title": "Airde fuaime do gach rannpháirtí ar leith",
+    "notes": [
+      "Rialtán nua airde fuaime do gach rannpháirtí aonair sa phainéal “Rannpháirtithe”: má tá duine ró-ard nó ró-íseal, is féidir leat é a choigeartú duit féin amháin, gan an fhuaim a athrú do dhaoine eile.",
+      "Tá an taifeadadh fuaime ar leith do gach rannpháirtí, a úsáidtear san iarléiriú, níos iontaofa: má bhíonn taifeadadh balbh, aithníonn an córas láithreach é agus seachnaítear tras-scríbhinní folmha a chruthú."
+    ]
+  },
+  "0.7.5": {
+    "title": "Fanann an lámh in airde",
+    "notes": [
+      "Nuair a chuireann tú do lámh in airde, fanann sí in airde anois go dtí go n-ísleoidh tú féin í nó go dtabharfaidh modhnóir aghaidh uirthi. Roimhe seo, thiteadh sí uaithi féin chomh luath is a thosaíteá ag caint, rud a d’fhágadh go n-imíodh tú as scuaine na gcainteoirí."
+    ]
+  },
+  "0.7.4": {
+    "title": "Ainmneacha sa chomhrá cosanta ar naisc a chuirtear ar aghaidh (slándáil)",
+    "notes": [
+      "Sa chomhrá, ní thaispeántar fíorainm duine chláraithe ach ar an ngléas ar chláraigh sé leis: má osclaíonn duine eile nasc rannpháirtíochta a cuireadh ar aghaidh chuige, glacann sé páirt faoin ainm a chlóscríobhann sé féin, agus ní faoi ainm an duine a chláraigh ó thús. Cuireann sé sin deireadh le teachtaireachtaí a chur i leith an duine mhícheart.",
+      "Baineann an chosaint chéanna leis na ceangaltáin: ní chuirtear comhad a sheoltar ó nasc a cuireadh ar aghaidh i leith ainm an duine a chláraigh ó thús a thuilleadh.",
+      "Is féidir le duine a cheanglaíonn ó dhara gléas — ón nguthán, cuir i gcás — nó leis an nasc a fuair sé roimh ré, leanúint air ag glacadh páirte, ag scríobh sa chomhrá agus ag seoladh ceangaltán gan bhriseadh. Níl de dhifríocht ann ach an t-ainm a thaispeántar, arb é an t-ainm a chlóscríobhtar agus tú ag dul isteach sa seomra é."
+    ]
+  },
+  "0.7.3": {
+    "title": "Comhaireamh cruinn tinrimh, frithghníomhartha sa lár agus feabhsuithe ar an seomra",
+    "notes": [
+      "Ní chomhairtear an duine céanna arís agus arís eile nuair a fhágann sé an seomra agus a fhilleann sé air, mar shampla leis an gcnaipe “Ar Ais” sa bhrabhsálaí: ní chomhairtear ceangail dhúbailte ón duine céanna ach uair amháin. Taispeánann liosta na rannpháirtithe gach ceangal i gcónaí, sa chaoi gur féidir leis an modhnóir iad go léir a fheiceáil agus a bhainistiú.",
+      "Tá barra na bhfrithghníomhartha (emoji) i lár bhun an scáileáin anois, áit a bhfuil sé soiléir agus éasca a aimsiú, in ionad é a bheith sa chúinne ag bun an scáileáin ar chlé.",
+      "Ní thaispeántar líon na ndaoine cláraithe go poiblí ar leathanach an imeachta ná i liosta na n-imeachtaí a thuilleadh: fanann sé le feiceáil ag riarthóirí sa phainéal riaracháin. Le linn an imeachta bheo ní fheiceann an pobal ach líon na ndaoine atá i láthair.",
+      "Cuirtear díbhrú torainn chúlra i bhfeidhm go huathoibríoch ar gach micreafón: bíonn an bhunphróiseáil fuaime — macalla agus torann — cumasaithe i gcónaí, agus ní gá aon rud a chur ar siúl de láimh.",
+      "Beagán níos tapúla dul isteach sa seomra: tosaíonn an córas físe ag dúiseacht chomh luath is a chliceálann tú ar an gcnaipe iontrála."
+    ]
+  },
+  "0.7.2": {
+    "title": "Comhrá níos saibhre: ceangaltáin, freagraí agus daoine a lua",
+    "notes": [
+      "Is féidir íomhánna agus ceangaltáin a sheoladh sa chomhrá anois (PNG, JPEG, WebP, GIF agus PDF, suas le 10 MB), agus réamhamharc le feiceáil sa teachtaireacht féin.",
+      "Feidhm nua “Freagair”: is féidir teachtaireacht ar leith a lua, agus fanann an lua le feiceáil i snáithe an chomhrá.",
+      "Daoine a lua le @: is féidir rannpháirtí a lua as a ainm laistigh de theachtaireacht.",
+      "Modhnú an chomhrá: is féidir le modhnóirí teachtaireachtaí aonair a bhaint le linn an imeachta."
+    ]
+  },
+  "0.7.1": {
+    "title": "Staitisticí iarimeachta do gach imeacht",
+    "notes": [
+      "Cluaisín nua “Staitisticí” do gach imeacht sa phainéal riaracháin, atá ar fáil fiú d’imeachtaí gan chlárú agus d’imeachtaí gan taifeadadh físe: taispeánann sé conas a chuaigh an glao ar aghaidh, cé a labhair is mó, an leibhéal rannpháirtíochta san iomlán agus na príomhtháscairí.",
+      "Graf a léiríonn an idirghníomhaíocht thar am — comhrá, ceisteanna, vótaí ar cheisteanna, pobalbhreitheanna, focail an scamaill focal agus frithghníomhartha — agus buaicphointe an ghlao aibhsithe air.",
+      "Rangú ar na daoine a labhair is faide, i nóiméid an duine, mar aon leis an gcothromaíocht idir na cainteoirí agus líon na bhfrithghníomhartha agus na lámh a cuireadh in airde.",
+      "Meastachán nua ar an meán-am a chaitheann rannpháirtithe sa seomra, a úsáidtear freisin chun an scór aire foriomlán a ríomh."
+    ]
+  },
+  "0.7.0": {
+    "title": "Ainmneacha cainteoirí inathraithe agus seinnteoir fuaime amháin",
+    "notes": [
+      "Tar éis an imeachta is féidir na cainteoirí a athainmniú anois, chun na hainmneacha a aithnítear go huathoibríoch sa tras-scríbhinn a cheartú.",
+      "Mura bhfuil físeán inseinnte ag an taifeadadh, taispeánann an leathanach ceartúcháin seinnteoir fuaime amháin mar sin féin, ionas gur féidir éisteacht siar leis agus an téacs agus na cainteoirí a chur ina gceart.",
+      "Ceartúchán ar an taifeadadh ilrianach: gabhtar fíorfhuaim na rannpháirtithe cianda i gceart anois."
+    ]
+  },
+  "0.6.9": {
+    "title": "Iontaofacht na próiseála AI",
+    "notes": [
+      "Taispeánann an painéal riaracháin táscaire iontaofachta anois don phróiseáil AI a dhéantar tar éis an imeachta (tras-scríbhinn, achoimre, aistriúcháin), ionas gur léir ar an toirt an bhfuil an toradh iomlán agus iontaofa."
+    ]
+  },
+  "0.6.8": {
+    "title": "Leathanach eagarthóireachta iarimeachta níos soiléire",
+    "notes": [
+      "Míníonn an leathanach ceartúcháin (tras-scríbhinn, achoimre, aistriúcháin) anois cathain nach bhfuil an t-ábhar AI ar fáil go fóill — “próiseáil ar siúl” nó “tosaigh an phróiseáil ó na rialtáin thuas” — in ionad earráid dhearg a thaispeáint a d’fhágadh gur chosúil go raibh rud éigin briste.",
+      "Taispeántar sábháil theipthe i ndearg anois, mar aon leis an gcúis shonrach a thugann an freastalaí, in ionad í a thaispeáint i nglas amhail is dá n-éireodh léi.",
+      "Déantar idirdhealú anois idir seisiún riarthóra atá imithe in éag agus fadhbanna luchtaithe, agus teachtaireacht ar leith ag gach ceann acu in ionad aon earráid ghinearálta amháin.",
+      "Mura féidir fuaim an taifeadta a sheinm, cuireann an leathanach é sin in iúl, agus is féidir téacs agus cainteoir gach míre a cheartú mar sin féin."
+    ]
+  },
+  "0.6.7": {
+    "title": "Frithghníomhartha le feiceáil i gcónaí agus “Nótaí / Seicliosta”",
+    "notes": [
+      "Tá na frithghníomhartha (emoji) le feiceáil i gcónaí anois i mbarra ag bun an scáileáin ar chlé, seachas iad a bheith i bhfolach taobh thiar de chnaipe: is fusa iad a aimsiú agus a úsáid le linn an imeachta.",
+      "Tugtar “Nótaí / Seicliosta” ar an bhfeidhm a mbíodh “Clár Oibre” uirthi, chun a chur in iúl gur limistéar nótaí i bhfoirm seicliosta atá ann agus nach dtéann an t-ábhar sa chomhrá. Is féidir leis an modhnóir í a chumasú do gach imeacht i gcónaí."
+    ]
+  },
+  "0.6.6": {
+    "title": "Feabhsuithe: comhrá, comhaireamh agus rochtain",
+    "notes": [
+      "Tá na naisc a chomhroinntear sa chomhrá inchliceáilte anois agus osclaítear go sábháilte i gcluaisín nua iad; téacs simplí a bhí iontu roimhe seo.",
+      "Sa seomra, níl líon iomlán na ndaoine cláraithe le feiceáil ach ag modhnóirí anois: ní fheiceann rannpháirtithe ach líon na ndaoine atá i láthair i ndáiríre.",
+      "Rochtain níos tapúla ar an seomra: ullmhaítear an ceangal leis an bhfreastalaí físe agus tú fós sa seomra feithimh, rud a laghdaíonn an mhoill agus tú ag dul isteach.",
+      "I liosta na rannpháirtithe, fanann an ceanntásc leis an gcomhaireamh le feiceáil i gcónaí agus tú ag scrolláil síos tríd."
+    ]
+  },
+  "0.6.5": {
+    "title": "Taifeadtaí agus comhaireamh",
+    "notes": [
+      "Fágtar an taifeadán as an áireamh anois i líon na ndaoine atá sa seomra: ní thaispeántar ach fíordhaoine, agus ní an bot a ghabhann an fhuaim.",
+      "Iarléiriú: cnaipe nua “Gin le AI” chun tras-scríbhinn, achoimre agus aistriúchán a thosú ar thaifeadtaí fuaime amháin freisin, le rian ar leith do gach rannpháirtí. Roimhe seo ní bhíodh aon rialtán tosaithe ar fáil dóibh sin.",
+      "I liosta na rianta, cuirtear aitheantóir le hais gach leasainm: faigheann daoine éagsúla a bhfuil an leasainm céanna acu aitheantóirí ar leith, agus roinneann na cuir isteach éagsúla ón duine céanna aon aitheantóir amháin.",
+      "Teachtaireacht shoiléir nuair nach gcuirtear aon obair sa scuaine agus an phíblíne á tosú — mar go bhfuil AI díchumasaithe don imeacht nó an phíblíne ar sos — in ionad teachtaireacht bhréagach “d’éirigh leis an oibríocht”."
+    ]
+  },
+  "0.6.4": {
+    "title": "Slándáil aitheantais agus feabhsuithe ar an seomra",
+    "notes": [
+      "Ceartúchán slándála: má chomhroinneann tú do nasc pearsanta chun an seomra, téann an duine a osclaíonn é isteach faoina AINM FÉIN anois; roimhe seo, d’fhéadfadh sé ainm an duine a sheol an nasc a fháil le hoidhreacht.",
+      "Comhroinnt scáileáin níos géire: tugtar tús áite anois don taifeach (5 fhráma sa soicind ar ardchaighdeán) seachas don réidhe, sa chaoi go bhfanann sleamhnáin agus cáipéisí inléite nuair is beag gluaiseacht atá i gceist.",
+      "Baineadh an rogha “cuir d’íomhá féin i bhfolach”: nuair a chuirtí ar siúl í, ní bhíodh aon bhealach ann do thíl féin a thabhairt ar ais.",
+      "Rochtain riarthóra: tar éis duit logáil isteach arís i ndiaidh tréimhse neamhghníomhaíochta, nuashonraítear an leathanach i gceart — níl leathanach ann a thuilleadh a bhfuil cuma air go bhfuil sé sáinnithe go dtí go n-athlódálann tú de láimh é."
+    ]
+  },
+  "0.6.3": {
+    "title": "Feabhsuithe ar sheomra an imeachta — babhta 2",
+    "notes": [
+      "Tá amadóir an chur i láthair suite i mbarra rialtán an mhodhnóra anois, gan líne ar leith a thógáil; ní thaispeántar barra an chomhairimh síos ach nuair atá an t-amadóir ar siúl.",
+      "Taispeántar fíorainm an duine a scríobhann sa chomhrá anois, in ionad “Modhnóir” ginearálta.",
+      "Tá painéal dá chuid féin ag an gcomhrá sa bharra taoibh anois, in ionad é a bheith ag forluí ar an ábhar eile i gcónaí: comhéadan níos glaine, agus áiritheoir teachtaireachtaí neamhléite ar an gcluaisín.",
+      "Cnaipe nua “Clár Bán” do mhodhnóirí, chun an clár bán comhroinnte a oscailt díreach ó bharra na rialtán.",
+      "Tá an dath ceart ar an gcnaipe “Comhroinn” anois, sa chaoi nach féidir é a mheascadh suas leis an gcnaipe “Fág”; tá deilbhíní le hais na nasc; agus tá nasc na modhnóireachta, nach bhfeiceann ach modhnóirí, taobh thiar de rabhadh, ionas gur féidir cuireadh a thabhairt do mhodhnóirí eile gan dul amú.",
+      "Níl an scamall focal ar siúl de réir réamhshocraithe a thuilleadh: is féidir leis an modhnóir é a chumasú le linn an imeachta más mian leis."
+    ]
+  },
+  "0.6.2": {
+    "title": "Feabhsuithe ar sheomra beo an imeachta",
+    "notes": [
+      "Fanann barra na rialtán (micreafón, ceamara, comhroinnt scáileáin) le feiceáil agus inchliceáilte i gcónaí: ar lánscáileán, agus duine éigin ag comhroinnt a scáileáin, agus nuair atá tú i d’aonar sa seomra.",
+      "Is féidir leis an modhnóir na feidhmeanna beo (Ceisteanna, Comhrá, Clár Oibre) a chumasú agus a dhíchumasú arís le linn an imeachta.",
+      "Is féidir na rialtáin fuaime agus físe a úsáid agus an seomra fós á ullmhú, gan fanacht go dtosóidh an freastalaí físe.",
+      "Taispeánann an liosta “Lámha in airde” i gceart cé a d’iarr cead labhartha.",
+      "Cnaipe nua “Comhroinn” sa seomra: cóipeálann sé an nasc rannpháirtíochta agus nasc leathanach an imeachta d’aon chlic amháin, gan sonraí rochtana príobháideacha a nochtadh.",
+      "Tá branda PA Webinar le feiceáil arís i mbarra uachtarach sheomra an imeachta."
+    ]
+  },
+  "0.6.1": {
+    "title": "Loga athruithe poiblí agus nuashonruithe slándála",
+    "notes": [
+      "Leathanach nua poiblí ina bhfuil loga na n-athruithe, ar féidir teacht air trí chliceáil ar uimhir an leagain i mbun an leathanaigh: liostaítear ann gach leagan den ardán mar aon leis na príomhathruithe a tháinig leis.",
+      "Nuashonruithe slándála ar na spleáchais (undici, nodemailer) agus daingniú na píblíne tógála, lena n-áirítear scanadh leochaileachtaí."
+    ]
+  },
+  "0.6.0": {
+    "title": "Sreabhadh oibre iarimeachta agus seomra feithimh idirghníomhach",
+    "notes": [
+      "Sreabhadh oibre nua ag deireadh imeachta: nuair a chríochnaíonn an t-imeacht, iarrtar ar an modhnóir a roghnú cá rachaidh an taifeadadh — foilsithe ar leathanach an imeachta, sa leabharlann, nó sa chartlann amháin.",
+      "Achoimre uathoibríoch gan ainmneacha ar an imeacht — tinreamh, na ceisteanna is mó a fuair vótaí, torthaí na bpobalbhreitheanna, an scamall focal agus na rátálacha — a thaispeántar ar leathanach gach imeachta atá thart, fiú mura bhfuil taifeadadh ann.",
+      "Ríomhphost achoimre a sheoltar chuig na rannpháirtithe tar éis an imeachta, mar aon le hábhar an imeachta.",
+      "Seomra feithimh idirghníomhach “Piazza Digitale”: siúlann tú le d’abhatár chomh fada leis an ngeata chun dul isteach sa ghlao, agus an gnáthchnaipe iontrála ar fáil in aice leis i gcónaí.",
+      "Tá rannóg dá cuid féin ag an scamall focal ar leathanach imeachta atá thart, agus is féidir leis an riarthóir a rogha a dhéanamh í a thaispeáint nó a cheilt.",
+      "Clár bán comhroinnte ar féidir é a chumasú d’imeachtaí aonair agus ó theimpléid.",
+      "Athdhearadh ar dhraoi cruthaithe na n-imeachtaí: roghanna casta fillte, príomh-mhodhnóir agus a nasc, rabhaidh faoi shonraí pearsanta, dréachtaí a shábháil agus láimhseáil níos fearr ar earráidí páirteacha.",
+      "Tréimhsí coinneála ar leith do na taifeadtaí agus do na rianta fuaime a bhaineann le gach cainteoir, bunaithe ar an gcomhartha “físeán foilsithe”, mar aon le glanadh GDPR ar theachtaireachtaí an chomhrá."
+    ]
+  },
+  "0.5.11": {
+    "title": "Feabhsuithe ar an modhnú, ar dhúnadh na nglaonna agus ar an bhfuaim",
+    "notes": [
+      "Taispeántar fíorainmneacha na modhnóirí anois in ionad “Modhnóir” ginearálta.",
+      "Taispeántar scáileán deiridh san fheidhmchlár nuair a chríochnaíonn an t-imeacht, in ionad na teachtaireachta míthreoraí “Seomra á ullmhú”.",
+      "Ceartaíodh forluí na ndeilbhíní sa seomra feithimh.",
+      "Cuireadh díbhrú an torainn as feidhm tríd an IFrame API chun fadhbanna fuaime a réiteach."
+    ]
+  },
+  "0.5.9": {
+    "title": "Taifeadadh ilrianach cobhsaí, aiseolas le réaltaí agus feidhmíocht",
+    "notes": [
+      "Rinneadh an taifeadadh do gach cainteoir (ilrianach) iontaofa ó thús deireadh: fuaim iomlán ar gach rian, gan aon ghearradh, agus uaslódálacha comhthreomhara.",
+      "Ceistneoir aiseolais le rátáil réaltaí tar éis an imeachta, mar aon le painéal achoimre don riarthóir.",
+      "Feabhsuithe feidhmíochta: an codec VP9 don cheamara, luchtú leisciúil ar ghléasanna soghluaiste agus tiúnadh an taifeadáin.",
+      "Crúca Helm i ndiaidh uasghrádaithe a athlódálann config.js Jitsi go huathoibríoch."
+    ]
+  },
+  "0.5.8": {
+    "title": "Cáilíocht físe agus fuaime inchumraithe agus sreabhadh nua iontrála",
+    "notes": [
+      "Is féidir leis an riarthóir cáilíocht na físe agus na fuaime a chumrú, le réamhshocruithe do gach imeacht.",
+      "Athdhearadh ar an sreabhadh iontrála: clárú, ansin an seomra feithimh, ansin an físghlao.",
+      "Taispeánann na lámha in airde fíorainm gach rannpháirtí."
+    ]
+  },
+  "0.5.6": {
+    "title": "Seomra feithimh inchumraithe agus íomhánna clúdaigh d’imeachtaí",
+    "notes": [
+      "Is féidir cur i láthair an tseomra feithimh a chumrú — cluiche, gairdín nó an gnáthstíl — don suíomh ar fad agus d’imeachtaí aonair.",
+      "Íomhánna clúdaigh ar leathanach an imeachta agus i mionsamhlacha na gcártaí.",
+      "Freastalaítear ar chomhaid uaslódáilte trí bhealach tiomnaithe, le URLanna sínithe a théann in éag go tapa.",
+      "Cnaipe “Téigh isteach anois” ar fáil láithreach tar éis an chláraithe.",
+      "Rannóg riaracháin aontaithe chun próiseáil AI na dtaifeadtaí a bhainistiú, agus gabháil ilrianach níos daingne."
+    ]
+  },
+  "0.5.2": {
+    "title": "Ullmhúchán imeachtaí agus feabhsuithe",
+    "notes": [
+      "Clár oibre le haontú nó easaontú, agus ceartúcháin ar na ceadanna a fhaightear le hoidhreacht ó theimpléid.",
+      "Fíorainmneacha in ionad “SPEAKER_00” sna hachoimrí agus sna fotheidil.",
+      "Sraith deisiúchán práinneach (v0.5.2–v0.5.5) mar ullmhúchán d’imeachtaí poiblí."
+    ]
+  },
+  "0.5.1": {
+    "title": "Leathanach baile dírithe ar an bpobal agus cartlann ilrianach",
+    "notes": [
+      "Athdhearadh ar an leathanach baile agus tús áite ag an bpobal, le sáruithe aistriúcháin is féidir a chur i bhfeidhm ag am rite agus le hinrochtaineacht de réir chaighdeáin AgID.",
+      "Cartlann MKV ilrianach le seinnteoir chun éisteacht siar le gach cainteoir ar leith.",
+      "Ailíniú na rianta ilrianacha le meascán Jibri trí thraschomhghaolú."
+    ]
+  },
+  "0.5.0": {
+    "title": "Iarléiriú AI agus taifeadadh ilrianach",
+    "notes": [
+      "Píblíne iarléirithe AI: tras-scríbhinn, achoimrí, fotheidil, aistriúcháin agus athghuthú ilghutha (sintéiseach i gcónaí), agus bunús na samhlacha á rianú.",
+      "Taifeadadh ilrianach, rian amháin do gach cainteoir, le sannadh cainteoirí agus ainmniú uathoibríoch (ADR-013).",
+      "Leabharlann físeán poiblí agus leathanach bainistíochta iarimeachta don riarthóir.",
+      "Eagarthóir tras-scríbhinne tar éis an imeachta, chun an téacs a cheartú agus na cainteoirí a athshannadh.",
+      "Athchóiriú ar chomhéadan an riaracháin: fógraí agus boscaí dialóige .italia in ionad foláirimh dhúchasacha an bhrabhsálaí, scáileáin shealadacha luchtaithe, agus comharthaí dearaidh do na dathanna in ionad na gcéadta luach heicsidheachúlach crua-chódaithe.",
+      "Toiliú ó gach rannpháirtí don taifeadadh ilrianach (GDPR) agus easpórtáil sonraí faoi Airteagal 15 leathnaithe."
+    ]
+  },
+  "0.4.0": {
+    "title": "Rannpháirtíocht agus saolré",
+    "notes": [
+      "Feidhmeanna nua beo: scamall focal, amadóir cur i láthair, áiritheoir frithghníomhartha, rialtáin bheo ar stíl Meet agus painéal do na lámha in airde.",
+      "Saolré na dtaifeadtaí, ó thaifeadadh sealadach go dtí taifeadadh foilsithe, le bainistíocht ag an riarthóir (réamhamharc, foilsiú, scriosadh) agus tréimhsí coinneála ar leith.",
+      "Leathanach iarimeachta le cluaisíní (taifeadadh, cartlann Q&A, pobalbhreitheanna, aiseolas, ábhair), agus rialú ar a bhfoilsítear agus ar cathain.",
+      "Draoi cruthaithe imeachtaí i gcúig chéim, tacsanomaíocht clibeanna, eolaire teagmhálaithe agus ceannlíne eagarthóireachta os cionn na dteideal.",
+      "Leabharlann físeán poiblí ag /video-library agus leathanach trédhearcachta ag /service-inventory (CycloneDX 1.6 do gach tionónta).",
+      "Uathscálú JVB i dhá chéim, le seatanna Redis a bheathaíonn an leathanach stádais.",
+      "Glanadh GDPR i dtrí chéim: sonraí pearsanta a bhaint láithreach, ábhar a bhaint nuair a chríochnaíonn a thréimhse coinneála, agus scriosadh buan ina dhiaidh sin."
+    ]
+  },
+  "0.3.0": {
+    "title": "Ardán inchumraithe agus bonneagar",
+    "notes": [
+      "Socruithe suímh a chuireann ar chumas comhlachtaí poiblí eile an t-ardán a athúsáid — brandáil, dathanna, favicon, SEO, bun an leathanaigh, mód an leathanaigh bhaile, leathanaigh phríobháideachta agus inrochtaineachta — gan é a atógáil.",
+      "Painéal anailísíochta agus painéal riaracháin don bhonneagar.",
+      "Trí mhód imscartha Helm (simple, standard, full) agus JVB a scálaíonn síos go nialas ar linn nód thiomnaithe.",
+      "Píblíne Jibri il-néil (Azure Blob, S3, GCS, MinIO nó stóráil áitiúil) agus comhartha uisce Jitsi inchumraithe.",
+      "OpenSSF Scorecard, Dependabot, SBOM na spleáchas, láimhseáil earráidí lárnaithe, teorannú rátaí agus breis is 210 tástáil aonaid.",
+      "Go leor eisiúintí incriminteacha (v0.3.8–v0.3.45) i ndiaidh an aiseolais a fuarthas tar éis an taispeántais."
+    ]
+  },
+  "0.2.0": {
+    "title": "Aiseolas ón DTD",
+    "notes": [
+      "Sonraí próifíle a bhailiú ó rannpháirtithe agus iad ag clárú (eagraíocht, ról, catagóir), inchumraithe do gach imeacht, le heaspórtáil CSV agus staitisticí comhiomlánaithe.",
+      "Meabhrúcháin inchumraithe, le tréimhsí éagsúla roimh ré agus ríomhphost ar leith do gach ceann acu.",
+      "Pobalbhreitheanna le torthaí fíor-ama agus easpórtáil CSV.",
+      "Feabhsuithe GDPR: polasaí príobháideachta do gach imeacht, toilithe mionsonraithe, loga iniúchta na scriosadh agus easpórtáil sonraí faoi Airteagal 15.",
+      "Comhdhlúthú na ról Modhnóra agus Iniúchóra, agus iniúchadh ar cheadúnais na spleáchas."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP — an chéad leagan",
+    "notes": [
+      "Ardán poiblí d’imeachtaí digiteacha, tógtha ar chóras dearaidh .italia (Bootstrap Italia, design-react-kit).",
+      "Seomra beo le Jitsi Meet (IFrame API, fíordheimhniú JWT) agus na róil á bhfeidhmiú ar an bhfreastalaí.",
+      "Clárú rannpháirtithe a chomhlíonann GDPR, agus na sonraí pearsanta criptithe (AES-256-GCM).",
+      "Q&A le vótáil agus modhnú, agus seomra feithimh le comhaireamh síos agus rochtain do chuairteoirí.",
+      "Ríomhphoist deimhnithe agus meabhrúcháin, agus comhtháthú le féilirí (Google, Outlook, Yahoo, iCal).",
+      "Painéal riaracháin le fíordheimhniú trí eochair API, glanadh GDPR agus méadrachtaí Prometheus.",
+      "Cairt Helm ar chaighdeán táirgthe, íomhánna Docker gan phribhléidí fréimhe agus inléite amháin, CI/CD le GitHub Actions, agus publiccode.yml."
+    ]
+  }
+}

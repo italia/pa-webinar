@@ -164,6 +164,13 @@ interface WaitingRoomProps {
    *  dato che il gate protegge. Evita il doppio consenso e riabilita il
    *  minigioco. */
   multitrackConsentExempt?: boolean;
+  /** Token dell'utente (moderatore/iscritto) da usare per leggere e scrivere in
+   *  chat durante l'attesa. Vuoto per un ospite senza credenziali. */
+  chatToken?: string;
+  /** Serve a sapere se la chat è leggibile prima del LIVE: le call INSTANT sono
+   *  aperte per link e ammettono ospiti già durante il warm-up, un evento
+   *  schedulato no (vedi lib/chat/read-access). */
+  eventType?: 'SCHEDULED' | 'INSTANT';
 }
 
 const PARTICIPANT_NAME_KEY = 'pawebinar.participant.name';
@@ -187,6 +194,8 @@ export default function WaitingRoom({
   warmup = null,
   exitHref,
   multitrackConsentExempt = false,
+  chatToken = '',
+  eventType = 'SCHEDULED',
 }: WaitingRoomProps) {
   const t = useTranslations('waiting');
   const tc = useTranslations('common');
@@ -301,7 +310,14 @@ export default function WaitingRoom({
   // La chat è app-side e NON dipende dal bridge: mentre la sala si scalda
   // (IDLE/PROVISIONING) chi aspetta può già chiacchierare — è la differenza
   // tra un'attesa cieca e una sala d'attesa vera.
-  const showChatPreview = (isLive || isWarmingUp) && (event.chatEnabled ?? true);
+  // La chat è leggibile prima del LIVE solo da chi ha un token (moderatore o
+  // iscritto) oppure, senza token, nelle call INSTANT — le stesse condizioni
+  // che il server applica in lettura E in scrittura (lib/chat/read-access).
+  // Mostrarla anche agli altri significherebbe un riquadro vuoto e permanente:
+  // né i messaggi né l'invio funzionerebbero.
+  const canReadChatNow = isLive || !!chatToken || eventType === 'INSTANT';
+  const showChatPreview =
+    (isLive || isWarmingUp) && (event.chatEnabled ?? true) && canReadChatNow;
   // Only LIVE events admit participants into the room. Moderators in
   // PUBLISHED past startsAt get a separate "Avvia evento" action that
   // flips the status to LIVE; once that happens this flag re-opens.
@@ -678,7 +694,12 @@ export default function WaitingRoom({
       </div>
       {nameValid ? (
         <div style={{ height: 220, display: 'flex', flexDirection: 'column' }}>
-          <ChatPanel eventSlug={event.slug} token="" displayName={trimmedName} isGuest />
+          <ChatPanel
+            eventSlug={event.slug}
+            token={chatToken}
+            displayName={trimmedName}
+            isGuest={!chatToken}
+          />
         </div>
       ) : (
         <div

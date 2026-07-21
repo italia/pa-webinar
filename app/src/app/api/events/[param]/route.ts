@@ -388,6 +388,10 @@ export const PUT = withErrorHandling(async (request, context) => {
           data.joinPassword.length > 0 ? hashJoinPassword(data.joinPassword) : null,
       }),
       ...(data.youtubeUrl !== undefined && { youtubeUrl: data.youtubeUrl }),
+      // The wizard sends the cadence back on every save; it used to be accepted
+      // by the schema and then dropped here, so editing an event silently wiped
+      // its recurrence (docs/ROADMAP.md, "Eventi ricorrenti / serie").
+      ...(data.recurrenceRule !== undefined && { recurrenceRule: data.recurrenceRule }),
       ...(data.libraryListed !== undefined && { libraryListed: data.libraryListed }),
       ...(data.coverImageUrl !== undefined && { coverImageUrl: data.coverImageUrl }),
       ...(data.parseTitleKicker !== undefined && {

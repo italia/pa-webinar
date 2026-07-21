@@ -57,13 +57,15 @@ RUN set -eu; \
 #
 # The emoji are pure decoration: nothing in them is clickable, so disabling
 # pointer events costs no behaviour. Appending (rather than sed-ing a rule we do
-# not control) survives upstream CSS reshuffles; the guard keeps it idempotent
-# and fails loudly if the target file ever moves.
+# not control) survives upstream CSS reshuffles. The guards are fail-loud, not
+# idempotent-retry: a marker already present means the base image is not the
+# pristine upstream one we think it is, and appending a second copy would hide
+# that — so the build stops instead.
 RUN set -eu; \
     C=/usr/share/jitsi-meet/css/all.css; \
     [ -f "$C" ] || { echo "FATAL: $C not found (base image layout changed?)"; exit 1; }; \
     grep -qF 'pa-webinar reactions overlay' "$C" && { echo "FATAL: patch already present"; exit 1; }; \
     grep -qF '.reactions-animations-container' "$C" || { echo "FATAL: .reactions-animations-container missing from $C (reactions UI changed?)"; exit 1; }; \
     printf '\n/* pa-webinar reactions overlay: flying emoji must never intercept toolbar clicks (feedback #3) */\n.reactions-animations-container,.reactions-animations-container *{pointer-events:none!important}\n' >> "$C"; \
-    tail -c 200 "$C"; \
+    grep -qF 'pa-webinar reactions overlay' "$C" || { echo "FATAL: append did not land in $C"; exit 1; }; \
     echo "OK: reaction emoji overlay set to pointer-events:none"

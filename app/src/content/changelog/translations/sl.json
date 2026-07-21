@@ -1,0 +1,308 @@
+{
+  "0.8.3": {
+    "title": "Zasebnost klepeta, pravilno število udeležencev in znova delujoče moderiranje",
+    "notes": [
+      "Zgodovine klepeta ne more več brati nekdo, ki se dogodka ne udeležuje. Doslej je lahko vsakdo, ki je poznal spletni naslov dogodka, prenesel njegova sporočila – skupaj z imeni tistih, ki so jih napisali –, tudi po koncu dogodka. Za dostop je zdaj treba biti prijavljen na dogodek, biti moderator ali biti v sobi med samim dogodkom.",
+      "Število udeležencev, prikazano v sobi, je bilo napačno za eno osebo, saj posameznik ni štel sebe. Ista napaka se je prenesla tudi v statistiko dogodka (največje število hkratnih udeležencev). Zdaj je število pravilno in se ujema s tistim, ki je zabeleženo v statistiki.",
+      "Moderatorski ukazi na seznamu udeležencev spet delujejo: odstranitev udeleženca iz sobe in nastavitev glasnosti posameznika prej nista imeli nobenega učinka.",
+      "Reakcije so zdaj na voljo tudi na pametnih telefonih, kjer gumba za pošiljanje ni bilo več. Emodžiji, ki letijo čez zaslon, ne prestrezajo več klikov na orodni vrstici.",
+      "V celozaslonskem načinu so pogovorna okna – deljenje povezave in za moderatorje »Zapusti sobo« – spet vidna: prej so ostajala skrita za sliko, zato je bilo videti, kot da gumbi ne delujejo.",
+      "Predloge dogodkov imajo zdaj klepet privzeto vklopljen, skladno s samo sobo: ob ustvarjanju dogodka iz predloge »Webinar« je prej nastal dogodek brez klepeta.",
+      "Angleški prevod vmesnika je dokončan; manjkalo je nekaj postavk, med njimi celotno okno »Deli«."
+    ]
+  },
+  "0.8.2": {
+    "title": "Nobena prazna soba ne ostane odprta po predvidenem koncu",
+    "notes": [
+      "Soba, ki je ostala odprta po predvidenem koncu dogodka in se je nato izpraznila, je ostala dejavna za nedoločen čas in po nepotrebnem zasedala vire za video. Zdaj se zapre, ko je 45 minut prazna po predvidenem času konca. Soba, v kateri so še ljudje, se nikoli ne prekine: po predvidenem koncu se prikaže le obvestilo, nikogar pa sistem ne odklopi."
+    ]
+  },
+  "0.8.1": {
+    "title": "Nastavljive reakcije, zapiranje praznih sob in varnejši skrbniški del",
+    "notes": [
+      "Reakcije z emodžiji lahko zdaj nastavi skrbnik. Privzeto so v rabi izvorne reakcije Jitsi, dosegljive kar v orodni vrstici (nezahtevne in kratkotrajne). Namesto njih je mogoče vklopiti lastne reakcije platforme, prikazane v vrstici spodaj levo, ki se štejejo v statistiko dogodka.",
+      "Nova skrbniška možnost: samodejno zapiranje sobe, ki ostane povsem prazna, tudi brez moderatorja, kar pomeni, da je dogodek opuščen. Privzeto je izklopljena – nedejavnost brez navzočega moderatorja je že varno urejena, saj soba po 45 minutah preide v mirovanje – vklopite pa jo lahko v nastavitvah.",
+      "Varnejši skrbniški del: ob poteku seje vas sistem vrne na prijavni zaslon, zato skrbniških strani po poteku ni več mogoče uporabljati. Seja hkrati traja dlje in se med delom samodejno podaljšuje."
+    ]
+  },
+  "0.8.0": {
+    "title": "Preglednejša soba v živo: klepet, reakcije, celozaslonski način in prijava na dogodek",
+    "notes": [
+      "Klepet: v sporočila lahko zdaj vstavljate emodžije s posebnim izbirnikom, majhen kazalnik pa opozori, če se posodabljanje klepeta upočasni. Poslana sporočila se prikažejo takoj, tudi v poslovnih omrežjih, ki zadržujejo sprotne posodobitve.",
+      "Celozaslonski način: gumb za celozaslonski način zdaj ohrani klepet viden ob strani, namesto da bi ga skril.",
+      "Reakcije z emodžiji ne prekrivajo več ukazov na dnu zaslona: orodna vrstica ostaja ves čas odzivna na klike, tudi v mozaičnem pogledu.",
+      "Gumba »Deli« in »Zapusti sobo« sta zdaj jasno vidna in privzeto obarvana (izhod je rdeč), ne šele ob prehodu z miško.",
+      "Bota »Recorder«, ki skrbi za snemanje, ni več na seznamu udeležencev in se ne šteje med navzoče.",
+      "Prijava na dogodek: če se prijavite precej vnaprej, vas sistem pripelje na potrditveno stran s povezavo za dodajanje dogodka v koledar, in ne v čakalnico; tik pred začetkom vstopite naravnost v sobo. Na strani dogodka je zdaj razvidno tudi, ali ste že prijavljeni.",
+      "Klepet je zdaj glavni način sodelovanja v sobi. Izboljšana sta tudi samodejno zapiranje dogodka, ki ostane prazen, in štetje udeležencev v statistiki."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderator lahko spusti dvignjeno roko",
+    "notes": [
+      "V vrsti dvignjenih rok ima moderator zdaj gumb, s katerim spusti roko posameznega udeleženca – kar je uporabno, kadar je nekdo že govoril ali je roko po pomoti pustil dvignjeno. Zahteva doseže tistega udeleženca, ki vidi, da se njegova roka spusti; na druge to ne vpliva."
+    ]
+  },
+  "0.7.7": {
+    "title": "Manj šuma iz ozadja, ko govorite",
+    "notes": [
+      "Ko prevzamete besedo, se vklopi napredno odpravljanje šuma iz ozadja: bolje zaduši zvoke, kot so tipkanje, ventilatorji ali promet, poleg osnovnega odpravljanja šuma, ki je bilo na voljo že doslej."
+    ]
+  },
+  "0.7.6": {
+    "title": "Glasnost za vsakega udeleženca posebej",
+    "notes": [
+      "Nova nastavitev glasnosti za vsakega udeleženca posebej v podoknu »Udeleženci«: če je kdo preglasen ali pretih, ga prilagodite samo zase, ne da bi spremenili zvok za druge.",
+      "Ločeno snemanje zvoka za vsakega udeleženca, ki se uporablja pri poprodukciji, je zanesljivejše: če je zajem nem, sistem to takoj zazna in ne ustvari praznih prepisov."
+    ]
+  },
+  "0.7.5": {
+    "title": "Dvignjena roka ostane dvignjena",
+    "notes": [
+      "Ko dvignete roko, ta zdaj ostane dvignjena, dokler je ne spustite sami ali dokler je ne obravnava moderator. Prej se je spustila sama v trenutku, ko ste začeli govoriti, zato ste izginili iz vrste za besedo."
+    ]
+  },
+  "0.7.4": {
+    "title": "Zaščita imena v klepetu pri posredovanih povezavah (varnost)",
+    "notes": [
+      "V klepetu se pravo ime prijavljene osebe pokaže samo na napravi, s katere se je prijavila: kdor odpre posredovano povezavo za vstop, zdaj sodeluje pod imenom, ki ga vpiše sam, in ne pod imenom prvotno prijavljene osebe. S tem je odpravljeno napačno pripisovanje sporočil.",
+      "Enako velja za priponke: datoteka, poslana prek posredovane povezave, se ne pripiše več imenu prvotno prijavljene osebe.",
+      "Kdor se pridruži z druge naprave, na primer s telefona, ali s povezavo, prejeto vnaprej, lahko še naprej brez motenj sodeluje, piše v klepetu in pošilja priponke: spremeni se le prikazano ime, ki je odslej tisto, vpisano ob vstopu."
+    ]
+  },
+  "0.7.3": {
+    "title": "Pravilno štetje navzočih, reakcije na sredini in izboljšave sobe",
+    "notes": [
+      "Štetje navzočih ne podvaja več iste osebe, ki izstopi in znova vstopi – na primer z gumbom »Nazaj« v brskalniku –: podvojene povezave iste osebe se štejejo enkrat. Na seznamu udeležencev so še naprej prikazane vse povezave, tako da moderator vedno vidi vse in jih lahko upravlja.",
+      "Vrstica z reakcijami je zdaj na sredini spodaj, dobro vidna in lahko dostopna, in ne več v spodnjem levem kotu.",
+      "Število prijavljenih ni več javno prikazano na strani dogodka in na seznamu dogodkov; ostaja vidno skrbnikom v skrbniški plošči. Med prenosom v živo občinstvo vidi le število navzočih.",
+      "Odpravljanje šuma iz ozadja je samodejno vklopljeno na vseh mikrofonih: osnovna obdelava zvoka – odmev in šum – je vedno vklopljena, ročno vklapljanje ni potrebno.",
+      "Vstop v sobo je nekoliko hitrejši: videosistem se začne prebujati že ob kliku na gumb za vstop."
+    ]
+  },
+  "0.7.2": {
+    "title": "Bogatejši klepet: priponke, odgovori in omembe",
+    "notes": [
+      "V klepetu je zdaj mogoče pošiljati slike in priponke (PNG, JPEG, WebP, GIF in PDF, do 10 MB), s predogledom kar v sporočilu.",
+      "Nova možnost »Odgovori«: navedete lahko določeno sporočilo, navedek pa ostane viden v poteku pogovora.",
+      "Omembe z znakom @: udeleženca lahko po imenu nagovorite znotraj sporočila.",
+      "Moderiranje klepeta: moderatorji lahko med dogodkom odstranijo posamezna sporočila."
+    ]
+  },
+  "0.7.1": {
+    "title": "Statistika po dogodku za vsak dogodek",
+    "notes": [
+      "Nov zavihek »Statistika« za vsak dogodek v skrbniški plošči, na voljo tudi za dogodke brez prijav in za dogodke brez videoposnetka: prikaže potek videosrečanja, kdo je govoril največ, splošno raven sodelovanja in ključne kazalnike.",
+      "Grafikon poteka sodelovanja skozi čas – klepet, vprašanja, glasovi za vprašanja, ankete, besede iz oblaka besed in reakcije – s poudarjenim vrhuncem videosrečanja.",
+      "Lestvica tistih, ki so govorili najdlje (minute na osebo), z razmerjem med prispevki ter s številom reakcij in dvigov rok.",
+      "Nova ocena povprečnega časa, ki ga udeleženci preživijo v sobi in ki se upošteva tudi pri izračunu skupne ravni pozornosti."
+    ]
+  },
+  "0.7.0": {
+    "title": "Urejanje imen govorcev in predvajalnik samo za zvok",
+    "notes": [
+      "Po dogodku je zdaj mogoče preimenovati govorce in tako popraviti imena, ki jih je sistem samodejno prepoznal v prepisu.",
+      "Če posnetek nima predvajljive slike, stran za urejanje kljub temu ponudi predvajalnik samo za zvok, tako da lahko posnetek poslušate ter popravite besedilo in imena govorcev.",
+      "Popravek večslednega snemanja: zdaj se pravilno zajame dejanski zvok oddaljenih udeležencev."
+    ]
+  },
+  "0.6.9": {
+    "title": "Zanesljivost obdelave z umetno inteligenco",
+    "notes": [
+      "Skrbniška plošča zdaj prikazuje kazalnik zanesljivosti obdelave z umetno inteligenco po dogodku (prepis, povzetki, prevodi), tako da je na prvi pogled razvidno, ali je rezultat popoln in verodostojen."
+    ]
+  },
+  "0.6.8": {
+    "title": "Preglednejša stran za urejanje po dogodku",
+    "notes": [
+      "Stran za urejanje prepisa, povzetkov in prevodov zdaj pojasni, kadar vsebine, ustvarjene z umetno inteligenco, še niso na voljo – »obdelava poteka« ali »obdelavo zaženite z ukazi na vrhu« –, namesto da bi prikazala rdeče sporočilo o napaki, ki je bilo videti kot okvara.",
+      "Neuspešno shranjevanje je zdaj prikazano rdeče in navede natančen razlog, ki ga sporoči strežnik, namesto da bi bilo prikazano zeleno, kot da je uspelo.",
+      "Potekla skrbniška seja in težave pri nalaganju so zdaj ločeni z lastnimi sporočili, ne več z eno samo splošno napako.",
+      "Če zvoka posnetka ni mogoče predvajati, stran na to opozori, popravljanje besedila in govorcev pri posameznih odsekih pa je še vedno mogoče."
+    ]
+  },
+  "0.6.7": {
+    "title": "Vedno vidne reakcije in »Zapiski / Kontrolni seznam«",
+    "notes": [
+      "Reakcije z emodžiji so zdaj vedno vidne v vrstici spodaj levo in ne več skrite za gumbom: lažje jih je najti in uporabiti med dogodkom.",
+      "Funkcija »Agenda« se zdaj imenuje »Zapiski / Kontrolni seznam«, da je jasno, da gre za prostor za zapiske v obliki kontrolnega seznama, katerih vsebina ne gre v klepet. Moderator jo lahko še naprej vklopi za vsak dogodek posebej."
+    ]
+  },
+  "0.6.6": {
+    "title": "Izboljšave: klepet, števila in vstop",
+    "notes": [
+      "Povezave, deljene v klepetu, je zdaj mogoče klikniti in se varno odprejo v novem zavihku; prej so bile navadno besedilo.",
+      "V sobi je skupno število prijavljenih zdaj vidno samo moderatorjem: udeleženci vidijo le, koliko ljudi je dejansko navzočih.",
+      "Hitrejši vstop v sobo: povezava z videostrežnikom se pripravi že med čakanjem v čakalnici, zato je čakanje ob vstopu krajše.",
+      "Na seznamu udeležencev glava s številom ostane vidna tudi med pomikanjem po seznamu."
+    ]
+  },
+  "0.6.5": {
+    "title": "Posnetki in števila",
+    "notes": [
+      "Število navzočih v sobi zdaj ne vključuje snemalnika: prikazuje samo resnične osebe, ne bota, ki zajema zvok.",
+      "Poprodukcija: nov gumb »Ustvari z umetno inteligenco« zažene prepis, povzetek in prevod tudi pri posnetkih samo z zvokom (ena sled za vsakega udeleženca), ki doslej niso ponujali nobenega ukaza za zagon.",
+      "Na seznamu sledi je vsakemu vzdevku pripisan identifikator: različne osebe z istim vzdevkom dobijo različne identifikatorje, več prispevkov iste osebe pa si deli istega.",
+      "Jasno sporočilo, kadar zagon obdelave ne uvrsti v vrsto nobenega opravila (ker je umetna inteligenca za dogodek izklopljena ali je obdelava zaustavljena), namesto lažnega sporočila »opravilo je uspelo«."
+    ]
+  },
+  "0.6.4": {
+    "title": "Varnost identitete in izboljšave sobe",
+    "notes": [
+      "Varnostni popravek: kdor odpre vašo osebno povezavo do sobe, ki ste jo delili, zdaj vstopi pod SVOJIM imenom; prej je lahko prevzel ime osebe, ki je povezavo poslala.",
+      "Ostrejše deljenje zaslona: zdaj ima prednost ločljivost (5 sličic na sekundo v visoki kakovosti) pred tekočostjo, tako da prosojnice in dokumenti ostanejo berljivi tudi, kadar je gibanja malo.",
+      "Odstranjena je možnost »skrij svojo sliko«: ko je bila enkrat vklopljena, svojega okenca ni bilo mogoče več prikazati nazaj.",
+      "Skrbniški dostop: po ponovni prijavi zaradi nedejavnosti se stran pravilno osveži – ni več videti, kot da je obtičala, dokler je ročno ne naložite znova."
+    ]
+  },
+  "0.6.3": {
+    "title": "Izboljšave sobe dogodka – drugi krog",
+    "notes": [
+      "Časovnik za predstavitev je zdaj vgrajen v moderatorjevo orodno vrstico in ne zaseda več lastne vrstice; vrstica z odštevanjem se pokaže le, kadar časovnik teče.",
+      "V klepetu je zdaj prikazano pravo ime tistega, ki piše, in ne več splošno »Moderator«.",
+      "Klepet je postal samostojno podokno v stranski vrstici in ne prekriva več drugih vsebin: vmesnik je preglednejši, na zavihku pa je števec neprebranih sporočil.",
+      "Nov gumb »Tabla« moderatorjem omogoča, da skupno tablo odprejo kar iz orodne vrstice.",
+      "Gumb »Deli« ima zdaj pravo barvo, tako da ga ni več mogoče zamenjati z »Zapusti«; ob povezavah so ikone; moderatorska povezava, ki jo vidijo samo moderatorji, pa je skrita za opozorilom, tako da je druge moderatorje mogoče povabiti brez pomot.",
+      "Oblak besed ni več privzeto vklopljen: moderator ga lahko po želji vklopi med dogodkom."
+    ]
+  },
+  "0.6.2": {
+    "title": "Izboljšave sobe med dogodkom v živo",
+    "notes": [
+      "Orodna vrstica (mikrofon, kamera, deljenje zaslona) ostaja vedno vidna in odzivna na klike: v celozaslonskem načinu, med deljenjem zaslona in kadar ste v sobi sami.",
+      "Moderator lahko med dogodkom spet vklaplja in izklaplja funkcije v živo (Vprašanja, Klepet, Agenda).",
+      "Ukaze za zvok in sliko je mogoče uporabljati že med pripravo sobe, ne da bi čakali na zagon videostrežnika.",
+      "Seznam »Dvignjene roke« pravilno prikazuje, kdo je zaprosil za besedo.",
+      "Nov gumb »Deli« v sobi: z enim klikom prekopira povezavo za pridružitev in povezavo do strani dogodka, brez razkritja zaupnih žetonov.",
+      "Znamka PA Webinar je spet vidna v zgornji vrstici sobe dogodka."
+    ]
+  },
+  "0.6.1": {
+    "title": "Javni dnevnik sprememb in varnostne posodobitve",
+    "notes": [
+      "Nova javna stran z dnevnikom sprememb, do katere pridete s klikom na številko različice v nogi strani, navaja vse različice platforme z glavnimi novostmi.",
+      "Varnostne posodobitve odvisnosti (undici, nodemailer) in utrjena veriga za gradnjo z iskanjem ranljivosti."
+    ]
+  },
+  "0.6.0": {
+    "title": "Potek dela po dogodku in interaktivna čakalnica",
+    "notes": [
+      "Nov potek dela ob koncu dogodka: ob zaključku moderator v posebnem oknu izbere, kam naj gre posnetek – objava na strani dogodka, uvrstitev v knjižnico ali samo shramba v arhivu.",
+      "Samodejni in anonimizirani povzetek po dogodku (udeležba, najbolj podprta vprašanja, izidi anket, oblak besed, ocene), prikazan na strani vsakega končanega dogodka, tudi kadar posnetka ni.",
+      "Elektronsko sporočilo z vsebinami dogodka, poslano udeležencem po koncu.",
+      "Interaktivna čakalnica »Piazza Digitale«: s svojim likom se sprehodite do prehoda in vstopite v videosrečanje, ob tem pa je vedno na voljo tudi klasični gumb za vstop.",
+      "Oblak besed ima na strani končanega dogodka svoj razdelek, skrbnik pa lahko preklopi njegovo vidnost.",
+      "Skupna tabla, ki jo je mogoče vklopiti za posamezni dogodek in iz predloge.",
+      "Prenovljena uporabniška izkušnja čarovnika za ustvarjanje dogodka: zložene napredne možnosti, glavni moderator s povezavo, opozorila o osebnih podatkih, shranjevanje osnutka in obravnava delnih napak.",
+      "Ločeni roki hrambe za posnetke in za zvočne sledi posameznih govorcev, vezani na signal »video je objavljen«, skupaj s čiščenjem klepeta v skladu z GDPR."
+    ]
+  },
+  "0.5.11": {
+    "title": "Izboljšave moderiranja, zaključka videosrečanja in zvoka",
+    "notes": [
+      "Moderatorji se zdaj prikažejo s svojim pravim imenom in ne s splošnim »Moderator«.",
+      "Ob koncu dogodka se v aplikaciji prikaže zaključni zaslon (ne več zavajajoče sporočilo »Soba je v pripravi«).",
+      "Odpravljeno prekrivanje ikon v čakalnici.",
+      "Odpravljanje šuma je prek IFrame API prisilno izklopljeno, da so odpravljene težave z zvokom."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabilno večsledno snemanje, ocene z zvezdicami in zmogljivost",
+    "notes": [
+      "Snemanje po govorcih (večsledno) je od začetka do konca zanesljivo: popoln zvok na vsaki sledi, brez odrezanih delov, vzporedno nalaganje.",
+      "Vprašalnik za povratne informacije po dogodku z ocenami v zvezdicah in zbirno nadzorno ploščo za skrbnika.",
+      "Izboljšave zmogljivosti: kodek VP9 za kamero, zakasnjeno nalaganje na mobilnih napravah, prilagoditve snemalnika.",
+      "Helmov hook po nadgradnji, ki samodejno znova naloži datoteko config.js za Jitsi."
+    ]
+  },
+  "0.5.8": {
+    "title": "Nastavljiva kakovost slike in zvoka ter nov potek vstopa",
+    "notes": [
+      "Skrbnik lahko nastavi kakovost slike in zvoka (prednastavitve za posamezni dogodek).",
+      "Prenovljen potek pridružitve: prijava na dogodek, nato čakalnica, nato videosrečanje.",
+      "Pri dvigu roke je prikazano pravo ime vsakega udeleženca."
+    ]
+  },
+  "0.5.6": {
+    "title": "Nastavljiva čakalnica in naslovne slike dogodkov",
+    "notes": [
+      "Nastavljiv način čakalnice (igra, vrt ali klasična), tako za celotno spletišče kot za posamezni dogodek.",
+      "Naslovne slike na strani dogodka in v sličicah na karticah.",
+      "Naložene datoteke se strežejo prek namenske poti s podpisanimi povezavami s kratkim rokom veljavnosti.",
+      "Gumb »Vstopi zdaj«, ki je na voljo takoj po prijavi na dogodek.",
+      "Združen skrbniški razdelek za upravljanje obdelave posnetkov z umetno inteligenco in trdnejši zajem več sledi."
+    ]
+  },
+  "0.5.2": {
+    "title": "Priprava dogodkov in izboljšave",
+    "notes": [
+      "Agenda z izražanjem strinjanja in nestrinjanja ter popravki pravic, podedovanih iz predlog.",
+      "Prava imena namesto »SPEAKER_00« v povzetkih in podnapisih.",
+      "Niz hitrih popravkov (od v0.5.2 do v0.5.5) v pripravah na javne dogodke."
+    ]
+  },
+  "0.5.1": {
+    "title": "Domača stran, usmerjena v skupnost, in večsledni arhiv",
+    "notes": [
+      "Prenova domače strani z usmeritvijo v skupnost, s prevodi, ki jih je mogoče nadomestiti med delovanjem, in z dostopnostjo po zahtevah AgID.",
+      "Večsledni arhiv MKV s predvajalnikom za poslušanje vsakega govorca posebej.",
+      "Uskladitev večslednih posnetkov z zvočno mešanico Jibri s pomočjo navzkrižne korelacije."
+    ]
+  },
+  "0.5.0": {
+    "title": "Poprodukcija z umetno inteligenco in večsledno snemanje",
+    "notes": [
+      "Veriga poprodukcije z umetno inteligenco: prepis, povzetki, podnapisi, prevodi in večglasna sinhronizacija (vedno sintetična), s sledenjem izvora modelov.",
+      "Večsledno snemanje (ena sled za vsakega govorca) s pripisovanjem govorcev in samodejnim poimenovanjem (ADR-013).",
+      "Javna videoknjižnica in stran za upravljanje po dogodku za skrbnika.",
+      "Urejevalnik prepisa po dogodku s popravljanjem besedila in vnovičnim pripisovanjem govorcev.",
+      "Prenova skrbniškega vmesnika: obvestila in pogovorna okna .italia namesto sistemskih opozoril brskalnika, ogrodni nalagalniki in barvni oblikovalni žetoni namesto stotin trdo zapisanih vrednosti hex.",
+      "Privolitev vsakega udeleženca v večsledno snemanje (GDPR) in razširjen izvoz podatkov po 15. členu."
+    ]
+  },
+  "0.4.0": {
+    "title": "Sodelovanje in življenjski cikel",
+    "notes": [
+      "Nove funkcije v živo: oblak besed, časovnik za predstavitev, števec reakcij, ukazi v slogu Meet in podokno z dvignjenimi rokami.",
+      "Življenjski cikel posnetkov (od začasnega do objavljenega) s skrbniškim upravljanjem (predogled, objava, izbris) in ločenimi roki hrambe.",
+      "Stran po dogodku z zavihki (posnetek, arhiv Q&A, ankete, povratne informacije, gradiva) z možnostjo določanja, kaj objaviti in kdaj.",
+      "Čarovnik za ustvarjanje dogodka v petih korakih, taksonomija oznak, imenik stikov in uredniški nadnaslov.",
+      "Javna videoknjižnica /video-library in stran o preglednosti /service-inventory (CycloneDX 1.6 za posameznega najemnika).",
+      "Dvostopenjsko samodejno prilagajanje števila JVB s posnetkom stanja v Redisu za stran o stanju.",
+      "Čiščenje po GDPR v treh fazah (takojšen izbris osebnih podatkov, izbris vsebin ob izteku hrambe, dokončni izbris)."
+    ]
+  },
+  "0.3.0": {
+    "title": "Nastavljiva platforma in infrastruktura",
+    "notes": [
+      "Nastavitve spletišča, ki omogočajo ponovno uporabo v drugih javnih ustanovah (znamka, barve, favicon, SEO, noga, način domače strani, strani o zasebnosti in dostopnosti) brez ponovne gradnje.",
+      "Nadzorna plošča z analitiko in skrbniško podokno za infrastrukturo.",
+      "Trije načini namestitve s Helmom (simple, standard, full) in samodejno zmanjševanje števila JVB na nič z namenskim naborom vozlišč.",
+      "Veriga Jibri za več oblakov (Azure Blob, S3, GCS, MinIO ali lokalna shramba) in nastavljiv vodni žig Jitsi.",
+      "OpenSSF Scorecard, Dependabot, SBOM odvisnosti, centralizirana obravnava napak, omejevanje števila zahtevkov in več kot 210 testov enot.",
+      "Številne vmesne izdaje (od v0.3.8 do v0.3.45) po odzivih s predstavitve."
+    ]
+  },
+  "0.2.0": {
+    "title": "Povratne informacije DTD",
+    "notes": [
+      "Profiliranje udeležencev ob prijavi na dogodek (ustanova, vloga, vrsta), nastavljivo za vsak dogodek, z izvozom v CSV in zbirno statistiko.",
+      "Nastavljivi opomniki z več časovnimi zamiki in različnimi elektronskimi sporočili.",
+      "Ankete in glasovanja s sprotnimi izidi in izvozom v CSV.",
+      "Izboljšave na področju GDPR: izjava o zasebnosti za vsak dogodek, podrobne privolitve, dnevnik izbrisov in izvoz podatkov po 15. členu.",
+      "Poenotenje vlog moderator in nadzornik ter pregled licenc odvisnosti."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP – prva različica",
+    "notes": [
+      "Javna platforma za digitalne dogodke z oblikovnim sistemom .italia (Bootstrap Italia, design-react-kit).",
+      "Soba v živo z Jitsi Meet (IFrame API, overjanje z JWT) in vlogami, ki se uveljavljajo na strežniku.",
+      "Prijava udeležencev na dogodke v skladu z GDPR s šifriranimi osebnimi podatki (AES-256-GCM).",
+      "Q&A z glasovanjem za vprašanja in moderiranjem ter čakalnica z odštevanjem in dostopom za goste.",
+      "Potrditvena in opomniška elektronska sporočila ter povezovanje s koledarji (Google, Outlook, Yahoo, iCal).",
+      "Skrbniška plošča z overjanjem prek ključa API, čiščenjem po GDPR in meritvami Prometheus.",
+      "Helm chart, primeren za produkcijsko rabo, vsebniki Docker brez korenskih pravic in samo za branje, CI/CD z GitHub Actions in publiccode.yml."
+    ]
+  }
+}

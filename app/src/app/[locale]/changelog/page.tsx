@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { CHANGELOG } from '@/content/changelog';
+import { getChangelog } from '@/content/changelog';
 import { getSettings } from '@/lib/settings';
 
 // Marks the release matching the currently deployed build so visitors can see
@@ -25,6 +25,10 @@ export default async function ChangelogPage() {
   const locale = await getLocale();
   const settings = await getSettings();
 
+  // Release notes in the reader's language, falling back to English (see
+  // content/changelog): the page used to render Italian to everyone.
+  const releases = getChangelog(locale);
+
   const dateFmt = new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'long',
@@ -46,7 +50,7 @@ export default async function ChangelogPage() {
           </header>
 
           <ol className="list-unstyled d-flex flex-column gap-3 mb-0">
-            {CHANGELOG.map((rel) => {
+            {releases.map((rel) => {
               const isCurrent = CURRENT_VERSION === rel.version;
               return (
                 <li key={rel.version}>
@@ -85,8 +89,10 @@ export default async function ChangelogPage() {
                           {dateFmt.format(new Date(rel.date))}
                         </time>
                       </div>
-                      <h2 className="h5 mb-3">{rel.title}</h2>
-                      <ul className="mb-0 ps-3 d-flex flex-column gap-1">
+                      <h2 className="h5 mb-3" lang={rel.textLocale}>
+                        {rel.title}
+                      </h2>
+                      <ul className="mb-0 ps-3 d-flex flex-column gap-1" lang={rel.textLocale}>
                         {rel.notes.map((note, i) => (
                           <li key={i} style={{ fontSize: '0.94rem' }}>
                             {note}

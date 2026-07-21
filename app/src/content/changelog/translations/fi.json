@@ -1,0 +1,308 @@
+{
+  "0.8.3": {
+    "title": "Chatin tietosuoja, oikea osallistujamäärä ja moderointi taas toiminnassa",
+    "notes": [
+      "Chat-keskustelun historia ei ole enää luettavissa tapahtuman ulkopuolisille. Aiemmin kuka tahansa tapahtuman osoitteen tuntenut pystyi lataamaan viestit ja niiden kirjoittajien nimet myös tapahtuman päätyttyä. Nyt lukeminen edellyttää ilmoittautumista, moderaattorin oikeuksia tai läsnäoloa tapahtumatilassa tapahtuman aikana.",
+      "Tapahtumatilassa näytetty osallistujamäärä oli yhden liian pieni, koska kukaan ei laskenut mukaan itseään. Sama virhe siirtyi tapahtuman tilastoihin (osallistujien huippumäärä). Nyt laskenta on oikea ja vastaa tilastoihin kirjattua lukua.",
+      "Moderaattorin toiminnot osallistujalistassa on korjattu: osallistujan poistaminen tilasta ja yksittäisen osallistujan äänenvoimakkuuden säätö eivät aiemmin tehneet mitään.",
+      "Reaktiot ovat nyt käytettävissä myös älypuhelimella, josta lähetyspainike oli hävinnyt kokonaan. Näytön poikki lentävät emojit eivät myöskään enää nappaa hallintapalkkiin kohdistuvia napsautuksia.",
+      "Koko näytön tilassa valintaikkunat – linkin jakaminen ja moderaattorille ”Poistu tilasta” – näkyvät jälleen: aiemmin ne jäivät videon taakse, jolloin painikkeet vaikuttivat rikkinäisiltä.",
+      "Tapahtumapohjissa chat on nyt oletusarvoisesti käytössä, kuten itse tapahtumatilassakin: aiemmin ”Webinaari”-pohjasta syntyi yhä tapahtuma ilman chattia.",
+      "Käyttöliittymän englanninkielinen käännös on nyt valmis. Aiemmin siitä puuttui useita kohtia, muun muassa koko ”Jaa”-ikkuna."
+    ]
+  },
+  "0.8.2": {
+    "title": "Tyhjä tapahtumatila ei jää enää päälle päättymisajan jälkeen",
+    "notes": [
+      "Päättymisajan yli auki jäänyt ja sitten tyhjentynyt tapahtumatila pysyi aiemmin aktiivisena rajattoman ajan ja varasi videoresursseja turhaan. Nyt tila suljetaan, kun se on ollut tyhjänä 45 minuuttia suunnitellun päättymisajan jälkeen. Yhä käytössä olevaa tilaa ei koskaan katkaista: päättymisajan jälkeen näytetään vain ilmoitus, eikä ketään poisteta tilasta."
+    ]
+  },
+  "0.8.1": {
+    "title": "Muokattavat reaktiot, tyhjän tilan sulkeminen ja turvallisempi ylläpito-osio",
+    "notes": [
+      "Ylläpitäjä voi nyt valita, millaisia emoji-reaktioita käytetään. Oletuksena ovat Jitsin omat reaktiot suoraan hallintapalkissa (kevyet ja hetkessä katoavat). Vaihtoehtoisesti voidaan ottaa käyttöön palvelun omat reaktiot, jotka näkyvät vasemmassa alareunassa olevassa palkissa ja jotka lasketaan mukaan tapahtuman tilastoihin.",
+      "Uusi ylläpitäjän asetus: kokonaan tyhjäksi jäänyt tapahtumatila – myös moderaattorien poistuttua – voidaan sulkea automaattisesti merkkinä hylätystä tapahtumasta. Asetus on oletuksena pois käytöstä, sillä toimettomuus ilman moderaattoria on jo hoidettu turvallisesti: tila siirtyy lepotilaan 45 minuutin kuluttua. Asetuksen voi ottaa käyttöön asetussivulta.",
+      "Turvallisempi ylläpito-osio: istunnon vanhentuessa käyttäjä ohjataan takaisin kirjautumisnäkymään, joten ylläpitosivuja ei voi enää käyttää vanhentuneella istunnolla. Lisäksi istunto kestää pidempään ja uusiutuu automaattisesti työskentelyn aikana."
+    ]
+  },
+  "0.8.0": {
+    "title": "Selkeämpi live-tapahtumatila: chat, reaktiot, koko näyttö ja ilmoittautuminen",
+    "notes": [
+      "Chat: viesteihin voi nyt lisätä emojeja omalla valitsimella, ja pieni ilmaisin kertoo, jos chatin päivitykset hidastuvat. Lähetetyt viestit ilmestyvät heti näkyviin myös organisaatioverkoissa, jotka puskuroivat reaaliaikaisia päivityksiä.",
+      "Koko näyttö: koko näytön painike pitää chatin näkyvissä videon vierellä sen sijaan, että piilottaisi sen.",
+      "Emoji-reaktiot eivät enää peitä alareunan hallintapainikkeita: palkkia voi napsauttaa aina, myös ruudukkonäkymässä.",
+      "Painikkeet ”Jaa” ja ”Poistu tilasta” ovat nyt selvästi näkyvissä ja väritettyjä jo oletuksena (poistuminen punaisella), eivät vasta hiiren osoittimen osuessa niihin.",
+      "”Recorder”-botti ei näy enää osallistujalistassa eikä osallistujamäärässä.",
+      "Ilmoittautuminen: hyvissä ajoin etukäteen ilmoittautunut ohjataan vahvistussivulle, jolta tapahtuman voi lisätä kalenteriin – ei siis odotustilaan. Lähellä alkamisaikaa pääsee suoraan tapahtumatilaan. Tapahtumasivulla näkyy myös, onko ilmoittautuminen jo tehty.",
+      "Chat on nyt tapahtumatilan tärkein vuorovaikutuskanava. Myös tyhjäksi jääneen tapahtuman automaattista sulkemista ja tilastojen osallistujalaskentaa on parannettu."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderaattori voi laskea nostetun käden",
+    "notes": [
+      "Nostettujen käsien jonossa moderaattorilla on nyt painike yksittäisen osallistujan käden laskemiseen. Tämä on hyödyllistä silloin, kun osallistuja on jo käyttänyt puheenvuoron tai käsi on jäänyt vahingossa ylös. Pyyntö menee juuri sille osallistujalle, jonka käsi laskeutuu; kenenkään muun tilanne ei muutu."
+    ]
+  },
+  "0.7.7": {
+    "title": "Vähemmän taustamelua puheenvuoron aikana",
+    "notes": [
+      "Puheenvuoron aikana käytetään kehittynyttä taustamelun vaimennusta: se vaimentaa aiempaa paremmin esimerkiksi näppäimistön, tuulettimien ja liikenteen äänet jo käytössä olevan perusvaimennuksen lisäksi."
+    ]
+  },
+  "0.7.6": {
+    "title": "Osallistujakohtainen äänenvoimakkuus",
+    "notes": [
+      "Uusi äänenvoimakkuuden säätö jokaiselle osallistujalle ”Osallistujat”-paneelissa: jos jonkun ääni kuuluu liian voimakkaana tai liian hiljaisena, sen voi säätää vain itselleen muiden kuulemaa ääntä muuttamatta.",
+      "Osallistujakohtainen erillinen äänitallennus, jota käytetään jälkituotannossa, on aiempaa luotettavampi: jos tallennus jää mykäksi, järjestelmä havaitsee sen heti eikä tuota tyhjiä litterointeja."
+    ]
+  },
+  "0.7.5": {
+    "title": "Nostettu käsi pysyy ylhäällä",
+    "notes": [
+      "Nostettu käsi pysyy nyt ylhäällä siihen asti, kunnes osallistuja laskee sen itse tai moderaattori käsittelee pyynnön. Aiemmin käsi laskeutui itsestään heti puheenvuoron alkaessa, jolloin osallistuja katosi puheenvuorojonosta."
+    ]
+  },
+  "0.7.4": {
+    "title": "Chatissa näkyvä nimi suojattu edelleen lähetetyiltä linkeiltä (tietoturva)",
+    "notes": [
+      "Ilmoittautuneen henkilön oikea nimi näkyy chatissa vain sillä laitteella, jolla ilmoittautuminen on tehty: edelleen lähetetyn osallistumislinkin avaava osallistuu sillä nimellä, jonka hän itse kirjoittaa, ei alkuperäisen ilmoittautuneen nimissä. Näin viestien virheellinen kohdistaminen on estetty.",
+      "Sama suojaus koskee liitteitä: edelleen lähetetystä linkistä lähetettyä tiedostoa ei enää merkitä alkuperäisen ilmoittautuneen nimiin.",
+      "Toiselta laitteelta – esimerkiksi puhelimesta – tai etukäteen saadulla linkillä liittyvä voi edelleen osallistua, kirjoittaa chatissa ja lähettää liitteitä keskeytyksettä. Ainoa ero on näytettävä nimi, joka on tilaan siirryttäessä kirjoitettu nimi."
+    ]
+  },
+  "0.7.3": {
+    "title": "Oikea läsnäolijoiden määrä, keskitetyt reaktiot ja tilan hienosäätöä",
+    "notes": [
+      "Läsnäolijoiden laskenta ei enää moninkertaista samaa henkilöä, joka poistuu ja palaa takaisin esimerkiksi selaimen Takaisin-painikkeella: saman henkilön päällekkäiset yhteydet lasketaan vain kerran. Osallistujalistassa näkyvät edelleen kaikki yhteydet, joten moderaattori näkee ja voi hallita niitä kaikkia.",
+      "Reaktioiden ja emojien palkki on nyt keskellä alareunaa, selvästi näkyvissä ja helposti löydettävissä – ei enää vasemmassa alakulmassa.",
+      "Ilmoittautuneiden määrää ei enää näytetä julkisesti tapahtumasivulla eikä tapahtumalistauksessa: se näkyy ylläpitäjille hallintapaneelissa. Tapahtuman aikana yleisö näkee vain läsnäolijoiden määrän.",
+      "Taustamelun vaimennus on automaattisesti käytössä kaikissa mikrofoneissa: äänen peruskäsittely eli kaiun ja melun poisto on aina päällä, eikä sitä tarvitse kytkeä käsin.",
+      "Tapahtumatilaan pääsee hieman nopeammin: videojärjestelmän herätys käynnistyy jo siirtymispainiketta napsautettaessa."
+    ]
+  },
+  "0.7.2": {
+    "title": "Monipuolisempi chat: liitteet, vastaukset ja maininnat",
+    "notes": [
+      "Chatissa voi nyt lähettää kuvia ja liitteitä (PNG, JPEG, WebP, GIF ja PDF, enintään 10 Mt), ja esikatselu näkyy suoraan viestissä.",
+      "Uusi ”Vastaa”-toiminto: viestissä voi lainata tiettyä aiempaa viestiä, ja lainaus jää näkyviin keskusteluun.",
+      "@-maininnat: viestissä voi puhutella osallistujaa nimeltä.",
+      "Chatin moderointi: moderaattorit voivat poistaa yksittäisiä viestejä tapahtuman aikana."
+    ]
+  },
+  "0.7.1": {
+    "title": "Tapahtumakohtaiset tilastot tapahtuman jälkeen",
+    "notes": [
+      "Uusi ”Tilastot”-välilehti jokaiselle tapahtumalle ylläpitäjän hallintapaneelissa – myös tapahtumille, joissa ei ole ilmoittautumista tai videotallennetta. Välilehti näyttää, miten tapahtuma eteni, kuka puhui eniten, millainen osallistumisen taso oli ja mitkä ovat keskeiset tunnusluvut.",
+      "Kaavio vuorovaikutuksen kehityksestä ajan mittaan – chat, kysymykset, kysymysten äänestykset, kyselyt, sanapilven sanat ja reaktiot – ja siinä korostettuna tapahtuman vilkkain hetki.",
+      "Listaus siitä, kuka puhui pisimpään (minuutteina), sekä puheenvuorojen tasapuolisuus yhdessä reaktioiden ja kädennostojen määrien kanssa.",
+      "Uusi arvio osallistujien keskimääräisestä läsnäoloajasta tapahtumatilassa. Sitä käytetään myös kokonaisvaltaisen tarkkaavaisuusasteen laskennassa."
+    ]
+  },
+  "0.7.0": {
+    "title": "Muokattavat puhujien nimet ja pelkän äänen soitin",
+    "notes": [
+      "Tapahtuman jälkeen puhujat voi nyt nimetä uudelleen ja korjata litteroinnista automaattisesti tunnistetut nimet.",
+      "Jos tallenteessa ei ole toistettavaa videota, korjaussivulla on silti pelkän äänen soitin, jonka avulla tallenteen voi kuunnella uudelleen ja korjata tekstin ja puhujat.",
+      "Moniraitatallennuksen korjaus: etäosallistujien todellinen ääni tallentuu nyt oikein."
+    ]
+  },
+  "0.6.9": {
+    "title": "Tekoälykäsittelyn luotettavuus",
+    "notes": [
+      "Hallintapaneeli näyttää nyt luotettavuusilmaisimen tapahtuman jälkeiselle tekoälykäsittelylle (litterointi, tiivistelmät, käännökset), joten yhdellä silmäyksellä näkee, onko tulos täydellinen ja luotettava."
+    ]
+  },
+  "0.6.8": {
+    "title": "Selkeämpi muokkaussivu tapahtuman jälkeen",
+    "notes": [
+      "Litterointien, tiivistelmien ja käännösten korjaussivu kertoo nyt, kun tekoälysisältöä ei ole vielä saatavilla – ”käsittely on kesken” tai ”käynnistä käsittely yläreunan painikkeista” – aiemman punaisen virheilmoituksen sijaan, joka näytti vialta.",
+      "Epäonnistunut tallennus näkyy nyt punaisena ja kertoo palvelimen palauttaman tarkan syyn sen sijaan, että se näyttäisi vihreältä kuin tallennus olisi onnistunut.",
+      "Vanhentunut ylläpitäjän istunto ja lataamisen ongelmat erotetaan nyt toisistaan omilla viesteillään yhden yleisen virheilmoituksen sijaan.",
+      "Jos tallenteen ääntä ei voi toistaa, sivu kertoo siitä, ja jaksojen tekstin ja puhujat voi silti korjata."
+    ]
+  },
+  "0.6.7": {
+    "title": "Aina näkyvät reaktiot ja ”Muistiinpanot / Tarkistuslista”",
+    "notes": [
+      "Emoji-reaktiot ovat nyt aina näkyvissä vasemmassa alareunassa olevassa palkissa, eivät enää piilossa painikkeen takana: ne on helpompi löytää ja niitä on helpompi käyttää tapahtuman aikana.",
+      "”Ohjelma”-toiminnon nimi on muutettu muotoon ”Muistiinpanot / Tarkistuslista”, jotta on selvää, että kyse on tarkistuslistamaisesta muistiinpanoalueesta eivätkä sisällöt päädy chattiin. Moderaattori voi edelleen ottaa sen käyttöön tapahtumakohtaisesti."
+    ]
+  },
+  "0.6.6": {
+    "title": "Hienosäätöä: chat, laskurit ja pääsy tilaan",
+    "notes": [
+      "Chatissa jaetut linkit ovat nyt napsautettavia ja avautuvat turvallisesti uuteen välilehteen; aiemmin ne olivat pelkkää tekstiä.",
+      "Tapahtumatilassa ilmoittautuneiden kokonaismäärä näkyy nyt vain moderaattoreille: osallistujat näkevät vain sen, kuinka monta henkilöä on todella paikalla.",
+      "Nopeampi pääsy tapahtumatilaan: yhteys videopalvelimeen valmistellaan jo odotustilassa, jolloin siirtyminen vie vähemmän aikaa.",
+      "Osallistujalistassa laskurin sisältävä otsikkorivi pysyy näkyvissä listaa selattaessa."
+    ]
+  },
+  "0.6.5": {
+    "title": "Tallenteet ja laskurit",
+    "notes": [
+      "Tapahtumatilan läsnäolijoiden laskenta ei enää sisällä tallenninta: mukana ovat vain todelliset henkilöt, ei ääntä tallentava botti.",
+      "Jälkituotanto: uusi ”Luo tekoälyllä” -painike käynnistää litteroinnin, tiivistämisen ja kääntämisen myös pelkän äänen tallenteille, joissa on yksi raita osallistujaa kohden. Aiemmin niissä ei ollut lainkaan käynnistyspainiketta.",
+      "Raitojen listauksessa jokaisen nimimerkin rinnalla on tunniste: samaa nimimerkkiä käyttävät eri henkilöt saavat eri tunnisteet, kun taas saman henkilön useat puheenvuorot jakavat saman tunnisteen.",
+      "Selkeä viesti silloin, kun käsittelyn käynnistäminen ei lisää jonoon yhtään työtä – koska tekoäly on poistettu käytöstä tapahtumalta tai käsittely on tauolla – aiemman harhaanjohtavan ”toiminto onnistui” -ilmoituksen sijaan."
+    ]
+  },
+  "0.6.4": {
+    "title": "Henkilöllisyyden suojaus ja tilan hienosäätöä",
+    "notes": [
+      "Tietoturvakorjaus: jos oman henkilökohtaisen osallistumislinkkinsä jakaa eteenpäin, linkin avaaja siirtyy tilaan nyt OMALLA nimellään. Aiemmin hän saattoi periä linkin lähettäneen henkilön nimen.",
+      "Terävämpi näytön jakaminen: nyt painotetaan tarkkuutta (5 kuvaa sekunnissa korkealla laadulla) sujuvuuden sijaan, joten diat ja asiakirjat pysyvät luettavina silloinkin, kun liikettä on vähän.",
+      "”Piilota oma kuva” -toiminto on poistettu: käyttöön otettuna se ei enää antanut tuoda omaa ruutua takaisin näkyviin.",
+      "Ylläpitäjän kirjautuminen: kun toimettomuuden jälkeen kirjaudutaan uudelleen, sivu päivittyy oikein. Sivu ei siis enää jää näennäisesti jumiin käsin tehtävään uudelleenlataukseen asti."
+    ]
+  },
+  "0.6.3": {
+    "title": "Tapahtumatilan hienosäätöä – kierros 2",
+    "notes": [
+      "Esitysajastin on nyt osa moderaattorin hallintapalkkia eikä vie enää omaa riviään; lähtölaskennan palkki näkyy vain silloin, kun ajastin on käynnissä.",
+      "Chatissa näkyy kirjoittajan oikea nimi eikä enää yleisluontoinen ”Moderaattori”.",
+      "Chatista on tullut sivupalkin oma paneeli, joten se ei enää peitä muita sisältöjä: käyttöliittymä on selkeämpi, ja välilehdellä näkyy lukemattomien viestien määrä.",
+      "Uusi ”Piirtoalusta”-painike moderaattoreille: jaetun piirtoalustan voi avata suoraan hallintapalkista.",
+      "”Jaa”-painikkeen väri on korjattu, joten sitä ei enää sekoita ”Poistu”-painikkeeseen; linkkien vieressä on kuvakkeet; ja vain moderaattoreille näkyvä moderointilinkki on varoituksen takana, jotta muita moderaattoreita voi kutsua ilman erehdyksiä.",
+      "Sanapilvi ei ole enää oletuksena käytössä: moderaattori voi halutessaan ottaa sen käyttöön tapahtuman aikana."
+    ]
+  },
+  "0.6.2": {
+    "title": "Live-tapahtumatilan hienosäätöä",
+    "notes": [
+      "Hallintapalkki (mikrofoni, kamera, näytön jakaminen) pysyy aina näkyvissä ja napsautettavana: myös koko näytön tilassa, jakamisen aikana ja silloin, kun tilassa on yksin.",
+      "Moderaattori voi jälleen ottaa live-toimintoja (Kysymykset, Chat, Ohjelma) käyttöön ja poistaa niitä käytöstä tapahtuman aikana.",
+      "Ääni- ja videosäätimiä voi käyttää jo tilan valmistelun aikana ilman, että videopalvelimen käynnistymistä tarvitsee odottaa.",
+      "”Nostetut kädet” -lista näyttää oikein, kuka on pyytänyt puheenvuoroa.",
+      "Uusi ”Jaa”-painike tapahtumatilassa: se kopioi kerralla osallistumislinkin ja tapahtumasivun linkin paljastamatta salaisia tunnisteita.",
+      "PA Webinar -tunnus näkyy jälleen tapahtumatilan yläpalkissa."
+    ]
+  },
+  "0.6.1": {
+    "title": "Julkinen muutosloki ja tietoturvapäivityksiä",
+    "notes": [
+      "Uusi julkinen muutoslokisivu, jolle pääsee napsauttamalla versionumeroa sivun alatunnisteessa: se listaa palvelun kaikki versiot ja niiden keskeiset uudistukset.",
+      "Riippuvuuksien tietoturvapäivityksiä (undici, nodemailer) sekä koontiputken kovennus haavoittuvuusskannauksella."
+    ]
+  },
+  "0.6.0": {
+    "title": "Tapahtuman jälkeinen työnkulku ja vuorovaikutteinen odotustila",
+    "notes": [
+      "Uusi tapahtuman päättämisen työnkulku: lopuksi moderaattori valitsee erillisessä kyselyssä, mihin tallenne menee – julkaistaanko se tapahtumasivulla, viedäänkö se kirjastoon vai jätetäänkö se vain arkistoon.",
+      "Automaattinen ja anonymisoitu kooste tapahtuman jälkeen (osallistujat, eniten ääniä saaneet kysymykset, kyselyiden tulokset, sanapilvi ja arviot) näkyy jokaisen päättyneen tapahtuman sivulla myös silloin, kun tallennetta ei ole.",
+      "Osallistujille lähetettävä koostesähköposti tapahtuman jälkeen, mukanaan tapahtuman sisällöt.",
+      "Vuorovaikutteinen ”Piazza Digitale” -odotustila: omalla hahmolla kävellään portille ja siirrytään sitä kautta tapahtumaan. Rinnalla on aina myös perinteinen siirtymispainike.",
+      "Sanapilvellä on nyt oma osionsa päättyneen tapahtuman sivulla, ja ylläpitäjä voi säätää sen näkyvyyttä.",
+      "Jaettu piirtoalusta, jonka voi ottaa käyttöön tapahtumakohtaisesti ja tapahtumapohjasta.",
+      "Tapahtuman luontivelhon käyttökokemus on uudistettu: lisäasetukset on koottu piiloon, päämoderaattorille on oma linkki, henkilötiedoista varoitetaan, luonnoksen voi tallentaa ja osittaiset virheet käsitellään paremmin.",
+      "Tallenteille ja puhujakohtaisille ääniraidoille erilliset säilytysajat, jotka on sidottu ”video julkaistu” -merkintään, sekä chat-viestien GDPR-siivous."
+    ]
+  },
+  "0.5.11": {
+    "title": "Moderoinnin, tapahtuman päättämisen ja äänen hienosäätöä",
+    "notes": [
+      "Moderaattorit näkyvät omilla oikeilla nimillään yleisluontoisen ”Moderaattori”-nimen sijaan.",
+      "Tapahtuman päättyessä näytetään palvelun oma päätösnäkymä harhaanjohtavan ”Tilaa valmistellaan” -viestin sijaan.",
+      "Korjattu odotustilan päällekkäiset kuvakkeet.",
+      "Melunvaimennus pakotettu pois päältä IFrame API:n kautta ääniongelmien ratkaisemiseksi."
+    ]
+  },
+  "0.5.9": {
+    "title": "Vakaa moniraitatallennus, tähtiarviot ja suorituskyky",
+    "notes": [
+      "Puhujakohtainen eli moniraitainen tallennus toimii nyt luotettavasti alusta loppuun: kunkin raidan ääni on täydellinen, katkoksia ei ole ja lataukset tapahtuvat rinnakkain.",
+      "Tapahtuman jälkeinen palautekysely tähtiarvioilla ja koontinäkymä ylläpitäjille.",
+      "Suorituskykyparannuksia: VP9-koodekki kameralle, viivästetty lataus mobiililaitteilla ja tallentimen hienosäätö.",
+      "Helm-päivityksen jälkeinen hook, joka lataa Jitsin config.js-tiedoston automaattisesti uudelleen."
+    ]
+  },
+  "0.5.8": {
+    "title": "Muokattava kuvan- ja äänenlaatu sekä uusi liittymispolku",
+    "notes": [
+      "Ylläpitäjä voi määrittää kuvan- ja äänenlaadun tapahtumakohtaisilla esiasetuksilla.",
+      "Uudistettu liittymispolku: ilmoittautuminen, odotustila ja sitten videoyhteys.",
+      "Kädennostossa näkyy kunkin osallistujan oikea nimi."
+    ]
+  },
+  "0.5.6": {
+    "title": "Muokattava odotustila ja tapahtumien kansikuvat",
+    "notes": [
+      "Odotustilan toteutus on valittavissa – peli, puutarha tai perinteinen – sekä koko sivustolle että tapahtumakohtaisesti.",
+      "Kansikuvat tapahtumasivulle ja korttien pikkukuviin.",
+      "Ladatut tiedostot tarjoillaan omalla reitillään lyhytikäisin allekirjoitetuin osoittein.",
+      "”Siirry nyt” -painike heti ilmoittautumisen jälkeen.",
+      "Tallenteiden tekoälykäsittelyn ylläpito-osio on koottu yhteen, ja moniraitaista tallennusta on vahvistettu."
+    ]
+  },
+  "0.5.2": {
+    "title": "Tapahtuman valmistelu ja hienosäätöä",
+    "notes": [
+      "Ohjelma, jossa voi ilmaista kannatuksensa tai vastustuksensa, sekä korjauksia tapahtumapohjilta perittyihin käyttöoikeuksiin.",
+      "Oikeat nimet eikä enää ”SPEAKER_00” tiivistelmissä ja tekstityksissä.",
+      "Sarja pikakorjauksia (v0.5.2–v0.5.5) julkisiin tapahtumiin valmistautumiseksi."
+    ]
+  },
+  "0.5.1": {
+    "title": "Yhteisölähtöinen etusivu ja moniraita-arkisto",
+    "notes": [
+      "Etusivu on uudistettu yhteisölähtöiseksi. Käännöksiä voi korvata ajonaikaisesti, ja sivu täyttää AgID:n saavutettavuusvaatimukset.",
+      "Moniraitainen MKV-arkisto ja soitin, jolla kunkin puhujan voi kuunnella erikseen.",
+      "Moniraitaisen äänen kohdistus Jibri-miksaukseen ristikorrelaation avulla."
+    ]
+  },
+  "0.5.0": {
+    "title": "Tekoälyavusteinen jälkituotanto ja moniraitatallennus",
+    "notes": [
+      "Tekoälyavusteinen jälkituotantoputki: litterointi, tiivistelmät, tekstitykset, käännökset ja moniääninen dubbaus (aina synteettinen), mallien alkuperä kirjattuna.",
+      "Moniraitatallennus eli yksi raita puhujaa kohden, puhujien tunnistus ja automaattinen nimeäminen (ADR-013).",
+      "Julkinen videokirjasto ja tapahtuman jälkeisen hallinnan sivu ylläpitäjille.",
+      "Litteroinnin muokkaustyökalu tapahtuman jälkeen: tekstin korjaus ja puhujien uudelleenkohdistus.",
+      "Ylläpidon käyttökokemuksen uudistus: .italia-tyyliset ilmoitukset ja valintaikkunat selaimen omien ilmoitusten sijaan, luurankonäkymät latauksen ajaksi ja värien suunnittelutunnisteet satojen kovakoodattujen heksa-arvojen tilalle.",
+      "Osallistujakohtainen suostumus moniraitatallennukseen (GDPR) ja laajennettu artiklan 15 mukainen tietojen vienti."
+    ]
+  },
+  "0.4.0": {
+    "title": "Osallistaminen ja elinkaari",
+    "notes": [
+      "Uusia live-toimintoja: sanapilvi, esitysajastin, reaktiolaskuri, Meet-tyyliset live-säätimet ja nostettujen käsien paneeli.",
+      "Tallenteiden elinkaari väliaikaisesta julkaistuun, ylläpidon hallintatoiminnot (esikatselu, julkaisu, poisto) ja eriytetyt säilytysajat.",
+      "Välilehdellinen tapahtuman jälkeinen sivu (tallenne, Q&A-arkisto, kyselyt, palaute, materiaalit) sekä hallinta sille, mitä julkaistaan ja milloin.",
+      "Viisivaiheinen tapahtuman luontivelho, tunnisteiden luokittelu, yhteystietorekisteri ja toimituksellinen otsikon esirivi.",
+      "Julkinen videokirjasto osoitteessa /video-library ja läpinäkyvyyssivu /service-inventory (tenanttikohtainen CycloneDX 1.6).",
+      "Kaksivaiheinen JVB-automaattiskaalaus ja Redisiin tallennettu tilannekuva tilannesivua varten.",
+      "Kolmivaiheinen GDPR-siivous: henkilötiedot heti, sisällöt säilytysajan päätyttyä ja lopuksi lopullinen poisto."
+    ]
+  },
+  "0.3.0": {
+    "title": "Muokattava palvelu ja infrastruktuuri",
+    "notes": [
+      "Sivuston asetukset, joiden avulla muut julkishallinnon organisaatiot voivat ottaa palvelun käyttöön ilman uutta koontia: ilme, värit, favicon, hakukoneoptimointi, alatunniste, etusivun tila sekä tietosuoja- ja saavutettavuussivut.",
+      "Analytiikan koontinäyttö ja infrastruktuurin ylläpitopaneeli.",
+      "Kolme Helm-asennustapaa (simple, standard ja full) sekä JVB:n skaalautuminen nollaan omassa solmuryhmässään.",
+      "Monipilvinen Jibri-putki (Azure Blob, S3, GCS, MinIO tai paikallinen tallennus) ja muokattava Jitsi-vesileima.",
+      "OpenSSF Scorecard, Dependabot, riippuvuuksien SBOM, keskitetty virheiden käsittely, pyyntörajoitukset ja yli 210 yksikkötestiä.",
+      "Lukuisia välijulkaisuja (v0.3.8–v0.3.45) demon jälkeisen palautteen pohjalta."
+    ]
+  },
+  "0.2.0": {
+    "title": "DTD:n palaute",
+    "notes": [
+      "Osallistujien profilointi ilmoittautumisen yhteydessä (organisaatio, rooli, tyyppi) tapahtumakohtaisesti määriteltynä, CSV-vienti ja koostetilastot.",
+      "Muokattavat muistutukset useilla eri ajankohdilla ja kullekin omalla sähköpostiviestillä.",
+      "Kyselyt ja äänestykset reaaliaikaisin tuloksin ja CSV-vientinä.",
+      "GDPR-parannuksia: tapahtumakohtainen tietosuojaseloste, eritellyt suostumukset, poistojen lokitus ja artiklan 15 mukainen tietojen vienti.",
+      "Moderaattorin ja tarkkailijan roolien vakiinnuttaminen sekä riippuvuuksien lisenssien tarkastus."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP – ensimmäinen versio",
+    "notes": [
+      "Julkinen alusta digitaalisille tapahtumille .italia-suunnittelujärjestelmällä (Bootstrap Italia, design-react-kit).",
+      "Live-tapahtumatila Jitsi Meetillä (IFrame API, JWT-tunnistautuminen) ja palvelimella valvotut roolit.",
+      "GDPR-vaatimusten mukainen osallistujien ilmoittautuminen salatuin henkilötiedoin (AES-256-GCM).",
+      "Q&A äänestyksineen ja moderointeineen sekä odotustila, jossa on lähtölaskenta ja vieraskäyttö.",
+      "Vahvistus- ja muistutusviestit sekä kalenteri-integraatio (Google, Outlook, Yahoo, iCal).",
+      "Ylläpitopaneeli API-avaintunnistautumisella, GDPR-siivous ja Prometheus-mittarit.",
+      "Tuotantotason Helm chart, non-root- ja read-only-Docker-kuvat, CI/CD GitHub Actionsilla ja publiccode.yml."
+    ]
+  }
+}
