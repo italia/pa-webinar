@@ -41,7 +41,7 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, UnauthorizedError } from '@/lib/errors';
 import { duplicatedConfig } from '@/lib/events/duplicate-fields';
-import { nextOccurrences } from '@/lib/utils/recurrence';
+import { nextOccurrenceAfter } from '@/lib/utils/recurrence';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import type { LocalizedField } from '@/lib/utils/locale';
 
@@ -110,11 +110,10 @@ function resolveSchedule(
   }
 
   if (options.nextOccurrence && source.recurrenceRule) {
-    const now = new Date();
-    // Ask for a handful and take the first in the future: the series may have
-    // been running for a while, so occurrence #1 is usually in the past.
-    const upcoming = nextOccurrences(source.recurrenceRule, source.startsAt, 60)
-      .find((d) => d.getTime() > now.getTime());
+    // Seek past the occurrences already held rather than enumerating a window:
+    // a daily series running for months would otherwise yield only past dates,
+    // and the copy would silently keep the source's (past) schedule.
+    const upcoming = nextOccurrenceAfter(source.recurrenceRule, source.startsAt, new Date());
     if (upcoming) {
       return { startsAt: upcoming, endsAt: new Date(upcoming.getTime() + durationMs) };
     }

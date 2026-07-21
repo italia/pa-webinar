@@ -24,7 +24,13 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-const GRANT_TTL_SECONDS = 2 * 60 * 60; // 2h, matches typical call length
+// 12h. It used to be 2h "matching a typical call", but the grant is what the
+// live page checks before issuing a guest JWT AND what the chat read gate checks
+// (lib/chat/read-access): at 2h a guest who entered the password before a long
+// event lost the chat part-way through, and would be bounced back to the
+// password page on any reload — mid-event. A day-long ceiling still expires the
+// grant well before the next occurrence of a recurring event.
+const GRANT_TTL_SECONDS = 12 * 60 * 60;
 
 function joinGrantCookieName(eventId: string): string {
   return `join_granted_${eventId}`;

@@ -342,7 +342,8 @@
       "hide": "Nascondi",
       "hideFailed": "Impossibile nascondere il messaggio. Riprova.",
       "connReconnecting": "Riconnessione…",
-      "connDegraded": "Aggiornamenti rallentati"
+      "connDegraded": "Aggiornamenti rallentati",
+      "readDenied": "La chat non è disponibile: non risulti tra i partecipanti di questo evento, oppure la sala non è ancora aperta. Riprovo automaticamente."
     },
     "role": {
       "moderator": "Moderatore",

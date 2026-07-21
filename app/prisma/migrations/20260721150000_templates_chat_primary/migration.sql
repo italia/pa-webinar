@@ -19,7 +19,11 @@ UPDATE "event_templates"
 SET "chat_enabled" = true,
     "qa_enabled" = false
 WHERE "is_system" = true
-  AND "updated_at" = "created_at";
+  -- A one-second tolerance rather than strict equality: rows seeded by an
+  -- earlier raw-SQL migration or by `prisma db seed` can carry timestamps that
+  -- differ by microseconds, and a strict `=` would make this a silent no-op on
+  -- those deployments. An admin edit is always minutes or more away.
+  AND "updated_at" <= "created_at" + interval '1 second';
 
 -- Same rationale for the column defaults, so a template row inserted without an
 -- explicit value (admin form, future migrations) starts chat-primary too.

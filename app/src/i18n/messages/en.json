@@ -328,7 +328,8 @@
       "hide": "Hide",
       "hideFailed": "Couldn't hide the message. Please try again.",
       "connReconnecting": "Reconnecting…",
-      "connDegraded": "Updates delayed"
+      "connDegraded": "Updates delayed",
+      "readDenied": "Chat is unavailable: you are not among this event’s participants, or the room is not open yet. Retrying automatically."
     },
     "role": {
       "moderator": "Moderator",

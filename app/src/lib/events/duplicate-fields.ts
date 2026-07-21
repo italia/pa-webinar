@@ -80,7 +80,6 @@ export const DUPLICATED_EVENT_FIELDS = [
 
   // post-event page
   'postEventPublic',
-  'postEventPublicUntil',
   'postEventShowQA',
   'postEventShowMaterials',
   'postEventShowPolls',
@@ -88,7 +87,6 @@ export const DUPLICATED_EVENT_FIELDS = [
   'postEventShowRecap',
   'postEventShowWordCloud',
   'postEventEmailEnabled',
-  'youtubeUrl',
   'libraryListed',
 
   // series
@@ -114,6 +112,12 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   peakParticipants: 'analytics of the occurrence that ran',
   capacityEstimateJson: 'recomputed from the new schedule',
   recordingUrl: 'artefact of the occurrence that ran',
+  youtubeUrl:
+    'the published video of the occurrence that ran — inheriting it would show ' +
+    'last month\'s recording under this month\'s event, in the library too',
+  postEventPublicUntil:
+    'an absolute deadline set for the previous occurrence, normally already past ' +
+    '— inheriting it would make the copy\'s post-event page 404 the moment it ends',
   recordingPublished: 'artefact of the occurrence that ran',
   recordingPublishedAt: 'artefact of the occurrence that ran',
   recordingDuration: 'artefact of the occurrence that ran',
@@ -125,6 +129,15 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   postEventEmailSentAt: 'send state of the occurrence that ran',
 };
 
+/**
+ * Json columns among the inherited fields. Prisma refuses a literal `null` for a
+ * nullable Json input (`NullableJsonNullValueInput | InputJsonValue`), so a
+ * source row with no permission matrix — every event created before that feature
+ * and every instant call — would make `create` throw. Omitting the key instead
+ * lets the column default to NULL, which is the same end state.
+ */
+const JSON_FIELDS = new Set<string>(['description', 'speakersInfo', 'permissionMatrix']);
+
 /** Build the inherited slice of the create payload. */
 export function duplicatedConfig<T extends Record<string, unknown>>(
   source: T,
@@ -132,7 +145,9 @@ export function duplicatedConfig<T extends Record<string, unknown>>(
   const out: Record<string, unknown> = {};
   for (const field of DUPLICATED_EVENT_FIELDS) {
     const value = source[field];
-    if (value !== undefined) out[field] = value;
+    if (value === undefined) continue;
+    if (value === null && JSON_FIELDS.has(field)) continue;
+    out[field] = value;
   }
   return out;
 }

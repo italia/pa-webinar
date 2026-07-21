@@ -55,8 +55,8 @@ const peakSchema = z.object({
   count: z.number().int().min(0),
   // Any attendee of THIS event may report the live count so the peak isn't
   // stuck at 0 in a moderator-less session (feedback #4b): a moderator/
-  // co-moderator/speaker grant token, or a participant access token. INSTANT
-  // rooms are the one tokenless case — see the authorization block below.
+  // co-moderator/speaker grant token, or a participant access token. Rooms where
+  // no token can exist are the tokenless case — see the authorization block.
   // Bounded so a caller cannot use it as an unbounded rate-limiter key.
   token: z.string().min(1).max(512).optional(),
 });
@@ -82,7 +82,11 @@ export const POST = withErrorHandling(async (request, context) => {
   //    protects those lookups. Generous, because a whole organisation can share
   //    one egress IP and each client legitimately posts twice a minute.
   const ip = getClientIp(request);
-  const ipLimit = rateLimit(`peak:ip:${ip}`, { limit: 120, windowMs: 60_000 });
+  // 600/min: a 300-person room where everyone shares one corporate egress IP
+  // legitimately produces ~600 reports a minute, and the pre-auth bucket must
+  // never throttle a real audience (the moderator included) before the
+  // per-reporter limit below has had a chance to do the accurate job.
+  const ipLimit = rateLimit(`peak:ip:${ip}`, { limit: 600, windowMs: 60_000 });
   if (!ipLimit.allowed) {
     throw new RateLimitError((ipLimit.resetAt - Date.now()) / 1000);
   }
@@ -92,7 +96,13 @@ export const POST = withErrorHandling(async (request, context) => {
       ...eventWhereClause(param),
       status: 'LIVE',
     },
-    select: { id: true, moderatorToken: true, maxParticipants: true, eventType: true },
+    select: {
+      id: true,
+      moderatorToken: true,
+      maxParticipants: true,
+      eventType: true,
+      _count: { select: { registrations: true } },
+    },
   });
 
   if (!event) {
@@ -104,14 +114,18 @@ export const POST = withErrorHandling(async (request, context) => {
   // already-fetched event (no extra query) and covers the speaker case that a
   // moderator-only check rejected.
   //
-  // Tokenless reporting is accepted ONLY for INSTANT rooms. Those are opened by
-  // link and have no registrations at all, so requiring a token guaranteed a
-  // peak of 0 for them — the very hole #4b was about. Everywhere else a token
-  // stays mandatory: a scheduled event's slug is public, and a monotonic,
-  // publicly-rendered attendance figure that any anonymous caller can pin to
-  // the clamp is worth more to a vandal than it is to us.
+  // Tokenless reporting is accepted only where NOBODY could hold a token: an
+  // INSTANT room, or an event with zero registrations. The reported figure is
+  // the whole-room headcount, so a single token-bearing attendee is enough to
+  // track the peak for everyone; the anonymous path is needed only when there
+  // is no such attendee — which is exactly the moderator-less public-link case
+  // #4b was about. Keeping it that narrow matters because the figure is
+  // monotonic and publicly rendered: on an event that has registrations, a
+  // public slug would otherwise let any anonymous caller pin it to the clamp.
   // `reporter` is the identity the per-event throttle is keyed on — resolved,
   // never caller-supplied.
+  const tokenlessAllowed =
+    event.eventType === 'INSTANT' || event._count.registrations === 0;
   let reporter: string;
   if (token) {
     const grant = await resolveGrantForEvent(event, token);
@@ -128,7 +142,7 @@ export const POST = withErrorHandling(async (request, context) => {
       reporter = `reg:${reg.id}`;
     }
   } else {
-    if (event.eventType !== 'INSTANT') {
+    if (!tokenlessAllowed) {
       throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
     }
     reporter = `ip:${ip}`;

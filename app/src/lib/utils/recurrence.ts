@@ -357,6 +357,26 @@ export function nextOccurrences(
   }
 }
 
+/**
+ * First occurrence strictly after `after`, or null.
+ *
+ * Distinct from `nextOccurrences(...).find(d => d > now)`: that enumerates from
+ * DTSTART, so a series already past the requested limit returns only past dates
+ * and the caller silently falls back to them. `RRule.after` seeks instead of
+ * enumerating, so it is correct however long the series has been running (and
+ * cheap for a daily rule started years ago).
+ */
+export function nextOccurrenceAfter(rrule: string, dtstart: Date, after: Date): Date | null {
+  const body = stripRRulePrefix((rrule ?? '').trim());
+  if (!body) return null;
+  try {
+    const options = RRule.parseString(body);
+    return new RRule({ ...options, dtstart }).after(after) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // ── helpers ─────────────────────────────────────────────────────────────────
 
 function stripRRulePrefix(input: string): string {
