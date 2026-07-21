@@ -28,6 +28,29 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.8.3',
+    date: '2026-07-21',
+    title: 'Riservatezza della chat, conteggio partecipanti corretto e moderazione ripristinata',
+    security: true,
+    notes: [
+      'La cronologia della chat non è più leggibile da chi non partecipa all\'evento. Prima chiunque conoscesse l\'indirizzo di un evento poteva scaricarne i messaggi — con i nomi di chi li aveva scritti — anche a evento concluso. Ora serve essere iscritti, moderatori o trovarsi in sala mentre l\'evento è in corso.',
+      'Il numero di partecipanti mostrato in sala era sbagliato di una unità: ciascuno non contava sé stesso. Lo stesso errore finiva nelle statistiche dell\'evento (partecipanti di picco). Ora il conteggio è corretto e coincide con quello registrato nelle statistiche.',
+      'Ripristinati i comandi del moderatore sulla lista partecipanti: l\'espulsione di un partecipante e il volume individuale non avevano alcun effetto.',
+      'Le reazioni sono ora disponibili anche da smartphone, dove non esisteva più alcun pulsante per inviarle. Le emoji in volo non intercettano più i clic sulla barra dei controlli.',
+      'A schermo intero le finestre di dialogo — condivisione del link e, per il moderatore, "Esci dalla sala" — sono di nuovo visibili: prima restavano nascoste dietro il video e i pulsanti sembravano non funzionare.',
+      'I modelli di evento partono ora con la chat attiva, coerentemente con la sala: creando un "Webinar" si otteneva ancora un evento senza chat.',
+      'Completata la traduzione inglese dell\'interfaccia (mancavano alcune voci, tra cui l\'intera finestra "Condividi").',
+    ],
+  },
+  {
+    version: '0.8.2',
+    date: '2026-07-17',
+    title: 'Nessuna sala vuota lasciata accesa oltre l\'orario',
+    notes: [
+      'Una sala rimasta aperta oltre l\'orario di fine e poi svuotata veniva mantenuta attiva a tempo indeterminato, tenendo occupate risorse video inutilmente. Ora, se resta vuota per 45 minuti dopo l\'orario di fine previsto, viene chiusa. Una sala ancora occupata non viene mai interrotta: oltre l\'orario compare solo un avviso, nessuno viene disconnesso.',
+    ],
+  },
+  {
     version: '0.8.1',
     date: '2026-07-17',
     title: 'Reazioni configurabili, chiusura sala vuota e sicurezza area admin',
