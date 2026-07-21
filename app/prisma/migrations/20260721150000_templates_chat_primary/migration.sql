@@ -1,0 +1,25 @@
+-- Chat is the primary interaction channel (live feedback #10).
+--
+-- WHY: v0.8.0 changed the blank-event default to chat-on / Q&A-off
+-- (defaultMatrix()), but that default is only reached when the admin skips the
+-- template picker — and the picker is shown first whenever templates exist.
+-- Every system template still carried the OLD combination, so creating an event
+-- from "Webinar" or "Presentazione pubblica" reproduced exactly the incoherence
+-- the feedback reported: the admin sees a Q&A flag, the room shows only chat.
+--
+-- Scope: system templates only. Templates an admin created or edited themselves
+-- are their own decision and are left untouched. Q&A is not removed — it stays a
+-- per-event toggle a moderator can switch back on.
+UPDATE "event_templates"
+SET "chat_enabled" = true,
+    "qa_enabled" = false
+WHERE "is_system" = true;
+
+-- Same rationale for the column defaults, so a template row inserted without an
+-- explicit value (admin form, future migrations) starts chat-primary too.
+ALTER TABLE "event_templates" ALTER COLUMN "chat_enabled" SET DEFAULT true;
+ALTER TABLE "event_templates" ALTER COLUMN "qa_enabled" SET DEFAULT false;
+
+-- Events keep their historical column defaults untouched on purpose: existing
+-- rows are records of how a past event actually ran, and the creation path
+-- always writes both flags explicitly from the wizard.

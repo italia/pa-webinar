@@ -2,8 +2,10 @@ import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 
 /**
  * Resolves the display name for a participant. Tries, in order:
- *  1. the local-name short-circuit (`getParticipantsInfo()` excludes self,
- *     so a local raiser would otherwise resolve to empty);
+ *  1. the local-name short-circuit — kept because the local row may carry an
+ *     empty displayName even when it IS listed (the served external_api.js does
+ *     list self: `video-conference-joined` falls through into
+ *     `participant-joined`), so a local raiser could otherwise resolve to empty;
  *  2. the direct per-id accessor `getDisplayName(id)` — this is populated
  *     by Jitsi as soon as the endpoint exists, even before the MUC presence
  *     that backfills `getParticipantsInfo()`. In JWT rooms the displayName
@@ -33,7 +35,7 @@ export function resolveDisplayName(
     // getDisplayName can throw before the endpoint is known — ignore and scan.
   }
   const info = api.getParticipantsInfo();
-  const p = info.find((pp) => pp.id === participantId);
+  const p = info.find((pp) => pp.participantId === participantId);
   return p?.displayName || p?.formattedDisplayName || '';
 }
 

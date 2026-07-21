@@ -19,7 +19,6 @@ import {
 import { Link, useRouter } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
-import { humanParticipantCount } from '@/lib/jitsi/participants';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import RecordingConsent, { RecordingBanner } from '@/components/jitsi/recording-consent';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
@@ -208,6 +207,11 @@ export default function LiveEventClient({
   const [phase, setPhase] = useState<LivePhase>('waiting');
   const [credentials, setCredentials] = useState<JitsiCredentials | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
+  // Mirror of participantCount for the peak reporter's interval: reading it
+  // from a ref keeps the 30s timer from being torn down and restarted on every
+  // join/leave (which would reset the cadence in a busy room).
+  const participantCountRef = useRef(0);
+  useEffect(() => { participantCountRef.current = participantCount; }, [participantCount]);
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState('');
   const [jitsiApi, setJitsiApi] = useState<JitsiMeetExternalAPI | null>(null);
@@ -844,22 +848,33 @@ export default function LiveEventClient({
   // the next tick. The server bump is a single conditional UPDATE (peak < count)
   // so it's monotonic and race-safe even with many concurrent reporters; the
   // redundant writes are a light, bounded cost accepted for that robustness.
+  //
+  // The count comes from the SAME value JitsiRoom pushes to the UI
+  // (`onParticipantCountChanged`), not a second local computation: JitsiRoom
+  // knows the local endpoint id from `videoConferenceJoined` and so counts the
+  // roster exactly, while a recount here could only fall back to name matching.
+  // One number, one source — what the sidebar shows is what the peak records.
+  //
+  // Guests (no token) report too: the live page passes token="" to anyone
+  // joining a public-link / INSTANT room, and gating on it meant precisely the
+  // moderator-less sessions #4b was about recorded nothing. The server accepts a
+  // tokenless report only while the event is LIVE.
   useEffect(() => {
-    if (!jitsiApi || !token) return;
+    if (!jitsiApi) return;
     const report = () => {
-      const count = humanParticipantCount(jitsiApi, credentials?.displayName);
+      const count = participantCountRef.current;
       if (count > 0) {
         fetch(`/api/events/${event.slug}/analytics/peak`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ count, token }),
+          body: JSON.stringify(token ? { count, token } : { count }),
         }).catch(() => {});
       }
     };
     report();
     const interval = setInterval(report, 30000);
     return () => clearInterval(interval);
-  }, [jitsiApi, event.slug, token, credentials]);
+  }, [jitsiApi, event.slug, token]);
 
   // F8 — receive a moderator "lower your hand" control signal and lower our OWN
   // hand. The Jitsi IFrame API can lower only the local hand (toggleRaiseHand),
@@ -978,6 +993,16 @@ export default function LiveEventClient({
     document.addEventListener('fullscreenchange', onFsChange);
     return () => document.removeEventListener('fullscreenchange', onFsChange);
   }, []);
+
+  // Reactstrap portals every Modal into <body> by default. Once the app owns
+  // fullscreen on the live wrapper (#6), <body> is OUTSIDE the fullscreen
+  // subtree, so those modals never reach the top layer and are simply invisible:
+  // in fullscreen "Condividi", the recording prompt and — worst of all — the
+  // moderator's "Esci dalla sala" dialog all looked like dead buttons, with no
+  // way out of the room. Rendering them inside the fullscreen element fixes it,
+  // and outside fullscreen we keep the default (undefined = <body>) so nothing
+  // else changes.
+  const modalContainer = isFullscreen ? (liveRootRef.current ?? undefined) : undefined;
 
   const handleLeaveRoom = useCallback(() => {
     // Moderators get the leave/end-for-all prompt; everyone else leaves for
@@ -1312,6 +1337,7 @@ export default function LiveEventClient({
         moderatorToken={isActualModerator ? token : undefined}
         onLeaveRoom={handleLeaveRoom}
         isFullscreen={isFullscreen}
+        modalContainer={modalContainer}
         onToggleFullscreen={toggleFullscreen}
       />
 
@@ -1434,7 +1460,12 @@ export default function LiveEventClient({
       {feedbackModal}
 
       {/* Recording pre-activation prompt for moderator */}
-      <Modal isOpen={showRecPrompt} toggle={handleRecPromptLater} centered>
+      <Modal
+        isOpen={showRecPrompt}
+        toggle={handleRecPromptLater}
+        centered
+        container={modalContainer}
+      >
         <ModalHeader toggle={handleRecPromptLater}>
           {t('recordingPromptTitle')}
         </ModalHeader>
@@ -1456,6 +1487,7 @@ export default function LiveEventClient({
         isOpen={showLeaveChoice}
         toggle={() => !endingForAll && setShowLeaveChoice(false)}
         centered
+        container={modalContainer}
       >
         <ModalHeader toggle={() => !endingForAll && setShowLeaveChoice(false)}>
           {t('leaveChoice.title')}
@@ -1496,6 +1528,7 @@ export default function LiveEventClient({
         isOpen={showEndDestino}
         toggle={() => !endingForAll && setShowEndDestino(false)}
         centered
+        container={modalContainer}
       >
         <ModalHeader toggle={() => !endingForAll && setShowEndDestino(false)}>
           {t('endDestino.title')}
@@ -2295,6 +2328,8 @@ interface LiveTopBarProps {
    *  live-phase top bar (the consent-pending one renders no video/sidebar). */
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
+  /** Fullscreen element to portal the share modal into while fullscreen is on. */
+  modalContainer?: HTMLElement;
 }
 
 function LiveTopBar({
@@ -2313,6 +2348,7 @@ function LiveTopBar({
   onLeaveRoom,
   isFullscreen,
   onToggleFullscreen,
+  modalContainer,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -2450,10 +2486,18 @@ function LiveTopBar({
             aria-label={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
             title={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
           >
-            <Icon icon={isFullscreen ? 'it-collapse' : 'it-expand'} size="xs" color="white" />
+            {/* it-expand/it-collapse are the ACCORDION chevrons in the Bootstrap
+                Italia sprite, so this icon-only button read as "open a panel".
+                it-fullscreen is the four-corners glyph people expect here. */}
+            <Icon icon={isFullscreen ? 'it-collapse' : 'it-fullscreen'} size="xs" color="white" />
           </Button>
         )}
-        <LiveShareButton slug={slug} locale={locale} moderatorToken={moderatorToken} />
+        <LiveShareButton
+          slug={slug}
+          locale={locale}
+          moderatorToken={moderatorToken}
+          modalContainer={modalContainer}
+        />
         {onLeaveRoom && (
           <Button
             color="danger"
@@ -2503,7 +2547,7 @@ function ScreenshareBanner({ api }: { api: JitsiMeetExternalAPI }) {
       }
       if (evt.id === localIdRef.current) return; // don't ping the presenter
       setActiveSharerId(evt.id);
-      const info = api.getParticipantsInfo().find((p) => p.id === evt.id);
+      const info = api.getParticipantsInfo().find((p) => p.participantId === evt.id);
       setActiveSharerName(info?.displayName ?? info?.formattedDisplayName ?? '');
     };
     const onLeft = (evt: { id: string }) => {

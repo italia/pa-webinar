@@ -92,6 +92,51 @@ describe('Chat i18n keys consistency with reference (it.json)', () => {
   });
 });
 
+/**
+ * Parity guard for the locales that actually ship.
+ *
+ * The hand-listed `requiredKeys` above only ever checked four keys, so every
+ * feature added since drifted in silently: five keys added by the v0.8.x live-room
+ * work existed only in it/en, and — worse — 18 keys existed only in `it` while
+ * `en` is ENABLED in production (SiteSetting.availableLocales = ["it","en"]).
+ * Among them the whole `live.share.*` block, i.e. an English user opening
+ * "Share" got raw message keys.
+ *
+ * Scope is deliberately the enabled locales only: the other 22 EU files are
+ * partial by design (~650 keys behind) and asserting full parity there would be
+ * red on arrival and get skipped. Widen this list when a locale is enabled.
+ */
+const SHIPPING_LOCALES = ['en'];
+
+describe('Shipping locales are at full key parity with the reference (it.json)', () => {
+  const flatten = (obj: Record<string, unknown>, prefix = ''): string[] =>
+    Object.entries(obj).flatMap(([k, v]) => {
+      const key = prefix ? `${prefix}.${k}` : k;
+      return v !== null && typeof v === 'object' && !Array.isArray(v)
+        ? flatten(v as Record<string, unknown>, key)
+        : [key];
+    });
+
+  const itKeys = flatten(loadMessages('it.json'));
+
+  for (const locale of SHIPPING_LOCALES) {
+    it(`${locale}.json has every key it.json has`, () => {
+      const keys = new Set(flatten(loadMessages(`${locale}.json`)));
+      const missing = itKeys.filter((k) => !keys.has(k));
+      expect(missing, `${locale}.json is missing ${missing.length} key(s)`).toEqual([]);
+    });
+
+    it(`${locale}.json has no non-empty-string leaves missing a value`, () => {
+      const messages = loadMessages(`${locale}.json`);
+      const empty = flatten(messages).filter((k) => {
+        const v = getNestedKey(messages, k);
+        return typeof v === 'string' && v.trim().length === 0;
+      });
+      expect(empty, `${locale}.json has empty translations`).toEqual([]);
+    });
+  }
+});
+
 describe('All locale files are valid JSON', () => {
   const localeFiles = getLocaleFiles();
 

@@ -44,36 +44,60 @@ export function isHumanParticipant(p: {
  * nuovo utente. Alex è entrato 3 volte, risulta 3!").
  *
  * The IFrame API does NOT surface our JWT identity (`context.user.id`) on a
- * client-side participant — only `id` (a fresh per-connection endpoint id),
+ * client-side participant — only the endpoint id (a fresh per-connection value),
  * `displayName` and `formattedDisplayName`. So we key on the normalized
  * display name: a person re-entering keeps the same name, so their leftover
  * "zombie" endpoint (not yet evicted by Prosody) shares the key and collapses
  * to one. Endpoints with no name fall back to their unique endpoint id, so
  * anonymous users are never merged together.
+ *
+ * The endpoint id field is `participantId` — external_api.js stamps it in
+ * `getParticipantsInfo()` (`e.participantId = <key of this._participants>`).
+ * `id` is accepted too because raised-hand/participant EVENT payloads use that
+ * name; taking either keeps one helper valid for both shapes.
  */
 export function participantIdentityKey(p: {
   id?: string | null;
+  participantId?: string | null;
   displayName?: string | null;
   formattedDisplayName?: string | null;
 }): string {
   const name = (p.displayName ?? p.formattedDisplayName ?? '').trim().toLowerCase();
   if (name) return name;
-  if (p.id) return `#${p.id}`;
+  const endpointId = p.participantId ?? p.id;
+  if (endpointId) return `#${endpointId}`;
   return '';
 }
 
 /**
- * Human headcount for a Jitsi IFrame API instance. `getNumberOfParticipants()`
- * is the total (local + remotes, bot included); `getParticipantsInfo()` lists
- * the remotes. We subtract any non-human remotes from the total so the local
- * user is still counted and the bot is not — and additionally subtract
- * same-identity duplicate remotes (F4) so a person who re-entered (Back-button
- * rejoin leaving a lingering "zombie" endpoint) isn't counted multiple times.
+ * Human headcount for a Jitsi IFrame API instance: the number of DISTINCT human
+ * identities in the room, bot excluded (F2) and re-entry "zombies" collapsed
+ * (F4: "Alex è entrato 3 volte, risulta 3!").
  *
- * `localDisplayName` (optional) is the local user's own name: getParticipantsInfo
- * is remotes-only, so we seed it into the dedup set to also collapse the local
- * user's OWN zombie on their own screen (otherwise the very person who re-entered
- * would still see their count inflated).
+ * We count the roster directly instead of subtracting corrections from
+ * `getNumberOfParticipants()`. The old subtract-from-total form was off by one:
+ * it assumed `getParticipantsInfo()` is remotes-only and seeded the dedup set
+ * with the local user's name, but in the external_api.js this platform serves
+ * `case "video-conference-joined"` has NO `break` and falls through into
+ * `case "participant-joined"`, which writes the LOCAL user's displayName into
+ * `_participants`. The local user is therefore IN the roster, matched the seeded
+ * key, and was counted as a duplicate — so every client under-reported by one.
+ * That is exactly the "4 persone" of live feedback #4 (6 endpoints − 1 bot −
+ * 1 self), and since #4b it was also the number persisted to
+ * `Event.peakParticipants`.
+ *
+ * Counting the union of {roster identities} ∪ {local identity} is correct under
+ * BOTH shapes: where the roster includes the local user the union is a no-op,
+ * and where it does not (the documented upstream contract, and what a future
+ * Jitsi bump may restore) the local user is added back exactly once. Pass
+ * `localEndpointId` (the `id` from `videoConferenceJoined`, which JitsiRoom
+ * already tracks) to make that decision EXACT instead of name-based: with it we
+ * detect the local row in the roster by id, so a user who renames themselves
+ * mid-call can no longer be counted twice. This build exposes no
+ * `getMyUserId()`, hence the id has to come from the caller.
+ *
+ * `getNumberOfParticipants()` survives only as the fallback for an API that
+ * exposes no roster at all.
  *
  * NOTE (known limitation): the only identity readable client-side is the display
  * name, so two genuinely DISTINCT attendees who share an identical name count as
@@ -86,41 +110,41 @@ export function humanParticipantCount(
     getNumberOfParticipants: () => number;
     getParticipantsInfo?: () => Array<{
       id?: string | null;
+      participantId?: string | null;
       displayName?: string | null;
       formattedDisplayName?: string | null;
     }>;
   },
   localDisplayName?: string | null,
+  localEndpointId?: string | null,
 ): number {
-  const total = api.getNumberOfParticipants();
-  const remotes = api.getParticipantsInfo?.() ?? [];
+  const roster = api.getParticipantsInfo?.() ?? [];
+  // No roster to count (API not ready, or a build without getParticipantsInfo):
+  // fall back to the raw total rather than reporting an empty room.
+  if (roster.length === 0) return Math.max(0, api.getNumberOfParticipants());
 
-  // One pass over the remotes yields both corrections we subtract from the
-  // ground-truth total:
-  //   • nonHuman   — the recording bot (F2), never a person.
-  //   • duplicates — extra endpoints of a person already counted (F4 "zombies":
-  //     a Back-button rejoin leaves a lingering endpoint under the same name).
-  // We seed the dedup set with the LOCAL user's identity (getParticipantsInfo
-  // is remotes-only) so their OWN zombie collapses on their own screen too —
-  // otherwise the very person who re-entered would still see an inflated count.
-  const seen = new Set<string>();
-  const localKey = participantIdentityKey({ displayName: localDisplayName });
-  if (localKey) seen.add(localKey);
-
-  let nonHuman = 0;
-  let duplicates = 0;
-  remotes.forEach((p, i) => {
-    if (!isHumanParticipant(p)) {
-      nonHuman += 1;
-      return;
+  const identities = new Set<string>();
+  let sawLocal = false;
+  roster.forEach((p, i) => {
+    if (localEndpointId && (p.participantId ?? p.id) === localEndpointId) {
+      sawLocal = true;
     }
+    if (!isHumanParticipant(p)) return; // the recording bot (F2)
     // participantIdentityKey falls back to the endpoint id for nameless
     // endpoints (distinct anonymous users never merge); `#anon-${i}` covers the
     // rare both-name-and-id-empty case so it still can't collide with another.
-    const key = participantIdentityKey(p) || `#anon-${i}`;
-    if (seen.has(key)) duplicates += 1;
-    else seen.add(key);
+    identities.add(participantIdentityKey(p) || `#anon-${i}`);
   });
 
-  return Math.max(0, total - nonHuman - duplicates);
+  // Add the local user only when the roster demonstrably does not list them.
+  // With an endpoint id that is a certainty; without one we fall back to the
+  // name key, which the Set collapses when the roster already carries it.
+  if (!sawLocal) {
+    const localKey =
+      participantIdentityKey({ displayName: localDisplayName }) ||
+      (localEndpointId ? `#${localEndpointId}` : '');
+    if (localKey) identities.add(localKey);
+  }
+
+  return identities.size;
 }
