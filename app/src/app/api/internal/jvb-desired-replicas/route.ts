@@ -606,9 +606,11 @@ export const GET = withErrorHandling(async (request) => {
  * `prisma.$transaction` so the status flip + session close are
  * atomic.
  *
- * We also denormalize the final peakParticipants from the event
- * (bumped live by Jitsi via the JVB IFrame API → admin monitoring
- * endpoint) so the session row is self-contained for analytics.
+ * The session's own peakParticipants is written live by the analytics/peak
+ * route. Here we only FILL it when the session never received one (an older
+ * row, or a session nobody reported for), using the event-wide peak as the best
+ * available estimate — overwriting it would replace a real per-session figure
+ * with a high-water mark across all sessions.
  */
 async function closeOpenSessions(
   tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
@@ -618,7 +620,7 @@ async function closeOpenSessions(
   if (eventIds.length === 0) return;
   const openSessions = await tx.callSession.findMany({
     where: { eventId: { in: eventIds }, endedAt: null },
-    select: { id: true, eventId: true, startedAt: true },
+    select: { id: true, eventId: true, startedAt: true, peakParticipants: true },
   });
   if (openSessions.length === 0) return;
 
@@ -639,7 +641,17 @@ async function closeOpenSessions(
         data: {
           endedAt: now,
           duration: durationSeconds,
-          peakParticipants: peakById.get(s.eventId) ?? 0,
+          // Only FILL a session that never got its own figure — never overwrite
+          // one. The event-wide peak is a high-water mark across every session,
+          // so stamping it here turned a room that peaked at 6 and then refilled
+          // with 2 into "6 participants" for the second session too, and the
+          // admin analytics reads the newest session as the event headcount:
+          // a believable wrong number is worse than the obvious 0 it replaced.
+          // Sessions that predate the live per-session write still inherit it,
+          // which is the best estimate available for them.
+          ...(s.peakParticipants > 0
+            ? {}
+            : { peakParticipants: peakById.get(s.eventId) ?? 0 }),
         },
       });
     }),

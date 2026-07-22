@@ -507,6 +507,16 @@ describe('wake window', () => {
     ).toBe('2026-07-22T09:00:00.000Z');
   });
 
+  it('the guard is scoped to PUBLISHED by the caller, so IDLE revival is unaffected', () => {
+    // Documented here because the predicate itself is status-agnostic: the wake
+    // route applies it ONLY to PUBLISHED. `/wake` is the sole IDLE→PROVISIONING
+    // path (the scaler pre-scales PUBLISHED only), so gating an IDLE room would
+    // leave a room that emptied during a break dark for good.
+    const beforeWindow = { ...base, now: at('2026-07-22T08:12:00Z') };
+    expect(canWakeNow(beforeWindow)).toBe(false);
+    // …which is why the route must not consult it for IDLE. See wake/route.ts.
+  });
+
   it('follows the configured pre-scale minutes', () => {
     const early = { ...base, preScaleMinutes: 45, now: at('2026-07-22T08:40:00Z') };
     expect(canWakeNow(early)).toBe(true);
