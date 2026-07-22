@@ -100,6 +100,9 @@ postgresql:
 # Bot recorder (registrazione per-partecipante, ADR-013).
 recorder:
   enabled: true
+  # Tag mutabile `:dev`: senza questo un nodo puo' riusare un layer in cache e
+  # registrare col codice di ieri. Vedi la nota estesa in values.yaml.
+  imagePullPolicy: Always
   # Il bot entra sul dominio nascosto di Prosody e sparisce dall'interfaccia
   # Jitsi in modo nativo: nessun riquadro, nessuna riga nell'elenco, nessuna
   # notifica di ingresso, escluso dal conteggio. Va in coppia con
@@ -107,6 +110,8 @@ recorder:
   # quella deroga il MUC rifiuta chi non presenta un token.
   hiddenDomain: "hidden.meet.jitsi"
   # Secret gia' creato dal subchart jitsi per Jibri: nessuna credenziale nuova.
+  # NB: `jitsi-meet.jibri.recorder.password` DEVE restare pinnata nei values del
+  # deploy, altrimenti ogni upgrade la rigenera e il login del bot fallisce.
   xmppSecretName: "pa-webinar-jitsi-meet-jibri-secret-recorder"
 
 jitsi:

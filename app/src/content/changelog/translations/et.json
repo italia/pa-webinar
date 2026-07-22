@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Ooteruum: leht ja väljak, kuhu astud omal valikul",
+    "notes": [
+      "Ooteruum on nüüd puhas leht disainisüsteemi järgi: sündmus, heli- ja videoseaded, nimi, vestlus. Külgkastis olnud väike mäng on eemaldatud.",
+      "Interaktiivne väljak avaneb ainult siis, kui selle valid, ja täidab kogu ekraani. Lehe enda juhtnupud jäävad kõrvale — nimi, mikrofon, kaamera, vestlus, teated — ja saad igal ajal tagasi tulla. Kes eelistab animatsioonita vaadet, saab lülituda klassikalisele versioonile ja valik jäetakse meelde.",
+      "Avatarid: kui aadressil, millega registreerusid, on Gravatar, võib see nüüd ilmuda ruumis pildina. Selle lülitab sisse haldaja ja päringu teeb meie server: osalejate brauserid ei võta gravatar.com-iga kunagi ühendust.",
+      "Sündmust salvestav komponent ei ilmu enam osalejate hulka ega loendusse: see on sisemine teenus, mitte inimene ruumis. Teade sündmuse salvestamisest jääb alles."
+    ]
+  },
   "0.8.5": {
     "title": "Elavam vestlus: mainimised, reaktsioonid, parandused ja väljavõte",
     "notes": [

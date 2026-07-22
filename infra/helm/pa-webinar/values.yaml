@@ -1034,14 +1034,23 @@ recorder:
   # Valorizzando `hiddenDomain` il recorder si autentica li' invece che col JWT
   # del portale. Richiede DUE cose sul lato Prosody:
   #   1. l'account esista (l'immagine jitsi lo crea con ENABLE_RECORDING);
-  #   2. il dominio sia in `token_verification_allowlist` sul componente MUC —
+  #   2. l'ACCOUNT sia in `token_verification_allowlist` sul componente MUC —
   #      altrimenti, con l'autenticazione a token, l'ingresso viene rifiutato.
   #      Si imposta senza toccare i file di config:
-  #        XMPP_MUC_CONFIGURATION: 'token_verification_allowlist = { "<dominio>" }'
+  #        XMPP_MUC_CONFIGURATION: 'token_verification_allowlist = { "recorder@<dominio>" }'
+  #      Il singolo account, NON l'intero dominio: chi ha quella password entra
+  #      in qualunque stanza senza token, quindi la deroga si tiene stretta.
+  #
+  #   La password va PINNATA nei values (`jitsi-meet.jibri.recorder.password`):
+  #   il subchart la rigenera con `randAlphaNum` a ogni upgrade se non lo e', e
+  #   il bot si ritroverebbe credenziali diverse da quelle registrate su
+  #   Prosody. In quel caso ricade sul JWT — registra comunque, ma torna
+  #   visibile in stanza.
   # Vuoto = disattivato: il bot entra col JWT e resta VISIBILE in stanza.
   hiddenDomain: ""
-  # Secret con le credenziali del bot. Di default quello che il subchart jitsi
-  # crea gia' per Jibri: nessun secret nuovo da gestire o ruotare a parte.
+  # Secret con le credenziali del bot. Vuoto = quello che il subchart jitsi crea
+  # gia' per Jibri (`<release>-jitsi-meet-jibri-secret-recorder`): nessun secret
+  # nuovo da gestire o ruotare a parte. Valorizzalo se usi un secret esterno.
   xmppSecretName: ""
   xmppSecretUserKey: "JIBRI_RECORDER_USER"
   xmppSecretPasswordKey: "JIBRI_RECORDER_PASSWORD"

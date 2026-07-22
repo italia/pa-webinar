@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Uzgaidāmā telpa: lapa un laukums, kurā ieej pēc paša izvēles",
+    "notes": [
+      "Uzgaidāmā telpa tagad ir pārskatāma lapa atbilstoši dizaina sistēmai: pasākums, skaņas un video iestatījumi, vārds, tērzēšana. Mazā spēle sānu lodziņā ir noņemta.",
+      "Interaktīvais laukums atveras tikai tad, ja to izvēlies, un aizņem visu ekrānu. Lapas vadīklas paliek blakus — vārds, mikrofons, kamera, tērzēšana, paziņojumi — un jebkurā brīdī vari atgriezties. Kas dod priekšroku versijai bez animācijas, var pārslēgties uz klasisko, un izvēle tiek atcerēta.",
+      "Avatāri: ja adresei, ar kuru reģistrējies, ir Gravatar, tas tagad var parādīties kā attēls telpā. To ieslēdz administrators, un pieprasījumu veic mūsu serveris: dalībnieku pārlūkprogrammas nekad nesazinās ar gravatar.com.",
+      "Komponente, kas ieraksta pasākumu, vairs neparādās ne dalībnieku sarakstā, ne skaitā: tā ir iekšēja pakalpojuma daļa, nevis cilvēks telpā. Paziņojums, ka pasākums tiek ierakstīts, paliek."
+    ]
+  },
   "0.8.5": {
     "title": "Dzīvāka tērzēšana: pieminējumi, reakcijas, labojumi un eksports",
     "notes": [

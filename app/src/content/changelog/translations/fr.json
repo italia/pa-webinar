@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "La salle d'attente : une page, et une place où l'on choisit d'entrer",
+    "notes": [
+      "La salle d'attente est désormais une page claire, conforme au système de design : l'événement, les contrôles audio et vidéo, votre nom, la conversation. Le petit jeu qui occupait l'encadré latéral a été retiré.",
+      "La place interactive ne s'ouvre que si vous la choisissez, et occupe tout l'écran. Les contrôles de la page restent à côté — nom, micro, caméra, conversation, avis — et vous pouvez revenir en arrière quand vous voulez. Qui préfère éviter l'animation peut passer à la version classique, et ce choix est mémorisé.",
+      "Avatars : si un Gravatar est associé à l'adresse avec laquelle vous vous êtes inscrit, il peut maintenant apparaître comme image dans la salle. C'est l'administrateur qui l'active, et c'est notre serveur qui fait la requête : le navigateur des participants ne contacte jamais gravatar.com.",
+      "Le composant qui enregistre l'événement n'apparaît plus parmi les participants ni dans le décompte : c'est un service interne, pas quelqu'un dans la salle. L'avis indiquant que l'événement est enregistré reste en place."
+    ]
+  },
   "0.8.5": {
     "title": "Un chat plus vivant : mentions, réactions, corrections et export",
     "notes": [

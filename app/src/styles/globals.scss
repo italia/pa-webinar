@@ -2580,6 +2580,17 @@ html.live-call-immersive body {
   gap: 8px;
 }
 
+// Il suggerimento accanto ai pulsanti: dice che si può entrare camminando
+// fino al cancello, cosa che nessun altro elemento dell'interfaccia rivela.
+.wr-piazza-hint {
+  align-self: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: #17324d;
+  background: rgba(255, 255, 255, 0.78);
+}
+
 .wr-piazza-btn {
   border: 0;
   border-radius: 999px;

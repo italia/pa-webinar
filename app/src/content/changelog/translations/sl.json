@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Čakalnica: stran in trg, na katerega vstopiš po lastni izbiri",
+    "notes": [
+      "Čakalnica je zdaj pregledna stran po oblikovnem sistemu: dogodek, nastavitve zvoka in slike, ime, klepet. Majhna igra v stranskem okvirju je odstranjena.",
+      "Interaktivni trg se odpre le, če ga izberete, in zapolni ves zaslon. Ob njem ostanejo iste kontrole kot na strani — ime, mikrofon, kamera, klepet, obvestila — in kadar koli se lahko vrnete. Kdor ima raje brez animacije, preklopi na klasično različico; izbira se zapomni.",
+      "Avatarji: če ima naslov, s katerim ste se prijavili, Gravatar, se lahko zdaj prikaže kot slika v sobi. Vklopi ga skrbnik, zahtevo pa opravi naš strežnik: brskalniki udeležencev se z gravatar.com nikoli ne povežejo.",
+      "Komponenta, ki snema dogodek, se ne prikazuje več med udeleženci niti v štetju: gre za notranjo storitev, ne za osebo v sobi. Obvestilo, da se dogodek snema, ostaja."
+    ]
+  },
   "0.8.5": {
     "title": "Živahnejši klepet: omembe, reakcije, popravki in izvoz",
     "notes": [

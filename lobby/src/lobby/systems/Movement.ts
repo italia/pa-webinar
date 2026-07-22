@@ -109,10 +109,10 @@ export class Movement {
       k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright';
     const isWasd = k === 'w' || k === 'a' || k === 's' || k === 'd';
     const target = e.target as HTMLElement | null;
-    const typing = isInteractive(target);
+    const typing = isTextEntry(target);
 
     if (k === ' ' || k === 'spacebar') {
-      if (typing) return;
+      if (typing || isActivatable(target)) return;
       e.preventDefault();
       this.cbs.onJump();
       return;
@@ -145,11 +145,29 @@ export class Movement {
   }
 }
 
-function isInteractive(el: HTMLElement | null): boolean {
+/**
+ * Si sta SCRIVENDO: il tasto appartiene al cursore di testo, non al gioco.
+ *
+ * I bottoni sono deliberatamente fuori. La piazza porta il fuoco sul pulsante
+ * di uscita appena si entra, e trattarlo come «sto scrivendo» lasciava
+ * l'avatar immobile: le frecce non facevano nulla finché non si cliccava sul
+ * canvas — e chi naviga da tastiera non aveva alcun modo di sbloccarsi.
+ */
+function isTextEntry(el: HTMLElement | null): boolean {
   if (!el) return false;
-  return (
-    /^(input|textarea|select|button)$/i.test(el.tagName) || el.isContentEditable
-  );
+  return /^(input|textarea|select)$/i.test(el.tagName) || el.isContentEditable;
+}
+
+/**
+ * Un controllo che la BARRA SPAZIATRICE attiva (bottoni, link).
+ *
+ * Lo spazio fa saltare l'avatar, ma su un controllo a fuoco significa
+ * «premilo»: rubarlo con preventDefault renderebbe l'uscita dalla piazza
+ * inutilizzabile da tastiera. Le frecce invece restano al gioco.
+ */
+function isActivatable(el: HTMLElement | null): boolean {
+  if (!el) return false;
+  return /^(button|a)$/i.test(el.tagName) || el.getAttribute('role') === 'button';
 }
 
 function clamp(v: number, lo: number, hi: number): number {

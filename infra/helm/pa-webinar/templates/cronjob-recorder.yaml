@@ -78,6 +78,7 @@ spec:
                       name: {{ include "pa-webinar.secretName" . }}
                       key: CRON_API_KEY
                 {{- if .Values.recorder.hiddenDomain }}
+                {{- $xmppSecret := .Values.recorder.xmppSecretName | default (printf "%s-jitsi-meet-jibri-secret-recorder" .Release.Name) }}
                 # Identita' del bot sul dominio NASCOSTO di Prosody. E' cosi'
                 # che il recorder sparisce da Jitsi in modo nativo: ogni client
                 # confronta il dominio del JID con `config.hiddenDomain` e, se
@@ -89,12 +90,12 @@ spec:
                 - name: JITSI_XMPP_USER
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.recorder.xmppSecretName | quote }}
+                      name: {{ $xmppSecret | quote }}
                       key: {{ .Values.recorder.xmppSecretUserKey | quote }}
                 - name: JITSI_XMPP_PASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.recorder.xmppSecretName | quote }}
+                      name: {{ $xmppSecret | quote }}
                       key: {{ .Values.recorder.xmppSecretPasswordKey | quote }}
                 {{- end }}
                 {{- if .Values.recorder.idleTimeoutSec }}

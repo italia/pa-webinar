@@ -284,12 +284,12 @@ export class WorldScene extends Phaser.Scene {
       await this.ctx.conference.join(sel);
     } catch {
       this.joining = false;
-      // Il rifiuto va DIMENTICATO anche sulla zona cancello: `inGateZone` resta
-      // true finché non se ne esce, e senza questo l'ingresso camminando
-      // diventava una porta che si apre una volta sola — completa il nome nel
-      // pannello e il cancello non risponde più, perché nessuno riemette la
-      // richiesta. Azzerandolo, il prossimo passo dentro la zona riprova.
-      this.inGateZone = false;
+      // `inGateZone` resta VOLUTAMENTE true. Azzerarlo qui sembrava gentile
+      // («completa il nome e riprova senza muoverti») ma `emitGateZone` gira a
+      // ogni frame e riemette sul FRONTE: con l'avatar fermo dentro la zona
+      // ripartirebbe sessanta volte al secondo, e ogni tentativo respinto
+      // rimette il fuoco sul campo del nome — impossibile perfino correggere
+      // l'email. Si riarma uscendo dalla zona e rientrando: un passo indietro.
       return;
     }
     // Release preview tracks BEFORE the (future) real conference grabs devices.

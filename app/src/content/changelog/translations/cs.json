@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Čekárna: stránka a náměstí, na které se vstupuje z vlastní vůle",
+    "notes": [
+      "Čekárna je nyní přehledná stránka podle designového systému: událost, ovládání zvuku a obrazu, jméno, chat. Malá hra v postranním rámečku byla odstraněna.",
+      "Interaktivní náměstí se otevře, jen když si ho vyberete, a zaplní celou obrazovku. Ovládací prvky stránky zůstávají vedle — jméno, mikrofon, kamera, chat, upozornění — a kdykoli se můžete vrátit. Kdo dává přednost verzi bez animace, přepne na klasickou; volba se zapamatuje.",
+      "Avatary: má-li adresa, se kterou jste se přihlásili, Gravatar, může se nyní zobrazit jako obrázek v místnosti. Zapíná to správce a dotaz posílá náš server: prohlížeče účastníků se s gravatar.com nespojují.",
+      "Součást, která událost nahrává, se už neobjevuje mezi účastníky ani v počtu: je to interní služba, ne člověk v místnosti. Upozornění, že se událost nahrává, zůstává."
+    ]
+  },
   "0.8.5": {
     "title": "Živější chat: zmínky, reakce, opravy a export",
     "notes": [

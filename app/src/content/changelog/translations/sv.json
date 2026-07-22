@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Väntrummet: en sida och ett torg man väljer att gå in på",
+    "notes": [
+      "Väntrummet är nu en ren sida enligt designsystemet: evenemanget, ljud- och bildinställningarna, namnet, chatten. Det lilla spelet i sidorutan har tagits bort.",
+      "Det interaktiva torget öppnas bara om du väljer det, och fyller hela skärmen. Sidans egna kontroller stannar bredvid — namn, mikrofon, kamera, chatt, information — och du kan gå tillbaka när du vill. Den som hellre slipper animation kan byta till den klassiska versionen, och valet kommer ihåg.",
+      "Avatarer: om adressen du anmälde dig med har en Gravatar kan den nu visas som din bild i rummet. En administratör slår på det, och vår server gör förfrågan: deltagarnas webbläsare kontaktar aldrig gravatar.com.",
+      "Komponenten som spelar in evenemanget syns inte längre bland deltagarna eller i räkningen: den är en intern tjänst, inte någon i rummet. Meddelandet om att evenemanget spelas in står kvar."
+    ]
+  },
   "0.8.5": {
     "title": "En livligare chatt: omnämnanden, reaktioner, rättelser och export",
     "notes": [

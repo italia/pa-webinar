@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Sala d'attesa: una pagina, e una piazza in cui si sceglie di entrare",
+    "notes": [
+      "La sala d'attesa è ora una pagina pulita e conforme al design system: l'evento, i controlli audio e video, il nome, la chat. Il piccolo gioco che occupava il riquadro laterale è stato rimosso.",
+      "La piazza interattiva si apre solo se la scegli, e occupa tutto lo schermo. Restano a fianco gli stessi controlli della pagina — nome, microfono, telecamera, chat, avvisi — e si torna indietro quando vuoi. Chi preferisce nessuna animazione può passare alla versione classica, e la scelta viene ricordata.",
+      "Avatar: se all'indirizzo con cui ti sei iscritto è collegato un Gravatar, ora può comparire come immagine in sala. È l'amministratore ad attivarlo, ed è il nostro server a fare la richiesta: il browser di chi partecipa non contatta mai gravatar.com.",
+      "Il componente che registra l'evento non compare più tra i partecipanti né nel conteggio: è un servizio interno, non una persona in sala. L'avviso che l'evento viene registrato resta dov'era."
+    ]
+  },
   "0.8.5": {
     "title": "Chat più viva: menzioni, reazioni, correzioni ed export",
     "notes": [

@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Poczekalnia: strona i plac, na który wchodzi się z wyboru",
+    "notes": [
+      "Poczekalnia jest teraz przejrzystą stroną zgodną z systemem projektowym: wydarzenie, ustawienia dźwięku i obrazu, imię, czat. Mała gra zajmująca boczną ramkę została usunięta.",
+      "Interaktywny plac otwiera się tylko wtedy, gdy go wybierzesz, i zajmuje cały ekran. Obok pozostają te same elementy sterujące co na stronie — imię, mikrofon, kamera, czat, komunikaty — i w każdej chwili można wrócić. Kto woli bez animacji, przechodzi do wersji klasycznej, a wybór zostaje zapamiętany.",
+      "Awatary: jeśli do adresu, którym się zapisano, przypisany jest Gravatar, może teraz pojawić się jako zdjęcie w sali. Włącza to administrator, a zapytanie wysyła nasz serwer: przeglądarki uczestników nigdy nie łączą się z gravatar.com.",
+      "Składnik nagrywający wydarzenie nie pojawia się już wśród uczestników ani w liczniku: to usługa wewnętrzna, a nie osoba w sali. Informacja o nagrywaniu pozostaje bez zmian."
+    ]
+  },
   "0.8.5": {
     "title": "Żywszy czat: wzmianki, reakcje, poprawianie wiadomości i eksport",
     "notes": [

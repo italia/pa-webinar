@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "De wachtruimte: een pagina, en een plein dat je zelf betreedt",
+    "notes": [
+      "De wachtruimte is nu een overzichtelijke pagina volgens het ontwerpsysteem: het evenement, de audio- en videoinstellingen, je naam, de chat. Het kleine spel in het zijvak is verwijderd.",
+      "Het interactieve plein opent alleen als je ervoor kiest en vult het hele scherm. De bedieningselementen van de pagina blijven ernaast staan — naam, microfoon, camera, chat, meldingen — en je kunt altijd terug. Wie liever geen animatie heeft, schakelt over op de klassieke versie; die keuze wordt onthouden.",
+      "Avatars: als aan het adres waarmee je je hebt aangemeld een Gravatar is gekoppeld, kan die nu als afbeelding in de ruimte verschijnen. Een beheerder zet het aan, en onze server doet het verzoek: de browser van deelnemers neemt nooit contact op met gravatar.com.",
+      "Het onderdeel dat het evenement opneemt, verschijnt niet meer bij de deelnemers of in de telling: het is een interne dienst, geen persoon in de ruimte. De melding dat er wordt opgenomen blijft staan."
+    ]
+  },
   "0.8.5": {
     "title": "Een levendigere chat: vermeldingen, reacties, correcties en export",
     "notes": [

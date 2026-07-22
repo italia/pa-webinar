@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Il-kamra tal-istennija: paġna, u pjazza li tagħżel int li tidħol fiha",
+    "notes": [
+      "Il-kamra tal-istennija issa hija paġna nadifa skont is-sistema tad-disinn: l-avveniment, il-kontrolli tal-awdjo u tal-vidjo, l-isem, iċ-chat. Il-logħba ż-żgħira li kienet fil-kaxxa tal-ġenb tneħħiet.",
+      "Il-pjazza interattiva tinfetaħ biss jekk tagħżilha, u timla l-iskrin kollu. Il-kontrolli tal-paġna jibqgħu maġenbha — isem, mikrofonu, kamera, chat, avviżi — u tista' terġa' lura meta trid. Min jippreferi mingħajr animazzjoni jista' jaqleb għall-verżjoni klassika, u l-għażla tinżamm.",
+      "Avatars: jekk l-indirizz li rreġistrajt bih għandu Gravatar, issa jista' jidher bħala r-ritratt tiegħek fil-kamra. Jixgħelu l-amministratur, u t-talba ssir mis-server tagħna: il-browser ta' min jipparteċipa qatt ma jikkuntattja lil gravatar.com.",
+      "Il-komponent li jirreġistra l-avveniment m'għadux jidher fost il-parteċipanti u lanqas fl-għadd: hija servizz intern, mhux persuna fil-kamra. L-avviż li l-avveniment qed jiġi rreġistrat jibqa' fejn kien."
+    ]
+  },
   "0.8.5": {
     "title": "Chat aktar ħajja: mentions, reazzjonijiet, korrezzjonijiet u esportazzjoni",
     "notes": [

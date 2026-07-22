@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "An seomra feithimh: leathanach, agus cearnóg a roghnaíonn tú dul isteach inti",
+    "notes": [
+      "Is leathanach glan de réir an chórais dearaidh é an seomra feithimh anois: an t-imeacht, na rialtáin fuaime agus físe, d'ainm, an comhrá. Baineadh an cluiche beag a bhí sa bhosca taoibh.",
+      "Ní osclaíonn an chearnóg idirghníomhach ach amháin má roghnaíonn tú í, agus líonann sí an scáileán. Fanann rialtáin an leathanaigh lena taobh — ainm, micreafón, ceamara, comhrá, fógraí — agus is féidir filleadh am ar bith. Is féidir leo siúd nach dteastaíonn beochan uathu an leagan clasaiceach a roghnú, agus cuimhnítear ar an rogha sin.",
+      "Abhatáir: má tá Gravatar ceangailte leis an seoladh ar chláraigh tú leis, féadfaidh sé a bheith le feiceáil mar phictiúr sa seomra anois. Cuireann riarthóir ar siúl é, agus is é ár bhfreastalaí a dhéanann an t-iarratas: ní dhéanann brabhsálaithe na rannpháirtithe teagmháil le gravatar.com riamh.",
+      "Ní thaispeántar a thuilleadh an chomhpháirt a thaifeadann an t-imeacht i measc na rannpháirtithe ná sa chomhaireamh: seirbhís inmheánach atá inti, ní duine sa seomra. Fanann an fógra go bhfuil an t-imeacht á thaifeadadh mar a bhí."
+    ]
+  },
   "0.8.5": {
     "title": "Comhrá níos beoga: daoine a lua, frithghníomhartha, ceartúcháin agus easpórtáil",
     "notes": [

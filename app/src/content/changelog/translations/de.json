@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Der Warteraum: eine Seite und ein Platz, den man betreten kann",
+    "notes": [
+      "Der Warteraum ist jetzt eine aufgeräumte Seite nach dem Designsystem: die Veranstaltung, die Ton- und Videoeinstellungen, Ihr Name, der Chat. Das kleine Spiel im Seitenkasten wurde entfernt.",
+      "Der interaktive Platz öffnet sich nur, wenn Sie ihn wählen, und füllt den Bildschirm. Die Bedienelemente der Seite bleiben daneben — Name, Mikrofon, Kamera, Chat, Hinweise — und Sie können jederzeit zurück. Wer lieber keine Animation möchte, wechselt zur klassischen Ansicht; diese Wahl wird gemerkt.",
+      "Avatare: Ist mit Ihrer Anmeldeadresse ein Gravatar verknüpft, kann er nun als Bild im Raum erscheinen. Eine Administratorin oder ein Administrator schaltet das frei, und unser Server stellt die Anfrage: Die Browser der Teilnehmenden kontaktieren gravatar.com nie.",
+      "Die Komponente, die die Veranstaltung aufzeichnet, erscheint nicht mehr in der Teilnehmerliste und nicht in der Zählung: Sie ist ein interner Dienst, keine Person im Raum. Der Hinweis auf die Aufzeichnung bleibt unverändert."
+    ]
+  },
   "0.8.5": {
     "title": "Lebendigerer Chat: Erwähnungen, Reaktionen, Korrekturen und Export",
     "notes": [

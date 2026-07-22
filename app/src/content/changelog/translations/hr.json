@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Čekaonica: stranica i trg na koji se ulazi po vlastitom izboru",
+    "notes": [
+      "Čekaonica je sada pregledna stranica u skladu sa sustavom dizajna: događaj, postavke zvuka i slike, ime, razgovor. Mala igra u bočnom okviru je uklonjena.",
+      "Interaktivni trg otvara se samo ako ga odaberete i ispunjava cijeli zaslon. Uz njega ostaju iste kontrole kao na stranici — ime, mikrofon, kamera, razgovor, obavijesti — i možete se vratiti kad god želite. Tko radije bez animacije, prelazi na klasičnu verziju; izbor se pamti.",
+      "Avatari: ako adresa kojom ste se prijavili ima Gravatar, sada se može prikazati kao slika u sobi. Uključuje ga administrator, a zahtjev šalje naš poslužitelj: preglednici sudionika nikada ne kontaktiraju gravatar.com.",
+      "Komponenta koja snima događaj više se ne pojavljuje među sudionicima ni u brojanju: to je interna usluga, a ne osoba u sobi. Obavijest da se događaj snima ostaje."
+    ]
+  },
   "0.8.5": {
     "title": "Živahniji chat: spominjanja, reakcije, ispravci i izvoz",
     "notes": [

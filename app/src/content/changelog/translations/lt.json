@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Laukiamasis: puslapis ir aikštė, į kurią įeinama savo noru",
+    "notes": [
+      "Laukiamasis dabar yra tvarkingas puslapis pagal dizaino sistemą: renginys, garso ir vaizdo valdikliai, vardas, pokalbiai. Mažas žaidimas šoniniame langelyje pašalintas.",
+      "Interaktyvi aikštė atsiveria tik tada, kai ją pasirenki, ir užima visą ekraną. Puslapio valdikliai lieka šalia — vardas, mikrofonas, kamera, pokalbiai, pranešimai — ir bet kada gali grįžti. Kas nori be animacijos, gali pereiti į klasikinę versiją, o pasirinkimas įsimenamas.",
+      "Avatarai: jei adresas, kuriuo užsiregistravai, turi Gravatar, jis dabar gali būti rodomas kaip nuotrauka salėje. Tai įjungia administratorius, o užklausą atlieka mūsų serveris: dalyvių naršyklės niekada nesikreipia į gravatar.com.",
+      "Renginį įrašantis komponentas neberodomas nei tarp dalyvių, nei skaičiuojant: tai vidinė paslauga, o ne žmogus salėje. Pranešimas, kad renginys įrašomas, lieka."
+    ]
+  },
   "0.8.5": {
     "title": "Gyvesni pokalbiai: paminėjimai, reakcijos, taisymai ir atsisiuntimas",
     "notes": [
