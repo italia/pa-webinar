@@ -199,6 +199,15 @@ export async function main(): Promise<void> {
   // caricare né da ingestare. Usciamo puliti — l'ingest rifiuterebbe un
   // array vuoto (422) e non avrebbe senso accodare la pipeline.
   if (manifest.tracks.length === 0) {
+    // Mai entrati in conferenza = configurazione o credenziali sbagliate, non
+    // una stanza vuota. Uscire con 0 lo farebbe passare per un lavoro riuscito
+    // e l'anomalia si scoprirebbe a evento finito, quando non c'e' piu' nulla
+    // da registrare: meglio un Job in errore, che si vede.
+    if (!joinedConference) {
+      throw new Error(
+        'mai entrati in conferenza: credenziali del bot o allowlist del MUC da verificare',
+      );
+    }
     console.warn('[recorder] nessuna traccia catturata — niente upload/ingest');
     return;
   }

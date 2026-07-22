@@ -174,9 +174,6 @@ const PARTICIPANT_EMAIL_KEY = 'pawebinar.participant.email';
 // no longer disables the (now default) game experience.
 const ARCADE_CLASSIC_KEY = 'pawebinar.arcade.classic';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-/** Cosa può ricevere il fuoco dentro la piazza (per il contenimento del Tab). */
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function WaitingRoom({
   event,
@@ -485,7 +482,6 @@ export default function WaitingRoom({
   // Tastiera nella piazza: entrarci porta il focus sull'uscita, uscirne lo
   // riporta all'invito.
   const gameDialogRef = useRef<HTMLDivElement>(null);
-  const shellRef = useRef<HTMLDivElement>(null);
   const inviteRef = useRef<HTMLButtonElement>(null);
   const classicToggleRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef(false);
@@ -505,29 +501,6 @@ export default function WaitingRoom({
     // raggiunge uscita, versione classica e tutti i controlli della pagina.
     gameDialogRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      // Il Tab non deve uscire dal guscio: sotto ci sono l'intestazione e il
-      // piè di pagina del sito, invisibili ma ancora tabulabili. Senza questo,
-      // `aria-modal` prometterebbe un isolamento che non c'è.
-      if (e.key === 'Tab' && !e.defaultPrevented) {
-        const shell = shellRef.current;
-        if (shell) {
-          const focusable = Array.from(
-            shell.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-          ).filter((el) => el.offsetParent !== null || el === shell);
-          const first = focusable[0];
-          const last = focusable[focusable.length - 1];
-          const active = document.activeElement as HTMLElement | null;
-          if (!first || !last) return;
-          if (e.shiftKey && (active === first || !shell.contains(active))) {
-            e.preventDefault();
-            last.focus();
-          } else if (!e.shiftKey && active === last) {
-            e.preventDefault();
-            first.focus();
-          }
-        }
-        return;
-      }
       if (e.key !== 'Escape' || e.defaultPrevented) return;
       // Non mentre si scrive: Esc in un campo di testo (o in chat) significa
       // "annulla quello che sto scrivendo", non "chiudi la piazza". Il pannello
@@ -1076,13 +1049,17 @@ export default function WaitingRoom({
 
   return (
     <div
-      ref={shellRef}
       className={piazzaOpen ? 'waiting-shell waiting-shell--piazza' : 'waiting-shell'}
-      // In piazza il guscio copre tutta la finestra: l'intestazione e il piè di
-      // pagina del sito restano DIETRO, invisibili ma ancora tabulabili. Con
-      // `aria-modal` le tecnologie assistive ignorano ciò che sta fuori.
+      // `role`+`aria-label`, ma NON `aria-modal`: quello dichiara che tutto il
+      // resto è nascosto, e sarebbe una bugia — dietro il guscio restano
+      // l'intestazione e il piè di pagina del sito, ancora tabulabili. Una
+      // trappola del fuoco l'avrebbe reso vero, ma la mia sbagliava in tre modi
+      // (agganciata allo stato sbagliato, non tratteneva dalla scena, non
+      // riprendeva il Tab in avanti) e una trappola rotta è peggio di nessuna
+      // promessa: chi naviga da tastiera si ritrova bloccato in una pagina che
+      // non è più un dialogo. Meglio dire meno e dire il vero.
       {...(piazzaOpen
-        ? { role: 'dialog' as const, 'aria-modal': true, 'aria-label': t('gardenDialogLabel') }
+        ? { role: 'dialog' as const, 'aria-label': t('gardenDialogLabel') }
         : {})}
     >
       {/* Fratello, non sostituto: `{false}` occupa comunque la sua posizione

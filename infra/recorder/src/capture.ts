@@ -110,7 +110,8 @@ export interface CaptureResult {
  *      a. `JitsiMeetJS.init({ disableAudioLevels: false })`
  *      b. crea la connection: con le credenziali del dominio NASCOSTO se
  *         configurate (login SASL, bot invisibile in stanza), altrimenti col
- *         JWT del portale. Un login rifiutato ricade UNA volta sul JWT.
+ *         JWT del portale. Un login rifiutato NON si ritenta qui: se ne accorge
+ *         `index.ts`, che rilancia l'intera cattura (vedi `joinedConference`).
  *      c. su CONNECTION_ESTABLISHED, `initJitsiConference(roomName, {})` —
  *         receive-only perché non crea né pubblica track locali.
  *      d. `conference.setDisplayName(botDisplayName)` e `conference.join(jwt)`.
