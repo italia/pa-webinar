@@ -2918,3 +2918,55 @@ html.live-call-immersive body {
   background: rgba(0, 102, 204, 0.12);
   font-weight: 600;
 }
+
+// Sala d'attesa: la piazza si apre su invito, non addosso a chi arriva (C1).
+.wr-game-invite {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px dashed #cfd8e3;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8fbff 0%, #f2f7fb 100%);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--app-primary, #06c);
+    transform: translateY(-1px);
+  }
+}
+
+.wr-game-invite__art {
+  font-size: 1.6rem;
+  line-height: 1;
+  // Un respiro appena percettibile: è l'"infografica che si muove" chiesta,
+  // non un elemento che reclama attenzione.
+  animation: wr-invite-breathe 3.2s ease-in-out infinite;
+}
+
+.wr-game-invite__title {
+  display: block;
+  font-weight: 600;
+  color: var(--app-text, #17324d);
+}
+
+.wr-game-invite__hint {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--app-muted, #5c6f82);
+}
+
+@keyframes wr-invite-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.12); }
+}
+
+// Chi ha chiesto meno movimento non lo subisce.
+@media (prefers-reduced-motion: reduce) {
+  .wr-game-invite__art { animation: none; }
+  .wr-game-invite { transition: none; }
+}

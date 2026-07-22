@@ -3420,7 +3420,9 @@
     "aiNoticeTitle": "Elaborazione AI dopo l'evento",
     "aiNotice": "Al termine, la registrazione sarà elaborata da strumenti di intelligenza artificiale per generare trascrizione, sintesi ed eventuali traduzioni e doppiaggi. Gli artefatti possono contenere imprecisioni; il video resta la fonte autoritativa.",
     "multitrackConsentTitle": "Registrazione per partecipante",
-    "multitrackConsentRequired": "Devi accettare la registrazione della tua traccia audio per entrare"
+    "multitrackConsentRequired": "Devi accettare la registrazione della tua traccia audio per entrare",
+    "enterGardenTitle": "Entra nella piazza",
+    "enterGardenHint": "Uno spazio da esplorare mentre aspetti che l’evento cominci."
   },
   "recording": {
     "management": "Registrazione video",
