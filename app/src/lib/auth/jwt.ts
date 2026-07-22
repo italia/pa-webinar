@@ -44,8 +44,6 @@ function getJitsiJwtSubject(): string {
 }
 
 import { generateAvatarDataUri } from '@/lib/avatar';
-import { gravatarUrl } from '@/lib/avatar-gravatar';
-import { getSettings } from '@/lib/settings';
 
 interface JitsiTokenPayload {
   roomName: string;
@@ -87,20 +85,8 @@ export async function generateJitsiJwt(
   const jitsiJwtAudience = getJitsiJwtAudience();
   const jitsiJwtSubject = getJitsiJwtSubject();
 
-  // Inline SVG data URI bypasses Jitsi web CSP restrictions. When the admin has
-  // enabled Gravatar AND we have the attendee's email, that wins — see
-  // lib/avatar-gravatar for why it is opt-in.
-  let avatarUrl = generateAvatarDataUri(payload.displayName);
-  if (payload.email) {
-    try {
-      const settings = await getSettings();
-      if (settings.gravatarEnabled) {
-        avatarUrl = gravatarUrl(payload.email) ?? avatarUrl;
-      }
-    } catch {
-      // Settings unreachable: keep the generated avatar rather than fail a join.
-    }
-  }
+  // Inline SVG data URI bypasses Jitsi web CSP restrictions
+  const avatarUrl = generateAvatarDataUri(payload.displayName);
 
   const jwt = await new SignJWT({
     context: {
