@@ -134,7 +134,9 @@ export const POST = withErrorHandling(async (request, context) => {
   void publishChat({
     id: messageId,
     eventId: auth.eventId,
-    senderId: auth.senderId,
+    // Vuoto di proposito: questo envelope arriva a TUTTA la sala, e l'id di chi
+    // reagisce non serve a nessun client (i conteggi bastano).
+    senderId: '',
     senderName: '',
     isModerator: false,
     text: '',
