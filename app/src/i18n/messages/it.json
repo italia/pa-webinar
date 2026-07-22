@@ -1581,7 +1581,9 @@
         "emailFromName": "Nome del mittente",
         "emailFromNameHelp": "Vuoto = si usa il nome configurato nel deploy (SMTP_FROM_NAME). Le email restano inviate dall’indirizzo di sistema.",
         "emailReplyTo": "Indirizzo per le risposte",
-        "emailReplyToHelp": "Le email partono da un indirizzo no-reply: senza questo, chi risponde non raggiunge nessuno."
+        "emailReplyToHelp": "Le email partono da un indirizzo no-reply: senza questo, chi risponde non raggiunge nessuno.",
+        "gravatarEnabled": "Usa Gravatar come immagine dei partecipanti",
+        "gravatarEnabledHelp": "Chi si è iscritto con un'email che ha un Gravatar lo vedrà come immagine in sala. L'indirizzo Gravatar contiene l'hash dell'email, viene mostrato a tutti i partecipanti e comporta una richiesta a un servizio terzo: va dichiarato nell'informativa privacy. Disattivato: si usano le iniziali generate dalla piattaforma."
       }
     },
     "analytics": {

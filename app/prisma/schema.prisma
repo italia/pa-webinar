@@ -1134,6 +1134,13 @@ model SiteSetting {
   // instance that never touches this keeps the historical behaviour. The
   // ADDRESS stays in SMTP_FROM: it has to match what the SMTP relay is
   // authorised to send as, so it is deployment config, not a site setting.
+  // Avatar via Gravatar per chi si è iscritto con la propria email (A4).
+  // DISATTIVO di default, e deve restare una scelta esplicita: l'URL Gravatar
+  // contiene l'hash dell'email e viene diffuso da Jitsi in presenza a TUTTI i
+  // partecipanti, oltre a essere una richiesta a un terzo (Automattic). Con il
+  // flag spento restano gli avatar con le iniziali, generati da noi.
+  gravatarEnabled Boolean @default(false) @map("gravatar_enabled")
+
   emailFromName String? @map("email_from_name")
   // Optional Reply-To. The From address is a no-reply relay, so without this a
   // reply from an attendee goes nowhere.
