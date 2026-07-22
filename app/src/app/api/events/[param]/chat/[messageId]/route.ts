@@ -21,7 +21,8 @@ import { authenticateChatSender } from '@/lib/chat/authenticate';
 import { encryptPII } from '@/lib/crypto/pii';
 import { publishChat } from '@/lib/chat/pubsub';
 import { prisma } from '@/lib/db';
-import { ForbiddenError, NotFoundError, ValidationError } from '@/lib/errors';
+import { ForbiddenError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { rateLimit } from '@/lib/rate-limit';
 import { getFilesStorage } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
@@ -121,6 +122,16 @@ export const PATCH = withErrorHandling(async (request, context) => {
     request,
   );
 
+  // Every sibling write path is throttled (POST /chat 30/min, reactions 60/min)
+  // and an edit is a DB write plus a fan-out to every SSE subscriber in the room.
+  const rl = rateLimit(`chat-edit:${auth.eventId}:${auth.senderId}`, {
+    limit: 20,
+    windowMs: 60_000,
+  });
+  if (!rl.allowed) {
+    throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
+  }
+
   const message = await prisma.chatMessage.findFirst({
     where: { id: messageId, eventId: auth.eventId, hiddenAt: null },
     select: { id: true, senderId: true, createdAt: true },
@@ -129,6 +140,18 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   // Authorship is the whole authorisation here: a moderator gets `hide`, not
   // the ability to put words in someone else's message.
+  //
+  // Matching senderId is NOT enough. Several legitimate identities share one:
+  // everybody holding the shared primary moderator link is
+  // `mod-<eventId>-primary`, and a forwarded registration link deliberately
+  // keeps the SAME `reg-<id>` seat (F7). A guest id is a truncated hash of
+  // ip:name and collides behind a NAT. Any of those would let one person rewrite
+  // another's message while it stays attributed to the original author — so
+  // editing requires an identity that provably belongs to ONE person: a per-row
+  // grant, or the browser that actually registered.
+  if (!auth.isPerPersonIdentity) {
+    throw new ForbiddenError('This link is shared, so it cannot edit messages');
+  }
   if (message.senderId !== auth.senderId) {
     throw new ForbiddenError('Not your message');
   }

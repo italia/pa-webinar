@@ -21,6 +21,8 @@ export interface ChatAuthResult {
   senderId: string;
   senderName: string;
   isModerator: boolean;
+  /** See ChatTokenSender: a seat is not a person. */
+  isPerPersonIdentity: boolean;
 }
 
 /**
@@ -97,5 +99,9 @@ export async function authenticateChatSender(
     senderId: `guest-${Buffer.from(`${ip}:${name}`).toString('base64url').slice(0, 24)}`,
     senderName: name,
     isModerator: false,
+    // Truncated base64 of ip:name — it collides for two people behind one NAT
+    // with similar names, and for IPv6 the address alone fills the budget. It
+    // is a display hint, never a credential.
+    isPerPersonIdentity: false,
   };
 }

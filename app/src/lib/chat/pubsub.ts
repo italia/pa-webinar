@@ -41,9 +41,10 @@ export interface ChatEnvelope {
   replyTo?: ChatReplyRef;
   // Marks the message as corrected by its author; the UI shows "modificato".
   editedAt?: string | null;
-  // Reaction tallies: emoji → who reacted (sender ids). Sent on every change so
-  // a late joiner and a live client converge on the same counts.
-  reactions?: Record<string, string[]>;
+  // Reaction tallies: emoji → COUNT. Sent whole on every change so a client that
+  // missed a frame still converges. Never the sender ids: this envelope goes to
+  // every reader of the chat.
+  reactions?: Record<string, number>;
   // What the subscriber should DO with this envelope:
   //   'delete'   → hide the message (moderation, live, no refresh needed)
   //   'edit'     → replace the text of an existing message

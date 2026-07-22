@@ -15,14 +15,10 @@ describe('chat reaction emoji', () => {
 });
 
 describe('tallyReactions', () => {
-  it('groups sender ids by emoji', () => {
+  it('counts per emoji and never carries an id — the tally is broadcast to the room', () => {
     expect(
-      tallyReactions([
-        { emoji: '👍', senderId: 'reg-1' },
-        { emoji: '👍', senderId: 'reg-2' },
-        { emoji: '🎉', senderId: 'reg-1' },
-      ]),
-    ).toEqual({ '👍': ['reg-1', 'reg-2'], '🎉': ['reg-1'] });
+      tallyReactions([{ emoji: '👍' }, { emoji: '👍' }, { emoji: '🎉' }]),
+    ).toEqual({ '👍': 2, '🎉': 1 });
   });
 
   it('is empty for no rows', () => {

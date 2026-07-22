@@ -26,6 +26,18 @@ export interface ChatTokenSender {
   senderId: string;
   senderName: string;
   isModerator: boolean;
+  /**
+   * True only when this token identifies ONE person.
+   *
+   * `senderId` deliberately is NOT that: the shared primary moderator link
+   * resolves to `mod-<eventId>-primary` for everyone who holds it, and a
+   * forwarded registration link keeps the SAME `reg-<id>` seat (F7, on purpose —
+   * it keeps a legitimate cross-device registrant from splitting in two). Those
+   * are seats, not people. Anything that authorises acting AS the author — such
+   * as editing a message after the fact — must require this flag instead, or one
+   * holder of a shared link can rewrite another's words under their name.
+   */
+  isPerPersonIdentity: boolean;
 }
 
 export interface ChatEventForAuth {
@@ -67,6 +79,9 @@ export async function resolveTokenSender(
         : `${isGrantModerator ? 'mod' : 'spk'}-${event.id}-${grant.grantId}`,
       senderName,
       isModerator: isGrantModerator,
+      // A per-ROW grant is issued to one named person; the shared primary link
+      // is handed around a team.
+      isPerPersonIdentity: !grant.isPrimaryShared,
     };
   }
 
@@ -94,6 +109,10 @@ export async function resolveTokenSender(
         ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
         : displayNameOverride?.trim() || 'Partecipante',
       isModerator: false,
+      // Only the browser that registered — the one holding the signed
+      // event_access cookie — is provably this person. A forwarded link shares
+      // the seat, which is fine for attribution and wrong for authorship.
+      isPerPersonIdentity: owns,
     };
   }
 

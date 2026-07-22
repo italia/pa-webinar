@@ -20,16 +20,21 @@ export function isChatReactionEmoji(value: string): value is ChatReactionEmoji {
   return (CHAT_REACTION_EMOJIS as readonly string[]).includes(value);
 }
 
-/** emoji → sender ids who reacted with it. */
-export type ChatReactionTally = Record<string, string[]>;
+/**
+ * emoji → how many reacted with it.
+ *
+ * COUNTS, never the sender ids. The ids are broadcast to every reader of the
+ * chat, the UI only ever renders the number, and a guest id is a base64 of
+ * `ip:name` — publishing the list would have handed the public IP of every
+ * silent attendee who tapped an emoji to anyone with devtools open.
+ */
+export type ChatReactionTally = Record<string, number>;
 
-/** Collapse reaction rows into the shape the clients render. */
-export function tallyReactions(
-  rows: Array<{ emoji: string; senderId: string }>,
-): ChatReactionTally {
+/** Collapse reaction rows into the counts the clients render. */
+export function tallyReactions(rows: Array<{ emoji: string }>): ChatReactionTally {
   const out: ChatReactionTally = {};
   for (const r of rows) {
-    (out[r.emoji] ??= []).push(r.senderId);
+    out[r.emoji] = (out[r.emoji] ?? 0) + 1;
   }
   return out;
 }
