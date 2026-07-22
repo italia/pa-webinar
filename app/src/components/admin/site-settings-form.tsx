@@ -1073,6 +1073,40 @@ function FeaturesTab({ settings, updateField }: TabProps) {
       </Row>
 
       <hr className="my-4" />
+      <h3 className="h5 mb-3">{t('emailSenderTitle')}</h3>
+      <p className="text-muted small mb-3">{t('emailSenderHelp')}</p>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="emailFromName">{t('emailFromName')}</Label>
+            <Input
+              id="emailFromName"
+              value={settings.emailFromName ?? ''}
+              placeholder={settings.siteName || 'PA Webinar'}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('emailFromName', e.target.value || null)
+              }
+            />
+            <small className="text-muted">{t('emailFromNameHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="emailReplyTo">{t('emailReplyTo')}</Label>
+            <Input
+              id="emailReplyTo"
+              type="email"
+              value={settings.emailReplyTo ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('emailReplyTo', e.target.value || null)
+              }
+            />
+            <small className="text-muted">{t('emailReplyToHelp')}</small>
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <hr className="my-4" />
       <h3 className="h5 mb-3">{t('jvbScalingTitle')}</h3>
       <p className="text-muted small mb-3">{t('jvbScalingHelp')}</p>
       <Row>

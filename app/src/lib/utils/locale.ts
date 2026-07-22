@@ -32,6 +32,16 @@ export type LocalizedField = Record<string, string> | null | undefined;
  * Retrieve a localized string from a multilingual JSON field.
  * Falls back to the given fallback locale (default: 'it'),
  * then to the first available value.
+ *
+ * An EMPTY (or whitespace-only) translation counts as absent and falls through.
+ * The event form writes one key per enabled locale and leaves the ones nobody
+ * filled in as "", so `obj[locale] ?? …` — which only falls back on
+ * null/undefined — returned the empty string and stopped there. In production
+ * that produced confirmation emails with the subject "Registration confirmed: "
+ * and no event name anywhere in the body, plus an iCal attachment with an empty
+ * SUMMARY, for everyone who registered from an /en page of an
+ * Italian-only-titled event. "Not translated" must mean "show the original",
+ * never "show nothing".
  */
 export function getLocalized(
   field: LocalizedField,
@@ -40,7 +50,12 @@ export function getLocalized(
 ): string {
   if (!field || typeof field !== 'object') return '';
   const obj = field as Record<string, string>;
-  return obj[locale] ?? obj[fallbackLocale] ?? Object.values(obj)[0] ?? '';
+  const usable = (v: unknown): v is string =>
+    typeof v === 'string' && v.trim().length > 0;
+
+  if (usable(obj[locale])) return obj[locale];
+  if (usable(obj[fallbackLocale])) return obj[fallbackLocale];
+  return Object.values(obj).find(usable) ?? '';
 }
 
 /**

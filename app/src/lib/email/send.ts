@@ -6,6 +6,8 @@
 import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 
+import { getSettings } from '@/lib/settings';
+
 let transporter: Transporter | null = null;
 
 function getTransporter(): Transporter {
@@ -48,13 +50,39 @@ interface SendEmailInput {
 
 /**
  * Send an email via the configured SMTP transport.
+ *
+ * The display name comes from the admin panel (`SiteSetting.emailFromName`) and
+ * falls back to SMTP_FROM_NAME, then to the site name: an instance that never
+ * sets it behaves exactly as before. The ADDRESS stays environment-only —
+ * the relay authorises a specific sender, so letting an operator type one in
+ * would silently break delivery (SPF/DKIM) rather than rebrand anything.
+ *
+ * Reply-To is set when configured: From is a no-reply mailbox, so without it a
+ * reply from an attendee is simply lost.
  */
 export async function sendEmail(input: SendEmailInput): Promise<void> {
   const transport = getTransporter();
 
+  let fromName = process.env.SMTP_FROM_NAME ?? 'PA Webinar';
+  let replyTo: string | undefined;
+  try {
+    const settings = await getSettings();
+    const configured = settings.emailFromName?.trim();
+    if (configured) fromName = configured;
+    else if (settings.siteName?.trim() && !process.env.SMTP_FROM_NAME) {
+      fromName = settings.siteName.trim();
+    }
+    replyTo = settings.emailReplyTo?.trim() || undefined;
+  } catch {
+    // Settings unreachable (DB blip): fall back to the env, never block a send.
+  }
+
   await transport.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME ?? 'PA Webinar'}" <${process.env.SMTP_FROM ?? 'noreply@dominio.gov.it'}>`,
+    // A display name containing `"` would break the quoted string and could
+    // inject header syntax — strip the quote characters and CR/LF outright.
+    from: `"${fromName.replace(/["\r\n]/g, '')}" <${process.env.SMTP_FROM ?? 'noreply@dominio.gov.it'}>`,
     to: input.to,
+    ...(replyTo ? { replyTo } : {}),
     subject: input.subject,
     html: input.html,
     text: input.text,

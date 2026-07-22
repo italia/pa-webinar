@@ -92,6 +92,32 @@ describe('getLocalized', () => {
   it('returns empty string for empty object', () => {
     expect(getLocalized({}, 'it')).toBe('');
   });
+
+  // The event form writes one key per enabled locale and leaves the untranslated
+  // ones as "". Treating that as a real value produced, in production,
+  // confirmation emails with the subject "Registration confirmed: " and no event
+  // name anywhere — for every attendee who registered from an /en page of an
+  // event titled only in Italian.
+  it('treats an EMPTY translation as missing and falls back', () => {
+    expect(getLocalized({ it: 'Sync DesIt + DevIt', en: '' }, 'en')).toBe('Sync DesIt + DevIt');
+  });
+
+  it('treats a whitespace-only translation as missing', () => {
+    expect(getLocalized({ it: 'Ciao', en: '   ' }, 'en')).toBe('Ciao');
+    expect(getLocalized({ it: 'Ciao', en: '\n\t' }, 'en')).toBe('Ciao');
+  });
+
+  it('skips an empty fallback and takes the first usable value', () => {
+    expect(getLocalized({ it: '', en: '', de: 'Hallo' }, 'fr')).toBe('Hallo');
+  });
+
+  it('returns empty only when every translation is empty', () => {
+    expect(getLocalized({ it: '', en: '  ' }, 'en')).toBe('');
+  });
+
+  it('still prefers the requested locale when it has content', () => {
+    expect(getLocalized({ it: 'Ciao', en: 'Hello' }, 'en')).toBe('Hello');
+  });
 });
 
 // ── setLocalized ────────────────────────────────────────────

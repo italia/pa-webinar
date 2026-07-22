@@ -1560,7 +1560,13 @@
         "jvbProvisioningTimeoutMinutesHelp": "Dopo quanti minuti da startsAt un evento con JVB non ancora pronto viene segnalato come 'degraded' sulla status page. Default 15. Copre cold-start del nodo (~3-5 min) + margine di sicurezza.",
         "statusPollIntervalSeconds": "Intervallo polling status page (secondi)",
         "statusPollIntervalSecondsHelp": "Ogni quanti secondi la pagina /status aggiorna i dati lato browser. Default 30. Valori più bassi = dati più freschi ma più carico sull'app."
-      }
+      },
+      "emailSenderTitle": "Mittente delle email",
+      "emailSenderHelp": "Come appare il mittente nella posta di chi si iscrive. L'indirizzo di invio resta configurato nel deploy (deve corrispondere a quello autorizzato dal server SMTP).",
+      "emailFromName": "Nome del mittente",
+      "emailFromNameHelp": "Vuoto = si usa il nome del sito. Le email restano inviate dall’indirizzo di sistema.",
+      "emailReplyTo": "Indirizzo per le risposte",
+      "emailReplyToHelp": "Le email partono da un indirizzo no-reply: senza questo, chi risponde non raggiunge nessuno."
     },
     "analytics": {
       "title": "Statistiche",

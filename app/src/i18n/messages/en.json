@@ -1490,7 +1490,13 @@
         "jvbProvisioningTimeoutMinutesHelp": "After how many minutes since startsAt an event without JVB ready is flagged as 'degraded' on the status page. Default 15. Covers node cold-start (~3-5 min) plus safety margin.",
         "statusPollIntervalSeconds": "Status page poll interval (seconds)",
         "statusPollIntervalSecondsHelp": "How often the /status page refreshes from the browser. Default 30. Lower values = fresher data but more load on the app."
-      }
+      },
+      "emailSenderTitle": "Email sender",
+      "emailSenderHelp": "How the sender appears in a registrant’s inbox. The sending address stays in the deployment configuration — it has to match what the SMTP server is authorised to send as.",
+      "emailFromName": "Sender name",
+      "emailFromNameHelp": "Empty = the site name is used. Emails are still sent from the system address.",
+      "emailReplyTo": "Reply-to address",
+      "emailReplyToHelp": "Emails come from a no-reply address: without this, a reply reaches nobody."
     },
     "analytics": {
       "title": "Analytics",

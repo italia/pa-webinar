@@ -50,6 +50,9 @@ const updateSettingsSchema = z.object({
   videoQuality: z.enum(['SAVE_DATA', 'BALANCED', 'HIGH', 'MAX']).optional(),
   githubUrl: z.string().url().nullish(),
   supportEmail: z.string().email().nullish(),
+  // Nome mittente mostrato in posta; stringa vuota = torna al default.
+  emailFromName: z.string().max(100).nullish(),
+  emailReplyTo: z.string().email().nullish(),
   availableLocales: z.array(z.string().min(2).max(5)).optional(),
   localeNames: z.record(z.string().min(2).max(5), z.string().max(50)).optional(),
   translationOverrides: z.record(z.string(), z.record(z.string(), z.string())).optional(),
