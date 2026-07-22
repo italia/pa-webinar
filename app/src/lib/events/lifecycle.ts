@@ -106,6 +106,40 @@ export interface OvertimeReclaimInput {
  * acceptable: while another event holds the bridge up there is no JVB to
  * reclaim anyway; once the bridge truly empties this fires within one grace.
  */
+export interface IdleDemotionInput {
+  /** Last tick at which the bridge reported participants for this event. */
+  lastActiveAt: Date | null;
+  /** When the room started warming up (set by /wake and by the pre-scale). */
+  provisioningStartedAt: Date | null;
+  /** Scheduled start. */
+  startsAt: Date;
+  /** now - jvbInactiveGraceMinutes. */
+  inactiveCutoff: Date;
+}
+
+/**
+ * Should a LIVE event (still before its end time) be demoted to IDLE for
+ * inactivity, freeing its bridge?
+ *
+ * The rule is "no activity for the whole grace window", and the window is
+ * measured from the LATEST meaningful signal — including `startsAt`.
+ *
+ * That last term is the point. In production an event was demoted to IDLE three
+ * minutes after going LIVE, killing the bridge exactly as people were arriving:
+ * nobody had joined yet, so `lastActiveAt` was null and the check fell back to
+ * `provisioningStartedAt` — which was already more than 45 minutes old, because
+ * a registrant had opened the event page (and `/wake` warmed the room) an hour
+ * before the start. An event cannot have been idle for longer than it has been
+ * running: a room that started two minutes ago is not stale, whenever it was
+ * warmed up.
+ */
+export function shouldDemoteLiveToIdle(input: IdleDemotionInput): boolean {
+  const signals = [input.startsAt.getTime()];
+  if (input.lastActiveAt) signals.push(input.lastActiveAt.getTime());
+  if (input.provisioningStartedAt) signals.push(input.provisioningStartedAt.getTime());
+  return Math.max(...signals) < input.inactiveCutoff.getTime();
+}
+
 export function shouldReclaimEmptyOvertime(input: OvertimeReclaimInput): boolean {
   if (!input.canReclaimEmpty) return false;
   // Open-ended rooms only. A finite grace (>= 0) is already bounded in time by

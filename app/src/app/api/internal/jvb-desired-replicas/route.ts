@@ -34,6 +34,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import {
+  shouldDemoteLiveToIdle,
   shouldEndLiveEvent,
   shouldReclaimEmptyOvertime,
   emptyCloseCutoff,
@@ -238,17 +239,28 @@ export const GET = withErrorHandling(async (request) => {
     //    endsAt fallback + a stricter reliability gate BECAUSE it closes to
     //    ENDED. The two are deliberately NOT the same predicate — don't unify.
     if (!skipIdleDemotion) {
-      const idleCandidates = await tx.event.findMany({
-        where: {
-          status: 'LIVE',
-          endsAt: { gt: now },
-          OR: [
-            { lastActiveAt: { lt: inactiveCutoff } },
-            { AND: [{ lastActiveAt: null }, { provisioningStartedAt: { lt: inactiveCutoff } }] },
-          ],
+      // Fetch the LIVE-before-endsAt set and decide in `shouldDemoteLiveToIdle`,
+      // rather than encoding the rule as a WHERE clause: the rule needs the
+      // LATEST of several timestamps (SQL would need GREATEST, which Prisma
+      // cannot express here) and it is worth unit-testing on its own. The set is
+      // at most a handful of rows.
+      const liveEvents = await tx.event.findMany({
+        where: { status: 'LIVE', endsAt: { gt: now } },
+        select: {
+          id: true,
+          lastActiveAt: true,
+          provisioningStartedAt: true,
+          startsAt: true,
         },
-        select: { id: true },
       });
+      const idleCandidates = liveEvents.filter((e) =>
+        shouldDemoteLiveToIdle({
+          lastActiveAt: e.lastActiveAt,
+          provisioningStartedAt: e.provisioningStartedAt,
+          startsAt: e.startsAt,
+          inactiveCutoff,
+        }),
+      );
       if (idleCandidates.length > 0) {
         const demotedIds = idleCandidates.map((e) => e.id);
         const r = await tx.event.updateMany({
