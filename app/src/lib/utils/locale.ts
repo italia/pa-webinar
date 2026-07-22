@@ -59,6 +59,40 @@ export function getLocalized(
 }
 
 /**
+ * Drop the locales whose value is empty or whitespace-only.
+ *
+ * Apply on WRITE. The event wizard initialises `{ it: '', en: '' }` and posts
+ * every key back, so an event titled only in Italian is stored as
+ * `{ it: 'Sync', en: '' }` forever. `getLocalized` now copes with that, but any
+ * consumer reading the JSON directly (an API client, an export, a future
+ * surface) reproduces the blank-title symptom. Not storing the emptiness
+ * removes the class of bug instead of patching each reader.
+ */
+export function pruneEmptyTranslations(field: LocalizedField): Record<string, string> {
+  if (!field || typeof field !== 'object') return {};
+  const out: Record<string, string> = {};
+  for (const [locale, value] of Object.entries(field as Record<string, string>)) {
+    if (typeof value === 'string' && value.trim().length > 0) out[locale] = value;
+  }
+  return out;
+}
+
+/**
+ * The value authored FOR THIS LOCALE, with no fallback at all.
+ *
+ * For the legal pages (privacy, accessibility) "not authored in this language"
+ * must NOT mean "serve the Italian text to an English reader": there the
+ * absence is a signal to render the built-in, fully translated document. The
+ * fallback chain in `getLocalized` is right for a title — where showing the
+ * original beats showing nothing — and wrong for a legal document.
+ */
+export function getLocalizedExact(field: LocalizedField, locale: string): string {
+  if (!field || typeof field !== 'object') return '';
+  const value = (field as Record<string, string>)[locale];
+  return typeof value === 'string' && value.trim().length > 0 ? value : '';
+}
+
+/**
  * Set a value in a multilingual JSON field, returning a new object.
  */
 export function setLocalized(

@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getSettings } from '@/lib/settings';
 import { publicEventStatusWhere } from '@/lib/events/visibility';
 import EventListClient from '@/components/events/event-list-client';
@@ -158,7 +159,7 @@ async function TagFilterRow({ tags, activeTag, locale }: TagFilterRowProps) {
         {tags.map((tag) => {
           const active = activeTag === tag.slug;
           const displayName =
-            tag.name[locale] ?? tag.name.it ?? tag.name.en ?? tag.slug;
+            getLocalized(tag.name as LocalizedField, locale) || tag.slug;
           const color = tag.color ?? '#0066CC';
           return (
             <a

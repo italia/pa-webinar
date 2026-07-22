@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { resolveLocale, localiseEvent, getLocalized, setLocalized } from './locale';
+import {
+  resolveLocale,
+  localiseEvent,
+  getLocalized,
+  getLocalizedExact,
+  pruneEmptyTranslations,
+  setLocalized,
+} from './locale';
 
 function makeRequest(url: string, headers?: Record<string, string>): Request {
   return new Request(url, { headers });
@@ -186,5 +193,46 @@ describe('localiseEvent', () => {
     const { title, description } = localiseEvent(event, 'fr');
     expect(title).toBe('Titre');
     expect(description).toBe('Description');
+  });
+});
+
+// ── pruneEmptyTranslations ──────────────────────────────────
+
+describe('pruneEmptyTranslations', () => {
+  it('drops empty and whitespace-only locales', () => {
+    expect(pruneEmptyTranslations({ it: 'Sync', en: '', fr: '  ' })).toEqual({ it: 'Sync' });
+  });
+
+  it('keeps every locale that has content', () => {
+    expect(pruneEmptyTranslations({ it: 'Ciao', en: 'Hello' })).toEqual({ it: 'Ciao', en: 'Hello' });
+  });
+
+  it('returns an empty object for null/undefined/empty input', () => {
+    expect(pruneEmptyTranslations(null)).toEqual({});
+    expect(pruneEmptyTranslations(undefined)).toEqual({});
+    expect(pruneEmptyTranslations({})).toEqual({});
+  });
+
+  it('is what makes the stored shape and the read fallback agree', () => {
+    const stored = pruneEmptyTranslations({ it: 'Sync DesIt + DevIt', en: '' });
+    expect(getLocalized(stored, 'en')).toBe('Sync DesIt + DevIt');
+    // …and a consumer reading the JSON directly no longer sees an empty string.
+    expect(stored).not.toHaveProperty('en');
+  });
+});
+
+// ── getLocalizedExact ───────────────────────────────────────
+
+describe('getLocalizedExact', () => {
+  it('returns only what was authored for that locale', () => {
+    expect(getLocalizedExact({ it: 'Testo', en: '' }, 'en')).toBe('');
+    expect(getLocalizedExact({ it: 'Testo' }, 'en')).toBe('');
+    expect(getLocalizedExact({ it: 'Testo', en: 'Text' }, 'en')).toBe('Text');
+  });
+
+  it('never falls back — a legal page must not serve another language as its own', () => {
+    // privacy/accessibility rely on the empty result to render the built-in,
+    // fully translated document instead of the operator's Italian text.
+    expect(getLocalizedExact({ it: 'Informativa' }, 'de')).toBe('');
   });
 });

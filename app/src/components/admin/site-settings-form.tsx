@@ -1082,7 +1082,6 @@ function FeaturesTab({ settings, updateField }: TabProps) {
             <Input
               id="emailFromName"
               value={settings.emailFromName ?? ''}
-              placeholder={settings.siteName || 'PA Webinar'}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 updateField('emailFromName', e.target.value || null)
               }
