@@ -1134,6 +1134,13 @@ model SiteSetting {
   // instance that never touches this keeps the historical behaviour. The
   // ADDRESS stays in SMTP_FROM: it has to match what the SMTP relay is
   // authorised to send as, so it is deployment config, not a site setting.
+  // Avatar via Gravatar (A4). DISATTIVO di default: l'immagine passa comunque
+  // dal nostro proxy `/api/avatar` — il browser dei partecipanti non contatta
+  // mai gravatar.com — ma resta una richiesta della piattaforma a un terzo, e
+  // va dichiarata nell'informativa. Con il flag spento restano gli avatar con
+  // le iniziali generati da noi.
+  gravatarEnabled Boolean @default(false) @map("gravatar_enabled")
+
   emailFromName String? @map("email_from_name")
   // Optional Reply-To. The From address is a no-reply relay, so without this a
   // reply from an attendee goes nowhere.

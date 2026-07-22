@@ -44,6 +44,7 @@ function getJitsiJwtSubject(): string {
 }
 
 import { generateAvatarDataUri } from '@/lib/avatar';
+import { encryptPII } from '@/lib/crypto/pii';
 
 interface JitsiTokenPayload {
   roomName: string;
@@ -52,8 +53,16 @@ interface JitsiTokenPayload {
   uniqueId: string;
   isModerator: boolean;
   expiresInSeconds?: number;
-  /** Kept for forward compatibility but not used for avatar URLs. */
+  /** Usata per l'avatar solo quando `useGravatar` è true (vedi sotto). */
   email?: string;
+  /**
+   * Quando true l'avatar punta al NOSTRO proxy `/api/avatar`, che interroga
+   * Gravatar lato server e ricade sull'SVG con le iniziali. La decisione arriva
+   * dal chiamante, che ha già i settings: leggerli qui accoppierebbe ogni
+   * emissione di token — cron del recorder compreso — alle impostazioni del
+   * sito, e renderebbe impuri gli unit test di questo modulo.
+   */
+  useGravatar?: boolean;
 }
 
 /**
@@ -85,8 +94,27 @@ export async function generateJitsiJwt(
   const jitsiJwtAudience = getJitsiJwtAudience();
   const jitsiJwtSubject = getJitsiJwtSubject();
 
-  // Inline SVG data URI bypasses Jitsi web CSP restrictions
-  const avatarUrl = generateAvatarDataUri(payload.displayName);
+  // Di norma un data URI SVG inline: attraversa qualunque restrizione del web
+  // Jitsi e non fa partire richieste.
+  //
+  // Con Gravatar attivo puntiamo al NOSTRO proxy `/api/avatar`, mai a
+  // gravatar.com: è il nostro server a parlare col terzo, non il browser dei
+  // partecipanti, e `docs/GDPR.md` resta vero. L'email viaggia CIFRATA: l'URL
+  // dell'avatar viene diffuso in presenza a tutta la sala, e un digest non
+  // salato di un indirizzo lì sarebbe un oracolo di re-identificazione, non
+  // un'anonimizzazione.
+  let avatarUrl = generateAvatarDataUri(payload.displayName);
+  if (payload.useGravatar && payload.email) {
+    const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '');
+    if (base) {
+      const q = new URLSearchParams({
+        name: payload.displayName,
+        e: encryptPII(payload.email),
+        size: '200',
+      });
+      avatarUrl = `${base}/api/avatar?${q.toString()}`;
+    }
+  }
 
   const jwt = await new SignJWT({
     context: {

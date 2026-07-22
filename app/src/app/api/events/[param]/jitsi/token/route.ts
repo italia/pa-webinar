@@ -8,6 +8,7 @@ import {
   AppError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { getSettings } from '@/lib/settings';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
 import { EventModeratorRole, verifyGrantToken } from '@/lib/auth/moderator';
 import {
@@ -168,6 +169,9 @@ export const POST = withErrorHandling(async (request, context) => {
       uniqueId: participantJitsiId(registration.id),
       isModerator: false,
       email,
+      // La scelta è dell'amministratore, e la legge il chiamante: il minter del
+      // token resta puro (vedi JitsiTokenPayload.useGravatar).
+      useGravatar: (await getSettings()).gravatarEnabled,
     });
 
     return Response.json({
