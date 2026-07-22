@@ -49,6 +49,8 @@ describe('resolveTokenSender — F7 registration name gate', () => {
       senderId: 'reg-reg-99',
       senderName: 'Alice', // DB name wins for the owner; typed override ignored
       isModerator: false,
+      // Solo il browser che si è registrato è provabilmente questa persona.
+      isPerPersonIdentity: true,
     });
   });
 
@@ -62,6 +64,9 @@ describe('resolveTokenSender — F7 registration name gate', () => {
       senderId: 'reg-reg-99',
       senderName: 'Bob',
       isModerator: false,
+      // Link inoltrato: stesso posto, persona diversa — non può spacciarsi
+      // per l'autore (di qui il divieto di modificare i messaggi).
+      isPerPersonIdentity: false,
     });
     expect(sender?.senderName).not.toBe('Alice');
   });

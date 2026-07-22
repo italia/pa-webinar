@@ -52,7 +52,7 @@ export const GET = withErrorHandling(async (request, context) => {
       createdAt: true,
       editedAt: true,
       attachmentName: true,
-      reactions: { select: { emoji: true, senderId: true } },
+      reactions: { select: { emoji: true } },
       replyTo: { select: { senderName: true, hiddenAt: true } },
     },
   });
@@ -94,7 +94,7 @@ export const GET = withErrorHandling(async (request, context) => {
               m.edited ? '(modificato)' : '',
               m.attachment ? `[allegato: ${m.attachment}]` : '',
               Object.entries(m.reactions)
-                .map(([e, who]) => `${e}${who.length}`)
+                .map(([e, n]) => `${e}${n}`)
                 .join(' '),
             ]
               .filter(Boolean)

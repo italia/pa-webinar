@@ -336,7 +336,9 @@
       "editLabel": "Edit message",
       "editSave": "Save",
       "editFailed": "Could not edit the message.",
-      "exportChat": "Download the chat"
+      "exportChat": "Download the chat",
+      "reactNotAllowed": "Reacting to messages needs your personal or moderator link.",
+      "editNotAllowed": "This link is shared, so it cannot edit messages."
     },
     "role": {
       "moderator": "Moderator",

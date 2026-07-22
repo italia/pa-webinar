@@ -24,7 +24,7 @@ import { authenticateChatSender } from '@/lib/chat/authenticate';
 import { isChatReactionEmoji, tallyReactions } from '@/lib/chat/emoji';
 import { publishChat } from '@/lib/chat/pubsub';
 import { prisma } from '@/lib/db';
-import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { ForbiddenError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -67,6 +67,16 @@ export const POST = withErrorHandling(async (request, context) => {
     parsed.data.displayNameOverride,
     request,
   );
+
+  // Members only. A guest senderId is a truncated base64 of `ip:name`: behind
+  // one NAT two guests with similar names collide, and the unique key
+  // (message, sender, emoji) would then make one person's tap REMOVE the
+  // other's reaction — the counter going down for the whole room. A seat shared
+  // by a team is fine here (the tally counts seats, not souls); an id that
+  // collides between strangers is not.
+  if (auth.senderId.startsWith('guest-')) {
+    throw new ForbiddenError('Reactions require a participant or moderator link');
+  }
 
   // Cheaper than a message but just as spammable: a reaction is a write plus a
   // fan-out to every connected client.
@@ -115,6 +125,9 @@ export const POST = withErrorHandling(async (request, context) => {
     select: { emoji: true, senderId: true },
   });
   const reactions = tallyReactions(rows);
+  // What THIS caller reacted with, so the client can render its own state
+  // without the tally ever carrying anyone's id.
+  const mine = rows.filter((r) => r.senderId === auth.senderId).map((r) => r.emoji);
 
   // Publish the WHOLE tally, not a delta: a client that missed a frame still
   // converges, and late joiners get the same numbers from the history endpoint.
@@ -130,5 +143,5 @@ export const POST = withErrorHandling(async (request, context) => {
     reactions,
   });
 
-  return NextResponse.json({ reactions, mine: !existing });
+  return NextResponse.json({ reactions, mine });
 });

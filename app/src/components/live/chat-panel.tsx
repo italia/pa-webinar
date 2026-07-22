@@ -74,8 +74,8 @@ interface ChatMessage {
   replyTo?: ChatReply;
   /** Impostato quando l'autore ha corretto il messaggio (A6). */
   editedAt?: string | null;
-  /** emoji → id di chi ha reagito (A3). */
-  reactions?: Record<string, string[]>;
+  /** emoji → quante reazioni (A3). Mai gli id: la tally va a tutta la sala. */
+  reactions?: Record<string, number>;
 }
 
 // Small static emoji set for the compose-box picker (feedback #9). Plain string
@@ -85,11 +85,6 @@ const CHAT_EMOJIS = [
   '👍', '🙏', '👏', '😀', '😂', '😍', '🤔', '😮',
   '😢', '🎉', '❤️', '🔥', '✅', '👀', '💡', '🚀',
 ] as const;
-
-// Placeholder id for MY reaction in the optimistic tally: the panel does not
-// know its own server-side senderId (mod-/reg-/guest-), and the server replies
-// with the authoritative tally a moment later anyway.
-const SELF_REACTION_ID = '__me__';
 
 const AVATAR_COLORS = [
   '#0066CC', '#008758', '#A66300', '#D9364F',
@@ -148,6 +143,9 @@ export default function ChatPanel({
   //                    buffering proxy). Chat still works, just via polling.
   const [connStatus, setConnStatus] =
     useState<'live' | 'reconnecting' | 'degraded'>('live');
+  // Letto dentro il backfill, che non deve ricrearsi a ogni cambio di stato.
+  const connStatusRef = useRef(connStatus);
+  useEffect(() => { connStatusRef.current = connStatus; }, [connStatus]);
 
   // Compose extras (authenticated members only).
   const canAttach = !isGuest && !!token;
@@ -208,28 +206,48 @@ export default function ChatPanel({
   }, [t]);
 
   // ── Reazioni e modifica (A3, A6) ──────────────────────────────────────────
+  // Le mie reazioni, per messaggio: la tally dal server è solo un conteggio
+  // (non porta id, e non deve), quindi lo stato "ho già reagito" vive qui.
+  const [myReactions, setMyReactions] = useState<Record<string, Set<string>>>({});
+  // Il mio senderId lato server, imparato dal primo messaggio che invio. È
+  // l'unico modo per sapere quali messaggi sono davvero miei: confrontare i nomi
+  // sbaglia ogni volta che due persone condividono un nome (due moderatori sul
+  // link condiviso si chiamano entrambi "Moderatore").
+  const [mySenderId, setMySenderId] = useState<string | null>(null);
+  // Il server rifiuta la modifica a chi arriva da un link condiviso (un posto
+  // non è una persona): finché non lo sappiamo non offriamo la matita.
+  const [canEditOwn, setCanEditOwn] = useState(false);
   const [reactingId, setReactingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
 
   const toggleReaction = useCallback(async (messageId: string, emoji: string) => {
     setReactingId(null);
-    // Optimistic: the tally is a local, reversible detail — unlike a message,
-    // where a swallowed failure would leave text on screen that nobody received.
-    setMessages((prev) =>
-      prev.map((m) => {
-        if (m.id !== messageId) return m;
-        const current = { ...(m.reactions ?? {}) };
-        const mine = current[emoji] ?? [];
-        const has = mine.includes(SELF_REACTION_ID);
-        const next = has
-          ? mine.filter((x) => x !== SELF_REACTION_ID)
-          : [...mine, SELF_REACTION_ID];
-        if (next.length === 0) delete current[emoji];
-        else current[emoji] = next;
-        return { ...m, reactions: current };
-      }),
-    );
+    const had = myReactions[messageId]?.has(emoji) ?? false;
+    const delta = had ? -1 : 1;
+
+    // Ottimistico sul CONTEGGIO, con rollback: un fallimento silenzioso
+    // lascerebbe un numero fantasma che vede solo chi ha cliccato.
+    const applyDelta = (d: number, mine: boolean) => {
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (m.id !== messageId) return m;
+          const next = { ...(m.reactions ?? {}) };
+          const value = (next[emoji] ?? 0) + d;
+          if (value <= 0) delete next[emoji];
+          else next[emoji] = value;
+          return { ...m, reactions: next };
+        }),
+      );
+      setMyReactions((prev) => {
+        const set = new Set(prev[messageId] ?? []);
+        if (mine) set.add(emoji);
+        else set.delete(emoji);
+        return { ...prev, [messageId]: set };
+      });
+    };
+
+    applyDelta(delta, !had);
     try {
       const res = await fetch(
         `/api/events/${eventSlug}/chat/${messageId}/reactions`,
@@ -239,27 +257,38 @@ export default function ChatPanel({
             'Content-Type': 'application/json',
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          body: JSON.stringify({
-            emoji,
-            ...(isGuest ? { guestName: displayName } : {}),
-          }),
+          body: JSON.stringify({ emoji }),
         },
       );
-      if (!res.ok) return;
-      // Server tally wins: it knows about everyone else's reactions too.
-      const body = (await res.json()) as { reactions?: Record<string, string[]> };
+      if (!res.ok) {
+        applyDelta(-delta, had); // rollback
+        if (res.status === 403) setComposeError(t('reactNotAllowed'));
+        return;
+      }
+      // Il server è autoritativo su entrambi: conosce anche le reazioni altrui.
+      const body = (await res.json()) as {
+        reactions?: Record<string, number>;
+        mine?: string[];
+      };
       if (body.reactions) {
         setMessages((prev) =>
           prev.map((m) => (m.id === messageId ? { ...m, reactions: body.reactions } : m)),
         );
       }
-    } catch { /* the next stream frame reconciles */ }
-  }, [eventSlug, token, isGuest, displayName]);
+      if (body.mine) {
+        setMyReactions((prev) => ({ ...prev, [messageId]: new Set(body.mine) }));
+      }
+    } catch {
+      applyDelta(-delta, had); // rollback
+    }
+  }, [eventSlug, token, myReactions, t]);
 
   const saveEdit = useCallback(async (messageId: string) => {
     const text = editText.trim();
     if (!text) return;
-    setEditingId(null);
+    // L'editor resta aperto finché il server non conferma: chiuderlo prima
+    // butterebbe via il testo appena riscritto a ogni rifiuto (finestra di 15
+    // minuti scaduta, link condiviso, rete).
     try {
       const res = await fetch(`/api/events/${eventSlug}/chat/${messageId}`, {
         method: 'PATCH',
@@ -270,13 +299,14 @@ export default function ChatPanel({
         body: JSON.stringify({ text, ...(isGuest ? { guestName: displayName } : {}) }),
       });
       if (!res.ok) {
-        setComposeError(t('editFailed'));
+        setComposeError(res.status === 403 ? t('editNotAllowed') : t('editFailed'));
         return;
       }
       const body = (await res.json()) as { editedAt?: string };
       setMessages((prev) =>
         prev.map((m) => (m.id === messageId ? { ...m, text, editedAt: body.editedAt } : m)),
       );
+      setEditingId(null);
     } catch {
       setComposeError(t('editFailed'));
     }
@@ -432,10 +462,15 @@ export default function ChatPanel({
         // posted after they joined. Otherwise fetch only what is newer than the
         // last message we actually received from the stream/backfill. Dedup by id
         // (seenIdsRef) keeps either path idempotent.
+        // Dopo un'interruzione dello stream serve una rilettura COMPLETA, non
+        // incrementale: una modifica o una reazione su un messaggio VECCHIO non
+        // ha un createdAt nuovo, quindi `?since=` non la restituirebbe mai e il
+        // testo corretto resterebbe sbagliato sullo schermo per tutto l'evento.
         const since = lastSeenAtRef.current;
-        const url = since
-          ? `/api/events/${eventSlug}/chat?since=${encodeURIComponent(since)}`
-          : `/api/events/${eventSlug}/chat?limit=200`;
+        const full = !since || connStatusRef.current !== 'live';
+        const url = full
+          ? `/api/events/${eventSlug}/chat?limit=200`
+          : `/api/events/${eventSlug}/chat?since=${encodeURIComponent(since)}`;
         const res = await fetch(url, {
           cache: 'no-store',
           ...(readHeaders ? { headers: readHeaders } : {}),
@@ -458,6 +493,19 @@ export default function ChatPanel({
           if (!seenIdsRef.current.has(m.id)) recovered += 1;
           upsertMessage(m);
         });
+        if (full) {
+          // upsertMessage ignora per progetto gli id già visti (evita i doppioni
+          // dell'eco SSE), quindi la rilettura completa riconcilia a parte il
+          // testo, il segno di modifica e i conteggi delle reazioni.
+          setMessages((prev) =>
+            prev.map((m) => {
+              const fresh = data.messages.find((x) => x.id === m.id);
+              return fresh
+                ? { ...m, text: fresh.text, editedAt: fresh.editedAt, reactions: fresh.reactions }
+                : m;
+            }),
+          );
+        }
         return recovered;
       } catch {
         /* fine, we'll try again on the next tick/reconnect */
@@ -485,6 +533,14 @@ export default function ChatPanel({
               m.id === env.id ? { ...m, text: env.text, editedAt: env.editedAt } : m,
             ),
           );
+          // Una correzione può AGGIUNGERE una menzione ("scusa @Alex, intendevo
+          // le 16"): senza questo, essere nominati in una modifica non avvisa
+          // nessuno, a differenza di qualsiasi altro messaggio.
+          if (env.senderId !== mySenderId && mentionsUser(env.text, displayName)) {
+            mentionedIdsRef.current.add(env.id);
+            setMentionTick((n) => n + 1);
+            notifyMention(env.senderName, env.text);
+          }
           return;
         }
         if (env.op === 'reaction') {
@@ -706,12 +762,14 @@ export default function ChatPanel({
       // the later SSE echo is dropped by seenIdsRef dedup (no double bubble),
       // and since we only echo on a confirmed 201 no rollback is ever needed.
       const created = (await res.json().catch(() => null)) as
-        | { id?: string; createdAt?: string }
+        | { id?: string; createdAt?: string; senderId?: string; canEdit?: boolean }
         | null;
+      if (created?.senderId) setMySenderId(created.senderId);
+      if (typeof created?.canEdit === 'boolean') setCanEditOwn(created.canEdit);
       if (created?.id && created.createdAt) {
         upsertMessage({
           id: created.id,
-          senderId: '', // own bubble hides the avatar; senderName drives isOwn
+          senderId: created.senderId ?? '',
           senderName: displayName,
           isModerator: !!isModerator,
           text,
@@ -806,7 +864,13 @@ export default function ChatPanel({
           </div>
         ) : (
           messages.map((m) => {
-            const isOwn = m.senderName === displayName;
+            // Il senderId quando lo conosco: due persone possono condividere il
+            // nome (due moderatori sul link condiviso sono entrambi
+            // "Moderatore"), e la matita di modifica non deve comparire sul
+            // messaggio di un altro.
+            const isOwn = mySenderId
+              ? m.senderId === mySenderId
+              : m.senderName === displayName;
             const color = getAvatarColor(m.senderId || m.senderName);
             const initials = m.senderName
               .split(/\s+/)
@@ -904,17 +968,23 @@ export default function ChatPanel({
                     {m.attachment && <Attachment att={m.attachment} openLabel={t('openAttachment')} />}
                     {m.reactions && Object.keys(m.reactions).length > 0 && (
                       <div className="chat-panel__reactions">
-                        {Object.entries(m.reactions).map(([emoji, who]) => (
-                          <button
-                            key={emoji}
-                            type="button"
-                            className="chat-panel__reaction-chip"
-                            onClick={() => void toggleReaction(m.id, emoji)}
-                            aria-label={`${emoji} ${who.length}`}
-                          >
-                            <span aria-hidden="true">{emoji}</span> {who.length}
-                          </button>
-                        ))}
+                        {Object.entries(m.reactions).map(([emoji, count]) => {
+                          const mine = myReactions[m.id]?.has(emoji) ?? false;
+                          return (
+                            <button
+                              key={emoji}
+                              type="button"
+                              className={`chat-panel__reaction-chip${
+                                mine ? ' chat-panel__reaction-chip--mine' : ''
+                              }`}
+                              aria-pressed={mine}
+                              onClick={() => void toggleReaction(m.id, emoji)}
+                              aria-label={`${emoji} ${count}`}
+                            >
+                              <span aria-hidden="true">{emoji}</span> {count}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -970,7 +1040,7 @@ export default function ChatPanel({
                         </span>
                       )}
                     </span>
-                    {isOwn && !isGuest && token && (
+                    {isOwn && canEditOwn && !isGuest && token && (
                       <button
                         type="button"
                         className="chat-panel__reply-btn btn btn-link p-0 ms-2"

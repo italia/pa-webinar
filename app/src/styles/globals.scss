@@ -2911,3 +2911,10 @@ html.live-call-immersive body {
 .live-timer--over {
   background: rgba(217, 54, 79, 0.85);
 }
+
+// La mia reazione, distinta dal conteggio altrui.
+.chat-panel__reaction-chip--mine {
+  border-color: var(--app-primary, #06c);
+  background: rgba(0, 102, 204, 0.12);
+  font-weight: 600;
+}

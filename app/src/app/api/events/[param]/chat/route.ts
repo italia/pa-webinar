@@ -119,7 +119,7 @@ export const GET = withErrorHandling(async (request, context) => {
       attachmentMime: true,
       attachmentSize: true,
       editedAt: true,
-      reactions: { select: { emoji: true, senderId: true } },
+      reactions: { select: { emoji: true } },
       replyToId: true,
       replyTo: {
         select: {
@@ -317,5 +317,13 @@ export const POST = withErrorHandling(async (request, context) => {
   return NextResponse.json({
     id: created.id,
     createdAt: created.createdAt.toISOString(),
+    // The caller's own seat id. The panel has no other way to tell which
+    // messages are really its own: comparing display names is wrong whenever two
+    // people share one (two moderators on the shared link are both "Moderatore"),
+    // and that comparison is what decides whether the edit affordance appears.
+    senderId: auth.senderId,
+    // Whether this identity may edit its own messages at all — a shared link
+    // cannot, so the UI should not offer it (the server refuses anyway).
+    canEdit: auth.isPerPersonIdentity,
   }, { status: 201 });
 });
