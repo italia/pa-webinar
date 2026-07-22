@@ -349,7 +349,8 @@
       "edited": "modificato",
       "editLabel": "Modifica messaggio",
       "editSave": "Salva",
-      "editFailed": "Non è stato possibile modificare il messaggio."
+      "editFailed": "Non è stato possibile modificare il messaggio.",
+      "exportChat": "Scarica la chat"
     },
     "role": {
       "moderator": "Moderatore",

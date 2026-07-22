@@ -2850,3 +2850,25 @@ html.live-call-immersive body {
   font-size: 0.7rem;
   color: var(--app-muted, #5c6f82);
 }
+
+// Chat: barra con l'export (A5). Discreta, in cima alla lista.
+.chat-panel__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 10px 0;
+}
+
+.chat-panel__export {
+  font-size: 0.72rem;
+  color: var(--app-muted, #5c6f82);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--app-primary, #06c);
+    text-decoration: underline;
+  }
+}

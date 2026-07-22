@@ -768,6 +768,29 @@ export default function ChatPanel({
 
   return (
     <div className="chat-panel flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
+      {/* Export (A5). The messages were always persisted, but with no way to
+          take them away they were, from a participant's side, lost at the end of
+          the event. Shown to whoever can read the chat — the download contains
+          exactly what they can already fetch, so it adds no exposure. */}
+      {messages.length > 0 && !readDenied && (
+        <div className="chat-panel__toolbar">
+          <a
+            className="chat-panel__export"
+            href={`/api/events/${eventSlug}/chat/export?format=txt${
+              token ? `&token=${encodeURIComponent(token)}` : ''
+            }`}
+            download
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            {' '}{t('exportChat')}
+          </a>
+        </div>
+      )}
       <div
         ref={listRef}
         className="chat-panel__messages flex-grow-1"
