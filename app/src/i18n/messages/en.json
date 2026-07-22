@@ -329,7 +329,8 @@
       "hideFailed": "Couldn't hide the message. Please try again.",
       "connReconnecting": "Reconnecting…",
       "connDegraded": "Updates delayed",
-      "readDenied": "Chat is unavailable: you are not among this event’s participants, or the room is not open yet. Retrying automatically."
+      "readDenied": "Chat is unavailable: you are not among this event’s participants, or the room is not open yet. Retrying automatically.",
+      "mentionNotificationTitle": "{name} mentioned you in the chat"
     },
     "role": {
       "moderator": "Moderator",

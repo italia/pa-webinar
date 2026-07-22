@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { isValidElement, type ReactNode } from 'react';
 
-import { linkifyChat, renderChatBody } from './linkify';
+import { linkifyChat, renderChatBody, mentionsUser } from './linkify';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const props = (n: ReactNode): any => (n as any).props;
@@ -85,5 +85,31 @@ describe('renderChatBody (mentions + links)', () => {
     // "@" not at a word boundary (preceded by a letter) is not a mention.
     const nodes = renderChatBody('scrivimi a mario@example.com');
     expect(elements(nodes).filter((e) => props(e).className?.startsWith('chat-mention'))).toHaveLength(0);
+  });
+});
+
+describe('mentionsUser', () => {
+  it('matches the first name token, case-insensitively', () => {
+    expect(mentionsUser('ciao @Alex come va', 'Alex Rossi')).toBe(true);
+    expect(mentionsUser('ciao @alex', 'Alex Rossi')).toBe(true);
+    expect(mentionsUser('ciao @ALEX', 'Alex')).toBe(true);
+  });
+
+  it('does not match a different handle', () => {
+    expect(mentionsUser('ciao @Daniele', 'Alex')).toBe(false);
+  });
+
+  it('does not match an email or a mid-word @', () => {
+    expect(mentionsUser('scrivi a alex@example.it', 'Alex')).toBe(false);
+  });
+
+  it('matches after an opening bracket or at the start', () => {
+    expect(mentionsUser('@Alex ci sei?', 'Alex')).toBe(true);
+    expect(mentionsUser('(@Alex)', 'Alex')).toBe(true);
+  });
+
+  it('is false without a display name or without text', () => {
+    expect(mentionsUser('@Alex', undefined)).toBe(false);
+    expect(mentionsUser('', 'Alex')).toBe(false);
   });
 });

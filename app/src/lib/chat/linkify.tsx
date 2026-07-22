@@ -77,6 +77,23 @@ function firstToken(name: string): string {
 }
 
 /**
+ * Does this message mention `displayName`?
+ *
+ * Same rule the renderer uses to highlight the @handle, exported so the panel
+ * can also NOTIFY. Being named in a busy chat was previously indistinguishable
+ * from any other message once you had scrolled away: "quando viene taggato
+ * qualcuno non viene avviata alcuna notifica, né di suono né visiva".
+ */
+export function mentionsUser(text: string, displayName?: string): boolean {
+  const self = displayName ? firstToken(displayName) : '';
+  if (!self || !text) return false;
+  for (const m of text.matchAll(MENTION_RE)) {
+    if ((m[2] ?? '').toLowerCase() === self) return true;
+  }
+  return false;
+}
+
+/**
  * Render a chat body with BOTH safe URL linking and @mention highlighting.
  * Mentions of the current user (matched on their first name token) get a
  * stronger "self" style. Still no dangerouslySetInnerHTML — every text run is
