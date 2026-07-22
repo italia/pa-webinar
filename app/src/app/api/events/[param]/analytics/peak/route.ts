@@ -168,21 +168,37 @@ export const POST = withErrorHandling(async (request, context) => {
     : PEAK_FALLBACK_CAP;
   const capped = Math.min(count, cap);
 
-  await prisma.event.updateMany({
-    where: { id: event.id, peakParticipants: { lt: capped } },
-    data: { peakParticipants: capped },
+  // The session the reporter is actually in gets the same treatment. It was left
+  // at 0 for every event ever recorded — `Event.peakParticipants` was correct
+  // while `CallSession.peakParticipants` stayed zero — so per-session analytics
+  // (a room that empties and refills produces several sessions) had nothing to
+  // work with.
+  //
+  // The NEWEST open session, not every open one: a multitrack recording keeps a
+  // placeholder session open for the whole event, and writing the live headcount
+  // into that too would put the same number on two different rows.
+  const currentSession = await prisma.callSession.findFirst({
+    where: { eventId: event.id, endedAt: null },
+    orderBy: { startedAt: 'desc' },
+    select: { id: true },
   });
 
-  // The OPEN session gets the same treatment. It was left at 0 for every event
-  // ever recorded — `Event.peakParticipants` was correct while
-  // `CallSession.peakParticipants` stayed zero — so any per-session analytics
-  // (a room that emptied and refilled produces several sessions) had nothing to
-  // work with. Same monotonic conditional update, scoped to the session still
-  // running; if none is open the update simply matches nothing.
-  await prisma.callSession.updateMany({
-    where: { eventId: event.id, endedAt: null, peakParticipants: { lt: capped } },
-    data: { peakParticipants: capped },
-  });
+  // Issued together: this runs twice a minute per client on a live event, and
+  // the two writes are independent.
+  await Promise.all([
+    prisma.event.updateMany({
+      where: { id: event.id, peakParticipants: { lt: capped } },
+      data: { peakParticipants: capped },
+    }),
+    ...(currentSession
+      ? [
+          prisma.callSession.updateMany({
+            where: { id: currentSession.id, peakParticipants: { lt: capped } },
+            data: { peakParticipants: capped },
+          }),
+        ]
+      : []),
+  ]);
 
   return NextResponse.json({ ok: true });
 });
