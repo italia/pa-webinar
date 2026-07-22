@@ -3420,7 +3420,9 @@
     "aiNoticeTitle": "AI processing after the event",
     "aiNotice": "After it ends, the recording will be processed by AI tools to generate a transcript, summary and any translations and dubbing. The artifacts may contain inaccuracies; the video remains the authoritative source.",
     "multitrackConsentTitle": "Per-participant recording",
-    "multitrackConsentRequired": "You must accept the recording of your audio track to enter"
+    "multitrackConsentRequired": "You must accept the recording of your audio track to enter",
+    "enterGardenTitle": "Step into the square",
+    "enterGardenHint": "A place to wander while you wait for the event to begin."
   },
   "recording": {
     "management": "Video recording",

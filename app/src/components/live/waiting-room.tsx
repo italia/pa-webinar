@@ -220,6 +220,8 @@ export default function WaitingRoom({
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
   const [classicView, setClassicView] = useState(false);
+  // La piazza/giardino si apre su richiesta: vedi il commento su gameInvite.
+  const [gameOpen, setGameOpen] = useState(false);
   const [devicePrefs, setDevicePrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: true,
     micOn: true,
@@ -929,11 +931,35 @@ export default function WaitingRoom({
         </div>
       </div>
     );
+  // C1 — "quando si entra in sala d'attesa si atterra su una pagina senza
+  // l'interazione game … aggiungere un pulsante che quando lo clicchi entri
+  // nella sala d'attesa del game".
+  //
+  // Il gioco era già secondario (riquadro laterale), ma partiva APERTO: chi
+  // arrivava per prepararsi — nome, microfono, telecamera — se lo trovava
+  // addosso. Ora l'arrivo è la preparazione, e la piazza si apre con un gesto.
+  // Non memorizziamo la scelta: la richiesta riguarda l'ORDINE di ogni ingresso,
+  // e chi vuole il gioco lo apre con un click.
+  const gameInvite = showGameBox && !gameOpen ? (
+    <button
+      type="button"
+      className="wr-game-invite"
+      onClick={() => setGameOpen(true)}
+      aria-expanded={false}
+    >
+      <span className="wr-game-invite__art" aria-hidden="true">🌿</span>
+      <span>
+        <span className="wr-game-invite__title">{t('enterGardenTitle')}</span>
+        <span className="wr-game-invite__hint">{t('enterGardenHint')}</span>
+      </span>
+    </button>
+  ) : null;
+
   const asideBox = showGameBox || chatPreviewBlock ? (
     <Card className="wr-aside shadow-sm border-0">
       <div className="wr-aside__head">
         <span className="fw-semibold">{t('whileYouWait')}</span>
-        {showGameBox && (
+        {showGameBox && gameOpen && (
           <button
             type="button"
             className="wr-aside__toggle"
@@ -945,7 +971,8 @@ export default function WaitingRoom({
         )}
       </div>
       <div className="wr-aside__body">
-        {showGameBox && gameStageBox}
+        {gameInvite}
+        {showGameBox && gameOpen && gameStageBox}
         {chatPreviewBlock}
       </div>
     </Card>
