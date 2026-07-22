@@ -95,12 +95,16 @@ spec:
                   valueFrom:
                     secretKeyRef:
                       name: {{ $xmppSecret | quote }}
-                      key: {{ .Values.recorder.xmppSecretUserKey | quote }}
+                      {{- /* `default` inline e non solo in values.yaml: un
+                             `helm upgrade --reuse-values` NON eredita i default
+                             di una chiave nuova, e un `key` vuoto fa fallire il
+                             patch del CronJob — bloccando l'intera release. */}}
+                      key: {{ .Values.recorder.xmppSecretUserKey | default "JIBRI_RECORDER_USER" | quote }}
                 - name: JITSI_XMPP_PASSWORD
                   valueFrom:
                     secretKeyRef:
                       name: {{ $xmppSecret | quote }}
-                      key: {{ .Values.recorder.xmppSecretPasswordKey | quote }}
+                      key: {{ .Values.recorder.xmppSecretPasswordKey | default "JIBRI_RECORDER_PASSWORD" | quote }}
                 {{- end }}
                 {{- if .Values.recorder.idleTimeoutSec }}
                 # Chiusura dopo stanza vuota (default capture.ts: 90s).
