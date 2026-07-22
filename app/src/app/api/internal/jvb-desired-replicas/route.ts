@@ -193,6 +193,21 @@ export const GET = withErrorHandling(async (request) => {
     // aggregated cross-pod stats the count is correct and the guard is dropped.
     const skipIdleDemotion = !scalerAggregated && (currentReplicas ?? 1) > 1;
 
+    // The LIVE-before-endsAt set, shared by the empty-close (1b) and the IDLE
+    // demotion (2). Both decide in `shouldDemoteLiveToIdle` rather than in a
+    // WHERE clause: the rule needs the LATEST of several timestamps (SQL would
+    // need GREATEST, which Prisma cannot express here) and it is worth
+    // unit-testing on its own. The set is at most a handful of rows.
+    const liveEvents = await tx.event.findMany({
+      where: { status: 'LIVE', endsAt: { gt: now } },
+      select: {
+        id: true,
+        lastActiveAt: true,
+        provisioningStartedAt: true,
+        startsAt: true,
+      },
+    });
+
     // 1b) LIVE → ENDED — authoritative empty-conference close (feedback #12).
     //     Runs BEFORE the IDLE demotion so, when both would match, ENDED wins
     //     (terminal) over IDLE (revivable). Fires only for rooms that HAD
@@ -210,14 +225,23 @@ export const GET = withErrorHandling(async (request) => {
     //     purpose, since ENDED is NOT auto-revived on rejoin (only IDLE is, via
     //     /wake). Honours the same multi-replica skipIdleDemotion guard.
     if (!skipIdleDemotion && emptyCloseCut && jvbReachable) {
-      const emptyCloseCandidates = await tx.event.findMany({
-        where: {
-          status: 'LIVE',
-          endsAt: { gt: now },
-          lastActiveAt: { not: null, lt: emptyCloseCut },
-        },
-        select: { id: true },
-      });
+      // `lastActiveAt !== null` keeps the "had traffic, then emptied" meaning;
+      // the shared predicate adds the freshness guards. Without them this
+      // TERMINAL close inherits the bug fixed one branch below: a room revived
+      // hours later still carries the OLD lastActiveAt (the demotion writes only
+      // `status`, and /wake refreshes provisioningStartedAt), so it would be
+      // ENDed — irreversibly — before anyone could join.
+      const emptyCloseCandidates = liveEvents.filter(
+        (e) =>
+          e.lastActiveAt !== null &&
+          shouldDemoteLiveToIdle({
+            lastActiveAt: e.lastActiveAt,
+            provisioningStartedAt: e.provisioningStartedAt,
+            startsAt: e.startsAt,
+            inactiveCutoff: emptyCloseCut,
+            now,
+          }),
+      );
       if (emptyCloseCandidates.length > 0) {
         const closedIds = emptyCloseCandidates.map((e) => e.id);
         const r = await tx.event.updateMany({
@@ -230,35 +254,23 @@ export const GET = withErrorHandling(async (request) => {
     }
 
     // 2) LIVE → IDLE when the conference has been empty for ≥ grace.
-    //    Use lastActiveAt when set, else fall back to provisioningStartedAt
-    //    (for events that went LIVE but never had anyone join). Uses the shared
-    //    skipIdleDemotion guard computed above (multi-replica staleness).
+    //    "Empty for how long" is the LATEST of lastActiveAt, provisioningStartedAt
+    //    and (once past) startsAt — see shouldDemoteLiveToIdle, which also
+    //    documents why a room with no signal at all is left alone. Uses the
+    //    shared skipIdleDemotion guard computed above (multi-replica staleness).
     //    NOTE: this is a REVIVABLE, future-endsAt demotion, so it intentionally
     //    uses simpler empty-detection than the terminal past-endsAt reclaim in
     //    step 3b (shouldReclaimEmptyOvertime), which adds max-of-signals +
     //    endsAt fallback + a stricter reliability gate BECAUSE it closes to
     //    ENDED. The two are deliberately NOT the same predicate — don't unify.
     if (!skipIdleDemotion) {
-      // Fetch the LIVE-before-endsAt set and decide in `shouldDemoteLiveToIdle`,
-      // rather than encoding the rule as a WHERE clause: the rule needs the
-      // LATEST of several timestamps (SQL would need GREATEST, which Prisma
-      // cannot express here) and it is worth unit-testing on its own. The set is
-      // at most a handful of rows.
-      const liveEvents = await tx.event.findMany({
-        where: { status: 'LIVE', endsAt: { gt: now } },
-        select: {
-          id: true,
-          lastActiveAt: true,
-          provisioningStartedAt: true,
-          startsAt: true,
-        },
-      });
       const idleCandidates = liveEvents.filter((e) =>
         shouldDemoteLiveToIdle({
           lastActiveAt: e.lastActiveAt,
           provisioningStartedAt: e.provisioningStartedAt,
           startsAt: e.startsAt,
           inactiveCutoff,
+          now,
         }),
       );
       if (idleCandidates.length > 0) {
@@ -392,7 +404,15 @@ export const GET = withErrorHandling(async (request) => {
           startsAt: { lte: now },
           endsAt: { gt: now },
         },
-        data: { status: 'LIVE' },
+        data: {
+          status: 'LIVE',
+          // Re-stamp the warm-up time: the room became reachable NOW, whatever
+          // hour a visitor's /wake first warmed it. Without this the value stays
+          // the (possibly hours-old) wake time, which made the status pages
+          // report "stale provisioning" on a perfectly healthy bridge and left
+          // the inactivity signals looking older than the room actually is.
+          provisioningStartedAt: now,
+        },
       });
       counts.provisioningToLive = r5.count;
     }

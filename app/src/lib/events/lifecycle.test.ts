@@ -367,6 +367,7 @@ describe('shouldDemoteLiveToIdle', () => {
         provisioningStartedAt: at('2026-07-22T08:12:00Z'),
         startsAt: at('2026-07-22T09:15:00Z'),
         inactiveCutoff: cutoffFor('2026-07-22T09:18:00Z'),
+        now: at('2026-07-22T09:18:00Z'),
       }),
     ).toBe(false);
   });
@@ -378,6 +379,7 @@ describe('shouldDemoteLiveToIdle', () => {
         provisioningStartedAt: at('2026-07-22T08:12:00Z'),
         startsAt: at('2026-07-22T09:15:00Z'),
         inactiveCutoff: cutoffFor('2026-07-22T10:05:00Z'), // start + 50 min
+        now: at('2026-07-22T10:05:00Z'),
       }),
     ).toBe(true);
   });
@@ -391,6 +393,7 @@ describe('shouldDemoteLiveToIdle', () => {
         provisioningStartedAt: at('2026-07-22T09:00:00Z'),
         startsAt,
         inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+        now: at('2026-07-22T10:50:00Z'),
       }),
     ).toBe(true);
     // Someone was there 5 minutes ago → not stale.
@@ -400,6 +403,7 @@ describe('shouldDemoteLiveToIdle', () => {
         provisioningStartedAt: at('2026-07-22T09:00:00Z'),
         startsAt,
         inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+        now: at('2026-07-22T10:50:00Z'),
       }),
     ).toBe(false);
   });
@@ -411,8 +415,41 @@ describe('shouldDemoteLiveToIdle', () => {
         provisioningStartedAt: at('2026-07-22T10:48:00Z'),
         startsAt: at('2026-07-22T08:00:00Z'),
         inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+        now: at('2026-07-22T10:50:00Z'),
       }),
     ).toBe(false);
+  });
+
+  it('leaves a room alone when there is NO activity signal at all', () => {
+    // A revived event (endsAt pushed forward) that never entered PROVISIONING
+    // and that nobody has rejoined yet: both timestamps are null, so there is
+    // no evidence of inactivity. The SQL this replaced matched neither branch
+    // here; demoting on startsAt alone would kill the room on the first tick —
+    // the same outage, reintroduced from the other side.
+    expect(
+      shouldDemoteLiveToIdle({
+        lastActiveAt: null,
+        provisioningStartedAt: null,
+        startsAt: at('2026-07-22T06:00:00Z'),
+        inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+        now: at('2026-07-22T10:50:00Z'),
+      }),
+    ).toBe(false);
+  });
+
+  it('still demotes when the start is in the FUTURE (a postponed LIVE row)', () => {
+    // An admin moves an already-LIVE event to tomorrow. Counting a future
+    // startsAt as "activity" would make the row undemotable for the whole
+    // postponement and pin a JVB node (and Jibri) against scale-to-zero.
+    expect(
+      shouldDemoteLiveToIdle({
+        lastActiveAt: at('2026-07-22T08:00:00Z'),
+        provisioningStartedAt: at('2026-07-22T08:00:00Z'),
+        startsAt: at('2026-07-23T09:00:00Z'),
+        inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+        now: at('2026-07-22T10:50:00Z'),
+      }),
+    ).toBe(true);
   });
 
   it('takes the LATEST signal, never the earliest', () => {
@@ -423,6 +460,7 @@ describe('shouldDemoteLiveToIdle', () => {
         provisioningStartedAt: at('2026-07-22T06:00:00Z'),
         startsAt: at('2026-07-22T10:45:00Z'),
         inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+        now: at('2026-07-22T10:50:00Z'),
       }),
     ).toBe(false);
   });
