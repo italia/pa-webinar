@@ -2039,7 +2039,9 @@
       "recordingRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan osallistumiseksi",
       "futureCommunications": "Haluan saada tietoa DTD:n järjestämistä tulevista tapahtumista",
       "addressBook": "Haluan, että minut lisätään DTD:n osoitekirjaan, jotta minut voidaan kutsua vastaaviin tapahtumiin",
-      "addressBookHelp": "Erillinen suostumus (GDPR art. 6.1.a). Voit peruuttaa sen milloin tahansa saamissasi sähköposteissa olevasta linkistä \"Poista tietoni osoitekirjasta\". Nimi ja organisaatio otetaan ilmoittautumisprofiilista."
+      "addressBookHelp": "Erillinen suostumus (GDPR art. 6.1.a). Voit peruuttaa sen milloin tahansa saamissasi sähköposteissa olevasta linkistä \"Poista tietoni osoitekirjasta\". Nimi ja organisaatio otetaan ilmoittautumisprofiilista.",
+      "multitrack": "Suostun siihen, että ääneni tallennetaan erilliselle ääniraidalle yksinomaan siksi, että litterointi kohdistetaan oikein kullekin puhujalle. Raita on väliaikainen ja poistetaan litteroinnin jälkeen; sitä ei käytetä ääneni tunnistamiseen tai toistamiseen.",
+      "multitrackRequired": "Suostumus ääniraitasi tallentamiseen on pakollinen tähän tapahtumaan osallistumiseksi"
     },
     "export": {
       "title": "Omat tietoni",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Säilytys ja oikeudet",
           "body": "Tietoja säilytetään kullekin tapahtumalle määritetyn ajan ja poistetaan sen jälkeen automaattisesti, ellei lainsäädäntö edellytä toisin. Rekisteröidyt voivat käyttää GDPR-oikeuksiaan milloin tahansa, mukaan lukien pääsy tietoihin, oikaisu ja poisto, osaston institutionaalisten kanavien kautta."
+        },
+        "automatedProcessing": {
+          "title": "Tekoälyn tuottama litterointi, tiivistelmä ja dubbaus",
+          "body": "Tapahtumissa, jotka sitä pyytävät, tallenne käsitellään lähetyksen päätyttyä tekoälyketjulla, joka suoritetaan kokonaan osaston omassa klusteri-infrastruktuurissa. Se tuottaa puheen litteroinnin (eri puhujat erotellen), yleistajuisen tiivistelmän, mahdolliset käännökset muille eurooppalaisille kielille sekä dubatun ääniversion yleisluontoisella synteettisellä äänellä. Kaikki käytetyt mallit (WhisperX litterointiin, Mistral-Small tiivistelmään ja käännökseen, Piper TTS dubbaukseen) suoritetaan klusterin sisäisillä omilla GPU:illa: osallistujien tietoja ei lähetetä kolmansien osapuolten palveluihin. Osallistujien ääntä ei kloonata eikä säilytetä biometrisenä tietona (yleisen tietosuoja-asetuksen 9 artikla): dubbauksessa käytetään julkisia esikoulutettuja synteettisiä ääniä, jotka annetaan puhujille mielivaltaisesti. Jokaisen tallenteen kohdalla tapahtuman sivu näyttää käytettyjen mallien tarkan tilannekuvan (”Tekoälykäsittelyn läpinäkyvyys”). Tuotettu sisältö voi sisältää epätarkkuuksia: ratkaiseva lähde on aina alkuperäinen video (tekoälyasetus, 50 artikla)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Anna kelvollinen sähköpostiosoite",
     "chatLockedMessage": "Anna nimesi, jotta voit liittyä tapahtuman chattiin.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Tapahtuma alkaa aivan kohta, odota järjestäjää…",
+    "exitWaiting": "Poistu odotustilasta",
+    "aiNoticeTitle": "Tekoälykäsittely tapahtuman jälkeen",
+    "aiNotice": "Lopuksi tallenne käsitellään tekoälytyökaluilla litteroinnin, tiivistelmän sekä mahdollisten käännösten ja dubbausten tuottamiseksi. Tulokset voivat sisältää epätarkkuuksia; video on edelleen ratkaiseva lähde.",
+    "multitrackConsentTitle": "Osallistujakohtainen tallennus",
+    "multitrackConsentRequired": "Sinun on hyväksyttävä ääniraitasi tallennus päästäksesi sisään",
+    "enterGardenTitle": "Astu torille",
+    "enterGardenHint": "Paikka kuljeskella odotellessa: sieltä voit myös asettaa nimen ja mikrofonin ja liittyä tapahtumaan.",
+    "backToWaitingRoom": "Takaisin odotustilaan",
+    "gardenDialogLabel": "Odotustilan tori",
+    "gardenGateHint": "Voit liittyä täältä tai viedä hahmosi portille.",
+    "classicVersion": "Klassinen versio",
+    "warmup": {
+      "queued": "Pyyntö vastaanotettu",
+      "startingBridge": "Käynnistetään videopalvelinta…",
+      "provisioningNode": "Luodaan oma videopalvelin",
+      "almostReady": "Videopalvelin käynnissä: melkein valmista",
+      "almostReadyDetail": "Vielä hetki, ja liittymispainike aktivoituu itsestään.",
+      "honestHint": "Tavallinen odotus: alle minuutti, jos infrastruktuuri on jo lämmin, 3–5 minuuttia ensimmäisellä käynnistyksellä. Sillä välin voit tarkistaa kameran ja mikrofonin tai käyttää keskustelua.",
+      "elapsed": "valmistelussa {time}"
+    }
   },
   "recording": {
     "management": "Videotallenne",

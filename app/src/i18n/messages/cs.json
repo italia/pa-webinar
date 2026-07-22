@@ -2039,7 +2039,9 @@
       "recordingRequired": "Pro účast na této události je nutný souhlas s nahráváním",
       "futureCommunications": "Přeji si dostávat informace o budoucích událostech organizovaných DTD",
       "addressBook": "Chci být zařazen do adresáře DTD, abych byl zván na podobné události",
-      "addressBookHelp": "Samostatný souhlas (čl. 6.1.a GDPR). Můžete jej kdykoli odvolat pomocí odkazu „Odstranit moje údaje z adresáře“ v e-mailech, které obdržíte. Jméno a organizace budou převzaty z registračního profilu."
+      "addressBookHelp": "Samostatný souhlas (čl. 6.1.a GDPR). Můžete jej kdykoli odvolat pomocí odkazu „Odstranit moje údaje z adresáře“ v e-mailech, které obdržíte. Jméno a organizace budou převzaty z registračního profilu.",
+      "multitrack": "Souhlasím s nahráváním samostatné zvukové stopy svého hlasu výhradně za účelem správného přiřazení přepisu jednotlivým mluvčím. Stopa je dočasná a po přepisu se maže; nepoužívá se k identifikaci ani k reprodukci mého hlasu.",
+      "multitrackRequired": "Souhlas s nahráváním vaší zvukové stopy je pro účast na této události povinný"
     },
     "export": {
       "title": "Moje údaje",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Uchovávání údajů a práva",
           "body": "Údaje jsou uchovávány po dobu nakonfigurovanou pro každou událost a poté automaticky smazány, pokud zákonné povinnosti nestanoví jinak. Subjekty údajů mohou kdykoli uplatnit svá práva podle GDPR, včetně přístupu, opravy a výmazu, prostřednictvím institucionálních kanálů Odboru."
+        },
+        "automatedProcessing": {
+          "title": "Přepis, shrnutí a dabing vytvořené umělou inteligencí",
+          "body": "U událostí, které o to požádají, je po skončení přenosu nahrávka zpracována řetězcem umělé inteligence běžícím výhradně na klastrové infrastruktuře Odboru. Vzniká přepis mluveného slova (s rozlišením jednotlivých mluvčích), srozumitelné shrnutí, případné překlady do dalších evropských jazyků a dabovaná verze zvuku s obecným syntetickým hlasem. Všechny použité modely (WhisperX pro přepis, Mistral-Small pro shrnutí a překlad, Piper TTS pro dabing) běží na vyhrazených GPU uvnitř klastru: žádná data účastníků se neodesílají službám třetích stran. Hlas účastníků se neklonuje ani neuchovává jako biometrický údaj (čl. 9 GDPR): dabing používá veřejné předtrénované syntetické hlasy, přiřazované mluvčím libovolně. U každé nahrávky stránka události ukazuje přesný snímek použitých modelů („Transparentnost zpracování UI“). Vytvořený obsah může obsahovat nepřesnosti: závazným zdrojem zůstává vždy původní video (akt o UI, čl. 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Zadejte platnou e-mailovou adresu",
     "chatLockedMessage": "Zadejte své jméno pro účast v chatu události.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Událost každou chvíli začne, vyčkejte na organizátory…",
+    "exitWaiting": "Opustit čekárnu",
+    "aiNoticeTitle": "Zpracování umělou inteligencí po události",
+    "aiNotice": "Po skončení bude nahrávka zpracována nástroji umělé inteligence, aby vznikl přepis, shrnutí a případné překlady a dabing. Výstupy mohou obsahovat nepřesnosti; závazným zdrojem zůstává video.",
+    "multitrackConsentTitle": "Nahrávání po účastnících",
+    "multitrackConsentRequired": "Pro vstup musíte souhlasit s nahráváním své zvukové stopy",
+    "enterGardenTitle": "Vstupte na náměstí",
+    "enterGardenHint": "Místo k procházení, než začneme: odtud si také nastavíte jméno a mikrofon a vstoupíte do události.",
+    "backToWaitingRoom": "Zpět do čekárny",
+    "gardenDialogLabel": "Náměstí čekárny",
+    "gardenGateHint": "Můžete vstoupit odtud, nebo dovést svého avatara k bráně.",
+    "classicVersion": "Klasická verze",
+    "warmup": {
+      "queued": "Požadavek přijat",
+      "startingBridge": "Spouštíme videoserver…",
+      "provisioningNode": "Vytváříme vyhrazený videoserver",
+      "almostReady": "Videoserver běží: už to bude",
+      "almostReadyDetail": "Ještě okamžik a tlačítko pro vstup se samo aktivuje.",
+      "honestHint": "Obvyklé čekání: méně než minuta, pokud je infrastruktura zahřátá, 3–5 minut při prvním spuštění. Zatím si můžete zkontrolovat kameru a mikrofon nebo použít chat.",
+      "elapsed": "připravuje se {time}"
+    }
   },
   "recording": {
     "management": "Videozáznam",

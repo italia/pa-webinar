@@ -2039,7 +2039,9 @@
       "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
       "futureCommunications": "Ik wil informatie ontvangen over toekomstige evenementen van DTD",
       "addressBook": "Ik wil opgenomen worden in het DTD-adresboek om uitgenodigd te worden voor soortgelijke evenementen",
-      "addressBookHelp": "Aparte toestemming (art. 6.1.a AVG). U kunt deze op elk moment intrekken via de link \"Verwijder mijn gegevens uit het adresboek\" in de e-mails die u ontvangt. Naam en organisatie worden overgenomen uit uw aanmeldingsprofiel."
+      "addressBookHelp": "Aparte toestemming (art. 6.1.a AVG). U kunt deze op elk moment intrekken via de link \"Verwijder mijn gegevens uit het adresboek\" in de e-mails die u ontvangt. Naam en organisatie worden overgenomen uit uw aanmeldingsprofiel.",
+      "multitrack": "Ik stem in met het opnemen van een apart audiospoor van mijn stem, uitsluitend om het transcript correct aan elke spreker toe te wijzen. Het spoor is tijdelijk en wordt na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te identificeren of weer te geven.",
+      "multitrackRequired": "Toestemming voor het opnemen van je audiospoor is verplicht om aan dit evenement deel te nemen"
     },
     "export": {
       "title": "Mijn gegevens",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Bewaring en rechten",
           "body": "Gegevens worden bewaard gedurende de voor elk evenement geconfigureerde periode en vervolgens automatisch verwijderd, tenzij andere wettelijke verplichtingen van toepassing zijn. Betrokkenen kunnen te allen tijde hun GDPR-rechten uitoefenen, waaronder inzage, rectificatie en wissing, via de institutionele kanalen van het Departement."
+        },
+        "automatedProcessing": {
+          "title": "Door kunstmatige intelligentie gegenereerde transcriptie, samenvatting en nasynchronisatie",
+          "body": "Bij evenementen die daarom vragen, wordt de opname na afloop van de uitzending verwerkt door een AI-pijplijn die volledig draait op de clusterinfrastructuur van het Departement. Die produceert de transcriptie van het gesprokene (met scheiding van de verschillende sprekers), een samenvatting in gewone taal, eventuele vertalingen naar andere Europese talen en een nagesynchroniseerde audioversie met een generieke synthetische stem. Alle gebruikte modellen (WhisperX voor de transcriptie, Mistral-Small voor samenvatting en vertaling, Piper TTS voor de nasynchronisatie) draaien op eigen GPU's binnen het cluster: er worden geen deelnemersgegevens naar diensten van derden gestuurd. De stem van deelnemers wordt niet gekloond en niet bewaard als biometrisch gegeven (art. 9 AVG): de nasynchronisatie gebruikt openbare, vooraf getrainde synthetische stemmen die willekeurig aan de sprekers worden toegewezen. Voor elke opname toont de evenementpagina de exacte momentopname van de gebruikte modellen ('Transparantie van de AI-verwerking'). De gegenereerde inhoud kan onnauwkeurigheden bevatten: de gezaghebbende bron blijft altijd de originele video (AI-verordening, art. 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Voer een geldig e-mailadres in",
     "chatLockedMessage": "Voer uw naam in om deel te nemen aan de chat van het evenement.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Het evenement begint zo, wacht op de organisatie…",
+    "exitWaiting": "Wachtruimte verlaten",
+    "aiNoticeTitle": "AI-verwerking na het evenement",
+    "aiNotice": "Na afloop wordt de opname verwerkt door AI-hulpmiddelen om een transcript, een samenvatting en eventuele vertalingen en nasynchronisatie te maken. De resultaten kunnen onnauwkeurigheden bevatten; de video blijft de gezaghebbende bron.",
+    "multitrackConsentTitle": "Opname per deelnemer",
+    "multitrackConsentRequired": "Je moet instemmen met de opname van je audiospoor om binnen te komen",
+    "enterGardenTitle": "Betreed het plein",
+    "enterGardenHint": "Een plek om rond te lopen terwijl je wacht — daar kun je ook je naam en microfoon instellen en aan het evenement deelnemen.",
+    "backToWaitingRoom": "Terug naar de wachtruimte",
+    "gardenDialogLabel": "Plein van de wachtruimte",
+    "gardenGateHint": "Je kunt hiervandaan deelnemen, of je avatar naar de poort lopen.",
+    "classicVersion": "Klassieke versie",
+    "warmup": {
+      "queued": "Verzoek ontvangen",
+      "startingBridge": "Videoserver wordt gestart…",
+      "provisioningNode": "Een eigen videoserver wordt aangemaakt",
+      "almostReady": "Videoserver actief: bijna klaar",
+      "almostReadyDetail": "Nog even en de deelnameknop wordt vanzelf actief.",
+      "honestHint": "Gebruikelijke wachttijd: minder dan een minuut als de infrastructuur al warm is, 3–5 minuten bij de eerste start. Ondertussen kun je camera en microfoon controleren of de chat gebruiken.",
+      "elapsed": "in voorbereiding sinds {time}"
+    }
   },
   "recording": {
     "management": "Video-opname",

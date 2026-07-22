@@ -2039,7 +2039,9 @@
       "recordingRequired": "Lai piedalītos šajā pasākumā, ir nepieciešama piekrišana ierakstīšanai",
       "futureCommunications": "Vēlos saņemt informāciju par nākotnes pasākumiem, ko organizē DTD",
       "addressBook": "Vēlos tikt iekļauts DTD kontaktu grāmatā, lai saņemtu uzaicinājumus uz līdzīgiem pasākumiem",
-      "addressBookHelp": "Atsevišķa piekrišana (VDAR 6.1.a pants). Jūs varat to atsaukt jebkurā laikā, izmantojot saiti \"Noņemt manus datus no kontaktu grāmatas\" saņemtajos e-pastos. Vārds un organizācija tiks iegūti no reģistrācijas profila."
+      "addressBookHelp": "Atsevišķa piekrišana (VDAR 6.1.a pants). Jūs varat to atsaukt jebkurā laikā, izmantojot saiti \"Noņemt manus datus no kontaktu grāmatas\" saņemtajos e-pastos. Vārds un organizācija tiks iegūti no reģistrācijas profila.",
+      "multitrack": "Piekrītu, ka manas balss ieraksts tiek veikts atsevišķā audio celiņā vienīgi ar mērķi pareizi attiecināt atšifrējumu uz katru runātāju. Celiņš ir pagaidu un pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atskaņošanai.",
+      "multitrackRequired": "Piekrišana jūsu audio celiņa ierakstīšanai ir obligāta, lai piedalītos šajā pasākumā"
     },
     "export": {
       "title": "Mani dati",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Datu saglabāšana un tiesības",
           "body": "Dati tiek glabāti katram pasākumam konfigurēto periodu un pēc tam automātiski dzēsti, ja vien nepastāv citi juridiskie pienākumi. Datu subjekti var jebkurā laikā izmantot savas GDPR tiesības, tostarp piekļuvi, labošanu un dzēšanu, izmantojot departamenta institucionālos kanālus."
+        },
+        "automatedProcessing": {
+          "title": "Mākslīgā intelekta radīts atšifrējums, kopsavilkums un dublējums",
+          "body": "Pasākumiem, kas to pieprasa, pēc tiešraides beigām ieraksts tiek apstrādāts ar mākslīgā intelekta ķēdi, kas pilnībā darbojas Departamenta klastera infrastruktūrā. Tā izveido runas atšifrējumu (nodalot dažādus runātājus), saprotamu kopsavilkumu, iespējamos tulkojumus citās Eiropas valodās un dublētu audio versiju ar vispārīgu sintētisku balsi. Visi izmantotie modeļi (WhisperX atšifrēšanai, Mistral-Small kopsavilkumam un tulkojumam, Piper TTS dublēšanai) darbojas uz atsevišķiem GPU klastera iekšienē: nekādi dalībnieku dati netiek nosūtīti trešo pušu pakalpojumiem. Dalībnieku balss netiek klonēta un netiek glabāta kā biometrisks dats (VDAR 9. pants): dublēšanā izmanto publiskas iepriekš apmācītas sintētiskas balsis, kas runātājiem tiek piešķirtas patvaļīgi. Katram ierakstam pasākuma lapā ir redzams izmantoto modeļu precīzs momentuzņēmums („MI apstrādes pārredzamība“). Radītais saturs var saturēt neprecizitātes: noteicošais avots vienmēr paliek sākotnējais video (MI akts, 50. pants)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Lūdzu, ievadiet derīgu e-pasta adresi",
     "chatLockedMessage": "Ievadiet savu vārdu, lai piedalītos pasākuma tērzēšanā.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Pasākums tūlīt sāksies, uzgaidiet rīkotāju…",
+    "exitWaiting": "Iziet no uzgaidāmās telpas",
+    "aiNoticeTitle": "MI apstrāde pēc pasākuma",
+    "aiNotice": "Beigās ieraksts tiks apstrādāts ar mākslīgā intelekta rīkiem, lai izveidotu atšifrējumu, kopsavilkumu un iespējamos tulkojumus un dublējumus. Rezultāti var saturēt neprecizitātes; video paliek noteicošais avots.",
+    "multitrackConsentTitle": "Ieraksts pa dalībniekiem",
+    "multitrackConsentRequired": "Lai ienāktu, jums jāpiekrīt savas audio celiņa ierakstīšanai",
+    "enterGardenTitle": "Ieej laukumā",
+    "enterGardenHint": "Vieta, kur pastaigāt, kamēr gaidi: no turienes vari arī iestatīt vārdu un mikrofonu un pievienoties pasākumam.",
+    "backToWaitingRoom": "Atpakaļ uz uzgaidāmo telpu",
+    "gardenDialogLabel": "Uzgaidāmās telpas laukums",
+    "gardenGateHint": "Vari pievienoties no šejienes vai aizvest savu avataru līdz vārtiem.",
+    "classicVersion": "Klasiskā versija",
+    "warmup": {
+      "queued": "Pieprasījums saņemts",
+      "startingBridge": "Startējam video serveri…",
+      "provisioningNode": "Veidojam atsevišķu video serveri",
+      "almostReady": "Video serveris darbojas: gandrīz gatavs",
+      "almostReadyDetail": "Vēl mirklis, un pievienošanās poga ieslēgsies pati.",
+      "honestHint": "Parastā gaidīšana: mazāk par minūti, ja infrastruktūra jau ir uzsilusi, 3–5 minūtes pirmajā startā. Pa to laiku vari pārbaudīt kameru un mikrofonu vai izmantot tērzēšanu.",
+      "elapsed": "sagatavošanā jau {time}"
+    }
   },
   "recording": {
     "management": "Video ieraksts",

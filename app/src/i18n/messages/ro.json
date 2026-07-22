@@ -2039,7 +2039,9 @@
       "recordingRequired": "Consimțământul pentru înregistrare este obligatoriu pentru a participa la acest eveniment",
       "futureCommunications": "Doresc să primesc informații despre evenimentele viitoare organizate de DTD",
       "addressBook": "Doresc să fiu inclus în Agenda DTD pentru a fi invitat la evenimente similare",
-      "addressBookHelp": "Consimțământ separat (art. 6.1.a RGPD). Îl puteți retrage în orice moment prin linkul „Eliminați-mi datele din agendă” din e-mailurile pe care le veți primi. Numele și organizația vor fi preluate din profilul de înregistrare."
+      "addressBookHelp": "Consimțământ separat (art. 6.1.a RGPD). Îl puteți retrage în orice moment prin linkul „Eliminați-mi datele din agendă” din e-mailurile pe care le veți primi. Numele și organizația vor fi preluate din profilul de înregistrare.",
+      "multitrack": "Consimt la înregistrarea unei piste audio separate a vocii mele, exclusiv în scopul atribuirii corecte a transcrierii fiecărui vorbitor. Pista este temporară și ștearsă după transcriere; nu este folosită pentru a identifica sau reproduce vocea mea.",
+      "multitrackRequired": "Consimțământul pentru înregistrarea pistei tale audio este obligatoriu pentru a participa la acest eveniment"
     },
     "export": {
       "title": "Datele mele",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Păstrarea datelor și drepturi",
           "body": "Datele sunt păstrate pe perioada configurată pentru fiecare eveniment și apoi șterse automat, cu excepția unor obligații legale diferite. În orice moment pot fi exercitate drepturile prevăzute de GDPR, inclusiv accesul, rectificarea și ștergerea, prin canalele instituționale ale Departamentului."
+        },
+        "automatedProcessing": {
+          "title": "Transcriere, sinteză și dublaj generate de inteligența artificială",
+          "body": "Pentru evenimentele care solicită acest lucru, după încheierea transmisiunii înregistrarea este procesată de un flux de inteligență artificială executat integral pe infrastructura de cluster a Departamentului. Acesta produce transcrierea vorbirii (cu separarea vorbitorilor), o sinteză pe înțelesul tuturor, eventuale traduceri în alte limbi europene și o versiune dublată a audio cu o voce sintetică generică. Toate modelele folosite (WhisperX pentru transcriere, Mistral-Small pentru sinteză și traducere, Piper TTS pentru dublaj) rulează pe GPU dedicate în interiorul clusterului: niciun dat al participanților nu este trimis către servicii terțe. Vocea participanților nu este clonată și nu este păstrată ca dată biometrică (art. 9 GDPR): dublajul folosește voci sintetice publice preantrenate, atribuite arbitrar vorbitorilor. Pentru fiecare înregistrare, pagina evenimentului arată fotografia exactă a modelelor utilizate („Transparența procesării IA”). Conținutul generat poate conține inexactități: referința de autoritate rămâne întotdeauna înregistrarea video originală (Regulamentul IA, art. 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Introduceți o adresă de e-mail validă",
     "chatLockedMessage": "Introduceți numele pentru a participa la chatul evenimentului.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Evenimentul este pe cale să înceapă, așteaptă organizatorii…",
+    "exitWaiting": "Ieși din sala de așteptare",
+    "aiNoticeTitle": "Procesare cu IA după eveniment",
+    "aiNotice": "La final, înregistrarea va fi procesată cu instrumente de inteligență artificială pentru a genera transcriere, rezumat și eventuale traduceri și dublaje. Rezultatele pot conține inexactități; înregistrarea video rămâne sursa de referință.",
+    "multitrackConsentTitle": "Înregistrare per participant",
+    "multitrackConsentRequired": "Trebuie să accepți înregistrarea pistei tale audio pentru a intra",
+    "enterGardenTitle": "Intră în piață",
+    "enterGardenHint": "Un spațiu de explorat cât aștepți: de acolo îți poți potrivi numele și microfonul și poți intra în eveniment.",
+    "backToWaitingRoom": "Înapoi la sala de așteptare",
+    "gardenDialogLabel": "Piața sălii de așteptare",
+    "gardenGateHint": "Poți intra de aici sau îți poți duce avatarul până la poartă.",
+    "classicVersion": "Versiunea clasică",
+    "warmup": {
+      "queued": "Cerere preluată",
+      "startingBridge": "Pornim serverul video…",
+      "provisioningNode": "Creăm un server video dedicat",
+      "almostReady": "Server video activ: aproape gata",
+      "almostReadyDetail": "Încă o clipă și butonul de intrare se va activa singur.",
+      "honestHint": "Așteptare obișnuită: sub un minut dacă infrastructura este deja caldă, 3–5 minute la prima pornire. Între timp poți verifica camera și microfonul sau folosi conversația.",
+      "elapsed": "în pregătire de {time}"
+    }
   },
   "recording": {
     "management": "Înregistrare video",

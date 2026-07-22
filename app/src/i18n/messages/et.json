@@ -2039,7 +2039,9 @@
       "recordingRequired": "Selles üritusel osalemiseks on nõutav salvestamise nõusolek",
       "futureCommunications": "Soovin saada teavet DTD tulevaste ürituste kohta",
       "addressBook": "Soovin olla DTD aadressraamatus, et saada kutseid sarnastele sündmustele",
-      "addressBookHelp": "Eraldi nõusolek (IKÜM art. 6.1.a). Saate selle igal ajal tagasi võtta lingiga \"Eemalda mu andmed aadressraamatust\" saadud e-kirjades. Nimi ja organisatsioon võetakse registreerimisprofiilist."
+      "addressBookHelp": "Eraldi nõusolek (IKÜM art. 6.1.a). Saate selle igal ajal tagasi võtta lingiga \"Eemalda mu andmed aadressraamatust\" saadud e-kirjades. Nimi ja organisatsioon võetakse registreerimisprofiilist.",
+      "multitrack": "Nõustun oma hääle salvestamisega eraldi helirajale ainsa eesmärgiga omistada transkriptsioon õigesti igale kõnelejale. Rada on ajutine ja kustutatakse pärast transkribeerimist; seda ei kasutata minu hääle tuvastamiseks ega taasesitamiseks.",
+      "multitrackRequired": "Nõusolek sinu heliraja salvestamiseks on sellel sündmusel osalemiseks kohustuslik"
     },
     "export": {
       "title": "Minu andmed",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Andmete säilitamine ja õigused",
           "body": "Andmeid säilitatakse iga ürituse jaoks seadistatud perioodi jooksul ja seejärel kustutatakse automaatselt, välja arvatud juhul, kui kehtivad muud õiguslikud kohustused. Andmesubjektid saavad igal ajal kasutada oma GDPR-i õigusi, sealhulgas juurdepääsu, parandamise ja kustutamise õigust, osakonna institutsiooniliste kanalite kaudu."
+        },
+        "automatedProcessing": {
+          "title": "Tehisintellekti loodud transkriptsioon, kokkuvõte ja dubleering",
+          "body": "Sündmuste puhul, mis seda taotlevad, töödeldakse salvestist pärast ülekande lõppu tehisintellekti ahelaga, mis töötab täielikult osakonna enda klastritaristul. See loob kõne transkriptsiooni (eri kõnelejad eristatud), üldarusaadava kokkuvõtte, võimalikud tõlked teistesse Euroopa keeltesse ja dubleeritud heliversiooni üldise sünteeshäälega. Kõik kasutatud mudelid (WhisperX transkriptsiooniks, Mistral-Small kokkuvõtteks ja tõlkeks, Piper TTS dubleerimiseks) töötavad klastri sees pühendatud GPU-del: osalejate andmeid ei saadeta kolmandate isikute teenustesse. Osalejate häält ei kloonita ega säilitata biomeetrilise andmena (isikuandmete kaitse üldmääruse art 9): dubleerimisel kasutatakse avalikke eelõpetatud sünteeshääli, mis omistatakse kõnelejatele suvaliselt. Iga salvestise puhul näitab sündmuse leht kasutatud mudelite täpset hetktõmmist („Tehisintellekti töötluse läbipaistvus“). Loodud sisu võib sisaldada ebatäpsusi: mõõduandev allikas on alati algne video (tehisintellekti määrus, art 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Sisestage kehtiv e-posti aadress",
     "chatLockedMessage": "Sisestage oma nimi sündmuse vestlusega liitumiseks.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Sündmus algab kohe, oota korraldajat…",
+    "exitWaiting": "Lahku ooteruumist",
+    "aiNoticeTitle": "Tehisintellekti töötlus pärast sündmust",
+    "aiNotice": "Lõpus töödeldakse salvestist tehisintellekti tööriistadega, et luua transkriptsioon, kokkuvõte ning võimalikud tõlked ja dubleeringud. Tulemused võivad sisaldada ebatäpsusi; video jääb autoriteetseks allikaks.",
+    "multitrackConsentTitle": "Osalejapõhine salvestamine",
+    "multitrackConsentRequired": "Sisenemiseks pead nõustuma oma helirea salvestamisega",
+    "enterGardenTitle": "Astu väljakule",
+    "enterGardenHint": "Koht, kus oodates ringi liikuda: sealt saad seada ka nime ja mikrofoni ning sündmusega liituda.",
+    "backToWaitingRoom": "Tagasi ooteruumi",
+    "gardenDialogLabel": "Ooteruumi väljak",
+    "gardenGateHint": "Võid liituda siit või viia oma avatari väravani.",
+    "classicVersion": "Klassikaline versioon",
+    "warmup": {
+      "queued": "Taotlus vastu võetud",
+      "startingBridge": "Käivitame videoserveri…",
+      "provisioningNode": "Loome pühendatud videoserveri",
+      "almostReady": "Videoserver töötab: peaaegu valmis",
+      "almostReadyDetail": "Veel hetk ja liitumisnupp aktiveerub ise.",
+      "honestHint": "Tavaline ootus: alla minuti, kui taristu on juba soe, 3–5 minutit esmakäivitusel. Vahepeal saad kontrollida kaamerat ja mikrofoni või kasutada vestlust.",
+      "elapsed": "ettevalmistuses {time}"
+    }
   },
   "recording": {
     "management": "Videosalvestis",

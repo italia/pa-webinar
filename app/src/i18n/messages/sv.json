@@ -2039,7 +2039,9 @@
       "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
       "futureCommunications": "Jag vill ta emot information om framtida evenemang arrangerade av DTD",
       "addressBook": "Jag vill läggas till i DTD-adressboken för att bli inbjuden till liknande evenemang",
-      "addressBookHelp": "Separat samtycke (GDPR art. 6.1.a). Du kan återkalla det när som helst via länken \"Ta bort mina uppgifter från adressboken\" i de mejl du får. Namn och organisation hämtas från din anmälningsprofil."
+      "addressBookHelp": "Separat samtycke (GDPR art. 6.1.a). Du kan återkalla det när som helst via länken \"Ta bort mina uppgifter från adressboken\" i de mejl du får. Namn och organisation hämtas från din anmälningsprofil.",
+      "multitrack": "Jag samtycker till inspelning av ett separat ljudspår med min röst, enbart för att transkriptionen ska kunna tillskrivas rätt talare. Spåret är tillfälligt och raderas efter transkriptionen; det används inte för att identifiera eller återge min röst.",
+      "multitrackRequired": "Samtycke till inspelning av ditt ljudspår krävs för att delta i detta evenemang"
     },
     "export": {
       "title": "Mina uppgifter",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Lagring och rättigheter",
           "body": "Uppgifter lagras under den period som konfigurerats för varje evenemang och raderas därefter automatiskt, om inte annan lagstiftning kräver annat. Registrerade kan när som helst utöva sina GDPR-rättigheter, inklusive tillgång, rättelse och radering, via avdelningens institutionella kanaler."
+        },
+        "automatedProcessing": {
+          "title": "Transkription, sammanfattning och dubbning genererade av artificiell intelligens",
+          "body": "För evenemang som begär det behandlas inspelningen efter sändningens slut av en AI-kedja som körs helt på avdelningens egen klusterinfrastruktur. Den tar fram transkription av det talade (med separering av de olika talarna), en lättläst sammanfattning, eventuella översättningar till andra europeiska språk och en dubbad ljudversion med en generisk syntetisk röst. Alla modeller som används (WhisperX för transkription, Mistral-Small för sammanfattning och översättning, Piper TTS för dubbning) körs på dedikerade GPU:er inuti klustret: inga deltagardata skickas till tredjepartstjänster. Deltagarnas röst klonas inte och lagras inte som biometriska uppgifter (art. 9 GDPR): dubbningen använder offentliga förtränade syntetiska röster som tilldelas talarna godtyckligt. För varje inspelning visar evenemangssidan den exakta ögonblicksbilden av de modeller som använts (”Transparens i AI-behandlingen”). Det genererade innehållet kan innehålla felaktigheter: den auktoritativa källan är alltid originalvideon (AI-förordningen, art. 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Ange en giltig e-postadress",
     "chatLockedMessage": "Ange ditt namn för att delta i evenemangets chatt.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Evenemanget börjar strax, vänta på arrangören…",
+    "exitWaiting": "Lämna väntrummet",
+    "aiNoticeTitle": "AI-bearbetning efter evenemanget",
+    "aiNotice": "När det är slut bearbetas inspelningen av AI-verktyg för att skapa transkription, sammanfattning och eventuella översättningar och dubbning. Resultaten kan innehålla felaktigheter; videon är fortfarande den auktoritativa källan.",
+    "multitrackConsentTitle": "Inspelning per deltagare",
+    "multitrackConsentRequired": "Du måste godkänna inspelningen av ditt ljudspår för att komma in",
+    "enterGardenTitle": "Gå in på torget",
+    "enterGardenHint": "En plats att strosa på medan du väntar — där kan du också ställa in namn och mikrofon och gå med i evenemanget.",
+    "backToWaitingRoom": "Tillbaka till väntrummet",
+    "gardenDialogLabel": "Väntrummets torg",
+    "gardenGateHint": "Du kan gå med härifrån, eller gå med din avatar fram till porten.",
+    "classicVersion": "Klassisk version",
+    "warmup": {
+      "queued": "Förfrågan mottagen",
+      "startingBridge": "Startar videoservern…",
+      "provisioningNode": "Skapar en dedikerad videoserver",
+      "almostReady": "Videoservern igång: snart klart",
+      "almostReadyDetail": "Ett ögonblick till, sedan aktiveras anslutningsknappen av sig själv.",
+      "honestHint": "Vanlig väntetid: under en minut om infrastrukturen redan är varm, 3–5 minuter vid första starten. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten.",
+      "elapsed": "förbereds sedan {time}"
+    }
   },
   "recording": {
     "management": "Videoinspelning",

@@ -2039,7 +2039,9 @@
       "recordingRequired": "Il-kunsens għar-reġistrazzjoni huwa obbligatorju biex tipparteċipa f'dan l-avveniment",
       "futureCommunications": "Nixtieq nirċievi informazzjoni dwar avvenimenti futuri organizzati mid-DTD",
       "addressBook": "Voglio tkun imdaħħal fil-Direttorju DTD għal tkun mistieden ad avvenimenti simili",
-      "addressBookHelp": "Kunsens separato (art. 6.1.a GDPR). Potrlill- revocarlo fi qualsiasi momento mill-link \"Neħħi il-miei data mill-direttorju\" fl-email li jirċievirai. Il nomu u l'organizzazzjoni ikunu ricavati mill-profilo ta' reġistrazzjoni."
+      "addressBookHelp": "Kunsens separato (art. 6.1.a GDPR). Potrlill- revocarlo fi qualsiasi momento mill-link \"Neħħi il-miei data mill-direttorju\" fl-email li jirċievirai. Il nomu u l'organizzazzjoni ikunu ricavati mill-profilo ta' reġistrazzjoni.",
+      "multitrack": "Nagħti l-kunsens għar-reġistrazzjoni ta' traċċa awdjo separata tal-vuċi tiegħi, unikament biex it-traskrizzjoni tiġi attribwita korrettament lil kull kelliem. It-traċċa hija temporanja u titħassar wara t-traskrizzjoni; ma tintużax biex tidentifika jew tirriproduċi l-vuċi tiegħi.",
+      "multitrackRequired": "Il-kunsens għar-reġistrazzjoni tat-traċċa awdjo tiegħek huwa obbligatorju biex tipparteċipa f'dan l-avveniment"
     },
     "export": {
       "title": "Id-dejta tiegħi",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Żamma u drittijiet",
           "body": "Id-dejta tinżamm għall-perjodu kkonfigurat għal kull avveniment u mbagħad tiġi mħassra awtomatikament, sakemm ma japplikawx obbligi legali differenti. Is-suġġetti tad-dejta jistgħu jeżerċitaw id-drittijiet tagħhom skont il-GDPR fi kwalunkwe ħin, inkluż l-aċċess, ir-rettifika u t-tħassir, permezz tal-kanali istituzzjonali tad-Dipartiment."
+        },
+        "automatedProcessing": {
+          "title": "Traskrizzjoni, sommarju u doppjaġġ iġġenerati minn intelliġenza artifiċjali",
+          "body": "Għall-avvenimenti li jitolbuh, wara t-tmiem tax-xandira r-reġistrazzjoni tiġi pproċessata minn katina ta' intelliġenza artifiċjali li taħdem kollha kemm hi fuq l-infrastruttura tal-cluster tad-Dipartiment. Tipproduċi t-traskrizzjoni tad-diskors (bis-separazzjoni tal-kelliema differenti), sommarju f'lingwaġġ ċar, traduzzjonijiet eventwali f'lingwi Ewropej oħra u verżjoni doppjata tal-awdjo b'vuċi sintetika ġenerali. Il-mudelli kollha użati (WhisperX għat-traskrizzjoni, Mistral-Small għas-sommarju u t-traduzzjoni, Piper TTS għad-doppjaġġ) jaħdmu fuq GPU dedikati fi ħdan il-cluster: l-ebda dejta tal-parteċipanti ma tintbagħat lil servizzi ta' partijiet terzi. Il-vuċi tal-parteċipanti ma tiġix ikklonjata u ma tinżammx bħala dejta bijometrika (Art. 9 GDPR): id-doppjaġġ juża vuċijiet sintetiċi pubbliċi mħarrġa minn qabel, assenjati lill-kelliema b'mod arbitrarju. Għal kull reġistrazzjoni, il-paġna tal-avveniment turi r-ritratt eżatt tal-mudelli użati (\"Trasparenza tal-ipproċessar bl-IA\"). Il-kontenut iġġenerat jista' jkun fih impreċiżjonijiet: is-sors awtorevoli jibqa' dejjem il-vidjo oriġinali (Att dwar l-IA, Art. 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Daħħal wieħed indirizz email validu",
     "chatLockedMessage": "Daħħal il-tuo nomu per tipparteċipa lill-chat tal-avveniment.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "L-avveniment wasal biex jibda, stenna lill-organizzaturi…",
+    "exitWaiting": "Oħroġ mill-kamra tal-istennija",
+    "aiNoticeTitle": "Ipproċessar bl-IA wara l-avveniment",
+    "aiNotice": "Fl-aħħar, ir-reġistrazzjoni tiġi pproċessata b'għodod ta' intelliġenza artifiċjali biex jinħolqu traskrizzjoni, sommarju u eventwali traduzzjonijiet u doppjaġġi. Ir-riżultati jistgħu jkun fihom impreċiżjonijiet; il-vidjo jibqa' s-sors awtorevoli.",
+    "multitrackConsentTitle": "Reġistrazzjoni għal kull parteċipant",
+    "multitrackConsentRequired": "Trid taċċetta r-reġistrazzjoni tat-traċċa awdjo tiegħek biex tidħol",
+    "enterGardenTitle": "Idħol fil-pjazza",
+    "enterGardenHint": "Post fejn tterraq waqt li tistenna: minn hemm tista' wkoll tissettja l-isem u l-mikrofonu u tidħol fl-avveniment.",
+    "backToWaitingRoom": "Lura lejn il-kamra tal-istennija",
+    "gardenDialogLabel": "Il-pjazza tal-kamra tal-istennija",
+    "gardenGateHint": "Tista' tidħol minn hawn, jew twassal l-avatar tiegħek sal-bieb.",
+    "classicVersion": "Verżjoni klassika",
+    "warmup": {
+      "queued": "It-talba waslet",
+      "startingBridge": "Qed nibdew is-server tal-vidjo…",
+      "provisioningNode": "Qed noħolqu server tal-vidjo dedikat",
+      "almostReady": "Is-server tal-vidjo qed jaħdem: kważi lesti",
+      "almostReadyDetail": "Mument ieħor u l-buttuna tad-dħul tinxtegħel waħidha.",
+      "honestHint": "Stennija tas-soltu: inqas minn minuta jekk l-infrastruttura diġà sħuna, 3–5 minuti mal-ewwel tħaddim. Sadanittant tista' tiċċekkja l-kamera u l-mikrofonu jew tuża ċ-chat.",
+      "elapsed": "qed jitħejja minn {time}"
+    }
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",

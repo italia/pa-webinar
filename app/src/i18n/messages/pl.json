@@ -2039,7 +2039,9 @@
       "recordingRequired": "Zgoda na nagrywanie jest wymagana do uczestnictwa w tym wydarzeniu",
       "futureCommunications": "Chcę otrzymywać informacje o przyszłych wydarzeniach organizowanych przez DTD",
       "addressBook": "Chcę zostać wpisany do Książki adresowej DTD, aby otrzymywać zaproszenia na podobne wydarzenia",
-      "addressBookHelp": "Oddzielna zgoda (art. 6.1.a RODO). Możesz ją wycofać w dowolnej chwili za pomocą linku \"Usuń moje dane z książki adresowej\" w otrzymywanych e-mailach. Imię i organizacja zostaną pobrane z profilu rejestracyjnego."
+      "addressBookHelp": "Oddzielna zgoda (art. 6.1.a RODO). Możesz ją wycofać w dowolnej chwili za pomocą linku \"Usuń moje dane z książki adresowej\" w otrzymywanych e-mailach. Imię i organizacja zostaną pobrane z profilu rejestracyjnego.",
+      "multitrack": "Wyrażam zgodę na nagranie osobnej ścieżki dźwiękowej mojego głosu wyłącznie w celu prawidłowego przypisania transkrypcji do osób mówiących. Ścieżka jest tymczasowa i usuwana po transkrypcji; nie służy do identyfikacji ani odtwarzania mojego głosu.",
+      "multitrackRequired": "Zgoda na nagrywanie Twojej ścieżki dźwiękowej jest wymagana, aby uczestniczyć w tym wydarzeniu"
     },
     "export": {
       "title": "Moje dane",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Przechowywanie danych i prawa",
           "body": "Dane są przechowywane przez okres skonfigurowany dla każdego wydarzenia, a następnie automatycznie usuwane, chyba że obowiązują inne wymogi prawne. W dowolnym momencie można skorzystać z praw przewidzianych w GDPR, w tym prawa dostępu, sprostowania i usunięcia danych, za pośrednictwem kanałów instytucjonalnych Departamentu."
+        },
+        "automatedProcessing": {
+          "title": "Transkrypcja, streszczenie i dubbing wygenerowane przez sztuczną inteligencję",
+          "body": "W wydarzeniach, które o to wnoszą, po zakończeniu transmisji nagranie jest przetwarzane przez potok sztucznej inteligencji działający w całości na infrastrukturze klastra Departamentu. Powstaje transkrypcja wypowiedzi (z rozdzieleniem poszczególnych mówców), przystępne streszczenie, ewentualne tłumaczenia na inne języki europejskie oraz zdubbingowana wersja dźwięku z ogólnym głosem syntetycznym. Wszystkie wykorzystywane modele (WhisperX do transkrypcji, Mistral-Small do streszczenia i tłumaczenia, Piper TTS do dubbingu) działają na dedykowanych GPU wewnątrz klastra: żadne dane uczestników nie są wysyłane do usług podmiotów trzecich. Głos uczestników nie jest klonowany ani przechowywany jako dana biometryczna (art. 9 RODO): dubbing korzysta z publicznych, wstępnie wytrenowanych głosów syntetycznych, przypisywanych mówcom w sposób dowolny. Dla każdego nagrania strona wydarzenia pokazuje dokładny wykaz użytych modeli („Przejrzystość przetwarzania SI”). Wygenerowane treści mogą zawierać nieścisłości: źródłem rozstrzygającym pozostaje zawsze oryginalne nagranie wideo (akt o SI, art. 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Wprowadź prawidłowy adres e-mail",
     "chatLockedMessage": "Wprowadź swoje imię, aby uczestniczyć w czacie wydarzenia.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Wydarzenie zaraz się zacznie, poczekaj na organizatorów…",
+    "exitWaiting": "Opuść poczekalnię",
+    "aiNoticeTitle": "Przetwarzanie przez SI po wydarzeniu",
+    "aiNotice": "Po zakończeniu nagranie zostanie przetworzone narzędziami sztucznej inteligencji w celu utworzenia transkrypcji, streszczenia oraz ewentualnych tłumaczeń i dubbingu. Wyniki mogą zawierać nieścisłości; źródłem rozstrzygającym pozostaje nagranie wideo.",
+    "multitrackConsentTitle": "Nagrywanie na uczestnika",
+    "multitrackConsentRequired": "Aby wejść, musisz zgodzić się na nagrywanie swojej ścieżki dźwiękowej",
+    "enterGardenTitle": "Wejdź na plac",
+    "enterGardenHint": "Miejsce do przechadzki w oczekiwaniu: stamtąd ustawisz też imię i mikrofon oraz dołączysz do wydarzenia.",
+    "backToWaitingRoom": "Wróć do poczekalni",
+    "gardenDialogLabel": "Plac poczekalni",
+    "gardenGateHint": "Możesz dołączyć stąd albo doprowadzić swojego awatara do bramy.",
+    "classicVersion": "Wersja klasyczna",
+    "warmup": {
+      "queued": "Zgłoszenie przyjęte",
+      "startingBridge": "Uruchamianie serwera wideo…",
+      "provisioningNode": "Tworzymy dedykowany serwer wideo",
+      "almostReady": "Serwer wideo działa: już prawie",
+      "almostReadyDetail": "Jeszcze chwila i przycisk wejścia włączy się sam.",
+      "honestHint": "Typowe oczekiwanie: poniżej minuty, jeśli infrastruktura jest już rozgrzana, 3–5 minut przy pierwszym uruchomieniu. W międzyczasie sprawdź kamerę i mikrofon albo skorzystaj z czatu.",
+      "elapsed": "w przygotowaniu od {time}"
+    }
   },
   "recording": {
     "management": "Nagranie wideo",

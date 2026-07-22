@@ -2039,7 +2039,9 @@
       "recordingRequired": "Die Einwilligung zur Aufzeichnung ist für die Teilnahme an dieser Veranstaltung erforderlich",
       "futureCommunications": "Ich möchte Informationen über zukünftige Veranstaltungen des DTD erhalten",
       "addressBook": "Ich möchte ins DTD-Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
-      "addressBookHelp": "Separate Einwilligung (Art. 6.1.a GDPR). Sie können sie jederzeit über den Link \"Meine Daten aus dem Adressbuch entfernen\" in den E-Mails widerrufen. Name und Organisation werden aus dem Anmeldeprofil übernommen."
+      "addressBookHelp": "Separate Einwilligung (Art. 6.1.a GDPR). Sie können sie jederzeit über den Link \"Meine Daten aus dem Adressbuch entfernen\" in den E-Mails widerrufen. Name und Organisation werden aus dem Anmeldeprofil übernommen.",
+      "multitrack": "Ich willige in die Aufzeichnung einer separaten Tonspur meiner Stimme ein, allein zu dem Zweck, das Transkript den Sprechenden korrekt zuzuordnen. Die Spur ist temporär und wird nach der Transkription gelöscht; sie wird nicht verwendet, um meine Stimme zu identifizieren oder wiederzugeben.",
+      "multitrackRequired": "Die Einwilligung in die Aufzeichnung Ihrer Tonspur ist für die Teilnahme an dieser Veranstaltung erforderlich"
     },
     "export": {
       "title": "Meine Daten",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Speicherung und Rechte",
           "body": "Die Daten werden für den für jede Veranstaltung konfigurierten Zeitraum aufbewahrt und anschließend automatisch gelöscht, sofern keine anderen gesetzlichen Verpflichtungen bestehen. Betroffene können ihre GDPR-Rechte jederzeit ausüben, einschließlich Auskunft, Berichtigung und Löschung, über die institutionellen Kanäle des Departements."
+        },
+        "automatedProcessing": {
+          "title": "Von künstlicher Intelligenz erzeugte Transkription, Zusammenfassung und Synchronisation",
+          "body": "Bei Veranstaltungen, die dies anfordern, wird die Aufzeichnung nach Ende der Live-Übertragung von einer KI-Pipeline verarbeitet, die vollständig auf der Cluster-Infrastruktur des Departments läuft. Die Pipeline erzeugt die Transkription des Gesprochenen (mit Trennung der einzelnen Sprechenden), eine allgemeinverständliche Zusammenfassung, gegebenenfalls Übersetzungen in andere europäische Sprachen und eine synchronisierte Tonfassung mit einer generischen synthetischen Stimme. Alle verwendeten Modelle (WhisperX für die Transkription, Mistral-Small für Zusammenfassung und Übersetzung, Piper TTS für die Synchronisation) laufen auf eigenen GPUs innerhalb des Clusters: Es werden keine Teilnehmerdaten an Dritte übermittelt. Die Stimme der Teilnehmenden wird nicht geklont und nicht als biometrisches Datum gespeichert (Art. 9 DSGVO): Die Synchronisation verwendet öffentlich vortrainierte synthetische Stimmen, die den Sprechenden willkürlich zugewiesen werden. Für jede Aufzeichnung kann die genaue Momentaufnahme der verwendeten Modelle auf der Veranstaltungsseite eingesehen werden („Transparenz der KI-Verarbeitung“). Die erzeugten Inhalte können Ungenauigkeiten enthalten: Maßgeblich bleibt stets das Originalvideo (KI-Verordnung, Art. 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Bitte eine gültige E-Mail-Adresse eingeben",
     "chatLockedMessage": "Geben Sie Ihren Namen ein, um am Event-Chat teilzunehmen.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Die Veranstaltung beginnt gleich, bitte warten Sie auf die Organisation…",
+    "exitWaiting": "Warteraum verlassen",
+    "aiNoticeTitle": "KI-Verarbeitung nach der Veranstaltung",
+    "aiNotice": "Nach dem Ende wird die Aufzeichnung von KI-Werkzeugen verarbeitet, um Transkript, Zusammenfassung sowie eventuelle Übersetzungen und Synchronisationen zu erstellen. Die Ergebnisse können Ungenauigkeiten enthalten; maßgeblich bleibt das Video.",
+    "multitrackConsentTitle": "Aufzeichnung pro Teilnehmende",
+    "multitrackConsentRequired": "Sie müssen der Aufzeichnung Ihrer Tonspur zustimmen, um beizutreten",
+    "enterGardenTitle": "Den Platz betreten",
+    "enterGardenHint": "Ein Ort zum Umherstreifen während der Wartezeit — von dort können Sie auch Name und Mikrofon einstellen und der Veranstaltung beitreten.",
+    "backToWaitingRoom": "Zurück zum Warteraum",
+    "gardenDialogLabel": "Platz des Warteraums",
+    "gardenGateHint": "Sie können von hier beitreten oder Ihren Avatar bis zum Tor führen.",
+    "classicVersion": "Klassische Ansicht",
+    "warmup": {
+      "queued": "Anfrage angenommen",
+      "startingBridge": "Videoserver wird gestartet…",
+      "provisioningNode": "Ein eigener Videoserver wird bereitgestellt",
+      "almostReady": "Videoserver läuft: fast geschafft",
+      "almostReadyDetail": "Noch einen Moment, dann wird die Beitrittsschaltfläche von selbst aktiv.",
+      "honestHint": "Übliche Wartezeit: unter einer Minute, wenn die Infrastruktur bereits warm ist, 3–5 Minuten beim ersten Start. In der Zwischenzeit können Sie Kamera und Mikrofon prüfen oder den Chat nutzen.",
+      "elapsed": "seit {time} in Vorbereitung"
+    }
   },
   "recording": {
     "management": "Videoaufzeichnung",

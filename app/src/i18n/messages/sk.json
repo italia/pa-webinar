@@ -2039,7 +2039,9 @@
       "recordingRequired": "Pre účasť na tejto udalosti je potrebný súhlas s nahrávaním",
       "futureCommunications": "Prajem si dostávať informácie o budúcich udalostiach organizovaných DTD",
       "addressBook": "Chcem byť zaradený do adresára DTD na pozývanie na podobné podujatia",
-      "addressBookHelp": "Samostatný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať pomocou odkazu \"Odstrániť moje údaje z adresára\" v e-mailoch, ktoré dostanete. Meno a organizácia budú prevzaté z registračného profilu."
+      "addressBookHelp": "Samostatný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať pomocou odkazu \"Odstrániť moje údaje z adresára\" v e-mailoch, ktoré dostanete. Meno a organizácia budú prevzaté z registračného profilu.",
+      "multitrack": "Súhlasím s nahrávaním samostatnej zvukovej stopy svojho hlasu výhradne na účel správneho priradenia prepisu jednotlivým hovoriacim. Stopa je dočasná a po prepise sa maže; nepoužíva sa na identifikáciu ani reprodukciu môjho hlasu.",
+      "multitrackRequired": "Súhlas s nahrávaním vašej zvukovej stopy je na účasť na tomto podujatí povinný"
     },
     "export": {
       "title": "Moje údaje",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Uchovávanie údajov a práva",
           "body": "Údaje sú uchovávané po dobu nakonfigurovanú pre každú udalosť a potom automaticky zmazané, pokiaľ zákonné povinnosti nestanovia inak. Dotknuté osoby môžu kedykoľvek uplatniť svoje práva podľa GDPR, vrátane prístupu, opravy a vymazania, prostredníctvom inštitucionálnych kanálov Odboru."
+        },
+        "automatedProcessing": {
+          "title": "Prepis, zhrnutie a dabing vytvorené umelou inteligenciou",
+          "body": "Pri podujatiach, ktoré o to požiadajú, je po skončení prenosu nahrávka spracovaná reťazcom umelej inteligencie bežiacim výhradne na klastrovej infraštruktúre Odboru. Vzniká prepis hovoreného slova (s rozlíšením jednotlivých hovoriacich), zrozumiteľné zhrnutie, prípadné preklady do ďalších európskych jazykov a dabovaná verzia zvuku so všeobecným syntetickým hlasom. Všetky použité modely (WhisperX na prepis, Mistral-Small na zhrnutie a preklad, Piper TTS na dabing) bežia na vyhradených GPU vnútri klastra: žiadne údaje účastníkov sa neodosielajú službám tretích strán. Hlas účastníkov sa neklonuje ani neuchováva ako biometrický údaj (čl. 9 GDPR): dabing používa verejné predtrénované syntetické hlasy, priraďované hovoriacim ľubovoľne. Pri každej nahrávke stránka podujatia ukazuje presnú snímku použitých modelov („Transparentnosť spracovania UI“). Vytvorený obsah môže obsahovať nepresnosti: záväzným zdrojom zostáva vždy pôvodné video (akt o UI, čl. 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Zadajte platnú e-mailovú adresu",
     "chatLockedMessage": "Zadajte svoje meno na pripojenie do chatu podujatia.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Podujatie sa o chvíľu začne, počkajte na organizátorov…",
+    "exitWaiting": "Opustiť čakáreň",
+    "aiNoticeTitle": "Spracovanie umelou inteligenciou po podujatí",
+    "aiNotice": "Po skončení bude nahrávka spracovaná nástrojmi umelej inteligencie, aby vznikol prepis, zhrnutie a prípadné preklady a dabing. Výstupy môžu obsahovať nepresnosti; záväzným zdrojom zostáva video.",
+    "multitrackConsentTitle": "Nahrávanie po účastníkoch",
+    "multitrackConsentRequired": "Na vstup musíte súhlasiť s nahrávaním svojej zvukovej stopy",
+    "enterGardenTitle": "Vstúpte na námestie",
+    "enterGardenHint": "Miesto na prechádzku, kým čakáte: odtiaľ si tiež nastavíte meno a mikrofón a vstúpite do podujatia.",
+    "backToWaitingRoom": "Späť do čakárne",
+    "gardenDialogLabel": "Námestie čakárne",
+    "gardenGateHint": "Môžete vstúpiť odtiaľto, alebo doviesť svojho avatara k bráne.",
+    "classicVersion": "Klasická verzia",
+    "warmup": {
+      "queued": "Požiadavka prijatá",
+      "startingBridge": "Spúšťame videoserver…",
+      "provisioningNode": "Vytvárame vyhradený videoserver",
+      "almostReady": "Videoserver beží: už to bude",
+      "almostReadyDetail": "Ešte chvíľu a tlačidlo na vstup sa samo aktivuje.",
+      "honestHint": "Zvyčajné čakanie: menej ako minúta, ak je infraštruktúra zohriata, 3–5 minút pri prvom spustení. Zatiaľ si môžete skontrolovať kameru a mikrofón alebo použiť chat.",
+      "elapsed": "pripravuje sa {time}"
+    }
   },
   "recording": {
     "management": "Videozáznam",

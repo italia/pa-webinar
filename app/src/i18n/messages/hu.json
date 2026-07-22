@@ -2039,7 +2039,9 @@
       "recordingRequired": "A felvételhez való hozzájárulás szükséges az eseményen való részvételhez",
       "futureCommunications": "Szeretnék tájékoztatást kapni a DTD által szervezett jövőbeli eseményekről",
       "addressBook": "Szeretnék felkerülni a DTD címjegyzékére, hogy hasonló eseményekre meghívást kapjak",
-      "addressBookHelp": "Külön hozzájárulás (GDPR 6. cikk (1) a) pont). Bármikor visszavonhatja a kapott e-mailekben található „Adataim eltávolítása a címjegyzékből” hivatkozással. A név és a szervezet a regisztrációs profilból származik."
+      "addressBookHelp": "Külön hozzájárulás (GDPR 6. cikk (1) a) pont). Bármikor visszavonhatja a kapott e-mailekben található „Adataim eltávolítása a címjegyzékből” hivatkozással. A név és a szervezet a regisztrációs profilból származik.",
+      "multitrack": "Hozzájárulok a hangom külön hangsávon történő rögzítéséhez, kizárólag abból a célból, hogy az átirat helyesen legyen az egyes beszélőkhöz rendelve. A sáv ideiglenes, és az átirat elkészülte után törlésre kerül; nem használják a hangom azonosítására vagy visszajátszására.",
+      "multitrackRequired": "A hangsávod rögzítéséhez adott hozzájárulás kötelező az eseményen való részvételhez"
     },
     "export": {
       "title": "Az én adataim",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Adatmegőrzés és jogok",
           "body": "Az adatokat az egyes eseményekhez konfigurált ideig őrizzük, majd automatikusan töröljük, hacsak jogszabályi kötelezettségek másként nem rendelkeznek. Az érintettek bármikor gyakorolhatják GDPR szerinti jogaikat, beleértve a hozzáférést, helyesbítést és törlést, a Főosztály intézményi csatornáin keresztül."
+        },
+        "automatedProcessing": {
+          "title": "Mesterséges intelligencia által készített átirat, összefoglaló és szinkron",
+          "body": "Az ezt kérő eseményeknél az élő adás végeztével a felvételt egy mesterségesintelligencia-lánc dolgozza fel, amely teljes egészében az Osztály saját fürtinfrastruktúráján fut. Elkészül a beszéd átirata (az egyes beszélők elkülönítésével), egy közérthető összefoglaló, esetleges fordítások más európai nyelvekre, valamint a hang szinkronizált változata általános szintetikus hanggal. Minden felhasznált modell (WhisperX az átirathoz, Mistral-Small az összefoglalóhoz és a fordításhoz, Piper TTS a szinkronhoz) a fürtön belüli dedikált GPU-kon fut: a résztvevők adatai nem kerülnek harmadik felek szolgáltatásaihoz. A résztvevők hangját nem klónozzuk és nem tároljuk biometrikus adatként (GDPR 9. cikk): a szinkron nyilvános, előre betanított szintetikus hangokat használ, amelyeket önkényesen rendelünk a beszélőkhöz. Minden felvételnél az esemény oldala mutatja a felhasznált modellek pontos pillanatképét („Az MI-feldolgozás átláthatósága”). A létrehozott tartalom pontatlanságokat tartalmazhat: a mérvadó forrás mindig az eredeti videó (MI-rendelet, 50. cikk)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Adjon meg egy érvényes e-mail címet",
     "chatLockedMessage": "Adja meg a nevét, hogy csatlakozhasson az esemény chatjéhez.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Az esemény mindjárt kezdődik, várd meg a szervezőket…",
+    "exitWaiting": "Kilépés a váróteremből",
+    "aiNoticeTitle": "MI-feldolgozás az esemény után",
+    "aiNotice": "A végén a felvételt mesterséges intelligencia eszközök dolgozzák fel átirat, összefoglaló, valamint esetleges fordítások és szinkron készítéséhez. Az eredmények pontatlanságokat tartalmazhatnak; a mérvadó forrás továbbra is a videó.",
+    "multitrackConsentTitle": "Résztvevőnkénti rögzítés",
+    "multitrackConsentRequired": "A belépéshez el kell fogadnod a saját hangsávod rögzítését",
+    "enterGardenTitle": "Lépj be a térre",
+    "enterGardenHint": "Hely, ahol várakozás közben járkálhatsz: onnan a nevedet és a mikrofonodat is beállíthatod, és beléphetsz az eseménybe.",
+    "backToWaitingRoom": "Vissza a váróterembe",
+    "gardenDialogLabel": "A váróterem tere",
+    "gardenGateHint": "Beléphetsz innen, vagy elviheted az avatarodat a kapuig.",
+    "classicVersion": "Klasszikus változat",
+    "warmup": {
+      "queued": "Kérés fogadva",
+      "startingBridge": "Videokiszolgáló indítása…",
+      "provisioningNode": "Dedikált videokiszolgálót hozunk létre",
+      "almostReady": "A videokiszolgáló fut: mindjárt kész",
+      "almostReadyDetail": "Még egy pillanat, és a belépés gomb magától aktiválódik.",
+      "honestHint": "Szokásos várakozás: egy percnél kevesebb, ha az infrastruktúra már meleg, első indításnál 3–5 perc. Addig ellenőrizheted a kamerát és a mikrofont, vagy használhatod a csevegést.",
+      "elapsed": "{time} óta készül"
+    }
   },
   "recording": {
     "management": "Videofelvétel",
