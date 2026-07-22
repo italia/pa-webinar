@@ -22,7 +22,50 @@
 # Base tag is PINNED to the exact prod-served build so the minified identifiers,
 # and prosody/jicofo/jvb compatibility, are unchanged. Bump both the FROM tag and
 # the image tag together when the served jitsi/web version changes.
-FROM jitsi/web:stable-10741
+FROM jitsi/web:stable-10741 AS base
+
+# "Nascondi la tua immagine" is a one-way trap for anyone already caught by it
+# (live report: a participant saw everyone but himself, while everyone saw him).
+#
+# WHY A PATCH: the app already sets `disableSelfViewSettings: true`, which hides
+# the control so nobody NEW can get stuck — but it does nothing for a browser
+# where the flag was already stored. Jitsi keeps that choice in localStorage
+# (`features/base/settings`, origin = the Jitsi host, so the embedding app cannot
+# reach it), and the selector ORs the two sources:
+#
+#   config.disableSelfView || settings.disableSelfView || isVisitor
+#
+# so `configOverwrite.disableSelfView = false` cannot win — the stored `true`
+# still hides the tile, with no UI left to undo it. Only an incognito window or
+# clearing that origin's site data rescued the user.
+#
+# The patch makes an EXPLICIT `config.disableSelfView === false` authoritative
+# over the stored setting, leaving the visitor rule untouched (a visitor must
+# still not get a self view). The app then pins the flag to false and every
+# stuck browser recovers on its next join.
+#
+# Done in a node stage rather than with `sed`: the needle is full of regex and
+# replacement metacharacters (`.`, `[`, `]`, `&&`), and node does a literal,
+# assertion-checked replacement with nothing to escape. The base image is a
+# static-file nginx image with no scripting runtime of its own.
+FROM node:20-alpine AS patcher
+COPY --from=base /usr/share/jitsi-meet/libs/app.bundle.min.js /work/app.bundle.min.js
+RUN node -e "\
+const fs = require('fs'); \
+const p = '/work/app.bundle.min.js'; \
+const OLD = 'e[\"features/base/config\"].disableSelfView||e[\"features/base/settings\"].disableSelfView||e9(e)'; \
+const NEW = '(!1!==e[\"features/base/config\"].disableSelfView&&(e[\"features/base/config\"].disableSelfView||e[\"features/base/settings\"].disableSelfView))||e9(e)'; \
+const src = fs.readFileSync(p, 'utf8'); \
+const n = src.split(OLD).length - 1; \
+if (n !== 1) { console.error('FATAL: expected exactly 1 self-view selector, found ' + n + ' (base image changed?)'); process.exit(1); } \
+const out = src.replace(OLD, NEW); \
+if (out.split(NEW).length - 1 !== 1 || out.includes(OLD)) { console.error('FATAL: self-view patch verification failed'); process.exit(1); } \
+fs.writeFileSync(p, out); \
+console.log('OK: an explicit config.disableSelfView=false now overrides the stored setting'); \
+"
+
+FROM base
+COPY --from=patcher /work/app.bundle.min.js /usr/share/jitsi-meet/libs/app.bundle.min.js
 
 # hadolint ignore=DL4006
 # Count OCCURRENCES with `grep -oF … | wc -l` (NOT `grep -c`, which counts
