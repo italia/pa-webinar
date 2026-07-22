@@ -1511,7 +1511,9 @@
         "emailFromName": "Sender name",
         "emailFromNameHelp": "Empty = the name configured in the deployment (SMTP_FROM_NAME) is used. Emails are still sent from the system address.",
         "emailReplyTo": "Reply-to address",
-        "emailReplyToHelp": "Emails come from a no-reply address: without this, a reply reaches nobody."
+        "emailReplyToHelp": "Emails come from a no-reply address: without this, a reply reaches nobody.",
+        "gravatarEnabled": "Use Gravatar for participant pictures",
+        "gravatarEnabledHelp": "Attendees who registered with an email that has a Gravatar will show it in the room. The Gravatar address embeds a hash of the email, is visible to every participant, and each load is a request to a third party: declare it in your privacy notice. When off, the platform’s own initials avatars are used."
       }
     },
     "analytics": {
