@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "En livligare chatt: omnämnanden, reaktioner, rättelser och export",
+    "notes": [
+      "Chatt: när någon nämner dig med @ framhävs nu meddelandet, och om du tittar åt annat håll får du en avisering. Tidigare gick ett omnämnande inte att skilja från vilket meddelande som helst.",
+      "Chatt: du kan reagera på ett enskilt meddelande med en emoji och rätta ett eget meddelande inom femton minuter (det framgår fortfarande att det har ändrats). Knappen ”Svara” är nu mer diskret.",
+      "Chatt: ny knapp för att ladda ner hela samtalet, som text eller som data. Meddelandena sparades redan, men det fanns inget sätt att ta med sig dem.",
+      "I mötesrummet: en timer visar hur lång tid som återstår till slutet (eller hur länge evenemanget har pågått), påslagen som standard för den som leder evenemanget och möjlig att slå på för vem som helst.",
+      "Ett mötesrum startas inte längre av att någon öppnar evenemangssidan flera timmar i förväg: det värms upp när det behövs, som det är tänkt. Det löser också ett fall där evenemanget stängdes av bara några minuter efter starten.",
+      "Statistik: det högsta antalet deltagare registreras nu även för den enskilda mötessessionen, inte bara för evenemanget i sin helhet."
+    ]
+  },
   "0.8.4": {
     "title": "Bekräftelsemejl: evenemangets namn, bild och konfigurerbar avsändare",
     "notes": [

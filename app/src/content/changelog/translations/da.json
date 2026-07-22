@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "En mere levende chat: omtaler, reaktioner, rettelser og eksport",
+    "notes": [
+      "Chat: nævner nogen dig med @, bliver beskeden nu fremhævet, og kigger du et andet sted hen, får du en notifikation. Hidtil kunne en omtale ikke skelnes fra en hvilken som helst anden besked.",
+      "Chat: du kan nu reagere på en enkelt besked med en emoji og rette dine egne beskeder inden for femten minutter (det fremgår fortsat, at beskeden er ændret). Knappen »Svar« er blevet mere diskret.",
+      "Chat: en ny knap henter hele samtalen ned – som tekst eller i dataformat. Beskederne blev allerede gemt, men der var ingen måde at tage dem med sig på.",
+      "I mødelokalet: en timer viser, hvor lang tid der er tilbage (eller hvor længe man har været i gang). Den er slået til som standard for moderatorer og kan slås til af alle.",
+      "Et mødelokale startes ikke længere af den, der åbner arrangementssiden timer i forvejen: det gøres først klar, når der er brug for det. Det løser samtidig et tilfælde, hvor arrangementet blev lukket få minutter efter starten.",
+      "Statistik: det højeste antal deltagere samtidig registreres nu også for den enkelte session og ikke længere kun for hele arrangementet."
+    ]
+  },
   "0.8.4": {
     "title": "Bekræftelsesmails: arrangementets navn og billede samt en afsender, der kan indstilles",
     "notes": [

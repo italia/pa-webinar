@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Comhrá níos beoga: daoine a lua, frithghníomhartha, ceartúcháin agus easpórtáil",
+    "notes": [
+      "Comhrá: nuair a luann duine thú le @, aibhsítear an teachtaireacht anois agus, má tá tú ag féachaint in áit eile, faigheann tú fógra. Roimhe seo, ní raibh aon difríocht le feiceáil idir lua agus gnáth-theachtaireacht.",
+      "Comhrá: is féidir frithghníomhú le emoji ar theachtaireacht ar leith, agus do theachtaireacht féin a cheartú laistigh de chúig nóiméad déag (fanann sé le feiceáil gur athraíodh í). Tá cuma níos discréidí ar an gcnaipe “Freagair” anois.",
+      "Comhrá: cnaipe nua chun an comhrá a íoslódáil, i bhformáid téacs nó sonraí. Bhí na teachtaireachtaí á gcoinneáil cheana féin, ach ní raibh aon bhealach ann iad a thabhairt leat.",
+      "Sa seomra: taispeánann amadóir cé mhéad ama atá fágtha (nó cá fhad ó thosaigh sibh), agus é ar siúl de réir réamhshocraithe don té atá i mbun an imeachta agus ar fáil do dhuine ar bith é a chur ar siúl.",
+      "Ní dhúisítear seomra a thuilleadh nuair a osclaíonn duine leathanach an imeachta uaireanta an chloig roimh ré: dúisítear é nuair is gá, mar ba cheart. Réitítear cás eile freisin: uaireanta dhúntaí an t-imeacht cúpla nóiméad tar éis dó tosú.",
+      "Staitisticí: taifeadtar buaiclíon na rannpháirtithe ar an seisiún glao aonair anois freisin, agus ní ar an imeacht amháin."
+    ]
+  },
   "0.8.4": {
     "title": "Ríomhphoist deimhnithe: ainm an imeachta, an íomhá agus seoltóir inchumraithe",
     "notes": [

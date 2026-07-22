@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Eloisampi chat: maininnat, reaktiot, korjaukset ja vienti",
+    "notes": [
+      "Chat: kun joku mainitsee sinut @-merkillä, viesti korostuu, ja jos katse on muualla, siitä tulee ilmoitus. Aiemmin maininta ei erottunut mitenkään tavallisesta viestistä.",
+      "Chat: yksittäiseen viestiin voi reagoida emojilla, ja omaa viestiä voi korjata viidentoista minuutin ajan (viestiin jää merkintä muokkauksesta). ”Vastaa”-painike on nyt huomaamattomampi.",
+      "Chat: uudella painikkeella keskustelun voi ladata itselleen tekstinä tai datamuodossa. Viestit säilyivät jo ennestään, mutta niitä ei päässyt viemään mukanaan.",
+      "Tapahtumatilassa: ajastin näyttää, paljonko aikaa on jäljellä päättymiseen – tai kuinka kauan tapahtuma on ollut käynnissä. Se on oletuksena käytössä tapahtumaa vetävällä moderaattorilla, ja kuka tahansa voi ottaa sen käyttöön.",
+      "Tapahtumatila ei enää käynnisty siitä, että joku avaa tapahtumasivun tunteja ennen alkua: se lämpiää vasta silloin, kun sitä oikeasti tarvitaan. Samalla korjaantuu tilanne, jossa tapahtuma sammutettiin muutama minuutti alkamisen jälkeen.",
+      "Tilastot: osallistujien huippumäärä kirjataan nyt myös yksittäiseen istuntoon, ei enää pelkästään koko tapahtumaan."
+    ]
+  },
   "0.8.4": {
     "title": "Vahvistussähköpostit: tapahtuman nimi, kuva ja muokattava lähettäjä",
     "notes": [

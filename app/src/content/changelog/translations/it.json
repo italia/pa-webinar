@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Chat più viva: menzioni, reazioni, correzioni ed export",
+    "notes": [
+      "Chat: quando qualcuno ti nomina con @ ora la riga è evidenziata e, se stai guardando altrove, arriva una notifica. Prima essere citati non si distingueva da un messaggio qualsiasi.",
+      "Chat: si può reagire a un singolo messaggio con un'emoji e correggere un proprio messaggio entro quindici minuti (resta indicato che è stato modificato). Il pulsante «Rispondi» è diventato discreto.",
+      "Chat: nuovo pulsante per scaricare la conversazione, in testo o in formato dati. I messaggi erano già conservati, ma non c'era modo di portarli via.",
+      "In sala: un contatore mostra quanto manca alla fine (o da quanto si è iniziato), acceso di default per chi conduce e attivabile da chiunque.",
+      "Una sala non viene più accesa da chi apre la pagina dell'evento con ore di anticipo: si scalda quando serve, come previsto. Risolve anche un caso in cui l'evento veniva spento pochi minuti dopo l'inizio.",
+      "Statistiche: il numero massimo di partecipanti viene ora registrato anche sulla singola sessione, non solo sull'evento."
+    ]
+  },
   "0.8.4": {
     "title": "Email di conferma: nome dell'evento, immagine e mittente configurabile",
     "notes": [

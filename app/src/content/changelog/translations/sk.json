@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Živší chat: označenia, reakcie, opravy a export",
+    "notes": [
+      "Chat: keď vás niekto označí pomocou @, správa sa teraz zvýrazní, a ak sa práve venujete niečomu inému, dostanete upozornenie. Doteraz sa označenie nedalo odlíšiť od hociktorej inej správy.",
+      "Chat: na jednotlivú správu možno reagovať emoji a vlastnú správu možno do pätnástich minút opraviť (zostane pri nej označenie, že bola upravená). Tlačidlo „Odpovedať“ je teraz nenápadnejšie.",
+      "Chat: nové tlačidlo na stiahnutie celej konverzácie, v textovej podobe alebo ako údaje. Správy sa uchovávali už doteraz, no nedali sa vziať so sebou.",
+      "V miestnosti: časomiera ukazuje, koľko času zostáva do konca (prípadne ako dlho už podujatie trvá). Pre moderátora je zapnutá v predvolenom nastavení, zapnúť si ju však môže ktokoľvek.",
+      "Miestnosť sa už nespúšťa len preto, že niekto otvorí stránku podujatia niekoľko hodín vopred: nabehne, až keď je to potrebné, ako sa predpokladá. Opravený je aj prípad, keď sa podujatie vyplo pár minút po začiatku.",
+      "Štatistiky: najvyšší počet účastníkov sa teraz zaznamenáva aj pri jednotlivej relácii hovoru, nielen pri celom podujatí."
+    ]
+  },
   "0.8.4": {
     "title": "Potvrdzovacie e-maily: názov podujatia, obrázok a nastaviteľný odosielateľ",
     "notes": [

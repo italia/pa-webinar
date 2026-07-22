@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Żywszy czat: wzmianki, reakcje, poprawianie wiadomości i eksport",
+    "notes": [
+      "Czat: przywołanie kogoś z użyciem @ powoduje teraz wyróżnienie wiadomości, a osoba wskazana otrzymuje powiadomienie, jeśli akurat patrzy w inne miejsce. Wcześniej wzmianka niczym nie różniła się od zwykłej wiadomości.",
+      "Czat: na pojedynczą wiadomość można zareagować emoji, a własną wiadomość poprawić w ciągu piętnastu minut (pozostaje przy niej oznaczenie, że została zmieniona). Przycisk „Odpowiedz” stał się mniej rzucający się w oczy.",
+      "Czat: nowy przycisk pozwala pobrać całą rozmowę — w postaci tekstu albo w formacie danych. Wiadomości były przechowywane już wcześniej, brakowało jednak sposobu, aby je stamtąd zabrać.",
+      "W sali: licznik pokazuje, ile czasu pozostało do końca (albo ile upłynęło od rozpoczęcia). Jest domyślnie włączony dla osób prowadzących, a włączyć może go każdy.",
+      "Otwarcie strony wydarzenia na wiele godzin przed jego rozpoczęciem nie uruchamia już sali: jest ona wybudzana dopiero wtedy, gdy jest to potrzebne. Rozwiązuje to również przypadek, w którym wydarzenie było wyłączane kilka minut po rozpoczęciu.",
+      "Statystyki: szczytowa liczba uczestników jest teraz zapisywana również dla pojedynczej sesji połączenia, a nie wyłącznie dla całego wydarzenia."
+    ]
+  },
   "0.8.4": {
     "title": "Wiadomości potwierdzające: nazwa wydarzenia, obraz i konfigurowalny nadawca",
     "notes": [

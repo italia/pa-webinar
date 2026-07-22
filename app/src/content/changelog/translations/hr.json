@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Živahniji chat: spominjanja, reakcije, ispravci i izvoz",
+    "notes": [
+      "Chat: kad vas netko spomene znakom @, poruka je sada istaknuta, a ako gledate negdje drugdje, stiže obavijest. Dosad se spominjanje ni po čemu nije razlikovalo od bilo koje druge poruke.",
+      "Chat: na pojedinu poruku sada možete reagirati emojijem, a vlastitu poruku možete ispraviti unutar petnaest minuta (uz nju ostaje oznaka da je izmijenjena). Gumb „Odgovori” postao je nenametljiv.",
+      "Chat: novi gumb preuzima razgovor, u tekstualnom ili podatkovnom obliku. Poruke su se i dosad čuvale, ali ih nije bilo moguće ponijeti sa sobom.",
+      "U dvorani: mjerač vremena pokazuje koliko je ostalo do kraja (ili koliko je prošlo od početka); prema zadanim je postavkama uključen onima koji vode događaj, a može ga uključiti svatko.",
+      "Dvoranu više ne pokreće onaj tko stranicu događaja otvori nekoliko sati unaprijed: videosustav se priprema tek kad je potrebno, kako je i predviđeno. Time se rješava i slučaj u kojem se događaj gasio nekoliko minuta nakon početka.",
+      "Statistika: najveći broj sudionika sada se bilježi i za pojedinu sesiju poziva, a ne samo za cijeli događaj."
+    ]
+  },
   "0.8.4": {
     "title": "E-poruke s potvrdom: naziv događaja, slika i prilagodljiv pošiljatelj",
     "notes": [

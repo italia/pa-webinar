@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Chat mais vivo: menções, reações, correções e exportação",
+    "notes": [
+      "Chat: quando alguém o menciona com @, a mensagem passa a ficar destacada e, se estiver a olhar para outro lado, recebe uma notificação. Até agora, ser mencionado não se distinguia de uma mensagem qualquer.",
+      "Chat: passa a ser possível reagir a uma mensagem com um emoji e corrigir uma mensagem própria no prazo de quinze minutos (fica assinalado que foi editada). O botão «Responder» tornou-se mais discreto.",
+      "Chat: novo botão para transferir a conversa, em texto ou em formato de dados. As mensagens já eram conservadas, mas não havia forma de as levar consigo.",
+      "Na sala: um temporizador indica quanto falta para o fim (ou há quanto tempo se começou), ativado por predefinição para quem conduz o evento e disponível para qualquer participante.",
+      "Uma sala deixa de arrancar só porque alguém abriu a página do evento com horas de antecedência: passa a ser preparada no momento certo, como estava previsto. Fica também corrigido um caso em que o evento era encerrado poucos minutos depois de começar.",
+      "Estatísticas: o pico de participantes passa a ser registado também em cada sessão, e não apenas no conjunto do evento."
+    ]
+  },
   "0.8.4": {
     "title": "E-mails de confirmação: nome do evento, imagem e remetente configurável",
     "notes": [

@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Gyvesni pokalbiai: paminėjimai, reakcijos, taisymai ir atsisiuntimas",
+    "notes": [
+      "Pokalbiai: kai kas nors pamini jus su @, žinutė dabar išryškinama, o jei tuo metu žiūrite kitur — gaunate pranešimą. Anksčiau paminėjimas niekuo nesiskyrė nuo bet kurios kitos žinutės.",
+      "Pokalbiai: į atskirą žinutę galima reaguoti jaustuku, o savo žinutę per penkiolika minučių galima pataisyti (lieka žyma, kad ji redaguota). Mygtukas „Atsakyti“ dabar mažiau krenta į akis.",
+      "Pokalbiai: naujas mygtukas leidžia atsisiųsti visą pokalbį — tekstiniu arba duomenų formatu. Žinutės ir anksčiau buvo saugomos, tačiau nebuvo kaip jų pasiimti.",
+      "Salėje: laikmatis rodo, kiek liko iki pabaigos (arba kiek laiko praėjo nuo pradžios). Renginį vedantiesiems jis įjungtas pagal numatytuosius nustatymus, o įjungti jį gali bet kuris dalyvis.",
+      "Salė nebeįjungiama vien dėl to, kad kas nors atvėrė renginio puslapį likus kelioms valandoms iki pradžios: ji pažadinama tada, kai to iš tikrųjų reikia. Kartu ištaisytas atvejis, kai renginys būdavo išjungiamas praėjus vos kelioms minutėms nuo pradžios.",
+      "Statistika: didžiausias dalyvių skaičius dabar fiksuojamas ir kiekviename atskirame vaizdo pokalbio seanse, ne tik viso renginio mastu."
+    ]
+  },
   "0.8.4": {
     "title": "Patvirtinimo laiškai: renginio pavadinimas, paveikslėlis ir konfigūruojamas siuntėjas",
     "notes": [

@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Élénkebb csevegés: említések, reakciók, javítások és export",
+    "notes": [
+      "Csevegés: ha valaki @ jellel néven szólít, az üzenet mostantól kiemelve jelenik meg, és ha épp máshol jár a figyelme, értesítést is kap róla. Korábban az említés semmiben nem különbözött a többi üzenettől.",
+      "Csevegés: egy-egy üzenetre mostantól emojival lehet reagálni, a saját üzenet pedig tizenöt percen belül javítható (a rendszer jelzi, hogy módosult). A „Válasz” gomb visszafogottabb lett.",
+      "Csevegés: új gombbal tölthető le a beszélgetés, szöveges vagy adatformátumban. Az üzeneteket eddig is megőrizte a rendszer, csak nem lehetett kimenteni őket.",
+      "A teremben számláló mutatja, mennyi idő van hátra a végéig (vagy mennyi telt el a kezdés óta): a moderátoroknál alapértelmezés szerint be van kapcsolva, de bárki bekapcsolhatja.",
+      "A termet többé nem indítja el az, aki órákkal korábban megnyitja az esemény oldalát: a rendszer akkor készíti elő, amikor valóban szükség van rá. Ezzel megszűnt az az eset is, amikor az esemény néhány perccel a kezdés után leállt.",
+      "Statisztikák: a csúcslétszámot a rendszer mostantól az egyes hívás-munkamenetekre is rögzíti, nem csak az eseményre összesítve."
+    ]
+  },
   "0.8.4": {
     "title": "Visszaigazoló e-mailek: az esemény neve, képe és beállítható feladó",
     "notes": [

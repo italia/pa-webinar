@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Elavam vestlus: mainimised, reaktsioonid, parandused ja väljavõte",
+    "notes": [
+      "Vestlus: kui keegi mainib sind @-märgiga, on see sõnum nüüd esile tõstetud, ja kui parajasti mujale vaatad, saad teavituse. Varem ei erinenud mainimine kuidagi tavalisest sõnumist.",
+      "Vestlus: üksikule sõnumile saab reageerida emojiga ja oma sõnumit saab viieteistkümne minuti jooksul parandada – sõnumi juurde jääb märge, et seda on muudetud. Nupp „Vasta“ on nüüd tagasihoidlikum.",
+      "Vestlus: uus nupp laadib kogu vestluse alla kas tekstina või andmefailina. Sõnumid olid ka varem alles, kuid neid ei olnud kuidagi võimalik endaga kaasa võtta.",
+      "Ruumis näitab loendur, kui palju on lõpuni jäänud (või kui kaua on juba kestnud). Üritust juhtival inimesel on see vaikimisi sees ja igaüks saab selle ise sisse lülitada.",
+      "Ruumi ei käivita enam see, kes avab ürituse lehe tunde varem: ruum soojendatakse siis, kui seda on vaja, nagu ette nähtud. Ühtlasi on lahendatud juhtum, kus üritus lülitus välja mõni minut pärast algust.",
+      "Statistika: osalejate tippnumber talletatakse nüüd ka iga üksiku kõneseansi kohta, mitte üksnes kogu ürituse kohta."
+    ]
+  },
   "0.8.4": {
     "title": "Kinnituskirjad: ürituse nimi, pilt ja seadistatav saatja",
     "notes": [
