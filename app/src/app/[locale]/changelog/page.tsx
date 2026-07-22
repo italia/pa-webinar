@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, getLocale } from 'next-intl/server';
 
+import ReleaseCadence from '@/components/changelog/release-cadence';
 import { getChangelog } from '@/content/changelog';
 import { getSettings } from '@/lib/settings';
 
@@ -37,8 +38,20 @@ export default async function ChangelogPage() {
 
   const repoUrl =
     typeof settings.githubUrl === 'string' && settings.githubUrl.startsWith('http')
-      ? settings.githubUrl
+      ? settings.githubUrl.replace(/\/+$/, '')
       : null;
+
+  // Ordinate dalla più recente: la prima e l'ultima dell'elenco sono gli estremi.
+  const newest = releases[0];
+  const oldest = releases[releases.length - 1];
+  const cadenceSummary =
+    newest && oldest
+      ? t('cadenceSummary', {
+          count: releases.length,
+          from: dateFmt.format(new Date(oldest.date)),
+          to: dateFmt.format(new Date(newest.date)),
+        })
+      : '';
 
   return (
     <div className="container py-5">
@@ -46,7 +59,27 @@ export default async function ChangelogPage() {
         <div className="col-lg-9">
           <header className="mb-4">
             <h1 className="mb-3">{t('title')}</h1>
-            <p className="lead text-muted mb-0">{t('intro')}</p>
+            <p className="lead text-muted mb-3">{t('intro')}</p>
+
+            {/* Il ritmo, non la cronologia: vedi il commento in ReleaseCadence.
+                Il riassunto è TESTO, e viene prima del disegno — il grafico lo
+                illustra, non lo sostituisce. */}
+            {releases.length > 1 && (
+              <section aria-labelledby="cadence-h" className="mt-4">
+                <h2 id="cadence-h" className="h6 text-muted mb-1">
+                  {t('cadence')}
+                </h2>
+                <p className="text-muted mb-2" style={{ fontSize: '0.88rem' }}>
+                  {cadenceSummary}
+                </p>
+                <ReleaseCadence
+                  releases={releases.map((r) => ({ version: r.version, date: r.date }))}
+                  currentVersion={CURRENT_VERSION}
+                  formatDate={(d) => dateFmt.format(d)}
+                  label={cadenceSummary}
+                />
+              </section>
+            )}
           </header>
 
           <ol className="list-unstyled d-flex flex-column gap-3 mb-0">
@@ -99,6 +132,21 @@ export default async function ChangelogPage() {
                           </li>
                         ))}
                       </ul>
+                      {/* Non è un vezzo: alla release di GitHub è allegato
+                          l'SBOM di QUELLA versione (CycloneDX + SPDX). È la
+                          catena che permette a un'amministrazione di sapere
+                          cosa c'è dentro il software che sta riusando. */}
+                      {repoUrl && (
+                        <a
+                          className="d-inline-block mt-3"
+                          style={{ fontSize: '0.85rem' }}
+                          href={`${repoUrl}/releases/tag/v${rel.version}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {t('releaseNotes')} ↗
+                        </a>
+                      )}
                     </div>
                   </article>
                 </li>
@@ -115,6 +163,14 @@ export default async function ChangelogPage() {
                 rel="noopener noreferrer"
               >
                 {t('sourceLink')}
+              </a>
+              {' · '}
+              <a
+                href={`${repoUrl}/blob/main/CHANGELOG.md`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('rawChangelog')}
               </a>
               .
             </p>

@@ -96,7 +96,11 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Lataa .ics-tiedosto"
-      }
+      },
+      "alreadyRegisteredEnter": "Oletko jo ilmoittautunut? Siirry huoneeseen",
+      "invalidTokenTitle": "Pääsylinkki ei ole enää voimassa",
+      "invalidTokenBody": "Käyttämäsi linkki ei ole voimassa tai se on vanhentunut. Jos olet ilmoittautunut, tarkista henkilökohtainen linkkisi vahvistussähköpostista tai ilmoittaudu uudelleen alta.",
+      "invalidTokenBodyEnded": "Käyttämäsi linkki ei ole enää voimassa. Tapahtuma on päättynyt: alta löydät tallenteen ja materiaalit."
     },
     "manage": {
       "toggleChat": "Keskustelu",
@@ -116,6 +120,20 @@
     "list": {
       "filterByTag": "Suodata kategorian mukaan",
       "allTags": "Kaikki"
+    },
+    "wordCloudTitle": "Sanapilvi",
+    "recap": {
+      "title": "Tapahtuman yhteenveto",
+      "intro": "Yhteenveto siitä, mitä tapahtuman aikana nousi esiin.",
+      "participants": "Osallistujat (huippu)",
+      "registered": "Ilmoittautuneet",
+      "topQuestions": "Eniten kannatetut kysymykset",
+      "upvotes": "{count, plural, =0 {ei ääniä} one {1 ääni} other {# ääntä}}",
+      "polls": "Kyselyjen tulokset",
+      "votes": "{count, plural, =0 {ei ääniä} one {1 ääni} other {# ääntä}}",
+      "topWords": "Eniten jaetut sanat",
+      "feedback": "Keskiarvosana",
+      "feedbackCount": "{count, plural, one {1 vastaus} other {# vastausta}}"
     }
   },
   "registration": {
@@ -164,8 +182,11 @@
       "consentRequired": "Suostumus tietojenkäsittelyyn on pakollinen",
       "recordingConsentRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan",
       "eventFull": "Tapahtuman osallistujamäärä on täynnä",
-      "generic": "Virhe ilmoittautumisessa. Yritä uudelleen."
-    }
+      "generic": "Virhe ilmoittautumisessa. Yritä uudelleen.",
+      "multitrackConsentRequired": "Suostumus oman ääniraitasi tallentamiseen on pakollinen tässä tapahtumassa"
+    },
+    "successScheduledMessage": "Ilmoittautumisesi on rekisteröity! Lähetimme sinulle sähköpostin, jossa on henkilökohtainen pääsylinkkisi. Lisää tapahtuma kalenteriisi ja palaa tänne vähän ennen alkua.",
+    "addToCalendar": "Lisää kalenteriin"
   },
   "videoLibrary": {
     "title": "Videokirjasto",
@@ -252,7 +273,33 @@
       "noMessages": "Ei viestejä",
       "empty": "Ei vielä viestejä. Kirjoita ensimmäinen!",
       "inputLabel": "Keskusteluviesti",
-      "moderatorBadge": "Moderaattori"
+      "moderatorBadge": "Moderaattori",
+      "attach": "Liitä tiedosto",
+      "emojiPicker": "Lisää emoji",
+      "attachBadType": "Tiedostotyyppiä ei tueta (kuvat tai PDF).",
+      "attachTooLarge": "Tiedosto on liian suuri (enintään 10 Mt).",
+      "attachFailed": "Lataus epäonnistui. Yritä uudelleen.",
+      "sendFailed": "Viestiä ei lähetetty. Yritä uudelleen.",
+      "removeAttachment": "Poista liite",
+      "openAttachment": "Avaa liite",
+      "reply": "Vastaa",
+      "replyingTo": "Vastaus käyttäjälle {name}",
+      "cancelReply": "Peruuta vastaus",
+      "hide": "Piilota",
+      "hideFailed": "Viestiä ei voitu piilottaa. Yritä uudelleen.",
+      "connReconnecting": "Yhdistetään uudelleen…",
+      "connDegraded": "Päivitykset viivästyvät",
+      "readDenied": "Keskustelu ei ole käytettävissä: et ole tämän tapahtuman osallistujien joukossa tai huone ei ole vielä auki. Yritetään automaattisesti uudelleen.",
+      "mentionNotificationTitle": "{name} mainitsi sinut keskustelussa",
+      "react": "Reagoi",
+      "edited": "muokattu",
+      "editLabel": "Muokkaa viestiä",
+      "editSave": "Tallenna",
+      "editFailed": "Viestiä ei voitu muokata.",
+      "exportChat": "Lataa keskustelu",
+      "reactNotAllowed": "Viesteihin reagoiminen edellyttää henkilökohtaista linkkiä tai moderaattorilinkkiä.",
+      "editNotAllowed": "Tämä linkki on jaettu, joten sillä ei voi muokata viestejä.",
+      "editExpired": "Yli 15 minuuttia on kulunut: tätä viestiä ei voi enää muokata."
     },
     "role": {
       "moderator": "Moderaattori",
@@ -271,7 +318,9 @@
         "medium": "Kohtalainen",
         "poor": "Heikko",
         "unknown": "Ei tietoa"
-      }
+      },
+      "volume": "Äänenvoimakkuus",
+      "volumeFor": "Osallistujan {name} äänenvoimakkuus"
     },
     "moderator": {
       "muteAll": "Mykistä kaikki",
@@ -295,14 +344,17 @@
       "micDisabled": "Mikrofoni poissa käytöstä",
       "videoModeration": "Osallistujan video",
       "videoDisabled": "Video poissa käytöstä",
-      "eventEndedSuccess": "Tapahtuma päättynyt onnistuneesti. Uudelleenohjataan..."
+      "eventEndedSuccess": "Tapahtuma päättynyt onnistuneesti. Uudelleenohjataan...",
+      "whiteboard": "Piirtotaulu",
+      "lowerHand": "Laske käsi"
     },
     "closeDrawer": "Sulje",
     "hintBanner": {
       "controls": "Säätimet alareunassa",
       "raiseHand": "Nosta käsi puhuaksesi",
       "sidebar": "Q&A ja keskustelu sivupaneelissa",
-      "dismiss": "Selvä"
+      "dismiss": "Selvä",
+      "ariaLabel": "Vinkit"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# henkilö} other {# henkilöä}}"
@@ -310,7 +362,55 @@
     "sidebarTabChatUnread": "Uusia lukemattomia viestejä",
     "floatingControlsLabel": "Tapahtuman säätimet",
     "screenshareActive": "🖥️ {name} jakaa näyttöä",
-    "screenshareFallbackName": "Osallistuja"
+    "screenshareFallbackName": "Osallistuja",
+    "share": {
+      "button": "Jaa",
+      "title": "Jaa tapahtuma",
+      "callLink": "Osallistumislinkki",
+      "callLinkHint": "Linkin avaaja siirtyy suoraan huoneeseen, kun tapahtuma on käynnissä; muutoin hän ohjautuu ilmoittautumiseen. Linkki ei sisällä salaisia tunnisteita.",
+      "eventLink": "Tapahtumasivu",
+      "eventLinkHint": "Julkinen sivu, jolla ovat tapahtuman tiedot ja ilmoittautumislomake.",
+      "copy": "Kopioi",
+      "copied": "Kopioitu!",
+      "moderatorReveal": "Näytä moderaattorilinkki",
+      "moderatorWarning": "Tämä linkki antaa MODERAATTORIN oikeudet (kaikkien mykistys, tallennuksen aloitus, tapahtuman päättäminen). Jaa se vain muille moderaattoreille.",
+      "moderatorLink": "Moderaattorilinkki",
+      "moderatorLinkHint": "Linkin avaaja liittyy moderaattorina ja saa huoneen täydet ohjausoikeudet."
+    },
+    "enterFullscreen": "Koko näyttö",
+    "exitFullscreen": "Poistu koko näytöstä",
+    "leaveChoice": {
+      "title": "Miten haluat poistua?",
+      "body": "Voit poistua vain itse — puhelu jatkuu muille — tai päättää sen kaikilta osallistujilta.",
+      "leaveSelf": "Poistu vain itse",
+      "endForAll": "Päätä kaikilta",
+      "ending": "Päätetään…",
+      "endError": "Puhelua ei voitu päättää. Yritä uudelleen."
+    },
+    "endDestino": {
+      "title": "Tapahtuman kohtalo",
+      "body": "Olet päättämässä tapahtuman kaikilta. Mitä sille tehdään päättymisen jälkeen?",
+      "public": "Pidä julkisena",
+      "publicHelp": "Päättyneen tapahtuman sivu pysyy näkyvissä, ja siinä ovat yhteenveto, kysymykset, kyselyt, materiaalit ja palaute.",
+      "library": "Julkaise kirjastoon",
+      "libraryHelp": "Kuten yllä, ja lisäksi tapahtuma näytetään julkisessa videokirjastossa (edellyttää julkaistua tallennetta tai YouTube-videota).",
+      "archive": "Arkistoi (yksityinen)",
+      "archiveHelp": "Päättyneen tapahtuman sivu ei ole julkinen (404). Tiedot säilytetään säilytysajan päättymiseen asti, minkä jälkeen ne poistetaan.",
+      "genAi": "Luo tallenteesta tekoälyllä litterointi ja yhteenveto (kun käsittely on valmis)",
+      "back": "Takaisin",
+      "confirm": "Päätä tapahtuma"
+    },
+    "liveFeaturesLabel": "Toiminnot:",
+    "whiteboardNotSavedHint": "Piirtotaulua ei tallenneta automaattisesti. Jos käytät sitä, vie se tiedostoon (piirtotaulun valikko) ja liitä se tapahtuman materiaaleihin ennen päättämistä.",
+    "sidebarTabWordcloud": "Sanapilvi",
+    "sidebarTabAgenda": "Muistiinpanot / tarkistuslista",
+    "liveToggleAgenda": "Muistiinpanot / tarkistuslista (agenda)",
+    "timer": {
+      "show": "Näytä ajastin",
+      "hide": "Piilota ajastin",
+      "remainingLabel": "Aikaa jäljellä (napsauta nähdäksesi kuluneen ajan)",
+      "elapsedLabel": "Kulunut aika (napsauta nähdäksesi jäljellä olevan ajan)"
+    }
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -407,12 +507,31 @@
         "maxParticipantsHelp": "Arvioi osallistujien enimmäismäärä. Vaikuttaa videopalvelimen kapasiteettiin ja odotushuoneen käyttöliittymään.",
         "validation": {
           "startsAt": "Virheellinen alkamispäivä.",
-          "endsAt": "Päättymispäivän on oltava alkamispäivän jälkeen."
+          "endsAt": "Päättymispäivän on oltava alkamispäivän jälkeen.",
+          "titleRequired": "Otsikko on pakollinen (vähintään 3 merkkiä).",
+          "titleRequiredOtherLocale": "Otsikko oletuskielellä ({locale}) on pakollinen: siirry välilehdelle {locale}.",
+          "maxParticipants": "Anna luku väliltä 2–500."
         },
         "senderRatioLabel": "Arvioitu aktiivinen osuus",
         "senderRatioHelp": "Kuinka monella osallistujalla odotetaan olevan mikrofoni tai kamera päällä. Auttaa videopalvelimen mitoituksessa.",
         "activeParticipantsEstimate": "≈ {count} aktiivista osallistujaa",
-        "senderRatioPreset": "{pct} %"
+        "senderRatioPreset": "{pct} %",
+        "advancedOptions": "Lisäasetukset",
+        "waitingRoomEngineLabel": "Odotushuone (tämä tapahtuma)",
+        "waitingRoomEngineSiteDefault": "Sivuston oletus",
+        "waitingRoomEngineGarden": "Puutarha (tavallinen)",
+        "waitingRoomEngineGame": "Videopeli (Phaser-aula)",
+        "waitingRoomEngineClassic": "Klassinen (staattinen)",
+        "waitingRoomEngineHelp": "Ohittaa sivuston oletuksen tässä tapahtumassa.",
+        "videoQuality": "Video- ja äänenlaatu (tämä tapahtuma)",
+        "videoQualityHelp": "Ohittaa sivuston oletuksen tässä tapahtumassa. Korkeampi laatu kuluttaa enemmän kaistanleveyttä.",
+        "videoQualitySiteDefault": "Sivuston oletus",
+        "videoQualityOptions": {
+          "MAX": "Suurin (1080p, korkea tarkkuus)",
+          "HIGH": "Korkea (720p, suositeltu)",
+          "BALANCED": "Tasapainoinen (540p)",
+          "SAVE_DATA": "Datansäästö (360p)"
+        }
       },
       "step2": {
         "heading": "Kuka voi tehdä mitäkin",
@@ -449,7 +568,8 @@
             "desc": "Aloittaa tai pysäyttää tallennuksen."
           }
         },
-        "recordingHeading": "Tallennus"
+        "recordingHeading": "Tallennus",
+        "roomFeaturesHeading": "Huoneen toiminnot"
       },
       "step3": {
         "heading": "Henkilöt ja kutsut",
@@ -484,7 +604,8 @@
         "invalidEmail": "Virheellinen sähköpostiosoite.",
         "duplicateEmail": "Osoite on jo lisätty.",
         "rubricaPick": "Hae osoitekirjasta…",
-        "rubricaOrAdd": "tai lisää manuaalisesti"
+        "rubricaOrAdd": "tai lisää manuaalisesti",
+        "organizerLogo": "Järjestäjän logo"
       },
       "step4": {
         "heading": "Sisältö ja materiaalit",
@@ -544,7 +665,9 @@
           "recording": "Tallennus",
           "recordingAuto": "Käytössä — automaattinen aloitus",
           "recordingManual": "Käytössä — manuaalinen aloitus",
-          "recordingOff": "Pois käytöstä"
+          "recordingOff": "Pois käytöstä",
+          "multitrack": "Osallistujakohtainen tallennus",
+          "multitrackOn": "Käytössä — edellyttää nimenomaista suostumusta ilmoittautumisen yhteydessä"
         },
         "noRecurrence": "Yksittäinen tapahtuma",
         "gdprHeading": "Yksityisyys ja tietojen säilytys",
@@ -560,9 +683,24 @@
         "featuresHeading": "Kokoonpanon yhteenveto",
         "privacyDoc": "Tietosuojaseloste-dokumentti (PDF tai linkki)",
         "privacyDocHelp": "Lataa PDF tai liitä vaihtoehtoisen tietosuojaselosteen URL. Korvaa GDPR-mallin, jos asetettu.",
-        "privacyTextHelp": "Lyhyt teksti, joka näytetään ilmoittautumislomakkeessa; voi täydentää tai korvata GDPR-mallin."
+        "privacyTextHelp": "Lyhyt teksti, joka näytetään ilmoittautumislomakkeessa; voi täydentää tai korvata GDPR-mallin.",
+        "moderatorPublishHint": "Nimi ja sähköpostiosoite ovat pakollisia tapahtuman julkaisemiseksi (niitä tarvitaan moderaattorilinkkiin ja vahvistussähköpostiin). Luonnoksena tallentamiseen niitä ei vaadita.",
+        "moderatorLinkNote": "Tämä henkilö on tapahtuman päämoderaattori: hän saa sähköpostitse yksityisen linkin tapahtuman hallintaan (tallennuksen aloitus, kysymysten moderointi, kyselyjen käynnistys…). Tämä on eri asia kuin Henkilöt-vaiheessa lisätyt apumoderaattorit, jotka saavat kukin oman linkkinsä.",
+        "moderatorRequired": "Anna moderaattorin nimi",
+        "moderatorEmailRequired": "Anna moderaattorin kelvollinen sähköpostiosoite"
       },
-      "validationFailed": "Tarkista korostetut kentät ennen jatkamista."
+      "validationFailed": "Tarkista korostetut kentät ennen jatkamista.",
+      "partialFailure": "Tapahtuma luotiin, mutta joitakin osia ei tallennettu: {items}. Voit lisätä ne tapahtuman sivulta.",
+      "draftFound": "Löysimme tästä tapahtumasta tallentamattoman luonnoksen. Palautetaanko se?",
+      "draftRestore": "Palauta luonnos",
+      "draftDiscard": "Ohita",
+      "resources": {
+        "organizers": "järjestäjät",
+        "invitations": "kutsut",
+        "moderators": "moderaattorit",
+        "speakers": "puhujat",
+        "materials": "materiaalit"
+      }
     },
     "nav": {
       "events": "Tapahtumien hallinta",
@@ -603,7 +741,8 @@
       "eventQuestionnaires": "Kyselyt",
       "rubricaList": "Luettelo",
       "rubricaDetail": "Tiedot",
-      "feedbackDashboard": "Feedback"
+      "feedbackDashboard": "Feedback",
+      "recordingsPostprod": "Litteroinnit / tekoäly"
     },
     "landing": {
       "title": "Hallintapaneeli",
@@ -701,7 +840,8 @@
           "dateRequired": "Alkuperäinen päivämäärä on pakollinen.",
           "saveFailed": "Metatietojen tallennus epäonnistui."
         }
-      }
+      },
+      "updateFailed": "Päivitys epäonnistui."
     },
     "recordingsLibrary": {
       "title": "Videotallenteet",
@@ -770,7 +910,10 @@
       "detailEnd": "Loppu",
       "detailModerator": "Moderaattori",
       "detailRoom": "Jitsi-huone",
-      "detailFilename": "Tiedostonimi"
+      "detailFilename": "Tiedostonimi",
+      "transcriptManage": "Hallinnoi litterointia / tekoälyä",
+      "transcriptReady": "Litteroitu",
+      "transcriptProcessing": "Käsitellään"
     },
     "gdprAudit": {
       "title": "GDPR-auditointi",
@@ -1023,7 +1166,32 @@
       "retentionPreviewRecordings": "Videotallenteet",
       "retentionPreviewKept": "Koostetilastot ja tapahtuman metatiedot säilytetään.",
       "configPreview": "Kokoonpanon esikatselu",
-      "templateApplied": "Malli otettu käyttöön: {name}. Kaikkia asetuksia voi muokata."
+      "templateApplied": "Malli otettu käyttöön: {name}. Kaikkia asetuksia voi muokata.",
+      "agendaEnabled": "Live-muistiinpanot / tarkistuslista (agenda)",
+      "agendaEnabledDesc": "Tarkistuslista käsiteltävistä aiheista, jotka moderaattorit merkitsevät tehdyiksi tapahtuman aikana. Se sisältyy automaattiseen yhteenvetoon. Valinnainen, ja sen voi ottaa käyttöön myös tapahtuman aikana.",
+      "whiteboardEnabled": "Jaettu piirtotaulu",
+      "whiteboardEnabledDesc": "Ottaa käyttöön natiivin yhteiskäyttöisen piirtotaulun (Excalidraw): moderaattorit voivat avata sen työkalupalkista tapahtuman aikana. Aina käytössä pikapuheluissa.",
+      "aiSectionHeading": "Automaattinen jälkituotanto",
+      "aiSectionDesc": "Tapahtuman päätyttyä tallenne voidaan käsitellä klusterissa toimivalla tekoälyputkella, joka tuottaa litteroinnin, yhteenvedon sekä pyydettäessä käännökset ja dubbauksen. Kaikki tapahtuu osaston omassa infrastruktuurissa, eikä tietoja siirry kolmansille osapuolille.",
+      "aiTranscriptEnabled": "Automaattinen litterointi",
+      "aiTranscriptEnabledDesc": "Puheentunnistus ja puhujien tunnistus. Vaaditaan, jotta yhteenveto, käännökset ja dubbaus voidaan ottaa käyttöön.",
+      "aiSummaryEnabled": "Yhteenveto ja luvut",
+      "aiSummaryEnabledDesc": "Kokouksen yhteenveto, tehdyt päätökset, tehtävät sekä jako lukuihin aikaleimoineen.",
+      "aiTranslationEnabled": "Käännös muille kielille",
+      "aiTranslationEnabledDesc": "Litterointi ja yhteenveto käännettyinä alla määritetyille kielille.",
+      "aiTargetLocales": "Käännöskielet",
+      "aiTargetLocalesDesc": "ISO-kielikoodit (esim. en, fr, de) pilkulla erotettuina. Jätä tyhjäksi, jos haluat käyttää sivustotasolla määritettyjä kieliä.",
+      "aiTargetLocalesRequired": "Määritä vähintään yksi käännöskieli tai poista automaattinen käännös käytöstä.",
+      "aiDubbingEnabled": "Äänen dubbaus",
+      "aiDubbingEnabledDesc": "Dubattu ääni kohdekielillä, tuotettuna esiopetetuilla synteettisillä äänillä. Ei kloonaa osallistujien ääntä.",
+      "consentBadge": "Nimenomainen suostumus",
+      "retentionBadge": "Pidentää säilytysaikaa",
+      "multitrackRecordingEnabled": "Osallistujakohtainen tallennus (suuri tarkkuus)",
+      "multitrackRecordingEnabledDesc": "Tallentaa erillisen ääniraidan jokaisesta osallistujasta, jolloin litterointi kohdistaa varmasti sen, kuka sanoi mitä (ei enää ”Puhuja 1/2”). Käsittelyssä on yksittäisen puhujan eristetty ääni (arkaluonteinen henkilötieto): raidat ovat väliaikaisia ja ne poistetaan heti litteroinnin jälkeen. Edellyttää suostumusta tallentamiseen.",
+      "retainParticipantTracks": "Säilytä osallistujakohtaiset raidat",
+      "retainParticipantTracksDesc": "Säilyttää yksittäiset ääniraidat litteroinnin jälkeenkin ladattavaa arkistoa ja puhujakohtaista kuuntelua varten. HUOMIO: tämä pidentää arkaluonteisten henkilötietojen (eristetty ääni) säilytystä tapahtuman säilytysajan päättymiseen asti. Ota käyttöön vain tarvittaessa ja varmista asianmukainen suostumus ja informointi.",
+      "expectedSpeakers": "Odotettu puhujien määrä",
+      "expectedSpeakersDesc": "Kun tiedät sen (esim. 3 puhujaa), sen ilmoittaminen parantaa puhujien tunnistuksen laatua. Jätä tyhjäksi, jos haluat putken päättävän asian."
     },
     "links": {
       "title": "Tapahtuman linkit",
@@ -1123,7 +1291,8 @@
         "pages": "Sivut",
         "footer": "Alatunniste",
         "features": "Toiminnot",
-        "scaling": "Infrastruktuurin mitoitus"
+        "scaling": "Infrastruktuurin mitoitus",
+        "postprod": "Tapahtuman jälkeinen tekoälyputki"
       },
       "scaling": {
         "intro": "Parametrit, jotka kuvaavat alustan ajavan klusterin kapasiteettia. Oletukset on kalibroitu Azure F16s_v2:lle (16 vCPU / 32 GiB) JVB:tä varten ja F4s_v2:lle (4 vCPU / 8 GiB) Jibriä varten. Jos käytät eri laitteistoa, päivitä arvot tähän — skaalain laskee uudelleen heti.",
@@ -1285,7 +1454,55 @@
         "jvbProvisioningTimeoutMinutes": "Provisioinnin aikakatkaisu (minuuttia)",
         "jvbProvisioningTimeoutMinutesHelp": "Kuinka monen minuutin kuluttua startsAt:sta tapahtuma, jonka JVB ei ole valmis, merkitään tilasivulla 'degraded'. Oletus 15. Kattaa solmun cold-startin (~3–5 min) ja turvamarginaalin.",
         "statusPollIntervalSeconds": "Tilasivun pollausväli (sekuntia)",
-        "statusPollIntervalSecondsHelp": "Kuinka usein /status-sivu päivittyy selaimessa. Oletus 30. Pienemmät arvot = tuoreemmat tiedot, mutta enemmän kuormaa sovellukselle."
+        "statusPollIntervalSecondsHelp": "Kuinka usein /status-sivu päivittyy selaimessa. Oletus 30. Pienemmät arvot = tuoreemmat tiedot, mutta enemmän kuormaa sovellukselle.",
+        "jvbEmptyCloseMinutes": "Tyhjän huoneen minuutit ennen lopullista sulkemista",
+        "jvbEmptyCloseMinutesHelp": "Jos LIVE-huone, jossa on jo ollut osallistujia, pysyy tyhjänä näin monta minuuttia, se suljetaan lopullisesti (ENDED) — näin ilman moderaattoria jäänyt tapahtuma sulkeutuu itsestään toimettomuuden vuoksi odottamatta suunniteltua päättymisaikaa. Oletus 15 (käytössä). -1 = pois käytöstä. 0 = sulje heti ensimmäisellä tyhjän huoneen tarkistuksella.",
+        "waitingRoomLeadMinutes": "Odotushuoneeseen ohjauksen aikaikkuna (minuuttia)",
+        "waitingRoomLeadMinutesHelp": "Näin monta minuuttia ennen alkua tehty ilmoittautuminen vie suoraan odotushuoneeseen; aiemmin ilmoittautuneet näkevät vahvistuksen ja kalenterilinkin. 0 = näytä aina vahvistus alkuun asti. Suositus 15.",
+        "reactionsMode": "Reaktiot (emoji)",
+        "reactionsModeNative": "Jitsin natiivit (työkalupalkissa, hetkelliset)",
+        "reactionsModeCustom": "Sovelluksen omat (vasen palkki, tilastoineen)",
+        "reactionsModeHelp": "Natiivit = Jitsin oma reaktiopainike ohjauspalkissa, kevyt ja hetkellinen (ei laskentaa). Omat = sovelluksen reaktiopalkki vasemmassa alakulmassa, laskureineen ja tilastoineen. Oletus: natiivit.",
+        "emailSenderTitle": "Sähköpostin lähettäjä",
+        "emailSenderHelp": "Miltä lähettäjä näyttää ilmoittautujan postilaatikossa. Lähetysosoite pysyy käyttöönoton asetuksissa — sen on vastattava osoitetta, jonka käyttöön SMTP-palvelin on valtuutettu.",
+        "emailFromName": "Lähettäjän nimi",
+        "emailFromNameHelp": "Tyhjä = käytetään käyttöönotossa määritettyä nimeä (SMTP_FROM_NAME). Sähköpostit lähetetään edelleen järjestelmän osoitteesta.",
+        "emailReplyTo": "Vastausosoite",
+        "emailReplyToHelp": "Sähköpostit lähtevät no-reply-osoitteesta: ilman tätä vastaus ei tavoita ketään.",
+        "avatarTitle": "Osallistujien kuvat",
+        "gravatarEnabled": "Käytä Gravataria, kun se on saatavilla",
+        "gravatarEnabledHelp": "Osallistujat, jotka ilmoittautuivat Gravatariin liitetyllä sähköpostiosoitteella, näkyvät huoneessa kuvallaan; muilla säilyvät alustan luomat nimikirjaimet. Kuva haetaan oman palvelimemme kautta, joten osallistujien selaimet eivät ota yhteyttä gravatar.comiin — mutta alusta ottaa: tämä on mainittava tietosuojaselosteessa."
+      },
+      "postprod": {
+        "prerequisitesNote": "Jälkituotanto käsittelee koko tallenteen tapahtuman päätyttyä. Erillinen GPU-pooli käynnistyy, kun jonoon saapuu ensimmäinen työ, ja sammuu jonon tyhjennyttyä kustannusten hillitsemiseksi. Ennen putken käyttöönottoa varmista, että klusterissa on GPU-pooli määritettynä, NVIDIA-operaattori asennettuna, HuggingFace-tunnukset saatavilla nimiavaruudessa ja mallien painot esiladattuina erilliselle levylle. Operatiivinen tarkistuslista on tiedostossa docs/POSTPROD.md.",
+        "pipelineEnabled": "Tapahtuman jälkeinen putki käytössä",
+        "pipelineEnabledHelp": "Pääkytkin. Kun se on pois päältä, uusille tapahtumille ei tuoteta litterointia, yhteenvetoa, käännöstä eikä dubbausta, vaikka yksittäisissä tapahtumissa jälkituotanto olisi käytössä. Jo tuotettuja tuotoksia ei enää näytetä julkisesti, ennen kuin kytket putken takaisin päälle. Kätevä tapa keskeyttää kaikki ilman sovelluksen uudelleenjulkaisua.",
+        "timingNote": "Putki ei koskaan puutu suoraan lähetykseen. Kaikki tapahtuu tapahtuman päätyttyä, kun tallenne on arkistoitu: tekstitykset ja yhteenveto eivät ole koskaan saatavilla reaaliajassa. Valinta painottaa litteroinnin laatua ja hillitsee GPU:n kulutusta live-tekstitykseen verrattuna.",
+        "providersSection": "Tekoälymoottorit",
+        "providersIntro": "Litterointiin, yhteenvetoon ja dubbaukseen käytettävät moottorit määritellään käyttöönoton yhteydessä. Uuden lisääminen edellyttää infrastruktuuritoimenpiteitä (moottorin julkaisu klusteriin, rekisteröinti tuettujen tarjoajien luetteloon, skeeman päivitys). Alla olevat valikot näyttävät tässä instanssissa tällä hetkellä saatavilla olevat moottorit.",
+        "asrProvider": "Litterointimoottori",
+        "asrProviderHelp": "Tuottaa tapahtuman litteroinnin minuuttikohtaisin aikamerkinnöin ja puhujat eroteltuina. Käytämme WhisperX large-v3:a ja sen rinnalla pyannote.audiota diarisaatioon. Molemmat mallit ajetaan klusterissa erilliselle levylle tallennetuilla painoilla.",
+        "asrOptionWhisperx": "WhisperX large-v3 + pyannote-diarisaatio",
+        "llmProvider": "Yhteenveto- ja käännösmoottori",
+        "llmProviderHelp": "Tuottaa kokouksen yhteenvedon, tunnistaa käsitellyt aiheet ja kääntää litteroinnin ja yhteenvedon kohdekielille. Malli Mistral-Small-3.2-24B (eurooppalainen toimittaja, Apache 2.0 -lisenssi), joka tarjoillaan vLLM:llä klusterissa.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM klusterissa",
+        "ttsEngine": "Dubbausmoottori",
+        "ttsEngineHelp": "Syntetisoi äänen valituilla kielillä käyttäen julkisia esiopetettuja ääniä. Kun puhujia on useampia, kukin puhuja saa eri äänen käytettävissä olevasta valikoimasta, jotta kuulijan on helpompi seurata keskustelua: valinta on mielivaltainen eikä se toista millään tavalla osallistujien todellista ääntä. Dubbaus tuotetaan vain, jos järjestäjä pyytää sitä yksittäiselle tapahtumalle.",
+        "ttsOptionPiper": "Piper TTS · esiopetetut synteettiset äänet",
+        "voiceCloningSection": "Toimituksellinen linja äänen käytöstä",
+        "voiceCloningNote": "Järjestelmä käyttää yksinomaan yleisiä synteettisiä ääniä (Piper TTS, julkiset MIT-lisenssin mallit). Se ei analysoi, tallenna eikä toista osallistujien ääntä: kutakin puhujaa edustaa valikoimasta valittu ääni, joka määräytyy deterministisesti puheajan perusteella ilman yhteyttä hänen ääni-identiteettiinsä. Puhujalle valittu ääni vaihtuu kunkin yksittäisen tapahtuman puhujakokoonpanon mukaan, joten sama puhuja voidaan dubata eri tapahtumissa eri äänillä. Tämä valinta sulkee pois yleisen tietosuoja-asetuksen (GDPR) 9 artiklassa tarkoitettujen biometristen tietojen käsittelyn.",
+        "defaultTargetLocales": "Oletusarvoiset käännöskielet",
+        "defaultTargetLocalesHelp": "ISO-639-1-koodit pilkulla erotettuina (esim. `en,fr,de`). Niitä käytetään tapahtumissa, jotka eivät määritä omia käännöskieliään. Tapahtuman lähdekieli jätetään aina automaattisesti pois.",
+        "limitsSection": "Toiminnalliset rajat",
+        "maxConcurrentJobs": "Rinnakkaiset työt",
+        "maxConcurrentJobsHelp": "Suurin määrä töitä, joita putki ajaa samanaikaisesti GPU-poolissa. Suuremmat arvot purkavat ruuhkan nopeammin, kun useita tapahtumia päättyy peräkkäin, mutta edellyttävät vapaita GPU:ita. Tyypillinen arvo on 2.",
+        "jobMaxAttempts": "Yrityksiä ennen epäonnistumista",
+        "jobMaxAttemptsHelp": "Kuinka monta kertaa putki yrittää työtä uudelleen ennen kuin merkitsee sen epäonnistuneeksi. Odotusaika yritysten välillä kasvaa eksponentiaalisesti (30 sekunnista jopa 2 tuntiin). Tyypillinen arvo on 5.",
+        "artifactRetentionDays": "Tuotosten säilytys (päivää)",
+        "artifactRetentionDaysHelp": "Arvolla 0 tekoälyn tuotokset noudattavat tapahtuman omaa säilytysaikaa. Nollaa suurempi arvo säilyttää ne ilmoitetun päivien määrän ajan myös tapahtuman sulkemisen jälkeen, kunnes päivittäinen cron poistaa ne. Poisto kattaa puhujien nimet ja töiden hyötykuormat docs/GDPR.md-tiedoston mukaisesti.",
+        "consentDisclosureSection": "Tekoälyilmoitus odotushuoneessa",
+        "consentDisclosureHelp": "Teksti, joka näytetään osallistujille odotushuoneessa, kun tapahtumassa käytetään tekoälyjälkituotantoa (litterointi, yhteenveto, käännös, dubbaus). Mukautettavissa kielikohtaisesti. Jätä tyhjäksi, jos haluat käyttää järjestelmän oletustekstiä.",
+        "consentDisclosurePlaceholder": "Esim. Tämä tapahtuma litteroidaan ja tiivistetään automaattisesti tekoälytyökaluilla suoran lähetyksen jälkeen…"
       }
     },
     "analytics": {
@@ -1372,7 +1589,23 @@
       "screen": "Näytön jakaminen",
       "pickerTitle": "Valitse malli",
       "pickerSubtitle": "Valitse malli esimäärittääksesi tapahtuma-asetukset tai ohita ja määritä kaikki manuaalisesti.",
-      "skipTemplate": "Määritä manuaalisesti"
+      "skipTemplate": "Määritä manuaalisesti",
+      "whiteboardLabel": "Piirtotaulu",
+      "waitingRoomEngineLabel": "Odotushuone (mallipohjan oletus)",
+      "waitingRoomEngineSiteDefault": "Sivuston oletus",
+      "waitingRoomEngineGarden": "Puutarha (tavallinen)",
+      "waitingRoomEngineGame": "Videopeli (Phaser-aula)",
+      "waitingRoomEngineClassic": "Klassinen (staattinen)",
+      "waitingRoomEngineHelp": "Esitäyttää odotushuoneen moottorin tästä mallipohjasta luotaviin tapahtumiin. Sitä voi edelleen muuttaa ohjatussa toiminnossa.",
+      "durationLabel": "Oletuskesto (minuuttia)",
+      "durationHint": "Esitäyttää tapahtuman päättymisajan (alku + kesto). Käyttäjä voi muuttaa sitä. Tyhjä = 2 tuntia.",
+      "retentionLabel": "Tietojen oletussäilytysaika (päivää)",
+      "expectedSpeakersLabel": "Odotettu puhujien määrä (oletus)",
+      "descriptionTemplateLabel": "Oletuskuvaus",
+      "descriptionTemplateHint": "Tapahtuman kuvaukseen esitäytettävä teksti (muokattavissa).",
+      "aiTranscript": "Automaattinen litterointi (oletus)",
+      "aiSummary": "Automaattinen yhteenveto (oletus)",
+      "aiTranslation": "Automaattinen käännös (oletus)"
     },
     "instantCall": {
       "title": "Pikavideopuhelu",
@@ -1456,7 +1689,8 @@
       },
       "errors": {
         "saveFailed": "Tallennus epäonnistui. Tarkista kentät ja yritä uudelleen."
-      }
+      },
+      "deleteTitle": "Poista mallipohja"
     },
     "emailTemplates": {
       "title": "Sähköpostimallit",
@@ -1637,7 +1871,8 @@
       "play": "Toista",
       "hidePlayer": "Piilota toistin",
       "download": "Lataa",
-      "deleteConfirm": "Poistetaanko tämä istunto ja siihen liittyvä tallenne?"
+      "deleteConfirm": "Poistetaanko tämä istunto ja siihen liittyvä tallenne?",
+      "deleteTitle": "Poista istunto"
     },
     "monitoring": {
       "title": "Valvonta",
@@ -1798,7 +2033,9 @@
         "settings": "Asetukset",
         "people": "Henkilöt",
         "content": "Sisältö",
-        "audit": "Tallenteet ja auditointi"
+        "audit": "Tallenteet ja auditointi",
+        "postEvent": "Tapahtuman jälkeen",
+        "analytics": "Tilastot"
       },
       "toggles": {
         "unmute": "Osallistujat voivat avata mikrofonin",
@@ -1820,7 +2057,22 @@
         "postEventSummary": "{connected} liittyi / {registered} ilmoittautunutta (arvio {estimated})",
         "estimatedAttendance": "Arvio: {estimated} osallistujaa"
       },
-      "copyGuestUrl": "Kopioi vieraslinkki"
+      "copyGuestUrl": "Kopioi vieraslinkki",
+      "aiManageTitle": "Litterointi, yhteenveto ja käännökset",
+      "aiManageDesc": "Hallinnoi tämän tallenteen tekoälyjälkituotantoa: korjaa litterointia ja puhujien kohdistusta (kuka sanoo mitä), muokkaa yhteenvetoa ja hallitse käännöskieliä.",
+      "aiManageCta": "Avaa jälkituotannon hallinta",
+      "aiManageNotEnded": "Käytettävissä, kun tapahtuma on päättynyt ja tekoälyputki on käsitellyt tallenteen.",
+      "aiGenerateCta": "Luo tekoälyllä nyt",
+      "aiGenerateRunning": "Käynnistetään…",
+      "aiGenerateQueued": "Tekoälyputki käynnistetty: litterointi ja yhteenveto ovat jonossa. Seuraa etenemistä jälkituotannon hallinnasta.",
+      "aiGenerateAlready": "Tekoälyputki oli jo käynnistetty tälle tallenteelle: uusia töitä ei lisätty.",
+      "aiGenerateError": "Tekoälyputkea ei voitu käynnistää. Tarkista, että tekoäly on käytössä sivustotasolla ja että tallenne on olemassa.",
+      "aiGenerateHelp": "Ottaa käyttöön tekoälyllä tehtävän litteroinnin ja yhteenvedon ja käynnistää putken tallenteelle yhdellä napsautuksella. Idempotentti: kaksi napsautusta ei kahdenna töitä.",
+      "aiGenerateNoRecording": "Ei tallennetta: tapahtuman jälkeinen tekoäly edellyttää tallennetta (kaappaus tapahtuu vain tapahtuman aikana). Voit silti hallita jälkituotantoa täältä.",
+      "duplicateNext": "Monista seuraavaa kertaa varten",
+      "duplicateNextBusy": "Monistetaan…",
+      "duplicateNextHint": "Luo luonnoksen, joka sisältää tämän tapahtuman koko määrityksen (tallennus, erilliset raidat, tekoäly, agenda, muistutukset). Jos tapahtumalla on toistuvuus, päivämäärä siirtyy seuraavaan kertaan; muutoin se jää sinun asetettavaksesi.",
+      "duplicateNextError": "Monistaminen epäonnistui. Yritä uudelleen."
     },
     "rubrica": {
       "title": "Osoitekirja",
@@ -1838,6 +2090,299 @@
     "eventQuestionnaires": {
       "title": "Kyselyt — {eventTitle}",
       "subtitle": "Määritä ennakkoilmoittautumis- ja/tai tapahtuman jälkeinen kysely yhdistämällä malleja ja ad-hoc-kysymyksiä."
+    },
+    "eventAnalytics": {
+      "title": "Tilastot",
+      "loadError": "Tilastoja ei voitu ladata.",
+      "noData": "Tietoja ei ole saatavilla.",
+      "notEndedYet": "Tapahtuma ei ole vielä päättynyt: tilastot ovat osittaisia ja päivittyvät reaaliajassa.",
+      "cappedNote": "Erittäin suuri tapahtuma: osa mittareista on laskettu otoksesta (riviraja saavutettu).",
+      "scoreTitle": "Tarkkaavaisuuspistemäärä",
+      "adminOnly": "vain ylläpitäjille",
+      "scoreProxy": "Indeksi 0–100 siitä, kuinka osallistuvaa yleisö oli. Se on osallistumisen epäsuora mittari, ei kognitiivisen tarkkaavaisuuden mittaus — lue sitä tapahtuman muoto huomioiden (luento vai työpaja), älä koskaan laatuarvosanana.",
+      "scoreUnavailable": "Pistemäärän laskemiseen ei ole riittävästi tietoja.",
+      "comp": {
+        "attendanceRate": "Osallistumisaste (liittyneet/ilmoittautuneet)",
+        "breadth": "Vuorovaikutuksen laajuus",
+        "depth": "Vuorovaikutuksen syvyys",
+        "chatRate": "Keskustelun vilkkaus",
+        "liveParticipation": "Live-osallistuminen",
+        "talkBalance": "Puheajan tasapaino",
+        "retention": "Läsnäolon kesto"
+      },
+      "kpiConversion": "Konversio",
+      "kpiPeak": "Osallistujahuippu",
+      "kpiDuration": "Kesto",
+      "kpiInteractors": "Aktiivisia osallistujia",
+      "interactionsWord": "vuorovaikutusta",
+      "kpiHandRaises": "Kädennostot",
+      "handRaisesSessionsSub": "{n, plural, one {# istunnosta} other {# istunnosta}}",
+      "kpiReactions": "Reaktiot",
+      "kpiRetention": "Keskimääräinen läsnäoloaika",
+      "dwellSub": "{d} · {n, plural, one {# mitattu} other {# mitattua}}",
+      "reactionsTitle": "Reaktiot",
+      "timelineTitle": "Puhelun aktiivisuus ajan mittaan",
+      "timelineEmpty": "Puhelun aikana ei kirjattu vuorovaikutusta.",
+      "timelinePeak": "Vuorovaikutuksen huippu klo {at} ({n} tapahtumaa aikavälillä).",
+      "kind": {
+        "chat": "Keskustelu",
+        "question": "Kysymykset",
+        "upvote": "Kannatusäänet",
+        "poll": "Kyselyt",
+        "word": "Sanapilvi",
+        "reaction": "Reaktiot"
+      },
+      "speakersTitle": "Kuka puhui",
+      "audioUnavailable": "Äänitilastot eivät ole käytettävissä — tapahtumaa ei tallennettu (tai tallenteessa ei ollut puhetta).",
+      "predominant": "Eniten äänessä ollut puhuja",
+      "talkBalance": "Tasapaino",
+      "speechDensity": "Puheen tiheys",
+      "chatTitle": "Keskustelu",
+      "chatAudience": "Yleisö",
+      "chatStaff": "Henkilökunta",
+      "qaTitle": "Eniten kannatetut kysymykset",
+      "none": "Ei yhtään.",
+      "pollsTitle": "Kyselyt",
+      "wordsTitle": "Sanapilvi",
+      "feedbackTitle": "Palaute",
+      "responses": "vastausta",
+      "privacyNote": "Henkilökohtaiset tilastot ovat oletuksena pseudonymisoituja. Anonyymit koosteet säilytetään tapahtuman yhteenvedossa; raakarivit poistetaan säilytysajan päättyessä."
+    },
+    "postprod": {
+      "title": "Tekoälyn jälkituotantoputki",
+      "subtitle": "Klusterissa toimivan tekoälyputken tuottamat litteroinnit, yhteenvedot ja käännökset. Kohdista puhujat, aja työt uudelleen tai peruuta ne.",
+      "filterStatus": "Tila",
+      "all": "Kaikki",
+      "queued": "Jonossa",
+      "running": "Käynnissä",
+      "done": "Valmis",
+      "partial": "Osittainen",
+      "failed": "Epäonnistui",
+      "totalRows": "{count, plural, =0 {ei tallenteita} one {1 tallenne} other {# tallennetta}}",
+      "colEvent": "Tapahtuma",
+      "colCreated": "Luotu",
+      "colDuration": "Kesto",
+      "colStatus": "Tila",
+      "colJobs": "Työt",
+      "colArtifacts": "Tuotokset",
+      "colActions": "Toiminnot",
+      "rerun": "Aja uudelleen",
+      "rerunTooltip": "Luo uuden ajon kasvattamalla runCount-arvoa; aiemmat tuotokset säilyvät säilytysajan päättymiseen asti",
+      "cancel": "Peruuta",
+      "cancelConfirm": "Peruutetaanko kaikki tämän tallenteen odottavat työt?",
+      "rerunFailed": "Uudelleenajo epäonnistui (HTTP {code})",
+      "cancelFailed": "Peruutus epäonnistui (HTTP {code})",
+      "speakerUpdateFailed": "Puhujan päivitys epäonnistui (HTTP {code})",
+      "loadError": "Työluetteloa ei voitu ladata",
+      "empty": "Yksikään tallenne ei vastaa valittuja suodattimia",
+      "detailJobs": "Työt",
+      "detailArtifacts": "Tuotokset",
+      "detailSpeakers": "Puhujat",
+      "noArtifacts": "Tuotoksia ei ole vielä luotu",
+      "noSpeakers": "Puhujia ei havaittu",
+      "attempts": "yritys {n}",
+      "speakerPlaceholder": "Oikea nimi (valinnainen)",
+      "speakerSpoke": "Puheaika: {sec} s",
+      "suggestedApply": "Käytä ehdotusta: {name}",
+      "suggestedTitle": "Tekoälyputken ehdottama nimi, joka perustuu litteroinnissa mainittuihin erisnimiin. Napsauta täyttääksesi kentän (voit vielä muokata sitä ennen tallennusta).",
+      "save": "Tallenna",
+      "editTranscript": "Muokkaa litterointia",
+      "editClose": "Sulje editori",
+      "editTranscriptTitle": "Litteroinnin editori",
+      "editHint": "Korjaa tekstiä tai vaihda kunkin segmentin puhujaa. Tallennettaessa litterointi ja lähdekieliset tekstitykset päivittyvät. Käännöksiä ja dubbausta EI luoda uudelleen: käytä ”Aja uudelleen” -toimintoa, jos tarvitset myös muut kielet päivitettyinä.",
+      "editLoading": "Ladataan litterointia…",
+      "editLoadError": "Litterointia ei voitu ladata (HTTP {code}).",
+      "editNotReady": "Tälle tallenteelle ei ole vielä litterointia. Käynnistä (tai aja uudelleen) tekoälykäsittely yllä olevista säätimistä: litterointi on ensimmäinen vaihe, minkä jälkeen voit korjata sitä täällä ja luoda yhteenvedon ja käännökset.",
+      "editProcessing": "Tekoälykäsittely on käynnissä: litterointi ilmestyy tähän, kun se valmistuu. Päivitä sivu muutaman minuutin kuluttua.",
+      "editSessionExpired": "Ylläpitoistunto on vanhentunut. Lataa sivu uudelleen ja kirjaudu sisään muokataksesi litterointia.",
+      "editEmpty": "Ei muokattavia segmenttejä",
+      "editSpeakerNone": "— ei ketään —",
+      "editSave": "Tallenna muutokset",
+      "editSaving": "Tallennetaan…",
+      "editDirty": "{n, plural, one {1 tallentamaton muutos} other {# tallentamatonta muutosta}}",
+      "editSaved": "Tallennettu: {text} tekstiä, {speaker} puhujaa.",
+      "editFailed": "Tallennus epäonnistui (HTTP {code})",
+      "editFailedDetail": "Tallennus epäonnistui: {message}",
+      "editMediaError": "Tallenteen ääntä ei voitu ladata: toisto ei ole käytettävissä. Voit silti korjata segmenttien tekstiä ja puhujia.",
+      "summaryLoadError": "Yhteenvetoa ei voitu ladata.",
+      "summaryLoading": "Ladataan yhteenvetoa…",
+      "summaryEmptyProcessing": "Tekoälyn yhteenveto ei ole vielä valmis: käsittely on käynnissä. Päivitä sivu muutaman minuutin kuluttua.",
+      "summaryEmptyFailed": "Yhteenvedon luonti epäonnistui. Tarkista putken tila ja aja käsittely uudelleen yllä olevista säätimistä.",
+      "summaryEmptyNone": "Tälle tallenteelle ei ole luotu tekoälyn yhteenvetoa. Käynnistä käsittely yllä olevista säätimistä.",
+      "editSeek": "Siirry tähän kohtaan videossa",
+      "manageTabTranscript": "Litterointi",
+      "manageTabSummary": "Yhteenveto",
+      "manageTabTranslations": "Käännökset",
+      "manageTabArchive": "Arkisto",
+      "manageTabReliability": "Luotettavuus",
+      "manageLoading": "Ladataan…",
+      "archivePiiNote": "Osallistujakohtaiset eristetyt ääniraidat ovat arkaluonteisia henkilötietoja (eristetty ääni): tämä osio on rajattu ylläpitäjille ja moderaattoreille eikä sitä koskaan näytetä julkisesti.",
+      "archiveNoTracks": "Tälle tallenteelle ei ole saatavilla osallistujakohtaisia raitoja (moniraitatallennus ei ole käytössä tai raidat on jo poistettu GDPR-minimoinnin vuoksi).",
+      "archivePlayerTitle": "Puhujakohtainen kuuntelu",
+      "archiveAudioHint": "Käytä soittimen ”Ääni”-valitsinta ja kuuntele joko miksausta tai yksittäisen osallistujan eristettyä raitaa videon kanssa synkronoituna.",
+      "archiveTitle": "Ladattava arkisto",
+      "archiveIntro": "Luo MKV-tiedoston, jossa on video, yksi ääniraita osallistujaa kohti (nimellä merkittynä ja tarkasti kohdistettuna) sekä tekstitykset. Se on tarkoitettu lataamiseen ja arkistointiin: selaimet eivät osaa vaihtaa ääniraitaa MKV-tiedoston sisällä, joten käytä kuunteluun yllä olevaa soitinta.",
+      "archiveGenerate": "Luo arkisto",
+      "archiveStatusLabel": "Tila",
+      "archiveStatus_none": "ei luotu",
+      "archiveStatus_pending": "jonossa",
+      "archiveStatus_running": "käsitellään",
+      "archiveStatus_done": "valmis",
+      "archiveStatus_failed": "epäonnistui",
+      "archiveDownload": "Lataa MKV",
+      "archiveGenerateOk": "Arkiston luonti käynnistetty.",
+      "archiveGenerateErr": "Arkiston luonti epäonnistui (HTTP {code}).",
+      "archiveTrackFallback": "Osallistuja",
+      "manageBackToList": "Kaikki tallenteet",
+      "manageDuration": "Kesto",
+      "manageSource": "Lähdekieli",
+      "manageOpenPublic": "Julkinen sivu",
+      "manageRerunOk": "Putken uudelleenajo käynnistetty.",
+      "manageRerunNoop": "Yhtään työtä ei käynnistetty: tekoäly on poissa käytöstä tässä tapahtumassa tai putki on tauolla. Käytä ”Luo tekoälyllä” -toimintoa.",
+      "manageRerunAlreadyQueued": "Käsittely on jo jonossa: uutta käynnistettävää ei ole.",
+      "generateAi": "Luo tekoälyllä",
+      "generateAiConfirm": "Aja tekoälyputki (litterointi ja yhteenveto) tälle tallenteelle. Tekoälykäsittely otetaan käyttöön tapahtumassa ja käynnistyy taustalla. Käännökset lisätään myöhemmin kieli kerrallaan ”Käännökset”-välilehdeltä.",
+      "generateAiOk": "Tekoälyputki käynnistetty.",
+      "manageOpen": "Hallinnoi",
+      "cancelConfirmTitle": "Peruuta jälkituotanto",
+      "speakerUpdateSuccess": "Puhuja päivitetty",
+      "tm": {
+        "loading": "Ladataan käännöskieliä…",
+        "loadError": "Käännöskieliä ei voitu ladata.",
+        "title": "Käännöskielet",
+        "sourceLabel": "Lähdekieli:",
+        "already": "Jo käännetyt:",
+        "noneYet": "Ei vielä käännöksiä.",
+        "addLabel": "Lisää kieli",
+        "noneAvailable": "Ei kieliä saatavilla",
+        "selectPlaceholder": "Valitse kieli…",
+        "adding": "Lisätään…",
+        "addButton": "Lisää kieli",
+        "unexpectedError": "Odottamaton virhe",
+        "note": "Kielen lisääminen luo litteroinnin ja yhteenvedon käännöksen — sekä äänen dubbauksen, jos se on käytössä tapahtumassa. Käsittely tapahtuu taustalla.",
+        "summary": "Yhteenveto",
+        "subtitles": "Tekstitykset",
+        "dub": "Dubbaus",
+        "download": "lataa",
+        "allTranslated": "Kaikki aktiiviset kielet on jo käännetty.",
+        "translatedHeader": "Käännetyt kielet"
+      },
+      "ov": {
+        "tab": "Yleiskatsaus",
+        "intro": "Mitä tekoälyputki tuotti tälle tallenteelle, kieli kerrallaan.",
+        "processing": "Käsittely on kesken tai tuotoksia ei ole vielä. Palaa, kun tila on ”Valmis”.",
+        "loadError": "Yleiskatsausta ei voitu ladata.",
+        "langsTitle": "Kielet ja tuotokset",
+        "colLang": "Kieli",
+        "colTranscript": "Litterointi",
+        "colSummary": "Yhteenveto",
+        "colSubtitles": "Tekstitykset",
+        "colDub": "Dubbaus",
+        "source": "alkuperäinen",
+        "present": "saatavilla",
+        "absent": "puuttuu",
+        "listen": "Kuuntele",
+        "download": "Lataa",
+        "dubTitle": "Äänen dubbaus (yksi ääni puhujaa kohti, synkronoitu)",
+        "dubNone": "Dubbausta ei tuotettu.",
+        "summaryTitle": "Yhteenveto",
+        "summaryLang": "Kieli",
+        "summaryNone": "Yhteenvetoa ei ole saatavilla.",
+        "decisions": "Päätökset",
+        "actions": "Tehtävät",
+        "topics": "Luvut",
+        "speakersTitle": "Puhujat",
+        "speakerAnon": "ei kohdistettu",
+        "speakerRenameHint": "Nimeä puhujat uudelleen korjataksesi nimet: nimi korvaa anonyymin merkinnän litteroinnissa ja julkisella sivulla.",
+        "speakerNamePlaceholder": "Oikea nimi (esim. Mario Rossi)",
+        "speakerNameAria": "Nimi puhujalle",
+        "save": "Tallenna",
+        "saving": "Tallennetaan…",
+        "saved": "Tallennettu",
+        "saveError": "Virhe",
+        "editHint": "Käytä yllä olevia välilehtiä tekstin, nimien tai yhteenvedon korjaamiseen.",
+        "kpiDuration": "Kesto",
+        "kpiParticipants": "Osallistujat (huippu)",
+        "kpiTracks": "Ääniraidat",
+        "kpiLanguages": "Kielet",
+        "kpiArtifacts": "Tuotokset",
+        "kpiProcessed": "Käsitelty",
+        "statusLabel": "Tila",
+        "run": "ajo",
+        "jobsTitle": "Putken eteneminen",
+        "jobsNone": "Tälle tallenteelle ei ole töitä.",
+        "attempts": "{n} yritystä",
+        "filesTitle": "Tiedostot tallennustilassa",
+        "filesNone": "Tallennustilasta ei löytynyt tiedostoja.",
+        "filesToggle": "Näytä/piilota {n} tiedostoa",
+        "tracksTitle": "Osallistujakohtaiset raidat",
+        "tracksNone": "Ei osallistujakohtaisia raitoja (moniraita pois käytöstä tai raidat jo poistettu).",
+        "trackPurged": "poistettu (GDPR)",
+        "trackEnters": "liittyi +{s} s",
+        "metricsTitle": "Yhteenvedon mittarit (LLM)",
+        "chars": "merkkiä",
+        "model": "Malli",
+        "notAvailable": "ei tietoa"
+      },
+      "rel": {
+        "title": "Tekoälyn luotettavuus",
+        "subtitle": "Kuinka luotettavaa tekoälyn tuottama sisältö on tälle tallenteelle.",
+        "loading": "Analysoidaan luotettavuutta…",
+        "loadError": "Luotettavuusmittareita ei voitu ladata.",
+        "noData": "Tälle tallenteelle ei ole tehty tekoälykäsittelyä.",
+        "level": {
+          "good": "Luotettava",
+          "fair": "Hyväksyttävä",
+          "poor": "Heikko",
+          "failed": "Epäluotettava"
+        },
+        "overallScore": "Kokonaisluottamus",
+        "totalTime": "Käsittelyaika",
+        "sourceLang": "Lähdekieli",
+        "transcriptTitle": "Litterointi",
+        "segments": "Segmentit",
+        "speakers": "Puhujat",
+        "speech": "Havaittu puhe",
+        "confidence": "Keskimääräinen luottamus",
+        "silence": "Arvioitu hiljaisuus",
+        "coverage": "Puheen kattavuus",
+        "lowConf": "Matalan luottamuksen segmentit",
+        "transcriptNotProduced": "Litterointia ei ole vielä tuotettu (putkea ei ole ajettu).",
+        "transcriptUnavailable": "Litterointi on olemassa, mutta sitä ei voi analysoida täällä (arkistoitu tallennustilaan).",
+        "stagesTitle": "Putken vaiheet",
+        "colStage": "Vaihe",
+        "colStatus": "Tila",
+        "colModel": "Malli",
+        "colTime": "Kesto",
+        "colLangs": "Kielet",
+        "warn": {
+          "transcriptEmpty": "Tyhjä litterointi: lähdeääni vaikuttaa hiljaiselta tai siinä ei ole puhetta. Siitä johdetut yhteenveto, käännökset ja dubbaus EIVÄT ole luotettavia.",
+          "lowConfidence": "Litteroinnin luottamus on matala: tarkista teksti ennen julkaisua.",
+          "manyLowConfSegments": "Monta matalan luottamuksen segmenttiä: litterointi voi sisältää virheitä.",
+          "highNoSpeech": "Ääni on suurelta osin hiljainen tai siinä ei ole puhetta: litterointi voi olla hallusinoitu.",
+          "stageFailed": "Vaihe ”{stage}” epäonnistui.",
+          "stageRetried": "Vaihe ”{stage}” valmistui usean yrityksen jälkeen."
+        },
+        "stage": {
+          "TRANSCRIBE": "Litterointi",
+          "TRANSCRIBE_MULTITRACK": "Litterointi (moniraita)",
+          "SUMMARIZE": "Yhteenveto",
+          "TRANSLATE": "Käännös",
+          "SUBTITLE": "Tekstitykset",
+          "DUB": "Dubbaus",
+          "ARCHIVE": "Arkisto"
+        },
+        "status": {
+          "PENDING": "Odottaa",
+          "CLAIMED": "Varattu",
+          "RUNNING": "Käynnissä",
+          "DONE": "Valmis",
+          "FAILED": "Epäonnistui"
+        }
+      },
+      "archiveSourceTitle": "Lähdetallenne",
+      "archiveSourceHint": "Tapahtuman alkuperäinen video. Erilliset osallistujakohtaiset raidat ja MKV-arkisto edellyttävät moniraitatallennusta (ei käytössä tässä tapahtumassa).",
+      "archiveSourceDownload": "Lataa alkuperäinen video"
     }
   },
   "email": {
@@ -2326,7 +2871,31 @@
     "overallStatus": "Yleistila",
     "lastChecked": "Viimeksi tarkistettu",
     "responseTime": "Vasteaika",
-    "systemStatus": "Järjestelmän tila"
+    "systemStatus": "Järjestelmän tila",
+    "postprod": {
+      "title": "Tapahtuman jälkeinen putki",
+      "subtitle": "Tallenteen litterointi, yhteenveto, käännös ja dubbaus",
+      "whatItDoes": "Kun tapahtuma päättyy, tallenne käy läpi sisäisen putken: WhisperX tuottaa litteroinnin, Mistral-malli hoitaa yhteenvedon ja käännökset, Piper TTS luo dubatun äänen. Kaikki mallit ajetaan klusterin GPU:lla, joka on päällä vain työn keston ajan, joten energiankulutus seuraa todellista kuormaa.",
+      "status": {
+        "idle": "Odottaa",
+        "running": "Käynnissä",
+        "degraded": "Heikentynyt"
+      },
+      "aiBadge": "Tämän tapahtuman litterointi, yhteenveto ja dubbaus on luotu tekoälymalleilla, ja ne voivat sisältää epätarkkuuksia. Kun tarvitset täyden varmuuden, tarkista asia aina alkuperäisestä videosta.",
+      "idleMessage": "Putki on valmiina, käsiteltäviä tallenteita ei ole juuri nyt.",
+      "queueAriaLabel": "Jälkituotantojonon koostumus",
+      "queuePending": "jonossa",
+      "queueRunning": "työn alla",
+      "queueDone": "valmiit",
+      "queueFailed": "epäonnistuneet",
+      "asrProvider": "Litterointi",
+      "llmProvider": "Yhteenveto/käännös",
+      "targetLocales": "Kohdekielet",
+      "lastSuccess": "Viimeisin onnistuminen {when}",
+      "lastFailure": "Viimeisin virhe {when}",
+      "artifactsProduced": "{count, plural, =0 {ei tuotoksia} one {1 tuotos luotu} other {# tuotosta luotu}}",
+      "eventsEnabled": "{count, plural, =0 {ei tapahtumia, joissa tekoäly on käytössä} one {1 tapahtuma, jossa tekoäly on käytössä} other {# tapahtumaa, joissa tekoäly on käytössä}}"
+    }
   },
   "infraMap": {
     "loading": "Ladataan infrastruktuurikarttaa...",
@@ -2388,7 +2957,8 @@
       "jicofo": "Konferenssikoordinaattori",
       "jvb": "Videosilta",
       "jibri": "Videotallennus",
-      "smtp": "Sähköpostipalvelu"
+      "smtp": "Sähköpostipalvelu",
+      "postprod": "Tapahtuman jälkeinen tekoälyputki"
     },
     "descriptions": {
       "app": "Verkkosivusto, jolla pääset tapahtumiin",
@@ -2399,7 +2969,8 @@
       "jicofo": "Koordinoi, kuka osallistuu kuhunkin konferenssiin",
       "jvb": "Välittää ääntä ja videota osallistujille",
       "jibri": "Tallentaa tapahtumien videoistunnot",
-      "smtp": "Lähettää vahvistusviestit ja muistutukset"
+      "smtp": "Lähettää vahvistusviestit ja muistutukset",
+      "postprod": "Litteroi, tiivistää ja kääntää tallenteet klusterissa toimivilla tekoälymalleilla (NVIDIA A100 -GPU). Aktivoituu vain, kun tapahtumassa otetaan tekoälytoiminnot käyttöön."
     },
     "verdicts": {
       "app": {
@@ -2447,6 +3018,12 @@
       "smtp": {
         "healthy": "Sähköpostipalvelu on määritetty ja valmis lähettämään ilmoituksia.",
         "standby": "Sähköpostipalvelua ei ole määritetty. Vahvistusviestejä ja muistutuksia ei lähetetä."
+      },
+      "postprod": {
+        "healthy": "Tekoälyputki käsittelee tallennetta (GPU-työntekijä aktiivinen).",
+        "scaling": "Jälkituotantotöitä on jonossa — GPU-solmu käynnistyy (kylmäkäynnistys ~3 min).",
+        "standby": "Tekoälyputki on käytössä mutta odottaa: käsiteltäviä tallenteita ei ole. GPU-solmu on sammutettu energian säästämiseksi.",
+        "degraded": "Yksi tai useampi tekoälytyö epäonnistui viimeisen 24 tunnin aikana. Tarkista tiedot osoitteesta /admin/postprod."
       }
     },
     "impacts": {
@@ -2459,7 +3036,8 @@
       "jvbStale": "Tapahtuma odottaa bridgeä konfiguroitua aikakatkaisua kauemmin: osallistujat eivät pääse mukaan.",
       "jibri": "Tapahtumia ei voi tallentaa. Osallistujat voivat silti liittyä ja osallistua.",
       "jibriStale": "Tapahtuma, jossa tallennus on käytössä, odottaa Jibriä yli aikakatkaisun: istuntoa ei tallenneta.",
-      "smtp": "Vahvistusviestejä ja muistutuksia ei lähetetä."
+      "smtp": "Vahvistusviestejä ja muistutuksia ei lähetetä.",
+      "postprodDegraded": "Joidenkin viimeaikaisten tallenteiden litterointeja ja yhteenvetoja ei luotu. Videotallenteet ovat kuitenkin saatavilla."
     },
     "overallVerdicts": {
       "operational": "Kaikki palvelut toimivat oikein. Alusta on täysin toiminnassa.",
@@ -2500,7 +3078,8 @@
       "errorRate": "5xx-virheet",
       "requestRate": "Pyynnöt/s",
       "podUptime": "Podin käyttöaika"
-    }
+    },
+    "connPostprod": "tekoälyn jälkituotanto"
   },
   "feedback": {
     "title": "Miten arvioisit tämän tapahtuman?",
@@ -2590,7 +3169,8 @@
     "buildInfoDev": "kehitysversio",
     "viewCommit": "Näytä commit GitHubissa",
     "viewRelease": "Näytä julkaisu GitHubissa",
-    "buildDatePrefix": "Koostettu"
+    "buildDatePrefix": "Koostettu",
+    "viewChangelog": "Katso uutuudet (muutosloki)"
   },
   "pages": {
     "privacyTitle": "Tietosuojaseloste",
@@ -2609,7 +3189,26 @@
     "unmute": "Poista mykistys",
     "download": "Lataa tallenne",
     "speedLabel": "Toistonopeus",
-    "progress": "Edistymispalkki"
+    "progress": "Edistymispalkki",
+    "subtitles": "Tekstitykset",
+    "subtitlesOff": "Pois käytöstä",
+    "audioLabel": "Ääni",
+    "audioOriginal": "Alkuperäinen",
+    "audioSyntheticBanner": "Tekoälyllä dubattu ääni — synteettinen ääni, automaattisesti luotua sisältöä.",
+    "audioSyntheticHint": "Tekoälyn luoma ääni",
+    "shortcutsHelpOpen": "Näytä pikanäppäimet",
+    "shortcutsHelpClose": "Sulje pikanäppäimet",
+    "shortcutsTitle": "Pikanäppäimet",
+    "shortcutsSpace": "Toista tai keskeytä",
+    "shortcutsArrowsLR": "Siirry 5 sekuntia taakse- tai eteenpäin",
+    "shortcutsArrowsUD": "Vähennä tai lisää äänenvoimakkuutta 5 %",
+    "shortcutsJL": "Siirry 10 sekuntia taakse- tai eteenpäin",
+    "shortcutsM": "Mykistä tai poista mykistys",
+    "shortcutsC": "Näytä tai piilota tekstitykset",
+    "shortcutsF": "Koko näyttö päälle tai pois",
+    "shortcutsSpeed": "Hidasta tai nopeuta toistoa",
+    "captionsOn": "Tekstitykset käytössä",
+    "captionsOff": "Tekstitykset pois käytöstä"
   },
   "diagram": {
     "title": "Tapahtuman kokoonpano",
@@ -2740,7 +3339,11 @@
     "notConfigured": "Jibri ei ole määritetty. Videotallennus ei ole käytettävissä.",
     "disabledHint": "Videotallennus ei ole käytössä tässä tapahtumassa. Ota se käyttöön avaamalla yllä oleva Asetukset-osio ja kytkemällä \"Tallennus\"-valitsin päälle.",
     "play": "Toista",
-    "download": "Lataa"
+    "download": "Lataa",
+    "transcriptManage": "Litterointi / tekoäly",
+    "deleteConfirmTitle": "Poista tallenne",
+    "deleteFailed": "Poisto epäonnistui",
+    "deleteSuccess": "Tallenne poistettu"
   },
   "postEvent": {
     "config": "Tapahtuman jälkeiset asetukset",
@@ -2758,8 +3361,17 @@
       "qa": "Kysymykset ja vastaukset",
       "materials": "Materiaalit",
       "polls": "Kyselyt",
-      "feedback": "Palaute"
-    }
+      "feedback": "Palaute",
+      "transcript": "Tekoälylitterointi"
+    },
+    "pageVisibleHelp": "Kun asetus on pois päältä (tai näkyvyysikkuna on päättynyt), päättyneen tapahtuman julkinen sivu palauttaa 404-virheen ja tapahtuma poistuu luetteloista ja sivukartasta.",
+    "libraryListed": "Julkaise videokirjastoon",
+    "libraryListedHelp": "Näytä tämä tapahtuma julkisessa kirjastossa (/video-library). Edellyttää julkaistua tallennetta tai YouTube-videota sekä sitä, että tapahtumasivu on näkyvissä.",
+    "libraryListedNoRecording": "Ei julkaistua tallennetta: tapahtuma ei näy kirjastossa, ennen kuin julkaiset tallenteen tai lisäät YouTube-videon.",
+    "showRecap": "Näytä tapahtuman yhteenveto",
+    "showWordCloud": "Näytä sanapilvi",
+    "emailEnabled": "Lähetä yhteenvetosähköposti tapahtuman päättyessä",
+    "emailEnabledHelp": "Lähettää päättymisen yhteydessä ilmoittautuneille osallistujille kiitossähköpostin, jossa on linkit yhteenvetoon ja palautteeseen, ja moderaattorille lyhyen yhteenvedon. Lähetetään vain kerran."
   },
   "provisioning": {
     "loading": "Ladataan",
@@ -2829,5 +3441,125 @@
     "noComments": "No comments",
     "yes": "Kyllä",
     "no": "Ei"
+  },
+  "agenda": {
+    "title": "Muistiinpanot / tarkistuslista",
+    "empty": "Ei vielä kohtia. Lisää käsiteltävät aiheet ja merkitse ne tehdyiksi sitä mukaa.",
+    "add": "Lisää",
+    "addPlaceholder": "Uusi kohta…",
+    "remove": "Poista",
+    "inProgress": "käynnissä",
+    "agree": "Samaa mieltä",
+    "disagree": "Eri mieltä",
+    "favorablePct": "{pct} % kannattaa",
+    "noReactions": "Kerro mielipiteesi"
+  },
+  "changelog": {
+    "metaTitle": "Uutuudet ja muutosloki",
+    "title": "Uutuudet ja muutosloki",
+    "intro": "Alustan kaikki versiot, uusin ensin. Jokainen merkintä tiivistää tärkeimmät uutuudet, korjaukset ja parannukset.",
+    "current": "Nykyinen versio",
+    "sourceNote": "Julkaisutiedot on koottu projektin tageista, pull requesteista ja commiteista.",
+    "sourceLink": "Katso kaikki julkaisut GitHubissa",
+    "cadence": "Julkaisutahti",
+    "cadenceSummary": "{count} versiota välillä {from}–{to}.",
+    "releaseNotes": "Julkaisutiedot ja SBOM",
+    "rawChangelog": "CHANGELOG.md tietovarastossa"
+  },
+  "postprod": {
+    "loading": "Ladataan litterointia…",
+    "loadError": "Litterointia ei voitu ladata: {error}",
+    "empty": "Tälle tapahtumalle ei ole saatavilla litterointia.",
+    "tabTranscript": "Litterointi",
+    "tabSummary": "Yhteenveto",
+    "aiBadgeLabel": "Tekoälyn luomaa sisältöä",
+    "aiBadgeBody": "Litterointi ja yhteenveto tuotetaan automaattisesti klusterissa toimivalla tekoälyputkella. Ne voivat sisältää virheitä; video on edelleen ensisijainen lähde.",
+    "searchPlaceholder": "Hae litteroinnista…",
+    "searchLabel": "Hae litteroinnista",
+    "searchClear": "Tyhjennä haku",
+    "searchNoMatches": "Ei tuloksia haulle ”{query}”.",
+    "searchMatches": "{count, plural, =1 {1 osuma} other {# osumaa}}",
+    "downloadLabel": "Lataa",
+    "downloadMenu": "Latausvaihtoehdot",
+    "downloadTranscriptTxt": "Litterointi (.txt)",
+    "downloadTranscriptSrt": "Tekstitykset (.srt)",
+    "downloadTranscriptVtt": "Tekstitykset (.vtt)",
+    "downloadSummaryMd": "Yhteenveto (.md)",
+    "hero": {
+      "badge": "Automaattinen yhteenveto",
+      "aiActArt50": "Tekoälyn luomaa sisältöä",
+      "title": "Lyhyesti",
+      "availableIn": "Yhteenveto saatavilla myös kielillä {langs}",
+      "summaryLanguageLabel": "Yhteenvedon kieli",
+      "topicsLabel": "Luvut — napsauta siirtyäksesi kyseiseen kohtaan videossa",
+      "keyDecisions": "Tehdyt päätökset",
+      "actionItems": "Tehtävät",
+      "expandDetails": "Näytä päätökset ja tehtävät",
+      "collapseDetails": "Piilota päätökset ja tehtävät"
+    },
+    "nowSpeaking": "Äänessä nyt",
+    "shareSegment": "Jaa tämä kohta",
+    "shareSegmentCopied": "Linkki kopioitu leikepöydälle",
+    "bookmarkAdd": "Tallenna kirjanmerkkeihin",
+    "bookmarkRemove": "Poista kirjanmerkki",
+    "bookmarksHeader": "Kirjanmerkkisi",
+    "bookmarksEmpty": "Et ole vielä tallentanut yhtään kohtaa videosta. Avaa litteroinnin segmentti ja napsauta tähteä lisätäksesi sen tähän.",
+    "miniPlayerOpen": "Tuo video etualalle",
+    "miniPlayerClose": "Sulje minisoitin",
+    "miniPlayerHint": "Pysy videon lähellä, kun vierität sivua",
+    "followLive": "Seuraa videota",
+    "followManual": "Vapaa lukeminen",
+    "followResume": "Palaa seuraamaan videota",
+    "lowConfidenceBadge": "tarkista",
+    "lowConfidenceTitle": "Tämän litterointiosuuden luottamus on matala: tallenteessa voi olla eri sanoja. Tarkista asia aina alkuperäisestä videosta.",
+    "miniTranscriptLabel": "Live-litterointi",
+    "dubAvailableHint": "Dubattu ääni on saatavilla kielillä {langs}. Käytä soittimen säätimissä olevaa äänivalitsinta kuunnellaksesi käännettyä versiota.",
+    "provenance": {
+      "triggerLabel": "Tekoälykäsittelyn läpinäkyvyys",
+      "closeLabel": "Piilota käsittelyn tiedot",
+      "intro": "Nämä ovat mallit, jotka tuottivat tämän tallenteen litteroinnin, yhteenvedon ja dubbauksen. Tiedot tallennetaan käsittelyn päättyessä: näet, mitä tuolloin todella käytettiin, riippumatta myöhemmistä asetusmuutoksista.",
+      "asr": {
+        "title": "Litterointi",
+        "hint": "Puheentunnistus ja puhujien erottelu.",
+        "engine": "Moottori",
+        "model": "Malli",
+        "version": "Versio",
+        "diarizationEngine": "Diarisaatio",
+        "diarizationSpeakers": "Havaitut puhujat"
+      },
+      "llm": {
+        "title": "Yhteenveto ja käännös",
+        "hint": "Kokouksen yhteenveto sekä litteroinnin ja yhteenvedon käännös.",
+        "engine": "Ajoalusta",
+        "model": "Malli",
+        "vendor": "Toimittaja",
+        "license": "Lisenssi",
+        "country": "Kotipaikka"
+      },
+      "tts": {
+        "title": "Dubbaus",
+        "hint": "Puhesynteesi äänen tuottamiseksi kohdekielillä.",
+        "engine": "Moottori",
+        "license": "Lisenssi",
+        "policy": "Äänten valintasääntö"
+      },
+      "languages": {
+        "title": "Käsitellyt kielet",
+        "hint": "Tallenteen lähdekieli sekä käännösten ja dubbauksen kohdekielet.",
+        "source": "Alkuperäinen kieli",
+        "translation": "Käännökset",
+        "dubbing": "Dubbaukset",
+        "none": "Ei yhtään"
+      },
+      "voices": {
+        "title": "Puhujille määritetyt synteettiset äänet",
+        "male": "miesääni",
+        "female": "naisääni"
+      },
+      "runAt": "Käsittely valmistui",
+      "version": "Putken versio"
+    },
+    "overlapBadge": "päällekkäinen",
+    "overlapTitle": "Päällekkäinen puhe: tällä aikavälillä puhuu useampi kuin yksi henkilö samanaikaisesti."
   }
 }

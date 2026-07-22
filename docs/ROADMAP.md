@@ -1,6 +1,10 @@
 # Roadmap — pa-webinar
 
-Allineata al 2026-07-17. In produzione: **v0.7.7** (v0.8.0 in corso). Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici (v0.8 / v0.9 / v1.0 / backlog) rispetto allo stato attuale del codice.
+Allineata al 2026-07-22, **verificata contro il codice** (non contro gli stati dichiarati). In produzione: **v0.8.6**.
+
+Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici rispetto a ciò che il codice fa davvero oggi.
+
+> Nota di metodo: la revisione del 22 luglio ha trovato questo documento sbagliato **in entrambe le direzioni** — voci spedite ancora marcate "in corso" e sottosistemi marcati ✅ con un buco strutturale dentro. Le seconde sono le pericolose: chi legge decide di non guardarci. Dove un ✅ ha un limite noto, adesso il limite è scritto accanto.
 
 ## v0.1.0 — MVP ✅
 
@@ -113,21 +117,43 @@ Rilasciate in produzione tra v0.5 e v0.7.1. Voci che le versioni precedenti di q
 | Smoke test su AKS reale | ✅ fatto (prod live con eventi reali) |
 | Evento pilota interno DTD | ✅ fatto (Caffettino + eventi v0.6/v0.7) |
 | Ritocco testi e layout | ✅ in gran parte (passaggi UX v0.6.x) |
-| Test E2E Playwright (batteria flussi critici) | 🟡 parziale (solo smoke waiting-room/registrazione) → **v0.8** |
-| Screenshot per README | ❌ da fare → **v0.8** |
+| Test E2E Playwright (batteria flussi critici) | 🟡 parziale (1 file / 7 test, `continue-on-error`) → **v0.8** |
+| Screenshot per README | ✅ fatto — schermate reali dell'istanza in produzione in `docs/screenshots/`, referenziate da README, README.en e `publiccode.yml` |
 
 Flussi critici Playwright ancora da coprire: login admin + creazione + pubblicazione evento, ingresso sala (moderatore + partecipante), Q&A (invio/upvote/moderazione), polling, cambio lingua senza reload, GDPR cleanup, download `.ics`, responsive mobile, chat in-app real-time multi-pod.
+
+## Limiti noti dietro un ✅
+
+Voci spedite e funzionanti, ognuna con un confine che vale la pena conoscere prima di appoggiarcisi. Sono state trovate verificando il codice il 22 luglio, non segnalate da utenti.
+
+| Sottosistema | Il limite |
+|---|---|
+| **Allegati in chat (F16)** | Serviti da una rotta pubblica: la protezione è che l'UUID non è indovinabile, non un controllo di accesso |
+| **Recorder multitraccia (ADR-013)** | Nessuna riconnessione dopo `CONFERENCE_FAILED`: una caduta a metà evento chiude la registrazione con quello che ha già catturato. L'errore finisce nei log del Job, non nel pannello admin |
+| **Scale-to-zero JVB (ADR-007)** | `/colibri/stats` è aggregato per pod: due eventi LIVE sullo stesso bridge tengono acceso il nodepool anche se uno si è svuotato |
+| **i18n a 24 lingue (ADR-008)** | Il fallback delle chiavi mancanti ricade sull'**italiano**, non sull'inglese |
+| **Piazza della sala d'attesa** | Le emote sono locali: chi le usa vede la propria animazione, gli altri no |
+| **Copertura dei test** | 844 casi, nessuno su un handler API. Le due falle già trovate (impersonazione in chat, `/chat` senza auth) stavano entrambe in un handler — vedi la voce "test di handler" in v0.8 |
+
+## Copertura dei test — stato reale
+
+Misurata, non stimata (`npm run test:coverage --workspace=app`): **5,5% per riga** sull'intero `src/**`. Il numero è basso perché il denominatore è tutto: 153 route API e ~49.000 righe di componenti senza un test, contro una `lib/` coperta bene.
+
+Le soglie in `app/vitest.config.ts` sono un **cricchetto sul pavimento misurato** — impediscono che scenda, non dichiarano che vada bene. In CI girano con `--coverage`, quindi da ora una regressione di copertura fa fallire la build.
+
+Da qui in avanti si sale dai punti in cui vivono le guardie, non dai più facili: conio del JWT Jitsi, autorizzazione della chat, cleanup GDPR, presign dell'upload.
 
 ## v0.8.0 — In corso / prossima
 
 | Feature | Note |
 |---|---|
-| **Upload completi + hardening** 🟢 in corso | Upload immagini ovunque (logo/favicon/OG/watermark/organizzatore), materiali salvati come `FILE` con `blobPath` (sblocca il cleanup dei blob), hardening sicurezza (nosniff + `Content-Disposition` sul serving, sniff magic-byte, rate-limit, pre-check `Content-Length`), fix `DELETE` recording/session sul dominio storage corretto |
-| **Allegati in chat (F16)** 🟢 in corso | Upload allegati (immagini/documenti) in chat live: gating a soli utenti autenticati (no guest anonimi), allowlist MIME stretta + size + rate-limit dedicati, rotta di moderazione (`hiddenAt` + `op:'delete'` già previsti nell'envelope), serving con accesso controllato, cleanup blob in retention |
-| **Chat: @menziona + rispondi/quote** 🟢 in corso | `@nome` con autocomplete dalla roster + rendering evidenziato; `replyToId` con citazione dello snippet del messaggio padre |
+| **Upload completi + hardening** ✅ (v0.7.2) | Upload immagini ovunque (logo/favicon/OG/watermark/organizzatore), materiali salvati come `FILE` con `blobPath` (sblocca il cleanup dei blob), hardening sicurezza (nosniff + `Content-Disposition` sul serving, sniff magic-byte, rate-limit, pre-check `Content-Length`), fix `DELETE` recording/session sul dominio storage corretto |
+| **Allegati in chat (F16)** ✅ (v0.7.2) — ma il serving è una *capability-URL*, non un ACL: chi conosce il link vede l'allegato | Upload allegati (immagini/documenti) in chat live: gating a soli utenti autenticati (no guest anonimi), allowlist MIME stretta + size + rate-limit dedicati, rotta di moderazione (`hiddenAt` + `op:'delete'` già previsti nell'envelope), serving con accesso controllato, cleanup blob in retention |
+| **Chat: @menziona + rispondi/quote** ✅ (v0.7.2, esteso in v0.8.5) — l'autocomplete pesca da chi ha già scritto, non dalla roster | `@nome` con autocomplete + rendering evidenziato; `replyToId` con citazione dello snippet del messaggio padre |
 | **SSE/WebSocket per Q&A** | Sostituire il polling SWR 3s riusando l'infra SSE già provata per la chat (scala a 300+) |
-| **Eventi ricorrenti — quick win** 🟡 | Togliere i footgun di clonazione: `duplicate` copia **tutti** i flag (AI/multitraccia/agenda/wordcloud/ricorrenza) + i reminder, `PUT /api/events/[param]` persiste `recurrenceRule` (oggi scartato), `EventTemplate` porta i flag mancanti, affordance admin "Duplica come prossima occorrenza". Dettaglio nella sezione **Eventi ricorrenti / serie** |
-| **Batteria E2E Playwright** + **screenshot README** | Chiudere i requisiti pre-rilascio pubblico |
+| **Eventi ricorrenti — quick win** 🟡 quasi chiuso | ✅ `duplicate` copia tutta la config + i reminder; ✅ `PUT /api/events/[param]` persiste `recurrenceRule`; ✅ affordance admin "Duplica come prossima occorrenza". ❌ **resta**: `EventTemplate` non porta ancora `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `aiDubbingEnabled`, `wordCloudEnabled`; e `duplicate` copia gli scalari ma **non le relazioni** (tag, organizzatori, co-moderatori, agenda, questionari) |
+| **Batteria E2E Playwright** | Oggi è **1 file, 7 test** (`app/e2e/live-flow.spec.ts`) con `continue-on-error` per i rate-limit di Docker Hub sul runner condiviso: non protegge da regressioni. Scoperti: Q&A, sondaggi, cambio lingua, cleanup GDPR, download `.ics`, chat SSE multi-pod, e il click reale su "Entra ora" (oggi l'ingresso è coperto solo via API) |
+| **SSE per Q&A** | vedi riga sopra: oggi `useSWR(refreshInterval: 3000)` in `qa/question-list.tsx`, stesso polling in `polls/poll-panel.tsx` e `live/agenda-panel.tsx` |
 
 ## v0.9.0 — Pianificata
 

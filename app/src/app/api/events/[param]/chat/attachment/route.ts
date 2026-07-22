@@ -12,6 +12,10 @@
  *     magic bytes (not just the declared type), plus a size cap and an early
  *     Content-Length pre-check.
  *   - Per-sender rate limit distinct from the message limit.
+ *   - Il blob finisce nel namespace `assets/chat/<eventId>/…`, che
+ *     /api/assets serve solo a chi supera authorizeChatRead: la lettura è
+ *     stretta quanto la scrittura, non protetta dalla sola non-indovinabilità
+ *     dell'UUID.
  * There is no malware scanner in the stack; the authenticated-only gate + tight
  * allow-list + attachment-disposition serving are the compensating controls.
  */
@@ -33,7 +37,7 @@ import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, RateLimitError, ValidationError } from '@/lib/errors';
 import { rateLimit } from '@/lib/rate-limit';
 import { getFilesStorage } from '@/lib/storage';
-import { buildAssetKey, sanitizeFilename } from '@/lib/utils/asset-key';
+import { buildChatAssetKey, sanitizeFilename } from '@/lib/utils/asset-key';
 import { contentMatchesDeclaredMime } from '@/lib/utils/mime-sniff';
 
 export const dynamic = 'force-dynamic';
@@ -125,8 +129,10 @@ export const POST = withErrorHandling(async (request, context) => {
   }
 
   const originalName = fileField.name || 'upload';
-  const assetType = mime.startsWith('image/') ? 'image' : 'document';
-  const key = buildAssetKey(assetType, originalName, { uuid: randomUUID() });
+  // Namespace `assets/chat/<eventId>/…`: è quello che permette a /api/assets di
+  // proteggere SOLO gli allegati (stesso gate della lettura chat) lasciando
+  // pubblici logo, copertine e materiali. Vedi buildChatAssetKey.
+  const key = buildChatAssetKey(event.id, originalName, { uuid: randomUUID() });
 
   try {
     await storage.put(key, buffer, mime);

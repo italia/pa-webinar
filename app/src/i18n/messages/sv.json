@@ -96,7 +96,11 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Kalender",
         "downloadIcs": "Ladda ned .ics-fil"
-      }
+      },
+      "alreadyRegisteredEnter": "Redan anmäld? Gå in i rummet",
+      "invalidTokenTitle": "Åtkomstlänken gäller inte längre",
+      "invalidTokenBody": "Länken du använde är ogiltig eller har gått ut. Om du har anmält dig, leta upp din personliga länk i bekräftelsemejlet, eller anmäl dig igen nedan.",
+      "invalidTokenBodyEnded": "Länken du använde gäller inte längre. Evenemanget är avslutat: nedan hittar du inspelningen och materialet."
     },
     "manage": {
       "toggleChat": "Chatt",
@@ -116,6 +120,20 @@
     "list": {
       "filterByTag": "Filtrera efter kategori",
       "allTags": "Alla"
+    },
+    "wordCloudTitle": "Ordmoln",
+    "recap": {
+      "title": "Sammanfattning av evenemanget",
+      "intro": "En sammanfattning av vad som kom upp under evenemanget.",
+      "participants": "Deltagare (som mest)",
+      "registered": "Anmälda",
+      "topQuestions": "Frågor med flest röster",
+      "upvotes": "{count, plural, =0 {inga röster} one {1 röst} other {# röster}}",
+      "polls": "Resultat av omröstningarna",
+      "votes": "{count, plural, =0 {inga röster} one {1 röst} other {# röster}}",
+      "topWords": "Mest delade ord",
+      "feedback": "Genomsnittligt betyg",
+      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}"
     }
   },
   "registration": {
@@ -164,8 +182,11 @@
       "consentRequired": "Samtycke till databehandling krävs",
       "recordingConsentRequired": "Samtycke till inspelning krävs för detta evenemang",
       "eventFull": "Evenemanget har nått maximalt antal deltagare",
-      "generic": "Fel vid anmälan. Försök igen."
-    }
+      "generic": "Fel vid anmälan. Försök igen.",
+      "multitrackConsentRequired": "Samtycke till inspelning av ditt ljudspår är obligatoriskt för det här evenemanget"
+    },
+    "successScheduledMessage": "Du är anmäld! Vi har skickat ett mejl med din personliga åtkomstlänk. Lägg till evenemanget i kalendern och kom tillbaka hit strax innan det börjar.",
+    "addToCalendar": "Lägg till i kalendern"
   },
   "videoLibrary": {
     "title": "Videobibliotek",
@@ -252,7 +273,33 @@
       "noMessages": "Inga meddelanden ännu",
       "empty": "Inga meddelanden ännu. Skriv det första!",
       "inputLabel": "Chattmeddelande",
-      "moderatorBadge": "Moderator"
+      "moderatorBadge": "Moderator",
+      "attach": "Bifoga en fil",
+      "emojiPicker": "Infoga emoji",
+      "attachBadType": "Filtypen stöds inte (bilder eller PDF).",
+      "attachTooLarge": "Filen är för stor (max 10 MB).",
+      "attachFailed": "Uppladdningen misslyckades. Försök igen.",
+      "sendFailed": "Meddelandet skickades inte. Försök igen.",
+      "removeAttachment": "Ta bort bilaga",
+      "openAttachment": "Öppna bilaga",
+      "reply": "Svara",
+      "replyingTo": "Svarar {name}",
+      "cancelReply": "Avbryt svaret",
+      "hide": "Dölj",
+      "hideFailed": "Det gick inte att dölja meddelandet. Försök igen.",
+      "connReconnecting": "Återansluter…",
+      "connDegraded": "Uppdateringarna är fördröjda",
+      "readDenied": "Chatten är inte tillgänglig: du finns inte bland deltagarna i det här evenemanget, eller så är rummet inte öppet ännu. Försöker igen automatiskt.",
+      "mentionNotificationTitle": "{name} nämnde dig i chatten",
+      "react": "Reagera",
+      "edited": "redigerat",
+      "editLabel": "Redigera meddelande",
+      "editSave": "Spara",
+      "editFailed": "Det gick inte att redigera meddelandet.",
+      "exportChat": "Ladda ner chatten",
+      "reactNotAllowed": "För att reagera på meddelanden krävs din personliga länk eller moderatorlänken.",
+      "editNotAllowed": "Den här länken är delad och kan därför inte redigera meddelanden.",
+      "editExpired": "Mer än 15 minuter har gått: meddelandet går inte längre att redigera."
     },
     "role": {
       "moderator": "Moderator",
@@ -271,7 +318,9 @@
         "medium": "Medel",
         "poor": "Dålig",
         "unknown": "Okänd"
-      }
+      },
+      "volume": "Volym",
+      "volumeFor": "Volym för {name}"
     },
     "moderator": {
       "muteAll": "Tysta alla",
@@ -295,14 +344,17 @@
       "micDisabled": "Mikrofon avstängd",
       "videoModeration": "Deltagarens video",
       "videoDisabled": "Video avstängd",
-      "eventEndedSuccess": "Evenemanget avslutat. Omdirigerar..."
+      "eventEndedSuccess": "Evenemanget avslutat. Omdirigerar...",
+      "whiteboard": "Whiteboard",
+      "lowerHand": "Sänk handen"
     },
     "closeDrawer": "Stäng",
     "hintBanner": {
       "controls": "Kontroller längst ned",
       "raiseHand": "Räck upp handen för att tala",
       "sidebar": "Q&A och chatt i sidopanelen",
-      "dismiss": "Uppfattat"
+      "dismiss": "Uppfattat",
+      "ariaLabel": "Tips"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# person} other {# personer}}"
@@ -310,7 +362,55 @@
     "sidebarTabChatUnread": "Nya olästa meddelanden",
     "floatingControlsLabel": "Evenemangskontroller",
     "screenshareActive": "🖥️ {name} delar sin skärm",
-    "screenshareFallbackName": "En deltagare"
+    "screenshareFallbackName": "En deltagare",
+    "share": {
+      "button": "Dela",
+      "title": "Dela evenemanget",
+      "callLink": "Länk för att delta",
+      "callLinkHint": "Den som öppnar den här länken kommer in direkt medan evenemanget pågår live; annars går personen via anmälan. Länken innehåller inga hemliga tokens.",
+      "eventLink": "Evenemangets sida",
+      "eventLinkHint": "Den publika sidan med detaljerna och anmälningsformuläret.",
+      "copy": "Kopiera",
+      "copied": "Kopierad!",
+      "moderatorReveal": "Visa moderatorlänk",
+      "moderatorWarning": "Den här länken ger MODERATORBEHÖRIGHET (stänga av allas mikrofoner, starta inspelning, avsluta evenemanget). Dela den bara med andra moderatorer.",
+      "moderatorLink": "Moderatorlänk",
+      "moderatorLinkHint": "Den som öppnar den här länken kommer in som moderator med full kontroll över rummet."
+    },
+    "enterFullscreen": "Helskärm",
+    "exitFullscreen": "Avsluta helskärm",
+    "leaveChoice": {
+      "title": "Hur vill du lämna?",
+      "body": "Du kan lämna själv – samtalet fortsätter för alla andra – eller avsluta det för alla deltagare.",
+      "leaveSelf": "Lämna själv",
+      "endForAll": "Avsluta för alla",
+      "ending": "Avslutar…",
+      "endError": "Det gick inte att avsluta samtalet. Försök igen."
+    },
+    "endDestino": {
+      "title": "Evenemangets öde",
+      "body": "Du är på väg att avsluta evenemanget för alla. Vad ska hända med det när det är slut?",
+      "public": "Behåll det publikt",
+      "publicHelp": "Sidan för det avslutade evenemanget förblir synlig med sammanfattning, frågor och svar, omröstningar, material och feedback.",
+      "library": "Publicera i biblioteket",
+      "libraryHelp": "Som ovan, och dessutom visas evenemanget i det publika videobiblioteket (kräver en publicerad inspelning eller en YouTube-video).",
+      "archive": "Arkivera (privat)",
+      "archiveHelp": "Sidan för det avslutade evenemanget blir inte publik (404). Uppgifterna sparas tills lagringstiden går ut och raderas sedan.",
+      "genAi": "Generera AI-transkription och sammanfattning från inspelningen (när bearbetningen är klar)",
+      "back": "Tillbaka",
+      "confirm": "Avsluta evenemanget"
+    },
+    "liveFeaturesLabel": "Funktioner:",
+    "whiteboardNotSavedHint": "Whiteboarden sparas inte automatiskt. Om du använder den, exportera den (whiteboardens meny) och bifoga den till evenemangets material innan du avslutar.",
+    "sidebarTabWordcloud": "Ordmoln",
+    "sidebarTabAgenda": "Anteckningar / Checklista",
+    "liveToggleAgenda": "Anteckningar / Checklista (agenda)",
+    "timer": {
+      "show": "Visa timern",
+      "hide": "Dölj timern",
+      "remainingLabel": "Återstående tid (klicka för förfluten tid)",
+      "elapsedLabel": "Förfluten tid (klicka för återstående tid)"
+    }
   },
   "qa": {
     "title": "Frågor och svar",
@@ -407,12 +507,31 @@
         "maxParticipantsHelp": "Uppskatta det högsta antalet deltagare. Påverkar videoserverns kapacitet och väntrummets gränssnitt.",
         "validation": {
           "startsAt": "Ogiltigt startdatum.",
-          "endsAt": "Slutdatumet måste vara efter startdatumet."
+          "endsAt": "Slutdatumet måste vara efter startdatumet.",
+          "titleRequired": "Titeln är obligatorisk (minst 3 tecken).",
+          "titleRequiredOtherLocale": "Titeln på standardspråket ({locale}) är obligatorisk: byt till fliken {locale}.",
+          "maxParticipants": "Ange ett tal mellan 2 och 500."
         },
         "senderRatioLabel": "Uppskattad andel aktiva",
         "senderRatioHelp": "Hur många deltagare som förväntas ha mikrofon/video aktiv. Hjälper till att dimensionera videoservern.",
         "activeParticipantsEstimate": "≈ {count} aktiva deltagare",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "advancedOptions": "Avancerade alternativ",
+        "waitingRoomEngineLabel": "Väntrum (det här evenemanget)",
+        "waitingRoomEngineSiteDefault": "Webbplatsens standard",
+        "waitingRoomEngineGarden": "Trädgård (standard)",
+        "waitingRoomEngineGame": "Videospel (Phaser-lobby)",
+        "waitingRoomEngineClassic": "Klassiskt (statiskt)",
+        "waitingRoomEngineHelp": "Åsidosätter webbplatsens standard för det här evenemanget.",
+        "videoQuality": "Video- och ljudkvalitet (det här evenemanget)",
+        "videoQualityHelp": "Åsidosätter webbplatsens standard för det här evenemanget. Högre kvalitet använder mer bandbredd.",
+        "videoQualitySiteDefault": "Webbplatsens standard",
+        "videoQualityOptions": {
+          "MAX": "Maximal (1080p, hög detaljrikedom)",
+          "HIGH": "Hög (720p, rekommenderas)",
+          "BALANCED": "Balanserad (540p)",
+          "SAVE_DATA": "Datasparläge (360p)"
+        }
       },
       "step2": {
         "heading": "Vem får göra vad",
@@ -449,7 +568,8 @@
             "desc": "Starta/stoppa inspelningen."
           }
         },
-        "recordingHeading": "Inspelning"
+        "recordingHeading": "Inspelning",
+        "roomFeaturesHeading": "Rummets funktioner"
       },
       "step3": {
         "heading": "Personer och inbjudningar",
@@ -484,7 +604,8 @@
         "invalidEmail": "Ogiltig e-postadress.",
         "duplicateEmail": "Adressen finns redan.",
         "rubricaPick": "Sök i adressboken…",
-        "rubricaOrAdd": "eller lägg till manuellt"
+        "rubricaOrAdd": "eller lägg till manuellt",
+        "organizerLogo": "Arrangörens logotyp"
       },
       "step4": {
         "heading": "Innehåll och material",
@@ -544,7 +665,9 @@
           "recording": "Inspelning",
           "recordingAuto": "På — automatisk start",
           "recordingManual": "På — manuell start",
-          "recordingOff": "Av"
+          "recordingOff": "Av",
+          "multitrack": "Inspelning per deltagare",
+          "multitrackOn": "På – kräver uttryckligt samtycke vid anmälan"
         },
         "noRecurrence": "Engångsevenemang",
         "gdprHeading": "Integritet och datalagring",
@@ -560,9 +683,24 @@
         "featuresHeading": "Konfigurationssammanfattning",
         "privacyDoc": "Integritetspolicydokument (PDF eller länk)",
         "privacyDocHelp": "Ladda upp en PDF eller klistra in URL:en till en alternativ integritetspolicy. Ersätter GDPR-mallen om angiven.",
-        "privacyTextHelp": "Kort text som visas på registreringsformuläret; kan komplettera eller ersätta GDPR-mallen."
+        "privacyTextHelp": "Kort text som visas på registreringsformuläret; kan komplettera eller ersätta GDPR-mallen.",
+        "moderatorPublishHint": "Namn och e-postadress krävs för att publicera evenemanget (de används för moderatorlänken och bekräftelsemejlet). De krävs inte för att spara som utkast.",
+        "moderatorLinkNote": "Den här personen är evenemangets huvudmoderator: hen får en privat länk via e-post för att sköta det (starta inspelningen, moderera frågorna, starta omröstningar …). Det är något annat än de medmoderatorer som läggs till i steget Personer, som var och en får sin egen länk.",
+        "moderatorRequired": "Ange moderatorns namn",
+        "moderatorEmailRequired": "Ange en giltig e-postadress till moderatorn"
       },
-      "validationFailed": "Kontrollera de markerade fälten innan du fortsätter."
+      "validationFailed": "Kontrollera de markerade fälten innan du fortsätter.",
+      "partialFailure": "Evenemanget skapades, men vissa delar sparades inte: {items}. Du kan lägga till dem från evenemangets sida.",
+      "draftFound": "Vi hittade ett osparat utkast av det här evenemanget. Vill du återställa det?",
+      "draftRestore": "Återställ utkastet",
+      "draftDiscard": "Ignorera",
+      "resources": {
+        "organizers": "arrangörer",
+        "invitations": "inbjudningar",
+        "moderators": "moderatorer",
+        "speakers": "talare",
+        "materials": "material"
+      }
     },
     "nav": {
       "events": "Evenemangshantering",
@@ -603,7 +741,8 @@
       "eventQuestionnaires": "Enkäter",
       "rubricaList": "Lista",
       "rubricaDetail": "Post",
-      "feedbackDashboard": "Feedback"
+      "feedbackDashboard": "Feedback",
+      "recordingsPostprod": "Transkriptioner / AI"
     },
     "landing": {
       "title": "Administrationspanel",
@@ -701,7 +840,8 @@
           "dateRequired": "Ursprungsdatum är obligatoriskt.",
           "saveFailed": "Det gick inte att spara metadata."
         }
-      }
+      },
+      "updateFailed": "Uppdateringen misslyckades."
     },
     "recordingsLibrary": {
       "title": "Videoinspelningar",
@@ -770,7 +910,10 @@
       "detailEnd": "Slut",
       "detailModerator": "Moderator",
       "detailRoom": "Jitsi-rum",
-      "detailFilename": "Filnamn"
+      "detailFilename": "Filnamn",
+      "transcriptManage": "Hantera transkription / AI",
+      "transcriptReady": "Transkriberad",
+      "transcriptProcessing": "Bearbetas"
     },
     "gdprAudit": {
       "title": "GDPR-revision",
@@ -1023,7 +1166,32 @@
       "retentionPreviewRecordings": "Videoinspelningar",
       "retentionPreviewKept": "Aggregerad statistik och evenemangsmetadata bevaras.",
       "configPreview": "Förhandsgranskning av konfiguration",
-      "templateApplied": "Mall tillämpad: {name}. Du kan ändra alla inställningar."
+      "templateApplied": "Mall tillämpad: {name}. Du kan ändra alla inställningar.",
+      "agendaEnabled": "Live-anteckningar / checklista (agenda)",
+      "agendaEnabledDesc": "En checklista över ämnen som ska tas upp och som moderatorerna bockar av under evenemanget. Den används i den automatiska sammanfattningen. Valfri och kan aktiveras även under evenemanget.",
+      "whiteboardEnabled": "Delad whiteboard",
+      "whiteboardEnabledDesc": "Aktiverar den inbyggda samarbetswhiteboarden (Excalidraw): moderatorerna kan öppna den från verktygsfältet under evenemanget. Alltid på i snabbsamtal.",
+      "aiSectionHeading": "Automatisk efterproduktion",
+      "aiSectionDesc": "När evenemanget är slut kan inspelningen bearbetas av en AI-pipeline i klustret som tar fram transkription, sammanfattning och – om det efterfrågas – översättningar och dubbning. Allt sker på departementets egen infrastruktur, inga uppgifter lämnas till tredje part.",
+      "aiTranscriptEnabled": "Automatisk transkribering",
+      "aiTranscriptEnabledDesc": "Taligenkänning med identifiering av talare. Krävs för att kunna aktivera sammanfattning, översättningar och dubbning.",
+      "aiSummaryEnabled": "Sammanfattning och kapitel",
+      "aiSummaryEnabledDesc": "Sammanfattning av mötet, fattade beslut, att göra-punkter och indelning i kapitel med tidsangivelser.",
+      "aiTranslationEnabled": "Översättning till andra språk",
+      "aiTranslationEnabledDesc": "Transkription och sammanfattning översatta till språken som anges nedan.",
+      "aiTargetLocales": "Översättningsspråk",
+      "aiTargetLocalesDesc": "ISO-språkkoder (t.ex. en, fr, de) åtskilda med kommatecken. Lämna tomt för att använda språken som är inställda för hela webbplatsen.",
+      "aiTargetLocalesRequired": "Ange minst ett översättningsspråk, eller stäng av den automatiska översättningen.",
+      "aiDubbingEnabled": "Ljuddubbning",
+      "aiDubbingEnabledDesc": "Dubbat ljud på målspråken, genererat med förtränade syntetiska röster. Deltagarnas röster klonas inte.",
+      "consentBadge": "Uttryckligt samtycke",
+      "retentionBadge": "Förlänger lagringstiden",
+      "multitrackRecordingEnabled": "Inspelning per deltagare (hög precision)",
+      "multitrackRecordingEnabledDesc": "Spelar in ett separat ljudspår för varje deltagare, så att transkriptionen med säkerhet kan ange vem som säger vad (inga fler ”Talare 1/2”). Den behandlar isolerat ljud från en enskild talare (känsliga personuppgifter): spåren är tillfälliga och raderas direkt efter transkriberingen. Kräver samtycke till inspelning.",
+      "retainParticipantTracks": "Behåll spåren per deltagare",
+      "retainParticipantTracksDesc": "Behåller de enskilda ljudspåren efter transkriberingen, för det nedladdningsbara arkivet och uppspelning per talare. OBS: detta förlänger lagringen av känsliga personuppgifter (isolerad röst) fram till att evenemangets lagringstid går ut. Aktivera bara om det behövs och med adekvat samtycke och information.",
+      "expectedSpeakers": "Förväntat antal talare",
+      "expectedSpeakersDesc": "När du vet det (t.ex. 3 talare) förbättrar en angivelse kvaliteten på identifieringen av talare. Lämna tomt för att låta pipelinen avgöra."
     },
     "links": {
       "title": "Evenemangslänkar",
@@ -1123,7 +1291,8 @@
         "pages": "Sidor",
         "footer": "Sidfot",
         "features": "Funktioner",
-        "scaling": "Infrastrukturdimensionering"
+        "scaling": "Infrastrukturdimensionering",
+        "postprod": "AI-pipeline efter evenemanget"
       },
       "scaling": {
         "intro": "Parametrar som beskriver kapaciteten i klustret där plattformen körs. Standardvärdena är kalibrerade för Azure F16s_v2 (16 vCPU / 32 GiB) för JVB och F4s_v2 (4 vCPU / 8 GiB) för Jibri. Vid annan hårdvara, uppdatera här — skalern räknar om direkt.",
@@ -1285,7 +1454,55 @@
         "jvbProvisioningTimeoutMinutes": "Provisioning-timeout (minuter)",
         "jvbProvisioningTimeoutMinutesHelp": "Efter hur många minuter från startsAt ett evenemang utan JVB redo flaggas som 'degraded' på statussidan. Standard 15. Täcker nodens cold-start (~3–5 min) plus säkerhetsmarginal.",
         "statusPollIntervalSeconds": "Pollningsintervall för statussida (sekunder)",
-        "statusPollIntervalSecondsHelp": "Hur ofta /status-sidan uppdateras från webbläsaren. Standard 30. Lägre värden = färskare data men mer belastning på appen."
+        "statusPollIntervalSecondsHelp": "Hur ofta /status-sidan uppdateras från webbläsaren. Standard 30. Lägre värden = färskare data men mer belastning på appen.",
+        "jvbEmptyCloseMinutes": "Minuter med tomt rum före definitiv stängning",
+        "jvbEmptyCloseMinutesHelp": "Om ett LIVE-rum som redan har haft deltagare står tomt i så här många minuter stängs det definitivt (ENDED) – så att ett evenemang utan moderator stänger sig självt vid inaktivitet, utan att vänta på den schemalagda sluttiden. Standard 15 (på). -1 = avstängt. 0 = stäng vid första kontrollen med tomt rum.",
+        "waitingRoomLeadMinutes": "Tidsfönster för väntrummet (minuter)",
+        "waitingRoomLeadMinutesHelp": "Den som anmäler sig inom så här många minuter från starten kommer direkt till väntrummet; tidigare anmälningar får en bekräftelse med kalenderlänk. 0 = visa alltid bekräftelsen fram till starten. Rekommenderat 15.",
+        "reactionsMode": "Reaktioner (emoji)",
+        "reactionsModeNative": "Jitsis egna (i verktygsfältet, flyktiga)",
+        "reactionsModeCustom": "Appens egna (fältet till vänster, med statistik)",
+        "reactionsModeHelp": "Jitsis egna = Jitsis reaktionsknapp i kontrollfältet, lätt och flyktig (räknas inte). Appens egna = appens reaktionsfält nere till vänster, med räknare och statistik. Standard: Jitsis egna.",
+        "emailSenderTitle": "Avsändare för e-post",
+        "emailSenderHelp": "Hur avsändaren visas i inkorgen hos den som anmäler sig. Avsändaradressen ställs in i driftsättningen (den måste stämma med den som SMTP-servern tillåter).",
+        "emailFromName": "Avsändarens namn",
+        "emailFromNameHelp": "Tomt = namnet som är konfigurerat i driftsättningen (SMTP_FROM_NAME) används. Mejlen skickas fortfarande från systemadressen.",
+        "emailReplyTo": "Adress för svar",
+        "emailReplyToHelp": "Mejlen skickas från en no-reply-adress: utan detta når svaren ingen.",
+        "avatarTitle": "Deltagarnas bilder",
+        "gravatarEnabled": "Använd Gravatar när det finns",
+        "gravatarEnabledHelp": "Den som har anmält sig med en e-postadress som har en Gravatar får den som bild i rummet; för alla andra visas initialerna som plattformen genererar. Bilden hämtas via vår egen server, så deltagarnas webbläsare kontaktar aldrig gravatar.com – men plattformen gör det: det måste anges i integritetspolicyn."
+      },
+      "postprod": {
+        "prerequisitesNote": "Efterproduktionen arbetar med hela inspelningen, efter att evenemanget är slut. Den dedikerade GPU-poolen startar när det första jobbet hamnar i kön och stängs av när kön är tom, för att hålla nere kostnaden. Innan du aktiverar pipelinen, kontrollera att klustret har GPU-poolen konfigurerad, NVIDIA-operatorn installerad, HuggingFace-uppgifterna tillgängliga i namespacet och volymen med modellvikterna förladdad. Den operativa checklistan finns i docs/POSTPROD.md.",
+        "pipelineEnabled": "Pipelinen efter evenemang är aktiv",
+        "pipelineEnabledHelp": "Huvudströmbrytare. När den är avstängd produceras ingen transkription, sammanfattning, översättning eller dubbning för nya evenemang, även om enskilda evenemang har efterproduktion påslagen. Redan genererade artefakter visas inte längre publikt förrän du slår på strömbrytaren igen. Praktiskt för att pausa allt utan att distribuera om applikationen.",
+        "timingNote": "Pipelinen rör aldrig direktsändningen. Allt sker efter att evenemanget är slut, när inspelningen arkiveras: undertexter och sammanfattning är aldrig tillgängliga i realtid. Valet prioriterar transkriptionens kvalitet och håller nere GPU-förbrukningen jämfört med livetextning.",
+        "providersSection": "AI-motorer",
+        "providersIntro": "Motorerna som används för transkription, sammanfattning och dubbning deklareras vid driftsättningen. Att lägga till en ny kräver ett ingrepp i infrastrukturen (driftsätta motorn i klustret, registrera den i listan över stödda leverantörer, uppdatera schemat). Rullgardinsmenyerna nedan visar motorerna som för närvarande är tillgängliga på den här instansen.",
+        "asrProvider": "Transkriptionsmotor",
+        "asrProviderHelp": "Genererar videons transkription med tidsangivelser per minut och separering av talare. Vi använder WhisperX large-v3 tillsammans med pyannote.audio för diarisering. Båda modellerna körs i klustret på vikterna som ligger på den dedikerade volymen.",
+        "asrOptionWhisperx": "WhisperX large-v3 + pyannote-diarisering",
+        "llmProvider": "Motor för sammanfattning och översättning",
+        "llmProviderHelp": "Tar fram sammanfattningen av mötet, identifierar ämnena som togs upp och översätter transkription och sammanfattning till målspråken. Modellen Mistral-Small-3.2-24B (europeisk leverantör, licens Apache 2.0) körs via vLLM i klustret.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM i klustret",
+        "ttsEngine": "Dubbningsmotor",
+        "ttsEngineHelp": "Syntetiserar ljudet på de valda språken med förtränade offentliga röster. När det finns flera talare får varje talare en egen röst ur den tillgängliga poolen, för att göra det lättare att följa samtalet: tilldelningen är godtycklig och återger aldrig deltagarnas verkliga röster. Dubbning tas bara fram om arrangören begär det för det enskilda evenemanget.",
+        "ttsOptionPiper": "Piper TTS · förtränade syntetiska röster",
+        "voiceCloningSection": "Redaktionell linje om rösten",
+        "voiceCloningNote": "Systemet använder uteslutande generiska syntetiska röster (Piper TTS, offentliga modeller under MIT-licens). Det analyserar, lagrar eller återger inte deltagarnas röster: varje talare representeras av en röst ur poolen, vald deterministiskt utifrån taltid, utan någon koppling till talarens röstidentitet. Den tilldelade rösten ändras med sammansättningen av talare i varje enskilt evenemang, så samma talare kan dubbas med olika röster i olika evenemang. Detta val utesluter behandling av sådana biometriska uppgifter som omfattas av artikel 9 i GDPR.",
+        "defaultTargetLocales": "Standardspråk för översättning",
+        "defaultTargetLocalesHelp": "ISO-639-1-koder åtskilda med kommatecken (t.ex. `en,fr,de`). De används för evenemang som inte anger egna översättningsspråk. Evenemangets källspråk utesluts alltid automatiskt.",
+        "limitsSection": "Driftsgränser",
+        "maxConcurrentJobs": "Parallella jobb",
+        "maxConcurrentJobsHelp": "Högsta antal jobb som pipelinen kör samtidigt på GPU-poolen. Fler parallella jobb betar av kön snabbare när flera evenemang avslutas efter varandra, men kräver lediga GPU:er. Typiskt värde är 2.",
+        "jobMaxAttempts": "Försök före misslyckande",
+        "jobMaxAttemptsHelp": "Hur många gånger pipelinen gör om ett jobb innan det markeras som misslyckat. Väntetiden mellan försöken växer exponentiellt (från 30 sekunder upp till 2 timmar). Typiskt värde är 5.",
+        "artifactRetentionDays": "Lagring av artefakter (dagar)",
+        "artifactRetentionDaysHelp": "Lämnat på 0 följer AI-artefakterna evenemangets egen lagringstid. Ett värde större än noll behåller dem i angivet antal dagar även efter att evenemanget är stängt, tills ett dagligt cron-jobb raderar dem. Raderingen omfattar talarnas namn och jobbens payload, i linje med docs/GDPR.md.",
+        "consentDisclosureSection": "AI-information i väntrummet",
+        "consentDisclosureHelp": "Text som visas för deltagarna i väntrummet när evenemanget använder AI-efterproduktion (transkription, sammanfattning, översättning, dubbning). Kan anpassas per språk. Lämna tomt för att använda systemets standardtext.",
+        "consentDisclosurePlaceholder": "T.ex. Det här evenemanget kommer att transkriberas och sammanfattas automatiskt med AI-verktyg efter direktsändningen…"
       }
     },
     "analytics": {
@@ -1372,7 +1589,23 @@
       "screen": "Skärmdelning",
       "pickerTitle": "Välj en mall",
       "pickerSubtitle": "Välj en mall för att förkonfigurera evenemangsinställningarna, eller hoppa över för att konfigurera allt manuellt.",
-      "skipTemplate": "Konfigurera manuellt"
+      "skipTemplate": "Konfigurera manuellt",
+      "whiteboardLabel": "Whiteboard",
+      "waitingRoomEngineLabel": "Väntrum (mallens standard)",
+      "waitingRoomEngineSiteDefault": "Webbplatsens standard",
+      "waitingRoomEngineGarden": "Trädgård (standard)",
+      "waitingRoomEngineGame": "Videospel (Phaser-lobby)",
+      "waitingRoomEngineClassic": "Klassiskt (statiskt)",
+      "waitingRoomEngineHelp": "Förifyller väntrumsmotorn i evenemang som skapas från den här mallen. Går fortfarande att ändra i guiden.",
+      "durationLabel": "Standardlängd (minuter)",
+      "durationHint": "Förifyller evenemangets sluttid (start + längd). Användaren kan ändra den. Tomt = 2 timmar.",
+      "retentionLabel": "Standardlagring av data (dagar)",
+      "expectedSpeakersLabel": "Förväntat antal talare (standard)",
+      "descriptionTemplateLabel": "Standardbeskrivning",
+      "descriptionTemplateHint": "Text som förifylls i evenemangets beskrivning (går att ändra).",
+      "aiTranscript": "Automatisk transkribering (standard)",
+      "aiSummary": "Automatisk sammanfattning (standard)",
+      "aiTranslation": "Automatisk översättning (standard)"
     },
     "instantCall": {
       "title": "Omedelbart videosamtal",
@@ -1456,7 +1689,8 @@
       },
       "errors": {
         "saveFailed": "Det gick inte att spara. Kontrollera fälten och försök igen."
-      }
+      },
+      "deleteTitle": "Ta bort mall"
     },
     "emailTemplates": {
       "title": "E-postmallar",
@@ -1637,7 +1871,8 @@
       "play": "Spela",
       "hidePlayer": "Dölj spelaren",
       "download": "Ladda ned",
-      "deleteConfirm": "Vill du radera denna session och dess inspelning?"
+      "deleteConfirm": "Vill du radera denna session och dess inspelning?",
+      "deleteTitle": "Ta bort session"
     },
     "monitoring": {
       "title": "Övervakning",
@@ -1798,7 +2033,9 @@
         "settings": "Inställningar",
         "people": "Personer",
         "content": "Innehåll",
-        "audit": "Inspelningar och revision"
+        "audit": "Inspelningar och revision",
+        "postEvent": "Efter evenemanget",
+        "analytics": "Statistik"
       },
       "toggles": {
         "unmute": "Deltagare får tala",
@@ -1820,7 +2057,22 @@
         "postEventSummary": "{connected} anslöt av {registered} anmälningar (uppskattat {estimated})",
         "estimatedAttendance": "Uppskattat: {estimated} deltagare"
       },
-      "copyGuestUrl": "Kopiera gästlänk"
+      "copyGuestUrl": "Kopiera gästlänk",
+      "aiManageTitle": "Transkription, sammanfattning och översättningar",
+      "aiManageDesc": "Hantera AI-efterproduktionen av den här inspelningen: rätta transkriptionen och tilldelningen av talare (vem som säger vad), redigera sammanfattningen och hantera översättningsspråken.",
+      "aiManageCta": "Öppna hanteringen av efterproduktionen",
+      "aiManageNotEnded": "Tillgängligt när evenemanget är avslutat och inspelningen har bearbetats av AI-pipelinen.",
+      "aiGenerateCta": "Generera AI nu",
+      "aiGenerateRunning": "Startar…",
+      "aiGenerateQueued": "AI-pipelinen har startat: transkription och sammanfattning ligger i kö. Följ förloppet i hanteringen av efterproduktionen.",
+      "aiGenerateAlready": "AI-pipelinen hade redan startats för den här inspelningen: inga nya jobb har lagts till.",
+      "aiGenerateError": "Det gick inte att starta AI-pipelinen. Kontrollera att AI är aktiverat för hela webbplatsen och att det finns en inspelning.",
+      "aiGenerateHelp": "Aktiverar AI-transkription och sammanfattning och startar pipelinen på inspelningen, med ett klick. Idempotent: att klicka två gånger dubblerar inte jobben.",
+      "aiGenerateNoRecording": "Ingen inspelning: AI efter evenemanget kräver en inspelning (inspelning sker bara under evenemanget). Du kan ändå hantera efterproduktionen här.",
+      "duplicateNext": "Duplicera till nästa gång",
+      "duplicateNextBusy": "Duplicerar…",
+      "duplicateNextHint": "Skapar ett utkast med hela konfigurationen från det här evenemanget (inspelning, separata spår, AI, agenda, påminnelser). Om evenemanget är återkommande flyttas datumet till nästa tillfälle; annars får du ange det själv.",
+      "duplicateNextError": "Dupliceringen misslyckades. Försök igen."
     },
     "rubrica": {
       "title": "Adressbok",
@@ -1838,6 +2090,299 @@
     "eventQuestionnaires": {
       "title": "Enkäter — {eventTitle}",
       "subtitle": "Konfigurera en förregistrerings- och/eller eftermöteenkät genom att kombinera mallar och ad hoc-frågor."
+    },
+    "eventAnalytics": {
+      "title": "Statistik",
+      "loadError": "Det gick inte att läsa in statistiken.",
+      "noData": "Inga uppgifter tillgängliga.",
+      "notEndedYet": "Evenemanget är inte avslutat ännu: statistiken är ofullständig och uppdateras i realtid.",
+      "cappedNote": "Mycket stort evenemang: vissa mått är beräknade på ett urval (radgränsen har nåtts).",
+      "scoreTitle": "Uppmärksamhetsgrad",
+      "adminOnly": "endast admin",
+      "scoreProxy": "Ett index 0–100 för hur delaktig publiken var. Det är en indikator på delaktighet, inte ett mått på kognitiv uppmärksamhet – läs det med evenemangets format i åtanke (föreläsning kontra workshop), aldrig som ett kvalitetsbetyg.",
+      "scoreUnavailable": "Otillräckliga data för att beräkna graden.",
+      "comp": {
+        "attendanceRate": "Närvaro (deltog/anmälda)",
+        "breadth": "Interaktionens bredd",
+        "depth": "Interaktionens djup",
+        "chatRate": "Chattempo",
+        "liveParticipation": "Deltagande live",
+        "talkBalance": "Balans i taltid",
+        "retention": "Kvarstannande"
+      },
+      "kpiConversion": "Konvertering",
+      "kpiPeak": "Toppantal deltagare",
+      "kpiDuration": "Längd",
+      "kpiInteractors": "Unika interagerande",
+      "interactionsWord": "interaktioner",
+      "kpiHandRaises": "Handuppräckningar",
+      "handRaisesSessionsSub": "från {n, plural, one {# session} other {# sessioner}}",
+      "kpiReactions": "Reaktioner",
+      "kpiRetention": "Genomsnittligt kvarstannande",
+      "dwellSub": "{d} · {n, plural, one {# uppmätt} other {# uppmätta}}",
+      "reactionsTitle": "Reaktioner",
+      "timelineTitle": "Aktiviteten under samtalet",
+      "timelineEmpty": "Ingen interaktion registrerades under samtalet.",
+      "timelinePeak": "Interaktionen nådde sin topp {at} ({n} händelser i intervallet).",
+      "kind": {
+        "chat": "Chatt",
+        "question": "Frågor",
+        "upvote": "Röster",
+        "poll": "Omröstningar",
+        "word": "Ordmoln",
+        "reaction": "Reaktioner"
+      },
+      "speakersTitle": "Vem som talade",
+      "audioUnavailable": "Ljudstatistik är inte tillgänglig – evenemanget spelades inte in (eller inspelningen saknade tal).",
+      "predominant": "Dominerande talare",
+      "talkBalance": "Balans",
+      "speechDensity": "Taldensitet",
+      "chatTitle": "Chatt",
+      "chatAudience": "Publik",
+      "chatStaff": "Personal",
+      "qaTitle": "Frågor med flest röster",
+      "none": "Inga.",
+      "pollsTitle": "Omröstningar",
+      "wordsTitle": "Ordmoln",
+      "feedbackTitle": "Feedback",
+      "responses": "svar",
+      "privacyNote": "Statistik per person är pseudonymiserad som standard. Anonyma aggregat sparas i evenemangets sammanfattning; rådata raderas när lagringstiden går ut."
+    },
+    "postprod": {
+      "title": "AI-pipeline för efterproduktion",
+      "subtitle": "Transkriptioner, sammanfattningar och översättningar framtagna av AI-pipelinen i klustret. Mappa talare, kör om eller avbryt jobb.",
+      "filterStatus": "Status",
+      "all": "Alla",
+      "queued": "I kö",
+      "running": "Körs",
+      "done": "Klart",
+      "partial": "Delvis",
+      "failed": "Misslyckat",
+      "totalRows": "{count, plural, =0 {inga inspelningar} one {1 inspelning} other {# inspelningar}}",
+      "colEvent": "Evenemang",
+      "colCreated": "Skapad",
+      "colDuration": "Längd",
+      "colStatus": "Status",
+      "colJobs": "Jobb",
+      "colArtifacts": "Artefakter",
+      "colActions": "Åtgärder",
+      "rerun": "Kör om",
+      "rerunTooltip": "Skapar en ny körning genom att öka runCount; tidigare artefakter finns kvar tills lagringstiden går ut",
+      "cancel": "Avbryt",
+      "cancelConfirm": "Vill du avbryta alla väntande jobb för den här inspelningen?",
+      "rerunFailed": "Omkörningen misslyckades (HTTP {code})",
+      "cancelFailed": "Det gick inte att avbryta (HTTP {code})",
+      "speakerUpdateFailed": "Uppdateringen av talaren misslyckades (HTTP {code})",
+      "loadError": "Det gick inte att läsa in joblistan",
+      "empty": "Inga inspelningar matchar de aktuella filtren",
+      "detailJobs": "Jobb",
+      "detailArtifacts": "Artefakter",
+      "detailSpeakers": "Talare",
+      "noArtifacts": "Inga artefakter har producerats ännu",
+      "noSpeakers": "Inga talare har upptäckts",
+      "attempts": "försök {n}",
+      "speakerPlaceholder": "Riktigt namn (valfritt)",
+      "speakerSpoke": "Taltid: {sec} s",
+      "suggestedApply": "Använd förslaget: {name}",
+      "suggestedTitle": "Namn som AI-pipelinen föreslår utifrån egennamn som nämns i transkriptionen. Klicka för att fylla i fältet (du kan fortfarande ändra det innan du sparar).",
+      "save": "Spara",
+      "editTranscript": "Redigera transkriptionen",
+      "editClose": "Stäng redigeraren",
+      "editTranscriptTitle": "Transkriptionsredigerare",
+      "editHint": "Rätta texten eller byt talare för varje segment. När du sparar uppdateras transkriptionen och undertexterna på källspråket. Översättningarna och dubbningen genereras INTE på nytt: använd ”Kör om” om du behöver dem uppdaterade även på de andra språken.",
+      "editLoading": "Läser in transkriptionen…",
+      "editLoadError": "Det gick inte att läsa in transkriptionen (HTTP {code}).",
+      "editNotReady": "Det finns ingen transkription för den här inspelningen ännu. Starta (eller kör om) AI-bearbetningen från kontrollerna ovan: transkriptionen är första steget, sedan kan du rätta den här och generera sammanfattning och översättningar.",
+      "editProcessing": "AI-bearbetning pågår: transkriptionen visas här när den är klar. Uppdatera sidan om några minuter.",
+      "editSessionExpired": "Adminsessionen har gått ut. Ladda om sidan och logga in igen för att redigera transkriptionen.",
+      "editEmpty": "Inga redigerbara segment",
+      "editSpeakerNone": "— ingen —",
+      "editSave": "Spara ändringarna",
+      "editSaving": "Sparar…",
+      "editDirty": "{n, plural, one {1 osparad ändring} other {# osparade ändringar}}",
+      "editSaved": "Sparat: {text} texter, {speaker} talare.",
+      "editFailed": "Sparandet misslyckades (HTTP {code})",
+      "editFailedDetail": "Sparandet misslyckades: {message}",
+      "editMediaError": "Det gick inte att läsa in inspelningens ljud: uppspelning är inte tillgänglig. Du kan ändå rätta texten och talarna i segmenten.",
+      "summaryLoadError": "Det gick inte att läsa in sammanfattningen.",
+      "summaryLoading": "Läser in sammanfattningen…",
+      "summaryEmptyProcessing": "AI-sammanfattningen är inte klar ännu: bearbetningen pågår. Uppdatera sidan om några minuter.",
+      "summaryEmptyFailed": "Genereringen av sammanfattningen misslyckades. Kontrollera pipelinens status och kör om bearbetningen från kontrollerna ovan.",
+      "summaryEmptyNone": "Ingen AI-sammanfattning har genererats för den här inspelningen. Starta bearbetningen från kontrollerna ovan.",
+      "editSeek": "Hoppa till den här punkten i videon",
+      "manageTabTranscript": "Transkription",
+      "manageTabSummary": "Sammanfattning",
+      "manageTabTranslations": "Översättningar",
+      "manageTabArchive": "Arkiv",
+      "manageTabReliability": "Tillförlitlighet",
+      "manageLoading": "Läser in…",
+      "archivePiiNote": "Isolerade ljudspår per deltagare är känsliga personuppgifter (isolerad röst): det här avsnittet är förbehållet administratörer och moderatorer och visas aldrig publikt.",
+      "archiveNoTracks": "Inga spår per deltagare finns för den här inspelningen (flerspårsinspelning är inte aktiverad, eller så är spåren redan raderade för GDPR-minimering).",
+      "archivePlayerTitle": "Uppspelning per talare",
+      "archiveAudioHint": "Använd spelarens väljare ”Ljud” för att lyssna på mixen eller på en enskild deltagares isolerade spår, synkroniserat med videon.",
+      "archiveTitle": "Nedladdningsbart arkiv",
+      "archiveIntro": "Skapa en MKV-fil med videon, ett ljudspår per deltagare (märkt med namnet, exakt synkroniserat) och undertexterna. Den är tänkt för nedladdning och arkivering: webbläsare kan inte byta ljudspår i en MKV, så använd spelaren ovan för att lyssna.",
+      "archiveGenerate": "Skapa arkiv",
+      "archiveStatusLabel": "Status",
+      "archiveStatus_none": "inte skapat",
+      "archiveStatus_pending": "i kö",
+      "archiveStatus_running": "bearbetas",
+      "archiveStatus_done": "klart",
+      "archiveStatus_failed": "misslyckat",
+      "archiveDownload": "Ladda ner MKV",
+      "archiveGenerateOk": "Skapandet av arkivet har startat.",
+      "archiveGenerateErr": "Skapandet av arkivet misslyckades (HTTP {code}).",
+      "archiveTrackFallback": "Deltagare",
+      "manageBackToList": "Alla inspelningar",
+      "manageDuration": "Längd",
+      "manageSource": "Källspråk",
+      "manageOpenPublic": "Publik sida",
+      "manageRerunOk": "Omkörningen av pipelinen har startat.",
+      "manageRerunNoop": "Inget jobb startades: AI är avstängt för det här evenemanget, eller så är pipelinen pausad. Använd ”Generera AI”.",
+      "manageRerunAlreadyQueued": "Bearbetningen ligger redan i kö: inget nytt att starta.",
+      "generateAi": "Generera AI",
+      "generateAiConfirm": "Kör AI-pipelinen (transkription och sammanfattning) på den här inspelningen. AI-bearbetning aktiveras för evenemanget och startar i bakgrunden. Översättningar läggs till efteråt, ett språk i taget, från fliken ”Översättningar”.",
+      "generateAiOk": "AI-pipelinen har startat.",
+      "manageOpen": "Hantera",
+      "cancelConfirmTitle": "Avbryt efterproduktionen",
+      "speakerUpdateSuccess": "Talaren har uppdaterats",
+      "tm": {
+        "loading": "Läser in översättningsspråken…",
+        "loadError": "Det gick inte att läsa in översättningsspråken.",
+        "title": "Översättningsspråk",
+        "sourceLabel": "Källspråk:",
+        "already": "Redan översatta:",
+        "noneYet": "Inga översättningar ännu.",
+        "addLabel": "Lägg till ett språk",
+        "noneAvailable": "Inga språk tillgängliga",
+        "selectPlaceholder": "Välj ett språk…",
+        "adding": "Lägger till…",
+        "addButton": "Lägg till språk",
+        "unexpectedError": "Oväntat fel",
+        "note": "När du lägger till ett språk genereras översättningen av transkription och sammanfattning – och ljuddubbningen, om den är aktiverad för evenemanget. Bearbetningen sker i bakgrunden.",
+        "summary": "Sammanfattning",
+        "subtitles": "Undertexter",
+        "dub": "Dubbning",
+        "download": "ladda ner",
+        "allTranslated": "Alla aktiva språk är redan översatta.",
+        "translatedHeader": "Översatta språk"
+      },
+      "ov": {
+        "tab": "Översikt",
+        "intro": "Vad AI-pipelinen har producerat för den här inspelningen, språk för språk.",
+        "processing": "Bearbetning pågår eller inga artefakter ännu. Kom tillbaka när statusen är ”Klart”.",
+        "loadError": "Det gick inte att läsa in översikten.",
+        "langsTitle": "Språk och artefakter",
+        "colLang": "Språk",
+        "colTranscript": "Transkription",
+        "colSummary": "Sammanfattning",
+        "colSubtitles": "Undertexter",
+        "colDub": "Dubbning",
+        "source": "original",
+        "present": "tillgänglig",
+        "absent": "saknas",
+        "listen": "Lyssna",
+        "download": "Ladda ner",
+        "dubTitle": "Ljuddubbning (en röst per talare, synkroniserad)",
+        "dubNone": "Ingen dubbning har producerats.",
+        "summaryTitle": "Sammanfattning",
+        "summaryLang": "Språk",
+        "summaryNone": "Ingen sammanfattning tillgänglig.",
+        "decisions": "Beslut",
+        "actions": "Att göra-punkter",
+        "topics": "Kapitel",
+        "speakersTitle": "Talare",
+        "speakerAnon": "ej tilldelad",
+        "speakerRenameHint": "Byt namn på talarna för att rätta namnen: namnet ersätter den anonyma etiketten i transkriptionen och på den publika sidan.",
+        "speakerNamePlaceholder": "Riktigt namn (t.ex. Mario Rossi)",
+        "speakerNameAria": "Namn för",
+        "save": "Spara",
+        "saving": "Sparar…",
+        "saved": "Sparat",
+        "saveError": "Fel",
+        "editHint": "Använd flikarna ovan för att rätta text, namn eller sammanfattning.",
+        "kpiDuration": "Längd",
+        "kpiParticipants": "Deltagare (som mest)",
+        "kpiTracks": "Ljudspår",
+        "kpiLanguages": "Språk",
+        "kpiArtifacts": "Artefakter",
+        "kpiProcessed": "Bearbetad",
+        "statusLabel": "Status",
+        "run": "körning",
+        "jobsTitle": "Pipelinens förlopp",
+        "jobsNone": "Inga jobb för den här inspelningen.",
+        "attempts": "{n} försök",
+        "filesTitle": "Filer i lagringen",
+        "filesNone": "Inga filer hittades i lagringen.",
+        "filesToggle": "Visa/dölj de {n} filerna",
+        "tracksTitle": "Spår per deltagare",
+        "tracksNone": "Inga spår per deltagare (flerspår är avstängt eller spåren är redan raderade).",
+        "trackPurged": "raderat (GDPR)",
+        "trackEnters": "anslöt +{s} s",
+        "metricsTitle": "Mått för sammanfattningen (LLM)",
+        "chars": "tecken",
+        "model": "Modell",
+        "notAvailable": "ej tillg."
+      },
+      "rel": {
+        "title": "AI-tillförlitlighet",
+        "subtitle": "Hur tillförlitligt det AI-genererade resultatet är för den här inspelningen.",
+        "loading": "Analyserar tillförlitligheten…",
+        "loadError": "Det gick inte att läsa in måtten för tillförlitlighet.",
+        "noData": "Ingen AI-bearbetning för den här inspelningen.",
+        "level": {
+          "good": "Tillförlitlig",
+          "fair": "Acceptabel",
+          "poor": "Svag",
+          "failed": "Otillförlitlig"
+        },
+        "overallScore": "Sammantagen konfidens",
+        "totalTime": "Bearbetningstid",
+        "sourceLang": "Källspråk",
+        "transcriptTitle": "Transkribering",
+        "segments": "Segment",
+        "speakers": "Talare",
+        "speech": "Upptäckt tal",
+        "confidence": "Genomsnittlig konfidens",
+        "silence": "Uppskattad tystnad",
+        "coverage": "Taltäckning",
+        "lowConf": "Segment med låg konfidens",
+        "transcriptNotProduced": "Transkriptionen har inte producerats ännu (pipelinen har inte körts).",
+        "transcriptUnavailable": "Transkriptionen finns men kan inte analyseras här (arkiverad i objektlagringen).",
+        "stagesTitle": "Pipelinens steg",
+        "colStage": "Steg",
+        "colStatus": "Status",
+        "colModel": "Modell",
+        "colTime": "Längd",
+        "colLangs": "Språk",
+        "warn": {
+          "transcriptEmpty": "Tom transkription: källjudet verkar tyst eller sakna tal. Sammanfattningen, översättningarna och dubbningen som härleds ur den är INTE tillförlitliga.",
+          "lowConfidence": "Låg konfidens i transkriptionen: granska texten innan du publicerar den.",
+          "manyLowConfSegments": "Många segment med låg konfidens: transkriptionen kan innehålla fel.",
+          "highNoSpeech": "Ljudet är till stor del tyst eller utan tal: transkriptionen kan vara hallucinerad.",
+          "stageFailed": "Steget ”{stage}” misslyckades.",
+          "stageRetried": "Steget ”{stage}” slutfördes efter flera försök."
+        },
+        "stage": {
+          "TRANSCRIBE": "Transkribering",
+          "TRANSCRIBE_MULTITRACK": "Transkribering (flerspår)",
+          "SUMMARIZE": "Sammanfattning",
+          "TRANSLATE": "Översättning",
+          "SUBTITLE": "Undertexter",
+          "DUB": "Dubbning",
+          "ARCHIVE": "Arkiv"
+        },
+        "status": {
+          "PENDING": "Väntar",
+          "CLAIMED": "Tilldelat",
+          "RUNNING": "Pågår",
+          "DONE": "Klart",
+          "FAILED": "Misslyckat"
+        }
+      },
+      "archiveSourceTitle": "Källinspelning",
+      "archiveSourceHint": "Evenemangets originalvideo. Separata spår per deltagare och MKV-arkivet kräver flerspårsinspelning (inte aktiverad för det här evenemanget).",
+      "archiveSourceDownload": "Ladda ner originalvideon"
     }
   },
   "email": {
@@ -2326,7 +2871,31 @@
     "overallStatus": "Övergripande status",
     "lastChecked": "Senast kontrollerad",
     "responseTime": "Svarstid",
-    "systemStatus": "Systemstatus"
+    "systemStatus": "Systemstatus",
+    "postprod": {
+      "title": "Pipeline efter evenemanget",
+      "subtitle": "Transkription, sammanfattning, översättning och dubbning av inspelningen",
+      "whatItDoes": "När ett evenemang är slut går inspelningen genom en intern pipeline: transkriptionen tas fram av WhisperX, sammanfattningen och översättningarna av en Mistral-modell, det dubbade ljudet av Piper TTS. Alla modeller körs på en GPU i klustret som bara är påslagen så länge arbetet pågår, så att energiförbrukningen följer den faktiska belastningen.",
+      "status": {
+        "idle": "Väntar",
+        "running": "Körs",
+        "degraded": "Försämrad"
+      },
+      "aiBadge": "Transkriptionen, sammanfattningen och dubbningen för det här evenemanget är genererade av AI-modeller och kan innehålla felaktigheter. Utgå alltid från originalvideon när du behöver full säkerhet.",
+      "idleMessage": "Pipelinen är redo, inga inspelningar att bearbeta just nu.",
+      "queueAriaLabel": "Sammansättningen av efterproduktionskön",
+      "queuePending": "i kö",
+      "queueRunning": "pågår",
+      "queueDone": "slutförda",
+      "queueFailed": "misslyckade",
+      "asrProvider": "Transkription",
+      "llmProvider": "Sammanfattning/Översättning",
+      "targetLocales": "Målspråk",
+      "lastSuccess": "Senast lyckad {when}",
+      "lastFailure": "Senast misslyckad {when}",
+      "artifactsProduced": "{count, plural, =0 {inga artefakter} one {1 artefakt producerad} other {# artefakter producerade}}",
+      "eventsEnabled": "{count, plural, =0 {inga evenemang med AI} one {1 evenemang med aktiv AI} other {# evenemang med aktiv AI}}"
+    }
   },
   "infraMap": {
     "loading": "Laddar infrastrukturkarta...",
@@ -2388,7 +2957,8 @@
       "jicofo": "Konferenskoordinator",
       "jvb": "Videobrygga",
       "jibri": "Videoinspelning",
-      "smtp": "E-posttjänst"
+      "smtp": "E-posttjänst",
+      "postprod": "AI-pipeline efter evenemanget"
     },
     "descriptions": {
       "app": "Webbplatsen där du kommer åt evenemang",
@@ -2399,7 +2969,8 @@
       "jicofo": "Koordinerar vem som deltar i varje konferens",
       "jvb": "Överför ljud och video till deltagare",
       "jibri": "Spelar in videosessioner av evenemang",
-      "smtp": "Skickar bekräftelsemeddelanden och påminnelser"
+      "smtp": "Skickar bekräftelsemeddelanden och påminnelser",
+      "postprod": "Transkriberar, sammanfattar och översätter inspelningar med AI-modeller i klustret (NVIDIA A100-GPU). Aktiveras bara när ett evenemang använder AI-funktionerna."
     },
     "verdicts": {
       "app": {
@@ -2447,6 +3018,12 @@
       "smtp": {
         "healthy": "E-posttjänsten är konfigurerad och redo att skicka aviseringar.",
         "standby": "E-posttjänsten är inte konfigurerad. Bekräftelsemeddelanden och påminnelser kommer inte att skickas."
+      },
+      "postprod": {
+        "healthy": "AI-pipelinen bearbetar en inspelning (GPU-worker aktiv).",
+        "scaling": "Postprod-jobb i kö – GPU-noden startar upp (kallstart ca 3 min).",
+        "standby": "AI-pipelinen är aktiverad men vilande: inga inspelningar att bearbeta. GPU-noden är avstängd för att spara energi.",
+        "degraded": "Ett eller flera AI-jobb har misslyckats de senaste 24 timmarna. Kontrollera /admin/postprod för detaljer."
       }
     },
     "impacts": {
@@ -2459,7 +3036,8 @@
       "jvbStale": "Ett evenemang väntar på bridgen längre än konfigurerad timeout: deltagarna kan inte ansluta.",
       "jibri": "Evenemang kan inte spelas in. Deltagare kan fortfarande ansluta och delta.",
       "jibriStale": "Ett evenemang med aktiv inspelning väntar på Jibri längre än timeouten: sessionen spelas inte in.",
-      "smtp": "Bekräftelsemeddelanden och påminnelser skickas inte."
+      "smtp": "Bekräftelsemeddelanden och påminnelser skickas inte.",
+      "postprodDegraded": "Transkriptioner och sammanfattningar för några av de senaste inspelningarna har inte genererats. Videoinspelningarna är ändå tillgängliga."
     },
     "overallVerdicts": {
       "operational": "Alla tjänster fungerar korrekt. Plattformen är fullt operativ.",
@@ -2500,7 +3078,8 @@
       "errorRate": "5xx-fel",
       "requestRate": "Förfrågningar/s",
       "podUptime": "Pod-drifttid"
-    }
+    },
+    "connPostprod": "AI-efterproduktion"
   },
   "feedback": {
     "title": "Hur bedömer du detta evenemang?",
@@ -2590,7 +3169,8 @@
     "buildInfoDev": "utvecklingsbygge",
     "viewCommit": "Visa commit på GitHub",
     "viewRelease": "Visa version på GitHub",
-    "buildDatePrefix": "Byggd den"
+    "buildDatePrefix": "Byggd den",
+    "viewChangelog": "Se vad som är nytt (changelog)"
   },
   "pages": {
     "privacyTitle": "Integritetspolicy",
@@ -2609,7 +3189,26 @@
     "unmute": "Slå på ljud",
     "download": "Ladda ned inspelning",
     "speedLabel": "Uppspelningshastighet",
-    "progress": "Förloppsindikator"
+    "progress": "Förloppsindikator",
+    "subtitles": "Undertexter",
+    "subtitlesOff": "Av",
+    "audioLabel": "Ljud",
+    "audioOriginal": "Original",
+    "audioSyntheticBanner": "AI-dubbat ljud – syntetisk röst, automatiskt genererat innehåll.",
+    "audioSyntheticHint": "AI-genererat ljud",
+    "shortcutsHelpOpen": "Visa kortkommandon",
+    "shortcutsHelpClose": "Stäng kortkommandon",
+    "shortcutsTitle": "Kortkommandon",
+    "shortcutsSpace": "Spela upp eller pausa",
+    "shortcutsArrowsLR": "Hoppa bakåt eller framåt 5 sekunder",
+    "shortcutsArrowsUD": "Sänk eller höj volymen med 5 %",
+    "shortcutsJL": "Hoppa bakåt eller framåt 10 sekunder",
+    "shortcutsM": "Slå på eller av ljudet",
+    "shortcutsC": "Visa eller dölj undertexterna",
+    "shortcutsF": "Helskärm",
+    "shortcutsSpeed": "Sänk eller höj hastigheten",
+    "captionsOn": "Undertexter på",
+    "captionsOff": "Undertexter av"
   },
   "diagram": {
     "title": "Evenemangskonfiguration",
@@ -2740,7 +3339,11 @@
     "notConfigured": "Jibri är inte konfigurerat. Videoinspelning är inte tillgänglig.",
     "disabledHint": "Videoinspelning är inte aktiverad för detta evenemang. För att aktivera, öppna avsnittet Inställningar ovan och slå på \"Inspelning\".",
     "play": "Spela upp",
-    "download": "Ladda ned"
+    "download": "Ladda ned",
+    "transcriptManage": "Transkription / AI",
+    "deleteConfirmTitle": "Ta bort inspelning",
+    "deleteFailed": "Borttagningen misslyckades",
+    "deleteSuccess": "Inspelningen har tagits bort"
   },
   "postEvent": {
     "config": "Konfiguration efter evenemang",
@@ -2758,8 +3361,17 @@
       "qa": "Frågor och svar",
       "materials": "Material",
       "polls": "Omröstningar",
-      "feedback": "Feedback"
-    }
+      "feedback": "Feedback",
+      "transcript": "AI-transkription"
+    },
+    "pageVisibleHelp": "Om den är avstängd (eller när synlighetsfönstret har gått ut) returnerar det avslutade evenemangets publika sida 404 och evenemanget försvinner från listor och sitemap.",
+    "libraryListed": "Publicera i videobiblioteket",
+    "libraryListedHelp": "Visa det här evenemanget i det publika biblioteket (/video-library). Kräver en publicerad inspelning eller en YouTube-video, och att evenemangssidan är synlig.",
+    "libraryListedNoRecording": "Ingen publicerad inspelning: evenemanget visas inte i biblioteket förrän du publicerar inspelningen eller lägger till en YouTube-video.",
+    "showRecap": "Visa sammanfattningen av evenemanget",
+    "showWordCloud": "Visa ordmoln",
+    "emailEnabled": "Skicka sammanfattningsmejl när evenemanget avslutas",
+    "emailEnabledHelp": "Vid avslutningen skickas ett tackmejl till de anmälda deltagarna med länkar till sammanfattningen och feedbacken, och en kort sammanfattning till moderatorn. Skickas bara en gång."
   },
   "provisioning": {
     "loading": "Laddar",
@@ -2829,5 +3441,125 @@
     "noComments": "No comments",
     "yes": "Ja",
     "no": "Nej"
+  },
+  "agenda": {
+    "title": "Anteckningar / Checklista",
+    "empty": "Inga punkter ännu. Lägg till ämnena som ska tas upp och bocka av dem efter hand.",
+    "add": "Lägg till",
+    "addPlaceholder": "Ny punkt…",
+    "remove": "Ta bort",
+    "inProgress": "pågår",
+    "agree": "Instämmer",
+    "disagree": "Instämmer inte",
+    "favorablePct": "{pct} % instämmer",
+    "noReactions": "Dela din åsikt"
+  },
+  "changelog": {
+    "metaTitle": "Nyheter och changelog",
+    "title": "Nyheter och changelog",
+    "intro": "Alla versioner av plattformen, med den senaste först. Varje post sammanfattar de viktigaste nyheterna, rättningarna och förbättringarna.",
+    "current": "Aktuell version",
+    "sourceNote": "Noteringarna är sammanställda utifrån projektets taggar, pull requests och commits.",
+    "sourceLink": "Se alla releaser på GitHub",
+    "cadence": "Släpptakt",
+    "cadenceSummary": "{count} versioner mellan {from} och {to}.",
+    "releaseNotes": "Versionsinformation och SBOM",
+    "rawChangelog": "CHANGELOG.md i förvaret"
+  },
+  "postprod": {
+    "loading": "Läser in transkriptionen…",
+    "loadError": "Det gick inte att läsa in transkriptionen: {error}",
+    "empty": "Ingen transkription tillgänglig för det här evenemanget.",
+    "tabTranscript": "Transkription",
+    "tabSummary": "Sammanfattning",
+    "aiBadgeLabel": "AI-genererat innehåll",
+    "aiBadgeBody": "Transkription och sammanfattning tas fram automatiskt av AI-pipelinen i klustret. De kan innehålla fel; videon förblir den auktoritativa källan.",
+    "searchPlaceholder": "Sök i transkriptionen…",
+    "searchLabel": "Sök i transkriptionen",
+    "searchClear": "Rensa sökningen",
+    "searchNoMatches": "Inga resultat för ”{query}”.",
+    "searchMatches": "{count, plural, =1 {1 träff} other {# träffar}}",
+    "downloadLabel": "Ladda ner",
+    "downloadMenu": "Nedladdningsalternativ",
+    "downloadTranscriptTxt": "Transkription (.txt)",
+    "downloadTranscriptSrt": "Undertexter (.srt)",
+    "downloadTranscriptVtt": "Undertexter (.vtt)",
+    "downloadSummaryMd": "Sammanfattning (.md)",
+    "hero": {
+      "badge": "Automatisk sammanfattning",
+      "aiActArt50": "AI-genererat innehåll",
+      "title": "I korthet",
+      "availableIn": "Sammanfattningen finns också på {langs}",
+      "summaryLanguageLabel": "Sammanfattningens språk",
+      "topicsLabel": "Kapitel – klicka för att hoppa till den punkten i videon",
+      "keyDecisions": "Fattade beslut",
+      "actionItems": "Att göra-punkter",
+      "expandDetails": "Visa beslut och åtgärder",
+      "collapseDetails": "Dölj beslut och åtgärder"
+    },
+    "nowSpeaking": "Talar nu",
+    "shareSegment": "Dela den här punkten",
+    "shareSegmentCopied": "Länken har kopierats till urklipp",
+    "bookmarkAdd": "Spara i bokmärken",
+    "bookmarkRemove": "Ta bort bokmärket",
+    "bookmarksHeader": "Dina bokmärken",
+    "bookmarksEmpty": "Du har inte sparat några punkter i videon ännu. Öppna ett segment i transkriptionen och klicka på stjärnan för att lägga till det i listan.",
+    "miniPlayerOpen": "Ta fram videon igen",
+    "miniPlayerClose": "Stäng minispelaren",
+    "miniPlayerHint": "Håll videon nära medan du bläddrar på sidan",
+    "followLive": "Följ videon",
+    "followManual": "Fri läsning",
+    "followResume": "Följ videon igen",
+    "lowConfidenceBadge": "granska",
+    "lowConfidenceTitle": "Den här delen av transkriptionen har låg konfidens: inspelningen kan innehålla andra ord. Utgå alltid från originalvideon.",
+    "miniTranscriptLabel": "Live-transkription",
+    "dubAvailableHint": "Dubbat ljud finns på {langs}. Använd ljudväljaren i spelarens kontroller för att lyssna på den översatta versionen.",
+    "provenance": {
+      "triggerLabel": "Transparens om AI-bearbetningen",
+      "closeLabel": "Dölj detaljerna om bearbetningen",
+      "intro": "Det här är modellerna som har genererat transkriptionen, sammanfattningen och dubbningen av den här inspelningen. Ögonblicksbilden sparas när bearbetningen är klar: du ser vad som faktiskt användes just då, oavsett senare ändringar i inställningarna.",
+      "asr": {
+        "title": "Transkription",
+        "hint": "Taligenkänning och separering av talare.",
+        "engine": "Motor",
+        "model": "Modell",
+        "version": "Version",
+        "diarizationEngine": "Diarisering",
+        "diarizationSpeakers": "Upptäckta talare"
+      },
+      "llm": {
+        "title": "Sammanfattning och översättning",
+        "hint": "Sammanfattning av mötet och översättning av transkription och sammanfattning.",
+        "engine": "Serveras av",
+        "model": "Modell",
+        "vendor": "Leverantör",
+        "license": "Licens",
+        "country": "Säte"
+      },
+      "tts": {
+        "title": "Dubbning",
+        "hint": "Talsyntes för att generera ljudet på målspråken.",
+        "engine": "Motor",
+        "license": "Licens",
+        "policy": "Regel för rösttilldelning"
+      },
+      "languages": {
+        "title": "Behandlade språk",
+        "hint": "Inspelningens källspråk och målspråken för översättning och dubbning.",
+        "source": "Originalspråk",
+        "translation": "Översättningar",
+        "dubbing": "Dubbningar",
+        "none": "Inga"
+      },
+      "voices": {
+        "title": "Syntetiska röster tilldelade talarna",
+        "male": "manlig röst",
+        "female": "kvinnlig röst"
+      },
+      "runAt": "Bearbetningen slutfördes den",
+      "version": "Pipelineversion"
+    },
+    "overlapBadge": "samtidigt",
+    "overlapTitle": "Samtidigt tal: i det här intervallet talar mer än en person samtidigt."
   }
 }

@@ -96,7 +96,11 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Descargar archivo .ics"
-      }
+      },
+      "alreadyRegisteredEnter": "¿Ya te has inscrito? Entra en la sala",
+      "invalidTokenTitle": "El enlace de acceso ya no es válido",
+      "invalidTokenBody": "El enlace que has usado no es válido o ha caducado. Si te inscribiste, consulta el correo de confirmación para encontrar tu enlace personal, o vuelve a inscribirte más abajo.",
+      "invalidTokenBodyEnded": "El enlace que has usado ya no es válido. El evento ha terminado: más abajo encontrarás la grabación y los materiales."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -116,6 +120,20 @@
     "list": {
       "filterByTag": "Filtrar por categoría",
       "allTags": "Todas"
+    },
+    "wordCloudTitle": "Nube de palabras",
+    "recap": {
+      "title": "Resumen del evento",
+      "intro": "Una síntesis de lo que surgió durante el evento.",
+      "participants": "Participantes (pico)",
+      "registered": "Inscritos",
+      "topQuestions": "Preguntas más votadas",
+      "upvotes": "{count, plural, =0 {ningún voto} one {1 voto} other {# votos}}",
+      "polls": "Resultados de las encuestas",
+      "votes": "{count, plural, =0 {ningún voto} one {1 voto} other {# votos}}",
+      "topWords": "Palabras más compartidas",
+      "feedback": "Valoración media",
+      "feedbackCount": "{count, plural, one {1 respuesta} other {# respuestas}}"
     }
   },
   "registration": {
@@ -164,8 +182,11 @@
       "consentRequired": "El consentimiento para el tratamiento de datos es obligatorio",
       "recordingConsentRequired": "El consentimiento para la grabación es obligatorio para este evento",
       "eventFull": "El evento ha alcanzado el número máximo de participantes",
-      "generic": "Error durante la inscripción. Inténtelo de nuevo."
-    }
+      "generic": "Error durante la inscripción. Inténtelo de nuevo.",
+      "multitrackConsentRequired": "El consentimiento para grabar tu pista de audio es obligatorio en este evento"
+    },
+    "successScheduledMessage": "¡Te has inscrito! Te hemos enviado un correo con tu enlace personal de acceso. Añade el evento a tu calendario y vuelve aquí poco antes de que empiece.",
+    "addToCalendar": "Añadir al calendario"
   },
   "videoLibrary": {
     "title": "Biblioteca de vídeos",
@@ -252,7 +273,33 @@
       "noMessages": "No hay mensajes",
       "empty": "Aún no hay mensajes. ¡Sea el primero en escribir!",
       "inputLabel": "Mensaje de chat",
-      "moderatorBadge": "Moderador"
+      "moderatorBadge": "Moderador",
+      "attach": "Adjuntar un archivo",
+      "emojiPicker": "Insertar un emoji",
+      "attachBadType": "Tipo de archivo no admitido (imágenes o PDF).",
+      "attachTooLarge": "Archivo demasiado grande (máx. 10 MB).",
+      "attachFailed": "No se ha podido subir el archivo. Inténtalo de nuevo.",
+      "sendFailed": "No se ha podido enviar el mensaje. Inténtalo de nuevo.",
+      "removeAttachment": "Quitar el adjunto",
+      "openAttachment": "Abrir el adjunto",
+      "reply": "Responder",
+      "replyingTo": "En respuesta a {name}",
+      "cancelReply": "Cancelar la respuesta",
+      "hide": "Ocultar",
+      "hideFailed": "No se ha podido ocultar el mensaje. Inténtalo de nuevo.",
+      "connReconnecting": "Reconectando…",
+      "connDegraded": "Actualizaciones ralentizadas",
+      "readDenied": "El chat no está disponible: no figuras entre los participantes de este evento o la sala aún no está abierta. Lo reintento automáticamente.",
+      "mentionNotificationTitle": "{name} te ha mencionado en el chat",
+      "react": "Reaccionar",
+      "edited": "editado",
+      "editLabel": "Editar el mensaje",
+      "editSave": "Guardar",
+      "editFailed": "No se ha podido editar el mensaje.",
+      "exportChat": "Descargar el chat",
+      "reactNotAllowed": "Para reaccionar a los mensajes necesitas tu enlace personal o de moderador.",
+      "editNotAllowed": "Este enlace es compartido: no permite editar los mensajes.",
+      "editExpired": "Han pasado más de 15 minutos: el mensaje ya no se puede editar."
     },
     "role": {
       "moderator": "Moderador",
@@ -271,7 +318,9 @@
         "medium": "Media",
         "poor": "Escasa",
         "unknown": "N/D"
-      }
+      },
+      "volume": "Volumen",
+      "volumeFor": "Volumen de {name}"
     },
     "moderator": {
       "muteAll": "Silenciar a todos",
@@ -295,14 +344,17 @@
       "micDisabled": "Micrófono desactivado",
       "videoModeration": "Vídeo participantes",
       "videoDisabled": "Vídeo desactivado",
-      "eventEndedSuccess": "Evento finalizado con éxito. Redirigiendo..."
+      "eventEndedSuccess": "Evento finalizado con éxito. Redirigiendo...",
+      "whiteboard": "Pizarra",
+      "lowerHand": "Bajar la mano"
     },
     "closeDrawer": "Cerrar",
     "hintBanner": {
       "controls": "Controles abajo",
       "raiseHand": "Levante la mano para hablar",
       "sidebar": "Q&A y chat en la barra lateral",
-      "dismiss": "Entendido"
+      "dismiss": "Entendido",
+      "ariaLabel": "Sugerencias"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# persona} other {# personas}}"
@@ -310,7 +362,55 @@
     "sidebarTabChatUnread": "Mensajes nuevos sin leer",
     "floatingControlsLabel": "Controles del evento",
     "screenshareActive": "🖥️ {name} está compartiendo la pantalla",
-    "screenshareFallbackName": "Un participante"
+    "screenshareFallbackName": "Un participante",
+    "share": {
+      "button": "Compartir",
+      "title": "Comparte el evento",
+      "callLink": "Enlace para participar",
+      "callLinkHint": "Quien abra este enlace entra directamente mientras el evento está en directo; de lo contrario pasa por la inscripción. No contiene tokens reservados.",
+      "eventLink": "Página del evento",
+      "eventLinkHint": "La página pública con los detalles y el formulario de inscripción.",
+      "copy": "Copiar",
+      "copied": "¡Copiado!",
+      "moderatorReveal": "Mostrar el enlace de moderador",
+      "moderatorWarning": "Este enlace da acceso de MODERADOR (silenciar a todos, iniciar la grabación, terminar el evento). Compártelo solo con otros moderadores.",
+      "moderatorLink": "Enlace de moderador",
+      "moderatorLinkHint": "Quien abra este enlace entra como moderador con pleno control de la sala."
+    },
+    "enterFullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de la pantalla completa",
+    "leaveChoice": {
+      "title": "¿Cómo quieres salir?",
+      "body": "Puedes salir solo tú —la llamada sigue activa para los demás— o terminarla para todos los participantes.",
+      "leaveSelf": "Salir solo yo",
+      "endForAll": "Terminar para todos",
+      "ending": "Terminando…",
+      "endError": "No se ha podido terminar la llamada. Inténtalo de nuevo."
+    },
+    "endDestino": {
+      "title": "Destino del evento",
+      "body": "Estás a punto de terminar el evento para todos. ¿Qué quieres que pase con él una vez concluido?",
+      "public": "Mantener público",
+      "publicHelp": "La página del evento concluido sigue visible con el resumen, las preguntas y respuestas, las encuestas, los materiales y el feedback.",
+      "library": "Publicar en la biblioteca",
+      "libraryHelp": "Igual que arriba y, además, muestra el evento en la biblioteca pública de vídeos (requiere una grabación publicada o un vídeo de YouTube).",
+      "archive": "Archivar (privado)",
+      "archiveHelp": "La página del evento concluido no será pública (404). Los datos se conservan hasta que venza el periodo de conservación y después se eliminan.",
+      "genAi": "Generar la transcripción y el resumen con IA a partir de la grabación (cuando termine el procesamiento)",
+      "back": "Atrás",
+      "confirm": "Terminar el evento"
+    },
+    "liveFeaturesLabel": "Funciones:",
+    "whiteboardNotSavedHint": "La pizarra no se guarda automáticamente. Si la usas, expórtala (menú de la pizarra) y adjúntala a los Materiales del evento antes de terminar.",
+    "sidebarTabWordcloud": "Nube de palabras",
+    "sidebarTabAgenda": "Notas / Lista de comprobación",
+    "liveToggleAgenda": "Notas / Lista de comprobación (agenda)",
+    "timer": {
+      "show": "Mostrar el contador",
+      "hide": "Ocultar el contador",
+      "remainingLabel": "Tiempo restante (haz clic para ver el tiempo transcurrido)",
+      "elapsedLabel": "Tiempo transcurrido (haz clic para ver el tiempo restante)"
+    }
   },
   "qa": {
     "title": "Preguntas y Respuestas",
@@ -407,12 +507,31 @@
         "maxParticipantsHelp": "Estime el número máximo de participantes. Determina la capacidad del servidor de vídeo y la interfaz de la sala de espera.",
         "validation": {
           "startsAt": "Fecha de inicio no válida.",
-          "endsAt": "La fecha de finalización debe ser posterior a la de inicio."
+          "endsAt": "La fecha de finalización debe ser posterior a la de inicio.",
+          "titleRequired": "El título es obligatorio (al menos 3 caracteres).",
+          "titleRequiredOtherLocale": "El título en el idioma predeterminado ({locale}) es obligatorio: cambia a la pestaña {locale}.",
+          "maxParticipants": "Introduce un número entre 2 y 500."
         },
         "senderRatioLabel": "Porcentaje activo estimado",
         "senderRatioHelp": "Cuántos participantes se prevé que tengan micrófono o vídeo activos. Ayuda a dimensionar el servidor de vídeo.",
         "activeParticipantsEstimate": "≈ {count} participantes activos",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "advancedOptions": "Opciones avanzadas",
+        "waitingRoomEngineLabel": "Sala de espera (este evento)",
+        "waitingRoomEngineSiteDefault": "Predeterminada del sitio",
+        "waitingRoomEngineGarden": "Jardín (normal)",
+        "waitingRoomEngineGame": "Videojuego (lobby Phaser)",
+        "waitingRoomEngineClassic": "Clásica (estática)",
+        "waitingRoomEngineHelp": "Sobrescribe el valor predeterminado del sitio para este evento.",
+        "videoQuality": "Calidad de vídeo/audio (este evento)",
+        "videoQualityHelp": "Sobrescribe el valor predeterminado del sitio para este evento. Una calidad más alta consume más ancho de banda.",
+        "videoQualitySiteDefault": "Predeterminada del sitio",
+        "videoQualityOptions": {
+          "MAX": "Máxima (1080p, alta fidelidad)",
+          "HIGH": "Alta (720p, recomendada)",
+          "BALANCED": "Equilibrada (540p)",
+          "SAVE_DATA": "Ahorro de datos (360p)"
+        }
       },
       "step2": {
         "heading": "Quién puede hacer qué",
@@ -449,7 +568,8 @@
             "desc": "Iniciar/detener la grabación."
           }
         },
-        "recordingHeading": "Grabación"
+        "recordingHeading": "Grabación",
+        "roomFeaturesHeading": "Funciones de la sala"
       },
       "step3": {
         "heading": "Personas e invitaciones",
@@ -484,7 +604,8 @@
         "invalidEmail": "Dirección de correo no válida.",
         "duplicateEmail": "Esta dirección ya está añadida.",
         "rubricaPick": "Buscar en la agenda…",
-        "rubricaOrAdd": "o añada manualmente"
+        "rubricaOrAdd": "o añada manualmente",
+        "organizerLogo": "Logotipo del organizador"
       },
       "step4": {
         "heading": "Contenidos y materiales",
@@ -544,7 +665,9 @@
           "recording": "Grabación",
           "recordingAuto": "Activa — inicio automático",
           "recordingManual": "Activa — inicio manual",
-          "recordingOff": "No activa"
+          "recordingOff": "No activa",
+          "multitrack": "Grabación por participante",
+          "multitrackOn": "Activa: requiere consentimiento explícito en la inscripción"
         },
         "noRecurrence": "Evento único",
         "gdprHeading": "Privacidad y conservación de datos",
@@ -560,9 +683,24 @@
         "featuresHeading": "Resumen de configuración",
         "privacyDoc": "Documento de aviso de privacidad (PDF o enlace)",
         "privacyDocHelp": "Suba un PDF o pegue la URL de un aviso de privacidad alternativo. Sustituye a la plantilla RGPD si está presente.",
-        "privacyTextHelp": "Texto sintético mostrado en el formulario de registro; puede complementar o sustituir a la plantilla RGPD."
+        "privacyTextHelp": "Texto sintético mostrado en el formulario de registro; puede complementar o sustituir a la plantilla RGPD.",
+        "moderatorPublishHint": "El nombre y el correo electrónico son obligatorios para publicar el evento (se usan para el enlace de moderador y el correo de confirmación). No se piden para guardar como borrador.",
+        "moderatorLinkNote": "Esta persona es el moderador principal del evento: recibirá por correo un enlace privado para gestionarlo (iniciar la grabación, moderar las preguntas, lanzar encuestas…). Es distinto de los comoderadores añadidos en el paso «Personas», que reciben cada uno su propio enlace.",
+        "moderatorRequired": "Introduce el nombre del moderador",
+        "moderatorEmailRequired": "Introduce un correo electrónico válido del moderador"
       },
-      "validationFailed": "Revise los campos resaltados antes de continuar."
+      "validationFailed": "Revise los campos resaltados antes de continuar.",
+      "partialFailure": "Evento creado, pero algunos elementos no se han guardado: {items}. Puedes añadirlos desde la página del evento.",
+      "draftFound": "Hemos encontrado un borrador sin guardar de este evento. ¿Quieres restaurarlo?",
+      "draftRestore": "Restaurar el borrador",
+      "draftDiscard": "Descartar",
+      "resources": {
+        "organizers": "organizadores",
+        "invitations": "invitaciones",
+        "moderators": "moderadores",
+        "speakers": "ponentes",
+        "materials": "materiales"
+      }
     },
     "nav": {
       "events": "Gestión de eventos",
@@ -603,7 +741,8 @@
       "eventQuestionnaires": "Cuestionarios",
       "rubricaList": "Lista",
       "rubricaDetail": "Detalle",
-      "feedbackDashboard": "Feedback"
+      "feedbackDashboard": "Feedback",
+      "recordingsPostprod": "Transcripciones / IA"
     },
     "landing": {
       "title": "Panel de administración",
@@ -701,7 +840,8 @@
           "dateRequired": "La fecha original es obligatoria.",
           "saveFailed": "No se ha podido guardar los metadatos."
         }
-      }
+      },
+      "updateFailed": "No se ha podido actualizar."
     },
     "recordingsLibrary": {
       "title": "Grabaciones de vídeo",
@@ -770,7 +910,10 @@
       "detailEnd": "Fin",
       "detailModerator": "Moderador",
       "detailRoom": "Sala Jitsi",
-      "detailFilename": "Nombre del archivo"
+      "detailFilename": "Nombre del archivo",
+      "transcriptManage": "Gestionar la transcripción / IA",
+      "transcriptReady": "Transcrito",
+      "transcriptProcessing": "En proc."
     },
     "gdprAudit": {
       "title": "Auditoría RGPD",
@@ -1023,7 +1166,32 @@
       "retentionPreviewRecordings": "Grabaciones de vídeo",
       "retentionPreviewKept": "Las estadísticas agregadas y los metadatos del evento se conservan.",
       "configPreview": "Vista previa de la configuración",
-      "templateApplied": "Plantilla aplicada: {name}. Puede modificar todos los ajustes."
+      "templateApplied": "Plantilla aplicada: {name}. Puede modificar todos los ajustes.",
+      "agendaEnabled": "Notas / Lista de comprobación (agenda) en directo",
+      "agendaEnabledDesc": "Una lista de los puntos que hay que tratar y que los moderadores van marcando durante el evento. Se incorpora al resumen automático. Es opcional y también se puede activar durante el evento.",
+      "whiteboardEnabled": "Pizarra compartida",
+      "whiteboardEnabledDesc": "Activa la pizarra colaborativa nativa (Excalidraw): los moderadores pueden abrirla desde la barra de herramientas durante el evento. Siempre activa en las llamadas instantáneas.",
+      "aiSectionHeading": "Posproducción automática",
+      "aiSectionDesc": "Tras el final del evento, la grabación puede procesarse con un pipeline de inteligencia artificial en el clúster para producir la transcripción, el resumen y, si se solicita, traducciones y doblaje. Todo ocurre en la infraestructura del Departamento; ningún dato sale hacia terceros.",
+      "aiTranscriptEnabled": "Transcripción automática",
+      "aiTranscriptEnabledDesc": "Reconocimiento del habla con identificación de los hablantes. Es necesaria para activar el resumen, las traducciones y el doblaje.",
+      "aiSummaryEnabled": "Resumen y capítulos",
+      "aiSummaryEnabledDesc": "Resumen de la reunión, decisiones tomadas, tareas pendientes y división en capítulos con marcas de tiempo.",
+      "aiTranslationEnabled": "Traducción a otros idiomas",
+      "aiTranslationEnabledDesc": "Transcripción y resumen traducidos a los idiomas indicados a continuación.",
+      "aiTargetLocales": "Idiomas de traducción",
+      "aiTargetLocalesDesc": "Códigos de idioma ISO (p. ej. en, fr, de) separados por comas. Déjalo vacío para usar los idiomas configurados a nivel de sitio.",
+      "aiTargetLocalesRequired": "Indica al menos un idioma de traducción o desactiva la traducción automática.",
+      "aiDubbingEnabled": "Doblaje del audio",
+      "aiDubbingEnabledDesc": "Audio doblado a los idiomas de destino, generado con voces sintéticas preentrenadas. No clona la voz de los participantes.",
+      "consentBadge": "Consentimiento explícito",
+      "retentionBadge": "Amplía la conservación",
+      "multitrackRecordingEnabled": "Grabación por participante (alta precisión)",
+      "multitrackRecordingEnabledDesc": "Graba una pista de audio separada para cada participante, de modo que la transcripción atribuye con certeza quién dice qué (se acabaron los «Hablante 1/2»). Trata el audio aislado de cada hablante (dato personal sensible): las pistas son temporales y se eliminan justo después de la transcripción. Requiere el consentimiento para la grabación.",
+      "retainParticipantTracks": "Conservar las pistas por participante",
+      "retainParticipantTracksDesc": "Mantiene las pistas de audio individuales más allá de la transcripción, para el archivo descargable y la escucha por ponente. ATENCIÓN: amplía la conservación de datos personales sensibles (voz aislada) hasta el vencimiento del periodo de conservación del evento. Actívalo solo si es necesario y con el consentimiento y la información adecuados.",
+      "expectedSpeakers": "Número de hablantes previstos",
+      "expectedSpeakersDesc": "Cuando lo sabes (p. ej. 3 ponentes), indicarlo mejora la calidad de la identificación de los hablantes. Déjalo vacío para que decida el pipeline."
     },
     "links": {
       "title": "Enlaces del evento",
@@ -1123,7 +1291,8 @@
         "pages": "Páginas",
         "footer": "Pie de página",
         "features": "Funcionalidades",
-        "scaling": "Dimensionado de infra"
+        "scaling": "Dimensionado de infra",
+        "postprod": "Pipeline de IA posevento"
       },
       "scaling": {
         "intro": "Parámetros que describen la capacidad del clúster donde se ejecuta la plataforma. Los valores predeterminados están calibrados para Azure F16s_v2 (16 vCPU / 32 GiB) para JVB y F4s_v2 (4 vCPU / 8 GiB) para Jibri. Si utiliza hardware distinto, actualícelos aquí; el escalador recalcula al instante.",
@@ -1285,7 +1454,55 @@
         "jvbProvisioningTimeoutMinutes": "Timeout de provisioning (minutos)",
         "jvbProvisioningTimeoutMinutesHelp": "Tras cuántos minutos desde startsAt un evento con JVB aún no listo se marca como 'degraded' en la status page. Predeterminado 15. Cubre cold-start del nodo (~3-5 min) más margen de seguridad.",
         "statusPollIntervalSeconds": "Intervalo de polling de la status page (segundos)",
-        "statusPollIntervalSecondsHelp": "Cada cuántos segundos la página /status actualiza los datos en el navegador. Predeterminado 30. Valores más bajos = datos más frescos pero más carga sobre la app."
+        "statusPollIntervalSecondsHelp": "Cada cuántos segundos la página /status actualiza los datos en el navegador. Predeterminado 30. Valores más bajos = datos más frescos pero más carga sobre la app.",
+        "jvbEmptyCloseMinutes": "Minutos con la sala vacía antes del cierre definitivo",
+        "jvbEmptyCloseMinutesHelp": "Si una sala LIVE que ya ha tenido participantes permanece vacía durante estos minutos, se cierra definitivamente (ENDED): así un evento sin moderador se cierra solo por inactividad, sin esperar a la hora de finalización. Predeterminado 15 (activo). -1 = desactivado. 0 = cerrar en la primera comprobación con la sala vacía.",
+        "waitingRoomLeadMinutes": "Antelación para entrar en la sala (minutos)",
+        "waitingRoomLeadMinutesHelp": "Quien se inscribe dentro de estos minutos previos al inicio entra directamente en la sala de espera; con más antelación ve la confirmación con el enlace al calendario. 0 = mostrar siempre la pantalla de confirmación hasta el inicio. Recomendado: 15.",
+        "reactionsMode": "Reacciones (emoji)",
+        "reactionsModeNative": "Nativas de Jitsi (en la barra, efímeras)",
+        "reactionsModeCustom": "Personalizadas de la app (barra izquierda, con estadísticas)",
+        "reactionsModeHelp": "Nativas = botón de reacciones de Jitsi en la barra de controles, ligeras y efímeras (no se contabilizan). Personalizadas = barra de reacciones de la app abajo a la izquierda, con recuentos y estadísticas. Predeterminado: Nativas.",
+        "emailSenderTitle": "Remitente de los correos",
+        "emailSenderHelp": "Cómo aparece el remitente en el buzón de quien se inscribe. La dirección de envío se sigue configurando en el despliegue (debe coincidir con la autorizada por el servidor SMTP).",
+        "emailFromName": "Nombre del remitente",
+        "emailFromNameHelp": "Vacío = se usa el nombre configurado en el despliegue (SMTP_FROM_NAME). Los correos se siguen enviando desde la dirección del sistema.",
+        "emailReplyTo": "Dirección para las respuestas",
+        "emailReplyToHelp": "Los correos salen de una dirección no-reply: sin esto, quien responda no llega a nadie.",
+        "avatarTitle": "Imágenes de los participantes",
+        "gravatarEnabled": "Usar Gravatar cuando esté disponible",
+        "gravatarEnabledHelp": "Quien se haya inscrito con un correo que tenga un Gravatar lo verá como imagen en la sala; para el resto se mantienen las iniciales generadas por la plataforma. La imagen pasa por nuestro servidor, así que el navegador de los participantes no contacta con gravatar.com, pero la plataforma sí: hay que declararlo en la información sobre privacidad."
+      },
+      "postprod": {
+        "prerequisitesNote": "La posproducción trabaja sobre la grabación completa, una vez terminado el evento. El pool de GPU dedicado se enciende cuando llega el primer trabajo a la cola y se apaga cuando la cola queda vacía, para contener el coste. Antes de activar el pipeline, comprueba que el clúster tenga el pool de GPU configurado, el operador NVIDIA instalado, las credenciales de HuggingFace presentes en el namespace y el volumen con los pesos de los modelos precargado. La lista de comprobación operativa está en docs/POSTPROD.md.",
+        "pipelineEnabled": "Pipeline posevento activo",
+        "pipelineEnabledHelp": "Interruptor general. Cuando está desactivado, no se produce ninguna transcripción, resumen, traducción ni doblaje para los nuevos eventos, aunque cada evento tenga la posproducción habilitada. Los artefactos ya generados dejan de mostrarse al público hasta que vuelvas a activar el interruptor. Es útil para pausar el pipeline sin volver a desplegar la aplicación.",
+        "timingNote": "El pipeline no interviene en el directo. Todo ocurre después del final del evento, cuando la grabación se archiva: los subtítulos y el resumen nunca están disponibles en tiempo real. Esta decisión prioriza la calidad de la transcripción y contiene el consumo de GPU frente al subtitulado en directo.",
+        "providersSection": "Motores de inteligencia artificial",
+        "providersIntro": "Los motores usados para la transcripción, el resumen y el doblaje se declaran en el momento del despliegue. Añadir uno nuevo requiere una intervención en la infraestructura (desplegar el motor en el clúster, registrarlo en la lista de proveedores admitidos, actualizar el esquema). Los desplegables de abajo muestran los motores disponibles actualmente en esta instancia.",
+        "asrProvider": "Motor de transcripción",
+        "asrProviderHelp": "Genera la transcripción del vídeo con indicación del minuto y separación de los hablantes. Usamos WhisperX large-v3 junto con pyannote.audio para la diarización. Ambos modelos se ejecutan en el clúster sobre los pesos cargados en el volumen dedicado.",
+        "asrOptionWhisperx": "WhisperX large-v3 + diarización pyannote",
+        "llmProvider": "Motor de resumen y traducción",
+        "llmProviderHelp": "Produce el resumen de la reunión, identifica los temas tratados y traduce la transcripción y el resumen a los idiomas de destino. Modelo Mistral-Small-3.2-24B (proveedor europeo, licencia Apache 2.0) servido mediante vLLM en el clúster.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM en el clúster",
+        "ttsEngine": "Motor de doblaje",
+        "ttsEngineHelp": "Sintetiza el audio en los idiomas elegidos usando voces preentrenadas públicas. Cuando hay varios hablantes, cada uno recibe una voz distinta del pool disponible para facilitar la escucha de la diversidad: la asignación es arbitraria y no reproduce en modo alguno la voz real de los participantes. El doblaje se produce solo si el organizador lo solicita para ese evento concreto.",
+        "ttsOptionPiper": "Piper TTS · voces sintéticas preentrenadas",
+        "voiceCloningSection": "Línea editorial sobre la voz",
+        "voiceCloningNote": "El sistema usa exclusivamente voces sintéticas genéricas (Piper TTS, modelos públicos con licencia MIT). No analiza, no almacena ni reproduce la voz de los participantes reales: cada hablante se representa con una voz del pool elegida de forma determinista en función del tiempo de habla, sin ningún vínculo con su identidad vocal. La voz asignada cambia según la composición de los hablantes de cada evento, por lo que un mismo ponente puede doblarse con voces distintas en eventos distintos. Esta decisión evita el tratamiento de datos biométricos regulado por el art. 9 del RGPD.",
+        "defaultTargetLocales": "Idiomas de traducción predeterminados",
+        "defaultTargetLocalesHelp": "Idiomas ISO-639-1 separados por comas (p. ej. `en,fr,de`). Se usan para los eventos que no especifican sus propios idiomas de traducción. El idioma de origen del evento siempre se excluye automáticamente.",
+        "limitsSection": "Límites operativos",
+        "maxConcurrentJobs": "Trabajos en paralelo",
+        "maxConcurrentJobsHelp": "Número máximo de trabajos que el pipeline ejecuta simultáneamente en el pool de GPU. Más trabajos en paralelo aceleran el vaciado de la cola cuando terminas varios eventos seguidos, pero requieren GPU disponibles. El valor típico es 2.",
+        "jobMaxAttempts": "Intentos antes del fallo",
+        "jobMaxAttemptsHelp": "Cuántas veces reintenta el pipeline un trabajo antes de marcarlo como fallido. El backoff entre un intento y el siguiente crece exponencialmente (de 30 segundos hasta 2 horas). El valor típico es 5.",
+        "artifactRetentionDays": "Conservación de los artefactos (días)",
+        "artifactRetentionDaysHelp": "Si se deja en 0, los artefactos de IA siguen el mismo vencimiento que el evento. Un valor mayor que cero los conserva durante los días indicados, incluso después del cierre del evento, hasta que un cron diario los elimina. La eliminación incluye los nombres de los hablantes y las cargas útiles de los trabajos, en línea con docs/GDPR.md.",
+        "consentDisclosureSection": "Aviso sobre la IA en la sala de espera",
+        "consentDisclosureHelp": "Texto que se muestra a los participantes en la sala de espera cuando el evento usa la posproducción con IA (transcripción, resumen, traducción, doblaje). Se puede personalizar por idioma. Déjalo vacío para usar el texto predeterminado del sistema.",
+        "consentDisclosurePlaceholder": "P. ej. Este evento se transcribirá y resumirá automáticamente con herramientas de IA después del directo…"
       }
     },
     "analytics": {
@@ -1372,7 +1589,23 @@
       "screen": "Compartir pantalla",
       "pickerTitle": "Elija una plantilla",
       "pickerSubtitle": "Seleccione una plantilla para preconfigurar los ajustes del evento, o salte este paso para configurar todo manualmente.",
-      "skipTemplate": "Configurar manualmente"
+      "skipTemplate": "Configurar manualmente",
+      "whiteboardLabel": "Pizarra",
+      "waitingRoomEngineLabel": "Sala de espera (predeterminada de la plantilla)",
+      "waitingRoomEngineSiteDefault": "Predeterminada del sitio",
+      "waitingRoomEngineGarden": "Jardín (normal)",
+      "waitingRoomEngineGame": "Videojuego (lobby Phaser)",
+      "waitingRoomEngineClassic": "Clásica (estática)",
+      "waitingRoomEngineHelp": "Prerrellena el motor de la sala de espera en los eventos creados a partir de esta plantilla. Se puede seguir modificando en el asistente.",
+      "durationLabel": "Duración predeterminada (minutos)",
+      "durationHint": "Prerrellena el final del evento (inicio + duración). El usuario puede modificarlo. Vacío = 2 horas.",
+      "retentionLabel": "Conservación de datos predeterminada (días)",
+      "expectedSpeakersLabel": "Número de hablantes previstos (predeterminado)",
+      "descriptionTemplateLabel": "Descripción predeterminada",
+      "descriptionTemplateHint": "Texto prerrellenado en la descripción del evento (modificable).",
+      "aiTranscript": "Transcripción automática (predeterminado)",
+      "aiSummary": "Resumen automático (predeterminado)",
+      "aiTranslation": "Traducción automática (predeterminado)"
     },
     "instantCall": {
       "title": "Videollamada instantánea",
@@ -1456,7 +1689,8 @@
       },
       "errors": {
         "saveFailed": "No se ha podido guardar. Compruebe los datos y vuelva a intentarlo."
-      }
+      },
+      "deleteTitle": "Eliminar la plantilla"
     },
     "emailTemplates": {
       "title": "Plantillas de correo",
@@ -1637,7 +1871,8 @@
       "play": "Reproducir",
       "hidePlayer": "Ocultar reproductor",
       "download": "Descargar",
-      "deleteConfirm": "¿Eliminar esta sesión y la grabación asociada?"
+      "deleteConfirm": "¿Eliminar esta sesión y la grabación asociada?",
+      "deleteTitle": "Eliminar la sesión"
     },
     "monitoring": {
       "title": "Monitorización",
@@ -1798,7 +2033,9 @@
         "settings": "Configuración",
         "people": "Personas",
         "content": "Contenidos",
-        "audit": "Grabaciones y auditoría"
+        "audit": "Grabaciones y auditoría",
+        "postEvent": "Posevento",
+        "analytics": "Estadísticas"
       },
       "toggles": {
         "unmute": "Los participantes pueden hablar",
@@ -1820,7 +2057,22 @@
         "postEventSummary": "{connected} asistieron de {registered} inscripciones (estimadas {estimated})",
         "estimatedAttendance": "Estimados: {estimated} participantes"
       },
-      "copyGuestUrl": "Copiar enlace para invitados"
+      "copyGuestUrl": "Copiar enlace para invitados",
+      "aiManageTitle": "Transcripción, resumen y traducciones",
+      "aiManageDesc": "Gestiona la posproducción con IA de esta grabación: corrige la transcripción y la asignación de los ponentes (quién dice qué), edita el resumen y gestiona los idiomas de traducción.",
+      "aiManageCta": "Abrir la gestión de la posproducción",
+      "aiManageNotEnded": "Disponible cuando el evento haya concluido y la grabación haya sido procesada por el pipeline de IA.",
+      "aiGenerateCta": "Generar IA ahora",
+      "aiGenerateRunning": "Iniciando…",
+      "aiGenerateQueued": "Pipeline de IA iniciado: la transcripción y el resumen están en cola. Sigue el avance en la gestión de la posproducción.",
+      "aiGenerateAlready": "El pipeline de IA ya se había iniciado para esta grabación: no se ha añadido ningún trabajo nuevo.",
+      "aiGenerateError": "No se ha podido iniciar el pipeline de IA. Comprueba que la IA esté habilitada a nivel de sitio y que exista una grabación.",
+      "aiGenerateHelp": "Habilita la transcripción y el resumen con IA e inicia el pipeline sobre la grabación con un solo clic. Es idempotente: hacer clic dos veces no duplica los trabajos.",
+      "aiGenerateNoRecording": "Sin grabación: la IA posevento requiere una grabación (la captura solo ocurre durante el evento). Aun así puedes gestionar la posproducción aquí.",
+      "duplicateNext": "Duplicar para la próxima",
+      "duplicateNextBusy": "Duplicando…",
+      "duplicateNextHint": "Crea un borrador con toda la configuración de este evento (grabación, pistas separadas, IA, agenda, recordatorios). Si el evento tiene una periodicidad, la fecha pasa a la siguiente ocurrencia; si no, queda pendiente de establecer.",
+      "duplicateNextError": "No se ha podido duplicar. Inténtalo de nuevo."
     },
     "rubrica": {
       "title": "Agenda",
@@ -1838,6 +2090,299 @@
     "eventQuestionnaires": {
       "title": "Cuestionarios — {eventTitle}",
       "subtitle": "Configure un cuestionario de pre-registro y/o posevento combinando plantillas y preguntas ad-hoc."
+    },
+    "eventAnalytics": {
+      "title": "Estadísticas",
+      "loadError": "No se han podido cargar las estadísticas.",
+      "noData": "No hay datos disponibles.",
+      "notEndedYet": "El evento aún no ha concluido: las estadísticas son parciales y se actualizan en tiempo real.",
+      "cappedNote": "Evento muy grande: algunas métricas se calculan sobre una muestra (se ha alcanzado el límite de filas).",
+      "scoreTitle": "Grado de atención",
+      "adminOnly": "solo admin",
+      "scoreProxy": "Índice 0–100 de participación de la sala. Es un indicador aproximado de participación, no mide la atención cognitiva: léelo teniendo en cuenta el formato del evento (clase magistral o taller), nunca como una nota de calidad.",
+      "scoreUnavailable": "Datos insuficientes para calcular el grado.",
+      "comp": {
+        "attendanceRate": "Asistencia (asistentes/inscritos)",
+        "breadth": "Amplitud de la interacción",
+        "depth": "Profundidad de la interacción",
+        "chatRate": "Ritmo del chat",
+        "liveParticipation": "Participación en directo",
+        "talkBalance": "Equilibrio del tiempo de habla",
+        "retention": "Permanencia"
+      },
+      "kpiConversion": "Conversión",
+      "kpiPeak": "Pico de participantes",
+      "kpiDuration": "Duración",
+      "kpiInteractors": "Interlocutores distintos",
+      "interactionsWord": "interacciones",
+      "kpiHandRaises": "Manos levantadas",
+      "handRaisesSessionsSub": "de {n, plural, one {# sesión} other {# sesiones}}",
+      "kpiReactions": "Reacciones",
+      "kpiRetention": "Permanencia media",
+      "dwellSub": "{d} · {n, plural, one {# medido} other {# medidos}}",
+      "reactionsTitle": "Reacciones",
+      "timelineTitle": "Evolución de la llamada",
+      "timelineEmpty": "No se ha registrado ninguna interacción durante la llamada.",
+      "timelinePeak": "Pico de interacción a las {at} ({n} eventos en el intervalo).",
+      "kind": {
+        "chat": "Chat",
+        "question": "Preguntas",
+        "upvote": "Votos a favor",
+        "poll": "Encuestas",
+        "word": "Nube de palabras",
+        "reaction": "Reacciones"
+      },
+      "speakersTitle": "Quién ha hablado",
+      "audioUnavailable": "Estadísticas de audio no disponibles: el evento no se grabó (o la grabación no tenía habla).",
+      "predominant": "Interlocutor predominante",
+      "talkBalance": "Equilibrio",
+      "speechDensity": "Densidad del habla",
+      "chatTitle": "Chat",
+      "chatAudience": "Público",
+      "chatStaff": "Equipo",
+      "qaTitle": "Preguntas más votadas",
+      "none": "Ninguna.",
+      "pollsTitle": "Encuestas",
+      "wordsTitle": "Nube de palabras",
+      "feedbackTitle": "Feedback",
+      "responses": "respuestas",
+      "privacyNote": "Las estadísticas por persona son seudónimas de forma predeterminada. Los agregados anónimos se conservan en el resumen del evento; las filas en bruto se eliminan al vencer el periodo de conservación."
+    },
+    "postprod": {
+      "title": "Pipeline de IA de posproducción",
+      "subtitle": "Transcripciones, resúmenes y traducciones generados por el pipeline de IA en el clúster. Asigna los hablantes, relanza o cancela los trabajos.",
+      "filterStatus": "Estado",
+      "all": "Todos",
+      "queued": "En cola",
+      "running": "En ejecución",
+      "done": "Completado",
+      "partial": "Parcial",
+      "failed": "Fallido",
+      "totalRows": "{count, plural, =0 {ninguna grabación} one {1 grabación} other {# grabaciones}}",
+      "colEvent": "Evento",
+      "colCreated": "Creado",
+      "colDuration": "Duración",
+      "colStatus": "Estado",
+      "colJobs": "Trabajos",
+      "colArtifacts": "Artefactos",
+      "colActions": "Acciones",
+      "rerun": "Relanzar",
+      "rerunTooltip": "Crea una nueva ejecución incrementando runCount; los artefactos anteriores se mantienen hasta el fin de la conservación",
+      "cancel": "Cancelar",
+      "cancelConfirm": "¿Cancelar todos los trabajos pendientes de esta grabación?",
+      "rerunFailed": "Relanzamiento fallido (HTTP {code})",
+      "cancelFailed": "Cancelación fallida (HTTP {code})",
+      "speakerUpdateFailed": "Actualización del hablante fallida (HTTP {code})",
+      "loadError": "No se ha podido cargar la lista de trabajos",
+      "empty": "Ninguna grabación coincide con los filtros",
+      "detailJobs": "Trabajos",
+      "detailArtifacts": "Artefactos",
+      "detailSpeakers": "Hablantes",
+      "noArtifacts": "Todavía no se ha producido ningún artefacto",
+      "noSpeakers": "No se ha detectado ningún hablante",
+      "attempts": "intento {n}",
+      "speakerPlaceholder": "Nombre real (opcional)",
+      "speakerSpoke": "Tiempo de habla: {sec} s",
+      "suggestedApply": "Aplicar la sugerencia: {name}",
+      "suggestedTitle": "Nombre sugerido por el pipeline de IA a partir de los nombres propios mencionados en la transcripción. Haz clic para introducirlo en el campo (siempre puedes modificarlo antes de guardar).",
+      "save": "Guardar",
+      "editTranscript": "Editar la transcripción",
+      "editClose": "Cerrar el editor",
+      "editTranscriptTitle": "Editor de transcripción",
+      "editHint": "Corrige el texto o reasigna el hablante de cada segmento. Al guardar, se actualizan la transcripción y los subtítulos en el idioma de origen. Las traducciones y el doblaje NO se regeneran: usa «Relanzar» si también los necesitas actualizados en los demás idiomas.",
+      "editLoading": "Cargando la transcripción…",
+      "editLoadError": "No se ha podido cargar la transcripción (HTTP {code}).",
+      "editNotReady": "Todavía no hay transcripción disponible para esta grabación. Inicia (o relanza) el procesamiento de IA desde los controles de arriba: la transcripción es el primer paso y después podrás corregirla aquí y generar el resumen y las traducciones.",
+      "editProcessing": "Procesamiento de IA en curso: la transcripción aparecerá aquí cuando termine. Actualiza la página dentro de unos minutos.",
+      "editSessionExpired": "La sesión de administración ha caducado. Recarga la página y vuelve a iniciar sesión para editar la transcripción.",
+      "editEmpty": "Ningún segmento modificable",
+      "editSpeakerNone": "— ninguno —",
+      "editSave": "Guardar los cambios",
+      "editSaving": "Guardando…",
+      "editDirty": "{n, plural, one {1 cambio sin guardar} other {# cambios sin guardar}}",
+      "editSaved": "Guardado: {text} textos, {speaker} hablantes.",
+      "editFailed": "Guardado fallido (HTTP {code})",
+      "editFailedDetail": "Guardado fallido: {message}",
+      "editMediaError": "No se ha podido cargar el audio de la grabación: la reproducción no está disponible. Aun así puedes corregir el texto y los hablantes de los segmentos.",
+      "summaryLoadError": "No se ha podido cargar el resumen.",
+      "summaryLoading": "Cargando el resumen…",
+      "summaryEmptyProcessing": "El resumen de IA todavía no está listo: el procesamiento está en curso. Actualiza la página dentro de unos minutos.",
+      "summaryEmptyFailed": "La generación del resumen ha fallado. Comprueba el estado del pipeline y relanza el procesamiento desde los controles de arriba.",
+      "summaryEmptyNone": "No se ha generado ningún resumen de IA para esta grabación. Inicia el procesamiento desde los controles de arriba.",
+      "editSeek": "Ir a este punto del vídeo",
+      "manageTabTranscript": "Transcripción",
+      "manageTabSummary": "Resumen",
+      "manageTabTranslations": "Traducciones",
+      "manageTabArchive": "Archivo",
+      "manageTabReliability": "Fiabilidad",
+      "manageLoading": "Cargando…",
+      "archivePiiNote": "Las pistas de audio aisladas por participante son datos personales sensibles (voz aislada): esta sección está reservada a administradores y moderadores y nunca se expone públicamente.",
+      "archiveNoTracks": "No hay pistas por participante disponibles para esta grabación (la grabación multipista no está activa o las pistas ya se han eliminado por minimización según el RGPD).",
+      "archivePlayerTitle": "Escucha por ponente",
+      "archiveAudioHint": "Usa el selector «Audio» del reproductor para escuchar la mezcla o la pista aislada de un participante concreto, sincronizada con el vídeo.",
+      "archiveTitle": "Archivo descargable",
+      "archiveIntro": "Genera un archivo MKV con el vídeo, una pista de audio por participante (etiquetada con su nombre y alineada con precisión) y los subtítulos. Está pensado para la descarga y el archivado: los navegadores no saben cambiar de pista de audio dentro de un MKV, así que para la escucha usa el reproductor de arriba.",
+      "archiveGenerate": "Generar el archivo",
+      "archiveStatusLabel": "Estado",
+      "archiveStatus_none": "no generado",
+      "archiveStatus_pending": "en cola",
+      "archiveStatus_running": "en proceso",
+      "archiveStatus_done": "listo",
+      "archiveStatus_failed": "fallido",
+      "archiveDownload": "Descargar el MKV",
+      "archiveGenerateOk": "Generación del archivo iniciada.",
+      "archiveGenerateErr": "La generación del archivo ha fallado (HTTP {code}).",
+      "archiveTrackFallback": "Participante",
+      "manageBackToList": "Todas las grabaciones",
+      "manageDuration": "Duración",
+      "manageSource": "Idioma de origen",
+      "manageOpenPublic": "Página pública",
+      "manageRerunOk": "Pipeline relanzado.",
+      "manageRerunNoop": "No se ha iniciado ningún trabajo: la IA está desactivada para este evento o el pipeline está en pausa. Usa «Generar IA».",
+      "manageRerunAlreadyQueued": "El procesamiento ya está en cola: no hay nada nuevo que iniciar.",
+      "generateAi": "Generar IA",
+      "generateAiConfirm": "Inicia el pipeline de IA (transcripción y resumen) sobre esta grabación. El procesamiento de IA se activará para el evento y se ejecuta en segundo plano. Las traducciones se añaden después, idioma por idioma, desde la pestaña «Traducciones».",
+      "generateAiOk": "Pipeline de IA iniciado.",
+      "manageOpen": "Gestionar",
+      "cancelConfirmTitle": "Cancelar la posproducción",
+      "speakerUpdateSuccess": "Hablante actualizado",
+      "tm": {
+        "loading": "Cargando los idiomas de traducción…",
+        "loadError": "No se han podido cargar los idiomas de traducción.",
+        "title": "Idiomas de traducción",
+        "sourceLabel": "Idioma de origen:",
+        "already": "Ya traducidos:",
+        "noneYet": "Todavía no hay traducciones.",
+        "addLabel": "Añadir un idioma",
+        "noneAvailable": "No hay idiomas disponibles",
+        "selectPlaceholder": "Selecciona un idioma…",
+        "adding": "Añadiendo…",
+        "addButton": "Añadir el idioma",
+        "unexpectedError": "Error inesperado",
+        "note": "Añadir un idioma genera la traducción de la transcripción y del resumen, y el doblaje del audio si está activo para el evento. El trabajo se realiza en segundo plano.",
+        "summary": "Resumen",
+        "subtitles": "Subtítulos",
+        "dub": "Doblaje",
+        "download": "descargar",
+        "allTranslated": "Todos los idiomas activos ya están traducidos.",
+        "translatedHeader": "Idiomas traducidos"
+      },
+      "ov": {
+        "tab": "Vista general",
+        "intro": "Qué ha producido el pipeline de IA para esta grabación, idioma por idioma.",
+        "processing": "Procesamiento en curso o ningún artefacto disponible. Vuelve cuando el estado sea «Completado».",
+        "loadError": "No se ha podido cargar la vista general.",
+        "langsTitle": "Idiomas y artefactos",
+        "colLang": "Idioma",
+        "colTranscript": "Transcripción",
+        "colSummary": "Resumen",
+        "colSubtitles": "Subtítulos",
+        "colDub": "Doblaje",
+        "source": "original",
+        "present": "disponible",
+        "absent": "ausente",
+        "listen": "Escuchar",
+        "download": "Descargar",
+        "dubTitle": "Doblaje del audio (una voz por hablante, sincronizado)",
+        "dubNone": "No se ha producido ningún doblaje.",
+        "summaryTitle": "Resumen",
+        "summaryLang": "Idioma",
+        "summaryNone": "No hay ningún resumen disponible.",
+        "decisions": "Decisiones",
+        "actions": "Tareas pendientes",
+        "topics": "Capítulos",
+        "speakersTitle": "Hablantes",
+        "speakerAnon": "sin asignar",
+        "speakerRenameHint": "Cambia el nombre de los hablantes para corregirlo: el nombre sustituye a la etiqueta anónima en la transcripción y en la página pública.",
+        "speakerNamePlaceholder": "Nombre real (p. ej. Mario Rossi)",
+        "speakerNameAria": "Nombre de",
+        "save": "Guardar",
+        "saving": "Guardando…",
+        "saved": "Guardado",
+        "saveError": "Error",
+        "editHint": "Para corregir el texto, los nombres o el resumen usa las pestañas de arriba.",
+        "kpiDuration": "Duración",
+        "kpiParticipants": "Participantes (pico)",
+        "kpiTracks": "Pistas de audio",
+        "kpiLanguages": "Idiomas",
+        "kpiArtifacts": "Artefactos",
+        "kpiProcessed": "Procesado",
+        "statusLabel": "Estado",
+        "run": "ejecución",
+        "jobsTitle": "Avance del pipeline",
+        "jobsNone": "No hay ningún trabajo para esta grabación.",
+        "attempts": "{n} intentos",
+        "filesTitle": "Archivos en el almacenamiento",
+        "filesNone": "No se ha encontrado ningún archivo en el almacenamiento.",
+        "filesToggle": "Mostrar/ocultar los {n} archivos",
+        "tracksTitle": "Pistas por participante",
+        "tracksNone": "No hay pistas por participante (multipista desactivado o pistas ya eliminadas).",
+        "trackPurged": "eliminada (RGPD)",
+        "trackEnters": "entrada +{s} s",
+        "metricsTitle": "Métricas del resumen (LLM)",
+        "chars": "caracteres",
+        "model": "Modelo",
+        "notAvailable": "n/d"
+      },
+      "rel": {
+        "title": "Fiabilidad de la IA",
+        "subtitle": "Hasta qué punto es fiable el resultado generado por la IA para esta grabación.",
+        "loading": "Analizando la fiabilidad…",
+        "loadError": "No se han podido cargar las métricas de fiabilidad.",
+        "noData": "No hay ningún procesamiento de IA para esta grabación.",
+        "level": {
+          "good": "Fiable",
+          "fair": "Aceptable",
+          "poor": "Escasa",
+          "failed": "No fiable"
+        },
+        "overallScore": "Confianza global",
+        "totalTime": "Tiempo de procesamiento",
+        "sourceLang": "Idioma de origen",
+        "transcriptTitle": "Transcripción",
+        "segments": "Segmentos",
+        "speakers": "Hablantes",
+        "speech": "Habla detectada",
+        "confidence": "Confianza media",
+        "silence": "Silencio estimado",
+        "coverage": "Cobertura del habla",
+        "lowConf": "Segmentos con baja confianza",
+        "transcriptNotProduced": "Transcripción aún no producida (el pipeline no se ha ejecutado).",
+        "transcriptUnavailable": "Transcripción presente pero no analizable aquí (archivada en el almacenamiento).",
+        "stagesTitle": "Fases del pipeline",
+        "colStage": "Fase",
+        "colStatus": "Estado",
+        "colModel": "Modelo",
+        "colTime": "Duración",
+        "colLangs": "Idiomas",
+        "warn": {
+          "transcriptEmpty": "Transcripción vacía: el audio de origen parece silencioso o sin habla. El resumen, las traducciones y el doblaje derivados NO son fiables.",
+          "lowConfidence": "Confianza de la transcripción baja: revisa el texto antes de publicarlo.",
+          "manyLowConfSegments": "Muchos segmentos con baja confianza: la transcripción podría contener errores.",
+          "highNoSpeech": "Audio en gran parte silencioso o sin habla: la transcripción podría estar alucinada.",
+          "stageFailed": "La fase «{stage}» ha fallado.",
+          "stageRetried": "La fase «{stage}» se ha completado tras varios intentos."
+        },
+        "stage": {
+          "TRANSCRIBE": "Transcripción",
+          "TRANSCRIBE_MULTITRACK": "Transcripción (multipista)",
+          "SUMMARIZE": "Resumen",
+          "TRANSLATE": "Traducción",
+          "SUBTITLE": "Subtítulos",
+          "DUB": "Doblaje",
+          "ARCHIVE": "Archivo"
+        },
+        "status": {
+          "PENDING": "En espera",
+          "CLAIMED": "Asignada",
+          "RUNNING": "En curso",
+          "DONE": "Completada",
+          "FAILED": "Fallida"
+        }
+      },
+      "archiveSourceTitle": "Grabación de origen",
+      "archiveSourceHint": "Vídeo original del evento. Las pistas separadas por participante y el archivo MKV requieren la grabación multipista (no activa para este evento).",
+      "archiveSourceDownload": "Descargar el vídeo original"
     }
   },
   "email": {
@@ -2326,7 +2871,31 @@
     "overallStatus": "Estado general",
     "lastChecked": "Última comprobación",
     "responseTime": "Tiempo de respuesta",
-    "systemStatus": "Estado del sistema"
+    "systemStatus": "Estado del sistema",
+    "postprod": {
+      "title": "Pipeline posevento",
+      "subtitle": "Transcripción, resumen, traducción y doblaje de la grabación",
+      "whatItDoes": "Cuando un evento termina, la grabación pasa por un pipeline interno: la transcripción la genera WhisperX, el resumen y las traducciones un modelo Mistral, y el audio doblado Piper TTS. Todos los modelos se ejecutan en una GPU del clúster que permanece encendida solo durante el tiempo de trabajo, de modo que la energía consumida sigue la carga real.",
+      "status": {
+        "idle": "En espera",
+        "running": "En ejecución",
+        "degraded": "Degradado"
+      },
+      "aiBadge": "La transcripción, el resumen y el doblaje de este evento están generados por modelos de inteligencia artificial y pueden contener imprecisiones. Para tener una certeza definitiva, consulta siempre el vídeo original.",
+      "idleMessage": "Pipeline listo, no hay ninguna grabación que procesar en este momento.",
+      "queueAriaLabel": "Composición de la cola de posproducción",
+      "queuePending": "en cola",
+      "queueRunning": "en proceso",
+      "queueDone": "completados",
+      "queueFailed": "fallidos",
+      "asrProvider": "Transcripción",
+      "llmProvider": "Resumen/Traducción",
+      "targetLocales": "Idiomas de destino",
+      "lastSuccess": "Último éxito {when}",
+      "lastFailure": "Último error {when}",
+      "artifactsProduced": "{count, plural, =0 {ningún artefacto} one {1 artefacto producido} other {# artefactos producidos}}",
+      "eventsEnabled": "{count, plural, =0 {ningún evento con IA} one {1 evento con IA activa} other {# eventos con IA activa}}"
+    }
   },
   "infraMap": {
     "loading": "Cargando mapa de infraestructura...",
@@ -2388,7 +2957,8 @@
       "jicofo": "Coordinador de conferencias",
       "jvb": "Puente de vídeo",
       "jibri": "Grabación de vídeo",
-      "smtp": "Servicio de correo electrónico"
+      "smtp": "Servicio de correo electrónico",
+      "postprod": "Pipeline de IA posevento"
     },
     "descriptions": {
       "app": "El sitio web donde se accede a los eventos",
@@ -2399,7 +2969,8 @@
       "jicofo": "Coordina quién participa en cada conferencia",
       "jvb": "Transmite audio y vídeo a los participantes",
       "jibri": "Graba las sesiones de vídeo de los eventos",
-      "smtp": "Envía los correos de confirmación y los recordatorios"
+      "smtp": "Envía los correos de confirmación y los recordatorios",
+      "postprod": "Transcribe, resume y traduce las grabaciones con modelos de IA en el clúster (GPU NVIDIA A100). Se activa solo cuando un evento habilita las funciones de IA."
     },
     "verdicts": {
       "app": {
@@ -2447,6 +3018,12 @@
       "smtp": {
         "healthy": "El servicio de correo electrónico está configurado y listo para enviar notificaciones.",
         "standby": "El servicio de correo electrónico no está configurado. Los correos de confirmación y los recordatorios no se enviarán."
+      },
+      "postprod": {
+        "healthy": "El pipeline de IA está procesando una grabación (worker de GPU activo).",
+        "scaling": "Trabajos de posproducción en cola: el nodo GPU se está arrancando (arranque en frío ~3 min).",
+        "standby": "Pipeline de IA activo pero en espera: no hay grabaciones que procesar. El nodo GPU está apagado para ahorrar energía.",
+        "degraded": "Uno o más trabajos de IA han fallado en las últimas 24 h. Consulta /admin/postprod para ver los detalles."
       }
     },
     "impacts": {
@@ -2459,7 +3036,8 @@
       "jvbStale": "Un evento espera el bridge desde hace más del timeout configurado: los participantes no pueden entrar.",
       "jibri": "Los eventos no pueden ser grabados. Los participantes pueden seguir uniéndose y participando.",
       "jibriStale": "Un evento con grabación activa espera Jibri desde hace más del timeout: la sesión no se está grabando.",
-      "smtp": "Los correos de confirmación de inscripción y los recordatorios no se enviarán."
+      "smtp": "Los correos de confirmación de inscripción y los recordatorios no se enviarán.",
+      "postprodDegraded": "Las transcripciones y las actas de algunas grabaciones recientes no se han generado. Las grabaciones de vídeo siguen estando disponibles."
     },
     "overallVerdicts": {
       "operational": "Todos los servicios funcionan correctamente. La plataforma está plenamente operativa.",
@@ -2500,7 +3078,8 @@
       "errorRate": "Errores 5xx",
       "requestRate": "Solicitudes/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "connPostprod": "posproducción con IA"
   },
   "feedback": {
     "title": "¿Cómo valora este evento?",
@@ -2590,7 +3169,8 @@
     "buildInfoDev": "compilación de desarrollo",
     "viewCommit": "Ver el commit en GitHub",
     "viewRelease": "Ver la versión en GitHub",
-    "buildDatePrefix": "Compilado el"
+    "buildDatePrefix": "Compilado el",
+    "viewChangelog": "Ver las novedades (changelog)"
   },
   "pages": {
     "privacyTitle": "Política de privacidad",
@@ -2609,7 +3189,26 @@
     "unmute": "Activar audio",
     "download": "Descargar grabación",
     "speedLabel": "Velocidad de reproducción",
-    "progress": "Barra de progreso"
+    "progress": "Barra de progreso",
+    "subtitles": "Subtítulos",
+    "subtitlesOff": "Desactivados",
+    "audioLabel": "Audio",
+    "audioOriginal": "Original",
+    "audioSyntheticBanner": "Audio doblado con IA: voz sintética, contenido generado automáticamente.",
+    "audioSyntheticHint": "Audio generado por IA",
+    "shortcutsHelpOpen": "Mostrar los atajos de teclado",
+    "shortcutsHelpClose": "Cerrar los atajos de teclado",
+    "shortcutsTitle": "Atajos de teclado",
+    "shortcutsSpace": "Reproducir o pausar",
+    "shortcutsArrowsLR": "Avanzar o retroceder 5 segundos",
+    "shortcutsArrowsUD": "Subir o bajar el volumen un 5 %",
+    "shortcutsJL": "Avanzar o retroceder 10 segundos",
+    "shortcutsM": "Activar o desactivar el sonido",
+    "shortcutsC": "Mostrar u ocultar los subtítulos",
+    "shortcutsF": "Pantalla completa",
+    "shortcutsSpeed": "Reducir o aumentar la velocidad",
+    "captionsOn": "Subtítulos activados",
+    "captionsOff": "Subtítulos desactivados"
   },
   "diagram": {
     "title": "Configuración del evento",
@@ -2740,7 +3339,11 @@
     "notConfigured": "Jibri no está configurado. La grabación de vídeo no está disponible.",
     "disabledHint": "La grabación de vídeo no está habilitada para este evento. Para activarla, abra la sección Configuración más arriba y active el interruptor \"Grabación\".",
     "play": "Reproducir",
-    "download": "Descargar"
+    "download": "Descargar",
+    "transcriptManage": "Transcripción / IA",
+    "deleteConfirmTitle": "Eliminar la grabación",
+    "deleteFailed": "No se ha podido eliminar",
+    "deleteSuccess": "Grabación eliminada"
   },
   "postEvent": {
     "config": "Configuración post-evento",
@@ -2758,8 +3361,17 @@
       "qa": "Preguntas y Respuestas",
       "materials": "Materiales",
       "polls": "Encuestas",
-      "feedback": "Valoraciones"
-    }
+      "feedback": "Valoraciones",
+      "transcript": "Transcripción con IA"
+    },
+    "pageVisibleHelp": "Si se desactiva (o vence la ventana de visibilidad), la página pública del evento concluido devuelve 404 y el evento desaparece de los listados y del sitemap.",
+    "libraryListed": "Publicar en la biblioteca de vídeos",
+    "libraryListedHelp": "Muestra este evento en la biblioteca pública (/video-library). Requiere una grabación publicada o un vídeo de YouTube, y que la página del evento sea visible.",
+    "libraryListedNoRecording": "Ninguna grabación publicada: el evento no aparecerá en la biblioteca hasta que publiques la grabación o añadas un vídeo de YouTube.",
+    "showRecap": "Mostrar el resumen del evento",
+    "showWordCloud": "Mostrar la nube de palabras",
+    "emailEnabled": "Enviar un correo de resumen al finalizar el evento",
+    "emailEnabledHelp": "Al concluir, envía a los participantes inscritos un correo de agradecimiento con el enlace al resumen y al feedback, y al moderador un resumen sintético. Se envía una sola vez."
   },
   "provisioning": {
     "loading": "Cargando",
@@ -2829,5 +3441,125 @@
     "noComments": "Sin comentarios",
     "yes": "Sí",
     "no": "No"
+  },
+  "agenda": {
+    "title": "Notas / Lista de comprobación",
+    "empty": "Todavía no hay puntos. Añade los temas que hay que tratar y márcalos a medida que avances.",
+    "add": "Añadir",
+    "addPlaceholder": "Nuevo punto…",
+    "remove": "Quitar",
+    "inProgress": "en curso",
+    "agree": "De acuerdo",
+    "disagree": "En desacuerdo",
+    "favorablePct": "{pct}% a favor",
+    "noReactions": "Comparte tu opinión"
+  },
+  "changelog": {
+    "metaTitle": "Novedades y changelog",
+    "title": "Novedades y changelog",
+    "intro": "Todas las versiones de la plataforma, de la más reciente a la más antigua. Cada entrada resume las principales novedades, correcciones y mejoras.",
+    "current": "Versión actual",
+    "sourceNote": "Las notas se elaboran a partir de las etiquetas, las pull requests y los commits del proyecto.",
+    "sourceLink": "Ver todas las releases en GitHub",
+    "cadence": "Ritmo de publicación",
+    "cadenceSummary": "{count} versiones entre el {from} y el {to}.",
+    "releaseNotes": "Notas de la versión y SBOM",
+    "rawChangelog": "CHANGELOG.md en el repositorio"
+  },
+  "postprod": {
+    "loading": "Cargando la transcripción…",
+    "loadError": "No se ha podido cargar la transcripción: {error}",
+    "empty": "No hay ninguna transcripción disponible para este evento.",
+    "tabTranscript": "Transcripción",
+    "tabSummary": "Resumen",
+    "aiBadgeLabel": "Contenido generado por IA",
+    "aiBadgeBody": "La transcripción y el resumen los produce automáticamente el pipeline de IA en el clúster. Pueden contener errores; el vídeo sigue siendo la fuente autorizada.",
+    "searchPlaceholder": "Buscar en la transcripción…",
+    "searchLabel": "Buscar en la transcripción",
+    "searchClear": "Borrar la búsqueda",
+    "searchNoMatches": "No hay resultados para «{query}».",
+    "searchMatches": "{count, plural, =1 {1 resultado} other {# resultados}}",
+    "downloadLabel": "Descargar",
+    "downloadMenu": "Opciones de descarga",
+    "downloadTranscriptTxt": "Transcripción (.txt)",
+    "downloadTranscriptSrt": "Subtítulos (.srt)",
+    "downloadTranscriptVtt": "Subtítulos (.vtt)",
+    "downloadSummaryMd": "Resumen (.md)",
+    "hero": {
+      "badge": "Resumen automático",
+      "aiActArt50": "Contenido generado por IA",
+      "title": "En resumen",
+      "availableIn": "Resumen disponible también en {langs}",
+      "summaryLanguageLabel": "Idioma del resumen",
+      "topicsLabel": "Capítulos: haz clic para ir a ese punto del vídeo",
+      "keyDecisions": "Decisiones tomadas",
+      "actionItems": "Tareas pendientes",
+      "expandDetails": "Mostrar las decisiones y las tareas",
+      "collapseDetails": "Ocultar las decisiones y las tareas"
+    },
+    "nowSpeaking": "Está hablando",
+    "shareSegment": "Compartir este punto",
+    "shareSegmentCopied": "Enlace copiado al portapapeles",
+    "bookmarkAdd": "Guardar en los marcadores",
+    "bookmarkRemove": "Quitar de los marcadores",
+    "bookmarksHeader": "Tus marcadores",
+    "bookmarksEmpty": "Todavía no has guardado ningún punto del vídeo. Abre un segmento de la transcripción y haz clic en la estrella para añadirlo aquí.",
+    "miniPlayerOpen": "Traer el vídeo al primer plano",
+    "miniPlayerClose": "Cerrar el minirreproductor",
+    "miniPlayerHint": "Mantente cerca del vídeo mientras te desplazas por la página",
+    "followLive": "Seguir el vídeo",
+    "followManual": "Lectura libre",
+    "followResume": "Volver a seguir el vídeo",
+    "lowConfidenceBadge": "revisar",
+    "lowConfidenceTitle": "Esta parte de la transcripción tiene una confianza baja: la grabación podría contener palabras distintas. Consulta siempre el vídeo original.",
+    "miniTranscriptLabel": "Transcripción en directo",
+    "dubAvailableHint": "Audio doblado disponible en {langs}. Usa el selector de audio en los controles del reproductor para escuchar la versión traducida.",
+    "provenance": {
+      "triggerLabel": "Transparencia del procesamiento con IA",
+      "closeLabel": "Ocultar los detalles del procesamiento",
+      "intro": "Estos son los modelos que han generado la transcripción, el resumen y el doblaje de esta grabación. Se guardan al terminar el procesamiento: ves lo que se usó realmente en ese momento, independientemente de los cambios posteriores en la configuración.",
+      "asr": {
+        "title": "Transcripción",
+        "hint": "Reconocimiento del habla y separación de los hablantes.",
+        "engine": "Motor",
+        "model": "Modelo",
+        "version": "Versión",
+        "diarizationEngine": "Diarización",
+        "diarizationSpeakers": "Hablantes detectados"
+      },
+      "llm": {
+        "title": "Resumen y traducción",
+        "hint": "Resumen de la reunión y traducción de la transcripción y del resumen.",
+        "engine": "Servido por",
+        "model": "Modelo",
+        "vendor": "Proveedor",
+        "license": "Licencia",
+        "country": "Sede social"
+      },
+      "tts": {
+        "title": "Doblaje",
+        "hint": "Síntesis de voz para generar el audio en los idiomas de destino.",
+        "engine": "Motor",
+        "license": "Licencia",
+        "policy": "Regla de asignación de las voces"
+      },
+      "languages": {
+        "title": "Idiomas tratados",
+        "hint": "Origen de la grabación y destinos de traducción y doblaje.",
+        "source": "Idioma original",
+        "translation": "Traducciones",
+        "dubbing": "Doblajes",
+        "none": "Ninguno"
+      },
+      "voices": {
+        "title": "Voces sintéticas asignadas a los hablantes",
+        "male": "voz masculina",
+        "female": "voz femenina"
+      },
+      "runAt": "Procesamiento completado el",
+      "version": "Versión del pipeline"
+    },
+    "overlapBadge": "simultáneo",
+    "overlapTitle": "Habla simultánea: en este intervalo hablan varias personas a la vez."
   }
 }

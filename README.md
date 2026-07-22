@@ -4,7 +4,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/italia/pa-webinar/badge)](https://scorecard.dev/viewer/?uri=github.com/italia/pa-webinar)
 [![License: EUPL-1.2](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
 [![publiccode.yml](https://img.shields.io/badge/publiccode-available-brightgreen.svg)](publiccode.yml)
-[![Tests](https://img.shields.io/badge/tests-568%20passing-brightgreen.svg)](#qualità-e-sicurezza)
+[![Tests](https://img.shields.io/badge/tests-1178%20passing-brightgreen.svg)](#qualità-e-sicurezza)
 
 Piattaforma open-source per eventi pubblici digitali della Pubblica Amministrazione italiana, basata su [Jitsi Meet](https://jitsi.org/) e il [design system .italia](https://designers.italia.it/). Sviluppata dal [Dipartimento per la Trasformazione Digitale](https://innovazione.gov.it/).
 
@@ -13,6 +13,17 @@ Interfaccia utente disponibile in **24 lingue UE** configurabili a runtime dall'
 🇬🇧 **English version**: [README.en.md](README.en.md)
 
 ---
+
+## Come si presenta
+
+| | |
+|---|---|
+| ![Home](docs/screenshots/home.png) | ![Elenco eventi](docs/screenshots/events.png) |
+| **Home** — prossimi eventi e registrazioni da rivedere | **Eventi** — filtri per data, argomento e tipo |
+| ![Libreria video](docs/screenshots/video-library.png) | ![Trasparenza](docs/screenshots/service-inventory.png) |
+| **Libreria video** — registrazioni pubblicate, con sottotitoli | **Inventario dei servizi** — CycloneDX 1.6, cosa gira e dove |
+
+Schermate reali dell'istanza in produzione. La sala live non è ritratta: richiederebbe un evento in corso e i volti di chi partecipa.
 
 ## Indice
 

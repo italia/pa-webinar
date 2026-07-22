@@ -3,6 +3,13 @@ import { prisma } from '@/lib/db';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
+import {
+  CLEANABLE_EVENT_STATUSES,
+  isEventDataRetentionExpired,
+  isRecordingRetentionExpired,
+  shouldPurgeRecordingBlob,
+  tempRecordingExpiryCutoff,
+} from '@/lib/gdpr/cleanup-selection';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +33,7 @@ export const GET = withErrorHandling(async (request) => {
     where: {
       tempRecordingUrl: { not: null },
       recordingPublished: false,
-      tempRecordingStartedAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
+      tempRecordingStartedAt: { lt: tempRecordingExpiryCutoff(now) },
     },
     select: { id: true, slug: true, tempRecordingUrl: true },
   });
@@ -83,11 +90,7 @@ export const GET = withErrorHandling(async (request) => {
   });
 
   for (const evt of recordingRetentionEvents) {
-    if (!evt.recordingPublishedAt || !evt.recordingDeleteAfterDays) continue;
-    const expiresAt = new Date(
-      evt.recordingPublishedAt.getTime() + evt.recordingDeleteAfterDays * 86_400_000
-    );
-    if (expiresAt >= now) continue;
+    if (!isRecordingRetentionExpired(evt, now)) continue;
 
     try {
       // Delete the expired blob (best-effort, outside the transaction).
@@ -129,7 +132,7 @@ export const GET = withErrorHandling(async (request) => {
   // ── Phase 3: Full event data retention cleanup ──
   const expiredEvents = await prisma.event.findMany({
     where: {
-      status: { in: ['ENDED', 'ARCHIVED'] },
+      status: { in: [...CLEANABLE_EVENT_STATUSES] },
     },
     select: {
       id: true,
@@ -144,12 +147,7 @@ export const GET = withErrorHandling(async (request) => {
     },
   });
 
-  const toClean = expiredEvents.filter((evt) => {
-    const retentionExpiry = new Date(
-      evt.endsAt.getTime() + evt.dataRetentionDays * 86_400_000
-    );
-    return retentionExpiry < now;
-  });
+  const toClean = expiredEvents.filter((evt) => isEventDataRetentionExpired(evt, now));
 
   let totalRegistrationsDeleted = 0;
   let totalQuestionsDeleted = 0;
@@ -328,16 +326,9 @@ export const GET = withErrorHandling(async (request) => {
         const ok = await deleteRecordingBlob(evt.tempRecordingUrl).catch(() => false);
         if (ok) totalRecordingBlobsDeleted++;
       }
-      // recordingUrl: EXEMPT the PUBLISHED video only. `recordingPublished` is
-      // the single "kept public record" signal — the public page shows
-      // recordingUrl only when recordingPublished, and the library index also
-      // requires it — so its lifetime is governed by recordingDeleteAfterDays
-      // (Phase 2), not the PII retention window. Deleting it here would 404 the
-      // still-linked player/card. Do NOT also exempt on libraryListed: a
-      // library-listed-but-unpublished recording is invisible everywhere, and
-      // since Phase 2 only touches published recordings, exempting it here would
-      // leak its blob forever.
-      if (evt.recordingUrl && !evt.recordingPublished) {
+      // recordingUrl: EXEMPT the PUBLISHED video only — see
+      // shouldPurgeRecordingBlob (lib/gdpr/cleanup-selection.ts) for why.
+      if (evt.recordingUrl && shouldPurgeRecordingBlob(evt)) {
         const ok = await deleteRecordingBlob(evt.recordingUrl).catch(() => false);
         if (ok) totalRecordingBlobsDeleted++;
       }
@@ -373,13 +364,9 @@ export const GET = withErrorHandling(async (request) => {
   return Response.json({
     ok: true,
     tempRecordingsCleaned: tempRecordingEvents.length,
-    publishedRecordingsCleaned: recordingRetentionEvents.filter((evt) => {
-      if (!evt.recordingPublishedAt || !evt.recordingDeleteAfterDays) return false;
-      const expiresAt = new Date(
-        evt.recordingPublishedAt.getTime() + evt.recordingDeleteAfterDays * 86_400_000
-      );
-      return expiresAt < now;
-    }).length,
+    publishedRecordingsCleaned: recordingRetentionEvents.filter((evt) =>
+      isRecordingRetentionExpired(evt, now)
+    ).length,
     eventsProcessed,
     registrationsDeleted: totalRegistrationsDeleted,
     questionsDeleted: totalQuestionsDeleted,

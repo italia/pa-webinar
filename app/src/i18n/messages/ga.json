@@ -96,7 +96,11 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Íoslódáil comhad .ics"
-      }
+      },
+      "alreadyRegisteredEnter": "Cláraithe cheana? Téigh isteach sa seomra",
+      "invalidTokenTitle": "Níl an nasc rochtana bailí a thuilleadh",
+      "invalidTokenBody": "Níl an nasc a d'úsáid tú bailí nó tá sé imithe in éag. Má chláraigh tú, féach ar an ríomhphost deimhnithe le do nasc pearsanta a fháil, nó cláraigh arís thíos.",
+      "invalidTokenBodyEnded": "Níl an nasc a d'úsáid tú bailí a thuilleadh. Tá deireadh leis an imeacht: gheobhaidh tú an taifeadadh agus na hábhair thíos."
     },
     "manage": {
       "toggleChat": "Comhrá",
@@ -116,6 +120,20 @@
     "list": {
       "filterByTag": "Scag de réir catagóire",
       "allTags": "Gach ceann"
+    },
+    "wordCloudTitle": "Scamall focal",
+    "recap": {
+      "title": "Achoimre ar an imeacht",
+      "intro": "Achoimre ar ar tháinig chun cinn le linn an imeachta.",
+      "participants": "Rannpháirtithe (buaic)",
+      "registered": "Cláraithe",
+      "topQuestions": "Na ceisteanna is mó vótaí",
+      "upvotes": "{count, plural, =0 {gan vóta} one {1 vóta} two {2 vóta} few {# vóta} many {# vóta} other {# vóta}}",
+      "polls": "Torthaí na bpobalbhreitheanna",
+      "votes": "{count, plural, =0 {gan vóta} one {1 vóta} two {2 vóta} few {# vóta} many {# vóta} other {# vóta}}",
+      "topWords": "Na focail is mó a roinneadh",
+      "feedback": "Meánrátáil",
+      "feedbackCount": "{count, plural, one {1 freagra} two {2 fhreagra} few {# fhreagra} many {# bhfreagra} other {# freagra}}"
     }
   },
   "registration": {
@@ -164,8 +182,11 @@
       "consentRequired": "Tá toiliú le próiseáil sonraí riachtanach",
       "recordingConsentRequired": "Tá toiliú leis an taifeadadh riachtanach don imeacht seo",
       "eventFull": "Tá uaslíon na rannpháirtithe sroichte ag an imeacht",
-      "generic": "Earráid le linn an chláraithe. Bain triail eile as, le bhur dtoil."
-    }
+      "generic": "Earráid le linn an chláraithe. Bain triail eile as, le bhur dtoil.",
+      "multitrackConsentRequired": "Tá toiliú le taifeadadh do riain fuaime riachtanach don imeacht seo"
+    },
+    "successScheduledMessage": "Tá tú cláraithe! Sheolamar ríomhphost chugat leis an nasc rochtana pearsanta. Cuir an t-imeacht le do fhéilire agus tar ar ais anseo go gairid roimh an tús.",
+    "addToCalendar": "Cuir le do fhéilire"
   },
   "videoLibrary": {
     "title": "Leabharlann físeán",
@@ -252,7 +273,33 @@
       "noMessages": "Gan teachtaireachtaí",
       "empty": "Níl teachtaireacht ar bith fós. Bí ar an gcéad duine!",
       "inputLabel": "Teachtaireacht chomhrá",
-      "moderatorBadge": "Modhnóir"
+      "moderatorBadge": "Modhnóir",
+      "attach": "Ceangail comhad",
+      "emojiPicker": "Cuir emoji isteach",
+      "attachBadType": "Cineál comhaid nach dtacaítear leis (íomhánna nó PDF).",
+      "attachTooLarge": "Tá an comhad rómhór (10 MB ar a mhéad).",
+      "attachFailed": "Theip ar an uaslódáil. Bain triail eile as.",
+      "sendFailed": "Níor seoladh an teachtaireacht. Bain triail eile as.",
+      "removeAttachment": "Bain an ceangaltán",
+      "openAttachment": "Oscail an ceangaltán",
+      "reply": "Freagair",
+      "replyingTo": "Ag freagairt do {name}",
+      "cancelReply": "Cealaigh an freagra",
+      "hide": "Folaigh",
+      "hideFailed": "Níorbh fhéidir an teachtaireacht a fholú. Bain triail eile as.",
+      "connReconnecting": "Ag athnascadh…",
+      "connDegraded": "Nuashonruithe moillithe",
+      "readDenied": "Níl an comhrá ar fáil: níl tú i measc rannpháirtithe an imeachta seo, nó níl an seomra oscailte fós. Ag baint triail eile as go huathoibríoch.",
+      "mentionNotificationTitle": "Luaigh {name} thú sa chomhrá",
+      "react": "Frithghníomhaigh",
+      "edited": "curtha in eagar",
+      "editLabel": "Cuir an teachtaireacht in eagar",
+      "editSave": "Sábháil",
+      "editFailed": "Níorbh fhéidir an teachtaireacht a chur in eagar.",
+      "exportChat": "Íoslódáil an comhrá",
+      "reactNotAllowed": "Teastaíonn do nasc pearsanta nó nasc modhnóra chun frithghníomhú le teachtaireachtaí.",
+      "editNotAllowed": "Is nasc comhroinnte é seo: ní féidir teachtaireachtaí a chur in eagar leis.",
+      "editExpired": "Tá níos mó ná 15 nóiméad caite: ní féidir an teachtaireacht seo a chur in eagar a thuilleadh."
     },
     "role": {
       "moderator": "Modhnóir",
@@ -271,7 +318,9 @@
         "medium": "Measartha",
         "poor": "Lag",
         "unknown": "N/B"
-      }
+      },
+      "volume": "Airde",
+      "volumeFor": "Airde {name}"
     },
     "moderator": {
       "muteAll": "Balbhaigh gach duine",
@@ -295,14 +344,17 @@
       "micDisabled": "Micreafón díchumasaithe",
       "videoModeration": "Físeán rannpháirtithe",
       "videoDisabled": "Físeán díchumasaithe",
-      "eventEndedSuccess": "Imeacht críochnaithe go rathúil. Ag atreorú..."
+      "eventEndedSuccess": "Imeacht críochnaithe go rathúil. Ag atreorú...",
+      "whiteboard": "Clár bán",
+      "lowerHand": "Ísligh an lámh"
     },
     "closeDrawer": "Dún",
     "hintBanner": {
       "controls": "Tá na rialuithe thíos",
       "raiseHand": "Ardaigh do lámh chun labhairt",
       "sidebar": "Q&A agus comhrá sa bharra taoibh",
-      "dismiss": "Tuigim"
+      "dismiss": "Tuigim",
+      "ariaLabel": "Leideanna"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# duine} other {# dhuine}}"
@@ -310,7 +362,55 @@
     "sidebarTabChatUnread": "Teachtaireachtaí nua gan léamh",
     "floatingControlsLabel": "Rialuithe imeachta",
     "screenshareActive": "🖥️ tá {name} ag comhroinnt an scáileáin",
-    "screenshareFallbackName": "Rannpháirtí"
+    "screenshareFallbackName": "Rannpháirtí",
+    "share": {
+      "button": "Comhroinn",
+      "title": "Comhroinn an t-imeacht",
+      "callLink": "Nasc chun páirt a ghlacadh",
+      "callLinkHint": "Rachaidh duine ar bith a osclaíonn an nasc seo isteach go díreach fad a bheidh an t-imeacht beo; murab ea, rachaidh sé tríd an gclárú. Níl aon chomhartha rochtana príobháideach ann.",
+      "eventLink": "Leathanach an imeachta",
+      "eventLinkHint": "An leathanach poiblí leis na sonraí agus leis an bhfoirm chláraithe.",
+      "copy": "Cóipeáil",
+      "copied": "Cóipeáilte!",
+      "moderatorReveal": "Taispeáin an nasc modhnóra",
+      "moderatorWarning": "Tugann an nasc seo rochtain MHODHNÓRA (gach duine a bhalbhú, taifeadadh a thosú, deireadh a chur leis an imeacht). Ná comhroinn é ach le modhnóirí eile.",
+      "moderatorLink": "Nasc modhnóra",
+      "moderatorLinkHint": "Rachaidh duine ar bith a osclaíonn an nasc seo isteach mar mhodhnóir le lánsmacht ar an seomra."
+    },
+    "enterFullscreen": "Lánscáileán",
+    "exitFullscreen": "Scoir den lánscáileán",
+    "leaveChoice": {
+      "title": "Conas is mian leat imeacht?",
+      "body": "Is féidir leat imeacht leat féin — fanfaidh an glao beo do gach duine eile — nó deireadh a chur leis do na rannpháirtithe go léir.",
+      "leaveSelf": "Imigh leat féin",
+      "endForAll": "Cuir deireadh leis do chách",
+      "ending": "Á chur i gcrích…",
+      "endError": "Níorbh fhéidir deireadh a chur leis an nglao. Bain triail eile as."
+    },
+    "endDestino": {
+      "title": "Cinniúint an imeachta",
+      "body": "Tá tú ar tí deireadh a chur leis an imeacht do chách. Cad ba cheart tarlú dó nuair a bheidh sé thart?",
+      "public": "Coinnigh poiblí é",
+      "publicHelp": "Fanfaidh leathanach an imeachta chríochnaithe le feiceáil, le hachoimre, ceisteanna, pobalbhreitheanna, ábhair agus aiseolas.",
+      "library": "Foilsigh sa leabharlann",
+      "libraryHelp": "Mar atá thuas, agus taispeántar an t-imeacht sa leabharlann físeán poiblí freisin (teastaíonn taifeadadh foilsithe nó físeán YouTube).",
+      "archive": "Cuir i gcartlann (príobháideach)",
+      "archiveHelp": "Ní bheidh leathanach an imeachta chríochnaithe poiblí (404). Coinnítear na sonraí go dtí go rachaidh an tréimhse choinneála in éag, agus scriostar ansin iad.",
+      "genAi": "Cruthaigh tras-scríbhinn agus achoimre AI ón taifeadadh (nuair a bheidh an phróiseáil críochnaithe)",
+      "back": "Ar ais",
+      "confirm": "Cuir deireadh leis an imeacht"
+    },
+    "liveFeaturesLabel": "Gnéithe:",
+    "whiteboardNotSavedHint": "Ní shábháiltear an clár bán go huathoibríoch. Má úsáideann tú é, easpórtáil é (roghchlár an chláir bháin) agus ceangail le hÁbhair an imeachta é sula gcuirfidh tú deireadh leis.",
+    "sidebarTabWordcloud": "Scamall focal",
+    "sidebarTabAgenda": "Nótaí / Seicliosta",
+    "liveToggleAgenda": "Nótaí / Seicliosta (clár oibre)",
+    "timer": {
+      "show": "Taispeáin an t-amadóir",
+      "hide": "Folaigh an t-amadóir",
+      "remainingLabel": "An t-am atá fágtha (cliceáil chun an t-am caite a fheiceáil)",
+      "elapsedLabel": "An t-am caite (cliceáil chun an t-am atá fágtha a fheiceáil)"
+    }
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -407,12 +507,31 @@
         "maxParticipantsHelp": "Meas an líon uasta rannpháirtithe. Cinneann sé acmhainn an fhreastalaí físe agus comhéadan an tseomra feithimh.",
         "validation": {
           "startsAt": "Dáta tosaithe neamhbhailí.",
-          "endsAt": "Caithfidh an dáta críochnaithe a bheith tar éis an dáta tosaithe."
+          "endsAt": "Caithfidh an dáta críochnaithe a bheith tar éis an dáta tosaithe.",
+          "titleRequired": "Tá an teideal riachtanach (3 charachtar ar a laghad).",
+          "titleRequiredOtherLocale": "Tá an teideal sa teanga réamhshocraithe ({locale}) riachtanach: téigh go dtí an cluaisín {locale}.",
+          "maxParticipants": "Cuir isteach uimhir idir 2 agus 500."
         },
         "senderRatioLabel": "Céatadán gníomhach measta",
         "senderRatioHelp": "Cé mhéad rannpháirtí a bhfuiltear ag súil leis go mbeidh micreafón/físeán gníomhach acu. Cabhraíonn sé an freastalaí físe a thomhas.",
         "activeParticipantsEstimate": "≈ {count} rannpháirtithe gníomhacha",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "advancedOptions": "Ardroghanna",
+        "waitingRoomEngineLabel": "Seomra feithimh (an t-imeacht seo)",
+        "waitingRoomEngineSiteDefault": "Réamhshocrú an tsuímh",
+        "waitingRoomEngineGarden": "Gairdín (caighdeánach)",
+        "waitingRoomEngineGame": "Físchluiche (forsheomra Phaser)",
+        "waitingRoomEngineClassic": "Clasaiceach (statach)",
+        "waitingRoomEngineHelp": "Sáraíonn sé réamhshocrú an tsuímh don imeacht seo.",
+        "videoQuality": "Cáilíocht físe/fuaime (an t-imeacht seo)",
+        "videoQualityHelp": "Sáraíonn sé réamhshocrú an tsuímh don imeacht seo. Úsáideann cáilíocht níos airde níos mó bandaleithid.",
+        "videoQualitySiteDefault": "Réamhshocrú an tsuímh",
+        "videoQualityOptions": {
+          "MAX": "Uasta (1080p, arddílseacht)",
+          "HIGH": "Ard (720p, molta)",
+          "BALANCED": "Cothrom (540p)",
+          "SAVE_DATA": "Coigilt sonraí (360p)"
+        }
       },
       "step2": {
         "heading": "Cé atá in ann cad a dhéanamh",
@@ -449,7 +568,8 @@
             "desc": "Tús/stop a chur leis an taifeadadh."
           }
         },
-        "recordingHeading": "Taifeadadh"
+        "recordingHeading": "Taifeadadh",
+        "roomFeaturesHeading": "Gnéithe an tseomra"
       },
       "step3": {
         "heading": "Daoine agus cuirí",
@@ -484,7 +604,8 @@
         "invalidEmail": "Seoladh ríomhphoist neamhbhailí.",
         "duplicateEmail": "Tá an seoladh ann cheana.",
         "rubricaPick": "Cuardaigh ón leabhar seoltaí…",
-        "rubricaOrAdd": "nó cuir isteach de láimh é"
+        "rubricaOrAdd": "nó cuir isteach de láimh é",
+        "organizerLogo": "Lógó an eagraí"
       },
       "step4": {
         "heading": "Ábhar agus áiseanna",
@@ -544,7 +665,9 @@
           "recording": "Taifeadadh",
           "recordingAuto": "Ar siúl — tús uathoibríoch",
           "recordingManual": "Ar siúl — tús de láimh",
-          "recordingOff": "As"
+          "recordingOff": "As",
+          "multitrack": "Taifeadadh de réir rannpháirtí",
+          "multitrackOn": "Ar siúl — teastaíonn toiliú follasach tráth an chláraithe"
         },
         "noRecurrence": "Imeacht aonuaire",
         "gdprHeading": "Príobháideachas agus coinneáil sonraí",
@@ -560,9 +683,24 @@
         "featuresHeading": "Achoimre cumraíochta",
         "privacyDoc": "Doiciméad fógra príobháideachais (PDF nó nasc)",
         "privacyDocHelp": "Uaslódáil PDF nó greamaigh URL fógra príobháideachais ionadúil. Sáraíonn sé an teimpléad GDPR má tá ceann ann.",
-        "privacyTextHelp": "Téacs gairid taispeánta ar fhoirm an chlárúcháin; is féidir leis an teimpléad GDPR a chomhlánú nó a athrú."
+        "privacyTextHelp": "Téacs gairid taispeánta ar fhoirm an chlárúcháin; is féidir leis an teimpléad GDPR a chomhlánú nó a athrú.",
+        "moderatorPublishHint": "Tá an t-ainm agus an ríomhphost riachtanach chun an t-imeacht a fhoilsiú (úsáidtear iad don nasc modhnóra agus don ríomhphost deimhnithe). Níl siad riachtanach chun é a shábháil mar dhréacht.",
+        "moderatorLinkNote": "Is é an duine seo príomh-mhodhnóir an imeachta: gheobhaidh sé nasc príobháideach le ríomhphost chun é a bhainistiú (taifeadadh a thosú, ceisteanna a mhodhnú, pobalbhreitheanna a sheoladh…). Tá sé sin difriúil ó na comhmhodhnóirí a chuirtear leis sa chéim “Daoine”, a fhaigheann a nasc féin an duine.",
+        "moderatorRequired": "Cuir isteach ainm an mhodhnóra",
+        "moderatorEmailRequired": "Cuir isteach seoladh ríomhphoist bailí don mhodhnóir"
       },
-      "validationFailed": "Athbhreithnigh na réimsí aibhsithe sula leantar ar aghaidh."
+      "validationFailed": "Athbhreithnigh na réimsí aibhsithe sula leantar ar aghaidh.",
+      "partialFailure": "Cruthaíodh an t-imeacht, ach níor sábháladh roinnt míreanna: {items}. Is féidir leat iad a chur leis ó leathanach an imeachta.",
+      "draftFound": "Fuaireamar dréacht neamhshábháilte den imeacht seo. Ar mhaith leat é a athchóiriú?",
+      "draftRestore": "Athchóirigh an dréacht",
+      "draftDiscard": "Déan neamhaird",
+      "resources": {
+        "organizers": "eagraithe",
+        "invitations": "cuirí",
+        "moderators": "modhnóirí",
+        "speakers": "cainteoirí",
+        "materials": "ábhair"
+      }
     },
     "nav": {
       "events": "Bainistíocht imeachtaí",
@@ -603,7 +741,8 @@
       "eventQuestionnaires": "Ceistneoirí",
       "rubricaList": "Liosta",
       "rubricaDetail": "Iontráil",
-      "feedbackDashboard": "Feedback"
+      "feedbackDashboard": "Feedback",
+      "recordingsPostprod": "Tras-scríbhinní / AI"
     },
     "landing": {
       "title": "Painéal riaracháin",
@@ -701,7 +840,8 @@
           "dateRequired": "Tá an dáta bunaidh riachtanach.",
           "saveFailed": "Theip ar shábháil na meiteashonraí."
         }
-      }
+      },
+      "updateFailed": "Theip ar an nuashonrú."
     },
     "recordingsLibrary": {
       "title": "Físthaifeadtaí",
@@ -770,7 +910,10 @@
       "detailEnd": "Deireadh",
       "detailModerator": "Modhnóir",
       "detailRoom": "Seomra Jitsi",
-      "detailFilename": "Ainm comhaid"
+      "detailFilename": "Ainm comhaid",
+      "transcriptManage": "Bainistigh an tras-scríbhinn / AI",
+      "transcriptReady": "Tras-scríofa",
+      "transcriptProcessing": "Á phróiseáil"
     },
     "gdprAudit": {
       "title": "Iniúchadh GDPR",
@@ -1023,7 +1166,32 @@
       "retentionPreviewRecordings": "Taifeadtaí físe",
       "retentionPreviewKept": "Coinnítear staitisticí comhiomlánaithe agus meiteashonraí an imeachta.",
       "configPreview": "Réamhamharc cumraíochta",
-      "templateApplied": "Teimpléad curtha i bhfeidhm: {name}. Is féidir libh gach socrú a athrú."
+      "templateApplied": "Teimpléad curtha i bhfeidhm: {name}. Is féidir libh gach socrú a athrú.",
+      "agendaEnabled": "Nótaí / Seicliosta beo (clár oibre)",
+      "agendaEnabledDesc": "Seicliosta de na topaicí atá le plé a thiceálann na modhnóirí le linn an imeachta. Cuirtear san áireamh san achoimre uathoibríoch é. Roghnach, agus is féidir é a chur ar siúl le linn an imeachta freisin.",
+      "whiteboardEnabled": "Clár bán comhroinnte",
+      "whiteboardEnabledDesc": "Cumasaíonn sé an clár bán comhoibríoch dúchasach (Excalidraw): is féidir le modhnóirí é a oscailt ón mbarra uirlisí le linn an imeachta. Ar siúl i gcónaí i nglaonna láithreacha.",
+      "aiSectionHeading": "Iarléiriú uathoibríoch",
+      "aiSectionDesc": "Tar éis dheireadh an imeachta, is féidir an taifeadadh a phróiseáil le píblíne intleachta saorga sa bhraisle chun tras-scríbhinn, achoimre agus — má iarrtar é — aistriúcháin agus dubáil a chruthú. Ritheann gach rud ar bhonneagar na Roinne, ní théann aon sonraí chuig tríú páirtithe.",
+      "aiTranscriptEnabled": "Tras-scríobh uathoibríoch",
+      "aiTranscriptEnabledDesc": "Aithint cainte le sainaithint na gcainteoirí. Riachtanach chun an achoimre, na haistriúcháin agus an dubáil a chumasú.",
+      "aiSummaryEnabled": "Achoimre agus caibidlí",
+      "aiSummaryEnabledDesc": "Achoimre ar an gcruinniú, na cinntí a rinneadh, na gníomhartha atá le déanamh agus roinnt ina caibidlí le stampaí ama.",
+      "aiTranslationEnabled": "Aistriúchán go teangacha eile",
+      "aiTranslationEnabledDesc": "An tras-scríbhinn agus an achoimre aistrithe go dtí na teangacha atá socraithe thíos.",
+      "aiTargetLocales": "Teangacha aistriúcháin",
+      "aiTargetLocalesDesc": "Cóid teanga ISO (m.sh. en, fr, de) scartha le camóga. Fág folamh chun na teangacha atá socraithe ar leibhéal an tsuímh a úsáid.",
+      "aiTargetLocalesRequired": "Socraigh teanga aistriúcháin amháin ar a laghad, nó múch an t-aistriúchán uathoibríoch.",
+      "aiDubbingEnabled": "Dubáil fuaime",
+      "aiDubbingEnabledDesc": "Fuaim dhubáilte sna sprioctheangacha, cruthaithe le guthanna sintéiseacha réamhoilte. Ní chlónáiltear guth na rannpháirtithe.",
+      "consentBadge": "Toiliú follasach",
+      "retentionBadge": "Fadaíonn sé an choinneáil",
+      "multitrackRecordingEnabled": "Taifeadadh de réir rannpháirtí (ardchruinneas)",
+      "multitrackRecordingEnabledDesc": "Taifeadann sé rian fuaime ar leith do gach rannpháirtí, ionas go luafaidh an tras-scríbhinn go cinnte cé a dúirt cad é (deireadh le “Cainteoir 1/2”). Próiseálann sé fuaim scoite cainteora aonair (sonraí pearsanta íogaire): tá na rianta sealadach agus scriostar iad díreach tar éis an tras-scríofa. Teastaíonn toiliú leis an taifeadadh.",
+      "retainParticipantTracks": "Coinnigh na rianta de réir rannpháirtí",
+      "retainParticipantTracksDesc": "Coinníonn sé na rianta fuaime aonair thar an tras-scríobh, don chartlann is féidir a íoslódáil agus don athéisteacht de réir cainteora. RABHADH: fadaíonn sé seo coinneáil sonraí pearsanta íogaire (guth scoite) go dtí spriocdháta coinneála an imeachta. Ná cuir ar siúl é ach amháin más gá, agus le toiliú/fógra cuí.",
+      "expectedSpeakers": "Líon na gcainteoirí a bhfuiltear ag súil leo",
+      "expectedSpeakersDesc": "Nuair atá a fhios agat (m.sh. 3 chainteoir), feabhsaíonn sé sin cáilíocht shainaithint na gcainteoirí. Fág folamh chun ligean don phíblíne cinneadh a dhéanamh."
     },
     "links": {
       "title": "Naisc an imeachta",
@@ -1123,7 +1291,8 @@
         "pages": "Leathanaigh",
         "footer": "Buntásc",
         "features": "Gnéithe",
-        "scaling": "Méid an bhonneagair"
+        "scaling": "Méid an bhonneagair",
+        "postprod": "Píblíne AI iarimeachta"
       },
       "scaling": {
         "intro": "Paraiméadair a léiríonn acmhainn an bhraisle ina ritheann an t-ardán. Tá na luachanna réamhshocraithe calabraithe d'Azure F16s_v2 (16 vCPU / 32 GiB) le haghaidh JVB agus F4s_v2 (4 vCPU / 8 GiB) le haghaidh Jibri. Má úsáideann tú crua-earraí éagsúla, nuashonraigh anseo — déanfaidh an scálálaí athríomh láithreach.",
@@ -1285,7 +1454,55 @@
         "jvbProvisioningTimeoutMinutes": "Teorainn ama soláthair (nóiméid)",
         "jvbProvisioningTimeoutMinutesHelp": "Tar éis cé mhéad nóiméad ó startsAt go marcáiltear imeacht le JVB nár ullmhaíodh fós mar 'meathlaithe' ar an leathanach stádais. Réamhshocrú 15. Clúdaíonn sé tús fuar an nóid (~3-5 nóim) móide corrlach sábháilteachta.",
         "statusPollIntervalSeconds": "Eatramh vótála leathanach stádais (soicindí)",
-        "statusPollIntervalSecondsHelp": "Cé chomh minic a athnuann an leathanach /status na sonraí ar thaobh an bhrabhsálaí. Réamhshocrú 30. Luachanna níos ísle = sonraí níos úire ach níos mó luchta ar an aip."
+        "statusPollIntervalSecondsHelp": "Cé chomh minic a athnuann an leathanach /status na sonraí ar thaobh an bhrabhsálaí. Réamhshocrú 30. Luachanna níos ísle = sonraí níos úire ach níos mó luchta ar an aip.",
+        "jvbEmptyCloseMinutes": "Nóiméid le seomra folamh roimh dhúnadh cinntitheach",
+        "jvbEmptyCloseMinutesHelp": "Má fhanann seomra LIVE a raibh rannpháirtithe ann cheana folamh ar feadh an oiread seo nóiméad, dúntar go buan é (ENDED) — mar sin dúnann imeacht gan mhodhnóir é féin de bharr neamhghníomhaíochta, gan fanacht leis an am deiridh sceidealta. Réamhshocrú 15 (ar siúl). -1 = díchumasaithe. 0 = dún ag an gcéad seiceáil ar sheomra folamh.",
+        "waitingRoomLeadMinutes": "Fuinneog rochtana ar an seomra feithimh (nóiméid)",
+        "waitingRoomLeadMinutesHelp": "Má chláraíonn duine laistigh den líon nóiméad seo roimh an tús, téann sé díreach isteach sa seomra feithimh; le clárú níos luaithe feictear an deimhniú leis an nasc chuig an bhféilire. 0 = taispeáin an deimhniú i gcónaí go dtí an tús. Moltar 15.",
+        "reactionsMode": "Frithghníomhartha (emoji)",
+        "reactionsModeNative": "Dúchasach Jitsi (sa bharra uirlisí, gearrshaolach)",
+        "reactionsModeCustom": "Saincheaptha don aip (barra ar chlé, le staitisticí)",
+        "reactionsModeHelp": "Dúchasach = cnaipe frithghníomhartha Jitsi sa bharra rialaithe, éadrom agus gearrshaolach (gan chomhaireamh). Saincheaptha = barra frithghníomhartha na haipe ag bun na láimhe clé, le comhaireamh agus staitisticí. Réamhshocrú: Dúchasach.",
+        "emailSenderTitle": "Seoltóir na ríomhphost",
+        "emailSenderHelp": "An chuma a bhíonn ar an seoltóir i mbosca isteach an duine a chláraíonn. Fanann an seoladh seolta i gcumraíocht an imscartha — caithfidh sé teacht leis an seoladh atá údaraithe ag an bhfreastalaí SMTP.",
+        "emailFromName": "Ainm an seoltóra",
+        "emailFromNameHelp": "Folamh = úsáidtear an t-ainm atá cumraithe san imscaradh (SMTP_FROM_NAME). Seoltar na ríomhphoist ón seoladh córais i gcónaí.",
+        "emailReplyTo": "Seoladh freagartha",
+        "emailReplyToHelp": "Seoltar na ríomhphoist ó sheoladh nach nglactar le freagraí air: gan é seo, ní shroicheann freagra aon duine.",
+        "avatarTitle": "Pictiúir na rannpháirtithe",
+        "gravatarEnabled": "Úsáid Gravatar nuair atá sé ar fáil",
+        "gravatarEnabledHelp": "Taispeánfar an Gravatar sa seomra do dhaoine a chláraigh le seoladh ríomhphoist a bhfuil Gravatar aige; coinníonn gach duine eile na ceannlitreacha a chruthaíonn an t-ardán. Faightear an íomhá trínár bhfreastalaí féin, agus mar sin ní dhéanann brabhsálaithe na rannpháirtithe teagmháil le gravatar.com — ach déanann an t-ardán: caithfear é sin a lua i bhfógra príobháideachais an tsuímh."
+      },
+      "postprod": {
+        "prerequisitesNote": "Oibríonn an t-iarléiriú ar an taifeadadh iomlán, tar éis dheireadh an imeachta. Músclaítear an linn GPU thiomnaithe nuair a thagann an chéad jab isteach sa scuaine agus múchtar í nuair a bhíonn an scuaine folamh, chun an costas a choinneáil íseal. Sula gcumasaíonn tú an phíblíne, deimhnigh go bhfuil an linn GPU cumraithe sa bhraisle, go bhfuil oibreoir NVIDIA suiteáilte, go bhfuil dintiúir HuggingFace ar fáil sa namespace agus go bhfuil meáchain na samhlacha réamhluchtaithe ar an imleabhar tiomnaithe. Tá an seicliosta oibríochtúil in docs/POSTPROD.md.",
+        "pipelineEnabled": "Píblíne iarimeachta gníomhach",
+        "pipelineEnabledHelp": "Príomhlasc. Nuair atá sé díchumasaithe, ní chruthaítear aon tras-scríbhinn, achoimre, aistriúchán ná dubáil d'imeachtaí nua, fiú má tá an t-iarléiriú cumasaithe ag imeachtaí aonair. Ní nochtar na déantáin atá cruthaithe cheana don phobal go dtí go gcuirfidh tú an phíblíne ar siúl arís. Úsáid é chun gach rud a chur ar sos gan an feidhmchlár a athimscaradh.",
+        "timingNote": "Ní bhaineann an phíblíne leis an tarchur beo. Tarlaíonn gach rud tar éis dheireadh an imeachta, nuair a chuirtear an taifeadadh i gcartlann: ní bhíonn na fotheidil ná an achoimre ar fáil i bhfíor-am riamh. Tugann an rogha seo tosaíocht do cháilíocht an tras-scríofa agus coinníonn sí ídiú na GPU faoi smacht i gcomparáid le fotheidealú beo.",
+        "providersSection": "Innill intleachta saorga",
+        "providersIntro": "Dearbhaítear na hinnill a úsáidtear le haghaidh tras-scríofa, achoimrithe agus dubála tráth an imscartha. Is obair bhonneagair é ceann nua a chur leis (an t-inneall a imscaradh sa bhraisle, é a chlárú i liosta na soláthraithe tacaithe, agus an scéimre a nuashonrú). Taispeánann na roghchláir anuas thíos na hinnill atá ar fáil ar an ásc seo faoi láthair.",
+        "asrProvider": "Inneall tras-scríofa",
+        "asrProviderHelp": "Cruthaíonn sé tras-scríbhinn an fhíseáin le stampaí ama de réir nóiméid agus le deighilt na gcainteoirí. Úsáidimid WhisperX large-v3 in éineacht le pyannote.audio chun na cainteoirí a dheighilt. Ritheann an dá shamhail sa bhraisle ar na meáchain atá stóráilte ar an imleabhar tiomnaithe.",
+        "asrOptionWhisperx": "WhisperX large-v3 + diarization pyannote",
+        "llmProvider": "Inneall achoimrithe agus aistriúcháin",
+        "llmProviderHelp": "Cruthaíonn sé achoimre an chruinnithe, aithníonn sé na topaicí a pléadh agus aistríonn sé an tras-scríbhinn agus an achoimre go dtí na sprioctheangacha. Samhail Mistral-Small-3.2-24B (soláthraí Eorpach, ceadúnas Apache 2.0) arna freastal trí vLLM sa bhraisle.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM sa bhraisle",
+        "ttsEngine": "Inneall dubála",
+        "ttsEngineHelp": "Sintéisíonn sé an fhuaim sna teangacha roghnaithe le guthanna poiblí réamhoilte. Nuair a bhíonn níos mó ná cainteoir amháin ann, faigheann gach cainteoir guth difriúil ón linn atá ar fáil chun cabhrú leis na héisteoirí an comhrá a leanúint: is go treallach a dhéantar an sannadh agus ní athchruthaíonn sé fíorghuth na rannpháirtithe ar chor ar bith. Ní chruthaítear an dubáil ach amháin nuair a iarrann an t-eagraí é don imeacht ar leith.",
+        "ttsOptionPiper": "Piper TTS · guthanna sintéiseacha réamhoilte",
+        "voiceCloningSection": "Beartas eagarthóireachta maidir leis an nguth",
+        "voiceCloningNote": "Ní úsáideann an córas ach guthanna sintéiseacha ginearálta (Piper TTS, samhlacha poiblí faoi cheadúnas MIT). Ní dhéanann sé anailís ar ghuth na rannpháirtithe, ní stórálann sé é agus ní athchruthaíonn sé é: léirítear gach cainteoir le guth ón linn, arna roghnú go cinntitheach de réir an ama chainte, gan aon nasc lena chéannacht ghutha. Athraíonn an guth a shanntar de réir chomhdhéanamh na gcainteoirí i ngach imeacht ar leith, agus mar sin d'fhéadfaí an cainteoir céanna a dhubáil le guthanna difriúla in imeachtaí difriúla. Seachnaíonn an rogha seo próiseáil sonraí bithmhéadracha a rialaítear le hAirteagal 9 den RGCS.",
+        "defaultTargetLocales": "Teangacha aistriúcháin réamhshocraithe",
+        "defaultTargetLocalesHelp": "Cóid ISO-639-1 scartha le camóga (m.sh. `en,fr,de`). Baineann siad le himeachtaí nach sonraíonn a dteangacha aistriúcháin féin. Fágtar teanga fhoinseach an imeachta ar lár go huathoibríoch i gcónaí.",
+        "limitsSection": "Teorainneacha oibríochtúla",
+        "maxConcurrentJobs": "Jabanna comhthreomhara",
+        "maxConcurrentJobsHelp": "Uaslíon na jabanna a ritheann an phíblíne ag an am céanna ar an linn GPU. Glanann luachanna níos airde an riaráiste níos tapúla nuair a chríochnaíonn go leor imeachtaí i ndiaidh a chéile, ach caithfidh GPUanna a bheith ar fáil. Is é 2 an gnáthluach.",
+        "jobMaxAttempts": "Iarrachtaí roimh theip",
+        "jobMaxAttemptsHelp": "Cé mhéad uair a bhaineann an phíblíne triail eile as jab sula marcálann sí mar theipthe é. Fásann an cúlú idir iarrachtaí go heispéantúil (ó 30 soicind suas go 2 uair an chloig). Is é 5 an gnáthluach.",
+        "artifactRetentionDays": "Coinneáil na ndéantán (laethanta)",
+        "artifactRetentionDaysHelp": "Ag 0, leanann na déantáin AI sceideal coinneála an imeachta féin. Coinníonn luach dearfach iad ar feadh an líon laethanta a shonraítear, fiú tar éis an t-imeacht a dhúnadh, go dtí go scriosann cron laethúil iad. Cuimsíonn an scriosadh ainmneacha na gcainteoirí agus pálasta na jabanna, i gcomhréir le docs/GDPR.md.",
+        "consentDisclosureSection": "Fógra AI sa seomra feithimh",
+        "consentDisclosureHelp": "Téacs a thaispeántar do rannpháirtithe sa seomra feithimh nuair a bhaineann an t-imeacht úsáid as iarléiriú AI (tras-scríobh, achoimre, aistriúchán, dubáil). Inoiriúnaithe de réir teanga. Fág folamh chun an téacs réamhshocraithe a úsáid.",
+        "consentDisclosurePlaceholder": "M.sh. Déanfar an t-imeacht seo a thras-scríobh agus a achoimriú go huathoibríoch le huirlisí AI tar éis an tarchuir bheo…"
       }
     },
     "analytics": {
@@ -1372,7 +1589,23 @@
       "screen": "Roinnt scáileáin",
       "pickerTitle": "Roghnaigh teimpléad",
       "pickerSubtitle": "Roghnaigh teimpléad chun socruithe an imeachta a réamhchumrú, nó scipeáil chun gach rud a chumrú de láimh.",
-      "skipTemplate": "Cumraigh de láimh"
+      "skipTemplate": "Cumraigh de láimh",
+      "whiteboardLabel": "Clár bán",
+      "waitingRoomEngineLabel": "Seomra feithimh (réamhshocrú an teimpléid)",
+      "waitingRoomEngineSiteDefault": "Réamhshocrú an tsuímh",
+      "waitingRoomEngineGarden": "Gairdín (caighdeánach)",
+      "waitingRoomEngineGame": "Físchluiche (forsheomra Phaser)",
+      "waitingRoomEngineClassic": "Clasaiceach (statach)",
+      "waitingRoomEngineHelp": "Réamhlíonann sé inneall an tseomra feithimh sna himeachtaí a chruthaítear ón teimpléad seo. Is féidir é a athrú sa draoi fós.",
+      "durationLabel": "Fad réamhshocraithe (nóiméid)",
+      "durationHint": "Réamhlíonann sé deireadh an imeachta (tús + fad). Is féidir leis an úsáideoir é a athrú. Folamh = 2 uair an chloig.",
+      "retentionLabel": "Coinneáil sonraí réamhshocraithe (laethanta)",
+      "expectedSpeakersLabel": "Líon na gcainteoirí a bhfuiltear ag súil leo (réamhshocrú)",
+      "descriptionTemplateLabel": "Cur síos réamhshocraithe",
+      "descriptionTemplateHint": "Téacs a réamhlíontar i gcur síos an imeachta (inathraithe).",
+      "aiTranscript": "Tras-scríobh uathoibríoch (réamhshocrú)",
+      "aiSummary": "Achoimre uathoibríoch (réamhshocrú)",
+      "aiTranslation": "Aistriúchán uathoibríoch (réamhshocrú)"
     },
     "instantCall": {
       "title": "Glao físe láithreach",
@@ -1456,7 +1689,8 @@
       },
       "errors": {
         "saveFailed": "Theip ar an sábháil. Seiceáil na sonraí agus bain triail eile as."
-      }
+      },
+      "deleteTitle": "Scrios an teimpléad"
     },
     "emailTemplates": {
       "title": "Teimpléid ríomhphoist",
@@ -1637,7 +1871,8 @@
       "play": "Seinn",
       "hidePlayer": "Cuir an seinnteoir i bhfolach",
       "download": "Íoslódáil",
-      "deleteConfirm": "An scriostar an seisiún seo agus an taifeadadh gaolmhar?"
+      "deleteConfirm": "An scriostar an seisiún seo agus an taifeadadh gaolmhar?",
+      "deleteTitle": "Scrios an seisiún"
     },
     "monitoring": {
       "title": "Monatóireacht",
@@ -1798,7 +2033,9 @@
         "settings": "Socruithe",
         "people": "Daoine",
         "content": "Ábhar",
-        "audit": "Taifeadtaí & Iniúchadh"
+        "audit": "Taifeadtaí & Iniúchadh",
+        "postEvent": "Iarimeacht",
+        "analytics": "Staitisticí"
       },
       "toggles": {
         "unmute": "Is féidir le rannpháirtithe labhairt",
@@ -1820,7 +2057,22 @@
         "postEventSummary": "{connected} ceangailte as {registered} cláruithe (measta {estimated})",
         "estimatedAttendance": "Measta: {estimated} rannpháirtí"
       },
-      "copyGuestUrl": "Cóipeáil nasc d'aíonna"
+      "copyGuestUrl": "Cóipeáil nasc d'aíonna",
+      "aiManageTitle": "Tras-scríbhinn, achoimre agus aistriúcháin",
+      "aiManageDesc": "Bainistigh iarléiriú AI an taifeadta seo: ceartaigh an tras-scríbhinn agus sannadh na gcainteoirí (cé a deir cad é), cuir an achoimre in eagar agus bainistigh na teangacha aistriúcháin.",
+      "aiManageCta": "Oscail bainistiú an iarléirithe",
+      "aiManageNotEnded": "Ar fáil nuair a bheidh deireadh leis an imeacht agus an taifeadadh próiseáilte ag an bpíblíne AI.",
+      "aiGenerateCta": "Cruthaigh AI anois",
+      "aiGenerateRunning": "Á thosú…",
+      "aiGenerateQueued": "Tosaíodh an phíblíne AI: tá an tras-scríobh agus an achoimre i scuaine. Lean an dul chun cinn i mbainistiú an iarléirithe.",
+      "aiGenerateAlready": "Bhí an phíblíne AI tosaithe cheana don taifeadadh seo: níor cuireadh aon jab nua leis.",
+      "aiGenerateError": "Níorbh fhéidir an phíblíne AI a thosú. Deimhnigh go bhfuil an AI cumasaithe ar leibhéal an tsuímh agus go bhfuil taifeadadh ann.",
+      "aiGenerateHelp": "Cumasaíonn sé an tras-scríobh + an achoimre AI agus tosaíonn sé an phíblíne ar an taifeadadh, le cliceáil amháin. Idempotent: ní dhúblaíonn dhá chliceáil na jabanna.",
+      "aiGenerateNoRecording": "Gan taifeadadh: teastaíonn taifeadadh don AI iarimeachta (ní tharlaíonn an gabháil ach le linn an imeachta). Is féidir leat an t-iarléiriú a bhainistiú anseo mar sin féin.",
+      "duplicateNext": "Dúblaigh don chéad cheann eile",
+      "duplicateNextBusy": "Á dhúbláil…",
+      "duplicateNextHint": "Cruthaíonn sé dréacht a iompraíonn cumraíocht iomlán an imeachta seo (taifeadadh, rianta ar leith, AI, clár oibre, meabhrúcháin). Má tá minicíocht ag an imeacht, bogtar an dáta go dtí an chéad ócáid eile; murab ea, fágtar duitse é a shocrú.",
+      "duplicateNextError": "Níorbh fhéidir é a dhúbláil. Bain triail eile as."
     },
     "rubrica": {
       "title": "Leabhar seoltaí",
@@ -1838,6 +2090,299 @@
     "eventQuestionnaires": {
       "title": "Ceistneoirí — {eventTitle}",
       "subtitle": "Cumraigh ceistneoir réamhchlárúcháin agus/nó iar-imeachta trí theimpléid agus ceisteanna ad hoc a chumasc."
+    },
+    "eventAnalytics": {
+      "title": "Staitisticí",
+      "loadError": "Níorbh fhéidir na staitisticí a lódáil.",
+      "noData": "Níl aon sonraí ar fáil.",
+      "notEndedYet": "Níl deireadh leis an imeacht fós: tá na staitisticí páirteach agus nuashonraítear i bhfíor-am iad.",
+      "cappedNote": "Imeacht an-mhór: ríomhtar roinnt méadrachtaí ar shampla (baineadh amach uasteorainn na sraitheanna).",
+      "scoreTitle": "Scór aire",
+      "adminOnly": "riarthóirí amháin",
+      "scoreProxy": "Innéacs 0–100 ar a rannpháirtí a bhí an lucht féachana. Is ionadaí ar rannpháirtíocht é, ní tomhas ar aire chognaíoch — léigh i gcomhthéacs fhormáid an imeachta é (léacht i gcomparáid le ceardlann), agus ná léigh riamh mar ghrád cáilíochta é.",
+      "scoreUnavailable": "Níl go leor sonraí ann chun an scór a ríomh.",
+      "comp": {
+        "attendanceRate": "Freastal (isteach/cláraithe)",
+        "breadth": "Leithead an idirghníomhaithe",
+        "depth": "Doimhneacht an idirghníomhaithe",
+        "chatRate": "Ráta an chomhrá",
+        "liveParticipation": "Rannpháirtíocht bheo",
+        "talkBalance": "Cothromaíocht an ama chainte",
+        "retention": "Fanacht"
+      },
+      "kpiConversion": "Comhshó",
+      "kpiPeak": "Buaic na rannpháirtithe",
+      "kpiDuration": "Fad",
+      "kpiInteractors": "Idirghníomhaithe ar leith",
+      "interactionsWord": "idirghníomhaíochtaí",
+      "kpiHandRaises": "Lámha in airde",
+      "handRaisesSessionsSub": "ó {n, plural, one {# seisiún} two {# sheisiún} few {# sheisiún} many {# seisiún} other {# seisiún}}",
+      "kpiReactions": "Frithghníomhartha",
+      "kpiRetention": "Meánfhad fanachta",
+      "dwellSub": "{d} · {n, plural, one {# tomhaiste} two {# tomhaiste} few {# tomhaiste} many {# tomhaiste} other {# tomhaiste}}",
+      "reactionsTitle": "Frithghníomhartha",
+      "timelineTitle": "Gníomhaíocht an ghlao le himeacht ama",
+      "timelineEmpty": "Níor taifeadadh aon idirghníomhaíocht le linn an ghlao.",
+      "timelinePeak": "Buaic idirghníomhaíochta ag {at} ({n} teagmhas sa bhuicéad).",
+      "kind": {
+        "chat": "Comhrá",
+        "question": "Ceisteanna",
+        "upvote": "Vótaí suas",
+        "poll": "Pobalbhreitheanna",
+        "word": "Scamall focal",
+        "reaction": "Frithghníomhartha"
+      },
+      "speakersTitle": "Cé a labhair",
+      "audioUnavailable": "Níl staitisticí fuaime ar fáil — níor taifeadadh an t-imeacht (nó ní raibh caint ar bith sa taifeadadh).",
+      "predominant": "An cainteoir ceannasach",
+      "talkBalance": "Cothromaíocht",
+      "speechDensity": "Dlús na cainte",
+      "chatTitle": "Comhrá",
+      "chatAudience": "Lucht féachana",
+      "chatStaff": "Foireann",
+      "qaTitle": "Na ceisteanna is mó vótaí",
+      "none": "Ceann ar bith.",
+      "pollsTitle": "Pobalbhreitheanna",
+      "wordsTitle": "Scamall focal",
+      "feedbackTitle": "Aiseolas",
+      "responses": "freagraí",
+      "privacyNote": "Tá na staitisticí de réir duine bréagainmnithe mar réamhshocrú. Coinnítear comhiomláin gan ainm in achoimre an imeachta; scriostar na sraitheanna amha nuair a rachaidh an tréimhse choinneála in éag."
+    },
+    "postprod": {
+      "title": "Píblíne iarléirithe AI",
+      "subtitle": "Tras-scríbhinní, achoimrí agus aistriúcháin a chruthaigh an phíblíne AI sa bhraisle. Mapáil na cainteoirí, athrith nó cealaigh jabanna.",
+      "filterStatus": "Stádas",
+      "all": "Uile",
+      "queued": "I scuaine",
+      "running": "Ar siúl",
+      "done": "Críochnaithe",
+      "partial": "Páirteach",
+      "failed": "Teipthe",
+      "totalRows": "{count, plural, =0 {gan taifeadadh} one {1 taifeadadh} two {2 thaifeadadh} few {# thaifeadadh} many {# dtaifeadadh} other {# taifeadadh}}",
+      "colEvent": "Imeacht",
+      "colCreated": "Cruthaithe",
+      "colDuration": "Fad",
+      "colStatus": "Stádas",
+      "colJobs": "Jabanna",
+      "colArtifacts": "Déantáin",
+      "colActions": "Gníomhartha",
+      "rerun": "Athrith",
+      "rerunTooltip": "Cruthaíonn sé rith nua trí runCount a mhéadú; fanann na déantáin roimhe seo ann go dtí deireadh na coinneála",
+      "cancel": "Cealaigh",
+      "cancelConfirm": "Na jabanna ar feitheamh go léir don taifeadadh seo a chealú?",
+      "rerunFailed": "Theip ar an athrith (HTTP {code})",
+      "cancelFailed": "Theip ar an gcealú (HTTP {code})",
+      "speakerUpdateFailed": "Theip ar nuashonrú an chainteora (HTTP {code})",
+      "loadError": "Níorbh fhéidir liosta na jabanna a lódáil",
+      "empty": "Níl aon taifeadadh ag teacht leis na scagairí reatha",
+      "detailJobs": "Jabanna",
+      "detailArtifacts": "Déantáin",
+      "detailSpeakers": "Cainteoirí",
+      "noArtifacts": "Níor cruthaíodh aon déantán fós",
+      "noSpeakers": "Níor braitheadh aon chainteoir",
+      "attempts": "iarracht {n}",
+      "speakerPlaceholder": "Fíorainm (roghnach)",
+      "speakerSpoke": "Am cainte: {sec}s",
+      "suggestedApply": "Cuir an moladh i bhfeidhm: {name}",
+      "suggestedTitle": "Ainm arna mholadh ag an bpíblíne AI bunaithe ar na hainmneacha dílse a luaitear sa tras-scríbhinn. Cliceáil air chun an réimse a líonadh (is féidir leat é a athrú i gcónaí sula sábhálfaidh tú é).",
+      "save": "Sábháil",
+      "editTranscript": "Cuir an tras-scríbhinn in eagar",
+      "editClose": "Dún an t-eagarthóir",
+      "editTranscriptTitle": "Eagarthóir tras-scríbhinne",
+      "editHint": "Ceartaigh an téacs nó athshann cainteoir gach míre. Nuair a shábhálann tú, nuashonraítear an tras-scríbhinn agus na fotheidil sa teanga fhoinseach. NÍ athchruthaítear na haistriúcháin ná an dubáil: úsáid “Athrith” má tá na teangacha eile ag teastáil uait chomh maith.",
+      "editLoading": "Tras-scríbhinn á lódáil…",
+      "editLoadError": "Níorbh fhéidir an tras-scríbhinn a lódáil (HTTP {code}).",
+      "editNotReady": "Níl aon tras-scríbhinn ar fáil don taifeadadh seo fós. Tosaigh (nó athrith) an phróiseáil AI ó na rialtáin thuas: is é an tras-scríobh an chéad chéim, agus ansin is féidir leat é a cheartú anseo agus an achoimre agus na haistriúcháin a chruthú.",
+      "editProcessing": "Próiseáil AI ar siúl: taispeánfar an tras-scríbhinn anseo nuair a bheidh sí críochnaithe. Athlódáil an leathanach i gceann cúpla nóiméad.",
+      "editSessionExpired": "Chuaigh seisiún an riarthóra in éag. Athlódáil an leathanach agus sínigh isteach arís chun an tras-scríbhinn a chur in eagar.",
+      "editEmpty": "Níl aon mhír inathraithe ann",
+      "editSpeakerNone": "— ceann ar bith —",
+      "editSave": "Sábháil na hathruithe",
+      "editSaving": "Á shábháil…",
+      "editDirty": "{n, plural, one {1 athrú gan sábháil} two {2 athrú gan sábháil} few {# athrú gan sábháil} many {# n-athrú gan sábháil} other {# athrú gan sábháil}}",
+      "editSaved": "Sábháladh: {text} téacs, {speaker} cainteoir.",
+      "editFailed": "Theip ar an sábháil (HTTP {code})",
+      "editFailedDetail": "Theip ar an sábháil: {message}",
+      "editMediaError": "Níorbh fhéidir fuaim an taifeadta a lódáil: níl an athsheinm ar fáil. Is féidir leat téacs agus cainteoirí na míreanna a cheartú mar sin féin.",
+      "summaryLoadError": "Níorbh fhéidir an achoimre a lódáil.",
+      "summaryLoading": "Achoimre á lódáil…",
+      "summaryEmptyProcessing": "Níl an achoimre AI réidh fós: tá an phróiseáil ar siúl. Athlódáil an leathanach i gceann cúpla nóiméad.",
+      "summaryEmptyFailed": "Theip ar chruthú na hachoimre. Seiceáil stádas na píblíne agus athrith an phróiseáil ó na rialtáin thuas.",
+      "summaryEmptyNone": "Níor cruthaíodh aon achoimre AI don taifeadadh seo. Tosaigh an phróiseáil ó na rialtáin thuas.",
+      "editSeek": "Léim go dtí an pointe seo san fhíseán",
+      "manageTabTranscript": "Tras-scríbhinn",
+      "manageTabSummary": "Achoimre",
+      "manageTabTranslations": "Aistriúcháin",
+      "manageTabArchive": "Cartlann",
+      "manageTabReliability": "Iontaofacht",
+      "manageLoading": "Á lódáil…",
+      "archivePiiNote": "Is sonraí pearsanta íogaire iad na rianta fuaime scoite de réir rannpháirtí (guth scoite): tá an chuid seo curtha in áirithe do riarthóirí/modhnóirí agus ní nochtar go poiblí riamh í.",
+      "archiveNoTracks": "Níl aon rian de réir rannpháirtí ar fáil don taifeadadh seo (níl an taifeadadh ilrianach cumasaithe, nó scriosadh na rianta cheana ar mhaithe le híoslaghdú RGCS).",
+      "archivePlayerTitle": "Athéisteacht de réir cainteora",
+      "archiveAudioHint": "Úsáid roghnóir “Fuaim” an tseinnteora chun éisteacht leis an meascán nó le rian scoite rannpháirtí aonair, sioncronaithe leis an bhfíseán.",
+      "archiveTitle": "Cartlann iníoslódáilte",
+      "archiveIntro": "Cruthaigh comhad MKV leis an bhfíseán, rian fuaime amháin do gach rannpháirtí (lipéadaithe lena ainm, ailínithe go beacht) agus na fotheidil. Tá sé beartaithe le híoslódáil agus le cartlannú: ní féidir le brabhsálaithe an rian fuaime a athrú taobh istigh d'MKV, mar sin úsáid an seinnteoir thuas le haghaidh athéisteachta.",
+      "archiveGenerate": "Cruthaigh an chartlann",
+      "archiveStatusLabel": "Stádas",
+      "archiveStatus_none": "gan cruthú",
+      "archiveStatus_pending": "i scuaine",
+      "archiveStatus_running": "á phróiseáil",
+      "archiveStatus_done": "réidh",
+      "archiveStatus_failed": "teipthe",
+      "archiveDownload": "Íoslódáil MKV",
+      "archiveGenerateOk": "Tosaíodh cruthú na cartlainne.",
+      "archiveGenerateErr": "Theip ar chruthú na cartlainne (HTTP {code}).",
+      "archiveTrackFallback": "Rannpháirtí",
+      "manageBackToList": "Na taifeadtaí go léir",
+      "manageDuration": "Fad",
+      "manageSource": "Teanga fhoinseach",
+      "manageOpenPublic": "Leathanach poiblí",
+      "manageRerunOk": "Tosaíodh athrith na píblíne.",
+      "manageRerunNoop": "Níor tosaíodh aon jab: tá an AI díchumasaithe don imeacht seo, nó tá an phíblíne ar sos. Úsáid “Cruthaigh AI”.",
+      "manageRerunAlreadyQueued": "Tá an phróiseáil i scuaine cheana: níl aon rud nua le tosú.",
+      "generateAi": "Cruthaigh AI",
+      "generateAiConfirm": "Rith an phíblíne AI (tras-scríobh agus achoimre) ar an taifeadadh seo. Cumasófar an phróiseáil AI don imeacht agus tosóidh sí sa chúlra. Cuirtear na haistriúcháin leis ina dhiaidh sin, teanga ar theanga, ón gcluaisín “Aistriúcháin”.",
+      "generateAiOk": "Tosaíodh an phíblíne AI.",
+      "manageOpen": "Bainistigh",
+      "cancelConfirmTitle": "Cealaigh an t-iarléiriú",
+      "speakerUpdateSuccess": "Cainteoir nuashonraithe",
+      "tm": {
+        "loading": "Teangacha aistriúcháin á lódáil…",
+        "loadError": "Níorbh fhéidir na teangacha aistriúcháin a lódáil.",
+        "title": "Teangacha aistriúcháin",
+        "sourceLabel": "Teanga fhoinseach:",
+        "already": "Aistrithe cheana:",
+        "noneYet": "Níl aon aistriúchán ann fós.",
+        "addLabel": "Cuir teanga leis",
+        "noneAvailable": "Níl aon teanga ar fáil",
+        "selectPlaceholder": "Roghnaigh teanga…",
+        "adding": "Á cur leis…",
+        "addButton": "Cuir teanga leis",
+        "unexpectedError": "Earráid gan choinne",
+        "note": "Nuair a chuirtear teanga leis, cruthaítear aistriúchán na tras-scríbhinne agus na hachoimre — agus an dubáil fuaime, má tá sí cumasaithe don imeacht. Ritheann an phróiseáil sa chúlra.",
+        "summary": "Achoimre",
+        "subtitles": "Fotheidil",
+        "dub": "Dubáil",
+        "download": "íoslódáil",
+        "allTranslated": "Tá na teangacha gníomhacha go léir aistrithe cheana.",
+        "translatedHeader": "Teangacha aistrithe"
+      },
+      "ov": {
+        "tab": "Forbhreathnú",
+        "intro": "A bhfuil cruthaithe ag an bpíblíne AI don taifeadadh seo, teanga ar theanga.",
+        "processing": "Á phróiseáil, nó níl aon déantán ar fáil fós. Tar ar ais nuair a bheidh an stádas “Críochnaithe”.",
+        "loadError": "Níorbh fhéidir an forbhreathnú a lódáil.",
+        "langsTitle": "Teangacha agus déantáin",
+        "colLang": "Teanga",
+        "colTranscript": "Tras-scríbhinn",
+        "colSummary": "Achoimre",
+        "colSubtitles": "Fotheidil",
+        "colDub": "Dubáil",
+        "source": "bunleagan",
+        "present": "ar fáil",
+        "absent": "in easnamh",
+        "listen": "Éist",
+        "download": "Íoslódáil",
+        "dubTitle": "Dubáil fuaime (guth amháin in aghaidh an chainteora, sioncronaithe)",
+        "dubNone": "Níor cruthaíodh aon dubáil.",
+        "summaryTitle": "Achoimre",
+        "summaryLang": "Teanga",
+        "summaryNone": "Níl aon achoimre ar fáil.",
+        "decisions": "Cinntí",
+        "actions": "Gníomhartha le déanamh",
+        "topics": "Caibidlí",
+        "speakersTitle": "Cainteoirí",
+        "speakerAnon": "gan sannadh",
+        "speakerRenameHint": "Athainmnigh na cainteoirí chun na hainmneacha a cheartú: cuirtear an t-ainm in ionad an lipéid gan ainm sa tras-scríbhinn agus ar an leathanach poiblí.",
+        "speakerNamePlaceholder": "Fíorainm (m.sh. Mario Rossi)",
+        "speakerNameAria": "Ainm do",
+        "save": "Sábháil",
+        "saving": "Á shábháil…",
+        "saved": "Sábháilte",
+        "saveError": "Earráid",
+        "editHint": "Chun an téacs, na hainmneacha nó an achoimre a cheartú, úsáid na cluaisíní thuas.",
+        "kpiDuration": "Fad",
+        "kpiParticipants": "Rannpháirtithe (buaic)",
+        "kpiTracks": "Rianta fuaime",
+        "kpiLanguages": "Teangacha",
+        "kpiArtifacts": "Déantáin",
+        "kpiProcessed": "Próiseáilte",
+        "statusLabel": "Stádas",
+        "run": "rith",
+        "jobsTitle": "Dul chun cinn na píblíne",
+        "jobsNone": "Níl aon jab ann don taifeadadh seo.",
+        "attempts": "{n} iarracht",
+        "filesTitle": "Comhaid sa stóras",
+        "filesNone": "Níor aimsíodh aon chomhad sa stóras.",
+        "filesToggle": "Taispeáin/folaigh na {n} comhad",
+        "tracksTitle": "Rianta de réir rannpháirtí",
+        "tracksNone": "Níl aon rian de réir rannpháirtí ann (ilrian múchta nó rianta scriosta cheana).",
+        "trackPurged": "scriosta (RGCS)",
+        "trackEnters": "isteach +{s}s",
+        "metricsTitle": "Méadrachtaí na hachoimre (LLM)",
+        "chars": "carachtair",
+        "model": "Samhail",
+        "notAvailable": "n/b"
+      },
+      "rel": {
+        "title": "Iontaofacht AI",
+        "subtitle": "Cé chomh hiontaofa is atá an t-aschur a chruthaigh an AI don taifeadadh seo.",
+        "loading": "Iontaofacht á hanailísiú…",
+        "loadError": "Níorbh fhéidir na méadrachtaí iontaofachta a lódáil.",
+        "noData": "Níl aon phróiseáil AI ann don taifeadadh seo.",
+        "level": {
+          "good": "Iontaofa",
+          "fair": "Inghlactha",
+          "poor": "Lag",
+          "failed": "Neamhiontaofa"
+        },
+        "overallScore": "Muinín fhoriomlán",
+        "totalTime": "Am próiseála",
+        "sourceLang": "Teanga fhoinseach",
+        "transcriptTitle": "Tras-scríobh",
+        "segments": "Míreanna",
+        "speakers": "Cainteoirí",
+        "speech": "Caint bhraite",
+        "confidence": "Meánmhuinín",
+        "silence": "Tost measta",
+        "coverage": "Clúdach cainte",
+        "lowConf": "Míreanna ar bheagán muiníne",
+        "transcriptNotProduced": "Níl an tras-scríbhinn cruthaithe fós (níor ritheadh an phíblíne).",
+        "transcriptUnavailable": "Tá an tras-scríbhinn ann ach ní féidir í a anailísiú anseo (curtha i stóras blob).",
+        "stagesTitle": "Céimeanna na píblíne",
+        "colStage": "Céim",
+        "colStatus": "Stádas",
+        "colModel": "Samhail",
+        "colTime": "Fad",
+        "colLangs": "Teangacha",
+        "warn": {
+          "transcriptEmpty": "Tras-scríbhinn fholamh: dealraíonn sé go bhfuil an fhuaim fhoinseach ciúin nó gan chaint. NÍL an achoimre, na haistriúcháin ná an dubáil a dhíorthaítear uaithi iontaofa.",
+          "lowConfidence": "Muinín íseal sa tras-scríobh: seiceáil an téacs sula bhfoilseofar é.",
+          "manyLowConfSegments": "Go leor míreanna ar bheagán muiníne: d'fhéadfadh earráidí a bheith sa tras-scríbhinn.",
+          "highNoSpeech": "Tá an fhuaim ciúin nó gan chaint den chuid is mó: d'fhéadfadh an tras-scríbhinn a bheith cumtha (seachmall).",
+          "stageFailed": "Theip ar an gcéim “{stage}”.",
+          "stageRetried": "Críochnaíodh an chéim “{stage}” tar éis roinnt iarrachtaí."
+        },
+        "stage": {
+          "TRANSCRIBE": "Tras-scríobh",
+          "TRANSCRIBE_MULTITRACK": "Tras-scríobh (ilrianach)",
+          "SUMMARIZE": "Achoimre",
+          "TRANSLATE": "Aistriúchán",
+          "SUBTITLE": "Fotheidil",
+          "DUB": "Dubáil",
+          "ARCHIVE": "Cartlann"
+        },
+        "status": {
+          "PENDING": "Ar feitheamh",
+          "CLAIMED": "Éilithe",
+          "RUNNING": "Ar siúl",
+          "DONE": "Críochnaithe",
+          "FAILED": "Teipthe"
+        }
+      },
+      "archiveSourceTitle": "Taifeadadh foinseach",
+      "archiveSourceHint": "Físeán bunaidh an imeachta. Teastaíonn taifeadadh ilrianach do na rianta ar leith de réir rannpháirtí agus don chartlann MKV (níl sé cumasaithe don imeacht seo).",
+      "archiveSourceDownload": "Íoslódáil an físeán bunaidh"
     }
   },
   "email": {
@@ -2326,7 +2871,31 @@
     "overallStatus": "Stádas ginearálta",
     "lastChecked": "Seiceáilte go deireanach",
     "responseTime": "Am freagartha",
-    "systemStatus": "Stádas an chórais"
+    "systemStatus": "Stádas an chórais",
+    "postprod": {
+      "title": "Píblíne iarimeachta",
+      "subtitle": "Tras-scríobh, achoimre, aistriúchán agus dubáil an taifeadta",
+      "whatItDoes": "Nuair a chríochnaíonn imeacht, téann an taifeadadh trí phíblíne inmheánach: cruthaíonn WhisperX an tras-scríbhinn, láimhseálann samhail Mistral an achoimre agus na haistriúcháin, agus cruthaíonn Piper TTS an fhuaim dhubáilte. Ritheann na samhlacha go léir ar GPU sa bhraisle nach bhfanann ar siúl ach ar feadh thréimhse na hoibre, agus mar sin leanann an fuinneamh a ídítear an t-éileamh iarbhír.",
+      "status": {
+        "idle": "Díomhaoin",
+        "running": "Ar siúl",
+        "degraded": "Díghrádaithe"
+      },
+      "aiBadge": "Is samhlacha intleachta saorga a chruthaigh tras-scríbhinn, achoimre agus dubáil an imeachta seo, agus d'fhéadfadh míchruinneas a bheith iontu. Téigh i muinín an fhíseáin bhunaidh i gcónaí nuair a theastaíonn cinnteacht iomlán uait.",
+      "idleMessage": "Píblíne réidh, níl aon taifeadadh le próiseáil faoi láthair.",
+      "queueAriaLabel": "Comhdhéanamh scuaine an iarléirithe",
+      "queuePending": "i scuaine",
+      "queueRunning": "ar siúl",
+      "queueDone": "críochnaithe",
+      "queueFailed": "teipthe",
+      "asrProvider": "Tras-scríobh",
+      "llmProvider": "Achoimre/Aistriúchán",
+      "targetLocales": "Sprioctheangacha",
+      "lastSuccess": "Rath deireanach {when}",
+      "lastFailure": "Teip dheireanach {when}",
+      "artifactsProduced": "{count, plural, =0 {gan déantán} one {1 déantán cruthaithe} two {2 dhéantán cruthaithe} few {# dhéantán cruthaithe} many {# ndéantán cruthaithe} other {# déantán cruthaithe}}",
+      "eventsEnabled": "{count, plural, =0 {gan imeacht le AI} one {1 imeacht le AI gníomhach} two {2 imeacht le AI gníomhach} few {# imeacht le AI gníomhach} many {# n-imeacht le AI gníomhach} other {# imeacht le AI gníomhach}}"
+    }
   },
   "infraMap": {
     "loading": "Léarscáil bhonneagair á lódáil...",
@@ -2388,7 +2957,8 @@
       "jicofo": "Comhordaitheoir comhdhála",
       "jvb": "Droichead físeáin",
       "jibri": "Taifeadadh físeáin",
-      "smtp": "Seirbhís ríomhphoist"
+      "smtp": "Seirbhís ríomhphoist",
+      "postprod": "Píblíne AI iarimeachta"
     },
     "descriptions": {
       "app": "An suíomh gréasáin ina n-aimsíonn sibh imeachtaí",
@@ -2399,7 +2969,8 @@
       "jicofo": "Comhordaíonn cé a ghlacann páirt i ngach comhdháil",
       "jvb": "Tarchuireann fuaim agus físeán chuig rannpháirtithe",
       "jibri": "Taifeadann seisiúin físe d'imeachtaí",
-      "smtp": "Seolann ríomhphoist deimhnithe agus meabhrúcháin"
+      "smtp": "Seolann ríomhphoist deimhnithe agus meabhrúcháin",
+      "postprod": "Tras-scríobhann, achoimríonn agus aistríonn sé na taifeadtaí le samhlacha AI sa bhraisle (GPU NVIDIA A100). Ní ghníomhachtaítear é ach amháin nuair a roghnaíonn imeacht na gnéithe AI."
     },
     "verdicts": {
       "app": {
@@ -2447,6 +3018,12 @@
       "smtp": {
         "healthy": "Tá an tseirbhís ríomhphoist cumraithe agus réidh le fógraí a sheoladh.",
         "standby": "Níl an tseirbhís ríomhphoist cumraithe. Ní sheolfar ríomhphoist deimhnithe ná meabhrúcháin."
+      },
+      "postprod": {
+        "healthy": "Tá an phíblíne AI ag próiseáil taifeadta (oibrí GPU gníomhach).",
+        "scaling": "Jabanna iarléirithe i scuaine — tá an nód GPU ag tosú (fuartosú ~3 nóim.).",
+        "standby": "Píblíne AI cumasaithe ach díomhaoin: níl aon taifeadadh le próiseáil. Tá an nód GPU múchta chun fuinneamh a shábháil.",
+        "degraded": "Theip ar jab AI amháin nó níos mó le 24 uair anuas. Seiceáil /admin/postprod le haghaidh sonraí."
       }
     },
     "impacts": {
@@ -2459,7 +3036,8 @@
       "jvbStale": "Tá imeacht ag fanacht ar an droichead níos faide ná an teorainn ama chumraithe: ní féidir le rannpháirtithe dul isteach.",
       "jibri": "Ní féidir imeachtaí a thaifeadadh. Is féidir le rannpháirtithe páirt a ghlacadh fós.",
       "jibriStale": "Tá imeacht le taifeadadh gníomhach ag fanacht ar Jibri thar an teorainn ama: níl an seisiún á thaifeadadh.",
-      "smtp": "Ní sheolfar ríomhphoist deimhnithe clárúcháin ná meabhrúcháin."
+      "smtp": "Ní sheolfar ríomhphoist deimhnithe clárúcháin ná meabhrúcháin.",
+      "postprodDegraded": "Níor cruthaíodh na tras-scríbhinní ná na hachoimrí do roinnt taifeadtaí le déanaí. Tá na taifeadtaí físe ar fáil mar sin féin."
     },
     "overallVerdicts": {
       "operational": "Tá gach seirbhís ag obair i gceart. Tá an t-ardán ag feidhmiú go hiomlán.",
@@ -2500,7 +3078,8 @@
       "errorRate": "Earráidí 5xx",
       "requestRate": "Iarratais/s",
       "podUptime": "Aimsir pod"
-    }
+    },
+    "connPostprod": "iarléiriú AI"
   },
   "feedback": {
     "title": "Conas a mheasann sibh an t-imeacht seo?",
@@ -2590,7 +3169,8 @@
     "buildInfoDev": "tógáil forbartha",
     "viewCommit": "Féach ar an gcommit ar GitHub",
     "viewRelease": "Féach ar an eisiúint ar GitHub",
-    "buildDatePrefix": "Tógtha ar"
+    "buildDatePrefix": "Tógtha ar",
+    "viewChangelog": "Féach ar na nuashonruithe (loga athruithe)"
   },
   "pages": {
     "privacyTitle": "Beartas príobháideachta",
@@ -2609,7 +3189,26 @@
     "unmute": "Díbhalbhaigh",
     "download": "Íoslódáil taifeadadh",
     "speedLabel": "Luas athsheanma",
-    "progress": "Barra dul chun cinn"
+    "progress": "Barra dul chun cinn",
+    "subtitles": "Fotheidil",
+    "subtitlesOff": "Múchta",
+    "audioLabel": "Fuaim",
+    "audioOriginal": "Bunleagan",
+    "audioSyntheticBanner": "Fuaim dhubáilte le AI — guth sintéiseach, ábhar cruthaithe go huathoibríoch.",
+    "audioSyntheticHint": "Fuaim chruthaithe ag AI",
+    "shortcutsHelpOpen": "Taispeáin na haicearraí méarchláir",
+    "shortcutsHelpClose": "Dún na haicearraí méarchláir",
+    "shortcutsTitle": "Aicearraí méarchláir",
+    "shortcutsSpace": "Seinn nó cuir ar sos",
+    "shortcutsArrowsLR": "Téigh siar nó ar aghaidh 5 shoicind",
+    "shortcutsArrowsUD": "Ísligh nó ardaigh an airde 5%",
+    "shortcutsJL": "Téigh siar nó ar aghaidh 10 soicind",
+    "shortcutsM": "Balbhaigh nó díbhalbhaigh",
+    "shortcutsC": "Taispeáin nó folaigh na fotheidil",
+    "shortcutsF": "Lánscáileán",
+    "shortcutsSpeed": "Laghdaigh nó méadaigh an luas",
+    "captionsOn": "Fotheidil ar siúl",
+    "captionsOff": "Fotheidil múchta"
   },
   "diagram": {
     "title": "Cumraíocht an imeachta",
@@ -2740,7 +3339,11 @@
     "notConfigured": "Níl Jibri cumraithe. Níl taifeadadh físe ar fáil.",
     "disabledHint": "Níl an taifeadadh físe cumasaithe don imeacht seo. Chun é a chumasú, oscail an rannóg Socruithe thuas agus athraigh an t-athroghnóir \"Taifeadadh\".",
     "play": "Seinn",
-    "download": "Íoslódáil"
+    "download": "Íoslódáil",
+    "transcriptManage": "Tras-scríbhinn / AI",
+    "deleteConfirmTitle": "Scrios an taifeadadh",
+    "deleteFailed": "Theip ar an scriosadh",
+    "deleteSuccess": "Scriosadh an taifeadadh"
   },
   "postEvent": {
     "config": "Cumraíocht iar-imeachta",
@@ -2758,8 +3361,17 @@
       "qa": "Ceisteanna agus Freagraí",
       "materials": "Ábhair",
       "polls": "Pobalbhreitheanna",
-      "feedback": "Aiseolas"
-    }
+      "feedback": "Aiseolas",
+      "transcript": "Tras-scríbhinn AI"
+    },
+    "pageVisibleHelp": "Nuair atá sé múchta (nó nuair a rachaidh an fhuinneog infheictheachta in éag), tugann leathanach poiblí an imeachta chríochnaithe 404 ar ais agus imíonn an t-imeacht as na liostaí agus as an suíomhléarscáil.",
+    "libraryListed": "Foilsigh sa leabharlann físeán",
+    "libraryListedHelp": "Taispeáin an t-imeacht seo sa leabharlann phoiblí (/video-library). Teastaíonn taifeadadh foilsithe nó físeán YouTube, agus caithfidh leathanach an imeachta a bheith infheicthe.",
+    "libraryListedNoRecording": "Níl aon taifeadadh foilsithe: ní bheidh an t-imeacht le feiceáil sa leabharlann go dtí go bhfoilseoidh tú an taifeadadh nó go gcuirfidh tú físeán YouTube leis.",
+    "showRecap": "Taispeáin achoimre an imeachta",
+    "showWordCloud": "Taispeáin an scamall focal",
+    "emailEnabled": "Seol ríomhphost achoimre nuair a chríochnaíonn an t-imeacht",
+    "emailEnabledHelp": "Nuair a chríochnaíonn sé, seoltar ríomhphost buíochais chuig na rannpháirtithe cláraithe le naisc chuig an achoimre agus chuig an aiseolas, agus achoimre ghairid chuig an modhnóir. Ní sheoltar ach uair amháin é."
   },
   "provisioning": {
     "loading": "Á luchtú",
@@ -2829,5 +3441,125 @@
     "noComments": "No comments",
     "yes": "Tá",
     "no": "Níl"
+  },
+  "agenda": {
+    "title": "Nótaí / Seicliosta",
+    "empty": "Níl aon phointe ann fós. Cuir na topaicí atá le plé leis agus ticeáil iad de réir mar a théann tú ar aghaidh.",
+    "add": "Cuir leis",
+    "addPlaceholder": "Pointe nua…",
+    "remove": "Bain",
+    "inProgress": "ar siúl",
+    "agree": "Aontaím",
+    "disagree": "Ní aontaím",
+    "favorablePct": "{pct}% i bhfabhar",
+    "noReactions": "Abair do thuairim"
+  },
+  "changelog": {
+    "metaTitle": "Nuacht agus loga athruithe",
+    "title": "Nuacht agus loga athruithe",
+    "intro": "Gach leagan den ardán, an ceann is nuaí ar dtús. Tugann gach iontráil achoimre ar na príomhghnéithe nua, ar na ceartúcháin agus ar na feabhsuithe.",
+    "current": "An leagan reatha",
+    "sourceNote": "Cuirtear na nótaí le chéile ó chlibeanna, ó iarratais tarraingthe agus ó thiomnuithe an tionscadail.",
+    "sourceLink": "Féach ar na heisiúintí go léir ar GitHub",
+    "cadence": "Rithim na n-eisiúintí",
+    "cadenceSummary": "{count} leagan idir {from} agus {to}.",
+    "releaseNotes": "Nótaí eisiúna agus SBOM",
+    "rawChangelog": "CHANGELOG.md sa stór"
+  },
+  "postprod": {
+    "loading": "Tras-scríbhinn á lódáil…",
+    "loadError": "Níorbh fhéidir an tras-scríbhinn a lódáil: {error}",
+    "empty": "Níl aon tras-scríbhinn ar fáil don imeacht seo.",
+    "tabTranscript": "Tras-scríbhinn",
+    "tabSummary": "Achoimre",
+    "aiBadgeLabel": "Ábhar cruthaithe ag AI",
+    "aiBadgeBody": "Cruthaíonn an phíblíne AI sa bhraisle an tras-scríbhinn agus an achoimre go huathoibríoch. D'fhéadfadh earráidí a bheith iontu; is é an físeán an fhoinse údarásach i gcónaí.",
+    "searchPlaceholder": "Cuardaigh sa tras-scríbhinn…",
+    "searchLabel": "Cuardaigh sa tras-scríbhinn",
+    "searchClear": "Glan an cuardach",
+    "searchNoMatches": "Gan torthaí do «{query}».",
+    "searchMatches": "{count, plural, =1 {1 toradh} one {1 toradh} two {2 thoradh} few {# thoradh} many {# dtoradh} other {# toradh}}",
+    "downloadLabel": "Íoslódáil",
+    "downloadMenu": "Roghanna íoslódála",
+    "downloadTranscriptTxt": "Tras-scríbhinn (.txt)",
+    "downloadTranscriptSrt": "Fotheidil (.srt)",
+    "downloadTranscriptVtt": "Fotheidil (.vtt)",
+    "downloadSummaryMd": "Achoimre (.md)",
+    "hero": {
+      "badge": "Achoimre uathoibríoch",
+      "aiActArt50": "Ábhar cruthaithe ag AI",
+      "title": "Go hachomair",
+      "availableIn": "Tá an achoimre ar fáil i {langs} freisin",
+      "summaryLanguageLabel": "Teanga na hachoimre",
+      "topicsLabel": "Caibidlí — cliceáil chun léim go dtí an pointe sin san fhíseán",
+      "keyDecisions": "Cinntí a rinneadh",
+      "actionItems": "Gníomhartha le déanamh",
+      "expandDetails": "Taispeáin na cinntí agus na gníomhartha",
+      "collapseDetails": "Folaigh na cinntí agus na gníomhartha"
+    },
+    "nowSpeaking": "Ag caint anois",
+    "shareSegment": "Comhroinn an pointe seo",
+    "shareSegmentCopied": "Cóipeáladh an nasc chuig an ngearrthaisce",
+    "bookmarkAdd": "Sábháil sna leabharmharcanna",
+    "bookmarkRemove": "Bain an leabharmharc",
+    "bookmarksHeader": "Do leabharmharcanna",
+    "bookmarksEmpty": "Níor shábháil tú aon nóiméad den fhíseán fós. Oscail mír den tras-scríbhinn agus cliceáil ar an réalta chun é a chur leis anseo.",
+    "miniPlayerOpen": "Tabhair an físeán chun tosaigh arís",
+    "miniPlayerClose": "Dún an mionseinnteoir",
+    "miniPlayerHint": "Fan gar don fhíseán agus tú ag scrollú",
+    "followLive": "Lean an físeán",
+    "followManual": "Léamh saor",
+    "followResume": "Lean an físeán arís",
+    "lowConfidenceBadge": "seiceáil",
+    "lowConfidenceTitle": "Tá muinín íseal ag baint leis an gcuid seo den tras-scríbhinn: d'fhéadfadh focail eile a bheith sa taifeadadh. Téigh i muinín an fhíseáin bhunaidh i gcónaí.",
+    "miniTranscriptLabel": "Tras-scríbhinn bheo",
+    "dubAvailableHint": "Tá fuaim dhubáilte ar fáil i {langs}. Úsáid roghnóir na fuaime i rialtáin an tseinnteora chun éisteacht leis an leagan aistrithe.",
+    "provenance": {
+      "triggerLabel": "Trédhearcacht na próiseála AI",
+      "closeLabel": "Folaigh sonraí na próiseála",
+      "intro": "Seo iad na samhlacha a chruthaigh an tras-scríbhinn, an achoimre agus an dubáil don taifeadadh seo. Sábháiltear iad nuair a chríochnaíonn an phróiseáil: feiceann tú a raibh in úsáid ag an am sin, is cuma cad iad na hathruithe a rinneadh ar na socruithe ina dhiaidh sin.",
+      "asr": {
+        "title": "Tras-scríobh",
+        "hint": "Aithint cainte agus deighilt na gcainteoirí.",
+        "engine": "Inneall",
+        "model": "Samhail",
+        "version": "Leagan",
+        "diarizationEngine": "Deighilt cainteoirí (diarization)",
+        "diarizationSpeakers": "Cainteoirí braite"
+      },
+      "llm": {
+        "title": "Achoimre agus aistriúchán",
+        "hint": "Achoimre an chruinnithe agus aistriúchán na tras-scríbhinne agus na hachoimre.",
+        "engine": "Arna fhreastal ag",
+        "model": "Samhail",
+        "vendor": "Soláthraí",
+        "license": "Ceadúnas",
+        "country": "Ceanncheathrú"
+      },
+      "tts": {
+        "title": "Dubáil",
+        "hint": "Sintéis chainte chun an fhuaim a chruthú sna sprioctheangacha.",
+        "engine": "Inneall",
+        "license": "Ceadúnas",
+        "policy": "Riail sannta na nguthanna"
+      },
+      "languages": {
+        "title": "Teangacha",
+        "hint": "Foinse an taifeadta agus spriocanna an aistriúcháin agus na dubála.",
+        "source": "Teanga bhunaidh",
+        "translation": "Aistriúcháin",
+        "dubbing": "Dubáil",
+        "none": "Ceann ar bith"
+      },
+      "voices": {
+        "title": "Guthanna sintéiseacha sannta do na cainteoirí",
+        "male": "guth fir",
+        "female": "guth mná"
+      },
+      "runAt": "Críochnaíodh an phróiseáil ar",
+      "version": "Leagan na píblíne"
+    },
+    "overlapBadge": "comhuaineach",
+    "overlapTitle": "Caint chomhuaineach: labhraíonn níos mó ná duine amháin ag an am céanna san eatramh seo."
   }
 }

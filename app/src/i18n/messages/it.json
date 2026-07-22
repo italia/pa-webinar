@@ -3190,7 +3190,11 @@
     "intro": "Tutte le versioni della piattaforma, dalla più recente. Ogni voce riassume le principali novità, correzioni e miglioramenti.",
     "current": "Versione attuale",
     "sourceNote": "Le note sono curate a partire da tag, pull request e commit del progetto.",
-    "sourceLink": "Vedi tutte le release su GitHub"
+    "sourceLink": "Vedi tutte le release su GitHub",
+    "cadence": "Ritmo dei rilasci",
+    "cadenceSummary": "{count} versioni fra {from} e {to}.",
+    "releaseNotes": "Note di rilascio e SBOM",
+    "rawChangelog": "CHANGELOG.md nel repository"
   },
   "pages": {
     "privacyTitle": "Informativa sulla privacy",

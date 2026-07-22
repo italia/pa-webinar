@@ -15,8 +15,9 @@ import { z } from 'zod';
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
-import { NotFoundError, ValidationError } from '@/lib/errors';
+import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
 import { presignArtifactUpload } from '@/lib/storage/postprod';
+import { isConfinedBlobKey } from '@/lib/recorder/blob-key';
 import { MULTITRACK_PREFIX } from '@/lib/recorder/lifecycle';
 
 export const dynamic = 'force-dynamic';
@@ -36,14 +37,28 @@ export const POST = withErrorHandling(async (request) => {
 
   const recording = await prisma.recording.findUnique({
     where: { id: recordingId },
-    select: { id: true, eventId: true },
+    select: { id: true, eventId: true, status: true },
   });
   if (!recording) throw new NotFoundError('Recording');
 
+  // ARCHIVED = la retention è già passata (cron/postprod-retention ha
+  // cancellato tracce e artefatti) e NON ripasserà: le sue query di purge
+  // escludono `status: ARCHIVED`. Firmare ancora un PUT qui farebbe
+  // ricomparire audio per-partecipante che nessuno cancellerebbe mai più.
+  if (recording.status === 'ARCHIVED') {
+    throw new ConflictError(
+      `Recording ${recordingId} è ARCHIVED (retention già eseguita): nessun upload`,
+    );
+  }
+
+  // Confinamento: non `startsWith` (confronto fra stringhe, non fra path) —
+  // vedi isConfinedBlobKey per i casi che lascerebbe passare (`..`, `%2e%2e`,
+  // doppie barre). Questa rotta consegna un permesso di SCRITTURA su storage
+  // condiviso: la key deve stare dentro la cartella di QUESTA registrazione.
   const prefix = `${MULTITRACK_PREFIX}${recording.eventId}/${recordingId}/`;
-  if (!blobKey.startsWith(prefix)) {
+  if (!isConfinedBlobKey(blobKey, prefix)) {
     throw new ValidationError(
-      `blobKey "${blobKey}" fuori dal prefisso atteso "${prefix}"`,
+      `blobKey "${blobKey}" non confinata sotto il prefisso atteso "${prefix}"`,
     );
   }
 

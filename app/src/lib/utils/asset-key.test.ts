@@ -1,9 +1,16 @@
 import { describe, it, expect } from 'vitest';
 
-import { buildAssetKey, sanitizeFilename } from './asset-key';
+import {
+  buildAssetKey,
+  buildChatAssetKey,
+  chatAssetEventId,
+  isChatAssetPath,
+  sanitizeFilename,
+} from './asset-key';
 
 const FIXED_UUID = '11111111-2222-3333-4444-555555555555';
 const FIXED_DATE = new Date(Date.UTC(2026, 3, 7, 10, 0, 0)); // 2026-04-07
+const EVENT_ID = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 
 describe('sanitizeFilename', () => {
   it('keeps a basic filename unchanged', () => {
@@ -107,5 +114,77 @@ describe('buildAssetKey', () => {
       now: FIXED_DATE,
     });
     expect(key).toBe(`assets/image/2026/04/${FIXED_UUID}-file`);
+  });
+});
+
+/**
+ * Il namespace degli allegati di chat.
+ *
+ * Non è organizzazione dello storage: è l'unica cosa che permette a
+ * /api/assets di negare un documento condiviso in chat lasciando pubblici logo,
+ * copertine e materiali. Finché le due famiglie condividevano
+ * `assets/image|document/…` la rotta non poteva distinguerle, e la sola difesa
+ * di un PDF riservato era che l'UUID non fosse indovinabile — cioè nessuna,
+ * appena l'URL usciva dalla stanza.
+ */
+describe('buildChatAssetKey', () => {
+  it('mette il namespace e l’eventId nel percorso', () => {
+    expect(
+      buildChatAssetKey(EVENT_ID, 'verbale.pdf', {
+        uuid: FIXED_UUID,
+        now: FIXED_DATE,
+      }),
+    ).toBe(`assets/chat/${EVENT_ID}/2026/04/${FIXED_UUID}-verbale.pdf`);
+  });
+
+  it('sanifica il nome file come gli altri asset (niente traversal nel namespace)', () => {
+    const key = buildChatAssetKey(EVENT_ID, '../../../etc/passwd', {
+      uuid: FIXED_UUID,
+      now: FIXED_DATE,
+    });
+    // Un `..` sopravvissuto qui uscirebbe dal namespace e quindi dal gate.
+    expect(key).toBe(`assets/chat/${EVENT_ID}/2026/04/${FIXED_UUID}-passwd`);
+    expect(chatAssetEventId(key.replace(/^assets\//, ''))).toBe(EVENT_ID);
+  });
+
+  it('rifiuta un eventId che non è un UUID invece di scrivere una chiave illeggibile', () => {
+    // Passare lo slug produrrebbe una chiave che il parser scarta: l'allegato
+    // si caricherebbe e smetterebbe di aprirsi, senza errori, in un altro
+    // punto del sistema.
+    expect(() => buildChatAssetKey('il-caffettino', 'x.pdf')).toThrow();
+  });
+});
+
+describe('isChatAssetPath / chatAssetEventId', () => {
+  const sub = (key: string) => key.replace(/^assets\//, '');
+
+  it('riconosce come protetto solo il namespace chat', () => {
+    expect(isChatAssetPath(`chat/${EVENT_ID}/2026/04/${FIXED_UUID}-x.pdf`)).toBe(true);
+    // Gli asset pubblici NON devono finire nel ramo protetto: sono già in
+    // pagine pubbliche, og:image ed email.
+    expect(isChatAssetPath(`image/2026/04/${FIXED_UUID}-logo.png`)).toBe(false);
+    expect(isChatAssetPath(`audio/2026/04/${FIXED_UUID}-attesa.mp3`)).toBe(false);
+    expect(isChatAssetPath(`document/2026/04/${FIXED_UUID}-slide.pdf`)).toBe(false);
+  });
+
+  it('non si fa ingannare da un prefisso che somiglia al namespace', () => {
+    // `chatbot/...` non è `chat/...`: senza il separatore un asset pubblico
+    // finirebbe dietro il gate di un evento inesistente.
+    expect(isChatAssetPath('chatbot/2026/04/x.png')).toBe(false);
+    expect(chatAssetEventId('chatbot/2026/04/x.png')).toBeNull();
+  });
+
+  it('estrae l’eventId proprietario dal percorso', () => {
+    expect(chatAssetEventId(sub(buildChatAssetKey(EVENT_ID, 'a.png')))).toBe(EVENT_ID);
+  });
+
+  it('nega per default quando il namespace è protetto ma il percorso è malformato', () => {
+    // Chi risponde null qui riceve un 404 dalla rotta: mai un fallback al
+    // ramo pubblico, che sarebbe un bypass del gate per variante di percorso.
+    expect(chatAssetEventId('chat')).toBeNull();
+    expect(chatAssetEventId('chat/')).toBeNull();
+    expect(chatAssetEventId('chat/non-un-uuid/2026/04/x.png')).toBeNull();
+    expect(chatAssetEventId(`chat/${EVENT_ID}`)).toBeNull();
+    expect(chatAssetEventId(`chat/${EVENT_ID}/`)).toBeNull();
   });
 });

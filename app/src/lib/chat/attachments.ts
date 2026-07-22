@@ -3,12 +3,20 @@
  * route and the message POST validation, plus safe conversions between the
  * app-served asset URL and the storage key.
  *
- * Attachments are stored in the "files" storage domain under the same
- * `assets/…` prefix as other uploads and served (with nosniff +
- * attachment-for-active-document hardening) by /api/assets/[...path]. We keep
- * the storage key on the ChatMessage row so retention/moderation can delete
- * the blob. Only authenticated members may upload (see the upload route);
- * tokenless guests never can.
+ * Attachments are stored in the "files" storage domain under the DEDICATED
+ * `assets/chat/<eventId>/…` namespace (buildChatAssetKey) and served (with
+ * nosniff + attachment-for-active-document hardening) by /api/assets/[...path].
+ * Il namespace è ciò che rende protetta la lettura: quella rotta applica
+ * `authorizeChatRead` a tutto ciò che sta sotto `chat/`, e lascia pubblico
+ * tutto il resto (logo, copertine, materiali). We keep the storage key on the
+ * ChatMessage row so retention/moderation can delete the blob. Only
+ * authenticated members may upload (see the upload route); tokenless guests
+ * never can.
+ *
+ * Le righe caricate PRIMA del namespace conservano una chiave
+ * `assets/image|document/…`: restano leggibili da chiunque abbia l'URL, per
+ * scelta esplicita (i link già inviati non si rompono). Vedi la nota in
+ * /api/assets/[...path].
  */
 
 import { tryDecryptPII } from '@/lib/crypto/pii';

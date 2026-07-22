@@ -122,6 +122,21 @@ function humanSize(bytes: number): string {
   return `${v.toFixed(v < 10 ? 1 : 0)} ${units[i]}`;
 }
 
+/**
+ * URL di un allegato con il token del lettore in query.
+ *
+ * `/api/assets/chat/…` è protetto dallo stesso gate della lettura chat, ma un
+ * <img src> e un <a href> non possono portare un header Authorization: il token
+ * deve viaggiare nell'URL. Un ospite non ne ha: chiede senza, e il gate lo
+ * ammette solo finché ammette anche la lettura dei messaggi (evento LIVE, senza
+ * password). Sugli allegati vecchi — serviti ancora da un percorso pubblico —
+ * il parametro è semplicemente ignorato.
+ */
+function attachmentUrl(url: string, token: string): string {
+  if (!token || !url.startsWith('/api/assets/')) return url;
+  return `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
+}
+
 /** First name-token used as the @handle for mentions. */
 function mentionHandle(name: string): string {
   return (name.trim().split(/\s+/)[0] ?? '').replace(/[^\p{L}\p{N}._-]/gu, '');
@@ -1026,7 +1041,9 @@ export default function ChatPanel({
                         </div>
                       )
                     )}
-                    {m.attachment && <Attachment att={m.attachment} openLabel={t('openAttachment')} />}
+                    {m.attachment && (
+                      <Attachment att={m.attachment} openLabel={t('openAttachment')} token={token} />
+                    )}
                     {m.reactions && Object.keys(m.reactions).length > 0 && (
                       <div className="chat-panel__reactions">
                         {Object.entries(m.reactions).map(([emoji, count]) => {
@@ -1337,14 +1354,23 @@ export default function ChatPanel({
 }
 
 /** Render a message attachment: an inline image thumbnail, or a file chip. */
-function Attachment({ att, openLabel }: { att: ChatAttachment; openLabel: string }) {
+function Attachment({
+  att,
+  openLabel,
+  token,
+}: {
+  att: ChatAttachment;
+  openLabel: string;
+  token: string;
+}) {
   const isImage = att.mime.startsWith('image/');
+  const href = attachmentUrl(att.url, token);
   if (isImage) {
     return (
-      <a href={att.url} target="_blank" rel="noopener noreferrer" title={att.name} aria-label={openLabel}>
+      <a href={href} target="_blank" rel="noopener noreferrer" title={att.name} aria-label={openLabel}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={att.url}
+          src={href}
           alt={att.name}
           style={{ maxWidth: 220, maxHeight: 220, borderRadius: 6, marginTop: 4, display: 'block' }}
         />
@@ -1353,7 +1379,7 @@ function Attachment({ att, openLabel }: { att: ChatAttachment; openLabel: string
   }
   return (
     <a
-      href={att.url}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       className="chat-panel__file-chip d-inline-flex align-items-center gap-1 mt-1"
