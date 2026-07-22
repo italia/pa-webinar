@@ -121,6 +121,45 @@ export function shouldReclaimEmptyOvertime(input: OvertimeReclaimInput): boolean
   return aliveUntil < input.inactiveCutoff.getTime();
 }
 
+export interface WakeWindowInput {
+  /** Scheduled start of the event. */
+  startsAt: Date;
+  /** INSTANT rooms are opened on demand and have no meaningful schedule. */
+  eventType: string;
+  /** SiteSetting.jvbPreScaleMinutes — when the scaler warms the bridge itself. */
+  preScaleMinutes: number;
+  now: Date;
+}
+
+/**
+ * When does `/wake` become allowed for this event?
+ *
+ * `/wake` starts a JVB. Until now it accepted a call at ANY time, from anyone
+ * (the route is unauthenticated), so a single visitor opening an event page the
+ * day before could pin a bridge — and did: on 22 July a visitor warmed the room
+ * an hour early, which cost a bridge-hour AND, because the inactivity window was
+ * measured from that timestamp, got the event demoted three minutes after it
+ * went live.
+ *
+ * The room is allowed to warm up exactly when the scaler would warm it anyway:
+ * `jvbPreScaleMinutes` before the start. Earlier than that there is nothing to
+ * gain — the bridge would just sit idle — and the scaler still brings it up on
+ * schedule without anyone asking.
+ *
+ * INSTANT calls are exempt: they exist to be opened on demand, and their
+ * `startsAt` is only a creation timestamp.
+ */
+export function wakeWindowOpensAt(input: WakeWindowInput): Date | null {
+  if (input.eventType === 'INSTANT') return null;
+  return new Date(input.startsAt.getTime() - input.preScaleMinutes * 60_000);
+}
+
+/** True when `/wake` may warm the bridge for this event right now. */
+export function canWakeNow(input: WakeWindowInput): boolean {
+  const opensAt = wakeWindowOpensAt(input);
+  return opensAt === null || input.now.getTime() >= opensAt.getTime();
+}
+
 export interface IdleDemotionInput {
   /** Last tick at which the bridge reported participants for this event. */
   lastActiveAt: Date | null;

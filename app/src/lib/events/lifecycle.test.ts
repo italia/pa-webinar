@@ -6,6 +6,8 @@ import {
   reviveStatus,
   emptyCloseCutoff,
   shouldDemoteLiveToIdle,
+  canWakeNow,
+  wakeWindowOpensAt,
 } from './lifecycle';
 
 // Frozen reference time for deterministic comparisons.
@@ -463,5 +465,51 @@ describe('shouldDemoteLiveToIdle', () => {
         now: at('2026-07-22T10:50:00Z'),
       }),
     ).toBe(false);
+  });
+});
+
+// ── canWakeNow / wakeWindowOpensAt ──────────────────────────
+
+describe('wake window', () => {
+  const at = (iso: string) => new Date(iso);
+  const base = {
+    startsAt: at('2026-07-22T09:15:00Z'),
+    eventType: 'SCHEDULED',
+    preScaleMinutes: 15,
+  };
+
+  it('refuses to warm the bridge before the pre-scale window', () => {
+    // The 22 July incident: a visitor opened the event page an hour early and
+    // /wake started a bridge that then sat idle — and made the event look stale
+    // before it had begun.
+    expect(canWakeNow({ ...base, now: at('2026-07-22T08:12:00Z') })).toBe(false);
+    expect(canWakeNow({ ...base, now: at('2026-07-21T09:15:00Z') })).toBe(false);
+  });
+
+  it('allows it from the moment the scaler would pre-scale anyway', () => {
+    expect(canWakeNow({ ...base, now: at('2026-07-22T09:00:00Z') })).toBe(true);
+    expect(canWakeNow({ ...base, now: at('2026-07-22T09:01:00Z') })).toBe(true);
+  });
+
+  it('allows it during and after the event', () => {
+    expect(canWakeNow({ ...base, now: at('2026-07-22T09:30:00Z') })).toBe(true);
+  });
+
+  it('never gates an INSTANT call — it exists to be opened on demand', () => {
+    const instant = { ...base, eventType: 'INSTANT' };
+    expect(canWakeNow({ ...instant, now: at('2026-07-20T00:00:00Z') })).toBe(true);
+    expect(wakeWindowOpensAt({ ...instant, now: at('2026-07-20T00:00:00Z') })).toBeNull();
+  });
+
+  it('reports when the window opens, so the caller can say so', () => {
+    expect(
+      wakeWindowOpensAt({ ...base, now: at('2026-07-22T08:00:00Z') })?.toISOString(),
+    ).toBe('2026-07-22T09:00:00.000Z');
+  });
+
+  it('follows the configured pre-scale minutes', () => {
+    const early = { ...base, preScaleMinutes: 45, now: at('2026-07-22T08:40:00Z') };
+    expect(canWakeNow(early)).toBe(true);
+    expect(canWakeNow({ ...early, preScaleMinutes: 5 })).toBe(false);
   });
 });
