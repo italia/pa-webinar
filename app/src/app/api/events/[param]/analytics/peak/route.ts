@@ -173,5 +173,16 @@ export const POST = withErrorHandling(async (request, context) => {
     data: { peakParticipants: capped },
   });
 
+  // The OPEN session gets the same treatment. It was left at 0 for every event
+  // ever recorded — `Event.peakParticipants` was correct while
+  // `CallSession.peakParticipants` stayed zero — so any per-session analytics
+  // (a room that emptied and refilled produces several sessions) had nothing to
+  // work with. Same monotonic conditional update, scoped to the session still
+  // running; if none is open the update simply matches nothing.
+  await prisma.callSession.updateMany({
+    where: { eventId: event.id, endedAt: null, peakParticipants: { lt: capped } },
+    data: { peakParticipants: capped },
+  });
+
   return NextResponse.json({ ok: true });
 });
