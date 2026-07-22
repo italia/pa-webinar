@@ -99,8 +99,10 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  let gravatarUnreachable = false;
   if (hash && gravatarAllowed) {
     const gravatar = await tryGravatar(hash, size);
+    gravatarUnreachable = !gravatar;
     if (gravatar) {
       const body = await gravatar.arrayBuffer();
       const contentType =
@@ -119,14 +121,17 @@ export async function GET(request: NextRequest) {
   return new NextResponse(svg, {
     headers: {
       'Content-Type': 'image/svg+xml',
-      // Un giorno di cache va bene per una risposta CERTA. Se le impostazioni
-      // non erano leggibili, però, questa è una risposta di ripiego: metterla
-      // in cache per 24 ore farebbe sopravvivere alla panne un giorno intero di
-      // avatar con le iniziali, senza modo di invalidarli. Un minuto basta a
-      // reggere l'ondata e a guarire da solo.
-      'Cache-Control': settingsUnknown
-        ? 'public, max-age=60, s-maxage=60'
-        : 'public, max-age=86400, s-maxage=86400',
+      // Un giorno di cache va bene per una risposta CERTA: nessun Gravatar per
+      // questo indirizzo, o nessun indirizzo affatto. Ma se le impostazioni non
+      // erano leggibili, o gravatar.com non ha risposto, questa è una risposta
+      // di RIPIEGO: tenerla un giorno farebbe sopravvivere alla panne — un
+      // timeout di due secondi durante l'ondata di ingressi — un giorno intero
+      // di avatar con le iniziali, senza modo di invalidarli. Un minuto regge
+      // l'ondata e guarisce da solo.
+      'Cache-Control':
+        settingsUnknown || gravatarUnreachable
+          ? 'public, max-age=60, s-maxage=60'
+          : 'public, max-age=86400, s-maxage=86400',
       ...CORS_HEADERS,
     },
   });

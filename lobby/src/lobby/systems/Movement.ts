@@ -110,32 +110,37 @@ export class Movement {
       k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright';
     const isWasd = k === 'w' || k === 'a' || k === 's' || k === 'd';
     const target = e.target as HTMLElement | null;
-    const typing = isInteractive(target);
+    const typing = isTextEntry(target);
+    const onControl = typing || isActivatable(target);
 
     if (k === ' ' || k === 'spacebar') {
-      if (typing) return;
+      if (onControl) return;
       e.preventDefault();
       this.cbs.onJump();
       return;
     }
     if (k === 'e') {
-      if (typing) return;
+      if (onControl) return;
       this.cbs.onEmote('wave');
       return;
     }
     if (k === 'h') {
-      if (typing) return;
+      if (onControl) return;
       this.cbs.onEmote('heart');
       return;
     }
     if (!isArrow && !isWasd) return;
-    // Col fuoco su un controllo, i tasti sono suoi. Prima le frecce facevano
-    // `target.blur()` e prendevano il comando: aveva senso quando l'unico campo
-    // era la casella del nome dentro il gioco. Ora accanto alla piazza c'è il
+    // Mentre si SCRIVE le frecce sono del cursore: accanto alla piazza c'è il
     // pannello della sala d'attesa — nome, email, chat — e correggere un refuso
     // con la freccia sinistra buttava fuori dal campo e faceva camminare
-    // l'avatar.
+    // l'avatar. WASD, essendo lettere, cedono a qualunque controllo.
     if (typing) return;
+    if (isWasd && onControl) return;
+    // Su un bottone invece le frecce muovono, e gli tolgono il fuoco: senza,
+    // un solo Tab (verso l'uscita, o verso i controlli del pannello)
+    // congelerebbe l'avatar fino al prossimo clic sul canvas — e la scena non
+    // è raggiungibile col Tab.
+    if (onControl) target?.blur();
     e.preventDefault();
     this.down.add(k);
   }
@@ -146,24 +151,27 @@ export class Movement {
 }
 
 /**
- * Il fuoco è su un CONTROLLO: i tasti appartengono a lui, non al gioco.
+ * Si sta scrivendo: il tasto è del CURSORE DI TESTO, e il gioco non lo tocca.
  *
- * Comprende i bottoni e i link, non solo i campi di testo. Il listener è
- * globale e in fase di cattura: escluderli significherebbe annullare le frecce
- * e la barra spaziatrice su qualunque controllo dell'INTERA pagina — la
- * scorciatoia di tastiera del gioco calpesterebbe l'interfaccia che gli sta
- * intorno.
- *
- * Il gioco riceve i tasti quando il fuoco è sulla scena, ed è per questo che la
- * piazza porta il fuoco sulla scena e non sul pulsante di uscita.
+ * Solo campi di testo. Un bottone a fuoco non è scrittura: le frecce restano
+ * al gioco (vedi sotto).
  */
-function isInteractive(el: HTMLElement | null): boolean {
+function isTextEntry(el: HTMLElement | null): boolean {
   if (!el) return false;
-  return (
-    /^(input|textarea|select|button|a)$/i.test(el.tagName) ||
-    el.isContentEditable ||
-    el.getAttribute('role') === 'button'
-  );
+  return /^(input|textarea|select)$/i.test(el.tagName) || el.isContentEditable;
+}
+
+/**
+ * Un controllo che si attiva da tastiera (bottone, link).
+ *
+ * Lo spazio e le lettere gli appartengono — rubarli renderebbe l'uscita dalla
+ * piazza impossibile da premere. Le frecce no: quelle muovono l'avatar, e nel
+ * farlo TOLGONO il fuoco al controllo, altrimenti un solo Tab congelerebbe il
+ * gioco finché non si clicca col mouse sul canvas.
+ */
+function isActivatable(el: HTMLElement | null): boolean {
+  if (!el) return false;
+  return /^(button|a)$/i.test(el.tagName) || el.getAttribute('role') === 'button';
 }
 
 function clamp(v: number, lo: number, hi: number): number {
