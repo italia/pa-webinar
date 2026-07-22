@@ -335,7 +335,8 @@
       "edited": "edited",
       "editLabel": "Edit message",
       "editSave": "Save",
-      "editFailed": "Could not edit the message."
+      "editFailed": "Could not edit the message.",
+      "exportChat": "Download the chat"
     },
     "role": {
       "moderator": "Moderator",
