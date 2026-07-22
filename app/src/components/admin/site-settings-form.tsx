@@ -283,7 +283,10 @@ function BrandingTab({ settings, updateField }: TabProps) {
             <select
               className="form-select"
               id="waitingRoomEngine"
-              value={settings.waitingRoomEngine}
+              // GARDEN è un valore storico (il giardino SVG, rimosso): vale
+              // GAME, ed è così che va MOSTRATO — un'opzione che non esiste più
+              // lascerebbe la select apparentemente vuota.
+              value={settings.waitingRoomEngine === 'GARDEN' ? 'GAME' : settings.waitingRoomEngine}
               onChange={(e) =>
                 updateField(
                   'waitingRoomEngine',
@@ -291,7 +294,6 @@ function BrandingTab({ settings, updateField }: TabProps) {
                 )
               }
             >
-              <option value="GARDEN">Giardino (normale)</option>
               <option value="GAME">Videogame (lobby Phaser)</option>
               <option value="CLASSIC">Classica (statica)</option>
             </select>

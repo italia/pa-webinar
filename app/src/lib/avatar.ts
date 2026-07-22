@@ -3,7 +3,13 @@
  *
  * Used by:
  * - /api/avatar route (HTTP proxy with Gravatar fallback)
- * - JWT generation (inline data URI to bypass Jitsi CSP)
+ * - JWT generation (inline data URI, the default)
+ *
+ * The data URI is the default because it always works and starts no request,
+ * not because a remote URL is forbidden: verified on the deployed jitsi-web
+ * (stable-10741), the bundle takes `avatarURL` from the JWT unconditionally,
+ * preloads it, and falls back to initials if it fails to load. No CSP header is
+ * served for that origin either.
  */
 
 const BI_PALETTE = [

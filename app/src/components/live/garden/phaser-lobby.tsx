@@ -37,9 +37,23 @@ interface PhaserLobbyProps {
   onEnterLive: (name: string, prefs: JoinPrefs) => void;
   /** "Versione classica" pressed inside the lobby → switch back to the SVG UI. */
   onExitClassic: () => void;
-  /** Render boxed inside the waiting-room shell (no full-screen chrome /
-   *  takeover; the host owns the name + "Entra" CTA). Default false. */
-  embed?: boolean;
+  /**
+   * The REACT shell owns identity, device choice and the "Entra" CTA, so the
+   * game suppresses its own chrome (onboarding modal, top bar, device panel,
+   * status badge) and entry happens by walking into the gate — which the game
+   * only opens once the event is LIVE.
+   *
+   * This is not the same question as `boxed`: the piazza fills the page and
+   * still lets the shell own the controls, which is the whole point of C1 —
+   * one set of controls, in one language, validated once.
+   */
+  hostOwnsEntry?: boolean;
+  /**
+   * Fit the host container instead of the viewport (smaller world, so the
+   * camera shows enough context in a card-sized box). Kept for the dev harness
+   * and any future embedded preview.
+   */
+  boxed?: boolean;
 }
 
 export default function PhaserLobby({
@@ -50,7 +64,8 @@ export default function PhaserLobby({
   isHost,
   onEnterLive,
   onExitClassic,
-  embed = false,
+  hostOwnsEntry = false,
+  boxed = false,
 }: PhaserLobbyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<LobbyHandle | null>(null);
@@ -65,12 +80,12 @@ export default function PhaserLobby({
     const el = containerRef.current;
     if (!el) return;
 
-    // Sizing. Embed: fill the host box exactly (its `.wr-stage` sets the
-    // height) and follow the box on resize. Full-screen: fill from just under
-    // the app header to the bottom of the viewport. The Phaser canvas (RESIZE
-    // scale mode) refits on the synthetic resize either way.
+    // Sizing. Boxed: fill the host box exactly and follow it on resize.
+    // Otherwise: fill from just under the app header to the bottom of the
+    // viewport. The Phaser canvas (RESIZE scale mode) refits on the synthetic
+    // resize either way.
     const applyHeight = (): void => {
-      if (embed) {
+      if (boxed) {
         el.style.height = '100%';
         return;
       }
@@ -79,7 +94,7 @@ export default function PhaserLobby({
     };
     applyHeight();
 
-    const world = embed ? EMBED_WORLD : WORLD;
+    const world = boxed ? EMBED_WORLD : WORLD;
     const shared: LobbyLocalState = {
       name: displayName.trim() || 'Ospite',
       color: '#1d6fb8',
@@ -98,7 +113,7 @@ export default function PhaserLobby({
       el,
       {
         worldSize: world,
-        embed,
+        embed: hostOwnsEntry,
         initialProfile: { name: displayName.trim() },
         onExitToClassic: () => onExitRef.current(),
       },
@@ -109,10 +124,10 @@ export default function PhaserLobby({
     // The canvas was created at the fitted size; keep it fitted on resize.
     window.dispatchEvent(new Event('resize'));
     const onResize = (): void => applyHeight();
-    // Embed follows the host box (it can resize independently of the window);
-    // full-screen just tracks the window.
+    // A boxed lobby follows its host box (which can resize independently of the
+    // window); a full-page one just tracks the window.
     let boxObserver: ResizeObserver | null = null;
-    if (embed) {
+    if (boxed) {
       boxObserver = new ResizeObserver(() => {
         applyHeight();
         window.dispatchEvent(new Event('resize'));
@@ -147,17 +162,17 @@ export default function PhaserLobby({
     handleRef.current?.setProfile({ name: displayName.trim() });
   }, [displayName]);
 
-  // Embed: fill the host box (its `.wr-stage` sets the height). Full-screen:
-  // the mount effect sizes this to fill the space between header and footer.
+  // Boxed: fill the host box (its container sets the height). Otherwise the
+  // mount effect sizes this to fill the space between header and footer.
   return (
     <div
       ref={containerRef}
       style={{
         position: 'relative',
         width: '100%',
-        height: embed ? '100%' : undefined,
+        height: boxed ? '100%' : undefined,
         overflow: 'hidden',
-        background: embed ? '#eaf3fb' : '#26344a',
+        background: boxed ? '#eaf3fb' : '#26344a',
       }}
     />
   );

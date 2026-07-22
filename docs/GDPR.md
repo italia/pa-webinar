@@ -212,6 +212,19 @@ Tutti i font (Titillium Web, Roboto Mono, Lora) sono **self-hosted**. Non viene 
 
 Non vengono utilizzati script di analytics (Google Analytics, Mixpanel, ecc.) né pixel di tracciamento.
 
+### Avatar e Gravatar (opzione disattivata per impostazione predefinita)
+
+Di norma l'immagine di un partecipante è generata **dal server**, dalle iniziali del nome: nessuna richiesta esce dalla piattaforma.
+
+Un'amministrazione può attivare, dal pannello di amministrazione, la ricerca dell'immagine su **Gravatar** (Automattic Inc., Stati Uniti). Quando è attiva:
+
+- la richiesta a `gravatar.com` è fatta **dal nostro server**, mai dal browser del partecipante: il browser contatta solo `/api/avatar` di questa piattaforma, quindi Gravatar non riceve l'indirizzo IP né lo user agent di chi partecipa;
+- a Gravatar viene inviato l'**hash MD5** dell'indirizzo email, mai l'indirizzo — è il formato richiesto dal loro protocollo e l'unico dato trasmesso;
+- chi **non** ha un account Gravatar mantiene l'immagine con le iniziali: l'assenza viene rilevata lato server (`d=404`) e nulla viene mostrato o dedotto;
+- nell'URL dell'avatar che viaggia dentro il token Jitsi — e che Jitsi diffonde in presenza a tutta la sala — l'hash è **cifrato** con la chiave della piattaforma: agli altri partecipanti non arriva né l'indirizzo né un suo digest utilizzabile per verifiche a tentativi.
+
+Con l'opzione disattivata (impostazione predefinita) **nessuna** richiesta viene inviata a Gravatar.
+
 ## Diritti dell'interessato / Data Subject Rights
 
 I partecipanti possono esercitare i diritti previsti dal GDPR (accesso, rettifica, cancellazione, portabilità) contattando l'organizzatore dell'evento o il Dipartimento per la Trasformazione Digitale.

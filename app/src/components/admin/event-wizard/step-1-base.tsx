@@ -242,7 +242,7 @@ export default function Step1Base({
               id="ev-waiting-room-engine"
               className="form-select form-select-sm"
               style={{ maxWidth: 340 }}
-              value={value.waitingRoomEngine ?? ''}
+              value={value.waitingRoomEngine === 'GARDEN' ? 'GAME' : value.waitingRoomEngine ?? ''}
               onChange={(e) =>
                 onChange({
                   waitingRoomEngine:
@@ -253,8 +253,7 @@ export default function Step1Base({
               }
             >
               <option value="">{t('waitingRoomEngineSiteDefault')}</option>
-              <option value="GARDEN">{t('waitingRoomEngineGarden')}</option>
-              <option value="GAME">{t('waitingRoomEngineGame')}</option>
+                  <option value="GAME">{t('waitingRoomEngineGame')}</option>
               <option value="CLASSIC">{t('waitingRoomEngineClassic')}</option>
             </select>
             <small className="form-text text-muted d-block">

@@ -167,8 +167,11 @@ export const jitsiConfigOverwrite = {
   p2p: { enabled: false },
   enableFileSharing: false,
   enableLobbyChat: false,
-  // Gravatar disabled separately — we proxy via /api/avatar.
-  // disableThirdPartyRequests blocked JWT avatar data URIs in some Jitsi builds.
+  // Gravatar disabled HERE means: the browser must never ask gravatar.com
+  // itself. In the deployed bundle this flag only gates the avatar that Jitsi
+  // would DERIVE from an email — the explicit `avatarURL` we put in the JWT is
+  // used before that branch is ever reached. So when an admin enables Gravatar
+  // it still resolves, but through /api/avatar, server-side.
   gravatar: { disabled: true },
   brandingRoomAlias: null,
 

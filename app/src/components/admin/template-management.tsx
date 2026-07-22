@@ -546,7 +546,7 @@ function TemplateForm({
           id="tpl-waiting-room-engine"
           className="form-select form-select-sm"
           style={{ maxWidth: 340 }}
-          value={form.waitingRoomEngine ?? ''}
+          value={form.waitingRoomEngine === 'GARDEN' ? 'GAME' : form.waitingRoomEngine ?? ''}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             setField(
               'waitingRoomEngine',
@@ -557,7 +557,6 @@ function TemplateForm({
           }
         >
           <option value="">{t('waitingRoomEngineSiteDefault')}</option>
-          <option value="GARDEN">{t('waitingRoomEngineGarden')}</option>
           <option value="GAME">{t('waitingRoomEngineGame')}</option>
           <option value="CLASSIC">{t('waitingRoomEngineClassic')}</option>
         </select>
