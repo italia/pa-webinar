@@ -43,8 +43,6 @@ export const PUBLIC_SETTING_FIELDS = [
   'githubUrl', 'supportEmail',
   // The sender NAME appears in every message we send: it is public by nature.
   'emailFromName',
-  // Sapere SE l'istanza usa Gravatar non rivela nulla di nessuno.
-  'gravatarEnabled',
   'defaultLocale', 'availableLocales', 'localeNames', 'translationOverrides',
   'jvbInactiveGraceMinutes', 'jvbPreScaleMinutes', 'waitingRoomLeadMinutes',
   'jvbEmptyCloseMinutes', 'reactionsMode',
