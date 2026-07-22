@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Potvrdzovacie e-maily: názov podujatia, obrázok a nastaviteľný odosielateľ",
+    "notes": [
+      "Potvrdzovacie e-maily o registrácii opäť obsahujú názov podujatia, a to v predmete aj v texte správy. Kto sa registroval zo stránky v jazyku, do ktorého názov nebol preložený, dostal e-mail bez názvu podujatia a prílohu do kalendára bez názvu.",
+      "Potvrdzovacie e-maily aj pripomienky teraz v hornej časti zobrazujú obrázok podujatia a jeho názov je zreteľne zvýraznený – už nie je uvedený len v jednom riadku tabuľky s podrobnosťami.",
+      "Nové nastavenia v administračnom paneli: názov, pod ktorým sa odosielateľ zobrazí v doručenej pošte, a adresa, na ktorú majú prichádzať odpovede (e-maily sa odosielajú z adresy, ktorá odpovede neprijíma).",
+      "Vo všeobecnosti sa text, ktorý nie je preložený do daného jazyka, teraz zobrazí v pôvodnom znení namiesto toho, aby zostal prázdny: týkalo sa to aj názvov a popisov na verejných stránkach."
+    ]
+  },
   "0.8.3": {
     "title": "Súkromie chatu, správny počet účastníkov a obnovené moderovanie",
     "notes": [

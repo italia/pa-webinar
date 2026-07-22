@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Bekräftelsemejl: evenemangets namn, bild och konfigurerbar avsändare",
+    "notes": [
+      "Bekräftelsemejlen vid anmälan innehåller åter evenemangets namn, både i ämnesraden och i själva meddelandet. Den som anmälde sig från en sida på ett språk som titeln inte hade översatts till fick ett mejl utan evenemangets namn och en kalenderbilaga utan titel.",
+      "Bekräftelsemejlen och påminnelserna inleds nu med evenemangets bild och visar titeln tydligt, i stället för att bara ha den i en rad i tabellen med uppgifter om evenemanget.",
+      "Nya inställningar i administratörspanelen: namnet som avsändaren visas med i mottagarens inkorg och en svarsadress dit svaren kommer fram (mejlen skickas från en adress som inte tar emot svar).",
+      "Mer generellt visas nu originaltexten när något inte har översatts till ett språk, i stället för att fältet står tomt: det gällde även titlar och beskrivningar på de publika sidorna."
+    ]
+  },
   "0.8.3": {
     "title": "Sekretess i chatten, korrekt deltagarräkning och återställd moderering",
     "notes": [

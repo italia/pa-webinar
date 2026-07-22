@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Patvirtinimo laiškai: renginio pavadinimas, paveikslėlis ir konfigūruojamas siuntėjas",
+    "notes": [
+      "Registracijos patvirtinimo laiškuose vėl nurodomas renginio pavadinimas — tiek laiško temoje, tiek jo tekste. Tie, kurie registravosi puslapyje ta kalba, į kurią pavadinimas nebuvo išverstas, gaudavo laišką be renginio pavadinimo ir kalendoriaus priedą be pavadinimo.",
+      "Patvirtinimo laiškų ir priminimų viršuje dabar rodomas renginio paveikslėlis, o pavadinimas iškeltas į gerai matomą vietą — anksčiau jis būdavo paslėptas vienoje išsamios informacijos lentelės eilutėje.",
+      "Nauji administratoriaus skydelio nustatymai: vardas, kuriuo siuntėjas rodomas gavėjo pašto dėžutėje, ir atsakymams skirtas adresas (laiškai siunčiami iš adreso, kuris atsakymų nepriima).",
+      "Apskritai į kurią nors kalbą neišverstas tekstas dabar rodomas originalo kalba, o ne lieka tuščias: tai buvo aktualu ir viešuosiuose puslapiuose rodomiems pavadinimams bei aprašymams."
+    ]
+  },
   "0.8.3": {
     "title": "Pokalbių privatumas, tikslus dalyvių skaičius ir atkurtos moderavimo priemonės",
     "notes": [

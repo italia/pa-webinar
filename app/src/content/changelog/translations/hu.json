@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Visszaigazoló e-mailek: az esemény neve, képe és beállítható feladó",
+    "notes": [
+      "A regisztrációt visszaigazoló e-mailek ismét tartalmazzák az esemény nevét, a tárgyban és a szövegben is. Aki olyan nyelvű oldalról regisztrált, amelyre a cím nem volt lefordítva, az esemény neve nélküli e-mailt és cím nélküli naptármellékletet kapott.",
+      "A visszaigazoló e-mailek és az emlékeztetők élén mostantól az esemény képe áll, a cím pedig jól láthatóan jelenik meg, nem csak a részleteket felsoroló táblázat egyik soraként.",
+      "Új beállítások az adminisztrációs felületen: a feladó neve, ahogyan a címzett postafiókjában megjelenik, valamint egy válaszcím, amelyre a válaszok érkeznek (az e-mailek olyan címről indulnak, amely nem fogad válaszokat).",
+      "Általánosabban: az adott nyelvre le nem fordított szöveg helyén mostantól az eredeti jelenik meg, nem üres hely – ez a nyilvános oldalak címeire és leírásaira is vonatkozott."
+    ]
+  },
   "0.8.3": {
     "title": "A csevegés bizalmassága, pontos résztvevőszám és újra működő moderálás",
     "notes": [

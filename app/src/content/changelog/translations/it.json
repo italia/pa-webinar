@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Email di conferma: nome dell'evento, immagine e mittente configurabile",
+    "notes": [
+      "Le email di conferma iscrizione contengono di nuovo il nome dell'evento, nell'oggetto e nel corpo. Chi si iscriveva da una pagina in una lingua in cui il titolo non era stato tradotto riceveva un'email senza il nome dell'evento e un allegato calendario senza titolo.",
+      "Le email di conferma e i promemoria mostrano ora l'immagine dell'evento in cima e il titolo bene in evidenza, non più solo in una riga della tabella dei dettagli.",
+      "Nuove impostazioni nel pannello di amministrazione: il nome con cui il mittente appare nella posta e un indirizzo a cui far arrivare le risposte (le email partono da un indirizzo che non le riceve).",
+      "In generale, un testo non tradotto in una lingua mostra ora l'originale invece di apparire vuoto: valeva anche per titoli e descrizioni sulle pagine pubbliche."
+    ]
+  },
   "0.8.3": {
     "title": "Riservatezza della chat, conteggio partecipanti corretto e moderazione ripristinata",
     "notes": [

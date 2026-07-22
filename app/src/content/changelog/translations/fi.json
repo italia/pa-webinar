@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Vahvistussähköpostit: tapahtuman nimi, kuva ja muokattava lähettäjä",
+    "notes": [
+      "Ilmoittautumisen vahvistussähköposteissa näkyy jälleen tapahtuman nimi, sekä viestin aiheessa että sen sisällössä. Sivulta, jonka kielelle tapahtuman otsikkoa ei ollut käännetty, ilmoittautunut sai viestin ilman tapahtuman nimeä ja kalenteriliitteen ilman otsikkoa.",
+      "Vahvistusviestien ja muistutusten yläreunassa näkyy nyt tapahtuman kuva, ja otsikko on selvästi esillä – ei enää vain yhtenä rivinä tapahtuman tietotaulukossa.",
+      "Uusia asetuksia ylläpitäjän hallintapaneelissa: nimi, jolla lähettäjä näkyy vastaanottajan postilaatikossa, sekä vastausosoite viesteihin vastaamista varten (viestit lähetetään osoitteesta, joka ei vastaanota postia).",
+      "Yleisemminkin teksti, jota ei ole käännetty valitulle kielelle, näkyy nyt alkuperäisenä sen sijaan, että kohta jäisi tyhjäksi. Sama koski myös otsikoita ja kuvauksia julkisilla sivuilla."
+    ]
+  },
   "0.8.3": {
     "title": "Chatin tietosuoja, oikea osallistujamäärä ja moderointi taas toiminnassa",
     "notes": [

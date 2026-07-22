@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Potvrzovací e-maily: název akce, obrázek a nastavitelný odesílatel",
+    "notes": [
+      "E-maily potvrzující registraci opět obsahují název akce, a to v předmětu i v textu zprávy. Kdo se registroval ze stránky v jazyce, do kterého název přeložen nebyl, dostal e-mail bez názvu akce a přílohu pro kalendář bez názvu.",
+      "Potvrzovací e-maily i připomínky nyní začínají obrázkem akce a její název je výrazně vidět, místo aby byl schovaný v jednom z řádků tabulky s podrobnostmi.",
+      "Nová nastavení v panelu administrace: jméno, pod kterým se odesílatel zobrazí v poště příjemce, a adresa, na kterou mají chodit odpovědi (e-maily odcházejí z adresy, která odpovědi nepřijímá).",
+      "Obecně platí, že text, který do daného jazyka nebyl přeložen, se nyní zobrazí v původním znění, místo aby zůstal prázdný: týkalo se to i názvů a popisů na veřejných stránkách."
+    ]
+  },
   "0.8.3": {
     "title": "Soukromí chatu, správný počet účastníků a obnovená moderace",
     "notes": [

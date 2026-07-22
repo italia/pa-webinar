@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Correos de confirmación: el nombre del evento, su imagen y un remitente configurable",
+    "notes": [
+      "Los correos de confirmación de la inscripción vuelven a incluir el nombre del evento, tanto en el asunto como en el cuerpo del mensaje. Quien se inscribía desde una página en un idioma al que el título no se había traducido recibía un correo sin el nombre del evento y un archivo de calendario adjunto sin título.",
+      "Los correos de confirmación y los recordatorios muestran ahora la imagen del evento en la parte superior y el título bien destacado, en lugar de relegarlo a una fila de la tabla de detalles.",
+      "Nuevos ajustes en el panel de administración: el nombre con el que aparece el remitente en el buzón de quien recibe el mensaje y una dirección a la que dirigir las respuestas (los correos se envían desde una dirección que no las recibe).",
+      "En general, un texto que no se ha traducido a un idioma muestra ahora el original en lugar de aparecer vacío: esto afectaba también a los títulos y las descripciones de las páginas públicas."
+    ]
+  },
   "0.8.3": {
     "title": "Privacidad del chat, recuento de participantes correcto y moderación restablecida",
     "notes": [

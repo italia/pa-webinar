@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Emails ta’ konferma: l-isem tal-avveniment, l-istampa u mittent konfigurabbli",
+    "notes": [
+      "L-emails ta’ konferma tar-reġistrazzjoni reġgħu jġorru l-isem tal-avveniment, kemm fis-suġġett kif ukoll fil-korp tal-messaġġ. Min kien jirreġistra minn paġna b’lingwa li fiha t-titlu ma kienx ġie tradott kien jirċievi email mingħajr l-isem tal-avveniment u anness tal-kalendarju mingħajr titlu.",
+      "L-emails ta’ konferma u t-tfakkiriet issa jinfetħu bl-istampa tal-avveniment fil-quċċata, bit-titlu jispikka sew, minflok ma jibqa’ mistur f’ringiela tat-tabella tad-dettalji.",
+      "Issettjar ġdid fil-pannell tal-amministrazzjoni: l-isem li bih jidher il-mittent fil-kaxxa postali ta’ min jirċievi, u indirizz fejn jaslu r-risposti (l-emails jintbagħtu minn indirizz li ma jirċevihomx).",
+      "B’mod aktar ġenerali, test li ma jkunx ġie tradott f’lingwa issa juri l-verżjoni oriġinali minflok ma jidher vojt: dan kien jolqot ukoll it-titli u d-deskrizzjonijiet fuq il-paġni pubbliċi."
+    ]
+  },
   "0.8.3": {
     "title": "Kunfidenzjalità taċ-chat, għadd korrett tal-parteċipanti u moderazzjoni lura fis-seħħ",
     "notes": [

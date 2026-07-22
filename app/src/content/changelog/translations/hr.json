@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "E-poruke s potvrdom: naziv događaja, slika i prilagodljiv pošiljatelj",
+    "notes": [
+      "E-poruke s potvrdom prijave ponovno sadrže naziv događaja, i u predmetu i u tekstu poruke. Tko se prijavio sa stranice na jeziku na koji naslov nije bio preveden, dobivao je poruku bez naziva događaja i kalendarski privitak bez naslova.",
+      "E-poruke s potvrdom i podsjetnici sada na vrhu prikazuju sliku događaja, a naslov je jasno istaknut umjesto da stoji tek u jednom retku tablice s pojedinostima.",
+      "Nove postavke u administratorskom sučelju: ime pod kojim se pošiljatelj prikazuje u pristigloj pošti i adresa na koju stižu odgovori (poruke se šalju s adrese koja ih ne prima).",
+      "Općenito, tekst koji nije preveden na neki jezik sada se prikazuje u izvorniku umjesto da ostane prazan: to se odnosilo i na naslove i opise na javnim stranicama."
+    ]
+  },
   "0.8.3": {
     "title": "Povjerljivost chata, točan broj sudionika i vraćene moderatorske naredbe",
     "notes": [
