@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Ríomhphoist deimhnithe: ainm an imeachta, an íomhá agus seoltóir inchumraithe",
+    "notes": [
+      "Tá ainm an imeachta sna ríomhphoist a dheimhníonn an clárú arís, san ábhar agus i gcorp na teachtaireachta. Roimhe seo, dá gcláródh duine ó leathanach i dteanga nach raibh an teideal aistrithe inti, gheobhadh sé ríomhphost gan ainm an imeachta agus ceangaltán féilire gan teideal.",
+      "Taispeánann na ríomhphoist deimhnithe agus na meabhrúcháin íomhá an imeachta ag a mbarr anois, agus an teideal go feiceálach, in ionad é a bheith i líne amháin de thábla na sonraí.",
+      "Socruithe nua sa phainéal riaracháin: an t-ainm faoina dtaispeántar an seoltóir i mbosca isteach an fhaighteora, agus seoladh chun na freagraí a fháil (seoltar na ríomhphoist ó sheoladh nach nglacann le freagraí).",
+      "Go ginearálta, nuair nach bhfuil téacs aistrithe go teanga áirithe, taispeántar an bunleagan anois in ionad spás folamh: bhain sé sin le teidil agus le cur síos ar na leathanaigh phoiblí freisin."
+    ]
+  },
   "0.8.3": {
     "title": "Príobháideacht an chomhrá, líon cruinn rannpháirtithe agus modhnú ar ais i bhfeidhm",
     "notes": [

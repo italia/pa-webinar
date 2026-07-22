@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Potrditvena elektronska sporočila: ime dogodka, slika in nastavljiv pošiljatelj",
+    "notes": [
+      "Potrditvena sporočila o prijavi na dogodek znova vsebujejo ime dogodka, tako v zadevi kot v besedilu sporočila. Kdor se je prijavil s strani v jeziku, v katerega naslov dogodka ni bil preveden, je prejel sporočilo brez imena dogodka in koledarsko priponko brez naslova.",
+      "Potrditvena sporočila in opomniki zdaj na vrhu prikažejo sliko dogodka, naslov dogodka pa je jasno poudarjen in ne več le v eni od vrstic razpredelnice s podrobnostmi.",
+      "Novi nastavitvi v skrbniški plošči: ime, pod katerim se pošiljatelj prikaže v prejemnikovem poštnem predalu, in naslov, na katerega naj prispejo odgovori (sporočila se pošiljajo z naslova, ki odgovorov ne sprejema).",
+      "Na splošno se besedilo, ki v določen jezik ni prevedeno, zdaj prikaže v izvirniku, namesto da bi ostalo prazno: to je veljalo tudi za naslove in opise na javnih straneh."
+    ]
+  },
   "0.8.3": {
     "title": "Zasebnost klepeta, pravilno število udeležencev in znova delujoče moderiranje",
     "notes": [

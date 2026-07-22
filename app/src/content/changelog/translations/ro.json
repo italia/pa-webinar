@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "E-mailuri de confirmare: numele evenimentului, imaginea și un expeditor configurabil",
+    "notes": [
+      "E-mailurile de confirmare a înscrierii conțin din nou numele evenimentului, atât în subiect, cât și în corpul mesajului. Cine se înscria de pe o pagină într-o limbă în care titlul nu fusese tradus primea un e-mail fără numele evenimentului și un fișier de calendar atașat fără titlu.",
+      "E-mailurile de confirmare și mementourile afișează acum imaginea evenimentului în partea de sus, iar titlul apare bine evidențiat, nu doar într-un rând al tabelului cu detalii.",
+      "Setări noi în panoul de administrare: numele sub care apare expeditorul în căsuța poștală a destinatarului și o adresă la care să ajungă răspunsurile (e-mailurile sunt trimise de la o adresă care nu primește mesaje).",
+      "În general, un text netradus într-o limbă afișează acum varianta originală, în loc să apară gol: același lucru era valabil și pentru titlurile și descrierile de pe paginile publice."
+    ]
+  },
   "0.8.3": {
     "title": "Confidențialitatea chatului, număr corect de participanți și moderare restabilită",
     "notes": [

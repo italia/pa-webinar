@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Kinnituskirjad: ürituse nimi, pilt ja seadistatav saatja",
+    "notes": [
+      "Registreerumise kinnituskirjades on ürituse nimi taas olemas, nii kirja teemas kui ka sisus. Kes registreerus lehel keeles, millesse ürituse pealkirja ei olnud tõlgitud, sai kirja ilma ürituse nimeta ja pealkirjata kalendrimanuse.",
+      "Kinnitus- ja meeldetuletuskirjad algavad nüüd ürituse pildiga ning pealkiri on selgelt esile tõstetud, mitte enam peidus üksnes üksikasjade tabeli ühel real.",
+      "Uued seaded halduspaneelis: nimi, mille all saatja adressaadi postkastis kuvatakse, ja vastamisaadress (kirjad saadetakse aadressilt, mis vastuseid vastu ei võta).",
+      "Üldisemalt: kui tekst ei ole mõnda keelde tõlgitud, kuvatakse nüüd algupärast teksti, mitte tühja kohta – see puudutas ka pealkirju ja kirjeldusi avalikel lehtedel."
+    ]
+  },
   "0.8.3": {
     "title": "Vestluse privaatsus, täpne osalejate arv ja taastatud modereerimine",
     "notes": [

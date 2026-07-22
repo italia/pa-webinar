@@ -10,6 +10,15 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.8.4 — 2026-07-22
+
+**Confirmation emails: the event name, its image, and a configurable sender**
+
+- Registration confirmation emails carry the event name again, in the subject and in the body. Anyone registering from a page in a language the title had not been translated into received an email with no event name and a calendar attachment with no title.
+- Confirmation emails and reminders now open with the event image and show the title prominently, instead of tucking it into a row of the details table.
+- New settings in the admin panel: the name the sender appears under in a recipient's inbox, and a reply-to address (emails are sent from an address that does not receive replies).
+- More generally, text that has not been translated into a language now shows the original instead of appearing blank — this affected titles and descriptions on the public pages too.
+
 ## 0.8.3 — 2026-07-21 🔒
 
 **Chat privacy, an accurate participant count and moderation restored**

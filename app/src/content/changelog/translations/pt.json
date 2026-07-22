@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "E-mails de confirmação: nome do evento, imagem e remetente configurável",
+    "notes": [
+      "Os e-mails de confirmação de inscrição voltam a incluir o nome do evento, tanto no assunto como no corpo da mensagem. Quem se inscrevia a partir de uma página numa língua para a qual o título não tinha sido traduzido recebia um e-mail sem o nome do evento e um anexo de calendário sem título.",
+      "Os e-mails de confirmação e os lembretes passam a apresentar a imagem do evento no topo e o título bem em destaque, em vez de o relegarem para uma simples linha da tabela de detalhes.",
+      "Novas definições no painel de administração: o nome com que o remetente aparece na caixa de correio de quem recebe e um endereço para onde encaminhar as respostas (os e-mails são enviados a partir de um endereço que não as recebe).",
+      "De um modo geral, um texto que não tenha sido traduzido para uma língua passa a apresentar o original, em vez de aparecer vazio: o mesmo sucedia com os títulos e as descrições nas páginas públicas."
+    ]
+  },
   "0.8.3": {
     "title": "Privacidade do chat, contagem de participantes correta e moderação reposta",
     "notes": [

@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Apstiprinājuma e-pasta vēstules: pasākuma nosaukums, attēls un konfigurējams sūtītājs",
+    "notes": [
+      "Reģistrācijas apstiprinājuma vēstulēs atkal ir norādīts pasākuma nosaukums — gan tēmā, gan vēstules tekstā. Tie, kas reģistrējās lapā valodā, kurā nosaukums nebija iztulkots, saņēma vēstuli bez pasākuma nosaukuma un kalendāra pielikumu bez virsraksta.",
+      "Apstiprinājuma vēstules un atgādinājumi tagad sākas ar pasākuma attēlu, un nosaukums ir skaidri izcelts, nevis paslēpts vienā no informācijas tabulas rindām.",
+      "Jauni iestatījumi administratora panelī: vārds, ar kādu sūtītājs parādās saņēmēja pastkastē, un adrese, uz kuru nonāk atbildes (vēstules tiek sūtītas no adreses, kas atbildes nesaņem).",
+      "Vispārīgāk — teksts, kas kādā valodā nav iztulkots, tagad tiek rādīts oriģinālvalodā, nevis paliek tukšs; tas attiecās arī uz nosaukumiem un aprakstiem publiskajās lapās."
+    ]
+  },
   "0.8.3": {
     "title": "Tērzēšanas konfidencialitāte, precīzs dalībnieku skaits un atjaunota moderēšana",
     "notes": [

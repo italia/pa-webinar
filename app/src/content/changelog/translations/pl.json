@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Wiadomości potwierdzające: nazwa wydarzenia, obraz i konfigurowalny nadawca",
+    "notes": [
+      "Wiadomości potwierdzające zapisanie się na wydarzenie znów zawierają jego nazwę — zarówno w temacie, jak i w treści. Kto zapisywał się ze strony w języku, na który tytuł nie został przetłumaczony, otrzymywał wiadomość bez nazwy wydarzenia oraz załącznik kalendarza bez tytułu.",
+      "Wiadomości potwierdzające i przypomnienia zaczynają się teraz od obrazu wydarzenia i wyraźnie eksponują jego tytuł, zamiast umieszczać go wyłącznie w wierszu tabeli ze szczegółami.",
+      "Nowe ustawienia w panelu administracyjnym: nazwa, pod jaką nadawca pojawia się w skrzynce odbiorcy, oraz adres, na który mają trafiać odpowiedzi (wiadomości są wysyłane z adresu, który odpowiedzi nie odbiera).",
+      "Ogólniej: tekst, który nie został przetłumaczony na dany język, pokazuje teraz wersję oryginalną, zamiast pozostawać pusty — dotyczyło to również tytułów i opisów na stronach publicznych."
+    ]
+  },
   "0.8.3": {
     "title": "Poufność czatu, poprawna liczba uczestników i przywrócona moderacja",
     "notes": [

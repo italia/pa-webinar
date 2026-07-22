@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Courriels de confirmation : le nom de l’événement, son image et un expéditeur configurable",
+    "notes": [
+      "Les courriels de confirmation d’inscription portent de nouveau le nom de l’événement, dans l’objet comme dans le corps du message. Les personnes qui s’inscrivaient depuis une page rédigée dans une langue où le titre n’avait pas été traduit recevaient un courriel sans le nom de l’événement et une pièce jointe d’agenda sans intitulé.",
+      "Les courriels de confirmation et les rappels s’ouvrent désormais sur l’image de l’événement et mettent le titre bien en évidence, au lieu de le reléguer dans une ligne du tableau des détails.",
+      "Nouveaux paramètres dans le panneau d’administration : le nom sous lequel l’expéditeur apparaît dans la boîte de réception des destinataires, et une adresse à laquelle adresser les réponses (les courriels partent d’une adresse qui n’en reçoit pas).",
+      "Plus généralement, un texte non traduit dans une langue affiche désormais l’original au lieu de rester vide : cela valait aussi pour les titres et les descriptions sur les pages publiques."
+    ]
+  },
   "0.8.3": {
     "title": "Confidentialité du chat, comptage exact des participants et modération rétablie",
     "notes": [

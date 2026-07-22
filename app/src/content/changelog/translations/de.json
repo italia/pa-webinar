@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Bestätigungs-E-Mails: Name der Veranstaltung, Bild und konfigurierbarer Absender",
+    "notes": [
+      "Die E-Mails zur Bestätigung der Anmeldung enthalten wieder den Namen der Veranstaltung – im Betreff und im Text. Wer sich von einer Seite in einer Sprache aus anmeldete, in die der Titel nicht übersetzt worden war, erhielt eine E-Mail ohne den Namen der Veranstaltung und einen Kalenderanhang ohne Titel.",
+      "Bestätigungs-E-Mails und Erinnerungen zeigen jetzt oben das Bild der Veranstaltung und den Titel gut sichtbar hervorgehoben, statt ihn nur in einer Zeile der Detailtabelle aufzuführen.",
+      "Neue Einstellungen im Verwaltungsbereich: der Name, unter dem der Absender im Posteingang der Empfangenden erscheint, sowie eine Antwortadresse (die E-Mails werden von einer Adresse versendet, die keine Antworten empfängt).",
+      "Ganz allgemein wird ein Text, der nicht in eine Sprache übersetzt wurde, jetzt im Original angezeigt, statt leer zu bleiben – das betraf auch Titel und Beschreibungen auf den öffentlichen Seiten."
+    ]
+  },
   "0.8.3": {
     "title": "Vertraulicher Chat, korrekte Teilnehmendenzahl und wiederhergestellte Moderationsfunktionen",
     "notes": [

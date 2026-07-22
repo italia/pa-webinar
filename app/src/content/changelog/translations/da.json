@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Bekræftelsesmails: arrangementets navn og billede samt en afsender, der kan indstilles",
+    "notes": [
+      "Bekræftelsesmails ved tilmelding indeholder igen arrangementets navn, både i emnefeltet og i selve teksten. Tilmeldte man sig fra en side på et sprog, som titlen ikke var oversat til, modtog man en e-mail uden arrangementets navn og en kalendervedhæftning uden titel.",
+      "Bekræftelsesmails og påmindelser viser nu arrangementets billede øverst og titlen tydeligt fremhævet i stedet for kun i en enkelt række i tabellen med oplysninger.",
+      "Nye indstillinger i administrationspanelet: det navn, afsenderen vises med i modtagerens indbakke, og en adresse, som svar skal sendes til (e-mailene afsendes fra en adresse, der ikke modtager svar).",
+      "Mere generelt gælder det nu, at en tekst, der ikke er oversat til et sprog, vises på originalsproget i stedet for at stå tom. Det gjaldt også titler og beskrivelser på de offentlige sider."
+    ]
+  },
   "0.8.3": {
     "title": "Fortrolighed i chatten, korrekt deltagertal og moderation, der virker igen",
     "notes": [

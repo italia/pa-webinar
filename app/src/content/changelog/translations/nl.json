@@ -1,4 +1,13 @@
 {
+  "0.8.4": {
+    "title": "Bevestigingsmails: naam van het evenement, afbeelding en instelbare afzender",
+    "notes": [
+      "De bevestigingsmails van de aanmelding vermelden weer de naam van het evenement, zowel in het onderwerp als in de tekst. Wie zich aanmeldde vanaf een pagina in een taal waarin de titel niet was vertaald, kreeg een e-mail zonder de naam van het evenement en een agendabijlage zonder titel.",
+      "De bevestigingsmails en de herinneringen tonen nu bovenaan de afbeelding van het evenement en zetten de titel goed in het zicht, in plaats van die weg te stoppen in een regel van de tabel met gegevens.",
+      "Nieuwe instellingen in het beheerpaneel: de naam waaronder de afzender in de mailbox verschijnt en een adres waarop de antwoorden binnenkomen (de e-mails worden verstuurd vanaf een adres dat zelf geen antwoorden ontvangt).",
+      "Meer in het algemeen: tekst die niet in een bepaalde taal is vertaald, toont nu het origineel in plaats van leeg te blijven — dat gold ook voor titels en beschrijvingen op de openbare pagina’s."
+    ]
+  },
   "0.8.3": {
     "title": "Vertrouwelijkheid van de chat, een juist deelnemersaantal en herstelde moderatie",
     "notes": [
