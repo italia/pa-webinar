@@ -57,6 +57,13 @@ concurrency:
 
 jobs:
   build-and-push:
+    # La quota artefatti di Actions e' dell'ORGANIZZAZIONE, non di questo repo
+    # (qui siamo sotto i 50 MB): quando si esaurisce OGNI upload fallisce, e con
+    # lui il job — anche a immagine gia' pubblicata. Il "build record" di buildx
+    # e' un artefatto per ogni build che nessuno scarica mai.
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Build & Push Dev Image
     runs-on: arc-runner-pa-webinar
     permissions:
@@ -175,6 +182,13 @@ jobs:
           fi
 
   build-worker:
+    # La quota artefatti di Actions e' dell'ORGANIZZAZIONE, non di questo repo
+    # (qui siamo sotto i 50 MB): quando si esaurisce OGNI upload fallisce, e con
+    # lui il job — anche a immagine gia' pubblicata. Il "build record" di buildx
+    # e' un artefatto per ogni build che nessuno scarica mai.
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Build & Push Postprod Worker Image
     needs: detect-worker-changes
     if: needs.detect-worker-changes.outputs.worker_changed == 'true'
@@ -272,6 +286,13 @@ jobs:
           fi
 
   build-recorder:
+    # La quota artefatti di Actions e' dell'ORGANIZZAZIONE, non di questo repo
+    # (qui siamo sotto i 50 MB): quando si esaurisce OGNI upload fallisce, e con
+    # lui il job — anche a immagine gia' pubblicata. Il "build record" di buildx
+    # e' un artefatto per ogni build che nessuno scarica mai.
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Build & Push Recorder Image
     needs: detect-recorder-changes
     if: needs.detect-recorder-changes.outputs.recorder_changed == 'true'
@@ -355,6 +376,13 @@ jobs:
           fi
 
   build-recorder-controller:
+    # La quota artefatti di Actions e' dell'ORGANIZZAZIONE, non di questo repo
+    # (qui siamo sotto i 50 MB): quando si esaurisce OGNI upload fallisce, e con
+    # lui il job — anche a immagine gia' pubblicata. Il "build record" di buildx
+    # e' un artefatto per ogni build che nessuno scarica mai.
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Build & Push Recorder Controller Image
     needs: detect-recorder-controller-changes
     if: needs.detect-recorder-controller-changes.outputs.changed == 'true'
