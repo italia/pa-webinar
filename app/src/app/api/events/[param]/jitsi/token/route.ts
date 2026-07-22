@@ -78,6 +78,12 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       uniqueId: moderatorJitsiId(event.id),
       isModerator: !isSpeaker,
+      // Chi sta sullo schermo è soprattutto chi modera e chi parla: se l'avatar
+      // Gravatar valesse solo per il pubblico, la funzione si vedrebbe dove
+      // conta meno. `grant.email` è null per il link primario — condiviso da
+      // tutto il team, nessuna persona dietro — e lì restano le iniziali.
+      email: grant.email ?? undefined,
+      useGravatar: (await getSettings()).gravatarEnabled,
     });
 
     return Response.json({

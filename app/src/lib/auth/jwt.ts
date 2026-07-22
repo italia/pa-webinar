@@ -44,7 +44,8 @@ function getJitsiJwtSubject(): string {
 }
 
 import { generateAvatarDataUri } from '@/lib/avatar';
-import { encryptPII } from '@/lib/crypto/pii';
+import { getPublicEnv } from '@/lib/env';
+import { gravatarRef } from '@/lib/gravatar-ref';
 
 interface JitsiTokenPayload {
   roomName: string;
@@ -63,6 +64,18 @@ interface JitsiTokenPayload {
    * sito, e renderebbe impuri gli unit test di questo modulo.
    */
   useGravatar?: boolean;
+}
+
+/** L'origin pubblico dell'app, o null se non è un URL http(s) assoluto (nel
+ *  qual caso l'avatar resta il data URI invece di diventare un link rotto). */
+function absoluteAppUrl(): string | null {
+  try {
+    const url = new URL(getPublicEnv('NEXT_PUBLIC_APP_URL'));
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+    return `${url.origin}${url.pathname.replace(/\/$/, '')}`;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -99,17 +112,25 @@ export async function generateJitsiJwt(
   //
   // Con Gravatar attivo puntiamo al NOSTRO proxy `/api/avatar`, mai a
   // gravatar.com: è il nostro server a parlare col terzo, non il browser dei
-  // partecipanti, e `docs/GDPR.md` resta vero. L'email viaggia CIFRATA: l'URL
-  // dell'avatar viene diffuso in presenza a tutta la sala, e un digest non
-  // salato di un indirizzo lì sarebbe un oracolo di re-identificazione, non
-  // un'anonimizzazione.
+  // partecipanti, e `docs/GDPR.md` resta vero. Quello che viaggia nell'URL è
+  // l'hash dell'email, cifrato — mai l'indirizzo: vedi `lib/gravatar-ref`.
+  //
+  // `getPublicEnv` e non `process.env.NEXT_PUBLIC_*`: la seconda forma viene
+  // SOSTITUITA a build time da webpack, e l'immagine è costruita con
+  // `ARG NEXT_PUBLIC_APP_URL=http://localhost:3000` — in produzione ogni avatar
+  // avrebbe puntato al localhost di chi guarda.
+  //
+  // Se il proxy non è raggiungibile resta il data URI: `d=404` lato proxy fa
+  // ricadere sulle iniziali chi non ha un Gravatar, quindi l'unico scenario
+  // scoperto è l'URL remoto in sé — ed è per questo che l'opzione è opt-in.
   let avatarUrl = generateAvatarDataUri(payload.displayName);
   if (payload.useGravatar && payload.email) {
-    const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '');
-    if (base) {
+    const base = absoluteAppUrl();
+    const ref = gravatarRef(payload.email);
+    if (base && ref) {
       const q = new URLSearchParams({
         name: payload.displayName,
-        e: encryptPII(payload.email),
+        g: ref,
         size: '200',
       });
       avatarUrl = `${base}/api/avatar?${q.toString()}`;

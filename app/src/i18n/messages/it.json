@@ -3426,7 +3426,9 @@
     "multitrackConsentRequired": "Devi accettare la registrazione della tua traccia audio per entrare",
     "enterGardenTitle": "Entra nella piazza",
     "enterGardenHint": "Uno spazio da esplorare mentre aspetti: da lì puoi anche sistemare nome e microfono ed entrare nell’evento.",
-    "backToWaitingRoom": "Torna alla sala d’attesa"
+    "backToWaitingRoom": "Torna alla sala d’attesa",
+    "gardenDialogLabel": "Piazza della sala d’attesa",
+    "gardenGateHint": "Puoi entrare da qui, oppure portare il tuo avatar fino al cancello."
   },
   "recording": {
     "management": "Registrazione video",

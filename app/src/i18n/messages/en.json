@@ -3426,7 +3426,9 @@
     "multitrackConsentRequired": "You must accept the recording of your audio track to enter",
     "enterGardenTitle": "Step into the square",
     "enterGardenHint": "A place to wander while you wait — you can set your name and microphone and join the event from there too.",
-    "backToWaitingRoom": "Back to the waiting room"
+    "backToWaitingRoom": "Back to the waiting room",
+    "gardenDialogLabel": "Waiting-room square",
+    "gardenGateHint": "You can join from here, or walk your avatar to the gate."
   },
   "recording": {
     "management": "Video recording",

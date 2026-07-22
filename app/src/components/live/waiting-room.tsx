@@ -454,6 +454,13 @@ export default function WaitingRoom({
   // conference.join as "not joined" and resets, so the avatar is never left
   // phantom-seated when the host never actually entered. The standard "Entra
   // ora" button stays available for anyone who doesn't want to play.
+  //
+  // The `(name, prefs)` the lobby passes are deliberately IGNORED, and that is
+  // only safe because the lobby runs with `hostOwnsEntry`: its own name field
+  // and device panel are suppressed, so those arguments are the profile we
+  // pushed in and a pair of placeholder muted flags. Drop that prop and the
+  // game grows a second set of controls whose answers land nowhere — a
+  // participant who muted camera and mic in there would join with both live.
   const handleGameEnter = useCallback(() => {
     if (canEnter) {
       handleEnterLive();
@@ -471,6 +478,21 @@ export default function WaitingRoom({
     (s: WaitingRoomJoinPrefs) => setDevicePrefs(s),
     [],
   );
+
+  // La piazza a piena pagina è un dialogo, non solo un div che copre tutto:
+  // chi naviga da tastiera deve poterci entrare e — soprattutto — uscirne.
+  const gameDialogRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!gameOpen) return;
+    gameDialogRef.current
+      ?.querySelector<HTMLElement>('.wr-game-full__exit')
+      ?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setGameOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [gameOpen]);
 
   // ── Catch-up recording player ─────────────────────────────────────
   if (watchingCatchUp && event.tempRecordingUrl) {
@@ -897,30 +919,75 @@ export default function WaitingRoom({
   // controlli, ingresso in call — e un'uscita che riporta qui.
   const canPlay = !isEnded && !classicView && !multitrackRequired;
 
-  // Modalità gioco a piena pagina. `embed={false}`: la lobby possiede il proprio
-  // nome e la propria CTA d'ingresso, quindi la pagina non deve duplicarli.
-  // `onEnterLive` passa comunque dal VALIDATED handleGameEnter della shell, così
-  // entrare camminando fino al cancello applica gli stessi controlli del
-  // pulsante "Entra ora": nome, consensi, preferenze audio/video.
+  // Modalità piazza a piena pagina. Il gioco prende la scena; i controlli
+  // restano quelli DI QUESTA PAGINA, in un pannello a fianco — è il "collegali"
+  // chiesto: stesso nome, stesse preferenze audio/video, stessa CTA validata,
+  // stessa chat, stesse informazioni sull'evento. Un solo insieme di controlli,
+  // in una sola lingua, validato una sola volta.
+  //
+  // `hostOwnsEntry` spegne la chrome interna della lobby (onboarding, top bar,
+  // pannello dispositivi). Senza, il gioco ne mostra una propria: in italiano
+  // fisso — su 24 lingue —, con un nome che non torna mai nello stato React
+  // (quindi l'ingresso si blocca in silenzio) e un ingresso che scavalca il
+  // gate LIVE, facendo entrare un moderatore in una sala mai avviata.
   const gameFullScreen = canPlay && gameOpen ? (
     <PhaserLobbyBoundary onError={() => { setGameOpen(false); toggleClassic(true); }}>
-      <div className="wr-game-full">
-        <PhaserLobby
-          eventSlug={event.slug}
-          displayName={trimmedName}
-          status={event.status}
-          startsAtMs={startsAtMs}
-          isHost={isModerator}
-          onEnterLive={handleGameEnter}
-          onExitClassic={() => setGameOpen(false)}
-        />
-        <button
-          type="button"
-          className="wr-game-full__exit"
-          onClick={() => setGameOpen(false)}
-        >
-          ← {t('backToWaitingRoom')}
-        </button>
+      <div
+        className="wr-game-full"
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('gardenDialogLabel')}
+        ref={gameDialogRef}
+      >
+        <div className="wr-game-full__stage">
+          <PhaserLobby
+            hostOwnsEntry
+            eventSlug={event.slug}
+            displayName={trimmedName}
+            status={event.status}
+            startsAtMs={startsAtMs}
+            isHost={isModerator}
+            onEnterLive={handleGameEnter}
+            // "Versione classica" dentro il gioco è l'uscita di sicurezza per
+            // chi non regge l'animazione: deve RICORDARE la scelta, non solo
+            // chiudere l'overlay e riproporre la piazza al reload successivo.
+            onExitClassic={() => { setGameOpen(false); toggleClassic(true); }}
+          />
+          <button
+            type="button"
+            className="wr-game-full__exit"
+            onClick={() => setGameOpen(false)}
+          >
+            <Icon icon="it-arrow-left" size="xs" className="me-1" />
+            {t('backToWaitingRoom')}
+          </button>
+        </div>
+        <aside className="wr-game-full__panel">
+          <div className="wr-game-full__panel-inner">
+            <EventTitle
+              title={event.title}
+              kickerEnabled={event.parseTitleKicker ?? false}
+              as="h2"
+              className="h6 fw-bold mb-1"
+              style={{ color: 'var(--app-text)' }}
+            />
+            <div className="text-muted mb-3" style={{ fontSize: '0.8rem' }}>
+              {dateLabel} · {startTimeLabel} – {endTimeLabel}
+            </div>
+            {statusBanners}
+            <div className="d-grid gap-3">
+              {nameField}
+              {deviceCheckField}
+              {primaryCta}
+              {isLive && (
+                <p className="text-muted mb-0" style={{ fontSize: '0.78rem' }}>
+                  {t('gardenGateHint')}
+                </p>
+              )}
+              {chatPreviewBlock}
+            </div>
+          </div>
+        </aside>
       </div>
     </PhaserLobbyBoundary>
   ) : null;

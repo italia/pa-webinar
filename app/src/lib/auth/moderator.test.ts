@@ -202,6 +202,9 @@ describe('resolveGrantForEvent (risoluzione unica token→identità)', () => {
       displayName: 'Organizzatore',
       isPrimaryShared: true,
       grantId: null,
+      // Il link primario è CONDIVISO: non c'è una persona dietro, quindi non
+      // c'è un'email — e infatti nessun avatar personale.
+      email: null,
     });
     expect(prisma.eventModerator.findUnique).not.toHaveBeenCalled();
   });
@@ -220,6 +223,36 @@ describe('resolveGrantForEvent (risoluzione unica token→identità)', () => {
       displayName: 'Paolo',
       isPrimaryShared: false,
       grantId: 'grant-1',
+    });
+  });
+
+  it('co-moderatore: espone l\'email decifrata (serve solo per Gravatar)', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      id: 'grant-3',
+      eventId: 'evt-g',
+      revokedAt: null,
+      role: 'MODERATOR',
+      name: 'Paolo',
+      email: 'paolo@example.it',
+    } as never);
+    expect(await resolveGrantForEvent(event, 'comod-token')).toMatchObject({
+      email: 'paolo@example.it',
+    });
+  });
+
+  it('grant senza email: null, non stringa vuota', async () => {
+    const { prisma } = await import('@/lib/db');
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      id: 'grant-4',
+      eventId: 'evt-g',
+      revokedAt: null,
+      role: 'SPEAKER',
+      name: 'Relatrice',
+      email: null,
+    } as never);
+    expect(await resolveGrantForEvent(event, 'speaker-token')).toMatchObject({
+      email: null,
     });
   });
 
