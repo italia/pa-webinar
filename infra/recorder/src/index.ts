@@ -69,13 +69,27 @@ function requireEnv(name: string): string {
  */
 export function recorderJid(
   user: string | undefined,
-  domain: string | undefined,
+  domain: string | undefined
 ): string | undefined {
   const u = user?.trim();
   if (!u) return undefined;
   if (u.includes('@')) return u;
   const d = domain?.trim();
   return d ? `${u}@${d}` : undefined;
+}
+
+/**
+ * Vale la pena rientrare col JWT del portale?
+ *
+ * Solo se si era scelto il dominio nascosto E non si e' mai entrati in
+ * conferenza. Una stanza rimasta vuota entra e non registra nulla: e' normale,
+ * e ritentare la farebbe solo rioccupare, stavolta con un bot visibile.
+ */
+export function shouldRetryWithJwt(
+  joinedConference: boolean,
+  xmppUser: string | undefined,
+): boolean {
+  return !joinedConference && !!xmppUser;
 }
 
 function readEnv(): RecorderEnv {
@@ -89,10 +103,7 @@ function readEnv(): RecorderEnv {
     // Entrambe o nessuna: una sola delle due è una configurazione a metà, e
     // fallire il login lascerebbe l'evento senza registrazione. Meglio il
     // fallback esplicito sul JWT.
-    xmppUser: recorderJid(
-      process.env.JITSI_XMPP_USER,
-      process.env.JITSI_XMPP_DOMAIN,
-    ),
+    xmppUser: recorderJid(process.env.JITSI_XMPP_USER, process.env.JITSI_XMPP_DOMAIN),
     xmppPassword: process.env.JITSI_XMPP_PASSWORD || undefined,
     // Quanto il bot resta in stanza vuota prima di chiudere (default 90s in
     // capture.ts). Configurabile per dare tempo ai partecipanti di entrare.
@@ -125,7 +136,7 @@ export async function main(): Promise<void> {
   });
   console.log(
     `[recorder] work-order: room=${wo.roomName} event=${wo.eventId} ` +
-      `recording=${wo.recordingId}`,
+      `recording=${wo.recordingId}`
   );
 
   const captureConfig: CaptureConfig = {
@@ -144,7 +155,36 @@ export async function main(): Promise<void> {
   };
 
   // ── 3. Cattura WebRTC (blocca fino a fine evento) ──
-  const { recordings } = await captureRoom(captureConfig);
+  let { recordings, joinedConference } = await captureRoom(captureConfig);
+
+  // Rete di sicurezza, e sta QUI di proposito.
+  //
+  // Il bot entra sul dominio nascosto di Prosody per essere invisibile in
+  // sala. Quell'autenticazione può essere rifiutata — password rigenerata da un
+  // helm upgrade, allowlist del MUC assente o scritta male — e allora l'evento
+  // resterebbe senza audio: irripetibile, e scoperto solo a cose fatte. In quel
+  // caso si rientra col JWT del portale: il bot torna VISIBILE in stanza, che è
+  // un difetto estetico, non una perdita.
+  //
+  // La condizione è «non siamo MAI entrati in conferenza», non «zero tracce»:
+  // una stanza rimasta vuota è normale e non va ritentata. E il controllo è
+  // qui, a sessione conclusa, non dentro il gestore di eventi della pagina:
+  // là non si distingue un login rifiutato da una linea caduta a metà evento, e
+  // una riconnessione dopo quaranta minuti avrebbe fatto ricomparire il bot
+  // davanti a tutti i partecipanti, a registrazione in corso.
+  if (shouldRetryWithJwt(joinedConference, captureConfig.xmppUser)) {
+    console.warn(
+      '[recorder] mai entrati in conferenza col login sul dominio nascosto — ' +
+        'riprovo col JWT del portale (il bot sara VISIBILE in stanza)'
+    );
+    const retry = await captureRoom({
+      ...captureConfig,
+      xmppUser: undefined,
+      xmppPassword: undefined,
+    });
+    recordings = retry.recordings;
+    joinedConference = retry.joinedConference;
+  }
 
   // ── 4. Manifest (puro) ──
   const manifest = buildManifest({
@@ -180,7 +220,7 @@ export async function main(): Promise<void> {
     failed,
   } = await uploadRecording(provider, { manifest, files });
   console.log(
-    `[recorder] upload completato (${uploaded} tracce, ${failed.length} fallite, provider=${provider.name})`,
+    `[recorder] upload completato (${uploaded} tracce, ${failed.length} fallite, provider=${provider.name})`
   );
   if (failed.length > 0) {
     console.warn(`[recorder] tracce NON caricate (saltate): ${failed.join(', ')}`);
@@ -204,8 +244,7 @@ export async function main(): Promise<void> {
 // Esegui solo se invocato direttamente (non quando importato dai test).
 // In ESM controlliamo che questo modulo sia il main entry confrontando l'URL.
 const isMain =
-  typeof process.argv[1] === 'string' &&
-  import.meta.url === `file://${process.argv[1]}`;
+  typeof process.argv[1] === 'string' && import.meta.url === `file://${process.argv[1]}`;
 
 if (isMain) {
   main()

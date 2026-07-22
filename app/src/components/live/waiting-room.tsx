@@ -174,6 +174,9 @@ const PARTICIPANT_EMAIL_KEY = 'pawebinar.participant.email';
 // no longer disables the (now default) game experience.
 const ARCADE_CLASSIC_KEY = 'pawebinar.arcade.classic';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/** Cosa può ricevere il fuoco dentro la piazza (per il contenimento del Tab). */
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function WaitingRoom({
   event,
@@ -482,6 +485,7 @@ export default function WaitingRoom({
   // Tastiera nella piazza: entrarci porta il focus sull'uscita, uscirne lo
   // riporta all'invito.
   const gameDialogRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const inviteRef = useRef<HTMLButtonElement>(null);
   const classicToggleRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef(false);
@@ -495,10 +499,35 @@ export default function WaitingRoom({
       }
       return;
     }
-    gameDialogRef.current
-      ?.querySelector<HTMLElement>('.wr-piazza-btn--exit')
-      ?.focus();
+    // Sulla SCENA, non sul pulsante di uscita: il gioco cede i tasti a
+    // qualunque controllo a fuoco, quindi partire dal pulsante lasciava
+    // l'avatar immobile finché non si cliccava sul canvas. Da qui il Tab
+    // raggiunge uscita, versione classica e tutti i controlli della pagina.
+    gameDialogRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
+      // Il Tab non deve uscire dal guscio: sotto ci sono l'intestazione e il
+      // piè di pagina del sito, invisibili ma ancora tabulabili. Senza questo,
+      // `aria-modal` prometterebbe un isolamento che non c'è.
+      if (e.key === 'Tab' && !e.defaultPrevented) {
+        const shell = shellRef.current;
+        if (shell) {
+          const focusable = Array.from(
+            shell.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+          ).filter((el) => el.offsetParent !== null || el === shell);
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          const active = document.activeElement as HTMLElement | null;
+          if (!first || !last) return;
+          if (e.shiftKey && (active === first || !shell.contains(active))) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && active === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+        return;
+      }
       if (e.key !== 'Escape' || e.defaultPrevented) return;
       // Non mentre si scrive: Esc in un campo di testo (o in chat) significa
       // "annulla quello che sto scrivendo", non "chiudi la piazza". Il pannello
@@ -978,8 +1007,10 @@ export default function WaitingRoom({
   // (quindi l'ingresso si blocca in silenzio) e un ingresso che scavalca il
   // gate LIVE, facendo entrare un moderatore in una sala mai avviata.
   const piazzaStage = piazzaOpen ? (
-    <PhaserLobbyBoundary onError={() => { setGameOpen(false); toggleClassic(true); }}>
-      <div className="wr-piazza-stage" ref={gameDialogRef}>
+    <PhaserLobbyBoundary onError={goClassic}>
+      {/* tabIndex -1: la scena riceve il fuoco all'apertura senza entrare
+          nell'ordine di tabulazione. */}
+      <div className="wr-piazza-stage" ref={gameDialogRef} tabIndex={-1}>
         <PhaserLobby
           hostOwnsEntry
           eventSlug={event.slug}
@@ -1045,6 +1076,7 @@ export default function WaitingRoom({
 
   return (
     <div
+      ref={shellRef}
       className={piazzaOpen ? 'waiting-shell waiting-shell--piazza' : 'waiting-shell'}
       // In piazza il guscio copre tutta la finestra: l'intestazione e il piè di
       // pagina del sito restano DIETRO, invisibili ma ancora tabulabili. Con

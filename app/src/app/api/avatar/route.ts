@@ -88,11 +88,14 @@ export async function GET(request: NextRequest) {
   // dalle impostazioni, l'avatar generato è sempre una risposta valida — e nel
   // dubbio non si contatta un terzo.
   let gravatarAllowed = false;
+  let settingsUnknown = false;
   if (hash) {
     try {
       gravatarAllowed = (await getSettings()).gravatarEnabled;
-    } catch {
+    } catch (err) {
       gravatarAllowed = false;
+      settingsUnknown = true;
+      console.warn('[avatar] impostazioni non leggibili, Gravatar saltato', err);
     }
   }
 
@@ -116,7 +119,14 @@ export async function GET(request: NextRequest) {
   return new NextResponse(svg, {
     headers: {
       'Content-Type': 'image/svg+xml',
-      'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+      // Un giorno di cache va bene per una risposta CERTA. Se le impostazioni
+      // non erano leggibili, però, questa è una risposta di ripiego: metterla
+      // in cache per 24 ore farebbe sopravvivere alla panne un giorno intero di
+      // avatar con le iniziali, senza modo di invalidarli. Un minuto basta a
+      // reggere l'ondata e a guarire da solo.
+      'Cache-Control': settingsUnknown
+        ? 'public, max-age=60, s-maxage=60'
+        : 'public, max-age=86400, s-maxage=86400',
       ...CORS_HEADERS,
     },
   });
