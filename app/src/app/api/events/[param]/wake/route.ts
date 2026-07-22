@@ -35,7 +35,13 @@ export const dynamic = 'force-dynamic';
 export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
-  const rl = rateLimit(`wake:${getClientIp(request)}`, { limit: 30, windowMs: 60_000 });
+  // Keyed on IP **and event**: an IP-wide bucket meant a burst of clicks on one
+  // event could starve a DIFFERENT event whose room had gone idle — and since
+  // /wake is the only way back from IDLE, that room would simply never return.
+  const rl = rateLimit(`wake:${getClientIp(request)}:${slug}`, {
+    limit: 60,
+    windowMs: 60_000,
+  });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
@@ -56,25 +62,6 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const now = new Date();
 
-  // Warming the bridge costs a JVB node, and this endpoint has no
-  // authentication, so the only thing standing between a passer-by with a slug
-  // and a running bridge is this window. It opens exactly when the scaler would
-  // pre-scale the room anyway — earlier is pure waste, and the scaler still
-  // brings the bridge up on schedule without anyone asking.
-  const settings = await getSettings();
-  const wakeInput = {
-    startsAt: event.startsAt,
-    eventType: event.eventType,
-    preScaleMinutes: settings.jvbPreScaleMinutes ?? 15,
-    now,
-  };
-  if (!canWakeNow(wakeInput)) {
-    const opensAt = wakeWindowOpensAt(wakeInput);
-    throw new ConflictError('Too early to warm up the room', {
-      currentStatus: event.status,
-      opensAt: opensAt ? opensAt.toISOString() : null,
-    });
-  }
 
   if (event.endsAt < now) {
     throw new ConflictError('Event is already over', { currentStatus: event.status });
@@ -91,6 +78,37 @@ export const POST = withErrorHandling(async (request, context) => {
       provisioningStartedAt: event.provisioningStartedAt,
       alreadyProvisioning: true,
     });
+  }
+
+  // Warming the bridge costs a JVB node, and this endpoint has no
+  // authentication, so this window is the only thing between a passer-by with a
+  // slug and a running bridge. It opens exactly when the scaler would pre-scale
+  // the room anyway — earlier is pure waste, and the scaler brings the bridge up
+  // on schedule without anyone asking.
+  //
+  // Scope: PUBLISHED only. An IDLE room already HAD a bridge and is being
+  // revived by someone who is actually there — and `/wake` is the ONLY
+  // IDLE→PROVISIONING path there is (the scaler's pre-scale matches PUBLISHED),
+  // so gating it would leave a room that emptied during a break dark for good.
+  // The abuse this guard exists for is warming a room that has not started yet.
+  //
+  // Placed AFTER the LIVE/PROVISIONING no-op above so the documented
+  // idempotency still holds: a room that is already warm answers 200, not 409.
+  if (event.status === 'PUBLISHED') {
+    const settings = await getSettings();
+    const wakeInput = {
+      startsAt: event.startsAt,
+      eventType: event.eventType,
+      preScaleMinutes: settings.jvbPreScaleMinutes ?? 15,
+      now,
+    };
+    if (!canWakeNow(wakeInput)) {
+      const opensAt = wakeWindowOpensAt(wakeInput);
+      throw new ConflictError('Too early to warm up the room', {
+        currentStatus: event.status,
+        opensAt: opensAt ? opensAt.toISOString() : null,
+      });
+    }
   }
 
   // IDLE or PUBLISHED → PROVISIONING. We use updateMany with a status guard
