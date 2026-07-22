@@ -199,13 +199,22 @@ export async function main(): Promise<void> {
   // caricare né da ingestare. Usciamo puliti — l'ingest rifiuterebbe un
   // array vuoto (422) e non avrebbe senso accodare la pipeline.
   if (manifest.tracks.length === 0) {
-    // Mai entrati in conferenza = configurazione o credenziali sbagliate, non
-    // una stanza vuota. Uscire con 0 lo farebbe passare per un lavoro riuscito
-    // e l'anomalia si scoprirebbe a evento finito, quando non c'e' piu' nulla
-    // da registrare: meglio un Job in errore, che si vede.
+    // Mai entrati in conferenza non e' una stanza vuota: e' un ingresso non
+    // riuscito. Uscire con 0 lo farebbe passare per un lavoro riuscito e
+    // l'anomalia si scoprirebbe a evento finito, quando non c'e' piu' nulla da
+    // registrare. Fallire lascia anche che il Job venga rilanciato: se la causa
+    // era transitoria — Prosody in riavvio, un blip di rete prima del join — il
+    // secondo tentativo puo' ancora registrare il resto dell'evento.
+    //
+    // Il messaggio ELENCA le cause possibili senza sceglierne una: il segnale
+    // che abbiamo (`joinedConference` falso) non le distingue, e accusare le
+    // credenziali quando era la rete manderebbe chi indaga dalla parte
+    // sbagliata.
     if (!joinedConference) {
       throw new Error(
-        'mai entrati in conferenza: credenziali del bot o allowlist del MUC da verificare',
+        'ingresso in conferenza mai riuscito (nessuna traccia). Cause possibili: ' +
+          'credenziali del bot non valide, allowlist del MUC mancante, ' +
+          'stanza chiusa, o XMPP non raggiungibile al momento del join',
       );
     }
     console.warn('[recorder] nessuna traccia catturata — niente upload/ingest');

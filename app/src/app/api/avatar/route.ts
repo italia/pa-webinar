@@ -39,20 +39,38 @@ import { getSettings } from '@/lib/settings';
 const GRAVATAR_BASE = 'https://www.gravatar.com/avatar';
 const GRAVATAR_TIMEOUT_MS = 2000;
 
+/**
+ * L'esito va distinto, non ridotto a «non c'è immagine».
+ *
+ * `d=404` chiede a Gravatar di rispondere 404 quando quell'indirizzo non ha un
+ * avatar: è una risposta CERTA e definitiva, e merita la cache lunga. Un
+ * timeout o un errore di rete somigliano al 404 nel risultato — iniziali — ma
+ * sono transitori, e metterli in cache un giorno intero congelerebbe la panne.
+ * Confonderli rendeva la cache lunga irraggiungibile: chi NON ha un Gravatar è
+ * il caso comune, e ogni avatar sarebbe stato richiesto una volta al minuto da
+ * tutta la sala.
+ */
+type GravatarOutcome =
+  | { kind: 'found'; res: Response }
+  | { kind: 'absent' }
+  | { kind: 'unreachable' };
+
 async function tryGravatar(
   md5Hash: string,
   size: number,
-): Promise<Response | null> {
+): Promise<GravatarOutcome> {
   const url = `${GRAVATAR_BASE}/${md5Hash}?s=${size}&d=404`;
   try {
     const res = await fetch(url, {
       signal: AbortSignal.timeout(GRAVATAR_TIMEOUT_MS),
     });
-    if (res.ok) return res;
+    if (res.ok) return { kind: 'found', res };
+    if (res.status === 404) return { kind: 'absent' };
+    return { kind: 'unreachable' };
   } catch {
-    // Timeout or network error — fall through to SVG
+    // Timeout o errore di rete.
+    return { kind: 'unreachable' };
   }
-  return null;
 }
 
 const CORS_HEADERS = {
@@ -101,12 +119,12 @@ export async function GET(request: NextRequest) {
 
   let gravatarUnreachable = false;
   if (hash && gravatarAllowed) {
-    const gravatar = await tryGravatar(hash, size);
-    gravatarUnreachable = !gravatar;
-    if (gravatar) {
-      const body = await gravatar.arrayBuffer();
+    const outcome = await tryGravatar(hash, size);
+    gravatarUnreachable = outcome.kind === 'unreachable';
+    if (outcome.kind === 'found') {
+      const body = await outcome.res.arrayBuffer();
       const contentType =
-        gravatar.headers.get('content-type') || 'image/jpeg';
+        outcome.res.headers.get('content-type') || 'image/jpeg';
       return new NextResponse(body, {
         headers: {
           'Content-Type': contentType,

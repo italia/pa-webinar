@@ -981,9 +981,16 @@ export default function WaitingRoom({
   // gate LIVE, facendo entrare un moderatore in una sala mai avviata.
   const piazzaStage = piazzaOpen ? (
     <PhaserLobbyBoundary onError={goClassic}>
-      {/* tabIndex -1: la scena riceve il fuoco all'apertura senza entrare
-          nell'ordine di tabulazione. */}
-      <div className="wr-piazza-stage" ref={gameDialogRef} tabIndex={-1}>
+      {/* La scena è raggiungibile col Tab, non solo col mouse: il gioco cede i
+          tasti a qualunque controllo a fuoco, quindi dopo un Tab verso i
+          pulsanti ci si deve poter tornare da tastiera. */}
+      <div
+        className="wr-piazza-stage"
+        ref={gameDialogRef}
+        tabIndex={0}
+        role="application"
+        aria-label={t('gardenGateHint')}
+      >
         <PhaserLobby
           hostOwnsEntry
           eventSlug={event.slug}
@@ -1050,16 +1057,18 @@ export default function WaitingRoom({
   return (
     <div
       className={piazzaOpen ? 'waiting-shell waiting-shell--piazza' : 'waiting-shell'}
-      // `role`+`aria-label`, ma NON `aria-modal`: quello dichiara che tutto il
-      // resto è nascosto, e sarebbe una bugia — dietro il guscio restano
-      // l'intestazione e il piè di pagina del sito, ancora tabulabili. Una
-      // trappola del fuoco l'avrebbe reso vero, ma la mia sbagliava in tre modi
-      // (agganciata allo stato sbagliato, non tratteneva dalla scena, non
-      // riprendeva il Tab in avanti) e una trappola rotta è peggio di nessuna
-      // promessa: chi naviga da tastiera si ritrova bloccato in una pagina che
-      // non è più un dialogo. Meglio dire meno e dire il vero.
+      // Una REGIONE con un nome, non un dialogo.
+      //
+      // `dialog` (con o senza `aria-modal`) promette che ciò che sta sotto è
+      // fuori gioco. Qui non lo è: il guscio copre la finestra, ma
+      // l'intestazione e il piè di pagina del sito restano raggiungibili col
+      // Tab, e stanno FUORI da questo componente — da qui non si possono
+      // rendere inerti. Una trappola del fuoco l'avrebbe reso vero; la mia
+      // sbagliava in tre modi, e una trappola rotta intrappola davvero. Meglio
+      // annunciare quello che questa cosa è: una parte di pagina, con un nome.
+      // Esc la chiude comunque.
       {...(piazzaOpen
-        ? { role: 'dialog' as const, 'aria-label': t('gardenDialogLabel') }
+        ? { role: 'region' as const, 'aria-label': t('gardenDialogLabel') }
         : {})}
     >
       {/* Fratello, non sostituto: `{false}` occupa comunque la sua posizione
