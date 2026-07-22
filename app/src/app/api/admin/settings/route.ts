@@ -52,6 +52,7 @@ const updateSettingsSchema = z.object({
   githubUrl: z.string().url().nullish(),
   supportEmail: z.string().email().nullish(),
   // Nome mittente mostrato in posta; stringa vuota = torna al default.
+  gravatarEnabled: z.boolean().optional(),
   emailFromName: z.string().max(100).nullish(),
   emailReplyTo: z.string().email().nullish(),
   availableLocales: z.array(z.string().min(2).max(5)).optional(),

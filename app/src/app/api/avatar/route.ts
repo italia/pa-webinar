@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { createHash } from 'crypto';
+
 import { generateAvatarSvg } from '@/lib/avatar';
+import { decryptPII } from '@/lib/crypto/pii';
 
 /**
  * Smart avatar proxy: Gravatar → custom SVG fallback (BI palette).
@@ -8,8 +11,18 @@ import { generateAvatarSvg } from '@/lib/avatar';
  * GET /api/avatar?name=Raff&size=200
  * GET /api/avatar?name=Raff&gh=a1b2c3...&size=200
  *
- * `gh` is the pre-computed MD5 hash of the email (Gravatar format).
- * No raw email ever reaches this endpoint — GDPR safe.
+ * Two ways to point it at a Gravatar:
+ *   `gh` — the pre-computed MD5 of the email (Gravatar's own format), kept for
+ *          the email templates that already build it;
+ *   `e`  — the email ENCRYPTED with our PII key (encryptPII), which is what the
+ *          Jitsi JWT uses.
+ *
+ * `e` exists because the JWT avatar URL is broadcast by Jitsi in presence to
+ * every participant in the room. An unsalted digest of an email there would be
+ * a re-identification oracle, not an anonymisation measure: email addresses
+ * have far too little entropy, so any attendee could test a candidate list
+ * (nome.cognome@comune.it) against everyone else present. Ciphertext reveals
+ * nothing and only this server can undo it.
  *
  * When `gh` is provided, tries Gravatar first (server-side proxy so
  * disableThirdPartyRequests in Jitsi doesn't block it). Falls back to
@@ -52,13 +65,27 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const name = searchParams.get('name') || 'User';
   const gh = searchParams.get('gh');
+  // Encrypted email (see the header): decrypted here and hashed server-side, so
+  // nothing derived from the address ever travels in the URL.
+  const encrypted = searchParams.get('e');
+  let hash = gh && /^[0-9a-f]{32}$/i.test(gh) ? gh : null;
+  if (!hash && encrypted) {
+    try {
+      const email = decryptPII(encrypted).trim().toLowerCase();
+      if (email.includes('@')) {
+        hash = createHash('md5').update(email).digest('hex');
+      }
+    } catch {
+      // Tampered or stale ciphertext: fall through to the generated avatar.
+    }
+  }
   const size = Math.min(
     Math.max(Number(searchParams.get('size') || '200'), 32),
     512,
   );
 
-  if (gh && /^[0-9a-f]{32}$/i.test(gh)) {
-    const gravatar = await tryGravatar(gh, size);
+  if (hash) {
+    const gravatar = await tryGravatar(hash, size);
     if (gravatar) {
       const body = await gravatar.arrayBuffer();
       const contentType =

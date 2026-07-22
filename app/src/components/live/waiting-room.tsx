@@ -29,17 +29,10 @@ const PhaserLobby = dynamic(() => import('@/components/live/garden/phaser-lobby'
   ssr: false,
 });
 
-// SVG garden engine (default, but classic is the default *view* on mobile and
+// (Il giardino SVG minimale che stava nel riquadro laterale è stato rimosso:
 // for ended/multitrack events). Loaded client-only so the garden JS only ships
 // once the game box is actually rendered with `engine === 'svg'`, not on every
 // waiting-room load.
-const GardenScene = dynamic(() => import('@/components/live/garden-scene'), {
-  ssr: false,
-});
-const GardenInteractive = dynamic(
-  () => import('@/components/live/garden/garden-interactive'),
-  { ssr: false },
-);
 
 /**
  * Error boundary around the Phaser lobby. Phaser is a lazy chunk (~1MB) loaded
@@ -212,11 +205,6 @@ export default function WaitingRoom({
   const [startingSoon, setStartingSoon] = useState(false);
   const [name, setName] = useState(defaultName);
   const [email, setEmail] = useState('');
-  // Waiting-room engine state. Resolved post-mount (see the resolution effect
-  // below) from the configured default (admin: site + per-event) + `?engine=`
-  // override + the classic preference. Kept on the SSR-safe default 'svg' (the
-  // Phaser lobby is client-only, ssr:false) so there's no hydration mismatch.
-  const [engine, setEngine] = useState<'svg' | 'phaser'>('svg');
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
   const [classicView, setClassicView] = useState(false);
@@ -269,8 +257,8 @@ export default function WaitingRoom({
   //   3. the configured default — per-event override merged with the site
   //      default, arriving resolved on `event.waitingRoomEngine`
   //   4. GARDEN
-  // GARDEN/GAME drive `engine` (svg vs phaser); CLASSIC drives `classicView`
-  // (the static-card branch wins before either engine renders).
+  // Ora c'è un solo gioco: GARDEN e GAME sono equivalenti ("piazza disponibile"),
+  // CLASSIC la disattiva del tutto.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -288,7 +276,9 @@ export default function WaitingRoom({
           false,
         classicPref: window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1',
       });
-      setEngine(mode === 'GAME' ? 'phaser' : 'svg');
+      // Con un solo gameplay, GARDEN e GAME significano entrambi "la piazza è
+      // disponibile"; CLASSIC resta l'uscita di sicurezza per telefoni e per chi
+      // ha scelto la versione accessibile.
       setClassicView(mode === 'CLASSIC');
     } catch {
       /* ignore */
@@ -896,56 +886,64 @@ export default function WaitingRoom({
   // the fulcro. The game box is hidden for ENDED, when multitrack consent is
   // required (hard-gate), and in the accessibility "classic" view (the default
   // on touch devices — see the engine-resolution effect above).
-  const showGameBox = !isEnded && !classicView && !multitrackRequired;
-  const gameStageBox =
-    engine === 'phaser' ? (
-      // GAME engine: the Phaser lobby, embedded in the box. Walking the avatar
-      // into the OPEN gate (LIVE) is a real, interactive entry path — it routes
-      // through the shell's VALIDATED handleEnterLive (name/consent + device
-      // prefs), exactly like the standard "Entra ora" button, which stays
-      // available alongside it (legacy/a11y/non-players never need the game).
-      // If a chunk-load fails, the boundary degrades to the accessible classic
-      // card instead of a blank box.
-      <PhaserLobbyBoundary onError={() => toggleClassic(true)}>
-        <div className="wr-stage">
-          <PhaserLobby
-            embed
-            eventSlug={event.slug}
-            displayName={trimmedName}
-            status={event.status}
-            startsAtMs={startsAtMs}
-            isHost={isModerator}
-            onEnterLive={handleGameEnter}
-            onExitClassic={() => toggleClassic(true)}
-          />
-        </div>
-      </PhaserLobbyBoundary>
-    ) : (
-      // GARDEN engine (default): the SVG walkable garden. Wrapped in
-      // `.arcade-stage` (absolute inset:0) so GardenInteractive's
-      // ResizeObserver fits the avatar to THIS box, not the viewport.
-      <div className="wr-stage" role="group" aria-label={t('whileYouWait')}>
-        <div className="arcade-stage">
-          <GardenScene />
-          <GardenInteractive eventSlug={event.slug} displayName={trimmedName} />
-        </div>
-      </div>
-    );
-  // C1 — "quando si entra in sala d'attesa si atterra su una pagina senza
-  // l'interazione game … aggiungere un pulsante che quando lo clicchi entri
-  // nella sala d'attesa del game".
+  // C1 — la sala d'attesa è una PAGINA (evento, controlli, contatti), e il
+  // gioco è un posto in cui si sceglie di entrare.
   //
-  // Il gioco era già secondario (riquadro laterale), ma partiva APERTO: chi
-  // arrivava per prepararsi — nome, microfono, telecamera — se lo trovava
-  // addosso. Ora l'arrivo è la preparazione, e la piazza si apre con un gesto.
-  // Non memorizziamo la scelta: la richiesta riguarda l'ORDINE di ogni ingresso,
-  // e chi vuole il gioco lo apre con un click.
-  const gameInvite = showGameBox && !gameOpen ? (
+  // Prima c'erano due giochi: un giardino SVG minimale incastrato nel riquadro
+  // laterale e, opzionalmente, la lobby Phaser — anch'essa in quel riquadro. Il
+  // primo è stato rimosso (era troppo piccolo per essere un gioco e troppo
+  // ingombrante per essere un ornamento) e la seconda ha smesso di stare in una
+  // scatola: si apre a piena pagina, con dentro tutto il necessario — nome,
+  // controlli, ingresso in call — e un'uscita che riporta qui.
+  const canPlay = !isEnded && !classicView && !multitrackRequired;
+
+  // Modalità gioco a piena pagina. `embed={false}`: la lobby possiede il proprio
+  // nome e la propria CTA d'ingresso, quindi la pagina non deve duplicarli.
+  // `onEnterLive` passa comunque dal VALIDATED handleGameEnter della shell, così
+  // entrare camminando fino al cancello applica gli stessi controlli del
+  // pulsante "Entra ora": nome, consensi, preferenze audio/video.
+  const gameFullScreen = canPlay && gameOpen ? (
+    <PhaserLobbyBoundary onError={() => { setGameOpen(false); toggleClassic(true); }}>
+      <div className="wr-game-full">
+        <PhaserLobby
+          eventSlug={event.slug}
+          displayName={trimmedName}
+          status={event.status}
+          startsAtMs={startsAtMs}
+          isHost={isModerator}
+          onEnterLive={handleGameEnter}
+          onExitClassic={() => setGameOpen(false)}
+        />
+        <button
+          type="button"
+          className="wr-game-full__exit"
+          onClick={() => setGameOpen(false)}
+        >
+          ← {t('backToWaitingRoom')}
+        </button>
+      </div>
+    </PhaserLobbyBoundary>
+  ) : null;
+
+  // Il riquadro laterale ora ospita solo la chat: aspettare insieme agli altri
+  // non era la parte che stava in mezzo.
+  const asideBox = chatPreviewBlock ? (
+    <Card className="wr-aside shadow-sm border-0">
+      <div className="wr-aside__head">
+        <span className="fw-semibold">{t('whileYouWait')}</span>
+      </div>
+      <div className="wr-aside__body">{chatPreviewBlock}</div>
+    </Card>
+  ) : null;
+
+  // L'invito al gioco: un riquadro nella colonna principale, sotto i controlli.
+  // È il "pulsante o infografica" chiesto — un gesto esplicito, non una scena
+  // che parte addosso a chi è arrivato per prepararsi.
+  const gameInvite = canPlay && !gameOpen ? (
     <button
       type="button"
       className="wr-game-invite"
       onClick={() => setGameOpen(true)}
-      aria-expanded={false}
     >
       <span className="wr-game-invite__art" aria-hidden="true">🌿</span>
       <span>
@@ -955,28 +953,9 @@ export default function WaitingRoom({
     </button>
   ) : null;
 
-  const asideBox = showGameBox || chatPreviewBlock ? (
-    <Card className="wr-aside shadow-sm border-0">
-      <div className="wr-aside__head">
-        <span className="fw-semibold">{t('whileYouWait')}</span>
-        {showGameBox && gameOpen && (
-          <button
-            type="button"
-            className="wr-aside__toggle"
-            onClick={() => toggleClassic(true)}
-          >
-            <Icon icon="it-list" size="xs" className="me-1" />
-            {t('classicView')}
-          </button>
-        )}
-      </div>
-      <div className="wr-aside__body">
-        {gameInvite}
-        {showGameBox && gameOpen && gameStageBox}
-        {chatPreviewBlock}
-      </div>
-    </Card>
-  ) : null;
+  // Il gioco prende tutta la pagina: dentro ha nome, controlli e ingresso in
+  // call, e l'uscita riporta esattamente qui.
+  if (gameFullScreen) return gameFullScreen;
 
   return (
     <div className="waiting-shell">
@@ -1137,6 +1116,7 @@ export default function WaitingRoom({
                   </div>
                 )}
 
+                {gameInvite && <div className="mb-3">{gameInvite}</div>}
                 <div className="mb-3">{netiquetteBlock}</div>
                 {recordingNoticeBlock && <div className="mb-3">{recordingNoticeBlock}</div>}
                 {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}

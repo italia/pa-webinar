@@ -1581,7 +1581,10 @@
         "emailFromName": "Nome del mittente",
         "emailFromNameHelp": "Vuoto = si usa il nome configurato nel deploy (SMTP_FROM_NAME). Le email restano inviate dall’indirizzo di sistema.",
         "emailReplyTo": "Indirizzo per le risposte",
-        "emailReplyToHelp": "Le email partono da un indirizzo no-reply: senza questo, chi risponde non raggiunge nessuno."
+        "emailReplyToHelp": "Le email partono da un indirizzo no-reply: senza questo, chi risponde non raggiunge nessuno.",
+        "avatarTitle": "Immagini dei partecipanti",
+        "gravatarEnabled": "Usa Gravatar quando disponibile",
+        "gravatarEnabledHelp": "Chi si è iscritto con un'email che ha un Gravatar lo vedrà come immagine in sala; per tutti gli altri restano le iniziali generate dalla piattaforma. L'immagine passa dal nostro server, quindi il browser dei partecipanti non contatta gravatar.com — ma la piattaforma sì: va dichiarato nell'informativa privacy."
       }
     },
     "analytics": {
@@ -3422,7 +3425,8 @@
     "multitrackConsentTitle": "Registrazione per partecipante",
     "multitrackConsentRequired": "Devi accettare la registrazione della tua traccia audio per entrare",
     "enterGardenTitle": "Entra nella piazza",
-    "enterGardenHint": "Uno spazio da esplorare mentre aspetti che l’evento cominci."
+    "enterGardenHint": "Uno spazio da esplorare mentre aspetti: da lì puoi anche sistemare nome e microfono ed entrare nell’evento.",
+    "backToWaitingRoom": "Torna alla sala d’attesa"
   },
   "recording": {
     "management": "Registrazione video",

@@ -1511,7 +1511,10 @@
         "emailFromName": "Sender name",
         "emailFromNameHelp": "Empty = the name configured in the deployment (SMTP_FROM_NAME) is used. Emails are still sent from the system address.",
         "emailReplyTo": "Reply-to address",
-        "emailReplyToHelp": "Emails come from a no-reply address: without this, a reply reaches nobody."
+        "emailReplyToHelp": "Emails come from a no-reply address: without this, a reply reaches nobody.",
+        "avatarTitle": "Participant pictures",
+        "gravatarEnabled": "Use Gravatar when available",
+        "gravatarEnabledHelp": "Attendees who registered with an email that has a Gravatar will show it in the room; everyone else keeps the initials avatar the platform generates. The image is fetched through our own server, so participants’ browsers never contact gravatar.com — but the platform does: declare it in your privacy notice."
       }
     },
     "analytics": {
@@ -3422,7 +3425,8 @@
     "multitrackConsentTitle": "Per-participant recording",
     "multitrackConsentRequired": "You must accept the recording of your audio track to enter",
     "enterGardenTitle": "Step into the square",
-    "enterGardenHint": "A place to wander while you wait for the event to begin."
+    "enterGardenHint": "A place to wander while you wait — you can set your name and microphone and join the event from there too.",
+    "backToWaitingRoom": "Back to the waiting room"
   },
   "recording": {
     "management": "Video recording",
