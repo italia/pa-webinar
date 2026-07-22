@@ -104,6 +104,17 @@ export const jitsiConfigOverwrite = {
   // entry and the Settings checkbox on this flag, so nobody can get stuck.
   disableSelfViewSettings: true,
 
+  // …and explicitly UN-hide it. `disableSelfViewSettings` only removes the
+  // control, which stops new users getting stuck but abandons everyone already
+  // caught: the choice lives in localStorage on the JITSI origin, which this app
+  // cannot reach, and upstream ORs the two sources, so a stored `true` wins over
+  // any config. A participant reported seeing everyone but himself, with no way
+  // back short of an incognito window. Our patched jitsi/web makes an explicit
+  // `false` here authoritative over the stored value (see
+  // infra/jitsi-web-patched/Dockerfile), so those browsers recover on the next
+  // join. Visitors are unaffected — upstream still hides their self view.
+  disableSelfView: false,
+
   disableChat: false,
 
   // NOTE: `disableKick: true` is the safe default — prevents participants
