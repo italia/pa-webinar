@@ -97,6 +97,18 @@ postgresql:
 
 # ── Jitsi Meet — full mode with dedicated JVB nodes ──
 
+# Bot recorder (registrazione per-partecipante, ADR-013).
+recorder:
+  enabled: true
+  # Il bot entra sul dominio nascosto di Prosody e sparisce dall'interfaccia
+  # Jitsi in modo nativo: nessun riquadro, nessuna riga nell'elenco, nessuna
+  # notifica di ingresso, escluso dal conteggio. Va in coppia con
+  # `jitsi-meet.prosody.extraEnvs.XMPP_MUC_CONFIGURATION` piu' sotto: senza
+  # quella deroga il MUC rifiuta chi non presenta un token.
+  hiddenDomain: "hidden.meet.jitsi"
+  # Secret gia' creato dal subchart jitsi per Jibri: nessuna credenziale nuova.
+  xmppSecretName: "pa-webinar-jitsi-meet-jibri-secret-recorder"
+
 jitsi:
   enabled: true
   mode: full
@@ -114,6 +126,20 @@ jitsi-meet:
         appSecret: ""
         acceptedIssuers: "pa-webinar"
         acceptedAudiences: "jitsi"
+
+    extraEnvs:
+      # Il bot recorder entra come `recorder@hidden.meet.jitsi` invece che col
+      # JWT del portale: e' cosi' che jitsi-meet lo nasconde NATIVAMENTE (ogni
+      # client confronta il dominio del JID con `config.hiddenDomain`, gia'
+      # impostato dall'immagine). Con l'autenticazione a token, pero', il
+      # componente MUC rifiuterebbe chi non presenta un token: questa e' la
+      # deroga prevista da mod_token_verification, ed e' il motivo per cui la
+      # riga esiste ("allowlist for participants, jigasi, jibri").
+      #
+      # E' un SINGOLO account, non l'intero dominio: chi ha quella password
+      # entra senza token, quindi la deroga resta la piu' stretta possibile.
+      # La password e' quella che il subchart genera gia' per Jibri.
+      XMPP_MUC_CONFIGURATION: 'token_verification_allowlist = { "recorder@hidden.meet.jitsi" }'
 
     nodeSelector:
       agentpool: applications

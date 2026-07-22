@@ -1023,6 +1023,28 @@ recorder:
   imagePullSecrets: []
   # Dominio Jitsi per il bot; se vuoto usa app.env.NEXT_PUBLIC_JITSI_DOMAIN.
   jitsiDomain: ""
+
+  # ── Il bot invisibile ──────────────────────────────────────────────
+  # Prosody ha un VirtualHost "nascosto" (lo stesso che usa Jibri) e ogni
+  # client jitsi-meet confronta il dominio del JID in presenza con
+  # `config.hiddenDomain`: se coincide, il partecipante non compare
+  # nell'elenco, non prende un riquadro, non genera la notifica di ingresso e
+  # non entra nel conteggio. E' il meccanismo nativo di Jitsi per i bot.
+  #
+  # Valorizzando `hiddenDomain` il recorder si autentica li' invece che col JWT
+  # del portale. Richiede DUE cose sul lato Prosody:
+  #   1. l'account esista (l'immagine jitsi lo crea con ENABLE_RECORDING);
+  #   2. il dominio sia in `token_verification_allowlist` sul componente MUC —
+  #      altrimenti, con l'autenticazione a token, l'ingresso viene rifiutato.
+  #      Si imposta senza toccare i file di config:
+  #        XMPP_MUC_CONFIGURATION: 'token_verification_allowlist = { "<dominio>" }'
+  # Vuoto = disattivato: il bot entra col JWT e resta VISIBILE in stanza.
+  hiddenDomain: ""
+  # Secret con le credenziali del bot. Di default quello che il subchart jitsi
+  # crea gia' per Jibri: nessun secret nuovo da gestire o ruotare a parte.
+  xmppSecretName: ""
+  xmppSecretUserKey: "JIBRI_RECORDER_USER"
+  xmppSecretPasswordKey: "JIBRI_RECORDER_PASSWORD"
   backoffLimit: 1
   activeDeadlineSeconds: 21600   # 6h max per evento
   ttlSecondsAfterFinished: 600

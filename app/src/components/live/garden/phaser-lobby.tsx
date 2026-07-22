@@ -24,9 +24,6 @@ import { EventStatusSchedule, type AppEventStatus } from '@/lib/lobby/schedule-a
 import type { LobbyLocalState } from '@/lib/lobby/shared';
 
 const WORLD = { w: 2400, h: 1600 };
-// A smaller world for the boxed "Mentre aspetti" embed so the camera shows
-// enough context inside the ~440px-tall card instead of a tiny crop.
-const EMBED_WORLD = { w: 1400, h: 1000 };
 
 interface PhaserLobbyProps {
   eventSlug: string;
@@ -43,17 +40,11 @@ interface PhaserLobbyProps {
    * status badge) and entry happens by walking into the gate — which the game
    * only opens once the event is LIVE.
    *
-   * This is not the same question as `boxed`: the piazza fills the page and
-   * still lets the shell own the controls, which is the whole point of C1 —
-   * one set of controls, in one language, validated once.
+   * È il cuore di C1: un solo insieme di controlli, in una sola lingua,
+   * validato una sola volta — quelli della pagina, che nella piazza diventa la
+   * colonna a fianco della scena.
    */
   hostOwnsEntry?: boolean;
-  /**
-   * Fit the host container instead of the viewport (smaller world, so the
-   * camera shows enough context in a card-sized box). Kept for the dev harness
-   * and any future embedded preview.
-   */
-  boxed?: boolean;
 }
 
 export default function PhaserLobby({
@@ -65,7 +56,6 @@ export default function PhaserLobby({
   onEnterLive,
   onExitClassic,
   hostOwnsEntry = false,
-  boxed = false,
 }: PhaserLobbyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<LobbyHandle | null>(null);
@@ -80,21 +70,15 @@ export default function PhaserLobby({
     const el = containerRef.current;
     if (!el) return;
 
-    // Sizing. Boxed: fill the host box exactly and follow it on resize.
-    // Otherwise: fill from just under the app header to the bottom of the
-    // viewport. The Phaser canvas (RESIZE scale mode) refits on the synthetic
-    // resize either way.
-    const applyHeight = (): void => {
-      if (boxed) {
-        el.style.height = '100%';
-        return;
-      }
-      const top = el.getBoundingClientRect().top;
-      el.style.height = `${Math.max(480, Math.round(window.innerHeight - top))}px`;
-    };
-    applyHeight();
-
-    const world = boxed ? EMBED_WORLD : WORLD;
+    // Il contenitore riempie il proprio host (inset:0 via CSS) e basta: la
+    // geometria la decide il CSS, non questo componente.
+    //
+    // Prima si misurava la FINESTRA (`innerHeight - top`) dando per scontato
+    // che sotto ci fosse solo viewport. Da quando la piazza vive accanto ai
+    // controlli e, sotto i 992px, dentro una fascia da 45vh, quel calcolo
+    // costruiva un canvas alto il doppio del riquadro: la metà inferiore —
+    // avatar e cancello compresi — finiva tagliata via.
+    const world = WORLD;
     const shared: LobbyLocalState = {
       name: displayName.trim() || 'Ospite',
       color: '#1d6fb8',
@@ -122,28 +106,20 @@ export default function PhaserLobby({
     handleRef.current = handle;
 
     // The canvas was created at the fitted size; keep it fitted on resize.
+    // Osserviamo il CONTENITORE, non la finestra: cambia anche quando la
+    // finestra non cambia (apertura/chiusura del pannello, rotazione, barra
+    // URL di iOS che si ritira).
     window.dispatchEvent(new Event('resize'));
-    const onResize = (): void => applyHeight();
-    // A boxed lobby follows its host box (which can resize independently of the
-    // window); a full-page one just tracks the window.
-    let boxObserver: ResizeObserver | null = null;
-    if (boxed) {
-      boxObserver = new ResizeObserver(() => {
-        applyHeight();
-        window.dispatchEvent(new Event('resize'));
-      });
-      boxObserver.observe(el);
-    } else {
-      window.addEventListener('resize', onResize);
-    }
+    const boxObserver = new ResizeObserver(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+    boxObserver.observe(el);
     const settle = window.setTimeout(() => {
-      applyHeight();
       window.dispatchEvent(new Event('resize'));
     }, 150);
 
     return () => {
-      if (boxObserver) boxObserver.disconnect();
-      else window.removeEventListener('resize', onResize);
+      boxObserver.disconnect();
       window.clearTimeout(settle);
       handle.destroy();
       handleRef.current = null;
@@ -162,18 +138,12 @@ export default function PhaserLobby({
     handleRef.current?.setProfile({ name: displayName.trim() });
   }, [displayName]);
 
-  // Boxed: fill the host box (its container sets the height). Otherwise the
-  // mount effect sizes this to fill the space between header and footer.
+  // Riempie l'host, che deve essere posizionato (`position: relative`) e avere
+  // una dimensione propria — vedi `.wr-piazza-stage`.
   return (
     <div
       ref={containerRef}
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: boxed ? '100%' : undefined,
-        overflow: 'hidden',
-        background: boxed ? '#eaf3fb' : '#26344a',
-      }}
+      style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#26344a' }}
     />
   );
 }

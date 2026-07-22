@@ -3428,7 +3428,8 @@
     "enterGardenHint": "A place to wander while you wait — you can set your name and microphone and join the event from there too.",
     "backToWaitingRoom": "Back to the waiting room",
     "gardenDialogLabel": "Waiting-room square",
-    "gardenGateHint": "You can join from here, or walk your avatar to the gate."
+    "gardenGateHint": "You can join from here, or walk your avatar to the gate.",
+    "classicVersion": "Classic version"
   },
   "recording": {
     "management": "Video recording",

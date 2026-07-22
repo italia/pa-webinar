@@ -1,7 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { generateAvatarSvg } from '@/lib/avatar';
+import { generateAvatarSvg, parseAvatarSize } from '@/lib/avatar';
 import { readGravatarRef } from '@/lib/gravatar-ref';
+import { getSettings } from '@/lib/settings';
 
 /**
  * Smart avatar proxy: Gravatar → custom SVG fallback (BI palette).
@@ -25,6 +26,11 @@ import { readGravatarRef } from '@/lib/gravatar-ref';
  * `d=404` so that anyone without a Gravatar keeps the generated initials
  * instead of a stranger's default drawing. The participant's browser never
  * talks to gravatar.com — which is what lets docs/GDPR.md keep saying so.
+ *
+ * And it is made only when the ADMIN has enabled Gravatar for the instance.
+ * The check lives here, not only in the callers that build the URL: this route
+ * is public and unauthenticated, so without it anyone could keep using the
+ * deployment as a Gravatar probe with the option switched off.
  *
  * The Jitsi JWT normally carries an inline data URI (see lib/avatar.ts); it
  * points here only when an admin has enabled Gravatar for the instance.
@@ -68,15 +74,16 @@ export async function GET(request: NextRequest) {
   const hash =
     (gh && /^[0-9a-f]{32}$/i.test(gh) ? gh : null) ??
     (ref ? readGravatarRef(ref) : null);
-  // `Number('abc')` is NaN, and NaN survives both Math.max and Math.min: the
-  // whole SVG would then be built with NaN coordinates on a public,
-  // unauthenticated route.
-  const requested = Number(searchParams.get('size') ?? '');
-  const size = Number.isFinite(requested)
-    ? Math.min(Math.max(requested, 32), 512)
-    : 200;
+  const size = parseAvatarSize(searchParams.get('size'));
 
-  if (hash) {
+  // L'interruttore dell'amministratore vale QUI, non solo in chi costruisce
+  // l'URL. docs/GDPR.md — che l'ente pubblica come informativa — promette che
+  // con l'opzione spenta nessuna richiesta parte verso Gravatar: se la
+  // decidesse solo il chiamante, questa route resterebbe una sonda Gravatar
+  // aperta a chiunque, e quella frase sarebbe falsa. Letture in cache (60s).
+  const gravatarAllowed = hash ? (await getSettings()).gravatarEnabled : false;
+
+  if (hash && gravatarAllowed) {
     const gravatar = await tryGravatar(hash, size);
     if (gravatar) {
       const body = await gravatar.arrayBuffer();

@@ -3428,7 +3428,8 @@
     "enterGardenHint": "Uno spazio da esplorare mentre aspetti: da lì puoi anche sistemare nome e microfono ed entrare nell’evento.",
     "backToWaitingRoom": "Torna alla sala d’attesa",
     "gardenDialogLabel": "Piazza della sala d’attesa",
-    "gardenGateHint": "Puoi entrare da qui, oppure portare il tuo avatar fino al cancello."
+    "gardenGateHint": "Puoi entrare da qui, oppure portare il tuo avatar fino al cancello.",
+    "classicVersion": "Versione classica"
   },
   "recording": {
     "management": "Registrazione video",

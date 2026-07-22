@@ -284,6 +284,12 @@ export class WorldScene extends Phaser.Scene {
       await this.ctx.conference.join(sel);
     } catch {
       this.joining = false;
+      // Il rifiuto va DIMENTICATO anche sulla zona cancello: `inGateZone` resta
+      // true finché non se ne esce, e senza questo l'ingresso camminando
+      // diventava una porta che si apre una volta sola — completa il nome nel
+      // pannello e il cancello non risponde più, perché nessuno riemette la
+      // richiesta. Azzerandolo, il prossimo passo dentro la zona riprova.
+      this.inGateZone = false;
       return;
     }
     // Release preview tracks BEFORE the (future) real conference grabs devices.

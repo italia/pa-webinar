@@ -1,11 +1,18 @@
 /**
  * Human-vs-bot participant helpers.
  *
- * The multitrack recording bot joins the Jitsi room as a normal endpoint so it
- * can subscribe to every track. Left unfiltered it inflates the "N persone"
- * headcount and shows up in the roster (F2: "il count dovrebbe essere solo
- * delle persone vere non recording"). These helpers are the single source of
- * truth for excluding it — used by every count consumer and the roster.
+ * The multitrack recording bot subscribes to every track, so it has to be in
+ * the room. Left unfiltered it inflates the "N persone" headcount and shows up
+ * in the roster (F2: "il count dovrebbe essere solo delle persone vere non
+ * recording"). These helpers are the single source of truth for excluding it.
+ *
+ * SECONDA LINEA, non la prima: quando il deployment configura
+ * `recorder.hiddenDomain` (vedi il chart), il bot si autentica sul dominio
+ * nascosto di Prosody e Jitsi lo esclude NATIVAMENTE — non arriva proprio
+ * all'IFrame API, quindi qui non c'è nulla da filtrare. Questi helper restano
+ * per i deployment che non lo configurano (docker-compose di sviluppo, chart
+ * senza il Secret di Jibri), dove il bot entra col JWT del portale ed è un
+ * partecipante come gli altri.
  */
 
 /** Display name the recording bot joins under (see recorder-claim route, which
