@@ -18,10 +18,11 @@ export interface MoveResult {
  * Local player input + integration + collision.
  *
  * Input comes from our own document listeners (NOT Phaser's global keyboard) so
- * the DOM UI overlays keep working: arrow keys always move (and blur a focused
- * field), WASD only moves when the user isn't typing, Space=jump and E=emote
- * fire only when no form control is focused. A `setExternalAxis` hook lets a
- * touch joystick feed the same pipeline.
+ * the DOM UI overlays keep working. One rule governs all of them: while the
+ * focus is on a control — a field, a button, a link — the keys belong to that
+ * control and the game does not touch them. Otherwise arrows and WASD move,
+ * Space jumps, E and H emote. A `setExternalAxis` hook lets a touch joystick
+ * feed the same pipeline.
  *
  * Movement is authoritative and immediate (no physics engine): we integrate
  * velocity, then push the feet-circle out of every collider, then clamp to the
@@ -109,10 +110,10 @@ export class Movement {
       k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright';
     const isWasd = k === 'w' || k === 'a' || k === 's' || k === 'd';
     const target = e.target as HTMLElement | null;
-    const typing = isTextEntry(target);
+    const typing = isInteractive(target);
 
     if (k === ' ' || k === 'spacebar') {
-      if (typing || isActivatable(target)) return;
+      if (typing) return;
       e.preventDefault();
       this.cbs.onJump();
       return;
@@ -128,13 +129,12 @@ export class Movement {
       return;
     }
     if (!isArrow && !isWasd) return;
-    // Mentre si scrive, le frecce sono del CURSORE DI TESTO, sempre.
-    //
-    // Prima le frecce facevano `target.blur()` e prendevano il comando: aveva
-    // senso quando l'unico campo era la casella del nome dentro il gioco, un
-    // dettaglio da cui uscire. Ora accanto alla piazza c'è il pannello della
-    // sala d'attesa — nome, email, chat — e correggere un refuso con la freccia
-    // sinistra buttava fuori dal campo e faceva camminare l'avatar.
+    // Col fuoco su un controllo, i tasti sono suoi. Prima le frecce facevano
+    // `target.blur()` e prendevano il comando: aveva senso quando l'unico campo
+    // era la casella del nome dentro il gioco. Ora accanto alla piazza c'è il
+    // pannello della sala d'attesa — nome, email, chat — e correggere un refuso
+    // con la freccia sinistra buttava fuori dal campo e faceva camminare
+    // l'avatar.
     if (typing) return;
     e.preventDefault();
     this.down.add(k);
@@ -146,28 +146,24 @@ export class Movement {
 }
 
 /**
- * Si sta SCRIVENDO: il tasto appartiene al cursore di testo, non al gioco.
+ * Il fuoco è su un CONTROLLO: i tasti appartengono a lui, non al gioco.
  *
- * I bottoni sono deliberatamente fuori. La piazza porta il fuoco sul pulsante
- * di uscita appena si entra, e trattarlo come «sto scrivendo» lasciava
- * l'avatar immobile: le frecce non facevano nulla finché non si cliccava sul
- * canvas — e chi naviga da tastiera non aveva alcun modo di sbloccarsi.
- */
-function isTextEntry(el: HTMLElement | null): boolean {
-  if (!el) return false;
-  return /^(input|textarea|select)$/i.test(el.tagName) || el.isContentEditable;
-}
-
-/**
- * Un controllo che la BARRA SPAZIATRICE attiva (bottoni, link).
+ * Comprende i bottoni e i link, non solo i campi di testo. Il listener è
+ * globale e in fase di cattura: escluderli significherebbe annullare le frecce
+ * e la barra spaziatrice su qualunque controllo dell'INTERA pagina — la
+ * scorciatoia di tastiera del gioco calpesterebbe l'interfaccia che gli sta
+ * intorno.
  *
- * Lo spazio fa saltare l'avatar, ma su un controllo a fuoco significa
- * «premilo»: rubarlo con preventDefault renderebbe l'uscita dalla piazza
- * inutilizzabile da tastiera. Le frecce invece restano al gioco.
+ * Il gioco riceve i tasti quando il fuoco è sulla scena, ed è per questo che la
+ * piazza porta il fuoco sulla scena e non sul pulsante di uscita.
  */
-function isActivatable(el: HTMLElement | null): boolean {
+function isInteractive(el: HTMLElement | null): boolean {
   if (!el) return false;
-  return /^(button|a)$/i.test(el.tagName) || el.getAttribute('role') === 'button';
+  return (
+    /^(input|textarea|select|button|a)$/i.test(el.tagName) ||
+    el.isContentEditable ||
+    el.getAttribute('role') === 'button'
+  );
 }
 
 function clamp(v: number, lo: number, hi: number): number {
