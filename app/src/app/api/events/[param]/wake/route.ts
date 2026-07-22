@@ -99,11 +99,22 @@ export const POST = withErrorHandling(async (request, context) => {
     const wakeInput = {
       startsAt: event.startsAt,
       eventType: event.eventType,
-      preScaleMinutes: settings.jvbPreScaleMinutes ?? 15,
+      // The larger of the two lead times. Coupling this to `jvbPreScaleMinutes`
+      // alone would mean that lowering it (to 0, say, to save bridge minutes)
+      // silently removes an early arrival's ability to warm the room at all —
+      // two unrelated knobs, one surprising interaction.
+      preScaleMinutes: Math.max(
+        settings.jvbPreScaleMinutes ?? 15,
+        settings.waitingRoomLeadMinutes ?? 15,
+      ),
       now,
     };
     if (!canWakeNow(wakeInput)) {
       const opensAt = wakeWindowOpensAt(wakeInput);
+      // The details payload is diagnostics only: `errorResponse` ships `details`
+      // to the client for VALIDATION_ERROR or in development, never for a 409 in
+      // production. The caller does not need it — it re-asks on every poll and
+      // the room warms up by itself the moment the window opens.
       throw new ConflictError('Too early to warm up the room', {
         currentStatus: event.status,
         opensAt: opensAt ? opensAt.toISOString() : null,
