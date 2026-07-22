@@ -2039,7 +2039,9 @@
       "recordingRequired": "O consentimento para a gravação é obrigatório para participar neste evento",
       "futureCommunications": "Desejo receber informações sobre futuros eventos organizados pelo DTD",
       "addressBook": "Quero ser inserido na Agenda DTD para ser convidado para eventos semelhantes",
-      "addressBookHelp": "Consentimento separado (art. 6.1.a RGPD). Poderá revogá-lo a qualquer momento através da ligação \"Remover os meus dados da agenda\" presente nos e-mails que receber. O nome e a organização serão obtidos a partir do perfil de inscrição."
+      "addressBookHelp": "Consentimento separado (art. 6.1.a RGPD). Poderá revogá-lo a qualquer momento através da ligação \"Remover os meus dados da agenda\" presente nos e-mails que receber. O nome e a organização serão obtidos a partir do perfil de inscrição.",
+      "multitrack": "Consinto a gravação de uma faixa de áudio separada da minha voz, com o único objetivo de atribuir corretamente a transcrição a cada pessoa que fala. A faixa é temporária e eliminada após a transcrição; não é usada para identificar nem reproduzir a minha voz.",
+      "multitrackRequired": "O consentimento para a gravação da sua faixa de áudio é obrigatório para participar neste evento"
     },
     "export": {
       "title": "Os meus dados",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Conservação dos dados e direitos",
           "body": "Os dados são conservados pelo período configurado para cada evento e depois eliminados automaticamente, salvo obrigações legais diferentes. Em qualquer momento é possível exercer os direitos previstos pelo GDPR, incluindo acesso, retificação e eliminação, através dos canais institucionais do Departamento."
+        },
+        "automatedProcessing": {
+          "title": "Transcrição, síntese e dobragem gerados por inteligência artificial",
+          "body": "Nos eventos que o solicitam, terminada a emissão a gravação é processada por uma cadeia de inteligência artificial executada inteiramente na infraestrutura do cluster do Departamento. Produz a transcrição do discurso (com separação das diferentes pessoas que falam), uma síntese divulgativa, eventuais traduções para outras línguas europeias e uma versão dobrada do áudio com voz sintética genérica. Todos os modelos utilizados (WhisperX para a transcrição, Mistral-Small para a síntese e a tradução, Piper TTS para a dobragem) são executados em GPU dedicadas dentro do cluster: nenhum dado dos participantes é enviado a serviços de terceiros. A voz dos participantes não é clonada nem conservada como dado biométrico (art. 9.º do RGPD): a dobragem usa vozes sintéticas públicas pré-treinadas, atribuídas de forma arbitrária a cada pessoa. Para cada gravação, a página do evento mostra o retrato exato dos modelos usados («Transparência do processamento com IA»). Os conteúdos gerados podem conter imprecisões: a referência autorizada continua a ser sempre o vídeo original (Regulamento da IA, art. 50.º)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Introduza um endereço de e-mail válido",
     "chatLockedMessage": "Introduza o seu nome para participar no chat do evento.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "O evento está prestes a começar, aguarde a organização…",
+    "exitWaiting": "Sair da sala de espera",
+    "aiNoticeTitle": "Processamento por IA depois do evento",
+    "aiNotice": "No final, a gravação será processada por ferramentas de inteligência artificial para gerar transcrição, resumo e eventuais traduções e dobragens. Os resultados podem conter imprecisões; o vídeo continua a ser a fonte autoritativa.",
+    "multitrackConsentTitle": "Gravação por participante",
+    "multitrackConsentRequired": "Tem de aceitar a gravação da sua faixa de áudio para entrar",
+    "enterGardenTitle": "Entrar na praça",
+    "enterGardenHint": "Um espaço para percorrer enquanto espera: a partir dali também pode acertar o nome e o microfone e entrar no evento.",
+    "backToWaitingRoom": "Voltar à sala de espera",
+    "gardenDialogLabel": "Praça da sala de espera",
+    "gardenGateHint": "Pode entrar a partir daqui, ou levar o seu avatar até ao portão.",
+    "classicVersion": "Versão clássica",
+    "warmup": {
+      "queued": "Pedido recebido",
+      "startingBridge": "A iniciar o servidor de vídeo…",
+      "provisioningNode": "A criar um servidor de vídeo dedicado",
+      "almostReady": "Servidor de vídeo ativo: falta pouco",
+      "almostReadyDetail": "Mais um instante e o botão de entrada ativa-se sozinho.",
+      "honestHint": "Espera habitual: menos de um minuto se a infraestrutura já estiver quente, 3–5 minutos no primeiro arranque. Entretanto pode verificar câmara e microfone ou usar o chat.",
+      "elapsed": "em preparação há {time}"
+    }
   },
   "recording": {
     "management": "Gravação de vídeo",

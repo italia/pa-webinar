@@ -2039,7 +2039,9 @@
       "recordingRequired": "Norint dalyvauti šiame renginyje, būtinas sutikimas dėl įrašymo",
       "futureCommunications": "Noriu gauti informaciją apie būsimus DTD organizuojamus renginius",
       "addressBook": "Noriu būti įtrauktas į DTD adresų knygą, kad būčiau kviečiamas į panašius renginius",
-      "addressBookHelp": "Atskiras sutikimas (GDPR/BDAR str. 6.1.a). Galite jį atšaukti bet kada per nuorodą „Pašalinkite mano duomenis iš adresų knygos“ gautuose el. laiškuose. Vardas ir organizacija bus paimti iš registracijos profilio."
+      "addressBookHelp": "Atskiras sutikimas (GDPR/BDAR str. 6.1.a). Galite jį atšaukti bet kada per nuorodą „Pašalinkite mano duomenis iš adresų knygos“ gautuose el. laiškuose. Vardas ir organizacija bus paimti iš registracijos profilio.",
+      "multitrack": "Sutinku, kad mano balsas būtų įrašomas atskiru garso takeliu vien tam, kad transkripcija būtų teisingai priskirta kiekvienam kalbėtojui. Takelis yra laikinas ir po transkripcijos ištrinamas; jis nenaudojamas mano balsui atpažinti ar atkurti.",
+      "multitrackRequired": "Sutikimas įrašyti jūsų garso takelį yra privalomas norint dalyvauti šiame renginyje"
     },
     "export": {
       "title": "Mano duomenys",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Duomenų saugojimas ir teisės",
           "body": "Duomenys saugomi kiekvienam renginiui sukonfigūruotą laikotarpį, po kurio automatiškai ištrinami, nebent taikomi kiti teisiniai įsipareigojimai. Duomenų subjektai gali bet kada pasinaudoti savo GDPR teisėmis, įskaitant prieigą, ištaisymą ir ištrynimą, per departamento institucinius kanalus."
+        },
+        "automatedProcessing": {
+          "title": "Dirbtinio intelekto sukurta transkripcija, santrauka ir įgarsinimas",
+          "body": "Renginiuose, kurie to prašo, pasibaigus transliacijai įrašas apdorojamas dirbtinio intelekto grandine, veikiančia vien tik Departamento klasterio infrastruktūroje. Ji parengia kalbos transkripciją (atskiriant skirtingus kalbėtojus), suprantamą santrauką, galimus vertimus į kitas Europos kalbas ir įgarsintą garso versiją su bendriniu sintetiniu balsu. Visi naudojami modeliai (WhisperX transkripcijai, Mistral-Small santraukai ir vertimui, Piper TTS įgarsinimui) veikia klasterio viduje esančiuose skirtuose GPU: jokie dalyvių duomenys nesiunčiami trečiųjų šalių paslaugoms. Dalyvių balsas neklonuojamas ir nesaugomas kaip biometrinis duomuo (BDAR 9 straipsnis): įgarsinimui naudojami vieši iš anksto apmokyti sintetiniai balsai, kalbėtojams priskiriami savavališkai. Kiekvieno įrašo atveju renginio puslapyje rodoma tiksli naudotų modelių nuotrauka („DI apdorojimo skaidrumas“). Sukurtas turinys gali turėti netikslumų: autoritetingas šaltinis visada lieka originalus vaizdo įrašas (DI aktas, 50 straipsnis)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Įveskite teisingą el. pašto adresą",
     "chatLockedMessage": "Įveskite savo vardą, kad galėtumėte dalyvauti renginio pokalbyje.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Renginys tuoj prasidės, palaukite organizatorių…",
+    "exitWaiting": "Išeiti iš laukiamojo",
+    "aiNoticeTitle": "DI apdorojimas po renginio",
+    "aiNotice": "Pabaigoje įrašas bus apdorotas dirbtinio intelekto įrankiais, kad būtų sukurtas transkriptas, santrauka ir galimi vertimai bei įgarsinimai. Rezultatuose gali pasitaikyti netikslumų; vaizdo įrašas lieka autoritetingas šaltinis.",
+    "multitrackConsentTitle": "Įrašymas pagal dalyvį",
+    "multitrackConsentRequired": "Kad įeitumėte, turite sutikti su savo garso takelio įrašymu",
+    "enterGardenTitle": "Įeik į aikštę",
+    "enterGardenHint": "Vieta pasivaikščioti belaukiant: iš ten taip pat nusistatysi vardą ir mikrofoną bei prisijungsi prie renginio.",
+    "backToWaitingRoom": "Atgal į laukiamąjį",
+    "gardenDialogLabel": "Laukiamojo aikštė",
+    "gardenGateHint": "Gali prisijungti iš čia arba nuvesti savo avatarą iki vartų.",
+    "classicVersion": "Klasikinė versija",
+    "warmup": {
+      "queued": "Užklausa priimta",
+      "startingBridge": "Paleidžiame vaizdo serverį…",
+      "provisioningNode": "Kuriame skirtą vaizdo serverį",
+      "almostReady": "Vaizdo serveris veikia: beveik viskas",
+      "almostReadyDetail": "Dar akimirka ir prisijungimo mygtukas įsijungs pats.",
+      "honestHint": "Įprastas laukimas: mažiau nei minutė, jei infrastruktūra jau įšilusi, 3–5 minutės pirmo paleidimo metu. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais.",
+      "elapsed": "ruošiama jau {time}"
+    }
   },
   "recording": {
     "management": "Vaizdo įrašas",

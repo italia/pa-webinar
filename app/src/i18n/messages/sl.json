@@ -2039,7 +2039,9 @@
       "recordingRequired": "Soglasje s snemanjem je obvezno za udeležbo na tem dogodku",
       "futureCommunications": "Želim prejemati informacije o prihodnjih dogodkih, ki jih organizira DTD",
       "addressBook": "Želim biti vključen v imenik DTD za prejemanje vabil na podobne dogodke",
-      "addressBookHelp": "Ločeno soglasje (čl. 6.1.a GDPR). Prekličete ga lahko kadar koli prek povezave „Odstrani moje podatke iz imenika“ v prejetih e-poštnih sporočilih. Ime in organizacija se prevzameta iz profila prijave."
+      "addressBookHelp": "Ločeno soglasje (čl. 6.1.a GDPR). Prekličete ga lahko kadar koli prek povezave „Odstrani moje podatke iz imenika“ v prejetih e-poštnih sporočilih. Ime in organizacija se prevzameta iz profila prijave.",
+      "multitrack": "Soglašam s snemanjem ločene zvočne sledi svojega glasu izključno za namen pravilnega pripisa prepisa posameznim govorcem. Sled je začasna in se po prepisu izbriše; ne uporablja se za prepoznavo ali predvajanje mojega glasu.",
+      "multitrackRequired": "Soglasje za snemanje vaše zvočne sledi je za udeležbo na tem dogodku obvezno"
     },
     "export": {
       "title": "Moji podatki",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Hramba podatkov in pravice",
           "body": "Podatki se hranijo za obdobje, konfigurirano za vsak dogodek, nato pa se samodejno izbrišejo, razen če veljajo drugačne zakonske obveznosti. Kadarkoli je mogoče uveljavljati pravice, predvidene z GDPR, vključno z dostopom, popravkom in izbrisom, prek institucionalnih kanalov Oddelka."
+        },
+        "automatedProcessing": {
+          "title": "Prepis, povzetek in sinhronizacija, ustvarjeni z umetno inteligenco",
+          "body": "Pri dogodkih, ki to zahtevajo, se posnetek po koncu prenosa obdela z verigo umetne inteligence, ki teče v celoti na gruči Oddelka. Ustvari prepis govora (z ločevanjem posameznih govorcev), poljuden povzetek, morebitne prevode v druge evropske jezike in sinhronizirano zvočno različico s splošnim sintetičnim glasom. Vsi uporabljeni modeli (WhisperX za prepis, Mistral-Small za povzetek in prevod, Piper TTS za sinhronizacijo) tečejo na namenskih GPU znotraj gruče: nobenih podatkov udeležencev ne pošiljamo storitvam tretjih oseb. Glas udeležencev se ne klonira in se ne hrani kot biometrični podatek (9. člen GDPR): sinhronizacija uporablja javne vnaprej naučene sintetične glasove, ki se govorcem dodelijo poljubno. Za vsak posnetek stran dogodka prikaže natančen posnetek stanja uporabljenih modelov (»Preglednost obdelave z UI«). Ustvarjena vsebina lahko vsebuje netočnosti: merodajen vir ostaja vedno izvirni videoposnetek (Akt o UI, 50. člen)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Vnesite veljaven e-poštni naslov",
     "chatLockedMessage": "Vnesite ime za sodelovanje v klepetu dogodka.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Dogodek se bo začel vsak hip, počakajte organizatorje…",
+    "exitWaiting": "Zapusti čakalnico",
+    "aiNoticeTitle": "Obdelava z UI po dogodku",
+    "aiNotice": "Ob koncu bo posnetek obdelan z orodji umetne inteligence za izdelavo prepisa, povzetka ter morebitnih prevodov in sinhronizacij. Rezultati lahko vsebujejo netočnosti; merodajen ostaja videoposnetek.",
+    "multitrackConsentTitle": "Snemanje po udeležencih",
+    "multitrackConsentRequired": "Za vstop morate privoliti v snemanje svoje zvočne sledi",
+    "enterGardenTitle": "Vstopi na trg",
+    "enterGardenHint": "Prostor za sprehod med čakanjem: od tam lahko nastaviš tudi ime in mikrofon ter se pridružiš dogodku.",
+    "backToWaitingRoom": "Nazaj v čakalnico",
+    "gardenDialogLabel": "Trg čakalnice",
+    "gardenGateHint": "Pridružiš se lahko od tu ali pa svojega avatarja pripelješ do vrat.",
+    "classicVersion": "Klasična različica",
+    "warmup": {
+      "queued": "Zahteva sprejeta",
+      "startingBridge": "Zaganjamo videostrežnik…",
+      "provisioningNode": "Ustvarjamo namenski videostrežnik",
+      "almostReady": "Videostrežnik teče: skoraj smo",
+      "almostReadyDetail": "Še trenutek in gumb za vstop se bo vklopil sam.",
+      "honestHint": "Običajno čakanje: manj kot minuto, če je infrastruktura že ogreta, 3–5 minut ob prvem zagonu. Medtem lahko preveriš kamero in mikrofon ali uporabiš klepet.",
+      "elapsed": "v pripravi že {time}"
+    }
   },
   "recording": {
     "management": "Video posnetek",

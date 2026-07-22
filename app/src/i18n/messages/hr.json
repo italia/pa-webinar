@@ -2039,7 +2039,9 @@
       "recordingRequired": "Pristanak na snimanje je obvezan za sudjelovanje u ovom događaju",
       "futureCommunications": "Želim primati informacije o budućim događajima koje organizira DTD",
       "addressBook": "Želim biti uvršten u Imenik DTD-a kako bih bio pozivan na slične događaje",
-      "addressBookHelp": "Zasebna privola (čl. 6.1.a GDPR). Možete je opozvati u bilo kojem trenutku putem poveznice \"Ukloni moje podatke iz imenika\" u e-porukama. Ime i organizacija preuzimaju se iz profila prijave."
+      "addressBookHelp": "Zasebna privola (čl. 6.1.a GDPR). Možete je opozvati u bilo kojem trenutku putem poveznice \"Ukloni moje podatke iz imenika\" u e-porukama. Ime i organizacija preuzimaju se iz profila prijave.",
+      "multitrack": "Pristajem na snimanje zasebne zvučne snimke svojega glasa isključivo radi ispravnog pripisivanja transkripta pojedinim govornicima. Snimka je privremena i briše se nakon transkripcije; ne koristi se za identifikaciju ni reprodukciju mojega glasa.",
+      "multitrackRequired": "Pristanak na snimanje vaše zvučne snimke obvezan je za sudjelovanje na ovom događaju"
     },
     "export": {
       "title": "Moji podaci",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Čuvanje podataka i prava",
           "body": "Podaci se čuvaju tijekom razdoblja konfiguriranog za svaki događaj, a zatim se automatski brišu, osim ako ne postoje drugačije zakonske obveze. U svakom trenutku mogu se ostvariti prava predviđena GDPR-om, uključujući pristup, ispravak i brisanje, putem institucionalnih kanala Odjela."
+        },
+        "automatedProcessing": {
+          "title": "Transkript, sažetak i sinkronizacija koje je izradila umjetna inteligencija",
+          "body": "Za događaje koji to zatraže, nakon završetka prijenosa snimka se obrađuje lancem umjetne inteligencije koji se u cijelosti izvodi na klasterskoj infrastrukturi Odjela. Nastaje transkript govora (uz razdvajanje pojedinih govornika), razumljiv sažetak, mogući prijevodi na druge europske jezike i sinkronizirana zvučna verzija s općenitim sintetskim glasom. Svi korišteni modeli (WhisperX za transkript, Mistral-Small za sažetak i prijevod, Piper TTS za sinkronizaciju) izvode se na namjenskim GPU-ovima unutar klastera: nikakvi podaci sudionika ne šalju se uslugama trećih strana. Glas sudionika ne klonira se niti pohranjuje kao biometrijski podatak (čl. 9. GDPR-a): sinkronizacija koristi javne unaprijed naučene sintetske glasove, koji se govornicima dodjeljuju proizvoljno. Za svaku snimku stranica događaja prikazuje točan snimak korištenih modela („Transparentnost obrade UI-jem”). Generirani sadržaj može sadržavati netočnosti: mjerodavan izvor uvijek ostaje izvorni videozapis (Akt o UI, čl. 50.)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Unesite valjanu adresu e-pošte",
     "chatLockedMessage": "Unesite svoje ime za sudjelovanje u chatu događaja.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Događaj samo što nije počeo, pričekajte organizatore…",
+    "exitWaiting": "Izađi iz čekaonice",
+    "aiNoticeTitle": "Obrada umjetnom inteligencijom nakon događaja",
+    "aiNotice": "Na kraju će snimka biti obrađena alatima umjetne inteligencije radi izrade transkripta, sažetka te mogućih prijevoda i sinkronizacija. Rezultati mogu sadržavati netočnosti; mjerodavan ostaje videozapis.",
+    "multitrackConsentTitle": "Snimanje po sudioniku",
+    "multitrackConsentRequired": "Za ulazak morate pristati na snimanje svoje zvučne snimke",
+    "enterGardenTitle": "Uđi na trg",
+    "enterGardenHint": "Prostor za šetnju dok čekaš: odande možeš namjestiti i ime i mikrofon te ući u događaj.",
+    "backToWaitingRoom": "Natrag u čekaonicu",
+    "gardenDialogLabel": "Trg čekaonice",
+    "gardenGateHint": "Možeš ući odavde ili odvesti svoj avatar do vrata.",
+    "classicVersion": "Klasična verzija",
+    "warmup": {
+      "queued": "Zahtjev zaprimljen",
+      "startingBridge": "Pokrećemo videoposlužitelj…",
+      "provisioningNode": "Stvaramo namjenski videoposlužitelj",
+      "almostReady": "Videoposlužitelj radi: skoro smo gotovi",
+      "almostReadyDetail": "Još trenutak i gumb za ulazak uključit će se sam.",
+      "honestHint": "Uobičajeno čekanje: manje od minute ako je infrastruktura već zagrijana, 3–5 minuta pri prvom pokretanju. U međuvremenu možeš provjeriti kameru i mikrofon ili koristiti razgovor.",
+      "elapsed": "priprema traje {time}"
+    }
   },
   "recording": {
     "management": "Video snimka",

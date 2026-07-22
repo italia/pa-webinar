@@ -2039,7 +2039,9 @@
       "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
       "futureCommunications": "Jeg ønsker at modtage information om fremtidige begivenheder arrangeret af DTD",
       "addressBook": "Jeg ønsker at blive optaget i DTD-adressebogen for at blive inviteret til lignende arrangementer",
-      "addressBookHelp": "Separat samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket \"Fjern mine data fra adressebogen\" i de e-mails, du modtager. Navn og organisation hentes fra din tilmeldingsprofil."
+      "addressBookHelp": "Separat samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket \"Fjern mine data fra adressebogen\" i de e-mails, du modtager. Navn og organisation hentes fra din tilmeldingsprofil.",
+      "multitrack": "Jeg samtykker til optagelse af et separat lydspor med min stemme, alene med det formål at tilskrive transskriptionen den rette taler. Sporet er midlertidigt og slettes efter transskriptionen; det bruges ikke til at identificere eller gengive min stemme.",
+      "multitrackRequired": "Samtykke til optagelse af dit lydspor er påkrævet for at deltage i denne begivenhed"
     },
     "export": {
       "title": "Mine data",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Opbevaring og rettigheder",
           "body": "Data opbevares i den konfigurerede periode for hver begivenhed og slettes derefter automatisk, medmindre anden lovgivning kræver det. Registrerede kan til enhver tid udøve deres GDPR-rettigheder, herunder adgang, berigtigelse og sletning, via afdelingens institutionelle kanaler."
+        },
+        "automatedProcessing": {
+          "title": "Transskription, resumé og eftersynkronisering genereret af kunstig intelligens",
+          "body": "For begivenheder, der anmoder om det, behandles optagelsen efter udsendelsens afslutning af en AI-kæde, der kører helt på afdelingens egen klyngeinfrastruktur. Den frembringer transskription af det talte (med adskillelse af de forskellige talere), et letlæseligt resumé, eventuelle oversættelser til andre europæiske sprog og en eftersynkroniseret lydversion med en generisk syntetisk stemme. Alle anvendte modeller (WhisperX til transskription, Mistral-Small til resumé og oversættelse, Piper TTS til eftersynkronisering) kører på dedikerede GPU'er inde i klyngen: ingen deltagerdata sendes til tredjepartstjenester. Deltagernes stemme klones ikke og gemmes ikke som biometriske data (art. 9 i GDPR): eftersynkroniseringen bruger offentlige, forudtrænede syntetiske stemmer, der tildeles talerne vilkårligt. For hver optagelse viser begivenhedssiden det nøjagtige øjebliksbillede af de anvendte modeller (»Gennemsigtighed i AI-behandlingen«). Det genererede indhold kan indeholde unøjagtigheder: den autoritative kilde er altid den oprindelige video (AI-forordningen, art. 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Indtast en gyldig e-mailadresse",
     "chatLockedMessage": "Indtast dit navn for at deltage i arrangementets chat.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Begivenheden begynder om lidt, vent på arrangøren…",
+    "exitWaiting": "Forlad venteværelset",
+    "aiNoticeTitle": "AI-behandling efter begivenheden",
+    "aiNotice": "Når det er slut, behandles optagelsen af AI-værktøjer for at lave transskription, resumé og eventuelle oversættelser og eftersynkronisering. Resultaterne kan indeholde unøjagtigheder; videoen er fortsat den autoritative kilde.",
+    "multitrackConsentTitle": "Optagelse pr. deltager",
+    "multitrackConsentRequired": "Du skal acceptere optagelsen af dit lydspor for at komme ind",
+    "enterGardenTitle": "Gå ind på pladsen",
+    "enterGardenHint": "Et sted at gå rundt, mens du venter — derfra kan du også indstille navn og mikrofon og deltage i begivenheden.",
+    "backToWaitingRoom": "Tilbage til venteværelset",
+    "gardenDialogLabel": "Venteværelsets plads",
+    "gardenGateHint": "Du kan deltage herfra, eller føre din avatar hen til porten.",
+    "classicVersion": "Klassisk version",
+    "warmup": {
+      "queued": "Anmodning modtaget",
+      "startingBridge": "Starter videoserveren…",
+      "provisioningNode": "Opretter en dedikeret videoserver",
+      "almostReady": "Videoserveren kører: næsten klar",
+      "almostReadyDetail": "Et øjeblik endnu, så aktiveres deltagelsesknappen af sig selv.",
+      "honestHint": "Sædvanlig ventetid: under et minut hvis infrastrukturen allerede er varm, 3–5 minutter ved første opstart. I mellemtiden kan du tjekke kamera og mikrofon eller bruge chatten.",
+      "elapsed": "under forberedelse i {time}"
+    }
   },
   "recording": {
     "management": "Videooptagelse",

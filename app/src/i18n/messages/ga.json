@@ -2039,7 +2039,9 @@
       "recordingRequired": "Tá toiliú leis an taifeadadh riachtanach chun páirt a ghlacadh san imeacht seo",
       "futureCommunications": "Ba mhaith liom eolas a fháil faoi imeachtaí amach anseo arna n-eagrú ag DTD",
       "addressBook": "Ba mhaith liom a bheith curtha le Leabhar Seoltaí DTD chun cuireadh a fháil chuig imeachtaí cosúla",
-      "addressBookHelp": "Toiliú ar leith (airteagal 6.1.a GDPR). Is féidir é a tharraingt siar tráth ar bith tríd an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Glactar an t-ainm agus an eagraíocht ón bpróifíl chlárúcháin."
+      "addressBookHelp": "Toiliú ar leith (airteagal 6.1.a GDPR). Is féidir é a tharraingt siar tráth ar bith tríd an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Glactar an t-ainm agus an eagraíocht ón bpróifíl chlárúcháin.",
+      "multitrack": "Toilím le taifeadadh rian fuaime ar leith de mo ghuth, chun na críche amháin an tras-scríbhinn a chur i leith gach cainteora i gceart. Tá an rian sealadach agus scriostar é tar éis na tras-scríbhinne; ní úsáidtear é chun mo ghuth a aithint ná a atáirgeadh.",
+      "multitrackRequired": "Tá toiliú le taifeadadh do riain fuaime riachtanach chun páirt a ghlacadh san imeacht seo"
     },
     "export": {
       "title": "Mo chuid sonraí",
@@ -2110,6 +2112,10 @@
         "retention": {
           "title": "Coinneáil agus cearta",
           "body": "Coinnítear sonraí ar feadh na tréimhse atá cumraithe do gach imeacht agus scriostar go huathoibríoch iad ina dhiaidh sin, mura bhfuil oibleagáidí dlíthiúla éagsúla i bhfeidhm. Is féidir le hábhair sonraí a gcearta GDPR a fheidhmiú am ar bith, lena n-áirítear rochtain, ceartú agus léirscriosadh, trí bhealaí institiúideacha na Roinne."
+        },
+        "automatedProcessing": {
+          "title": "Tras-scríbhinn, achoimre agus fuaimniú arna nginiúint ag intleacht shaorga",
+          "body": "I gcás imeachtaí a iarrann é, tar éis dheireadh na craolta déantar an taifeadadh a phróiseáil le slabhra intleachta saorga a ritheann go hiomlán ar bhonneagar braisle na Roinne. Cruthaítear tras-scríbhinn na cainte (le deighilt idir na cainteoirí éagsúla), achoimre shoiléir, aistriúcháin fhéideartha go teangacha Eorpacha eile agus leagan fuaimnithe den fhuaim le guth sintéiseach ginearálta. Ritheann na samhlacha uile a úsáidtear (WhisperX don tras-scríbhinn, Mistral-Small don achoimre agus don aistriúchán, Piper TTS don fhuaimniú) ar GPUnna tiomnaithe laistigh den bhraisle: ní sheoltar aon sonraí rannpháirtithe chuig seirbhísí tríú páirtí. Ní dhéantar guth na rannpháirtithe a chlónáil ná a stóráil mar shonraí bithmhéadracha (Airteagal 9 RGCS): úsáideann an fuaimniú guthanna sintéiseacha poiblí réamhoilte, a shanntar do na cainteoirí go treallach. I gcás gach taifeadta, taispeánann leathanach an imeachta an léargas cruinn ar na samhlacha a úsáideadh (\"Trédhearcacht na próiseála IS\"). D'fhéadfadh míchruinneas a bheith san ábhar a ghintear: is é an físeán bunaidh an fhoinse údarásach i gcónaí (An Gníomh um IS, Airteagal 50)."
         }
       },
       "note": {
@@ -2687,7 +2693,28 @@
     "emailInvalid": "Iontráil seoladh ríomhphoist bailí",
     "chatLockedMessage": "Iontráil d'ainm chun páirt a ghlacadh i gcomhrá an imeachta.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Tá an t-imeacht ar tí tosú, fan leis na heagraithe…",
+    "exitWaiting": "Fág an seomra feithimh",
+    "aiNoticeTitle": "Próiseáil le IS tar éis an imeachta",
+    "aiNotice": "Ag an deireadh, déanfar an taifeadadh a phróiseáil le huirlisí intleachta saorga chun tras-scríbhinn, achoimre agus aistriúcháin nó fuaimniú a chruthú. D'fhéadfadh míchruinneas a bheith sna torthaí; is é an físeán an fhoinse údarásach i gcónaí.",
+    "multitrackConsentTitle": "Taifeadadh de réir rannpháirtí",
+    "multitrackConsentRequired": "Caithfidh tú glacadh le taifeadadh do rian fuaime chun dul isteach",
+    "enterGardenTitle": "Téigh isteach sa chearnóg",
+    "enterGardenHint": "Áit le siúl thart fad is atá tú ag fanacht: as sin is féidir leat d'ainm agus do mhicreafón a shocrú agus dul isteach san imeacht.",
+    "backToWaitingRoom": "Ar ais go dtí an seomra feithimh",
+    "gardenDialogLabel": "Cearnóg an tseomra feithimh",
+    "gardenGateHint": "Is féidir leat dul isteach as seo, nó d'abhatár a threorú chuig an ngeata.",
+    "classicVersion": "Leagan clasaiceach",
+    "warmup": {
+      "queued": "Iarratas faighte",
+      "startingBridge": "An freastalaí físe á thosú…",
+      "provisioningNode": "Freastalaí físe tiomnaithe á chruthú",
+      "almostReady": "Freastalaí físe ag rith: beagnach réidh",
+      "almostReadyDetail": "Nóiméad eile agus beidh an cnaipe iontrála gníomhach as a stuaim féin.",
+      "honestHint": "Gnáthfhanacht: faoi bhun nóiméid má tá an bonneagar te cheana, 3–5 nóiméad ag an gcéad tosú. Idir an dá linn is féidir leat an ceamara agus an micreafón a sheiceáil nó an comhrá a úsáid.",
+      "elapsed": "á ullmhú le {time}"
+    }
   },
   "recording": {
     "management": "Taifeadadh físe",
