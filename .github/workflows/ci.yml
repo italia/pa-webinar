@@ -199,6 +199,13 @@ jobs:
           retention-days: 7
 
   docker:
+    # La quota artefatti di Actions e' dell'ORGANIZZAZIONE, non di questo repo
+    # (qui siamo sotto i 50 MB): quando si esaurisce OGNI upload fallisce, e con
+    # lui il job — anche a immagine gia' pubblicata. Il "build record" di buildx
+    # e' un artefatto per ogni build che nessuno scarica mai.
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Docker Build & Scan
     runs-on: arc-runner-pa-webinar
     needs: [lint, test]

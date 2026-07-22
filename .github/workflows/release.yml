@@ -11,6 +11,13 @@ env:
 
 jobs:
   build-and-push:
+    # La quota artefatti di Actions e' dell'ORGANIZZAZIONE, non di questo repo
+    # (qui siamo sotto i 50 MB): quando si esaurisce OGNI upload fallisce, e con
+    # lui il job — anche a immagine gia' pubblicata. Il "build record" di buildx
+    # e' un artefatto per ogni build che nessuno scarica mai.
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Build & Push Docker Image
     runs-on: arc-runner-pa-webinar
     permissions:
@@ -93,6 +100,11 @@ jobs:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
           format: spdx-json
           output-file: sbom.spdx.json
+          # L'SBOM viene allegato alla Release qui sotto, che NON consuma la
+          # quota artefatti di Actions. Caricarlo anche come artefatto era un
+          # doppione, e quando la quota dell'organizzazione si esaurisce quel
+          # doppione fa fallire l'intero job — a immagini gia' pubblicate.
+          upload-artifact: false
 
       - name: Generate npm SBOM (CycloneDX)
         continue-on-error: true
