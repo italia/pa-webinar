@@ -130,17 +130,16 @@ export class Movement {
       return;
     }
     if (!isArrow && !isWasd) return;
-    // Mentre si SCRIVE le frecce sono del cursore: accanto alla piazza c'è il
-    // pannello della sala d'attesa — nome, email, chat — e correggere un refuso
-    // con la freccia sinistra buttava fuori dal campo e faceva camminare
-    // l'avatar. WASD, essendo lettere, cedono a qualunque controllo.
-    if (typing) return;
-    if (isWasd && onControl) return;
-    // Su un bottone invece le frecce muovono, e gli tolgono il fuoco: senza,
-    // un solo Tab (verso l'uscita, o verso i controlli del pannello)
-    // congelerebbe l'avatar fino al prossimo clic sul canvas — e la scena non
-    // è raggiungibile col Tab.
-    if (onControl) target?.blur();
+    // Una regola sola: i tasti sono di chi ha il FUOCO.
+    //
+    // Il listener è sul document e in fase di cattura, quindi ogni eccezione
+    // vale per l'intera pagina, non solo per il gioco. Provare a strappare le
+    // frecce a un bottone a fuoco — per non «congelare» l'avatar dopo un Tab —
+    // annullava lo scorrimento da tastiera del pannello della sala d'attesa e
+    // faceva sparire il fuoco nel nulla. Il conflitto si risolve dall'altra
+    // parte: la scena è raggiungibile col Tab (`tabIndex=0`), quindi tornare a
+    // muoversi è un Tab, non un clic col mouse.
+    if (onControl) return;
     e.preventDefault();
     this.down.add(k);
   }
