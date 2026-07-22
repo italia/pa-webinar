@@ -330,7 +330,12 @@
       "connReconnecting": "Reconnecting…",
       "connDegraded": "Updates delayed",
       "readDenied": "Chat is unavailable: you are not among this event’s participants, or the room is not open yet. Retrying automatically.",
-      "mentionNotificationTitle": "{name} mentioned you in the chat"
+      "mentionNotificationTitle": "{name} mentioned you in the chat",
+      "react": "React",
+      "edited": "edited",
+      "editLabel": "Edit message",
+      "editSave": "Save",
+      "editFailed": "Could not edit the message."
     },
     "role": {
       "moderator": "Moderator",

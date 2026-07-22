@@ -39,10 +39,17 @@ export interface ChatEnvelope {
   attachment?: ChatAttachmentRef;
   // Optional quote of the parent message this one replies to.
   replyTo?: ChatReplyRef;
-  // When set to 'delete' the subscriber hides the message instead of
-  // appending. Covers the moderation path (hide message live without
-  // the sender having to refresh).
-  op?: 'delete';
+  // Marks the message as corrected by its author; the UI shows "modificato".
+  editedAt?: string | null;
+  // Reaction tallies: emoji → who reacted (sender ids). Sent on every change so
+  // a late joiner and a live client converge on the same counts.
+  reactions?: Record<string, string[]>;
+  // What the subscriber should DO with this envelope:
+  //   'delete'   → hide the message (moderation, live, no refresh needed)
+  //   'edit'     → replace the text of an existing message
+  //   'reaction' → replace that message's reaction tallies
+  // Absent = a new message to append.
+  op?: 'delete' | 'edit' | 'reaction';
 }
 
 function channel(eventId: string): string {

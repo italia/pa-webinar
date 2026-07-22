@@ -26,7 +26,6 @@ import { z } from 'zod';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import {
-  AppError,
   ForbiddenError,
   RateLimitError,
   ValidationError,
@@ -38,8 +37,9 @@ import {
   type ChatReplyRef,
   type ChatAttachmentRef,
 } from '@/lib/chat/pubsub';
-import { authorizeChatRead, guestChatWindowOpen } from '@/lib/chat/read-access';
-import { resolveTokenSender } from '@/lib/chat/sender';
+import { authenticateChatSender } from '@/lib/chat/authenticate';
+import { tallyReactions } from '@/lib/chat/emoji';
+import { authorizeChatRead } from '@/lib/chat/read-access';
 import {
   CHAT_ATTACHMENT_MIME,
   CHAT_ATTACHMENT_MAX_BYTES,
@@ -51,12 +51,10 @@ import {
   type ChatAttachmentClaims,
 } from '@/lib/chat/attachment-token';
 import { chatMessagesTotal } from '@/lib/metrics';
-import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const HISTORY_DEFAULT_LIMIT = 100;
 const HISTORY_MAX_LIMIT = 500;
@@ -87,90 +85,6 @@ const postSchema = z
     message: 'empty message',
     path: ['text'],
   });
-
-interface AuthResult {
-  eventId: string;
-  senderId: string;
-  senderName: string;
-  isModerator: boolean;
-}
-
-/**
- * Resolve the caller to one of {moderator, registered participant,
- * guest-on-live-event}. Throws Forbidden otherwise.
- *
- * Token is read from `?token=` (what the live page already passes)
- * and the event is looked up by slug OR id.
- */
-async function authenticateSender(
-  eventIdOrSlug: string,
-  token: string | null,
-  guestName: string | undefined,
-  displayNameOverride: string | undefined,
-  req: Request,
-): Promise<AuthResult> {
-  const where = UUID_RE.test(eventIdOrSlug)
-    ? { id: eventIdOrSlug }
-    : { slug: eventIdOrSlug };
-  const event = await prisma.event.findUnique({
-    where,
-    select: {
-      id: true,
-      status: true,
-      eventType: true,
-      moderatorToken: true,
-      moderatorName: true,
-    },
-  });
-  if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
-
-  if (token) {
-    // Non-guest resolution (primary moderator / co-mod / speaker / registered
-    // participant) is shared with the attachment + moderation routes via
-    // resolveTokenSender. Only role=MODERATOR gets the moderator badge — a
-    // SPEAKER is a relatore, not staff (coerente con verifyModeratorToken).
-    //
-    // F7 identity binding lives inside resolveTokenSender: an owning registrant
-    // gets their real DB name; a forwarded-link opener keeps the same reg-<id>
-    // seat but is named from what they typed (displayNameOverride), never the
-    // registrant's decrypted name. A genuinely invalid/foreign/deleted token
-    // matches nothing → 403 (contract unchanged).
-    const sender = await resolveTokenSender(event, token, displayNameOverride);
-    if (sender) return sender;
-    throw new ForbiddenError('Invalid token for this event');
-  }
-
-  // Guest branch — la chat è app-side e non dipende dal JVB. Consentita:
-  //   • su qualunque evento LIVE (comportamento storico), e
-  //   • durante il warm-up del bridge (PROVISIONING/IDLE) SOLO per le call
-  //     INSTANT — aperte per link, senza gate d'orario — dove la sala
-  //     d'attesa mostra la chat mentre il bridge si scalda.
-  // Gli eventi schedulati/con password NON ammettono guest senza token fuori
-  // dal LIVE: /wake è non autenticato e chiunque potrebbe flippare
-  // PUBLISHED→PROVISIONING per iniettare messaggi anonimi (regressione chiusa).
-  // Shared with the read side (lib/chat/read-access) so the guest write window
-  // and the guest read window can never drift apart.
-  if (!guestChatWindowOpen(event)) {
-    throw new ForbiddenError('Chat requires a participant or moderator token');
-  }
-  const name = (guestName ?? '').trim();
-  if (name.length < 1) {
-    throw new ValidationError('Guest display name required', [
-      { path: ['guestName'], message: 'required for unauthenticated chat' },
-    ]);
-  }
-  // We anchor the guest id to the client IP + name so reloading or
-  // reconnecting keeps the same senderId across messages. Not secure
-  // in any way — it's purely a display hint for UI clustering (same
-  // bubble colour, AI summary "this attendee said 3 things").
-  const ip = getClientIp(req);
-  return {
-    eventId: event.id,
-    senderId: `guest-${Buffer.from(`${ip}:${name}`).toString('base64url').slice(0, 24)}`,
-    senderName: name,
-    isModerator: false,
-  };
-}
 
 export const GET = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
@@ -204,6 +118,8 @@ export const GET = withErrorHandling(async (request, context) => {
       attachmentName: true,
       attachmentMime: true,
       attachmentSize: true,
+      editedAt: true,
+      reactions: { select: { emoji: true, senderId: true } },
       replyToId: true,
       replyTo: {
         select: {
@@ -248,6 +164,10 @@ export const GET = withErrorHandling(async (request, context) => {
         isModerator: m.isModerator,
         text: tryDecryptPII(m.text) ?? m.text,
         createdAt: m.createdAt.toISOString(),
+        editedAt: m.editedAt ? m.editedAt.toISOString() : null,
+        // Tallies travel with the history so a late joiner sees the same counts
+        // a live client has been accumulating from the stream.
+        reactions: tallyReactions(m.reactions),
         attachment: attachmentRefFromRow(m),
         ...(replyTo ? { replyTo } : {}),
       };
@@ -270,7 +190,7 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
-  const auth = await authenticateSender(
+  const auth = await authenticateChatSender(
     param,
     token,
     parsed.data.guestName,

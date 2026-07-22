@@ -344,7 +344,12 @@
       "connReconnecting": "Riconnessione…",
       "connDegraded": "Aggiornamenti rallentati",
       "readDenied": "La chat non è disponibile: non risulti tra i partecipanti di questo evento, oppure la sala non è ancora aperta. Riprovo automaticamente.",
-      "mentionNotificationTitle": "{name} ti ha menzionato in chat"
+      "mentionNotificationTitle": "{name} ti ha menzionato in chat",
+      "react": "Reagisci",
+      "edited": "modificato",
+      "editLabel": "Modifica messaggio",
+      "editSave": "Salva",
+      "editFailed": "Non è stato possibile modificare il messaggio."
     },
     "role": {
       "moderator": "Moderatore",

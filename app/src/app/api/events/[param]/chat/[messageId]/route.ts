@@ -13,11 +13,15 @@
 
 import { NextResponse } from 'next/server';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { z } from 'zod';
+
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderator';
+import { authenticateChatSender } from '@/lib/chat/authenticate';
+import { encryptPII } from '@/lib/crypto/pii';
 import { publishChat } from '@/lib/chat/pubsub';
 import { prisma } from '@/lib/db';
-import { ForbiddenError, NotFoundError } from '@/lib/errors';
+import { ForbiddenError, NotFoundError, ValidationError } from '@/lib/errors';
 import { getFilesStorage } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
@@ -72,4 +76,83 @@ export const DELETE = withErrorHandling(async (request, context) => {
   });
 
   return NextResponse.json({ hidden: true });
+});
+
+const EDIT_WINDOW_MS = 15 * 60_000;
+
+const editSchema = z.object({
+  text: z.string().trim().min(1).max(2000),
+  guestName: z.string().trim().min(1).max(80).optional(),
+  displayNameOverride: z.string().trim().min(1).max(80).optional(),
+});
+
+/**
+ * PATCH /chat/<messageId> — the AUTHOR corrects their own message.
+ *
+ * "non posso modificare il messaggio se ho fatto degli errori": until now a typo
+ * was permanent, and the only way out was asking a moderator to hide the message.
+ *
+ * Only the author, only within EDIT_WINDOW_MS, only while the message is
+ * visible. The window matters: chat feeds the post-event archive and the AI
+ * summary, so a message must stop being rewritable long before anyone quotes it
+ * — a correction is for a typo, not for rewriting what you said an hour ago.
+ * `editedAt` is set so the UI can say so rather than silently changing history.
+ */
+export const PATCH = withErrorHandling(async (request, context) => {
+  const { param, messageId } = await context.params;
+  if (typeof messageId !== 'string' || !UUID_RE.test(messageId)) {
+    throw new NotFoundError('Message');
+  }
+
+  const body = await parseJsonBody(request);
+  const parsed = editSchema.safeParse(body);
+  if (!parsed.success) {
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+    );
+  }
+
+  const auth = await authenticateChatSender(
+    param,
+    extractModeratorToken(request),
+    parsed.data.guestName,
+    parsed.data.displayNameOverride,
+    request,
+  );
+
+  const message = await prisma.chatMessage.findFirst({
+    where: { id: messageId, eventId: auth.eventId, hiddenAt: null },
+    select: { id: true, senderId: true, createdAt: true },
+  });
+  if (!message) throw new NotFoundError('Message');
+
+  // Authorship is the whole authorisation here: a moderator gets `hide`, not
+  // the ability to put words in someone else's message.
+  if (message.senderId !== auth.senderId) {
+    throw new ForbiddenError('Not your message');
+  }
+  if (Date.now() - message.createdAt.getTime() > EDIT_WINDOW_MS) {
+    throw new ForbiddenError('Edit window has closed');
+  }
+
+  const editedAt = new Date();
+  await prisma.chatMessage.update({
+    where: { id: messageId },
+    data: { text: encryptPII(parsed.data.text), editedAt },
+  });
+
+  void publishChat({
+    id: messageId,
+    eventId: auth.eventId,
+    senderId: auth.senderId,
+    senderName: auth.senderName,
+    isModerator: auth.isModerator,
+    text: parsed.data.text,
+    createdAt: message.createdAt.toISOString(),
+    editedAt: editedAt.toISOString(),
+    op: 'edit',
+  });
+
+  return NextResponse.json({ ok: true, editedAt: editedAt.toISOString() });
 });
