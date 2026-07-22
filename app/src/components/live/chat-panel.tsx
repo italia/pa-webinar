@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Icon } from 'design-react-kit';
 
-import { renderChatBody } from '@/lib/chat/linkify';
+import { renderChatBody, mentionsUser } from '@/lib/chat/linkify';
 import {
   CHAT_ATTACHMENT_MIME,
   CHAT_ATTACHMENT_MAX_BYTES,
@@ -171,6 +171,31 @@ export default function ChatPanel({
     onUnreadCountChangeRef.current?.(n);
   }, []);
 
+  // Ids of messages that name me. A ref holds the set (it is read during render
+  // of every row) and a counter forces the re-render when it grows.
+  const mentionedIdsRef = useRef<Set<string>>(new Set());
+  const [, setMentionTick] = useState(0);
+
+  const notifyMention = useCallback((from: string, text: string) => {
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    // Only when the chat is not what the user is looking at — a notification for
+    // a message already on screen is pure noise.
+    if (activeRef.current && document.visibilityState === 'visible') return;
+    try {
+      if (Notification.permission !== 'granted') return;
+      const n = new Notification(t('mentionNotificationTitle', { name: from }), {
+        body: text.slice(0, 140),
+        // Same tag: a burst of mentions collapses into one notification instead
+        // of stacking up.
+        tag: 'pa-webinar-chat-mention',
+      });
+      n.onclick = () => { window.focus(); n.close(); };
+    } catch {
+      // Some browsers throw in insecure contexts or when the user has blocked
+      // notifications at OS level. Never let that break message rendering.
+    }
+  }, [t]);
+
   const notificationAskedRef = useRef(false);
   const maybeRequestNotificationPermission = useCallback(() => {
     if (notificationAskedRef.current) return;
@@ -215,13 +240,22 @@ export default function ChatPanel({
     setMessages((prev) => [...prev, msg]);
 
     const isOwn = msg.senderName === displayName;
+    // Being named in a busy chat used to look like any other message: no sound,
+    // no badge, nothing — you found out by scrolling back. Mentions now get
+    // their own emphasis in the list and, when the panel is not in front of you,
+    // a browser notification.
+    if (!isOwn && mentionsUser(msg.text, displayName)) {
+      mentionedIdsRef.current.add(msg.id);
+      setMentionTick((n) => n + 1);
+      notifyMention(msg.senderName, msg.text);
+    }
     if (!activeRef.current && !isOwn) {
       setUnread(unreadCountRef.current + 1);
       maybeRequestNotificationPermission();
     } else if (activeRef.current) {
       lastReadIdRef.current = msg.id;
     }
-  }, [displayName, setUnread, maybeRequestNotificationPermission]);
+  }, [displayName, setUnread, maybeRequestNotificationPermission, notifyMention]);
 
   useEffect(() => {
     if (active) {
@@ -656,7 +690,9 @@ export default function ChatPanel({
             return (
               <div
                 key={m.id}
-                className={`chat-panel__msg ${isOwn ? 'chat-panel__msg--own' : ''}`}
+                className={`chat-panel__msg ${isOwn ? 'chat-panel__msg--own' : ''}${
+                  mentionedIdsRef.current.has(m.id) ? ' chat-panel__msg--mention' : ''
+                }`}
               >
                 {!isOwn && (
                   <div
@@ -716,13 +752,22 @@ export default function ChatPanel({
                       <button
                         type="button"
                         className="chat-panel__reply-btn btn btn-link p-0 ms-2"
-                        style={{ fontSize: '0.7rem' }}
+                        aria-label={t('reply')}
+                        title={t('reply')}
                         onClick={() => {
                           setReplyTo({ id: m.id, senderName: m.senderName, text: m.text || '📎' });
                           inputRef.current?.focus();
                         }}
                       >
-                        {t('reply')}
+                        {/* Inline SVG, not <Icon>: this renders once per message,
+                            and design-react-kit's dynamic icon loader is the
+                            known hydration-mismatch trigger on hot paths. */}
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                             strokeLinejoin="round" aria-hidden="true">
+                          <polyline points="9 17 4 12 9 7" />
+                          <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+                        </svg>
                       </button>
                     )}
                     {isModerator && token && (

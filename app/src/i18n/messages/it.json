@@ -343,7 +343,8 @@
       "hideFailed": "Impossibile nascondere il messaggio. Riprova.",
       "connReconnecting": "Riconnessione…",
       "connDegraded": "Aggiornamenti rallentati",
-      "readDenied": "La chat non è disponibile: non risulti tra i partecipanti di questo evento, oppure la sala non è ancora aperta. Riprovo automaticamente."
+      "readDenied": "La chat non è disponibile: non risulti tra i partecipanti di questo evento, oppure la sala non è ancora aperta. Riprovo automaticamente.",
+      "mentionNotificationTitle": "{name} ti ha menzionato in chat"
     },
     "role": {
       "moderator": "Moderatore",

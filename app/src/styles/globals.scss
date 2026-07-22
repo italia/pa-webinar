@@ -2763,3 +2763,26 @@ html.live-call-immersive body {
     animation: none;
   }
 }
+
+// Chat: un messaggio che ti nomina non deve sembrare uguale agli altri
+// ("quando viene taggato qualcuno non viene avviata alcuna notifica, né di
+// suono né visiva"). Accento a sinistra sulla riga, non solo sul chip @nome.
+.chat-panel__msg--mention .chat-panel__bubble {
+  border-left: 3px solid var(--app-primary, #06c);
+  background: rgba(0, 102, 204, 0.06);
+}
+
+// Il pulsante "Rispondi" era un link testuale vistoso quanto il messaggio:
+// ora un'icona tenue che si accende al passaggio del mouse.
+.chat-panel__reply-btn {
+  color: var(--app-muted, #5c6f82);
+  opacity: 0.55;
+  transition: opacity 0.15s ease, color 0.15s ease;
+  vertical-align: middle;
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+    color: var(--app-primary, #06c);
+  }
+}
