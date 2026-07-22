@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Icon } from 'design-react-kit';
 
 import { renderChatBody, mentionsUser } from '@/lib/chat/linkify';
+import { CHAT_REACTION_EMOJIS } from '@/lib/chat/emoji';
 import {
   CHAT_ATTACHMENT_MIME,
   CHAT_ATTACHMENT_MAX_BYTES,
@@ -71,6 +72,10 @@ interface ChatMessage {
   createdAt: string; // ISO
   attachment?: ChatAttachment;
   replyTo?: ChatReply;
+  /** Impostato quando l'autore ha corretto il messaggio (A6). */
+  editedAt?: string | null;
+  /** emoji → id di chi ha reagito (A3). */
+  reactions?: Record<string, string[]>;
 }
 
 // Small static emoji set for the compose-box picker (feedback #9). Plain string
@@ -80,6 +85,11 @@ const CHAT_EMOJIS = [
   '👍', '🙏', '👏', '😀', '😂', '😍', '🤔', '😮',
   '😢', '🎉', '❤️', '🔥', '✅', '👀', '💡', '🚀',
 ] as const;
+
+// Placeholder id for MY reaction in the optimistic tally: the panel does not
+// know its own server-side senderId (mod-/reg-/guest-), and the server replies
+// with the authoritative tally a moment later anyway.
+const SELF_REACTION_ID = '__me__';
 
 const AVATAR_COLORS = [
   '#0066CC', '#008758', '#A66300', '#D9364F',
@@ -126,6 +136,7 @@ export default function ChatPanel({
   onUnreadCountChange,
 }: ChatPanelProps) {
   const t = useTranslations('live.chat');
+  const tc = useTranslations('common');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -195,6 +206,81 @@ export default function ChatPanel({
       // notifications at OS level. Never let that break message rendering.
     }
   }, [t]);
+
+  // ── Reazioni e modifica (A3, A6) ──────────────────────────────────────────
+  const [reactingId, setReactingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
+
+  const toggleReaction = useCallback(async (messageId: string, emoji: string) => {
+    setReactingId(null);
+    // Optimistic: the tally is a local, reversible detail — unlike a message,
+    // where a swallowed failure would leave text on screen that nobody received.
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== messageId) return m;
+        const current = { ...(m.reactions ?? {}) };
+        const mine = current[emoji] ?? [];
+        const has = mine.includes(SELF_REACTION_ID);
+        const next = has
+          ? mine.filter((x) => x !== SELF_REACTION_ID)
+          : [...mine, SELF_REACTION_ID];
+        if (next.length === 0) delete current[emoji];
+        else current[emoji] = next;
+        return { ...m, reactions: current };
+      }),
+    );
+    try {
+      const res = await fetch(
+        `/api/events/${eventSlug}/chat/${messageId}/reactions`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            emoji,
+            ...(isGuest ? { guestName: displayName } : {}),
+          }),
+        },
+      );
+      if (!res.ok) return;
+      // Server tally wins: it knows about everyone else's reactions too.
+      const body = (await res.json()) as { reactions?: Record<string, string[]> };
+      if (body.reactions) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === messageId ? { ...m, reactions: body.reactions } : m)),
+        );
+      }
+    } catch { /* the next stream frame reconciles */ }
+  }, [eventSlug, token, isGuest, displayName]);
+
+  const saveEdit = useCallback(async (messageId: string) => {
+    const text = editText.trim();
+    if (!text) return;
+    setEditingId(null);
+    try {
+      const res = await fetch(`/api/events/${eventSlug}/chat/${messageId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ text, ...(isGuest ? { guestName: displayName } : {}) }),
+      });
+      if (!res.ok) {
+        setComposeError(t('editFailed'));
+        return;
+      }
+      const body = (await res.json()) as { editedAt?: string };
+      setMessages((prev) =>
+        prev.map((m) => (m.id === messageId ? { ...m, text, editedAt: body.editedAt } : m)),
+      );
+    } catch {
+      setComposeError(t('editFailed'));
+    }
+  }, [editText, eventSlug, token, isGuest, displayName, t]);
 
   const notificationAskedRef = useRef(false);
   const maybeRequestNotificationPermission = useCallback(() => {
@@ -383,9 +469,28 @@ export default function ChatPanel({
       lastRecvRef.current = Date.now();
       setConnStatus('live'); // a real SSE frame proves the stream is flowing
       try {
-        const env = JSON.parse(e.data) as ChatMessage & { op?: 'delete' };
+        const env = JSON.parse(e.data) as ChatMessage & {
+          op?: 'delete' | 'edit' | 'reaction';
+        };
         if (env.op === 'delete') {
           removeMessage(env.id);
+          return;
+        }
+        // Edits and reactions patch a message already on screen; they must NOT
+        // go through upsertMessage, whose dedup-by-id would drop them as
+        // "already seen" and whose watermark would jump to the edit time.
+        if (env.op === 'edit') {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === env.id ? { ...m, text: env.text, editedAt: env.editedAt } : m,
+            ),
+          );
+          return;
+        }
+        if (env.op === 'reaction') {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === env.id ? { ...m, reactions: env.reactions } : m)),
+          );
           return;
         }
         upsertMessage(env);
@@ -739,12 +844,56 @@ export default function ChatPanel({
                         </div>
                       </div>
                     )}
-                    {m.text && (
-                      <div className="chat-panel__text">
-                        {renderChatBody(m.text, displayName)}
+                    {editingId === m.id ? (
+                      <div className="d-flex gap-1 align-items-center">
+                        <input
+                          className="form-control form-control-sm"
+                          value={editText}
+                          autoFocus
+                          onChange={(e) => setEditText(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') { e.preventDefault(); void saveEdit(m.id); }
+                            if (e.key === 'Escape') setEditingId(null);
+                          }}
+                          aria-label={t('editLabel')}
+                        />
+                        <button type="button" className="btn btn-sm btn-primary"
+                                onClick={() => void saveEdit(m.id)}>
+                          {t('editSave')}
+                        </button>
+                        <button type="button" className="btn btn-sm btn-link"
+                                onClick={() => setEditingId(null)}>
+                          {tc('cancel')}
+                        </button>
                       </div>
+                    ) : (
+                      m.text && (
+                        <div className="chat-panel__text">
+                          {renderChatBody(m.text, displayName)}
+                          {m.editedAt && (
+                            <span className="chat-panel__edited" title={formatTime(m.editedAt)}>
+                              {' '}({t('edited')})
+                            </span>
+                          )}
+                        </div>
+                      )
                     )}
                     {m.attachment && <Attachment att={m.attachment} openLabel={t('openAttachment')} />}
+                    {m.reactions && Object.keys(m.reactions).length > 0 && (
+                      <div className="chat-panel__reactions">
+                        {Object.entries(m.reactions).map(([emoji, who]) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            className="chat-panel__reaction-chip"
+                            onClick={() => void toggleReaction(m.id, emoji)}
+                            aria-label={`${emoji} ${who.length}`}
+                          >
+                            <span aria-hidden="true">{emoji}</span> {who.length}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="chat-panel__time">
                     {formatTime(m.createdAt)}
@@ -767,6 +916,50 @@ export default function ChatPanel({
                              strokeLinejoin="round" aria-hidden="true">
                           <polyline points="9 17 4 12 9 7" />
                           <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+                        </svg>
+                      </button>
+                    )}
+                    <span className="chat-panel__react-wrap">
+                      <button
+                        type="button"
+                        className="chat-panel__reply-btn btn btn-link p-0 ms-2"
+                        aria-label={t('react')}
+                        title={t('react')}
+                        aria-expanded={reactingId === m.id}
+                        onClick={() => setReactingId(reactingId === m.id ? null : m.id)}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                             strokeLinejoin="round" aria-hidden="true">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                          <line x1="9" y1="9" x2="9.01" y2="9" />
+                          <line x1="15" y1="9" x2="15.01" y2="9" />
+                        </svg>
+                      </button>
+                      {reactingId === m.id && (
+                        <span className="chat-panel__react-pop" role="group" aria-label={t('react')}>
+                          {CHAT_REACTION_EMOJIS.map((e) => (
+                            <button key={e} type="button" onClick={() => void toggleReaction(m.id, e)}>
+                              {e}
+                            </button>
+                          ))}
+                        </span>
+                      )}
+                    </span>
+                    {isOwn && !isGuest && token && (
+                      <button
+                        type="button"
+                        className="chat-panel__reply-btn btn btn-link p-0 ms-2"
+                        aria-label={t('editLabel')}
+                        title={t('editLabel')}
+                        onClick={() => { setEditingId(m.id); setEditText(m.text); }}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                             strokeLinejoin="round" aria-hidden="true">
+                          <path d="M12 20h9" />
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
                         </svg>
                       </button>
                     )}

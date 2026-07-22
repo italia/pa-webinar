@@ -566,6 +566,33 @@ model ChatMessage {
   @@index([eventId, createdAt])
   @@index([replyToId])
   @@map("chat_messages")
+  // Ultima modifica dell'autore (A6: "non posso modificare il messaggio se ho
+  // fatto degli errori"). Null = mai modificato; la UI mostra "modificato".
+  editedAt DateTime? @map("edited_at")
+
+  reactions ChatMessageReaction[]
+
+}
+
+/// Reazione emoji a un singolo messaggio di chat (A3).
+///
+/// Una riga per (messaggio, autore, emoji): l'unique rende il toggle
+/// idempotente e impedisce che lo stesso utente conti due volte. `senderId` è
+/// la stessa identità usata dai messaggi (mod-/reg-/guest-), quindi una
+/// reazione resta attribuibile anche se il nome visualizzato cambia.
+model ChatMessageReaction {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  messageId String @map("message_id") @db.Uuid
+  senderId  String @map("sender_id")
+  emoji     String @db.VarChar(16)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, senderId, emoji])
+  @@index([messageId])
+  @@map("chat_message_reactions")
 }
 
 // ─── GDPR Templates ─────────────────────────────────────────

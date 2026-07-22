@@ -2786,3 +2786,67 @@ html.live-call-immersive body {
     color: var(--app-primary, #06c);
   }
 }
+
+// Chat: reazioni al singolo messaggio (A3).
+.chat-panel__reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.chat-panel__reaction-chip {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--app-text, #17324d);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--app-primary, #06c);
+    background: rgba(0, 102, 204, 0.06);
+  }
+}
+
+.chat-panel__react-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+// Il selettore si apre SOPRA il messaggio: in fondo alla lista non deve
+// finire fuori dal pannello.
+.chat-panel__react-pop {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+  button {
+    border: 0;
+    background: transparent;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 3px;
+    cursor: pointer;
+    border-radius: 4px;
+
+    &:hover,
+    &:focus-visible { background: rgba(0, 102, 204, 0.1); }
+  }
+}
+
+.chat-panel__edited {
+  font-size: 0.7rem;
+  color: var(--app-muted, #5c6f82);
+}
