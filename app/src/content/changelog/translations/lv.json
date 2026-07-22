@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Dzīvāka tērzēšana: pieminējumi, reakcijas, labojumi un eksports",
+    "notes": [
+      "Tērzēšana: ja kāds jūs piemin ar @, ziņa tagad tiek izcelta un, ja tobrīd skatāties citur, saņemat paziņojumu. Iepriekš pieminējums neatšķīrās no jebkuras citas ziņas.",
+      "Tērzēšana: uz atsevišķu ziņu var reaģēt ar emocijzīmi, un savu ziņu piecpadsmit minūšu laikā var izlabot (paliek redzama norāde, ka tā ir labota). Poga „Atbildēt“ tagad ir diskrētāka.",
+      "Tērzēšana: jauna poga sarunas lejupielādei — teksta vai datu formātā. Ziņas jau iepriekš tika saglabātas, taču nebija iespējas tās izgūt.",
+      "Telpā: laika skaitītājs rāda, cik ilgs laiks atlicis līdz beigām (vai cik ilgi pasākums jau notiek). Moderatoriem tas ir ieslēgts pēc noklusējuma, un ieslēgt to var ikviens.",
+      "Telpa vairs netiek palaista tikai tāpēc, ka kāds atver pasākuma lapu vairākas stundas pirms sākuma: tā tiek sagatavota tad, kad tas patiešām nepieciešams, kā paredzēts. Novērsts arī gadījums, kad pasākums tika izslēgts dažas minūtes pēc sākuma.",
+      "Statistika: lielākais dalībnieku skaits tagad tiek fiksēts arī katrā atsevišķā sesijā, nevis tikai visam pasākumam kopumā."
+    ]
+  },
   "0.8.4": {
     "title": "Apstiprinājuma e-pasta vēstules: pasākuma nosaukums, attēls un konfigurējams sūtītājs",
     "notes": [

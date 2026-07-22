@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Chat aktar ħajja: mentions, reazzjonijiet, korrezzjonijiet u esportazzjoni",
+    "notes": [
+      "Chat: meta xi ħadd isejjaħlek bl-@, il-messaġġ issa jiġi enfasizzat u, jekk tkun qed tħares band’oħra, tasallek notifika. Qabel, li tissemma ma kien jingħaraf xejn minn messaġġ ieħor.",
+      "Chat: issa tista’ tirreaġixxi għal messaġġ wieħed b’emoji, u tikkoreġi messaġġ tiegħek stess sa ħmistax-il minuta wara (jibqa’ jidher li nbidel). Il-buttuna “Wieġeb” saret aktar diskreta.",
+      "Chat: buttuna ġdida biex tniżżel il-konverżazzjoni kollha, f’forma ta’ test jew ta’ dejta. Il-messaġġi diġà kienu jinżammu, imma ma kien hemm ebda mod kif jitteħdu ’l barra.",
+      "Fil-kamra: timer juri kemm fadal sat-tmiem (jew kemm ilu li beda l-avveniment), mixgħul bħala default għal min imexxi u li kulħadd jista’ jixgħel.",
+      "Kamra m’għadhiex tinxtegħel minn min jiftaħ il-paġna tal-avveniment sigħat qabel: tissaħħan meta jkun il-waqt, kif suppost. Issewwa wkoll każ fejn l-avveniment kien jintefa ftit minuti wara li jibda.",
+      "Statistika: l-ogħla numru ta’ parteċipanti issa jiġi rreġistrat ukoll għal kull sessjoni għaliha, mhux biss għall-avveniment kollu."
+    ]
+  },
   "0.8.4": {
     "title": "Emails ta’ konferma: l-isem tal-avveniment, l-istampa u mittent konfigurabbli",
     "notes": [

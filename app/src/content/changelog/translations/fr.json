@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Un chat plus vivant : mentions, réactions, corrections et export",
+    "notes": [
+      "Chat : lorsque quelqu’un vous nomme avec @, le message est désormais mis en évidence et, si vous regardez ailleurs, une notification vous prévient. Jusqu’ici, être cité ne se distinguait en rien d’un message ordinaire.",
+      "Chat : il est désormais possible de réagir à un message précis avec un emoji et de corriger l’un de ses propres messages dans les quinze minutes qui suivent (la mention « modifié » reste affichée). Le bouton « Répondre » est devenu discret.",
+      "Chat : nouveau bouton pour télécharger la conversation, en texte ou en format de données. Les messages étaient déjà conservés, mais il n’existait aucun moyen de les emporter.",
+      "Dans la salle : un compteur indique le temps restant avant la fin (ou le temps écoulé depuis le début), activé par défaut pour la personne qui anime et activable par tout le monde.",
+      "Une salle n’est plus démarrée par la simple ouverture de la page de l’événement plusieurs heures à l’avance : elle se prépare au moment voulu, comme prévu. Cela corrige également un cas où l’événement se fermait quelques minutes après son début.",
+      "Statistiques : le pic de participants est désormais enregistré aussi pour chaque session, et non plus seulement pour l’événement."
+    ]
+  },
   "0.8.4": {
     "title": "Courriels de confirmation : le nom de l’événement, son image et un expéditeur configurable",
     "notes": [

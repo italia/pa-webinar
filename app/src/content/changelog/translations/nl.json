@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Een levendigere chat: vermeldingen, reacties, correcties en export",
+    "notes": [
+      "Chat: wordt u met @ genoemd, dan is die regel nu gemarkeerd en krijgt u een melding als u op dat moment ergens anders kijkt. Tot nu toe was een vermelding niet te onderscheiden van een gewoon bericht.",
+      "Chat: u kunt met een emoji op een afzonderlijk bericht reageren en uw eigen bericht binnen vijftien minuten verbeteren (het blijft aangeduid als bewerkt). De knop ‘Beantwoorden’ is nu onopvallender vormgegeven.",
+      "Chat: nieuwe knop om het gesprek te downloaden, als tekst of als gegevensbestand. De berichten werden al bewaard, maar er was geen manier om ze mee te nemen.",
+      "In de zaal: een teller toont hoeveel tijd er nog rest tot het einde (of hoelang het evenement al loopt), standaard aan voor wie het evenement leidt en door iedereen in te schakelen.",
+      "Een zaal wordt niet langer gestart doordat iemand de evenementpagina uren van tevoren opent: die warmt op wanneer dat nodig is, zoals bedoeld. Daarmee is ook een geval verholpen waarin een evenement enkele minuten na aanvang werd afgesloten.",
+      "Statistieken: het piekaantal deelnemers wordt nu ook per afzonderlijke sessie vastgelegd, niet alleen voor het evenement als geheel."
+    ]
+  },
   "0.8.4": {
     "title": "Bevestigingsmails: naam van het evenement, afbeelding en instelbare afzender",
     "notes": [

@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Chat más viva: menciones, reacciones, correcciones y exportación",
+    "notes": [
+      "Chat: las menciones con @ se muestran ahora resaltadas para la persona mencionada y, si está mirando otra cosa, le llega una notificación. Hasta ahora, ser mencionado no se distinguía de recibir un mensaje cualquiera.",
+      "Chat: se puede reaccionar a un mensaje concreto con un emoji y corregir los mensajes propios durante los quince minutos siguientes (queda indicado que se han modificado). El botón «Responder» pasa a ser más discreto.",
+      "Chat: nuevo botón para descargar la conversación, en formato de texto o de datos. Los mensajes ya se conservaban, pero no había forma de llevárselos.",
+      "En la sala: un temporizador muestra cuánto falta para el final (o cuánto tiempo se lleva en marcha); está activado de forma predeterminada para quien modera y puede activarlo cualquier persona.",
+      "Una sala ya no se activa porque alguien abra la página del evento con horas de antelación: se prepara cuando corresponde. Se corrige también un caso en el que el evento se cerraba pocos minutos después de haber empezado.",
+      "Estadísticas: el pico de participantes se registra ahora también en cada sesión de la videollamada, y no solo en el conjunto del evento."
+    ]
+  },
   "0.8.4": {
     "title": "Correos de confirmación: el nombre del evento, su imagen y un remitente configurable",
     "notes": [

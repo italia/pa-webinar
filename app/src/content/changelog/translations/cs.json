@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Živější chat: zmínky, reakce, opravy a export",
+    "notes": [
+      "Chat: když vás někdo zmíní pomocí @, jeho zpráva se nyní zvýrazní, a pokud se zrovna díváte jinam, dorazí upozornění. Dosud se zmínka nijak nelišila od běžné zprávy.",
+      "Chat: na jednotlivou zprávu lze nově reagovat emoji a vlastní zprávu je možné do 15 minut opravit (zůstane u ní uvedeno, že byla upravena). Tlačítko „Odpovědět“ je nyní nenápadné.",
+      "Chat: nové tlačítko stáhne celou konverzaci, a to jako text, nebo jako data. Zprávy se uchovávaly už dříve, chyběla ale možnost odnést si je s sebou.",
+      "V místnosti: časovač ukazuje, kolik času zbývá do konce (nebo jak dlouho už akce běží). Pro moderátory je ve výchozím nastavení zapnutý, zapnout si jej ale může kdokoli.",
+      "Místnost už nespustí ten, kdo otevře stránku akce s několikahodinovým předstihem: připraví se, až když je to potřeba, jak má být. Tím se řeší i případ, kdy se akce vypnula pár minut po svém začátku.",
+      "Statistiky: nejvyšší počet účastníků se nyní zaznamenává i u jednotlivého videohovoru, nejen u celé akce."
+    ]
+  },
   "0.8.4": {
     "title": "Potvrzovací e-maily: název akce, obrázek a nastavitelný odesílatel",
     "notes": [

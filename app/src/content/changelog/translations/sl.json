@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Živahnejši klepet: omembe, reakcije, popravki in izvoz",
+    "notes": [
+      "Klepet: ko vas kdo omeni z znakom @, je vrstica zdaj poudarjena, in če takrat gledate drugam, prejmete obvestilo. Doslej se omemba ni razlikovala od katerega koli drugega sporočila.",
+      "Klepet: na posamezno sporočilo lahko dodate reakcijo z emodžijem, svoje sporočilo pa lahko petnajst minut po objavi še popravite (ostane označeno, da je bilo spremenjeno). Gumb »Odgovori« je zdaj manj opazen.",
+      "Klepet: nov gumb omogoča prenos celotnega pogovora, v besedilni ali podatkovni obliki. Sporočila so se že doslej shranjevala, le odnesti jih ni bilo mogoče.",
+      "V sobi: števec prikazuje, koliko časa je še do konca (oziroma koliko časa je minilo od začetka); pri tistih, ki dogodek vodijo, je privzeto vklopljen, vklopi pa ga lahko vsakdo.",
+      "Sobe ne zažene več tisti, ki stran dogodka odpre več ur pred začetkom: pripravi se takrat, ko je to zares potrebno. S tem je odpravljen tudi primer, ko se je dogodek zaprl že nekaj minut po začetku.",
+      "Statistika: največje število hkratnih udeležencev se zdaj zabeleži tudi za posamezno sejo videosrečanja, ne le za celoten dogodek."
+    ]
+  },
   "0.8.4": {
     "title": "Potrditvena elektronska sporočila: ime dogodka, slika in nastavljiv pošiljatelj",
     "notes": [

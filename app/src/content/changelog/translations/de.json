@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Lebendigerer Chat: Erwähnungen, Reaktionen, Korrekturen und Export",
+    "notes": [
+      "Chat: Werden Sie mit @ namentlich angesprochen, ist die Nachricht jetzt hervorgehoben; schauen Sie gerade woanders hin, erhalten Sie eine Benachrichtigung. Bisher unterschied sich eine Erwähnung nicht von einer beliebigen anderen Nachricht.",
+      "Chat: Auf eine einzelne Nachricht lässt sich jetzt mit einem Emoji reagieren, und eine eigene Nachricht kann innerhalb von fünfzehn Minuten korrigiert werden (sie bleibt als bearbeitet gekennzeichnet). Die Schaltfläche „Antworten“ tritt jetzt dezenter auf.",
+      "Chat: Eine neue Schaltfläche lädt den Gesprächsverlauf herunter – als Text oder in einem Datenformat. Die Nachrichten wurden bereits gespeichert, es gab jedoch keine Möglichkeit, sie mitzunehmen.",
+      "Im Raum zeigt eine Zeitanzeige, wie viel Zeit bis zum Ende bleibt (oder wie lange die Veranstaltung schon läuft): für die Moderation standardmäßig eingeschaltet und für alle anderen zuschaltbar.",
+      "Ein Raum wird nicht mehr allein dadurch gestartet, dass jemand die Veranstaltungsseite Stunden im Voraus öffnet: Er wird erst dann hochgefahren, wenn es nötig ist, wie vorgesehen. Damit ist auch ein Fall behoben, in dem eine Veranstaltung wenige Minuten nach dem Beginn abgeschaltet wurde.",
+      "Statistik: Die Höchstzahl der Teilnehmenden wird jetzt auch für die einzelne Konferenzsitzung erfasst, nicht mehr nur für die gesamte Veranstaltung."
+    ]
+  },
   "0.8.4": {
     "title": "Bestätigungs-E-Mails: Name der Veranstaltung, Bild und konfigurierbarer Absender",
     "notes": [

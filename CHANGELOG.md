@@ -10,6 +10,17 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.8.5 — 2026-07-22 🔒
+
+**A livelier chat: mentions, reactions, corrections and export**
+
+- Chat: being named with @ now highlights the message and, if you are looking elsewhere, sends a notification. Until now a mention was indistinguishable from any other message.
+- Chat: you can react to a single message with an emoji, and correct your own message within fifteen minutes (it is marked as edited). The “Reply” button is now discreet.
+- Chat: a new button downloads the conversation, as text or as data. The messages were already kept, but there was no way to take them with you.
+- In the room: a timer shows how long is left (or how long you have been going), on by default for whoever is running it and available to everyone.
+- A room is no longer started by someone opening the event page hours ahead: it warms up when it should. This also fixes a case where an event was shut down minutes after it began.
+- Analytics: the peak number of participants is now recorded on the individual session too, not only on the event.
+
 ## 0.8.4 — 2026-07-22
 
 **Confirmation emails: the event name, its image, and a configurable sender**

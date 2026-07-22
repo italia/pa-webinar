@@ -1,4 +1,15 @@
 {
+  "0.8.5": {
+    "title": "Chat mai viu: mențiuni, reacții, corectări și export",
+    "notes": [
+      "Chat: atunci când cineva vă menționează cu @, rândul este acum evidențiat, iar dacă priviți în altă parte primiți o notificare. Până acum, o mențiune nu se deosebea cu nimic de un mesaj oarecare.",
+      "Chat: puteți reacționa la un anumit mesaj cu un emoji și vă puteți corecta propriul mesaj în interval de cincisprezece minute (rămâne indicat faptul că a fost modificat). Butonul „Răspunde” a devenit discret.",
+      "Chat: buton nou pentru descărcarea conversației, ca text sau în format de date. Mesajele erau deja păstrate, însă nu exista nicio modalitate de a le lua cu dumneavoastră.",
+      "În sală: un cronometru arată cât mai este până la încheiere (sau de cât timp a început evenimentul); este pornit implicit pentru cine conduce evenimentul și poate fi activat de oricine.",
+      "O sală nu mai este pornită de cine deschide pagina evenimentului cu ore înainte: se trezește atunci când este nevoie, așa cum este prevăzut. Se rezolvă astfel și un caz în care evenimentul era oprit la câteva minute după începere.",
+      "Statistici: numărul maxim de participanți este consemnat acum și pentru fiecare sesiune în parte, nu doar pentru eveniment."
+    ]
+  },
   "0.8.4": {
     "title": "E-mailuri de confirmare: numele evenimentului, imaginea și un expeditor configurabil",
     "notes": [
