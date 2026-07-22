@@ -39,6 +39,7 @@ import {
 } from '@/lib/chat/pubsub';
 import { authenticateChatSender } from '@/lib/chat/authenticate';
 import { tallyReactions } from '@/lib/chat/emoji';
+import { senderColourKey } from '@/lib/chat/sender-key';
 import { authorizeChatRead } from '@/lib/chat/read-access';
 import {
   CHAT_ATTACHMENT_MIME,
@@ -97,7 +98,10 @@ export const GET = withErrorHandling(async (request, context) => {
 
   // History is PII (names + free text) and was world-readable for any event in
   // any status. Readers now clear the same bar as writers — see read-access.
-  const { eventId } = await authorizeChatRead(param, extractModeratorToken(request));
+  const { eventId, senderId: callerId, isPerPersonIdentity } = await authorizeChatRead(
+    param,
+    extractModeratorToken(request),
+  );
 
   const rows = await prisma.chatMessage.findMany({
     where: {
@@ -119,7 +123,7 @@ export const GET = withErrorHandling(async (request, context) => {
       attachmentMime: true,
       attachmentSize: true,
       editedAt: true,
-      reactions: { select: { emoji: true } },
+      reactions: { select: { emoji: true, senderId: true } },
       replyToId: true,
       replyTo: {
         select: {
@@ -154,9 +158,21 @@ export const GET = withErrorHandling(async (request, context) => {
                 ) || (m.replyTo.attachmentBlobPath ? '📎' : ''),
             }
           : undefined;
+      const mineReactions = callerId
+        ? m.reactions.filter((r) => r.senderId === callerId).map((r) => r.emoji)
+        : [];
       return {
         id: m.id,
-        senderId: m.senderId,
+        // NOT the raw senderId: a guest one is base64 of `ip:name` and decodes
+        // straight back to the attendee's public IP. The client only ever used
+        // it to pick a bubble colour, so it gets a one-way key instead.
+        senderKey: senderColourKey(m.senderId),
+        // Whether the CALLER may act on this message. Computed here because the
+        // client cannot: a seat id is shared by several people, so comparing ids
+        // (or names) client-side got it wrong in both directions.
+        mine: !!callerId && m.senderId === callerId,
+        canEdit: !!callerId && m.senderId === callerId && isPerPersonIdentity,
+        myReactions: mineReactions,
         // senderName + text are encrypted at rest (see schema comment).
         // tryDecryptPII falls back to the input string for legacy
         // plaintext rows, so this is safe across the migration boundary.
@@ -321,7 +337,7 @@ export const POST = withErrorHandling(async (request, context) => {
     // messages are really its own: comparing display names is wrong whenever two
     // people share one (two moderators on the shared link are both "Moderatore"),
     // and that comparison is what decides whether the edit affordance appears.
-    senderId: auth.senderId,
+    senderKey: senderColourKey(auth.senderId),
     // Whether this identity may edit its own messages at all — a shared link
     // cannot, so the UI should not offer it (the server refuses anyway).
     canEdit: auth.isPerPersonIdentity,

@@ -338,7 +338,8 @@
       "editFailed": "Could not edit the message.",
       "exportChat": "Download the chat",
       "reactNotAllowed": "Reacting to messages needs your personal or moderator link.",
-      "editNotAllowed": "This link is shared, so it cannot edit messages."
+      "editNotAllowed": "This link is shared, so it cannot edit messages.",
+      "editExpired": "More than 15 minutes have passed: this message can no longer be edited."
     },
     "role": {
       "moderator": "Moderator",

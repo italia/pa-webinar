@@ -25,7 +25,7 @@
  * which runs outside the normal route handler wrapper — cheap.
  */
 
-import { resolveGrantForEvent } from '@/lib/auth/moderator';
+import { resolveTokenSender } from '@/lib/chat/sender';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
@@ -55,7 +55,7 @@ export function guestChatWindowOpen(event: {
 export async function authorizeChatRead(
   eventIdOrSlug: string,
   token: string | null,
-): Promise<{ eventId: string }> {
+): Promise<{ eventId: string; senderId: string | null; isPerPersonIdentity: boolean }> {
   const event = await prisma.event.findFirst({
     where: eventParamWhere(eventIdOrSlug),
     select: {
@@ -69,15 +69,18 @@ export async function authorizeChatRead(
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
 
   if (token) {
-    const grant = await resolveGrantForEvent(event, token);
-    if (grant) return { eventId: event.id };
-
-    const registration = await prisma.registration.findUnique({
-      where: { accessToken: token },
-      select: { eventId: true },
-    });
-    if (registration && registration.eventId === event.id) {
-      return { eventId: event.id };
+    // Resolve the FULL sender identity, not just "may you read": the history
+    // endpoint has to tell each caller which messages are theirs and which
+    // reactions they already left. Deriving that client-side is what produced a
+    // string of bugs — a seat id shared by two moderators made one person's
+    // messages render as the other's, and a reaction survived no reload.
+    const sender = await resolveTokenSender(event, token);
+    if (sender) {
+      return {
+        eventId: event.id,
+        senderId: sender.senderId,
+        isPerPersonIdentity: sender.isPerPersonIdentity,
+      };
     }
     // A token that matches nothing is an error, not a downgrade to guest: same
     // contract as the POST route, so a stale/foreign token fails loudly instead
@@ -96,5 +99,5 @@ export async function authorizeChatRead(
     throw new ForbiddenError('Chat requires the event join password');
   }
 
-  return { eventId: event.id };
+  return { eventId: event.id, senderId: null, isPerPersonIdentity: false };
 }

@@ -20,6 +20,7 @@ import { extractModeratorToken } from '@/lib/auth/moderator';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { authorizeChatRead } from '@/lib/chat/read-access';
 import { tallyReactions } from '@/lib/chat/emoji';
+import { senderColourKey } from '@/lib/chat/sender-key';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -63,7 +64,9 @@ export const GET = withErrorHandling(async (request, context) => {
     // Names and text are encrypted at rest; tryDecryptPII also passes through
     // the legacy plaintext rows unchanged.
     from: tryDecryptPII(m.senderName) ?? m.senderName,
-    senderId: m.senderId,
+    // Chiave opaca, non l'id: quello degli ospiti decodifica nell'IP pubblico,
+    // e questo è un file che viene scaricato e girato.
+    senderKey: senderColourKey(m.senderId),
     isModerator: m.isModerator,
     text: tryDecryptPII(m.text) ?? m.text,
     edited: m.editedAt ? m.editedAt.toISOString() : null,
