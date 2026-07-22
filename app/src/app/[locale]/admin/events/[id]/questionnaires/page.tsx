@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import EventQuestionnairesManager from '@/components/admin/event-questionnaires-manager';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { prisma } from '@/lib/db';
 
 interface PageProps {
@@ -28,7 +29,7 @@ export default async function EventQuestionnairesPage({ params }: PageProps) {
   });
   if (!event) notFound();
 
-  const eventTitle = (event.title as Record<string, string>)[locale] ?? (event.title as Record<string, string>).it ?? event.slug;
+  const eventTitle = getLocalized(event.title as LocalizedField, locale) || event.slug;
   const t = await getTranslations('admin.eventQuestionnaires');
 
   return (

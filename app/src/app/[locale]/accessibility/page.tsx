@@ -3,7 +3,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { getSettings } from '@/lib/settings';
 import LegalDocumentPage from '@/components/layout/legal-document-page';
-import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { getLocalizedExact, type LocalizedField } from '@/lib/utils/locale';
 
 // Official AgID references for the accessibility statement model. External,
 // so rendered as plain anchors (not the locale-prefixed <Link>).
@@ -33,7 +33,10 @@ export default async function AccessibilityPage() {
 
   // Each adopting PA can publish its own statement via SiteSetting; that
   // overrides the built-in AgID-model template below.
-  const dbContent = getLocalized(settings.accessibility as LocalizedField, locale);
+  // Esatto, non con fallback: un documento legale non authored in questa
+  // lingua deve mostrare il testo integrato e tradotto, non quello
+  // italiano dell'ente spacciato per la versione inglese.
+  const dbContent = getLocalizedExact(settings.accessibility as LocalizedField, locale);
 
   if (dbContent) {
     return <LegalDocumentPage title={t('title')} htmlContent={dbContent} />;

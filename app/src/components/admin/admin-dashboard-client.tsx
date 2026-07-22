@@ -12,7 +12,7 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
-import { getLocalized } from '@/lib/utils/locale';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import EventTitle from '@/components/events/event-title';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
@@ -348,7 +348,7 @@ export default function AdminDashboardClient({
               {availableTags.map((tag) => {
                 const active = tagFilter.has(tag.slug);
                 const displayName =
-                  tag.name[locale] ?? tag.name.it ?? tag.name.en ?? tag.slug;
+                  getLocalized(tag.name as LocalizedField, locale) || tag.slug;
                 const color = tag.color ?? '#0066CC';
                 return (
                   <button

@@ -9,7 +9,7 @@ import { prisma } from '@/lib/db';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
-import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
+import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
@@ -99,8 +99,10 @@ export const POST = withErrorHandling(async (request) => {
       slug,
       jitsiRoomName,
       moderatorToken,
-      title: data.title,
-      description: data.description,
+      // Le traduzioni vuote non si persistono: il wizard rimanda una chiave
+      // per ogni lingua attiva, anche quelle che nessuno ha compilato.
+      title: pruneEmptyTranslations(data.title as LocalizedField),
+      description: pruneEmptyTranslations(data.description as LocalizedField),
       startsAt: new Date(data.startsAt),
       endsAt: new Date(data.endsAt),
       timezone: data.timezone,

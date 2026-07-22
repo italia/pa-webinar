@@ -8,6 +8,7 @@ import EventMaterialsManager, {
 } from '@/components/admin/event-materials-manager';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { prisma } from '@/lib/db';
+import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
@@ -41,7 +42,7 @@ export default async function EventMaterialsAdminPage({ params }: PageProps) {
   const tCommon = await getTranslations('common');
 
   const titleMap = event.title as Record<string, string>;
-  const eventTitle = titleMap[locale] ?? titleMap.it ?? event.slug;
+  const eventTitle = getLocalized(titleMap as LocalizedField, locale) || event.slug;
 
   const initialMaterials: MaterialRow[] = event.materials.map((m) => ({
     id: m.id,

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
+import { publicSettings } from '@/lib/settings/public-projection';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -108,8 +109,7 @@ export const GET = withErrorHandling(async () => {
       return NextResponse.json(created);
     }
 
-    const { customHomeHtml: _, ...publicSettings } = created;
-    return NextResponse.json(publicSettings, {
+    return NextResponse.json(publicSettings(created), {
       headers: {
         'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
       },
@@ -120,8 +120,7 @@ export const GET = withErrorHandling(async () => {
     return NextResponse.json(settings);
   }
 
-  const { customHomeHtml: _, ...publicSettings } = settings;
-  return NextResponse.json(publicSettings, {
+  return NextResponse.json(publicSettings(settings), {
     headers: {
       'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
     },

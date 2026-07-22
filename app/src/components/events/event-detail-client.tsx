@@ -395,7 +395,7 @@ export default function EventDetailClient({
           {tags.length > 0 && (
             <div className="d-flex flex-wrap gap-2 mb-4">
               {tags.map((tag) => {
-                const label = tag.name[locale] ?? tag.name.it ?? tag.name.en ?? tag.slug;
+                const label = getLocalized(tag.name as LocalizedField, locale) || tag.slug;
                 const color = tag.color ?? '#5A768A';
                 return (
                   <Link
