@@ -106,39 +106,6 @@ export interface OvertimeReclaimInput {
  * acceptable: while another event holds the bridge up there is no JVB to
  * reclaim anyway; once the bridge truly empties this fires within one grace.
  */
-export interface IdleDemotionInput {
-  /** Last tick at which the bridge reported participants for this event. */
-  lastActiveAt: Date | null;
-  /** When the room started warming up (set by /wake and by the pre-scale). */
-  provisioningStartedAt: Date | null;
-  /** Scheduled start. */
-  startsAt: Date;
-  /** now - jvbInactiveGraceMinutes. */
-  inactiveCutoff: Date;
-}
-
-/**
- * Should a LIVE event (still before its end time) be demoted to IDLE for
- * inactivity, freeing its bridge?
- *
- * The rule is "no activity for the whole grace window", and the window is
- * measured from the LATEST meaningful signal — including `startsAt`.
- *
- * That last term is the point. In production an event was demoted to IDLE three
- * minutes after going LIVE, killing the bridge exactly as people were arriving:
- * nobody had joined yet, so `lastActiveAt` was null and the check fell back to
- * `provisioningStartedAt` — which was already more than 45 minutes old, because
- * a registrant had opened the event page (and `/wake` warmed the room) an hour
- * before the start. An event cannot have been idle for longer than it has been
- * running: a room that started two minutes ago is not stale, whenever it was
- * warmed up.
- */
-export function shouldDemoteLiveToIdle(input: IdleDemotionInput): boolean {
-  const signals = [input.startsAt.getTime()];
-  if (input.lastActiveAt) signals.push(input.lastActiveAt.getTime());
-  if (input.provisioningStartedAt) signals.push(input.provisioningStartedAt.getTime());
-  return Math.max(...signals) < input.inactiveCutoff.getTime();
-}
 
 export function shouldReclaimEmptyOvertime(input: OvertimeReclaimInput): boolean {
   if (!input.canReclaimEmpty) return false;
@@ -152,6 +119,61 @@ export function shouldReclaimEmptyOvertime(input: OvertimeReclaimInput): boolean
   const aliveUntil =
     signals.length > 0 ? Math.max(...signals) : input.endsAt.getTime();
   return aliveUntil < input.inactiveCutoff.getTime();
+}
+
+export interface IdleDemotionInput {
+  /** Last tick at which the bridge reported participants for this event. */
+  lastActiveAt: Date | null;
+  /** When the room started warming up (set by /wake and by the pre-scale). */
+  provisioningStartedAt: Date | null;
+  /** Scheduled start. */
+  startsAt: Date;
+  /** now - jvbInactiveGraceMinutes. */
+  inactiveCutoff: Date;
+  /** Current time, to tell a start that has happened from one still ahead. */
+  now: Date;
+}
+
+/**
+ * Should a LIVE event (still before its end time) be demoted to IDLE for
+ * inactivity, freeing its bridge?
+ *
+ * The rule is "no activity for the whole grace window", measured from the LATEST
+ * meaningful signal.
+ *
+ * Including `startsAt` is the point. In production an event was demoted three
+ * minutes after going LIVE, killing the bridge exactly as people were arriving:
+ * nobody had joined yet, so `lastActiveAt` was null and the check fell back to
+ * `provisioningStartedAt` alone — already 65 minutes old, because a registrant
+ * had opened the event page (and `/wake` warmed the room) long before the start.
+ * An event cannot have been idle for longer than it has been running.
+ *
+ * Two guards keep that term from creating the opposite leak:
+ *
+ *  • `startsAt` counts only once it has PASSED. A LIVE row whose start is in the
+ *    future — an already-live event postponed by an admin, or a mistyped date —
+ *    would otherwise be undemotable for as long as the start stays ahead, and
+ *    would pin a JVB node (and Jibri) for the whole postponement, against the
+ *    scale-to-zero this scaler exists for (ADR-007).
+ *
+ *  • With NEITHER `lastActiveAt` NOR `provisioningStartedAt` we have no evidence
+ *    of inactivity at all, so we leave the room alone — as the SQL this replaced
+ *    did, where both OR-branches required one of the two to be non-null. That
+ *    state is reachable: an event revived by pushing `endsAt` forward, which
+ *    never entered PROVISIONING and that nobody has rejoined yet, would
+ *    otherwise be demoted on the first tick — the very outage this fixes.
+ */
+export function shouldDemoteLiveToIdle(input: IdleDemotionInput): boolean {
+  if (!input.lastActiveAt && !input.provisioningStartedAt) return false;
+
+  const signals: number[] = [];
+  if (input.lastActiveAt) signals.push(input.lastActiveAt.getTime());
+  if (input.provisioningStartedAt) signals.push(input.provisioningStartedAt.getTime());
+  if (input.startsAt.getTime() <= input.now.getTime()) {
+    signals.push(input.startsAt.getTime());
+  }
+
+  return Math.max(...signals) < input.inactiveCutoff.getTime();
 }
 
 export interface RevivalInput {
