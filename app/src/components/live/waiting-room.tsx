@@ -479,19 +479,39 @@ export default function WaitingRoom({
     [],
   );
 
-  // La piazza a piena pagina è un dialogo, non solo un div che copre tutto:
-  // chi naviga da tastiera deve poterci entrare e — soprattutto — uscirne.
+  // Tastiera nella piazza: entrarci porta il focus sull'uscita, uscirne lo
+  // riporta all'invito.
   const gameDialogRef = useRef<HTMLDivElement>(null);
+  const inviteRef = useRef<HTMLButtonElement>(null);
+  const returnFocusRef = useRef(false);
   useEffect(() => {
-    if (!gameOpen) return;
+    if (!gameOpen) {
+      if (returnFocusRef.current) {
+        returnFocusRef.current = false;
+        inviteRef.current?.focus();
+      }
+      return;
+    }
     gameDialogRef.current
-      ?.querySelector<HTMLElement>('.wr-game-full__exit')
+      ?.querySelector<HTMLElement>('.wr-piazza-btn--exit')
       ?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setGameOpen(false);
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      // Non mentre si scrive: Esc in un campo di testo (o in chat) significa
+      // "annulla quello che sto scrivendo", non "chiudi la piazza". Il pannello
+      // dei controlli è pieno di campi, e sono gli stessi della pagina.
+      const el = e.target as HTMLElement | null;
+      if (
+        el &&
+        (/^(input|textarea|select)$/i.test(el.tagName) || el.isContentEditable)
+      ) {
+        return;
+      }
+      closePiazza();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameOpen]);
 
   // ── Catch-up recording player ─────────────────────────────────────
@@ -557,6 +577,22 @@ export default function WaitingRoom({
     year: 'numeric',
     timeZone: event.timezone,
   });
+
+  // Chiudere la piazza rimette a fuoco l'invito da cui si è entrati: senza,
+  // il focus resta su un pulsante che non esiste più e chi naviga da tastiera
+  // riparte dall'inizio del documento.
+  const closePiazza = () => {
+    setGameOpen(false);
+    returnFocusRef.current = true;
+  };
+
+  // "Versione classica": chiude la piazza E ricorda la scelta. `classicView`
+  // spegne `canPlay`, quindi l'invito non si ripresenta — né ora né al
+  // prossimo evento.
+  const goClassic = () => {
+    setGameOpen(false);
+    toggleClassic(true);
+  };
 
   // ── Toggle between the full-screen park and the static classic card ──
   const toggleClassic = (on: boolean) => {
@@ -919,75 +955,54 @@ export default function WaitingRoom({
   // controlli, ingresso in call — e un'uscita che riporta qui.
   const canPlay = !isEnded && !classicView && !multitrackRequired;
 
-  // Modalità piazza a piena pagina. Il gioco prende la scena; i controlli
-  // restano quelli DI QUESTA PAGINA, in un pannello a fianco — è il "collegali"
-  // chiesto: stesso nome, stesse preferenze audio/video, stessa CTA validata,
-  // stessa chat, stesse informazioni sull'evento. Un solo insieme di controlli,
-  // in una sola lingua, validato una sola volta.
+  // La piazza non è una pagina DIVERSA: è QUESTA pagina, ri-disposta accanto
+  // alla scena. Il primo tentativo duplicava i controlli in un pannello
+  // dedicato, e ogni cosa lasciata fuori dalla copia diventava un difetto —
+  // l'email mancante bloccava in silenzio un ospite, l'informativa su
+  // registrazione e AI spariva proprio dalla schermata in cui si preme "Entra".
+  // Tenendo un albero solo, quel genere di dimenticanza non è più possibile:
+  // quello che c'è nella sala d'attesa c'è anche nella piazza, per costruzione.
   //
+  // Ed è anche il motivo per cui l'anteprima della fotocamera non si spegne e
+  // la bozza in chat non si perde entrando e uscendo: React non smonta nulla,
+  // cambia solo il vestito.
+  const piazzaOpen = canPlay && gameOpen;
+
   // `hostOwnsEntry` spegne la chrome interna della lobby (onboarding, top bar,
   // pannello dispositivi). Senza, il gioco ne mostra una propria: in italiano
   // fisso — su 24 lingue —, con un nome che non torna mai nello stato React
   // (quindi l'ingresso si blocca in silenzio) e un ingresso che scavalca il
   // gate LIVE, facendo entrare un moderatore in una sala mai avviata.
-  const gameFullScreen = canPlay && gameOpen ? (
+  const piazzaStage = piazzaOpen ? (
     <PhaserLobbyBoundary onError={() => { setGameOpen(false); toggleClassic(true); }}>
-      <div
-        className="wr-game-full"
-        role="dialog"
-        aria-modal="true"
-        aria-label={t('gardenDialogLabel')}
-        ref={gameDialogRef}
-      >
-        <div className="wr-game-full__stage">
-          <PhaserLobby
-            hostOwnsEntry
-            eventSlug={event.slug}
-            displayName={trimmedName}
-            status={event.status}
-            startsAtMs={startsAtMs}
-            isHost={isModerator}
-            onEnterLive={handleGameEnter}
-            // "Versione classica" dentro il gioco è l'uscita di sicurezza per
-            // chi non regge l'animazione: deve RICORDARE la scelta, non solo
-            // chiudere l'overlay e riproporre la piazza al reload successivo.
-            onExitClassic={() => { setGameOpen(false); toggleClassic(true); }}
-          />
+      <div className="wr-piazza-stage" ref={gameDialogRef}>
+        <PhaserLobby
+          hostOwnsEntry
+          eventSlug={event.slug}
+          displayName={trimmedName}
+          status={event.status}
+          startsAtMs={startsAtMs}
+          isHost={isModerator}
+          onEnterLive={handleGameEnter}
+          onExitClassic={goClassic}
+        />
+        <div className="wr-piazza-stage__bar">
           <button
             type="button"
-            className="wr-game-full__exit"
-            onClick={() => setGameOpen(false)}
+            className="wr-piazza-btn wr-piazza-btn--exit"
+            onClick={closePiazza}
           >
             <Icon icon="it-arrow-left" size="xs" className="me-1" />
             {t('backToWaitingRoom')}
           </button>
+          {/* L'uscita di sicurezza per chi non regge l'animazione. Stava nella
+              top bar del gioco, che `hostOwnsEntry` spegne: senza questo
+              pulsante non resterebbe alcun modo di scegliere la versione
+              accessibile — e la scelta va RICORDATA, non solo applicata. */}
+          <button type="button" className="wr-piazza-btn" onClick={goClassic}>
+            {t('classicVersion')}
+          </button>
         </div>
-        <aside className="wr-game-full__panel">
-          <div className="wr-game-full__panel-inner">
-            <EventTitle
-              title={event.title}
-              kickerEnabled={event.parseTitleKicker ?? false}
-              as="h2"
-              className="h6 fw-bold mb-1"
-              style={{ color: 'var(--app-text)' }}
-            />
-            <div className="text-muted mb-3" style={{ fontSize: '0.8rem' }}>
-              {dateLabel} · {startTimeLabel} – {endTimeLabel}
-            </div>
-            {statusBanners}
-            <div className="d-grid gap-3">
-              {nameField}
-              {deviceCheckField}
-              {primaryCta}
-              {isLive && (
-                <p className="text-muted mb-0" style={{ fontSize: '0.78rem' }}>
-                  {t('gardenGateHint')}
-                </p>
-              )}
-              {chatPreviewBlock}
-            </div>
-          </div>
-        </aside>
       </div>
     </PhaserLobbyBoundary>
   ) : null;
@@ -1010,6 +1025,7 @@ export default function WaitingRoom({
     <button
       type="button"
       className="wr-game-invite"
+      ref={inviteRef}
       onClick={() => setGameOpen(true)}
     >
       <span className="wr-game-invite__art" aria-hidden="true">🌿</span>
@@ -1020,12 +1036,13 @@ export default function WaitingRoom({
     </button>
   ) : null;
 
-  // Il gioco prende tutta la pagina: dentro ha nome, controlli e ingresso in
-  // call, e l'uscita riporta esattamente qui.
-  if (gameFullScreen) return gameFullScreen;
-
   return (
-    <div className="waiting-shell">
+    <div className={piazzaOpen ? 'waiting-shell waiting-shell--piazza' : 'waiting-shell'}>
+      {/* Fratello, non sostituto: `{false}` occupa comunque la sua posizione
+          fra i figli, quindi il container qui sotto resta lo STESSO nodo React
+          aprendo e chiudendo la piazza — niente smontaggi, niente fotocamera
+          riacquisita, niente bozze perse. */}
+      {piazzaStage}
       <div className="container py-4 py-md-5">
         <div className="row g-4 justify-content-center">
           <div className={asideBox ? 'col-lg-7 col-xl-6' : 'col-lg-8 col-xl-7'}>

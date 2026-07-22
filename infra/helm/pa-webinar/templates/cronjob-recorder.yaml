@@ -77,6 +77,26 @@ spec:
                     secretKeyRef:
                       name: {{ include "pa-webinar.secretName" . }}
                       key: CRON_API_KEY
+                {{- if .Values.recorder.hiddenDomain }}
+                # Identita' del bot sul dominio NASCOSTO di Prosody. E' cosi'
+                # che il recorder sparisce da Jitsi in modo nativo: ogni client
+                # confronta il dominio del JID con `config.hiddenDomain` e, se
+                # coincide, non lo mostra e non lo conta. Senza queste, il bot
+                # entra col JWT del portale ed e' un partecipante come gli
+                # altri. Vedi docs/ARCHITECTURE.md.
+                - name: JITSI_XMPP_DOMAIN
+                  value: {{ .Values.recorder.hiddenDomain | quote }}
+                - name: JITSI_XMPP_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.recorder.xmppSecretName | quote }}
+                      key: {{ .Values.recorder.xmppSecretUserKey | quote }}
+                - name: JITSI_XMPP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.recorder.xmppSecretName | quote }}
+                      key: {{ .Values.recorder.xmppSecretPasswordKey | quote }}
+                {{- end }}
                 {{- if .Values.recorder.idleTimeoutSec }}
                 # Chiusura dopo stanza vuota (default capture.ts: 90s).
                 - name: IDLE_TIMEOUT_SEC

@@ -35,6 +35,10 @@ interface RecorderEnv {
   portalUrl: string;
   cronApiKey: string;
   outputDir: string;
+  /** Credenziali del bot sul dominio nascosto di Prosody. Opzionali: senza,
+   *  si entra col JWT del portale (e il bot resta VISIBILE in stanza). */
+  xmppUser?: string;
+  xmppPassword?: string;
   idleTimeoutSec?: number;
   initialGraceSec?: number;
   maxDurationSec?: number;
@@ -55,6 +59,25 @@ function requireEnv(name: string): string {
   return v;
 }
 
+/**
+ * JID completo del bot sul dominio nascosto.
+ *
+ * L'utente arriva dal Secret già usato da Jibri (`JIBRI_RECORDER_USER`, di
+ * norma la sola parte locale "recorder") mentre il dominio è un valore del
+ * chart: comporli qui evita di duplicare un Secret solo per aggiungere una
+ * chiocciola. Un JID già completo passa invariato.
+ */
+export function recorderJid(
+  user: string | undefined,
+  domain: string | undefined,
+): string | undefined {
+  const u = user?.trim();
+  if (!u) return undefined;
+  if (u.includes('@')) return u;
+  const d = domain?.trim();
+  return d ? `${u}@${d}` : undefined;
+}
+
 function readEnv(): RecorderEnv {
   return {
     jitsiDomain: requireEnv('JITSI_DOMAIN'),
@@ -63,6 +86,14 @@ function readEnv(): RecorderEnv {
     portalUrl: requireEnv('PORTAL_URL').replace(/\/+$/, ''),
     cronApiKey: requireEnv('CRON_API_KEY'),
     outputDir: process.env.OUTPUT_DIR ?? '/recordings',
+    // Entrambe o nessuna: una sola delle due è una configurazione a metà, e
+    // fallire il login lascerebbe l'evento senza registrazione. Meglio il
+    // fallback esplicito sul JWT.
+    xmppUser: recorderJid(
+      process.env.JITSI_XMPP_USER,
+      process.env.JITSI_XMPP_DOMAIN,
+    ),
+    xmppPassword: process.env.JITSI_XMPP_PASSWORD || undefined,
     // Quanto il bot resta in stanza vuota prima di chiudere (default 90s in
     // capture.ts). Configurabile per dare tempo ai partecipanti di entrare.
     idleTimeoutSec: readIntEnv('IDLE_TIMEOUT_SEC'),
@@ -101,6 +132,8 @@ export async function main(): Promise<void> {
     jitsiDomain: env.jitsiDomain,
     roomName: wo.roomName,
     jwt: wo.jwt,
+    xmppUser: env.xmppPassword ? env.xmppUser : undefined,
+    xmppPassword: env.xmppUser ? env.xmppPassword : undefined,
     outputDir: env.outputDir,
     // Wiring delle env di timing (erano parse-ate ma scartate qui → i default
     // hardcoded in capture.ts vincevano sempre, rendendo la config operatore

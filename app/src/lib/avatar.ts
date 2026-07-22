@@ -12,6 +12,26 @@
  * served for that origin either.
  */
 
+const DEFAULT_SIZE = 200;
+const MIN_SIZE = 32;
+const MAX_SIZE = 512;
+
+/**
+ * Lato del quadrato richiesto a `/api/avatar`, in pixel.
+ *
+ * Due trappole in una riga sola, ed è per questo che vive qui, testata.
+ * `Number('abc')` è NaN, e NaN sopravvive sia a Math.max sia a Math.min:
+ * l'SVG verrebbe costruito con coordinate NaN, su una route pubblica. Ma
+ * `Number('')` è 0, che è FINITO, e verrebbe schiacciato sul minimo di 32 —
+ * cioè proprio la richiesta senza `size`, la forma più comune, servita a 32px
+ * dentro uno slot da 200.
+ */
+export function parseAvatarSize(raw: string | null): number {
+  const n = raw ? Number(raw) : Number.NaN;
+  if (!Number.isFinite(n)) return DEFAULT_SIZE;
+  return Math.min(Math.max(n, MIN_SIZE), MAX_SIZE);
+}
+
 const BI_PALETTE = [
   { bg: '#004D99', fg: '#FFFFFF' },
   { bg: '#4B44CC', fg: '#FFFFFF' },

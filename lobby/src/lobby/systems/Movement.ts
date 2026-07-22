@@ -128,10 +128,14 @@ export class Movement {
       return;
     }
     if (!isArrow && !isWasd) return;
-    if (typing) {
-      if (!isArrow) return; // don't steal WASD letters while typing
-      target?.blur(); // arrows take over movement
-    }
+    // Mentre si scrive, le frecce sono del CURSORE DI TESTO, sempre.
+    //
+    // Prima le frecce facevano `target.blur()` e prendevano il comando: aveva
+    // senso quando l'unico campo era la casella del nome dentro il gioco, un
+    // dettaglio da cui uscire. Ora accanto alla piazza c'è il pannello della
+    // sala d'attesa — nome, email, chat — e correggere un refuso con la freccia
+    // sinistra buttava fuori dal campo e faceva camminare l'avatar.
+    if (typing) return;
     e.preventDefault();
     this.down.add(k);
   }

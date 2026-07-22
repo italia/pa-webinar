@@ -39,8 +39,24 @@ import type { TrackRecording } from './manifest.js';
 export interface CaptureConfig {
   jitsiDomain: string;
   roomName: string;
-  /** JWT del portale che ci fa entrare come bot receive-only. */
+  /** JWT del portale che ci fa entrare come bot receive-only. Usato solo
+   *  quando NON ci sono credenziali XMPP (vedi `xmppUser`). */
   jwt: string;
+  /**
+   * Identità XMPP del bot sul dominio NASCOSTO di Prosody (es.
+   * `recorder@hidden.meet.jitsi`). Quando c'è, il recorder si autentica con
+   * queste invece che col JWT — ed è l'unico modo di sparire davvero.
+   *
+   * `config.hiddenDomain` di jitsi-meet confronta il DOMINIO del JID reale in
+   * presenza: se coincide, ogni client marca il partecipante come hidden e
+   * lib-jitsi-meet lo esclude a monte — niente riquadro, niente riga
+   * nell'elenco, niente notifica di ingresso, e `membersCount` non lo conta.
+   * Con un JWT sul dominio principale il bot è un partecipante come gli altri
+   * e nasconderlo resterebbe un trucco lato client, da rifare a ogni
+   * aggiornamento di Jitsi.
+   */
+  xmppUser?: string;
+  xmppPassword?: string;
   /** Directory locale dove scrivere i file `.opus`. */
   outputDir: string;
   /** displayName del bot in stanza (es. "📼 Recorder"). */
@@ -246,6 +262,8 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
       appId: config.jitsiDomain,
       room: config.roomName.toLowerCase(),
       jwt: config.jwt,
+      xmppUser: config.xmppUser ?? '',
+      xmppPassword: config.xmppPassword ?? '',
       botName: config.botDisplayName ?? '📼 Recorder',
       serviceUrl,
       mucDomain,
@@ -286,6 +304,8 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
   appId: string;
   room: string;
   jwt: string;
+  xmppUser: string;
+  xmppPassword: string;
   botName: string;
   serviceUrl: string;
   mucDomain: string;
@@ -326,11 +346,14 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     const serviceUrl = jcfg.websocket ?? jcfg.bosh ?? cfg.serviceUrl;
     log(`connessione: domain=${hosts.domain} muc=${hosts.muc} svc=${serviceUrl}`);
 
-    const connection = new JitsiMeetJS.JitsiConnection(null, cfg.jwt, {
-      hosts,
-      serviceUrl,
-      clientNode: 'https://jitsi.org/jitsimeet',
-    });
+    // Con le credenziali del dominio nascosto il token non serve — e non deve
+    // esserci: il JID che finisce in presenza è quello con cui ci si autentica.
+    const useXmppLogin = !!(cfg.xmppUser && cfg.xmppPassword);
+    const connection = new JitsiMeetJS.JitsiConnection(
+      null,
+      useXmppLogin ? null : cfg.jwt,
+      { hosts, serviceUrl, clientNode: 'https://jitsi.org/jitsimeet' },
+    );
 
     let conference: any = null;
     // AudioContext condiviso: serve a "consumare" le track audio remote
@@ -645,7 +668,14 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         void finish();
       },
     );
-    connection.connect();
+    // `connect({id, password})` → login SASL: il JID è quello passato, quindi
+    // il dominio nascosto. Senza argomenti resta il path anonimo/JWT.
+    if (useXmppLogin) {
+      log(`login XMPP come ${cfg.xmppUser}`);
+      connection.connect({ id: cfg.xmppUser, password: cfg.xmppPassword });
+    } else {
+      connection.connect();
+    }
     // Setup completato → risolviamo SUBITO il page.evaluate. Tenere questa
     // Promise pending per TUTTA la sessione bloccava la consegna dei
     // bindingCalled di Puppeteer (le exposeFunction onTrackChunk): i chunk
