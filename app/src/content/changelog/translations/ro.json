@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Sala de așteptare: o pagină și o piață în care alegi să intri",
+    "notes": [
+      "Sala de așteptare este acum o pagină curată, conformă cu sistemul de design: evenimentul, comenzile audio și video, numele, conversația. Jocul mic din caseta laterală a fost eliminat.",
+      "Piața interactivă se deschide doar dacă o alegi și ocupă tot ecranul. Comenzile paginii rămân alături — nume, microfon, cameră, conversație, anunțuri — și te poți întoarce oricând. Cine preferă fără animație poate trece la versiunea clasică, iar alegerea este reținută.",
+      "Avataruri: dacă adresa cu care te-ai înscris are un Gravatar, acesta poate apărea acum ca imagine în sală. Administratorul îl activează, iar serverul nostru face cererea: browserul participanților nu contactează niciodată gravatar.com.",
+      "Componenta care înregistrează evenimentul nu mai apare printre participanți și nici în numărătoare: este un serviciu intern, nu o persoană în sală. Anunțul că evenimentul este înregistrat rămâne la locul lui."
+    ]
+  },
   "0.8.5": {
     "title": "Chat mai viu: mențiuni, reacții, corectări și export",
     "notes": [

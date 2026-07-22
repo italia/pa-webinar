@@ -81,7 +81,20 @@ export async function GET(request: NextRequest) {
   // con l'opzione spenta nessuna richiesta parte verso Gravatar: se la
   // decidesse solo il chiamante, questa route resterebbe una sonda Gravatar
   // aperta a chiunque, e quella frase sarebbe falsa. Letture in cache (60s).
-  const gravatarAllowed = hash ? (await getSettings()).gravatarEnabled : false;
+  //
+  // In `catch` si NEGA. Questa route non aveva alcuna dipendenza dal database,
+  // e Jitsi ne diffonde l'URL a tutta la sala: durante un riavvio di Postgres
+  // ogni riquadro mostrerebbe un errore invece di una faccia. Senza risposta
+  // dalle impostazioni, l'avatar generato è sempre una risposta valida — e nel
+  // dubbio non si contatta un terzo.
+  let gravatarAllowed = false;
+  if (hash) {
+    try {
+      gravatarAllowed = (await getSettings()).gravatarEnabled;
+    } catch {
+      gravatarAllowed = false;
+    }
+  }
 
   if (hash && gravatarAllowed) {
     const gravatar = await tryGravatar(hash, size);

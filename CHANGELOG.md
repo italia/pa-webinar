@@ -10,6 +10,15 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.8.6 — 2026-07-22
+
+**The waiting room: a page, and a square you choose to enter**
+
+- The waiting room is now a clean page that follows the design system: the event, the audio and video controls, your name, the chat. The small game that used to sit in the side box is gone.
+- The interactive square opens only if you choose it, and it fills the screen. The page's own controls stay beside it — name, microphone, camera, chat, notices — and you can step back out whenever you like. Anyone who would rather have no animation can switch to the classic version, and that choice is remembered.
+- Avatars: if the address you registered with has a Gravatar, it can now appear as your picture in the room. An administrator turns it on, and our server makes the request: participants' browsers never contact gravatar.com.
+- The component that records the event no longer appears among the participants or in the headcount: it is an internal service, not someone in the room. The notice that the event is being recorded stays exactly where it was.
+
 ## 0.8.5 — 2026-07-22 🔒
 
 **A livelier chat: mentions, reactions, corrections and export**

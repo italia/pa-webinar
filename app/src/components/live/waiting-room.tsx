@@ -483,12 +483,15 @@ export default function WaitingRoom({
   // riporta all'invito.
   const gameDialogRef = useRef<HTMLDivElement>(null);
   const inviteRef = useRef<HTMLButtonElement>(null);
+  const classicToggleRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef(false);
   useEffect(() => {
     if (!gameOpen) {
       if (returnFocusRef.current) {
         returnFocusRef.current = false;
-        inviteRef.current?.focus();
+        // L'invito, se c'è ancora; passando alla versione classica sparisce, e
+        // allora il posto giusto è il pulsante che riporta indietro.
+        (inviteRef.current ?? classicToggleRef.current)?.focus();
       }
       return;
     }
@@ -592,6 +595,7 @@ export default function WaitingRoom({
   const goClassic = () => {
     setGameOpen(false);
     toggleClassic(true);
+    returnFocusRef.current = true;
   };
 
   // ── Toggle between the full-screen park and the static classic card ──
@@ -1002,6 +1006,9 @@ export default function WaitingRoom({
           <button type="button" className="wr-piazza-btn" onClick={goClassic}>
             {t('classicVersion')}
           </button>
+          {isLive && (
+            <p className="wr-piazza-hint mb-0">{t('gardenGateHint')}</p>
+          )}
         </div>
       </div>
     </PhaserLobbyBoundary>
@@ -1037,7 +1044,15 @@ export default function WaitingRoom({
   ) : null;
 
   return (
-    <div className={piazzaOpen ? 'waiting-shell waiting-shell--piazza' : 'waiting-shell'}>
+    <div
+      className={piazzaOpen ? 'waiting-shell waiting-shell--piazza' : 'waiting-shell'}
+      // In piazza il guscio copre tutta la finestra: l'intestazione e il piè di
+      // pagina del sito restano DIETRO, invisibili ma ancora tabulabili. Con
+      // `aria-modal` le tecnologie assistive ignorano ciò che sta fuori.
+      {...(piazzaOpen
+        ? { role: 'dialog' as const, 'aria-modal': true, 'aria-label': t('gardenDialogLabel') }
+        : {})}
+    >
       {/* Fratello, non sostituto: `{false}` occupa comunque la sua posizione
           fra i figli, quindi il container qui sotto resta lo STESSO nodo React
           aprendo e chiudendo la piazza — niente smontaggi, niente fotocamera
@@ -1193,7 +1208,14 @@ export default function WaitingRoom({
                     touch default). Only when the game is actually available. */}
                 {!isEnded && !multitrackRequired && classicView && (
                   <div className="text-center mb-3">
-                    <Button color="primary" outline size="sm" className="fw-semibold" onClick={() => toggleClassic(false)}>
+                    <Button
+                      color="primary"
+                      outline
+                      size="sm"
+                      className="fw-semibold"
+                      innerRef={classicToggleRef}
+                      onClick={() => toggleClassic(false)}
+                    >
                       <Icon icon="it-arrow-left" size="xs" className="me-1" />
                       {t('backToGarden')}
                     </Button>

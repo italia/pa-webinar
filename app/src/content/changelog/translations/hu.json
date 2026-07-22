@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "A váróterem: egy oldal és egy tér, ahová magad döntesz belépni",
+    "notes": [
+      "A váróterem mostantól letisztult oldal a tervezési rendszer szerint: az esemény, a hang- és képbeállítások, a név, a csevegés. Az oldaldobozban lévő kis játékot eltávolítottuk.",
+      "Az interaktív tér csak akkor nyílik meg, ha kéred, és kitölti a képernyőt. Az oldal vezérlői mellette maradnak — név, mikrofon, kamera, csevegés, tájékoztatók —, és bármikor visszaléphetsz. Aki animáció nélkül szeretné, átválthat a klasszikus változatra; a választás megmarad.",
+      "Profilképek: ha a regisztrációhoz használt címhez tartozik Gravatar, mostantól megjelenhet képként a teremben. Az adminisztrátor kapcsolja be, és a kérést a mi kiszolgálónk küldi: a résztvevők böngészője soha nem lép kapcsolatba a gravatar.com-mal.",
+      "Az eseményt rögzítő összetevő már nem jelenik meg a résztvevők között és a létszámban sem: belső szolgáltatás, nem a teremben ülő személy. A rögzítésről szóló tájékoztatás változatlan marad."
+    ]
+  },
   "0.8.5": {
     "title": "Élénkebb csevegés: említések, reakciók, javítások és export",
     "notes": [

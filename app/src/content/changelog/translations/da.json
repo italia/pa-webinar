@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Venteværelset: en side og en plads, man selv vælger at gå ind på",
+    "notes": [
+      "Venteværelset er nu en ren side efter designsystemet: begivenheden, lyd- og videoindstillingerne, navnet, chatten. Det lille spil i sideboksen er fjernet.",
+      "Den interaktive plads åbnes kun, hvis du vælger den, og fylder hele skærmen. Sidens egne kontroller bliver ved siden af — navn, mikrofon, kamera, chat, oplysninger — og du kan gå tilbage, når du vil. Den, der helst er fri for animation, kan skifte til den klassiske version, og valget huskes.",
+      "Avatarer: hvis den adresse, du tilmeldte dig med, har en Gravatar, kan den nu vises som dit billede i rummet. En administrator slår det til, og vores server sender forespørgslen: deltagernes browsere kontakter aldrig gravatar.com.",
+      "Komponenten, der optager begivenheden, vises ikke længere blandt deltagerne eller i optællingen: den er en intern tjeneste, ikke en person i rummet. Oplysningen om, at begivenheden optages, bliver stående."
+    ]
+  },
   "0.8.5": {
     "title": "En mere levende chat: omtaler, reaktioner, rettelser og eksport",
     "notes": [

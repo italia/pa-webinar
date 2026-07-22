@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Odotustila: sivu ja tori, johon astutaan omasta valinnasta",
+    "notes": [
+      "Odotustila on nyt selkeä sivu suunnittelujärjestelmän mukaisesti: tapahtuma, ääni- ja kuva-asetukset, nimi, keskustelu. Sivulaatikossa ollut pieni peli on poistettu.",
+      "Vuorovaikutteinen tori avautuu vain, jos sen valitset, ja täyttää koko näytön. Sivun omat säätimet pysyvät vieressä — nimi, mikrofoni, kamera, keskustelu, ilmoitukset — ja voit palata milloin tahansa. Ilman animaatiota haluava voi siirtyä klassiseen näkymään, ja valinta muistetaan.",
+      "Profiilikuvat: jos ilmoittautumisosoitteeseesi liittyy Gravatar, se voi nyt näkyä kuvana huoneessa. Ylläpitäjä ottaa sen käyttöön, ja pyynnön tekee oma palvelimemme: osallistujien selaimet eivät ota koskaan yhteyttä gravatar.comiin.",
+      "Tapahtumaa tallentava osa ei enää näy osallistujissa eikä laskennassa: se on sisäinen palvelu, ei henkilö huoneessa. Ilmoitus tallentamisesta pysyy ennallaan."
+    ]
+  },
   "0.8.5": {
     "title": "Eloisampi chat: maininnat, reaktiot, korjaukset ja vienti",
     "notes": [

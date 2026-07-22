@@ -1,4 +1,13 @@
 {
+  "0.8.6": {
+    "title": "Čakáreň: stránka a námestie, na ktoré sa vstupuje z vlastnej vôle",
+    "notes": [
+      "Čakáreň je teraz prehľadná stránka podľa dizajnového systému: podujatie, ovládanie zvuku a obrazu, meno, chat. Malá hra v bočnom rámčeku bola odstránená.",
+      "Interaktívne námestie sa otvorí, len keď si ho vyberiete, a zaplní celú obrazovku. Ovládacie prvky stránky zostávajú vedľa — meno, mikrofón, kamera, chat, upozornenia — a kedykoľvek sa môžete vrátiť. Kto uprednostňuje verziu bez animácie, prepne na klasickú; voľba sa zapamätá.",
+      "Avatary: ak má adresa, ktorou ste sa prihlásili, Gravatar, môže sa teraz zobraziť ako obrázok v miestnosti. Zapína to správca a požiadavku posiela náš server: prehliadače účastníkov sa s gravatar.com nespájajú.",
+      "Súčasť, ktorá podujatie nahráva, sa už neobjavuje medzi účastníkmi ani v počte: je to interná služba, nie človek v miestnosti. Upozornenie, že sa podujatie nahráva, zostáva."
+    ]
+  },
   "0.8.5": {
     "title": "Živší chat: označenia, reakcie, opravy a export",
     "notes": [

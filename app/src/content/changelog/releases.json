@@ -1,5 +1,9 @@
 [
   {
+    "version": "0.8.6",
+    "date": "2026-07-22"
+  },
+  {
     "version": "0.8.5",
     "date": "2026-07-22",
     "security": true
