@@ -5,6 +5,7 @@ import {
   shouldReclaimEmptyOvertime,
   reviveStatus,
   emptyCloseCutoff,
+  shouldDemoteLiveToIdle,
 } from './lifecycle';
 
 // Frozen reference time for deterministic comparisons.
@@ -345,5 +346,84 @@ describe('emptyCloseCutoff — authoritative empty-close (#12)', () => {
   });
   it('returns now - N minutes when minutes > 0', () => {
     expect(emptyCloseCutoff(NOW, 10)?.getTime()).toBe(minutes(-10).getTime());
+  });
+});
+
+// ── shouldDemoteLiveToIdle ──────────────────────────────────
+
+describe('shouldDemoteLiveToIdle', () => {
+  const GRACE_MIN = 45;
+  const at = (iso: string) => new Date(iso);
+  const cutoffFor = (nowIso: string) =>
+    new Date(at(nowIso).getTime() - GRACE_MIN * 60_000);
+
+  it('does NOT demote an event that has only just started', () => {
+    // The production incident: a registrant opened the event page an hour early,
+    // /wake warmed the room, nobody had joined yet when the event went LIVE —
+    // and three minutes in the scaler demoted it and killed the bridge.
+    expect(
+      shouldDemoteLiveToIdle({
+        lastActiveAt: null,
+        provisioningStartedAt: at('2026-07-22T08:12:00Z'),
+        startsAt: at('2026-07-22T09:15:00Z'),
+        inactiveCutoff: cutoffFor('2026-07-22T09:18:00Z'),
+      }),
+    ).toBe(false);
+  });
+
+  it('demotes a room nobody ever joined, once the grace has passed since the start', () => {
+    expect(
+      shouldDemoteLiveToIdle({
+        lastActiveAt: null,
+        provisioningStartedAt: at('2026-07-22T08:12:00Z'),
+        startsAt: at('2026-07-22T09:15:00Z'),
+        inactiveCutoff: cutoffFor('2026-07-22T10:05:00Z'), // start + 50 min
+      }),
+    ).toBe(true);
+  });
+
+  it('measures from the last activity when the room did have traffic', () => {
+    const startsAt = at('2026-07-22T09:15:00Z');
+    // Emptied 50 minutes ago → stale.
+    expect(
+      shouldDemoteLiveToIdle({
+        lastActiveAt: at('2026-07-22T10:00:00Z'),
+        provisioningStartedAt: at('2026-07-22T09:00:00Z'),
+        startsAt,
+        inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+      }),
+    ).toBe(true);
+    // Someone was there 5 minutes ago → not stale.
+    expect(
+      shouldDemoteLiveToIdle({
+        lastActiveAt: at('2026-07-22T10:45:00Z'),
+        provisioningStartedAt: at('2026-07-22T09:00:00Z'),
+        startsAt,
+        inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+      }),
+    ).toBe(false);
+  });
+
+  it('a fresh warm-up protects a long-past start (an event revived by /wake)', () => {
+    expect(
+      shouldDemoteLiveToIdle({
+        lastActiveAt: null,
+        provisioningStartedAt: at('2026-07-22T10:48:00Z'),
+        startsAt: at('2026-07-22T08:00:00Z'),
+        inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+      }),
+    ).toBe(false);
+  });
+
+  it('takes the LATEST signal, never the earliest', () => {
+    // Old activity + old warm-up + recent start → not stale.
+    expect(
+      shouldDemoteLiveToIdle({
+        lastActiveAt: at('2026-07-22T06:00:00Z'),
+        provisioningStartedAt: at('2026-07-22T06:00:00Z'),
+        startsAt: at('2026-07-22T10:45:00Z'),
+        inactiveCutoff: cutoffFor('2026-07-22T10:50:00Z'),
+      }),
+    ).toBe(false);
   });
 });
