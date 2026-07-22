@@ -413,7 +413,13 @@
     "sidebarTabChatUnread": "Nuovi messaggi non letti",
     "floatingControlsLabel": "Controlli evento",
     "screenshareActive": "🖥️ {name} sta condividendo lo schermo",
-    "screenshareFallbackName": "Un partecipante"
+    "screenshareFallbackName": "Un partecipante",
+    "timer": {
+      "show": "Mostra il contatore",
+      "hide": "Nascondi il contatore",
+      "remainingLabel": "Tempo rimanente (clicca per il tempo trascorso)",
+      "elapsedLabel": "Tempo trascorso (clicca per il tempo rimanente)"
+    }
   },
   "qa": {
     "title": "Domande e Risposte",

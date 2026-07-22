@@ -34,6 +34,7 @@ import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
 import WordCloud from '@/components/live/word-cloud';
+import EventTimer from '@/components/live/event-timer';
 import LiveShareButton from '@/components/live/live-share-button';
 import WaitingRoom, {
   type WaitingRoomJoinPrefs,
@@ -1348,6 +1349,8 @@ export default function LiveEventClient({
         onLeaveRoom={handleLeaveRoom}
         isFullscreen={isFullscreen}
         modalContainer={modalContainer}
+        startsAt={event.startsAt}
+        endsAt={event.endsAt}
         onToggleFullscreen={toggleFullscreen}
       />
 
@@ -2340,6 +2343,9 @@ interface LiveTopBarProps {
   onToggleFullscreen?: () => void;
   /** Fullscreen element to portal the share modal into while fullscreen is on. */
   modalContainer?: HTMLElement;
+  /** Orario dell'evento per il contatore in barra (B4). */
+  startsAt?: string;
+  endsAt?: string;
 }
 
 function LiveTopBar({
@@ -2359,6 +2365,8 @@ function LiveTopBar({
   isFullscreen,
   onToggleFullscreen,
   modalContainer,
+  startsAt,
+  endsAt,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -2501,6 +2509,17 @@ function LiveTopBar({
                 it-fullscreen is the four-corners glyph people expect here. */}
             <Icon icon={isFullscreen ? 'it-collapse' : 'it-fullscreen'} size="xs" color="white" />
           </Button>
+        )}
+        {startsAt && endsAt && (
+          <EventTimer
+            startsAt={startsAt}
+            endsAt={endsAt}
+            // Acceso di default per chi conduce la sala: la richiesta arriva da
+            // lì ("regolare al meglio i vari interventi"), e un orologio che
+            // scorre addosso al pubblico è pressione che nessuno ha chiesto.
+            // Chiunque può accenderlo dall'icona, e la scelta resta salvata.
+            defaultVisible={role === 'moderator'}
+          />
         )}
         <LiveShareButton
           slug={slug}

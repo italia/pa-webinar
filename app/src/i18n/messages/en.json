@@ -413,6 +413,12 @@
       "moderatorWarning": "This link grants MODERATOR access (mute everyone, start recording, end the event). Share it only with other moderators.",
       "moderatorLink": "Moderator link",
       "moderatorLinkHint": "Anyone opening this link joins as a moderator with full control of the room."
+    },
+    "timer": {
+      "show": "Show the timer",
+      "hide": "Hide the timer",
+      "remainingLabel": "Time remaining (click for time elapsed)",
+      "elapsedLabel": "Time elapsed (click for time remaining)"
     }
   },
   "qa": {
