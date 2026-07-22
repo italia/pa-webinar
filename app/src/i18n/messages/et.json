@@ -96,7 +96,11 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Laadi alla .ics fail"
-      }
+      },
+      "alreadyRegisteredEnter": "Oled juba registreerunud? Sisene ruumi",
+      "invalidTokenTitle": "Ligipääsulink ei kehti enam",
+      "invalidTokenBody": "Kasutatud link on vigane või aegunud. Kui oled registreerunud, otsi oma isiklik link kinnituskirjast või registreeru allpool uuesti.",
+      "invalidTokenBodyEnded": "Kasutatud link ei kehti enam. Sündmus on lõppenud: allpool leiad salvestise ja materjalid."
     },
     "manage": {
       "toggleChat": "Vestlus",
@@ -116,6 +120,20 @@
     "list": {
       "filterByTag": "Filtreeri kategooria järgi",
       "allTags": "Kõik"
+    },
+    "wordCloudTitle": "Sõnapilv",
+    "recap": {
+      "title": "Sündmuse kokkuvõte",
+      "intro": "Ülevaade sellest, mis sündmuse jooksul esile kerkis.",
+      "participants": "Osalejad (tipphetkel)",
+      "registered": "Registreerunud",
+      "topQuestions": "Enim hääletatud küsimused",
+      "upvotes": "{count, plural, =0 {poolthääli pole} one {1 poolthääl} other {# poolthäält}}",
+      "polls": "Küsitluste tulemused",
+      "votes": "{count, plural, =0 {hääli pole} one {1 hääl} other {# häält}}",
+      "topWords": "Enim jagatud sõnad",
+      "feedback": "Keskmine hinnang",
+      "feedbackCount": "{count, plural, one {1 vastus} other {# vastust}}"
     }
   },
   "registration": {
@@ -164,8 +182,11 @@
       "consentRequired": "Nõusolek andmetöötluseks on kohustuslik",
       "recordingConsentRequired": "Selle ürituse jaoks on salvestamise nõusolek kohustuslik",
       "eventFull": "Üritus on saavutanud osalejate maksimaalse arvu",
-      "generic": "Registreerumisel ilmnes viga. Palun proovige uuesti."
-    }
+      "generic": "Registreerumisel ilmnes viga. Palun proovige uuesti.",
+      "multitrackConsentRequired": "Sellel sündmusel on nõusolek sinu heliraja salvestamiseks kohustuslik"
+    },
+    "successScheduledMessage": "Oled registreerunud! Saatsime sulle e-kirja isikliku ligipääsulingiga. Lisa sündmus kalendrisse ja tule veidi enne algust tagasi.",
+    "addToCalendar": "Lisa kalendrisse"
   },
   "videoLibrary": {
     "title": "Videoteek",
@@ -252,7 +273,33 @@
       "noMessages": "Sõnumeid pole",
       "empty": "Sõnumeid veel pole. Kirjutage esimesena!",
       "inputLabel": "Vestlussõnum",
-      "moderatorBadge": "Moderaator"
+      "moderatorBadge": "Moderaator",
+      "attach": "Lisa fail",
+      "emojiPicker": "Lisa emoji",
+      "attachBadType": "Failitüüp ei ole toetatud (pildid või PDF).",
+      "attachTooLarge": "Fail on liiga suur (kuni 10 MB).",
+      "attachFailed": "Üleslaadimine ebaõnnestus. Proovi uuesti.",
+      "sendFailed": "Sõnumit ei saadetud. Proovi uuesti.",
+      "removeAttachment": "Eemalda manus",
+      "openAttachment": "Ava manus",
+      "reply": "Vasta",
+      "replyingTo": "Vastad kasutajale {name}",
+      "cancelReply": "Tühista vastus",
+      "hide": "Peida",
+      "hideFailed": "Sõnumit ei õnnestunud peita. Proovi uuesti.",
+      "connReconnecting": "Taasühendumine…",
+      "connDegraded": "Uuendused hilinevad",
+      "readDenied": "Vestlus ei ole saadaval: sa ei ole selle sündmuse osalejate seas või ruum ei ole veel avatud. Proovin automaatselt uuesti.",
+      "mentionNotificationTitle": "{name} mainis sind vestluses",
+      "react": "Reageeri",
+      "edited": "muudetud",
+      "editLabel": "Muuda sõnumit",
+      "editSave": "Salvesta",
+      "editFailed": "Sõnumit ei õnnestunud muuta.",
+      "exportChat": "Laadi vestlus alla",
+      "reactNotAllowed": "Sõnumitele reageerimiseks on vaja isiklikku või moderaatori linki.",
+      "editNotAllowed": "See link on jagatud, seega sellega ei saa sõnumeid muuta.",
+      "editExpired": "Möödunud on rohkem kui 15 minutit: seda sõnumit ei saa enam muuta."
     },
     "role": {
       "moderator": "Moderaator",
@@ -271,7 +318,9 @@
         "medium": "Keskmine",
         "poor": "Halb",
         "unknown": "Pole saadaval"
-      }
+      },
+      "volume": "Helitugevus",
+      "volumeFor": "{name} helitugevus"
     },
     "moderator": {
       "muteAll": "Vaigista kõik",
@@ -295,14 +344,17 @@
       "micDisabled": "Mikrofon välja lülitatud",
       "videoModeration": "Osalejate video",
       "videoDisabled": "Video välja lülitatud",
-      "eventEndedSuccess": "Üritus on edukalt lõpetatud. Suunamine..."
+      "eventEndedSuccess": "Üritus on edukalt lõpetatud. Suunamine...",
+      "whiteboard": "Tahvel",
+      "lowerHand": "Langeta käsi"
     },
     "closeDrawer": "Sulge",
     "hintBanner": {
       "controls": "Juhtnupud on all",
       "raiseHand": "Tõstke käsi rääkimiseks",
       "sidebar": "Q&A ja vestlus külgribal",
-      "dismiss": "Selge"
+      "dismiss": "Selge",
+      "ariaLabel": "Nõuanded"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# inimene} other {# inimest}}"
@@ -310,7 +362,55 @@
     "sidebarTabChatUnread": "Uued lugemata sõnumid",
     "floatingControlsLabel": "Sündmuse juhtnupud",
     "screenshareActive": "🖥️ {name} jagab oma ekraani",
-    "screenshareFallbackName": "Osaleja"
+    "screenshareFallbackName": "Osaleja",
+    "share": {
+      "button": "Jaga",
+      "title": "Jaga sündmust",
+      "callLink": "Osalemise link",
+      "callLinkHint": "Kes selle lingi avab, siseneb sündmuse ajal otse; muul juhul suunatakse ta registreerumisele. Link ei sisalda salajasi tunnuseid.",
+      "eventLink": "Sündmuse leht",
+      "eventLinkHint": "Avalik leht sündmuse üksikasjade ja registreerumisvormiga.",
+      "copy": "Kopeeri",
+      "copied": "Kopeeritud!",
+      "moderatorReveal": "Näita moderaatori linki",
+      "moderatorWarning": "See link annab MODERAATORI õigused (kõigi vaigistamine, salvestamise käivitamine, sündmuse lõpetamine). Jaga seda ainult teiste moderaatoritega.",
+      "moderatorLink": "Moderaatori link",
+      "moderatorLinkHint": "Kes selle lingi avab, siseneb moderaatorina ja saab ruumi täielikult juhtida."
+    },
+    "enterFullscreen": "Täisekraan",
+    "exitFullscreen": "Välju täisekraanilt",
+    "leaveChoice": {
+      "title": "Kuidas soovid lahkuda?",
+      "body": "Võid lahkuda üksi – kõne jääb teiste jaoks alles – või lõpetada selle kõigi osalejate jaoks.",
+      "leaveSelf": "Lahku üksi",
+      "endForAll": "Lõpeta kõigi jaoks",
+      "ending": "Lõpetan…",
+      "endError": "Kõne lõpetamine ebaõnnestus. Proovi uuesti."
+    },
+    "endDestino": {
+      "title": "Sündmuse saatus",
+      "body": "Oled lõpetamas sündmust kõigi jaoks. Mis peaks sellega pärast lõppu juhtuma?",
+      "public": "Jäta avalikuks",
+      "publicHelp": "Lõppenud sündmuse leht jääb nähtavaks koos kokkuvõtte, küsimuste, küsitluste, materjalide ja tagasisidega.",
+      "library": "Avalda videokogus",
+      "libraryHelp": "Nagu ülal, lisaks kuvatakse sündmust avalikus videokogus (eeldab avaldatud salvestist või YouTube'i videot).",
+      "archive": "Arhiveeri (privaatne)",
+      "archiveHelp": "Lõppenud sündmuse leht ei ole avalik (404). Andmeid hoitakse säilitustähtaja lõpuni, seejärel kustutatakse.",
+      "genAi": "Loo salvestisest AI transkriptsioon ja kokkuvõte (kui töötlus on lõppenud)",
+      "back": "Tagasi",
+      "confirm": "Lõpeta sündmus"
+    },
+    "liveFeaturesLabel": "Funktsioonid:",
+    "whiteboardNotSavedHint": "Tahvlit ei salvestata automaatselt. Kui seda kasutad, ekspordi see (tahvli menüüst) ja lisa enne lõpetamist sündmuse materjalide juurde.",
+    "sidebarTabWordcloud": "Sõnapilv",
+    "sidebarTabAgenda": "Märkmed / kontrollnimekiri",
+    "liveToggleAgenda": "Märkmed / kontrollnimekiri (päevakava)",
+    "timer": {
+      "show": "Näita taimerit",
+      "hide": "Peida taimer",
+      "remainingLabel": "Järelejäänud aeg (klõpsa, et näha kulunud aega)",
+      "elapsedLabel": "Kulunud aeg (klõpsa, et näha järelejäänud aega)"
+    }
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -407,12 +507,31 @@
         "maxParticipantsHelp": "Hinnake osalejate maksimaalset arvu. Määrab videoserveri mahu ja ooteruumi liidese.",
         "validation": {
           "startsAt": "Algusaeg pole kehtiv.",
-          "endsAt": "Lõpukuupäev peab olema pärast alguskuupäeva."
+          "endsAt": "Lõpukuupäev peab olema pärast alguskuupäeva.",
+          "titleRequired": "Pealkiri on kohustuslik (vähemalt 3 tähemärki).",
+          "titleRequiredOtherLocale": "Pealkiri vaikekeeles ({locale}) on kohustuslik: mine vahekaardile {locale}.",
+          "maxParticipants": "Sisesta arv vahemikus 2 kuni 500."
         },
         "senderRatioLabel": "Hinnanguline aktiivsete osakaal",
         "senderRatioHelp": "Mitu osalejat eeldatavasti aktiveerib mikrofoni/video. Aitab kohandada videoserveri mahtu.",
         "activeParticipantsEstimate": "≈ {count} aktiivset osalejat",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "advancedOptions": "Täpsemad valikud",
+        "waitingRoomEngineLabel": "Ooteruum (see sündmus)",
+        "waitingRoomEngineSiteDefault": "Saidi vaikeväärtus",
+        "waitingRoomEngineGarden": "Aed (tavaline)",
+        "waitingRoomEngineGame": "Videomäng (Phaseri ooteala)",
+        "waitingRoomEngineClassic": "Klassikaline (staatiline)",
+        "waitingRoomEngineHelp": "Kirjutab selle sündmuse jaoks saidi vaikeväärtuse üle.",
+        "videoQuality": "Video/heli kvaliteet (see sündmus)",
+        "videoQualityHelp": "Kirjutab selle sündmuse jaoks saidi vaikeväärtuse üle. Kõrgem kvaliteet kulutab rohkem ribalaiust.",
+        "videoQualitySiteDefault": "Saidi vaikeväärtus",
+        "videoQualityOptions": {
+          "MAX": "Maksimaalne (1080p, parim kvaliteet)",
+          "HIGH": "Kõrge (720p, soovituslik)",
+          "BALANCED": "Tasakaalustatud (540p)",
+          "SAVE_DATA": "Andmesääst (360p)"
+        }
       },
       "step2": {
         "heading": "Kes mida saab teha",
@@ -449,7 +568,8 @@
             "desc": "Käivitada/peatada salvestus."
           }
         },
-        "recordingHeading": "Salvestus"
+        "recordingHeading": "Salvestus",
+        "roomFeaturesHeading": "Ruumi funktsioonid"
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
@@ -484,7 +604,8 @@
         "invalidEmail": "E-posti aadress pole kehtiv.",
         "duplicateEmail": "Aadress on juba lisatud.",
         "rubricaPick": "Otsi aadressraamatust…",
-        "rubricaOrAdd": "või lisa käsitsi"
+        "rubricaOrAdd": "või lisa käsitsi",
+        "organizerLogo": "Korraldaja logo"
       },
       "step4": {
         "heading": "Sisu ja materjalid",
@@ -544,7 +665,9 @@
           "recording": "Salvestus",
           "recordingAuto": "Sees — automaatne käivitus",
           "recordingManual": "Sees — käsitsi käivitus",
-          "recordingOff": "Väljas"
+          "recordingOff": "Väljas",
+          "multitrack": "Osalejapõhine salvestamine",
+          "multitrackOn": "Sees – nõuab registreerumisel selgesõnalist nõusolekut"
         },
         "noRecurrence": "Üksiksündmus",
         "gdprHeading": "Privaatsus ja andmete säilitamine",
@@ -560,9 +683,24 @@
         "featuresHeading": "Konfiguratsiooni kokkuvõte",
         "privacyDoc": "Privaatsusteabe dokument (PDF või link)",
         "privacyDocHelp": "Laadige üles PDF või kleepige asendava teabe URL. Olemasolul kirjutab IKÜM-i malli üle.",
-        "privacyTextHelp": "Lühike tekst, mis kuvatakse registreerimisvormil; võib täiendada või asendada IKÜM-i malli."
+        "privacyTextHelp": "Lühike tekst, mis kuvatakse registreerimisvormil; võib täiendada või asendada IKÜM-i malli.",
+        "moderatorPublishHint": "Sündmuse avaldamiseks on nimi ja e-posti aadress kohustuslikud (neid kasutatakse moderaatori lingi ja kinnituskirja jaoks). Mustandina salvestamiseks neid ei nõuta.",
+        "moderatorLinkNote": "See inimene on sündmuse peamoderaator: ta saab e-postiga privaatse lingi sündmuse haldamiseks (salvestamise käivitamine, küsimuste modereerimine, küsitluste käivitamine…). See erineb sammus „Inimesed“ lisatud kaasmoderaatoritest, kes saavad igaüks oma lingi.",
+        "moderatorRequired": "Sisesta moderaatori nimi",
+        "moderatorEmailRequired": "Sisesta moderaatori kehtiv e-posti aadress"
       },
-      "validationFailed": "Enne jätkamist kontrollige esiletõstetud välju."
+      "validationFailed": "Enne jätkamist kontrollige esiletõstetud välju.",
+      "partialFailure": "Sündmus loodi, kuid mõnda elementi ei salvestatud: {items}. Saad need lisada sündmuse lehelt.",
+      "draftFound": "Leidsime selle sündmuse salvestamata mustandi. Kas taastame selle?",
+      "draftRestore": "Taasta mustand",
+      "draftDiscard": "Loobu",
+      "resources": {
+        "organizers": "korraldajad",
+        "invitations": "kutsed",
+        "moderators": "moderaatorid",
+        "speakers": "esinejad",
+        "materials": "materjalid"
+      }
     },
     "nav": {
       "events": "Ürituste haldus",
@@ -603,7 +741,8 @@
       "eventQuestionnaires": "Küsimustikud",
       "rubricaList": "Loend",
       "rubricaDetail": "Detail",
-      "feedbackDashboard": "Feedback"
+      "feedbackDashboard": "Feedback",
+      "recordingsPostprod": "Transkriptsioonid / AI"
     },
     "landing": {
       "title": "Halduspaneel",
@@ -701,7 +840,8 @@
           "dateRequired": "Algne kuupäev on kohustuslik.",
           "saveFailed": "Metaandmete salvestamine ebaõnnestus."
         }
-      }
+      },
+      "updateFailed": "Uuendamine ebaõnnestus."
     },
     "recordingsLibrary": {
       "title": "Videosalvestused",
@@ -770,7 +910,10 @@
       "detailEnd": "Lõpp",
       "detailModerator": "Moderaator",
       "detailRoom": "Jitsi ruum",
-      "detailFilename": "Failinimi"
+      "detailFilename": "Failinimi",
+      "transcriptManage": "Halda transkriptsiooni / AI-d",
+      "transcriptReady": "Transkribeeritud",
+      "transcriptProcessing": "Töötlemisel"
     },
     "gdprAudit": {
       "title": "IKÜM-i audit",
@@ -1023,7 +1166,32 @@
       "retentionPreviewRecordings": "Videosalvestised",
       "retentionPreviewKept": "Koondstatistika ja ürituse metaandmed säilitatakse.",
       "configPreview": "Seadistuse eelvaade",
-      "templateApplied": "Mall rakendatud: {name}. Saate kõiki seadeid muuta."
+      "templateApplied": "Mall rakendatud: {name}. Saate kõiki seadeid muuta.",
+      "agendaEnabled": "Otsemärkmed / kontrollnimekiri (päevakava)",
+      "agendaEnabledDesc": "Käsitletavate teemade kontrollnimekiri, mille moderaatorid sündmuse ajal punkthaaval tehtuks märgivad. Läheb automaatsesse kokkuvõttesse. Valikuline ja sisselülitatav ka sündmuse ajal.",
+      "whiteboardEnabled": "Jagatud tahvel",
+      "whiteboardEnabledDesc": "Lubab sisseehitatud koostöötahvli (Excalidraw): moderaatorid saavad selle sündmuse ajal tööriistaribalt avada. Kiirkõnedes alati sees.",
+      "aiSectionHeading": "Automaatne järeltöötlus",
+      "aiSectionDesc": "Pärast sündmuse lõppu saab salvestist töödelda klastrisisese tehisintellekti töövooga, et luua transkriptsioon, kokkuvõte ning soovi korral tõlked ja dubleering. Kõik toimub osakonna taristus, andmeid ei edastata kolmandatele isikutele.",
+      "aiTranscriptEnabled": "Automaatne transkribeerimine",
+      "aiTranscriptEnabledDesc": "Kõnetuvastus koos kõnelejate tuvastamisega. Vajalik kokkuvõtte, tõlgete ja dubleerimise sisselülitamiseks.",
+      "aiSummaryEnabled": "Kokkuvõte ja peatükid",
+      "aiSummaryEnabledDesc": "Koosoleku kokkuvõte, tehtud otsused, tegevusülesanded ja jaotus ajatemplitega peatükkideks.",
+      "aiTranslationEnabled": "Tõlge teistesse keeltesse",
+      "aiTranslationEnabledDesc": "Transkriptsioon ja kokkuvõte tõlgitakse allpool määratud keeltesse.",
+      "aiTargetLocales": "Tõlkekeeled",
+      "aiTargetLocalesDesc": "ISO keelekoodid (nt en, fr, de) komadega eraldatult. Jäta tühjaks, et kasutada saidi tasemel määratud keeli.",
+      "aiTargetLocalesRequired": "Määra vähemalt üks tõlkekeel või lülita automaatne tõlge välja.",
+      "aiDubbingEnabled": "Heli dubleerimine",
+      "aiDubbingEnabledDesc": "Dubleeritud heli sihtkeeltes, loodud eeltreenitud sünteeshäältega. Osalejate häält ei kloonita.",
+      "consentBadge": "Selgesõnaline nõusolek",
+      "retentionBadge": "Pikendab säilitusaega",
+      "multitrackRecordingEnabled": "Osalejapõhine salvestamine (suur täpsus)",
+      "multitrackRecordingEnabledDesc": "Salvestab iga osaleja jaoks eraldi heliraja, nii et transkriptsioon omistab kindlalt, kes mida ütles (enam mitte „Kõneleja 1/2“). Töödeldakse üksiku kõneleja eraldatud heli (tundlikud isikuandmed): rajad on ajutised ja kustutatakse kohe pärast transkribeerimist. Nõuab nõusolekut salvestamiseks.",
+      "retainParticipantTracks": "Säilita osalejapõhised helirajad",
+      "retainParticipantTracksDesc": "Hoiab üksikud helirajad alles ka pärast transkribeerimist – allalaaditava arhiivi ja kõnelejapõhise taasesituse jaoks. TÄHELEPANU: see pikendab tundlike isikuandmete (eraldatud hääl) säilitamist kuni sündmuse säilitustähtajani. Lülita sisse ainult vajaduse korral ning piisava nõusoleku ja teavituse olemasolul.",
+      "expectedSpeakers": "Eeldatav kõnelejate arv",
+      "expectedSpeakersDesc": "Kui see on teada (nt 3 esinejat), parandab selle määramine kõnelejate tuvastamise kvaliteeti. Jäta tühjaks, et otsustamine jääks töövoo hooleks."
     },
     "links": {
       "title": "Ürituse lingid",
@@ -1123,7 +1291,8 @@
         "pages": "Lehed",
         "footer": "Jalus",
         "features": "Funktsioonid",
-        "scaling": "Infra mõõtmine"
+        "scaling": "Infra mõõtmine",
+        "postprod": "Sündmusejärgne AI töövoog"
       },
       "scaling": {
         "intro": "Parameetrid, mis kirjeldavad klastri mahtu, kus platvorm töötab. Vaikeväärtused on kalibreeritud Azure F16s_v2 (16 vCPU / 32 GiB) JVB jaoks ja F4s_v2 (4 vCPU / 8 GiB) Jibri jaoks. Kui kasutate teist riistvara, värskendage siin — skaleerija arvutab kohe ümber.",
@@ -1285,7 +1454,55 @@
         "jvbProvisioningTimeoutMinutes": "Ettevalmistuse ajalimiit (minutid)",
         "jvbProvisioningTimeoutMinutesHelp": "Mitu minutit pärast startsAt JVB-ga ette valmistamata sündmus märgitakse oleku lehel 'halvenenuks'. Vaikeväärtus 15. Katab sõlme külmkäivituse (~3-5 min) pluss turvavaru.",
         "statusPollIntervalSeconds": "Olekulehe küsitlemise intervall (sekundid)",
-        "statusPollIntervalSecondsHelp": "Mitu sekundit /status leht brauseri poolt värskendab. Vaikeväärtus 30. Madalamad väärtused = värskemad andmed, kuid suurem koormus rakendusele."
+        "statusPollIntervalSecondsHelp": "Mitu sekundit /status leht brauseri poolt värskendab. Vaikeväärtus 30. Madalamad väärtused = värskemad andmed, kuid suurem koormus rakendusele.",
+        "jvbEmptyCloseMinutes": "Tühja ruumi minutid enne lõplikku sulgemist",
+        "jvbEmptyCloseMinutesHelp": "Kui LIVE-ruum, kus on juba osalejaid käinud, püsib nii mitu minutit tühjana, suletakse see lõplikult (ENDED) – nii lõpeb moderaatorita sündmus tegevusetuse tõttu ise, ilma kavandatud lõpuaega ootamata. Vaikimisi 15 (sees). -1 = välja lülitatud. 0 = sulge esimesel tühja ruumi kontrollil.",
+        "waitingRoomLeadMinutes": "Ooteruumi suunamise aken (minutites)",
+        "waitingRoomLeadMinutesHelp": "Kui registreerud nii mitu minutit enne algust, satud kohe ooteruumi; varem registreerunud näevad kinnitust koos kalendrilingiga. 0 = kuni alguseni näidatakse alati kinnituslehte. Soovituslik 15.",
+        "reactionsMode": "Reaktsioonid (emoji)",
+        "reactionsModeNative": "Jitsi natiivsed (juhtribal, hetkelised)",
+        "reactionsModeCustom": "Rakenduse kohandatud (vasakpoolsel ribal, statistikaga)",
+        "reactionsModeHelp": "Natiivsed = Jitsi enda reaktsiooninupp juhtribal, kerged ja hetkelised (ei loendata). Kohandatud = rakenduse reaktsiooniriba all vasakul koos loenduste ja statistikaga. Vaikimisi: natiivsed.",
+        "emailSenderTitle": "E-kirjade saatja",
+        "emailSenderHelp": "Kuidas saatja registreerunu postkastis paistab. Saatmisaadress jääb juurutuse seadistusse (see peab vastama aadressile, mille kasutamiseks on SMTP-serveril luba).",
+        "emailFromName": "Saatja nimi",
+        "emailFromNameHelp": "Tühi = kasutatakse juurutuses seadistatud nime (SMTP_FROM_NAME). E-kirjad saadetakse endiselt süsteemi aadressilt.",
+        "emailReplyTo": "Vastamisaadress",
+        "emailReplyToHelp": "E-kirjad saadetakse no-reply aadressilt: ilma selleta ei jõua vastus kellenigi.",
+        "avatarTitle": "Osalejate pildid",
+        "gravatarEnabled": "Kasuta Gravatari, kui see on olemas",
+        "gravatarEnabledHelp": "Osalejad, kes registreerusid e-posti aadressiga, millel on Gravatar, näevad seda ruumis pildina; kõigil teistel jäävad platvormi loodud initsiaalid. Pilt tuuakse läbi meie enda serveri, seega osalejate brauserid ei võta ühendust saidiga gravatar.com – küll aga teeb seda platvorm: märgi see privaatsusteatesse."
+      },
+      "postprod": {
+        "prerequisitesNote": "Järeltöötlus töötab kogu salvestisega pärast sündmuse lõppu. Spetsiaalne GPU-kogum ärkab, kui järjekorda jõuab esimene töö, ja lülitub välja, kui järjekord tühjeneb – nii hoitakse kulud kontrolli all. Enne töövoo sisselülitamist veendu, et klastris on seadistatud GPU-kogum, paigaldatud NVIDIA operaator, nimeruumis olemas HuggingFace’i mandaadid ja spetsiaalsele kettale eellaaditud mudelite kaalud. Töökorralduslik kontrollnimekiri on failis docs/POSTPROD.md.",
+        "pipelineEnabled": "Sündmusejärgne töövoog aktiivne",
+        "pipelineEnabledHelp": "Üldlüliti. Kui see on välja lülitatud, ei looda uute sündmuste jaoks ühtegi transkriptsiooni, kokkuvõtet, tõlget ega dubleeringut, isegi kui üksikutel sündmustel on järeltöötlus sisse lülitatud. Juba loodud artefakte ei näidata enam avalikult, kuni lülitad töövoo uuesti sisse. Kasulik töövoo peatamiseks ilma rakendust uuesti juurutamata.",
+        "timingNote": "Töövoog ei sekku otseülekandesse. Kõik toimub pärast sündmuse lõppu, kui salvestis arhiveeritakse: subtiitrid ja kokkuvõte ei ole kunagi reaalajas saadaval. See valik eelistab transkriptsiooni kvaliteeti ja hoiab GPU-kulu väiksemana kui otsesubtiitrite puhul.",
+        "providersSection": "Tehisintellekti mootorid",
+        "providersIntro": "Transkribeerimiseks, kokkuvõtete koostamiseks ja dubleerimiseks kasutatavad mootorid määratakse juurutamise ajal. Uue lisamine nõuab sekkumist taristusse (mootori juurutamine klastris, registreerimine toetatud pakkujate nimekirjas, skeemipoolne uuendus). Allolevad rippmenüüd näitavad selles paigalduses praegu saadaolevaid mootoreid.",
+        "asrProvider": "Transkriptsioonimootor",
+        "asrProviderHelp": "Loob video transkriptsiooni koos ajamärgistuse ja kõnelejate eristamisega. Kasutame WhisperX large-v3 koos pyannote.audio’ga diarisatsiooniks. Mõlemad mudelid töötavad klastris spetsiaalsele kettale laaditud kaaludega.",
+        "asrOptionWhisperx": "WhisperX large-v3 + pyannote diarisatsioon",
+        "llmProvider": "Kokkuvõtte- ja tõlkemootor",
+        "llmProviderHelp": "Koostab koosoleku kokkuvõtte, tuvastab käsitletud teemad ning tõlgib transkriptsiooni ja kokkuvõtte sihtkeeltesse. Mudel Mistral-Small-3.2-24B (Euroopa pakkuja, Apache 2.0 litsents), teenindatud klastrisisese vLLM-i kaudu.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM klastris",
+        "ttsEngine": "Dubleerimismootor",
+        "ttsEngineHelp": "Sünteesib heli valitud keeltes, kasutades avalikke eeltreenitud hääli. Kui kõnelejaid on mitu, saab iga kõneleja saadaolevast kogumist erineva hääle, et vestlust oleks lihtsam jälgida: määramine on suvaline ega taasesita mingil moel osalejate tegelikku häält. Dubleering luuakse ainult siis, kui korraldaja seda konkreetse sündmuse jaoks soovib.",
+        "ttsOptionPiper": "Piper TTS · eeltreenitud sünteeshääled",
+        "voiceCloningSection": "Toimetuspõhimõte hääle kohta",
+        "voiceCloningNote": "Süsteem kasutab ainult üldisi sünteeshääli (Piper TTS, avalikud mudelid MIT-litsentsi all). See ei analüüsi, ei salvesta ega taasesita osalejate häält: iga kõnelejat esindab kogumist pärinev hääl, mis valitakse deterministlikult kõneaja põhjal, ilma igasuguse seoseta tema häälelise identiteediga. Määratud hääl muutub koos iga sündmuse kõnelejate koosseisuga, seega võib sama esineja olla eri sündmustel dubleeritud eri häältega. See valik välistab IKÜM-i artiklis 9 reguleeritud biomeetriliste andmete töötlemise.",
+        "defaultTargetLocales": "Vaikimisi tõlkekeeled",
+        "defaultTargetLocalesHelp": "ISO-639-1 keelekoodid komadega eraldatult (nt `en,fr,de`). Neid kasutatakse sündmuste puhul, mis ei määra oma tõlkekeeli. Sündmuse lähtekeel jäetakse alati automaatselt välja.",
+        "limitsSection": "Operatiivsed piirangud",
+        "maxConcurrentJobs": "Paralleelsed tööd",
+        "maxConcurrentJobsHelp": "Suurim arv töid, mida töövoog GPU-kogumis korraga käivitab. Suuremad väärtused tühjendavad järjekorda kiiremini, kui mitu sündmust lõpeb järjest, kuid nõuavad vabu GPU-sid. Tüüpiline väärtus on 2.",
+        "jobMaxAttempts": "Katseid enne ebaõnnestumist",
+        "jobMaxAttemptsHelp": "Mitu korda töövoog tööd uuesti proovib, enne kui märgib selle ebaõnnestunuks. Katsete vaheline ooteaeg kasvab eksponentsiaalselt (30 sekundist kuni 2 tunnini). Tüüpiline väärtus on 5.",
+        "artifactRetentionDays": "Artefaktide säilitamine (päevades)",
+        "artifactRetentionDaysHelp": "Väärtusega 0 järgivad AI artefaktid sündmuse enda säilitustähtaega. Nullist suurem väärtus hoiab neid määratud arvu päevi ka pärast sündmuse sulgemist, kuni igapäevane cron need kustutab. Kustutamine hõlmab kõnelejate nimesid ja tööde andmeid kooskõlas failiga docs/GDPR.md.",
+        "consentDisclosureSection": "AI teavitus ooteruumis",
+        "consentDisclosureHelp": "Tekst, mida näidatakse osalejatele ooteruumis, kui sündmus kasutab AI järeltöötlust (transkribeerimine, kokkuvõte, tõlge, dubleerimine). Kohandatav keelte kaupa. Jäta tühjaks, et kasutada süsteemi vaiketeksti.",
+        "consentDisclosurePlaceholder": "Nt Sellest sündmusest tehakse pärast otseülekannet AI tööriistadega automaatselt transkriptsioon ja kokkuvõte…"
       }
     },
     "analytics": {
@@ -1372,7 +1589,23 @@
       "screen": "Ekraanijagamine",
       "pickerTitle": "Valige mall",
       "pickerSubtitle": "Valige mall ürituse seadete eelseadistamiseks või jätke vahele, et kõik käsitsi seadistada.",
-      "skipTemplate": "Seadista käsitsi"
+      "skipTemplate": "Seadista käsitsi",
+      "whiteboardLabel": "Tahvel",
+      "waitingRoomEngineLabel": "Ooteruum (malli vaikeväärtus)",
+      "waitingRoomEngineSiteDefault": "Saidi vaikeväärtus",
+      "waitingRoomEngineGarden": "Aed (tavaline)",
+      "waitingRoomEngineGame": "Videomäng (Phaseri ooteala)",
+      "waitingRoomEngineClassic": "Klassikaline (staatiline)",
+      "waitingRoomEngineHelp": "Täidab sellest mallist loodud sündmuste ooteruumi mootori ette. Viisardis saab seda muuta.",
+      "durationLabel": "Vaikimisi kestus (minutites)",
+      "durationHint": "Täidab sündmuse lõpu ette (algus + kestus). Kasutaja saab seda muuta. Tühi = 2 tundi.",
+      "retentionLabel": "Vaikimisi andmete säilitamine (päevades)",
+      "expectedSpeakersLabel": "Eeldatav kõnelejate arv (vaikimisi)",
+      "descriptionTemplateLabel": "Vaikimisi kirjeldus",
+      "descriptionTemplateHint": "Tekst, mis täidetakse sündmuse kirjeldusse ette (muudetav).",
+      "aiTranscript": "Automaatne transkribeerimine (vaikimisi)",
+      "aiSummary": "Automaatne kokkuvõte (vaikimisi)",
+      "aiTranslation": "Automaatne tõlge (vaikimisi)"
     },
     "instantCall": {
       "title": "Kiire videokõne",
@@ -1456,7 +1689,8 @@
       },
       "errors": {
         "saveFailed": "Salvestamine ebaõnnestus. Kontrollige andmeid ja proovige uuesti."
-      }
+      },
+      "deleteTitle": "Kustuta mall"
     },
     "emailTemplates": {
       "title": "E-kirjade mallid",
@@ -1637,7 +1871,8 @@
       "play": "Esita",
       "hidePlayer": "Peida mängija",
       "download": "Lae alla",
-      "deleteConfirm": "Kustutada see sessioon ja sellega seotud salvestus?"
+      "deleteConfirm": "Kustutada see sessioon ja sellega seotud salvestus?",
+      "deleteTitle": "Kustuta sessioon"
     },
     "monitoring": {
       "title": "Seire",
@@ -1798,7 +2033,9 @@
         "settings": "Seaded",
         "people": "Inimesed",
         "content": "Sisu",
-        "audit": "Salvestused ja audit"
+        "audit": "Salvestused ja audit",
+        "postEvent": "Sündmusejärgne",
+        "analytics": "Statistika"
       },
       "toggles": {
         "unmute": "Osalejad saavad rääkida",
@@ -1820,7 +2057,22 @@
         "postEventSummary": "{connected} liitus {registered} registreeringust (hinnatud {estimated})",
         "estimatedAttendance": "Hinnanguliselt: {estimated} osalejat"
       },
-      "copyGuestUrl": "Kopeeri külalislink"
+      "copyGuestUrl": "Kopeeri külalislink",
+      "aiManageTitle": "Transkriptsioon, kokkuvõte ja tõlked",
+      "aiManageDesc": "Halda selle salvestise AI järeltöötlust: paranda transkriptsiooni ja kõnelejate omistamist (kes mida ütleb), muuda kokkuvõtet ja halda tõlkekeeli.",
+      "aiManageCta": "Ava järeltöötluse haldus",
+      "aiManageNotEnded": "Saadaval siis, kui sündmus on lõppenud ja AI töövoog on salvestise töödelnud.",
+      "aiGenerateCta": "Loo AI kohe",
+      "aiGenerateRunning": "Käivitamine…",
+      "aiGenerateQueued": "AI töövoog käivitatud: transkribeerimine ja kokkuvõte on järjekorras. Jälgi edenemist järeltöötluse halduses.",
+      "aiGenerateAlready": "AI töövoog oli selle salvestise jaoks juba käivitatud: uusi töid ei lisatud.",
+      "aiGenerateError": "AI töövoogu ei õnnestunud käivitada. Kontrolli, kas AI on saidi tasemel lubatud ja kas salvestis on olemas.",
+      "aiGenerateHelp": "Lubab ühe klõpsuga AI transkribeerimise ja kokkuvõtte ning käivitab salvestisel töövoo. Idempotentne: kaks korda klõpsamine ei tekita topelttöid.",
+      "aiGenerateNoRecording": "Salvestis puudub: sündmusejärgne AI vajab salvestist (jäädvustamine toimub ainult sündmuse ajal). Järeltöötlust saad siiski siin hallata.",
+      "duplicateNext": "Dubleeri järgmise korra jaoks",
+      "duplicateNextBusy": "Dubleerimine…",
+      "duplicateNextHint": "Loob mustandi, mis kannab üle kogu selle sündmuse seadistuse (salvestamine, eraldi rajad, AI, päevakava, meeldetuletused). Kui sündmusel on kordumissagedus, nihkub kuupäev järgmisele korrale; muul juhul jääb see sinu määrata.",
+      "duplicateNextError": "Dubleerimine ebaõnnestus. Proovi uuesti."
     },
     "rubrica": {
       "title": "Aadressraamat",
@@ -1838,6 +2090,299 @@
     "eventQuestionnaires": {
       "title": "Küsimustikud — {eventTitle}",
       "subtitle": "Konfigureerige eelregistreerimise ja/või sündmusejärgne küsimustik, kombineerides malle ja ad-hoc küsimusi."
+    },
+    "eventAnalytics": {
+      "title": "Statistika",
+      "loadError": "Statistikat ei õnnestunud laadida.",
+      "noData": "Andmed puuduvad.",
+      "notEndedYet": "Sündmus ei ole veel lõppenud: statistika on osaline ja uueneb reaalajas.",
+      "cappedNote": "Väga suur sündmus: mõned mõõdikud on arvutatud valimi põhjal (ridade ülempiir saavutatud).",
+      "scoreTitle": "Tähelepanu tase",
+      "adminOnly": "ainult administraatorile",
+      "scoreProxy": "Indeks 0–100 selle kohta, kui aktiivselt saal osales. See on osaluse kaudne näitaja, mitte kognitiivse tähelepanu mõõdik – loe seda sündmuse vormi kontekstis (loeng vs töötuba), mitte kunagi kvaliteedihindena.",
+      "scoreUnavailable": "Taseme arvutamiseks pole piisavalt andmeid.",
+      "comp": {
+        "attendanceRate": "Kohalolek (sisenenud/registreerunud)",
+        "breadth": "Suhtluse ulatus",
+        "depth": "Suhtluse sügavus",
+        "chatRate": "Vestluse tempo",
+        "liveParticipation": "Otseosalus",
+        "talkBalance": "Kõneaja tasakaal",
+        "retention": "Püsivus"
+      },
+      "kpiConversion": "Konversioon",
+      "kpiPeak": "Osalejate tipp",
+      "kpiDuration": "Kestus",
+      "kpiInteractors": "Unikaalsed suhtlejad",
+      "interactionsWord": "interaktsiooni",
+      "kpiHandRaises": "Käetõsted",
+      "handRaisesSessionsSub": "{n, plural, one {# sessioonist} other {# sessioonist}}",
+      "kpiReactions": "Reaktsioonid",
+      "kpiRetention": "Keskmine püsivus",
+      "dwellSub": "{d} · {n, plural, one {# mõõdetud} other {# mõõdetud}}",
+      "reactionsTitle": "Reaktsioonid",
+      "timelineTitle": "Kõne aktiivsus ajas",
+      "timelineEmpty": "Kõne ajal ei registreeritud ühtegi interaktsiooni.",
+      "timelinePeak": "Suhtluse tipp kell {at} ({n} sündmust selles ajavahemikus).",
+      "kind": {
+        "chat": "Vestlus",
+        "question": "Küsimused",
+        "upvote": "Poolthääled",
+        "poll": "Küsitlused",
+        "word": "Sõnapilv",
+        "reaction": "Reaktsioonid"
+      },
+      "speakersTitle": "Kes rääkis",
+      "audioUnavailable": "Helistatistika pole saadaval – sündmust ei salvestatud (või salvestises polnud kõnet).",
+      "predominant": "Peamine kõneleja",
+      "talkBalance": "Tasakaal",
+      "speechDensity": "Kõne tihedus",
+      "chatTitle": "Vestlus",
+      "chatAudience": "Publik",
+      "chatStaff": "Meeskond",
+      "qaTitle": "Enim hääletatud küsimused",
+      "none": "Puuduvad.",
+      "pollsTitle": "Küsitlused",
+      "wordsTitle": "Sõnapilv",
+      "feedbackTitle": "Tagasiside",
+      "responses": "vastust",
+      "privacyNote": "Isikupõhine statistika on vaikimisi pseudonüümitud. Anonüümsed koondnäitajad säilitatakse sündmuse kokkuvõttes; toorandmete read kustutatakse säilitustähtaja möödudes."
+    },
+    "postprod": {
+      "title": "AI järeltöötluse töövoog",
+      "subtitle": "Klastrisisese AI töövoo loodud transkriptsioonid, kokkuvõtted ja tõlked. Seosta kõnelejad, käivita tööd uuesti või tühista need.",
+      "filterStatus": "Olek",
+      "all": "Kõik",
+      "queued": "Järjekorras",
+      "running": "Töös",
+      "done": "Valmis",
+      "partial": "Osaline",
+      "failed": "Ebaõnnestunud",
+      "totalRows": "{count, plural, =0 {salvestisi pole} one {1 salvestis} other {# salvestist}}",
+      "colEvent": "Sündmus",
+      "colCreated": "Loodud",
+      "colDuration": "Kestus",
+      "colStatus": "Olek",
+      "colJobs": "Tööd",
+      "colArtifacts": "Artefaktid",
+      "colActions": "Toimingud",
+      "rerun": "Käivita uuesti",
+      "rerunTooltip": "Loob uue käivituse, suurendades runCount’i; varasemad artefaktid säilivad kuni säilitustähtajani",
+      "cancel": "Tühista",
+      "cancelConfirm": "Kas tühistada kõik selle salvestise ootel tööd?",
+      "rerunFailed": "Uuesti käivitamine ebaõnnestus (HTTP {code})",
+      "cancelFailed": "Tühistamine ebaõnnestus (HTTP {code})",
+      "speakerUpdateFailed": "Kõneleja uuendamine ebaõnnestus (HTTP {code})",
+      "loadError": "Tööde nimekirja ei õnnestunud laadida",
+      "empty": "Ükski salvestis ei vasta filtritele",
+      "detailJobs": "Tööd",
+      "detailArtifacts": "Artefaktid",
+      "detailSpeakers": "Kõnelejad",
+      "noArtifacts": "Ühtegi artefakti pole veel loodud",
+      "noSpeakers": "Ühtegi kõnelejat ei tuvastatud",
+      "attempts": "katse {n}",
+      "speakerPlaceholder": "Pärisnimi (valikuline)",
+      "speakerSpoke": "Kõneaeg: {sec} s",
+      "suggestedApply": "Rakenda soovitus: {name}",
+      "suggestedTitle": "Nimi, mille AI töövoog pakkus transkriptsioonis mainitud pärisnimede põhjal. Klõpsa, et see väljale lisada (saad seda enne salvestamist veel muuta).",
+      "save": "Salvesta",
+      "editTranscript": "Muuda transkriptsiooni",
+      "editClose": "Sulge redaktor",
+      "editTranscriptTitle": "Transkriptsiooni redaktor",
+      "editHint": "Paranda teksti või määra iga lõigu kõneleja uuesti. Salvestamisel uuendatakse transkriptsioon ja lähtekeele subtiitrid. Tõlkeid ja dubleeringut EI looda uuesti: kui vajad ka teisi keeli värskena, kasuta nuppu „Käivita uuesti“.",
+      "editLoading": "Transkriptsiooni laadimine…",
+      "editLoadError": "Transkriptsiooni ei õnnestunud laadida (HTTP {code}).",
+      "editNotReady": "Selle salvestise transkriptsioon ei ole veel saadaval. Käivita (või käivita uuesti) AI töötlus ülalolevatest nuppudest: transkribeerimine on esimene samm, seejärel saad seda siin parandada ning luua kokkuvõtte ja tõlked.",
+      "editProcessing": "AI töötlus käib: transkriptsioon ilmub siia, kui see valmib. Värskenda lehte mõne minuti pärast.",
+      "editSessionExpired": "Administraatori sessioon on aegunud. Laadi leht uuesti ja logi transkriptsiooni muutmiseks uuesti sisse.",
+      "editEmpty": "Muudetavaid lõike pole",
+      "editSpeakerNone": "— puudub —",
+      "editSave": "Salvesta muudatused",
+      "editSaving": "Salvestamine…",
+      "editDirty": "{n, plural, one {1 salvestamata muudatus} other {# salvestamata muudatust}}",
+      "editSaved": "Salvestatud: {text} teksti, {speaker} kõnelejat.",
+      "editFailed": "Salvestamine ebaõnnestus (HTTP {code})",
+      "editFailedDetail": "Salvestamine ebaõnnestus: {message}",
+      "editMediaError": "Salvestise heli ei õnnestunud laadida: taasesitus pole saadaval. Lõikude teksti ja kõnelejaid saad siiski parandada.",
+      "summaryLoadError": "Kokkuvõtet ei õnnestunud laadida.",
+      "summaryLoading": "Kokkuvõtte laadimine…",
+      "summaryEmptyProcessing": "AI kokkuvõte ei ole veel valmis: töötlus käib. Värskenda lehte mõne minuti pärast.",
+      "summaryEmptyFailed": "Kokkuvõtte loomine ebaõnnestus. Kontrolli töövoo olekut ja käivita töötlus ülalolevatest nuppudest uuesti.",
+      "summaryEmptyNone": "Selle salvestise jaoks pole ühtegi AI kokkuvõtet loodud. Käivita töötlus ülalolevatest nuppudest.",
+      "editSeek": "Hüppa videos sellesse kohta",
+      "manageTabTranscript": "Transkriptsioon",
+      "manageTabSummary": "Kokkuvõte",
+      "manageTabTranslations": "Tõlked",
+      "manageTabArchive": "Arhiiv",
+      "manageTabReliability": "Usaldusväärsus",
+      "manageLoading": "Laadimine…",
+      "archivePiiNote": "Osalejapõhised eraldatud helirajad on tundlikud isikuandmed (eraldatud hääl): see jaotis on mõeldud ainult administraatoritele ja moderaatoritele ning seda ei avaldata kunagi avalikult.",
+      "archiveNoTracks": "Selle salvestise jaoks pole osalejapõhiseid helirajasid saadaval (mitmerajaline salvestamine ei olnud sees või on rajad IKÜM-i minimeerimise tõttu juba kustutatud).",
+      "archivePlayerTitle": "Kõnelejapõhine taasesitus",
+      "archiveAudioHint": "Kasuta pleieri valikut „Heli“, et kuulata videoga sünkroonis kas miksi või ühe osaleja eraldatud helirada.",
+      "archiveTitle": "Allalaaditav arhiiv",
+      "archiveIntro": "Loo MKV-fail, mis sisaldab videot, iga osaleja helirada (nimega märgistatud, täpselt joondatud) ja subtiitreid. See on mõeldud allalaadimiseks ja arhiveerimiseks: brauserid ei oska MKV sees helirada vahetada, seega kasuta kuulamiseks ülalolevat pleierit.",
+      "archiveGenerate": "Loo arhiiv",
+      "archiveStatusLabel": "Olek",
+      "archiveStatus_none": "loomata",
+      "archiveStatus_pending": "järjekorras",
+      "archiveStatus_running": "töötlemisel",
+      "archiveStatus_done": "valmis",
+      "archiveStatus_failed": "ebaõnnestunud",
+      "archiveDownload": "Laadi MKV alla",
+      "archiveGenerateOk": "Arhiivi loomine käivitatud.",
+      "archiveGenerateErr": "Arhiivi loomine ebaõnnestus (HTTP {code}).",
+      "archiveTrackFallback": "Osaleja",
+      "manageBackToList": "Kõik salvestised",
+      "manageDuration": "Kestus",
+      "manageSource": "Lähtekeel",
+      "manageOpenPublic": "Avalik leht",
+      "manageRerunOk": "Töövoog käivitati uuesti.",
+      "manageRerunNoop": "Ühtegi tööd ei käivitatud: AI on selle sündmuse jaoks välja lülitatud või töövoog on peatatud. Kasuta nuppu „Loo AI“.",
+      "manageRerunAlreadyQueued": "Töötlus on juba järjekorras: uut käivitada pole midagi.",
+      "generateAi": "Loo AI",
+      "generateAiConfirm": "Käivita sellel salvestisel AI töövoog (transkribeerimine ja kokkuvõte). AI töötlus lülitatakse sündmuse jaoks sisse ja käivitub taustal. Tõlked lisatakse hiljem keelte kaupa vahekaardilt „Tõlked“.",
+      "generateAiOk": "AI töövoog käivitatud.",
+      "manageOpen": "Halda",
+      "cancelConfirmTitle": "Tühista järeltöötlus",
+      "speakerUpdateSuccess": "Kõneleja uuendatud",
+      "tm": {
+        "loading": "Tõlkekeelte laadimine…",
+        "loadError": "Tõlkekeeli ei õnnestunud laadida.",
+        "title": "Tõlkekeeled",
+        "sourceLabel": "Lähtekeel:",
+        "already": "Juba tõlgitud:",
+        "noneYet": "Tõlkeid veel pole.",
+        "addLabel": "Lisa keel",
+        "noneAvailable": "Ühtegi keelt pole saadaval",
+        "selectPlaceholder": "Vali keel…",
+        "adding": "Lisamine…",
+        "addButton": "Lisa keel",
+        "unexpectedError": "Ootamatu viga",
+        "note": "Keele lisamine loob transkriptsiooni ja kokkuvõtte tõlke – ning heli dubleeringu, kui see on sündmuse jaoks sisse lülitatud. Töötlus toimub taustal.",
+        "summary": "Kokkuvõte",
+        "subtitles": "Subtiitrid",
+        "dub": "Dubleerimine",
+        "download": "laadi alla",
+        "allTranslated": "Kõik aktiivsed keeled on juba tõlgitud.",
+        "translatedHeader": "Tõlgitud keeled"
+      },
+      "ov": {
+        "tab": "Ülevaade",
+        "intro": "Mida AI töövoog selle salvestise jaoks lõi, keelte kaupa.",
+        "processing": "Töötlus käib või artefakte veel pole. Tule tagasi, kui olek on „Valmis“.",
+        "loadError": "Ülevaadet ei õnnestunud laadida.",
+        "langsTitle": "Keeled ja artefaktid",
+        "colLang": "Keel",
+        "colTranscript": "Transkriptsioon",
+        "colSummary": "Kokkuvõte",
+        "colSubtitles": "Subtiitrid",
+        "colDub": "Dubleerimine",
+        "source": "originaal",
+        "present": "saadaval",
+        "absent": "puudub",
+        "listen": "Kuula",
+        "download": "Laadi alla",
+        "dubTitle": "Heli dubleerimine (üks hääl kõneleja kohta, sünkroonis)",
+        "dubNone": "Dubleeringut ei loodud.",
+        "summaryTitle": "Kokkuvõte",
+        "summaryLang": "Keel",
+        "summaryNone": "Kokkuvõtet pole saadaval.",
+        "decisions": "Otsused",
+        "actions": "Tegevusülesanded",
+        "topics": "Peatükid",
+        "speakersTitle": "Kõnelejad",
+        "speakerAnon": "määramata",
+        "speakerRenameHint": "Nimeta kõnelejad ümber, et nimed parandada: nimi asendab anonüümse sildi nii transkriptsioonis kui ka avalikul lehel.",
+        "speakerNamePlaceholder": "Pärisnimi (nt Mario Rossi)",
+        "speakerNameAria": "Nimi kõnelejale",
+        "save": "Salvesta",
+        "saving": "Salvestamine…",
+        "saved": "Salvestatud",
+        "saveError": "Viga",
+        "editHint": "Teksti, nimede või kokkuvõtte parandamiseks kasuta ülalolevaid vahekaarte.",
+        "kpiDuration": "Kestus",
+        "kpiParticipants": "Osalejad (tipphetkel)",
+        "kpiTracks": "Helirajad",
+        "kpiLanguages": "Keeled",
+        "kpiArtifacts": "Artefaktid",
+        "kpiProcessed": "Töödeldud",
+        "statusLabel": "Olek",
+        "run": "käivitus",
+        "jobsTitle": "Töövoo edenemine",
+        "jobsNone": "Selle salvestise jaoks pole ühtegi tööd.",
+        "attempts": "{n} katset",
+        "filesTitle": "Failid salvestusruumis",
+        "filesNone": "Salvestusruumist ei leitud ühtegi faili.",
+        "filesToggle": "Näita/peida {n} faili",
+        "tracksTitle": "Osalejapõhised helirajad",
+        "tracksNone": "Osalejapõhiseid helirajasid pole (mitmerajaline salvestamine on väljas või on rajad juba kustutatud).",
+        "trackPurged": "kustutatud (IKÜM)",
+        "trackEnters": "sisenes +{s} s",
+        "metricsTitle": "Kokkuvõtte mõõdikud (LLM)",
+        "chars": "tähemärki",
+        "model": "Mudel",
+        "notAvailable": "puudub"
+      },
+      "rel": {
+        "title": "AI usaldusväärsus",
+        "subtitle": "Kui usaldusväärne on selle salvestise jaoks AI loodud tulemus.",
+        "loading": "Usaldusväärsuse analüüs…",
+        "loadError": "Usaldusväärsuse mõõdikuid ei õnnestunud laadida.",
+        "noData": "Selle salvestise jaoks pole AI töötlust tehtud.",
+        "level": {
+          "good": "Usaldusväärne",
+          "fair": "Vastuvõetav",
+          "poor": "Nõrk",
+          "failed": "Ebausaldusväärne"
+        },
+        "overallScore": "Üldine kindlus",
+        "totalTime": "Töötlemise aeg",
+        "sourceLang": "Lähtekeel",
+        "transcriptTitle": "Transkribeerimine",
+        "segments": "Lõigud",
+        "speakers": "Kõnelejad",
+        "speech": "Tuvastatud kõne",
+        "confidence": "Keskmine kindlus",
+        "silence": "Hinnanguline vaikus",
+        "coverage": "Kõne kaetus",
+        "lowConf": "Madala kindlusega lõigud",
+        "transcriptNotProduced": "Transkriptsiooni ei ole veel loodud (töövoogu pole käivitatud).",
+        "transcriptUnavailable": "Transkriptsioon on olemas, kuid seda ei saa siin analüüsida (see on arhiveeritud objektisalvestusse).",
+        "stagesTitle": "Töövoo etapid",
+        "colStage": "Etapp",
+        "colStatus": "Olek",
+        "colModel": "Mudel",
+        "colTime": "Kestus",
+        "colLangs": "Keeled",
+        "warn": {
+          "transcriptEmpty": "Tühi transkriptsioon: lähteheli tundub vaikne või ilma kõneta. Sellest tuletatud kokkuvõte, tõlked ja dubleering EI ole usaldusväärsed.",
+          "lowConfidence": "Transkriptsiooni kindlus on madal: kontrolli tekst enne avaldamist üle.",
+          "manyLowConfSegments": "Palju madala kindlusega lõike: transkriptsioon võib sisaldada vigu.",
+          "highNoSpeech": "Heli on suures osas vaikne või ilma kõneta: transkriptsioon võib olla hallutsineeritud.",
+          "stageFailed": "Etapp „{stage}“ ebaõnnestus.",
+          "stageRetried": "Etapp „{stage}“ lõpetati pärast mitut katset."
+        },
+        "stage": {
+          "TRANSCRIBE": "Transkribeerimine",
+          "TRANSCRIBE_MULTITRACK": "Transkribeerimine (mitmerajaline)",
+          "SUMMARIZE": "Kokkuvõte",
+          "TRANSLATE": "Tõlge",
+          "SUBTITLE": "Subtiitrid",
+          "DUB": "Dubleerimine",
+          "ARCHIVE": "Arhiiv"
+        },
+        "status": {
+          "PENDING": "Ootel",
+          "CLAIMED": "Määratud",
+          "RUNNING": "Töös",
+          "DONE": "Valmis",
+          "FAILED": "Ebaõnnestunud"
+        }
+      },
+      "archiveSourceTitle": "Lähtesalvestis",
+      "archiveSourceHint": "Sündmuse originaalvideo. Eraldi osalejapõhised rajad ja MKV-arhiiv nõuavad mitmerajalist salvestamist (selle sündmuse puhul ei ole see sees).",
+      "archiveSourceDownload": "Laadi originaalvideo alla"
     }
   },
   "email": {
@@ -2326,7 +2871,31 @@
     "overallStatus": "Üldine olek",
     "lastChecked": "Viimati kontrollitud",
     "responseTime": "Vastamisaeg",
-    "systemStatus": "Süsteemi olek"
+    "systemStatus": "Süsteemi olek",
+    "postprod": {
+      "title": "Sündmusejärgne töövoog",
+      "subtitle": "Salvestise transkribeerimine, kokkuvõte, tõlge ja dubleerimine",
+      "whatItDoes": "Kui sündmus lõpeb, läbib salvestis sisemise töövoo: transkriptsiooni loob WhisperX, kokkuvõtte ja tõlked Mistrali mudel, dubleeritud heli Piper TTS. Kõik mudelid töötavad klastri GPU-l, mis on sisse lülitatud ainult töö ajaks, nii et energiakulu järgib tegelikku koormust.",
+      "status": {
+        "idle": "Ootel",
+        "running": "Töös",
+        "degraded": "Häiritud"
+      },
+      "aiBadge": "Selle sündmuse transkriptsioon, kokkuvõte ja dubleering on loodud tehisintellekti mudelitega ja võivad sisaldada ebatäpsusi. Täieliku kindluse saamiseks vaata alati originaalvideot.",
+      "idleMessage": "Töövoog on valmis, praegu pole ühtegi salvestist töödelda.",
+      "queueAriaLabel": "Järeltöötluse järjekorra koosseis",
+      "queuePending": "järjekorras",
+      "queueRunning": "töös",
+      "queueDone": "lõpetatud",
+      "queueFailed": "ebaõnnestunud",
+      "asrProvider": "Transkribeerimine",
+      "llmProvider": "Kokkuvõte/tõlge",
+      "targetLocales": "Sihtkeeled",
+      "lastSuccess": "Viimane õnnestumine {when}",
+      "lastFailure": "Viimane tõrge {when}",
+      "artifactsProduced": "{count, plural, =0 {artefakte pole} one {1 artefakt loodud} other {# artefakti loodud}}",
+      "eventsEnabled": "{count, plural, =0 {AI-ga sündmusi pole} one {1 sündmus aktiivse AI-ga} other {# sündmust aktiivse AI-ga}}"
+    }
   },
   "infraMap": {
     "loading": "Infrastruktuuri kaardi laadimine...",
@@ -2388,7 +2957,8 @@
       "jicofo": "Konverentside koordinaator",
       "jvb": "Videosild",
       "jibri": "Videosalvestus",
-      "smtp": "E-posti teenus"
+      "smtp": "E-posti teenus",
+      "postprod": "Sündmusejärgne AI töövoog"
     },
     "descriptions": {
       "app": "Veebileht, kust pääsete sündmustele ligi",
@@ -2399,7 +2969,8 @@
       "jicofo": "Koordineerib, kes osaleb igas konverentsis",
       "jvb": "Edastab heli ja videot osalejatele",
       "jibri": "Salvestab sündmuste videoseansse",
-      "smtp": "Saadab kinnitusmeile ja meeldetuletusi"
+      "smtp": "Saadab kinnitusmeile ja meeldetuletusi",
+      "postprod": "Transkribeerib, võtab kokku ja tõlgib salvestisi klastrisiseste AI mudelitega (NVIDIA A100 GPU). Aktiveerub ainult siis, kui sündmus kasutab AI funktsioone."
     },
     "verdicts": {
       "app": {
@@ -2447,6 +3018,12 @@
       "smtp": {
         "healthy": "E-posti teenus on seadistatud ja valmis teavituste saatmiseks.",
         "standby": "E-posti teenus ei ole seadistatud. Kinnitusmeile ja meeldetuletusi ei saadeta."
+      },
+      "postprod": {
+        "healthy": "AI töövoog töötleb salvestist (GPU-tööline aktiivne).",
+        "scaling": "Järeltöötluse tööd on järjekorras – GPU-sõlm käivitub (külmkäivitus ~3 min).",
+        "standby": "AI töövoog on sees, kuid ootel: töödelda pole ühtegi salvestist. GPU-sõlm on energia säästmiseks välja lülitatud.",
+        "degraded": "Viimase 24 tunni jooksul ebaõnnestus üks või mitu AI tööd. Üksikasjad leiad aadressilt /admin/postprod."
       }
     },
     "impacts": {
@@ -2459,7 +3036,8 @@
       "jvbStale": "Sündmus ootab silda kauem kui konfigureeritud ajalimiit: osalejad ei saa siseneda.",
       "jibri": "Sündmusi ei saa salvestada. Osalejad saavad endiselt liituda ja osaleda.",
       "jibriStale": "Aktiivse salvestusega sündmus ootab Jibrit kauem kui ajalimiit: sessiooni ei salvestata.",
-      "smtp": "Registreerimise kinnitusmeile ja meeldetuletusi ei saadeta."
+      "smtp": "Registreerimise kinnitusmeile ja meeldetuletusi ei saadeta.",
+      "postprodDegraded": "Mõne hiljutise salvestise transkriptsioone ja kokkuvõtteid ei loodud. Videosalvestised on siiski saadaval."
     },
     "overallVerdicts": {
       "operational": "Kõik teenused töötavad korrektselt. Platvorm on täielikult töökorras.",
@@ -2500,7 +3078,8 @@
       "errorRate": "5xx vead",
       "requestRate": "Päringud/s",
       "podUptime": "Podi töötamisaeg"
-    }
+    },
+    "connPostprod": "AI järeltöötlus"
   },
   "feedback": {
     "title": "Kuidas hindate seda üritust?",
@@ -2590,7 +3169,8 @@
     "buildInfoDev": "arendusversioon",
     "viewCommit": "Vaata committi GitHubis",
     "viewRelease": "Vaata väljalaset GitHubis",
-    "buildDatePrefix": "Ehitatud"
+    "buildDatePrefix": "Ehitatud",
+    "viewChangelog": "Vaata uuendusi (muudatuste logi)"
   },
   "pages": {
     "privacyTitle": "Privaatsuspoliitika",
@@ -2609,7 +3189,26 @@
     "unmute": "Taasta heli",
     "download": "Laadi salvestis alla",
     "speedLabel": "Esituskiirus",
-    "progress": "Edenemisriba"
+    "progress": "Edenemisriba",
+    "subtitles": "Subtiitrid",
+    "subtitlesOff": "Väljas",
+    "audioLabel": "Heli",
+    "audioOriginal": "Originaal",
+    "audioSyntheticBanner": "AI-ga dubleeritud heli – sünteeshääl, automaatselt loodud sisu.",
+    "audioSyntheticHint": "AI loodud heli",
+    "shortcutsHelpOpen": "Näita klaviatuuri kiirklahve",
+    "shortcutsHelpClose": "Sulge klaviatuuri kiirklahvid",
+    "shortcutsTitle": "Klaviatuuri kiirklahvid",
+    "shortcutsSpace": "Esita või peata",
+    "shortcutsArrowsLR": "Liigu 5 sekundit edasi või tagasi",
+    "shortcutsArrowsUD": "Vähenda või suurenda helitugevust 5% võrra",
+    "shortcutsJL": "Liigu 10 sekundit edasi või tagasi",
+    "shortcutsM": "Lülita heli sisse või välja",
+    "shortcutsC": "Näita või peida subtiitrid",
+    "shortcutsF": "Täisekraan",
+    "shortcutsSpeed": "Vähenda või suurenda kiirust",
+    "captionsOn": "Subtiitrid sees",
+    "captionsOff": "Subtiitrid väljas"
   },
   "diagram": {
     "title": "Ürituse seadistus",
@@ -2740,7 +3339,11 @@
     "notConfigured": "Jibri pole infrastruktuuris seadistatud. Videosalvestamine pole saadaval.",
     "disabledHint": "Selle sündmuse jaoks pole videosalvestus lubatud. Selle aktiveerimiseks avage ülal asuv jaotis Seaded ja lülitage sisse \"Salvestus\".",
     "play": "Esita",
-    "download": "Laadi alla"
+    "download": "Laadi alla",
+    "transcriptManage": "Transkriptsioon / AI",
+    "deleteConfirmTitle": "Kustuta salvestis",
+    "deleteFailed": "Kustutamine ebaõnnestus",
+    "deleteSuccess": "Salvestis kustutatud"
   },
   "postEvent": {
     "config": "Üritusejärgne seadistus",
@@ -2758,8 +3361,17 @@
       "qa": "Küsimused ja vastused",
       "materials": "Materjalid",
       "polls": "Küsitlused",
-      "feedback": "Tagasiside"
-    }
+      "feedback": "Tagasiside",
+      "transcript": "AI transkriptsioon"
+    },
+    "pageVisibleHelp": "Kui see on välja lülitatud (või nähtavuse aken on möödunud), tagastab lõppenud sündmuse avalik leht 404 ning sündmus kaob nimekirjadest ja saidikaardilt.",
+    "libraryListed": "Avalda videokogus",
+    "libraryListedHelp": "Näita seda sündmust avalikus kogus (/video-library). Eeldab avaldatud salvestist või YouTube’i videot ja seda, et sündmuse leht oleks nähtav.",
+    "libraryListedNoRecording": "Avaldatud salvestist pole: sündmus ei ilmu kogusse enne, kui avaldad salvestise või lisad YouTube’i video.",
+    "showRecap": "Näita sündmuse kokkuvõtet",
+    "showWordCloud": "Näita sõnapilve",
+    "emailEnabled": "Saada sündmuse lõppedes kokkuvõtlik e-kiri",
+    "emailEnabledHelp": "Lõppemisel saadetakse registreerunud osalejatele tänukiri koos linkidega kokkuvõttele ja tagasisidele ning moderaatorile lühike kokkuvõte. Saadetakse ainult üks kord."
   },
   "provisioning": {
     "loading": "Laadimine",
@@ -2829,5 +3441,125 @@
     "noComments": "No comments",
     "yes": "Jah",
     "no": "Ei"
+  },
+  "agenda": {
+    "title": "Märkmed / kontrollnimekiri",
+    "empty": "Ühtegi punkti veel pole. Lisa käsitletavad teemad ja märgi need töö käigus tehtuks.",
+    "add": "Lisa",
+    "addPlaceholder": "Uus punkt…",
+    "remove": "Eemalda",
+    "inProgress": "pooleli",
+    "agree": "Nõus",
+    "disagree": "Ei ole nõus",
+    "favorablePct": "{pct}% poolt",
+    "noReactions": "Avalda oma arvamus"
+  },
+  "changelog": {
+    "metaTitle": "Uudised ja muudatuste logi",
+    "title": "Uudised ja muudatuste logi",
+    "intro": "Kõik platvormi versioonid, uusimad eespool. Iga kirje võtab kokku peamised uuendused, parandused ja täiustused.",
+    "current": "Praegune versioon",
+    "sourceNote": "Märkused on koostatud projekti siltide, tõmbepäringute ja commit’ide põhjal.",
+    "sourceLink": "Vaata kõiki väljalaskeid GitHubis",
+    "cadence": "Väljalasete rütm",
+    "cadenceSummary": "{count} versiooni ajavahemikus {from} kuni {to}.",
+    "releaseNotes": "Väljalaskemärkmed ja SBOM",
+    "rawChangelog": "CHANGELOG.md hoidlas"
+  },
+  "postprod": {
+    "loading": "Transkriptsiooni laadimine…",
+    "loadError": "Transkriptsiooni ei õnnestunud laadida: {error}",
+    "empty": "Selle sündmuse jaoks pole transkriptsiooni saadaval.",
+    "tabTranscript": "Transkriptsioon",
+    "tabSummary": "Kokkuvõte",
+    "aiBadgeLabel": "AI loodud sisu",
+    "aiBadgeBody": "Transkriptsiooni ja kokkuvõtte koostab automaatselt klastrisisene AI töövoog. Need võivad sisaldada vigu; autoriteetne allikas on video.",
+    "searchPlaceholder": "Otsi transkriptsioonist…",
+    "searchLabel": "Otsi transkriptsioonist",
+    "searchClear": "Tühjenda otsing",
+    "searchNoMatches": "Päringule „{query}“ ei leitud tulemusi.",
+    "searchMatches": "{count, plural, =1 {1 tulemus} other {# tulemust}}",
+    "downloadLabel": "Laadi alla",
+    "downloadMenu": "Allalaadimisvalikud",
+    "downloadTranscriptTxt": "Transkriptsioon (.txt)",
+    "downloadTranscriptSrt": "Subtiitrid (.srt)",
+    "downloadTranscriptVtt": "Subtiitrid (.vtt)",
+    "downloadSummaryMd": "Kokkuvõte (.md)",
+    "hero": {
+      "badge": "Automaatne kokkuvõte",
+      "aiActArt50": "AI loodud sisu",
+      "title": "Lühidalt",
+      "availableIn": "Kokkuvõte on saadaval ka keeltes {langs}",
+      "summaryLanguageLabel": "Kokkuvõtte keel",
+      "topicsLabel": "Peatükid – klõpsa, et liikuda videos sellesse kohta",
+      "keyDecisions": "Tehtud otsused",
+      "actionItems": "Tegevusülesanded",
+      "expandDetails": "Näita otsuseid ja tegevusi",
+      "collapseDetails": "Peida otsused ja tegevused"
+    },
+    "nowSpeaking": "Räägib praegu",
+    "shareSegment": "Jaga seda kohta",
+    "shareSegmentCopied": "Link kopeeriti lõikelauale",
+    "bookmarkAdd": "Salvesta järjehoidjatesse",
+    "bookmarkRemove": "Eemalda järjehoidjatest",
+    "bookmarksHeader": "Sinu järjehoidjad",
+    "bookmarksEmpty": "Sa ei ole veel ühtegi kohta salvestanud. Ava transkriptsiooni lõik ja klõpsa tärnil, et see siia lisada.",
+    "miniPlayerOpen": "Too video esiplaanile",
+    "miniPlayerClose": "Sulge minipleier",
+    "miniPlayerHint": "Püsi lehte kerides video lähedal",
+    "followLive": "Järgi videot",
+    "followManual": "Vaba lugemine",
+    "followResume": "Hakka videot uuesti järgima",
+    "lowConfidenceBadge": "kontrolli",
+    "lowConfidenceTitle": "Sellel transkriptsiooni osal on madal kindlus: salvestises võivad olla teised sõnad. Vaata alati originaalvideot.",
+    "miniTranscriptLabel": "Reaalajas transkriptsioon",
+    "dubAvailableHint": "Dubleeritud heli on saadaval keeltes {langs}. Tõlgitud versiooni kuulamiseks kasuta pleieri juhtnuppude helivalijat.",
+    "provenance": {
+      "triggerLabel": "AI töötluse läbipaistvus",
+      "closeLabel": "Peida töötluse üksikasjad",
+      "intro": "Need on mudelid, mis lõid selle salvestise transkriptsiooni, kokkuvõtte ja dubleeringu. Andmed salvestatakse töötluse lõppedes: näed seda, mida tookord tegelikult kasutati, sõltumata hilisematest seadistuste muudatustest.",
+      "asr": {
+        "title": "Transkribeerimine",
+        "hint": "Kõnetuvastus ja kõnelejate eristamine.",
+        "engine": "Mootor",
+        "model": "Mudel",
+        "version": "Versioon",
+        "diarizationEngine": "Diarisatsioon",
+        "diarizationSpeakers": "Tuvastatud kõnelejad"
+      },
+      "llm": {
+        "title": "Kokkuvõte ja tõlge",
+        "hint": "Koosoleku kokkuvõte ning transkriptsiooni ja kokkuvõtte tõlkimine.",
+        "engine": "Teenindaja",
+        "model": "Mudel",
+        "vendor": "Pakkuja",
+        "license": "Litsents",
+        "country": "Peakorter"
+      },
+      "tts": {
+        "title": "Dubleerimine",
+        "hint": "Kõnesüntees heli loomiseks sihtkeeltes.",
+        "engine": "Mootor",
+        "license": "Litsents",
+        "policy": "Häälte määramise reegel"
+      },
+      "languages": {
+        "title": "Käsitletud keeled",
+        "hint": "Salvestise lähtekeel ning tõlgete ja dubleeringute sihtkeeled.",
+        "source": "Originaalkeel",
+        "translation": "Tõlked",
+        "dubbing": "Dubleeringud",
+        "none": "Puuduvad"
+      },
+      "voices": {
+        "title": "Kõnelejatele määratud sünteeshääled",
+        "male": "meeshääl",
+        "female": "naishääl"
+      },
+      "runAt": "Töötlus lõpetati",
+      "version": "Töövoo versioon"
+    },
+    "overlapBadge": "samaaegne",
+    "overlapTitle": "Samaaegne kõne: selles vahemikus räägib korraga rohkem kui üks inimene."
   }
 }

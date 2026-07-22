@@ -129,6 +129,12 @@ interface LiveEventClientProps {
    *  button (ephemeral); 'CUSTOM' = the app's analytics-backed ReactionBar.
    *  Default 'NATIVE'. */
   reactionsMode?: 'NATIVE' | 'CUSTOM';
+  /** F18 — rnnoise (soppressione rumore avanzata di Jitsi) forzata OFF.
+   *  Default true = spenta, che è il comportamento da validare in una call
+   *  vera prima di cambiarlo. Risolto a RUNTIME dal Server Component (vedi
+   *  lib/jitsi/rnnoise.ts): qui non si può leggere l'env, perché in un
+   *  componente client webpack lo congela nel bundle a build time. */
+  rnnoiseEnforceOff?: boolean;
 }
 
 type LivePhase =
@@ -200,6 +206,7 @@ export default function LiveEventClient({
   watermark,
   jibriAvailable: _jibriAvailable = true,
   reactionsMode = 'NATIVE',
+  rnnoiseEnforceOff = true,
 }: LiveEventClientProps) {
   const t = useTranslations('live');
   const tc = useTranslations('common');
@@ -1431,6 +1438,7 @@ export default function LiveEventClient({
               whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
               videoQuality={event.videoQuality}
               reactionsMode={reactionsMode}
+              rnnoiseEnforceOff={rnnoiseEnforceOff}
               startWithVideoMuted={!joinPrefs.cameraOn}
               startWithAudioMuted={!joinPrefs.micOn}
               watermark={watermark}

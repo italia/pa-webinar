@@ -47,9 +47,74 @@ jobs:
           node-version: "20"
           cache: "npm"
       - run: npm ci
-      - run: npm run test --workspace=app
+      # Con `--coverage`: le soglie in app/vitest.config.ts sono un cricchetto
+      # sul pavimento misurato, quindi qui fallisce se la copertura SCENDE.
+      # Senza questo passaggio quelle soglie non le misurava nessuno.
+      - run: npm run test:coverage --workspace=app
         env:
           DATABASE_URL: postgresql://eventi:test@localhost:5432/pa_webinar_test
+
+
+  # I test dei pacchetti FUORI dai workspace npm.
+  #
+  # `package.json` alla radice dichiara `workspaces: ["app", "lobby"]`, e lo
+  # script `test` gira solo `--workspace=app`. Il risultato e' che 8 file di
+  # test gia' scritti — recorder, recorder-controller — e 7 pytest del worker AI
+  # non venivano eseguiti da NESSUNO: potevano essere rossi da mesi senza che
+  # nulla lo segnalasse. Sono test gia' pagati; qui si limitano a girare.
+  test-infra-node:
+    name: Unit Tests (recorder, controller)
+    runs-on: arc-runner-pa-webinar
+    strategy:
+      fail-fast: false
+      matrix:
+        pkg: [recorder, recorder-controller]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+        working-directory: infra/${{ matrix.pkg }}
+      - run: npx tsc --noEmit -p tsconfig.json
+        working-directory: infra/${{ matrix.pkg }}
+      - run: npm test
+        working-directory: infra/${{ matrix.pkg }}
+
+  # Il workspace `lobby` e' dipendenza runtime dell'app (la piazza della sala
+  # d'attesa) ma non era type-checkato da nessuna parte.
+  typecheck-lobby:
+    name: Typecheck (lobby)
+    runs-on: arc-runner-pa-webinar
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npx tsc --noEmit -p lobby/tsconfig.json
+
+  # Il worker della pipeline AI: 7 file pytest mai eseguiti. Nessuna GPU serve —
+  # i test coprono logica pura (allineamento, VTT, silenzio, archivio).
+  test-ai-worker:
+    name: Unit Tests (worker AI)
+    runs-on: arc-runner-pa-webinar
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Dipendenze minime per i test puri
+        working-directory: infra/ai/worker
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+      - name: pytest
+        working-directory: infra/ai/worker
+        # I test che richiedono modelli o GPU si escludono da soli via skip;
+        # qui interessa che la logica pura non regredisca in silenzio.
+        run: pytest -q
 
   security:
     name: Security Scan

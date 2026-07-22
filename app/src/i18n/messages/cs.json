@@ -96,7 +96,11 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Stáhnout soubor .ics"
-      }
+      },
+      "alreadyRegisteredEnter": "Už jste zaregistrováni? Vstupte do místnosti",
+      "invalidTokenTitle": "Přístupový odkaz už není platný",
+      "invalidTokenBody": "Odkaz, který jste použili, je neplatný nebo jeho platnost vypršela. Pokud jste se zaregistrovali, najděte svůj osobní odkaz v potvrzovacím e-mailu, nebo se zaregistrujte znovu níže.",
+      "invalidTokenBodyEnded": "Odkaz, který jste použili, už není platný. Událost skončila: níže najdete záznam a materiály."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -116,6 +120,20 @@
     "list": {
       "filterByTag": "Filtrovat podle kategorie",
       "allTags": "Všechny"
+    },
+    "wordCloudTitle": "Slovní mrak",
+    "recap": {
+      "title": "Shrnutí události",
+      "intro": "Přehled toho, co během události zaznělo.",
+      "participants": "Účastníci (maximum)",
+      "registered": "Registrovaní",
+      "topQuestions": "Nejvíce hlasované otázky",
+      "upvotes": "{count, plural, =0 {žádné hlasy} one {1 hlas} few {# hlasy} many {# hlasu} other {# hlasů}}",
+      "polls": "Výsledky anket",
+      "votes": "{count, plural, =0 {žádné hlasy} one {1 hlas} few {# hlasy} many {# hlasu} other {# hlasů}}",
+      "topWords": "Nejčastěji sdílená slova",
+      "feedback": "Průměrné hodnocení",
+      "feedbackCount": "{count, plural, one {1 odpověď} few {# odpovědi} many {# odpovědi} other {# odpovědí}}"
     }
   },
   "registration": {
@@ -164,8 +182,11 @@
       "consentRequired": "Souhlas se zpracováním údajů je povinný",
       "recordingConsentRequired": "Souhlas s nahráváním je pro tuto událost povinný",
       "eventFull": "Událost dosáhla maximálního počtu účastníků",
-      "generic": "Chyba při registraci. Zkuste to znovu."
-    }
+      "generic": "Chyba při registraci. Zkuste to znovu.",
+      "multitrackConsentRequired": "Souhlas s nahráváním vaší zvukové stopy je pro tuto událost povinný"
+    },
+    "successScheduledMessage": "Jste zaregistrováni! Poslali jsme vám e-mail s osobním přístupovým odkazem. Přidejte si událost do kalendáře a vraťte se sem krátce před začátkem.",
+    "addToCalendar": "Přidat do kalendáře"
   },
   "videoLibrary": {
     "title": "Videotéka",
@@ -252,7 +273,33 @@
       "noMessages": "Žádné zprávy",
       "empty": "Zatím žádné zprávy. Napište jako první!",
       "inputLabel": "Zpráva chatu",
-      "moderatorBadge": "Moderátor"
+      "moderatorBadge": "Moderátor",
+      "attach": "Přiložit soubor",
+      "emojiPicker": "Vložit emoji",
+      "attachBadType": "Nepodporovaný typ souboru (obrázky nebo PDF).",
+      "attachTooLarge": "Soubor je příliš velký (max. 10 MB).",
+      "attachFailed": "Nahrání se nezdařilo. Zkuste to prosím znovu.",
+      "sendFailed": "Zprávu se nepodařilo odeslat. Zkuste to prosím znovu.",
+      "removeAttachment": "Odebrat přílohu",
+      "openAttachment": "Otevřít přílohu",
+      "reply": "Odpovědět",
+      "replyingTo": "Odpověď na {name}",
+      "cancelReply": "Zrušit odpověď",
+      "hide": "Skrýt",
+      "hideFailed": "Zprávu se nepodařilo skrýt. Zkuste to prosím znovu.",
+      "connReconnecting": "Obnovování spojení…",
+      "connDegraded": "Aktualizace se zpožďují",
+      "readDenied": "Chat není dostupný: nejste mezi účastníky této události, nebo místnost ještě není otevřená. Zkouším to znovu automaticky.",
+      "mentionNotificationTitle": "{name} vás zmínil(a) v chatu",
+      "react": "Reagovat",
+      "edited": "upraveno",
+      "editLabel": "Upravit zprávu",
+      "editSave": "Uložit",
+      "editFailed": "Zprávu se nepodařilo upravit.",
+      "exportChat": "Stáhnout chat",
+      "reactNotAllowed": "K reakcím na zprávy je potřeba váš osobní odkaz nebo odkaz moderátora.",
+      "editNotAllowed": "Tento odkaz je sdílený, a proto neumožňuje upravovat zprávy.",
+      "editExpired": "Uplynulo více než 15 minut: tuto zprávu už nelze upravit."
     },
     "role": {
       "moderator": "Moderátor",
@@ -271,7 +318,9 @@
         "medium": "Střední",
         "poor": "Slabé",
         "unknown": "N/A"
-      }
+      },
+      "volume": "Hlasitost",
+      "volumeFor": "Hlasitost pro {name}"
     },
     "moderator": {
       "muteAll": "Ztlumit všechny",
@@ -295,14 +344,17 @@
       "micDisabled": "Mikrofon vypnutý",
       "videoModeration": "Video účastníků",
       "videoDisabled": "Video vypnuté",
-      "eventEndedSuccess": "Událost úspěšně ukončena. Přesměrování..."
+      "eventEndedSuccess": "Událost úspěšně ukončena. Přesměrování...",
+      "whiteboard": "Tabule",
+      "lowerHand": "Dát ruku dolů"
     },
     "closeDrawer": "Zavřít",
     "hintBanner": {
       "controls": "Ovládací prvky dole",
       "raiseHand": "Zvedněte ruku, chcete-li mluvit",
       "sidebar": "Q&A a chat v bočním panelu",
-      "dismiss": "Rozumím"
+      "dismiss": "Rozumím",
+      "ariaLabel": "Tipy"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# osoba} few {# osoby} other {# osob}}"
@@ -310,7 +362,55 @@
     "sidebarTabChatUnread": "Nové nepřečtené zprávy",
     "floatingControlsLabel": "Ovládání události",
     "screenshareActive": "🖥️ {name} sdílí obrazovku",
-    "screenshareFallbackName": "Účastník"
+    "screenshareFallbackName": "Účastník",
+    "share": {
+      "button": "Sdílet",
+      "title": "Sdílet událost",
+      "callLink": "Odkaz pro připojení",
+      "callLinkHint": "Kdo otevře tento odkaz, připojí se rovnou, dokud událost běží živě; jinak projde registrací. Neobsahuje žádné soukromé tokeny.",
+      "eventLink": "Stránka události",
+      "eventLinkHint": "Veřejná stránka s podrobnostmi a registračním formulářem.",
+      "copy": "Kopírovat",
+      "copied": "Zkopírováno!",
+      "moderatorReveal": "Zobrazit odkaz pro moderátora",
+      "moderatorWarning": "Tento odkaz uděluje přístup MODERÁTORA (ztlumit všechny, spustit nahrávání, ukončit událost). Sdílejte ho pouze s dalšími moderátory.",
+      "moderatorLink": "Odkaz pro moderátora",
+      "moderatorLinkHint": "Kdo otevře tento odkaz, připojí se jako moderátor s plnými právy k řízení místnosti."
+    },
+    "enterFullscreen": "Celá obrazovka",
+    "exitFullscreen": "Ukončit celou obrazovku",
+    "leaveChoice": {
+      "title": "Jak chcete odejít?",
+      "body": "Můžete odejít jen vy — hovor pro ostatní pokračuje — nebo jej ukončit pro všechny účastníky.",
+      "leaveSelf": "Jen odejít",
+      "endForAll": "Ukončit pro všechny",
+      "ending": "Ukončuji…",
+      "endError": "Hovor se nepodařilo ukončit. Zkuste to prosím znovu."
+    },
+    "endDestino": {
+      "title": "Osud události",
+      "body": "Chystáte se ukončit událost pro všechny. Co se s ní má stát po skončení?",
+      "public": "Ponechat veřejnou",
+      "publicHelp": "Stránka ukončené události zůstane viditelná se shrnutím, otázkami, anketami, materiály a zpětnou vazbou.",
+      "library": "Publikovat do knihovny",
+      "libraryHelp": "Jako výše a navíc se událost zobrazí ve veřejné videoknihovně (vyžaduje publikovaný záznam nebo video na YouTube).",
+      "archive": "Archivovat (soukromé)",
+      "archiveHelp": "Stránka ukončené události nebude veřejná (404). Data zůstanou do konce doby uchování, poté se smažou.",
+      "genAi": "Vygenerovat přepis a AI shrnutí ze záznamu (po dokončení zpracování)",
+      "back": "Zpět",
+      "confirm": "Ukončit událost"
+    },
+    "liveFeaturesLabel": "Funkce:",
+    "whiteboardNotSavedHint": "Tabule se neukládá automaticky. Pokud ji použijete, exportujte ji (nabídka tabule) a před ukončením ji přiložte k materiálům události.",
+    "sidebarTabWordcloud": "Slovní mrak",
+    "sidebarTabAgenda": "Poznámky / kontrolní seznam",
+    "liveToggleAgenda": "Poznámky / kontrolní seznam (agenda)",
+    "timer": {
+      "show": "Zobrazit časomíru",
+      "hide": "Skrýt časomíru",
+      "remainingLabel": "Zbývající čas (kliknutím zobrazíte uplynulý čas)",
+      "elapsedLabel": "Uplynulý čas (kliknutím zobrazíte zbývající čas)"
+    }
   },
   "qa": {
     "title": "Otázky a odpovědi",
@@ -407,12 +507,31 @@
         "maxParticipantsHelp": "Odhadněte maximální počet účastníků. Určuje kapacitu videoserveru a UI čekárny.",
         "validation": {
           "startsAt": "Neplatné datum začátku.",
-          "endsAt": "Datum konce musí být po datu začátku."
+          "endsAt": "Datum konce musí být po datu začátku.",
+          "titleRequired": "Název je povinný (alespoň 3 znaky).",
+          "titleRequiredOtherLocale": "Název ve výchozím jazyce ({locale}) je povinný: přepněte na kartu {locale}.",
+          "maxParticipants": "Zadejte číslo mezi 2 a 500."
         },
         "senderRatioLabel": "Odhadovaný podíl aktivních",
         "senderRatioHelp": "Kolik účastníků očekáváte se zapnutým mikrofonem/videem. Pomáhá dimenzovat videoserver.",
         "activeParticipantsEstimate": "≈ {count} aktivních účastníků",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "advancedOptions": "Pokročilé možnosti",
+        "waitingRoomEngineLabel": "Čekárna (tato událost)",
+        "waitingRoomEngineSiteDefault": "Výchozí nastavení webu",
+        "waitingRoomEngineGarden": "Zahrada (běžná)",
+        "waitingRoomEngineGame": "Videohra (lobby Phaser)",
+        "waitingRoomEngineClassic": "Klasická (statická)",
+        "waitingRoomEngineHelp": "Přepíše výchozí nastavení webu pro tuto událost.",
+        "videoQuality": "Kvalita videa/zvuku (tato událost)",
+        "videoQualityHelp": "Přepíše výchozí nastavení webu pro tuto událost. Vyšší kvalita spotřebuje více přenosového pásma.",
+        "videoQualitySiteDefault": "Výchozí nastavení webu",
+        "videoQualityOptions": {
+          "MAX": "Maximální (1080p, vysoká věrnost)",
+          "HIGH": "Vysoká (720p, doporučeno)",
+          "BALANCED": "Vyvážená (540p)",
+          "SAVE_DATA": "Úspora dat (360p)"
+        }
       },
       "step2": {
         "heading": "Kdo může co dělat",
@@ -449,7 +568,8 @@
             "desc": "Spustit/zastavit záznam."
           }
         },
-        "recordingHeading": "Záznam"
+        "recordingHeading": "Záznam",
+        "roomFeaturesHeading": "Funkce místnosti"
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -484,7 +604,8 @@
         "invalidEmail": "Neplatná e-mailová adresa.",
         "duplicateEmail": "Adresa je již zadána.",
         "rubricaPick": "Hledat v adresáři…",
-        "rubricaOrAdd": "nebo přidejte ručně"
+        "rubricaOrAdd": "nebo přidejte ručně",
+        "organizerLogo": "Logo pořadatele"
       },
       "step4": {
         "heading": "Obsah a materiály",
@@ -544,7 +665,9 @@
           "recording": "Záznam",
           "recordingAuto": "Zapnuto — automatické spuštění",
           "recordingManual": "Zapnuto — ruční spuštění",
-          "recordingOff": "Vypnuto"
+          "recordingOff": "Vypnuto",
+          "multitrack": "Nahrávání po jednotlivých účastnících",
+          "multitrackOn": "Zapnuto — vyžaduje výslovný souhlas při registraci"
         },
         "noRecurrence": "Jednorázová událost",
         "gdprHeading": "Soukromí a uchovávání dat",
@@ -560,9 +683,24 @@
         "featuresHeading": "Souhrn konfigurace",
         "privacyDoc": "Dokument s informacemi o ochraně (PDF nebo odkaz)",
         "privacyDocHelp": "Nahrajte PDF nebo vložte URL alternativního textu. Přepíše šablonu GDPR, pokud existuje.",
-        "privacyTextHelp": "Stručný text zobrazený v registračním formuláři; může doplňovat nebo nahradit šablonu GDPR."
+        "privacyTextHelp": "Stručný text zobrazený v registračním formuláři; může doplňovat nebo nahradit šablonu GDPR.",
+        "moderatorPublishHint": "Ke zveřejnění události jsou jméno a e-mail povinné (slouží pro odkaz moderátora a potvrzovací e-mail). Pro uložení konceptu potřeba nejsou.",
+        "moderatorLinkNote": "Tato osoba je hlavním moderátorem události: e-mailem obdrží soukromý odkaz pro její řízení (spuštění nahrávání, moderování otázek, spouštění anket…). Liší se od spolumoderátorů přidaných v kroku „Lidé“, z nichž každý dostane vlastní odkaz.",
+        "moderatorRequired": "Zadejte jméno moderátora",
+        "moderatorEmailRequired": "Zadejte platný e-mail moderátora"
       },
-      "validationFailed": "Před pokračováním zkontrolujte zvýrazněná pole."
+      "validationFailed": "Před pokračováním zkontrolujte zvýrazněná pole.",
+      "partialFailure": "Událost byla vytvořena, ale některé položky se neuložily: {items}. Můžete je doplnit na stránce události.",
+      "draftFound": "Našli jsme neuložený koncept této události. Chcete jej obnovit?",
+      "draftRestore": "Obnovit koncept",
+      "draftDiscard": "Ignorovat",
+      "resources": {
+        "organizers": "pořadatelé",
+        "invitations": "pozvánky",
+        "moderators": "moderátoři",
+        "speakers": "řečníci",
+        "materials": "materiály"
+      }
     },
     "nav": {
       "events": "Správa událostí",
@@ -603,7 +741,8 @@
       "eventQuestionnaires": "Dotazníky",
       "rubricaList": "Seznam",
       "rubricaDetail": "Detail",
-      "feedbackDashboard": "Feedback"
+      "feedbackDashboard": "Feedback",
+      "recordingsPostprod": "Přepisy / AI"
     },
     "landing": {
       "title": "Administrační panel",
@@ -701,7 +840,8 @@
           "dateRequired": "Původní datum je povinné.",
           "saveFailed": "Uložení metadat se nezdařilo."
         }
-      }
+      },
+      "updateFailed": "Aktualizace se nezdařila."
     },
     "recordingsLibrary": {
       "title": "Videozáznamy",
@@ -770,7 +910,10 @@
       "detailEnd": "Konec",
       "detailModerator": "Moderátor",
       "detailRoom": "Místnost Jitsi",
-      "detailFilename": "Název souboru"
+      "detailFilename": "Název souboru",
+      "transcriptManage": "Spravovat přepis / AI",
+      "transcriptReady": "Přepsáno",
+      "transcriptProcessing": "Zpracovává se"
     },
     "gdprAudit": {
       "title": "Audit GDPR",
@@ -1023,7 +1166,32 @@
       "retentionPreviewRecordings": "Videozáznamy",
       "retentionPreviewKept": "Souhrnné statistiky a metadata události jsou uchovány.",
       "configPreview": "Náhled konfigurace",
-      "templateApplied": "Šablona použita: {name}. Můžete upravit všechna nastavení."
+      "templateApplied": "Šablona použita: {name}. Můžete upravit všechna nastavení.",
+      "agendaEnabled": "Živé poznámky / kontrolní seznam (agenda)",
+      "agendaEnabledDesc": "Kontrolní seznam témat k projednání, který moderátoři během události odškrtávají. Promítá se do automatického shrnutí. Nepovinné, lze zapnout i v průběhu události.",
+      "whiteboardEnabled": "Sdílená tabule",
+      "whiteboardEnabledDesc": "Zapne nativní společnou tabuli (Excalidraw): moderátoři ji mohou během události otevřít z panelu nástrojů. U okamžitých hovorů je vždy zapnutá.",
+      "aiSectionHeading": "Automatická postprodukce",
+      "aiSectionDesc": "Po skončení události může být záznam zpracován AI pipeline běžící v clusteru, která vytvoří přepis, shrnutí a — pokud si to vyžádáte — překlady a dabing. Vše probíhá na infrastruktuře úřadu, žádná data neputují k třetím stranám.",
+      "aiTranscriptEnabled": "Automatický přepis",
+      "aiTranscriptEnabledDesc": "Rozpoznávání řeči s identifikací mluvčích. Nutné pro zapnutí shrnutí, překladů a dabingu.",
+      "aiSummaryEnabled": "Shrnutí a kapitoly",
+      "aiSummaryEnabledDesc": "Shrnutí jednání, přijatá rozhodnutí, úkoly a rozdělení do kapitol s časováním.",
+      "aiTranslationEnabled": "Překlad do dalších jazyků",
+      "aiTranslationEnabledDesc": "Přepis a shrnutí přeložené do jazyků nastavených níže.",
+      "aiTargetLocales": "Jazyky překladu",
+      "aiTargetLocalesDesc": "Kódy jazyků podle ISO (např. en, fr, de) oddělené čárkou. Ponechte prázdné, chcete-li použít jazyky nastavené na úrovni webu.",
+      "aiTargetLocalesRequired": "Nastavte alespoň jeden jazyk překladu, nebo vypněte automatický překlad.",
+      "aiDubbingEnabled": "Dabing zvuku",
+      "aiDubbingEnabledDesc": "Nadabovaný zvuk v cílových jazycích vytvořený předtrénovanými syntetickými hlasy. Neklonuje hlasy účastníků.",
+      "consentBadge": "Výslovný souhlas",
+      "retentionBadge": "Prodlužuje dobu uchování",
+      "multitrackRecordingEnabled": "Nahrávání po jednotlivých účastnících (vysoká přesnost)",
+      "multitrackRecordingEnabledDesc": "Nahrává samostatnou zvukovou stopu pro každého účastníka, takže přepis s jistotou určí, kdo co řekl (žádní „Mluvčí 1/2“). Zpracovává izolovaný zvuk jednotlivého mluvčího (citlivý osobní údaj): stopy jsou dočasné a mažou se ihned po přepisu. Vyžaduje souhlas s nahráváním.",
+      "retainParticipantTracks": "Uchovat stopy jednotlivých účastníků",
+      "retainParticipantTracksDesc": "Ponechá jednotlivé zvukové stopy i po přepisu, pro stažitelný archiv a přehrávání po mluvčích. POZOR: prodlužuje uchovávání citlivých osobních údajů (izolovaný hlas) až do konce doby uchování události. Zapínejte jen v případě potřeby a s odpovídajícím souhlasem a poučením.",
+      "expectedSpeakers": "Očekávaný počet mluvčích",
+      "expectedSpeakersDesc": "Pokud jej znáte (např. 3 mluvčí), zadání zlepší kvalitu identifikace mluvčích. Ponechte prázdné a rozhodne pipeline."
     },
     "links": {
       "title": "Odkazy události",
@@ -1123,7 +1291,8 @@
         "pages": "Stránky",
         "footer": "Zápatí",
         "features": "Funkce",
-        "scaling": "Dimenzování infrastruktury"
+        "scaling": "Dimenzování infrastruktury",
+        "postprod": "AI pipeline po události"
       },
       "scaling": {
         "intro": "Parametry popisující kapacitu clusteru, ve kterém platforma běží. Výchozí hodnoty jsou kalibrovány pro Azure F16s_v2 (16 vCPU / 32 GiB) pro JVB a F4s_v2 (4 vCPU / 8 GiB) pro Jibri. Pokud používáte jiný hardware, aktualizujte hodnoty zde — scaler okamžitě přepočítá.",
@@ -1285,7 +1454,55 @@
         "jvbProvisioningTimeoutMinutes": "Časový limit zřizování (minuty)",
         "jvbProvisioningTimeoutMinutesHelp": "Po kolika minutách od startsAt je událost bez připraveného JVB označena jako „degraded“ na status stránce. Výchozí 15. Pokrývá studený start uzlu (~3–5 min) + bezpečnostní rezervu.",
         "statusPollIntervalSeconds": "Interval pollingu status stránky (sekundy)",
-        "statusPollIntervalSecondsHelp": "Každých kolik sekund stránka /status aktualizuje data v prohlížeči. Výchozí 30. Nižší hodnoty = čerstvější data, ale větší zátěž na aplikaci."
+        "statusPollIntervalSecondsHelp": "Každých kolik sekund stránka /status aktualizuje data v prohlížeči. Výchozí 30. Nižší hodnoty = čerstvější data, ale větší zátěž na aplikaci.",
+        "jvbEmptyCloseMinutes": "Počet minut prázdné místnosti před definitivním uzavřením",
+        "jvbEmptyCloseMinutesHelp": "Pokud živá místnost, která už měla účastníky, zůstane po tento počet minut prázdná, definitivně se uzavře (ENDED) — událost bez moderátora se tak sama uzavře pro nečinnost, bez čekání na plánovaný konec. Výchozí 15 (zapnuto). -1 = vypnuto. 0 = uzavřít při první kontrole prázdné místnosti.",
+        "waitingRoomLeadMinutes": "Okno pro vstup do čekárny (minuty)",
+        "waitingRoomLeadMinutesHelp": "Registrace v tomto počtu minut před začátkem vede rovnou do čekárny; dřívější registrace zobrazí potvrzení s odkazem do kalendáře. 0 = až do začátku vždy zobrazit potvrzení. Doporučeno 15.",
+        "reactionsMode": "Reakce (emoji)",
+        "reactionsModeNative": "Nativní z Jitsi (v liště, dočasné)",
+        "reactionsModeCustom": "Vlastní v aplikaci (levá lišta, se statistikami)",
+        "reactionsModeHelp": "Nativní = tlačítko reakcí přímo z Jitsi v ovládací liště, lehké a dočasné (nepočítají se). Vlastní = lišta reakcí aplikace vlevo dole, s počty a statistikami. Výchozí: Nativní.",
+        "emailSenderTitle": "Odesílatel e-mailů",
+        "emailSenderHelp": "Jak se odesílatel zobrazí v poště registrovaného. Odesílací adresa zůstává v konfiguraci nasazení — musí odpovídat adrese, ze které smí SMTP server odesílat.",
+        "emailFromName": "Jméno odesílatele",
+        "emailFromNameHelp": "Prázdné = použije se jméno nastavené při nasazení (SMTP_FROM_NAME). E-maily se stále odesílají ze systémové adresy.",
+        "emailReplyTo": "Adresa pro odpovědi",
+        "emailReplyToHelp": "E-maily odcházejí z adresy no-reply: bez tohoto nastavení odpověď nikam nedorazí.",
+        "avatarTitle": "Obrázky účastníků",
+        "gravatarEnabled": "Použít Gravatar, když je k dispozici",
+        "gravatarEnabledHelp": "Účastníci, kteří se zaregistrovali e-mailem s Gravatarem, jej uvidí jako obrázek v místnosti; ostatním zůstanou iniciály generované platformou. Obrázek se načítá přes náš server, takže prohlížeče účastníků gravatar.com nikdy nekontaktují — platforma ale ano: uveďte to v zásadách ochrany osobních údajů."
+      },
+      "postprod": {
+        "prerequisitesNote": "Postprodukce pracuje s kompletním záznamem až po skončení události. Vyhrazený GPU pool se zapne, jakmile do fronty přijde první úloha, a vypne se, když se fronta vyprázdní, aby se udržely náklady nízko. Před zapnutím pipeline ověřte, že cluster má nakonfigurovaný GPU pool, nainstalovaný operátor NVIDIA, přihlašovací údaje HuggingFace dostupné v namespace a váhy modelů předem nahrané na vyhrazeném svazku. Provozní checklist najdete v docs/POSTPROD.md.",
+        "pipelineEnabled": "Pipeline po události je aktivní",
+        "pipelineEnabledHelp": "Hlavní vypínač. Když je vypnutý, pro nové události se nevytváří žádný přepis, shrnutí, překlad ani dabing, i když mají jednotlivé události postprodukci zapnutou. Již vytvořené artefakty se přestanou zobrazovat veřejnosti, dokud pipeline znovu nezapnete. Slouží k pozastavení všeho bez nutnosti znovu nasazovat aplikaci.",
+        "timingNote": "Pipeline nikdy nezasahuje do živého přenosu. Vše probíhá až po skončení události, jakmile je záznam uložen: titulky a shrnutí nejsou nikdy k dispozici v reálném čase. Tato volba upřednostňuje kvalitu přepisu a oproti živým titulkům snižuje spotřebu GPU.",
+        "providersSection": "Motory umělé inteligence",
+        "providersIntro": "Motory používané pro přepis, shrnutí a dabing se deklarují při nasazení. Přidání nového je zásah do infrastruktury (nasazení motoru do clusteru, registrace v seznamu podporovaných poskytovatelů, úprava schématu). Rozbalovací nabídky níže ukazují motory aktuálně dostupné v této instanci.",
+        "asrProvider": "Motor přepisu",
+        "asrProviderHelp": "Vytváří přepis události s časováním po minutách a rozdělením mluvčích. Používáme WhisperX large-v3 spolu s pyannote.audio pro diarizaci. Oba modely běží v clusteru nad váhami uloženými na vyhrazeném svazku.",
+        "asrOptionWhisperx": "WhisperX large-v3 + diarizace pyannote",
+        "llmProvider": "Motor shrnutí a překladu",
+        "llmProviderHelp": "Vytváří shrnutí jednání, určuje probíraná témata a překládá přepis a shrnutí do cílových jazyků. Model Mistral-Small-3.2-24B (evropský dodavatel, licence Apache 2.0) provozovaný přes vLLM v clusteru.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM v clusteru",
+        "ttsEngine": "Motor dabingu",
+        "ttsEngineHelp": "Syntetizuje zvuk ve zvolených jazycích pomocí předtrénovaných veřejných hlasů. Má-li událost více mluvčích, dostane každý mluvčí jiný hlas z dostupného poolu, aby posluchači konverzaci lépe sledovali: přiřazení je libovolné a nikdy nereprodukuje skutečný hlas účastníků. Dabing se vytváří pouze tehdy, když si jej pořadatel pro konkrétní událost vyžádá.",
+        "ttsOptionPiper": "Piper TTS · předtrénované syntetické hlasy",
+        "voiceCloningSection": "Redakční přístup k hlasu",
+        "voiceCloningNote": "Systém používá výhradně obecné syntetické hlasy (Piper TTS, veřejné modely pod licencí MIT). Neanalyzuje, neukládá ani nereprodukuje hlas skutečných účastníků: každý mluvčí je zastoupen hlasem z poolu, vybraným deterministicky podle délky mluvení, bez jakékoli vazby na jeho hlasovou identitu. Přiřazený hlas se mění podle složení mluvčích v každé jednotlivé události, takže tentýž mluvčí může být v různých událostech nadabován různými hlasy. Tato volba vylučuje zpracování biometrických údajů ve smyslu čl. 9 GDPR.",
+        "defaultTargetLocales": "Výchozí jazyky překladu",
+        "defaultTargetLocalesHelp": "Kódy ISO-639-1 oddělené čárkou (např. `en,fr,de`). Použijí se u událostí, které nemají vlastní jazyky překladu. Zdrojový jazyk události je vždy automaticky vyloučen.",
+        "limitsSection": "Provozní limity",
+        "maxConcurrentJobs": "Paralelní úlohy",
+        "maxConcurrentJobsHelp": "Maximální počet úloh, které pipeline zpracovává současně na GPU poolu. Vyšší hodnoty rychleji odbaví frontu, když skončí více událostí za sebou, ale vyžadují dostupné GPU. Obvyklá hodnota je 2.",
+        "jobMaxAttempts": "Počet pokusů před selháním",
+        "jobMaxAttemptsHelp": "Kolikrát pipeline zopakuje úlohu, než ji označí za neúspěšnou. Prodleva mezi pokusy roste exponenciálně (od 30 sekund až po 2 hodiny). Obvyklá hodnota je 5.",
+        "artifactRetentionDays": "Uchování artefaktů (dny)",
+        "artifactRetentionDaysHelp": "Při hodnotě 0 se AI artefakty řídí stejnou lhůtou jako samotná událost. Kladná hodnota je uchová po zadaný počet dní i po uzavření události, dokud je denní cron nesmaže. Smazání zahrnuje jména mluvčích a payloady úloh, v souladu s docs/GDPR.md.",
+        "consentDisclosureSection": "Informace o AI v čekárně",
+        "consentDisclosureHelp": "Text zobrazený účastníkům v čekárně, když událost používá AI postprodukci (přepis, shrnutí, překlad, dabing). Lze upravit pro každý jazyk. Ponechte prázdné, chcete-li použít výchozí systémový text.",
+        "consentDisclosurePlaceholder": "Např. Tato událost bude po skončení živého přenosu automaticky přepsána a shrnuta pomocí nástrojů AI…"
       }
     },
     "analytics": {
@@ -1372,7 +1589,23 @@
       "screen": "Sdílení obrazovky",
       "pickerTitle": "Vyberte šablonu",
       "pickerSubtitle": "Vyberte šablonu pro předkonfiguraci nastavení události, nebo přeskočte pro ruční konfiguraci.",
-      "skipTemplate": "Konfigurovat ručně"
+      "skipTemplate": "Konfigurovat ručně",
+      "whiteboardLabel": "Tabule",
+      "waitingRoomEngineLabel": "Čekárna (výchozí pro šablonu)",
+      "waitingRoomEngineSiteDefault": "Výchozí nastavení webu",
+      "waitingRoomEngineGarden": "Zahrada (běžná)",
+      "waitingRoomEngineGame": "Videohra (lobby Phaser)",
+      "waitingRoomEngineClassic": "Klasická (statická)",
+      "waitingRoomEngineHelp": "Předvyplní motor čekárny u událostí vytvořených z této šablony. V průvodci jej lze změnit.",
+      "durationLabel": "Výchozí délka (minuty)",
+      "durationHint": "Předvyplní konec události (začátek + délka). Uživatel jej může změnit. Prázdné = 2 hodiny.",
+      "retentionLabel": "Výchozí uchování dat (dny)",
+      "expectedSpeakersLabel": "Očekávaný počet mluvčích (výchozí)",
+      "descriptionTemplateLabel": "Výchozí popis",
+      "descriptionTemplateHint": "Text předvyplněný do popisu události (lze upravit).",
+      "aiTranscript": "Automatický přepis (výchozí)",
+      "aiSummary": "Automatické shrnutí (výchozí)",
+      "aiTranslation": "Automatický překlad (výchozí)"
     },
     "instantCall": {
       "title": "Okamžitý videohovor",
@@ -1456,7 +1689,8 @@
       },
       "errors": {
         "saveFailed": "Uložení se nezdařilo. Zkontrolujte údaje a zkuste to znovu."
-      }
+      },
+      "deleteTitle": "Smazat šablonu"
     },
     "emailTemplates": {
       "title": "E-mailové šablony",
@@ -1637,7 +1871,8 @@
       "play": "Přehrát",
       "hidePlayer": "Skrýt přehrávač",
       "download": "Stáhnout",
-      "deleteConfirm": "Smazat tuto relaci a související záznam?"
+      "deleteConfirm": "Smazat tuto relaci a související záznam?",
+      "deleteTitle": "Smazat relaci"
     },
     "monitoring": {
       "title": "Monitorování",
@@ -1798,7 +2033,9 @@
         "settings": "Nastavení",
         "people": "Osoby",
         "content": "Obsah",
-        "audit": "Záznamy a audit"
+        "audit": "Záznamy a audit",
+        "postEvent": "Po události",
+        "analytics": "Statistiky"
       },
       "toggles": {
         "unmute": "Účastníci mohou mluvit",
@@ -1820,7 +2057,22 @@
         "postEventSummary": "{connected} připojených z {registered} registrací (odhadováno {estimated})",
         "estimatedAttendance": "Odhadováno: {estimated} účastníků"
       },
-      "copyGuestUrl": "Zkopírovat odkaz pro hosty"
+      "copyGuestUrl": "Zkopírovat odkaz pro hosty",
+      "aiManageTitle": "Přepis, shrnutí a překlady",
+      "aiManageDesc": "Spravujte AI postprodukci tohoto záznamu: opravte přepis a přiřazení mluvčích (kdo co říká), upravte shrnutí a spravujte jazyky překladu.",
+      "aiManageCta": "Otevřít správu postprodukce",
+      "aiManageNotEnded": "K dispozici po skončení události, jakmile AI pipeline zpracuje záznam.",
+      "aiGenerateCta": "Vygenerovat AI hned",
+      "aiGenerateRunning": "Spouštění…",
+      "aiGenerateQueued": "AI pipeline byla spuštěna: přepis a shrnutí jsou ve frontě. Průběh sledujte ve správě postprodukce.",
+      "aiGenerateAlready": "AI pipeline už byla pro tento záznam spuštěna: nebyly přidány žádné nové úlohy.",
+      "aiGenerateError": "AI pipeline se nepodařilo spustit. Ověřte, že je AI zapnutá na úrovni webu a že existuje záznam.",
+      "aiGenerateHelp": "Jediným kliknutím zapne AI přepis a shrnutí a spustí pipeline nad záznamem. Idempotentní: dvojí kliknutí úlohy nezduplikuje.",
+      "aiGenerateNoRecording": "Žádný záznam: AI po události vyžaduje záznam (nahrávání probíhá jen v průběhu události). Postprodukci zde přesto můžete spravovat.",
+      "duplicateNext": "Duplikovat pro příště",
+      "duplicateNextBusy": "Duplikuji…",
+      "duplicateNextHint": "Vytvoří koncept s celou konfigurací této události (nahrávání, oddělené stopy, AI, agenda, připomínky). Pokud se událost pravidelně opakuje, datum se posune na další výskyt; jinak jej doplníte sami.",
+      "duplicateNextError": "Duplikace se nezdařila. Zkuste to prosím znovu."
     },
     "rubrica": {
       "title": "Adresář",
@@ -1838,6 +2090,299 @@
     "eventQuestionnaires": {
       "title": "Dotazníky — {eventTitle}",
       "subtitle": "Nakonfigurujte dotazník předregistrace a/nebo po události kombinováním šablon a ad-hoc otázek."
+    },
+    "eventAnalytics": {
+      "title": "Statistiky",
+      "loadError": "Statistiky se nepodařilo načíst.",
+      "noData": "Nejsou k dispozici žádná data.",
+      "notEndedYet": "Událost ještě neskončila: statistiky jsou dílčí a aktualizují se v reálném čase.",
+      "cappedNote": "Velmi rozsáhlá událost: některé metriky jsou spočítány na vzorku (byl dosažen limit řádků).",
+      "scoreTitle": "Míra pozornosti",
+      "adminOnly": "pouze pro administrátory",
+      "scoreProxy": "Index 0–100 vyjadřující, jak moc se publikum zapojovalo. Je to ukazatel zapojení, nikoli měření kognitivní pozornosti — čtěte jej s ohledem na formát události (přednáška vs. workshop), nikdy jako známku kvality.",
+      "scoreUnavailable": "Pro výpočet míry není dost dat.",
+      "comp": {
+        "attendanceRate": "Účast (připojení/registrovaní)",
+        "breadth": "Šíře interakce",
+        "depth": "Hloubka interakce",
+        "chatRate": "Tempo chatu",
+        "liveParticipation": "Živé zapojení",
+        "talkBalance": "Vyváženost mluvení",
+        "retention": "Setrvání"
+      },
+      "kpiConversion": "Konverze",
+      "kpiPeak": "Maximum účastníků",
+      "kpiDuration": "Délka",
+      "kpiInteractors": "Různí zapojení účastníci",
+      "interactionsWord": "interakcí",
+      "kpiHandRaises": "Zvednuté ruce",
+      "handRaisesSessionsSub": "z {n, plural, one {# relace} few {# relací} many {# relace} other {# relací}}",
+      "kpiReactions": "Reakce",
+      "kpiRetention": "Průměrné setrvání",
+      "dwellSub": "{d} · {n, plural, one {# měření} few {# měření} many {# měření} other {# měření}}",
+      "reactionsTitle": "Reakce",
+      "timelineTitle": "Průběh hovoru",
+      "timelineEmpty": "Během hovoru nebyla zaznamenána žádná interakce.",
+      "timelinePeak": "Vrchol interakcí v {at} (počet interakcí v intervalu: {n}).",
+      "kind": {
+        "chat": "Chat",
+        "question": "Otázky",
+        "upvote": "Hlasy",
+        "poll": "Ankety",
+        "word": "Slovní mrak",
+        "reaction": "Reakce"
+      },
+      "speakersTitle": "Kdo mluvil",
+      "audioUnavailable": "Statistiky zvuku nejsou k dispozici — událost nebyla nahrávána (nebo záznam neobsahuje řeč).",
+      "predominant": "Převažující mluvčí",
+      "talkBalance": "Vyváženost",
+      "speechDensity": "Hustota řeči",
+      "chatTitle": "Chat",
+      "chatAudience": "Publikum",
+      "chatStaff": "Tým",
+      "qaTitle": "Nejvíce hlasované otázky",
+      "none": "Žádné.",
+      "pollsTitle": "Ankety",
+      "wordsTitle": "Slovní mrak",
+      "feedbackTitle": "Zpětná vazba",
+      "responses": "odpovědí",
+      "privacyNote": "Statistiky jednotlivých osob jsou ve výchozím nastavení pseudonymizované. Anonymní souhrny se uchovávají ve shrnutí události; nezpracované jednotlivé řádky se mažou po uplynutí doby uchování."
+    },
+    "postprod": {
+      "title": "AI postprodukční pipeline",
+      "subtitle": "Přepisy, shrnutí a překlady vytvořené AI pipeline v clusteru. Přiřaďte mluvčí, spusťte úlohy znovu nebo je zrušte.",
+      "filterStatus": "Stav",
+      "all": "Vše",
+      "queued": "Ve frontě",
+      "running": "Probíhá",
+      "done": "Dokončeno",
+      "partial": "Částečné",
+      "failed": "Selhalo",
+      "totalRows": "{count, plural, =0 {žádné záznamy} one {1 záznam} few {# záznamy} many {# záznamu} other {# záznamů}}",
+      "colEvent": "Událost",
+      "colCreated": "Vytvořeno",
+      "colDuration": "Délka",
+      "colStatus": "Stav",
+      "colJobs": "Úlohy",
+      "colArtifacts": "Artefakty",
+      "colActions": "Akce",
+      "rerun": "Spustit znovu",
+      "rerunTooltip": "Vytvoří nový běh zvýšením runCount; předchozí artefakty zůstávají až do konce doby uchování",
+      "cancel": "Zrušit",
+      "cancelConfirm": "Zrušit všechny čekající úlohy pro tento záznam?",
+      "rerunFailed": "Opětovné spuštění selhalo (HTTP {code})",
+      "cancelFailed": "Zrušení selhalo (HTTP {code})",
+      "speakerUpdateFailed": "Aktualizace mluvčího selhala (HTTP {code})",
+      "loadError": "Seznam úloh se nepodařilo načíst",
+      "empty": "Filtrům neodpovídá žádný záznam",
+      "detailJobs": "Úlohy",
+      "detailArtifacts": "Artefakty",
+      "detailSpeakers": "Mluvčí",
+      "noArtifacts": "Zatím nebyly vytvořeny žádné artefakty",
+      "noSpeakers": "Nebyl rozpoznán žádný mluvčí",
+      "attempts": "pokus {n}",
+      "speakerPlaceholder": "Skutečné jméno (nepovinné)",
+      "speakerSpoke": "Doba mluvení: {sec} s",
+      "suggestedApply": "Použít návrh: {name}",
+      "suggestedTitle": "Jméno navržené AI pipeline na základě vlastních jmen zmíněných v přepisu. Kliknutím jej vložíte do pole (před uložením jej můžete upravit).",
+      "save": "Uložit",
+      "editTranscript": "Upravit přepis",
+      "editClose": "Zavřít editor",
+      "editTranscriptTitle": "Editor přepisu",
+      "editHint": "Opravte text nebo přiřaďte jiného mluvčího ke každému segmentu. Při uložení se aktualizuje přepis i titulky ve zdrojovém jazyce. Překlady a dabing se znovu NEGENERUJÍ: pokud potřebujete aktualizovat i ostatní jazyky, použijte „Spustit znovu“.",
+      "editLoading": "Načítání přepisu…",
+      "editLoadError": "Přepis se nepodařilo načíst (HTTP {code}).",
+      "editNotReady": "Pro tento záznam zatím není přepis k dispozici. Spusťte (nebo znovu spusťte) AI zpracování z ovládacích prvků nahoře: přepis je prvním krokem, poté jej zde můžete opravit a vygenerovat shrnutí a překlady.",
+      "editProcessing": "Probíhá AI zpracování: přepis se zde objeví po jeho dokončení. Za pár minut stránku obnovte.",
+      "editSessionExpired": "Platnost administrátorské relace vypršela. Znovu načtěte stránku a přihlaste se, abyste mohli přepis upravovat.",
+      "editEmpty": "Žádné upravitelné segmenty",
+      "editSpeakerNone": "— nikdo —",
+      "editSave": "Uložit změny",
+      "editSaving": "Ukládání…",
+      "editDirty": "{n, plural, one {1 neuložená změna} few {# neuložené změny} many {# neuložené změny} other {# neuložených změn}}",
+      "editSaved": "Uloženo: {text} textů, {speaker} mluvčích.",
+      "editFailed": "Uložení selhalo (HTTP {code})",
+      "editFailedDetail": "Uložení selhalo: {message}",
+      "editMediaError": "Zvuk záznamu se nepodařilo načíst: přehrávání není k dispozici. Text a mluvčí jednotlivých segmentů přesto můžete opravit.",
+      "summaryLoadError": "Shrnutí se nepodařilo načíst.",
+      "summaryLoading": "Načítání shrnutí…",
+      "summaryEmptyProcessing": "AI shrnutí zatím není hotové: probíhá zpracování. Za pár minut stránku obnovte.",
+      "summaryEmptyFailed": "Vytvoření shrnutí se nezdařilo. Zkontrolujte stav pipeline a spusťte zpracování znovu z ovládacích prvků nahoře.",
+      "summaryEmptyNone": "Pro tento záznam nebylo vygenerováno žádné AI shrnutí. Spusťte zpracování z ovládacích prvků nahoře.",
+      "editSeek": "Přejít na toto místo ve videu",
+      "manageTabTranscript": "Přepis",
+      "manageTabSummary": "Shrnutí",
+      "manageTabTranslations": "Překlady",
+      "manageTabArchive": "Archiv",
+      "manageTabReliability": "Spolehlivost",
+      "manageLoading": "Načítání…",
+      "archivePiiNote": "Izolované zvukové stopy jednotlivých účastníků jsou citlivé osobní údaje (izolovaný hlas): tato sekce je vyhrazena administrátorům a moderátorům a nikdy není veřejně přístupná.",
+      "archiveNoTracks": "Pro tento záznam nejsou k dispozici žádné stopy jednotlivých účastníků (vícestopé nahrávání není zapnuté, nebo už byly stopy smazány kvůli minimalizaci podle GDPR).",
+      "archivePlayerTitle": "Přehrávání po mluvčích",
+      "archiveAudioHint": "Pomocí voliče „Zvuk“ v přehrávači si poslechnete mix nebo izolovanou stopu jednotlivého účastníka, synchronně s videem.",
+      "archiveTitle": "Stažitelný archiv",
+      "archiveIntro": "Vytvoří soubor MKV s videem, jednou zvukovou stopou na účastníka (označenou jménem a přesně zarovnanou) a titulky. Je určen ke stažení a archivaci: prohlížeče neumí v MKV přepínat zvukové stopy, k poslechu použijte přehrávač výše.",
+      "archiveGenerate": "Vytvořit archiv",
+      "archiveStatusLabel": "Stav",
+      "archiveStatus_none": "nevytvořen",
+      "archiveStatus_pending": "ve frontě",
+      "archiveStatus_running": "zpracovává se",
+      "archiveStatus_done": "připraven",
+      "archiveStatus_failed": "selhal",
+      "archiveDownload": "Stáhnout MKV",
+      "archiveGenerateOk": "Vytváření archivu bylo spuštěno.",
+      "archiveGenerateErr": "Vytvoření archivu selhalo (HTTP {code}).",
+      "archiveTrackFallback": "Účastník",
+      "manageBackToList": "Všechny záznamy",
+      "manageDuration": "Délka",
+      "manageSource": "Zdrojový jazyk",
+      "manageOpenPublic": "Veřejná stránka",
+      "manageRerunOk": "Pipeline byla spuštěna znovu.",
+      "manageRerunNoop": "Nebyla spuštěna žádná úloha: AI je pro tuto událost vypnutá nebo je pipeline pozastavená. Použijte „Vygenerovat AI“.",
+      "manageRerunAlreadyQueued": "Zpracování už je ve frontě: není co nového spouštět.",
+      "generateAi": "Vygenerovat AI",
+      "generateAiConfirm": "Spustí AI pipeline (přepis a shrnutí) nad tímto záznamem. AI zpracování se pro událost zapne a poběží na pozadí. Překlady se přidávají později po jednotlivých jazycích na kartě „Překlady“.",
+      "generateAiOk": "AI pipeline byla spuštěna.",
+      "manageOpen": "Spravovat",
+      "cancelConfirmTitle": "Zrušit postprodukci",
+      "speakerUpdateSuccess": "Mluvčí byl aktualizován",
+      "tm": {
+        "loading": "Načítání jazyků překladu…",
+        "loadError": "Jazyky překladu se nepodařilo načíst.",
+        "title": "Jazyky překladu",
+        "sourceLabel": "Zdrojový jazyk:",
+        "already": "Již přeloženo:",
+        "noneYet": "Zatím žádné překlady.",
+        "addLabel": "Přidat jazyk",
+        "noneAvailable": "Žádné dostupné jazyky",
+        "selectPlaceholder": "Vyberte jazyk…",
+        "adding": "Přidávání…",
+        "addButton": "Přidat jazyk",
+        "unexpectedError": "Neočekávaná chyba",
+        "note": "Přidání jazyka vygeneruje překlad přepisu a shrnutí — a dabing zvuku, je-li pro událost zapnutý. Zpracování probíhá na pozadí.",
+        "summary": "Shrnutí",
+        "subtitles": "Titulky",
+        "dub": "Dabing",
+        "download": "stáhnout",
+        "allTranslated": "Všechny aktivní jazyky jsou už přeložené.",
+        "translatedHeader": "Přeložené jazyky"
+      },
+      "ov": {
+        "tab": "Přehled",
+        "intro": "Co AI pipeline pro tento záznam vytvořila, jazyk po jazyku.",
+        "processing": "Probíhá zpracování nebo zatím nejsou k dispozici žádné artefakty. Vraťte se, až bude stav „Dokončeno“.",
+        "loadError": "Přehled se nepodařilo načíst.",
+        "langsTitle": "Jazyky a artefakty",
+        "colLang": "Jazyk",
+        "colTranscript": "Přepis",
+        "colSummary": "Shrnutí",
+        "colSubtitles": "Titulky",
+        "colDub": "Dabing",
+        "source": "originál",
+        "present": "k dispozici",
+        "absent": "chybí",
+        "listen": "Poslechnout",
+        "download": "Stáhnout",
+        "dubTitle": "Dabing zvuku (jeden hlas na mluvčího, synchronizovaný)",
+        "dubNone": "Nebyl vytvořen žádný dabing.",
+        "summaryTitle": "Shrnutí",
+        "summaryLang": "Jazyk",
+        "summaryNone": "Není k dispozici žádné shrnutí.",
+        "decisions": "Rozhodnutí",
+        "actions": "Úkoly",
+        "topics": "Kapitoly",
+        "speakersTitle": "Mluvčí",
+        "speakerAnon": "nepřiřazeno",
+        "speakerRenameHint": "Přejmenováním mluvčích opravíte jejich jména: jméno nahradí anonymní označení v přepisu i na veřejné stránce.",
+        "speakerNamePlaceholder": "Skutečné jméno (např. Jan Novák)",
+        "speakerNameAria": "Jméno pro",
+        "save": "Uložit",
+        "saving": "Ukládání…",
+        "saved": "Uloženo",
+        "saveError": "Chyba",
+        "editHint": "K opravě textu, jmen nebo shrnutí použijte karty výše.",
+        "kpiDuration": "Délka",
+        "kpiParticipants": "Účastníci (maximum)",
+        "kpiTracks": "Zvukové stopy",
+        "kpiLanguages": "Jazyky",
+        "kpiArtifacts": "Artefakty",
+        "kpiProcessed": "Zpracováno",
+        "statusLabel": "Stav",
+        "run": "běh",
+        "jobsTitle": "Průběh pipeline",
+        "jobsNone": "Pro tento záznam nejsou žádné úlohy.",
+        "attempts": "pokusů: {n}",
+        "filesTitle": "Soubory v úložišti",
+        "filesNone": "V úložišti nebyly nalezeny žádné soubory.",
+        "filesToggle": "Zobrazit/skrýt soubory ({n})",
+        "tracksTitle": "Stopy jednotlivých účastníků",
+        "tracksNone": "Žádné stopy jednotlivých účastníků (vícestopé nahrávání je vypnuté nebo už byly stopy smazány).",
+        "trackPurged": "smazána (GDPR)",
+        "trackEnters": "vstup +{s} s",
+        "metricsTitle": "Metriky shrnutí (LLM)",
+        "chars": "znaků",
+        "model": "Model",
+        "notAvailable": "n/a"
+      },
+      "rel": {
+        "title": "Spolehlivost AI",
+        "subtitle": "Nakolik lze věřit výstupu, který AI pro tento záznam vytvořila.",
+        "loading": "Probíhá analýza spolehlivosti…",
+        "loadError": "Metriky spolehlivosti se nepodařilo načíst.",
+        "noData": "Pro tento záznam neproběhlo žádné AI zpracování.",
+        "level": {
+          "good": "Spolehlivá",
+          "fair": "Přijatelná",
+          "poor": "Slabá",
+          "failed": "Nespolehlivá"
+        },
+        "overallScore": "Celková míra jistoty",
+        "totalTime": "Doba zpracování",
+        "sourceLang": "Zdrojový jazyk",
+        "transcriptTitle": "Přepis",
+        "segments": "Segmenty",
+        "speakers": "Mluvčí",
+        "speech": "Zjištěná řeč",
+        "confidence": "Průměrná míra jistoty",
+        "silence": "Odhadované ticho",
+        "coverage": "Pokrytí řečí",
+        "lowConf": "Segmenty s nízkou mírou jistoty",
+        "transcriptNotProduced": "Přepis zatím nebyl vytvořen (pipeline neproběhla).",
+        "transcriptUnavailable": "Přepis existuje, ale nelze jej zde analyzovat (je uložen v objektovém úložišti).",
+        "stagesTitle": "Fáze pipeline",
+        "colStage": "Fáze",
+        "colStatus": "Stav",
+        "colModel": "Model",
+        "colTime": "Délka",
+        "colLangs": "Jazyky",
+        "warn": {
+          "transcriptEmpty": "Prázdný přepis: zdrojový zvuk se zdá tichý nebo bez řeči. Odvozené shrnutí, překlady a dabing NEJSOU důvěryhodné.",
+          "lowConfidence": "Nízká míra jistoty přepisu: text před zveřejněním zkontrolujte.",
+          "manyLowConfSegments": "Mnoho segmentů s nízkou mírou jistoty: přepis může obsahovat chyby.",
+          "highNoSpeech": "Zvuk je z velké části tichý nebo bez řeči: přepis může obsahovat halucinace.",
+          "stageFailed": "Fáze „{stage}“ selhala.",
+          "stageRetried": "Fáze „{stage}“ byla dokončena až po několika pokusech."
+        },
+        "stage": {
+          "TRANSCRIBE": "Přepis",
+          "TRANSCRIBE_MULTITRACK": "Přepis (vícestopý)",
+          "SUMMARIZE": "Shrnutí",
+          "TRANSLATE": "Překlad",
+          "SUBTITLE": "Titulky",
+          "DUB": "Dabing",
+          "ARCHIVE": "Archiv"
+        },
+        "status": {
+          "PENDING": "Čeká",
+          "CLAIMED": "Převzata",
+          "RUNNING": "Probíhá",
+          "DONE": "Dokončena",
+          "FAILED": "Selhala"
+        }
+      },
+      "archiveSourceTitle": "Zdrojový záznam",
+      "archiveSourceHint": "Původní video události. Oddělené stopy jednotlivých účastníků a archiv MKV vyžadují vícestopé nahrávání (pro tuto událost není zapnuté).",
+      "archiveSourceDownload": "Stáhnout původní video"
     }
   },
   "email": {
@@ -2326,7 +2871,31 @@
     "overallStatus": "Celkový stav",
     "lastChecked": "Poslední kontrola",
     "responseTime": "Doba odezvy",
-    "systemStatus": "Stav systému"
+    "systemStatus": "Stav systému",
+    "postprod": {
+      "title": "Pipeline po události",
+      "subtitle": "Přepis, shrnutí, překlad a dabing záznamu",
+      "whatItDoes": "Když událost skončí, projde záznam interní pipeline: přepis vytvoří WhisperX, shrnutí a překlady model Mistral, nadabovaný zvuk Piper TTS. Všechny modely běží na GPU v clusteru, která zůstává zapnutá pouze po dobu zpracování, takže spotřeba energie odpovídá skutečné zátěži.",
+      "status": {
+        "idle": "Nečinná",
+        "running": "Probíhá",
+        "degraded": "Omezená"
+      },
+      "aiBadge": "Přepis, shrnutí a dabing této události vytvořily modely umělé inteligence a mohou obsahovat nepřesnosti. Potřebujete-li úplnou jistotu, vždy se řiďte původním videem.",
+      "idleMessage": "Pipeline je připravena, momentálně není co zpracovávat.",
+      "queueAriaLabel": "Složení fronty postprodukce",
+      "queuePending": "ve frontě",
+      "queueRunning": "zpracovává se",
+      "queueDone": "dokončeno",
+      "queueFailed": "selhalo",
+      "asrProvider": "Přepis",
+      "llmProvider": "Shrnutí/Překlad",
+      "targetLocales": "Cílové jazyky",
+      "lastSuccess": "Poslední úspěch {when}",
+      "lastFailure": "Poslední chyba {when}",
+      "artifactsProduced": "{count, plural, =0 {žádné artefakty} one {1 vytvořený artefakt} few {# vytvořené artefakty} many {# vytvořeného artefaktu} other {# vytvořených artefaktů}}",
+      "eventsEnabled": "{count, plural, =0 {žádná událost s AI} one {1 událost s aktivní AI} few {# události s aktivní AI} many {# události s aktivní AI} other {# událostí s aktivní AI}}"
+    }
   },
   "infraMap": {
     "loading": "Načítání mapy infrastruktury...",
@@ -2388,7 +2957,8 @@
       "jicofo": "Koordinátor konferencí",
       "jvb": "Video bridge",
       "jibri": "Videozáznam",
-      "smtp": "E-mailová služba"
+      "smtp": "E-mailová služba",
+      "postprod": "AI pipeline po události"
     },
     "descriptions": {
       "app": "Webová stránka, kde přistupujete k událostem",
@@ -2399,7 +2969,8 @@
       "jicofo": "Koordinuje účastníky v jednotlivých konferencích",
       "jvb": "Přenáší zvuk a video účastníkům",
       "jibri": "Nahrává video relace událostí",
-      "smtp": "Odesílá potvrzovací e-maily a upozornění"
+      "smtp": "Odesílá potvrzovací e-maily a upozornění",
+      "postprod": "Přepisuje, shrnuje a překládá záznamy pomocí AI modelů v clusteru (GPU NVIDIA A100). Aktivuje se pouze tehdy, když událost zapne funkce AI."
     },
     "verdicts": {
       "app": {
@@ -2447,6 +3018,12 @@
       "smtp": {
         "healthy": "E-mailová služba je nakonfigurována a připravena odesílat oznámení.",
         "standby": "E-mailová služba není nakonfigurována. Potvrzovací e-maily a upozornění nebudou odesílány."
+      },
+      "postprod": {
+        "healthy": "AI pipeline zpracovává záznam (GPU worker je aktivní).",
+        "scaling": "Úlohy postprodukce jsou ve frontě — GPU uzel se spouští (studený start ~3 min).",
+        "standby": "AI pipeline je zapnutá, ale nečinná: není co zpracovávat. GPU uzel je vypnutý kvůli úspoře energie.",
+        "degraded": "Za posledních 24 h selhala jedna nebo více AI úloh. Podrobnosti najdete v /admin/postprod."
       }
     },
     "impacts": {
@@ -2459,7 +3036,8 @@
       "jvbStale": "Událost čeká na bridge déle než nakonfigurovaný časový limit: účastníci nemohou vstoupit.",
       "jibri": "Události nelze nahrávat. Účastníci se stále mohou připojit a účastnit.",
       "jibriStale": "Událost s aktivním záznamem čeká na Jibri déle než časový limit: relace není zaznamenávána.",
-      "smtp": "Potvrzovací e-maily registrací a upozornění nebudou odesílány."
+      "smtp": "Potvrzovací e-maily registrací a upozornění nebudou odesílány.",
+      "postprodDegraded": "Přepisy a shrnutí u některých nedávných záznamů nebyly vytvořeny. Videozáznamy jsou i tak k dispozici."
     },
     "overallVerdicts": {
       "operational": "Všechny služby fungují správně. Platforma je plně funkční.",
@@ -2500,7 +3078,8 @@
       "errorRate": "Chyby 5xx",
       "requestRate": "Požadavky/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "connPostprod": "AI postprodukce"
   },
   "feedback": {
     "title": "Jak hodnotíte tuto událost?",
@@ -2590,7 +3169,8 @@
     "buildInfoDev": "vývojový build",
     "viewCommit": "Zobrazit commit na GitHubu",
     "viewRelease": "Zobrazit vydání na GitHubu",
-    "buildDatePrefix": "Sestaveno"
+    "buildDatePrefix": "Sestaveno",
+    "viewChangelog": "Zobrazit novinky (changelog)"
   },
   "pages": {
     "privacyTitle": "Zásady ochrany osobních údajů",
@@ -2609,7 +3189,26 @@
     "unmute": "Zapnout zvuk",
     "download": "Stáhnout záznam",
     "speedLabel": "Rychlost přehrávání",
-    "progress": "Ukazatel průběhu"
+    "progress": "Ukazatel průběhu",
+    "subtitles": "Titulky",
+    "subtitlesOff": "Vypnuto",
+    "audioLabel": "Zvuk",
+    "audioOriginal": "Originál",
+    "audioSyntheticBanner": "Zvuk nadabovaný pomocí AI — syntetický hlas, automaticky generovaný obsah.",
+    "audioSyntheticHint": "Zvuk generovaný AI",
+    "shortcutsHelpOpen": "Zobrazit klávesové zkratky",
+    "shortcutsHelpClose": "Zavřít klávesové zkratky",
+    "shortcutsTitle": "Klávesové zkratky",
+    "shortcutsSpace": "Přehrát nebo pozastavit",
+    "shortcutsArrowsLR": "Posunout o 5 sekund vzad nebo vpřed",
+    "shortcutsArrowsUD": "Snížit nebo zvýšit hlasitost o 5 %",
+    "shortcutsJL": "Posunout o 10 sekund vzad nebo vpřed",
+    "shortcutsM": "Zapnout nebo vypnout zvuk",
+    "shortcutsC": "Zobrazit nebo skrýt titulky",
+    "shortcutsF": "Celá obrazovka",
+    "shortcutsSpeed": "Snížit nebo zvýšit rychlost",
+    "captionsOn": "Titulky zapnuty",
+    "captionsOff": "Titulky vypnuty"
   },
   "diagram": {
     "title": "Konfigurace události",
@@ -2740,7 +3339,11 @@
     "notConfigured": "Jibri není nakonfigurován. Videozáznam není k dispozici.",
     "disabledHint": "Záznam videa není pro tuto událost povolen. Pro aktivaci otevřete sekci Nastavení výše a zapněte přepínač „Záznam“.",
     "play": "Přehrát",
-    "download": "Stáhnout"
+    "download": "Stáhnout",
+    "transcriptManage": "Přepis / AI",
+    "deleteConfirmTitle": "Smazat záznam",
+    "deleteFailed": "Smazání se nezdařilo",
+    "deleteSuccess": "Záznam byl smazán"
   },
   "postEvent": {
     "config": "Konfigurace po události",
@@ -2758,8 +3361,17 @@
       "qa": "Otázky a odpovědi",
       "materials": "Materiály",
       "polls": "Ankety",
-      "feedback": "Zpětná vazba"
-    }
+      "feedback": "Zpětná vazba",
+      "transcript": "AI přepis"
+    },
+    "pageVisibleHelp": "Když je vypnutá (nebo vyprší okno viditelnosti), veřejná stránka ukončené události vrací 404 a událost zmizí ze seznamů i ze sitemapy.",
+    "libraryListed": "Publikovat do videoknihovny",
+    "libraryListedHelp": "Zobrazí tuto událost ve veřejné knihovně (/video-library). Vyžaduje publikovaný záznam nebo video na YouTube a viditelnou stránku události.",
+    "libraryListedNoRecording": "Žádný publikovaný záznam: událost se v knihovně neobjeví, dokud záznam nepublikujete nebo nepřidáte video z YouTube.",
+    "showRecap": "Zobrazit shrnutí události",
+    "showWordCloud": "Zobrazit slovní mrak",
+    "emailEnabled": "Po skončení události odeslat souhrnný e-mail",
+    "emailEnabledHelp": "Po ukončení odešle registrovaným účastníkům děkovný e-mail s odkazy na shrnutí a zpětnou vazbu a moderátorovi krátký přehled. Odesílá se pouze jednou."
   },
   "provisioning": {
     "loading": "Načítání",
@@ -2829,5 +3441,125 @@
     "noComments": "No comments",
     "yes": "Ano",
     "no": "Ne"
+  },
+  "agenda": {
+    "title": "Poznámky / kontrolní seznam",
+    "empty": "Zatím žádné body. Přidejte témata k projednání a postupně je odškrtávejte.",
+    "add": "Přidat",
+    "addPlaceholder": "Nový bod…",
+    "remove": "Odebrat",
+    "inProgress": "probíhá",
+    "agree": "Souhlasím",
+    "disagree": "Nesouhlasím",
+    "favorablePct": "{pct} % pro",
+    "noReactions": "Vyjádřete svůj názor"
+  },
+  "changelog": {
+    "metaTitle": "Novinky a changelog",
+    "title": "Novinky a changelog",
+    "intro": "Všechny verze platformy, od nejnovější. Každá položka shrnuje hlavní novinky, opravy a vylepšení.",
+    "current": "Aktuální verze",
+    "sourceNote": "Poznámky vznikají z tagů, pull requestů a commitů projektu.",
+    "sourceLink": "Zobrazit všechna vydání na GitHubu",
+    "cadence": "Rytmus vydání",
+    "cadenceSummary": "{count} verzí mezi {from} a {to}.",
+    "releaseNotes": "Poznámky k vydání a SBOM",
+    "rawChangelog": "CHANGELOG.md v repozitáři"
+  },
+  "postprod": {
+    "loading": "Načítání přepisu…",
+    "loadError": "Přepis se nepodařilo načíst: {error}",
+    "empty": "Pro tuto událost není k dispozici žádný přepis.",
+    "tabTranscript": "Přepis",
+    "tabSummary": "Shrnutí",
+    "aiBadgeLabel": "Obsah generovaný AI",
+    "aiBadgeBody": "Přepis a shrnutí vytváří automaticky AI pipeline v clusteru. Mohou obsahovat chyby; závazným zdrojem zůstává video.",
+    "searchPlaceholder": "Hledat v přepisu…",
+    "searchLabel": "Hledat v přepisu",
+    "searchClear": "Vymazat hledání",
+    "searchNoMatches": "Žádné výsledky pro „{query}“.",
+    "searchMatches": "{count, plural, =1 {1 výsledek} few {# výsledky} many {# výsledku} other {# výsledků}}",
+    "downloadLabel": "Stáhnout",
+    "downloadMenu": "Možnosti stažení",
+    "downloadTranscriptTxt": "Přepis (.txt)",
+    "downloadTranscriptSrt": "Titulky (.srt)",
+    "downloadTranscriptVtt": "Titulky (.vtt)",
+    "downloadSummaryMd": "Shrnutí (.md)",
+    "hero": {
+      "badge": "Automatické shrnutí",
+      "aiActArt50": "Obsah generovaný AI",
+      "title": "Ve zkratce",
+      "availableIn": "Shrnutí je k dispozici také v jazycích: {langs}",
+      "summaryLanguageLabel": "Jazyk shrnutí",
+      "topicsLabel": "Kapitoly — kliknutím přejdete na dané místo ve videu",
+      "keyDecisions": "Přijatá rozhodnutí",
+      "actionItems": "Úkoly",
+      "expandDetails": "Zobrazit rozhodnutí a úkoly",
+      "collapseDetails": "Skrýt rozhodnutí a úkoly"
+    },
+    "nowSpeaking": "Právě mluví",
+    "shareSegment": "Sdílet toto místo",
+    "shareSegmentCopied": "Odkaz byl zkopírován do schránky",
+    "bookmarkAdd": "Uložit do záložek",
+    "bookmarkRemove": "Odebrat ze záložek",
+    "bookmarksHeader": "Vaše záložky",
+    "bookmarksEmpty": "Zatím jste si neuložili žádné okamžiky. Otevřete segment přepisu a kliknutím na hvězdičku jej sem přidejte.",
+    "miniPlayerOpen": "Přenést video do popředí",
+    "miniPlayerClose": "Zavřít mini přehrávač",
+    "miniPlayerHint": "Zůstaňte u videa i při posouvání stránky",
+    "followLive": "Sledovat video",
+    "followManual": "Volné čtení",
+    "followResume": "Znovu sledovat video",
+    "lowConfidenceBadge": "ověřit",
+    "lowConfidenceTitle": "Tato část přepisu má nízkou míru jistoty: v záznamu mohou zaznít jiná slova. Vždy se řiďte původním videem.",
+    "miniTranscriptLabel": "Živý přepis",
+    "dubAvailableHint": "Nadabovaný zvuk je k dispozici v jazycích: {langs}. Pro poslech přeložené verze použijte volič zvuku v ovládacích prvcích přehrávače.",
+    "provenance": {
+      "triggerLabel": "Transparentnost zpracování AI",
+      "closeLabel": "Skrýt podrobnosti zpracování",
+      "intro": "Toto jsou modely, které pro tento záznam vytvořily přepis, shrnutí a dabing. Ukládají se po dokončení zpracování: vidíte, co bylo v tu chvíli skutečně použito, bez ohledu na pozdější změny nastavení.",
+      "asr": {
+        "title": "Přepis",
+        "hint": "Rozpoznávání řeči a rozdělení mluvčích.",
+        "engine": "Motor",
+        "model": "Model",
+        "version": "Verze",
+        "diarizationEngine": "Diarizace",
+        "diarizationSpeakers": "Rozpoznaní mluvčí"
+      },
+      "llm": {
+        "title": "Shrnutí a překlad",
+        "hint": "Shrnutí jednání a překlad přepisu a shrnutí.",
+        "engine": "Provozováno přes",
+        "model": "Model",
+        "vendor": "Dodavatel",
+        "license": "Licence",
+        "country": "Sídlo"
+      },
+      "tts": {
+        "title": "Dabing",
+        "hint": "Syntéza řeči pro zvuk v cílových jazycích.",
+        "engine": "Motor",
+        "license": "Licence",
+        "policy": "Pravidlo přiřazování hlasů"
+      },
+      "languages": {
+        "title": "Zpracované jazyky",
+        "hint": "Původ záznamu a cílové jazyky překladu a dabingu.",
+        "source": "Původní jazyk",
+        "translation": "Překlady",
+        "dubbing": "Dabing",
+        "none": "Žádné"
+      },
+      "voices": {
+        "title": "Syntetické hlasy přiřazené mluvčím",
+        "male": "mužský hlas",
+        "female": "ženský hlas"
+      },
+      "runAt": "Zpracování dokončeno dne",
+      "version": "Verze pipeline"
+    },
+    "overlapBadge": "současně",
+    "overlapTitle": "Souběžná řeč: v tomto úseku mluví více osob najednou."
   }
 }

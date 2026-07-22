@@ -18,18 +18,6 @@ import {
 } from '@/lib/jitsi/config';
 import { humanParticipantCount } from '@/lib/jitsi/participants';
 
-// F18: forcing Jitsi's advanced rnnoise noise-cancellation OFF is a workaround
-// for jitsi/web:stable-10741, whose rnnoise worklet has no resampling and
-// SILENCES non-48kHz microphones. Base WebRTC noise suppression (AEC/NS/AGC)
-// stays ON automatically via lib/jitsi/config.ts regardless of this flag.
-// Default = enforce-off (safe, = current behaviour). Set
-// NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE=false ONLY after the served Jitsi web image
-// is bumped to a build with the fixed worklet, then re-validate on a LIVE call.
-// Build-time inlined (NEXT_PUBLIC_*), so flipping it requires a rebuild — which
-// coincides with the image bump anyway.
-const RNNOISE_ENFORCE_OFF =
-  process.env.NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE !== 'false';
-
 interface WatermarkSettings {
   url?: string;
   enabled?: boolean;
@@ -64,6 +52,18 @@ interface JitsiRoomProps {
    *  button in the toolbar (ephemeral, no app analytics); 'CUSTOM' → the app's
    *  ReactionBar overlay (persisted/aggregated). Default 'NATIVE'. */
   reactionsMode?: 'NATIVE' | 'CUSTOM';
+  /** F18 — se true (DEFAULT) l'app forza OFF la soppressione rumore avanzata
+   *  (rnnoise) di Jitsi e la ri-spegne per tutta la call; se false la accende
+   *  a ogni unmute. La soppressione WebRTC di base (AEC/NS/AGC) resta accesa
+   *  in entrambi i casi via lib/jitsi/config.ts.
+   *
+   *  Arriva come prop e non da `process.env.NEXT_PUBLIC_*` perché qui siamo in
+   *  un componente client: quella lettura viene sostituita da webpack a BUILD
+   *  time e resterebbe congelata nell'immagine. Il valore lo risolve il Server
+   *  Component con `getPublicEnv` + `resolveRnnoiseEnforceOff`, così si cambia
+   *  dall'env del pod. Vedi lib/jitsi/rnnoise.ts per il perché il default è
+   *  spento e cosa serve per accenderlo. */
+  rnnoiseEnforceOff?: boolean;
   /** If true, the iframe initializes with the local video track muted.
    *  Reflects the user's pre-join DeviceCheck toggle so the choice
    *  actually takes effect when the user lands in the Jitsi room. */
@@ -109,6 +109,9 @@ export default function JitsiRoom({
   whiteboardEnabled = false,
   videoQuality,
   reactionsMode = 'NATIVE',
+  // Default spento (= rnnoise forzata OFF): un chiamante che dimentica la prop
+  // deve ricadere sul comportamento sicuro, non su quello da validare.
+  rnnoiseEnforceOff = true,
   startWithVideoMuted = false,
   startWithAudioMuted = false,
   watermark,
@@ -414,7 +417,7 @@ export default function JitsiRoom({
         };
 
         // P4 — Forza la "soppressione rumore extra" (rnnoise) OFF e la tiene OFF
-        // (default dev/test, RNNOISE_ENFORCE_OFF=true). Su jitsi/web:stable-10741
+        // (default ovunque, `rnnoiseEnforceOff=true`). Su jitsi/web:stable-10741
         // stock il worklet rnnoise non fa conversione di sample-rate e ZITTISCE il
         // microfono su contesti non-48kHz (un moderatore è rimasto muto nella demo
         // prova-con-roberto). Non c'è un flag per-feature né un toggle rimovibile,
@@ -425,12 +428,13 @@ export default function JitsiRoom({
         const enforceNoiseSuppressionOff = (): void => setNoiseSuppression(false);
 
         // F18: enable advanced rnnoise noise-suppression — but ONLY when the
-        // served jitsi/web image is the 48 kHz-patched build (RNNOISE_ENFORCE_OFF
-        // is false). It's a no-op with no local audio track, and everyone joins
-        // startWithAudioMuted, so enabling once at join wouldn't take — we
-        // (re)assert it on every unmute, when the mic track actually exists.
+        // served jitsi/web image is the 48 kHz-patched build AND the operator
+        // opted in (`rnnoiseEnforceOff=false`, dall'env del pod). It's a no-op
+        // with no local audio track, and everyone joins startWithAudioMuted, so
+        // enabling once at join wouldn't take — we (re)assert it on every
+        // unmute, when the mic track actually exists.
         const enableNoiseSuppression = (): void => {
-          if (RNNOISE_ENFORCE_OFF) return;
+          if (rnnoiseEnforceOff) return;
           setNoiseSuppression(true);
         };
 
@@ -447,7 +451,7 @@ export default function JitsiRoom({
           onParticipantCountChangedRef.current?.(humanParticipantCount(api, displayName, myEndpointIdRef.current));
           // Annulla un'eventuale NS persistita da Jitsi in localStorage da una
           // sessione precedente, poi continua a ri-asserirla off per tutta la call.
-          if (RNNOISE_ENFORCE_OFF) {
+          if (rnnoiseEnforceOff) {
             enforceNoiseSuppressionOff();
             if (!nsEnforceTimerRef.current) {
               nsEnforceTimerRef.current = setInterval(enforceNoiseSuppressionOff, 2000);
@@ -640,7 +644,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, videoQuality, reactionsMode, startWithVideoMuted, startWithAudioMuted]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, videoQuality, reactionsMode, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted]);
 
   return (
     <div className="jitsi-wrapper position-relative">

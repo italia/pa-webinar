@@ -1,5 +1,5 @@
 /**
- * Public asset serving.
+ * Asset serving: pubblico per default, protetto per gli allegati della chat.
  *
  * Uploaded files (logos, event covers, materials) are written to a PRIVATE
  * object-storage container — the storage account has public blob access
@@ -16,6 +16,36 @@
  * Only the `assets/` key prefix is reachable (the prefix produced by
  * buildAssetKey), so this can never be used to read recordings or other blobs.
  *
+ * ── DUE FAMIGLIE DI ASSET ──────────────────────────────────────────────────
+ *
+ * 1. Asset pubblici (logo, favicon, copertine, watermark, audio della sala
+ *    d'attesa, materiali): restano pubblici. Sono già esposti in pagine
+ *    pubbliche, in og:image e nelle email — un gate qui li romperebbe.
+ *
+ * 2. Allegati della chat (`assets/chat/<eventId>/…`, vedi buildChatAssetKey):
+ *    PROTETTI. In un webinar PA la chat contiene documenti, e finora l'unica
+ *    difesa era che l'UUID non fosse indovinabile: un URL copiato dalla stanza
+ *    (o un vecchio link inoltrato) apriva il file a chiunque, per sempre, anche
+ *    a evento concluso — mentre il messaggio che lo conteneva era già dietro
+ *    autenticazione. Il gate è `authorizeChatRead`, lo STESSO di GET /chat e
+ *    dello stream SSE: chi può leggere i messaggi vede gli allegati, gli altri
+ *    no. Nessuna regola parallela da tenere allineata a mano.
+ *
+ * Il token del lettore arriva in `?token=` oltre che in Authorization: un
+ * <img src> e un <a href> non possono portare un header. È lo stesso
+ * compromesso già in uso sui magic link (extractModeratorToken). Un ospite non
+ * ha token e passa dal ramo anonimo del gate — cioè vede l'allegato solo
+ * finestra-ospite aperta (LIVE, evento senza password), esattamente come vede
+ * il messaggio.
+ *
+ * SCELTA CONSAPEVOLE — allegati caricati PRIMA di questo cambio: le loro chiavi
+ * stanno sotto `assets/image|document/…`, indistinguibili da un logo, e restano
+ * quindi capability-URL pubbliche. Non li irrigidiamo perché non si può farlo
+ * senza un gate su OGNI asset (una query DB per ogni richiesta di logo) oppure
+ * riscrivendo chiavi in storage e righe ChatMessage: i link già inviati
+ * continuano a funzionare, per scelta. Il nuovo namespace chiude la porta da
+ * qui in avanti; l'insieme residuo è finito e non cresce.
+ *
  * Security: the container is private but this route is public. We always send
  * `X-Content-Type-Options: nosniff` (so e.g. text/plain can't be sniffed as
  * HTML) and force `Content-Disposition: attachment` for anything that isn't a
@@ -28,7 +58,11 @@
 
 import type { NextRequest } from 'next/server';
 
+import { extractModeratorToken } from '@/lib/auth/moderator';
+import { authorizeChatRead } from '@/lib/chat/read-access';
+import { AppError } from '@/lib/errors';
 import { getFilesStorage } from '@/lib/storage';
+import { chatAssetEventId, isChatAssetPath } from '@/lib/utils/asset-key';
 import { normalizeMimeType } from '@/lib/utils/mime-sniff';
 
 export const dynamic = 'force-dynamic';
@@ -53,7 +87,7 @@ function mustForceDownload(contentType: string): boolean {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await context.params;
@@ -68,6 +102,31 @@ export async function GET(
     return new Response('Bad request', { status: 400 });
   }
   const key = `assets/${sub}`;
+
+  // Allegati di chat: stesso gate della lettura dei messaggi. Prima di
+  // qualsiasi accesso allo storage, così a un lettore non autorizzato non viene
+  // nemmeno emesso il SAS.
+  const gated = isChatAssetPath(sub);
+  if (gated) {
+    const eventId = chatAssetEventId(sub);
+    // Namespace protetto ma percorso che non nomina un evento valido: non
+    // esiste un blob così, e comunque non sapremmo su cosa autorizzare.
+    if (!eventId) return new Response('Not found', { status: 404 });
+    try {
+      await authorizeChatRead(eventId, extractModeratorToken(request));
+    } catch (err) {
+      // authorizeChatRead distingue 404 (evento inesistente) da 403 (non puoi
+      // leggere questa chat). Qualunque ALTRO errore resta un rifiuto — un gate
+      // che si apre quando il DB non risponde non è un gate — ma va loggato:
+      // altrimenti un guasto di infrastruttura si presenta come "permesso
+      // negato" e si cerca il bug nel posto sbagliato.
+      if (!(err instanceof AppError)) {
+        console.error('[assets] chat access gate failed unexpectedly:', err);
+      }
+      const status = err instanceof AppError && err.statusCode === 404 ? 404 : 403;
+      return new Response(status === 404 ? 'Not found' : 'Forbidden', { status });
+    }
+  }
 
   const storage = getFilesStorage();
   if (!storage) return new Response('Not found', { status: 404 });
@@ -106,7 +165,14 @@ export async function GET(
   }
   // Asset keys embed a random UUID → the bytes for a given key never change,
   // so they're safe to cache aggressively at the browser/CDN.
-  headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+  // Gli allegati di chat NO: `public` autorizzerebbe una cache condivisa (CDN,
+  // proxy) a restituire il documento a chi non ha superato il gate, e la
+  // risposta dipende dal token/cookie del richiedente. Il controllo va rifatto
+  // a ogni richiesta, perché il diritto a leggere scade con l'evento.
+  headers.set(
+    'Cache-Control',
+    gated ? 'private, no-store' : 'public, max-age=31536000, immutable',
+  );
 
   return new Response(upstream.body, { status: 200, headers });
 }
