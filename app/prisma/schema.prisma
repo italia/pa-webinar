@@ -1102,6 +1102,16 @@ model SiteSetting {
   githubUrl    String? @map("github_url")
   supportEmail String? @map("support_email")
 
+  // Email sender. `emailFromName` is the display name recipients see in their
+  // inbox; null falls back to SMTP_FROM_NAME and then to the site name, so an
+  // instance that never touches this keeps the historical behaviour. The
+  // ADDRESS stays in SMTP_FROM: it has to match what the SMTP relay is
+  // authorised to send as, so it is deployment config, not a site setting.
+  emailFromName String? @map("email_from_name")
+  // Optional Reply-To. The From address is a no-reply relay, so without this a
+  // reply from an attendee goes nowhere.
+  emailReplyTo  String? @map("email_reply_to")
+
   // i18n / locale management
   defaultLocale        String @default("it") @map("default_locale")
   availableLocales     Json   @default("[\"it\",\"en\"]") @map("available_locales")

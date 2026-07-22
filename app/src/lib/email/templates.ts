@@ -33,6 +33,8 @@ interface EmailTemplateInput {
   };
   siteName?: string;
   organizationFooter?: string;
+  /** Immagine dell'evento (URL assoluto), mostrata come banner in cima. */
+  eventImageUrl?: string | null;
 }
 
 interface LocaleCopy {
@@ -129,7 +131,57 @@ const copy: Record<Locale, LocaleCopy> = {
   },
 };
 
-function layout(heading: string, body: string, footerText: string, locale: Locale = 'it', siteName = 'PA Webinar'): string {
+/**
+ * URL assoluto dell'immagine di un evento, o null.
+ *
+ * `imageUrl`/`coverImageUrl` sono normalmente già assoluti (li scrive la rotta
+ * di upload), ma un valore relativo esiste in configurazioni più vecchie e in
+ * un client di posta non risolverebbe: lo ancoriamo al base URL pubblico.
+ */
+export function absoluteEventImage(
+  event: { imageUrl?: string | null; coverImageUrl?: string | null },
+  baseUrl: string,
+): string | null {
+  const raw = event.imageUrl ?? event.coverImageUrl;
+  if (!raw) return null;
+  try {
+    return new URL(raw, baseUrl).toString();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Banner dell'evento. Solo URL assoluti http(s): il valore finisce in un
+ * `src=` dentro l'HTML dell'email, quindi uno schema arbitrario (`javascript:`,
+ * `data:`) non deve poter passare, e un percorso relativo non risolverebbe
+ * comunque in un client di posta.
+ */
+function eventBanner(url: string | null | undefined, alt: string): string {
+  if (!url) return '';
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return '';
+  }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return '';
+  return `
+<!-- Banner evento -->
+<tr><td style="padding:0;line-height:0;">
+  <img src="${escapeHtml(parsed.toString())}" alt="${escapeHtml(alt)}" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;">
+</td></tr>
+`;
+}
+
+function layout(
+  heading: string,
+  body: string,
+  footerText: string,
+  locale: Locale = 'it',
+  siteName = 'PA Webinar',
+  banner = '',
+): string {
   return `<!DOCTYPE html>
 <html lang="${locale}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -142,7 +194,7 @@ function layout(heading: string, body: string, footerText: string, locale: Local
 <tr><td style="background:#06c;padding:20px 24px;">
   <span style="color:#fff;font-size:20px;font-weight:700;letter-spacing:0.5px;">${escapeHtml(siteName)}</span>
 </td></tr>
-
+${banner}
 <!-- Heading -->
 <tr><td style="padding:32px 24px 8px;">
   <h1 style="margin:0;font-size:24px;color:#17324d;">${heading}</h1>
@@ -272,7 +324,11 @@ export function confirmationHtml(
   ⚠️ ${escapeHtml(r.infoNote)}
 </p>`
     : '';
+  const eventName = input.eventTitle
+    ? `<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#17324d;">${escapeHtml(input.eventTitle)}</p>`
+    : '';
   const body = `
+${eventName}
 ${intro}
 ${detailsTable(c, input)}
 ${ctaButton(r.ctaLabel, input.joinUrl)}
@@ -280,7 +336,14 @@ ${calendarHtml}
 ${info}
 <p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
 
-  return layout(escapeHtml(r.heading), body, `${footerText}<br>${escapeHtml(r.footerNote)}`, input.locale, input.siteName);
+  return layout(
+    escapeHtml(r.heading),
+    body,
+    `${footerText}<br>${escapeHtml(r.footerNote)}`,
+    input.locale,
+    input.siteName,
+    eventBanner(input.eventImageUrl, input.eventTitle),
+  );
 }
 
 export function confirmationText(
@@ -340,7 +403,11 @@ export function reminderHtml(
   ⚠️ ${escapeHtml(r.infoNote)}
 </p>`
     : '';
+  const eventName = input.eventTitle
+    ? `<p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#17324d;">${escapeHtml(input.eventTitle)}</p>`
+    : '';
   const body = `
+${eventName}
 ${intro}
 ${detailsTable(c, input)}
 ${ctaButton(r.ctaLabel, input.joinUrl)}
@@ -348,7 +415,14 @@ ${calendarHtml}
 ${info}
 <p style="margin:16px 0 0;font-size:14px;"><a href="${input.eventPageUrl}" style="color:#06c;">${c.viewEvent}</a></p>`;
 
-  return layout(escapeHtml(r.heading), body, `${footerText}<br>${escapeHtml(r.footerNote)}`, input.locale, input.siteName);
+  return layout(
+    escapeHtml(r.heading),
+    body,
+    `${footerText}<br>${escapeHtml(r.footerNote)}`,
+    input.locale,
+    input.siteName,
+    eventBanner(input.eventImageUrl, input.eventTitle),
+  );
 }
 
 export function reminderText(
