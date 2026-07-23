@@ -1,7 +1,15 @@
 [
   {
     "version": "0.8.7",
-    "date": "2026-07-23"
+    "date": "2026-07-23",
+    "technical": [
+      "rnnoise noise-suppression flag moved from build-time-inlined to a runtime read (lib/jitsi/rnnoise); production values keep it enabled, preventing a silent regression on deploy.",
+      "i18n: 664 missing keys completed across 22 locales; a parity test now guards the whole catalogue (keys + ICU placeholders), not just the consent namespaces.",
+      "CI stopped rendering green on untested code: recorder, recorder-controller and the AI worker (pytest) now run in CI (were in no pipeline); coverage provider installed with a measured floor; Dependabot extended to the previously-uncovered images.",
+      "Chat attachments: after two gate attempts flagged in review (a durable token leaking into the URL, then a self-signed token bypassing live event status), reverted to the documented capability-URL; a cookie-scoped ACL is on the roadmap.",
+      "Brand asset kit + Open Graph/social preview wiring via a shared lib/seo with a guarded metadataBase (a malformed NEXT_PUBLIC_APP_URL no longer 500s the site).",
+      "Release CI fixed: the SBOM step no longer fails on the org artifact-storage quota, so GitHub Releases (with SBOM) are created again."
+    ]
   },
   {
     "version": "0.8.6",

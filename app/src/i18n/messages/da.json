@@ -3461,12 +3461,13 @@
     "current": "Nuværende version",
     "sourceNote": "Noterne er redigeret ud fra projektets tags, pull requests og commits.",
     "sourceLink": "Se alle releases på GitHub",
-    "cadence": "Udgivelsestakt",
-    "cadenceSummary": "{count} versioner mellem {from} og {to}.",
     "rawChangelog": "CHANGELOG.md i repositoriet",
     "transparencyNote": "For hver version: hvad der kører og med hvilke komponenter, i",
     "transparencyInventory": "tjenestegennemsigtigheden",
-    "transparencySecurity": "sikkerhed og SBOM"
+    "transparencySecurity": "sikkerhed og SBOM",
+    "technicalDetail": "Tekniske detaljer",
+    "releaseLink": "Udgivelse og SBOM på GitHub",
+    "securityBadge": "Sikkerhed"
   },
   "postprod": {
     "loading": "Indlæser transskriptionen…",

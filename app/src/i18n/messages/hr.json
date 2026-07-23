@@ -3461,12 +3461,13 @@
     "current": "Trenutačna verzija",
     "sourceNote": "Bilješke se uređuju na temelju oznaka, pull requestova i commitova projekta.",
     "sourceLink": "Pogledaj sva izdanja na GitHubu",
-    "cadence": "Ritam izdanja",
-    "cadenceSummary": "{count} verzija između {from} i {to}.",
     "rawChangelog": "CHANGELOG.md u repozitoriju",
     "transparencyNote": "Za svaku verziju: što radi i s kojim komponentama, u",
     "transparencyInventory": "transparentnosti usluga",
-    "transparencySecurity": "sigurnosti i SBOM"
+    "transparencySecurity": "sigurnosti i SBOM",
+    "technicalDetail": "Tehnički detalji",
+    "releaseLink": "Izdanje i SBOM na GitHubu",
+    "securityBadge": "Sigurnost"
   },
   "postprod": {
     "loading": "Učitavanje transkripta…",

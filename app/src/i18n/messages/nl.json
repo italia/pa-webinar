@@ -3461,12 +3461,13 @@
     "current": "Huidige versie",
     "sourceNote": "De notities zijn samengesteld op basis van de tags, pull requests en commits van het project.",
     "sourceLink": "Bekijk alle releases op GitHub",
-    "cadence": "Releaseritme",
-    "cadenceSummary": "{count} versies tussen {from} en {to}.",
     "rawChangelog": "CHANGELOG.md in de repository",
     "transparencyNote": "Voor elke versie: wat er draait en met welke componenten, in de",
     "transparencyInventory": "dienstentransparantie",
-    "transparencySecurity": "beveiliging en SBOM"
+    "transparencySecurity": "beveiliging en SBOM",
+    "technicalDetail": "Technische details",
+    "releaseLink": "Release en SBOM op GitHub",
+    "securityBadge": "Beveiliging"
   },
   "postprod": {
     "loading": "Transcriptie laden…",

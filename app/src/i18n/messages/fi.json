@@ -3461,12 +3461,13 @@
     "current": "Nykyinen versio",
     "sourceNote": "Julkaisutiedot on koottu projektin tageista, pull requesteista ja commiteista.",
     "sourceLink": "Katso kaikki julkaisut GitHubissa",
-    "cadence": "Julkaisutahti",
-    "cadenceSummary": "{count} versiota välillä {from}–{to}.",
     "rawChangelog": "CHANGELOG.md tietovarastossa",
     "transparencyNote": "Jokaiselle versiolle: mikä on käynnissä ja millä osilla,",
     "transparencyInventory": "palvelujen läpinäkyvyys",
-    "transparencySecurity": "tietoturva ja SBOM"
+    "transparencySecurity": "tietoturva ja SBOM",
+    "technicalDetail": "Tekniset tiedot",
+    "releaseLink": "Julkaisu ja SBOM GitHubissa",
+    "securityBadge": "Tietoturva"
   },
   "postprod": {
     "loading": "Ladataan litterointia…",

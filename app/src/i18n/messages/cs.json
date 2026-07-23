@@ -3461,12 +3461,13 @@
     "current": "Aktuální verze",
     "sourceNote": "Poznámky vznikají z tagů, pull requestů a commitů projektu.",
     "sourceLink": "Zobrazit všechna vydání na GitHubu",
-    "cadence": "Rytmus vydání",
-    "cadenceSummary": "{count} verzí mezi {from} a {to}.",
     "rawChangelog": "CHANGELOG.md v repozitáři",
     "transparencyNote": "Pro každou verzi: co běží a s jakými komponentami, v",
     "transparencyInventory": "transparentnosti služeb",
-    "transparencySecurity": "zabezpečení a SBOM"
+    "transparencySecurity": "zabezpečení a SBOM",
+    "technicalDetail": "Technické podrobnosti",
+    "releaseLink": "Vydání a SBOM na GitHubu",
+    "securityBadge": "Zabezpečení"
   },
   "postprod": {
     "loading": "Načítání přepisu…",

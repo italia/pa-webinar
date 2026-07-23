@@ -3461,12 +3461,13 @@
     "current": "Jelenlegi verzió",
     "sourceNote": "A jegyzetek a projekt címkéi, pull requestjei és commitjai alapján készülnek.",
     "sourceLink": "Az összes kiadás megtekintése a GitHubon",
-    "cadence": "Kiadási ütem",
-    "cadenceSummary": "{count} verzió {from} és {to} között.",
     "rawChangelog": "CHANGELOG.md a tárolóban",
     "transparencyNote": "Minden verzióhoz: mi fut és milyen összetevőkkel, a",
     "transparencyInventory": "szolgáltatások átláthatóságában",
-    "transparencySecurity": "biztonság és SBOM oldalon"
+    "transparencySecurity": "biztonság és SBOM oldalon",
+    "technicalDetail": "Technikai részletek",
+    "releaseLink": "Kiadás és SBOM a GitHubon",
+    "securityBadge": "Biztonság"
   },
   "postprod": {
     "loading": "Átirat betöltése…",

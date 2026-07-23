@@ -3461,12 +3461,13 @@
     "current": "Текуща версия",
     "sourceNote": "Бележките са съставени въз основа на таговете, заявките за сливане и комитите на проекта.",
     "sourceLink": "Вижте всички издания в GitHub",
-    "cadence": "Ритъм на изданията",
-    "cadenceSummary": "{count} версии между {from} и {to}.",
     "rawChangelog": "CHANGELOG.md в хранилището",
     "transparencyNote": "За всяка версия: какво работи и с какви компоненти, в",
     "transparencyInventory": "прозрачността на услугите",
-    "transparencySecurity": "сигурността и SBOM"
+    "transparencySecurity": "сигурността и SBOM",
+    "technicalDetail": "Технически детайли",
+    "releaseLink": "Издание и SBOM в GitHub",
+    "securityBadge": "Сигурност"
   },
   "postprod": {
     "loading": "Зарежда се транскрипцията…",

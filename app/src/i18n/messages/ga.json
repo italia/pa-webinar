@@ -3461,12 +3461,13 @@
     "current": "An leagan reatha",
     "sourceNote": "Cuirtear na nótaí le chéile ó chlibeanna, ó iarratais tarraingthe agus ó thiomnuithe an tionscadail.",
     "sourceLink": "Féach ar na heisiúintí go léir ar GitHub",
-    "cadence": "Rithim na n-eisiúintí",
-    "cadenceSummary": "{count} leagan idir {from} agus {to}.",
     "rawChangelog": "CHANGELOG.md sa stór",
     "transparencyNote": "Do gach leagan: cad atá ar siúl agus le cé na comhpháirteanna, sa",
     "transparencyInventory": "trédhearcacht seirbhísí",
-    "transparencySecurity": "slándáil agus SBOM"
+    "transparencySecurity": "slándáil agus SBOM",
+    "technicalDetail": "Sonraí teicniúla",
+    "releaseLink": "Eisiúint agus SBOM ar GitHub",
+    "securityBadge": "Slándáil"
   },
   "postprod": {
     "loading": "Tras-scríbhinn á lódáil…",
