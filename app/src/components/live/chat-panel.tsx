@@ -1347,9 +1347,8 @@ function Attachment({
   openLabel: string;
 }) {
   const isImage = att.mime.startsWith('image/');
-  // L'URL arriva GIÀ firmato dal server (token di sola lettura, legato al
-  // percorso): il client non aggiunge la propria credenziale. Vedi
-  // lib/chat/attachment-token → signAssetRead.
+  // URL pubblico servito dalla rotta asset (capability-URL): il client non
+  // aggiunge alcuna credenziale. Un ACL vero è in roadmap.
   const href = att.url;
   if (isImage) {
     return (

@@ -148,10 +148,12 @@ export async function GET(
   // a ogni richiesta, perché il diritto a leggere scade con l'evento.
   headers.set(
     'Cache-Control',
-    // Chat: cache BREVE, così una rimozione dalla moderazione si propaga in
-    // pochi minuti anche a chi l'aveva già aperto. Il resto (logo, copertine)
-    // ha un URL per-blob immutabile: cache lunga.
-    isChatAttachment ? 'public, max-age=300' : 'public, max-age=31536000, immutable'
+    // Chat: PRIVATA e breve. Mai `public`: una cache condivisa (CDN, proxy
+    // aziendale) continuerebbe a servire un allegato rimosso dalla moderazione
+    // anche dopo la cancellazione del blob, e a chiunque. `private` la tiene nel
+    // solo browser di chi l'ha aperto, `max-age=60` la fa scadere in fretta. Il
+    // resto (logo, copertine) ha un URL per-blob immutabile: cache lunga.
+    isChatAttachment ? 'private, max-age=60' : 'public, max-age=31536000, immutable'
   );
 
   return new Response(upstream.body, { status: 200, headers });

@@ -11,37 +11,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  * servono, il namespace chat ha cache breve (una rimozione si propaga), e la
  * difesa in profondità contro il traversal non cede.
  */
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    event: { findFirst: vi.fn() },
-    eventModerator: { findUnique: vi.fn() },
-    registration: { findUnique: vi.fn() },
-  },
-}));
 vi.mock('@/lib/storage', () => ({ getFilesStorage: vi.fn() }));
-vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => v }));
-vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn() }));
-vi.mock('@/lib/event-session', () => ({ readOwnedEventAccessToken: vi.fn() }));
 
-import { prisma } from '@/lib/db';
-import { readOwnedEventAccessToken } from '@/lib/event-session';
-import { hasJoinGrant } from '@/lib/events/join-grant';
 import { getFilesStorage } from '@/lib/storage';
 
 import { GET } from './route';
 
-const mockedEvent = prisma.event.findFirst as unknown as ReturnType<typeof vi.fn>;
-const mockedGrantRow = prisma.eventModerator
-  .findUnique as unknown as ReturnType<typeof vi.fn>;
-const mockedRegistration = prisma.registration
-  .findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedStorage = getFilesStorage as unknown as ReturnType<typeof vi.fn>;
-const mockedJoinGrant = hasJoinGrant as unknown as ReturnType<typeof vi.fn>;
-const mockedOwnedToken = readOwnedEventAccessToken as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 const BLOB_UUID = '11111111-2222-3333-4444-555555555555';
-const PRIMARY_TOKEN = 'PRIMARY_MOD_TOKEN';
 
 /** Percorsi serviti (la chiave senza il prefisso `assets/`). */
 const CHAT_PATH = ['chat', EVENT_ID, '2026', '07', `${BLOB_UUID}-verbale.pdf`];
@@ -56,24 +35,12 @@ const upstreamFetch = vi.fn(
     }),
 );
 
-function eventRow(over: Record<string, unknown> = {}) {
-  return {
-    id: EVENT_ID,
-    status: 'LIVE',
-    eventType: 'SCHEDULED',
-    moderatorToken: PRIMARY_TOKEN,
-    joinPasswordHash: null,
-    ...over,
-  };
-}
-
 /** Il param catch-all arriva come Promise: firma di Next 15. */
 const ctx = (path: string[]) => ({ params: Promise.resolve({ path }) });
 
-function request(path: string[], opts: { query?: string; bearer?: string } = {}): NextRequest {
+function request(path: string[]): NextRequest {
   return new Request(
-    `https://webinar.gov.it/api/assets/${path.join('/')}${opts.query ?? ''}`,
-    opts.bearer ? { headers: { authorization: `Bearer ${opts.bearer}` } } : undefined,
+    `https://webinar.gov.it/api/assets/${path.join('/')}`,
   ) as unknown as NextRequest;
 }
 
@@ -81,11 +48,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.stubGlobal('fetch', upstreamFetch);
   mockedStorage.mockReturnValue({ getDownloadUrl });
-  mockedEvent.mockResolvedValue(eventRow());
-  mockedGrantRow.mockResolvedValue(null);
-  mockedRegistration.mockResolvedValue(null);
-  mockedJoinGrant.mockResolvedValue(false);
-  mockedOwnedToken.mockResolvedValue(null);
 });
 
 /**
@@ -109,8 +71,9 @@ describe('GET /api/assets/[...path] — gli asset pubblici restano pubblici', ()
   it('non interroga il DB per un asset pubblico', async () => {
     // Il gate costa una query per richiesta: se scattasse anche sul logo, ogni
     // pagina pubblica pagherebbe un roundtrip su un byte-stream cacheabile.
+    // Nessun gate su nessun asset: la rotta non tocca il DB.
     await GET(request(LOGO_PATH), ctx(LOGO_PATH));
-    expect(mockedEvent).not.toHaveBeenCalled();
+    expect(getDownloadUrl).toHaveBeenCalledTimes(1);
   });
 
   it('resta cacheabile a lungo dalle cache condivise', async () => {
@@ -131,8 +94,6 @@ describe('GET /api/assets/chat/… — capability-URL, cache breve', () => {
     expect(getDownloadUrl).toHaveBeenCalledWith(`assets/${CHAT_PATH.join('/')}`, {
       expiresInMinutes: 10,
     });
-    // Nessun gate: non si interroga l'evento.
-    expect(mockedEvent).not.toHaveBeenCalled();
   });
 
   it('cache BREVE sugli allegati di chat, perché una rimozione si propaghi', async () => {
@@ -140,7 +101,7 @@ describe('GET /api/assets/chat/… — capability-URL, cache breve', () => {
     // allegato può essere rimosso dalla moderazione: la sua cache deve scadere
     // in fretta perché chi l'aveva aperto smetta di vederlo.
     const res = await GET(request(CHAT_PATH), ctx(CHAT_PATH));
-    expect(res.headers.get('Cache-Control')).toBe('public, max-age=300');
+    expect(res.headers.get('Cache-Control')).toBe('private, max-age=60');
   });
 
   it('non lascia risalire fuori dal prefisso assets/ (traversal)', async () => {
