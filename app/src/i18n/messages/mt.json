@@ -3464,7 +3464,10 @@
     "cadence": "Ritmu tar-rilaxxi",
     "cadenceSummary": "{count} verżjonijiet bejn {from} u {to}.",
     "releaseNotes": "Noti tar-rilaxx u SBOM",
-    "rawChangelog": "CHANGELOG.md fir-repożitorju"
+    "rawChangelog": "CHANGELOG.md fir-repożitorju",
+    "transparencyNote": "Għal kull verżjoni: x'qed jaħdem u b'liema komponenti, fit-",
+    "transparencyInventory": "trasparenza tas-servizzi",
+    "transparencySecurity": "sigurtà u SBOM"
   },
   "postprod": {
     "loading": "Qed titgħabba t-traskrizzjoni…",

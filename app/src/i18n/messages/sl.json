@@ -3464,7 +3464,10 @@
     "cadence": "Ritem izdaj",
     "cadenceSummary": "{count} različic med {from} in {to}.",
     "releaseNotes": "Opombe ob izdaji in SBOM",
-    "rawChangelog": "CHANGELOG.md v repozitoriju"
+    "rawChangelog": "CHANGELOG.md v repozitoriju",
+    "transparencyNote": "Za vsako različico: kaj teče in s katerimi komponentami, v",
+    "transparencyInventory": "preglednosti storitev",
+    "transparencySecurity": "varnosti in SBOM"
   },
   "postprod": {
     "loading": "Nalaganje prepisa…",

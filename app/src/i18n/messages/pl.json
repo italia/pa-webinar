@@ -3464,7 +3464,10 @@
     "cadence": "Rytm wydań",
     "cadenceSummary": "{count} wersji między {from} a {to}.",
     "releaseNotes": "Informacje o wydaniu i SBOM",
-    "rawChangelog": "CHANGELOG.md w repozytorium"
+    "rawChangelog": "CHANGELOG.md w repozytorium",
+    "transparencyNote": "Dla każdej wersji: co działa i z jakimi składnikami, w",
+    "transparencyInventory": "przejrzystości usług",
+    "transparencySecurity": "bezpieczeństwie i SBOM"
   },
   "postprod": {
     "loading": "Wczytywanie transkrypcji…",

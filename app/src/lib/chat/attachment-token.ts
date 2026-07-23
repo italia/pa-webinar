@@ -130,3 +130,66 @@ export function verifyChatAttachmentToken(
     senderId: payload.u,
   };
 }
+
+
+/**
+ * Token di SOLA LETTURA per servire un allegato a `<img src>` / `<a href>`.
+ *
+ * Un tag immagine non può portare un header Authorization, quindi il permesso
+ * deve viaggiare nell'URL. Ci mettevamo il token DUREVOLE del lettore — che per
+ * un moderatore è la sua magic-link con pieni poteri: finiva nella barra degli
+ * indirizzi, nella condivisione schermo, nella registrazione. Questo invece è
+ * una capability minima: sblocca QUEL percorso e basta, per un evento solo,
+ * finché non scade. Rubato da uno screenshot, apre un'immagine di chat, non la
+ * stanza.
+ *
+ * Scadenza volutamente lunga (una sessione): la cronologia rifirma a ogni
+ * caricamento della pagina, ma un pannello aperto a lungo non deve vedere le
+ * immagini sparire a metà evento. Un allegato rimosso dalla moderazione viene
+ * cancellato dallo storage, quindi un URL trapelato a quel punto è un 404.
+ */
+const READ_TOKEN_TTL_SECONDS = 12 * 60 * 60; // 12h: copre una sessione lunga
+
+export function signAssetRead(
+  key: string,
+  eventId: string,
+  now: Date = new Date(),
+): string {
+  const exp = Math.floor(now.getTime() / 1000) + READ_TOKEN_TTL_SECONDS;
+  // Il percorso e l'evento sono DENTRO la firma: un token non si sposta su un
+  // altro blob né su un'altra chat.
+  const encoded = b64urlEncode(Buffer.from(`${exp}:${eventId}:${key}`, 'utf8'));
+  const sig = createHmac('sha256', requireAppSecret()).update(encoded).digest();
+  return `${encoded}.${b64urlEncode(sig)}`;
+}
+
+/** True se `token` autorizza la lettura di `key` per `eventId` ed è ancora valido. */
+export function verifyAssetRead(
+  token: string,
+  key: string,
+  eventId: string,
+  now: Date = new Date(),
+): boolean {
+  const dot = token.indexOf('.');
+  if (dot <= 0) return false;
+  const encoded = token.slice(0, dot);
+  let expectedSig: Buffer;
+  try {
+    expectedSig = createHmac('sha256', requireAppSecret()).update(encoded).digest();
+  } catch {
+    return false;
+  }
+  const provided = b64urlDecode(token.slice(dot + 1));
+  if (provided.length !== expectedSig.length) return false;
+  if (!timingSafeEqual(provided, expectedSig)) return false;
+  const parts = b64urlDecode(encoded).toString('utf8').split(':');
+  if (parts.length < 3) return false;
+  const exp = Number(parts[0]);
+  const evt = parts[1];
+  // La chiave può contenere ':'? No (percorsi di blob non ne hanno), ma per
+  // sicurezza ricomponiamo il resto.
+  const signedKey = parts.slice(2).join(':');
+  if (!Number.isFinite(exp) || exp < Math.floor(now.getTime() / 1000)) return false;
+  if (evt !== eventId || signedKey !== key) return false;
+  return true;
+}

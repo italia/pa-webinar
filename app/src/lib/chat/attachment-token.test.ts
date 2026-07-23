@@ -3,6 +3,8 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import {
   issueChatAttachmentToken,
   verifyChatAttachmentToken,
+  signAssetRead,
+  verifyAssetRead,
   type ChatAttachmentClaims,
 } from './attachment-token';
 
@@ -59,5 +61,39 @@ describe('chat attachment token', () => {
     expect(verifyChatAttachmentToken('', CALLER)).toBeNull();
     expect(verifyChatAttachmentToken('no-dot', CALLER)).toBeNull();
     expect(verifyChatAttachmentToken('.onlysig', CALLER)).toBeNull();
+  });
+});
+
+describe('asset read token (sola lettura, legato al percorso)', () => {
+  const KEY = 'assets/chat/aaaa-bbbb/2026/07/uuid-verbale.pdf';
+  const EVT = 'aaaa-bbbb';
+
+  it('verifica un token appena firmato', () => {
+    expect(verifyAssetRead(signAssetRead(KEY, EVT), KEY, EVT)).toBe(true);
+  });
+
+  it('non apre un ALTRO percorso', () => {
+    const t = signAssetRead(KEY, EVT);
+    expect(verifyAssetRead(t, KEY + '.altro', EVT)).toBe(false);
+  });
+
+  it('non apre un ALTRO evento', () => {
+    const t = signAssetRead(KEY, EVT);
+    expect(verifyAssetRead(t, KEY, 'altro-evento')).toBe(false);
+  });
+
+  it('rifiuta un token scaduto', () => {
+    const past = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const t = signAssetRead(KEY, EVT, past);
+    expect(verifyAssetRead(t, KEY, EVT)).toBe(false);
+  });
+
+  it('rifiuta firma manomessa e input malformato', () => {
+    const t = signAssetRead(KEY, EVT);
+    const [payload] = t.split('.');
+    expect(verifyAssetRead(`${payload}.deadbeef`, KEY, EVT)).toBe(false);
+    expect(verifyAssetRead('', KEY, EVT)).toBe(false);
+    expect(verifyAssetRead('no-dot', KEY, EVT)).toBe(false);
+    expect(verifyAssetRead('.onlysig', KEY, EVT)).toBe(false);
   });
 });

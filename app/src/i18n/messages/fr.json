@@ -3560,6 +3560,9 @@
     "cadence": "Rythme des versions",
     "cadenceSummary": "{count} versions entre le {from} et le {to}.",
     "releaseNotes": "Notes de version et SBOM",
-    "rawChangelog": "CHANGELOG.md dans le dépôt"
+    "rawChangelog": "CHANGELOG.md dans le dépôt",
+    "transparencyNote": "Pour chaque version : ce qui tourne et avec quels composants, dans la",
+    "transparencyInventory": "transparence des services",
+    "transparencySecurity": "sécurité et SBOM"
   }
 }

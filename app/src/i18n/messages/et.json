@@ -3464,7 +3464,10 @@
     "cadence": "Väljalasete rütm",
     "cadenceSummary": "{count} versiooni ajavahemikus {from} kuni {to}.",
     "releaseNotes": "Väljalaskemärkmed ja SBOM",
-    "rawChangelog": "CHANGELOG.md hoidlas"
+    "rawChangelog": "CHANGELOG.md hoidlas",
+    "transparencyNote": "Iga versiooni kohta: mis töötab ja milliste komponentidega,",
+    "transparencyInventory": "teenuste läbipaistvus",
+    "transparencySecurity": "turvalisus ja SBOM"
   },
   "postprod": {
     "loading": "Transkriptsiooni laadimine…",

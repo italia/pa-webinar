@@ -27,6 +27,8 @@ interface Props {
   /** Versione in esecuzione, evidenziata. Vuota nelle build non taggate. */
   currentVersion: string;
   formatDate: (d: Date) => string;
+  /** Locale della pagina: le etichette dei mesi sull'asse la seguono. */
+  locale: string;
   label: string;
 }
 
@@ -38,6 +40,7 @@ export default function ReleaseCadence({
   releases,
   currentVersion,
   formatDate,
+  locale,
   label,
 }: Props) {
   const times = releases
@@ -63,7 +66,7 @@ export default function ReleaseCadence({
     if (t >= first) {
       months.push({
         at: x(t),
-        label: new Intl.DateTimeFormat('en', { month: 'short' })
+        label: new Intl.DateTimeFormat(locale, { month: 'short' })
           .format(cursor)
           .toUpperCase(),
       });

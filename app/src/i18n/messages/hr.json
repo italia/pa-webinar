@@ -3464,7 +3464,10 @@
     "cadence": "Ritam izdanja",
     "cadenceSummary": "{count} verzija između {from} i {to}.",
     "releaseNotes": "Bilješke uz izdanje i SBOM",
-    "rawChangelog": "CHANGELOG.md u repozitoriju"
+    "rawChangelog": "CHANGELOG.md u repozitoriju",
+    "transparencyNote": "Za svaku verziju: što radi i s kojim komponentama, u",
+    "transparencyInventory": "transparentnosti usluga",
+    "transparencySecurity": "sigurnosti i SBOM"
   },
   "postprod": {
     "loading": "Učitavanje transkripta…",

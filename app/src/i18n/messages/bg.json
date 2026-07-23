@@ -3464,7 +3464,10 @@
     "cadence": "Ритъм на изданията",
     "cadenceSummary": "{count} версии между {from} и {to}.",
     "releaseNotes": "Бележки към изданието и SBOM",
-    "rawChangelog": "CHANGELOG.md в хранилището"
+    "rawChangelog": "CHANGELOG.md в хранилището",
+    "transparencyNote": "За всяка версия: какво работи и с какви компоненти, в",
+    "transparencyInventory": "прозрачността на услугите",
+    "transparencySecurity": "сигурността и SBOM"
   },
   "postprod": {
     "loading": "Зарежда се транскрипцията…",

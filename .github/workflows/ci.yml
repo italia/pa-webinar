@@ -109,7 +109,10 @@ jobs:
         working-directory: infra/ai/worker
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          # I moduli importano torch/whisperx solo dentro le funzioni: bastano
+          # le due leggere che compaiono in cima (numpy, httpx). Vedi
+          # requirements-test.txt.
+          pip install -r requirements-test.txt
       - name: pytest
         working-directory: infra/ai/worker
         # I test che richiedono modelli o GPU si escludono da soli via skip;

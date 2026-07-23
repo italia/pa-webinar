@@ -3464,7 +3464,10 @@
     "cadence": "Laidienu ritms",
     "cadenceSummary": "{count} versijas laikā no {from} līdz {to}.",
     "releaseNotes": "Laidiena piezīmes un SBOM",
-    "rawChangelog": "CHANGELOG.md repozitorijā"
+    "rawChangelog": "CHANGELOG.md repozitorijā",
+    "transparencyNote": "Katrai versijai: kas darbojas un ar kādiem komponentiem,",
+    "transparencyInventory": "pakalpojumu pārredzamībā",
+    "transparencySecurity": "drošība un SBOM"
   },
   "postprod": {
     "loading": "Notiek transkripcijas ielāde…",

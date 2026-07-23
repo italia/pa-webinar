@@ -36,6 +36,13 @@ app:
     NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.eventi.developers.italia.it"
     NEXT_PUBLIC_APP_URL: "https://eventi.developers.italia.it"
     NEXT_PUBLIC_DEFAULT_LOCALE: "it"
+    # rnnoise ACCESO in produzione. Qui gira l'immagine jitsi/web patchata a
+    # 48 kHz, dove la soppressione avanzata del rumore funziona; su dev/test
+    # gira quella stock, dove zittisce il microfono, e la si tiene spenta
+    # (default). Il flag e' letto a RUNTIME (vedi lib/jitsi/rnnoise): se non
+    # fosse qui, il pod ripiegherebbe sul default e la spegnerebbe anche in
+    # prod, in silenzio, al primo deploy.
+    NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE: "false"
     DEFAULT_DATA_RETENTION_DAYS: "90"
     DEFAULT_PRIVACY_POLICY_URL: "https://eventi.developers.italia.it/it/privacy"
 

@@ -3464,7 +3464,10 @@
     "cadence": "Julkaisutahti",
     "cadenceSummary": "{count} versiota välillä {from}–{to}.",
     "releaseNotes": "Julkaisutiedot ja SBOM",
-    "rawChangelog": "CHANGELOG.md tietovarastossa"
+    "rawChangelog": "CHANGELOG.md tietovarastossa",
+    "transparencyNote": "Jokaiselle versiolle: mikä on käynnissä ja millä osilla,",
+    "transparencyInventory": "palvelujen läpinäkyvyys",
+    "transparencySecurity": "tietoturva ja SBOM"
   },
   "postprod": {
     "loading": "Ladataan litterointia…",

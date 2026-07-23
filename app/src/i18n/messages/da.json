@@ -3464,7 +3464,10 @@
     "cadence": "Udgivelsestakt",
     "cadenceSummary": "{count} versioner mellem {from} og {to}.",
     "releaseNotes": "Udgivelsesnoter og SBOM",
-    "rawChangelog": "CHANGELOG.md i repositoriet"
+    "rawChangelog": "CHANGELOG.md i repositoriet",
+    "transparencyNote": "For hver version: hvad der kører og med hvilke komponenter, i",
+    "transparencyInventory": "tjenestegennemsigtigheden",
+    "transparencySecurity": "sikkerhed og SBOM"
   },
   "postprod": {
     "loading": "Indlæser transskriptionen…",
