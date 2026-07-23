@@ -6,6 +6,7 @@ import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
 import { locales, type Locale } from '@/i18n/config';
+import { getPublicEnv } from '@/lib/env';
 import { Skiplink } from '@/components/layout/skiplinks';
 import PAHeader from '@/components/layout/pa-header';
 import PAFooter from '@/components/layout/pa-footer';
@@ -41,10 +42,30 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'common' });
   const settings = await getSettings();
 
+  // Un'anteprima social (WhatsApp, Slack, X, LinkedIn…) vuole un'immagine con
+  // URL ASSOLUTO. `metadataBase` la risolve dai path relativi; l'og-image di
+  // default è il lockup del brand, usato quando l'admin non ne ha impostata una
+  // propria. Prima esisteva il file ma non lo referenziava nulla.
+  const appUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
+  const ogImage = settings.seoImage || '/images/logo/og-image.png';
+  const title = settings.seoTitle || t('appName');
+  const description = settings.seoDescription || t('appDescription');
+
   return {
-    title: settings.seoTitle || t('appName'),
-    description: settings.seoDescription || t('appDescription'),
-    openGraph: settings.seoImage ? { images: [settings.seoImage] } : undefined,
+    metadataBase: appUrl ? new URL(appUrl) : undefined,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
