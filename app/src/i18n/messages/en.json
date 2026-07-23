@@ -3191,12 +3191,13 @@
     "current": "Current version",
     "sourceNote": "Notes are curated from the project's tags, pull requests and commits.",
     "sourceLink": "See all releases on GitHub",
-    "cadence": "Release cadence",
-    "cadenceSummary": "{count} versions between {from} and {to}.",
     "rawChangelog": "CHANGELOG.md in the repository",
     "transparencyNote": "For every version: what runs and with which components, in the",
     "transparencyInventory": "service transparency",
-    "transparencySecurity": "security and SBOM"
+    "transparencySecurity": "security and SBOM",
+    "technicalDetail": "Technical detail",
+    "releaseLink": "Release and SBOM on GitHub",
+    "securityBadge": "Security"
   },
   "pages": {
     "privacyTitle": "Privacy policy",

@@ -3461,12 +3461,13 @@
     "current": "Praegune versioon",
     "sourceNote": "Märkused on koostatud projekti siltide, tõmbepäringute ja commit’ide põhjal.",
     "sourceLink": "Vaata kõiki väljalaskeid GitHubis",
-    "cadence": "Väljalasete rütm",
-    "cadenceSummary": "{count} versiooni ajavahemikus {from} kuni {to}.",
     "rawChangelog": "CHANGELOG.md hoidlas",
     "transparencyNote": "Iga versiooni kohta: mis töötab ja milliste komponentidega,",
     "transparencyInventory": "teenuste läbipaistvus",
-    "transparencySecurity": "turvalisus ja SBOM"
+    "transparencySecurity": "turvalisus ja SBOM",
+    "technicalDetail": "Tehnilised üksikasjad",
+    "releaseLink": "Väljalase ja SBOM GitHubis",
+    "securityBadge": "Turvalisus"
   },
   "postprod": {
     "loading": "Transkriptsiooni laadimine…",

@@ -3461,12 +3461,13 @@
     "current": "Τρέχουσα έκδοση",
     "sourceNote": "Οι σημειώσεις επιμελούνται με βάση τα tag, τα pull request και τα commit του έργου.",
     "sourceLink": "Δείτε όλες τις εκδόσεις στο GitHub",
-    "cadence": "Ρυθμός εκδόσεων",
-    "cadenceSummary": "{count} εκδόσεις μεταξύ {from} και {to}.",
     "rawChangelog": "CHANGELOG.md στο αποθετήριο",
     "transparencyNote": "Για κάθε έκδοση: τι εκτελείται και με ποια στοιχεία, στη",
     "transparencyInventory": "διαφάνεια των υπηρεσιών",
-    "transparencySecurity": "ασφάλεια και SBOM"
+    "transparencySecurity": "ασφάλεια και SBOM",
+    "technicalDetail": "Τεχνικές λεπτομέρειες",
+    "releaseLink": "Έκδοση και SBOM στο GitHub",
+    "securityBadge": "Ασφάλεια"
   },
   "postprod": {
     "loading": "Φόρτωση μεταγραφής…",

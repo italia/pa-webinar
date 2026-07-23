@@ -3461,12 +3461,13 @@
     "current": "Versiunea actuală",
     "sourceNote": "Notele sunt redactate pornind de la tag-urile, pull request-urile și commit-urile proiectului.",
     "sourceLink": "Vezi toate versiunile pe GitHub",
-    "cadence": "Ritmul versiunilor",
-    "cadenceSummary": "{count} versiuni între {from} și {to}.",
     "rawChangelog": "CHANGELOG.md în depozit",
     "transparencyNote": "Pentru fiecare versiune: ce rulează și cu ce componente, în",
     "transparencyInventory": "transparența serviciilor",
-    "transparencySecurity": "securitate și SBOM"
+    "transparencySecurity": "securitate și SBOM",
+    "technicalDetail": "Detalii tehnice",
+    "releaseLink": "Versiune și SBOM pe GitHub",
+    "securityBadge": "Securitate"
   },
   "postprod": {
     "loading": "Se încarcă transcrierea…",

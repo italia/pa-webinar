@@ -3461,12 +3461,13 @@
     "current": "Versión actual",
     "sourceNote": "Las notas se elaboran a partir de las etiquetas, las pull requests y los commits del proyecto.",
     "sourceLink": "Ver todas las releases en GitHub",
-    "cadence": "Ritmo de publicación",
-    "cadenceSummary": "{count} versiones entre el {from} y el {to}.",
     "rawChangelog": "CHANGELOG.md en el repositorio",
     "transparencyNote": "Para cada versión: qué se ejecuta y con qué componentes, en la",
     "transparencyInventory": "transparencia de los servicios",
-    "transparencySecurity": "seguridad y SBOM"
+    "transparencySecurity": "seguridad y SBOM",
+    "technicalDetail": "Detalle técnico",
+    "releaseLink": "Versión y SBOM en GitHub",
+    "securityBadge": "Seguridad"
   },
   "postprod": {
     "loading": "Cargando la transcripción…",

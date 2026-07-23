@@ -3461,12 +3461,13 @@
     "current": "Pašreizējā versija",
     "sourceNote": "Piezīmes ir sagatavotas, balstoties uz projekta tagiem, pull request un commit ierakstiem.",
     "sourceLink": "Skatīt visus laidienus vietnē GitHub",
-    "cadence": "Laidienu ritms",
-    "cadenceSummary": "{count} versijas laikā no {from} līdz {to}.",
     "rawChangelog": "CHANGELOG.md repozitorijā",
     "transparencyNote": "Katrai versijai: kas darbojas un ar kādiem komponentiem,",
     "transparencyInventory": "pakalpojumu pārredzamībā",
-    "transparencySecurity": "drošība un SBOM"
+    "transparencySecurity": "drošība un SBOM",
+    "technicalDetail": "Tehniskā informācija",
+    "releaseLink": "Laidiens un SBOM GitHubā",
+    "securityBadge": "Drošība"
   },
   "postprod": {
     "loading": "Notiek transkripcijas ielāde…",

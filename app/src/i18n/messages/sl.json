@@ -3461,12 +3461,13 @@
     "current": "Trenutna različica",
     "sourceNote": "Opombe so pripravljene na podlagi oznak (tag), zahtevkov pull request in commitov v projektu.",
     "sourceLink": "Oglejte si vse izdaje na GitHubu",
-    "cadence": "Ritem izdaj",
-    "cadenceSummary": "{count} različic med {from} in {to}.",
     "rawChangelog": "CHANGELOG.md v repozitoriju",
     "transparencyNote": "Za vsako različico: kaj teče in s katerimi komponentami, v",
     "transparencyInventory": "preglednosti storitev",
-    "transparencySecurity": "varnosti in SBOM"
+    "transparencySecurity": "varnosti in SBOM",
+    "technicalDetail": "Tehnične podrobnosti",
+    "releaseLink": "Izdaja in SBOM na GitHubu",
+    "securityBadge": "Varnost"
   },
   "postprod": {
     "loading": "Nalaganje prepisa…",

@@ -22,6 +22,13 @@ export interface Release {
   date: string;
   /** Marks a release whose primary purpose was security/dependency hardening. */
   security?: boolean;
+  /**
+   * Developer-facing detail, shown in a collapsible per card. English and
+   * language-neutral (it lives here in the spine, NOT in the 24 translation
+   * files): the user-facing `notes` are curated for impact and translated;
+   * this is the internal work (CI, refactors, reverts) for whoever wants it.
+   */
+  technical?: string[];
 }
 
 /** Newest first. `translations/<locale>.json` is keyed by `version`. */

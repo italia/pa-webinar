@@ -3461,12 +3461,13 @@
     "current": "Aktuell version",
     "sourceNote": "Noteringarna är sammanställda utifrån projektets taggar, pull requests och commits.",
     "sourceLink": "Se alla releaser på GitHub",
-    "cadence": "Släpptakt",
-    "cadenceSummary": "{count} versioner mellan {from} och {to}.",
     "rawChangelog": "CHANGELOG.md i förvaret",
     "transparencyNote": "För varje version: vad som körs och med vilka komponenter, i",
     "transparencyInventory": "tjänstetransparensen",
-    "transparencySecurity": "säkerhet och SBOM"
+    "transparencySecurity": "säkerhet och SBOM",
+    "technicalDetail": "Tekniska detaljer",
+    "releaseLink": "Version och SBOM på GitHub",
+    "securityBadge": "Säkerhet"
   },
   "postprod": {
     "loading": "Läser in transkriptionen…",
