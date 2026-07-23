@@ -28,7 +28,7 @@ httpx==0.27.2
 # Pydantic — validates the claim response shape so we don't deref
 # `None`s on a malformed payload. Matches what `lib/ai/schemas.ts`
 # enforces server-side.
-pydantic==2.9.2
+pydantic==2.13.4
 
 # ASR + diarization. WhisperX bundles faster-whisper + pyannote
 # integration + word-level alignment via wav2vec2.
