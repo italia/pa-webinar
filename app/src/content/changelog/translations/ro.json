@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Jurnalul de modificări, acum cu inventarul software integrat",
+    "notes": [
+      "Fiecare versiune își deschide aici lista componentelor software (SBOM): o listă care poate fi căutată cu fiecare componentă inclusă, cu versiune și ecosistem — fără descărcare.",
+      "Secțiunea tehnică este acum un set de legături — SBOM, versiunea de pe GitHub, sursele la acea etichetă, fluxul de compilare — în locul unui paragraf care repeta rezumatul de mai sus.",
+      "Subsolul adaugă semnalele de securitate ale proiectului: OpenSSF Scorecard și rezultatele analizei codului."
+    ]
+  },
   "0.8.8": {
     "title": "Pagina de noutăți, reproiectată",
     "notes": [

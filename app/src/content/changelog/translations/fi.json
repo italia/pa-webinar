@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Muutosloki, nyt sisäänrakennetulla ohjelmistoluettelolla",
+    "notes": [
+      "Jokainen julkaisu avaa tässä ohjelmiston osaluettelonsa (SBOM): haettavan listan kaikista mukana tulevista komponenteista, versioineen ja ekosysteemeineen — ilman latausta.",
+      "Tekninen osio on nyt joukko linkkejä — SBOM, GitHub-julkaisu, lähdekoodi kyseisessä tunnisteessa, koontiputki — sen sijaan että kappale toistaisi yllä olevan yhteenvedon.",
+      "Alatunniste lisää projektin turvasignaalit: OpenSSF Scorecardin ja koodin tarkistuksen tulokset."
+    ]
+  },
   "0.8.8": {
     "title": "Uutissivu, uudistettu",
     "notes": [

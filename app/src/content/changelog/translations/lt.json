@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Pakeitimų žurnalas dabar su integruotu programinės įrangos inventoriumi",
+    "notes": [
+      "Kiekviena laida čia atveria savo programinės įrangos sudėties sąrašą (SBOM): ieškomą visų pateikiamų komponentų sąrašą su versija ir ekosistema — nieko neatsisiunčiant.",
+      "Techninė dalis dabar yra nuorodų rinkinys — SBOM, laida „GitHub“, pirminis kodas prie tos žymos, kūrimo konvejeris — vietoj pastraipos, kuri kartojo aukščiau esančią santrauką.",
+      "Poraštė prideda projekto saugumo signalus: „OpenSSF Scorecard“ ir kodo nuskaitymo rezultatus."
+    ]
+  },
   "0.8.8": {
     "title": "Naujienų puslapis, perkurtas",
     "notes": [

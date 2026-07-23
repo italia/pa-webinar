@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "A változásnapló, mostantól beépített szoftverleltárral",
+    "notes": [
+      "Minden kiadás itt nyitja meg a szoftverjegyzékét (SBOM): a benne foglalt összes összetevő kereshető listája, verzióval és ökoszisztémával — letöltés nélkül.",
+      "A technikai szakasz mostantól hivatkozások összessége — SBOM, a GitHub-kiadás, a források az adott címkénél, az összeállítási folyamat — a fenti összefoglalót ismétlő bekezdés helyett.",
+      "A lábléc hozzáadja a projekt biztonsági jelzéseit: az OpenSSF Scorecardot és a kódelemzés eredményeit."
+    ]
+  },
   "0.8.8": {
     "title": "Az újdonságok oldala, újratervezve",
     "notes": [

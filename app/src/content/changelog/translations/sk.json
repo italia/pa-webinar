@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Zoznam zmien, teraz so vstavaným inventárom softvéru",
+    "notes": [
+      "Každé vydanie tu otvorí svoj zoznam softvérových komponentov (SBOM): prehľadávateľný zoznam všetkých dodaných komponentov s verziou a ekosystémom — bez sťahovania.",
+      "Technická časť je teraz súbor odkazov — SBOM, vydanie na GitHube, zdroje pri danej značke, zostavovací kanál — namiesto odseku, ktorý opakoval zhrnutie vyššie.",
+      "Päta pridáva bezpečnostné signály projektu: OpenSSF Scorecard a výsledky skenovania kódu."
+    ]
+  },
   "0.8.8": {
     "title": "Stránka noviniek, prepracovaná",
     "notes": [

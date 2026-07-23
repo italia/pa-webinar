@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Dziennik zmian, teraz z wbudowanym inwentarzem oprogramowania",
+    "notes": [
+      "Każde wydanie otwiera tutaj swój wykaz składników oprogramowania (SBOM): przeszukiwalną listę wszystkich dostarczonych składników, z wersją i ekosystemem — bez pobierania.",
+      "Sekcja techniczna to teraz zestaw odnośników — SBOM, wydanie na GitHubie, źródła przy danym tagu, potok kompilacji — zamiast akapitu, który powtarzał powyższe podsumowanie.",
+      "Stopka dodaje sygnały bezpieczeństwa projektu: OpenSSF Scorecard i wyniki skanowania kodu."
+    ]
+  },
   "0.8.8": {
     "title": "Strona nowości, przeprojektowana",
     "notes": [

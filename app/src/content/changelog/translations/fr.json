@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Le journal des modifications, désormais avec l'inventaire logiciel intégré",
+    "notes": [
+      "Chaque version ouvre ici sa nomenclature logicielle (SBOM) : la liste consultable de chaque composant livré, avec sa version et son écosystème — sans rien télécharger.",
+      "La section technique est désormais un ensemble de liens — SBOM, la release GitHub, les sources à ce tag, la pipeline de build — au lieu d'un paragraphe qui répétait le résumé ci-dessus.",
+      "Le pied de page ajoute les signaux de sécurité du projet : le Scorecard OpenSSF et les résultats de l'analyse du code."
+    ]
+  },
   "0.8.8": {
     "title": "La page des nouveautés, repensée",
     "notes": [
