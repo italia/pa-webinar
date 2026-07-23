@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Interfaccia completa in tutte le 24 lingue, e identità visiva rinnovata",
+    "notes": [
+      "L'interfaccia è ora tradotta per intero in tutte e 24 le lingue UE: prima diverse schermate — tra cui la sala d'attesa e i testi di consenso — ripiegavano sull'italiano dove mancava la traduzione.",
+      "Logo e identità visiva rinnovati (favicon, icona, watermark), e un'anteprima con immagine quando si condivide il link di un evento su chat e social.",
+      "Pagina delle novità: il ritmo dei rilasci a colpo d'occhio e i collegamenti alla trasparenza dei servizi e alla sicurezza."
+    ]
+  },
   "0.8.6": {
     "title": "Sala d'attesa: una pagina, e una piazza in cui si sceglie di entrare",
     "notes": [

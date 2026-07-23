@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Käyttöliittymä täydellisenä kaikilla 24 kielellä ja uudistettu visuaalinen ilme",
+    "notes": [
+      "Käyttöliittymä on nyt kokonaan käännetty kaikille 24 EU-kielelle: aiemmin useat näkymät — muun muassa odotustila ja suostumustekstit — palasivat italiaan siellä, missä käännös puuttui.",
+      "Uudistettu logo ja visuaalinen ilme (favicon, kuvake, vesileima) sekä kuvallinen esikatselu, kun tapahtuman linkki jaetaan keskustelussa ja sosiaalisessa mediassa.",
+      "Uutiset-sivu: julkaisutahti yhdellä silmäyksellä sekä linkit palvelujen läpinäkyvyyteen ja tietoturvaan."
+    ]
+  },
   "0.8.6": {
     "title": "Odotustila: sivu ja tori, johon astutaan omasta valinnasta",
     "notes": [

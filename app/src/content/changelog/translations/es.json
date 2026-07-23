@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "La interfaz completa en los 24 idiomas, y una identidad visual renovada",
+    "notes": [
+      "La interfaz está ahora totalmente traducida a los 24 idiomas de la UE: antes, varias pantallas —incluida la sala de espera y los textos de consentimiento— recurrían al italiano donde faltaba la traducción.",
+      "Logotipo e identidad visual renovados (favicon, icono, marca de agua), y una vista previa con imagen al compartir el enlace de un evento en el chat y en redes sociales.",
+      "Página de novedades: el ritmo de publicación de un vistazo y los enlaces a la transparencia de los servicios y a la seguridad."
+    ]
+  },
   "0.8.6": {
     "title": "La sala de espera: una página y una plaza en la que se elige entrar",
     "notes": [

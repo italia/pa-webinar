@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Sąsaja pilna visomis 24 kalbomis ir atnaujinta vizualinė tapatybė",
+    "notes": [
+      "Sąsaja dabar visiškai išversta į visas 24 ES kalbas: anksčiau keli ekranai — tarp jų laukiamasis ir sutikimo tekstai — persijungdavo į italų kalbą ten, kur trūko vertimo.",
+      "Atnaujintas logotipas ir vizualinė tapatybė (favicon, piktograma, vandenženklis) bei peržiūra su paveikslėliu, kai renginio nuoroda dalijamasi pokalbiuose ir socialiniuose tinkluose.",
+      "Naujienų puslapis: leidimų ritmas iš pirmo žvilgsnio ir nuorodos į paslaugų skaidrumą ir saugą."
+    ]
+  },
   "0.8.6": {
     "title": "Laukiamasis: puslapis ir aikštė, į kurią įeinama savo noru",
     "notes": [

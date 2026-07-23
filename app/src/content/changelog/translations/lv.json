@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Saskarne pilnīga visās 24 valodās un atjaunota vizuālā identitāte",
+    "notes": [
+      "Saskarne tagad ir pilnībā iztulkota visās 24 ES valodās: iepriekš vairāki ekrāni — tostarp uzgaidāmā telpa un piekrišanas teksti — pārslēdzās uz itāļu valodu tur, kur trūka tulkojuma.",
+      "Atjaunots logotips un vizuālā identitāte (favicon, ikona, ūdenszīme) un priekšskatījums ar attēlu, kad pasākuma saite tiek kopīgota tērzēšanā un sociālajos tīklos.",
+      "Jaunumu lapa: laidienu ritms vienā acu uzmetienā un saites uz pakalpojumu pārredzamību un drošību."
+    ]
+  },
   "0.8.6": {
     "title": "Uzgaidāmā telpa: lapa un laukums, kurā ieej pēc paša izvēles",
     "notes": [

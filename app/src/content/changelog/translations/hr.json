@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Sučelje potpuno na svih 24 jezika i osvježen vizualni identitet",
+    "notes": [
+      "Sučelje je sada u potpunosti prevedeno na svih 24 jezika EU-a: prije se nekoliko zaslona — među njima čekaonica i tekstovi privole — vraćalo na talijanski ondje gdje je prijevod nedostajao.",
+      "Osvježen logotip i vizualni identitet (favicon, ikona, vodeni žig) te pretpregled sa slikom pri dijeljenju poveznice na događaj u razgovoru i na društvenim mrežama.",
+      "Stranica s novostima: ritam izdanja na prvi pogled i poveznice na transparentnost usluga i sigurnost."
+    ]
+  },
   "0.8.6": {
     "title": "Čekaonica: stranica i trg na koji se ulazi po vlastitom izboru",
     "notes": [

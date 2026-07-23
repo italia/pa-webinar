@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Vmesnik popoln v vseh 24 jezikih in prenovljena vizualna identiteta",
+    "notes": [
+      "Vmesnik je zdaj v celoti preveden v vseh 24 jezikov EU: prej je več zaslonov — med njimi čakalnica in besedila privolitev — prešlo v italijanščino, kjer je prevod manjkal.",
+      "Prenovljen logotip in vizualna identiteta (favicon, ikona, vodni žig) ter predogled s sliko ob deljenju povezave do dogodka v klepetu in družbenih omrežjih.",
+      "Stran z novostmi: ritem izdaj na prvi pogled in povezave do preglednosti storitev in varnosti."
+    ]
+  },
   "0.8.6": {
     "title": "Čakalnica: stran in trg, na katerega vstopiš po lastni izbiri",
     "notes": [

@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "L-interfaċċja kompluta fl-24 lingwa kollha, u identità viżiva mġedda",
+    "notes": [
+      "L-interfaċċja issa hija tradotta kompletament fl-24 lingwa kollha tal-UE: qabel, diversi skrins — fosthom il-kamra tal-istennija u t-testi tal-kunsens — kienu jaqilbu għat-Taljan fejn kienet nieqsa t-traduzzjoni.",
+      "Logo u identità viżiva mġedda (favicon, ikona, watermark), u previżjoni b'immaġni meta jiġi kondiviż il-link ta' avveniment fiċ-chat u fuq il-midja soċjali.",
+      "Paġna tal-aħbarijiet: ir-ritmu tar-rilaxxi f'daqqa t'għajn u links għat-trasparenza tas-servizzi u għas-sigurtà."
+    ]
+  },
   "0.8.6": {
     "title": "Il-kamra tal-istennija: paġna, u pjazza li tagħżel int li tidħol fiha",
     "notes": [
