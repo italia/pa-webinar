@@ -39,8 +39,24 @@ import type { TrackRecording } from './manifest.js';
 export interface CaptureConfig {
   jitsiDomain: string;
   roomName: string;
-  /** JWT del portale che ci fa entrare come bot receive-only. */
+  /** JWT del portale che ci fa entrare come bot receive-only. Usato solo
+   *  quando NON ci sono credenziali XMPP (vedi `xmppUser`). */
   jwt: string;
+  /**
+   * Identità XMPP del bot sul dominio NASCOSTO di Prosody (es.
+   * `recorder@hidden.meet.jitsi`). Quando c'è, il recorder si autentica con
+   * queste invece che col JWT — ed è l'unico modo di sparire davvero.
+   *
+   * `config.hiddenDomain` di jitsi-meet confronta il DOMINIO del JID reale in
+   * presenza: se coincide, ogni client marca il partecipante come hidden e
+   * lib-jitsi-meet lo esclude a monte — niente riquadro, niente riga
+   * nell'elenco, niente notifica di ingresso, e `membersCount` non lo conta.
+   * Con un JWT sul dominio principale il bot è un partecipante come gli altri
+   * e nasconderlo resterebbe un trucco lato client, da rifare a ogni
+   * aggiornamento di Jitsi.
+   */
+  xmppUser?: string;
+  xmppPassword?: string;
   /** Directory locale dove scrivere i file `.opus`. */
   outputDir: string;
   /** displayName del bot in stanza (es. "📼 Recorder"). */
@@ -66,6 +82,15 @@ export interface CaptureConfig {
  */
 export interface CaptureResult {
   recordings: TrackRecording[];
+  /**
+   * True se la conference è stata raggiunta almeno una volta.
+   *
+   * È la differenza tra «la stanza era vuota» e «non siamo mai entrati»: la
+   * prima è normale e non va ritentata, la seconda è un'autenticazione
+   * rifiutata — ed è il solo caso in cui vale la pena rientrare col JWT.
+   * Distinguerle dal solo numero di tracce era impossibile.
+   */
+  joinedConference: boolean;
 }
 
 /**
@@ -83,8 +108,10 @@ export interface CaptureResult {
  * 2. Naviga su una pagina minimale servita dal dominio Jitsi (stessa
  *    origin di lib-jitsi-meet, per CSP/CORS) e inietta uno script che:
  *      a. `JitsiMeetJS.init({ disableAudioLevels: false })`
- *      b. crea la connection con il JWT (`new JitsiMeetJS.JitsiConnection(
- *         appId, jwt, { hosts, serviceUrl })`)
+ *      b. crea la connection: con le credenziali del dominio NASCOSTO se
+ *         configurate (login SASL, bot invisibile in stanza), altrimenti col
+ *         JWT del portale. Un login rifiutato NON si ritenta qui: se ne accorge
+ *         `index.ts`, che rilancia l'intera cattura (vedi `joinedConference`).
  *      c. su CONNECTION_ESTABLISHED, `initJitsiConference(roomName, {})` —
  *         receive-only perché non crea né pubblica track locali.
  *      d. `conference.setDisplayName(botDisplayName)` e `conference.join(jwt)`.
@@ -118,13 +145,19 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
   // partecipante crea una NUOVA chiave → un NUOVO file (prima riusava
   // `${pid}.opus` e troncava la sessione precedente: audio perso).
   const writers = new Map<string, TrackWriter>();
+  // Vedi `CaptureResult.joinedConference`: lo alza la pagina via binding.
+  let joinedConference = false;
   // Append in volo (IPC chunk page→Node): vanno attesi PRIMA di chiudere i
   // writer e leggere i file, altrimenti l'upload legge file troncati (i chunk
   // arrivano async via exposeFunction mentre finish() già chiude/uploada).
   const pendingAppends = new Set<Promise<void>>();
   // Diagnostica trasporto: chunk/byte RICEVUTI lato Node per traccia.
   const nodeChunkStats = new Map<string, { n: number; b: number }>();
-  function getOrCreateWriter(trackFileId: string, pid: string, name: string | null): TrackWriter {
+  function getOrCreateWriter(
+    trackFileId: string,
+    pid: string,
+    name: string | null
+  ): TrackWriter {
     let w = writers.get(trackFileId);
     if (!w) {
       w = new TrackWriter(pid, trackFileId, name, config.outputDir);
@@ -172,7 +205,13 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
     // qui e vengono appesi al file della traccia.
     await page.exposeFunction(
       'onTrackChunk',
-      async (trackKey: string, pid: string, name: string | null, b64: string, nowMs: number) => {
+      async (
+        trackKey: string,
+        pid: string,
+        name: string | null,
+        b64: string,
+        nowMs: number
+      ) => {
         const buf = Buffer.from(b64, 'base64');
         // DIAGNOSTICA: conta i chunk RICEVUTI lato Node (vs quelli loggati in
         // pagina) per distinguere perdita-IPC da perdita-write.
@@ -181,7 +220,9 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
         st.b += buf.length;
         nodeChunkStats.set(trackKey, st);
         if (st.n <= 2 || st.n % 10 === 0) {
-          console.log(`[recorder] NODE recv ${trackKey} #${st.n} +${buf.length}B (tot ${st.b}B)`);
+          console.log(
+            `[recorder] NODE recv ${trackKey} #${st.n} +${buf.length}B (tot ${st.b}B)`
+          );
         }
         const p = (async () => {
           try {
@@ -193,7 +234,7 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
         pendingAppends.add(p);
         await p;
         pendingAppends.delete(p);
-      },
+      }
     );
     // Ancora la timeline della traccia all'istante in cui parte il
     // MediaRecorder (origine del file), NON al primo chunk (~1s dopo, con
@@ -203,12 +244,15 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
       'onTrackStarted',
       (trackKey: string, pid: string, name: string | null, startedAtMs: number) => {
         getOrCreateWriter(trackKey, pid, name).anchor(startedAtMs);
-      },
+      }
     );
     await page.exposeFunction('onTrackEnded', async (trackKey: string) => {
       await writers.get(trackKey)?.close();
     });
     await page.exposeFunction('onConferenceDone', () => resolveDone());
+    await page.exposeFunction('onConferenceJoined', () => {
+      joinedConference = true;
+    });
     await page.exposeFunction('logFromPage', (msg: string) => console.log('[page]', msg));
 
     // Stessa origin di lib-jitsi-meet (CSP/CORS): carichiamo la pagina del
@@ -228,12 +272,16 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
         break;
       } catch (e) {
         gotoErr = e;
-        console.error(`[recorder] page.goto tentativo ${attempt}/4 fallito: ${String(e)}`);
+        console.error(
+          `[recorder] page.goto tentativo ${attempt}/4 fallito: ${String(e)}`
+        );
         await new Promise((r) => setTimeout(r, 2_000 * attempt));
       }
     }
     if (gotoErr) throw gotoErr;
-    await page.addScriptTag({ url: `https://${config.jitsiDomain}/libs/lib-jitsi-meet.min.js` });
+    await page.addScriptTag({
+      url: `https://${config.jitsiDomain}/libs/lib-jitsi-meet.min.js`,
+    });
     // Carichiamo anche il config.js del deployment Jitsi: definisce
     // `window.config` con gli host XMPP reali (es. domain=meet.jitsi,
     // muc=muc.meet.jitsi) e l'endpoint BOSH/WebSocket effettivo. Sintetizzarli
@@ -246,6 +294,8 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
       appId: config.jitsiDomain,
       room: config.roomName.toLowerCase(),
       jwt: config.jwt,
+      xmppUser: config.xmppUser ?? '',
+      xmppPassword: config.xmppPassword ?? '',
       botName: config.botDisplayName ?? '📼 Recorder',
       serviceUrl,
       mucDomain,
@@ -270,7 +320,10 @@ export async function captureRoom(config: CaptureConfig): Promise<CaptureResult>
     await browser.close();
   }
 
-  return { recordings: Array.from(writers.values()).map((w) => w.toRecording()) };
+  return {
+    recordings: Array.from(writers.values()).map((w) => w.toRecording()),
+    joinedConference,
+  };
 }
 
 /**
@@ -286,6 +339,8 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
   appId: string;
   room: string;
   jwt: string;
+  xmppUser: string;
+  xmppPassword: string;
   botName: string;
   serviceUrl: string;
   mucDomain: string;
@@ -326,11 +381,22 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     const serviceUrl = jcfg.websocket ?? jcfg.bosh ?? cfg.serviceUrl;
     log(`connessione: domain=${hosts.domain} muc=${hosts.muc} svc=${serviceUrl}`);
 
-    const connection = new JitsiMeetJS.JitsiConnection(null, cfg.jwt, {
-      hosts,
-      serviceUrl,
-      clientNode: 'https://jitsi.org/jitsimeet',
-    });
+    // Con le credenziali del dominio nascosto il token non serve — e non deve
+    // esserci: il JID che finisce in presenza è quello con cui ci si autentica.
+    //
+    // Nessuna riconnessione QUI. L'autenticazione può essere rifiutata (password
+    // rigenerata da un upgrade, allowlist del MUC assente), e la rete di
+    // sicurezza esiste — ma vive in `index.ts`, che rilancia l'INTERA cattura
+    // col JWT quando questa non è mai entrata in conferenza. Riconnettere da
+    // dentro il gestore di eventi significava non saper distinguere un login
+    // rifiutato da una linea caduta a metà evento: una disconnessione dopo
+    // quaranta minuti avrebbe fatto rientrare il bot VISIBILE davanti a tutti.
+    const useXmppLogin = !!(cfg.xmppUser && cfg.xmppPassword);
+    const connection = new JitsiMeetJS.JitsiConnection(
+      null,
+      useXmppLogin ? null : cfg.jwt,
+      { hosts, serviceUrl, clientNode: 'https://jitsi.org/jitsimeet' }
+    );
 
     let conference: any = null;
     // AudioContext condiviso: serve a "consumare" le track audio remote
@@ -398,8 +464,8 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
               } catch {
                 res();
               }
-            }),
-        ),
+            })
+        )
       );
       await new Promise<void>((res) => setTimeout(res, 500));
       for (const entry of recorders.values()) {
@@ -432,13 +498,13 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       // dell'arrivo), BREVE dopo che l'evento ha avuto attività.
       void (idleTimer = setTimeout(
         () => void finish(),
-        seenParticipant ? cfg.idleTimeoutMs : cfg.initialGraceMs,
+        seenParticipant ? cfg.idleTimeoutMs : cfg.initialGraceMs
       ));
     };
 
     const onTrackAdded = async (track: any) => {
       log(
-        `TRACK_ADDED type=${track.getType?.()} local=${track.isLocal?.()} pid=${track.getParticipantId?.()}`,
+        `TRACK_ADDED type=${track.getType?.()} local=${track.isLocal?.()} pid=${track.getParticipantId?.()}`
       );
       if (track.isLocal?.() || track.getType?.() !== 'audio') return;
       seenParticipant = true;
@@ -553,7 +619,9 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
       // (locali block-scoped) dopo il ritorno di onTrackAdded → altra fonte di
       // silenzio.
       recorders.set(track.getId?.() ?? key, { rec, key, sinkEl, srcNode, destNode });
-      log(`recording audio track key=${key} pid=${pid} name=${name} (recorders=${recorders.size})`);
+      log(
+        `recording audio track key=${key} pid=${pid} name=${name} (recorders=${recorders.size})`
+      );
     };
 
     const onTrackRemoved = (track: any) => {
@@ -572,9 +640,12 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
     };
 
     const onConferenceJoined = () => {
+      w.onConferenceJoined?.();
       log(
-        'conference joined: ' + cfg.room +
-        ' participants=' + (conference?.getParticipants?.()?.length ?? 0),
+        'conference joined: ' +
+          cfg.room +
+          ' participants=' +
+          (conference?.getParticipants?.()?.length ?? 0)
       );
       armIdle();
     };
@@ -601,30 +672,42 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         conference.setDisplayName(cfg.botName);
         conference.on(JitsiMeetJS.events.conference.TRACK_ADDED, onTrackAdded);
         conference.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onTrackRemoved);
-        conference.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
+        conference.on(
+          JitsiMeetJS.events.conference.CONFERENCE_JOINED,
+          onConferenceJoined
+        );
         conference.on(JitsiMeetJS.events.conference.USER_LEFT, armIdle);
         conference.on(JitsiMeetJS.events.conference.USER_JOINED, (id: string) => {
           seenParticipant = true;
           if (idleTimer) clearTimeout(idleTimer);
-          log('USER_JOINED ' + id + ' (participants=' + (conference?.getParticipants?.()?.length ?? 0) + ')');
+          log(
+            'USER_JOINED ' +
+              id +
+              ' (participants=' +
+              (conference?.getParticipants?.()?.length ?? 0) +
+              ')'
+          );
         });
         // Diagnostica salute media (ICE/bridge): se il media non si stabilisce
         // i TRACK_ADDED non arrivano. Logghiamo gli eventi disponibili.
         try {
-          conference.on(JitsiMeetJS.events.conference.CONNECTION_INTERRUPTED, () => log('media CONNECTION_INTERRUPTED'));
-          conference.on(JitsiMeetJS.events.conference.CONNECTION_RESTORED, () => log('media CONNECTION_RESTORED'));
-        } catch { /* eventi non disponibili in questo build */ }
+          conference.on(JitsiMeetJS.events.conference.CONNECTION_INTERRUPTED, () =>
+            log('media CONNECTION_INTERRUPTED')
+          );
+          conference.on(JitsiMeetJS.events.conference.CONNECTION_RESTORED, () =>
+            log('media CONNECTION_RESTORED')
+          );
+        } catch {
+          /* eventi non disponibili in questo build */
+        }
         // Errore di conference (kick, bridge down, ICE failed): NON uscire
         // in silenzio. Logga il motivo così l'operator/portale lo vede; chiude
         // pulito salvando ciò che è stato catturato finora. Un reconnect
         // completo (mantenendo i writer aperti) va validato su Jitsi reale.
-        conference.on(
-          JitsiMeetJS.events.conference.CONFERENCE_FAILED,
-          (err: unknown) => {
-            log('conference FAILED: ' + String(err));
-            void finish();
-          },
-        );
+        conference.on(JitsiMeetJS.events.conference.CONFERENCE_FAILED, (err: unknown) => {
+          log('conference FAILED: ' + String(err));
+          void finish();
+        });
         conference.join();
         // Vogliamo l'audio di TUTTI i partecipanti (no last-N sul video,
         // che non ci serve). Best-effort: l'API varia per versione.
@@ -636,16 +719,23 @@ const IN_PAGE_BOOTSTRAP = (cfg: {
         } catch {
           /* versione lib-jitsi-meet senza setReceiverConstraints */
         }
-      },
+      }
     );
     connection.addEventListener(
       JitsiMeetJS.events.connection.CONNECTION_FAILED,
-      () => {
-        log('connection failed');
+      (err: unknown) => {
+        log('connection failed: ' + String(err));
         void finish();
-      },
+      }
     );
-    connection.connect();
+    // `connect({id, password})` → login SASL: il JID è quello passato, quindi
+    // il dominio nascosto. Senza argomenti resta il path anonimo/JWT.
+    if (useXmppLogin) {
+      log(`login XMPP come ${cfg.xmppUser}`);
+      connection.connect({ id: cfg.xmppUser, password: cfg.xmppPassword });
+    } else {
+      connection.connect();
+    }
     // Setup completato → risolviamo SUBITO il page.evaluate. Tenere questa
     // Promise pending per TUTTA la sessione bloccava la consegna dei
     // bindingCalled di Puppeteer (le exposeFunction onTrackChunk): i chunk
@@ -691,7 +781,7 @@ class TrackWriter {
     participantId: string,
     trackFileId: string,
     displayName: string | null,
-    outputDir: string,
+    outputDir: string
   ) {
     this.participantId = participantId;
     this.trackFileId = trackFileId;

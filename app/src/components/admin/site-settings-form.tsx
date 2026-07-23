@@ -18,6 +18,7 @@ import {
 } from 'design-react-kit';
 import type { SiteSetting } from '@prisma/client';
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';
 
 type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features' | 'scaling' | 'postprod';
@@ -282,7 +283,10 @@ function BrandingTab({ settings, updateField }: TabProps) {
             <select
               className="form-select"
               id="waitingRoomEngine"
-              value={settings.waitingRoomEngine}
+              // GARDEN è un valore storico (il giardino SVG, rimosso): vale
+              // GAME, ed è così che va MOSTRATO — un'opzione che non esiste più
+              // lascerebbe la select apparentemente vuota.
+              value={settings.waitingRoomEngine === 'GARDEN' ? 'GAME' : settings.waitingRoomEngine}
               onChange={(e) =>
                 updateField(
                   'waitingRoomEngine',
@@ -290,7 +294,6 @@ function BrandingTab({ settings, updateField }: TabProps) {
                 )
               }
             >
-              <option value="GARDEN">Giardino (normale)</option>
               <option value="GAME">Videogame (lobby Phaser)</option>
               <option value="CLASSIC">Classica (statica)</option>
             </select>
@@ -390,38 +393,24 @@ function BrandingTab({ settings, updateField }: TabProps) {
       <Row>
         <Col md={6}>
           <FormGroup>
-            <Label htmlFor="logoUrl">{t('logoUrl')}</Label>
-            <Input
+            <FileOrUrlInput
               id="logoUrl"
-              type="url"
-              value={settings.logoUrl ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('logoUrl', e.target.value || null)
-              }
+              label={t('logoUrl')}
+              assetType="image"
+              value={settings.logoUrl ?? null}
+              onChange={(v) => updateField('logoUrl', v)}
+              helpText={t('logoUrlHelp')}
             />
-            <small className="text-muted">{t('logoUrlHelp')}</small>
-            {settings.logoUrl && (
-              <div className="mt-2 p-2 bg-light rounded">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={settings.logoUrl}
-                  alt="Logo preview"
-                  style={{ maxHeight: 48 }}
-                />
-              </div>
-            )}
           </FormGroup>
         </Col>
         <Col md={6}>
           <FormGroup>
-            <Label htmlFor="faviconUrl">{t('faviconUrl')}</Label>
-            <Input
+            <FileOrUrlInput
               id="faviconUrl"
-              type="url"
-              value={settings.faviconUrl ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('faviconUrl', e.target.value || null)
-              }
+              label={t('faviconUrl')}
+              assetType="image"
+              value={settings.faviconUrl ?? null}
+              onChange={(v) => updateField('faviconUrl', v)}
             />
           </FormGroup>
         </Col>
@@ -444,16 +433,14 @@ function BrandingTab({ settings, updateField }: TabProps) {
       {settings.jitsiWatermarkEnabled && (
         <>
           <FormGroup>
-            <Label htmlFor="jitsiWatermarkUrl">{tw('url')}</Label>
-            <Input
+            <FileOrUrlInput
               id="jitsiWatermarkUrl"
-              type="url"
-              value={settings.jitsiWatermarkUrl ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('jitsiWatermarkUrl', e.target.value || null)
-              }
+              label={tw('url')}
+              assetType="image"
+              value={settings.jitsiWatermarkUrl ?? null}
+              onChange={(v) => updateField('jitsiWatermarkUrl', v)}
+              helpText={tw('urlHelp')}
             />
-            <small className="text-muted">{tw('urlHelp')}</small>
           </FormGroup>
 
           <Row>
@@ -557,26 +544,14 @@ function SeoTab({ settings, updateField }: TabProps) {
         <small className="text-muted">{t('descriptionHelp')}</small>
       </FormGroup>
       <FormGroup>
-        <Label htmlFor="seoImage">{t('image')}</Label>
-        <Input
+        <FileOrUrlInput
           id="seoImage"
-          type="url"
-          value={settings.seoImage ?? ''}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            updateField('seoImage', e.target.value || null)
-          }
+          label={t('image')}
+          assetType="image"
+          value={settings.seoImage ?? null}
+          onChange={(v) => updateField('seoImage', v)}
+          helpText={t('imageHelp')}
         />
-        <small className="text-muted">{t('imageHelp')}</small>
-        {settings.seoImage && (
-          <div className="mt-2 p-2 bg-light rounded">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={settings.seoImage}
-              alt="OG image preview"
-              style={{ maxHeight: 120, maxWidth: '100%' }}
-            />
-          </div>
-        )}
       </FormGroup>
     </div>
   );
@@ -977,26 +952,14 @@ function HeaderTab({ settings, updateField }: TabProps) {
       <Row>
         <Col md={6}>
           <FormGroup>
-            <Label htmlFor="hdr-logo">{t('logoUrl')}</Label>
-            <Input
+            <FileOrUrlInput
               id="hdr-logo"
-              type="url"
-              value={settings.logoUrl ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('logoUrl', e.target.value || null)
-              }
+              label={t('logoUrl')}
+              assetType="image"
+              value={settings.logoUrl ?? null}
+              onChange={(v) => updateField('logoUrl', v)}
+              helpText={t('logoUrlHelp')}
             />
-            <small className="text-muted">{t('logoUrlHelp')}</small>
-            {settings.logoUrl && (
-              <div className="mt-2 p-2 bg-light rounded">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={settings.logoUrl}
-                  alt="Logo preview"
-                  style={{ maxHeight: 48 }}
-                />
-              </div>
-            )}
           </FormGroup>
         </Col>
         <Col md={6}>
@@ -1112,6 +1075,58 @@ function FeaturesTab({ settings, updateField }: TabProps) {
       </Row>
 
       <hr className="my-4" />
+      <h3 className="h5 mb-3">{t('avatarTitle')}</h3>
+      <Row>
+        <Col md={12}>
+          <FormGroup check className="mb-3">
+            <Input
+              id="gravatarEnabled"
+              type="checkbox"
+              checked={settings.gravatarEnabled ?? false}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('gravatarEnabled', e.target.checked)
+              }
+            />
+            <Label check htmlFor="gravatarEnabled">{t('gravatarEnabled')}</Label>
+            <div><small className="text-muted">{t('gravatarEnabledHelp')}</small></div>
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <hr className="my-4" />
+      <h3 className="h5 mb-3">{t('emailSenderTitle')}</h3>
+      <p className="text-muted small mb-3">{t('emailSenderHelp')}</p>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="emailFromName">{t('emailFromName')}</Label>
+            <Input
+              id="emailFromName"
+              value={settings.emailFromName ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('emailFromName', e.target.value || null)
+              }
+            />
+            <small className="text-muted">{t('emailFromNameHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="emailReplyTo">{t('emailReplyTo')}</Label>
+            <Input
+              id="emailReplyTo"
+              type="email"
+              value={settings.emailReplyTo ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField('emailReplyTo', e.target.value || null)
+              }
+            />
+            <small className="text-muted">{t('emailReplyToHelp')}</small>
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <hr className="my-4" />
       <h3 className="h5 mb-3">{t('jvbScalingTitle')}</h3>
       <p className="text-muted small mb-3">{t('jvbScalingHelp')}</p>
       <Row>
@@ -1156,6 +1171,71 @@ function FeaturesTab({ settings, updateField }: TabProps) {
             />
             <small className="text-muted d-block mt-1">
               {t('jvbPreScaleMinutesHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="jvbEmptyCloseMinutes">
+              {t('jvbEmptyCloseMinutes')}
+            </Label>
+            <Input
+              id="jvbEmptyCloseMinutes"
+              type="number"
+              min={-1}
+              max={240}
+              step={1}
+              value={settings.jvbEmptyCloseMinutes}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('jvbEmptyCloseMinutes', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('jvbEmptyCloseMinutesHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="waitingRoomLeadMinutes">
+              {t('waitingRoomLeadMinutes')}
+            </Label>
+            <Input
+              id="waitingRoomLeadMinutes"
+              type="number"
+              min={0}
+              max={1440}
+              step={1}
+              value={settings.waitingRoomLeadMinutes}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('waitingRoomLeadMinutes', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">
+              {t('waitingRoomLeadMinutesHelp')}
+            </small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="reactionsMode">{t('reactionsMode')}</Label>
+            <select
+              className="form-select"
+              id="reactionsMode"
+              value={settings.reactionsMode}
+              onChange={(e) =>
+                updateField('reactionsMode', e.target.value as 'NATIVE' | 'CUSTOM')
+              }
+            >
+              <option value="NATIVE">{t('reactionsModeNative')}</option>
+              <option value="CUSTOM">{t('reactionsModeCustom')}</option>
+            </select>
+            <small className="text-muted d-block mt-1">
+              {t('reactionsModeHelp')}
             </small>
           </FormGroup>
         </Col>

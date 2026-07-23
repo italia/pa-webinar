@@ -26,6 +26,82 @@ updates:
       - "dependencies"
       - "docker"
 
+
+  # Il package.json alla RADICE: dichiara i workspace (app, lobby) e le
+  # dipendenze di build. Non era coperto: un aggiornamento di sicurezza qui non
+  # sarebbe mai stato proposto.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  # Recorder e controller stanno FUORI dai workspace npm, quindi avevano un
+  # package-lock proprio che nessuno teneva aggiornato. Sono anche le immagini
+  # piu' delicate del progetto: il recorder gira Chrome headless e maneggia
+  # audio per-partecipante (dato dell'art. 9).
+  - package-ecosystem: "npm"
+    directory: "/infra/recorder"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "npm"
+    directory: "/infra/recorder-controller"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  # Il worker della pipeline AI: nessun ecosystem pip era dichiarato.
+  - package-ecosystem: "pip"
+    directory: "/infra/ai/worker"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+
+  # Immagini base dei Dockerfile secondari (quello alla radice era gia' coperto).
+  - package-ecosystem: "docker"
+    directory: "/infra/recorder"
+    schedule: { interval: "weekly", day: "monday" }
+    labels: ["dependencies", "docker"]
+
+  - package-ecosystem: "docker"
+    directory: "/infra/recorder-controller"
+    schedule: { interval: "weekly", day: "monday" }
+    labels: ["dependencies", "docker"]
+
+  - package-ecosystem: "docker"
+    directory: "/infra/ai"
+    schedule: { interval: "weekly", day: "monday" }
+    labels: ["dependencies", "docker"]
+
+  - package-ecosystem: "docker"
+    directory: "/infra/jitsi-web-patched"
+    schedule: { interval: "weekly", day: "monday" }
+    labels: ["dependencies", "docker"]
+
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"

@@ -96,7 +96,11 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Download .ics-fil"
-      }
+      },
+      "alreadyRegisteredEnter": "Allerede tilmeldt? Gå ind i mødelokalet",
+      "invalidTokenTitle": "Adgangslinket er ikke længere gyldigt",
+      "invalidTokenBody": "Det link, du har brugt, er ugyldigt eller udløbet. Hvis du er tilmeldt, kan du finde dit personlige link i bekræftelsesmailen — eller tilmelde dig igen nedenfor.",
+      "invalidTokenBodyEnded": "Det link, du har brugt, er ikke længere gyldigt. Arrangementet er afsluttet: nedenfor finder du optagelsen og materialerne."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -116,6 +120,20 @@
     "list": {
       "filterByTag": "Filtrér efter kategori",
       "allTags": "Alle"
+    },
+    "wordCloudTitle": "Ordsky",
+    "recap": {
+      "title": "Opsummering af arrangementet",
+      "intro": "Et resumé af det, der kom frem under arrangementet.",
+      "participants": "Deltagere (maks.)",
+      "registered": "Tilmeldte",
+      "topQuestions": "Spørgsmål med flest stemmer",
+      "upvotes": "{count, plural, =0 {ingen stemmer} one {1 stemme} other {# stemmer}}",
+      "polls": "Resultater af afstemningerne",
+      "votes": "{count, plural, =0 {ingen stemmer} one {1 stemme} other {# stemmer}}",
+      "topWords": "Mest delte ord",
+      "feedback": "Gennemsnitlig bedømmelse",
+      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}"
     }
   },
   "registration": {
@@ -164,8 +182,11 @@
       "consentRequired": "Samtykke til databehandling er påkrævet",
       "recordingConsentRequired": "Samtykke til optagelse er påkrævet for denne begivenhed",
       "eventFull": "Begivenheden har nået det maksimale antal deltagere",
-      "generic": "Fejl ved tilmelding. Prøv venligst igen."
-    }
+      "generic": "Fejl ved tilmelding. Prøv venligst igen.",
+      "multitrackConsentRequired": "Samtykke til optagelse af dit eget lydspor er obligatorisk for dette arrangement"
+    },
+    "successScheduledMessage": "Du er tilmeldt! Vi har sendt dig en e-mail med dit personlige adgangslink. Læg arrangementet i kalenderen, og kom tilbage kort før det begynder.",
+    "addToCalendar": "Føj til kalender"
   },
   "videoLibrary": {
     "title": "Videobibliotek",
@@ -252,7 +273,33 @@
       "noMessages": "Ingen beskeder endnu",
       "empty": "Ingen beskeder endnu. Skriv den første!",
       "inputLabel": "Chatbesked",
-      "moderatorBadge": "Moderator"
+      "moderatorBadge": "Moderator",
+      "attach": "Vedhæft en fil",
+      "emojiPicker": "Indsæt emoji",
+      "attachBadType": "Filtypen understøttes ikke (billeder eller PDF).",
+      "attachTooLarge": "Filen er for stor (maks. 10 MB).",
+      "attachFailed": "Upload mislykkedes. Prøv igen.",
+      "sendFailed": "Beskeden blev ikke sendt. Prøv igen.",
+      "removeAttachment": "Fjern vedhæftet fil",
+      "openAttachment": "Åbn vedhæftet fil",
+      "reply": "Svar",
+      "replyingTo": "Svar til {name}",
+      "cancelReply": "Annullér svaret",
+      "hide": "Skjul",
+      "hideFailed": "Beskeden kunne ikke skjules. Prøv igen.",
+      "connReconnecting": "Genopretter forbindelsen…",
+      "connDegraded": "Forsinkede opdateringer",
+      "readDenied": "Chatten er ikke tilgængelig: du står ikke blandt dette arrangements deltagere, eller mødelokalet er endnu ikke åbnet. Der forsøges automatisk igen.",
+      "mentionNotificationTitle": "{name} nævnte dig i chatten",
+      "react": "Reagér",
+      "edited": "redigeret",
+      "editLabel": "Redigér besked",
+      "editSave": "Gem",
+      "editFailed": "Beskeden kunne ikke redigeres.",
+      "exportChat": "Download chatten",
+      "reactNotAllowed": "For at reagere på beskeder skal du bruge dit personlige link eller moderatorlinket.",
+      "editNotAllowed": "Dette link er delt: det giver ikke mulighed for at redigere beskeder.",
+      "editExpired": "Der er gået mere end 15 minutter: beskeden kan ikke længere redigeres."
     },
     "role": {
       "moderator": "Moderator",
@@ -271,7 +318,9 @@
         "medium": "Middel",
         "poor": "Dårlig",
         "unknown": "Ikke tilgængelig"
-      }
+      },
+      "volume": "Lydstyrke",
+      "volumeFor": "Lydstyrke for {name}"
     },
     "moderator": {
       "muteAll": "Slå alle fra",
@@ -295,14 +344,17 @@
       "micDisabled": "Mikrofon slået fra",
       "videoModeration": "Deltagervideo",
       "videoDisabled": "Video slået fra",
-      "eventEndedSuccess": "Begivenheden er afsluttet. Omdirigerer..."
+      "eventEndedSuccess": "Begivenheden er afsluttet. Omdirigerer...",
+      "whiteboard": "Whiteboard",
+      "lowerHand": "Tag hånden ned"
     },
     "closeDrawer": "Luk",
     "hintBanner": {
       "controls": "Knapper i bunden",
       "raiseHand": "Ræk hånden op for at tale",
       "sidebar": "Q&A og chat i sidepanelet",
-      "dismiss": "Forstået"
+      "dismiss": "Forstået",
+      "ariaLabel": "Tips"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# person} other {# personer}}"
@@ -310,7 +362,55 @@
     "sidebarTabChatUnread": "Nye ulæste beskeder",
     "floatingControlsLabel": "Arrangementsknapper",
     "screenshareActive": "🖥️ {name} deler sin skærm",
-    "screenshareFallbackName": "En deltager"
+    "screenshareFallbackName": "En deltager",
+    "share": {
+      "button": "Del",
+      "title": "Del arrangementet",
+      "callLink": "Link til at deltage",
+      "callLinkHint": "Alle, der åbner dette link, kommer direkte ind, mens arrangementet er i gang; ellers går de via tilmeldingen. Linket indeholder ingen fortrolige tokens.",
+      "eventLink": "Arrangementets side",
+      "eventLinkHint": "Den offentlige side med detaljerne og tilmeldingsformularen.",
+      "copy": "Kopiér",
+      "copied": "Kopieret!",
+      "moderatorReveal": "Vis moderatorlink",
+      "moderatorWarning": "Dette link giver MODERATOR-adgang (slå lyden fra for alle, start optagelse, afslut arrangementet). Del det kun med andre moderatorer.",
+      "moderatorLink": "Moderatorlink",
+      "moderatorLinkHint": "Alle, der åbner dette link, kommer ind som moderator med fuld kontrol over mødelokalet."
+    },
+    "enterFullscreen": "Fuld skærm",
+    "exitFullscreen": "Afslut fuld skærm",
+    "leaveChoice": {
+      "title": "Hvordan vil du forlade mødet?",
+      "body": "Du kan forlade mødet alene — opkaldet fortsætter for de andre — eller afslutte det for alle deltagere.",
+      "leaveSelf": "Forlad kun selv",
+      "endForAll": "Afslut for alle",
+      "ending": "Afslutter…",
+      "endError": "Opkaldet kunne ikke afsluttes. Prøv igen."
+    },
+    "endDestino": {
+      "title": "Arrangementets skæbne",
+      "body": "Du er ved at afslutte arrangementet for alle. Hvad skal der ske med det, når det er slut?",
+      "public": "Behold det offentligt",
+      "publicHelp": "Siden for det afsluttede arrangement forbliver synlig med opsummering, spørgsmål, afstemninger, materialer og feedback.",
+      "library": "Udgiv i biblioteket",
+      "libraryHelp": "Som ovenfor, og vis desuden arrangementet i det offentlige videobibliotek (kræver en udgivet optagelse eller en YouTube-video).",
+      "archive": "Arkivér (privat)",
+      "archiveHelp": "Siden for det afsluttede arrangement bliver ikke offentlig (404). Data gemmes, indtil opbevaringsperioden udløber, og slettes derefter.",
+      "genAi": "Generér AI-transskription og -resumé ud fra optagelsen (når behandlingen er færdig)",
+      "back": "Tilbage",
+      "confirm": "Afslut arrangementet"
+    },
+    "liveFeaturesLabel": "Funktioner:",
+    "whiteboardNotSavedHint": "Whiteboardet gemmes ikke automatisk. Hvis du bruger det, skal du eksportere det (whiteboardets menu) og vedhæfte det til arrangementets materialer, før du afslutter.",
+    "sidebarTabWordcloud": "Ordsky",
+    "sidebarTabAgenda": "Noter / Tjekliste",
+    "liveToggleAgenda": "Noter / Tjekliste (dagsorden)",
+    "timer": {
+      "show": "Vis timeren",
+      "hide": "Skjul timeren",
+      "remainingLabel": "Resterende tid (klik for forbrugt tid)",
+      "elapsedLabel": "Forbrugt tid (klik for resterende tid)"
+    }
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -407,12 +507,31 @@
         "maxParticipantsHelp": "Estimer det maksimale antal deltagere. Bestemmer videoserverens kapacitet og venteområdets UI.",
         "validation": {
           "startsAt": "Ugyldig startdato.",
-          "endsAt": "Slutdatoen skal være efter startdatoen."
+          "endsAt": "Slutdatoen skal være efter startdatoen.",
+          "titleRequired": "Titlen er obligatorisk (mindst 3 tegn).",
+          "titleRequiredOtherLocale": "Titlen på standardsproget ({locale}) er obligatorisk: skift til fanen {locale}.",
+          "maxParticipants": "Indtast et tal mellem 2 og 500."
         },
         "senderRatioLabel": "Estimeret andel aktive",
         "senderRatioHelp": "Hvor mange deltagere forventes at have mikrofon/video aktiveret. Hjælper med at dimensionere videoserveren.",
         "activeParticipantsEstimate": "≈ {count} aktive deltagere",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "advancedOptions": "Avancerede indstillinger",
+        "waitingRoomEngineLabel": "Venteværelse (dette arrangement)",
+        "waitingRoomEngineSiteDefault": "Sitets standard",
+        "waitingRoomEngineGarden": "Have (almindelig)",
+        "waitingRoomEngineGame": "Videospil (Phaser-lobby)",
+        "waitingRoomEngineClassic": "Klassisk (statisk)",
+        "waitingRoomEngineHelp": "Tilsidesætter sitets standard for dette arrangement.",
+        "videoQuality": "Video-/lydkvalitet (dette arrangement)",
+        "videoQualityHelp": "Tilsidesætter sitets standard for dette arrangement. Højere kvalitet bruger mere båndbredde.",
+        "videoQualitySiteDefault": "Sitets standard",
+        "videoQualityOptions": {
+          "MAX": "Maksimal (1080p, høj kvalitet)",
+          "HIGH": "Høj (720p, anbefales)",
+          "BALANCED": "Balanceret (540p)",
+          "SAVE_DATA": "Databesparelse (360p)"
+        }
       },
       "step2": {
         "heading": "Hvem må gøre hvad",
@@ -449,7 +568,8 @@
             "desc": "Starte/stoppe optagelsen."
           }
         },
-        "recordingHeading": "Optagelse"
+        "recordingHeading": "Optagelse",
+        "roomFeaturesHeading": "Funktioner i mødelokalet"
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -484,7 +604,8 @@
         "invalidEmail": "Ugyldig e-mailadresse.",
         "duplicateEmail": "Adressen er allerede tilføjet.",
         "rubricaPick": "Søg i adressebogen…",
-        "rubricaOrAdd": "eller tilføj manuelt"
+        "rubricaOrAdd": "eller tilføj manuelt",
+        "organizerLogo": "Arrangørens logo"
       },
       "step4": {
         "heading": "Indhold og materialer",
@@ -544,7 +665,9 @@
           "recording": "Optagelse",
           "recordingAuto": "Til — automatisk start",
           "recordingManual": "Til — manuel start",
-          "recordingOff": "Fra"
+          "recordingOff": "Fra",
+          "multitrack": "Optagelse pr. deltager",
+          "multitrackOn": "Slået til — kræver udtrykkeligt samtykke ved tilmeldingen"
         },
         "noRecurrence": "Enkeltstående arrangement",
         "gdprHeading": "Privatliv og opbevaring af data",
@@ -560,9 +683,24 @@
         "featuresHeading": "Konfigurationsoversigt",
         "privacyDoc": "Privatlivsdokument (PDF eller link)",
         "privacyDocHelp": "Upload en PDF eller indsæt en URL til en alternativ erklæring. Tilsidesætter GDPR-skabelonen, hvis den er angivet.",
-        "privacyTextHelp": "Kort tekst, der vises i tilmeldingsformularen; kan supplere eller erstatte GDPR-skabelonen."
+        "privacyTextHelp": "Kort tekst, der vises i tilmeldingsformularen; kan supplere eller erstatte GDPR-skabelonen.",
+        "moderatorPublishHint": "Navn og e-mail er obligatoriske for at udgive arrangementet (de bruges til moderatorlinket og bekræftelsesmailen). De er ikke påkrævet for at gemme som kladde.",
+        "moderatorLinkNote": "Denne person er arrangementets primære moderator: vedkommende modtager et privat link pr. e-mail til at styre det (starte optagelsen, moderere spørgsmål, sætte afstemninger i gang …). Det er noget andet end de medmoderatorer, der tilføjes i trinnet »Personer«, som hver får deres eget link.",
+        "moderatorRequired": "Indtast moderatorens navn",
+        "moderatorEmailRequired": "Indtast en gyldig e-mailadresse på moderatoren"
       },
-      "validationFailed": "Gennemgå de fremhævede felter, før du fortsætter."
+      "validationFailed": "Gennemgå de fremhævede felter, før du fortsætter.",
+      "partialFailure": "Arrangementet blev oprettet, men nogle elementer blev ikke gemt: {items}. Du kan tilføje dem fra arrangementets side.",
+      "draftFound": "Vi fandt en ikke-gemt kladde af dette arrangement. Vil du gendanne den?",
+      "draftRestore": "Gendan kladden",
+      "draftDiscard": "Ignorér",
+      "resources": {
+        "organizers": "arrangører",
+        "invitations": "invitationer",
+        "moderators": "moderatorer",
+        "speakers": "talere",
+        "materials": "materialer"
+      }
     },
     "nav": {
       "events": "Begivenhedsstyring",
@@ -603,7 +741,8 @@
       "eventQuestionnaires": "Spørgeskemaer",
       "rubricaList": "Liste",
       "rubricaDetail": "Post",
-      "feedbackDashboard": "Feedback"
+      "feedbackDashboard": "Feedback",
+      "recordingsPostprod": "Transskriptioner / AI"
     },
     "landing": {
       "title": "Administrationspanel",
@@ -701,7 +840,8 @@
           "dateRequired": "Den oprindelige dato er påkrævet.",
           "saveFailed": "Lagring af metadata mislykkedes."
         }
-      }
+      },
+      "updateFailed": "Opdateringen mislykkedes."
     },
     "recordingsLibrary": {
       "title": "Videooptagelser",
@@ -770,7 +910,10 @@
       "detailEnd": "Slut",
       "detailModerator": "Moderator",
       "detailRoom": "Jitsi-lokale",
-      "detailFilename": "Filnavn"
+      "detailFilename": "Filnavn",
+      "transcriptManage": "Administrér transskription / AI",
+      "transcriptReady": "Transskriberet",
+      "transcriptProcessing": "Behandles"
     },
     "gdprAudit": {
       "title": "GDPR-audit",
@@ -1023,7 +1166,32 @@
       "retentionPreviewRecordings": "Videooptagelser",
       "retentionPreviewKept": "Aggregerede statistikker og begivenhedsmetadata bevares.",
       "configPreview": "Forhåndsvisning af konfiguration",
-      "templateApplied": "Skabelon anvendt: {name}. Du kan ændre alle indstillinger."
+      "templateApplied": "Skabelon anvendt: {name}. Du kan ændre alle indstillinger.",
+      "agendaEnabled": "Live-noter / tjekliste (dagsorden)",
+      "agendaEnabledDesc": "En tjekliste over de emner, der skal behandles, som moderatorerne krydser af under arrangementet. Indgår i det automatiske resumé. Valgfri og kan også slås til under arrangementet.",
+      "whiteboardEnabled": "Delt whiteboard",
+      "whiteboardEnabledDesc": "Aktiverer det indbyggede whiteboard til samarbejde (Excalidraw): moderatorerne kan åbne det fra værktøjslinjen under arrangementet. Altid slået til ved øjeblikkelige opkald.",
+      "aiSectionHeading": "Automatisk efterbehandling",
+      "aiSectionDesc": "Når arrangementet er slut, kan optagelsen behandles af en AI-pipeline i klyngen, der producerer transskription, resumé og — hvis det ønskes — oversættelser og eftersynkronisering. Alt foregår på Departementets egen infrastruktur, og ingen data sendes til tredjeparter.",
+      "aiTranscriptEnabled": "Automatisk transskription",
+      "aiTranscriptEnabledDesc": "Talegenkendelse med identifikation af talerne. Nødvendig for at kunne aktivere resumé, oversættelser og eftersynkronisering.",
+      "aiSummaryEnabled": "Resumé og kapitler",
+      "aiSummaryEnabledDesc": "Resumé af mødet, trufne beslutninger, opgaver og opdeling i kapitler med tidsangivelser.",
+      "aiTranslationEnabled": "Oversættelse til andre sprog",
+      "aiTranslationEnabledDesc": "Transskription og resumé oversat til de sprog, der angives nedenfor.",
+      "aiTargetLocales": "Oversættelsessprog",
+      "aiTargetLocalesDesc": "ISO-sprogkoder (f.eks. en, fr, de) adskilt af komma. Lad feltet stå tomt for at bruge de sprog, der er sat op for hele sitet.",
+      "aiTargetLocalesRequired": "Angiv mindst ét oversættelsessprog, eller slå den automatiske oversættelse fra.",
+      "aiDubbingEnabled": "Eftersynkronisering af lyd",
+      "aiDubbingEnabledDesc": "Eftersynkroniseret lyd på målsprogene, genereret med færdigtrænede syntetiske stemmer. Deltagernes stemmer klones ikke.",
+      "consentBadge": "Udtrykkeligt samtykke",
+      "retentionBadge": "Forlænger opbevaringen",
+      "multitrackRecordingEnabled": "Optagelse pr. deltager (høj præcision)",
+      "multitrackRecordingEnabledDesc": "Optager et separat lydspor for hver deltager, så transskriptionen med sikkerhed kan tilskrive, hvem der siger hvad (ikke flere »Taler 1/2«). Der behandles isoleret lyd fra den enkelte taler (følsomme personoplysninger): sporene er midlertidige og slettes umiddelbart efter transskriptionen. Kræver samtykke til optagelse.",
+      "retainParticipantTracks": "Behold sporene pr. deltager",
+      "retainParticipantTracksDesc": "Beholder de enkelte lydspor ud over transskriptionen, til arkivet, der kan downloades, og til gennemlytning pr. taler. ADVARSEL: dette forlænger opbevaringen af følsomme personoplysninger (isoleret stemme) indtil arrangementets opbevaringsfrist. Slå det kun til, hvis det er nødvendigt, og med tilstrækkeligt samtykke og passende oplysning.",
+      "expectedSpeakers": "Forventet antal talere",
+      "expectedSpeakersDesc": "Når du kender tallet (f.eks. 3 talere), forbedrer det kvaliteten af identifikationen af talerne, hvis du angiver det. Lad feltet stå tomt for at lade pipelinen bestemme."
     },
     "links": {
       "title": "Begivenhedslinks",
@@ -1123,7 +1291,8 @@
         "pages": "Sider",
         "footer": "Sidefod",
         "features": "Funktioner",
-        "scaling": "Infra-dimensionering"
+        "scaling": "Infra-dimensionering",
+        "postprod": "AI-pipeline efter arrangementet"
       },
       "scaling": {
         "intro": "Parametre, der beskriver kapaciteten på det cluster, platformen kører på. Standardværdierne er kalibreret til Azure F16s_v2 (16 vCPU / 32 GiB) for JVB og F4s_v2 (4 vCPU / 8 GiB) for Jibri. Ved anden hardware: opdater her — scaleren genberegner straks.",
@@ -1285,7 +1454,55 @@
         "jvbProvisioningTimeoutMinutes": "Provisioneringstimeout (minutter)",
         "jvbProvisioningTimeoutMinutesHelp": "Efter hvor mange minutter siden startsAt et arrangement uden klar JVB markeres som 'degraded' på statussiden. Standard 15. Dækker cold start (~3-5 min) plus sikkerhedsmargen.",
         "statusPollIntervalSeconds": "Statussidens pollinginterval (sekunder)",
-        "statusPollIntervalSecondsHelp": "Hvor ofte siden /status opdaterer data fra browseren. Standard 30. Lavere værdier = friskere data, men mere belastning på appen."
+        "statusPollIntervalSecondsHelp": "Hvor ofte siden /status opdaterer data fra browseren. Standard 30. Lavere værdier = friskere data, men mere belastning på appen.",
+        "jvbEmptyCloseMinutes": "Minutter med tomt mødelokale før endelig lukning",
+        "jvbEmptyCloseMinutesHelp": "Hvis et LIVE-mødelokale, der allerede har haft deltagere, står tomt i så mange minutter, lukkes det endeligt (ENDED) — så et arrangement uden moderator lukker sig selv på grund af inaktivitet uden at vente på det planlagte sluttidspunkt. Standard 15 (slået til). -1 = slået fra. 0 = luk ved første kontrol, hvor lokalet er tomt.",
+        "waitingRoomLeadMinutes": "Tidsvindue for adgang til venteværelset (minutter)",
+        "waitingRoomLeadMinutesHelp": "Tilmelder man sig inden for så mange minutter før starten, kommer man direkte i venteværelset; tilmelder man sig tidligere, ses en bekræftelse med link til kalenderen. 0 = vis altid bekræftelsen indtil starten. Anbefalet 15.",
+        "reactionsMode": "Reaktioner (emoji)",
+        "reactionsModeNative": "Jitsis egne (i værktøjslinjen, flygtige)",
+        "reactionsModeCustom": "Appens egne (bjælke til venstre, med statistik)",
+        "reactionsModeHelp": "Jitsis egne = Jitsis reaktionsknap i værktøjslinjen, let og flygtig (tælles ikke). Appens egne = appens reaktionsbjælke nederst til venstre, med optællinger og statistik. Standard: Jitsis egne.",
+        "emailSenderTitle": "Afsender af e-mails",
+        "emailSenderHelp": "Sådan fremstår afsenderen i indbakken hos den, der tilmelder sig. Afsendelsesadressen konfigureres fortsat i udrulningen (den skal svare til den, SMTP-serveren har tilladelse til at sende fra).",
+        "emailFromName": "Afsenderens navn",
+        "emailFromNameHelp": "Tomt = det navn, der er konfigureret i udrulningen (SMTP_FROM_NAME), bliver brugt. E-mailene sendes stadig fra systemets adresse.",
+        "emailReplyTo": "Svaradresse",
+        "emailReplyToHelp": "E-mailene sendes fra en no-reply-adresse: uden denne når svarene ikke frem til nogen.",
+        "avatarTitle": "Deltagernes billeder",
+        "gravatarEnabled": "Brug Gravatar, når det er muligt",
+        "gravatarEnabledHelp": "Deltagere, der har tilmeldt sig med en e-mail, der har en Gravatar, får den vist som billede i mødelokalet; for alle andre bruges de initialer, platformen genererer. Billedet hentes via vores egen server, så deltagernes browser kontakter aldrig gravatar.com — men det gør platformen: det skal fremgå af privatlivspolitikken."
+      },
+      "postprod": {
+        "prerequisitesNote": "Efterbehandlingen arbejder på hele optagelsen, efter at arrangementet er slut. Den dedikerede GPU-pulje starter, når det første job kommer i kø, og lukker ned, når køen er tom, for at holde omkostningerne nede. Før du aktiverer pipelinen, skal du sikre dig, at klyngen har GPU-puljen konfigureret, NVIDIA-operatoren installeret, HuggingFace-legitimationsoplysningerne til stede i namespacet og volumenet med modellernes vægte forudindlæst. Den operationelle tjekliste findes i docs/POSTPROD.md.",
+        "pipelineEnabled": "Pipelinen efter arrangementet er aktiv",
+        "pipelineEnabledHelp": "Hovedafbryder. Når den er slået fra, produceres der hverken transskription, resumé, oversættelse eller eftersynkronisering for nye arrangementer, heller ikke, selvom efterbehandlingen er slået til på de enkelte arrangementer. Allerede genererede artefakter vises ikke længere offentligt, før du slår afbryderen til igen. Nyttig til at sætte det hele på pause uden at udrulle applikationen igen.",
+        "timingNote": "Pipelinen rører ikke ved den direkte udsendelse. Alt sker, efter at arrangementet er slut, når optagelsen arkiveres: undertekster og resumé er aldrig tilgængelige i realtid. Valget prioriterer transskriptionens kvalitet og begrænser GPU-forbruget sammenlignet med live-tekstning.",
+        "providersSection": "Motorer til kunstig intelligens",
+        "providersIntro": "De motorer, der bruges til transskription, resumé og eftersynkronisering, fastlægges ved udrulningen. At tilføje en ny kræver et indgreb i infrastrukturen (udrulning af motoren i klyngen, registrering på listen over understøttede providere, opdatering af skemaet). Dropdown-menuerne nedenfor viser de motorer, der aktuelt er tilgængelige på denne instans.",
+        "asrProvider": "Transskriptionsmotor",
+        "asrProviderHelp": "Genererer transskriptionen af videoen med angivelse af tidspunkt og adskillelse af talerne. Vi bruger WhisperX large-v3 sammen med pyannote.audio til diarisering. Begge modeller kører i klyngen på de vægte, der ligger på det dedikerede volumen.",
+        "asrOptionWhisperx": "WhisperX large-v3 + pyannote-diarisering",
+        "llmProvider": "Motor til resumé og oversættelse",
+        "llmProviderHelp": "Producerer resuméet af mødet, identificerer de emner, der er behandlet, og oversætter transskription og resumé til målsprogene. Modellen Mistral-Small-3.2-24B (europæisk leverandør, Apache 2.0-licens) serveret via vLLM i klyngen.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM i klyngen",
+        "ttsEngine": "Eftersynkroniseringsmotor",
+        "ttsEngineHelp": "Syntetiserer lyden på de valgte sprog ved hjælp af færdigtrænede offentlige stemmer. Når der er flere talere, får hver taler sin egen stemme fra den tilgængelige pulje, så lytteren lettere kan følge samtalen: tildelingen er vilkårlig og gengiver på ingen måde deltagernes virkelige stemme. Eftersynkroniseringen produceres kun, hvis arrangøren beder om det for det enkelte arrangement.",
+        "ttsOptionPiper": "Piper TTS · færdigtrænede syntetiske stemmer",
+        "voiceCloningSection": "Redaktionel linje om stemmer",
+        "voiceCloningNote": "Systemet bruger udelukkende generiske syntetiske stemmer (Piper TTS, offentlige modeller under MIT-licens). Det hverken analyserer, gemmer eller gengiver de virkelige deltageres stemmer: hver taler repræsenteres af en stemme fra puljen, valgt deterministisk ud fra taletiden og uden nogen forbindelse til vedkommendes stemmeidentitet. Den tildelte stemme skifter med sammensætningen af talere ved hvert enkelt arrangement, så den samme taler kan blive eftersynkroniseret med forskellige stemmer ved forskellige arrangementer. Dette valg udelukker behandling af biometriske data omfattet af artikel 9 i GDPR.",
+        "defaultTargetLocales": "Standardsprog for oversættelse",
+        "defaultTargetLocalesHelp": "ISO-639-1-koder adskilt af komma (f.eks. `en,fr,de`). De gælder for arrangementer, der ikke angiver deres egne oversættelsessprog. Arrangementets kildesprog udelades altid automatisk.",
+        "limitsSection": "Driftsgrænser",
+        "maxConcurrentJobs": "Parallelle job",
+        "maxConcurrentJobsHelp": "Det maksimale antal job, som pipelinen kører samtidig på GPU-puljen. Flere parallelle job afvikler køen hurtigere, når du afslutter flere arrangementer i træk, men de kræver ledige GPU'er. Den typiske værdi er 2.",
+        "jobMaxAttempts": "Forsøg før fejl",
+        "jobMaxAttemptsHelp": "Hvor mange gange pipelinen forsøger et job igen, før det markeres som mislykket. Ventetiden mellem forsøgene vokser eksponentielt (fra 30 sekunder op til 2 timer). Den typiske værdi er 5.",
+        "artifactRetentionDays": "Opbevaring af artefakter (dage)",
+        "artifactRetentionDaysHelp": "Står værdien på 0, følger AI-artefakterne arrangementets egen udløbsfrist. En værdi over nul beholder dem i det angivne antal dage, også efter at arrangementet er lukket, indtil et dagligt cron-job sletter dem. Sletningen omfatter talernes navne og jobbenes payload, i tråd med docs/GDPR.md.",
+        "consentDisclosureSection": "AI-oplysning i venteværelset",
+        "consentDisclosureHelp": "Tekst, der vises for deltagerne i venteværelset, når arrangementet bruger AI-efterbehandling (transskription, resumé, oversættelse, eftersynkronisering). Kan tilpasses pr. sprog. Lad feltet stå tomt for at bruge systemets standardtekst.",
+        "consentDisclosurePlaceholder": "F.eks. Dette arrangement bliver automatisk transskriberet og resumeret med AI-værktøjer efter den direkte udsendelse…"
       }
     },
     "analytics": {
@@ -1372,7 +1589,23 @@
       "screen": "Skærmdeling",
       "pickerTitle": "Vælg en skabelon",
       "pickerSubtitle": "Vælg en skabelon for at forkonfigurere begivenhedsindstillingerne, eller spring over for at konfigurere alt manuelt.",
-      "skipTemplate": "Konfigurer manuelt"
+      "skipTemplate": "Konfigurer manuelt",
+      "whiteboardLabel": "Whiteboard",
+      "waitingRoomEngineLabel": "Venteværelse (skabelonens standard)",
+      "waitingRoomEngineSiteDefault": "Sitets standard",
+      "waitingRoomEngineGarden": "Have (almindelig)",
+      "waitingRoomEngineGame": "Videospil (Phaser-lobby)",
+      "waitingRoomEngineClassic": "Klassisk (statisk)",
+      "waitingRoomEngineHelp": "Forudfylder venteværelsesmotoren i de arrangementer, der oprettes ud fra denne skabelon. Kan stadig ændres i guiden.",
+      "durationLabel": "Standardvarighed (minutter)",
+      "durationHint": "Forudfylder arrangementets sluttidspunkt (start + varighed). Brugeren kan ændre det. Tomt = 2 timer.",
+      "retentionLabel": "Standardopbevaring af data (dage)",
+      "expectedSpeakersLabel": "Forventet antal talere (standard)",
+      "descriptionTemplateLabel": "Standardbeskrivelse",
+      "descriptionTemplateHint": "Tekst, der forudfyldes i arrangementets beskrivelse (kan redigeres).",
+      "aiTranscript": "Automatisk transskription (standard)",
+      "aiSummary": "Automatisk resumé (standard)",
+      "aiTranslation": "Automatisk oversættelse (standard)"
     },
     "instantCall": {
       "title": "Øjeblikkeligt videoopkald",
@@ -1456,7 +1689,8 @@
       },
       "errors": {
         "saveFailed": "Lagring mislykkedes. Kontrollér oplysningerne, og prøv igen."
-      }
+      },
+      "deleteTitle": "Slet skabelon"
     },
     "emailTemplates": {
       "title": "E-mailskabeloner",
@@ -1637,7 +1871,8 @@
       "play": "Afspil",
       "hidePlayer": "Skjul afspiller",
       "download": "Download",
-      "deleteConfirm": "Slet denne session og dens tilknyttede optagelse?"
+      "deleteConfirm": "Slet denne session og dens tilknyttede optagelse?",
+      "deleteTitle": "Slet session"
     },
     "monitoring": {
       "title": "Overvågning",
@@ -1798,7 +2033,9 @@
         "settings": "Indstillinger",
         "people": "Personer",
         "content": "Indhold",
-        "audit": "Optagelser og audit"
+        "audit": "Optagelser og audit",
+        "postEvent": "Efter arrangementet",
+        "analytics": "Statistik"
       },
       "toggles": {
         "unmute": "Deltagere kan slå mikrofonen til",
@@ -1820,7 +2057,22 @@
         "postEventSummary": "{connected} tilsluttede ud af {registered} tilmeldinger (estimeret {estimated})",
         "estimatedAttendance": "Estimeret: {estimated} deltagere"
       },
-      "copyGuestUrl": "Kopiér gæstelink"
+      "copyGuestUrl": "Kopiér gæstelink",
+      "aiManageTitle": "Transskription, resumé og oversættelser",
+      "aiManageDesc": "Administrér AI-efterbehandlingen af denne optagelse: ret transskriptionen og tildelingen af talere (hvem siger hvad), redigér resuméet, og styr oversættelsessprogene.",
+      "aiManageCta": "Åbn administrationen af efterbehandlingen",
+      "aiManageNotEnded": "Tilgængelig, når arrangementet er afsluttet, og optagelsen er behandlet af AI-pipelinen.",
+      "aiGenerateCta": "Generér AI nu",
+      "aiGenerateRunning": "Starter…",
+      "aiGenerateQueued": "AI-pipelinen er startet: transskription og resumé er i kø. Følg forløbet i administrationen af efterbehandlingen.",
+      "aiGenerateAlready": "AI-pipelinen var allerede startet for denne optagelse: der er ikke tilføjet nye job.",
+      "aiGenerateError": "AI-pipelinen kunne ikke startes. Kontrollér, at AI er slået til for hele sitet, og at der findes en optagelse.",
+      "aiGenerateHelp": "Slår AI-transskription + resumé til og starter pipelinen på optagelsen med ét klik. Idempotent: to klik dublerer ikke jobbene.",
+      "aiGenerateNoRecording": "Ingen optagelse: AI-behandling efter arrangementet kræver en optagelse (optagelsen sker kun under arrangementet). Du kan stadig administrere efterbehandlingen her.",
+      "duplicateNext": "Dublér til næste gang",
+      "duplicateNextBusy": "Dublerer…",
+      "duplicateNextHint": "Opretter en kladde med hele dette arrangements opsætning (optagelse, separate spor, AI, dagsorden, påmindelser). Har arrangementet en kadence, flyttes datoen til næste forekomst; ellers skal du selv sætte den.",
+      "duplicateNextError": "Dubleringen mislykkedes. Prøv igen."
     },
     "rubrica": {
       "title": "Adressebog",
@@ -1838,6 +2090,299 @@
     "eventQuestionnaires": {
       "title": "Spørgeskemaer — {eventTitle}",
       "subtitle": "Konfigurér et spørgeskema før tilmelding og/eller efter arrangementet ved at kombinere skabeloner og ad hoc-spørgsmål."
+    },
+    "eventAnalytics": {
+      "title": "Statistik",
+      "loadError": "Statistikken kunne ikke indlæses.",
+      "noData": "Ingen data tilgængelige.",
+      "notEndedYet": "Arrangementet er endnu ikke afsluttet: statistikken er delvis og opdateres i realtid.",
+      "cappedNote": "Meget stort arrangement: nogle målinger er beregnet på en stikprøve (grænsen for antal rækker er nået).",
+      "scoreTitle": "Opmærksomhedsgrad",
+      "adminOnly": "kun admin",
+      "scoreProxy": "Et indeks fra 0–100 for, hvor deltagende publikum var. Det er en indikator for deltagelse, ikke en måling af kognitiv opmærksomhed — læs det i lyset af formatet (forelæsning vs. workshop), aldrig som en kvalitetskarakter.",
+      "scoreUnavailable": "Der er ikke data nok til at beregne graden.",
+      "comp": {
+        "attendanceRate": "Fremmøde (deltaget/tilmeldte)",
+        "breadth": "Interaktionens bredde",
+        "depth": "Interaktionens dybde",
+        "chatRate": "Chattempo",
+        "liveParticipation": "Live-deltagelse",
+        "talkBalance": "Balance i taletiden",
+        "retention": "Fastholdelse"
+      },
+      "kpiConversion": "Konvertering",
+      "kpiPeak": "Maks. deltagere",
+      "kpiDuration": "Varighed",
+      "kpiInteractors": "Unikke deltagere med interaktion",
+      "interactionsWord": "interaktioner",
+      "kpiHandRaises": "Håndsoprækninger",
+      "handRaisesSessionsSub": "fra {n, plural, one {# session} other {# sessioner}}",
+      "kpiReactions": "Reaktioner",
+      "kpiRetention": "Gennemsnitlig fastholdelse",
+      "dwellSub": "{d} · {n, plural, one {# målt} other {# målte}}",
+      "reactionsTitle": "Reaktioner",
+      "timelineTitle": "Aktiviteten i opkaldet over tid",
+      "timelineEmpty": "Ingen interaktion registreret under opkaldet.",
+      "timelinePeak": "Interaktionen toppede kl. {at} ({n} hændelser i intervallet).",
+      "kind": {
+        "chat": "Chat",
+        "question": "Spørgsmål",
+        "upvote": "Opstemmer",
+        "poll": "Afstemninger",
+        "word": "Ordsky",
+        "reaction": "Reaktioner"
+      },
+      "speakersTitle": "Hvem talte",
+      "audioUnavailable": "Lydstatistik er ikke tilgængelig — arrangementet blev ikke optaget (eller optagelsen indeholdt ingen tale).",
+      "predominant": "Dominerende taler",
+      "talkBalance": "Balance",
+      "speechDensity": "Taletæthed",
+      "chatTitle": "Chat",
+      "chatAudience": "Publikum",
+      "chatStaff": "Personale",
+      "qaTitle": "Spørgsmål med flest stemmer",
+      "none": "Ingen.",
+      "pollsTitle": "Afstemninger",
+      "wordsTitle": "Ordsky",
+      "feedbackTitle": "Feedback",
+      "responses": "svar",
+      "privacyNote": "Statistik pr. person er som udgangspunkt pseudonym. Anonyme aggregater gemmes i arrangementets opsummering; rådata slettes, når opbevaringsperioden udløber."
+    },
+    "postprod": {
+      "title": "AI-pipeline til efterbehandling",
+      "subtitle": "Transskriptioner, resuméer og oversættelser produceret af AI-pipelinen i klyngen. Tilknyt talere, kør job igen, eller annullér dem.",
+      "filterStatus": "Status",
+      "all": "Alle",
+      "queued": "I kø",
+      "running": "Kører",
+      "done": "Færdig",
+      "partial": "Delvis",
+      "failed": "Mislykket",
+      "totalRows": "{count, plural, =0 {ingen optagelser} one {1 optagelse} other {# optagelser}}",
+      "colEvent": "Arrangement",
+      "colCreated": "Oprettet",
+      "colDuration": "Varighed",
+      "colStatus": "Status",
+      "colJobs": "Job",
+      "colArtifacts": "Artefakter",
+      "colActions": "Handlinger",
+      "rerun": "Kør igen",
+      "rerunTooltip": "Opretter en ny kørsel ved at øge runCount; de tidligere artefakter bevares, indtil opbevaringsfristen udløber",
+      "cancel": "Annullér",
+      "cancelConfirm": "Skal alle ventende job for denne optagelse annulleres?",
+      "rerunFailed": "Den nye kørsel mislykkedes (HTTP {code})",
+      "cancelFailed": "Annulleringen mislykkedes (HTTP {code})",
+      "speakerUpdateFailed": "Opdateringen af taleren mislykkedes (HTTP {code})",
+      "loadError": "Joblisten kunne ikke indlæses",
+      "empty": "Ingen optagelser matcher de valgte filtre",
+      "detailJobs": "Job",
+      "detailArtifacts": "Artefakter",
+      "detailSpeakers": "Talere",
+      "noArtifacts": "Der er endnu ikke produceret nogen artefakter",
+      "noSpeakers": "Ingen talere fundet",
+      "attempts": "forsøg {n}",
+      "speakerPlaceholder": "Rigtigt navn (valgfrit)",
+      "speakerSpoke": "Taletid: {sec}s",
+      "suggestedApply": "Anvend forslaget: {name}",
+      "suggestedTitle": "Navn foreslået af AI-pipelinen ud fra de egennavne, der nævnes i transskriptionen. Klik for at indsætte det i feltet (du kan altid rette det, før du gemmer).",
+      "save": "Gem",
+      "editTranscript": "Redigér transskriptionen",
+      "editClose": "Luk editoren",
+      "editTranscriptTitle": "Transskriptionseditor",
+      "editHint": "Ret teksten, eller tildel et andet talernavn til det enkelte segment. Når du gemmer, opdateres transskriptionen og underteksterne på kildesproget. Oversættelserne og eftersynkroniseringen genereres IKKE på ny: brug »Kør igen«, hvis du også vil have de øvrige sprog opdateret.",
+      "editLoading": "Indlæser transskriptionen…",
+      "editLoadError": "Transskriptionen kunne ikke indlæses (HTTP {code}).",
+      "editNotReady": "Der findes endnu ingen transskription for denne optagelse. Start (eller kør igen) AI-behandlingen fra kontrollerne øverst: transskriptionen er første skridt, og derefter kan du rette den her og generere resumé og oversættelser.",
+      "editProcessing": "AI-behandlingen er i gang: transskriptionen vises her, når den er færdig. Opdatér siden om et par minutter.",
+      "editSessionExpired": "Admin-sessionen er udløbet. Genindlæs siden, og log ind igen for at redigere transskriptionen.",
+      "editEmpty": "Ingen segmenter kan redigeres",
+      "editSpeakerNone": "— ingen —",
+      "editSave": "Gem ændringerne",
+      "editSaving": "Gemmer…",
+      "editDirty": "{n, plural, one {1 ikke-gemt ændring} other {# ikke-gemte ændringer}}",
+      "editSaved": "Gemt: {text} tekster, {speaker} talere.",
+      "editFailed": "Lagringen mislykkedes (HTTP {code})",
+      "editFailedDetail": "Lagringen mislykkedes: {message}",
+      "editMediaError": "Optagelsens lyd kunne ikke indlæses: afspilning er ikke tilgængelig. Du kan stadig rette teksten og talerne i segmenterne.",
+      "summaryLoadError": "Resuméet kunne ikke indlæses.",
+      "summaryLoading": "Indlæser resuméet…",
+      "summaryEmptyProcessing": "AI-resuméet er ikke klar endnu: behandlingen er i gang. Opdatér siden om et par minutter.",
+      "summaryEmptyFailed": "Genereringen af resuméet mislykkedes. Kontrollér pipelinens status, og kør behandlingen igen fra kontrollerne øverst.",
+      "summaryEmptyNone": "Der er ikke genereret noget AI-resumé for denne optagelse. Start behandlingen fra kontrollerne øverst.",
+      "editSeek": "Gå til dette sted i videoen",
+      "manageTabTranscript": "Transskription",
+      "manageTabSummary": "Resumé",
+      "manageTabTranslations": "Oversættelser",
+      "manageTabArchive": "Arkiv",
+      "manageTabReliability": "Pålidelighed",
+      "manageLoading": "Indlæser…",
+      "archivePiiNote": "De isolerede lydspor pr. deltager er følsomme personoplysninger (isoleret stemme): dette afsnit er forbeholdt administratorer og moderatorer og vises aldrig offentligt.",
+      "archiveNoTracks": "Der er ingen spor pr. deltager for denne optagelse (flersporsoptagelse er ikke slået til, eller sporene er allerede slettet af hensyn til dataminimering efter GDPR).",
+      "archivePlayerTitle": "Gennemlytning pr. taler",
+      "archiveAudioHint": "Brug afspillerens »Lyd«-vælger til at lytte til miksningen eller til en enkelt deltagers isolerede spor, synkront med videoen.",
+      "archiveTitle": "Arkiv til download",
+      "archiveIntro": "Generér en MKV-fil med videoen, ét lydspor pr. deltager (mærket med navn og præcist synkroniseret) og underteksterne. Den er tænkt til download og arkivering: browsere kan ikke skifte lydspor i en MKV, så brug afspilleren ovenfor til gennemlytning.",
+      "archiveGenerate": "Generér arkiv",
+      "archiveStatusLabel": "Status",
+      "archiveStatus_none": "ikke genereret",
+      "archiveStatus_pending": "i kø",
+      "archiveStatus_running": "under behandling",
+      "archiveStatus_done": "klar",
+      "archiveStatus_failed": "mislykket",
+      "archiveDownload": "Download MKV",
+      "archiveGenerateOk": "Genereringen af arkivet er startet.",
+      "archiveGenerateErr": "Genereringen af arkivet mislykkedes (HTTP {code}).",
+      "archiveTrackFallback": "Deltager",
+      "manageBackToList": "Alle optagelser",
+      "manageDuration": "Varighed",
+      "manageSource": "Kildesprog",
+      "manageOpenPublic": "Offentlig side",
+      "manageRerunOk": "Pipelinen er sat i gang igen.",
+      "manageRerunNoop": "Der blev ikke startet noget job: AI er slået fra for dette arrangement, eller pipelinen er sat på pause. Brug »Generér AI«.",
+      "manageRerunAlreadyQueued": "Behandlingen er allerede i kø: der er intet nyt at starte.",
+      "generateAi": "Generér AI",
+      "generateAiConfirm": "Kør AI-pipelinen (transskription og resumé) på denne optagelse. AI-behandlingen slås til for arrangementet og starter i baggrunden. Oversættelserne tilføjes bagefter ét sprog ad gangen fra fanen »Oversættelser«.",
+      "generateAiOk": "AI-pipelinen er startet.",
+      "manageOpen": "Administrér",
+      "cancelConfirmTitle": "Annullér efterbehandlingen",
+      "speakerUpdateSuccess": "Taleren er opdateret",
+      "tm": {
+        "loading": "Indlæser oversættelsessprogene…",
+        "loadError": "Oversættelsessprogene kunne ikke indlæses.",
+        "title": "Oversættelsessprog",
+        "sourceLabel": "Kildesprog:",
+        "already": "Allerede oversat:",
+        "noneYet": "Ingen oversættelser endnu.",
+        "addLabel": "Tilføj et sprog",
+        "noneAvailable": "Ingen sprog tilgængelige",
+        "selectPlaceholder": "Vælg et sprog…",
+        "adding": "Tilføjer…",
+        "addButton": "Tilføj sprog",
+        "unexpectedError": "Uventet fejl",
+        "note": "Når du tilføjer et sprog, genereres oversættelsen af transskription og resumé — og eftersynkroniseringen af lyden, hvis den er slået til for arrangementet. Behandlingen sker i baggrunden.",
+        "summary": "Resumé",
+        "subtitles": "Undertekster",
+        "dub": "Eftersynkronisering",
+        "download": "download",
+        "allTranslated": "Alle aktive sprog er allerede oversat.",
+        "translatedHeader": "Oversatte sprog"
+      },
+      "ov": {
+        "tab": "Oversigt",
+        "intro": "Hvad AI-pipelinen har produceret for denne optagelse, sprog for sprog.",
+        "processing": "Behandlingen er i gang, eller der er ingen artefakter endnu. Kom tilbage, når status er »Færdig«.",
+        "loadError": "Oversigten kunne ikke indlæses.",
+        "langsTitle": "Sprog og artefakter",
+        "colLang": "Sprog",
+        "colTranscript": "Transskription",
+        "colSummary": "Resumé",
+        "colSubtitles": "Undertekster",
+        "colDub": "Eftersynkronisering",
+        "source": "original",
+        "present": "tilgængelig",
+        "absent": "mangler",
+        "listen": "Lyt",
+        "download": "Download",
+        "dubTitle": "Eftersynkroniseret lyd (én stemme pr. taler, synkroniseret)",
+        "dubNone": "Der er ikke produceret nogen eftersynkronisering.",
+        "summaryTitle": "Resumé",
+        "summaryLang": "Sprog",
+        "summaryNone": "Intet resumé tilgængeligt.",
+        "decisions": "Beslutninger",
+        "actions": "Opgaver",
+        "topics": "Kapitler",
+        "speakersTitle": "Talere",
+        "speakerAnon": "ikke tildelt",
+        "speakerRenameHint": "Omdøb talerne for at rette navnene: navnet erstatter den anonyme etiket i transskriptionen og på den offentlige side.",
+        "speakerNamePlaceholder": "Rigtigt navn (f.eks. Mario Rossi)",
+        "speakerNameAria": "Navn på",
+        "save": "Gem",
+        "saving": "Gemmer…",
+        "saved": "Gemt",
+        "saveError": "Fejl",
+        "editHint": "Brug fanerne ovenfor til at rette tekst, navne eller resumé.",
+        "kpiDuration": "Varighed",
+        "kpiParticipants": "Deltagere (maks.)",
+        "kpiTracks": "Lydspor",
+        "kpiLanguages": "Sprog",
+        "kpiArtifacts": "Artefakter",
+        "kpiProcessed": "Behandlet",
+        "statusLabel": "Status",
+        "run": "kørsel",
+        "jobsTitle": "Pipelinens forløb",
+        "jobsNone": "Ingen job for denne optagelse.",
+        "attempts": "{n} forsøg",
+        "filesTitle": "Filer i lageret",
+        "filesNone": "Ingen filer fundet i lageret.",
+        "filesToggle": "Vis/skjul de {n} filer",
+        "tracksTitle": "Spor pr. deltager",
+        "tracksNone": "Ingen spor pr. deltager (flersporsoptagelse er slået fra, eller sporene er allerede slettet).",
+        "trackPurged": "slettet (GDPR)",
+        "trackEnters": "kom ind +{s}s",
+        "metricsTitle": "Målinger for resuméet (LLM)",
+        "chars": "tegn",
+        "model": "Model",
+        "notAvailable": "n/a"
+      },
+      "rel": {
+        "title": "AI-pålidelighed",
+        "subtitle": "Hvor meget du kan stole på det AI-genererede output for denne optagelse.",
+        "loading": "Analyserer pålideligheden…",
+        "loadError": "Målingerne af pålideligheden kunne ikke indlæses.",
+        "noData": "Ingen AI-behandling for denne optagelse.",
+        "level": {
+          "good": "Pålidelig",
+          "fair": "Acceptabel",
+          "poor": "Svag",
+          "failed": "Upålidelig"
+        },
+        "overallScore": "Samlet konfidens",
+        "totalTime": "Behandlingstid",
+        "sourceLang": "Kildesprog",
+        "transcriptTitle": "Transskription",
+        "segments": "Segmenter",
+        "speakers": "Talere",
+        "speech": "Registreret tale",
+        "confidence": "Gennemsnitlig konfidens",
+        "silence": "Anslået stilhed",
+        "coverage": "Taledækning",
+        "lowConf": "Segmenter med lav konfidens",
+        "transcriptNotProduced": "Transskriptionen er endnu ikke produceret (pipelinen er ikke kørt).",
+        "transcriptUnavailable": "Transskriptionen findes, men kan ikke analyseres her (arkiveret i objektlageret).",
+        "stagesTitle": "Pipelinens faser",
+        "colStage": "Fase",
+        "colStatus": "Status",
+        "colModel": "Model",
+        "colTime": "Varighed",
+        "colLangs": "Sprog",
+        "warn": {
+          "transcriptEmpty": "Tom transskription: kildelyden virker stille eller uden tale. Det afledte resumé, oversættelserne og eftersynkroniseringen er IKKE pålidelige.",
+          "lowConfidence": "Lav konfidens i transskriptionen: gennemgå teksten, før den udgives.",
+          "manyLowConfSegments": "Mange segmenter med lav konfidens: transskriptionen kan indeholde fejl.",
+          "highNoSpeech": "Lyden er i vid udstrækning stille eller uden tale: transskriptionen kan være hallucineret.",
+          "stageFailed": "Fasen »{stage}« mislykkedes.",
+          "stageRetried": "Fasen »{stage}« blev gennemført efter flere forsøg."
+        },
+        "stage": {
+          "TRANSCRIBE": "Transskription",
+          "TRANSCRIBE_MULTITRACK": "Transskription (flerspors)",
+          "SUMMARIZE": "Resumé",
+          "TRANSLATE": "Oversættelse",
+          "SUBTITLE": "Undertekster",
+          "DUB": "Eftersynkronisering",
+          "ARCHIVE": "Arkiv"
+        },
+        "status": {
+          "PENDING": "Afventer",
+          "CLAIMED": "Tildelt",
+          "RUNNING": "I gang",
+          "DONE": "Færdig",
+          "FAILED": "Mislykket"
+        }
+      },
+      "archiveSourceTitle": "Kildeoptagelse",
+      "archiveSourceHint": "Arrangementets originale video. Separate spor pr. deltager og MKV-arkivet kræver flersporsoptagelse (ikke slået til for dette arrangement).",
+      "archiveSourceDownload": "Download den originale video"
     }
   },
   "email": {
@@ -2039,7 +2584,9 @@
       "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
       "futureCommunications": "Jeg ønsker at modtage information om fremtidige begivenheder arrangeret af DTD",
       "addressBook": "Jeg ønsker at blive optaget i DTD-adressebogen for at blive inviteret til lignende arrangementer",
-      "addressBookHelp": "Separat samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket \"Fjern mine data fra adressebogen\" i de e-mails, du modtager. Navn og organisation hentes fra din tilmeldingsprofil."
+      "addressBookHelp": "Separat samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket \"Fjern mine data fra adressebogen\" i de e-mails, du modtager. Navn og organisation hentes fra din tilmeldingsprofil.",
+      "multitrack": "Jeg samtykker til optagelse af et separat lydspor med min stemme, alene med det formål at tilskrive transskriptionen den rette taler. Sporet er midlertidigt og slettes efter transskriptionen; det bruges ikke til at identificere eller gengive min stemme.",
+      "multitrackRequired": "Samtykke til optagelse af dit lydspor er påkrævet for at deltage i denne begivenhed"
     },
     "export": {
       "title": "Mine data",
@@ -2110,6 +2657,10 @@
         "retention": {
           "title": "Opbevaring og rettigheder",
           "body": "Data opbevares i den konfigurerede periode for hver begivenhed og slettes derefter automatisk, medmindre anden lovgivning kræver det. Registrerede kan til enhver tid udøve deres GDPR-rettigheder, herunder adgang, berigtigelse og sletning, via afdelingens institutionelle kanaler."
+        },
+        "automatedProcessing": {
+          "title": "Transskription, resumé og eftersynkronisering genereret af kunstig intelligens",
+          "body": "For begivenheder, der anmoder om det, behandles optagelsen efter udsendelsens afslutning af en AI-kæde, der kører helt på afdelingens egen klyngeinfrastruktur. Den frembringer transskription af det talte (med adskillelse af de forskellige talere), et letlæseligt resumé, eventuelle oversættelser til andre europæiske sprog og en eftersynkroniseret lydversion med en generisk syntetisk stemme. Alle anvendte modeller (WhisperX til transskription, Mistral-Small til resumé og oversættelse, Piper TTS til eftersynkronisering) kører på dedikerede GPU'er inde i klyngen: ingen deltagerdata sendes til tredjepartstjenester. Deltagernes stemme klones ikke og gemmes ikke som biometriske data (art. 9 i GDPR): eftersynkroniseringen bruger offentlige, forudtrænede syntetiske stemmer, der tildeles talerne vilkårligt. For hver optagelse viser begivenhedssiden det nøjagtige øjebliksbillede af de anvendte modeller (»Gennemsigtighed i AI-behandlingen«). Det genererede indhold kan indeholde unøjagtigheder: den autoritative kilde er altid den oprindelige video (AI-forordningen, art. 50)."
         }
       },
       "note": {
@@ -2320,7 +2871,31 @@
     "overallStatus": "Samlet status",
     "lastChecked": "Sidst kontrolleret",
     "responseTime": "Svartid",
-    "systemStatus": "Systemstatus"
+    "systemStatus": "Systemstatus",
+    "postprod": {
+      "title": "Pipeline efter arrangementet",
+      "subtitle": "Transskription, resumé, oversættelse og eftersynkronisering af optagelsen",
+      "whatItDoes": "Når et arrangement slutter, sendes optagelsen gennem en intern pipeline: WhisperX laver transskriptionen, en Mistral-model står for resumé og oversættelser, og Piper TTS genererer den eftersynkroniserede lyd. Alle modellerne kører på en GPU i klyngen, som kun er tændt, mens arbejdet står på, så energiforbruget følger den faktiske belastning.",
+      "status": {
+        "idle": "Afventer",
+        "running": "Kører",
+        "degraded": "Forringet"
+      },
+      "aiBadge": "Transskriptionen, resuméet og eftersynkroniseringen af dette arrangement er genereret af modeller for kunstig intelligens og kan indeholde unøjagtigheder. Se altid den originale video, når du har brug for fuld sikkerhed.",
+      "idleMessage": "Pipelinen er klar, ingen optagelser skal behandles lige nu.",
+      "queueAriaLabel": "Sammensætningen af køen til efterbehandling",
+      "queuePending": "i kø",
+      "queueRunning": "under behandling",
+      "queueDone": "gennemført",
+      "queueFailed": "mislykkedes",
+      "asrProvider": "Transskription",
+      "llmProvider": "Resumé/oversættelse",
+      "targetLocales": "Målsprog",
+      "lastSuccess": "Seneste succes {when}",
+      "lastFailure": "Seneste fejl {when}",
+      "artifactsProduced": "{count, plural, =0 {ingen artefakter} one {1 artefakt produceret} other {# artefakter produceret}}",
+      "eventsEnabled": "{count, plural, =0 {ingen arrangementer med AI} one {1 arrangement med AI slået til} other {# arrangementer med AI slået til}}"
+    }
   },
   "infraMap": {
     "loading": "Indlæser infrastrukturkort...",
@@ -2382,7 +2957,8 @@
       "jicofo": "Konferencekoordinator",
       "jvb": "Videobro",
       "jibri": "Videooptagelse",
-      "smtp": "E-mailtjeneste"
+      "smtp": "E-mailtjeneste",
+      "postprod": "AI-pipeline efter arrangementet"
     },
     "descriptions": {
       "app": "Hjemmesiden, hvor du tilgår begivenheder",
@@ -2393,7 +2969,8 @@
       "jicofo": "Koordinerer hvem der deltager i hver konference",
       "jvb": "Overfører lyd og video til deltagere",
       "jibri": "Optager videosessioner af begivenheder",
-      "smtp": "Sender bekræftelsesmails og påmindelser"
+      "smtp": "Sender bekræftelsesmails og påmindelser",
+      "postprod": "Transskriberer, opsummerer og oversætter optagelserne med AI-modeller i klyngen (NVIDIA A100 GPU). Aktiveres kun, når et arrangement vælger AI-funktionerne til."
     },
     "verdicts": {
       "app": {
@@ -2441,6 +3018,12 @@
       "smtp": {
         "healthy": "E-mailtjenesten er konfigureret og klar til at sende notifikationer.",
         "standby": "E-mailtjenesten er ikke konfigureret. Bekræftelsesmails og påmindelser vil ikke blive sendt."
+      },
+      "postprod": {
+        "healthy": "AI-pipelinen er ved at behandle en optagelse (GPU-worker aktiv).",
+        "scaling": "Efterbehandlingsjob i kø — GPU-noden er ved at starte op (koldstart ca. 3 min.).",
+        "standby": "AI-pipelinen er slået til, men afventer: ingen optagelser at behandle. GPU-noden er slukket for at spare energi.",
+        "degraded": "Et eller flere AI-job er mislykkedes inden for de seneste 24 timer. Se /admin/postprod for detaljer."
       }
     },
     "impacts": {
@@ -2453,7 +3036,8 @@
       "jvbStale": "Et arrangement venter på bridgen længere end den konfigurerede timeout: deltagerne kan ikke komme ind.",
       "jibri": "Begivenheder kan ikke optages. Deltagere kan stadig deltage.",
       "jibriStale": "Et arrangement med optagelse aktiveret venter på Jibri ud over timeout: sessionen optages ikke.",
-      "smtp": "Bekræftelsesmails og påmindelser vil ikke blive sendt."
+      "smtp": "Bekræftelsesmails og påmindelser vil ikke blive sendt.",
+      "postprodDegraded": "Transskriptionerne og resuméerne for nogle nylige optagelser blev ikke genereret. Videooptagelserne er stadig tilgængelige."
     },
     "overallVerdicts": {
       "operational": "Alle tjenester fungerer korrekt. Platformen er fuldt operationel.",
@@ -2494,7 +3078,8 @@
       "errorRate": "5xx-fejl",
       "requestRate": "Anmodninger/s",
       "podUptime": "Pod-oppetid"
-    }
+    },
+    "connPostprod": "AI-efterbehandling"
   },
   "feedback": {
     "title": "Hvordan vurderer du denne begivenhed?",
@@ -2584,7 +3169,8 @@
     "buildInfoDev": "udviklingsbuild",
     "viewCommit": "Se commit på GitHub",
     "viewRelease": "Se udgivelse på GitHub",
-    "buildDatePrefix": "Bygget den"
+    "buildDatePrefix": "Bygget den",
+    "viewChangelog": "Se nyhederne (changelog)"
   },
   "pages": {
     "privacyTitle": "Privatlivspolitik",
@@ -2603,7 +3189,26 @@
     "unmute": "Slå lyd til",
     "download": "Download optagelse",
     "speedLabel": "Afspilningshastighed",
-    "progress": "Statusbjælke"
+    "progress": "Statusbjælke",
+    "subtitles": "Undertekster",
+    "subtitlesOff": "Fra",
+    "audioLabel": "Lyd",
+    "audioOriginal": "Original",
+    "audioSyntheticBanner": "Lyd eftersynkroniseret med AI — syntetisk stemme, automatisk genereret indhold.",
+    "audioSyntheticHint": "AI-genereret lyd",
+    "shortcutsHelpOpen": "Vis tastaturgenveje",
+    "shortcutsHelpClose": "Luk tastaturgenveje",
+    "shortcutsTitle": "Tastaturgenveje",
+    "shortcutsSpace": "Afspil eller sæt på pause",
+    "shortcutsArrowsLR": "Spol 5 sekunder frem eller tilbage",
+    "shortcutsArrowsUD": "Skru lyden 5 % op eller ned",
+    "shortcutsJL": "Spol 10 sekunder frem eller tilbage",
+    "shortcutsM": "Slå lyden til eller fra",
+    "shortcutsC": "Vis eller skjul underteksterne",
+    "shortcutsF": "Fuld skærm",
+    "shortcutsSpeed": "Sænk eller øg hastigheden",
+    "captionsOn": "Undertekster slået til",
+    "captionsOff": "Undertekster slået fra"
   },
   "diagram": {
     "title": "Begivenhedskonfiguration",
@@ -2687,7 +3292,28 @@
     "emailInvalid": "Indtast en gyldig e-mailadresse",
     "chatLockedMessage": "Indtast dit navn for at deltage i arrangementets chat.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Begivenheden begynder om lidt, vent på arrangøren…",
+    "exitWaiting": "Forlad venteværelset",
+    "aiNoticeTitle": "AI-behandling efter begivenheden",
+    "aiNotice": "Når det er slut, behandles optagelsen af AI-værktøjer for at lave transskription, resumé og eventuelle oversættelser og eftersynkronisering. Resultaterne kan indeholde unøjagtigheder; videoen er fortsat den autoritative kilde.",
+    "multitrackConsentTitle": "Optagelse pr. deltager",
+    "multitrackConsentRequired": "Du skal acceptere optagelsen af dit lydspor for at komme ind",
+    "enterGardenTitle": "Gå ind på pladsen",
+    "enterGardenHint": "Et sted at gå rundt, mens du venter — derfra kan du også indstille navn og mikrofon og deltage i begivenheden.",
+    "backToWaitingRoom": "Tilbage til venteværelset",
+    "gardenDialogLabel": "Venteværelsets plads",
+    "gardenGateHint": "Du kan deltage herfra, eller føre din avatar hen til porten.",
+    "classicVersion": "Klassisk version",
+    "warmup": {
+      "queued": "Anmodning modtaget",
+      "startingBridge": "Starter videoserveren…",
+      "provisioningNode": "Opretter en dedikeret videoserver",
+      "almostReady": "Videoserveren kører: næsten klar",
+      "almostReadyDetail": "Et øjeblik endnu, så aktiveres deltagelsesknappen af sig selv.",
+      "honestHint": "Sædvanlig ventetid: under et minut hvis infrastrukturen allerede er varm, 3–5 minutter ved første opstart. I mellemtiden kan du tjekke kamera og mikrofon eller bruge chatten.",
+      "elapsed": "under forberedelse i {time}"
+    }
   },
   "recording": {
     "management": "Videooptagelse",
@@ -2713,7 +3339,11 @@
     "notConfigured": "Jibri er ikke konfigureret. Videooptagelse er ikke tilgængelig.",
     "disabledHint": "Videooptagelse er ikke aktiveret for dette arrangement. For at aktivere den åbnes afsnittet Indstillinger ovenfor, og kontakten \"Optagelse\" slås til.",
     "play": "Afspil",
-    "download": "Download"
+    "download": "Download",
+    "transcriptManage": "Transskription / AI",
+    "deleteConfirmTitle": "Slet optagelse",
+    "deleteFailed": "Sletningen mislykkedes",
+    "deleteSuccess": "Optagelsen er slettet"
   },
   "postEvent": {
     "config": "Konfiguration efter begivenhed",
@@ -2731,8 +3361,17 @@
       "qa": "Spørgsmål og svar",
       "materials": "Materialer",
       "polls": "Afstemninger",
-      "feedback": "Feedback"
-    }
+      "feedback": "Feedback",
+      "transcript": "AI-transskription"
+    },
+    "pageVisibleHelp": "Når den er slået fra (eller når synlighedsperioden er udløbet), returnerer den offentlige side for det afsluttede arrangement 404, og arrangementet forsvinder fra oversigter og sitemap.",
+    "libraryListed": "Udgiv i videobiblioteket",
+    "libraryListedHelp": "Vis dette arrangement i det offentlige bibliotek (/video-library). Kræver en udgivet optagelse eller en YouTube-video, og at arrangementets side er synlig.",
+    "libraryListedNoRecording": "Ingen udgivet optagelse: arrangementet vises ikke i biblioteket, før du udgiver optagelsen eller tilføjer en YouTube-video.",
+    "showRecap": "Vis opsummeringen af arrangementet",
+    "showWordCloud": "Vis ordskyen",
+    "emailEnabled": "Send opsummerings-e-mail, når arrangementet slutter",
+    "emailEnabledHelp": "Ved afslutningen sendes der en takke-e-mail til de tilmeldte deltagere med link til opsummeringen og til feedback, og en kort opsummering til moderatoren. Den sendes kun én gang."
   },
   "provisioning": {
     "loading": "Indlæser",
@@ -2802,5 +3441,143 @@
     "noComments": "No comments",
     "yes": "Ja",
     "no": "Nej"
+  },
+  "agenda": {
+    "title": "Noter / Tjekliste",
+    "empty": "Ingen punkter endnu. Tilføj de emner, der skal behandles, og kryds dem af undervejs.",
+    "add": "Tilføj",
+    "addPlaceholder": "Nyt punkt…",
+    "remove": "Fjern",
+    "inProgress": "i gang",
+    "agree": "Enig",
+    "disagree": "Uenig",
+    "favorablePct": "{pct}% enige",
+    "noReactions": "Del din mening"
+  },
+  "changelog": {
+    "metaTitle": "Nyheder og changelog",
+    "title": "Nyheder og changelog",
+    "intro": "Alle versioner af platformen, den nyeste først. Hvert punkt opsummerer de vigtigste nyheder, rettelser og forbedringer.",
+    "current": "Nuværende version",
+    "sourceNote": "Noterne er redigeret ud fra projektets tags, pull requests og commits.",
+    "sourceLink": "Se alle releases på GitHub",
+    "rawChangelog": "CHANGELOG.md i repositoriet",
+    "transparencyNote": "For hver version: hvad der kører og med hvilke komponenter, i",
+    "transparencyInventory": "tjenestegennemsigtigheden",
+    "transparencySecurity": "sikkerhed og SBOM",
+    "technicalDetail": "Tekniske detaljer",
+    "releaseLink": "Release",
+    "securityBadge": "Sikkerhed",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Luk",
+    "sbomLoading": "Indlæser…",
+    "sbomError": "Kunne ikke indlæse SBOM.",
+    "sbomComponents": "komponenter",
+    "sbomSearch": "søg komponent…",
+    "sbomColName": "Komponent",
+    "sbomColVersion": "Version",
+    "sbomColEcosystem": "Økosystem",
+    "sbomNoMatch": "Ingen matchende komponent.",
+    "sbomDownload": "Download komplet SBOM (SPDX)",
+    "sourcesLink": "Kildekode",
+    "codeScanningLink": "Kodescanning (CodeQL)"
+  },
+  "postprod": {
+    "loading": "Indlæser transskriptionen…",
+    "loadError": "Transskriptionen kunne ikke indlæses: {error}",
+    "empty": "Der er ingen transskription for dette arrangement.",
+    "tabTranscript": "Transskription",
+    "tabSummary": "Resumé",
+    "aiBadgeLabel": "AI-genereret indhold",
+    "aiBadgeBody": "Transskriptionen og resuméet produceres automatisk af AI-pipelinen i klyngen. De kan indeholde fejl; videoen er fortsat den autoritative kilde.",
+    "searchPlaceholder": "Søg i transskriptionen…",
+    "searchLabel": "Søg i transskriptionen",
+    "searchClear": "Ryd søgningen",
+    "searchNoMatches": "Ingen resultater for »{query}«.",
+    "searchMatches": "{count, plural, =1 {1 resultat} other {# resultater}}",
+    "downloadLabel": "Download",
+    "downloadMenu": "Downloadmuligheder",
+    "downloadTranscriptTxt": "Transskription (.txt)",
+    "downloadTranscriptSrt": "Undertekster (.srt)",
+    "downloadTranscriptVtt": "Undertekster (.vtt)",
+    "downloadSummaryMd": "Resumé (.md)",
+    "hero": {
+      "badge": "Automatisk resumé",
+      "aiActArt50": "AI-genereret indhold",
+      "title": "Kort fortalt",
+      "availableIn": "Resuméet findes også på {langs}",
+      "summaryLanguageLabel": "Resuméets sprog",
+      "topicsLabel": "Kapitler — klik for at hoppe til det sted i videoen",
+      "keyDecisions": "Trufne beslutninger",
+      "actionItems": "Opgaver",
+      "expandDetails": "Vis beslutninger og opgaver",
+      "collapseDetails": "Skjul beslutninger og opgaver"
+    },
+    "nowSpeaking": "Taler nu",
+    "shareSegment": "Del dette sted",
+    "shareSegmentCopied": "Linket er kopieret til udklipsholderen",
+    "bookmarkAdd": "Gem som bogmærke",
+    "bookmarkRemove": "Fjern bogmærket",
+    "bookmarksHeader": "Dine bogmærker",
+    "bookmarksEmpty": "Du har endnu ikke gemt nogen steder i videoen. Åbn et segment i transskriptionen, og klik på stjernen for at tilføje det her.",
+    "miniPlayerOpen": "Hent videoen frem igen",
+    "miniPlayerClose": "Luk mini-afspilleren",
+    "miniPlayerHint": "Bliv tæt på videoen, mens du scroller",
+    "followLive": "Følg videoen",
+    "followManual": "Fri læsning",
+    "followResume": "Følg videoen igen",
+    "lowConfidenceBadge": "tjek",
+    "lowConfidenceTitle": "Denne del af transskriptionen har lav konfidens: optagelsen kan indeholde andre ord. Se altid den originale video.",
+    "miniTranscriptLabel": "Live-transskription",
+    "dubAvailableHint": "Eftersynkroniseret lyd er tilgængelig på {langs}. Brug lydvælgeren i afspillerens kontroller for at lytte til den oversatte version.",
+    "provenance": {
+      "triggerLabel": "Gennemsigtighed om AI-behandlingen",
+      "closeLabel": "Skjul detaljerne om behandlingen",
+      "intro": "Dette er de modeller, der har genereret transskriptionen, resuméet og eftersynkroniseringen af denne optagelse. De gemmes, når behandlingen er færdig: du ser det, der rent faktisk blev brugt på det tidspunkt, uanset senere ændringer i indstillingerne.",
+      "asr": {
+        "title": "Transskription",
+        "hint": "Talegenkendelse og adskillelse af talerne.",
+        "engine": "Motor",
+        "model": "Model",
+        "version": "Version",
+        "diarizationEngine": "Diarisering",
+        "diarizationSpeakers": "Fundne talere"
+      },
+      "llm": {
+        "title": "Resumé og oversættelse",
+        "hint": "Resumé af mødet og oversættelse af transskription og resumé.",
+        "engine": "Leveret af",
+        "model": "Model",
+        "vendor": "Leverandør",
+        "license": "Licens",
+        "country": "Hjemsted"
+      },
+      "tts": {
+        "title": "Eftersynkronisering",
+        "hint": "Talesyntese til at generere lyden på målsprogene.",
+        "engine": "Motor",
+        "license": "Licens",
+        "policy": "Regel for tildeling af stemmer"
+      },
+      "languages": {
+        "title": "Behandlede sprog",
+        "hint": "Optagelsens oprindelse og målsprogene for oversættelse og eftersynkronisering.",
+        "source": "Originalsprog",
+        "translation": "Oversættelser",
+        "dubbing": "Eftersynkroniseringer",
+        "none": "Ingen"
+      },
+      "voices": {
+        "title": "Syntetiske stemmer tildelt talerne",
+        "male": "mandsstemme",
+        "female": "kvindestemme"
+      },
+      "runAt": "Behandlingen blev afsluttet den",
+      "version": "Pipelineversion"
+    },
+    "overlapBadge": "samtidig",
+    "overlapTitle": "Samtidig tale: i dette interval taler mere end én person på samme tid."
   }
 }

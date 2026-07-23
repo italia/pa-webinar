@@ -160,6 +160,8 @@
     "submitting": "Registrazione in corso...",
     "success": "Registrazione completata!",
     "successMessage": "Riceverai un'email di conferma con il link per accedere all'evento.",
+    "successScheduledMessage": "Sei registrato! Ti abbiamo inviato un'email con il link personale per accedere. Aggiungi l'evento al calendario e torna qui poco prima dell'inizio.",
+    "addToCalendar": "Aggiungi al calendario",
     "enteringRoom": "Ti stiamo portando nella sala d'attesa dell'evento.",
     "enteringRoomHint": "Apertura della sala…",
     "alreadyRegistered": "Sei già registrato a questo evento",
@@ -237,6 +239,8 @@
     "connecting": "Connessione in corso...",
     "connectionError": "Impossibile connettersi alla sala. Verifica la connessione e riprova.",
     "activeVsRegistered": "{active} attivi · {registered} registrati",
+    "enterFullscreen": "Schermo intero",
+    "exitFullscreen": "Esci da schermo intero",
     "overtime": {
       "withCountdown": "L'orario di fine previsto è passato. L'evento si chiuderà automaticamente fra {minutes, plural, one {# minuto} other {# minuti}}.",
       "closingNow": "L'orario di fine è stato raggiunto. L'evento sta per chiudersi.",
@@ -323,7 +327,33 @@
       "noMessages": "Nessun messaggio",
       "empty": "Nessun messaggio ancora. Scrivi per primo!",
       "inputLabel": "Messaggio chat",
-      "moderatorBadge": "Moderatore"
+      "moderatorBadge": "Moderatore",
+      "attach": "Allega un file",
+      "emojiPicker": "Inserisci emoji",
+      "attachBadType": "Tipo di file non supportato (immagini o PDF).",
+      "attachTooLarge": "File troppo grande (max 10 MB).",
+      "attachFailed": "Caricamento non riuscito. Riprova.",
+      "sendFailed": "Invio non riuscito. Riprova.",
+      "removeAttachment": "Rimuovi allegato",
+      "openAttachment": "Apri allegato",
+      "reply": "Rispondi",
+      "replyingTo": "In risposta a {name}",
+      "cancelReply": "Annulla risposta",
+      "hide": "Nascondi",
+      "hideFailed": "Impossibile nascondere il messaggio. Riprova.",
+      "connReconnecting": "Riconnessione…",
+      "connDegraded": "Aggiornamenti rallentati",
+      "readDenied": "La chat non è disponibile: non risulti tra i partecipanti di questo evento, oppure la sala non è ancora aperta. Riprovo automaticamente.",
+      "mentionNotificationTitle": "{name} ti ha menzionato in chat",
+      "react": "Reagisci",
+      "edited": "modificato",
+      "editLabel": "Modifica messaggio",
+      "editSave": "Salva",
+      "editFailed": "Non è stato possibile modificare il messaggio.",
+      "exportChat": "Scarica la chat",
+      "reactNotAllowed": "Per reagire ai messaggi serve il link personale o da moderatore.",
+      "editNotAllowed": "Questo link è condiviso: non permette di modificare i messaggi.",
+      "editExpired": "Sono passati più di 15 minuti: il messaggio non è più modificabile."
     },
     "role": {
       "moderator": "Moderatore",
@@ -342,7 +372,9 @@
         "medium": "Media",
         "poor": "Scarsa",
         "unknown": "N/D"
-      }
+      },
+      "volume": "Volume",
+      "volumeFor": "Volume di {name}"
     },
     "moderator": {
       "muteAll": "Silenzia tutti",
@@ -362,6 +394,7 @@
       "approveVideo": "Dai la parola (video)",
       "approveAll": "Dai la parola",
       "audioOnly": "Solo audio",
+      "lowerHand": "Abbassa mano",
       "participantFallback": "Partecipante",
       "audioModeration": "Mic partecipanti",
       "micDisabled": "Mic disattivato",
@@ -383,7 +416,13 @@
     "sidebarTabChatUnread": "Nuovi messaggi non letti",
     "floatingControlsLabel": "Controlli evento",
     "screenshareActive": "🖥️ {name} sta condividendo lo schermo",
-    "screenshareFallbackName": "Un partecipante"
+    "screenshareFallbackName": "Un partecipante",
+    "timer": {
+      "show": "Mostra il contatore",
+      "hide": "Nascondi il contatore",
+      "remainingLabel": "Tempo rimanente (clicca per il tempo trascorso)",
+      "elapsedLabel": "Tempo trascorso (clicca per il tempo rimanente)"
+    }
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -622,6 +661,7 @@
         "organizerName": "Referente",
         "organizerOrganization": "Organizzazione",
         "organizerWebsite": "Sito web",
+        "organizerLogo": "Logo organizzatore",
         "organizerRequired": "Referente e organizzazione sono obbligatori.",
         "moderatorsHeading": "Moderatori",
         "moderatorsHelp": "Co-moderatori aggiuntivi: ognuno riceve un proprio link per gestire la sessione e i permessi durante l'evento. Il moderatore principale (contatto obbligatorio) si imposta nell'ultimo step, «Riepilogo».",
@@ -1520,6 +1560,14 @@
         "jvbInactiveGraceMinutesHelp": "Dopo quanto tempo di conferenza vuota il nodo video viene messo in pausa. Consigliato 45 minuti. Range 5-240.",
         "jvbPreScaleMinutes": "Minuti di anticipo per avvio programmato",
         "jvbPreScaleMinutesHelp": "Quanto prima di startsAt avviare il nodo video per un evento programmato. Consigliato 10 minuti.",
+        "jvbEmptyCloseMinutes": "Minuti sala vuota prima della chiusura definitiva",
+        "jvbEmptyCloseMinutesHelp": "Se una sala LIVE che ha già avuto partecipanti resta vuota per questi minuti, viene chiusa definitivamente (ENDED) — così un evento senza moderatore si chiude da solo per inattività, senza attendere l'orario di fine. Default 15 (attivo). -1 = disattivato. 0 = chiudi al primo controllo a sala vuota.",
+        "waitingRoomLeadMinutes": "Anticipo ingresso in sala (minuti)",
+        "waitingRoomLeadMinutesHelp": "Registrandosi entro questi minuti dall'inizio si entra subito nella sala d'attesa; con maggiore anticipo si vede la conferma con il link al calendario. 0 = sempre schermata di conferma fino all'inizio. Consigliato 15.",
+        "reactionsMode": "Reazioni (emoji)",
+        "reactionsModeNative": "Native di Jitsi (nella barra, effimere)",
+        "reactionsModeCustom": "Custom dell'app (barra a sinistra, con statistiche)",
+        "reactionsModeHelp": "Native = pulsante reazioni di Jitsi nella barra controlli, leggere ed effimere (non conteggiate). Custom = barra reazioni dell'app in basso a sinistra, con conteggi e statistiche. Default: Native.",
         "jvbStressWarnPercent": "Soglia stress warning (%)",
         "jvbStressWarnPercentHelp": "Sopra questa soglia lo scaler aggiunge 1 replica JVB anche se il predictive non la richiede. Default 50.",
         "jvbStressCriticalPercent": "Soglia stress critical (%)",
@@ -1527,7 +1575,16 @@
         "jvbProvisioningTimeoutMinutes": "Timeout provisioning (minuti)",
         "jvbProvisioningTimeoutMinutesHelp": "Dopo quanti minuti da startsAt un evento con JVB non ancora pronto viene segnalato come 'degraded' sulla status page. Default 15. Copre cold-start del nodo (~3-5 min) + margine di sicurezza.",
         "statusPollIntervalSeconds": "Intervallo polling status page (secondi)",
-        "statusPollIntervalSecondsHelp": "Ogni quanti secondi la pagina /status aggiorna i dati lato browser. Default 30. Valori più bassi = dati più freschi ma più carico sull'app."
+        "statusPollIntervalSecondsHelp": "Ogni quanti secondi la pagina /status aggiorna i dati lato browser. Default 30. Valori più bassi = dati più freschi ma più carico sull'app.",
+        "emailSenderTitle": "Mittente delle email",
+        "emailSenderHelp": "Come appare il mittente nella posta di chi si iscrive. L'indirizzo di invio resta configurato nel deploy (deve corrispondere a quello autorizzato dal server SMTP).",
+        "emailFromName": "Nome del mittente",
+        "emailFromNameHelp": "Vuoto = si usa il nome configurato nel deploy (SMTP_FROM_NAME). Le email restano inviate dall’indirizzo di sistema.",
+        "emailReplyTo": "Indirizzo per le risposte",
+        "emailReplyToHelp": "Le email partono da un indirizzo no-reply: senza questo, chi risponde non raggiunge nessuno.",
+        "avatarTitle": "Immagini dei partecipanti",
+        "gravatarEnabled": "Usa Gravatar quando disponibile",
+        "gravatarEnabledHelp": "Chi si è iscritto con un'email che ha un Gravatar lo vedrà come immagine in sala; per tutti gli altri restano le iniziali generate dalla piattaforma. L'immagine passa dal nostro server, quindi il browser dei partecipanti non contatta gravatar.com — ma la piattaforma sì: va dichiarato nell'informativa privacy."
       }
     },
     "analytics": {
@@ -2093,7 +2150,11 @@
       "aiGenerateAlready": "La pipeline AI era già stata avviata per questa registrazione: nessun nuovo job aggiunto.",
       "aiGenerateError": "Impossibile avviare la pipeline AI. Verifica che l'AI sia abilitata a livello di sito e che esista una registrazione.",
       "aiGenerateHelp": "Abilita la trascrizione + sintesi AI ed avvia la pipeline sulla registrazione, in un solo clic. Idempotente: cliccare due volte non duplica i job.",
-      "aiGenerateNoRecording": "Nessuna registrazione: l'AI post-evento richiede una registrazione (la cattura avviene solo durante l'evento). Puoi comunque gestire la post-produzione qui."
+      "aiGenerateNoRecording": "Nessuna registrazione: l'AI post-evento richiede una registrazione (la cattura avviene solo durante l'evento). Puoi comunque gestire la post-produzione qui.",
+      "duplicateNext": "Duplica per la prossima",
+      "duplicateNextBusy": "Duplicazione…",
+      "duplicateNextHint": "Crea una bozza con l'intera configurazione di questo evento (registrazione, tracce separate, AI, agenda, promemoria). Se l'evento ha una cadenza, la data viene portata alla prossima occorrenza; altrimenti resta da impostare.",
+      "duplicateNextError": "Duplicazione non riuscita. Riprova."
     },
     "rubrica": {
       "title": "Rubrica",
@@ -3129,7 +3190,29 @@
     "intro": "Tutte le versioni della piattaforma, dalla più recente. Ogni voce riassume le principali novità, correzioni e miglioramenti.",
     "current": "Versione attuale",
     "sourceNote": "Le note sono curate a partire da tag, pull request e commit del progetto.",
-    "sourceLink": "Vedi tutte le release su GitHub"
+    "sourceLink": "Vedi tutte le release su GitHub",
+    "rawChangelog": "CHANGELOG.md nel repository",
+    "transparencyNote": "Per ogni versione: cosa gira e con quali componenti, nella",
+    "transparencyInventory": "trasparenza dei servizi",
+    "transparencySecurity": "sicurezza e SBOM",
+    "technicalDetail": "Dettaglio tecnico",
+    "releaseLink": "Release",
+    "securityBadge": "Sicurezza",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Chiudi",
+    "sbomLoading": "Caricamento…",
+    "sbomError": "Impossibile caricare l'SBOM.",
+    "sbomComponents": "componenti",
+    "sbomSearch": "cerca componente…",
+    "sbomColName": "Componente",
+    "sbomColVersion": "Versione",
+    "sbomColEcosystem": "Ecosistema",
+    "sbomNoMatch": "Nessun componente corrisponde.",
+    "sbomDownload": "Scarica SBOM completo (SPDX)",
+    "sourcesLink": "Sorgenti",
+    "codeScanningLink": "Analisi del codice (CodeQL)"
   },
   "pages": {
     "privacyTitle": "Informativa sulla privacy",
@@ -3362,7 +3445,13 @@
     "aiNoticeTitle": "Elaborazione AI dopo l'evento",
     "aiNotice": "Al termine, la registrazione sarà elaborata da strumenti di intelligenza artificiale per generare trascrizione, sintesi ed eventuali traduzioni e doppiaggi. Gli artefatti possono contenere imprecisioni; il video resta la fonte autoritativa.",
     "multitrackConsentTitle": "Registrazione per partecipante",
-    "multitrackConsentRequired": "Devi accettare la registrazione della tua traccia audio per entrare"
+    "multitrackConsentRequired": "Devi accettare la registrazione della tua traccia audio per entrare",
+    "enterGardenTitle": "Entra nella piazza",
+    "enterGardenHint": "Uno spazio da esplorare mentre aspetti: da lì puoi anche sistemare nome e microfono ed entrare nell’evento.",
+    "backToWaitingRoom": "Torna alla sala d’attesa",
+    "gardenDialogLabel": "Piazza della sala d’attesa",
+    "gardenGateHint": "Puoi entrare da qui, oppure portare il tuo avatar fino al cancello.",
+    "classicVersion": "Versione classica"
   },
   "recording": {
     "management": "Registrazione video",

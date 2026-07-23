@@ -1,6 +1,10 @@
 // @vitest-environment node
-import { describe, it, expect, beforeAll } from 'vitest';
+import { createHash } from 'crypto';
+
+import { describe, it, expect, beforeAll, afterEach } from 'vitest';
 import { jwtVerify } from 'jose';
+
+import { readGravatarRef } from '@/lib/gravatar-ref';
 
 import {
   generateJitsiJwt,
@@ -20,6 +24,7 @@ const JWT_SUBJECT = 'jitsi.test.local';
 beforeAll(() => {
   process.env.JITSI_JWT_SECRET = JWT_SECRET;
   process.env.APP_SECRET = 'test-app-secret';
+  process.env.PII_ENCRYPTION_KEY = 'a'.repeat(64);
   process.env.NEXT_PUBLIC_JITSI_DOMAIN = JWT_SUBJECT;
 });
 
@@ -140,9 +145,11 @@ describe('generateJitsiJwt', () => {
   });
 
   it('embeds avatar as inline SVG data URI (CSP-safe for Jitsi web)', async () => {
-    // History: avatars used to be served by /api/avatar, but Jitsi web's CSP
-    // blocks remote images on the prejoin screen, so generateAvatarDataUri
-    // now inlines a Bootstrap Italia initials SVG as a data: URI.
+    // Il default è un data URI: attraversa qualunque restrizione e non fa
+    // partire richieste. Non è però vero, come diceva questa nota, che una URL
+    // remota sia bloccata: sul bundle jitsi-web in produzione (stable-10741)
+    // `avatarURL` del JWT viene usata senza condizioni e, se non carica, si
+    // ricade sulle iniziali. Nessun header CSP su quell'origine.
     const jwt = await generateJitsiJwt({
       roomName: 'room',
       displayName: 'Raff',
@@ -177,6 +184,75 @@ describe('generateJitsiJwt', () => {
     expect(ctx.user.avatar).toMatch(/^data:image\/svg\+xml;base64,/);
     expect(ctx.user.avatar).not.toContain('mario@');
     expect(ctx.user.avatar).not.toContain('example.com');
+  });
+
+  describe('con Gravatar attivo (opt-in dell\'amministratore)', () => {
+    const EMAIL = 'mario.rossi@example.com';
+    const MD5 = createHash('md5').update(EMAIL).digest('hex');
+
+    async function avatarOf(overrides: Record<string, unknown> = {}) {
+      const jwt = await generateJitsiJwt({
+        roomName: 'room',
+        displayName: 'Mario Rossi',
+        uniqueId: 'test-gravatar-on',
+        isModerator: false,
+        email: EMAIL,
+        useGravatar: true,
+        ...overrides,
+      });
+      const payload = await decodeJwt(jwt);
+      const ctx = payload.context as { user: Record<string, string> };
+      return ctx.user.avatar ?? '';
+    }
+
+    it('punta al NOSTRO proxy, mai a gravatar.com', async () => {
+      process.env.NEXT_PUBLIC_APP_URL = 'https://webinar.example.gov.it';
+      const avatar = await avatarOf();
+      expect(avatar.startsWith('https://webinar.example.gov.it/api/avatar?')).toBe(true);
+      expect(avatar).not.toContain('gravatar.com');
+    });
+
+    it('non porta né l\'email né il suo hash in chiaro (ADR-004)', async () => {
+      // Jitsi diffonde questo URL in presenza a tutta la sala: quello che ci
+      // finisce dentro è pubblico verso il pubblico dell'evento.
+      process.env.NEXT_PUBLIC_APP_URL = 'https://webinar.example.gov.it';
+      const avatar = await avatarOf();
+      expect(avatar).not.toContain('mario.rossi');
+      expect(avatar).not.toContain('example.com');
+      expect(avatar).not.toContain(MD5);
+
+      const ref = new URL(avatar).searchParams.get('g');
+      expect(ref).toBeTruthy();
+      expect(readGravatarRef(ref!)).toBe(MD5);
+    });
+
+    it('legge NEXT_PUBLIC_APP_URL a RUNTIME, non a build time', async () => {
+      // `process.env.NEXT_PUBLIC_*` in notazione puntata viene sostituito da
+      // webpack a build time, e l'immagine è costruita con il default
+      // http://localhost:3000: ogni partecipante avrebbe visto un avatar
+      // puntato al proprio computer. Cambiare il valore DOPO l'import deve
+      // cambiare l'URL emesso.
+      process.env.NEXT_PUBLIC_APP_URL = 'https://primo.example.it';
+      expect(await avatarOf()).toContain('https://primo.example.it/api/avatar');
+      process.env.NEXT_PUBLIC_APP_URL = 'https://secondo.example.it';
+      expect(await avatarOf()).toContain('https://secondo.example.it/api/avatar');
+    });
+
+    it('senza un URL pubblico valido resta il data URI, non un link rotto', async () => {
+      process.env.NEXT_PUBLIC_APP_URL = 'non-un-url';
+      expect(await avatarOf()).toMatch(/^data:image\/svg\+xml;base64,/);
+    });
+
+    it('senza email resta il data URI (link primario condiviso, ospiti)', async () => {
+      process.env.NEXT_PUBLIC_APP_URL = 'https://webinar.example.gov.it';
+      expect(await avatarOf({ email: undefined })).toMatch(
+        /^data:image\/svg\+xml;base64,/,
+      );
+    });
+
+    afterEach(() => {
+      delete process.env.NEXT_PUBLIC_APP_URL;
+    });
   });
 
   it('includes features in context', async () => {

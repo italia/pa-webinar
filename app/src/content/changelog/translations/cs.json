@@ -1,0 +1,361 @@
+{
+  "0.8.9": {
+    "title": "Seznam změn, nyní s vestavěným soupisem softwaru",
+    "notes": [
+      "Každé vydání zde otevře svůj soupis softwarových komponent (SBOM): prohledávatelný seznam všech dodaných komponent s verzí a ekosystémem — bez stahování.",
+      "Technická sekce je nyní sada odkazů — SBOM, vydání na GitHubu, zdroje u daného tagu, sestavovací pipeline — místo odstavce, který opakoval shrnutí výše.",
+      "Zápatí přidává bezpečnostní signály projektu: OpenSSF Scorecard a výsledky skenování kódu."
+    ]
+  },
+  "0.8.8": {
+    "title": "Stránka novinek, přepracovaná",
+    "notes": [
+      "Každé vydání se nyní čte na dvou úrovních: novinky, na kterých vám záleží, a — pod záložkou „Technické podrobnosti“, kterou otevřete jen když chcete — technická práce za nimi.",
+      "Každá verze vydaná se soupisem softwarových komponent (SBOM) odkazuje přímo na své vydání na GitHubu, kde je SBOM přiložen. Repozitář se zdrojovým kódem je nyní veřejný.",
+      "Pruh s časovou osou nahoře je pryč: s přibývajícími vydáními se stával nepřehledným a málo vypovídal. Data zůstávají na každé kartě."
+    ]
+  },
+  "0.8.7": {
+    "title": "Rozhraní kompletní ve všech 24 jazycích a obnovená vizuální identita",
+    "notes": [
+      "Rozhraní je nyní plně přeloženo do všech 24 jazyků EU: dříve několik obrazovek — včetně čekárny a textů souhlasu — přecházelo do italštiny tam, kde překlad chyběl.",
+      "Obnovené logo a vizuální identita (favicon, ikona, vodoznak) a náhled s obrázkem při sdílení odkazu na událost v chatu a na sociálních sítích.",
+      "Stránka novinek v každém jazyce, s odkazy na transparentnost služeb a na bezpečnost."
+    ]
+  },
+  "0.8.6": {
+    "title": "Čekárna: stránka a náměstí, na které se vstupuje z vlastní vůle",
+    "notes": [
+      "Čekárna je nyní přehledná stránka podle designového systému: událost, ovládání zvuku a obrazu, jméno, chat. Malá hra v postranním rámečku byla odstraněna.",
+      "Interaktivní náměstí se otevře, jen když si ho vyberete, a zaplní celou obrazovku. Ovládací prvky stránky zůstávají vedle — jméno, mikrofon, kamera, chat, upozornění — a kdykoli se můžete vrátit. Kdo dává přednost verzi bez animace, přepne na klasickou; volba se zapamatuje.",
+      "Avatary: má-li adresa, se kterou jste se přihlásili, Gravatar, může se nyní zobrazit jako obrázek v místnosti. Zapíná to správce a dotaz posílá náš server: prohlížeče účastníků se s gravatar.com nespojují.",
+      "Součást, která událost nahrává, se už neobjevuje mezi účastníky ani v počtu: je to interní služba, ne člověk v místnosti. Upozornění, že se událost nahrává, zůstává."
+    ]
+  },
+  "0.8.5": {
+    "title": "Živější chat: zmínky, reakce, opravy a export",
+    "notes": [
+      "Chat: když vás někdo zmíní pomocí @, jeho zpráva se nyní zvýrazní, a pokud se zrovna díváte jinam, dorazí upozornění. Dosud se zmínka nijak nelišila od běžné zprávy.",
+      "Chat: na jednotlivou zprávu lze nově reagovat emoji a vlastní zprávu je možné do 15 minut opravit (zůstane u ní uvedeno, že byla upravena). Tlačítko „Odpovědět“ je nyní nenápadné.",
+      "Chat: nové tlačítko stáhne celou konverzaci, a to jako text, nebo jako data. Zprávy se uchovávaly už dříve, chyběla ale možnost odnést si je s sebou.",
+      "V místnosti: časovač ukazuje, kolik času zbývá do konce (nebo jak dlouho už akce běží). Pro moderátory je ve výchozím nastavení zapnutý, zapnout si jej ale může kdokoli.",
+      "Místnost už nespustí ten, kdo otevře stránku akce s několikahodinovým předstihem: připraví se, až když je to potřeba, jak má být. Tím se řeší i případ, kdy se akce vypnula pár minut po svém začátku.",
+      "Statistiky: nejvyšší počet účastníků se nyní zaznamenává i u jednotlivého videohovoru, nejen u celé akce."
+    ]
+  },
+  "0.8.4": {
+    "title": "Potvrzovací e-maily: název akce, obrázek a nastavitelný odesílatel",
+    "notes": [
+      "E-maily potvrzující registraci opět obsahují název akce, a to v předmětu i v textu zprávy. Kdo se registroval ze stránky v jazyce, do kterého název přeložen nebyl, dostal e-mail bez názvu akce a přílohu pro kalendář bez názvu.",
+      "Potvrzovací e-maily i připomínky nyní začínají obrázkem akce a její název je výrazně vidět, místo aby byl schovaný v jednom z řádků tabulky s podrobnostmi.",
+      "Nová nastavení v panelu administrace: jméno, pod kterým se odesílatel zobrazí v poště příjemce, a adresa, na kterou mají chodit odpovědi (e-maily odcházejí z adresy, která odpovědi nepřijímá).",
+      "Obecně platí, že text, který do daného jazyka nebyl přeložen, se nyní zobrazí v původním znění, místo aby zůstal prázdný: týkalo se to i názvů a popisů na veřejných stránkách."
+    ]
+  },
+  "0.8.3": {
+    "title": "Soukromí chatu, správný počet účastníků a obnovená moderace",
+    "notes": [
+      "Historii chatu si už nemohou přečíst lidé, kteří se akce neúčastní. Dosud si kdokoli, kdo znal adresu akce, mohl stáhnout její zprávy – včetně jmen těch, kdo je napsali – a to i po jejím skončení. Nově je nutné být registrovaným účastníkem, moderátorem, nebo být v místnosti v průběhu akce.",
+      "Počet účastníků zobrazený v místnosti byl o jednoho nižší: nikdo nezapočítal sám sebe. Stejná chyba se promítala i do statistik akce (nejvyšší počet účastníků). Nyní je počet správný a shoduje se s hodnotou uvedenou ve statistikách.",
+      "Moderátorské ovládací prvky v seznamu účastníků opět fungují: vyloučení účastníka z místnosti a nastavení hlasitosti jednotlivce dosud neměly žádný účinek.",
+      "Reakce jsou nově dostupné i na chytrých telefonech, kde tlačítko pro jejich odeslání chybělo. Poletující emoji už nezachytávají kliknutí na ovládací liště.",
+      "V režimu celé obrazovky jsou dialogová okna – sdílení odkazu a pro moderátory „Odejít z místnosti“ – opět viditelná: dříve zůstávala skrytá za videem a tlačítka tak působila nefunkčně.",
+      "Šablony akcí nově vycházejí ze zapnutého chatu, ve shodě s nastavením místnosti: při vytvoření akce ze šablony „Webinář“ dosud vznikla akce bez chatu.",
+      "Dokončili jsme anglický překlad rozhraní; chybělo v něm několik položek, mimo jiné celé okno „Sdílet“."
+    ]
+  },
+  "0.8.2": {
+    "title": "Žádná prázdná místnost už neběží po skončení akce",
+    "notes": [
+      "Místnost, která zůstala otevřená po plánovaném konci a poté se vyprázdnila, zůstávala aktivní bez časového omezení a zbytečně blokovala prostředky pro video. Nově se uzavře, jakmile je 45 minut po plánovaném konci prázdná. Místnost, ve které se ještě někdo nachází, se nikdy nepřeruší: po uplynutí plánovaného času se pouze zobrazí upozornění a nikdo není odpojen."
+    ]
+  },
+  "0.8.1": {
+    "title": "Nastavitelné reakce, uzavírání prázdné místnosti a bezpečnější administrace",
+    "notes": [
+      "Reakce (emoji) může nově nastavit administrátor. Ve výchozím nastavení se používají nativní reakce Jitsi přímo v ovládací liště – jsou nenáročné a krátkodobé. Případně lze zapnout vlastní reakce platformy, které se zobrazují v liště vlevo dole a započítávají se do statistik akce.",
+      "Nová možnost pro administrátory: automaticky uzavřít místnost, která zůstala zcela prázdná, tedy i bez moderátora, což je známkou opuštěné akce. Ve výchozím stavu je vypnutá – nečinnost bez přítomného moderátora je již bezpečně ošetřena, protože místnost po 45 minutách přejde do spánku – a lze ji zapnout v nastavení.",
+      "Bezpečnější administrace: po vypršení relace se vracíte na přihlašovací obrazovku, takže stránky administrace už nelze používat s prošlou relací. Relace zároveň trvá déle a během práce se automaticky obnovuje."
+    ]
+  },
+  "0.8.0": {
+    "title": "Přehlednější živá místnost: chat, reakce, celá obrazovka a registrace",
+    "notes": [
+      "Chat: do zpráv nyní můžete vkládat emoji pomocí samostatného výběru a malý indikátor upozorní, pokud se aktualizace chatu zpomalí. Odeslané zprávy se zobrazí okamžitě, a to i ve firemních sítích, které aktualizace v reálném čase ukládají do vyrovnávací paměti.",
+      "Celá obrazovka: tlačítko pro celou obrazovku nyní ponechá chat viditelný po straně, místo aby jej skrylo.",
+      "Reakce (emoji) už nepřekrývají ovládací prvky ve spodní části: lišta zůstává vždy klikatelná, i v dlaždicovém zobrazení.",
+      "Tlačítka „Sdílet“ a „Odejít z místnosti“ jsou nyní dobře viditelná a barevná už ve výchozím stavu (odchod červeně), nejen při najetí myší.",
+      "Bot „Recorder“, který pořizuje nahrávku, se už neobjevuje v seznamu účastníků ani v jejich počtu.",
+      "Registrace: pokud se zaregistrujete s velkým předstihem, systém vás nasměruje na stránku s potvrzením a odkazem pro přidání akce do kalendáře, nikoli do čekárny; těsně před začátkem vstoupíte rovnou do místnosti. Na stránce akce navíc uvidíte, zda jste již registrováni.",
+      "Chat je nyní hlavním způsobem interakce v místnosti. Vylepšili jsme také automatické uzavření akce, která zůstala prázdná, a počítání účastníků ve statistikách."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderátor může sundat zvednutou ruku",
+    "notes": [
+      "Ve frontě zvednutých rukou má moderátor nově tlačítko, kterým sundá ruku konkrétnímu účastníkovi – hodí se, když už dotyčný promluvil nebo ruku nechal zvednutou omylem. Požadavek dorazí právě k tomuto účastníkovi, kterému se ruka sníží; nikoho dalšího se to nedotkne."
+    ]
+  },
+  "0.7.7": {
+    "title": "Méně hluku na pozadí, když mluvíte",
+    "notes": [
+      "Ve chvíli, kdy se ujmete slova, se zapne pokročilé potlačení hluku na pozadí: nad rámec základního potlačení, které funguje již dříve, lépe tlumí zvuky, jako je psaní na klávesnici, ventilátory nebo doprava."
+    ]
+  },
+  "0.7.6": {
+    "title": "Hlasitost pro každého účastníka zvlášť",
+    "notes": [
+      "Nový ovladač hlasitosti pro jednotlivé účastníky v panelu „Účastníci“: pokud je někdo slyšet příliš hlasitě nebo příliš potichu, upravíte si jeho hlasitost pouze pro sebe, aniž byste změnili zvuk ostatním.",
+      "Samostatné nahrávání zvuku jednotlivých účastníků, které slouží pro následné zpracování, je spolehlivější: pokud je záznam němý, systém to ihned rozpozná a nevytvoří prázdný přepis."
+    ]
+  },
+  "0.7.5": {
+    "title": "Zvednutá ruka zůstane zvednutá",
+    "notes": [
+      "Když zvednete ruku, zůstane nyní zvednutá, dokud ji sami nesundáte nebo dokud ji nevyřídí moderátor. Dříve se sundala sama ve chvíli, kdy jste začali mluvit, a vy jste tak zmizeli z fronty přihlášených o slovo."
+    ]
+  },
+  "0.7.4": {
+    "title": "Jméno v chatu chráněné před přeposlanými odkazy (bezpečnost)",
+    "notes": [
+      "V chatu se skutečné jméno registrovaného účastníka zobrazuje pouze na zařízení, ze kterého se registroval: kdo otevře jeho přeposlaný odkaz pro vstup, vystupuje pod jménem, které sám zadá, nikoli pod jménem původního registrovaného účastníka. Tím se uzavřela možnost nesprávného přiřazení zpráv.",
+      "Stejná ochrana platí i pro přílohy: soubor odeslaný z přeposlaného odkazu se už nepřipíše jménu původního registrovaného účastníka.",
+      "Kdo se připojí z druhého zařízení, například z telefonu, nebo pomocí odkazu obdrženého s předstihem, se může dál bez omezení účastnit, psát do chatu a posílat přílohy. Mění se pouze zobrazované jméno, kterým je nově to, jež zadal při vstupu."
+    ]
+  },
+  "0.7.3": {
+    "title": "Správný počet přítomných, reakce uprostřed a úpravy místnosti",
+    "notes": [
+      "Počet přítomných už nenásobí tutéž osobu, která odejde a znovu se připojí, například tlačítkem „Zpět“ v prohlížeči: opakovaná připojení téhož člověka se počítají jen jednou. Seznam účastníků nadále zobrazuje každé připojení, takže moderátor má stále přehled o všech a může je spravovat.",
+      "Lišta reakcí a emoji je nyní umístěna dole uprostřed, je dobře viditelná a snadno k nalezení, místo aby byla v levém dolním rohu.",
+      "Počet registrovaných účastníků se už veřejně nezobrazuje na stránce akce ani v přehledu akcí; administrátorům zůstává viditelný v panelu administrace. V průběhu živé akce vidí veřejnost pouze počet přítomných.",
+      "Potlačení hluku na pozadí se automaticky zapíná u všech mikrofonů: základní zpracování zvuku – ozvěna a hluk – je vždy aktivní a není třeba je zapínat ručně.",
+      "Vstup do místnosti je o něco rychlejší: probouzení videosystému začíná už při kliknutí na tlačítko pro vstup."
+    ]
+  },
+  "0.7.2": {
+    "title": "Bohatší chat: přílohy, odpovědi a zmínky",
+    "notes": [
+      "V chatu lze nyní posílat obrázky a přílohy (PNG, JPEG, WebP, GIF a PDF do velikosti 10 MB) s náhledem přímo ve zprávě.",
+      "Nová funkce „Odpovědět“: můžete citovat konkrétní zprávu a citace zůstane viditelná ve vlákně konverzace.",
+      "Zmínky pomocí @: účastníka lze ve zprávě oslovit jménem.",
+      "Moderace chatu: moderátoři mohou v průběhu akce odstraňovat jednotlivé zprávy."
+    ]
+  },
+  "0.7.1": {
+    "title": "Statistiky po skončení každé akce",
+    "notes": [
+      "Nová záložka „Statistiky“ u každé akce v panelu administrace, dostupná i u akcí bez registrace a u akcí bez videozáznamu: ukazuje průběh videohovoru, kdo mluvil nejvíce, celkovou míru zapojení a hlavní ukazatele.",
+      "Graf vývoje interakcí v čase – chat, dotazy, hlasy k dotazům, ankety, slova ve slovním mraku a reakce – se zvýrazněným vrcholným okamžikem videohovoru.",
+      "Žebříček těch, kdo mluvili nejdéle (minuty na osobu), s údajem o vyrovnanosti jednotlivých vystoupení, spolu s počty reakcí a zvednutých rukou.",
+      "Nový odhad průměrné doby, kterou účastníci strávili v místnosti, který se promítá i do výpočtu celkové míry pozornosti."
+    ]
+  },
+  "0.7.0": {
+    "title": "Upravitelná jména řečníků a přehrávač pouze se zvukem",
+    "notes": [
+      "Po skončení akce lze nyní přejmenovat řečníky a opravit tak jména, která systém automaticky rozpoznal v přepisu.",
+      "Pokud nahrávka neobsahuje přehratelné video, nabídne stránka pro opravy alespoň přehrávač se zvukem, abyste si mohli záznam poslechnout a upravit text i jména řečníků.",
+      "Oprava vícestopého nahrávání: nyní se správně zachytí skutečný zvuk vzdálených účastníků."
+    ]
+  },
+  "0.6.9": {
+    "title": "Spolehlivost zpracování pomocí AI",
+    "notes": [
+      "Panel administrace nyní zobrazuje ukazatel spolehlivosti zpracování pomocí AI po skončení akce (přepis, shrnutí, překlady), takže na první pohled poznáte, zda je výsledek úplný a důvěryhodný."
+    ]
+  },
+  "0.6.8": {
+    "title": "Přehlednější stránka pro úpravy po skončení akce",
+    "notes": [
+      "Stránka pro opravy přepisu, shrnutí a překladů nyní vysvětluje, kdy obsah vytvořený pomocí AI ještě není k dispozici – „zpracování probíhá“ nebo „spusťte zpracování pomocí ovládacích prvků nahoře“ – místo červeného chybového hlášení, které působilo jako porucha.",
+      "Neúspěšné uložení se nyní zobrazí červeně a uvádí konkrétní důvod vrácený serverem, místo aby se zobrazilo zeleně, jako by proběhlo v pořádku.",
+      "Vypršená relace administrátora a potíže s načítáním se nyní rozlišují samostatnými hláškami místo jediné obecné chyby.",
+      "Pokud zvuk nahrávky nelze přehrát, stránka na to upozorní a text i jméno řečníka u jednotlivých úseků je i tak možné opravit."
+    ]
+  },
+  "0.6.7": {
+    "title": "Trvale viditelné reakce a „Poznámky / kontrolní seznam“",
+    "notes": [
+      "Reakce (emoji) jsou nyní trvale viditelné v liště vlevo dole a nejsou už skryté za tlačítkem: snáze se hledají i používají v průběhu akce.",
+      "Funkce „Agenda“ byla přejmenována na „Poznámky / kontrolní seznam“, aby bylo zřejmé, že jde o prostor pro poznámky ve formě kontrolního seznamu, jehož obsah se nedostane do chatu. Moderátor ji může i nadále zapnout u každé akce."
+    ]
+  },
+  "0.6.6": {
+    "title": "Vylepšení: chat, počty a vstup",
+    "notes": [
+      "Odkazy sdílené v chatu jsou nyní klikatelné a bezpečně se otevírají na nové kartě; dříve šlo jen o prostý text.",
+      "V místnosti vidí celkový počet registrovaných účastníků nově pouze moderátoři: účastníci vidí jen to, kolik lidí je skutečně přítomno.",
+      "Rychlejší vstup do místnosti: připojení k video serveru se připraví už během čekání v čekárně, takže při vstupu čekáte kratší dobu.",
+      "V seznamu účastníků zůstává záhlaví s počtem viditelné i při posouvání seznamu."
+    ]
+  },
+  "0.6.5": {
+    "title": "Nahrávky a počty",
+    "notes": [
+      "Počet přítomných v místnosti nyní nezahrnuje nahrávací službu: zobrazuje pouze skutečné lidi, nikoli bota, který zaznamenává zvuk.",
+      "Následné zpracování: nové tlačítko „Vygenerovat pomocí AI“ spouští přepis, shrnutí a překlad i u nahrávek obsahujících pouze zvuk, s jednou stopou pro každého účastníka. U nich dosud žádné tlačítko pro spuštění nebylo.",
+      "V seznamu stop je ke každé přezdívce připojen identifikátor: různí lidé se stejnou přezdívkou dostanou odlišné identifikátory, zatímco více vystoupení téže osoby sdílí jeden.",
+      "Jasná zpráva se zobrazí, když spuštění zpracování nezařadí žádnou úlohu – protože je AI pro danou akci vypnutá nebo je zpracování pozastaveno – místo klamavého hlášení o úspěchu."
+    ]
+  },
+  "0.6.4": {
+    "title": "Bezpečnost identity a vylepšení místnosti",
+    "notes": [
+      "Bezpečnostní oprava: pokud sdílíte svůj osobní odkaz do místnosti, vstoupí ten, kdo jej otevře, pod SVÝM vlastním jménem. Dříve mohl převzít jméno osoby, která odkaz poslala.",
+      "Ostřejší sdílení obrazovky: nově upřednostňuje rozlišení (5 snímků za sekundu ve vysoké kvalitě) před plynulostí, takže prezentace a dokumenty zůstávají čitelné i tam, kde je málo pohybu.",
+      "Odstranili jsme funkci pro skrytí vlastního obrazu: po zapnutí už nebylo možné vlastní okénko znovu zobrazit.",
+      "Přístup administrátora: po opětovném přihlášení v důsledku nečinnosti se stránka správně obnoví – žádné zdánlivě zablokované obrazovky čekající na ruční načtení."
+    ]
+  },
+  "0.6.3": {
+    "title": "Vylepšení místnosti akce – druhé kolo",
+    "notes": [
+      "Časovač prezentace je nyní součástí ovládací lišty moderátora a nezabírá vlastní řádek; pruh s odpočtem se zobrazí, pouze když časovač běží.",
+      "V chatu se zobrazuje skutečné jméno pisatele, nikoli obecné označení „Moderátor“.",
+      "Chat se stal samostatným panelem v postranní liště a nepřekrývá už neustále ostatní obsah: rozhraní je přehlednější a na záložce přibyl počet nepřečtených zpráv.",
+      "Nové tlačítko „Tabule“ umožňuje moderátorům otevřít sdílenou tabuli přímo z ovládací lišty.",
+      "Tlačítko „Sdílet“ má nyní správnou barvu, takže je nelze zaměnit s tlačítkem „Odejít“; u odkazů jsou ikony a odkaz pro moderátory, viditelný pouze jim, je skrytý za upozorněním, aby bylo možné bez omylu pozvat další moderátory.",
+      "Slovní mrak už není zapnutý ve výchozím nastavení: moderátor jej může podle potřeby zapnout v průběhu akce."
+    ]
+  },
+  "0.6.2": {
+    "title": "Vylepšení místnosti probíhající akce",
+    "notes": [
+      "Ovládací lišta (mikrofon, kamera, sdílení obrazovky) zůstává stále viditelná a klikatelná – i v režimu celé obrazovky, během sdílení nebo když jste v místnosti sami.",
+      "Moderátor může znovu zapínat a vypínat živé funkce (Dotazy, Chat, Agenda) v průběhu akce.",
+      "Ovládání zvuku a videa lze používat už během přípravy místnosti, bez čekání na spuštění video serveru.",
+      "Seznam „Zvednuté ruce“ správně zobrazuje, kdo se přihlásil o slovo.",
+      "Nové tlačítko „Sdílet“ v místnosti: zkopíruje naráz odkaz pro vstup i odkaz na stránku akce, aniž by odhalilo neveřejné tokeny.",
+      "Značka PA Webinar je opět viditelná v horní liště místnosti akce."
+    ]
+  },
+  "0.6.1": {
+    "title": "Veřejný přehled změn a bezpečnostní aktualizace",
+    "notes": [
+      "Nová veřejná stránka s přehledem změn, na kterou se dostanete kliknutím na číslo verze v patičce: uvádí všechny verze platformy s hlavními novinkami.",
+      "Bezpečnostní aktualizace závislostí (undici, nodemailer) a zpevnění sestavovací pipeline o kontrolu zranitelností."
+    ]
+  },
+  "0.6.0": {
+    "title": "Postup po skončení akce a interaktivní čekárna",
+    "notes": [
+      "Nový postup na konci akce: po jejím skončení vyzve moderátora zvláštní okno, aby zvolil, kam nahrávka poputuje – zveřejnit ji na stránce akce, uložit do knihovny, nebo ponechat pouze v archivu.",
+      "Automatické anonymizované shrnutí po akci (účast, nejvíce hlasované dotazy, výsledky anket, slovní mrak, hodnocení) se zobrazuje na stránce každé ukončené akce, a to i tehdy, když nevznikla nahrávka.",
+      "E-mail se shrnutím a obsahem akce rozeslaný účastníkům po jejím skončení.",
+      "Interaktivní čekárna „Piazza Digitale“: se svým avatarem dojdete až k bráně a vstoupíte do videohovoru; klasické tlačítko pro vstup je vedle vždy k dispozici.",
+      "Slovní mrak má na stránce ukončené akce vlastní sekci s přepínačem viditelnosti pro administrátora.",
+      "Sdílená tabule, kterou lze zapnout pro jednotlivé akce i ze šablony.",
+      "Přepracované rozhraní průvodce vytvořením akce: sbalené pokročilé volby, hlavní moderátor s odkazem, upozornění na osobní údaje, ukládání konceptu a lepší zvládání dílčích chyb.",
+      "Odlišná doba uchování nahrávek a zvukových stop jednotlivých řečníků, navázaná na signál „video zveřejněno“, spolu s vymazáním chatu podle GDPR."
+    ]
+  },
+  "0.5.11": {
+    "title": "Vylepšení moderace, ukončení videohovoru a zvuku",
+    "notes": [
+      "Moderátoři se zobrazují pod svým skutečným jménem místo obecného označení „Moderátor“.",
+      "Po skončení akce se přímo v aplikaci zobrazí uzavírací obrazovka místo zavádějícího hlášení „Místnost se připravuje“.",
+      "Opraveno překrývání ikon v čekárně.",
+      "Potlačení hluku vynuceně vypnuto přes IFrame API kvůli vyřešení potíží se zvukem."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabilní vícestopé nahrávání, hodnocení hvězdičkami a výkon",
+    "notes": [
+      "Nahrávání jednotlivých řečníků (vícestopé) je spolehlivé od začátku do konce: úplný zvuk v každé stopě, žádné ořezávání, paralelní odesílání souborů.",
+      "Dotazník zpětné vazby po akci s hodnocením hvězdičkami a souhrnný přehled pro administrátora.",
+      "Zlepšení výkonu: kodek VP9 pro kameru, odložené načítání na mobilních zařízeních, doladění nahrávací služby.",
+      "Hook v Helmu spouštěný po aktualizaci, který automaticky znovu načte konfigurační soubor config.js pro Jitsi."
+    ]
+  },
+  "0.5.8": {
+    "title": "Nastavitelná kvalita obrazu a zvuku a nový postup vstupu",
+    "notes": [
+      "Kvalitu obrazu a zvuku může nastavit administrátor pomocí přednastavených profilů pro každou akci.",
+      "Přepracovaný postup vstupu: registrace, čekárna, videohovor.",
+      "U zvednutých rukou se zobrazuje skutečné jméno každého účastníka."
+    ]
+  },
+  "0.5.6": {
+    "title": "Nastavitelná čekárna a titulní obrázky akcí",
+    "notes": [
+      "Podobu čekárny lze nastavit – hra, zahrada nebo klasická – jak pro celý web, tak pro jednotlivé akce.",
+      "Titulní obrázky na stránce akce a v náhledech karet.",
+      "Nahrané soubory se poskytují přes vyhrazenou cestu s podepsanými odkazy s krátkou platností.",
+      "Tlačítko „Vstoupit nyní“ dostupné ihned po registraci.",
+      "Sjednocená část administrace pro správu zpracování nahrávek pomocí AI a odolnější vícestopé nahrávání."
+    ]
+  },
+  "0.5.2": {
+    "title": "Příprava akce a drobná vylepšení",
+    "notes": [
+      "Agenda s vyjádřením souhlasu i nesouhlasu a opravy oprávnění přebíraných ze šablon.",
+      "Skutečná jména místo označení „SPEAKER_00“ ve shrnutích a titulcích.",
+      "Série opravných verzí (v0.5.2 až v0.5.5) v rámci přípravy veřejných akcí."
+    ]
+  },
+  "0.5.1": {
+    "title": "Domovská stránka zaměřená na komunitu a vícestopý archiv",
+    "notes": [
+      "Přepracovaná domovská stránka s důrazem na komunitu, s možností přepsat překlady za běhu a s dodržením pravidel přístupnosti AgID.",
+      "Vícestopý archiv ve formátu MKV s přehrávačem pro poslech jednotlivých řečníků.",
+      "Sladění vícestopého zvuku s mixem z Jibri pomocí vzájemné korelace."
+    ]
+  },
+  "0.5.0": {
+    "title": "Následné zpracování pomocí AI a vícestopé nahrávání",
+    "notes": [
+      "Pipeline následného zpracování pomocí AI: přepis, shrnutí, titulky, překlady a vícehlasý dabing (vždy syntetický), se sledováním původu použitých modelů.",
+      "Vícestopé nahrávání, jedna stopa pro každého řečníka, s přiřazením řečníků a automatickým pojmenováním (ADR-013).",
+      "Veřejná videoknihovna a stránka pro správu akce po jejím skončení, určená administrátorům.",
+      "Editor přepisu po skončení akce s možností opravit text a znovu přiřadit řečníky.",
+      "Přepracované rozhraní administrace: oznámení a dialogová okna ve stylu .italia místo nativních hlášení prohlížeče, kostry načítání a barevné design tokeny místo stovek napevno zapsaných hexadecimálních hodnot.",
+      "Souhlas každého účastníka s vícestopým nahráváním (GDPR) a rozšířený export údajů podle článku 15."
+    ]
+  },
+  "0.4.0": {
+    "title": "Zapojení a životní cyklus",
+    "notes": [
+      "Nové funkce pro živé akce: slovní mrak, časovač prezentace, počítadlo reakcí, živé ovládací prvky ve stylu Meet a panel zvednutých rukou.",
+      "Životní cyklus nahrávek, od dočasné po zveřejněnou, se správou pro administrátory (náhled, zveřejnění, smazání) a s odlišnou dobou uchování.",
+      "Stránka po skončení akce rozdělená do záložek (nahrávka, archiv Q&A, ankety, zpětná vazba, materiály) s možností nastavit, co a kdy se zveřejní.",
+      "Průvodce vytvořením akce v pěti krocích, taxonomie štítků, adresář kontaktů a redakční nadtitulek.",
+      "Veřejná videoknihovna na adrese /video-library a stránka transparentnosti /service-inventory (CycloneDX 1.6 pro jednotlivé instance).",
+      "Dvoufázové automatické škálování JVB se snímkem stavu v Redis pro stránku o stavu služby.",
+      "Třífázové mazání podle GDPR: okamžité odstranění osobních údajů, odstranění obsahu po uplynutí doby uchování, poté trvalé smazání."
+    ]
+  },
+  "0.3.0": {
+    "title": "Nastavitelná platforma a infrastruktura",
+    "notes": [
+      "Nastavení webu, která umožňují opětovné použití platformy dalšími úřady (vizuální identita, barvy, favicon, SEO, patička, režim domovské stránky, stránky o soukromí a přístupnosti) bez nutnosti nového sestavení.",
+      "Přehled analytických údajů a panel administrace infrastruktury.",
+      "Tři režimy nasazení přes Helm (simple, standard, full) a škálování JVB až na nulu ve vyhrazeném poolu uzlů.",
+      "Pipeline Jibri pro různá cloudová prostředí (Azure Blob, S3, GCS, MinIO nebo místní úložiště) a nastavitelný vodoznak v Jitsi.",
+      "OpenSSF Scorecard, Dependabot, SBOM závislostí, centralizované zpracování chyb, omezení počtu požadavků a více než 210 jednotkových testů.",
+      "Řada dílčích verzí (v0.3.8 až v0.3.45) na základě zpětné vazby po ukázkové prezentaci."
+    ]
+  },
+  "0.2.0": {
+    "title": "Zpětná vazba od DTD",
+    "notes": [
+      "Profilace účastníků při registraci (instituce, role, typ), nastavitelná pro každou akci, s exportem do CSV a souhrnnými statistikami.",
+      "Nastavitelné připomínky s několika časovými odstupy a odlišnými e-maily.",
+      "Ankety a hlasování s výsledky v reálném čase a exportem do CSV.",
+      "Vylepšení v oblasti GDPR: zásady ochrany osobních údajů pro jednotlivé akce, podrobné souhlasy, protokol o provedených výmazech a export údajů podle článku 15.",
+      "Sjednocení rolí moderátor a auditor a prověření licencí použitých závislostí."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP – první verze",
+    "notes": [
+      "Veřejná platforma pro digitální akce postavená na designovém systému .italia (Bootstrap Italia, design-react-kit).",
+      "Živá místnost s Jitsi Meet (IFrame API, ověřování pomocí JWT) a rolemi vynucovanými na straně serveru.",
+      "Registrace účastníků v souladu s GDPR se šifrovanými osobními údaji (AES-256-GCM).",
+      "Q&A s hlasováním a moderací, čekárna s odpočtem a přístup pro hosty.",
+      "Potvrzovací a připomínkové e-maily, propojení s kalendáři (Google, Outlook, Yahoo, iCal).",
+      "Panel administrace s ověřováním pomocí API klíče, mazáním podle GDPR a metrikami pro Prometheus.",
+      "Produkční Helm chart, image Dockeru bez práv roota a jen pro čtení, CI/CD v GitHub Actions, publiccode.yml."
+    ]
+  }
+}

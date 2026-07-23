@@ -9,7 +9,7 @@ import {
 import { prisma } from '@/lib/db';
 import { reviveStatus } from '@/lib/events/lifecycle';
 import { updateEventSchema } from '@/lib/validation/schemas';
-import { resolveLocale, localiseEvent } from '@/lib/utils/locale';
+import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
 import {
   extractModeratorToken,
   verifyModeratorToken,
@@ -308,8 +308,12 @@ export const PUT = withErrorHandling(async (request, context) => {
     data: {
       ...(revivedStatus && { status: revivedStatus }),
       ...(matrixUpdate && { permissionMatrix: matrixUpdate }),
-      ...(data.title !== undefined && { title: data.title }),
-      ...(data.description !== undefined && { description: data.description }),
+      ...(data.title !== undefined && {
+        title: pruneEmptyTranslations(data.title as LocalizedField),
+      }),
+      ...(data.description !== undefined && {
+        description: pruneEmptyTranslations(data.description as LocalizedField),
+      }),
       ...(data.startsAt !== undefined && {
         startsAt: new Date(data.startsAt),
       }),
@@ -388,6 +392,10 @@ export const PUT = withErrorHandling(async (request, context) => {
           data.joinPassword.length > 0 ? hashJoinPassword(data.joinPassword) : null,
       }),
       ...(data.youtubeUrl !== undefined && { youtubeUrl: data.youtubeUrl }),
+      // The wizard sends the cadence back on every save; it used to be accepted
+      // by the schema and then dropped here, so editing an event silently wiped
+      // its recurrence (docs/ROADMAP.md, "Eventi ricorrenti / serie").
+      ...(data.recurrenceRule !== undefined && { recurrenceRule: data.recurrenceRule }),
       ...(data.libraryListed !== undefined && { libraryListed: data.libraryListed }),
       ...(data.coverImageUrl !== undefined && { coverImageUrl: data.coverImageUrl }),
       ...(data.parseTitleKicker !== undefined && {

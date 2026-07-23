@@ -19,6 +19,8 @@
 
 import { getRedis, getRedisSubscriber } from '@/lib/redis';
 
+export type GardenEmoteType = 'wave' | 'heart';
+
 export interface GardenPeer {
   userId: string;
   displayName: string;
@@ -28,6 +30,16 @@ export interface GardenPeer {
   facing: 'down' | 'up' | 'left' | 'right';
   walkPhase: number; // 0..1 (animation clock shared)
   updatedAt: number; // ms
+  /**
+   * Emote transiente (saluto / cuore) allegata al ping.
+   *
+   * Opzionale di proposito: i client che non la conoscono continuano a pingare
+   * senza il campo e restano validi. `at` è l'orologio del MITTENTE e non va
+   * confrontato con il nostro: serve solo da identificatore per-peer, così chi
+   * legge riconosce che due ping consecutivi portano la STESSA emote e non
+   * riavvia l'animazione a ogni poll.
+   */
+  emote?: { type: GardenEmoteType; at: number };
 }
 
 function posKey(eventId: string): string {

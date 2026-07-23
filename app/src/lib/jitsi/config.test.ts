@@ -49,6 +49,12 @@ describe('Jitsi config exports', () => {
     expect(baseToolbarButtons).not.toContain('chat');
   });
 
+  it('baseToolbarButtons excludes native fullscreen (app-owned fullscreen keeps chat, #6)', () => {
+    // The native Jitsi fullscreen fullscreens the iframe only, hiding our chat.
+    // LiveTopBar provides an app-owned fullscreen on the whole live wrapper.
+    expect(baseToolbarButtons).not.toContain('fullscreen');
+  });
+
   it('baseToolbarButtons excludes reactions (handled by custom ReactionBar)', () => {
     expect(baseToolbarButtons).not.toContain('reactions');
   });
@@ -130,6 +136,14 @@ describe('Jitsi config overwrite', () => {
 
   it('disables native reactions (handled by custom overlay)', () => {
     expect(jitsiConfigOverwrite.disableReactions).toBe(true);
+  });
+
+  it('keeps a raised hand up via the NESTED raisedHands flag (F8; flat form no-ops on stable 10741)', () => {
+    // The served build reads ONLY config.raisedHands?.disableRemoveRaisedHandOnFocus;
+    // flattening this would silently re-enable auto-lowering on dominant speaker.
+    expect(jitsiConfigOverwrite.raisedHands).toEqual({
+      disableRemoveRaisedHandOnFocus: true,
+    });
   });
 
   it('keeps echo cancellation / noise suppression / AGC ON', () => {
@@ -220,6 +234,8 @@ describe('Instant call config', () => {
   it('instant call config inherits base config properties', () => {
     expect(instantCallConfigOverwrite.disableDeepLinking).toBe(true);
     expect(instantCallConfigOverwrite.prejoinConfig.enabled).toBe(false);
+    // F8: inherited via the ...jitsiConfigOverwrite spread.
+    expect(instantCallConfigOverwrite.raisedHands?.disableRemoveRaisedHandOnFocus).toBe(true);
   });
 
   it('instant call config starts muted', () => {

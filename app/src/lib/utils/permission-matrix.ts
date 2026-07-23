@@ -28,9 +28,13 @@ export type EventFeature =
   | 'share'
   | 'recording_control';
 
+// Chat is listed before Q&A: it is the primary audience-interaction channel
+// (live feedback #10 "manteniamo solo chat"), so it renders as the first row in
+// the admin permissions wizard and the leftmost live tab. Consumers iterate by
+// key, so the order is purely presentational.
 export const EVENT_FEATURES: readonly EventFeature[] = [
-  'qa',
   'chat',
+  'qa',
   'mic',
   'video',
   'share',
@@ -103,9 +107,12 @@ export function togglesFromMatrix(matrix: PermissionMatrix) {
 }
 
 export function defaultMatrix(): PermissionMatrix {
+  // Chat-on / Q&A-off by default for a blank event (live feedback #10: chat is
+  // the primary channel). Q&A stays available for a moderator to re-enable
+  // per-event; the Questions subsystem is unchanged.
   return matrixFromToggles({
-    qaEnabled: true,
-    chatEnabled: false,
+    qaEnabled: false,
+    chatEnabled: true,
     participantsCanUnmute: false,
     participantsCanStartVideo: false,
     participantsCanShareScreen: false,

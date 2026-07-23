@@ -35,6 +35,10 @@ interface RecorderEnv {
   portalUrl: string;
   cronApiKey: string;
   outputDir: string;
+  /** Credenziali del bot sul dominio nascosto di Prosody. Opzionali: senza,
+   *  si entra col JWT del portale (e il bot resta VISIBILE in stanza). */
+  xmppUser?: string;
+  xmppPassword?: string;
   idleTimeoutSec?: number;
   initialGraceSec?: number;
   maxDurationSec?: number;
@@ -55,6 +59,39 @@ function requireEnv(name: string): string {
   return v;
 }
 
+/**
+ * JID completo del bot sul dominio nascosto.
+ *
+ * L'utente arriva dal Secret già usato da Jibri (`JIBRI_RECORDER_USER`, di
+ * norma la sola parte locale "recorder") mentre il dominio è un valore del
+ * chart: comporli qui evita di duplicare un Secret solo per aggiungere una
+ * chiocciola. Un JID già completo passa invariato.
+ */
+export function recorderJid(
+  user: string | undefined,
+  domain: string | undefined
+): string | undefined {
+  const u = user?.trim();
+  if (!u) return undefined;
+  if (u.includes('@')) return u;
+  const d = domain?.trim();
+  return d ? `${u}@${d}` : undefined;
+}
+
+/**
+ * Vale la pena rientrare col JWT del portale?
+ *
+ * Solo se si era scelto il dominio nascosto E non si e' mai entrati in
+ * conferenza. Una stanza rimasta vuota entra e non registra nulla: e' normale,
+ * e ritentare la farebbe solo rioccupare, stavolta con un bot visibile.
+ */
+export function shouldRetryWithJwt(
+  joinedConference: boolean,
+  xmppUser: string | undefined,
+): boolean {
+  return !joinedConference && !!xmppUser;
+}
+
 function readEnv(): RecorderEnv {
   return {
     jitsiDomain: requireEnv('JITSI_DOMAIN'),
@@ -63,6 +100,11 @@ function readEnv(): RecorderEnv {
     portalUrl: requireEnv('PORTAL_URL').replace(/\/+$/, ''),
     cronApiKey: requireEnv('CRON_API_KEY'),
     outputDir: process.env.OUTPUT_DIR ?? '/recordings',
+    // Entrambe o nessuna: una sola delle due è una configurazione a metà, e
+    // fallire il login lascerebbe l'evento senza registrazione. Meglio il
+    // fallback esplicito sul JWT.
+    xmppUser: recorderJid(process.env.JITSI_XMPP_USER, process.env.JITSI_XMPP_DOMAIN),
+    xmppPassword: process.env.JITSI_XMPP_PASSWORD || undefined,
     // Quanto il bot resta in stanza vuota prima di chiudere (default 90s in
     // capture.ts). Configurabile per dare tempo ai partecipanti di entrare.
     idleTimeoutSec: readIntEnv('IDLE_TIMEOUT_SEC'),
@@ -94,13 +136,15 @@ export async function main(): Promise<void> {
   });
   console.log(
     `[recorder] work-order: room=${wo.roomName} event=${wo.eventId} ` +
-      `recording=${wo.recordingId}`,
+      `recording=${wo.recordingId}`
   );
 
   const captureConfig: CaptureConfig = {
     jitsiDomain: env.jitsiDomain,
     roomName: wo.roomName,
     jwt: wo.jwt,
+    xmppUser: env.xmppPassword ? env.xmppUser : undefined,
+    xmppPassword: env.xmppUser ? env.xmppPassword : undefined,
     outputDir: env.outputDir,
     // Wiring delle env di timing (erano parse-ate ma scartate qui → i default
     // hardcoded in capture.ts vincevano sempre, rendendo la config operatore
@@ -111,7 +155,36 @@ export async function main(): Promise<void> {
   };
 
   // ── 3. Cattura WebRTC (blocca fino a fine evento) ──
-  const { recordings } = await captureRoom(captureConfig);
+  let { recordings, joinedConference } = await captureRoom(captureConfig);
+
+  // Rete di sicurezza, e sta QUI di proposito.
+  //
+  // Il bot entra sul dominio nascosto di Prosody per essere invisibile in
+  // sala. Quell'autenticazione può essere rifiutata — password rigenerata da un
+  // helm upgrade, allowlist del MUC assente o scritta male — e allora l'evento
+  // resterebbe senza audio: irripetibile, e scoperto solo a cose fatte. In quel
+  // caso si rientra col JWT del portale: il bot torna VISIBILE in stanza, che è
+  // un difetto estetico, non una perdita.
+  //
+  // La condizione è «non siamo MAI entrati in conferenza», non «zero tracce»:
+  // una stanza rimasta vuota è normale e non va ritentata. E il controllo è
+  // qui, a sessione conclusa, non dentro il gestore di eventi della pagina:
+  // là non si distingue un login rifiutato da una linea caduta a metà evento, e
+  // una riconnessione dopo quaranta minuti avrebbe fatto ricomparire il bot
+  // davanti a tutti i partecipanti, a registrazione in corso.
+  if (shouldRetryWithJwt(joinedConference, captureConfig.xmppUser)) {
+    console.warn(
+      '[recorder] mai entrati in conferenza col login sul dominio nascosto — ' +
+        'riprovo col JWT del portale (il bot sara VISIBILE in stanza)'
+    );
+    const retry = await captureRoom({
+      ...captureConfig,
+      xmppUser: undefined,
+      xmppPassword: undefined,
+    });
+    recordings = retry.recordings;
+    joinedConference = retry.joinedConference;
+  }
 
   // ── 4. Manifest (puro) ──
   const manifest = buildManifest({
@@ -126,6 +199,24 @@ export async function main(): Promise<void> {
   // caricare né da ingestare. Usciamo puliti — l'ingest rifiuterebbe un
   // array vuoto (422) e non avrebbe senso accodare la pipeline.
   if (manifest.tracks.length === 0) {
+    // Mai entrati in conferenza non e' una stanza vuota: e' un ingresso non
+    // riuscito. Uscire con 0 lo farebbe passare per un lavoro riuscito e
+    // l'anomalia si scoprirebbe a evento finito, quando non c'e' piu' nulla da
+    // registrare. Fallire lascia anche che il Job venga rilanciato: se la causa
+    // era transitoria — Prosody in riavvio, un blip di rete prima del join — il
+    // secondo tentativo puo' ancora registrare il resto dell'evento.
+    //
+    // Il messaggio ELENCA le cause possibili senza sceglierne una: il segnale
+    // che abbiamo (`joinedConference` falso) non le distingue, e accusare le
+    // credenziali quando era la rete manderebbe chi indaga dalla parte
+    // sbagliata.
+    if (!joinedConference) {
+      throw new Error(
+        'ingresso in conferenza mai riuscito (nessuna traccia). Cause possibili: ' +
+          'credenziali del bot non valide, allowlist del MUC mancante, ' +
+          'stanza chiusa, o XMPP non raggiungibile al momento del join',
+      );
+    }
     console.warn('[recorder] nessuna traccia catturata — niente upload/ingest');
     return;
   }
@@ -147,7 +238,7 @@ export async function main(): Promise<void> {
     failed,
   } = await uploadRecording(provider, { manifest, files });
   console.log(
-    `[recorder] upload completato (${uploaded} tracce, ${failed.length} fallite, provider=${provider.name})`,
+    `[recorder] upload completato (${uploaded} tracce, ${failed.length} fallite, provider=${provider.name})`
   );
   if (failed.length > 0) {
     console.warn(`[recorder] tracce NON caricate (saltate): ${failed.join(', ')}`);
@@ -171,8 +262,7 @@ export async function main(): Promise<void> {
 // Esegui solo se invocato direttamente (non quando importato dai test).
 // In ESM controlliamo che questo modulo sia il main entry confrontando l'URL.
 const isMain =
-  typeof process.argv[1] === 'string' &&
-  import.meta.url === `file://${process.argv[1]}`;
+  typeof process.argv[1] === 'string' && import.meta.url === `file://${process.argv[1]}`;
 
 if (isMain) {
   main()

@@ -3,7 +3,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { getSettings } from '@/lib/settings';
 import LegalDocumentPage from '@/components/layout/legal-document-page';
-import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { getLocalizedExact, type LocalizedField } from '@/lib/utils/locale';
 
 interface PrivacyPageProps {
   params: Promise<{ locale: string }>;
@@ -25,7 +25,10 @@ export default async function PrivacyPage() {
   const locale = await getLocale();
   const settings = await getSettings();
 
-  const dbContent = getLocalized(settings.privacyPolicy as LocalizedField, locale);
+  // Esatto, non con fallback: un documento legale non authored in questa
+  // lingua deve mostrare il testo integrato e tradotto, non quello
+  // italiano dell'ente spacciato per la versione inglese.
+  const dbContent = getLocalizedExact(settings.privacyPolicy as LocalizedField, locale);
 
   if (dbContent) {
     return (

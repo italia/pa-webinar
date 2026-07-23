@@ -76,8 +76,10 @@ const DEFAULT_NEW: EditingTemplate = {
   name: '',
   description: '',
   icon: 'it-video',
-  qaEnabled: true,
-  chatEnabled: false,
+  // Chat primaria, Q&A opt-in — stesso default di defaultMatrix() e dei
+  // template di sistema (live feedback #10: "tenere SOLO chat").
+  qaEnabled: false,
+  chatEnabled: true,
   whiteboardEnabled: false,
   waitingRoomEngine: null,
   recordingEnabled: false,
@@ -544,7 +546,7 @@ function TemplateForm({
           id="tpl-waiting-room-engine"
           className="form-select form-select-sm"
           style={{ maxWidth: 340 }}
-          value={form.waitingRoomEngine ?? ''}
+          value={form.waitingRoomEngine === 'GARDEN' ? 'GAME' : form.waitingRoomEngine ?? ''}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             setField(
               'waitingRoomEngine',
@@ -555,7 +557,6 @@ function TemplateForm({
           }
         >
           <option value="">{t('waitingRoomEngineSiteDefault')}</option>
-          <option value="GARDEN">{t('waitingRoomEngineGarden')}</option>
           <option value="GAME">{t('waitingRoomEngineGame')}</option>
           <option value="CLASSIC">{t('waitingRoomEngineClassic')}</option>
         </select>

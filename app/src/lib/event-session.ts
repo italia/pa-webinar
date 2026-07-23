@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { SignJWT, jwtVerify } from 'jose';
 
 import { requireAppSecretKey, tryGetAppSecret } from '@/lib/auth/app-secret';
@@ -78,4 +79,21 @@ export async function verifyEventAccess(
   } catch {
     return null;
   }
+}
+
+/**
+ * Shared helper for "does the CURRENT request's browser own a personal token for
+ * this event?" (F7 identity binding): reads and verifies the signed
+ * `event_access` cookie and returns the accessToken it proves ownership of, or
+ * null. Callers compare the result to a presented token. Fails closed (missing/
+ * bad cookie, wrong event, no APP_SECRET → null). Must be called within a
+ * request scope (uses next/headers `cookies()`).
+ *
+ * Used by resolveTokenSender (chat identity). A few older sites (jitsi/token,
+ * attendance/leave, the live/event pages) still inline the same cookie read;
+ * new code should call this helper.
+ */
+export async function readOwnedEventAccessToken(eventId: string): Promise<string | null> {
+  const cookieStore = await cookies();
+  return verifyEventAccess(eventId, cookieStore.get(eventAccessCookieName(eventId))?.value);
 }

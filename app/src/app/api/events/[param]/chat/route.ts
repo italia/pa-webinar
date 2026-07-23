@@ -26,154 +26,66 @@ import { z } from 'zod';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import {
-  AppError,
   ForbiddenError,
   RateLimitError,
   ValidationError,
 } from '@/lib/errors';
-import { extractModeratorToken, resolveGrantForEvent } from '@/lib/auth/moderator';
+import { extractModeratorToken } from '@/lib/auth/moderator';
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
-import { publishChat } from '@/lib/chat/pubsub';
+import {
+  publishChat,
+  type ChatReplyRef,
+  type ChatAttachmentRef,
+} from '@/lib/chat/pubsub';
+import { authenticateChatSender } from '@/lib/chat/authenticate';
+import { tallyReactions } from '@/lib/chat/emoji';
+import { senderColourKey } from '@/lib/chat/sender-key';
+import { authorizeChatRead } from '@/lib/chat/read-access';
+import {
+  CHAT_ATTACHMENT_MIME,
+  CHAT_ATTACHMENT_MAX_BYTES,
+  attachmentRefFromRow,
+  assetUrlFromKey,
+} from '@/lib/chat/attachments';
+import {
+  verifyChatAttachmentToken,
+  type ChatAttachmentClaims,
+} from '@/lib/chat/attachment-token';
 import { chatMessagesTotal } from '@/lib/metrics';
-import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const HISTORY_DEFAULT_LIMIT = 100;
 const HISTORY_MAX_LIMIT = 500;
 const MESSAGE_MAX_LENGTH = 2000;
 
-const postSchema = z.object({
-  text: z
-    .string()
-    .trim()
-    .min(1, 'empty message')
-    .max(MESSAGE_MAX_LENGTH),
-  // Provided by guests only — participants and moderators derive the
-  // name from their token lookup. Ignored for those branches.
-  guestName: z.string().trim().min(1).max(80).optional(),
-  // Self-asserted display name for a moderator on the SHARED primary link,
-  // where the server has no per-person name. Honoured ONLY for that grant
-  // (per-row co-moderators/speakers keep their authoritative decrypted name).
-  // Mirrors the JWT displayName override already used for the video identity.
-  displayNameOverride: z.string().trim().min(1).max(80).optional(),
-});
+const REPLY_SNIPPET_MAX = 140;
 
-interface AuthResult {
-  eventId: string;
-  senderId: string;
-  senderName: string;
-  isModerator: boolean;
-}
-
-/**
- * Resolve the caller to one of {moderator, registered participant,
- * guest-on-live-event}. Throws Forbidden otherwise.
- *
- * Token is read from `?token=` (what the live page already passes)
- * and the event is looked up by slug OR id.
- */
-async function authenticateSender(
-  eventIdOrSlug: string,
-  token: string | null,
-  guestName: string | undefined,
-  displayNameOverride: string | undefined,
-  req: Request,
-): Promise<AuthResult> {
-  const where = UUID_RE.test(eventIdOrSlug)
-    ? { id: eventIdOrSlug }
-    : { slug: eventIdOrSlug };
-  const event = await prisma.event.findUnique({
-    where,
-    select: {
-      id: true,
-      status: true,
-      eventType: true,
-      moderatorToken: true,
-      moderatorName: true,
-    },
+const postSchema = z
+  .object({
+    // May be empty when an attachment is present (see refine below).
+    text: z.string().trim().max(MESSAGE_MAX_LENGTH).default(''),
+    // Provided by guests only — participants and moderators derive the
+    // name from their token lookup. Ignored for those branches.
+    guestName: z.string().trim().min(1).max(80).optional(),
+    // Self-asserted display name for a moderator on the SHARED primary link,
+    // where the server has no per-person name. Honoured ONLY for that grant
+    // (per-row co-moderators/speakers keep their authoritative decrypted name).
+    // Mirrors the JWT displayName override already used for the video identity.
+    displayNameOverride: z.string().trim().min(1).max(80).optional(),
+    // Optional single attachment, referenced by the SIGNED token minted by the
+    // upload route (never a client URL/metadata — that would let a member point
+    // at an arbitrary blob or spoof mime/size). Authenticated members only.
+    attachmentToken: z.string().min(1).max(4000).optional(),
+    // Optional reply to an earlier message in the same event.
+    replyToId: z.string().uuid().optional(),
+  })
+  .refine((d) => d.text.length > 0 || d.attachmentToken !== undefined, {
+    message: 'empty message',
+    path: ['text'],
   });
-  if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
-
-  if (token) {
-    // Primario condiviso / co-moderatore / speaker: risoluzione unica in
-    // resolveGrantForEvent (nome già decifrato). Ognuno chatta col PROPRIO
-    // nome, ma solo role=MODERATOR ottiene il badge moderatore: uno SPEAKER
-    // è un relatore, non staff — coerente con isEventModerator/
-    // verifyModeratorToken che escludono gli SPEAKER dalla moderazione.
-    const grant = await resolveGrantForEvent(event, token);
-    if (grant) {
-      const isGrantModerator = grant.role === 'MODERATOR';
-      // Shared PRIMARY link: the server only has the single event-level
-      // moderatorName (or none) → honour the client's self-asserted name so
-      // each moderator chats under their real name (same identity as the
-      // JWT/video). Per-row grants carry their own decrypted name → keep it
-      // authoritative and ignore the override.
-      const override = displayNameOverride?.trim();
-      const senderName = grant.isPrimaryShared
-        ? override || grant.displayName || 'Moderatore'
-        : grant.displayName ?? 'Moderatore';
-      return {
-        eventId: event.id,
-        senderId: grant.isPrimaryShared
-          ? `mod-${event.id}-primary`
-          : `${isGrantModerator ? 'mod' : 'spk'}-${event.id}-${grant.grantId}`,
-        senderName,
-        isModerator: isGrantModerator,
-      };
-    }
-    // Registered participant via accessToken?
-    const registration = await prisma.registration.findUnique({
-      where: { accessToken: token },
-      select: { id: true, displayName: true, eventId: true },
-    });
-    if (registration && registration.eventId === event.id) {
-      return {
-        eventId: event.id,
-        senderId: `reg-${registration.id}`,
-        senderName: tryDecryptPII(registration.displayName) ?? registration.displayName,
-        isModerator: false,
-      };
-    }
-    throw new ForbiddenError('Invalid token for this event');
-  }
-
-  // Guest branch — la chat è app-side e non dipende dal JVB. Consentita:
-  //   • su qualunque evento LIVE (comportamento storico), e
-  //   • durante il warm-up del bridge (PROVISIONING/IDLE) SOLO per le call
-  //     INSTANT — aperte per link, senza gate d'orario — dove la sala
-  //     d'attesa mostra la chat mentre il bridge si scalda.
-  // Gli eventi schedulati/con password NON ammettono guest senza token fuori
-  // dal LIVE: /wake è non autenticato e chiunque potrebbe flippare
-  // PUBLISHED→PROVISIONING per iniettare messaggi anonimi (regressione chiusa).
-  const guestAllowed =
-    event.status === 'LIVE' ||
-    (event.eventType === 'INSTANT' &&
-      (event.status === 'PROVISIONING' || event.status === 'IDLE'));
-  if (!guestAllowed) {
-    throw new ForbiddenError('Chat requires a participant or moderator token');
-  }
-  const name = (guestName ?? '').trim();
-  if (name.length < 1) {
-    throw new ValidationError('Guest display name required', [
-      { path: ['guestName'], message: 'required for unauthenticated chat' },
-    ]);
-  }
-  // We anchor the guest id to the client IP + name so reloading or
-  // reconnecting keeps the same senderId across messages. Not secure
-  // in any way — it's purely a display hint for UI clustering (same
-  // bubble colour, AI summary "this attendee said 3 things").
-  const ip = getClientIp(req);
-  return {
-    eventId: event.id,
-    senderId: `guest-${Buffer.from(`${ip}:${name}`).toString('base64url').slice(0, 24)}`,
-    senderName: name,
-    isModerator: false,
-  };
-}
 
 export const GET = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
@@ -184,18 +96,16 @@ export const GET = withErrorHandling(async (request, context) => {
     HISTORY_MAX_LIMIT,
   );
 
-  const where = UUID_RE.test(param)
-    ? { id: param }
-    : { slug: param };
-  const event = await prisma.event.findUnique({
-    where,
-    select: { id: true },
-  });
-  if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
+  // History is PII (names + free text) and was world-readable for any event in
+  // any status. Readers now clear the same bar as writers — see read-access.
+  const { eventId, senderId: callerId, isPerPersonIdentity } = await authorizeChatRead(
+    param,
+    extractModeratorToken(request),
+  );
 
   const rows = await prisma.chatMessage.findMany({
     where: {
-      eventId: event.id,
+      eventId,
       hiddenAt: null,
       ...(since && { createdAt: { gt: new Date(since) } }),
     },
@@ -208,6 +118,22 @@ export const GET = withErrorHandling(async (request, context) => {
       isModerator: true,
       text: true,
       createdAt: true,
+      attachmentBlobPath: true,
+      attachmentName: true,
+      attachmentMime: true,
+      attachmentSize: true,
+      editedAt: true,
+      reactions: { select: { emoji: true, senderId: true } },
+      replyToId: true,
+      replyTo: {
+        select: {
+          id: true,
+          senderName: true,
+          text: true,
+          hiddenAt: true,
+          attachmentBlobPath: true,
+        },
+      },
     },
   });
 
@@ -218,17 +144,50 @@ export const GET = withErrorHandling(async (request, context) => {
   const ordered = since ? rows : rows.slice().reverse();
 
   return NextResponse.json({
-    messages: ordered.map((m) => ({
-      id: m.id,
-      senderId: m.senderId,
-      // senderName + text are encrypted at rest (see schema comment).
-      // tryDecryptPII falls back to the input string for legacy
-      // plaintext rows, so this is safe across the migration boundary.
-      senderName: tryDecryptPII(m.senderName) ?? m.senderName,
-      isModerator: m.isModerator,
-      text: tryDecryptPII(m.text) ?? m.text,
-      createdAt: m.createdAt.toISOString(),
-    })),
+    messages: ordered.map((m) => {
+      // A reply whose parent was hidden/removed degrades to no quote.
+      const replyTo: ChatReplyRef | undefined =
+        m.replyTo && !m.replyTo.hiddenAt
+          ? {
+              id: m.replyTo.id,
+              senderName: tryDecryptPII(m.replyTo.senderName) ?? m.replyTo.senderName,
+              text:
+                (tryDecryptPII(m.replyTo.text) ?? m.replyTo.text).slice(
+                  0,
+                  REPLY_SNIPPET_MAX,
+                ) || (m.replyTo.attachmentBlobPath ? '📎' : ''),
+            }
+          : undefined;
+      const mineReactions = callerId
+        ? m.reactions.filter((r) => r.senderId === callerId).map((r) => r.emoji)
+        : [];
+      return {
+        id: m.id,
+        // NOT the raw senderId: a guest one is base64 of `ip:name` and decodes
+        // straight back to the attendee's public IP. The client only ever used
+        // it to pick a bubble colour, so it gets a one-way key instead.
+        senderKey: senderColourKey(m.senderId),
+        // Whether the CALLER may act on this message. Computed here because the
+        // client cannot: a seat id is shared by several people, so comparing ids
+        // (or names) client-side got it wrong in both directions.
+        mine: !!callerId && m.senderId === callerId,
+        canEdit: !!callerId && m.senderId === callerId && isPerPersonIdentity,
+        myReactions: mineReactions,
+        // senderName + text are encrypted at rest (see schema comment).
+        // tryDecryptPII falls back to the input string for legacy
+        // plaintext rows, so this is safe across the migration boundary.
+        senderName: tryDecryptPII(m.senderName) ?? m.senderName,
+        isModerator: m.isModerator,
+        text: tryDecryptPII(m.text) ?? m.text,
+        createdAt: m.createdAt.toISOString(),
+        editedAt: m.editedAt ? m.editedAt.toISOString() : null,
+        // Tallies travel with the history so a late joiner sees the same counts
+        // a live client has been accumulating from the stream.
+        reactions: tallyReactions(m.reactions),
+        attachment: attachmentRefFromRow(m),
+        ...(replyTo ? { replyTo } : {}),
+      };
+    }),
   }, {
     headers: { 'Cache-Control': 'no-store' },
   });
@@ -247,7 +206,7 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
-  const auth = await authenticateSender(
+  const auth = await authenticateChatSender(
     param,
     token,
     parsed.data.guestName,
@@ -265,11 +224,62 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
-  // Encrypt PII fields at rest. senderName and text are the only
-  // PII-bearing columns on ChatMessage; everything else (senderId,
-  // eventId, isModerator) is non-PII metadata. We keep plaintext in
-  // local vars so the Redis envelope below stays human-readable
-  // without an extra decrypt on the fan-out hot path.
+  // Attachments: authenticated members only (never tokenless guests). The token
+  // is a signed capability minted by the upload route — verifying it proves the
+  // blob key/mime/size/name belong to a file THIS sender just uploaded for THIS
+  // event, so nothing here is client-controlled (no arbitrary blob reference, no
+  // spoofed metadata). We still re-check mime/size against the policy in case the
+  // allow-list tightened since the token was issued.
+  let attachmentClaims: ChatAttachmentClaims | null = null;
+  if (parsed.data.attachmentToken) {
+    if (auth.senderId.startsWith('guest-')) {
+      throw new ForbiddenError('Guests cannot attach files');
+    }
+    attachmentClaims = verifyChatAttachmentToken(parsed.data.attachmentToken, {
+      eventId: auth.eventId,
+      senderId: auth.senderId,
+    });
+    if (
+      !attachmentClaims ||
+      !CHAT_ATTACHMENT_MIME.has(attachmentClaims.mime) ||
+      attachmentClaims.size > CHAT_ATTACHMENT_MAX_BYTES
+    ) {
+      throw new ValidationError('Invalid attachment', [
+        { path: ['attachmentToken'], message: 'expired, tampered, or unsupported attachment' },
+      ]);
+    }
+  }
+
+  // Reply: the parent must exist, belong to THIS event, and not be hidden.
+  // A missing/foreign/hidden parent is dropped (message still posts, no reply).
+  let replyRef: ChatReplyRef | undefined;
+  let replyToId: string | null = null;
+  if (parsed.data.replyToId) {
+    const parent = await prisma.chatMessage.findFirst({
+      where: { id: parsed.data.replyToId, eventId: auth.eventId, hiddenAt: null },
+      select: { id: true, senderName: true, text: true, attachmentBlobPath: true },
+    });
+    if (parent) {
+      replyToId = parent.id;
+      const parentText = (tryDecryptPII(parent.text) ?? parent.text).slice(
+        0,
+        REPLY_SNIPPET_MAX,
+      );
+      replyRef = {
+        id: parent.id,
+        senderName: tryDecryptPII(parent.senderName) ?? parent.senderName,
+        // An attachment-only parent has no text: quote a paperclip glyph instead
+        // of a blank line (matches the client compose bar).
+        text: parentText || (parent.attachmentBlobPath ? '📎' : ''),
+      };
+    }
+  }
+
+  // Encrypt PII fields at rest. senderName, text and the attachment filename
+  // are the PII-bearing columns; everything else (senderId, eventId,
+  // isModerator, mime, size, blobPath) is non-PII metadata. We keep plaintext
+  // in local vars so the Redis envelope below stays human-readable without an
+  // extra decrypt on the fan-out hot path.
   const plaintextSenderName = auth.senderName;
   const plaintextText = parsed.data.text;
 
@@ -280,9 +290,29 @@ export const POST = withErrorHandling(async (request, context) => {
       senderName: encryptPII(plaintextSenderName),
       isModerator: auth.isModerator,
       text: encryptPII(plaintextText),
+      replyToId,
+      ...(attachmentClaims
+        ? {
+            attachmentBlobPath: attachmentClaims.key,
+            attachmentName: encryptPII(attachmentClaims.name),
+            attachmentMime: attachmentClaims.mime,
+            attachmentSize: BigInt(attachmentClaims.size),
+          }
+        : {}),
     },
   });
   chatMessagesTotal.inc({ event_id: auth.eventId });
+
+  // Fan out the server-derived URL (assetUrlFromKey of the signed key), NOT any
+  // client value — a live subscriber must never be handed an off-origin URL.
+  const attachmentRef: ChatAttachmentRef | undefined = attachmentClaims
+    ? {
+        url: assetUrlFromKey(attachmentClaims.key),
+        name: attachmentClaims.name,
+        mime: attachmentClaims.mime,
+        size: attachmentClaims.size,
+      }
+    : undefined;
 
   // Fire-and-forget Redis fan-out — persistence is already done, and
   // pubsub failure is survivable (clients fall back to GET /history
@@ -296,10 +326,20 @@ export const POST = withErrorHandling(async (request, context) => {
     isModerator: created.isModerator,
     text: plaintextText,
     createdAt: created.createdAt.toISOString(),
+    ...(attachmentRef ? { attachment: attachmentRef } : {}),
+    ...(replyRef ? { replyTo: replyRef } : {}),
   });
 
   return NextResponse.json({
     id: created.id,
     createdAt: created.createdAt.toISOString(),
+    // The caller's own seat id. The panel has no other way to tell which
+    // messages are really its own: comparing display names is wrong whenever two
+    // people share one (two moderators on the shared link are both "Moderatore"),
+    // and that comparison is what decides whether the edit affordance appears.
+    senderKey: senderColourKey(auth.senderId),
+    // Whether this identity may edit its own messages at all — a shared link
+    // cannot, so the UI should not offer it (the server refuses anyway).
+    canEdit: auth.isPerPersonIdentity,
   }, { status: 201 });
 });

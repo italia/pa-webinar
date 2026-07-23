@@ -120,8 +120,11 @@ description:
       - Cloud-native (Kubernetes, Helm, scale-to-zero)
     screenshots:
       - docs/screenshots/home.png
-      - docs/screenshots/event-detail.png
-      - docs/screenshots/live-room.png
+      - docs/screenshots/events.png
+      - docs/screenshots/video-library.png
+      - docs/screenshots/service-inventory.png
+      - docs/screenshots/status.png
+      - docs/screenshots/changelog.png
   en:
     genericName: Digital events platform
     shortDescription: >

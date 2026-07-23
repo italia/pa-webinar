@@ -30,10 +30,10 @@ async function main() {
     {
       name: 'Webinar',
       description:
-        'Presentazione pubblica con molti partecipanti. Solo ascolto, Q&A attivo, nessuna webcam partecipanti.',
+        'Presentazione pubblica con molti partecipanti. Solo ascolto, chat attiva, nessuna webcam partecipanti.',
       icon: 'it-presentation',
-      qaEnabled: true,
-      chatEnabled: false,
+      qaEnabled: false,
+      chatEnabled: true,
       recordingEnabled: false,
       participantsCanUnmute: false,
       participantsCanStartVideo: false,
@@ -45,9 +45,9 @@ async function main() {
     {
       name: 'Community interattiva',
       description:
-        'Evento partecipativo con chat, Q&A e possibilità per tutti di parlare e mostrare la webcam.',
+        'Evento partecipativo con chat e possibilità per tutti di parlare e mostrare la webcam.',
       icon: 'it-team-digitale',
-      qaEnabled: true,
+      qaEnabled: false,
       chatEnabled: true,
       recordingEnabled: false,
       participantsCanUnmute: true,
@@ -75,10 +75,10 @@ async function main() {
     {
       name: 'Presentazione pubblica',
       description:
-        'Evento pubblico con registrazione video e condivisione schermo del relatore. Q&A attivo.',
+        'Evento pubblico con registrazione video e condivisione schermo del relatore. Chat attiva.',
       icon: 'it-camera',
-      qaEnabled: true,
-      chatEnabled: false,
+      qaEnabled: false,
+      chatEnabled: true,
       recordingEnabled: true,
       participantsCanUnmute: false,
       participantsCanStartVideo: false,

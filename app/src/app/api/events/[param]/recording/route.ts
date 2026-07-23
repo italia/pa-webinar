@@ -6,11 +6,9 @@ import {
   constantTimeEqual,
 } from '@/lib/auth/moderator';
 import {
-  isAzureConfigured,
-  deleteBlob,
-  getRecordingBlobPath,
-} from '@/lib/azure/blob-storage';
-import { generateRecordingSasUrl } from '@/lib/storage/recordings';
+  generateRecordingSasUrl,
+  deleteRecordingBlob,
+} from '@/lib/storage/recordings';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,9 +76,17 @@ export const DELETE = withErrorHandling(async (request, context) => {
     throw new ForbiddenError('Invalid moderator token');
   }
 
-  if (isAzureConfigured() && (event.recordingUrl || event.tempRecordingUrl)) {
-    const blobPath = getRecordingBlobPath(event.id);
-    await deleteBlob(blobPath);
+  // Delete the actual blobs from the RECORDINGS storage domain, keyed off the
+  // stored URL (the published recording and any temp upload). Best-effort: the
+  // DB scrub below must still run even if a blob delete fails, so a storage
+  // hiccup can't block GDPR erasure.
+  for (const recordingUrl of [event.recordingUrl, event.tempRecordingUrl]) {
+    if (!recordingUrl) continue;
+    try {
+      await deleteRecordingBlob(recordingUrl);
+    } catch (err) {
+      console.error('[recording DELETE] blob delete failed:', err);
+    }
   }
 
   await prisma.$transaction([

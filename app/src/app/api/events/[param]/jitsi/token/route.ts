@@ -8,6 +8,7 @@ import {
   AppError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { getSettings } from '@/lib/settings';
 import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
 import { EventModeratorRole, verifyGrantToken } from '@/lib/auth/moderator';
 import {
@@ -77,6 +78,12 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       uniqueId: moderatorJitsiId(event.id),
       isModerator: !isSpeaker,
+      // Chi sta sullo schermo è soprattutto chi modera e chi parla: se l'avatar
+      // Gravatar valesse solo per il pubblico, la funzione si vedrebbe dove
+      // conta meno. `grant.email` è null per il link primario — condiviso da
+      // tutto il team, nessuna persona dietro — e lì restano le iniziali.
+      email: grant.email ?? undefined,
+      useGravatar: (await getSettings()).gravatarEnabled,
     });
 
     return Response.json({
@@ -168,6 +175,9 @@ export const POST = withErrorHandling(async (request, context) => {
       uniqueId: participantJitsiId(registration.id),
       isModerator: false,
       email,
+      // La scelta è dell'amministratore, e la legge il chiamante: il minter del
+      // token resta puro (vedi JitsiTokenPayload.useGravatar).
+      useGravatar: (await getSettings()).gravatarEnabled,
     });
 
     return Response.json({

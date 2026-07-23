@@ -77,6 +77,35 @@ spec:
                     secretKeyRef:
                       name: {{ include "pa-webinar.secretName" . }}
                       key: CRON_API_KEY
+                {{- if .Values.recorder.hiddenDomain }}
+                {{- /* Nessun default indovinato: il nome del Secret dipende da
+                       come e' installato il subchart (fullnameOverride, jibri
+                       disattivato, existingSecretName). Sbagliarlo non fallisce
+                       il render — fallisce OGNI Job, a evento gia' iniziato. */}}
+                {{- $xmppSecret := required "recorder.xmppSecretName e' obbligatorio quando recorder.hiddenDomain e' valorizzato: e' il Secret con le credenziali del bot (di norma <release>-jitsi-meet-jibri-secret-recorder)." .Values.recorder.xmppSecretName }}
+                # Identita' del bot sul dominio NASCOSTO di Prosody. E' cosi'
+                # che il recorder sparisce da Jitsi in modo nativo: ogni client
+                # confronta il dominio del JID con `config.hiddenDomain` e, se
+                # coincide, non lo mostra e non lo conta. Senza queste, il bot
+                # entra col JWT del portale ed e' un partecipante come gli
+                # altri. Vedi docs/ARCHITECTURE.md.
+                - name: JITSI_XMPP_DOMAIN
+                  value: {{ .Values.recorder.hiddenDomain | quote }}
+                - name: JITSI_XMPP_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ $xmppSecret | quote }}
+                      {{- /* `default` inline e non solo in values.yaml: un
+                             `helm upgrade --reuse-values` NON eredita i default
+                             di una chiave nuova, e un `key` vuoto fa fallire il
+                             patch del CronJob — bloccando l'intera release. */}}
+                      key: {{ .Values.recorder.xmppSecretUserKey | default "JIBRI_RECORDER_USER" | quote }}
+                - name: JITSI_XMPP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ $xmppSecret | quote }}
+                      key: {{ .Values.recorder.xmppSecretPasswordKey | default "JIBRI_RECORDER_PASSWORD" | quote }}
+                {{- end }}
                 {{- if .Values.recorder.idleTimeoutSec }}
                 # Chiusura dopo stanza vuota (default capture.ts: 90s).
                 - name: IDLE_TIMEOUT_SEC

@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { getSettings } from '@/lib/settings';
 import {
+  absoluteEventImage,
   reminderHtml,
   reminderText,
   baseReminderCopy,
@@ -122,6 +123,7 @@ export const GET = withErrorHandling(async (request) => {
             yahoo: generateYahooCalendarUrl(calendarInput),
             icsDownload: generateIcsDownloadUrl(event.slug, baseUrl),
           },
+          eventImageUrl: absoluteEventImage(event, baseUrl),
         };
 
         const icsContent = generateEventICal({

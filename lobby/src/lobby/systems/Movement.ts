@@ -18,10 +18,11 @@ export interface MoveResult {
  * Local player input + integration + collision.
  *
  * Input comes from our own document listeners (NOT Phaser's global keyboard) so
- * the DOM UI overlays keep working: arrow keys always move (and blur a focused
- * field), WASD only moves when the user isn't typing, Space=jump and E=emote
- * fire only when no form control is focused. A `setExternalAxis` hook lets a
- * touch joystick feed the same pipeline.
+ * the DOM UI overlays keep working. One rule governs all of them: while the
+ * focus is on a control — a field, a button, a link — the keys belong to that
+ * control and the game does not touch them. Otherwise arrows and WASD move,
+ * Space jumps, E and H emote. A `setExternalAxis` hook lets a touch joystick
+ * feed the same pipeline.
  *
  * Movement is authoritative and immediate (no physics engine): we integrate
  * velocity, then push the feet-circle out of every collider, then clamp to the
@@ -109,29 +110,36 @@ export class Movement {
       k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright';
     const isWasd = k === 'w' || k === 'a' || k === 's' || k === 'd';
     const target = e.target as HTMLElement | null;
-    const typing = isInteractive(target);
+    const typing = isTextEntry(target);
+    const onControl = typing || isActivatable(target);
 
     if (k === ' ' || k === 'spacebar') {
-      if (typing) return;
+      if (onControl) return;
       e.preventDefault();
       this.cbs.onJump();
       return;
     }
     if (k === 'e') {
-      if (typing) return;
+      if (onControl) return;
       this.cbs.onEmote('wave');
       return;
     }
     if (k === 'h') {
-      if (typing) return;
+      if (onControl) return;
       this.cbs.onEmote('heart');
       return;
     }
     if (!isArrow && !isWasd) return;
-    if (typing) {
-      if (!isArrow) return; // don't steal WASD letters while typing
-      target?.blur(); // arrows take over movement
-    }
+    // Una regola sola: i tasti sono di chi ha il FUOCO.
+    //
+    // Il listener è sul document e in fase di cattura, quindi ogni eccezione
+    // vale per l'intera pagina, non solo per il gioco. Provare a strappare le
+    // frecce a un bottone a fuoco — per non «congelare» l'avatar dopo un Tab —
+    // annullava lo scorrimento da tastiera del pannello della sala d'attesa e
+    // faceva sparire il fuoco nel nulla. Il conflitto si risolve dall'altra
+    // parte: la scena è raggiungibile col Tab (`tabIndex=0`), quindi tornare a
+    // muoversi è un Tab, non un clic col mouse.
+    if (onControl) return;
     e.preventDefault();
     this.down.add(k);
   }
@@ -141,11 +149,28 @@ export class Movement {
   }
 }
 
-function isInteractive(el: HTMLElement | null): boolean {
+/**
+ * Si sta scrivendo: il tasto è del CURSORE DI TESTO, e il gioco non lo tocca.
+ *
+ * Solo campi di testo. Un bottone a fuoco non è scrittura: le frecce restano
+ * al gioco (vedi sotto).
+ */
+function isTextEntry(el: HTMLElement | null): boolean {
   if (!el) return false;
-  return (
-    /^(input|textarea|select|button)$/i.test(el.tagName) || el.isContentEditable
-  );
+  return /^(input|textarea|select)$/i.test(el.tagName) || el.isContentEditable;
+}
+
+/**
+ * Un controllo che si attiva da tastiera (bottone, link).
+ *
+ * Lo spazio e le lettere gli appartengono — rubarli renderebbe l'uscita dalla
+ * piazza impossibile da premere. Le frecce no: quelle muovono l'avatar, e nel
+ * farlo TOLGONO il fuoco al controllo, altrimenti un solo Tab congelerebbe il
+ * gioco finché non si clicca col mouse sul canvas.
+ */
+function isActivatable(el: HTMLElement | null): boolean {
+  if (!el) return false;
+  return /^(button|a)$/i.test(el.tagName) || el.getAttribute('role') === 'button';
 }
 
 function clamp(v: number, lo: number, hi: number): number {

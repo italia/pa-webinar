@@ -1,7 +1,6 @@
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
-import { jwtVerify } from 'jose';
 
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
@@ -14,21 +13,8 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
-
-async function hasJoinGrant(eventId: string): Promise<boolean> {
-  const appSecret = process.env.APP_SECRET;
-  if (!appSecret) return false;
-  const cookieStore = await cookies();
-  const cookie = cookieStore.get(`join_granted_${eventId}`)?.value;
-  if (!cookie) return false;
-  try {
-    const secret = new TextEncoder().encode(appSecret);
-    const { payload } = await jwtVerify(cookie, secret);
-    return payload.eventId === eventId;
-  } catch {
-    return false;
-  }
-}
+import { hasJoinGrant } from '@/lib/events/join-grant';
+import { resolveRnnoiseEnforceOff } from '@/lib/jitsi/rnnoise';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,6 +64,16 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // Video/audio quality: per-event override (Event.videoQuality) inherits the
   // site default (SiteSetting.videoQuality) when null. Flows down to JitsiRoom.
   const videoQuality = event.videoQuality ?? settings.videoQuality;
+
+  // F18 — rnnoise ON/OFF si decide QUI, in un Server Component, e scende come
+  // prop: la stessa lettura dentro JitsiRoom (client) verrebbe sostituita da
+  // webpack a build time e resterebbe congelata nell'immagine, rendendo il
+  // flag non modificabile da Helm. Default = forzata OFF: si accende con
+  // NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE="false" nell'env del pod, e solo con il
+  // jitsi/web patchato a 48 kHz (vedi lib/jitsi/rnnoise.ts).
+  const rnnoiseEnforceOff = resolveRnnoiseEnforceOff(
+    getPublicEnv('NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE'),
+  );
 
   // Informativa AI per la sala d'attesa (AI Act / GDPR trasparenza): la
   // mostriamo quando il master switch è attivo E l'evento ha almeno una
@@ -174,6 +170,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
           watermark={watermark}
           jibriAvailable={jibriAvailable}
+          reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
+          rnnoiseEnforceOff={rnnoiseEnforceOff}
         />
       );
     } else if (isInstant) {
@@ -303,6 +301,8 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
       watermark={watermark}
       jibriAvailable={jibriAvailable}
+      reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
+      rnnoiseEnforceOff={rnnoiseEnforceOff}
     />
   );
 }

@@ -29,17 +29,10 @@ const PhaserLobby = dynamic(() => import('@/components/live/garden/phaser-lobby'
   ssr: false,
 });
 
-// SVG garden engine (default, but classic is the default *view* on mobile and
+// (Il giardino SVG minimale che stava nel riquadro laterale è stato rimosso:
 // for ended/multitrack events). Loaded client-only so the garden JS only ships
 // once the game box is actually rendered with `engine === 'svg'`, not on every
 // waiting-room load.
-const GardenScene = dynamic(() => import('@/components/live/garden-scene'), {
-  ssr: false,
-});
-const GardenInteractive = dynamic(
-  () => import('@/components/live/garden/garden-interactive'),
-  { ssr: false },
-);
 
 /**
  * Error boundary around the Phaser lobby. Phaser is a lazy chunk (~1MB) loaded
@@ -164,6 +157,13 @@ interface WaitingRoomProps {
    *  dato che il gate protegge. Evita il doppio consenso e riabilita il
    *  minigioco. */
   multitrackConsentExempt?: boolean;
+  /** Token dell'utente (moderatore/iscritto) da usare per leggere e scrivere in
+   *  chat durante l'attesa. Vuoto per un ospite senza credenziali. */
+  chatToken?: string;
+  /** Serve a sapere se la chat è leggibile prima del LIVE: le call INSTANT sono
+   *  aperte per link e ammettono ospiti già durante il warm-up, un evento
+   *  schedulato no (vedi lib/chat/read-access). */
+  eventType?: 'SCHEDULED' | 'INSTANT';
 }
 
 const PARTICIPANT_NAME_KEY = 'pawebinar.participant.name';
@@ -187,6 +187,8 @@ export default function WaitingRoom({
   warmup = null,
   exitHref,
   multitrackConsentExempt = false,
+  chatToken = '',
+  eventType = 'SCHEDULED',
 }: WaitingRoomProps) {
   const t = useTranslations('waiting');
   const tc = useTranslations('common');
@@ -203,14 +205,11 @@ export default function WaitingRoom({
   const [startingSoon, setStartingSoon] = useState(false);
   const [name, setName] = useState(defaultName);
   const [email, setEmail] = useState('');
-  // Waiting-room engine state. Resolved post-mount (see the resolution effect
-  // below) from the configured default (admin: site + per-event) + `?engine=`
-  // override + the classic preference. Kept on the SSR-safe default 'svg' (the
-  // Phaser lobby is client-only, ssr:false) so there's no hydration mismatch.
-  const [engine, setEngine] = useState<'svg' | 'phaser'>('svg');
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
   const [classicView, setClassicView] = useState(false);
+  // La piazza/giardino si apre su richiesta: vedi il commento su gameInvite.
+  const [gameOpen, setGameOpen] = useState(false);
   const [devicePrefs, setDevicePrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: true,
     micOn: true,
@@ -258,8 +257,8 @@ export default function WaitingRoom({
   //   3. the configured default — per-event override merged with the site
   //      default, arriving resolved on `event.waitingRoomEngine`
   //   4. GARDEN
-  // GARDEN/GAME drive `engine` (svg vs phaser); CLASSIC drives `classicView`
-  // (the static-card branch wins before either engine renders).
+  // Ora c'è un solo gioco: GARDEN e GAME sono equivalenti ("piazza disponibile"),
+  // CLASSIC la disattiva del tutto.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -277,7 +276,9 @@ export default function WaitingRoom({
           false,
         classicPref: window.localStorage.getItem(ARCADE_CLASSIC_KEY) === '1',
       });
-      setEngine(mode === 'GAME' ? 'phaser' : 'svg');
+      // Con un solo gameplay, GARDEN e GAME significano entrambi "la piazza è
+      // disponibile"; CLASSIC resta l'uscita di sicurezza per telefoni e per chi
+      // ha scelto la versione accessibile.
       setClassicView(mode === 'CLASSIC');
     } catch {
       /* ignore */
@@ -301,7 +302,14 @@ export default function WaitingRoom({
   // La chat è app-side e NON dipende dal bridge: mentre la sala si scalda
   // (IDLE/PROVISIONING) chi aspetta può già chiacchierare — è la differenza
   // tra un'attesa cieca e una sala d'attesa vera.
-  const showChatPreview = (isLive || isWarmingUp) && (event.chatEnabled ?? true);
+  // La chat è leggibile prima del LIVE solo da chi ha un token (moderatore o
+  // iscritto) oppure, senza token, nelle call INSTANT — le stesse condizioni
+  // che il server applica in lettura E in scrittura (lib/chat/read-access).
+  // Mostrarla anche agli altri significherebbe un riquadro vuoto e permanente:
+  // né i messaggi né l'invio funzionerebbero.
+  const canReadChatNow = isLive || !!chatToken || eventType === 'INSTANT';
+  const showChatPreview =
+    (isLive || isWarmingUp) && (event.chatEnabled ?? true) && canReadChatNow;
   // Only LIVE events admit participants into the room. Moderators in
   // PUBLISHED past startsAt get a separate "Avvia evento" action that
   // flips the status to LIVE; once that happens this flag re-opens.
@@ -446,6 +454,13 @@ export default function WaitingRoom({
   // conference.join as "not joined" and resets, so the avatar is never left
   // phantom-seated when the host never actually entered. The standard "Entra
   // ora" button stays available for anyone who doesn't want to play.
+  //
+  // The `(name, prefs)` the lobby passes are deliberately IGNORED, and that is
+  // only safe because the lobby runs with `hostOwnsEntry`: its own name field
+  // and device panel are suppressed, so those arguments are the profile we
+  // pushed in and a pair of placeholder muted flags. Drop that prop and the
+  // game grows a second set of controls whose answers land nowhere — a
+  // participant who muted camera and mic in there would join with both live.
   const handleGameEnter = useCallback(() => {
     if (canEnter) {
       handleEnterLive();
@@ -463,6 +478,46 @@ export default function WaitingRoom({
     (s: WaitingRoomJoinPrefs) => setDevicePrefs(s),
     [],
   );
+
+  // Tastiera nella piazza: entrarci porta il focus sull'uscita, uscirne lo
+  // riporta all'invito.
+  const gameDialogRef = useRef<HTMLDivElement>(null);
+  const inviteRef = useRef<HTMLButtonElement>(null);
+  const classicToggleRef = useRef<HTMLButtonElement>(null);
+  const returnFocusRef = useRef(false);
+  useEffect(() => {
+    if (!gameOpen) {
+      if (returnFocusRef.current) {
+        returnFocusRef.current = false;
+        // L'invito, se c'è ancora; passando alla versione classica sparisce, e
+        // allora il posto giusto è il pulsante che riporta indietro.
+        (inviteRef.current ?? classicToggleRef.current)?.focus();
+      }
+      return;
+    }
+    // Sulla SCENA, non sul pulsante di uscita: il gioco cede i tasti a
+    // qualunque controllo a fuoco, quindi partire dal pulsante lasciava
+    // l'avatar immobile finché non si cliccava sul canvas. Da qui il Tab
+    // raggiunge uscita, versione classica e tutti i controlli della pagina.
+    gameDialogRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      // Non mentre si scrive: Esc in un campo di testo (o in chat) significa
+      // "annulla quello che sto scrivendo", non "chiudi la piazza". Il pannello
+      // dei controlli è pieno di campi, e sono gli stessi della pagina.
+      const el = e.target as HTMLElement | null;
+      if (
+        el &&
+        (/^(input|textarea|select)$/i.test(el.tagName) || el.isContentEditable)
+      ) {
+        return;
+      }
+      closePiazza();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameOpen]);
 
   // ── Catch-up recording player ─────────────────────────────────────
   if (watchingCatchUp && event.tempRecordingUrl) {
@@ -527,6 +582,23 @@ export default function WaitingRoom({
     year: 'numeric',
     timeZone: event.timezone,
   });
+
+  // Chiudere la piazza rimette a fuoco l'invito da cui si è entrati: senza,
+  // il focus resta su un pulsante che non esiste più e chi naviga da tastiera
+  // riparte dall'inizio del documento.
+  const closePiazza = () => {
+    setGameOpen(false);
+    returnFocusRef.current = true;
+  };
+
+  // "Versione classica": chiude la piazza E ricorda la scelta. `classicView`
+  // spegne `canPlay`, quindi l'invito non si ripresenta — né ora né al
+  // prossimo evento.
+  const goClassic = () => {
+    setGameOpen(false);
+    toggleClassic(true);
+    returnFocusRef.current = true;
+  };
 
   // ── Toggle between the full-screen park and the static classic card ──
   const toggleClassic = (on: boolean) => {
@@ -678,7 +750,12 @@ export default function WaitingRoom({
       </div>
       {nameValid ? (
         <div style={{ height: 220, display: 'flex', flexDirection: 'column' }}>
-          <ChatPanel eventSlug={event.slug} token="" displayName={trimmedName} isGuest />
+          <ChatPanel
+            eventSlug={event.slug}
+            token={chatToken}
+            displayName={trimmedName}
+            isGuest={!chatToken}
+          />
         </div>
       ) : (
         <div
@@ -873,65 +950,132 @@ export default function WaitingRoom({
   // the fulcro. The game box is hidden for ENDED, when multitrack consent is
   // required (hard-gate), and in the accessibility "classic" view (the default
   // on touch devices — see the engine-resolution effect above).
-  const showGameBox = !isEnded && !classicView && !multitrackRequired;
-  const gameStageBox =
-    engine === 'phaser' ? (
-      // GAME engine: the Phaser lobby, embedded in the box. Walking the avatar
-      // into the OPEN gate (LIVE) is a real, interactive entry path — it routes
-      // through the shell's VALIDATED handleEnterLive (name/consent + device
-      // prefs), exactly like the standard "Entra ora" button, which stays
-      // available alongside it (legacy/a11y/non-players never need the game).
-      // If a chunk-load fails, the boundary degrades to the accessible classic
-      // card instead of a blank box.
-      <PhaserLobbyBoundary onError={() => toggleClassic(true)}>
-        <div className="wr-stage">
-          <PhaserLobby
-            embed
-            eventSlug={event.slug}
-            displayName={trimmedName}
-            status={event.status}
-            startsAtMs={startsAtMs}
-            isHost={isModerator}
-            onEnterLive={handleGameEnter}
-            onExitClassic={() => toggleClassic(true)}
-          />
-        </div>
-      </PhaserLobbyBoundary>
-    ) : (
-      // GARDEN engine (default): the SVG walkable garden. Wrapped in
-      // `.arcade-stage` (absolute inset:0) so GardenInteractive's
-      // ResizeObserver fits the avatar to THIS box, not the viewport.
-      <div className="wr-stage" role="group" aria-label={t('whileYouWait')}>
-        <div className="arcade-stage">
-          <GardenScene />
-          <GardenInteractive eventSlug={event.slug} displayName={trimmedName} />
+  // C1 — la sala d'attesa è una PAGINA (evento, controlli, contatti), e il
+  // gioco è un posto in cui si sceglie di entrare.
+  //
+  // Prima c'erano due giochi: un giardino SVG minimale incastrato nel riquadro
+  // laterale e, opzionalmente, la lobby Phaser — anch'essa in quel riquadro. Il
+  // primo è stato rimosso (era troppo piccolo per essere un gioco e troppo
+  // ingombrante per essere un ornamento) e la seconda ha smesso di stare in una
+  // scatola: si apre a piena pagina, con dentro tutto il necessario — nome,
+  // controlli, ingresso in call — e un'uscita che riporta qui.
+  const canPlay = !isEnded && !classicView && !multitrackRequired;
+
+  // La piazza non è una pagina DIVERSA: è QUESTA pagina, ri-disposta accanto
+  // alla scena. Il primo tentativo duplicava i controlli in un pannello
+  // dedicato, e ogni cosa lasciata fuori dalla copia diventava un difetto —
+  // l'email mancante bloccava in silenzio un ospite, l'informativa su
+  // registrazione e AI spariva proprio dalla schermata in cui si preme "Entra".
+  // Tenendo un albero solo, quel genere di dimenticanza non è più possibile:
+  // quello che c'è nella sala d'attesa c'è anche nella piazza, per costruzione.
+  //
+  // Ed è anche il motivo per cui l'anteprima della fotocamera non si spegne e
+  // la bozza in chat non si perde entrando e uscendo: React non smonta nulla,
+  // cambia solo il vestito.
+  const piazzaOpen = canPlay && gameOpen;
+
+  // `hostOwnsEntry` spegne la chrome interna della lobby (onboarding, top bar,
+  // pannello dispositivi). Senza, il gioco ne mostra una propria: in italiano
+  // fisso — su 24 lingue —, con un nome che non torna mai nello stato React
+  // (quindi l'ingresso si blocca in silenzio) e un ingresso che scavalca il
+  // gate LIVE, facendo entrare un moderatore in una sala mai avviata.
+  const piazzaStage = piazzaOpen ? (
+    <PhaserLobbyBoundary onError={goClassic}>
+      {/* La scena è raggiungibile col Tab, non solo col mouse: il gioco cede i
+          tasti a qualunque controllo a fuoco, quindi dopo un Tab verso i
+          pulsanti ci si deve poter tornare da tastiera. */}
+      <div
+        className="wr-piazza-stage"
+        ref={gameDialogRef}
+        tabIndex={0}
+        role="application"
+        aria-label={t('gardenGateHint')}
+      >
+        <PhaserLobby
+          hostOwnsEntry
+          eventSlug={event.slug}
+          displayName={trimmedName}
+          status={event.status}
+          startsAtMs={startsAtMs}
+          isHost={isModerator}
+          onEnterLive={handleGameEnter}
+          onExitClassic={goClassic}
+        />
+        <div className="wr-piazza-stage__bar">
+          <button
+            type="button"
+            className="wr-piazza-btn wr-piazza-btn--exit"
+            onClick={closePiazza}
+          >
+            <Icon icon="it-arrow-left" size="xs" className="me-1" />
+            {t('backToWaitingRoom')}
+          </button>
+          {/* L'uscita di sicurezza per chi non regge l'animazione. Stava nella
+              top bar del gioco, che `hostOwnsEntry` spegne: senza questo
+              pulsante non resterebbe alcun modo di scegliere la versione
+              accessibile — e la scelta va RICORDATA, non solo applicata. */}
+          <button type="button" className="wr-piazza-btn" onClick={goClassic}>
+            {t('classicVersion')}
+          </button>
+          {isLive && (
+            <p className="wr-piazza-hint mb-0">{t('gardenGateHint')}</p>
+          )}
         </div>
       </div>
-    );
-  const asideBox = showGameBox || chatPreviewBlock ? (
+    </PhaserLobbyBoundary>
+  ) : null;
+
+  // Il riquadro laterale ora ospita solo la chat: aspettare insieme agli altri
+  // non era la parte che stava in mezzo.
+  const asideBox = chatPreviewBlock ? (
     <Card className="wr-aside shadow-sm border-0">
       <div className="wr-aside__head">
         <span className="fw-semibold">{t('whileYouWait')}</span>
-        {showGameBox && (
-          <button
-            type="button"
-            className="wr-aside__toggle"
-            onClick={() => toggleClassic(true)}
-          >
-            <Icon icon="it-list" size="xs" className="me-1" />
-            {t('classicView')}
-          </button>
-        )}
       </div>
-      <div className="wr-aside__body">
-        {showGameBox && gameStageBox}
-        {chatPreviewBlock}
-      </div>
+      <div className="wr-aside__body">{chatPreviewBlock}</div>
     </Card>
   ) : null;
 
+  // L'invito al gioco: un riquadro nella colonna principale, sotto i controlli.
+  // È il "pulsante o infografica" chiesto — un gesto esplicito, non una scena
+  // che parte addosso a chi è arrivato per prepararsi.
+  const gameInvite = canPlay && !gameOpen ? (
+    <button
+      type="button"
+      className="wr-game-invite"
+      ref={inviteRef}
+      onClick={() => setGameOpen(true)}
+    >
+      <span className="wr-game-invite__art" aria-hidden="true">🌿</span>
+      <span>
+        <span className="wr-game-invite__title">{t('enterGardenTitle')}</span>
+        <span className="wr-game-invite__hint">{t('enterGardenHint')}</span>
+      </span>
+    </button>
+  ) : null;
+
   return (
-    <div className="waiting-shell">
+    <div
+      className={piazzaOpen ? 'waiting-shell waiting-shell--piazza' : 'waiting-shell'}
+      // Una REGIONE con un nome, non un dialogo.
+      //
+      // `dialog` (con o senza `aria-modal`) promette che ciò che sta sotto è
+      // fuori gioco. Qui non lo è: il guscio copre la finestra, ma
+      // l'intestazione e il piè di pagina del sito restano raggiungibili col
+      // Tab, e stanno FUORI da questo componente — da qui non si possono
+      // rendere inerti. Una trappola del fuoco l'avrebbe reso vero; la mia
+      // sbagliava in tre modi, e una trappola rotta intrappola davvero. Meglio
+      // annunciare quello che questa cosa è: una parte di pagina, con un nome.
+      // Esc la chiude comunque.
+      {...(piazzaOpen
+        ? { role: 'region' as const, 'aria-label': t('gardenDialogLabel') }
+        : {})}
+    >
+      {/* Fratello, non sostituto: `{false}` occupa comunque la sua posizione
+          fra i figli, quindi il container qui sotto resta lo STESSO nodo React
+          aprendo e chiudendo la piazza — niente smontaggi, niente fotocamera
+          riacquisita, niente bozze perse. */}
+      {piazzaStage}
       <div className="container py-4 py-md-5">
         <div className="row g-4 justify-content-center">
           <div className={asideBox ? 'col-lg-7 col-xl-6' : 'col-lg-8 col-xl-7'}>
@@ -1082,13 +1226,21 @@ export default function WaitingRoom({
                     touch default). Only when the game is actually available. */}
                 {!isEnded && !multitrackRequired && classicView && (
                   <div className="text-center mb-3">
-                    <Button color="primary" outline size="sm" className="fw-semibold" onClick={() => toggleClassic(false)}>
+                    <Button
+                      color="primary"
+                      outline
+                      size="sm"
+                      className="fw-semibold"
+                      innerRef={classicToggleRef}
+                      onClick={() => toggleClassic(false)}
+                    >
                       <Icon icon="it-arrow-left" size="xs" className="me-1" />
                       {t('backToGarden')}
                     </Button>
                   </div>
                 )}
 
+                {gameInvite && <div className="mb-3">{gameInvite}</div>}
                 <div className="mb-3">{netiquetteBlock}</div>
                 {recordingNoticeBlock && <div className="mb-3">{recordingNoticeBlock}</div>}
                 {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}

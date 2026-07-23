@@ -95,6 +95,45 @@ nell'operator né nello spec del Job/container.
 | `PORTAL_URL` | ✅ | — | Base URL interna del portale (claim, upload-url, ingest). |
 | `CRON_API_KEY` | ✅ | — | Header `x-api-key` verso il portale. |
 | `OUTPUT_DIR` | — | `/recordings` | Dir locale per le tracce prima dell'upload. |
+| `JITSI_XMPP_USER` | — | — | Utente del bot sul dominio nascosto (o JID completo). Vedi sotto. |
+| `JITSI_XMPP_DOMAIN` | — | — | Dominio nascosto di Prosody, es. `hidden.meet.jitsi`. |
+| `JITSI_XMPP_PASSWORD` | — | — | Password del bot. |
+
+### Perché il bot è invisibile (e come si rompe)
+
+L'invisibilità non è un trucco lato interfaccia: è il meccanismo nativo di
+Jitsi per i bot, lo stesso che usa Jibri.
+
+Prosody ha un VirtualHost «nascosto» (`hidden.meet.jitsi` nell'immagine
+standard). Ogni client jitsi-meet confronta il **dominio del JID reale** che
+vede in presenza con `config.hiddenDomain`: se coincide, `lib-jitsi-meet`
+marca il partecipante come *hidden* e l'applicazione lo scarta **a monte** —
+non entra nello store, quindi niente riquadro, niente riga nell'elenco, niente
+notifica di ingresso, e `membersCount` non lo conta. Nemmeno le statistiche di
+chi parla lo vedono.
+
+Con le tre variabili sopra il recorder si autentica lì (login SASL) invece che
+col JWT del portale. **Senza**, entra col JWT sul dominio principale ed è un
+partecipante come tutti gli altri: nasconderlo tocca poi a ogni client, ed è
+esattamente il tipo di rattoppo che si rompe al primo aggiornamento di Jitsi.
+
+Due condizioni sul lato Prosody, entrambe già previste dall'immagine standard:
+
+1. l'account esiste (`ENABLE_RECORDING` lo crea, con `JIBRI_RECORDER_USER` /
+   `JIBRI_RECORDER_PASSWORD`);
+2. con l'autenticazione a token, il componente MUC deve avere una deroga per
+   quell'account — altrimenti chi non presenta un token viene rifiutato:
+
+   ```
+   XMPP_MUC_CONFIGURATION: 'token_verification_allowlist = { "recorder@hidden.meet.jitsi" }'
+   ```
+
+   È la deroga che `mod_token_verification` prevede apposta («allowlist for
+   participants, jigasi (sip & transcriber), jibri (recorder & sip)»). Va
+   tenuta sul **singolo account**, non sull'intero dominio: chi ha quella
+   password entra in qualunque stanza senza token.
+
+Nel chart: `recorder.hiddenDomain` + `recorder.xmppSecretName`.
 
 ## Layout storage e manifest
 

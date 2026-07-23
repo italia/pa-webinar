@@ -91,6 +91,8 @@ export default async function RegistrationPage({
             recordingEnabled={event.recordingEnabled}
             multitrackRecordingEnabled={event.multitrackRecordingEnabled}
             hasPreRegistrationQuestionnaire={!!preRegistrationQuestionnaire}
+            startsAt={event.startsAt.toISOString()}
+            waitingRoomLeadMinutes={settings.waitingRoomLeadMinutes}
             profiling={{
               requireOrganization: event.requireOrganization,
               requireOrganizationRole: event.requireOrganizationRole,

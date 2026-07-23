@@ -96,7 +96,11 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Descărcați fișierul .ics"
-      }
+      },
+      "alreadyRegisteredEnter": "V-ați înscris deja? Intrați în sală",
+      "invalidTokenTitle": "Linkul de acces nu mai este valid",
+      "invalidTokenBody": "Linkul pe care l-ați folosit nu este valid sau a expirat. Dacă v-ați înscris, căutați linkul personal în e-mailul de confirmare sau înscrieți-vă din nou mai jos.",
+      "invalidTokenBodyEnded": "Linkul pe care l-ați folosit nu mai este valid. Evenimentul s-a încheiat: mai jos găsiți înregistrarea și materialele."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -116,6 +120,20 @@
     "list": {
       "filterByTag": "Filtrare după categorie",
       "allTags": "Toate"
+    },
+    "wordCloudTitle": "Nor de cuvinte",
+    "recap": {
+      "title": "Recapitularea evenimentului",
+      "intro": "Un rezumat al celor discutate în timpul evenimentului.",
+      "participants": "Participanți (vârf)",
+      "registered": "Înscriși",
+      "topQuestions": "Întrebări cu cele mai multe voturi",
+      "upvotes": "{count, plural, =0 {niciun vot} one {1 vot} few {# voturi} other {# de voturi}}",
+      "polls": "Rezultatele sondajelor",
+      "votes": "{count, plural, =0 {niciun vot} one {1 vot} few {# voturi} other {# de voturi}}",
+      "topWords": "Cele mai frecvente cuvinte",
+      "feedback": "Evaluare medie",
+      "feedbackCount": "{count, plural, one {1 răspuns} few {# răspunsuri} other {# de răspunsuri}}"
     }
   },
   "registration": {
@@ -164,8 +182,11 @@
       "consentRequired": "Consimțământul pentru prelucrarea datelor este obligatoriu",
       "recordingConsentRequired": "Consimțământul pentru înregistrare este obligatoriu pentru acest eveniment",
       "eventFull": "Evenimentul a atins numărul maxim de participanți",
-      "generic": "Eroare la înregistrare. Vă rugăm să reîncercați."
-    }
+      "generic": "Eroare la înregistrare. Vă rugăm să reîncercați.",
+      "multitrackConsentRequired": "Consimțământul pentru înregistrarea pistei dumneavoastră audio este obligatoriu pentru acest eveniment"
+    },
+    "successScheduledMessage": "V-ați înscris! V-am trimis un e-mail cu linkul personal de acces. Adăugați evenimentul în calendar și reveniți aici cu puțin timp înainte de început.",
+    "addToCalendar": "Adaugă în calendar"
   },
   "videoLibrary": {
     "title": "Bibliotecă video",
@@ -252,7 +273,33 @@
       "noMessages": "Niciun mesaj încă",
       "empty": "Niciun mesaj încă. Scrieți primul!",
       "inputLabel": "Mesaj chat",
-      "moderatorBadge": "Moderator"
+      "moderatorBadge": "Moderator",
+      "attach": "Atașează un fișier",
+      "emojiPicker": "Inserează emoji",
+      "attachBadType": "Tip de fișier neacceptat (imagini sau PDF).",
+      "attachTooLarge": "Fișier prea mare (max. 10 MB).",
+      "attachFailed": "Încărcarea nu a reușit. Încercați din nou.",
+      "sendFailed": "Mesajul nu a fost trimis. Încercați din nou.",
+      "removeAttachment": "Elimină atașamentul",
+      "openAttachment": "Deschide atașamentul",
+      "reply": "Răspunde",
+      "replyingTo": "Ca răspuns la {name}",
+      "cancelReply": "Anulează răspunsul",
+      "hide": "Ascunde",
+      "hideFailed": "Mesajul nu a putut fi ascuns. Încercați din nou.",
+      "connReconnecting": "Reconectare…",
+      "connDegraded": "Actualizări întârziate",
+      "readDenied": "Chatul nu este disponibil: nu vă aflați printre participanții acestui eveniment sau sala nu este încă deschisă. Se reîncearcă automat.",
+      "mentionNotificationTitle": "{name} v-a menționat în chat",
+      "react": "Reacționează",
+      "edited": "modificat",
+      "editLabel": "Modifică mesajul",
+      "editSave": "Salvează",
+      "editFailed": "Mesajul nu a putut fi modificat.",
+      "exportChat": "Descarcă chatul",
+      "reactNotAllowed": "Pentru a reacționa la mesaje aveți nevoie de linkul personal sau de cel de moderator.",
+      "editNotAllowed": "Acest link este partajat: nu permite modificarea mesajelor.",
+      "editExpired": "Au trecut mai mult de 15 minute: mesajul nu mai poate fi modificat."
     },
     "role": {
       "moderator": "Moderator",
@@ -271,7 +318,9 @@
         "medium": "Medie",
         "poor": "Slabă",
         "unknown": "N/A"
-      }
+      },
+      "volume": "Volum",
+      "volumeFor": "Volumul pentru {name}"
     },
     "moderator": {
       "muteAll": "Dezactivați sunetul tuturor",
@@ -295,14 +344,17 @@
       "micDisabled": "Microfon dezactivat",
       "videoModeration": "Video participanți",
       "videoDisabled": "Video dezactivat",
-      "eventEndedSuccess": "Evenimentul s-a încheiat cu succes. Redirecționare..."
+      "eventEndedSuccess": "Evenimentul s-a încheiat cu succes. Redirecționare...",
+      "whiteboard": "Tablă",
+      "lowerHand": "Coboară mâna"
     },
     "closeDrawer": "Închideți",
     "hintBanner": {
       "controls": "Comenzile sunt în partea de jos",
       "raiseHand": "Ridicați mâna pentru a vorbi",
       "sidebar": "Q&A și chat în bara laterală",
-      "dismiss": "Am înțeles"
+      "dismiss": "Am înțeles",
+      "ariaLabel": "Sfaturi"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# persoană} other {# persoane}}"
@@ -310,7 +362,55 @@
     "sidebarTabChatUnread": "Mesaje noi necitite",
     "floatingControlsLabel": "Comenzi eveniment",
     "screenshareActive": "🖥️ {name} partajează ecranul",
-    "screenshareFallbackName": "Un participant"
+    "screenshareFallbackName": "Un participant",
+    "share": {
+      "button": "Partajează",
+      "title": "Partajați evenimentul",
+      "callLink": "Link de participare",
+      "callLinkHint": "Cine deschide acest link intră direct cât timp evenimentul este în direct; altfel trece prin înscriere. Nu conține token-uri private.",
+      "eventLink": "Pagina evenimentului",
+      "eventLinkHint": "Pagina publică cu detaliile și formularul de înscriere.",
+      "copy": "Copiază",
+      "copied": "Copiat!",
+      "moderatorReveal": "Arată linkul de moderator",
+      "moderatorWarning": "Acest link acordă acces de MODERATOR (oprirea microfoanelor tuturor, pornirea înregistrării, încheierea evenimentului). Partajați-l doar cu alți moderatori.",
+      "moderatorLink": "Link de moderator",
+      "moderatorLinkHint": "Cine deschide acest link intră ca moderator, cu control deplin asupra sălii."
+    },
+    "enterFullscreen": "Ecran complet",
+    "exitFullscreen": "Ieși din ecran complet",
+    "leaveChoice": {
+      "title": "Cum doriți să ieșiți?",
+      "body": "Puteți ieși doar dumneavoastră — apelul rămâne activ pentru ceilalți — sau îl puteți încheia pentru toți participanții.",
+      "leaveSelf": "Părăsește apelul",
+      "endForAll": "Încheie pentru toți",
+      "ending": "Se încheie…",
+      "endError": "Apelul nu a putut fi încheiat. Încercați din nou."
+    },
+    "endDestino": {
+      "title": "Soarta evenimentului",
+      "body": "Sunteți pe cale să încheiați evenimentul pentru toți. Ce doriți să se întâmple cu el după încheiere?",
+      "public": "Păstrează-l public",
+      "publicHelp": "Pagina evenimentului încheiat rămâne vizibilă, cu recapitulare, întrebări, sondaje, materiale și feedback.",
+      "library": "Publică în bibliotecă",
+      "libraryHelp": "Ca mai sus și, în plus, afișează evenimentul în biblioteca video publică (necesită o înregistrare publicată sau un videoclip YouTube).",
+      "archive": "Arhivează (privat)",
+      "archiveHelp": "Pagina evenimentului încheiat nu va fi publică (404). Datele se păstrează până la expirarea perioadei de păstrare, apoi sunt șterse.",
+      "genAi": "Generează transcrierea și rezumatul AI din înregistrare (la finalul procesării)",
+      "back": "Înapoi",
+      "confirm": "Încheie evenimentul"
+    },
+    "liveFeaturesLabel": "Funcții:",
+    "whiteboardNotSavedHint": "Tabla nu se salvează automat. Dacă o folosiți, exportați-o (meniul tablei) și atașați-o la Materialele evenimentului înainte de încheiere.",
+    "sidebarTabWordcloud": "Nor de cuvinte",
+    "sidebarTabAgenda": "Notițe / Listă de verificare",
+    "liveToggleAgenda": "Notițe / Listă de verificare (agendă)",
+    "timer": {
+      "show": "Afișează cronometrul",
+      "hide": "Ascunde cronometrul",
+      "remainingLabel": "Timp rămas (faceți clic pentru timpul scurs)",
+      "elapsedLabel": "Timp scurs (faceți clic pentru timpul rămas)"
+    }
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",
@@ -407,12 +507,31 @@
         "maxParticipantsHelp": "Estimați numărul maxim de participanți. Determină capacitatea serverului video și interfața sălii de așteptare.",
         "validation": {
           "startsAt": "Dată de început nevalidă.",
-          "endsAt": "Data de încheiere trebuie să fie ulterioară datei de început."
+          "endsAt": "Data de încheiere trebuie să fie ulterioară datei de început.",
+          "titleRequired": "Titlul este obligatoriu (cel puțin 3 caractere).",
+          "titleRequiredOtherLocale": "Titlul în limba implicită ({locale}) este obligatoriu: treceți la fila {locale}.",
+          "maxParticipants": "Introduceți un număr între 2 și 500."
         },
         "senderRatioLabel": "Procent activ estimat",
         "senderRatioHelp": "Câți participanți se așteaptă să aibă microfonul/camera activă. Ajută la dimensionarea serverului video.",
         "activeParticipantsEstimate": "≈ {count} participanți activi",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "advancedOptions": "Opțiuni avansate",
+        "waitingRoomEngineLabel": "Sala de așteptare (acest eveniment)",
+        "waitingRoomEngineSiteDefault": "Implicită a site-ului",
+        "waitingRoomEngineGarden": "Grădină (standard)",
+        "waitingRoomEngineGame": "Joc video (lobby Phaser)",
+        "waitingRoomEngineClassic": "Clasică (statică)",
+        "waitingRoomEngineHelp": "Suprascrie setarea implicită a site-ului pentru acest eveniment.",
+        "videoQuality": "Calitate video/audio (acest eveniment)",
+        "videoQualityHelp": "Suprascrie setarea implicită a site-ului pentru acest eveniment. O calitate mai ridicată consumă mai multă bandă.",
+        "videoQualitySiteDefault": "Implicită a site-ului",
+        "videoQualityOptions": {
+          "MAX": "Maximă (1080p, fidelitate ridicată)",
+          "HIGH": "Înaltă (720p, recomandată)",
+          "BALANCED": "Echilibrată (540p)",
+          "SAVE_DATA": "Economie de date (360p)"
+        }
       },
       "step2": {
         "heading": "Cine ce poate face",
@@ -449,7 +568,8 @@
             "desc": "Pornirea/oprirea înregistrării."
           }
         },
-        "recordingHeading": "Înregistrare"
+        "recordingHeading": "Înregistrare",
+        "roomFeaturesHeading": "Funcțiile sălii"
       },
       "step3": {
         "heading": "Persoane și invitații",
@@ -484,7 +604,8 @@
         "invalidEmail": "Adresă de e-mail nevalidă.",
         "duplicateEmail": "Adresă deja existentă.",
         "rubricaPick": "Căutați în agendă…",
-        "rubricaOrAdd": "sau adăugați manual"
+        "rubricaOrAdd": "sau adăugați manual",
+        "organizerLogo": "Logoul organizatorului"
       },
       "step4": {
         "heading": "Conținut și materiale",
@@ -544,7 +665,9 @@
           "recording": "Înregistrare",
           "recordingAuto": "Activă — pornire automată",
           "recordingManual": "Activă — pornire manuală",
-          "recordingOff": "Inactivă"
+          "recordingOff": "Inactivă",
+          "multitrack": "Înregistrare pe participant",
+          "multitrackOn": "Activată — necesită consimțământ explicit la înscriere"
         },
         "noRecurrence": "Eveniment unic",
         "gdprHeading": "Confidențialitate și păstrarea datelor",
@@ -560,9 +683,24 @@
         "featuresHeading": "Configurație sintetică",
         "privacyDoc": "Document notă de informare (PDF sau link)",
         "privacyDocHelp": "Încărcați un PDF sau lipiți URL-ul unei note de informare alternative. Suprascrie șablonul RGPD dacă este setat.",
-        "privacyTextHelp": "Text sintetic afișat în formularul de înregistrare; poate completa sau înlocui șablonul RGPD."
+        "privacyTextHelp": "Text sintetic afișat în formularul de înregistrare; poate completa sau înlocui șablonul RGPD.",
+        "moderatorPublishHint": "Numele și adresa de e-mail sunt obligatorii pentru publicarea evenimentului (sunt folosite pentru linkul de moderator și e-mailul de confirmare). Pentru salvarea ca ciornă nu sunt necesare.",
+        "moderatorLinkNote": "Această persoană este moderatorul principal al evenimentului: primește prin e-mail un link privat pentru a-l gestiona (pornirea înregistrării, moderarea întrebărilor, lansarea sondajelor…). Este diferit de co-moderatorii adăugați la pasul „Persoane”, care primesc fiecare propriul link.",
+        "moderatorRequired": "Introduceți numele moderatorului",
+        "moderatorEmailRequired": "Introduceți o adresă de e-mail validă a moderatorului"
       },
-      "validationFailed": "Verificați câmpurile evidențiate înainte de a continua."
+      "validationFailed": "Verificați câmpurile evidențiate înainte de a continua.",
+      "partialFailure": "Evenimentul a fost creat, dar unele elemente nu au fost salvate: {items}. Le puteți adăuga din pagina evenimentului.",
+      "draftFound": "Am găsit o ciornă nesalvată a acestui eveniment. Doriți să o restaurați?",
+      "draftRestore": "Restaurează ciorna",
+      "draftDiscard": "Renunță",
+      "resources": {
+        "organizers": "organizatori",
+        "invitations": "invitații",
+        "moderators": "moderatori",
+        "speakers": "vorbitori",
+        "materials": "materiale"
+      }
     },
     "nav": {
       "events": "Gestionare evenimente",
@@ -603,7 +741,8 @@
       "eventQuestionnaires": "Chestionare",
       "rubricaList": "Listă",
       "rubricaDetail": "Detaliu",
-      "feedbackDashboard": "Feedback"
+      "feedbackDashboard": "Feedback",
+      "recordingsPostprod": "Transcrieri / AI"
     },
     "landing": {
       "title": "Panou de administrare",
@@ -701,7 +840,8 @@
           "dateRequired": "Data originală este obligatorie.",
           "saveFailed": "Salvarea metadatelor a eșuat."
         }
-      }
+      },
+      "updateFailed": "Actualizarea nu a reușit."
     },
     "recordingsLibrary": {
       "title": "Înregistrări video",
@@ -770,7 +910,10 @@
       "detailEnd": "Sfârșit",
       "detailModerator": "Moderator",
       "detailRoom": "Sală Jitsi",
-      "detailFilename": "Nume fișier"
+      "detailFilename": "Nume fișier",
+      "transcriptManage": "Gestionează transcrierea / AI",
+      "transcriptReady": "Transcris",
+      "transcriptProcessing": "În curs"
     },
     "gdprAudit": {
       "title": "Audit RGPD",
@@ -1023,7 +1166,32 @@
       "retentionPreviewRecordings": "Înregistrările video",
       "retentionPreviewKept": "Statisticile agregate și metadatele evenimentului sunt păstrate.",
       "configPreview": "Previzualizare configurație",
-      "templateApplied": "Șablon aplicat: {name}. Puteți modifica toate setările."
+      "templateApplied": "Șablon aplicat: {name}. Puteți modifica toate setările.",
+      "agendaEnabled": "Notițe / Listă de verificare (agendă) live",
+      "agendaEnabledDesc": "O listă a punctelor de tratat, pe care moderatorii le bifează în timpul evenimentului. Este preluată în rezumatul automat. Opțională și activabilă și în timpul evenimentului.",
+      "whiteboardEnabled": "Tablă partajată",
+      "whiteboardEnabledDesc": "Activează tabla colaborativă nativă (Excalidraw): moderatorii o pot deschide din bara de instrumente în timpul evenimentului. Întotdeauna activă în apelurile instantanee.",
+      "aiSectionHeading": "Post-producție automată",
+      "aiSectionDesc": "După încheierea evenimentului, înregistrarea poate fi procesată de un pipeline de inteligență artificială în cluster, pentru a produce transcrierea, rezumatul și, la cerere, traduceri și dublaj. Totul se desfășoară pe infrastructura Departamentului, niciun fel de date nu ajung la terți.",
+      "aiTranscriptEnabled": "Transcriere automată",
+      "aiTranscriptEnabledDesc": "Recunoașterea vorbirii cu identificarea vorbitorilor. Necesară pentru activarea rezumatului, traducerilor și dublajului.",
+      "aiSummaryEnabled": "Rezumat și capitole",
+      "aiSummaryEnabledDesc": "Rezumatul întâlnirii, deciziile luate, sarcinile de îndeplinit și împărțirea pe capitole cu marcaje de timp.",
+      "aiTranslationEnabled": "Traducere în alte limbi",
+      "aiTranslationEnabledDesc": "Transcrierea și rezumatul traduse în limbile indicate mai jos.",
+      "aiTargetLocales": "Limbi de traducere",
+      "aiTargetLocalesDesc": "Coduri de limbă ISO (ex. en, fr, de) separate prin virgulă. Lăsați gol pentru a folosi limbile setate la nivel de site.",
+      "aiTargetLocalesRequired": "Indicați cel puțin o limbă de traducere sau dezactivați traducerea automată.",
+      "aiDubbingEnabled": "Dublaj audio",
+      "aiDubbingEnabledDesc": "Audio dublat în limbile țintă, generat cu voci sintetice preantrenate. Nu clonează vocea participanților.",
+      "consentBadge": "Consimțământ explicit",
+      "retentionBadge": "Extinde perioada de păstrare",
+      "multitrackRecordingEnabled": "Înregistrare pe participant (precizie ridicată)",
+      "multitrackRecordingEnabledDesc": "Înregistrează o pistă audio separată pentru fiecare participant, astfel încât transcrierea să atribuie cu certitudine cine ce spune (fără „Vorbitor 1/2”). Prelucrează audio izolat al unui singur vorbitor (date personale sensibile): pistele sunt temporare și se șterg imediat după transcriere. Necesită consimțământul pentru înregistrare.",
+      "retainParticipantTracks": "Păstrează pistele pe participant",
+      "retainParticipantTracksDesc": "Păstrează pistele audio individuale și după transcriere, pentru arhiva descărcabilă și reascultarea pe vorbitor. ATENȚIE: extinde păstrarea unor date personale sensibile (voce izolată) până la termenul de păstrare al evenimentului. Activați doar dacă este necesar și cu consimțământ/informare adecvate.",
+      "expectedSpeakers": "Numărul estimat de vorbitori",
+      "expectedSpeakersDesc": "Când îl cunoașteți (ex. 3 vorbitori), indicarea lui îmbunătățește calitatea identificării vorbitorilor. Lăsați gol pentru a lăsa pipeline-ul să decidă."
     },
     "links": {
       "title": "Linkurile evenimentului",
@@ -1123,7 +1291,8 @@
         "pages": "Pagini",
         "footer": "Subsol",
         "features": "Funcționalități",
-        "scaling": "Dimensionare infra"
+        "scaling": "Dimensionare infra",
+        "postprod": "Pipeline AI post-eveniment"
       },
       "scaling": {
         "intro": "Parametrii care descriu capacitatea clusterului pe care rulează platforma. Valorile implicite sunt calibrate pentru Azure F16s_v2 (16 vCPU / 32 GiB) pentru JVB și F4s_v2 (4 vCPU / 8 GiB) pentru Jibri. Dacă folosiți hardware diferit, actualizați aici — scaler-ul recalculează imediat.",
@@ -1285,7 +1454,55 @@
         "jvbProvisioningTimeoutMinutes": "Timeout provisioning (minute)",
         "jvbProvisioningTimeoutMinutesHelp": "După câte minute de la startsAt un eveniment cu JVB încă nepregătit este semnalat ca „degraded” pe pagina de status. Implicit 15. Acoperă cold-start-ul nodului (~3-5 min) + marjă de siguranță.",
         "statusPollIntervalSeconds": "Interval polling pagină status (secunde)",
-        "statusPollIntervalSecondsHelp": "La câte secunde pagina /status reîmprospătează datele în browser. Implicit 30. Valori mai mici = date mai proaspete, dar mai multă încărcare pe aplicație."
+        "statusPollIntervalSecondsHelp": "La câte secunde pagina /status reîmprospătează datele în browser. Implicit 30. Valori mai mici = date mai proaspete, dar mai multă încărcare pe aplicație.",
+        "jvbEmptyCloseMinutes": "Minute cu sala goală înainte de închiderea definitivă",
+        "jvbEmptyCloseMinutesHelp": "Dacă o sală LIVE care a avut deja participanți rămâne goală atâtea minute, este închisă definitiv (ENDED) — astfel, un eveniment fără moderator se închide singur din inactivitate, fără să aștepte ora de final. Implicit 15 (activ). -1 = dezactivat. 0 = închide la prima verificare cu sala goală.",
+        "waitingRoomLeadMinutes": "Fereastra de intrare în sala de așteptare (minute)",
+        "waitingRoomLeadMinutesHelp": "Înscrierea în acest interval față de ora de început duce direct în sala de așteptare; înscrierile mai timpurii primesc confirmarea cu linkul către calendar. 0 = se afișează întotdeauna confirmarea până la începere. Recomandat 15.",
+        "reactionsMode": "Reacții (emoji)",
+        "reactionsModeNative": "Native Jitsi (în bara de instrumente, efemere)",
+        "reactionsModeCustom": "Personalizate ale aplicației (bara din stânga, cu statistici)",
+        "reactionsModeHelp": "Native = butonul de reacții al Jitsi din bara de control, ușoare și efemere (nu sunt numărate). Personalizate = bara de reacții a aplicației, jos în stânga, cu numărători și statistici. Implicit: Native.",
+        "emailSenderTitle": "Expeditorul e-mailurilor",
+        "emailSenderHelp": "Cum apare expeditorul în căsuța poștală a celor care se înscriu. Adresa de trimitere rămâne configurată în deployment (trebuie să corespundă celei autorizate de serverul SMTP).",
+        "emailFromName": "Numele expeditorului",
+        "emailFromNameHelp": "Gol = se folosește numele configurat în deployment (SMTP_FROM_NAME). E-mailurile sunt trimise în continuare de la adresa de sistem.",
+        "emailReplyTo": "Adresă pentru răspunsuri",
+        "emailReplyToHelp": "E-mailurile pleacă de la o adresă no-reply: fără aceasta, cine răspunde nu ajunge la nimeni.",
+        "avatarTitle": "Imaginile participanților",
+        "gravatarEnabled": "Folosește Gravatar când este disponibil",
+        "gravatarEnabledHelp": "Cei care s-au înscris cu o adresă de e-mail asociată unui Gravatar îl vor vedea ca imagine în sală; pentru toți ceilalți rămân inițialele generate de platformă. Imaginea trece prin serverul nostru, deci browserul participanților nu contactează gravatar.com — dar platforma o face: acest lucru trebuie declarat în nota de informare privind confidențialitatea."
+      },
+      "postprod": {
+        "prerequisitesNote": "Post-producția lucrează pe înregistrarea completă, după încheierea evenimentului. Pool-ul GPU dedicat pornește la sosirea primului job în coadă și se oprește când coada este goală, pentru a limita costurile. Înainte de a activa pipeline-ul, verificați că în cluster sunt configurate pool-ul GPU, operatorul NVIDIA instalat, credențialele HuggingFace prezente în namespace și volumul cu greutățile modelelor preîncărcat. Lista operativă de verificare se află în docs/POSTPROD.md.",
+        "pipelineEnabled": "Pipeline post-eveniment activ",
+        "pipelineEnabledHelp": "Comutator general. Când este dezactivat, nu se produce nicio transcriere, niciun rezumat, nicio traducere și niciun dublaj pentru evenimentele noi, chiar dacă acestea au post-producția activată individual. Artefactele deja generate nu mai sunt expuse publicului până la reactivarea comutatorului. Util pentru a pune pipeline-ul pe pauză fără a redistribui aplicația.",
+        "timingNote": "Pipeline-ul nu intervine asupra transmisiunii în direct. Totul se întâmplă după încheierea evenimentului, când înregistrarea este arhivată: subtitrările și rezumatul nu sunt niciodată disponibile în timp real. Această alegere privilegiază calitatea transcrierii și limitează consumul de GPU față de subtitrarea în direct.",
+        "providersSection": "Motoare de inteligență artificială",
+        "providersIntro": "Motoarele folosite pentru transcriere, rezumat și dublaj sunt declarate în momentul deployment-ului. Adăugarea unuia nou necesită o intervenție asupra infrastructurii (deployment-ul motorului în cluster, înregistrarea în lista furnizorilor acceptați, actualizarea schemei). Listele derulante de mai jos arată motoarele disponibile în prezent pe această instanță.",
+        "asrProvider": "Motor de transcriere",
+        "asrProviderHelp": "Generează transcrierea videoului, cu indicarea minutului și separarea vorbitorilor. Folosim WhisperX large-v3 împreună cu pyannote.audio pentru diarizare. Ambele modele rulează în cluster, pe greutățile încărcate pe volumul dedicat.",
+        "asrOptionWhisperx": "WhisperX large-v3 + diarizare pyannote",
+        "llmProvider": "Motor de rezumat și traducere",
+        "llmProviderHelp": "Produce rezumatul întâlnirii, identifică temele tratate și traduce transcrierea și rezumatul în limbile țintă. Model Mistral-Small-3.2-24B (furnizor european, licență Apache 2.0) servit prin vLLM în cluster.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM în cluster",
+        "ttsEngine": "Motor de dublaj",
+        "ttsEngineHelp": "Sintetizează audio în limbile alese, folosind voci publice preantrenate. Când sunt mai mulți vorbitori, fiecare primește o voce diferită din pool-ul disponibil, pentru ca ascultarea să fie mai ușor de urmărit: atribuirea este arbitrară și nu reproduce în niciun fel vocea reală a participanților. Dublajul se produce doar dacă organizatorul îl solicită pentru evenimentul respectiv.",
+        "ttsOptionPiper": "Piper TTS · voci sintetice preantrenate",
+        "voiceCloningSection": "Linia editorială privind vocea",
+        "voiceCloningNote": "Sistemul folosește exclusiv voci sintetice generice (Piper TTS, modele publice sub licență MIT). Nu analizează, nu stochează și nu reproduce vocea participanților reali: fiecare vorbitor este reprezentat de o voce din pool, aleasă determinist în funcție de timpul de vorbire, fără nicio legătură cu identitatea sa vocală. Vocea atribuită se schimbă odată cu componența vorbitorilor fiecărui eveniment, așa că același vorbitor poate fi dublat cu voci diferite la evenimente diferite. Această alegere evită prelucrarea datelor biometrice reglementată de art. 9 din GDPR.",
+        "defaultTargetLocales": "Limbi de traducere implicite",
+        "defaultTargetLocalesHelp": "Coduri ISO-639-1 separate prin virgulă (ex. `en,fr,de`). Se aplică evenimentelor care nu specifică limbi proprii de traducere. Limba sursă a evenimentului este întotdeauna exclusă automat.",
+        "limitsSection": "Limite operaționale",
+        "maxConcurrentJobs": "Joburi în paralel",
+        "maxConcurrentJobsHelp": "Numărul maxim de joburi pe care pipeline-ul le execută simultan pe pool-ul GPU. Mai multe joburi în paralel golesc coada mai repede când se încheie mai multe evenimente unul după altul, dar necesită GPU-uri disponibile. Valoarea tipică este 2.",
+        "jobMaxAttempts": "Încercări înainte de eșec",
+        "jobMaxAttemptsHelp": "De câte ori reîncearcă pipeline-ul un job înainte de a-l marca drept eșuat. Intervalul dintre încercări crește exponențial (de la 30 de secunde până la 2 ore). Valoarea tipică este 5.",
+        "artifactRetentionDays": "Păstrarea artefactelor (zile)",
+        "artifactRetentionDaysHelp": "Lăsată la 0, artefactele AI urmează același termen de păstrare ca evenimentul. O valoare mai mare decât zero le păstrează pentru numărul de zile indicat, chiar și după închiderea evenimentului, până când un cron zilnic le șterge. Ștergerea include numele vorbitorilor și payload-urile joburilor, în conformitate cu docs/GDPR.md.",
+        "consentDisclosureSection": "Notă informativă AI în sala de așteptare",
+        "consentDisclosureHelp": "Text afișat participanților în sala de așteptare când evenimentul folosește post-producția AI (transcriere, rezumat, traducere, dublaj). Personalizabil pentru fiecare limbă. Lăsați gol pentru a folosi textul implicit al sistemului.",
+        "consentDisclosurePlaceholder": "Ex. Acest eveniment va fi transcris și rezumat automat cu instrumente AI după transmisiunea în direct…"
       }
     },
     "analytics": {
@@ -1372,7 +1589,23 @@
       "screen": "Partajare ecran",
       "pickerTitle": "Alegeți un șablon",
       "pickerSubtitle": "Selectați un șablon pentru a pre-configura setările evenimentului sau omiteți pentru a configura totul manual.",
-      "skipTemplate": "Configurați manual"
+      "skipTemplate": "Configurați manual",
+      "whiteboardLabel": "Tablă",
+      "waitingRoomEngineLabel": "Sala de așteptare (implicită a șablonului)",
+      "waitingRoomEngineSiteDefault": "Implicită a site-ului",
+      "waitingRoomEngineGarden": "Grădină (standard)",
+      "waitingRoomEngineGame": "Joc video (lobby Phaser)",
+      "waitingRoomEngineClassic": "Clasică (statică)",
+      "waitingRoomEngineHelp": "Precompletează motorul sălii de așteptare pentru evenimentele create din acest șablon. Rămâne modificabil în asistent.",
+      "durationLabel": "Durată implicită (minute)",
+      "durationHint": "Precompletează finalul evenimentului (început + durată). Utilizatorul o poate modifica. Gol = 2 ore.",
+      "retentionLabel": "Păstrarea implicită a datelor (zile)",
+      "expectedSpeakersLabel": "Numărul estimat de vorbitori (implicit)",
+      "descriptionTemplateLabel": "Descriere implicită",
+      "descriptionTemplateHint": "Text precompletat în descrierea evenimentului (modificabil).",
+      "aiTranscript": "Transcriere automată (implicit)",
+      "aiSummary": "Rezumat automat (implicit)",
+      "aiTranslation": "Traducere automată (implicit)"
     },
     "instantCall": {
       "title": "Apel video instant",
@@ -1456,7 +1689,8 @@
       },
       "errors": {
         "saveFailed": "Salvare nereușită. Verificați datele și încercați din nou."
-      }
+      },
+      "deleteTitle": "Șterge șablonul"
     },
     "emailTemplates": {
       "title": "Șabloane de e-mail",
@@ -1637,7 +1871,8 @@
       "play": "Redați",
       "hidePlayer": "Ascundeți player-ul",
       "download": "Descărcați",
-      "deleteConfirm": "Ștergeți această sesiune și înregistrarea asociată?"
+      "deleteConfirm": "Ștergeți această sesiune și înregistrarea asociată?",
+      "deleteTitle": "Șterge sesiunea"
     },
     "monitoring": {
       "title": "Monitorizare",
@@ -1798,7 +2033,9 @@
         "settings": "Setări",
         "people": "Persoane",
         "content": "Conținut",
-        "audit": "Înregistrări și audit"
+        "audit": "Înregistrări și audit",
+        "postEvent": "Post-eveniment",
+        "analytics": "Statistici"
       },
       "toggles": {
         "unmute": "Participanții pot vorbi",
@@ -1820,7 +2057,22 @@
         "postEventSummary": "{connected} conectați din {registered} înscrieri (estimate {estimated})",
         "estimatedAttendance": "Estimați: {estimated} participanți"
       },
-      "copyGuestUrl": "Copiați linkul pentru invitați"
+      "copyGuestUrl": "Copiați linkul pentru invitați",
+      "aiManageTitle": "Transcriere, rezumat și traduceri",
+      "aiManageDesc": "Gestionați post-producția AI a acestei înregistrări: corectați transcrierea și atribuirea vorbitorilor (cine ce spune), modificați rezumatul și gestionați limbile de traducere.",
+      "aiManageCta": "Deschide gestionarea post-producției",
+      "aiManageNotEnded": "Disponibil după încheierea evenimentului, când înregistrarea a fost procesată de pipeline-ul AI.",
+      "aiGenerateCta": "Generează AI acum",
+      "aiGenerateRunning": "Se pornește…",
+      "aiGenerateQueued": "Pipeline-ul AI a pornit: transcrierea și rezumatul sunt în coadă. Urmăriți progresul în gestionarea post-producției.",
+      "aiGenerateAlready": "Pipeline-ul AI fusese deja pornit pentru această înregistrare: nu s-a adăugat niciun job nou.",
+      "aiGenerateError": "Pipeline-ul AI nu a putut fi pornit. Verificați dacă AI este activat la nivel de site și dacă există o înregistrare.",
+      "aiGenerateHelp": "Activează transcrierea + rezumatul AI și pornește pipeline-ul pe înregistrare, dintr-un singur clic. Idempotent: două clicuri nu duplică joburile.",
+      "aiGenerateNoRecording": "Nicio înregistrare: AI-ul post-eveniment necesită o înregistrare (captura are loc doar în timpul evenimentului). Puteți totuși gestiona post-producția aici.",
+      "duplicateNext": "Duplică pentru data viitoare",
+      "duplicateNextBusy": "Se duplică…",
+      "duplicateNextHint": "Creează o ciornă cu întreaga configurație a acestui eveniment (înregistrare, piste separate, AI, agendă, memento-uri). Dacă evenimentul are o recurență, data trece la următoarea apariție; altfel rămâne de stabilit.",
+      "duplicateNextError": "Duplicarea nu a reușit. Încercați din nou."
     },
     "rubrica": {
       "title": "Agendă",
@@ -1838,6 +2090,299 @@
     "eventQuestionnaires": {
       "title": "Chestionare — {eventTitle}",
       "subtitle": "Configurați un chestionar de preînregistrare și/sau post-eveniment combinând șabloane și întrebări ad-hoc."
+    },
+    "eventAnalytics": {
+      "title": "Statistici",
+      "loadError": "Statisticile nu au putut fi încărcate.",
+      "noData": "Nu există date disponibile.",
+      "notEndedYet": "Evenimentul nu s-a încheiat încă: statisticile sunt parțiale și se actualizează în timp real.",
+      "cappedNote": "Eveniment foarte mare: unele metrici sunt calculate pe un eșantion (limita de rânduri atinsă).",
+      "scoreTitle": "Grad de atenție",
+      "adminOnly": "doar admin",
+      "scoreProxy": "Indice 0–100 al participării sălii. Este un indicator indirect de participare, nu o măsură a atenției cognitive — citiți-l în contextul formatului (curs vs atelier), niciodată ca notă de calitate.",
+      "scoreUnavailable": "Date insuficiente pentru calcularea gradului.",
+      "comp": {
+        "attendanceRate": "Prezență (intrați/înscriși)",
+        "breadth": "Amploarea interacțiunii",
+        "depth": "Profunzimea interacțiunii",
+        "chatRate": "Ritmul chatului",
+        "liveParticipation": "Participare live",
+        "talkBalance": "Echilibrul timpului de vorbire",
+        "retention": "Timp de rămânere"
+      },
+      "kpiConversion": "Conversie",
+      "kpiPeak": "Vârf de participanți",
+      "kpiDuration": "Durată",
+      "kpiInteractors": "Interlocutori distincți",
+      "interactionsWord": "interacțiuni",
+      "kpiHandRaises": "Ridicări de mână",
+      "handRaisesSessionsSub": "din {n, plural, one {# sesiune} few {# sesiuni} other {# de sesiuni}}",
+      "kpiReactions": "Reacții",
+      "kpiRetention": "Timp mediu de rămânere",
+      "dwellSub": "{d} · {n, plural, one {# măsurat} few {# măsurați} other {# de măsurați}}",
+      "reactionsTitle": "Reacții",
+      "timelineTitle": "Evoluția apelului în timp",
+      "timelineEmpty": "Nicio interacțiune înregistrată în timpul apelului.",
+      "timelinePeak": "Vârf de interacțiune la {at} ({n} evenimente în interval).",
+      "kind": {
+        "chat": "Chat",
+        "question": "Întrebări",
+        "upvote": "Voturi",
+        "poll": "Sondaje",
+        "word": "Nor de cuvinte",
+        "reaction": "Reacții"
+      },
+      "speakersTitle": "Cine a vorbit",
+      "audioUnavailable": "Statistici audio indisponibile — evenimentul nu a fost înregistrat (sau înregistrarea nu conține vorbire).",
+      "predominant": "Vorbitor predominant",
+      "talkBalance": "Echilibru",
+      "speechDensity": "Densitatea vorbirii",
+      "chatTitle": "Chat",
+      "chatAudience": "Public",
+      "chatStaff": "Echipă",
+      "qaTitle": "Întrebări cu cele mai multe voturi",
+      "none": "Niciuna.",
+      "pollsTitle": "Sondaje",
+      "wordsTitle": "Nor de cuvinte",
+      "feedbackTitle": "Feedback",
+      "responses": "răspunsuri",
+      "privacyNote": "Statisticile pe persoană sunt pseudonime în mod implicit. Agregatele anonime se păstrează în recapitularea evenimentului; rândurile brute se șterg la expirarea perioadei de păstrare."
+    },
+    "postprod": {
+      "title": "Pipeline AI de post-producție",
+      "subtitle": "Transcrieri, rezumate și traduceri produse de pipeline-ul AI în cluster. Asociați vorbitorii, reluați sau anulați joburile.",
+      "filterStatus": "Stare",
+      "all": "Toate",
+      "queued": "În coadă",
+      "running": "În execuție",
+      "done": "Finalizat",
+      "partial": "Parțial",
+      "failed": "Eșuat",
+      "totalRows": "{count, plural, =0 {nicio înregistrare} one {1 înregistrare} few {# înregistrări} other {# de înregistrări}}",
+      "colEvent": "Eveniment",
+      "colCreated": "Creat",
+      "colDuration": "Durată",
+      "colStatus": "Stare",
+      "colJobs": "Joburi",
+      "colArtifacts": "Artefacte",
+      "colActions": "Acțiuni",
+      "rerun": "Rulează din nou",
+      "rerunTooltip": "Creează o rulare nouă, incrementând runCount; artefactele anterioare rămân până la expirarea perioadei de păstrare",
+      "cancel": "Anulează",
+      "cancelConfirm": "Anulați toate joburile în așteptare pentru această înregistrare?",
+      "rerunFailed": "Rularea din nou a eșuat (HTTP {code})",
+      "cancelFailed": "Anularea a eșuat (HTTP {code})",
+      "speakerUpdateFailed": "Actualizarea vorbitorului a eșuat (HTTP {code})",
+      "loadError": "Lista de joburi nu a putut fi încărcată",
+      "empty": "Nicio înregistrare nu corespunde filtrelor",
+      "detailJobs": "Joburi",
+      "detailArtifacts": "Artefacte",
+      "detailSpeakers": "Vorbitori",
+      "noArtifacts": "Niciun artefact produs încă",
+      "noSpeakers": "Niciun vorbitor detectat",
+      "attempts": "încercarea {n}",
+      "speakerPlaceholder": "Nume real (opțional)",
+      "speakerSpoke": "Timp de vorbire: {sec}s",
+      "suggestedApply": "Aplică sugestia: {name}",
+      "suggestedTitle": "Nume sugerat de pipeline-ul AI pe baza numelor proprii menționate în transcriere. Faceți clic pentru a-l completa în câmp (îl puteți modifica înainte de salvare).",
+      "save": "Salvează",
+      "editTranscript": "Modifică transcrierea",
+      "editClose": "Închide editorul",
+      "editTranscriptTitle": "Editor de transcriere",
+      "editHint": "Corectați textul sau reatribuiți vorbitorul fiecărui segment. La salvare, transcrierea și subtitrările în limba sursă sunt actualizate. Traducerile și dublajul NU sunt regenerate: folosiți „Rulează din nou” dacă aveți nevoie de ele actualizate și în celelalte limbi.",
+      "editLoading": "Se încarcă transcrierea…",
+      "editLoadError": "Transcrierea nu a putut fi încărcată (HTTP {code}).",
+      "editNotReady": "Nu există încă o transcriere pentru această înregistrare. Porniți (sau reluați) procesarea AI din controalele de sus: transcrierea este primul pas, apoi o veți putea corecta aici și genera rezumatul și traducerile.",
+      "editProcessing": "Procesare AI în curs: transcrierea va apărea aici la final. Reîmprospătați pagina peste câteva minute.",
+      "editSessionExpired": "Sesiunea de administrator a expirat. Reîncărcați pagina și autentificați-vă din nou pentru a modifica transcrierea.",
+      "editEmpty": "Niciun segment modificabil",
+      "editSpeakerNone": "— niciunul —",
+      "editSave": "Salvează modificările",
+      "editSaving": "Se salvează…",
+      "editDirty": "{n, plural, one {1 modificare nesalvată} few {# modificări nesalvate} other {# de modificări nesalvate}}",
+      "editSaved": "Salvat: {text} texte, {speaker} vorbitori.",
+      "editFailed": "Salvarea a eșuat (HTTP {code})",
+      "editFailedDetail": "Salvarea a eșuat: {message}",
+      "editMediaError": "Audio-ul înregistrării nu a putut fi încărcat: redarea nu este disponibilă. Puteți totuși corecta textul și vorbitorii segmentelor.",
+      "summaryLoadError": "Rezumatul nu a putut fi încărcat.",
+      "summaryLoading": "Se încarcă rezumatul…",
+      "summaryEmptyProcessing": "Rezumatul AI nu este încă pregătit: procesarea este în curs. Reîmprospătați pagina peste câteva minute.",
+      "summaryEmptyFailed": "Generarea rezumatului nu a reușit. Verificați starea pipeline-ului și reluați procesarea din controalele de sus.",
+      "summaryEmptyNone": "Nu a fost generat niciun rezumat AI pentru această înregistrare. Porniți procesarea din controalele de sus.",
+      "editSeek": "Sari la acest moment din video",
+      "manageTabTranscript": "Transcriere",
+      "manageTabSummary": "Rezumat",
+      "manageTabTranslations": "Traduceri",
+      "manageTabArchive": "Arhivă",
+      "manageTabReliability": "Fiabilitate",
+      "manageLoading": "Se încarcă…",
+      "archivePiiNote": "Pistele audio izolate pe participant sunt date personale sensibile (voce izolată): această secțiune este rezervată administratorilor/moderatorilor și nu este niciodată expusă public.",
+      "archiveNoTracks": "Nicio pistă pe participant disponibilă pentru această înregistrare (înregistrarea multi-pistă nu este activă sau pistele au fost deja șterse pentru minimizarea GDPR).",
+      "archivePlayerTitle": "Reascultare pe vorbitor",
+      "archiveAudioHint": "Folosiți selectorul „Audio” al playerului pentru a asculta mixul sau pista izolată a unui singur participant, sincronizat cu videoul.",
+      "archiveTitle": "Arhivă descărcabilă",
+      "archiveIntro": "Generează un fișier MKV cu videoul, câte o pistă audio pentru fiecare participant (etichetată cu numele, aliniată cu precizie) și subtitrările. Este gândit pentru descărcare și arhivare: browserele nu pot schimba pista audio într-un MKV, așa că pentru reascultare folosiți playerul de mai sus.",
+      "archiveGenerate": "Generează arhiva",
+      "archiveStatusLabel": "Stare",
+      "archiveStatus_none": "negenerată",
+      "archiveStatus_pending": "în coadă",
+      "archiveStatus_running": "în procesare",
+      "archiveStatus_done": "gata",
+      "archiveStatus_failed": "eșuată",
+      "archiveDownload": "Descarcă MKV",
+      "archiveGenerateOk": "Generarea arhivei a pornit.",
+      "archiveGenerateErr": "Generarea arhivei a eșuat (HTTP {code}).",
+      "archiveTrackFallback": "Participant",
+      "manageBackToList": "Toate înregistrările",
+      "manageDuration": "Durată",
+      "manageSource": "Limba sursă",
+      "manageOpenPublic": "Pagină publică",
+      "manageRerunOk": "Pipeline-ul a fost relansat.",
+      "manageRerunNoop": "Niciun job pornit: AI este dezactivat pentru acest eveniment sau pipeline-ul este pe pauză. Folosiți „Generează AI”.",
+      "manageRerunAlreadyQueued": "Procesarea este deja în coadă: nu este nimic nou de pornit.",
+      "generateAi": "Generează AI",
+      "generateAiConfirm": "Rulează pipeline-ul AI (transcriere și rezumat) pe această înregistrare. Procesarea AI va fi activată pentru eveniment și pornește în fundal. Traducerile se adaugă ulterior, limbă cu limbă, din fila „Traduceri”.",
+      "generateAiOk": "Pipeline-ul AI a pornit.",
+      "manageOpen": "Gestionează",
+      "cancelConfirmTitle": "Anulează post-producția",
+      "speakerUpdateSuccess": "Vorbitor actualizat",
+      "tm": {
+        "loading": "Se încarcă limbile de traducere…",
+        "loadError": "Limbile de traducere nu au putut fi încărcate.",
+        "title": "Limbi de traducere",
+        "sourceLabel": "Limba sursă:",
+        "already": "Deja traduse:",
+        "noneYet": "Nicio traducere încă.",
+        "addLabel": "Adaugă o limbă",
+        "noneAvailable": "Nicio limbă disponibilă",
+        "selectPlaceholder": "Selectați o limbă…",
+        "adding": "Se adaugă…",
+        "addButton": "Adaugă limba",
+        "unexpectedError": "Eroare neașteptată",
+        "note": "Adăugarea unei limbi generează traducerea transcrierii și a rezumatului — și dublajul audio, dacă este activ pentru eveniment. Prelucrarea are loc în fundal.",
+        "summary": "Rezumat",
+        "subtitles": "Subtitrări",
+        "dub": "Dublaj",
+        "download": "descarcă",
+        "allTranslated": "Toate limbile active sunt deja traduse.",
+        "translatedHeader": "Limbi traduse"
+      },
+      "ov": {
+        "tab": "Prezentare generală",
+        "intro": "Ce a produs pipeline-ul AI pentru această înregistrare, limbă cu limbă.",
+        "processing": "Procesare în curs sau niciun artefact disponibil. Reveniți când starea este „Finalizat”.",
+        "loadError": "Prezentarea generală nu a putut fi încărcată.",
+        "langsTitle": "Limbi și artefacte",
+        "colLang": "Limbă",
+        "colTranscript": "Transcriere",
+        "colSummary": "Rezumat",
+        "colSubtitles": "Subtitrări",
+        "colDub": "Dublaj",
+        "source": "original",
+        "present": "disponibil",
+        "absent": "absent",
+        "listen": "Ascultă",
+        "download": "Descarcă",
+        "dubTitle": "Dublaj audio (o voce pentru fiecare vorbitor, sincronizat)",
+        "dubNone": "Niciun dublaj produs.",
+        "summaryTitle": "Rezumat",
+        "summaryLang": "Limbă",
+        "summaryNone": "Niciun rezumat disponibil.",
+        "decisions": "Decizii",
+        "actions": "Sarcini de îndeplinit",
+        "topics": "Capitole",
+        "speakersTitle": "Vorbitori",
+        "speakerAnon": "neatribuit",
+        "speakerRenameHint": "Redenumiți vorbitorii pentru a corecta numele: numele înlocuiește eticheta anonimă în transcriere și pe pagina publică.",
+        "speakerNamePlaceholder": "Nume real (ex. Mario Rossi)",
+        "speakerNameAria": "Nume pentru",
+        "save": "Salvează",
+        "saving": "Se salvează…",
+        "saved": "Salvat",
+        "saveError": "Eroare",
+        "editHint": "Pentru a corecta textul, numele sau rezumatul, folosiți filele de mai sus.",
+        "kpiDuration": "Durată",
+        "kpiParticipants": "Participanți (vârf)",
+        "kpiTracks": "Piste audio",
+        "kpiLanguages": "Limbi",
+        "kpiArtifacts": "Artefacte",
+        "kpiProcessed": "Procesat",
+        "statusLabel": "Stare",
+        "run": "rulare",
+        "jobsTitle": "Progresul pipeline-ului",
+        "jobsNone": "Niciun job pentru această înregistrare.",
+        "attempts": "{n} încercări",
+        "filesTitle": "Fișiere în stocare",
+        "filesNone": "Niciun fișier găsit în stocare.",
+        "filesToggle": "Afișează/ascunde cele {n} fișiere",
+        "tracksTitle": "Piste pe participant",
+        "tracksNone": "Nicio pistă pe participant (multi-pistă inactiv sau piste deja șterse).",
+        "trackPurged": "ștearsă (GDPR)",
+        "trackEnters": "intrare +{s}s",
+        "metricsTitle": "Metrici ale rezumatului (LLM)",
+        "chars": "caractere",
+        "model": "Model",
+        "notAvailable": "n/a"
+      },
+      "rel": {
+        "title": "Fiabilitatea AI",
+        "subtitle": "Cât de credibil este rezultatul generat de AI pentru această înregistrare.",
+        "loading": "Se analizează fiabilitatea…",
+        "loadError": "Metricile de fiabilitate nu au putut fi încărcate.",
+        "noData": "Nicio procesare AI pentru această înregistrare.",
+        "level": {
+          "good": "Fiabil",
+          "fair": "Acceptabil",
+          "poor": "Slab",
+          "failed": "Nefiabil"
+        },
+        "overallScore": "Încredere generală",
+        "totalTime": "Timp de procesare",
+        "sourceLang": "Limba sursă",
+        "transcriptTitle": "Transcriere",
+        "segments": "Segmente",
+        "speakers": "Vorbitori",
+        "speech": "Vorbire detectată",
+        "confidence": "Încredere medie",
+        "silence": "Tăcere estimată",
+        "coverage": "Acoperirea vorbirii",
+        "lowConf": "Segmente cu încredere scăzută",
+        "transcriptNotProduced": "Transcrierea nu a fost încă produsă (pipeline neexecutat).",
+        "transcriptUnavailable": "Transcriere prezentă, dar care nu poate fi analizată aici (arhivată în stocare).",
+        "stagesTitle": "Etapele pipeline-ului",
+        "colStage": "Etapă",
+        "colStatus": "Stare",
+        "colModel": "Model",
+        "colTime": "Durată",
+        "colLangs": "Limbi",
+        "warn": {
+          "transcriptEmpty": "Transcriere goală: sunetul sursă pare silențios sau fără vorbire. Rezumatul, traducerile și dublajul derivate NU sunt de încredere.",
+          "lowConfidence": "Încredere scăzută a transcrierii: verificați textul înainte de publicare.",
+          "manyLowConfSegments": "Multe segmente cu încredere scăzută: transcrierea poate conține erori.",
+          "highNoSpeech": "Sunet în mare parte silențios sau fără vorbire: transcrierea ar putea fi halucinată.",
+          "stageFailed": "Etapa „{stage}” a eșuat.",
+          "stageRetried": "Etapa „{stage}” s-a finalizat după mai multe încercări."
+        },
+        "stage": {
+          "TRANSCRIBE": "Transcriere",
+          "TRANSCRIBE_MULTITRACK": "Transcriere (multi-pistă)",
+          "SUMMARIZE": "Rezumat",
+          "TRANSLATE": "Traducere",
+          "SUBTITLE": "Subtitrări",
+          "DUB": "Dublaj",
+          "ARCHIVE": "Arhivă"
+        },
+        "status": {
+          "PENDING": "În așteptare",
+          "CLAIMED": "Preluată",
+          "RUNNING": "În curs",
+          "DONE": "Finalizată",
+          "FAILED": "Eșuată"
+        }
+      },
+      "archiveSourceTitle": "Înregistrarea sursă",
+      "archiveSourceHint": "Videoul original al evenimentului. Pistele separate pe participant și arhiva MKV necesită înregistrarea multi-pistă (neactivată pentru acest eveniment).",
+      "archiveSourceDownload": "Descarcă videoul original"
     }
   },
   "email": {
@@ -2039,7 +2584,9 @@
       "recordingRequired": "Consimțământul pentru înregistrare este obligatoriu pentru a participa la acest eveniment",
       "futureCommunications": "Doresc să primesc informații despre evenimentele viitoare organizate de DTD",
       "addressBook": "Doresc să fiu inclus în Agenda DTD pentru a fi invitat la evenimente similare",
-      "addressBookHelp": "Consimțământ separat (art. 6.1.a RGPD). Îl puteți retrage în orice moment prin linkul „Eliminați-mi datele din agendă” din e-mailurile pe care le veți primi. Numele și organizația vor fi preluate din profilul de înregistrare."
+      "addressBookHelp": "Consimțământ separat (art. 6.1.a RGPD). Îl puteți retrage în orice moment prin linkul „Eliminați-mi datele din agendă” din e-mailurile pe care le veți primi. Numele și organizația vor fi preluate din profilul de înregistrare.",
+      "multitrack": "Consimt la înregistrarea unei piste audio separate a vocii mele, exclusiv în scopul atribuirii corecte a transcrierii fiecărui vorbitor. Pista este temporară și ștearsă după transcriere; nu este folosită pentru a identifica sau reproduce vocea mea.",
+      "multitrackRequired": "Consimțământul pentru înregistrarea pistei tale audio este obligatoriu pentru a participa la acest eveniment"
     },
     "export": {
       "title": "Datele mele",
@@ -2110,6 +2657,10 @@
         "retention": {
           "title": "Păstrarea datelor și drepturi",
           "body": "Datele sunt păstrate pe perioada configurată pentru fiecare eveniment și apoi șterse automat, cu excepția unor obligații legale diferite. În orice moment pot fi exercitate drepturile prevăzute de GDPR, inclusiv accesul, rectificarea și ștergerea, prin canalele instituționale ale Departamentului."
+        },
+        "automatedProcessing": {
+          "title": "Transcriere, sinteză și dublaj generate de inteligența artificială",
+          "body": "Pentru evenimentele care solicită acest lucru, după încheierea transmisiunii înregistrarea este procesată de un flux de inteligență artificială executat integral pe infrastructura de cluster a Departamentului. Acesta produce transcrierea vorbirii (cu separarea vorbitorilor), o sinteză pe înțelesul tuturor, eventuale traduceri în alte limbi europene și o versiune dublată a audio cu o voce sintetică generică. Toate modelele folosite (WhisperX pentru transcriere, Mistral-Small pentru sinteză și traducere, Piper TTS pentru dublaj) rulează pe GPU dedicate în interiorul clusterului: niciun dat al participanților nu este trimis către servicii terțe. Vocea participanților nu este clonată și nu este păstrată ca dată biometrică (art. 9 GDPR): dublajul folosește voci sintetice publice preantrenate, atribuite arbitrar vorbitorilor. Pentru fiecare înregistrare, pagina evenimentului arată fotografia exactă a modelelor utilizate („Transparența procesării IA”). Conținutul generat poate conține inexactități: referința de autoritate rămâne întotdeauna înregistrarea video originală (Regulamentul IA, art. 50)."
         }
       },
       "note": {
@@ -2320,7 +2871,31 @@
     "overallStatus": "Stare generală",
     "lastChecked": "Ultima verificare",
     "responseTime": "Timp de răspuns",
-    "systemStatus": "Starea sistemului"
+    "systemStatus": "Starea sistemului",
+    "postprod": {
+      "title": "Pipeline post-eveniment",
+      "subtitle": "Transcrierea, rezumatul, traducerea și dublajul înregistrării",
+      "whatItDoes": "Când un eveniment se încheie, înregistrarea trece printr-un pipeline intern: transcrierea este generată de WhisperX, rezumatul și traducerile de un model Mistral, iar sunetul dublat de Piper TTS. Toate modelele rulează pe un GPU din cluster, care rămâne pornit doar pe durata prelucrării, astfel încât energia consumată să urmeze sarcina efectivă.",
+      "status": {
+        "idle": "În așteptare",
+        "running": "În execuție",
+        "degraded": "Degradată"
+      },
+      "aiBadge": "Transcrierea, rezumatul și dublajul acestui eveniment sunt generate de modele de inteligență artificială și pot conține inexactități. Pentru certitudine deplină, consultați întotdeauna videoul original.",
+      "idleMessage": "Pipeline pregătit, nicio înregistrare de procesat în acest moment.",
+      "queueAriaLabel": "Componența cozii de post-producție",
+      "queuePending": "în coadă",
+      "queueRunning": "în lucru",
+      "queueDone": "finalizate",
+      "queueFailed": "eșuate",
+      "asrProvider": "Transcriere",
+      "llmProvider": "Rezumat/Traducere",
+      "targetLocales": "Limbi țintă",
+      "lastSuccess": "Ultimul succes {when}",
+      "lastFailure": "Ultima eroare {when}",
+      "artifactsProduced": "{count, plural, =0 {niciun artefact} one {1 artefact produs} few {# artefacte produse} other {# de artefacte produse}}",
+      "eventsEnabled": "{count, plural, =0 {niciun eveniment cu AI} one {1 eveniment cu AI activ} few {# evenimente cu AI activ} other {# de evenimente cu AI activ}}"
+    }
   },
   "infraMap": {
     "loading": "Se încarcă harta infrastructurii...",
@@ -2382,7 +2957,8 @@
       "jicofo": "Coordonator conferințe",
       "jvb": "Punte video",
       "jibri": "Înregistrare video",
-      "smtp": "Serviciu email"
+      "smtp": "Serviciu email",
+      "postprod": "Pipeline AI post-eveniment"
     },
     "descriptions": {
       "app": "Site-ul web de unde accesați evenimentele",
@@ -2393,7 +2969,8 @@
       "jicofo": "Coordonează participanții la fiecare conferință",
       "jvb": "Transmite audio și video către participanți",
       "jibri": "Înregistrează sesiunile video ale evenimentelor",
-      "smtp": "Trimite emailuri de confirmare și mementouri"
+      "smtp": "Trimite emailuri de confirmare și mementouri",
+      "postprod": "Transcrie, rezumă și traduce înregistrările cu modele AI în cluster (GPU NVIDIA A100). Se activează doar când un eveniment optează pentru funcțiile AI."
     },
     "verdicts": {
       "app": {
@@ -2441,6 +3018,12 @@
       "smtp": {
         "healthy": "Serviciul de email este configurat și pregătit să trimită notificări.",
         "standby": "Serviciul de email nu este configurat. Emailurile de confirmare și mementourile nu vor fi trimise."
+      },
+      "postprod": {
+        "healthy": "Pipeline-ul AI procesează o înregistrare (worker GPU activ).",
+        "scaling": "Joburi de post-producție în coadă — nodul GPU pornește (cold-start ~3 min).",
+        "standby": "Pipeline AI activ, dar în așteptare: nicio înregistrare de procesat. Nodul GPU este oprit pentru economie de energie.",
+        "degraded": "Unul sau mai multe joburi AI au eșuat în ultimele 24 h. Verificați /admin/postprod pentru detalii."
       }
     },
     "impacts": {
@@ -2453,7 +3036,8 @@
       "jvbStale": "Un eveniment așteaptă bridge-ul de mai mult timp decât timeout-ul configurat: participanții nu pot intra.",
       "jibri": "Evenimentele nu pot fi înregistrate. Participanții se pot alătura și participa în continuare.",
       "jibriStale": "Un eveniment cu înregistrare activă așteaptă Jibri peste timeout: sesiunea nu este înregistrată.",
-      "smtp": "Emailurile de confirmare a înregistrării și mementourile nu vor fi trimise."
+      "smtp": "Emailurile de confirmare a înregistrării și mementourile nu vor fi trimise.",
+      "postprodDegraded": "Transcrierile și rezumatele pentru unele înregistrări recente nu au fost generate. Înregistrările video rămân disponibile."
     },
     "overallVerdicts": {
       "operational": "Toate serviciile funcționează corect. Platforma este complet operațională.",
@@ -2494,7 +3078,8 @@
       "errorRate": "Erori 5xx",
       "requestRate": "Cereri/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "connPostprod": "post-producție AI"
   },
   "feedback": {
     "title": "Cum evaluați acest eveniment?",
@@ -2584,7 +3169,8 @@
     "buildInfoDev": "versiune de dezvoltare",
     "viewCommit": "Vezi commit-ul pe GitHub",
     "viewRelease": "Vezi versiunea pe GitHub",
-    "buildDatePrefix": "Compilat la"
+    "buildDatePrefix": "Compilat la",
+    "viewChangelog": "Vezi noutățile (changelog)"
   },
   "pages": {
     "privacyTitle": "Politica de confidențialitate",
@@ -2603,7 +3189,26 @@
     "unmute": "Activați sunetul",
     "download": "Descărcați înregistrarea",
     "speedLabel": "Viteza de redare",
-    "progress": "Bară de progres"
+    "progress": "Bară de progres",
+    "subtitles": "Subtitrări",
+    "subtitlesOff": "Dezactivate",
+    "audioLabel": "Audio",
+    "audioOriginal": "Original",
+    "audioSyntheticBanner": "Sunet dublat cu AI — voce sintetică, conținut generat automat.",
+    "audioSyntheticHint": "Sunet generat de AI",
+    "shortcutsHelpOpen": "Afișează scurtăturile de tastatură",
+    "shortcutsHelpClose": "Închide scurtăturile de tastatură",
+    "shortcutsTitle": "Scurtături de tastatură",
+    "shortcutsSpace": "Redă sau pune pe pauză",
+    "shortcutsArrowsLR": "Derulează înainte sau înapoi cu 5 secunde",
+    "shortcutsArrowsUD": "Crește sau scade volumul cu 5%",
+    "shortcutsJL": "Derulează înainte sau înapoi cu 10 secunde",
+    "shortcutsM": "Activează sau dezactivează sunetul",
+    "shortcutsC": "Afișează sau ascunde subtitrările",
+    "shortcutsF": "Ecran complet",
+    "shortcutsSpeed": "Scade sau crește viteza",
+    "captionsOn": "Subtitrări activate",
+    "captionsOff": "Subtitrări dezactivate"
   },
   "diagram": {
     "title": "Configurare eveniment",
@@ -2687,7 +3292,28 @@
     "emailInvalid": "Introduceți o adresă de e-mail validă",
     "chatLockedMessage": "Introduceți numele pentru a participa la chatul evenimentului.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Evenimentul este pe cale să înceapă, așteaptă organizatorii…",
+    "exitWaiting": "Ieși din sala de așteptare",
+    "aiNoticeTitle": "Procesare cu IA după eveniment",
+    "aiNotice": "La final, înregistrarea va fi procesată cu instrumente de inteligență artificială pentru a genera transcriere, rezumat și eventuale traduceri și dublaje. Rezultatele pot conține inexactități; înregistrarea video rămâne sursa de referință.",
+    "multitrackConsentTitle": "Înregistrare per participant",
+    "multitrackConsentRequired": "Trebuie să accepți înregistrarea pistei tale audio pentru a intra",
+    "enterGardenTitle": "Intră în piață",
+    "enterGardenHint": "Un spațiu de explorat cât aștepți: de acolo îți poți potrivi numele și microfonul și poți intra în eveniment.",
+    "backToWaitingRoom": "Înapoi la sala de așteptare",
+    "gardenDialogLabel": "Piața sălii de așteptare",
+    "gardenGateHint": "Poți intra de aici sau îți poți duce avatarul până la poartă.",
+    "classicVersion": "Versiunea clasică",
+    "warmup": {
+      "queued": "Cerere preluată",
+      "startingBridge": "Pornim serverul video…",
+      "provisioningNode": "Creăm un server video dedicat",
+      "almostReady": "Server video activ: aproape gata",
+      "almostReadyDetail": "Încă o clipă și butonul de intrare se va activa singur.",
+      "honestHint": "Așteptare obișnuită: sub un minut dacă infrastructura este deja caldă, 3–5 minute la prima pornire. Între timp poți verifica camera și microfonul sau folosi conversația.",
+      "elapsed": "în pregătire de {time}"
+    }
   },
   "recording": {
     "management": "Înregistrare video",
@@ -2713,7 +3339,11 @@
     "notConfigured": "Jibri nu este configurat în infrastructură. Înregistrarea video nu este disponibilă.",
     "disabledHint": "Înregistrarea video nu este activată pentru acest eveniment. Pentru a o activa, deschideți secțiunea Setări de mai sus și activați comutatorul „Înregistrare”.",
     "play": "Redați",
-    "download": "Descărcați"
+    "download": "Descărcați",
+    "transcriptManage": "Transcriere / AI",
+    "deleteConfirmTitle": "Șterge înregistrarea",
+    "deleteFailed": "Ștergerea nu a reușit",
+    "deleteSuccess": "Înregistrare ștearsă"
   },
   "postEvent": {
     "config": "Configurare post-eveniment",
@@ -2731,8 +3361,17 @@
       "qa": "Întrebări și Răspunsuri",
       "materials": "Materiale",
       "polls": "Sondaje",
-      "feedback": "Feedback"
-    }
+      "feedback": "Feedback",
+      "transcript": "Transcriere AI"
+    },
+    "pageVisibleHelp": "Dacă este dezactivată (sau dacă fereastra de vizibilitate a expirat), pagina publică a evenimentului încheiat returnează 404, iar evenimentul dispare din liste și din sitemap.",
+    "libraryListed": "Publică în biblioteca video",
+    "libraryListedHelp": "Afișează acest eveniment în biblioteca publică (/video-library). Necesită o înregistrare publicată sau un videoclip YouTube și ca pagina evenimentului să fie vizibilă.",
+    "libraryListedNoRecording": "Nicio înregistrare publicată: evenimentul nu va apărea în bibliotecă până când nu publicați înregistrarea sau nu adăugați un videoclip YouTube.",
+    "showRecap": "Afișează recapitularea evenimentului",
+    "showWordCloud": "Afișează norul de cuvinte",
+    "emailEnabled": "Trimite e-mail de recapitulare la finalul evenimentului",
+    "emailEnabledHelp": "La încheiere, trimite participanților înscriși un e-mail de mulțumire cu linkurile către recapitulare și feedback, iar moderatorului un scurt rezumat. Se trimite o singură dată."
   },
   "provisioning": {
     "loading": "Se încarcă",
@@ -2802,5 +3441,143 @@
     "noComments": "No comments",
     "yes": "Da",
     "no": "Nu"
+  },
+  "agenda": {
+    "title": "Notițe / Listă de verificare",
+    "empty": "Încă nu există puncte. Adăugați temele de tratat și bifați-le pe parcurs.",
+    "add": "Adaugă",
+    "addPlaceholder": "Punct nou…",
+    "remove": "Elimină",
+    "inProgress": "în curs",
+    "agree": "De acord",
+    "disagree": "Nu sunt de acord",
+    "favorablePct": "{pct}% favorabil",
+    "noReactions": "Spuneți-vă părerea"
+  },
+  "changelog": {
+    "metaTitle": "Noutăți și changelog",
+    "title": "Noutăți și changelog",
+    "intro": "Toate versiunile platformei, începând cu cea mai recentă. Fiecare intrare rezumă principalele noutăți, corecții și îmbunătățiri.",
+    "current": "Versiunea actuală",
+    "sourceNote": "Notele sunt redactate pornind de la tag-urile, pull request-urile și commit-urile proiectului.",
+    "sourceLink": "Vezi toate versiunile pe GitHub",
+    "rawChangelog": "CHANGELOG.md în depozit",
+    "transparencyNote": "Pentru fiecare versiune: ce rulează și cu ce componente, în",
+    "transparencyInventory": "transparența serviciilor",
+    "transparencySecurity": "securitate și SBOM",
+    "technicalDetail": "Detalii tehnice",
+    "releaseLink": "Release",
+    "securityBadge": "Securitate",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Închide",
+    "sbomLoading": "Se încarcă…",
+    "sbomError": "SBOM-ul nu a putut fi încărcat.",
+    "sbomComponents": "componente",
+    "sbomSearch": "caută componentă…",
+    "sbomColName": "Componentă",
+    "sbomColVersion": "Versiune",
+    "sbomColEcosystem": "Ecosistem",
+    "sbomNoMatch": "Nicio componentă corespunzătoare.",
+    "sbomDownload": "Descarcă SBOM complet (SPDX)",
+    "sourcesLink": "Cod sursă",
+    "codeScanningLink": "Analiza codului (CodeQL)"
+  },
+  "postprod": {
+    "loading": "Se încarcă transcrierea…",
+    "loadError": "Transcrierea nu a putut fi încărcată: {error}",
+    "empty": "Nicio transcriere disponibilă pentru acest eveniment.",
+    "tabTranscript": "Transcriere",
+    "tabSummary": "Rezumat",
+    "aiBadgeLabel": "Conținut generat de AI",
+    "aiBadgeBody": "Transcrierea și rezumatul sunt produse automat de pipeline-ul AI în cluster. Pot conține erori; videoul rămâne sursa de referință.",
+    "searchPlaceholder": "Caută în transcriere…",
+    "searchLabel": "Caută în transcriere",
+    "searchClear": "Șterge căutarea",
+    "searchNoMatches": "Niciun rezultat pentru „{query}”.",
+    "searchMatches": "{count, plural, =1 {1 rezultat} one {# rezultat} few {# rezultate} other {# de rezultate}}",
+    "downloadLabel": "Descarcă",
+    "downloadMenu": "Opțiuni de descărcare",
+    "downloadTranscriptTxt": "Transcriere (.txt)",
+    "downloadTranscriptSrt": "Subtitrări (.srt)",
+    "downloadTranscriptVtt": "Subtitrări (.vtt)",
+    "downloadSummaryMd": "Rezumat (.md)",
+    "hero": {
+      "badge": "Rezumat automat",
+      "aiActArt50": "Conținut generat de AI",
+      "title": "Pe scurt",
+      "availableIn": "Rezumat disponibil și în {langs}",
+      "summaryLanguageLabel": "Limba rezumatului",
+      "topicsLabel": "Capitole — faceți clic pentru a sări la momentul respectiv din video",
+      "keyDecisions": "Decizii luate",
+      "actionItems": "Sarcini de îndeplinit",
+      "expandDetails": "Afișează deciziile și sarcinile",
+      "collapseDetails": "Ascunde deciziile și sarcinile"
+    },
+    "nowSpeaking": "Vorbește acum",
+    "shareSegment": "Partajează acest moment",
+    "shareSegmentCopied": "Link copiat în clipboard",
+    "bookmarkAdd": "Salvează la marcaje",
+    "bookmarkRemove": "Elimină marcajul",
+    "bookmarksHeader": "Marcajele dumneavoastră",
+    "bookmarksEmpty": "Nu ați salvat încă niciun moment din video. Deschideți un segment al transcrierii și faceți clic pe stea pentru a-l adăuga aici.",
+    "miniPlayerOpen": "Adu videoul în prim-plan",
+    "miniPlayerClose": "Închide mini-playerul",
+    "miniPlayerHint": "Rămâneți aproape de video în timp ce derulați pagina",
+    "followLive": "Urmărește videoul",
+    "followManual": "Citire liberă",
+    "followResume": "Reia urmărirea videoului",
+    "lowConfidenceBadge": "de verificat",
+    "lowConfidenceTitle": "Această porțiune a transcrierii are încredere scăzută: înregistrarea poate conține alte cuvinte. Consultați întotdeauna videoul original.",
+    "miniTranscriptLabel": "Transcriere live",
+    "dubAvailableHint": "Sunet dublat disponibil în {langs}. Folosiți selectorul audio din controalele playerului pentru a asculta versiunea tradusă.",
+    "provenance": {
+      "triggerLabel": "Transparența procesării AI",
+      "closeLabel": "Ascunde detaliile procesării",
+      "intro": "Acestea sunt modelele care au generat transcrierea, rezumatul și dublajul acestei înregistrări. Sunt salvate la finalul procesării: vedeți ce a fost folosit efectiv în acel moment, indiferent de eventualele modificări ulterioare ale setărilor.",
+      "asr": {
+        "title": "Transcriere",
+        "hint": "Recunoașterea vorbirii și separarea vorbitorilor.",
+        "engine": "Motor",
+        "model": "Model",
+        "version": "Versiune",
+        "diarizationEngine": "Diarizare",
+        "diarizationSpeakers": "Vorbitori detectați"
+      },
+      "llm": {
+        "title": "Rezumat și traducere",
+        "hint": "Rezumatul întâlnirii și traducerea transcrierii și a rezumatului.",
+        "engine": "Servit de",
+        "model": "Model",
+        "vendor": "Furnizor",
+        "license": "Licență",
+        "country": "Sediu social"
+      },
+      "tts": {
+        "title": "Dublaj",
+        "hint": "Sinteză vocală pentru generarea sunetului în limbile țintă.",
+        "engine": "Motor",
+        "license": "Licență",
+        "policy": "Regula de atribuire a vocilor"
+      },
+      "languages": {
+        "title": "Limbi procesate",
+        "hint": "Originea înregistrării și destinațiile pentru traducere și dublaj.",
+        "source": "Limba originală",
+        "translation": "Traduceri",
+        "dubbing": "Dublaje",
+        "none": "Niciuna"
+      },
+      "voices": {
+        "title": "Voci sintetice atribuite vorbitorilor",
+        "male": "voce masculină",
+        "female": "voce feminină"
+      },
+      "runAt": "Procesare finalizată la",
+      "version": "Versiunea pipeline-ului"
+    },
+    "overlapBadge": "simultan",
+    "overlapTitle": "Vorbire simultană: în acest interval vorbesc mai multe persoane în același timp."
   }
 }

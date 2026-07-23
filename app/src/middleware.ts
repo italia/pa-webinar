@@ -11,7 +11,17 @@ const LOCALE_SEGMENT = locales.join('|');
 
 const ADMIN_PATH_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin(?:/|$)`);
 const ADMIN_LOGIN_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/login(?:/|$)`);
-const ADMIN_EVENT_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/(?:events|eventi)/[^/]+(?:/[^/]+)?$`);
+// Event pages under /admin reachable by a NON-admin event moderator via magic
+// link (moderatorLink = /admin/events/{id}?token=…): the shared management page
+// and its /edit. They authenticate on the event moderator token, not the admin
+// session (see events/[id]/page.tsx + edit/page.tsx). The id segment MUST be a
+// UUID — this deliberately EXCLUDES the sibling /admin/events/new create wizard,
+// which has no token auth of its own and must stay behind the admin session
+// (otherwise ?token=<any-uuid> would leak the wizard's templates/settings).
+const ADMIN_EVENT_RE = new RegExp(
+  `^/(?:${LOCALE_SEGMENT})/admin/(?:events|eventi)/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(?:/[^/]+)?$`,
+  'i',
+);
 const LOCALE_PREFIX_RE = new RegExp(`^/(${LOCALE_SEGMENT})(?:/|$)`);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -221,22 +231,36 @@ export default async function middleware(request: NextRequest) {
     return applySecurityHeaders(response, nonce);
   }
 
-  if (ADMIN_EVENT_RE.test(pathname)) {
-    const tokenParam = request.nextUrl.searchParams.get('token');
-    if (tokenParam && UUID_RE.test(tokenParam)) {
-      return applySecurityHeaders(response, nonce);
-    }
+  // Admin-area gate. A VALID admin session (JWT signature + non-expired) lets
+  // any /admin/* page through.
+  const hasAdminCookie = !!request.cookies.get('admin_session')?.value;
+  const validAdmin = hasAdminCookie ? await isValidAdminSession(request) : false;
+  if (validAdmin) {
+    return applySecurityHeaders(response, nonce);
   }
 
-  const valid = await isValidAdminSession(request);
-  if (!valid) {
-    const pathLocale = extractLocaleFromPath(pathname);
-    const locale = pathLocale ?? getRuntimeDefaultLocale(request);
-    const loginUrl = new URL(`/${locale}/admin/login`, request.url);
-    return NextResponse.redirect(loginUrl);
+  // No valid admin session. Distinguish two very different visitors:
+  //  • an EVENT MODERATOR reaching a `?token=` management/edit page via magic
+  //    link — they have NO admin_session cookie at all and must keep access
+  //    (bouncing them to an admin-key login they can't pass would lock them out
+  //    of running their own event: moderatorLink = /admin/events/{id}?token=…);
+  //  • an ADMIN whose session LAPSED — the cookie outlives the JWT (see
+  //    ADMIN_COOKIE_MAX_AGE_SECONDS), so it is still PRESENT though invalid;
+  //    that "present-but-invalid" state means an admin, and they go to login.
+  const tokenParam = request.nextUrl.searchParams.get('token');
+  const isModeratorTokenPage =
+    ADMIN_EVENT_RE.test(pathname) &&
+    !!tokenParam &&
+    UUID_RE.test(tokenParam) &&
+    !hasAdminCookie;
+  if (isModeratorTokenPage) {
+    return applySecurityHeaders(response, nonce);
   }
 
-  return applySecurityHeaders(response, nonce);
+  const pathLocale = extractLocaleFromPath(pathname);
+  const locale = pathLocale ?? getRuntimeDefaultLocale(request);
+  const loginUrl = new URL(`/${locale}/admin/login`, request.url);
+  return NextResponse.redirect(loginUrl);
 }
 
 export const config = {

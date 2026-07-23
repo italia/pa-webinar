@@ -1,5 +1,5 @@
 import { getSettings } from '@/lib/settings';
-import { getPublicEnv } from '@/lib/env';
+import { appBaseUrl } from '@/lib/env';
 
 const CORS_HEADERS = {
   'Cache-Control': 'public, s-maxage=300',
@@ -43,7 +43,8 @@ export async function GET() {
         settings.logoUrl ||
         '/images/default-watermark.svg',
       avatarBackgrounds: BI_AVATAR_BACKGROUNDS,
-      inviteDomain: new URL(getPublicEnv('NEXT_PUBLIC_APP_URL')).hostname,
+      // Guardato: un NEXT_PUBLIC_APP_URL senza schema faceva 500 questa route.
+      inviteDomain: appBaseUrl()?.hostname ?? '',
     },
     { headers: CORS_HEADERS },
   );

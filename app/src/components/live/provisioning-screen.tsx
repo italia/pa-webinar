@@ -46,22 +46,35 @@ export default function ProvisioningScreen({
   const [elapsedMs, setElapsedMs] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const wokeOnce = useRef(false);
+  // Mirror of `status` for the interval below, which must not be torn down and
+  // recreated on every status change.
+  const statusRef = useRef(initialStatus);
+  useEffect(() => { statusRef.current = status; }, [status]);
 
-  // 1) Fire /wake once on mount.
+  // 1) Ask the room to warm up. `/wake` is the ONLY way out of IDLE — the
+  //    scaler's pre-scale only picks up PUBLISHED events — so a single
+  //    fire-and-forget attempt is not enough: a transient failure (rate limit,
+  //    a blip, or arriving before the pre-scale window opens) would leave the
+  //    room dark with nothing left to retry. We re-ask on every poll until the
+  //    room is actually warming or live.
+  const wake = useCallback(async () => {
+    try {
+      const r = await fetch(`/api/events/${encodeURIComponent(slug)}/wake`, {
+        method: 'POST',
+      });
+      if (!r.ok) return;
+      const body = (await r.json()) as { status?: EventStatus };
+      if (body.status) setStatus(body.status);
+    } catch {
+      // Next poll tries again.
+    }
+  }, [slug]);
+
   useEffect(() => {
     if (wokeOnce.current) return;
     wokeOnce.current = true;
-    fetch(`/api/events/${encodeURIComponent(slug)}/wake`, { method: 'POST' })
-      .then(async (r) => {
-        if (!r.ok) throw new Error(`wake ${r.status}`);
-        const body = (await r.json()) as { status?: EventStatus };
-        if (body.status) setStatus(body.status);
-      })
-      .catch(() => {
-        // Transient: the poll loop below will still catch the LIVE state once
-        // the scaler runs. Don't block the UI on wake errors.
-      });
-  }, [slug]);
+    void wake();
+  }, [wake]);
 
   // 2) Poll lifecycle until LIVE (or ENDED/error).
   const poll = useCallback(async () => {
@@ -88,9 +101,17 @@ export default function ProvisioningScreen({
   }, [slug, t]);
 
   useEffect(() => {
-    const id = setInterval(poll, POLL_INTERVAL_MS);
+    const id = setInterval(() => {
+      void poll();
+      // Re-ask while the room is still cold. Cheap (the endpoint is a no-op
+      // once it is PROVISIONING/LIVE) and it is what turns a one-shot failure
+      // into a self-healing wait.
+      if (statusRef.current === 'IDLE' || statusRef.current === 'PUBLISHED') {
+        void wake();
+      }
+    }, POLL_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [poll]);
+  }, [poll, wake]);
 
   // 3) Elapsed ticker for the progress bar.
   useEffect(() => {

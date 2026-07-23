@@ -15,10 +15,12 @@ describe('permission-matrix', () => {
     for (const f of EVENT_FEATURES) expect(m[f]).toContain('MODERATOR');
   });
 
-  it('defaults: guests see Q&A, not chat/mic/video/share/rec', () => {
+  it('defaults: guests see chat, not Q&A/mic/video/share/rec', () => {
+    // Chat is the primary channel (live feedback #10): a blank event defaults
+    // to chat-on / Q&A-off for guests.
     const m = defaultMatrix();
-    expect(m.qa).toContain('GUEST');
-    expect(m.chat).not.toContain('GUEST');
+    expect(m.chat).toContain('GUEST');
+    expect(m.qa).not.toContain('GUEST');
     expect(m.mic).not.toContain('GUEST');
     expect(m.video).not.toContain('GUEST');
     expect(m.share).not.toContain('GUEST');

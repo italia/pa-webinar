@@ -1,0 +1,361 @@
+{
+  "0.8.9": {
+    "title": "Ir-reġistru tal-bidliet, issa bl-inventarju tas-software integrat",
+    "notes": [
+      "Kull ħruġ jiftaħ hawn il-lista tal-komponenti tas-software tiegħu (SBOM): lista li tista' tfittex ta' kull komponent inkluż, bil-verżjoni u l-ekosistema — mingħajr tniżżil.",
+      "It-taqsima teknika issa hija sett ta' links — SBOM, il-ħruġ fuq GitHub, is-sorsi f'dik it-tikketta, il-pipeline tal-bini — minflok paragrafu li kien jirrepeti s-sommarju ta' fuq.",
+      "Il-qiegħ iżid is-sinjali tas-sigurtà tal-proġett: l-OpenSSF Scorecard u r-riżultati tal-iskennjar tal-kodiċi."
+    ]
+  },
+  "0.8.8": {
+    "title": "Il-paġna tal-aħbarijiet, iddisinjata mill-ġdid",
+    "notes": [
+      "Kull ħruġ issa jinqara fuq żewġ livelli: il-punti ewlenin li jimpurtawlek u — taħt it-tab „Dettall tekniku“ li tiftaħ biss jekk trid — ix-xogħol tekniku ta’ warajhom.",
+      "Kull verżjoni li toħroġ b’lista tal-komponenti tas-software (SBOM) tgħaqqad direttament mal-ħruġ tagħha fuq GitHub, fejn l-SBOM huwa mehmuż. Ir-repożitorju tal-kodiċi sors issa huwa pubbliku.",
+      "Il-faxxa tal-linja taż-żmien fin-naħa ta’ fuq telqet: saret imħawda hekk kif il-ħruġ akkumula u kienet tgħid ftit. Id-dati jibqgħu fuq kull karta."
+    ]
+  },
+  "0.8.7": {
+    "title": "L-interfaċċja kompluta fl-24 lingwa kollha, u identità viżiva mġedda",
+    "notes": [
+      "L-interfaċċja issa hija tradotta kompletament fl-24 lingwa kollha tal-UE: qabel, diversi skrins — fosthom il-kamra tal-istennija u t-testi tal-kunsens — kienu jaqilbu għat-Taljan fejn kienet nieqsa t-traduzzjoni.",
+      "Logo u identità viżiva mġedda (favicon, ikona, watermark), u previżjoni b'immaġni meta jiġi kondiviż il-link ta' avveniment fiċ-chat u fuq il-midja soċjali.",
+      "Paġna tal-aħbarijiet f'kull lingwa, b'links għat-trasparenza tas-servizzi u għas-sigurtà."
+    ]
+  },
+  "0.8.6": {
+    "title": "Il-kamra tal-istennija: paġna, u pjazza li tagħżel int li tidħol fiha",
+    "notes": [
+      "Il-kamra tal-istennija issa hija paġna nadifa skont is-sistema tad-disinn: l-avveniment, il-kontrolli tal-awdjo u tal-vidjo, l-isem, iċ-chat. Il-logħba ż-żgħira li kienet fil-kaxxa tal-ġenb tneħħiet.",
+      "Il-pjazza interattiva tinfetaħ biss jekk tagħżilha, u timla l-iskrin kollu. Il-kontrolli tal-paġna jibqgħu maġenbha — isem, mikrofonu, kamera, chat, avviżi — u tista' terġa' lura meta trid. Min jippreferi mingħajr animazzjoni jista' jaqleb għall-verżjoni klassika, u l-għażla tinżamm.",
+      "Avatars: jekk l-indirizz li rreġistrajt bih għandu Gravatar, issa jista' jidher bħala r-ritratt tiegħek fil-kamra. Jixgħelu l-amministratur, u t-talba ssir mis-server tagħna: il-browser ta' min jipparteċipa qatt ma jikkuntattja lil gravatar.com.",
+      "Il-komponent li jirreġistra l-avveniment m'għadux jidher fost il-parteċipanti u lanqas fl-għadd: hija servizz intern, mhux persuna fil-kamra. L-avviż li l-avveniment qed jiġi rreġistrat jibqa' fejn kien."
+    ]
+  },
+  "0.8.5": {
+    "title": "Chat aktar ħajja: mentions, reazzjonijiet, korrezzjonijiet u esportazzjoni",
+    "notes": [
+      "Chat: meta xi ħadd isejjaħlek bl-@, il-messaġġ issa jiġi enfasizzat u, jekk tkun qed tħares band’oħra, tasallek notifika. Qabel, li tissemma ma kien jingħaraf xejn minn messaġġ ieħor.",
+      "Chat: issa tista’ tirreaġixxi għal messaġġ wieħed b’emoji, u tikkoreġi messaġġ tiegħek stess sa ħmistax-il minuta wara (jibqa’ jidher li nbidel). Il-buttuna “Wieġeb” saret aktar diskreta.",
+      "Chat: buttuna ġdida biex tniżżel il-konverżazzjoni kollha, f’forma ta’ test jew ta’ dejta. Il-messaġġi diġà kienu jinżammu, imma ma kien hemm ebda mod kif jitteħdu ’l barra.",
+      "Fil-kamra: timer juri kemm fadal sat-tmiem (jew kemm ilu li beda l-avveniment), mixgħul bħala default għal min imexxi u li kulħadd jista’ jixgħel.",
+      "Kamra m’għadhiex tinxtegħel minn min jiftaħ il-paġna tal-avveniment sigħat qabel: tissaħħan meta jkun il-waqt, kif suppost. Issewwa wkoll każ fejn l-avveniment kien jintefa ftit minuti wara li jibda.",
+      "Statistika: l-ogħla numru ta’ parteċipanti issa jiġi rreġistrat ukoll għal kull sessjoni għaliha, mhux biss għall-avveniment kollu."
+    ]
+  },
+  "0.8.4": {
+    "title": "Emails ta’ konferma: l-isem tal-avveniment, l-istampa u mittent konfigurabbli",
+    "notes": [
+      "L-emails ta’ konferma tar-reġistrazzjoni reġgħu jġorru l-isem tal-avveniment, kemm fis-suġġett kif ukoll fil-korp tal-messaġġ. Min kien jirreġistra minn paġna b’lingwa li fiha t-titlu ma kienx ġie tradott kien jirċievi email mingħajr l-isem tal-avveniment u anness tal-kalendarju mingħajr titlu.",
+      "L-emails ta’ konferma u t-tfakkiriet issa jinfetħu bl-istampa tal-avveniment fil-quċċata, bit-titlu jispikka sew, minflok ma jibqa’ mistur f’ringiela tat-tabella tad-dettalji.",
+      "Issettjar ġdid fil-pannell tal-amministrazzjoni: l-isem li bih jidher il-mittent fil-kaxxa postali ta’ min jirċievi, u indirizz fejn jaslu r-risposti (l-emails jintbagħtu minn indirizz li ma jirċevihomx).",
+      "B’mod aktar ġenerali, test li ma jkunx ġie tradott f’lingwa issa juri l-verżjoni oriġinali minflok ma jidher vojt: dan kien jolqot ukoll it-titli u d-deskrizzjonijiet fuq il-paġni pubbliċi."
+    ]
+  },
+  "0.8.3": {
+    "title": "Kunfidenzjalità taċ-chat, għadd korrett tal-parteċipanti u moderazzjoni lura fis-seħħ",
+    "notes": [
+      "L-istorja taċ-chat m’għadhiex tista’ tinqara minn min ma jkunx qed jieħu sehem fl-avveniment. Qabel, kull min kien jaf l-indirizz ta’ avveniment seta’ jniżżel il-messaġġi tiegħu — flimkien mal-ismijiet ta’ min kitibhom — anke wara li l-avveniment kien intemm. Issa jeħtieġ li wieħed ikun irreġistrat, ikun moderatur, jew ikun fil-kamra waqt li l-avveniment ikun għaddej.",
+      "In-numru ta’ parteċipanti muri fil-kamra kien żbaljat b’wieħed, għax kull persuna ma kinitx tgħodd lilha nnifisha. L-istess żball kien jispiċċa fl-istatistika tal-avveniment (l-ogħla numru ta’ parteċipanti). Issa l-għadd huwa korrett u jaqbel ma’ dak imniżżel fl-istatistika.",
+      "Il-kontrolli tal-moderatur fil-lista tal-parteċipanti reġgħu jaħdmu: it-tneħħija ta’ parteċipant u l-volum individwali qabel ma kienu jagħmlu ebda effett.",
+      "Ir-reazzjonijiet issa huma disponibbli wkoll mis-smartphone, fejn ma kienet għadha teżisti ebda buttuna biex jintbagħtu. L-emojis li jtiru mal-iskrin m’għadhomx jaqtgħu l-klikks fuq il-bar tal-kontrolli.",
+      "Bl-iskrin sħiħ, il-kaxxi ta’ djalogu — dik għall-qsim tal-link u, għall-moderatur, “Oħroġ mill-kamra” — reġgħu jidhru: qabel kienu jibqgħu moħbija wara l-video, u l-buttuni kienu jidhru li ma kinux jaħdmu.",
+      "Il-mudelli tal-avvenimenti issa jibdew biċ-chat mixgħula, bħall-kamra nnifisha: meta wieħed kien joħloq “Webinar” xorta kien joħroġlu avveniment mingħajr chat.",
+      "It-traduzzjoni bl-Ingliż tal-interfaċċa issa hija kompluta; kien hemm xi elementi neqsin, fosthom il-kaxxa “Aqsam” kollha kemm hi."
+    ]
+  },
+  "0.8.2": {
+    "title": "Ebda kamra vojta ma tibqa’ mixgħula wara l-ħin",
+    "notes": [
+      "Kamra li kienet tibqa’ miftuħa wara l-ħin tat-tmiem u mbagħad titbattal kienet tinżamm attiva għal żmien indefinit, u żżomm riżorsi tal-video okkupati għalxejn. Issa, jekk tibqa’ vojta għal 45 minuta wara l-ħin tat-tmiem previst, tingħalaq. Kamra li tkun għadha qed tintuża qatt ma tiġi interrotta: wara l-ħin jidher biss avviż, u ħadd ma jinqata’ mill-kamra."
+    ]
+  },
+  "0.8.1": {
+    "title": "Reazzjonijiet konfigurabbli, għeluq tal-kamra vojta u aktar sigurtà fl-area tal-amministrazzjoni",
+    "notes": [
+      "Ir-reazzjonijiet (emojis) issa jistgħu jiġu kkonfigurati mill-amministratur: bħala default jintużaw dawk nattivi ta’ Jitsi, direttament mill-bar tal-kontrolli (ħfief u ta’ mument). Inkella jistgħu jinxtegħlu r-reazzjonijiet proprji tal-pjattaforma, li jidhru f’bar fin-naħa t’isfel tax-xellug u jingħaddu fl-istatistika tal-avveniment.",
+      "Għażla ġdida għall-amministratur: l-għeluq awtomatiku ta’ kamra li tibqa’ għal kollox vojta, moderaturi inklużi, bħala sinjal li l-avveniment ġie abbandunat. Hija mitfija bħala default — l-inattività mingħajr moderatur diġà hija ttrattata b’mod sigur, għax il-kamra tidħol fi stat ta’ rqad wara 45 minuta — u tista’ tinxtegħel mill-issettjar.",
+      "Area tal-amministrazzjoni aktar sigura: meta s-sessjoni tiskadi wieħed jintbagħat lura lejn l-iskrin tal-login, u b’hekk m’għadux possibbli li jintużaw il-paġni tal-amministrazzjoni b’sessjoni skaduta. Is-sessjoni ddum ukoll aktar u tiġġedded waħedha waqt li tkun għaddejja l-ħidma."
+    ]
+  },
+  "0.8.0": {
+    "title": "Kamra tal-avveniment aktar nadifa: chat, reazzjonijiet, skrin sħiħ u reġistrazzjoni",
+    "notes": [
+      "Chat: issa jistgħu jiddaħħlu emojis fil-messaġġi permezz ta’ selettur apposta, u indikatur żgħir iwissi jekk l-aġġornamenti taċ-chat jibdew jitniżżlu bil-mod. Il-messaġġi li jintbagħtu jidhru mal-ewwel, anke fuq netwerks tal-uffiċċju li jżommu lura l-aġġornamenti f’ħin reali.",
+      "Skrin sħiħ: il-buttuna tal-iskrin sħiħ issa żżomm iċ-chat tidher fil-ġenb, minflok ma taħbiha.",
+      "Ir-reazzjonijiet (emojis) m’għadhomx jgħattu l-kontrolli t’isfel: il-bar jibqa’ dejjem jista’ jiġi kklikkjat, anke fil-veduta f’mużajk.",
+      "Il-buttuni “Aqsam” u “Oħroġ mill-kamra” issa jidhru ċari u kkuluriti bħala default (dik tal-ħruġ bl-aħmar), u mhux biss meta jgħaddi l-maws minn fuqhom.",
+      "Il-bot “Recorder” m’għadux jidher fil-lista tal-parteċipanti u lanqas fl-għadd.",
+      "Reġistrazzjoni: min jirreġistra ħafna qabel jintbagħat lejn paġna ta’ konferma bil-link biex iżid l-avveniment mal-kalendarju, minflok lejn il-kamra tal-istennija; qrib il-ħin tal-bidu wieħed jidħol dritt fil-kamra. Fuq il-paġna tal-avveniment jidher ukoll jekk wieħed ikunx diġà rreġistra.",
+      "Iċ-chat issa hija l-mezz ewlieni ta’ interazzjoni fil-kamra. Tjiebu wkoll l-għeluq awtomatiku ta’ avveniment li jibqa’ vojt u l-għadd tal-parteċipanti fl-istatistika."
+    ]
+  },
+  "0.7.8": {
+    "title": "Il-moderatur jista’ jniżżel id merfugħa",
+    "notes": [
+      "Fil-kju tal-idejn merfugħa, il-moderatur issa għandu buttuna biex iniżżel id ta’ parteċipant wieħed — utli meta xi ħadd ikun diġà tkellem jew ikun ħalla idu merfugħa bi żball. It-talba tasal għand dak il-parteċipant, li jara idu nieżla; ħadd ieħor ma jintmess."
+    ]
+  },
+  "0.7.7": {
+    "title": "Inqas storbju fl-isfond waqt li wieħed jitkellem",
+    "notes": [
+      "Kanċellazzjoni avvanzata tal-istorbju tal-isfond tidħol fis-seħħ meta wieħed jieħu l-kelma: trażżan aħjar ħsejjes bħall-keyboard, il-fannijiet jew it-traffiku, minbarra t-tnaqqis bażiku li diġà kien hemm."
+    ]
+  },
+  "0.7.6": {
+    "title": "Volum għal kull parteċipant",
+    "notes": [
+      "Kontroll ġdid tal-volum għal kull parteċipant fil-pannell “Parteċipanti”: jekk vuċi tinstema’ għolja wisq jew baxxa wisq, tista’ tiġi aġġustata b’mod personali biss, mingħajr ma jinbidel dak li jisimgħu l-oħrajn.",
+      "Ir-rekording tal-awdjo separat għal kull parteċipant, użat fil-post-produzzjoni, sar aktar affidabbli: jekk il-qbid tal-awdjo joħroġ mut, is-sistema tinduna mill-ewwel u tevita li tinħoloq traskrizzjoni vojta."
+    ]
+  },
+  "0.7.5": {
+    "title": "L-id merfugħa tibqa’ merfugħa",
+    "notes": [
+      "Meta wieħed jerfa’ idu, issa tibqa’ merfugħa sakemm iniżżilha hu stess jew sakemm moderatur jieħu ħsiebha: qabel kienet tinżel waħedha malli l-persuna tibda titkellem, u b’hekk kienet “tisparixxi” mill-kju ta’ min ried jitkellem."
+    ]
+  },
+  "0.7.4": {
+    "title": "L-isem fiċ-chat protett mil-links mgħoddija lil ħaddieħor (sigurtà)",
+    "notes": [
+      "Fiċ-chat, l-isem veru ta’ persuna rreġistrata jintwera biss fuq l-apparat li bih tkun irreġistrat: min jiftaħ link ta’ parteċipazzjoni li jkun ġie mgħoddi lilu jieħu sehem bl-isem li jdaħħal hu, u mhux f’isem il-persuna rreġistrata oriġinali. B’hekk ingħalqet il-possibbiltà li l-messaġġi jiġu attribwiti lil min ma kitibhomx.",
+      "L-istess protezzjoni tapplika għall-annessi: fajl mibgħut minn link mgħoddi lil ħaddieħor m’għadux jiġi attribwit lill-isem tal-persuna rreġistrata oriġinali.",
+      "Min jidħol minn apparat ieħor, pereżempju mit-telefon, jew bil-link li jkun irċieva minn qabel, jibqa’ jieħu sehem, jikteb fiċ-chat u jibgħat l-annessi mingħajr interruzzjoni: jinbidel biss l-isem muri, li jsir dak imdaħħal mad-dħul fil-kamra."
+    ]
+  },
+  "0.7.3": {
+    "title": "Għadd korrett tal-preżenti, reazzjonijiet fin-nofs u rtukkar fil-kamra",
+    "notes": [
+      "L-għadd tal-preżenti m’għadux jimmoltiplika l-istess persuna li toħroġ u terġa’ tidħol, pereżempju bil-buttuna “Lura” tal-browser: il-konnessjonijiet doppji tal-istess persuna jingħaddu darba biss. Il-lista tal-parteċipanti tibqa’ turi kull konnessjoni, biex il-moderatur dejjem ikun jista’ jarahom u jimmaniġġjahom kollha.",
+      "Il-bar tar-reazzjonijiet u tal-emojis issa jinsab fin-nofs, fin-naħa t’isfel tal-iskrin, fejn jidher sew u faċli biex jinstab, minflok fir-rokna t’isfel tax-xellug.",
+      "In-numru ta’ persuni rreġistrati m’għadux jintwera pubblikament fuq il-paġna tal-avveniment u fil-lista tal-avvenimenti: jibqa’ jidher lill-amministraturi fil-pannell. Waqt id-dirett il-pubbliku jara biss in-numru ta’ dawk preżenti.",
+      "It-tnaqqis tal-istorbju tal-isfond jinxtegħel awtomatikament fuq il-mikrofoni kollha: l-ipproċessar bażiku tal-awdjo — eku u storbju — huwa dejjem attiv, mingħajr ma hemm bżonn li jinxtegħel bl-idejn.",
+      "Id-dħul fil-kamra sar ftit aktar mgħaġġel: il-qawmien tas-sistema tal-video jibda diġà malli tingħafas il-buttuna tad-dħul."
+    ]
+  },
+  "0.7.2": {
+    "title": "Chat aktar sinjura: annessi, risposti u mentions",
+    "notes": [
+      "Fiċ-chat issa jistgħu jintbagħtu stampi u annessi (PNG, JPEG, WebP, GIF u PDF, sa 10 MB), b’anteprima direttament fil-messaġġ.",
+      "Funzjoni ġdida “Wieġeb”: wieħed jista’ jikkwota messaġġ speċifiku, u l-kwotazzjoni tibqa’ tidher fil-fil tad-diskussjoni.",
+      "Mentions bl-@: fi ħdan messaġġ wieħed jista’ jsejjaħ parteċipant b’ismu.",
+      "Moderazzjoni taċ-chat: il-moderaturi jistgħu jneħħu messaġġi individwali waqt l-avveniment."
+    ]
+  },
+  "0.7.1": {
+    "title": "Statistika ta’ wara l-avveniment għal kull avveniment",
+    "notes": [
+      "Tab ġdida “Statistika” għal kull avveniment fil-pannell tal-amministratur, disponibbli anke għall-avvenimenti mingħajr reġistrazzjoni jew mingħajr rekording tal-video: turi kif żvolġiet il-laqgħa, min tkellem l-aktar, il-livell ġenerali ta’ parteċipazzjoni u l-indikaturi ewlenin.",
+      "Grafika tal-andament tal-interazzjoni maż-żmien — chat, mistoqsijiet, voti fuq il-mistoqsijiet, stħarriġ, kliem tas-sħaba tal-kliem u reazzjonijiet — bil-mument ta’ qofol tal-laqgħa enfasizzat.",
+      "Klassifika ta’ min tkellem l-itwal (minuti għal kull persuna), bl-indikazzjoni ta’ kemm inqasam sew il-ħin tal-kelma, flimkien mal-għadd tar-reazzjonijiet u tal-idejn merfugħa.",
+      "Stima ġdida ta’ kemm jibqgħu fil-kamra l-parteċipanti bħala medja, użata wkoll fil-kalkolu tal-livell ġenerali ta’ attenzjoni."
+    ]
+  },
+  "0.7.0": {
+    "title": "Ismijiet tal-kelliema li jistgħu jinbidlu u player bl-awdjo biss",
+    "notes": [
+      "Wara l-avveniment issa jistgħu jinbidlu l-ismijiet tal-kelliema, biex jiġu kkoreġuti l-ismijiet li s-sistema tagħraf waħedha mit-traskrizzjoni.",
+      "Jekk ir-rekording ma jkollux video li jista’ jindaqq, il-paġna tal-korrezzjoni xorta toffri player bl-awdjo biss, biex wieħed jerġa’ jisma’ u jirranġa t-test u l-ismijiet tal-kelliema.",
+      "Korrezzjoni fir-rekording b’diversi tracks: issa jinqabad sew l-awdjo veru tal-parteċipanti mill-bogħod."
+    ]
+  },
+  "0.6.9": {
+    "title": "Affidabbiltà tal-ipproċessar bl-IA",
+    "notes": [
+      "Il-pannell tal-amministratur issa juri indikatur tal-affidabbiltà tal-ipproċessar bl-IA ta’ wara l-avveniment (traskrizzjoni, sinteżi, traduzzjonijiet), biex b’daqqa t’għajn wieħed jifhem jekk ir-riżultat huwiex sħiħ u ta’ min joqgħod fuqu."
+    ]
+  },
+  "0.6.8": {
+    "title": "Paġna ta’ editjar ta’ wara l-avveniment aktar ċara",
+    "notes": [
+      "Il-paġna tal-korrezzjoni (traskrizzjoni, sinteżi, traduzzjonijiet) issa tispjega meta l-kontenut maħdum bl-IA jkun għadu mhux disponibbli — “ipproċessar għaddej” jew “ibda l-ipproċessar mill-kontrolli ta’ fuq” — minflok ma turi żball bl-aħmar li kien jidher qisu ħsara.",
+      "Salvataġġ li ma jirnexxix issa jintwera bl-aħmar u jagħti r-raġuni speċifika mibgħuta mis-server, minflok ma jidher bl-aħdar bħallikieku rnexxa.",
+      "Sessjoni tal-amministratur skaduta u problemi fit-tagħbija issa jingħataw messaġġi differenti u ċari, minflok żball ġeneriku wieħed.",
+      "Jekk l-awdjo tar-rekording ma jistax jindaqq, il-paġna tgħid dan, u xorta jibqa’ possibbli li jiġu kkoreġuti t-test u l-kelliem ta’ kull segment."
+    ]
+  },
+  "0.6.7": {
+    "title": "Reazzjonijiet dejjem viżibbli u “Noti / Checklist”",
+    "notes": [
+      "Ir-reazzjonijiet (emojis) issa jidhru dejjem f’bar fin-naħa t’isfel tax-xellug u m’għadhomx moħbija wara buttuna: eħfef biex jinstabu u jintużaw waqt l-avveniment.",
+      "Il-funzjoni “Aġenda” inbidlet f’“Noti / Checklist” biex ikun ċar li hija żona ta’ noti f’forma ta’ checklist u li l-kontenut tagħha ma jmurx fiċ-chat; il-moderatur jibqa’ jista’ jixgħelha għal kull avveniment."
+    ]
+  },
+  "0.6.6": {
+    "title": "Irtukkar: chat, għadd u aċċess",
+    "notes": [
+      "Il-links maqsuma fiċ-chat issa jistgħu jiġu kklikkjati u jinfetħu f’tab ġdid b’mod sigur; qabel kienu test sempliċi.",
+      "Fil-kamra, in-numru totali ta’ persuni rreġistrati issa jidher biss lill-moderaturi: il-parteċipanti jaraw biss kemm hemm nies preżenti tabilħaqq.",
+      "Aċċess aktar mgħaġġel għall-kamra: il-konnessjoni mas-server tal-video titħejja diġà waqt li wieħed ikun fil-kamra tal-istennija, u b’hekk jonqos l-istennija mad-dħul.",
+      "Fil-lista tal-parteċipanti, l-intestatura bl-għadd tibqa’ dejjem tidher waqt li wieħed jiskrollja l-lista."
+    ]
+  },
+  "0.6.5": {
+    "title": "Rekordings u għadd",
+    "notes": [
+      "L-għadd tal-preżenti fil-kamra issa jeskludi r-rekorder: juri biss nies veri, u mhux il-bot li jaqbad l-awdjo.",
+      "Post-produzzjoni: buttuna ġdida “Iġġenera bl-IA” tibda t-traskrizzjoni, is-sinteżi u t-traduzzjoni anke fuq ir-rekordings bl-awdjo biss (track wieħed għal kull parteċipant), li qabel ma kienu joffru ebda mod kif jinbdew.",
+      "Fil-lista tat-tracks, ma’ kull laqam jitqiegħed identifikatur: nies differenti bl-istess laqam jieħdu identifikaturi distinti, filwaqt li diversi interventi tal-istess persuna jaqsmu l-istess identifikatur.",
+      "Messaġġ ċar meta l-bidu tal-pipeline ma jdaħħal ebda xogħol fil-kju — għax l-IA tkun mitfija għal dak l-avveniment jew il-pipeline tkun pawżata — minflok “operazzjoni rnexxiet” li ma tkunx minnha."
+    ]
+  },
+  "0.6.4": {
+    "title": "Sigurtà tal-identità u rtukkar fil-kamra",
+    "notes": [
+      "Korrezzjoni ta’ sigurtà: meta wieħed jaqsam il-link personali tiegħu għall-kamra, min jiftħu issa jidħol b’ISMU stess; qabel seta’ jieħu l-isem ta’ min kien bagħat il-link.",
+      "Qsim tal-iskrin aktar ċar: issa tingħata prijorità lir-riżoluzzjoni (5 fps ta’ kwalità għolja) minflok lill-fluwidità, biex is-slides u d-dokumenti jibqgħu jinqraw anke meta jkun hemm ftit moviment.",
+      "Tneħħiet il-funzjoni “aħbi l-istampa tiegħek” li, ladarba tinxtegħel, ma kinitx tħalli l-kaxxa tal-persuna terġa’ tidher.",
+      "Aċċess tal-amministratur: wara awtentikazzjoni ġdida li ssir minħabba inattività, il-paġna tiġġedded sew, u m’għadhiex tidher imwaħħla sakemm terġa’ tittella’ bl-idejn."
+    ]
+  },
+  "0.6.3": {
+    "title": "Irtukkar fil-kamra tal-avveniment — it-tieni rawnd",
+    "notes": [
+      "It-timer tal-preżentazzjoni issa huwa integrat fil-bar tal-kontrolli tal-moderatur, mingħajr ma jieħu ringiela għalih; il-bar bil-ħin li jonqos jidher biss meta t-timer ikun mixgħul.",
+      "Fiċ-chat jidher l-isem veru ta’ min jikteb, u mhux aktar “Moderatur” ġeneriku.",
+      "Iċ-chat saret pannell għaliha fil-bar tal-ġenb, u m’għadhiex dejjem tinfirex fuq il-kontenut l-ieħor: interfaċċa aktar nadifa, bl-għadd tal-messaġġi mhux moqrija fuq it-tab.",
+      "Buttuna ġdida “Bord” għall-moderaturi, biex il-bord kondiviż jinfetaħ direttament mill-bar tal-kontrolli.",
+      "Il-buttuna “Aqsam” ħadet il-kulur it-tajjeb, u b’hekk m’għadhiex tiġi mħawda ma’ “Oħroġ”; il-links għandhom ikoni ħdejhom; u l-link tal-moderazzjoni, li jidher biss lill-moderaturi, jinsab wara twissija biex ikunu jistgħu jistiednu moderaturi oħra mingħajr żbalji.",
+      "Is-sħaba tal-kliem m’għadhiex mixgħula bħala default: il-moderatur jibqa’ jista’ jixgħelha waqt l-avveniment jekk iridha."
+    ]
+  },
+  "0.6.2": {
+    "title": "Irtukkar fil-kamra tal-avveniment dirett",
+    "notes": [
+      "Il-bar tal-kontrolli (mikrofonu, kamera, qsim tal-iskrin) jibqa’ dejjem viżibbli u jista’ jiġi kklikkjat, anke bl-iskrin sħiħ, waqt qsim tal-iskrin jew meta wieħed ikun waħdu fil-kamra.",
+      "Il-moderatur jista’ mill-ġdid jixgħel u jitfi l-funzjonijiet diretti (Mistoqsijiet, Chat, Aġenda) waqt l-avveniment.",
+      "Il-kontrolli tal-awdjo u tal-video jistgħu jintużaw diġà waqt it-tħejjija tal-kamra, mingħajr ma wieħed jistenna li jitla’ s-server tal-video.",
+      "Il-lista “Idejn merfugħa” turi sew min talab li jitkellem.",
+      "Buttuna ġdida “Aqsam” fil-kamra: tikkopja mal-ewwel il-link biex wieħed jieħu sehem u l-link tal-paġna tal-avveniment, mingħajr ma tikxef tokens riservati.",
+      "Il-marka PA Webinar reġgħet tidher fil-bar ta’ fuq tal-kamra tal-avveniment."
+    ]
+  },
+  "0.6.1": {
+    "title": "Changelog pubbliku u aġġornamenti ta’ sigurtà",
+    "notes": [
+      "Paġna ġdida tal-changelog pubblika, li tinfetaħ billi jingħafas in-numru tal-verżjoni fil-footer: telenka l-verżjonijiet kollha tal-pjattaforma bin-novitajiet ewlenin.",
+      "Aġġornamenti ta’ sigurtà tad-dipendenzi (undici, nodemailer) u tisħiħ tal-pipeline tal-build, b’skennjar tal-vulnerabbiltajiet."
+    ]
+  },
+  "0.6.0": {
+    "title": "Ħidma ta’ wara l-avveniment u kamra tal-istennija interattiva",
+    "notes": [
+      "Fluss ġdid għat-tmiem tal-avveniment: fl-aħħar, mistoqsija apposta tistaqsi lill-moderatur fejn għandu jmur ir-rekording — ippubblikat fuq il-paġna, fil-librerija, jew fl-arkivju biss.",
+      "Sunt awtomatiku u anonimizzat ta’ wara l-avveniment (attendenza, mistoqsijiet l-aktar ivvutati, riżultati tal-istħarriġ, sħaba tal-kliem u evalwazzjonijiet), muri fuq kull paġna ta’ avveniment li ntemm, anke meta ma jkunx hemm rekording.",
+      "Email ta’ sommarju wara l-avveniment lill-parteċipanti, bil-kontenut tal-avveniment.",
+      "Kamra tal-istennija interattiva “Piazza Digitale”: wieħed jimxi bl-avatar tiegħu sal-bieb biex jidħol fil-laqgħa, dejjem bil-buttuna klassika tad-dħul ħdejh.",
+      "Is-sħaba tal-kliem saret sezzjoni għaliha fil-paġna tal-avveniment li ntemm, b’għażla ta’ viżibbiltà għall-amministratur.",
+      "Bord kondiviż (whiteboard) li jista’ jinxtegħel għal kull avveniment u mill-mudelli.",
+      "Reviżjoni tal-esperjenza tal-utent fil-wizard tal-ħolqien tal-avvenimenti: għażliet avvanzati magħluqa, moderatur prinċipali bil-link tiegħu, twissijiet dwar id-dejta personali, salvataġġ tal-abbozz u trattament aħjar tal-iżbalji parzjali.",
+      "Perjodi ta’ żamma differenti għar-rekordings u għat-tracks tal-awdjo ta’ kull kelliem, marbuta mas-sinjal “video ippubblikat”, flimkien mat-tindif taċ-chat skont il-GDPR."
+    ]
+  },
+  "0.5.11": {
+    "title": "Irtukkar fil-moderazzjoni, fl-għeluq tal-laqgħa u fl-awdjo",
+    "notes": [
+      "Il-moderaturi jidhru b’isimhom veru minflok b’“Moderatur” ġeneriku.",
+      "Skrin ta’ għeluq fl-app meta l-avveniment jintemm, minflok il-messaġġ qarrieqi “Kamra qed titħejja”.",
+      "Issewwiet is-sovrappożizzjoni tal-ikoni fil-kamra tal-istennija.",
+      "It-tnaqqis tal-istorbju ġie sfurzat mitfi permezz tal-IFrame API biex jissolvew problemi fl-awdjo."
+    ]
+  },
+  "0.5.9": {
+    "title": "Rekording b’diversi tracks stabbli, feedback bl-istilel u prestazzjoni",
+    "notes": [
+      "Ir-rekording għal kull kelliem (b’diversi tracks) sar affidabbli minn tarf sa tarf: awdjo sħiħ f’kull track, ebda qtugħ, u tellgħat b’mod parallel.",
+      "Kwestjonarju ta’ feedback wara l-avveniment bl-istilel, b’dashboard ta’ sommarju għall-amministratur.",
+      "Titjib fil-prestazzjoni: codec VP9 għall-kamera, tagħbija lazy fuq il-mowbajl u tuning tar-rekorder.",
+      "Hook ta’ wara l-aġġornament f’Helm li jerġa’ jtella’ awtomatikament il-config.js ta’ Jitsi."
+    ]
+  },
+  "0.5.8": {
+    "title": "Kwalità tal-video u tal-awdjo konfigurabbli u fluss ġdid tad-dħul",
+    "notes": [
+      "Kontroll tal-kwalità tal-video u tal-awdjo konfigurabbli mill-amministratur, b’presets għal kull avveniment.",
+      "Fluss tad-dħul iddisinjat mill-ġdid: reġistrazzjoni, imbagħad kamra tal-istennija, imbagħad videokonferenza.",
+      "L-idejn merfugħa juru l-isem veru ta’ kull parteċipant."
+    ]
+  },
+  "0.5.6": {
+    "title": "Kamra tal-istennija konfigurabbli u stampi tal-qoxra tal-avvenimenti",
+    "notes": [
+      "Il-magna tal-kamra tal-istennija tista’ tiġi kkonfigurata (logħba / ġnien / klassika), kemm għas-sit kollu kif ukoll għal kull avveniment.",
+      "Stampi tal-qoxra fuq il-paġna tal-avveniment u fil-miniaturi tal-cards.",
+      "Fajls mtellgħin li jingħataw permezz ta’ rotta apposta, b’URLs iffirmati li jiskadu malajr.",
+      "Buttuna “Idħol issa” disponibbli minnufih wara r-reġistrazzjoni.",
+      "Konsolidazzjoni tas-sezzjoni tal-amministrazzjoni għall-immaniġġjar tar-rekordings maħduma bl-IA u tisħiħ tal-qbid b’diversi tracks."
+    ]
+  },
+  "0.5.2": {
+    "title": "Tħejjija tal-avvenimenti u rtukkar",
+    "notes": [
+      "Aġenda bl-għażla ta’ qbil jew nuqqas ta’ qbil, u korrezzjonijiet fil-permessi li jintirtu mill-mudelli.",
+      "Ismijiet veri, u mhux “SPEAKER_00”, fis-sinteżi u fis-sottotitli.",
+      "Sensiela ta’ hotfixes (v0.5.2–v0.5.5) bi tħejjija għall-avvenimenti pubbliċi."
+    ]
+  },
+  "0.5.1": {
+    "title": "Home page community-first u arkivju b’diversi tracks",
+    "notes": [
+      "Disinn mill-ġdid tal-home page b’enfasi fuq il-komunità, bil-possibbiltà li t-traduzzjonijiet jinbidlu waqt it-tħaddim u b’aċċessibbiltà skont l-AgID.",
+      "Arkivju MKV b’diversi tracks, b’player biex jerġa’ jinstema’ kull kelliem għalih.",
+      "Allinjament tat-tracks mal-mix ta’ Jibri permezz ta’ korrelazzjoni inkroċjata."
+    ]
+  },
+  "0.5.0": {
+    "title": "Post-produzzjoni bl-IA u rekording b’diversi tracks",
+    "notes": [
+      "Pipeline ta’ post-produzzjoni bl-IA: traskrizzjoni, sinteżi, sottotitli, traduzzjonijiet u dubbing b’diversi vuċijiet (dejjem sintetiċi), bil-provenjenza tal-mudelli rreġistrata.",
+      "Rekording b’diversi tracks (track wieħed għal kull kelliem), bl-attribuzzjoni tal-kelliem u b’isem mogħti awtomatikament (ADR-013).",
+      "Librerija tal-video pubblika u paġna ta’ mmaniġġjar ta’ wara l-avveniment għall-amministratur.",
+      "Editur tat-traskrizzjoni ta’ wara l-avveniment, bil-korrezzjoni tat-test u l-assenjazzjoni mill-ġdid tal-kelliema.",
+      "Reviżjoni sħiħa tal-interfaċċa tal-amministrazzjoni: toasts u kaxxi ta’ djalogu .italia minflok l-alerts nattivi tal-browser, skeleton loaders, u tokens tad-disinn għall-kuluri minflok mijiet ta’ valuri hex miktuba fil-kodiċi.",
+      "Kunsens ta’ kull parteċipant għar-rekording b’diversi tracks (GDPR) u esportazzjoni estiża tad-dejta skont l-Artikolu 15."
+    ]
+  },
+  "0.4.0": {
+    "title": "Involviment u ċiklu tal-ħajja",
+    "notes": [
+      "Funzjonijiet diretti ġodda: sħaba tal-kliem, timer tal-preżentazzjoni, għadd tar-reazzjonijiet, kontrolli diretti fl-istil ta’ Meet u pannell tal-idejn merfugħa.",
+      "Ċiklu tal-ħajja tar-rekordings, minn temporanju għal ippubblikat, b’kontrolli għall-amministratur (anteprima, pubblikazzjoni, tħassir) u perjodi ta’ żamma differenti.",
+      "Paġna ta’ wara l-avveniment b’tabs (rekording, arkivju tal-Q&A, stħarriġ, feedback, materjali), bil-possibbiltà li jintgħażel x’jidher u meta.",
+      "Wizard tal-ħolqien tal-avvenimenti f’5 passi, tassonomija tat-tags, direttorju tal-kuntatti u kicker editorjali għat-titli.",
+      "Librerija tal-video pubblika /video-library u paġna ta’ trasparenza /service-inventory (CycloneDX 1.6 għal kull tenant).",
+      "Awtoskalar tal-JVB f’żewġ fażijiet, bi snapshot f’Redis li jitma’ l-paġna tal-istatus.",
+      "Tindif GDPR fi tliet fażijiet: tneħħija immedjata tad-dejta personali, tneħħija tal-kontenut mal-iskadenza taż-żamma, u mbagħad tħassir definittiv."
+    ]
+  },
+  "0.3.0": {
+    "title": "Pjattaforma konfigurabbli u infrastruttura",
+    "notes": [
+      "Issettjar tas-sit li jħalli amministrazzjonijiet pubbliċi oħra jerġgħu jużaw il-pjattaforma (branding, kuluri, favicon, SEO, footer, modalità tal-home page, paġni tal-privatezza u tal-aċċessibbiltà) mingħajr ma jerġgħu jibnuha.",
+      "Dashboard tal-analitika u pannell tal-amministrazzjoni għall-infrastruttura.",
+      "Tliet modalitajiet ta’ deploy b’Helm (simple / standard / full) u JVB li jinżel sa żero fuq node pool apposta.",
+      "Pipeline ta’ Jibri multi-cloud (Azure Blob / S3 / GCS / MinIO / lokali) u watermark ta’ Jitsi konfigurabbli.",
+      "OpenSSF Scorecard, Dependabot, SBOM tad-dipendenzi, immaniġġjar ċentralizzat tal-iżbalji, rate limiting u aktar minn 210 test tal-unità.",
+      "Bosta verżjonijiet inkrementali (v0.3.8–v0.3.45) wara l-feedback li wasal mid-dimostrazzjoni."
+    ]
+  },
+  "0.2.0": {
+    "title": "Feedback mid-DTD",
+    "notes": [
+      "Profilazzjoni tal-parteċipanti mar-reġistrazzjoni (entità, rwol, tip), konfigurabbli għal kull avveniment, b’esportazzjoni CSV u statistika aggregata.",
+      "Tfakkiriet konfigurabbli, b’diversi ħinijiet minn qabel u b’emails differenti għal kull wieħed.",
+      "Stħarriġ b’riżultati f’ħin reali u b’esportazzjoni CSV.",
+      "Titjib fil-konformità mal-GDPR: politika tal-privatezza għal kull avveniment, kunsensi granulari, reġistru tal-verifika tat-tħassir u esportazzjoni tad-dejta skont l-Artikolu 15.",
+      "Konsolidazzjoni tar-rwoli ta’ Moderatur u Awditur, u verifika tal-liċenzji tad-dipendenzi."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP — l-ewwel verżjoni",
+    "notes": [
+      "Pjattaforma pubblika għall-avvenimenti diġitali bid-design system .italia (Bootstrap Italia, design-react-kit).",
+      "Kamra dirett b’Jitsi Meet (IFrame API, awtentikazzjoni JWT) u rwoli infurzati fuq is-server.",
+      "Reġistrazzjoni tal-parteċipanti konformi mal-GDPR, b’dejta personali kriptata (AES-256-GCM).",
+      "Q&A b’upvoting u moderazzjoni, u kamra tal-istennija bil-ħin li jonqos u b’aċċess għall-mistednin.",
+      "Emails ta’ konferma u ta’ tfakkir, u integrazzjoni mal-kalendarju (Google, Outlook, Yahoo, iCal).",
+      "Pannell tal-amministrazzjoni b’awtentikazzjoni bl-API key, tindif GDPR u metriċi Prometheus.",
+      "Helm chart ta’ livell ta’ produzzjoni, immaġini Docker non-root u read-only, CI/CD b’GitHub Actions u publiccode.yml."
+    ]
+  }
+}

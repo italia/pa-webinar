@@ -20,8 +20,10 @@
  * AbortSignal and unsubscribe to prevent listener leaks.
  */
 
-import { prisma } from '@/lib/db';
+import { extractModeratorToken } from '@/lib/auth/moderator';
+import { authorizeChatRead } from '@/lib/chat/read-access';
 import { subscribeChat, type ChatEnvelope } from '@/lib/chat/pubsub';
+import { errorResponse } from '@/lib/errors';
 import { chatSseConnectionsGauge } from '@/lib/metrics';
 
 export const dynamic = 'force-dynamic';
@@ -29,9 +31,6 @@ export const dynamic = 'force-dynamic';
 // for the length of the call. Next.js requires a literal integer
 // here (no arithmetic), so 3600 = 1 hour.
 export const maxDuration = 3600;
-
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Idle-keepalive: EventSource considers the connection healthy as
 // long as bytes arrive. Send a comment line every 25s so NGINX's
@@ -45,19 +44,21 @@ export async function GET(
 ) {
   const { param } = await context.params;
 
-  const where = UUID_RE.test(param)
-    ? { id: param }
-    : { slug: param };
-  const event = await prisma.event.findUnique({
-    where,
-    select: { id: true },
-  });
-  if (!event) {
-    return new Response('Event not found', { status: 404 });
+  // Same gate as GET /chat: this stream is a LIVE feed of attendee names and
+  // messages, so it must not be open to anyone holding a slug. EventSource
+  // cannot set headers, hence the token arrives as `?token=` here — which
+  // extractModeratorToken already accepts alongside the Bearer header.
+  //
+  // This route builds raw Responses (no withErrorHandling wrapper), so the
+  // AppError is mapped through the shared `errorResponse` — same JSON body and
+  // status codes as every other route, instead of a hand-rolled mapping that
+  // would drift (and that returned a 500 whose body read "Forbidden").
+  let eventId: string;
+  try {
+    ({ eventId } = await authorizeChatRead(param, extractModeratorToken(request)));
+  } catch (err) {
+    return errorResponse(err);
   }
-  // Capture id into a local const so TS narrowing survives across
-  // the inner closures (closed()/callbacks).
-  const eventId: string = event.id;
 
   const encoder = new TextEncoder();
   let cleanup: (() => void) | null = null;

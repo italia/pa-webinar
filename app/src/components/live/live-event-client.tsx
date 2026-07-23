@@ -34,6 +34,7 @@ import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
 import WordCloud from '@/components/live/word-cloud';
+import EventTimer from '@/components/live/event-timer';
 import LiveShareButton from '@/components/live/live-share-button';
 import WaitingRoom, {
   type WaitingRoomJoinPrefs,
@@ -124,6 +125,16 @@ interface LiveEventClientProps {
   jitsiDomain: string;
   watermark?: WatermarkSettings;
   jibriAvailable?: boolean;
+  /** Reactions mode (admin SiteSetting, #7): 'NATIVE' = Jitsi's own reactions
+   *  button (ephemeral); 'CUSTOM' = the app's analytics-backed ReactionBar.
+   *  Default 'NATIVE'. */
+  reactionsMode?: 'NATIVE' | 'CUSTOM';
+  /** F18 — rnnoise (soppressione rumore avanzata di Jitsi) forzata OFF.
+   *  Default true = spenta, che è il comportamento da validare in una call
+   *  vera prima di cambiarlo. Risolto a RUNTIME dal Server Component (vedi
+   *  lib/jitsi/rnnoise.ts): qui non si può leggere l'env, perché in un
+   *  componente client webpack lo congela nel bundle a build time. */
+  rnnoiseEnforceOff?: boolean;
 }
 
 type LivePhase =
@@ -194,6 +205,8 @@ export default function LiveEventClient({
   jitsiDomain,
   watermark,
   jibriAvailable: _jibriAvailable = true,
+  reactionsMode = 'NATIVE',
+  rnnoiseEnforceOff = true,
 }: LiveEventClientProps) {
   const t = useTranslations('live');
   const tc = useTranslations('common');
@@ -202,9 +215,18 @@ export default function LiveEventClient({
   const [phase, setPhase] = useState<LivePhase>('waiting');
   const [credentials, setCredentials] = useState<JitsiCredentials | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
+  // Mirror of participantCount for the peak reporter's interval: reading it
+  // from a ref keeps the 30s timer from being torn down and restarted on every
+  // join/leave (which would reset the cadence in a busy room).
+  const participantCountRef = useRef(0);
+  useEffect(() => { participantCountRef.current = participantCount; }, [participantCount]);
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState('');
   const [jitsiApi, setJitsiApi] = useState<JitsiMeetExternalAPI | null>(null);
+  // App-owned fullscreen (#6): fullscreen the whole live wrapper (video +
+  // sidebar) instead of the Jitsi iframe, so the chat stays visible.
+  const liveRootRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [chosenName, setChosenName] = useState(initialDisplayName);
   // True once THIS client is actually in the conference (Jitsi
   // `videoConferenceJoined` → handleJitsiReady). Used to lift the "warming up"
@@ -824,21 +846,138 @@ export default function LiveEventClient({
     setShowRecPrompt(false);
   }, []);
 
-  // Peak participant tracking (moderator only)
+  // Peak participant tracking — reported by ANY authenticated attendee, not
+  // just a moderator (live feedback #4b). Previously this was gated on
+  // `isModerator`, so a moderator-less session (or one the moderator left before
+  // the first tick) never bumped `peakParticipants`, leaving post-event
+  // analytics at 0. We re-report the human-filtered count (Recorder excluded,
+  // same helper as the sidebar) once immediately + every 30s. The re-post is
+  // deliberately UNCONDITIONAL (self-healing): a dropped write is recovered on
+  // the next tick. The server bump is a single conditional UPDATE (peak < count)
+  // so it's monotonic and race-safe even with many concurrent reporters; the
+  // redundant writes are a light, bounded cost accepted for that robustness.
+  //
+  // The count comes from the SAME value JitsiRoom pushes to the UI
+  // (`onParticipantCountChanged`), not a second local computation: JitsiRoom
+  // knows the local endpoint id from `videoConferenceJoined` and so counts the
+  // roster exactly, while a recount here could only fall back to name matching.
+  // One number, one source — what the sidebar shows is what the peak records.
+  //
+  // Guests (no token) report too: the live page passes token="" to anyone
+  // joining a public-link / INSTANT room, and gating on it meant precisely the
+  // moderator-less sessions #4b was about recorded nothing. The server accepts a
+  // tokenless report only where nobody could hold a token (INSTANT room, or an
+  // event with no registrations) — elsewhere it answers 401, and we then stop
+  // rather than re-posting a request that will be refused for the whole event.
   useEffect(() => {
-    if (!jitsiApi || !isModerator) return;
-    const interval = setInterval(() => {
-      const count = jitsiApi.getNumberOfParticipants?.();
-      if (typeof count === 'number' && count > 0) {
+    if (!jitsiApi) return;
+    let refused = false;
+    const report = () => {
+      if (refused) return;
+      const count = participantCountRef.current;
+      if (count > 0) {
         fetch(`/api/events/${event.slug}/analytics/peak`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ count, moderatorToken: token }),
-        }).catch(() => {});
+          body: JSON.stringify(token ? { count, token } : { count }),
+        })
+          .then((res) => {
+            if (res.status === 401 || res.status === 403) refused = true;
+          })
+          .catch(() => {});
       }
-    }, 30000);
+    };
+    report();
+    const interval = setInterval(report, 30000);
     return () => clearInterval(interval);
-  }, [jitsiApi, isModerator, event.slug, token]);
+  }, [jitsiApi, event.slug, token]);
+
+  // F8 — receive a moderator "lower your hand" control signal and lower our OWN
+  // hand. The Jitsi IFrame API can lower only the local hand (toggleRaiseHand),
+  // so a moderator's "abbassa mano" reaches the raiser's browser here; the
+  // resulting raiseHandUpdated(0) then drains the queue on every client. Lives
+  // here (not jitsi-room) because this component owns jitsiApi and stays mounted
+  // for the whole live session; the control stream is separate from chat so it
+  // works even when chat is disabled.
+  const myEndpointIdRef = useRef('');
+  // Jitsi's shared raise timestamp (evt.handRaised) for OUR hand; 0 = down. It
+  // is the same value on every client for a given raise and changes on each new
+  // raise, so it uniquely identifies WHICH raise a moderator asked us to lower.
+  const myHandRaiseIdRef = useRef(0);
+  // We only need to HEAR "lower your hand" while our hand is actually up, so the
+  // control SSE is opened only then (effect below). This keeps the overwhelming
+  // majority of participants — hand down — off the control channel entirely,
+  // instead of every client holding an always-open stream for the whole session.
+  const [handControlActive, setHandControlActive] = useState(false);
+  useEffect(() => {
+    if (!jitsiApi) return;
+
+    const onJoined = (evt: { id?: string }) => {
+      if (evt?.id) myEndpointIdRef.current = evt.id;
+    };
+    // Authoritative own-hand identity — sourced ONLY from Jitsi's broadcast for
+    // OUR endpoint, never inferred. Also gates whether we hold the control SSE.
+    const onHand = (evt: { id?: string; handRaised?: number }) => {
+      if (!evt?.id || evt.id !== myEndpointIdRef.current) return;
+      const raiseId = evt.handRaised ?? 0;
+      myHandRaiseIdRef.current = raiseId;
+      setHandControlActive(raiseId > 0);
+    };
+    jitsiApi.addListener('videoConferenceJoined', onJoined);
+    jitsiApi.addListener('raiseHandUpdated', onHand);
+    return () => {
+      jitsiApi.removeListener('videoConferenceJoined', onJoined);
+      jitsiApi.removeListener('raiseHandUpdated', onHand);
+    };
+  }, [jitsiApi]);
+
+  // Hold the control SSE ONLY while our hand is raised. A moderator can only ask
+  // to lower a hand that is up, and by the time they see it and click (seconds
+  // later) this stream is long since open; when our hand goes down, onHand flips
+  // handControlActive false and this effect tears the stream down.
+  useEffect(() => {
+    if (!jitsiApi || !handControlActive) return;
+
+    const es = new EventSource(`/api/events/${event.slug}/control/stream`);
+    const onControl = (e: MessageEvent) => {
+      let env: { op?: string; targetEndpointId?: string; raiseId?: number };
+      try {
+        env = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      if (env.op !== 'lowerHand') return;
+      // Exact endpoint match — a broadcast reaches everyone; a loose filter would
+      // lower every hand.
+      if (!env.targetEndpointId || env.targetEndpointId !== myEndpointIdRef.current) return;
+      // Lower ONLY the exact raise the moderator targeted. toggleRaiseHand is a
+      // toggle, so firing it when our hand is already down would RAISE it. Gating
+      // on the shared raise id means a signal that raced a manual lower+re-raise
+      // (our id differs now) is ignored — closing the re-raise race. Two rare,
+      // benign residuals remain, inherent to a toggle-only API over a best-effort
+      // channel: a moderator click landing in the sub-ms window between a manual
+      // lower and its raiseHandUpdated(0) echo could re-raise once; and if the
+      // toggle is delivered but silently not applied, the optimistic-0 below gates
+      // further retries until the participant acts. Both self-recover.
+      const raiseId = typeof env.raiseId === 'number' ? env.raiseId : 0;
+      if (raiseId <= 0 || myHandRaiseIdRef.current !== raiseId) return;
+      try {
+        jitsiApi.executeCommand('toggleRaiseHand');
+      } catch {
+        return;
+      }
+      // Optimistically mark our hand down NOW. If the confirming
+      // raiseHandUpdated(0) is dropped, a duplicate signal for the same raise
+      // can't re-fire (0 !== raiseId) — closing the lost-confirmation re-raise.
+      // A genuine re-raise later overwrites this via onHand.
+      myHandRaiseIdRef.current = 0;
+    };
+    es.addEventListener('message', onControl);
+
+    return () => {
+      es.close();
+    };
+  }, [jitsiApi, event.slug, handControlActive]);
 
   // Leave for yourself only. Marks the upcoming `videoConferenceLeft` as a
   // deliberate hangup so the network-resilience path doesn't rejoin behind us.
@@ -850,6 +989,36 @@ export default function LiveEventClient({
       setPhase('ended');
     }
   }, [jitsiApi]);
+
+  // App-owned fullscreen toggle (#6): targets the live root wrapper so both the
+  // Jitsi iframe AND the chat sidebar are in the fullscreen subtree. Optional
+  // chaining makes it a safe no-op where Element.requestFullscreen is missing
+  // (e.g. iPhone Safari).
+  const toggleFullscreen = useCallback(() => {
+    const root = liveRootRef.current;
+    if (!root) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.();
+    } else {
+      root.requestFullscreen?.();
+    }
+  }, []);
+
+  useEffect(() => {
+    const onFsChange = () => setIsFullscreen(document.fullscreenElement != null);
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
+
+  // Reactstrap portals every Modal into <body> by default. Once the app owns
+  // fullscreen on the live wrapper (#6), <body> is OUTSIDE the fullscreen
+  // subtree, so those modals never reach the top layer and are simply invisible:
+  // in fullscreen "Condividi", the recording prompt and — worst of all — the
+  // moderator's "Esci dalla sala" dialog all looked like dead buttons, with no
+  // way out of the room. Rendering them inside the fullscreen element fixes it,
+  // and outside fullscreen we keep the default (undefined = <body>) so nothing
+  // else changes.
+  const modalContainer = isFullscreen ? (liveRootRef.current ?? undefined) : undefined;
 
   const handleLeaveRoom = useCallback(() => {
     // Moderators get the leave/end-for-all prompt; everyone else leaves for
@@ -986,6 +1155,8 @@ export default function LiveEventClient({
           // Uscita esplicita dalla sala d'attesa: le instant call non hanno una
           // pagina evento pubblica (404), quindi tornano alla home.
           exitHref={event.eventType === 'INSTANT' ? '/' : `/events/${event.slug}`}
+          chatToken={token}
+          eventType={event.eventType === 'INSTANT' ? 'INSTANT' : 'SCHEDULED'}
           defaultName={chosenName || initialDisplayName}
           onEnterLive={handleEnterFromWaiting}
           onStartEvent={isModerator ? handleStartEvent : undefined}
@@ -1162,7 +1333,7 @@ export default function LiveEventClient({
     eventStatus === 'LIVE' && jvbReady !== true && !jitsiJoined;
 
   return (
-    <div className="d-flex flex-column live-page-bg">
+    <div ref={liveRootRef} className="d-flex flex-column live-page-bg">
       <RecordingBanner visible={isRecording} />
       <OvertimeBanner
         endsAt={event.endsAt}
@@ -1183,9 +1354,12 @@ export default function LiveEventClient({
         locale={locale}
         moderatorToken={isActualModerator ? token : undefined}
         onLeaveRoom={handleLeaveRoom}
+        isFullscreen={isFullscreen}
+        modalContainer={modalContainer}
+        startsAt={event.startsAt}
+        endsAt={event.endsAt}
+        onToggleFullscreen={toggleFullscreen}
       />
-
-      <FirstEntryHintBanner />
 
       {isActualModerator && !showJvbOverlay && (
         <ModeratorControls
@@ -1263,6 +1437,8 @@ export default function LiveEventClient({
               enableFileSharing={isInstantCall}
               whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
               videoQuality={event.videoQuality}
+              reactionsMode={reactionsMode}
+              rnnoiseEnforceOff={rnnoiseEnforceOff}
               startWithVideoMuted={!joinPrefs.cameraOn}
               startWithAudioMuted={!joinPrefs.micOn}
               watermark={watermark}
@@ -1273,7 +1449,9 @@ export default function LiveEventClient({
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
             />
-            <ReactionBar eventSlug={event.slug} />
+            {/* Custom reactions bar only in CUSTOM mode (#7); NATIVE mode uses
+                Jitsi's own reactions button in the toolbar instead. */}
+            {reactionsMode === 'CUSTOM' && <ReactionBar eventSlug={event.slug} />}
             {/* Floating controls slot: the sidebar portals its bar here
                 so it sits on top of the Jitsi iframe (Meet-style) on
                 both desktop and mobile. */}
@@ -1303,7 +1481,12 @@ export default function LiveEventClient({
       {feedbackModal}
 
       {/* Recording pre-activation prompt for moderator */}
-      <Modal isOpen={showRecPrompt} toggle={handleRecPromptLater} centered>
+      <Modal
+        isOpen={showRecPrompt}
+        toggle={handleRecPromptLater}
+        centered
+        container={modalContainer}
+      >
         <ModalHeader toggle={handleRecPromptLater}>
           {t('recordingPromptTitle')}
         </ModalHeader>
@@ -1325,6 +1508,7 @@ export default function LiveEventClient({
         isOpen={showLeaveChoice}
         toggle={() => !endingForAll && setShowLeaveChoice(false)}
         centered
+        container={modalContainer}
       >
         <ModalHeader toggle={() => !endingForAll && setShowLeaveChoice(false)}>
           {t('leaveChoice.title')}
@@ -1365,6 +1549,7 @@ export default function LiveEventClient({
         isOpen={showEndDestino}
         toggle={() => !endingForAll && setShowEndDestino(false)}
         centered
+        container={modalContainer}
       >
         <ModalHeader toggle={() => !endingForAll && setShowEndDestino(false)}>
           {t('endDestino.title')}
@@ -1553,7 +1738,9 @@ function LiveSidebar({
     [eventId, token, mutateFlags]
   );
   const [activeTab, setActiveTab] = useState<SidebarTab>(
-    qaEnabled ? 'qa' : showChat ? 'chat' : 'polls'
+    // Chat is the primary channel (live feedback #10): prefer it as the initial
+    // tab, falling back to Q&A then polls only when chat is disabled.
+    showChat ? 'chat' : qaEnabled ? 'qa' : 'polls'
   );
   const [participantCount, setParticipantCount] = useState(0);
   // Drawer-open state only matters on mobile (<992px); on desktop the
@@ -1615,6 +1802,30 @@ function LiveSidebar({
     dot?: boolean;
     show: boolean;
   }> = [
+    // Chat first (live feedback #10): it is the primary audience channel, so it
+    // renders as the leftmost sidebar tab, ahead of Q&A.
+    {
+      key: 'chat',
+      label: t('sidebarTabChat'),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      ),
+      dot: chatUnread > 0,
+      show: showChat,
+    },
     {
       key: 'qa',
       label: t('sidebarTabQa'),
@@ -1637,28 +1848,6 @@ function LiveSidebar({
         </svg>
       ),
       show: effQa,
-    },
-    {
-      key: 'chat',
-      label: t('sidebarTabChat'),
-      svg: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      ),
-      dot: chatUnread > 0,
-      show: showChat,
     },
     {
       key: 'polls',
@@ -2018,6 +2207,7 @@ function LiveSidebar({
                 token={token}
                 displayName={displayName}
                 isGuest={!token}
+                isModerator={isModerator}
                 active={isChatActive}
                 onUnreadCountChange={setChatUnread}
               />
@@ -2155,6 +2345,15 @@ interface LiveTopBarProps {
    *  Surfaced (collapsed, with a warning) in the share popup. */
   moderatorToken?: string;
   onLeaveRoom?: () => void;
+  /** App-owned fullscreen (#6): current state + toggle. Passed only by the
+   *  live-phase top bar (the consent-pending one renders no video/sidebar). */
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
+  /** Fullscreen element to portal the share modal into while fullscreen is on. */
+  modalContainer?: HTMLElement;
+  /** Orario dell'evento per il contatore in barra (B4). */
+  startsAt?: string;
+  endsAt?: string;
 }
 
 function LiveTopBar({
@@ -2171,6 +2370,11 @@ function LiveTopBar({
   locale,
   moderatorToken,
   onLeaveRoom,
+  isFullscreen,
+  onToggleFullscreen,
+  modalContainer,
+  startsAt,
+  endsAt,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -2270,23 +2474,11 @@ function LiveTopBar({
         >
           {tr(role)}
         </Badge>
-        {/* "👥 87" — capacity display is intentionally omitted: the system
-         *  autoscales, so we only surface the live count. */}
-        {participantCount > 0 && (
-          <Badge
-            color=""
-            pill
-            className="px-2 py-1"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.18)',
-              color: '#fff',
-              fontSize: '0.72rem',
-            }}
-            aria-live="polite"
-          >
-            {t('topBarCount.live', { count: participantCount })}
-          </Badge>
-        )}
+        {/* The live people-count is intentionally NOT shown here: it was a
+         *  redundant duplicate of the authoritative count in the participants
+         *  sidebar and, being fed only by post-attach join/leave deltas, it
+         *  under-reported (live feedback #4). The sidebar remains the single
+         *  source of truth for the present-participant count. */}
       </div>
       <div className="d-flex align-items-center gap-3">
         {isRecording && (
@@ -2295,10 +2487,12 @@ function LiveTopBar({
             {t('recordingActive')}
           </Badge>
         )}
-        {/* The total registrations are a moderator-only figure (F5 —
-            participants shouldn't see attendance numbers). Everyone already
-            sees the present-participant count in the left-hand badge, so
-            non-moderators get nothing extra here (no duplicated count). */}
+        {/* The "active vs registered" figure is moderator-only (F5 —
+            participants shouldn't see attendance numbers). The live people-count
+            now lives only in the participants sidebar, so non-moderators get
+            nothing extra here. `participantCount` is seeded on join and kept
+            current by JitsiRoom (recorder-excluded), so this reads correctly even
+            when a moderator joins an already-populated room. */}
         {role === 'moderator' && registrationCount !== undefined && registrationCount > 0 && (
           <span className="small d-none d-md-inline">
             <Icon icon="it-user" size="sm" color="white" className="me-1" />
@@ -2308,7 +2502,39 @@ function LiveTopBar({
             })}
           </span>
         )}
-        <LiveShareButton slug={slug} locale={locale} moderatorToken={moderatorToken} />
+        {onToggleFullscreen && (
+          <Button
+            color="light"
+            outline
+            size="xs"
+            className="d-none d-md-inline-flex align-items-center fullscreen-toggle-btn"
+            onClick={onToggleFullscreen}
+            aria-label={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
+            title={isFullscreen ? t('exitFullscreen') : t('enterFullscreen')}
+          >
+            {/* it-expand/it-collapse are the ACCORDION chevrons in the Bootstrap
+                Italia sprite, so this icon-only button read as "open a panel".
+                it-fullscreen is the four-corners glyph people expect here. */}
+            <Icon icon={isFullscreen ? 'it-collapse' : 'it-fullscreen'} size="xs" color="white" />
+          </Button>
+        )}
+        {startsAt && endsAt && (
+          <EventTimer
+            startsAt={startsAt}
+            endsAt={endsAt}
+            // Acceso di default per chi conduce la sala: la richiesta arriva da
+            // lì ("regolare al meglio i vari interventi"), e un orologio che
+            // scorre addosso al pubblico è pressione che nessuno ha chiesto.
+            // Chiunque può accenderlo dall'icona, e la scelta resta salvata.
+            defaultVisible={role === 'moderator'}
+          />
+        )}
+        <LiveShareButton
+          slug={slug}
+          locale={locale}
+          moderatorToken={moderatorToken}
+          modalContainer={modalContainer}
+        />
         {onLeaveRoom && (
           <Button
             color="danger"
@@ -2322,73 +2548,6 @@ function LiveTopBar({
             {t('leaveRoom')}
           </Button>
         )}
-      </div>
-    </div>
-  );
-}
-
-// ── First-entry hint banner ──
-//
-// One-time dismissible tips shown the first time a user reaches phase=ready.
-// Dismissal persists in localStorage so repeat joiners don't see it again.
-
-const HINT_DISMISSED_KEY = 'pawebinar.liveHint.dismissed';
-
-function FirstEntryHintBanner() {
-  const t = useTranslations('live.hintBanner');
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      if (window.localStorage.getItem(HINT_DISMISSED_KEY) !== '1') {
-        setVisible(true);
-      }
-    } catch {
-      // Private mode / blocked storage → show the banner once per session.
-      setVisible(true);
-    }
-  }, []);
-
-  const handleDismiss = useCallback(() => {
-    setVisible(false);
-    try {
-      window.localStorage.setItem(HINT_DISMISSED_KEY, '1');
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  if (!visible) return null;
-
-  return (
-    <div
-      className="px-3 py-2 d-flex flex-column flex-md-row align-items-md-center gap-2 gap-md-3 live-hint-banner"
-      style={{
-        background: '#E8F0FE',
-        color: '#003D80',
-        borderBottom: '1px solid #B6D4FE',
-        fontSize: '0.85rem',
-      }}
-      role="note"
-      aria-label={t('ariaLabel')}
-    >
-      <span className="d-inline-flex align-items-center gap-2">
-        <span aria-hidden="true">🎤</span>
-        {t('controls')}
-      </span>
-      <span className="d-inline-flex align-items-center gap-2">
-        <span aria-hidden="true">✋</span>
-        {t('raiseHand')}
-      </span>
-      <span className="d-inline-flex align-items-center gap-2">
-        <span aria-hidden="true">💬</span>
-        {t('sidebar')}
-      </span>
-      <div className="ms-md-auto">
-        <Button color="primary" size="xs" onClick={handleDismiss}>
-          {t('dismiss')}
-        </Button>
       </div>
     </div>
   );
@@ -2425,7 +2584,7 @@ function ScreenshareBanner({ api }: { api: JitsiMeetExternalAPI }) {
       }
       if (evt.id === localIdRef.current) return; // don't ping the presenter
       setActiveSharerId(evt.id);
-      const info = api.getParticipantsInfo().find((p) => p.id === evt.id);
+      const info = api.getParticipantsInfo().find((p) => p.participantId === evt.id);
       setActiveSharerName(info?.displayName ?? info?.formattedDisplayName ?? '');
     };
     const onLeft = (evt: { id: string }) => {

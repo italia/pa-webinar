@@ -1,0 +1,361 @@
+{
+  "0.8.9": {
+    "title": "El registro de cambios, ahora con el inventario de software integrado",
+    "notes": [
+      "Cada versión abre aquí su lista de materiales de software (SBOM): la lista consultable de todos los componentes que incluye, con versión y ecosistema, sin descargar nada.",
+      "La sección técnica es ahora un conjunto de enlaces —SBOM, la release de GitHub, el código fuente en esa etiqueta, la canalización de compilación— en lugar de un párrafo que repetía el resumen anterior.",
+      "El pie de página añade las señales de seguridad del proyecto: la Scorecard de OpenSSF y los resultados del análisis del código."
+    ]
+  },
+  "0.8.8": {
+    "title": "La página de novedades, rediseñada",
+    "notes": [
+      "Cada versión se lee ahora en dos niveles: las novedades que le importan y —bajo una pestaña «Detalle técnico» que abre solo si lo desea— el trabajo técnico que hay detrás.",
+      "Cada versión que se publica con una lista de materiales de software (SBOM) enlaza directamente con su release en GitHub, donde el SBOM está adjunto. El repositorio del código fuente ahora es público.",
+      "La franja cronológica de la parte superior ha desaparecido: se volvía recargada a medida que se acumulaban las versiones y decía poco. Las fechas permanecen en cada tarjeta."
+    ]
+  },
+  "0.8.7": {
+    "title": "La interfaz completa en los 24 idiomas, y una identidad visual renovada",
+    "notes": [
+      "La interfaz está ahora totalmente traducida a los 24 idiomas de la UE: antes, varias pantallas —incluida la sala de espera y los textos de consentimiento— recurrían al italiano donde faltaba la traducción.",
+      "Logotipo e identidad visual renovados (favicon, icono, marca de agua), y una vista previa con imagen al compartir el enlace de un evento en el chat y en redes sociales.",
+      "Una página de novedades en todos los idiomas, con enlaces a la transparencia de los servicios y a la seguridad."
+    ]
+  },
+  "0.8.6": {
+    "title": "La sala de espera: una página y una plaza en la que se elige entrar",
+    "notes": [
+      "La sala de espera es ahora una página clara y conforme al sistema de diseño: el evento, los controles de audio y vídeo, tu nombre, el chat. El pequeño juego que ocupaba el recuadro lateral se ha retirado.",
+      "La plaza interactiva se abre solo si la eliges, y ocupa toda la pantalla. Los controles de la página siguen al lado — nombre, micrófono, cámara, chat, avisos — y puedes volver atrás cuando quieras. Quien prefiera no ver animaciones puede pasar a la versión clásica, y esa elección se recuerda.",
+      "Avatares: si la dirección con la que te inscribiste tiene un Gravatar, ahora puede aparecer como tu imagen en la sala. Lo activa la administración, y es nuestro servidor quien hace la petición: el navegador de quien participa nunca contacta con gravatar.com.",
+      "El componente que graba el evento ya no aparece entre los participantes ni en el recuento: es un servicio interno, no alguien en la sala. El aviso de que el evento se está grabando sigue donde estaba."
+    ]
+  },
+  "0.8.5": {
+    "title": "Chat más viva: menciones, reacciones, correcciones y exportación",
+    "notes": [
+      "Chat: las menciones con @ se muestran ahora resaltadas para la persona mencionada y, si está mirando otra cosa, le llega una notificación. Hasta ahora, ser mencionado no se distinguía de recibir un mensaje cualquiera.",
+      "Chat: se puede reaccionar a un mensaje concreto con un emoji y corregir los mensajes propios durante los quince minutos siguientes (queda indicado que se han modificado). El botón «Responder» pasa a ser más discreto.",
+      "Chat: nuevo botón para descargar la conversación, en formato de texto o de datos. Los mensajes ya se conservaban, pero no había forma de llevárselos.",
+      "En la sala: un temporizador muestra cuánto falta para el final (o cuánto tiempo se lleva en marcha); está activado de forma predeterminada para quien modera y puede activarlo cualquier persona.",
+      "Una sala ya no se activa porque alguien abra la página del evento con horas de antelación: se prepara cuando corresponde. Se corrige también un caso en el que el evento se cerraba pocos minutos después de haber empezado.",
+      "Estadísticas: el pico de participantes se registra ahora también en cada sesión de la videollamada, y no solo en el conjunto del evento."
+    ]
+  },
+  "0.8.4": {
+    "title": "Correos de confirmación: el nombre del evento, su imagen y un remitente configurable",
+    "notes": [
+      "Los correos de confirmación de la inscripción vuelven a incluir el nombre del evento, tanto en el asunto como en el cuerpo del mensaje. Quien se inscribía desde una página en un idioma al que el título no se había traducido recibía un correo sin el nombre del evento y un archivo de calendario adjunto sin título.",
+      "Los correos de confirmación y los recordatorios muestran ahora la imagen del evento en la parte superior y el título bien destacado, en lugar de relegarlo a una fila de la tabla de detalles.",
+      "Nuevos ajustes en el panel de administración: el nombre con el que aparece el remitente en el buzón de quien recibe el mensaje y una dirección a la que dirigir las respuestas (los correos se envían desde una dirección que no las recibe).",
+      "En general, un texto que no se ha traducido a un idioma muestra ahora el original en lugar de aparecer vacío: esto afectaba también a los títulos y las descripciones de las páginas públicas."
+    ]
+  },
+  "0.8.3": {
+    "title": "Privacidad del chat, recuento de participantes correcto y moderación restablecida",
+    "notes": [
+      "El historial del chat ya no puede consultarlo quien no participa en el evento. Hasta ahora, cualquier persona que conociera la dirección de un evento podía descargar sus mensajes —junto con los nombres de quienes los habían escrito—, incluso una vez finalizado. Ahora es necesario estar inscrito, ser moderador o encontrarse en la sala mientras el evento está en curso.",
+      "El número de participantes que se mostraba en la sala tenía un error de una unidad, porque cada persona no se contaba a sí misma. El mismo error se trasladaba a las estadísticas del evento (pico de participantes). Ahora el recuento es correcto y coincide con el registrado en las estadísticas.",
+      "Se han restablecido los controles del moderador en la lista de participantes: la expulsión de un participante y el ajuste del volumen individual no surtían ningún efecto.",
+      "Las reacciones están ahora disponibles también desde el teléfono móvil, donde había dejado de existir el botón para enviarlas. Los emojis en movimiento ya no interceptan los clics en la barra de controles.",
+      "En pantalla completa vuelven a verse las ventanas de diálogo —compartir el enlace y, para el moderador, «Salir de la sala»—: antes quedaban ocultas detrás del vídeo y los botones parecían no funcionar.",
+      "Las plantillas de evento se crean ahora con el chat activado, en coherencia con la sala: al crear un «Webinar» se seguía obteniendo un evento sin chat.",
+      "Se ha completado la traducción al inglés de la interfaz, en la que faltaban algunos elementos, entre ellos toda la ventana «Compartir»."
+    ]
+  },
+  "0.8.2": {
+    "title": "Ninguna sala vacía sigue activa una vez pasada la hora de fin",
+    "notes": [
+      "Una sala que permanecía abierta más allá de la hora de finalización y que después se quedaba vacía seguía activa de forma indefinida, ocupando recursos de vídeo sin necesidad. Ahora, si permanece vacía durante 45 minutos desde la hora de fin prevista, se cierra. Una sala que sigue en uso no se interrumpe nunca: pasada la hora solo aparece un aviso y no se desconecta a nadie."
+    ]
+  },
+  "0.8.1": {
+    "title": "Reacciones configurables, cierre de salas vacías y seguridad del área de administración",
+    "notes": [
+      "Las reacciones (emojis) puede configurarlas ahora la persona administradora: de forma predeterminada se usan las nativas de Jitsi, disponibles directamente en la barra de controles (ligeras y efímeras). Como alternativa, pueden activarse las reacciones propias de la plataforma, en una barra situada abajo a la izquierda, que sí se contabilizan en las estadísticas del evento.",
+      "Nueva opción de administración: cerrar automáticamente una sala que se ha quedado completamente vacía, moderador incluido, como señal de evento abandonado. Está desactivada de forma predeterminada —la inactividad sin moderador ya se gestiona de manera segura, puesto que la sala queda en reposo transcurridos 45 minutos— y puede activarse desde los ajustes.",
+      "Área de administración más segura: cuando la sesión caduca se vuelve a la pantalla de acceso, de modo que ya no es posible seguir usando las páginas de administración con la sesión caducada. Además, la sesión dura más tiempo y se renueva automáticamente mientras se trabaja."
+    ]
+  },
+  "0.8.0": {
+    "title": "Sala en directo más despejada: chat, reacciones, pantalla completa e inscripción",
+    "notes": [
+      "Chat: ahora pueden insertarse emojis en los mensajes mediante un selector específico, y un pequeño indicador avisa si las actualizaciones del chat se ralentizan. Los mensajes enviados aparecen de inmediato, incluso en redes corporativas que retienen las actualizaciones en tiempo real.",
+      "Pantalla completa: el botón de pantalla completa mantiene ahora el chat visible a un lado, en lugar de ocultarlo.",
+      "Las reacciones (emojis) ya no tapan los controles de la parte inferior: la barra sigue siendo siempre accesible, también en la vista en mosaico.",
+      "Los botones «Compartir» y «Salir de la sala» se muestran ahora bien visibles y con color de forma predeterminada (el de salida, en rojo), y no solo al pasar el ratón por encima.",
+      "El bot «Recorder» ya no aparece en la lista de participantes ni en el recuento.",
+      "Inscripción: quien se inscribe con mucha antelación accede a una página de confirmación con el enlace para añadir el evento al calendario, en lugar de ir a la sala de espera; cerca de la hora de inicio se entra directamente en la sala. En la página del evento se indica también si ya se está inscrito.",
+      "El chat es ahora el canal principal de interacción de la sala. También se han mejorado el cierre automático de un evento que se queda vacío y el recuento de participantes en las estadísticas."
+    ]
+  },
+  "0.7.8": {
+    "title": "El moderador puede bajar una mano levantada",
+    "notes": [
+      "En la cola de manos levantadas, el moderador dispone ahora de un botón para bajar la mano de un participante concreto, útil cuando alguien ya ha intervenido o ha dejado la mano levantada por error. La petición llega a ese participante, que ve cómo se baja su mano; nadie más se ve afectado."
+    ]
+  },
+  "0.7.7": {
+    "title": "Menos ruido de fondo al hablar",
+    "notes": [
+      "La cancelación avanzada del ruido de fondo se activa al tomar la palabra: atenúa mejor sonidos como el teclado, los ventiladores o el tráfico, además de la supresión básica ya existente."
+    ]
+  },
+  "0.7.6": {
+    "title": "Volumen por participante",
+    "notes": [
+      "Nuevo control de volumen para cada participante en el panel «Participantes»: si una voz se oye demasiado alta o demasiado baja, se ajusta solo para uno mismo, sin modificar el audio que escuchan los demás.",
+      "La grabación de audio independiente por participante, utilizada en la posproducción, es más fiable: si la captura resulta muda, el sistema lo detecta de inmediato y evita generar transcripciones vacías."
+    ]
+  },
+  "0.7.5": {
+    "title": "La mano levantada permanece levantada",
+    "notes": [
+      "Al levantar la mano, ahora permanece levantada hasta que la baja la propia persona o hasta que un moderador la gestiona: antes se bajaba sola en cuanto se empezaba a hablar, lo que hacía desaparecer a esa persona de la cola de intervenciones."
+    ]
+  },
+  "0.7.4": {
+    "title": "Nombre en el chat protegido frente a los enlaces reenviados (seguridad)",
+    "notes": [
+      "En el chat, el nombre real de una persona inscrita se muestra únicamente en el dispositivo con el que se inscribió: quien abre un enlace de participación reenviado interviene con el nombre que escribe, y no en nombre de la persona inscrita originalmente. Se cierra así una atribución indebida de los mensajes.",
+      "La misma protección se aplica a los archivos adjuntos: un archivo enviado desde un enlace reenviado ya no se atribuye al nombre de la persona inscrita originalmente.",
+      "Quien se conecta desde un segundo dispositivo (por ejemplo, desde el teléfono) o con el enlace recibido con antelación puede seguir participando, escribiendo en el chat y enviando archivos adjuntos sin interrupciones: solo cambia el nombre que se muestra, que pasa a ser el escrito al entrar."
+    ]
+  },
+  "0.7.3": {
+    "title": "Recuento de asistentes correcto, reacciones centradas y mejoras en la sala",
+    "notes": [
+      "El recuento de personas presentes ya no multiplica a quien sale y vuelve a entrar (por ejemplo, con el botón «Atrás» del navegador): las conexiones duplicadas de una misma persona se cuentan una sola vez. La lista de participantes sigue mostrando cada conexión, de modo que el moderador puede verlas y gestionarlas todas.",
+      "La barra de reacciones y emojis está ahora centrada en la parte inferior, bien visible y fácil de localizar, en lugar de en la esquina inferior izquierda.",
+      "El número de personas inscritas ya no se muestra públicamente en la página del evento ni en el listado de eventos: sigue siendo visible para la administración en el panel. Durante el directo, el público solo ve el número de personas presentes.",
+      "La supresión del ruido de fondo se activa automáticamente en todos los micrófonos: el procesamiento de audio básico —eco y ruido— está siempre habilitado, sin necesidad de activarlo a mano.",
+      "La entrada en la sala es algo más rápida: la reactivación del sistema de vídeo empieza ya al pulsar el botón de acceso."
+    ]
+  },
+  "0.7.2": {
+    "title": "Chat más completo: archivos adjuntos, respuestas y menciones",
+    "notes": [
+      "En el chat ya pueden enviarse imágenes y archivos adjuntos (PNG, JPEG, WebP, GIF y PDF, hasta 10 MB), con vista previa en el propio mensaje.",
+      "Nueva función «Responder»: puede citarse un mensaje concreto y la cita permanece visible en el hilo de la conversación.",
+      "Menciones con @: es posible dirigirse a un participante por su nombre dentro de un mensaje.",
+      "Moderación del chat: los moderadores pueden eliminar mensajes concretos durante el evento."
+    ]
+  },
+  "0.7.1": {
+    "title": "Estadísticas posteriores a cada evento",
+    "notes": [
+      "Nueva pestaña «Estadísticas» para cada evento en el panel de administración, disponible también para los eventos sin inscripción o sin grabación de vídeo: muestra cómo se ha desarrollado la videollamada, quién ha hablado más, el grado de participación general y los principales indicadores.",
+      "Gráfico de la evolución de la interacción a lo largo del tiempo —chat, preguntas, votos a las preguntas, encuestas, palabras de la nube de palabras y reacciones—, con el momento de mayor actividad de la videollamada destacado.",
+      "Clasificación de quienes han hablado durante más tiempo (minutos por persona), con el equilibrio de las intervenciones, junto al recuento de reacciones y de manos levantadas.",
+      "Nueva estimación del tiempo medio de permanencia de los participantes en la sala, que se emplea también para calcular el grado de atención general."
+    ]
+  },
+  "0.7.0": {
+    "title": "Nombres de ponentes editables y reproductor solo de audio",
+    "notes": [
+      "Tras el evento ya es posible cambiar el nombre de los ponentes y corregir así los nombres reconocidos automáticamente en la transcripción.",
+      "Si la grabación no tiene un vídeo reproducible, la página de corrección ofrece igualmente un reproductor solo de audio para volver a escuchar y ajustar el texto y los ponentes.",
+      "Corrección de la grabación multipista: ahora se captura correctamente el audio real de los participantes remotos."
+    ]
+  },
+  "0.6.9": {
+    "title": "Fiabilidad del procesamiento con IA",
+    "notes": [
+      "El panel de administración muestra ahora un indicador de fiabilidad del procesamiento con IA posterior al evento (transcripción, resumen, traducciones), para saber de un vistazo si el resultado es completo y fiable."
+    ]
+  },
+  "0.6.8": {
+    "title": "Página de edición posterior al evento más clara",
+    "notes": [
+      "La página de corrección (transcripción, resumen, traducciones) explica ahora cuándo los contenidos generados con IA todavía no están disponibles —«procesamiento en curso» o «inicie el procesamiento desde los controles superiores»—, en lugar de mostrar un error en rojo que parecía una avería.",
+      "Cuando un guardado no se completa, ahora se indica en rojo e incluye el motivo concreto devuelto por el servidor, en vez de aparecer en verde como si hubiera funcionado.",
+      "La caducidad de la sesión de administración y los problemas de carga se distinguen ahora con mensajes específicos, en lugar de un único error genérico.",
+      "Si el audio de la grabación no puede reproducirse, la página lo advierte y sigue siendo posible corregir el texto y el ponente de cada segmento."
+    ]
+  },
+  "0.6.7": {
+    "title": "Reacciones siempre visibles y «Notas / Lista de comprobación»",
+    "notes": [
+      "Las reacciones (emojis) están ahora siempre visibles en una barra situada abajo a la izquierda, en lugar de quedar ocultas tras un botón: son más fáciles de encontrar y de usar durante el evento.",
+      "La función «Agenda» pasa a llamarse «Notas / Lista de comprobación» para dejar claro que es un espacio de notas en forma de lista de comprobación, cuyo contenido no se publica en el chat. El moderador puede seguir activándola en cada evento."
+    ]
+  },
+  "0.6.6": {
+    "title": "Mejoras: chat, recuentos y acceso",
+    "notes": [
+      "Los enlaces compartidos en el chat son ahora clicables y se abren de forma segura en una pestaña nueva; antes eran texto sin formato.",
+      "En la sala, el número total de personas inscritas solo es visible para los moderadores: los participantes ven únicamente cuántas personas están realmente presentes.",
+      "Acceso a la sala más rápido: la conexión con el servidor de vídeo se prepara ya durante la sala de espera, lo que reduce la espera al entrar.",
+      "En la lista de participantes, el encabezado con el recuento permanece siempre visible al desplazarse por la lista."
+    ]
+  },
+  "0.6.5": {
+    "title": "Grabaciones y recuentos",
+    "notes": [
+      "El recuento de personas presentes en la sala excluye ahora al grabador: muestra solo a las personas reales, no al bot que captura el audio.",
+      "Posproducción: nuevo botón «Generar con IA» para iniciar la transcripción, el resumen y la traducción también en las grabaciones solo de audio (una pista por participante), que hasta ahora no ofrecían ningún control de inicio.",
+      "En la lista de pistas, cada alias va acompañado de un identificador: personas distintas con el mismo alias reciben identificadores diferentes, mientras que varias intervenciones de una misma persona comparten el mismo identificador.",
+      "Mensaje claro cuando al iniciar el procesamiento no se pone ningún trabajo en cola, porque la IA está desactivada para el evento o el procesamiento está en pausa, en lugar de un falso «operación realizada correctamente»."
+    ]
+  },
+  "0.6.4": {
+    "title": "Seguridad de la identidad y mejoras en la sala",
+    "notes": [
+      "Corrección de seguridad: al compartir el enlace personal de acceso a la sala, quien lo abre entra ahora con su PROPIO nombre; antes podía heredar el nombre de quien había enviado el enlace.",
+      "Compartición de pantalla más nítida: ahora se prioriza la resolución (5 fps de alta calidad) frente a la fluidez, de modo que las diapositivas y los documentos siguen siendo legibles cuando hay poco movimiento.",
+      "Se ha eliminado la función «ocultar la propia imagen» que, una vez activada, impedía volver a mostrar el propio recuadro.",
+      "Acceso de administración: tras autenticarse de nuevo después de un periodo de inactividad, la página se actualiza correctamente y ya no queda aparentemente bloqueada hasta recargarla a mano."
+    ]
+  },
+  "0.6.3": {
+    "title": "Mejoras en la sala del evento: segunda ronda",
+    "notes": [
+      "El temporizador de las presentaciones está ahora integrado en la barra de controles del moderador, sin ocupar una fila propia; la barra de cuenta atrás aparece solo cuando el temporizador está en marcha.",
+      "En el chat se muestra el nombre real de quien escribe, y ya no un genérico «Moderador».",
+      "El chat pasa a ser un panel independiente de la barra lateral, en lugar de superponerse siempre al resto de los contenidos: una interfaz más despejada, con el contador de mensajes no leídos en la pestaña.",
+      "Nuevo botón «Pizarra» para los moderadores, que permite abrir la pizarra compartida directamente desde la barra de controles.",
+      "El botón «Compartir» tiene ahora el color correcto, de modo que ya no se confunde con «Salir»; los enlaces llevan iconos al lado y el enlace de moderación, visible solo para los moderadores, queda tras un aviso para poder invitar a otros moderadores sin equivocarse.",
+      "La nube de palabras ya no está activa de forma predeterminada: el moderador puede activarla durante el evento si así lo desea."
+    ]
+  },
+  "0.6.2": {
+    "title": "Mejoras en la sala del evento en directo",
+    "notes": [
+      "La barra de controles (micrófono, cámara, compartir pantalla) permanece siempre visible y accesible, también en pantalla completa, mientras alguien comparte contenido o cuando se está a solas en la sala.",
+      "El moderador puede volver a activar y desactivar las funciones en directo (Preguntas, Chat, Agenda) durante el evento.",
+      "Los controles de audio y vídeo pueden usarse ya durante la preparación de la sala, sin esperar a que arranque el servidor de vídeo.",
+      "La lista «Manos levantadas» muestra correctamente quién ha pedido la palabra.",
+      "Nuevo botón «Compartir» en la sala: copia al instante el enlace para participar y el enlace de la página del evento, sin exponer ningún token reservado.",
+      "La marca PA Webinar vuelve a verse en la barra superior de la sala del evento."
+    ]
+  },
+  "0.6.1": {
+    "title": "Registro de cambios público y actualizaciones de seguridad",
+    "notes": [
+      "Nueva página pública con el registro de cambios, accesible al hacer clic en el número de versión del pie de página: recoge todas las versiones de la plataforma con sus principales novedades.",
+      "Actualizaciones de seguridad de las dependencias (undici, nodemailer) y refuerzo del proceso de compilación, con análisis de vulnerabilidades."
+    ]
+  },
+  "0.6.0": {
+    "title": "Flujo posterior al evento y sala de espera interactiva",
+    "notes": [
+      "Nuevo flujo de cierre del evento: al finalizar, un aviso específico pide al moderador que elija el destino de la grabación (publicarla en la página, incorporarla a la biblioteca o conservarla solo en el archivo).",
+      "Resumen posterior al evento, automático y anonimizado (asistencia, preguntas más votadas, resultados de las encuestas, nube de palabras y valoraciones), que se muestra en la página de todos los eventos finalizados, incluso sin grabación.",
+      "Correo de resumen posterior al evento para los participantes, con los contenidos de la sesión.",
+      "Sala de espera interactiva «Piazza Digitale»: se camina con el propio avatar hasta el acceso para entrar en la videollamada, siempre acompañada del botón de entrada clásico.",
+      "La nube de palabras pasa a tener una sección propia en la página del evento finalizado, con control de visibilidad para la administración.",
+      "Pizarra compartida activable para cada evento y desde las plantillas.",
+      "Revisión de la experiencia de uso del asistente de creación de eventos: opciones avanzadas plegadas, moderador principal con enlace, avisos sobre datos personales, guardado de borradores y gestión de errores parciales.",
+      "Periodos de conservación diferenciados para las grabaciones y para las pistas de audio de cada ponente, vinculados a la señal de «vídeo publicado», junto con la limpieza GDPR de los mensajes del chat."
+    ]
+  },
+  "0.5.11": {
+    "title": "Mejoras en la moderación, el cierre de la videollamada y el audio",
+    "notes": [
+      "Los moderadores aparecen con su nombre real en lugar de un genérico «Moderador».",
+      "Pantalla de cierre dentro de la aplicación cuando el evento termina, en lugar del confuso mensaje «Sala en preparación».",
+      "Corregida la superposición de iconos en la sala de espera.",
+      "Supresión de ruido desactivada de forma forzada mediante la IFrame API para resolver problemas de audio."
+    ]
+  },
+  "0.5.9": {
+    "title": "Grabación multipista estable, valoración con estrellas y rendimiento",
+    "notes": [
+      "Grabación por ponente (multipista) fiable de principio a fin: audio completo en cada pista, sin cortes y con subidas en paralelo.",
+      "Cuestionario de valoración posterior al evento con estrellas y panel de resumen para la administración.",
+      "Mejoras de rendimiento: códec VP9 para la cámara, carga diferida en el móvil y ajuste del grabador.",
+      "Hook posterior a la actualización de Helm que recarga automáticamente el archivo config.js de Jitsi."
+    ]
+  },
+  "0.5.8": {
+    "title": "Calidad de vídeo y audio configurable y nuevo flujo de acceso",
+    "notes": [
+      "Control de la calidad de vídeo y audio configurable por la administración, con ajustes predefinidos por evento.",
+      "Rediseño del flujo de acceso: inscripción, sala de espera y videollamada.",
+      "Al levantar la mano se muestra el nombre real de cada participante."
+    ]
+  },
+  "0.5.6": {
+    "title": "Sala de espera configurable y portadas de los eventos",
+    "notes": [
+      "Modo de sala de espera configurable (videojuego, jardín o clásica), tanto para todo el sitio como para cada evento.",
+      "Imágenes de portada en la página del evento y en las miniaturas de las tarjetas.",
+      "Archivos subidos servidos mediante una ruta específica, con URL firmadas de corta duración.",
+      "Botón «Entrar ahora» disponible de inmediato tras la inscripción.",
+      "Consolidación del área de administración para gestionar el procesamiento con IA de las grabaciones y refuerzo de la captura multipista."
+    ]
+  },
+  "0.5.2": {
+    "title": "Preparación de los eventos y mejoras",
+    "notes": [
+      "Agenda con votación a favor y en contra, y correcciones en los permisos heredados de las plantillas.",
+      "Nombres reales, en lugar de «SPEAKER_00», en los resúmenes y los subtítulos.",
+      "Serie de correcciones urgentes (v0.5.2–v0.5.5) como preparación de los eventos públicos."
+    ]
+  },
+  "0.5.1": {
+    "title": "Página de inicio orientada a la comunidad y archivo multipista",
+    "notes": [
+      "Rediseño de la página de inicio con un enfoque orientado a la comunidad, con textos de traducción sustituibles en caliente y accesibilidad conforme a AgID.",
+      "Archivo MKV multipista con reproductor para volver a escuchar a cada ponente por separado.",
+      "Alineación de las pistas multipista con la mezcla de Jibri mediante correlación cruzada."
+    ]
+  },
+  "0.5.0": {
+    "title": "Posproducción con IA y grabación multipista",
+    "notes": [
+      "Cadena de posproducción con IA: transcripción, resumen, subtítulos, traducciones y doblaje a varias voces (siempre sintéticas), con trazabilidad del origen de los modelos.",
+      "Grabación multipista (una pista por ponente) con atribución de ponente y asignación automática de nombres (ADR-013).",
+      "Biblioteca pública de vídeos y página de gestión posterior al evento para la administración.",
+      "Editor de la transcripción posterior al evento, con corrección del texto y reasignación de ponentes.",
+      "Renovación de la interfaz de administración: avisos y ventanas .italia en lugar de las alertas nativas del navegador, indicadores de carga y tokens de diseño para los colores en sustitución de cientos de valores hexadecimales escritos a mano.",
+      "Consentimiento de cada participante para la grabación multipista (GDPR) y exportación ampliada de datos conforme al artículo 15."
+    ]
+  },
+  "0.4.0": {
+    "title": "Participación y ciclo de vida",
+    "notes": [
+      "Nuevas funciones en directo: nube de palabras, temporizador de presentación, contador de reacciones, controles en directo al estilo Meet y panel de manos levantadas.",
+      "Ciclo de vida de las grabaciones, de temporal a publicada, con gestión desde la administración (vista previa, publicación y eliminación) y periodos de conservación diferenciados.",
+      "Página posterior al evento organizada en pestañas (grabación, archivo de Q&A, encuestas, valoraciones y materiales), con configuración de qué mostrar y cuándo.",
+      "Asistente de creación de eventos en cinco pasos, taxonomía de etiquetas, directorio de contactos (Person) y antetítulo editorial.",
+      "Biblioteca pública de vídeos en /video-library y página de transparencia /service-inventory (CycloneDX 1.6 por cada instancia).",
+      "Autoescalado de JVB en dos fases, con instantánea en Redis para la página de estado.",
+      "Limpieza GDPR en tres fases: datos personales de inmediato, contenidos al vencer su periodo de conservación y borrado definitivo."
+    ]
+  },
+  "0.3.0": {
+    "title": "Plataforma configurable e infraestructura",
+    "notes": [
+      "Ajustes del sitio que permiten a otras administraciones públicas reutilizar la plataforma (identidad visual, colores, favicon, SEO, pie de página, modo de la página de inicio y páginas de privacidad y accesibilidad) sin necesidad de volver a compilarla.",
+      "Panel de analítica y panel de administración de la infraestructura.",
+      "Tres modos de despliegue con Helm (simple, estándar y completo) y escalado a cero de JVB con un grupo de nodos específico.",
+      "Cadena de grabación con Jibri multinube (Azure Blob, S3, GCS, MinIO o almacenamiento local) y marca de agua de Jitsi configurable.",
+      "OpenSSF Scorecard, Dependabot, SBOM de las dependencias, gestión centralizada de errores, limitación de peticiones y más de 210 pruebas unitarias.",
+      "Numerosas versiones incrementales (v0.3.8–v0.3.45) a raíz de los comentarios recibidos tras la demostración."
+    ]
+  },
+  "0.2.0": {
+    "title": "Aportaciones del DTD",
+    "notes": [
+      "Perfilado de los participantes en la inscripción (organismo, cargo y tipología), configurable en cada evento, con exportación a CSV y estadísticas agregadas.",
+      "Recordatorios configurables, con varios plazos de antelación y correos diferenciados.",
+      "Encuestas con resultados en tiempo real y exportación a CSV.",
+      "Mejoras en materia de GDPR: política de privacidad por evento, consentimientos granulares, registro de auditoría de las eliminaciones y exportación de datos conforme al artículo 15.",
+      "Consolidación de los roles de moderador y auditor, y auditoría de las licencias de las dependencias."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP: primera versión",
+    "notes": [
+      "Plataforma pública para eventos digitales con el sistema de diseño .italia (Bootstrap Italia, design-react-kit).",
+      "Sala en directo con Jitsi Meet (IFrame API y autenticación JWT), con los roles aplicados en el servidor.",
+      "Inscripción de participantes conforme al GDPR, con los datos personales cifrados (AES-256-GCM).",
+      "Q&A con votación y moderación, y sala de espera con cuenta atrás y acceso como invitado.",
+      "Correos de confirmación y de recordatorio, e integración con el calendario (Google, Outlook, Yahoo, iCal).",
+      "Panel de administración con autenticación mediante clave de API, limpieza GDPR y métricas de Prometheus.",
+      "Chart de Helm listo para producción, imágenes Docker sin usuario root y de solo lectura, CI/CD con GitHub Actions y publiccode.yml."
+    ]
+  }
+}
