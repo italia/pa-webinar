@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "De interface compleet in alle 24 talen, en een vernieuwde visuele identiteit",
+    "notes": [
+      "De interface is nu volledig vertaald in alle 24 EU-talen: eerder vielen meerdere schermen — waaronder de wachtruimte en de toestemmingsteksten — terug op het Italiaans waar een vertaling ontbrak.",
+      "Vernieuwd logo en visuele identiteit (favicon, pictogram, watermerk), en een afbeeldingsvoorbeeld wanneer een evenementlink in chat en op social media wordt gedeeld.",
+      "Nieuws-pagina: het releaseritme in één oogopslag en links naar de dienstentransparantie en de beveiliging."
+    ]
+  },
   "0.8.6": {
     "title": "De wachtruimte: een pagina, en een plein dat je zelf betreedt",
     "notes": [

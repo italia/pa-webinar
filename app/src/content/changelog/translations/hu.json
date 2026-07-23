@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "A felület teljes mind a 24 nyelven, és megújult vizuális arculat",
+    "notes": [
+      "A felület mostantól teljesen le van fordítva mind a 24 uniós nyelvre: korábban több képernyő — köztük a váróterem és a hozzájárulási szövegek — olaszra váltott ott, ahol hiányzott a fordítás.",
+      "Megújult logó és vizuális arculat (favikon, ikon, vízjel), valamint képes előnézet, amikor egy esemény hivatkozását csevegésben és közösségi médiában osztják meg.",
+      "Újdonságok oldal: a kiadási ütem egy pillantásra, és hivatkozások a szolgáltatások átláthatóságára és a biztonságra."
+    ]
+  },
   "0.8.6": {
     "title": "A váróterem: egy oldal és egy tér, ahová magad döntesz belépni",
     "notes": [

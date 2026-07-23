@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Rozhraní kompletní ve všech 24 jazycích a obnovená vizuální identita",
+    "notes": [
+      "Rozhraní je nyní plně přeloženo do všech 24 jazyků EU: dříve několik obrazovek — včetně čekárny a textů souhlasu — přecházelo do italštiny tam, kde překlad chyběl.",
+      "Obnovené logo a vizuální identita (favicon, ikona, vodoznak) a náhled s obrázkem při sdílení odkazu na událost v chatu a na sociálních sítích.",
+      "Stránka novinek: rytmus vydání na první pohled a odkazy na transparentnost služeb a zabezpečení."
+    ]
+  },
   "0.8.6": {
     "title": "Čekárna: stránka a náměstí, na které se vstupuje z vlastní vůle",
     "notes": [

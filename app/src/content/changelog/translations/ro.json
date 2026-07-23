@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Interfața completă în toate cele 24 de limbi și o identitate vizuală reînnoită",
+    "notes": [
+      "Interfața este acum tradusă integral în toate cele 24 de limbi ale UE: înainte, mai multe ecrane — inclusiv sala de așteptare și textele de consimțământ — reveneau la italiană acolo unde lipsea traducerea.",
+      "Siglă și identitate vizuală reînnoite (favicon, pictogramă, filigran) și o previzualizare cu imagine la partajarea linkului unui eveniment în chat și pe rețelele sociale.",
+      "Pagina de noutăți: ritmul versiunilor dintr-o privire și legăturile către transparența serviciilor și securitate."
+    ]
+  },
   "0.8.6": {
     "title": "Sala de așteptare: o pagină și o piață în care alegi să intri",
     "notes": [

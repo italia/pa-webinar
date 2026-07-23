@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Die Oberfläche vollständig in allen 24 Sprachen, und eine erneuerte visuelle Identität",
+    "notes": [
+      "Die Oberfläche ist jetzt in allen 24 EU-Sprachen vollständig übersetzt: zuvor wichen mehrere Ansichten — darunter der Warteraum und die Einwilligungstexte — auf Italienisch aus, wo eine Übersetzung fehlte.",
+      "Erneuertes Logo und visuelle Identität (Favicon, Symbol, Wasserzeichen) sowie eine Bildvorschau, wenn ein Veranstaltungslink im Chat und in sozialen Netzwerken geteilt wird.",
+      "Neuigkeiten-Seite: der Release-Rhythmus auf einen Blick und Links zur Dienst-Transparenz und zur Sicherheit."
+    ]
+  },
   "0.8.6": {
     "title": "Der Warteraum: eine Seite und ein Platz, den man betreten kann",
     "notes": [

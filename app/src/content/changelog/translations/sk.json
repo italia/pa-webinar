@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Rozhranie kompletné vo všetkých 24 jazykoch a obnovená vizuálna identita",
+    "notes": [
+      "Rozhranie je teraz úplne preložené do všetkých 24 jazykov EÚ: predtým sa niekoľko obrazoviek — vrátane čakárne a textov súhlasu — prepínalo do taliančiny tam, kde preklad chýbal.",
+      "Obnovené logo a vizuálna identita (favicon, ikona, vodoznak) a náhľad s obrázkom pri zdieľaní odkazu na podujatie v chate a na sociálnych sieťach.",
+      "Stránka noviniek: rytmus vydaní na prvý pohľad a odkazy na transparentnosť služieb a bezpečnosť."
+    ]
+  },
   "0.8.6": {
     "title": "Čakáreň: stránka a námestie, na ktoré sa vstupuje z vlastnej vôle",
     "notes": [

@@ -10,6 +10,14 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.8.7 — 2026-07-23
+
+**The interface complete in all 24 languages, and a refreshed visual identity**
+
+- The interface is now fully translated in all 24 EU languages: before, several screens — including the waiting room and the consent texts — fell back to Italian where a translation was missing.
+- Refreshed logo and visual identity (favicon, icon, watermark), and an image preview when an event link is shared on chat and social.
+- What's-new page: the release cadence at a glance and links to the service transparency and security pages.
+
 ## 0.8.6 — 2026-07-22
 
 **The waiting room: a page, and a square you choose to enter**

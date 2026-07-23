@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Liides täielik kõigis 24 keeles ja uuendatud visuaalne identiteet",
+    "notes": [
+      "Liides on nüüd täielikult tõlgitud kõigisse 24 ELi keelde: varem läks mitu vaadet — sealhulgas ooteruum ja nõusolekutekstid — itaalia keelele üle seal, kus tõlge puudus.",
+      "Uuendatud logo ja visuaalne identiteet (favicon, ikoon, vesimärk) ning pildiga eelvaade, kui sündmuse link jagatakse vestluses ja sotsiaalmeedias.",
+      "Uudiste leht: väljalasete rütm ühe pilguga ning lingid teenuste läbipaistvusele ja turvalisusele."
+    ]
+  },
   "0.8.6": {
     "title": "Ooteruum: leht ja väljak, kuhu astud omal valikul",
     "notes": [

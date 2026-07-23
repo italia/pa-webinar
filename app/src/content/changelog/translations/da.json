@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "Grænsefladen komplet på alle 24 sprog og en fornyet visuel identitet",
+    "notes": [
+      "Grænsefladen er nu fuldt oversat til alle 24 EU-sprog: tidligere faldt flere skærme — heriblandt venteværelset og samtykketeksterne — tilbage til italiensk, hvor en oversættelse manglede.",
+      "Fornyet logo og visuel identitet (favicon, ikon, vandmærke) og et billedeksempel, når et begivenhedslink deles i chat og på sociale medier.",
+      "Nyheder-side: udgivelsestakten på et øjeblik og links til tjenestegennemsigtigheden og sikkerheden."
+    ]
+  },
   "0.8.6": {
     "title": "Venteværelset: en side og en plads, man selv vælger at gå ind på",
     "notes": [

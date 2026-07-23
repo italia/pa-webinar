@@ -1,4 +1,12 @@
 {
+  "0.8.7": {
+    "title": "An comhéadan iomlán sna 24 teanga, agus féiniúlacht amhairc athnuaite",
+    "notes": [
+      "Tá an comhéadan aistrithe go hiomlán anois sna 24 teanga AE ar fad: roimhe seo, d'iompaigh roinnt scáileán — an seomra feithimh agus na téacsanna toilithe ina measc — go hIodáilis nuair a bhí aistriúchán in easnamh.",
+      "Lógó agus féiniúlacht amhairc athnuaite (favicon, deilbhín, comhartha uisce), agus réamhamharc le híomhá nuair a roinntear nasc imeachta i gcomhrá agus ar na meáin shóisialta.",
+      "Leathanach nuachta: rithim na n-eisiúintí ar an toirt agus naisc chuig trédhearcacht na seirbhísí agus an tslándáil."
+    ]
+  },
   "0.8.6": {
     "title": "An seomra feithimh: leathanach, agus cearnóg a roghnaíonn tú dul isteach inti",
     "notes": [
