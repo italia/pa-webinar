@@ -61,7 +61,7 @@ transformers==4.48.3
 # TTS — Piper (rhasspy/piper-tts). MIT license, voci pre-trained
 # scaricate da huggingface.co/rhasspy/piper-voices. Gira su CPU
 # (ONNX runtime), niente GPU richiesta. Per DUB job.
-piper-tts==1.2.0
+piper-tts==1.6.0
 
 # Sentry / structured logging optional — we use stdlib logging
 # configured for JSON. Cluster Loki picks them up.
