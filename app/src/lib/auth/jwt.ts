@@ -44,7 +44,7 @@ function getJitsiJwtSubject(): string {
 }
 
 import { generateAvatarDataUri } from '@/lib/avatar';
-import { getPublicEnv } from '@/lib/env';
+import { appBaseUrl } from '@/lib/env';
 import { gravatarRef } from '@/lib/gravatar-ref';
 
 interface JitsiTokenPayload {
@@ -69,13 +69,8 @@ interface JitsiTokenPayload {
 /** L'origin pubblico dell'app, o null se non è un URL http(s) assoluto (nel
  *  qual caso l'avatar resta il data URI invece di diventare un link rotto). */
 function absoluteAppUrl(): string | null {
-  try {
-    const url = new URL(getPublicEnv('NEXT_PUBLIC_APP_URL'));
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
-    return `${url.origin}${url.pathname.replace(/\/$/, '')}`;
-  } catch {
-    return null;
-  }
+  const url = appBaseUrl();
+  return url ? `${url.origin}${url.pathname.replace(/\/$/, '')}` : null;
 }
 
 /**

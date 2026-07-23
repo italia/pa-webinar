@@ -82,13 +82,15 @@ describe('GET /api/assets/[...path] — gli asset pubblici restano pubblici', ()
   });
 
   it('la rotta non dipende dal database', () => {
-    // Il vero presidio del test qui sopra: nessun import di `@/lib/db`. Se
-    // rientra, questo fallisce e obbliga a ripensare la cache/costo della rotta.
+    // Il vero presidio del test qui sopra: nessuna riga `import ... @/lib/db`.
+    // Ancorato all'import (non ai commenti: la rotta ne è piena e potrebbe
+    // NOMINARE @/lib/db per spiegare perché NON lo importa). Se rientra come
+    // import, questo fallisce e obbliga a ripensare la cache/costo della rotta.
     const src = fs.readFileSync(
       path.join(__dirname, 'route.ts'),
       'utf-8',
     );
-    expect(src).not.toMatch(/@\/lib\/db/);
+    expect(src).not.toMatch(/^import[^\n]*@\/lib\/db/m);
   });
 
   it('resta cacheabile a lungo dalle cache condivise', async () => {

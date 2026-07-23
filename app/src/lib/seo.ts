@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { getPublicEnv } from '@/lib/env';
+import { appBaseUrl } from '@/lib/env';
 
 /**
  * Metadata SEO/social condivisi fra il layout e le pagine che definiscono un
@@ -25,13 +25,7 @@ import { getPublicEnv } from '@/lib/env';
 /** Base assoluta per risolvere gli URL relativi dei metadata; undefined se
  *  `NEXT_PUBLIC_APP_URL` non è un URL http(s) valido (niente crash). */
 export function metadataBase(): URL | undefined {
-  try {
-    const url = new URL(getPublicEnv('NEXT_PUBLIC_APP_URL'));
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') return undefined;
-    return url;
-  } catch {
-    return undefined;
-  }
+  return appBaseUrl() ?? undefined;
 }
 
 /**
