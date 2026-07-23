@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Dnevnik sprememb, zdaj z vgrajenim popisom programske opreme",
+    "notes": [
+      "Vsaka izdaja tukaj odpre svoj seznam sestavin programske opreme (SBOM): iskalni seznam vseh vključenih sestavin z različico in ekosistemom — brez prenosa.",
+      "Tehnični razdelek je zdaj nabor povezav — SBOM, izdaja na GitHubu, viri pri tisti oznaki, gradbeni cevovod — namesto odstavka, ki je ponavljal zgornji povzetek.",
+      "Noga doda varnostne signale projekta: OpenSSF Scorecard in rezultate pregledovanja kode."
+    ]
+  },
   "0.8.8": {
     "title": "Stran z novostmi, prenovljena",
     "notes": [

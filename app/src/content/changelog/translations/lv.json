@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Izmaiņu žurnāls tagad ar integrētu programmatūras inventāru",
+    "notes": [
+      "Katrs laidiens šeit atver savu programmatūras sastāvdaļu sarakstu (SBOM): meklējamu sarakstu ar visām iekļautajām sastāvdaļām, versiju un ekosistēmu — bez lejupielādes.",
+      "Tehniskā sadaļa tagad ir saišu kopums — SBOM, laidiens vietnē GitHub, pirmkods pie šī taga, būvēšanas konveijers — nevis rindkopa, kas atkārtoja iepriekšējo kopsavilkumu.",
+      "Kājenē pievienoti projekta drošības signāli: OpenSSF Scorecard un koda skenēšanas rezultāti."
+    ]
+  },
   "0.8.8": {
     "title": "Jaunumu lapa, pārveidota",
     "notes": [

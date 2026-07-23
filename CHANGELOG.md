@@ -10,6 +10,14 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.8.9 — 2026-07-23
+
+**The changelog, now with the software inventory built in**
+
+- Each release now opens its software bill of materials (SBOM) right here: a searchable list of every component it ships, with version and ecosystem — no download needed.
+- The technical section is now a set of links — SBOM, the GitHub release, the source at that tag, the build pipeline — instead of a paragraph that repeated the summary above.
+- The footer adds the project's security signals: the OpenSSF Scorecard and the code-scanning results.
+
 ## 0.8.8 — 2026-07-23
 
 **The what's-new page, redesigned**

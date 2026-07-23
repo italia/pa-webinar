@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Muudatuste logi, nüüd sisseehitatud tarkvarainventuuriga",
+    "notes": [
+      "Iga väljalase avab siin oma tarkvara koostisosade loendi (SBOM): otsitav loend kõigist kaasasolevatest komponentidest koos versiooni ja ökosüsteemiga — allalaadimiseta.",
+      "Tehniline osa on nüüd linkide kogum — SBOM, GitHubi väljalase, lähtekood selle sildi juures, ehituskonveier — selle asemel, et lõik kordaks ülalolevat kokkuvõtet.",
+      "Jalus lisab projekti turvasignaalid: OpenSSF Scorecard ja koodiskaneerimise tulemused."
+    ]
+  },
   "0.8.8": {
     "title": "Uudiste leht, ümber kujundatud",
     "notes": [

@@ -3562,7 +3562,22 @@
     "transparencyInventory": "transparence des services",
     "transparencySecurity": "sécurité et SBOM",
     "technicalDetail": "Détail technique",
-    "releaseLink": "Version et SBOM sur GitHub",
-    "securityBadge": "Sécurité"
+    "releaseLink": "Release",
+    "securityBadge": "Sécurité",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Fermer",
+    "sbomLoading": "Chargement…",
+    "sbomError": "Impossible de charger le SBOM.",
+    "sbomComponents": "composants",
+    "sbomSearch": "rechercher un composant…",
+    "sbomColName": "Composant",
+    "sbomColVersion": "Version",
+    "sbomColEcosystem": "Écosystème",
+    "sbomNoMatch": "Aucun composant correspondant.",
+    "sbomDownload": "Télécharger le SBOM complet (SPDX)",
+    "sourcesLink": "Sources",
+    "codeScanningLink": "Analyse du code (CodeQL)"
   }
 }

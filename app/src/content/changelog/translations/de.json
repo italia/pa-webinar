@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Das Änderungsprotokoll, jetzt mit integriertem Software-Inventar",
+    "notes": [
+      "Jede Version öffnet ihre Software-Stückliste (SBOM) direkt hier: eine durchsuchbare Liste aller mitgelieferten Komponenten mit Version und Ökosystem — kein Download nötig.",
+      "Der technische Abschnitt ist jetzt eine Reihe von Links — SBOM, die GitHub-Release, die Quellen zu diesem Tag, die Build-Pipeline — statt eines Absatzes, der die Zusammenfassung darüber wiederholte.",
+      "Die Fußzeile ergänzt die Sicherheitssignale des Projekts: die OpenSSF Scorecard und die Ergebnisse des Code-Scannings."
+    ]
+  },
   "0.8.8": {
     "title": "Die Neuigkeiten-Seite, neu gestaltet",
     "notes": [

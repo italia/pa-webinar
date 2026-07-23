@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "O registo de alterações, agora com o inventário de software integrado",
+    "notes": [
+      "Cada versão abre aqui a sua lista de materiais de software (SBOM): a lista pesquisável de todos os componentes que inclui, com versão e ecossistema, sem transferir nada.",
+      "A secção técnica é agora um conjunto de ligações — SBOM, a release no GitHub, o código-fonte nessa etiqueta, o pipeline de compilação — em vez de um parágrafo que repetia o resumo acima.",
+      "O rodapé acrescenta os sinais de segurança do projeto: a Scorecard OpenSSF e os resultados da análise do código."
+    ]
+  },
   "0.8.8": {
     "title": "A página de novidades, redesenhada",
     "notes": [

@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Ändringsloggen, nu med programvaruinventeringen inbyggd",
+    "notes": [
+      "Varje version öppnar här sin programvaruförteckning (SBOM): en sökbar lista över alla medföljande komponenter, med version och ekosystem — utan nedladdning.",
+      "Det tekniska avsnittet är nu en uppsättning länkar — SBOM, GitHub-releasen, källkoden vid den taggen, byggpipelinen — i stället för ett stycke som upprepade sammanfattningen ovan.",
+      "Sidfoten lägger till projektets säkerhetssignaler: OpenSSF Scorecard och resultaten från kodskanningen."
+    ]
+  },
   "0.8.8": {
     "title": "Nyhetssidan, omdesignad",
     "notes": [

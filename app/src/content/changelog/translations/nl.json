@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Het wijzigingslogboek, nu met het software-inventaris ingebouwd",
+    "notes": [
+      "Elke release opent hier zijn software-stuklijst (SBOM): een doorzoekbare lijst van elk meegeleverd onderdeel, met versie en ecosysteem — zonder iets te downloaden.",
+      "Het technische gedeelte is nu een reeks links — SBOM, de GitHub-release, de broncode bij die tag, de build-pipeline — in plaats van een alinea die de samenvatting hierboven herhaalde.",
+      "De voettekst voegt de beveiligingssignalen van het project toe: de OpenSSF Scorecard en de resultaten van de code-scanning."
+    ]
+  },
   "0.8.8": {
     "title": "De nieuws-pagina, opnieuw ontworpen",
     "notes": [

@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Ir-reġistru tal-bidliet, issa bl-inventarju tas-software integrat",
+    "notes": [
+      "Kull ħruġ jiftaħ hawn il-lista tal-komponenti tas-software tiegħu (SBOM): lista li tista' tfittex ta' kull komponent inkluż, bil-verżjoni u l-ekosistema — mingħajr tniżżil.",
+      "It-taqsima teknika issa hija sett ta' links — SBOM, il-ħruġ fuq GitHub, is-sorsi f'dik it-tikketta, il-pipeline tal-bini — minflok paragrafu li kien jirrepeti s-sommarju ta' fuq.",
+      "Il-qiegħ iżid is-sinjali tas-sigurtà tal-proġett: l-OpenSSF Scorecard u r-riżultati tal-iskennjar tal-kodiċi."
+    ]
+  },
   "0.8.8": {
     "title": "Il-paġna tal-aħbarijiet, iddisinjata mill-ġdid",
     "notes": [

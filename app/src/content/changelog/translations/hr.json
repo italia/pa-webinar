@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Zapisnik promjena, sada s ugrađenim inventarom softvera",
+    "notes": [
+      "Svako izdanje ovdje otvara svoj popis softverskih komponenti (SBOM): pretraživ popis svih isporučenih komponenti, s verzijom i ekosustavom — bez preuzimanja.",
+      "Tehnički odjeljak sada je skup poveznica — SBOM, izdanje na GitHubu, izvorni kod na toj oznaci, cjevovod za izgradnju — umjesto odlomka koji je ponavljao gornji sažetak.",
+      "Podnožje dodaje sigurnosne signale projekta: OpenSSF Scorecard i rezultate skeniranja koda."
+    ]
+  },
   "0.8.8": {
     "title": "Stranica s novostima, redizajnirana",
     "notes": [

@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Ændringsloggen, nu med softwareoversigten indbygget",
+    "notes": [
+      "Hver udgivelse åbner her sin software-stykliste (SBOM): en søgbar liste over alle medfølgende komponenter med version og økosystem — uden download.",
+      "Det tekniske afsnit er nu et sæt links — SBOM, GitHub-udgivelsen, kildekoden ved det tag, build-pipelinen — i stedet for et afsnit, der gentog resuméet ovenfor.",
+      "Sidefoden tilføjer projektets sikkerhedssignaler: OpenSSF Scorecard og resultaterne af kodescanningen."
+    ]
+  },
   "0.8.8": {
     "title": "Nyhedssiden, redesignet",
     "notes": [

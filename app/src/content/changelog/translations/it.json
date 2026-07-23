@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Il changelog, ora con l'inventario del software integrato",
+    "notes": [
+      "Ogni rilascio apre qui la sua distinta dei componenti software (SBOM): l'elenco cercabile di ogni componente incluso, con versione ed ecosistema — senza scaricare nulla.",
+      "La sezione tecnica ora è un insieme di link — SBOM, la release su GitHub, i sorgenti a quel tag, la pipeline di build — invece di un paragrafo che ripeteva il riepilogo qui sopra.",
+      "In fondo, i segnali di sicurezza del progetto: la Scorecard OpenSSF e i risultati dell'analisi del codice."
+    ]
+  },
   "0.8.8": {
     "title": "La pagina delle novità, rifatta",
     "notes": [

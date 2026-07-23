@@ -1,4 +1,12 @@
 {
+  "0.8.9": {
+    "title": "Seznam změn, nyní s vestavěným soupisem softwaru",
+    "notes": [
+      "Každé vydání zde otevře svůj soupis softwarových komponent (SBOM): prohledávatelný seznam všech dodaných komponent s verzí a ekosystémem — bez stahování.",
+      "Technická sekce je nyní sada odkazů — SBOM, vydání na GitHubu, zdroje u daného tagu, sestavovací pipeline — místo odstavce, který opakoval shrnutí výše.",
+      "Zápatí přidává bezpečnostní signály projektu: OpenSSF Scorecard a výsledky skenování kódu."
+    ]
+  },
   "0.8.8": {
     "title": "Stránka novinek, přepracovaná",
     "notes": [

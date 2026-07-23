@@ -4,6 +4,8 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { getChangelog } from '@/content/changelog';
 import { getSettings } from '@/lib/settings';
+import { githubRepoUrl } from '@/lib/changelog/repo';
+import { SbomViewer } from '@/components/changelog/sbom-viewer';
 
 // Marks the release matching the currently deployed build so visitors can see
 // "what am I running". Only meaningful on release builds where the tag is set.
@@ -36,10 +38,13 @@ export default async function ChangelogPage() {
     day: 'numeric',
   });
 
-  const repoUrl =
-    typeof settings.githubUrl === 'string' && settings.githubUrl.startsWith('http')
-      ? settings.githubUrl.replace(/\/+$/, '')
-      : null;
+  // Only a trusted github.com repo lights up the artifact/source/Scorecard links
+  // — the SBOM route applies the same guard, so page and API agree on what a
+  // valid public repo is (the admin validator only checks it's a URL).
+  const repoUrl = githubRepoUrl(settings.githubUrl);
+
+  // "owner/repo" from the repo URL, for the OpenSSF Scorecard viewer.
+  const repoPath = repoUrl ? repoUrl.replace(/^https:\/\/github\.com\//, '') : null;
 
   return (
     <div className="container py-5">
@@ -97,23 +102,6 @@ export default async function ChangelogPage() {
                         >
                           {dateFmt.format(new Date(rel.date))}
                         </time>
-                        {/* Link per-versione alla release GitHub, che porta l'SBOM
-                            di quella versione. Reso solo quando il repo è pubblico
-                            (githubUrl impostato) E quella release ha davvero un
-                            asset SBOM (`rel.sbom`): molte versioni sono solo tag
-                            git, senza release né SBOM — un link generico su tutte
-                            darebbe un 404 o prometterebbe un SBOM inesistente. */}
-                        {repoUrl && rel.sbom && (
-                          <a
-                            className="ms-auto"
-                            style={{ fontSize: '0.82rem' }}
-                            href={`${repoUrl}/releases/tag/v${rel.version}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {t('releaseLink')} ↗
-                          </a>
-                        )}
                       </div>
                       <h2 className="h5 mb-3" lang={rel.textLocale}>
                         {rel.title}
@@ -126,12 +114,13 @@ export default async function ChangelogPage() {
                         ))}
                       </ul>
 
-                      {/* Due livelli: le note d'impatto utente sopra, il dettaglio
-                          tecnico in una linguetta comprimibile. `<details>` è
-                          nativo (niente JS, accessibile). Il contenuto è in
-                          inglese — è per chi sviluppa/riusa — la sola etichetta
-                          è tradotta. Compare solo dove il dettaglio esiste. */}
-                      {rel.technical && rel.technical.length > 0 && (
+                      {/* Secondo livello: niente prosa tecnica (ripeteva le note
+                          utente), solo gli ARTEFATTI di quella release. `<details>`
+                          nativo, comprimibile e accessibile. Reso quando il repo è
+                          pubblico: ogni versione ha un tag, quindi Release/Sorgenti
+                          sono sempre validi; l'SBOM solo dove esiste (`rel.sbom`),
+                          e apre un visore interno invece di uno scarico grezzo. */}
+                      {repoUrl && (
                         <details className="mt-3">
                           <summary
                             className="text-muted"
@@ -139,15 +128,41 @@ export default async function ChangelogPage() {
                           >
                             {t('technicalDetail')}
                           </summary>
-                          <ul
-                            className="mt-2 mb-0 ps-3 d-flex flex-column gap-1"
-                            lang="en"
-                            style={{ fontSize: '0.86rem', color: 'var(--app-muted, #5a6772)' }}
-                          >
-                            {rel.technical.map((line, i) => (
-                              <li key={i}>{line}</li>
-                            ))}
-                          </ul>
+                          <div className="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                            {rel.sbom && (
+                              <SbomViewer
+                                version={rel.version}
+                                rawUrl={`${repoUrl}/releases/download/v${rel.version}/sbom.spdx.json`}
+                              />
+                            )}
+                            <a
+                              className="btn btn-outline-secondary btn-sm"
+                              style={{ fontSize: '0.8rem' }}
+                              href={`${repoUrl}/releases/tag/v${rel.version}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              🔖 {t('releaseLink')} ↗
+                            </a>
+                            <a
+                              className="btn btn-outline-secondary btn-sm"
+                              style={{ fontSize: '0.8rem' }}
+                              href={`${repoUrl}/tree/v${rel.version}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {'</>'} {t('sourcesLink')} ↗
+                            </a>
+                            <a
+                              className="btn btn-outline-secondary btn-sm"
+                              style={{ fontSize: '0.8rem' }}
+                              href={`${repoUrl}/actions/workflows/release.yml`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              ⚙ {t('pipelineLink')} ↗
+                            </a>
+                          </div>
                         </details>
                       )}
                     </div>
@@ -170,9 +185,10 @@ export default async function ChangelogPage() {
             .
           </p>
 
-          {/* I link diretti a GitHub compaiono SOLO se un amministratore ha
-              impostato un repository pubblico (githubUrl vuoto in prod oggi).
-              Cosi' non pubblichiamo mai un link a un 404. */}
+          {/* Link a livello di sito (non per-versione), visibili solo con un
+              repository pubblico impostato: sorgenti/changelog e le scansioni di
+              sicurezza di progetto — Scorecard OpenSSF e l'analisi del codice
+              (CodeQL) — che non hanno un senso per-release. */}
           {repoUrl && (
             <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.88rem' }}>
               {t('sourceNote')}{' '}
@@ -186,6 +202,22 @@ export default async function ChangelogPage() {
                 rel="noopener noreferrer"
               >
                 {t('rawChangelog')}
+              </a>
+              {' · '}
+              <a
+                href={`https://scorecard.dev/viewer/?uri=github.com/${repoPath}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('scorecardLink')}
+              </a>
+              {' · '}
+              <a
+                href={`${repoUrl}/security/code-scanning`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('codeScanningLink')}
               </a>
               .
             </p>
