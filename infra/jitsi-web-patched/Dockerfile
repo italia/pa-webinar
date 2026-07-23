@@ -22,7 +22,7 @@
 # Base tag is PINNED to the exact prod-served build so the minified identifiers,
 # and prosody/jicofo/jvb compatibility, are unchanged. Bump both the FROM tag and
 # the image tag together when the served jitsi/web version changes.
-FROM jitsi/web:stable-10741 AS base
+FROM jitsi/web:stable-11031 AS base
 
 # "Nascondi la tua immagine" is a one-way trap for anyone already caught by it
 # (live report: a participant saw everyone but himself, while everyone saw him).
