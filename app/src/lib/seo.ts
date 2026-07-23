@@ -12,8 +12,8 @@ import { appBaseUrl } from '@/lib/env';
  *     restituisce il valore grezzo dell'operatore (mai vuoto — ripiega sul
  *     default localhost solo se non impostato), quindi un valore senza schema
  *     (`webinar.gov.it`) fa lanciare `new URL` DENTRO `generateMetadata`, che
- *     Next esegue per ogni pagina: l'intero sito va in 500. Stessa cura del
- *     try/catch già in `lib/auth/jwt.ts`.
+ *     Next esegue per ogni pagina: l'intero sito va in 500. Il parsing
+ *     guardato vive in un punto solo: `appBaseUrl` in `lib/env`.
  *
  *  2. `openGraph` NON si fonde fra segmenti: una pagina figlia che dichiara il
  *     proprio `openGraph` SOSTITUISCE quello del layout. Un'immagine di default

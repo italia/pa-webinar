@@ -142,7 +142,10 @@ export function absoluteEventImage(
   event: { imageUrl?: string | null; coverImageUrl?: string | null },
   baseUrl: string,
 ): string | null {
-  const raw = event.imageUrl ?? event.coverImageUrl;
+  // Cover-first, come le card in-app e le anteprime social: la copertina 16:9
+  // curata vince sulla generica, così un evento mostra la STESSA immagine su
+  // ogni canale (prima l'email era imageUrl-first e divergeva dal resto).
+  const raw = event.coverImageUrl ?? event.imageUrl;
   if (!raw) return null;
   try {
     return new URL(raw, baseUrl).toString();

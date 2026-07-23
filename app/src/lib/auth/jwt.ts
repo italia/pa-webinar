@@ -110,8 +110,9 @@ export async function generateJitsiJwt(
   // partecipanti, e `docs/GDPR.md` resta vero. Quello che viaggia nell'URL è
   // l'hash dell'email, cifrato — mai l'indirizzo: vedi `lib/gravatar-ref`.
   //
-  // `getPublicEnv` e non `process.env.NEXT_PUBLIC_*`: la seconda forma viene
-  // SOSTITUITA a build time da webpack, e l'immagine è costruita con
+  // `appBaseUrl()` legge il valore a RUNTIME (via getPublicEnv): la forma
+  // `process.env.NEXT_PUBLIC_*` in notazione puntata la sostituisce webpack a
+  // build time, e l'immagine è costruita con
   // `ARG NEXT_PUBLIC_APP_URL=http://localhost:3000` — in produzione ogni avatar
   // avrebbe puntato al localhost di chi guarda.
   //
