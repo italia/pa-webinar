@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Strona nowości, przeprojektowana",
+    "notes": [
+      "Każde wydanie czyta się teraz na dwóch poziomach: najważniejsze zmiany, które są dla Ciebie istotne, oraz — pod zakładką „Szczegóły techniczne”, którą otwierasz tylko wtedy, gdy chcesz — praca techniczna, która za nimi stoi.",
+      "Każda wersja wydana z wykazem składników oprogramowania (SBOM) prowadzi bezpośrednio do swojego wydania na GitHubie, gdzie SBOM jest dołączony. Repozytorium kodu źródłowego jest teraz publiczne.",
+      "Pasek osi czasu u góry zniknął: stawał się zagracony w miarę przybywania wydań i niewiele mówił. Daty pozostają na każdej karcie."
+    ]
+  },
   "0.8.7": {
     "title": "Interfejs kompletny we wszystkich 24 językach i odświeżona identyfikacja wizualna",
     "notes": [
       "Interfejs jest teraz w pełni przetłumaczony na wszystkie 24 języki UE: wcześniej kilka ekranów — w tym poczekalnia i teksty zgód — przełączało się na włoski tam, gdzie brakowało tłumaczenia.",
       "Odświeżone logo i identyfikacja wizualna (favicon, ikona, znak wodny) oraz podgląd z obrazem przy udostępnianiu linku do wydarzenia na czacie i w mediach społecznościowych.",
-      "Strona nowości: rytm wydań na pierwszy rzut oka oraz odnośniki do przejrzystości usług i bezpieczeństwa."
+      "Strona nowości w każdym języku, z odnośnikami do przejrzystości usług i do bezpieczeństwa."
     ]
   },
   "0.8.6": {

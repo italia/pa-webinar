@@ -86,7 +86,6 @@ export default async function ChangelogPage() {
                           <span
                             className="badge rounded-pill"
                             style={{ background: '#FFF3CD', color: '#664D03', fontSize: '0.8rem' }}
-                            title={t('securityBadge')}
                           >
                             🔒 {t('securityBadge')}
                           </span>
@@ -99,9 +98,12 @@ export default async function ChangelogPage() {
                           {dateFmt.format(new Date(rel.date))}
                         </time>
                         {/* Link per-versione alla release GitHub, che porta l'SBOM
-                            di quella versione. Solo se il repo è pubblico
-                            (githubUrl impostato): altrimenti sarebbe un 404. */}
-                        {repoUrl && (
+                            di quella versione. Reso solo quando il repo è pubblico
+                            (githubUrl impostato) E quella release ha davvero un
+                            asset SBOM (`rel.sbom`): molte versioni sono solo tag
+                            git, senza release né SBOM — un link generico su tutte
+                            darebbe un 404 o prometterebbe un SBOM inesistente. */}
+                        {repoUrl && rel.sbom && (
                           <a
                             className="ms-auto"
                             style={{ fontSize: '0.82rem' }}

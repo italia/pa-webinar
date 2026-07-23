@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Nyhedssiden, redesignet",
+    "notes": [
+      "Hver udgivelse læses nu på to niveauer: de nyheder, der betyder noget for dig, og — under en fane „Teknisk detalje“, som du kun åbner, hvis du vil — det tekniske arbejde bag dem.",
+      "Hver version, der udgives med en software-stykliste (SBOM), linker direkte til sin release på GitHub, hvor SBOM’en er vedhæftet. Kildekode-repositoriet er nu offentligt.",
+      "Tidslinjestriben øverst er væk: den blev rodet, efterhånden som udgivelserne hobede sig op, og sagde ikke meget. Datoerne bliver på hvert kort."
+    ]
+  },
   "0.8.7": {
     "title": "Grænsefladen komplet på alle 24 sprog og en fornyet visuel identitet",
     "notes": [
       "Grænsefladen er nu fuldt oversat til alle 24 EU-sprog: tidligere faldt flere skærme — heriblandt venteværelset og samtykketeksterne — tilbage til italiensk, hvor en oversættelse manglede.",
       "Fornyet logo og visuel identitet (favicon, ikon, vandmærke) og et billedeksempel, når et begivenhedslink deles i chat og på sociale medier.",
-      "Nyheder-side: udgivelsestakten på et øjeblik og links til tjenestegennemsigtigheden og sikkerheden."
+      "En nyhedsside på alle sprog, med links til tjenestens gennemsigtighed og til sikkerhed."
     ]
   },
   "0.8.6": {

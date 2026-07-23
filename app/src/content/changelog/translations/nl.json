@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "De nieuws-pagina, opnieuw ontworpen",
+    "notes": [
+      "Elke release leest nu op twee niveaus: de hoogtepunten die er voor u toe doen en — onder een tabblad ‘Technisch detail’ dat u alleen opent als u dat wilt — het technische werk erachter.",
+      "Elke versie die met een software-stuklijst (SBOM) wordt uitgebracht, verwijst rechtstreeks naar de release op GitHub, waar de SBOM is bijgevoegd. De broncoderepository is nu openbaar.",
+      "De tijdlijnstrook bovenaan is verdwenen: die werd rommelig naarmate er meer releases bijkwamen en zei weinig. De datums blijven op elke kaart staan."
+    ]
+  },
   "0.8.7": {
     "title": "De interface compleet in alle 24 talen, en een vernieuwde visuele identiteit",
     "notes": [
       "De interface is nu volledig vertaald in alle 24 EU-talen: eerder vielen meerdere schermen — waaronder de wachtruimte en de toestemmingsteksten — terug op het Italiaans waar een vertaling ontbrak.",
       "Vernieuwd logo en visuele identiteit (favicon, pictogram, watermerk), en een afbeeldingsvoorbeeld wanneer een evenementlink in chat en op social media wordt gedeeld.",
-      "Nieuws-pagina: het releaseritme in één oogopslag en links naar de dienstentransparantie en de beveiliging."
+      "Een nieuws-pagina in elke taal, met links naar de transparantie van de diensten en naar de beveiliging."
     ]
   },
   "0.8.6": {

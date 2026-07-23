@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Stránka noviniek, prepracovaná",
+    "notes": [
+      "Každé vydanie sa teraz číta na dvoch úrovniach: novinky, na ktorých vám záleží, a — pod záložkou „Technické podrobnosti“, ktorú otvoríte len ak chcete — technická práca za nimi.",
+      "Každá verzia vydaná so zoznamom softvérových komponentov (SBOM) odkazuje priamo na svoje vydanie na GitHube, kde je SBOM priložený. Repozitár so zdrojovým kódom je teraz verejný.",
+      "Pruh s časovou osou navrchu je preč: s pribúdajúcimi vydaniami sa stával neprehľadným a hovoril málo. Dátumy zostávajú na každej karte."
+    ]
+  },
   "0.8.7": {
     "title": "Rozhranie kompletné vo všetkých 24 jazykoch a obnovená vizuálna identita",
     "notes": [
       "Rozhranie je teraz úplne preložené do všetkých 24 jazykov EÚ: predtým sa niekoľko obrazoviek — vrátane čakárne a textov súhlasu — prepínalo do taliančiny tam, kde preklad chýbal.",
       "Obnovené logo a vizuálna identita (favicon, ikona, vodoznak) a náhľad s obrázkom pri zdieľaní odkazu na podujatie v chate a na sociálnych sieťach.",
-      "Stránka noviniek: rytmus vydaní na prvý pohľad a odkazy na transparentnosť služieb a bezpečnosť."
+      "Stránka noviniek v každom jazyku, s odkazmi na transparentnosť služieb a na bezpečnosť."
     ]
   },
   "0.8.6": {

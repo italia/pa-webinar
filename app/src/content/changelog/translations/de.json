@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Die Neuigkeiten-Seite, neu gestaltet",
+    "notes": [
+      "Jede Version liest sich jetzt auf zwei Ebenen: die Highlights, die für Sie zählen, und — unter einem Reiter „Technische Details“, den Sie nur bei Bedarf öffnen — die Technik dahinter.",
+      "Jede Version, die mit einer Software-Stückliste (SBOM) ausgeliefert wird, verweist direkt auf ihre Release auf GitHub, wo die SBOM angehängt ist. Das Quellcode-Repository ist jetzt öffentlich.",
+      "Der Zeitleisten-Streifen oben ist weg: Er wurde mit wachsender Zahl der Versionen unübersichtlich und sagte wenig aus. Die Daten bleiben auf jeder Karte."
+    ]
+  },
   "0.8.7": {
     "title": "Die Oberfläche vollständig in allen 24 Sprachen, und eine erneuerte visuelle Identität",
     "notes": [
       "Die Oberfläche ist jetzt in allen 24 EU-Sprachen vollständig übersetzt: zuvor wichen mehrere Ansichten — darunter der Warteraum und die Einwilligungstexte — auf Italienisch aus, wo eine Übersetzung fehlte.",
       "Erneuertes Logo und visuelle Identität (Favicon, Symbol, Wasserzeichen) sowie eine Bildvorschau, wenn ein Veranstaltungslink im Chat und in sozialen Netzwerken geteilt wird.",
-      "Neuigkeiten-Seite: der Release-Rhythmus auf einen Blick und Links zur Dienst-Transparenz und zur Sicherheit."
+      "Eine Neuigkeiten-Seite in jeder Sprache, mit Links zur Transparenz der Dienste und zur Sicherheit."
     ]
   },
   "0.8.6": {

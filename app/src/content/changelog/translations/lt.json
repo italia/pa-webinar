@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Naujienų puslapis, perkurtas",
+    "notes": [
+      "Kiekviena laida dabar skaitoma dviem lygmenimis: jums svarbūs akcentai ir — skirtuke „Techninė informacija“, kurį atveriate tik panorėję — už jų slypintis techninis darbas.",
+      "Kiekviena versija, išleista su programinės įrangos sudėties sąrašu (SBOM), tiesiogiai nukreipia į savo laidą „GitHub“, kur pridėtas SBOM. Pirminio kodo saugykla dabar yra vieša.",
+      "Viršuje esanti laiko juostos juosta pašalinta: kaupiantis laidoms ji darėsi perkrauta ir mažai ką pasakė. Datos lieka kiekvienoje kortelėje."
+    ]
+  },
   "0.8.7": {
     "title": "Sąsaja pilna visomis 24 kalbomis ir atnaujinta vizualinė tapatybė",
     "notes": [
       "Sąsaja dabar visiškai išversta į visas 24 ES kalbas: anksčiau keli ekranai — tarp jų laukiamasis ir sutikimo tekstai — persijungdavo į italų kalbą ten, kur trūko vertimo.",
       "Atnaujintas logotipas ir vizualinė tapatybė (favicon, piktograma, vandenženklis) bei peržiūra su paveikslėliu, kai renginio nuoroda dalijamasi pokalbiuose ir socialiniuose tinkluose.",
-      "Naujienų puslapis: leidimų ritmas iš pirmo žvilgsnio ir nuorodos į paslaugų skaidrumą ir saugą."
+      "Naujienų puslapis kiekviena kalba su nuorodomis į paslaugų skaidrumą ir saugumą."
     ]
   },
   "0.8.6": {

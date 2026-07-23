@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Pagina de noutăți, reproiectată",
+    "notes": [
+      "Fiecare versiune se citește acum pe două niveluri: noutățile care contează pentru tine și — sub o filă „Detaliu tehnic” pe care o deschizi doar dacă dorești — munca tehnică din spatele lor.",
+      "Fiecare versiune lansată cu o listă a componentelor software (SBOM) trimite direct la lansarea sa pe GitHub, unde SBOM-ul este atașat. Depozitul codului sursă este acum public.",
+      "Banda cronologică din partea de sus a dispărut: devenea aglomerată pe măsură ce versiunile se acumulau și spunea puține. Datele rămân pe fiecare card."
+    ]
+  },
   "0.8.7": {
     "title": "Interfața completă în toate cele 24 de limbi și o identitate vizuală reînnoită",
     "notes": [
       "Interfața este acum tradusă integral în toate cele 24 de limbi ale UE: înainte, mai multe ecrane — inclusiv sala de așteptare și textele de consimțământ — reveneau la italiană acolo unde lipsea traducerea.",
       "Siglă și identitate vizuală reînnoite (favicon, pictogramă, filigran) și o previzualizare cu imagine la partajarea linkului unui eveniment în chat și pe rețelele sociale.",
-      "Pagina de noutăți: ritmul versiunilor dintr-o privire și legăturile către transparența serviciilor și securitate."
+      "O pagină de noutăți în fiecare limbă, cu legături către transparența serviciilor și către securitate."
     ]
   },
   "0.8.6": {

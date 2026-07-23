@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Stran z novostmi, prenovljena",
+    "notes": [
+      "Vsaka izdaja se zdaj bere na dveh ravneh: poudarki, ki so pomembni za vas, in — pod zavihkom „Tehnične podrobnosti“, ki ga odprete samo, če želite — tehnično delo za njimi.",
+      "Vsaka različica, izdana s seznamom sestavin programske opreme (SBOM), neposredno vodi do svoje izdaje na GitHubu, kjer je SBOM priložen. Repozitorij izvorne kode je zdaj javen.",
+      "Trak s časovnico na vrhu je odstranjen: z naraščanjem izdaj je postajal natrpan in povedal malo. Datumi ostajajo na vsaki kartici."
+    ]
+  },
   "0.8.7": {
     "title": "Vmesnik popoln v vseh 24 jezikih in prenovljena vizualna identiteta",
     "notes": [
       "Vmesnik je zdaj v celoti preveden v vseh 24 jezikov EU: prej je več zaslonov — med njimi čakalnica in besedila privolitev — prešlo v italijanščino, kjer je prevod manjkal.",
       "Prenovljen logotip in vizualna identiteta (favicon, ikona, vodni žig) ter predogled s sliko ob deljenju povezave do dogodka v klepetu in družbenih omrežjih.",
-      "Stran z novostmi: ritem izdaj na prvi pogled in povezave do preglednosti storitev in varnosti."
+      "Stran z novostmi v vsakem jeziku, s povezavami do preglednosti storitev in do varnosti."
     ]
   },
   "0.8.6": {
