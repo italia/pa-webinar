@@ -48,7 +48,7 @@ FROM jitsi/web:stable-10741 AS base
 # replacement metacharacters (`.`, `[`, `]`, `&&`), and node does a literal,
 # assertion-checked replacement with nothing to escape. The base image is a
 # static-file nginx image with no scripting runtime of its own.
-FROM node:20-alpine AS patcher
+FROM node:26-alpine AS patcher
 COPY --from=base /usr/share/jitsi-meet/libs/app.bundle.min.js /work/app.bundle.min.js
 RUN node -e "\
 const fs = require('fs'); \
