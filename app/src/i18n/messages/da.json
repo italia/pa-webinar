@@ -3463,7 +3463,6 @@
     "sourceLink": "Se alle releases på GitHub",
     "cadence": "Udgivelsestakt",
     "cadenceSummary": "{count} versioner mellem {from} og {to}.",
-    "releaseNotes": "Udgivelsesnoter og SBOM",
     "rawChangelog": "CHANGELOG.md i repositoriet",
     "transparencyNote": "For hver version: hvad der kører og med hvilke komponenter, i",
     "transparencyInventory": "tjenestegennemsigtigheden",

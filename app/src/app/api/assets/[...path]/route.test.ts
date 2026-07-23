@@ -2,19 +2,14 @@ import type { NextRequest } from 'next/server';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 /**
- * Serving degli asset: pubblico per default, protetto per gli allegati di chat.
+ * Serving degli asset.
  *
- * Il difetto che questi test impediscono: la rotta era dichiaratamente pubblica
- * e gli allegati della chat vivevano sotto lo stesso prefisso di un logo, quindi
- * un documento condiviso in una stanza PA era protetto solo dal fatto che
- * l'UUID non fosse indovinabile. Chiunque avesse visto l'URL una volta — o lo
- * avesse ricevuto inoltrato — poteva riaprirlo per sempre, anche a evento
- * concluso, mentre il messaggio che lo conteneva era già dietro autenticazione.
- *
- * Come per il test della chat, l'autorizzazione NON è mockata: `authorizeChatRead`
- * (e sotto di lei sender/moderator) gira davvero, perché il punto è proprio che
- * il gate degli allegati sia LO STESSO della lettura dei messaggi. Si stubbano
- * solo DB, storage, cookie e la fetch verso il blob.
+ * Gli allegati della chat NON hanno un gate: sono capability-URL (UUID non
+ * indovinabile), lo stesso modello degli altri asset. Un gate vero richiede un
+ * cookie con ambito sulla rotta ed è in roadmap (vedi il docblock della rotta).
+ * Questi test fissano il perimetro che DEVE reggere comunque: gli asset si
+ * servono, il namespace chat ha cache breve (una rimozione si propaga), e la
+ * difesa in profondità contro il traversal non cede.
  */
 vi.mock('@/lib/db', () => ({
   prisma: {
@@ -33,12 +28,7 @@ import { readOwnedEventAccessToken } from '@/lib/event-session';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { getFilesStorage } from '@/lib/storage';
 
-import { signAssetRead } from '@/lib/chat/attachment-token';
-
 import { GET } from './route';
-
-// Il token di sola lettura è firmato HMAC con APP_SECRET.
-process.env.APP_SECRET = 'test-app-secret-for-asset-read-tokens';
 
 const mockedEvent = prisma.event.findFirst as unknown as ReturnType<typeof vi.fn>;
 const mockedGrantRow = prisma.eventModerator
@@ -50,16 +40,12 @@ const mockedJoinGrant = hasJoinGrant as unknown as ReturnType<typeof vi.fn>;
 const mockedOwnedToken = readOwnedEventAccessToken as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
-const OTHER_EVENT_ID = 'ffffffff-1111-4222-8333-444444444444';
 const BLOB_UUID = '11111111-2222-3333-4444-555555555555';
 const PRIMARY_TOKEN = 'PRIMARY_MOD_TOKEN';
-const ACCESS_TOKEN = 'ALICE_ACCESS_TOKEN';
 
 /** Percorsi serviti (la chiave senza il prefisso `assets/`). */
 const CHAT_PATH = ['chat', EVENT_ID, '2026', '07', `${BLOB_UUID}-verbale.pdf`];
 const LOGO_PATH = ['image', '2026', '07', `${BLOB_UUID}-logo.png`];
-
-const CHAT_KEY = `assets/${['chat', EVENT_ID, '2026', '07', `${'11111111-2222-3333-4444-555555555555'}-verbale.pdf`].join('/')}`;
 
 const getDownloadUrl = vi.fn(async (key: string) => `https://blob.example/${key}?sig=x`);
 const upstreamFetch = vi.fn(
@@ -138,140 +124,36 @@ describe('GET /api/assets/[...path] — gli asset pubblici restano pubblici', ()
  * usciva dalla stanza, o in cui un irrigidimento maldestro chiuderebbe fuori
  * chi ha diritto di vederlo.
  */
-describe('GET /api/assets/chat/… — stesso gate della lettura chat', () => {
-  it('nega a un lettore anonimo un allegato di un evento concluso, senza emettere il SAS', async () => {
-    // Il difetto: l'URL dell'allegato era una capability eterna. GET /chat su
-    // un evento ENDED risponde 403; l'allegato rispondeva 200 a chiunque.
-    // Non basta il 403: la firma di lettura sul blob non deve nemmeno nascere.
-    mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
-    const res = await GET(request(CHAT_PATH), ctx(CHAT_PATH));
-    expect(res.status).toBe(403);
-    expect(getDownloadUrl).not.toHaveBeenCalled();
-    expect(upstreamFetch).not.toHaveBeenCalled();
-  });
-
-  it('ammette un ospite finché la finestra ospite è aperta, come per i messaggi', async () => {
-    // Chi in questo momento può LEGGERE il messaggio deve poterne aprire
-    // l'allegato: un gate più stretto della chat romperebbe la sala live.
+describe('GET /api/assets/chat/… — capability-URL, cache breve', () => {
+  it('serve un allegato di chat come qualunque altro asset', async () => {
     const res = await GET(request(CHAT_PATH), ctx(CHAT_PATH));
     expect(res.status).toBe(200);
     expect(getDownloadUrl).toHaveBeenCalledWith(`assets/${CHAT_PATH.join('/')}`, {
       expiresInMinutes: 10,
     });
-  });
-
-  it('nega a un ospite senza join grant l’allegato di un evento con password', async () => {
-    // "Ho l'URL" non basta per entrare in sala, quindi non basta per il file.
-    mockedEvent.mockResolvedValue(eventRow({ joinPasswordHash: 'argon2-hash' }));
-    const res = await GET(request(CHAT_PATH), ctx(CHAT_PATH));
-    expect(res.status).toBe(403);
-    expect(mockedJoinGrant).toHaveBeenCalledWith(EVENT_ID);
-  });
-
-  it('serve un <img> con il token di lettura FIRMATO nell’URL', async () => {
-    // <img src>/<a href> non possono mandare un header, e la credenziale
-    // durevole del lettore NON deve mai finire nell'URL (una magic-link di
-    // moderatore, esposta nella barra e nella condivisione schermo). L'URL
-    // porta invece un token di sola lettura, firmato dal server e legato a
-    // QUESTO percorso: sblocca l'immagine e nient'altro. Vale anche a evento
-    // concluso, senza toccare il DB.
-    mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
-    const t = signAssetRead(CHAT_KEY, EVENT_ID);
-    const res = await GET(request(CHAT_PATH, { query: `?t=${t}` }), ctx(CHAT_PATH));
-    expect(res.status).toBe(200);
-    // Non serve nemmeno interrogare l'evento: la firma basta.
+    // Nessun gate: non si interroga l'evento.
     expect(mockedEvent).not.toHaveBeenCalled();
   });
 
-  it('rifiuta un token di lettura firmato per un ALTRO percorso', async () => {
-    // Legato al percorso: un token valido per un allegato non ne apre un altro.
-    mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
-    const t = signAssetRead(`${CHAT_KEY}.altro`, EVENT_ID);
-    const res = await GET(request(CHAT_PATH, { query: `?t=${t}` }), ctx(CHAT_PATH));
-    // Firma non valida per QUESTO percorso → si ricade sul gate, evento ENDED
-    // e nessun bearer → 403.
-    expect(res.status).toBe(403);
-  });
-
-  it('IGNORA una credenziale durevole messa in ?token= (mai autorizzata via URL)', async () => {
-    // La proprietà strutturale: su questa rotta il token durevole autorizza
-    // solo dall'header. In query viene ignorato, così un vecchio link col
-    // token non è più una capability. Evento ENDED → 403 nonostante il token.
-    mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
-    const res = await GET(
-      request(CHAT_PATH, { query: `?token=${PRIMARY_TOKEN}` }),
-      ctx(CHAT_PATH),
-    );
-    expect(res.status).toBe(403);
-  });
-
-  it('accetta lo stesso token in Authorization: Bearer', async () => {
-    mockedEvent.mockResolvedValue(eventRow({ status: 'ARCHIVED' }));
-    const res = await GET(request(CHAT_PATH, { bearer: PRIMARY_TOKEN }), ctx(CHAT_PATH));
-    expect(res.status).toBe(200);
-  });
-
-  it('ammette il partecipante registrato anche a evento concluso', async () => {
-    mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
-    mockedRegistration.mockResolvedValue({
-      id: '42',
-      displayName: 'Alice',
-      eventId: EVENT_ID,
-    });
-    const res = await GET(
-      request(CHAT_PATH, { bearer: ACCESS_TOKEN }),
-      ctx(CHAT_PATH),
-    );
-    expect(res.status).toBe(200);
-  });
-
-  it('nega il token di un ALTRO evento invece di degradarlo a ospite', async () => {
-    // Bearer di un'altra registrazione: se scivolasse nel ramo ospite la
-    // richiesta passerebbe lo stesso e il gate sembrerebbe funzionare.
-    mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
-    mockedRegistration.mockResolvedValue({
-      id: '43',
-      displayName: 'Bruno',
-      eventId: OTHER_EVENT_ID,
-    });
-    const res = await GET(
-      request(CHAT_PATH, { bearer: 'TOKEN-DI-UN-ALTRO-EVENTO' }),
-      ctx(CHAT_PATH),
-    );
-    expect(res.status).toBe(403);
-  });
-
-  it('risponde 404 quando l’evento nel percorso non esiste', async () => {
-    mockedEvent.mockResolvedValue(null);
+  it('cache BREVE sugli allegati di chat, perché una rimozione si propaghi', async () => {
+    // A differenza di un logo (URL per-blob immutabile, cache di un anno), un
+    // allegato può essere rimosso dalla moderazione: la sua cache deve scadere
+    // in fretta perché chi l'aveva aperto smetta di vederlo.
     const res = await GET(request(CHAT_PATH), ctx(CHAT_PATH));
-    expect(res.status).toBe(404);
-    expect(getDownloadUrl).not.toHaveBeenCalled();
+    expect(res.headers.get('Cache-Control')).toBe('public, max-age=300');
   });
 
-  it('nega per default un percorso malformato dentro il namespace protetto', async () => {
-    // Nessun fallback al ramo pubblico: sarebbe un bypass del gate ottenuto
-    // storpiando il percorso.
-    for (const path of [['chat'], ['chat', 'non-un-uuid', 'x.pdf'], ['chat', EVENT_ID]]) {
+  it('non lascia risalire fuori dal prefisso assets/ (traversal)', async () => {
+    for (const path of [['chat', '..', '..', 'evil.pdf'], ['..', 'recordings', 'x.mp4']]) {
       const res = await GET(request(path), ctx(path));
-      expect(res.status, path.join('/')).toBe(404);
+      expect(res.status, path.join('/')).toBe(400);
     }
     expect(getDownloadUrl).not.toHaveBeenCalled();
   });
 
-  it('non lascia mai un allegato in una cache CONDIVISA', async () => {
-    // `public` davanti a una CDN vanificherebbe il gate: la prima richiesta
-    // autorizzata riempirebbe la cache e le successive verrebbero servite a
-    // chiunque. Privata e breve: il browser può riusarla nella sessione, ma
-    // nessuna cache condivisa, e un allegato rimosso sparisce entro pochi min.
-    const res = await GET(request(CHAT_PATH), ctx(CHAT_PATH));
-    expect(res.status).toBe(200);
-    expect(res.headers.get('Cache-Control')).toBe('private, max-age=300');
-    expect(res.headers.get('Cache-Control')).not.toContain('public');
-  });
-
-  it('mantiene le protezioni di serving già presenti', async () => {
-    // Il gate si aggiunge a nosniff & co., non li sostituisce.
+  it('mantiene le protezioni di serving già presenti (nosniff)', async () => {
     const res = await GET(request(CHAT_PATH), ctx(CHAT_PATH));
     expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff');
   });
 });
+

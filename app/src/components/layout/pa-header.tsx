@@ -111,7 +111,16 @@ function CenterHeader({
             <h2>{appName}</h2>
           </HeaderBrand>
         ) : (
-          <HeaderBrand iconName="it-pa" iconAlt={appName} tag={Link} href="/">
+          <HeaderBrand tag={Link} href="/">
+            {/* Default PA Webinar mark (white knockout) — appName text sits
+                next to it, so the image is decorative (aria-hidden). */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo/pa-webinar-mark-white.svg"
+              alt=""
+              aria-hidden="true"
+              style={{ height: 34, marginRight: 10 }}
+            />
             <h2>{appName}</h2>
           </HeaderBrand>
         )}

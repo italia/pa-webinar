@@ -3463,7 +3463,6 @@
     "sourceLink": "Féach ar na heisiúintí go léir ar GitHub",
     "cadence": "Rithim na n-eisiúintí",
     "cadenceSummary": "{count} leagan idir {from} agus {to}.",
-    "releaseNotes": "Nótaí eisiúna agus SBOM",
     "rawChangelog": "CHANGELOG.md sa stór",
     "transparencyNote": "Do gach leagan: cad atá ar siúl agus le cé na comhpháirteanna, sa",
     "transparencyInventory": "trédhearcacht seirbhísí",

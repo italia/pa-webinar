@@ -3463,7 +3463,6 @@
     "sourceLink": "Oglejte si vse izdaje na GitHubu",
     "cadence": "Ritem izdaj",
     "cadenceSummary": "{count} različic med {from} in {to}.",
-    "releaseNotes": "Opombe ob izdaji in SBOM",
     "rawChangelog": "CHANGELOG.md v repozitoriju",
     "transparencyNote": "Za vsako različico: kaj teče in s katerimi komponentami, v",
     "transparencyInventory": "preglednosti storitev",

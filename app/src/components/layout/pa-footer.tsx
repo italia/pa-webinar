@@ -146,7 +146,16 @@ export default function PAFooter() {
             <div className="row clearfix">
               <div className="col-sm-12">
                 <div className="it-brand-wrapper">
-                  <Link href="/" className="d-inline-block">
+                  <Link href="/" className="d-inline-flex align-items-center">
+                    {/* PA Webinar mark (white knockout) on the dark footer —
+                        decorative next to the org name text. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/logo/pa-webinar-mark-white.svg"
+                      alt=""
+                      aria-hidden="true"
+                      style={{ height: 44, marginRight: 12 }}
+                    />
                     <div className="it-brand-text">
                       <h2 className="mb-0">{orgName}</h2>
                       <h3 className="d-none d-md-block mb-0">{parentOrg}</h3>
