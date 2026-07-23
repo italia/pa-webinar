@@ -4,11 +4,26 @@ const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;
 const AUTH_TAG_LENGTH = 16;
 
+/**
+ * The development placeholder shipped in the (now public) `.env.example` /
+ * `docker-compose.yml`, plus any single-nibble key. Encrypting PII with a value
+ * that is public in the repo gives no confidentiality, so in production we
+ * fail closed — the same stance `APP_SECRET` already takes.
+ */
+function isPlaceholderKey(hex: string): boolean {
+  return /^(?:0123456789abcdef){4}$/i.test(hex) || /^(.)\1{63}$/.test(hex);
+}
+
 function getKey(): Buffer {
   const hex = process.env.PII_ENCRYPTION_KEY;
   if (!hex || hex.length !== 64) {
     throw new Error(
       'PII_ENCRYPTION_KEY must be a 64-char hex string (32 bytes)',
+    );
+  }
+  if (process.env.NODE_ENV === 'production' && isPlaceholderKey(hex)) {
+    throw new Error(
+      'PII_ENCRYPTION_KEY is the public development placeholder; set a real, random 32-byte key in production',
     );
   }
   return Buffer.from(hex, 'hex');
