@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest';
 import {
   encryptPII,
   decryptPII,
@@ -206,5 +206,40 @@ describe('encryptPIIOrNull', () => {
     const ct = encryptPIIOrNull('  test@example.com  ');
     expect(ct).not.toBeNull();
     expect(decryptPII(ct!)).toBe('test@example.com');
+  });
+});
+
+// ── production placeholder-key guard ────────────────────────
+// vi.stubEnv handles NODE_ENV (typed read-only) and restores it via unstub.
+describe('getKey production guard', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('rejects the public dev placeholder key in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('PII_ENCRYPTION_KEY', TEST_KEY); // the committed 0123..ef placeholder
+    expect(() => encryptPII('x')).toThrow(/placeholder/i);
+  });
+
+  it('rejects a single-nibble key (e.g. all zeros) in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('PII_ENCRYPTION_KEY', '0'.repeat(64));
+    expect(() => encryptPII('x')).toThrow(/placeholder/i);
+  });
+
+  it('accepts a real random key in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv(
+      'PII_ENCRYPTION_KEY',
+      '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
+    );
+    expect(() => encryptPII('x')).not.toThrow();
+  });
+
+  it('still allows the dev placeholder outside production', () => {
+    vi.stubEnv('NODE_ENV', 'test');
+    vi.stubEnv('PII_ENCRYPTION_KEY', TEST_KEY);
+    expect(() => encryptPII('x')).not.toThrow();
   });
 });

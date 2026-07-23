@@ -36,7 +36,11 @@ services:
       - SMTP_SECURE=false
       - SMTP_FROM=eventi@dominio.gov.it
       - SMTP_FROM_NAME=PA Webinar
-      - PII_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      # 64-char hex dummy che PASSA la guardia fail-closed di pii.ts (che in
+      # NODE_ENV=production rifiuta il placeholder sequenziale 0123..ef e le
+      # chiavi a nibble singolo). Come APP_SECRET sopra: NON è un segreto, è per
+      # dev / e2e locale. Sovrascrivere in produzione con una chiave casuale.
+      - PII_ENCRYPTION_KEY=c0ffee00c0ffee00c0ffee00c0ffee00c0ffee00c0ffee00c0ffee00c0ffee00
       - DEFAULT_PRIVACY_POLICY_URL=http://localhost:3000/it/privacy
       - CRON_API_KEY=dev_cron_key_change_in_production
       - ADMIN_API_KEY=dev_admin_key_2026

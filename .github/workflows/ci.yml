@@ -10,10 +10,21 @@ on:
   # #62 ha richiesto il dispatch manuale per far partire i check).
   workflow_dispatch:
 
+# Sicurezza repo pubblico:
+# - Le PR (anche da fork non fidato) girano su runner GitHub-hosted
+#   `ubuntu-latest`, NON sul runner self-hosted dentro il cluster di produzione:
+#   il codice di una PR non deve poter eseguire nel cluster (accesso a IMDS,
+#   ServiceAccount K8s, socket Docker). I push/tag/dispatch (fidati) restano sul
+#   self-hosted. Vedi il `runs-on` condizionale in ogni job.
+# - `GITHUB_TOKEN` a privilegio minimo: nessun job qui scrive sul repo o su un
+#   registry (il build Docker è `push: false`).
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint & Typecheck
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,7 +37,7 @@ jobs:
 
   test:
     name: Unit Tests
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     services:
       postgres:
         image: mirror.gcr.io/library/postgres:16-alpine
@@ -64,7 +75,7 @@ jobs:
   # nulla lo segnalasse. Sono test gia' pagati; qui si limitano a girare.
   test-infra-node:
     name: Unit Tests (recorder, controller)
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     strategy:
       fail-fast: false
       matrix:
@@ -85,7 +96,7 @@ jobs:
   # d'attesa) ma non era type-checkato da nessuna parte.
   typecheck-lobby:
     name: Typecheck (lobby)
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -99,7 +110,7 @@ jobs:
   # i test coprono logica pura (allineamento, VTT, silenzio, archivio).
   test-ai-worker:
     name: Unit Tests (worker AI)
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -121,11 +132,11 @@ jobs:
 
   security:
     name: Security Scan
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
       - uses: actions/checkout@v4
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: "fs"
           scan-ref: "."
@@ -134,7 +145,7 @@ jobs:
 
   license-check:
     name: License Compliance
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -155,7 +166,7 @@ jobs:
 
   migration-check:
     name: Migration Integrity
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     services:
       postgres:
         image: mirror.gcr.io/library/postgres:16-alpine
@@ -192,7 +203,7 @@ jobs:
 
   e2e:
     name: E2E Smoke Tests
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     needs: [lint, test]
     # E2E spins up the full docker-compose stack, which pulls Jitsi
     # (jitsi/web/prosody/jicofo/jvb) and mailpit images from Docker
@@ -275,7 +286,7 @@ jobs:
       DOCKER_BUILD_SUMMARY: "false"
       DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Docker Build & Scan
-    runs-on: arc-runner-pa-webinar
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     needs: [lint, test]
     steps:
       - uses: actions/checkout@v4
@@ -290,7 +301,7 @@ jobs:
           no-cache-filters: runner
           load: true
       - name: Run Trivy on Docker image
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: "pa-webinar:${{ github.sha }}"
           severity: "CRITICAL,HIGH"
