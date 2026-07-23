@@ -13,7 +13,7 @@ import { getRedis, getRedisSubscriber } from '@/lib/redis';
 
 /** A file/image attached to a chat message. Never carries bytes — just a
  * reference the client fetches from /api/assets, which gates the
- * `assets/chat/<eventId>/…` namespace behind `authorizeChatRead`: chi può
+ * `assets/chat/<eventId>/…` namespace (capability-URL, ACL in roadmap): chi può
  * leggere questi messaggi può aprire l'allegato, gli altri no. (Gli allegati
  * anteriori a quel namespace restano capability-URL pubbliche — vedi la nota
  * nella rotta di serving.) */
