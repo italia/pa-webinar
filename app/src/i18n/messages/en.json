@@ -3194,7 +3194,10 @@
     "cadence": "Release cadence",
     "cadenceSummary": "{count} versions between {from} and {to}.",
     "releaseNotes": "Release notes and SBOM",
-    "rawChangelog": "CHANGELOG.md in the repository"
+    "rawChangelog": "CHANGELOG.md in the repository",
+    "transparencyNote": "For every version: what runs and with which components, in the",
+    "transparencyInventory": "service transparency",
+    "transparencySecurity": "security and SBOM"
   },
   "pages": {
     "privacyTitle": "Privacy policy",

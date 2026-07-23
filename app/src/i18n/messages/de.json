@@ -3464,7 +3464,10 @@
     "cadence": "Release-Rhythmus",
     "cadenceSummary": "{count} Versionen zwischen {from} und {to}.",
     "releaseNotes": "Release-Notes und SBOM",
-    "rawChangelog": "CHANGELOG.md im Repository"
+    "rawChangelog": "CHANGELOG.md im Repository",
+    "transparencyNote": "Für jede Version: was läuft und mit welchen Komponenten, in der",
+    "transparencyInventory": "Dienst-Transparenz",
+    "transparencySecurity": "Sicherheit und SBOM"
   },
   "postprod": {
     "loading": "Transkript wird geladen…",

@@ -122,21 +122,6 @@ function humanSize(bytes: number): string {
   return `${v.toFixed(v < 10 ? 1 : 0)} ${units[i]}`;
 }
 
-/**
- * URL di un allegato con il token del lettore in query.
- *
- * `/api/assets/chat/…` è protetto dallo stesso gate della lettura chat, ma un
- * <img src> e un <a href> non possono portare un header Authorization: il token
- * deve viaggiare nell'URL. Un ospite non ne ha: chiede senza, e il gate lo
- * ammette solo finché ammette anche la lettura dei messaggi (evento LIVE, senza
- * password). Sugli allegati vecchi — serviti ancora da un percorso pubblico —
- * il parametro è semplicemente ignorato.
- */
-function attachmentUrl(url: string, token: string): string {
-  if (!token || !url.startsWith('/api/assets/')) return url;
-  return `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
-}
-
 /** First name-token used as the @handle for mentions. */
 function mentionHandle(name: string): string {
   return (name.trim().split(/\s+/)[0] ?? '').replace(/[^\p{L}\p{N}._-]/gu, '');
@@ -1042,7 +1027,7 @@ export default function ChatPanel({
                       )
                     )}
                     {m.attachment && (
-                      <Attachment att={m.attachment} openLabel={t('openAttachment')} token={token} />
+                      <Attachment att={m.attachment} openLabel={t('openAttachment')} />
                     )}
                     {m.reactions && Object.keys(m.reactions).length > 0 && (
                       <div className="chat-panel__reactions">
@@ -1357,14 +1342,15 @@ export default function ChatPanel({
 function Attachment({
   att,
   openLabel,
-  token,
 }: {
   att: ChatAttachment;
   openLabel: string;
-  token: string;
 }) {
   const isImage = att.mime.startsWith('image/');
-  const href = attachmentUrl(att.url, token);
+  // L'URL arriva GIÀ firmato dal server (token di sola lettura, legato al
+  // percorso): il client non aggiunge la propria credenziale. Vedi
+  // lib/chat/attachment-token → signAssetRead.
+  const href = att.url;
   if (isImage) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" title={att.name} aria-label={openLabel}>

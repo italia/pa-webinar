@@ -3464,7 +3464,10 @@
     "cadence": "Ritmul versiunilor",
     "cadenceSummary": "{count} versiuni între {from} și {to}.",
     "releaseNotes": "Note de lansare și SBOM",
-    "rawChangelog": "CHANGELOG.md în depozit"
+    "rawChangelog": "CHANGELOG.md în depozit",
+    "transparencyNote": "Pentru fiecare versiune: ce rulează și cu ce componente, în",
+    "transparencyInventory": "transparența serviciilor",
+    "transparencySecurity": "securitate și SBOM"
   },
   "postprod": {
     "loading": "Se încarcă transcrierea…",

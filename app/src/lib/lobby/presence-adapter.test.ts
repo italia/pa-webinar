@@ -98,16 +98,23 @@ afterEach(() => {
 });
 
 describe('GardenPresenceClient.emote — trasmissione', () => {
-  it('allega l’emote al ping e lo spedisce subito', async () => {
-    // Il difetto: `emote()` non spediva niente. Se questa asserzione cade, il
-    // tasto torna a essere una promessa non mantenuta.
+  it('allega l’emote al PROSSIMO ping, senza una POST fuori banda', async () => {
+    // Il difetto era doppio: prima `emote()` non spediva nulla; poi sparava una
+    // POST immediata per ogni pressione, spendendo il budget della rotta ping
+    // sullo stesso conto dei ping di posizione. Ora non fa alcuna POST propria:
+    // imposta lo stato e lo raccoglie il tick da 200ms. Se questa cade, o il
+    // saluto non parte più, o è tornato il POST fuori banda.
     const client = await connectedClient();
+    const at = Date.now();
     client.emote('wave');
     await flush();
+    // Nessuna POST immediata.
+    expect(fetchMock).not.toHaveBeenCalled();
 
-    expect(fetchMock).toHaveBeenCalledTimes(1); // subito, non al tick da 200ms
+    await vi.advanceTimersByTimeAsync(200); // un tick
+    expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0]![0]).toBe(`/api/events/${SLUG}/garden/ping`);
-    expect(lastBody().emote).toEqual({ type: 'wave', at: Date.now() });
+    expect(lastBody().emote).toEqual({ type: 'wave', at });
     client.disconnect();
   });
 
@@ -146,7 +153,10 @@ describe('GardenPresenceClient.emote — trasmissione', () => {
     const client = await connectedClient();
     for (let i = 0; i < 30; i++) client.emote('wave');
     await flush();
+    // Trenta pressioni, zero POST fuori banda.
+    expect(fetchMock).not.toHaveBeenCalled();
 
+    await vi.advanceTimersByTimeAsync(200); // un solo tick le porta tutte
     expect(fetchMock).toHaveBeenCalledTimes(1);
     client.disconnect();
   });
@@ -156,14 +166,13 @@ describe('GardenPresenceClient.emote — trasmissione', () => {
     // secondo saluto (anche di tipo diverso) deve partire.
     const client = await connectedClient();
     client.emote('wave');
-    await flush();
+    await vi.advanceTimersByTimeAsync(700); // oltre la finestra minima
     fetchMock.mockClear();
 
-    await vi.advanceTimersByTimeAsync(700);
+    const at = Date.now();
     client.emote('heart');
-    await flush();
-
-    expect(lastBody().emote).toEqual({ type: 'heart', at: Date.now() });
+    await vi.advanceTimersByTimeAsync(200); // il tick successivo lo porta
+    expect(lastBody().emote).toEqual({ type: 'heart', at });
     client.disconnect();
   });
 

@@ -3464,7 +3464,10 @@
     "cadence": "Rytmus vydání",
     "cadenceSummary": "{count} verzí mezi {from} a {to}.",
     "releaseNotes": "Poznámky k vydání a SBOM",
-    "rawChangelog": "CHANGELOG.md v repozitáři"
+    "rawChangelog": "CHANGELOG.md v repozitáři",
+    "transparencyNote": "Pro každou verzi: co běží a s jakými komponentami, v",
+    "transparencyInventory": "transparentnosti služeb",
+    "transparencySecurity": "zabezpečení a SBOM"
   },
   "postprod": {
     "loading": "Načítání přepisu…",

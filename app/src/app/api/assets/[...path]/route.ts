@@ -31,12 +31,18 @@
  *    dello stream SSE: chi può leggere i messaggi vede gli allegati, gli altri
  *    no. Nessuna regola parallela da tenere allineata a mano.
  *
- * Il token del lettore arriva in `?token=` oltre che in Authorization: un
- * <img src> e un <a href> non possono portare un header. È lo stesso
- * compromesso già in uso sui magic link (extractModeratorToken). Un ospite non
- * ha token e passa dal ramo anonimo del gate — cioè vede l'allegato solo
- * finestra-ospite aperta (LIVE, evento senza password), esattamente come vede
- * il messaggio.
+ * DUE modi di autorizzare, e la differenza è la chiave della sicurezza:
+ *   - `?t=<token firmato>` — una capability di SOLA LETTURA legata a QUESTO
+ *     percorso e a QUESTO evento, che il SERVER mette nell'URL alla
+ *     serializzazione (assetUrlFromKey → signAssetRead). È ciò che finisce in
+ *     un <img src>, e se trapela da uno screenshot apre quell'immagine e nulla
+ *     più. Prima ci mettevamo il token DUREVOLE del lettore — per un moderatore
+ *     la sua magic-link con pieni poteri: esposta nella barra e nella
+ *     registrazione. Mai più;
+ *   - il bearer durevole in header Authorization — per il download/fetch
+ *     autenticato, dove un header si può mandare. Stesso gate della lettura dei
+ *     messaggi (authorizeChatRead). Un ospite senza token passa dal ramo
+ *     anonimo, cioè vede l'allegato solo a finestra-ospite aperta.
  *
  * SCELTA CONSAPEVOLE — allegati caricati PRIMA di questo cambio: le loro chiavi
  * stanno sotto `assets/image|document/…`, indistinguibili da un logo, e restano
@@ -58,7 +64,7 @@
 
 import type { NextRequest } from 'next/server';
 
-import { extractModeratorToken } from '@/lib/auth/moderator';
+import { verifyAssetRead } from '@/lib/chat/attachment-token';
 import { authorizeChatRead } from '@/lib/chat/read-access';
 import { AppError } from '@/lib/errors';
 import { getFilesStorage } from '@/lib/storage';
@@ -112,8 +118,29 @@ export async function GET(
     // Namespace protetto ma percorso che non nomina un evento valido: non
     // esiste un blob così, e comunque non sapremmo su cosa autorizzare.
     if (!eventId) return new Response('Not found', { status: 404 });
+
+    // Prima strada, quella dei tag immagine: un token di SOLA LETTURA firmato,
+    // legato a QUESTO percorso e a QUESTO evento (l'URL lo produce il server in
+    // assetUrlFromKey). Un <img> non può mandare un header, e ci mettevamo il
+    // token durevole del lettore — per un moderatore, la sua magic-link con
+    // pieni poteri, esposta nella barra e nella condivisione schermo.
+    const readToken = new URL(request.url).searchParams.get('t');
+    if (readToken && verifyAssetRead(readToken, key, eventId)) {
+      // autorizzato: prosegue al serving sotto
+    } else {
+    // Seconda strada: il bearer durevole, ma SOLO dall'header Authorization —
+    // mai dalla query. È questa la proprietà che rende la sicurezza
+    // strutturale: su questa rotta una credenziale durevole non autorizza mai
+    // attraverso l'URL, quindi non può finire in un log, in una cronologia o in
+    // una condivisione schermo. L'unico permesso via URL è il `?t=` firmato ed
+    // effimero. Assente l'header, si passa `null`: il ramo ospite di
+    // authorizeChatRead decide (finestra LIVE, evento senza password).
+    const authHeader = request.headers.get('authorization');
+    const bearer = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7).trim()
+      : null;
     try {
-      await authorizeChatRead(eventId, extractModeratorToken(request));
+      await authorizeChatRead(eventId, bearer);
     } catch (err) {
       // authorizeChatRead distingue 404 (evento inesistente) da 403 (non puoi
       // leggere questa chat). Qualunque ALTRO errore resta un rifiuto — un gate
@@ -125,6 +152,7 @@ export async function GET(
       }
       const status = err instanceof AppError && err.statusCode === 404 ? 404 : 403;
       return new Response(status === 404 ? 'Not found' : 'Forbidden', { status });
+    }
     }
   }
 
@@ -171,7 +199,10 @@ export async function GET(
   // a ogni richiesta, perché il diritto a leggere scade con l'evento.
   headers.set(
     'Cache-Control',
-    gated ? 'private, no-store' : 'public, max-age=31536000, immutable',
+    // Privata (mai una cache condivisa: il token nell'URL e' una capability),
+    // breve: se un allegato viene rimosso dalla moderazione, sparisce entro
+    // pochi minuti anche dalle cache dei browser.
+    gated ? 'private, max-age=300' : 'public, max-age=31536000, immutable',
   );
 
   return new Response(upstream.body, { status: 200, headers });

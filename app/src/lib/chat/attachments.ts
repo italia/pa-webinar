@@ -19,6 +19,8 @@
  * /api/assets/[...path].
  */
 
+import { signAssetRead } from '@/lib/chat/attachment-token';
+import { chatAssetEventId } from '@/lib/utils/asset-key';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import type { ChatAttachmentRef } from '@/lib/chat/pubsub';
 
@@ -46,7 +48,13 @@ const ASSET_PATH_PREFIX = '/api/assets/';
  * no client-URL validation to do: the server owns the key end to end.
  */
 export function assetUrlFromKey(key: string): string {
-  return `${ASSET_PATH_PREFIX}${key.replace(/^assets\//, '')}`;
+  const sub = key.replace(/^assets\//, '');
+  const base = `${ASSET_PATH_PREFIX}${sub}`;
+  // Namespace protetto → l'URL porta un token di SOLA LETTURA legato a questo
+  // percorso (vedi signAssetRead), NON la credenziale durevole del lettore. Gli
+  // allegati vecchi, sotto il vecchio percorso pubblico, restano bare.
+  const eventId = chatAssetEventId(sub);
+  return eventId ? `${base}?t=${signAssetRead(key, eventId)}` : base;
 }
 
 /**

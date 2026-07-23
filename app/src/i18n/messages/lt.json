@@ -3464,7 +3464,10 @@
     "cadence": "Leidimų ritmas",
     "cadenceSummary": "{count} versijos nuo {from} iki {to}.",
     "releaseNotes": "Leidimo pastabos ir SBOM",
-    "rawChangelog": "CHANGELOG.md saugykloje"
+    "rawChangelog": "CHANGELOG.md saugykloje",
+    "transparencyNote": "Kiekvienai versijai: kas veikia ir su kokiais komponentais,",
+    "transparencyInventory": "paslaugų skaidrume",
+    "transparencySecurity": "sauga ir SBOM"
   },
   "postprod": {
     "loading": "Įkeliama transkripcija…",

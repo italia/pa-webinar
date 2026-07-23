@@ -3464,7 +3464,10 @@
     "cadence": "Ρυθμός εκδόσεων",
     "cadenceSummary": "{count} εκδόσεις μεταξύ {from} και {to}.",
     "releaseNotes": "Σημειώσεις έκδοσης και SBOM",
-    "rawChangelog": "CHANGELOG.md στο αποθετήριο"
+    "rawChangelog": "CHANGELOG.md στο αποθετήριο",
+    "transparencyNote": "Για κάθε έκδοση: τι εκτελείται και με ποια στοιχεία, στη",
+    "transparencyInventory": "διαφάνεια των υπηρεσιών",
+    "transparencySecurity": "ασφάλεια και SBOM"
   },
   "postprod": {
     "loading": "Φόρτωση μεταγραφής…",

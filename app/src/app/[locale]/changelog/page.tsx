@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, getLocale } from 'next-intl/server';
 
+import { Link } from '@/i18n/navigation';
 import ReleaseCadence from '@/components/changelog/release-cadence';
 import { getChangelog } from '@/content/changelog';
 import { getSettings } from '@/lib/settings';
@@ -76,6 +77,7 @@ export default async function ChangelogPage() {
                   releases={releases.map((r) => ({ version: r.version, date: r.date }))}
                   currentVersion={CURRENT_VERSION}
                   formatDate={(d) => dateFmt.format(d)}
+                  locale={locale}
                   label={cadenceSummary}
                 />
               </section>
@@ -132,21 +134,6 @@ export default async function ChangelogPage() {
                           </li>
                         ))}
                       </ul>
-                      {/* Non è un vezzo: alla release di GitHub è allegato
-                          l'SBOM di QUELLA versione (CycloneDX + SPDX). È la
-                          catena che permette a un'amministrazione di sapere
-                          cosa c'è dentro il software che sta riusando. */}
-                      {repoUrl && (
-                        <a
-                          className="d-inline-block mt-3"
-                          style={{ fontSize: '0.85rem' }}
-                          href={`${repoUrl}/releases/tag/v${rel.version}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {t('releaseNotes')} ↗
-                        </a>
-                      )}
                     </div>
                   </article>
                 </li>
@@ -154,14 +141,27 @@ export default async function ChangelogPage() {
             })}
           </ol>
 
+          {/* Trasparenza per-versione, verso le pagine PUBBLICHE che la
+              piattaforma gia' serve. NON verso GitHub: il repository e'
+              privato (le release danno 404 al pubblico) e le versioni piu'
+              recenti non hanno nemmeno una GitHub Release. La distinta dei
+              componenti la da' /service-inventory (CycloneDX 1.6), l'SBOM e la
+              Scorecard le da' /security. */}
+          <p className="text-muted mt-4 mb-0" style={{ fontSize: '0.88rem' }}>
+            {t('transparencyNote')}{' '}
+            <Link href="/service-inventory">{t('transparencyInventory')}</Link>
+            {' · '}
+            <Link href="/security">{t('transparencySecurity')}</Link>
+            .
+          </p>
+
+          {/* I link diretti a GitHub compaiono SOLO se un amministratore ha
+              impostato un repository pubblico (githubUrl vuoto in prod oggi).
+              Cosi' non pubblichiamo mai un link a un 404. */}
           {repoUrl && (
-            <p className="text-muted mt-4 mb-0" style={{ fontSize: '0.88rem' }}>
+            <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.88rem' }}>
               {t('sourceNote')}{' '}
-              <a
-                href={`${repoUrl}/releases`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={`${repoUrl}/releases`} target="_blank" rel="noopener noreferrer">
                 {t('sourceLink')}
               </a>
               {' · '}

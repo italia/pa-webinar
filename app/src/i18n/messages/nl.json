@@ -3464,7 +3464,10 @@
     "cadence": "Releaseritme",
     "cadenceSummary": "{count} versies tussen {from} en {to}.",
     "releaseNotes": "Releaseopmerkingen en SBOM",
-    "rawChangelog": "CHANGELOG.md in de repository"
+    "rawChangelog": "CHANGELOG.md in de repository",
+    "transparencyNote": "Voor elke versie: wat er draait en met welke componenten, in de",
+    "transparencyInventory": "dienstentransparantie",
+    "transparencySecurity": "beveiliging en SBOM"
   },
   "postprod": {
     "loading": "Transcriptie laden…",

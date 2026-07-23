@@ -134,15 +134,20 @@ export class GardenPresenceClient implements PresenceClient {
    * passano di lì), e `emote` è opzionale nello schema della rotta, quindi i
    * client vecchi continuano a funzionare senza sapere che esiste.
    *
-   * Il ping parte subito invece di aspettare il tick: fino a 200ms fra il tasto
-   * premuto e il saluto visto dagli altri si notano, in un gesto sociale.
+   * NIENTE POST fuori banda: l'emote viaggia sul PROSSIMO ping (5Hz), cioè
+   * entro ≤200ms. Un POST immediato per ogni pressione spendeva il budget della
+   * rotta ping (600/min per IP) sullo STESSO conto dei ping di posizione: due
+   * utenti dietro lo stesso NAT erano già al limite, e un tasto tenuto premuto
+   * li faceva sparire dal giardino di tutti. Duecento millisecondi su un saluto
+   * non si notano; l'avatar sparito sì. Il gioco anima comunque il gesto locale
+   * all'istante.
    */
   emote(type: EmoteType): void {
     if (!this.connected) return;
     const now = Date.now();
     if (this.pendingEmote && now - this.pendingEmote.at < EMOTE_MIN_INTERVAL_MS) return;
     this.pendingEmote = { type, at: now };
-    void this.ping(false);
+    // Nessun `this.ping()` qui: lo raccoglie il tick successivo (vedi sopra).
   }
 
   getPeers(): PeerState[] {

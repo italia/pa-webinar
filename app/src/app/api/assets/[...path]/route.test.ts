@@ -33,7 +33,12 @@ import { readOwnedEventAccessToken } from '@/lib/event-session';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { getFilesStorage } from '@/lib/storage';
 
+import { signAssetRead } from '@/lib/chat/attachment-token';
+
 import { GET } from './route';
+
+// Il token di sola lettura è firmato HMAC con APP_SECRET.
+process.env.APP_SECRET = 'test-app-secret-for-asset-read-tokens';
 
 const mockedEvent = prisma.event.findFirst as unknown as ReturnType<typeof vi.fn>;
 const mockedGrantRow = prisma.eventModerator
@@ -53,6 +58,8 @@ const ACCESS_TOKEN = 'ALICE_ACCESS_TOKEN';
 /** Percorsi serviti (la chiave senza il prefisso `assets/`). */
 const CHAT_PATH = ['chat', EVENT_ID, '2026', '07', `${BLOB_UUID}-verbale.pdf`];
 const LOGO_PATH = ['image', '2026', '07', `${BLOB_UUID}-logo.png`];
+
+const CHAT_KEY = `assets/${['chat', EVENT_ID, '2026', '07', `${'11111111-2222-3333-4444-555555555555'}-verbale.pdf`].join('/')}`;
 
 const getDownloadUrl = vi.fn(async (key: string) => `https://blob.example/${key}?sig=x`);
 const upstreamFetch = vi.fn(
@@ -161,16 +168,41 @@ describe('GET /api/assets/chat/… — stesso gate della lettura chat', () => {
     expect(mockedJoinGrant).toHaveBeenCalledWith(EVENT_ID);
   });
 
-  it('lascia al moderatore l’archivio post-evento, con il token in query', async () => {
-    // Regressione speculare: <img src> e <a href> non possono mandare header,
-    // quindi il token in query è l'unico modo in cui un lettore autenticato si
-    // presenta. Se non lo leggessimo, l'archivio del moderatore sparirebbe.
-    mockedEvent.mockResolvedValue(eventRow({ status: 'ARCHIVED' }));
+  it('serve un <img> con il token di lettura FIRMATO nell’URL', async () => {
+    // <img src>/<a href> non possono mandare un header, e la credenziale
+    // durevole del lettore NON deve mai finire nell'URL (una magic-link di
+    // moderatore, esposta nella barra e nella condivisione schermo). L'URL
+    // porta invece un token di sola lettura, firmato dal server e legato a
+    // QUESTO percorso: sblocca l'immagine e nient'altro. Vale anche a evento
+    // concluso, senza toccare il DB.
+    mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
+    const t = signAssetRead(CHAT_KEY, EVENT_ID);
+    const res = await GET(request(CHAT_PATH, { query: `?t=${t}` }), ctx(CHAT_PATH));
+    expect(res.status).toBe(200);
+    // Non serve nemmeno interrogare l'evento: la firma basta.
+    expect(mockedEvent).not.toHaveBeenCalled();
+  });
+
+  it('rifiuta un token di lettura firmato per un ALTRO percorso', async () => {
+    // Legato al percorso: un token valido per un allegato non ne apre un altro.
+    mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
+    const t = signAssetRead(`${CHAT_KEY}.altro`, EVENT_ID);
+    const res = await GET(request(CHAT_PATH, { query: `?t=${t}` }), ctx(CHAT_PATH));
+    // Firma non valida per QUESTO percorso → si ricade sul gate, evento ENDED
+    // e nessun bearer → 403.
+    expect(res.status).toBe(403);
+  });
+
+  it('IGNORA una credenziale durevole messa in ?token= (mai autorizzata via URL)', async () => {
+    // La proprietà strutturale: su questa rotta il token durevole autorizza
+    // solo dall'header. In query viene ignorato, così un vecchio link col
+    // token non è più una capability. Evento ENDED → 403 nonostante il token.
+    mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
     const res = await GET(
       request(CHAT_PATH, { query: `?token=${PRIMARY_TOKEN}` }),
       ctx(CHAT_PATH),
     );
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(403);
   });
 
   it('accetta lo stesso token in Authorization: Bearer', async () => {
@@ -187,15 +219,15 @@ describe('GET /api/assets/chat/… — stesso gate della lettura chat', () => {
       eventId: EVENT_ID,
     });
     const res = await GET(
-      request(CHAT_PATH, { query: `?token=${ACCESS_TOKEN}` }),
+      request(CHAT_PATH, { bearer: ACCESS_TOKEN }),
       ctx(CHAT_PATH),
     );
     expect(res.status).toBe(200);
   });
 
   it('nega il token di un ALTRO evento invece di degradarlo a ospite', async () => {
-    // Evento LIVE apposta: se il token sconosciuto scivolasse nel ramo ospite
-    // la richiesta passerebbe lo stesso e il gate sembrerebbe funzionare.
+    // Bearer di un'altra registrazione: se scivolasse nel ramo ospite la
+    // richiesta passerebbe lo stesso e il gate sembrerebbe funzionare.
     mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
     mockedRegistration.mockResolvedValue({
       id: '43',
@@ -203,7 +235,7 @@ describe('GET /api/assets/chat/… — stesso gate della lettura chat', () => {
       eventId: OTHER_EVENT_ID,
     });
     const res = await GET(
-      request(CHAT_PATH, { query: '?token=TOKEN-DI-UN-ALTRO-EVENTO' }),
+      request(CHAT_PATH, { bearer: 'TOKEN-DI-UN-ALTRO-EVENTO' }),
       ctx(CHAT_PATH),
     );
     expect(res.status).toBe(403);
@@ -226,14 +258,14 @@ describe('GET /api/assets/chat/… — stesso gate della lettura chat', () => {
     expect(getDownloadUrl).not.toHaveBeenCalled();
   });
 
-  it('non lascia mai un allegato in una cache condivisa', async () => {
-    // `public, immutable` davanti a una CDN vanificherebbe il gate: la prima
-    // richiesta autorizzata riempirebbe la cache e le successive verrebbero
-    // servite a chiunque, gate incluso saltato. E il diritto a leggere scade
-    // con l'evento, quindi va rivalutato a ogni richiesta.
+  it('non lascia mai un allegato in una cache CONDIVISA', async () => {
+    // `public` davanti a una CDN vanificherebbe il gate: la prima richiesta
+    // autorizzata riempirebbe la cache e le successive verrebbero servite a
+    // chiunque. Privata e breve: il browser può riusarla nella sessione, ma
+    // nessuna cache condivisa, e un allegato rimosso sparisce entro pochi min.
     const res = await GET(request(CHAT_PATH), ctx(CHAT_PATH));
     expect(res.status).toBe(200);
-    expect(res.headers.get('Cache-Control')).toBe('private, no-store');
+    expect(res.headers.get('Cache-Control')).toBe('private, max-age=300');
     expect(res.headers.get('Cache-Control')).not.toContain('public');
   });
 

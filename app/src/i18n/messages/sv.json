@@ -3464,7 +3464,10 @@
     "cadence": "Släpptakt",
     "cadenceSummary": "{count} versioner mellan {from} och {to}.",
     "releaseNotes": "Versionsinformation och SBOM",
-    "rawChangelog": "CHANGELOG.md i förvaret"
+    "rawChangelog": "CHANGELOG.md i förvaret",
+    "transparencyNote": "För varje version: vad som körs och med vilka komponenter, i",
+    "transparencyInventory": "tjänstetransparensen",
+    "transparencySecurity": "säkerhet och SBOM"
   },
   "postprod": {
     "loading": "Läser in transkriptionen…",
