@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Jaunumu lapa, pārveidota",
+    "notes": [
+      "Katrs laidiens tagad lasāms divos līmeņos: jums svarīgākais un — cilnē „Tehniska detaļa“, kuru atverat tikai tad, ja vēlaties — tehniskais darbs aiz tā.",
+      "Katra versija, kas tiek izdota ar programmatūras sastāvdaļu sarakstu (SBOM), tieši norāda uz savu laidienu vietnē GitHub, kur SBOM ir pievienots. Pirmkoda krātuve tagad ir publiska.",
+      "Augšējā laika joslas svītra ir noņemta: uzkrājoties laidieniem, tā kļuva pārblīvēta un maz ko pateica. Datumi paliek uz katras kartītes."
+    ]
+  },
   "0.8.7": {
     "title": "Saskarne pilnīga visās 24 valodās un atjaunota vizuālā identitāte",
     "notes": [
       "Saskarne tagad ir pilnībā iztulkota visās 24 ES valodās: iepriekš vairāki ekrāni — tostarp uzgaidāmā telpa un piekrišanas teksti — pārslēdzās uz itāļu valodu tur, kur trūka tulkojuma.",
       "Atjaunots logotips un vizuālā identitāte (favicon, ikona, ūdenszīme) un priekšskatījums ar attēlu, kad pasākuma saite tiek kopīgota tērzēšanā un sociālajos tīklos.",
-      "Jaunumu lapa: laidienu ritms vienā acu uzmetienā un saites uz pakalpojumu pārredzamību un drošību."
+      "Jaunumu lapa katrā valodā ar saitēm uz pakalpojumu pārredzamību un drošību."
     ]
   },
   "0.8.6": {

@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Stranica s novostima, redizajnirana",
+    "notes": [
+      "Svako se izdanje sada čita na dvije razine: istaknuto što vam je važno i — pod karticom „Tehnički detalj“ koju otvarate samo ako želite — tehnički rad iza toga.",
+      "Svaka verzija koja izlazi s popisom softverskih komponenti (SBOM) izravno vodi na svoje izdanje na GitHubu, gdje je SBOM priložen. Repozitorij izvornog koda sada je javan.",
+      "Traka s vremenskom crtom na vrhu je uklonjena: postajala je pretrpana kako su se izdanja gomilala i govorila je malo. Datumi ostaju na svakoj kartici."
+    ]
+  },
   "0.8.7": {
     "title": "Sučelje potpuno na svih 24 jezika i osvježen vizualni identitet",
     "notes": [
       "Sučelje je sada u potpunosti prevedeno na svih 24 jezika EU-a: prije se nekoliko zaslona — među njima čekaonica i tekstovi privole — vraćalo na talijanski ondje gdje je prijevod nedostajao.",
       "Osvježen logotip i vizualni identitet (favicon, ikona, vodeni žig) te pretpregled sa slikom pri dijeljenju poveznice na događaj u razgovoru i na društvenim mrežama.",
-      "Stranica s novostima: ritam izdanja na prvi pogled i poveznice na transparentnost usluga i sigurnost."
+      "Stranica s novostima na svakom jeziku, s poveznicama na transparentnost usluga i na sigurnost."
     ]
   },
   "0.8.6": {

@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Il-paġna tal-aħbarijiet, iddisinjata mill-ġdid",
+    "notes": [
+      "Kull ħruġ issa jinqara fuq żewġ livelli: il-punti ewlenin li jimpurtawlek u — taħt it-tab „Dettall tekniku“ li tiftaħ biss jekk trid — ix-xogħol tekniku ta’ warajhom.",
+      "Kull verżjoni li toħroġ b’lista tal-komponenti tas-software (SBOM) tgħaqqad direttament mal-ħruġ tagħha fuq GitHub, fejn l-SBOM huwa mehmuż. Ir-repożitorju tal-kodiċi sors issa huwa pubbliku.",
+      "Il-faxxa tal-linja taż-żmien fin-naħa ta’ fuq telqet: saret imħawda hekk kif il-ħruġ akkumula u kienet tgħid ftit. Id-dati jibqgħu fuq kull karta."
+    ]
+  },
   "0.8.7": {
     "title": "L-interfaċċja kompluta fl-24 lingwa kollha, u identità viżiva mġedda",
     "notes": [
       "L-interfaċċja issa hija tradotta kompletament fl-24 lingwa kollha tal-UE: qabel, diversi skrins — fosthom il-kamra tal-istennija u t-testi tal-kunsens — kienu jaqilbu għat-Taljan fejn kienet nieqsa t-traduzzjoni.",
       "Logo u identità viżiva mġedda (favicon, ikona, watermark), u previżjoni b'immaġni meta jiġi kondiviż il-link ta' avveniment fiċ-chat u fuq il-midja soċjali.",
-      "Paġna tal-aħbarijiet: ir-ritmu tar-rilaxxi f'daqqa t'għajn u links għat-trasparenza tas-servizzi u għas-sigurtà."
+      "Paġna tal-aħbarijiet f'kull lingwa, b'links għat-trasparenza tas-servizzi u għas-sigurtà."
     ]
   },
   "0.8.6": {

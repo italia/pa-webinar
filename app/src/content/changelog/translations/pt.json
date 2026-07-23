@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "A página de novidades, redesenhada",
+    "notes": [
+      "Cada versão lê-se agora em dois níveis: as novidades que lhe interessam e — sob um separador «Detalhe técnico» que abre apenas se quiser — o trabalho técnico que está por trás.",
+      "Cada versão publicada com uma lista de materiais de software (SBOM) liga diretamente à sua release no GitHub, onde o SBOM está anexado. O repositório do código-fonte é agora público.",
+      "A faixa cronológica no topo desapareceu: ficava sobrecarregada à medida que as versões se acumulavam e dizia pouco. As datas permanecem em cada cartão."
+    ]
+  },
   "0.8.7": {
     "title": "A interface completa nos 24 idiomas, e uma identidade visual renovada",
     "notes": [
       "A interface está agora totalmente traduzida nos 24 idiomas da UE: antes, vários ecrãs — incluindo a sala de espera e os textos de consentimento — recorriam ao italiano onde faltava a tradução.",
       "Logótipo e identidade visual renovados (favicon, ícone, marca de água), e uma pré-visualização com imagem ao partilhar a ligação de um evento no chat e nas redes sociais.",
-      "Página de novidades: o ritmo dos lançamentos num relance e as ligações para a transparência dos serviços e para a segurança."
+      "Uma página de novidades em todos os idiomas, com ligações para a transparência dos serviços e para a segurança."
     ]
   },
   "0.8.6": {

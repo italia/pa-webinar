@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Uutissivu, uudistettu",
+    "notes": [
+      "Jokainen julkaisu luetaan nyt kahdella tasolla: sinulle merkitykselliset kohokohdat ja — välilehden ”Tekniset tiedot” alla, jonka avaat vain halutessasi — niiden takana oleva tekninen työ.",
+      "Jokainen versio, joka julkaistaan ohjelmiston osaluettelon (SBOM) kanssa, linkittää suoraan julkaisuunsa GitHubissa, jossa SBOM on liitteenä. Lähdekoodin tietovarasto on nyt julkinen.",
+      "Yläreunan aikajanapalkki on poistettu: siitä tuli sekava julkaisujen kertyessä eikä se kertonut paljoa. Päivämäärät säilyvät jokaisessa kortissa."
+    ]
+  },
   "0.8.7": {
     "title": "Käyttöliittymä täydellisenä kaikilla 24 kielellä ja uudistettu visuaalinen ilme",
     "notes": [
       "Käyttöliittymä on nyt kokonaan käännetty kaikille 24 EU-kielelle: aiemmin useat näkymät — muun muassa odotustila ja suostumustekstit — palasivat italiaan siellä, missä käännös puuttui.",
       "Uudistettu logo ja visuaalinen ilme (favicon, kuvake, vesileima) sekä kuvallinen esikatselu, kun tapahtuman linkki jaetaan keskustelussa ja sosiaalisessa mediassa.",
-      "Uutiset-sivu: julkaisutahti yhdellä silmäyksellä sekä linkit palvelujen läpinäkyvyyteen ja tietoturvaan."
+      "Uutissivu jokaisella kielellä, linkkeineen palvelujen läpinäkyvyyteen ja turvallisuuteen."
     ]
   },
   "0.8.6": {

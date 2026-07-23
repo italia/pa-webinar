@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Nyhetssidan, omdesignad",
+    "notes": [
+      "Varje version läses nu på två nivåer: de nyheter som betyder något för dig och — under en flik ”Tekniska detaljer” som du öppnar bara om du vill — det tekniska arbetet bakom dem.",
+      "Varje version som släpps med en programvaruförteckning (SBOM) länkar direkt till sin release på GitHub, där SBOM:en är bifogad. Källkodsförrådet är nu offentligt.",
+      "Tidslinjeremsan högst upp är borta: den blev rörig när versionerna hopade sig och sa lite. Datumen finns kvar på varje kort."
+    ]
+  },
   "0.8.7": {
     "title": "Gränssnittet komplett på alla 24 språk och en uppfräschad visuell identitet",
     "notes": [
       "Gränssnittet är nu fullständigt översatt till alla 24 EU-språk: tidigare föll flera vyer — bland dem väntrummet och samtyckestexterna — tillbaka på italienska där en översättning saknades.",
       "Uppfräschad logotyp och visuell identitet (favicon, ikon, vattenstämpel) och en bildförhandsvisning när en evenemangslänk delas i chatt och sociala medier.",
-      "Nyhetssida: släpptakten i ett ögonkast och länkar till tjänstetransparensen och säkerheten."
+      "En nyhetssida på alla språk, med länkar till tjänsternas transparens och till säkerheten."
     ]
   },
   "0.8.6": {

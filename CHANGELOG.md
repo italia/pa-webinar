@@ -10,13 +10,21 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.8.8 — 2026-07-23
+
+**The what's-new page, redesigned**
+
+- Each release now reads on two levels: the highlights that matter to you, and — under a “Technical detail” tab you open only if you want — the engineering behind them.
+- Every version that ships with a software bill of materials (SBOM) links straight to its release on GitHub, where the SBOM is attached. The source code repository is now public.
+- The timeline strip at the top is gone: it grew cluttered as releases piled up and told you little. The dates stay on each card.
+
 ## 0.8.7 — 2026-07-23
 
 **The interface complete in all 24 languages, and a refreshed visual identity**
 
 - The interface is now fully translated in all 24 EU languages: before, several screens — including the waiting room and the consent texts — fell back to Italian where a translation was missing.
 - Refreshed logo and visual identity (favicon, icon, watermark), and an image preview when an event link is shared on chat and social.
-- What's-new page: the release cadence at a glance and links to the service transparency and security pages.
+- A what's-new page in every language, with links to the service transparency and security pages.
 
 ## 0.8.6 — 2026-07-22
 

@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Leathanach na nuachta, athdheartha",
+    "notes": [
+      "Léitear gach eisiúint anois ar dhá leibhéal: na buaicphointí atá tábhachtach duit agus — faoi chluaisín „Sonra teicniúil“ a osclaíonn tú ach amháin más mian leat — an obair theicniúil taobh thiar díobh.",
+      "Nascann gach leagan a eisítear le liosta ábhar bogearraí (SBOM) go díreach lena eisiúint ar GitHub, áit a bhfuil an SBOM ceangailte. Tá stór an chóid foinse poiblí anois.",
+      "Tá an stríoc amlíne ag barr imithe: d’éirigh sé plódaithe de réir mar a charnaigh na heisiúintí agus is beag a dúirt sé. Fanann na dátaí ar gach cárta."
+    ]
+  },
   "0.8.7": {
     "title": "An comhéadan iomlán sna 24 teanga, agus féiniúlacht amhairc athnuaite",
     "notes": [
       "Tá an comhéadan aistrithe go hiomlán anois sna 24 teanga AE ar fad: roimhe seo, d'iompaigh roinnt scáileán — an seomra feithimh agus na téacsanna toilithe ina measc — go hIodáilis nuair a bhí aistriúchán in easnamh.",
       "Lógó agus féiniúlacht amhairc athnuaite (favicon, deilbhín, comhartha uisce), agus réamhamharc le híomhá nuair a roinntear nasc imeachta i gcomhrá agus ar na meáin shóisialta.",
-      "Leathanach nuachta: rithim na n-eisiúintí ar an toirt agus naisc chuig trédhearcacht na seirbhísí agus an tslándáil."
+      "Leathanach nuachta i ngach teanga, le naisc chuig trédhearcacht na seirbhísí agus chuig an tslándáil."
     ]
   },
   "0.8.6": {

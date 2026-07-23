@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "La pagina delle novità, rifatta",
+    "notes": [
+      "Ogni rilascio ora si legge su due livelli: le novità che contano per chi partecipa e, sotto una linguetta «Dettaglio tecnico» che si apre solo se lo si desidera, il lavoro tecnico che c'è dietro.",
+      "Ogni versione che esce con una distinta dei componenti software (SBOM) rimanda direttamente alla sua release su GitHub, dove l'SBOM è allegato. Il repository del codice sorgente è ora pubblico.",
+      "La striscia della cronologia in cima non c'è più: si affollava man mano che i rilasci si accumulavano e diceva poco. Le date restano su ogni card."
+    ]
+  },
   "0.8.7": {
     "title": "Interfaccia completa in tutte le 24 lingue, e identità visiva rinnovata",
     "notes": [
       "L'interfaccia è ora tradotta per intero in tutte e 24 le lingue UE: prima diverse schermate — tra cui la sala d'attesa e i testi di consenso — ripiegavano sull'italiano dove mancava la traduzione.",
       "Logo e identità visiva rinnovati (favicon, icona, watermark), e un'anteprima con immagine quando si condivide il link di un evento su chat e social.",
-      "Pagina delle novità: il ritmo dei rilasci a colpo d'occhio e i collegamenti alla trasparenza dei servizi e alla sicurezza."
+      "Una pagina delle novità in ogni lingua, con i collegamenti alla trasparenza dei servizi e alla sicurezza."
     ]
   },
   "0.8.6": {

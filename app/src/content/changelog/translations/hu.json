@@ -1,10 +1,18 @@
 {
+  "0.8.8": {
+    "title": "Az újdonságok oldala, újratervezve",
+    "notes": [
+      "Minden kiadás mostantól két szinten olvasható: az Ön számára fontos újdonságok, és — egy „Technikai részletek” fül alatt, amelyet csak akkor nyit meg, ha szeretné — a mögöttük álló technikai munka.",
+      "Minden verzió, amely szoftverjegyzékkel (SBOM) jelenik meg, közvetlenül a GitHubon lévő kiadására mutat, ahol az SBOM csatolva van. A forráskód tárolója mostantól nyilvános.",
+      "A felső idővonal-sáv eltűnt: a kiadások gyűlésével zsúfolttá vált, és keveset mondott. A dátumok minden kártyán megmaradnak."
+    ]
+  },
   "0.8.7": {
     "title": "A felület teljes mind a 24 nyelven, és megújult vizuális arculat",
     "notes": [
       "A felület mostantól teljesen le van fordítva mind a 24 uniós nyelvre: korábban több képernyő — köztük a váróterem és a hozzájárulási szövegek — olaszra váltott ott, ahol hiányzott a fordítás.",
       "Megújult logó és vizuális arculat (favikon, ikon, vízjel), valamint képes előnézet, amikor egy esemény hivatkozását csevegésben és közösségi médiában osztják meg.",
-      "Újdonságok oldal: a kiadási ütem egy pillantásra, és hivatkozások a szolgáltatások átláthatóságára és a biztonságra."
+      "Egy újdonságok oldal minden nyelven, a szolgáltatások átláthatóságára és a biztonságra mutató hivatkozásokkal."
     ]
   },
   "0.8.6": {
