@@ -73,4 +73,4 @@ gender-guesser>=0.4,<1
 # vincono sulle dipendenze >= di audioseal). Modello scaricato da HF a
 # runtime (audioseal_wm_16bits, ~pochi MB). Best-effort: il DUB non
 # fallisce se il watermark non riesce (vedi worker/tts.py).
-audioseal==0.1.4
+audioseal==0.2.0
