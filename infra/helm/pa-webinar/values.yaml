@@ -627,6 +627,20 @@ jitsi-meet:
   enableAuth: true
   enableGuests: false
 
+  # Global pull secrets for ALL jitsi component pods (the subchart exposes only a
+  # single global list, not per-component). `ghcr-secret` is required because
+  # `web.image` below is the PRIVATE GHCR patched image (F18); `dockerhub-secret`
+  # keeps the stock Docker Hub images (jvb/jicofo/coturn/prosody/jibri) pulling
+  # without hitting anon rate limits. Both secrets must exist in the namespace
+  # (created out-of-band, like any private-registry chart). Without ghcr-secret a
+  # fresh install's web pod 401s on ghcr.io → ImagePullBackOff → nobody can join.
+  # NB: the existing prod (rev ≤44) was deployed before this default and wires
+  # ghcr-secret via a `kubectl patch deploy …-jitsi-meet-web` instead; a future
+  # non-`--reuse-values` upgrade converges it to this helm-managed value.
+  imagePullSecrets:
+    - name: ghcr-secret
+    - name: dockerhub-secret
+
   prosody:
     auth:
       type: jwt
@@ -659,6 +673,31 @@ jitsi-meet:
     tolerations: []
 
   web:
+    # F18: patched jitsi/web that forces the rnnoise noise-suppression
+    # AudioContext to 48 kHz (built from infra/jitsi-web-patched). Base image is
+    # stable-10741 (= the subchart appVersion prod already served), so
+    # prosody/jicofo/jvb compatibility is unchanged — only the noise-suppression
+    # context differs.
+    #
+    # pullPolicy: Always — the jitsi-web.yml workflow re-pushes the SAME
+    # `stable-10741-rnnoise` tag whenever the patch changes, so the tag is MUTABLE
+    # in practice. This is a DELIBERATE trade-off for a mic-silencing-critical
+    # image: IfNotPresent could let a node keep serving a stale, mis-patched image
+    # cached under that tag → SILENT, persistent mic loss after we push a fix (the
+    # worse failure). Always instead re-pulls on every web-pod (re)creation, so a
+    # transient GHCR hiccup during an upgrade can leave the pod ImagePullBackOff —
+    # a LOUD, obvious, self-healing outage. Loud+recoverable beats silent+wrong.
+    #
+    # Pull auth: this is a PRIVATE GHCR image → the web pod needs `ghcr-secret`,
+    # supplied by the global `jitsi-meet.imagePullSecrets` above. (The existing
+    # prod predates that default and wires it via a `kubectl patch deploy
+    # …-jitsi-meet-web` — see that block's comment.) NB: a `--reuse-values`
+    # upgrade does NOT pick up these file-level defaults, so the prod deploy also
+    # passes repository/tag/pullPolicy via `--set`.
+    image:
+      repository: ghcr.io/italia/pa-webinar-jitsi-web
+      tag: stable-10741-rnnoise
+      pullPolicy: Always
     ingress:
       enabled: true
       annotations:
@@ -972,10 +1011,52 @@ recorder:
   # Immagine del bot recorder (Puppeteer + lib-jitsi-meet, un'audio-track per
   # partecipante). Gira sul pool NORMALE, non GPU.
   image: ghcr.io/italia/pa-webinar-recorder:dev
+  # NOTE on stale images: with a MUTABLE tag like `:dev`, IfNotPresent may reuse
+  # a node's cached (possibly outdated) layer for that tag. Prod sets `Always`
+  # via a values override so each recorder Job re-pulls the current `:dev` — the
+  # per-track audio fix landed in recorder commit 9739d70, and a cached pre-fix
+  # layer captures only silence. The chart DEFAULT stays IfNotPresent so an
+  # offline / air-gapped cluster that pre-loads the image (or a registry outage)
+  # doesn't turn every recording into ImagePullBackOff. When you enable the
+  # recorder with registry access, pin an immutable digest or set `Always`.
   imagePullPolicy: IfNotPresent
   imagePullSecrets: []
   # Dominio Jitsi per il bot; se vuoto usa app.env.NEXT_PUBLIC_JITSI_DOMAIN.
   jitsiDomain: ""
+
+  # ── Il bot invisibile ──────────────────────────────────────────────
+  # Prosody ha un VirtualHost "nascosto" (lo stesso che usa Jibri) e ogni
+  # client jitsi-meet confronta il dominio del JID in presenza con
+  # `config.hiddenDomain`: se coincide, il partecipante non compare
+  # nell'elenco, non prende un riquadro, non genera la notifica di ingresso e
+  # non entra nel conteggio. E' il meccanismo nativo di Jitsi per i bot.
+  #
+  # Valorizzando `hiddenDomain` il recorder si autentica li' invece che col JWT
+  # del portale. Richiede DUE cose sul lato Prosody:
+  #   1. l'account esista (l'immagine jitsi lo crea con ENABLE_RECORDING);
+  #   2. l'ACCOUNT sia in `token_verification_allowlist` sul componente MUC —
+  #      altrimenti, con l'autenticazione a token, l'ingresso viene rifiutato.
+  #      Si imposta senza toccare i file di config:
+  #        XMPP_MUC_CONFIGURATION: 'token_verification_allowlist = { "recorder@<dominio>" }'
+  #      Il singolo account, NON l'intero dominio: chi ha quella password entra
+  #      in qualunque stanza senza token, quindi la deroga si tiene stretta.
+  #
+  #   La password va PINNATA nei values (`jitsi-meet.jibri.recorder.password`):
+  #   il subchart la rigenera con `randAlphaNum` a ogni upgrade se non lo e', e
+  #   il bot si ritroverebbe credenziali diverse da quelle registrate su
+  #   Prosody. In quel caso ricade sul JWT — registra comunque, ma torna
+  #   visibile in stanza.
+  # Vuoto = disattivato: il bot entra col JWT e resta VISIBILE in stanza.
+  hiddenDomain: ""
+  # Secret con le credenziali del bot. OBBLIGATORIO se `hiddenDomain` e'
+  # valorizzato — niente default indovinato: il nome dipende da come e'
+  # installato il subchart (fullnameOverride, jibri disattivato,
+  # existingSecretName) e un nome sbagliato non fallirebbe il render, fallirebbe
+  # ogni Job a evento gia' iniziato. Di norma e' quello che il subchart crea per
+  # Jibri: `<release>-jitsi-meet-jibri-secret-recorder`.
+  xmppSecretName: ""
+  xmppSecretUserKey: "JIBRI_RECORDER_USER"
+  xmppSecretPasswordKey: "JIBRI_RECORDER_PASSWORD"
   backoffLimit: 1
   activeDeadlineSeconds: 21600   # 6h max per evento
   ttlSecondsAfterFinished: 600

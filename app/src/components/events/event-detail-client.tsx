@@ -395,7 +395,7 @@ export default function EventDetailClient({
           {tags.length > 0 && (
             <div className="d-flex flex-wrap gap-2 mb-4">
               {tags.map((tag) => {
-                const label = tag.name[locale] ?? tag.name.it ?? tag.name.en ?? tag.slug;
+                const label = getLocalized(tag.name as LocalizedField, locale) || tag.slug;
                 const color = tag.color ?? '#5A768A';
                 return (
                   <Link
@@ -722,33 +722,20 @@ export default function EventDetailClient({
               {isEnded ? (
                 <PostEventSidebar
                   event={event}
-                  registrationCount={event.registrationCount}
                   feedbackSummary={feedbackSummary}
                 />
               ) : (
                 <>
-                  <h3
-                    className="h6 text-uppercase fw-semibold mb-3"
-                    style={{
-                      letterSpacing: '0.04em',
-                      color: 'var(--app-muted)',
-                      fontSize: '0.8rem',
-                    }}
-                  >
-                    {t('detail.participants')}
-                  </h3>
-
-                  <div
-                    className="mb-2 fw-semibold"
-                    style={{ fontSize: '1.5rem', color: 'var(--app-text)' }}
-                  >
-                    {event.registrationCount}
-                  </div>
-                  <div className="text-muted small mb-4">
-                    {t('detail.totalRegistrations', { count: event.registrationCount })}
-                  </div>
-
-                  {canRegister && (
+                  {/* F5: il numero di registrati NON è più mostrato
+                      pubblicamente (né qui né nel listing). Resta visibile
+                      agli amministratori nel pannello admin. Il pubblico vede
+                      solo il conteggio dei presenti nella sala live. */}
+                  {hasRoomAccess && !invalidToken && (
+                    <p className="text-success fw-semibold text-center mb-3" role="status">
+                      {t('detail.registered')}
+                    </p>
+                  )}
+                  {canRegister && !(hasRoomAccess && !invalidToken) && (
                     <Link href={`/events/${event.slug}/registration`}>
                       <Button
                         color="primary"
@@ -776,6 +763,16 @@ export default function EventDetailClient({
                       <Link
                         href={`/events/${event.slug}/live`}
                         className="text-decoration-none fw-semibold text-primary"
+                        onMouseDown={() => {
+                          // 1a: anticipa il risveglio del bridge (JVB) al
+                          // momento del click, prima di navigazione + idratazione
+                          // di /live — così il pre-warm parte qualche secondo
+                          // prima. L'endpoint wake è idempotente e no-op se
+                          // l'evento è già LIVE.
+                          void fetch(`/api/events/${event.slug}/wake`, {
+                            method: 'POST',
+                          }).catch(() => {});
+                        }}
                       >
                         {t('detail.alreadyRegisteredEnter')}
                       </Link>
@@ -835,11 +832,9 @@ function StatusPill({ status }: { status: string }) {
 
 function PostEventSidebar({
   event,
-  registrationCount,
   feedbackSummary,
 }: {
   event: EventData;
-  registrationCount: number;
   feedbackSummary?: FeedbackSummary | null;
 }) {
   const t = useTranslations('events');
@@ -859,14 +854,8 @@ function PostEventSidebar({
         {t('detail.eventEnded')}
       </h3>
 
-      <div
-        className="d-flex align-items-center text-muted mb-2"
-        style={{ fontSize: '0.88rem' }}
-      >
-        <Icon icon="it-user" size="sm" className="me-2" />
-        <span>{t('detail.totalRegistrations', { count: registrationCount })}</span>
-      </div>
-
+      {/* F5: registrati non mostrati pubblicamente. Manteniamo solo il
+          conteggio dei presenti (picco) qui sotto. */}
       {event.peakParticipants !== undefined && event.peakParticipants > 0 && (
         <div
           className="d-flex align-items-center text-muted mb-2"

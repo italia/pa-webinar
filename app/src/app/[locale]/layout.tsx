@@ -6,6 +6,7 @@ import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
 import { locales, type Locale } from '@/i18n/config';
+import { metadataBase, openGraphImages, twitterImageCard } from '@/lib/seo';
 import { Skiplink } from '@/components/layout/skiplinks';
 import PAHeader from '@/components/layout/pa-header';
 import PAFooter from '@/components/layout/pa-footer';
@@ -41,10 +42,24 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'common' });
   const settings = await getSettings();
 
+  // Anteprima social: immagine con URL assoluto (risolto da `metadataBase`,
+  // guardato contro un NEXT_PUBLIC_APP_URL malformato — vedi lib/seo). Vale per
+  // le pagine che NON dichiarano un proprio openGraph (home, pagine statiche);
+  // quelle che lo fanno — es. il dettaglio evento — includono l'immagine da sé,
+  // perché Next SOSTITUISCE l'openGraph per segmento, non lo fonde.
+  const title = settings.seoTitle || t('appName');
+  const description = settings.seoDescription || t('appDescription');
+
   return {
-    title: settings.seoTitle || t('appName'),
-    description: settings.seoDescription || t('appDescription'),
-    openGraph: settings.seoImage ? { images: [settings.seoImage] } : undefined,
+    metadataBase: metadataBase(),
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: openGraphImages(settings.seoImage),
+    },
+    twitter: twitterImageCard(title, description, settings.seoImage),
   };
 }
 

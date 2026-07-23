@@ -75,10 +75,16 @@ export default function LiveShareButton({
   slug,
   locale,
   moderatorToken,
+  modalContainer,
 }: {
   slug: string;
   locale: string;
   moderatorToken?: string;
+  /** Element to portal the modal into. The live client passes the fullscreen
+   *  element while app-owned fullscreen is active (#6) — a modal left in
+   *  <body> would be outside the fullscreen subtree, i.e. invisible. Undefined
+   *  keeps reactstrap's default (<body>). */
+  modalContainer?: HTMLElement;
 }) {
   const t = useTranslations('live.share');
   const [open, setOpen] = useState(false);
@@ -138,7 +144,7 @@ export default function LiveShareButton({
         <span className="d-none d-md-inline ms-1">{t('button')}</span>
       </Button>
 
-      <Modal isOpen={open} toggle={() => setOpen(false)} centered>
+      <Modal isOpen={open} toggle={() => setOpen(false)} centered container={modalContainer}>
         <ModalHeader toggle={() => setOpen(false)}>{t('title')}</ModalHeader>
         <ModalBody>
           {rows.map((r) => (

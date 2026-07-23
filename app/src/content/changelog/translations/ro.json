@@ -1,0 +1,361 @@
+{
+  "0.8.9": {
+    "title": "Jurnalul de modificări, acum cu inventarul software integrat",
+    "notes": [
+      "Fiecare versiune își deschide aici lista componentelor software (SBOM): o listă care poate fi căutată cu fiecare componentă inclusă, cu versiune și ecosistem — fără descărcare.",
+      "Secțiunea tehnică este acum un set de legături — SBOM, versiunea de pe GitHub, sursele la acea etichetă, fluxul de compilare — în locul unui paragraf care repeta rezumatul de mai sus.",
+      "Subsolul adaugă semnalele de securitate ale proiectului: OpenSSF Scorecard și rezultatele analizei codului."
+    ]
+  },
+  "0.8.8": {
+    "title": "Pagina de noutăți, reproiectată",
+    "notes": [
+      "Fiecare versiune se citește acum pe două niveluri: noutățile care contează pentru tine și — sub o filă „Detaliu tehnic” pe care o deschizi doar dacă dorești — munca tehnică din spatele lor.",
+      "Fiecare versiune lansată cu o listă a componentelor software (SBOM) trimite direct la lansarea sa pe GitHub, unde SBOM-ul este atașat. Depozitul codului sursă este acum public.",
+      "Banda cronologică din partea de sus a dispărut: devenea aglomerată pe măsură ce versiunile se acumulau și spunea puține. Datele rămân pe fiecare card."
+    ]
+  },
+  "0.8.7": {
+    "title": "Interfața completă în toate cele 24 de limbi și o identitate vizuală reînnoită",
+    "notes": [
+      "Interfața este acum tradusă integral în toate cele 24 de limbi ale UE: înainte, mai multe ecrane — inclusiv sala de așteptare și textele de consimțământ — reveneau la italiană acolo unde lipsea traducerea.",
+      "Siglă și identitate vizuală reînnoite (favicon, pictogramă, filigran) și o previzualizare cu imagine la partajarea linkului unui eveniment în chat și pe rețelele sociale.",
+      "O pagină de noutăți în fiecare limbă, cu legături către transparența serviciilor și către securitate."
+    ]
+  },
+  "0.8.6": {
+    "title": "Sala de așteptare: o pagină și o piață în care alegi să intri",
+    "notes": [
+      "Sala de așteptare este acum o pagină curată, conformă cu sistemul de design: evenimentul, comenzile audio și video, numele, conversația. Jocul mic din caseta laterală a fost eliminat.",
+      "Piața interactivă se deschide doar dacă o alegi și ocupă tot ecranul. Comenzile paginii rămân alături — nume, microfon, cameră, conversație, anunțuri — și te poți întoarce oricând. Cine preferă fără animație poate trece la versiunea clasică, iar alegerea este reținută.",
+      "Avataruri: dacă adresa cu care te-ai înscris are un Gravatar, acesta poate apărea acum ca imagine în sală. Administratorul îl activează, iar serverul nostru face cererea: browserul participanților nu contactează niciodată gravatar.com.",
+      "Componenta care înregistrează evenimentul nu mai apare printre participanți și nici în numărătoare: este un serviciu intern, nu o persoană în sală. Anunțul că evenimentul este înregistrat rămâne la locul lui."
+    ]
+  },
+  "0.8.5": {
+    "title": "Chat mai viu: mențiuni, reacții, corectări și export",
+    "notes": [
+      "Chat: atunci când cineva vă menționează cu @, rândul este acum evidențiat, iar dacă priviți în altă parte primiți o notificare. Până acum, o mențiune nu se deosebea cu nimic de un mesaj oarecare.",
+      "Chat: puteți reacționa la un anumit mesaj cu un emoji și vă puteți corecta propriul mesaj în interval de cincisprezece minute (rămâne indicat faptul că a fost modificat). Butonul „Răspunde” a devenit discret.",
+      "Chat: buton nou pentru descărcarea conversației, ca text sau în format de date. Mesajele erau deja păstrate, însă nu exista nicio modalitate de a le lua cu dumneavoastră.",
+      "În sală: un cronometru arată cât mai este până la încheiere (sau de cât timp a început evenimentul); este pornit implicit pentru cine conduce evenimentul și poate fi activat de oricine.",
+      "O sală nu mai este pornită de cine deschide pagina evenimentului cu ore înainte: se trezește atunci când este nevoie, așa cum este prevăzut. Se rezolvă astfel și un caz în care evenimentul era oprit la câteva minute după începere.",
+      "Statistici: numărul maxim de participanți este consemnat acum și pentru fiecare sesiune în parte, nu doar pentru eveniment."
+    ]
+  },
+  "0.8.4": {
+    "title": "E-mailuri de confirmare: numele evenimentului, imaginea și un expeditor configurabil",
+    "notes": [
+      "E-mailurile de confirmare a înscrierii conțin din nou numele evenimentului, atât în subiect, cât și în corpul mesajului. Cine se înscria de pe o pagină într-o limbă în care titlul nu fusese tradus primea un e-mail fără numele evenimentului și un fișier de calendar atașat fără titlu.",
+      "E-mailurile de confirmare și mementourile afișează acum imaginea evenimentului în partea de sus, iar titlul apare bine evidențiat, nu doar într-un rând al tabelului cu detalii.",
+      "Setări noi în panoul de administrare: numele sub care apare expeditorul în căsuța poștală a destinatarului și o adresă la care să ajungă răspunsurile (e-mailurile sunt trimise de la o adresă care nu primește mesaje).",
+      "În general, un text netradus într-o limbă afișează acum varianta originală, în loc să apară gol: același lucru era valabil și pentru titlurile și descrierile de pe paginile publice."
+    ]
+  },
+  "0.8.3": {
+    "title": "Confidențialitatea chatului, număr corect de participanți și moderare restabilită",
+    "notes": [
+      "Istoricul chatului nu mai poate fi citit de persoanele care nu iau parte la eveniment. Până acum, oricine cunoștea adresa unui eveniment îi putea descărca mesajele — împreună cu numele celor care le scriseseră — chiar și după încheierea evenimentului. Acum este necesar să fiți înscris, să fiți moderator sau să vă aflați în sală în timpul desfășurării evenimentului.",
+      "Numărul de participanți afișat în sală era greșit cu o unitate, pentru că fiecare persoană nu se număra pe sine. Aceeași eroare ajungea și în statisticile evenimentului (numărul maxim de participanți). Acum numărul este corect și coincide cu cel consemnat în statistici.",
+      "Au fost repuse în funcțiune comenzile moderatorului din lista de participanți: excluderea unui participant și reglarea volumului individual nu aveau niciun efect.",
+      "Reacțiile sunt disponibile acum și pe telefon, unde nu mai exista niciun buton pentru a le trimite. Emoji-urile care traversează ecranul nu mai interceptează clicurile pe bara de comenzi.",
+      "Pe ecran complet, ferestrele de dialog — partajarea linkului și, pentru moderatori, „Ieșire din sală” — sunt din nou vizibile: înainte rămâneau ascunse în spatele imaginii video, iar butoanele păreau că nu funcționează.",
+      "Șabloanele de eveniment pornesc acum cu chatul activ, la fel ca sala: la crearea unui „Webinar” se obținea încă un eveniment fără chat.",
+      "A fost finalizată traducerea în engleză a interfeței (lipseau câteva elemente, printre care întreaga fereastră „Partajare”)."
+    ]
+  },
+  "0.8.2": {
+    "title": "Nicio sală goală lăsată deschisă după ora de încheiere",
+    "notes": [
+      "O sală rămasă deschisă după ora de încheiere și apoi golită era menținută activă pe termen nelimitat, ocupând inutil resurse video. Acum, dacă rămâne goală timp de 45 de minute după ora de încheiere prevăzută, este închisă. O sală în care se mai află persoane nu este întreruptă niciodată: după ora de încheiere apare doar un avertisment, nimeni nu este deconectat."
+    ]
+  },
+  "0.8.1": {
+    "title": "Reacții configurabile, închiderea sălilor goale și securitatea zonei de administrare",
+    "notes": [
+      "Reacțiile (emoji) pot fi acum configurate de administrator: implicit se folosesc cele native din Jitsi, direct din bara de comenzi (discrete și de scurtă durată). Ca alternativă, pot fi activate reacțiile proprii ale platformei, afișate într-o bară în stânga jos, care sunt contorizate în statisticile evenimentului.",
+      "Opțiune nouă pentru administrator: închiderea automată a unei săli rămase complet goale, inclusiv fără moderator, ca semn că evenimentul a fost abandonat. Este dezactivată implicit — inactivitatea în lipsa unui moderator este deja gestionată în siguranță, sala intrând în repaus după 45 de minute — și poate fi activată din setări.",
+      "Zonă de administrare mai sigură: la expirarea sesiunii, utilizatorul este readus la ecranul de autentificare, astfel încât paginile de administrare nu mai pot fi folosite după expirare. În plus, sesiunea durează mai mult și se reînnoiește automat în timpul lucrului."
+    ]
+  },
+  "0.8.0": {
+    "title": "Sală în direct mai curată: chat, reacții, ecran complet și înscriere",
+    "notes": [
+      "Chat: acum puteți insera emoji în mesaje cu ajutorul unui selector dedicat, iar un mic indicator vă avertizează dacă actualizările chatului încetinesc. Mesajele trimise apar imediat, chiar și în rețelele instituționale care rețin temporar actualizările în timp real.",
+      "Ecran complet: butonul pentru ecran complet păstrează acum chatul vizibil lateral, în loc să îl ascundă.",
+      "Reacțiile (emoji) nu mai acoperă comenzile din partea de jos: bara rămâne mereu accesibilă, inclusiv în vizualizarea tip mozaic.",
+      "Butoanele „Partajare” și „Ieșire din sală” sunt acum bine vizibile și colorate implicit (ieșirea cu roșu), nu doar la trecerea cu mouse-ul.",
+      "Robotul „Recorder” nu mai apare în lista de participanți și nici în numărătoare.",
+      "Înscriere: dacă vă înscrieți cu mult timp înainte, ajungeți pe o pagină de confirmare cu linkul pentru adăugarea evenimentului în calendar, în loc să fiți trimis în sala de așteptare; aproape de ora de început intrați direct în sală. Pe pagina evenimentului se vede dacă sunteți deja înscris.",
+      "Chatul este acum principalul canal de interacțiune din sală. Au fost îmbunătățite și închiderea automată a unui eveniment rămas gol, precum și numărarea participanților în statistici."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderatorul poate coborî o mână ridicată",
+    "notes": [
+      "În lista mâinilor ridicate, moderatorul are acum un buton pentru a coborî mâna unui anumit participant — util atunci când cineva a vorbit deja sau a lăsat mâna ridicată din greșeală. Solicitarea ajunge la participantul respectiv, care își vede mâna coborând; nimeni altcineva nu este afectat."
+    ]
+  },
+  "0.7.7": {
+    "title": "Mai puțin zgomot de fond atunci când vorbiți",
+    "notes": [
+      "Eliminarea avansată a zgomotului de fond se activează atunci când luați cuvântul: atenuează mai bine sunete precum tastatura, ventilatoarele sau traficul, în plus față de suprimarea de bază deja existentă."
+    ]
+  },
+  "0.7.6": {
+    "title": "Volum reglabil pentru fiecare participant",
+    "notes": [
+      "Un nou control al volumului pentru fiecare participant în parte, în panoul „Participanți”: dacă o voce se aude prea tare sau prea încet, o reglați doar pentru dumneavoastră, fără a schimba sunetul pentru ceilalți.",
+      "Înregistrarea audio separată pentru fiecare participant, folosită în postproducție, este mai fiabilă: dacă o captură este mută, sistemul detectează imediat acest lucru și evită generarea unor transcrieri goale."
+    ]
+  },
+  "0.7.5": {
+    "title": "Mâna ridicată rămâne ridicată",
+    "notes": [
+      "Când ridicați mâna, aceasta rămâne ridicată până când o coborâți dumneavoastră sau până când un moderator o gestionează: înainte se cobora singură în momentul în care începeați să vorbiți, iar astfel dispăreați din lista celor care așteaptă să ia cuvântul."
+    ]
+  },
+  "0.7.4": {
+    "title": "Numele din chat, protejat împotriva linkurilor transmise mai departe (securitate)",
+    "notes": [
+      "În chat, numele real al unei persoane înscrise este afișat doar pe dispozitivul cu care aceasta s-a înscris: cine deschide un link de participare transmis mai departe intervine cu numele pe care îl introduce, nu în numele persoanei înscrise inițial. A fost eliminată astfel o atribuire greșită a mesajelor.",
+      "Aceeași protecție se aplică fișierelor atașate: un fișier trimis de pe un link transmis mai departe nu mai este atribuit numelui persoanei înscrise inițial.",
+      "Cine se conectează de pe un al doilea dispozitiv, de exemplu de pe telefon, sau cu linkul primit în avans poate participa în continuare, poate scrie în chat și poate trimite fișiere fără întreruperi: se schimbă doar numele afișat, care devine cel introdus la intrarea în sală."
+    ]
+  },
+  "0.7.3": {
+    "title": "Număr corect al persoanelor prezente, reacții centrate și îmbunătățiri ale sălii",
+    "notes": [
+      "Numărul persoanelor prezente nu mai multiplică aceeași persoană care iese și reintră, de exemplu cu butonul „Înapoi” al browserului: conexiunile duble ale aceleiași persoane sunt numărate o singură dată. Lista de participanți continuă să afișeze fiecare conexiune, astfel încât moderatorul să îi poată vedea și gestiona pe toți.",
+      "Bara de reacții și emoji este acum centrată în partea de jos, bine vizibilă și ușor de găsit, în loc să fie în colțul din stânga jos.",
+      "Numărul de înscriși nu mai este afișat public pe pagina evenimentului și în lista de evenimente: rămâne vizibil administratorilor, în panoul de administrare. În timpul transmisiunii în direct, publicul vede doar numărul persoanelor prezente.",
+      "Suprimarea zgomotului de fond este activată automat pe toate microfoanele: prelucrarea audio de bază — ecou și zgomot — este întotdeauna pornită, fără a fi nevoie de o activare manuală.",
+      "Intrarea în sală este puțin mai rapidă: „trezirea” sistemului video începe încă de la clicul pe butonul de intrare."
+    ]
+  },
+  "0.7.2": {
+    "title": "Chat mai bogat: fișiere atașate, răspunsuri și mențiuni",
+    "notes": [
+      "În chat pot fi trimise acum imagini și fișiere atașate (PNG, JPEG, WebP, GIF și PDF, până la 10 MB), cu previzualizare direct în mesaj.",
+      "Funcție nouă „Răspunde”: se poate cita un anumit mesaj, iar citatul rămâne vizibil în firul conversației.",
+      "Mențiuni cu @: un participant poate fi chemat pe nume în interiorul unui mesaj.",
+      "Moderarea chatului: moderatorii pot elimina mesaje individuale în timpul evenimentului."
+    ]
+  },
+  "0.7.1": {
+    "title": "Statistici după eveniment pentru fiecare eveniment",
+    "notes": [
+      "Filă nouă „Statistici” pentru fiecare eveniment, în panoul de administrare, disponibilă și pentru evenimentele fără înscriere sau fără înregistrare video: arată cum s-a desfășurat sesiunea, cine a vorbit cel mai mult, gradul general de participare și principalii indicatori.",
+      "Grafic al evoluției interacțiunii în timp — chat, întrebări, voturi la întrebări, sondaje, cuvinte din norul de cuvinte și reacții — cu evidențierea momentului de vârf al sesiunii.",
+      "Clasament al celor care au vorbit cel mai mult timp (minute de fiecare), cu echilibrul intervențiilor, alături de numărul de reacții și de mâini ridicate.",
+      "O nouă estimare a duratei medii de ședere a participanților în sală, folosită și la calculul gradului general de atenție."
+    ]
+  },
+  "0.7.0": {
+    "title": "Nume de vorbitori care pot fi corectate și player doar audio",
+    "notes": [
+      "După eveniment pot fi redenumiți acum vorbitorii, corectând numele identificate automat în transcriere.",
+      "Dacă înregistrarea nu are un video care poate fi redat, pagina de corectare oferă totuși un player doar audio, pentru a reasculta și a corecta textul și numele vorbitorilor.",
+      "Corectarea înregistrării pe mai multe piste: acum este captat corect sunetul real al participanților aflați la distanță."
+    ]
+  },
+  "0.6.9": {
+    "title": "Fiabilitatea prelucrării AI",
+    "notes": [
+      "Panoul de administrare afișează acum un indicator al fiabilității prelucrării AI de după eveniment (transcriere, sinteză, traduceri), pentru a vedea dintr-o privire dacă rezultatul este complet și de încredere."
+    ]
+  },
+  "0.6.8": {
+    "title": "Pagină de editare după eveniment mai clară",
+    "notes": [
+      "Pagina de corectare (transcriere, sinteză, traduceri) explică acum când conținutul generat de AI nu este încă disponibil — „prelucrare în curs” sau „porniți prelucrarea din comenzile de sus” — în loc să afișeze o eroare roșie care părea o defecțiune.",
+      "O salvare nereușită este afișată acum cu roșu și indică motivul exact returnat de server, în loc să apară cu verde, ca și cum ar fi reușit.",
+      "Sesiunea de administrator expirată și problemele de încărcare sunt deosebite acum prin mesaje dedicate, în locul unei singure erori generice.",
+      "Dacă sunetul înregistrării nu poate fi redat, pagina semnalează acest lucru și rămâne oricum posibilă corectarea textului și a vorbitorului pentru fiecare segment."
+    ]
+  },
+  "0.6.7": {
+    "title": "Reacții mereu vizibile și „Note / Listă de verificare”",
+    "notes": [
+      "Reacțiile (emoji) sunt acum mereu vizibile într-o bară în stânga jos și nu mai sunt ascunse în spatele unui buton: mai ușor de găsit și de folosit în timpul evenimentului.",
+      "Funcția „Agendă” a fost redenumită „Note / Listă de verificare”, pentru a arăta clar că este o zonă de notițe sub formă de listă de verificare, al cărei conținut nu ajunge în chat. Moderatorul o poate activa în continuare pentru fiecare eveniment."
+    ]
+  },
+  "0.6.6": {
+    "title": "Îmbunătățiri: chat, numărători și acces",
+    "notes": [
+      "Linkurile partajate în chat pot fi deschise acum cu un clic, în siguranță, într-o filă nouă; înainte erau simplu text.",
+      "În sală, numărul total al persoanelor înscrise este vizibil acum doar moderatorilor: participanții văd doar câte persoane sunt efectiv prezente.",
+      "Acces mai rapid în sală: conexiunea la serverul video este pregătită încă din sala de așteptare, reducând timpul de așteptare la intrare.",
+      "În lista de participanți, antetul cu numărătoarea rămâne mereu vizibil în timp ce parcurgeți lista."
+    ]
+  },
+  "0.6.5": {
+    "title": "Înregistrări și numărători",
+    "notes": [
+      "Numărul persoanelor prezente în sală exclude acum robotul de înregistrare: arată doar persoanele reale, nu și robotul care captează sunetul.",
+      "Postproducție: buton nou „Generează cu AI” pentru a porni transcrierea, sinteza și traducerea și în cazul înregistrărilor doar audio, cu câte o pistă pentru fiecare participant, care înainte nu ofereau nicio comandă de pornire.",
+      "În lista pistelor, fiecărui pseudonim îi este alăturat un identificator: persoane diferite cu același pseudonim primesc identificatori distincți, în timp ce mai multe intervenții ale aceleiași persoane au același identificator.",
+      "Mesaj clar atunci când pornirea fluxului de prelucrare nu pune în așteptare nicio sarcină, fie pentru că AI este dezactivată pentru eveniment, fie pentru că fluxul este suspendat, în locul unui fals „operațiune reușită”."
+    ]
+  },
+  "0.6.4": {
+    "title": "Securitatea identității și îmbunătățiri ale sălii",
+    "notes": [
+      "Corecție de securitate: dacă vă partajați linkul personal de acces în sală, cine îl deschide intră acum cu numele PROPRIU; înainte putea moșteni numele persoanei care trimisese linkul.",
+      "Partajare a ecranului mai clară: se acordă acum prioritate rezoluției (5 cadre pe secundă, la calitate înaltă) în locul fluidității, astfel încât prezentările și documentele să rămână lizibile chiar și când mișcarea este redusă.",
+      "A fost eliminată funcția „ascunde propria imagine” care, odată activată, nu mai permitea reafișarea propriului cadru.",
+      "Acces de administrator: după o nouă autentificare în urma unei perioade de inactivitate, pagina se actualizează corect — nu mai apare o pagină aparent blocată până la reîncărcarea manuală."
+    ]
+  },
+  "0.6.3": {
+    "title": "Îmbunătățiri ale sălii de eveniment — runda 2",
+    "notes": [
+      "Cronometrul de prezentare este integrat acum în bara de comenzi a moderatorului, fără să ocupe un rând dedicat; bara numărătorii inverse apare doar atunci când cronometrul este pornit.",
+      "În chat apare numele real al persoanei care scrie, nu un generic „Moderator”.",
+      "Chatul a devenit un panou de sine stătător în bara laterală și nu mai este suprapus permanent peste celelalte conținuturi: o interfață mai curată, cu numărul mesajelor necitite afișat pe filă.",
+      "Buton nou „Tablă” pentru moderatori, care deschide tabla partajată direct din bara de comenzi.",
+      "Butonul „Partajare” are acum culoarea potrivită, ca să nu mai poată fi confundat cu „Ieșire”, linkurile au pictograme alături, iar linkul de moderare, vizibil doar moderatorilor, este ascuns în spatele unui avertisment, pentru a putea invita alți moderatori fără greșeli.",
+      "Norul de cuvinte nu mai este activ implicit: rămâne la alegerea moderatorului, care îl poate porni în timpul evenimentului."
+    ]
+  },
+  "0.6.2": {
+    "title": "Îmbunătățiri ale sălii de eveniment în direct",
+    "notes": [
+      "Bara de comenzi (microfon, cameră web, partajarea ecranului) rămâne mereu vizibilă și accesibilă: pe ecran complet, în timpul unei partajări și când sunteți singur în sală.",
+      "Moderatorul poate din nou să activeze și să dezactiveze funcțiile din timpul evenimentului (Întrebări, Chat, Agendă).",
+      "Comenzile audio și video pot fi folosite încă din faza de pregătire a sălii, fără a aștepta pornirea serverului video.",
+      "Lista „Mâini ridicate” arată corect cine a cerut cuvântul.",
+      "Buton nou „Partajare” în sală: copiază pe loc linkul de participare și linkul paginii evenimentului, fără a expune token-uri confidențiale.",
+      "Marca PA Webinar este din nou vizibilă în bara de sus a sălii de eveniment."
+    ]
+  },
+  "0.6.1": {
+    "title": "Jurnal public al modificărilor și actualizări de securitate",
+    "notes": [
+      "Pagină nouă cu jurnalul public al modificărilor, accesibilă printr-un clic pe numărul versiunii din subsol: enumeră toate versiunile platformei, împreună cu principalele noutăți.",
+      "Actualizări de securitate ale dependențelor (undici, nodemailer) și consolidarea lanțului de compilare, cu scanarea vulnerabilităților."
+    ]
+  },
+  "0.6.0": {
+    "title": "Flux de lucru după eveniment și sală de așteptare interactivă",
+    "notes": [
+      "Flux nou de încheiere a evenimentului: la final, o fereastră dedicată îi cere moderatorului să aleagă destinația înregistrării — publicare pe pagina evenimentului, adăugare în bibliotecă sau păstrare doar în arhivă.",
+      "Rezumat automat și anonimizat după eveniment (persoane prezente, întrebările cele mai votate, rezultatele sondajelor, norul de cuvinte, evaluări), afișat pe fiecare pagină de eveniment încheiat, chiar și în lipsa unei înregistrări.",
+      "E-mail de sinteză trimis participanților după eveniment, cu conținutul evenimentului.",
+      "Sală de așteptare interactivă „Piazza Digitale”: vă deplasați cu propriul avatar până la poartă pentru a intra în sesiunea video, având mereu alături și butonul clasic de intrare.",
+      "Norul de cuvinte are acum o secțiune dedicată în pagina evenimentului încheiat, cu comutator de vizibilitate pentru administrator.",
+      "Tablă partajată, care poate fi activată pentru fiecare eveniment în parte și din șabloane.",
+      "Revizuirea experienței de utilizare pentru asistentul de creare a evenimentelor: opțiuni avansate restrânse, moderator principal cu link, avertismente privind datele cu caracter personal, salvarea ciornei și gestionarea erorilor parțiale.",
+      "Perioade de păstrare diferite pentru înregistrări și pentru pistele audio ale fiecărui vorbitor, corelate cu semnalul „video publicat”, împreună cu ștergerea GDPR a mesajelor din chat."
+    ]
+  },
+  "0.5.11": {
+    "title": "Îmbunătățiri ale moderării, ale încheierii sesiunii și ale sunetului",
+    "notes": [
+      "Moderatorii apar cu numele lor real, în locul unui generic „Moderator”.",
+      "Ecran de încheiere în aplicație atunci când evenimentul se termină, în locul mesajului înșelător „Sală în pregătire”.",
+      "A fost corectată suprapunerea pictogramelor din sala de așteptare.",
+      "Suprimarea zgomotului dezactivată prin IFrame API, pentru rezolvarea unor probleme de sunet."
+    ]
+  },
+  "0.5.9": {
+    "title": "Înregistrare pe mai multe piste stabilă, evaluări cu stele și performanță",
+    "notes": [
+      "Înregistrarea separată pentru fiecare vorbitor (pe mai multe piste) a devenit fiabilă de la un capăt la altul: sunet complet pe fiecare pistă, fără trunchieri, încărcări în paralel.",
+      "Chestionar de feedback după eveniment, cu evaluare în stele și tablou de bord de sinteză pentru administrator.",
+      "Îmbunătățiri de performanță: codec VP9 pentru camera web, încărcare întârziată pe telefon, optimizarea componentei de înregistrare.",
+      "Procedură Helm care rulează după actualizare și reîncarcă automat fișierul config.js al Jitsi."
+    ]
+  },
+  "0.5.8": {
+    "title": "Calitate video și audio configurabilă și flux nou de intrare",
+    "notes": [
+      "Controlul calității video și audio, configurabil de către administrator, cu presetări pentru fiecare eveniment.",
+      "Reproiectarea fluxului de intrare: înscriere, apoi sală de așteptare, apoi sesiune video.",
+      "Mâinile ridicate afișează numele real al fiecărui participant."
+    ]
+  },
+  "0.5.6": {
+    "title": "Sală de așteptare configurabilă și imagini de copertă pentru evenimente",
+    "notes": [
+      "Modul de funcționare a sălii de așteptare este configurabil — joc, grădină sau clasic — atât la nivelul întregului site, cât și pentru fiecare eveniment în parte.",
+      "Imagini de copertă pe pagina evenimentului și în miniaturile cardurilor.",
+      "Fișierele încărcate sunt servite printr-o rută dedicată, cu adrese semnate care expiră rapid.",
+      "Buton „Intră acum”, disponibil imediat după înscriere.",
+      "Secțiune de administrare unificată pentru gestionarea prelucrării AI a înregistrărilor și o captură pe mai multe piste mai robustă."
+    ]
+  },
+  "0.5.2": {
+    "title": "Pregătirea evenimentelor și îmbunătățiri",
+    "notes": [
+      "Agendă cu exprimarea acordului sau a dezacordului și corecții ale permisiunilor moștenite din șabloane.",
+      "Nume reale, nu „SPEAKER_00”, în sinteze și în subtitrări.",
+      "O serie de remedieri rapide (de la v0.5.2 la v0.5.5), în pregătirea evenimentelor publice."
+    ]
+  },
+  "0.5.1": {
+    "title": "Pagină principală orientată spre comunitate și arhivă pe mai multe piste",
+    "notes": [
+      "Reproiectarea paginii principale cu accent pe comunitate, cu traduceri care pot fi suprascrise în timpul funcționării și cu accesibilitate conformă cerințelor AgID.",
+      "Arhivă MKV pe mai multe piste, cu player pentru reascultarea fiecărui vorbitor în parte.",
+      "Alinierea pistelor multiple la mixajul Jibri prin corelație încrucișată."
+    ]
+  },
+  "0.5.0": {
+    "title": "Postproducție cu AI și înregistrare pe mai multe piste",
+    "notes": [
+      "Flux de postproducție cu AI: transcriere, sinteză, subtitrări, traduceri și dublaj cu mai multe voci (întotdeauna sintetice), cu proveniența modelelor consemnată.",
+      "Înregistrare pe mai multe piste, câte o pistă pentru fiecare vorbitor, cu atribuirea vorbitorilor și denumire automată (ADR-013).",
+      "Bibliotecă video publică și pagină de gestionare după eveniment pentru administrator.",
+      "Editor al transcrierii de după eveniment, cu corectarea textului și reatribuirea vorbitorilor.",
+      "Revizuirea completă a interfeței de administrare: notificări și ferestre .italia în locul alertelor native ale browserului, indicatoare de încărcare și valori de design pentru culori în locul a sute de coduri hexazecimale scrise direct în cod.",
+      "Consimțământul fiecărui participant pentru înregistrarea pe mai multe piste (GDPR) și export extins de date conform art. 15."
+    ]
+  },
+  "0.4.0": {
+    "title": "Implicare și ciclu de viață",
+    "notes": [
+      "Funcții noi pentru timpul evenimentului: nor de cuvinte, cronometru de prezentare, contor de reacții, comenzi în stil Meet și panou al mâinilor ridicate.",
+      "Ciclul de viață al înregistrărilor, de la temporară la publicată, cu gestionare din zona de administrare (previzualizare, publicare, ștergere) și perioade de păstrare diferențiate.",
+      "Pagină de după eveniment organizată pe file (înregistrare, arhiva Q&A, sondaje, feedback, materiale), cu posibilitatea de a configura ce se publică și când.",
+      "Asistent de creare a evenimentelor în 5 pași, taxonomie a etichetelor, agendă de contacte și supratitlu editorial.",
+      "Bibliotecă video publică la /video-library și pagină de transparență la /service-inventory (CycloneDX 1.6 pentru fiecare tenant).",
+      "Scalare automată a JVB în două faze, cu instantanee Redis care alimentează pagina de stare.",
+      "Curățare GDPR în 3 etape: eliminarea imediată a datelor cu caracter personal, eliminarea conținutului la expirarea perioadei de păstrare și, în final, ștergerea definitivă."
+    ]
+  },
+  "0.3.0": {
+    "title": "Platformă configurabilă și infrastructură",
+    "notes": [
+      "Setări de site care permit reutilizarea platformei de către alte instituții publice — identitate vizuală, culori, favicon, SEO, subsol, modul paginii principale, pagini de confidențialitate și accesibilitate — fără o nouă compilare.",
+      "Tablou de bord cu analize și panou de administrare a infrastructurii.",
+      "3 moduri de instalare Helm (simple, standard, full) și JVB cu scalare până la zero, pe un grup de noduri dedicat.",
+      "Flux Jibri multi-cloud (Azure Blob, S3, GCS, MinIO sau stocare locală) și watermark Jitsi configurabil.",
+      "OpenSSF Scorecard, Dependabot, SBOM al dependențelor, gestionare centralizată a erorilor, limitarea numărului de solicitări și peste 210 teste unitare.",
+      "Numeroase actualizări intermediare (de la v0.3.8 la v0.3.45), în urma observațiilor primite după demonstrație."
+    ]
+  },
+  "0.2.0": {
+    "title": "Observațiile DTD",
+    "notes": [
+      "Profilarea participanților la înscriere (instituție, rol, categorie), configurabilă pentru fiecare eveniment, cu export CSV și statistici agregate.",
+      "Mementouri configurabile, cu mai multe momente de trimitere și mesaje diferite pentru fiecare.",
+      "Sondaje cu rezultate în timp real și export CSV.",
+      "Îmbunătățiri privind GDPR: politică de confidențialitate pentru fiecare eveniment, consimțăminte granulare, jurnal de audit al ștergerilor și export de date conform art. 15.",
+      "Consolidarea rolurilor de moderator și de auditor și audit al licențelor dependențelor."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP — prima versiune",
+    "notes": [
+      "Platformă publică pentru evenimente digitale, construită pe sistemul de design .italia (Bootstrap Italia, design-react-kit).",
+      "Sală în direct cu Jitsi Meet (IFrame API, autentificare JWT) și roluri aplicate pe server.",
+      "Înscrierea participanților în conformitate cu GDPR, cu datele cu caracter personal criptate (AES-256-GCM).",
+      "Q&A cu votare și moderare, sală de așteptare cu numărătoare inversă și acces pentru invitați.",
+      "E-mailuri de confirmare și de reamintire, integrare cu calendarul (Google, Outlook, Yahoo, iCal).",
+      "Panou de administrare cu autentificare prin cheie API, curățare GDPR și metrici Prometheus.",
+      "Chart Helm pregătit pentru producție, containere Docker fără drepturi de root și în regim doar-citire, CI/CD cu GitHub Actions, publiccode.yml."
+    ]
+  }
+}

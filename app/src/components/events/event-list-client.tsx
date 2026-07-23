@@ -254,22 +254,16 @@ export default function EventListClient({
                   className="d-flex justify-content-between align-items-center mt-auto pt-3"
                   style={{ borderTop: '1px solid #e8e8e8' }}
                 >
-                  {isEnded ? (
-                    event.recordingUrl ? (
-                      <Badge color="success" pill>
-                        <Icon icon="it-video" size="xs" className="me-1" />
-                        {t('detail.recording')}
-                      </Badge>
-                    ) : event.registrationCount > 0 ? (
-                      <span className="text-muted small">
-                        {t('card.registeredCount', { count: event.registrationCount })}
-                      </span>
-                    ) : null
-                  ) : (
-                    <Badge color="secondary" pill>
-                      <Icon icon="it-user" size="xs" className="me-1" />
-                      {t('card.registeredCount', { count: event.registrationCount })}
+                  {/* F5: il conteggio dei registrati non è più esposto
+                      pubblicamente sulle card. Manteniamo solo il badge
+                      "registrazione disponibile" per gli eventi conclusi. */}
+                  {isEnded && event.recordingUrl ? (
+                    <Badge color="success" pill>
+                      <Icon icon="it-video" size="xs" className="me-1" />
+                      {t('detail.recording')}
                     </Badge>
+                  ) : (
+                    <span />
                   )}
                   <CardReadMore
                     tag={Link}

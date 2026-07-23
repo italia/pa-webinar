@@ -234,6 +234,9 @@ export default function EventMaterialsManager({
       return;
     }
     try {
+      // Uploaded files are served from an absolute /api/assets/… URL (the
+      // upload route always returns an absolute URL), matching the server's
+      // absolute-URL contract.
       new URL(url);
     } catch {
       setError(t('errorGeneric'));
@@ -375,7 +378,40 @@ export default function EventMaterialsManager({
             id="mat-url"
             label={t('typeLabel')}
             value={draft.url || null}
-            onChange={(v) => setDraft((d) => ({ ...d, url: v ?? '' }))}
+            onChange={(v) =>
+              setDraft((d) => {
+                const next = v ?? '';
+                // No-op if the URL is unchanged (e.g. a blur on the URL tab of
+                // an existing FILE material) — otherwise we'd wrongly strip its
+                // FILE provenance and orphan the blob.
+                if (next === d.url) return d;
+                // A genuinely new/changed URL (or a clear) means this is a LINK,
+                // not an uploaded file: drop any FILE provenance from a prior
+                // upload so the row is labeled correctly.
+                return {
+                  ...d,
+                  url: next,
+                  type: 'LINK',
+                  fileName: null,
+                  fileSize: null,
+                  mimeType: null,
+                  blobPath: null,
+                };
+              })
+            }
+            onUpload={(meta) =>
+              setDraft((d) => ({
+                ...d,
+                url: meta.url,
+                type: 'FILE',
+                fileName: meta.filename,
+                fileSize: meta.size,
+                mimeType: meta.mime,
+                // Full storage key (assets/…) so the cleanup cron can delete
+                // the blob on retention/removal.
+                blobPath: meta.key,
+              }))
+            }
             assetType="document"
           />
         </div>

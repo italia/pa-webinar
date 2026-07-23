@@ -15,6 +15,14 @@ interface JitsiEventsState {
 /**
  * Subscribes to JitsiMeetExternalAPI events and exposes reactive state.
  * Cleans up all listeners on unmount or when the API instance changes.
+ *
+ * `humanParticipantCount` is called without the local identity here: this hook
+ * only has the API handle, and the roster of the external_api.js we serve DOES
+ * include the local user (see lib/jitsi/participants.ts), so the count is right
+ * without it. JitsiRoom passes name + endpoint id because it has them and that
+ * makes the count exact under BOTH roster shapes; if a Jitsi bump ever removes
+ * the local row, this consumer — currently only ModeratorControls — would
+ * under-report by one and should be given the same arguments.
  */
 export function useJitsiEvents(api: JitsiMeetExternalAPI | null): JitsiEventsState {
   const [participantCount, setParticipantCount] = useState(0);

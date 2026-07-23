@@ -1,0 +1,361 @@
+{
+  "0.8.9": {
+    "title": "Dziennik zmian, teraz z wbudowanym inwentarzem oprogramowania",
+    "notes": [
+      "Każde wydanie otwiera tutaj swój wykaz składników oprogramowania (SBOM): przeszukiwalną listę wszystkich dostarczonych składników, z wersją i ekosystemem — bez pobierania.",
+      "Sekcja techniczna to teraz zestaw odnośników — SBOM, wydanie na GitHubie, źródła przy danym tagu, potok kompilacji — zamiast akapitu, który powtarzał powyższe podsumowanie.",
+      "Stopka dodaje sygnały bezpieczeństwa projektu: OpenSSF Scorecard i wyniki skanowania kodu."
+    ]
+  },
+  "0.8.8": {
+    "title": "Strona nowości, przeprojektowana",
+    "notes": [
+      "Każde wydanie czyta się teraz na dwóch poziomach: najważniejsze zmiany, które są dla Ciebie istotne, oraz — pod zakładką „Szczegóły techniczne”, którą otwierasz tylko wtedy, gdy chcesz — praca techniczna, która za nimi stoi.",
+      "Każda wersja wydana z wykazem składników oprogramowania (SBOM) prowadzi bezpośrednio do swojego wydania na GitHubie, gdzie SBOM jest dołączony. Repozytorium kodu źródłowego jest teraz publiczne.",
+      "Pasek osi czasu u góry zniknął: stawał się zagracony w miarę przybywania wydań i niewiele mówił. Daty pozostają na każdej karcie."
+    ]
+  },
+  "0.8.7": {
+    "title": "Interfejs kompletny we wszystkich 24 językach i odświeżona identyfikacja wizualna",
+    "notes": [
+      "Interfejs jest teraz w pełni przetłumaczony na wszystkie 24 języki UE: wcześniej kilka ekranów — w tym poczekalnia i teksty zgód — przełączało się na włoski tam, gdzie brakowało tłumaczenia.",
+      "Odświeżone logo i identyfikacja wizualna (favicon, ikona, znak wodny) oraz podgląd z obrazem przy udostępnianiu linku do wydarzenia na czacie i w mediach społecznościowych.",
+      "Strona nowości w każdym języku, z odnośnikami do przejrzystości usług i do bezpieczeństwa."
+    ]
+  },
+  "0.8.6": {
+    "title": "Poczekalnia: strona i plac, na który wchodzi się z wyboru",
+    "notes": [
+      "Poczekalnia jest teraz przejrzystą stroną zgodną z systemem projektowym: wydarzenie, ustawienia dźwięku i obrazu, imię, czat. Mała gra zajmująca boczną ramkę została usunięta.",
+      "Interaktywny plac otwiera się tylko wtedy, gdy go wybierzesz, i zajmuje cały ekran. Obok pozostają te same elementy sterujące co na stronie — imię, mikrofon, kamera, czat, komunikaty — i w każdej chwili można wrócić. Kto woli bez animacji, przechodzi do wersji klasycznej, a wybór zostaje zapamiętany.",
+      "Awatary: jeśli do adresu, którym się zapisano, przypisany jest Gravatar, może teraz pojawić się jako zdjęcie w sali. Włącza to administrator, a zapytanie wysyła nasz serwer: przeglądarki uczestników nigdy nie łączą się z gravatar.com.",
+      "Składnik nagrywający wydarzenie nie pojawia się już wśród uczestników ani w liczniku: to usługa wewnętrzna, a nie osoba w sali. Informacja o nagrywaniu pozostaje bez zmian."
+    ]
+  },
+  "0.8.5": {
+    "title": "Żywszy czat: wzmianki, reakcje, poprawianie wiadomości i eksport",
+    "notes": [
+      "Czat: przywołanie kogoś z użyciem @ powoduje teraz wyróżnienie wiadomości, a osoba wskazana otrzymuje powiadomienie, jeśli akurat patrzy w inne miejsce. Wcześniej wzmianka niczym nie różniła się od zwykłej wiadomości.",
+      "Czat: na pojedynczą wiadomość można zareagować emoji, a własną wiadomość poprawić w ciągu piętnastu minut (pozostaje przy niej oznaczenie, że została zmieniona). Przycisk „Odpowiedz” stał się mniej rzucający się w oczy.",
+      "Czat: nowy przycisk pozwala pobrać całą rozmowę — w postaci tekstu albo w formacie danych. Wiadomości były przechowywane już wcześniej, brakowało jednak sposobu, aby je stamtąd zabrać.",
+      "W sali: licznik pokazuje, ile czasu pozostało do końca (albo ile upłynęło od rozpoczęcia). Jest domyślnie włączony dla osób prowadzących, a włączyć może go każdy.",
+      "Otwarcie strony wydarzenia na wiele godzin przed jego rozpoczęciem nie uruchamia już sali: jest ona wybudzana dopiero wtedy, gdy jest to potrzebne. Rozwiązuje to również przypadek, w którym wydarzenie było wyłączane kilka minut po rozpoczęciu.",
+      "Statystyki: szczytowa liczba uczestników jest teraz zapisywana również dla pojedynczej sesji połączenia, a nie wyłącznie dla całego wydarzenia."
+    ]
+  },
+  "0.8.4": {
+    "title": "Wiadomości potwierdzające: nazwa wydarzenia, obraz i konfigurowalny nadawca",
+    "notes": [
+      "Wiadomości potwierdzające zapisanie się na wydarzenie znów zawierają jego nazwę — zarówno w temacie, jak i w treści. Kto zapisywał się ze strony w języku, na który tytuł nie został przetłumaczony, otrzymywał wiadomość bez nazwy wydarzenia oraz załącznik kalendarza bez tytułu.",
+      "Wiadomości potwierdzające i przypomnienia zaczynają się teraz od obrazu wydarzenia i wyraźnie eksponują jego tytuł, zamiast umieszczać go wyłącznie w wierszu tabeli ze szczegółami.",
+      "Nowe ustawienia w panelu administracyjnym: nazwa, pod jaką nadawca pojawia się w skrzynce odbiorcy, oraz adres, na który mają trafiać odpowiedzi (wiadomości są wysyłane z adresu, który odpowiedzi nie odbiera).",
+      "Ogólniej: tekst, który nie został przetłumaczony na dany język, pokazuje teraz wersję oryginalną, zamiast pozostawać pusty — dotyczyło to również tytułów i opisów na stronach publicznych."
+    ]
+  },
+  "0.8.3": {
+    "title": "Poufność czatu, poprawna liczba uczestników i przywrócona moderacja",
+    "notes": [
+      "Historia czatu nie jest już dostępna dla osób, które nie biorą udziału w wydarzeniu. Wcześniej każdy, kto znał adres wydarzenia, mógł pobrać jego wiadomości — wraz z nazwami osób, które je napisały — nawet po zakończeniu wydarzenia. Teraz dostęp mają wyłącznie osoby zapisane na wydarzenie, moderatorzy oraz osoby przebywające w sali w trakcie jego trwania.",
+      "Liczba uczestników wyświetlana w sali była zaniżona o jedną osobę: nikt nie był liczony we własnym widoku. Ten sam błąd trafiał do statystyk wydarzenia (szczytowa liczba uczestników). Teraz licznik jest poprawny i zgodny z wartością zapisaną w statystykach.",
+      "Przywrócono działanie narzędzi moderatora na liście uczestników: usunięcie uczestnika z sali oraz regulacja głośności pojedynczych osób wcześniej nie przynosiły żadnego efektu.",
+      "Reakcje są teraz dostępne również na smartfonach, gdzie zniknął przycisk pozwalający je wysyłać. Przelatujące emoji nie przechwytują już kliknięć na pasku sterowania.",
+      "W trybie pełnoekranowym okna dialogowe — udostępnianie linku oraz, dla moderatora, „Opuść salę” — są znowu widoczne: wcześniej pozostawały ukryte za obrazem wideo, przez co przyciski sprawiały wrażenie niedziałających.",
+      "Szablony wydarzeń mają teraz domyślnie włączony czat, spójnie z ustawieniami samej sali: utworzenie wydarzenia z szablonu „Webinar” nadal dawało wydarzenie bez czatu.",
+      "Uzupełniono angielskie tłumaczenie interfejsu — brakowało kilku elementów, w tym całego okna „Udostępnij”."
+    ]
+  },
+  "0.8.2": {
+    "title": "Żadna pusta sala nie pozostaje otwarta po zaplanowanej godzinie zakończenia",
+    "notes": [
+      "Sala pozostawiona otwarta po godzinie zakończenia, a następnie opuszczona przez wszystkich, pozostawała aktywna bezterminowo i niepotrzebnie blokowała zasoby wideo. Teraz, jeśli przez 45 minut po zaplanowanej godzinie zakończenia pozostaje pusta, zostaje zamknięta. Sala, w której nadal ktoś przebywa, nigdy nie jest przerywana: po upływie zaplanowanego czasu pojawia się wyłącznie komunikat, nikt nie zostaje rozłączony."
+    ]
+  },
+  "0.8.1": {
+    "title": "Konfigurowalne reakcje, zamykanie pustej sali i bezpieczeństwo panelu administracyjnego",
+    "notes": [
+      "Reakcje (emoji) może teraz skonfigurować administrator: domyślnie używane są natywne reakcje Jitsi, dostępne bezpośrednio na pasku sterowania (lekkie i ulotne). Alternatywnie można włączyć własne reakcje platformy (pasek w lewym dolnym rogu), które są uwzględniane w statystykach wydarzenia.",
+      "Nowa opcja dla administratora: automatyczne zamykanie sali, w której nie pozostał już nikt (łącznie z moderatorem), co jest sygnałem porzucenia wydarzenia. Opcja jest domyślnie wyłączona — brak aktywności przy nieobecnym moderatorze jest już bezpiecznie obsługiwany, ponieważ sala przechodzi w stan uśpienia po 45 minutach — i można ją włączyć w ustawieniach.",
+      "Bezpieczniejszy panel administracyjny: po wygaśnięciu sesji następuje powrót do ekranu logowania, więc stron administracyjnych nie da się już używać po jej wygaśnięciu. Sama sesja trwa również dłużej i odnawia się automatycznie podczas pracy."
+    ]
+  },
+  "0.8.0": {
+    "title": "Przejrzystsza sala na żywo: czat, reakcje, tryb pełnoekranowy i zapisy",
+    "notes": [
+      "Czat: do wiadomości można teraz wstawiać emoji za pomocą osobnego selektora, a niewielki wskaźnik ostrzega, gdy aktualizacje czatu zaczynają się opóźniać. Wysyłane wiadomości pojawiają się natychmiast, również w sieciach firmowych buforujących aktualizacje przekazywane w czasie rzeczywistym.",
+      "Tryb pełnoekranowy: przycisk pełnego ekranu zachowuje teraz czat widoczny z boku, zamiast go ukrywać.",
+      "Reakcje (emoji) nie zasłaniają już elementów sterowania na dole ekranu: pasek pozostaje klikalny przez cały czas, także w widoku kafelkowym.",
+      "Przyciski „Udostępnij” i „Opuść salę” są teraz wyraźnie widoczne i domyślnie kolorowe (opuszczenie sali na czerwono), a nie dopiero po najechaniu kursorem.",
+      "Bot „Recorder” nie pojawia się już na liście uczestników ani w liczniku.",
+      "Zapisy: przy rejestracji z dużym wyprzedzeniem następuje przejście na stronę potwierdzenia z linkiem pozwalającym dodać wydarzenie do kalendarza, zamiast do poczekalni; tuż przed rozpoczęciem następuje wejście prosto do sali. Na stronie wydarzenia widać też, czy zapis został już dokonany.",
+      "Czat stał się głównym kanałem interakcji w sali. Usprawniono również automatyczne zamykanie wydarzenia pozostawionego bez uczestników oraz liczenie uczestników w statystykach."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderator może opuścić podniesioną rękę",
+    "notes": [
+      "W kolejce podniesionych rąk moderator ma teraz przycisk pozwalający opuścić rękę pojedynczego uczestnika — przydatny, gdy ktoś już zabrał głos albo przez pomyłkę zostawił podniesioną rękę. Żądanie dociera do tego uczestnika, który widzi, że jego ręka zostaje opuszczona; nikogo innego to nie dotyczy."
+    ]
+  },
+  "0.7.7": {
+    "title": "Mniej hałasu w tle podczas zabierania głosu",
+    "notes": [
+      "Zaawansowane usuwanie hałasu z tła włącza się w momencie zabrania głosu: lepiej tłumi dźwięki takie jak stukanie w klawiaturę, praca wentylatorów czy uliczny ruch, uzupełniając podstawową redukcję szumów, która działała już wcześniej."
+    ]
+  },
+  "0.7.6": {
+    "title": "Głośność ustawiana dla każdego uczestnika osobno",
+    "notes": [
+      "Nowa regulacja głośności dla poszczególnych uczestników w panelu „Uczestnicy”: jeśli czyjś głos jest zbyt donośny lub zbyt cichy, można go dostosować wyłącznie dla siebie, bez wpływu na dźwięk słyszany przez pozostałe osoby.",
+      "Osobne nagrywanie dźwięku każdego uczestnika, wykorzystywane w postprodukcji, jest bardziej niezawodne: jeśli nagranie okaże się ciche, system wykrywa to od razu i nie tworzy pustych transkrypcji."
+    ]
+  },
+  "0.7.5": {
+    "title": "Podniesiona ręka pozostaje podniesiona",
+    "notes": [
+      "Podniesiona ręka pozostaje teraz w górze do chwili, gdy uczestnik sam ją opuści albo moderator obsłuży zgłoszenie. Wcześniej opadała samoczynnie w momencie zabrania głosu, przez co osoba znikała z kolejki zgłoszeń do wypowiedzi."
+    ]
+  },
+  "0.7.4": {
+    "title": "Ochrona nazwy wyświetlanej na czacie przed przekazanymi linkami (bezpieczeństwo)",
+    "notes": [
+      "Na czacie prawdziwe dane osoby zapisanej na wydarzenie są pokazywane wyłącznie na urządzeniu, z którego dokonano rejestracji: kto otworzy przekazany dalej link do udziału, występuje pod nazwą, którą sam wpisze, a nie pod danymi osoby pierwotnie zapisanej. Zamknięto w ten sposób lukę pozwalającą na błędne przypisywanie wiadomości.",
+      "Ta sama ochrona obejmuje załączniki: plik wysłany z przekazanego linku nie jest już przypisywany do danych osoby pierwotnie zapisanej.",
+      "Osoby łączące się z drugiego urządzenia (na przykład z telefonu) lub przy użyciu linku otrzymanego z wyprzedzeniem nadal biorą udział, piszą na czacie i wysyłają załączniki bez przeszkód. Zmienia się jedynie wyświetlana nazwa, którą staje się ta wpisana przy wejściu do sali."
+    ]
+  },
+  "0.7.3": {
+    "title": "Poprawne liczenie obecnych, reakcje na środku ekranu i poprawki w sali",
+    "notes": [
+      "Licznik osób obecnych nie zwielokrotnia już tej samej osoby, która wychodzi i wraca — na przykład przyciskiem „Wstecz” w przeglądarce: podwójne połączenia tej samej osoby liczone są tylko raz. Lista uczestników nadal pokazuje każde połączenie, dzięki czemu moderator zawsze widzi wszystkich i może nimi zarządzać.",
+      "Pasek reakcji i emoji znajduje się teraz na dole ekranu, pośrodku — jest dobrze widoczny i łatwy do znalezienia — zamiast w lewym dolnym rogu.",
+      "Liczba osób zapisanych nie jest już pokazywana publicznie na stronie wydarzenia ani na liście wydarzeń: pozostaje widoczna dla administratorów w panelu. W trakcie transmisji na żywo publiczność widzi wyłącznie liczbę osób obecnych.",
+      "Tłumienie hałasu z tła jest teraz włączane automatycznie na wszystkich mikrofonach: podstawowe przetwarzanie dźwięku — echo i szumy — działa zawsze, bez potrzeby ręcznego włączania.",
+      "Nieco szybsze wejście do sali: „wybudzanie” systemu wideo rozpoczyna się już w chwili kliknięcia przycisku wejścia."
+    ]
+  },
+  "0.7.2": {
+    "title": "Bogatszy czat: załączniki, odpowiedzi i wzmianki",
+    "notes": [
+      "Na czacie można teraz wysyłać obrazy i załączniki (PNG, JPEG, WebP, GIF i PDF, do 10 MB), z podglądem bezpośrednio w wiadomości.",
+      "Nowa funkcja „Odpowiedz”: można zacytować konkretną wiadomość, a cytat pozostaje widoczny w wątku rozmowy.",
+      "Wzmianki z użyciem @: w treści wiadomości można przywołać uczestnika po nazwie.",
+      "Moderacja czatu: moderatorzy mogą usuwać pojedyncze wiadomości w trakcie wydarzenia."
+    ]
+  },
+  "0.7.1": {
+    "title": "Statystyki po wydarzeniu dla każdego wydarzenia",
+    "notes": [
+      "Nowa zakładka „Statystyki” przy każdym wydarzeniu w panelu administratora, dostępna także dla wydarzeń bez zapisów oraz bez nagrania wideo: pokazuje przebieg spotkania, kto mówił najdłużej, ogólny poziom zaangażowania i najważniejsze wskaźniki.",
+      "Wykres interakcji w czasie — czat, pytania, głosy oddane na pytania, ankiety, słowa z chmury słów i reakcje — z zaznaczonym najbardziej ożywionym momentem spotkania.",
+      "Zestawienie osób, które mówiły najdłużej (liczba minut na osobę), pokazujące równomierność rozłożenia wypowiedzi, wraz z licznikami reakcji i podniesionych rąk.",
+      "Nowe oszacowanie średniego czasu przebywania uczestników w sali, wykorzystywane także przy obliczaniu ogólnego wskaźnika uwagi."
+    ]
+  },
+  "0.7.0": {
+    "title": "Edytowalne nazwy prelegentów i odtwarzacz z samym dźwiękiem",
+    "notes": [
+      "Po zakończeniu wydarzenia można teraz zmieniać nazwy prelegentów, poprawiając dane mówców rozpoznane automatycznie w transkrypcji.",
+      "Jeśli nagranie nie zawiera obrazu możliwego do odtworzenia, strona korekty udostępnia mimo to odtwarzacz z samym dźwiękiem, pozwalający odsłuchać nagranie oraz poprawić tekst i przypisanie mówców.",
+      "Poprawka nagrywania wielościeżkowego: dźwięk zdalnych uczestników jest teraz rejestrowany prawidłowo."
+    ]
+  },
+  "0.6.9": {
+    "title": "Wiarygodność przetwarzania przez AI",
+    "notes": [
+      "Panel administratora pokazuje teraz wskaźnik wiarygodności przetwarzania przez AI po wydarzeniu (transkrypcja, streszczenia, tłumaczenia), pozwalający od razu ocenić, czy wynik jest kompletny i godny zaufania."
+    ]
+  },
+  "0.6.8": {
+    "title": "Czytelniejsza strona edycji materiałów po wydarzeniu",
+    "notes": [
+      "Strona korekty transkrypcji, streszczeń i tłumaczeń wyjaśnia teraz, kiedy treści przygotowane przez AI nie są jeszcze dostępne — „przetwarzanie w toku” albo „uruchom przetwarzanie za pomocą przycisków u góry” — zamiast pokazywać czerwony komunikat o błędzie, który wyglądał jak awaria.",
+      "Nieudany zapis jest teraz oznaczany na czerwono i zawiera konkretny powód zwrócony przez serwer, zamiast wyświetlać się na zielono, jak gdyby zakończył się powodzeniem.",
+      "Wygaśnięcie sesji administratora i problem z wczytaniem danych są teraz rozróżniane osobnymi komunikatami, a nie jednym ogólnym błędem.",
+      "Jeśli dźwięku nagrania nie da się odtworzyć, strona informuje o tym, a mimo to nadal można poprawić tekst i przypisanie mówców w poszczególnych fragmentach."
+    ]
+  },
+  "0.6.7": {
+    "title": "Zawsze widoczne reakcje oraz „Notatki / Lista kontrolna”",
+    "notes": [
+      "Reakcje (emoji) są teraz zawsze widoczne na pasku w lewym dolnym rogu, a nie ukryte pod przyciskiem: łatwiej je znaleźć i wykorzystać w trakcie wydarzenia.",
+      "Funkcja „Agenda” została przemianowana na „Notatki / Lista kontrolna”, aby jasno wskazać, że jest to obszar notatek w formie listy kontrolnej, którego treść nie trafia na czat. Moderator nadal może ją włączyć dla każdego wydarzenia."
+    ]
+  },
+  "0.6.6": {
+    "title": "Poprawki: czat, liczniki i dostęp",
+    "notes": [
+      "Linki udostępniane na czacie są teraz klikalne i otwierają się bezpiecznie w nowej karcie; wcześniej były zwykłym tekstem.",
+      "W sali łączna liczba osób zapisanych jest teraz widoczna wyłącznie dla moderatorów: uczestnicy widzą jedynie, ile osób jest faktycznie obecnych.",
+      "Szybsze wejście do sali: połączenie z serwerem wideo jest przygotowywane już w poczekalni, co skraca oczekiwanie w momencie wejścia.",
+      "Na liście uczestników nagłówek z licznikiem pozostaje widoczny podczas przewijania listy."
+    ]
+  },
+  "0.6.5": {
+    "title": "Nagrania i liczniki",
+    "notes": [
+      "Licznik osób obecnych w sali nie uwzględnia już rejestratora: pokazuje wyłącznie rzeczywiste osoby, a nie bota nagrywającego dźwięk.",
+      "Postprodukcja: nowy przycisk „Wygeneruj z AI” pozwala uruchomić transkrypcję, streszczenie i tłumaczenie także dla nagrań zawierających sam dźwięk, po jednej ścieżce na uczestnika. Wcześniej nie miały one żadnego przycisku uruchamiającego przetwarzanie.",
+      "Na liście ścieżek obok pseudonimów pojawia się identyfikator: różne osoby o tym samym pseudonimie otrzymują odrębne identyfikatory, natomiast kolejne wypowiedzi tej samej osoby mają identyfikator wspólny.",
+      "Czytelny komunikat, gdy uruchomienie potoku przetwarzania nie kolejkuje żadnego zadania — bo AI jest wyłączona dla danego wydarzenia albo potok jest wstrzymany — zamiast mylącego „operacja zakończona powodzeniem”."
+    ]
+  },
+  "0.6.4": {
+    "title": "Bezpieczeństwo tożsamości i poprawki w sali",
+    "notes": [
+      "Poprawka bezpieczeństwa: przy udostępnieniu własnego, osobistego linku do sali osoba, która go otworzy, wchodzi teraz pod WŁASNĄ nazwą; wcześniej mogła przejąć nazwę osoby, która wysłała link.",
+      "Wyraźniejsze udostępnianie ekranu: pierwszeństwo ma teraz rozdzielczość (5 klatek na sekundę w wysokiej jakości), a nie płynność, dzięki czemu slajdy i dokumenty pozostają czytelne również przy niewielkim ruchu obrazu.",
+      "Usunięto funkcję „ukryj własny obraz”, która po włączeniu nie pozwalała już przywrócić własnego kafelka.",
+      "Dostęp administratora: po ponownym zalogowaniu wymuszonym bezczynnością strona odświeża się prawidłowo — koniec z ekranami, które sprawiały wrażenie zablokowanych do czasu ręcznego przeładowania."
+    ]
+  },
+  "0.6.3": {
+    "title": "Poprawki w sali wydarzenia — runda 2",
+    "notes": [
+      "Zegar prezentacji jest teraz wbudowany w pasek sterowania moderatora i nie zajmuje osobnego wiersza; pasek odliczania pojawia się wyłącznie wtedy, gdy zegar jest uruchomiony.",
+      "Na czacie widoczna jest prawdziwa nazwa osoby piszącej, a nie ogólne „Moderator”.",
+      "Czat stał się osobnym panelem na pasku bocznym i nie nakłada się już stale na pozostałe treści: interfejs jest czytelniejszy, a na zakładce widnieje licznik nieprzeczytanych wiadomości.",
+      "Nowy przycisk „Tablica” pozwala moderatorom otworzyć wspólną tablicę bezpośrednio z paska sterowania.",
+      "Przycisk „Udostępnij” ma poprawny kolor, więc nie da się go już pomylić z „Opuść”; przy linkach pojawiły się ikony, a link moderatorski, widoczny wyłącznie dla moderatorów, został ukryty za ostrzeżeniem, tak aby zapraszanie kolejnych moderatorów odbywało się bezbłędnie.",
+      "Chmura słów nie jest już włączona domyślnie: moderator może ją uruchomić według uznania w trakcie wydarzenia."
+    ]
+  },
+  "0.6.2": {
+    "title": "Poprawki w sali wydarzenia na żywo",
+    "notes": [
+      "Pasek sterowania (mikrofon, kamera, udostępnianie ekranu) pozostaje zawsze widoczny i klikalny: również w trybie pełnoekranowym, podczas udostępniania ekranu oraz gdy w sali jest tylko jedna osoba.",
+      "Moderator może ponownie włączać i wyłączać funkcje działające na żywo (Pytania, Czat, Agenda) w trakcie wydarzenia.",
+      "Sterowanie dźwiękiem i obrazem działa już na etapie przygotowywania sali, bez czekania na uruchomienie serwera wideo.",
+      "Lista „Podniesione ręce” prawidłowo pokazuje osoby, które zgłosiły się do zabrania głosu.",
+      "Nowy przycisk „Udostępnij” w sali kopiuje jednym kliknięciem link do udziału oraz link do strony wydarzenia, bez ujawniania poufnych tokenów.",
+      "Znak PA Webinar jest znów widoczny na górnym pasku sali wydarzenia."
+    ]
+  },
+  "0.6.1": {
+    "title": "Publiczny rejestr zmian i aktualizacje bezpieczeństwa",
+    "notes": [
+      "Nowa publiczna strona z rejestrem zmian, dostępna po kliknięciu numeru wersji w stopce: zawiera wykaz wszystkich wersji platformy wraz z najważniejszymi nowościami.",
+      "Aktualizacje bezpieczeństwa zależności (undici, nodemailer) oraz wzmocnienie potoku budowania aplikacji o skanowanie podatności."
+    ]
+  },
+  "0.6.0": {
+    "title": "Proces po wydarzeniu i interaktywna poczekalnia",
+    "notes": [
+      "Nowy proces zakończenia wydarzenia: po jego zakończeniu moderator wskazuje w osobnym oknie przeznaczenie nagrania — publikacja na stronie, umieszczenie w bibliotece albo pozostawienie wyłącznie w archiwum.",
+      "Automatyczne i zanonimizowane podsumowanie po wydarzeniu (uczestnicy, najwyżej ocenione pytania, wyniki ankiet, chmura słów, oceny), prezentowane na stronie każdego zakończonego wydarzenia, także wtedy, gdy nie ma nagrania.",
+      "Wiadomość e-mail z podsumowaniem po wydarzeniu, wysyłana do uczestników wraz z materiałami z wydarzenia.",
+      "Interaktywna poczekalnia „Piazza Digitale”: własnym awatarem można podejść do bramy, aby wejść do spotkania, a obok zawsze pozostaje klasyczny przycisk wejścia.",
+      "Chmura słów jako osobna sekcja na stronie zakończonego wydarzenia, z przełącznikiem widoczności dla administratora.",
+      "Wspólna tablica (whiteboard) do włączenia dla pojedynczego wydarzenia oraz z poziomu szablonu.",
+      "Przeprojektowany kreator tworzenia wydarzenia: zwinięte opcje zaawansowane, główny moderator wraz z linkiem, ostrzeżenia dotyczące danych osobowych, zapisywanie wersji roboczej i lepsza obsługa błędów częściowych.",
+      "Zróżnicowane okresy przechowywania nagrań oraz ścieżek dźwiękowych poszczególnych prelegentów, powiązane z sygnałem „wideo opublikowane”, wraz z czyszczeniem czatu zgodnie z GDPR."
+    ]
+  },
+  "0.5.11": {
+    "title": "Poprawki moderacji, zakończenia spotkania i dźwięku",
+    "notes": [
+      "Moderatorzy występują pod swoimi prawdziwymi nazwami zamiast ogólnego „Moderator”.",
+      "Ekran zakończenia wyświetlany w aplikacji, gdy wydarzenie dobiegnie końca — koniec z mylącym komunikatem „Sala w przygotowaniu”.",
+      "Poprawiono nakładanie się ikon w poczekalni.",
+      "Wymuszone wyłączenie tłumienia szumów przez IFrame API w celu rozwiązania problemów z dźwiękiem."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabilne nagrywanie wielościeżkowe, ocena w gwiazdkach i wydajność",
+    "notes": [
+      "Nagrywanie w podziale na prelegentów (wielościeżkowe) działa niezawodnie od początku do końca: pełny dźwięk na każdej ścieżce, brak ucięć, równoległe przesyłanie plików.",
+      "Ankieta oceny po wydarzeniu w formie gwiazdek wraz z panelem podsumowującym dla administratora.",
+      "Poprawa wydajności: kodek VP9 dla kamery, leniwe ładowanie na urządzeniach mobilnych, dostrojenie rejestratora.",
+      "Hook Helm uruchamiany po aktualizacji, automatycznie przeładowujący plik config.js Jitsi."
+    ]
+  },
+  "0.5.8": {
+    "title": "Konfigurowalna jakość obrazu i dźwięku oraz nowy proces wejścia",
+    "notes": [
+      "Jakość obrazu i dźwięku konfigurowana przez administratora, z ustawieniami predefiniowanymi dla poszczególnych wydarzeń.",
+      "Przeprojektowany proces dołączania: rejestracja, następnie poczekalnia, następnie spotkanie wideo.",
+      "Podniesienie ręki pokazuje prawdziwą nazwę każdego uczestnika."
+    ]
+  },
+  "0.5.6": {
+    "title": "Konfigurowalna poczekalnia i obrazy okładkowe wydarzeń",
+    "notes": [
+      "Konfigurowalny tryb poczekalni (gra / ogród / klasyczna), zarówno dla całego serwisu, jak i dla pojedynczego wydarzenia.",
+      "Obrazy okładkowe na stronie wydarzenia i w miniaturach kart.",
+      "Przesłane pliki udostępniane przez osobną ścieżkę, z podpisanymi adresami o krótkim terminie ważności.",
+      "Przycisk „Wejdź teraz” dostępny od razu po zapisaniu się na wydarzenie.",
+      "Uporządkowanie sekcji administracyjnej służącej do zarządzania przetwarzaniem nagrań przez AI oraz wzmocnienie rejestrowania wielościeżkowego."
+    ]
+  },
+  "0.5.2": {
+    "title": "Przygotowanie wydarzenia i poprawki",
+    "notes": [
+      "Agenda z możliwością wyrażenia poparcia lub sprzeciwu oraz poprawki uprawnień dziedziczonych z szablonów.",
+      "Prawdziwe nazwy zamiast „SPEAKER_00” w streszczeniach i napisach.",
+      "Seria poprawek (v0.5.2–v0.5.5) w ramach przygotowań do wydarzeń publicznych."
+    ]
+  },
+  "0.5.1": {
+    "title": "Strona główna zorientowana na społeczność i archiwum wielościeżkowe",
+    "notes": [
+      "Przeprojektowana strona główna w duchu community-first, z możliwością nadpisywania tłumaczeń w czasie działania serwisu i zgodnością z wymaganiami dostępności AgID.",
+      "Archiwum MKV z wieloma ścieżkami oraz odtwarzacz pozwalający odsłuchać każdego prelegenta z osobna.",
+      "Zsynchronizowanie ścieżek wielościeżkowych z miksem Jibri metodą korelacji wzajemnej."
+    ]
+  },
+  "0.5.0": {
+    "title": "Postprodukcja z udziałem AI i nagrywanie wielościeżkowe",
+    "notes": [
+      "Potok postprodukcji z udziałem AI: transkrypcja, streszczenia, napisy, tłumaczenia i wielogłosowy dubbing (zawsze syntetyczny), z udokumentowanym pochodzeniem modeli.",
+      "Nagrywanie wielościeżkowe, po jednej ścieżce na prelegenta, z przypisaniem mówców i automatycznym nazewnictwem (ADR-013).",
+      "Publiczna biblioteka wideo oraz strona zarządzania materiałami po wydarzeniu dla administratora.",
+      "Edytor transkrypcji po wydarzeniu, pozwalający poprawić tekst i ponownie przypisać mówców.",
+      "Przebudowa interfejsu administracyjnego: powiadomienia i okna dialogowe .italia zamiast natywnych alertów przeglądarki, wskaźniki wczytywania treści oraz tokeny kolorów zamiast setek wartości szesnastkowych wpisanych na sztywno.",
+      "Zgoda każdego uczestnika na nagrywanie wielościeżkowe (GDPR) oraz rozszerzony eksport danych z art. 15."
+    ]
+  },
+  "0.4.0": {
+    "title": "Zaangażowanie i cykl życia materiałów",
+    "notes": [
+      "Nowe funkcje działające na żywo: chmura słów, zegar prezentacji, licznik reakcji, sterowanie w stylu Meet oraz panel podniesionych rąk.",
+      "Cykl życia nagrań, od tymczasowego do opublikowanego, z obsługą administracyjną (podgląd, publikacja, usunięcie) i zróżnicowanymi okresami przechowywania.",
+      "Strona po wydarzeniu w formie zakładek (nagranie, archiwum Q&A, ankiety, oceny, materiały), z możliwością decydowania, co i kiedy jest udostępniane.",
+      "Pięcioetapowy kreator tworzenia wydarzenia, taksonomia tagów, książka kontaktów oraz redakcyjny nadtytuł.",
+      "Publiczna biblioteka wideo pod adresem /video-library oraz strona przejrzystości /service-inventory (CycloneDX 1.6 dla każdego podmiotu).",
+      "Dwuetapowe automatyczne skalowanie JVB, z migawką w Redis zasilającą stronę statusu.",
+      "Trzyetapowe czyszczenie danych zgodne z GDPR: natychmiastowe usunięcie danych osobowych, usunięcie treści po upływie okresu przechowywania, a następnie trwałe usunięcie."
+    ]
+  },
+  "0.3.0": {
+    "title": "Konfigurowalna platforma i infrastruktura",
+    "notes": [
+      "Ustawienia serwisu pozwalające innym podmiotom publicznym ponownie wykorzystać platformę — identyfikacja wizualna, kolory, favicon, SEO, stopka, tryb strony głównej, strony prywatności i dostępności — bez ponownego budowania aplikacji.",
+      "Panel analityczny oraz administracyjny podgląd infrastruktury.",
+      "Trzy tryby wdrożenia Helm (simple / standard / full) oraz skalowanie JVB do zera z dedykowaną pulą węzłów.",
+      "Wielochmurowy potok Jibri (Azure Blob / S3 / GCS / MinIO / dysk lokalny) oraz konfigurowalny znak wodny Jitsi.",
+      "OpenSSF Scorecard, Dependabot, SBOM zależności, scentralizowana obsługa błędów, ograniczanie liczby żądań i ponad 210 testów jednostkowych.",
+      "Liczne wydania przyrostowe (v0.3.8–v0.3.45) w odpowiedzi na uwagi zebrane po prezentacji."
+    ]
+  },
+  "0.2.0": {
+    "title": "Uwagi zgłoszone przez DTD",
+    "notes": [
+      "Profilowanie uczestników podczas zapisów (instytucja, stanowisko, typ), konfigurowalne dla każdego wydarzenia, z eksportem do CSV i statystykami zbiorczymi.",
+      "Konfigurowalne przypomnienia, wysyłane z wyprzedzeniem w kilku terminach i o zróżnicowanej treści.",
+      "Ankiety z wynikami w czasie rzeczywistym i eksportem do CSV.",
+      "Usprawnienia w zakresie GDPR: polityka prywatności dla każdego wydarzenia, szczegółowe zgody, dziennik audytowy usunięć oraz eksport danych z art. 15.",
+      "Uporządkowanie ról moderatora i audytora oraz audyt licencji zależności."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP — pierwsza wersja",
+    "notes": [
+      "Publiczna platforma wydarzeń cyfrowych oparta na systemie projektowym .italia (Bootstrap Italia, design-react-kit).",
+      "Sala na żywo oparta na Jitsi Meet (IFrame API, uwierzytelnianie JWT), z rolami egzekwowanymi po stronie serwera.",
+      "Zapisy uczestników zgodne z GDPR, z szyfrowaniem danych osobowych (AES-256-GCM).",
+      "Q&A z głosowaniem na pytania i moderacją, poczekalnia z odliczaniem oraz dostęp dla gości.",
+      "Wiadomości potwierdzające i przypomnienia, integracja z kalendarzami (Google, Outlook, Yahoo, iCal).",
+      "Panel administracyjny z uwierzytelnianiem kluczem API, czyszczenie danych zgodne z GDPR, metryki Prometheus.",
+      "Chart Helm klasy produkcyjnej, obrazy Docker uruchamiane bez uprawnień roota i w trybie tylko do odczytu, CI/CD w GitHub Actions, publiccode.yml."
+    ]
+  }
+}

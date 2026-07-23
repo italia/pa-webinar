@@ -1,0 +1,361 @@
+{
+  "0.8.9": {
+    "title": "Das Änderungsprotokoll, jetzt mit integriertem Software-Inventar",
+    "notes": [
+      "Jede Version öffnet ihre Software-Stückliste (SBOM) direkt hier: eine durchsuchbare Liste aller mitgelieferten Komponenten mit Version und Ökosystem — kein Download nötig.",
+      "Der technische Abschnitt ist jetzt eine Reihe von Links — SBOM, die GitHub-Release, die Quellen zu diesem Tag, die Build-Pipeline — statt eines Absatzes, der die Zusammenfassung darüber wiederholte.",
+      "Die Fußzeile ergänzt die Sicherheitssignale des Projekts: die OpenSSF Scorecard und die Ergebnisse des Code-Scannings."
+    ]
+  },
+  "0.8.8": {
+    "title": "Die Neuigkeiten-Seite, neu gestaltet",
+    "notes": [
+      "Jede Version liest sich jetzt auf zwei Ebenen: die Highlights, die für Sie zählen, und — unter einem Reiter „Technische Details“, den Sie nur bei Bedarf öffnen — die Technik dahinter.",
+      "Jede Version, die mit einer Software-Stückliste (SBOM) ausgeliefert wird, verweist direkt auf ihre Release auf GitHub, wo die SBOM angehängt ist. Das Quellcode-Repository ist jetzt öffentlich.",
+      "Der Zeitleisten-Streifen oben ist weg: Er wurde mit wachsender Zahl der Versionen unübersichtlich und sagte wenig aus. Die Daten bleiben auf jeder Karte."
+    ]
+  },
+  "0.8.7": {
+    "title": "Die Oberfläche vollständig in allen 24 Sprachen, und eine erneuerte visuelle Identität",
+    "notes": [
+      "Die Oberfläche ist jetzt in allen 24 EU-Sprachen vollständig übersetzt: zuvor wichen mehrere Ansichten — darunter der Warteraum und die Einwilligungstexte — auf Italienisch aus, wo eine Übersetzung fehlte.",
+      "Erneuertes Logo und visuelle Identität (Favicon, Symbol, Wasserzeichen) sowie eine Bildvorschau, wenn ein Veranstaltungslink im Chat und in sozialen Netzwerken geteilt wird.",
+      "Eine Neuigkeiten-Seite in jeder Sprache, mit Links zur Transparenz der Dienste und zur Sicherheit."
+    ]
+  },
+  "0.8.6": {
+    "title": "Der Warteraum: eine Seite und ein Platz, den man betreten kann",
+    "notes": [
+      "Der Warteraum ist jetzt eine aufgeräumte Seite nach dem Designsystem: die Veranstaltung, die Ton- und Videoeinstellungen, Ihr Name, der Chat. Das kleine Spiel im Seitenkasten wurde entfernt.",
+      "Der interaktive Platz öffnet sich nur, wenn Sie ihn wählen, und füllt den Bildschirm. Die Bedienelemente der Seite bleiben daneben — Name, Mikrofon, Kamera, Chat, Hinweise — und Sie können jederzeit zurück. Wer lieber keine Animation möchte, wechselt zur klassischen Ansicht; diese Wahl wird gemerkt.",
+      "Avatare: Ist mit Ihrer Anmeldeadresse ein Gravatar verknüpft, kann er nun als Bild im Raum erscheinen. Eine Administratorin oder ein Administrator schaltet das frei, und unser Server stellt die Anfrage: Die Browser der Teilnehmenden kontaktieren gravatar.com nie.",
+      "Die Komponente, die die Veranstaltung aufzeichnet, erscheint nicht mehr in der Teilnehmerliste und nicht in der Zählung: Sie ist ein interner Dienst, keine Person im Raum. Der Hinweis auf die Aufzeichnung bleibt unverändert."
+    ]
+  },
+  "0.8.5": {
+    "title": "Lebendigerer Chat: Erwähnungen, Reaktionen, Korrekturen und Export",
+    "notes": [
+      "Chat: Werden Sie mit @ namentlich angesprochen, ist die Nachricht jetzt hervorgehoben; schauen Sie gerade woanders hin, erhalten Sie eine Benachrichtigung. Bisher unterschied sich eine Erwähnung nicht von einer beliebigen anderen Nachricht.",
+      "Chat: Auf eine einzelne Nachricht lässt sich jetzt mit einem Emoji reagieren, und eine eigene Nachricht kann innerhalb von fünfzehn Minuten korrigiert werden (sie bleibt als bearbeitet gekennzeichnet). Die Schaltfläche „Antworten“ tritt jetzt dezenter auf.",
+      "Chat: Eine neue Schaltfläche lädt den Gesprächsverlauf herunter – als Text oder in einem Datenformat. Die Nachrichten wurden bereits gespeichert, es gab jedoch keine Möglichkeit, sie mitzunehmen.",
+      "Im Raum zeigt eine Zeitanzeige, wie viel Zeit bis zum Ende bleibt (oder wie lange die Veranstaltung schon läuft): für die Moderation standardmäßig eingeschaltet und für alle anderen zuschaltbar.",
+      "Ein Raum wird nicht mehr allein dadurch gestartet, dass jemand die Veranstaltungsseite Stunden im Voraus öffnet: Er wird erst dann hochgefahren, wenn es nötig ist, wie vorgesehen. Damit ist auch ein Fall behoben, in dem eine Veranstaltung wenige Minuten nach dem Beginn abgeschaltet wurde.",
+      "Statistik: Die Höchstzahl der Teilnehmenden wird jetzt auch für die einzelne Konferenzsitzung erfasst, nicht mehr nur für die gesamte Veranstaltung."
+    ]
+  },
+  "0.8.4": {
+    "title": "Bestätigungs-E-Mails: Name der Veranstaltung, Bild und konfigurierbarer Absender",
+    "notes": [
+      "Die E-Mails zur Bestätigung der Anmeldung enthalten wieder den Namen der Veranstaltung – im Betreff und im Text. Wer sich von einer Seite in einer Sprache aus anmeldete, in die der Titel nicht übersetzt worden war, erhielt eine E-Mail ohne den Namen der Veranstaltung und einen Kalenderanhang ohne Titel.",
+      "Bestätigungs-E-Mails und Erinnerungen zeigen jetzt oben das Bild der Veranstaltung und den Titel gut sichtbar hervorgehoben, statt ihn nur in einer Zeile der Detailtabelle aufzuführen.",
+      "Neue Einstellungen im Verwaltungsbereich: der Name, unter dem der Absender im Posteingang der Empfangenden erscheint, sowie eine Antwortadresse (die E-Mails werden von einer Adresse versendet, die keine Antworten empfängt).",
+      "Ganz allgemein wird ein Text, der nicht in eine Sprache übersetzt wurde, jetzt im Original angezeigt, statt leer zu bleiben – das betraf auch Titel und Beschreibungen auf den öffentlichen Seiten."
+    ]
+  },
+  "0.8.3": {
+    "title": "Vertraulicher Chat, korrekte Teilnehmendenzahl und wiederhergestellte Moderationsfunktionen",
+    "notes": [
+      "Der Chatverlauf ist nicht mehr für Personen einsehbar, die nicht an der Veranstaltung teilnehmen. Bisher konnte jede Person, die die Adresse einer Veranstaltung kannte, deren Nachrichten samt der Namen der Verfassenden herunterladen – auch nach dem Ende der Veranstaltung. Erforderlich sind jetzt eine Anmeldung, Moderationsrechte oder die Anwesenheit im Raum während der laufenden Veranstaltung.",
+      "Die im Raum angezeigte Teilnehmendenzahl war um eins zu niedrig: Die eigene Person wurde nicht mitgezählt. Derselbe Fehler wirkte sich auf die Veranstaltungsstatistik aus (Höchstzahl der Teilnehmenden). Die Zählung ist jetzt korrekt und stimmt mit dem in der Statistik erfassten Wert überein.",
+      "Die Moderationsfunktionen in der Teilnehmendenliste wirken wieder: Das Entfernen einer teilnehmenden Person und die individuelle Lautstärkeregelung blieben zuvor ohne Wirkung.",
+      "Reaktionen stehen jetzt auch auf dem Smartphone zur Verfügung, wo die Schaltfläche zum Senden ganz fehlte. Die über den Bildschirm fliegenden Emojis fangen außerdem keine Klicks auf der Steuerungsleiste mehr ab.",
+      "Im Vollbild sind Dialogfenster wieder sichtbar – das Teilen des Links und, für die Moderation, „Raum verlassen“: Bisher blieben sie hinter dem Video verborgen, sodass die Schaltflächen wirkungslos schienen.",
+      "Veranstaltungsvorlagen starten jetzt mit aktiviertem Chat, passend zum Raum: Beim Anlegen eines „Webinars“ entstand bisher weiterhin eine Veranstaltung ohne Chat.",
+      "Die englische Übersetzung der Benutzeroberfläche ist vollständig; zuvor fehlten einzelne Texte, darunter das gesamte Fenster „Teilen“."
+    ]
+  },
+  "0.8.2": {
+    "title": "Kein leerer Raum bleibt über die Endzeit hinaus geöffnet",
+    "notes": [
+      "Ein Raum, der über die geplante Endzeit hinaus geöffnet blieb und sich danach leerte, wurde zeitlich unbegrenzt aktiv gehalten und belegte unnötig Videoressourcen. Bleibt er nach der geplanten Endzeit 45 Minuten lang leer, wird er jetzt geschlossen. Ein noch genutzter Raum wird dagegen nie unterbrochen: Nach der Endzeit erscheint lediglich ein Hinweis, niemand wird getrennt."
+    ]
+  },
+  "0.8.1": {
+    "title": "Konfigurierbare Reaktionen, Schließen leerer Räume und mehr Sicherheit im Verwaltungsbereich",
+    "notes": [
+      "Die Emoji-Reaktionen lassen sich jetzt von der Administration konfigurieren: Standardmäßig kommen die nativen Reaktionen von Jitsi zum Einsatz, direkt in der Steuerungsleiste (schlank und kurzlebig). Alternativ lassen sich die plattformeigenen Reaktionen aktivieren (Leiste unten links), die in der Veranstaltungsstatistik mitgezählt werden.",
+      "Neue Option für die Administration: Ein vollständig leerer Raum – auch ohne Moderation – kann automatisch geschlossen werden, weil dies auf eine verlassene Veranstaltung hindeutet. Die Option ist standardmäßig deaktiviert, denn Inaktivität ohne Moderation wird bereits sicher behandelt (der Raum geht nach 45 Minuten in den Ruhezustand), und kann in den Einstellungen eingeschaltet werden.",
+      "Sicherer Verwaltungsbereich: Nach Ablauf der Sitzung gelangt man zurück zum Login-Bildschirm, sodass sich keine Verwaltungsseiten mehr mit abgelaufener Sitzung nutzen lassen. Zudem laufen die Sitzungen länger und werden während der Arbeit automatisch verlängert."
+    ]
+  },
+  "0.8.0": {
+    "title": "Aufgeräumter Veranstaltungsraum: Chat, Reaktionen, Vollbild und Anmeldung",
+    "notes": [
+      "Chat: Emojis lassen sich jetzt über eine eigene Auswahl in Nachrichten einfügen, und ein kleiner Hinweis meldet, wenn die Chat-Aktualisierung ins Stocken gerät. Eigene Nachrichten erscheinen sofort – auch in Unternehmensnetzen, die Aktualisierungen in Echtzeit zwischenspeichern.",
+      "Vollbild: Die Schaltfläche für das Vollbild lässt den Chat jetzt seitlich sichtbar, statt ihn auszublenden.",
+      "Die Emoji-Reaktionen verdecken die Bedienelemente am unteren Rand nicht mehr: Die Leiste bleibt jederzeit anklickbar, auch in der Kachelansicht.",
+      "Die Schaltflächen „Teilen“ und „Raum verlassen“ sind jetzt standardmäßig gut sichtbar und farbig hervorgehoben (Verlassen in Rot) – nicht mehr erst beim Überfahren mit der Maus.",
+      "Der Bot „Recorder“ erscheint weder in der Teilnehmendenliste noch in der Zählung.",
+      "Anmeldung: Wer sich lange im Voraus anmeldet, gelangt jetzt auf eine Bestätigungsseite mit dem Link zum Eintrag in den eigenen Kalender, statt in den Warteraum; kurz vor Beginn geht es direkt in den Raum. Auf der Veranstaltungsseite ist außerdem zu sehen, ob man bereits angemeldet ist.",
+      "Der Chat ist jetzt der zentrale Kanal für den Austausch im Raum. Verbessert wurden außerdem das automatische Schließen leer gebliebener Veranstaltungen und die Zählung der Teilnehmenden in der Statistik."
+    ]
+  },
+  "0.7.8": {
+    "title": "Die Moderation kann eine erhobene Hand senken",
+    "notes": [
+      "In der Warteschlange der erhobenen Hände steht der Moderation jetzt eine Schaltfläche zur Verfügung, um die Hand einer einzelnen teilnehmenden Person zu senken – hilfreich, wenn jemand bereits gesprochen oder die Hand versehentlich oben gelassen hat. Die Anfrage erreicht genau diese Person, deren Hand sichtbar sinkt; alle anderen bleiben unberührt."
+    ]
+  },
+  "0.7.7": {
+    "title": "Weniger Hintergrundgeräusche beim Sprechen",
+    "notes": [
+      "Sobald Sie das Wort ergreifen, wird die erweiterte Unterdrückung von Hintergrundgeräuschen aktiv: Sie dämpft Geräusche wie Tastatur, Lüfter oder Straßenverkehr deutlich besser – zusätzlich zur bereits vorhandenen Grundunterdrückung."
+    ]
+  },
+  "0.7.6": {
+    "title": "Lautstärke je teilnehmender Person",
+    "notes": [
+      "Neue Lautstärkeregelung für einzelne Teilnehmende im Bereich „Teilnehmende“: Ist eine Stimme zu laut oder zu leise, passen Sie sie nur für sich selbst an, ohne den Ton für die anderen zu verändern.",
+      "Die getrennte Audioaufzeichnung je teilnehmender Person (für die Nachbearbeitung) ist zuverlässiger geworden: Bleibt eine Aufnahme stumm, erkennt das System dies sofort und erzeugt keine leeren Transkripte."
+    ]
+  },
+  "0.7.5": {
+    "title": "Die erhobene Hand bleibt oben",
+    "notes": [
+      "Wenn Sie die Hand heben, bleibt sie jetzt oben, bis Sie sie selbst senken oder die Moderation sie bearbeitet: Bisher senkte sie sich von selbst, sobald Sie zu sprechen begannen, und Sie verschwanden dadurch aus der Redeliste."
+    ]
+  },
+  "0.7.4": {
+    "title": "Name im Chat vor weitergeleiteten Links geschützt (Sicherheit)",
+    "notes": [
+      "Im Chat wird der echte Name einer angemeldeten Person nur noch auf dem Gerät angezeigt, mit dem die Anmeldung erfolgt ist: Wer einen weitergeleiteten Teilnahmelink öffnet, schreibt unter dem selbst eingegebenen Namen und nicht im Namen der ursprünglich angemeldeten Person. Damit ist eine falsche Zuordnung von Nachrichten ausgeschlossen.",
+      "Derselbe Schutz gilt für Anhänge: Eine über einen weitergeleiteten Link gesendete Datei wird nicht mehr dem Namen der ursprünglich angemeldeten Person zugeordnet.",
+      "Wer sich von einem zweiten Gerät aus verbindet (zum Beispiel vom Telefon) oder den vorab erhaltenen Link nutzt, kann weiterhin ohne Unterbrechung teilnehmen, im Chat schreiben und Anhänge senden: Es ändert sich allein der angezeigte Name, der nun dem beim Betreten eingegebenen Namen entspricht."
+    ]
+  },
+  "0.7.3": {
+    "title": "Korrekte Anwesenheitszählung, zentrierte Reaktionen und Verbesserungen im Raum",
+    "notes": [
+      "Die Zählung der anwesenden Personen vervielfacht dieselbe Person nicht mehr, wenn sie den Raum verlässt und erneut betritt (etwa über die Zurück-Schaltfläche des Browsers): Mehrfachverbindungen derselben Person werden nur einmal gezählt. Die Teilnehmendenliste zeigt weiterhin jede einzelne Verbindung, damit die Moderation stets alle sehen und verwalten kann.",
+      "Die Leiste für Reaktionen und Emojis sitzt jetzt zentriert am unteren Rand, gut sichtbar und leicht zu finden, statt in der linken unteren Ecke.",
+      "Die Zahl der Angemeldeten wird auf der Veranstaltungsseite und in der Veranstaltungsübersicht nicht mehr öffentlich angezeigt: Sie bleibt der Administration im Verwaltungsbereich vorbehalten. Während der laufenden Veranstaltung sieht das Publikum nur die Zahl der anwesenden Personen.",
+      "Die Unterdrückung von Hintergrundgeräuschen ist für alle Mikrofone automatisch aktiv (die grundlegende Audioverarbeitung gegen Echo und Rauschen ist immer eingeschaltet und muss nicht von Hand aktiviert werden).",
+      "Der Zutritt zum Raum erfolgt etwas schneller: Das Videosystem wird bereits beim Klick auf die Schaltfläche zum Betreten geweckt."
+    ]
+  },
+  "0.7.2": {
+    "title": "Mehr Möglichkeiten im Chat: Anhänge, Antworten und Erwähnungen",
+    "notes": [
+      "Im Chat lassen sich jetzt Bilder und Anhänge senden (PNG, JPEG, WebP, GIF und PDF, bis 10 MB), mit Vorschau direkt in der Nachricht.",
+      "Neue Funktion „Antworten“: Eine bestimmte Nachricht kann zitiert werden, und das Zitat bleibt im Gesprächsverlauf sichtbar.",
+      "Erwähnungen mit @: Teilnehmende können innerhalb einer Nachricht namentlich angesprochen werden.",
+      "Moderation des Chats: Die Moderation kann einzelne Nachrichten während der Veranstaltung entfernen."
+    ]
+  },
+  "0.7.1": {
+    "title": "Statistik nach jeder Veranstaltung",
+    "notes": [
+      "Neuer Bereich „Statistik“ für jede Veranstaltung im Verwaltungsbereich (auch für Veranstaltungen ohne Anmeldung oder ohne Videoaufzeichnung verfügbar): Er zeigt den Verlauf der Konferenz, wer am meisten gesprochen hat, die Gesamtbeteiligung und die wichtigsten Kennzahlen.",
+      "Diagramm zum Verlauf der Interaktion – Chat, Fragen, Bewertungen von Fragen, Umfragen, Wörter der Wortwolke und Reaktionen – mit hervorgehobenem Höhepunkt der Konferenz.",
+      "Rangliste der längsten Redebeiträge (Minuten je Person) samt Ausgewogenheit der Wortmeldungen, ergänzt um die Zahl der Reaktionen und der Handmeldungen.",
+      "Neue Schätzung der durchschnittlichen Verweildauer der Teilnehmenden im Raum, die auch in die Berechnung der Gesamtaufmerksamkeit einfließt."
+    ]
+  },
+  "0.7.0": {
+    "title": "Namen der Sprechenden bearbeitbar und Player nur für Ton",
+    "notes": [
+      "Nach der Veranstaltung lassen sich die Namen der Sprechenden ändern, um die automatisch aus dem Transkript erkannten Namen zu korrigieren.",
+      "Enthält eine Aufzeichnung kein abspielbares Video, bietet die Korrekturseite dennoch einen Player nur für den Ton, um Text und Namen der Sprechenden beim Anhören zu berichtigen.",
+      "Korrektur der Mehrspuraufzeichnung: Der tatsächliche Ton der entfernt zugeschalteten Teilnehmenden wird jetzt richtig aufgenommen."
+    ]
+  },
+  "0.6.9": {
+    "title": "Verlässlichkeit der KI-Verarbeitung",
+    "notes": [
+      "Der Verwaltungsbereich zeigt jetzt einen Indikator für die Verlässlichkeit der KI-Verarbeitung nach der Veranstaltung (Transkription, Zusammenfassung, Übersetzungen). So ist auf einen Blick erkennbar, ob das Ergebnis vollständig und belastbar ist."
+    ]
+  },
+  "0.6.8": {
+    "title": "Übersichtlichere Bearbeitungsseite nach der Veranstaltung",
+    "notes": [
+      "Die Korrekturseite (Transkription, Zusammenfassung, Übersetzungen) erklärt jetzt, wenn KI-Inhalte noch nicht verfügbar sind – „Verarbeitung läuft“ oder „Verarbeitung über die Steuerung oben starten“ –, statt eine rote Fehlermeldung anzuzeigen, die wie eine Störung wirkte.",
+      "Ein fehlgeschlagenes Speichern wird jetzt rot dargestellt und nennt den konkreten vom Server gemeldeten Grund, statt grün zu erscheinen, als wäre alles gut gegangen.",
+      "Eine abgelaufene Sitzung im Verwaltungsbereich und Ladeprobleme werden jetzt mit eigenen Meldungen unterschieden, statt mit einer einzigen allgemeinen Fehlermeldung.",
+      "Ist der Ton einer Aufzeichnung nicht abspielbar, weist die Seite darauf hin; Text und Sprechende der einzelnen Abschnitte lassen sich trotzdem korrigieren."
+    ]
+  },
+  "0.6.7": {
+    "title": "Immer sichtbare Reaktionen und „Notizen / Checkliste“",
+    "notes": [
+      "Die Emoji-Reaktionen sind jetzt dauerhaft in einer Leiste unten links sichtbar und nicht mehr hinter einer Schaltfläche verborgen: leichter zu finden und während der Veranstaltung zu nutzen.",
+      "Die Funktion „Agenda“ heißt jetzt „Notizen / Checkliste“, um deutlich zu machen, dass es sich um einen Notizbereich in Form einer Checkliste handelt (die Inhalte gelangen nicht in den Chat). Die Moderation kann sie weiterhin für jede Veranstaltung aktivieren."
+    ]
+  },
+  "0.6.6": {
+    "title": "Feinschliff: Chat, Zählungen und Zutritt",
+    "notes": [
+      "Im Chat geteilte Links sind jetzt anklickbar und öffnen sich auf sichere Weise in einem neuen Tab (zuvor waren sie reiner Text).",
+      "Im Raum ist die Gesamtzahl der Angemeldeten nur noch für die Moderation sichtbar: Teilnehmende sehen ausschließlich, wie viele Personen tatsächlich anwesend sind.",
+      "Schnellerer Zutritt zum Raum: Die Verbindung zum Videoserver wird bereits im Warteraum vorbereitet, was die Wartezeit beim Betreten verkürzt.",
+      "In der Teilnehmendenliste bleibt die Kopfzeile mit der Zählung beim Blättern durch die Liste dauerhaft sichtbar."
+    ]
+  },
+  "0.6.5": {
+    "title": "Aufzeichnungen und Zählungen",
+    "notes": [
+      "Die Zählung der im Raum anwesenden Personen schließt jetzt die Aufzeichnungskomponente aus: Angezeigt werden nur echte Personen, nicht der Bot, der den Ton aufnimmt.",
+      "Nachbearbeitung: Die neue Schaltfläche „Mit KI erzeugen“ startet Transkription, Zusammenfassung und Übersetzung auch bei reinen Audioaufzeichnungen (eine Spur je teilnehmender Person), die bisher keinerlei Möglichkeit zum Starten boten.",
+      "In der Liste der Spuren steht neben jedem Anzeigenamen eine Kennung: Verschiedene Personen mit demselben Anzeigenamen erhalten unterschiedliche Kennungen, während mehrere Beiträge derselben Person dieselbe Kennung tragen.",
+      "Klare Meldung, wenn der Start der Verarbeitung keinen Auftrag einreiht (KI für die Veranstaltung deaktiviert oder Verarbeitung angehalten), statt einer irreführenden Erfolgsmeldung."
+    ]
+  },
+  "0.6.4": {
+    "title": "Sicherheit der Identität und Verbesserungen im Raum",
+    "notes": [
+      "Sicherheitskorrektur: Wird der persönliche Zugangslink zum Raum weitergegeben, betritt die empfangende Person den Raum jetzt unter dem EIGENEN Namen (zuvor konnte sie den Namen der absendenden Person übernehmen).",
+      "Schärfere Bildschirmfreigabe: Vorrang hat jetzt die Auflösung (5 Bilder pro Sekunde in hoher Qualität) statt der Flüssigkeit, sodass Folien und Dokumente auch bei wenig Bewegung lesbar bleiben.",
+      "Die Funktion „eigenes Bild ausblenden“ wurde entfernt: Einmal eingeschaltet, ließ sich das eigene Bild nicht wieder einblenden.",
+      "Zugang zum Verwaltungsbereich: Nach einer erneuten Authentifizierung infolge von Inaktivität aktualisiert sich die Seite korrekt (keine scheinbar blockierten Seiten mehr, die erst nach manuellem Neuladen wieder reagierten)."
+    ]
+  },
+  "0.6.3": {
+    "title": "Verbesserungen im Veranstaltungsraum – Teil 2",
+    "notes": [
+      "Der Präsentationstimer ist jetzt in die Steuerungsleiste der Moderation eingebunden und belegt keine eigene Zeile mehr; die Leiste mit dem Countdown erscheint nur, solange der Timer läuft.",
+      "Im Chat erscheint der echte Name der schreibenden Person und nicht mehr ein allgemeines „Moderator“.",
+      "Der Chat ist zu einem eigenständigen Bereich in der Seitenleiste geworden und überlagert nicht mehr dauerhaft die übrigen Inhalte: eine aufgeräumtere Oberfläche mit Zähler für ungelesene Nachrichten am Reiter.",
+      "Neue Schaltfläche „Whiteboard“ für die Moderation, um das gemeinsame Whiteboard direkt aus der Steuerungsleiste zu öffnen.",
+      "Die Schaltfläche „Teilen“ hat jetzt die richtige Farbe und ist nicht mehr mit „Verlassen“ zu verwechseln; neben den Links stehen Symbole, und der Moderationslink ist ausschließlich für die Moderation hinter einem Warnhinweis abgelegt, damit weitere Moderatorinnen und Moderatoren ohne Missverständnisse eingeladen werden können.",
+      "Die Wortwolke ist nicht mehr standardmäßig aktiv: Die Moderation kann sie während der Veranstaltung nach Bedarf einschalten."
+    ]
+  },
+  "0.6.2": {
+    "title": "Verbesserungen im Veranstaltungsraum bei laufender Veranstaltung",
+    "notes": [
+      "Die Steuerungsleiste (Mikrofon, Kamera, Bildschirmfreigabe) bleibt immer sichtbar und anklickbar – auch im Vollbild, während einer Freigabe oder wenn man allein im Raum ist.",
+      "Die Moderation kann die Live-Funktionen (Fragen, Chat, Agenda) während der Veranstaltung wieder ein- und ausschalten.",
+      "Die Steuerung von Ton und Bild lässt sich bereits während der Vorbereitung des Raums nutzen, ohne den Start des Videoservers abzuwarten.",
+      "Die Liste „Erhobene Hände“ zeigt korrekt an, wer sich zu Wort gemeldet hat.",
+      "Neue Schaltfläche „Teilen“ im Raum: Sie kopiert auf einen Klick den Teilnahmelink und den Link zur Veranstaltungsseite, ohne vertrauliche Token preiszugeben.",
+      "Die Marke PA Webinar ist in der oberen Leiste des Veranstaltungsraums wieder sichtbar."
+    ]
+  },
+  "0.6.1": {
+    "title": "Öffentliches Changelog und Sicherheitsaktualisierungen",
+    "notes": [
+      "Neue öffentliche Changelog-Seite, erreichbar über einen Klick auf die Versionsnummer in der Fußzeile: Sie führt alle Versionen der Plattform mit den wichtigsten Neuerungen auf.",
+      "Sicherheitsaktualisierungen der Abhängigkeiten (undici, nodemailer) und Härtung der Build-Pipeline (Prüfung auf Schwachstellen)."
+    ]
+  },
+  "0.6.0": {
+    "title": "Arbeitsablauf nach der Veranstaltung und interaktiver Warteraum",
+    "notes": [
+      "Neuer Ablauf zum Abschluss einer Veranstaltung: Am Ende entscheidet die Moderation über eine eigene Abfrage, wohin die Aufzeichnung gelangt – öffentlich auf die Veranstaltungsseite, in die Mediathek oder nur ins Archiv.",
+      "Automatische und anonymisierte Zusammenfassung nach der Veranstaltung (Teilnahme, am häufigsten bewertete Fragen, Umfrageergebnisse, Wortwolke, Bewertungen), die auf jeder Seite einer abgeschlossenen Veranstaltung erscheint – auch ohne Aufzeichnung.",
+      "Zusammenfassende E-Mail nach der Veranstaltung an die Teilnehmenden, mit den Inhalten der Veranstaltung.",
+      "Interaktiver Warteraum „Piazza Digitale“: Mit dem eigenen Avatar geht man bis zum Durchgang, um die Konferenz zu betreten; die klassische Schaltfläche zum Betreten steht immer daneben zur Verfügung.",
+      "Die Wortwolke erhält einen eigenen Abschnitt auf der Seite abgeschlossener Veranstaltungen, mit Schalter für die Sichtbarkeit im Verwaltungsbereich.",
+      "Gemeinsames Whiteboard, das für einzelne Veranstaltungen und über Vorlagen aktiviert werden kann.",
+      "Überarbeitete Bedienführung im Assistenten zum Anlegen von Veranstaltungen: eingeklappte erweiterte Optionen, Hauptmoderation mit Link, Hinweise zu personenbezogenen Daten, Speichern als Entwurf und Umgang mit Teilfehlern.",
+      "Unterschiedliche Aufbewahrungsfristen für Aufzeichnungen und für die Audiospuren je sprechender Person, ausgerichtet am Signal „Video veröffentlicht“, samt GDPR-konformer Bereinigung des Chats."
+    ]
+  },
+  "0.5.11": {
+    "title": "Feinschliff bei Moderation, Beenden der Konferenz und Ton",
+    "notes": [
+      "Die Moderation erscheint mit dem eigenen echten Namen statt mit einem allgemeinen „Moderator“.",
+      "Abschlussbildschirm in der Anwendung, sobald die Veranstaltung endet (kein „Raum wird vorbereitet“ mehr).",
+      "Behebung der überlappenden Symbole im Warteraum.",
+      "Rauschunterdrückung über die IFrame API fest auf AUS gesetzt, um Tonprobleme zu beheben."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabile Mehrspuraufzeichnung, Bewertung mit Sternen und Leistung",
+    "notes": [
+      "Aufzeichnung je sprechender Person (mehrspurig) durchgängig zuverlässig gemacht: vollständiger Ton je Spur, keine Abbrüche, parallele Uploads.",
+      "Fragebogen zur Rückmeldung nach der Veranstaltung mit Bewertung in Sternen und Übersichts-Dashboard für die Administration.",
+      "Verbesserungen bei der Leistung: VP9-Codec für die Kamera, verzögertes Laden auf Mobilgeräten, Feinabstimmung der Aufzeichnung.",
+      "Helm-Hook nach dem Upgrade, der die config.js von Jitsi automatisch neu lädt."
+    ]
+  },
+  "0.5.8": {
+    "title": "Konfigurierbare Bild- und Tonqualität und neuer Zutrittsablauf",
+    "notes": [
+      "Von der Administration konfigurierbare Steuerung der Bild- und Tonqualität (Voreinstellungen je Veranstaltung).",
+      "Neu gestalteter Zutrittsablauf: Anmeldung, Warteraum, Videokonferenz.",
+      "Die Handmeldung zeigt den echten Namen jeder teilnehmenden Person."
+    ]
+  },
+  "0.5.6": {
+    "title": "Konfigurierbarer Warteraum und Titelbilder für Veranstaltungen",
+    "notes": [
+      "Konfigurierbare Gestaltung des Warteraums (Spiel / Garten / klassisch), sowohl für die gesamte Website als auch für einzelne Veranstaltungen.",
+      "Titelbilder auf der Veranstaltungsseite und in den Vorschaubildern der Karten.",
+      "Hochgeladene Dateien werden über einen eigenen Pfad mit kurzlebigen signierten URLs ausgeliefert.",
+      "Schaltfläche „Jetzt beitreten“ unmittelbar nach der Anmeldung.",
+      "Zusammenführung des Verwaltungsbereichs für die KI-Bearbeitung von Aufzeichnungen und robustere Mehrspuraufnahme."
+    ]
+  },
+  "0.5.2": {
+    "title": "Vorbereitung von Veranstaltungen und Feinschliff",
+    "notes": [
+      "Agenda mit Zustimmung und Ablehnung sowie Korrekturen an den aus Vorlagen übernommenen Berechtigungen.",
+      "Echte Namen statt „SPEAKER_00“ in Zusammenfassungen und Untertiteln.",
+      "Reihe von Hotfixes (v0.5.2–v0.5.5) zur Vorbereitung der öffentlichen Veranstaltungen."
+    ]
+  },
+  "0.5.1": {
+    "title": "Startseite mit Fokus auf die Community und Mehrspurarchiv",
+    "notes": [
+      "Neugestaltung der Startseite mit Fokus auf die Community, mit zur Laufzeit überschreibbaren Übersetzungen und Barrierefreiheit nach AgID.",
+      "MKV-Archiv mit mehreren Spuren und Player zum Nachhören einzelner Sprechender.",
+      "Abgleich der einzelnen Spuren mit der Jibri-Mischung per Kreuzkorrelation."
+    ]
+  },
+  "0.5.0": {
+    "title": "KI-Nachbearbeitung und Mehrspuraufzeichnung",
+    "notes": [
+      "Pipeline zur KI-Nachbearbeitung: Transkription, Zusammenfassung, Untertitel, Übersetzungen und mehrstimmige Synchronisation (immer synthetisch), mit nachvollziehbarer Herkunft der Modelle.",
+      "Mehrspuraufzeichnung (eine Spur je sprechender Person) mit Zuordnung der Sprechenden und automatischer Benennung (ADR-013).",
+      "Öffentliche Video-Mediathek und Verwaltungsseite für die Zeit nach der Veranstaltung.",
+      "Editor für das Transkript nach der Veranstaltung, mit Korrektur des Textes und Neuzuordnung der Sprechenden.",
+      "Überarbeitung der Bedienoberfläche im Verwaltungsbereich: Hinweise und Dialoge im Stil von .italia statt nativer Browsermeldungen, Ladeplatzhalter, Farb-Token des Designsystems statt Hunderter fest eingetragener Hex-Werte.",
+      "Einwilligung jeder teilnehmenden Person in die Mehrspuraufzeichnung (GDPR) und erweiterter Datenexport nach Art. 15."
+    ]
+  },
+  "0.4.0": {
+    "title": "Beteiligung und Lebenszyklus",
+    "notes": [
+      "Neue Funktionen für laufende Veranstaltungen: Wortwolke, Präsentationstimer, Zähler für Reaktionen, Live-Steuerung im Stil von Meet und Bereich für erhobene Hände.",
+      "Lebenszyklus der Aufzeichnungen (vorläufig, dann veröffentlicht) mit Verwaltung durch die Administration (Vorschau, Veröffentlichung, Löschung) und unterschiedlichen Aufbewahrungsfristen.",
+      "Seite nach der Veranstaltung mit Reitern (Aufzeichnung, Q&A-Archiv, Umfragen, Rückmeldungen, Materialien) und Einstellung, was wann veröffentlicht wird.",
+      "Assistent zum Anlegen von Veranstaltungen in fünf Schritten, Systematik der Schlagwörter, Kontaktverzeichnis (Person) und redaktionelle Dachzeile für Titel.",
+      "Öffentliche Video-Mediathek unter /video-library und Transparenzseite unter /service-inventory (CycloneDX 1.6 je Mandant).",
+      "Zweistufige automatische Skalierung der JVB, mit Redis-Snapshot für die Statusseite.",
+      "GDPR-Bereinigung in drei Stufen: sofortige Löschung personenbezogener Daten, Löschung der Inhalte nach Ablauf der Aufbewahrungsfrist, endgültige Löschung."
+    ]
+  },
+  "0.3.0": {
+    "title": "Konfigurierbare Plattform und Infrastruktur",
+    "notes": [
+      "Einstellungen der Website für die Nachnutzung durch andere Verwaltungen (Erscheinungsbild, Farben, Favicon, SEO, Fußzeile, Modus der Startseite, Datenschutz und Barrierefreiheit) ohne erneuten Build.",
+      "Dashboard für Auswertungen und Verwaltungsbereich für die Infrastruktur.",
+      "Drei Bereitstellungsvarianten mit Helm (simple / standard / full) und Skalierung der JVB auf null mit eigenem Nodepool.",
+      "Multi-Cloud-Pipeline für Jibri (Azure Blob / S3 / GCS / MinIO / lokal) und konfigurierbares Wasserzeichen in Jitsi.",
+      "OpenSSF Scorecard, Dependabot, SBOM der Abhängigkeiten, zentrale Fehlerbehandlung, Rate Limiting und über 210 Unit-Tests.",
+      "Zahlreiche Zwischenversionen (v0.3.8–v0.3.45) infolge der Rückmeldungen nach der Demo."
+    ]
+  },
+  "0.2.0": {
+    "title": "Rückmeldungen des DTD",
+    "notes": [
+      "Erfassung von Angaben zu den Teilnehmenden bei der Anmeldung (Einrichtung, Funktion, Art), je Veranstaltung konfigurierbar, mit CSV-Export und aggregierter Statistik.",
+      "Konfigurierbare Erinnerungen mit mehreren Vorlaufzeiten und jeweils eigenen E-Mails.",
+      "Umfragen mit Ergebnissen in Echtzeit und CSV-Export.",
+      "Verbesserungen im Sinne der GDPR: Datenschutzerklärung je Veranstaltung, abgestufte Einwilligungen, Audit-Log der Löschungen und Datenexport nach Art. 15.",
+      "Zusammenführung der Rollen Moderation und Zuhörende sowie Prüfung der Lizenzen aller Abhängigkeiten."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP – erste Version",
+    "notes": [
+      "Öffentliche Plattform für digitale Veranstaltungen mit dem Designsystem .italia (Bootstrap Italia, design-react-kit).",
+      "Raum für laufende Veranstaltungen mit Jitsi Meet (IFrame API, Authentifizierung per JWT) und serverseitig durchgesetzten Rollen.",
+      "GDPR-konforme Anmeldung der Teilnehmenden mit verschlüsselten personenbezogenen Daten (AES-256-GCM).",
+      "Q&A mit Bewertung und Moderation, Warteraum mit Countdown und Zugang für Gäste.",
+      "E-Mails zur Bestätigung und Erinnerung, Anbindung an den Kalender (Google, Outlook, Yahoo, iCal).",
+      "Verwaltungsbereich mit Authentifizierung per API-Schlüssel, GDPR-Bereinigung, Metriken für Prometheus.",
+      "Produktionsreifes Helm-Chart, Docker-Images ohne Root-Rechte und mit schreibgeschütztem Dateisystem, CI/CD mit GitHub Actions, publiccode.yml."
+    ]
+  }
+}

@@ -44,6 +44,8 @@ function getJitsiJwtSubject(): string {
 }
 
 import { generateAvatarDataUri } from '@/lib/avatar';
+import { appBaseUrl } from '@/lib/env';
+import { gravatarRef } from '@/lib/gravatar-ref';
 
 interface JitsiTokenPayload {
   roomName: string;
@@ -52,8 +54,23 @@ interface JitsiTokenPayload {
   uniqueId: string;
   isModerator: boolean;
   expiresInSeconds?: number;
-  /** Kept for forward compatibility but not used for avatar URLs. */
+  /** Usata per l'avatar solo quando `useGravatar` è true (vedi sotto). */
   email?: string;
+  /**
+   * Quando true l'avatar punta al NOSTRO proxy `/api/avatar`, che interroga
+   * Gravatar lato server e ricade sull'SVG con le iniziali. La decisione arriva
+   * dal chiamante, che ha già i settings: leggerli qui accoppierebbe ogni
+   * emissione di token — cron del recorder compreso — alle impostazioni del
+   * sito, e renderebbe impuri gli unit test di questo modulo.
+   */
+  useGravatar?: boolean;
+}
+
+/** L'origin pubblico dell'app, o null se non è un URL http(s) assoluto (nel
+ *  qual caso l'avatar resta il data URI invece di diventare un link rotto). */
+function absoluteAppUrl(): string | null {
+  const url = appBaseUrl();
+  return url ? `${url.origin}${url.pathname.replace(/\/$/, '')}` : null;
 }
 
 /**
@@ -85,8 +102,36 @@ export async function generateJitsiJwt(
   const jitsiJwtAudience = getJitsiJwtAudience();
   const jitsiJwtSubject = getJitsiJwtSubject();
 
-  // Inline SVG data URI bypasses Jitsi web CSP restrictions
-  const avatarUrl = generateAvatarDataUri(payload.displayName);
+  // Di norma un data URI SVG inline: attraversa qualunque restrizione del web
+  // Jitsi e non fa partire richieste.
+  //
+  // Con Gravatar attivo puntiamo al NOSTRO proxy `/api/avatar`, mai a
+  // gravatar.com: è il nostro server a parlare col terzo, non il browser dei
+  // partecipanti, e `docs/GDPR.md` resta vero. Quello che viaggia nell'URL è
+  // l'hash dell'email, cifrato — mai l'indirizzo: vedi `lib/gravatar-ref`.
+  //
+  // `appBaseUrl()` legge il valore a RUNTIME (via getPublicEnv): la forma
+  // `process.env.NEXT_PUBLIC_*` in notazione puntata la sostituisce webpack a
+  // build time, e l'immagine è costruita con
+  // `ARG NEXT_PUBLIC_APP_URL=http://localhost:3000` — in produzione ogni avatar
+  // avrebbe puntato al localhost di chi guarda.
+  //
+  // Se il proxy non è raggiungibile resta il data URI: `d=404` lato proxy fa
+  // ricadere sulle iniziali chi non ha un Gravatar, quindi l'unico scenario
+  // scoperto è l'URL remoto in sé — ed è per questo che l'opzione è opt-in.
+  let avatarUrl = generateAvatarDataUri(payload.displayName);
+  if (payload.useGravatar && payload.email) {
+    const base = absoluteAppUrl();
+    const ref = gravatarRef(payload.email);
+    if (base && ref) {
+      const q = new URLSearchParams({
+        name: payload.displayName,
+        g: ref,
+        size: '200',
+      });
+      avatarUrl = `${base}/api/avatar?${q.toString()}`;
+    }
+  }
 
   const jwt = await new SignJWT({
     context: {

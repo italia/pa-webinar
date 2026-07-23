@@ -11,6 +11,26 @@
 
 import { getRedis, getRedisSubscriber } from '@/lib/redis';
 
+/** A file/image attached to a chat message. Never carries bytes — just a
+ * reference the client fetches from /api/assets, which gates the
+ * `assets/chat/<eventId>/…` namespace (capability-URL, ACL in roadmap): chi può
+ * leggere questi messaggi può aprire l'allegato, gli altri no. (Gli allegati
+ * anteriori a quel namespace restano capability-URL pubbliche — vedi la nota
+ * nella rotta di serving.) */
+export interface ChatAttachmentRef {
+  url: string; // absolute app-served URL
+  name: string; // original filename (decrypted; plaintext on the wire like text)
+  mime: string;
+  size: number;
+}
+
+/** A compact quote of the message being replied to. */
+export interface ChatReplyRef {
+  id: string;
+  senderName: string; // decrypted
+  text: string; // decrypted, truncated snippet
+}
+
 export interface ChatEnvelope {
   id: string;
   eventId: string;
@@ -19,10 +39,22 @@ export interface ChatEnvelope {
   isModerator: boolean;
   text: string;
   createdAt: string; // ISO
-  // When set to 'delete' the subscriber hides the message instead of
-  // appending. Covers the moderation path (hide message live without
-  // the sender having to refresh).
-  op?: 'delete';
+  // Optional single attachment reference (no bytes on the wire).
+  attachment?: ChatAttachmentRef;
+  // Optional quote of the parent message this one replies to.
+  replyTo?: ChatReplyRef;
+  // Marks the message as corrected by its author; the UI shows "modificato".
+  editedAt?: string | null;
+  // Reaction tallies: emoji → COUNT. Sent whole on every change so a client that
+  // missed a frame still converges. Never the sender ids: this envelope goes to
+  // every reader of the chat.
+  reactions?: Record<string, number>;
+  // What the subscriber should DO with this envelope:
+  //   'delete'   → hide the message (moderation, live, no refresh needed)
+  //   'edit'     → replace the text of an existing message
+  //   'reaction' → replace that message's reaction tallies
+  // Absent = a new message to append.
+  op?: 'delete' | 'edit' | 'reaction';
 }
 
 function channel(eventId: string): string {

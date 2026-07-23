@@ -19,6 +19,7 @@ import {
 } from '@/lib/ical/calendar-links';
 import { enqueueEmail } from '@/lib/email/outbox';
 import {
+  absoluteEventImage,
   confirmationHtml,
   confirmationText,
   baseConfirmationCopy,
@@ -91,6 +92,9 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       },
       siteName: input.siteName,
       organizationFooter: input.organizationFooter,
+      // Banner dell'evento in cima all'email (l'immagine c'era sulla pagina
+      // pubblica ma non è mai arrivata in posta).
+      eventImageUrl: absoluteEventImage(event, baseUrl),
     };
 
     const icsContent = generateEventICal({

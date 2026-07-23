@@ -543,12 +543,56 @@ model ChatMessage {
   hiddenAt DateTime? @map("hidden_at")
   hiddenBy String?   @map("hidden_by")
 
+  // Reply/quote: optional self-reference to the message being replied to.
+  // SetNull on delete so hiding/removing a parent doesn't cascade-delete
+  // replies (the UI degrades a dangling reply to "messaggio rimosso").
+  replyToId String?       @map("reply_to_id") @db.Uuid
+  replyTo   ChatMessage?  @relation("ChatReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   ChatMessage[] @relation("ChatReply")
+
+  // Optional single attachment. attachmentBlobPath is an opaque storage key
+  // (not PII, plaintext). attachmentName is the original filename (PII →
+  // encrypted at rest via encryptPII, read via tryDecryptPII). mime/size are
+  // not PII. Only authenticated senders may attach (see chat upload route).
+  attachmentBlobPath String? @map("attachment_blob_path")
+  attachmentName     String? @map("attachment_name")
+  attachmentMime     String? @map("attachment_mime")
+  attachmentSize     BigInt? @map("attachment_size")
+
   createdAt DateTime @default(now()) @map("created_at")
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId, createdAt])
+  @@index([replyToId])
   @@map("chat_messages")
+  // Ultima modifica dell'autore (A6: "non posso modificare il messaggio se ho
+  // fatto degli errori"). Null = mai modificato; la UI mostra "modificato".
+  editedAt DateTime? @map("edited_at")
+
+  reactions ChatMessageReaction[]
+
+}
+
+/// Reazione emoji a un singolo messaggio di chat (A3).
+///
+/// Una riga per (messaggio, autore, emoji): l'unique rende il toggle
+/// idempotente e impedisce che lo stesso utente conti due volte. `senderId` è
+/// la stessa identità usata dai messaggi (mod-/reg-/guest-), quindi una
+/// reazione resta attribuibile anche se il nome visualizzato cambia.
+model ChatMessageReaction {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  messageId String @map("message_id") @db.Uuid
+  senderId  String @map("sender_id")
+  emoji     String @db.VarChar(16)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, senderId, emoji])
+  @@index([messageId])
+  @@map("chat_message_reactions")
 }
 
 // ─── GDPR Templates ─────────────────────────────────────────
@@ -965,8 +1009,10 @@ model EventTemplate {
   description String? @db.Text
   icon        String  @default("it-video")
 
-  qaEnabled                  Boolean @default(true) @map("qa_enabled")
-  chatEnabled                Boolean @default(false) @map("chat_enabled")
+  // Chat primaria, Q&A opt-in (live feedback #10 — "tenere SOLO chat"):
+  // allineato a defaultMatrix() e ai template di sistema.
+  qaEnabled                  Boolean @default(false) @map("qa_enabled")
+  chatEnabled                Boolean @default(true) @map("chat_enabled")
   recordingEnabled           Boolean @default(false) @map("recording_enabled")
   autoStartRecording         Boolean @default(false) @map("auto_start_recording")
   // Pre-attiva la checklist/note live (Event.agendaEnabled) per gli eventi
@@ -1083,6 +1129,23 @@ model SiteSetting {
   githubUrl    String? @map("github_url")
   supportEmail String? @map("support_email")
 
+  // Email sender. `emailFromName` is the display name recipients see in their
+  // inbox; null falls back to SMTP_FROM_NAME and then to the site name, so an
+  // instance that never touches this keeps the historical behaviour. The
+  // ADDRESS stays in SMTP_FROM: it has to match what the SMTP relay is
+  // authorised to send as, so it is deployment config, not a site setting.
+  // Avatar via Gravatar (A4). DISATTIVO di default: l'immagine passa comunque
+  // dal nostro proxy `/api/avatar` — il browser dei partecipanti non contatta
+  // mai gravatar.com — ma resta una richiesta della piattaforma a un terzo, e
+  // va dichiarata nell'informativa. Con il flag spento restano gli avatar con
+  // le iniziali generati da noi.
+  gravatarEnabled Boolean @default(false) @map("gravatar_enabled")
+
+  emailFromName String? @map("email_from_name")
+  // Optional Reply-To. The From address is a no-reply relay, so without this a
+  // reply from an attendee goes nowhere.
+  emailReplyTo  String? @map("email_reply_to")
+
   // i18n / locale management
   defaultLocale        String @default("it") @map("default_locale")
   availableLocales     Json   @default("[\"it\",\"en\"]") @map("available_locales")
@@ -1094,8 +1157,32 @@ model SiteSetting {
   // e scalare il JVB a 0. Default: 45. Range consigliato: 15-120.
   jvbInactiveGraceMinutes  Int @default(45) @map("jvb_inactive_grace_minutes")
   // Minuti di lookahead per il pre-scaling di eventi PUBLISHED → PROVISIONING.
-  // Il nodo viene avviato N minuti prima di startsAt. Default: 10.
-  jvbPreScaleMinutes       Int @default(10) @map("jvb_pre_scale_minutes")
+  // Il nodo viene avviato N minuti prima di startsAt. Default: 15.
+  jvbPreScaleMinutes       Int @default(15) @map("jvb_pre_scale_minutes")
+  // Finestra "vicino all'inizio" (minuti) entro cui la registrazione instrada
+  // subito nella sala d'attesa; oltre (registrazione con ore di anticipo)
+  // mostra la schermata di conferma con iCal invece della sala. 0 = mai
+  // instradare in sala prima dell'inizio. Default 15 (feedback #1).
+  waitingRoomLeadMinutes   Int @default(15) @map("waiting_room_lead_minutes")
+  // Empty-conference authoritative close (feedback #12). Minuti che una sala
+  // LIVE che HA avuto traffico può restare vuota prima che lo scaler la porti
+  // DIRETTAMENTE a ENDED (terminale), PRIMA di endsAt e separatamente dalla
+  // grace di scale-to-zero (jvbInactiveGraceMinutes/45m) e dalla grace di
+  // overtime post-endsAt (eventGracePeriodMinutes/15m).
+  //   -1  → disabilitato (default)
+  //    0  → chiudi al primo tick a sala vuota (~cadenza cron)
+  //   N>0 → chiudi dopo N minuti di sala COMPLETAMENTE vuota (moderatore incluso)
+  // DISATTIVO di default: è un ENDED TERMINALE (non risvegliabile) e la review
+  // ha evidenziato rischi reali (uno stato participants=0 stantìo/degradato
+  // potrebbe chiudere una sala ancora piena; una pausa in cui esce anche il
+  // moderatore chiuderebbe una sala a cui si voleva tornare). L'auto-chiusura
+  // per inattività SICURA è già data dalla grace 45-min LIVE->IDLE (risvegliabile);
+  // questo close terminale anticipato resta un opt-in configurabile da admin.
+  jvbEmptyCloseMinutes     Int @default(-1) @map("jvb_empty_close_minutes")
+  // Modalità reazioni (#7): 'NATIVE' = pulsante reazioni nativo di Jitsi nella
+  // barra (effimere, nessuna analitica); 'CUSTOM' = barra reazioni custom
+  // dell'app (persistite/aggregate). Default 'NATIVE'.
+  reactionsMode            String @default("NATIVE") @map("reactions_mode")
   // Soglie di stress che attivano il reactive scale-up oltre al predictive.
   // Sopra la warn, aggiunge 1 replica; sopra la critical, 2. Entrambe
   // sono espresse come percentuale 0-100 per comodità dell'admin UI.

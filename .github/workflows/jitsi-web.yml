@@ -1,0 +1,135 @@
+name: Build patched jitsi/web image
+
+# Builds ghcr.io/italia/pa-webinar-jitsi-web — a copy of jitsi/web:stable-10741
+# carrying our in-place patches (see infra/jitsi-web-patched/Dockerfile):
+#   • F18  — noise-suppression AudioContext forced to 48 kHz;
+#   • #3   — flying reaction emoji set to pointer-events:none;
+#   • self-view — an explicit config.disableSelfView=false overrides the value
+#     stored in the user's browser, so a participant stuck with a hidden self
+#     view recovers instead of needing an incognito window.
+# Rarely changes, so it runs only when that directory changes or on manual
+# dispatch — NOT on every dev push.
+#
+# IMAGE_TAG is bumped with every patch change instead of re-pushing the same
+# tag: prod pins this tag in its Helm values, and a mutable tag makes "which
+# build is actually running?" unanswerable and a rollback impossible.
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "infra/jitsi-web-patched/**"
+      - ".github/workflows/jitsi-web.yml"
+  workflow_dispatch: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: italia/pa-webinar-jitsi-web
+  IMAGE_TAG: stable-10741-rnnoise-r3
+  BASE_IMAGE: jitsi/web:stable-10741
+
+jobs:
+  build:
+    # La quota artefatti di Actions e' dell'ORGANIZZAZIONE, non di questo repo
+    # (qui siamo sotto i 50 MB): quando si esaurisce OGNI upload fallisce, e con
+    # lui il job — anche a immagine gia' pubblicata. Il "build record" di buildx
+    # e' un artefatto per ogni build che nessuno scarica mai.
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
+    name: Build & validate patched jitsi/web
+    # Self-hosted ARC runner in the cluster, like ci.yml / release.yml / dev.yml.
+    # GitHub-hosted runners are unavailable to this org (billing), so a
+    # `ubuntu-latest` job never even starts.
+    runs-on: arc-runner-pa-webinar
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image (load locally, don't push yet)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./infra/jitsi-web-patched
+          file: ./infra/jitsi-web-patched/Dockerfile
+          load: true
+          push: false
+          # The docker exporter (load:true) can't carry provenance/SBOM
+          # attestations; leaving them on makes buildx emit an image index the
+          # local daemon refuses to load. Disable so the exact validated image
+          # loads and is then `docker push`ed unchanged.
+          provenance: false
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+
+      # Independent post-build gate on the EXACT image that will be pushed.
+      # The Dockerfile RUN already fails the build if the patch is wrong, so the
+      # grep counts here are deliberate belt-and-suspenders for a mic-silencing-
+      # critical image; the unique add is `node --check` (bundle still parses).
+      - name: Validate patched bundle
+        run: |
+          set -euo pipefail
+          IMG="${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+          docker run --rm --entrypoint cat "$IMG" /usr/share/jitsi-meet/libs/app.bundle.min.js > patched.js
+          docker run --rm --entrypoint cat "$BASE_IMAGE" /usr/share/jitsi-meet/libs/app.bundle.min.js > orig.js
+          # Count OCCURRENCES with `grep -oF … | wc -l` — NOT `grep -c`/`grep -oc`,
+          # which count matching LINES and always return 1 on this single-line
+          # minified bundle. The patched form must appear exactly once and the
+          # unpatched target must be gone (catches a missing target AND an
+          # ambiguous over-patch — the mixer `this.audioContext=new AudioContext`
+          # is never a sed target, so it stays intact).
+          test "$(grep -oF 'Xy=new AudioContext({sampleRate:48000}))' patched.js | wc -l | tr -d ' ')" = "1"
+          test "$(grep -oF 'Xy=new AudioContext)' patched.js | wc -l | tr -d ' ')" = "0"
+          # Syntax-validate. The extraction above uses `--entrypoint cat`: without
+          # it the image's s6 init runs first and prepends its own lines to the
+          # file, so BOTH bundles failed to parse — and the "only gate when the
+          # baseline parses" fallback below meant this check silently never ran.
+          # It does now, and it is the guard that matters most for a bundle we
+          # edit by hand.
+          if node --check orig.js 2>/dev/null; then
+            node --check patched.js
+            echo "patched bundle is valid JS (node --check) and carries every patch"
+          else
+            echo "::warning::node cannot parse the UNPATCHED bundle either — falling back to the Dockerfile's before/after grep guards"
+          fi
+          # CSS patch (#3): the reaction overlay must be click-through, exactly
+          # once, and the selector it targets must still exist upstream — a
+          # silently-renamed class would leave the rule inert and the toolbar
+          # unclickable again during a reaction burst.
+          docker run --rm --entrypoint cat "$IMG" /usr/share/jitsi-meet/css/all.css > patched.css
+          docker run --rm --entrypoint cat "$BASE_IMAGE" /usr/share/jitsi-meet/css/all.css > orig.css
+          test "$(grep -oF 'pa-webinar reactions overlay' patched.css | wc -l | tr -d ' ')" = "1"
+          test "$(grep -oF 'pa-webinar reactions overlay' orig.css | wc -l | tr -d ' ')" = "0"
+          grep -qF '.reactions-animations-container,.reactions-animations-container *{pointer-events:none!important}' patched.css
+          grep -qF '.reactions-animations-container{' orig.css
+          echo "reaction overlay is click-through and the upstream selector is unchanged"
+          # Self-view patch: an explicit config.disableSelfView=false must win
+          # over the value stored in the browser, and the visitor rule must be
+          # untouched. Verified on the exact bundle that will be pushed.
+          test "$(grep -oF '(!1!==e["features/base/config"].disableSelfView&&(e["features/base/config"].disableSelfView||e["features/base/settings"].disableSelfView))||e9(e)' patched.js | wc -l | tr -d ' ')" = "1"
+          test "$(grep -oF 'e["features/base/config"].disableSelfView||e["features/base/settings"].disableSelfView||e9(e)' patched.js | wc -l | tr -d ' ')" = "0"
+          test "$(grep -oF 'e["features/base/config"].disableSelfView||e["features/base/settings"].disableSelfView||e9(e)' orig.js | wc -l | tr -d ' ')" = "1"
+          echo "self-view selector patched exactly once, and the upstream form is gone"
+
+      # Push the EXACT image that was validated above (loaded into the local
+      # daemon in the build step) — do NOT rebuild, or the pushed artifact could
+      # diverge from the validated one (mutable base tag, cache drift).
+      - name: Push validated image
+        run: docker push "${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+
+      - name: Summary
+        run: |
+          {
+            echo "### Patched jitsi/web pushed"
+            echo ""
+            echo "\`${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}\` — base \`${BASE_IMAGE}\`, rnnoise AudioContext at 48 kHz, reaction overlay pointer-events:none, self-view config-overridable."
+          } >> "$GITHUB_STEP_SUMMARY"

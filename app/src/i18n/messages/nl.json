@@ -96,7 +96,11 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": ".ics-bestand downloaden"
-      }
+      },
+      "alreadyRegisteredEnter": "Al geregistreerd? Ga naar de zaal",
+      "invalidTokenTitle": "Toegangslink niet meer geldig",
+      "invalidTokenBody": "De link die u hebt gebruikt is ongeldig of verlopen. Als u zich hebt geregistreerd, vindt u uw persoonlijke link in de bevestigingsmail; registreer u anders hieronder opnieuw.",
+      "invalidTokenBodyEnded": "De link die u hebt gebruikt is niet meer geldig. Het evenement is afgelopen: hieronder vindt u de opname en het materiaal."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -116,6 +120,20 @@
     "list": {
       "filterByTag": "Filteren op categorie",
       "allTags": "Alle"
+    },
+    "wordCloudTitle": "Woordwolk",
+    "recap": {
+      "title": "Samenvatting van het evenement",
+      "intro": "Een overzicht van wat er tijdens het evenement aan bod is gekomen.",
+      "participants": "Deelnemers (piek)",
+      "registered": "Geregistreerd",
+      "topQuestions": "Vragen met de meeste stemmen",
+      "upvotes": "{count, plural, =0 {geen stemmen} one {1 stem} other {# stemmen}}",
+      "polls": "Resultaten van de peilingen",
+      "votes": "{count, plural, =0 {geen stemmen} one {1 stem} other {# stemmen}}",
+      "topWords": "Meest gedeelde woorden",
+      "feedback": "Gemiddelde beoordeling",
+      "feedbackCount": "{count, plural, one {1 antwoord} other {# antwoorden}}"
     }
   },
   "registration": {
@@ -164,8 +182,11 @@
       "consentRequired": "Toestemming voor gegevensverwerking is vereist",
       "recordingConsentRequired": "Toestemming voor opname is vereist voor dit evenement",
       "eventFull": "Het evenement heeft het maximale aantal deelnemers bereikt",
-      "generic": "Fout bij inschrijving. Probeer het opnieuw."
-    }
+      "generic": "Fout bij inschrijving. Probeer het opnieuw.",
+      "multitrackConsentRequired": "Toestemming voor het opnemen van uw audiospoor is verplicht voor dit evenement"
+    },
+    "successScheduledMessage": "U bent geregistreerd! We hebben u een e-mail gestuurd met uw persoonlijke toegangslink. Zet het evenement in uw agenda en kom kort voor aanvang weer terug.",
+    "addToCalendar": "Aan agenda toevoegen"
   },
   "videoLibrary": {
     "title": "Videobibliotheek",
@@ -252,7 +273,33 @@
       "noMessages": "Nog geen berichten",
       "empty": "Nog geen berichten. Wees de eerste!",
       "inputLabel": "Chatbericht",
-      "moderatorBadge": "Moderator"
+      "moderatorBadge": "Moderator",
+      "attach": "Een bestand bijvoegen",
+      "emojiPicker": "Emoji invoegen",
+      "attachBadType": "Bestandstype wordt niet ondersteund (afbeeldingen of PDF).",
+      "attachTooLarge": "Bestand te groot (max. 10 MB).",
+      "attachFailed": "Uploaden mislukt. Probeer het opnieuw.",
+      "sendFailed": "Bericht niet verzonden. Probeer het opnieuw.",
+      "removeAttachment": "Bijlage verwijderen",
+      "openAttachment": "Bijlage openen",
+      "reply": "Beantwoorden",
+      "replyingTo": "Antwoord aan {name}",
+      "cancelReply": "Antwoord annuleren",
+      "hide": "Verbergen",
+      "hideFailed": "Kan het bericht niet verbergen. Probeer het opnieuw.",
+      "connReconnecting": "Opnieuw verbinden…",
+      "connDegraded": "Vertraagde updates",
+      "readDenied": "De chat is niet beschikbaar: u staat niet in de deelnemerslijst van dit evenement, of de zaal is nog niet open. We proberen het automatisch opnieuw.",
+      "mentionNotificationTitle": "{name} heeft u genoemd in de chat",
+      "react": "Reageren",
+      "edited": "bewerkt",
+      "editLabel": "Bericht bewerken",
+      "editSave": "Opslaan",
+      "editFailed": "Het bericht kon niet worden bewerkt.",
+      "exportChat": "De chat downloaden",
+      "reactNotAllowed": "Om op berichten te reageren hebt u uw persoonlijke link of de moderatorlink nodig.",
+      "editNotAllowed": "Dit is een gedeelde link: daarmee kunt u berichten niet bewerken.",
+      "editExpired": "Er zijn meer dan 15 minuten verstreken: dit bericht kan niet meer worden bewerkt."
     },
     "role": {
       "moderator": "Moderator",
@@ -271,7 +318,9 @@
         "medium": "Gemiddeld",
         "poor": "Slecht",
         "unknown": "n.v.t."
-      }
+      },
+      "volume": "Volume",
+      "volumeFor": "Volume van {name}"
     },
     "moderator": {
       "muteAll": "Iedereen dempen",
@@ -295,14 +344,17 @@
       "micDisabled": "Microfoon uit",
       "videoModeration": "Video deelnemers",
       "videoDisabled": "Video uit",
-      "eventEndedSuccess": "Evenement succesvol beëindigd. U wordt doorgestuurd..."
+      "eventEndedSuccess": "Evenement succesvol beëindigd. U wordt doorgestuurd...",
+      "whiteboard": "Whiteboard",
+      "lowerHand": "Hand omlaag"
     },
     "closeDrawer": "Sluiten",
     "hintBanner": {
       "controls": "Bediening onderaan",
       "raiseHand": "Steek uw hand op om te spreken",
       "sidebar": "Q&A en chat in het zijpaneel",
-      "dismiss": "Begrepen"
+      "dismiss": "Begrepen",
+      "ariaLabel": "Tips"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# persoon} other {# personen}}"
@@ -310,7 +362,55 @@
     "sidebarTabChatUnread": "Nieuwe ongelezen berichten",
     "floatingControlsLabel": "Bediening evenement",
     "screenshareActive": "🖥️ {name} deelt het scherm",
-    "screenshareFallbackName": "Een deelnemer"
+    "screenshareFallbackName": "Een deelnemer",
+    "share": {
+      "button": "Delen",
+      "title": "Het evenement delen",
+      "callLink": "Deelnamelink",
+      "callLinkHint": "Wie deze link opent, komt rechtstreeks binnen zolang het evenement live is; anders volgt eerst de registratie. De link bevat geen vertrouwelijke tokens.",
+      "eventLink": "Pagina van het evenement",
+      "eventLinkHint": "De openbare pagina met de details en het registratieformulier.",
+      "copy": "Kopiëren",
+      "copied": "Gekopieerd!",
+      "moderatorReveal": "Moderatorlink tonen",
+      "moderatorWarning": "Deze link geeft MODERATOR-toegang (iedereen dempen, opname starten, evenement beëindigen). Deel hem alleen met andere moderatoren.",
+      "moderatorLink": "Moderatorlink",
+      "moderatorLinkHint": "Wie deze link opent, komt binnen als moderator met volledige regie over de zaal."
+    },
+    "enterFullscreen": "Volledig scherm",
+    "exitFullscreen": "Volledig scherm verlaten",
+    "leaveChoice": {
+      "title": "Hoe wilt u de call verlaten?",
+      "body": "U kunt alleen zelf vertrekken — de call blijft actief voor de anderen — of de call voor alle deelnemers beëindigen.",
+      "leaveSelf": "Alleen zelf vertrekken",
+      "endForAll": "Voor iedereen beëindigen",
+      "ending": "Bezig met beëindigen…",
+      "endError": "Beëindigen mislukt. Probeer het opnieuw."
+    },
+    "endDestino": {
+      "title": "Bestemming van het evenement",
+      "body": "U staat op het punt het evenement voor iedereen te beëindigen. Wat moet ermee gebeuren zodra het is afgelopen?",
+      "public": "Openbaar houden",
+      "publicHelp": "De pagina van het afgelopen evenement blijft zichtbaar met samenvatting, vragen (Q&A), peilingen, materiaal en feedback.",
+      "library": "In de bibliotheek publiceren",
+      "libraryHelp": "Zoals hierboven, en bovendien wordt het evenement getoond in de openbare videobibliotheek (vereist een gepubliceerde opname of een YouTube-video).",
+      "archive": "Archiveren (privé)",
+      "archiveHelp": "De pagina van het afgelopen evenement wordt niet openbaar (404). De gegevens blijven bewaard tot de bewaartermijn verstrijkt en worden daarna verwijderd.",
+      "genAi": "AI-transcriptie en -samenvatting genereren uit de opname (zodra de verwerking klaar is)",
+      "back": "Terug",
+      "confirm": "Evenement beëindigen"
+    },
+    "liveFeaturesLabel": "Functies:",
+    "whiteboardNotSavedHint": "Het whiteboard wordt niet automatisch opgeslagen. Als u het gebruikt, exporteer het dan (menu van het whiteboard) en voeg het toe aan het Materiaal van het evenement voordat u afsluit.",
+    "sidebarTabWordcloud": "Woordwolk",
+    "sidebarTabAgenda": "Notities / Checklist",
+    "liveToggleAgenda": "Notities / Checklist (agenda)",
+    "timer": {
+      "show": "De timer tonen",
+      "hide": "De timer verbergen",
+      "remainingLabel": "Resterende tijd (klik voor de verstreken tijd)",
+      "elapsedLabel": "Verstreken tijd (klik voor de resterende tijd)"
+    }
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -407,12 +507,31 @@
         "maxParticipantsHelp": "Schat het maximum aantal deelnemers. Bepaalt de capaciteit van de videoserver en de UI van de wachtruimte.",
         "validation": {
           "startsAt": "Ongeldige startdatum.",
-          "endsAt": "Einddatum moet na startdatum liggen."
+          "endsAt": "Einddatum moet na startdatum liggen.",
+          "titleRequired": "De titel is verplicht (minimaal 3 tekens).",
+          "titleRequiredOtherLocale": "De titel in de standaardtaal ({locale}) is verplicht: ga naar het tabblad {locale}.",
+          "maxParticipants": "Voer een getal tussen 2 en 500 in."
         },
         "senderRatioLabel": "Geschat percentage actief",
         "senderRatioHelp": "Hoeveel deelnemers naar verwachting microfoon/video aan zullen hebben. Helpt bij het dimensioneren van de videoserver.",
         "activeParticipantsEstimate": "≈ {count} actieve deelnemers",
-        "senderRatioPreset": "{pct}%"
+        "senderRatioPreset": "{pct}%",
+        "advancedOptions": "Geavanceerde opties",
+        "waitingRoomEngineLabel": "Wachtruimte (dit evenement)",
+        "waitingRoomEngineSiteDefault": "Standaard van de site",
+        "waitingRoomEngineGarden": "Tuin (normaal)",
+        "waitingRoomEngineGame": "Videogame (Phaser-lobby)",
+        "waitingRoomEngineClassic": "Klassiek (statisch)",
+        "waitingRoomEngineHelp": "Overschrijft de standaardinstelling van de site voor dit evenement.",
+        "videoQuality": "Video-/audiokwaliteit (dit evenement)",
+        "videoQualityHelp": "Overschrijft de standaardinstelling van de site voor dit evenement. Een hogere kwaliteit verbruikt meer bandbreedte.",
+        "videoQualitySiteDefault": "Standaard van de site",
+        "videoQualityOptions": {
+          "MAX": "Maximaal (1080p, hoge kwaliteit)",
+          "HIGH": "Hoog (720p, aanbevolen)",
+          "BALANCED": "Gebalanceerd (540p)",
+          "SAVE_DATA": "Databesparing (360p)"
+        }
       },
       "step2": {
         "heading": "Wie mag wat",
@@ -449,7 +568,8 @@
             "desc": "De opname starten/stoppen."
           }
         },
-        "recordingHeading": "Opname"
+        "recordingHeading": "Opname",
+        "roomFeaturesHeading": "Functies van de zaal"
       },
       "step3": {
         "heading": "Personen en uitnodigingen",
@@ -484,7 +604,8 @@
         "invalidEmail": "Ongeldig e-mailadres.",
         "duplicateEmail": "Adres al toegevoegd.",
         "rubricaPick": "Zoeken in adresboek…",
-        "rubricaOrAdd": "of handmatig toevoegen"
+        "rubricaOrAdd": "of handmatig toevoegen",
+        "organizerLogo": "Logo van de organisator"
       },
       "step4": {
         "heading": "Inhoud en materialen",
@@ -544,7 +665,9 @@
           "recording": "Opname",
           "recordingAuto": "Aan — automatische start",
           "recordingManual": "Aan — handmatige start",
-          "recordingOff": "Niet actief"
+          "recordingOff": "Niet actief",
+          "multitrack": "Opname per deelnemer",
+          "multitrackOn": "Aan — vereist uitdrukkelijke toestemming bij de registratie"
         },
         "noRecurrence": "Eenmalig evenement",
         "gdprHeading": "Privacy en bewaring van gegevens",
@@ -560,9 +683,24 @@
         "featuresHeading": "Configuratie-overzicht",
         "privacyDoc": "Privacydocument (PDF of link)",
         "privacyDocHelp": "Upload een PDF of plak de URL van een vervangende privacyverklaring. Vervangt het AVG-sjabloon indien aanwezig.",
-        "privacyTextHelp": "Korte tekst die op het aanmeldingsformulier wordt getoond; kan het AVG-sjabloon aanvullen of vervangen."
+        "privacyTextHelp": "Korte tekst die op het aanmeldingsformulier wordt getoond; kan het AVG-sjabloon aanvullen of vervangen.",
+        "moderatorPublishHint": "Naam en e-mailadres zijn verplicht om het evenement te publiceren (ze worden gebruikt voor de moderatorlink en de bevestigingsmail). Om als concept op te slaan zijn ze niet vereist.",
+        "moderatorLinkNote": "Deze persoon is de hoofdmoderator van het evenement: hij of zij ontvangt per e-mail een privélink om het te beheren (opname starten, vragen modereren, peilingen starten…). Dit is iets anders dan de comoderatoren die in de stap “Personen” worden toegevoegd; die krijgen elk hun eigen link.",
+        "moderatorRequired": "Voer de naam van de moderator in",
+        "moderatorEmailRequired": "Voer een geldig e-mailadres van de moderator in"
       },
-      "validationFailed": "Controleer de gemarkeerde velden voordat u doorgaat."
+      "validationFailed": "Controleer de gemarkeerde velden voordat u doorgaat.",
+      "partialFailure": "Evenement aangemaakt, maar sommige onderdelen zijn niet opgeslagen: {items}. U kunt ze toevoegen vanaf de pagina van het evenement.",
+      "draftFound": "We hebben een niet-opgeslagen concept van dit evenement gevonden. Wilt u het herstellen?",
+      "draftRestore": "Concept herstellen",
+      "draftDiscard": "Negeren",
+      "resources": {
+        "organizers": "organisatoren",
+        "invitations": "uitnodigingen",
+        "moderators": "moderatoren",
+        "speakers": "sprekers",
+        "materials": "materiaal"
+      }
     },
     "nav": {
       "events": "Evenementbeheer",
@@ -603,7 +741,8 @@
       "eventQuestionnaires": "Vragenlijsten",
       "rubricaList": "Lijst",
       "rubricaDetail": "Detail",
-      "feedbackDashboard": "Feedback"
+      "feedbackDashboard": "Feedback",
+      "recordingsPostprod": "Transcripties / AI"
     },
     "landing": {
       "title": "Beheerpaneel",
@@ -701,7 +840,8 @@
           "dateRequired": "De originele datum is verplicht.",
           "saveFailed": "Opslaan van de metadata is mislukt."
         }
-      }
+      },
+      "updateFailed": "Bijwerken mislukt."
     },
     "recordingsLibrary": {
       "title": "Video-opnames",
@@ -770,7 +910,10 @@
       "detailEnd": "Einde",
       "detailModerator": "Moderator",
       "detailRoom": "Jitsi-ruimte",
-      "detailFilename": "Bestandsnaam"
+      "detailFilename": "Bestandsnaam",
+      "transcriptManage": "Transcriptie / AI beheren",
+      "transcriptReady": "Getranscribeerd",
+      "transcriptProcessing": "In verwerking"
     },
     "gdprAudit": {
       "title": "AVG-audit",
@@ -1023,7 +1166,32 @@
       "retentionPreviewRecordings": "Video-opnamen",
       "retentionPreviewKept": "Geaggregeerde statistieken en metadata van het evenement blijven bewaard.",
       "configPreview": "Configuratievoorbeeld",
-      "templateApplied": "Sjabloon toegepast: {name}. U kunt alle instellingen wijzigen."
+      "templateApplied": "Sjabloon toegepast: {name}. U kunt alle instellingen wijzigen.",
+      "agendaEnabled": "Live notities / checklist (agenda)",
+      "agendaEnabledDesc": "Een checklist met de te behandelen punten die de moderatoren tijdens het evenement afvinken. Wordt meegenomen in de automatische samenvatting. Optioneel en ook tijdens het evenement in te schakelen.",
+      "whiteboardEnabled": "Gedeeld whiteboard",
+      "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Altijd actief bij directe calls.",
+      "aiSectionHeading": "Automatische postproductie",
+      "aiSectionDesc": "Na afloop van het evenement kan de opname worden verwerkt door een AI-pijplijn in het cluster om een transcriptie, een samenvatting en, indien gewenst, vertalingen en nasynchronisatie te produceren. Alles gebeurt op de infrastructuur van het Departement, er gaan geen gegevens naar derden.",
+      "aiTranscriptEnabled": "Automatische transcriptie",
+      "aiTranscriptEnabledDesc": "Spraakherkenning met identificatie van de sprekers. Vereist om samenvatting, vertalingen en nasynchronisatie in te schakelen.",
+      "aiSummaryEnabled": "Samenvatting en hoofdstukken",
+      "aiSummaryEnabledDesc": "Samenvatting van de bijeenkomst, genomen besluiten, actiepunten en indeling in hoofdstukken met tijdsaanduiding.",
+      "aiTranslationEnabled": "Vertaling in andere talen",
+      "aiTranslationEnabledDesc": "Transcriptie en samenvatting vertaald in de hieronder ingestelde talen.",
+      "aiTargetLocales": "Vertaaltalen",
+      "aiTargetLocalesDesc": "ISO-taalcodes (bijv. en, fr, de) gescheiden door komma’s. Laat leeg om de talen te gebruiken die op siteniveau zijn ingesteld.",
+      "aiTargetLocalesRequired": "Geef minstens één vertaaltaal op, of schakel de automatische vertaling uit.",
+      "aiDubbingEnabled": "Audio-nasynchronisatie",
+      "aiDubbingEnabledDesc": "Nagesynchroniseerde audio in de doeltalen, gegenereerd met vooraf getrainde synthetische stemmen. De stem van de deelnemers wordt niet gekloond.",
+      "consentBadge": "Uitdrukkelijke toestemming",
+      "retentionBadge": "Verlengt de bewaartermijn",
+      "multitrackRecordingEnabled": "Opname per deelnemer (hoge nauwkeurigheid)",
+      "multitrackRecordingEnabledDesc": "Neemt voor elke deelnemer een apart audiospoor op, zodat de transcriptie met zekerheid toewijst wie wat zegt (geen “Spreker 1/2” meer). Hierbij wordt geïsoleerde audio van één spreker verwerkt (gevoelig persoonsgegeven): de sporen zijn tijdelijk en worden meteen na de transcriptie verwijderd. Vereist toestemming voor de opname.",
+      "retainParticipantTracks": "De sporen per deelnemer bewaren",
+      "retainParticipantTracksDesc": "Bewaart de afzonderlijke audiosporen ook na de transcriptie, voor het downloadbare archief en het terugluisteren per spreker. LET OP: dit verlengt de bewaring van gevoelige persoonsgegevens (geïsoleerde stem) tot het verstrijken van de bewaartermijn van het evenement. Alleen inschakelen wanneer het nodig is en met passende toestemming/informatievoorziening.",
+      "expectedSpeakers": "Verwacht aantal sprekers",
+      "expectedSpeakersDesc": "Wanneer u dit weet (bijv. 3 sprekers), verbetert het opgeven ervan de kwaliteit van de sprekeridentificatie. Laat leeg om de pijplijn te laten beslissen."
     },
     "links": {
       "title": "Evenementlinks",
@@ -1123,7 +1291,8 @@
         "pages": "Pagina's",
         "footer": "Footer",
         "features": "Functionaliteiten",
-        "scaling": "Infra-dimensionering"
+        "scaling": "Infra-dimensionering",
+        "postprod": "AI-pijplijn na het evenement"
       },
       "scaling": {
         "intro": "Parameters die de capaciteit van het cluster beschrijven waarop het platform draait. De standaardwaarden zijn afgestemd op Azure F16s_v2 (16 vCPU / 32 GiB) voor JVB en F4s_v2 (4 vCPU / 8 GiB) voor Jibri. Bij andere hardware deze waarden bijwerken — de scaler herberekent direct.",
@@ -1285,7 +1454,55 @@
         "jvbProvisioningTimeoutMinutes": "Provisioning-timeout (minuten)",
         "jvbProvisioningTimeoutMinutesHelp": "Na hoeveel minuten vanaf startsAt een evenement zonder JVB-readiness als 'degraded' wordt gemeld op de statuspagina. Standaard 15. Dekt cold-start van de knoop (~3-5 min) + veiligheidsmarge.",
         "statusPollIntervalSeconds": "Polling-interval statuspagina (seconden)",
-        "statusPollIntervalSecondsHelp": "Hoe vaak de /status-pagina vanuit de browser wordt vernieuwd. Standaard 30. Lagere waarden = verser data maar meer belasting op de app."
+        "statusPollIntervalSecondsHelp": "Hoe vaak de /status-pagina vanuit de browser wordt vernieuwd. Standaard 30. Lagere waarden = verser data maar meer belasting op de app.",
+        "jvbEmptyCloseMinutes": "Minuten lege zaal vóór definitieve sluiting",
+        "jvbEmptyCloseMinutesHelp": "Als een LIVE zaal die al deelnemers heeft gehad dit aantal minuten leeg blijft, wordt de zaal definitief gesloten (ENDED) — zo sluit een evenement zonder moderator zichzelf wegens inactiviteit, zonder het geplande eindtijdstip af te wachten. Standaard 15 (actief). -1 = uitgeschakeld. 0 = sluiten bij de eerste controle met lege zaal.",
+        "waitingRoomLeadMinutes": "Vervroegde toegang tot de zaal (minuten)",
+        "waitingRoomLeadMinutesHelp": "Wie zich binnen dit aantal minuten vóór de aanvang registreert, komt meteen in de wachtruimte; wie zich eerder registreert, ziet de bevestiging met de link naar de agenda. 0 = altijd het bevestigingsscherm tot aan de aanvang. Aanbevolen 15.",
+        "reactionsMode": "Reacties (emoji)",
+        "reactionsModeNative": "Native van Jitsi (in de balk, kortstondig)",
+        "reactionsModeCustom": "Van de app zelf (balk links, met statistieken)",
+        "reactionsModeHelp": "Native = de reactieknop van Jitsi in de bedieningsbalk, licht en kortstondig (niet meegeteld). Custom = de reactiebalk van de app linksonder, met tellingen en statistieken. Standaard: Native.",
+        "emailSenderTitle": "Afzender van de e-mails",
+        "emailSenderHelp": "Hoe de afzender verschijnt in de mailbox van wie zich registreert. Het verzendadres blijft in de deployment geconfigureerd (het moet overeenkomen met het adres dat de SMTP-server toestaat).",
+        "emailFromName": "Naam van de afzender",
+        "emailFromNameHelp": "Leeg = de naam die in de deployment is geconfigureerd (SMTP_FROM_NAME) wordt gebruikt. De e-mails worden nog steeds vanaf het systeemadres verzonden.",
+        "emailReplyTo": "Adres voor antwoorden",
+        "emailReplyToHelp": "De e-mails komen van een no-reply-adres: zonder dit adres komt een antwoord bij niemand terecht.",
+        "avatarTitle": "Afbeeldingen van de deelnemers",
+        "gravatarEnabled": "Gravatar gebruiken wanneer beschikbaar",
+        "gravatarEnabledHelp": "Wie zich heeft geregistreerd met een e-mailadres dat een Gravatar heeft, ziet die als afbeelding in de zaal; voor alle anderen blijven de initialen die het platform genereert. De afbeelding loopt via onze server, dus de browser van de deelnemers neemt geen contact op met gravatar.com — het platform wel: dat moet in de privacyverklaring worden vermeld."
+      },
+      "postprod": {
+        "prerequisitesNote": "De postproductie werkt op de volledige opname, na afloop van het evenement. De speciale GPU-pool wordt actief zodra de eerste taak in de wachtrij komt en schakelt uit wanneer de wachtrij leeg is, om de kosten te beperken. Controleer voordat u de pijplijn inschakelt of het cluster de GPU-pool geconfigureerd heeft, of de NVIDIA-operator is geïnstalleerd, of de HuggingFace-inloggegevens in de namespace aanwezig zijn en of het volume met de modelgewichten vooraf is geladen. De operationele checklist staat in docs/POSTPROD.md.",
+        "pipelineEnabled": "Pijplijn na het evenement actief",
+        "pipelineEnabledHelp": "Hoofdschakelaar. Wanneer deze uit staat, wordt er voor nieuwe evenementen geen transcriptie, samenvatting, vertaling of nasynchronisatie geproduceerd, ook niet als de postproductie voor de afzonderlijke evenementen is ingeschakeld. Reeds gegenereerde artefacten worden niet meer openbaar getoond totdat u de schakelaar weer aanzet. Handig om de pijplijn te pauzeren zonder de applicatie opnieuw uit te rollen.",
+        "timingNote": "De pijplijn grijpt niet in op de live-uitzending. Alles gebeurt na afloop van het evenement, wanneer de opname wordt gearchiveerd: de ondertiteling en de samenvatting zijn nooit in realtime beschikbaar. Deze keuze geeft voorrang aan de kwaliteit van de transcriptie en beperkt het GPU-verbruik ten opzichte van live captioning.",
+        "providersSection": "AI-engines",
+        "providersIntro": "De engines die worden gebruikt voor transcriptie, samenvatting en nasynchronisatie worden bij de uitrol vastgelegd. Een nieuwe engine toevoegen vereist ingrijpen in de infrastructuur (de engine in het cluster uitrollen, hem opnemen in de lijst met ondersteunde providers, het schema bijwerken). De keuzelijsten hieronder tonen de engines die momenteel op deze instantie beschikbaar zijn.",
+        "asrProvider": "Transcriptie-engine",
+        "asrProviderHelp": "Genereert de transcriptie van de video met tijdsaanduiding per minuut en scheiding van de sprekers. Wij gebruiken WhisperX large-v3 samen met pyannote.audio voor de diarization. Beide modellen draaien in het cluster op de gewichten die op het speciale volume zijn geladen.",
+        "asrOptionWhisperx": "WhisperX large-v3 + pyannote-diarization",
+        "llmProvider": "Engine voor samenvatting en vertaling",
+        "llmProviderHelp": "Produceert de samenvatting van de bijeenkomst, herkent de behandelde onderwerpen en vertaalt de transcriptie en de samenvatting in de doeltalen. Model Mistral-Small-3.2-24B (Europese leverancier, Apache 2.0-licentie), gehost via vLLM in het cluster.",
+        "llmOptionVllm": "Mistral-Small-3.2-24B · vLLM in het cluster",
+        "ttsEngine": "Nasynchronisatie-engine",
+        "ttsEngineHelp": "Synthetiseert de audio in de gekozen talen met openbare, vooraf getrainde stemmen. Wanneer er meerdere sprekers zijn, krijgt elke spreker een andere stem uit de beschikbare pool om het luisteren te vergemakkelijken: de toewijzing is willekeurig en geeft op geen enkele manier de echte stem van de deelnemers weer. De nasynchronisatie wordt alleen geproduceerd als de organisator daarom vraagt voor het betreffende evenement.",
+        "ttsOptionPiper": "Piper TTS · vooraf getrainde synthetische stemmen",
+        "voiceCloningSection": "Redactionele lijn over de stem",
+        "voiceCloningNote": "Het systeem gebruikt uitsluitend generieke synthetische stemmen (Piper TTS, openbare modellen onder MIT-licentie). Het analyseert, bewaart en reproduceert de stem van de echte deelnemers niet: elke spreker wordt weergegeven met een stem uit de pool, deterministisch gekozen op basis van de spreektijd, zonder enige band met zijn of haar stemidentiteit. De toegewezen stem verandert met de samenstelling van de sprekers van elk afzonderlijk evenement, zodat dezelfde spreker in verschillende evenementen met verschillende stemmen kan worden nagesynchroniseerd. Deze keuze voorkomt de verwerking van biometrische gegevens zoals geregeld in artikel 9 AVG.",
+        "defaultTargetLocales": "Standaard vertaaltalen",
+        "defaultTargetLocalesHelp": "ISO-639-1-codes gescheiden door komma’s (bijv. `en,fr,de`). Ze worden gebruikt voor evenementen die geen eigen vertaaltalen opgeven. De brontaal van het evenement wordt altijd automatisch uitgesloten.",
+        "limitsSection": "Operationele limieten",
+        "maxConcurrentJobs": "Parallelle jobs",
+        "maxConcurrentJobsHelp": "Maximaal aantal taken dat de pijplijn tegelijk op de GPU-pool uitvoert. Meer parallelle jobs werken de wachtrij sneller weg wanneer u meerdere evenementen achter elkaar afsluit, maar vereisen beschikbare GPU’s. De gebruikelijke waarde is 2.",
+        "jobMaxAttempts": "Pogingen vóór mislukking",
+        "jobMaxAttemptsHelp": "Hoe vaak de pijplijn een taak opnieuw probeert voordat deze als mislukt wordt gemarkeerd. De backoff tussen de pogingen groeit exponentieel (van 30 seconden tot 2 uur). De gebruikelijke waarde is 5.",
+        "artifactRetentionDays": "Bewaring van de artefacten (dagen)",
+        "artifactRetentionDaysHelp": "Op 0 volgen de AI-artefacten dezelfde vervaltermijn als het evenement. Een waarde groter dan nul bewaart ze gedurende het opgegeven aantal dagen, ook na de afsluiting van het evenement, totdat een dagelijkse cron ze verwijdert. Het verwijderen omvat de namen van de sprekers en de payloads van de jobs, in lijn met docs/GDPR.md.",
+        "consentDisclosureSection": "AI-mededeling in de wachtruimte",
+        "consentDisclosureHelp": "Tekst die aan de deelnemers in de wachtruimte wordt getoond wanneer het evenement AI-postproductie gebruikt (transcriptie, samenvatting, vertaling, nasynchronisatie). Per taal aan te passen. Laat leeg om de standaardtekst van het systeem te gebruiken.",
+        "consentDisclosurePlaceholder": "Bijv. Dit evenement wordt na de live-uitzending automatisch getranscribeerd en samengevat met AI-hulpmiddelen…"
       }
     },
     "analytics": {
@@ -1372,7 +1589,23 @@
       "screen": "Scherm delen",
       "pickerTitle": "Kies een sjabloon",
       "pickerSubtitle": "Selecteer een sjabloon om de evenementinstellingen vooraf te configureren, of sla over om alles handmatig in te stellen.",
-      "skipTemplate": "Handmatig instellen"
+      "skipTemplate": "Handmatig instellen",
+      "whiteboardLabel": "Whiteboard",
+      "waitingRoomEngineLabel": "Wachtruimte (standaard van het sjabloon)",
+      "waitingRoomEngineSiteDefault": "Standaard van de site",
+      "waitingRoomEngineGarden": "Tuin (normaal)",
+      "waitingRoomEngineGame": "Videogame (Phaser-lobby)",
+      "waitingRoomEngineClassic": "Klassiek (statisch)",
+      "waitingRoomEngineHelp": "Vult de engine van de wachtruimte vooraf in voor evenementen die met dit sjabloon worden gemaakt. Blijft aanpasbaar in de wizard.",
+      "durationLabel": "Standaardduur (minuten)",
+      "durationHint": "Vult het einde van het evenement vooraf in (begin + duur). De gebruiker kan dit wijzigen. Leeg = 2 uur.",
+      "retentionLabel": "Standaard bewaring van gegevens (dagen)",
+      "expectedSpeakersLabel": "Verwacht aantal sprekers (standaard)",
+      "descriptionTemplateLabel": "Standaardbeschrijving",
+      "descriptionTemplateHint": "Tekst die vooraf in de beschrijving van het evenement wordt ingevuld (aanpasbaar).",
+      "aiTranscript": "Automatische transcriptie (standaard)",
+      "aiSummary": "Automatische samenvatting (standaard)",
+      "aiTranslation": "Automatische vertaling (standaard)"
     },
     "instantCall": {
       "title": "Directe videogesprek",
@@ -1456,7 +1689,8 @@
       },
       "errors": {
         "saveFailed": "Opslaan mislukt. Controleer de gegevens en probeer opnieuw."
-      }
+      },
+      "deleteTitle": "Sjabloon verwijderen"
     },
     "emailTemplates": {
       "title": "E-mailsjablonen",
@@ -1637,7 +1871,8 @@
       "play": "Afspelen",
       "hidePlayer": "Speler verbergen",
       "download": "Downloaden",
-      "deleteConfirm": "Deze sessie en de bijbehorende opname verwijderen?"
+      "deleteConfirm": "Deze sessie en de bijbehorende opname verwijderen?",
+      "deleteTitle": "Sessie verwijderen"
     },
     "monitoring": {
       "title": "Monitoring",
@@ -1798,7 +2033,9 @@
         "settings": "Instellingen",
         "people": "Personen",
         "content": "Inhoud",
-        "audit": "Opnames & audit"
+        "audit": "Opnames & audit",
+        "postEvent": "Na het evenement",
+        "analytics": "Statistieken"
       },
       "toggles": {
         "unmute": "Deelnemers kunnen spreken",
@@ -1820,7 +2057,22 @@
         "postEventSummary": "{connected} verbonden van {registered} aanmeldingen (geschat {estimated})",
         "estimatedAttendance": "Geschat: {estimated} deelnemers"
       },
-      "copyGuestUrl": "Gastlink kopiëren"
+      "copyGuestUrl": "Gastlink kopiëren",
+      "aiManageTitle": "Transcriptie, samenvatting en vertalingen",
+      "aiManageDesc": "Beheer de AI-postproductie van deze opname: corrigeer de transcriptie en de toewijzing van de sprekers (wie zegt wat), pas de samenvatting aan en beheer de vertaaltalen.",
+      "aiManageCta": "Het postproductiebeheer openen",
+      "aiManageNotEnded": "Beschikbaar zodra het evenement is afgelopen en de opname door de AI-pijplijn is verwerkt.",
+      "aiGenerateCta": "AI nu genereren",
+      "aiGenerateRunning": "Bezig met starten…",
+      "aiGenerateQueued": "AI-pijplijn gestart: de transcriptie en de samenvatting staan in de wachtrij. Volg de voortgang in het postproductiebeheer.",
+      "aiGenerateAlready": "De AI-pijplijn was al gestart voor deze opname: er zijn geen nieuwe jobs toegevoegd.",
+      "aiGenerateError": "Kan de AI-pijplijn niet starten. Controleer of AI op siteniveau is ingeschakeld en of er een opname bestaat.",
+      "aiGenerateHelp": "Schakelt de AI-transcriptie + samenvatting in en start de pijplijn op de opname, met één klik. Idempotent: twee keer klikken dupliceert de jobs niet.",
+      "aiGenerateNoRecording": "Geen opname: AI na het evenement vereist een opname (het vastleggen gebeurt alleen tijdens het evenement). U kunt de postproductie hier wel beheren.",
+      "duplicateNext": "Dupliceren voor de volgende keer",
+      "duplicateNextBusy": "Bezig met dupliceren…",
+      "duplicateNextHint": "Maakt een concept met de volledige configuratie van dit evenement (opname, aparte sporen, AI, agenda, herinneringen). Als het evenement een vaste frequentie heeft, wordt de datum naar de volgende keer verplaatst; anders moet die nog worden ingesteld.",
+      "duplicateNextError": "Dupliceren mislukt. Probeer het opnieuw."
     },
     "rubrica": {
       "title": "Adresboek",
@@ -1838,6 +2090,299 @@
     "eventQuestionnaires": {
       "title": "Vragenlijsten — {eventTitle}",
       "subtitle": "Configureer een aanmeldings- en/of post-event vragenlijst door sjablonen en ad-hoc vragen te combineren."
+    },
+    "eventAnalytics": {
+      "title": "Statistieken",
+      "loadError": "Kan de statistieken niet laden.",
+      "noData": "Geen gegevens beschikbaar.",
+      "notEndedYet": "Het evenement is nog niet afgelopen: de statistieken zijn gedeeltelijk en worden in realtime bijgewerkt.",
+      "cappedNote": "Zeer groot evenement: sommige statistieken zijn berekend op basis van een steekproef (rijlimiet bereikt).",
+      "scoreTitle": "Aandachtsscore",
+      "adminOnly": "alleen admin",
+      "scoreProxy": "Index van 0–100 voor de participatie van de zaal. Het is een indicatie van participatie, geen meting van cognitieve aandacht — lees hem in de context van het format (college versus workshop), nooit als kwaliteitscijfer.",
+      "scoreUnavailable": "Onvoldoende gegevens om de score te berekenen.",
+      "comp": {
+        "attendanceRate": "Aanwezigheid (binnengekomen/geregistreerd)",
+        "breadth": "Breedte van de interactie",
+        "depth": "Diepte van de interactie",
+        "chatRate": "Chattempo",
+        "liveParticipation": "Live participatie",
+        "talkBalance": "Balans van de spreektijd",
+        "retention": "Verblijfsduur"
+      },
+      "kpiConversion": "Conversie",
+      "kpiPeak": "Piek deelnemers",
+      "kpiDuration": "Duur",
+      "kpiInteractors": "Unieke actieve deelnemers",
+      "interactionsWord": "interacties",
+      "kpiHandRaises": "Handopstekingen",
+      "handRaisesSessionsSub": "van {n, plural, one {# sessie} other {# sessies}}",
+      "kpiReactions": "Reacties",
+      "kpiRetention": "Gemiddelde verblijfsduur",
+      "dwellSub": "{d} · {n, plural, one {# gemeten} other {# gemeten}}",
+      "reactionsTitle": "Reacties",
+      "timelineTitle": "Verloop van de call",
+      "timelineEmpty": "Geen interactie geregistreerd tijdens de call.",
+      "timelinePeak": "Interactiepiek om {at} ({n} gebeurtenissen in het interval).",
+      "kind": {
+        "chat": "Chat",
+        "question": "Vragen",
+        "upvote": "Stemmen",
+        "poll": "Peilingen",
+        "word": "Woordwolk",
+        "reaction": "Reacties"
+      },
+      "speakersTitle": "Wie heeft gesproken",
+      "audioUnavailable": "Audiostatistieken niet beschikbaar — evenement niet opgenomen (of opname zonder spraak).",
+      "predominant": "Dominante spreker",
+      "talkBalance": "Balans",
+      "speechDensity": "Spraakdichtheid",
+      "chatTitle": "Chat",
+      "chatAudience": "Publiek",
+      "chatStaff": "Organisatie",
+      "qaTitle": "Vragen met de meeste stemmen",
+      "none": "Geen.",
+      "pollsTitle": "Peilingen",
+      "wordsTitle": "Woordwolk",
+      "feedbackTitle": "Feedback",
+      "responses": "antwoorden",
+      "privacyNote": "Statistieken per persoon zijn standaard gepseudonimiseerd. Anonieme geaggregeerde gegevens worden bewaard in de samenvatting van het evenement; de onbewerkte rijen worden verwijderd wanneer de bewaartermijn verstrijkt."
+    },
+    "postprod": {
+      "title": "AI-pijplijn voor postproductie",
+      "subtitle": "Transcripties, samenvattingen en vertalingen geproduceerd door de AI-pijplijn in het cluster. Wijs de sprekers toe, start de jobs opnieuw of annuleer ze.",
+      "filterStatus": "Status",
+      "all": "Alle",
+      "queued": "In wachtrij",
+      "running": "Wordt uitgevoerd",
+      "done": "Voltooid",
+      "partial": "Gedeeltelijk",
+      "failed": "Mislukt",
+      "totalRows": "{count, plural, =0 {geen opnamen} one {1 opname} other {# opnamen}}",
+      "colEvent": "Evenement",
+      "colCreated": "Aangemaakt",
+      "colDuration": "Duur",
+      "colStatus": "Status",
+      "colJobs": "Jobs",
+      "colArtifacts": "Artefacten",
+      "colActions": "Acties",
+      "rerun": "Opnieuw uitvoeren",
+      "rerunTooltip": "Maakt een nieuwe run door runCount te verhogen; de eerdere artefacten blijven tot het einde van de bewaartermijn",
+      "cancel": "Annuleren",
+      "cancelConfirm": "Alle openstaande jobs voor deze opname annuleren?",
+      "rerunFailed": "Opnieuw uitvoeren mislukt (HTTP {code})",
+      "cancelFailed": "Annuleren mislukt (HTTP {code})",
+      "speakerUpdateFailed": "Bijwerken van de spreker mislukt (HTTP {code})",
+      "loadError": "Kan de lijst met jobs niet laden",
+      "empty": "Geen enkele opname komt overeen met de filters",
+      "detailJobs": "Jobs",
+      "detailArtifacts": "Artefacten",
+      "detailSpeakers": "Sprekers",
+      "noArtifacts": "Nog geen artefacten geproduceerd",
+      "noSpeakers": "Geen sprekers gedetecteerd",
+      "attempts": "poging {n}",
+      "speakerPlaceholder": "Echte naam (optioneel)",
+      "speakerSpoke": "Spreektijd: {sec}s",
+      "suggestedApply": "Suggestie toepassen: {name}",
+      "suggestedTitle": "Naam die de AI-pijplijn voorstelt op basis van de eigennamen die in de transcriptie worden genoemd. Klik erop om hem in het veld in te vullen (u kunt hem vóór het opslaan altijd nog aanpassen).",
+      "save": "Opslaan",
+      "editTranscript": "Transcriptie bewerken",
+      "editClose": "Editor sluiten",
+      "editTranscriptTitle": "Transcriptie-editor",
+      "editHint": "Corrigeer de tekst of wijs per segment een andere spreker toe. Bij het opslaan worden de transcriptie en de ondertiteling in de brontaal bijgewerkt. De vertalingen en de nasynchronisatie worden NIET opnieuw gegenereerd: gebruik “Opnieuw uitvoeren” als u ze ook in de andere talen bijgewerkt wilt hebben.",
+      "editLoading": "Transcriptie laden…",
+      "editLoadError": "Kan de transcriptie niet laden (HTTP {code}).",
+      "editNotReady": "Er is nog geen transcriptie beschikbaar voor deze opname. Start (of herstart) de AI-verwerking met de knoppen bovenaan: de transcriptie is de eerste stap, daarna kunt u die hier corrigeren en de samenvatting en de vertalingen genereren.",
+      "editProcessing": "De AI-verwerking is bezig: de transcriptie verschijnt hier zodra die klaar is. Vernieuw de pagina over een paar minuten.",
+      "editSessionExpired": "Adminsessie verlopen. Herlaad de pagina en meld u opnieuw aan om de transcriptie te bewerken.",
+      "editEmpty": "Geen bewerkbare segmenten",
+      "editSpeakerNone": "— geen —",
+      "editSave": "Wijzigingen opslaan",
+      "editSaving": "Opslaan…",
+      "editDirty": "{n, plural, one {1 niet-opgeslagen wijziging} other {# niet-opgeslagen wijzigingen}}",
+      "editSaved": "Opgeslagen: {text} teksten, {speaker} sprekers.",
+      "editFailed": "Opslaan mislukt (HTTP {code})",
+      "editFailedDetail": "Opslaan mislukt: {message}",
+      "editMediaError": "Kan de audio van de opname niet laden: afspelen is niet beschikbaar. U kunt de tekst en de sprekers van de segmenten wel corrigeren.",
+      "summaryLoadError": "Kan de samenvatting niet laden.",
+      "summaryLoading": "Samenvatting laden…",
+      "summaryEmptyProcessing": "De AI-samenvatting is nog niet klaar: de verwerking is bezig. Vernieuw de pagina over een paar minuten.",
+      "summaryEmptyFailed": "Het genereren van de samenvatting is mislukt. Controleer de status van de pijplijn en start de verwerking opnieuw met de knoppen bovenaan.",
+      "summaryEmptyNone": "Er is geen AI-samenvatting gegenereerd voor deze opname. Start de verwerking met de knoppen bovenaan.",
+      "editSeek": "Ga naar dit punt in de video",
+      "manageTabTranscript": "Transcriptie",
+      "manageTabSummary": "Samenvatting",
+      "manageTabTranslations": "Vertalingen",
+      "manageTabArchive": "Archief",
+      "manageTabReliability": "Betrouwbaarheid",
+      "manageLoading": "Laden…",
+      "archivePiiNote": "De geïsoleerde audiosporen per deelnemer zijn gevoelige persoonsgegevens (geïsoleerde stem): dit onderdeel is voorbehouden aan admins/moderatoren en wordt nooit openbaar getoond.",
+      "archiveNoTracks": "Geen sporen per deelnemer beschikbaar voor deze opname (opname met meerdere sporen niet actief, of sporen al verwijderd wegens AVG-minimalisatie).",
+      "archivePlayerTitle": "Terugluisteren per spreker",
+      "archiveAudioHint": "Gebruik de keuzeknop “Audio” van de speler om de mix of het geïsoleerde spoor van één deelnemer te beluisteren, synchroon met de video.",
+      "archiveTitle": "Downloadbaar archief",
+      "archiveIntro": "Genereer een MKV-bestand met de video, één audiospoor per deelnemer (voorzien van de naam, nauwkeurig uitgelijnd) en de ondertiteling. Het is bedoeld om te downloaden en te archiveren: browsers kunnen het audiospoor in een MKV niet wisselen, gebruik voor het terugluisteren dus de speler hierboven.",
+      "archiveGenerate": "Archief genereren",
+      "archiveStatusLabel": "Status",
+      "archiveStatus_none": "niet gegenereerd",
+      "archiveStatus_pending": "in wachtrij",
+      "archiveStatus_running": "in verwerking",
+      "archiveStatus_done": "klaar",
+      "archiveStatus_failed": "mislukt",
+      "archiveDownload": "MKV downloaden",
+      "archiveGenerateOk": "Het genereren van het archief is gestart.",
+      "archiveGenerateErr": "Genereren van het archief mislukt (HTTP {code}).",
+      "archiveTrackFallback": "Deelnemer",
+      "manageBackToList": "Alle opnamen",
+      "manageDuration": "Duur",
+      "manageSource": "Brontaal",
+      "manageOpenPublic": "Openbare pagina",
+      "manageRerunOk": "Pijplijn opnieuw gestart.",
+      "manageRerunNoop": "Geen job gestart: AI is uitgeschakeld voor dit evenement of de pijplijn is gepauzeerd. Gebruik “AI genereren”.",
+      "manageRerunAlreadyQueued": "De verwerking staat al in de wachtrij: er is niets nieuws te starten.",
+      "generateAi": "AI genereren",
+      "generateAiConfirm": "Start de AI-pijplijn (transcriptie en samenvatting) op deze opname. De AI-verwerking wordt voor het evenement ingeschakeld en start op de achtergrond. De vertalingen worden daarna per taal toegevoegd via het tabblad “Vertalingen”.",
+      "generateAiOk": "AI-pijplijn gestart.",
+      "manageOpen": "Beheren",
+      "cancelConfirmTitle": "Postproductie annuleren",
+      "speakerUpdateSuccess": "Spreker bijgewerkt",
+      "tm": {
+        "loading": "Vertaaltalen laden…",
+        "loadError": "Kan de vertaaltalen niet laden.",
+        "title": "Vertaaltalen",
+        "sourceLabel": "Brontaal:",
+        "already": "Al vertaald:",
+        "noneYet": "Nog geen vertalingen.",
+        "addLabel": "Een taal toevoegen",
+        "noneAvailable": "Geen talen beschikbaar",
+        "selectPlaceholder": "Selecteer een taal…",
+        "adding": "Bezig met toevoegen…",
+        "addButton": "Taal toevoegen",
+        "unexpectedError": "Onverwachte fout",
+        "note": "Het toevoegen van een taal genereert de vertaling van de transcriptie en de samenvatting — en de audio-nasynchronisatie, als die voor het evenement actief is. De verwerking gebeurt op de achtergrond.",
+        "summary": "Samenvatting",
+        "subtitles": "Ondertiteling",
+        "dub": "Nasynchronisatie",
+        "download": "downloaden",
+        "allTranslated": "Alle actieve talen zijn al vertaald.",
+        "translatedHeader": "Vertaalde talen"
+      },
+      "ov": {
+        "tab": "Overzicht",
+        "intro": "Wat de AI-pijplijn voor deze opname heeft geproduceerd, taal voor taal.",
+        "processing": "De verwerking is bezig of er zijn nog geen artefacten beschikbaar. Kom terug wanneer de status “Voltooid” is.",
+        "loadError": "Kan het overzicht niet laden.",
+        "langsTitle": "Talen en artefacten",
+        "colLang": "Taal",
+        "colTranscript": "Transcriptie",
+        "colSummary": "Samenvatting",
+        "colSubtitles": "Ondertiteling",
+        "colDub": "Nasynchronisatie",
+        "source": "origineel",
+        "present": "beschikbaar",
+        "absent": "ontbreekt",
+        "listen": "Beluisteren",
+        "download": "Downloaden",
+        "dubTitle": "Audio-nasynchronisatie (één stem per spreker, gesynchroniseerd)",
+        "dubNone": "Geen nasynchronisatie geproduceerd.",
+        "summaryTitle": "Samenvatting",
+        "summaryLang": "Taal",
+        "summaryNone": "Geen samenvatting beschikbaar.",
+        "decisions": "Besluiten",
+        "actions": "Actiepunten",
+        "topics": "Hoofdstukken",
+        "speakersTitle": "Sprekers",
+        "speakerAnon": "niet toegewezen",
+        "speakerRenameHint": "Hernoem de sprekers om de namen te corrigeren: de naam vervangt het anonieme label in de transcriptie en op de openbare pagina.",
+        "speakerNamePlaceholder": "Echte naam (bijv. Mario Rossi)",
+        "speakerNameAria": "Naam voor",
+        "save": "Opslaan",
+        "saving": "Opslaan…",
+        "saved": "Opgeslagen",
+        "saveError": "Fout",
+        "editHint": "Gebruik de tabbladen hierboven om de tekst, de namen of de samenvatting te corrigeren.",
+        "kpiDuration": "Duur",
+        "kpiParticipants": "Deelnemers (piek)",
+        "kpiTracks": "Audiosporen",
+        "kpiLanguages": "Talen",
+        "kpiArtifacts": "Artefacten",
+        "kpiProcessed": "Verwerkt",
+        "statusLabel": "Status",
+        "run": "uitvoering",
+        "jobsTitle": "Voortgang van de pijplijn",
+        "jobsNone": "Geen jobs voor deze opname.",
+        "attempts": "{n} pogingen",
+        "filesTitle": "Bestanden in de opslag",
+        "filesNone": "Geen bestanden gevonden in de opslag.",
+        "filesToggle": "De {n} bestanden tonen/verbergen",
+        "tracksTitle": "Sporen per deelnemer",
+        "tracksNone": "Geen sporen per deelnemer (multitrack niet actief of sporen al verwijderd).",
+        "trackPurged": "verwijderd (AVG)",
+        "trackEnters": "binnengekomen +{s}s",
+        "metricsTitle": "Metrieken van de samenvatting (LLM)",
+        "chars": "tekens",
+        "model": "Model",
+        "notAvailable": "n.v.t."
+      },
+      "rel": {
+        "title": "Betrouwbaarheid van de AI",
+        "subtitle": "Hoe betrouwbaar de door de AI gegenereerde output voor deze opname is.",
+        "loading": "Bezig met de betrouwbaarheidsanalyse…",
+        "loadError": "Kan de betrouwbaarheidsgegevens niet laden.",
+        "noData": "Geen AI-verwerking voor deze opname.",
+        "level": {
+          "good": "Betrouwbaar",
+          "fair": "Aanvaardbaar",
+          "poor": "Zwak",
+          "failed": "Onbetrouwbaar"
+        },
+        "overallScore": "Algehele betrouwbaarheid",
+        "totalTime": "Verwerkingstijd",
+        "sourceLang": "Brontaal",
+        "transcriptTitle": "Transcriptie",
+        "segments": "Segmenten",
+        "speakers": "Sprekers",
+        "speech": "Gedetecteerde spraak",
+        "confidence": "Gemiddelde betrouwbaarheid",
+        "silence": "Geschatte stilte",
+        "coverage": "Spraakdekking",
+        "lowConf": "Segmenten met lage betrouwbaarheid",
+        "transcriptNotProduced": "Transcriptie nog niet geproduceerd (pijplijn niet uitgevoerd).",
+        "transcriptUnavailable": "Transcriptie aanwezig, maar hier niet te analyseren (opgeslagen in de objectopslag).",
+        "stagesTitle": "Fasen van de pijplijn",
+        "colStage": "Fase",
+        "colStatus": "Status",
+        "colModel": "Model",
+        "colTime": "Duur",
+        "colLangs": "Talen",
+        "warn": {
+          "transcriptEmpty": "Lege transcriptie: de bronaudio lijkt stil of zonder spraak. De hieruit afgeleide samenvatting, vertalingen en nasynchronisatie zijn NIET betrouwbaar.",
+          "lowConfidence": "Lage betrouwbaarheid van de transcriptie: controleer de tekst voordat u hem publiceert.",
+          "manyLowConfSegments": "Veel segmenten met lage betrouwbaarheid: de transcriptie kan fouten bevatten.",
+          "highNoSpeech": "De audio is grotendeels stil of zonder spraak: de transcriptie kan gehallucineerd zijn.",
+          "stageFailed": "Fase “{stage}” mislukt.",
+          "stageRetried": "Fase “{stage}” voltooid na meerdere pogingen."
+        },
+        "stage": {
+          "TRANSCRIBE": "Transcriptie",
+          "TRANSCRIBE_MULTITRACK": "Transcriptie (multitrack)",
+          "SUMMARIZE": "Samenvatting",
+          "TRANSLATE": "Vertaling",
+          "SUBTITLE": "Ondertiteling",
+          "DUB": "Nasynchronisatie",
+          "ARCHIVE": "Archief"
+        },
+        "status": {
+          "PENDING": "In afwachting",
+          "CLAIMED": "Toegewezen",
+          "RUNNING": "Bezig",
+          "DONE": "Voltooid",
+          "FAILED": "Mislukt"
+        }
+      },
+      "archiveSourceTitle": "Bronopname",
+      "archiveSourceHint": "Originele video van het evenement. Aparte sporen per deelnemer en het MKV-archief vereisen opname met meerdere sporen (niet actief voor dit evenement).",
+      "archiveSourceDownload": "Originele video downloaden"
     }
   },
   "email": {
@@ -2039,7 +2584,9 @@
       "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
       "futureCommunications": "Ik wil informatie ontvangen over toekomstige evenementen van DTD",
       "addressBook": "Ik wil opgenomen worden in het DTD-adresboek om uitgenodigd te worden voor soortgelijke evenementen",
-      "addressBookHelp": "Aparte toestemming (art. 6.1.a AVG). U kunt deze op elk moment intrekken via de link \"Verwijder mijn gegevens uit het adresboek\" in de e-mails die u ontvangt. Naam en organisatie worden overgenomen uit uw aanmeldingsprofiel."
+      "addressBookHelp": "Aparte toestemming (art. 6.1.a AVG). U kunt deze op elk moment intrekken via de link \"Verwijder mijn gegevens uit het adresboek\" in de e-mails die u ontvangt. Naam en organisatie worden overgenomen uit uw aanmeldingsprofiel.",
+      "multitrack": "Ik stem in met het opnemen van een apart audiospoor van mijn stem, uitsluitend om het transcript correct aan elke spreker toe te wijzen. Het spoor is tijdelijk en wordt na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te identificeren of weer te geven.",
+      "multitrackRequired": "Toestemming voor het opnemen van je audiospoor is verplicht om aan dit evenement deel te nemen"
     },
     "export": {
       "title": "Mijn gegevens",
@@ -2110,6 +2657,10 @@
         "retention": {
           "title": "Bewaring en rechten",
           "body": "Gegevens worden bewaard gedurende de voor elk evenement geconfigureerde periode en vervolgens automatisch verwijderd, tenzij andere wettelijke verplichtingen van toepassing zijn. Betrokkenen kunnen te allen tijde hun GDPR-rechten uitoefenen, waaronder inzage, rectificatie en wissing, via de institutionele kanalen van het Departement."
+        },
+        "automatedProcessing": {
+          "title": "Door kunstmatige intelligentie gegenereerde transcriptie, samenvatting en nasynchronisatie",
+          "body": "Bij evenementen die daarom vragen, wordt de opname na afloop van de uitzending verwerkt door een AI-pijplijn die volledig draait op de clusterinfrastructuur van het Departement. Die produceert de transcriptie van het gesprokene (met scheiding van de verschillende sprekers), een samenvatting in gewone taal, eventuele vertalingen naar andere Europese talen en een nagesynchroniseerde audioversie met een generieke synthetische stem. Alle gebruikte modellen (WhisperX voor de transcriptie, Mistral-Small voor samenvatting en vertaling, Piper TTS voor de nasynchronisatie) draaien op eigen GPU's binnen het cluster: er worden geen deelnemersgegevens naar diensten van derden gestuurd. De stem van deelnemers wordt niet gekloond en niet bewaard als biometrisch gegeven (art. 9 AVG): de nasynchronisatie gebruikt openbare, vooraf getrainde synthetische stemmen die willekeurig aan de sprekers worden toegewezen. Voor elke opname toont de evenementpagina de exacte momentopname van de gebruikte modellen ('Transparantie van de AI-verwerking'). De gegenereerde inhoud kan onnauwkeurigheden bevatten: de gezaghebbende bron blijft altijd de originele video (AI-verordening, art. 50)."
         }
       },
       "note": {
@@ -2320,7 +2871,31 @@
     "overallStatus": "Algemene status",
     "lastChecked": "Laatst gecontroleerd",
     "responseTime": "Reactietijd",
-    "systemStatus": "Systeemstatus"
+    "systemStatus": "Systeemstatus",
+    "postprod": {
+      "title": "Pijplijn na het evenement",
+      "subtitle": "Transcriptie, samenvatting, vertaling en nasynchronisatie van de opname",
+      "whatItDoes": "Wanneer een evenement afloopt, gaat de opname door een interne pijplijn: de transcriptie wordt gegenereerd door WhisperX, de samenvatting en de vertalingen door een Mistral-model, de nagesynchroniseerde audio door Piper TTS. Alle modellen draaien op een GPU van het cluster die alleen aan blijft zolang het werk duurt, zodat het energieverbruik de werkelijke belasting volgt.",
+      "status": {
+        "idle": "In afwachting",
+        "running": "Wordt uitgevoerd",
+        "degraded": "Verminderde werking"
+      },
+      "aiBadge": "De transcriptie, de samenvatting en de nasynchronisatie van dit evenement zijn gegenereerd door modellen voor kunstmatige intelligentie en kunnen onnauwkeurigheden bevatten. Raadpleeg voor volledige zekerheid altijd de originele video.",
+      "idleMessage": "Pijplijn gereed, op dit moment geen opnamen te verwerken.",
+      "queueAriaLabel": "Samenstelling van de wachtrij voor postproductie",
+      "queuePending": "in wachtrij",
+      "queueRunning": "in bewerking",
+      "queueDone": "voltooid",
+      "queueFailed": "mislukt",
+      "asrProvider": "Transcriptie",
+      "llmProvider": "Samenvatting/Vertaling",
+      "targetLocales": "Doeltalen",
+      "lastSuccess": "Laatste succes {when}",
+      "lastFailure": "Laatste fout {when}",
+      "artifactsProduced": "{count, plural, =0 {geen artefacten} one {1 artefact geproduceerd} other {# artefacten geproduceerd}}",
+      "eventsEnabled": "{count, plural, =0 {geen evenementen met AI} one {1 evenement met AI actief} other {# evenementen met AI actief}}"
+    }
   },
   "infraMap": {
     "loading": "Infrastructuurkaart laden...",
@@ -2382,7 +2957,8 @@
       "jicofo": "Conferentiecoördinator",
       "jvb": "Videobridge",
       "jibri": "Video-opname",
-      "smtp": "E-maildienst"
+      "smtp": "E-maildienst",
+      "postprod": "AI-pijplijn na het evenement"
     },
     "descriptions": {
       "app": "De website waar u toegang krijgt tot evenementen",
@@ -2393,7 +2969,8 @@
       "jicofo": "Coördineert wie deelneemt aan elke conferentie",
       "jvb": "Verzendt audio en video naar deelnemers",
       "jibri": "Neemt videosessies van evenementen op",
-      "smtp": "Verstuurt bevestigingsmails en herinneringen"
+      "smtp": "Verstuurt bevestigingsmails en herinneringen",
+      "postprod": "Transcribeert, vat samen en vertaalt de opnamen met AI-modellen in het cluster (NVIDIA A100-GPU). Wordt alleen actief wanneer een evenement de AI-functies inschakelt."
     },
     "verdicts": {
       "app": {
@@ -2441,6 +3018,12 @@
       "smtp": {
         "healthy": "De e-maildienst is geconfigureerd en klaar om meldingen te versturen.",
         "standby": "De e-maildienst is niet geconfigureerd. Bevestigingsmails en herinneringen worden niet verstuurd."
+      },
+      "postprod": {
+        "healthy": "De AI-pijplijn is een opname aan het verwerken (GPU-worker actief).",
+        "scaling": "Postprod-jobs in de wachtrij — de GPU-node start op (koude start ~3 min).",
+        "standby": "AI-pijplijn actief maar in afwachting: geen opnamen te verwerken. De GPU-node is uitgeschakeld om energie te besparen.",
+        "degraded": "Een of meer AI-jobs zijn in de afgelopen 24 uur mislukt. Raadpleeg /admin/postprod voor details."
       }
     },
     "impacts": {
@@ -2453,7 +3036,8 @@
       "jvbStale": "Een evenement wacht langer dan de geconfigureerde timeout op de bridge: deelnemers kunnen niet binnenkomen.",
       "jibri": "Evenementen kunnen niet worden opgenomen. Deelnemers kunnen nog steeds deelnemen.",
       "jibriStale": "Een evenement met actieve opname wacht langer dan de timeout op Jibri: de sessie wordt niet opgenomen.",
-      "smtp": "Bevestigingsmails en herinneringen voor inschrijvingen worden niet verstuurd."
+      "smtp": "Bevestigingsmails en herinneringen voor inschrijvingen worden niet verstuurd.",
+      "postprodDegraded": "De transcripties en de samenvattingen van enkele recente opnamen zijn niet gegenereerd. De video-opnamen blijven wel beschikbaar."
     },
     "overallVerdicts": {
       "operational": "Alle diensten werken correct. Het platform is volledig operationeel.",
@@ -2494,7 +3078,8 @@
       "errorRate": "5xx-fouten",
       "requestRate": "Verzoeken/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "connPostprod": "AI-postproductie"
   },
   "feedback": {
     "title": "Hoe beoordeelt u dit evenement?",
@@ -2584,7 +3169,8 @@
     "buildInfoDev": "ontwikkelbuild",
     "viewCommit": "Bekijk commit op GitHub",
     "viewRelease": "Bekijk release op GitHub",
-    "buildDatePrefix": "Gebouwd op"
+    "buildDatePrefix": "Gebouwd op",
+    "viewChangelog": "Bekijk wat er nieuw is (changelog)"
   },
   "pages": {
     "privacyTitle": "Privacybeleid",
@@ -2603,7 +3189,26 @@
     "unmute": "Geluid aan",
     "download": "Opname downloaden",
     "speedLabel": "Afspeelsnelheid",
-    "progress": "Voortgangsbalk"
+    "progress": "Voortgangsbalk",
+    "subtitles": "Ondertiteling",
+    "subtitlesOff": "Uit",
+    "audioLabel": "Audio",
+    "audioOriginal": "Origineel",
+    "audioSyntheticBanner": "Audio nagesynchroniseerd met AI — synthetische stem, automatisch gegenereerde inhoud.",
+    "audioSyntheticHint": "Door AI gegenereerde audio",
+    "shortcutsHelpOpen": "Sneltoetsen tonen",
+    "shortcutsHelpClose": "Sneltoetsen sluiten",
+    "shortcutsTitle": "Sneltoetsen",
+    "shortcutsSpace": "Afspelen of pauzeren",
+    "shortcutsArrowsLR": "5 seconden vooruit of achteruit springen",
+    "shortcutsArrowsUD": "Het volume met 5% verhogen of verlagen",
+    "shortcutsJL": "10 seconden vooruit of achteruit springen",
+    "shortcutsM": "Het geluid aan- of uitzetten",
+    "shortcutsC": "De ondertiteling tonen of verbergen",
+    "shortcutsF": "Volledig scherm",
+    "shortcutsSpeed": "De snelheid verlagen of verhogen",
+    "captionsOn": "Ondertiteling aan",
+    "captionsOff": "Ondertiteling uit"
   },
   "diagram": {
     "title": "Evenementconfiguratie",
@@ -2687,7 +3292,28 @@
     "emailInvalid": "Voer een geldig e-mailadres in",
     "chatLockedMessage": "Voer uw naam in om deel te nemen aan de chat van het evenement.",
     "classicView": "Classic view",
-    "backToGarden": "Back to the park"
+    "backToGarden": "Back to the park",
+    "startingSoon": "Het evenement begint zo, wacht op de organisatie…",
+    "exitWaiting": "Wachtruimte verlaten",
+    "aiNoticeTitle": "AI-verwerking na het evenement",
+    "aiNotice": "Na afloop wordt de opname verwerkt door AI-hulpmiddelen om een transcript, een samenvatting en eventuele vertalingen en nasynchronisatie te maken. De resultaten kunnen onnauwkeurigheden bevatten; de video blijft de gezaghebbende bron.",
+    "multitrackConsentTitle": "Opname per deelnemer",
+    "multitrackConsentRequired": "Je moet instemmen met de opname van je audiospoor om binnen te komen",
+    "enterGardenTitle": "Betreed het plein",
+    "enterGardenHint": "Een plek om rond te lopen terwijl je wacht — daar kun je ook je naam en microfoon instellen en aan het evenement deelnemen.",
+    "backToWaitingRoom": "Terug naar de wachtruimte",
+    "gardenDialogLabel": "Plein van de wachtruimte",
+    "gardenGateHint": "Je kunt hiervandaan deelnemen, of je avatar naar de poort lopen.",
+    "classicVersion": "Klassieke versie",
+    "warmup": {
+      "queued": "Verzoek ontvangen",
+      "startingBridge": "Videoserver wordt gestart…",
+      "provisioningNode": "Een eigen videoserver wordt aangemaakt",
+      "almostReady": "Videoserver actief: bijna klaar",
+      "almostReadyDetail": "Nog even en de deelnameknop wordt vanzelf actief.",
+      "honestHint": "Gebruikelijke wachttijd: minder dan een minuut als de infrastructuur al warm is, 3–5 minuten bij de eerste start. Ondertussen kun je camera en microfoon controleren of de chat gebruiken.",
+      "elapsed": "in voorbereiding sinds {time}"
+    }
   },
   "recording": {
     "management": "Video-opname",
@@ -2713,7 +3339,11 @@
     "notConfigured": "Jibri is niet geconfigureerd in de infrastructuur. Video-opname is niet beschikbaar.",
     "disabledHint": "Video-opname is niet ingeschakeld voor dit evenement. Open het gedeelte Instellingen hierboven en zet de schakelaar \"Opname\" aan.",
     "play": "Afspelen",
-    "download": "Downloaden"
+    "download": "Downloaden",
+    "transcriptManage": "Transcriptie / AI",
+    "deleteConfirmTitle": "Opname verwijderen",
+    "deleteFailed": "Verwijderen mislukt",
+    "deleteSuccess": "Opname verwijderd"
   },
   "postEvent": {
     "config": "Configuratie na het evenement",
@@ -2731,8 +3361,17 @@
       "qa": "Vragen en Antwoorden",
       "materials": "Materialen",
       "polls": "Peilingen",
-      "feedback": "Feedback"
-    }
+      "feedback": "Feedback",
+      "transcript": "AI-transcriptie"
+    },
+    "pageVisibleHelp": "Wanneer deze uit staat (of het zichtbaarheidsvenster is verstreken), geeft de openbare pagina van het afgelopen evenement 404 terug en verdwijnt het evenement uit de overzichten en de sitemap.",
+    "libraryListed": "In de videobibliotheek publiceren",
+    "libraryListedHelp": "Toont dit evenement in de openbare bibliotheek (/video-library). Vereist een gepubliceerde opname of een YouTube-video, en dat de pagina van het evenement zichtbaar is.",
+    "libraryListedNoRecording": "Geen gepubliceerde opname: het evenement verschijnt pas in de bibliotheek wanneer u de opname publiceert of een YouTube-video toevoegt.",
+    "showRecap": "De samenvatting van het evenement tonen",
+    "showWordCloud": "De woordwolk tonen",
+    "emailEnabled": "Een samenvattingsmail versturen bij het einde van het evenement",
+    "emailEnabledHelp": "Bij de afsluiting ontvangen de geregistreerde deelnemers een bedankmail met de link naar de samenvatting en naar de feedback, en de moderator een beknopt overzicht. Wordt maar één keer verzonden."
   },
   "provisioning": {
     "loading": "Laden",
@@ -2802,5 +3441,143 @@
     "noComments": "No comments",
     "yes": "Ja",
     "no": "Nee"
+  },
+  "agenda": {
+    "title": "Notities / Checklist",
+    "empty": "Nog geen punten. Voeg de te bespreken onderwerpen toe en vink ze gaandeweg af.",
+    "add": "Toevoegen",
+    "addPlaceholder": "Nieuw punt…",
+    "remove": "Verwijderen",
+    "inProgress": "bezig",
+    "agree": "Eens",
+    "disagree": "Oneens",
+    "favorablePct": "{pct}% voor",
+    "noReactions": "Geef uw mening"
+  },
+  "changelog": {
+    "metaTitle": "Nieuws en changelog",
+    "title": "Nieuws en changelog",
+    "intro": "Alle versies van het platform, te beginnen met de meest recente. Elk item vat de belangrijkste nieuwe functies, correcties en verbeteringen samen.",
+    "current": "Huidige versie",
+    "sourceNote": "De notities zijn samengesteld op basis van de tags, pull requests en commits van het project.",
+    "sourceLink": "Bekijk alle releases op GitHub",
+    "rawChangelog": "CHANGELOG.md in de repository",
+    "transparencyNote": "Voor elke versie: wat er draait en met welke componenten, in de",
+    "transparencyInventory": "dienstentransparantie",
+    "transparencySecurity": "beveiliging en SBOM",
+    "technicalDetail": "Technische details",
+    "releaseLink": "Release",
+    "securityBadge": "Beveiliging",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Sluiten",
+    "sbomLoading": "Laden…",
+    "sbomError": "Kan de SBOM niet laden.",
+    "sbomComponents": "onderdelen",
+    "sbomSearch": "onderdeel zoeken…",
+    "sbomColName": "Onderdeel",
+    "sbomColVersion": "Versie",
+    "sbomColEcosystem": "Ecosysteem",
+    "sbomNoMatch": "Geen overeenkomend onderdeel.",
+    "sbomDownload": "Volledige SBOM downloaden (SPDX)",
+    "sourcesLink": "Broncode",
+    "codeScanningLink": "Code-scanning (CodeQL)"
+  },
+  "postprod": {
+    "loading": "Transcriptie laden…",
+    "loadError": "Kan de transcriptie niet laden: {error}",
+    "empty": "Geen transcriptie beschikbaar voor dit evenement.",
+    "tabTranscript": "Transcriptie",
+    "tabSummary": "Samenvatting",
+    "aiBadgeLabel": "Door AI gegenereerde inhoud",
+    "aiBadgeBody": "De transcriptie en de samenvatting worden automatisch geproduceerd door de AI-pijplijn in het cluster. Ze kunnen fouten bevatten; de video blijft de gezaghebbende bron.",
+    "searchPlaceholder": "Zoek in de transcriptie…",
+    "searchLabel": "Zoek in de transcriptie",
+    "searchClear": "Zoekopdracht wissen",
+    "searchNoMatches": "Geen resultaten voor “{query}”.",
+    "searchMatches": "{count, plural, =1 {1 resultaat} other {# resultaten}}",
+    "downloadLabel": "Downloaden",
+    "downloadMenu": "Downloadopties",
+    "downloadTranscriptTxt": "Transcriptie (.txt)",
+    "downloadTranscriptSrt": "Ondertiteling (.srt)",
+    "downloadTranscriptVtt": "Ondertiteling (.vtt)",
+    "downloadSummaryMd": "Samenvatting (.md)",
+    "hero": {
+      "badge": "Automatische samenvatting",
+      "aiActArt50": "Door AI gegenereerde inhoud",
+      "title": "Samengevat",
+      "availableIn": "Samenvatting ook beschikbaar in {langs}",
+      "summaryLanguageLabel": "Taal van de samenvatting",
+      "topicsLabel": "Hoofdstukken — klik om naar dat punt in de video te springen",
+      "keyDecisions": "Genomen besluiten",
+      "actionItems": "Actiepunten",
+      "expandDetails": "Besluiten en acties tonen",
+      "collapseDetails": "Besluiten en acties verbergen"
+    },
+    "nowSpeaking": "Aan het woord",
+    "shareSegment": "Dit punt delen",
+    "shareSegmentCopied": "Link naar het klembord gekopieerd",
+    "bookmarkAdd": "In bladwijzers opslaan",
+    "bookmarkRemove": "Bladwijzer verwijderen",
+    "bookmarksHeader": "Uw bladwijzers",
+    "bookmarksEmpty": "U hebt nog geen momenten in de video opgeslagen. Open een segment van de transcriptie en klik op de ster om het hier toe te voegen.",
+    "miniPlayerOpen": "De video naar de voorgrond halen",
+    "miniPlayerClose": "Miniplayer sluiten",
+    "miniPlayerHint": "Blijf dicht bij de video terwijl u door de pagina scrolt",
+    "followLive": "De video volgen",
+    "followManual": "Vrij lezen",
+    "followResume": "Weer de video volgen",
+    "lowConfidenceBadge": "controleren",
+    "lowConfidenceTitle": "Dit deel van de transcriptie heeft een lage betrouwbaarheid: de opname kan andere woorden bevatten. Raadpleeg altijd de originele video.",
+    "miniTranscriptLabel": "Live transcriptie",
+    "dubAvailableHint": "Nagesynchroniseerde audio beschikbaar in {langs}. Gebruik de audiokiezer in de bedieningsbalk van de speler om de vertaalde versie te beluisteren.",
+    "provenance": {
+      "triggerLabel": "Transparantie van de AI-verwerking",
+      "closeLabel": "Details van de verwerking verbergen",
+      "intro": "Dit zijn de modellen die de transcriptie, de samenvatting en de nasynchronisatie van deze opname hebben gegenereerd. Ze worden aan het einde van de verwerking opgeslagen: u ziet wat op dat moment daadwerkelijk is gebruikt, ongeacht latere wijzigingen in de instellingen.",
+      "asr": {
+        "title": "Transcriptie",
+        "hint": "Spraakherkenning en scheiding van de sprekers.",
+        "engine": "Engine",
+        "model": "Model",
+        "version": "Versie",
+        "diarizationEngine": "Diarization",
+        "diarizationSpeakers": "Gedetecteerde sprekers"
+      },
+      "llm": {
+        "title": "Samenvatting en vertaling",
+        "hint": "Samenvatting van de bijeenkomst en vertaling van de transcriptie en de samenvatting.",
+        "engine": "Gehost door",
+        "model": "Model",
+        "vendor": "Leverancier",
+        "license": "Licentie",
+        "country": "Statutaire zetel"
+      },
+      "tts": {
+        "title": "Nasynchronisatie",
+        "hint": "Spraaksynthese om de audio in de doeltalen te genereren.",
+        "engine": "Engine",
+        "license": "Licentie",
+        "policy": "Regel voor de toewijzing van de stemmen"
+      },
+      "languages": {
+        "title": "Behandelde talen",
+        "hint": "Herkomst van de opname en doeltalen van de vertaling en de nasynchronisatie.",
+        "source": "Oorspronkelijke taal",
+        "translation": "Vertalingen",
+        "dubbing": "Nasynchronisaties",
+        "none": "Geen"
+      },
+      "voices": {
+        "title": "Aan de sprekers toegewezen synthetische stemmen",
+        "male": "mannelijke stem",
+        "female": "vrouwelijke stem"
+      },
+      "runAt": "Verwerking voltooid op",
+      "version": "Versie van de pijplijn"
+    },
+    "overlapBadge": "gelijktijdig",
+    "overlapTitle": "Gelijktijdig spreken: in dit interval spreekt meer dan één persoon tegelijk."
   }
 }

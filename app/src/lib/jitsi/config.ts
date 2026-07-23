@@ -31,7 +31,9 @@ export const baseToolbarButtons = [
   'camera',
   'select-background',
   'desktop',
-  'fullscreen',
+  // No native 'fullscreen': it fullscreens the Jitsi IFRAME only, hiding the
+  // pa-webinar chat/sidebar. Replaced by an app-owned fullscreen on the whole
+  // live wrapper (LiveTopBar toggle → .live-page-bg) so chat stays visible (#6).
   'filmstrip',
   'tileview',
   'settings',
@@ -102,6 +104,17 @@ export const jitsiConfigOverwrite = {
   // entry and the Settings checkbox on this flag, so nobody can get stuck.
   disableSelfViewSettings: true,
 
+  // …and explicitly UN-hide it. `disableSelfViewSettings` only removes the
+  // control, which stops new users getting stuck but abandons everyone already
+  // caught: the choice lives in localStorage on the JITSI origin, which this app
+  // cannot reach, and upstream ORs the two sources, so a stored `true` wins over
+  // any config. A participant reported seeing everyone but himself, with no way
+  // back short of an incognito window. Our patched jitsi/web makes an explicit
+  // `false` here authoritative over the stored value (see
+  // infra/jitsi-web-patched/Dockerfile), so those browsers recover on the next
+  // join. Visitors are unaffected — upstream still hides their self view.
+  disableSelfView: false,
+
   disableChat: false,
 
   // NOTE: `disableKick: true` is the safe default — prevents participants
@@ -133,6 +146,18 @@ export const jitsiConfigOverwrite = {
   notifications: [] as string[],
   disableReactions: true,
 
+  // F8 — keep a raised hand UP until the user lowers it or a moderator handles
+  // it. Stock Jitsi auto-lowers the hand the moment the participant becomes the
+  // dominant speaker (starts talking), which testers found confusing ("ho alzato
+  // la mano e sparisce appena parlo"). MUST be the NESTED form on our served
+  // build (jitsi/web stable 10741): the selector reads only
+  // config.raisedHands?.disableRemoveRaisedHandOnFocus — the legacy TOP-LEVEL
+  // `disableRemoveRaisedHandOnFocus` is deprecated and a silent no-op there, so
+  // do NOT flatten this key.
+  raisedHands: {
+    disableRemoveRaisedHandOnFocus: true,
+  },
+
   breakoutRooms: {
     hideAddRoomButton: true,
     hideAutoAssignButton: true,
@@ -142,8 +167,11 @@ export const jitsiConfigOverwrite = {
   p2p: { enabled: false },
   enableFileSharing: false,
   enableLobbyChat: false,
-  // Gravatar disabled separately — we proxy via /api/avatar.
-  // disableThirdPartyRequests blocked JWT avatar data URIs in some Jitsi builds.
+  // Gravatar disabled HERE means: the browser must never ask gravatar.com
+  // itself. In the deployed bundle this flag only gates the avatar that Jitsi
+  // would DERIVE from an email — the explicit `avatarURL` we put in the JWT is
+  // used before that branch is ever reached. So when an admin enables Gravatar
+  // it still resolves, but through /api/avatar, server-side.
   gravatar: { disabled: true },
   brandingRoomAlias: null,
 
@@ -262,7 +290,8 @@ export const instantCallToolbarButtons = [
   'camera',
   'select-background',
   'desktop',
-  'fullscreen',
+  // No native 'fullscreen' (see baseToolbarButtons): LiveTopBar also renders for
+  // instant calls, so the app-owned fullscreen replaces it here too (#6).
   'filmstrip',
   'tileview',
   'settings',

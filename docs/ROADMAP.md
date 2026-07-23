@@ -1,6 +1,10 @@
 # Roadmap — pa-webinar
 
-Allineata al 2026-04-24. Le versioni spedite sono riassunte in forma compatta; le voci pianificate mantengono nota/effort dove utile.
+Allineata al 2026-07-22, **verificata contro il codice** (non contro gli stati dichiarati). In produzione: **v0.8.6**.
+
+Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici rispetto a ciò che il codice fa davvero oggi.
+
+> Nota di metodo: la revisione del 22 luglio ha trovato questo documento sbagliato **in entrambe le direzioni** — voci spedite ancora marcate "in corso" e sottosistemi marcati ✅ con un buco strutturale dentro. Le seconde sono le pericolose: chi legge decide di non guardarci. Dove un ✅ ha un limite noto, adesso il limite è scritto accanto.
 
 ## v0.1.0 — MVP ✅
 
@@ -90,60 +94,130 @@ Rilasciati tra v0.3.8 e v0.3.44, a seguito del feedback post-demo 2026-04-16.
 - **Screenshare banner** ✅ — banner arancione quando un partecipante remoto inizia a condividere lo schermo
 - **CallSession always-on** ✅ — ogni evento live produce una `CallSession` anche senza recording, aperta al primo `videoConferenceJoined` via `POST /api/events/:slug/sessions` e chiusa dallo scaler su `LIVE→IDLE` / `*→ENDED`
 
+## v0.5.0 – v0.7.x — Spedite ✅
+
+Rilasciate in produzione tra v0.5 e v0.7.1. Voci che le versioni precedenti di questa roadmap elencavano ancora come "pianificate/in corso" ma che sono **live**:
+
+- **Servizio AI post-evento** ✅ — pipeline in-cluster (vincolo sovranità, nessuna API esterna): trascrizione WhisperX + speaker attribution (pyannote 3.1), sintesi "verbale PA" (vLLM Qwen3-32B), traduzione EN/FR di transcript + sintesi, **sottotitoli WebVTT multilingua nel player**, dubbing (Piper). Coda Postgres-outbox + orchestrator CronJob + GPU nodepool A100 scale-to-zero. Vedi [`docs/POSTPROD.md`](POSTPROD.md)
+- **Editor trascrizione post-evento** ✅ — correzione testo + riassegnazione speaker per segmento, **timeline + waveform** (`WAVEFORM_JSON`), export WebVTT/SRT/TXT. (Resta: rigenerazione automatica di traduzioni/dub dopo un edit → v0.9)
+- **Recorder multi-traccia (ADR-013)** ✅ — cattura audio per-partecipante per speaker attribution reale; **metrica di affidabilità** dell'elaborazione AI nel pannello admin (v0.6.9)
+- **Roster relatori editabile + player solo-audio** ✅ (v0.7.0) — rinomina degli speaker riconosciuti; se manca il video, player solo-audio per correggere testo/speaker
+- **Ruolo Relatore (SPEAKER)** ✅ — `EventModeratorRole.SPEAKER`: mic/camera/share senza poteri di moderazione, cablato nel JWT Jitsi
+- **Questionari pre/post evento** ✅ e **Rubrica/Person** ✅ — vedi v0.4 (fase A/B completate)
+- **Upload materiali (FILE) + immagine cover evento** ✅ — upload diretto via `StorageProvider` (non più solo link/URL esterni)
+- **Statistiche post-evento** ✅ (v0.7.1) — tab "Statistiche" per evento: andamento interazione nel tempo (picco), classifica di chi ha parlato di più, grado di attenzione, **alzate di mano**, **reazioni**, **permanenza media** (dwell/retention). Route admin + `lib/analytics` puro
+- **Dashboard Grafana** ✅ — template `infra/grafana/pa-webinar-dashboard.json` deployabile via Helm, su metriche prom-client
+- **Trasparenza service-inventory su prod** ✅ — pubblicata via ConfigMap + `SERVICE_INVENTORY_URL` relativo (l'automazione Azure CronJob → Blob pubblico resta opzionale)
+- **Changelog pubblico** ✅ — `/changelog` allineato alle release, evidenzia la "Versione attuale"
+
 ## Da fare prima del rilascio pubblico
 
-| Item | Effort |
+| Item | Stato |
 |---|---|
-| Ritocco testi e layout | 1 giorno |
-| Test E2E Playwright (flussi critici) | 2-3 giorni |
-| Smoke test su AKS reale | 1 giorno |
-| Screenshot per README | 0.5 giorni |
-| Evento pilota interno DTD | 1 giorno |
+| Smoke test su AKS reale | ✅ fatto (prod live con eventi reali) |
+| Evento pilota interno DTD | ✅ fatto (Caffettino + eventi v0.6/v0.7) |
+| Ritocco testi e layout | ✅ in gran parte (passaggi UX v0.6.x) |
+| Test E2E Playwright (batteria flussi critici) | 🟡 parziale (1 file / 7 test, `continue-on-error`) → **v0.8** |
+| Screenshot per README | ✅ fatto — schermate reali dell'istanza in produzione in `docs/screenshots/`, referenziate da README, README.en e `publiccode.yml` |
 
-Flussi critici Playwright: registrazione con campi ente, login admin + creazione + pubblicazione evento, ingresso sala (moderatore + partecipante), Q&A (invio/upvote/moderazione), polling (creazione/voto/risultati), cambio lingua senza reload, GDPR cleanup, download `.ics`, responsive mobile, chat in-app real-time multi-pod.
+Flussi critici Playwright ancora da coprire: login admin + creazione + pubblicazione evento, ingresso sala (moderatore + partecipante), Q&A (invio/upvote/moderazione), polling, cambio lingua senza reload, GDPR cleanup, download `.ics`, responsive mobile, chat in-app real-time multi-pod.
 
-## v0.5.0 — Pianificata
+## Limiti noti dietro un ✅
+
+Voci spedite e funzionanti, ognuna con un confine che vale la pena conoscere prima di appoggiarcisi. Sono state trovate verificando il codice il 22 luglio, non segnalate da utenti.
+
+| Sottosistema | Il limite |
+|---|---|
+| **Allegati in chat (F16)** | Capability-URL: la protezione è l'UUID non indovinabile + cancellazione del blob alla moderazione/retention, non un controllo d'accesso. Un ACL vero — che rilegga lo stato vivo dell'evento a ogni richiesta — richiede un **cookie con ambito sulla rotta** (un `<img>` non manda header). Due tentativi con un token nell'URL sono falliti: la credenziale durevole trapelava nella condivisione schermo, la capability firmata ignorava la chiusura dell'evento per tutta la durata. È la strada da fare, ma è una feature |
+| **Recorder multitraccia (ADR-013)** | Nessuna riconnessione dopo `CONFERENCE_FAILED`: una caduta a metà evento chiude la registrazione con quello che ha già catturato. L'errore finisce nei log del Job, non nel pannello admin |
+| **Scale-to-zero JVB (ADR-007)** | `/colibri/stats` è aggregato per pod: due eventi LIVE sullo stesso bridge tengono acceso il nodepool anche se uno si è svuotato |
+| **i18n a 24 lingue (ADR-008)** | Il fallback delle chiavi mancanti ricade sull'**italiano**, non sull'inglese |
+| **Piazza della sala d'attesa** | Le emote sono locali: chi le usa vede la propria animazione, gli altri no |
+| **Copertura dei test** | 844 casi, nessuno su un handler API. Le due falle già trovate (impersonazione in chat, `/chat` senza auth) stavano entrambe in un handler — vedi la voce "test di handler" in v0.8 |
+
+## Copertura dei test — stato reale
+
+Misurata, non stimata (`npm run test:coverage --workspace=app`): **5,5% per riga** sull'intero `src/**`. Il numero è basso perché il denominatore è tutto: 153 route API e ~49.000 righe di componenti senza un test, contro una `lib/` coperta bene.
+
+Le soglie in `app/vitest.config.ts` sono un **cricchetto sul pavimento misurato** — impediscono che scenda, non dichiarano che vada bene. In CI girano con `--coverage`, quindi da ora una regressione di copertura fa fallire la build.
+
+Da qui in avanti si sale dai punti in cui vivono le guardie, non dai più facili: conio del JWT Jitsi, autorizzazione della chat, cleanup GDPR, presign dell'upload.
+
+## v0.8.0 — In corso / prossima
 
 | Feature | Note |
 |---|---|
-| **HLS live streaming** | Audience passiva illimitata senza caricare JVB. Jibri → RTMP → ffmpeg HLS → Blob → player |
-| **Ruolo Relatore (speaker)** | Mic/video/share senza poteri admin. Intermedio tra moderatore e partecipante |
-| **Breakout rooms** | Sottogruppi durante l'evento — Jitsi nativo, da esporre nella UI |
-| **Servizio AI — trascrizioni, sottotitoli, sintesi** 🟡 in corso | Modulo `lib/ai/` con provider in-cluster (vincolo sovranità: niente API esterne). MVP+V1 spediti: trascrizione post-evento (WhisperX + pyannote 3.1) con speaker attribution, sintesi "verbale PA" via vLLM Qwen3-32B in-cluster, traduzione EN/FR per transcript + summary, sottotitoli WebVTT multilingua nel player. Coda Postgres-outbox; orchestrator CronJob + GPU node pool (Italy North NC24ads_A100_v4) scale-to-zero. Vedi [`docs/POSTPROD.md`](POSTPROD.md). Pendenti: sottotitoli live (v1.0.0), wizard integration, post-event tab |
-| **Questionari pre e post evento — fase A** ✅ (spedita) | Modelli `QuestionTemplate`, `QuestionItem` (single/multi/yes_no/likert/open_text), `EventQuestionnaire` con placement `pre_registration` o `post_event`, `QuestionnaireResponse` + `QuestionnaireAnswer`. Admin: `/admin/questionnaires` per gestire template riusabili + sezione nel wizard (step 4 Contenuti) per collegare template e aggiungere domande ad hoc. Dashboard risposte in `/admin/questionnaires` con filtri. Nessuna identità cross-evento: risposte legate alla registrazione, scadono con retention evento |
-| **Rubrica + identità Persona — fase B** ✅ (spedita) | ADR-011 (`docs/adr/011-person-rubrica.md`). Modello `Person` distinto da `Registration`: identità minima (emailHash, displayName, organization, role) con opt-in esplicito separato. Admin: `/admin/rubrica` (lista persone, dettaglio, export), RubricaPicker nel wizard (step Inviti) per inviti multi-select. Opt-out via signed HMAC token (`src/lib/persons/opt-out-token.ts`), cron retention per inattività (`/api/cron/rubrica-retention`, default 24 mesi) |
-| **Upload file nei materiali** | Attualmente solo link — upload diretto via `StorageProvider` (Azure Blob / S3 / …) |
-| **Upload immagine evento** | Cover image tramite storage provider invece di URL esterno |
-| **Automazione OPS service-inventory su prod** | Applicare CronJob `infra/service-inventory/azure/` su tenant produttivo, flippare `SERVICE_INVENTORY_URL` al Blob pubblico; runbook in `docs/SERVICE-INVENTORY-GENERATION.md` |
-| **HA Redis / migrazione Valkey** | Solo se si introduce una feature con Redis in path critico (rate-limit distribuito, cache sessione). `architecture: replication` 1+2+3-sentinel. Cost ~3× |
+| **Upload completi + hardening** ✅ (v0.7.2) | Upload immagini ovunque (logo/favicon/OG/watermark/organizzatore), materiali salvati come `FILE` con `blobPath` (sblocca il cleanup dei blob), hardening sicurezza (nosniff + `Content-Disposition` sul serving, sniff magic-byte, rate-limit, pre-check `Content-Length`), fix `DELETE` recording/session sul dominio storage corretto |
+| **Allegati in chat (F16)** ✅ (v0.7.2) — ma il serving è una *capability-URL*, non un ACL: chi conosce il link vede l'allegato | Upload allegati (immagini/documenti) in chat live: gating a soli utenti autenticati (no guest anonimi), allowlist MIME stretta + size + rate-limit dedicati, rotta di moderazione (`hiddenAt` + `op:'delete'` già previsti nell'envelope), serving con accesso controllato, cleanup blob in retention |
+| **Chat: @menziona + rispondi/quote** ✅ (v0.7.2, esteso in v0.8.5) — l'autocomplete pesca da chi ha già scritto, non dalla roster | `@nome` con autocomplete + rendering evidenziato; `replyToId` con citazione dello snippet del messaggio padre |
+| **SSE/WebSocket per Q&A** | Sostituire il polling SWR 3s riusando l'infra SSE già provata per la chat (scala a 300+) |
+| **Eventi ricorrenti — quick win** 🟡 quasi chiuso | ✅ `duplicate` copia tutta la config + i reminder; ✅ `PUT /api/events/[param]` persiste `recurrenceRule`; ✅ affordance admin "Duplica come prossima occorrenza". ❌ **resta**: `EventTemplate` non porta ancora `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `aiDubbingEnabled`, `wordCloudEnabled`; e `duplicate` copia gli scalari ma **non le relazioni** (tag, organizzatori, co-moderatori, agenda, questionari) |
+| **Batteria E2E Playwright** | Oggi è **1 file, 7 test** (`app/e2e/live-flow.spec.ts`) con `continue-on-error` per i rate-limit di Docker Hub sul runner condiviso: non protegge da regressioni. Scoperti: Q&A, sondaggi, cambio lingua, cleanup GDPR, download `.ics`, chat SSE multi-pod, e il click reale su "Entra ora" (oggi l'ingresso è coperto solo via API) |
+| **SSE per Q&A** | vedi riga sopra: oggi `useSWR(refreshInterval: 3000)` in `qa/question-list.tsx`, stesso polling in `polls/poll-panel.tsx` e `live/agenda-panel.tsx` |
 
-## v0.6.0 — Futura
+## v0.9.0 — Pianificata
 
 | Feature | Note |
 |---|---|
-| **SPID/CIE** | Autenticazione partecipanti con identità digitale italiana |
-| **Microsoft Graph API** | Outlook RSVP → auto-registrazione, Teams calendar sync |
-| **Export report PDF** | Statistiche evento, Q&A, poll, partecipanti — documento scaricabile |
-| **Tagging e capitoli video** | Moderatore aggiunge marker durante evento → capitoli nel player |
-| **Offuscamento video** | Volti/voci offuscati prima della pubblicazione (GDPR-by-design) |
-| **SSE/WebSocket per Q&A** | Sostituire polling 3s per scalare a 300+ utenti |
-| **Redis per rate-limiting distribuito** | Necessario se HPA multi-replica attivo |
-| **Editor trascrizione post-evento** 🟢 base spedita | Editor admin per segmento: correzione testo + riassegnazione speaker, riscrittura `TRANSCRIPT_JSON` + rigenerazione `TRANSCRIPT_VTT` sorgente + ricalcolo `totalSpeechSec`. Export WebVTT/SRT/TXT già attivo (download endpoint). Pendenti: timeline + waveform, rigenerazione automatica di traduzioni/dub dopo l'edit |
-| **Ricerca full-text trascrizioni** | PostgreSQL `tsvector` sufficiente per volumi previsti |
-| **Questionario AI-assisted** | Pre-compilazione automatica del questionario post-evento dai temi emersi nella trascrizione (richiede servizio AI + modello `EventQuestionnaire` di v0.5.0) |
+| **ACL allegati chat (via cookie)** | Oggi gli allegati sono capability-URL (vedi "Limiti noti"). Il gate vero: la pagina live imposta un cookie httpOnly con ambito su `/api/assets/chat/<eventId>/`, rinnovato; la rotta lo rilegge e ri-autorizza con `authorizeChatRead` a OGNI richiesta, così una password aggiunta o un evento chiuso hanno effetto subito. Niente token nell'URL |
+| **Export report PDF** | Statistiche evento + Q&A + poll + partecipanti in un documento scaricabile (naturale seguito della tab Statistiche) |
+| **Rate-limiting distribuito (Redis)** | Il limiter è in-memory per-pod; con HPA multi-replica serve un contatore globale |
+| **Ricerca full-text trascrizioni** | `tsvector` PostgreSQL per la libreria video (oggi solo ricerca client dentro una singola trascrizione) |
+| **Tagging e capitoli video (live)** | Marker del moderatore durante l'evento → capitoli nel player (i capitoli AI esistono già; mancano quelli autoriali live) |
+| **API pubblica documentata** | Lo spec OpenAPI 3.1 è già servito da `/api/openapi.json`; restano docs UI (Swagger/Redoc), garanzie di stabilità e storia auth |
+| **Rigenerazione AI dopo edit trascrizione** | Rigenerare automaticamente traduzioni/dub quando un segmento viene corretto |
+
+## Eventi ricorrenti / serie — nuova (Caffettino, DevIt)
+
+Due call ricorrenti reali, cadenze diverse: **Caffettino** (ogni venerdì mattina — cadenza fissa ma **data da confermare**) e **DevIt sync** (periodica ma **spesso rimandata di qualche giorno**). Oggi ogni occorrenza si crea a mano (duplica → rimetti la data → **ri-attiva i flag di cattura**): flusso fragile perché la duplicazione **perde silenziosamente** proprio i flag che per queste call devono restare accesi (multitraccia, trascrizione AI, agenda, retention, lingue, speaker attesi).
+
+**Stato attuale del codice** (per chi implementa):
+- **WIRED**: picker RRULE nel wizard (`recurrence-picker.tsx` + `lib/utils/recurrence.ts` + libreria `rrule`); `recurrenceRule` persistito alla creazione; anteprima "prossime 5 date" (solo display).
+- **DORMANT**: `recurrenceRule` dopo il salvataggio (nessuno lo consuma); `recurrenceSeriesId` + relazione `EventRecurrenceSeries` (mai scritti/letti); endpoint `POST /api/admin/events/[id]/duplicate` (nessun caller UI).
+- **ABSENT**: qualsiasi job di materializzazione delle occorrenze da RRULE; "crea da template" server-side; raggruppamento per serie di registrazioni/trascrizioni/libreria; reminder consapevoli della ricorrenza; qualsiasi affordance "programma prossima".
+- **Bug latenti da chiudere comunque**: `PUT /api/events/[param]` **scarta** `recurrenceRule` (round-trip: modifichi la ricorrenza nel wizard, al salvataggio sparisce); `duplicate` scarta `aiTranscript/Summary/Translation/Dubbing`, `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`, `autoStartRecording`, `recurrenceRule` **e i reminder**; `EventTemplate` non porta `multitrackRecordingEnabled` / `retainParticipantTracks` / `aiTargetLocales` / `aiDubbingEnabled` / `wordCloudEnabled`.
+
+**Idea portante** — una **Serie** possiede la configurazione canonica (flag di cattura/AI, retention, lingue, speaker attesi, permessi, descrizione, immagine) e **ogni occorrenza la eredita**: così i flag non possono più essere persi per dimenticanza. La cadenza è un *suggerimento*, non una schedulazione rigida: **occorrenze provvisorie** (bozza con data proiettata) che l'operatore **conferma / sposta / salta** — esattamente ciò che serve quando "le date non sono sempre confermate". Riprogrammare = spostare la data della singola occorrenza senza toccare la serie.
+
+**Fasi:**
+
+- **Quick win (v0.8 — bassa spesa, alto valore)** — togliere i footgun senza ancora introdurre la Serie:
+  - `duplicate` copia **tutta** la config (inclusi i flag AI/multitraccia/agenda/wordcloud/ricorrenza) + crea i reminder di default → un clone è fedele all'originale.
+  - `PUT /api/events/[param]` persiste `recurrenceRule` (fix del round-trip).
+  - `EventTemplate` porta anche i flag mancanti (multitraccia, retain-tracks, lingue, dubbing, wordcloud).
+  - Affordance admin **"Duplica come prossima occorrenza"** (avanza la data, eredita la config) — attiva l'endpoint `duplicate` oggi dormiente. Copre già gran parte del bisogno DevIt (data mobile) e Caffettino con un click.
+- **v0.9 — Serie vera e propria**:
+  - Entità `EventSeries` (attiva `recurrenceSeriesId` + relazione): la serie è la source-of-truth della config; le occorrenze ereditano con override puntuale possibile.
+  - **"Programma prossima occorrenza"**: materializza la prossima occorrenza in **bozza** con data proiettata dalla RRULE; l'operatore conferma (→ PUBLISHED) / sposta (DevIt rimandata) / salta.
+  - Reminder consapevoli della serie (per-occorrenza, non una tantum sul parent).
+- **v0.9 / v1.0 — Post-prod & libreria per serie**:
+  - Rollup: registrazioni/trascrizioni/recap di tutte le occorrenze di una serie in un'unica vista admin + una card "serie" in libreria (oggi ogni evento è una card isolata; `Recording` non ha chiave cross-evento).
+  - **Auto-materializzazione** a cadenza fissa (Caffettino, venerdì) via CronJob che crea la prossima occorrenza provvisoria N giorni prima — sempre **confermabile prima di andare pubblica**, così una settimana saltata non pubblica nulla per sbaglio.
+
+Registrazione e post-prod restano **per-occorrenza** (ogni call è la sua `Recording` + pipeline AI): corretto e già funzionante. La serie aggiunge *ereditarietà della config* (i flag giusti sempre accesi) e *aggregazione della vista*, non cambia il modello di cattura.
 
 ## v1.0.0 — Visione
 
 | Feature | Note |
 |---|---|
-| **Multi-tenancy** | Più enti sullo stesso portale con branding separato |
-| **App mobile** | React Native con Jitsi SDK |
-| **Registrazione multi-camera** | Speaker + slide separati |
-| **Live subtitles** | Sottotitoli in tempo reale (Jigasi + Whisper streaming) |
-| **Marketplace template eventi** | Webinar, workshop, conferenza, Q&A session |
-| **API pubblica documentata** | OpenAPI spec per integrazioni di terze parti |
-| **Dashboard Grafana** | Template dashboard per monitoring operativo |
-| **Runbook operativo** | Guida on-call per troubleshooting produzione |
+| **Sottotitoli live** | Real-time (Jigasi + Whisper streaming). Oggi i sottotitoli sono solo post-evento (WebVTT) per scelta |
+| **Multi-tenancy** | Più enti su un unico portale con branding separato (oggi: white-label singola istanza via `SiteSetting` + deploy separati per tenant) |
+| **Questionario AI-assisted** | Pre-compilazione del questionario post-evento dai temi della trascrizione (prerequisiti — AI + questionari — già presenti) |
+| **Runbook operativo on-call** | Guida consolidata di troubleshooting produzione (oggi frammenti in DEPLOYMENT/POSTPROD) |
+
+## Backlog / condizionale
+
+Voci reali ma non pianificate a breve (grandi, di nicchia, o attivate solo da un trigger):
+
+- **SPID/CIE** — autenticazione partecipanti con identità digitale italiana
+- **Microsoft Graph API** — Outlook RSVP → auto-registrazione, sync calendario Teams
+- **Breakout rooms** — sottogruppi (Jitsi nativo oggi *disabilitato*, non esposto)
+- **Offuscamento video** — blur volti/voci pre-pubblicazione (GDPR-by-design)
+- **HLS live streaming** — audience passiva illimitata senza caricare JVB (Jibri → RTMP → HLS → Blob → player)
+- **App mobile** — React Native + Jitsi SDK (oggi: web responsive)
+- **Registrazione multi-camera** — speaker + slide separati (il multi-traccia attuale è audio per attribution)
+- **Marketplace template eventi** — catalogo condivisibile cross-PA (oggi: template interni riusabili)
+- **HA Redis / migrazione Valkey** — solo se Redis entra in un path critico (rate-limit distribuito, cache sessione)
 
 ## Contribuire
 

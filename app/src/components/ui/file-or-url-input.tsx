@@ -31,6 +31,15 @@ export interface FileOrUrlInputProps {
   label: string;
   value: string | null;
   onChange: (next: string | null) => void;
+  /**
+   * Fired only when the value comes from an actual file upload (not a pasted
+   * URL), carrying the full upload metadata (mime/size/filename/storage key).
+   * Callers that persist file provenance (e.g. materials as type=FILE with a
+   * blobPath) use this; branding fields that only need the URL can ignore it.
+   * A subsequent onChange from a URL paste or a clear signals "no longer an
+   * uploaded file".
+   */
+  onUpload?: (meta: AssetUploadResponse) => void;
   assetType: FileOrUrlAssetType;
   /** Override the native <input> accept attribute. */
   accept?: string;
@@ -50,7 +59,11 @@ const DEFAULT_ACCEPT: Record<FileOrUrlAssetType, string> = {
 function isValidUrl(v: string): boolean {
   try {
     const u = new URL(v);
-    return u.protocol === 'http:' || u.protocol === 'https:';
+    // http(s) for normal links; data: so branding fields keep accepting inline
+    // base64 images (e.g. a small favicon) as they did before this widget.
+    return (
+      u.protocol === 'http:' || u.protocol === 'https:' || u.protocol === 'data:'
+    );
   } catch {
     return false;
   }
@@ -136,6 +149,7 @@ export default function FileOrUrlInput({
   label,
   value,
   onChange,
+  onUpload,
   assetType,
   accept,
   helpText,
@@ -190,6 +204,7 @@ export default function FileOrUrlInput({
         }
         const data = (await res.json()) as AssetUploadResponse;
         onChange(data.url);
+        onUpload?.(data);
       } catch {
         setError(t('errorGeneric'));
       } finally {
@@ -197,7 +212,7 @@ export default function FileOrUrlInput({
         if (fileInputRef.current) fileInputRef.current.value = '';
       }
     },
-    [assetType, onChange, t],
+    [assetType, onChange, onUpload, t],
   );
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

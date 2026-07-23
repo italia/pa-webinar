@@ -11,6 +11,7 @@ import EventDetailClient from '@/components/events/event-detail-client';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import { openGraphImages, twitterImageCard } from '@/lib/seo';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 
@@ -40,6 +41,13 @@ export async function generateMetadata({
   return {
     title,
     description: description.slice(0, 160),
+    // Immagine dell'anteprima: la copertina dell'evento se c'è (è la più
+    // pertinente per un link condiviso), altrimenti il logo di default. Va
+    // messa QUI e non ereditata dal layout: Next sostituisce l'openGraph per
+    // segmento, non lo fonde (vedi lib/seo). La copertina 16:9 (`coverImageUrl`)
+    // vince sulla generica, come ovunque nell'app; `settings.seoImage` non entra
+    // qui di proposito: è l'immagine del SITO, quella dell'evento è più
+    // pertinente per un link condiviso.
     openGraph: {
       title,
       description: description.slice(0, 160),
@@ -47,12 +55,13 @@ export async function generateMetadata({
       type: 'website',
       locale: locale === 'en' ? 'en_GB' : 'it_IT',
       siteName: settings.siteName || 'PA Webinar',
+      images: openGraphImages(event.coverImageUrl ?? event.imageUrl),
     },
-    twitter: {
-      card: 'summary',
+    twitter: twitterImageCard(
       title,
-      description: description.slice(0, 160),
-    },
+      description.slice(0, 160),
+      event.coverImageUrl ?? event.imageUrl,
+    ),
     alternates: {
       canonical: pageUrl,
       languages: {

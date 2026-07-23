@@ -56,3 +56,9 @@ infra/terraform/.terraform.lock.hcl
 *.tgz
 *.log
 __pycache__/
+
+# TypeScript incremental build cache (machine-generated; every tsc run mutates it)
+*.tsbuildinfo
+
+# Local scratch: extracted subchart for inspection (not part of the chart)
+scratchsub/

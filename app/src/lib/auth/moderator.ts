@@ -170,6 +170,8 @@ export async function verifyGrantToken(
        *  to the same generic event.moderatorName. Per-row grants
        *  (co-moderator / speaker) carry their own `displayName`. */
       isPrimaryShared: boolean;
+      /** Vedi `resolveGrantForEvent`: null per il link primario condiviso. */
+      email: string | null;
     }
   | null
 > {
@@ -188,6 +190,7 @@ export async function verifyGrantToken(
     role: grant.role,
     displayName: grant.displayName,
     isPrimaryShared: grant.isPrimaryShared,
+    email: grant.email,
   };
 }
 
@@ -207,6 +210,12 @@ export async function resolveGrantForEvent(
       isPrimaryShared: boolean;
       /** EventModerator.id per i grant per-riga; null per il primario condiviso. */
       grantId: string | null;
+      /**
+       * Email decifrata del grant per-riga, quando c'è. Serve SOLO a risolvere
+       * un avatar Gravatar: il link primario è condiviso da tutto il team, non
+       * ha una persona dietro, e quindi resta `null` per costruzione.
+       */
+      email: string | null;
     }
   | null
 > {
@@ -216,6 +225,7 @@ export async function resolveGrantForEvent(
       displayName: event.moderatorName ?? null,
       isPrimaryShared: true,
       grantId: null,
+      email: null,
     };
   }
 
@@ -226,6 +236,7 @@ export async function resolveGrantForEvent(
       displayName: tryDecryptPII(grant.name) ?? grant.name,
       isPrimaryShared: false,
       grantId: grant.id,
+      email: grant.email ? tryDecryptPII(grant.email) ?? grant.email : null,
     };
   }
 

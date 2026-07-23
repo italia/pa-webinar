@@ -19,7 +19,8 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "copy-sprites": "mkdir -p public/svg && cp $(node -e \"console.log(require.resolve('bootstrap-italia/dist/svg/sprites.svg'))\") public/svg/sprites.svg",
-    "postinstall": "prisma generate && npm run copy-sprites"
+    "postinstall": "prisma generate && npm run copy-sprites",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.5.0",
@@ -66,6 +67,7 @@
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^5.2.0",
+    "@vitest/coverage-v8": "^3.2.7",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.1.0",
     "eslint-config-prettier": "^10.1.8",

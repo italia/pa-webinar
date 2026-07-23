@@ -21,6 +21,23 @@ export type AssetType = 'image' | 'audio' | 'document';
 
 const MAX_FILENAME_LEN = 60;
 
+/**
+ * Namespace segment che separa gli allegati della CHAT da tutti gli altri
+ * asset caricati (logo, favicon, copertine, watermark, audio della sala
+ * d'attesa), che sono e devono restare pubblici.
+ *
+ * Il prefisso non è cosmetico: è ciò che permette a `/api/assets/[...path]` di
+ * applicare un gate SOLO agli allegati di chat senza toccare il serving
+ * pubblico. Senza di esso le due famiglie finivano entrambe sotto
+ * `assets/image|document/...` e l'unica protezione di un documento condiviso in
+ * chat era che l'UUID non fosse indovinabile — cioè nessuna, appena l'URL usciva
+ * dalla stanza.
+ */
+const CHAT_NAMESPACE = 'chat';
+
+const EVENT_ID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function sanitizeFilename(name: string): string {
   // Drop any path component a client may have included.
   const base = name.split(/[\\/]/).pop() ?? '';
@@ -81,6 +98,64 @@ export function buildAssetKey(
   const uuid = opts.uuid ?? cryptoRandomUuid();
   const safe = sanitizeFilename(filename);
   return `assets/${type}/${yyyy}/${mm}/${uuid}-${safe}`;
+}
+
+/**
+ * Chiave di un allegato di chat: `assets/chat/{eventId}/{yyyy}/{mm}/{uuid}-{file}`.
+ *
+ * L'eventId sta NEL PERCORSO perché è ciò che la rotta di serving usa per
+ * decidere "chi può leggere questa chat può vedere questo file". È autoritativo:
+ * lo scrive solo la rotta di upload, dopo aver autenticato il mittente su
+ * QUELL'evento, quindi nessuno può depositare un blob nel namespace di un altro
+ * evento per farselo aprire con il gate sbagliato.
+ *
+ * Niente segmento `{type}`: il mime autoritativo sta sulla riga ChatMessage, e
+ * un segmento in meno significa che l'eventId è sempre nella stessa posizione.
+ *
+ * @throws se l'eventId non è un UUID — un chiamante che passasse lo slug
+ *         produrrebbe una chiave che il parser rifiuta, cioè allegati che
+ *         smettono di aprirsi molto dopo essere stati caricati.
+ */
+export function buildChatAssetKey(
+  eventId: string,
+  filename: string,
+  opts: { uuid?: string; now?: Date } = {},
+): string {
+  if (!EVENT_ID_RE.test(eventId)) {
+    throw new Error(`buildChatAssetKey: eventId must be a UUID, got "${eventId}"`);
+  }
+  const now = opts.now ?? new Date();
+  const yyyy = String(now.getUTCFullYear());
+  const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const uuid = opts.uuid ?? cryptoRandomUuid();
+  const safe = sanitizeFilename(filename);
+  return `assets/${CHAT_NAMESPACE}/${eventId}/${yyyy}/${mm}/${uuid}-${safe}`;
+}
+
+/**
+ * True quando il percorso servito (la chiave SENZA il prefisso `assets/`, cioè
+ * quello che arriva a `/api/assets/[...path]`) cade nel namespace protetto.
+ *
+ * Deve rispondere true anche a un percorso malformato dentro `chat/`: la rotta
+ * nega per default: meglio un 404 su una chiave che non esiste che un varco
+ * aperto da una variante di percorso a cui non avevamo pensato.
+ */
+export function isChatAssetPath(subPath: string): boolean {
+  return subPath === CHAT_NAMESPACE || subPath.startsWith(`${CHAT_NAMESPACE}/`);
+}
+
+/**
+ * Estrae l'eventId proprietario di un percorso nel namespace chat, o null se il
+ * percorso non è del namespace / è malformato (segmento non-UUID, nessun file
+ * dopo l'evento). Il chiamante tratta null come "non servire".
+ */
+export function chatAssetEventId(subPath: string): string | null {
+  if (!isChatAssetPath(subPath)) return null;
+  const [, eventId, ...rest] = subPath.split('/');
+  if (!eventId || !EVENT_ID_RE.test(eventId)) return null;
+  // Serve almeno un segmento oltre all'evento: `chat/<uuid>/` non è un blob.
+  if (rest.length === 0 || rest[rest.length - 1] === '') return null;
+  return eventId;
 }
 
 function cryptoRandomUuid(): string {

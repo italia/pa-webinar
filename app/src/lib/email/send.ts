@@ -6,6 +6,8 @@
 import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 
+import { getSettings } from '@/lib/settings';
+
 let transporter: Transporter | null = null;
 
 function getTransporter(): Transporter {
@@ -48,13 +50,53 @@ interface SendEmailInput {
 
 /**
  * Send an email via the configured SMTP transport.
+ *
+ * The display name comes from the admin panel (`SiteSetting.emailFromName`) and
+ * falls back to SMTP_FROM_NAME, then to the site name: an instance that never
+ * sets it behaves exactly as before. The ADDRESS stays environment-only —
+ * the relay authorises a specific sender, so letting an operator type one in
+ * would silently break delivery (SPF/DKIM) rather than rebrand anything.
+ *
+ * Reply-To is set when configured: From is a no-reply mailbox, so without it a
+ * reply from an attendee is simply lost.
  */
+export async function resolveSender(): Promise<{ fromName: string; replyTo?: string }> {
+  // Env is the deployment default; the admin field, when set, wins. Precedence
+  // is deliberately NOT "fall back to siteName": every documented deployment
+  // sets SMTP_FROM_NAME, so preferring siteName would silently rename the
+  // sender of an existing instance on upgrade. The admin help text says exactly
+  // this, so the UI and the behaviour agree.
+  const envName = process.env.SMTP_FROM_NAME?.trim();
+  try {
+    const settings = await getSettings();
+    const configured = settings.emailFromName?.trim();
+    return {
+      fromName: configured || envName || settings.siteName?.trim() || 'PA Webinar',
+      replyTo: settings.emailReplyTo?.trim() || undefined,
+    };
+  } catch (err) {
+    // Settings unreachable (DB blip): fall back to the env rather than block a
+    // send — but say so, otherwise a persistently failing lookup silently keeps
+    // every instance on the deployment default.
+    console.warn('[email] site settings unavailable, using SMTP_FROM_NAME:', err);
+    return { fromName: envName || 'PA Webinar' };
+  }
+}
+
 export async function sendEmail(input: SendEmailInput): Promise<void> {
   const transport = getTransporter();
 
+  const { fromName, replyTo } = await resolveSender();
+
   await transport.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME ?? 'PA Webinar'}" <${process.env.SMTP_FROM ?? 'noreply@dominio.gov.it'}>`,
+    // Object form on purpose: nodemailer quotes and encodes the display name
+    // itself. Hand-building `"name" <addr>` meant sanitising by hand, and a
+    // sanitiser that strips `"` but not `\` still lets a name ending in a
+    // backslash escape the closing quote — the quoted string never terminates
+    // and EVERY outgoing message gets a broken From.
+    from: { name: fromName, address: process.env.SMTP_FROM ?? 'noreply@dominio.gov.it' },
     to: input.to,
+    ...(replyTo ? { replyTo } : {}),
     subject: input.subject,
     html: input.html,
     text: input.text,

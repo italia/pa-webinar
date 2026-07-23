@@ -1,0 +1,361 @@
+{
+  "0.8.9": {
+    "title": "Izmaiņu žurnāls tagad ar integrētu programmatūras inventāru",
+    "notes": [
+      "Katrs laidiens šeit atver savu programmatūras sastāvdaļu sarakstu (SBOM): meklējamu sarakstu ar visām iekļautajām sastāvdaļām, versiju un ekosistēmu — bez lejupielādes.",
+      "Tehniskā sadaļa tagad ir saišu kopums — SBOM, laidiens vietnē GitHub, pirmkods pie šī taga, būvēšanas konveijers — nevis rindkopa, kas atkārtoja iepriekšējo kopsavilkumu.",
+      "Kājenē pievienoti projekta drošības signāli: OpenSSF Scorecard un koda skenēšanas rezultāti."
+    ]
+  },
+  "0.8.8": {
+    "title": "Jaunumu lapa, pārveidota",
+    "notes": [
+      "Katrs laidiens tagad lasāms divos līmeņos: jums svarīgākais un — cilnē „Tehniska detaļa“, kuru atverat tikai tad, ja vēlaties — tehniskais darbs aiz tā.",
+      "Katra versija, kas tiek izdota ar programmatūras sastāvdaļu sarakstu (SBOM), tieši norāda uz savu laidienu vietnē GitHub, kur SBOM ir pievienots. Pirmkoda krātuve tagad ir publiska.",
+      "Augšējā laika joslas svītra ir noņemta: uzkrājoties laidieniem, tā kļuva pārblīvēta un maz ko pateica. Datumi paliek uz katras kartītes."
+    ]
+  },
+  "0.8.7": {
+    "title": "Saskarne pilnīga visās 24 valodās un atjaunota vizuālā identitāte",
+    "notes": [
+      "Saskarne tagad ir pilnībā iztulkota visās 24 ES valodās: iepriekš vairāki ekrāni — tostarp uzgaidāmā telpa un piekrišanas teksti — pārslēdzās uz itāļu valodu tur, kur trūka tulkojuma.",
+      "Atjaunots logotips un vizuālā identitāte (favicon, ikona, ūdenszīme) un priekšskatījums ar attēlu, kad pasākuma saite tiek kopīgota tērzēšanā un sociālajos tīklos.",
+      "Jaunumu lapa katrā valodā ar saitēm uz pakalpojumu pārredzamību un drošību."
+    ]
+  },
+  "0.8.6": {
+    "title": "Uzgaidāmā telpa: lapa un laukums, kurā ieej pēc paša izvēles",
+    "notes": [
+      "Uzgaidāmā telpa tagad ir pārskatāma lapa atbilstoši dizaina sistēmai: pasākums, skaņas un video iestatījumi, vārds, tērzēšana. Mazā spēle sānu lodziņā ir noņemta.",
+      "Interaktīvais laukums atveras tikai tad, ja to izvēlies, un aizņem visu ekrānu. Lapas vadīklas paliek blakus — vārds, mikrofons, kamera, tērzēšana, paziņojumi — un jebkurā brīdī vari atgriezties. Kas dod priekšroku versijai bez animācijas, var pārslēgties uz klasisko, un izvēle tiek atcerēta.",
+      "Avatāri: ja adresei, ar kuru reģistrējies, ir Gravatar, tas tagad var parādīties kā attēls telpā. To ieslēdz administrators, un pieprasījumu veic mūsu serveris: dalībnieku pārlūkprogrammas nekad nesazinās ar gravatar.com.",
+      "Komponente, kas ieraksta pasākumu, vairs neparādās ne dalībnieku sarakstā, ne skaitā: tā ir iekšēja pakalpojuma daļa, nevis cilvēks telpā. Paziņojums, ka pasākums tiek ierakstīts, paliek."
+    ]
+  },
+  "0.8.5": {
+    "title": "Dzīvāka tērzēšana: pieminējumi, reakcijas, labojumi un eksports",
+    "notes": [
+      "Tērzēšana: ja kāds jūs piemin ar @, ziņa tagad tiek izcelta un, ja tobrīd skatāties citur, saņemat paziņojumu. Iepriekš pieminējums neatšķīrās no jebkuras citas ziņas.",
+      "Tērzēšana: uz atsevišķu ziņu var reaģēt ar emocijzīmi, un savu ziņu piecpadsmit minūšu laikā var izlabot (paliek redzama norāde, ka tā ir labota). Poga „Atbildēt“ tagad ir diskrētāka.",
+      "Tērzēšana: jauna poga sarunas lejupielādei — teksta vai datu formātā. Ziņas jau iepriekš tika saglabātas, taču nebija iespējas tās izgūt.",
+      "Telpā: laika skaitītājs rāda, cik ilgs laiks atlicis līdz beigām (vai cik ilgi pasākums jau notiek). Moderatoriem tas ir ieslēgts pēc noklusējuma, un ieslēgt to var ikviens.",
+      "Telpa vairs netiek palaista tikai tāpēc, ka kāds atver pasākuma lapu vairākas stundas pirms sākuma: tā tiek sagatavota tad, kad tas patiešām nepieciešams, kā paredzēts. Novērsts arī gadījums, kad pasākums tika izslēgts dažas minūtes pēc sākuma.",
+      "Statistika: lielākais dalībnieku skaits tagad tiek fiksēts arī katrā atsevišķā sesijā, nevis tikai visam pasākumam kopumā."
+    ]
+  },
+  "0.8.4": {
+    "title": "Apstiprinājuma e-pasta vēstules: pasākuma nosaukums, attēls un konfigurējams sūtītājs",
+    "notes": [
+      "Reģistrācijas apstiprinājuma vēstulēs atkal ir norādīts pasākuma nosaukums — gan tēmā, gan vēstules tekstā. Tie, kas reģistrējās lapā valodā, kurā nosaukums nebija iztulkots, saņēma vēstuli bez pasākuma nosaukuma un kalendāra pielikumu bez virsraksta.",
+      "Apstiprinājuma vēstules un atgādinājumi tagad sākas ar pasākuma attēlu, un nosaukums ir skaidri izcelts, nevis paslēpts vienā no informācijas tabulas rindām.",
+      "Jauni iestatījumi administratora panelī: vārds, ar kādu sūtītājs parādās saņēmēja pastkastē, un adrese, uz kuru nonāk atbildes (vēstules tiek sūtītas no adreses, kas atbildes nesaņem).",
+      "Vispārīgāk — teksts, kas kādā valodā nav iztulkots, tagad tiek rādīts oriģinālvalodā, nevis paliek tukšs; tas attiecās arī uz nosaukumiem un aprakstiem publiskajās lapās."
+    ]
+  },
+  "0.8.3": {
+    "title": "Tērzēšanas konfidencialitāte, precīzs dalībnieku skaits un atjaunota moderēšana",
+    "notes": [
+      "Tērzēšanas vēsture vairs nav pieejama tiem, kas pasākumā nepiedalās. Līdz šim ikviens, kurš zināja pasākuma adresi, varēja lejupielādēt tā ziņas kopā ar rakstītāju vārdiem — arī pēc pasākuma beigām. Tagad piekļuve ir tikai reģistrētiem dalībniekiem, moderatoriem un tiem, kas pasākuma laikā atrodas telpā.",
+      "Telpā rādītais dalībnieku skaits bija par vienu mazāks, jo katrs neieskaitīja pats sevi. Tā pati kļūda nonāca arī pasākuma statistikā (lielākais dalībnieku skaits). Tagad skaits ir pareizs un sakrīt ar statistikā fiksēto.",
+      "Atjaunotas moderatora darbības dalībnieku sarakstā: dalībnieka izslēgšana no telpas un atsevišķa dalībnieka skaļuma regulēšana iepriekš nedarbojās.",
+      "Reakcijas tagad ir pieejamas arī viedtālrunī, kur poga to nosūtīšanai bija pazudusi. Ekrānā lidojošās emocijzīmes vairs nepārtver klikšķus uz vadības joslas.",
+      "Pilnekrāna režīmā dialoglodziņi — saites kopīgošana un moderatoriem arī „Iziet no telpas“ — atkal ir redzami: iepriekš tie palika aiz video attēla, un šķita, ka pogas nedarbojas.",
+      "Pasākumu veidnēs tērzēšana tagad ir ieslēgta jau no sākuma, tāpat kā pašā telpā: veidojot „Vebināru“, līdz šim tika izveidots pasākums bez tērzēšanas.",
+      "Pabeigts saskarnes tulkojums angļu valodā — trūka vairāku elementu, tostarp visa loga „Kopīgot“."
+    ]
+  },
+  "0.8.2": {
+    "title": "Neviena tukša telpa vairs nepaliek aktīva pēc beigu laika",
+    "notes": [
+      "Telpa, kas palika atvērta pēc paredzētā beigu laika un pēc tam iztukšojās, saglabājās aktīva bez laika ierobežojuma un lieki noslogoja video resursus. Tagad tā tiek slēgta, ja 45 minūtes pēc paredzētā beigu laika tajā nav neviena. Telpa, kurā sarunā vēl ir dalībnieki, netiek pārtraukta nekad: pēc beigu laika parādās tikai paziņojums, un neviens netiek atvienots."
+    ]
+  },
+  "0.8.1": {
+    "title": "Konfigurējamas reakcijas, tukšas telpas slēgšana un drošāka administratora sadaļa",
+    "notes": [
+      "Reakcijas (emocijzīmes) tagad var konfigurēt administrators: pēc noklusējuma tiek izmantotas Jitsi iebūvētās reakcijas, kas pieejamas tieši vadības joslā (vieglas un īslaicīgas). Alternatīvi var ieslēgt platformas pašas reakcijas, kas redzamas joslā ekrāna apakšā pa kreisi un tiek ieskaitītas pasākuma statistikā.",
+      "Jauna administratora iespēja: automātiski slēgt telpu, kas palikusi pilnīgi tukša, tostarp bez moderatora, jo tā ir pazīme, ka pasākums ir pamests. Pēc noklusējuma šī iespēja ir izslēgta — neaktivitāte bez moderatora jau tiek risināta droši, telpai pēc 45 minūtēm pārejot miega režīmā — un to var ieslēgt iestatījumos.",
+      "Drošāka administrēšanas sadaļa: sesijai beidzoties, notiek atgriešanās pieteikšanās ekrānā, tāpēc administratora lapas pēc sesijas beigām vairs nav izmantojamas. Sesija arī ir ilgāka un darba laikā atjaunojas automātiski."
+    ]
+  },
+  "0.8.0": {
+    "title": "Pārskatāmāka tiešraides telpa: tērzēšana, reakcijas, pilnekrāna režīms un reģistrācija",
+    "notes": [
+      "Tērzēšana: ziņām tagad var pievienot emocijzīmes ar atsevišķu atlasītāju, un neliels indikators brīdina, ja tērzēšanas atjauninājumi kļūst lēnāki. Nosūtītās ziņas parādās uzreiz — arī organizāciju tīklos, kas aizkavē reāllaika atjauninājumus.",
+      "Pilnekrāna režīms: pilnekrāna poga tagad saglabā tērzēšanu redzamu blakus video, nevis to paslēpj.",
+      "Reakcijas (emocijzīmes) vairs neaizsedz vadības pogas ekrāna apakšā: josla vienmēr paliek nospiežama, arī mozaīkas skatā.",
+      "Pogas „Kopīgot“ un „Iziet no telpas“ tagad ir skaidri redzamas un krāsainas jau no sākuma (iziešana — sarkanā krāsā), nevis tikai tad, kad pār tām pārvieto peles kursoru.",
+      "Ierakstīšanas robots „Recorder“ vairs neparādās ne dalībnieku sarakstā, ne dalībnieku skaitā.",
+      "Reģistrācija: ja piesakāties krietni pirms pasākuma, tiek atvērta apstiprinājuma lapa ar saiti pasākuma pievienošanai kalendāram, nevis gaidīšanas telpa; tuvu sākuma laikam nokļūstat telpā uzreiz. Pasākuma lapā tagad redzams arī tas, vai reģistrācija jau ir veikta.",
+      "Tērzēšana tagad ir galvenais saziņas kanāls telpā. Uzlabota arī tukša pasākuma automātiskā slēgšana un dalībnieku uzskaite statistikā."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderators var nolaist paceltu roku",
+    "notes": [
+      "Pacelto roku sarakstā moderatoram tagad ir poga, ar kuru nolaist atsevišķa dalībnieka roku — tas noder, ja dalībnieks jau ir runājis vai atstājis roku paceltu nejauši. Pieprasījums nonāk pie attiecīgā dalībnieka, kurš redz, ka viņa roka tiek nolaista; pārējie dalībnieki netiek ietekmēti."
+    ]
+  },
+  "0.7.7": {
+    "title": "Mazāk fona trokšņa, kad runājat",
+    "notes": [
+      "Kad ņemat vārdu, tiek izmantota uzlabota fona trokšņa slāpēšana: papildus jau esošajai pamata slāpēšanai tā labāk apslāpē tādas skaņas kā tastatūras klikšķi, ventilatori vai satiksme."
+    ]
+  },
+  "0.7.6": {
+    "title": "Skaļuma regulēšana katram dalībniekam",
+    "notes": [
+      "Panelī „Dalībnieki“ tagad ir atsevišķa skaļuma vadība katram dalībniekam: ja kāda balss skan pārāk skaļi vai pārāk klusi, to var pielāgot tikai sev, nemainot skaņu pārējiem.",
+      "Atsevišķs audio ieraksts katram dalībniekam, ko izmanto pēcapstrādē, kļuvis uzticamāks: ja ierakstā nav skaņas, sistēma to pamana uzreiz un neveido tukšas transkripcijas."
+    ]
+  },
+  "0.7.5": {
+    "title": "Paceltā roka paliek pacelta",
+    "notes": [
+      "Kad paceļat roku, tā tagad paliek pacelta, līdz to nolaižat vai kamēr to apstrādā moderators. Iepriekš roka nolaidās pati brīdī, kad sākāt runāt, un jūs pazudāt no runātāju rindas."
+    ]
+  },
+  "0.7.4": {
+    "title": "Vārds tērzēšanā aizsargāts pret pārsūtītām saitēm (drošība)",
+    "notes": [
+      "Tērzēšanā reģistrēta dalībnieka īstais vārds tiek rādīts tikai tajā ierīcē, kurā veikta reģistrācija: ikviens, kas atver pārsūtītu pievienošanās saiti, piedalās ar paša ievadīto vārdu, nevis sākotnēji reģistrētā dalībnieka vārdā. Tādējādi novērsta nepareiza ziņu attiecināšana.",
+      "Tāda pati aizsardzība attiecas uz pielikumiem: no pārsūtītas saites nosūtīts fails vairs netiek attiecināts uz sākotnēji reģistrētā dalībnieka vārdu.",
+      "Ikviens, kas pievienojas no otras ierīces, piemēram, no tālruņa, vai ar iepriekš saņemtu saiti, arī turpmāk var piedalīties, rakstīt tērzēšanā un sūtīt pielikumus bez traucējumiem: mainās tikai attēlotais vārds, kas tagad ir tas pats, kurš ievadīts, ienākot telpā."
+    ]
+  },
+  "0.7.3": {
+    "title": "Precīzs klātesošo skaits, reakcijas ekrāna centrā un telpas uzlabojumi",
+    "notes": [
+      "Klātesošo skaitā vairs netiek vairākkārt ieskaitīta viena un tā pati persona, kas iziet un atgriežas, piemēram, izmantojot pārlūka pogu „Atpakaļ“: vienas personas atkārtotie savienojumi tiek skaitīti tikai vienu reizi. Dalībnieku sarakstā joprojām redzams katrs savienojums, tāpēc moderators vienmēr var redzēt un pārvaldīt visus.",
+      "Reakciju un emocijzīmju josla tagad atrodas ekrāna apakšā pa vidu — skaidri redzama un viegli atrodama, nevis apakšējā kreisajā stūrī.",
+      "Reģistrēto dalībnieku skaits vairs netiek publiski rādīts pasākuma lapā un pasākumu sarakstā: tas paliek redzams administratoriem panelī. Tiešraides laikā auditorija redz tikai klātesošo skaitu.",
+      "Fona trokšņa slāpēšana tagad automātiski darbojas visos mikrofonos: pamata skaņas apstrāde — atbalss un trokšņa novēršana — vienmēr ir ieslēgta, un nekas nav jāieslēdz manuāli.",
+      "Ienākšana telpā ir nedaudz ātrāka: video sistēmas sagatavošana sākas jau brīdī, kad noklikšķina uz pievienošanās pogas."
+    ]
+  },
+  "0.7.2": {
+    "title": "Bagātīgāka tērzēšana: pielikumi, atbildes un pieminējumi",
+    "notes": [
+      "Tērzēšanā tagad var nosūtīt attēlus un pielikumus (PNG, JPEG, WebP, GIF un PDF līdz 10 MB), un priekšskatījums redzams tieši ziņā.",
+      "Jauna funkcija „Atbildēt“: var citēt konkrētu ziņu, un citāts paliek redzams sarunas pavedienā.",
+      "Pieminējumi ar @: ziņā var uzrunāt dalībnieku vārdā.",
+      "Tērzēšanas moderēšana: moderatori pasākuma laikā var dzēst atsevišķas ziņas."
+    ]
+  },
+  "0.7.1": {
+    "title": "Pēcpasākuma statistika katram pasākumam",
+    "notes": [
+      "Jauna cilne „Statistika“ katram pasākumam administratora panelī — pieejama arī pasākumiem bez reģistrācijas un bez video ieraksta. Tajā redzams, kā norisinājās saruna, kurš runāja visvairāk, kopējais iesaistes līmenis un galvenie rādītāji.",
+      "Diagramma par mijiedarbības norisi laika gaitā — tērzēšana, jautājumi, balsojumi par jautājumiem, aptaujas, vārdu mākoņa vārdi un reakcijas — ar izceltu sarunas aktivitātes maksimumu.",
+      "Saraksts ar tiem, kuri runāja visilgāk (minūtes katram), rādot, cik līdzsvaroti sadalījās runas laiks, kā arī reakciju un pacelto roku skaits.",
+      "Jauns novērtējums par to, cik ilgi dalībnieki vidēji uzturējās telpā; tas tiek izmantots arī kopējā uzmanības līmeņa aprēķinā."
+    ]
+  },
+  "0.7.0": {
+    "title": "Rediģējami runātāju vārdi un tikai skaņas atskaņotājs",
+    "notes": [
+      "Pēc pasākuma tagad var pārdēvēt runātājus, labojot vārdus, kurus transkripcijā sistēma atpazinusi automātiski.",
+      "Ja ierakstam nav atskaņojama video, labošanas lapā tāpat ir pieejams tikai skaņas atskaņotājs, lai varētu noklausīties ierakstu un sakārtot tekstu un runātāju vārdus.",
+      "Novērsta kļūda vairāku celiņu ierakstā: tagad tiek pareizi tverta attālināto dalībnieku patiesā skaņa."
+    ]
+  },
+  "0.6.9": {
+    "title": "Mākslīgā intelekta apstrādes uzticamība",
+    "notes": [
+      "Administratora panelī tagad redzams pēcpasākuma mākslīgā intelekta apstrādes (transkripcijas, kopsavilkumu, tulkojumu) uzticamības rādītājs, kas ļauj uzreiz saprast, vai rezultāts ir pilnīgs un ticams."
+    ]
+  },
+  "0.6.8": {
+    "title": "Skaidrāka pēcpasākuma labošanas lapa",
+    "notes": [
+      "Transkripciju, kopsavilkumu un tulkojumu labošanas lapā tagad tiek paskaidrots, kad mākslīgā intelekta veidotais saturs vēl nav pieejams — „notiek apstrāde“ vai „sāciet apstrādi ar vadības pogām lapas augšā“ — nevis rādīts sarkans kļūdas paziņojums, kas radīja iespaidu par bojājumu.",
+      "Neizdevusies saglabāšana tagad tiek rādīta sarkanā krāsā un norāda konkrēto servera atgriezto iemeslu, nevis parādās zaļā krāsā, it kā viss būtu izdevies.",
+      "Beigusies administratora sesija un ielādes problēmas tagad tiek nošķirtas ar atsevišķiem paziņojumiem, nevis vienu vispārīgu kļūdu.",
+      "Ja ieraksta skaņa nav atskaņojama, lapa par to informē, un segmentu tekstu un runātājus joprojām var labot."
+    ]
+  },
+  "0.6.7": {
+    "title": "Vienmēr redzamas reakcijas un „Piezīmes / kontrolsaraksts“",
+    "notes": [
+      "Reakcijas (emocijzīmes) tagad vienmēr redzamas joslā ekrāna apakšā pa kreisi, nevis paslēptas aiz pogas: tās ir vieglāk atrast un izmantot pasākuma laikā.",
+      "Funkcija „Darba kārtība“ pārdēvēta par „Piezīmes / kontrolsaraksts“, lai būtu skaidrs, ka tā ir kontrolsaraksta veida piezīmju sadaļa, kuras saturs nenonāk tērzēšanā; moderators to joprojām var ieslēgt katram pasākumam."
+    ]
+  },
+  "0.6.6": {
+    "title": "Uzlabojumi: tērzēšana, skaitītāji un piekļuve",
+    "notes": [
+      "Tērzēšanā kopīgotās saites tagad ir noklikšķināmas un droši atveras jaunā cilnē; iepriekš tās bija vienkāršs teksts.",
+      "Telpā kopējais reģistrēto dalībnieku skaits tagad ir redzams tikai moderatoriem: dalībnieki redz tikai to, cik cilvēku patiešām ir klāt.",
+      "Ātrāka piekļuve telpai: savienojums ar video serveri tiek sagatavots jau gaidīšanas telpā, tāpēc ienākot jāgaida mazāk.",
+      "Dalībnieku sarakstā galvene ar dalībnieku skaitu paliek redzama arī tad, kad sarakstu ritina."
+    ]
+  },
+  "0.6.5": {
+    "title": "Ieraksti un skaitītāji",
+    "notes": [
+      "Telpā klātesošo skaitā vairs netiek ieskaitīts ierakstītājs: tiek rādīti tikai īsti cilvēki, nevis robots, kas tver skaņu.",
+      "Pēcapstrāde: jauna poga „Ģenerēt ar mākslīgo intelektu“ ļauj sākt transkripciju, kopsavilkuma veidošanu un tulkošanu arī tikai skaņas ierakstiem, kuros ir viens celiņš katram dalībniekam un kuriem iepriekš nebija nevienas sākšanas pogas.",
+      "Celiņu sarakstā katram segvārdam blakus ir identifikators: dažādas personas ar vienādu segvārdu saņem atšķirīgus identifikatorus, savukārt vairākiem vienas personas izteikumiem ir viens un tas pats identifikators.",
+      "Skaidrs paziņojums gadījumos, kad apstrādes sākšana neizveido nevienu uzdevumu (pasākumam mākslīgais intelekts ir izslēgts vai apstrāde ir apturēta), nevis maldinošs „darbība izdevusies“."
+    ]
+  },
+  "0.6.4": {
+    "title": "Identitātes drošība un telpas uzlabojumi",
+    "notes": [
+      "Drošības labojums: kopīgojot savu personisko saiti uz telpu, tas, kurš to atver, tagad ienāk ar SAVU vārdu — iepriekš varēja tikt pārmantots saites sūtītāja vārds.",
+      "Skaidrāka ekrāna kopīgošana: tagad priekšroka tiek dota izšķirtspējai (5 kadri sekundē augstā kvalitātē), nevis attēla plūdumam, tāpēc slaidi un dokumenti paliek salasāmi arī tad, ja kustības ir maz.",
+      "Noņemta funkcija „paslēpt savu attēlu“, kas pēc ieslēgšanas vairs neļāva atgriezt paša attēlu ekrānā.",
+      "Administratora piekļuve: pēc atkārtotas autentificēšanās, kas notiek pēc neaktivitātes perioda, lapa atjaunojas pareizi — vairs nav lapu, kas šķiet iestrēgušas līdz manuālai pārlādēšanai."
+    ]
+  },
+  "0.6.3": {
+    "title": "Pasākuma telpas uzlabojumi — otrā kārta",
+    "notes": [
+      "Prezentācijas taimeris tagad ir iekļauts moderatora vadības joslā un neaizņem atsevišķu rindu; atpakaļskaitīšanas josla parādās tikai tad, kad taimeris darbojas.",
+      "Tērzēšanā redzams rakstītāja īstais vārds, nevis vispārīgais „Moderators“.",
+      "Tērzēšana kļuvusi par atsevišķu paneli sānjoslā un vairs nepārklāj pārējo saturu: saskarne ir pārskatāmāka, un cilnē redzams neizlasīto ziņu skaits.",
+      "Jauna poga „Tāfele“ moderatoriem ļauj atvērt koplietojamo tāfeli tieši no vadības joslas.",
+      "Pogai „Kopīgot“ ir pareiza krāsa, tāpēc to vairs nevar sajaukt ar „Iziet“; blakus saitēm ir ikonas; moderatora saite, kas redzama tikai moderatoriem, ir paslēpta aiz brīdinājuma, lai citus moderatorus varētu uzaicināt bez kļūdām.",
+      "Vārdu mākonis vairs nav ieslēgts no sākuma: moderators to pēc vajadzības var ieslēgt pasākuma laikā."
+    ]
+  },
+  "0.6.2": {
+    "title": "Tiešraides pasākuma telpas uzlabojumi",
+    "notes": [
+      "Vadības josla (mikrofons, kamera, ekrāna kopīgošana) vienmēr paliek redzama un lietojama — arī pilnekrāna režīmā, kopīgošanas laikā un tad, kad telpā neviena cita nav.",
+      "Moderators atkal var pasākuma laikā ieslēgt un izslēgt tiešraides funkcijas (Jautājumi, Tērzēšana, Darba kārtība).",
+      "Skaņas un attēla vadību var lietot jau telpas sagatavošanas laikā, negaidot video servera palaišanu.",
+      "Sarakstā „Paceltās rokas“ tagad pareizi redzams, kurš ir lūdzis vārdu.",
+      "Jauna poga „Kopīgot“ telpā: ar vienu klikšķi nokopē pievienošanās saiti un pasākuma lapas saiti, neatklājot slepenās piekļuves pilnvaras.",
+      "PA Webinar zīmols atkal ir redzams pasākuma telpas augšējā joslā."
+    ]
+  },
+  "0.6.1": {
+    "title": "Publisks izmaiņu žurnāls un drošības atjauninājumi",
+    "notes": [
+      "Jauna publiska izmaiņu žurnāla lapa, kas atveras, noklikšķinot uz versijas numura kājenē: tajā uzskaitītas visas platformas versijas ar galvenajiem jaunumiem.",
+      "Drošības atjauninājumi atkarībām (undici, nodemailer) un stingrāk aizsargāts būvēšanas konveijers ar ievainojamību skenēšanu."
+    ]
+  },
+  "0.6.0": {
+    "title": "Pēcpasākuma darbplūsma un interaktīva gaidīšanas telpa",
+    "notes": [
+      "Jauna pasākuma noslēguma darbplūsma: pasākumam beidzoties, atsevišķa uzvedne ļauj moderatoram izvēlēties, kur nonāks ieraksts — publicēts pasākuma lapā, ievietots bibliotēkā vai saglabāts tikai arhīvā.",
+      "Automātisks un anonimizēts pēcpasākuma kopsavilkums (dalība, visvairāk atbalstītie jautājumi, aptauju rezultāti, vārdu mākonis, vērtējumi), kas redzams katra noslēgtā pasākuma lapā arī tad, ja ieraksta nav.",
+      "Pēcpasākuma kopsavilkuma e-pasta vēstule dalībniekiem ar pasākuma saturu.",
+      "Interaktīva gaidīšanas telpa „Piazza Digitale“: ar savu avataru var aiziet līdz vārtiem, lai ienāktu sarunā, un blakus vienmēr ir pieejama arī klasiskā ienākšanas poga.",
+      "Vārdu mākonis kā atsevišķa sadaļa noslēgtā pasākuma lapā ar redzamības slēdzi administratoram.",
+      "Koplietojamā tāfele, ko var ieslēgt atsevišķiem pasākumiem un no veidnēm.",
+      "Pārstrādāta pasākuma izveides vedņa lietojamība: sakļautas papildu iespējas, galvenais moderators ar saiti, brīdinājumi par personas datiem, melnraksta saglabāšana un labāka daļēju kļūdu apstrāde.",
+      "Atsevišķi glabāšanas termiņi ierakstiem un katra runātāja skaņas celiņiem, saskaņoti ar pazīmi „video publicēts“, kā arī tērzēšanas ziņu dzēšana atbilstoši GDPR."
+    ]
+  },
+  "0.5.11": {
+    "title": "Uzlabojumi moderēšanā, sarunas noslēgšanā un skaņā",
+    "notes": [
+      "Moderatori tagad redzami ar savu īsto vārdu, nevis vispārīgo „Moderators“.",
+      "Pasākumam beidzoties, tiek rādīts noslēguma ekrāns, nevis maldinošais paziņojums „Telpa tiek sagatavota“.",
+      "Novērsta ikonu pārklāšanās gaidīšanas telpā.",
+      "Trokšņa slāpēšana ar IFrame API piespiedu kārtā izslēgta, lai novērstu skaņas problēmas."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabils vairāku celiņu ieraksts, vērtējums zvaigznītēs un veiktspēja",
+    "notes": [
+      "Ieraksts katram runātājam atsevišķi (vairāku celiņu ieraksts) padarīts uzticams no sākuma līdz beigām: pilna skaņa katrā celiņā, bez pārtraukumiem, ar paralēlu augšupielādi.",
+      "Pēcpasākuma atsauksmju anketa ar vērtējumu zvaigznītēs un kopsavilkuma panelis administratoram.",
+      "Veiktspējas uzlabojumi: VP9 kodeks kamerai, atlikta ielāde mobilajās ierīcēs, ierakstītāja pieregulēšana.",
+      "Helm pēcjaunināšanas āķis, kas automātiski pārlādē Jitsi config.js failu."
+    ]
+  },
+  "0.5.8": {
+    "title": "Konfigurējama attēla un skaņas kvalitāte un jauna pievienošanās plūsma",
+    "notes": [
+      "Attēla un skaņas kvalitāti var konfigurēt administrators, izmantojot sagatavotus iestatījumus katram pasākumam.",
+      "Pārstrādāta pievienošanās plūsma: reģistrācija, gaidīšanas telpa, videosaruna.",
+      "Paceļot roku, tiek rādīts katra dalībnieka īstais vārds."
+    ]
+  },
+  "0.5.6": {
+    "title": "Konfigurējama gaidīšanas telpa un pasākumu vāka attēli",
+    "notes": [
+      "Gaidīšanas telpas veidu (spēle, dārzs vai klasiskā) var konfigurēt gan visai vietnei, gan atsevišķiem pasākumiem.",
+      "Vāka attēli pasākuma lapā un kartīšu sīktēlos.",
+      "Augšupielādētie faili tiek piegādāti pa atsevišķu maršrutu, izmantojot parakstītas saites ar īsu derīguma termiņu.",
+      "Poga „Ienākt tagad“ pieejama uzreiz pēc reģistrācijas.",
+      "Apvienota administratora sadaļa ierakstu mākslīgā intelekta apstrādes pārvaldībai un noturīgāka vairāku celiņu tveršana."
+    ]
+  },
+  "0.5.2": {
+    "title": "Pasākumu sagatavošana un uzlabojumi",
+    "notes": [
+      "Darba kārtība ar piekrišanas un iebilduma atzīmēm, kā arī labojumi no veidnēm pārmantotajās atļaujās.",
+      "Kopsavilkumos un subtitros tiek rādīti īstie vārdi, nevis „SPEAKER_00“.",
+      "Vairāki steidzami labojumi (no v0.5.2 līdz v0.5.5), gatavojoties publiskiem pasākumiem."
+    ]
+  },
+  "0.5.1": {
+    "title": "Kopienai veltīta sākumlapa un vairāku celiņu arhīvs",
+    "notes": [
+      "Sākumlapa pārveidota, izceļot kopienu; tulkojumus var aizstāt darbības laikā, un lapa atbilst AgID piekļūstamības prasībām.",
+      "Vairāku celiņu MKV arhīvs ar atskaņotāju, kas ļauj noklausīties katru runātāju atsevišķi.",
+      "Vairāku celiņu skaņa saskaņota ar Jibri kopmiksējumu, izmantojot savstarpējo korelāciju."
+    ]
+  },
+  "0.5.0": {
+    "title": "Mākslīgā intelekta pēcapstrāde un vairāku celiņu ieraksts",
+    "notes": [
+      "Mākslīgā intelekta pēcapstrādes konveijers: transkripcija, kopsavilkumi, subtitri, tulkojumi un vairākbalsu dublēšana (vienmēr sintētiska), izsekojot izmantoto modeļu izcelsmi.",
+      "Vairāku celiņu ieraksts (viens celiņš katram runātājam) ar runātāju atpazīšanu un automātisku nosaukumu piešķiršanu (ADR-013).",
+      "Publiska video bibliotēka un pēcpasākuma pārvaldības lapa administratoram.",
+      "Pēcpasākuma transkripcijas redaktors ar teksta labošanu un runātāju pārpiešķiršanu.",
+      "Pārstrādāta administratora saskarne: .italia paziņojumi un dialoglodziņi pārlūka standarta brīdinājumu vietā, ielādes vietturi un krāsu dizaina marķieri simtiem cieti ierakstītu heksadecimālo vērtību vietā.",
+      "Katra dalībnieka piekrišana vairāku celiņu ierakstam (GDPR) un paplašināts datu izraksts saskaņā ar 15. pantu."
+    ]
+  },
+  "0.4.0": {
+    "title": "Iesaiste un dzīves cikls",
+    "notes": [
+      "Jaunas tiešraides funkcijas: vārdu mākonis, prezentācijas taimeris, reakciju skaitītājs, Meet stila tiešraides vadība un pacelto roku panelis.",
+      "Ierakstu dzīves cikls (no pagaidu ieraksta līdz publicētam) ar administratora rīkiem (priekšskatījums, publicēšana, dzēšana) un atsevišķiem glabāšanas termiņiem.",
+      "Pēcpasākuma lapa ar cilnēm (ieraksts, Q&A arhīvs, aptaujas, atsauksmes, materiāli) un iespēju noteikt, kas un kad tiek publicēts.",
+      "Pasākuma izveides vednis piecos soļos, birku taksonomija, kontaktpersonu katalogs un redakcionāla virsraksta ievadrindiņa.",
+      "Publiska video bibliotēka /video-library un pārredzamības lapa /service-inventory (CycloneDX 1.6 katram nomniekam).",
+      "Divpakāpju JVB automātiskā mērogošana ar Redis momentuzņēmumu statusa lapai.",
+      "Trīspakāpju GDPR datu tīrīšana: tūlītēja personas datu dzēšana, satura dzēšana pēc glabāšanas termiņa beigām un pēc tam pilnīga dzēšana."
+    ]
+  },
+  "0.3.0": {
+    "title": "Konfigurējama platforma un infrastruktūra",
+    "notes": [
+      "Vietnes iestatījumi, kas ļauj citām iestādēm izmantot platformu atkārtoti (zīmols, krāsas, favicon, SEO, kājene, sākumlapas režīms, privātuma un piekļūstamības lapas), neveicot atkārtotu būvēšanu.",
+      "Analītikas panelis un infrastruktūras administrēšanas panelis.",
+      "Trīs Helm izvietošanas režīmi (simple, standard, full) un JVB mērogošana līdz nullei atsevišķā mezglu kopā.",
+      "Vairāku mākoņu Jibri konveijers (Azure Blob, S3, GCS, MinIO vai vietējā glabātuve) un konfigurējama Jitsi ūdenszīme.",
+      "OpenSSF Scorecard, Dependabot, atkarību SBOM, centralizēta kļūdu apstrāde, pieprasījumu ierobežošana un vairāk nekā 210 vienību testu.",
+      "Daudz pakāpenisku laidienu (no v0.3.8 līdz v0.3.45) pēc demonstrācijā saņemtajām atsauksmēm."
+    ]
+  },
+  "0.2.0": {
+    "title": "DTD atsauksmes",
+    "notes": [
+      "Dalībnieku profilēšana reģistrācijas laikā (iestāde, amats, kategorija), konfigurējama katram pasākumam, ar CSV eksportu un apkopotu statistiku.",
+      "Konfigurējami atgādinājumi ar vairākiem nosūtīšanas laikiem un atšķirīgām e-pasta vēstulēm.",
+      "Aptaujas ar reāllaika rezultātiem un CSV eksportu.",
+      "GDPR uzlabojumi: privātuma politika katram pasākumam, detalizētas piekrišanas, dzēšanas darbību auditācijas pieraksti un datu izraksts saskaņā ar 15. pantu.",
+      "Nostiprinātas moderatora un auditora lomas, kā arī atkarību licenču audits."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP — pirmā versija",
+    "notes": [
+      "Publiska digitālo pasākumu platforma, kas veidota uz .italia dizaina sistēmas (Bootstrap Italia, design-react-kit).",
+      "Tiešraides telpa ar Jitsi Meet (IFrame API, JWT autentifikācija) un lomām, kuras tiek pārbaudītas servera pusē.",
+      "GDPR prasībām atbilstoša dalībnieku reģistrācija ar šifrētiem personas datiem (AES-256-GCM).",
+      "Q&A ar balsošanu par jautājumiem un moderēšanu, gaidīšanas telpa ar atpakaļskaitīšanu un viesu piekļuvi.",
+      "Apstiprinājuma un atgādinājuma e-pasta vēstules, kalendāru integrācija (Google, Outlook, Yahoo, iCal).",
+      "Administratora panelis ar API atslēgas autentifikāciju, GDPR datu tīrīšanu un Prometheus metrikām.",
+      "Ražošanas videi gatavs Helm chart, Docker attēli bez root tiesībām un tikai lasāmā režīmā, CI/CD ar GitHub Actions un publiccode.yml."
+    ]
+  }
+}

@@ -2,7 +2,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { ForbiddenError, NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { extractModeratorToken } from '@/lib/auth/moderator';
-import { isAzureConfigured, deleteBlob } from '@/lib/azure/blob-storage';
+import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { tryDecryptJSON } from '@/lib/crypto/pii';
 
 export const dynamic = 'force-dynamic';
@@ -67,10 +67,14 @@ export const DELETE = withErrorHandling(async (request, context) => {
   });
   if (!session) throw new NotFoundError('CallSession');
 
-  if (session.recordingUrl && isAzureConfigured()) {
+  // Delete the blob from the RECORDINGS domain, keyed off the stored URL
+  // (not a guessed files-domain key). Best-effort.
+  if (session.recordingUrl) {
     try {
-      await deleteBlob(`recordings/${id}`);
-    } catch { /* best effort */ }
+      await deleteRecordingBlob(session.recordingUrl);
+    } catch {
+      /* best effort */
+    }
   }
 
   await prisma.callSession.delete({ where: { id: session.id } });

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
+import { publicSettings } from '@/lib/settings/public-projection';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -50,11 +51,18 @@ const updateSettingsSchema = z.object({
   videoQuality: z.enum(['SAVE_DATA', 'BALANCED', 'HIGH', 'MAX']).optional(),
   githubUrl: z.string().url().nullish(),
   supportEmail: z.string().email().nullish(),
+  // Nome mittente mostrato in posta; stringa vuota = torna al default.
+  gravatarEnabled: z.boolean().optional(),
+  emailFromName: z.string().max(100).nullish(),
+  emailReplyTo: z.string().email().nullish(),
   availableLocales: z.array(z.string().min(2).max(5)).optional(),
   localeNames: z.record(z.string().min(2).max(5), z.string().max(50)).optional(),
   translationOverrides: z.record(z.string(), z.record(z.string(), z.string())).optional(),
   jvbInactiveGraceMinutes: z.number().int().min(5).max(240).optional(),
   jvbPreScaleMinutes: z.number().int().min(1).max(60).optional(),
+  jvbEmptyCloseMinutes: z.number().int().min(-1).max(240).optional(),
+  waitingRoomLeadMinutes: z.number().int().min(0).max(1440).optional(),
+  reactionsMode: z.enum(['NATIVE', 'CUSTOM']).optional(),
   jvbStressWarnPercent: z.number().int().min(0).max(100).optional(),
   jvbStressCriticalPercent: z.number().int().min(0).max(100).optional(),
   jvbProvisioningTimeoutMinutes: z.number().int().min(1).max(120).optional(),
@@ -102,8 +110,7 @@ export const GET = withErrorHandling(async () => {
       return NextResponse.json(created);
     }
 
-    const { customHomeHtml: _, ...publicSettings } = created;
-    return NextResponse.json(publicSettings, {
+    return NextResponse.json(publicSettings(created), {
       headers: {
         'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
       },
@@ -114,8 +121,7 @@ export const GET = withErrorHandling(async () => {
     return NextResponse.json(settings);
   }
 
-  const { customHomeHtml: _, ...publicSettings } = settings;
-  return NextResponse.json(publicSettings, {
+  return NextResponse.json(publicSettings(settings), {
     headers: {
       'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
     },

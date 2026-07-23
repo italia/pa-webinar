@@ -1,0 +1,361 @@
+{
+  "0.8.9": {
+    "title": "Zapisnik promjena, sada s ugrađenim inventarom softvera",
+    "notes": [
+      "Svako izdanje ovdje otvara svoj popis softverskih komponenti (SBOM): pretraživ popis svih isporučenih komponenti, s verzijom i ekosustavom — bez preuzimanja.",
+      "Tehnički odjeljak sada je skup poveznica — SBOM, izdanje na GitHubu, izvorni kod na toj oznaci, cjevovod za izgradnju — umjesto odlomka koji je ponavljao gornji sažetak.",
+      "Podnožje dodaje sigurnosne signale projekta: OpenSSF Scorecard i rezultate skeniranja koda."
+    ]
+  },
+  "0.8.8": {
+    "title": "Stranica s novostima, redizajnirana",
+    "notes": [
+      "Svako se izdanje sada čita na dvije razine: istaknuto što vam je važno i — pod karticom „Tehnički detalj“ koju otvarate samo ako želite — tehnički rad iza toga.",
+      "Svaka verzija koja izlazi s popisom softverskih komponenti (SBOM) izravno vodi na svoje izdanje na GitHubu, gdje je SBOM priložen. Repozitorij izvornog koda sada je javan.",
+      "Traka s vremenskom crtom na vrhu je uklonjena: postajala je pretrpana kako su se izdanja gomilala i govorila je malo. Datumi ostaju na svakoj kartici."
+    ]
+  },
+  "0.8.7": {
+    "title": "Sučelje potpuno na svih 24 jezika i osvježen vizualni identitet",
+    "notes": [
+      "Sučelje je sada u potpunosti prevedeno na svih 24 jezika EU-a: prije se nekoliko zaslona — među njima čekaonica i tekstovi privole — vraćalo na talijanski ondje gdje je prijevod nedostajao.",
+      "Osvježen logotip i vizualni identitet (favicon, ikona, vodeni žig) te pretpregled sa slikom pri dijeljenju poveznice na događaj u razgovoru i na društvenim mrežama.",
+      "Stranica s novostima na svakom jeziku, s poveznicama na transparentnost usluga i na sigurnost."
+    ]
+  },
+  "0.8.6": {
+    "title": "Čekaonica: stranica i trg na koji se ulazi po vlastitom izboru",
+    "notes": [
+      "Čekaonica je sada pregledna stranica u skladu sa sustavom dizajna: događaj, postavke zvuka i slike, ime, razgovor. Mala igra u bočnom okviru je uklonjena.",
+      "Interaktivni trg otvara se samo ako ga odaberete i ispunjava cijeli zaslon. Uz njega ostaju iste kontrole kao na stranici — ime, mikrofon, kamera, razgovor, obavijesti — i možete se vratiti kad god želite. Tko radije bez animacije, prelazi na klasičnu verziju; izbor se pamti.",
+      "Avatari: ako adresa kojom ste se prijavili ima Gravatar, sada se može prikazati kao slika u sobi. Uključuje ga administrator, a zahtjev šalje naš poslužitelj: preglednici sudionika nikada ne kontaktiraju gravatar.com.",
+      "Komponenta koja snima događaj više se ne pojavljuje među sudionicima ni u brojanju: to je interna usluga, a ne osoba u sobi. Obavijest da se događaj snima ostaje."
+    ]
+  },
+  "0.8.5": {
+    "title": "Živahniji chat: spominjanja, reakcije, ispravci i izvoz",
+    "notes": [
+      "Chat: kad vas netko spomene znakom @, poruka je sada istaknuta, a ako gledate negdje drugdje, stiže obavijest. Dosad se spominjanje ni po čemu nije razlikovalo od bilo koje druge poruke.",
+      "Chat: na pojedinu poruku sada možete reagirati emojijem, a vlastitu poruku možete ispraviti unutar petnaest minuta (uz nju ostaje oznaka da je izmijenjena). Gumb „Odgovori” postao je nenametljiv.",
+      "Chat: novi gumb preuzima razgovor, u tekstualnom ili podatkovnom obliku. Poruke su se i dosad čuvale, ali ih nije bilo moguće ponijeti sa sobom.",
+      "U dvorani: mjerač vremena pokazuje koliko je ostalo do kraja (ili koliko je prošlo od početka); prema zadanim je postavkama uključen onima koji vode događaj, a može ga uključiti svatko.",
+      "Dvoranu više ne pokreće onaj tko stranicu događaja otvori nekoliko sati unaprijed: videosustav se priprema tek kad je potrebno, kako je i predviđeno. Time se rješava i slučaj u kojem se događaj gasio nekoliko minuta nakon početka.",
+      "Statistika: najveći broj sudionika sada se bilježi i za pojedinu sesiju poziva, a ne samo za cijeli događaj."
+    ]
+  },
+  "0.8.4": {
+    "title": "E-poruke s potvrdom: naziv događaja, slika i prilagodljiv pošiljatelj",
+    "notes": [
+      "E-poruke s potvrdom prijave ponovno sadrže naziv događaja, i u predmetu i u tekstu poruke. Tko se prijavio sa stranice na jeziku na koji naslov nije bio preveden, dobivao je poruku bez naziva događaja i kalendarski privitak bez naslova.",
+      "E-poruke s potvrdom i podsjetnici sada na vrhu prikazuju sliku događaja, a naslov je jasno istaknut umjesto da stoji tek u jednom retku tablice s pojedinostima.",
+      "Nove postavke u administratorskom sučelju: ime pod kojim se pošiljatelj prikazuje u pristigloj pošti i adresa na koju stižu odgovori (poruke se šalju s adrese koja ih ne prima).",
+      "Općenito, tekst koji nije preveden na neki jezik sada se prikazuje u izvorniku umjesto da ostane prazan: to se odnosilo i na naslove i opise na javnim stranicama."
+    ]
+  },
+  "0.8.3": {
+    "title": "Povjerljivost chata, točan broj sudionika i vraćene moderatorske naredbe",
+    "notes": [
+      "Povijest chata više ne mogu čitati osobe koje ne sudjeluju u događaju. Dosad je svatko tko je znao adresu događaja mogao preuzeti poruke — zajedno s imenima osoba koje su ih napisale — čak i nakon završetka događaja. Za pristup je sada potrebno biti prijavljeni sudionik ili moderator, odnosno nalaziti se u dvorani dok događaj traje.",
+      "Broj sudionika prikazan u dvorani bio je manji za jedan jer nitko nije brojio sam sebe. Ista se pogreška prenosila i u statistiku događaja (najveći broj sudionika). Brojanje je sada ispravno i podudara se s vrijednošću zabilježenom u statistici.",
+      "Ponovno rade moderatorske naredbe na popisu sudionika: uklanjanje sudionika i prilagodba glasnoće pojedine osobe dosad nisu imali nikakav učinak.",
+      "Reakcije su sada dostupne i na pametnim telefonima, na kojima više nije bilo gumba za njihovo slanje. Emoji koji lete preko zaslona više ne presreću klikove na upravljačkoj traci.",
+      "U prikazu preko cijelog zaslona dijaloški su okviri — dijeljenje poveznice i, za moderatore, „Izađi iz dvorane” — ponovno vidljivi: dosad su ostajali skriveni iza videa, pa se činilo da gumbi ne rade.",
+      "Predlošci događaja sada se otvaraju s uključenim chatom, u skladu s postavkama same dvorane: stvaranjem „Webinara” dosad se dobivao događaj bez chata.",
+      "Dovršen je engleski prijevod sučelja; nedostajalo je nekoliko stavki, među njima i cijeli dijaloški okvir „Podijeli”."
+    ]
+  },
+  "0.8.2": {
+    "title": "Nijedna prazna dvorana ne ostaje aktivna nakon predviđenog završetka",
+    "notes": [
+      "Dvorana koja je ostala otvorena nakon predviđenog završetka i potom se ispraznila ostajala je aktivna neograničeno dugo i bespotrebno zauzimala videoresurse. Sada se zatvara kad je 45 minuta prazna nakon predviđenog vremena završetka. Dvorana u kojoj još ima sudionika nikada se ne prekida: nakon predviđenog završetka prikazuje se samo obavijest i nitko se ne isključuje."
+    ]
+  },
+  "0.8.1": {
+    "title": "Prilagodljive reakcije, zatvaranje prazne dvorane i sigurnija administratorska zona",
+    "notes": [
+      "Reakcije (emoji) sada podešava administrator: prema zadanim se postavkama upotrebljavaju izvorne Jitsi reakcije, dostupne izravno na upravljačkoj traci (jednostavne i kratkotrajne). Umjesto njih mogu se uključiti vlastite reakcije platforme, prikazane u traci u donjem lijevom kutu, koje se broje u statistici događaja.",
+      "Nova administratorska mogućnost: automatsko zatvaranje dvorane koja je ostala potpuno prazna, uključujući i moderatore, kao znak da je događaj napušten. Prema zadanim je postavkama isključena — neaktivnost bez prisutnog moderatora već se rješava na siguran način jer dvorana nakon 45 minuta prelazi u stanje mirovanja — a uključuje se u postavkama.",
+      "Sigurnija administratorska zona: istekom sesije vraćate se na zaslon za prijavu, pa se administratorske stranice više ne mogu upotrebljavati nakon isteka. Sesija uz to traje dulje i automatski se obnavlja dok radite."
+    ]
+  },
+  "0.8.0": {
+    "title": "Preglednija dvorana uživo: chat, reakcije, cijeli zaslon i prijave",
+    "notes": [
+      "Chat: u poruke sada možete umetnuti emoji pomoću posebnog izbornika, a mali pokazatelj upozorava ako osvježavanje chata počne kasniti. Poruke koje šaljete pojavljuju se odmah, i na mrežama ustanova koje zadržavaju promet u stvarnom vremenu.",
+      "Cijeli zaslon: gumb za prikaz preko cijelog zaslona sada zadržava chat vidljivim uz video umjesto da ga sakrije.",
+      "Reakcije (emoji) više ne prekrivaju upravljačke gumbe pri dnu zaslona: traka ostaje dostupna za klikanje u svakom trenutku, pa i u prikazu s pločicama.",
+      "Gumbi „Podijeli” i „Izađi iz dvorane” sada su prema zadanim postavkama jasno vidljivi i obojeni (izlaz crvenom bojom), a ne samo kad se pokazivač zadrži na njima.",
+      "Bot „Recorder” više se ne pojavljuje na popisu sudionika ni u brojanju.",
+      "Prijava na događaj: ako se prijavite mnogo prije početka, vodimo vas na stranicu s potvrdom i poveznicom za dodavanje događaja u kalendar umjesto u čekaonicu; neposredno prije početka ulazite izravno u dvoranu. Na stranici događaja sada vidite i jeste li se već prijavili.",
+      "Chat je sada glavni kanal za međusobnu komunikaciju u dvorani. Poboljšani su i automatsko zatvaranje događaja koji su ostali prazni te brojanje sudionika u statistici."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderator može spustiti podignutu ruku",
+    "notes": [
+      "U redu podignutih ruku moderator sada ima gumb kojim spušta ruku pojedinom sudioniku — korisno kad je netko već govorio ili je ruku zabunom ostavio podignutom. Zahtjev stiže do tog sudionika, koji vidi da mu se ruka spušta; ni na koga drugog to ne utječe."
+    ]
+  },
+  "0.7.7": {
+    "title": "Manje pozadinske buke dok govorite",
+    "notes": [
+      "Napredno uklanjanje pozadinske buke uključuje se kad preuzmete riječ: bolje prigušuje zvukove poput tipkanja, ventilatora ili prometa, uz osnovno potiskivanje koje je već postojalo."
+    ]
+  },
+  "0.7.6": {
+    "title": "Glasnoća za svakog sudionika zasebno",
+    "notes": [
+      "Nova regulacija glasnoće za pojedinog sudionika u panelu „Sudionici”: ako se nečiji glas čuje preglasno ili pretiho, prilagodit ćete ga samo za sebe, bez utjecaja na zvuk koji čuju ostali.",
+      "Odvojeno snimanje zvuka za svakog sudionika, koje se upotrebljava u postprodukciji, sada je pouzdanije: ako je snimka ostala nijema, sustav to odmah prepoznaje i ne izrađuje prazne transkripte."
+    ]
+  },
+  "0.7.5": {
+    "title": "Podignuta ruka ostaje podignuta",
+    "notes": [
+      "Kad podignete ruku, ona sada ostaje podignuta dok je sami ne spustite ili dok je moderator ne obradi: dosad se spuštala sama čim biste počeli govoriti, pa biste „nestali” iz reda za javljanje."
+    ]
+  },
+  "0.7.4": {
+    "title": "Zaštita imena u chatu kod proslijeđenih poveznica (sigurnost)",
+    "notes": [
+      "U chatu se stvarno ime prijavljene osobe prikazuje samo na uređaju s kojeg se prijavila: tko otvori njezinu proslijeđenu poveznicu za sudjelovanje, sudjeluje pod imenom koje sam upiše, a ne pod imenom izvorno prijavljene osobe. Time je zatvorena mogućnost pogrešnog pripisivanja poruka.",
+      "Ista zaštita vrijedi i za privitke: datoteka poslana s proslijeđene poveznice više se ne pripisuje imenu izvorno prijavljene osobe.",
+      "Tko se spoji s drugog uređaja (primjerice s mobitela) ili poveznicom primljenom ranije, i dalje nesmetano sudjeluje, piše u chatu i šalje privitke: mijenja se samo prikazano ime, koje postaje ono upisano pri ulasku."
+    ]
+  },
+  "0.7.3": {
+    "title": "Točan broj prisutnih, reakcije na sredini i dorade dvorane",
+    "notes": [
+      "Broj prisutnih više ne umnožava istu osobu koja izađe pa se vrati (primjerice tipkom „Natrag” u pregledniku): dvostruke veze iste osobe broje se samo jednom. Popis sudionika i dalje prikazuje svaku vezu, pa ih moderator uvijek može vidjeti i njima upravljati.",
+      "Traka s reakcijama i emojijima sada je na sredini pri dnu zaslona, jasno vidljiva i lako dostupna, umjesto u donjem lijevom kutu.",
+      "Broj prijavljenih više se ne prikazuje javno na stranici događaja ni u popisu događaja: ostaje vidljiv administratorima u administratorskom sučelju. Tijekom prijenosa uživo publika vidi samo broj prisutnih.",
+      "Potiskivanje pozadinske buke automatski je uključeno na svim mikrofonima (osnovna obrada zvuka — jeka i šum — uvijek je uključena, bez ručnog aktiviranja).",
+      "Ulazak u dvoranu nešto je brži: „buđenje” videosustava započinje već pri kliku na gumb za ulazak."
+    ]
+  },
+  "0.7.2": {
+    "title": "Bogatiji chat: privitci, odgovori i spominjanja",
+    "notes": [
+      "U chatu je sada moguće slati slike i privitke (PNG, JPEG, WebP, GIF i PDF, do 10 MB), uz pregled izravno u poruci.",
+      "Nova mogućnost „Odgovori”: možete citirati određenu poruku, a citat ostaje vidljiv u tijeku razgovora.",
+      "Spominjanje znakom @: sudionika možete prozvati imenom unutar poruke.",
+      "Moderacija chata: moderatori tijekom događaja mogu ukloniti pojedinačne poruke."
+    ]
+  },
+  "0.7.1": {
+    "title": "Statistika nakon događaja za svaki događaj",
+    "notes": [
+      "Nova kartica „Statistika” za svaki događaj u administratorskom sučelju (dostupna i za događaje bez prijava te za one bez videosnimke): prikazuje tijek videopoziva, tko je najviše govorio, ukupnu razinu sudjelovanja i glavne pokazatelje.",
+      "Grafikon interakcije kroz vrijeme — chat, pitanja, glasovi za pitanja, ankete, riječi iz oblaka riječi i reakcije — s istaknutim trenutkom najveće aktivnosti u videopozivu.",
+      "Poredak onih koji su najdulje govorili (broj minuta po osobi) s prikazom ravnomjernosti izlaganja, uz broj reakcija i podignutih ruku.",
+      "Nova procjena prosječnog zadržavanja sudionika u dvorani, koja se upotrebljava i pri izračunu ukupne razine pozornosti."
+    ]
+  },
+  "0.7.0": {
+    "title": "Izmjenjiva imena govornika i reproduktor samo za zvuk",
+    "notes": [
+      "Nakon događaja sada je moguće preimenovati govornike i tako ispraviti imena koja su automatski prepoznata u transkriptu.",
+      "Ako snimka nema videozapis koji se može reproducirati, stranica za uređivanje ipak nudi reproduktor samo za zvuk, pa možete preslušati snimku te ispraviti tekst i imena govornika.",
+      "Ispravak snimanja s odvojenim zapisima: sada se ispravno bilježi stvarni zvuk udaljenih sudionika."
+    ]
+  },
+  "0.6.9": {
+    "title": "Pouzdanost obrade umjetnom inteligencijom",
+    "notes": [
+      "Administratorsko sučelje sada prikazuje pokazatelj pouzdanosti obrade umjetnom inteligencijom nakon događaja (transkripcija, sažetci, prijevodi), pa se na prvi pogled vidi je li rezultat potpun i vjerodostojan."
+    ]
+  },
+  "0.6.8": {
+    "title": "Preglednija stranica za uređivanje nakon događaja",
+    "notes": [
+      "Stranica za uređivanje (transkript, sažetak, prijevodi) sada objašnjava kada sadržaji izrađeni umjetnom inteligencijom još nisu dostupni — „obrada je u tijeku” ili „pokrenite obradu upravljačkim gumbima na vrhu” — umjesto crvene poruke o pogrešci koja je djelovala kao kvar.",
+      "Neuspjelo spremanje sada se prikazuje crvenom bojom i navodi točan razlog koji je vratio poslužitelj, umjesto da se prikaže zelenom, kao da je uspjelo.",
+      "Istek administratorske sesije i poteškoće s učitavanjem sada se razlikuju zasebnim porukama, umjesto jedne opće pogreške.",
+      "Ako se zvuk snimke ne može reproducirati, stranica na to upozorava, a i dalje je moguće ispraviti tekst i govornika svakog odsječka."
+    ]
+  },
+  "0.6.7": {
+    "title": "Uvijek vidljive reakcije i „Bilješke / Kontrolni popis”",
+    "notes": [
+      "Reakcije (emoji) sada su uvijek vidljive u traci u donjem lijevom kutu, a ne skrivene iza gumba: lakše ih je pronaći i upotrijebiti tijekom događaja.",
+      "Mogućnost „Agenda” preimenovana je u „Bilješke / Kontrolni popis” kako bi bilo jasno da je riječ o prostoru za bilješke u obliku kontrolnog popisa čiji sadržaj ne završava u chatu. Moderator je i dalje može uključiti za svaki događaj."
+    ]
+  },
+  "0.6.6": {
+    "title": "Dorade: chat, brojanje i pristup",
+    "notes": [
+      "Poveznice podijeljene u chatu sada se mogu kliknuti i sigurno se otvaraju u novoj kartici; dosad su bile običan tekst.",
+      "U dvorani je ukupan broj prijavljenih sada vidljiv samo moderatorima: sudionici vide samo koliko je osoba stvarno prisutno.",
+      "Brži pristup dvorani: veza s videoposlužiteljem priprema se već tijekom boravka u čekaonici, čime se skraćuje čekanje pri ulasku.",
+      "Na popisu sudionika zaglavlje s brojem ostaje vidljivo dok se popis pomiče."
+    ]
+  },
+  "0.6.5": {
+    "title": "Snimke i brojanje",
+    "notes": [
+      "Broj prisutnih u dvorani sada isključuje snimač: prikazuje samo stvarne osobe, a ne bota koji bilježi zvuk.",
+      "Postprodukcija: novi gumb „Generiraj pomoću AI-ja” pokreće transkripciju, sažimanje i prijevod i za snimke koje sadrže samo zvuk (jedan zapis po sudioniku), a koje dosad nisu nudile nikakvu mogućnost pokretanja.",
+      "Na popisu zapisa uz nadimke stoji i identifikator: različite osobe s istim nadimkom dobivaju različite identifikatore, dok više javljanja iste osobe dijeli isti identifikator.",
+      "Jasna poruka kad pokretanje obrade ne uvrsti u red nijedan posao (umjetna inteligencija isključena za događaj ili obrada pauzirana), umjesto lažne poruke o uspjehu."
+    ]
+  },
+  "0.6.4": {
+    "title": "Sigurnost identiteta i dorade dvorane",
+    "notes": [
+      "Sigurnosni ispravak: ako podijelite svoju osobnu poveznicu za ulazak u dvoranu, onaj tko je otvori sada ulazi pod VLASTITIM imenom; dosad je mogao naslijediti ime osobe koja je poveznicu poslala.",
+      "Oštrije dijeljenje zaslona: sada se prednost daje razlučivosti (5 sličica u sekundi u visokoj kvaliteti) pred glatkoćom prikaza, pa prezentacije i dokumenti ostaju čitljivi i kad je pokreta malo.",
+      "Uklonjena je mogućnost „sakrij vlastitu sliku” koja, jednom uključena, više nije dopuštala povratak vlastitog okvira.",
+      "Administratorski pristup: nakon ponovne prijave zbog neaktivnosti stranica se ispravno osvježava — nema više prikaza koji djeluju zaglavljeno do ručnog ponovnog učitavanja."
+    ]
+  },
+  "0.6.3": {
+    "title": "Dorade dvorane događaja — drugi krug",
+    "notes": [
+      "Mjerač vremena za izlaganje sada je ugrađen u moderatorovu upravljačku traku i ne zauzima poseban redak; traka s odbrojavanjem pojavljuje se samo dok mjerač radi.",
+      "U chatu se prikazuje stvarno ime osobe koja piše, a ne više općenito „Moderator”.",
+      "Chat je postao zaseban panel u bočnoj traci i više se ne preklapa s ostalim sadržajem: sučelje je preglednije, a na kartici stoji brojač nepročitanih poruka.",
+      "Novi gumb „Ploča” moderatorima omogućuje otvaranje zajedničke ploče izravno s upravljačke trake.",
+      "Gumb „Podijeli” dobio je ispravnu boju pa se više ne može zamijeniti s gumbom „Izađi”, uz poveznice stoje ikone, a poveznica za moderatore — vidljiva samo njima — skrivena je iza upozorenja, kako bi se drugi moderatori mogli pozvati bez zabune.",
+      "Oblak riječi više nije uključen prema zadanim postavkama: moderator ga i dalje može uključiti tijekom događaja."
+    ]
+  },
+  "0.6.2": {
+    "title": "Dorade dvorane događaja uživo",
+    "notes": [
+      "Upravljačka traka (mikrofon, kamera, dijeljenje zaslona) ostaje uvijek vidljiva i dostupna za klikanje: i u prikazu preko cijelog zaslona, i tijekom dijeljenja, i kad ste sami u dvorani.",
+      "Moderator ponovno može uključivati i isključivati mogućnosti uživo (Pitanja, Chat, Agenda) tijekom događaja.",
+      "Upravljanje zvukom i videom moguće je već tijekom pripreme dvorane, bez čekanja da se pokrene videoposlužitelj.",
+      "Popis „Podignute ruke” ispravno prikazuje tko je zatražio riječ.",
+      "Novi gumb „Podijeli” u dvorani: jednim klikom kopira poveznicu za sudjelovanje i poveznicu stranice događaja, bez otkrivanja povjerljivih tokena.",
+      "Znak PA Webinar ponovno je vidljiv u gornjoj traci dvorane događaja."
+    ]
+  },
+  "0.6.1": {
+    "title": "Javni popis promjena i sigurnosne nadogradnje",
+    "notes": [
+      "Nova javna stranica s popisom promjena, dostupna klikom na broj verzije u podnožju: navodi sve verzije platforme s glavnim novostima.",
+      "Sigurnosne nadogradnje ovisnosti (undici, nodemailer) i dodatno osiguran postupak izgradnje s provjerom ranjivosti."
+    ]
+  },
+  "0.6.0": {
+    "title": "Postupak nakon događaja i interaktivna čekaonica",
+    "notes": [
+      "Novi postupak na kraju događaja: po završetku moderator posebnim upitom bira odredište snimke (objava na stranici događaja, uvrštavanje u videoteku ili čuvanje samo u arhivi).",
+      "Automatski i anonimizirani sažetak nakon događaja (sudionici, pitanja s najviše glasova, rezultati anketa, oblak riječi, ocjene) prikazuje se na svakoj stranici završenog događaja, i kad snimke nema.",
+      "E-poruka sa sažetkom nakon događaja šalje se sudionicima i sadrži sadržaje s događaja.",
+      "Interaktivna čekaonica „Piazza Digitale”: vlastitim avatarom hodate do prolaza kako biste ušli u videopoziv, uz uvijek dostupan klasičan gumb za ulazak.",
+      "Oblak riječi kao zaseban odjeljak na stranici završenog događaja, s prekidačem vidljivosti za administratore.",
+      "Zajednička ploča koja se može uključiti za pojedini događaj i iz predloška.",
+      "Preuređeno korisničko iskustvo čarobnjaka za stvaranje događaja: sažete napredne mogućnosti, glavni moderator s poveznicom, upozorenja o osobnim podacima, spremanje skice i bolje postupanje s djelomičnim pogreškama.",
+      "Različita razdoblja čuvanja snimaka i pojedinačnih zvučnih zapisa govornika, usklađena sa signalom „video objavljen”, uz brisanje chata u skladu s GDPR-om."
+    ]
+  },
+  "0.5.11": {
+    "title": "Dorade moderacije, završetka videopoziva i zvuka",
+    "notes": [
+      "Moderatori se prikazuju pod vlastitim stvarnim imenom umjesto općenitog „Moderator”.",
+      "Kad događaj završi, u aplikaciji se prikazuje zaslon završetka umjesto zavaravajuće poruke „Dvorana se priprema”.",
+      "Ispravljeno preklapanje ikona u čekaonici.",
+      "Potiskivanje šuma prisilno isključeno putem IFrame API-ja radi rješavanja poteškoća sa zvukom."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabilno snimanje s odvojenim zapisima, ocjene zvjezdicama i brzina",
+    "notes": [
+      "Snimanje po govorniku (s odvojenim zapisima) pouzdano je od početka do kraja: potpun zvuk u svakom zapisu, bez odsijecanja, uz usporedno slanje datoteka.",
+      "Upitnik za povratne informacije nakon događaja s ocjenama u zvjezdicama i zbirnom nadzornom pločom za administratore.",
+      "Poboljšanja brzine: VP9 kodek za kameru, odgođeno učitavanje na mobilnim uređajima i ugađanje snimača.",
+      "Helm hook nakon nadogradnje koji automatski ponovno učitava Jitsi datoteku config.js."
+    ]
+  },
+  "0.5.8": {
+    "title": "Prilagodljiva kvaliteta zvuka i slike te novi tijek ulaska",
+    "notes": [
+      "Administrator može podesiti kvalitetu zvuka i slike, s unaprijed određenim postavkama za svaki događaj.",
+      "Preuređen tijek ulaska: prijava, zatim čekaonica, zatim videopoziv.",
+      "Podizanje ruke prikazuje stvarno ime svakog sudionika."
+    ]
+  },
+  "0.5.6": {
+    "title": "Prilagodljiva čekaonica i naslovne slike događaja",
+    "notes": [
+      "Prilagodljiv način prikaza čekaonice (igra / vrt / klasična), na razini cijelog sustava i pojedinog događaja.",
+      "Naslovne slike na stranici događaja i na sličicama kartica.",
+      "Učitane datoteke poslužuju se posebnom rutom, uz potpisane poveznice kratkog trajanja.",
+      "Gumb „Uđi odmah” dostupan neposredno nakon prijave.",
+      "Objedinjen administratorski odjeljak za upravljanje obradom snimaka umjetnom inteligencijom i pouzdanije snimanje odvojenih zapisa."
+    ]
+  },
+  "0.5.2": {
+    "title": "Priprema događaja i dorade",
+    "notes": [
+      "Agenda s izražavanjem slaganja i neslaganja te ispravci ovlasti naslijeđenih iz predložaka.",
+      "Stvarna imena umjesto oznaka „SPEAKER_00” u sažetcima i titlovima.",
+      "Niz brzih ispravaka (v0.5.2 – v0.5.5) u pripremi za javne događaje."
+    ]
+  },
+  "0.5.1": {
+    "title": "Naslovnica usmjerena zajednici i arhiva s odvojenim zapisima",
+    "notes": [
+      "Preuređena naslovnica usmjerena zajednici, s prijevodima koje je moguće nadjačati tijekom rada i s pristupačnošću prema smjernicama AgID-a.",
+      "MKV arhiva s odvojenim zapisima i reproduktorom za preslušavanje svakog govornika zasebno.",
+      "Usklađivanje odvojenih zapisa s Jibri mješavinom zvuka pomoću unakrsne korelacije."
+    ]
+  },
+  "0.5.0": {
+    "title": "Postprodukcija uz umjetnu inteligenciju i snimanje s odvojenim zapisima",
+    "notes": [
+      "Postupak postprodukcije uz umjetnu inteligenciju: transkripcija, sažetci, titlovi, prijevodi i višeglasna sinkronizacija (uvijek sintetička), uz praćenje podrijetla modela.",
+      "Snimanje s odvojenim zapisima, jedan zapis po govorniku, s prepoznavanjem govornika i automatskim imenovanjem (ADR-013).",
+      "Javna videoteka i stranica za upravljanje sadržajem nakon događaja, namijenjena administratorima.",
+      "Uređivač transkripta nakon događaja, s ispravljanjem teksta i ponovnom dodjelom govornika.",
+      "Preuređeno administratorsko sučelje: .italia obavijesti i dijaloški okviri umjesto izvornih preglednikovih upozorenja, okviri za učitavanje sadržaja i dizajnerski tokeni boja umjesto stotina ručno upisanih heksadecimalnih vrijednosti.",
+      "Privola svakog sudionika za snimanje s odvojenim zapisima (GDPR) i prošireni izvoz podataka prema članku 15."
+    ]
+  },
+  "0.4.0": {
+    "title": "Sudjelovanje i životni ciklus",
+    "notes": [
+      "Nove mogućnosti uživo: oblak riječi, mjerač vremena za izlaganje, brojač reakcija, upravljanje uživo u stilu sučelja Meet i panel s podignutim rukama.",
+      "Životni ciklus snimaka, od privremene do objavljene, uz administratorsko upravljanje (pregled, objava, brisanje) i različita razdoblja čuvanja.",
+      "Stranica nakon događaja s karticama (snimka, arhiva Q&A, ankete, povratne informacije, materijali) i mogućnošću odabira što se objavljuje i kada.",
+      "Čarobnjak za stvaranje događaja u pet koraka, taksonomija oznaka, imenik kontakata i urednički nadnaslov uz naslove.",
+      "Javna videoteka /video-library i stranica transparentnosti /service-inventory (CycloneDX 1.6 za svaku instancu).",
+      "Dvofazno automatsko skaliranje JVB-a, uz snimku stanja u Redisu koja napaja stranicu o stanju sustava.",
+      "Brisanje podataka u skladu s GDPR-om u tri faze: trenutačno uklanjanje osobnih podataka, uklanjanje sadržaja po isteku razdoblja čuvanja, zatim trajno brisanje."
+    ]
+  },
+  "0.3.0": {
+    "title": "Prilagodljiva platforma i infrastruktura",
+    "notes": [
+      "Postavke sustava koje drugim javnim tijelima omogućuju ponovnu upotrebu platforme — vizualni identitet, boje, favicon, SEO, podnožje, način prikaza naslovnice, stranice o privatnosti i pristupačnosti — bez ponovne izgradnje.",
+      "Nadzorna ploča s analitikom i administratorski panel za infrastrukturu.",
+      "Tri načina postavljanja putem Helma (simple / standard / full) i skaliranje JVB-a do nule na namjenskom skupu čvorova.",
+      "Jibri postupak za više oblaka (Azure Blob / S3 / GCS / MinIO / lokalna pohrana) i prilagodljiv Jitsi vodeni žig.",
+      "OpenSSF Scorecard, Dependabot, SBOM ovisnosti, središnje postupanje s pogreškama, ograničavanje broja zahtjeva i više od 210 jediničnih testova.",
+      "Brojna manja izdanja (v0.3.8 – v0.3.45) nastala na temelju povratnih informacija nakon demonstracije."
+    ]
+  },
+  "0.2.0": {
+    "title": "Povratne informacije DTD-a",
+    "notes": [
+      "Profiliranje sudionika pri prijavi (ustanova, uloga, vrsta), prilagodljivo za svaki događaj, uz izvoz u CSV i skupnu statistiku.",
+      "Prilagodljivi podsjetnici s više vremenskih odmaka i različitim e-porukama.",
+      "Ankete s rezultatima u stvarnom vremenu i izvozom u CSV.",
+      "Poboljšanja u skladu s GDPR-om: pravila privatnosti za svaki događaj, pojedinačne privole, revizijski zapis brisanja i izvoz podataka prema članku 15.",
+      "Objedinjene uloge moderatora i promatrača te revizija licencija ovisnosti."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP — prvo izdanje",
+    "notes": [
+      "Javna platforma za digitalne događaje izgrađena na dizajnerskom sustavu .italia (Bootstrap Italia, design-react-kit).",
+      "Dvorana uživo utemeljena na sustavu Jitsi Meet (IFrame API, autentifikacija JWT-om), s ulogama koje se provode na poslužitelju.",
+      "Prijava sudionika u skladu s GDPR-om, s osobnim podacima zaštićenima šifriranjem (AES-256-GCM).",
+      "Q&A s glasovanjem za pitanja i moderacijom te čekaonica s odbrojavanjem i pristupom za goste.",
+      "E-poruke s potvrdom i podsjetnicima te povezivanje s kalendarima (Google, Outlook, Yahoo, iCal).",
+      "Administratorsko sučelje s prijavom putem API ključa, brisanjem podataka prema GDPR-u i mjerenjima za Prometheus.",
+      "Helm chart spreman za produkciju, Docker slike bez root ovlasti i samo za čitanje, CI/CD putem GitHub Actions i publiccode.yml."
+    ]
+  }
+}

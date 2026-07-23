@@ -11,6 +11,13 @@ env:
 
 jobs:
   build-and-push:
+    # La quota artefatti di Actions e' dell'ORGANIZZAZIONE, non di questo repo
+    # (qui siamo sotto i 50 MB): quando si esaurisce OGNI upload fallisce, e con
+    # lui il job — anche a immagine gia' pubblicata. Il "build record" di buildx
+    # e' un artefatto per ogni build che nessuno scarica mai.
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
     name: Build & Push Docker Image
     runs-on: arc-runner-pa-webinar
     permissions:
@@ -66,6 +73,16 @@ jobs:
             NEXT_PUBLIC_BUILD_SHA=${{ steps.sha.outputs.short }}
             NEXT_PUBLIC_BUILD_CHANNEL=release
             NEXT_PUBLIC_BUILD_DATE=${{ steps.build_date.outputs.iso }}
+            # F18: prod serves the PATCHED jitsi/web (ghcr.io/italia/pa-webinar-jitsi-web:stable-10741-rnnoise,
+            # noise-suppression AudioContext forced to 48 kHz), so advanced rnnoise no longer silences
+            # non-48 kHz mics and is enabled. COUPLING: this ONLY holds while the patched jitsi/web image
+            # is the one served — the helm deploy pins it via `--set jitsi-meet.web.image.*` (and the
+            # committed values.yaml default), and `--reuse-values` preserves that pin across upgrades.
+            # If jitsi/web is ever rolled back to stock, drop this line and re-release so rnnoise is
+            # force-OFF again. The static bundle guards (Dockerfile/jitsi-web.yml) prove the patch is
+            # PRESENT, not that audio works — always re-validate the mic on a LIVE call after deploy.
+            # (dev/test keep the default.)
+            NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE=false
 
       - name: Build and push migration image
         uses: docker/build-push-action@v6
@@ -83,6 +100,11 @@ jobs:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
           format: spdx-json
           output-file: sbom.spdx.json
+          # L'SBOM viene allegato alla Release qui sotto, che NON consuma la
+          # quota artefatti di Actions. Caricarlo anche come artefatto era un
+          # doppione, e quando la quota dell'organizzazione si esaurisce quel
+          # doppione fa fallire l'intero job — a immagini gia' pubblicate.
+          upload-artifact: false
 
       - name: Generate npm SBOM (CycloneDX)
         continue-on-error: true

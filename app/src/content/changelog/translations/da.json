@@ -1,0 +1,361 @@
+{
+  "0.8.9": {
+    "title": "Ændringsloggen, nu med softwareoversigten indbygget",
+    "notes": [
+      "Hver udgivelse åbner her sin software-stykliste (SBOM): en søgbar liste over alle medfølgende komponenter med version og økosystem — uden download.",
+      "Det tekniske afsnit er nu et sæt links — SBOM, GitHub-udgivelsen, kildekoden ved det tag, build-pipelinen — i stedet for et afsnit, der gentog resuméet ovenfor.",
+      "Sidefoden tilføjer projektets sikkerhedssignaler: OpenSSF Scorecard og resultaterne af kodescanningen."
+    ]
+  },
+  "0.8.8": {
+    "title": "Nyhedssiden, redesignet",
+    "notes": [
+      "Hver udgivelse læses nu på to niveauer: de nyheder, der betyder noget for dig, og — under en fane „Teknisk detalje“, som du kun åbner, hvis du vil — det tekniske arbejde bag dem.",
+      "Hver version, der udgives med en software-stykliste (SBOM), linker direkte til sin release på GitHub, hvor SBOM’en er vedhæftet. Kildekode-repositoriet er nu offentligt.",
+      "Tidslinjestriben øverst er væk: den blev rodet, efterhånden som udgivelserne hobede sig op, og sagde ikke meget. Datoerne bliver på hvert kort."
+    ]
+  },
+  "0.8.7": {
+    "title": "Grænsefladen komplet på alle 24 sprog og en fornyet visuel identitet",
+    "notes": [
+      "Grænsefladen er nu fuldt oversat til alle 24 EU-sprog: tidligere faldt flere skærme — heriblandt venteværelset og samtykketeksterne — tilbage til italiensk, hvor en oversættelse manglede.",
+      "Fornyet logo og visuel identitet (favicon, ikon, vandmærke) og et billedeksempel, når et begivenhedslink deles i chat og på sociale medier.",
+      "En nyhedsside på alle sprog, med links til tjenestens gennemsigtighed og til sikkerhed."
+    ]
+  },
+  "0.8.6": {
+    "title": "Venteværelset: en side og en plads, man selv vælger at gå ind på",
+    "notes": [
+      "Venteværelset er nu en ren side efter designsystemet: begivenheden, lyd- og videoindstillingerne, navnet, chatten. Det lille spil i sideboksen er fjernet.",
+      "Den interaktive plads åbnes kun, hvis du vælger den, og fylder hele skærmen. Sidens egne kontroller bliver ved siden af — navn, mikrofon, kamera, chat, oplysninger — og du kan gå tilbage, når du vil. Den, der helst er fri for animation, kan skifte til den klassiske version, og valget huskes.",
+      "Avatarer: hvis den adresse, du tilmeldte dig med, har en Gravatar, kan den nu vises som dit billede i rummet. En administrator slår det til, og vores server sender forespørgslen: deltagernes browsere kontakter aldrig gravatar.com.",
+      "Komponenten, der optager begivenheden, vises ikke længere blandt deltagerne eller i optællingen: den er en intern tjeneste, ikke en person i rummet. Oplysningen om, at begivenheden optages, bliver stående."
+    ]
+  },
+  "0.8.5": {
+    "title": "En mere levende chat: omtaler, reaktioner, rettelser og eksport",
+    "notes": [
+      "Chat: nævner nogen dig med @, bliver beskeden nu fremhævet, og kigger du et andet sted hen, får du en notifikation. Hidtil kunne en omtale ikke skelnes fra en hvilken som helst anden besked.",
+      "Chat: du kan nu reagere på en enkelt besked med en emoji og rette dine egne beskeder inden for femten minutter (det fremgår fortsat, at beskeden er ændret). Knappen »Svar« er blevet mere diskret.",
+      "Chat: en ny knap henter hele samtalen ned – som tekst eller i dataformat. Beskederne blev allerede gemt, men der var ingen måde at tage dem med sig på.",
+      "I mødelokalet: en timer viser, hvor lang tid der er tilbage (eller hvor længe man har været i gang). Den er slået til som standard for moderatorer og kan slås til af alle.",
+      "Et mødelokale startes ikke længere af den, der åbner arrangementssiden timer i forvejen: det gøres først klar, når der er brug for det. Det løser samtidig et tilfælde, hvor arrangementet blev lukket få minutter efter starten.",
+      "Statistik: det højeste antal deltagere samtidig registreres nu også for den enkelte session og ikke længere kun for hele arrangementet."
+    ]
+  },
+  "0.8.4": {
+    "title": "Bekræftelsesmails: arrangementets navn og billede samt en afsender, der kan indstilles",
+    "notes": [
+      "Bekræftelsesmails ved tilmelding indeholder igen arrangementets navn, både i emnefeltet og i selve teksten. Tilmeldte man sig fra en side på et sprog, som titlen ikke var oversat til, modtog man en e-mail uden arrangementets navn og en kalendervedhæftning uden titel.",
+      "Bekræftelsesmails og påmindelser viser nu arrangementets billede øverst og titlen tydeligt fremhævet i stedet for kun i en enkelt række i tabellen med oplysninger.",
+      "Nye indstillinger i administrationspanelet: det navn, afsenderen vises med i modtagerens indbakke, og en adresse, som svar skal sendes til (e-mailene afsendes fra en adresse, der ikke modtager svar).",
+      "Mere generelt gælder det nu, at en tekst, der ikke er oversat til et sprog, vises på originalsproget i stedet for at stå tom. Det gjaldt også titler og beskrivelser på de offentlige sider."
+    ]
+  },
+  "0.8.3": {
+    "title": "Fortrolighed i chatten, korrekt deltagertal og moderation, der virker igen",
+    "notes": [
+      "Chatforløbet kan ikke længere læses af personer, der ikke deltager i arrangementet. Hidtil kunne alle, der kendte adressen på et arrangement, hente beskederne – med navnene på dem, der havde skrevet dem – også efter at arrangementet var slut. Nu kræver adgang, at man er tilmeldt, er moderator eller befinder sig i mødelokalet, mens arrangementet er i gang.",
+      "Antallet af deltagere i mødelokalet var én for lavt, fordi den enkelte ikke talte sig selv med. Den samme fejl gik igen i arrangementets statistik (flest deltagere samtidig). Tallet er nu korrekt og stemmer overens med det, der registreres i statistikken.",
+      "Moderatorens funktioner i deltagerlisten virker igen: det havde hidtil ingen effekt at fjerne en deltager eller at justere lydstyrken for den enkelte.",
+      "Reaktioner kan nu også sendes fra smartphone, hvor knappen var forsvundet. Emojier, der svæver hen over skærmen, opfanger ikke længere klik på kontrolbjælken.",
+      "I fuld skærm er dialogvinduerne – deling af link og, for moderatorer, »Forlad mødelokalet« – synlige igen. Tidligere lå de skjult bag videoen, så knapperne så ud til ikke at virke.",
+      "Skabeloner til arrangementer starter nu med chatten slået til, i tråd med selve mødelokalet: hidtil gav skabelonen »Webinar« stadig et arrangement uden chat.",
+      "Den engelske oversættelse af brugerfladen er nu komplet. Der manglede en række tekster, blandt andet hele dialogvinduet »Del«."
+    ]
+  },
+  "0.8.2": {
+    "title": "Ingen tomme mødelokaler kører videre efter sluttidspunktet",
+    "notes": [
+      "Et mødelokale, der blev holdt åbent efter sluttidspunktet og derefter tømt, forblev aktivt på ubestemt tid og lagde unødigt beslag på videoressourcer. Nu lukkes lokalet, når det har stået tomt i 45 minutter efter det planlagte sluttidspunkt. Et lokale, der stadig er i brug, afbrydes aldrig: efter sluttidspunktet vises der blot en besked, og ingen bliver koblet af."
+    ]
+  },
+  "0.8.1": {
+    "title": "Reaktioner kan tilpasses, tomme mødelokaler lukkes, og administrationen er blevet sikrere",
+    "notes": [
+      "Reaktioner (emojier) kan nu indstilles af administratoren. Som standard bruges Jitsis egne reaktioner direkte i kontrolbjælken – de er lette og forsvinder hurtigt igen. Alternativt kan platformens egne reaktioner slås til; de vises i en bjælke nederst til venstre og tælles med i arrangementets statistik.",
+      "Ny indstilling for administratorer: luk automatisk et mødelokale, der står helt tomt – også uden moderator – som tegn på, at arrangementet er forladt. Funktionen er slået fra som standard, fordi inaktivitet uden moderator allerede håndteres sikkert (lokalet går i dvale efter 45 minutter), og den kan slås til i indstillingerne.",
+      "Sikrere administrationsområde: når sessionen udløber, føres man tilbage til login-siden, så administrationssiderne ikke længere kan bruges efter udløb. Samtidig varer sessionen længere og fornyes automatisk, mens man arbejder."
+    ]
+  },
+  "0.8.0": {
+    "title": "Et mere overskueligt mødelokale: chat, reaktioner, fuld skærm og tilmelding",
+    "notes": [
+      "Chat: du kan nu indsætte emojier i dine beskeder med en emoji-vælger, og en lille indikator gør opmærksom på, hvis opdateringerne i chatten bliver forsinket. Beskeder, du sender, vises med det samme – også på virksomhedsnetværk, der forsinker opdateringer i realtid.",
+      "Fuld skærm: knappen til fuld skærm holder nu chatten synlig ved siden af videoen i stedet for at skjule den.",
+      "Reaktioner (emojier) dækker ikke længere for knapperne i bunden: kontrolbjælken kan altid klikkes, også i mosaikvisning.",
+      "Knapperne »Del« og »Forlad mødelokalet« er nu tydelige og farvede som standard – forlad-knappen i rødt – og ikke først, når musen føres hen over dem.",
+      "Optagerobotten »Recorder« optræder ikke længere i deltagerlisten eller i deltagertallet.",
+      "Tilmelding: tilmelder du dig i god tid, kommer du til en bekræftelsesside med et link til at føje arrangementet til din kalender i stedet for at blive sendt til venteværelset. Tæt på starttidspunktet kommer du direkte ind i mødelokalet. På arrangementssiden kan du desuden se, om du allerede er tilmeldt.",
+      "Chatten er nu den primære måde at interagere på i mødelokalet. Desuden er den automatiske lukning af tomme arrangementer og optællingen af deltagere i statistikken blevet forbedret."
+    ]
+  },
+  "0.7.8": {
+    "title": "Moderatoren kan tage en oprakt hånd ned",
+    "notes": [
+      "I køen af oprakte hænder har moderatoren nu en knap, der tager en enkelt deltagers hånd ned – nyttigt, når nogen allerede har haft ordet eller har glemt at tage hånden ned igen. Beskeden når frem til netop den deltager, som ser sin egen hånd blive taget ned. Ingen andre berøres."
+    ]
+  },
+  "0.7.7": {
+    "title": "Mindre baggrundsstøj, når du taler",
+    "notes": [
+      "Avanceret støjreduktion aktiveres, når du får ordet: den dæmper lyde som tastaturklik, ventilatorer og trafik bedre end den grundlæggende støjdæmpning, der allerede fandtes."
+    ]
+  },
+  "0.7.6": {
+    "title": "Lydstyrke for den enkelte deltager",
+    "notes": [
+      "Ny lydstyrkeknap for hver enkelt deltager i panelet »Deltagere«: lyder en stemme for høj eller for lav, kan du justere den kun for dig selv, uden at ændre lyden for de andre.",
+      "Den separate lydoptagelse pr. deltager, som bruges i efterbehandlingen, er blevet mere pålidelig: hvis en optagelse viser sig at være tavs, opdager systemet det med det samme og undgår at lave tomme transskriptioner."
+    ]
+  },
+  "0.7.5": {
+    "title": "Den oprakte hånd bliver oppe",
+    "notes": [
+      "Når du rækker hånden op, bliver den nu oppe, indtil du selv tager den ned, eller en moderator håndterer den. Tidligere gik hånden af sig selv ned i det øjeblik, du begyndte at tale, så du forsvandt fra talerkøen."
+    ]
+  },
+  "0.7.4": {
+    "title": "Navnet i chatten er beskyttet mod videresendte links (sikkerhed)",
+    "notes": [
+      "I chatten vises en tilmeldt deltagers rigtige navn kun på den enhed, vedkommende har tilmeldt sig med. Åbner nogen et videresendt deltagelseslink, deltager de under det navn, de selv skriver, og ikke i den oprindeligt tilmeldtes navn. Dermed er en fejlagtig tilskrivning af beskeder lukket.",
+      "Den samme beskyttelse gælder vedhæftede filer: en fil sendt fra et videresendt link tilskrives ikke længere den oprindeligt tilmeldtes navn.",
+      "Den, der logger på fra en ekstra enhed – for eksempel telefonen – eller med et link modtaget i forvejen, kan fortsat deltage, skrive i chatten og sende filer uden afbrydelser. Det eneste, der ændrer sig, er det viste navn, som bliver det, man skriver ved indgangen."
+    ]
+  },
+  "0.7.3": {
+    "title": "Korrekt optælling af tilstedeværende, reaktioner i midten og finpudsning af mødelokalet",
+    "notes": [
+      "Optællingen af tilstedeværende tæller ikke længere den samme person flere gange, når vedkommende forlader lokalet og kommer ind igen – for eksempel med browserens tilbage-knap. Dobbelte forbindelser fra samme person tælles kun én gang. Deltagerlisten viser fortsat hver enkelt forbindelse, så moderatoren altid kan se og håndtere dem alle.",
+      "Bjælken med reaktioner og emojier er nu placeret nederst i midten, hvor den er tydelig og let at finde, i stedet for i hjørnet nederst til venstre.",
+      "Antallet af tilmeldte vises ikke længere offentligt på arrangementssiden eller i oversigten over arrangementer; det er fortsat synligt for administratorer i administrationspanelet. Under et live-arrangement ser publikum kun, hvor mange der er til stede.",
+      "Støjdæmpning er nu slået til automatisk på alle mikrofoner. Den grundlæggende lydbehandling – ekko og støj – er altid aktiv, og der er ikke noget at slå til manuelt.",
+      "Det går lidt hurtigere at komme ind i mødelokalet: videosystemet begynder at vågne op, allerede når du klikker på knappen for at gå ind."
+    ]
+  },
+  "0.7.2": {
+    "title": "En rigere chat: vedhæftede filer, svar og omtaler",
+    "notes": [
+      "Du kan nu sende billeder og filer i chatten (PNG, JPEG, WebP, GIF og PDF på op til 10 MB) med en forhåndsvisning direkte i beskeden.",
+      "Ny funktion »Svar«: du kan citere en bestemt besked, og citatet bliver stående synligt i samtaletråden.",
+      "Omtaler med @: du kan nævne en deltager ved navn inde i en besked.",
+      "Moderation af chatten: moderatorer kan fjerne enkelte beskeder under arrangementet."
+    ]
+  },
+  "0.7.1": {
+    "title": "Statistik efter hvert arrangement",
+    "notes": [
+      "Ny fane »Statistik« for hvert arrangement i administrationspanelet – også for arrangementer uden tilmelding og uden videooptagelse. Den viser mødets forløb, hvem der talte mest, den samlede grad af deltagelse og de vigtigste nøgletal.",
+      "Et diagram over interaktionen over tid – chat, spørgsmål, stemmer på spørgsmål, afstemninger, ord i ordskyen og reaktioner – hvor mødets mest aktive øjeblik fremhæves.",
+      "En oversigt over, hvem der talte længst (minutter pr. person), og hvor jævnt taletiden var fordelt, sammen med antallet af reaktioner og håndsoprækninger.",
+      "Et nyt skøn over, hvor længe deltagerne i gennemsnit blev i mødelokalet, som også indgår i beregningen af den samlede opmærksomhed."
+    ]
+  },
+  "0.7.0": {
+    "title": "Talernavne kan rettes, og en afspiller kun med lyd",
+    "notes": [
+      "Efter et arrangement kan du nu omdøbe talerne og rette de navne, der automatisk er genkendt i transskriptionen.",
+      "Hvis en optagelse ikke har video, der kan afspilles, viser redigeringssiden alligevel en afspiller kun med lyd, så du kan lytte optagelsen igennem og rette tekst og talernavne.",
+      "Rettelse i flersporsoptagelsen: den faktiske lyd fra de øvrige deltagere optages nu korrekt."
+    ]
+  },
+  "0.6.9": {
+    "title": "Pålidelighed i AI-behandlingen",
+    "notes": [
+      "Administrationspanelet viser nu en indikator for, hvor pålidelig AI-behandlingen efter arrangementet er (transskription, resuméer og oversættelser), så man med ét blik kan se, om resultatet er komplet og troværdigt."
+    ]
+  },
+  "0.6.8": {
+    "title": "En mere forståelig redigeringsside efter arrangementet",
+    "notes": [
+      "Redigeringssiden for transskription, resuméer og oversættelser forklarer nu, når AI-indholdet endnu ikke er klar – »behandling i gang« eller »start behandlingen med knapperne øverst« – i stedet for at vise en rød fejlmeddelelse, der lignede et nedbrud.",
+      "En mislykket lagring vises nu i rødt med den konkrete årsag fra serveren i stedet for i grønt, som om alt var gået godt.",
+      "En udløbet administratorsession og problemer med at hente indhold vises nu med hver sin besked i stedet for én generisk fejl.",
+      "Hvis lyden i en optagelse ikke kan afspilles, oplyser siden om det, og det er stadig muligt at rette tekst og taler for hvert afsnit."
+    ]
+  },
+  "0.6.7": {
+    "title": "Reaktioner altid synlige og »Noter / Tjekliste«",
+    "notes": [
+      "Reaktioner (emojier) er nu altid synlige i en bjælke nederst til venstre og ikke længere gemt bag en knap. De er dermed lettere at finde og bruge under arrangementet.",
+      "Funktionen »Dagsorden« har skiftet navn til »Noter / Tjekliste«, så det er tydeligt, at der er tale om et noteområde i tjeklisteform, hvis indhold ikke havner i chatten. Moderatoren kan fortsat slå den til for hvert enkelt arrangement."
+    ]
+  },
+  "0.6.6": {
+    "title": "Finpudsning: chat, optælling og adgang",
+    "notes": [
+      "Links, der deles i chatten, kan nu klikkes og åbnes sikkert i en ny fane; tidligere var de blot tekst.",
+      "I mødelokalet er det samlede antal tilmeldte nu kun synligt for moderatorer. Deltagerne ser kun, hvor mange der rent faktisk er til stede.",
+      "Hurtigere adgang til mødelokalet: forbindelsen til videoserveren forberedes allerede, mens du er i venteværelset, så ventetiden ved indgangen bliver kortere.",
+      "I deltagerlisten bliver overskriften med antallet stående, mens du ruller ned gennem listen."
+    ]
+  },
+  "0.6.5": {
+    "title": "Optagelser og optælling",
+    "notes": [
+      "Optællingen af tilstedeværende i mødelokalet medregner ikke længere optageren: den viser kun rigtige personer og ikke den robot, der optager lyden.",
+      "Efterbehandling: en ny knap »Generér med AI« starter transskription, resumé og oversættelse – også for optagelser med lyd alene, med ét spor pr. deltager, som hidtil slet ikke kunne sættes i gang.",
+      "I listen over spor står der nu et id ved siden af hvert kaldenavn: forskellige personer med samme kaldenavn får hvert sit id, mens flere indlæg fra den samme person deler ét id.",
+      "Der vises nu en klar besked, når igangsætningen ikke sætter noget arbejde i kø – fordi AI er slået fra for arrangementet, eller fordi behandlingen er sat på pause – i stedet for et misvisende »handlingen lykkedes«."
+    ]
+  },
+  "0.6.4": {
+    "title": "Sikkerhed om identitet og finpudsning af mødelokalet",
+    "notes": [
+      "Sikkerhedsrettelse: deler du dit personlige link til mødelokalet, går den, der åbner det, nu ind under sit EGET navn. Tidligere kunne vedkommende overtage navnet på den, der havde sendt linket.",
+      "Skarpere skærmdeling: der prioriteres nu opløsning (5 billeder i sekundet i høj kvalitet) frem for jævn bevægelse, så slides og dokumenter forbliver læsbare, når der ikke sker så meget på skærmen.",
+      "Funktionen »skjul dit eget billede« er fjernet: når den først var slået til, var der ingen vej tilbage til at få sit eget felt frem igen.",
+      "Administratoradgang: efter fornyet login som følge af inaktivitet opdateres siden korrekt – ikke længere en side, der ser ud til at være låst, indtil man selv genindlæser den."
+    ]
+  },
+  "0.6.3": {
+    "title": "Finpudsning af mødelokalet – anden runde",
+    "notes": [
+      "Præsentationstimeren er nu indbygget i moderatorens kontrolbjælke og optager ikke længere sin egen række. Nedtællingsbjælken vises kun, mens timeren kører.",
+      "I chatten vises nu det rigtige navn på den, der skriver, i stedet for et generisk »Moderator«.",
+      "Chatten er blevet et selvstændigt panel i sidebjælken i stedet for altid at ligge oven på det øvrige indhold. Det giver en mere overskuelig brugerflade med en tæller for ulæste beskeder på fanen.",
+      "Ny knap »Tavle« til moderatorer, som åbner den fælles tavle direkte fra kontrolbjælken.",
+      "Knappen »Del« har fået den rigtige farve, så den ikke længere kan forveksles med »Forlad«. Der er ikoner ved siden af linkene, og moderatorlinket, som kun moderatorer ser, ligger bag en advarsel, så andre moderatorer kan inviteres uden forvekslinger.",
+      "Ordskyen er ikke længere slået til som standard, men moderatoren kan fortsat slå den til under arrangementet."
+    ]
+  },
+  "0.6.2": {
+    "title": "Finpudsning af mødelokalet under live-arrangementer",
+    "notes": [
+      "Kontrolbjælken (mikrofon, kamera og skærmdeling) er nu altid synlig og klikbar – også i fuld skærm, mens nogen deler skærm, og når du er alene i mødelokalet.",
+      "Moderatoren kan igen slå livefunktionerne (Spørgsmål, Chat og Dagsorden) til og fra under arrangementet.",
+      "Lyd- og videoknapperne kan bruges, allerede mens mødelokalet gøres klar, uden at man skal vente på, at videoserveren starter.",
+      "Listen »Oprakte hænder« viser nu korrekt, hvem der har bedt om ordet.",
+      "Ny knap »Del« i mødelokalet: den kopierer med det samme både deltagelseslinket og linket til arrangementssiden, uden at afsløre fortrolige adgangsnøgler.",
+      "PA Webinar-mærket er igen synligt i den øverste bjælke i mødelokalet."
+    ]
+  },
+  "0.6.1": {
+    "title": "Offentlig ændringslog og sikkerhedsopdateringer",
+    "notes": [
+      "Ny offentlig side med ændringsloggen, som åbnes ved at klikke på versionsnummeret i sidefoden. Den viser alle versioner af platformen med de vigtigste nyheder.",
+      "Sikkerhedsopdateringer af afhængigheder (undici, nodemailer) og en mere robust byggeproces med scanning for sårbarheder."
+    ]
+  },
+  "0.6.0": {
+    "title": "Arbejdsgang efter arrangementet og interaktivt venteværelse",
+    "notes": [
+      "Ny arbejdsgang, når arrangementet slutter: en dedikeret dialog beder moderatoren vælge, hvor optagelsen skal ende – offentliggjort på arrangementssiden, i videobiblioteket eller kun i arkivet.",
+      "Et automatisk og anonymiseret resumé efter arrangementet – fremmøde, mest stemte spørgsmål, resultater af afstemninger, ordsky og bedømmelser – vises på alle sider for afsluttede arrangementer, også når der ikke findes en optagelse.",
+      "En opsamlende e-mail til deltagerne efter arrangementet med indholdet fra arrangementet.",
+      "Et interaktivt venteværelse, »Piazza Digitale«: du går med din avatar hen til porten for at komme ind i mødet, og den klassiske knap til at gå ind er altid tilgængelig ved siden af.",
+      "Ordskyen får sit eget afsnit på siden for afsluttede arrangementer, hvor administratoren kan vælge, om den skal vises.",
+      "En fælles tavle, der kan slås til for det enkelte arrangement og fra skabeloner.",
+      "Guiden til oprettelse af arrangementer er gennemarbejdet: avancerede indstillinger er foldet sammen, der er en hovedmoderator med eget link, advarsler om personoplysninger, mulighed for at gemme en kladde og bedre håndtering af delvise fejl.",
+      "Forskellige opbevaringsperioder for optagelser og for lydspor pr. taler, knyttet til signalet »video offentliggjort«, samt GDPR-oprydning i chatbeskederne."
+    ]
+  },
+  "0.5.11": {
+    "title": "Finpudsning af moderation, afslutning af møder og lyd",
+    "notes": [
+      "Moderatorer vises nu med deres rigtige navn i stedet for et generisk »Moderator«.",
+      "Der vises en afslutningsskærm i platformen, når arrangementet slutter – ikke længere den misvisende besked »Mødelokalet gøres klar«.",
+      "Rettet ikoner, der lå oven i hinanden i venteværelset.",
+      "Støjdæmpning tvunget fra via IFrame API for at løse problemer med lyden."
+    ]
+  },
+  "0.5.9": {
+    "title": "Stabil flersporsoptagelse, stjernebedømmelser og ydeevne",
+    "notes": [
+      "Optagelse pr. taler (flere spor) er gjort pålidelig hele vejen igennem: fuld lyd på hvert spor, ingen afkortede optagelser og parallelle uploads.",
+      "Et evalueringsskema efter arrangementet med stjernebedømmelse og et samlet overblik for administratoren.",
+      "Forbedret ydeevne: VP9-codec til kameraet, forsinket indlæsning på mobil og finjustering af optageren.",
+      "Et Helm-hook efter opgradering, som automatisk genindlæser Jitsis config.js."
+    ]
+  },
+  "0.5.8": {
+    "title": "Indstillelig video- og lydkvalitet og et nyt forløb ved indgangen",
+    "notes": [
+      "Video- og lydkvaliteten kan indstilles af administratoren med forudindstillinger for hvert arrangement.",
+      "Nyt design af forløbet ved indgangen: tilmelding, dernæst venteværelse og til sidst videomødet.",
+      "Oprakte hænder viser den enkelte deltagers rigtige navn."
+    ]
+  },
+  "0.5.6": {
+    "title": "Indstilleligt venteværelse og forsidebilleder til arrangementer",
+    "notes": [
+      "Venteværelset kan indstilles – spil, have eller klassisk – både for hele webstedet og for det enkelte arrangement.",
+      "Forsidebilleder på arrangementssiden og som miniaturer på kortene.",
+      "Uploadede filer leveres via en dedikeret adresse med signerede links, der udløber hurtigt.",
+      "Knappen »Gå ind nu« er tilgængelig med det samme efter tilmeldingen.",
+      "En samlet administrationsdel til AI-behandling af optagelser og en mere robust optagelse af flere spor."
+    ]
+  },
+  "0.5.2": {
+    "title": "Forberedelse af arrangementer og finpudsning",
+    "notes": [
+      "Dagsorden med mulighed for at erklære sig enig eller uenig samt rettelser til de rettigheder, der arves fra skabeloner.",
+      "Rigtige navne i stedet for »SPEAKER_00« i resuméer og undertekster.",
+      "En række hurtige rettelser (v0.5.2–v0.5.5) forud for de offentlige arrangementer."
+    ]
+  },
+  "0.5.1": {
+    "title": "Forside med fællesskabet i centrum og flersporsarkiv",
+    "notes": [
+      "Forsiden er redesignet med fællesskabet i centrum, med oversættelser der kan tilsidesættes under drift, og med tilgængelighed efter AgID-kravene.",
+      "Et MKV-arkiv med flere spor og en afspiller, hvor hver enkelt taler kan høres for sig.",
+      "Sporene synkroniseres med Jibri-miksningen ved hjælp af krydskorrelation."
+    ]
+  },
+  "0.5.0": {
+    "title": "AI-efterbehandling og flersporsoptagelse",
+    "notes": [
+      "En AI-baseret efterbehandling: transskription, resuméer, undertekster, oversættelser og eftersynkronisering med flere stemmer (altid syntetiske), hvor modellernes oprindelse er dokumenteret.",
+      "Optagelse i flere spor, ét spor pr. taler, med automatisk genkendelse og navngivning af talere (ADR-013).",
+      "Et offentligt videobibliotek og en side, hvor administratoren kan håndtere arbejdet efter arrangementet.",
+      "En editor til transskriptionen efter arrangementet, hvor teksten kan rettes og talerne tildeles på ny.",
+      "Administrationens brugerflade er gennemarbejdet: notifikationer og dialoger efter .italia i stedet for browserens egne beskeder, indlæsningsskabeloner og designtokens til farver i stedet for hundredvis af hårdkodede farvekoder.",
+      "Samtykke fra hver enkelt deltager til optagelse i flere spor (GDPR) og en udvidet dataeksport efter artikel 15."
+    ]
+  },
+  "0.4.0": {
+    "title": "Engagement og livscyklus",
+    "notes": [
+      "Nye livefunktioner: ordsky, præsentationstimer, tæller for reaktioner, kontrolknapper i Meet-stil og et panel med oprakte hænder.",
+      "En livscyklus for optagelser, fra midlertidig til offentliggjort, med administratorfunktioner (forhåndsvisning, offentliggørelse og sletning) og differentierede opbevaringsperioder.",
+      "En side efter arrangementet med faner (optagelse, Q&A-arkiv, afstemninger, evaluering og materialer), hvor det kan indstilles, hvad der vises hvornår.",
+      "En guide til oprettelse af arrangementer i fem trin, en systematik for emneord, en kontaktliste og en redaktionel overrubrik til titler.",
+      "Et offentligt videobibliotek på /video-library og en gennemsigtighedsside på /service-inventory (CycloneDX 1.6 pr. instans).",
+      "Automatisk skalering af JVB i to faser med et Redis-øjebliksbillede, der forsyner statussiden.",
+      "GDPR-oprydning i tre faser: personoplysninger fjernes straks, indhold fjernes efter opbevaringsperioden, og til sidst slettes alt endeligt."
+    ]
+  },
+  "0.3.0": {
+    "title": "En platform, der kan tilpasses, og infrastruktur",
+    "notes": [
+      "Webstedsindstillinger, så andre offentlige myndigheder kan genbruge platformen – logo og farver, favicon, SEO, sidefod, forsidevisning samt sider om privatliv og tilgængelighed – uden at skulle bygge den om.",
+      "Et overblik med statistik og et administrationspanel for infrastrukturen.",
+      "Tre installationsformer med Helm (simple, standard og full) samt JVB, der kan skaleres ned til nul på en dedikeret node-pulje.",
+      "En Jibri-arbejdsgang på tværs af skyleverandører (Azure Blob, S3, GCS, MinIO eller lokalt lager) og et Jitsi-vandmærke, der kan indstilles.",
+      "OpenSSF Scorecard, Dependabot, SBOM over afhængigheder, central fejlhåndtering, begrænsning af antal forespørgsler og over 210 enhedstest.",
+      "Talrige mindre udgivelser (v0.3.8–v0.3.45) på baggrund af tilbagemeldingerne efter demoen."
+    ]
+  },
+  "0.2.0": {
+    "title": "Tilbagemeldinger fra DTD",
+    "notes": [
+      "Oplysninger om deltagerne ved tilmelding (myndighed, rolle og type), som kan tilpasses for hvert arrangement, med CSV-eksport og samlet statistik.",
+      "Påmindelser, der kan indstilles med flere tidspunkter og forskellige e-mails.",
+      "Afstemninger med resultater i realtid og CSV-eksport.",
+      "GDPR-forbedringer: en privatlivspolitik for hvert arrangement, detaljerede samtykker, en revisionslog over sletninger og dataeksport efter artikel 15.",
+      "Rollerne moderator og observatør er blevet konsolideret, og licenserne for afhængighederne er gennemgået."
+    ]
+  },
+  "0.1.0": {
+    "title": "MVP – første version",
+    "notes": [
+      "En offentlig platform til digitale arrangementer bygget på designsystemet .italia (Bootstrap Italia, design-react-kit).",
+      "Et live mødelokale med Jitsi Meet (IFrame API og JWT-godkendelse), hvor roller håndhæves på serveren.",
+      "Tilmelding af deltagere i overensstemmelse med GDPR og med krypterede personoplysninger (AES-256-GCM).",
+      "Q&A med stemmer på spørgsmål og moderation samt et venteværelse med nedtælling og adgang for gæster.",
+      "Bekræftelses- og påmindelsesmails samt integration med kalendere (Google, Outlook, Yahoo, iCal).",
+      "Et administrationspanel med API-nøglegodkendelse, GDPR-oprydning og Prometheus-målinger.",
+      "Et Helm-chart klar til produktion, Docker-images uden root og med skrivebeskyttet filsystem, CI/CD med GitHub Actions og publiccode.yml."
+    ]
+  }
+}

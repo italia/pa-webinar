@@ -3,8 +3,34 @@
  *
  * Used by:
  * - /api/avatar route (HTTP proxy with Gravatar fallback)
- * - JWT generation (inline data URI to bypass Jitsi CSP)
+ * - JWT generation (inline data URI, the default)
+ *
+ * The data URI is the default because it always works and starts no request,
+ * not because a remote URL is forbidden: verified on the deployed jitsi-web
+ * (stable-10741), the bundle takes `avatarURL` from the JWT unconditionally,
+ * preloads it, and falls back to initials if it fails to load. No CSP header is
+ * served for that origin either.
  */
+
+const DEFAULT_SIZE = 200;
+const MIN_SIZE = 32;
+const MAX_SIZE = 512;
+
+/**
+ * Lato del quadrato richiesto a `/api/avatar`, in pixel.
+ *
+ * Due trappole in una riga sola, ed è per questo che vive qui, testata.
+ * `Number('abc')` è NaN, e NaN sopravvive sia a Math.max sia a Math.min:
+ * l'SVG verrebbe costruito con coordinate NaN, su una route pubblica. Ma
+ * `Number('')` è 0, che è FINITO, e verrebbe schiacciato sul minimo di 32 —
+ * cioè proprio la richiesta senza `size`, la forma più comune, servita a 32px
+ * dentro uno slot da 200.
+ */
+export function parseAvatarSize(raw: string | null): number {
+  const n = raw ? Number(raw) : Number.NaN;
+  if (!Number.isFinite(n)) return DEFAULT_SIZE;
+  return Math.min(Math.max(n, MIN_SIZE), MAX_SIZE);
+}
 
 const BI_PALETTE = [
   { bg: '#004D99', fg: '#FFFFFF' },

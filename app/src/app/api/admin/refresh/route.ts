@@ -2,13 +2,16 @@
  * POST /api/admin/refresh
  *
  * Re-mint the admin_session cookie when the caller already holds a
- * valid one. The admin UI calls this on a timer (every ~3h, well
- * inside the 4h TTL) so a working operator never gets logged out
- * mid-session — but a walked-away laptop loses access after 4h
- * because the timer doesn't fire from the server.
+ * valid one. AdminSessionKeepAlive calls this every ~10 min while the
+ * admin is actively working (tab visible + recent activity), well inside
+ * the 6h JWT TTL, so a working operator never gets logged out mid-session.
+ * A walked-away laptop stops refreshing and decays to the 6h idle ceiling;
+ * the cookie itself lingers ~1 day (ADMIN_COOKIE_MAX_AGE_SECONDS) purely as
+ * a "was an admin here" marker, granting no access.
  *
  * Returns 401 if the current cookie is missing or invalid (no
- * implicit privilege escalation).
+ * implicit privilege escalation). Intentionally writes NO audit-log row:
+ * this is a silent keepalive slide, not a meaningful admin action.
  */
 
 import { cookies } from 'next/headers';
@@ -23,11 +26,10 @@ import {
   isAdminAuthenticated,
   setAdminSessionCookie,
 } from '@/lib/auth/admin-session';
-import { logAdminAction } from '@/lib/audit/admin-audit';
 
 export const dynamic = 'force-dynamic';
 
-export const POST = withErrorHandling(async (request) => {
+export const POST = withErrorHandling(async (_request) => {
   const cookieStore = await cookies();
   if (!(await isAdminAuthenticated(cookieStore))) {
     throw new UnauthorizedError();
@@ -46,7 +48,9 @@ export const POST = withErrorHandling(async (request) => {
     .setExpirationTime(`${ADMIN_SESSION_TTL_SECONDS}s`)
     .sign(secret);
 
-  await logAdminAction({ request, action: 'ADMIN_SESSION_REFRESH' });
+  // No audit-log row here: this is a silent keepalive slide (called every few
+  // minutes per active tab by AdminSessionKeepAlive), not a meaningful admin
+  // action — logging it would flood admin_audit_log and bury real actions.
 
   const response = NextResponse.json({ success: true });
   setAdminSessionCookie(response, token);

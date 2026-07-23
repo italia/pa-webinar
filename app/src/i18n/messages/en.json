@@ -160,6 +160,8 @@
     "submitting": "Registering...",
     "success": "Registration complete!",
     "successMessage": "You will receive a confirmation email with the link to access the event.",
+    "successScheduledMessage": "You're registered! We've sent you an email with your personal access link. Add the event to your calendar and come back shortly before it starts.",
+    "addToCalendar": "Add to calendar",
     "enteringRoom": "We're taking you to the event waiting room.",
     "enteringRoomHint": "Opening the room…",
     "alreadyRegistered": "You are already registered for this event",
@@ -223,6 +225,8 @@
     "connecting": "Connecting...",
     "connectionError": "Unable to connect to the room. Check your connection and try again.",
     "activeVsRegistered": "{active} active · {registered} registered",
+    "enterFullscreen": "Fullscreen",
+    "exitFullscreen": "Exit fullscreen",
     "overtime": {
       "withCountdown": "The scheduled end time has passed. The event will close automatically in {minutes, plural, one {# minute} other {# minutes}}.",
       "closingNow": "End time reached. The event is about to close.",
@@ -309,7 +313,33 @@
       "noMessages": "No messages yet",
       "empty": "No messages yet. Be the first!",
       "inputLabel": "Chat message",
-      "moderatorBadge": "Moderator"
+      "moderatorBadge": "Moderator",
+      "attach": "Attach a file",
+      "emojiPicker": "Insert emoji",
+      "attachBadType": "Unsupported file type (images or PDF).",
+      "attachTooLarge": "File too large (max 10 MB).",
+      "attachFailed": "Upload failed. Please try again.",
+      "sendFailed": "Message not sent. Please try again.",
+      "removeAttachment": "Remove attachment",
+      "openAttachment": "Open attachment",
+      "reply": "Reply",
+      "replyingTo": "Replying to {name}",
+      "cancelReply": "Cancel reply",
+      "hide": "Hide",
+      "hideFailed": "Couldn't hide the message. Please try again.",
+      "connReconnecting": "Reconnecting…",
+      "connDegraded": "Updates delayed",
+      "readDenied": "Chat is unavailable: you are not among this event’s participants, or the room is not open yet. Retrying automatically.",
+      "mentionNotificationTitle": "{name} mentioned you in the chat",
+      "react": "React",
+      "edited": "edited",
+      "editLabel": "Edit message",
+      "editSave": "Save",
+      "editFailed": "Could not edit the message.",
+      "exportChat": "Download the chat",
+      "reactNotAllowed": "Reacting to messages needs your personal or moderator link.",
+      "editNotAllowed": "This link is shared, so it cannot edit messages.",
+      "editExpired": "More than 15 minutes have passed: this message can no longer be edited."
     },
     "role": {
       "moderator": "Moderator",
@@ -328,7 +358,9 @@
         "medium": "Medium",
         "poor": "Poor",
         "unknown": "N/A"
-      }
+      },
+      "volume": "Volume",
+      "volumeFor": "Volume for {name}"
     },
     "moderator": {
       "muteAll": "Mute all",
@@ -347,12 +379,14 @@
       "approveVideo": "Approve video",
       "approveAll": "Give the floor",
       "audioOnly": "Audio only",
+      "lowerHand": "Lower hand",
       "participantFallback": "Participant",
       "audioModeration": "Participant mic",
       "micDisabled": "Mic disabled",
       "videoModeration": "Participant video",
       "videoDisabled": "Video disabled",
-      "eventEndedSuccess": "Event ended successfully. Redirecting..."
+      "eventEndedSuccess": "Event ended successfully. Redirecting...",
+      "whiteboard": "Whiteboard"
     },
     "closeDrawer": "Close",
     "hintBanner": {
@@ -368,7 +402,27 @@
     "sidebarTabChatUnread": "New unread messages",
     "floatingControlsLabel": "Event controls",
     "screenshareActive": "🖥️ {name} is sharing their screen",
-    "screenshareFallbackName": "A participant"
+    "screenshareFallbackName": "A participant",
+    "share": {
+      "button": "Share",
+      "title": "Share the event",
+      "callLink": "Link to join",
+      "callLinkHint": "Anyone opening this link joins directly while the event is live; otherwise they go through registration. It carries no private tokens.",
+      "eventLink": "Event page",
+      "eventLinkHint": "The public page with the details and the registration form.",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "moderatorReveal": "Show moderator link",
+      "moderatorWarning": "This link grants MODERATOR access (mute everyone, start recording, end the event). Share it only with other moderators.",
+      "moderatorLink": "Moderator link",
+      "moderatorLinkHint": "Anyone opening this link joins as a moderator with full control of the room."
+    },
+    "timer": {
+      "show": "Show the timer",
+      "hide": "Hide the timer",
+      "remainingLabel": "Time remaining (click for time elapsed)",
+      "elapsedLabel": "Time elapsed (click for time remaining)"
+    }
   },
   "qa": {
     "title": "Questions & Answers",
@@ -537,6 +591,7 @@
         "organizerName": "Contact name",
         "organizerOrganization": "Organization",
         "organizerWebsite": "Website",
+        "organizerLogo": "Organizer logo",
         "organizerRequired": "Contact name and organization are required.",
         "moderatorsHeading": "Moderators",
         "moderatorsHelp": "Additional co-moderators: each receives their own link to manage the session and permissions during the event. The primary moderator (required contact) is set in the last step, “Review”.",
@@ -1435,6 +1490,14 @@
         "jvbInactiveGraceMinutesHelp": "How long the conference must stay empty before the video node is scaled down. Recommended 45 minutes. Range 5-240.",
         "jvbPreScaleMinutes": "Pre-scale lead time (minutes)",
         "jvbPreScaleMinutesHelp": "How many minutes before startsAt to boot the video node for a scheduled event. Recommended 10 minutes.",
+        "jvbEmptyCloseMinutes": "Empty-room minutes before definitive close",
+        "jvbEmptyCloseMinutesHelp": "If a LIVE room that already had participants stays empty for this many minutes, it is closed for good (ENDED) — so a moderator-less event closes itself for inactivity, without waiting for its scheduled end. Default 15 (on). -1 = disabled. 0 = close on the first empty poll.",
+        "waitingRoomLeadMinutes": "Waiting-room routing window (minutes)",
+        "waitingRoomLeadMinutesHelp": "Registering within this many minutes of the start goes straight to the waiting room; earlier registrations see a confirmation with a calendar link. 0 = always show the confirmation until start. Recommended 15.",
+        "reactionsMode": "Reactions (emoji)",
+        "reactionsModeNative": "Jitsi native (in the toolbar, ephemeral)",
+        "reactionsModeCustom": "App custom (left-hand bar, with stats)",
+        "reactionsModeHelp": "Native = Jitsi's own reactions button in the control bar, lightweight and ephemeral (not counted). Custom = the app's reactions bar at bottom-left, with counts and analytics. Default: Native.",
         "jvbStressWarnPercent": "Stress warning threshold (%)",
         "jvbStressWarnPercentHelp": "Above this threshold the scaler adds 1 extra JVB replica even if predictive sizing doesn't require it. Default 50.",
         "jvbStressCriticalPercent": "Stress critical threshold (%)",
@@ -1442,7 +1505,16 @@
         "jvbProvisioningTimeoutMinutes": "Provisioning timeout (minutes)",
         "jvbProvisioningTimeoutMinutesHelp": "After how many minutes since startsAt an event without JVB ready is flagged as 'degraded' on the status page. Default 15. Covers node cold-start (~3-5 min) plus safety margin.",
         "statusPollIntervalSeconds": "Status page poll interval (seconds)",
-        "statusPollIntervalSecondsHelp": "How often the /status page refreshes from the browser. Default 30. Lower values = fresher data but more load on the app."
+        "statusPollIntervalSecondsHelp": "How often the /status page refreshes from the browser. Default 30. Lower values = fresher data but more load on the app.",
+        "emailSenderTitle": "Email sender",
+        "emailSenderHelp": "How the sender appears in a registrant’s inbox. The sending address stays in the deployment configuration — it has to match what the SMTP server is authorised to send as.",
+        "emailFromName": "Sender name",
+        "emailFromNameHelp": "Empty = the name configured in the deployment (SMTP_FROM_NAME) is used. Emails are still sent from the system address.",
+        "emailReplyTo": "Reply-to address",
+        "emailReplyToHelp": "Emails come from a no-reply address: without this, a reply reaches nobody.",
+        "avatarTitle": "Participant pictures",
+        "gravatarEnabled": "Use Gravatar when available",
+        "gravatarEnabledHelp": "Attendees who registered with an email that has a Gravatar will show it in the room; everyone else keeps the initials avatar the platform generates. The image is fetched through our own server, so participants’ browsers never contact gravatar.com — but the platform does: declare it in your privacy notice."
       }
     },
     "analytics": {
@@ -2008,7 +2080,11 @@
       "aiGenerateAlready": "The AI pipeline was already started for this recording: no new jobs added.",
       "aiGenerateError": "Could not start the AI pipeline. Check that AI is enabled site-wide and that a recording exists.",
       "aiGenerateHelp": "Enables AI transcription + summary and starts the pipeline on the recording, in one click. Idempotent: clicking twice won't duplicate jobs.",
-      "aiGenerateNoRecording": "No recording: post-event AI needs a recording (capture only happens during the event). You can still manage post-production here."
+      "aiGenerateNoRecording": "No recording: post-event AI needs a recording (capture only happens during the event). You can still manage post-production here.",
+      "duplicateNext": "Duplicate for next time",
+      "duplicateNextBusy": "Duplicating…",
+      "duplicateNextHint": "Creates a draft carrying this event’s entire configuration (recording, separate tracks, AI, agenda, reminders). If the event has a cadence the date moves to the next occurrence; otherwise it is left for you to set.",
+      "duplicateNextError": "Could not duplicate. Please try again."
     },
     "rubrica": {
       "title": "Address book",
@@ -2301,7 +2377,12 @@
       },
       "archiveSourceTitle": "Source recording",
       "archiveSourceHint": "Original event video. Separate per-participant tracks and the MKV archive require multi-track recording (not enabled for this event).",
-      "archiveSourceDownload": "Download original video"
+      "archiveSourceDownload": "Download original video",
+      "manageRerunNoop": "No job started: AI is disabled for this event, or the pipeline is paused. Use “Generate AI”.",
+      "manageRerunAlreadyQueued": "Processing is already queued: nothing new to start.",
+      "generateAi": "Generate AI",
+      "generateAiConfirm": "Run the AI pipeline (transcription and summary) on this recording. AI processing will be enabled for the event and starts in the background. Translations are added afterwards, one language at a time, from the “Translations” tab.",
+      "generateAiOk": "AI pipeline started."
     },
     "questionnairesPage": {
       "title": "Questionnaires",
@@ -3109,7 +3190,29 @@
     "intro": "Every version of the platform, newest first. Each entry summarizes the main new features, fixes and improvements.",
     "current": "Current version",
     "sourceNote": "Notes are curated from the project's tags, pull requests and commits.",
-    "sourceLink": "See all releases on GitHub"
+    "sourceLink": "See all releases on GitHub",
+    "rawChangelog": "CHANGELOG.md in the repository",
+    "transparencyNote": "For every version: what runs and with which components, in the",
+    "transparencyInventory": "service transparency",
+    "transparencySecurity": "security and SBOM",
+    "technicalDetail": "Technical detail",
+    "releaseLink": "Release",
+    "securityBadge": "Security",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Close",
+    "sbomLoading": "Loading…",
+    "sbomError": "Couldn't load the SBOM.",
+    "sbomComponents": "components",
+    "sbomSearch": "search component…",
+    "sbomColName": "Component",
+    "sbomColVersion": "Version",
+    "sbomColEcosystem": "Ecosystem",
+    "sbomNoMatch": "No matching component.",
+    "sbomDownload": "Download full SBOM (SPDX)",
+    "sourcesLink": "Sources",
+    "codeScanningLink": "Code scanning (CodeQL)"
   },
   "pages": {
     "privacyTitle": "Privacy policy",
@@ -3342,7 +3445,13 @@
     "aiNoticeTitle": "AI processing after the event",
     "aiNotice": "After it ends, the recording will be processed by AI tools to generate a transcript, summary and any translations and dubbing. The artifacts may contain inaccuracies; the video remains the authoritative source.",
     "multitrackConsentTitle": "Per-participant recording",
-    "multitrackConsentRequired": "You must accept the recording of your audio track to enter"
+    "multitrackConsentRequired": "You must accept the recording of your audio track to enter",
+    "enterGardenTitle": "Step into the square",
+    "enterGardenHint": "A place to wander while you wait — you can set your name and microphone and join the event from there too.",
+    "backToWaitingRoom": "Back to the waiting room",
+    "gardenDialogLabel": "Waiting-room square",
+    "gardenGateHint": "You can join from here, or walk your avatar to the gate.",
+    "classicVersion": "Classic version"
   },
   "recording": {
     "management": "Video recording",

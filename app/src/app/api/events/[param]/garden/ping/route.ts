@@ -43,6 +43,18 @@ const pingSchema = z.object({
   y: z.number().min(0).max(100),
   facing: z.enum(['down', 'up', 'left', 'right']),
   walkPhase: z.number().min(0).max(1),
+  /**
+   * Emote transiente (saluto / cuore). `.optional()` NON è pigrizia: i client
+   * già in giro non mandano il campo e devono continuare a pingare senza
+   * beccarsi un 400. Il server fa solo da ripetitore — `at` è l'orologio del
+   * mittente e serve al ricevente per deduplicare (vedi GardenPeer.emote).
+   */
+  emote: z
+    .object({
+      type: z.enum(['wave', 'heart']),
+      at: z.number().int().nonnegative(),
+    })
+    .optional(),
   /** When true the server removes the peer — used on "Leave garden". */
   leave: z.boolean().optional(),
 });
@@ -92,6 +104,10 @@ export const POST = withErrorHandling(async (request, context) => {
     facing: parsed.data.facing,
     walkPhase: parsed.data.walkPhase,
     updatedAt: Date.now(),
+    // Presente solo quando il client la manda: mettere `emote: undefined` la
+    // farebbe sparire comunque nel JSON, ma così il record Redis resta
+    // identico a prima per i client che non emotano.
+    ...(parsed.data.emote ? { emote: parsed.data.emote } : {}),
   };
 
   await publishGardenPing(event.id, peer);

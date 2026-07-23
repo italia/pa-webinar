@@ -1,4 +1,5 @@
 import type {
+  EmoteType,
   Facing,
   PeerState,
   PlayerProfile,
@@ -21,9 +22,9 @@ import { Listeners, type LobbyLocalState } from './shared';
  *  - the ping has no colour/accessories field, so we smuggle them through
  *    `avatarId` (6 hex colour + optional 'h'/'g' flags) — round-trips without a
  *    backend change. Legacy SVG-garden ids fall back to a default look.
- *  - the ping has no emote/inCall channel: emotes are local-only here and peers
- *    are always rendered as waiting (the amphitheatre shows only the local user
- *    after they join). Networking those needs ping fields (a follow-up).
+ *  - the ping has no inCall channel: peers are always rendered as waiting (the
+ *    amphitheatre shows only the local user after they join). Networking that
+ *    needs a ping field (a follow-up).
  */
 interface GardenPeerWire {
   userId: string;
@@ -34,10 +35,38 @@ interface GardenPeerWire {
   facing: Facing;
   walkPhase: number;
   updatedAt: number;
+  emote?: { type: EmoteType; at: number };
 }
 
 const PING_MS = 200;
 const DEFAULT_COLOR = '#48566a';
+
+/**
+ * Per quanto tempo l'emote viene ri-allegata a ogni ping.
+ *
+ * Serve perché Redis tiene UN SOLO record per utente, l'ultimo: se l'emote
+ * viaggiasse in un ping soltanto resterebbe leggibile ~200ms e chi poll-a con
+ * un minimo di jitter di rete non la vedrebbe mai. Ripetendola per la durata
+ * dell'animazione (EMOTE_MS del lobby, 1500ms) chi legge la becca di sicuro e
+ * deduplica sull'`at`. Effetto collaterale utile: un'emote vista per la prima
+ * volta non può essere più vecchia di questa finestra, quindi non serve
+ * confrontare orologi fra client per scartare quelle stantie.
+ */
+const EMOTE_BROADCAST_MS = 1500;
+
+/**
+ * Distanza minima fra due emote allegate al ping. Non è cosmesi, è correttezza.
+ *
+ * Chi chiama è un handler di `keydown` senza guardia sull'auto-repeat: tenendo
+ * premuto E il browser ripete l'evento ~30 volte al secondo. L'emote NON fa una
+ * POST propria (viaggia sul tick successivo, vedi `emote()`), ma senza questo
+ * throttle ogni ripetizione sovrascriverebbe `pendingEmote` con un nuovo `at`,
+ * e i peer che deduplicano su `at` vedrebbero un saluto solo che non finisce
+ * mai invece di uno con un inizio e una fine. La soglia sta qui e non nel gioco
+ * perché è questo lo strato che possiede lo stato di trasmissione; il gioco
+ * anima comunque l'avatar locale a ogni pressione.
+ */
+const EMOTE_MIN_INTERVAL_MS = 600;
 
 export class GardenPresenceClient implements PresenceClient {
   private selfId = '';
@@ -47,6 +76,10 @@ export class GardenPresenceClient implements PresenceClient {
 
   private peers: PeerState[] = [];
   private byId = new Map<string, PeerState>();
+  /** Emote locale in corso di trasmissione (vedi EMOTE_BROADCAST_MS). */
+  private pendingEmote: { type: EmoteType; at: number } | null = null;
+  /** Ultima emote già notificata per peer, per non riemetterla a ogni poll. */
+  private readonly seenEmoteAt = new Map<string, number>();
 
   private readonly onJoin = new Listeners<PeerState>();
   private readonly onLeave = new Listeners<PeerState>();
@@ -89,8 +122,31 @@ export class GardenPresenceClient implements PresenceClient {
     this.latest.facing = facing;
   }
 
-  emote(_type: 'wave' | 'heart'): void {
-    /* the ping protocol has no emote channel — local-only for now */
+  /**
+   * Emote di rete vera, non più no-op.
+   *
+   * Era dichiarata "il protocollo ping non ha un canale emote": vero alla
+   * lettera, ma il risultato era che chi premeva il tasto vedeva la PROPRIA
+   * animazione ed era convinto che gli altri la vedessero — un saluto che non
+   * arrivava a nessuno. Fra togliere il tasto e aggiungere un campo, il campo
+   * costa meno: il ping è già il canale di presenza (posizione e profilo
+   * passano di lì), e `emote` è opzionale nello schema della rotta, quindi i
+   * client vecchi continuano a funzionare senza sapere che esiste.
+   *
+   * NIENTE POST fuori banda: l'emote viaggia sul PROSSIMO ping (5Hz), cioè
+   * entro ≤200ms. Un POST immediato per ogni pressione spendeva il budget della
+   * rotta ping (600/min per IP) sullo STESSO conto dei ping di posizione: due
+   * utenti dietro lo stesso NAT erano già al limite, e un tasto tenuto premuto
+   * li faceva sparire dal giardino di tutti. Duecento millisecondi su un saluto
+   * non si notano; l'avatar sparito sì. Il gioco anima comunque il gesto locale
+   * all'istante.
+   */
+  emote(type: EmoteType): void {
+    if (!this.connected) return;
+    const now = Date.now();
+    if (this.pendingEmote && now - this.pendingEmote.at < EMOTE_MIN_INTERVAL_MS) return;
+    this.pendingEmote = { type, at: now };
+    // Nessun `this.ping()` qui: lo raccoglie il tick successivo (vedi sopra).
   }
 
   getPeers(): PeerState[] {
@@ -135,12 +191,15 @@ export class GardenPresenceClient implements PresenceClient {
     }
     this.peers = [];
     this.byId.clear();
+    this.pendingEmote = null;
+    this.seenEmoteAt.clear();
   }
 
   // ── internals ──
   private wireBody(): Record<string, unknown> {
     const xPct = clampPct((this.latest.x / this.world.w) * 100);
     const yPct = clampPct((this.latest.y / this.world.h) * 100);
+    const emote = this.currentEmote();
     return {
       userId: this.selfId,
       // The route stores at most 80 chars; cap here so a long registered name
@@ -151,7 +210,18 @@ export class GardenPresenceClient implements PresenceClient {
       y: yPct,
       facing: this.latest.facing,
       walkPhase: 0,
+      ...(emote ? { emote } : {}),
     };
+  }
+
+  /** L'emote locale finché è dentro la finestra di ripetizione, poi scade. */
+  private currentEmote(): { type: EmoteType; at: number } | null {
+    if (!this.pendingEmote) return null;
+    if (Date.now() - this.pendingEmote.at >= EMOTE_BROADCAST_MS) {
+      this.pendingEmote = null;
+      return null;
+    }
+    return this.pendingEmote;
   }
 
   private async ping(leave: boolean): Promise<void> {
@@ -185,9 +255,21 @@ export class GardenPresenceClient implements PresenceClient {
       } else if (prev.name !== peer.name || appearanceChanged(prev, peer)) {
         this.onProfile.emit(peer);
       }
+      // Dopo l'eventuale join, mai prima: il PeerStore butta via le emote dei
+      // peer che non ha ancora in mappa, quindi un saluto arrivato insieme al
+      // primo avvistamento andrebbe perso.
+      if (peer.emote && this.seenEmoteAt.get(id) !== peer.emote.at) {
+        this.seenEmoteAt.set(id, peer.emote.at);
+        this.onEmote.emit(peer);
+      }
     }
     for (const [id, peer] of this.byId) {
-      if (!next.has(id)) this.onLeave.emit(peer);
+      if (!next.has(id)) {
+        // Se rientra ricomincia da capo: tenere lo storico impedirebbe di
+        // rivedere un saluto identico, e la mappa crescerebbe per sempre.
+        this.seenEmoteAt.delete(id);
+        this.onLeave.emit(peer);
+      }
     }
     this.byId = next;
     this.peers = [...next.values()];
@@ -204,6 +286,7 @@ export class GardenPresenceClient implements PresenceClient {
       y: (w.y / 100) * this.world.h,
       facing: w.facing,
       inCall: false,
+      ...(w.emote ? { emote: w.emote } : {}),
     };
   }
 }
