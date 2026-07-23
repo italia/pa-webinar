@@ -18,7 +18,7 @@ torch==2.6.0
 torchvision==0.21.0
 torchaudio==2.6.0
 # pyannote / transformers behave best on numpy 1.x; avoid the 2.x ABI flip.
-numpy<2
+numpy<3
 
 # HTTP client — used to talk to the app's /api/internal/* endpoints
 # and to the in-cluster vLLM service. Sync API is plenty here: a

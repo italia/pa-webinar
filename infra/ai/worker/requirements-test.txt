@@ -5,6 +5,6 @@
 # che compaiono in cima — numpy (align, xcorr, merge tracce) e httpx (il client
 # del LLM). Cosi' il job CI non deve tirare ~2 GB di CUDA per verificare che
 # l'allineamento dei sottotitoli non regredisca.
-numpy<2
+numpy<3
 httpx==0.27.2
 pytest
