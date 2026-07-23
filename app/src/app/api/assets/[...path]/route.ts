@@ -142,10 +142,10 @@ export async function GET(
   }
   // Asset keys embed a random UUID → the bytes for a given key never change,
   // so they're safe to cache aggressively at the browser/CDN.
-  // Gli allegati di chat NO: `public` autorizzerebbe una cache condivisa (CDN,
-  // proxy) a restituire il documento a chi non ha superato il gate, e la
-  // risposta dipende dal token/cookie del richiedente. Il controllo va rifatto
-  // a ogni richiesta, perché il diritto a leggere scade con l'evento.
+  // Gli allegati di chat NO: sono capability-URL (nessun gate), ma `public`
+  // lascerebbe che una cache CONDIVISA (CDN, proxy) continui a servire un
+  // allegato rimosso dalla moderazione — a chiunque — dopo la cancellazione del
+  // blob. `private` lo tiene nel solo browser di chi l'ha aperto.
   headers.set(
     'Cache-Control',
     // Chat: PRIVATA e breve. Mai `public`: una cache condivisa (CDN, proxy

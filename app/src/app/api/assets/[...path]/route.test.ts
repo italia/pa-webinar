@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import type { NextRequest } from 'next/server';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -68,12 +71,24 @@ describe('GET /api/assets/[...path] — gli asset pubblici restano pubblici', ()
     });
   });
 
-  it('non interroga il DB per un asset pubblico', async () => {
-    // Il gate costa una query per richiesta: se scattasse anche sul logo, ogni
-    // pagina pubblica pagherebbe un roundtrip su un byte-stream cacheabile.
-    // Nessun gate su nessun asset: la rotta non tocca il DB.
+  it('serve l’asset via storage senza altri roundtrip', async () => {
+    // La rotta non ha alcun gate e non importa nemmeno `@/lib/db` (garanzia
+    // strutturale, non solo runtime): un logo o un'og:image non deve pagare una
+    // query. Se un domani qualcuno reintroducesse un accesso al DB qui, servono
+    // anche i mock relativi in questo file — assenti di proposito — e il test
+    // andrebbe esteso ad asserirne il non-uso.
     await GET(request(LOGO_PATH), ctx(LOGO_PATH));
     expect(getDownloadUrl).toHaveBeenCalledTimes(1);
+  });
+
+  it('la rotta non dipende dal database', () => {
+    // Il vero presidio del test qui sopra: nessun import di `@/lib/db`. Se
+    // rientra, questo fallisce e obbliga a ripensare la cache/costo della rotta.
+    const src = fs.readFileSync(
+      path.join(__dirname, 'route.ts'),
+      'utf-8',
+    );
+    expect(src).not.toMatch(/@\/lib\/db/);
   });
 
   it('resta cacheabile a lungo dalle cache condivise', async () => {
