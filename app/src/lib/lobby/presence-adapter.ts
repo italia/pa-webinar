@@ -55,17 +55,16 @@ const DEFAULT_COLOR = '#48566a';
 const EMOTE_BROADCAST_MS = 1500;
 
 /**
- * Distanza minima fra due emote spedite. Non è cosmesi, è il budget di rete.
+ * Distanza minima fra due emote allegate al ping. Non è cosmesi, è correttezza.
  *
  * Chi chiama è un handler di `keydown` senza guardia sull'auto-repeat: tenendo
- * premuto E il browser ripete l'evento ~30 volte al secondo. Finché `emote()`
- * era un no-op non faceva danno; ora ogni chiamata è una POST, e la rotta ping
- * taglia a 600 richieste/minuto per IP — un tasto tenuto premuto brucerebbe il
- * budget e farebbe fallire ANCHE i ping di posizione, cioè l'utente sparirebbe
- * dal giardino di tutti. Con questa soglia il picco resta ~1,7 POST/s extra
- * sopra i 5/s di cadenza normale. La soglia sta qui e non nel gioco perché è
- * questo lo strato che possiede la rete (stesso principio del throttle di
- * `move()`), e il gioco anima comunque l'avatar locale a ogni pressione.
+ * premuto E il browser ripete l'evento ~30 volte al secondo. L'emote NON fa una
+ * POST propria (viaggia sul tick successivo, vedi `emote()`), ma senza questo
+ * throttle ogni ripetizione sovrascriverebbe `pendingEmote` con un nuovo `at`,
+ * e i peer che deduplicano su `at` vedrebbero un saluto solo che non finisce
+ * mai invece di uno con un inizio e una fine. La soglia sta qui e non nel gioco
+ * perché è questo lo strato che possiede lo stato di trasmissione; il gioco
+ * anima comunque l'avatar locale a ogni pressione.
  */
 const EMOTE_MIN_INTERVAL_MS = 600;
 

@@ -128,7 +128,7 @@ Voci spedite e funzionanti, ognuna con un confine che vale la pena conoscere pri
 
 | Sottosistema | Il limite |
 |---|---|
-| **Allegati in chat (F16)** | Serviti da una rotta pubblica: la protezione è che l'UUID non è indovinabile, non un controllo di accesso |
+| **Allegati in chat (F16)** | Capability-URL: la protezione è l'UUID non indovinabile + cancellazione del blob alla moderazione/retention, non un controllo d'accesso. Un ACL vero — che rilegga lo stato vivo dell'evento a ogni richiesta — richiede un **cookie con ambito sulla rotta** (un `<img>` non manda header). Due tentativi con un token nell'URL sono falliti: la credenziale durevole trapelava nella condivisione schermo, la capability firmata ignorava la chiusura dell'evento per tutta la durata. È la strada da fare, ma è una feature |
 | **Recorder multitraccia (ADR-013)** | Nessuna riconnessione dopo `CONFERENCE_FAILED`: una caduta a metà evento chiude la registrazione con quello che ha già catturato. L'errore finisce nei log del Job, non nel pannello admin |
 | **Scale-to-zero JVB (ADR-007)** | `/colibri/stats` è aggregato per pod: due eventi LIVE sullo stesso bridge tengono acceso il nodepool anche se uno si è svuotato |
 | **i18n a 24 lingue (ADR-008)** | Il fallback delle chiavi mancanti ricade sull'**italiano**, non sull'inglese |
@@ -159,6 +159,7 @@ Da qui in avanti si sale dai punti in cui vivono le guardie, non dai più facili
 
 | Feature | Note |
 |---|---|
+| **ACL allegati chat (via cookie)** | Oggi gli allegati sono capability-URL (vedi "Limiti noti"). Il gate vero: la pagina live imposta un cookie httpOnly con ambito su `/api/assets/chat/<eventId>/`, rinnovato; la rotta lo rilegge e ri-autorizza con `authorizeChatRead` a OGNI richiesta, così una password aggiunta o un evento chiuso hanno effetto subito. Niente token nell'URL |
 | **Export report PDF** | Statistiche evento + Q&A + poll + partecipanti in un documento scaricabile (naturale seguito della tab Statistiche) |
 | **Rate-limiting distribuito (Redis)** | Il limiter è in-memory per-pod; con HPA multi-replica serve un contatore globale |
 | **Ricerca full-text trascrizioni** | `tsvector` PostgreSQL per la libreria video (oggi solo ricerca client dentro una singola trascrizione) |

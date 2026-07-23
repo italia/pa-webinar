@@ -3463,7 +3463,6 @@
     "sourceLink": "Skatīt visus laidienus vietnē GitHub",
     "cadence": "Laidienu ritms",
     "cadenceSummary": "{count} versijas laikā no {from} līdz {to}.",
-    "releaseNotes": "Laidiena piezīmes un SBOM",
     "rawChangelog": "CHANGELOG.md repozitorijā",
     "transparencyNote": "Katrai versijai: kas darbojas un ar kādiem komponentiem,",
     "transparencyInventory": "pakalpojumu pārredzamībā",

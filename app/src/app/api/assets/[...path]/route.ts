@@ -19,38 +19,18 @@
  * ── DUE FAMIGLIE DI ASSET ──────────────────────────────────────────────────
  *
  * 1. Asset pubblici (logo, favicon, copertine, watermark, audio della sala
- *    d'attesa, materiali): restano pubblici. Sono già esposti in pagine
- *    pubbliche, in og:image e nelle email — un gate qui li romperebbe.
+ *    d'attesa, materiali): pubblici, cache lunga. Sono già esposti in pagine
+ *    pubbliche, in og:image e nelle email.
  *
- * 2. Allegati della chat (`assets/chat/<eventId>/…`, vedi buildChatAssetKey):
- *    PROTETTI. In un webinar PA la chat contiene documenti, e finora l'unica
- *    difesa era che l'UUID non fosse indovinabile: un URL copiato dalla stanza
- *    (o un vecchio link inoltrato) apriva il file a chiunque, per sempre, anche
- *    a evento concluso — mentre il messaggio che lo conteneva era già dietro
- *    autenticazione. Il gate è `authorizeChatRead`, lo STESSO di GET /chat e
- *    dello stream SSE: chi può leggere i messaggi vede gli allegati, gli altri
- *    no. Nessuna regola parallela da tenere allineata a mano.
- *
- * DUE modi di autorizzare, e la differenza è la chiave della sicurezza:
- *   - `?t=<token firmato>` — una capability di SOLA LETTURA legata a QUESTO
- *     percorso e a QUESTO evento, che il SERVER mette nell'URL alla
- *     serializzazione (assetUrlFromKey → signAssetRead). È ciò che finisce in
- *     un <img src>, e se trapela da uno screenshot apre quell'immagine e nulla
- *     più. Prima ci mettevamo il token DUREVOLE del lettore — per un moderatore
- *     la sua magic-link con pieni poteri: esposta nella barra e nella
- *     registrazione. Mai più;
- *   - il bearer durevole in header Authorization — per il download/fetch
- *     autenticato, dove un header si può mandare. Stesso gate della lettura dei
- *     messaggi (authorizeChatRead). Un ospite senza token passa dal ramo
- *     anonimo, cioè vede l'allegato solo a finestra-ospite aperta.
- *
- * SCELTA CONSAPEVOLE — allegati caricati PRIMA di questo cambio: le loro chiavi
- * stanno sotto `assets/image|document/…`, indistinguibili da un logo, e restano
- * quindi capability-URL pubbliche. Non li irrigidiamo perché non si può farlo
- * senza un gate su OGNI asset (una query DB per ogni richiesta di logo) oppure
- * riscrivendo chiavi in storage e righe ChatMessage: i link già inviati
- * continuano a funzionare, per scelta. Il nuovo namespace chiude la porta da
- * qui in avanti; l'insieme residuo è finito e non cresce.
+ * 2. Allegati della chat (`assets/chat/<eventId>/…`, buildChatAssetKey): un
+ *    NAMESPACE separato, ma NON un controllo d'accesso. La difesa è quella
+ *    documentata di una capability-URL: UUID non indovinabile, blob cancellato
+ *    alla moderazione e alla retention (un URL trapelato diventa 404), cache
+ *    breve perché una rimozione si propaghi. Un ACL vero — che rilegga lo stato
+ *    vivo dell'evento a ogni richiesta — richiede un cookie con ambito sulla
+ *    rotta (un <img> non manda header), ed è in ROADMAP. I due tentativi con un
+ *    token nell'URL (credenziale durevole trapelata; capability autosufficiente
+ *    che ignora lo stato vivo) erano entrambi peggiori del problema.
  *
  * Security: the container is private but this route is public. We always send
  * `X-Content-Type-Options: nosniff` (so e.g. text/plain can't be sniffed as
@@ -64,11 +44,8 @@
 
 import type { NextRequest } from 'next/server';
 
-import { verifyAssetRead } from '@/lib/chat/attachment-token';
-import { authorizeChatRead } from '@/lib/chat/read-access';
-import { AppError } from '@/lib/errors';
 import { getFilesStorage } from '@/lib/storage';
-import { chatAssetEventId, isChatAssetPath } from '@/lib/utils/asset-key';
+import { isChatAssetPath } from '@/lib/utils/asset-key';
 import { normalizeMimeType } from '@/lib/utils/mime-sniff';
 
 export const dynamic = 'force-dynamic';
@@ -94,7 +71,7 @@ function mustForceDownload(contentType: string): boolean {
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ path: string[] }> },
+  context: { params: Promise<{ path: string[] }> }
 ) {
   const { path } = await context.params;
   if (!Array.isArray(path) || path.length === 0) {
@@ -109,52 +86,25 @@ export async function GET(
   }
   const key = `assets/${sub}`;
 
-  // Allegati di chat: stesso gate della lettura dei messaggi. Prima di
-  // qualsiasi accesso allo storage, così a un lettore non autorizzato non viene
-  // nemmeno emesso il SAS.
-  const gated = isChatAssetPath(sub);
-  if (gated) {
-    const eventId = chatAssetEventId(sub);
-    // Namespace protetto ma percorso che non nomina un evento valido: non
-    // esiste un blob così, e comunque non sapremmo su cosa autorizzare.
-    if (!eventId) return new Response('Not found', { status: 404 });
-
-    // Prima strada, quella dei tag immagine: un token di SOLA LETTURA firmato,
-    // legato a QUESTO percorso e a QUESTO evento (l'URL lo produce il server in
-    // assetUrlFromKey). Un <img> non può mandare un header, e ci mettevamo il
-    // token durevole del lettore — per un moderatore, la sua magic-link con
-    // pieni poteri, esposta nella barra e nella condivisione schermo.
-    const readToken = new URL(request.url).searchParams.get('t');
-    if (readToken && verifyAssetRead(readToken, key, eventId)) {
-      // autorizzato: prosegue al serving sotto
-    } else {
-    // Seconda strada: il bearer durevole, ma SOLO dall'header Authorization —
-    // mai dalla query. È questa la proprietà che rende la sicurezza
-    // strutturale: su questa rotta una credenziale durevole non autorizza mai
-    // attraverso l'URL, quindi non può finire in un log, in una cronologia o in
-    // una condivisione schermo. L'unico permesso via URL è il `?t=` firmato ed
-    // effimero. Assente l'header, si passa `null`: il ramo ospite di
-    // authorizeChatRead decide (finestra LIVE, evento senza password).
-    const authHeader = request.headers.get('authorization');
-    const bearer = authHeader?.startsWith('Bearer ')
-      ? authHeader.slice(7).trim()
-      : null;
-    try {
-      await authorizeChatRead(eventId, bearer);
-    } catch (err) {
-      // authorizeChatRead distingue 404 (evento inesistente) da 403 (non puoi
-      // leggere questa chat). Qualunque ALTRO errore resta un rifiuto — un gate
-      // che si apre quando il DB non risponde non è un gate — ma va loggato:
-      // altrimenti un guasto di infrastruttura si presenta come "permesso
-      // negato" e si cerca il bug nel posto sbagliato.
-      if (!(err instanceof AppError)) {
-        console.error('[assets] chat access gate failed unexpectedly:', err);
-      }
-      const status = err instanceof AppError && err.statusCode === 404 ? 404 : 403;
-      return new Response(status === 404 ? 'Not found' : 'Forbidden', { status });
-    }
-    }
-  }
+  // Allegati di chat: serviti da qui, con `nosniff` e la forzatura del download
+  // per i tipi attivi (vedi sotto). Il namespace `assets/chat/<eventId>/…`
+  // (buildChatAssetKey) li tiene separati dagli asset pubblici — utile per la
+  // retention e per l'ACL futuro — ma NON è un controllo d'accesso: come per un
+  // logo, chi ha l'URL apre il file.
+  //
+  // SCELTA CONSAPEVOLE, e ci siamo arrivati sbagliando due volte. Un ACL vero
+  // qui richiede che ogni richiesta rilegga lo stato VIVO dell'evento (chiuso?
+  // password aggiunta? allegato rimosso?), e un <img>/<a> non può mandare un
+  // header Authorization. Un token firmato nell'URL o è la credenziale durevole
+  // del lettore (e allora trapela nella condivisione schermo) o è una
+  // capability autosufficiente che ignora lo stato vivo per tutta la sua durata
+  // — entrambe peggiori del problema. La forma giusta è un COOKIE con ambito
+  // sulla rotta, rinnovato, riletto e ri-autorizzato dal server a ogni
+  // richiesta: è una feature, ed è in ROADMAP ("ACL allegati chat via cookie").
+  // Nel frattempo la difesa è quella documentata: UUID non indovinabile, blob
+  // cancellato alla moderazione e alla retention (un URL trapelato diventa un
+  // 404), cache breve perché una rimozione si propaghi in fretta.
+  const isChatAttachment = isChatAssetPath(sub);
 
   const storage = getFilesStorage();
   if (!storage) return new Response('Not found', { status: 404 });
@@ -176,8 +126,7 @@ export async function GET(
     return new Response('Not found', { status: 404 });
   }
 
-  const contentType =
-    upstream.headers.get('content-type') ?? 'application/octet-stream';
+  const contentType = upstream.headers.get('content-type') ?? 'application/octet-stream';
 
   const headers = new Headers();
   headers.set('Content-Type', contentType);
@@ -199,10 +148,10 @@ export async function GET(
   // a ogni richiesta, perché il diritto a leggere scade con l'evento.
   headers.set(
     'Cache-Control',
-    // Privata (mai una cache condivisa: il token nell'URL e' una capability),
-    // breve: se un allegato viene rimosso dalla moderazione, sparisce entro
-    // pochi minuti anche dalle cache dei browser.
-    gated ? 'private, max-age=300' : 'public, max-age=31536000, immutable',
+    // Chat: cache BREVE, così una rimozione dalla moderazione si propaga in
+    // pochi minuti anche a chi l'aveva già aperto. Il resto (logo, copertine)
+    // ha un URL per-blob immutabile: cache lunga.
+    isChatAttachment ? 'public, max-age=300' : 'public, max-age=31536000, immutable'
   );
 
   return new Response(upstream.body, { status: 200, headers });

@@ -3463,7 +3463,6 @@
     "sourceLink": "Ver todas as versões no GitHub",
     "cadence": "Ritmo dos lançamentos",
     "cadenceSummary": "{count} versões entre {from} e {to}.",
-    "releaseNotes": "Notas de lançamento e SBOM",
     "rawChangelog": "CHANGELOG.md no repositório",
     "transparencyNote": "Para cada versão: o que corre e com que componentes, na",
     "transparencyInventory": "transparência dos serviços",

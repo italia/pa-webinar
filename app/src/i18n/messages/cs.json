@@ -3463,7 +3463,6 @@
     "sourceLink": "Zobrazit všechna vydání na GitHubu",
     "cadence": "Rytmus vydání",
     "cadenceSummary": "{count} verzí mezi {from} a {to}.",
-    "releaseNotes": "Poznámky k vydání a SBOM",
     "rawChangelog": "CHANGELOG.md v repozitáři",
     "transparencyNote": "Pro každou verzi: co běží a s jakými komponentami, v",
     "transparencyInventory": "transparentnosti služeb",

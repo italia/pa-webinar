@@ -3463,7 +3463,6 @@
     "sourceLink": "Az összes kiadás megtekintése a GitHubon",
     "cadence": "Kiadási ütem",
     "cadenceSummary": "{count} verzió {from} és {to} között.",
-    "releaseNotes": "Kiadási megjegyzések és SBOM",
     "rawChangelog": "CHANGELOG.md a tárolóban",
     "transparencyNote": "Minden verzióhoz: mi fut és milyen összetevőkkel, a",
     "transparencyInventory": "szolgáltatások átláthatóságában",
