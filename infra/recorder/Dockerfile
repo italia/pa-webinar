@@ -6,7 +6,7 @@
 # sue librerie di sistema.
 #
 # ── Stage 1: build TypeScript → dist/ ────────────────────────────────────
-FROM node:22-bookworm-slim AS build
+FROM node:26-bookworm-slim AS build
 WORKDIR /app
 
 # Puppeteer scarica il Chrome compatibile durante l'install: lo dirigiamo in
@@ -24,7 +24,7 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # ── Stage 2: runtime con Chrome ──────────────────────────────────────────
-FROM node:22-bookworm-slim AS runtime
+FROM node:26-bookworm-slim AS runtime
 WORKDIR /app
 
 # Dipendenze di sistema per Chrome headless (allineate alla doc Puppeteer).
