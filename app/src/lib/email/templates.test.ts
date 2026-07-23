@@ -87,15 +87,17 @@ describe('confirmation email', () => {
 describe('absoluteEventImage', () => {
   const BASE = 'https://pa-webinar.example.gov.it';
 
-  it('prefers imageUrl over coverImageUrl', () => {
+  it('prefers the curated cover over the generic image', () => {
+    // Cover-first ovunque: card in-app, anteprime social ed email mostrano la
+    // STESSA immagine per lo stesso evento.
     expect(
       absoluteEventImage({ imageUrl: 'https://x/a.png', coverImageUrl: 'https://x/b.png' }, BASE),
-    ).toBe('https://x/a.png');
+    ).toBe('https://x/b.png');
   });
 
-  it('falls back to the cover image', () => {
-    expect(absoluteEventImage({ imageUrl: null, coverImageUrl: 'https://x/b.png' }, BASE)).toBe(
-      'https://x/b.png',
+  it('falls back to the generic image when there is no cover', () => {
+    expect(absoluteEventImage({ imageUrl: 'https://x/a.png', coverImageUrl: null }, BASE)).toBe(
+      'https://x/a.png',
     );
   });
 

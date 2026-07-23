@@ -82,15 +82,18 @@ describe('GET /api/assets/[...path] — gli asset pubblici restano pubblici', ()
   });
 
   it('la rotta non dipende dal database', () => {
-    // Il vero presidio del test qui sopra: nessuna riga `import ... @/lib/db`.
-    // Ancorato all'import (non ai commenti: la rotta ne è piena e potrebbe
-    // NOMINARE @/lib/db per spiegare perché NON lo importa). Se rientra come
-    // import, questo fallisce e obbliga a ripensare la cache/costo della rotta.
-    const src = fs.readFileSync(
-      path.join(__dirname, 'route.ts'),
-      'utf-8',
-    );
-    expect(src).not.toMatch(/^import[^\n]*@\/lib\/db/m);
+    // Il vero presidio del test qui sopra: la rotta non deve dipendere dal DB.
+    // Cerchiamo `@/lib/db` nel sorgente SENZA i commenti, così coglie ogni forma
+    // (import su più righe, re-export, `await import`) ma non un commento che lo
+    // nomina. Se rientra, questo fallisce e obbliga a ripensare la cache/costo.
+    const src = fs
+      .readFileSync(path.join(__dirname, 'route.ts'), 'utf-8')
+      // Via i commenti PRIMA di cercare: la rotta è documentata e può NOMINARE
+      // @/lib/db per spiegare perché non lo importa. Restano import (anche
+      // multilinea), re-export e import dinamici, che invece devono far rosso.
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/[^\n]*/g, '');
+    expect(src).not.toMatch(/@\/lib\/db/);
   });
 
   it('resta cacheabile a lungo dalle cache condivise', async () => {
