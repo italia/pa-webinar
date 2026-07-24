@@ -47,16 +47,12 @@ export class KubernetesRunner implements RecorderRunner {
 
   /** I Job recorder reali nel namespace, mappati per `reconcile`. */
   async list(): Promise<ActualJob[]> {
-    const res = await this.batch.listNamespacedJob(
-      this.namespace,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      `${COMPONENT_LABEL}=${COMPONENT_VALUE}`,
-    );
+    const res = await this.batch.listNamespacedJob({
+      namespace: this.namespace,
+      labelSelector: `${COMPONENT_LABEL}=${COMPONENT_VALUE}`,
+    });
     const jobs: ActualJob[] = [];
-    for (const job of res.body.items) {
+    for (const job of res.items) {
       const recordingId = job.metadata?.labels?.[RECORDING_ID_LABEL];
       const jobName = job.metadata?.name;
       if (!recordingId || !jobName) continue;
@@ -71,11 +67,11 @@ export class KubernetesRunner implements RecorderRunner {
    * recording. Idempotente: nome deterministico → un 409 è benigno.
    */
   async start(d: DesiredRecorder): Promise<void> {
-    const cron = await this.batch.readNamespacedCronJob(
-      this.recorderCronJobName,
-      this.namespace,
-    );
-    const tpl = cron.body.spec?.jobTemplate?.spec;
+    const cron = await this.batch.readNamespacedCronJob({
+      name: this.recorderCronJobName,
+      namespace: this.namespace,
+    });
+    const tpl = cron.spec?.jobTemplate?.spec;
     if (!tpl) {
       throw new Error(
         `CronJob ${this.recorderCronJobName} senza jobTemplate.spec`,
@@ -108,7 +104,7 @@ export class KubernetesRunner implements RecorderRunner {
     };
 
     try {
-      await this.batch.createNamespacedJob(this.namespace, job);
+      await this.batch.createNamespacedJob({ namespace: this.namespace, body: job });
     } catch (err: unknown) {
       if (isConflict(err)) return; // già creato (race): benigno.
       throw err;
@@ -118,15 +114,11 @@ export class KubernetesRunner implements RecorderRunner {
   /** Elimina un Job (propagazione Background → elimina anche i pod). */
   async stop(name: string): Promise<void> {
     try {
-      await this.batch.deleteNamespacedJob(
+      await this.batch.deleteNamespacedJob({
         name,
-        this.namespace,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        'Background',
-      );
+        namespace: this.namespace,
+        propagationPolicy: 'Background',
+      });
     } catch (err: unknown) {
       if (isNotFound(err)) return;
       throw err;
