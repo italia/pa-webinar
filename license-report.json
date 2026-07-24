@@ -39,200 +39,115 @@
     "publisher": "Astea Solutions",
     "email": "info@asteasolutions.com"
   },
-  "@aws-crypto/crc32@5.2.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-crypto-helpers",
-    "publisher": "AWS Crypto Tools Team",
-    "email": "aws-cryptools@amazon.com",
-    "url": "https://docs.aws.amazon.com/aws-crypto-tools/index.html?id=docs_gateway#lang/en_us"
-  },
-  "@aws-crypto/crc32c@5.2.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-crypto-helpers",
-    "publisher": "AWS Crypto Tools Team",
-    "email": "aws-cryptools@amazon.com",
-    "url": "https://docs.aws.amazon.com/aws-crypto-tools/index.html?id=docs_gateway#lang/en_us"
-  },
-  "@aws-crypto/sha1-browser@5.2.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-crypto-helpers",
-    "publisher": "AWS Crypto Tools Team",
-    "email": "aws-cryptools@amazon.com",
-    "url": "https://docs.aws.amazon.com/aws-crypto-tools/index.html?id=docs_gateway#lang/en_us"
-  },
-  "@aws-crypto/sha256-browser@5.2.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-crypto-helpers",
-    "publisher": "AWS Crypto Tools Team",
-    "email": "aws-cryptools@amazon.com",
-    "url": "https://docs.aws.amazon.com/aws-crypto-tools/index.html?id=docs_gateway#lang/en_us"
-  },
-  "@aws-crypto/sha256-js@5.2.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-crypto-helpers",
-    "publisher": "AWS Crypto Tools Team",
-    "email": "aws-cryptools@amazon.com",
-    "url": "https://docs.aws.amazon.com/aws-crypto-tools/index.html?id=docs_gateway#lang/en_us"
-  },
-  "@aws-crypto/supports-web-crypto@5.2.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-crypto-helpers",
-    "publisher": "AWS Crypto Tools Team",
-    "email": "aws-cryptools@amazon.com",
-    "url": "https://docs.aws.amazon.com/aws-crypto-tools/index.html?id=docs_gateway#lang/en_us"
-  },
-  "@aws-crypto/util@5.2.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-crypto-helpers",
-    "publisher": "AWS Crypto Tools Team",
-    "email": "aws-cryptools@amazon.com",
-    "url": "https://docs.aws.amazon.com/aws-crypto-tools/index.html?id=docs_gateway#lang/en_us"
-  },
-  "@aws-sdk/client-s3@3.1055.0": {
+  "@aws-sdk/checksums@3.1000.20": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/core@3.974.14": {
+  "@aws-sdk/client-s3@3.1095.0": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/crc64-nvme@3.972.9": {
+  "@aws-sdk/core@3.977.0": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/credential-provider-env@3.972.40": {
+  "@aws-sdk/credential-provider-env@3.972.61": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/credential-provider-http@3.972.42": {
+  "@aws-sdk/credential-provider-http@3.972.63": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/credential-provider-ini@3.972.44": {
+  "@aws-sdk/credential-provider-ini@3.973.6": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/credential-provider-login@3.972.44": {
+  "@aws-sdk/credential-provider-login@3.972.68": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/credential-provider-node@3.972.45": {
+  "@aws-sdk/credential-provider-node@3.972.72": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/credential-provider-process@3.972.40": {
+  "@aws-sdk/credential-provider-process@3.972.61": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/credential-provider-sso@3.972.44": {
+  "@aws-sdk/credential-provider-sso@3.973.5": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/credential-provider-web-identity@3.972.44": {
+  "@aws-sdk/credential-provider-web-identity@3.972.67": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/middleware-bucket-endpoint@3.972.16": {
+  "@aws-sdk/middleware-sdk-s3@3.972.66": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/middleware-expect-continue@3.972.13": {
+  "@aws-sdk/nested-clients@3.997.35": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/middleware-flexible-checksums@3.974.22": {
+  "@aws-sdk/s3-request-presigner@3.1095.0": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/middleware-location-constraint@3.972.11": {
+  "@aws-sdk/signature-v4-multi-region@3.996.42": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/middleware-sdk-s3@3.972.43": {
+  "@aws-sdk/token-providers@3.1095.0": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/middleware-ssec@3.972.11": {
+  "@aws-sdk/types@3.974.2": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/nested-clients@3.997.12": {
+  "@aws-sdk/xml-builder@3.972.37": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/aws/aws-sdk-js-v3",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@aws-sdk/s3-request-presigner@3.1055.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-v3",
-    "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
-  },
-  "@aws-sdk/signature-v4-multi-region@3.996.29": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-v3",
-    "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
-  },
-  "@aws-sdk/token-providers@3.1054.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-v3",
-    "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
-  },
-  "@aws-sdk/types@3.973.9": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-v3",
-    "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
-  },
-  "@aws-sdk/util-locate-window@3.965.5": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-v3",
-    "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
-  },
-  "@aws-sdk/xml-builder@3.972.26": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/aws/aws-sdk-js-v3",
-    "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
-  },
-  "@aws/lambda-invoke-store@0.2.4": {
+  "@aws/lambda-invoke-store@0.3.0": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/awslabs/aws-lambda-invoke-store",
     "publisher": "Amazon Web Services",
@@ -253,7 +168,7 @@
     "repository": "https://github.com/Azure/azure-sdk-for-js",
     "publisher": "Microsoft Corporation"
   },
-  "@azure/core-http-compat@2.4.0": {
+  "@azure/core-http-compat@2.5.0": {
     "licenses": "MIT",
     "repository": "https://github.com/Azure/azure-sdk-for-js",
     "publisher": "Microsoft Corporation"
@@ -268,7 +183,7 @@
     "repository": "https://github.com/Azure/azure-sdk-for-js",
     "publisher": "Microsoft Corporation"
   },
-  "@azure/core-rest-pipeline@1.23.0": {
+  "@azure/core-rest-pipeline@1.25.0": {
     "licenses": "MIT",
     "repository": "https://github.com/Azure/azure-sdk-for-js",
     "publisher": "Microsoft Corporation"
@@ -293,12 +208,12 @@
     "repository": "https://github.com/Azure/azure-sdk-for-js",
     "publisher": "Microsoft Corporation"
   },
-  "@azure/storage-blob@12.31.0": {
+  "@azure/storage-blob@12.33.0": {
     "licenses": "MIT",
     "repository": "https://github.com/Azure/azure-sdk-for-js",
     "publisher": "Microsoft Corporation"
   },
-  "@azure/storage-common@12.3.0": {
+  "@azure/storage-common@12.4.1": {
     "licenses": "MIT",
     "repository": "https://github.com/Azure/azure-sdk-for-js",
     "publisher": "Microsoft Corporation"
@@ -515,11 +430,17 @@
     "publisher": "Long Ho",
     "email": "holevietlong@gmail.com"
   },
-  "@formatjs/icu-messageformat-parser@3.5.10": {
+  "@formatjs/fast-memoize@3.1.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/formatjs/formatjs",
+    "publisher": "Long Ho",
+    "email": "holevietlong@gmail.com"
+  },
+  "@formatjs/icu-messageformat-parser@3.5.15": {
     "licenses": "MIT",
     "repository": "https://github.com/formatjs/formatjs"
   },
-  "@formatjs/icu-skeleton-parser@2.1.9": {
+  "@formatjs/icu-skeleton-parser@2.1.11": {
     "licenses": "MIT",
     "repository": "https://github.com/formatjs/formatjs"
   },
@@ -536,28 +457,28 @@
     "email": "arshaw@arshaw.com",
     "url": "http://arshaw.com/"
   },
-  "@fullcalendar/daygrid@6.1.20": {
+  "@fullcalendar/daygrid@6.1.21": {
     "licenses": "MIT",
     "repository": "https://github.com/fullcalendar/fullcalendar",
     "publisher": "Adam Shaw",
     "email": "arshaw@arshaw.com",
     "url": "http://arshaw.com/"
   },
-  "@fullcalendar/interaction@6.1.20": {
+  "@fullcalendar/interaction@6.1.21": {
     "licenses": "MIT",
     "repository": "https://github.com/fullcalendar/fullcalendar",
     "publisher": "Adam Shaw",
     "email": "arshaw@arshaw.com",
     "url": "http://arshaw.com/"
   },
-  "@fullcalendar/list@6.1.20": {
+  "@fullcalendar/list@6.1.21": {
     "licenses": "MIT",
     "repository": "https://github.com/fullcalendar/fullcalendar",
     "publisher": "Adam Shaw",
     "email": "arshaw@arshaw.com",
     "url": "http://arshaw.com/"
   },
-  "@fullcalendar/multimonth@6.1.20": {
+  "@fullcalendar/multimonth@6.1.21": {
     "licenses": "MIT",
     "repository": "https://github.com/fullcalendar/fullcalendar",
     "publisher": "Adam Shaw",
@@ -568,7 +489,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/fullcalendar/fullcalendar-react"
   },
-  "@fullcalendar/timegrid@6.1.20": {
+  "@fullcalendar/timegrid@6.1.21": {
     "licenses": "MIT",
     "repository": "https://github.com/fullcalendar/fullcalendar",
     "publisher": "Adam Shaw",
@@ -709,7 +630,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/pkgjs/parseargs"
   },
-  "@playwright/test@1.60.0": {
+  "@playwright/test@1.61.1": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/microsoft/playwright",
     "publisher": "Microsoft Corporation"
@@ -806,59 +727,41 @@
     "publisher": "Marco Schumacher",
     "email": "marco@schumacher.dev"
   },
-  "@smithy/core@3.24.5": {
+  "@smithy/core@3.29.8": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/smithy-lang/smithy-typescript",
     "publisher": "AWS Smithy Team",
     "url": "https://smithy.io"
   },
-  "@smithy/credential-provider-imds@4.3.5": {
+  "@smithy/credential-provider-imds@4.4.13": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/smithy-lang/smithy-typescript",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@smithy/fetch-http-handler@5.4.5": {
+  "@smithy/fetch-http-handler@5.6.10": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/smithy-lang/smithy-typescript",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@smithy/is-array-buffer@2.2.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/awslabs/smithy-typescript",
-    "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
-  },
-  "@smithy/node-http-handler@4.7.5": {
+  "@smithy/node-http-handler@4.9.10": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/smithy-lang/smithy-typescript",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@smithy/signature-v4@5.4.5": {
+  "@smithy/signature-v4@5.6.9": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/smithy-lang/smithy-typescript",
     "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
+    "url": "https://aws.amazon.com/sdk-for-javascript/"
   },
-  "@smithy/types@4.14.2": {
+  "@smithy/types@4.16.1": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/smithy-lang/smithy-typescript",
     "publisher": "AWS Smithy Team",
     "url": "https://smithy.io"
-  },
-  "@smithy/util-buffer-from@2.2.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/awslabs/smithy-typescript",
-    "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
-  },
-  "@smithy/util-utf8@2.3.0": {
-    "licenses": "Apache-2.0",
-    "repository": "https://github.com/awslabs/smithy-typescript",
-    "publisher": "AWS SDK for JavaScript Team",
-    "url": "https://aws.amazon.com/javascript/"
   },
   "@splidejs/react-splide@0.7.12": {
     "licenses": "MIT",
@@ -979,7 +882,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
-  "@types/react@19.2.15": {
+  "@types/react@19.2.17": {
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
@@ -991,43 +894,43 @@
     "licenses": "MIT",
     "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped"
   },
-  "@typescript-eslint/eslint-plugin@8.60.0": {
+  "@typescript-eslint/eslint-plugin@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
-  "@typescript-eslint/parser@8.60.0": {
+  "@typescript-eslint/parser@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
-  "@typescript-eslint/project-service@8.60.0": {
+  "@typescript-eslint/project-service@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
-  "@typescript-eslint/scope-manager@8.60.0": {
+  "@typescript-eslint/scope-manager@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
-  "@typescript-eslint/tsconfig-utils@8.60.0": {
+  "@typescript-eslint/tsconfig-utils@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
-  "@typescript-eslint/type-utils@8.60.0": {
+  "@typescript-eslint/type-utils@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
-  "@typescript-eslint/types@8.60.0": {
+  "@typescript-eslint/types@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
-  "@typescript-eslint/typescript-estree@8.60.0": {
+  "@typescript-eslint/typescript-estree@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
-  "@typescript-eslint/utils@8.60.0": {
+  "@typescript-eslint/utils@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
-  "@typescript-eslint/visitor-keys@8.60.0": {
+  "@typescript-eslint/visitor-keys@8.65.0": {
     "licenses": "MIT",
     "repository": "https://github.com/typescript-eslint/typescript-eslint"
   },
@@ -1296,7 +1199,7 @@
     "publisher": "Vadim Graboys",
     "email": "dimva13@gmail.com"
   },
-  "bootstrap-italia@2.18.1": {
+  "bootstrap-italia@2.18.2": {
     "licenses": "BSD-3-Clause",
     "repository": "https://github.com/italia/bootstrap-italia",
     "publisher": "Presidenza del Consiglio dei Ministri"
@@ -1535,7 +1438,7 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "date-fns@4.3.0": {
+  "date-fns@4.4.0": {
     "licenses": "MIT",
     "repository": "https://github.com/date-fns/date-fns"
   },
@@ -2181,7 +2084,7 @@
     "publisher": "Sebastian Pekarek",
     "email": "mail@sebbo.net"
   },
-  "icu-minify@4.12.0": {
+  "icu-minify@4.13.4": {
     "licenses": "MIT",
     "repository": "https://github.com/amannn/next-intl",
     "publisher": "Jan Amann",
@@ -2230,7 +2133,7 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "intl-messageformat@11.2.7": {
+  "intl-messageformat@11.2.12": {
     "licenses": "BSD-3-Clause",
     "repository": "https://github.com/formatjs/formatjs",
     "publisher": "Eric Ferraiuolo",
@@ -2242,7 +2145,7 @@
     "publisher": "Andres Suarez",
     "email": "zertosh@gmail.com"
   },
-  "ioredis@5.11.0": {
+  "ioredis@5.11.1": {
     "licenses": "MIT",
     "repository": "https://github.com/luin/ioredis",
     "publisher": "Zihua Li",
@@ -2440,7 +2343,7 @@
     "email": "i@izs.me",
     "url": "http://blog.izs.me/"
   },
-  "isomorphic-dompurify@3.14.0": {
+  "isomorphic-dompurify@3.19.0": {
     "licenses": "MIT",
     "repository": "https://github.com/kkomelin/isomorphic-dompurify"
   },
@@ -2484,7 +2387,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/unjs/jiti"
   },
-  "jose@6.2.3": {
+  "jose@6.2.4": {
     "licenses": "MIT",
     "repository": "https://github.com/panva/jose",
     "publisher": "Filip Skokan",
@@ -2650,7 +2553,7 @@
     "email": "sindresorhus@gmail.com",
     "url": "https://sindresorhus.com"
   },
-  "marked@18.0.4": {
+  "marked@18.0.7": {
     "licenses": "MIT",
     "repository": "https://github.com/markedjs/marked",
     "publisher": "Christopher Jeffrey"
@@ -2776,13 +2679,13 @@
     "licenses": "MIT",
     "repository": "https://github.com/jshttp/negotiator"
   },
-  "next-intl-swc-plugin-extractor@4.12.0": {
+  "next-intl-swc-plugin-extractor@4.13.4": {
     "licenses": "MIT",
     "repository": "https://github.com/amannn/next-intl",
     "publisher": "강동윤",
     "email": "kdy1997.dev@gmail.com"
   },
-  "next-intl@4.12.0": {
+  "next-intl@4.13.4": {
     "licenses": "MIT",
     "repository": "https://github.com/amannn/next-intl",
     "publisher": "Jan Amann",
@@ -3006,12 +2909,12 @@
     "licenses": "MIT",
     "repository": "https://github.com/unjs/pkg-types"
   },
-  "playwright-core@1.60.0": {
+  "playwright-core@1.61.1": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/microsoft/playwright",
     "publisher": "Microsoft Corporation"
   },
-  "playwright@1.60.0": {
+  "playwright@1.61.1": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/microsoft/playwright",
     "publisher": "Microsoft Corporation"
@@ -3044,7 +2947,7 @@
     "publisher": "George Zahariev",
     "email": "z@georgezahariev.com"
   },
-  "prettier@3.8.3": {
+  "prettier@3.9.6": {
     "licenses": "MIT",
     "repository": "https://github.com/prettier/prettier",
     "publisher": "James Long"
@@ -3116,9 +3019,9 @@
     "publisher": "Stephen J. Collings",
     "email": "stevoland@gmail.com"
   },
-  "react-dom@19.2.6": {
+  "react-dom@19.2.8": {
     "licenses": "MIT",
-    "repository": "https://github.com/facebook/react"
+    "repository": "https://github.com/react/react"
   },
   "react-fast-compare@3.2.2": {
     "licenses": "MIT",
@@ -3159,9 +3062,9 @@
     "licenses": "BSD-3-Clause",
     "repository": "https://github.com/reactjs/react-transition-group"
   },
-  "react@19.2.6": {
+  "react@19.2.8": {
     "licenses": "MIT",
-    "repository": "https://github.com/facebook/react"
+    "repository": "https://github.com/react/react"
   },
   "reactstrap@9.2.2": {
     "licenses": "MIT",
@@ -3278,7 +3181,7 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "sass@1.100.0": {
+  "sass@1.101.7": {
     "licenses": "MIT",
     "repository": "https://github.com/sass/dart-sass",
     "publisher": "Natalie Weizenbaum",
@@ -3533,7 +3436,7 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "swr@2.4.1": {
+  "swr@2.4.2": {
     "licenses": "MIT",
     "repository": "https://github.com/vercel/swr"
   },
@@ -3633,7 +3536,7 @@
     "repository": "https://github.com/Microsoft/tslib",
     "publisher": "Microsoft Corp."
   },
-  "tsx@4.22.3": {
+  "tsx@4.23.1": {
     "licenses": "MIT",
     "repository": "https://github.com/privatenumber/tsx",
     "publisher": "Hiroki Osame",
@@ -3716,7 +3619,7 @@
     "publisher": "Gary Court",
     "email": "gary.court@gmail.com"
   },
-  "use-intl@4.12.0": {
+  "use-intl@4.13.4": {
     "licenses": "MIT",
     "repository": "https://github.com/amannn/next-intl",
     "publisher": "Jan Amann",

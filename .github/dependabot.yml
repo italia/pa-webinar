@@ -1,113 +1,235 @@
+# Dependabot — configurazione aggiornamenti.
+#
+# Politica MAJOR (24 lug 2026, dopo la remediation delle vulnerabilita'):
+# i major di runtime sono ignorati come update di ROUTINE. Vanno fatti come
+# upgrade DEDICATI (adattamento del codice + gate completo + review), mai come
+# merge di massa: e' cosi' che si introducono regressioni.
+#
+# IMPORTANTE: `version-update:semver-major` NON silenzia gli avvisi di SICUREZZA.
+# Se esce una CVE su una di queste dipendenze, Dependabot apre comunque la PR.
+# (Verificato sul campo: le vulnerabilita' di luglio erano tutte risolvibili con
+# patch/minor — es. la fix di next era 15.5.21, non il major 16.)
 version: 2
 updates:
-  # npm dependencies
-  - package-ecosystem: "npm"
-    directory: "/app"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-    groups:
-      # Group minor/patch updates
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
-
-  # Docker base images
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-      - "docker"
-
-
-  # Il package.json alla RADICE: dichiara i workspace (app, lobby) e le
-  # dipendenze di build. Non era coperto: un aggiornamento di sicurezza qui non
-  # sarebbe mai stato proposto.
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-    groups:
-      minor-and-patch:
-        update-types: ["minor", "patch"]
-
-  # Recorder e controller stanno FUORI dai workspace npm, quindi avevano un
-  # package-lock proprio che nessuno teneva aggiornato. Sono anche le immagini
-  # piu' delicate del progetto: il recorder gira Chrome headless e maneggia
-  # audio per-partecipante (dato dell'art. 9).
-  - package-ecosystem: "npm"
-    directory: "/infra/recorder"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-    groups:
-      minor-and-patch:
-        update-types: ["minor", "patch"]
-
-  - package-ecosystem: "npm"
-    directory: "/infra/recorder-controller"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-    groups:
-      minor-and-patch:
-        update-types: ["minor", "patch"]
-
-  # Il worker della pipeline AI: nessun ecosystem pip era dichiarato.
-  - package-ecosystem: "pip"
-    directory: "/infra/ai/worker"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "python"
-
-  # Immagini base dei Dockerfile secondari (quello alla radice era gia' coperto).
-  - package-ecosystem: "docker"
-    directory: "/infra/recorder"
-    schedule: { interval: "weekly", day: "monday" }
-    labels: ["dependencies", "docker"]
-
-  - package-ecosystem: "docker"
-    directory: "/infra/recorder-controller"
-    schedule: { interval: "weekly", day: "monday" }
-    labels: ["dependencies", "docker"]
-
-  - package-ecosystem: "docker"
-    directory: "/infra/ai"
-    schedule: { interval: "weekly", day: "monday" }
-    labels: ["dependencies", "docker"]
-
-  - package-ecosystem: "docker"
-    directory: "/infra/jitsi-web-patched"
-    schedule: { interval: "weekly", day: "monday" }
-    labels: ["dependencies", "docker"]
-
-  # GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-      - "ci"
+- package-ecosystem: npm
+  directory: /app
+  schedule:
+    interval: weekly
+    day: monday
+  open-pull-requests-limit: 10
+  labels:
+  - dependencies
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+  ignore:
+  - dependency-name: next
+    update-types:
+    - version-update:semver-major
+  - dependency-name: react
+    update-types:
+    - version-update:semver-major
+  - dependency-name: react-dom
+    update-types:
+    - version-update:semver-major
+  - dependency-name: '@prisma/client'
+    update-types:
+    - version-update:semver-major
+  - dependency-name: prisma
+    update-types:
+    - version-update:semver-major
+  - dependency-name: zod
+    update-types:
+    - version-update:semver-major
+  - dependency-name: eslint
+    update-types:
+    - version-update:semver-major
+  - dependency-name: eslint-config-next
+    update-types:
+    - version-update:semver-major
+  - dependency-name: typescript
+    update-types:
+    - version-update:semver-major
+  - dependency-name: ical-generator
+    update-types:
+    - version-update:semver-major
+  - dependency-name: nanoid
+    update-types:
+    - version-update:semver-major
+- package-ecosystem: docker
+  directory: /
+  schedule:
+    interval: weekly
+    day: monday
+  labels:
+  - dependencies
+  - docker
+# Il package.json alla RADICE: dichiara i workspace (app, lobby) e le dipendenze
+# di build. Senza questo blocco un aggiornamento di sicurezza qui non sarebbe
+# mai proposto.
+- package-ecosystem: npm
+  directory: /
+  schedule:
+    interval: weekly
+    day: monday
+  open-pull-requests-limit: 5
+  labels:
+  - dependencies
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+  ignore:
+  - dependency-name: phaser
+    update-types:
+    - version-update:semver-major
+  - dependency-name: typescript
+    update-types:
+    - version-update:semver-major
+  - dependency-name: prisma
+    update-types:
+    - version-update:semver-major
+  - dependency-name: '@prisma/client'
+    update-types:
+    - version-update:semver-major
+# Recorder e controller stanno FUORI dai workspace npm: hanno un package-lock
+# proprio che nessuno teneva aggiornato. Sono anche le immagini piu' delicate
+# del progetto: il recorder gira Chrome headless e maneggia audio
+# per-partecipante (dato dell'art. 9).
+- package-ecosystem: npm
+  directory: /infra/recorder
+  schedule:
+    interval: weekly
+    day: monday
+  open-pull-requests-limit: 5
+  labels:
+  - dependencies
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+  ignore:
+  - dependency-name: puppeteer
+    update-types:
+    - version-update:semver-major
+  - dependency-name: typescript
+    update-types:
+    - version-update:semver-major
+- package-ecosystem: npm
+  directory: /infra/recorder-controller
+  schedule:
+    interval: weekly
+    day: monday
+  open-pull-requests-limit: 5
+  labels:
+  - dependencies
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+  ignore:
+  - dependency-name: typescript
+    update-types:
+    - version-update:semver-major
+# Il worker della pipeline AI. Lo stack CUDA (torch/whisperx/numpy) e' pinnato
+# a mano e self-consistent: i major qui vanno provati su GPU, mai automatici.
+- package-ecosystem: pip
+  directory: /infra/ai/worker
+  schedule:
+    interval: weekly
+    day: monday
+  open-pull-requests-limit: 5
+  labels:
+  - dependencies
+  - python
+  ignore:
+  - dependency-name: torch
+    update-types:
+    - version-update:semver-major
+  - dependency-name: torchvision
+    update-types:
+    - version-update:semver-major
+  - dependency-name: torchaudio
+    update-types:
+    - version-update:semver-major
+  - dependency-name: numpy
+    update-types:
+    - version-update:semver-major
+  - dependency-name: transformers
+    update-types:
+    - version-update:semver-major
+  - dependency-name: whisperx
+    update-types:
+    - version-update:semver-major
+  - dependency-name: audioseal
+    update-types:
+    - version-update:semver-major
+  - dependency-name: piper-tts
+    update-types:
+    - version-update:semver-major
+  - dependency-name: pydantic
+    update-types:
+    - version-update:semver-major
+- package-ecosystem: docker
+  directory: /infra/recorder
+  schedule:
+    interval: weekly
+    day: monday
+  labels:
+  - dependencies
+  - docker
+  ignore:
+  - dependency-name: node
+    update-types:
+    - version-update:semver-major
+- package-ecosystem: docker
+  directory: /infra/recorder-controller
+  schedule:
+    interval: weekly
+    day: monday
+  labels:
+  - dependencies
+  - docker
+  ignore:
+  - dependency-name: node
+    update-types:
+    - version-update:semver-major
+- package-ecosystem: docker
+  directory: /infra/ai
+  schedule:
+    interval: weekly
+    day: monday
+  labels:
+  - dependencies
+  - docker
+# ATTENZIONE: questa immagine e' la build PATCHATA di jitsi/web (rnnoise 48kHz).
+# Un bump dell'immagine base perde la patch -> vedi `ignore` sotto.
+- package-ecosystem: docker
+  directory: /infra/jitsi-web-patched
+  schedule:
+    interval: weekly
+    day: monday
+  labels:
+  - dependencies
+  - docker
+  ignore:
+  - dependency-name: jitsi/web
+    update-types:
+    - version-update:semver-major
+  - dependency-name: node
+    update-types:
+    - version-update:semver-major
+# GitHub Actions: le action sono SHA-pinnate; Dependabot aggiorna SHA + commento.
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: weekly
+    day: monday
+  labels:
+  - dependencies
+  - ci
