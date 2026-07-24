@@ -23,7 +23,7 @@ numpy<2
 # HTTP client — used to talk to the app's /api/internal/* endpoints
 # and to the in-cluster vLLM service. Sync API is plenty here: a
 # worker is sequential by design (one job per Pod).
-httpx==0.27.2
+httpx==0.28.1
 
 # Pydantic — validates the claim response shape so we don't deref
 # `None`s on a malformed payload. Matches what `lib/ai/schemas.ts`
