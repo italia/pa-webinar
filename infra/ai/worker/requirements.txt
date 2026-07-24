@@ -56,7 +56,15 @@ webvtt-py==0.5.1
 # HIGH severity rilevato da Trivy nel CI dell'app — anche se l'uso qui
 # è solo per costruire prompt, e non scarichiamo modelli arbitrari,
 # evita il blocco del security scan).
-transformers==4.48.3
+#
+# 24 lug 2026: 4.48.3 → 4.57.6, l'ULTIMA della major 4. Chiude 7 advisory
+# (ReDoS fixate in 4.51/4.52.1/4.53, improper input validation) restando
+# compatibile con lo stack pinnato: whisperx chiede `transformers>=4.48.0`
+# (nessun cap) e 4.57.6 vuole `numpy>=1.17`, quindi il pin `numpy<2` regge.
+# NON si sale alla major 5 (romperebbe lo stack ASR): l'unico advisory che
+# resta aperto lì (GHSA-fgcw-684q-jj6r) è nel path del modello LightGlue
+# (visione), mai caricato da questo worker audio → alert dismesso not-used.
+transformers==4.57.6
 
 # TTS — Piper (rhasspy/piper-tts). MIT license, voci pre-trained
 # scaricate da huggingface.co/rhasspy/piper-voices. Gira su CPU
