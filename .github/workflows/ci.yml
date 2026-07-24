@@ -26,8 +26,8 @@ jobs:
     name: Lint & Typecheck
     runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
           cache: "npm"
@@ -52,8 +52,8 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
           cache: "npm"
@@ -81,8 +81,8 @@ jobs:
       matrix:
         pkg: [recorder, recorder-controller]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
       - run: npm ci
@@ -98,8 +98,8 @@ jobs:
     name: Typecheck (lobby)
     runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
           cache: "npm"
@@ -112,8 +112,8 @@ jobs:
     name: Unit Tests (worker AI)
     runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.11"
       - name: Dipendenze minime per i test puri
@@ -134,7 +134,7 @@ jobs:
     name: Security Scan
     runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -147,8 +147,8 @@ jobs:
     name: License Compliance
     runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
           cache: "npm"
@@ -181,8 +181,8 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
           cache: "npm"
@@ -216,8 +216,8 @@ jobs:
     # represent a code regression, so don't block PRs on it.
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
           cache: "npm"
@@ -228,7 +228,7 @@ jobs:
       # The ghcr.io/actions/actions-runner image used by ARC ships docker CLI
       # but not the compose v2 plugin — install it on the fly so `docker compose`
       # works on the self-hosted runner the same way it does on ubuntu-latest.
-      - uses: docker/setup-compose-action@v2
+      - uses: docker/setup-compose-action@4eb059ff7f16592f9c84d5ca339c53cb7c5064e2 # v2
       # Authenticate to Docker Hub when credentials are provided as
       # repo secrets. Anonymous pulls share a low rate limit (100 / 6h
       # per IP) that the shared ARC runner exhausts quickly during a
@@ -237,7 +237,7 @@ jobs:
       # the secrets aren't set, keeping forks working.
       - name: Login to Docker Hub (rate-limit lift)
         if: ${{ env.DOCKERHUB_USERNAME != '' }}
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         with:
@@ -270,7 +270,7 @@ jobs:
         env:
           ADMIN_API_KEY: dev_admin_key_2026
       - name: Upload test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: playwright-report
@@ -289,9 +289,9 @@ jobs:
     runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
     needs: [lint, test]
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/build-push-action@v6
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: .
           push: false
