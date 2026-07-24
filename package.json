@@ -28,8 +28,8 @@
     "changelog:md": "node scripts/generate-changelog-md.mjs"
   },
   "overrides": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "@xmldom/xmldom": "^0.9.10",
     "fast-xml-builder": "^1.2.0",
     "postcss": "^8.5.10",
