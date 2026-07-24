@@ -11,14 +11,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@kubernetes/client-node": "^0.22.3",
-    "dockerode": "^4.0.2"
+    "@kubernetes/client-node": "^1.4.0",
+    "dockerode": "^5.0.1"
   },
   "devDependencies": {
-    "@types/dockerode": "^3.3.31",
+    "@types/dockerode": "^4.0.1",
     "@types/node": "^22.10.0",
     "typescript": "^5.7.0",
-    "vitest": "^2.1.9"
+    "vitest": "^4.1.10"
   },
   "overrides": {
     "form-data": "2.5.6"
