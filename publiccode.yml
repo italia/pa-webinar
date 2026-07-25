@@ -3,8 +3,8 @@ name: pa-webinar
 applicationSuite: pa-webinar
 url: "https://github.com/italia/pa-webinar"
 landingURL: "https://github.com/italia/pa-webinar"
-softwareVersion: "0.8.9"
-releaseDate: "2026-07-23"
+softwareVersion: "0.9.0"
+releaseDate: "2026-07-26"
 developmentStatus: beta
 softwareType: standalone/web
 platforms:

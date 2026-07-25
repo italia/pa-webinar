@@ -19,3 +19,17 @@ azure-storage-account-key
 # pod with no untrusted-model path. Risk accepted (VEX: not_affected). Revisit
 # when whisperx/pyannote support a patched transformers line.
 CVE-2026-4372
+
+# CVE-2026-5241 (GHSA-29pf-2h5f-8g72) — transformers: RCE al caricamento del
+# modello. Il vettore richiede di caricare un modello scelto dall'attaccante via
+# `AutoModelForCausalLM.from_pretrained()` con un `config.json` malevolo che
+# punta a un repo dell'attaccante. Questo worker NON usa quell'API: un grep di
+# AutoModel/from_pretrained sul codice di produzione è vuoto, l'ASR passa da
+# whisperx/faster-whisper (CTranslate2) e l'id del modello ('large-v3') lo
+# decide la piattaforma, non chi partecipa agli eventi. Nessun
+# `trust_remote_code`. L'unica versione corretta è la 5.3, incompatibile con lo
+# stack pinnato (whisperx<3.5 ← pyannote 3.3 ← numpy 1.x ← torch 2.6): il bump
+# rompe il build del worker. Rischio accettato (VEX: not_affected), come
+# l'alert Dependabot #113 chiuso con la stessa motivazione. Da rivedere quando
+# whisperx supporterà una linea transformers corretta.
+CVE-2026-5241

@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Sikkerhed i afhængigheder, opdateret dokumentation og en komplet lokal opsætning",
+    "notes": [
+      "Alle kendte sårbarheder i afhængigheder er rettet, og de automatiske kodekontroller kører ikke længere på den infrastruktur, der afvikler arrangementerne: et eksternt ændringsforslag kan ikke længere udføre noget dér.",
+      "Dokumentationen svarer nu til softwaren: installationsvejledning, kommandoer og siderne om privatliv og sikkerhed beskriver, hvad systemet faktisk gør — for alle, der genbruger platformen i egen forvaltning.",
+      "Installation på én maskine giver nu også de periodiske opgaver (afsendelse af e-mail, påmindelser, sletning af data ved udløb) og chat i realtid, som i produktion.",
+      "Rettelser: siden med det offentlige API fejler ikke længere, og beskyttelsen af nøglen til kryptering af persondata træder igen i kraft, når der ikke er konfigureret en rigtig nøgle."
+    ]
+  },
   "0.8.9": {
     "title": "Ændringsloggen, nu med softwareoversigten indbygget",
     "notes": [

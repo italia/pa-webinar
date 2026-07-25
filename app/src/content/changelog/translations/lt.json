@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Priklausomybių saugumas, suderinta dokumentacija ir pilna vietinė aplinka",
+    "notes": [
+      "Visi žinomi priklausomybių pažeidžiamumai ištaisyti, o automatiniai kodo patikrinimai nebevykdomi infrastruktūroje, kurioje veikia renginiai: išorinis pakeitimo pasiūlymas ten nebegali nieko paleisti.",
+      "Dokumentacija dabar atitinka programinę įrangą: diegimo nurodymai, komandos bei privatumo ir saugumo puslapiai aprašo, ką sistema iš tikrųjų daro — visiems, kurie platformą pakartotinai naudoja savo administracijoje.",
+      "Įdiegus viename kompiuteryje, dabar veikia ir periodinės užduotys (el. laiškų siuntimas, priminimai, duomenų trynimas pasibaigus terminui) bei pokalbiai realiuoju laiku, kaip gamyboje.",
+      "Pataisymai: viešąją sąsają aprašantis puslapis nebeklysta, o asmens duomenų šifravimo rakto apsauga vėl suveikia, kai nesukonfigūruotas tikras raktas."
+    ]
+  },
   "0.8.9": {
     "title": "Pakeitimų žurnalas dabar su integruotu programinės įrangos inventoriumi",
     "notes": [

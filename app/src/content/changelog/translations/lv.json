@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Atkarību drošība, saskaņota dokumentācija un pilnvērtīga lokālā vide",
+    "notes": [
+      "Visas zināmās atkarību ievainojamības ir novērstas, un automātiskās koda pārbaudes vairs nedarbojas infrastruktūrā, kas nodrošina pasākumus: ārējs izmaiņu priekšlikums tur vairs neko nevar izpildīt.",
+      "Dokumentācija tagad atbilst programmatūrai: uzstādīšanas norādījumi, komandas un privātuma un drošības lapas apraksta, ko sistēma patiešām dara — ikvienam, kas platformu atkārtoti izmanto savā pārvaldē.",
+      "Uzstādot vienā datorā, tagad tiek iegūti arī periodiskie darbi (e-pasta sūtīšana, atgādinājumi, datu dzēšana pēc termiņa) un tērzēšana reāllaikā, tāpat kā ražošanā.",
+      "Labojumi: publisko API aprakstošā lapa vairs nerada kļūdu, un personas datu šifrēšanas atslēgas aizsardzība atkal darbojas, ja nav konfigurēta īsta atslēga."
+    ]
+  },
   "0.8.9": {
     "title": "Izmaiņu žurnāls tagad ar integrētu programmatūras inventāru",
     "notes": [

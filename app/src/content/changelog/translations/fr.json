@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Sécurité des dépendances, documentation réalignée et pile locale complète",
+    "notes": [
+      "Toutes les vulnérabilités connues des dépendances ont été corrigées, et les vérifications automatiques du code ne s'exécutent plus sur l'infrastructure qui héberge les événements : une proposition de modification externe ne peut plus y exécuter quoi que ce soit.",
+      "La documentation correspond de nouveau au logiciel : instructions d'installation, commandes et pages sur la confidentialité et la sécurité décrivent ce que le système fait réellement — pour qui réutilise la plateforme dans sa propre administration.",
+      "Une installation sur une seule machine comprend désormais aussi les tâches périodiques (envoi des e-mails, rappels, suppression des données à l'échéance) et le tchat en temps réel, comme en production.",
+      "Corrections : la page décrivant l'API publique ne tombe plus en erreur, et la protection de la clé de chiffrement des données personnelles intervient de nouveau lorsqu'aucune vraie clé n'a été configurée."
+    ]
+  },
   "0.8.9": {
     "title": "Le journal des modifications, désormais avec l'inventaire logiciel intégré",
     "notes": [

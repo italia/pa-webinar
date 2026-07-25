@@ -85,7 +85,8 @@ flowchart LR
   subgraph Jitsi["Jitsi Meet (Helm)"]
     Prosody["Prosody<br/>XMPP"]
     Jicofo
-    JVB["JVB pool<br/>0 → N replicas"]
+    JVB["JVB pool<br/>0 → N replicas<br/>IP pubblico annunciato"]
+    Coturn["coturn<br/>TURN/STUN"]
     Jibri["Jibri<br/>recording"]
   end
 
@@ -101,7 +102,10 @@ flowchart LR
   Admin -->|HTTPS + API key| Pages
   Pages --> API
   Browser -.->|IFrame + JWT| Prosody
-  Browser ==>|WebRTC UDP| JVB
+  Browser ==>|"media diretto<br/>UDP 10000 → IP pubblico JVB"| JVB
+  Browser -.->|"fallback dietro firewall<br/>TURNS TCP 443"| Coturn
+  Coturn -->|"relay verso la rete interna"| JVB
+  Prosody -.->|"discovery TURN (XEP-0215)"| Coturn
   Jibri -.->|XMPP join| Prosody
   Jibri -->|MP4 upload| Blob
 
@@ -114,6 +118,15 @@ flowchart LR
   Prosody --- Jicofo
   Jicofo --- JVB
 ```
+
+**Come viaggia l'audio/video.** Il media NON passa dall'applicazione: il browser
+parla direttamente col Jitsi Video Bridge in **UDP sulla porta 10000**, verso un
+**IP pubblico che il bridge annuncia** come candidato ICE (`publicIPs` nel chart;
+senza quell'annuncio i client proverebbero a raggiungere l'indirizzo interno del
+pod e la chiamata non si stabilirebbe). Chi sta dietro un firewall che blocca
+l'UDP ricade automaticamente su **coturn in TURNS, TCP 443** — una porta che
+passa quasi ovunque — e da lì il traffico viene rilanciato al bridge sulla rete
+interna. Il browser scopre il TURN server via XEP-0215, annunciato da Prosody.
 
 **Decisioni chiave** — il razionale completo è in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); le più recenti hanno anche un

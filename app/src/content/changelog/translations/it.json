@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Sicurezza delle dipendenze, documentazione allineata e stack locale completo",
+    "notes": [
+      "Tutte le vulnerabilità note nelle dipendenze sono state risolte, e le verifiche automatiche del codice non girano più sull'infrastruttura che ospita gli eventi: una proposta di modifica esterna non può più eseguire nulla lì.",
+      "La documentazione è stata riallineata al software reale: le istruzioni di installazione, i comandi e le pagine su privacy e sicurezza descrivono ciò che il sistema fa davvero, per chi vuole riusare la piattaforma nella propria amministrazione.",
+      "Chi installa la piattaforma su una macchina singola ora ottiene anche le attività periodiche (invio email, promemoria, cancellazione dei dati alla scadenza) e la chat in tempo reale come in produzione.",
+      "Correzioni: la pagina che descrive le API pubbliche non è più in errore, e la protezione della chiave di cifratura dei dati personali torna a intervenire quando non è stata configurata una chiave vera."
+    ]
+  },
   "0.8.9": {
     "title": "Il changelog, ora con l'inventario del software integrato",
     "notes": [

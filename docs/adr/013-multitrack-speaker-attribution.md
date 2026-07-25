@@ -1,6 +1,6 @@
 # ADR-013 — Speaker attribution accurato via registrazione multi-traccia per-partecipante
 
-**Stato**: Proposto (2026-06-01)
+**Stato**: Accettato e implementato (proposto 2026-06-01) — recorder multi-traccia in produzione; il bot entra su dominio nascosto Prosody, quindi non compare tra i partecipanti (v0.8.6).
 **Decisori**: team pa-webinar / DTD
 **Contesto abilitante**: la trascrizione post-evento attribuisce i parlanti con pyannote in "blind diarization" sull'audio misto Jibri; mislabel frequenti, mapping manuale e gestione debole delle sovrapposizioni. Jitsi conosce la sorgente reale di ogni voce, ma oggi la buttiamo via.
 
