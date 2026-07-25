@@ -133,7 +133,7 @@ Voci spedite e funzionanti, ognuna con un confine che vale la pena conoscere pri
 | **Scale-to-zero JVB (ADR-007)** | `/colibri/stats` è aggregato per pod: due eventi LIVE sullo stesso bridge tengono acceso il nodepool anche se uno si è svuotato |
 | **i18n a 24 lingue (ADR-008)** | Il fallback delle chiavi mancanti ricade sull'**italiano**, non sull'inglese |
 | **Piazza della sala d'attesa** | Le emote sono locali: chi le usa vede la propria animazione, gli altri no |
-| **Copertura dei test** | ~999 casi in 75 file, di cui **7 su handler API** (JWT Jitsi, chat, cleanup GDPR, presign upload, asset, garden ping, SBOM changelog). Le due falle già trovate (impersonazione in chat, `/chat` senza auth) stavano entrambe in un handler: la copertura è partita da lì, ma le restanti route non hanno test |
+| **Copertura dei test** | 1284 casi in 75 file, di cui **7 su handler API** (JWT Jitsi, chat, cleanup GDPR, presign upload, asset, garden ping, SBOM changelog). Le due falle già trovate (impersonazione in chat, `/chat` senza auth) stavano entrambe in un handler: la copertura è partita da lì, ma le restanti route non hanno test |
 
 ## Copertura dei test — stato reale
 

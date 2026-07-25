@@ -3,7 +3,7 @@ name: pa-webinar
 description: Piattaforma per eventi pubblici digitali della PA italiana
 type: application
 version: 0.1.1
-appVersion: "0.1.0"
+appVersion: "0.8.9"
 home: https://github.com/italia/pa-webinar
 icon: https://italia.github.io/bootstrap-italia/docs/assets/img/favicons/favicon-32x32.png
 keywords:
