@@ -1,23 +1,27 @@
 ---
-name: Feature
-about: Nuova funzionalità o componente
+name: Feature / Feature request
+about: Proponi una nuova funzionalità / Suggest a feature
 title: 'feat: '
 labels: enhancement
 assignees: ''
 ---
 
-## Descrizione
+## Descrizione / Description
 
-<!-- Descrivi la funzionalità -->
+<!-- Cosa dovrebbe fare / What it should do -->
 
-## Criteri di accettazione
+## Motivazione / Motivation
 
-- [ ] ...
+<!-- Quale problema risolve, per chi / Which problem it solves, for whom -->
 
-## Note tecniche
+## Criteri di accettazione / Acceptance criteria
 
-<!-- Componenti coinvolti, API, dipendenze -->
+- [ ]
 
-## Screenshot / Mockup
+## Note tecniche / Technical notes
 
-<!-- Se applicabile -->
+<!-- Componenti coinvolti, API, dipendenze / Components, APIs, dependencies -->
+
+## Screenshot / mockup
+
+<!-- Se applicabile / If applicable -->
