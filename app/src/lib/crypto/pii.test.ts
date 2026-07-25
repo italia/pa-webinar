@@ -218,8 +218,24 @@ describe('getKey production guard', () => {
 
   it('rejects the public dev placeholder key in production', () => {
     vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('PII_ENCRYPTION_KEY', TEST_KEY); // the committed 0123..ef placeholder
+    vi.stubEnv('PII_ENCRYPTION_KEY', TEST_KEY); // 0123..ef, the historical placeholder
     expect(() => encryptPII('x')).toThrow(/placeholder/i);
+  });
+
+  it('rejects the placeholder ACTUALLY shipped in .env.example / docker-compose', () => {
+    // Regression: the guard used to match only the literal 0123..ef string, so
+    // changing the example key to c0ffee00... silently disabled it.
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('PII_ENCRYPTION_KEY', 'c0ffee00'.repeat(8));
+    expect(() => encryptPII('x')).toThrow(/placeholder/i);
+  });
+
+  it('rejects any short-period repeated key (deadbeef, abab…)', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    for (const k of ['deadbeef'.repeat(8), 'ab'.repeat(32), 'f'.repeat(64)]) {
+      vi.stubEnv('PII_ENCRYPTION_KEY', k);
+      expect(() => encryptPII('x'), k).toThrow(/placeholder/i);
+    }
   });
 
   it('rejects a single-nibble key (e.g. all zeros) in production', () => {
