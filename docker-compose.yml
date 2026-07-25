@@ -46,6 +46,7 @@ services:
       # Deroga SOLO per lo stack di sviluppo/e2e. Mai in produzione: genera una
       # chiave vera con `openssl rand -hex 32`.
       - ALLOW_INSECURE_PII_KEY=true
+      - REDIS_URL=redis://redis:6379
       - DEFAULT_PRIVACY_POLICY_URL=http://localhost:3000/it/privacy
       - CRON_API_KEY=dev_cron_key_change_in_production
       - ADMIN_API_KEY=dev_admin_key_2026
@@ -56,6 +57,8 @@ services:
       - RECORDER_CONTROLLER_URL=http://recorder-controller:8080
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
@@ -206,6 +209,22 @@ services:
       - prosody
 
   # ── Mailpit (local email testing) ────────────────────────
+  # ── Redis ───────────────────────────────────────────────────────────
+  # In produzione è il canale pub/sub che fa arrivare chat, mani alzate e
+  # aggiornamenti della piazza a TUTTI i pod, oltre allo snapshot dei JVB.
+  # L'app funziona anche senza (ripiega su null), ma su una VM singola tenerlo
+  # acceso significa esercitare lo stesso codice della produzione invece del
+  # ramo degradato — e i bug di fan-out si vedono qui invece che in cluster.
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   mailpit:
     image: axllent/mailpit:latest
     restart: unless-stopped

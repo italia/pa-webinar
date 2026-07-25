@@ -4,7 +4,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/italia/pa-webinar/badge)](https://scorecard.dev/viewer/?uri=github.com/italia/pa-webinar)
 [![License: EUPL-1.2](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
 [![publiccode.yml](https://img.shields.io/badge/publiccode-available-brightgreen.svg)](publiccode.yml)
-[![Tests](https://img.shields.io/badge/tests-1284%20passing-brightgreen.svg)](#qualità-e-sicurezza)
+[![Tests](https://img.shields.io/badge/tests-1287%20passing-brightgreen.svg)](#qualità-e-sicurezza)
 
 Piattaforma open-source per eventi pubblici digitali della Pubblica Amministrazione italiana, basata su [Jitsi Meet](https://jitsi.org/) e il [design system .italia](https://designers.italia.it/). Sviluppata dal [Dipartimento per la Trasformazione Digitale](https://innovazione.gov.it/).
 
@@ -265,10 +265,11 @@ External Secrets Operator. Vedi [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 Lo stack `docker-compose` **non è solo una demo**: serve a sviluppare e a
 replicare la piattaforma su una **VM singola**, senza cluster. Fa girare app,
-PostgreSQL, l'intero stack Jitsi, Mailpit e uno scheduler che chiama gli stessi
-endpoint dei CronJob (così le email partono davvero, i promemoria scattano e la
-pulizia GDPR gira anche in locale). Il recorder multi-traccia ha una variante
-non-Kubernetes che usa il socket Docker: `--profile recorder`.
+PostgreSQL, Redis, l'intero stack Jitsi, Mailpit e uno scheduler che chiama gli
+stessi endpoint dei CronJob (così le email partono davvero, i promemoria
+scattano e la pulizia GDPR gira anche in locale). Il recorder multi-traccia ha
+una variante non-Kubernetes che usa il socket Docker: `--profile recorder`.
+Funziona anche con **Podman**.
 
 Cosa **non** c'è su VM singola: lo scale-to-zero dei JVB (serve un autoscaler di
 cluster; in locale il bridge è sempre acceso), la pipeline AI di post-produzione
