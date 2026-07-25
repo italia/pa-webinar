@@ -227,7 +227,11 @@ Con l'opzione disattivata (impostazione predefinita) **nessuna** richiesta viene
 
 ## Diritti dell'interessato / Data Subject Rights
 
-I partecipanti possono esercitare i diritti previsti dal GDPR (accesso, rettifica, cancellazione, portabilità) contattando l'organizzatore dell'evento o il Dipartimento per la Trasformazione Digitale.
+Accesso (Art. 15) e cancellazione (Art. 17) si esercitano **in autonomia** dalla
+pagina `/[locale]/privacy/my-data`, con conferma via email — il dettaglio del
+flusso è più sotto. Per gli altri diritti (rettifica, portabilità, opposizione)
+si contatta l'organizzatore dell'evento o il Dipartimento per la Trasformazione
+Digitale.
 
 La cancellazione automatica dei dati al termine del periodo di conservazione garantisce il principio di minimizzazione dei dati.
 
@@ -280,13 +284,37 @@ Azioni registrate:
 
 ### Diritto di accesso (Art. 15)
 
-Endpoint: `GET /api/gdpr/export?email=xxx`
+Il flusso è a **due passi**, così i dati li vede solo chi possiede davvero la
+casella di posta indicata (un endpoint che accetta l'email in chiaro
+permetterebbe a chiunque di estrarre i dati altrui conoscendo un indirizzo):
 
-- L'email viene hashata e confrontata con `emailHash` nelle registrazioni.
-- Restituisce: registrazioni, eventi, domande Q&A, voti ai sondaggi.
-- Non restituisce dati di altri partecipanti.
-- Rate limit: 3 richieste per ora per IP.
-- Pagina utente: `/[locale]/privacy/i-miei-dati`
+1. `POST /api/gdpr/export/request` — si indica l'email; il sistema invia a
+   quell'indirizzo un link con un **token firmato di breve durata (1 ora)**.
+   Risponde sempre `200`, anche se l'indirizzo non è registrato, per non
+   rivelare chi è iscritto.
+2. `GET /api/gdpr/export?t=<token>` — il link della mail restituisce i dati.
+   Senza token valido risponde `400`.
+
+- Il token porta con sé l'`emailHash`: l'email in chiaro non transita mai qui.
+- Restituisce: registrazioni, eventi, domande Q&A, voti ai sondaggi. Mai dati
+  di altri partecipanti.
+- Rate limit: 10 richieste/ora per IP sul passo 2.
+- Pagina utente: `/[locale]/privacy/my-data`
+
+### Diritto alla cancellazione (Art. 17)
+
+Stesso schema a due passi, con conferma via email:
+
+1. `POST /api/gdpr/erasure/request` — invia il link con token firmato.
+2. `POST /api/gdpr/erasure?t=<token>` — cancella tutte le `Registration`
+   associate a quell'`emailHash` e, in cascata, domande Q&A, voti ai sondaggi,
+   feedback e promemoria collegati.
+
+- Le **registrazioni video** non vengono cancellate qui: seguono la retention a
+  livello di evento ed eventuali obblighi di conservazione.
+- Ogni cancellazione scrive una riga `GdprAuditLog` per evento interessato, con
+  soli conteggi e il prefisso dell'hash email (nessun dato personale).
+- Pagina utente: `/[locale]/privacy/my-data/erasure`
 
 ### Anteprima conservazione dati
 

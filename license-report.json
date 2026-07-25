@@ -33,7 +33,7 @@
     "email": "diego.perini@gmail.com",
     "url": "http://www.iport.it/"
   },
-  "@asteasolutions/zod-to-openapi@8.5.0": {
+  "@asteasolutions/zod-to-openapi@7.3.4": {
     "licenses": "MIT",
     "repository": "https://github.com/asteasolutions/zod-to-openapi",
     "publisher": "Astea Solutions",

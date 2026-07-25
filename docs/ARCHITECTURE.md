@@ -864,7 +864,7 @@ graph LR
     subgraph "CronJob jvb-scaler (every 2 min)"
         A1[kubectl get deployment jvb] --> A2[list pods jvb]
         A2 --> A3[kubectl exec curl /colibri/stats<br/>on each pod]
-        A3 --> A4[aggregate sum(participants, bitrate...)<br/>max(stress_level)]
+        A3 --> A4["aggregate sum(participants, bitrate...)<br/>max(stress_level)"]
         A4 --> A5[GET /api/internal/jvb-desired-replicas<br/>?current=&ready=&participants=&...]
     end
 
