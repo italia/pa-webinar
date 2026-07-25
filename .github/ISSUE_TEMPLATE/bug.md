@@ -1,35 +1,38 @@
 ---
-name: Bug
-about: Segnala un bug
+name: Bug / Bug report
+about: Segnala un problema / Report a bug
 title: 'fix: '
 labels: bug
 assignees: ''
 ---
 
-## Descrizione
+<!--
+  Se il problema riguarda la SICUREZZA non aprire una issue pubblica: segui SECURITY.md.
+  If the issue is security related, do not open a public issue: see SECURITY.md.
+-->
 
-<!-- Descrivi il bug -->
+## Descrizione / Description
 
-## Come riprodurre
+<!-- Cosa non funziona / What is broken -->
 
-1. ...
-2. ...
-3. ...
+## Come riprodurre / Steps to reproduce
 
-## Comportamento atteso
+1.
+2.
+3.
 
-<!-- Cosa dovrebbe succedere -->
+## Comportamento atteso / Expected behavior
 
-## Comportamento attuale
+## Comportamento attuale / Actual behavior
 
-<!-- Cosa succede invece -->
+## Ambiente / Environment
 
-## Ambiente
-
+- Versione / Version (vedi `/changelog` o il tag):
 - Browser:
-- OS:
-- Versione app:
+- Sistema operativo / OS:
+- Modalità di deploy / Deployment mode (simple, standard, full):
 
-## Screenshot
+## Screenshot / log
 
-<!-- Se applicabile -->
+<!-- Se applicabile. Rimuovi i dati personali dai log. -->
+<!-- If applicable. Strip personal data from logs. -->

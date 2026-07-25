@@ -30,7 +30,7 @@ kubectl create namespace videocall
 
 # 2. Installa
 helm upgrade --install videocall ./infra/helm/pa-webinar \
-  -f examples/values-simple.yaml \
+  -f infra/helm/pa-webinar/examples/values-simple.yaml \
   -n videocall \
   --set postgresql.auth.password="$(openssl rand -hex 16)" \
   --set secrets.generate.APP_SECRET="$(openssl rand -hex 32)" \
@@ -73,7 +73,7 @@ kubectl create secret generic videocall-secrets -n videocall \
 
 # 2. Installa
 helm upgrade --install videocall ./infra/helm/pa-webinar \
-  -f examples/values-standard.yaml \
+  -f infra/helm/pa-webinar/examples/values-standard.yaml \
   -n videocall \
   --set app.env.NEXT_PUBLIC_APP_URL=https://videocall.tuodominio.com \
   --set "ingress.hosts[0].host=videocall.tuodominio.com" \
@@ -105,7 +105,7 @@ kubectl create secret generic videocall-secrets -n videocall --from-literal=...
 
 # 2. Installa
 helm upgrade --install videocall ./infra/helm/pa-webinar \
-  -f examples/values-full.yaml \
+  -f infra/helm/pa-webinar/examples/values-full.yaml \
   -n videocall \
   --set app.env.NEXT_PUBLIC_APP_URL=https://videocall.tuodominio.com \
   --set "ingress.hosts[0].host=videocall.tuodominio.com" \
@@ -336,7 +336,7 @@ git push origin v0.3.0
 
 # 2. Aggiorna il deployment
 helm upgrade videocall ./infra/helm/pa-webinar \
-  -f examples/values-full.yaml \  # o il tuo file di override
+  -f infra/helm/pa-webinar/examples/values-full.yaml \  # o il tuo file di override
   -n videocall \
   --set app.image.tag=v0.3.0
 ```

@@ -155,7 +155,7 @@ npm run db:seed --workspace=app
 npm run dev --workspace=app
 ```
 
-Assicurati che le variabili d'ambiente per la connessione al database e a Jitsi siano configurate correttamente (vedi `.env.example` nel workspace `app`).
+Assicurati che le variabili d'ambiente per la connessione al database e a Jitsi siano configurate correttamente (vedi `.env.example` nella radice del repository).
 
 ## Database
 
@@ -254,7 +254,7 @@ I test E2E richiedono lo stack completo in esecuzione (app + database + Jitsi + 
 | Naming hook | `use-kebab-case.ts` → `export function useNomeHook` |
 | Naming API routes | `route.ts` con export nominati (`GET`, `POST`, `PUT`, `DELETE`) |
 | UI framework | Solo `design-react-kit` + `bootstrap-italia` |
-| CSS custom | Non consentito. Usare classi utility di Bootstrap Italia |
+| CSS custom | Solo in `app/src/styles/globals.scss` (override tematici centralizzati). Nei componenti usare le utility di Bootstrap Italia |
 | Stringhe UI | Mai hardcoded. Sempre tramite `next-intl` (file `i18n/messages/`) |
 | Validazione | Schemi Zod per input API e form |
 | Componenti server | Default. Client component (`'use client'`) solo quando necessario |
