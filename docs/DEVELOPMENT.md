@@ -114,15 +114,34 @@ sviluppare e a far girare tutto su una **VM singola**. Questa tabella dice cosa
 | Portale, registrazioni, sala live, Q&A, sondaggi, word cloud, reazioni, timer | ✅ | ✅ |
 | Email (conferme, promemoria, iCal) | ✅ catturate da Mailpit; il servizio `cron` drena la coda `EmailOutbox` | ✅ CronJob |
 | Promemoria e pulizia GDPR | ✅ via servizio `cron` | ✅ CronJob |
-| Chat in tempo reale | ✅ singola istanza (senza Redis il fan-out fra pod non serve) | ✅ con Redis pub/sub multi-pod |
+| Chat in tempo reale, mani alzate, piazza | ✅ con Redis, lo stesso pub/sub della produzione | ✅ Redis pub/sub multi-pod |
 | Registrazione multi-traccia (recorder) | ✅ con `--profile recorder` (spawn via socket Docker) | ✅ Job per evento |
-| Scale-to-zero dei JVB | ❌ il bridge resta acceso: serve l'autoscaler di cluster | ✅ CronJob `jvb-scaler` + node pool |
-| Pipeline AI post-evento (trascrizione, sottotitoli, doppiaggio) | ❌ richiede GPU | ✅ node pool GPU |
-| Scalabilità orizzontale, HPA, TLS automatico, segreti gestiti | ❌ | ✅ HPA, cert-manager, External Secrets |
+| Scale-to-zero dei JVB | ➖ non replicabile né utile: serve un autoscaler di cluster che spenga i nodi. In locale il bridge resta acceso | ✅ CronJob `jvb-scaler` + node pool |
+| Pipeline AI post-evento (trascrizione, sottotitoli, doppiaggio) | ❌ richiede GPU e ~10 GB di modelli | ✅ node pool GPU |
+| Scalabilità orizzontale, HPA, TLS automatico, segreti gestiti | ➖ una VM singola non scala orizzontalmente; TLS e segreti si gestiscono col reverse proxy e l'ambiente della VM | ✅ HPA, cert-manager, External Secrets |
+
+Legenda: ✅ disponibile · ➖ non applicabile a una VM singola (è una capacità
+del cluster, non una funzionalità mancante) · ❌ limite tecnico.
+
+**Limiti invalicabili senza cluster/GPU** — da conoscere, non da aggirare:
+
+- **Pipeline AI** (trascrizione WhisperX, diarizzazione pyannote, doppiaggio):
+  richiede GPU CUDA e alcuni GB di modelli. Su CPU girerebbe in linea teorica,
+  ma con tempi tali da non essere utilizzabile: resta una capacità del deploy
+  con node pool GPU. In locale il resto della piattaforma funziona senza.
+- **Scale-to-zero dei JVB**: ha senso solo dove si pagano nodi a consumo e un
+  autoscaler può spegnerli. Su una VM il bridge è già lì.
+- **Jibri (registrazione video classica)**: richiede moduli audio del kernel
+  (loopback ALSA) e container privilegiati; sulla VM si usa il recorder
+  multi-traccia (`--profile recorder`), che non ne ha bisogno.
 
 > Se in locale un'email non arriva, la prima cosa da controllare è il servizio
 > `cron` (`docker compose logs cron`): senza di lui le email vengono accodate e
 > mai inviate, e la registrazione sembra riuscita a metà.
+
+> Lo stack è stato verificato anche con **Podman** (`podman compose`): i
+> servizi, la risoluzione dei nomi e gli healthcheck si comportano allo stesso
+> modo.
 
 ## Ambiente di sviluppo
 
