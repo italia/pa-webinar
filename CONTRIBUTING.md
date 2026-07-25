@@ -22,7 +22,7 @@ Apri una [issue](https://github.com/italia/pa-webinar/issues) descrivendo:
 
 ### Requisiti per le Pull Request
 
-- Il codice deve compilare senza errori TypeScript (`npx tsc --noEmit`)
+- Il codice deve compilare senza errori TypeScript (`npx tsc --noEmit --project app/tsconfig.json`)
 - Le stringhe UI devono essere localizzate in italiano e inglese (file in `app/src/i18n/messages/`)
 - I componenti UI devono usare [design-react-kit](https://italia.github.io/design-react-kit/) e seguire le [Linee guida di design](https://designers.italia.it/)
 - Le API devono validare l'input con Zod e non esporre dati sensibili nelle risposte
@@ -99,7 +99,7 @@ Open an [issue](https://github.com/italia/pa-webinar/issues) describing:
 
 ### Pull Request requirements
 
-- Code must compile without TypeScript errors (`npx tsc --noEmit`)
+- Code must compile without TypeScript errors (`npx tsc --noEmit --project app/tsconfig.json`)
 - UI strings must be localized in Italian and English (`app/src/i18n/messages/`)
 - UI components must use [design-react-kit](https://italia.github.io/design-react-kit/) and follow the [Italian design guidelines](https://designers.italia.it/)
 - APIs must validate input with Zod and must not expose sensitive data in responses

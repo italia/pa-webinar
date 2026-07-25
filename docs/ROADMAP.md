@@ -1,6 +1,6 @@
 # Roadmap — pa-webinar
 
-Allineata al 2026-07-22, **verificata contro il codice** (non contro gli stati dichiarati). In produzione: **v0.8.6**.
+Allineata al 2026-07-25, **verificata contro il codice** (non contro gli stati dichiarati). In produzione: **v0.8.9**.
 
 Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici rispetto a ciò che il codice fa davvero oggi.
 
@@ -133,7 +133,7 @@ Voci spedite e funzionanti, ognuna con un confine che vale la pena conoscere pri
 | **Scale-to-zero JVB (ADR-007)** | `/colibri/stats` è aggregato per pod: due eventi LIVE sullo stesso bridge tengono acceso il nodepool anche se uno si è svuotato |
 | **i18n a 24 lingue (ADR-008)** | Il fallback delle chiavi mancanti ricade sull'**italiano**, non sull'inglese |
 | **Piazza della sala d'attesa** | Le emote sono locali: chi le usa vede la propria animazione, gli altri no |
-| **Copertura dei test** | 844 casi, nessuno su un handler API. Le due falle già trovate (impersonazione in chat, `/chat` senza auth) stavano entrambe in un handler — vedi la voce "test di handler" in v0.8 |
+| **Copertura dei test** | 1284 casi in 75 file, di cui **7 su handler API** (JWT Jitsi, chat, cleanup GDPR, presign upload, asset, garden ping, SBOM changelog). Le due falle già trovate (impersonazione in chat, `/chat` senza auth) stavano entrambe in un handler: la copertura è partita da lì, ma le restanti route non hanno test |
 
 ## Copertura dei test — stato reale
 
@@ -141,7 +141,10 @@ Misurata, non stimata (`npm run test:coverage --workspace=app`): **5,5% per riga
 
 Le soglie in `app/vitest.config.ts` sono un **cricchetto sul pavimento misurato** — impediscono che scenda, non dichiarano che vada bene. In CI girano con `--coverage`, quindi da ora una regressione di copertura fa fallire la build.
 
-Da qui in avanti si sale dai punti in cui vivono le guardie, non dai più facili: conio del JWT Jitsi, autorizzazione della chat, cleanup GDPR, presign dell'upload.
+Si sale dai punti in cui vivono le guardie, non dai più facili. I primi quattro
+sono stati coperti (conio del JWT Jitsi, autorizzazione della chat, cleanup GDPR,
+presign dell'upload); i prossimi sono le route di registrazione, il webhook di
+registrazione video e le rotte admin.
 
 ## v0.8.0 — In corso / prossima
 

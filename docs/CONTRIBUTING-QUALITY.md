@@ -18,7 +18,12 @@ Questo progetto segue gli standard di qualità ispirati al programma badge di
   (`npm run license:report` + `THIRD-PARTY-LICENSES.md`)
 - **OpenSSF Scorecard**: analisi settimanale (`.github/workflows/scorecard.yml`)
   pubblicata su GitHub Security — badge in README
-- **Secret detection**: pre-commit hooks con detect-secrets
+- **Nessun segreto nel repository**: le credenziali non stanno nel codice ma
+  vengono iniettate a runtime (External Secrets Operator + Azure Key Vault in
+  produzione, variabili d'ambiente in locale). I valori negli esempi
+  (`.env.example`, `docker-compose.yml`) sono fittizi e la cifratura PII
+  li **rifiuta in produzione** (`app/src/lib/crypto/pii.ts`). Nota: NON esiste
+  un hook pre-commit di secret scanning — il controllo è la review.
 - **Security policy**: SECURITY.md con processo di disclosure responsabile
 - **Container sicuri**: non-root, read-only filesystem, seccomp, drop ALL capabilities
 
@@ -54,4 +59,4 @@ Ogni PR deve:
 2. Non introdurre dipendenze con licenze incompatibili
 3. Includere test per la nuova logica
 4. Aggiornare la documentazione se necessario
-5. Non contenere segreti o dati personali (pre-commit check)
+5. Non contenere segreti o dati personali (verificato in review)

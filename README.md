@@ -4,7 +4,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/italia/pa-webinar/badge)](https://scorecard.dev/viewer/?uri=github.com/italia/pa-webinar)
 [![License: EUPL-1.2](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
 [![publiccode.yml](https://img.shields.io/badge/publiccode-available-brightgreen.svg)](publiccode.yml)
-[![Tests](https://img.shields.io/badge/tests-1178%20passing-brightgreen.svg)](#qualità-e-sicurezza)
+[![Tests](https://img.shields.io/badge/tests-1284%20passing-brightgreen.svg)](#qualità-e-sicurezza)
 
 Piattaforma open-source per eventi pubblici digitali della Pubblica Amministrazione italiana, basata su [Jitsi Meet](https://jitsi.org/) e il [design system .italia](https://designers.italia.it/). Sviluppata dal [Dipartimento per la Trasformazione Digitale](https://innovazione.gov.it/).
 
@@ -115,7 +115,9 @@ flowchart LR
   Jicofo --- JVB
 ```
 
-**Decisioni chiave** (ADR in [`docs/adr/`](docs/adr/)):
+**Decisioni chiave** — il razionale completo è in
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); le più recenti hanno anche un
+record dedicato in [`docs/adr/`](docs/adr/):
 1. Jitsi IFrame API invece di lib-jitsi-meet — design control senza forkare Jitsi
 2. Next.js fullstack (un deployable, API + UI insieme)
 3. Moderatori via magic link (nessun account utente)
@@ -253,6 +255,27 @@ docker compose --profile setup run --rm db-migrate
 
 Dev mode (hot reload): `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`.
 
+### Dove gira: Kubernetes, e una VM singola
+
+Il bersaglio di produzione è **Kubernetes**: il chart Helm è l'unità di
+installazione supportata e alcune capacità sono native del cluster — lo
+scale-to-zero dei Jitsi Video Bridge (autoscaler sul node pool), i lavori
+periodici come CronJob, il recorder multi-traccia che crea Job, i segreti via
+External Secrets Operator. Vedi [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+Lo stack `docker-compose` **non è solo una demo**: serve a sviluppare e a
+replicare la piattaforma su una **VM singola**, senza cluster. Fa girare app,
+PostgreSQL, l'intero stack Jitsi, Mailpit e uno scheduler che chiama gli stessi
+endpoint dei CronJob (così le email partono davvero, i promemoria scattano e la
+pulizia GDPR gira anche in locale). Il recorder multi-traccia ha una variante
+non-Kubernetes che usa il socket Docker: `--profile recorder`.
+
+Cosa **non** c'è su VM singola: lo scale-to-zero dei JVB (serve un autoscaler di
+cluster; in locale il bridge è sempre acceso), la pipeline AI di post-produzione
+(richiede GPU) e la scalabilità orizzontale multi-nodo. La tabella completa di
+cosa è attivo in locale è in
+[`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md#parità-con-la-produzione).
+
 Setup completo (db, test, troubleshooting): [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 
 ---
@@ -286,6 +309,7 @@ Setup completo (db, test, troubleshooting): [`docs/DEVELOPMENT.md`](docs/DEVELOP
 | [`docs/LOAD-TESTING.md`](docs/LOAD-TESTING.md) | Benchmark, misurazioni reali, sizing JVB |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Rilasciato, in corso, a venire |
 | [`docs/adr/`](docs/adr/) | Architecture Decision Records |
+| [`docs/README.md`](docs/README.md) | **Indice di tutta la documentazione** |
 
 ---
 

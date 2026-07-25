@@ -3,8 +3,8 @@ name: pa-webinar
 applicationSuite: pa-webinar
 url: "https://github.com/italia/pa-webinar"
 landingURL: "https://github.com/italia/pa-webinar"
-softwareVersion: "0.5.1"
-releaseDate: "2026-06-04"
+softwareVersion: "0.8.9"
+releaseDate: "2026-07-23"
 developmentStatus: beta
 softwareType: standalone/web
 platforms:
@@ -105,7 +105,7 @@ description:
       avanzata, inviti email con allegato iCal, interfaccia multilingue (24 lingue UE), design system
       .italia, API REST documentate in OpenAPI 3, cloud-native (Kubernetes, Helm).
     documentation: "https://github.com/italia/pa-webinar/tree/main/docs"
-    apiDocumentation: "https://github.com/italia/pa-webinar/blob/main/api/openapi.json"
+    apiDocumentation: "https://pa-webinar.developers.italia.it/api/openapi.json"
     features:
       - Video conferenza con Jitsi Meet, scalabile orizzontalmente su Kubernetes
       - Q&A con sistema di upvote
@@ -138,7 +138,7 @@ description:
       standard JVB bridge (extendable via bridge cascading); total platform capacity bounded only by
       cluster resources, with auto-scaling JVB bridges and scale-to-zero when idle.
     documentation: "https://github.com/italia/pa-webinar/tree/main/docs"
-    apiDocumentation: "https://github.com/italia/pa-webinar/blob/main/api/openapi.json"
+    apiDocumentation: "https://pa-webinar.developers.italia.it/api/openapi.json"
     features:
       - Video conferencing with Jitsi Meet, horizontally scalable on Kubernetes
       - Q&A with upvote system

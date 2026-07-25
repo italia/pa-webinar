@@ -4,7 +4,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/italia/pa-webinar/badge)](https://scorecard.dev/viewer/?uri=github.com/italia/pa-webinar)
 [![License: EUPL-1.2](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
 [![publiccode.yml](https://img.shields.io/badge/publiccode-available-brightgreen.svg)](publiccode.yml)
-[![Tests](https://img.shields.io/badge/tests-1178%20passing-brightgreen.svg)](#quality--security)
+[![Tests](https://img.shields.io/badge/tests-1284%20passing-brightgreen.svg)](#quality--security)
 
 Open-source platform for public digital events run by the Italian Public Administration, built on top of [Jitsi Meet](https://jitsi.org/) and the [.italia design system](https://designers.italia.it/). Developed by the [Department for Digital Transformation](https://innovazione.gov.it/).
 
@@ -115,7 +115,9 @@ flowchart LR
   Jicofo --- JVB
 ```
 
-**Key decisions** (ADRs in [`docs/adr/`](docs/adr/)):
+**Key decisions** — the full rationale lives in
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); the most recent ones also have a
+dedicated record in [`docs/adr/`](docs/adr/):
 1. Jitsi IFrame API instead of lib-jitsi-meet — full UX control without forking Jitsi
 2. Full-stack Next.js (a single deployable, API + UI together)
 3. Moderators via magic link (no user accounts)
@@ -286,6 +288,7 @@ Full setup (DB, tests, troubleshooting): [`docs/DEVELOPMENT.md`](docs/DEVELOPMEN
 | [`docs/LOAD-TESTING.md`](docs/LOAD-TESTING.md) | Benchmarks, real measurements, JVB sizing |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Shipped, in progress, planned |
 | [`docs/adr/`](docs/adr/) | Architecture Decision Records |
+| [`docs/README.md`](docs/README.md) | **Index of all documentation** |
 
 ---
 
