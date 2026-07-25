@@ -84,8 +84,16 @@ ENV NEXT_PUBLIC_BUILD_SHA=$NEXT_PUBLIC_BUILD_SHA
 ENV NEXT_PUBLIC_BUILD_CHANNEL=$NEXT_PUBLIC_BUILD_CHANNEL
 ENV NEXT_PUBLIC_BUILD_DATE=$NEXT_PUBLIC_BUILD_DATE
 
-# Copy installed deps from stage 1
+# Copy installed deps from stage 1.
+#
+# NON basta la radice: npm hoista quasi tutto in /workspace/node_modules, ma
+# quando una dipendenza confligge con un'altra versione nell'albero la annida
+# sotto il workspace (app/node_modules, lobby/node_modules). Copiando solo la
+# radice quei pacchetti sparivano e il build falliva con "Module not found" —
+# invisibile in locale, dove le cartelle dei workspace ci sono comunque.
 COPY --from=deps /workspace/node_modules ./node_modules
+COPY --from=deps /workspace/app/node_modules ./app/node_modules
+COPY --from=deps /workspace/lobby/node_modules ./lobby/node_modules
 COPY --from=deps /workspace/package.json ./
 
 # Copy full app source + the lobby workspace (transpiled by Next via

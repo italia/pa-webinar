@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Seguridad de las dependencias, documentación alineada y entorno local completo",
+    "notes": [
+      "Se han resuelto todas las vulnerabilidades conocidas en las dependencias, y las comprobaciones automáticas del código ya no se ejecutan en la infraestructura que aloja los eventos: una propuesta de cambio externa ya no puede ejecutar nada allí.",
+      "La documentación vuelve a coincidir con el software: las instrucciones de instalación, los comandos y las páginas de privacidad y seguridad describen lo que el sistema hace realmente, para quien reutilice la plataforma en su propia administración.",
+      "Quien instala en una sola máquina obtiene ahora también las tareas periódicas (envío de correos, recordatorios, borrado de datos al vencer) y el chat en tiempo real, como en producción.",
+      "Correcciones: la página que describe la API pública ya no da error, y la protección de la clave de cifrado de los datos personales vuelve a actuar cuando no se ha configurado una clave real."
+    ]
+  },
   "0.8.9": {
     "title": "El registro de cambios, ahora con el inventario de software integrado",
     "notes": [

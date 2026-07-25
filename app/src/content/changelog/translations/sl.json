@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Varnost odvisnosti, usklajena dokumentacija in popolno lokalno okolje",
+    "notes": [
+      "Vse znane ranljivosti v odvisnostih so odpravljene, samodejna preverjanja kode pa ne tečejo več na infrastrukturi, ki gosti dogodke: zunanji predlog spremembe tam ne more več ničesar izvesti.",
+      "Dokumentacija zdaj ustreza programski opremi: navodila za namestitev, ukazi ter strani o zasebnosti in varnosti opisujejo, kaj sistem v resnici počne — za vse, ki platformo ponovno uporabijo v svoji upravi.",
+      "Namestitev na enem računalniku zdaj vključuje tudi periodična opravila (pošiljanje e-pošte, opomnike, brisanje podatkov ob poteku) in klepet v realnem času, kot v produkciji.",
+      "Popravki: stran, ki opisuje javni API, ne javlja več napake, zaščita ključa za šifriranje osebnih podatkov pa spet deluje, kadar pravi ključ ni nastavljen."
+    ]
+  },
   "0.8.9": {
     "title": "Dnevnik sprememb, zdaj z vgrajenim popisom programske opreme",
     "notes": [

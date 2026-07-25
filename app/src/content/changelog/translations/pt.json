@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Segurança das dependências, documentação alinhada e ambiente local completo",
+    "notes": [
+      "Todas as vulnerabilidades conhecidas nas dependências foram resolvidas, e as verificações automáticas do código já não são executadas na infraestrutura que aloja os eventos: uma proposta de alteração externa já não pode executar nada aí.",
+      "A documentação corresponde agora ao software: as instruções de instalação, os comandos e as páginas sobre privacidade e segurança descrevem o que o sistema realmente faz — para quem reutiliza a plataforma na sua própria administração.",
+      "Quem instala numa única máquina passa a ter também as tarefas periódicas (envio de e-mails, lembretes, eliminação dos dados no fim do prazo) e o chat em tempo real, tal como em produção.",
+      "Correções: a página que descreve a API pública deixou de dar erro, e a proteção da chave de cifragem dos dados pessoais volta a atuar quando não foi configurada uma chave verdadeira."
+    ]
+  },
   "0.8.9": {
     "title": "O registo de alterações, agora com o inventário de software integrado",
     "notes": [

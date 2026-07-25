@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Slándáil spleáchas, doiciméadú ailínithe agus cruachán áitiúil iomlán",
+    "notes": [
+      "Réitíodh gach leochaileacht aitheanta sna spleáchais, agus ní ritheann na seiceálacha uathoibríocha cóid ar an mbonneagar a óstálann na himeachtaí a thuilleadh: ní féidir le moladh athraithe seachtrach aon rud a rith ann.",
+      "Freagraíonn an doiciméadú don bhogearra anois: treoracha suiteála, orduithe agus na leathanaigh faoi phríobháideachas agus slándáil ag cur síos ar a ndéanann an córas i ndáiríre — do dhuine ar bith a athúsáideann an t-ardán ina riarachán féin.",
+      "Le suiteáil ar aon mheaisín amháin faightear anois na tascanna tréimhsiúla freisin (seoladh ríomhphoist, meabhrúcháin, scriosadh sonraí ag dul in éag) agus comhrá fíor-ama, mar atá i dtáirgeadh.",
+      "Ceartúcháin: ní theipeann ar an leathanach a chuireann síos ar an API poiblí a thuilleadh, agus oibríonn cosaint na heochrach criptithe sonraí pearsanta arís nuair nach bhfuil fíor-eochair cumraithe."
+    ]
+  },
   "0.8.9": {
     "title": "An logáil athruithe, anois le fardal bogearraí ionsuite",
     "notes": [

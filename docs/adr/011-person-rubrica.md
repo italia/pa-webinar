@@ -1,6 +1,6 @@
 # ADR-011 — Identità cross-evento `Person` + Rubrica
 
-**Stato**: Proposto (2026-04-21)
+**Stato**: Accettato e implementato (proposto 2026-04-21) — rubrica, opt-in esplicito e opt-out via token HMAC sono in produzione dalla v0.4.0.
 **Decisori**: team pa-webinar / DTD
 **Contesto abilitante**: v0.5.0 — Questionari + Rubrica (fase B)
 

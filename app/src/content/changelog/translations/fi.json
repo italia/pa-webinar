@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Riippuvuuksien tietoturva, ajantasainen dokumentaatio ja täysi paikallinen ympäristö",
+    "notes": [
+      "Kaikki tunnetut riippuvuuksien haavoittuvuudet on korjattu, eivätkä automaattiset koodintarkistukset enää suoritu infrastruktuurissa, joka isännöi tapahtumia: ulkopuolinen muutosehdotus ei voi enää suorittaa siellä mitään.",
+      "Dokumentaatio vastaa nyt ohjelmistoa: asennusohjeet, komennot sekä tietosuoja- ja turvallisuussivut kuvaavat, mitä järjestelmä todella tekee — kaikille, jotka ottavat alustan uudelleenkäyttöön omassa hallinnossaan.",
+      "Yhdelle koneelle asennettaessa mukaan tulevat nyt myös ajastetut tehtävät (sähköpostien lähetys, muistutukset, tietojen poisto määräajan päätyttyä) ja reaaliaikainen keskustelu, kuten tuotannossa.",
+      "Korjaukset: julkista rajapintaa kuvaava sivu ei enää anna virhettä, ja henkilötietojen salausavaimen suojaus toimii taas, kun oikeaa avainta ei ole määritetty."
+    ]
+  },
   "0.8.9": {
     "title": "Muutosloki, nyt sisäänrakennetulla ohjelmistoluettelolla",
     "notes": [

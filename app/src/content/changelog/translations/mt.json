@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Sigurtà tad-dipendenzi, dokumentazzjoni allinjata u stack lokali komplut",
+    "notes": [
+      "Il-vulnerabbiltajiet magħrufa kollha fid-dipendenzi ġew solvuti, u l-verifiki awtomatiċi tal-kodiċi ma jibqgħux jaħdmu fuq l-infrastruttura li tospita l-avvenimenti: proposta ta' bidla esterna ma tistax tibqa' tesegwixxi xejn hemm.",
+      "Id-dokumentazzjoni issa taqbel mas-software: l-istruzzjonijiet tal-installazzjoni, il-kmandi u l-paġni dwar il-privatezza u s-sigurtà jiddeskrivu dak li s-sistema tagħmel tassew — għal min jerġa' juża l-pjattaforma fl-amministrazzjoni tiegħu.",
+      "Min jinstalla fuq magna waħda issa jikseb ukoll ix-xogħlijiet perjodiċi (bagħt tal-emails, tfakkiriet, tħassir tad-data mal-iskadenza) u ċ-chat f'ħin reali, bħal fil-produzzjoni.",
+      "Korrezzjonijiet: il-paġna li tiddeskrivi l-API pubblika ma tibqax tagħti żball, u l-protezzjoni taċ-ċavetta taċ-ċifrar tad-data personali terġa' taħdem meta ma tkunx ikkonfigurata ċavetta vera."
+    ]
+  },
   "0.8.9": {
     "title": "Ir-reġistru tal-bidliet, issa bl-inventarju tas-software integrat",
     "notes": [

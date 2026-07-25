@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Beveiliging van afhankelijkheden, bijgewerkte documentatie en een volledige lokale omgeving",
+    "notes": [
+      "Alle bekende kwetsbaarheden in afhankelijkheden zijn verholpen, en de automatische codecontroles draaien niet langer op de infrastructuur die de evenementen host: een extern wijzigingsvoorstel kan daar niets meer uitvoeren.",
+      "De documentatie komt weer overeen met de software: installatie-instructies, commando’s en de pagina’s over privacy en beveiliging beschrijven wat het systeem werkelijk doet — voor iedereen die het platform hergebruikt in de eigen organisatie.",
+      "Wie op één machine installeert, krijgt nu ook de periodieke taken (e-mails versturen, herinneringen, gegevens verwijderen bij het verstrijken) en realtime chat, net als in productie.",
+      "Correcties: de pagina die de publieke API beschrijft geeft geen fout meer, en de bescherming van de sleutel voor versleuteling van persoonsgegevens werkt weer wanneer er geen echte sleutel is ingesteld."
+    ]
+  },
   "0.8.9": {
     "title": "Het wijzigingslogboek, nu met het software-inventaris ingebouwd",
     "notes": [

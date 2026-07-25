@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Sigurnost ovisnosti, usklađena dokumentacija i potpuno lokalno okruženje",
+    "notes": [
+      "Sve poznate ranjivosti u ovisnostima su otklonjene, a automatske provjere koda više se ne izvode na infrastrukturi koja poslužuje događaje: vanjski prijedlog izmjene ondje više ne može ništa izvršiti.",
+      "Dokumentacija sada odgovara softveru: upute za instalaciju, naredbe te stranice o privatnosti i sigurnosti opisuju što sustav doista radi — za sve koji platformu ponovno koriste u vlastitoj upravi.",
+      "Instalacija na jednom stroju sada uključuje i periodične poslove (slanje e-pošte, podsjetnike, brisanje podataka po isteku) i razgovor u stvarnom vremenu, kao u produkciji.",
+      "Ispravci: stranica koja opisuje javni API više ne javlja pogrešku, a zaštita ključa za šifriranje osobnih podataka ponovno djeluje kada pravi ključ nije postavljen."
+    ]
+  },
   "0.8.9": {
     "title": "Zapisnik promjena, sada s ugrađenim inventarom softvera",
     "notes": [

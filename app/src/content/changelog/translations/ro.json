@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Securitatea dependențelor, documentație aliniată și mediu local complet",
+    "notes": [
+      "Toate vulnerabilitățile cunoscute din dependențe au fost rezolvate, iar verificările automate ale codului nu mai rulează pe infrastructura care găzduiește evenimentele: o propunere externă de modificare nu mai poate executa nimic acolo.",
+      "Documentația corespunde acum software-ului: instrucțiunile de instalare, comenzile și paginile despre confidențialitate și securitate descriu ce face cu adevărat sistemul — pentru oricine reutilizează platforma în propria administrație.",
+      "Instalarea pe o singură mașină include acum și activitățile periodice (trimiterea e-mailurilor, mementouri, ștergerea datelor la expirare) și conversația în timp real, ca în producție.",
+      "Corecții: pagina care descrie API-ul public nu mai dă eroare, iar protecția cheii de criptare a datelor personale intervine din nou când nu a fost configurată o cheie reală."
+    ]
+  },
   "0.8.9": {
     "title": "Jurnalul de modificări, acum cu inventarul software integrat",
     "notes": [
