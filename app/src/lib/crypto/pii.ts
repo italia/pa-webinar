@@ -5,13 +5,26 @@ const IV_LENGTH = 12;
 const AUTH_TAG_LENGTH = 16;
 
 /**
- * The development placeholder shipped in the (now public) `.env.example` /
- * `docker-compose.yml`, plus any single-nibble key. Encrypting PII with a value
- * that is public in the repo gives no confidentiality, so in production we
- * fail closed — the same stance `APP_SECRET` already takes.
+ * True for the development placeholders shipped in the (now public)
+ * `.env.example` / `docker-compose.yml`, and for any key of the same shape.
+ * Encrypting PII with a value that is public in the repo gives no
+ * confidentiality, so in production we fail closed — the same stance
+ * `APP_SECRET` already takes.
+ *
+ * The test is GENERIC on purpose: every such placeholder is a short block
+ * repeated to length (`c0ffee00`×8, `0123456789abcdef`×4, `0`×64), while a key
+ * from `openssl rand -hex 32` has no short period. Matching the literal strings
+ * instead would silently stop protecting the moment the example file changes —
+ * which is exactly what happened once already.
  */
 function isPlaceholderKey(hex: string): boolean {
-  return /^(?:0123456789abcdef){4}$/i.test(hex) || /^(.)\1{63}$/.test(hex);
+  const k = hex.toLowerCase();
+  for (let period = 1; period <= 16; period++) {
+    if (k.length % period !== 0) continue;
+    const block = k.slice(0, period);
+    if (k === block.repeat(k.length / period)) return true;
+  }
+  return false;
 }
 
 function getKey(): Buffer {
