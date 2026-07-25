@@ -255,6 +255,27 @@ docker compose --profile setup run --rm db-migrate
 
 Dev mode (hot reload): `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`.
 
+### Dove gira: Kubernetes, e una VM singola
+
+Il bersaglio di produzione è **Kubernetes**: il chart Helm è l'unità di
+installazione supportata e alcune capacità sono native del cluster — lo
+scale-to-zero dei Jitsi Video Bridge (autoscaler sul node pool), i lavori
+periodici come CronJob, il recorder multi-traccia che crea Job, i segreti via
+External Secrets Operator. Vedi [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+Lo stack `docker-compose` **non è solo una demo**: serve a sviluppare e a
+replicare la piattaforma su una **VM singola**, senza cluster. Fa girare app,
+PostgreSQL, l'intero stack Jitsi, Mailpit e uno scheduler che chiama gli stessi
+endpoint dei CronJob (così le email partono davvero, i promemoria scattano e la
+pulizia GDPR gira anche in locale). Il recorder multi-traccia ha una variante
+non-Kubernetes che usa il socket Docker: `--profile recorder`.
+
+Cosa **non** c'è su VM singola: lo scale-to-zero dei JVB (serve un autoscaler di
+cluster; in locale il bridge è sempre acceso), la pipeline AI di post-produzione
+(richiede GPU) e la scalabilità orizzontale multi-nodo. La tabella completa di
+cosa è attivo in locale è in
+[`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md#parità-con-la-produzione).
+
 Setup completo (db, test, troubleshooting): [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 
 ---

@@ -27,16 +27,41 @@ function isPlaceholderKey(hex: string): boolean {
   return false;
 }
 
+/**
+ * Misconfiguration, not a decryption failure. It is a distinct class because
+ * the `tryDecrypt*` helpers swallow decrypt errors by design (legacy plaintext
+ * rows) — swallowing THIS one would render PII as raw base64 in the admin
+ * lists and GDPR exports instead of surfacing the bad key.
+ */
+export class PiiKeyError extends Error {}
+
+/**
+ * The local stack (`docker compose up`) runs the production image, which bakes
+ * `NODE_ENV=production`, with the dummy key from `docker-compose.yml` — so the
+ * guard below would fail-close on every write. This escape hatch is set THERE
+ * and nowhere else: `.env.example` deliberately does not carry it, so a real
+ * deployment that copies the template still gets the guard.
+ */
+function insecureKeyAllowed(): boolean {
+  return process.env.ALLOW_INSECURE_PII_KEY === 'true';
+}
+
 function getKey(): Buffer {
   const hex = process.env.PII_ENCRYPTION_KEY;
   if (!hex || hex.length !== 64) {
-    throw new Error(
+    throw new PiiKeyError(
       'PII_ENCRYPTION_KEY must be a 64-char hex string (32 bytes)',
     );
   }
-  if (process.env.NODE_ENV === 'production' && isPlaceholderKey(hex)) {
-    throw new Error(
-      'PII_ENCRYPTION_KEY is the public development placeholder; set a real, random 32-byte key in production',
+  if (
+    process.env.NODE_ENV === 'production' &&
+    isPlaceholderKey(hex) &&
+    !insecureKeyAllowed()
+  ) {
+    throw new PiiKeyError(
+      'PII_ENCRYPTION_KEY is a public placeholder key (a short block repeated); ' +
+        'generate a real one with `openssl rand -hex 32`. ' +
+        'For the local docker-compose stack set ALLOW_INSECURE_PII_KEY=true.',
     );
   }
   return Buffer.from(hex, 'hex');
@@ -101,7 +126,11 @@ export function tryDecryptPII(value: string | null | undefined): string | null {
   if (value.length < 40 || value.includes('@')) return value;
   try {
     return decryptPII(value);
-  } catch {
+  } catch (err) {
+    // Una chiave sbagliata NON è una riga legacy in chiaro: inghiottirla
+    // mostrerebbe base64 grezzo al posto di nomi ed email (liste admin,
+    // export GDPR). Si propaga.
+    if (err instanceof PiiKeyError) throw err;
     return value;
   }
 }
@@ -162,7 +191,8 @@ export function tryDecryptJSON<T = unknown>(
     try {
       const plaintext = decryptPII((stored as { enc: string }).enc);
       return JSON.parse(plaintext) as T;
-    } catch {
+    } catch (err) {
+      if (err instanceof PiiKeyError) throw err; // configurazione, non riga legacy
       return stored as T;
     }
   }

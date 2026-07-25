@@ -335,10 +335,12 @@ git tag -a v0.3.0 -m "v0.3.0"
 git push origin v0.3.0
 
 # 2. Aggiorna il deployment
+# (sostituisci il file di override e il tag con i tuoi)
 helm upgrade videocall ./infra/helm/pa-webinar \
-  -f infra/helm/pa-webinar/examples/values-full.yaml \  # o il tuo file di override
+  -f infra/helm/pa-webinar/examples/values-full.yaml \
   -n videocall \
-  --set app.image.tag=v0.3.0
+  --set app.image.tag=0.8.9 \
+  --set app.migration.image.tag=v0.8.9-migrate
 ```
 
 Le migrazioni del database vengono eseguite automaticamente dall'init container.

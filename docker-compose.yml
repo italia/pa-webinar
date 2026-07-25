@@ -36,11 +36,16 @@ services:
       - SMTP_SECURE=false
       - SMTP_FROM=eventi@dominio.gov.it
       - SMTP_FROM_NAME=PA Webinar
-      # 64-char hex dummy che PASSA la guardia fail-closed di pii.ts (che in
-      # NODE_ENV=production rifiuta il placeholder sequenziale 0123..ef e le
-      # chiavi a nibble singolo). Come APP_SECRET sopra: NON è un segreto, è per
-      # dev / e2e locale. Sovrascrivere in produzione con una chiave casuale.
+      # Chiave PII fittizia per lo stack locale. NON è un segreto: è pubblica
+      # in questo file. `pii.ts` la riconosce come placeholder (blocco corto
+      # ripetuto) e in NODE_ENV=production la RIFIUTA — ma l'immagine è buildata
+      # con NODE_ENV=production anche in locale, quindi qui serve la deroga
+      # esplicita qui sotto. `.env.example` NON la porta: chi copia il template
+      # per un deploy reale resta protetto dalla guardia.
       - PII_ENCRYPTION_KEY=c0ffee00c0ffee00c0ffee00c0ffee00c0ffee00c0ffee00c0ffee00c0ffee00
+      # Deroga SOLO per lo stack di sviluppo/e2e. Mai in produzione: genera una
+      # chiave vera con `openssl rand -hex 32`.
+      - ALLOW_INSECURE_PII_KEY=true
       - DEFAULT_PRIVACY_POLICY_URL=http://localhost:3000/it/privacy
       - CRON_API_KEY=dev_cron_key_change_in_production
       - ADMIN_API_KEY=dev_admin_key_2026
@@ -210,6 +215,40 @@ services:
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+  # ── Scheduler dei lavori periodici ──────────────────────────────────
+  # In Kubernetes questi endpoint sono chiamati da CronJob (vedi
+  # infra/helm/pa-webinar/templates/cronjob-*.yaml). Senza un equivalente in
+  # locale l'app SEMBRA funzionare ma le email restano accodate in EmailOutbox
+  # e non arrivano mai su Mailpit, i promemoria non partono e la pulizia GDPR
+  # non gira: la registrazione a un evento sembra riuscita e l'email non arriva.
+  # Questo servizio replica gli stessi tick, con la stessa autenticazione.
+  cron:
+    image: curlimages/curl:8.11.1
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_started
+    environment:
+      - CRON_API_KEY=dev_cron_key_change_in_production
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        # tick=30s. I contatori replicano le cadenze del chart:
+        # email-outbox ogni minuto, reminders ogni 5, cleanup ogni ora.
+        i=0
+        while true; do
+          call() {
+            curl -sf --max-time 30 -H "x-api-key: $${CRON_API_KEY}" \
+              "http://app:3000/api/cron/$$1" >/dev/null 2>&1 \
+              && echo "[cron] $$1 ok" || echo "[cron] $$1 fallito (l'app sta partendo?)"
+          }
+          [ $$((i % 2)) -eq 0 ] && call email-outbox
+          [ $$((i % 10)) -eq 0 ] && call reminders
+          [ $$((i % 120)) -eq 0 ] && call cleanup
+          i=$$((i + 1))
+          sleep 30
+        done
 
   # ── Recorder controller (ADR-013 Fase 3, opt-in: --profile recorder) ──
   # Operator riconciliante in modalità DOCKER: spawna container recorder via

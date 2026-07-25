@@ -96,6 +96,33 @@ Tutti i servizi vengono avviati tramite Docker Compose:
 | Jitsi JVB | — | 10000 | UDP | Video Bridge (traffico media WebRTC) |
 | Prosody | — | 5222 | TCP | Server XMPP (segnalazione Jitsi interna) |
 | Jicofo | — | — | — | Focus component Jitsi (gestione conferenze) |
+| Cron | — | — | — | Chiama periodicamente gli endpoint `/api/cron/*` (in Kubernetes lo fanno i CronJob) |
+
+Opt-in con profilo: `--profile recorder` avvia il **recorder controller** in
+modalità Docker (registrazione multi-traccia senza Kubernetes; monta il socket
+Docker, quindi va abilitato consapevolmente).
+
+## Parità con la produzione
+
+La piattaforma è pensata per **Kubernetes** (il chart Helm è l'unità di
+installazione supportata), ma lo stack Compose non è una demo ridotta: serve a
+sviluppare e a far girare tutto su una **VM singola**. Questa tabella dice cosa
+è attivo in locale e cosa no, per non inseguire bug che sono in realtà assenze.
+
+| Capacità | In locale (Compose / VM singola) | In Kubernetes |
+|---|---|---|
+| Portale, registrazioni, sala live, Q&A, sondaggi, word cloud, reazioni, timer | ✅ | ✅ |
+| Email (conferme, promemoria, iCal) | ✅ catturate da Mailpit; il servizio `cron` drena la coda `EmailOutbox` | ✅ CronJob |
+| Promemoria e pulizia GDPR | ✅ via servizio `cron` | ✅ CronJob |
+| Chat in tempo reale | ✅ singola istanza (senza Redis il fan-out fra pod non serve) | ✅ con Redis pub/sub multi-pod |
+| Registrazione multi-traccia (recorder) | ✅ con `--profile recorder` (spawn via socket Docker) | ✅ Job per evento |
+| Scale-to-zero dei JVB | ❌ il bridge resta acceso: serve l'autoscaler di cluster | ✅ CronJob `jvb-scaler` + node pool |
+| Pipeline AI post-evento (trascrizione, sottotitoli, doppiaggio) | ❌ richiede GPU | ✅ node pool GPU |
+| Scalabilità orizzontale, HPA, TLS automatico, segreti gestiti | ❌ | ✅ HPA, cert-manager, External Secrets |
+
+> Se in locale un'email non arriva, la prima cosa da controllare è il servizio
+> `cron` (`docker compose logs cron`): senza di lui le email vengono accodate e
+> mai inviate, e la registrazione sembra riuscita a metà.
 
 ## Ambiente di sviluppo
 
