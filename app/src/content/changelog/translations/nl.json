@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Vragen in de chat, eenvoudiger terugkerende reeksen en herstelde institutionele kleuren",
+    "notes": [
+      "Wie in de chat schrijft, kan het eigen bericht als vraag markeren: moderatoren markeren die als beantwoord of leggen hem terzijde, en een filter toont alleen de vragen. Er is geen tweede kanaal dat tijdens het evenement bewaakt moet worden.",
+      "De vragen uit de chat verschijnen, samen met de reacties die ze kregen, op de openbare samenvattingspagina van het evenement en blijven leesbaar ook nadat de persoonsgegevens van deelnemers zijn verwijderd.",
+      "De volgende editie van een reeks voorbereiden gaat sneller: een kopie van een evenement neemt labels, organisatoren, co-moderatoren (elk met nieuwe toegangsgegevens), programma, vragenlijsten en herinneringen mee, en sjablonen behouden hun instellingen voor opname en nabewerking.",
+      "Correcties: de institutionele kleuren zijn weer zoals bedoeld — de balk bovenaan de site werd wit weergegeven —, de knop die een kopie van een evenement maakt leidt niet meer naar een niet-bestaande pagina en bij het verstrijken van de bewaartermijn worden ook de contactgegevens van benoemde moderatoren en sprekers verwijderd."
+    ]
+  },
   "0.9.0": {
     "title": "Beveiliging van afhankelijkheden, bijgewerkte documentatie en een volledige lokale omgeving",
     "notes": [

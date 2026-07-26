@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Klausimai pokalbyje, paprastesnės pasikartojančios serijos ir atkurtos institucinės spalvos",
+    "notes": [
+      "Rašantis pokalbyje gali pažymėti savo pranešimą kaip klausimą: moderatoriai jį pažymi kaip atsakytą arba atideda, o filtras parodo tik klausimus. Renginio metu nereikia stebėti antro kanalo.",
+      "Pokalbio klausimai kartu su gautomis reakcijomis atsiranda viešame renginio apžvalgos puslapyje ir lieka įskaitomi net ištrynus dalyvių asmens duomenis.",
+      "Pasirengti kitam serijos renginiui greičiau: renginio kopija perima gaires, organizatorius, bendramoderatorius (kiekvienam nauji prieigos duomenys), programą, klausimynus ir priminimus, o šablonai išsaugo įrašymo ir tolesnio apdorojimo nuostatas.",
+      "Pataisymai: institucinės spalvos vėl tokios, kokios turi būti – juosta svetainės viršuje atrodė balta –, renginio kopiją kuriantis mygtukas nebeveda į neegzistuojantį puslapį, o pasibaigus saugojimo laikui ištrinami ir paskirtų moderatorių bei pranešėjų kontaktai."
+    ]
+  },
   "0.9.0": {
     "title": "Priklausomybių saugumas, suderinta dokumentacija ir pilna vietinė aplinka",
     "notes": [

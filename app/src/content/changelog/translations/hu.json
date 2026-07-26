@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Kérdések a csevegésben, egyszerűbb ismétlődő sorozatok és helyreállított intézményi színek",
+    "notes": [
+      "Aki a csevegésben ír, saját üzenetét kérdésként jelölheti meg: a moderátorok megválaszoltként jelölik vagy félreteszik, és egy szűrő csak a kérdéseket mutatja. Az esemény alatt nincs második csatorna, amit figyelni kell.",
+      "A csevegés kérdései a kapott reakciókkal együtt megjelennek az esemény nyilvános összefoglaló oldalán, és a résztvevők személyes adatainak törlése után is olvashatók maradnak.",
+      "Egy sorozat következő alkalmának előkészítése gyorsabb: az esemény másolata magával viszi a címkéket, a szervezőket, a társmoderátorokat (mindegyiket új belépési adatokkal), a programot, a kérdőíveket és az emlékeztetőket, a sablonok pedig megtartják a felvételi és az utólagos feldolgozási beállításokat.",
+      "Javítások: az intézményi színek ismét a megfelelőek – az oldal tetején lévő sáv fehérnek látszott –, az esemény másolatát létrehozó gomb már nem vezet nem létező oldalra, és a megőrzési idő lejártával a kijelölt moderátorok és előadók elérhetőségei is törlődnek."
+    ]
+  },
   "0.9.0": {
     "title": "Függőségek biztonsága, naprakész dokumentáció és teljes helyi környezet",
     "notes": [

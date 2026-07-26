@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Pitanja u razgovoru, jednostavnije ponavljajuće serije i ispravljene institucionalne boje",
+    "notes": [
+      "Onaj tko piše u razgovoru može svoju poruku označiti kao pitanje: moderatori ga označavaju odgovorenim ili ga odlažu, a filtar prikazuje samo pitanja. Tijekom događaja nema drugog kanala koji treba nadzirati.",
+      "Pitanja iz razgovora, zajedno s reakcijama koje su dobila, prikazuju se na javnoj stranici sa sažetkom događaja i ostaju čitljiva i nakon brisanja osobnih podataka sudionika.",
+      "Priprema sljedećeg događaja u seriji brža je: kopija događaja prenosi oznake, organizatore, su-moderatore (svaki s novim pristupnim podacima), program, upitnike i podsjetnike, a predlošci zadržavaju postavke snimanja i naknadne obrade.",
+      "Ispravci: institucionalne boje ponovno su onakve kakve moraju biti – traka na vrhu stranice prikazivala se bijelom –, gumb koji stvara kopiju događaja više ne vodi na nepostojeću stranicu, a istekom roka čuvanja brišu se i kontakti imenovanih moderatora i govornika."
+    ]
+  },
   "0.9.0": {
     "title": "Sigurnost ovisnosti, usklađena dokumentacija i potpuno lokalno okruženje",
     "notes": [

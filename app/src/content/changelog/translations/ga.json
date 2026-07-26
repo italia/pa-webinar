@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Ceisteanna sa chomhrá, sraitheanna athfhillteacha níos simplí agus dathanna institiúideacha ceartaithe",
+    "notes": [
+      "Is féidir le duine a scríobhann sa chomhrá a theachtaireacht féin a mharcáil mar cheist: marcálann na modhnóirí í mar cheist a freagraíodh nó cuireann siad i leataobh í, agus taispeánann scagaire na ceisteanna amháin. Níl dara cainéal ann a chaithfear a fhaire le linn na hócáide.",
+      "Taispeántar ceisteanna an chomhrá, mar aon leis na frithghníomhartha a fuair siad, ar leathanach achoimre poiblí na hócáide, agus fanann siad inléite fiú tar éis sonraí pearsanta na rannpháirtithe a scriosadh.",
+      "Tá sé níos tapúla an chéad ócáid eile i sraith a ullmhú: tugann cóip d'ócáid na clibeanna, na heagraithe, na comhmhodhnóirí (dintiúir rochtana nua ag gach duine), an clár, na ceistneoirí agus na meabhrúcháin léi, agus coinníonn na teimpléid na socruithe taifeadta agus iarphróiseála.",
+      "Ceartúcháin: tá na dathanna institiúideacha ar ais mar is ceart — bhí an banda ag barr an tsuímh le feiceáil bán —, ní thugann an cnaipe a chruthaíonn cóip d'ócáid go leathanach nach ann dó a thuilleadh, agus ag deireadh na tréimhse coinneála scriostar sonraí teagmhála na modhnóirí agus na gcainteoirí ainmnithe freisin."
+    ]
+  },
   "0.9.0": {
     "title": "Slándáil spleáchas, doiciméadú ailínithe agus cruachán áitiúil iomlán",
     "notes": [

@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Pytania na czacie, prostsze serie cykliczne i przywrócone barwy instytucjonalne",
+    "notes": [
+      "Osoba pisząca na czacie może oznaczyć własną wiadomość jako pytanie: moderatorzy oznaczają je jako obsłużone albo odkładają, a filtr pokazuje tylko pytania. W czasie wydarzenia nie ma drugiego kanału do pilnowania.",
+      "Pytania z czatu, wraz z otrzymanymi reakcjami, pojawiają się na publicznej stronie podsumowania wydarzenia i pozostają czytelne także po usunięciu danych osobowych uczestników.",
+      "Przygotowanie kolejnego wydarzenia z serii jest szybsze: kopia wydarzenia przenosi tagi, organizatorów, współmoderatorów (każdy z nowymi danymi dostępu), agendę, ankiety i przypomnienia, a szablony zachowują ustawienia nagrywania i późniejszego przetwarzania.",
+      "Poprawki: barwy instytucjonalne znów są takie, jakie powinny być — pasek u góry witryny wyświetlał się na biało —, przycisk tworzący kopię wydarzenia nie prowadzi już do nieistniejącej strony, a po upływie okresu przechowywania usuwane są również dane kontaktowe wyznaczonych moderatorów i prelegentów."
+    ]
+  },
   "0.9.0": {
     "title": "Bezpieczeństwo zależności, zaktualizowana dokumentacja i pełne środowisko lokalne",
     "notes": [

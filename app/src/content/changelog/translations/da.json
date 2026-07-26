@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Spørgsmål i chatten, enklere gentagne serier og rettede institutionelle farver",
+    "notes": [
+      "Den, der skriver i chatten, kan markere sin egen besked som et spørgsmål: moderatorerne markerer det som besvaret eller lægger det til side, og et filter viser kun spørgsmålene. Der er ingen ekstra kanal at holde øje med under arrangementet.",
+      "Spørgsmålene fra chatten vises sammen med de reaktioner, de har fået, på arrangementets offentlige opsummeringsside og kan stadig læses, efter at deltagernes personoplysninger er slettet.",
+      "Det går hurtigere at forberede næste gang i en serie: en kopi af et arrangement tager mærkater, arrangører, medmoderatorer (hver med nye adgangsoplysninger), program, spørgeskemaer og påmindelser med, og skabelonerne bevarer deres indstillinger for optagelse og efterbehandling.",
+      "Rettelser: de institutionelle farver er tilbage, som de skal være – bjælken øverst på sitet blev vist hvid –, knappen, der opretter en kopi af et arrangement, fører ikke længere til en side, der ikke findes, og når opbevaringsperioden udløber, slettes også kontaktoplysningerne på udpegede moderatorer og talere."
+    ]
+  },
   "0.9.0": {
     "title": "Sikkerhed i afhængigheder, opdateret dokumentation og en komplet lokal opsætning",
     "notes": [

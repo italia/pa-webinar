@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Otázky v chate, jednoduchšie opakujúce sa série a opravené inštitucionálne farby",
+    "notes": [
+      "Kto píše v chate, môže svoju správu označiť ako otázku: moderátori ju označia za vyriešenú alebo ju odložia a filter zobrazí iba otázky. Počas podujatia netreba sledovať druhý kanál.",
+      "Otázky z chatu sa spolu s reakciami, ktoré získali, zobrazujú na verejnej stránke so súhrnom podujatia a zostávajú čitateľné aj po vymazaní osobných údajov účastníkov.",
+      "Príprava ďalšieho podujatia zo série je rýchlejšia: kópia podujatia prenáša značky, organizátorov, spolumoderátorov (každý s novými prihlasovacími údajmi), program, dotazníky a upomienky a šablóny si zachovávajú nastavenia nahrávania a následného spracovania.",
+      "Opravy: inštitucionálne farby sú opäť také, aké majú byť – pruh v hornej časti webu sa zobrazoval biely –, tlačidlo, ktoré vytvára kópiu podujatia, už nevedie na neexistujúcu stránku, a po uplynutí doby uchovávania sa vymažú aj kontakty menovaných moderátorov a rečníkov."
+    ]
+  },
   "0.9.0": {
     "title": "Bezpečnosť závislostí, zosúladená dokumentácia a kompletné lokálne prostredie",
     "notes": [

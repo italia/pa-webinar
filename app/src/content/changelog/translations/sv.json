@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Frågor i chatten, enklare återkommande serier och återställda institutionella färger",
+    "notes": [
+      "Den som skriver i chatten kan markera sitt eget meddelande som en fråga: moderatorerna markerar den som besvarad eller lägger den åt sidan, och ett filter visar bara frågorna. Det finns ingen andra kanal att bevaka under evenemanget.",
+      "Frågorna från chatten visas, tillsammans med de reaktioner de fått, på evenemangets offentliga sammanfattningssida och går att läsa även efter att deltagarnas personuppgifter har raderats.",
+      "Att förbereda nästa tillfälle i en serie går snabbare: en kopia av ett evenemang tar med sig etiketter, arrangörer, medmoderatorer (var och en med nya inloggningsuppgifter), program, enkäter och påminnelser, och mallarna behåller sina inställningar för inspelning och efterbearbetning.",
+      "Rättningar: de institutionella färgerna är åter som de ska vara – listen högst upp på webbplatsen visades vit –, knappen som skapar en kopia av ett evenemang leder inte längre till en sida som inte finns, och när bevarandetiden går ut raderas även kontaktuppgifterna till utsedda moderatorer och talare."
+    ]
+  },
   "0.9.0": {
     "title": "Säkerhet i beroenden, uppdaterad dokumentation och en komplett lokal miljö",
     "notes": [

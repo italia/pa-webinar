@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Jautājumi tērzēšanā, vienkāršākas atkārtotas sērijas un atjaunotas institucionālās krāsas",
+    "notes": [
+      "Ikviens, kas raksta tērzēšanā, var atzīmēt savu ziņu kā jautājumu: moderatori to atzīmē kā atbildētu vai atliek, un filtrs rāda tikai jautājumus. Pasākuma laikā nav jāuzrauga otrs kanāls.",
+      "Tērzēšanas jautājumi kopā ar saņemtajām reakcijām parādās pasākuma publiskajā kopsavilkuma lapā un paliek lasāmi arī pēc dalībnieku personas datu dzēšanas.",
+      "Nākamā sērijas pasākuma sagatavošana ir ātrāka: pasākuma kopija pārņem birkas, organizatorus, līdzmoderatorus (katram jaunus piekļuves datus), programmu, anketas un atgādinājumus, un veidnes saglabā ierakstīšanas un turpmākās apstrādes iestatījumus.",
+      "Labojumi: institucionālās krāsas atkal ir tādas, kādām jābūt — josla vietnes augšdaļā rādījās balta —, poga, kas izveido pasākuma kopiju, vairs nenoved uz neesošu lapu, un pēc glabāšanas termiņa beigām tiek dzēsta arī norīkoto moderatoru un runātāju kontaktinformācija."
+    ]
+  },
   "0.9.0": {
     "title": "Atkarību drošība, saskaņota dokumentācija un pilnvērtīga lokālā vide",
     "notes": [

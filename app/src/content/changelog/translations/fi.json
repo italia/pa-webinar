@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Kysymykset chatissa, sujuvammat toistuvat sarjat ja korjatut instituutiovärit",
+    "notes": [
+      "Chatissa kirjoittava voi merkitä oman viestinsä kysymykseksi: valvojat merkitsevät sen vastatuksi tai siirtävät sen sivuun, ja suodatin näyttää vain kysymykset. Tapahtuman aikana ei ole toista kanavaa valvottavana.",
+      "Chatin kysymykset näkyvät saamiensa reaktioiden kanssa tapahtuman julkisella yhteenvetosivulla ja pysyvät luettavina myös sen jälkeen, kun osallistujien henkilötiedot on poistettu.",
+      "Sarjan seuraavan kerran valmistelu on nopeampaa: tapahtuman kopio ottaa mukaan aihetunnisteet, järjestäjät, apuvalvojat (kullekin uudet käyttöoikeustiedot), ohjelman, kyselyt ja muistutukset, ja mallit säilyttävät tallennuksen ja jälkikäsittelyn asetukset.",
+      "Korjaukset: instituutiovärit ovat jälleen oikeat – sivuston ylälaidan palkki näkyi valkoisena –, tapahtuman kopion luova painike ei enää johda puuttuvalle sivulle, ja säilytysajan päätyttyä poistetaan myös nimettyjen valvojien ja esiintyjien yhteystiedot."
+    ]
+  },
   "0.9.0": {
     "title": "Riippuvuuksien tietoturva, ajantasainen dokumentaatio ja täysi paikallinen ympäristö",
     "notes": [

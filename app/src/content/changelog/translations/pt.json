@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Perguntas no chat, séries recorrentes mais simples e cores institucionais corrigidas",
+    "notes": [
+      "Quem escreve no chat pode marcar a própria mensagem como pergunta: os moderadores assinalam-na como respondida ou põem-na de lado, e um filtro mostra apenas as perguntas. Não há um segundo canal a acompanhar durante o evento.",
+      "As perguntas do chat, com as reações que receberam, passam a constar na página pública de resumo do evento e continuam legíveis mesmo depois de eliminados os dados pessoais dos participantes.",
+      "Preparar a próxima ocorrência de uma série é mais rápido: a cópia de um evento leva consigo etiquetas, organizadores, co-moderadores (cada um com novas credenciais de acesso), programa, questionários e lembretes, e os modelos conservam as definições de gravação e de processamento posterior.",
+      "Correções: as cores institucionais voltaram ao previsto — a faixa no topo do site aparecia branca —, o botão que cria a cópia de um evento já não conduz a uma página inexistente e, ao expirar a conservação, são eliminados também os contactos dos moderadores e oradores nomeados."
+    ]
+  },
   "0.9.0": {
     "title": "Segurança das dependências, documentação alinhada e ambiente local completo",
     "notes": [

@@ -1,4 +1,13 @@
 {
+  "0.10.0": {
+    "title": "Mistoqsijiet fiċ-chat, serje rikorrenti aktar sempliċi u kuluri istituzzjonali kkoreġuti",
+    "notes": [
+      "Min jikteb fiċ-chat jista' jimmarka l-messaġġ tiegħu stess bħala mistoqsija: il-moderaturi jimmarkawha bħala mwieġba jew iwarrbuha, u filtru juri l-mistoqsijiet biss. Matul l-avveniment ma hemmx kanal ieħor x'jiġi segwit.",
+      "Il-mistoqsijiet miċ-chat, flimkien mar-reazzjonijiet li rċevew, jidhru fil-paġna pubblika ta' sommarju tal-avveniment u jibqgħu jinqraw ukoll wara li titħassar id-data personali tal-parteċipanti.",
+      "It-tħejjija tal-avveniment li jmiss ta' serje hija aktar mgħaġġla: il-kopja ta' avveniment tieħu magħha t-tikketti, l-organizzaturi, il-ko-moderaturi (kull wieħed bi kredenzjali ta' aċċess ġodda), il-programm, il-kwestjonarji u t-tfakkiriet, u l-mudelli jżommu l-issettjar tar-reġistrazzjoni u tal-ipproċessar sussegwenti.",
+      "Korrezzjonijiet: il-kuluri istituzzjonali reġgħu kif suppost — il-faxxa fil-quċċata tas-sit kienet tidher bajda —, il-buttuna li toħloq kopja ta' avveniment ma twassalx aktar għal paġna li ma teżistix, u meta jiskadi ż-żmien tal-konservazzjoni jitħassru wkoll il-kuntatti tal-moderaturi u l-kelliema nominati."
+    ]
+  },
   "0.9.0": {
     "title": "Sigurtà tad-dipendenzi, dokumentazzjoni allinjata u stack lokali komplut",
     "notes": [
