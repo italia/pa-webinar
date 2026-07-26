@@ -629,7 +629,7 @@ jitsi-meet:
 
   # Global pull secrets for ALL jitsi component pods (the subchart exposes only a
   # single global list, not per-component). `ghcr-secret` is required because
-  # `web.image` below is the PRIVATE GHCR patched image (F18); `dockerhub-secret`
+  # `web.image` below is the PRIVATE GHCR patched image; `dockerhub-secret`
   # keeps the stock Docker Hub images (jvb/jicofo/coturn/prosody/jibri) pulling
   # without hitting anon rate limits. Both secrets must exist in the namespace
   # (created out-of-band, like any private-registry chart). Without ghcr-secret a
