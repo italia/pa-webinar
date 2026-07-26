@@ -2,13 +2,13 @@
 
 **Stato**: Accettato e implementato in forma incrementale (proposto 2026-04-24) — piazza opzionale a schermo intero con fallback classico, in produzione dalla v0.8.6.
 **Decisori**: team pa-webinar / DTD
-**Contesto abilitante**: feedback informale post-caffettino 24 aprile — "la sala d'attesa potrebbe essere più divertente"
+**Contesto abilitante**: feedback informale dei partecipanti dopo alcune call — "la sala d'attesa potrebbe essere più divertente"
 
 ## Contesto
 
-La waiting room attuale (implementata con il refactor del 23 aprile, vedi `app/src/components/live/waiting-room.tsx`) è **funzionale ma statica**: l'utente arriva, vede un countdown, configura nome/email, testa device, legge le netiquette e aspetta. Se arriva 10 minuti prima, aspetta 10 minuti con un video player di musica d'attesa.
+La waiting room attuale (vedi `app/src/components/live/waiting-room.tsx`) è **funzionale ma statica**: l'utente arriva, vede un countdown, configura nome/email, testa device, legge le netiquette e aspetta. Se arriva 10 minuti prima, aspetta 10 minuti con un video player di musica d'attesa.
 
-Per gli eventi informali (tipo "caffettino" del venerdì mattina, community call DTD) questo contesto è pretesto: le persone **vogliono parlare tra loro prima dell'evento** — è metà del punto del caffettino. Oggi non hanno modo di farlo: possono solo leggere la chat globale (se è abilitata) sapendo che è letta anche dal moderatore.
+Per gli eventi informali (pause caffè digitali, call ricorrenti di community) questo contesto è pretesto: le persone **vogliono parlare tra loro prima dell'evento** — è metà del punto dell'incontro. Oggi non hanno modo di farlo: possono solo leggere la chat globale (se è abilitata) sapendo che è letta anche dal moderatore.
 
 Il suggerimento degli utenti: trasformare la waiting room in un **ambiente social 2D in stile pixel-game**, con:
 - Un avatar personalizzabile (genere + stile)
