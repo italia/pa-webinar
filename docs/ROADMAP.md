@@ -31,7 +31,7 @@ Il changelog resta l'unica fonte di verità su cosa è stato rilasciato e quando
 | Evento pilota interno | ✅ fatto |
 | Ritocco testi e layout | ✅ in gran parte |
 | Test E2E Playwright (batteria flussi critici) | 🟡 parziale (un solo file, `continue-on-error`) — vedi "Prossimo" |
-| Screenshot per README | ✅ fatto — schermate reali dell'istanza in produzione in `docs/screenshots/`, referenziate da README, README.en e `publiccode.yml` |
+| Screenshot per README | ✅ fatto — schermate in `docs/screenshots/`, referenziate da README, README.en e `publiccode.yml`. Da rifare quando cambia la UI, su dati dimostrativi (`npm run db:seed`), mai su dati di un'istanza reale |
 
 Flussi critici Playwright ancora da coprire: login admin + creazione + pubblicazione evento, ingresso sala (moderatore + partecipante), Q&A (invio/upvote/moderazione), polling, cambio lingua senza reload, GDPR cleanup, download `.ics`, responsive mobile, chat in-app real-time multi-pod.
 
