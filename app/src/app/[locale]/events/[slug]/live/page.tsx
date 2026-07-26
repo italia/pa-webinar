@@ -65,12 +65,13 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // site default (SiteSetting.videoQuality) when null. Flows down to JitsiRoom.
   const videoQuality = event.videoQuality ?? settings.videoQuality;
 
-  // F18 — rnnoise ON/OFF si decide QUI, in un Server Component, e scende come
-  // prop: la stessa lettura dentro JitsiRoom (client) verrebbe sostituita da
-  // webpack a build time e resterebbe congelata nell'immagine, rendendo il
-  // flag non modificabile da Helm. Default = forzata OFF: si accende con
-  // NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE="false" nell'env del pod, e solo con il
-  // jitsi/web patchato a 48 kHz (vedi lib/jitsi/rnnoise.ts).
+  // La soppressione rumore avanzata (rnnoise) di Jitsi si accende/spegne QUI,
+  // in un Server Component, e scende come prop: la stessa lettura dentro
+  // JitsiRoom (client) verrebbe sostituita da webpack a build time e
+  // resterebbe congelata nell'immagine, rendendo il flag non modificabile da
+  // Helm. Default = forzata OFF: si accende con
+  // NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE="false" nell'env del pod, e solo con
+  // il jitsi/web patchato a 48 kHz (vedi lib/jitsi/rnnoise.ts).
   const rnnoiseEnforceOff = resolveRnnoiseEnforceOff(
     getPublicEnv('NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE'),
   );
@@ -222,7 +223,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     // Only the browser that REGISTERED (matching signed event_access cookie)
     // inherits the registrant's name/consent. A forwarded personal link →
     // blank the pre-join name so the opener types their OWN and enters as a
-    // named guest; the JWT route enforces the same rule server-side (F7).
+    // named guest; the JWT route enforces the same rule server-side.
     const cookieStore = await cookies();
     const ownsToken =
       (await verifyEventAccess(

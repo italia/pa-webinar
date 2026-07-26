@@ -66,7 +66,8 @@ resource "azurerm_kubernetes_cluster_node_pool" "jvb" {
 # Cluster autoscaler profile tuning
 # ─────────────────────────────────────────────────────────────
 # Add these settings to your existing azurerm_kubernetes_cluster resource
-# in the iac-azure repo. They apply cluster-wide, not per node pool.
+# in your own Terraform/OpenTofu configuration. They apply cluster-wide, not
+# per node pool.
 #
 # auto_scaler_profile {
 #   scale_down_delay_after_add       = "10m"

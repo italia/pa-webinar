@@ -1438,7 +1438,7 @@
         "calendarPublic": "Offentlig kalender",
         "calendarPublicHelp": "Offentliggør begivenhedskalenderen. Besøgende kan se planlagte begivenheder.",
         "parseTitleKicker": "Titler med redaktionel kicker",
-        "parseTitleKickerHelp": "Hvis et arrangements titel indeholder tegnet \"|\", vises delen før det som en lille mærkat med versaler over hovedtitlen. Eksempel: \"Caffettino | OSS-test\" → mærkat \"CAFFETTINO\" + titel \"OSS-test\".",
+        "parseTitleKickerHelp": "Hvis et arrangements titel indeholder tegnet \"|\", vises delen før det som en lille mærkat med versaler over hovedtitlen. Eksempel: \"Kaffepause | OSS-test\" → mærkat \"KAFFEPAUSE\" + titel \"OSS-test\".",
         "githubUrl": "URL til GitHub-repository",
         "supportEmail": "Support-e-mail",
         "jvbScalingTitle": "Videobridge-skalering (JVB)",

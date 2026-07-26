@@ -320,7 +320,7 @@ describe('POST jitsi/token — accessToken di registrazione', () => {
     expect(prisma.registration.update).not.toHaveBeenCalled();
   });
 
-  it('un link INOLTRATO non presta l\'identità del registrato (F7)', async () => {
+  it('un link INOLTRATO non presta l\'identità del registrato', async () => {
     // Chi apre il link di qualcun altro entra — il token condiviso autorizza
     // l'accesso — ma sotto il proprio nome e con un'identità ospite fresca:
     // mai nome, posto o consenso alla registrazione dell'iscritto.

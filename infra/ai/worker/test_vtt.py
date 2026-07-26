@@ -28,11 +28,11 @@ def test_roundtrip_strips_tag_and_duplicate_prefix():
 
 def test_human_name_label():
     segs = [{"start": 1.0, "end": 2.0, "text": "Bonjour", "speaker": "SPEAKER_00"}]
-    vtt_text = vtt.segments_to_vtt(segs, speaker_names={"SPEAKER_00": "Paolo"})
-    assert "<v Paolo>Paolo: Bonjour" in vtt_text
+    vtt_text = vtt.segments_to_vtt(segs, speaker_names={"SPEAKER_00": "Anna Bianchi"})
+    assert "<v Anna Bianchi>Anna Bianchi: Bonjour" in vtt_text
     parsed, _ = vtt.parse_translated_vtt(vtt_text)
     assert parsed[0]["text"] == "Bonjour"
-    assert parsed[0]["speaker"] == "Paolo"
+    assert parsed[0]["speaker"] == "Anna Bianchi"
 
 
 def test_without_speaker_no_tag():
@@ -57,8 +57,8 @@ def test_plain_text_resolves_speaker_names():
         {"start": 1.0, "end": 2.0, "text": "ciao", "speaker": "SPEAKER_00"},
         {"start": 3.0, "end": 4.0, "text": "salve", "speaker": "SPEAKER_01"},
     ]
-    out = segments_to_plain_text(segs, speaker_names={"SPEAKER_00": "Raffaele"})
-    assert "Raffaele: ciao" in out
+    out = segments_to_plain_text(segs, speaker_names={"SPEAKER_00": "Mario Rossi"})
+    assert "Mario Rossi: ciao" in out
     assert "SPEAKER_00" not in out  # risolto al nome
     assert "SPEAKER_01: salve" in out  # non mappato → resta il label
 

@@ -50,7 +50,8 @@ describe('guestChatWindowOpen', () => {
   });
 
   it('stays shut before and after the event — including ENDED and ARCHIVED', () => {
-    // This is the hole that leaked the DevIt transcript days after the event.
+    // This is the hole that let anyone read a past event's chat transcript
+    // (real names + free text) days after it ended.
     for (const status of ['DRAFT', 'PUBLISHED', 'ENDED', 'ARCHIVED', 'CANCELLED']) {
       expect(guestChatWindowOpen(scheduled(status)), status).toBe(false);
       expect(guestChatWindowOpen(instant(status)), `INSTANT ${status}`).toBe(false);

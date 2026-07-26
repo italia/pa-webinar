@@ -33,7 +33,7 @@ export const baseToolbarButtons = [
   'desktop',
   // No native 'fullscreen': it fullscreens the Jitsi IFRAME only, hiding the
   // pa-webinar chat/sidebar. Replaced by an app-owned fullscreen on the whole
-  // live wrapper (LiveTopBar toggle → .live-page-bg) so chat stays visible (#6).
+  // live wrapper (LiveTopBar toggle → .live-page-bg) so chat stays visible.
   'filmstrip',
   'tileview',
   'settings',
@@ -61,8 +61,8 @@ export const moderatorToolbarButtons = [
  */
 // Mobile: no 'desktop' — iOS Safari + most Android browsers don't
 // support getDisplayMedia() inside an iframe, so the button would
-// surface a misleading error. Feedback on the Friday caffettino
-// confirmed this (several users on mobile couldn't share screen).
+// surface a misleading error. Confirmed by live feedback: several
+// users on mobile couldn't share their screen.
 export const mobileBaseToolbarButtons = [
   'microphone',
   'camera',
@@ -98,7 +98,7 @@ export const jitsiConfigOverwrite = {
   hideConferenceTimer: false,
   disableProfile: true,
 
-  // Self-view "hide" is a one-way trap in our embed (F10): once a user hides
+  // Self-view "hide" is a one-way trap in our embed: once a user hides
   // their own thumbnail there's no in-UI way to bring it back. Disable the
   // control entirely — Jitsi gates BOTH the local-tile "Hide self view" menu
   // entry and the Settings checkbox on this flag, so nobody can get stuck.
@@ -146,7 +146,7 @@ export const jitsiConfigOverwrite = {
   notifications: [] as string[],
   disableReactions: true,
 
-  // F8 — keep a raised hand UP until the user lowers it or a moderator handles
+  // Keep a raised hand UP until the user lowers it or a moderator handles
   // it. Stock Jitsi auto-lowers the hand the moment the participant becomes the
   // dominant speaker (starts talking), which testers found confusing ("ho alzato
   // la mano e sparisce appena parlo"). MUST be the NESTED form on our served
@@ -221,7 +221,7 @@ export const jitsiInterfaceConfigOverwrite = {
 
   TOOLBAR_BUTTONS: baseToolbarButtons as string[],
   // Keep the toolbar always visible. Auto-hide at 4s surprised users
-  // on the Friday caffettino — some saw it only as a half-peek when
+  // during live events — some saw it only as a half-peek when
   // the pointer was near the bottom and couldn't find mic/cam.
   TOOLBAR_ALWAYS_VISIBLE: true,
   INITIAL_TOOLBAR_TIMEOUT: 20000,
@@ -291,7 +291,7 @@ export const instantCallToolbarButtons = [
   'select-background',
   'desktop',
   // No native 'fullscreen' (see baseToolbarButtons): LiveTopBar also renders for
-  // instant calls, so the app-owned fullscreen replaces it here too (#6).
+  // instant calls, so the app-owned fullscreen replaces it here too.
   'filmstrip',
   'tileview',
   'settings',
@@ -367,7 +367,7 @@ interface VideoQualityDefinition {
     audioQuality: { opusMaxAverageBitrate: number };
     stereo: boolean;
     enableOpusRed: boolean;
-    // Framerate dello screenshare. Detail-first (F13): i preset di uso comune
+    // Framerate dello screenshare. Detail-first: i preset di uso comune
     // (SAVE_DATA/BALANCED/HIGH) stanno a max 5fps così l'encoder spende il
     // budget di bitrate su pochi frame NITIDI invece di spalmarlo su ~30fps
     // morbidi — il reclamo era "screenshare sgranato" su slide/documenti.

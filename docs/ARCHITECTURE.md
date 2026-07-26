@@ -2,8 +2,6 @@
 
 Documento tecnico di riferimento per sviluppatori, sistemisti e personale tecnico della PA.
 
-Ultimo aggiornamento: 26 luglio 2026 (v0.9.0)
-
 ---
 
 ## Panoramica del sistema

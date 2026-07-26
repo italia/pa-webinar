@@ -3,7 +3,7 @@
  *
  * Recording-scoped "start the AI pipeline" for the admin postprod page.
  *
- * Closes the F15 trap: a recording captured while the event had AI disabled
+ * Closes a dead end: a recording captured while the event had AI disabled
  * (or an AUDIO-ONLY multitrack recording, whose transcription only ever
  * auto-enqueues at event end) sits at status=READY with zero jobs, and every
  * launch control on the page is gated on an existing transcript. The plain

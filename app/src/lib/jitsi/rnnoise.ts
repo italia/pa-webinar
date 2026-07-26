@@ -1,6 +1,6 @@
 /**
- * F18 — chi decide se la soppressione rumore avanzata (rnnoise) di Jitsi è
- * accesa, e soprattutto QUANDO quella decisione viene presa.
+ * Chi decide se la soppressione rumore avanzata (rnnoise) di Jitsi è accesa,
+ * e soprattutto QUANDO quella decisione viene presa.
  *
  * Il worklet rnnoise di `jitsi/web:stable-10741` stock non ricampiona: su un
  * AudioContext ≠ 48 kHz processa a vuoto e ZITTISCE il microfono (in demo un

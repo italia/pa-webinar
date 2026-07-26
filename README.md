@@ -4,7 +4,6 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/italia/pa-webinar/badge)](https://scorecard.dev/viewer/?uri=github.com/italia/pa-webinar)
 [![License: EUPL-1.2](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
 [![publiccode.yml](https://img.shields.io/badge/publiccode-available-brightgreen.svg)](publiccode.yml)
-[![Tests](https://img.shields.io/badge/tests-1287%20passing-brightgreen.svg)](#qualità-e-sicurezza)
 
 Piattaforma open-source per eventi pubblici digitali della Pubblica Amministrazione italiana, basata su [Jitsi Meet](https://jitsi.org/) e il [design system .italia](https://designers.italia.it/). Sviluppata dal [Dipartimento per la Trasformazione Digitale](https://innovazione.gov.it/).
 
@@ -190,7 +189,7 @@ sequenceDiagram
   end
 ```
 
-Dettagli tecnici + tuning dei parametri (`jvbPreScaleMinutes`, `jvbInactiveGraceMinutes`, `jvbProvisioningTimeoutMinutes`, `jvbStressWarnPercent`) in [`docs/ARCHITECTURE.md#jvb-scaler`](docs/ARCHITECTURE.md) e [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md). Misurazioni reali da demo con 65 partecipanti su [`docs/LOAD-TESTING.md#caffettino-demo`](docs/LOAD-TESTING.md).
+Dettagli tecnici + tuning dei parametri (`jvbPreScaleMinutes`, `jvbInactiveGraceMinutes`, `jvbProvisioningTimeoutMinutes`, `jvbStressWarnPercent`) in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#jvb-scaler-ed-event-lifecycle) e [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md). Misurazioni reali su un webinar in produzione: [`docs/LOAD-TESTING.md`](docs/LOAD-TESTING.md).
 
 ---
 
@@ -298,7 +297,7 @@ Setup completo (db, test, troubleshooting): [`docs/DEVELOPMENT.md`](docs/DEVELOP
 
 | Area | Stato |
 |---|---|
-| Test | **568 test** (27 file, vitest) — [`docs/CONTRIBUTING-QUALITY.md`](docs/CONTRIBUTING-QUALITY.md) |
+| Test | Suite Vitest eseguita in CI, con soglie di copertura a cricchetto — [`docs/CONTRIBUTING-QUALITY.md`](docs/CONTRIBUTING-QUALITY.md) |
 | Typecheck | TypeScript `strict` + `noUncheckedIndexedAccess` — gate di PR |
 | Lint | ESLint — gate di PR |
 | SBOM | CycloneDX 1.6 (code + Azure services) generato per release |
@@ -306,7 +305,7 @@ Setup completo (db, test, troubleshooting): [`docs/DEVELOPMENT.md`](docs/DEVELOP
 | Container | Non-root, read-only rootfs, seccomp `RuntimeDefault` |
 | Dipendenze | Audit di compatibilità licenza EUPL |
 | GDPR | Encryption PII at rest, consenso granulare, retention automatica, rubrica opt-in — [`docs/GDPR.md`](docs/GDPR.md) |
-| Load testing | Misurazioni in produzione (65 partecipanti, 18.6% stress) — [`docs/LOAD-TESTING.md`](docs/LOAD-TESTING.md) |
+| Load testing | Misurazioni reali su un webinar in produzione, con sizing JVB — [`docs/LOAD-TESTING.md`](docs/LOAD-TESTING.md) |
 
 ---
 

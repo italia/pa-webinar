@@ -271,7 +271,7 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
                     {/* Same nickname can repeat: different people who typed the
                         same name, or one person who re-joined (same participantId
                         → same suffix, distinct blobKey → distinct track). The id
-                        suffix differentiates them (F15). */}
+                        suffix differentiates them. */}
                     {tr.displayName && (
                       <span
                         className="text-secondary ms-1"

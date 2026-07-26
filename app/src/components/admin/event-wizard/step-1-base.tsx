@@ -189,7 +189,7 @@ export default function Step1Base({
           />
           {/* Validation targets the default-locale title. Show the inline
               invalid message on that tab; on any other tab, point the admin
-              back to the required locale so the error isn't invisible (#4). */}
+              back to the required locale so the error isn't invisible. */}
           {fieldErrors[`title.${defaultLocale}`] &&
             (contentLocale === defaultLocale ? (
               <div className="invalid-feedback">{t('validation.titleRequired')}</div>

@@ -151,7 +151,7 @@ describe('buildChatAssetKey', () => {
     // Passare lo slug produrrebbe una chiave che il parser scarta: l'allegato
     // si caricherebbe e smetterebbe di aprirsi, senza errori, in un altro
     // punto del sistema.
-    expect(() => buildChatAssetKey('il-caffettino', 'x.pdf')).toThrow();
+    expect(() => buildChatAssetKey('evento-di-esempio', 'x.pdf')).toThrow();
   });
 });
 

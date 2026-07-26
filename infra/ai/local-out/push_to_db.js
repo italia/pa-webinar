@@ -1,6 +1,7 @@
 /**
- * Inserisce nel DB di test (videocall-test) gli artifact prodotti
- * localmente. Lanciato da package_and_push.py via kubectl exec.
+ * Inserisce nel DB dell'ambiente di test gli artifact prodotti
+ * localmente. Lanciato da package_and_push.py via kubectl exec
+ * (namespace e storage account arrivano da env, vedi quello script).
  *
  * stdin JSON:
  *   {

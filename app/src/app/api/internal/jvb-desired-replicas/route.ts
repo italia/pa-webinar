@@ -97,7 +97,7 @@ export const GET = withErrorHandling(async (request) => {
   const preScaleMin =
     settings.jvbPreScaleMinutes ??
     parseInt(process.env.JVB_PRE_SCALE_MINUTES || '10', 10);
-  // Authoritative empty-conference close (feedback #12). Minutes a LIVE room
+  // Authoritative empty-conference close. Minutes a LIVE room
   // that HAD traffic may stay COMPLETELY empty (moderator included) before we
   // flip it straight to ENDED — terminal, distinct from the scale-to-zero
   // inactivity grace. DISABLED by default (-1); opt-in admin setting only,
@@ -208,7 +208,7 @@ export const GET = withErrorHandling(async (request) => {
       },
     });
 
-    // 1b) LIVE → ENDED — authoritative empty-conference close (feedback #12).
+    // 1b) LIVE → ENDED — authoritative empty-conference close.
     //     Runs BEFORE the IDLE demotion so, when both would match, ENDED wins
     //     (terminal) over IDLE (revivable). Fires only for rooms that HAD
     //     traffic then emptied: lastActiveAt non-null AND older than the

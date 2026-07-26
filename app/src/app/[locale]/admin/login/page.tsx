@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
       if (res.ok) {
         // Hard navigation (not router.push): after an idle re-login the App
         // Router client cache still holds the stale logged-out RSC for /admin,
-        // so a soft push renders nothing until a manual reload (F14). A full
+        // so a soft push renders nothing until a manual reload. A full
         // document request re-runs middleware with the fresh admin_session
         // cookie and lands on the real admin page.
         window.location.assign(`/${locale}/admin`);

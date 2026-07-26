@@ -277,7 +277,7 @@ export const PUT = withErrorHandling(async (request, context) => {
   // future we flip the status back to PUBLISHED or LIVE instead of
   // leaving the row stuck in ENDED. Without this the call happens to
   // be terminated permanently from a single timing mistake — which
-  // is what happened on the caffettino dry-run.
+  // is what happened on a dry-run before a real event.
   const revivedStatus = reviveStatus({
     currentStatus: event.status,
     currentStartsAt: event.startsAt,

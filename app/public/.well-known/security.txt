@@ -4,4 +4,3 @@ Encryption: https://pa-webinar.gov.it/pgp-key.txt
 Policy: https://github.com/italia/pa-webinar/blob/main/SECURITY.md
 Acknowledgments: https://github.com/italia/pa-webinar/blob/main/SECURITY.md#acknowledgments
 Preferred-Languages: it, en
-Canonical: https://videocall-test.innovazione.gov.it/.well-known/security.txt

@@ -726,7 +726,7 @@ export default function EventDetailClient({
                 />
               ) : (
                 <>
-                  {/* F5: il numero di registrati NON è più mostrato
+                  {/* Il numero di registrati NON è mostrato
                       pubblicamente (né qui né nel listing). Resta visibile
                       agli amministratori nel pannello admin. Il pubblico vede
                       solo il conteggio dei presenti nella sala live. */}
@@ -854,7 +854,7 @@ function PostEventSidebar({
         {t('detail.eventEnded')}
       </h3>
 
-      {/* F5: registrati non mostrati pubblicamente. Manteniamo solo il
+      {/* Registrati non mostrati pubblicamente. Manteniamo solo il
           conteggio dei presenti (picco) qui sotto. */}
       {event.peakParticipants !== undefined && event.peakParticipants > 0 && (
         <div

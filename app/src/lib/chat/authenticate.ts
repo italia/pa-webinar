@@ -4,7 +4,7 @@
  * Extracted from the chat POST route so the message-level actions added later —
  * correcting your own message, reacting to one — resolve the sender through the
  * exact same rules instead of each re-deriving "who are you". A second
- * implementation of this is how identity bugs get in (see F7).
+ * implementation of this is how impersonation bugs get in.
  */
 
 import { prisma } from '@/lib/db';
@@ -60,7 +60,7 @@ export async function authenticateChatSender(
     // resolveTokenSender. Only role=MODERATOR gets the moderator badge — a
     // SPEAKER is a relatore, not staff (coerente con verifyModeratorToken).
     //
-    // F7 identity binding lives inside resolveTokenSender: an owning registrant
+    // Identity binding lives inside resolveTokenSender: an owning registrant
     // gets their real DB name; a forwarded-link opener keeps the same reg-<id>
     // seat but is named from what they typed (displayNameOverride), never the
     // registrant's decrypted name. A genuinely invalid/foreign/deleted token

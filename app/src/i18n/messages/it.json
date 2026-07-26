@@ -1551,7 +1551,7 @@
         "calendarPublic": "Calendario pubblico",
         "calendarPublicHelp": "Pubblica il calendario degli eventi. Visitatori possono vedere gli eventi programmati.",
         "parseTitleKicker": "Titoli con kicker editoriale",
-        "parseTitleKickerHelp": "Se il titolo di un evento contiene il carattere \"|\", la parte prima viene mostrata come piccola etichetta in maiuscoletto sopra il titolo principale. Esempio: \"Caffettino | Prova OSS\" → etichetta \"CAFFETTINO\" + titolo \"Prova OSS\".",
+        "parseTitleKickerHelp": "Se il titolo di un evento contiene il carattere \"|\", la parte prima viene mostrata come piccola etichetta in maiuscoletto sopra il titolo principale. Esempio: \"Pausa caffè | Prova OSS\" → etichetta \"PAUSA CAFFÈ\" + titolo \"Prova OSS\".",
         "githubUrl": "URL repository GitHub",
         "supportEmail": "Email supporto",
         "jvbScalingTitle": "Scaling ponte video (JVB)",

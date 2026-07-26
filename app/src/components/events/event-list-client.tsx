@@ -254,7 +254,7 @@ export default function EventListClient({
                   className="d-flex justify-content-between align-items-center mt-auto pt-3"
                   style={{ borderTop: '1px solid #e8e8e8' }}
                 >
-                  {/* F5: il conteggio dei registrati non è più esposto
+                  {/* Il conteggio dei registrati non è esposto
                       pubblicamente sulle card. Manteniamo solo il badge
                       "registrazione disponibile" per gli eventi conclusi. */}
                   {isEnded && event.recordingUrl ? (

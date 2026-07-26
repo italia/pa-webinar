@@ -54,7 +54,7 @@ export const GET = withErrorHandling(async (request, context) => {
 const peakSchema = z.object({
   count: z.number().int().min(0),
   // Any attendee of THIS event may report the live count so the peak isn't
-  // stuck at 0 in a moderator-less session (feedback #4b): a moderator/
+  // stuck at 0 in a moderator-less session: a moderator/
   // co-moderator/speaker grant token, or a participant access token. Rooms where
   // no token can exist are the tokenless case — see the authorization block.
   // Bounded so a caller cannot use it as an unbounded rate-limiter key.
@@ -118,8 +118,8 @@ export const POST = withErrorHandling(async (request, context) => {
   // INSTANT room, or an event with zero registrations. The reported figure is
   // the whole-room headcount, so a single token-bearing attendee is enough to
   // track the peak for everyone; the anonymous path is needed only when there
-  // is no such attendee — which is exactly the moderator-less public-link case
-  // #4b was about. Keeping it that narrow matters because the figure is
+  // is no such attendee — which is exactly the moderator-less public-link case.
+  // Keeping it that narrow matters because the figure is
   // monotonic and publicly rendered: on an event that has registrations, a
   // public slug would otherwise let any anonymous caller pin it to the clamp.
   // `reporter` is the identity the per-event throttle is keyed on — resolved,

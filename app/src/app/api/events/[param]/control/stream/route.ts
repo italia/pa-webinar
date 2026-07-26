@@ -1,6 +1,6 @@
 /**
  * Server-Sent Events stream of transient live-CONTROL signals for an event
- * (F8 raise-hand auto-lower, and any future targeted control op).
+ * (the moderator's "lower that hand" signal, and any future targeted control op).
  *
  * Deliberately SEPARATE from the chat SSE stream so that:
  *   - it stays open for the WHOLE live session regardless of whether the

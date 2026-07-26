@@ -335,7 +335,7 @@ function addMsg(who: Who, name: string, text: string): void {
 const PEERS = ['Giulia', 'Marco', 'Francesca', 'Davide', 'Sara', 'Luca'];
 const SEED: Array<[string, string]> = [
   ['Giulia', 'Buongiorno a tutte e tutti! ☕'],
-  ['Marco', 'Pronti per il caffettino del DTD?'],
+  ['Marco', 'Pronti per la pausa caffè digitale?'],
   ['Francesca', "Si sente bene l'audio da voi?"],
 ];
 addMsg('sys', '', "Benvenuto nella sala d'attesa. La chat è moderata.");

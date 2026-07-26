@@ -9,7 +9,7 @@
  *
  * Channel naming: `control:<eventId>` (one per event, like chat).
  *
- * F8 — raise-hand auto-lower: the Jitsi IFrame API can lower ONLY the
+ * Raise-hand auto-lower: the Jitsi IFrame API can lower ONLY the
  * local user's hand (`toggleRaiseHand`), never a remote one. So a
  * moderator "lower this hand" must reach the raiser's OWN browser, which
  * then lowers its own hand; Jitsi then broadcasts `raiseHandUpdated(0)`

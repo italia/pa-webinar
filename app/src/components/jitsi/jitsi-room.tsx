@@ -48,11 +48,11 @@ interface JitsiRoomProps {
    *  Drives resolution, bitrate caps, channelLastN and Opus settings, and is
    *  also enforced at runtime via setVideoQuality. Defaults to HIGH. */
   videoQuality?: VideoQualityPreset;
-  /** Reactions mode (admin SiteSetting, #7). 'NATIVE' → Jitsi's own reactions
+  /** Reactions mode (admin SiteSetting). 'NATIVE' → Jitsi's own reactions
    *  button in the toolbar (ephemeral, no app analytics); 'CUSTOM' → the app's
    *  ReactionBar overlay (persisted/aggregated). Default 'NATIVE'. */
   reactionsMode?: 'NATIVE' | 'CUSTOM';
-  /** F18 — se true (DEFAULT) l'app forza OFF la soppressione rumore avanzata
+  /** Se true (DEFAULT) l'app forza OFF la soppressione rumore avanzata
    *  (rnnoise) di Jitsi e la ri-spegne per tutta la call; se false la accende
    *  a ogni unmute. La soppressione WebRTC di base (AEC/NS/AGC) resta accesa
    *  in entrambi i casi via lib/jitsi/config.ts.
@@ -220,7 +220,7 @@ export default function JitsiRoom({
       }
     }
 
-    // Reactions (#7): NATIVE mode surfaces Jitsi's own reactions button and
+    // Reactions: NATIVE mode surfaces Jitsi's own reactions button and
     // enables the feature (the base config disables it in favour of the custom
     // bar); CUSTOM mode leaves it disabled and the app renders its own
     // analytics-backed ReactionBar instead. `extraConfig` is spread AFTER
@@ -427,7 +427,7 @@ export default function JitsiRoom({
         // enable qui sotto.
         const enforceNoiseSuppressionOff = (): void => setNoiseSuppression(false);
 
-        // F18: enable advanced rnnoise noise-suppression — but ONLY when the
+        // Enable advanced rnnoise noise-suppression — but ONLY when the
         // served jitsi/web image is the 48 kHz-patched build AND the operator
         // opted in (`rnnoiseEnforceOff=false`, dall'env del pod). It's a no-op
         // with no local audio track, and everyone joins startWithAudioMuted, so
@@ -443,7 +443,7 @@ export default function JitsiRoom({
           // Il nostro endpoint id: usato per segnalare solo le nostre alzate.
           if (evt?.id) myEndpointIdRef.current = evt.id;
           setLoadState('ready');
-          // Seed iniziale del conteggio partecipanti (feedback #4b): i listener
+          // Seed iniziale del conteggio partecipanti: i listener
           // participantJoined/Left qui sotto scattano SOLO per i cambiamenti dopo
           // che ci siamo agganciati, quindi senza questo seed il conteggio parte
           // da 0 e sotto-riporta per chi entra in una sala già popolata (es. un
@@ -457,7 +457,7 @@ export default function JitsiRoom({
               nsEnforceTimerRef.current = setInterval(enforceNoiseSuppressionOff, 2000);
             }
           } else {
-            // F18: the served jitsi/web image is patched (noise-suppression
+            // The served jitsi/web image is patched (noise-suppression
             // AudioContext forced to 48 kHz), so rnnoise no longer silences
             // non-48 kHz mics — turn it ON for stronger background-noise removal.
             // The toolbar toggle is hidden, so we drive it via the IFrame API.
@@ -499,7 +499,7 @@ export default function JitsiRoom({
           if (e && e.muted === false) reapplyVideoQuality();
         });
 
-        // F18: (re)assert advanced rnnoise whenever the mic is unmuted — that's
+        // (Re)assert advanced rnnoise whenever the mic is unmuted — that's
         // when the local audio track exists, so the enable actually takes (the
         // join-time attempt is a no-op for the startWithAudioMuted majority).
         // No-op unless the served jitsi/web image is the 48 kHz-patched build.

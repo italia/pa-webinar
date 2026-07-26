@@ -77,7 +77,8 @@ const DEFAULT_NEW: EditingTemplate = {
   description: '',
   icon: 'it-video',
   // Chat primaria, Q&A opt-in — stesso default di defaultMatrix() e dei
-  // template di sistema (live feedback #10: "tenere SOLO chat").
+  // template di sistema: la chat è il canale principale, la Q&A si attiva
+  // quando serve.
   qaEnabled: false,
   chatEnabled: true,
   whiteboardEnabled: false,

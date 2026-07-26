@@ -14,9 +14,10 @@
  * `multitrackRecordingEnabled`, `retainParticipantTracks`, the four AI flags,
  * `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`,
  * `autoStartRecording`, `videoQuality` and `recurrenceRule` on the floor. For a
- * recurring call (Caffettino, DevIt sync) that is the whole point of duplicating:
- * the operator would only discover the loss after the event, with no multitrack
- * audio and no transcript. See docs/ROADMAP.md, "Eventi ricorrenti / serie".
+ * recurring call (a weekly team sync, a monthly public webinar) that is the
+ * whole point of duplicating: the operator would only discover the loss after
+ * the event, with no multitrack audio and no transcript.
+ * See docs/ROADMAP.md, "Eventi ricorrenti / serie".
  *
  * What we reset: status (→ DRAFT), moderatorToken, jitsiRoomName, slug,
  * runtime/analytics state (lastActiveAt, provisioningStartedAt,

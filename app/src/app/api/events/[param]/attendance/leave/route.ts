@@ -21,7 +21,7 @@ const bodySchema = z.object({ accessToken: z.string().min(1).max(256) });
  * as a beacon on intentional close (readyToClose) and on real unload (pagehide
  * with !persisted) while in-call — mirroring how joinedAt is written.
  *
- * Identity binding (F7): joinedAt is only written for the cookie-verified OWNER
+ * Identity binding: joinedAt is only written for the cookie-verified OWNER
  * of the personal link; leftAt must match. So we require the signed
  * `event_access` cookie to carry this same accessToken (sendBeacon sends the
  * same-origin cookie). A forwarded link opened without the cookie is a silent

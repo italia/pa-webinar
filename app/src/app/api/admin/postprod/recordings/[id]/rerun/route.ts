@@ -56,7 +56,7 @@ export const POST = withErrorHandling(async (request, context) => {
     // enqueue no-ops. Throw BEFORE the status mutation so the recording stays
     // at READY and the "Genera AI" button (which enables the flag) remains
     // available — otherwise a mistaken Rerun strands it in POSTPROD_QUEUED with
-    // zero jobs and no way back. (review #1)
+    // zero jobs and no way back.
     if (!recording.event.aiTranscriptEnabled) {
       throw new ValidationError(
         'AI transcript is disabled for this event. Use "Genera AI" to enable AI processing and start the pipeline.',

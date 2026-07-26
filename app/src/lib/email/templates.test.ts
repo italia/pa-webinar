@@ -18,7 +18,7 @@ import {
  */
 const base = () => ({
   locale: 'it' as const,
-  eventTitle: 'Sync DesIt + DevIt',
+  eventTitle: 'Incontro di rete + domande',
   eventDate: 'mercoledì 22 luglio 2026',
   eventTime: '11:15',
   eventDuration: '45 min',
@@ -29,19 +29,19 @@ const base = () => ({
 
 describe('confirmation email', () => {
   it('puts the event name in the subject', () => {
-    expect(baseConfirmationCopy(base()).subject).toContain('Sync DesIt + DevIt');
-    expect(baseConfirmationCopy({ ...base(), locale: 'en' }).subject).toContain('Sync DesIt + DevIt');
+    expect(baseConfirmationCopy(base()).subject).toContain('Incontro di rete + domande');
+    expect(baseConfirmationCopy({ ...base(), locale: 'en' }).subject).toContain('Incontro di rete + domande');
   });
 
   it('shows the event name prominently in the body, not just in the table', () => {
     const html = confirmationHtml(base());
     // Once as the headline under the heading, once in the details table.
-    const occurrences = html.split('Sync DesIt + DevIt').length - 1;
+    const occurrences = html.split('Incontro di rete + domande').length - 1;
     expect(occurrences).toBeGreaterThanOrEqual(2);
   });
 
   it('keeps the event name in the plain-text part', () => {
-    expect(confirmationText(base())).toContain('Sync DesIt + DevIt');
+    expect(confirmationText(base())).toContain('Incontro di rete + domande');
   });
 
   it('renders the event banner when the event has an image', () => {
@@ -50,7 +50,7 @@ describe('confirmation email', () => {
       eventImageUrl: 'https://example.gov.it/api/assets/image/2026/07/banner.png',
     });
     expect(html).toContain('<img src="https://example.gov.it/api/assets/image/2026/07/banner.png"');
-    expect(html).toContain('alt="Sync DesIt + DevIt"');
+    expect(html).toContain('alt="Incontro di rete + domande"');
   });
 
   it('renders no banner when the event has no image', () => {

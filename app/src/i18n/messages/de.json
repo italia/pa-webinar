@@ -1438,7 +1438,7 @@
         "calendarPublic": "Öffentlicher Kalender",
         "calendarPublicHelp": "Den Veranstaltungskalender veröffentlichen. Besucher können geplante Veranstaltungen sehen.",
         "parseTitleKicker": "Titel mit redaktionellem Kicker",
-        "parseTitleKickerHelp": "Wenn der Eventtitel das Zeichen \"|\" enthält, wird der Teil davor als kleine Versalien-Etikette über dem Haupttitel dargestellt. Beispiel: \"Caffettino | OSS-Test\" → Etikette \"CAFFETTINO\" + Titel \"OSS-Test\".",
+        "parseTitleKickerHelp": "Wenn der Eventtitel das Zeichen \"|\" enthält, wird der Teil davor als kleine Versalien-Etikette über dem Haupttitel dargestellt. Beispiel: \"Kaffeepause | OSS-Test\" → Etikette \"KAFFEEPAUSE\" + Titel \"OSS-Test\".",
         "githubUrl": "GitHub-Repository-URL",
         "supportEmail": "Support-E-Mail",
         "jvbScalingTitle": "Skalierung der Video-Bridge (JVB)",

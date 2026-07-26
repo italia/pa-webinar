@@ -58,7 +58,7 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
 
   // Authenticated members only (moderator/speaker grant or a registered
-  // participant). resolveTokenSender bakes in the F7 gate and returns the same
+  // participant). resolveTokenSender bakes in the identity gate and returns the same
   // reg-<id> seat the chat POST will (so the signed attachment token binds); a
   // forwarded-link opener can still upload, but the message it attaches to is
   // named from the opener's typed name — no registrant name leaks. Tokenless

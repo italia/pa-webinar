@@ -22,7 +22,7 @@ export default function ParticipantPanel({
   const t = useTranslations('live.participants');
   const tr = useTranslations('live.role');
   const [participants, setParticipants] = useState<JitsiParticipant[]>([]);
-  // F12: per-participant LOCAL playback volume (0..1, default 1 = 100%) and
+  // Per-participant LOCAL playback volume (0..1, default 1 = 100%) and
   // which row currently has its slider expanded. Kept separate from
   // `participants` so the 5s roster refresh never resets a user's choices.
   const [volumes, setVolumes] = useState<Record<string, number>>({});
@@ -31,10 +31,10 @@ export default function ParticipantPanel({
 
   const refresh = useCallback(() => {
     if (!api) return;
-    // Show EVERY human endpoint (F2: minus the recorder bot). We deliberately
+    // Show EVERY human endpoint (i.e. minus the recorder bot). We deliberately
     // do NOT hide same-named connections from the roster — a moderator must be
     // able to see and kick every participant, and two distinct people can share
-    // a name. But we REPORT a de-duplicated people-count (F4) so the header
+    // a name. But we REPORT a de-duplicated people-count so the header
     // matches the "N persone" pill: a person who re-entered (leftover "zombie"
     // endpoint from a Back-button rejoin) is counted once.
     const list = api.getParticipantsInfo().filter(isHumanParticipant);
@@ -78,7 +78,7 @@ export default function ParticipantPanel({
     [api, t],
   );
 
-  // F12: setParticipantVolume adjusts a remote participant's audio *for this
+  // setParticipantVolume adjusts a remote participant's audio *for this
   // browser only* (a local gain on the received track — it never affects what
   // anyone else hears), so it's a per-user preference and is offered to every
   // attendee. Clamp to [0,1] to match the HTMLMediaElement volume range.
@@ -190,7 +190,7 @@ export default function ParticipantPanel({
                       {roleBadge(p.role)}
                     </div>
                     <div className="d-flex gap-2 flex-shrink-0 align-items-center">
-                      {/* F12: per-user local playback volume. It only changes what
+                      {/* Per-user local playback volume. It only changes what
                           THIS browser hears, so it's offered to every attendee.
                           NB: contrary to the upstream docs, the external_api.js
                           this platform serves DOES list the local user in

@@ -17,7 +17,7 @@ Implementazione di riferimento per generare la metà OPS del documento `/service
                  ┌──────────────────────────┐
                  │ Azure Blob (public)      │
                  │ service-inventory/       │
-                 │   videocall-prod/bom.json│
+                 │   <tenant>/bom.json      │
                  └──────────────┬───────────┘
                                 │
                                 ▼
@@ -40,15 +40,21 @@ Implementazione di riferimento per generare la metà OPS del documento `/service
 
 ## Quick start
 
+I valori tra parentesi angolari sono segnaposto da sostituire con quelli della
+tua installazione: `<resource-group>` il resource group che ospita la Managed
+Identity, `<namespace>` il namespace Kubernetes in cui gira il CronJob,
+`<tenant>` il nome con cui distingui l'istanza (finisce nel nome della
+federated credential e nel percorso del blob).
+
 ```bash
 # 1. Crea la Managed Identity e ottieni client-id + principal-id
 az identity create \
   --name id-service-inventory \
-  --resource-group rg-shared \
+  --resource-group <resource-group> \
   --location italynorth
 
-MI_CLIENT_ID=$(az identity show -n id-service-inventory -g rg-shared --query clientId -o tsv)
-MI_PRINCIPAL_ID=$(az identity show -n id-service-inventory -g rg-shared --query principalId -o tsv)
+MI_CLIENT_ID=$(az identity show -n id-service-inventory -g <resource-group> --query clientId -o tsv)
+MI_PRINCIPAL_ID=$(az identity show -n id-service-inventory -g <resource-group> --query principalId -o tsv)
 
 # 2. Assegna i ruoli
 az role assignment create \
@@ -67,35 +73,35 @@ az role assignment create \
 OIDC_ISSUER=$(az aks show -n $AKS_NAME -g $AKS_RG --query oidcIssuerProfile.issuerUrl -o tsv)
 az identity federated-credential create \
   --identity-name id-service-inventory \
-  --resource-group rg-shared \
-  --name fc-service-inventory-videocall-prod \
+  --resource-group <resource-group> \
+  --name fc-service-inventory-<tenant> \
   --issuer "$OIDC_ISSUER" \
-  --subject "system:serviceaccount:videocall-prod:service-inventory-generator" \
+  --subject "system:serviceaccount:<namespace>:service-inventory-generator" \
   --audiences api://AzureADTokenExchange
 
 # 4. Prepara il ConfigMap con lo script (il manifest ha un placeholder vuoto)
-kubectl -n videocall-prod create configmap service-inventory-scripts \
+kubectl -n <namespace> create configmap service-inventory-scripts \
   --from-file=azure-to-cyclonedx.py=scripts/azure-to-cyclonedx.py \
   --dry-run=client -o yaml | kubectl apply -f -
 
 # 5. Modifica cronjob.yaml sostituendo i placeholder REPLACE_WITH_...
 #    (MI client id, subscription id, resource group, storage account, blob name)
 # 6. Applica
-kubectl -n videocall-prod apply -f cronjob.yaml
+kubectl -n <namespace> apply -f cronjob.yaml
 
 # 7. (Opzionale) Esegui subito per test
-kubectl -n videocall-prod create job \
+kubectl -n <namespace> create job \
   --from=cronjob/service-inventory-generator si-test-$(date +%s)
-kubectl -n videocall-prod logs -f job/si-test-...
+kubectl -n <namespace> logs -f job/si-test-...
 ```
 
 Dopo il primo successo, puntare l'app via Helm values al JSON pubblicato:
 
 ```yaml
-# k8s-configuration/helm/videocall/prod/values.yaml
+# nei values Helm dell'istanza, nel tuo repository di configurazione
 app:
   env:
-    SERVICE_INVENTORY_URL: "https://${STORAGE_ACCOUNT}.blob.core.windows.net/service-inventory/videocall-prod/service-inventory.json"
+    SERVICE_INVENTORY_URL: "https://${STORAGE_ACCOUNT}.blob.core.windows.net/service-inventory/<tenant>/service-inventory.json"
 ```
 
 ## Estendere la mappatura

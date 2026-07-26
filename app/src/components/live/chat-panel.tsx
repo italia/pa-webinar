@@ -84,7 +84,7 @@ interface ChatMessage {
   reactions?: Record<string, number>;
 }
 
-// Small static emoji set for the compose-box picker (feedback #9). Plain string
+// Small static emoji set for the compose-box picker. Plain string
 // literals — no npm dep, server/client render identically (no hydration risk).
 // 16 emojis → 2 rows of 8 in the popover grid.
 const CHAT_EMOJIS = [
@@ -141,10 +141,10 @@ export default function ChatPanel({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
-  // Live-chat transport health, surfaced as an unobtrusive pill (feedback #8c).
+  // Live-chat transport health, surfaced as an unobtrusive pill.
   //   'live'         → SSE stream is delivering frames.
   //   'reconnecting' → EventSource fired 'error'; the browser is retrying.
-  //   'degraded'     → SSE went silent yet the poll fallback (feedback #8) had to
+  //   'degraded'     → SSE went silent yet the poll fallback had to
   //                    recover messages the stream should have pushed (a silently
   //                    buffering proxy). Chat still works, just via polling.
   const [connStatus, setConnStatus] =
@@ -169,7 +169,7 @@ export default function ChatPanel({
   const isAtBottomRef = useRef(true);
   const lastSeenAtRef = useRef<string | null>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
-  // Last time an SSE 'message'/'open' fired; the poll watchdog (feedback #8)
+  // Last time an SSE 'message'/'open' fired; the poll watchdog
   // backfills when this goes stale — a silently-buffered stream is otherwise
   // indistinguishable from a quiet one (keepalives are invisible to EventSource).
   const lastRecvRef = useRef(Date.now());
@@ -488,7 +488,7 @@ export default function ChatPanel({
     return () => { cancelled = true; };
   }, [eventSlug, readHeaders, readDenied]);
 
-  // 2. SSE stream for live updates + polling fallback (live feedback #8).
+  // 2. SSE stream for live updates + polling fallback.
   //
   // EventSource fires 'open' on the stream's first byte and the 25s keepalive is
   // a ':' comment it never surfaces as an event — so a stream that a proxy has
@@ -542,7 +542,7 @@ export default function ChatPanel({
         const data = (await res.json()) as { messages: ChatMessage[] };
         // Count messages the stream never delivered (still unseen) BEFORE upsert
         // marks them seen. A non-zero count on the POLL path means the SSE is
-        // buffered, not merely quiet (feedback #8c).
+        // buffered, not merely quiet.
         let recovered = 0;
         data.messages.forEach((m) => {
           if (!seenIdsRef.current.has(m.id)) recovered += 1;
@@ -706,7 +706,7 @@ export default function ChatPanel({
     inputRef.current?.focus();
   }, []);
 
-  // ── Emoji picker (feedback #9) ──────────────────────────
+  // ── Emoji picker ───────────────────────────────────────
   // Insert at the input's caret, update `input`, then restore focus + caret. The
   // emoji buttons preventDefault on mousedown so a mouse click never blurs the
   // input; the rAF focus() covers the keyboard-activation path.
@@ -818,7 +818,7 @@ export default function ChatPanel({
         setComposeError(attachment ? t('attachFailed') : t('sendFailed'));
         return;
       }
-      // Optimistic echo (live feedback #8): render our OWN message immediately
+      // Optimistic echo: render our OWN message immediately
       // using the REAL server id, instead of relying solely on the Redis→SSE
       // fan-out. A user behind a proxy that silently buffers the SSE stream
       // (e.g. some Edge/corporate setups) otherwise never sees anything they

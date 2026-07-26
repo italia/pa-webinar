@@ -105,7 +105,7 @@ export const POST = withErrorHandling(async (request, context) => {
     }
 
     // The accessToken lives in the personal join link, so a FORWARDED link would
-    // otherwise let the opener mint the registrant's identity (F7). Bind identity
+    // otherwise let the opener mint the registrant's identity. Bind identity
     // to the browser that registered: the signed `event_access` cookie must carry
     // this same token. A non-owner still gets in (possessing the shared token
     // authorizes entry), but under THEIR OWN typed name and a fresh guest

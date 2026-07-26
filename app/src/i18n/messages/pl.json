@@ -1438,7 +1438,7 @@
         "calendarPublic": "Kalendarz publiczny",
         "calendarPublicHelp": "Opublikuj kalendarz wydarzeń. Odwiedzający mogą zobaczyć zaplanowane wydarzenia.",
         "parseTitleKicker": "Tytuły z nagłówkiem redakcyjnym",
-        "parseTitleKickerHelp": "Jeśli tytuł wydarzenia zawiera znak \"|\", część przed nim zostanie wyświetlona jako mała etykieta wielkimi literami nad głównym tytułem. Przykład: \"Caffettino | Test OSS\" → etykieta \"CAFFETTINO\" + tytuł \"Test OSS\".",
+        "parseTitleKickerHelp": "Jeśli tytuł wydarzenia zawiera znak \"|\", część przed nim zostanie wyświetlona jako mała etykieta wielkimi literami nad głównym tytułem. Przykład: \"Przerwa na kawę | Test OSS\" → etykieta \"PRZERWA NA KAWĘ\" + tytuł \"Test OSS\".",
         "githubUrl": "URL repozytorium GitHub",
         "supportEmail": "E-mail pomocy technicznej",
         "jvbScalingTitle": "Skalowanie mostka wideo (JVB)",

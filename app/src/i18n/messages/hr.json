@@ -1438,7 +1438,7 @@
         "calendarPublic": "Javni kalendar",
         "calendarPublicHelp": "Objavi kalendar događaja. Posjetitelji mogu vidjeti zakazane događaje.",
         "parseTitleKicker": "Naslovi s uredničkim nadnaslovom",
-        "parseTitleKickerHelp": "Ako naslov događaja sadrži znak \"|\", dio prije njega prikazuje se kao mala oznaka iznad glavnog naslova. Primjer: \"Caffettino | Test OSS\" → oznaka \"CAFFETTINO\" + naslov \"Test OSS\".",
+        "parseTitleKickerHelp": "Ako naslov događaja sadrži znak \"|\", dio prije njega prikazuje se kao mala oznaka iznad glavnog naslova. Primjer: \"Pauza za kavu | Test OSS\" → oznaka \"PAUZA ZA KAVU\" + naslov \"Test OSS\".",
         "githubUrl": "URL GitHub repozitorija",
         "supportEmail": "Email za podršku",
         "jvbScalingTitle": "Skaliranje videomosta (JVB)",

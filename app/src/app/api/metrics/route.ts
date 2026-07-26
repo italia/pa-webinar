@@ -26,8 +26,8 @@ export const dynamic = 'force-dynamic';
  * written to Redis by the scaler CronJob (`jvb:replicas:snapshot`, TTL
  * 300 s). With N>1 pods a direct Service-VIP fetch of `/colibri/stats`
  * only sees one pod's slice and reports zeros for the rest — Prometheus
- * was scraping misleading values during the Friday caffettino (apparent
- * 0 participants while the scaler correctly saw 63). Prefer the snapshot;
+ * was scraping misleading values during a live event (apparent
+ * 0 participants while the scaler correctly saw dozens). Prefer the snapshot;
  * fall back to a single probe only when the snapshot is missing or has
  * no aggregated traffic data (fresh pod, scaler crashed, Redis cold).
  */

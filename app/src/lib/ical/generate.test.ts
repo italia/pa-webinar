@@ -60,7 +60,7 @@ describe('generateEventICal', () => {
     expect(ics).toContain('METHOD:REQUEST');
   });
 
-  // Regression guard for the DevIt invitation bug: the .ics used to carry
+  // Regression guard for the mis-timed invitation bug: the .ics used to carry
   // `DTSTART;TZID=Europe/Rome:20260615T100000` — the UTC wall clock relabelled
   // as Rome time, with no VTIMEZONE to resolve the TZID against — so calendars
   // booked the event two hours early.

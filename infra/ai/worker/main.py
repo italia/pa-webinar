@@ -355,7 +355,8 @@ def run_summarize(app: cli.AppClient, job: cli.ClaimResponse) -> None:
 
         # Nomi reali per l'LLM: priorità ai Speaker del DB (job.speakerNames,
         # mapping admin/multitrack), fallback ai nomi embeddati nel transcript
-        # (multitrack: dal JWT). Così la sintesi cita "Raffaele" non "SPEAKER_00".
+        # (multitrack: dal JWT). Così la sintesi cita il nome del relatore
+        # invece di "SPEAKER_00".
         names = dict(getattr(job, "speakerNames", {}) or {})
         for sp in transcript.get("speakers", []) or []:
             dl, dn = sp.get("diarLabel"), sp.get("displayName")
@@ -420,7 +421,8 @@ def run_translate(app: cli.AppClient, job: cli.ClaimResponse) -> None:
             transcript = json.load(f)
 
         # Nomi reali (DB Speaker + fallback transcript) per i sottotitoli
-        # tradotti: la label nel VTT diventa "Raffaele" non "SPEAKER_00".
+        # tradotti: la label nel VTT diventa il nome del relatore invece
+        # di "SPEAKER_00".
         names = dict(getattr(job, "speakerNames", {}) or {})
         for sp in transcript.get("speakers", []) or []:
             dl, dn = sp.get("diarLabel"), sp.get("displayName")

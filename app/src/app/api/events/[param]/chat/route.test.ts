@@ -347,7 +347,7 @@ describe('POST /api/events/[param]/chat — self-asserted names', () => {
     expect((await res.json()).canEdit).toBe(true);
   });
 
-  it('never auto-attributes the registrant name to a forwarded link (F7)', async () => {
+  it('never auto-attributes the registrant name to a forwarded link', async () => {
     // Il link personale inoltrato mantiene il posto reg-<id> (analytics e
     // rate-limit restano uniti) ma chi lo apre si chiama come ha digitato: il
     // nome vero della registrante non deve mai finire sotto le parole altrui.

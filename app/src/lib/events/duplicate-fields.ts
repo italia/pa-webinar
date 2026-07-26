@@ -5,9 +5,9 @@
  * copied fields by hand, and every feature added afterwards was simply forgotten
  * — `multitrackRecordingEnabled`, `retainParticipantTracks`, the four AI flags,
  * `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`,
- * `autoStartRecording`, `videoQuality`, `recurrenceRule`. For the recurring calls
- * this endpoint exists for (Caffettino, DevIt sync) that silent loss surfaces
- * only after the event: no isolated audio tracks, no transcript, no summary.
+ * `autoStartRecording`, `videoQuality`, `recurrenceRule`. On the recurring calls
+ * this endpoint exists for, that silent loss surfaces only after the event is
+ * over: no isolated audio tracks, no transcript, no summary.
  *
  * Splitting the model into these two exhaustive lists lets a test assert, against
  * Prisma's own schema, that EVERY scalar column is classified. Add a column and

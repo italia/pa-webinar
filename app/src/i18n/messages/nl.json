@@ -1438,7 +1438,7 @@
         "calendarPublic": "Openbare kalender",
         "calendarPublicHelp": "De evenementenkalender publiceren. Bezoekers kunnen geplande evenementen zien.",
         "parseTitleKicker": "Titels met redactionele kicker",
-        "parseTitleKickerHelp": "Als de titel van een evenement het teken \"|\" bevat, wordt het deel ervoor weergegeven als kleine kapitaal-bovenkop boven de hoofdtitel. Voorbeeld: \"Caffettino | OSS-test\" → bovenkop \"CAFFETTINO\" + titel \"OSS-test\".",
+        "parseTitleKickerHelp": "Als de titel van een evenement het teken \"|\" bevat, wordt het deel ervoor weergegeven als kleine kapitaal-bovenkop boven de hoofdtitel. Voorbeeld: \"Koffiepauze | OSS-test\" → bovenkop \"KOFFIEPAUZE\" + titel \"OSS-test\".",
         "githubUrl": "URL GitHub-repository",
         "supportEmail": "E-mail ondersteuning",
         "jvbScalingTitle": "Schalen videobridge (JVB)",

@@ -1438,7 +1438,7 @@
         "calendarPublic": "Verejný kalendár",
         "calendarPublicHelp": "Zverejniť kalendár udalostí. Návštevníci môžu vidieť naplánované udalosti.",
         "parseTitleKicker": "Názvy s redakčným nadtitulkom",
-        "parseTitleKickerHelp": "Ak názov podujatia obsahuje znak \"|\", časť pred ním sa zobrazí ako malý štítok veľkými písmenami nad hlavným názvom. Príklad: \"Caffettino | Test OSS\" → štítok \"CAFFETTINO\" + názov \"Test OSS\".",
+        "parseTitleKickerHelp": "Ak názov podujatia obsahuje znak \"|\", časť pred ním sa zobrazí ako malý štítok veľkými písmenami nad hlavným názvom. Príklad: \"Prestávka na kávu | Test OSS\" → štítok \"PRESTÁVKA NA KÁVU\" + názov \"Test OSS\".",
         "githubUrl": "URL repozitára GitHub",
         "supportEmail": "E-mail podpory",
         "jvbScalingTitle": "Škálovanie video mosta (JVB)",

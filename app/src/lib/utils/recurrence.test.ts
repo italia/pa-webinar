@@ -32,7 +32,7 @@ describe('buildRRule + parseRRule roundtrip', () => {
     expect(parsed?.preset).toBe('weekly');
   });
 
-  it('preset weekly with explicit byWeekday=FR (caffettino!) roundtrips', () => {
+  it('preset weekly with explicit byWeekday=FR roundtrips', () => {
     // 4 = Friday in RRULE convention (Mon=0..Sun=6)
     const body = buildRRule({ preset: 'weekly', dtstart: WED_10, byWeekday: [4] });
     expect(body).toContain('FREQ=WEEKLY');

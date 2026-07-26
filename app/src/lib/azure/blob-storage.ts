@@ -11,7 +11,8 @@
  *   getBlobProperties        → provider.stat() (not yet in interface)
  *   ensureContainer          → provider.ensure()
  *
- * Removing this file is tracked separately — see task #25.
+ * Migrating the remaining call-sites and deleting this shim is a separate
+ * cleanup: it touches many files and nothing else depends on it happening now.
  */
 
 import { getFilesStorage } from '@/lib/storage';

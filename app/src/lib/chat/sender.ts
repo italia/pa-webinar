@@ -8,7 +8,7 @@
  * Extracted so the chat POST route, the attachment upload route, and the
  * moderation route share one authoritative implementation instead of drifting.
  *
- * F7 identity binding is baked in here (not left to each caller) so no surface
+ * Identity binding is baked in here (not left to each caller) so no surface
  * can forget it: a registration accessToken is named from the registrant's
  * authoritative decrypted DB name ONLY on the browser that registered (holds
  * the signed event_access cookie). A forwarded personal link opened elsewhere
@@ -31,7 +31,7 @@ export interface ChatTokenSender {
    *
    * `senderId` deliberately is NOT that: the shared primary moderator link
    * resolves to `mod-<eventId>-primary` for everyone who holds it, and a
-   * forwarded registration link keeps the SAME `reg-<id>` seat (F7, on purpose —
+   * forwarded registration link keeps the SAME `reg-<id>` seat (on purpose —
    * it keeps a legitimate cross-device registrant from splitting in two). Those
    * are seats, not people. Anything that authorises acting AS the author — such
    * as editing a message after the fact — must require this flag instead, or one
@@ -52,10 +52,10 @@ export interface ChatEventForAuth {
  *
  * `displayNameOverride` is a client-typed name. It is honoured for the shared
  * primary moderator link (mirrors the JWT displayName override) and as the name
- * of a NON-owning registration-link opener (F7); per-row grants and the owning
+ * of a NON-owning registration-link opener; per-row grants and the owning
  * registrant keep their authoritative decrypted name.
  *
- * Must be called within a request scope — the F7 ownership check reads the
+ * Must be called within a request scope — the ownership check reads the
  * event_access cookie via next/headers.
  */
 export async function resolveTokenSender(
@@ -90,14 +90,15 @@ export async function resolveTokenSender(
     select: { id: true, displayName: true, eventId: true },
   });
   if (registration && registration.eventId === event.id) {
-    // F7 gate (read the cookie only now that a registration matched, so grants
+    // Ownership gate (read the cookie only now that a registration matched, so grants
     // never pay for it): surface the registrant's authoritative decrypted DB
     // name ONLY to the browser that registered (owns the event_access cookie).
     // A forwarded personal link opened elsewhere keeps the SAME registration
     // seat (reg-<id>) but is named from what the opener TYPED — never the
     // registrant's real name auto-decrypted from the DB.
     //
-    // The seat id is deliberately unchanged from the pre-F7 behaviour: chat has
+    // The seat id is deliberately unchanged from the behaviour that predates this
+    // gate: chat has
     // always keyed a registration token to reg-<id> (rate-limit + analytics), so
     // a legitimate cross-device / cookieless registrant still merges with their
     // own Q&A/poll activity instead of splitting into a second analytics identity.

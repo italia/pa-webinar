@@ -32,7 +32,7 @@ interface RegistrationFormClientProps {
    *  screen must show it (and stay put) instead of auto-redirecting the
    *  user into the waiting room. */
   hasPreRegistrationQuestionnaire?: boolean;
-  /** Event start (ISO). Routing (#1): registering within waitingRoomLeadMinutes
+  /** Event start (ISO). Routing: registering within waitingRoomLeadMinutes
    *  of start → straight to the waiting room; registering earlier → thank-you. */
   startsAt: string;
   /** Minutes before startsAt inside which we route into the waiting room
@@ -243,7 +243,7 @@ export default function RegistrationFormClient({
     }
   }, [eventSlug, email]);
 
-  // Registration routing by time (#1): "near start" = the event begins within
+  // Registration routing by time: "near start" = the event begins within
   // waitingRoomLeadMinutes. Computed at call time so it stays correct while the
   // confirmation screen sits open across the threshold.
   const isNearStart = useCallback(
@@ -329,8 +329,8 @@ export default function RegistrationFormClient({
             waiting room instead of forcing them to wait for the
             confirmation email. The /live token path renders the waiting
             room for any joinable status and auto-enables entry once the
-            event is LIVE — this is what was missing during the caffettino
-            run (people registered but had no on-screen way in). When we
+            event is LIVE — this is what was missing on a real run
+            (people registered but had no on-screen way in). When we
             auto-redirect, this button is the manual fallback. */}
         <div className="text-center d-flex flex-column align-items-center gap-2">
           {autoRedirecting && (
@@ -571,7 +571,7 @@ export default function RegistrationFormClient({
         </FormGroup>
       )}
 
-      {/* ── Consent 2b: Multitrack per-participant recording (ADR-013 F5) ── */}
+      {/* ── Consent 2b: Multitrack per-participant recording (ADR-013) ── */}
       {multitrackRecordingEnabled && (
         <FormGroup check className="mb-3">
           <Input

@@ -52,8 +52,7 @@ fi
 
 cd "$TORTURE_DIR"
 
-# Property names mirror upstream scripts/malleus.sh EXACTLY. Gotchas learned
-# the hard way (7 lug):
+# Property names mirror upstream scripts/malleus.sh EXACTLY. Hard-won gotchas:
 #   * The JWT is passed via -Dorg.jitsi.token (NOT -Dorg.jitsi.malleus.jwt,
 #     which does not exist). prosody enforces token auth (allow_empty_token=
 #     false) so a missing/invalid JWT makes the jitsi client fail client-side

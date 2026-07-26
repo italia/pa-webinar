@@ -5,8 +5,8 @@ from . import archive as arc
 
 def _tracks():
     return [
-        {"path": "/tmp/a.ogg", "title": "Alice", "language": "it", "offset_ms": 1500},
-        {"path": "/tmp/b.ogg", "title": "Marco", "language": None, "offset_ms": 0},
+        {"path": "/tmp/a.ogg", "title": "Mario Rossi", "language": "it", "offset_ms": 1500},
+        {"path": "/tmp/b.ogg", "title": "Anna Bianchi", "language": None, "offset_ms": 0},
     ]
 
 
@@ -43,7 +43,7 @@ def test_maps_video_audio_subtitle():
     # titoli tracce: mix + nomi.
     joined = " ".join(cmd)
     assert "title=Originale (mix)" in joined
-    assert "title=Alice" in joined and "title=Marco" in joined
+    assert "title=Mario Rossi" in joined and "title=Anna Bianchi" in joined
     assert "language=it" in joined
 
 

@@ -254,11 +254,11 @@ export default function EventManagementClient({
   const handleDeleted = useCallback(() => { router.push('/admin'); }, [router]);
 
   // "Duplica come prossima occorrenza" (docs/ROADMAP.md, "Eventi ricorrenti"):
-  // le call ricorrenti reali — Caffettino, sync DevIt — si ricreano a mano ogni
-  // volta, e la copia manuale è proprio dove si perdono i flag di cattura. Qui
-  // l'endpoint eredita l'intera configurazione e, se l'evento ha una cadenza,
-  // proietta la data della prossima occorrenza; la copia nasce in BOZZA, quindi
-  // resta comunque da confermare (le date DevIt slittano spesso).
+  // le call ricorrenti si ricreano a mano ogni volta, e la copia manuale è
+  // proprio dove si perdono i flag di cattura. Qui l'endpoint eredita l'intera
+  // configurazione e, se l'evento ha una cadenza, proietta la data della
+  // prossima occorrenza; la copia nasce in BOZZA, quindi resta comunque da
+  // confermare (nella pratica le date di una serie slittano spesso).
   const [duplicating, setDuplicating] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const duplicateAsNext = useCallback(async () => {

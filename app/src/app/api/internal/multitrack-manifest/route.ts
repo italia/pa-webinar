@@ -73,7 +73,8 @@ export const POST = withErrorHandling(async (request) => {
   }
 
   // Silence guard (ADR-013 defense-in-depth): if the recorder captured only
-  // digital silence on EVERY track — the pre-9739d70 Chrome-headless failure —
+  // digital silence on EVERY track — the Chrome-headless capture failure that
+  // predates the recorder's virtual-sink fix —
   // a TRANSCRIBE_MULTITRACK would burn GPU and yield empty transcripts that
   // masquerade as "done". We only act when the AI pipeline would actually run
   // (enqueue is already a no-op when the event has AI transcription off), and
@@ -127,7 +128,7 @@ export const POST = withErrorHandling(async (request) => {
     console.error(
       `[multitrack-manifest] recording=${recordingId} event=${eventId}: all ${tracks.length} ` +
         `track(s) at/under the ${SILENCE_FLOOR_BYTES_PER_SEC} B/s silence floor — captured audio is ` +
-        `empty (likely a stale/broken recorder image, cf. recorder commit 9739d70). ` +
+        `empty (likely a stale/broken recorder image). ` +
         `Marked POSTPROD_FAILED and skipped TRANSCRIBE_MULTITRACK; use the admin "Genera AI" ` +
         `control to force a re-run if this is wrong.`,
     );

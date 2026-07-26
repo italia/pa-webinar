@@ -33,12 +33,12 @@ interface RaisedHandsPanelProps {
   /**
    * When true, hides the "approve mic" / "approve video" action buttons
    * — used to show the same ordered queue to all attendees, so everyone
-   *   can see who raised their hand and in what order (addresses the
-   *   caffettino feedback where only moderators had this visibility).
+   *   can see who raised their hand and in what order (attendees asked for
+   *   this: the queue used to be visible to moderators only).
    */
   readOnly?: boolean;
   /**
-   * F8 — moderator "lower hand": passed ONLY to the full (non-readOnly)
+   * Moderator "lower hand": passed ONLY to the full (non-readOnly)
    * moderator instance. When both are present the panel shows an "abbassa
    * mano" button that asks the raiser's own client (via the control channel)
    * to lower its hand. The readOnly attendee instance gets neither, so the
@@ -199,7 +199,7 @@ export default function RaisedHandsPanel({
     [api],
   );
 
-  // F8: ask the raiser's OWN client to lower its hand (the IFrame API can't
+  // Ask the raiser's OWN client to lower its hand (the IFrame API can't
   // lower a remote hand). Fire-and-forget: we do NOT optimistically remove the
   // entry here — that would desync the moderator's view from the other panels
   // (the flaw of the earlier "mark handled" attempt). When the target lowers

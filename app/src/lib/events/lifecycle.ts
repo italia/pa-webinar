@@ -256,7 +256,7 @@ export function reviveStatus(input: RevivalInput): 'LIVE' | 'PUBLISHED' | null {
 
 /**
  * Compute the "empty since" cutoff for the authoritative empty-conference
- * close (feedback #12). A LIVE room whose `lastActiveAt` is non-null AND
+ * close. A LIVE room whose `lastActiveAt` is non-null AND
  * older than this cutoff is considered abandoned and flipped straight to
  * ENDED, separately from (and typically shorter than) the scale-to-zero
  * inactivity grace.

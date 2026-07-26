@@ -1,12 +1,14 @@
 # =============================================================================
 # jitsi-meet-torture MalleusJitsificus load Job (Selenium-remote mode)
-# Namespace: pa-webinar   |   app.kubernetes.io/component=load-test
-# CHANGE vs proposal: removed the UNVALIDATED sed patch on WebParticipant.java
-# (it strips config.prejoinConfig.enabled=false and can strand senders on the
-# prejoin screen), and removed -Dremote.resource.path (no fake-video file is
-# used). This is the VALIDATED invocation, only adapted for Selenium remote.
+# The `namespace:` below and the `jitsi-meet.instance.url` are EXAMPLE values:
+# set them to the namespace of your deploy and to the Jitsi hostname you are
+# testing (`<namespace>` / `jitsi.example.com` in README.md).
+# Deliberately NO sed patch on WebParticipant.java (it would strip
+# config.prejoinConfig.enabled=false and can strand senders on the prejoin
+# screen) and NO -Dremote.resource.path (no fake-video file is used): this is
+# the validated invocation, only adapted for Selenium remote.
 # Prereq: grid applied & Ready, Secret 'torture-jwt' (key 'jwt') present.
-# Cleanup: kubectl -n pa-webinar delete job -l app.kubernetes.io/component=load-test
+# Cleanup: kubectl -n <namespace> delete job -l app.kubernetes.io/component=load-test
 # =============================================================================
 apiVersion: batch/v1
 kind: Job
@@ -93,7 +95,7 @@ spec:
 
               exec mvn -B test \
                 -Dthreadcount=1 \
-                -Djitsi-meet.instance.url=https://pa-webinar-jitsi.developers.italia.it \
+                -Djitsi-meet.instance.url=https://jitsi.example.com \
                 -Djitsi-meet.tests.toRun=MalleusJitsificus \
                 -Djitsi-meet.isRemote=true \
                 -Dremote.address=http://selenium-hub:4444/wd/hub \

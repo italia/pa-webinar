@@ -1,8 +1,10 @@
 # ─────────────────────────────────────────────────────────────
-# pa-webinar — Production values for developers-italia-prod cluster
+# pa-webinar — Example production overrides
 #
-# This is DTD's own production config. It builds on examples/values-full.yaml
-# with DTD-specific domains, resources, and Azure Key Vault integration.
+# Builds on examples/values-full.yaml with per-instance domains, resources and
+# an externally managed Secret. Domains below use example.com placeholders: the
+# real values of a running instance (domains, cluster, node pool labels, Secret
+# names) live in the configuration repository of whoever operates it, not here.
 #
 # Usage:
 #   helm upgrade --install videocall ./infra/helm/pa-webinar \
@@ -33,8 +35,8 @@ app:
     agentpool: applications
 
   env:
-    NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.eventi.developers.italia.it"
-    NEXT_PUBLIC_APP_URL: "https://eventi.developers.italia.it"
+    NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.videocall.example.com"
+    NEXT_PUBLIC_APP_URL: "https://videocall.example.com"
     NEXT_PUBLIC_DEFAULT_LOCALE: "it"
     # rnnoise ACCESO in produzione. Qui gira l'immagine jitsi/web patchata a
     # 48 kHz, dove la soppressione avanzata del rumore funziona; su dev/test
@@ -44,7 +46,7 @@ app:
     # prod, in silenzio, al primo deploy.
     NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE: "false"
     DEFAULT_DATA_RETENTION_DAYS: "90"
-    DEFAULT_PRIVACY_POLICY_URL: "https://eventi.developers.italia.it/it/privacy"
+    DEFAULT_PRIVACY_POLICY_URL: "https://videocall.example.com/it/privacy"
 
 # ── Secrets ──────────────────────────────────────────────────
 
@@ -70,14 +72,14 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
   hosts:
-    - host: eventi.developers.italia.it
+    - host: videocall.example.com
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: videocall-tls
       hosts:
-        - eventi.developers.italia.it
+        - videocall.example.com
 
 # ── Autoscaling ──────────────────────────────────────────────
 
@@ -96,7 +98,7 @@ podDisruptionBudget:
 postgresql:
   enabled: false
   external:
-    host: "pa-webinar-db.postgres.database.azure.com"
+    host: "<db-server>.postgres.database.azure.com"
     port: 5432
     database: "pa_webinar"
     existingSecret: "videocall-secrets"
@@ -126,7 +128,7 @@ jitsi:
   mode: full
 
 jitsi-meet:
-  publicURL: "https://jitsi.eventi.developers.italia.it"
+  publicURL: "https://jitsi.videocall.example.com"
   enableAuth: true
   enableGuests: false
 
@@ -230,14 +232,14 @@ jitsi-meet:
           location = / { return 403; }
           location = /index.html { return 403; }
       hosts:
-        - host: jitsi.eventi.developers.italia.it
+        - host: jitsi.videocall.example.com
           paths:
             - path: /
               pathType: Prefix
       tls:
         - secretName: jitsi-tls
           hosts:
-            - jitsi.eventi.developers.italia.it
+            - jitsi.videocall.example.com
 
 # ── JVB auto-scaler ─────────────────────────────────────────
 

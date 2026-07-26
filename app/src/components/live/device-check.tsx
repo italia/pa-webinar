@@ -402,7 +402,7 @@ export default function DeviceCheck({ onReady, onStateChange, compact = false }:
             onClick={() => {
               // Short chime so the user can confirm their speakers /
               // headphones actually play audio before joining. Several
-              // caffettino attendees "didn't hear" the call — probably
+              // attendees reported they "didn't hear" the call — probably
               // because they never verified audio output beforehand.
               try {
                 const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext!)();

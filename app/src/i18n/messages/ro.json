@@ -1438,7 +1438,7 @@
         "calendarPublic": "Calendar public",
         "calendarPublicHelp": "Publicați calendarul evenimentelor. Vizitatorii pot vedea evenimentele programate.",
         "parseTitleKicker": "Titluri cu kicker editorial",
-        "parseTitleKickerHelp": "Dacă titlul unui eveniment conține caracterul „|”, partea de dinainte este afișată ca o etichetă mică cu majuscule deasupra titlului principal. Exemplu: „Caffettino | Probă OSS” → etichetă „CAFFETTINO” + titlu „Probă OSS”.",
+        "parseTitleKickerHelp": "Dacă titlul unui eveniment conține caracterul „|”, partea de dinainte este afișată ca o etichetă mică cu majuscule deasupra titlului principal. Exemplu: „Pauză de cafea | Probă OSS” → etichetă „PAUZĂ DE CAFEA” + titlu „Probă OSS”.",
         "githubUrl": "URL depozit GitHub",
         "supportEmail": "Email suport",
         "jvbScalingTitle": "Scalare punte video (JVB)",

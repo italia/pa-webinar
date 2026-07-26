@@ -49,7 +49,7 @@ export const dynamic = 'force-dynamic';
 /**
  * Costruisce l'initial_prompt per WhisperX dai metadata dell'evento.
  * Aiuta Whisper a riconoscere nomi propri, sigle, organizzazioni
- * specifiche dell'evento (es. "PCM", "OVH", "Raffaele Vitiello").
+ * specifiche dell'evento (es. una sigla come "PCM" o il nome di un relatore).
  *
  * Cap a 800 caratteri per stare ben dentro la token-window di Whisper
  * (~224 tokens il modello accetta come prompt iniziale).
@@ -317,7 +317,7 @@ export const POST = withErrorHandling(async (request) => {
   }> = [];
   // Mappa diarLabel→nome reale (Speaker DB): la passiamo al worker per
   // SUMMARIZE/TRANSLATE così la SINTESI e i sottotitoli tradotti usano il
-  // nome ("Raffaele") invece di "SPEAKER_00". Su multitrack i nomi (JWT) ci
+  // nome reale del relatore invece di "SPEAKER_00". Su multitrack i nomi (JWT) ci
   // sono sempre; su blind diarization compaiono dopo il mapping admin (→
   // ri-esegui SUMMARIZE). Speaker.displayName è in chiaro (vedi transcript
   // route che lo usa diretto).

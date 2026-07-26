@@ -39,10 +39,15 @@ ollama pull mistral-small3.2:24b
 
 ## Flusso (per evento)
 
+Nelle righe che seguono i valori fra `<…>` sono **segnaposto**: sostituisci
+con quelli del tuo ambiente (`<storage-account>` = storage account Azure che
+ospita il container `recordings`, `<namespace>` = namespace Kubernetes in cui
+gira l'app, `<host>` = hostname pubblico dell'installazione).
+
 ```sh
 # 0) scarica MP4 dal blob (serve account key)
 az storage blob download \
-  --account-name developersitaliarec \
+  --account-name <storage-account> \
   --account-key "$AZURE_KEY" \
   --container-name recordings \
   --name "recordings/<filename>.mp4" \
@@ -77,13 +82,15 @@ python build_vtt.py
 python dub.py
 
 # 7) push al DB di test + upload dubbed audio su Azure
-AZURE_KEY=… python package_and_push.py
+AZURE_KEY=… RECORDING_ID=… EVENT_ID=… \
+  STORAGE_ACCOUNT=<storage-account> K8S_NAMESPACE=<namespace> \
+  python package_and_push.py
 ```
 
 Dopo lo step 7, l'evento è visibile sul player pubblico:
-`https://videocall-test.innovazione.gov.it/it/eventi/<slug>` con
-trascrizione cliccabile (08:50 - Raffaele: …), sintesi multilingua,
-sottotitoli IT/EN, doppiaggio EN.
+`https://<host>/it/eventi/<slug>` con trascrizione cliccabile
+(08:50 - Mario Rossi: …), sintesi multilingua, sottotitoli IT/EN,
+doppiaggio EN.
 
 ## Differenze con il worker in cluster
 
@@ -103,6 +110,9 @@ spuri a mano nella UI admin.
 
 ## Note operative
 
+- I nomi dei relatori non stanno nel codice (sono dati personali): `correct.py`
+  li legge da `GLOSSARY_NAMES` (lista separata da virgole) e `retranscribe.py`
+  accetta l'intero `INITIAL_PROMPT` da env.
 - Il push allo stesso `recordingId` è idempotente: cancella job/speaker/artifact
   precedenti e ricrea da zero. Safe per re-run.
 - Il transcript inline ha contentHash sha256 (cache invalidation).

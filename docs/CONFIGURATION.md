@@ -218,7 +218,7 @@ redis:
       pullPolicy: Always
     serviceMonitor:
       enabled: true
-      namespace: videocall-test   # il namespace dove esce il ServiceMonitor
+      namespace: <namespace>   # il namespace dove esce il ServiceMonitor
       interval: 30s
 ```
 

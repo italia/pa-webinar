@@ -25,15 +25,17 @@ Other headers set alongside the CSP: `Strict-Transport-Security` (2y + preload),
 
 React renders the `style={{...}}` prop as a DOM `style="..."` **attribute**, not as a `<style>` block. In CSP terms that's an *inline style attribute*, controlled entirely by `'unsafe-inline'` (or by `'unsafe-hashes'` + a hash per distinct value).
 
-A survey of the codebase as of 2026-05-27:
+Inline styles are pervasive across the codebase — count them yourself with
+`grep -ro 'style={{' app/src --include=*.tsx | wc -l` (and `grep -rl` for the
+number of files):
 
-- **1022** occurrences of `style={{` in **60+** TSX files
+- Most TSX files that render layout use at least one `style={{...}}`
 - The values are frequently dynamic (`style={{transform: \`rotate(${angle}deg)\`}}`, computed widths, theme colours)
 - Bootstrap Italia and `design-react-kit` components also emit inline styles internally for their own animations / layout primitives
 
 Removing `'unsafe-inline'` today would break the rendered DOM. `'unsafe-hashes'` would need a hash per *exact* style string — impossible when React mutates them at runtime.
 
-### Migration paths (multi-sprint, out of scope for the security round)
+### Migration paths (large refactors, not attempted here)
 
 1. **className-only refactor** — replace every `style={{...}}` with a className backed by either a CSS module, a Bootstrap Italia utility, or a small utility class added to `globals.scss`. Most occurrences are simple (margin / colour / size); a smaller tail is dynamic and would need a CSS variable bridge (`style={{ '--x': value }}` + a class that reads `var(--x)` — note the bridge itself is still an inline style attribute, but a single property bridge is a tiny attack surface compared to arbitrary `style="..."` strings).
 2. **CSS-in-JS that emits stylesheets** — migrate to a library like vanilla-extract, linaria, or @stylex that compiles `style={{...}}` to a generated stylesheet (covered by `style-src 'self'` + an emitted-class allow-list, no inline attributes left).

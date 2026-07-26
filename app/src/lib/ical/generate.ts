@@ -27,7 +27,7 @@ interface EventICalInput {
  * for an event starting at 09:15Z — the UTC wall clock relabelled as Rome time,
  * because ical-generator does not convert the Date and we ship no VTIMEZONE
  * component for the TZID to resolve against. Calendar clients therefore booked
- * the event two hours early in summer (one in winter). Verified on the DevIt
+ * the event two hours early in summer (one in winter). Reproduced on a real
  * invitation before the fix.
  *
  * A UTC instant is unambiguous and needs no VTIMEZONE: every client renders it

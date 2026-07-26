@@ -125,11 +125,11 @@ interface LiveEventClientProps {
   jitsiDomain: string;
   watermark?: WatermarkSettings;
   jibriAvailable?: boolean;
-  /** Reactions mode (admin SiteSetting, #7): 'NATIVE' = Jitsi's own reactions
+  /** Reactions mode (admin SiteSetting): 'NATIVE' = Jitsi's own reactions
    *  button (ephemeral); 'CUSTOM' = the app's analytics-backed ReactionBar.
    *  Default 'NATIVE'. */
   reactionsMode?: 'NATIVE' | 'CUSTOM';
-  /** F18 — rnnoise (soppressione rumore avanzata di Jitsi) forzata OFF.
+  /** rnnoise (soppressione rumore avanzata di Jitsi) forzata OFF.
    *  Default true = spenta, che è il comportamento da validare in una call
    *  vera prima di cambiarlo. Risolto a RUNTIME dal Server Component (vedi
    *  lib/jitsi/rnnoise.ts): qui non si può leggere l'env, perché in un
@@ -223,7 +223,7 @@ export default function LiveEventClient({
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState('');
   const [jitsiApi, setJitsiApi] = useState<JitsiMeetExternalAPI | null>(null);
-  // App-owned fullscreen (#6): fullscreen the whole live wrapper (video +
+  // App-owned fullscreen: fullscreen the whole live wrapper (video +
   // sidebar) instead of the Jitsi iframe, so the chat stays visible.
   const liveRootRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -847,7 +847,7 @@ export default function LiveEventClient({
   }, []);
 
   // Peak participant tracking — reported by ANY authenticated attendee, not
-  // just a moderator (live feedback #4b). Previously this was gated on
+  // just a moderator. Previously this was gated on
   // `isModerator`, so a moderator-less session (or one the moderator left before
   // the first tick) never bumped `peakParticipants`, leaving post-event
   // analytics at 0. We re-report the human-filtered count (Recorder excluded,
@@ -864,8 +864,8 @@ export default function LiveEventClient({
   // One number, one source — what the sidebar shows is what the peak records.
   //
   // Guests (no token) report too: the live page passes token="" to anyone
-  // joining a public-link / INSTANT room, and gating on it meant precisely the
-  // moderator-less sessions #4b was about recorded nothing. The server accepts a
+  // joining a public-link / INSTANT room, and gating on it meant that exactly
+  // the moderator-less sessions this path exists for recorded nothing. The server accepts a
   // tokenless report only where nobody could hold a token (INSTANT room, or an
   // event with no registrations) — elsewhere it answers 401, and we then stop
   // rather than re-posting a request that will be refused for the whole event.
@@ -892,7 +892,7 @@ export default function LiveEventClient({
     return () => clearInterval(interval);
   }, [jitsiApi, event.slug, token]);
 
-  // F8 — receive a moderator "lower your hand" control signal and lower our OWN
+  // Receive a moderator "lower your hand" control signal and lower our OWN
   // hand. The Jitsi IFrame API can lower only the local hand (toggleRaiseHand),
   // so a moderator's "abbassa mano" reaches the raiser's browser here; the
   // resulting raiseHandUpdated(0) then drains the queue on every client. Lives
@@ -990,7 +990,7 @@ export default function LiveEventClient({
     }
   }, [jitsiApi]);
 
-  // App-owned fullscreen toggle (#6): targets the live root wrapper so both the
+  // App-owned fullscreen toggle: targets the live root wrapper so both the
   // Jitsi iframe AND the chat sidebar are in the fullscreen subtree. Optional
   // chaining makes it a safe no-op where Element.requestFullscreen is missing
   // (e.g. iPhone Safari).
@@ -1011,7 +1011,7 @@ export default function LiveEventClient({
   }, []);
 
   // Reactstrap portals every Modal into <body> by default. Once the app owns
-  // fullscreen on the live wrapper (#6), <body> is OUTSIDE the fullscreen
+  // fullscreen on the live wrapper, <body> is OUTSIDE the fullscreen
   // subtree, so those modals never reach the top layer and are simply invisible:
   // in fullscreen "Condividi", the recording prompt and — worst of all — the
   // moderator's "Esci dalla sala" dialog all looked like dead buttons, with no
@@ -1449,7 +1449,7 @@ export default function LiveEventClient({
               onRecordingStatusChanged={handleRecordingStatusChanged}
               onApiReady={handleApiReady}
             />
-            {/* Custom reactions bar only in CUSTOM mode (#7); NATIVE mode uses
+            {/* Custom reactions bar only in CUSTOM mode; NATIVE mode uses
                 Jitsi's own reactions button in the toolbar instead. */}
             {reactionsMode === 'CUSTOM' && <ReactionBar eventSlug={event.slug} />}
             {/* Floating controls slot: the sidebar portals its bar here
@@ -1738,7 +1738,7 @@ function LiveSidebar({
     [eventId, token, mutateFlags]
   );
   const [activeTab, setActiveTab] = useState<SidebarTab>(
-    // Chat is the primary channel (live feedback #10): prefer it as the initial
+    // Chat is the primary channel: prefer it as the initial
     // tab, falling back to Q&A then polls only when chat is disabled.
     showChat ? 'chat' : qaEnabled ? 'qa' : 'polls'
   );
@@ -1802,7 +1802,7 @@ function LiveSidebar({
     dot?: boolean;
     show: boolean;
   }> = [
-    // Chat first (live feedback #10): it is the primary audience channel, so it
+    // Chat first: it is the primary audience channel, so it
     // renders as the leftmost sidebar tab, ahead of Q&A.
     {
       key: 'chat',
@@ -2328,7 +2328,7 @@ interface LiveTopBarProps {
   /** Total confirmed registrations (if known). Rendered alongside the live
    *  count as "N attivi · M registrati" ONLY for moderators (role gate at the
    *  render site); everyone else sees just the present-participant count, so
-   *  the registration total is never leaked to attendees (F5). */
+   *  the registration total is never leaked to attendees. */
   registrationCount?: number;
   /** Event capacity (maxParticipants). Used by the "live / capacity"
    *  pill in the top bar and as fallback when no one has joined yet. */
@@ -2345,7 +2345,7 @@ interface LiveTopBarProps {
    *  Surfaced (collapsed, with a warning) in the share popup. */
   moderatorToken?: string;
   onLeaveRoom?: () => void;
-  /** App-owned fullscreen (#6): current state + toggle. Passed only by the
+  /** App-owned fullscreen: current state + toggle. Passed only by the
    *  live-phase top bar (the consent-pending one renders no video/sidebar). */
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
@@ -2477,7 +2477,7 @@ function LiveTopBar({
         {/* The live people-count is intentionally NOT shown here: it was a
          *  redundant duplicate of the authoritative count in the participants
          *  sidebar and, being fed only by post-attach join/leave deltas, it
-         *  under-reported (live feedback #4). The sidebar remains the single
+         *  under-reported. The sidebar remains the single
          *  source of truth for the present-participant count. */}
       </div>
       <div className="d-flex align-items-center gap-3">
@@ -2487,8 +2487,8 @@ function LiveTopBar({
             {t('recordingActive')}
           </Badge>
         )}
-        {/* The "active vs registered" figure is moderator-only (F5 —
-            participants shouldn't see attendance numbers). The live people-count
+        {/* The "active vs registered" figure is moderator-only:
+            participants shouldn't see attendance numbers. The live people-count
             now lives only in the participants sidebar, so non-moderators get
             nothing extra here. `participantCount` is seeded on join and kept
             current by JitsiRoom (recorder-excluded), so this reads correctly even
@@ -2558,7 +2558,7 @@ function LiveTopBar({
 // Surfaces a slim highlighted strip at the top of the live area whenever
 // any remote participant starts sharing their screen. Jitsi's own UI
 // auto-pins the share and puts a small "is sharing" label on the tile,
-// but attendees on the caffettino demo reported missing the transition
+// but attendees on a live event reported missing the transition
 // ("la schermata non era evidenziata rispetto alle altre"). The banner
 // uses Jitsi's `screenSharingStatusChanged` event — fires for every
 // remote presenter with on/off, and also for the local user (which we

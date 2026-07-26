@@ -339,7 +339,7 @@ describe('reviveStatus — event revival on endsAt extension', () => {
   });
 });
 
-describe('emptyCloseCutoff — authoritative empty-close (#12)', () => {
+describe('emptyCloseCutoff — authoritative empty-close', () => {
   it('returns null when disabled (minutes < 0)', () => {
     expect(emptyCloseCutoff(NOW, -1)).toBeNull();
   });

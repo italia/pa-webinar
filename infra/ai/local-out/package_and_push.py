@@ -13,8 +13,15 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
-RECORDING_ID = os.environ.get("RECORDING_ID", "837f1334-1b31-4c9c-bca7-03908e47100e")
-EVENT_ID = os.environ.get("EVENT_ID", "523a1fc3-e276-4826-9e42-a275fb3dca84")
+# Tutti i riferimenti d'ambiente arrivano da env: i default qui sotto sono
+# SEGNAPOSTO, vanno impostati per il proprio ambiente prima di lanciare.
+#   RECORDING_ID / EVENT_ID   → identificativi DB della registrazione
+#   STORAGE_ACCOUNT           → storage account Azure con il container recordings
+#   K8S_NAMESPACE             → namespace dove gira l'app (es. quello di test)
+RECORDING_ID = os.environ.get("RECORDING_ID", "<recording-id>")
+EVENT_ID = os.environ.get("EVENT_ID", "<event-id>")
+STORAGE_ACCOUNT = os.environ.get("STORAGE_ACCOUNT", "<storage-account>")
+K8S_NAMESPACE = os.environ.get("K8S_NAMESPACE", "<namespace>")
 SUMMARY_FILE = HERE / "summary.json"
 TX_FILE = HERE / "transcript_diarized.json"
 
@@ -124,7 +131,7 @@ def main():
 
     # Azure storage key (una volta) per gli upload dubbed.
     az_key = os.environ.get("AZURE_KEY") or sp.run(
-        ["az", "storage", "account", "keys", "list", "--account-name", "developersitaliarec",
+        ["az", "storage", "account", "keys", "list", "--account-name", STORAGE_ACCOUNT,
          "--query", "[0].value", "-o", "tsv"], capture_output=True, text=True, check=True,
     ).stdout.strip()
 
@@ -137,7 +144,7 @@ def main():
         if dub_local.exists():
             dub_blob = f"postprod/{EVENT_ID}/{RECORDING_ID}/run-1/dubbed_audio-{lang}.m4a"
             print(f"Uploading dubbed {lang} -> {dub_blob}")
-            sp.run(["az", "storage", "blob", "upload", "--account-name", "developersitaliarec",
+            sp.run(["az", "storage", "blob", "upload", "--account-name", STORAGE_ACCOUNT,
                     "--account-key", az_key, "--container-name", "recordings", "--name", dub_blob,
                     "--file", str(dub_local), "--overwrite", "--no-progress"],
                    check=True, capture_output=True)
@@ -172,16 +179,16 @@ def main():
     print(f"Payload saved; langs: it + {target_langs}; dub: {dub_langs}")
 
     pod = sp.run(
-        ["kubectl", "get", "pods", "-n", "videocall-test", "-l", "app.kubernetes.io/name=pa-webinar",
+        ["kubectl", "get", "pods", "-n", K8S_NAMESPACE, "-l", "app.kubernetes.io/name=pa-webinar",
          "--field-selector=status.phase=Running", "-o", "jsonpath={.items[0].metadata.name}"],
         capture_output=True, text=True, check=True,
     ).stdout.strip()
     print(f"Pod: {pod}")
-    sp.run(["kubectl", "cp", "-n", "videocall-test", "-c", "pa-webinar",
+    sp.run(["kubectl", "cp", "-n", K8S_NAMESPACE, "-c", "pa-webinar",
             str(HERE / "push_to_db.js"), f"{pod}:/tmp/push.js"], check=True)
     print("Pushing to DB via kubectl exec…")
     result = sp.run(
-        ["kubectl", "exec", "-i", "-n", "videocall-test", pod, "-c", "pa-webinar", "--",
+        ["kubectl", "exec", "-i", "-n", K8S_NAMESPACE, pod, "-c", "pa-webinar", "--",
          "sh", "-c", "cd /app && NODE_PATH=/app/node_modules node /tmp/push.js"],
         input=json.dumps(payload).encode(), capture_output=True,
     )

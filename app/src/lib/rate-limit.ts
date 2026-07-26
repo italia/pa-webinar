@@ -93,9 +93,9 @@ export function rateLimit(
  *      mode (one misbehaving client can DoS the bucket) than silently
  *      letting brute-force traffic through unkeyed.
  *
- * Live discovery on videocall-test (May 2026) showed the AKS NGINX
- * ingress not setting X-Forwarded-For by default; X-Real-IP was the
- * only populated client header. Without (2) the rate limit was
+ * Discovered on a real deployment: the AKS NGINX ingress does not set
+ * X-Forwarded-For by default, and X-Real-IP was the only populated
+ * client header. Without (2) the rate limit was
  * effectively per-instance instead of per-client.
  */
 export function getClientIp(request: Request): string {

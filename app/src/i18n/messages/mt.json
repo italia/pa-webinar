@@ -1438,7 +1438,7 @@
         "calendarPublic": "Kalendarju pubbliku",
         "calendarPublicHelp": "Ippubblika l-kalendarju tal-avvenimenti. Iż-żitaturi jistgħu jaraw l-avvenimenti skedati.",
         "parseTitleKicker": "Titoli ma' kicker editorjali",
-        "parseTitleKickerHelp": "Jekk il titlu ta' wieħed avveniment contienu il caratteru \"|\", il-partu prima vienu mostrata bħal piccola etichetta fi maiuscomoqri sopra il-titlu principale. Esempio: \"Caffettino | Prova OSS\" → etichetta \"CAFFETTINO\" + titlu \"Prova OSS\".",
+        "parseTitleKickerHelp": "Jekk il titlu ta' wieħed avveniment contienu il caratteru \"|\", il-partu prima vienu mostrata bħal piccola etichetta fi maiuscomoqri sopra il-titlu principale. Esempio: \"Pawża tal-kafè | Prova OSS\" → etichetta \"PAWŻA TAL-KAFÈ\" + titlu \"Prova OSS\".",
         "githubUrl": "URL tar-repożitorju GitHub",
         "supportEmail": "Email tas-sapport",
         "jvbScalingTitle": "Scaling pontu vidjo (JVB)",

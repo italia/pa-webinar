@@ -3,7 +3,7 @@
 Dubbing sintetico EN con Piper TTS — **multivoce gender-aware**.
 
 Estensioni vs V1:
-  - **Pool gender-aware**: F per Ilaria/Paola, M per Alex/Raffaele
+  - **Pool gender-aware**: F per Anna/Giulia, M per Mario/Luca
     (logica in `name_gender.py`, catalogo voci in `voice_pool.py`).
   - **Pitch variants**: per estendere il pool delle lingue povere
     (IT, RO, CS) genero ±300 cents variants dalla stessa voce-base,

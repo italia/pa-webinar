@@ -82,7 +82,7 @@ export default function RecordingManageClient({
         // A successful POST can enqueue NOTHING: either nothing was runnable (AI
         // disabled / pipeline paused → true no-op) or every job already exists at
         // this runCount (already queued). Distinguish them instead of a false
-        // "OK" (F15, review #1/#4).
+        // "OK".
         const data = (await r.json().catch(() => null)) as {
           enqueued?: number;
           skippedExisting?: number;
@@ -107,7 +107,7 @@ export default function RecordingManageClient({
   // jobs) — e.g. an audio-only multitrack recording, or an event captured with
   // AI off. Unlike Rerun this ENABLES the AI flags first, and the enqueue
   // auto-detects multitrack, so all three functions (transcript → summary →
-  // translation) actually start. (F15)
+  // translation) actually start.
   async function generateAi(): Promise<void> {
     const ok = await confirm({
       title: t('generateAi'),
@@ -123,7 +123,7 @@ export default function RecordingManageClient({
         headers: { 'Content-Type': 'application/json' },
         // Transcript + summary only. Translations are added explicitly, per
         // language, from the Translations tab — one click shouldn't blanket
-        // auto-translate to every default locale (consent/scope, review #3).
+        // auto-translate to every default locale (consent and scope stay explicit).
         body: JSON.stringify({ summary: true }),
       });
       if (r.ok) {
