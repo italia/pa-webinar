@@ -1,0 +1,113 @@
+<!doctype html>
+<!-- Harness di validazione per facefx.js (vedi run-poc-test.mjs).
+     Espone window.__runTests() che ritorna un oggetto risultati. -->
+<meta charset="utf-8">
+<title>paFaceFx harness</title>
+<script src="./facefx.js"></script>
+<body>
+<script>
+  'use strict';
+
+  function meanLumaOfTrack(track, sampleMs) {
+    return new Promise(function (resolve, reject) {
+      var video = document.createElement('video');
+      video.muted = true;
+      video.srcObject = new MediaStream([track]);
+      video.play().catch(reject);
+      setTimeout(function () {
+        try {
+          var w = video.videoWidth, h = video.videoHeight;
+          if (!w || !h) return reject(new Error('no frames (videoWidth=0)'));
+          var c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          var ctx = c.getContext('2d');
+          ctx.drawImage(video, 0, 0);
+          var d = ctx.getImageData(0, 0, w, h).data;
+          var sum = 0;
+          for (var i = 0; i < d.length; i += 4) {
+            sum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+          }
+          resolve({ luma: sum / (d.length / 4), w: w, h: h });
+        } catch (e) { reject(e); }
+      }, sampleMs);
+    });
+  }
+
+  function countFrames(track, ms) {
+    return new Promise(function (resolve) {
+      var video = document.createElement('video');
+      video.muted = true;
+      video.srcObject = new MediaStream([track]);
+      var n = 0;
+      function tick() { n++; video.requestVideoFrameCallback(tick); }
+      video.requestVideoFrameCallback(tick);
+      video.play();
+      setTimeout(function () { resolve(n); }, ms);
+    });
+  }
+
+  // Sorgente sintetica SCURA con spread (gradiente + forme): il caso
+  // "webcam in stanza buia" che il filtro deve recuperare.
+  function makeDarkStream() {
+    var c = document.createElement('canvas');
+    c.width = 320; c.height = 180;
+    var ctx = c.getContext('2d');
+    function draw() {
+      var grad = ctx.createLinearGradient(0, 0, 320, 180);
+      grad.addColorStop(0, 'rgb(4,4,6)');
+      grad.addColorStop(1, 'rgb(52,44,38)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 320, 180);
+      ctx.fillStyle = 'rgb(78,64,52)'; // "volto" sottoesposto
+      ctx.beginPath();
+      ctx.ellipse(160, 90, 48, 62, 0, 0, Math.PI * 2);
+      ctx.fill();
+      requestAnimationFrame(draw);
+    }
+    draw();
+    return c.captureStream(30);
+  }
+
+  window.__runTests = async function () {
+    var out = { errors: [] };
+    try {
+      // T1: flag spento → passthrough (niente generator)
+      localStorage.removeItem('paFaceFx');
+      var raw = await navigator.mediaDevices.getUserMedia({ video: true });
+      out.t1_disabled_passthrough =
+        !(raw.getVideoTracks()[0] instanceof MediaStreamTrackGenerator);
+      raw.getTracks().forEach(function (t) { t.stop(); });
+
+      // T2: flag acceso → gUM ritorna una track processata che produce frame
+      localStorage.setItem('paFaceFx', '1');
+      var fx = await navigator.mediaDevices.getUserMedia({ video: true });
+      var fxTrack = fx.getVideoTracks()[0];
+      out.t2_enabled_is_generator = fxTrack instanceof MediaStreamTrackGenerator;
+      out.t2_settings_proxied = (fxTrack.getSettings().width || 0) > 0;
+      out.t2_frames_in_2s = await countFrames(fxTrack, 2000);
+
+      // T3: la pipeline schiarisce una sorgente scura
+      var darkTrack = makeDarkStream().getVideoTracks()[0];
+      var inSample = await meanLumaOfTrack(darkTrack.clone(), 800);
+      var fxDark = window.__paFaceFx.createFxTrack(darkTrack);
+      var outSample = await meanLumaOfTrack(fxDark, 2500); // EMA deve convergere
+      out.t3_luma_in = Math.round(inSample.luma * 10) / 10;
+      out.t3_luma_out = Math.round(outSample.luma * 10) / 10;
+      out.t3_brightened = outSample.luma > inSample.luma * 1.8;
+
+      // T4: stop() della track processata ferma anche la sorgente
+      var s4 = await navigator.mediaDevices.getUserMedia({ video: true });
+      var t4fx = s4.getVideoTracks()[0];
+      t4fx.stop();
+      await new Promise(function (r) { setTimeout(r, 200); });
+      out.t4_stop_propagates = t4fx.readyState === 'ended';
+
+      fx.getTracks().forEach(function (t) { t.stop(); });
+      fxDark.stop();
+    } catch (e) {
+      out.errors.push(String(e && e.stack || e));
+    }
+    return out;
+  };
+</script>
+</body>
