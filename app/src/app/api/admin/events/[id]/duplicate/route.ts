@@ -8,24 +8,19 @@
  * What we copy: the ENTIRE configuration — titles (with "(copia)" appended),
  * description, schedule, every feature toggle, the capture/AI flags,
  * registration rules, privacy text, speakers/organiser info, GDPR template
- * link, cover image, event type, sizing overrides — plus the reminder schedule.
+ * link, cover image, event type, sizing overrides. The scalar side is
+ * enumerated in lib/events/duplicate-fields.
  *
- * The capture flags matter more than they look: this endpoint used to drop
- * `multitrackRecordingEnabled`, `retainParticipantTracks`, the four AI flags,
- * `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`,
- * `autoStartRecording`, `videoQuality` and `recurrenceRule` on the floor. For a
- * recurring call (a weekly team sync, a monthly public webinar) that is the
- * whole point of duplicating: the operator would only discover the loss after
- * the event, with no multitrack audio and no transcript.
- * See docs/ROADMAP.md, "Eventi ricorrenti / serie".
+ * Relations follow the same rule — the copy inherits the configuration, not the
+ * life of the occurrence: tags, organisers, named moderator/speaker grants (each
+ * with a fresh token), the agenda, questionnaires and the reminder schedule.
+ * Which ones, and why the others are left behind, is enumerated in
+ * lib/events/duplicate-relations.
  *
  * What we reset: status (→ DRAFT), moderatorToken, jitsiRoomName, slug,
  * runtime/analytics state (lastActiveAt, provisioningStartedAt,
  * peakParticipants, recording URLs/metadata, capacityEstimateJson) and the join
  * password — a fresh copy must not inherit a secret the operator cannot see.
- *
- * What we skip: the other relations (registrations, questions, polls,
- * materials, feedback, sessions) — those belong to the occurrence that ran.
  *
  * Optional body:
  *   { "nextOccurrence": true }        project the date from the source's RRULE
@@ -36,16 +31,22 @@ import { randomUUID } from 'crypto';
 
 import { cookies } from 'next/headers';
 
+import { z } from 'zod';
+
 import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { AppError, NotFoundError, UnauthorizedError } from '@/lib/errors';
+import {
+  AppError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from '@/lib/errors';
 import { duplicatedConfig } from '@/lib/events/duplicate-fields';
 import {
   DUPLICATE_SOURCE_INCLUDE,
   duplicatedRelations,
-  type DuplicableRelations,
 } from '@/lib/events/duplicate-relations';
 import { nextOccurrenceAfter } from '@/lib/utils/recurrence';
 import { generateUniqueSlug } from '@/lib/utils/slug';
@@ -74,20 +75,43 @@ function suffixTitle(title: LocalizedField): Record<string, string> {
   return out;
 }
 
-interface DuplicateOptions {
-  nextOccurrence?: boolean;
-  startsAt?: string;
-  endsAt?: string;
-}
+/**
+ * The body is validated rather than cast: `{ "startsAt": 1 }` used to reach
+ * `new Date(1)` and return a 201 for a copy dated 1970, and a truthy string
+ * `"false"` in `nextOccurrence` used to silently reschedule the copy.
+ */
+const duplicateOptionsSchema = z
+  .object({
+    nextOccurrence: z.boolean().optional(),
+    startsAt: z.string().datetime({ offset: true }).optional(),
+    endsAt: z.string().datetime({ offset: true }).optional(),
+  })
+  .strict();
 
-/** Body is optional: an empty POST keeps the historic "same dates" behaviour. */
+type DuplicateOptions = z.infer<typeof duplicateOptionsSchema>;
+
+/**
+ * Body is optional: an empty POST (no body at all, or `{}`) keeps the historic
+ * "same dates as the source" behaviour. A body that IS present must be valid —
+ * silently ignoring a malformed one would schedule the copy somewhere the
+ * operator never asked for.
+ */
 async function readOptions(request: Request): Promise<DuplicateOptions> {
+  const raw = await request.text();
+  if (raw.trim().length === 0) return {};
+
+  let parsed: unknown;
   try {
-    const raw = await request.json();
-    return raw && typeof raw === 'object' ? (raw as DuplicateOptions) : {};
+    parsed = JSON.parse(raw);
   } catch {
-    return {};
+    throw new AppError('Invalid JSON body', 400, 'INVALID_BODY');
   }
+
+  const result = duplicateOptionsSchema.safeParse(parsed);
+  if (!result.success) {
+    throw new ValidationError(result.error.issues[0]?.message ?? 'Invalid body');
+  }
+  return result.data;
 }
 
 /**
@@ -172,7 +196,7 @@ export const POST = withErrorHandling(async (request, context) => {
       // organizzatori, co-moderatori (con token NUOVI), scaletta, questionari e
       // promemoria. Prima qui c'erano solo i promemoria, scritti a mano — ed è
       // per questo che tutto il resto si perdeva a ogni duplicazione.
-      ...duplicatedRelations(source as unknown as DuplicableRelations),
+      ...duplicatedRelations(source),
     },
   });
 

@@ -184,7 +184,11 @@ Ogni evento ha un periodo di conservazione configurabile (`dataRetentionDays`, d
 
 - **Registrazioni dei partecipanti**: email crittografata, nome, hash, token di accesso.
 - **Domande Q&A**: testo delle domande e voti.
-- **Registrazioni video**: file su Azure Blob Storage e URL nel database.
+- **Chat dell'evento**: nomi dei mittenti e testo dei messaggi, allegati compresi.
+- **Concessioni nominali di moderatore e relatore**: nome ed email cifrati e il
+  relativo link di accesso. L'elenco dei relatori mostrato sulla pagina pubblica
+  dell'evento non dipende da queste righe e resta leggibile.
+- **Registrazioni video**: file su object storage e URL nel database.
 
 L'evento stesso (titolo, descrizione, date) viene mantenuto in stato `ARCHIVED` per riferimento storico.
 

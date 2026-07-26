@@ -32,6 +32,7 @@ import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-for
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
+import { questionnaireChanged } from './questionnaire-diff';
 import Step1Base, { type Step1Value } from './step-1-base';
 import Step2Permissions, { type Step2Value } from './step-2-permissions';
 import Step3Invites, { type Step3Value } from './step-3-invites';
@@ -1347,16 +1348,27 @@ async function fanoutEditDiff(
   // The server rejects with 409 if responses already exist; that failure is
   // silently swallowed here, matching create-mode behaviour. TODO: surface
   // this back to the admin (e.g. a toast) instead of just ignoring it.
-  await submitQuestionnaire(
-    eventId,
-    'PRE_REGISTRATION',
-    form.preEventQuestionnaire,
-    defaultLocale,
-  );
-  await submitQuestionnaire(
-    eventId,
-    'POST_EVENT',
-    form.postEventQuestionnaire,
-    defaultLocale,
-  );
+  //
+  // Only when the admin actually changed it: the PUT rewrites the whole
+  // questionnaire from the fields the wizard knows, so saving an untouched one
+  // would reset the title, the mandatory flag and any multilingual text the
+  // wizard doesn't show (see questionnaire-diff for the full reasoning).
+  if (
+    questionnaireChanged(form.preEventQuestionnaire, initial.preEventQuestionnaire)
+  ) {
+    await submitQuestionnaire(
+      eventId,
+      'PRE_REGISTRATION',
+      form.preEventQuestionnaire,
+      defaultLocale,
+    );
+  }
+  if (questionnaireChanged(form.postEventQuestionnaire, initial.postEventQuestionnaire)) {
+    await submitQuestionnaire(
+      eventId,
+      'POST_EVENT',
+      form.postEventQuestionnaire,
+      defaultLocale,
+    );
+  }
 }

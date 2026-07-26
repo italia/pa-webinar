@@ -100,6 +100,31 @@ describe('POST /api/admin/events/[id]/duplicate', () => {
     }));
   });
 
+  it('rifiuta un corpo malformato invece di programmare la copia a caso', async () => {
+    // `{ startsAt: 1 }` finiva in `new Date(1)`: una copia datata 1970 creata
+    // con 201. E `nextOccurrence: 'false'` è una stringa vera, quindi
+    // riprogrammava la copia pur dicendo il contrario.
+    for (const corpo of [
+      { startsAt: 1 },
+      { startsAt: 'domani' },
+      { nextOccurrence: 'false' },
+      { chiaveSconosciuta: true },
+    ]) {
+      // 422 come le altre rotte del progetto quando il corpo non passa lo schema.
+      const res = await POST(request(corpo), context as never);
+      expect(res.status, JSON.stringify(corpo)).toBe(422);
+      expect(mocked.event.create).not.toHaveBeenCalled();
+    }
+  });
+
+  it('un corpo assente o vuoto mantiene le date dell’originale', async () => {
+    const res = await POST(request(), context as never);
+    expect(res.status).toBe(201);
+    const data = mocked.event.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
+    expect(data.startsAt).toEqual(sourceEvent().startsAt);
+    expect(data.endsAt).toEqual(sourceEvent().endsAt);
+  });
+
   it('restituisce il moderatorToken: senza, la pagina di modifica risponde 404', async () => {
     const res = await POST(request(), context as never);
     expect(res.status).toBe(201);

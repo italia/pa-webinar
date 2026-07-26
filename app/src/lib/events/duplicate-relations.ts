@@ -2,22 +2,28 @@
  * Quali RELAZIONI di un evento eredita una copia, e quali no.
  *
  * Il gemello di `duplicate-fields.ts`, che fa lo stesso lavoro per le colonne
- * scalari. Serviva perché il meccanismo anti-dimenticanza guardava SOLO le
- * colonne: le relazioni erano "gestite esplicitamente dalla rotta", cioè da
- * nessuno — la duplicazione copiava i promemoria e basta. Un clone perdeva in
- * silenzio tag, organizzatori, co-moderatori, agenda e questionari, e chi
- * organizza una serie ricorrente li ricostruiva a mano ogni volta.
- *
- * Anche qui due elenchi esaustivi, così un test può verificare contro lo schema
- * di Prisma che OGNI relazione sia classificata: se ne aggiungi una e la
- * dimentichi, fallisce la suite invece del prossimo evento duplicato.
+ * scalari. Due elenchi esaustivi, così un test verifica contro lo schema di
+ * Prisma che OGNI relazione sia classificata: se ne aggiungi una e la dimentichi,
+ * fallisce la suite invece del prossimo evento duplicato.
  *
  * Il criterio è uno solo: **la copia eredita la configurazione, non la vita
  * dell'occorrenza**. Chi si è iscritto, cosa ha chiesto, come ha votato, cosa è
  * stato registrato appartengono all'evento che si è svolto.
+ *
+ * Il controllo esaustivo vale per le relazioni di primo livello di `Event`. I
+ * livelli sotto (i modelli e le domande dentro un questionario) sono presidiati
+ * dai tipi, non da un elenco: aggiungerne uno all'include lo rende disponibile al
+ * costruttore, ma dimenticarlo non fa fallire nessun test.
+ *
+ * I tipi non sono scritti a mano: la sorgente è derivata da `DUPLICATE_SOURCE_INCLUDE`
+ * e il risultato dal tipo di creazione di Prisma. È deliberato — un tipo scritto a
+ * mano (o un cast) lascia passare un campo tolto dal `select`, che poi arriva
+ * al costruttore come `undefined` e sparisce senza errori né test rossi.
  */
 
 import { randomUUID } from 'crypto';
+
+import type { Prisma } from '@prisma/client';
 
 /** Relazioni che la copia eredita. */
 export const DUPLICATED_EVENT_RELATIONS = [
@@ -28,6 +34,8 @@ export const DUPLICATED_EVENT_RELATIONS = [
   'questionnaires',
   'reminders',
 ] as const;
+
+type DuplicatedRelation = (typeof DUPLICATED_EVENT_RELATIONS)[number];
 
 /** Relazioni deliberatamente NON copiate, con il motivo. */
 export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
@@ -56,39 +64,11 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   materials: 'i materiali sono il contenuto di quel giorno (slide, allegati); una serie che usa sempre gli stessi merita una scelta esplicita, non un’eredità silenziosa',
 };
 
-/** Le forme minime che il costruttore legge: solo i campi che copia davvero. */
-export interface DuplicableRelations {
-  tagLinks: { tagId: string }[];
-  organizers: { name: string; logoUrl: string | null; websiteUrl: string | null; sortOrder: number }[];
-  additionalMods: { name: string; email: string | null; role: string }[];
-  agendaItems: { label: string; sortOrder: number }[];
-  reminders: { offsetMinutes: number; label: string | null }[];
-  questionnaires: {
-    placement: string;
-    title: unknown;
-    description: unknown;
-    required: boolean;
-    allowEdit: boolean;
-    templates: { templateId: string; sortOrder: number }[];
-    adhocItems: {
-      prompt: unknown;
-      type: string;
-      options: unknown;
-      scaleMin: number | null;
-      scaleMax: number | null;
-      scaleMinLabel: unknown;
-      scaleMaxLabel: unknown;
-      required: boolean;
-      sortOrder: number;
-    }[];
-  }[];
-}
-
 /**
  * Cosa caricare dalla sorgente. Sta qui e non nella rotta perché include e
- * costruttore devono cambiare insieme: se si aggiunge una relazione da copiare
- * e non la si carica, il costruttore riceve `undefined` e la perde in silenzio —
- * di nuovo il difetto che stiamo chiudendo.
+ * costruttore devono cambiare insieme: il tipo della sorgente è derivato da
+ * questo oggetto, quindi togliere un campo qui rompe la compilazione del
+ * costruttore invece di far sparire il dato in silenzio.
  */
 export const DUPLICATE_SOURCE_INCLUDE = {
   tagLinks: { select: { tagId: true } },
@@ -96,7 +76,8 @@ export const DUPLICATE_SOURCE_INCLUDE = {
   additionalMods: {
     // Solo le concessioni ancora valide: una revoca vale per l'occorrenza in
     // cui è avvenuta, ma ri-creare una persona già revocata sarebbe rimetterle
-    // in mano un accesso che le era stato tolto.
+    // in mano un accesso che le era stato tolto. È una regola di sicurezza, non
+    // un dettaglio della query: un test la verifica.
     where: { revokedAt: null },
     select: { name: true, email: true, role: true },
   },
@@ -104,9 +85,8 @@ export const DUPLICATE_SOURCE_INCLUDE = {
     // `completed`/`completedAt` NON si leggono: sono lo stato di esecuzione
     // della riunione che si è svolta, non la scaletta.
     select: { label: true, sortOrder: true },
-    orderBy: { sortOrder: 'asc' },
   },
-  reminders: { select: { offsetMinutes: true, label: true }, orderBy: { offsetMinutes: 'desc' } },
+  reminders: { select: { offsetMinutes: true, label: true } },
   questionnaires: {
     select: {
       placement: true,
@@ -130,14 +110,45 @@ export const DUPLICATE_SOURCE_INCLUDE = {
       },
     },
   },
-} as const;
+} as const satisfies Prisma.EventInclude;
+
+/**
+ * La sorgente, con le sole relazioni che si copiano e con i soli campi che
+ * l'include carica davvero. Derivata, non scritta: è questo che rende il
+ * costruttore sensibile a una modifica dell'include.
+ */
+export type DuplicateSource = Pick<
+  Prisma.EventGetPayload<{ include: typeof DUPLICATE_SOURCE_INCLUDE }>,
+  DuplicatedRelation
+>;
+
+/** Il payload di creazione annidato, verificato contro i tipi di Prisma. */
+export type DuplicatedRelationsPayload = Partial<
+  Pick<Prisma.EventCreateInput, DuplicatedRelation>
+>;
 
 /**
  * Prisma rifiuta `null` esplicito su una colonna Json nullable: va OMESSA.
  * Stessa trappola già gestita per gli scalari in `duplicatedConfig`.
  */
-function optionalJson(key: string, value: unknown): Record<string, unknown> {
-  return value === null || value === undefined ? {} : { [key]: value };
+function optionalJson<K extends string>(
+  key: K,
+  value: Prisma.JsonValue | null,
+): Record<K, Prisma.InputJsonValue> | Record<string, never> {
+  return value === null || value === undefined
+    ? {}
+    : ({ [key]: value } as Record<K, Prisma.InputJsonValue>);
+}
+
+/**
+ * Le colonne Json NON nullable (titolo e descrizione del questionario) hanno
+ * `{}` come default nello schema, ma il tipo letto ammette comunque il null
+ * JSON: passandolo, Prisma rifiuta l'inserimento e — dato che la copia è un
+ * unico insert annidato — l'intera duplicazione fallirebbe. Si ricade sul
+ * default.
+ */
+function requiredJson(value: Prisma.JsonValue | null): Prisma.InputJsonValue {
+  return value === null || value === undefined ? {} : value;
 }
 
 /**
@@ -145,8 +156,8 @@ function optionalJson(key: string, value: unknown): Record<string, unknown> {
  * non compaiono affatto: passare `{ create: [] }` funziona, ma sporca il
  * payload e rende più difficile leggere cosa è stato davvero copiato.
  */
-export function duplicatedRelations(source: DuplicableRelations): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
+export function duplicatedRelations(source: DuplicateSource): DuplicatedRelationsPayload {
+  const out: DuplicatedRelationsPayload = {};
 
   if (source.tagLinks.length > 0) {
     out.tagLinks = { create: source.tagLinks.map((l) => ({ tagId: l.tagId })) };
@@ -167,7 +178,8 @@ export function duplicatedRelations(source: DuplicableRelations): Record<string,
     out.additionalMods = {
       create: source.additionalMods.map((m) => ({
         // Nome ed email restano cifrati: si copiano i valori così come sono,
-        // senza decifrare nulla.
+        // senza decifrare nulla. Seguono la retention dell'evento copiato, che
+        // li cancella insieme al resto (vedi /api/cron/cleanup).
         name: m.name,
         email: m.email,
         role: m.role,
@@ -196,8 +208,8 @@ export function duplicatedRelations(source: DuplicableRelations): Record<string,
     out.questionnaires = {
       create: source.questionnaires.map((q) => ({
         placement: q.placement,
-        title: q.title,
-        description: q.description,
+        title: requiredJson(q.title),
+        description: requiredJson(q.description),
         required: q.required,
         allowEdit: q.allowEdit,
         ...(q.templates.length > 0
@@ -214,7 +226,7 @@ export function duplicatedRelations(source: DuplicableRelations): Record<string,
           ? {
               adhocItems: {
                 create: q.adhocItems.map((i) => ({
-                  prompt: i.prompt,
+                  prompt: requiredJson(i.prompt),
                   type: i.type,
                   scaleMin: i.scaleMin,
                   scaleMax: i.scaleMax,

@@ -20,6 +20,7 @@ vi.mock('@/lib/db', () => ({
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
     eventAgendaItem: { deleteMany: vi.fn() },
+    eventModerator: { deleteMany: vi.fn() },
     recordingTrack: { deleteMany: vi.fn() },
     callSession: { updateMany: vi.fn() },
     $transaction: vi.fn(),
@@ -63,6 +64,7 @@ const db = prisma as unknown as {
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
   eventAgendaItem: { deleteMany: Mock };
+  eventModerator: { deleteMany: Mock };
   recordingTrack: { deleteMany: Mock };
   callSession: { updateMany: Mock };
   $transaction: Mock;
@@ -321,6 +323,21 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.eventAgendaItem.deleteMany).toHaveBeenCalledWith(byEvent);
     expect(db.agendaItemReaction.deleteMany).toHaveBeenCalledWith({
       where: { agendaItem: { eventId: 'evt-vecchio' } },
+    });
+  });
+
+  it('fase 3: cancella le concessioni nominali di moderatore e relatore', async () => {
+    // `EventModerator` porta nome ed email cifrati piu' un token di accesso
+    // durevole, e la sua cascade non scatta (l'evento resta ARCHIVED). Chi
+    // duplica un evento ricorrente ne crea una copia a ogni occorrenza: senza
+    // questa riga l'indirizzo di quella persona sopravvive alla retention in
+    // tante copie quante sono le occorrenze della serie.
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+
+    await runCleanup();
+
+    expect(db.eventModerator.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio' },
     });
   });
 

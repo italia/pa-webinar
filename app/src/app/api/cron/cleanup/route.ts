@@ -256,6 +256,17 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // Named moderator/speaker grants: `name` and `email` are encrypted PII
+        // and `token` is a durable magic-link credential. Same cascade trap as
+        // the chat above — the event row survives as ARCHIVED, so nothing else
+        // ever removes these. The public programme is unaffected: the speaker
+        // list shown on the event page comes from `Event.speakersInfo`, not from
+        // these rows. Copies of a recurring event multiply the grants, so a
+        // series would otherwise keep one contact's address alive indefinitely.
+        const moderatorGrantsDeleted = await tx.eventModerator.deleteMany({
+          where: { eventId: evt.id },
+        });
+
         // Per-participant audio track rows (ADR-013). `displayName` is encrypted
         // PII. multitrack-purge already deletes the audio BLOB and stamps
         // audioPurgedAt but never removes the row, so it lingers. Guard on
@@ -303,6 +314,7 @@ export const GET = withErrorHandling(async (request) => {
           reactions: reactionsDeleted.count,
           agendaReactions: agendaReactionsDeleted.count,
           agendaItems: agendaItemsDeleted.count,
+          moderatorGrants: moderatorGrantsDeleted.count,
           recordingTracks: recordingTracksDeleted.count,
           callSessionsScrubbed: callSessionsScrubbed.count,
         };
