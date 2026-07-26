@@ -235,7 +235,7 @@ Digitale.
 
 La cancellazione automatica dei dati al termine del periodo di conservazione garantisce il principio di minimizzazione dei dati.
 
-## v0.2.0 — Campi aggiuntivi registrazione
+## Campi aggiuntivi registrazione
 
 ### Nuovi dati raccolti
 
@@ -325,7 +325,7 @@ Nel form di creazione evento, sotto il campo `dataRetentionDays`, un callout inf
 - Registrazioni video
 - Le statistiche aggregate vengono mantenute.
 
-## Rubrica / Identità Persona (v0.4.x)
+## Rubrica / Identità Persona
 
 Oltre alla `Registration` per-evento, la piattaforma introduce il modello
 `Person` — un'identità **cross-evento** basata su `emailHash` che persiste
@@ -377,21 +377,27 @@ Ai guest non viene chiesta l'email; il display name è sotto il controllo
 dell'utente e può essere lasciato vuoto (sostituito con un placeholder
 generico). Nessuna PII viene persistita senza un display name esplicito.
 
-## Proposta stringhe i18n — informativa multi-traccia
+## Informativa resa all'utente sulla registrazione multi-traccia
 
-> **Nota per chi implementa**: blocco **proposto**, non ancora applicato ai
-> file di messaggi. L'informativa privacy e il modulo di consenso dovranno
-> esporre queste chiavi. Testi IT (default) ed EN; le altre 23 lingue
-> seguiranno la traduzione standard. Le chiavi sono raggruppate sotto
-> `privacy.multitrack` per coerenza con il namespacing esistente.
+Quando l'evento ha `multitrackRecordingEnabled`, il modulo di registrazione
+mostra una casella di consenso dedicata, distinta da quella sulla registrazione
+audio/video. Il testo è la chiave i18n `gdpr.consent.multitrack`, presente in
+tutte le lingue supportate dalla piattaforma:
 
-| Chiave | IT | EN |
-|---|---|---|
-| `privacy.multitrack.consentLabel` | Acconsento alla registrazione di una traccia audio separata della mia voce, al solo scopo di attribuire correttamente la trascrizione a chi parla. | I consent to recording a separate audio track of my voice, for the sole purpose of correctly attributing the transcript to each speaker. |
-| `privacy.multitrack.purpose` | La traccia separata serve unicamente ad associare il testo trascritto al relatore corretto. Non viene usata per identificare, riconoscere o riprodurre la tua voce. | The separate track is used only to associate the transcribed text with the correct speaker. It is not used to identify, recognise or reproduce your voice. |
-| `privacy.multitrack.notBiometric` | Non creiamo alcuna impronta vocale né modello della tua voce: trattiamo l'audio solo per trasformarlo in testo. | We do not create any voiceprint or model of your voice: we process the audio only to turn it into text. |
-| `privacy.multitrack.minimization` | La traccia audio separata è temporanea: viene cancellata subito dopo la trascrizione e conservata per un periodo molto più breve del testo prodotto. | The separate audio track is temporary: it is deleted right after transcription and kept for a much shorter period than the resulting text. |
-| `privacy.multitrack.encryption` | La traccia è cifrata, non è mai pubblica ed è accessibile solo al sistema di trascrizione per il tempo strettamente necessario. | The track is encrypted, never public, and accessible only to the transcription system for the strictly necessary time. |
-| `privacy.multitrack.rights` | Puoi chiedere in qualsiasi momento la cancellazione della tua traccia audio. La cancellazione dell'audio non modifica il testo già trascritto e attribuito. | You can request deletion of your audio track at any time. Deleting the audio does not change text that has already been transcribed and attributed. |
-| `privacy.multitrack.legalBasis` | Base giuridica: consenso esplicito (art. 6, par. 1, lett. a, GDPR), distinto dal consenso alla registrazione video. | Legal basis: explicit consent (Art. 6(1)(a) GDPR), distinct from consent to video recording. |
-| `privacy.multitrack.optionalNotice` | Se non presti questo consenso, potrai comunque partecipare ed essere registrato nell'audio comune dell'evento; semplicemente non verrà creata una tua traccia separata. | If you do not give this consent, you can still take part and be recorded in the event's shared audio; simply no separate track of you will be created. |
+> Acconsento alla registrazione di una traccia audio separata della mia voce, al
+> solo scopo di attribuire correttamente la trascrizione a chi parla. La traccia
+> è temporanea e cancellata dopo la trascrizione; non viene usata per
+> identificare o riprodurre la mia voce.
+
+Il consenso è bloccante: senza la spunta la registrazione non si completa e il
+modulo mostra `gdpr.consent.multitrackRequired`. Chi non l'ha già prestato in
+fase di registrazione (per esempio chi entra con un link personale su un altro
+dispositivo) ritrova la stessa casella nella sala d'attesa, dove è sbarramento
+all'ingresso (`waiting.multitrackConsentTitle`,
+`waiting.multitrackConsentRequired`).
+
+La casella copre finalità, esclusione dell'uso biometrico e temporaneità della
+traccia. Cifratura at-rest, base giuridica e diritti dell'interessato non sono
+ripetuti nel modulo: vanno resi nell'informativa privacy dell'evento
+(`privacyPolicyUrl` / `privacyPolicyText`), sulla base di quanto descritto nelle
+sezioni precedenti.

@@ -26,8 +26,8 @@ cd pa-webinar/scripts/load-test
 podman build -t pa-webinar-load-test .
 # oppure: docker build -t pa-webinar-load-test .
 
-# 2. Estrai il JWT secret dal cluster test
-export JITSI_JWT_SECRET="$(kubectl -n videocall-test get secret videocall-secrets \
+# 2. Estrai il JWT secret dal cluster di test
+export JITSI_JWT_SECRET="$(kubectl -n <namespace> get secret <app-secret> \
   -o jsonpath='{.data.JITSI_JWT_SECRET}' | base64 -d)"
 
 # 3. Lancia uno smoke test (20 bot, 5 sender video, 5 min)
@@ -35,9 +35,9 @@ podman run --rm --shm-size=4g \
   --pids-limit=-1 \
   --ulimit nofile=65536:65536 \
   --ulimit nproc=65536:65536 \
-  -e JITSI_URL=https://jitsi-test.innovazione.gov.it \
+  -e JITSI_URL=https://jitsi.example.com \
   -e JITSI_JWT_SECRET \
-  -e JITSI_JWT_SUBJECT=jitsi-test.innovazione.gov.it \
+  -e JITSI_JWT_SUBJECT=jitsi.example.com \
   -e JITSI_ROOM=load-test-smoke \
   -e PARTICIPANTS=20 \
   -e SENDERS=5 \
@@ -47,9 +47,14 @@ podman run --rm --shm-size=4g \
   localhost/pa-webinar-load-test
 
 # 4. In un altro terminale, osserva le metriche lato JVB
-kubectl -n videocall-test exec <jvb-pod> -- \
+kubectl -n <namespace> exec <jvb-pod> -- \
   wget -qO- http://localhost:8080/colibri/stats | jq .
 ```
+
+Nei comandi di questa guida sostituisci `<namespace>` con il namespace del
+deploy, `<app-secret>` con il Secret che contiene le variabili d'ambiente
+dell'app, `<release>` con il nome della release Helm e `jitsi.example.com` con
+l'hostname Jitsi del deploy da testare.
 
 Per una lista completa di env var e scenari, continua a leggere.
 
@@ -59,7 +64,7 @@ Per una lista completa di env var e scenari, continua a leggere.
 
 | Env | Default | Descrizione |
 |---|---|---|
-| `JITSI_URL` | *(required)* | URL pubblico del dominio Jitsi (es. `https://jitsi-test.innovazione.gov.it`) |
+| `JITSI_URL` | *(required)* | URL pubblico del dominio Jitsi (es. `https://jitsi.example.com`) |
 | `JITSI_JWT_SECRET` | *(required)* | Segreto HS256 usato da Prosody per validare il JWT |
 | `JITSI_JWT_SUBJECT` | *(required)* | Claim `sub` del JWT (tipicamente il dominio Jitsi) |
 | `JITSI_JWT_ISSUER` | `pa-webinar` | Claim `iss` |
@@ -121,16 +126,16 @@ pod con poche risorse (15 Chrome fisici × 20 client ciascuno = 300 partecipanti
 
 Per workload più lunghi o ripetibili in CI, usa il Job template.
 
-Nella directory `k8s-configuration/helm/videocall/<env>/` c'è un
-`load-test-job.yaml` che lancia lo stesso container come `batch/Job`. Vantaggi:
+Tieni nel tuo repo di configurazione Kubernetes, accanto ai values dell'ambiente,
+un `load-test-job.yaml` che lancia lo stesso container come `batch/Job`. Vantaggi:
 - Traffico interno al cluster (no egress egress ingress round trip)
 - Ripetibile (`kubectl apply -f`)
 - `parallelism: N` per distribuire il carico su più pod
 
 ```bash
-kubectl -n videocall-test apply -f test/load-test-job.yaml
-kubectl -n videocall-test logs -f job/load-test-torture -c torture
-kubectl -n videocall-test delete job load-test-torture   # cleanup
+kubectl -n <namespace> apply -f load-test-job.yaml
+kubectl -n <namespace> logs -f job/load-test-torture -c torture
+kubectl -n <namespace> delete job load-test-torture   # cleanup
 ```
 
 Il template fa il mint del JWT in un initContainer con `alpine + openssl + jq`
@@ -143,7 +148,7 @@ Il template fa il mint del JWT in un initContainer con `alpine + openssl + jq`
 Documentare l'ambiente di esecuzione è fondamentale per interpretare i numeri.
 I nostri risultati sono stati raccolti su:
 
-### Cluster (AKS `developers-italia-prod`)
+### Cluster (AKS `<cluster>`)
 
 **Storico v1 — dismesso 2026-04-15**:
 
@@ -163,7 +168,7 @@ a 60-80 participants webinar (vedi scenario A storico).
 | **Prosody / Jicofo / Web** | `test` | `Standard_D2as_v5` (spot) | 2 | 8 Gi | sì | Signaling, auth, statici |
 | **App + load-test pod** | `applications` | `Standard_D8as_v5` | 8 | 32 Gi | no | Runtime applicativo |
 
-Chart values v2 (da `k8s-configuration/helm/videocall/test/values.yaml`):
+Chart values v2 (dai values dell'ambiente di test):
 - JVB `requests: cpu=14 memory=24Gi, limits: cpu=15 memory=28Gi`
 - `VIDEOBRIDGE_OPTS=-Xms4g -Xmx16g -XX:MaxDirectMemorySize=8g -XX:+UseG1GC -XX:MaxGCPauseMillis=40`
 - `octo.enabled: true`
@@ -189,7 +194,7 @@ encode), non la RAM.
 ## Scenari testati e risultati
 
 I risultati sotto sono raccolti con:
-- **Target**: `https://jitsi-test.innovazione.gov.it` (cluster AKS sopra)
+- **Target**: dominio Jitsi del deploy di test (cluster AKS sopra)
 - **Generatore**: workstation locale via `podman run` (vedi comando quick-start)
 - **Data**: 2026-04-14
 
@@ -336,7 +341,7 @@ flowchart LR
     U1[Utenti pubblici]-->|HTTPS|ING[NGINX Ingress]
     ING-->|/|APP[pa-webinar<br/>Next.js]
     ING-->|/event/*|JWEB[Jitsi Web]
-    APP-->|Prisma|DB[(Azure Postgres<br/>videocall_test)]
+    APP-->|Prisma|DB[(Azure Postgres)]
     APP-->|REST /colibri/stats|JVB1
     JWEB-->|XMPP BOSH|PROS[Prosody]
     PROS-->|MUC|JIC[Jicofo]
@@ -450,8 +455,8 @@ Validazione della cascata Octo con `SplitBridgeSelectionStrategy` forzata
 
 | Bridge | parts locali | octo_endpoints | octo_send_bitrate | stress |
 |---|---|---|---|---|
-| JVB1 (pod 76gm8) | ~30 | 30 | 85-100 Mbps | 3-4% |
-| JVB2 (pod jh8dl) | ~30 | 30 | 85-100 Mbps | 3-4% |
+| JVB1 | ~30 | 30 | 85-100 Mbps | 3-4% |
+| JVB2 | ~30 | 30 | 85-100 Mbps | 3-4% |
 
 - Totale unique parts nella room: **60**
 - **octo_conferences: 1** su entrambi i bridge → conferenza unica
@@ -470,7 +475,7 @@ networking degli F16 (~12.5 Gbps), ma va monitorato.
 
 Non un test di performance, ma una validazione dell'automazione:
 1. `SiteSetting.jvbInactiveGraceMinutes = 1` (override per velocizzare)
-2. Evento `prova` marcato `LIVE` con `lastActiveAt = -10 min`
+2. Un evento di prova marcato `LIVE` con `lastActiveAt = -10 min`
 3. Riattivato `jvb-scaler` CronJob
 4. **Osservato nel log scaler (ciclo successivo, ~2 min dopo)**:
    ```
@@ -682,20 +687,20 @@ container.
 
 ---
 
-## Come si sono fatti questi test (reproducibility)
+## Come riprodurre i test
 
 Passi concreti per rifare i test:
 
 1. **Applica le modifiche di deploy temporanee** (vengono sovrascritte al
    prossimo helm upgrade, quindi sono sicure per test ad-hoc):
    ```bash
-   kubectl -n videocall-test set env deployment/videocall-test-jitsi-meet-web ENABLE_PREJOIN_PAGE=false
-   kubectl -n videocall-test rollout status deployment/videocall-test-jitsi-meet-web
+   kubectl -n <namespace> set env deployment/<release>-jitsi-meet-web ENABLE_PREJOIN_PAGE=false
+   kubectl -n <namespace> rollout status deployment/<release>-jitsi-meet-web
    ```
 
 2. **Verifica che il deploy abbia prejoin disabilitato**:
    ```bash
-   curl -sk https://jitsi-test.innovazione.gov.it/config.js | grep prejoinConfig
+   curl -sk https://jitsi.example.com/config.js | grep prejoinConfig
    # deve dire: enabled: false
    ```
 
@@ -707,18 +712,17 @@ Passi concreti per rifare i test:
 
 4. **Estrai il secret JWT**:
    ```bash
-   export JITSI_JWT_SECRET=$(kubectl -n videocall-test get secret videocall-secrets \
+   export JITSI_JWT_SECRET=$(kubectl -n <namespace> get secret <app-secret> \
      -o jsonpath='{.data.JITSI_JWT_SECRET}' | base64 -d)
    ```
 
-5. **Lancia gli scenari** con il runner (vedi `/tmp/load-test-results/runner.sh`
-   nel repo di lavoro, qui riportato per riferimento). Il runner campiona JVB
-   ogni 30s tramite `kubectl exec` verso l'endpoint `colibri/stats` del pod JVB.
+5. **Lancia gli scenari** con un runner che campiona JVB ogni 30s tramite
+   `kubectl exec` verso l'endpoint `colibri/stats` del pod JVB.
 
 6. **Cleanup finale**:
    ```bash
-   kubectl -n videocall-test set env deployment/videocall-test-jitsi-meet-web ENABLE_PREJOIN_PAGE-
-   kubectl -n videocall-test rollout status deployment/videocall-test-jitsi-meet-web
+   kubectl -n <namespace> set env deployment/<release>-jitsi-meet-web ENABLE_PREJOIN_PAGE-
+   kubectl -n <namespace> rollout status deployment/<release>-jitsi-meet-web
    ```
 
 ---

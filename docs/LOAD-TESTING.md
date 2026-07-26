@@ -192,9 +192,13 @@ pratica se disponi di una workstation con RAM/CPU abbondanti (indicativamente
 - Rete in uscita verso il dominio Jitsi del deploy che stai testando
 - Il **secret JWT** dello stesso deploy (`JITSI_JWT_SECRET`) — puoi estrarlo dal cluster:
   ```bash
-  kubectl -n videocall-test get secret videocall-secrets \
+  kubectl -n <namespace> get secret <app-secret> \
     -o jsonpath='{.data.JITSI_JWT_SECRET}' | base64 -d
   ```
+
+Nei comandi di questa sezione sostituisci `<namespace>` con il namespace del
+deploy, `<app-secret>` con il Secret che contiene le variabili d'ambiente
+dell'app e `jitsi.example.com` con l'hostname Jitsi del deploy da testare.
 
 ### Build dell'immagine
 
@@ -216,11 +220,11 @@ Usa lo script wrapper `run-local.sh`, che gestisce runtime detection (podman/doc
 e propaga le env var al container:
 
 ```bash
-# Smoke test contro l'env test pubblico (stile scenario webinar scalato)
-JITSI_URL=https://jitsi-test.innovazione.gov.it \
-JITSI_JWT_SECRET="$(kubectl -n videocall-test get secret videocall-secrets \
+# Smoke test contro un deploy di test pubblico (stile scenario webinar scalato)
+JITSI_URL=https://jitsi.example.com \
+JITSI_JWT_SECRET="$(kubectl -n <namespace> get secret <app-secret> \
   -o jsonpath='{.data.JITSI_JWT_SECRET}' | base64 -d)" \
-JITSI_JWT_SUBJECT=jitsi-test.innovazione.gov.it \
+JITSI_JWT_SUBJECT=jitsi.example.com \
 PARTICIPANTS=20 SENDERS=5 DURATION=300 \
   ./run-local.sh
 ```
@@ -267,11 +271,11 @@ per capacity planning vero conviene il cluster.
 
 ## Misurazioni reali
 
-### Caffettino demo — 24 aprile 2026
+### Misurazione reale — webinar da 65 partecipanti su Kubernetes
 
-Prima prova di carico "vera" su traffico reale: demo interna DTD con scenario
-webinar tipico (moderatore + relatori + audience passiva), usata come
-baseline per la curva di capacità del deployment `videocall-test` su AKS.
+Prova di carico su traffico reale: webinar con scenario tipico (moderatore +
+relatori + audience passiva), usata come baseline per la curva di capacità di
+un deployment su Kubernetes gestito (AKS).
 
 | Metrica | Valore osservato | Note |
 |---|---|---|
@@ -290,11 +294,14 @@ baseline per la curva di capacità del deployment `videocall-test` su AKS.
   nominale** — coerente col 18.6% di stress osservato.
 - Non ci sono stati cambi di regime (scale-up reattivo oltre il predictive):
   lo stress è sempre rimasto sotto la soglia warn.
-- Due bug infrastrutturali scoperti e fissati in questa sessione sono
-  documentati come regressioni: lo scaler OOMKillato a 32Mi con ≥3 pod
-  (ora 256Mi, commit `3ac77dd`) e il gauge Prometheus `eventi_jvb_participants`
-  che leggeva solo un pod (ora legge il Redis snapshot aggregato,
-  commit `b77a375`). Entrambi visibili solo da 3 pod JVB in su.
+- Due difetti infrastrutturali emergono solo da 3 pod JVB in su, e sono già
+  coperti dalla configurazione corrente: lo scaler veniva OOMKillato con un
+  limite di memoria troppo basso (il chart chiede 256Mi, vedi
+  `infra/helm/pa-webinar/templates/cronjob-jvb-scaler.yaml`) e il gauge
+  Prometheus `eventi_jvb_participants` leggeva un solo pod (ora legge lo
+  snapshot aggregato cross-pod da Redis, vedi
+  `app/src/app/api/metrics/route.ts`). Se adatti chart o metriche, verifica
+  che entrambi restino validi con più di 2 bridge.
 
 Queste misurazioni sostituiscono parzialmente i "valori indicativi basati
 su hardware di riferimento" per la fascia 50-100 partecipanti. Prima di

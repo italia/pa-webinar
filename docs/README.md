@@ -38,7 +38,6 @@ Indice dei documenti. Se stai arrivando ora, parti dal
 | [SECURITY-CSP.md](SECURITY-CSP.md) | Content Security Policy |
 | [SERVICE-INVENTORY.md](SERVICE-INVENTORY.md) | Inventario dei servizi pubblicato in `/service-inventory` |
 | [SERVICE-INVENTORY-GENERATION.md](SERVICE-INVENTORY-GENERATION.md) | Come si genera e si tiene aggiornato quell'inventario |
-| [PENTEST-RFP.md](PENTEST-RFP.md) | Capitolato per un test di sicurezza esterno |
 
 ## Riusare il software
 

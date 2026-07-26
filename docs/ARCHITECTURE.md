@@ -553,7 +553,7 @@ La decisione su quale branch mostrare dipende dal wall-clock combinato con lo st
 
 - `status = PUBLISHED` e `startsAt` in futuro → countdown
 - `status = PUBLISHED` e `startsAt` passato → "in arrivo" con spinner + chat preview
-- `status = PROVISIONING` → `ProvisioningScreen` (anche se `startsAt` è futuro, la WaitingRoom prevale per mostrare il countdown — v0.4.x fix in commit `70d6a16`)
+- `status = PROVISIONING` → `ProvisioningScreen` (anche se `startsAt` è futuro, la WaitingRoom prevale per mostrare il countdown)
 - `status = LIVE` → CTA "Entra" (subito device check, poi Jitsi)
 - `status = IDLE` → "Evento in pausa" con re-entry
 - `status = ENDED` → recording / Q&A archive / feedback form
@@ -804,7 +804,7 @@ Il JWT è firmato con `JITSI_JWT_SECRET` (shared secret tra portale e Prosody). 
 
 ### Cluster AKS
 
-Il deployment avviene su un cluster Azure Kubernetes Service esistente del DTD.
+Il diagramma seguente descrive un deployment di riferimento su un cluster Azure Kubernetes Service esistente.
 
 ```mermaid
 graph TD
@@ -850,7 +850,7 @@ graph TD
 
 Dalla v0.4.x la sala live usa un pattern **controls floating + drawer** ispirato a Google Meet, unico per desktop e mobile con breakpoint a 992px. File principale: `app/src/components/live/live-event-client.tsx` (hub di tutti i pannelli live).
 
-- **Desktop ( ≥992px )**: floating control bar sopra il video Jitsi (in overlay), drawer laterale che scorre da destra con tabs Q&A / Chat / Polls / Materials / Participants. Il toolbar nativo Jitsi è disabilitato per attendee e permanente per moderator (`TOOLBAR_ALWAYS_VISIBLE=true` + timeout 20s, introdotto con commit `306dd20` dopo il feedback caffettino — i due bar non si sovrappongono più).
+- **Desktop ( ≥992px )**: floating control bar sopra il video Jitsi (in overlay), drawer laterale che scorre da destra con tabs Q&A / Chat / Polls / Materials / Participants. Il toolbar nativo Jitsi è disabilitato per attendee e permanente per moderator (`TOOLBAR_ALWAYS_VISIBLE=true` + timeout 20s in `lib/jitsi/config.ts`), così le due barre non si sovrappongono.
 - **Mobile ( <992px )**: bottom tab strip (Bootstrap Italia `.it-footer-nav`-style) con 5 tab; il drawer diventa full-screen. Il tasto "condividi schermo" è rimosso dai mobile toolbar buttons (`mobileBaseToolbarButtons` / `mobileModeratorToolbarButtons` in `lib/jitsi/config.ts`): iOS Safari e la maggior parte dei browser Android vietano `getDisplayMedia()` in iframe, meglio nasconderlo che mostrare un errore opaco.
 
 Componenti di supporto:
@@ -913,7 +913,7 @@ graph LR
     C1 --> E3["/api/metrics<br/>Prometheus gauges"]
 ```
 
-**Memory limit**: 256Mi (alzato da 32Mi in commit `3ac77dd` dopo OOMKill con ≥3 pod JVB: fan-out di `kubectl exec` + subshell bash supera il vecchio ceiling). Copre fino a ~6 pod (il default `jvbMaxReplicas`).
+**Memory limit**: 256Mi (con un limite più basso, tipo 32Mi, il tick va in OOMKill già con ≥3 pod JVB: il fan-out di `kubectl exec` + le subshell bash superano quel ceiling). Copre fino a ~6 pod (il default `jvbMaxReplicas`).
 
 **Macchina a stati dell'evento** — lo scaler è l'unico che fa transizioni automatiche (le altre sono manuali via admin UI):
 
@@ -945,7 +945,7 @@ Parametri chiave (tutti `SiteSetting`, override per-evento su `Event` quando app
 
 ### CallSession lifecycle
 
-Da v0.4.x ogni evento che genera traffico produce una `CallSession`, anche senza recording (prima di `233dd60` la riga veniva creata solo dal webhook Jibri):
+Ogni evento che genera traffico produce una `CallSession`, anche senza recording (l'apertura non dipende dal webhook Jibri):
 
 1. **Apertura** — il live client, dopo il primo `videoConferenceJoined`, fa `POST /api/events/:slug/sessions` (endpoint idempotente: se esiste una sessione `endedAt IS NULL` ritorna quella). Rate-limited 30 req/min per IP, no auth (chi è arrivato nella live room di un evento LIVE/PROVISIONING è signal valido). File: `app/src/app/api/events/[param]/sessions/route.ts`.
 
@@ -1122,7 +1122,7 @@ In sviluppo locale, Jitsi è esposto su `https://localhost:8443` per comodità.
 
 ### Monitoraggio
 
-Lo stack di monitoraggio è quello già presente nel cluster DTD:
+Lo stack di monitoraggio si appoggia ai componenti già presenti nel cluster:
 
 ```mermaid
 graph LR

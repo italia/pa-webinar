@@ -1,164 +1,70 @@
 # Roadmap — pa-webinar
 
-Allineata al 2026-07-25, **verificata contro il codice** (non contro gli stati dichiarati). In produzione: **v0.8.9**.
+Questo documento guarda avanti: cosa manca, in che ordine, e con quali limiti noti convive ciò che è già spedito. Le versioni rilasciate non sono elencate qui — stanno in [`CHANGELOG.md`](../CHANGELOG.md) e sulla pagina pubblica `/changelog`.
 
-Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici rispetto a ciò che il codice fa davvero oggi.
+Dove una funzionalità è completa ma ha un confine che conviene conoscere prima di appoggiarcisi, il limite è scritto accanto.
 
-> Nota di metodo: la revisione del 22 luglio ha trovato questo documento sbagliato **in entrambe le direzioni** — voci spedite ancora marcate "in corso" e sottosistemi marcati ✅ con un buco strutturale dentro. Le seconde sono le pericolose: chi legge decide di non guardarci. Dove un ✅ ha un limite noto, adesso il limite è scritto accanto.
+## Cosa c'è già
 
-## v0.1.0 — MVP ✅
+Il changelog resta l'unica fonte di verità su cosa è stato rilasciato e quando (è **generato** dai dati di release, non riscritto a mano, e la pagina `/changelog` lo mostra tradotto in tutte le lingue del sito). Qui serve solo il perimetro attuale, per capire da dove parte quello che segue:
 
-Core platform:
-
-- Layout PA con design system .italia (Bootstrap Italia, design-react-kit)
-- Admin panel con autenticazione API key
-- CRUD eventi (con modifica e notifica cambio data)
-- Registrazione partecipanti GDPR-compliant (PII cifrate AES-256-GCM)
-- Sala live con Jitsi Meet (IFrame API, JWT auth)
-- Ruoli Jitsi enforced server-side (plugin Prosody custom)
-- Controlli AV per evento (mic/video/screen share per ruolo) + AV Moderation live
-- Q&A con upvote, moderazione, persistenza post-evento
-- Sala d'attesa con countdown, pre-join screen, accesso guest
-- Email conferma/reminder, integrazione calendario (Google, Outlook, Yahoo, iCal)
-- GDPR cleanup cron, metriche Prometheus
-- Helm chart production-grade, Docker non-root/read-only, CI/CD GitHub Actions, publiccode.yml
-
-## v0.2.0 — Feedback DTD ✅
-
-- Profilazione partecipanti in registrazione (ente, ruolo, tipologia — configurabili per evento, export CSV, statistiche aggregate)
-- Reminder configurabili (modello `EventReminder`, N offsets, email differenziate)
-- Consolidamento ruoli Moderatore / Auditore (UI e permessi distinti)
-- GDPR improvements: privacy policy per evento (URL o rich text), retention UI chiara, audit log cancellazioni, consensi granulari (partecipazione / registrazione video / comunicazioni), export dati Art.15
-- Reaction Jitsi native riabilitate
-- Polling/sondaggi (modelli `Poll`/`PollVote`, risultati real-time, export CSV)
-- Gestione materiali sessione (link in v0.2; file in v0.5+)
-- Audit licenze dipendenze (`license-report`, compatibilità EUPL-1.2, step CI)
-- Miglioramento grafica iframe Jitsi (branding config, watermark)
-
-## v0.3.0 — Platform ✅ (tag v0.3.7)
-
-- Site settings (PA reuse, zero hardcoding: branding, colori, favicon, SEO, footer, home mode, privacy/accessibilità)
-- Dashboard analytics
-- Pannello admin infrastruttura
-- 3 modalità deploy Helm (simple / standard / full)
-- JVB scale-to-zero con CronJob (nodepool dedicato, autoscaler min=0)
-- Jibri pipeline multi-cloud (Azure Blob / S3 / GCS / MinIO / local)
-- Watermark Jitsi configurabile
-- 210+ test unitari Vitest
-- Error handling centralizzato, migrations formali, caching, rate limiting
-- OpenSSF Scorecard, Dependabot, SBOM dipendenze (`sbomLatest`)
-
-### v0.3.x — Incrementi post-v0.3.7 ✅
-
-Rilasciati tra v0.3.8 e v0.3.44, a seguito del feedback post-demo 2026-04-16.
-
-- **Hotfix 2026-04-16**
-  - Lista mani alzate ordinata FIFO + mappatura `jitsi-participant-id → registration.displayName`
-  - Moderatori multipli con mute-all (permessi JWT/Prosody legati al ruolo, non alla sessione)
-  - Magic-link moderatore: display name non pre-popolato in pre-join
-- **Breadcrumb admin + public** (componente `AdminBreadcrumb` su ogni pagina)
-- **Password opzionale per call** (gating su join page, utile per instant call privata)
-- **Multi-moderator magic links** (modello `EventModerator` — token individuale, nome, email, revoca granulare)
-- **Chat in-app real-time** — v0.3.43 (Postgres + Redis pub/sub + SSE; sostituisce chat XMPP Jitsi; late-join, archivio, audit, rate-limit server-side; subchart Bitnami `redis` standalone)
-- **Storage provider agnostico** — v0.3.44 (interfaccia `StorageProvider` + adapter `azure` e `s3`; copre AWS S3, MinIO path-style, Cloudflare R2, GCS HMAC, Wasabi, PSN on-prem)
-- **Autoscaling orizzontale app multi-nodo** — HPA `autoscaling/v2` (min 2 / max 6 pod, target 70% CPU). Fan-out Redis pub/sub della chat SSE rende l'app pronta a girare su più pod/nodi senza sticky session. Lato video: cluster autoscaler AKS su nodepool JVB dedicato (ADR-007)
-
-## v0.4.0 — Engagement & Lifecycle ✅ (corrente)
-
-- Feedback post-evento
-- Word cloud live
-- Presentation timer
-- Reaction counter
-- Video player con speed controls
-- Diagramma configurazione evento (topology SVG)
-- Sala d'attesa ridisegnata (3 scenari: early / countdown / started)
-- Catch-up ritardatari
-- Recording lifecycle (temporanea → pubblicata, retention differenziata)
-- Admin recording management (preview, pubblica, elimina)
-- Post-event page con tabs (recording, Q&A archive, poll results, feedback, materiali)
-- Post-event config per admin (cosa esporre e quando)
-- GDPR cleanup 3 fasi (immediate PII / retention content / hard delete)
-- **Two-phase JVB autoscaling** (Redis snapshot per status page; skip LIVE→IDLE quando replicas > 1 per evitare race su `/colibri/stats` multi-pod)
-- **Libreria video pubblica** `/video-library` — filtri per data/argomento/tipo, import YouTube per legacy, nuove registrazioni Jibri pubblicate automaticamente
-- **Trasparenza `/service-inventory`** — CycloneDX 1.6 per-tenant (DEV: npm+OCI; OPS: servizi Azure/AKS/Postgres/Blob/GHCR/Mailgun/coturn/…); `components[]` + `services[]` + `declarations[]` + `compositions[]` + `vulnerabilities[]` (VEX-ready) + `formulation[]` + `annotations[]`; stack diagram "Architettura in breve" data-driven da property `pa-webinar:layer`/`stack-label`; artefatto per-tenant servito via `SERVICE_INVENTORY_URL` (file locale su test, Blob pubblico su prod). Reference implementation per OPS half: CronJob AKS + Azure Resource Graph + Workload Identity → upload Blob (`infra/service-inventory/azure/`)
-- Footer build-date con HH:MM UTC
-- **5-step event wizard** ✅ — creazione/edit evento in 5 step (Base, Permessi, Inviti, Contenuti, Revisione) con stato condiviso `WizardForm`; sostituisce il form monolitico precedente (`app/src/components/admin/event-wizard/`)
-- **Title-kicker (pipe split)** ✅ — `SiteSetting.parseTitleKicker` + override per-evento `Event.parseTitleKicker`; rendering editoriale di titoli tipo `Serie | Episodio` con kicker + titolo principale
-- **Tag taxonomy** ✅ — modelli `Tag` + `EventTagLink`, CRUD admin in `/admin/settings/tags`, filtri pubblici `/eventi?tag=<slug>`, tag chips su lista/detail/admin
-- **Rubrica (Person)** ✅ — modello `Person` (emailHash, opt-in esplicito separato, retention inactivity-based), RubricaPicker multi-select nel wizard (step Inviti), pagina admin `/admin/rubrica`, opt-out via signed HMAC token in `src/lib/persons/opt-out-token.ts` (vedi ADR-011)
-- **Auto-start recording** ✅ — flag `autoStartRecording` per-evento (+ template), Jibri viene avviato automaticamente all'ingresso del primo moderatore
-- **Waiting-room unificata** ✅ — front-door unica per guest / partecipante / moderatore (`app/src/components/live/waiting-room.tsx`): email opzionale, name gate, device check (cam/mic toggle + chime test altoparlante), chat preview, netiquette, countdown, catch-up recording
-- **Guest Q&A** ✅ — `Question.registrationId` nullable; i guest (senza Registration) possono porre domande durante eventi open-attendance
-- **Meet-style live controls** ✅ — floating bar sopra il video (desktop), bottom tab strip (<992px mobile), drawer per Q&A/Chat/Polls/Materials/Participants (`app/src/components/live/live-event-client.tsx`)
-- **RaisedHandsPanel read-only** ✅ — coda mani alzate ordinata FIFO visibile a tutti; i moderatori mantengono i controlli approve-mic/video
-- **Screenshare banner** ✅ — banner arancione quando un partecipante remoto inizia a condividere lo schermo
-- **CallSession always-on** ✅ — ogni evento live produce una `CallSession` anche senza recording, aperta al primo `videoConferenceJoined` via `POST /api/events/:slug/sessions` e chiusa dallo scaler su `LIVE→IDLE` / `*→ENDED`
-
-## v0.5.0 – v0.7.x — Spedite ✅
-
-Rilasciate in produzione tra v0.5 e v0.7.1. Voci che le versioni precedenti di questa roadmap elencavano ancora come "pianificate/in corso" ma che sono **live**:
-
-- **Servizio AI post-evento** ✅ — pipeline in-cluster (vincolo sovranità, nessuna API esterna): trascrizione WhisperX + speaker attribution (pyannote 3.1), sintesi "verbale PA" (vLLM Qwen3-32B), traduzione EN/FR di transcript + sintesi, **sottotitoli WebVTT multilingua nel player**, dubbing (Piper). Coda Postgres-outbox + orchestrator CronJob + GPU nodepool A100 scale-to-zero. Vedi [`docs/POSTPROD.md`](POSTPROD.md)
-- **Editor trascrizione post-evento** ✅ — correzione testo + riassegnazione speaker per segmento, **timeline + waveform** (`WAVEFORM_JSON`), export WebVTT/SRT/TXT. (Resta: rigenerazione automatica di traduzioni/dub dopo un edit → v0.9)
-- **Recorder multi-traccia (ADR-013)** ✅ — cattura audio per-partecipante per speaker attribution reale; **metrica di affidabilità** dell'elaborazione AI nel pannello admin (v0.6.9)
-- **Roster relatori editabile + player solo-audio** ✅ (v0.7.0) — rinomina degli speaker riconosciuti; se manca il video, player solo-audio per correggere testo/speaker
-- **Ruolo Relatore (SPEAKER)** ✅ — `EventModeratorRole.SPEAKER`: mic/camera/share senza poteri di moderazione, cablato nel JWT Jitsi
-- **Questionari pre/post evento** ✅ e **Rubrica/Person** ✅ — vedi v0.4 (fase A/B completate)
-- **Upload materiali (FILE) + immagine cover evento** ✅ — upload diretto via `StorageProvider` (non più solo link/URL esterni)
-- **Statistiche post-evento** ✅ (v0.7.1) — tab "Statistiche" per evento: andamento interazione nel tempo (picco), classifica di chi ha parlato di più, grado di attenzione, **alzate di mano**, **reazioni**, **permanenza media** (dwell/retention). Route admin + `lib/analytics` puro
-- **Dashboard Grafana** ✅ — template `infra/grafana/pa-webinar-dashboard.json` deployabile via Helm, su metriche prom-client
-- **Trasparenza service-inventory su prod** ✅ — pubblicata via ConfigMap + `SERVICE_INVENTORY_URL` relativo (l'automazione Azure CronJob → Blob pubblico resta opzionale)
-- **Changelog pubblico** ✅ — `/changelog` allineato alle release, evidenzia la "Versione attuale"
+- registrazione partecipanti GDPR-compliant: PII cifrate, consensi granulari, retention e cleanup automatico (vedi [`GDPR.md`](GDPR.md))
+- sala live con Jitsi Meet embeddato: JWT, ruoli enforced server-side, permessi audio/video per ruolo
+- sala d'attesa con countdown, device check e accesso guest
+- Q&A con upvote e moderazione, con archivio post-evento
+- sondaggi live con risultati in tempo reale, e word cloud live
+- chat in-app real-time (Postgres + Redis pub/sub + SSE) con allegati, menzioni e citazioni
+- reazioni e coda delle mani alzate ordinata
+- questionari pre/post evento e rubrica dei contatti con opt-in esplicito
+- registrazione video (Jibri) su storage object-storage agnostico e libreria video pubblica
+- post-produzione AI in-cluster: trascrizione con attribuzione degli speaker, sottotitoli multilingua, sintesi, doppiaggio (vedi [`POSTPROD.md`](POSTPROD.md))
+- statistiche per evento: interazione nel tempo, chi ha parlato di più, attenzione, permanenza
+- pannello admin: wizard di creazione, template di evento, site settings white-label, monitoraggio infrastruttura
+- interfaccia in 24 lingue, italiano come default (ADR-008)
+- trasparenza: pagina `/service-inventory` con inventario CycloneDX di componenti e servizi
 
 ## Da fare prima del rilascio pubblico
 
 | Item | Stato |
 |---|---|
-| Smoke test su AKS reale | ✅ fatto (prod live con eventi reali) |
-| Evento pilota interno DTD | ✅ fatto (Caffettino + eventi v0.6/v0.7) |
-| Ritocco testi e layout | ✅ in gran parte (passaggi UX v0.6.x) |
-| Test E2E Playwright (batteria flussi critici) | 🟡 parziale (1 file / 7 test, `continue-on-error`) → **v0.8** |
+| Smoke test su cluster Kubernetes reale | ✅ fatto (istanza in produzione con eventi reali) |
+| Evento pilota interno | ✅ fatto |
+| Ritocco testi e layout | ✅ in gran parte |
+| Test E2E Playwright (batteria flussi critici) | 🟡 parziale (un solo file, `continue-on-error`) — vedi "Prossimo" |
 | Screenshot per README | ✅ fatto — schermate reali dell'istanza in produzione in `docs/screenshots/`, referenziate da README, README.en e `publiccode.yml` |
 
 Flussi critici Playwright ancora da coprire: login admin + creazione + pubblicazione evento, ingresso sala (moderatore + partecipante), Q&A (invio/upvote/moderazione), polling, cambio lingua senza reload, GDPR cleanup, download `.ics`, responsive mobile, chat in-app real-time multi-pod.
 
 ## Limiti noti dietro un ✅
 
-Voci spedite e funzionanti, ognuna con un confine che vale la pena conoscere prima di appoggiarcisi. Sono state trovate verificando il codice il 22 luglio, non segnalate da utenti.
+Voci spedite e funzionanti, ognuna con un confine che vale la pena conoscere prima di appoggiarcisi.
 
 | Sottosistema | Il limite |
 |---|---|
-| **Allegati in chat (F16)** | Capability-URL: la protezione è l'UUID non indovinabile + cancellazione del blob alla moderazione/retention, non un controllo d'accesso. Un ACL vero — che rilegga lo stato vivo dell'evento a ogni richiesta — richiede un **cookie con ambito sulla rotta** (un `<img>` non manda header). Due tentativi con un token nell'URL sono falliti: la credenziale durevole trapelava nella condivisione schermo, la capability firmata ignorava la chiusura dell'evento per tutta la durata. È la strada da fare, ma è una feature |
+| **Allegati in chat** | Capability-URL: la protezione è l'UUID non indovinabile + cancellazione del blob alla moderazione/retention, non un controllo d'accesso valutato a ogni richiesta. Un ACL vero — che rilegga lo stato vivo dell'evento — richiede un **cookie con ambito sulla rotta** (un `<img>` non manda header): è pianificato, vedi sotto |
 | **Recorder multitraccia (ADR-013)** | Nessuna riconnessione dopo `CONFERENCE_FAILED`: una caduta a metà evento chiude la registrazione con quello che ha già catturato. L'errore finisce nei log del Job, non nel pannello admin |
 | **Scale-to-zero JVB (ADR-007)** | `/colibri/stats` è aggregato per pod: due eventi LIVE sullo stesso bridge tengono acceso il nodepool anche se uno si è svuotato |
 | **i18n a 24 lingue (ADR-008)** | Il fallback delle chiavi mancanti ricade sull'**italiano**, non sull'inglese |
-| **Piazza della sala d'attesa** | Le emote sono locali: chi le usa vede la propria animazione, gli altri no |
-| **Copertura dei test** | 1284 casi in 75 file, di cui **7 su handler API** (JWT Jitsi, chat, cleanup GDPR, presign upload, asset, garden ping, SBOM changelog). Le due falle già trovate (impersonazione in chat, `/chat` senza auth) stavano entrambe in un handler: la copertura è partita da lì, ma le restanti route non hanno test |
+| **Piazza della sala d'attesa** | Posizioni ed emote viaggiano sul ping di presenza, non su un canale push dedicato: gli altri le vedono con il tick successivo (l'animazione locale parte subito) |
+| **Copertura dei test** | Concentrata su `lib/`: solo pochi handler API hanno test, la maggior parte delle route e dei componenti no (vedi la sezione seguente) |
 
 ## Copertura dei test — stato reale
 
-Misurata, non stimata (`npm run test:coverage --workspace=app`): **5,5% per riga** sull'intero `src/**`. Il numero è basso perché il denominatore è tutto: 153 route API e ~49.000 righe di componenti senza un test, contro una `lib/` coperta bene.
+La copertura per riga è misurata, non stimata (`npm run test:coverage --workspace=app`), ed è bassa perché il denominatore è tutto `src/**`: centinaia di route API e decine di migliaia di righe di componenti senza un test, contro una `lib/` coperta bene.
 
-Le soglie in `app/vitest.config.ts` sono un **cricchetto sul pavimento misurato** — impediscono che scenda, non dichiarano che vada bene. In CI girano con `--coverage`, quindi da ora una regressione di copertura fa fallire la build.
+Le soglie vive stanno in `app/vitest.config.ts` e sono un **cricchetto sul pavimento misurato** — impediscono che la copertura scenda, non dichiarano che vada bene. In CI i test girano con `--coverage`, quindi una regressione di copertura fa fallire la build.
 
-Si sale dai punti in cui vivono le guardie, non dai più facili. I primi quattro
-sono stati coperti (conio del JWT Jitsi, autorizzazione della chat, cleanup GDPR,
-presign dell'upload); i prossimi sono le route di registrazione, il webhook di
-registrazione video e le rotte admin.
+Si sale dai punti in cui vivono le guardie, non dai più facili: route di registrazione, webhook di registrazione video, rotte admin.
 
-## v0.8.0 — In corso / prossima
+## Prossimo
 
 | Feature | Note |
 |---|---|
-| **Upload completi + hardening** ✅ (v0.7.2) | Upload immagini ovunque (logo/favicon/OG/watermark/organizzatore), materiali salvati come `FILE` con `blobPath` (sblocca il cleanup dei blob), hardening sicurezza (nosniff + `Content-Disposition` sul serving, sniff magic-byte, rate-limit, pre-check `Content-Length`), fix `DELETE` recording/session sul dominio storage corretto |
-| **Allegati in chat (F16)** ✅ (v0.7.2) — ma il serving è una *capability-URL*, non un ACL: chi conosce il link vede l'allegato | Upload allegati (immagini/documenti) in chat live: gating a soli utenti autenticati (no guest anonimi), allowlist MIME stretta + size + rate-limit dedicati, rotta di moderazione (`hiddenAt` + `op:'delete'` già previsti nell'envelope), serving con accesso controllato, cleanup blob in retention |
-| **Chat: @menziona + rispondi/quote** ✅ (v0.7.2, esteso in v0.8.5) — l'autocomplete pesca da chi ha già scritto, non dalla roster | `@nome` con autocomplete + rendering evidenziato; `replyToId` con citazione dello snippet del messaggio padre |
-| **SSE/WebSocket per Q&A** | Sostituire il polling SWR 3s riusando l'infra SSE già provata per la chat (scala a 300+) |
-| **Eventi ricorrenti — quick win** 🟡 quasi chiuso | ✅ `duplicate` copia tutta la config + i reminder; ✅ `PUT /api/events/[param]` persiste `recurrenceRule`; ✅ affordance admin "Duplica come prossima occorrenza". ❌ **resta**: `EventTemplate` non porta ancora `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `aiDubbingEnabled`, `wordCloudEnabled`; e `duplicate` copia gli scalari ma **non le relazioni** (tag, organizzatori, co-moderatori, agenda, questionari) |
-| **Batteria E2E Playwright** | Oggi è **1 file, 7 test** (`app/e2e/live-flow.spec.ts`) con `continue-on-error` per i rate-limit di Docker Hub sul runner condiviso: non protegge da regressioni. Scoperti: Q&A, sondaggi, cambio lingua, cleanup GDPR, download `.ics`, chat SSE multi-pod, e il click reale su "Entra ora" (oggi l'ingresso è coperto solo via API) |
-| **SSE per Q&A** | vedi riga sopra: oggi `useSWR(refreshInterval: 3000)` in `qa/question-list.tsx`, stesso polling in `polls/poll-panel.tsx` e `live/agenda-panel.tsx` |
+| **SSE per Q&A e pannelli live** | Oggi il polling è `useSWR(refreshInterval: 3000)` in tre punti: `qa/question-list.tsx`, `polls/poll-panel.tsx`, `live/agenda-panel.tsx`. Da sostituire riusando l'infra SSE già provata per la chat (scala a 300+) |
+| **Eventi ricorrenti — chiudere il quick win** | `EventTemplate` non porta ancora `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `aiDubbingEnabled`, `wordCloudEnabled`; `duplicate` copia gli scalari e i reminder ma **non le relazioni** (tag, organizzatori, co-moderatori, agenda, questionari) |
+| **Batteria E2E Playwright** | Oggi è un solo file (`app/e2e/live-flow.spec.ts`) con `continue-on-error` per i rate-limit del registry sul runner condiviso: non protegge da regressioni. Scoperti: Q&A, sondaggi, cambio lingua, cleanup GDPR, download `.ics`, chat SSE multi-pod, e il click reale su "Entra ora" (oggi l'ingresso è coperto solo via API) |
 
-## v0.9.0 — Pianificata
+## Dopo
 
 | Feature | Note |
 |---|---|
@@ -170,36 +76,30 @@ registrazione video e le rotte admin.
 | **API pubblica documentata** | Lo spec OpenAPI 3.1 è già servito da `/api/openapi.json`; restano docs UI (Swagger/Redoc), garanzie di stabilità e storia auth |
 | **Rigenerazione AI dopo edit trascrizione** | Rigenerare automaticamente traduzioni/dub quando un segmento viene corretto |
 
-## Eventi ricorrenti / serie — nuova (Caffettino, DevIt)
+## Eventi ricorrenti / serie
 
-Due call ricorrenti reali, cadenze diverse: **Caffettino** (ogni venerdì mattina — cadenza fissa ma **data da confermare**) e **DevIt sync** (periodica ma **spesso rimandata di qualche giorno**). Oggi ogni occorrenza si crea a mano (duplica → rimetti la data → **ri-attiva i flag di cattura**): flusso fragile perché la duplicazione **perde silenziosamente** proprio i flag che per queste call devono restare accesi (multitraccia, trascrizione AI, agenda, retention, lingue, speaker attesi).
+Due casi tipici, con cadenze diverse: una **serie a cadenza fissa** (es. una call settimanale, giorno stabile ma data da confermare volta per volta) e una **serie a data mobile** (periodica, con l'occorrenza spesso riprogrammata di qualche giorno). Oggi ogni occorrenza si crea partendo dalla precedente (duplica → rimetti la data): il clone eredita la configurazione, ma la serie in sé non esiste come entità e la cadenza indicata nel wizard non viene consumata da nulla.
 
-**Stato attuale del codice** (per chi implementa):
-- **WIRED**: picker RRULE nel wizard (`recurrence-picker.tsx` + `lib/utils/recurrence.ts` + libreria `rrule`); `recurrenceRule` persistito alla creazione; anteprima "prossime 5 date" (solo display).
-- **DORMANT**: `recurrenceRule` dopo il salvataggio (nessuno lo consuma); `recurrenceSeriesId` + relazione `EventRecurrenceSeries` (mai scritti/letti); endpoint `POST /api/admin/events/[id]/duplicate` (nessun caller UI).
-- **ABSENT**: qualsiasi job di materializzazione delle occorrenze da RRULE; "crea da template" server-side; raggruppamento per serie di registrazioni/trascrizioni/libreria; reminder consapevoli della ricorrenza; qualsiasi affordance "programma prossima".
-- **Bug latenti da chiudere comunque**: `PUT /api/events/[param]` **scarta** `recurrenceRule` (round-trip: modifichi la ricorrenza nel wizard, al salvataggio sparisce); `duplicate` scarta `aiTranscript/Summary/Translation/Dubbing`, `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`, `autoStartRecording`, `recurrenceRule` **e i reminder**; `EventTemplate` non porta `multitrackRecordingEnabled` / `retainParticipantTracks` / `aiTargetLocales` / `aiDubbingEnabled` / `wordCloudEnabled`.
+Cosa resta davvero aperto sul quick win: `EventTemplate` non porta ancora i flag di cattura/AI mancanti (`multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `aiDubbingEnabled`, `wordCloudEnabled`) e `duplicate` copia gli scalari e i reminder ma non le relazioni (tag, organizzatori, co-moderatori, agenda, questionari).
 
 **Idea portante** — una **Serie** possiede la configurazione canonica (flag di cattura/AI, retention, lingue, speaker attesi, permessi, descrizione, immagine) e **ogni occorrenza la eredita**: così i flag non possono più essere persi per dimenticanza. La cadenza è un *suggerimento*, non una schedulazione rigida: **occorrenze provvisorie** (bozza con data proiettata) che l'operatore **conferma / sposta / salta** — esattamente ciò che serve quando "le date non sono sempre confermate". Riprogrammare = spostare la data della singola occorrenza senza toccare la serie.
 
 **Fasi:**
 
-- **Quick win (v0.8 — bassa spesa, alto valore)** — togliere i footgun senza ancora introdurre la Serie:
-  - `duplicate` copia **tutta** la config (inclusi i flag AI/multitraccia/agenda/wordcloud/ricorrenza) + crea i reminder di default → un clone è fedele all'originale.
-  - `PUT /api/events/[param]` persiste `recurrenceRule` (fix del round-trip).
+- **Quick win — bassa spesa, alto valore** — togliere i footgun senza ancora introdurre la Serie:
   - `EventTemplate` porta anche i flag mancanti (multitraccia, retain-tracks, lingue, dubbing, wordcloud).
-  - Affordance admin **"Duplica come prossima occorrenza"** (avanza la data, eredita la config) — attiva l'endpoint `duplicate` oggi dormiente. Copre già gran parte del bisogno DevIt (data mobile) e Caffettino con un click.
-- **v0.9 — Serie vera e propria**:
+  - `duplicate` copia anche le relazioni (tag, organizzatori, co-moderatori, agenda, questionari), non solo gli scalari e i reminder.
+- **Serie vera e propria**:
   - Entità `EventSeries` (attiva `recurrenceSeriesId` + relazione): la serie è la source-of-truth della config; le occorrenze ereditano con override puntuale possibile.
-  - **"Programma prossima occorrenza"**: materializza la prossima occorrenza in **bozza** con data proiettata dalla RRULE; l'operatore conferma (→ PUBLISHED) / sposta (DevIt rimandata) / salta.
+  - **"Programma prossima occorrenza"**: materializza la prossima occorrenza in **bozza** con data proiettata dalla RRULE; l'operatore conferma (→ PUBLISHED) / sposta (occorrenza rimandata) / salta.
   - Reminder consapevoli della serie (per-occorrenza, non una tantum sul parent).
-- **v0.9 / v1.0 — Post-prod & libreria per serie**:
+- **Post-prod e libreria per serie**:
   - Rollup: registrazioni/trascrizioni/recap di tutte le occorrenze di una serie in un'unica vista admin + una card "serie" in libreria (oggi ogni evento è una card isolata; `Recording` non ha chiave cross-evento).
-  - **Auto-materializzazione** a cadenza fissa (Caffettino, venerdì) via CronJob che crea la prossima occorrenza provvisoria N giorni prima — sempre **confermabile prima di andare pubblica**, così una settimana saltata non pubblica nulla per sbaglio.
+  - **Auto-materializzazione** per le serie a cadenza fissa via CronJob che crea la prossima occorrenza provvisoria N giorni prima — sempre **confermabile prima di andare pubblica**, così un'occorrenza saltata non pubblica nulla per sbaglio.
 
 Registrazione e post-prod restano **per-occorrenza** (ogni call è la sua `Recording` + pipeline AI): corretto e già funzionante. La serie aggiunge *ereditarietà della config* (i flag giusti sempre accesi) e *aggregazione della vista*, non cambia il modello di cattura.
 
-## v1.0.0 — Visione
+## Visione
 
 | Feature | Note |
 |---|---|

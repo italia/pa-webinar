@@ -4,8 +4,6 @@ Pipeline di post-produzione che trasforma le registrazioni Jibri in
 trascrizioni, sintesi e traduzioni. Tutto gira **in-cluster** (vincolo
 di sovranità del dato — nessuna chiamata ad API esterne).
 
-Ultimo aggiornamento: 2026-05-27.
-
 ---
 
 ## Indice
@@ -321,12 +319,18 @@ Modificabile dal pannello senza redeploy:
 
 | Secret | Chiavi | Da chi consumato | Note |
 |---|---|---|---|
-| `pa-webinar-secrets` | `CRON_API_KEY` | app + tutti i cron + orchestrator + worker | Già esistente |
+| Secret dell'app (`secrets.existingSecretName`, default `videocall-secrets`) | `CRON_API_KEY` | app + tutti i cron + orchestrator + worker | Già usato dal resto del chart |
 | `hf-token` | `HF_TOKEN` | worker pod | Per gated `pyannote/speaker-diarization-3.1`. Generare con TOS accettato su huggingface.co |
 
 ---
 
 ## Deploy on AKS Italy North
+
+Nei comandi che seguono sostituisci i segnaposto con i valori del tuo
+ambiente: `<SUB_ID>` (subscription Azure), `<resource-group>` (resource
+group del cluster), `<cluster>` (nome del cluster AKS), `<gpu-nodepool>`
+(nome del node pool GPU) e `<namespace>` (namespace in cui è installato
+il chart).
 
 ### 0. Quota Azure (PREREQUISITO BLOCCANTE)
 
@@ -373,9 +377,9 @@ in caso di fallimento, support ticket Microsoft via Portal.
 
 ### 1. GPU node pool
 
-Il pool produttivo è definito **nel repo `iac-azure`** su branch `main`:
-`modules/aks/main.tf` resource `azurerm_kubernetes_cluster_node_pool.ai_gpu`
-+ valori in `environments/prod/locals.tf` chiave `ai_gpu_*`.
+Il pool va definito **nel vostro repository Terraform/OpenTofu**: una
+resource `azurerm_kubernetes_cluster_node_pool` dedicata (per esempio
+`ai_gpu`) nel modulo AKS, con i valori per environment.
 
 **Default scelto: `Standard_NC24ads_A100_v4`** — 1× NVIDIA A100 80GB,
 24 vCPU, 220 GiB RAM, ~25 Gbps di rete. ~€3.40/hr Italy North; con
@@ -409,10 +413,11 @@ Italy North SKU disponibili (verifica `az vm list-skus
 H100 SKU (ND_H100_v5, NCads_H100_v5) **non disponibili in Italy North**
 a oggi. Verificare prima di promuovere.
 
-Applicare:
+Applicare dal vostro repository Terraform/OpenTofu, adattando il target
+all'indirizzo della resource nel vostro modulo:
 
 ```bash
-cd iac-azure/environments/prod
+cd <repo-tofu>/environments/<env>
 tofu plan  -target='module.aks.azurerm_kubernetes_cluster_node_pool.ai_gpu'
 tofu apply -target='module.aks.azurerm_kubernetes_cluster_node_pool.ai_gpu'
 ```
@@ -421,14 +426,14 @@ Verifica che il pool sia su (a 0 nodi):
 
 ```bash
 kubectl get nodes -l workload=ai-gpu
-az aks nodepool show -g developersitalia-prod \
-  --cluster-name developers-italia-prod --name aigpu \
+az aks nodepool show -g <resource-group> \
+  --cluster-name <cluster> --name <gpu-nodepool> \
   --query '{vmSize:vmSize, minCount:minCount, maxCount:maxCount, nodeCount:count, taints:nodeTaints}'
 ```
 
-> Reference standalone (per PA terze che adottano il chart fuori da
-> `iac-azure`): `infra/tofu/ai-gpu-nodepool.tf` nel repo pa-webinar
-> (`count = 0` di default — il file è solo template).
+> Template standalone, se non avete già un modulo AKS vostro:
+> `infra/tofu/ai-gpu-nodepool.tf` in questo repository (`count = 0` di
+> default — il file è solo un template; lì il pool è chiamato `aigpu`).
 
 ### 2. NVIDIA GPU Operator
 
@@ -519,7 +524,7 @@ spec:
 3. Secret:
    ```bash
    kubectl create secret generic hf-token \
-     -n videocall \
+     -n <namespace> \
      --from-literal=HF_TOKEN=hf_xxx
    ```
 4. Il Secret può essere **eliminato dopo il seed** se non si prevedono
@@ -550,7 +555,7 @@ spec:
     spec:
       nodeSelector: { workload: ai-gpu }
       tolerations:
-        # Il pool aigpu e' Spot (priority=Spot): oltre al taint custom
+        # Se il pool GPU e' Spot (priority=Spot): oltre al taint custom
         # workload=ai-gpu va tollerato il taint di sistema
         # kubernetes.azure.com/scalesetpriority=spot, altrimenti vLLM non
         # si schedula sul pool.
@@ -599,10 +604,10 @@ worker o vLLM è running. Se hai bisogno di latenza bassa, pinna
 > - **Sempre-on:** solo se serve latenza bassa costante, accettando il
 >   costo continuo.
 >
-> Il pool `aigpu` è ora **Spot** (`ai_gpu_spot=true` in iac-azure): un
-> guardrail (`k8s-configuration/manifests/gpu-node-guardrail.yaml`)
-> avvisa via email se un nodo GPU resta acceso >1h e lo spegne d'ufficio
-> a >2h, come rete di sicurezza contro vLLM lasciato acceso.
+> Consigliato: node pool GPU su istanze **Spot** per abbattere il costo,
+> più un guardrail nel vostro repository di configurazione del cluster
+> che avvisi via email se un nodo GPU resta acceso >1h e lo spenga
+> d'ufficio a >2h, come rete di sicurezza contro vLLM lasciato acceso.
 
 ### 5. Build + push immagine worker
 
@@ -824,7 +829,7 @@ video resta la fonte autoritativa".
 
 ### Unit tests
 
-`app/src/lib/ai/*.test.ts` — 41 test su:
+`app/src/lib/ai/*.test.ts` — test su:
 - idempotency (determinismo, runCount, payload reordering)
 - paths (formatRunId, prefisso, expected artifacts)
 - providers (vincolo sovranità: solo `vllm` ammesso)
@@ -917,7 +922,7 @@ a Mistral-Small-3.2 (~48GB) tramite `AI_VLLM_MODEL_ID`.
 
 ## Cosa manca / follow-up
 
-Elementi che restano fuori da questa iterazione e meritano un PR
+Elementi non ancora implementati, ognuno da affrontare con un PR
 dedicato:
 
 1. **Integrazione wizard**. I toggle `aiTranscriptEnabled`,

@@ -31,8 +31,11 @@ Questo progetto segue gli standard di qualità ispirati al programma badge di
 
 - **TypeScript strict mode**: nessun `any`, tutte le API tipizzate. Il check
   `tsc --noEmit` è un gate CI bloccante (`npx tsc --noEmit --project app/tsconfig.json`).
-- **568 test unitari** (Vitest, 27 file di test), soglia copertura 70%.
-  `npm run test --workspace=app` in locale replica esattamente la pipeline CI.
+- **Test unitari con Vitest**: la suite gira in CI con
+  `npm run test:coverage --workspace=app`; le soglie di copertura sono dichiarate
+  in `app/vitest.config.ts` e funzionano da cricchetto (un pavimento poco sotto
+  il valore misurato, alzato quando la copertura sale in modo stabile, mai
+  abbassato). In locale `npm run test --workspace=app` esegue la stessa suite.
 - **Lint bloccante**: ESLint + Prettier (`npm run lint --workspace=app`) su ogni PR;
   nessuna warning tollerata su codice modificato.
 - **Error handling centralizzato**: tutte le API route passano per

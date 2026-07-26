@@ -479,7 +479,7 @@ Flusso di un tick:
 6. Se `desired != current`: `kubectl scale deployment jvb --replicas=$desired`.
 7. Idem per Jibri (deployment o statefulset, autodetected).
 
-> **Nota importante** — non passare `--request-timeout` a `kubectl exec` dentro il tick: il client kubectl lo interpreta come "ignora kubeconfig in-cluster" e tenta `localhost:8080`, fallendo tutti i probe (osservato su bitnami/kubectl). Il timeout del singolo probe è già sul `curl --max-time 3`, e il tick intero è bloccato a 120s da `activeDeadlineSeconds`. Vedi commit `706ef8a`.
+> **Nota importante** — non passare `--request-timeout` a `kubectl exec` dentro il tick: il client kubectl lo interpreta come "ignora kubeconfig in-cluster" e tenta `localhost:8080`, fallendo tutti i probe (osservato su bitnami/kubectl). Il timeout del singolo probe è già sul `curl --max-time 3`, e il tick intero è bloccato a 120s da `activeDeadlineSeconds`.
 
 ### Validare il tick
 
