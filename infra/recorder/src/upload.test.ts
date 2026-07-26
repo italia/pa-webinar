@@ -313,9 +313,9 @@ async function setupFiles(): Promise<{
     recordingId: 'r1',
     roomName: 'room',
     recordings: [
-      { participantId: 'paolo', trackFileId: 'paolo-0', displayName: 'Paolo', firstFrameAtMs: 0, lastFrameAtMs: 5000, bytesWritten: 10 },
-      { participantId: 'paolo', trackFileId: 'paolo-1', displayName: 'Paolo', firstFrameAtMs: 60000, lastFrameAtMs: 65000, bytesWritten: 10 },
-      { participantId: 'raff', trackFileId: 'raff-0', displayName: 'Raffaele', firstFrameAtMs: 1000, lastFrameAtMs: 9000, bytesWritten: 10 },
+      { participantId: 'mario', trackFileId: 'mario-0', displayName: 'Mario Rossi', firstFrameAtMs: 0, lastFrameAtMs: 5000, bytesWritten: 10 },
+      { participantId: 'mario', trackFileId: 'mario-1', displayName: 'Mario Rossi', firstFrameAtMs: 60000, lastFrameAtMs: 65000, bytesWritten: 10 },
+      { participantId: 'anna', trackFileId: 'anna-0', displayName: 'Anna Bianchi', firstFrameAtMs: 1000, lastFrameAtMs: 9000, bytesWritten: 10 },
     ],
   });
   const files: LocalTrackFile[] = [];
@@ -333,7 +333,7 @@ describe('uploadRecording — tolleranza parziale + rejoin', () => {
     try {
       const provider = new MockProvider();
       const res = await uploadRecording(provider, { manifest, files });
-      // 3 tracce + manifest = 4 put; le due di paolo hanno key distinte.
+      // 3 tracce + manifest = 4 put; le due dello stesso pid hanno key distinte.
       expect(res.uploaded).toBe(3);
       expect(res.failed).toEqual([]);
       const trackKeys = manifest.tracks.map((t) => t.trackKey);
@@ -350,7 +350,7 @@ describe('uploadRecording — tolleranza parziale + rejoin', () => {
     const { dir, manifest, files } = await setupFiles();
     try {
       const provider = new MockProvider();
-      const failingKey = manifest.tracks[1]!.trackKey; // paolo-1
+      const failingKey = manifest.tracks[1]!.trackKey; // seconda sessione dello stesso pid
       provider.alwaysFail.add(failingKey);
       const res = await uploadRecording(provider, { manifest, files });
       expect(res.uploaded).toBe(2);

@@ -766,7 +766,7 @@ html.live-call-immersive body {
     pointer-events: none;
   }
 
-  // Always-visible reaction bar (F6): a horizontal pill of emoji buttons,
+  // Always-visible reaction bar: a horizontal pill of emoji buttons,
   // no collapse — findable at a glance without opening a picker.
   &__bar {
     // Re-enable pointer events on the pill only (the container is none), so the
@@ -916,7 +916,7 @@ html.live-call-immersive body {
     word-break: break-word;
   }
 
-  // Clickable links inside a chat message (F17). Long URLs wrap instead of
+  // Clickable links inside a chat message. Long URLs wrap instead of
   // overflowing the bubble.
   &__link {
     color: #0066CC;
