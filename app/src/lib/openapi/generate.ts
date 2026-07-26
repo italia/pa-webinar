@@ -509,7 +509,12 @@ export function generateOpenApiSpec(): object {
     openapi: '3.1.0',
     info: {
       title: 'pa-webinar API',
-      version: process.env.npm_package_version || '0.1.0',
+      // npm_package_version non esiste a runtime nel container: la versione
+    // vera è quella iniettata dal build (il tag della release).
+    version:
+      process.env.NEXT_PUBLIC_BUILD_VERSION ||
+      process.env.npm_package_version ||
+      '0.0.0-dev',
       description: 'REST API for the pa-webinar public event platform. Supports event management, registration, live interaction (Q&A, polls, word cloud, reactions), recording, and administration.',
       license: { name: 'EUPL-1.2', url: 'https://opensource.org/licenses/EUPL-1.2' },
       contact: { name: 'GitHub', url: 'https://github.com/italia/pa-webinar' },
