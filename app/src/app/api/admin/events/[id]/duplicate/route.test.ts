@@ -62,6 +62,15 @@ function sourceEvent() {
     moderatorToken: 'token-di-origine',
     jitsiRoomName: 'stanza-origine',
     status: 'PUBLISHED',
+    // Le relazioni arrivano dall'include della rotta: il costruttore le legge
+    // e se mancano fallisce, invece di perderle in silenzio. Qui una sorgente
+    // "spoglia" verifica proprio quel caso.
+    tagLinks: [{ tagId: 'tag-1' }],
+    organizers: [],
+    additionalMods: [{ name: 'cifrato', email: null, role: 'MODERATOR' }],
+    agendaItems: [],
+    reminders: [],
+    questionnaires: [],
   };
 }
 
@@ -106,6 +115,16 @@ describe('POST /api/admin/events/[id]/duplicate', () => {
     expect(body.moderatorToken).not.toBe('token-di-origine');
     const created = mocked.event.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
     expect(created.moderatorToken).not.toBe('token-di-origine');
+  });
+
+  it('copia le relazioni di configurazione, con credenziali NUOVE per i co-moderatori', async () => {
+    await POST(request(), context as never);
+    const created = mocked.event.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
+    expect(created.tagLinks).toEqual({ create: [{ tagId: 'tag-1' }] });
+    const mods = (created.additionalMods as { create: { token: string }[] }).create;
+    expect(mods).toHaveLength(1);
+    expect(mods[0]?.token).toBeTruthy();
+    expect(mods[0]?.token).not.toBe('token-di-origine');
   });
 
   it('la copia nasce in BOZZA: un clone non deve andare pubblico da solo', async () => {

@@ -42,6 +42,11 @@ import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, UnauthorizedError } from '@/lib/errors';
 import { duplicatedConfig } from '@/lib/events/duplicate-fields';
+import {
+  DUPLICATE_SOURCE_INCLUDE,
+  duplicatedRelations,
+  type DuplicableRelations,
+} from '@/lib/events/duplicate-relations';
 import { nextOccurrenceAfter } from '@/lib/utils/recurrence';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import type { LocalizedField } from '@/lib/utils/locale';
@@ -132,14 +137,14 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('id must be a UUID', 400, 'BAD_REQUEST');
   }
 
-  const source = await prisma.event.findUnique({ where: { id } });
-  if (!source) throw new NotFoundError('Event not found');
-
-  const reminders = await prisma.eventReminder.findMany({
-    where: { eventId: source.id },
-    select: { offsetMinutes: true, label: true },
-    orderBy: { offsetMinutes: 'desc' },
+  // L'include e il costruttore delle relazioni vivono insieme in
+  // lib/events/duplicate-relations.ts: separarli significherebbe poter
+  // aggiungere una relazione da copiare senza caricarla, e perderla in silenzio.
+  const source = await prisma.event.findUnique({
+    where: { id },
+    include: DUPLICATE_SOURCE_INCLUDE,
   });
+  if (!source) throw new NotFoundError('Event not found');
 
   const { startsAt, endsAt } = resolveSchedule(source, await readOptions(request));
 
@@ -163,16 +168,11 @@ export const POST = withErrorHandling(async (request, context) => {
       startsAt,
       endsAt,
 
-      // Reminder schedule: a duplicate with no reminders quietly stops warning
-      // registrants, which is exactly the kind of loss nobody notices in time.
-      ...(reminders.length > 0 && {
-        reminders: {
-          create: reminders.map((r) => ({
-            offsetMinutes: r.offsetMinutes,
-            label: r.label,
-          })),
-        },
-      }),
+      // Le relazioni ereditate, dallo stesso elenco classificato: tag,
+      // organizzatori, co-moderatori (con token NUOVI), scaletta, questionari e
+      // promemoria. Prima qui c'erano solo i promemoria, scritti a mano — ed è
+      // per questo che tutto il resto si perdeva a ogni duplicazione.
+      ...duplicatedRelations(source as unknown as DuplicableRelations),
     },
   });
 
