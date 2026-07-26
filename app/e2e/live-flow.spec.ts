@@ -16,9 +16,19 @@ async function adminLogin(request: APIRequestContext): Promise<string> {
   return `admin_session=${match![1]}`;
 }
 
-async function createEvent(request: APIRequestContext, cookie: string) {
-  const startsAt = new Date(Date.now() + 3600_000).toISOString();
-  const endsAt = new Date(Date.now() + 7200_000).toISOString();
+/**
+ * `startsInMs` decide se la registrazione porta dritti in sala d'attesa.
+ * L'auto-redirect scatta SOLO dentro la finestra `waitingRoomLeadMinutes`
+ * (default 15 min, vedi schema.prisma): un evento fra un'ora mostra invece la
+ * schermata di conferma, che è il comportamento voluto — non un bug.
+ */
+async function createEvent(
+  request: APIRequestContext,
+  cookie: string,
+  startsInMs = 3600_000,
+) {
+  const startsAt = new Date(Date.now() + startsInMs).toISOString();
+  const endsAt = new Date(Date.now() + startsInMs + 3600_000).toISOString();
   const uid = randomUUID().slice(0, 8);
 
   const res = await request.post(`${BASE}/api/events`, {
@@ -149,7 +159,10 @@ test.describe('Registration → waiting room (one-step access)', () => {
 
   test.beforeAll(async ({ request }) => {
     cookie = await adminLogin(request);
-    const event = await createEvent(request, cookie);
+    // 10 minuti: DENTRO la finestra waitingRoomLeadMinutes (15), altrimenti la
+    // registrazione si ferma sulla schermata di conferma e l'auto-redirect —
+    // che è proprio ciò che questi test verificano — non parte mai.
+    const event = await createEvent(request, cookie, 10 * 60_000);
     eventId = event.id;
     slug = event.slug;
     moderatorToken = event.moderatorToken;
