@@ -33,6 +33,14 @@ const templateSchema = z.object({
   aiTranscriptEnabled: z.boolean().optional(),
   aiSummaryEnabled: z.boolean().optional(),
   aiTranslationEnabled: z.boolean().optional(),
+  aiDubbingEnabled: z.boolean().optional(),
+  // Cattura per-partecipante: è la condizione dell'attribuzione certa del
+  // parlato. Va nel template perché è proprio il flag che si perdeva
+  // ricreando a mano un'occorrenza di una serie.
+  multitrackRecordingEnabled: z.boolean().optional(),
+  retainParticipantTracks: z.boolean().optional(),
+  // Elenco di lingue separate da virgola; null = eredita dal sito.
+  aiTargetLocales: z.string().max(200).nullish(),
   descriptionTemplate: z.record(z.string()).nullish(),
   defaultRetentionDays: z.number().int().min(1).max(3650).nullish(),
   defaultExpectedSpeakers: z.number().int().min(1).max(30).nullish(),

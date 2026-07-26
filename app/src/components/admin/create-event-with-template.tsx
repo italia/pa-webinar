@@ -45,6 +45,10 @@ interface TemplatePreset {
   aiTranscriptEnabled?: boolean;
   aiSummaryEnabled?: boolean;
   aiTranslationEnabled?: boolean;
+  aiDubbingEnabled?: boolean;
+  multitrackRecordingEnabled?: boolean;
+  retainParticipantTracks?: boolean;
+  aiTargetLocales?: string | null;
   descriptionTemplate?: Record<string, string> | null;
   defaultRetentionDays?: number | null;
   defaultExpectedSpeakers?: number | null;

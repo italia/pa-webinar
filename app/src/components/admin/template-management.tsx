@@ -37,6 +37,9 @@ interface SerializedTemplate {
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
   aiTranslationEnabled: boolean;
+  aiDubbingEnabled: boolean;
+  multitrackRecordingEnabled: boolean;
+  retainParticipantTracks: boolean;
   descriptionTemplate: Record<string, string> | null;
   defaultRetentionDays: number | null;
   defaultExpectedSpeakers: number | null;
@@ -67,6 +70,9 @@ interface EditingTemplate {
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
   aiTranslationEnabled: boolean;
+  aiDubbingEnabled: boolean;
+  multitrackRecordingEnabled: boolean;
+  retainParticipantTracks: boolean;
   descriptionTemplateIt: string;
   defaultRetentionDays: number | null;
   defaultExpectedSpeakers: number | null;
@@ -92,6 +98,9 @@ const DEFAULT_NEW: EditingTemplate = {
   aiTranscriptEnabled: false,
   aiSummaryEnabled: false,
   aiTranslationEnabled: false,
+  aiDubbingEnabled: false,
+  multitrackRecordingEnabled: false,
+  retainParticipantTracks: false,
   descriptionTemplateIt: '',
   defaultRetentionDays: null,
   defaultExpectedSpeakers: null,
@@ -134,6 +143,9 @@ export default function TemplateManagement({
       aiTranscriptEnabled: tpl.aiTranscriptEnabled,
       aiSummaryEnabled: tpl.aiSummaryEnabled,
       aiTranslationEnabled: tpl.aiTranslationEnabled,
+      aiDubbingEnabled: tpl.aiDubbingEnabled,
+      multitrackRecordingEnabled: tpl.multitrackRecordingEnabled,
+      retainParticipantTracks: tpl.retainParticipantTracks,
       descriptionTemplateIt: tpl.descriptionTemplate?.it ?? '',
       defaultRetentionDays: tpl.defaultRetentionDays,
       defaultExpectedSpeakers: tpl.defaultExpectedSpeakers,
@@ -397,6 +409,11 @@ function TemplateForm({
   t: ReturnType<typeof useTranslations>;
   tc: ReturnType<typeof useTranslations>;
 }) {
+  // Etichette già esistenti del form evento: stessi flag, stessi nomi.
+  // Duplicarle sotto `admin.templates` vorrebbe dire due testi da tenere
+  // allineati in 24 lingue per la stessa cosa.
+  const ta = useTranslations('admin.form');
+
   return (
     <div>
       <FormGroup className="mb-3">
@@ -518,6 +535,13 @@ function TemplateForm({
             ['aiTranscriptEnabled', t('aiTranscript')],
             ['aiSummaryEnabled', t('aiSummary')],
             ['aiTranslationEnabled', t('aiTranslation')],
+            // I flag di cattura che prima non si potevano impostare su un
+            // template: sono quelli che una serie ricorrente perde ricreando
+            // l'occorrenza a mano. Etichette riusate da admin.form — stessi
+            // flag, stessi nomi, un testo solo da mantenere in 24 lingue.
+            ['aiDubbingEnabled', ta('aiDubbingEnabled')],
+            ['multitrackRecordingEnabled', ta('multitrackRecordingEnabled')],
+            ['retainParticipantTracks', ta('retainParticipantTracks')],
           ] as const
         ).map(([key, label]) => (
           <div

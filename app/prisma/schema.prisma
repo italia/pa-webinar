@@ -1066,6 +1066,19 @@ model EventTemplate {
   aiTranscriptEnabled    Boolean @default(false) @map("ai_transcript_enabled")
   aiSummaryEnabled       Boolean @default(false) @map("ai_summary_enabled")
   aiTranslationEnabled   Boolean @default(false) @map("ai_translation_enabled")
+  // I flag di cattura e di elaborazione che mancavano al template, e che per
+  // questo si perdevano a ogni evento nuovo: chi crea una serie ricorrente
+  // riattivava a mano la traccia per-partecipante e le lingue, e quando se ne
+  // dimenticava lo scopriva a evento finito — senza audio isolato, quindi senza
+  // trascrizione né sintesi. I default sono gli stessi di `Event`: un template
+  // che pre-accende la registrazione per partecipante sarebbe una raccolta di
+  // dati personali attivata retroattivamente su tutte le righe esistenti.
+  aiDubbingEnabled           Boolean @default(false) @map("ai_dubbing_enabled")
+  multitrackRecordingEnabled Boolean @default(false) @map("multitrack_recording_enabled")
+  retainParticipantTracks    Boolean @default(false) @map("retain_participant_tracks")
+  // Null = eredita le lingue di default dalle impostazioni del sito, come
+  // sull'evento: un template non deve congelare una scelta globale.
+  aiTargetLocales            String? @map("ai_target_locales") @db.VarChar(200)
   // Altri default che pre-popolano il wizard (modificabili):
   // - descriptionTemplate: testo descrizione multilingua pre-compilato.
   // - defaultRetentionDays: giorni di conservazione dati suggeriti.

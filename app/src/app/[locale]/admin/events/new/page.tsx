@@ -69,6 +69,13 @@ export default async function CreateEventPage({
         aiTranscriptEnabled: selectedTemplate.aiTranscriptEnabled,
         aiSummaryEnabled: selectedTemplate.aiSummaryEnabled,
         aiTranslationEnabled: selectedTemplate.aiTranslationEnabled,
+        // Questa serializzazione è una whitelist esplicita, non uno spread: un
+        // campo nuovo sul template resta invisibile al wizard finché non lo si
+        // nomina anche qui. È il motivo per cui i flag di cattura si perdevano.
+        aiDubbingEnabled: selectedTemplate.aiDubbingEnabled,
+        multitrackRecordingEnabled: selectedTemplate.multitrackRecordingEnabled,
+        retainParticipantTracks: selectedTemplate.retainParticipantTracks,
+        aiTargetLocales: selectedTemplate.aiTargetLocales,
         descriptionTemplate:
           (selectedTemplate.descriptionTemplate as Record<string, string> | null) ?? null,
         defaultRetentionDays: selectedTemplate.defaultRetentionDays,

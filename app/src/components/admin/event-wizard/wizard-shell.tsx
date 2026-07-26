@@ -62,6 +62,10 @@ export interface WizardTemplatePreset {
   aiTranscriptEnabled?: boolean;
   aiSummaryEnabled?: boolean;
   aiTranslationEnabled?: boolean;
+  aiDubbingEnabled?: boolean;
+  multitrackRecordingEnabled?: boolean;
+  retainParticipantTracks?: boolean;
+  aiTargetLocales?: string | null;
   descriptionTemplate?: Record<string, string> | null;
   defaultRetentionDays?: number | null;
   defaultExpectedSpeakers?: number | null;
@@ -390,10 +394,23 @@ export default function EventWizard(props: WizardProps) {
         (tpl?.recordingEnabled ?? false) &&
         (tpl?.aiTranscriptEnabled ?? false) &&
         (tpl?.aiTranslationEnabled ?? false),
-      aiDubbingEnabled: false,
-      multitrackRecordingEnabled: false,
-      retainParticipantTracks: false,
-      aiTargetLocales: null,
+      // Presi dal template, non piu' cablati a false: e' qui che la
+      // configurazione di una serie si perdeva. La registrazione per
+      // partecipante resta subordinata alla registrazione video, come per la
+      // trascrizione qui sopra: catturare le tracce di chi parla senza che
+      // l'evento sia registrato non ha senso e sarebbe una raccolta di dati
+      // personali senza scopo.
+      aiDubbingEnabled:
+        (tpl?.recordingEnabled ?? false) &&
+        (tpl?.aiTranscriptEnabled ?? false) &&
+        (tpl?.aiDubbingEnabled ?? false),
+      multitrackRecordingEnabled:
+        (tpl?.recordingEnabled ?? false) && (tpl?.multitrackRecordingEnabled ?? false),
+      retainParticipantTracks:
+        (tpl?.recordingEnabled ?? false) &&
+        (tpl?.multitrackRecordingEnabled ?? false) &&
+        (tpl?.retainParticipantTracks ?? false),
+      aiTargetLocales: tpl?.aiTargetLocales ?? null,
       expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
       // Step 3
