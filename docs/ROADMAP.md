@@ -1,127 +1,75 @@
 # Roadmap — pa-webinar
 
-Questo documento guarda avanti: cosa manca, in che ordine, e con quali limiti noti convive ciò che è già spedito. Le versioni rilasciate non sono elencate qui — stanno in [`CHANGELOG.md`](../CHANGELOG.md) e sulla pagina pubblica `/changelog`.
+Questo documento elenca **solo ciò che manca**. Cosa la piattaforma fa già è nel [README](../README.md#funzionalità); cosa è stato rilasciato e quando è nel [CHANGELOG](../CHANGELOG.md) e sulla pagina pubblica `/changelog`.
 
-Dove una funzionalità è completa ma ha un confine che conviene conoscere prima di appoggiarcisi, il limite è scritto accanto.
-
-## Cosa c'è già
-
-Il changelog resta l'unica fonte di verità su cosa è stato rilasciato e quando (è **generato** dai dati di release, non riscritto a mano, e la pagina `/changelog` lo mostra tradotto in tutte le lingue del sito). Qui serve solo il perimetro attuale, per capire da dove parte quello che segue:
-
-- registrazione partecipanti GDPR-compliant: PII cifrate, consensi granulari, retention e cleanup automatico (vedi [`GDPR.md`](GDPR.md))
-- sala live con Jitsi Meet embeddato: JWT, ruoli enforced server-side, permessi audio/video per ruolo
-- sala d'attesa con countdown, device check e accesso guest
-- Q&A con upvote e moderazione, con archivio post-evento
-- sondaggi live con risultati in tempo reale, e word cloud live
-- chat in-app real-time (Postgres + Redis pub/sub + SSE) con allegati, menzioni e citazioni
-- reazioni e coda delle mani alzate ordinata
-- questionari pre/post evento e rubrica dei contatti con opt-in esplicito
-- registrazione video (Jibri) su storage object-storage agnostico e libreria video pubblica
-- post-produzione AI in-cluster: trascrizione con attribuzione degli speaker, sottotitoli multilingua, sintesi, doppiaggio (vedi [`POSTPROD.md`](POSTPROD.md))
-- statistiche per evento: interazione nel tempo, chi ha parlato di più, attenzione, permanenza
-- pannello admin: wizard di creazione, template di evento, site settings white-label, monitoraggio infrastruttura
-- interfaccia in 24 lingue, italiano come default (ADR-008)
-- trasparenza: pagina `/service-inventory` con inventario CycloneDX di componenti e servizi
-
-## Da fare prima del rilascio pubblico
-
-| Item | Stato |
-|---|---|
-| Smoke test su cluster Kubernetes reale | ✅ fatto (istanza in produzione con eventi reali) |
-| Evento pilota interno | ✅ fatto |
-| Ritocco testi e layout | ✅ in gran parte |
-| Test E2E Playwright (batteria flussi critici) | 🟡 parziale (un solo file, `continue-on-error`) — vedi "Prossimo" |
-| Screenshot per README | ✅ fatto — schermate in `docs/screenshots/`, referenziate da README, README.en e `publiccode.yml`. Da rifare quando cambia la UI, su dati dimostrativi (`npm run db:seed`), mai su dati di un'istanza reale |
-
-Flussi critici Playwright ancora da coprire: login admin + creazione + pubblicazione evento, ingresso sala (moderatore + partecipante), Q&A (invio/upvote/moderazione), polling, cambio lingua senza reload, GDPR cleanup, download `.ics`, responsive mobile, chat in-app real-time multi-pod.
-
-## Limiti noti dietro un ✅
-
-Voci spedite e funzionanti, ognuna con un confine che vale la pena conoscere prima di appoggiarcisi.
-
-| Sottosistema | Il limite |
-|---|---|
-| **Allegati in chat** | Capability-URL: la protezione è l'UUID non indovinabile + cancellazione del blob alla moderazione/retention, non un controllo d'accesso valutato a ogni richiesta. Un ACL vero — che rilegga lo stato vivo dell'evento — richiede un **cookie con ambito sulla rotta** (un `<img>` non manda header): è pianificato, vedi sotto |
-| **Recorder multitraccia (ADR-013)** | Nessuna riconnessione dopo `CONFERENCE_FAILED`: una caduta a metà evento chiude la registrazione con quello che ha già catturato. L'errore finisce nei log del Job, non nel pannello admin |
-| **Scale-to-zero JVB (ADR-007)** | `/colibri/stats` è aggregato per pod: due eventi LIVE sullo stesso bridge tengono acceso il nodepool anche se uno si è svuotato |
-| **i18n a 24 lingue (ADR-008)** | Il fallback delle chiavi mancanti ricade sull'**italiano**, non sull'inglese |
-| **Piazza della sala d'attesa** | Posizioni ed emote viaggiano sul ping di presenza, non su un canale push dedicato: gli altri le vedono con il tick successivo (l'animazione locale parte subito) |
-| **Copertura dei test** | Concentrata su `lib/`: solo pochi handler API hanno test, la maggior parte delle route e dei componenti no (vedi la sezione seguente) |
-
-## Copertura dei test — stato reale
-
-La copertura per riga è misurata, non stimata (`npm run test:coverage --workspace=app`), ed è bassa perché il denominatore è tutto `src/**`: centinaia di route API e decine di migliaia di righe di componenti senza un test, contro una `lib/` coperta bene.
-
-Le soglie vive stanno in `app/vitest.config.ts` e sono un **cricchetto sul pavimento misurato** — impediscono che la copertura scenda, non dichiarano che vada bene. In CI i test girano con `--coverage`, quindi una regressione di copertura fa fallire la build.
-
-Si sale dai punti in cui vivono le guardie, non dai più facili: route di registrazione, webhook di registrazione video, rotte admin.
+Le voci non hanno un numero di versione: un numero è una promessa con una data implicita, e quando slitta il documento inizia a mentire. Al suo posto ogni voce porta **da quando è aperta**, così uno slittamento resta visibile invece di essere riassorbito in silenzio.
 
 ## Prossimo
 
-| Feature | Note |
+| Voce | Dove siamo |
 |---|---|
-| **SSE per Q&A e pannelli live** | Oggi il polling è `useSWR(refreshInterval: 3000)` in tre punti: `qa/question-list.tsx`, `polls/poll-panel.tsx`, `live/agenda-panel.tsx`. Da sostituire riusando l'infra SSE già provata per la chat (scala a 300+) |
-| **Eventi ricorrenti — chiudere il quick win** | `EventTemplate` non porta ancora `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `aiDubbingEnabled`, `wordCloudEnabled`; `duplicate` copia gli scalari e i reminder ma **non le relazioni** (tag, organizzatori, co-moderatori, agenda, questionari) |
-| **Batteria E2E Playwright** | Oggi è un solo file (`app/e2e/live-flow.spec.ts`) con `continue-on-error` per i rate-limit del registry sul runner condiviso: non protegge da regressioni. Scoperti: Q&A, sondaggi, cambio lingua, cleanup GDPR, download `.ics`, chat SSE multi-pod, e il click reale su "Entra ora" (oggi l'ingresso è coperto solo via API) |
+| **Batteria E2E Playwright**<br/>*aperta da marzo* | Oggi c'è un solo file di test end-to-end. Copre in browser la sala d'attesa e l'ingresso in sala di moderatore e partecipante; la parte admin (login, creazione, pubblicazione) è esercitata solo via API. Restano scoperti: Q&A, sondaggi, cambio lingua, cancellazione GDPR, download del `.ics`, chat su più repliche. Il job è `continue-on-error`: un rosso non blocca il merge, quindi oggi non protegge da regressioni |
+| **SSE per i pannelli live**<br/>*aperta da giugno* | Q&A, sondaggi, agenda e word cloud si aggiornano interrogando il server ogni 3 secondi. Il trasporto push esiste già ed è in produzione per la chat e per le mani alzate: va esteso agli altri pannelli |
+| **Eventi ricorrenti: chiudere il quick win**<br/>*aperta da luglio* | I template di evento non portano i flag di cattura e di elaborazione AI, e la duplicazione di un evento copia i campi semplici e i promemoria ma non le relazioni (tag, organizzatori, co-moderatori, agenda, questionari). Finché è così, un'occorrenza clonata perde in silenzio proprio la configurazione che per una serie deve restare accesa |
+| **Conservare la trascrizione originale**<br/>*aperta da aprile* | Quando un segmento viene corretto nell'editor, l'artefatto viene sovrascritto: non resta una copia del testo prodotto dalla macchina accanto alla versione rivista. Per un verbale di un ente pubblico le due cose vanno distinte, ed era un requisito dichiarato fin da aprile — poi sparito dal documento senza essere né fatto né rinviato |
 
 ## Dopo
 
-| Feature | Note |
+| Voce | Dove siamo |
 |---|---|
-| **ACL allegati chat (via cookie)** | Oggi gli allegati sono capability-URL (vedi "Limiti noti"). Il gate vero: la pagina live imposta un cookie httpOnly con ambito su `/api/assets/chat/<eventId>/`, rinnovato; la rotta lo rilegge e ri-autorizza con `authorizeChatRead` a OGNI richiesta, così una password aggiunta o un evento chiuso hanno effetto subito. Niente token nell'URL |
-| **Export report PDF** | Statistiche evento + Q&A + poll + partecipanti in un documento scaricabile (naturale seguito della tab Statistiche) |
-| **Rate-limiting distribuito (Redis)** | Il limiter è in-memory per-pod; con HPA multi-replica serve un contatore globale |
-| **Ricerca full-text trascrizioni** | `tsvector` PostgreSQL per la libreria video (oggi solo ricerca client dentro una singola trascrizione) |
-| **Tagging e capitoli video (live)** | Marker del moderatore durante l'evento → capitoli nel player (i capitoli AI esistono già; mancano quelli autoriali live) |
-| **API pubblica documentata** | Lo spec OpenAPI 3.1 è già servito da `/api/openapi.json`; restano docs UI (Swagger/Redoc), garanzie di stabilità e storia auth |
-| **Rigenerazione AI dopo edit trascrizione** | Rigenerare automaticamente traduzioni/dub quando un segmento viene corretto |
+| **Controllo d'accesso sugli allegati in chat** | Oggi un allegato è protetto da un URL non indovinabile (vedi "Limiti noti"). Il controllo vero richiede un cookie con ambito sulla rotta degli allegati, riletto a ogni richiesta: così una password aggiunta o un evento chiuso hanno effetto subito. Un token nell'URL non basta ed è già stato scartato |
+| **Rate-limiting distribuito** | Il contatore dei limiti di frequenza vive nella memoria del singolo processo: con più repliche dell'app ognuna conta per conto suo. Serve un contatore condiviso su Redis — che è già nel percorso realtime, quindi la scelta si porta dietro il punto sull'alta affidabilità in "Condizionale" |
+| **Export del report di evento**<br/>*aperta da marzo* | Statistiche, Q&A, sondaggi e partecipanti in un documento scaricabile. Oggi l'export esiste solo come CSV delle registrazioni; per il PDF non c'è ancora nessuna libreria nel progetto |
+| **Ricerca nel testo delle trascrizioni** | Oggi la libreria video cerca solo su titolo e descrizione, e dentro una trascrizione si cerca lato client. Non è solo questione di aggiungere un indice: il testo sta nell'object storage e, quando è replicato in banca dati, è cifrato — un indice in chiaro sarebbe una nuova superficie di dati personali. Prima serve la decisione di disegno |
+| **Marker e capitoli del moderatore** | I capitoli generati dall'AI ci sono; mancano quelli decisi da chi conduce, durante l'evento. I segnalibri personali esistono già ma vivono nel browser di chi li mette: i marker del moderatore sono un'altra cosa, condivisi e persistiti |
+| **API pubblica documentata**<br/>*aperta da marzo* | Lo spec OpenAPI è servito e navigabile da fuori, ma copre circa un terzo delle rotte e la sua versione coincide con quella dell'applicazione. Prima di pubblicare una interfaccia di documentazione servono copertura e una politica di versionamento: un'API dichiarata pubblica è un impegno di stabilità |
 
-## Eventi ricorrenti / serie
+## Serie ed eventi ricorrenti
 
-Due casi tipici, con cadenze diverse: una **serie a cadenza fissa** (es. una call settimanale, giorno stabile ma data da confermare volta per volta) e una **serie a data mobile** (periodica, con l'occorrenza spesso riprogrammata di qualche giorno). Oggi ogni occorrenza si crea partendo dalla precedente (duplica → rimetti la data): il clone eredita la configurazione, ma la serie in sé non esiste come entità e la cadenza indicata nel wizard non viene consumata da nulla.
+Due casi tipici con esigenze diverse: una serie a **cadenza fissa** (giorno stabile, data da confermare volta per volta) e una serie a **data mobile** (periodica, spesso riprogrammata di qualche giorno).
 
-Cosa resta davvero aperto sul quick win: `EventTemplate` non porta ancora i flag di cattura/AI mancanti (`multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `aiDubbingEnabled`, `wordCloudEnabled`) e `duplicate` copia gli scalari e i reminder ma non le relazioni (tag, organizzatori, co-moderatori, agenda, questionari).
+Oggi un'occorrenza si crea duplicando la precedente: il clone eredita la configurazione e, se l'evento ha una cadenza, la data viene proiettata in avanti. Manca il pezzo centrale — **la serie non esiste come entità**: nessuno possiede la configurazione canonica, e la cadenza non viene consumata da nessuno schedulatore.
 
-**Idea portante** — una **Serie** possiede la configurazione canonica (flag di cattura/AI, retention, lingue, speaker attesi, permessi, descrizione, immagine) e **ogni occorrenza la eredita**: così i flag non possono più essere persi per dimenticanza. La cadenza è un *suggerimento*, non una schedulazione rigida: **occorrenze provvisorie** (bozza con data proiettata) che l'operatore **conferma / sposta / salta** — esattamente ciò che serve quando "le date non sono sempre confermate". Riprogrammare = spostare la data della singola occorrenza senza toccare la serie.
+L'idea portante è che la **serie possieda la configurazione** (flag di cattura, retention, lingue, permessi) e ogni occorrenza la erediti, con la possibilità di scostarsene puntualmente: così i flag non si perdono per dimenticanza. La cadenza resta un *suggerimento*, non una schedulazione rigida — l'occorrenza successiva nasce come bozza con una data proposta, che chi organizza conferma, sposta o salta.
 
-**Fasi:**
+Registrazione e post-produzione restano per-occorrenza: la serie aggiunge ereditarietà della configurazione e una vista aggregata, non cambia il modello di cattura.
 
-- **Quick win — bassa spesa, alto valore** — togliere i footgun senza ancora introdurre la Serie:
-  - `EventTemplate` porta anche i flag mancanti (multitraccia, retain-tracks, lingue, dubbing, wordcloud).
-  - `duplicate` copia anche le relazioni (tag, organizzatori, co-moderatori, agenda, questionari), non solo gli scalari e i reminder.
-- **Serie vera e propria**:
-  - Entità `EventSeries` (attiva `recurrenceSeriesId` + relazione): la serie è la source-of-truth della config; le occorrenze ereditano con override puntuale possibile.
-  - **"Programma prossima occorrenza"**: materializza la prossima occorrenza in **bozza** con data proiettata dalla RRULE; l'operatore conferma (→ PUBLISHED) / sposta (occorrenza rimandata) / salta.
-  - Reminder consapevoli della serie (per-occorrenza, non una tantum sul parent).
-- **Post-prod e libreria per serie**:
-  - Rollup: registrazioni/trascrizioni/recap di tutte le occorrenze di una serie in un'unica vista admin + una card "serie" in libreria (oggi ogni evento è una card isolata; `Recording` non ha chiave cross-evento).
-  - **Auto-materializzazione** per le serie a cadenza fissa via CronJob che crea la prossima occorrenza provvisoria N giorni prima — sempre **confermabile prima di andare pubblica**, così un'occorrenza saltata non pubblica nulla per sbaglio.
+## Limiti noti di ciò che è già spedito
 
-Registrazione e post-prod restano **per-occorrenza** (ogni call è la sua `Recording` + pipeline AI): corretto e già funzionante. La serie aggiunge *ereditarietà della config* (i flag giusti sempre accesi) e *aggregazione della vista*, non cambia il modello di cattura.
+Funzionalità complete e in uso, ognuna con un confine che conviene conoscere prima di appoggiarcisi.
 
-## Visione
-
-| Feature | Note |
+| Sottosistema | Il limite |
 |---|---|
-| **Sottotitoli live** | Real-time (Jigasi + Whisper streaming). Oggi i sottotitoli sono solo post-evento (WebVTT) per scelta |
-| **Multi-tenancy** | Più enti su un unico portale con branding separato (oggi: white-label singola istanza via `SiteSetting` + deploy separati per tenant) |
-| **Questionario AI-assisted** | Pre-compilazione del questionario post-evento dai temi della trascrizione (prerequisiti — AI + questionari — già presenti) |
-| **Runbook operativo on-call** | Guida consolidata di troubleshooting produzione (oggi frammenti in DEPLOYMENT/POSTPROD) |
+| **Allegati in chat** | La protezione è l'indirizzo non indovinabile più la cancellazione del file alla moderazione o alla scadenza, non un controllo d'accesso valutato a ogni richiesta: chi ha il link vede l'allegato anche a evento chiuso |
+| **Registrazione multi-traccia** | Se la conferenza cade a metà evento la cattura si chiude con quello che ha già raccolto, senza riconnessione. La registrazione troncata viene poi elaborata come una normale: nel pannello si vede una registrazione parziale **senza alcun segnale** che sia stata interrotta |
+| **Spegnimento automatico dei bridge video** | Le statistiche dei bridge sono aggregate per processo: due eventi in diretta sullo stesso bridge tengono acceso il nodo anche quando uno dei due si è svuotato |
+| **Interfaccia in 24 lingue** | Se una chiave di traduzione manca, il testo ricade sull'**italiano**, non sull'inglese |
+| **Piazza della sala d'attesa** | Posizioni ed emote viaggiano sul battito di presenza, non su un canale push dedicato: chi le usa vede subito la propria animazione, gli altri la vedono al battito successivo |
+| **Copertura dei test** | Concentrata sulla logica di libreria. Poche rotte hanno test propri e i componenti non ne hanno: le soglie in `app/vitest.config.ts` sono un cricchetto sul valore misurato — impediscono che scenda, non dichiarano che vada bene |
 
-## Backlog / condizionale
+## Più avanti
 
-Voci reali ma non pianificate a breve (grandi, di nicchia, o attivate solo da un trigger):
+| Voce | Nota |
+|---|---|
+| **Sottotitoli in diretta** | Oggi i sottotitoli sono solo post-evento, per scelta: in diretta richiedono un motore di riconoscimento in streaming accanto alla conferenza |
+| **Più enti su una sola installazione** | Oggi l'istanza è di un ente solo, personalizzabile a fondo; ospitare più enti separati chiede isolamento dei dati e branding per ente |
+| **Questionario post-evento assistito** | Precompilare le domande dai temi emersi nella trascrizione. I due pezzi (questionari e trascrizione) ci sono già |
+| **Guida operativa consolidata** | Oggi il troubleshooting è sparso tra le guide di sviluppo, deploy e post-produzione |
 
-- **SPID/CIE** — autenticazione partecipanti con identità digitale italiana
-- **Microsoft Graph API** — Outlook RSVP → auto-registrazione, sync calendario Teams
-- **Breakout rooms** — sottogruppi (Jitsi nativo oggi *disabilitato*, non esposto)
-- **Offuscamento video** — blur volti/voci pre-pubblicazione (GDPR-by-design)
-- **HLS live streaming** — audience passiva illimitata senza caricare JVB (Jibri → RTMP → HLS → Blob → player)
-- **App mobile** — React Native + Jitsi SDK (oggi: web responsive)
-- **Registrazione multi-camera** — speaker + slide separati (il multi-traccia attuale è audio per attribution)
-- **Marketplace template eventi** — catalogo condivisibile cross-PA (oggi: template interni riusabili)
-- **HA Redis / migrazione Valkey** — solo se Redis entra in un path critico (rate-limit distribuito, cache sessione)
+## Condizionale
+
+Voci reali ma non pianificate: grandi, di nicchia, o attivate solo da un evento preciso.
+
+- **SPID/CIE** — identità digitale italiana per i partecipanti
+- **Outlook e calendario Microsoft** — RSVP che diventa registrazione, sincronizzazione degli inviti
+- **Stanze separate** — i sottogruppi nativi di Jitsi sono nascosti nell'interfaccia, non disattivati sul server: esporli è una scelta di prodotto, non uno sviluppo da zero
+- **Offuscamento di volti e voci** prima della pubblicazione di una registrazione
+- **Diretta in sola visione** per un pubblico illimitato, senza caricare i bridge video
+- **App mobile** — oggi il web è responsive e funziona da telefono
+- **Registrazione multi-camera** — relatore e slide separati; la multi-traccia attuale è solo audio, per attribuire il parlato
+- **Catalogo di template condiviso tra enti** — oggi i template sono interni a un'installazione
+- **Alta affidabilità del livello Redis** — Redis è già nel percorso realtime (chat, controlli live, stato dei bridge) con degrado graceful; diventa un requisito quando ci si appoggia anche il rate-limiting distribuito
 
 ## Contribuire
 
-Vedi [CONTRIBUTING.md](../CONTRIBUTING.md) per come proporre nuove funzionalità o segnalare bug.
+Vedi [CONTRIBUTING.md](../CONTRIBUTING.md) per proporre una funzionalità o segnalare un problema.

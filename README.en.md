@@ -22,10 +22,25 @@ The user interface ships translated into **24 EU languages**, runtime-configurab
 | ![Video library](docs/screenshots/video-library.png) | ![Transparency](docs/screenshots/service-inventory.png) |
 | **Video library** — published recordings, with subtitles | **Service inventory** — CycloneDX 1.6: what runs, and where |
 
-Real screenshots from the production instance. The live room is not pictured: it would need an event in progress, and the faces of the people in it.
+Screenshots of the application on demo data (`npm run db:seed`). The live room is not pictured: it would need an event in progress, and the faces of the people in it.
+
+## How we got here
+
+```mermaid
+flowchart LR
+    A["Virtual room<br/>embedded Jitsi, .italia design,<br/>GDPR-compliant sign-up"]
+    B["Live interaction<br/>Q&A, polls, chat,<br/>reactions, raised hands"]
+    C["Event lifecycle<br/>recording, post-event page,<br/>retention"]
+    D["Post-production<br/>transcript, subtitles,<br/>summary, dubbing"]
+    E["Software for reuse<br/>white-label, 24 languages,<br/>service inventory"]
+    A --> B --> C --> D --> E
+```
+
+Each step grew out of a limit of the one before it: first make the call work, then let the audience take part and not just watch, then keep the event alive after the stream ends, then make it understandable to those who were not there and those who cannot hear, and finally make it installable by another public body. What is still missing is in the [roadmap](docs/ROADMAP.md); what shipped and when, in the [changelog](CHANGELOG.md).
 
 ## Contents
 
+- [How we got here](#how-we-got-here)
 - [Features](#features)
 - [Architecture](#architecture)
 - [On-demand scalability](#on-demand-scalability)

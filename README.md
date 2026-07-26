@@ -22,10 +22,25 @@ Interfaccia utente disponibile in **24 lingue UE** configurabili a runtime dall'
 | ![Libreria video](docs/screenshots/video-library.png) | ![Trasparenza](docs/screenshots/service-inventory.png) |
 | **Libreria video** — registrazioni pubblicate, con sottotitoli | **Inventario dei servizi** — CycloneDX 1.6, cosa gira e dove |
 
-Schermate reali dell'istanza in produzione. La sala live non è ritratta: richiederebbe un evento in corso e i volti di chi partecipa.
+Schermate dell'applicazione su dati dimostrativi (`npm run db:seed`). La sala live non è ritratta: richiederebbe un evento in corso e i volti di chi partecipa.
+
+## Il percorso
+
+```mermaid
+flowchart LR
+    A["Sala virtuale<br/>Jitsi embeddato, design .italia,<br/>registrazione conforme al GDPR"]
+    B["Interazione dal vivo<br/>Q&A, sondaggi, chat,<br/>reazioni, mani alzate"]
+    C["Ciclo di vita dell'evento<br/>registrazione video, pagina<br/>post-evento, conservazione"]
+    D["Post-produzione<br/>trascrizione, sottotitoli,<br/>sintesi, doppiaggio"]
+    E["Software a riuso<br/>white-label, 24 lingue,<br/>inventario dei servizi"]
+    A --> B --> C --> D --> E
+```
+
+Ogni tappa è nata da un limite della precedente: prima far funzionare la call, poi far partecipare chi guarda e non solo chi parla, poi far vivere l'evento anche dopo la diretta, poi renderlo comprensibile a chi non era presente e a chi non sente, infine renderlo installabile da un'altra amministrazione. Cosa manca da qui in avanti è nella [roadmap](docs/ROADMAP.md); cosa è uscito e quando, nel [changelog](CHANGELOG.md).
 
 ## Indice
 
+- [Il percorso](#il-percorso)
 - [Funzionalità](#funzionalità)
 - [Architettura](#architettura)
 - [Scalabilità on-demand](#scalabilità-on-demand)
