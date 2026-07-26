@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {ni glasov} one {# glas} two {# glasova} few {# glasovi} other {# glasov}}",
       "topWords": "Najpogosteje deljene besede",
       "feedback": "Povprečna ocena",
-      "feedbackCount": "{count, plural, one {# odgovor} two {# odgovora} few {# odgovori} other {# odgovorov}}"
+      "feedbackCount": "{count, plural, one {# odgovor} two {# odgovora} few {# odgovori} other {# odgovorov}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Podrobnosti dogodka",

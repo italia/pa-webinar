@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {ingen stemmer} one {1 stemme} other {# stemmer}}",
       "topWords": "Mest delte ord",
       "feedback": "Gennemsnitlig bedømmelse",
-      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}"
+      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Begivenhedsdetaljer",

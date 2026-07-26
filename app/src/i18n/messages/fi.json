@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {ei ääniä} one {1 ääni} other {# ääntä}}",
       "topWords": "Eniten jaetut sanat",
       "feedback": "Keskiarvosana",
-      "feedbackCount": "{count, plural, one {1 vastaus} other {# vastausta}}"
+      "feedbackCount": "{count, plural, one {1 vastaus} other {# vastausta}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Tapahtuman tiedot",

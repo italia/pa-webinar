@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {hääli pole} one {1 hääl} other {# häält}}",
       "topWords": "Enim jagatud sõnad",
       "feedback": "Keskmine hinnang",
-      "feedbackCount": "{count, plural, one {1 vastus} other {# vastust}}"
+      "feedbackCount": "{count, plural, one {1 vastus} other {# vastust}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Ürituse üksikasjad",

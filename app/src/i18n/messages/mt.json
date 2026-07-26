@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {l-ebda vot} one {vot wieħed} two {# voti} few {# voti} many {#-il vot} other {# vot}}",
       "topWords": "L-aktar kliem kondiviż",
       "feedback": "Valutazzjoni medja",
-      "feedbackCount": "{count, plural, one {tweġiba waħda} two {# tweġibiet} few {# tweġibiet} many {#-il tweġiba} other {# tweġiba}}"
+      "feedbackCount": "{count, plural, one {tweġiba waħda} two {# tweġibiet} few {# tweġibiet} many {#-il tweġiba} other {# tweġiba}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Dettalji tal-avveniment",

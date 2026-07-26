@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {nav balsu} zero {# balsu} one {# balss} other {# balsis}}",
       "topWords": "Biežāk minētie vārdi",
       "feedback": "Vidējais vērtējums",
-      "feedbackCount": "{count, plural, zero {# atbilžu} one {# atbilde} other {# atbildes}}"
+      "feedbackCount": "{count, plural, zero {# atbilžu} one {# atbilde} other {# atbildes}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Pasākuma informācija",

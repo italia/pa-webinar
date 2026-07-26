@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {geen stemmen} one {1 stem} other {# stemmen}}",
       "topWords": "Meest gedeelde woorden",
       "feedback": "Gemiddelde beoordeling",
-      "feedbackCount": "{count, plural, one {1 antwoord} other {# antwoorden}}"
+      "feedbackCount": "{count, plural, one {1 antwoord} other {# antwoorden}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Evenementdetails",

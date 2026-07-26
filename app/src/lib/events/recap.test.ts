@@ -8,6 +8,7 @@ vi.mock('@/lib/db', () => ({
     poll: { findMany: vi.fn() },
     wordCloudSubmission: { groupBy: vi.fn() },
     eventFeedback: { aggregate: vi.fn() },
+    chatMessage: { findMany: vi.fn() },
   },
 }));
 
@@ -22,6 +23,7 @@ const mocked = prisma as unknown as {
   poll: { findMany: ReturnType<typeof vi.fn> };
   wordCloudSubmission: { groupBy: ReturnType<typeof vi.fn> };
   eventFeedback: { aggregate: ReturnType<typeof vi.fn> };
+  chatMessage: { findMany: ReturnType<typeof vi.fn> };
 };
 
 describe('buildRecap', () => {
@@ -45,6 +47,10 @@ describe('buildRecap', () => {
       { word: 'pa', _count: { word: 4 } },
     ]);
     mocked.eventFeedback.aggregate.mockResolvedValue({ _avg: { rating: 4.5 }, _count: 20 });
+    mocked.chatMessage.findMany.mockResolvedValue([
+      { text: 'Ci sarà la registrazione?', answeredAt: null, _count: { reactions: 2 } },
+      { text: 'Le slide sono scaricabili?', answeredAt: new Date(), _count: { reactions: 5 } },
+    ]);
   });
 
   it('aggrega headcount, registrazioni, domande, parole e feedback', async () => {
@@ -163,5 +169,59 @@ describe('formatRecapSummary', () => {
       'it',
     );
     expect(summary).toBe('Registrati: 10');
+  });
+});
+
+describe('buildRecap — domande poste in chat', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocked.event.findUnique.mockResolvedValue({ peakParticipants: 10 });
+    mocked.registration.count.mockResolvedValue(10);
+    mocked.question.findMany.mockResolvedValue([]);
+    mocked.poll.findMany.mockResolvedValue([]);
+    mocked.wordCloudSubmission.groupBy.mockResolvedValue([]);
+    mocked.eventFeedback.aggregate.mockResolvedValue({ _avg: { rating: null }, _count: 0 });
+  });
+
+  it('ordina per reazioni ricevute e marca quelle con risposta', async () => {
+    mocked.chatMessage.findMany.mockResolvedValue([
+      { text: 'poco votata', answeredAt: null, _count: { reactions: 1 } },
+      { text: 'la più votata', answeredAt: new Date(), _count: { reactions: 9 } },
+    ]);
+    const recap = await buildRecap('evt1');
+    expect(recap.chatQuestions).toEqual([
+      { text: 'la più votata', reactions: 9, answered: true },
+      { text: 'poco votata', reactions: 1, answered: false },
+    ]);
+  });
+
+  it('non chiede mai il nome di chi ha scritto: nello snapshot non deve entrare', async () => {
+    mocked.chatMessage.findMany.mockResolvedValue([]);
+    await buildRecap('evt1');
+    const select = mocked.chatMessage.findMany.mock.calls[0]?.[0]?.select;
+    expect(select.senderName).toBeUndefined();
+    expect(select.senderId).toBeUndefined();
+  });
+
+  it('esclude dall’archivio pubblico le domande scartate e quelle nascoste', async () => {
+    mocked.chatMessage.findMany.mockResolvedValue([]);
+    await buildRecap('evt1');
+    const where = mocked.chatMessage.findMany.mock.calls[0]?.[0]?.where;
+    expect(where).toMatchObject({ isQuestion: true, hiddenAt: null, dismissedAt: null });
+  });
+
+  it('uno snapshot di versione 1 (senza il campo) resta leggibile', () => {
+    const vecchio = {
+      version: 1 as const,
+      generatedAt: '2026-01-01T00:00:00.000Z',
+      headcount: 0,
+      registrations: 0,
+      topQuestions: [],
+      polls: [],
+      topWords: [],
+      feedback: { average: null, count: 0 },
+    } satisfies EventRecap;
+    expect(isRecapEmpty(vecchio)).toBe(true);
+    expect(() => formatRecapSummary(vecchio, 'it')).not.toThrow();
   });
 });

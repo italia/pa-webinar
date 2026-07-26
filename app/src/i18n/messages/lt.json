@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {balsų nėra} one {# balsas} few {# balsai} other {# balsų}}",
       "topWords": "Dažniausiai minėti žodžiai",
       "feedback": "Vidutinis įvertinimas",
-      "feedbackCount": "{count, plural, one {# atsakymas} few {# atsakymai} other {# atsakymų}}"
+      "feedbackCount": "{count, plural, one {# atsakymas} few {# atsakymai} other {# atsakymų}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Renginio informacija",

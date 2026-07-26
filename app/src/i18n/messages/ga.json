@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {gan vóta} one {1 vóta} two {2 vóta} few {# vóta} many {# vóta} other {# vóta}}",
       "topWords": "Na focail is mó a roinneadh",
       "feedback": "Meánrátáil",
-      "feedbackCount": "{count, plural, one {1 freagra} two {2 fhreagra} few {# fhreagra} many {# bhfreagra} other {# freagra}}"
+      "feedbackCount": "{count, plural, one {1 freagra} two {2 fhreagra} few {# fhreagra} many {# bhfreagra} other {# freagra}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Sonraí an imeachta",

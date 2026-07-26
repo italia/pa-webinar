@@ -131,6 +131,33 @@ export default function PostEventRecap({
         </div>
       )}
 
+      {/* Domande poste in chat. Sezione distinta da `topQuestions` (il
+          sottosistema Q&A storico, spento su ogni evento nuovo) perché i due
+          insiemi hanno provenienze diverse e negli eventi vecchi possono
+          coesistere: unirli farebbe sparire quella distinzione senza guadagno.
+          `chatQuestions` è opzionale — gli snapshot di versione 1, generati
+          prima di questa funzione, semplicemente non hanno il campo. */}
+      {(recap.chatQuestions?.length ?? 0) > 0 && (
+        <div className="mb-3">
+          <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+            {t('chatQuestions')}
+          </h3>
+          <ol className="mb-0 ps-3" style={{ fontSize: '0.9rem' }}>
+            {recap.chatQuestions?.map((q, i) => (
+              <li key={i} className="mb-1">
+                <span style={{ color: 'var(--app-text)' }}>{q.text}</span>
+                {q.reactions > 0 && (
+                  <span className="text-secondary"> · {t('reactionsCount', { count: q.reactions })}</span>
+                )}
+                {/* Etichetta di testo, non un colore: chi legge deve capire se
+                    la domanda ha avuto risposta anche senza percepire tinte. */}
+                {q.answered && <span className="text-secondary"> · {t('answered')}</span>}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
       {/* Poll results */}
       {recap.polls.length > 0 && (
         <div className="mb-3">

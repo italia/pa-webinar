@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {ningún voto} one {1 voto} other {# votos}}",
       "topWords": "Palabras más compartidas",
       "feedback": "Valoración media",
-      "feedbackCount": "{count, plural, one {1 respuesta} other {# respuestas}}"
+      "feedbackCount": "{count, plural, one {1 respuesta} other {# respuestas}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Detalle del evento",

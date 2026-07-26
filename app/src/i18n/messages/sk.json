@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {žiadne hlasy} one {1 hlas} few {# hlasy} many {# hlasu} other {# hlasov}}",
       "topWords": "Najčastejšie zdieľané slová",
       "feedback": "Priemerné hodnotenie",
-      "feedbackCount": "{count, plural, one {1 odpoveď} few {# odpovede} many {# odpovede} other {# odpovedí}}"
+      "feedbackCount": "{count, plural, one {1 odpoveď} few {# odpovede} many {# odpovede} other {# odpovedí}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Detail udalosti",

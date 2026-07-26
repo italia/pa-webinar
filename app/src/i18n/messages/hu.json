@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {nincs szavazat} one {1 szavazat} other {# szavazat}}",
       "topWords": "Leggyakrabban megosztott szavak",
       "feedback": "Átlagos értékelés",
-      "feedbackCount": "{count, plural, one {1 válasz} other {# válasz}}"
+      "feedbackCount": "{count, plural, one {1 válasz} other {# válasz}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Esemény részletei",

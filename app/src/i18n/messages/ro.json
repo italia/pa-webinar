@@ -86,7 +86,10 @@
       "votes": "{count, plural, =0 {niciun vot} one {1 vot} few {# voturi} other {# de voturi}}",
       "topWords": "Cele mai frecvente cuvinte",
       "feedback": "Evaluare medie",
-      "feedbackCount": "{count, plural, one {1 răspuns} few {# răspunsuri} other {# de răspunsuri}}"
+      "feedbackCount": "{count, plural, one {1 răspuns} few {# răspunsuri} other {# de răspunsuri}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Detalii eveniment",
