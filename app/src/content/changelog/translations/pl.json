@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Bezpieczeństwo zależności, zaktualizowana dokumentacja i pełne środowisko lokalne",
+    "notes": [
+      "Wszystkie znane podatności w zależnościach zostały usunięte, a automatyczne kontrole kodu nie działają już na infrastrukturze obsługującej wydarzenia: zewnętrzna propozycja zmiany nie może tam niczego uruchomić.",
+      "Dokumentacja odpowiada teraz oprogramowaniu: instrukcje instalacji, polecenia oraz strony o prywatności i bezpieczeństwie opisują, co system naprawdę robi — dla każdego, kto ponownie wykorzysta platformę we własnej administracji.",
+      "Instalacja na jednej maszynie obejmuje teraz również zadania okresowe (wysyłkę e-maili, przypomnienia, usuwanie danych po upływie terminu) oraz czat w czasie rzeczywistym, tak jak w produkcji.",
+      "Poprawki: strona opisująca publiczne API nie zwraca już błędu, a ochrona klucza szyfrowania danych osobowych znów działa, gdy nie skonfigurowano prawdziwego klucza."
+    ]
+  },
   "0.8.9": {
     "title": "Dziennik zmian, teraz z wbudowanym inwentarzem oprogramowania",
     "notes": [

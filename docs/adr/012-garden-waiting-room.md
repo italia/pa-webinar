@@ -1,6 +1,6 @@
 # ADR-012 — Waiting room "Giardino": lobby sociale stile Pokemon
 
-**Stato**: Proposto (2026-04-24)
+**Stato**: Accettato e implementato in forma incrementale (proposto 2026-04-24) — piazza opzionale a schermo intero con fallback classico, in produzione dalla v0.8.6.
 **Decisori**: team pa-webinar / DTD
 **Contesto abilitante**: feedback informale post-caffettino 24 aprile — "la sala d'attesa potrebbe essere più divertente"
 
@@ -124,32 +124,29 @@ Un progetto della PA italiana deve rispettare [WCAG 2.1 livello AA](https://www.
 - Audio che si affievolisce con la distanza
 - Solo se feedback Fase 1-2 giustifica l'investimento
 
-## Valutazione
+## Decisione
 
-**Il concetto si valuta come:**
-- **Culturalmente adatto** a incontri informali di community PA: la socializzazione informale è valore reale
-- **Tecnicamente fattibile** ma **grosso** — non è un pomeriggio, sono 5-10 settimane di lavoro per qualcosa di decente
-- **Rischioso sul piano accessibilità** per una piattaforma PA — va progettato con il fallback classico fin dal primo prototipo, non aggiunto dopo
+Adottata l'**Opzione B in forma incrementale**, con la piazza come esperienza
+opzionale e non come unica porta d'ingresso.
 
-**Percorso proposto:**
-1. Partire dall'**Opzione C (lobby con tavoli)** come primo passo, 1-2 settimane di lavoro: consegna il 70% del valore UX (proximity chat di gruppo) e permette di validare se la community la usa
-2. Se l'uso è reale, passare all'**Opzione B Fase 1** per l'esperienza completa — con budget dedicato e possibilmente un'artista per le tilemap
-3. L'**Opzione A (WorkAdventure)** è tentante ma la complicazione AGPL + PII + branding non-italia probabilmente non vale la candela per la PA
+- La sala d'attesa è una **pagina del design system**: evento, controlli audio e
+  video, nome, chat. È il percorso predefinito e l'unico necessario per entrare.
+- La **piazza interattiva** (Phaser, `lobby/`) si apre solo se la si sceglie, a
+  schermo intero, e si può chiudere in qualsiasi momento tornando alla pagina.
+- La **presenza** non usa WebSocket dedicati: ping HTTP periodici con fan-out via
+  Redis pub/sub, lo stesso canale della chat — nessuna infrastruttura in più.
+- L'**accessibilità** è garantita dal fallback classico, disponibile fin dal
+  primo rilascio e ricordato come preferenza: nessuna funzione dell'evento
+  richiede di attraversare la piazza.
 
-**Raccomandazione**: approvare l'ADR come "Proposto" e decidere se partire dall'**Opzione C "lobby con tavoli"** come prima iterazione, rimandando il Giardino pixel-art alla Fase 2 con più validazione. Il Giardino pixel-art subito richiede sessioni dedicate a Phaser setup, tilemap design, protocollo WebSocket e test di accessibilità.
+L'engine è configurabile per evento e a livello di sito (`classica` / `piazza`),
+così una PA che riusa la piattaforma può disattivarla del tutto.
 
 ## Conseguenze
 
-**Se approvato (qualsiasi opzione)**:
-- Nuovo componente `waiting-room-garden.tsx` o equivalente, toggle per-evento su `SiteSetting` e/o `Event.waitingRoomStyle`
-- Se Opzione B: nuove dipendenze (Phaser, Socket.IO lato server), nuovo endpoint WebSocket, nuovo Prisma model per avatar persistente
-- Se Opzione C: nessuna dep nuova, estensione del chat model con un `zoneId` opzionale
-
-**Se rimandato**: ADR resta come documento storico della proposta; l'utente finale si arrangia con la waiting room attuale.
-
-## Link di riferimento
-
-- [WorkAdventure (GitHub)](https://github.com/thecodingmachine/workadventure) — Opzione A
-- [Phaser 3 docs](https://phaser.io/phaser3) — Opzione B
-- [Gather.town](https://www.gather.town/) — riferimento UX commerciale
-- [ADR-011](./011-person-rubrica.md) — pattern per avatar persistente se/quando servirà
+- Il valore sociale si ottiene senza mettere un videogioco sul percorso critico
+  di chi deve solo entrare a un webinar.
+- Il costo è un workspace in più da mantenere (`lobby/`), isolato dietro un
+  import dinamico lato client: se si rompe, non porta giù la sala d'attesa.
+- Le emote restano locali (chi le usa vede la propria animazione, gli altri no):
+  limite noto, registrato in ROADMAP.

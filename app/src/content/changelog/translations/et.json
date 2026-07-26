@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Sõltuvuste turvalisus, ühtlustatud dokumentatsioon ja täielik kohalik keskkond",
+    "notes": [
+      "Kõik teadaolevad sõltuvuste haavatavused on parandatud ja automaatsed koodikontrollid ei tööta enam taristul, mis sündmusi majutab: väline muudatusettepanek ei saa seal enam midagi käivitada.",
+      "Dokumentatsioon vastab nüüd tarkvarale: paigaldusjuhised, käsud ning privaatsuse ja turvalisuse lehed kirjeldavad, mida süsteem tegelikult teeb — kõigile, kes platvormi oma asutuses taaskasutavad.",
+      "Ühele masinale paigaldamine hõlmab nüüd ka perioodilisi töid (e-kirjade saatmine, meeldetuletused, andmete kustutamine tähtaja saabudes) ja reaalajas vestlust, nagu tootmises.",
+      "Parandused: avalikku API-t kirjeldav leht ei anna enam viga ja isikuandmete krüpteerimisvõtme kaitse toimib taas, kui päris võtit pole seadistatud."
+    ]
+  },
   "0.8.9": {
     "title": "Muudatuste logi, nüüd sisseehitatud tarkvarainventuuriga",
     "notes": [

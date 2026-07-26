@@ -10,6 +10,15 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.9.0 — 2026-07-26 🔒
+
+**Dependency security, documentation realigned, and a complete local stack**
+
+- Every known dependency vulnerability has been fixed, and automated code checks no longer run on the infrastructure that hosts the events: an outside contribution can no longer execute anything there.
+- The documentation now matches the software: install instructions, commands and the privacy and security pages describe what the system actually does — for anyone reusing the platform in their own administration.
+- Installing on a single machine now also gets the scheduled work (sending email, reminders, deleting data when it expires) and real-time chat, as in production.
+- Fixes: the page describing the public API no longer errors out, and the guard on the personal-data encryption key works again when no real key has been configured.
+
 ## 0.8.9 — 2026-07-23
 
 **The changelog, now with the software inventory built in**

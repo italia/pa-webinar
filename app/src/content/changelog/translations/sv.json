@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Säkerhet i beroenden, uppdaterad dokumentation och en komplett lokal miljö",
+    "notes": [
+      "Alla kända sårbarheter i beroenden är åtgärdade, och de automatiska kodkontrollerna körs inte längre på den infrastruktur som är värd för evenemangen: ett externt ändringsförslag kan inte längre köra något där.",
+      "Dokumentationen stämmer nu med programvaran: installationsanvisningar, kommandon och sidorna om integritet och säkerhet beskriver vad systemet faktiskt gör — för alla som återanvänder plattformen i sin egen förvaltning.",
+      "Den som installerar på en enda maskin får nu även de periodiska uppgifterna (utskick av e-post, påminnelser, radering av data vid utgång) och chatt i realtid, precis som i produktion.",
+      "Rättningar: sidan som beskriver det publika API:et ger inte längre fel, och skyddet för nyckeln som krypterar personuppgifter fungerar igen när ingen riktig nyckel har konfigurerats."
+    ]
+  },
   "0.8.9": {
     "title": "Ändringsloggen, nu med programvaruinventeringen inbyggd",
     "notes": [

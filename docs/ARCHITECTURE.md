@@ -2,7 +2,7 @@
 
 Documento tecnico di riferimento per sviluppatori, sistemisti e personale tecnico della PA.
 
-Ultimo aggiornamento: 24 aprile 2026
+Ultimo aggiornamento: 26 luglio 2026 (v0.9.0)
 
 ---
 
@@ -153,7 +153,21 @@ graph TD
 
 ### Jitsi Meet
 
-Jitsi è il motore video. Non viene modificato a livello di codice sorgente: tutta la personalizzazione avviene tramite configurazione e IFrame API.
+Jitsi è il motore video. **Non è forkato**: la personalizzazione passa da
+configurazione e IFrame API. Ci sono però due eccezioni deliberate, che vanno
+conosciute perché si rompono in silenzio quando si aggiorna il tag base di Jitsi:
+
+- **Immagine `jitsi/web` ricompilata** (`infra/jitsi-web-patched/`) per abilitare
+  la soppressione del rumore rnnoise a 48 kHz, che l'immagine di serie zittisce
+  sui microfoni non a 48 kHz. È l'immagine che gira in produzione
+  (`pa-webinar-jitsi-web:stable-10741-rnnoise-r3`), non quella upstream.
+- **Modulo Prosody personalizzato** (`infra/jitsi/prosody-plugins/mod_token_affiliation_custom.lua`)
+  per far rispettare lato server il ruolo trasportato dal JWT, invece di
+  affidarsi a quello che dichiara il client.
+
+Entrambe vanno ri-verificate a ogni bump del tag Jitsi: la presenza della patch
+nel bundle si controlla, il funzionamento reale dell'audio no — quello si prova
+solo in una chiamata vera.
 
 Lo stack Jitsi è composto da cinque (opzionalmente sei) componenti:
 
@@ -744,28 +758,43 @@ Il JWT inviato a Jitsi per autenticare l'accesso alla room:
   "context": {
     "user": {
       "name": "Mario Rossi",
-      "email": "a]94f...c3b2"
-    }
+      "displayName": "Mario Rossi",
+      "id": "reg-3f2a…-9c1b",
+      "avatar": "data:image/svg+xml;base64,…",
+      "affiliation": "member",
+      "moderator": "false"
+    },
+    "features": { "recording": false, "livestreaming": false, "…": "…" }
   },
   "room": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "iss": "pa-webinar",
-  "sub": "pa-webinar-app",
-  "aud": "jitsi",
   "moderator": false,
-  "exp": 1711305600
+  "affiliation": "member",
+  "iss": "pa-webinar",
+  "sub": "meet.jitsi",
+  "aud": "jitsi",
+  "jti": "pa_webinar:reg-3f2a…-9c1b",
+  "iat": 1711291200,
+  "exp": 1711296600
 }
 ```
 
 | Campo | Descrizione |
 |---|---|
-| `context.user.name` | Nome visualizzato del partecipante |
-| `context.user.email` | Hash SHA-256 dell'email — Jitsi non riceve mai l'email in chiaro |
+| `context.user.name` / `displayName` | Nome visualizzato. Entrambi i campi: `name` è quello canonico, `displayName` copre i fork/moduli che leggono l'altro |
+| `context.user.id` | Identificativo di sessione (`reg-…`, `mod-…`, `guest-…`), unico per ogni ingresso |
+| `context.user.avatar` | Di norma un **data URI SVG** con le iniziali, generato in locale. Con Gravatar attivo punta al **nostro** proxy `/api/avatar`, mai a gravatar.com, e ciò che viaggia nell'URL è un riferimento cifrato, non l'email |
+| `context.user.affiliation` / `moderator` | `owner`/`true` per i moderatori, `member`/`false` per gli altri |
+| `context.features` | Permessi per ruolo (registrazione, live streaming, …), applicati da Prosody |
 | `room` | UUID della room Jitsi, corrisponde a `jitsiRoomName` nel DB |
-| `iss` | Issuer, configurato in `JITSI_JWT_ISSUER` |
-| `sub` | Dominio/tenant Jitsi, configurato in `JITSI_JWT_SUBJECT` o derivato da `NEXT_PUBLIC_JITSI_DOMAIN` |
-| `aud` | Audience, configurato in `JITSI_JWT_AUDIENCE` |
-| `moderator` | `true` per moderatori, `false` per partecipanti |
-| `exp` | Scadenza UNIX timestamp, durata breve (es. 4 ore) |
+| `iss` / `aud` / `sub` | Issuer, audience e dominio Jitsi (`JITSI_JWT_ISSUER`, `JITSI_JWT_AUDIENCE`, `JITSI_JWT_SUBJECT`) |
+| `jti` | `<appId>:<id di sessione>` |
+| `exp` | Scadenza: **2 ore** per i moderatori, **90 minuti** per i partecipanti |
+
+> **L'email non è nel token, in nessuna forma.** Una versione precedente di
+> questo documento mostrava un campo `context.user.email` con l'hash SHA-256
+> dell'indirizzo: non viene emesso. Jitsi riceve solo nome visualizzato,
+> identificativo di sessione e permessi. L'`emailHash` (HMAC con `APP_SECRET`)
+> esiste, ma vive nel nostro database — non transita mai verso Jitsi.
 
 Il JWT è firmato con `JITSI_JWT_SECRET` (shared secret tra portale e Prosody). Prosody è configurato con `token` authentication per verificare la firma.
 
@@ -819,7 +848,7 @@ graph TD
 
 ### Live controls "Meet-style"
 
-Dalla v0.4.x la sala live usa un pattern **controls floating + drawer** ispirato a Google Meet, unico per desktop e mobile con breakpoint a 992px. File principale: `app/src/components/live/live-event-client.tsx` (~1280 righe, hub di tutti i pannelli live).
+Dalla v0.4.x la sala live usa un pattern **controls floating + drawer** ispirato a Google Meet, unico per desktop e mobile con breakpoint a 992px. File principale: `app/src/components/live/live-event-client.tsx` (hub di tutti i pannelli live).
 
 - **Desktop ( ≥992px )**: floating control bar sopra il video Jitsi (in overlay), drawer laterale che scorre da destra con tabs Q&A / Chat / Polls / Materials / Participants. Il toolbar nativo Jitsi è disabilitato per attendee e permanente per moderator (`TOOLBAR_ALWAYS_VISIBLE=true` + timeout 20s, introdotto con commit `306dd20` dopo il feedback caffettino — i due bar non si sovrappongono più).
 - **Mobile ( <992px )**: bottom tab strip (Bootstrap Italia `.it-footer-nav`-style) con 5 tab; il drawer diventa full-screen. Il tasto "condividi schermo" è rimosso dai mobile toolbar buttons (`mobileBaseToolbarButtons` / `mobileModeratorToolbarButtons` in `lib/jitsi/config.ts`): iOS Safari e la maggior parte dei browser Android vietano `getDisplayMedia()` in iframe, meglio nasconderlo che mostrare un errore opaco.
@@ -865,23 +894,23 @@ graph LR
         A1[kubectl get deployment jvb] --> A2[list pods jvb]
         A2 --> A3[kubectl exec curl /colibri/stats<br/>on each pod]
         A3 --> A4["aggregate sum(participants, bitrate...)<br/>max(stress_level)"]
-        A4 --> A5[GET /api/internal/jvb-desired-replicas<br/>?current=&ready=&participants=&...]
+        A4 --> A5["GET /api/internal/jvb-desired-replicas<br/>?current=&ready=&participants=&..."]
     end
 
-    A5 --> B1[Next.js API]
-    B1 --> B2{Compute desired}
-    B2 -->|lifecycle + sizing formula| B3[desired = ...]
-    B3 --> B4[SETEX jvb:replicas:snapshot 300s ...]
-    B3 --> B5[UPDATE Event.status<br/>transitions]
-    B3 --> B6[closeOpenSessions]
+    A5 --> B1["Next.js API"]
+    B1 --> B2{"Compute desired"}
+    B2 -->|"lifecycle + sizing formula"| B3["desired = ..."]
+    B3 --> B4["SETEX jvb:replicas:snapshot 300s ..."]
+    B3 --> B5["UPDATE Event.status<br/>transitions"]
+    B3 --> B6["closeOpenSessions"]
 
-    B4 --> C1[Redis]
-    A5 -.response{desired, jibriDesired}.-> D1[kubectl scale deployment jvb]
-    A5 -.response.-> D2[kubectl scale jibri]
+    B4 --> C1["Redis"]
+    A5 -. "response: desired, jibriDesired" .-> D1["kubectl scale deployment jvb"]
+    A5 -. "response" .-> D2["kubectl scale jibri"]
 
-    C1 --> E1[/api/status]
-    C1 --> E2[/api/status/infrastructure]
-    C1 --> E3[/api/metrics<br/>Prometheus gauges]
+    C1 --> E1["/api/status"]
+    C1 --> E2["/api/status/infrastructure"]
+    C1 --> E3["/api/metrics<br/>Prometheus gauges"]
 ```
 
 **Memory limit**: 256Mi (alzato da 32Mi in commit `3ac77dd` dopo OOMKill con ≥3 pod JVB: fan-out di `kubectl exec` + subshell bash supera il vecchio ceiling). Copre fino a ~6 pod (il default `jvbMaxReplicas`).
@@ -1150,6 +1179,45 @@ La separazione liveness/readiness è importante: un pod con schema DB incompatib
 | SSE chat per pod | `eventi_chat_sse_connections` | > 300 (scala app) |
 | Memoria Redis | `redis_memory_used_bytes` | > 80% del limit del pod |
 | Redis raggiungibile | `/api/status` probe | `outage` → chat fan-out broken |
+
+---
+
+## Recorder multi-traccia
+
+Per attribuire le parole a chi le ha dette (ADR-013) non basta la registrazione
+composita di Jibri: serve **una traccia audio per partecipante**. Se ne occupa un
+sottosistema separato, opzionale, spento per impostazione predefinita.
+
+**Come funziona.** Il `recorder` è un browser headless che entra nella riunione
+come un client qualsiasi e salva le tracce audio remote separate, poi le carica
+sullo storage. Non compare però tra i partecipanti: entra su un **dominio
+nascosto di Prosody** (`hidden.meet.jitsi`), che i client Jitsi scartano a monte
+— quindi non è nell'elenco, non è nel conteggio, non ha un riquadro video.
+L'avviso "questo evento viene registrato" resta ovviamente al suo posto: la
+riservatezza non è nascondere la registrazione, è non far comparire un finto
+partecipante.
+
+**Chi lo avvia.** Il `recorder-controller` è un operatore riconciliante: guarda
+gli eventi che passano LIVE e assicura che esista esattamente un recorder per
+evento. Ha due esecutori intercambiabili:
+
+| Esecutore | Dove gira | Come crea il recorder |
+|---|---|---|
+| Kubernetes | in cluster | crea un `Job` dal template di un CronJob sospeso |
+| Docker | VM singola | avvia un container via socket Docker (`--profile recorder`) |
+
+La logica di riconciliazione è pura e testata (`infra/recorder-controller/src/reconcile.ts`);
+gli esecutori fanno solo I/O. È ciò che rende il sottosistema utilizzabile anche
+fuori da Kubernetes, per chi riusa la piattaforma su una macchina singola.
+
+**Consenso.** Le tracce per-partecipante sono un trattamento in più rispetto alla
+registrazione dell'evento: sono subordinate sia al consenso della persona
+(`consentMultitrack`) sia all'abilitazione per evento
+(`multitrackRecordingEnabled`). Senza entrambi, la traccia non viene conservata.
+
+**Dopo la registrazione** le tracce alimentano la pipeline di post-produzione
+descritta qui sotto: da lì nascono trascrizione con speaker, sottotitoli ed
+eventuale doppiaggio.
 
 ---
 

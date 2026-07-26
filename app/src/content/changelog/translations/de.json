@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Sicherheit der Abhängigkeiten, aktualisierte Dokumentation und ein vollständiger lokaler Stack",
+    "notes": [
+      "Alle bekannten Schwachstellen in Abhängigkeiten wurden behoben, und die automatischen Code-Prüfungen laufen nicht mehr auf der Infrastruktur, die die Veranstaltungen bereitstellt: ein externer Änderungsvorschlag kann dort nichts mehr ausführen.",
+      "Die Dokumentation entspricht wieder der Software: Installationsanleitung, Befehle sowie die Seiten zu Datenschutz und Sicherheit beschreiben, was das System tatsächlich tut — für alle, die die Plattform in ihrer eigenen Verwaltung nachnutzen.",
+      "Wer auf einer einzelnen Maschine installiert, erhält jetzt auch die regelmäßigen Aufgaben (E-Mail-Versand, Erinnerungen, Löschen der Daten nach Ablauf) und den Echtzeit-Chat wie im Produktivbetrieb.",
+      "Korrekturen: Die Seite mit der öffentlichen API läuft nicht mehr auf einen Fehler, und der Schutz des Schlüssels zur Verschlüsselung personenbezogener Daten greift wieder, wenn kein echter Schlüssel konfiguriert wurde."
+    ]
+  },
   "0.8.9": {
     "title": "Das Änderungsprotokoll, jetzt mit integriertem Software-Inventar",
     "notes": [

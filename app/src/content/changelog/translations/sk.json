@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Bezpečnosť závislostí, zosúladená dokumentácia a kompletné lokálne prostredie",
+    "notes": [
+      "Všetky známe zraniteľnosti v závislostiach boli odstránené a automatické kontroly kódu už nebežia na infraštruktúre, ktorá hostí podujatia: externý návrh zmeny tam už nemôže nič spustiť.",
+      "Dokumentácia teraz zodpovedá softvéru: inštalačné pokyny, príkazy a stránky o súkromí a bezpečnosti opisujú, čo systém naozaj robí — pre každého, kto platformu znovu použije vo vlastnej správe.",
+      "Inštalácia na jednom stroji teraz zahŕňa aj pravidelné úlohy (odosielanie e-mailov, pripomienky, mazanie údajov po uplynutí lehoty) a chat v reálnom čase, ako v produkcii.",
+      "Opravy: stránka opisujúca verejné API už nekončí chybou a ochrana kľúča na šifrovanie osobných údajov opäť zasiahne, keď nie je nastavený skutočný kľúč."
+    ]
+  },
   "0.8.9": {
     "title": "Zoznam zmien, teraz so vstavaným inventárom softvéru",
     "notes": [

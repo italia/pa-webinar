@@ -1,4 +1,13 @@
 {
+  "0.9.0": {
+    "title": "Függőségek biztonsága, naprakész dokumentáció és teljes helyi környezet",
+    "notes": [
+      "A függőségek minden ismert sérülékenységét kijavítottuk, és az automatikus kódellenőrzések már nem futnak azon az infrastruktúrán, amely az eseményeket kiszolgálja: külső módosítási javaslat ott többé nem futtathat semmit.",
+      "A dokumentáció ismét megfelel a szoftvernek: a telepítési útmutató, a parancsok, valamint az adatvédelmi és biztonsági oldalak azt írják le, amit a rendszer valóban csinál — mindenkinek, aki a platformot saját közigazgatásában újrahasznosítja.",
+      "Egyetlen gépre telepítve mostantól az időzített feladatok (e-mailek küldése, emlékeztetők, adatok törlése lejáratkor) és a valós idejű csevegés is működik, ahogy éles üzemben.",
+      "Javítások: a nyilvános API-t leíró oldal már nem hibázik, és a személyes adatok titkosítási kulcsának védelme ismét életbe lép, ha nincs valódi kulcs beállítva."
+    ]
+  },
   "0.8.9": {
     "title": "A változásnapló, mostantól beépített szoftverleltárral",
     "notes": [

@@ -1,5 +1,11 @@
 [
   {
+    "version": "0.9.0",
+    "date": "2026-07-26",
+    "security": true,
+    "sbom": true
+  },
+  {
     "version": "0.8.9",
     "date": "2026-07-23",
     "sbom": true
