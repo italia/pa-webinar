@@ -271,8 +271,17 @@ export default function EventManagementClient({
         body: JSON.stringify({ nextOccurrence: true }),
       });
       if (!res.ok) throw new Error(String(res.status));
-      const created = (await res.json()) as { id: string };
-      router.push(`/admin/events/${created.id}/edit`);
+      // Il token DEVE viaggiare nell'URL: la pagina di modifica risponde
+      // notFound() senza (edit/page.tsx). Leggerlo qui non costa nulla — la
+      // rotta di duplicazione lo restituisce già — e senza, il bottone
+      // "Duplica come prossima occorrenza" atterrava su un 404 dopo aver
+      // creato davvero l'evento: la copia c'era, ma l'operatore vedeva una
+      // pagina inesistente e non aveva modo di raggiungerla.
+      const created = (await res.json()) as { id: string; moderatorToken?: string };
+      if (!created.moderatorToken) throw new Error('missing token');
+      router.push(
+        `/admin/events/${created.id}/edit?token=${encodeURIComponent(created.moderatorToken)}`,
+      );
     } catch {
       setDuplicateError(td('duplicateNextError'));
       setDuplicating(false);
