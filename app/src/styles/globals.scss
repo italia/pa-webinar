@@ -2406,6 +2406,74 @@ html.live-call-immersive body {
   color: var(--app-muted, #5c6f82);
 }
 
+// Domande in chat. Regola trasversale a questo blocco: nessuno stato è
+// affidato al solo colore (WCAG 1.4.1) — c'è sempre un'etichetta di testo
+// accanto, e il bottone di composizione cambia anche bordo e sfondo, non solo
+// tinta. Nessun `<Icon>` di design-react-kit: il pannello è sempre montato e
+// quel componente qui produce un errore di hydration.
+.chat-panel__lens {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px 0;
+}
+
+.chat-panel__lens-btn {
+  border: 1px solid var(--app-border, #c5c7c9);
+  background: transparent;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  color: var(--app-text, #17324d);
+
+  &.is-active {
+    // Attivo: non solo il colore di sfondo — il bordo diventa pieno e il testo
+    // passa in grassetto, così lo stato si legge anche senza percepire il colore.
+    background: var(--app-primary, #06c);
+    border-color: var(--app-primary, #06c);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-primary, #06c);
+    outline-offset: 2px;
+  }
+}
+
+// Interruttore "questo è una domanda" nella barra di composizione.
+.chat-panel__ask-btn {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 6px;
+  padding: 2px 6px;
+  color: var(--app-muted, #5c6f82);
+  line-height: 0;
+
+  &.is-on {
+    border-color: var(--app-primary, #06c);
+    background: rgba(0, 102, 204, 0.1);
+    color: var(--app-primary, #06c);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-primary, #06c);
+    outline-offset: 2px;
+  }
+
+  &:disabled { opacity: 0.5; }
+}
+
+// Marcatura sopra al testo del messaggio: icona + etichetta, mai icona sola.
+.chat-panel__question-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--app-primary, #06c);
+  margin-bottom: 2px;
+}
+
 // Chat: barra con l'export (A5). Discreta, in cima alla lista.
 .chat-panel__toolbar {
   display: flex;
@@ -2625,4 +2693,11 @@ html.live-call-immersive body {
   }
 
   .wr-piazza-stage { flex: 0 0 45vh; }
+}
+
+// Avviso della lente: la coda mostra solo i messaggi caricati.
+.chat-panel__lens-note {
+  margin: 4px 10px 0;
+  font-size: 0.7rem;
+  color: var(--app-muted, #5c6f82);
 }

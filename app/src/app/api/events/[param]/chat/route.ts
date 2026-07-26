@@ -81,9 +81,20 @@ const postSchema = z
     attachmentToken: z.string().min(1).max(4000).optional(),
     // Optional reply to an earlier message in the same event.
     replyToId: z.string().uuid().optional(),
+    // Chi scrive dichiara che il suo messaggio è una domanda. È l'autore a
+    // marcarla, non il moderatore: chiedere qualcosa è un atto di chi
+    // partecipa, e il pubblico non deve aspettare che qualcuno "promuova" il
+    // suo messaggio per vederlo entrare nella coda delle domande.
+    isQuestion: z.boolean().optional().default(false),
   })
   .refine((d) => d.text.length > 0 || d.attachmentToken !== undefined, {
     message: 'empty message',
+    path: ['text'],
+  })
+  // Una domanda deve avere un testo: un allegato da solo non è leggibile nella
+  // lente delle domande, e chi modera si troverebbe in coda una riga vuota.
+  .refine((d) => !d.isQuestion || d.text.length > 0, {
+    message: 'a question needs a text',
     path: ['text'],
   });
 
@@ -123,6 +134,9 @@ export const GET = withErrorHandling(async (request, context) => {
       attachmentMime: true,
       attachmentSize: true,
       editedAt: true,
+      isQuestion: true,
+      answeredAt: true,
+      dismissedAt: true,
       reactions: { select: { emoji: true, senderId: true } },
       replyToId: true,
       replyTo: {
@@ -181,6 +195,12 @@ export const GET = withErrorHandling(async (request, context) => {
         text: tryDecryptPII(m.text) ?? m.text,
         createdAt: m.createdAt.toISOString(),
         editedAt: m.editedAt ? m.editedAt.toISOString() : null,
+        // La marcatura viaggia con la cronologia, non solo sullo stream: chi
+        // ricarica la pagina o entra a evento iniziato deve vedere la stessa
+        // coda di domande di chi era già collegato.
+        isQuestion: m.isQuestion,
+        answeredAt: m.answeredAt ? m.answeredAt.toISOString() : null,
+        dismissedAt: m.dismissedAt ? m.dismissedAt.toISOString() : null,
         // Tallies travel with the history so a late joiner sees the same counts
         // a live client has been accumulating from the stream.
         reactions: tallyReactions(m.reactions),
@@ -291,6 +311,7 @@ export const POST = withErrorHandling(async (request, context) => {
       isModerator: auth.isModerator,
       text: encryptPII(plaintextText),
       replyToId,
+      isQuestion: parsed.data.isQuestion,
       ...(attachmentClaims
         ? {
             attachmentBlobPath: attachmentClaims.key,
@@ -326,6 +347,7 @@ export const POST = withErrorHandling(async (request, context) => {
     isModerator: created.isModerator,
     text: plaintextText,
     createdAt: created.createdAt.toISOString(),
+    ...(created.isQuestion ? { isQuestion: true } : {}),
     ...(attachmentRef ? { attachment: attachmentRef } : {}),
     ...(replyRef ? { replyTo: replyRef } : {}),
   });

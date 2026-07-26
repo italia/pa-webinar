@@ -82,6 +82,11 @@ interface ChatMessage {
   editedAt?: string | null;
   /** emoji → quante reazioni (A3). Mai gli id: la tally va a tutta la sala. */
   reactions?: Record<string, number>;
+  /** Dichiarata da chi scrive al momento dell'invio: questo è una domanda. */
+  isQuestion?: boolean;
+  /** Stato dato dal moderatore. Entrambi assenti = domanda ancora aperta. */
+  answeredAt?: string | null;
+  dismissedAt?: string | null;
 }
 
 // Small static emoji set for the compose-box picker. Plain string
@@ -157,6 +162,14 @@ export default function ChatPanel({
   // Compose extras (authenticated members only).
   const canAttach = !isGuest && !!token;
   const [replyTo, setReplyTo] = useState<ChatReply | null>(null);
+  /**
+   * Chi scrive dichiara che il messaggio è una domanda. Si azzera dopo l'invio:
+   * marcare è un atto per singolo messaggio, non una modalità in cui si resta —
+   * altrimenti si finisce per porre "domande" senza accorgersene.
+   */
+  const [askAsQuestion, setAskAsQuestion] = useState(false);
+  /** Lente: mostra tutti i messaggi oppure solo le domande. */
+  const [lens, setLens] = useState<'all' | 'questions'>('all');
   const [attachment, setAttachment] = useState<PendingAttachment | null>(null);
   const [attaching, setAttaching] = useState(false);
   const [composeError, setComposeError] = useState<string | null>(null);
@@ -179,6 +192,17 @@ export default function ChatPanel({
   const activeRef = useRef(active);
   const onUnreadCountChangeRef = useRef(onUnreadCountChange);
   useEffect(() => { activeRef.current = active; }, [active]);
+  /**
+   * "Il pannello è aperto" non basta più a dire "il messaggio è sotto gli occhi":
+   * con la lente sulle domande la lista mostra un sottoinsieme, quindi un
+   * messaggio normale — anche uno che mi nomina — non è visibile. Chi decide di
+   * tacere una notifica deve saperlo, altrimenti chi è stato nominato non riceve
+   * né riga, né badge, né avviso.
+   */
+  const lensFilteringRef = useRef(false);
+  // Sincronizzato con lo stato della lente: l'handler SSE legge il ref, non lo
+  // stato, per non ricreare la connessione a ogni cambio di filtro.
+  useEffect(() => { lensFilteringRef.current = lens === 'questions'; }, [lens]);
   useEffect(() => { onUnreadCountChangeRef.current = onUnreadCountChange; }, [onUnreadCountChange]);
 
   const setUnread = useCallback((n: number) => {
@@ -201,7 +225,7 @@ export default function ChatPanel({
     if (typeof window === 'undefined' || !('Notification' in window)) return;
     // Only when the chat is not what the user is looking at — a notification for
     // a message already on screen is pure noise.
-    if (activeRef.current && document.visibilityState === 'visible') return;
+    if (activeRef.current && !lensFilteringRef.current && document.visibilityState === 'visible') return;
     try {
       if (Notification.permission !== 'granted') return;
       const n = new Notification(t('mentionNotificationTitle', { name: from }), {
@@ -326,10 +350,14 @@ export default function ChatPanel({
       setMentionTick((n) => n + 1);
       notifyMention(msg.senderName, msg.text);
     }
-    if (!activeRef.current && !isOwn) {
+    // Stesso ragionamento della notifica: con la lente sulle domande un
+    // messaggio normale non è a schermo, quindi conta come non letto — e non va
+    // segnato come letto, altrimenti sparisce senza che nessuno l'abbia visto.
+    const onScreen = activeRef.current && !(lensFilteringRef.current && !msg.isQuestion);
+    if (!onScreen && !isOwn) {
       setUnread(unreadCountRef.current + 1);
       maybeRequestNotificationPermission();
-    } else if (activeRef.current) {
+    } else if (onScreen) {
       lastReadIdRef.current = msg.id;
     }
   }, [displayName, setUnread, maybeRequestNotificationPermission, notifyMention]);
@@ -551,12 +579,27 @@ export default function ChatPanel({
         if (full) {
           // upsertMessage ignora per progetto gli id già visti (evita i doppioni
           // dell'eco SSE), quindi la rilettura completa riconcilia a parte il
-          // testo, il segno di modifica e i conteggi delle reazioni.
+          // testo, il segno di modifica, i conteggi delle reazioni e lo stato
+          // delle domande.
+          //
+          // Lo stato della domanda DEVE stare qui: il moderatore lo cambia su un
+          // messaggio vecchio, quindi `?since=` non lo riporta (createdAt non si
+          // muove). Senza questa riga, chi ha avuto un rientro di stream
+          // continuerebbe a vedere aperta una domanda già evasa fino a quando non
+          // ricarica la pagina.
           setMessages((prev) =>
             prev.map((m) => {
               const fresh = data.messages.find((x) => x.id === m.id);
               return fresh
-                ? { ...m, text: fresh.text, editedAt: fresh.editedAt, reactions: fresh.reactions }
+                ? {
+                    ...m,
+                    text: fresh.text,
+                    editedAt: fresh.editedAt,
+                    reactions: fresh.reactions,
+                    isQuestion: fresh.isQuestion,
+                    answeredAt: fresh.answeredAt,
+                    dismissedAt: fresh.dismissedAt,
+                  }
                 : m;
             }),
           );
@@ -573,7 +616,7 @@ export default function ChatPanel({
       setConnStatus('live'); // a real SSE frame proves the stream is flowing
       try {
         const env = JSON.parse(e.data) as ChatMessage & {
-          op?: 'delete' | 'edit' | 'reaction';
+          op?: 'delete' | 'edit' | 'reaction' | 'question';
         };
         if (env.op === 'delete') {
           removeMessage(env.id);
@@ -607,6 +650,19 @@ export default function ChatPanel({
         if (env.op === 'reaction') {
           setMessages((prev) =>
             prev.map((m) => (m.id === env.id ? { ...m, reactions: env.reactions } : m)),
+          );
+          return;
+        }
+        // Stato della domanda deciso dal moderatore: come 'edit' e 'reaction'
+        // aggiorna un messaggio già in lista, quindi NON passa da upsertMessage
+        // (la dedup per id lo scarterebbe come "già visto").
+        if (env.op === 'question') {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === env.id
+                ? { ...m, answeredAt: env.answeredAt, dismissedAt: env.dismissedAt }
+                : m,
+            ),
           );
           return;
         }
@@ -795,6 +851,14 @@ export default function ChatPanel({
   const handleSend = useCallback(async () => {
     const text = input.trim();
     if ((!text && !attachment) || sending || attaching) return;
+    // Una domanda deve avere un testo (il server la rifiuta comunque). Senza
+    // questo controllo l'invio riusciva come messaggio normale e il toggle si
+    // spegneva esattamente come dopo una domanda andata a buon fine: chi ha
+    // scritto credeva di essere in coda e non c'era.
+    if (askAsQuestion && !text) {
+      setComposeError(t('questionNeedsText'));
+      return;
+    }
     setSending(true);
     try {
       const body: Record<string, unknown> = {};
@@ -803,6 +867,7 @@ export default function ChatPanel({
       else if (displayName) body.displayNameOverride = displayName;
       if (replyTo) body.replyToId = replyTo.id;
       if (attachment) body.attachmentToken = attachment.token;
+      if (askAsQuestion && text) body.isQuestion = true;
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
@@ -839,6 +904,7 @@ export default function ChatPanel({
           isModerator: !!isModerator,
           text,
           createdAt: created.createdAt,
+          ...(askAsQuestion && text ? { isQuestion: true } : {}),
           ...(attachment
             ? {
                 attachment: {
@@ -862,12 +928,49 @@ export default function ChatPanel({
       }
       setInput('');
       setReplyTo(null);
+      setAskAsQuestion(false);
       setAttachment(null);
       setComposeError(null);
     } finally {
       setSending(false);
     }
-  }, [input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, isModerator, replyTo, upsertMessage, t]);
+  }, [input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, isModerator, replyTo, askAsQuestion, upsertMessage, t]);
+
+  /**
+   * Il moderatore segna una domanda come risposta o la scarta. Come per
+   * hideMessage: NON ottimistico. Un fallimento inghiottito lascerebbe la
+   * domanda aperta per tutti mentre chi modera la crede evasa, e la coda
+   * ripartirebbe da capo al primo rientro di stream.
+   */
+  const setQuestionStatus = useCallback(
+    async (id: string, status: 'ANSWERED' | 'DISMISSED' | null) => {
+      if (!isModerator || !token) return;
+      try {
+        const res = await fetch(`/api/events/${eventSlug}/chat/${id}/question`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ status }),
+        });
+        if (!res.ok) {
+          setComposeError(t('questionStatusFailed'));
+          return;
+        }
+        const data = (await res.json().catch(() => null)) as
+          | { answeredAt?: string | null; dismissedAt?: string | null }
+          | null;
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === id
+              ? { ...m, answeredAt: data?.answeredAt ?? null, dismissedAt: data?.dismissedAt ?? null }
+              : m,
+          ),
+        );
+      } catch {
+        setComposeError(t('questionStatusFailed'));
+      }
+    },
+    [isModerator, token, eventSlug, t],
+  );
 
   const hideMessage = useCallback(async (id: string) => {
     if (!isModerator || !token) return;
@@ -888,6 +991,13 @@ export default function ChatPanel({
       setComposeError(t('hideFailed'));
     }
   }, [isModerator, token, eventSlug, removeMessage, t]);
+
+  // La lente è un filtro sui messaggi GIÀ in memoria: nessuna seconda fetch,
+  // nessun secondo stream, nessun parametro nuovo sulla GET (che oggi legge
+  // `limit`/`since` senza validazione: aggiungerci filtri allargherebbe un 500
+  // già esistente).
+  const questionCount = messages.filter((m) => m.isQuestion).length;
+  const visibleMessages = lens === 'questions' ? messages.filter((m) => m.isQuestion) : messages;
 
   return (
     <div className="chat-panel flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
@@ -914,12 +1024,59 @@ export default function ChatPanel({
           </a>
         </div>
       )}
+      {/* Lente. Due bottoni con aria-pressed invece di un role="tablist": un
+          tablist vero pretende la navigazione con le frecce e un tabindex
+          mobile, e un tablist a metà è meno accessibile di due bottoni normali,
+          che sono già raggiungibili da tastiera e annunciati con il loro stato.
+          Compare solo quando c'è almeno una domanda: un filtro che non filtra
+          nulla è rumore. */}
+      {/* La condizione include `lens === 'questions'`: se sparisse mentre la
+          lente è attiva (l'unica domanda viene nascosta dal moderatore), il
+          pannello resterebbe vuoto SENZA il bottone per tornare indietro, e
+          l'unica via d'uscita sarebbe ricaricare la pagina — cioè uscire dalla
+          call. La via di ritorno deve esserci sempre. */}
+      {(questionCount > 0 || lens === 'questions') && !readDenied && (
+        <div className="chat-panel__lens" role="group" aria-label={t('lensGroupLabel')}>
+          <button
+            type="button"
+            className={`chat-panel__lens-btn${lens === 'all' ? ' is-active' : ''}`}
+            aria-pressed={lens === 'all'}
+            onClick={() => setLens('all')}
+          >
+            {t('lensAll')}
+          </button>
+          <button
+            type="button"
+            className={`chat-panel__lens-btn${lens === 'questions' ? ' is-active' : ''}`}
+            aria-pressed={lens === 'questions'}
+            onClick={() => setLens('questions')}
+          >
+            {t('lensQuestions', { count: questionCount })}
+          </button>
+        </div>
+      )}
+      {/* La lente filtra i messaggi CARICATI, non l'intera chat: all'ingresso se
+          ne leggono gli ultimi 200. In una sala molto attiva possono quindi
+          esserci domande più vecchie fuori dalla finestra. Il limite è
+          accettabile, il silenzio no: un moderatore che svuota la coda deve
+          sapere se sta guardando tutto. */}
+      {lens === 'questions' && messages.length >= 200 && (
+        <p className="chat-panel__lens-note">{t('lensTruncated')}</p>
+      )}
+      {/* Il cambio di lente non sposta il focus: senza questo annuncio, chi usa
+          uno screen reader preme un bottone e non sa che la lista sotto è
+          cambiata. */}
+      <p className="visually-hidden" role="status" aria-live="polite">
+        {lens === 'questions'
+          ? t('lensAnnounceQuestions', { count: visibleMessages.length })
+          : t('lensAnnounceAll')}
+      </p>
       <div
         ref={listRef}
         className="chat-panel__messages flex-grow-1"
         onScroll={handleScroll}
       >
-        {messages.length === 0 ? (
+        {visibleMessages.length === 0 ? (
           <div className="chat-panel__empty">
             <Icon icon={readDenied ? 'it-lock' : 'it-comment'} size="lg" className="mb-2 text-muted" />
             {/* A refused reader must not be shown the same "no messages yet" as
@@ -928,7 +1085,7 @@ export default function ChatPanel({
             <p>{readDenied ? t('readDenied') : t('empty')}</p>
           </div>
         ) : (
-          messages.map((m) => {
+          visibleMessages.map((m) => {
             // Autorevole dal server; il fallback sul nome serve solo all'eco
             // ottimistica del proprio invio, che non ha ancora fatto il giro.
             const isOwn = m.mine ?? m.senderName === displayName;
@@ -971,6 +1128,37 @@ export default function ChatPanel({
                             ★
                           </span>
                         )}
+                      </div>
+                    )}
+                    {/* Marcatura della domanda. Lo stato è TESTO, non solo
+                        colore o icona (WCAG 1.4.1): "Domanda", "Risposta
+                        data", "Non verrà trattata" si leggono anche in bianco
+                        e nero e da uno screen reader. L'icona è SVG inline —
+                        <Icon> di design-react-kit qui produrrebbe un errore di
+                        hydration, essendo questo un componente sempre montato. */}
+                    {m.isQuestion && (
+                      <div className="chat-panel__question-mark">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                             strokeLinejoin="round" aria-hidden="true">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                          <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                        {' '}
+                        <span>
+                          {/* "Risposta data" è pubblico: è un'informazione utile
+                              a tutta la sala. "Non verrà trattata" no: lo vede
+                              solo chi modera, perché scartare pubblicamente la
+                              domanda di qualcuno davanti a tutti è un'esposizione
+                              gratuita — e il vecchio sottosistema Q&A, non a
+                              caso, le domande scartate non le pubblicava. */}
+                          {m.answeredAt
+                            ? t('questionAnswered')
+                            : m.dismissedAt && isModerator
+                              ? t('questionDismissed')
+                              : t('questionOpen')}
+                        </span>
                       </div>
                     )}
                     {m.replyTo && (
@@ -1121,6 +1309,35 @@ export default function ChatPanel({
                           <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
                         </svg>
                       </button>
+                    )}
+                    {/* Azioni sulla coda delle domande. Sono separate da
+                        "Nascondi": nascondere è moderazione del contenuto e lo
+                        toglie a tutti, segnare una domanda la lascia leggibile
+                        e cambia solo il suo posto nella coda. Il bottone
+                        ripete l'azione già fatta per poterla annullare: chi
+                        modera sbaglia, e un'azione senza ritorno costringe a
+                        nascondere il messaggio per rimediare. */}
+                    {isModerator && token && m.isQuestion && (
+                      <>
+                        <button
+                          type="button"
+                          className="chat-panel__q-btn btn btn-link p-0 ms-2"
+                          style={{ fontSize: '0.7rem' }}
+                          onClick={() => void setQuestionStatus(m.id, m.answeredAt ? null : 'ANSWERED')}
+                        >
+                          {m.answeredAt ? t('questionReopen') : t('questionMarkAnswered')}
+                        </button>
+                        {!m.answeredAt && (
+                          <button
+                            type="button"
+                            className="chat-panel__q-btn btn btn-link p-0 ms-2 text-muted"
+                            style={{ fontSize: '0.7rem' }}
+                            onClick={() => void setQuestionStatus(m.id, m.dismissedAt ? null : 'DISMISSED')}
+                          >
+                            {m.dismissedAt ? t('questionRestore') : t('questionDismiss')}
+                          </button>
+                        )}
+                      </>
                     )}
                     {isModerator && token && (
                       <button
@@ -1302,12 +1519,34 @@ export default function ChatPanel({
             </div>
           )}
         </div>
+        {/* Marcare la domanda è un interruttore per il messaggio che si sta
+            scrivendo, non una modalità in cui si resta: si azzera dopo l'invio.
+            È un <button aria-pressed> e non una checkbox perché sta in una barra
+            di comandi accanto a emoji e allegato e deve comportarsi come loro;
+            lo stato lo annuncia aria-pressed, il significato l'etichetta
+            accessibile. Il segno non è solo colore: cambia anche il bordo. */}
+        <button
+          type="button"
+          className={`chat-panel__ask-btn${askAsQuestion ? ' is-on' : ''}`}
+          aria-pressed={askAsQuestion}
+          aria-label={t('askAsQuestionLabel')}
+          title={t('askAsQuestionLabel')}
+          onClick={() => setAskAsQuestion((v) => !v)}
+          disabled={sending}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </button>
         <input
           ref={inputRef}
           type="text"
           className="chat-panel__input"
           value={input}
-          placeholder={t('placeholder')}
+          placeholder={askAsQuestion ? t('placeholderQuestion') : t('placeholder')}
           onChange={(e) => setInput(e.target.value)}
           onPaste={onPaste}
           onKeyDown={(e) => {

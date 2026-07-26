@@ -559,12 +559,38 @@ model ChatMessage {
   attachmentMime     String? @map("attachment_mime")
   attachmentSize     BigInt? @map("attachment_size")
 
+  // Una domanda è un messaggio di chat marcato da CHI LO SCRIVE al momento
+  // dell'invio. Non è un sottosistema separato: il Q&A a canale proprio è
+  // stato spento perché in sala convivevano due posti dove scrivere e il
+  // pubblico usava solo la chat. Qui la domanda resta nel flusso — si
+  // distingue, si filtra e si archivia, senza chiedere a nessuno di cambiare
+  // pannello.
+  isQuestion Boolean @default(false) @map("is_question")
+
+  // Stato dato dal moderatore alla domanda. Due timestamp e non un enum:
+  // `isQuestion` è l'intento di CHI SCRIVE, lo stato è il giudizio di CHI
+  // MODERA — un enum unico fonderebbe due decisioni di due persone diverse e
+  // renderebbe indistinguibile "non è una domanda" da "domanda non ancora
+  // evasa". In più i timestamp danno gratis il "quando" all'archivio e sono lo
+  // stile già stabilito in questa tabella (hiddenAt, editedAt).
+  //
+  // "Scartata" NON riusa hiddenAt: nascondere cancella l'allegato, toglie il
+  // messaggio dalla conversazione per tutti ed esclude la riga da storia,
+  // export e archivio. Scartare una domanda deve lasciarla leggibile — chi
+  // l'ha scritta deve continuare a vedere il proprio messaggio.
+  answeredAt  DateTime? @map("answered_at")
+  dismissedAt DateTime? @map("dismissed_at")
+  moderatedBy String?   @map("moderated_by")
+
   createdAt DateTime @default(now()) @map("created_at")
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId, createdAt])
   @@index([replyToId])
+  // Serve la lente "domande": filtra per evento sui soli messaggi marcati.
+  // Senza, la vista fa una scansione di tutta la chat dell'evento.
+  @@index([eventId, isQuestion, createdAt])
   @@map("chat_messages")
   // Ultima modifica dell'autore (A6: "non posso modificare il messaggio se ho
   // fatto degli errori"). Null = mai modificato; la UI mostra "modificato".

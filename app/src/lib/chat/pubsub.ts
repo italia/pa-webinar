@@ -49,12 +49,23 @@ export interface ChatEnvelope {
   // missed a frame still converges. Never the sender ids: this envelope goes to
   // every reader of the chat.
   reactions?: Record<string, number>;
+  // Il messaggio è una domanda, dichiarata da chi l'ha scritto.
+  isQuestion?: boolean;
+  // Stato dato dal moderatore (ISO o null). Entrambi null = domanda aperta.
+  answeredAt?: string | null;
+  dismissedAt?: string | null;
   // What the subscriber should DO with this envelope:
   //   'delete'   → hide the message (moderation, live, no refresh needed)
   //   'edit'     → replace the text of an existing message
   //   'reaction' → replace that message's reaction tallies
+  //   'question' → replace lo stato (risposta/scartata) di una domanda
   // Absent = a new message to append.
-  op?: 'delete' | 'edit' | 'reaction';
+  //
+  // Aggiungere un `op` è sicuro durante un rolling update: un client della
+  // versione precedente non riconosce 'question', cade sul ramo finale e
+  // chiama upsertMessage, che deduplica per id — quindi ignora lo stato senza
+  // duplicare il messaggio, che ha già in lista.
+  op?: 'delete' | 'edit' | 'reaction' | 'question';
 }
 
 function channel(eventId: string): string {
