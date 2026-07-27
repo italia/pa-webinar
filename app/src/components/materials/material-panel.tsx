@@ -30,7 +30,11 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
   const { data, mutate } = useSWR<{ materials: MaterialData[] }>(
     `/api/events/${eventSlug}/materials`,
     fetcher,
-    { refreshInterval: 5000 },
+    // I materiali cambiano due o tre volte per evento, ma questa richiesta la
+    // ripete ogni partecipante: a cinque secondi sono dodici chiamate al minuto
+    // a testa per un dato quasi fermo. Trenta secondi restano dentro l'attesa
+    // accettabile per un allegato.
+    { refreshInterval: 30_000 },
   );
 
   const [showForm, setShowForm] = useState(false);

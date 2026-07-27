@@ -523,7 +523,11 @@ export default function LiveEventClient({
     if (phase !== 'ready') return;
     const pollInterval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/events/${event.slug}`);
+        // Qui serve solo lo `status`, e questa chiamata la ripete ogni
+        // partecipante ogni cinque secondi per tutta la durata dell'evento: la
+        // rotta dell'evento intero carica anche relazioni che nessuno guarda.
+        // `/lifecycle` è la stessa fonte, molto più leggera.
+        const res = await fetch(`/api/events/${event.slug}/lifecycle`);
         if (!res.ok) return;
         const data = await res.json();
         if (data.status === 'ENDED' && eventStatus !== 'ENDED') {
@@ -787,7 +791,7 @@ export default function LiveEventClient({
       // ended (→ closing screen) or it's a real drop (→ reconnect).
       void (async () => {
         try {
-          const res = await fetch(`/api/events/${event.slug}`);
+          const res = await fetch(`/api/events/${event.slug}/lifecycle`);
           // readyToClose may still land while the fetch is in flight.
           if (userHangupRef.current) {
             setPhase('ended');
