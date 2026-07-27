@@ -43,7 +43,7 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!parsed.success) {
     throw new ValidationError(
       'Validation failed',
-      parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
     );
   }
   const { value, accessToken, guestId } = parsed.data;
@@ -127,14 +127,12 @@ export const POST = withErrorHandling(async (request, context) => {
     _count: { _all: true },
   });
   const agreeCount = counts.find((c) => c.value === 'AGREE')?._count._all ?? 0;
-  const disagreeCount =
-    counts.find((c) => c.value === 'DISAGREE')?._count._all ?? 0;
+  const disagreeCount = counts.find((c) => c.value === 'DISAGREE')?._count._all ?? 0;
 
   pokeLivePanel(event.id, 'agenda');
 
-
   return Response.json(
     { ok: true, itemId, agreeCount, disagreeCount, myReaction: value },
-    { status: 201 },
+    { status: 201 }
   );
 });

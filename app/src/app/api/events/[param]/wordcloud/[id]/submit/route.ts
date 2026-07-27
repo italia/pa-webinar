@@ -55,7 +55,10 @@ export const POST = withErrorHandling(async (request, context) => {
   const body = await parseJsonBody(request);
   const parsed = submitWordCloudSchema.safeParse(body);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
   const { word, accessToken, guestId } = parsed.data;
@@ -100,7 +103,12 @@ export const POST = withErrorHandling(async (request, context) => {
     data: {
       roundId: round.id,
       registrationId: accessToken
-        ? (await prisma.registration.findUnique({ where: { accessToken }, select: { id: true } }))?.id
+        ? (
+            await prisma.registration.findUnique({
+              where: { accessToken },
+              select: { id: true },
+            })
+          )?.id
         : null,
       guestId: guestId || null,
       word: word.toLowerCase().trim(),
@@ -108,7 +116,6 @@ export const POST = withErrorHandling(async (request, context) => {
   });
 
   pokeLivePanel(event.id, 'wordcloud');
-
 
   return Response.json({ ok: true }, { status: 201 });
 });

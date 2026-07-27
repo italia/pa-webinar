@@ -37,7 +37,10 @@ export const PATCH = withErrorHandling(async (request, context) => {
   const body = await parseJsonBody(request);
   const parsed = updateQuestionStatusSchema.safeParse(body);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
   const question = await prisma.question.findUnique({
@@ -61,8 +64,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
   });
 
   deleteCacheByPrefix(`qa:${event.id}:`);
-    pokeLivePanel(event.id, 'qa');
-
+  pokeLivePanel(event.id, 'qa');
 
   return Response.json({
     id: updated.id,

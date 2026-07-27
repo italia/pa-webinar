@@ -22,7 +22,10 @@ export const POST = withErrorHandling(async (request, context) => {
   const body = await parseJsonBody(request);
   const parsed = pollVoteSchema.safeParse(body);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
   const { optionIndex, accessToken, guestId } = parsed.data;
@@ -96,7 +99,6 @@ export const POST = withErrorHandling(async (request, context) => {
   });
 
   pokeLivePanel(event.id, 'polls');
-
 
   return Response.json({ ok: true, optionIndex }, { status: 201 });
 });

@@ -1,9 +1,5 @@
 import { withErrorHandling } from '@/lib/api-handler';
-import {
-  NotFoundError,
-  UnauthorizedError,
-  ForbiddenError,
-} from '@/lib/errors';
+import { NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
@@ -37,7 +33,6 @@ export const PATCH = withErrorHandling(async (request, context) => {
   });
 
   pokeLivePanel(event.id, 'wordcloud');
-
 
   return Response.json({
     id: updated.id,

@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import useSWR from 'swr';
+
+import { useLivePush } from '@/hooks/use-live-state';
 import { Button, Icon, Badge, Input } from 'design-react-kit';
 
 interface WordCloudProps {
@@ -33,7 +36,20 @@ const BI_COLORS = [
 
 export default function WordCloud({ eventSlug, token, isModerator }: WordCloudProps) {
   const t = useTranslations('wordcloud');
-  const [round, setRound] = useState<RoundData | null>(null);
+  const pushLive = useLivePush();
+  // Su SWR e non su un `fetch` a mano perché è la cache che il canale sa
+  // toccare: l'avviso di cambiamento invalida per chiave, e uno stato locale
+  // sarebbe invisibile.
+  //
+  // Il giro di lettura NON si spegne del tutto nemmeno con il canale attivo: è
+  // la lettura stessa a chiudere un giro scaduto, e nessun lavoro periodico lo
+  // fa al posto suo. Trenta secondi bastano perché la chiusura avvenga senza
+  // tenere il server occupato.
+  const { data: round = null, mutate: mutateRound } = useSWR<RoundData>(
+    `/api/events/${eventSlug}/wordcloud`,
+    (url: string) => fetch(url).then((r) => (r.ok ? r.json() : null)),
+    { refreshInterval: pushLive ? 30_000 : 3000 },
+  );
   const [inputWord, setInputWord] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
@@ -42,27 +58,18 @@ export default function WordCloud({ eventSlug, token, isModerator }: WordCloudPr
   const [timeLeft, setTimeLeft] = useState(0);
 
   const fetchRound = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/events/${eventSlug}/wordcloud`);
-      if (res.ok) {
-        const data: RoundData = await res.json();
-        setRound(data);
+    await mutateRound();
+  }, [mutateRound]);
 
-        if (data.active && data.createdAt && data.duration) {
-          const elapsed = (Date.now() - new Date(data.createdAt).getTime()) / 1000;
-          setTimeLeft(Math.max(0, Math.round(data.duration - elapsed)));
-        } else {
-          setTimeLeft(0);
-        }
-      }
-    } catch { /* retry next poll */ }
-  }, [eventSlug]);
-
+  // Il tempo residuo si ricava dal giro corrente, non si tiene per conto suo.
   useEffect(() => {
-    fetchRound();
-    const interval = setInterval(fetchRound, 3000);
-    return () => clearInterval(interval);
-  }, [fetchRound]);
+    if (round?.active && round.createdAt && round.duration) {
+      const trascorso = (Date.now() - new Date(round.createdAt).getTime()) / 1000;
+      setTimeLeft(Math.max(0, Math.round(round.duration - trascorso)));
+    } else {
+      setTimeLeft(0);
+    }
+  }, [round]);
 
   useEffect(() => {
     if (timeLeft <= 0) return;

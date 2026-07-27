@@ -1,6 +1,13 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { mutate as globalMutate } from 'swr';
 
 import type { LiveEnvelope, LiveFlags, PokeablePanel } from '@/lib/live-state/pubsub';
@@ -72,28 +79,40 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
   const [pushLive, setPushLive] = useState(false);
   const [flags, setFlags] = useState<LiveFlags | null>(null);
   const [eventStatus, setEventStatus] = useState<string | null>(null);
+  /** Cosa ha dichiarato il server all'apertura: senza Redis non si riaccende. */
+  const pushDisponibileRef = useRef(false);
 
   const ultimoMessaggioRef = useRef<number>(0);
   const ultimoRinfrescoRef = useRef<Record<string, number>>({});
+  const codaRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const rinfresca = useCallback(
     (panel: PokeablePanel) => {
-      const adesso = Date.now();
-      const ultimo = ultimoRinfrescoRef.current[panel] ?? 0;
-      if (adesso - ultimo < THROTTLE_MS) return;
-      ultimoRinfrescoRef.current[panel] = adesso;
-
       const prefisso = prefissoChiave(eventSlug, panel);
+      const esegui = () => {
+        ultimoRinfrescoRef.current[panel] = Date.now();
+        delete codaRef.current[panel];
+        void globalMutate(
+          (chiave) => typeof chiave === 'string' && chiave.startsWith(prefisso)
+        );
+      };
+
+      // Già in coda: l'avviso appena arrivato è coperto da quella rilettura.
+      if (codaRef.current[panel]) return;
+
+      const adesso = Date.now();
+      const trascorso = adesso - (ultimoRinfrescoRef.current[panel] ?? 0);
       // Un piccolo scarto casuale: con trecento partecipanti in sala, senza,
       // rileggerebbero tutti nella stessa manciata di millisecondi.
       const scarto = Math.floor(Math.random() * 500);
-      setTimeout(() => {
-        void globalMutate(
-          (chiave) => typeof chiave === 'string' && chiave.startsWith(prefisso),
-        );
-      }, scarto);
+      // Il freno ha anche il bordo d'USCITA: un avviso che arriva dentro la
+      // finestra non si butta, si rimanda alla fine. Buttarlo significherebbe
+      // perdere l'ultima modifica di una raffica — e con il polling spento non
+      // c'è nessun secondo giro a rimediare.
+      const attesa = trascorso >= THROTTLE_MS ? scarto : THROTTLE_MS - trascorso + scarto;
+      codaRef.current[panel] = setTimeout(esegui, attesa);
     },
-    [eventSlug],
+    [eventSlug]
   );
 
   useEffect(() => {
@@ -104,7 +123,15 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
 
     sorgente.onmessage = (evento: MessageEvent<string>) => {
       ultimoMessaggioRef.current = Date.now();
-      let busta: LiveEnvelope | { op: 'hello'; pushAvailable: boolean };
+      // Il canale sta consegnando: se la guardia lo aveva dichiarato morto —
+      // o se una disconnessione lo aveva spento — questo è il segnale che è
+      // tornato. Senza, il push si spegneva una volta e non si riaccendeva
+      // più per tutta la durata dell'evento.
+      if (vivo && pushDisponibileRef.current) setPushLive(true);
+      let busta:
+        | LiveEnvelope
+        | { op: 'hello'; pushAvailable: boolean }
+        | { op: 'ping'; ts: string };
       try {
         busta = JSON.parse(evento.data);
       } catch {
@@ -112,9 +139,14 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
       }
 
       switch (busta.op) {
+        case 'ping':
+          // Solo battito: serve ad aggiornare il tempo dell'ultimo messaggio,
+          // fatto qui sopra.
+          break;
         case 'hello':
           // Senza Redis il server non pubblichera' mai nulla: restare in ascolto
           // spegnendo il polling lascerebbe i pannelli fermi per sempre.
+          pushDisponibileRef.current = busta.pushAvailable;
           if (vivo) setPushLive(busta.pushAvailable);
           break;
         case 'flags':
@@ -142,7 +174,8 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
     // riconnessione automatica non sempre se ne accorge. Si guarda solo a
     // scheda visibile: in secondo piano il browser rallenta i timer.
     const guardia = setInterval(() => {
-      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible')
+        return;
       const ultimo = ultimoMessaggioRef.current;
       if (ultimo > 0 && Date.now() - ultimo > SILENZIO_MASSIMO_MS && vivo) {
         setPushLive(false);
@@ -152,6 +185,9 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
     return () => {
       vivo = false;
       clearInterval(guardia);
+      // Le riletture in coda non devono partire a sala lasciata.
+      for (const timer of Object.values(codaRef.current)) clearTimeout(timer);
+      codaRef.current = {};
       sorgente.close();
       setPushLive(false);
     };

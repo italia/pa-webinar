@@ -110,6 +110,5 @@ export const POST = withErrorHandling(async (request, context) => {
 
   pokeLivePanel(event.id, 'agenda');
 
-
   return Response.json(item, { status: 201 });
 });

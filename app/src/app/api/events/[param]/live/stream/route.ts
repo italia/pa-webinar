@@ -24,15 +24,22 @@
 import { prisma } from '@/lib/db';
 import { eventParamWhere } from '@/lib/events/event-param';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
-import { subscribeLiveState, type LiveEnvelope } from '@/lib/live-state/pubsub';
+import {
+  subscribeLiveState,
+  LIVE_FLAG_FIELDS,
+  type LiveEnvelope,
+  type LiveFlags,
+} from '@/lib/live-state/pubsub';
 import { getRedis } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 // Lo stream resta aperto per la durata della call (Next pretende un letterale).
 export const maxDuration = 3600;
 
-// Commento di keepalive ogni 25s: il proxy chiude a 60s di silenzio, e qui il
-// silenzio è il caso normale.
+// Battito ogni 25s: il proxy chiude a 60s di silenzio, e qui il silenzio è il
+// caso normale. È un MESSAGGIO, non un commento: `EventSource` non consegna i
+// commenti a `onmessage`, quindi un battito commentato tiene viva la
+// connessione ma lascia il client convinto che il canale sia morto.
 const KEEPALIVE_MS = 25_000;
 
 export async function GET(
@@ -70,7 +77,12 @@ export async function GET(
 
   const stream = new ReadableStream({
     async start(controller) {
-      const invia = (envelope: LiveEnvelope | { op: 'hello'; pushAvailable: boolean }) => {
+      const invia = (
+        envelope:
+          | LiveEnvelope
+          | { op: 'hello'; pushAvailable: boolean }
+          | { op: 'ping'; ts: string },
+      ) => {
         const payload = `event: message\n` + `data: ${JSON.stringify(envelope)}\n\n`;
         try {
           controller.enqueue(encoder.encode(payload));
@@ -83,16 +95,15 @@ export async function GET(
       controller.enqueue(encoder.encode(`: connected to live:${eventId}\n\n`));
 
       const ora = new Date().toISOString();
-      invia({ op: 'hello', pushAvailable: getRedis() !== null });
+      // Non basta che il client esista: `publishLiveState` pubblica solo a
+      // connessione pronta, quindi annunciare la disponibilità sulla sola
+      // esistenza spegnerebbe il polling proprio mentre Redis è irraggiungibile.
+      invia({ op: 'hello', pushAvailable: getRedis()?.status === 'ready' });
       invia({
         op: 'flags',
-        flags: {
-          qaEnabled: event.qaEnabled,
-          chatEnabled: event.chatEnabled,
-          agendaEnabled: event.agendaEnabled,
-          wordCloudEnabled: event.wordCloudEnabled,
-          recordingEnabled: event.recordingEnabled,
-        },
+        flags: Object.fromEntries(
+          LIVE_FLAG_FIELDS.map((campo) => [campo, event[campo]]),
+        ) as LiveFlags,
         ts: ora,
       });
       invia({ op: 'eventStatus', status: event.status, ts: ora });
@@ -118,11 +129,7 @@ export async function GET(
         return;
       }
       keepalive = setInterval(() => {
-        try {
-          controller.enqueue(encoder.encode(`: keepalive\n\n`));
-        } catch {
-          /* stream chiuso */
-        }
+        invia({ op: 'ping', ts: new Date().toISOString() });
       }, KEEPALIVE_MS);
     },
     cancel() {

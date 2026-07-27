@@ -27,14 +27,23 @@ export const POST = withErrorHandling(async (request, context) => {
   const body = await parseJsonBody(request);
   const parsed = createWordCloudRoundSchema.safeParse(body);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
-  // Chiusura del giro precedente e apertura del nuovo nella STESSA
-  // transazione: separate, due aperture ravvicinate (doppio click, due schede
-  // del moderatore) potevano incrociarsi e lasciare due giri aperti insieme —
-  // e la lettura ne mostra uno solo, quindi le parole finivano nell'altro.
+  // Due aperture ravvicinate (doppio click, due schede del moderatore) possono
+  // incrociarsi e lasciare due giri aperti: la lettura ne mostra uno solo, e le
+  // parole di chi ha in mano l'altro spariscono senza errore.
+  //
+  // La sola transazione NON basta: con l'isolamento predefinito di PostgreSQL
+  // nessuna delle due vede il giro non ancora confermato dell'altra, quindi
+  // entrambe chiudono il vecchio e ne creano uno nuovo. Si serializza prendendo
+  // il lucchetto sulla riga dell'evento: la seconda apertura aspetta la prima e
+  // ne chiude il giro.
   const round = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT id FROM events WHERE id = ${event.id}::uuid FOR UPDATE`;
     await tx.wordCloudRound.updateMany({
       where: { eventId: event.id, status: 'OPEN' },
       data: { status: 'CLOSED', closedAt: new Date() },
@@ -50,7 +59,6 @@ export const POST = withErrorHandling(async (request, context) => {
 
   pokeLivePanel(event.id, 'wordcloud');
 
-
   return Response.json(
     {
       id: round.id,
@@ -60,7 +68,7 @@ export const POST = withErrorHandling(async (request, context) => {
       createdAt: round.createdAt.toISOString(),
       words: [],
     },
-    { status: 201 },
+    { status: 201 }
   );
 });
 

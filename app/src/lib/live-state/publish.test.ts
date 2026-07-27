@@ -1,10 +1,20 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('./pubsub', () => ({ publishLiveState: vi.fn().mockResolvedValue(1) }));
+// Solo la pubblicazione è finta: l'elenco dei flag arriva da quello vero, così
+// il test resta legato alla fonte unica invece di ricopiarla.
+vi.mock('./pubsub', async (originale) => {
+  const vero = (await originale()) as Record<string, unknown>;
+  return { ...vero, publishLiveState: vi.fn().mockResolvedValue(1) };
+});
 
 import { publishLiveState, type LiveEnvelope } from './pubsub';
 
-import { pokeLivePanel, publishEventStatus, publishFlagsIfChanged } from './publish';
+import {
+  pokeLivePanel,
+  publishEventStatus,
+  publishFlagsIfChanged,
+  __resetPokeCoalescing,
+} from './publish';
 
 const publish = publishLiveState as unknown as ReturnType<typeof vi.fn>;
 
@@ -56,7 +66,10 @@ describe('publishFlagsIfChanged', () => {
 });
 
 describe('pokeLivePanel', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    __resetPokeCoalescing();
+  });
 
   it('annuncia il pannello e nient’altro', () => {
     // Il contenuto NON viaggia: la stessa rotta risponde diversamente a
@@ -78,8 +91,49 @@ describe('publishEventStatus', () => {
   });
 });
 
+describe('accorpamento degli avvisi', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    __resetPokeCoalescing();
+    vi.useFakeTimers();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('una raffica diventa due avvisi: subito e a fine finestra', () => {
+    // Venti voti in un secondo sono un solo cambiamento per chi guarda, ma
+    // l'ULTIMO va comunque annunciato: con il polling spento, senza quel
+    // secondo avviso il conteggio finale non arriverebbe mai.
+    for (let i = 0; i < 20; i++) pokeLivePanel('evt-1', 'polls');
+    expect(publish).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(1_100);
+    expect(publish).toHaveBeenCalledTimes(2);
+  });
+
+  it('un avviso isolato non ne genera un secondo a vuoto', () => {
+    pokeLivePanel('evt-1', 'qa');
+    vi.advanceTimersByTime(1_100);
+    expect(publish).toHaveBeenCalledTimes(1);
+  });
+
+  it('pannelli diversi non si accorpano fra loro', () => {
+    pokeLivePanel('evt-1', 'qa');
+    pokeLivePanel('evt-1', 'polls');
+    expect(publish).toHaveBeenCalledTimes(2);
+  });
+
+  it('eventi diversi non si accorpano fra loro', () => {
+    pokeLivePanel('evt-1', 'qa');
+    pokeLivePanel('evt-2', 'qa');
+    expect(publish).toHaveBeenCalledTimes(2);
+  });
+});
+
 describe('confine di ciò che viaggia sul canale', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    __resetPokeCoalescing();
+  });
 
   it('nessuna busta porta dati per-utente o dipendenti dal ruolo', () => {
     // È l'unica difesa automatica contro la regressione che renderebbe

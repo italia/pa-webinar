@@ -9,6 +9,7 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { getRedis } from '@/lib/redis';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createQuestionSchema } from '@/lib/validation/schemas';
 import { tryDecryptPII } from '@/lib/crypto/pii';
@@ -72,9 +73,16 @@ export const GET = withErrorHandling(async (request, context) => {
   // from ~100/s to ~1 every 2s per event.
   // Cache stores question data WITHOUT per-user hasUpvoted; that's
   // resolved per-request from a lightweight upvote lookup.
-  const cacheKey = isModerator
-    ? null
-    : `qa:${event.id}:${statusFilter ?? 'all'}`;
+  //
+  // La cache vale SOLO quando il push non è disponibile, cioè quando i client
+  // stanno ancora interrogando ogni tre secondi. Con il push attivo i client
+  // rileggono subito dopo una scrittura e non c'è un secondo giro a rimediare:
+  // un processo diverso da quello che ha scritto risponderebbe con l'elenco di
+  // prima, e quella risposta resterebbe sullo schermo. L'invalidazione locale
+  // non basta, perché ogni richiesta può finire su una replica qualsiasi.
+  const pushAttivo = getRedis()?.status === 'ready';
+  const cacheKey =
+    isModerator || pushAttivo ? null : `qa:${event.id}:${statusFilter ?? 'all'}`;
 
   interface CachedQuestion {
     id: string;
@@ -101,11 +109,7 @@ export const GET = withErrorHandling(async (request, context) => {
   if (!cachedQuestions) {
     const questions = await prisma.question.findMany({
       where,
-      orderBy: [
-        { status: 'asc' },
-        { upvoteCount: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ status: 'asc' }, { upvoteCount: 'desc' }, { createdAt: 'desc' }],
     });
 
     cachedQuestions = questions.map((q) => ({
@@ -161,7 +165,8 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const body = await parseJsonBody(request);
 
-  const bodyObj = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+  const bodyObj =
+    body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
   const { accessToken, guestName, ...rest } = bodyObj;
   const token =
     (typeof accessToken === 'string' ? accessToken : undefined) ??
@@ -195,7 +200,10 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const parsed = createQuestionSchema.safeParse(rest);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
   const rlKey = registrationId
@@ -216,8 +224,7 @@ export const POST = withErrorHandling(async (request, context) => {
   });
 
   deleteCacheByPrefix(`qa:${event.id}:`);
-    pokeLivePanel(event.id, 'qa');
-
+  pokeLivePanel(event.id, 'qa');
 
   return Response.json(
     {
@@ -231,6 +238,6 @@ export const POST = withErrorHandling(async (request, context) => {
       highlightedAt: null,
       answeredAt: null,
     },
-    { status: 201 },
+    { status: 201 }
   );
 });

@@ -27,9 +27,7 @@ export const POST = withErrorHandling(async (request, context) => {
     // body is optional, token can be in query
   }
 
-  const token =
-    accessToken ??
-    new URL(request.url).searchParams.get('token');
+  const token = accessToken ?? new URL(request.url).searchParams.get('token');
 
   if (!token) throw new UnauthorizedError('Access token required');
 
@@ -76,7 +74,6 @@ export const POST = withErrorHandling(async (request, context) => {
     deleteCacheByPrefix(`qa:${event.id}:`);
     pokeLivePanel(event.id, 'qa');
 
-
     return Response.json({
       upvoted: false,
       upvoteCount: Math.max(0, updated.upvoteCount),
@@ -94,8 +91,7 @@ export const POST = withErrorHandling(async (request, context) => {
   ]);
 
   deleteCacheByPrefix(`qa:${event.id}:`);
-    pokeLivePanel(event.id, 'qa');
-
+  pokeLivePanel(event.id, 'qa');
 
   return Response.json({
     upvoted: true,

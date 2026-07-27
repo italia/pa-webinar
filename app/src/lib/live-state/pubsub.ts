@@ -42,13 +42,18 @@ export type PokeablePanel = 'qa' | 'polls' | 'agenda' | 'wordcloud';
  * due cose devono restare identiche — un flag qui e non lì arriverebbe al
  * client in una forma che il polling di riserva non sa produrre.
  */
-export interface LiveFlags {
-  qaEnabled: boolean;
-  chatEnabled: boolean;
-  agendaEnabled: boolean;
-  wordCloudEnabled: boolean;
-  recordingEnabled: boolean;
-}
+export const LIVE_FLAG_FIELDS = [
+  'qaEnabled',
+  'chatEnabled',
+  'agendaEnabled',
+  'wordCloudEnabled',
+  'recordingEnabled',
+] as const;
+
+export type LiveFlagField = (typeof LIVE_FLAG_FIELDS)[number];
+
+/** Derivato dall'elenco: un flag si aggiunge in un posto solo. */
+export type LiveFlags = Record<LiveFlagField, boolean>;
 
 export type LiveEnvelope =
   | { op: 'flags'; flags: LiveFlags; ts: string }
@@ -100,7 +105,7 @@ function smista(receivedChannel: string, payload: string): void {
  */
 export async function publishLiveState(
   eventId: string,
-  envelope: LiveEnvelope,
+  envelope: LiveEnvelope
 ): Promise<number> {
   const redis = getRedis();
   if (!redis || redis.status !== 'ready') return 0;
@@ -117,7 +122,7 @@ export async function publishLiveState(
  */
 export async function subscribeLiveState(
   eventId: string,
-  onMessage: (envelope: LiveEnvelope) => void,
+  onMessage: (envelope: LiveEnvelope) => void
 ): Promise<() => void> {
   const sub = getRedisSubscriber();
   if (!sub) return () => {};
@@ -142,9 +147,17 @@ export async function subscribeLiveState(
     const insieme = registro.get(ch);
     if (!insieme) return;
     insieme.delete(onMessage);
-    // Il canale resta sottoscritto su Redis: altri stream dello stesso pod
-    // possono condividerlo, e Redis pulisce da sé i canali senza iscritti.
-    if (insieme.size === 0) registro.delete(ch);
+    if (insieme.size > 0) return;
+
+    // Ultimo ascoltatore locale andato via: si lascia anche il canale su Redis.
+    // Restare iscritti costerebbe traffico verso questo processo per ogni
+    // evento a cui ha assistito una volta sola, e la sottoscrizione non scade
+    // da sé finché la connessione resta aperta — che è per sempre.
+    registro.delete(ch);
+    void sub.unsubscribe(ch).catch(() => {
+      // Se la disiscrizione fallisce si riceveranno messaggi senza ascoltatori:
+      // vengono scartati dal registro, quindi è innocuo.
+    });
   };
 }
 

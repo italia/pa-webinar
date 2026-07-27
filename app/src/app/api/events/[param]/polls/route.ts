@@ -64,8 +64,8 @@ export const GET = withErrorHandling(async (request, context) => {
     const options = poll.options as string[];
     const totalVotes = poll._count.votes;
 
-    const optionCounts = options.map((_, idx) =>
-      poll.votes.filter((v) => v.optionIndex === idx).length,
+    const optionCounts = options.map(
+      (_, idx) => poll.votes.filter((v) => v.optionIndex === idx).length
     );
 
     const hasVoted = registrationId
@@ -73,7 +73,7 @@ export const GET = withErrorHandling(async (request, context) => {
       : false;
 
     const votedOptionIndex = registrationId
-      ? poll.votes.find((v) => v.registrationId === registrationId)?.optionIndex ?? null
+      ? (poll.votes.find((v) => v.registrationId === registrationId)?.optionIndex ?? null)
       : null;
 
     const showResults = isModerator || poll.status !== 'OPEN';
@@ -111,7 +111,10 @@ export const POST = withErrorHandling(async (request, context) => {
   const body = await parseJsonBody(request);
   const parsed = createPollSchema.safeParse(body);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
   const poll = await prisma.poll.create({
@@ -123,7 +126,6 @@ export const POST = withErrorHandling(async (request, context) => {
   });
 
   pokeLivePanel(event.id, 'polls');
-
 
   return Response.json(
     {
@@ -138,6 +140,6 @@ export const POST = withErrorHandling(async (request, context) => {
       createdAt: poll.createdAt.toISOString(),
       closedAt: null,
     },
-    { status: 201 },
+    { status: 201 }
   );
 });
