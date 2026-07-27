@@ -2,8 +2,9 @@ name: Build patched jitsi/web image
 
 # Builds ghcr.io/italia/pa-webinar-jitsi-web — a copy of jitsi/web:stable-10741
 # carrying our in-place patches (see infra/jitsi-web-patched/Dockerfile):
-#   • F18  — noise-suppression AudioContext forced to 48 kHz;
-#   • #3   — flying reaction emoji set to pointer-events:none;
+#   • noise suppression — AudioContext forced to 48 kHz, so a microphone at a
+#     different sample rate is no longer silenced;
+#   • flying reaction emoji set to pointer-events:none;
 #   • self-view — an explicit config.disableSelfView=false overrides the value
 #     stored in the user's browser, so a participant stuck with a hidden self
 #     view recovers instead of needing an incognito window.

@@ -1,6 +1,6 @@
 # Patched jitsi/web — forces the rnnoise noise-suppression AudioContext to 48 kHz.
 #
-# WHY (F18): jitsi/web:stable-10741 creates the noise-suppression AudioContext
+# WHY: jitsi/web:stable-10741 creates the noise-suppression AudioContext
 # with no explicit sampleRate, so it adopts the hardware default rate. When that
 # is not 48 kHz (e.g. 44.1 kHz), the NON-resampling rnnoise worklet processes the
 # samples as if they were 48 kHz and garbles / SILENCES the microphone. The bug

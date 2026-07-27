@@ -62,7 +62,7 @@ ENV NEXT_PUBLIC_JITSI_DOMAIN=$NEXT_PUBLIC_JITSI_DOMAIN
 ENV NEXT_PUBLIC_WATERMARK_URL=$NEXT_PUBLIC_WATERMARK_URL
 ENV NEXT_PUBLIC_DEFAULT_LOCALE=$NEXT_PUBLIC_DEFAULT_LOCALE
 
-# F18: EMPTY = safe default (advanced rnnoise force-OFF, working around stock
+# EMPTY = safe default (advanced rnnoise force-OFF, working around stock
 # jitsi/web:stable-10741 silencing non-48kHz mics). Set to "false" to ENABLE
 # rnnoise — only valid when the served jitsi/web image is the patched build
 # (infra/jitsi-web-patched, 48 kHz noise-suppression context), and only after
@@ -130,6 +130,19 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+
+# Identità della build, ridichiarata qui perché ARG vale per uno stage solo.
+# Nello stage di compilazione questi valori finiscono nel bundle del browser;
+# senza ripeterli qui il processo in esecuzione non sa quale versione sia, e
+# /api/health non ha modo di dichiararla a chi controlla il servizio.
+ARG NEXT_PUBLIC_BUILD_VERSION=dev
+ARG NEXT_PUBLIC_BUILD_SHA=
+ARG NEXT_PUBLIC_BUILD_CHANNEL=dev
+ARG NEXT_PUBLIC_BUILD_DATE=
+ENV NEXT_PUBLIC_BUILD_VERSION=$NEXT_PUBLIC_BUILD_VERSION
+ENV NEXT_PUBLIC_BUILD_SHA=$NEXT_PUBLIC_BUILD_SHA
+ENV NEXT_PUBLIC_BUILD_CHANNEL=$NEXT_PUBLIC_BUILD_CHANNEL
+ENV NEXT_PUBLIC_BUILD_DATE=$NEXT_PUBLIC_BUILD_DATE
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 --ingroup nodejs nextjs
