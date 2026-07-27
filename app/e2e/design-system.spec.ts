@@ -19,6 +19,18 @@ const TRASPARENTE = /^(transparent|rgba\(0,\s*0,\s*0,\s*0\))$/;
 test('la fascia istituzionale ha uno sfondo pieno', async ({ page }) => {
   await page.goto('/it');
 
+  // Il difetto esiste solo nel CSS minificato, cioè in una build di
+  // produzione. In sviluppo il foglio di stile non passa dal minificatore e
+  // questa prova passerebbe comunque, anche con la riparazione staccata: in
+  // quel caso si salta dichiarandolo, invece di dare una conferma che non vale.
+  const href = await page.locator('link[rel="stylesheet"]').first().getAttribute('href');
+  const foglio = href ? await (await page.request.get(href)).text() : '';
+  const minificato = foglio.length > 0 && !/\n\s{2}/.test(foglio);
+  test.skip(
+    !minificato,
+    'foglio di stile non minificato (build di sviluppo): qui il difetto non può manifestarsi',
+  );
+
   const fascia = page.locator('.it-header-slim-wrapper').first();
   await fascia.waitFor({ state: 'attached' });
 

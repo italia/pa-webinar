@@ -256,6 +256,14 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // Inviti: nome, email cifrata, HMAC dell'email e il token del link di
+        // registrazione precompilata. Stessa trappola della cascade, e un
+        // invito non accettato non ha piu' alcuna ragione di esistere quando
+        // l'evento a cui invitava e' scaduto.
+        const invitationsDeleted = await tx.eventInvitation.deleteMany({
+          where: { eventId: evt.id },
+        });
+
         // Named moderator/speaker grants: `name` and `email` are encrypted PII
         // and `token` is a durable magic-link credential. Same cascade trap as
         // the chat above — the event row survives as ARCHIVED, so nothing else
@@ -314,6 +322,7 @@ export const GET = withErrorHandling(async (request) => {
           reactions: reactionsDeleted.count,
           agendaReactions: agendaReactionsDeleted.count,
           agendaItems: agendaItemsDeleted.count,
+          invitations: invitationsDeleted.count,
           moderatorGrants: moderatorGrantsDeleted.count,
           recordingTracks: recordingTracksDeleted.count,
           callSessionsScrubbed: callSessionsScrubbed.count,

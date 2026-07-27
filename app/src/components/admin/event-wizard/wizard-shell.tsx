@@ -1159,13 +1159,30 @@ function mapAdhocToApi(
   index: number,
   defaultLocale: string,
 ) {
-  const prompt: Record<string, string> = { [defaultLocale]: draft.prompt.trim() };
+  // Se il testo visibile è ancora quello caricato dal database, la domanda non
+  // è stata riscritta: si rimandano indietro tutte le lingue, non solo quella
+  // mostrata. Se invece è stato modificato, vince ciò che l'admin ha scritto.
+  const typed = draft.prompt.trim();
+  const untouched =
+    draft.original !== undefined &&
+    (draft.original.prompt[defaultLocale] ?? '').trim() === typed;
+  const prompt: Record<string, string> = untouched
+    ? draft.original!.prompt
+    : { [defaultLocale]: typed };
   const base: Record<string, unknown> = {
     prompt,
     type: draft.type,
     required: draft.required,
     sortOrder: index,
   };
+  if (untouched) {
+    // Il wizard non ha campi per le etichette agli estremi di una scala:
+    // ometterle qui le cancellerebbe.
+    if (draft.original!.scaleMinLabel !== undefined)
+      base.scaleMinLabel = draft.original!.scaleMinLabel;
+    if (draft.original!.scaleMaxLabel !== undefined)
+      base.scaleMaxLabel = draft.original!.scaleMaxLabel;
+  }
   if (draft.type === 'SINGLE_CHOICE' || draft.type === 'MULTI_CHOICE') {
     base.options = draft.options
       .map((o) => o.trim())
@@ -1188,12 +1205,17 @@ async function submitQuestionnaire(
   if (block.templateIds.length === 0 && block.adhocQuestions.length === 0) {
     return;
   }
+  // Questi quattro campi il wizard non li mostra. Per un questionario che
+  // esiste già si rimandano indietro quelli che ha: scrivere i predefiniti
+  // sopra un titolo curato, o azzerare l'obbligatorietà, sarebbe una perdita
+  // silenziosa — e succede a ogni salvataggio, anche quando l'admin voleva
+  // solo aggiungere una domanda.
   const body = {
     placement,
-    title: PLACEMENT_TITLES[placement],
-    description: {},
-    required: false,
-    allowEdit: false,
+    title: block.original?.title ?? PLACEMENT_TITLES[placement],
+    description: block.original?.description ?? {},
+    required: block.original?.required ?? false,
+    allowEdit: block.original?.allowEdit ?? false,
     templateIds: block.templateIds,
     adhocItems: block.adhocQuestions.map((q, i) =>
       mapAdhocToApi(q, i, defaultLocale),
@@ -1209,6 +1231,38 @@ async function submitQuestionnaire(
   ).catch(() => {
     /* best-effort; admin can fix from the questionnaires page */
   });
+}
+
+/**
+ * Edit mode: apply what the admin did to the questionnaire, and nothing else.
+ *
+ * Three outcomes, because the PUT alone can't express all of them: untouched →
+ * don't write at all (it would reset what the wizard doesn't show); emptied →
+ * DELETE, because the PUT ignores an empty body and the removal would be
+ * swallowed silently; otherwise → the usual upsert.
+ */
+async function saveQuestionnaire(
+  eventId: string,
+  placement: Placement,
+  block: QuestionnaireBlock,
+  initial: QuestionnaireBlock | null,
+  defaultLocale: string,
+): Promise<void> {
+  if (!questionnaireChanged(block, initial)) return;
+
+  const emptied =
+    block.templateIds.length === 0 && block.adhocQuestions.length === 0;
+  if (emptied) {
+    if (!initial) return;
+    await fetch(`/api/admin/events/${eventId}/questionnaires/${placement}`, {
+      method: 'DELETE',
+    }).catch(() => {
+      /* best-effort, come il resto del fan-out */
+    });
+    return;
+  }
+
+  await submitQuestionnaire(eventId, placement, block, defaultLocale);
 }
 
 // ── Edit-mode fan-out: diff against the initial snapshot ────────────────────
@@ -1353,22 +1407,18 @@ async function fanoutEditDiff(
   // questionnaire from the fields the wizard knows, so saving an untouched one
   // would reset the title, the mandatory flag and any multilingual text the
   // wizard doesn't show (see questionnaire-diff for the full reasoning).
-  if (
-    questionnaireChanged(form.preEventQuestionnaire, initial.preEventQuestionnaire)
-  ) {
-    await submitQuestionnaire(
-      eventId,
-      'PRE_REGISTRATION',
-      form.preEventQuestionnaire,
-      defaultLocale,
-    );
-  }
-  if (questionnaireChanged(form.postEventQuestionnaire, initial.postEventQuestionnaire)) {
-    await submitQuestionnaire(
-      eventId,
-      'POST_EVENT',
-      form.postEventQuestionnaire,
-      defaultLocale,
-    );
-  }
+  await saveQuestionnaire(
+    eventId,
+    'PRE_REGISTRATION',
+    form.preEventQuestionnaire,
+    initial.preEventQuestionnaire,
+    defaultLocale,
+  );
+  await saveQuestionnaire(
+    eventId,
+    'POST_EVENT',
+    form.postEventQuestionnaire,
+    initial.postEventQuestionnaire,
+    defaultLocale,
+  );
 }

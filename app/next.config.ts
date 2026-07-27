@@ -96,9 +96,10 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: path.join(__dirname, '..'),
 
-  webpack(config, { webpack, dev }) {
-    // Dev doesn't minify, so there's nothing to repair there.
-    if (!dev) {
+  webpack(config, { webpack, dev, isServer }) {
+    // Dev doesn't minify, so there's nothing to repair there; the server and
+    // edge compilations emit no client stylesheet at all.
+    if (!dev && !isServer) {
       config.plugins.push({
         apply: (compiler: WebpackCompiler) =>
           compiler.hooks.compilation.tap(REPAIR_PLUGIN, (compilation) =>

@@ -29,6 +29,20 @@ export type AdhocQuestionType =
   | 'LIKERT'
   | 'OPEN_TEXT';
 
+/**
+ * Il questionario com'è nel database, per le parti che questa schermata non
+ * mostra: le altre lingue, le etichette agli estremi delle scale, il titolo,
+ * l'obbligatorietà. Il wizard le trasporta senza toccarle, così salvare non
+ * cancella quello che non si è potuto nemmeno vedere — capita a un evento
+ * copiato, che eredita un questionario curato altrove.
+ */
+export interface AdhocQuestionOriginal {
+  prompt: Record<string, string>;
+  options?: unknown;
+  scaleMinLabel?: unknown;
+  scaleMaxLabel?: unknown;
+}
+
 export interface AdhocQuestionDraft {
   prompt: string;
   type: AdhocQuestionType;
@@ -36,11 +50,22 @@ export interface AdhocQuestionDraft {
   scaleMin: number | null;
   scaleMax: number | null;
   required: boolean;
+  /** Presente solo per una domanda caricata dal database. */
+  original?: AdhocQuestionOriginal;
+}
+
+export interface QuestionnaireOriginal {
+  title: unknown;
+  description: unknown;
+  required: boolean;
+  allowEdit: boolean;
 }
 
 export interface QuestionnaireBlock {
   templateIds: string[];
   adhocQuestions: AdhocQuestionDraft[];
+  /** Presente solo per un questionario già esistente. */
+  original?: QuestionnaireOriginal;
 }
 
 export interface Step4Value {

@@ -185,6 +185,7 @@ Ogni evento ha un periodo di conservazione configurabile (`dataRetentionDays`, d
 - **Registrazioni dei partecipanti**: email crittografata, nome, hash, token di accesso.
 - **Domande Q&A**: testo delle domande e voti.
 - **Chat dell'evento**: nomi dei mittenti e testo dei messaggi, allegati compresi.
+- **Inviti**: nome, email cifrata e il link di registrazione precompilata.
 - **Concessioni nominali di moderatore e relatore**: nome ed email cifrati e il
   relativo link di accesso. L'elenco dei relatori mostrato sulla pagina pubblica
   dell'evento non dipende da queste righe e resta leggibile.

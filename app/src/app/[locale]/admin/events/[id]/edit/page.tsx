@@ -34,6 +34,8 @@ function adhocFromDb(
     options: unknown;
     scaleMin: number | null;
     scaleMax: number | null;
+    scaleMinLabel?: unknown;
+    scaleMaxLabel?: unknown;
     required: boolean;
   },
   defaultLocale: string,
@@ -66,6 +68,15 @@ function adhocFromDb(
     scaleMin: item.scaleMin,
     scaleMax: item.scaleMax,
     required: item.required,
+    // Trasportati senza modifiche: il wizard mostra una lingua sola e non ha
+    // campo per le etichette delle scale. Se la domanda non viene riscritta,
+    // il salvataggio li rimanda indietro come sono.
+    original: {
+      prompt: promptMap,
+      options: item.options ?? undefined,
+      scaleMinLabel: item.scaleMinLabel ?? undefined,
+      scaleMaxLabel: item.scaleMaxLabel ?? undefined,
+    },
   };
 }
 
@@ -120,6 +131,12 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     ? {
         templateIds: pre.templates.map((l) => l.templateId),
         adhocQuestions: pre.adhocItems.map((i) => adhocFromDb(i, defaultLocale)),
+        original: {
+          title: pre.title,
+          description: pre.description,
+          required: pre.required,
+          allowEdit: pre.allowEdit,
+        },
       }
     : null;
   const postBlock: QuestionnaireBlock | null = post
@@ -128,6 +145,12 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         adhocQuestions: post.adhocItems.map((i) =>
           adhocFromDb(i, defaultLocale),
         ),
+        original: {
+          title: post.title,
+          description: post.description,
+          required: post.required,
+          allowEdit: post.allowEdit,
+        },
       }
     : null;
 

@@ -10,17 +10,15 @@
  * Il risultato, `rgb(0,35%,70%)`, è invalido e il browser scarta l'intera
  * dichiarazione.
  *
- * COSA ROMPEVA. Ogni colore con un canale a zero, cioè la famiglia del blu
- * istituzionale (canale rosso 0). In produzione erano 102 dichiarazioni perse,
- * tra cui lo sfondo della fascia in cima al sito, che si vedeva bianca.
+ * COSA COLPISCE. Ogni colore con un canale a zero, cioè la famiglia del blu
+ * istituzionale (canale rosso 0), a partire dallo sfondo della fascia in cima
+ * al sito, che senza questa riparazione si vede bianca.
  *
- * DA DOVE ARRIVA. Non da un nostro cambiamento, ma dalla serializzazione di
- * Sass, che si è spostata sulle percentuali. Sullo stesso ingresso
- * (`color.mix(#0066cc, black, 90%)`): sass 1.77 dava `#005cb8`, sass 1.89
- * `rgb(0, 91.8, 183.6)` — entrambe forme che il minificatore non può rovinare —
- * e sass 1.101 dà `rgb(0%, 36%, 72%)`. Vincolare la versione di Sass sarebbe
- * rimandare il problema: quell'output è legittimo, ed è il minificatore a
- * trattarlo male.
+ * PERCHÉ NON SI VINCOLA LA VERSIONE DI SASS. Le percentuali sono la forma in cui
+ * Sass serializza i colori con canali frazionari: è output legittimo, ed è il
+ * minificatore a trattarlo male. Le versioni precedenti emettevano esadecimali
+ * o numeri interi, forme che il minificatore non può rovinare — restare
+ * indietro sarebbe solo rimandare.
  *
  * PERCHÉ SI RIPARA QUI E NON PRIMA. Le alternative a monte costano molto di più:
  * inseguire la serializzazione di Sass a ogni aggiornamento, oppure aggiungere
@@ -50,8 +48,12 @@
  */
 const RGB_CALL = /\brgba?\(([^()]*)\)/gi;
 
-/** Una percentuale semplice. */
-const PERCENTAGE = /^\d+(?:\.\d+)?%$/;
+/**
+ * Una percentuale semplice. Ammette anche la forma senza zero iniziale
+ * (`.4%`): è come il minificatore accorcia i decimali, e non riconoscerla
+ * lascerebbe irreparabili proprio le tinte più scure.
+ */
+const PERCENTAGE = /^(?:\d+(?:\.\d+)?|\.\d+)%$/;
 
 /** Uno zero senza unità: l'unico danno che il minificatore produce. */
 const UNITLESS_ZERO = /^0(?:\.0+)?$/;

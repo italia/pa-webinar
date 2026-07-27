@@ -83,10 +83,23 @@ function suffixTitle(title: LocalizedField): Record<string, string> {
 const duplicateOptionsSchema = z
   .object({
     nextOccurrence: z.boolean().optional(),
-    startsAt: z.string().datetime({ offset: true }).optional(),
-    endsAt: z.string().datetime({ offset: true }).optional(),
+    // `local: true` accetta anche un ISO senza fuso (`2026-09-01T10:00:00`):
+    // rifiutarlo restringerebbe ciò che l'endpoint accettava prima.
+    startsAt: z.string().datetime({ offset: true, local: true }).optional(),
+    endsAt: z.string().datetime({ offset: true, local: true }).optional(),
   })
-  .strict();
+  .strict()
+  // Le date si validano anche fra loro, non solo una per una: da sole
+  // passavano richieste che l'endpoint poi ignorava, rispondendo 201 con le
+  // date dell'originale — cioè programmando la copia dove nessuno ha chiesto.
+  .refine((o) => !(o.endsAt && !o.startsAt), {
+    message: 'endsAt requires startsAt',
+    path: ['startsAt'],
+  })
+  .refine((o) => !(o.startsAt && o.endsAt && new Date(o.endsAt) <= new Date(o.startsAt)), {
+    message: 'endsAt must be after startsAt',
+    path: ['endsAt'],
+  });
 
 type DuplicateOptions = z.infer<typeof duplicateOptionsSchema>;
 
@@ -127,15 +140,16 @@ function resolveSchedule(
 ): { startsAt: Date; endsAt: Date } {
   const durationMs = source.endsAt.getTime() - source.startsAt.getTime();
 
-  const explicitStart = options.startsAt ? new Date(options.startsAt) : null;
-  if (explicitStart && !Number.isNaN(explicitStart.getTime())) {
-    const explicitEnd = options.endsAt ? new Date(options.endsAt) : null;
+  // Le date arrivano già validate dallo schema: sono ISO parsabili, `endsAt`
+  // non viaggia mai da solo ed è sempre successivo a `startsAt`. Qui resta solo
+  // la scelta della durata quando la fine non è stata indicata.
+  if (options.startsAt) {
+    const explicitStart = new Date(options.startsAt);
     return {
       startsAt: explicitStart,
-      endsAt:
-        explicitEnd && !Number.isNaN(explicitEnd.getTime()) && explicitEnd > explicitStart
-          ? explicitEnd
-          : new Date(explicitStart.getTime() + durationMs),
+      endsAt: options.endsAt
+        ? new Date(options.endsAt)
+        : new Date(explicitStart.getTime() + durationMs),
     };
   }
 

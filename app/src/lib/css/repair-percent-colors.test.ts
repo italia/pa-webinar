@@ -62,6 +62,14 @@ describe('repairPercentColors', () => {
     expect(secondo.repaired).toBe(0);
   });
 
+  it('ripara anche le percentuali senza zero iniziale, come le scrive il minificatore', () => {
+    // Tinte molto scure: il minificatore accorcia `0.4%` in `.4%`. Se la forma
+    // non viene riconosciuta, il colore resta rotto e non viene nemmeno contato.
+    const { css, repaired } = repairPercentColors('.a{color:rgb(0,.4%,.8%)}');
+    expect(css).toBe('.a{color:rgb(0%,.4%,.8%)}');
+    expect(repaired).toBe(1);
+  });
+
   it('riconosce lo zero anche con i decimali e la sintassi moderna', () => {
     expect(repairPercentColors('.a{color:rgb(0.0,35%,70%)}').css).toBe('.a{color:rgb(0%,35%,70%)}');
     expect(repairPercentColors('.a{color:rgb(0 35% 70% / .5)}').css).toBe(

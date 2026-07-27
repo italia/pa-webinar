@@ -109,12 +109,37 @@ describe('POST /api/admin/events/[id]/duplicate', () => {
       { startsAt: 'domani' },
       { nextOccurrence: 'false' },
       { chiaveSconosciuta: true },
+      // Una fine da sola veniva accettata e poi ignorata: 201 con le date
+      // dell'originale, cioe' una copia programmata dove nessuno ha chiesto.
+      { endsAt: '2026-09-01T12:00:00Z' },
+      // Fine prima dell'inizio: veniva assorbita ricalcolando la durata.
+      { startsAt: '2026-09-01T12:00:00Z', endsAt: '2026-09-01T10:00:00Z' },
     ]) {
       // 422 come le altre rotte del progetto quando il corpo non passa lo schema.
       const res = await POST(request(corpo), context as never);
       expect(res.status, JSON.stringify(corpo)).toBe(422);
       expect(mocked.event.create).not.toHaveBeenCalled();
     }
+  });
+
+  it('riprogramma sulle date indicate, anche in ISO senza fuso', async () => {
+    const res = await POST(
+      request({ startsAt: '2026-09-01T10:00:00', endsAt: '2026-09-01T12:00:00' }),
+      context as never,
+    );
+    expect(res.status).toBe(201);
+    const data = mocked.event.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
+    expect(data.startsAt).toEqual(new Date('2026-09-01T10:00:00'));
+    expect(data.endsAt).toEqual(new Date('2026-09-01T12:00:00'));
+  });
+
+  it('senza fine indicata conserva la durata dell’originale', async () => {
+    const res = await POST(request({ startsAt: '2026-09-01T10:00:00Z' }), context as never);
+    expect(res.status).toBe(201);
+    const data = mocked.event.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
+    const source = sourceEvent();
+    const durata = source.endsAt.getTime() - source.startsAt.getTime();
+    expect((data.endsAt as Date).getTime() - (data.startsAt as Date).getTime()).toBe(durata);
   });
 
   it('un corpo assente o vuoto mantiene le date dell’originale', async () => {

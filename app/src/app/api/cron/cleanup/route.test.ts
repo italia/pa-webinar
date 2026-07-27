@@ -20,6 +20,7 @@ vi.mock('@/lib/db', () => ({
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
     eventAgendaItem: { deleteMany: vi.fn() },
+    eventInvitation: { deleteMany: vi.fn() },
     eventModerator: { deleteMany: vi.fn() },
     recordingTrack: { deleteMany: vi.fn() },
     callSession: { updateMany: vi.fn() },
@@ -64,6 +65,7 @@ const db = prisma as unknown as {
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
   eventAgendaItem: { deleteMany: Mock };
+  eventInvitation: { deleteMany: Mock };
   eventModerator: { deleteMany: Mock };
   recordingTrack: { deleteMany: Mock };
   callSession: { updateMany: Mock };
@@ -337,6 +339,19 @@ describe('GET /api/cron/cleanup', () => {
     await runCleanup();
 
     expect(db.eventModerator.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio' },
+    });
+  });
+
+  it('fase 3: cancella gli inviti, che portano email cifrata e link di accesso', async () => {
+    // Stessa classe di dati e stessa trappola della cascade delle concessioni
+    // nominali: un invito non accettato non ha piu' ragione di esistere quando
+    // l'evento a cui invitava e' scaduto.
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+
+    await runCleanup();
+
+    expect(db.eventInvitation.deleteMany).toHaveBeenCalledWith({
       where: { eventId: 'evt-vecchio' },
     });
   });
