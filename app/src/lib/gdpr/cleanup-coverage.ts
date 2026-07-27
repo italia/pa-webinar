@@ -44,4 +44,5 @@ export const NOT_PURGED_BY_CLEANUP: Record<string, string> = {
   GdprAuditLog: 'è il registro delle cancellazioni: cancellarlo distruggerebbe la prova di averle fatte',
   EventQuestionnaire: 'resta la configurazione, che non è un dato personale; le RISPOSTE, con nome e hash dell’email di chi ha risposto, vengono cancellate passando dal questionario',
   Recording: 'l’albero della registrazione segue la propria retention (può essere più lunga); di suo la transazione cancella le tracce per-partecipante già purgate, che portano il nome cifrato',
+  PostprodOriginalBody: 'il testo come l’ha prodotto la macchina, conservato accanto alla versione rivista: segue l’artefatto da cui è copiato e la retention della registrazione, che lo cancella insieme al resto (cron di post-produzione + cascade). Cancellarlo qui, alla scadenza dell’evento, separerebbe le due versioni di un verbale che deve restare confrontabile',
 };

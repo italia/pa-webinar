@@ -33,6 +33,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
+import { conservaOriginali } from '@/lib/ai/original-body';
 import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { buildVtt, parseInlineTranscriptJson, sha256Hex } from '@/lib/ai/transcript-format';
@@ -67,6 +68,9 @@ async function loadRecording(id: string) {
     where: { id },
     select: {
       id: true,
+      // La conservazione dell'originale è per-evento tanto quanto
+      // per-registrazione: la pulizia dei dati lavora anche per evento.
+      eventId: true,
       sourceLanguage: true,
       durationSec: true,
       speakers: {
@@ -79,7 +83,20 @@ async function loadRecording(id: string) {
       },
       artifacts: {
         where: { type: { in: ['TRANSCRIPT_JSON', 'TRANSCRIPT_VTT', 'WAVEFORM_JSON'] } },
-        select: { id: true, type: true, language: true, inlineBody: true },
+        select: {
+          id: true,
+          type: true,
+          language: true,
+          inlineBody: true,
+          // Servono a conservare il testo della macchina: si copia com'è,
+          // con il suo hash, la sua dimensione e il modello che l'ha prodotto.
+          contentHash: true,
+          sizeBytes: true,
+          modelId: true,
+          modelVersion: true,
+          revisedAt: true,
+          recordingId: true,
+        },
       },
     },
   });
@@ -116,13 +133,33 @@ export const GET = withErrorHandling(async (_request, context) => {
   }
 
   const transcript = parseTranscript(jsonArtifact.inlineBody);
-  const segments = (transcript.segments ?? []).map((s, index) => ({
-    index,
-    start: s.start,
-    end: s.end,
-    text: s.text,
-    speaker: s.speaker ?? null,
-  }));
+
+  // Il testo come l'ha prodotto la macchina, se è stato conservato. Serve a
+  // distinguere ciò che ha detto la macchina da ciò che ha corretto una
+  // persona: per un verbale pubblico le due cose non possono confondersi.
+  const conservato = await prisma.postprodOriginalBody.findUnique({
+    where: { artifactId: jsonArtifact.id },
+    select: { body: true, capturedAt: true, modelId: true, modelVersion: true },
+  });
+  const segmentiOriginali = conservato ? (parseTranscript(conservato.body).segments ?? []) : [];
+  // Il confronto è per indice, e regge perché la correzione non aggiunge né
+  // toglie segmenti. Se i due elenchi hanno lunghezze diverse non si confronta
+  // riga per riga: si dichiara la discordanza e basta.
+  const confrontabile = conservato !== null && segmentiOriginali.length === (transcript.segments ?? []).length;
+
+  const segments = (transcript.segments ?? []).map((s, index) => {
+    const originale = confrontabile ? segmentiOriginali[index] : undefined;
+    return {
+      index,
+      start: s.start,
+      end: s.end,
+      text: s.text,
+      speaker: s.speaker ?? null,
+      // Presenti solo dove il testo differisce davvero: un editor che mostra
+      // “originale identico” su ogni riga non aiuta a leggere niente.
+      originalText: originale && originale.text !== s.text ? originale.text : null,
+    };
+  });
 
   // Waveform peaks (optional). Produced by newer worker runs; absent on
   // older recordings, in which case the editor draws a segment-only
@@ -156,6 +193,17 @@ export const GET = withErrorHandling(async (_request, context) => {
     // source media, so the editor can play audio + drive the playhead.
     mediaUrl: `/api/admin/postprod/recordings/${recording.id}/media`,
     hasTranscript: true,
+    // Stato della versione originale: quando è stata conservata, quale modello
+    // l'ha prodotta, e se è confrontabile riga per riga.
+    original: conservato
+      ? {
+          capturedAt: conservato.capturedAt.toISOString(),
+          modelId: conservato.modelId,
+          modelVersion: conservato.modelVersion,
+          comparable: confrontabile,
+        }
+      : null,
+    revisedAt: jsonArtifact.revisedAt?.toISOString() ?? null,
   });
 });
 
@@ -172,6 +220,18 @@ const editSchema = z.object({
 
 const bodySchema = z.object({
   edits: z.array(editSchema).min(1).max(5_000),
+  /**
+   * Applica le stesse correzioni ANCHE al testo conservato della macchina.
+   *
+   * Serve per il diritto alla cancellazione: svuotare un segmento nell'editor è
+   * oggi l'unico modo per togliere una frase da una trascrizione (la rotta di
+   * cancellazione tocca solo le iscrizioni). Conservare l'originale, senza
+   * questo, renderebbe quella cancellazione apparente — il testo resterebbe
+   * nella copia. Spento di default: una correzione ordinaria NON deve
+   * riscrivere ciò che la macchina aveva prodotto, altrimenti le due versioni
+   * smettono di essere confrontabili.
+   */
+  redactOriginal: z.boolean().default(false),
 });
 
 export const PUT = withErrorHandling(async (request, context) => {
@@ -179,7 +239,7 @@ export const PUT = withErrorHandling(async (request, context) => {
   if (!isAdmin) throw new UnauthorizedError();
 
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  const { edits } = bodySchema.parse(await request.json());
+  const { edits, redactOriginal } = bodySchema.parse(await request.json());
 
   const recording = await loadRecording(id);
   if (!recording) throw new NotFoundError('Recording');
@@ -255,15 +315,95 @@ export const PUT = withErrorHandling(async (request, context) => {
       (a.language === recording.sourceLanguage || a.language === transcript.language),
   );
 
+  // Il testo come l'ha prodotto la macchina, conservato alla PRIMA correzione.
+  // Si copia il corpo memorizzato, non quello ricostruito dai segmenti: il
+  // ciclo qui sopra scarta i tempi delle parole di ogni segmento riscritto, e
+  // una copia ricostruita nascerebbe già priva di ciò che l'originale ha di
+  // proprio. Sta dentro la transazione perché o si conservano entrambe le
+  // versioni, o non si scrive nulla.
+  const artefattiDaConservare = [jsonArtifact, ...(vttArtifact ? [vttArtifact] : [])].map((a) => ({
+    id: a.id,
+    recordingId: a.recordingId,
+    type: a.type,
+    language: a.language,
+    inlineBody: a.inlineBody,
+    contentHash: a.contentHash,
+    sizeBytes: a.sizeBytes,
+    modelId: a.modelId,
+    modelVersion: a.modelVersion,
+  }));
+
   await prisma.$transaction(async (tx) => {
+    const originaliConservati = await conservaOriginali(
+      tx,
+      artefattiDaConservare,
+      recording.eventId,
+    );
+    void originaliConservati;
+
     await tx.postprodArtifact.update({
       where: { id: jsonArtifact.id },
       data: {
         inlineBody: encryptPII(newJsonBody),
         contentHash: sha256Hex(newJsonBody),
         sizeBytes: BigInt(Buffer.byteLength(newJsonBody, 'utf8')),
+        // Da qui in poi questa versione è rivista da una persona.
+        revisedAt: new Date(),
       },
     });
+
+    // Cancellazione di un contenuto, non correzione: le stesse modifiche vanno
+    // applicate anche al testo conservato, altrimenti quella cancellazione
+    // sarebbe apparente — la frase resterebbe nella copia della macchina.
+    if (redactOriginal) {
+      const conservati = await tx.postprodOriginalBody.findMany({
+        where: {
+          artifactId: { in: [jsonArtifact.id, ...(vttArtifact ? [vttArtifact.id] : [])] },
+        },
+        select: { id: true, artifactId: true, body: true },
+      });
+
+      const originaleJson = conservati.find((o) => o.artifactId === jsonArtifact.id);
+      if (originaleJson) {
+        const originale = parseTranscript(originaleJson.body);
+        const segmentiOriginali = originale.segments ?? [];
+        for (const edit of edits) {
+          const seg = segmentiOriginali[edit.index];
+          if (!seg || edit.text === undefined) continue;
+          seg.text = edit.text.trim();
+          // Come per la versione rivista: i tempi delle singole parole non
+          // corrispondono più a un testo riscritto a mano.
+          delete seg.words;
+        }
+        const corpo = JSON.stringify({ ...originale, segments: segmentiOriginali });
+        await tx.postprodOriginalBody.update({
+          where: { id: originaleJson.id },
+          data: {
+            body: encryptPII(corpo),
+            contentHash: sha256Hex(corpo),
+            sizeBytes: BigInt(Buffer.byteLength(corpo, 'utf8')),
+          },
+        });
+
+        const originaleVtt = conservati.find(
+          (o) => vttArtifact && o.artifactId === vttArtifact.id,
+        );
+        if (originaleVtt) {
+          // I sottotitoli conservati si ricostruiscono dagli stessi segmenti
+          // redatti: tempi e struttura restano quelli della macchina, il testo
+          // tolto sparisce anche da qui.
+          const vtt = buildVtt(segmentiOriginali, speakerNames);
+          await tx.postprodOriginalBody.update({
+            where: { id: originaleVtt.id },
+            data: {
+              body: encryptPII(vtt),
+              contentHash: sha256Hex(vtt),
+              sizeBytes: BigInt(Buffer.byteLength(vtt, 'utf8')),
+            },
+          });
+        }
+      }
+    }
 
     if (vttArtifact) {
       await tx.postprodArtifact.update({
@@ -291,9 +431,16 @@ export const PUT = withErrorHandling(async (request, context) => {
 
   await logAdminAction({
     request,
-    action: 'POSTPROD_TRANSCRIPT_EDIT',
+    action: redactOriginal ? 'POSTPROD_TRANSCRIPT_REDACT' : 'POSTPROD_TRANSCRIPT_EDIT',
     target: id,
-    details: { textChanges, speakerChanges, vttRegenerated: Boolean(vttArtifact) },
+    details: {
+      textChanges,
+      speakerChanges,
+      vttRegenerated: Boolean(vttArtifact),
+      // Una redazione tocca anche il testo conservato: va distinta nel
+      // registro, perché è l'unica azione che cancella davvero del contenuto.
+      redactOriginal,
+    },
   });
 
   return Response.json({

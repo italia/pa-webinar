@@ -193,6 +193,14 @@ Ogni evento ha un periodo di conservazione configurabile (`dataRetentionDays`, d
 
 L'evento stesso (titolo, descrizione, date) viene mantenuto in stato `ARCHIVED` per riferimento storico.
 
+### Trascrizione: versione della macchina e versione rivista
+
+Quando una persona corregge un segmento nell'editor, il testo **come lo aveva prodotto la trascrizione automatica** viene conservato accanto a quello corretto: per un verbale di un ente pubblico le due cose devono restare distinguibili. Si conserva la versione della macchina, non ogni revisione successiva.
+
+La copia segue la stessa conservazione della registrazione da cui proviene e viene cancellata insieme a essa: originale e versione rivista non possono avere scadenze diverse.
+
+Per il **diritto alla cancellazione** l'editor offre una modalità dedicata: quando l'amministratore chiede di rimuovere il contributo di una persona, la rimozione si applica a **entrambe** le versioni e viene registrata come azione distinta nel registro amministrativo. Senza quella modalità, conservare l'originale renderebbe apparente qualsiasi cancellazione fatta correggendo il testo.
+
 ## Cookie
 
 L'applicazione utilizza un unico cookie funzionale:

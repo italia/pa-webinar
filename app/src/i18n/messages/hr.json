@@ -2402,7 +2402,16 @@
       "manageRerunAlreadyQueued": "Obrada je već u redu čekanja: nema ništa novo za pokrenuti.",
       "generateAi": "Generiraj AI",
       "generateAiConfirm": "Pokreni AI pipeline (transkripcija i sažetak) nad ovom snimkom. AI obrada bit će uključena za događaj i kreće u pozadini. Prijevodi se dodaju naknadno, jezik po jezik, na kartici »Prijevodi«.",
-      "generateAiOk": "AI pipeline je pokrenut."
+      "generateAiOk": "AI pipeline je pokrenut.",
+      "originalToggle": "Show original text",
+      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
+      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
+      "originalLabel": "Original text:",
+      "revisedBadge": "Edited by a person",
+      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
+      "redactLabel": "Erase from the original too",
+      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
+      "redactSave": "Save and erase from the original"
     },
     "questionnairesPage": {
       "title": "Upitnici",

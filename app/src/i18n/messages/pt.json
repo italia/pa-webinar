@@ -2402,7 +2402,16 @@
       "manageRerunAlreadyQueued": "Processamento já em fila: não há nada de novo para iniciar.",
       "generateAi": "Gerar IA",
       "generateAiConfirm": "Executa a pipeline de IA (transcrição e resumo) sobre esta gravação. O processamento de IA será ativado para o evento e arranca em segundo plano. As traduções são acrescentadas depois, idioma a idioma, no separador «Traduções».",
-      "generateAiOk": "Pipeline de IA iniciada."
+      "generateAiOk": "Pipeline de IA iniciada.",
+      "originalToggle": "Show original text",
+      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
+      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
+      "originalLabel": "Original text:",
+      "revisedBadge": "Edited by a person",
+      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
+      "redactLabel": "Erase from the original too",
+      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
+      "redactSave": "Save and erase from the original"
     },
     "questionnairesPage": {
       "title": "Questionários",

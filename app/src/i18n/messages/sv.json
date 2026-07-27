@@ -2402,7 +2402,16 @@
       "manageRerunAlreadyQueued": "Bearbetningen ligger redan i kö: inget nytt att starta.",
       "generateAi": "Generera AI",
       "generateAiConfirm": "Kör AI-pipelinen (transkription och sammanfattning) på den här inspelningen. AI-bearbetning aktiveras för evenemanget och startar i bakgrunden. Översättningar läggs till efteråt, ett språk i taget, från fliken ”Översättningar”.",
-      "generateAiOk": "AI-pipelinen har startat."
+      "generateAiOk": "AI-pipelinen har startat.",
+      "originalToggle": "Show original text",
+      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
+      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
+      "originalLabel": "Original text:",
+      "revisedBadge": "Edited by a person",
+      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
+      "redactLabel": "Erase from the original too",
+      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
+      "redactSave": "Save and erase from the original"
     },
     "questionnairesPage": {
       "title": "Enkäter",

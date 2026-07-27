@@ -43,6 +43,9 @@ interface EditableSegment {
   end: number;
   text: string;
   speaker: string | null;
+  /** Il testo come l'ha prodotto la macchina, solo dove differisce da quello
+   *  corrente. Null quando coincidono o quando non è stato conservato. */
+  originalText?: string | null;
 }
 
 interface RosterEntry {
@@ -61,6 +64,18 @@ interface TranscriptResponse {
   /** False when no TRANSCRIPT_JSON exists yet (pipeline not run / still
    *  processing) — distinct from an existing transcript with 0 segments. */
   hasTranscript: boolean;
+  /** Presente dalla prima correzione: dice quando è stato conservato il testo
+   *  della macchina e quale modello l'aveva prodotto. */
+  original?: {
+    capturedAt: string;
+    modelId: string | null;
+    modelVersion: string | null;
+    /** Falso se il numero di segmenti non coincide: in quel caso non si
+     *  confronta riga per riga. */
+    comparable: boolean;
+  } | null;
+  /** Quando una persona ha corretto questa trascrizione. */
+  revisedAt?: string | null;
 }
 
 interface Draft {
@@ -97,6 +112,16 @@ export default function TranscriptEditor({
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
+  // Spento di default: la versione della macchina è un riferimento da
+  // consultare, non qualcosa che deve stare sempre sotto gli occhi mentre si
+  // corregge.
+  const [mostraOriginale, setMostraOriginale] = useState(false);
+  // Cancellazione, non correzione: applica le stesse modifiche anche al testo
+  // conservato della macchina. Spento di default, perché una correzione
+  // ordinaria non deve riscrivere ciò che la macchina aveva prodotto — ma
+  // senza questo comando una riga svuotata resterebbe nella copia, e chi la
+  // svuota crederebbe di averla cancellata.
+  const [redazione, setRedazione] = useState(false);
   const playerRef = useRef<TimelineControls | null>(null);
   const segScrollRef = useRef<HTMLDivElement>(null);
 
@@ -225,6 +250,27 @@ export default function TranscriptEditor({
       <div className="d-flex align-items-center gap-2 mb-2">
         <strong className="small">{t('editTranscriptTitle')}</strong>
         <span className="badge bg-light text-dark">{data.sourceLanguage}</span>
+        {data.revisedAt ? (
+          <span className="badge bg-warning text-dark" title={t('revisedHint')}>
+            {t('revisedBadge')}
+          </span>
+        ) : null}
+        {data.original ? (
+          <button
+            type="button"
+            className={`btn btn-sm ${mostraOriginale ? 'btn-secondary' : 'btn-outline-secondary'}`}
+            aria-pressed={mostraOriginale}
+            onClick={() => setMostraOriginale((v) => !v)}
+            title={
+              data.original.comparable
+                ? t('originalToggleHint')
+                : t('originalNotComparable')
+            }
+            disabled={!data.original.comparable}
+          >
+            {t('originalToggle')}
+          </button>
+        ) : null}
         <div className="ms-auto d-flex align-items-center gap-2">
           {savedMsg && <span className="small text-success">{savedMsg}</span>}
           {saveError && <span className="small text-danger">{saveError}</span>}
@@ -233,13 +279,31 @@ export default function TranscriptEditor({
               {t('editDirty', { n: dirtySegments.length })}
             </span>
           )}
+          {data.original ? (
+            <div className="form-check form-check-inline mb-0">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="redazione-originale"
+                checked={redazione}
+                onChange={(e) => setRedazione(e.target.checked)}
+              />
+              <label
+                className="form-check-label small"
+                htmlFor="redazione-originale"
+                title={t('redactHint')}
+              >
+                {t('redactLabel')}
+              </label>
+            </div>
+          ) : null}
           <button
             type="button"
-            className="btn btn-sm btn-primary"
+            className={`btn btn-sm ${redazione ? 'btn-danger' : 'btn-primary'}`}
             disabled={dirtySegments.length === 0 || saving}
             onClick={() => void save()}
           >
-            {saving ? t('editSaving') : t('editSave')}
+            {saving ? t('editSaving') : redazione ? t('redactSave') : t('editSave')}
           </button>
         </div>
       </div>

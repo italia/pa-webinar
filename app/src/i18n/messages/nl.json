@@ -2402,7 +2402,16 @@
       "manageRerunAlreadyQueued": "De verwerking staat al in de wachtrij: er is niets nieuws te starten.",
       "generateAi": "AI genereren",
       "generateAiConfirm": "Start de AI-pijplijn (transcriptie en samenvatting) op deze opname. De AI-verwerking wordt voor het evenement ingeschakeld en start op de achtergrond. De vertalingen worden daarna per taal toegevoegd via het tabblad “Vertalingen”.",
-      "generateAiOk": "AI-pijplijn gestart."
+      "generateAiOk": "AI-pijplijn gestart.",
+      "originalToggle": "Show original text",
+      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
+      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
+      "originalLabel": "Original text:",
+      "revisedBadge": "Edited by a person",
+      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
+      "redactLabel": "Erase from the original too",
+      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
+      "redactSave": "Save and erase from the original"
     },
     "questionnairesPage": {
       "title": "Vragenlijsten",

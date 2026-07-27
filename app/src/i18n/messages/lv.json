@@ -2402,7 +2402,16 @@
       "manageRerunAlreadyQueued": "Apstrāde jau ir rindā: nav nekā jauna, ko sākt.",
       "generateAi": "Ģenerēt MI",
       "generateAiConfirm": "Palaist MI konveijeru (transkripciju un kopsavilkumu) šim ierakstam. Pasākumam tiks iespējota MI apstrāde, un tā sāksies fonā. Tulkojumus pēc tam pa vienai valodai pievieno cilnē „Tulkojumi“.",
-      "generateAiOk": "MI konveijers ir palaists."
+      "generateAiOk": "MI konveijers ir palaists.",
+      "originalToggle": "Show original text",
+      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
+      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
+      "originalLabel": "Original text:",
+      "revisedBadge": "Edited by a person",
+      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
+      "redactLabel": "Erase from the original too",
+      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
+      "redactSave": "Save and erase from the original"
     },
     "questionnairesPage": {
       "title": "Anketas",

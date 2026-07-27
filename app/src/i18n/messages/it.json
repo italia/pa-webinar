@@ -2472,7 +2472,16 @@
       },
       "archiveSourceTitle": "Registrazione sorgente",
       "archiveSourceHint": "Video originale dell’evento. Le tracce separate per partecipante e l’archivio MKV richiedono la registrazione multi-traccia (non attiva per questo evento).",
-      "archiveSourceDownload": "Scarica video originale"
+      "archiveSourceDownload": "Scarica video originale",
+      "originalToggle": "Mostra testo originale",
+      "originalToggleHint": "Mostra, sotto ogni riga corretta, il testo come lo aveva prodotto la trascrizione automatica",
+      "originalNotComparable": "Il numero di righe è cambiato rispetto alla versione originale: il confronto riga per riga non è possibile",
+      "originalLabel": "Testo originale:",
+      "revisedBadge": "Rivista a mano",
+      "revisedHint": "Almeno una riga è stata corretta da una persona dopo la trascrizione automatica",
+      "redactLabel": "Cancella anche dall’originale",
+      "redactHint": "Da usare per una richiesta di cancellazione: le modifiche si applicano anche al testo conservato della macchina, che altrimenti conserverebbe la frase rimossa",
+      "redactSave": "Salva e cancella dall’originale"
     },
     "questionnairesPage": {
       "title": "Questionari",

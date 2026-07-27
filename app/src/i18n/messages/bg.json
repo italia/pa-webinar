@@ -2402,7 +2402,16 @@
       "manageRerunAlreadyQueued": "Обработката вече е в опашката: няма нищо ново за стартиране.",
       "generateAi": "Генериране с ИИ",
       "generateAiConfirm": "Стартирайте ИИ пайплайна (транскрипция и резюме) върху този запис. Обработката с ИИ ще бъде активирана за събитието и тръгва във фонов режим. Преводите се добавят след това, по един език, от раздела „Преводи“.",
-      "generateAiOk": "ИИ пайплайнът е стартиран."
+      "generateAiOk": "ИИ пайплайнът е стартиран.",
+      "originalToggle": "Show original text",
+      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
+      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
+      "originalLabel": "Original text:",
+      "revisedBadge": "Edited by a person",
+      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
+      "redactLabel": "Erase from the original too",
+      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
+      "redactSave": "Save and erase from the original"
     },
     "questionnairesPage": {
       "title": "Въпросници",

@@ -2402,7 +2402,16 @@
       "manageRerunAlreadyQueued": "Apdorojimas jau eilėje: naujų darbų paleisti nereikia.",
       "generateAi": "Generuoti DI",
       "generateAiConfirm": "Paleisti DI grandinę (transkripciją ir santrauką) šiam įrašui. DI apdorojimas bus įjungtas renginiui ir pradės veikti fone. Vertimai pridedami vėliau, po vieną kalbą, kortelėje „Vertimai“.",
-      "generateAiOk": "DI grandinė paleista."
+      "generateAiOk": "DI grandinė paleista.",
+      "originalToggle": "Show original text",
+      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
+      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
+      "originalLabel": "Original text:",
+      "revisedBadge": "Edited by a person",
+      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
+      "redactLabel": "Erase from the original too",
+      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
+      "redactSave": "Save and erase from the original"
     },
     "questionnairesPage": {
       "title": "Klausimynai",

@@ -2402,7 +2402,16 @@
       "manageRerunAlreadyQueued": "Przetwarzanie jest już w kolejce: nie ma nic nowego do uruchomienia.",
       "generateAi": "Wygeneruj AI",
       "generateAiConfirm": "Uruchom potok AI (transkrypcja i podsumowanie) na tym nagraniu. Przetwarzanie AI zostanie włączone dla wydarzenia i ruszy w tle. Tłumaczenia dodaje się później, język po języku, w karcie „Tłumaczenia”.",
-      "generateAiOk": "Potok AI uruchomiony."
+      "generateAiOk": "Potok AI uruchomiony.",
+      "originalToggle": "Show original text",
+      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
+      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
+      "originalLabel": "Original text:",
+      "revisedBadge": "Edited by a person",
+      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
+      "redactLabel": "Erase from the original too",
+      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
+      "redactSave": "Save and erase from the original"
     },
     "questionnairesPage": {
       "title": "Kwestionariusze",
