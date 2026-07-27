@@ -2135,6 +2135,12 @@ model PostprodOriginalBody {
 
   capturedAt DateTime @default(now()) @map("captured_at")
 
+  /// Falso quando NON si può affermare che questo testo sia quello della
+  /// macchina: succede alla prima conservazione di una trascrizione che
+  /// qualcuno aveva già corretto prima che questa funzione esistesse. Meglio
+  /// dichiarare l'incertezza che attribuire a un modello parole di una persona.
+  certainMachineOrigin Boolean @default(true) @map("certain_machine_origin")
+
   artifact PostprodArtifact @relation(fields: [artifactId], references: [id], onDelete: Cascade)
 
   @@index([recordingId])

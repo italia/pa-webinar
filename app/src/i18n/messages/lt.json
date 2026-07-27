@@ -2411,7 +2411,9 @@
       "revisedHint": "At least one line was corrected by a person after the automatic transcription",
       "redactLabel": "Erase from the original too",
       "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original"
+      "redactSave": "Save and erase from the original",
+      "originalUncertain": "Origin not certain",
+      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
     },
     "questionnairesPage": {
       "title": "Klausimynai",

@@ -2481,7 +2481,9 @@
       "revisedHint": "Almeno una riga è stata corretta da una persona dopo la trascrizione automatica",
       "redactLabel": "Cancella anche dall’originale",
       "redactHint": "Da usare per una richiesta di cancellazione: le modifiche si applicano anche al testo conservato della macchina, che altrimenti conserverebbe la frase rimossa",
-      "redactSave": "Salva e cancella dall’originale"
+      "redactSave": "Salva e cancella dall’originale",
+      "originalUncertain": "Origine non certa",
+      "originalUncertainHint": "Il testo conservato potrebbe già includere correzioni fatte prima che questa funzione esistesse: non è dimostrabile che sia quello prodotto dalla trascrizione automatica"
     },
     "questionnairesPage": {
       "title": "Questionari",

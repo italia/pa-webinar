@@ -73,6 +73,9 @@ interface TranscriptResponse {
     /** Falso se il numero di segmenti non coincide: in quel caso non si
      *  confronta riga per riga. */
     comparable: boolean;
+    /** Falso quando il testo conservato potrebbe già includere correzioni
+     *  fatte prima che questa funzione esistesse. */
+    certainMachineOrigin: boolean;
   } | null;
   /** Quando una persona ha corretto questa trascrizione. */
   revisedAt?: string | null;
@@ -214,7 +217,7 @@ export default function TranscriptEditor({
           method: 'PUT',
           credentials: 'include',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ edits }),
+          body: JSON.stringify({ edits, redactOriginal: redazione }),
         },
       );
       if (!r.ok) {
@@ -253,6 +256,11 @@ export default function TranscriptEditor({
         {data.revisedAt ? (
           <span className="badge bg-warning text-dark" title={t('revisedHint')}>
             {t('revisedBadge')}
+          </span>
+        ) : null}
+        {data.original && !data.original.certainMachineOrigin ? (
+          <span className="badge bg-light text-dark" title={t('originalUncertainHint')}>
+            {t('originalUncertain')}
           </span>
         ) : null}
         {data.original ? (
@@ -376,6 +384,15 @@ export default function TranscriptEditor({
                       value={d.text}
                       onChange={(e) => setDraft(seg, { text: e.target.value })}
                     />
+                    {mostraOriginale && seg.originalText ? (
+                      <p
+                        className="mt-1 mb-0 small text-muted"
+                        style={{ borderLeft: '3px solid #c5c7c9', paddingLeft: '.5rem' }}
+                      >
+                        <span className="fw-semibold">{t('originalLabel')}</span>{' '}
+                        {seg.originalText}
+                      </p>
+                    ) : null}
                   </td>
                 </tr>
               );
