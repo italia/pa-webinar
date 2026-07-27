@@ -42,7 +42,7 @@
     "bootstrap-italia": "^2.18.2",
     "date-fns": "^4.4.0",
     "design-react-kit": "^5.1.0",
-    "ical-generator": "^8.0.0",
+    "ical-generator": "^11.1.0",
     "ioredis": "^5.11.1",
     "isomorphic-dompurify": "^3.19.0",
     "jose": "^6.2.4",
