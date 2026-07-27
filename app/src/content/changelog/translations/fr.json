@@ -5,7 +5,7 @@
       "Toute personne qui écrit dans le chat peut marquer son message comme question : les modérateurs la signalent comme traitée ou la mettent de côté, et un filtre n'affiche que les questions. Il n'y a pas de second canal à surveiller pendant l'événement.",
       "Les questions du chat, avec les réactions reçues, figurent désormais sur la page publique de synthèse de l'événement et restent lisibles même après la suppression des données personnelles des participants.",
       "Préparer la prochaine occurrence d'une série est plus rapide : la copie d'un événement reprend les mots-clés, les organisateurs, les co-modérateurs (chacun avec de nouveaux identifiants d'accès), le déroulé, les questionnaires et les rappels, et les modèles conservent leurs réglages d'enregistrement et de traitement ultérieur.",
-      "Corrections : les couleurs institutionnelles sont revenues à ce qu'elles doivent être — le bandeau en haut du site apparaissait blanc —, le bouton qui crée la copie d'un événement ne mène plus à une page inexistante et, à l'expiration de la conservation, les coordonnées des modérateurs et des intervenants nommés sont elles aussi supprimées."
+      "Corrections : les couleurs institutionnelles sont revenues à ce qu'elles doivent être — le bandeau en haut du site apparaissait blanc —, le bouton qui crée la copie d'un événement ne mène plus à une page inexistante et, à l'expiration de la conservation, les coordonnées des personnes invitées ainsi que des modérateurs et intervenants nommés sont elles aussi supprimées."
     ]
   },
   "0.9.0": {

@@ -5,7 +5,7 @@
       "Kdor piše v klepetu, lahko svoje sporočilo označi kot vprašanje: moderatorji ga označijo kot odgovorjeno ali ga odložijo, filter pa prikaže samo vprašanja. Med dogodkom ni drugega kanala, ki bi ga bilo treba nadzirati.",
       "Vprašanja iz klepeta se skupaj s prejetimi odzivi pokažejo na javni strani s povzetkom dogodka in ostanejo berljiva tudi po izbrisu osebnih podatkov udeležencev.",
       "Priprava naslednje ponovitve niza je hitrejša: kopija dogodka prevzame oznake, organizatorje, somoderatorje (vsak z novimi dostopnimi podatki), program, vprašalnike in opomnike, predloge pa ohranijo nastavitve snemanja in nadaljnje obdelave.",
-      "Popravki: institucionalne barve so znova takšne, kot morajo biti – trak na vrhu spletišča se je prikazoval bel –, gumb, ki ustvari kopijo dogodka, ne vodi več na neobstoječo stran, in ob izteku hrambe se izbrišejo tudi kontakti imenovanih moderatorjev in govorcev."
+      "Popravki: institucionalne barve so znova takšne, kot morajo biti – trak na vrhu spletišča se je prikazoval bel –, gumb, ki ustvari kopijo dogodka, ne vodi več na neobstoječo stran, in ob izteku hrambe se izbrišejo tudi kontakti povabljenih ter imenovanih moderatorjev in govorcev."
     ]
   },
   "0.9.0": {
