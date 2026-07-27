@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Rummet reagerar nu i samma stund som något ändras",
+    "notes": [
+      "Frågor, omröstningar, program och ordmoln uppdateras så snart något ändras, i stället för att fråga servern med några sekunders mellanrum: den som är i rummet ser en fråga dyka upp direkt, och vid ett välbesökt evenemang minskar trafiken kraftigt.",
+      "Mindre arbete för servern också: rummets återkommande kontroller hämtar nu bara de uppgifter som behövs, och material — som sällan ändras — kontrolleras mer sällan.",
+      "Om den omedelbara förbindelsen inte är tillgänglig återgår rummet av sig självt till den tidigare återkommande kontrollen: ingen funktion slutar fungera på grund av det nya sättet.",
+      "Rättningar: att öppna två nya ordmoln tätt inpå varandra kunde lämna ett av dem osynligt, och orden som skickades dit syntes inte för någon; tjänstens statussida uppgav alltid samma versionsnummer i stället för det som faktiskt kördes."
+    ]
+  },
   "0.10.0": {
     "title": "Frågor i chatten, enklare återkommande serier och återställda institutionella färger",
     "notes": [

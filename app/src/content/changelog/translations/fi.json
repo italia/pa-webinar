@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Sali reagoi nyt heti, kun jokin muuttuu",
+    "notes": [
+      "Kysymykset, kyselyt, ohjelma ja sanapilvi päivittyvät heti muutoksen tapahtuessa sen sijaan, että ne kysyisivät palvelimelta muutaman sekunnin välein: salissa oleva näkee kysymyksen ilmestyvän saman tien, ja vilkkaassa tapahtumassa liikenne vähenee tuntuvasti.",
+      "Vähemmän työtä myös palvelimelle: salin säännölliset tarkistukset pyytävät nyt vain tarvittavan tiedon, ja aineistot — jotka muuttuvat harvoin — tarkistetaan harvemmin.",
+      "Jos välitön yhteys ei ole käytettävissä, sali palaa itsestään aiempaan säännölliseen tarkistukseen: mikään toiminto ei lakkaa toimimasta uuden tavan takia.",
+      "Korjaukset: kahden uuden sanapilven avaaminen nopeasti peräkkäin saattoi jättää toisen näkymättömiin, eivätkä sinne lähetetyt sanat näkyneet kenellekään; palvelun tilasivu ilmoitti aina saman versionumeron sen sijaan, joka todella oli käytössä."
+    ]
+  },
   "0.10.0": {
     "title": "Kysymykset chatissa, sujuvammat toistuvat sarjat ja korjatut instituutiovärit",
     "notes": [

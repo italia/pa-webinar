@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Is-sala issa tirreaġixxi fil-mument li xi ħaġa tinbidel",
+    "notes": [
+      "Il-mistoqsijiet, l-istħarriġ, il-programm u s-sħaba tal-kliem jiġġeddu malli xi ħaġa tinbidel, minflok ma jistaqsu lis-server kull ftit sekondi: min qiegħed fis-sala jara mistoqsija tidher mill-ewwel, u f'avveniment b'ħafna nies it-traffiku jonqos sew.",
+      "Inqas xogħol għas-server ukoll: il-verifiki perjodiċi tas-sala issa jitolbu biss id-data meħtieġa, u l-materjali — li rari jinbidlu — jiġu vverifikati inqas spiss.",
+      "Jekk il-konnessjoni immedjata ma tkunx disponibbli, is-sala terġa' lura waħedha għall-verifika perjodika ta' qabel: l-ebda funzjoni ma tieqaf taħdem minħabba l-mekkaniżmu l-ġdid.",
+      "Korrezzjonijiet: il-ftuħ ta' żewġ sħab tal-kliem ġodda f'qasir żmien seta' jħalli waħda minnhom inviżibbli, u l-kliem mibgħut hemm ma kien jidher lil ħadd; il-paġna tal-istat tas-servizz kienet dejjem tiddikjara l-istess numru ta' verżjoni minflok dak li kien tabilħaqq qed jaħdem."
+    ]
+  },
   "0.10.0": {
     "title": "Mistoqsijiet fiċ-chat, serje rikorrenti aktar sempliċi u kuluri istituzzjonali kkoreġuti",
     "notes": [

@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Místnost nyní reaguje ve chvíli, kdy se něco změní",
+    "notes": [
+      "Otázky, ankety, program a slovní mrak se aktualizují, jakmile se něco změní, místo aby se každých pár sekund ptaly serveru: kdo je v místnosti, uvidí otázku objevit se okamžitě, a při hojně navštívené akci provoz výrazně klesne.",
+      "Méně práce i pro server: pravidelné kontroly místnosti si nyní vyžádají jen potřebná data a materiály — které se mění zřídka — se kontrolují méně často.",
+      "Pokud okamžité spojení není k dispozici, místnost se sama vrátí k dřívější pravidelné kontrole: kvůli novému mechanismu žádná funkce nepřestane fungovat.",
+      "Opravy: otevření dvou nových slovních mraků krátce po sobě mohlo jeden z nich nechat neviditelný a slova do něj poslaná se nikomu neobjevila; stránka se stavem služby vždy uváděla stejné číslo verze místo té skutečně běžící."
+    ]
+  },
   "0.10.0": {
     "title": "Otázky v chatu, jednodušší opakující se série a opravené institucionální barvy",
     "notes": [

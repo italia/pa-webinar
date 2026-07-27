@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Soba se zdaj odzove v trenutku, ko se kaj spremeni",
+    "notes": [
+      "Vprašanja, ankete, program in oblak besed se posodobijo takoj, ko se kaj spremeni, namesto da bi vsakih nekaj sekund povpraševali strežnik: kdor je v sobi, vidi vprašanje takoj, na dobro obiskanem dogodku pa se promet občutno zmanjša.",
+      "Manj dela tudi za strežnik: redna preverjanja sobe zdaj zahtevajo le potrebne podatke, gradiva — ki se redko spreminjajo — pa se preverjajo redkeje.",
+      "Če takojšnja povezava ni na voljo, se soba sama vrne na prejšnje redno preverjanje: nobena funkcija zaradi novega mehanizma ne preneha delovati.",
+      "Popravki: če sta bila dva nova oblaka besed odprta v kratkem razmiku, je eden lahko ostal neviden, besede, poslane vanj, pa se nikomur niso pokazale; stran s stanjem storitve je vedno navajala isto številko različice namesto tiste, ki je v resnici tekla."
+    ]
+  },
   "0.10.0": {
     "title": "Vprašanja v klepetu, preprostejši ponavljajoči se dogodki in popravljene institucionalne barve",
     "notes": [

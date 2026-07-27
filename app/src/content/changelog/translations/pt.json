@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "A sala reage no momento em que algo muda",
+    "notes": [
+      "Perguntas, sondagens, programa e nuvem de palavras atualizam-se assim que algo muda, em vez de consultarem o servidor de poucos em poucos segundos: quem está na sala vê uma pergunta aparecer de imediato e, num evento concorrido, o tráfego diminui bastante.",
+      "Também menos trabalho para o servidor: as verificações periódicas da sala passam a pedir apenas o dado necessário, e os materiais — que mudam raramente — são verificados com menos frequência.",
+      "Se a ligação imediata não estiver disponível, a sala regressa sozinha à verificação periódica anterior: nenhuma funcionalidade deixa de funcionar por causa do novo mecanismo.",
+      "Correções: abrir duas novas nuvens de palavras em curto espaço de tempo podia deixar uma delas invisível, e as palavras enviadas para lá não apareciam a ninguém; a página de estado do serviço indicava sempre o mesmo número de versão em vez do que estava realmente em execução."
+    ]
+  },
   "0.10.0": {
     "title": "Perguntas no chat, séries recorrentes mais simples e cores institucionais corrigidas",
     "notes": [

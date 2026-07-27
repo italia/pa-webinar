@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Rummet reagerer nu i det øjeblik, noget ændrer sig",
+    "notes": [
+      "Spørgsmål, afstemninger, program og ordsky opdateres, så snart noget ændrer sig, i stedet for at spørge serveren med få sekunders mellemrum: den, der er i rummet, ser et spørgsmål dukke op med det samme, og ved et velbesøgt arrangement falder trafikken markant.",
+      "Også mindre arbejde for serveren: rummets tilbagevendende kontroller henter nu kun de oplysninger, der er brug for, og materialer — som sjældent ændrer sig — kontrolleres sjældnere.",
+      "Er den umiddelbare forbindelse ikke tilgængelig, vender rummet af sig selv tilbage til den tidligere tilbagevendende kontrol: ingen funktion holder op med at virke på grund af den nye måde.",
+      "Rettelser: at åbne to nye ordskyer kort efter hinanden kunne efterlade den ene usynlig, og ordene sendt dertil kom ikke frem for nogen; tjenestens statusside angav altid det samme versionsnummer i stedet for det, der faktisk kørte."
+    ]
+  },
   "0.10.0": {
     "title": "Spørgsmål i chatten, enklere gentagne serier og rettede institutionelle farver",
     "notes": [

@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Dvorana sada reagira u trenutku kad se nešto promijeni",
+    "notes": [
+      "Pitanja, ankete, program i oblak riječi osvježavaju se čim se nešto promijeni, umjesto da svakih nekoliko sekundi propituju poslužitelj: tko je u dvorani, pitanje vidi odmah, a na posjećenom događaju promet se znatno smanjuje.",
+      "Manje posla i za poslužitelj: redovite provjere dvorane sada traže samo potrebne podatke, a materijali — koji se rijetko mijenjaju — provjeravaju se rjeđe.",
+      "Ako trenutačna veza nije dostupna, dvorana se sama vraća na prijašnju redovitu provjeru: nijedna funkcija zbog novog mehanizma ne prestaje raditi.",
+      "Ispravci: otvaranje dvaju novih oblaka riječi u kratkom razmaku moglo je jedan ostaviti nevidljivim, a riječi poslane u njega nikome se nisu prikazivale; stranica stanja usluge uvijek je navodila isti broj inačice umjesto one koja je stvarno radila."
+    ]
+  },
   "0.10.0": {
     "title": "Pitanja u razgovoru, jednostavnije ponavljajuće serije i ispravljene institucionalne boje",
     "notes": [

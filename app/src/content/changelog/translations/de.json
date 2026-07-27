@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Der Raum reagiert jetzt in dem Moment, in dem sich etwas ändert",
+    "notes": [
+      "Fragen, Umfragen, Ablaufplan und Wortwolke werden aktualisiert, sobald sich etwas ändert, statt alle paar Sekunden beim Server nachzufragen: Wer im Raum ist, sieht eine Frage sofort erscheinen, und bei einer gut besuchten Veranstaltung sinkt der Datenverkehr deutlich.",
+      "Auch weniger Arbeit für den Server: Die regelmäßigen Abfragen des Raums fordern jetzt nur noch die tatsächlich benötigten Daten an, und Materialien — die sich selten ändern — werden seltener geprüft.",
+      "Ist die unmittelbare Verbindung nicht verfügbar, kehrt der Raum von selbst zur bisherigen regelmäßigen Abfrage zurück: Keine Funktion fällt wegen des neuen Verfahrens aus.",
+      "Korrekturen: Wurden zwei neue Wortwolken kurz hintereinander geöffnet, konnte eine davon unsichtbar bleiben, und die dorthin gesendeten Wörter erschienen bei niemandem; die Statusseite des Dienstes meldete stets dieselbe Versionsnummer statt der tatsächlich laufenden."
+    ]
+  },
   "0.10.0": {
     "title": "Fragen im Chat, einfachere Veranstaltungsreihen und korrekte institutionelle Farben",
     "notes": [

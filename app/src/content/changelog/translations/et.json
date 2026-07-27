@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Saal reageerib nüüd hetkel, mil midagi muutub",
+    "notes": [
+      "Küsimused, küsitlused, kava ja sõnapilv värskenevad kohe, kui midagi muutub, selle asemel et iga paari sekundi tagant serverilt pärida: saalis olija näeb küsimust ilmumas otsekohe ja rohkearvulisel sündmusel väheneb liiklus tunduvalt.",
+      "Vähem tööd ka serverile: saali korralised kontrollid küsivad nüüd ainult vajalikke andmeid ning materjale — mis muutuvad harva — kontrollitakse harvemini.",
+      "Kui vahetu ühendus ei ole saadaval, naaseb saal ise varasema korralise kontrolli juurde: ükski funktsioon ei lakka uue lahenduse tõttu töötamast.",
+      "Parandused: kahe uue sõnapilve avamine lühikese aja jooksul võis jätta ühe nähtamatuks ja sinna saadetud sõnad ei ilmunud kellelegi; teenuse olekuleht teatas alati sama versiooninumbrit selle asemel, mis tegelikult töötas."
+    ]
+  },
   "0.10.0": {
     "title": "Küsimused vestluses, lihtsamad korduvad sarjad ja parandatud institutsionaalsed värvid",
     "notes": [

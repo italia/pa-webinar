@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "La sala reagisce nel momento in cui qualcosa cambia",
+    "notes": [
+      "Domande, sondaggi, scaletta e nuvola di parole si aggiornano appena qualcosa cambia, invece di ricontrollare il server ogni pochi secondi: chi è in sala vede una domanda comparire subito, e su un evento affollato il traffico si riduce di molto.",
+      "Meno lavoro anche per il server: i controlli periodici della sala ora chiedono solo il dato che serve, e i materiali — che cambiano di rado — vengono ricontrollati meno spesso.",
+      "Se il collegamento immediato non è disponibile, la sala torna da sola al controllo periodico di prima: nessuna funzione smette di funzionare per colpa del nuovo meccanismo.",
+      "Correzioni: aprendo due nuove nuvole di parole a distanza ravvicinata poteva restarne una invisibile, e le parole inviate lì non comparivano a nessuno; la pagina di stato del servizio dichiarava sempre lo stesso numero di versione invece di quello davvero in esecuzione."
+    ]
+  },
   "0.10.0": {
     "title": "Domande in chat, serie ricorrenti più semplici e colori istituzionali corretti",
     "notes": [

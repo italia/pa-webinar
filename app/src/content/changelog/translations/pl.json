@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Sala reaguje teraz w chwili, gdy coś się zmienia",
+    "notes": [
+      "Pytania, ankiety, agenda i chmura słów odświeżają się, gdy tylko coś się zmieni, zamiast odpytywać serwer co kilka sekund: osoba w sali widzi pytanie od razu, a przy licznym wydarzeniu ruch spada wyraźnie.",
+      "Mniej pracy również dla serwera: okresowe sprawdzenia sali pobierają teraz tylko potrzebne dane, a materiały — które zmieniają się rzadko — są sprawdzane rzadziej.",
+      "Jeśli natychmiastowe połączenie jest niedostępne, sala sama wraca do wcześniejszego sprawdzania okresowego: żadna funkcja nie przestaje działać z powodu nowego mechanizmu.",
+      "Poprawki: otwarcie dwóch nowych chmur słów krótko po sobie mogło pozostawić jedną niewidoczną, a wysłane do niej słowa nie pojawiały się nikomu; strona stanu usługi zawsze podawała ten sam numer wersji zamiast tej faktycznie działającej."
+    ]
+  },
   "0.10.0": {
     "title": "Pytania na czacie, prostsze serie cykliczne i przywrócone barwy instytucjonalne",
     "notes": [

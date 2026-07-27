@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "De ruimte reageert nu op het moment dat er iets verandert",
+    "notes": [
+      "Vragen, peilingen, programma en woordwolk werken bij zodra er iets verandert, in plaats van elke paar seconden bij de server na te vragen: wie in de ruimte is, ziet een vraag meteen verschijnen, en bij een druk evenement daalt het verkeer sterk.",
+      "Ook minder werk voor de server: de periodieke controles van de ruimte vragen nu alleen de gegevens die echt nodig zijn, en materialen — die zelden veranderen — worden minder vaak gecontroleerd.",
+      "Is de directe verbinding niet beschikbaar, dan valt de ruimte vanzelf terug op de eerdere periodieke controle: geen enkele functie stopt door het nieuwe mechanisme.",
+      "Correcties: twee nieuwe woordwolken kort na elkaar openen kon er één onzichtbaar laten, en de woorden die daarheen werden gestuurd verschenen bij niemand; de statuspagina van de dienst meldde altijd hetzelfde versienummer in plaats van de versie die echt draaide."
+    ]
+  },
   "0.10.0": {
     "title": "Vragen in de chat, eenvoudiger terugkerende reeksen en herstelde institutionele kleuren",
     "notes": [

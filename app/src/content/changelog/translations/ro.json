@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Sala reacționează acum în momentul în care ceva se schimbă",
+    "notes": [
+      "Întrebările, sondajele, programul și norul de cuvinte se actualizează de îndată ce ceva se schimbă, în loc să interogheze serverul la câteva secunde: cine se află în sală vede întrebarea apărând imediat, iar la un eveniment aglomerat traficul scade considerabil.",
+      "Mai puțină muncă și pentru server: verificările periodice ale sălii cer acum doar datele necesare, iar materialele — care se schimbă rar — sunt verificate mai rar.",
+      "Dacă legătura imediată nu este disponibilă, sala revine singură la verificarea periodică de dinainte: nicio funcție nu încetează să meargă din cauza noului mecanism.",
+      "Corecții: deschiderea a doi nori de cuvinte la scurt timp unul după altul putea lăsa unul invizibil, iar cuvintele trimise acolo nu apăreau nimănui; pagina de stare a serviciului declara mereu același număr de versiune în locul celui aflat efectiv în execuție."
+    ]
+  },
   "0.10.0": {
     "title": "Întrebări în chat, serii recurente mai simple și culori instituționale corectate",
     "notes": [

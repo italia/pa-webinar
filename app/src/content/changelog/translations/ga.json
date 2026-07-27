@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Freagraíonn an seomra anois an nóiméad a athraíonn rud éigin",
+    "notes": [
+      "Déantar ceisteanna, pobalbhreitheanna, an clár agus an scamall focal a nuashonrú a luaithe a athraíonn rud éigin, in ionad ceistiú a chur ar an bhfreastalaí gach cúpla soicind: feiceann duine atá sa seomra ceist ag teacht chun cinn láithreach, agus ag ócáid le slua mór titeann an trácht go mór.",
+      "Níos lú oibre don fhreastalaí freisin: ní iarrann seiceálacha tréimhsiúla an tseomra ach na sonraí atá de dhíth, agus déantar ábhair — a athraíonn go hannamh — a sheiceáil níos annaimhe.",
+      "Mura bhfuil an nasc láithreach ar fáil, filleann an seomra uaidh féin ar an seiceáil thréimhsiúil a bhí ann roimhe: ní stopann aon ghné d'oibriú de bharr na slí nua.",
+      "Ceartúcháin: dá n-osclófaí dhá scamall focal nua go tapa i ndiaidh a chéile, d'fhéadfadh ceann acu fanacht dofheicthe, agus na focail a seoladh chuige ní fheicfeadh aon duine iad; thuairiscigh leathanach stádais na seirbhíse an uimhir leagain chéanna i gcónaí seachas an ceann a bhí ag rith i ndáiríre."
+    ]
+  },
   "0.10.0": {
     "title": "Ceisteanna sa chomhrá, sraitheanna athfhillteacha níos simplí agus dathanna institiúideacha ceartaithe",
     "notes": [

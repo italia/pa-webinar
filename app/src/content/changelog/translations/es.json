@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "La sala reacciona en el momento en que algo cambia",
+    "notes": [
+      "Preguntas, encuestas, programa y nube de palabras se actualizan en cuanto algo cambia, en lugar de consultar al servidor cada pocos segundos: quien está en la sala ve aparecer una pregunta de inmediato, y en un evento concurrido el tráfico se reduce mucho.",
+      "También menos trabajo para el servidor: las comprobaciones periódicas de la sala piden ahora solo el dato necesario, y los materiales —que cambian rara vez— se comprueban con menos frecuencia.",
+      "Si la conexión inmediata no está disponible, la sala vuelve por sí sola a la comprobación periódica anterior: ninguna función deja de funcionar por culpa del nuevo mecanismo.",
+      "Correcciones: abrir dos nubes de palabras seguidas podía dejar una invisible, y las palabras enviadas allí no aparecían a nadie; la página de estado del servicio declaraba siempre el mismo número de versión en lugar del realmente en ejecución."
+    ]
+  },
   "0.10.0": {
     "title": "Preguntas en el chat, series periódicas más sencillas y colores institucionales restaurados",
     "notes": [

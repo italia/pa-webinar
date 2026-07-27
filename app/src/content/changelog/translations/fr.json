@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "La salle réagit désormais au moment où quelque chose change",
+    "notes": [
+      "Questions, sondages, déroulé et nuage de mots se mettent à jour dès qu'un changement survient, au lieu d'interroger le serveur toutes les quelques secondes : les personnes présentes voient une question apparaître immédiatement, et sur un événement très suivi le trafic diminue fortement.",
+      "Moins de travail aussi pour le serveur : les vérifications périodiques de la salle ne demandent plus que la donnée nécessaire, et les documents — qui changent rarement — sont revérifiés moins souvent.",
+      "Si la liaison immédiate n'est pas disponible, la salle revient d'elle-même à la vérification périodique précédente : aucune fonction ne cesse de marcher à cause du nouveau mécanisme.",
+      "Corrections : ouvrir deux nouveaux nuages de mots coup sur coup pouvait en laisser un invisible, et les mots qui y étaient envoyés n'apparaissaient à personne ; la page d'état du service annonçait toujours le même numéro de version au lieu de celui réellement en service."
+    ]
+  },
   "0.10.0": {
     "title": "Questions dans le chat, séries récurrentes simplifiées et couleurs institutionnelles rétablies",
     "notes": [

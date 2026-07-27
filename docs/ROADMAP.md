@@ -9,7 +9,6 @@ Le voci non hanno un numero di versione: un numero è una promessa con una data 
 | Voce | Dove siamo |
 |---|---|
 | **Batteria E2E Playwright**<br/>*aperta da marzo* | Oggi c'è un solo file di test end-to-end. Copre in browser la sala d'attesa e l'ingresso in sala di moderatore e partecipante; la parte admin (login, creazione, pubblicazione) è esercitata solo via API. Restano scoperti: Q&A, sondaggi, cambio lingua, cancellazione GDPR, download del `.ics`, chat su più repliche. Il job è `continue-on-error`: un rosso non blocca il merge, quindi oggi non protegge da regressioni |
-| **SSE per i pannelli live**<br/>*aperta da giugno* | Q&A, sondaggi, agenda e word cloud si aggiornano interrogando il server ogni 3 secondi. Il trasporto push esiste già ed è in produzione per la chat e per le mani alzate: va esteso agli altri pannelli |
 | **Conservare la trascrizione originale**<br/>*aperta da aprile* | Quando un segmento viene corretto nell'editor, l'artefatto viene sovrascritto: non resta una copia del testo prodotto dalla macchina accanto alla versione rivista. Per un verbale di un ente pubblico le due cose vanno distinte, ed era un requisito dichiarato fin da aprile — poi sparito dal documento senza essere né fatto né rinviato |
 
 ## Dopo

@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "The room now reacts the moment something changes",
+    "notes": [
+      "Questions, polls, the agenda and the word cloud update as soon as something changes, instead of re-checking the server every few seconds: people in the room see a question appear straight away, and on a busy event the traffic drops sharply.",
+      "Less work for the server too: the room's periodic checks now ask only for the data they need, and materials — which rarely change — are re-checked less often.",
+      "If the immediate connection is unavailable, the room falls back on its own to the previous periodic check: no feature stops working because of the new mechanism.",
+      "Fixes: opening two new word clouds in quick succession could leave one of them invisible, and words sent to it appeared to nobody; the service status page always reported the same version number instead of the one actually running."
+    ]
+  },
   "0.10.0": {
     "title": "Chat questions, simpler recurring series, and institutional colours restored",
     "notes": [

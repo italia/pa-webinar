@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "A terem mostantól abban a pillanatban reagál, amikor valami megváltozik",
+    "notes": [
+      "A kérdések, a szavazások, a program és a szófelhő azonnal frissülnek, amint valami megváltozik, ahelyett hogy néhány másodpercenként lekérdeznék a kiszolgálót: aki a teremben van, rögtön látja megjelenni a kérdést, egy népes eseményen pedig jelentősen csökken a forgalom.",
+      "Kevesebb munka a kiszolgálónak is: a terem időszakos ellenőrzései már csak a szükséges adatot kérik le, az anyagokat pedig — amelyek ritkán változnak — ritkábban ellenőrzi.",
+      "Ha az azonnali kapcsolat nem érhető el, a terem magától visszatér a korábbi időszakos ellenőrzéshez: az új megoldás miatt egyetlen funkció sem áll le.",
+      "Javítások: két új szófelhő rövid időn belüli megnyitása esetén az egyik láthatatlan maradhatott, és az oda küldött szavak senkinél nem jelentek meg; a szolgáltatás állapotoldala mindig ugyanazt a verziószámot mutatta a ténylegesen futó helyett."
+    ]
+  },
   "0.10.0": {
     "title": "Kérdések a csevegésben, egyszerűbb ismétlődő sorozatok és helyreállított intézményi színek",
     "notes": [

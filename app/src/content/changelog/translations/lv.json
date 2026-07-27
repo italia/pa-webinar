@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Telpa tagad reaģē brīdī, kad kaut kas mainās",
+    "notes": [
+      "Jautājumi, aptaujas, darba kārtība un vārdu mākonis atjaunojas, tiklīdz kaut kas mainās, nevis ik pēc dažām sekundēm vaicā serverim: tas, kurš ir telpā, redz jautājumu parādāmies uzreiz, un apmeklētā pasākumā datu plūsma būtiski samazinās.",
+      "Mazāk darba arī serverim: telpas regulārās pārbaudes tagad pieprasa tikai nepieciešamos datus, bet materiāli — kas mainās reti — tiek pārbaudīti retāk.",
+      "Ja tūlītējais savienojums nav pieejams, telpa pati atgriežas pie iepriekšējās regulārās pārbaudes: neviena funkcija jaunā risinājuma dēļ nepārstāj darboties.",
+      "Labojumi: divu jaunu vārdu mākoņu atvēršana īsā laikā varēja atstāt vienu neredzamu, un tur nosūtītie vārdi nevienam neparādījās; pakalpojuma stāvokļa lapa vienmēr norādīja to pašu versijas numuru, nevis to, kas patiešām darbojās."
+    ]
+  },
   "0.10.0": {
     "title": "Jautājumi tērzēšanā, vienkāršākas atkārtotas sērijas un atjaunotas institucionālās krāsas",
     "notes": [

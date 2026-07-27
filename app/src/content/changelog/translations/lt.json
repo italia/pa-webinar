@@ -1,4 +1,13 @@
 {
+  "0.11.0": {
+    "title": "Salė dabar reaguoja tą akimirką, kai kas nors pasikeičia",
+    "notes": [
+      "Klausimai, apklausos, darbotvarkė ir žodžių debesis atnaujinami vos kam nors pasikeitus, užuot kas kelias sekundes kreipęsi į serverį: esantysis salėje mato klausimą iškart, o gausiame renginyje srautas smarkiai sumažėja.",
+      "Mažiau darbo ir serveriui: periodiniai salės patikrinimai dabar prašo tik reikalingų duomenų, o medžiaga — kuri keičiasi retai — tikrinama rečiau.",
+      "Jei tiesioginis ryšys neprieinamas, salė pati grįžta prie ankstesnio periodinio tikrinimo: dėl naujo mechanizmo nė viena funkcija nenustoja veikti.",
+      "Pataisymai: atvėrus du naujus žodžių debesis netrukus vienas po kito vienas jų galėjo likti nematomas, o ten išsiųsti žodžiai niekam nepasirodydavo; paslaugos būsenos puslapis visada skelbdavo tą patį versijos numerį, o ne tą, kuris iš tikrųjų veikė."
+    ]
+  },
   "0.10.0": {
     "title": "Klausimai pokalbyje, paprastesnės pasikartojančios serijos ir atkurtos institucinės spalvos",
     "notes": [
