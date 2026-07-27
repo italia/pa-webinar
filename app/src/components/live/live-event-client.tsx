@@ -20,6 +20,7 @@ import { Link, useRouter } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
+import { LivePushContext, useLivePush, useLiveState } from '@/hooks/use-live-state';
 import RecordingConsent, { RecordingBanner } from '@/components/jitsi/recording-consent';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
 import RaisedHandsPanel from '@/components/jitsi/raised-hands-panel';
@@ -212,6 +213,14 @@ export default function LiveEventClient({
   const tc = useTranslations('common');
   const router = useRouter();
 
+  // Un solo canale per sala, montato qui: i pannelli si smontano al cambio
+  // scheda e legarcelo aprirebbe e chiuderebbe una connessione a ogni click.
+  // La chiusura dell'evento continua a rilevarla il controllo periodico su
+  // `/lifecycle` (una query, ogni cinque secondi): reagire qui vorrebbe dire
+  // duplicare la chiusura della sala, che tocca schermata di feedback e
+  // segnali di riaggancio. Il canale la annuncia comunque, per chi vorra'
+  // agganciarla in un secondo momento.
+  const { pushLive } = useLiveState(event.slug);
   const [phase, setPhase] = useState<LivePhase>('waiting');
   const [credentials, setCredentials] = useState<JitsiCredentials | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
@@ -1337,6 +1346,7 @@ export default function LiveEventClient({
     eventStatus === 'LIVE' && jvbReady !== true && !jitsiJoined;
 
   return (
+    <LivePushContext.Provider value={pushLive}>
     <div ref={liveRootRef} className="d-flex flex-column live-page-bg">
       <RecordingBanner visible={isRecording} />
       <OvertimeBanner
@@ -1633,6 +1643,7 @@ export default function LiveEventClient({
         </ModalFooter>
       </Modal>
     </div>
+    </LivePushContext.Provider>
   );
 }
 
@@ -1689,6 +1700,8 @@ function LiveSidebar({
   // Live feature flags: i flag arrivano come props al mount, ma un moderatore
   // può attivarli/disattivarli DURANTE l'evento → li ripolliamo così i tab
   // reagiscono per tutti. I valori "eff*" sono quelli effettivi correnti.
+  // Dal contesto: il canale e' montato una volta sola nel contenitore.
+  const pushLive = useLivePush();
   const { data: liveFlags, mutate: mutateFlags } = useSWR<{
     qaEnabled: boolean;
     chatEnabled: boolean;
@@ -1698,7 +1711,9 @@ function LiveSidebar({
   }>(
     `/api/events/${eventSlug}/flags`,
     (url: string) => fetch(url).then((r) => r.json()),
-    { refreshInterval: 15000 }
+    // Con il canale vivo i flag arrivano da soli: l'interrogazione periodica
+    // resta accesa solo come rete, quando il push non e' disponibile.
+    { refreshInterval: pushLive ? 0 : 15000 }
   );
   const effQa = liveFlags?.qaEnabled ?? qaEnabled;
   const effChat = liveFlags?.chatEnabled ?? chatEnabled;

@@ -13,6 +13,7 @@ import {
   extractModeratorToken,
 } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createPollSchema } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
@@ -120,6 +121,9 @@ export const POST = withErrorHandling(async (request, context) => {
       options: parsed.data.options,
     },
   });
+
+  pokeLivePanel(event.id, 'polls');
+
 
   return Response.json(
     {

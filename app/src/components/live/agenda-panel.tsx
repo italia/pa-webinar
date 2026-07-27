@@ -12,6 +12,7 @@
 
 import { useCallback, useState } from 'react';
 import useSWR from 'swr';
+import { useLivePush } from '@/hooks/use-live-state';
 import { useTranslations } from 'next-intl';
 
 type ReactionValue = 'AGREE' | 'DISAGREE';
@@ -64,8 +65,10 @@ export default function AgendaPanel({
       ),
     [token],
   );
+  const pushLive = useLivePush();
   const { data, mutate } = useSWR<AgendaResponse>(swrKey, fetcher, {
-    refreshInterval: 3000,
+    // Spento quando il canale consegna: il pannello viene avvisato.
+    refreshInterval: pushLive ? 0 : 3000,
   });
 
   const items = data?.items ?? [];

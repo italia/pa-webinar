@@ -9,11 +9,12 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createQuestionSchema } from '@/lib/validation/schemas';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { isEventModeratorCached } from '@/lib/auth/moderator';
-import { getCached, setCache } from '@/lib/cache';
+import { getCached, setCache, deleteCacheByPrefix } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -213,6 +214,10 @@ export const POST = withErrorHandling(async (request, context) => {
       text: parsed.data.text,
     },
   });
+
+  deleteCacheByPrefix(`qa:${event.id}:`);
+    pokeLivePanel(event.id, 'qa');
+
 
   return Response.json(
     {

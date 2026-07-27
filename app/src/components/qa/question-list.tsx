@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
+import { useLivePush } from '@/hooks/use-live-state';
 import {
   Badge,
   Button,
@@ -54,8 +55,11 @@ export default function QuestionList({
     [token],
   );
 
+  const pushLive = useLivePush();
+
   const { data, mutate } = useSWR<QuestionsResponse>(apiUrl, fetcherWithAuth, {
-    refreshInterval: 3000,
+    // Spento quando il canale consegna: il pannello viene avvisato.
+    refreshInterval: pushLive ? 0 : 3000,
   });
 
   const [filter, setFilter] = useState<FilterTab>('ALL');

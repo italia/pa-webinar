@@ -7,7 +7,9 @@ import {
   ForbiddenError,
   ValidationError,
 } from '@/lib/errors';
+import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { updateQuestionStatusSchema } from '@/lib/validation/schemas';
 import { isEventModerator } from '@/lib/auth/moderator';
 
@@ -57,6 +59,10 @@ export const PATCH = withErrorHandling(async (request, context) => {
     where: { id },
     data,
   });
+
+  deleteCacheByPrefix(`qa:${event.id}:`);
+    pokeLivePanel(event.id, 'qa');
+
 
   return Response.json({
     id: updated.id,

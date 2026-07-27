@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderator';
 
@@ -25,12 +26,12 @@ async function authItem(request: Request, slug: string, id: string) {
   if (!event) throw new ForbiddenError('Moderator access required');
   const item = await prisma.eventAgendaItem.findUnique({ where: { id } });
   if (!item || item.eventId !== event.id) throw new NotFoundError('Agenda item');
-  return item;
+  return { item, eventId: event.id };
 }
 
 export const PATCH = withErrorHandling(async (request, context) => {
   const { param: slug, id } = (await context.params) as { param: string; id: string };
-  await authItem(request, slug, id);
+  const { eventId } = await authItem(request, slug, id);
   const body = patchSchema.parse(await request.json());
 
   const updated = await prisma.eventAgendaItem.update({
@@ -44,12 +45,16 @@ export const PATCH = withErrorHandling(async (request, context) => {
     },
     select: { id: true, label: true, completed: true, sortOrder: true },
   });
+  pokeLivePanel(eventId, 'agenda');
+
   return Response.json(updated);
 });
 
 export const DELETE = withErrorHandling(async (request, context) => {
   const { param: slug, id } = (await context.params) as { param: string; id: string };
-  await authItem(request, slug, id);
+  const { eventId } = await authItem(request, slug, id);
   await prisma.eventAgendaItem.delete({ where: { id } });
+  pokeLivePanel(eventId, 'agenda');
+
   return new Response(null, { status: 204 });
 });

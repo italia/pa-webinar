@@ -235,6 +235,23 @@ Alternative valutate: ejabberd/XMPP (reinventare client web complicato), Matrix/
 
 **Trade-off**: serve scrivere ~200 righe di real-time noi (stream handler + subscriber lifecycle). Niente presence server-side out-of-the-box; per ora non serve — si fa con heartbeat HTTP se mai richiesta. A >5000 SSE simultanee per pod si aggiunge una replica (il fan-out Redis rende lo scale-out orizzontale gratis).
 
+### Stato dei pannelli live (Redis + SSE)
+
+Terzo canale accanto a chat (`chat:<eventId>`) e controlli (`control:<eventId>`): `live:<eventId>`, servito da **GET `/api/events/[param]/live/stream`**. Alimenta i pannelli della sala — Q&A, sondaggi, agenda, word cloud — e i flag che un moderatore può accendere durante l'evento.
+
+Sul canale viaggiano due forme, e il confine è **chi vede cosa**:
+
+| Forma | Quando | Cosa contiene |
+|---|---|---|
+| snapshot | la risposta è identica per tutti quelli che vedono l'evento | i flag della sala, lo stato dell'evento |
+| notifica di rilettura | la risposta dipende dal ruolo (Q&A, sondaggi) o contiene un campo per-utente (agenda, word cloud) | soltanto il nome del pannello cambiato |
+
+Nel secondo caso a rispondere resta la rotta REST, con le autorizzazioni di chi chiede: mandare uno snapshot dove la risposta non è uguale per tutti significherebbe tenere sul canale una seconda copia di quelle regole, e una divergenza non darebbe errori — mostrerebbe a qualcuno lo stato di qualcun altro. Un test di confine verifica che nessuna busta contenga campi per-utente.
+
+Il polling resta sotto come rete: il client spegne il proprio intervallo **solo** mentre il canale consegna, e lo riaccende se lo stream tace oltre il keepalive, se la connessione cade o se il server dichiara di non avere Redis (messaggio `hello`). Sullo stack locale senza `REDIS_URL` il comportamento è quindi identico a prima.
+
+All'apertura lo stream manda subito flag e stato letti dal database: chi entra a metà evento è allineato senza aspettare il primo cambiamento. Le buste sono sempre snapshot, mai differenze: non c'è persistenza né replay.
+
 **Availability e HA**: il deploy di default è Redis **standalone** (1 pod, 50m/128Mi richiesti, no persistence). Su spot VM un'eviction = ~30-60s di fan-out gap; i messaggi continuano a essere persistiti in Postgres, quindi non si perdono — la chat live semplicemente non propaga in tempo reale durante il reschedule. `/api/status` riporta `outage` finché Redis non torna (non `standby`/`idle`): chat real-time è trattata come dipendenza richiesta, non opzionale. Per SLA più stretti, la roadmap prevede migrazione a **Valkey** (fork BSD-3 di Redis, gestito da Linux Foundation) con `architecture: replication` — 3× risorse per failover sub-secondo, giustificato solo quando si aggiungono feature critiche come distributed rate-limiting.
 
 **Metriche esposte**:

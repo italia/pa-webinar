@@ -5,7 +5,9 @@ import {
   ForbiddenError,
   RateLimitError,
 } from '@/lib/errors';
+import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -71,6 +73,10 @@ export const POST = withErrorHandling(async (request, context) => {
       }),
     ]);
 
+    deleteCacheByPrefix(`qa:${event.id}:`);
+    pokeLivePanel(event.id, 'qa');
+
+
     return Response.json({
       upvoted: false,
       upvoteCount: Math.max(0, updated.upvoteCount),
@@ -86,6 +92,10 @@ export const POST = withErrorHandling(async (request, context) => {
       data: { upvoteCount: { increment: 1 } },
     }),
   ]);
+
+  deleteCacheByPrefix(`qa:${event.id}:`);
+    pokeLivePanel(event.id, 'qa');
+
 
   return Response.json({
     upvoted: true,

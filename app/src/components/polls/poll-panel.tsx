@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Icon } from 'design-react-kit';
 import useSWR from 'swr';
+import { useLivePush } from '@/hooks/use-live-state';
 
 import PollCard from './poll-card';
 import PollCreateForm from './poll-create-form';
@@ -52,8 +53,11 @@ export default function PollPanel({
     [token],
   );
 
+  const pushLive = useLivePush();
+
   const { data, mutate } = useSWR<PollsResponse>(apiUrl, fetcher, {
-    refreshInterval: 3000,
+    // Spento quando il canale consegna: il pannello viene avvisato.
+    refreshInterval: pushLive ? 0 : 3000,
   });
 
   const polls = data?.polls ?? [];

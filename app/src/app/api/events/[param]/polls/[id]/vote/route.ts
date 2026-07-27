@@ -8,6 +8,7 @@ import {
   AppError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { pollVoteSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
@@ -93,6 +94,9 @@ export const POST = withErrorHandling(async (request, context) => {
       optionIndex,
     },
   });
+
+  pokeLivePanel(event.id, 'polls');
+
 
   return Response.json({ ok: true, optionIndex }, { status: 201 });
 });

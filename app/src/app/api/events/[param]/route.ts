@@ -7,6 +7,7 @@ import {
   AppError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publish';
 import { reviveStatus } from '@/lib/events/lifecycle';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
@@ -446,6 +447,14 @@ export const PUT = withErrorHandling(async (request, context) => {
   if (dateChanged && event.status === 'PUBLISHED') {
     const locale = resolveLocale(request) as 'it' | 'en';
     sendDateChangeNotifications({ eventId, locale });
+  }
+
+  // Chi è in sala vede subito una funzione accesa o spenta, senza aspettare il
+  // prossimo giro di interrogazione. Solo a flag realmente cambiati: questa
+  // rotta riceve anche i salvataggi del wizard, che rispedisce tutti i campi.
+  publishFlagsIfChanged(eventId, event, updated);
+  if (updated.status !== event.status) {
+    publishEventStatus(eventId, updated.status);
   }
 
   await logAdminAction({

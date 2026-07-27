@@ -6,6 +6,7 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createWordCloudRoundSchema } from '@/lib/validation/schemas';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 
@@ -29,19 +30,26 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
   }
 
-  // Close any existing open rounds first
-  await prisma.wordCloudRound.updateMany({
-    where: { eventId: event.id, status: 'OPEN' },
-    data: { status: 'CLOSED', closedAt: new Date() },
+  // Chiusura del giro precedente e apertura del nuovo nella STESSA
+  // transazione: separate, due aperture ravvicinate (doppio click, due schede
+  // del moderatore) potevano incrociarsi e lasciare due giri aperti insieme —
+  // e la lettura ne mostra uno solo, quindi le parole finivano nell'altro.
+  const round = await prisma.$transaction(async (tx) => {
+    await tx.wordCloudRound.updateMany({
+      where: { eventId: event.id, status: 'OPEN' },
+      data: { status: 'CLOSED', closedAt: new Date() },
+    });
+    return tx.wordCloudRound.create({
+      data: {
+        eventId: event.id,
+        prompt: parsed.data.prompt,
+        duration: parsed.data.duration,
+      },
+    });
   });
 
-  const round = await prisma.wordCloudRound.create({
-    data: {
-      eventId: event.id,
-      prompt: parsed.data.prompt,
-      duration: parsed.data.duration,
-    },
-  });
+  pokeLivePanel(event.id, 'wordcloud');
+
 
   return Response.json(
     {

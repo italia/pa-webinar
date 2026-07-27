@@ -7,6 +7,7 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { submitWordCloudSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
@@ -105,6 +106,9 @@ export const POST = withErrorHandling(async (request, context) => {
       word: word.toLowerCase().trim(),
     },
   });
+
+  pokeLivePanel(event.id, 'wordcloud');
+
 
   return Response.json({ ok: true }, { status: 201 });
 });
