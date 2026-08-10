@@ -47,7 +47,7 @@
     "isomorphic-dompurify": "^3.19.0",
     "jose": "^6.2.4",
     "marked": "^18.0.7",
-    "nanoid": "^5.0.0",
+    "nanoid": "^5.1.16",
     "next": "^15.5.18",
     "next-intl": "^4.13.4",
     "nodemailer": "^9.0.1",
