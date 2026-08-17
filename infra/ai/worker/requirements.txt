@@ -18,7 +18,7 @@ torch==2.6.0
 torchvision==0.21.0
 torchaudio==2.6.0
 # pyannote / transformers behave best on numpy 1.x; avoid the 2.x ABI flip.
-numpy<2
+numpy<3
 
 # HTTP client — used to talk to the app's /api/internal/* endpoints
 # and to the in-cluster vLLM service. Sync API is plenty here: a
@@ -60,7 +60,7 @@ webvtt-py==0.5.1
 # 24 lug 2026: 4.48.3 → 4.57.6, l'ULTIMA della major 4. Chiude 7 advisory
 # (ReDoS fixate in 4.51/4.52.1/4.53, improper input validation) restando
 # compatibile con lo stack pinnato: whisperx chiede `transformers>=4.48.0`
-# (nessun cap) e 4.57.6 vuole `numpy>=1.17`, quindi il pin `numpy<2` regge.
+# (nessun cap) e 4.57.6 vuole `numpy>=1.17`, quindi il pin `numpy<3` regge.
 # NON si sale alla major 5 (romperebbe lo stack ASR): l'unico advisory che
 # resta aperto lì (GHSA-fgcw-684q-jj6r) è nel path del modello LightGlue
 # (visione), mai caricato da questo worker audio → alert dismesso not-used.
