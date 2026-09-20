@@ -12,7 +12,11 @@ metadata:
     {{- include "pa-webinar.labels" . | nindent 4 }}
     app.kubernetes.io/component: coturn
 spec:
+  {{- if .Values.coturnPodDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.coturnPodDisruptionBudget.maxUnavailable }}
+  {{- else }}
   minAvailable: {{ .Values.coturnPodDisruptionBudget.minAvailable }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: jitsi-meet
