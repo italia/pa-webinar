@@ -98,3 +98,22 @@ Uses secrets.existingSecretName (new) with fallback to app.existingSecret (legac
 {{- define "pa-webinar.secretName" -}}
 {{- .Values.secrets.existingSecretName | default .Values.app.existingSecret | default "videocall-secrets" -}}
 {{- end }}
+
+{{/*
+Un pod ucciso da una disruption volontaria (drain di un nodo, eviction,
+prelazione di una VM spot) non e` un fallimento del job: il lavoro non e`
+stato svolto male, e` stato interrotto dall'infrastruttura. Senza questa
+regola quel pod consuma il backoffLimit, il Job viene marcato Failed e
+KubeJobFailed resta acceso per tutto il ttlSecondsAfterFinished.
+L'aggiornamento automatico dell'immagine dei nodi ne produce una raffica a
+ogni giro. I fallimenti veri (exit code non zero, deadline superata)
+continuano a contare come prima.
+Richiede restartPolicy: Never sul pod template.
+*/}}
+{{- define "pa-webinar.disruptionTolerantFailurePolicy" -}}
+podFailurePolicy:
+  rules:
+    - action: Ignore
+      onPodConditions:
+        - type: DisruptionTarget
+{{- end }}
