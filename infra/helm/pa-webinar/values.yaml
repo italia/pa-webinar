@@ -449,9 +449,16 @@ podDisruptionBudget:
 # l'unico relay a evento in corso (il drain viene bloccato finche' non c'e' un rimpiazzo).
 # Per avere ANCHE la drenabilita' senza interruzioni, portare coturn a 2 repliche
 # (funziona dietro singolo LB: l'hash 5-tuple di Azure tiene ogni client sullo stesso pod).
+# Negli ambienti spenti a orario la protezione va rovesciata: con coturn fermo o a
+# una sola replica, minAvailable=1 lascia il PDB a disruptionsAllowed=0 e ogni drain
+# volontario resta appeso, compreso l'aggiornamento automatico dell'immagine dei nodi.
+# Valorizzare maxUnavailable (mutuamente esclusivo con minAvailable, il PDB non li
+# accetta entrambi) rende il pool drenabile rinunciando alla protezione.
 coturnPodDisruptionBudget:
   enabled: true
   minAvailable: 1
+  # Se valorizzato, sostituisce minAvailable.
+  maxUnavailable: ""
 
 # ── CronJobs ─────────────────────────────────────────────────
 
