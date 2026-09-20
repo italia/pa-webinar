@@ -459,6 +459,9 @@ coturnPodDisruptionBudget:
   minAvailable: 1
   # Se valorizzato, sostituisce minAvailable.
   maxUnavailable: ""
+  # IfHealthyBudget (il default di Kubernetes) impedisce di evacuare un pod non
+  # Ready quando il budget e` gia` esaurito, e inchioda drain e scale-down.
+  unhealthyPodEvictionPolicy: AlwaysAllow
 
 # ── CronJobs ─────────────────────────────────────────────────
 
