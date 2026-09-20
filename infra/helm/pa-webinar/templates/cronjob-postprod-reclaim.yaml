@@ -18,6 +18,7 @@ spec:
       # KubeJobFailed molto oltre il problema reale.
       ttlSecondsAfterFinished: {{ .Values.cronjobs.jobTtlSeconds | default 7200 }}
       backoffLimit: 1
+      {{- include "pa-webinar.disruptionTolerantFailurePolicy" . | nindent 6 }}
       activeDeadlineSeconds: 55
       template:
         metadata:
