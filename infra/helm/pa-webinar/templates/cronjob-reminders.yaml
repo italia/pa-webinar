@@ -19,7 +19,14 @@ spec:
       ttlSecondsAfterFinished: {{ .Values.cronjobs.jobTtlSeconds | default 7200 }}
       backoffLimit: 2
       {{- include "pa-webinar.disruptionTolerantFailurePolicy" . | nindent 6 }}
-      activeDeadlineSeconds: 120
+      # 240s: il lavoro vero dura secondi, ma la deadline parte dalla creazione
+      # del Job e comprende l'attesa di schedulazione e il pull dell'immagine su
+      # un nodo nuovo del pool applications, che scala fra 0 e 10. Con i valori
+      # precedenti erano 149 fallimenti DeadlineExceeded in quattordici giorni su
+      # endpoint sani, cioe' una decina di allarmi falsi al giorno.
+      # concurrencyPolicy: Forbid resta la guardia contro l'accumulo: una run
+      # lunga fa saltare i tick successivi, non li accoda.
+      activeDeadlineSeconds: 240
       template:
         metadata:
           labels:
