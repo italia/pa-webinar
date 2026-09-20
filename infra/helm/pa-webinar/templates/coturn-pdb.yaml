@@ -17,6 +17,12 @@ spec:
   {{- else }}
   minAvailable: {{ .Values.coturnPodDisruptionBudget.minAvailable }}
   {{- end }}
+  # Un pod non Ready non serve traffico: lasciarlo evacuare non toglie
+  # disponibilita` e rompe il circolo vizioso del drain, in cui il primo pod
+  # spostato fa scendere currentHealthy, porta disruptionsAllowed a 0 e da li`
+  # in poi blocca sia il drain sia lo scale-down dell'autoscaler. I pod sani
+  # restano protetti da minAvailable/maxUnavailable come prima.
+  unhealthyPodEvictionPolicy: {{ .Values.coturnPodDisruptionBudget.unhealthyPodEvictionPolicy }}
   selector:
     matchLabels:
       app.kubernetes.io/name: jitsi-meet
