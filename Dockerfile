@@ -28,7 +28,14 @@ COPY package.json package-lock.json ./
 COPY app/package.json ./app/
 COPY lobby/package.json ./lobby/
 
-RUN npm ci --ignore-scripts && npm cache clean --force
+# Le cartelle dei workspace si creano comunque: npm decide da solo se
+# annidare una dipendenza sotto il workspace o issarla alla radice, e la
+# scelta cambia a ogni aggiornamento. Senza questo, un bump che sposta
+# l'ultima dipendenza annidata alla radice fa sparire la cartella e la COPY
+# dello stage successivo fallisce — con un errore che parla di checksum e non
+# dice che il problema e' l'assenza della cartella.
+RUN npm ci --ignore-scripts && npm cache clean --force \
+    && mkdir -p app/node_modules lobby/node_modules
 
 # Copy app config files needed by both build and dev mode
 COPY app/tsconfig.json app/next.config.ts app/next-env.d.ts ./app/
