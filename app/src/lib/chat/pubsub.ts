@@ -80,8 +80,16 @@ function channel(eventId: string): string {
  */
 export async function publishChat(envelope: ChatEnvelope): Promise<number> {
   const redis = getRedis();
-  if (!redis) return 0;
-  return redis.publish(channel(envelope.eventId), JSON.stringify(envelope));
+  // `status !== 'ready'`: the client is built with `maxRetriesPerRequest:
+  // null`, so an unreachable Redis queues the command forever rather than
+  // rejecting it, leaving one never-settled promise per published message.
+  // No cap here: callers fire-and-forget this, no HTTP response waits on it.
+  if (!redis || redis.status !== 'ready') return 0;
+  try {
+    return await redis.publish(channel(envelope.eventId), JSON.stringify(envelope));
+  } catch {
+    return 0;
+  }
 }
 
 /**

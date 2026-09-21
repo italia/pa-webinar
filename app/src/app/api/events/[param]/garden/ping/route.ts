@@ -11,7 +11,8 @@
  *   3. publishes on `garden:<eventId>` so subscribers of the SSE
  *      stream see the update;
  *   4. returns the current list of peers so the client also gets a
- *      ~200 ms-fresh snapshot even if the SSE is briefly behind.
+ *      ~200 ms-fresh snapshot even if the SSE is briefly behind — or says
+ *      the snapshot is missing, which is not the same as saying it is empty.
  *
  * No auth: anyone on the live page can ping, rate-limited per IP.
  * Not persistent: positions live only in Redis for 10 s.
@@ -112,6 +113,14 @@ export const POST = withErrorHandling(async (request, context) => {
 
   await publishGardenPing(event.id, peer);
   const peers = await listGardenPeers(event.id);
+  // `degraded` is ADDITIVE: clients that don't know it read `peers` as
+  // before. It exists because an empty list and a read that didn't happen
+  // are indistinguishable on the wire, and the client reacts to them in
+  // opposite ways — to the first it takes the avatars away, to the second it
+  // has to keep them.
+  if (peers === null) {
+    return NextResponse.json({ peers: [], active: true, degraded: true });
+  }
 
   return NextResponse.json({ peers, active: true });
 });

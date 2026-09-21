@@ -56,3 +56,38 @@ export function getRedisSubscriber(): RedisClient | null {
   if (subscriber === undefined) subscriber = buildClient('subscriber');
   return subscriber;
 }
+
+/**
+ * Run a Redis command with a deadline, returning `fallback` when it expires.
+ *
+ * Needed because the client is built with `maxRetriesPerRequest: null` (see
+ * `buildClient`): a command is never rejected for timing out, it stays
+ * queued until Redis comes back. Checking `status` covers a dropped
+ * connection, not one that stays 'ready' over a network that swallows
+ * packets — there the command leaves and never returns, and what waits on it
+ * is an HTTP route.
+ *
+ * The `.catch()` on the operation is NOT redundant with the race: when the
+ * command fails AFTER the deadline has already won, nobody observes that
+ * rejection any more and it becomes an unhandled rejection, which on Node
+ * takes the process down.
+ */
+export async function withDeadline<T>(
+  op: Promise<T>,
+  ms: number,
+  fallback: T,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      op.catch(() => fallback),
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), ms);
+      }),
+    ]);
+  } finally {
+    // Cleared either way: a fast reply must not leave a pending timer
+    // holding the event loop awake.
+    clearTimeout(timer);
+  }
+}
